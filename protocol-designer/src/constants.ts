@@ -10,14 +10,19 @@ import {
   TEMPERATURE_MODULE_V2,
   THERMOCYCLER_MODULE_V1,
   HEATERSHAKER_MODULE_V1,
-  LabwareDefinition2,
-  DeckSlot as DeckDefSlot,
   THERMOCYCLER_MODULE_V2,
   MAGNETIC_BLOCK_TYPE,
   MAGNETIC_BLOCK_V1,
+  ABSORBANCE_READER_TYPE,
+  ABSORBANCE_READER_V1,
+} from '@opentrons/shared-data'
+import type {
+  LabwareDefinition2,
+  DeckSlot as DeckDefSlot,
+  ModuleType,
+  ModuleModel,
 } from '@opentrons/shared-data'
 import type { DeckSlot, WellVolumes } from './types'
-import type { ModuleType, ModuleModel } from '@opentrons/shared-data'
 
 export const getMaxVolumes = (def: LabwareDefinition2): WellVolumes =>
   mapValues(def.wells, well => well.totalLiquidVolume)
@@ -58,7 +63,7 @@ export const INITIAL_DECK_SETUP_STEP_ID = '__INITIAL_DECK_SETUP_STEP__'
 export const DEFAULT_CHANGE_TIP_OPTION: 'always' = 'always'
 // TODO: Ian 2019-06-13 don't keep these as hard-coded static values (see #3587)
 export const DEFAULT_MM_FROM_BOTTOM_ASPIRATE = 1
-export const DEFAULT_MM_FROM_BOTTOM_DISPENSE = 0.5
+export const DEFAULT_MM_FROM_BOTTOM_DISPENSE = 1
 // NOTE: in the negative Z direction, to go down from top
 export const DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP = -1
 export const DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP = 0
@@ -135,6 +140,12 @@ export const MODELS_FOR_MODULE_TYPE: Record<
       value: MAGNETIC_BLOCK_V1,
     },
   ],
+  [ABSORBANCE_READER_TYPE]: [
+    {
+      name: 'GEN1',
+      value: ABSORBANCE_READER_V1,
+    },
+  ],
 }
 
 export const DEFAULT_MODEL_FOR_MODULE_TYPE: Record<ModuleType, ModuleModel> = {
@@ -143,6 +154,7 @@ export const DEFAULT_MODEL_FOR_MODULE_TYPE: Record<ModuleType, ModuleModel> = {
   [THERMOCYCLER_MODULE_TYPE]: THERMOCYCLER_MODULE_V2,
   [HEATERSHAKER_MODULE_TYPE]: HEATERSHAKER_MODULE_V1,
   [MAGNETIC_BLOCK_TYPE]: MAGNETIC_BLOCK_V1,
+  [ABSORBANCE_READER_TYPE]: ABSORBANCE_READER_V1,
 }
 // Values for pauseAction field
 export const PAUSE_UNTIL_RESUME: 'untilResume' = 'untilResume'

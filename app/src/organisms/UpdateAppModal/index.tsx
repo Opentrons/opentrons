@@ -15,7 +15,7 @@ import {
   PrimaryButton,
   SecondaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 import {
@@ -150,7 +150,9 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
       {error != null ? (
         <LegacyModal
           title={UPDATE_ERROR}
-          onClose={() => closeModal(true)}
+          onClose={() => {
+            closeModal(true)
+          }}
           css={LEGACY_MODAL_STYLE}
         >
           <PlaceholderError errorMessage={error.message} />
@@ -166,9 +168,9 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
             alignItems={ALIGN_CENTER}
             padding={SPACING.spacing48}
           >
-            <StyledText>
+            <LegacyStyledText>
               {downloading ? t('download_update') : t('restarting_app')}
-            </StyledText>
+            </LegacyStyledText>
             <ProgressBar
               percentComplete={downloaded ? 100 : downloadPercentage}
               outerStyles={UPDATE_PROGRESS_BAR_STYLE}
@@ -179,7 +181,9 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
       {!downloading && !downloaded && error == null ? (
         <LegacyModal
           title={t('branded:opentrons_app_update_available')}
-          onClose={() => closeModal(true)}
+          onClose={() => {
+            closeModal(true)
+          }}
           closeOnOutsideClick={true}
           footer={appUpdateFooter}
           maxHeight="80%"

@@ -16,7 +16,7 @@ import {
   SPACING,
   TYPOGRAPHY,
   useLongPress,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 import { LongPressModal } from './LongPressModal'
@@ -112,7 +112,9 @@ export function PinnedProtocol(props: {
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       maxWidth={cardStyleBySize[cardSize].width}
       minWidth={cardStyleBySize[cardSize].width}
-      onClick={() => handleProtocolClick(longpress, protocol.id)}
+      onClick={() => {
+        handleProtocolClick(longpress, protocol.id)
+      }}
       overflowWrap={OVERFLOW_WRAP_ANYWHERE}
       padding={SPACING.spacing24}
       ref={longpress.ref}
@@ -132,16 +134,16 @@ export function PinnedProtocol(props: {
         width="100%"
         color={COLORS.grey60}
       >
-        <StyledText as="p">
+        <LegacyStyledText as="p">
           {lastRun !== undefined
             ? `${formatDistance(new Date(lastRun), new Date(), {
                 addSuffix: true,
               }).replace('about ', '')}`
             : t('no_history')}
-        </StyledText>
-        <StyledText as="p">
+        </LegacyStyledText>
+        <LegacyStyledText as="p">
           {formatTimeWithUtcLabel(protocol.createdAt)}
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
       {longpress.isLongPressed && (
         <LongPressModal
@@ -155,7 +157,7 @@ export function PinnedProtocol(props: {
   )
 }
 
-const ProtocolNameText = styled(StyledText)`
+const ProtocolNameText = styled(LegacyStyledText)`
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: ${(props: { cardSize: CardSizeType }) =>

@@ -15,9 +15,7 @@ import {
 } from '@opentrons/components'
 import {
   NINETY_SIX_CHANNEL,
-  PipetteName,
   SINGLE_MOUNT_PIPETTES,
-  LoadedPipette,
 } from '@opentrons/shared-data'
 
 import { SmallButton } from '../../atoms/buttons'
@@ -30,7 +28,11 @@ import { PipetteWizardFlows } from '../PipetteWizardFlows'
 import { GripperWizardFlows } from '../GripperWizardFlows'
 
 import type { InstrumentData } from '@opentrons/api-client'
-import type { GripperModel } from '@opentrons/shared-data'
+import type {
+  GripperModel,
+  PipetteName,
+  LoadedPipette,
+} from '@opentrons/shared-data'
 import type { Mount } from '../../redux/pipettes/types'
 
 export const MountItem = styled.div<{ isReady: boolean }>`
@@ -176,7 +178,9 @@ export function ProtocolInstrumentMountItem(
       {showPipetteWizardFlow ? (
         <PipetteWizardFlows
           flowType={flowType}
-          closeFlow={() => setShowPipetteWizardFlow(false)}
+          closeFlow={() => {
+            setShowPipetteWizardFlow(false)
+          }}
           selectedPipette={selectedPipette}
           mount={mount as Mount}
           pipetteInfo={props.pipetteInfo}
@@ -187,7 +191,9 @@ export function ProtocolInstrumentMountItem(
         <GripperWizardFlows
           attachedGripper={memoizedAttachedGripper}
           flowType={memoizedAttachedGripper != null ? 'RECALIBRATE' : 'ATTACH'}
-          closeFlow={() => setShowGripperWizardFlow(false)}
+          closeFlow={() => {
+            setShowGripperWizardFlow(false)
+          }}
           onComplete={props.instrumentsRefetch}
         />
       ) : null}

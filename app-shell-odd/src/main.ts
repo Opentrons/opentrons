@@ -30,7 +30,8 @@ import {
 } from './notifications'
 
 import type { BrowserWindow } from 'electron'
-import type { Dispatch, Logger } from './types'
+import type { Action, Dispatch, Logger } from './types'
+import type { LogEntry } from 'winston'
 
 /**
  * node 17 introduced a change to default IP resolving to prefer IPv6 which causes localhost requests to fail
@@ -120,7 +121,9 @@ function startUp(): void {
 
   ipcMain.on('dispatch', (_, action) => {
     log.debug('Received action via IPC from renderer', { action })
-    actionHandlers.forEach(handler => handler(action))
+    actionHandlers.forEach(handler => {
+      handler(action as Action)
+    })
   })
 
   log.silly('Global references', { mainWindow, rendererLogger })
@@ -145,7 +148,7 @@ function createRendererLogger(): Logger {
   log.info('Creating renderer logger')
 
   const logger = createLogger('renderer')
-  ipcMain.on('log', (_, info) => logger.log(info))
+  ipcMain.on('log', (_, info) => logger.log(info as LogEntry))
 
   return logger
 }

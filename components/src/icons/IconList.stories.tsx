@@ -12,9 +12,10 @@ import {
   BORDERS,
 } from '@opentrons/components'
 import { ICON_DATA_BY_NAME } from './icon-data'
-import { Icon as IconComponent, IconName } from './Icon'
+import { Icon as IconComponent } from './Icon'
 
 import type { Story, Meta } from '@storybook/react'
+import type { IconName } from './Icon'
 
 export default {
   title: 'Library/Atoms/IconList',

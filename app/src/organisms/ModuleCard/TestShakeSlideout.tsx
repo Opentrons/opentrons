@@ -16,14 +16,13 @@ import {
   PrimaryButton,
   SIZE_AUTO,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   useConditionalConfirm,
   useHoverTooltip,
 } from '@opentrons/components'
 import { getIsHeaterShakerAttached } from '../../redux/config'
 import {
-  CreateCommand,
   getModuleDisplayName,
   HS_RPM_MAX,
   HS_RPM_MIN,
@@ -41,6 +40,7 @@ import { ModuleSetupModal } from './ModuleSetupModal'
 
 import type { HeaterShakerModule, LatchStatus } from '../../redux/modules/types'
 import type {
+  CreateCommand,
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerDeactivateShakerCreateCommand,
   HeaterShakerSetAndWaitForShakeSpeedCreateCommand,
@@ -186,9 +186,9 @@ export const TestShakeSlideout = (
           />
         </Flex>
         <Flex flexDirection={DIRECTION_COLUMN} fontSize={TYPOGRAPHY.fontSizeP}>
-          <StyledText fontWeight={TYPOGRAPHY.fontWeightRegular}>
+          <LegacyStyledText fontWeight={TYPOGRAPHY.fontWeightRegular}>
             {t('heater_shaker:test_shake_slideout_banner_info')}
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
       </Flex>
       <Flex
@@ -203,21 +203,21 @@ export const TestShakeSlideout = (
           alignItems={ALIGN_CENTER}
         >
           <Flex flexDirection={DIRECTION_COLUMN} marginTop={SPACING.spacing8}>
-            <StyledText
+            <LegacyStyledText
               textTransform={TYPOGRAPHY.textTransformCapitalize}
               fontSize={TYPOGRAPHY.fontSizeLabel}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             >
               {t('labware_latch')}
-            </StyledText>
-            <StyledText
+            </LegacyStyledText>
+            <LegacyStyledText
               textTransform={TYPOGRAPHY.textTransformCapitalize}
               fontSize={TYPOGRAPHY.fontSizeLabel}
               marginTop={SPACING.spacing8}
               data-testid="TestShake_Slideout_latch_status"
             >
               {getLatchStatus(module.data.labwareLatchStatus)}
-            </StyledText>
+            </LegacyStyledText>
           </Flex>
           <TertiaryButton
             marginTop={SPACING.spacing4}
@@ -238,13 +238,13 @@ export const TestShakeSlideout = (
           ) : null}
         </Flex>
         <Divider color={COLORS.grey30} />
-        <StyledText
+        <LegacyStyledText
           fontSize={TYPOGRAPHY.fontSizeLabel}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginTop={SPACING.spacing16}
         >
           {t('shake_speed')}
-        </StyledText>
+        </LegacyStyledText>
         <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_FLEX_START}>
           <Flex
             flexDirection={DIRECTION_COLUMN}
@@ -256,7 +256,9 @@ export const TestShakeSlideout = (
               autoFocus
               units={RPM}
               value={shakeValue != null ? Math.round(shakeValue) : null}
-              onChange={e => setShakeValue(e.target.valueAsNumber)}
+              onChange={e => {
+                setShakeValue(e.target.valueAsNumber)
+              }}
               type="number"
               caption={t('min_max_rpm', {
                 min: HS_RPM_MIN,
@@ -265,10 +267,10 @@ export const TestShakeSlideout = (
               error={errorMessage}
               disabled={isShaking}
             />
-            <StyledText
+            <LegacyStyledText
               color={COLORS.grey50}
               fontSize={TYPOGRAPHY.fontSizeCaption}
-            ></StyledText>
+            ></LegacyStyledText>
           </Flex>
           <TertiaryButton
             textTransform={TYPOGRAPHY.textTransformCapitalize}
@@ -293,7 +295,9 @@ export const TestShakeSlideout = (
       </Flex>
       {showModuleSetupModal && (
         <ModuleSetupModal
-          close={() => setShowModuleSetupModal(false)}
+          close={() => {
+            setShowModuleSetupModal(false)
+          }}
           moduleDisplayName={getModuleDisplayName(module.moduleModel)}
         />
       )}
@@ -302,7 +306,9 @@ export const TestShakeSlideout = (
         marginTop={SPACING.spacing4}
         css={TYPOGRAPHY.linkPSemiBold}
         id="HeaterShaker_Attachment_Instructions"
-        onClick={() => setShowModuleSetupModal(true)}
+        onClick={() => {
+          setShowModuleSetupModal(true)
+        }}
       >
         {t('show_attachment_instructions')}
       </Link>

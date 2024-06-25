@@ -43,7 +43,10 @@ export function StagingAreaTile(props: WizardTileProps): JSX.Element | null {
     // and a cutoutFixtureId so that we don't have to string parse here to generate them
     equipment.includes('stagingArea')
   )
-  const unoccupiedStagingAreaSlots = getUnoccupiedStagingAreaSlots(modules)
+  const unoccupiedStagingAreaSlots = getUnoccupiedStagingAreaSlots(
+    modules,
+    additionalEquipment
+  )
 
   const savedStagingAreaSlots: DeckConfiguration = stagingAreaItems.flatMap(
     item => {
@@ -148,7 +151,11 @@ export function StagingAreaTile(props: WizardTileProps): JSX.Element | null {
               }
             }}
           />
-          <PrimaryButton onClick={() => proceed()}>
+          <PrimaryButton
+            onClick={() => {
+              proceed()
+            }}
+          >
             {t('application:next')}
           </PrimaryButton>
         </Flex>

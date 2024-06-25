@@ -19,7 +19,7 @@ import {
   LocationIcon,
   MODULE_ICON_NAME_BY_TYPE,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -28,8 +28,6 @@ import {
   getLabwareDefURI,
   getLabwareDisplayName,
   HEATERSHAKER_MODULE_TYPE,
-  LoadLabwareRunTimeCommand,
-  RunTimeCommand,
 } from '@opentrons/shared-data'
 import { parseInitialLoadedLabwareByAdapter } from '@opentrons/api-client'
 import {
@@ -46,10 +44,7 @@ import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostR
 import { getLabwareSetupItemGroups } from '../../pages/Protocols/utils'
 import { getProtocolModulesInfo } from '../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { getAttachedProtocolModuleMatches } from '../ProtocolSetupModulesAndDeck/utils'
-import {
-  getNestedLabwareInfo,
-  NestedLabwareInfo,
-} from '../Devices/ProtocolRun/SetupLabware/getNestedLabwareInfo'
+import { getNestedLabwareInfo } from '../Devices/ProtocolRun/SetupLabware/getNestedLabwareInfo'
 import { LabwareMapViewModal } from './LabwareMapViewModal'
 import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
 
@@ -59,10 +54,13 @@ import type {
   HeaterShakerOpenLatchCreateCommand,
   LabwareDefinition2,
   LabwareLocation,
+  LoadLabwareRunTimeCommand,
+  RunTimeCommand,
 } from '@opentrons/shared-data'
 import type { HeaterShakerModule, Modules } from '@opentrons/api-client'
 import type { LabwareSetupItem } from '../../pages/Protocols/utils'
 import type { SetupScreens } from '../../pages/ProtocolSetup'
+import type { NestedLabwareInfo } from '../Devices/ProtocolRun/SetupLabware/getNestedLabwareInfo'
 import type { AttachedProtocolModuleMatch } from '../ProtocolSetupModulesAndDeck/utils'
 
 const MODULE_REFETCH_INTERVAL_MS = 5000
@@ -227,7 +225,9 @@ export function ProtocolSetupLabware({
               deckDef={deckDef}
               attachedProtocolModuleMatches={attachedProtocolModuleMatches}
               handleLabwareClick={handleLabwareClick}
-              onCloseClick={() => setShowDeckMapModal(false)}
+              onCloseClick={() => {
+                setShowDeckMapModal(false)
+              }}
               initialLoadedLabwareByAdapter={initialLoadedLabwareByAdapter}
             />
           ) : null}
@@ -250,13 +250,13 @@ export function ProtocolSetupLabware({
                   gridGap={SPACING.spacing12}
                 >
                   <Flex gridGap={SPACING.spacing4}>{location}</Flex>
-                  <StyledText
+                  <LegacyStyledText
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     fontSize={TYPOGRAPHY.fontSize22}
                   >
                     {getLabwareDisplayName(selectedLabware)}
-                  </StyledText>
-                  <StyledText as="p" color={COLORS.grey60}>
+                  </LegacyStyledText>
+                  <LegacyStyledText as="p" color={COLORS.grey60}>
                     {selectedLabware.nickName}
                     {selectedLabwareLocation != null &&
                     selectedLabwareLocation !== 'offDeck' &&
@@ -267,7 +267,7 @@ export function ProtocolSetupLabware({
                           )?.displayName,
                         })
                       : null}
-                  </StyledText>
+                  </LegacyStyledText>
                 </Flex>
               </Flex>
             </Modal>
@@ -277,7 +277,9 @@ export function ProtocolSetupLabware({
       )}
       <ODDBackButton
         label={t('labware')}
-        onClick={() => setSetupScreen('prepare to run')}
+        onClick={() => {
+          setSetupScreen('prepare to run')
+        }}
       />
       <Flex
         flexDirection={DIRECTION_COLUMN}
@@ -292,10 +294,10 @@ export function ProtocolSetupLabware({
           lineHeight={TYPOGRAPHY.lineHeight28}
         >
           <Flex paddingLeft={SPACING.spacing16} width="10.5625rem">
-            <StyledText>{t('location')}</StyledText>
+            <LegacyStyledText>{t('location')}</LegacyStyledText>
           </Flex>
           <Flex>
-            <StyledText>{t('labware_name')}</StyledText>
+            <LegacyStyledText>{t('labware_name')}</LegacyStyledText>
           </Flex>
         </Flex>
         {[...onDeckItems, ...offDeckItems].map((labware, i) => {
@@ -320,7 +322,11 @@ export function ProtocolSetupLabware({
           ) : null
         })}
       </Flex>
-      <FloatingActionButton onClick={() => setShowDeckMapModal(true)} />
+      <FloatingActionButton
+        onClick={() => {
+          setShowDeckMapModal(true)
+        }}
+      />
     </>
   )
 }
@@ -435,9 +441,9 @@ function LabwareLatch({
       onClick={toggleLatch}
       padding={SPACING.spacing12}
     >
-      <StyledText fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+      <LegacyStyledText fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {t('protocol_setup:labware_latch')}
-      </StyledText>
+      </LegacyStyledText>
       <Flex
         width="100%"
         justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -445,9 +451,9 @@ function LabwareLatch({
       >
         {hsLatchText != null && icon != null ? (
           <>
-            <StyledText fontWeight={TYPOGRAPHY.fontWeightRegular}>
+            <LegacyStyledText fontWeight={TYPOGRAPHY.fontWeightRegular}>
               {hsLatchText}
-            </StyledText>
+            </LegacyStyledText>
             <Icon
               name={icon}
               size="2.5rem"
@@ -573,12 +579,12 @@ function RowLabware({
             justifyContent={JUSTIFY_SPACE_EVENLY}
             gridGap={SPACING.spacing4}
           >
-            <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+            <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
               {getLabwareDisplayName(definition)}
-            </StyledText>
-            <StyledText color={COLORS.grey60} as="p">
+            </LegacyStyledText>
+            <LegacyStyledText color={COLORS.grey60} as="p">
               {nickName}
-            </StyledText>
+            </LegacyStyledText>
           </Flex>
           {nestedLabwareInfo != null ? (
             <Box
@@ -590,12 +596,15 @@ function RowLabware({
           {nestedLabwareInfo != null &&
           nestedLabwareInfo?.sharedSlotId === slotName ? (
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-              <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+              <LegacyStyledText
+                as="p"
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              >
                 {nestedLabwareInfo.nestedLabwareDisplayName}
-              </StyledText>
-              <StyledText as="p" color={COLORS.grey60}>
+              </LegacyStyledText>
+              <LegacyStyledText as="p" color={COLORS.grey60}>
                 {nestedLabwareInfo.nestedLabwareNickName}
-              </StyledText>
+              </LegacyStyledText>
             </Flex>
           ) : null}
         </Flex>

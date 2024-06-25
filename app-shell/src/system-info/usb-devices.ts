@@ -260,9 +260,9 @@ export function createUsbDeviceMonitor(
   }
   if (typeof onDeviceAdd === 'function') {
     usb.on('attach', device => {
-      upstreamDeviceFromUsbDevice(device).then(devices =>
+      upstreamDeviceFromUsbDevice(device).then(devices => {
         devices.forEach(onDeviceAdd)
-      )
+      })
     })
   }
 

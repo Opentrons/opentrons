@@ -19,6 +19,7 @@ from opentrons.hardware_control.instruments.ot3.pipette_handler import (
 from opentrons_shared_data.pipette.pipette_definition import (
     PressFitPickUpTipConfiguration,
     CamActionPickUpTipConfiguration,
+    PressAndCamConfigurationValues,
 )
 
 
@@ -115,16 +116,22 @@ def test_plan_check_pick_up_tip_with_presses_argument(
         expected_array_length
     )
     decoy.when(
-        mock_pipette.pick_up_configurations.press_fit.distance_by_tip_count
-    ).then_return({1: 5})
+        mock_pipette.get_pick_up_distance_by_configuration(
+            mock_pipette.pick_up_configurations.press_fit
+        )
+    ).then_return(5)
     decoy.when(mock_pipette.pick_up_configurations.press_fit.increment).then_return(0)
     decoy.when(
-        mock_pipette.pick_up_configurations.press_fit.speed_by_tip_count
-    ).then_return({1: 10})
+        mock_pipette.get_pick_up_speed_by_configuration(
+            mock_pipette.pick_up_configurations.press_fit
+        )
+    ).then_return(10)
     decoy.when(mock_pipette.config.end_tip_action_retract_distance_mm).then_return(0)
     decoy.when(
-        mock_pipette.pick_up_configurations.press_fit.current_by_tip_count
-    ).then_return({1: 1.0})
+        mock_pipette.get_pick_up_current_by_configuration(
+            mock_pipette.pick_up_configurations.press_fit
+        )
+    ).then_return(1.0)
     decoy.when(mock_pipette.nozzle_manager.current_configuration.tip_count).then_return(
         1
     )
@@ -158,28 +165,40 @@ def test_plan_check_pick_up_tip_with_presses_argument_ot3(
     mount = OT3Mount.LEFT
     presses = presses_input
     increment = 1
+    pac_values = PressAndCamConfigurationValues(
+        speed=5.5, distance=10, current=1.0, tipOverlaps={"v0": {"default": 1.0}}
+    )
 
     decoy.when(mock_pipette_ot3.has_tip).then_return(False)
-    decoy.when(
-        mock_pipette_ot3.get_pick_up_configuration_for_tip_count(channels)
-    ).then_return(
+    decoy.when(mock_pipette_ot3.get_pick_up_configuration()).then_return(
         CamActionPickUpTipConfiguration(
-            distance=10,
-            speed=5.5,
             prep_move_distance=19.0,
             prep_move_speed=10,
-            currentByTipCount={96: 1.0},
+            configurationsByNozzleMap={"Full": {"default": pac_values}},
             connectTiprackDistanceMM=8,
         )
         if channels == 96
         else PressFitPickUpTipConfiguration(
             presses=2,
             increment=increment,
-            distanceByTipCount={channels: 10},
-            speedByTipCount={channels: 5.5},
-            currentByTipCount={channels: 1.0},
+            configurationsByNozzleMap={"Full": {"default": pac_values}},
         )
     )
+    decoy.when(
+        mock_pipette_ot3.get_pick_up_distance_by_configuration(
+            mock_pipette_ot3.get_pick_up_configuration()
+        )
+    ).then_return(10)
+    decoy.when(
+        mock_pipette_ot3.get_pick_up_speed_by_configuration(
+            mock_pipette_ot3.get_pick_up_configuration()
+        )
+    ).then_return(5.5)
+    decoy.when(
+        mock_pipette_ot3.get_pick_up_current_by_configuration(
+            mock_pipette_ot3.get_pick_up_configuration()
+        )
+    ).then_return(1.0)
     decoy.when(mock_pipette_ot3.plunger_motor_current.run).then_return(1)
     decoy.when(mock_pipette_ot3.config.quirks).then_return([])
     decoy.when(mock_pipette_ot3.channels).then_return(channels)

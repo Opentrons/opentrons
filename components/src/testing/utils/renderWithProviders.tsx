@@ -5,11 +5,11 @@ import { QueryClient, QueryClientProvider } from 'react-query'
 import { I18nextProvider } from 'react-i18next'
 import { Provider } from 'react-redux'
 import { vi } from 'vitest'
-import { render, RenderResult } from '@testing-library/react'
+import { render } from '@testing-library/react'
 import { createStore } from 'redux'
 
+import type { RenderResult, RenderOptions } from '@testing-library/react'
 import type { PreloadedState, Store } from 'redux'
-import type { RenderOptions } from '@testing-library/react'
 
 export interface RenderWithProvidersOptions<State> extends RenderOptions {
   initialState?: State

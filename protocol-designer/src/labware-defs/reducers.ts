@@ -1,19 +1,20 @@
 import omit from 'lodash/omit'
-import { Reducer, combineReducers } from 'redux'
+import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 import pickBy from 'lodash/pickBy'
 import {
   getLabwareDefURI,
   getLabwareDefIsStandard,
 } from '@opentrons/shared-data'
-import { Action } from '../types'
-import { LabwareUploadMessage, LabwareDefByDefURI } from './types'
-import {
+import type { Action } from '../types'
+import type { LabwareUploadMessage, LabwareDefByDefURI } from './types'
+import type {
   CreateCustomLabwareDef,
   LabwareUploadMessageAction,
   ReplaceCustomLabwareDef,
 } from './actions'
-import { LoadFileAction } from '../load-file'
+import type { Reducer } from 'redux'
+import type { LoadFileAction } from '../load-file'
 // @ts-expect-error(sa, 2021-6-20): cannot use string literals as action type
 // TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
 const customDefs: Reducer<LabwareDefByDefURI, Action> = handleActions(

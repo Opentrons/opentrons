@@ -81,9 +81,14 @@ def test_load_old_overrides_regression(
         override_configuration_path,
         "P20SV222021040709",
     )
-    assert configs.pick_up_tip_configurations.press_fit.current_by_tip_count == {
-        1: 0.15
-    }
+    assert (
+        configs.pick_up_tip_configurations.press_fit.configuration_by_nozzle_map[
+            list(
+                configs.pick_up_tip_configurations.press_fit.configuration_by_nozzle_map.keys()
+            )[0]
+        ]["default"].current
+        == 0.15
+    )
 
 
 def test_list_mutable_configs_unknown_pipette_id(
@@ -269,9 +274,16 @@ def test_load_with_overrides(
 
     if serial_number == TEST_SERIAL_NUMBER:
         dict_loaded_configs = loaded_base_configurations.dict(by_alias=True)
-        dict_loaded_configs["pickUpTipConfigurations"]["pressFit"][
-            "speedByTipCount"
-        ] = {1: 5.0, 2: 5.0, 3: 5.0, 4: 5.0, 5: 5.0, 6: 5.0, 7: 5.0, 8: 5.0}
+        for map_key in dict_loaded_configs["pickUpTipConfigurations"]["pressFit"][
+            "configurationsByNozzleMap"
+        ]:
+            for tip_key in dict_loaded_configs["pickUpTipConfigurations"]["pressFit"][
+                "configurationsByNozzleMap"
+            ][map_key]:
+                dict_loaded_configs["pickUpTipConfigurations"]["pressFit"][
+                    "configurationsByNozzleMap"
+                ][map_key][tip_key]["speed"] = 5.0
+
         updated_configurations_dict = updated_configurations.dict(by_alias=True)
         assert set(dict_loaded_configs.pop("quirks")) == set(
             updated_configurations_dict.pop("quirks")

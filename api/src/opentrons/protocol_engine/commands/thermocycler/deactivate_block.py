@@ -5,7 +5,8 @@ from typing_extensions import Literal, Type
 
 from pydantic import BaseModel, Field
 
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ...errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.state import StateView
@@ -26,7 +27,7 @@ class DeactivateBlockResult(BaseModel):
 
 
 class DeactivateBlockImpl(
-    AbstractCommandImpl[DeactivateBlockParams, DeactivateBlockResult]
+    AbstractCommandImpl[DeactivateBlockParams, SuccessData[DeactivateBlockResult, None]]
 ):
     """Execution implementation of a Thermocycler's deactivate block command."""
 
@@ -39,7 +40,9 @@ class DeactivateBlockImpl(
         self._state_view = state_view
         self._equipment = equipment
 
-    async def execute(self, params: DeactivateBlockParams) -> DeactivateBlockResult:
+    async def execute(
+        self, params: DeactivateBlockParams
+    ) -> SuccessData[DeactivateBlockResult, None]:
         """Unset a Thermocycler's target block temperature."""
         thermocycler_state = self._state_view.modules.get_thermocycler_module_substate(
             params.moduleId
@@ -51,10 +54,12 @@ class DeactivateBlockImpl(
         if thermocycler_hardware is not None:
             await thermocycler_hardware.deactivate_block()
 
-        return DeactivateBlockResult()
+        return SuccessData(public=DeactivateBlockResult(), private=None)
 
 
-class DeactivateBlock(BaseCommand[DeactivateBlockParams, DeactivateBlockResult]):
+class DeactivateBlock(
+    BaseCommand[DeactivateBlockParams, DeactivateBlockResult, ErrorOccurrence]
+):
     """A command to unset a Thermocycler's target block temperature."""
 
     commandType: DeactivateBlockCommandType = "thermocycler/deactivateBlock"

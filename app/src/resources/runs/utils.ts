@@ -1,11 +1,12 @@
-import * as React from 'react'
 import { format } from 'date-fns'
+
+import type * as React from 'react'
+import type { UseMutateAsyncFunction } from 'react-query'
 import type { CommandData } from '@opentrons/api-client'
 import type { CreateCommand } from '@opentrons/shared-data'
+import type { CreateLiveCommandMutateParams } from '@opentrons/react-api-client/src/runs/useCreateLiveCommandMutation'
+import type { ModulePrepCommandsType } from '../../organisms/Devices/getModulePrepCommands'
 import type { CreateMaintenanceCommand, CreateRunCommand } from './hooks'
-import type { UseMutateAsyncFunction } from 'react-query'
-import { CreateLiveCommandMutateParams } from '@opentrons/react-api-client/src/runs/useCreateLiveCommandMutation'
-import { ModulePrepCommandsType } from '../../organisms/Devices/getModulePrepCommands'
 
 export const chainRunCommandsRecursive = (
   commands: CreateCommand[],
@@ -13,9 +14,11 @@ export const chainRunCommandsRecursive = (
   continuePastCommandFailure: boolean = true,
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
 ): Promise<CommandData[]> => {
-  if (commands.length < 1)
+  if (commands.length < 1) {
     return Promise.reject(new Error('no commands to execute'))
+  }
   setIsLoading(true)
+
   return createRunCommand({
     command: commands[0],
     waitUntilComplete: true,
@@ -57,9 +60,11 @@ export const chainLiveCommandsRecursive = (
   continuePastCommandFailure: boolean = true,
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
 ): Promise<CommandData[]> => {
-  if (commands.length < 1)
+  if (commands.length < 1) {
     return Promise.reject(new Error('no commands to execute'))
+  }
   setIsLoading(true)
+
   return createLiveCommand({
     command: commands[0],
     waitUntilComplete: true,
@@ -98,9 +103,11 @@ export const chainMaintenanceCommandsRecursive = (
   continuePastCommandFailure: boolean = true,
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
 ): Promise<CommandData[]> => {
-  if (commands.length < 1)
+  if (commands.length < 1) {
     return Promise.reject(new Error('no commands to execute'))
+  }
   setIsLoading(true)
+
   return createMaintenanceCommand({
     maintenanceRunId: maintenanceRunId,
     command: commands[0],
@@ -144,4 +151,19 @@ export const formatTimeWithUtcLabel = (time: string | null): string => {
   return typeof time === 'string' && dateIsValid(time)
     ? `${format(new Date(time), 'M/d/yy HH:mm')} ${UTC_LABEL}`
     : `${time} ${UTC_LABEL}`
+}
+
+// Visit the command, setting the command intent to "fixit" if a failedCommandId is supplied.
+export const setCommandIntent = (
+  command: CreateCommand,
+  failedCommandId?: string
+): CreateCommand => {
+  const isCommandWithFixitIntent = failedCommandId != null
+  if (isCommandWithFixitIntent) {
+    return {
+      ...command,
+      intent: 'fixit',
+    }
+  }
+  return command
 }

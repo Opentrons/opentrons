@@ -24,7 +24,6 @@ import {
 import {
   aspirate,
   configureForVolume,
-  configureNozzleLayout,
   delay,
   dropTip,
   moveToWell,
@@ -293,6 +292,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
             pipette: args.pipette,
             dropTipLocation,
             tipRack: args.tipRack,
+            nozzles: args.nozzles ?? undefined,
           }),
         ]
       }
@@ -486,20 +486,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
       const dropTipAfterDispenseAirGap =
         airGapAfterDispenseCommands.length > 0 ? dropTipCommand : []
 
-      const stateNozzles = prevRobotState.pipettes[args.pipette].nozzles
-      const configureNozzleLayoutCommand: CurriedCommandCreator[] =
-        //  only emit the command if previous nozzle state is different
-        is96Channel && args.nozzles != null && args.nozzles !== stateNozzles
-          ? [
-              curryCommandCreator(configureNozzleLayout, {
-                nozzles: args.nozzles,
-                pipetteId: args.pipette,
-              }),
-            ]
-          : []
-
       return [
-        ...configureNozzleLayoutCommand,
         ...tipCommands,
         ...configureForVolumeCommand,
         ...mixBeforeCommands,

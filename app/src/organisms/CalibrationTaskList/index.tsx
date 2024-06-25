@@ -12,7 +12,7 @@ import {
   JUSTIFY_CENTER,
   PrimaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -110,9 +110,9 @@ export function CalibrationTaskList({
   return (
     <LegacyModal
       title={`${robotName} ${t('calibration_dashboard')}`}
-      onClose={() =>
+      onClose={() => {
         history.push(`/devices/${robotName}/robot-settings/calibration`)
-      }
+      }}
       fullPage
       backgroundColor={COLORS.grey10}
       childrenPadding={`${SPACING.spacing16} ${SPACING.spacing24} ${SPACING.spacing24} ${SPACING.spacing4}`}
@@ -137,16 +137,16 @@ export function CalibrationTaskList({
             ) : (
               <Icon name="ot-check" size="3rem" color={COLORS.green50} />
             )}
-            <StyledText as="h1" marginTop={SPACING.spacing24}>
+            <LegacyStyledText as="h1" marginTop={SPACING.spacing24}>
               {exitBeforeDeckConfigCompletion
                 ? t('using_current_calibrations')
                 : t('calibrations_complete')}
-            </StyledText>
+            </LegacyStyledText>
             <PrimaryButton
               marginTop={SPACING.spacing24}
-              onClick={() =>
+              onClick={() => {
                 history.push(`/devices/${robotName}/robot-settings/calibration`)
-              }
+              }}
             >
               {t('device_settings:done')}
             </PrimaryButton>
@@ -160,9 +160,9 @@ export function CalibrationTaskList({
             padding={SPACING.spacing16}
             paddingBottom={SPACING.spacing32}
           >
-            <StyledText css={TYPOGRAPHY.h2SemiBold}>
+            <LegacyStyledText css={TYPOGRAPHY.h2SemiBold}>
               {t('calibration_status')}
-            </StyledText>
+            </LegacyStyledText>
             <StatusLabel
               status={statusLabelText}
               backgroundColor={statusLabelBackgroundColor}
@@ -176,7 +176,9 @@ export function CalibrationTaskList({
             activeIndex={activeIndex}
             taskList={taskList}
             taskListStatus={taskListStatus}
-            generalTaskClickHandler={() => setHasLaunchedWizard(true)}
+            generalTaskClickHandler={() => {
+              setHasLaunchedWizard(true)
+            }}
             generalTaskDisabledReason={generalTaskDisabledReason}
           />
         </>

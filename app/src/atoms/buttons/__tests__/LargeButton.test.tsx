@@ -24,9 +24,6 @@ describe('LargeButton', () => {
     render(props)
     fireEvent.click(screen.getByText('large button'))
     expect(props.onClick).toHaveBeenCalled()
-    expect(screen.getByRole('button')).toHaveStyle(
-      `background-color: ${COLORS.blue60}`
-    )
   })
   it('renders the alert button', () => {
     props = {
@@ -35,7 +32,7 @@ describe('LargeButton', () => {
     }
     render(props)
     expect(screen.getByRole('button')).toHaveStyle(
-      `background-color: ${COLORS.red40}`
+      `background-color: ${COLORS.red35}`
     )
   })
   it('renders the secondary button', () => {
@@ -45,9 +42,32 @@ describe('LargeButton', () => {
     }
     render(props)
     expect(screen.getByRole('button')).toHaveStyle(
-      `background-color: ${COLORS.blue40}`
+      `background-color: ${COLORS.blue35}`
     )
   })
+
+  it('renders the onColor button', () => {
+    props = {
+      ...props,
+      buttonType: 'onColor',
+    }
+    render(props)
+    expect(screen.getByRole('button')).toHaveStyle(
+      `background-color: ${COLORS.transparent}`
+    )
+  })
+
+  it('renders the alertAlt button', () => {
+    props = {
+      ...props,
+      buttonType: 'alertAlt',
+    }
+    render(props)
+    expect(screen.getByRole('button')).toHaveStyle(
+      `background-color: ${COLORS.white}`
+    )
+  })
+
   it('renders the button as disabled', () => {
     props = {
       ...props,

@@ -10,7 +10,7 @@ import {
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -48,7 +48,9 @@ export function NetworkDetailsModal({
     <Modal
       modalSize="medium"
       header={modalHeader}
-      onOutsideClick={() => setShowNetworkDetailModal(false)}
+      onOutsideClick={() => {
+        setShowNetworkDetailModal(false)
+      }}
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}
@@ -80,12 +82,12 @@ function ListItem({ itemName, itemValue }: ListItemProps): JSX.Element {
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       borderRadius={BORDERS.borderRadius8}
     >
-      <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+      <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {itemName}
-      </StyledText>
-      <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightRegular}>
+      </LegacyStyledText>
+      <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightRegular}>
         {itemValue}
-      </StyledText>
+      </LegacyStyledText>
     </Flex>
   )
 }

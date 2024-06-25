@@ -1,6 +1,10 @@
 import { beforeEach, describe, it, expect } from 'vitest'
 import flatMap from 'lodash/flatMap'
-import { FIXED_TRASH_ID } from '@opentrons/shared-data'
+import {
+  FIXED_TRASH_ID,
+  fixtureTiprack300ul,
+  getLabwareDefURI,
+} from '@opentrons/shared-data'
 import { mix } from '../commandCreators/compound/mix'
 import {
   getRobotStateWithTipStandard,
@@ -18,6 +22,7 @@ import {
   makeTouchTipHelper,
   delayCommand,
 } from '../fixtures'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   ChangeTipOptions,
   InvariantContext,
@@ -41,7 +46,7 @@ beforeEach(() => {
     commandCreatorFnName: 'mix',
     name: 'mix test',
     description: 'test blah blah',
-    tipRack: 'tiprack1Id',
+    tipRack: getLabwareDefURI(fixtureTiprack300ul as LabwareDefinition2),
     pipette: DEFAULT_PIPETTE,
     labware: SOURCE_LABWARE,
 

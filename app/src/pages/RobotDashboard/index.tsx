@@ -7,7 +7,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -19,9 +19,9 @@ import {
 import { getOnDeviceDisplaySettings } from '../../redux/config'
 import { AnalyticsOptInModal } from './AnalyticsOptInModal'
 import { WelcomeModal } from './WelcomeModal'
-import { RunData } from '@opentrons/api-client'
 import { ServerInitializing } from '../../organisms/OnDeviceDisplay/RobotDashboard/ServerInitializing'
 import { useNotifyAllRunsQuery } from '../../resources/runs'
+import type { RunData } from '@opentrons/api-client'
 
 export const MAXIMUM_RECENT_RUN_PROTOCOLS = 8
 
@@ -65,13 +65,13 @@ export function RobotDashboard(): JSX.Element {
   } else if (recentRunsOfUniqueProtocols.length > 0) {
     contents = (
       <>
-        <StyledText
+        <LegacyStyledText
           as="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           color={COLORS.grey60}
         >
           {t('run_again')}
-        </StyledText>
+        </LegacyStyledText>
         <RecentRunProtocolCarousel
           recentRunsOfUniqueProtocols={recentRunsOfUniqueProtocols}
         />

@@ -12,7 +12,8 @@ from .pipetting_common import (
     FlowRateMixin,
     BaseLiquidHandlingResult,
 )
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
 from ..errors.exceptions import PipetteNotReadyToAspirateError
 
 if TYPE_CHECKING:
@@ -36,7 +37,7 @@ class AspirateInPlaceResult(BaseLiquidHandlingResult):
 
 
 class AspirateInPlaceImplementation(
-    AbstractCommandImpl[AspirateInPlaceParams, AspirateInPlaceResult]
+    AbstractCommandImpl[AspirateInPlaceParams, SuccessData[AspirateInPlaceResult, None]]
 ):
     """AspirateInPlace command implementation."""
 
@@ -53,7 +54,9 @@ class AspirateInPlaceImplementation(
         self._hardware_api = hardware_api
         self._command_note_adder = command_note_adder
 
-    async def execute(self, params: AspirateInPlaceParams) -> AspirateInPlaceResult:
+    async def execute(
+        self, params: AspirateInPlaceParams
+    ) -> SuccessData[AspirateInPlaceResult, None]:
         """Aspirate without moving the pipette.
 
         Raises:
@@ -77,10 +80,12 @@ class AspirateInPlaceImplementation(
             command_note_adder=self._command_note_adder,
         )
 
-        return AspirateInPlaceResult(volume=volume)
+        return SuccessData(public=AspirateInPlaceResult(volume=volume), private=None)
 
 
-class AspirateInPlace(BaseCommand[AspirateInPlaceParams, AspirateInPlaceResult]):
+class AspirateInPlace(
+    BaseCommand[AspirateInPlaceParams, AspirateInPlaceResult, ErrorOccurrence]
+):
     """AspirateInPlace command model."""
 
     commandType: AspirateInPlaceCommandType = "aspirateInPlace"

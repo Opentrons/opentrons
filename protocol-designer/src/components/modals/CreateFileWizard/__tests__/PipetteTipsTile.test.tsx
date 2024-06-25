@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { fireEvent, screen, cleanup } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { fireEvent, screen } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import {
   fixture_tiprack_10_ul,
@@ -51,6 +51,7 @@ const mockWizardTileProps: Partial<WizardTileProps> = {
   proceed: vi.fn(),
   watch: vi.fn((name: keyof typeof values) => values[name]) as any,
   getValues: vi.fn(() => values) as any,
+  setValue: vi.fn(),
 }
 
 const fixtureTipRack10ul = {
@@ -90,9 +91,6 @@ describe('PipetteTipsTile', () => {
         value: 'opentrons/opentrons_flex_96_tiprack_1000ul/1',
       },
     ])
-  })
-  afterEach(() => {
-    cleanup()
   })
   it('renders default tiprack options for 1000uL flex pipette and btn ctas work', () => {
     render(props)

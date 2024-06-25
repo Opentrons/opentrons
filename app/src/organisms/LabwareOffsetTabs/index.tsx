@@ -8,7 +8,7 @@ import {
   Flex,
   RoundTab,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 import type { StyleProps } from '@opentrons/components'
@@ -45,21 +45,27 @@ export function LabwareOffsetTabs({
       <Flex gridGap={SPACING.spacing4} marginY={SPACING.spacing8}>
         <RoundTab
           isCurrent={currentTab === 'table'}
-          onClick={() => setCurrentTab('table')}
+          onClick={() => {
+            setCurrentTab('table')
+          }}
         >
-          <StyledText>{t('table_view')}</StyledText>
+          <LegacyStyledText>{t('table_view')}</LegacyStyledText>
         </RoundTab>
         <RoundTab
           isCurrent={currentTab === 'jupyter'}
-          onClick={() => setCurrentTab('jupyter')}
+          onClick={() => {
+            setCurrentTab('jupyter')
+          }}
         >
-          <StyledText>{t('jupyter_notebook')}</StyledText>
+          <LegacyStyledText>{t('jupyter_notebook')}</LegacyStyledText>
         </RoundTab>
         <RoundTab
           isCurrent={currentTab === 'cli'}
-          onClick={() => setCurrentTab('cli')}
+          onClick={() => {
+            setCurrentTab('cli')
+          }}
         >
-          <StyledText>{t('cli_ssh')}</StyledText>
+          <LegacyStyledText>{t('cli_ssh')}</LegacyStyledText>
         </RoundTab>
       </Flex>
       <Box

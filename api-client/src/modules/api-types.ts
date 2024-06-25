@@ -1,6 +1,8 @@
-import { ModuleType } from '@opentrons/shared-data'
-
-import type { Coordinates, ModuleModel } from '@opentrons/shared-data'
+import type {
+  ModuleType,
+  Coordinates,
+  ModuleModel,
+} from '@opentrons/shared-data'
 
 type PortGroup = 'main' | 'left' | 'right' | 'front' | 'unknown'
 interface PhysicalPort {
@@ -34,6 +36,7 @@ export interface ApiBaseModule {
   firmwareVersion: string
   hasAvailableUpdate: boolean
   usbPort: PhysicalPort
+  compatibleWithRobot?: boolean
   moduleOffset?: ModuleOffset
 }
 
@@ -77,6 +80,12 @@ export interface HeaterShakerData {
   errorDetails: string | null
   status: HeaterShakerStatus
 }
+export interface AbsorbanceReaderData {
+  lidStatus: 'open' | 'closed' | 'unknown'
+  platePresence: 'present' | 'absent' | 'unknown'
+  sampleWavelength: number | null
+  status: AbsorbanceReaderStatus
+}
 
 export type TemperatureStatus =
   | 'idle'
@@ -109,3 +118,5 @@ export type LatchStatus =
   | 'idle_closed'
   | 'idle_unknown'
   | 'unknown'
+
+export type AbsorbanceReaderStatus = 'idle' | 'measuring' | 'error'

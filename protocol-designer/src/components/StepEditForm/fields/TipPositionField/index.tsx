@@ -9,7 +9,6 @@ import {
   InputField,
   Tooltip,
   useHoverTooltip,
-  UseHoverTooltipTargetProps,
 } from '@opentrons/components'
 import { getWellsDepth, getWellDimension } from '@opentrons/shared-data'
 import {
@@ -25,6 +24,7 @@ import type {
   TipYOffsetFields,
   TipZOffsetFields,
 } from '../../../../form-types'
+import type { UseHoverTooltipTargetProps } from '@opentrons/components'
 import type { FieldPropsByName } from '../../types'
 import type { PositionSpecs } from './TipPositionModal'
 
@@ -168,7 +168,13 @@ export function TipPositionField(props: TipPositionFieldProps): JSX.Element {
       >
         {yField != null && xField != null ? (
           <Flex
-            onClick={disabled != null ? () => handleOpen(true) : () => {}}
+            onClick={
+              disabled != null
+                ? () => {
+                    handleOpen(true)
+                  }
+                : () => {}
+            }
             id={`TipPositionIcon_${zName}`}
             data-testid={`TipPositionIcon_${zName}`}
             width="5rem"
@@ -184,7 +190,9 @@ export function TipPositionField(props: TipPositionFieldProps): JSX.Element {
             disabled={disabled}
             className={stepFormStyles.small_field}
             readOnly
-            onClick={() => handleOpen(false)}
+            onClick={() => {
+              handleOpen(false)
+            }}
             value={String(zValue)}
             isIndeterminate={isIndeterminate}
             units={t('units.millimeter')}

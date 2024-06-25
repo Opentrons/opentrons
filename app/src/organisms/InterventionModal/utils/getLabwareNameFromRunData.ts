@@ -1,11 +1,8 @@
-import {
-  RunTimeCommand,
-  getLabwareDefURI,
-  getLabwareDisplayName,
-} from '@opentrons/shared-data'
-import { getLoadedLabware } from '../../CommandText/utils/accessors'
-import { getLabwareDefinitionsFromCommands } from '../../LabwarePositionCheck/utils/labware'
+import { getLabwareDefURI, getLabwareDisplayName } from '@opentrons/shared-data'
+import { getLoadedLabware } from '../../../molecules/Command/utils/accessors'
+import { getLabwareDefinitionsFromCommands } from '../../../molecules/Command/utils/getLabwareDefinitionsFromCommands'
 
+import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { RunData } from '@opentrons/api-client'
 
 const FIXED_TRASH_DEF_URIS = [

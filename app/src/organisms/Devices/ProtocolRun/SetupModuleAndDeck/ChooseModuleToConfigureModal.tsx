@@ -13,7 +13,7 @@ import {
   Icon,
   SPACING,
   SecondaryButton,
-  StyledText,
+  LegacyStyledText,
   TEXT_ALIGN_CENTER,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -118,7 +118,9 @@ export const ChooseModuleToConfigureModal = (
   const contents =
     fixtureOptions.length > 0 ? (
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
-        <StyledText as="p">{t('add_this_deck_hardware')}</StyledText>
+        <LegacyStyledText as="p">
+          {t('add_this_deck_hardware')}
+        </LegacyStyledText>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
           {fixtureOptions}
         </Flex>
@@ -155,9 +157,12 @@ export const ChooseModuleToConfigureModal = (
             gridGap={SPACING.spacing10}
             alignItems={ALIGN_CENTER}
           >
-            <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+            <LegacyStyledText
+              as="h3"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            >
               {t('add_to_slot', { slotName: displaySlotName })}
-            </StyledText>
+            </LegacyStyledText>
           </Flex>
         }
         onClose={onCloseClick}
@@ -225,13 +230,13 @@ function NoUnconfiguredModules(props: NoUnconfiguredModulesProps): JSX.Element {
         name="ot-spinner"
         spin
       />
-      <StyledText
+      <LegacyStyledText
         as={isOnDevice ? 'h4' : 'p'}
         color={COLORS.grey60}
         textAlign={TEXT_ALIGN_CENTER}
       >
         {t('plug_in_module_to_configure', { module: moduleDisplayName })}
-      </StyledText>
+      </LegacyStyledText>
     </Flex>
   )
   return (
@@ -241,22 +246,22 @@ function NoUnconfiguredModules(props: NoUnconfiguredModulesProps): JSX.Element {
     >
       {configuredModuleMatches.length > 0 ? (
         <>
-          <StyledText as="p">
+          <LegacyStyledText as="p">
             {t('there_are_other_configured_modules', {
               module: moduleDisplayName,
             })}
-          </StyledText>
+          </LegacyStyledText>
           {loadingBlock}
           {exitButton}
         </>
       ) : (
         <>
-          <StyledText as="p">
+          <LegacyStyledText as="p">
             {t('there_are_no_unconfigured_modules', {
               module: moduleDisplayName,
               slot: displaySlotName,
             })}
-          </StyledText>
+          </LegacyStyledText>
           {loadingBlock}
         </>
       )}

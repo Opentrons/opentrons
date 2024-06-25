@@ -1,5 +1,5 @@
-import { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../constants'
-import {
+import type { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../constants'
+import type {
   CommandCreatorArgs,
   MoveLabwareArgs,
   PauseArgs,
@@ -48,6 +48,7 @@ export interface SourceDestData {
   postIngreds: WellIngredientVolumeData
 }
 export interface SubstepTimelineFrame {
+  isAirGap?: boolean
   substepIndex?: number
   activeTips: TipLocation | null | undefined
   source?: SourceDestData

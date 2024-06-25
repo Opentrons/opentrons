@@ -171,18 +171,16 @@ _dist-collect-artifacts:
 # development
 #####################################################################
 
-.PHONY: clean-dev-autoupdate
-clean-dev-autoupdate:
-	rm -f ./dev-app-update.yml
 
-dev-app-update.yml:
+.PHONY: dev-app-update-file
+dev-app-update-file:
 	cp ./dev-app-update-$(OPENTRONS_PROJECT).yml ./dev-app-update.yml
 
 
 .PHONY: dev
 dev: export NODE_ENV := development
 dev: export OPENTRONS_PROJECT := $(OPENTRONS_PROJECT)
-dev: clean-dev-autoupdate ./dev-app-update.yml
+dev: dev-app-update-file
 	vite build
 	$(electron)
 

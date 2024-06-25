@@ -58,7 +58,9 @@ export const ContextMenu = (props: Props): JSX.Element => {
 
   React.useEffect(() => {
     global.addEventListener('click', handleClick)
-    return () => global.removeEventListener('click', handleClick)
+    return () => {
+      global.removeEventListener('click', handleClick)
+    }
   })
 
   const makeHandleContextMenu = (stepId: StepIdType) => (event: MouseEvent) => {

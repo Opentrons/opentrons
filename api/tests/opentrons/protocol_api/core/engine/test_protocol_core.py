@@ -44,6 +44,7 @@ from opentrons.protocol_engine import (
     commands,
     LabwareOffsetVector,
 )
+from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_engine.types import (
     Liquid as PE_Liquid,
@@ -248,10 +249,12 @@ def test_load_instrument_pre_219(
 ) -> None:
     """It should issue a LoadPipette command."""
     decoy.when(
-        mock_engine_client.load_pipette(
-            pipette_name=PipetteNameType.P300_SINGLE,
-            mount=MountType.LEFT,
-            tip_overlap_version="v0",
+        mock_engine_client.execute_command_without_recovery(
+            cmd.LoadPipetteParams(
+                pipetteName=PipetteNameType.P300_SINGLE,
+                mount=MountType.LEFT,
+                tipOverlapNotAfterVersion="v0",
+            )
         )
     ).then_return(commands.LoadPipetteResult(pipetteId="cool-pipette"))
 
@@ -282,10 +285,12 @@ def test_load_instrument_post_219(
 ) -> None:
     """It should issue a LoadPipette command."""
     decoy.when(
-        mock_engine_client.load_pipette(
-            pipette_name=PipetteNameType.P300_SINGLE,
-            mount=MountType.LEFT,
-            tip_overlap_version="v1",
+        mock_engine_client.execute_command_without_recovery(
+            cmd.LoadPipetteParams(
+                pipetteName=PipetteNameType.P300_SINGLE,
+                mount=MountType.LEFT,
+                tipOverlapNotAfterVersion="v1",
+            )
         )
     ).then_return(commands.LoadPipetteResult(pipetteId="cool-pipette"))
 
@@ -327,12 +332,14 @@ def test_load_labware(
     ).then_return(("some_namespace", 9001))
 
     decoy.when(
-        mock_engine_client.load_labware(
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
-            load_name="some_labware",
-            display_name="some_display_name",
-            namespace="some_namespace",
-            version=9001,
+        mock_engine_client.execute_command_without_recovery(
+            cmd.LoadLabwareParams(
+                location=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
+                loadName="some_labware",
+                displayName="some_display_name",
+                namespace="some_namespace",
+                version=9001,
+            )
         )
     ).then_return(
         commands.LoadLabwareResult(
@@ -399,12 +406,14 @@ def test_load_labware_on_staging_slot(
     ).then_return(("some_namespace", 9001))
 
     decoy.when(
-        mock_engine_client.load_labware(
-            location=AddressableAreaLocation(addressableAreaName="B4"),
-            load_name="some_labware",
-            display_name="some_display_name",
-            namespace="some_namespace",
-            version=9001,
+        mock_engine_client.execute_command_without_recovery(
+            cmd.LoadLabwareParams(
+                location=AddressableAreaLocation(addressableAreaName="B4"),
+                loadName="some_labware",
+                displayName="some_display_name",
+                namespace="some_namespace",
+                version=9001,
+            )
         )
     ).then_return(
         commands.LoadLabwareResult(
@@ -474,12 +483,14 @@ def test_load_labware_on_labware(
     ).then_return(("some_namespace", 9001))
 
     decoy.when(
-        mock_engine_client.load_labware(
-            location=OnLabwareLocation(labwareId="labware-id"),
-            load_name="some_labware",
-            display_name="some_display_name",
-            namespace="some_namespace",
-            version=9001,
+        mock_engine_client.execute_command_without_recovery(
+            cmd.LoadLabwareParams(
+                location=OnLabwareLocation(labwareId="labware-id"),
+                loadName="some_labware",
+                displayName="some_display_name",
+                namespace="some_namespace",
+                version=9001,
+            )
         )
     ).then_return(
         commands.LoadLabwareResult(
@@ -542,12 +553,14 @@ def test_load_labware_off_deck(
     ).then_return(("some_namespace", 9001))
 
     decoy.when(
-        mock_engine_client.load_labware(
-            location=OFF_DECK_LOCATION,
-            load_name="some_labware",
-            display_name="some_display_name",
-            namespace="some_namespace",
-            version=9001,
+        mock_engine_client.execute_command_without_recovery(
+            cmd.LoadLabwareParams(
+                location=OFF_DECK_LOCATION,
+                loadName="some_labware",
+                displayName="some_display_name",
+                namespace="some_namespace",
+                version=9001,
+            )
         )
     ).then_return(
         commands.LoadLabwareResult(
@@ -604,11 +617,13 @@ def test_load_adapter(
     ).then_return(("some_namespace", 9001))
 
     decoy.when(
-        mock_engine_client.load_labware(
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
-            load_name="some_adapter",
-            namespace="some_namespace",
-            version=9001,
+        mock_engine_client.execute_command_without_recovery(
+            cmd.LoadLabwareParams(
+                location=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
+                loadName="some_adapter",
+                namespace="some_namespace",
+                version=9001,
+            )
         )
     ).then_return(
         commands.LoadLabwareResult(
@@ -674,11 +689,13 @@ def test_load_adapter_on_staging_slot(
     ).then_return(("some_namespace", 9001))
 
     decoy.when(
-        mock_engine_client.load_labware(
-            location=AddressableAreaLocation(addressableAreaName="B4"),
-            load_name="some_adapter",
-            namespace="some_namespace",
-            version=9001,
+        mock_engine_client.execute_command_without_recovery(
+            cmd.LoadLabwareParams(
+                location=AddressableAreaLocation(addressableAreaName="B4"),
+                loadName="some_adapter",
+                namespace="some_namespace",
+                version=9001,
+            )
         )
     ).then_return(
         commands.LoadLabwareResult(
@@ -841,14 +858,16 @@ def test_move_labware(
         drop_offset=drop_offset,
     )
     decoy.verify(
-        mock_engine_client.move_labware(
-            labware_id="labware-id",
-            new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
-            strategy=expected_strategy,
-            pick_up_offset=LabwareOffsetVector(x=4, y=5, z=6)
-            if pick_up_offset
-            else None,
-            drop_offset=LabwareOffsetVector(x=4, y=5, z=6) if drop_offset else None,
+        mock_engine_client.execute_command(
+            cmd.MoveLabwareParams(
+                labwareId="labware-id",
+                newLocation=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
+                strategy=expected_strategy,
+                pickUpOffset=LabwareOffsetVector(x=4, y=5, z=6)
+                if pick_up_offset
+                else None,
+                dropOffset=LabwareOffsetVector(x=4, y=5, z=6) if drop_offset else None,
+            )
         ),
         deck_conflict.check(
             engine_state=mock_engine_client.state,
@@ -882,12 +901,14 @@ def test_move_labware_on_staging_slot(
         drop_offset=None,
     )
     decoy.verify(
-        mock_engine_client.move_labware(
-            labware_id="labware-id",
-            new_location=AddressableAreaLocation(addressableAreaName="B4"),
-            strategy=LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE,
-            pick_up_offset=None,
-            drop_offset=None,
+        mock_engine_client.execute_command(
+            cmd.MoveLabwareParams(
+                labwareId="labware-id",
+                newLocation=AddressableAreaLocation(addressableAreaName="B4"),
+                strategy=LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE,
+                pickUpOffset=None,
+                dropOffset=None,
+            )
         ),
         deck_conflict.check(
             engine_state=mock_engine_client.state,
@@ -926,12 +947,14 @@ def test_move_labware_on_non_connected_module(
         drop_offset=None,
     )
     decoy.verify(
-        mock_engine_client.move_labware(
-            labware_id="labware-id",
-            new_location=ModuleLocation(moduleId="module-id"),
-            strategy=LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE,
-            pick_up_offset=None,
-            drop_offset=None,
+        mock_engine_client.execute_command(
+            cmd.MoveLabwareParams(
+                labwareId="labware-id",
+                newLocation=ModuleLocation(moduleId="module-id"),
+                strategy=LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE,
+                pickUpOffset=None,
+                dropOffset=None,
+            )
         ),
         deck_conflict.check(
             engine_state=mock_engine_client.state,
@@ -966,12 +989,14 @@ def test_move_labware_off_deck(
         drop_offset=None,
     )
     decoy.verify(
-        mock_engine_client.move_labware(
-            labware_id="labware-id",
-            new_location=OFF_DECK_LOCATION,
-            strategy=LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE,
-            pick_up_offset=None,
-            drop_offset=None,
+        mock_engine_client.execute_command(
+            cmd.MoveLabwareParams(
+                labwareId="labware-id",
+                newLocation=OFF_DECK_LOCATION,
+                strategy=LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE,
+                pickUpOffset=None,
+                dropOffset=None,
+            )
         ),
         deck_conflict.check(
             engine_state=mock_engine_client.state,
@@ -1005,12 +1030,14 @@ def test_load_labware_on_module(
     ).then_return(("some_namespace", 9001))
 
     decoy.when(
-        mock_engine_client.load_labware(
-            location=ModuleLocation(moduleId="module-id"),
-            load_name="some_labware",
-            display_name="some_display_name",
-            namespace="some_namespace",
-            version=9001,
+        mock_engine_client.execute_command_without_recovery(
+            cmd.LoadLabwareParams(
+                location=ModuleLocation(moduleId="module-id"),
+                loadName="some_labware",
+                displayName="some_display_name",
+                namespace="some_namespace",
+                version=9001,
+            )
         )
     ).then_return(
         commands.LoadLabwareResult(
@@ -1080,12 +1107,14 @@ def test_load_labware_on_non_connected_module(
     ).then_return(("some_namespace", 9001))
 
     decoy.when(
-        mock_engine_client.load_labware(
-            location=ModuleLocation(moduleId="module-id"),
-            load_name="some_labware",
-            display_name="some_display_name",
-            namespace="some_namespace",
-            version=9001,
+        mock_engine_client.execute_command_without_recovery(
+            cmd.LoadLabwareParams(
+                location=ModuleLocation(moduleId="module-id"),
+                loadName="some_labware",
+                displayName="some_display_name",
+                namespace="some_namespace",
+                version=9001,
+            )
         )
     ).then_return(
         commands.LoadLabwareResult(
@@ -1257,9 +1286,11 @@ def test_load_module(
     decoy.when(mock_engine_client.state.config.robot_type).then_return(robot_type)
 
     decoy.when(
-        mock_engine_client.load_module(
-            model=engine_model,
-            location=DeckSlotLocation(slotName=slot_name),
+        mock_engine_client.execute_command_without_recovery(
+            cmd.LoadModuleParams(
+                model=engine_model,
+                location=DeckSlotLocation(slotName=slot_name),
+            )
         )
     ).then_return(
         commands.LoadModuleResult(
@@ -1339,9 +1370,11 @@ def test_load_mag_block(
     ).then_return("cutout" + DeckSlotName.SLOT_A2.value)
 
     decoy.when(
-        mock_engine_client.load_module(
-            model=EngineModuleModel.MAGNETIC_BLOCK_V1,
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_A2),
+        mock_engine_client.execute_command_without_recovery(
+            cmd.LoadModuleParams(
+                model=EngineModuleModel.MAGNETIC_BLOCK_V1,
+                location=DeckSlotLocation(slotName=DeckSlotName.SLOT_A2),
+            )
         )
     ).then_return(
         commands.LoadModuleResult(
@@ -1431,9 +1464,11 @@ def test_load_module_thermocycler_with_no_location(
     ).then_return("cutout" + expected_slot.value)
 
     decoy.when(
-        mock_engine_client.load_module(
-            model=engine_model,
-            location=DeckSlotLocation(slotName=expected_slot),
+        mock_engine_client.execute_command_without_recovery(
+            cmd.LoadModuleParams(
+                model=engine_model,
+                location=DeckSlotLocation(slotName=expected_slot),
+            )
         )
     ).then_return(
         commands.LoadModuleResult(
@@ -1491,7 +1526,9 @@ def test_pause(
 ) -> None:
     """It should issue a waitForResume command."""
     subject.pause(msg=message)
-    decoy.verify(mock_engine_client.wait_for_resume(message=message))
+    decoy.verify(
+        mock_engine_client.execute_command(cmd.WaitForResumeParams(message=message))
+    )
 
 
 @pytest.mark.parametrize("seconds", [0.0, -1.23, 1.23])
@@ -1505,7 +1542,11 @@ def test_delay(
 ) -> None:
     """It should issue a waitForDuration command."""
     subject.delay(seconds=seconds, msg=message)
-    decoy.verify(mock_engine_client.wait_for_duration(seconds=seconds, message=message))
+    decoy.verify(
+        mock_engine_client.execute_command(
+            cmd.WaitForDurationParams(seconds=seconds, message=message)
+        )
+    )
 
 
 def test_comment(
@@ -1515,7 +1556,9 @@ def test_comment(
 ) -> None:
     """It should issue a comment command."""
     subject.comment("Hello, world!")
-    decoy.verify(mock_engine_client.comment("Hello, world!"))
+    decoy.verify(
+        mock_engine_client.execute_command(cmd.CommentParams(message="Hello, world!"))
+    )
 
 
 def test_home(
@@ -1525,7 +1568,7 @@ def test_home(
 ) -> None:
     """It should home all axes."""
     subject.home()
-    decoy.verify(mock_engine_client.home(axes=None), times=1)
+    decoy.verify(mock_engine_client.execute_command(cmd.HomeParams(axes=None)), times=1)
 
 
 def test_is_simulating(
@@ -1543,10 +1586,10 @@ def test_set_rail_lights(
 ) -> None:
     """It should verify a call to sync client."""
     subject.set_rail_lights(on=True)
-    decoy.verify(mock_engine_client.set_rail_lights(on=True))
+    decoy.verify(mock_engine_client.execute_command(cmd.SetRailLightsParams(on=True)))
 
     subject.set_rail_lights(on=False)
-    decoy.verify(mock_engine_client.set_rail_lights(on=False))
+    decoy.verify(mock_engine_client.execute_command(cmd.SetRailLightsParams(on=False)))
 
 
 def test_get_rail_lights(

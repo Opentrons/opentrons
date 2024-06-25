@@ -1,10 +1,6 @@
 import * as React from 'react'
 
-import {
-  THERMOCYCLER_MODULE_V1,
-  ThermocyclerModuleModel,
-  getModuleDef2,
-} from '@opentrons/shared-data'
+import { THERMOCYCLER_MODULE_V1, getModuleDef2 } from '@opentrons/shared-data'
 
 import { C_MED_LIGHT_GRAY } from '../../../styles'
 import { COLORS, BORDERS } from '../../../helix-design-system'
@@ -12,6 +8,7 @@ import { COLORS, BORDERS } from '../../../helix-design-system'
 import { RobotCoordsForeignDiv } from '../../Deck'
 import { ThermocyclerGEN1 } from './ThermocyclerGEN1'
 import { ThermocyclerGEN2 } from './ThermocyclerGEN2'
+import type { ThermocyclerModuleModel } from '@opentrons/shared-data'
 
 const ROOM_TEMPERATURE_C = 23 // value taken from TC firmware
 export interface ThermocyclerVizProps {

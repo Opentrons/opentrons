@@ -21,9 +21,13 @@ const HINT_IS_ALERT: HintKey[] = ['add_liquids_and_labware']
 
 export const Hints = (): JSX.Element | null => {
   const { t } = useTranslation(['alert', 'nav', 'button'])
-  const [rememberDismissal, toggleRememberDismissal] = React.useState<boolean>(
+  const [rememberDismissal, setRememberDismissal] = React.useState<boolean>(
     false
   )
+
+  const toggleRememberDismissal = React.useCallback(() => {
+    setRememberDismissal(prevDismissal => !prevDismissal)
+  }, [])
   const hintKey = useSelector(selectors.getHint)
   const dispatch = useDispatch()
   const removeHint = (hintKey: HintKey): void => {
@@ -159,9 +163,7 @@ export const Hints = (): JSX.Element | null => {
         <DeprecatedCheckboxField
           className={styles.dont_show_again}
           label={t('hint.dont_show_again')}
-          onChange={() => {
-            toggleRememberDismissal(rememberDismissal)
-          }}
+          onChange={toggleRememberDismissal}
           value={rememberDismissal}
         />
         <OutlineButton

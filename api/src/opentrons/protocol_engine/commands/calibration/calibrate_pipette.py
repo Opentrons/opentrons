@@ -3,11 +3,8 @@ from typing import Optional, Type
 from typing_extensions import Literal
 from pydantic import BaseModel, Field
 
-from ..command import (
-    AbstractCommandImpl,
-    BaseCommand,
-    BaseCommandCreate,
-)
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ...errors.error_occurrence import ErrorOccurrence
 from ...types import InstrumentOffsetVector
 
 from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
@@ -37,7 +34,9 @@ class CalibratePipetteResult(BaseModel):
 
 
 class CalibratePipetteImplementation(
-    AbstractCommandImpl[CalibratePipetteParams, CalibratePipetteResult]
+    AbstractCommandImpl[
+        CalibratePipetteParams, SuccessData[CalibratePipetteResult, None]
+    ]
 ):
     """CalibratePipette command implementation."""
 
@@ -48,7 +47,9 @@ class CalibratePipetteImplementation(
     ) -> None:
         self._hardware_api = hardware_api
 
-    async def execute(self, params: CalibratePipetteParams) -> CalibratePipetteResult:
+    async def execute(
+        self, params: CalibratePipetteParams
+    ) -> SuccessData[CalibratePipetteResult, None]:
         """Execute calibrate-pipette command."""
         # TODO (tz, 20-9-22): Add a better solution to determine if a command can be executed on an OT-3/OT-2
         ot3_api = ensure_ot3_hardware(
@@ -65,14 +66,19 @@ class CalibratePipetteImplementation(
 
         await ot3_api.save_instrument_offset(mount=ot3_mount, delta=pipette_offset)
 
-        return CalibratePipetteResult.construct(
-            pipetteOffset=InstrumentOffsetVector.construct(
-                x=pipette_offset.x, y=pipette_offset.y, z=pipette_offset.z
-            )
+        return SuccessData(
+            public=CalibratePipetteResult.construct(
+                pipetteOffset=InstrumentOffsetVector.construct(
+                    x=pipette_offset.x, y=pipette_offset.y, z=pipette_offset.z
+                )
+            ),
+            private=None,
         )
 
 
-class CalibratePipette(BaseCommand[CalibratePipetteParams, CalibratePipetteResult]):
+class CalibratePipette(
+    BaseCommand[CalibratePipetteParams, CalibratePipetteResult, ErrorOccurrence]
+):
     """Calibrate-pipette command model."""
 
     commandType: CalibratePipetteCommandType = "calibration/calibratePipette"

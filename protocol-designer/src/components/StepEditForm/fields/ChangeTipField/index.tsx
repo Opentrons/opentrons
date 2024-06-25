@@ -7,13 +7,11 @@ import {
   useHoverTooltip,
   TOOLTIP_FIXED,
 } from '@opentrons/components'
-import {
-  getDisabledChangeTipOptions,
-  DisabledChangeTipArgs,
-} from './getDisabledChangeTipOptions'
-import { ChangeTipOptions } from '@opentrons/step-generation'
-import { FieldProps } from '../../types'
+import { getDisabledChangeTipOptions } from './getDisabledChangeTipOptions'
 import styles from '../../StepEditForm.module.css'
+import type { DisabledChangeTipArgs } from './getDisabledChangeTipOptions'
+import type { ChangeTipOptions } from '@opentrons/step-generation'
+import type { FieldProps } from '../../types'
 
 const ALL_CHANGE_TIP_VALUES: ChangeTipOptions[] = [
   'always',
@@ -56,7 +54,9 @@ export const ChangeTipField = (props: Props): JSX.Element => {
         name={name}
         options={options}
         value={value ? String(value) : null}
-        onValueChange={(name, value) => updateValue(value)}
+        onValueChange={(name, value) => {
+          updateValue(value)
+        }}
         formatOptionLabel={({ value }) => (
           <ChangeTipOptionLabel value={value} />
         )}

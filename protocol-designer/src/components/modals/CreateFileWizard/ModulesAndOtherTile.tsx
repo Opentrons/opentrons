@@ -20,13 +20,12 @@ import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   getPipetteSpecsV2,
-  PipetteName,
   OT2_ROBOT_TYPE,
   THERMOCYCLER_MODULE_V2,
   HEATERSHAKER_MODULE_V1,
   MAGNETIC_BLOCK_V1,
   TEMPERATURE_MODULE_V2,
-  ModuleModel,
+  ABSORBANCE_READER_V1,
   getModuleDisplayName,
   getModuleType,
   FLEX_ROBOT_TYPE,
@@ -37,7 +36,6 @@ import { getIsCrashablePipetteSelected } from '../../../step-forms'
 import gripperImage from '../../../images/flex_gripper.png'
 import wasteChuteImage from '../../../images/waste_chute.png'
 import trashBinImage from '../../../images/flex_trash_bin.png'
-import { getEnableMoam } from '../../../feature-flags/selectors'
 import { uuid } from '../../../utils'
 import { selectors as featureFlagSelectors } from '../../../feature-flags'
 import { CrashInfoBox, ModuleDiagram } from '../../modules'
@@ -51,6 +49,7 @@ import {
 import { EquipmentOption } from './EquipmentOption'
 import { HandleEnter } from './HandleEnter'
 
+import type { ModuleModel, PipetteName } from '@opentrons/shared-data'
 import type { AdditionalEquipment, WizardTileProps } from './types'
 
 const MAX_TEMPERATURE_MODULES = 7
@@ -60,12 +59,14 @@ export const DEFAULT_SLOT_MAP: { [moduleModel in ModuleModel]?: string } = {
   [HEATERSHAKER_MODULE_V1]: 'D1',
   [MAGNETIC_BLOCK_V1]: 'D2',
   [TEMPERATURE_MODULE_V2]: 'C1',
+  [ABSORBANCE_READER_V1]: 'D3',
 }
 export const FLEX_SUPPORTED_MODULE_MODELS: ModuleModel[] = [
   THERMOCYCLER_MODULE_V2,
   HEATERSHAKER_MODULE_V1,
   MAGNETIC_BLOCK_V1,
   TEMPERATURE_MODULE_V2,
+  ABSORBANCE_READER_V1,
 ]
 
 export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
@@ -172,7 +173,9 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
             }}
           />
           <PrimaryButton
-            onClick={() => proceed()}
+            onClick={() => {
+              proceed()
+            }}
             disabled={!hasATrash}
             {...targetProps}
           >
@@ -191,9 +194,11 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
 
 function FlexModuleFields(props: WizardTileProps): JSX.Element {
   const { watch, setValue } = props
-  const enableMoamFf = useSelector(getEnableMoam)
   const modules = watch('modules')
   const additionalEquipment = watch('additionalEquipment')
+  const enableAbsorbanceReader = useSelector(
+    featureFlagSelectors.getEnableAbsorbanceReader
+  )
   const moduleTypesOnDeck =
     modules != null ? Object.values(modules).map(module => module.type) : []
 
@@ -209,16 +214,16 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
     modules,
     trashType: 'trashBin',
   })
-
   React.useEffect(() => {
     if (trashBinDisabled) {
       setValue('additionalEquipment', without(additionalEquipment, 'trashBin'))
     }
   }, [trashBinDisabled, setValue])
-
   return (
     <Flex flexWrap={WRAP} gridGap={SPACING.spacing4} alignSelf={ALIGN_CENTER}>
-      {FLEX_SUPPORTED_MODULE_MODELS.map(moduleModel => {
+      {FLEX_SUPPORTED_MODULE_MODELS.filter(moduleModel =>
+        enableAbsorbanceReader ? true : moduleModel !== 'absorbanceReaderV1'
+      ).map(moduleModel => {
         const moduleType = getModuleType(moduleModel)
         const isModuleOnDeck = moduleTypesOnDeck.includes(moduleType)
 
@@ -226,7 +231,7 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
           getNumSlotsAvailable(modules, additionalEquipment) === 0
         //  special-casing TC since it takes up 2 slots
         if (moduleType === THERMOCYCLER_MODULE_TYPE) {
-          isDisabled = getNumSlotsAvailable(modules, additionalEquipment) === 1
+          isDisabled = getNumSlotsAvailable(modules, additionalEquipment) <= 1
         }
 
         const handleMultiplesClick = (num: number): void => {
@@ -261,10 +266,7 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
         }
 
         const handleOnClick = (): void => {
-          if (
-            (moduleType !== TEMPERATURE_MODULE_TYPE && enableMoamFf) ||
-            !enableMoamFf
-          ) {
+          if (moduleType !== TEMPERATURE_MODULE_TYPE) {
             if (isModuleOnDeck) {
               const updatedModules =
                 modules != null
@@ -302,7 +304,7 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
             }
             onClick={handleOnClick}
             multiples={
-              moduleType === TEMPERATURE_MODULE_TYPE && enableMoamFf
+              moduleType === TEMPERATURE_MODULE_TYPE
                 ? {
                     maxItems: MAX_TEMPERATURE_MODULES,
                     setValue: handleMultiplesClick,
@@ -316,15 +318,15 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
                   }
                 : undefined
             }
-            showCheckbox={
-              enableMoamFf ? moduleType !== TEMPERATURE_MODULE_TYPE : true
-            }
+            showCheckbox={moduleType !== TEMPERATURE_MODULE_TYPE}
           />
         )
       })}
       <EquipmentOption
         robotType={FLEX_ROBOT_TYPE}
-        onClick={() => handleSetEquipmentOption('gripper')}
+        onClick={() => {
+          handleSetEquipmentOption('gripper')
+        }}
         isSelected={additionalEquipment.includes('gripper')}
         image={
           <AdditionalItemImage
@@ -338,7 +340,9 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
 
       <EquipmentOption
         robotType={FLEX_ROBOT_TYPE}
-        onClick={() => handleSetEquipmentOption('wasteChute')}
+        onClick={() => {
+          handleSetEquipmentOption('wasteChute')
+        }}
         isSelected={additionalEquipment.includes('wasteChute')}
         disabled={getTrashOptionDisabled({
           additionalEquipment,
@@ -356,7 +360,9 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
       />
       <EquipmentOption
         robotType={FLEX_ROBOT_TYPE}
-        onClick={() => handleSetEquipmentOption('trashBin')}
+        onClick={() => {
+          handleSetEquipmentOption('trashBin')
+        }}
         isSelected={additionalEquipment.includes('trashBin')}
         image={
           <AdditionalItemImage src={trashBinImage} alt="Opentrons Trash Bin" />

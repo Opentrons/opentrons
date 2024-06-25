@@ -17,7 +17,7 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -88,14 +88,18 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           settingName={t('network_settings')}
           dataTestId="RobotSettingButton_network_settings"
           settingInfo={networkConnection?.connectionStatus}
-          onClick={() => setCurrentOption('NetworkSettings')}
+          onClick={() => {
+            setCurrentOption('NetworkSettings')
+          }}
           iconName="wifi"
         />
         <Link to="/robot-settings/rename-robot">
           <RobotSettingButton
             settingName={t('robot_name')}
             settingInfo={robotName}
-            onClick={() => setCurrentOption('RobotName')}
+            onClick={() => {
+              setCurrentOption('RobotName')
+            }}
             iconName="flex-robot"
           />
         </Link>
@@ -107,7 +111,9 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
               ? `v${robotServerVersion}`
               : t('robot_settings_advanced_unknown')
           }
-          onClick={() => setCurrentOption('RobotSystemVersion')}
+          onClick={() => {
+            setCurrentOption('RobotSystemVersion')
+          }}
           iconName="update"
           rightElement={
             <Flex gridGap={SPACING.spacing40} alignItems={ALIGN_CENTER}>
@@ -136,20 +142,26 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
         <RobotSettingButton
           settingName={t('touchscreen_sleep')}
           dataTestId="RobotSettingButton_touchscreen_sleep"
-          onClick={() => setCurrentOption('TouchscreenSleep')}
+          onClick={() => {
+            setCurrentOption('TouchscreenSleep')
+          }}
           iconName="sleep"
         />
         <RobotSettingButton
           settingName={t('touchscreen_brightness')}
           dataTestId="RobotSettingButton_touchscreen_brightness"
-          onClick={() => setCurrentOption('TouchscreenBrightness')}
+          onClick={() => {
+            setCurrentOption('TouchscreenBrightness')
+          }}
           iconName="brightness"
         />
         <RobotSettingButton
           settingName={t('app_settings:privacy')}
           dataTestId="RobotSettingButton_privacy"
           settingInfo={t('branded:choose_what_data_to_share')}
-          onClick={() => setCurrentOption('Privacy')}
+          onClick={() => {
+            setCurrentOption('Privacy')
+          }}
           iconName="privacy"
         />
         <RobotSettingButton
@@ -163,7 +175,9 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
         <RobotSettingButton
           settingName={t('device_reset')}
           dataTestId="RobotSettingButton_device_reset"
-          onClick={() => setCurrentOption('DeviceReset')}
+          onClick={() => {
+            setCurrentOption('DeviceReset')
+          }}
           iconName="reset"
         />
         <RobotSettingButton
@@ -181,7 +195,9 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
         <RobotSettingButton
           settingName={t('app_settings:update_channel')}
           dataTestId="RobotSettingButton_update_channel"
-          onClick={() => setCurrentOption('UpdateChannel')}
+          onClick={() => {
+            setCurrentOption('UpdateChannel')
+          }}
           iconName="update-channel"
         />
         <RobotSettingButton
@@ -234,9 +250,12 @@ function FeatureFlags(): JSX.Element {
               justifyContent={JUSTIFY_CENTER}
               width="46.25rem"
             >
-              <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+              <LegacyStyledText
+                as="h4"
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              >
                 {t(`__dev_internal__${flag}`)}
-              </StyledText>
+              </LegacyStyledText>
             </Flex>
           </Flex>
           <OnOffToggle isOn={Boolean(devInternalFlags?.[flag])} />
@@ -257,9 +276,9 @@ export function OnOffToggle(props: { isOn: boolean }): JSX.Element {
       padding={`${SPACING.spacing12} ${SPACING.spacing4}`}
       borderRadius={BORDERS.borderRadius16}
     >
-      <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightRegular}>
+      <LegacyStyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightRegular}>
         {props.isOn ? t('on') : t('off')}
-      </StyledText>
+      </LegacyStyledText>
     </Flex>
   )
 }

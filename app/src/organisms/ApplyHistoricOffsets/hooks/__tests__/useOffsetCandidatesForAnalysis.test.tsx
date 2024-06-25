@@ -20,7 +20,7 @@ vi.mock('../useAllHistoricOffsets')
 vi.mock('../getLabwareLocationCombos')
 vi.mock('@opentrons/shared-data')
 vi.mock('../../../../resources/runs')
-vi.mock('../../../../resources/useNotifyService')
+vi.mock('../../../../resources/useNotifyDataReady')
 
 const mockLabwareDef = fixtureTiprack300ul as LabwareDefinition2
 

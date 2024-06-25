@@ -1,15 +1,15 @@
-import { useAllCommandsQuery } from '@opentrons/react-api-client'
-import { useRunStatus } from '../../RunTimeControl/hooks'
 import {
   RUN_STATUS_AWAITING_RECOVERY,
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_FINISHING,
   RUN_STATUS_IDLE,
   RUN_STATUS_PAUSED,
-  RUN_STATUS_PAUSE_REQUESTED,
   RUN_STATUS_RUNNING,
   RUN_STATUS_STOP_REQUESTED,
 } from '@opentrons/api-client'
+
+import { useNotifyAllCommandsQuery } from '../../../resources/runs'
+import { useRunStatus } from '../../RunTimeControl/hooks'
 
 import type { UseQueryOptions } from 'react-query'
 import type { CommandsData, RunCommandSummary } from '@opentrons/api-client'
@@ -17,7 +17,6 @@ import type { CommandsData, RunCommandSummary } from '@opentrons/api-client'
 const LIVE_RUN_STATUSES = [
   RUN_STATUS_IDLE,
   RUN_STATUS_PAUSED,
-  RUN_STATUS_PAUSE_REQUESTED,
   RUN_STATUS_STOP_REQUESTED,
   RUN_STATUS_RUNNING,
   RUN_STATUS_FINISHING,
@@ -31,7 +30,7 @@ export function useLastRunCommand(
   options: UseQueryOptions<CommandsData, Error> = {}
 ): RunCommandSummary | null {
   const runStatus = useRunStatus(runId)
-  const { data: commandsData } = useAllCommandsQuery(
+  const { data: commandsData } = useNotifyAllCommandsQuery(
     runId,
     { cursor: null, pageLength: 1 },
     {

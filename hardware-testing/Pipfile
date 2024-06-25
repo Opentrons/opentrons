@@ -8,6 +8,7 @@ opentrons = {editable = true, path = "./../api", extras=['flex-hardware']}
 opentrons-shared-data = {editable = true, path = "./../shared-data/python"}
 opentrons-hardware = {editable = true, path = "./../hardware", extras=['FLEX']}
 hardware-testing = { editable = true, path = "." }
+abr-testing = { editable = true, path = "./../abr-testing" }
 pyserial = "==3.5"
 
 [dev-packages]
@@ -23,6 +24,7 @@ flake8-docstrings = "~=1.6.0"
 flake8-noqa = "~=1.2.1"
 requests = "==2.27.1"
 types-requests = "==2.25.6"
+pyusb = "==1.2.1"
 
 [requires]
 python_version = "3.10"

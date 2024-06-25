@@ -7,22 +7,27 @@ import {
   FormGroup,
   DeprecatedCheckboxField,
   DropdownField,
-  Options,
+  Flex,
+  DIRECTION_COLUMN,
+  SPACING,
 } from '@opentrons/components'
 import { getMaxDisposalVolumeForMultidispense } from '../../../steplist/formLevel/handleFormChange/utils'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import { selectors as uiLabwareSelectors } from '../../../ui/labware'
 import { getBlowoutLocationOptionsForForm } from '../utils'
 import { TextField } from './TextField'
+import { FlowRateField } from './FlowRateField'
+import { BlowoutZOffsetField } from './BlowoutZOffsetField'
 
-import type { FieldProps, FieldPropsByName } from '../types'
+import type { Options } from '@opentrons/components'
 import type { PathOption, StepType } from '../../../form-types'
+import type { FieldProps, FieldPropsByName } from '../types'
 
 import styles from '../StepEditForm.module.css'
 
 interface DropdownFormFieldProps extends FieldProps {
-  className?: string
   options: Options
+  className?: string
 }
 const DropdownFormField = (props: DropdownFormFieldProps): JSX.Element => {
   return (
@@ -31,7 +36,9 @@ const DropdownFormField = (props: DropdownFormFieldProps): JSX.Element => {
       id={`DisposalVolumeField_dropdown`}
       value={props.value ? String(props.value) : null}
       onBlur={props.onFieldBlur}
-      onChange={e => props.updateValue(e.currentTarget.value)}
+      onChange={e => {
+        props.updateValue(e.currentTarget.value)
+      }}
       onFocus={props.onFieldFocus}
     />
   )
@@ -103,7 +110,6 @@ export const DisposalVolumeField = (
   )
 
   const { value, updateValue } = propsForFields.disposalVolume_checkbox
-
   return (
     <FormGroup label={t('form:step_edit_form.multiDispenseOptionsLabel')}>
       <>
@@ -117,18 +123,35 @@ export const DisposalVolumeField = (
             label="Disposal Volume"
             value={Boolean(value)}
             className={cx(styles.checkbox_field, styles.large_field)}
-            onChange={(e: React.ChangeEvent<any>) => updateValue(!value)}
+            onChange={(e: React.ChangeEvent<any>) => {
+              updateValue(!value)
+            }}
           />
           {value ? volumeField : null}
         </div>
         {value ? (
           <div className={styles.checkbox_row}>
-            <div className={styles.sub_label_no_checkbox}>Blowout</div>
-            <DropdownFormField
-              {...propsForFields.blowout_location}
-              className={styles.large_field}
-              options={disposalDestinationOptions}
-            />
+            <div className={styles.sub_label_no_checkbox}>{t('blowout')}</div>
+            <Flex flexDireciton={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+              <DropdownFormField
+                {...propsForFields.blowout_location}
+                className={styles.large_field}
+                options={disposalDestinationOptions}
+              />
+              <FlowRateField
+                {...propsForFields.blowout_flowRate}
+                pipetteId={pipette}
+                flowRateType="blowout"
+                volume={propsForFields.volume?.value ?? 0}
+                tiprack={propsForFields.tipRack.value}
+              />
+              <BlowoutZOffsetField
+                {...propsForFields.blowout_z_offset}
+                sourceLabwareId={propsForFields.aspirate_labware.value}
+                destLabwareId={propsForFields.dispense_labware.value}
+                blowoutLabwareId={propsForFields.blowout_location.value}
+              />
+            </Flex>
           </div>
         ) : null}
       </>

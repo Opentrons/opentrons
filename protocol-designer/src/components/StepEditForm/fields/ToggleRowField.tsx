@@ -5,7 +5,7 @@ import { ToggleField } from '@opentrons/components'
 
 import styles from '../StepEditForm.module.css'
 
-import { FieldProps } from '../types'
+import type { FieldProps } from '../types'
 
 type ToggleRowProps = FieldProps & {
   offLabel?: string
@@ -29,7 +29,9 @@ export const ToggleRowField = (props: ToggleRowProps): JSX.Element => {
       onLabel={onLabel}
       className={cx(styles.toggle_field, className)}
       value={Boolean(value)}
-      onChange={() => updateValue(!value)}
+      onChange={() => {
+        updateValue(!value)
+      }}
       disabled={disabled}
     />
   )

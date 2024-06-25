@@ -3,30 +3,30 @@ import { Trans, useTranslation } from 'react-i18next'
 import {
   RESPONSIVENESS,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import {
-  CompletedProtocolAnalysis,
-  getPipetteNameSpecs,
-  CreateCommand,
-} from '@opentrons/shared-data'
+import { getPipetteNameSpecs } from '@opentrons/shared-data'
 import { css } from 'styled-components'
 import { ProbeNotAttached } from '../PipetteWizardFlows/ProbeNotAttached'
 import { RobotMotionLoader } from './RobotMotionLoader'
 import attachProbe1 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
 import attachProbe8 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_8.webm'
 import attachProbe96 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
-import { useChainRunCommands } from '../../resources/runs'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 
+import type {
+  CompletedProtocolAnalysis,
+  CreateCommand,
+} from '@opentrons/shared-data'
+import type { LabwareOffset } from '@opentrons/api-client'
 import type { Jog } from '../../molecules/JogControls/types'
+import type { useChainRunCommands } from '../../resources/runs'
 import type {
   AttachProbeStep,
   RegisterPositionAction,
   WorkingOffset,
 } from './types'
-import type { LabwareOffset } from '@opentrons/api-client'
 
 interface AttachProbeProps extends AttachProbeStep {
   protocolData: CompletedProtocolAnalysis
@@ -84,7 +84,9 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
         },
       ],
       false
-    ).catch(error => setFatalError(error.message))
+    ).catch(error => {
+      setFatalError(error.message as string)
+    })
   }, [])
 
   if (pipetteName == null || pipetteMount == null) return null
@@ -97,7 +99,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
       {
         commandType: 'verifyTipPresence',
         params: {
-          pipetteId: pipetteId,
+          pipetteId,
           expectedState: 'present',
           followSingularSensor: 'primary',
         },
@@ -123,7 +125,9 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     chainRunCommands(verifyCommands, false)
       .then(() => {
         chainRunCommands(homeCommands, false)
-          .then(() => proceed())
+          .then(() => {
+            proceed()
+          })
           .catch((e: Error) => {
             setFatalError(
               `AttachProbe failed to move to safe location after probe attach with message: ${e.message}`
@@ -166,7 +170,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
         </video>
       }
       bodyText={
-        <StyledText css={BODY_STYLE}>
+        <LegacyStyledText css={BODY_STYLE}>
           <Trans
             t={t}
             i18nKey={'install_probe'}
@@ -175,7 +179,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
               bold: <strong />,
             }}
           />
-        </StyledText>
+        </LegacyStyledText>
       }
       proceedButtonText={i18n.format(t('shared:continue'), 'capitalize')}
       proceed={handleProbeAttached}

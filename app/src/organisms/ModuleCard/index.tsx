@@ -14,7 +14,7 @@ import {
   Icon,
   ModuleIcon,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   useHoverTooltip,
   useOnClickOutside,
@@ -26,6 +26,7 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   MODULE_MODELS_OT2_ONLY,
+  ABSORBANCE_READER_TYPE,
 } from '@opentrons/shared-data'
 import { RUN_STATUS_FINISHING, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
@@ -74,6 +75,8 @@ import type {
 } from '../../redux/modules/types'
 import type { State, Dispatch } from '../../redux/types'
 import type { RequestState } from '../../redux/robot-api/types'
+import { AbsorbanceReaderData } from './AbsorbanceReaderData'
+import { AbsorbanceReaderSlideout } from './AbsorbanceReaderSlideout'
 
 interface ModuleCardProps {
   module: AttachedModule
@@ -110,7 +113,9 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     setShowOverflowMenu,
   } = useMenuHandleClickOutside()
   const moduleOverflowWrapperRef = useOnClickOutside<HTMLDivElement>({
-    onClickOutside: () => setShowOverflowMenu(false),
+    onClickOutside: () => {
+      setShowOverflowMenu(false)
+    },
   })
   const [showSlideout, setShowSlideout] = React.useState(false)
   const [hasSecondary, setHasSecondary] = React.useState(false)
@@ -135,9 +140,9 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     !MODULE_MODELS_OT2_ONLY.some(modModel => modModel === module.moduleModel) &&
     module.moduleOffset?.last_modified == null
   const isPipetteReady =
-    (!attachPipetteRequired ?? false) &&
-    (!calibratePipetteRequired ?? false) &&
-    (!updatePipetteFWRequired ?? false)
+    !Boolean(attachPipetteRequired) &&
+    !Boolean(calibratePipetteRequired) &&
+    !Boolean(updatePipetteFWRequired)
 
   const latestRequest = useSelector<State, RequestState | null>(state =>
     latestRequestId != null ? getRequestById(state, latestRequestId) : null
@@ -148,12 +153,12 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const [showFirmwareToast, setShowFirmwareToast] = React.useState(hasUpdated)
   const { makeToast } = useToaster()
   if (showFirmwareToast) {
-    makeToast(t('firmware_updated_successfully'), SUCCESS_TOAST)
+    makeToast(t('firmware_updated_successfully') as string, SUCCESS_TOAST)
     setShowFirmwareToast(false)
   }
 
   const handleFirmwareUpdateClick = (): void => {
-    robotName && handleModuleApiRequests(robotName, module.serialNumber)
+    robotName != null && handleModuleApiRequests(robotName, module.serialNumber)
   }
 
   const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
@@ -208,6 +213,12 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
           showTemperatureData={true}
         />
       )
+      break
+    }
+
+    case 'absorbanceReaderType': {
+      moduleData = <AbsorbanceReaderData moduleData={module.data} />
+      break
     }
   }
 
@@ -258,7 +269,9 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       {showCalModal ? (
         <ModuleWizardFlows
           attachedModule={module}
-          closeFlow={() => setShowCalModal(false)}
+          closeFlow={() => {
+            setShowCalModal(false)
+          }}
           isPrepCommandLoading={isCommandMutationLoading}
           prepCommandErrorMessage={
             prepCommandErrorMessage === '' ? undefined : prepCommandErrorMessage
@@ -267,7 +280,9 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       ) : null}
       {showHSWizard && module.moduleType === HEATERSHAKER_MODULE_TYPE && (
         <ModuleSetupModal
-          close={() => setShowHSWizard(false)}
+          close={() => {
+            setShowHSWizard(false)
+          }}
           moduleDisplayName={getModuleDisplayName(module.moduleModel)}
         />
       )}
@@ -276,14 +291,18 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
           module={module}
           isSecondary={hasSecondary}
           showSlideout={showSlideout}
-          onCloseClick={() => setShowSlideout(false)}
+          onCloseClick={() => {
+            setShowSlideout(false)
+          }}
         />
       )}
       {showAboutModule && (
         <AboutModuleSlideout
           module={module}
           isExpanded={showAboutModule}
-          onCloseClick={() => setShowAboutModule(false)}
+          onCloseClick={() => {
+            setShowAboutModule(false)
+          }}
           firmwareUpdateClick={handleFirmwareUpdateClick}
         />
       )}
@@ -291,7 +310,9 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
         <TestShakeSlideout
           module={module as HeaterShakerModule}
           isExpanded={showTestShake}
-          onCloseClick={() => setShowTestShake(false)}
+          onCloseClick={() => {
+            setShowTestShake(false)
+          }}
         />
       )}
       <Box padding={SPACING.spacing16} width="100%">
@@ -361,7 +382,9 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                     i18nKey="hot_to_the_touch"
                     components={{
                       bold: <strong />,
-                      block: <StyledText fontSize={TYPOGRAPHY.fontSizeP} />,
+                      block: (
+                        <LegacyStyledText fontSize={TYPOGRAPHY.fontSizeP} />
+                      ),
                     }}
                   />
                 </Banner>
@@ -380,13 +403,13 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                   aria-label="ot-spinner"
                   color={COLORS.grey60}
                 />
-                <StyledText marginLeft={SPACING.spacing8}>
+                <LegacyStyledText marginLeft={SPACING.spacing8}>
                   {t('updating_firmware')}
-                </StyledText>
+                </LegacyStyledText>
               </Flex>
             ) : (
               <>
-                <StyledText
+                <LegacyStyledText
                   textTransform={TYPOGRAPHY.textTransformUppercase}
                   color={COLORS.grey60}
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
@@ -403,7 +426,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                         port: module?.usbPort?.port,
                       })
                     : t('usb_port_not_connected')}
-                </StyledText>
+                </LegacyStyledText>
                 <Flex
                   paddingBottom={SPACING.spacing4}
                   data-testid={`ModuleCard_display_name_${module.serialNumber}`}
@@ -415,9 +438,9 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                     marginRight={SPACING.spacing2}
                     color={COLORS.grey60}
                   />
-                  <StyledText>
+                  <LegacyStyledText>
                     {getModuleDisplayName(module.moduleModel)}
-                  </StyledText>
+                  </LegacyStyledText>
                 </Flex>
               </>
             )}
@@ -454,7 +477,9 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
           <Box
             ref={moduleOverflowWrapperRef}
             data-testid={`ModuleCard_overflow_menu_${module.serialNumber}`}
-            onClick={() => setShowOverflowMenu(false)}
+            onClick={() => {
+              setShowOverflowMenu(false)
+            }}
           >
             <ModuleOverflowMenu
               handleAboutClick={handleAboutClick}
@@ -507,6 +532,14 @@ const ModuleSlideout = (props: ModuleSlideoutProps): JSX.Element => {
   } else if (module.moduleType === TEMPERATURE_MODULE_TYPE) {
     return (
       <TemperatureModuleSlideout
+        module={module}
+        onCloseClick={onCloseClick}
+        isExpanded={showSlideout}
+      />
+    )
+  } else if (module.moduleType === ABSORBANCE_READER_TYPE) {
+    return (
+      <AbsorbanceReaderSlideout
         module={module}
         onCloseClick={onCloseClick}
         isExpanded={showSlideout}

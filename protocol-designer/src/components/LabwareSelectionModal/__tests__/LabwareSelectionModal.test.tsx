@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
-import { fireEvent, screen, cleanup } from '@testing-library/react'
+import { vi, describe, it, expect, beforeEach } from 'vitest'
+import { fireEvent, screen } from '@testing-library/react'
 import {
   renderWithProviders,
   nestedTextMatcher,
@@ -73,9 +73,6 @@ describe('LabwareSelectionModal', () => {
     })
     vi.mocked(getCustomLabwareDefsByURI).mockReturnValue({})
   })
-  afterEach(() => {
-    cleanup()
-  })
   it('should NOT filter out labware above 57 mm when the slot is NOT next to a heater shaker', () => {
     render()
     expect(vi.mocked(getIsLabwareAboveHeight)).not.toHaveBeenCalled()
@@ -121,7 +118,7 @@ describe('LabwareSelectionModal', () => {
     })
     render()
     fireEvent.click(
-      screen.getByText(nestedTextMatcher('adapter compatible labware'))
+      screen.getByText(nestedTextMatcher('Adapter Compatible Labware'))
     )
     screen.getByText('Opentrons GEB 1000uL Tiprack')
   })

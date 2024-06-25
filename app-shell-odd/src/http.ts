@@ -1,13 +1,14 @@
 // fetch wrapper to throw if response is not ok
 import fs from 'fs'
 import { remove } from 'fs-extra'
-import { Transform, Readable } from 'stream'
 import pump from 'pump'
 import _fetch from 'node-fetch'
 import FormData from 'form-data'
+import { Transform } from 'stream'
 
 import { HTTP_API_VERSION } from './constants'
 
+import type { Readable } from 'stream'
 import type { Request, RequestInit, Response } from 'node-fetch'
 
 type RequestInput = Request | string
@@ -77,7 +78,9 @@ export function fetchToFile(
         // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
         if (error) {
           // if we error out, delete the temp dir to clean up
-          return remove(destination).then(() => reject(error))
+          return remove(destination).then(() => {
+            reject(error)
+          })
         }
         resolve(destination)
       })

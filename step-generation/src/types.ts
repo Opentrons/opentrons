@@ -1,11 +1,10 @@
-import {
+import type {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
-} from '@opentrons/shared-data'
-import type {
+  ABSORBANCE_READER_TYPE,
   CreateCommand,
   LabwareDefinition2,
   ModuleType,
@@ -75,6 +74,9 @@ export interface HeaterShakerModuleState {
 export interface MagneticBlockState {
   type: typeof MAGNETIC_BLOCK_TYPE
 }
+export interface AbsorbanceReaderState {
+  type: typeof ABSORBANCE_READER_TYPE
+}
 export interface ModuleTemporalProperties {
   slot: DeckSlot
   moduleState:
@@ -83,6 +85,7 @@ export interface ModuleTemporalProperties {
     | ThermocyclerModuleState
     | HeaterShakerModuleState
     | MagneticBlockState
+    | AbsorbanceReaderState
 }
 
 export interface LabwareEntity {
@@ -526,8 +529,10 @@ export type ErrorType =
   | 'HEATER_SHAKER_NORTH_SOUTH_EAST_WEST_SHAKING'
   | 'INSUFFICIENT_TIPS'
   | 'INVALID_SLOT'
+  | 'LABWARE_DISCARDED_IN_WASTE_CHUTE'
   | 'LABWARE_DOES_NOT_EXIST'
   | 'LABWARE_OFF_DECK'
+  | 'LABWARE_ON_ANOTHER_ENTITY'
   | 'MISMATCHED_SOURCE_DEST_WELLS'
   | 'MISSING_96_CHANNEL_TIPRACK_ADAPTER'
   | 'MISSING_MODULE'

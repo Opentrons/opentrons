@@ -17,7 +17,8 @@ from ..types import (
 )
 from ..errors import LabwareMovementNotAllowedError, NotSupportedOnRobotType
 from ..resources import labware_validation, fixture_validation
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
 from opentrons_shared_data.gripper.constants import GRIPPER_PADDLE_WIDTH
 
 if TYPE_CHECKING:
@@ -74,7 +75,7 @@ class MoveLabwareResult(BaseModel):
 
 
 class MoveLabwareImplementation(
-    AbstractCommandImpl[MoveLabwareParams, MoveLabwareResult]
+    AbstractCommandImpl[MoveLabwareParams, SuccessData[MoveLabwareResult, None]]
 ):
     """The execution implementation for ``moveLabware`` commands."""
 
@@ -93,7 +94,7 @@ class MoveLabwareImplementation(
 
     async def execute(  # noqa: C901
         self, params: MoveLabwareParams
-    ) -> MoveLabwareResult:
+    ) -> SuccessData[MoveLabwareResult, None]:
         """Move a loaded labware to a new location."""
         # Allow propagation of LabwareNotLoadedError.
         current_labware = self._state_view.labware.get(labware_id=params.labwareId)
@@ -212,10 +213,12 @@ class MoveLabwareImplementation(
             # Pause to allow for manual labware movement
             await self._run_control.wait_for_resume()
 
-        return MoveLabwareResult(offsetId=new_offset_id)
+        return SuccessData(
+            public=MoveLabwareResult(offsetId=new_offset_id), private=None
+        )
 
 
-class MoveLabware(BaseCommand[MoveLabwareParams, MoveLabwareResult]):
+class MoveLabware(BaseCommand[MoveLabwareParams, MoveLabwareResult, ErrorOccurrence]):
     """A ``moveLabware`` command."""
 
     commandType: MoveLabwareCommandType = "moveLabware"

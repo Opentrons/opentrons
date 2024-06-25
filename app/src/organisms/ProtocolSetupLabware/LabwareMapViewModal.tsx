@@ -11,7 +11,6 @@ import {
 import { Modal } from '../../molecules/Modal'
 import { getStandardDeckViewLayerBlockList } from '../Devices/ProtocolRun/utils/getStandardDeckViewLayerBlockList'
 import { getLabwareRenderInfo } from '../Devices/ProtocolRun/utils/getLabwareRenderInfo'
-import { AttachedProtocolModuleMatch } from '../ProtocolSetupModulesAndDeck/utils'
 
 import type {
   CompletedProtocolAnalysis,
@@ -20,6 +19,7 @@ import type {
 } from '@opentrons/shared-data'
 import type { LoadedLabwareByAdapter } from '@opentrons/api-client'
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
+import type { AttachedProtocolModuleMatch } from '../ProtocolSetupModulesAndDeck/utils'
 
 interface LabwareMapViewModalProps {
   attachedProtocolModuleMatches: AttachedProtocolModuleMatch[]
@@ -79,7 +79,9 @@ export function LabwareMapViewModal(
       nestedLabwareDef: topLabwareDefinition,
       onLabwareClick:
         topLabwareDefinition != null && topLabwareId != null
-          ? () => handleLabwareClick(topLabwareDefinition, topLabwareId)
+          ? () => {
+              handleLabwareClick(topLabwareDefinition, topLabwareId)
+            }
           : undefined,
       moduleChildren: null,
     }
@@ -99,8 +101,9 @@ export function LabwareMapViewModal(
         labwareLocation: { slotName },
         definition: topLabwareDefinition,
         topLabwareId,
-        onLabwareClick: () =>
-          handleLabwareClick(topLabwareDefinition, topLabwareId),
+        onLabwareClick: () => {
+          handleLabwareClick(topLabwareDefinition, topLabwareId)
+        },
         labwareChildren: null,
       }
     }

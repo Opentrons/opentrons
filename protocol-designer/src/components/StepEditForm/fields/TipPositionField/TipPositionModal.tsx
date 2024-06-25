@@ -9,7 +9,9 @@ import {
   InputField,
   RadioGroup,
   SPACING,
-  StyledText,
+  LegacyStyledText,
+  Tooltip,
+  useHoverTooltip,
 } from '@opentrons/components'
 import { getMainPagePortalEl } from '../../../portals/MainPageModalPortal'
 import { getIsTouchTipField } from '../../../../form-types'
@@ -51,11 +53,12 @@ export const TipPositionModal = (
     wellYWidthMm,
     closeModal,
   } = props
+  const [targetProps, tooltipProps] = useHoverTooltip()
   const zSpec = specs.z
   const ySpec = specs.y
   const xSpec = specs.x
 
-  const { t } = useTranslation(['modal', 'button'])
+  const { t } = useTranslation(['modal', 'button', 'tooltip'])
 
   if (zSpec == null || xSpec == null || ySpec == null) {
     console.error(
@@ -69,7 +72,7 @@ export const TipPositionModal = (
   })
 
   const [zValue, setZValue] = React.useState<string | null>(
-    zSpec?.value == null ? null : String(zSpec?.value)
+    zSpec?.value == null ? String(defaultMmFromBottom) : String(zSpec?.value)
   )
   const [yValue, setYValue] = React.useState<string | null>(
     ySpec?.value == null ? null : String(ySpec?.value)
@@ -239,9 +242,9 @@ export const TipPositionModal = (
   const TipPositionInputField = !isDefault ? (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-        <StyledText as="label" paddingLeft={SPACING.spacing24}>
+        <LegacyStyledText as="label" paddingLeft={SPACING.spacing24}>
           {t('tip_position.field_titles.x_position')}
-        </StyledText>
+        </LegacyStyledText>
         <InputField
           caption={t('tip_position.caption', {
             min: roundedXMin,
@@ -255,10 +258,15 @@ export const TipPositionModal = (
           value={xValue ?? ''}
         />
       </Flex>
-      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-        <StyledText as="label" paddingLeft={SPACING.spacing24}>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing4}
+        width="max-content"
+        {...targetProps}
+      >
+        <LegacyStyledText as="label" paddingLeft={SPACING.spacing24}>
           {t('tip_position.field_titles.y_position')}
-        </StyledText>
+        </LegacyStyledText>
         <InputField
           caption={t('tip_position.caption', {
             min: roundedYMin,
@@ -271,11 +279,12 @@ export const TipPositionModal = (
           units="mm"
           value={yValue ?? ''}
         />
+        <Tooltip {...tooltipProps}>{t('tooltip:y_position_value')}</Tooltip>
       </Flex>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-        <StyledText as="label" paddingLeft={SPACING.spacing24}>
+        <LegacyStyledText as="label" paddingLeft={SPACING.spacing24}>
           {t('tip_position.field_titles.z_position')}
-        </StyledText>
+        </LegacyStyledText>
         <InputField
           caption={t('tip_position.caption', {
             min: minMmFromBottom,

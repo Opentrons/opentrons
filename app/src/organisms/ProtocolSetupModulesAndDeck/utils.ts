@@ -1,9 +1,7 @@
 import {
-  DeckConfiguration,
   FLEX_ROBOT_TYPE,
   NON_CONNECTING_MODULE_TYPES,
   OT2_ROBOT_TYPE,
-  RobotType,
   checkModuleCompatibility,
   getCutoutFixturesForModuleModel,
   getCutoutIdsFromModuleSlotName,
@@ -11,6 +9,7 @@ import {
   getModuleType,
 } from '@opentrons/shared-data'
 
+import type { DeckConfiguration, RobotType } from '@opentrons/shared-data'
 import type { ProtocolModuleInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import type { AttachedModule } from '../../redux/modules/types'
 

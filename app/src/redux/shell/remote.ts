@@ -104,6 +104,8 @@ export function appShellListener({
 remote.ipcRenderer.on(
   'notify',
   (_, shellHostname, shellTopic, shellMessage) => {
-    callbackStore[shellHostname]?.[shellTopic]?.forEach(cb => cb(shellMessage))
+    callbackStore[shellHostname]?.[shellTopic]?.forEach(cb => {
+      cb(shellMessage)
+    })
   }
 )

@@ -2,8 +2,8 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
-  getModuleDisplayName,
   WASTE_CHUTE_CUTOUT,
+  getModuleDisplayName,
 } from '@opentrons/shared-data'
 import {
   getAdditionalEquipmentEntities,
@@ -14,8 +14,8 @@ import {
   getRobotStateAtActiveItem,
   getUnoccupiedLabwareLocationOptions,
 } from '../../../../top-selectors/labware-locations'
-import { getHasWasteChute } from '../../../labware'
 import { StepFormDropdown } from '../StepFormDropdownField'
+import { getHasWasteChute } from '../../../labware'
 
 export function LabwareLocationField(
   props: Omit<React.ComponentProps<typeof StepFormDropdown>, 'options'> & {
@@ -24,35 +24,30 @@ export function LabwareLocationField(
 ): JSX.Element {
   const { t } = useTranslation('form')
   const { labware, useGripper, value } = props
-  const labwareEntities = useSelector(getLabwareEntities)
-  const robotState = useSelector(getRobotStateAtActiveItem)
-  const moduleEntities = useSelector(getModuleEntities)
   const additionalEquipmentEntities = useSelector(
     getAdditionalEquipmentEntities
   )
-  const hasWasteChute = getHasWasteChute(additionalEquipmentEntities)
+  const labwareEntities = useSelector(getLabwareEntities)
+  const robotState = useSelector(getRobotStateAtActiveItem)
+  const moduleEntities = useSelector(getModuleEntities)
   const isLabwareOffDeck =
     labware != null ? robotState?.labware[labware]?.slot === 'offDeck' : false
-  const displayWasteChuteValue =
-    useGripper && hasWasteChute && !isLabwareOffDeck
 
   let unoccupiedLabwareLocationsOptions =
     useSelector(getUnoccupiedLabwareLocationOptions) ?? []
 
-  if (isLabwareOffDeck && hasWasteChute) {
-    unoccupiedLabwareLocationsOptions = unoccupiedLabwareLocationsOptions.filter(
-      option =>
-        option.value !== 'offDeck' && option.value !== WASTE_CHUTE_CUTOUT
-    )
-  } else if (useGripper || isLabwareOffDeck) {
+  if (useGripper || isLabwareOffDeck) {
     unoccupiedLabwareLocationsOptions = unoccupiedLabwareLocationsOptions.filter(
       option => option.value !== 'offDeck'
     )
-  } else if (!displayWasteChuteValue) {
+  }
+
+  if (!useGripper && getHasWasteChute(additionalEquipmentEntities)) {
     unoccupiedLabwareLocationsOptions = unoccupiedLabwareLocationsOptions.filter(
-      option => option.name !== 'Waste Chute in D3'
+      option => option.value !== WASTE_CHUTE_CUTOUT
     )
   }
+
   const location: string = value as string
 
   const bothFieldsSelected = labware != null && value != null

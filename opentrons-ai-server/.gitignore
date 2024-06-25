@@ -1,0 +1,13 @@
+*.env
+results
+package
+function.zip
+requirements.txt
+test.env
+cached_token.txt
+tests/helpers/cached_token.txt
+tests/helpers/prod_cached_token.txt
+tests/helpers/staging_cached_token.txt
+tests/helpers/*_cached_token.txt
+tests/helpers/test.env
+tests/helpers/*.env

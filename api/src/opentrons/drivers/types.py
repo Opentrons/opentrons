@@ -58,3 +58,28 @@ class ThermocyclerLidStatus(str, Enum):
     IN_BETWEEN = "in_between"
     OPEN = "open"
     MAX = "max"
+
+
+class AbsorbanceReaderLidStatus(str, Enum):
+    """Absorbance reader lid status."""
+
+    UNKNOWN = "unknown"
+    ON = "on"
+    OFF = "off"
+
+
+class AbsorbanceReaderPlatePresence(str, Enum):
+    """Absorbance reader plate presence."""
+
+    UNKNOWN = "unknown"
+    PRESENT = "present"
+    ABSENT = "absent"
+
+
+class AbsorbanceReaderDeviceState(str, Enum):
+    """Absorbance reader device state."""
+
+    UNKNOWN = "unknown"
+    OK = "ok"
+    BROKEN_FW = "broken_fw"
+    ERROR = "error"

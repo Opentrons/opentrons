@@ -12,12 +12,8 @@
     "title": "Allow all tip rack options",
     "description": "Enable selection of all tip racks for each pipette."
   },
-  "OT_PD_ENABLE_MULTI_TIP": {
-    "title": "Enable multi tiprack support",
-    "description": "Allow users to select multiple tipracks per pipette"
-  },
-  "OT_PD_ENABLE_MOAM": {
-    "title": "Enable multiples of a module",
-    "description": "Allow users to select multiples of a module"
+  "OT_PD_ENABLE_ABSORBANCE_READER": {
+    "title": "Enable absorbance plate reader",
+    "description": "Enable absorbance plate reader support."
   }
 }

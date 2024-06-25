@@ -7,7 +7,7 @@ import {
   POSITION_FIXED,
   PrimaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   VIEWPORT,
 } from '@opentrons/components'
 import { Toast } from '.'
@@ -31,14 +31,14 @@ const Template: Story<React.ComponentProps<typeof Toast>> = args => {
       <Flex flexDirection={DIRECTION_ROW} marginY={SPACING.spacing16}>
         <PrimaryButton onClick={handleClick}>Click me</PrimaryButton>
         <Flex flexDirection={DIRECTION_COLUMN} marginLeft={SPACING.spacing8}>
-          <StyledText as="p">
+          <LegacyStyledText as="p">
             When clicking the button, the Toast shows up in the bottom.
-          </StyledText>
-          <StyledText as="p">
+          </LegacyStyledText>
+          <LegacyStyledText as="p">
             Unless you set a duration or disable the timeout, the Toast will
             disappear between 2 and 7 seconds depending on the length of the
             text.
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
       </Flex>
       {isShowToast && (
@@ -48,7 +48,12 @@ const Template: Story<React.ComponentProps<typeof Toast>> = args => {
           bottom={SPACING.spacing16}
           zIndex={1000}
         >
-          <Toast {...args} onClose={() => setIsShowToast(false)} />
+          <Toast
+            {...args}
+            onClose={() => {
+              setIsShowToast(false)
+            }}
+          />
         </Flex>
       )}
     </>

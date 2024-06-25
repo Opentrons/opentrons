@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 import { Provider } from 'react-redux'
-import { createStore, Store } from 'redux'
+import { createStore } from 'redux'
 import { renderHook } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import {
@@ -11,6 +11,7 @@ import {
 
 import { useLights } from '..'
 
+import type { Store } from 'redux'
 import type { Mock } from 'vitest'
 
 vi.mock('@opentrons/react-api-client')

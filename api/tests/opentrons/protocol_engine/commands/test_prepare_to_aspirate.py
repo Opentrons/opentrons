@@ -6,6 +6,7 @@ from opentrons.protocol_engine.execution import (
     PipettingHandler,
 )
 
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.prepare_to_aspirate import (
     PrepareToAspirateParams,
     PrepareToAspirateImplementation,
@@ -26,4 +27,4 @@ async def test_prepare_to_aspirate_implmenetation(
     )
 
     result = await subject.execute(data)
-    assert isinstance(result, PrepareToAspirateResult)
+    assert result == SuccessData(public=PrepareToAspirateResult(), private=None)

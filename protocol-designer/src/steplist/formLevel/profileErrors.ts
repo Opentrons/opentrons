@@ -1,6 +1,7 @@
 import uniqBy from 'lodash/uniqBy'
 import { THERMOCYCLER_PROFILE } from '../../constants'
-import { PROFILE_STEP, ProfileStepItem } from '../../form-types'
+import { PROFILE_STEP } from '../../form-types'
+import type { ProfileStepItem } from '../../form-types'
 
 // TODO: real HydratedFormData type
 type HydratedFormData = any
@@ -54,7 +55,7 @@ export const getProfileFormErrors = (
     const item = profileItemsById[itemId]
 
     if (item.type === PROFILE_STEP) {
-      addStepErrors(item)
+      addStepErrors(item as ProfileStepItem)
     } else {
       // Cycles themselves don't currently have any form-level errors,
       // so we just validate each cycle's steps

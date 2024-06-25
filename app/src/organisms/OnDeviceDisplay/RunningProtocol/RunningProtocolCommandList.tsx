@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-import { ViewportList, ViewportListRef } from 'react-viewport-list'
+import { ViewportList } from 'react-viewport-list'
 
 import {
   ALIGN_CENTER,
@@ -16,17 +16,18 @@ import {
   OVERFLOW_WRAP_ANYWHERE,
   POSITION_RELATIVE,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
 
-import { CommandText } from '../../CommandText'
-import { CommandIcon } from '../../RunPreview/CommandIcon'
+import { CommandText, CommandIcon } from '../../../molecules/Command'
+import { getCommandTextData } from '../../../molecules/Command/utils/getCommandTextData'
 import { PlayPauseButton } from './PlayPauseButton'
 import { StopButton } from './StopButton'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '../../../redux/analytics'
 
+import type { ViewportListRef } from 'react-viewport-list'
 import type {
   CompletedProtocolAnalysis,
   RobotType,
@@ -166,10 +167,12 @@ export function RunningProtocolCommandList({
         height="6.75rem"
       >
         <Flex flexDirection={DIRECTION_COLUMN}>
-          <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightBold}>
+          <LegacyStyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightBold}>
             {currentRunStatus}
-          </StyledText>
-          <StyledText css={TITLE_TEXT_STYLE}>{protocolName}</StyledText>
+          </LegacyStyledText>
+          <LegacyStyledText css={TITLE_TEXT_STYLE}>
+            {protocolName}
+          </LegacyStyledText>
         </Flex>
         <Flex height="100%" gridGap="1.5rem" alignItems={ALIGN_CENTER}>
           <StopButton onStop={onStop} buttonSize="6.26rem" iconSize="2.5rem" />
@@ -234,7 +237,7 @@ export function RunningProtocolCommandList({
                     <CommandIcon command={command} size="2rem" />
                     <CommandText
                       command={command}
-                      robotSideAnalysis={robotSideAnalysis}
+                      commandTextData={getCommandTextData(robotSideAnalysis)}
                       robotType={robotType}
                       css={COMMAND_ROW_STYLE}
                       isOnDevice={true}

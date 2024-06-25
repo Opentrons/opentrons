@@ -1,10 +1,7 @@
-import type { StepIdType } from '../form-types'
-
 export interface DismissAction<ActionType> {
   type: ActionType
   payload: {
     type: string
-    stepId: StepIdType
   }
 }
 

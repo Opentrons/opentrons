@@ -6,11 +6,11 @@ import {
   getSelectedWells,
   getHighlightedWells,
 } from '../../well-selection/selectors'
-import { WellGroup } from '@opentrons/components'
-import { LabwareDefinition2, LabwareWell } from '@opentrons/shared-data'
-import { SingleLabwareLiquidState } from '@opentrons/step-generation'
-import { Selector } from '../../types'
-import {
+import type { WellGroup } from '@opentrons/components'
+import type { LabwareDefinition2, LabwareWell } from '@opentrons/shared-data'
+import type { SingleLabwareLiquidState } from '@opentrons/step-generation'
+import type { Selector } from '../../types'
+import type {
   ContentsByWell,
   WellContentsByLabware,
 } from '../../labware-ingred/types'

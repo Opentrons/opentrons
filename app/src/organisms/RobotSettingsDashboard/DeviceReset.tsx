@@ -10,7 +10,7 @@ import {
   DIRECTION_ROW,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   useConditionalConfirm,
 } from '@opentrons/components'
@@ -191,7 +191,9 @@ export function DeviceReset({
           heading: t('device_resets_cannot_be_undone'),
           type: 'alert',
         }}
-        onClickBack={() => setCurrentOption(null)}
+        onClickBack={() => {
+          setCurrentOption(null)
+        }}
       />
       <Flex
         gridGap={SPACING.spacing24}
@@ -208,26 +210,26 @@ export function DeviceReset({
                   id={option.id}
                   type="checkbox"
                   value={option.id}
-                  onChange={() =>
+                  onChange={() => {
                     setResetOptions({
                       ...resetOptions,
                       [option.id]: !(resetOptions[option.id] ?? false),
                     })
-                  }
+                  }}
                 />
                 <OptionLabel
                   htmlFor={option.id}
                   isSelected={resetOptions[option.id]}
                 >
                   <Flex flexDirection={DIRECTION_COLUMN}>
-                    <StyledText
+                    <LegacyStyledText
                       as="p"
                       fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     >
                       {optionText}
-                    </StyledText>
+                    </LegacyStyledText>
                     {subText != null ? (
-                      <StyledText
+                      <LegacyStyledText
                         as="p"
                         color={
                           resetOptions[option.id] ?? false
@@ -236,7 +238,7 @@ export function DeviceReset({
                         }
                       >
                         {subText}
-                      </StyledText>
+                      </LegacyStyledText>
                     ) : null}
                   </Flex>
                 </OptionLabel>
@@ -274,10 +276,13 @@ export function DeviceReset({
             }
           >
             <Flex flexDirection={DIRECTION_COLUMN}>
-              <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+              <LegacyStyledText
+                as="p"
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              >
                 {t('clear_all_stored_data')}
-              </StyledText>
-              <StyledText
+              </LegacyStyledText>
+              <LegacyStyledText
                 as="p"
                 color={
                   ((resetOptions.authorizedKeys ?? false) &&
@@ -288,7 +293,7 @@ export function DeviceReset({
                 }
               >
                 {t('clear_all_stored_data_description')}
-              </StyledText>
+              </LegacyStyledText>
             </Flex>
           </OptionLabel>
         </Flex>
@@ -339,9 +344,9 @@ export const ConfirmClearDataModal = ({
           gridGap={SPACING.spacing12}
           paddingBottom={SPACING.spacing32}
         >
-          <StyledText as="p">
+          <LegacyStyledText as="p">
             {t('confirm_device_reset_description')}
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
         <Flex
           flexDirection={DIRECTION_ROW}

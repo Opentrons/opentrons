@@ -41,7 +41,7 @@ describe('CheckboxField', () => {
     // INNER_STYLE_NO_VALUE
     expect(checkBoxIcon).toHaveStyle(`width: 1.25rem`)
     expect(checkBoxIcon).toHaveStyle(`min-width: 1.25rem`)
-    expect(checkBoxIcon).toHaveStyle(`color: ${String(COLORS.grey60)}`)
+    expect(checkBoxIcon).toHaveStyle(`color: ${String(COLORS.grey50)}`)
     expect(checkBoxIcon).toHaveStyle(`display: flex`)
     expect(checkBoxIcon).toHaveStyle(
       `border-radius: ${String(BORDERS.borderRadius2)}`
@@ -82,7 +82,7 @@ describe('CheckboxField', () => {
     const checkBoxIcon = screen.getByTestId('CheckboxField_icon')
     expect(checkBoxIcon).toHaveStyle(`width: 1.25rem`)
     expect(checkBoxIcon).toHaveStyle(`min-width: 1.25rem`)
-    expect(checkBoxIcon).toHaveStyle(`color: ${String(COLORS.blue60)}`)
+    expect(checkBoxIcon).toHaveStyle(`color: ${String(COLORS.blue50)}`)
     expect(checkBoxIcon).toHaveStyle(`display: flex`)
     expect(checkBoxIcon).toHaveStyle(
       `border-radius: ${String(BORDERS.borderRadius2)}`
@@ -99,7 +99,7 @@ describe('CheckboxField', () => {
     const checkBoxIcon = screen.getByTestId('CheckboxField_icon')
     expect(checkBoxIcon).toHaveStyle(`width: 1.25rem`)
     expect(checkBoxIcon).toHaveStyle(`min-width: 1.25rem`)
-    expect(checkBoxIcon).toHaveStyle(`color: ${String(COLORS.grey60)}`)
+    expect(checkBoxIcon).toHaveStyle(`color: ${String(COLORS.grey50)}`)
     expect(checkBoxIcon).toHaveStyle(`display: flex`)
     expect(checkBoxIcon).toHaveStyle(
       `border-radius: ${String(BORDERS.borderRadius2)}`

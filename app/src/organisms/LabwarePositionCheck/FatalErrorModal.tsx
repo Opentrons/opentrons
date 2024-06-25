@@ -14,7 +14,7 @@ import {
   PrimaryButton,
   RESPONSIVENESS,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TEXT_ALIGN_CENTER,
   TEXT_TRANSFORM_CAPITALIZE,
   TYPOGRAPHY,
@@ -61,19 +61,19 @@ export function FatalErrorModal(props: FatalErrorModalProps): JSX.Element {
           {i18n.format(t('shared:something_went_wrong'), 'sentenceCase')}
         </ErrorHeader>
         {shouldUseMetalProbe ? (
-          <StyledText
+          <LegacyStyledText
             as="p"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             textAlign={TEXT_ALIGN_CENTER}
           >
             {t('remove_probe_before_exit')}
-          </StyledText>
+          </LegacyStyledText>
         ) : null}
-        <StyledText as="p" textAlign={TEXT_ALIGN_CENTER}>
+        <LegacyStyledText as="p" textAlign={TEXT_ALIGN_CENTER}>
           {t('branded:help_us_improve_send_error_report', {
             support_email: SUPPORT_EMAIL,
           })}
-        </StyledText>
+        </LegacyStyledText>
         <ErrorTextArea readOnly value={errorMessage ?? ''} spellCheck={false} />
         <PrimaryButton
           textTransform={TEXT_TRANSFORM_CAPITALIZE}

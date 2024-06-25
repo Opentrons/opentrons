@@ -9,7 +9,7 @@ from opentrons.protocol_engine import (
     LabwareOffsetCreate,
     StateSummary,
     CommandSlice,
-    CurrentCommand,
+    CommandPointer,
     Command,
 )
 from opentrons.protocol_engine.types import RunTimeParamValuesType
@@ -194,8 +194,9 @@ class RunDataManager:
             created_at=created_at,
             protocol_id=protocol.protocol_id if protocol is not None else None,
         )
-        await self._runs_publisher.initialize(
+        await self._runs_publisher.start_publishing_for_run(
             get_current_command=self.get_current_command,
+            get_recovery_target_command=self.get_recovery_target_command,
             get_state_summary=self._get_good_state_summary,
             run_id=run_id,
         )
@@ -253,9 +254,7 @@ class RunDataManager:
                 f"Cannot get load labware definitions of {run_id} because it is not the current run."
             )
 
-        return (
-            self._engine_store.engine.state_view.labware.get_loaded_labware_definitions()
-        )
+        return self._engine_store.get_loaded_labware_definitions()
 
     def get_all(self, length: Optional[int]) -> List[Union[Run, BadRun]]:
         """Get current and stored run resources.
@@ -334,8 +333,8 @@ class RunDataManager:
                 run_id
             )
         else:
-            state_summary = self._engine_store.engine.state_view.get_summary()
-            parameters = self._engine_store.runner.run_time_parameters
+            state_summary = self._engine_store.get_state_summary()
+            parameters = self._engine_store.get_run_time_parameters()
             run_resource = self._run_store.get(run_id=run_id)
 
         return _build_run(
@@ -362,25 +361,43 @@ class RunDataManager:
             RunNotFoundError: The given run identifier was not found in the database.
         """
         if run_id == self._engine_store.current_run_id:
-            the_slice = self._engine_store.engine.state_view.commands.get_slice(
-                cursor=cursor, length=length
-            )
-            return the_slice
+            return self._engine_store.get_command_slice(cursor=cursor, length=length)
 
         # Let exception propagate
         return self._run_store.get_commands_slice(
             run_id=run_id, cursor=cursor, length=length
         )
 
-    def get_current_command(self, run_id: str) -> Optional[CurrentCommand]:
-        """Get the currently executing command, if any.
+    def get_current_command(self, run_id: str) -> Optional[CommandPointer]:
+        """Get the "current" command, if any.
+
+        See `ProtocolEngine.state_view.commands.get_current()` for the definition
+        of "current."
 
         Args:
             run_id: ID of the run.
         """
         if self._engine_store.current_run_id == run_id:
-            return self._engine_store.engine.state_view.commands.get_current()
-        return None
+            return self._engine_store.get_current_command()
+        else:
+            # todo(mm, 2024-05-20):
+            # For historical runs to behave consistently with the current run,
+            # this should be the most recently completed command, not `None`.
+            return None
+
+    def get_recovery_target_command(self, run_id: str) -> Optional[CommandPointer]:
+        """Get the current error recovery target.
+
+        See `ProtocolEngine.state_view.commands.get_recovery_target()`.
+
+        Args:
+            run_id: ID of the run.
+        """
+        if self._engine_store.current_run_id == run_id:
+            return self._engine_store.get_command_recovery_target()
+        else:
+            # Historical runs can't have any ongoing error recovery.
+            return None
 
     def get_command(self, run_id: str, command_id: str) -> Command:
         """Get a run's command by ID.
@@ -394,9 +411,7 @@ class RunDataManager:
             CommandNotFoundError: The given command identifier was not found.
         """
         if self._engine_store.current_run_id == run_id:
-            return self._engine_store.engine.state_view.commands.get(
-                command_id=command_id
-            )
+            return self._engine_store.get_command(command_id=command_id)
 
         return self._run_store.get_command(run_id=run_id, command_id=command_id)
 
@@ -404,7 +419,7 @@ class RunDataManager:
         """Get all commands of a run in a serialized json list."""
         if (
             run_id == self._engine_store.current_run_id
-            and not self._engine_store.engine.state_view.commands.get_is_terminal()
+            and not self._engine_store.get_is_run_terminal()
         ):
             raise PreSerializedCommandsNotAvailableError(
                 "Pre-serialized commands are only available after a run has ended."
@@ -413,7 +428,7 @@ class RunDataManager:
 
     def _get_state_summary(self, run_id: str) -> Union[StateSummary, BadStateSummary]:
         if run_id == self._engine_store.current_run_id:
-            return self._engine_store.engine.state_view.get_summary()
+            return self._engine_store.get_state_summary()
         else:
             return self._run_store.get_state_summary(run_id=run_id)
 
@@ -423,6 +438,6 @@ class RunDataManager:
 
     def _get_run_time_parameters(self, run_id: str) -> List[RunTimeParameter]:
         if run_id == self._engine_store.current_run_id:
-            return self._engine_store.runner.run_time_parameters
+            return self._engine_store.get_run_time_parameters()
         else:
             return self._run_store.get_run_time_parameters(run_id=run_id)

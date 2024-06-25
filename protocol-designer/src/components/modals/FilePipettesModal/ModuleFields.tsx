@@ -6,8 +6,6 @@ import {
   MAGNETIC_MODULE_TYPE,
   MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V2,
-  ModuleModel,
-  ModuleType,
   OT2_ROBOT_TYPE,
   SPAN7_8_10_11_SLOT,
   TEMPERATURE_MODULE_TYPE,
@@ -22,6 +20,7 @@ import {
 import { uuid } from '../../../utils'
 import { ModuleDiagram } from '../../modules'
 import { EquipmentOption } from '../CreateFileWizard/EquipmentOption'
+import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 import type { WizardTileProps } from '../CreateFileWizard/types'
 
 export const DEFAULT_SLOT_MAP: { [moduleType in ModuleType]?: string } = {

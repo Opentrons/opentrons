@@ -6,7 +6,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { Banner } from '../../atoms/Banner'
@@ -35,15 +35,19 @@ export function UpdateRobotBanner(
     robot !== null &&
     robot.healthStatus === 'ok' ? (
     <Flex
-      onClick={(e: React.MouseEvent) => e.stopPropagation()}
+      onClick={(e: React.MouseEvent) => {
+        e.stopPropagation()
+      }}
       flexDirection={DIRECTION_COLUMN}
     >
       <Banner type="error" {...styleProps} iconMarginLeft={SPACING.spacing4}>
-        <StyledText as="p" marginRight={SPACING.spacing4}>
+        <LegacyStyledText as="p" marginRight={SPACING.spacing4}>
           {t('branded:robot_software_update_required')}
-        </StyledText>
+        </LegacyStyledText>
         <Btn
-          onClick={() => handleUpdateBuildroot(robot)}
+          onClick={() => {
+            handleUpdateBuildroot(robot)
+          }}
           css={TYPOGRAPHY.pRegular}
           textDecoration={TYPOGRAPHY.textDecorationUnderline}
         >

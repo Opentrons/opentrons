@@ -9,7 +9,7 @@ import {
   Icon,
   LocationIcon,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
@@ -76,7 +76,9 @@ export function LiquidDetails(props: LiquidDetailsProps): JSX.Element {
           labwareId={labwareIdModal}
           liquidId={liquid.id}
           runId={runId}
-          closeModal={() => setLabwareIdModal(null)}
+          closeModal={() => {
+            setLabwareIdModal(null)
+          }}
         />
       )}
       <Table>
@@ -97,7 +99,9 @@ export function LiquidDetails(props: LiquidDetailsProps): JSX.Element {
               <TableRow
                 key={labware.labwareId}
                 aria-label={`LiquidDetails_${liquid.id}`}
-                onClick={() => setLabwareIdModal(labware.labwareId)}
+                onClick={() => {
+                  setLabwareIdModal(labware.labwareId)
+                }}
               >
                 <TableDatum>
                   <Flex>
@@ -105,13 +109,13 @@ export function LiquidDetails(props: LiquidDetailsProps): JSX.Element {
                   </Flex>
                 </TableDatum>
                 <TableDatum>
-                  <StyledText
+                  <LegacyStyledText
                     lineHeight={TYPOGRAPHY.lineHeight28}
                     fontSize="1.375rem"
                     fontWeight={TYPOGRAPHY.fontWeightRegular}
                   >
                     {labwareName}
-                  </StyledText>
+                  </LegacyStyledText>
                 </TableDatum>
 
                 <TableDatum>

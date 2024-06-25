@@ -10,7 +10,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   Link,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 import type { LabwareBrand } from '../../pages/Labware/types'
 
@@ -34,22 +34,24 @@ export function ManufacturerDetails(
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
         <Flex flexDirection={DIRECTION_COLUMN}>
-          <StyledText as="h6">{t('manufacturer')}</StyledText>
-          <StyledText as="p">{manufacturerValue}</StyledText>
+          <LegacyStyledText as="h6">{t('manufacturer')}</LegacyStyledText>
+          <LegacyStyledText as="p">{manufacturerValue}</LegacyStyledText>
           {links != null &&
             links.length > 0 &&
             links.map((href, index) => (
-              <StyledText as="p" key={index}>
+              <LegacyStyledText as="p" key={index}>
                 <Link href={href} external>
                   website <Icon height="10px" name="open-in-new" />
                 </Link>
-              </StyledText>
+              </LegacyStyledText>
             ))}
         </Flex>
         {brandId != null && brandId.length > 0 && (
           <Flex flexDirection={DIRECTION_COLUMN}>
-            <StyledText as="h6">{t('manufacturer_number')}</StyledText>
-            <StyledText as="p">{brandId.join(', ')}</StyledText>
+            <LegacyStyledText as="h6">
+              {t('manufacturer_number')}
+            </LegacyStyledText>
+            <LegacyStyledText as="p">{brandId.join(', ')}</LegacyStyledText>
           </Flex>
         )}
       </Flex>

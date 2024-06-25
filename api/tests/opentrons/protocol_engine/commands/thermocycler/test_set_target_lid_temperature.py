@@ -10,6 +10,7 @@ from opentrons.protocol_engine.state.module_substates import (
 )
 from opentrons.protocol_engine.execution import EquipmentHandler
 from opentrons.protocol_engine.commands import thermocycler as tc_commands
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.thermocycler.set_target_lid_temperature import (
     SetTargetLidTemperatureImpl,
 )
@@ -55,4 +56,4 @@ async def test_set_target_lid_temperature(
     result = await subject.execute(data)
 
     decoy.verify(await tc_hardware.set_target_lid_temperature(celsius=45.6), times=1)
-    assert result == expected_result
+    assert result == SuccessData(public=expected_result, private=None)

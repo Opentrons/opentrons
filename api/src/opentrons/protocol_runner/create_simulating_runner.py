@@ -12,7 +12,7 @@ from opentrons.protocol_reader.protocol_source import ProtocolConfig
 
 from opentrons_shared_data.robot.dev_types import RobotType
 
-from .legacy_wrappers import LegacySimulatingContextCreator
+from .python_protocol_wrappers import SimulatingContextCreator
 from .protocol_runner import create_protocol_runner, AbstractRunner
 
 
@@ -62,7 +62,7 @@ async def create_simulating_runner(
         load_fixed_trash=should_load_fixed_trash(protocol_config),
     )
 
-    simulating_legacy_context_creator = LegacySimulatingContextCreator(
+    simulating_context_creator = SimulatingContextCreator(
         hardware_api=simulating_hardware_api,
         protocol_engine=protocol_engine,
     )
@@ -71,7 +71,7 @@ async def create_simulating_runner(
         protocol_config=protocol_config,
         protocol_engine=protocol_engine,
         hardware_api=simulating_hardware_api,
-        legacy_context_creator=simulating_legacy_context_creator,
+        protocol_context_creator=simulating_context_creator,
     )
 
 

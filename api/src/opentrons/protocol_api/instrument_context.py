@@ -312,26 +312,33 @@ class InstrumentContext(publisher.CommandPublisher):
         :type volume: int or float
 
         :param location: Tells the robot where to dispense liquid held in the pipette.
-                         The location can be a :py:class:`.Well` or a
-                         :py:class:`.Location`.
+            The location can be a :py:class:`.Well`, :py:class:`.Location`,
+            :py:class:`.TrashBin`, or :py:class:`.WasteChute`.
 
-                            - If the location is a ``Well``, the pipette will dispense
+                            - If a ``Well``, the pipette will dispense
                               at or above the bottom center of the well. The distance (in
                               mm) from the well bottom is specified by
                               :py:obj:`well_bottom_clearance.dispense
                               <well_bottom_clearance>`.
 
-                            - If the location is a ``Location`` (e.g., the result of
-                              :py:meth:`.Well.top` or :py:meth:`.Well.bottom`), the robot
-                              will dispense into that specified position.
+                            - If a ``Location`` (e.g., the result of
+                              :py:meth:`.Well.top` or :py:meth:`.Well.bottom`), the pipette
+                              will dispense at that specified position.
 
-                            - If the ``location`` is unspecified, the robot will
-                              dispense into its current position.
+                            - If a trash container, the pipette will dispense at a location
+                              relative to its center and the trash container's top center.
+                              See :ref:`position-relative-trash` for details.
+
+                            - If unspecified, the pipette will
+                              dispense at its current position.
 
                             If only a ``location`` is passed (e.g.,
                             ``pipette.dispense(location=plate['A1'])``), all of the
                             liquid aspirated into the pipette will be dispensed (the
                             amount is accessible through :py:attr:`current_volume`).
+
+            .. versionchanged:: 2.16
+                Accepts ``TrashBin`` and ``WasteChute`` values.
 
         :param rate: How quickly a pipette dispenses liquid. The speed in µL/s is
                      calculated as ``rate`` multiplied by :py:attr:`flow_rate.dispense
@@ -549,7 +556,11 @@ class InstrumentContext(publisher.CommandPublisher):
         :ref:`blow-out`.
 
         :param location: The blowout location. If no location is specified, the pipette
-                         will blow out from its current position.
+            will blow out from its current position.
+
+            .. versionchanged:: 2.16
+                Accepts ``TrashBin`` and ``WasteChute`` values.
+
         :type location: :py:class:`.Well` or :py:class:`.Location` or ``None``
 
         :raises RuntimeError: If no location is specified and the location cache is
@@ -792,6 +803,21 @@ class InstrumentContext(publisher.CommandPublisher):
         :py:meth:`.Labware.wells`. To adjust where the sequence starts, use
         :py:obj:`.starting_tip`.
 
+        The exact position for tip pickup accounts for the length of the tip and how
+        much the tip overlaps with the pipette nozzle. These measurements are fixed
+        values on Flex, and are based on the results of tip length calibration on OT-2.
+
+        .. note::
+            API version 2.19 updates the tip overlap values for Flex. When updating a
+            protocol from 2.18 (or lower) to 2.19 (or higher), pipette performance
+            should improve without additional changes to your protocol. Nevertheless, it
+            is good practice after updating to do the following:
+
+            - Run Labware Position Check.
+            - Perform a dry run of your protocol.
+            - If tip position is slightly higher than expected, adjust the ``location``
+              parameter of pipetting actions to achieve the desired result.
+
         :param location: The location from which to pick up a tip. The ``location``
                          argument can be specified in several ways:
 
@@ -853,6 +879,9 @@ class InstrumentContext(publisher.CommandPublisher):
             can't prepare itself for aspiration during :py:meth:`.pick_up_tip`, and will
             instead always prepare during :py:meth:`.aspirate`. Version 2.12 and earlier
             will raise an ``APIVersionError`` if a value is set for ``prep_after``.
+
+        .. versionchanged:: 2.19
+            Uses new values for how much a tip overlaps with the pipette nozzle.
 
         :returns: This instance.
         """
@@ -1010,11 +1039,6 @@ class InstrumentContext(publisher.CommandPublisher):
         If no location is passed (e.g. ``pipette.drop_tip()``), the pipette will drop
         the attached tip into its :py:attr:`trash_container`.
 
-        Starting with API version 2.15, if the trash container is the default fixed
-        trash, the API will instruct the pipette to drop tips in different locations
-        within the trash container. Varying the tip drop location helps prevent tips
-        from piling up in a single location.
-
         The location in which to drop the tip can be manually specified with the
         ``location`` argument. The ``location`` argument can be specified in several
         ways:
@@ -1033,8 +1057,21 @@ class InstrumentContext(publisher.CommandPublisher):
               the ``WasteChute`` object. For example,
               ``pipette.drop_tip(location=waste_chute)``.
 
+        In API versions 2.15 to 2.17, if ``location`` is a ``TrashBin`` or not
+        specified, the API will instruct the pipette to drop tips in different locations
+        within the bin. Varying the tip drop location helps prevent tips
+        from piling up in a single location.
+
+        Starting with API version 2.18, the API will only vary the tip drop location if
+        ``location`` is not specified. Specifying a ``TrashBin`` as the ``location``
+        behaves the same as specifying :py:meth:`.TrashBin.top`, which is a fixed position.
+
         :param location:
-            The location to drop the tip.
+            Where to drop the tip.
+
+            .. versionchanged:: 2.16
+                Accepts ``TrashBin`` and ``WasteChute`` values.
+
         :type location:
             :py:class:`~.types.Location` or :py:class:`.Well` or ``None``
         :param home_after:
@@ -1481,7 +1518,11 @@ class InstrumentContext(publisher.CommandPublisher):
 
         See :ref:`move-to` for examples.
 
-        :param location: The location to move to.
+        :param location: Where to move to.
+
+          .. versionchanged:: 2.16
+               Accepts ``TrashBin`` and ``WasteChute`` values.
+
         :type location: :py:class:`~.types.Location`
         :param force_direct: If ``True``, move directly to the destination without arc
                              motion.
@@ -1935,6 +1976,10 @@ class InstrumentContext(publisher.CommandPublisher):
             to determine how it will move to different locations on the deck. The string
             should be of the same format used when identifying wells by name.
             Required unless setting ``style=ALL``.
+
+            .. note::
+                If possible, don't use both ``start="A1"`` and ``start="A12"`` to pick up
+                tips *from the same rack*. Doing so can affect positional accuracy.
 
         :type start: str or ``None``
         :param tip_racks: Behaves the same as setting the ``tip_racks`` parameter of

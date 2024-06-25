@@ -2,6 +2,7 @@
 import pytest
 from decoy import Decoy
 
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands import (
     LoadLiquidResult,
     LoadLiquidImplementation,
@@ -35,7 +36,7 @@ async def test_load_liquid_implementation(
     )
     result = await subject.execute(data)
 
-    assert result == LoadLiquidResult()
+    assert result == SuccessData(public=LoadLiquidResult(), private=None)
 
     decoy.verify(mock_state_view.liquid.validate_liquid_id("liquid-id"))
 

@@ -3,7 +3,6 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { AttachedModule } from '../../redux/modules/types'
 import type {
   HeaterShakerDeactivateHeaterCreateCommand,
   HeaterShakerDeactivateShakerCreateCommand,
@@ -15,6 +14,7 @@ import type {
   HeaterShakerCloseLatchCreateCommand,
   TCCloseLidCreateCommand,
 } from '@opentrons/shared-data'
+import type { AttachedModule } from '../../redux/modules/types'
 
 export type ModulePrepCommandsType =
   | TemperatureModuleDeactivateCreateCommand

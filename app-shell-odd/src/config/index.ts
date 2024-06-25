@@ -83,23 +83,23 @@ export function registerConfig(dispatch: Dispatch): (action: Action) => void {
         )
 
         if (path === 'devtools') {
-          systemd.setRemoteDevToolsEnabled(Boolean(nextValue)).catch(err =>
+          systemd.setRemoteDevToolsEnabled(Boolean(nextValue)).catch(err => {
             log().debug('Something wrong when setting remote dev tools', {
               err,
             })
-          )
+          })
         }
 
         // Note (kj:08/03/2023) change touchscreen brightness
         if (path === 'onDeviceDisplaySettings.brightness') {
-          systemd.updateBrightness(String(nextValue)).catch(err =>
+          systemd.updateBrightness(String(nextValue)).catch(err => {
             log().debug(
               'Something wrong when updating the touchscreen brightness',
               {
                 err,
               }
             )
-          )
+          })
         }
 
         log().debug('Updating config', { path, nextValue })
@@ -124,7 +124,7 @@ export function getConfig<P extends keyof Config>(path: P): Config[P]
 export function getConfig(): Config
 export function getConfig(path?: any): any {
   const result = store().get(path)
-  const over = getOverrides(path)
+  const over = getOverrides(path as string | undefined)
 
   if (over != null) {
     if (typeof result === 'object' && result != null) {

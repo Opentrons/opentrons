@@ -11,14 +11,21 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   POSITION_ABSOLUTE,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   useOnClickOutside,
   POSITION_RELATIVE,
   useHoverTooltip,
+  OVERFLOW_AUTO,
 } from '@opentrons/components'
 import { Tooltip } from '../Tooltip'
 import { MenuItem } from './MenuItem'
+
+/** this is the max height to display 10 items */
+const MAX_HEIGHT = 316
+
+/** this is for adjustment variable for the case that the space of the bottom and the space of the top are very close */
+const HEIGHT_ADJUSTMENT = 100
 
 export interface DropdownOption {
   name: string
@@ -69,6 +76,12 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
     'top' | 'bottom'
   >('bottom')
 
+  const dropDownMenuWrapperRef = useOnClickOutside<HTMLDivElement>({
+    onClickOutside: () => {
+      setShowDropdownMenu(false)
+    },
+  })
+
   React.useEffect(() => {
     const handlePositionCalculation = (): void => {
       const dropdownRect = dropDownMenuWrapperRef.current?.getBoundingClientRect()
@@ -88,10 +101,18 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
           scrollOffset = parentRect.top
         }
 
-        const dropdownBottom =
-          dropdownRect.bottom + (filterOptions.length + 1) * 34 - scrollOffset
+        const downSpace =
+          filterOptions.length + 1 > 10
+            ? MAX_HEIGHT
+            : (filterOptions.length + 1) * 34
+        const dropdownBottom = dropdownRect.bottom + downSpace - scrollOffset
 
-        setDropdownPosition(dropdownBottom > availableHeight ? 'top' : 'bottom')
+        setDropdownPosition(
+          dropdownBottom > availableHeight &&
+            Math.abs(dropdownBottom - availableHeight) > HEIGHT_ADJUSTMENT
+            ? 'top'
+            : 'bottom'
+        )
       }
     }
 
@@ -103,16 +124,11 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
       window.removeEventListener('resize', handlePositionCalculation)
       window.removeEventListener('scroll', handlePositionCalculation)
     }
-  }, [filterOptions.length, window.innerHeight])
+  }, [filterOptions.length, dropDownMenuWrapperRef])
 
   const toggleSetShowDropdownMenu = (): void => {
     setShowDropdownMenu(!showDropdownMenu)
   }
-  const dropDownMenuWrapperRef = useOnClickOutside<HTMLDivElement>({
-    onClickOutside: () => {
-      setShowDropdownMenu(false)
-    },
-  })
 
   const DROPDOWN_STYLE = css`
     flex-direction: ${DIRECTION_ROW};
@@ -154,13 +170,13 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
     <Flex flexDirection={DIRECTION_COLUMN} ref={dropDownMenuWrapperRef}>
       {title !== null ? (
         <Flex gridGap={SPACING.spacing8}>
-          <StyledText
+          <LegacyStyledText
             as="label"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             paddingBottom={SPACING.spacing8}
           >
             {title}
-          </StyledText>
+          </LegacyStyledText>
           {tooltipText != null ? (
             <>
               <Flex {...targetProps}>
@@ -184,7 +200,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
           css={DROPDOWN_STYLE}
           tabIndex={tabIndex}
         >
-          <StyledText
+          <LegacyStyledText
             css={css`
               ${dropdownType === 'rounded'
                 ? TYPOGRAPHY.pSemiBold
@@ -195,7 +211,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
             `}
           >
             {currentOption.name}
-          </StyledText>
+          </LegacyStyledText>
           {showDropdownMenu ? (
             <Icon size="0.75rem" name="menu-down" transform="rotate(180deg)" />
           ) : (
@@ -204,7 +220,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
         </Flex>
         {showDropdownMenu && (
           <Flex
-            zIndex={2}
+            zIndex={3}
             borderRadius={BORDERS.borderRadius8}
             boxShadow={BORDERS.tinyDropShadow}
             position={POSITION_ABSOLUTE}
@@ -213,9 +229,12 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
             width={width}
             top={dropdownPosition === 'bottom' ? '2.5rem' : undefined}
             bottom={dropdownPosition === 'top' ? '2.5rem' : undefined}
+            overflowY={OVERFLOW_AUTO}
+            maxHeight="20rem" // Set the maximum display number to 10.
           >
             {filterOptions.map((option, index) => (
               <MenuItem
+                zIndex={3}
                 key={`${option.name}-${index}`}
                 onClick={() => {
                   onClick(option.value)
@@ -229,13 +248,13 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
         )}
       </Flex>
       {caption != null ? (
-        <StyledText
+        <LegacyStyledText
           as="label"
           paddingTop={SPACING.spacing4}
           color={COLORS.grey60}
         >
           {caption}
-        </StyledText>
+        </LegacyStyledText>
       ) : null}
     </Flex>
   )

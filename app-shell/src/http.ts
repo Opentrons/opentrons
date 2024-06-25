@@ -1,12 +1,13 @@
 // fetch wrapper to throw if response is not ok
 import fs from 'fs'
 import fsPromises from 'fs/promises'
-import { Transform, Readable } from 'stream'
+import { Transform } from 'stream'
 import pump from 'pump'
 import _fetch from 'node-fetch'
 import FormData from 'form-data'
 
 import type { Request, RequestInit, Response } from 'node-fetch'
+import type { Readable } from 'stream'
 
 type RequestInput = Request | string
 
@@ -74,7 +75,10 @@ export function fetchToFile(
       // its callbacks when the streams are done
       pump(inputStream, progressReader, outputStream, error => {
         // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-        if (error) return reject(error)
+        if (error) {
+          reject(error)
+          return
+        }
         resolve(destination)
       })
     })

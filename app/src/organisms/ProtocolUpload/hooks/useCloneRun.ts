@@ -6,8 +6,9 @@ import {
   useCreateProtocolAnalysisMutation,
 } from '@opentrons/react-api-client'
 import { useNotifyRunQuery } from '../../../resources/runs'
+import { getRunTimeParameterValuesForRun } from '../../Devices/utils'
 
-import type { Run, RunTimeParameterCreateData } from '@opentrons/api-client'
+import type { Run } from '@opentrons/api-client'
 
 interface UseCloneRunResult {
   cloneRun: () => void
@@ -32,9 +33,9 @@ export function useCloneRun(
         'protocols',
         protocolKey,
       ])
-      Promise.all([invalidateRuns, invalidateProtocols]).catch((e: Error) =>
+      Promise.all([invalidateRuns, invalidateProtocols]).catch((e: Error) => {
         console.error(`error invalidating runs query: ${e.message}`)
-      )
+      })
       if (onSuccessCallback != null) onSuccessCallback(response)
     },
   })
@@ -45,12 +46,8 @@ export function useCloneRun(
   const cloneRun = (): void => {
     if (runRecord != null) {
       const { protocolId, labwareOffsets, runTimeParameters } = runRecord.data
-      const runTimeParameterValues = runTimeParameters.reduce<RunTimeParameterCreateData>(
-        (acc, param) =>
-          param.value !== param.default
-            ? { ...acc, [param.variableName]: param.value }
-            : acc,
-        {}
+      const runTimeParameterValues = getRunTimeParameterValuesForRun(
+        runTimeParameters
       )
       if (triggerAnalysis && protocolKey != null) {
         createProtocolAnalysis({ protocolKey, runTimeParameterValues })

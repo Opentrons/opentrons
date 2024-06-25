@@ -4,9 +4,24 @@ from collections import defaultdict
 from datetime import datetime
 from typing import Dict, List, Optional, Tuple, Union
 
+from opentrons.hardware_control.modules.types import (
+    ModuleModel as HardwareModuleModel,
+    TemperatureModuleModel,
+    MagneticModuleModel,
+    ThermocyclerModuleModel,
+    HeaterShakerModuleModel,
+)
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import MountType, DeckSlotName, Location
 from opentrons.legacy_commands import types as legacy_command_types
+from opentrons.protocol_api import InstrumentContext
+from opentrons.protocol_api.core.legacy.deck import FIXED_TRASH_ID
+from opentrons.protocol_api.core.legacy.load_info import (
+    LoadInfo as LegacyLoadInfo,
+    LabwareLoadInfo as LegacyLabwareLoadInfo,
+    InstrumentLoadInfo as LegacyInstrumentLoadInfo,
+    ModuleLoadInfo as LegacyModuleLoadInfo,
+)
 from opentrons.protocol_engine import (
     ProtocolEngineError,
     actions as pe_actions,
@@ -19,22 +34,9 @@ from opentrons.protocol_engine.resources import (
     ModuleDataProvider,
     pipette_data_provider,
 )
+
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.errors import ErrorCodes, EnumeratedError, PythonException
-from opentrons.protocol_api.core.legacy.deck import FIXED_TRASH_ID
-
-from .legacy_wrappers import (
-    LegacyLoadInfo,
-    LegacyInstrumentLoadInfo,
-    LegacyLabwareLoadInfo,
-    LegacyModuleLoadInfo,
-    LegacyPipetteContext,
-    LegacyModuleModel,
-    LegacyMagneticModuleModel,
-    LegacyTemperatureModuleModel,
-    LegacyThermocyclerModuleModel,
-    LegacyHeaterShakerModuleModel,
-)
 
 
 class LegacyCommandParams(pe_commands.CustomParams):
@@ -63,14 +65,14 @@ class LegacyContextCommandError(ProtocolEngineError):
             )
 
 
-_LEGACY_TO_PE_MODULE: Dict[LegacyModuleModel, pe_types.ModuleModel] = {
-    LegacyMagneticModuleModel.MAGNETIC_V1: pe_types.ModuleModel.MAGNETIC_MODULE_V1,
-    LegacyMagneticModuleModel.MAGNETIC_V2: pe_types.ModuleModel.MAGNETIC_MODULE_V2,
-    LegacyTemperatureModuleModel.TEMPERATURE_V1: pe_types.ModuleModel.TEMPERATURE_MODULE_V1,
-    LegacyTemperatureModuleModel.TEMPERATURE_V2: pe_types.ModuleModel.TEMPERATURE_MODULE_V2,
-    LegacyThermocyclerModuleModel.THERMOCYCLER_V1: pe_types.ModuleModel.THERMOCYCLER_MODULE_V1,
-    LegacyThermocyclerModuleModel.THERMOCYCLER_V2: pe_types.ModuleModel.THERMOCYCLER_MODULE_V2,
-    LegacyHeaterShakerModuleModel.HEATER_SHAKER_V1: pe_types.ModuleModel.HEATER_SHAKER_MODULE_V1,
+_HARDWARE_TO_PE_MODULE: Dict[HardwareModuleModel, pe_types.ModuleModel] = {
+    MagneticModuleModel.MAGNETIC_V1: pe_types.ModuleModel.MAGNETIC_MODULE_V1,
+    MagneticModuleModel.MAGNETIC_V2: pe_types.ModuleModel.MAGNETIC_MODULE_V2,
+    TemperatureModuleModel.TEMPERATURE_V1: pe_types.ModuleModel.TEMPERATURE_MODULE_V1,
+    TemperatureModuleModel.TEMPERATURE_V2: pe_types.ModuleModel.TEMPERATURE_MODULE_V2,
+    ThermocyclerModuleModel.THERMOCYCLER_V1: pe_types.ModuleModel.THERMOCYCLER_MODULE_V1,
+    ThermocyclerModuleModel.THERMOCYCLER_V2: pe_types.ModuleModel.THERMOCYCLER_MODULE_V2,
+    HeaterShakerModuleModel.HEATER_SHAKER_V1: pe_types.ModuleModel.HEATER_SHAKER_MODULE_V1,
 }
 
 _HIGHER_ORDER_COMMAND_TYPES = {
@@ -234,6 +236,15 @@ class LegacyCommandMapper:
                             "notes": [],
                         }
                     )
+                elif isinstance(running_command, pe_commands.Comment):
+                    completed_command = running_command.copy(
+                        update={
+                            "result": pe_commands.CommentResult.construct(),
+                            "status": pe_commands.CommandStatus.SUCCEEDED,
+                            "completedAt": now,
+                            "notes": [],
+                        }
+                    )
                 elif isinstance(running_command, pe_commands.Custom):
                     completed_command = running_command.copy(
                         update={
@@ -244,6 +255,9 @@ class LegacyCommandMapper:
                         }
                     )
                 else:
+                    # TODO(mm, 2024-06-13): This looks potentially wrong.
+                    # We're creating a `SUCCEEDED` command that does not have a `result`,
+                    # which is not normally possible.
                     completed_command = running_command.copy(
                         update={
                             "status": pe_commands.CommandStatus.SUCCEEDED,
@@ -330,6 +344,21 @@ class LegacyCommandMapper:
                 )
             )
             return wait_for_resume_create, wait_for_resume_running
+        elif command["name"] == legacy_command_types.COMMENT:
+            comment_running = pe_commands.Comment.construct(
+                id=command_id,
+                key=command_id,
+                status=pe_commands.CommandStatus.RUNNING,
+                createdAt=now,
+                startedAt=now,
+                params=pe_commands.CommentParams.construct(
+                    message=command["payload"]["text"],
+                ),
+            )
+            comment_create = pe_commands.CommentCreate.construct(
+                key=comment_running.key, params=comment_running.params
+            )
+            return comment_create, comment_running
         else:
             custom_running = pe_commands.Custom.construct(
                 id=command_id,
@@ -354,7 +383,7 @@ class LegacyCommandMapper:
         command_id: str,
         now: datetime,
     ) -> Tuple[pe_commands.CommandCreate, pe_commands.Command]:
-        pipette: LegacyPipetteContext = command["payload"]["instrument"]
+        pipette: InstrumentContext = command["payload"]["instrument"]
         well = command["payload"]["location"]
         mount = MountType(pipette.mount)
         #   the following type checking suppression assumes the tiprack is not loaded on top of a module
@@ -387,7 +416,7 @@ class LegacyCommandMapper:
         command_id: str,
         now: datetime,
     ) -> Tuple[pe_commands.CommandCreate, pe_commands.Command]:
-        pipette: LegacyPipetteContext = command["payload"]["instrument"]
+        pipette: InstrumentContext = command["payload"]["instrument"]
         location = command["payload"]["location"]
         well = location
         mount = MountType(pipette.mount)
@@ -422,7 +451,7 @@ class LegacyCommandMapper:
         command_id: str,
         now: datetime,
     ) -> Tuple[pe_commands.CommandCreate, pe_commands.Command]:
-        pipette: LegacyPipetteContext = command["payload"]["instrument"]
+        pipette: InstrumentContext = command["payload"]["instrument"]
         location = command["payload"]["location"]
         volume = command["payload"]["volume"]
         # TODO:(jr, 15.08.2022): aspirate and dispense commands with no specified labware
@@ -533,7 +562,7 @@ class LegacyCommandMapper:
         command_id: str,
         now: datetime,
     ) -> Tuple[pe_commands.CommandCreate, pe_commands.Command]:
-        pipette: LegacyPipetteContext = command["payload"]["instrument"]
+        pipette: InstrumentContext = command["payload"]["instrument"]
         location = command["payload"]["location"]
         flow_rate = pipette.flow_rate.blow_out
         #   TODO:(jr, 15.08.2022): blow_out commands with no specified labware get filtered
@@ -728,8 +757,8 @@ class LegacyCommandMapper:
         count = self._command_count["LOAD_MODULE"]
         command_id = f"commands.LOAD_MODULE-{count}"
         module_id = f"module-{count}"
-        requested_model = _LEGACY_TO_PE_MODULE[module_load_info.requested_model]
-        loaded_model = _LEGACY_TO_PE_MODULE[module_load_info.loaded_model]
+        requested_model = _HARDWARE_TO_PE_MODULE[module_load_info.requested_model]
+        loaded_model = _HARDWARE_TO_PE_MODULE[module_load_info.loaded_model]
 
         # This will fetch a V2 definition only. PAPI < v2.3 use V1 definitions.
         # When running a < v2.3 protocol, there will be a mismatch of definitions used

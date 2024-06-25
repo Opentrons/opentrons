@@ -22,6 +22,7 @@ from opentrons.protocol_engine.types import (
     AddressableAreaLocation,
 )
 from opentrons.protocol_engine.state import StateView
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.move_labware import (
     MoveLabwareParams,
     MoveLabwareResult,
@@ -99,8 +100,11 @@ async def test_manual_move_labware_implementation(
     decoy.verify(
         state_view.labware.raise_if_labware_has_labware_on_top("my-cool-labware-id")
     )
-    assert result == MoveLabwareResult(
-        offsetId="wowzers-a-new-offset-id",
+    assert result == SuccessData(
+        public=MoveLabwareResult(
+            offsetId="wowzers-a-new-offset-id",
+        ),
+        private=None,
     )
 
 
@@ -162,8 +166,11 @@ async def test_move_labware_implementation_on_labware(
             "my-even-cooler-labware-id",
         ),
     )
-    assert result == MoveLabwareResult(
-        offsetId="wowzers-a-new-offset-id",
+    assert result == SuccessData(
+        public=MoveLabwareResult(
+            offsetId="wowzers-a-new-offset-id",
+        ),
+        private=None,
     )
 
 
@@ -246,8 +253,11 @@ async def test_gripper_move_labware_implementation(
             post_drop_slide_offset=None,
         ),
     )
-    assert result == MoveLabwareResult(
-        offsetId="wowzers-a-new-offset-id",
+    assert result == SuccessData(
+        public=MoveLabwareResult(
+            offsetId="wowzers-a-new-offset-id",
+        ),
+        private=None,
     )
 
 
@@ -333,8 +343,11 @@ async def test_gripper_move_to_waste_chute_implementation(
             post_drop_slide_offset=expected_slide_offset,
         ),
     )
-    assert result == MoveLabwareResult(
-        offsetId="wowzers-a-new-offset-id",
+    assert result == SuccessData(
+        public=MoveLabwareResult(
+            offsetId="wowzers-a-new-offset-id",
+        ),
+        private=None,
     )
 
 

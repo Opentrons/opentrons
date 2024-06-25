@@ -1,4 +1,5 @@
 import { beforeEach, describe, it, expect } from 'vitest'
+import { getLabwareDefURI, fixtureTiprack300ul } from '@opentrons/shared-data'
 import { consolidate } from '../commandCreators/compound/consolidate'
 import { FIXED_TRASH_ID } from '../constants'
 import {
@@ -25,7 +26,11 @@ import {
   blowoutInPlaceHelper,
 } from '../fixtures'
 import { DEST_WELL_BLOWOUT_DESTINATION } from '../utils'
-import type { AspDispAirgapParams, CreateCommand } from '@opentrons/shared-data'
+import type {
+  AspDispAirgapParams,
+  CreateCommand,
+  LabwareDefinition2,
+} from '@opentrons/shared-data'
 import type { ConsolidateArgs, InvariantContext, RobotState } from '../types'
 
 const airGapHelper = makeAirGapHelper({
@@ -99,7 +104,7 @@ beforeEach(() => {
     mixInDestination: null,
     blowoutLocation: null,
     dropTipLocation: FIXED_TRASH_ID,
-    tipRack: 'tiprack1Id',
+    tipRack: getLabwareDefURI(fixtureTiprack300ul as LabwareDefinition2),
     aspirateXOffset: 0,
     dispenseXOffset: 0,
     aspirateYOffset: 0,
@@ -3210,7 +3215,7 @@ describe('consolidate multi-channel', () => {
     const data: ConsolidateArgs = {
       ...args,
       volume: 140,
-      tipRack: 'tiprack1Id',
+      tipRack: getLabwareDefURI(fixtureTiprack300ul as LabwareDefinition2),
       changeTip: 'once',
       aspirateXOffset: 0,
       dispenseXOffset: 0,

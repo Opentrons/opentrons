@@ -146,8 +146,8 @@ describe('CalibrateTipLength', () => {
         currentStep: Sessions.DECK_STEP_PREPARING_PIPETTE,
       },
     }
-    const { getByRole } = render({ isJogging: false, session })[0]
-    const forwardButton = getByRole('button', { name: 'forward' })
+    render({ isJogging: false, session })
+    const forwardButton = screen.getByRole('button', { name: 'forward' })
     fireEvent.click(forwardButton)
     expect(dispatchRequests).toHaveBeenCalledWith(
       Sessions.createSessionCommand('robot-name', session.id, {

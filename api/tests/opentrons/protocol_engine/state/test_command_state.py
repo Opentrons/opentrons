@@ -33,6 +33,70 @@ def _make_config() -> Config:
     )
 
 
+def test_queue_command_action() -> None:
+    """It should translate a command request into a queued command and add it."""
+    subject = CommandStore(is_door_open=False, config=_make_config())
+    subject_view = CommandView(subject.state)
+
+    id = "command-id"
+    key = "command-key"
+    params = commands.CommentParams(message="yay")
+    created_at = datetime(year=2021, month=1, day=1)
+    request = commands.CommentCreate(params=params, key=key)
+    action = actions.QueueCommandAction(
+        request=request,
+        request_hash=None,
+        created_at=created_at,
+        command_id=id,
+    )
+    expected_command = commands.Comment(
+        id=id,
+        key=key,
+        createdAt=created_at,
+        status=commands.CommandStatus.QUEUED,
+        params=params,
+    )
+
+    subject.handle_action(action)
+    assert subject_view.get("command-id") == expected_command
+    assert subject_view.get_all() == [expected_command]
+
+
+def test_latest_protocol_command_hash() -> None:
+    """It should return the latest protocol command's hash."""
+    subject = CommandStore(is_door_open=False, config=_make_config())
+    subject_view = CommandView(subject.state)
+
+    # The initial hash should be None.
+    assert subject_view.get_latest_protocol_command_hash() is None
+
+    # It should pick up the hash from an enqueued protocol command.
+    subject.handle_action(
+        actions.QueueCommandAction(
+            request=commands.CommentCreate(
+                params=commands.CommentParams(message="hello world"),
+            ),
+            request_hash="hash-1",
+            command_id="command-id-1",
+            created_at=datetime.now(),
+        )
+    )
+    assert subject_view.get_latest_protocol_command_hash() == "hash-1"
+
+    # It should pick up newer hashes as they come in.
+    subject.handle_action(
+        actions.QueueCommandAction(
+            request=commands.CommentCreate(
+                params=commands.CommentParams(message="hello world"),
+            ),
+            request_hash="hash-2",
+            command_id="command-id-2",
+            created_at=datetime.now(),
+        )
+    )
+    assert subject_view.get_latest_protocol_command_hash() == "hash-2"
+
+
 @pytest.mark.parametrize("error_recovery_type", ErrorRecoveryType)
 def test_command_failure(error_recovery_type: ErrorRecoveryType) -> None:
     """It should store an error and mark the command if it fails."""
@@ -356,8 +420,8 @@ def test_error_recovery_type_tracking() -> None:
     assert view.get_error_recovery_type("c2") == ErrorRecoveryType.FAIL_RUN
 
 
-def test_get_recovery_in_progress_for_command() -> None:
-    """It should return whether error recovery is in progress for the given command."""
+def test_recovery_target_tracking() -> None:
+    """It should keep track of the command currently undergoing error recovery."""
     subject = CommandStore(config=_make_config(), is_door_open=False)
     subject_view = CommandView(subject.state)
 
@@ -382,12 +446,16 @@ def test_get_recovery_in_progress_for_command() -> None:
     subject.handle_action(fail_1)
 
     # c1 failed recoverably and we're currently recovering from it.
+    recovery_target = subject_view.get_recovery_target()
+    assert recovery_target is not None
+    assert recovery_target.command_id == "c1"
     assert subject_view.get_recovery_in_progress_for_command("c1")
 
     resume_from_1_recovery = actions.ResumeFromRecoveryAction()
     subject.handle_action(resume_from_1_recovery)
 
     # c1 failed recoverably, but we've already completed its recovery.
+    assert subject_view.get_recovery_target() is None
     assert not subject_view.get_recovery_in_progress_for_command("c1")
 
     queue_2 = actions.QueueCommandAction(
@@ -411,6 +479,9 @@ def test_get_recovery_in_progress_for_command() -> None:
     subject.handle_action(fail_2)
 
     # c2 failed recoverably and we're currently recovering from it.
+    recovery_target = subject_view.get_recovery_target()
+    assert recovery_target is not None
+    assert recovery_target.command_id == "c2"
     assert subject_view.get_recovery_in_progress_for_command("c2")
     # ...and that means we're *not* currently recovering from c1,
     # even though it failed recoverably before.
@@ -439,7 +510,8 @@ def test_get_recovery_in_progress_for_command() -> None:
     subject.handle_action(fail_3)
 
     # c3 failed, but not recoverably.
-    assert not subject_view.get_recovery_in_progress_for_command("c2")
+    assert subject_view.get_recovery_target() is None
+    assert not subject_view.get_recovery_in_progress_for_command("c3")
 
 
 def test_final_state_after_estop() -> None:

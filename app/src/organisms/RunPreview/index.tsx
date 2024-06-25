@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
-import { ViewportList, ViewportListRef } from 'react-viewport-list'
+import { ViewportList } from 'react-viewport-list'
 
 import { RUN_STATUSES_TERMINAL } from '@opentrons/api-client'
 import {
@@ -16,24 +16,24 @@ import {
   POSITION_FIXED,
   PrimaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import {
-  useNotifyLastRunCommand,
   useNotifyAllCommandsAsPreSerializedList,
   useNotifyRunQuery,
 } from '../../resources/runs'
-import { CommandText } from '../CommandText'
+import { CommandText, CommandIcon } from '../../molecules/Command'
 import { Divider } from '../../atoms/structure'
 import { NAV_BAR_WIDTH } from '../../App/constants'
-import { CommandIcon } from './CommandIcon'
 import { useRunStatus } from '../RunTimeControl/hooks'
+import { useLastRunCommand } from '../Devices/hooks/useLastRunCommand'
 
 import type { RunStatus } from '@opentrons/api-client'
 import type { RobotType } from '@opentrons/shared-data'
+import type { ViewportListRef } from 'react-viewport-list'
 
 const COLOR_FADE_MS = 500
 const LIVE_RUN_COMMANDS_POLL_MS = 3000
@@ -73,7 +73,7 @@ export const RunPreviewComponent = (
   )
   const commandsFromQuery = commandsFromQueryResponse?.data
   const viewPortRef = React.useRef<HTMLDivElement | null>(null)
-  const currentRunCommandKey = useNotifyLastRunCommand(runId, {
+  const currentRunCommandKey = useLastRunCommand(runId, {
     refetchInterval: LIVE_RUN_COMMANDS_POLL_MS,
   })?.key
   const [
@@ -106,9 +106,9 @@ export const RunPreviewComponent = (
   if (isRunCommandDataLoading || commands == null) {
     return (
       <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing16}>
-        <StyledText alignSelf={ALIGN_CENTER} color={COLORS.grey50}>
+        <LegacyStyledText alignSelf={ALIGN_CENTER} color={COLORS.grey50}>
           {t('protocol_setup:loading_data')}
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
     )
   }
@@ -128,16 +128,16 @@ export const RunPreviewComponent = (
     >
       <>
         <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
-          <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          <LegacyStyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {t('run_preview')}
-          </StyledText>
-          <StyledText as="label" color={COLORS.grey50}>
+          </LegacyStyledText>
+          <LegacyStyledText as="label" color={COLORS.grey50}>
             {t('steps_total', { count: commands.length })}
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
-        <StyledText as="p" marginBottom={SPACING.spacing8}>
+        <LegacyStyledText as="p" marginBottom={SPACING.spacing8}>
           {t('preview_of_protocol_steps')}
-        </StyledText>
+        </LegacyStyledText>
         <Divider marginX={`calc(-1 * ${SPACING.spacing16})`} />
         <ViewportList
           viewportRef={viewPortRef}
@@ -166,12 +166,12 @@ export const RunPreviewComponent = (
                 alignItems={ALIGN_CENTER}
                 gridGap={SPACING.spacing8}
               >
-                <StyledText
+                <LegacyStyledText
                   minWidth={SPACING.spacing16}
                   fontSize={TYPOGRAPHY.fontSizeCaption}
                 >
                   {index + 1}
-                </StyledText>
+                </LegacyStyledText>
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
                   gridGap={SPACING.spacing4}
@@ -191,7 +191,7 @@ export const RunPreviewComponent = (
                     <CommandIcon command={command} color={iconColor} />
                     <CommandText
                       command={command}
-                      robotSideAnalysis={protocolDataFromAnalysisOrRun}
+                      commandTextData={protocolDataFromAnalysisOrRun}
                       robotType={robotType}
                       color={COLORS.black90}
                     />
@@ -216,9 +216,9 @@ export const RunPreviewComponent = (
           </PrimaryButton>
         ) : null}
         {currentRunCommandIndex === commands.length - 1 ? (
-          <StyledText as="h6" color={COLORS.grey60}>
+          <LegacyStyledText as="h6" color={COLORS.grey60}>
             {t('end_of_protocol')}
-          </StyledText>
+          </LegacyStyledText>
         ) : null}
       </>
     </Flex>

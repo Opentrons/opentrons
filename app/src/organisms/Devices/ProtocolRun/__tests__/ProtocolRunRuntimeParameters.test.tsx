@@ -1,20 +1,18 @@
 import * as React from 'react'
-import { UseQueryResult } from 'react-query'
 import { describe, it, vi, beforeEach, afterEach, expect } from 'vitest'
 import { screen } from '@testing-library/react'
 import { when } from 'vitest-when'
-
-import { Run } from '@opentrons/api-client'
 import { InfoScreen } from '@opentrons/components'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useRunStatus } from '../../../RunTimeControl/hooks'
 import { useNotifyRunQuery } from '../../../../resources/runs'
+import { useFeatureFlag } from '../../../../redux/config'
 import { mockSucceededRun } from '../../../RunTimeControl/__fixtures__'
-
 import { ProtocolRunRuntimeParameters } from '../ProtocolRunRunTimeParameters'
-
+import type { UseQueryResult } from 'react-query'
+import type { Run } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
   RunTimeParameter,
@@ -30,6 +28,7 @@ vi.mock('@opentrons/components', async importOriginal => {
 vi.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 vi.mock('../../../RunTimeControl/hooks')
 vi.mock('../../../../resources/runs')
+vi.mock('../../../../redux/config')
 
 const RUN_ID = 'mockId'
 
@@ -87,6 +86,16 @@ const mockRunTimeParameterData: RunTimeParameter[] = [
   },
 ]
 
+const mockCsvRtp = {
+  displayName: 'CSV File',
+  variableName: 'csv_file_var',
+  description: '',
+  type: 'csv_file',
+  file: {
+    file: { name: 'mock.csv' } as File,
+  },
+}
+
 const render = (
   props: React.ComponentProps<typeof ProtocolRunRuntimeParameters>
 ) => {
@@ -111,6 +120,9 @@ describe('ProtocolRunRuntimeParameters', () => {
     vi.mocked(useNotifyRunQuery).mockReturnValue(({
       data: { data: mockSucceededRun },
     } as unknown) as UseQueryResult<Run>)
+    when(vi.mocked(useFeatureFlag))
+      .calledWith('enableCsvFile')
+      .thenReturn(false)
   })
 
   afterEach(() => {
@@ -172,6 +184,17 @@ describe('ProtocolRunRuntimeParameters', () => {
     expect(screen.queryByText('Parameters')).not.toBeInTheDocument()
     expect(screen.queryByText('Default values')).not.toBeInTheDocument()
     screen.getByText('mock InfoScreen')
+  })
+
+  it('should render csv row if a protocol requires a csv', () => {
+    when(vi.mocked(useFeatureFlag)).calledWith('enableCsvFile').thenReturn(true)
+    vi.mocked(useMostRecentCompletedAnalysis).mockReturnValue({
+      runTimeParameters: [...mockRunTimeParameterData, mockCsvRtp],
+    } as CompletedProtocolAnalysis)
+
+    render(props)
+    screen.getByText('CSV File')
+    screen.getByText('mock.csv')
   })
 
   // ToDo Additional test will be implemented when chip component is added

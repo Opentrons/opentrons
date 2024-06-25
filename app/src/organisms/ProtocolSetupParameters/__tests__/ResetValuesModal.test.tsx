@@ -5,7 +5,7 @@ import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { ResetValuesModal } from '../ResetValuesModal'
-import { RunTimeParameter } from '@opentrons/shared-data'
+import type { RunTimeParameter } from '@opentrons/shared-data'
 
 const mockGoBack = vi.fn()
 const mockSetRunTimeParametersOverrides = vi.fn()

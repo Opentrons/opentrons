@@ -19,17 +19,15 @@ import {
   mockReachableRobot,
   mockUnreachableRobot,
 } from '../../../redux/discovery/__fixtures__'
-import { useFeatureFlag } from '../../../redux/config'
 import { getNetworkInterfaces } from '../../../redux/networking'
 import { ChooseRobotSlideout } from '..'
-import { useNotifyService } from '../../../resources/useNotifyService'
+import { useNotifyDataReady } from '../../../resources/useNotifyDataReady'
 import type { RunTimeParameter } from '@opentrons/shared-data'
 
 vi.mock('../../../redux/discovery')
 vi.mock('../../../redux/robot-update')
 vi.mock('../../../redux/networking')
-vi.mock('../../../resources/useNotifyService')
-vi.mock('../../../redux/config')
+vi.mock('../../../resources/useNotifyDataReady')
 const render = (props: React.ComponentProps<typeof ChooseRobotSlideout>) => {
   return renderWithProviders(
     <StaticRouter>
@@ -99,7 +97,6 @@ const mockRunTimeParameters: RunTimeParameter[] = [
 
 describe('ChooseRobotSlideout', () => {
   beforeEach(() => {
-    vi.mocked(useFeatureFlag).mockReturnValue(true)
     vi.mocked(getConnectableRobots).mockReturnValue([mockConnectableRobot])
     vi.mocked(getUnreachableRobots).mockReturnValue([mockUnreachableRobot])
     vi.mocked(getReachableRobots).mockReturnValue([mockReachableRobot])
@@ -111,7 +108,7 @@ describe('ChooseRobotSlideout', () => {
       wifi: null,
       ethernet: null,
     })
-    vi.mocked(useNotifyService).mockReturnValue({} as any)
+    vi.mocked(useNotifyDataReady).mockReturnValue({} as any)
   })
 
   it('renders slideout if isExpanded true', () => {
@@ -227,14 +224,16 @@ describe('ChooseRobotSlideout', () => {
       })
 
       screen.getByText(param.displayName)
-      if (param.type === 'bool') {
-        screen.getByText(param.description)
-      }
-      if (param.type === 'int') {
-        screen.getByText(`${param.min}-${param.max}`)
-      }
-      if (param.type === 'float') {
-        screen.getByText(`${param.min.toFixed(1)}-${param.max.toFixed(1)}`)
+      if (!('choices' in param)) {
+        if (param.type === 'bool') {
+          screen.getByText(param.description)
+        }
+        if (param.type === 'int') {
+          screen.getByText(`${param.min}-${param.max}`)
+        }
+        if (param.type === 'float') {
+          screen.getByText(`${param.min.toFixed(1)}-${param.max.toFixed(1)}`)
+        }
       }
     })
   })

@@ -15,7 +15,7 @@ import {
   POSITION_RELATIVE,
   SIZE_6,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
@@ -37,14 +37,14 @@ import { useCurrentRunId } from '../../../organisms/ProtocolUpload/hooks'
 import { OPENTRONS_USB } from '../../../redux/discovery'
 import { fetchProtocols } from '../../../redux/protocol-storage'
 import { appShellRequestor } from '../../../redux/shell/remote'
+import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 
+import type { ViewportListRef } from 'react-viewport-list'
 import type {
   DesktopRouteParams,
   ProtocolRunDetailsTab,
 } from '../../../App/types'
 import type { Dispatch } from '../../../redux/types'
-import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { ViewportListRef } from 'react-viewport-list'
 
 const baseRoundTabStyling = css`
   ${TYPOGRAPHY.pSemiBold}
@@ -110,9 +110,9 @@ function RoundTab({
   const [targetProps, tooltipProps] = useHoverTooltip()
   return disabled ? (
     <>
-      <StyledText css={disabledRoundTabStyling} {...targetProps}>
+      <LegacyStyledText css={disabledRoundTabStyling} {...targetProps}>
         {tabName}
-      </StyledText>
+      </LegacyStyledText>
       {tabDisabledReason != null ? (
         <Tooltip tooltipProps={tooltipProps}>{tabDisabledReason}</Tooltip>
       ) : null}
@@ -182,7 +182,9 @@ function PageContents(props: PageContentsProps): JSX.Element {
 
   React.useEffect(() => {
     if (jumpedIndex != null) {
-      setTimeout(() => setJumpedIndex(null), JUMPED_STEP_HIGHLIGHT_DELAY_MS)
+      setTimeout(() => {
+        setJumpedIndex(null)
+      }, JUMPED_STEP_HIGHLIGHT_DELAY_MS)
     }
   }, [jumpedIndex])
 

@@ -12,7 +12,7 @@ import {
   Flex,
   RESPONSIVENESS,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -152,15 +152,21 @@ export const PlaceAdapter = (props: PlaceAdapterProps): JSX.Element | null => {
   }
 
   const moduleType = attachedModule.moduleType
-  let bodyText = <StyledText css={BODY_STYLE}>{t('place_flush')}</StyledText>
+  let bodyText = (
+    <LegacyStyledText css={BODY_STYLE}>{t('place_flush')}</LegacyStyledText>
+  )
   if (moduleType === HEATERSHAKER_MODULE_TYPE) {
     bodyText = (
-      <StyledText css={BODY_STYLE}>{t('place_flush_heater_shaker')}</StyledText>
+      <LegacyStyledText css={BODY_STYLE}>
+        {t('place_flush_heater_shaker')}
+      </LegacyStyledText>
     )
   }
   if (moduleType === THERMOCYCLER_MODULE_TYPE) {
     bodyText = (
-      <StyledText css={BODY_STYLE}>{t('place_flush_thermocycler')}</StyledText>
+      <LegacyStyledText css={BODY_STYLE}>
+        {t('place_flush_thermocycler')}
+      </LegacyStyledText>
     )
   }
 

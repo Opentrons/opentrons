@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { connect, MapStateToProps, MapDispatchToProps } from 'react-redux'
+import { connect } from 'react-redux'
 import { LabeledToggle } from '@opentrons/components'
 
 import {
@@ -7,6 +7,7 @@ import {
   getAnalyticsOptedIn,
 } from '../../redux/analytics'
 
+import type { MapStateToProps, MapDispatchToProps } from 'react-redux'
 import type { State } from '../../redux/types'
 
 interface SP {

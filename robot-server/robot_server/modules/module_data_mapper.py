@@ -1,5 +1,8 @@
 """Module identification and response data mapping."""
 from typing import Type, cast, Optional
+from fastapi import Depends
+
+from opentrons_shared_data.module import load_definition
 
 from opentrons.hardware_control.modules import (
     LiveData,
@@ -8,15 +11,18 @@ from opentrons.hardware_control.modules import (
     TemperatureStatus,
     HeaterShakerStatus,
     SpeedStatus,
+    AbsorbanceReaderStatus,
 )
 from opentrons.hardware_control.modules.magdeck import OFFSET_TO_LABWARE_BOTTOM
 from opentrons.drivers.types import (
     ThermocyclerLidStatus,
     HeaterShakerLabwareLatchStatus,
+    AbsorbanceReaderLidStatus,
+    AbsorbanceReaderPlatePresence,
 )
 from opentrons.drivers.rpi_drivers.types import USBPort as HardwareUSBPort
 
-from opentrons.protocol_engine import ModuleModel
+from opentrons.protocol_engine import ModuleModel, DeckType
 
 from .module_identifier import ModuleIdentity
 from .module_models import (
@@ -31,12 +37,19 @@ from .module_models import (
     ThermocyclerModuleData,
     HeaterShakerModule,
     HeaterShakerModuleData,
+    AbsorbanceReaderModule,
+    AbsorbanceReaderModuleData,
     UsbPort,
 )
+
+from robot_server.hardware import get_deck_type
 
 
 class ModuleDataMapper:
     """Map hardware control modules to module response."""
+
+    def __init__(self, deck_type: DeckType = Depends(get_deck_type)) -> None:
+        self.deck_type = deck_type
 
     def map_data(
         self,
@@ -53,6 +66,7 @@ class ModuleDataMapper:
 
         module_cls: Type[AttachedModule]
         module_data: AttachedModuleData
+        module_definition = load_definition(model_or_loadname=model, version="3")
 
         # rely on Pydantic to check/coerce data fields from dicts at run time
         if module_type == ModuleType.MAGNETIC:
@@ -122,6 +136,19 @@ class ModuleDataMapper:
                 targetTemperature=cast(float, live_data["data"].get("targetTemp")),
                 errorDetails=cast(str, live_data["data"].get("errorDetails")),
             )
+        elif module_type == ModuleType.ABSORBANCE_READER:
+            module_cls = AbsorbanceReaderModule
+            module_data = AbsorbanceReaderModuleData(
+                status=AbsorbanceReaderStatus(live_data["status"]),
+                lidStatus=cast(
+                    AbsorbanceReaderLidStatus, live_data["data"].get("lidStatus")
+                ),
+                platePresence=cast(
+                    AbsorbanceReaderPlatePresence,
+                    live_data["data"].get("platePresence"),
+                ),
+                sampleWavelength=cast(int, live_data["data"].get("sampleWavelength")),
+            )
         else:
             assert False, f"Invalid module type {module_type}"
 
@@ -131,6 +158,9 @@ class ModuleDataMapper:
             firmwareVersion=module_identity.firmware_version,
             hardwareRevision=module_identity.hardware_revision,
             hasAvailableUpdate=has_available_update,
+            compatibleWithRobot=(
+                not (self.deck_type.value in module_definition["incompatibleWithDecks"])
+            ),
             usbPort=UsbPort(
                 port=usb_port.port_number,
                 portGroup=usb_port.port_group,

@@ -4,6 +4,7 @@ import type {
   LoadedModule,
   LoadedPipette,
   ModuleModel,
+  RunCommandError,
   RunTimeCommand,
   RunTimeParameter,
 } from '@opentrons/shared-data'
@@ -12,7 +13,6 @@ export * from './commands/types'
 
 export const RUN_STATUS_IDLE = 'idle' as const
 export const RUN_STATUS_RUNNING = 'running' as const
-export const RUN_STATUS_PAUSE_REQUESTED = 'pause-requested' as const
 export const RUN_STATUS_PAUSED = 'paused'
 export const RUN_STATUS_STOP_REQUESTED = 'stop-requested' as const
 export const RUN_STATUS_STOPPED = 'stopped' as const
@@ -25,7 +25,6 @@ export const RUN_STATUS_AWAITING_RECOVERY = 'awaiting-recovery' as const
 export type RunStatus =
   | typeof RUN_STATUS_IDLE
   | typeof RUN_STATUS_RUNNING
-  | typeof RUN_STATUS_PAUSE_REQUESTED
   | typeof RUN_STATUS_PAUSED
   | typeof RUN_STATUS_STOP_REQUESTED
   | typeof RUN_STATUS_STOPPED
@@ -46,8 +45,8 @@ export interface LegacyGoodRunData {
   errors: RunError[]
   pipettes: LoadedPipette[]
   labware: LoadedLabware[]
-  modules: LoadedModule[]
   liquids: Liquid[]
+  modules: LoadedModule[]
   protocolId?: string
   labwareOffsets?: LabwareOffset[]
   runTimeParameters: RunTimeParameter[]
@@ -129,20 +128,18 @@ export interface LabwareOffsetCreateData {
   vector: VectorOffset
 }
 
-export interface RunTimeParameterCreateData {
-  [key: string]: string | boolean | number
-}
+type FileRunTimeParameterCreateData = Record<string, string | number | boolean>
+
+type ValueRunTimeParameterCreateData = Record<string, { id: string }>
+
+export type RunTimeParameterCreateData =
+  | FileRunTimeParameterCreateData
+  | ValueRunTimeParameterCreateData
 
 export interface CommandData {
   data: RunTimeCommand
 }
 
-export interface RunError {
-  id: string
-  errorType: string
-  errorInfo: { [key: string]: string }
-  wrappedErrors: RunError[]
-  errorCode: string
-  createdAt: string
-  detail: string
-}
+// Although run errors are semantically different from command errors,
+// the server currently happens to use the exact same model for both.
+export type RunError = RunCommandError

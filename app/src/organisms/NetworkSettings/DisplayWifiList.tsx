@@ -14,7 +14,7 @@ import {
   Flex,
   Icon,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
@@ -80,7 +80,9 @@ export function DisplayWifiList({
       {isHeader ? (
         <RobotSetupHeader
           header={t('select_a_network')}
-          onClickBack={() => history.push('/network-setup')}
+          onClickBack={() => {
+            history.push('/network-setup')
+          }}
         />
       ) : null}
       <Flex
@@ -95,10 +97,12 @@ export function DisplayWifiList({
                 key={nw.ssid}
                 css={NETWORK_ROW_STYLE}
                 flexDirection={DIRECTION_ROW}
-                onClick={() => handleNetworkPress(nw.ssid)}
+                onClick={() => {
+                  handleNetworkPress(nw.ssid)
+                }}
               >
                 <Icon name="wifi" size="2.5rem" />
-                <StyledText as="h4">{nw.ssid}</StyledText>
+                <LegacyStyledText as="h4">{nw.ssid}</LegacyStyledText>
               </Btn>
             ))
           : null}
@@ -116,7 +120,7 @@ export function DisplayWifiList({
           gridGap={SPACING.spacing4}
         >
           <Icon name="plus" size="2.5rem" color={COLORS.black90} />
-          <StyledText as="h4">{t('join_other_network')}</StyledText>
+          <LegacyStyledText as="h4">{t('join_other_network')}</LegacyStyledText>
         </Btn>
         {list != null && list.length > 0 ? null : <DisplaySearchNetwork />}
       </Flex>

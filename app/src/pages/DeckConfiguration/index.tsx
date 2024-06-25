@@ -11,7 +11,6 @@ import {
   JUSTIFY_SPACE_AROUND,
 } from '@opentrons/components'
 
-import { SmallButton } from '../../atoms/buttons'
 import { ChildNavigation } from '../../organisms/ChildNavigation'
 import { DeckFixtureSetupInstructionsModal } from '../../organisms/DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
 import { DeckConfigurationDiscardChangesModal } from '../../organisms/DeviceDetailsDeckConfiguration/DeckConfigurationDiscardChangesModal'
@@ -20,6 +19,8 @@ import {
   useDeckConfigurationEditingTools,
   useNotifyDeckConfigurationQuery,
 } from '../../resources/deck_configuration'
+
+import type { SmallButton } from '../../atoms/buttons'
 
 export function DeckConfigurationEditor(): JSX.Element {
   const { t, i18n } = useTranslation([
@@ -52,7 +53,9 @@ export function DeckConfigurationEditor(): JSX.Element {
   }
 
   const secondaryButtonProps: React.ComponentProps<typeof SmallButton> = {
-    onClick: () => setShowSetupInstructionsModal(true),
+    onClick: () => {
+      setShowSetupInstructionsModal(true)
+    },
     buttonText: i18n.format(t('setup_instructions'), 'titleCase'),
     buttonType: 'tertiaryLowLight',
     iconName: 'information',

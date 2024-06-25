@@ -1,4 +1,4 @@
-import { WellGroup } from '@opentrons/components'
+import type { WellGroup } from '@opentrons/components'
 // ===== Preselect / select wells in plate
 // these actions all use PRIMARY WELLS (see reducers for definition)
 export interface HighlightWellsAction {

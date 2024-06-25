@@ -1,5 +1,5 @@
-import { AttachedModule } from '@opentrons/api-client'
-import { FLOWS, SECTIONS } from './constants'
+import type { AttachedModule } from '@opentrons/api-client'
+import type { FLOWS, SECTIONS } from './constants'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { PipetteInformation } from '../Devices/hooks'
 

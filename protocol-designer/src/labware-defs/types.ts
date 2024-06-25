@@ -1,4 +1,4 @@
-import { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 export type LabwareDefByDefURI = Record<string, LabwareDefinition2>
 export type LabwareUploadMessageType =
   | 'INVALID_JSON_FILE'

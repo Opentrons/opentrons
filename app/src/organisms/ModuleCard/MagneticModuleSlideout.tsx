@@ -10,7 +10,7 @@ import {
   JUSTIFY_END,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -138,7 +138,7 @@ export const MagneticModuleSlideout = (
         />
       }
     >
-      <StyledText
+      <LegacyStyledText
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         fontSize={TYPOGRAPHY.fontSizeP}
         paddingTop={SPACING.spacing4}
@@ -151,8 +151,8 @@ export const MagneticModuleSlideout = (
               : MAGNETIC_MODULE_V2_DISNEGAGED_HEIGHT,
           higher: MAGNETIC_MODULES_MAX_ENGAGE_HEIGHT,
         })}
-      </StyledText>
-      <StyledText
+      </LegacyStyledText>
+      <LegacyStyledText
         fontSize={TYPOGRAPHY.fontSizeH6}
         color={COLORS.grey50}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
@@ -162,7 +162,7 @@ export const MagneticModuleSlideout = (
         data-testid={`MagneticModuleSlideout_body_subtitle_${module.serialNumber}`}
       >
         {t('height_ranges', { gen: info.version })}
-      </StyledText>
+      </LegacyStyledText>
       <Flex
         backgroundColor={COLORS.grey20}
         flexDirection={DIRECTION_ROW}
@@ -177,32 +177,32 @@ export const MagneticModuleSlideout = (
           flexDirection={DIRECTION_COLUMN}
           data-testid={`MagneticModuleSlideout_body_data_text_${module.serialNumber}`}
         >
-          <StyledText paddingBottom={SPACING.spacing8}>
+          <LegacyStyledText paddingBottom={SPACING.spacing8}>
             {t('max_engage_height')}
-          </StyledText>
-          <StyledText paddingBottom={SPACING.spacing8}>
+          </LegacyStyledText>
+          <LegacyStyledText paddingBottom={SPACING.spacing8}>
             {t('labware_bottom')}
-          </StyledText>
-          <StyledText>{t('disengaged')}</StyledText>
+          </LegacyStyledText>
+          <LegacyStyledText>{t('disengaged')}</LegacyStyledText>
         </Flex>
         <Flex
           flexDirection={DIRECTION_COLUMN}
           justifyContent={JUSTIFY_END}
           data-testid={`MagneticModuleSlideout_body_data_num_${module.serialNumber}`}
         >
-          <StyledText
+          <LegacyStyledText
             paddingLeft={SPACING.spacing8}
             paddingBottom={SPACING.spacing8}
           >
             {max}
-          </StyledText>
-          <StyledText
+          </LegacyStyledText>
+          <LegacyStyledText
             paddingLeft={SPACING.spacing16}
             paddingBottom={SPACING.spacing8}
           >
             {labwareBottom}
-          </StyledText>
-          <StyledText>{disengageHeight}</StyledText>
+          </LegacyStyledText>
+          <LegacyStyledText>{disengageHeight}</LegacyStyledText>
         </Flex>
       </Flex>
       <Flex
@@ -210,14 +210,14 @@ export const MagneticModuleSlideout = (
         flexDirection={DIRECTION_COLUMN}
         data-testid={`MagneticModuleSlideout_input_field_${module.serialNumber}`}
       >
-        <StyledText
+        <LegacyStyledText
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           fontSize={TYPOGRAPHY.fontSizeH6}
           color={COLORS.grey50}
           paddingBottom={SPACING.spacing8}
         >
           {t('set_engage_height')}
-        </StyledText>
+        </LegacyStyledText>
         <form id="MagneticModuleSlideout_submitValue">
           <InputField
             data-testid={`${String(module.moduleModel)}`}
@@ -225,7 +225,9 @@ export const MagneticModuleSlideout = (
             units={info.units}
             value={engageHeightValue}
             autoFocus
-            onChange={e => setEngageHeightValue(e.target.value)}
+            onChange={e => {
+              setEngageHeightValue(e.target.value)
+            }}
             type="number"
             caption={t('module_status_range', {
               min: info.disengagedHeight,

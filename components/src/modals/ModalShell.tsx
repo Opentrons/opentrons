@@ -2,7 +2,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { SPACING } from '../ui-style-constants'
 import { BORDERS, COLORS } from '../helix-design-system'
-import { StyleProps, styleProps } from '../primitives'
+import { styleProps } from '../primitives'
 import {
   POSITION_FIXED,
   POSITION_ABSOLUTE,
@@ -12,6 +12,8 @@ import {
   JUSTIFY_CENTER,
   OVERFLOW_AUTO,
 } from '../styles'
+
+import type { StyleProps } from '../primitives'
 export interface ModalShellProps extends StyleProps {
   /** Modal content */
   children: React.ReactNode

@@ -98,13 +98,5 @@
     "opentrons/opentrons_96_tiprack_1000ul/1",
     "opentrons/opentrons_96_filtertiprack_1000ul/1",
     "opentrons/geb_96_tiprack_1000ul/1"
-  ],
-  "versionedTipOverlapDictionary": {
-    "v0": {
-      "default": 9.7,
-      "opentrons/opentrons_96_tiprack_1000ul/1": 11.5,
-      "opentrons/opentrons_96_filtertiprack_1000ul/1": 11.5,
-      "opentrons/geb_96_tiprack_1000ul/1": 9.5
-    }
-  }
+  ]
 }

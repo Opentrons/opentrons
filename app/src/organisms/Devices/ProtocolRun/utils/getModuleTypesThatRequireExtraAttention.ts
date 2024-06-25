@@ -1,4 +1,5 @@
-import { getModuleType, ModuleModel, ModuleType } from '@opentrons/shared-data'
+import { getModuleType } from '@opentrons/shared-data'
+import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 
 const MODULE_TYPES_THAT_REQUIRE_EXTRA_ATTENTION = [
   'magneticModuleType',

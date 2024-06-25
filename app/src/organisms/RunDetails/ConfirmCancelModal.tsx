@@ -11,7 +11,7 @@ import {
   JUSTIFY_FLEX_END,
   Link,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -20,7 +20,7 @@ import {
 } from '@opentrons/api-client'
 import { useStopRunMutation } from '@opentrons/react-api-client'
 
-import { getModalPortalEl } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 import { LegacyModal } from '../../molecules/LegacyModal'
 import { useTrackProtocolRunEvent, useIsFlex } from '../Devices/hooks'
 import { useRunStatus } from '../RunTimeControl/hooks'
@@ -76,12 +76,12 @@ export function ConfirmCancelModal(
       title={t('cancel_run_modal_heading')}
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <StyledText as="p" marginBottom={SPACING.spacing24}>
+        <LegacyStyledText as="p" marginBottom={SPACING.spacing24}>
           {cancelRunAlertInfo}
-        </StyledText>
-        <StyledText as="p" marginBottom={SPACING.spacing24}>
+        </LegacyStyledText>
+        <LegacyStyledText as="p" marginBottom={SPACING.spacing24}>
           {t('cancel_run_module_info')}
-        </StyledText>
+        </LegacyStyledText>
         <Flex justifyContent={JUSTIFY_FLEX_END} alignItems={ALIGN_CENTER}>
           {isCanceling ? null : (
             <Link
@@ -108,6 +108,6 @@ export function ConfirmCancelModal(
         </Flex>
       </Flex>
     </LegacyModal>,
-    getModalPortalEl()
+    getTopPortalEl()
   )
 }

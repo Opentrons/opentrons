@@ -26,6 +26,9 @@ beforeEach(() => {
     false
   )
   vi.mocked(uiModuleSelectors.getTemperatureModuleIds).mockReturnValue(null)
+  vi.mocked(uiModuleSelectors.getHeaterShakerModuleHasLabware).mockReturnValue(
+    false
+  )
   vi.mocked(uiModuleSelectors.getSingleThermocyclerModuleId).mockReturnValue(
     null
   )
@@ -92,6 +95,7 @@ describe('addAndSelectStepWithHints', () => {
           getSingleTemperatureModuleId: null,
           getSingleThermocyclerModuleId: null,
           getTemperatureModuleIds: [],
+          getHeaterShakerModuleHasLabware: false,
         },
       },
       {
@@ -105,12 +109,13 @@ describe('addAndSelectStepWithHints', () => {
           getThermocyclerModuleHasLabware: false,
           getSingleTemperatureModuleId: 'something',
           getSingleThermocyclerModuleId: null,
-          getTemperatureModuleIds: ['mockId'],
+          getTemperatureModuleIds: [],
+          getHeaterShakerModuleHasLabware: false,
         },
       },
       {
-        testName: 'temperature step, when thermocycler has no labware',
-        stepType: 'temperature' as StepType,
+        testName: 'thermocycler step, when thermocycler has no labware',
+        stepType: 'thermocycler' as StepType,
         selectorValues: {
           getMagnetModuleHasLabware: false,
           getTemperatureModulesHaveLabware: [],
@@ -118,6 +123,20 @@ describe('addAndSelectStepWithHints', () => {
           getSingleTemperatureModuleId: null,
           getSingleThermocyclerModuleId: 'something',
           getTemperatureModuleIds: [],
+          getHeaterShakerModuleHasLabware: false,
+        },
+      },
+      {
+        testName: 'heaterShaker step, when heaterShaker has no labware',
+        stepType: 'heaterShaker' as StepType,
+        selectorValues: {
+          getMagnetModuleHasLabware: false,
+          getTemperatureModulesHaveLabware: [],
+          getThermocyclerModuleHasLabware: false,
+          getSingleTemperatureModuleId: null,
+          getSingleThermocyclerModuleId: 'something',
+          getTemperatureModuleIds: [],
+          getHeaterShakerModuleHasLabware: false,
         },
       },
     ].forEach(({ testName, stepType, selectorValues }) => {
@@ -128,6 +147,9 @@ describe('addAndSelectStepWithHints', () => {
         vi.mocked(
           uiModuleSelectors.getTemperatureModulesHaveLabware
         ).mockReturnValue(selectorValues.getTemperatureModulesHaveLabware)
+        vi.mocked(
+          uiModuleSelectors.getHeaterShakerModuleHasLabware
+        ).mockReturnValue(selectorValues.getHeaterShakerModuleHasLabware)
         vi.mocked(
           uiModuleSelectors.getThermocyclerModuleHasLabware
         ).mockReturnValue(selectorValues.getThermocyclerModuleHasLabware)

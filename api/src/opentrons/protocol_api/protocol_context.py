@@ -50,6 +50,7 @@ from .core.module import (
     AbstractThermocyclerCore,
     AbstractHeaterShakerCore,
     AbstractMagneticBlockCore,
+    AbstractAbsorbanceReaderCore,
 )
 from .core.engine import ENGINE_CORE_API_VERSION
 from .core.legacy.legacy_protocol_core import LegacyProtocolCore
@@ -66,6 +67,7 @@ from .module_contexts import (
     ThermocyclerContext,
     HeaterShakerContext,
     MagneticBlockContext,
+    AbsorbanceReaderContext,
     ModuleContext,
 )
 from ._parameters import Parameters
@@ -80,6 +82,7 @@ ModuleTypes = Union[
     ThermocyclerContext,
     HeaterShakerContext,
     MagneticBlockContext,
+    AbsorbanceReaderContext,
 ]
 
 
@@ -224,6 +227,15 @@ class ProtocolContext(CommandPublisher):
     @property
     @requires_version(2, 18)
     def params(self) -> Parameters:
+        """
+        The values of runtime parameters, as set during run setup.
+
+        Each attribute of this object corresponds to the ``variable_name`` of a parameter.
+        See :ref:`using-rtp` for details.
+
+        Parameter values can only be set during run setup. If you try to alter the value
+        of any attribute of ``params``, the API will raise an error.
+        """
         return self._params
 
     def cleanup(self) -> None:
@@ -1204,6 +1216,8 @@ def _create_module_context(
         module_cls = HeaterShakerContext
     elif isinstance(module_core, AbstractMagneticBlockCore):
         module_cls = MagneticBlockContext
+    elif isinstance(module_core, AbstractAbsorbanceReaderCore):
+        module_cls = AbsorbanceReaderContext
     else:
         assert False, "Unsupported module type"
 

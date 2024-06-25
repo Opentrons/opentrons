@@ -21,7 +21,9 @@ export function ImportLabware(props: Props): JSX.Element {
   )
 }
 
-const stopEvent = (e: React.SyntheticEvent): void => e.preventDefault()
+const stopEvent = (e: React.SyntheticEvent): void => {
+  e.preventDefault()
+}
 
 function UploadInput(props: UploadInputProps): JSX.Element {
   const { isButton, onUpload } = props

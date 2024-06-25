@@ -10,6 +10,7 @@ from opentrons.protocol_engine.state.module_substates import (
 )
 from opentrons.protocol_engine.execution import EquipmentHandler
 from opentrons.protocol_engine.commands import temperature_module
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.temperature_module.set_target_temperature import (
     SetTargetTemperatureImpl,
 )
@@ -49,4 +50,7 @@ async def test_set_target_temperature(
 
     result = await subject.execute(data)
     decoy.verify(await tempdeck_hardware.start_set_temperature(celsius=1), times=1)
-    assert result == temperature_module.SetTargetTemperatureResult(targetTemperature=1)
+    assert result == SuccessData(
+        public=temperature_module.SetTargetTemperatureResult(targetTemperature=1),
+        private=None,
+    )

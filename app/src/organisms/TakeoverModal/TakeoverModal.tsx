@@ -9,7 +9,7 @@ import {
   Flex,
   Icon,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getTopPortalEl } from '../../App/portal'
@@ -45,12 +45,14 @@ export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
       //    confirm terminate modal
       <Modal header={terminateHeader}>
         <Flex flexDirection={DIRECTION_COLUMN}>
-          <StyledText as="p" marginBottom={SPACING.spacing32}>
+          <LegacyStyledText as="p" marginBottom={SPACING.spacing32}>
             {t('branded:confirm_terminate')}
-          </StyledText>
+          </LegacyStyledText>
           <Flex flex="1" gridGap={SPACING.spacing8}>
             <SmallButton
-              onClick={() => setShowConfirmTerminateModal(false)}
+              onClick={() => {
+                setShowConfirmTerminateModal(false)
+              }}
               buttonText={t('continue_activity')}
               width="50%"
             />
@@ -88,24 +90,26 @@ export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
               size="2.5rem"
               marginBottom={SPACING.spacing16}
             />
-            <StyledText
+            <LegacyStyledText
               as="h4"
               marginBottom={SPACING.spacing4}
               fontWeight={TYPOGRAPHY.fontWeightBold}
             >
               {i18n.format(t('robot_is_busy'), 'capitalize')}
-            </StyledText>
-            <StyledText as="p" textAlign={TYPOGRAPHY.textAlignCenter}>
+            </LegacyStyledText>
+            <LegacyStyledText as="p" textAlign={TYPOGRAPHY.textAlignCenter}>
               {t('branded:computer_in_app_is_controlling_robot')}
-            </StyledText>
+            </LegacyStyledText>
           </Flex>
-          <StyledText
+          <LegacyStyledText
             as="p"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            onClick={() => setShowConfirmTerminateModal(true)}
+            onClick={() => {
+              setShowConfirmTerminateModal(true)
+            }}
           >
             {t('terminate')}
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
       </Modal>
     ),

@@ -7,14 +7,9 @@ import {
   Modal,
   OutlineButton,
   LabeledValue,
-  WellGroup,
   WELL_LABEL_OPTIONS,
 } from '@opentrons/components'
-import {
-  sortWells,
-  LabwareDefinition2,
-  PipetteV2Specs,
-} from '@opentrons/shared-data'
+import { sortWells } from '@opentrons/shared-data'
 
 import { arrayToWellGroup } from '../../../../utils'
 import * as wellContentsSelectors from '../../../../top-selectors/well-contents'
@@ -23,6 +18,8 @@ import { selectors as stepFormSelectors } from '../../../../step-forms'
 import { WellSelectionInstructions } from '../../../WellSelectionInstructions'
 import { SelectableLabware, wellFillFromWellContents } from '../../../labware'
 
+import type { LabwareDefinition2, PipetteV2Specs } from '@opentrons/shared-data'
+import type { WellGroup } from '@opentrons/components'
 import type { ContentsByWell } from '../../../../labware-ingred/types'
 import type { WellIngredientNames } from '../../../../steplist/types'
 import type { StepFieldName } from '../../../../form-types'
@@ -88,7 +85,7 @@ const WellSelectionModalComponent = (
       <div className={styles.top_row}>
         <LabeledValue
           label="Pipette"
-          value={pipetteSpec ? pipetteSpec.displayName : ''}
+          value={pipetteSpec != null ? pipetteSpec.displayName : ''}
           className={styles.inverted_text}
         />
         <OutlineButton onClick={handleSave} inverted>
@@ -96,7 +93,7 @@ const WellSelectionModalComponent = (
         </OutlineButton>
       </div>
 
-      {labwareDef && (
+      {labwareDef != null ? (
         <SelectableLabware
           labwareProps={{
             wellLabelOption: WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE,
@@ -115,7 +112,7 @@ const WellSelectionModalComponent = (
           ingredNames={ingredNames}
           wellContents={wellContents}
         />
-      )}
+      ) : null}
 
       <WellSelectionInstructions />
     </Modal>
@@ -144,11 +141,12 @@ export const WellSelectionModal = (
   const pipetteEntities = useSelector(stepFormSelectors.getPipetteEntities)
 
   // selector-derived data
-  const labwareDef = (labwareId && labwareEntities[labwareId]?.def) || null
+  const labwareDef =
+    (labwareId != null ? labwareEntities[labwareId]?.def : null) ?? null
   const pipette = pipetteId != null ? pipetteEntities[pipetteId] : null
 
   const initialSelectedPrimaryWells = Array.isArray(wellFieldData)
-    ? arrayToWellGroup(wellFieldData)
+    ? arrayToWellGroup(wellFieldData as string[])
     : {}
 
   // component state

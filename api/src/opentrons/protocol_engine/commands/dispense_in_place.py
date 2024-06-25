@@ -11,7 +11,8 @@ from .pipetting_common import (
     FlowRateMixin,
     BaseLiquidHandlingResult,
 )
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
     from ..execution import PipettingHandler
@@ -36,14 +37,16 @@ class DispenseInPlaceResult(BaseLiquidHandlingResult):
 
 
 class DispenseInPlaceImplementation(
-    AbstractCommandImpl[DispenseInPlaceParams, DispenseInPlaceResult]
+    AbstractCommandImpl[DispenseInPlaceParams, SuccessData[DispenseInPlaceResult, None]]
 ):
     """DispenseInPlace command implementation."""
 
     def __init__(self, pipetting: PipettingHandler, **kwargs: object) -> None:
         self._pipetting = pipetting
 
-    async def execute(self, params: DispenseInPlaceParams) -> DispenseInPlaceResult:
+    async def execute(
+        self, params: DispenseInPlaceParams
+    ) -> SuccessData[DispenseInPlaceResult, None]:
         """Dispense without moving the pipette."""
         volume = await self._pipetting.dispense_in_place(
             pipette_id=params.pipetteId,
@@ -51,10 +54,12 @@ class DispenseInPlaceImplementation(
             flow_rate=params.flowRate,
             push_out=params.pushOut,
         )
-        return DispenseInPlaceResult(volume=volume)
+        return SuccessData(public=DispenseInPlaceResult(volume=volume), private=None)
 
 
-class DispenseInPlace(BaseCommand[DispenseInPlaceParams, DispenseInPlaceResult]):
+class DispenseInPlace(
+    BaseCommand[DispenseInPlaceParams, DispenseInPlaceResult, ErrorOccurrence]
+):
     """DispenseInPlace command model."""
 
     commandType: DispenseInPlaceCommandType = "dispenseInPlace"

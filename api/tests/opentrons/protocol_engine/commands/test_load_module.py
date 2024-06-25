@@ -16,6 +16,7 @@ from opentrons.protocol_engine.execution import EquipmentHandler, LoadedModuleDa
 from opentrons.protocol_engine import ModuleModel as EngineModuleModel
 from opentrons.hardware_control.modules import ModuleType
 
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.load_module import (
     LoadModuleParams,
     LoadModuleResult,
@@ -84,11 +85,14 @@ async def test_load_module_implementation(
     )
 
     result = await subject.execute(data)
-    assert result == LoadModuleResult(
-        moduleId="module-id",
-        serialNumber="mod-serial",
-        model=ModuleModel.TEMPERATURE_MODULE_V2,
-        definition=tempdeck_v2_def,
+    assert result == SuccessData(
+        public=LoadModuleResult(
+            moduleId="module-id",
+            serialNumber="mod-serial",
+            model=ModuleModel.TEMPERATURE_MODULE_V2,
+            definition=tempdeck_v2_def,
+        ),
+        private=None,
     )
 
 
@@ -137,11 +141,70 @@ async def test_load_module_implementation_mag_block(
     )
 
     result = await subject.execute(data)
-    assert result == LoadModuleResult(
-        moduleId="module-id",
-        serialNumber=None,
-        model=ModuleModel.MAGNETIC_BLOCK_V1,
-        definition=mag_block_v1_def,
+    assert result == SuccessData(
+        public=LoadModuleResult(
+            moduleId="module-id",
+            serialNumber=None,
+            model=ModuleModel.MAGNETIC_BLOCK_V1,
+            definition=mag_block_v1_def,
+        ),
+        private=None,
+    )
+
+
+async def test_load_module_implementation_abs_reader(
+    decoy: Decoy,
+    equipment: EquipmentHandler,
+    state_view: StateView,
+    abs_reader_v1_def: ModuleDefinition,
+) -> None:
+    """A loadModule command for abs reader should have an execution implementation."""
+    subject = LoadModuleImplementation(equipment=equipment, state_view=state_view)
+
+    data = LoadModuleParams(
+        model=ModuleModel.ABSORBANCE_READER_V1,
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_D3),
+        moduleId="some-id",
+    )
+
+    deck_def = load_deck(STANDARD_OT3_DECK, 5)
+
+    decoy.when(state_view.addressable_areas.state.deck_definition).then_return(deck_def)
+    decoy.when(
+        state_view.addressable_areas.get_cutout_id_by_deck_slot_name(
+            DeckSlotName.SLOT_D3
+        )
+    ).then_return("cutout" + DeckSlotName.SLOT_D3.value)
+
+    decoy.when(
+        state_view.geometry.ensure_location_not_occupied(
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_D3)
+        )
+    ).then_return(DeckSlotLocation(slotName=DeckSlotName.SLOT_D3))
+
+    decoy.when(
+        await equipment.load_module(
+            model=ModuleModel.ABSORBANCE_READER_V1,
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_D3),
+            module_id="some-id",
+        )
+    ).then_return(
+        LoadedModuleData(
+            module_id="module-id",
+            serial_number=None,
+            definition=abs_reader_v1_def,
+        )
+    )
+
+    result = await subject.execute(data)
+    assert result == SuccessData(
+        public=LoadModuleResult(
+            moduleId="module-id",
+            serialNumber=None,
+            model=ModuleModel.ABSORBANCE_READER_V1,
+            definition=abs_reader_v1_def,
+        ),
+        private=None,
     )
 
 

@@ -31,6 +31,7 @@ flake8-docstrings = "~=1.7.0"
 flake8-noqa = "~=1.4.0"
 black = "==22.3.0"
 decoy = "~=2.1.1"
+pyusb = "==1.2.1"
 
 [requires]
 python_version = "3.10"

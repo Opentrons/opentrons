@@ -11,7 +11,7 @@ import {
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   useOnClickOutside,
 } from '@opentrons/components'
@@ -64,7 +64,9 @@ export function RobotSettingsGripperCalibration(
     setShowOverflowMenu,
   } = useMenuHandleClickOutside()
   const calsOverflowWrapperRef = useOnClickOutside<HTMLDivElement>({
-    onClickOutside: () => setShowOverflowMenu(false),
+    onClickOutside: () => {
+      setShowOverflowMenu(false)
+    },
   })
   const [showWizardFlow, setShowWizardFlow] = React.useState<boolean>(false)
   const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
@@ -83,14 +85,16 @@ export function RobotSettingsGripperCalibration(
       paddingY={SPACING.spacing24}
       gridGap={SPACING.spacing8}
     >
-      <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+      <LegacyStyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {t('gripper_calibration_title')}
-      </StyledText>
-      <StyledText as="p">{t('gripper_calibration_description')}</StyledText>
+      </LegacyStyledText>
+      <LegacyStyledText as="p">
+        {t('gripper_calibration_description')}
+      </LegacyStyledText>
       {gripper == null ? (
-        <StyledText as="label" marginTop={SPACING.spacing8}>
+        <LegacyStyledText as="label" marginTop={SPACING.spacing8}>
           {t('no_gripper_attached')}
-        </StyledText>
+        </LegacyStyledText>
       ) : (
         <StyledTable>
           <thead>
@@ -104,16 +108,20 @@ export function RobotSettingsGripperCalibration(
           <tbody css={BODY_STYLE}>
             <StyledTableRow>
               <StyledTableCell>
-                <StyledText as="p">{gripper.serialNumber}</StyledText>
+                <LegacyStyledText as="p">
+                  {gripper.serialNumber}
+                </LegacyStyledText>
               </StyledTableCell>
               <StyledTableCell>
                 <Flex alignItems={ALIGN_CENTER}>
                   {gripperCalibrationLastModified != null ? (
-                    <StyledText as="p">
+                    <LegacyStyledText as="p">
                       {formatLastCalibrated(gripperCalibrationLastModified)}
-                    </StyledText>
+                    </LegacyStyledText>
                   ) : (
-                    <StyledText as="p">{t('not_calibrated_short')}</StyledText>
+                    <LegacyStyledText as="p">
+                      {t('not_calibrated_short')}
+                    </LegacyStyledText>
                   )}
                 </Flex>
               </StyledTableCell>
@@ -132,7 +140,9 @@ export function RobotSettingsGripperCalibration(
                     <GripperWizardFlows
                       flowType={'RECALIBRATE'}
                       attachedGripper={gripper}
-                      closeFlow={() => setShowWizardFlow(false)}
+                      closeFlow={() => {
+                        setShowWizardFlow(false)
+                      }}
                     />
                   ) : null}
                   {showOverflowMenu ? (

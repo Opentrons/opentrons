@@ -1,17 +1,14 @@
 import * as React from 'react'
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { fireEvent, screen, cleanup } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../localization'
 import { getInitialDeckSetup } from '../../../../step-forms/selectors'
 import { getLabwareIsCompatible } from '../../../../utils/labwareModuleCompatibility'
-import {
-  getLabwareOnSlot,
-  getSlotIsEmpty,
-  ModuleOnDeck,
-} from '../../../../step-forms'
+import { getLabwareOnSlot, getSlotIsEmpty } from '../../../../step-forms'
 import { EditMultipleModulesModal } from '../EditMultipleModulesModal'
 import type * as Components from '@opentrons/components'
+import type { ModuleOnDeck } from '../../../../step-forms'
 
 vi.mock('../../../../step-forms/selectors')
 vi.mock('../../../../utils/labwareModuleCompatibility')
@@ -72,9 +69,6 @@ describe('EditMultipleModulesModal', () => {
     })
     vi.mocked(getLabwareOnSlot).mockReturnValue(null)
     vi.mocked(getSlotIsEmpty).mockReturnValue(true)
-  })
-  afterEach(() => {
-    cleanup()
   })
   it('renders modal and buttons with no error', () => {
     vi.mocked(getLabwareIsCompatible).mockReturnValue(true)

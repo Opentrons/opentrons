@@ -28,7 +28,7 @@ describe('SubmitPrimaryButton', () => {
   it('renders submit primary button with text - active', () => {
     render(props)
     const button = screen.getByText('submit primary button')
-    expect(button).toHaveStyle(`background-color: ${COLORS.blue60}`)
+    expect(button).toHaveStyle(`background-color: ${COLORS.blue50}`)
     expect(button).toHaveStyle(`border-radius: ${BORDERS.borderRadius8}`)
     expect(button).toHaveStyle(
       `padding: ${SPACING.spacing8} ${SPACING.spacing16}`

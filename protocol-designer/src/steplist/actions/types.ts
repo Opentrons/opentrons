@@ -1,4 +1,4 @@
-import { StepFieldName } from '../fieldLevel'
+import type { StepFieldName } from '../fieldLevel'
 export type FormPatch = Partial<Record<StepFieldName, unknown | null>>
 // Update Form input (onChange on inputs)
 export interface ChangeFormPayload {

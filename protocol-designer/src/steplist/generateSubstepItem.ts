@@ -21,8 +21,8 @@ import type {
   MixArgs,
   TransferArgs,
 } from '@opentrons/step-generation'
-import { StepIdType } from '../form-types'
-import {
+import type { StepIdType } from '../form-types'
+import type {
   NamedIngred,
   StepArgsAndErrors,
   StepItemSourceDestRow,
@@ -112,8 +112,12 @@ export const mergeSubstepRowsSingleChannel = (args: {
   showDispenseVol: boolean
 }): StepItemSourceDestRow[] => {
   const { substepRows, showDispenseVol } = args
+  //  TODO(jr, 5/2/24): filtering out air gap steps for now since a refactor would be required
+  //  to figure out if the air gap is for the aspirate or dispense labware. Otherwise, a white screen
+  //  was happening with an air gap step trying to happen in an aspirate labware well that did not exist
+  const filteredSubstepRows = substepRows.filter(row => !row.isAirGap)
   return steplistUtils.mergeWhen(
-    substepRows,
+    filteredSubstepRows,
     (
       currentRow,
       nextRow // NOTE: if aspirate then dispense rows are adjacent, collapse them into one row
@@ -160,8 +164,12 @@ export const mergeSubstepRowsMultiChannel = (args: {
   showDispenseVol: boolean
 }): StepItemSourceDestRow[][] => {
   const { substepRows, channels, isMixStep, showDispenseVol } = args
+  //  TODO(jr, 5/2/24): filtering out air gap steps for now since a refactor would be required
+  //  to figure out if the air gap is for the aspirate or dispense labware. Otherwise, a white screen
+  //  was happening with an air gap step trying to happen in an aspirate labware well that did not exist
+  const filteredSubstepRows = substepRows.filter(row => !row.isAirGap)
   return steplistUtils.mergeWhen(
-    substepRows,
+    filteredSubstepRows,
     (
       currentMultiRow: SubstepTimelineFrame,
       nextMultiRow: SubstepTimelineFrame

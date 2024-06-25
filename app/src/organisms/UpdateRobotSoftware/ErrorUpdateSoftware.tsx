@@ -10,7 +10,7 @@ import {
   Icon,
   JUSTIFY_CENTER,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -45,16 +45,16 @@ export function ErrorUpdateSoftware({
           gridGap={SPACING.spacing4}
           alignItems={ALIGN_CENTER}
         >
-          <StyledText
+          <LegacyStyledText
             as="h2"
             fontWeight={TYPOGRAPHY.fontWeightBold}
             color={COLORS.black90}
           >
             {t('software_update_error')}
-          </StyledText>
-          <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightRegular}>
+          </LegacyStyledText>
+          <LegacyStyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightRegular}>
             {errorMessage}
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
       </Flex>
       {children}

@@ -45,7 +45,7 @@ from .ot3utils import (
     motor_nodes,
     LIMIT_SWITCH_OVERTRAVEL_DISTANCE,
     map_pipette_type_to_sensor_id,
-    moving_axes_in_move_group,
+    moving_pipettes_in_move_group,
     gripper_jaw_state_from_fw,
     get_system_constraints,
     get_system_constraints_for_calibration,
@@ -191,6 +191,10 @@ from opentrons_shared_data.errors.exceptions import (
     PipetteOverpressureError,
     FirmwareUpdateRequiredError,
     FailedGripperPickupError,
+    PipetteLiquidNotFoundError,
+    CommunicationError,
+    PythonException,
+    UnsupportedHardwareCommand,
 )
 
 from .subsystem_manager import SubsystemManager
@@ -663,12 +667,9 @@ class OT3Controller(FlexBackend):
             else False,
         )
 
-        mounts_moving = [
-            k
-            for k in moving_axes_in_move_group(move_group)
-            if k in [NodeId.pipette_left, NodeId.pipette_right]
-        ]
-        async with self._monitor_overpressure(mounts_moving):
+        pipettes_moving = moving_pipettes_in_move_group(move_group)
+
+        async with self._monitor_overpressure(pipettes_moving):
             positions = await runner.run(can_messenger=self._messenger)
         self._handle_motor_status_response(positions)
 
@@ -1185,7 +1186,14 @@ class OT3Controller(FlexBackend):
     async def is_motor_engaged(self, axis: Axis) -> bool:
         node = axis_to_node(axis)
         result = await get_motor_enabled(self._messenger, {node})
-        engaged = result[node]
+        try:
+            engaged = result[node]
+        except KeyError as ke:
+            raise CommunicationError(
+                message=f"No response from {node.name} for motor engagement query",
+                detail={"node": node.name},
+                wrapping=[PythonException(ke)],
+            ) from ke
         self._engaged_axes.update({axis: engaged})
         return engaged
 
@@ -1352,17 +1360,19 @@ class OT3Controller(FlexBackend):
         threshold_pascals: float,
         output_option: OutputOptions = OutputOptions.can_bus_only,
         data_files: Optional[Dict[InstrumentProbeType, str]] = None,
-        auto_zero_sensor: bool = True,
-        num_baseline_reads: int = 10,
         probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
     ) -> float:
         if output_option == OutputOptions.sync_buffer_to_csv:
-            assert (
+            if (
                 self._subsystem_manager.device_info[
                     SubSystem.of_mount(mount)
                 ].revision.tertiary
-                == "1"
-            )
+                != "1"
+            ):
+                raise UnsupportedHardwareCommand(
+                    "Liquid Probe not supported on this pipette firmware"
+                )
+
         head_node = axis_to_node(Axis.by_mount(mount))
         tool = sensor_node_for_pipette(OT3Mount(mount.value))
         csv_output = bool(output_option.value & OutputOptions.stream_to_csv.value)
@@ -1392,13 +1402,23 @@ class OT3Controller(FlexBackend):
             sync_buffer_output=sync_buffer_output,
             can_bus_only_output=can_bus_only_output,
             data_files=data_files_transposed,
-            auto_zero_sensor=auto_zero_sensor,
-            num_baseline_reads=num_baseline_reads,
             sensor_id=sensor_id_for_instrument(probe),
         )
         for node, point in positions.items():
             self._position.update({node: point.motor_position})
             self._encoder_position.update({node: point.encoder_position})
+        if (
+            head_node not in positions
+            or positions[head_node].move_ack
+            == MoveCompleteAck.complete_without_condition
+        ):
+            raise PipetteLiquidNotFoundError(
+                "Liquid not found during probe.",
+                {
+                    str(node_to_axis(node)): str(point.motor_position)
+                    for node, point in positions.items()
+                },
+            )
         return self._position[axis_to_node(Axis.by_mount(mount))]
 
     async def capacitive_probe(
@@ -1408,15 +1428,44 @@ class OT3Controller(FlexBackend):
         distance_mm: float,
         speed_mm_per_s: float,
         sensor_threshold_pf: float,
-        probe: InstrumentProbeType,
+        probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
+        output_option: OutputOptions = OutputOptions.sync_only,
+        data_files: Optional[Dict[InstrumentProbeType, str]] = None,
     ) -> bool:
+        if output_option == OutputOptions.sync_buffer_to_csv:
+            assert (
+                self._subsystem_manager.device_info[
+                    SubSystem.of_mount(mount)
+                ].revision.tertiary
+                == "1"
+            )
+        csv_output = bool(output_option.value & OutputOptions.stream_to_csv.value)
+        sync_buffer_output = bool(
+            output_option.value & OutputOptions.sync_buffer_to_csv.value
+        )
+        can_bus_only_output = bool(
+            output_option.value & OutputOptions.can_bus_only.value
+        )
+        data_files_transposed = (
+            None
+            if data_files is None
+            else {
+                sensor_id_for_instrument(probe): data_files[probe]
+                for probe in data_files.keys()
+            }
+        )
         status = await capacitive_probe(
-            self._messenger,
-            sensor_node_for_mount(mount),
-            axis_to_node(moving),
-            distance_mm,
-            speed_mm_per_s,
-            sensor_id_for_instrument(probe),
+            messenger=self._messenger,
+            tool=sensor_node_for_mount(mount),
+            mover=axis_to_node(moving),
+            distance=distance_mm,
+            plunger_speed=speed_mm_per_s,
+            mount_speed=speed_mm_per_s,
+            csv_output=csv_output,
+            sync_buffer_output=sync_buffer_output,
+            can_bus_only_output=can_bus_only_output,
+            data_files=data_files_transposed,
+            sensor_id=sensor_id_for_instrument(probe),
             relative_threshold_pf=sensor_threshold_pf,
         )
 

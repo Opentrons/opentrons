@@ -9,7 +9,7 @@ import {
   Flex,
   JUSTIFY_CENTER,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -32,17 +32,17 @@ export function NoProtocols(): JSX.Element {
         width="284px"
         height="166px"
       />
-      <StyledText
+      <LegacyStyledText
         as="h3"
         fontWeight={TYPOGRAPHY.fontWeightBold}
         marginTop={SPACING.spacing16}
         marginBottom={SPACING.spacing8}
       >
         {t('nothing_here_yet')}
-      </StyledText>
-      <StyledText as="h4" color={COLORS.grey60}>
+      </LegacyStyledText>
+      <LegacyStyledText as="h4" color={COLORS.grey60}>
         {t('branded:send_a_protocol_to_store')}
-      </StyledText>
+      </LegacyStyledText>
     </Flex>
   )
 }

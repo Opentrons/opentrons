@@ -16,10 +16,12 @@ export { getWellTotalVolume } from './getWellTotalVolume'
 export { wellIsRect } from './wellIsRect'
 export { orderWells } from './orderWells'
 export { get96Channel384WellPlateWells } from './get96Channel384WellPlateWells'
+export { getTipTypeFromTipRackDefinition } from './getTipTypeFromTipRackDefinition'
 
 export * from './parseProtocolData'
 export * from './volume'
 export * from './wellSets'
+export * from './getAreFlexSlotsAdjacent'
 export * from './getModuleVizDims'
 export * from './getVectorDifference'
 export * from './getVectorSum'
@@ -33,6 +35,7 @@ export * from './formatRunTimeParameterDefaultValue'
 export * from './formatRunTimeParameterValue'
 export * from './formatRunTimeParameterMinMax'
 export * from './orderRuntimeParameterRangeOptions'
+export * from './sortRunTimeParameters'
 
 export const getLabwareDefIsStandard = (def: LabwareDefinition2): boolean =>
   def?.namespace === OPENTRONS_LABWARE_NAMESPACE

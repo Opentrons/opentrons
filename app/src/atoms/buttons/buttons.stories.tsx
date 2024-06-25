@@ -5,7 +5,7 @@ import {
   Flex,
   PrimaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   useLongPress,
 } from '@opentrons/components'
 import {
@@ -120,9 +120,9 @@ const LongPressButtonTemplate: Story<
         {children}
       </PrimaryButton>
       {
-        <StyledText
+        <LegacyStyledText
           marginTop={SPACING.spacing16}
-        >{`You tapped ${tapCount} times`}</StyledText>
+        >{`You tapped ${tapCount} times`}</LegacyStyledText>
       }
     </Flex>
   )

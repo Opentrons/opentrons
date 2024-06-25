@@ -4,18 +4,17 @@ import type {
   ThermocyclerModuleModel,
   MagneticModuleModel,
   HeaterShakerModuleModel,
-} from '@opentrons/shared-data'
-
-import {
+  AbsorbanceReaderModel,
   TEMPERATURE_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
+  ABSORBANCE_READER_TYPE,
 } from '@opentrons/shared-data'
 
-import { ModuleOffset } from '@opentrons/api-client'
+import type { ModuleOffset } from '@opentrons/api-client'
 
-import * as ApiTypes from './api-types'
+import type * as ApiTypes from './api-types'
 export * from './api-types'
 
 // common types
@@ -66,11 +65,19 @@ export interface HeaterShakerModule extends CommonModuleInfo {
   moduleOffset?: ModuleOffset
 }
 
+export interface AbsorbanceReaderModule extends CommonModuleInfo {
+  moduleType: typeof ABSORBANCE_READER_TYPE
+  moduleModel: AbsorbanceReaderModel
+  data: ApiTypes.AbsorbanceReaderData
+  moduleOffset?: ModuleOffset
+}
+
 export type AttachedModule =
   | TemperatureModule
   | MagneticModule
   | ThermocyclerModule
   | HeaterShakerModule
+  | AbsorbanceReaderModule
 // action object types
 
 export interface MatchedModule {

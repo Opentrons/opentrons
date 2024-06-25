@@ -9,7 +9,7 @@ import {
   DIRECTION_ROW,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { Modal } from '../../molecules/Modal'
@@ -37,7 +37,9 @@ export function SetupInstructionsModal({
   return (
     <Modal
       header={modalHeader}
-      onOutsideClick={() => setShowSetupInstructionsModal(false)}
+      onOutsideClick={() => {
+        setShowSetupInstructionsModal(false)
+      }}
     >
       <Flex
         flexDirection={DIRECTION_ROW}
@@ -45,17 +47,17 @@ export function SetupInstructionsModal({
         gridGap={SPACING.spacing40}
       >
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
-          <StyledText as="p">
+          <LegacyStyledText as="p">
             {t('branded:setup_instructions_description')}
-          </StyledText>
+          </LegacyStyledText>
           <Flex
             backgroundColor={COLORS.grey35}
             borderRadius={BORDERS.borderRadius8}
             padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
           >
-            <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+            <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
               {INSTRUCTIONS_URL}
-            </StyledText>
+            </LegacyStyledText>
           </Flex>
         </Flex>
         <img
