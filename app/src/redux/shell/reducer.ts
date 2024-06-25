@@ -57,7 +57,7 @@ export function massStorageReducer(
   action: Action
 ): string[] {
   switch (action.type) {
-    case 'shell:SEND_FILE_PATH':
+    case 'shell:SEND_FILE_PATHS':
       return action.payload.filePaths
   }
   return state

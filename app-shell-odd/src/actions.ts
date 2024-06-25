@@ -83,7 +83,7 @@ import {
   DISCOVERY_START,
   DISCOVERY_FINISH,
   SEND_READY_STATUS,
-  SEND_FILE_PATH,
+  SEND_FILE_PATHS,
 } from './constants'
 import type {
   InitializedAction,
@@ -449,7 +449,7 @@ export const sendReadyStatus = (status: boolean): RobotSystemAction => ({
 })
 
 export const sendFilePaths = (filePaths: string[]): SendFilePathAction => ({
-  type: SEND_FILE_PATH,
+  type: SEND_FILE_PATHS,
   payload: { filePaths },
   meta: { shell: true },
 })

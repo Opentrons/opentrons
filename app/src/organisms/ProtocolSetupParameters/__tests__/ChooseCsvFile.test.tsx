@@ -21,7 +21,7 @@ const mockSetParameter = vi.fn()
 const mockParameter: CsvFileParameter = {} as any
 const mockSetFileInfo = vi.fn()
 const mockUsbData = {
-  type: 'shell:SEND_FILE_PATH',
+  type: 'shell:SEND_FILE_PATHS',
   payload: {
     filePaths: [
       '/media/mock-usb-drive/mock-file1.csv',

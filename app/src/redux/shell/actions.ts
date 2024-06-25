@@ -33,7 +33,7 @@ export const ROBOT_MASS_STORAGE_DEVICE_ENUMERATED: 'shell:ROBOT_MASS_STORAGE_DEV
   'shell:ROBOT_MASS_STORAGE_DEVICE_ENUMERATED'
 export const NOTIFY_SUBSCRIBE: 'shell:NOTIFY_SUBSCRIBE' =
   'shell:NOTIFY_SUBSCRIBE'
-export const SEND_FILE_PATH: 'shell:SEND_FILE_PATH' = 'shell:SEND_FILE_PATH'
+export const SEND_FILE_PATHS: 'shell:SEND_FILE_PATHS' = 'shell:SEND_FILE_PATHS'
 
 export const uiInitialized = (): UiInitializedAction => ({
   type: UI_INITIALIZED,
@@ -127,7 +127,7 @@ export const notifySubscribeAction = (
 })
 
 export const getFilePaths = (state: State): SendFilePathAction => ({
-  type: SEND_FILE_PATH,
+  type: SEND_FILE_PATHS,
   payload: { filePaths: state.shell.filePaths },
   meta: { shell: true },
 })
