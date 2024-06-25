@@ -42,7 +42,9 @@ def get_all_plate_readings(
 ) -> float:
     """Calculate accuracy of liquid moved on final measurement step."""
     accuracy = 0.0
-    all_data = google_sheet.get_all_data()
+    header_list = google_sheet.get_row(1)
+    all_data = google_sheet.get_all_data(header_list)
+
     # Get mass of first reading
     mass_1_readings = []
     for row in all_data:
