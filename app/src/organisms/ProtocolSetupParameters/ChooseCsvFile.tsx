@@ -26,9 +26,7 @@ interface ChooseCsvFileProps {
   // ToDo (kk:06/18/2024) null will be removed when implemented required part
   parameter: CsvFileParameter | null
   setParameter: (value: boolean | string | number, variableName: string) => void
-  /** if files on robot has the same id, the file name is highlighted */
   csvFileInfo: string
-  /** If a user chooses a file on robot, store fileId. If a user chooses a file on usb, store full file path.  */
   setCsvFileInfo: (fileInfo: string) => void
 }
 

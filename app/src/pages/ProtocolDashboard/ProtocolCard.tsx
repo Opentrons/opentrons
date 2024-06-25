@@ -106,9 +106,10 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
         analysisForProtocolCard.result === 'not-ok')) ??
     false
 
-  // ToDo (kk:06/18/2024) this part will be updated when Nick's PR is merged into edge
-  // https://github.com/Opentrons/opentrons/pull/15440
-  const isRequiredCSV = enableCsvFile && protocolName.includes('RTP')
+  // ToDo (kk:06/25/2024) remove ff when we are ready for freezing the code
+  const isRequiredCSV =
+    enableCsvFile &&
+    analysisForProtocolCard?.result === 'parameter-value-required'
 
   const isPendingAnalysis = analysisForProtocolCard == null
 
