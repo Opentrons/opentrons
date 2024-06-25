@@ -79,7 +79,7 @@ app.once('window-all-closed', () => {
 })
 
 app.once('render-process-gone', () => {
-  log.debug('Renderer process has died, quitting the app')
+  log.error('Renderer process has died, quitting the app')
   quitApplication()
 })
 
