@@ -561,20 +561,20 @@ class AbsorbanceReaderCore(ModuleCore, AbstractAbsorbanceReaderCore):
                 )
             )
 
-    def close_lid(self, ) -> None:
+    def close_lid(
+        self,
+    ) -> None:
         """Close the Absorbance Reader's lid."""
         self._engine_client.execute_command(
             cmd.absorbance_reader.CloseLidParams(
-                moduleId=self.module_id,
-                pickUpOffset=None,
-                dropOffset=None)
+                moduleId=self.module_id, pickUpOffset=None, dropOffset=None
+            )
         )
 
     def open_lid(self) -> None:
         """Close the Absorbance Reader's lid."""
         self._engine_client.execute_command(
             cmd.absorbance_reader.OpenLidParams(
-                moduleId=self.module_id,
-                pickUpOffset=None,
-                dropOffset=None)
+                moduleId=self.module_id, pickUpOffset=None, dropOffset=None
+            )
         )

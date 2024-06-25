@@ -452,12 +452,13 @@ class ProtocolCore(
     ) -> None:
         if isinstance(module_core, AbsorbanceReaderCore):
             lid_dock_loc = module_core.get_lid_dock_location()
-            self._engine_client.load_labware(
-                load_name="opentrons_flex_lid_absorbance_plate_reader_module",
-                location=lid_dock_loc,
-                namespace="opentrons",
-                version=1,
-                display_name="Absorbance Reader Lid",
+            load_result = self._engine_client.execute_command_without_recovery(
+                cmd.LoadLabwareParams(
+                    loadName="opentrons_flex_lid_absorbance_plate_reader_module",
+                    location=lid_dock_loc,
+                    namespace="opentrons",
+                    version=1,
+                )
             )
 
     def _create_non_connected_module_core(

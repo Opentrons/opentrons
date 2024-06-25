@@ -58,6 +58,7 @@ class OpenLidResult(BaseModel):
         ),
     )
 
+
 class OpenLidImpl(AbstractCommandImpl[OpenLidParams, SuccessData[OpenLidResult, None]]):
     """Execution implementation of opening the lid on an Absorbance Reader."""
 
@@ -80,27 +81,25 @@ class OpenLidImpl(AbstractCommandImpl[OpenLidParams, SuccessData[OpenLidResult, 
         # Make sure the lid is closed
         mod_substate.raise_if_lid_status_not_expected(lid_on_expected=True)
 
-         # Allow propagation of ModuleNotAttachedError.
-        mod_hw = self._equipment.get_module_hardware_api(
-            mod_substate.module_id
-        )
+        # Allow propagation of ModuleNotAttachedError.
+        mod_hw = self._equipment.get_module_hardware_api(mod_substate.module_id)
 
         # lid should currently be on the module
-        lid_id = self._state_view.labware.get_id_by_module(
-            mod_substate.module_id
-        )
+        lid_id = self._state_view.labware.get_id_by_module(mod_substate.module_id)
         loaded_lid = self._state_view.labware.get(lid_id)
         assert labware_validation.is_absorbance_reader_lid(loaded_lid.loadName)
 
         current_location = loaded_lid.location
-        validated_current_location = self._state_view.geometry.ensure_valid_gripper_location(
-            current_location
+        validated_current_location = (
+            self._state_view.geometry.ensure_valid_gripper_location(current_location)
         )
 
         # we need to move the lid to the lid dock
-        new_location = self._state_view.modules.get_lid_dock_location(mod_substate.module_id)
-        validated_new_location = self._state_view.geometry.ensure_valid_gripper_location(
-            new_location
+        new_location = self._state_view.modules.get_lid_dock_location(
+            mod_substate.module_id
+        )
+        validated_new_location = (
+            self._state_view.geometry.ensure_valid_gripper_location(new_location)
         )
         # TODO (AA): we probably don't need this, but let's keep it until we're sure
         user_offset_data = LabwareMovementOffsetData(

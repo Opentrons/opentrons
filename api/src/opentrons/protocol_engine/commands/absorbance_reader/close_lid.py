@@ -87,29 +87,28 @@ class CloseLidImpl(
         mod_substate.raise_if_lid_status_not_expected(lid_on_expected=False)
 
         # Allow propagation of ModuleNotAttachedError.
-        mod_hw = self._equipment.get_module_hardware_api(
-            mod_substate.module_id
-        )
+        mod_hw = self._equipment.get_module_hardware_api(mod_substate.module_id)
 
         # lid should currently be docked
 
         lid_dock_slot = self._state_view.modules.get_lid_dock_slot(
-            mod_substate.module_id)
+            mod_substate.module_id
+        )
         loaded_lid = self._state_view.labware.get_by_slot(lid_dock_slot)
-        assert loaded_lid is not None, "Absorbance Reader lid is not present in the lid dock."
+        assert (
+            loaded_lid is not None
+        ), "Absorbance Reader lid is not present in the lid dock."
         assert labware_validation.is_absorbance_reader_lid(loaded_lid.loadName)
 
         current_location = loaded_lid.location
-        validated_current_location = self._state_view.geometry.ensure_valid_gripper_location(
-            current_location
+        validated_current_location = (
+            self._state_view.geometry.ensure_valid_gripper_location(current_location)
         )
 
         # we need to move the lid onto the module
-        new_location = self._state_view.modules.get_location(
-            mod_substate.module_id
-        )
-        validated_new_location = self._state_view.geometry.ensure_valid_gripper_location(
-            new_location
+        new_location = self._state_view.modules.get_location(mod_substate.module_id)
+        validated_new_location = (
+            self._state_view.geometry.ensure_valid_gripper_location(new_location)
         )
 
         # TODO (AA): we probably don't need this, but let's keep it until we're sure
