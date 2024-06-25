@@ -24,6 +24,7 @@ from opentrons.protocol_engine.errors.exceptions import (
     LabwareNotLoadedOnModuleError,
     NoMagnetEngageHeightError,
 )
+from opentrons.protocol_engine.types import AddressableAreaLocation
 
 from opentrons.protocols.api_support.types import APIVersion
 
@@ -528,8 +529,12 @@ class AbsorbanceReaderCore(ModuleCore, AbstractAbsorbanceReaderCore):
     _initialized_value: Optional[int] = None
 
     def get_lid_dock_slot(self) -> StagingSlotName:
-        """Get the Absorbance Reader's lid dock status."""
+        """Get the Absorbance Reader's lid dock slot."""
         return self._engine_client.state.modules.get_lid_dock_slot(self.module_id)
+
+    def get_lid_dock_location(self) -> AddressableAreaLocation:
+        """Get the addressable area location of the Absorbance Reader's lid dock."""
+        return AddressableAreaLocation(addressableAreaName=self.get_lid_dock_slot().id)
 
     def get_lid_dock_slot_id(self) -> str:
         slot_name = self.get_lid_dock_slot()

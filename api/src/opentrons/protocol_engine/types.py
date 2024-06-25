@@ -174,7 +174,6 @@ LabwareLocation = Union[
     OnLabwareLocation,
     _OffDeckLocationType,
     AddressableAreaLocation,
-    StagingSlotLocation,
 ]
 """Union of all locations where it's legal to keep a labware."""
 
@@ -787,18 +786,6 @@ class AreaType(Enum):
     TEMPERATURE = "temperatureModule"
     MAGNETICBLOCK = "magneticBlock"
     ABSORBANCE_READER = "absorbanceReader"
-    LID_DOCK = "lidDock"
-
-
-@dataclass(frozen=True)
-class FixturePeripheral:
-    """Peripherals associated with a given cutout Fixture."""
-
-    id: str
-    loadName: str
-    namespace: str
-    version: int
-    locations: Dict[str, str]
 
 
 @dataclass(frozen=True)
