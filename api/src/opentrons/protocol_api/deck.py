@@ -188,7 +188,7 @@ class Deck(Mapping[DeckLocation, Optional[DeckItem]]):
         return Location(point=Point(x, y, z), labware=normalized_slot_name)
 
     # todo(mm, 2023-05-08): This may be internal and removable from this public class. Jira RSS-236.
-def get_slot_definition(self, slot: DeckLocation) -> SlotDefV3:
+    def get_slot_definition(self, slot: DeckLocation) -> SlotDefV3:
         """Get the geometric definition data of a slot."""
         slot_name = _get_slot_name(
             slot, self._api_version, self._protocol_core.robot_type
