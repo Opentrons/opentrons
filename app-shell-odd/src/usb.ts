@@ -27,7 +27,10 @@ const isWeirdDirectoryAndShouldSkip = (dirName: string): boolean =>
     .map(keyword => dirName.includes(keyword))
     .reduce((prev, current) => prev || current, false)
 
-const enumerateMassStorage = (path: string): Promise<string[]> =>
+const enumerateMassStorage = (
+  path: string,
+  filterCSV: boolean = false
+): Promise<string[]> =>
   fsPromises
     .readdir(path)
     .then(entries =>
@@ -53,6 +56,18 @@ const enumerateMassStorage = (path: string): Promise<string[]> =>
     )
     .catch(() => [])
     .then(flatten)
+    .then(contents => {
+      if (filterCSV) {
+        const regex = /._\w/gm
+        const csvFilePaths =
+          contents.filter(
+            path => !path.match(regex) && path.endsWith('.csv')
+          ) ?? []
+        return csvFilePaths
+      } else {
+        return contents
+      }
+    })
 
 export function watchForMassStorage(dispatch: Dispatch): () => void {
   console.log('watching for mass storage')
@@ -177,15 +192,11 @@ export function registerFilePath(
   return function handleAction(action: Action) {
     switch (action.type) {
       case ROBOT_MASS_STORAGE_DEVICE_ENUMERATED:
-        void enumerateMassStorage(action.payload.rootPath).then(contents => {
-          // Note (kk:06/12/2024) need to filter out resource fork files which starts ._
-          const regex = /._\w/gm
-          const csvFilePaths =
-            contents.filter(
-              path => !path.match(regex) && path.endsWith('.csv')
-            ) ?? []
-          dispatch(sendFilePaths(csvFilePaths))
-        })
+        void enumerateMassStorage(action.payload.rootPath, true).then(
+          csvFilePaths => {
+            dispatch(sendFilePaths(csvFilePaths))
+          }
+        )
         break
 
       case ROBOT_MASS_STORAGE_DEVICE_REMOVED:
