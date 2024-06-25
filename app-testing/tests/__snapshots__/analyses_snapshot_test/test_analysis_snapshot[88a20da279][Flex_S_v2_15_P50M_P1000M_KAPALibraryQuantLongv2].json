@@ -17856,6 +17856,7 @@
       "commandType": "loadPipette",
       "notes": [],
       "params": {
+        "liquidPresenceDetection": false,
         "mount": "left",
         "pipetteName": "p50_multi_flex"
       },
@@ -17866,6 +17867,7 @@
       "commandType": "loadPipette",
       "notes": [],
       "params": {
+        "liquidPresenceDetection": false,
         "mount": "right",
         "pipetteName": "p1000_multi_flex"
       },
