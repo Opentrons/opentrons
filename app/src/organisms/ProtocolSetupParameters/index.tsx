@@ -153,6 +153,14 @@ export function ProtocolSetupParameters({
     }
   }
 
+  console.log('isLoading', isLoading)
+  console.log('startSetup', startSetup)
+  console.log('enableCsvFile', enableCsvFile)
+  console.log(
+    'result',
+    mostRecentAnalysis?.result === 'parameter-value-required'
+  )
+
   let children = (
     <>
       <ChildNavigation
@@ -162,6 +170,10 @@ export function ProtocolSetupParameters({
         }}
         onClickButton={handleConfirmValues}
         buttonText={t('confirm_values')}
+        buttonIsDisabled={
+          enableCsvFile &&
+          mostRecentAnalysis?.result === 'parameter-value-required'
+        }
         iconName={isLoading || startSetup ? 'ot-spinner' : undefined}
         iconPlacement="startIcon"
         secondaryButtonProps={{
@@ -183,16 +195,33 @@ export function ProtocolSetupParameters({
       >
         {sortRuntimeParameters(runTimeParametersOverrides).map(
           (parameter, index) => {
+            const detailLabelForCsv =
+              mostRecentAnalysis?.result === 'parameter-value-required'
+                ? t('required')
+                : parameter.displayName
+
+            let setupStatus: 'ready' | 'not ready' | 'general' | 'inform' =
+              'inform'
+            if (
+              enableCsvFile &&
+              parameter.type === 'csv_file' &&
+              mostRecentAnalysis?.result === 'parameter-value-required'
+            ) {
+              setupStatus = 'not ready'
+            }
+            if (
+              enableCsvFile &&
+              parameter.type === 'csv_file' &&
+              mostRecentAnalysis?.result === 'ok'
+            ) {
+              setupStatus = 'ready'
+            }
             return (
               <React.Fragment key={`${parameter.displayName}_${index}`}>
                 <ProtocolSetupStep
                   hasRightIcon={!(parameter.type === 'bool')}
                   hasLeftIcon={false}
-                  status={
-                    enableCsvFile && parameter.type === 'csv_file'
-                      ? 'not ready'
-                      : 'inform'
-                  }
+                  status={setupStatus}
                   title={
                     parameter.type === 'csv_file'
                       ? t('csv_file')
@@ -202,10 +231,8 @@ export function ProtocolSetupParameters({
                     handleSetParameter(parameter)
                   }}
                   detail={
-                    enableCsvFile && // ToDo this line will be removed
-                    parameter.type === 'csv_file' &&
-                    mostRecentAnalysis?.result === 'parameter-value-required'
-                      ? t('required')
+                    enableCsvFile && parameter.type === 'csv_file'
+                      ? detailLabelForCsv
                       : formatRunTimeParameterValue(parameter, t)
                   }
                   description={

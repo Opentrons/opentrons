@@ -154,6 +154,8 @@ describe('ProtocolSetupParameters', () => {
     })
     screen.getByText('CSV File')
     screen.getByText('Required')
+    const button = screen.getByRole('button', { name: 'Confirm values' })
+    expect(button).toBeDisabled()
   })
 
   it.todo(
