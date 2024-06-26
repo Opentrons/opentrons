@@ -78,7 +78,7 @@ gather() {
             echo "Gathering logs"
             shopt -s extglob
             cp -r /var/log/!(journal) $diag_dir/logs/
-            journalctl --boot > $diag_dir/logs/journal.log
+            journalctl > $diag_dir/logs/journal.log
             dmesg > $diag_dir/logs/dmesg.log
 
             echo "Gathering system state"
@@ -87,6 +87,7 @@ gather() {
             top -c -b -n 10 > $diag_dir/system/top.txt
             free -wl -c 10 -s 10 > $diag_dir/system/free.txt
             date > $diag_dir/system/datetime.txt
+            timedatectl >> $diag_dir/system/datetime.txt
             uptime > $diag_dir/system/uptime.txt
 
             echo "Gathering network info"
@@ -96,6 +97,12 @@ gather() {
             echo -e "\n\n" >> $diag_dir/network/network.txt
             ( nmcli dev list || nmcli dev show ) 2>/dev/null |
                 grep DNS >> $diag_dir/network/network.txt
+
+            echo "Gathering NTP server info"
+            echo -e "\n\n" >> $diag_dir/network/network.txt
+            ping -c 2 -w 2 time.google.com >> $diag_dir/network/network.txt || true
+            ping -c 2 -w 2 ntp.tencent.com >> $diag_dir/network/network.txt || true
+            ping -c 2 -w 2 time.amazonaws.cn >> $diag_dir/network/network.txt || true
 
             echo "Downloading releases.json"
             wget https://builds.opentrons.com/ot3-oe/releases.json -P $diag_dir/network/
