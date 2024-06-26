@@ -89,13 +89,14 @@ export function InlineNotification(
       backgroundColor={INLINE_NOTIFICATION_PROPS_BY_TYPE[type].backgroundColor}
       data-testid={`InlineNotification_${type}`}
       flexDirection={DIRECTION_ROW}
-      gridGap={SPACING.spacing12}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       width={hug ? 'max-content' : '100%'}
       css={css`
+        gap: ${SPACING.spacing8};
         border-radius: ${BORDERS.borderRadius4};
-        padding: ${SPACING.spacing4} ${SPACING.spacing12};
+        padding: ${SPACING.spacing8} ${SPACING.spacing12};
         @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+          gap: ${SPACING.spacing12};
           border-radius: ${BORDERS.borderRadius8};
           padding: ${SPACING.spacing12} ${SPACING.spacing16};
         }
@@ -104,8 +105,13 @@ export function InlineNotification(
       <Flex
         justifyContent={JUSTIFY_FLEX_START}
         alignItems={ALIGN_CENTER}
-        gap={SPACING.spacing12}
         flexDirection={DIRECTION_ROW}
+        css={css`
+          gap: ${SPACING.spacing8};
+          @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+            gap: ${SPACING.spacing12};
+          }
+        `}
       >
         <Box
           css={css`
@@ -164,6 +170,16 @@ export function InlineNotification(
           <Btn
             data-testid="InlineNotification_close-button"
             onClick={onCloseClick}
+            css={css`
+              width: 28px;
+              height: 28px;
+              @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+                width: ${SPACING.spacing48};
+                height: ${SPACING.spacing48};
+              }
+            `}
+            width=""
+            height="fit-content"
           >
             <Icon
               aria-label="close_icon"
