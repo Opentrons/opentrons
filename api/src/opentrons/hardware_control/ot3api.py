@@ -1757,6 +1757,10 @@ class OT3API(
             self._current_position,
         )
 
+        # NOTE: overshoot is for HW testing only
+        overshoot_pos = target_pos.copy()
+        overshoot_pos[Axis.of_main_tool_actuator(realmount.to_mount())] -= 0.0  # EDIT HERE (6/26)
+
         try:
             await self._backend.set_active_current(
                 {aspirate_spec.axis: aspirate_spec.current}
@@ -1764,6 +1768,11 @@ class OT3API(
             async with self.restore_system_constrants():
                 await self.set_system_constraints_for_plunger_acceleration(
                     realmount, aspirate_spec.acceleration
+                )
+                await self._move(
+                    overshoot_pos,  # NOTE: overshoot is for HW testing only
+                    speed=aspirate_spec.speed,
+                    home_flagged_axes=False,
                 )
                 await self._move(
                     target_pos,

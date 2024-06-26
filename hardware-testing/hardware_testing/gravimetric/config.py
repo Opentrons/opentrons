@@ -75,9 +75,7 @@ SCALE_SECONDS_TO_TRUE_STABILIZE = 30
 
 LOW_VOLUME_UPPER_LIMIT_UL: Final = 2.0
 
-DELAY_AFTER_BACKLASH_96CH_LOW_VOLUMES = (
-    0.0  # NOTE: %D can shift <=20% during first few seconds after plunger movement
-)
+DELAY_AFTER_BACKLASH_96CH_LOW_VOLUMES = 0.0  # EDIT HERE (6/26)
 
 TOUCH_TIP_SPEED = 30
 
