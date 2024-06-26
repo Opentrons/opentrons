@@ -165,7 +165,6 @@ class MaintenanceEngineStore:
         assert (
             self._run_orchestrator is None
         ), "There is an active maintenance run that was not cleared correctly."
-
         engine = await create_protocol_engine(
             hardware_api=self._hardware_api,
             config=ProtocolEngineConfig(
