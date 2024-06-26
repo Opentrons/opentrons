@@ -9,7 +9,12 @@
   },
   "robot": {
     "model": "OT-3 Standard",
-    "extents": [477.20, 493.8, 0.0]
+    "extents": [477.20, 493.8, 0.0],
+    "mountOffsets": {
+      "left": [-13.5, -60.5, 255.675],
+      "right": [40.5, -60.5, 255.675],
+      "gripper": [84.55, -12.75, 93.85]
+    }
   },
   "locations": {
     "addressableAreas": [

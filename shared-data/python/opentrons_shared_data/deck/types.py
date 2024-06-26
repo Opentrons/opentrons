@@ -4,7 +4,7 @@ opentrons_shared_data.deck.types: types for deck defs
 This should only be imported if typing.TYPE_CHECKING is True
 """
 
-from typing import Any, Dict, List, NewType, Union
+from typing import Any, Dict, List, NewType, Union, Optional
 from typing_extensions import Literal, TypedDict
 
 from ..module.types import ModuleType
@@ -26,10 +26,15 @@ class Metadata(TypedDict, total=False):
     displayName: str
     tags: List[str]
 
+class mountOffset(TypedDict):
+    left: List[float]
+    right: List[float]
+    gripper: Optional[List[float]]
 
 class Robot(TypedDict):
     model: RobotModel
     extents: List[float]
+    mountOffsets: mountOffset
 
 
 class BoundingBox(TypedDict):

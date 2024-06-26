@@ -98,7 +98,7 @@
     },
     "robot": {
       "type": "object",
-      "required": ["model", "extents"],
+      "required": ["model", "extents", "mountOffsets"],
       "properties": {
         "model": {
           "description": "Model of the robot",
@@ -108,6 +108,25 @@
         "extents": {
           "description": "The maximum addressable coordinates",
           "$ref": "#/definitions/xyzArray"
+        },
+        "mountOffsets": {
+          "description": "The physical mount offsets of the robot",
+          "type": "object",
+          "required": ["left", "right"],
+          "properties": {
+            "left": {
+              "description": "The left mount offset",
+              "$ref": "#/definitions/xyzArray"
+            },
+            "right": {
+              "description": "The right mount offset",
+              "$ref": "#/definitions/xyzArray"
+            },
+            "gripper": {
+              "description": "The gripper mount offset, only on OT-3 Standard definitions",
+              "$ref": "#/definitions/xyzArray"
+            }
+          }
         }
       }
     },
