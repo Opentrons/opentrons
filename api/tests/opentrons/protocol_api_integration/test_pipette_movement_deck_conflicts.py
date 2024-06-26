@@ -82,6 +82,7 @@ def test_deck_conflicts_for_96_ch_a12_column_configuration() -> None:
 
     # Will NOT raise error since first column of TC labware is accessible
     # (it is just a few mm away from the left bound)
+    # TODO Confirm if this location is valid after bounds updates
     instrument.dispense(25, accessible_plate.wells_by_name()["A1"])
 
     instrument.drop_tip()

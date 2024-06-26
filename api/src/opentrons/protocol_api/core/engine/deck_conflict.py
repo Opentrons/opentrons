@@ -16,7 +16,6 @@ from typing import (
 from opentrons_shared_data.errors.exceptions import MotionPlanningFailureError
 from opentrons_shared_data.module import FLEX_TC_LID_COLLISION_ZONE
 
-from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
 from opentrons.hardware_control.modules.types import ModuleType
 from opentrons.motion_planning import deck_conflict as wrapped_deck_conflict
 from opentrons.motion_planning import adjacent_slots_getters
@@ -62,21 +61,6 @@ class UnsuitableTiprackForPipetteMotion(MotionPlanningFailureError):
 
 
 _log = logging.getLogger(__name__)
-
-# TODO (spp, 2023-12-06): move this to a location like motion planning where we can
-#  derive these values from geometry definitions
-#  Also, verify y-axis extents values for the nozzle columns.
-# Bounding box measurements
-A12_column_front_left_bound = Point(x=-11.03, y=2)
-A12_column_back_right_bound = Point(x=526.77, y=506.2)
-
-_NOZZLE_PITCH = 9
-A1_column_front_left_bound = Point(
-    x=A12_column_front_left_bound.x - _NOZZLE_PITCH * 11, y=2
-)
-A1_column_back_right_bound = Point(
-    x=A12_column_back_right_bound.x - _NOZZLE_PITCH * 11, y=506.2
-)
 
 _FLEX_TC_LID_BACK_LEFT_PT = Point(
     x=FLEX_TC_LID_COLLISION_ZONE["back_left"]["x"],
@@ -429,18 +413,20 @@ def _is_within_pipette_extents(
     location: Point,
 ) -> bool:
     """Whether a given point is within the extents of a configured pipette on the specified robot."""
-    robot_extents = engine_state.geometry.deck_extents
-    mount_offsets = engine_state.geometry.mount_offsets
-    # Get the relative robot bounding box based on the pipette's current configuration 
-    rel_robot_bounding_box = engine_state.pipettes.get_robot_extent_per_pipette(pipette_id, mount_offsets, robot_extents)
-    return (
-        rel_robot_bounding_box.back_right.x
-        <= location.x
-        <= rel_robot_bounding_box.front_left.x
-        and rel_robot_bounding_box.back_right.y
-        <= location.y
-        <= rel_robot_bounding_box.front_left.y
+    mount = engine_state.pipettes.get_mount(pipette_id)
+    robot_extents = engine_state.geometry.absolute_deck_extents
+    pipette_bounds_offsets = engine_state.pipettes.get_pipette_bounding_box(pipette_id)
+    from_back_right = (
+        robot_extents.back_right[mount] - pipette_bounds_offsets.back_right_corner
     )
+    from_front_left = (
+        robot_extents.front_left[mount] + pipette_bounds_offsets.front_left_corner
+    )
+    return (
+        from_back_right.x <= location.x <= from_front_left.x
+        and from_back_right.y <= location.y <= from_front_left.y
+    )
+
 
 def _map_labware(
     engine_state: StateView,

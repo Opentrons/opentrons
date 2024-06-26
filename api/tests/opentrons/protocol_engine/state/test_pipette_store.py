@@ -773,6 +773,8 @@ def test_add_pipette_config(
         pipette_bounding_box_offsets=PipetteBoundingBoxOffsets(
             back_left_corner=Point(x=1, y=2, z=3),
             front_right_corner=Point(x=4, y=5, z=6),
+            front_left_corner=Point(x=1, y=5, z=3),
+            back_right_corner=Point(x=4, y=2, z=3),
         ),
     )
     assert subject.state.flow_rates_by_id["pipette-id"].default_aspirate == {"a": 1.0}

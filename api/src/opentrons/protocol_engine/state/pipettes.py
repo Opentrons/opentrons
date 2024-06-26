@@ -5,8 +5,7 @@ from typing import Dict, List, Mapping, Optional, Tuple, Union
 from typing_extensions import assert_type
 
 from opentrons_shared_data.pipette import pipette_definition
-from opentrons.config.defaults_ot2 import Z_RETRACT_DISTANCE, DEFAULT_MOUNT_OFFSET
-from opentrons.config.defaults_ot3 import DEFAULT_CARRIAGE_OFFSET, DEFAULT_LEFT_MOUNT_OFFSET, DEFAULT_RIGHT_MOUNT_OFFSET
+from opentrons.config.defaults_ot2 import Z_RETRACT_DISTANCE
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control.nozzle_manager import (
     NozzleConfigurationType,
@@ -98,6 +97,8 @@ class PipetteBoundingBoxOffsets:
 
     back_left_corner: Point
     front_right_corner: Point
+    back_right_corner: Point
+    front_left_corner: Point
 
 
 @dataclass(frozen=True)
@@ -119,14 +120,6 @@ class StaticPipetteConfig:
     pipette_bounding_box_offsets: PipetteBoundingBoxOffsets
     bounding_nozzle_offsets: BoundingNozzlesOffsets
     default_nozzle_map: NozzleMap
-
-
-
-@dataclass
-class RelativeRobotExtent:
-    """Relative robot extents based off the active nozzle offset."""
-    back_right: Point
-    front_left: Point
 
 
 @dataclass
@@ -200,6 +193,16 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 pipette_bounding_box_offsets=PipetteBoundingBoxOffsets(
                     back_left_corner=config.back_left_corner_offset,
                     front_right_corner=config.front_right_corner_offset,
+                    back_right_corner=Point(
+                        config.front_right_corner_offset.x,
+                        config.back_left_corner_offset.y,
+                        config.back_left_corner_offset.z,
+                    ),
+                    front_left_corner=Point(
+                        config.back_left_corner_offset.x,
+                        config.front_right_corner_offset.y,
+                        config.back_left_corner_offset.z,
+                    ),
                 ),
                 bounding_nozzle_offsets=BoundingNozzlesOffsets(
                     back_left_offset=config.nozzle_map.back_left_nozzle_offset,
@@ -768,23 +771,10 @@ class PipetteView(HasState[PipetteState]):
     ) -> BoundingNozzlesOffsets:
         """Get the nozzle offsets of the pipette's bounding nozzles."""
         return self.get_config(pipette_id).bounding_nozzle_offsets
-    
-    def get_mount_stackup(self, pipette_id: str, robot_type: str) -> Point:
-        return self.get_config(pipette_id).mount_stackup[robot_type]
-    
-    def get_robot_extent_per_pipette(self, pipette_id: str, robot_type: str, robot_extents) -> RelativeRobotExtent:
-        """Get the relative robot extents of the provided pipette based off the current nozzle configuration and provided robot extents."""
-        primary_nozzle_offset = self.get_primary_nozzle_offset(pipette_id)
-        # figure out how to better get the corner nozzles. Need front left and back right.
-        pipette_bounds_offsets = self.get_config(
-            pipette_id
-        ).pipette_bounding_box_offsets
-        robot_mount_stackup = self.get_mount_stackup(pipette_id, robot_type)
-        # TODO determine if we need to subtract or add here
-        # TODO get the max pipette bound 
-        from_back_right = robot_extents.back_right - robot_mount_stackup - pipette_bounds_offsets.back_right_corner
-        from_front_left = robot_extents.front_left - robot_mount_stackup - pipette_bounds_offsets.front_right_corner
-        return RelativeRobotExtent(back_right=from_back_right, front_left=from_front_left)
+
+    def get_pipette_bounding_box(self, pipette_id: str) -> PipetteBoundingBoxOffsets:
+        """Get the bounding box of the pipette."""
+        return self.get_config(pipette_id).pipette_bounding_box_offsets
 
     def get_pipette_bounds_at_specified_move_to_position(
         self,
