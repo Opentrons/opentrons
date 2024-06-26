@@ -756,14 +756,14 @@ class Protocols:
         file_extension="py",
         robot="Flex",
     )
-    pl_Uni_of_Montana_Cherrypicking_Flex_for_library_upload_v13: Protocol = Protocol(
-        file_stem="pl_Uni_of_Montana_Cherrypicking_Flex_for_library_upload_v13",
+    pl_cherrypicking_flex_v3: Protocol = Protocol(
+        file_stem="pl_cherrypicking_flex_v3",
         file_extension="py",
         robot="Flex",
     )
 
-    pl_upload_Uni_of_Montana_Normalization_Flex_Final_052324: Protocol = Protocol(
-        file_stem="pl_upload_Uni_of_Montana_Normalization_Flex_Final_052324",
+    pl_normalization_with_csv: Protocol = Protocol(
+        file_stem="pl_normalization_with_csv",
         file_extension="py",
         robot="Flex",
     )
