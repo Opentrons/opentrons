@@ -284,14 +284,12 @@ class Protocols:
         file_extension="py",
         robot="Flex",
         custom_labware=["opentrons_ot3_96_tiprack_1000ul_rss"],
-
     )
     Flex_S_v2_15_P1000_96_GRIP_HS_MB_TM_MagMaxRNAExtraction: Protocol = Protocol(
         file_stem="Flex_S_v2_15_P1000_96_GRIP_HS_MB_TM_MagMaxRNAExtraction",
         file_extension="py",
         robot="Flex",
         custom_labware=["opentrons_ot3_96_tiprack_200ul_rss"],
-
     )
     Flex_S_v2_15_P1000_96_GRIP_HS_MB_TC_TM_IlluminaDNAPrep96PART3: Protocol = Protocol(
         file_stem="Flex_S_v2_15_P1000_96_GRIP_HS_MB_TC_TM_IlluminaDNAPrep96PART3",
