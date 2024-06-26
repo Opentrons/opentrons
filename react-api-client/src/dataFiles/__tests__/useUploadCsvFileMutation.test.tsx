@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { act, renderHook, waitFor } from '@testing-library/react'
+import { renderHook, waitFor } from '@testing-library/react'
 import { uploadCsvFile } from '@opentrons/api-client'
 import { useHost } from '../../api'
 import { useUploadCsvFileMutation } from '../useUploadCsvFileMutation'
@@ -69,7 +69,7 @@ describe('useUploadCsvFileMutation', () => {
     } as Response<UploadedCsvFileResponse>)
 
     const { result } = renderHook(() => useUploadCsvFileMutation(), { wrapper })
-    await act(async () => result.current.uploadCsvFile(mockFilePath))
+    await waitFor(() => result.current.uploadCsvFile(mockFilePath))
 
     await waitFor(() => {
       expect(result.current.data).toEqual(mockUploadResponse)
