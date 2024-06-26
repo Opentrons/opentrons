@@ -631,28 +631,13 @@ def _run_file_pe(
             load_fixed_trash=should_load_fixed_trash(protocol_source.config),
         )
 
-        protocol_runner = create_protocol_runner(
+        orchestrator = RunOrchestrator.build_orchestrator(
+            hardware_api=hardware_api_wrapped,
+            protocol_engine=protocol_engine,
             protocol_config=protocol_source.config,
-            protocol_engine=protocol_engine,
-            hardware_api=hardware_api_wrapped,
         )
 
-        orchestrator = RunOrchestrator(
-            hardware_api=hardware_api_wrapped,
-            protocol_engine=protocol_engine,
-            json_or_python_protocol_runner=protocol_runner,
-            fixit_runner=LiveRunner(
-                protocol_engine=protocol_engine, hardware_api=hardware_api_wrapped
-            ),
-            setup_runner=LiveRunner(
-                protocol_engine=protocol_engine, hardware_api=hardware_api_wrapped
-            ),
-            protocol_live_runner=LiveRunner(
-                protocol_engine=protocol_engine, hardware_api=hardware_api_wrapped
-            ),
-        )
-
-        unsubscribe = protocol_runner.broker.subscribe(
+        unsubscribe = orchestrator.get_protocol_runner().broker.subscribe(
             "command", lambda event: emit_runlog(event) if emit_runlog else None
         )
         try:
