@@ -759,3 +759,182 @@ class Protocols:
         app_error=False,
         robot_error=False,
     )
+
+    ##########################################################################################################
+    # Begin Protocol Library Protocols #######################################################################
+    ##########################################################################################################
+    pl_96_ch_demo_rtp_with_hs: Protocol = Protocol(
+        file_stem="pl_96_ch_demo_rtp_with_hs", file_extension="py", robot="Flex", app_error=False, robot_error=False
+    )
+    pl_96_ch_demo_rtp: Protocol = Protocol(
+        file_stem="pl_96_ch_demo_rtp", file_extension="py", robot="Flex", app_error=False, robot_error=False
+    )
+    pl_AMPure_XP_48x_v8: Protocol = Protocol(
+        file_stem="pl_AMPure_XP_48x_v8", file_extension="py", robot="Flex", app_error=False, robot_error=False
+    )
+    pl_BacteriaInoculation_Flex_6plates: Protocol = Protocol(
+        file_stem="pl_BacteriaInoculation_Flex_6plates",
+        file_extension="py",
+        robot="Flex",
+        app_error=False,
+        robot_error=False,
+        custom_labware=["Omni_Plate_with_Tilt_Adapter", "Omni_Tray_Single_Well_Plate"],
+    )
+    pl_BCApeptideassay: Protocol = Protocol(
+        file_stem="pl_BCApeptideassay", file_extension="py", robot="Flex", app_error=False, robot_error=False
+    )
+    pl_Bradford_proteinassay: Protocol = Protocol(
+        file_stem="pl_Bradford_proteinassay", file_extension="py", robot="Flex", app_error=False, robot_error=False
+    )
+    pl_cherrypicking_csv_airgap: Protocol = Protocol(
+        file_stem="pl_cherrypicking_csv_airgap", file_extension="py", robot="Flex", app_error=False, robot_error=False
+    )
+    pl_Dynabeads_IP_Flex_96well_final: Protocol = Protocol(
+        file_stem="pl_Dynabeads_IP_Flex_96well_final", file_extension="py", robot="Flex", app_error=False, robot_error=False
+    )
+    pl_Dynabeads_IP_Flex_96well_RIT_final: Protocol = Protocol(
+        file_stem="pl_Dynabeads_IP_Flex_96well_RIT_final", file_extension="py", robot="Flex", app_error=False, robot_error=False
+    )
+    pl_EM_seq_48Samples_AllSteps_Edits_150: Protocol = Protocol(
+        file_stem="pl_EM_seq_48Samples_AllSteps_Edits_150", file_extension="py", robot="Flex", app_error=False, robot_error=False
+    )
+    pl_ExpressPlex_96_final: Protocol = Protocol(
+        file_stem="pl_ExpressPlex_96_final",
+        file_extension="py",
+        robot="Flex",
+        app_error=False,
+        robot_error=False,
+        custom_labware=["BioRad_96_Well_Plate_200_uL"],
+    )
+    pl_ExpressPlex_Pooling_Final: Protocol = Protocol(
+        file_stem="pl_ExpressPlex_Pooling_Final", file_extension="py", robot="Flex", app_error=False, robot_error=False
+    )
+    pl_Flex_customizable_serial_dilution_upload: Protocol = Protocol(
+        file_stem="pl_Flex_customizable_serial_dilution_upload", file_extension="py", robot="Flex", app_error=False, robot_error=False
+    )
+    pl_Flex_Protein_Digestion_Protocol: Protocol = Protocol(
+        file_stem="pl_Flex_Protein_Digestion_Protocol",
+        file_extension="py",
+        robot="Flex",
+        app_error=False,
+        robot_error=False,
+        custom_labware=["Thermo_96_Well_Plate_2200_uL"],
+    )
+    pl_Hyperplus_tiptracking_V4_final: Protocol = Protocol(
+        file_stem="pl_Hyperplus_tiptracking_V4_final", file_extension="py", robot="Flex", app_error=False, robot_error=False
+    )
+    pl_Illumina_DNA_PCR_Free: Protocol = Protocol(
+        file_stem="pl_Illumina_DNA_PCR_Free", file_extension="py", robot="Flex", app_error=False, robot_error=False
+    )
+    pl_Illumina_DNA_Prep_48x_v8: Protocol = Protocol(
+        file_stem="pl_Illumina_DNA_Prep_48x_v8", file_extension="py", robot="Flex", app_error=False, robot_error=False
+    )
+    pl_Illumina_Stranded_total_RNA_Ribo_Zero_protocol: Protocol = Protocol(
+        file_stem="pl_Illumina_Stranded_total_RNA_Ribo_Zero_protocol",
+        file_extension="py",
+        robot="Flex",
+        app_error=False,
+        robot_error=False,
+        custom_labware=["Eppendorf_96_Well_Plate_150_uL"],
+    )
+    pl_KAPA_Library_Quant_48_v8: Protocol = Protocol(
+        file_stem="pl_KAPA_Library_Quant_48_v8", file_extension="py", robot="Flex", app_error=False, robot_error=False
+    )
+    pl_langone_pt2_ribo: Protocol = Protocol(
+        file_stem="pl_langone_pt2_ribo", file_extension="py", robot="Flex", app_error=False, robot_error=False
+    )
+    pl_langone_ribo_pt1_ramp: Protocol = Protocol(
+        file_stem="pl_langone_ribo_pt1_ramp", file_extension="py", robot="Flex", app_error=False, robot_error=False
+    )
+    pl_M_N_Nucleomag_DNA_Flex_multi: Protocol = Protocol(
+        file_stem="pl_M_N_Nucleomag_DNA_Flex_multi",
+        file_extension="py",
+        robot="Flex",
+        app_error=False,
+        robot_error=False,
+        custom_labware=["Macherey_Nagel_deepwell_plate_2200ul"],
+    )
+    pl_MagMax_RNA_Cells_Flex_96_Channel: Protocol = Protocol(
+        file_stem="pl_MagMax_RNA_Cells_Flex_96_Channel", file_extension="py", robot="Flex", app_error=False, robot_error=False
+    )
+    pl_MagMax_RNA_Cells_Flex_multi: Protocol = Protocol(
+        file_stem="pl_MagMax_RNA_Cells_Flex_multi", file_extension="py", robot="Flex", app_error=False, robot_error=False
+    )
+    pl_microBioID_beads_touchtip: Protocol = Protocol(
+        file_stem="pl_microBioID_beads_touchtip", file_extension="py", robot="Flex", app_error=False, robot_error=False
+    )
+    pl_Nanopore_Genomic_Ligation_v5_Final: Protocol = Protocol(
+        file_stem="pl_Nanopore_Genomic_Ligation_v5_Final", file_extension="py", robot="Flex", app_error=False, robot_error=False
+    )
+    pl_NiNTA_Flex_96well_final: Protocol = Protocol(
+        file_stem="pl_NiNTA_Flex_96well_final", file_extension="py", robot="Flex", app_error=False, robot_error=False
+    )
+    pl_NiNTA_Flex_96well_PlatePrep_final: Protocol = Protocol(
+        file_stem="pl_NiNTA_Flex_96well_PlatePrep_final", file_extension="py", robot="Flex", app_error=False, robot_error=False
+    )
+    pl_Normalization_with_PCR: Protocol = Protocol(
+        file_stem="pl_Normalization_with_PCR",
+        file_extension="py",
+        robot="Flex",
+        app_error=False,
+        robot_error=False,
+        custom_labware=["Axygen_96_Well_Plate_200_uL"],
+    )
+    pl_Omega_HDQ_DNA_Bacteria_Flex_96_channel: Protocol = Protocol(
+        file_stem="pl_Omega_HDQ_DNA_Bacteria_Flex_96_channel", file_extension="py", robot="Flex", app_error=False, robot_error=False
+    )
+    pl_Omega_HDQ_DNA_Bacteria_Flex_multi: Protocol = Protocol(
+        file_stem="pl_Omega_HDQ_DNA_Bacteria_Flex_multi", file_extension="py", robot="Flex", app_error=False, robot_error=False
+    )
+    pl_Omega_HDQ_DNA_Cells_Flex_96_channel: Protocol = Protocol(
+        file_stem="pl_Omega_HDQ_DNA_Cells_Flex_96_channel", file_extension="py", robot="Flex", app_error=False, robot_error=False
+    )
+    pl_Omega_HDQ_DNA_Cells_Flex_multi: Protocol = Protocol(
+        file_stem="pl_Omega_HDQ_DNA_Cells_Flex_multi", file_extension="py", robot="Flex", app_error=False, robot_error=False
+    )
+    pl_QIAseq_FX_24x_Normalizer_Workflow_B: Protocol = Protocol(
+        file_stem="pl_QIAseq_FX_24x_Normalizer_Workflow_B", file_extension="py", robot="Flex", app_error=False, robot_error=False
+    )
+    pl_QIASeq_FX_48x_v8: Protocol = Protocol(
+        file_stem="pl_QIASeq_FX_48x_v8", file_extension="py", robot="Flex", app_error=False, robot_error=False
+    )
+    pl_sample_dilution_with_96_channel_pipette: Protocol = Protocol(
+        file_stem="pl_sample_dilution_with_96_channel_pipette", file_extension="py", robot="Flex", app_error=False, robot_error=False
+    )
+    pl_SamplePrep_MS_Cleanup_Flex_upto96: Protocol = Protocol(
+        file_stem="pl_SamplePrep_MS_Cleanup_Flex_upto96", file_extension="py", robot="Flex", app_error=False, robot_error=False
+    )
+    pl_SamplePrep_MS_Digest_Flex_upto96: Protocol = Protocol(
+        file_stem="pl_SamplePrep_MS_Digest_Flex_upto96", file_extension="py", robot="Flex", app_error=False, robot_error=False
+    )
+    pl_sigdx_part2: Protocol = Protocol(file_stem="pl_sigdx_part2", file_extension="py", robot="Flex", app_error=False, robot_error=False)
+    pl_Takara_InFusionSnapAssembly_Flex: Protocol = Protocol(
+        file_stem="pl_Takara_InFusionSnapAssembly_Flex", file_extension="py", robot="Flex", app_error=False, robot_error=False
+    )
+    pl_Uni_of_Montana_Cherrypicking_Flex_for_library_upload_v13: Protocol = Protocol(
+        file_stem="pl_Uni_of_Montana_Cherrypicking_Flex_for_library_upload_v13",
+        file_extension="py",
+        robot="Flex",
+        app_error=False,
+        robot_error=False,
+    )
+
+    pl_upload_Uni_of_Montana_Normalization_Flex_Final_052324: Protocol = Protocol(
+        file_stem="pl_upload_Uni_of_Montana_Normalization_Flex_Final_052324",
+        file_extension="py",
+        robot="Flex",
+        app_error=False,
+        robot_error=False,
+    )
+    pl_Zymo_Magbead_DNA_Cells_Flex_96_channel: Protocol = Protocol(
+        file_stem="pl_Zymo_Magbead_DNA_Cells_Flex_96_channel", file_extension="py", robot="Flex", app_error=False, robot_error=False
+    )
+    pl_Zymo_Magbead_DNA_Cells_Flex_multi: Protocol = Protocol(
+        file_stem="pl_Zymo_Magbead_DNA_Cells_Flex_multi", file_extension="py", robot="Flex", app_error=False, robot_error=False
+    )
+    pl_Zymo_Quick_RNA_Cells_Flex_96_Channel: Protocol = Protocol(
+        file_stem="pl_Zymo_Quick_RNA_Cells_Flex_96_Channel", file_extension="py", robot="Flex", app_error=False, robot_error=False
+    )
+    pl_Zymo_Quick_RNA_Cells_Flex_multi: Protocol = Protocol(
+        file_stem="pl_Zymo_Quick_RNA_Cells_Flex_multi", file_extension="py", robot="Flex", app_error=False, robot_error=False
+    )
