@@ -1166,6 +1166,7 @@
       },
       "notes": [],
       "params": {
+        "liquidPresenceDetection": false,
         "mount": "left",
         "pipetteName": "p300_multi_gen2",
         "tipOverlapNotAfterVersion": "v0"

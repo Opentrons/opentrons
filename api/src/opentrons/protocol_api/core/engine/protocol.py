@@ -496,7 +496,10 @@ class ProtocolCore(
             )
 
     def load_instrument(
-        self, instrument_name: PipetteNameType, mount: Mount
+        self,
+        instrument_name: PipetteNameType,
+        mount: Mount,
+        liquid_presence_detection: bool = False,
     ) -> InstrumentCore:
         """Load an instrument into the protocol.
 
@@ -515,6 +518,7 @@ class ProtocolCore(
                 tipOverlapNotAfterVersion=overlap_versions.overlap_for_api_version(
                     self._api_version
                 ),
+                liquidPresenceDetection=liquid_presence_detection,
             )
         )
 

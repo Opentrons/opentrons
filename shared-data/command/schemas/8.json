@@ -1657,6 +1657,11 @@
           "title": "Tipoverlapnotafterversion",
           "description": "A version of tip overlap data to not exceed. The highest-versioned tip overlap data that does not exceed this version will be used. Versions are expressed as vN where N is an integer, counting up from v0. If None, the current highest version will be used.",
           "type": "string"
+        },
+        "liquidPresenceDetection": {
+          "title": "Liquidpresencedetection",
+          "description": "Enable liquid presence detection for this pipette. Defaults to False.",
+          "type": "boolean"
         }
       },
       "required": ["pipetteName", "mount"]

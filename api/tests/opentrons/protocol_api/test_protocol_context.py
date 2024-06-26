@@ -14,7 +14,7 @@ from opentrons.legacy_broker import LegacyBroker
 from opentrons.hardware_control.modules.types import ModuleType, TemperatureModuleModel
 from opentrons.protocols.api_support import instrument as mock_instrument_support
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.util import APIVersionError
+from opentrons.protocols.api_support.util import APIVersionError, RobotTypeError
 from opentrons.protocol_api import (
     MAX_SUPPORTED_VERSION,
     ProtocolContext,
@@ -178,6 +178,64 @@ def test_deck(subject: ProtocolContext) -> None:
     assert isinstance(result, Deck)
 
 
+@pytest.mark.parametrize("api_version", [APIVersion(2, 20)])
+def test_load_instrument_robot_type(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    subject: ProtocolContext,
+) -> None:
+    """Non-Flex robot type should raise a ValueError."""
+    mock_tip_racks = [decoy.mock(cls=Labware), decoy.mock(cls=Labware)]
+
+    decoy.when(mock_validation.ensure_lowercase_name("Gandalf")).then_return("gandalf")
+    decoy.when(mock_validation.ensure_pipette_name("gandalf")).then_return(
+        PipetteNameType.P300_SINGLE
+    )
+    decoy.when(
+        mock_validation.ensure_mount_for_pipette(
+            "shadowfax", PipetteNameType.P300_SINGLE
+        )
+    ).then_return(Mount.LEFT)
+    decoy.when(mock_core.robot_type).then_return("OT-2 Standard")
+
+    with pytest.raises(RobotTypeError):
+        subject.load_instrument(
+            instrument_name="Gandalf",
+            mount="shadowfax",
+            tip_racks=mock_tip_racks,
+            liquid_presence_detection=False,
+        )
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
+def test_load_instrument_api_version(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    subject: ProtocolContext,
+) -> None:
+    """Using an API Version prior to 2.20 should raise a APIVersionError."""
+    mock_tip_racks = [decoy.mock(cls=Labware), decoy.mock(cls=Labware)]
+
+    decoy.when(mock_validation.ensure_lowercase_name("Gandalf")).then_return("gandalf")
+    decoy.when(mock_validation.ensure_pipette_name("gandalf")).then_return(
+        PipetteNameType.P300_SINGLE
+    )
+    decoy.when(
+        mock_validation.ensure_mount_for_pipette(
+            "shadowfax", PipetteNameType.P300_SINGLE
+        )
+    ).then_return(Mount.LEFT)
+    decoy.when(mock_core.robot_type).then_return("OT-3 Standard")
+
+    with pytest.raises(APIVersionError):
+        subject.load_instrument(
+            instrument_name="Gandalf",
+            mount="shadowfax",
+            tip_racks=mock_tip_racks,
+            liquid_presence_detection=False,
+        )
+
+
 def test_load_instrument(
     decoy: Decoy,
     mock_core: ProtocolCore,
@@ -201,6 +259,7 @@ def test_load_instrument(
         mock_core.load_instrument(
             instrument_name=PipetteNameType.P300_SINGLE,
             mount=Mount.LEFT,
+            liquid_presence_detection=False,
         )
     ).then_return(mock_instrument_core)
 
@@ -253,6 +312,7 @@ def test_load_instrument_replace(
         mock_core.load_instrument(
             instrument_name=matchers.IsA(PipetteNameType),
             mount=matchers.IsA(Mount),
+            liquid_presence_detection=False,
         )
     ).then_return(mock_instrument_core)
     decoy.when(mock_instrument_core.get_pipette_name()).then_return("Ada Lovelace")
@@ -296,6 +356,7 @@ def test_96_channel_pipette_raises_if_another_pipette_attached(
         mock_core.load_instrument(
             instrument_name=PipetteNameType.P300_SINGLE,
             mount=Mount.RIGHT,
+            liquid_presence_detection=False,
         )
     ).then_return(mock_instrument_core)
 

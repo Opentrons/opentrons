@@ -10685,6 +10685,7 @@
       "commandType": "loadPipette",
       "notes": [],
       "params": {
+        "liquidPresenceDetection": false,
         "mount": "right",
         "pipetteName": "p1000_single_flex",
         "tipOverlapNotAfterVersion": "v0"
