@@ -82,6 +82,7 @@ def test_sets_initial_state(subject: PipetteStore) -> None:
         static_config_by_id={},
         flow_rates_by_id={},
         nozzle_configuration_by_id={},
+        liquid_presence_detection_by_id={},
     )
 
 

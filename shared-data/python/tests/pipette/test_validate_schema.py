@@ -1,7 +1,11 @@
 import os
+import json
+from typing import Iterator
 from opentrons_shared_data import get_shared_data_root
 
-from opentrons_shared_data.pipette.pipette_definition import PipetteConfigurations
+from opentrons_shared_data.pipette.pipette_definition import (
+    PipetteConfigurations,
+)
 from opentrons_shared_data.pipette.load_data import (
     load_definition,
     load_valid_nozzle_maps,
@@ -12,32 +16,42 @@ from opentrons_shared_data.pipette.pipette_load_name_conversions import (
 from opentrons_shared_data.pipette.dev_types import PipetteModel
 
 
-def test_check_all_models_are_valid() -> None:
-    paths_to_validate = (
-        get_shared_data_root() / "pipette" / "definitions" / "2" / "general"
-    )
+def iterate_models() -> Iterator[PipetteModel]:
+    """Get an iterator of all pipette models."""
     _channel_model_str = {
         "single_channel": "single",
         "ninety_six_channel": "96",
         "eight_channel": "multi",
     }
-    assert os.listdir(paths_to_validate), "You have a path wrong"
-    for channel_dir in os.listdir(paths_to_validate):
-        for model_dir in os.listdir(paths_to_validate / channel_dir):
-            for version_file in os.listdir(paths_to_validate / channel_dir / model_dir):
-                version_list = version_file.split(".json")[0].split("_")
-                built_model: PipetteModel = PipetteModel(
-                    f"{model_dir}_{_channel_model_str[channel_dir]}_v{version_list[0]}.{version_list[1]}"
-                )
+    defn_root = get_shared_data_root() / "pipette" / "definitions" / "2" / "liquid"
+    assert os.listdir(defn_root), "A path is wrong"
+    for channel_dir in defn_root.iterdir():
+        for model_dir in channel_dir.iterdir():
+            for lc_dir in model_dir.iterdir():
+                for version_file in lc_dir.iterdir():
+                    version_list = version_file.stem.split("_")
+                    yield PipetteModel(
+                        f"{model_dir.stem}_{_channel_model_str[channel_dir.stem]}_v{version_list[0]}.{version_list[1]}"
+                    )
 
-                model_version = convert_pipette_model(built_model)
-                loaded_model = load_definition(
-                    model_version.pipette_type,
-                    model_version.pipette_channels,
-                    model_version.pipette_version,
-                )
 
-                assert isinstance(loaded_model, PipetteConfigurations)
+def test_check_all_models_are_valid() -> None:
+    """Make sure each model can be loaded."""
+    for model in iterate_models():
+        model_version = convert_pipette_model(model)
+        try:
+            loaded_model = load_definition(
+                model_version.pipette_type,
+                model_version.pipette_channels,
+                model_version.pipette_version,
+            )
+        except json.JSONDecodeError:
+            print(
+                f"Failed to parse {model_version.pipette_type} {model_version.pipette_channels} {model_version.pipette_version}"
+            )
+            raise
+
+        assert isinstance(loaded_model, PipetteConfigurations)
 
 
 def test_pick_up_configs_configuration_by_nozzle_map_keys() -> None:

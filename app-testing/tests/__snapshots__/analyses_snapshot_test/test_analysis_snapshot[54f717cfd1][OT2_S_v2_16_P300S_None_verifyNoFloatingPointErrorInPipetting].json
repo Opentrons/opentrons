@@ -1518,8 +1518,10 @@
       "commandType": "loadPipette",
       "notes": [],
       "params": {
+        "liquidPresenceDetection": false,
         "mount": "left",
-        "pipetteName": "p300_single_gen2"
+        "pipetteName": "p300_single_gen2",
+        "tipOverlapNotAfterVersion": "v0"
       },
       "result": {},
       "status": "succeeded"

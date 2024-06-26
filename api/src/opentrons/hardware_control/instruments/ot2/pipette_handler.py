@@ -212,6 +212,7 @@ class PipetteHandlerProvider(Generic[MountType]):
                 "blow_out_flow_rate",
                 "working_volume",
                 "tip_overlap",
+                "versioned_tip_overlap",
                 "available_volume",
                 "return_tip_height",
                 "default_aspirate_flow_rates",
@@ -744,9 +745,9 @@ class PipetteHandlerProvider(Generic[MountType]):
     def plan_check_pick_up_tip(
         self,
         mount: top_types.Mount,
-        tip_length: float,
         presses: Optional[int],
         increment: Optional[float],
+        tip_length: float = 0,
     ) -> Tuple[PickUpTipSpec, Callable[[], None]]:
         ...
 
@@ -754,18 +755,18 @@ class PipetteHandlerProvider(Generic[MountType]):
     def plan_check_pick_up_tip(
         self,
         mount: OT3Mount,
-        tip_length: float,
         presses: Optional[int],
         increment: Optional[float],
+        tip_length: float = 0,
     ) -> Tuple[PickUpTipSpec, Callable[[], None]]:
         ...
 
     def plan_check_pick_up_tip(  # type: ignore[no-untyped-def]
         self,
         mount,
-        tip_length,
         presses,
         increment,
+        tip_length=0,
     ):
         # Prechecks: ready for pickup tip and press/increment are valid
         instrument = self.get_pipette(mount)

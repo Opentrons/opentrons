@@ -12,7 +12,6 @@ from opentrons_shared_data.errors import ErrorCodes
 
 from opentrons.ordered_set import OrderedSet
 from opentrons.protocol_engine.actions.actions import RunCommandAction
-from opentrons.hardware_control.types import DoorState
 
 from opentrons.protocol_engine import commands, errors
 from opentrons.protocol_engine.types import DeckType
@@ -35,7 +34,6 @@ from opentrons.protocol_engine.actions import (
     FinishErrorDetails,
     StopAction,
     HardwareStoppedAction,
-    DoorChangeAction,
 )
 
 from opentrons.protocol_engine.state.command_history import CommandHistory
@@ -776,79 +774,3 @@ def test_handles_hardware_stopped() -> None:
     assert subject.state.command_history.get_all_ids() == []
     assert subject.state.command_history.get_queue_ids() == OrderedSet()
     assert subject.state.command_history.get_setup_queue_ids() == OrderedSet()
-
-
-@pytest.mark.parametrize(
-    ("is_door_open", "config", "expected_queue_status"),
-    [
-        (False, _make_config(), QueueStatus.RUNNING),
-        (True, _make_config(), QueueStatus.RUNNING),
-        (False, _make_config(block_on_door_open=True), QueueStatus.RUNNING),
-        (True, _make_config(block_on_door_open=True), QueueStatus.PAUSED),
-    ],
-)
-def test_command_store_handles_play_according_to_initial_door_state(
-    is_door_open: bool,
-    config: Config,
-    expected_queue_status: QueueStatus,
-) -> None:
-    """It should set command queue state on play action according to door state."""
-    subject = CommandStore(is_door_open=is_door_open, config=config)
-    start_time = datetime(year=2021, month=1, day=1)
-    subject.handle_action(PlayAction(requested_at=start_time, deck_configuration=[]))
-
-    assert subject.state.queue_status == expected_queue_status
-    assert subject.state.run_started_at == start_time
-
-
-@pytest.mark.parametrize(
-    ("config", "expected_is_door_blocking"),
-    [
-        (_make_config(block_on_door_open=True), True),
-        (_make_config(block_on_door_open=False), False),
-    ],
-)
-def test_handles_door_open_and_close_event_before_play(
-    config: Config, expected_is_door_blocking: bool
-) -> None:
-    """It should update state but not pause on door open whenis setup."""
-    subject = CommandStore(is_door_open=False, config=config)
-
-    subject.handle_action(DoorChangeAction(door_state=DoorState.OPEN))
-
-    assert subject.state.queue_status == QueueStatus.SETUP
-    assert subject.state.is_door_blocking is expected_is_door_blocking
-
-    subject.handle_action(DoorChangeAction(door_state=DoorState.CLOSED))
-
-    assert subject.state.queue_status == QueueStatus.SETUP
-    assert subject.state.is_door_blocking is False
-
-
-@pytest.mark.parametrize(
-    ("config", "expected_queue_status", "expected_is_door_blocking"),
-    [
-        (_make_config(block_on_door_open=True), QueueStatus.PAUSED, True),
-        (_make_config(block_on_door_open=False), QueueStatus.RUNNING, False),
-    ],
-)
-def test_handles_door_open_and_close_event_after_play(
-    config: Config, expected_queue_status: QueueStatus, expected_is_door_blocking: bool
-) -> None:
-    """It should update state when door opened and closed after run is played."""
-    subject = CommandStore(is_door_open=False, config=config)
-
-    subject.handle_action(
-        PlayAction(
-            requested_at=datetime(year=2021, month=1, day=1), deck_configuration=[]
-        )
-    )
-    subject.handle_action(DoorChangeAction(door_state=DoorState.OPEN))
-
-    assert subject.state.queue_status == expected_queue_status
-    assert subject.state.is_door_blocking is expected_is_door_blocking
-
-    subject.handle_action(DoorChangeAction(door_state=DoorState.CLOSED))
-
-    assert subject.state.queue_status == expected_queue_status
-    assert subject.state.is_door_blocking is False
