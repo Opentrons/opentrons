@@ -306,7 +306,7 @@ export function ChooseRobotSlideout(
                   color={COLORS.red60}
                   overflowWrap={OVERFLOW_WRAP_ANYWHERE}
                   display={DISPLAY_INLINE_BLOCK}
-                  marginTop={`-${SPACING.spacing8}`}
+                  marginTop={`-${SPACING.spacing4}`}
                   marginBottom={SPACING.spacing8}
                 >
                   {runCreationErrorCode === 409 ? (

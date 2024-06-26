@@ -168,7 +168,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
       createRunFromProtocolSource({
         files: srcFileObjects,
         protocolKey,
-        runTimeParameterValues: runTimeParameterValuesWithFiles,
+        runTimeParameterValues, // : runTimeParameterValuesWithFiles,
       })
     })
   }

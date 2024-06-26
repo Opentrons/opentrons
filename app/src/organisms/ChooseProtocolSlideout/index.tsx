@@ -724,8 +724,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
         const missingAnalysisData =
           analysisStatus === 'error' || analysisStatus === 'stale'
         const requiresCsvRunTimeParameter =
-          storedProtocol.mostRecentAnalysis?.result ===
-          'parameter-value-required'
+          analysisStatus === 'parameterRequired'
         return (
           <React.Fragment key={storedProtocol.protocolKey}>
             <Flex flexDirection={DIRECTION_COLUMN}>
@@ -829,7 +828,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                 color={COLORS.yellow60}
                 overflowWrap="anywhere"
                 display={DISPLAY_BLOCK}
-                marginTop={`-${SPACING.spacing8}`}
+                marginTop={`-${SPACING.spacing4}`}
                 marginBottom={SPACING.spacing8}
               >
                 {t('csv_required_for_analysis')}
@@ -841,7 +840,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                 color={COLORS.yellow60}
                 overflowWrap="anywhere"
                 display={DISPLAY_BLOCK}
-                marginTop={`-${SPACING.spacing8}`}
+                marginTop={`-${SPACING.spacing4}`}
                 marginBottom={SPACING.spacing8}
               >
                 {analysisStatus === 'stale'

@@ -56,20 +56,20 @@ describe('useUploadCsvFileMutation', () => {
       wrapper,
     })
     expect(result.current.data).toBeUndefined()
-    result.current.uploadCsvFile(mockFilePath)
+    result.current.uploadCsvFile(mockFilePath).catch(_ => {})
     await waitFor(() => {
-      expect(result.current.data).toBeUndefined()
+      expect(result.current.error).toBe('oh no')
     })
   })
 
-  it.skip('should return data when calling uploadCsvFile successfully', async () => {
+  it('should return data when calling uploadCsvFile successfully', async () => {
     vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
     vi.mocked(uploadCsvFile).mockResolvedValue({
       data: mockUploadResponse,
     } as Response<UploadedCsvFileResponse>)
 
     const { result } = renderHook(() => useUploadCsvFileMutation(), { wrapper })
-    act(() => result.current.uploadCsvFile(mockFilePath))
+    await act(async () => result.current.uploadCsvFile(mockFilePath))
 
     await waitFor(() => {
       expect(result.current.data).toEqual(mockUploadResponse)
