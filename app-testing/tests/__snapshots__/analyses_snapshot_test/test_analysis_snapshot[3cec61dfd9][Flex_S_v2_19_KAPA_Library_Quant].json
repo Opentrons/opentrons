@@ -6251,7 +6251,7 @@
             }
           ],
           "metadata": {
-            "displayCategory": "adapter",
+            "displayCategory": "aluminumBlock",
             "displayName": "Opentrons 96 Well Aluminum Block",
             "displayVolumeUnits": "µL",
             "tags": []
@@ -11032,61 +11032,55 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Diluting Sample",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Diluting Sample"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding Diluent",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding Diluent"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "FIRST RACK",
-        "legacyCommandType": "command.COMMENT"
+        "message": "FIRST RACK"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Adding tiprack_200_1",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Adding tiprack_200_1"
       },
       "result": {},
       "status": "succeeded"
@@ -12673,31 +12667,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding Sample to Diluent 1",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding Sample to Diluent 1"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "FIRST RACK",
-        "legacyCommandType": "command.COMMENT"
+        "message": "FIRST RACK"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Adding tiprack_50_1",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Adding tiprack_50_1"
       },
       "result": {},
       "status": "succeeded"
@@ -16055,11 +16046,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding Sample to Diluent 2",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding Sample to Diluent 2"
       },
       "result": {},
       "status": "succeeded"
@@ -18264,31 +18254,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding qPCR Mix",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding qPCR Mix"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -18780,31 +18767,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding Standards to Mix",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding Standards to Mix"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -19233,31 +19217,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding Diluted Sample to Mix",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding Diluted Sample to Mix"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -19686,31 +19667,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Dispensing 384 well",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Dispensing 384 well"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -21945,21 +21923,19 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "IS THERE AN EMPTY RACK?",
-        "legacyCommandType": "command.COMMENT"
+        "message": "IS THERE AN EMPTY RACK?"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Adding tiprack_50_2",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Adding tiprack_50_2"
       },
       "result": {},
       "status": "succeeded"
@@ -23875,241 +23851,217 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Report",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Report"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "REUSE_50_TIPS []",
-        "legacyCommandType": "command.COMMENT"
+        "message": "REUSE_50_TIPS []"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "p50_INITIALTIPS []",
-        "legacyCommandType": "command.COMMENT"
+        "message": "p50_INITIALTIPS []"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "REUSE_200_TIPS_1 []",
-        "legacyCommandType": "command.COMMENT"
+        "message": "REUSE_200_TIPS_1 []"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "REUSE_200_TIPS_2 []",
-        "legacyCommandType": "command.COMMENT"
+        "message": "REUSE_200_TIPS_2 []"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "p200_INITIALTIPS []",
-        "legacyCommandType": "command.COMMENT"
+        "message": "p200_INITIALTIPS []"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "SWAPSPOT ['A2']",
-        "legacyCommandType": "command.COMMENT"
+        "message": "SWAPSPOT ['A2']"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "AVAILABLE_POS_ONDECK []",
-        "legacyCommandType": "command.COMMENT"
+        "message": "AVAILABLE_POS_ONDECK []"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "AVAILABLE_POS_OFFDECK ['D4', 'C4', 'B4', 'B4']",
-        "legacyCommandType": "command.COMMENT"
+        "message": "AVAILABLE_POS_OFFDECK ['D4', 'C4', 'B4', 'B4']"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "REUSE_50_TIPS_COUNT 0",
-        "legacyCommandType": "command.COMMENT"
+        "message": "REUSE_50_TIPS_COUNT 0"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "REUSE_200_TIPS_COUNT 0",
-        "legacyCommandType": "command.COMMENT"
+        "message": "REUSE_200_TIPS_COUNT 0"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "p50_RACKS_ONDECK [tiprack_50_2]",
-        "legacyCommandType": "command.COMMENT"
+        "message": "p50_RACKS_ONDECK [tiprack_50_2]"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "p50_RACKS_OFFDECK []",
-        "legacyCommandType": "command.COMMENT"
+        "message": "p50_RACKS_OFFDECK []"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "p50_RACKS_DROPPED []",
-        "legacyCommandType": "command.COMMENT"
+        "message": "p50_RACKS_DROPPED []"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "p50_TIPS 11",
-        "legacyCommandType": "command.COMMENT"
+        "message": "p50_TIPS 11"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "p50_RACKS_PIPET [tiprack_50_1, tiprack_50_2]",
-        "legacyCommandType": "command.COMMENT"
+        "message": "p50_RACKS_PIPET [tiprack_50_1, tiprack_50_2]"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "p200_RACKS_ONDECK [tiprack_200_1]",
-        "legacyCommandType": "command.COMMENT"
+        "message": "p200_RACKS_ONDECK [tiprack_200_1]"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "p200_RACKS_OFFDECK []",
-        "legacyCommandType": "command.COMMENT"
+        "message": "p200_RACKS_OFFDECK []"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "p200_RACKS_DROPPED []",
-        "legacyCommandType": "command.COMMENT"
+        "message": "p200_RACKS_DROPPED []"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "p200_TIPS 11",
-        "legacyCommandType": "command.COMMENT"
+        "message": "p200_TIPS 11"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "p200_RACKS_PIPET [tiprack_200_1]",
-        "legacyCommandType": "command.COMMENT"
+        "message": "p200_RACKS_PIPET [tiprack_200_1]"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "RACKS_TO_DUMP [tiprack_50_1]",
-        "legacyCommandType": "command.COMMENT"
+        "message": "RACKS_TO_DUMP [tiprack_50_1]"
       },
       "result": {},
       "status": "succeeded"
@@ -27044,6 +26996,7 @@
       "pipetteName": "p50_multi_flex"
     }
   ],
+  "result": "ok",
   "robotType": "OT-3 Standard",
   "runTimeParameters": [
     {
@@ -27068,18 +27021,18 @@
       "choices": [
         {
           "displayName": "384",
-          "value": 384.0
+          "value": "384"
         },
         {
           "displayName": "96",
-          "value": 96.0
+          "value": "96"
         }
       ],
-      "default": 384.0,
+      "default": "384",
       "description": "qPCR Plate Format",
       "displayName": "qPCR Plate Format",
       "type": "str",
-      "value": 384.0,
+      "value": "384",
       "variableName": "FORMAT"
     },
     {

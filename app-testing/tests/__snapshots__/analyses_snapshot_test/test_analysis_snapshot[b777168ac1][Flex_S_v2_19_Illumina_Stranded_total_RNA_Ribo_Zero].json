@@ -607,7 +607,7 @@
             }
           ],
           "metadata": {
-            "displayCategory": "adapter",
+            "displayCategory": "aluminumBlock",
             "displayName": "Opentrons 96 Well Aluminum Block",
             "displayVolumeUnits": "µL",
             "tags": []
@@ -3241,6 +3241,11 @@
               "x": 0,
               "y": 0,
               "z": 16.3
+            },
+            "opentrons_96_deep_well_temp_mod_adapter": {
+              "x": 0,
+              "y": 0,
+              "z": 16.1
             }
           },
           "stackingOffsetWithModule": {
@@ -15794,11 +15799,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "500",
-        "legacyCommandType": "command.COMMENT"
+        "message": "500"
       },
       "result": {},
       "status": "succeeded"
@@ -15859,11 +15863,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "---------HYBRIDIZE PROBES---------",
-        "legacyCommandType": "command.COMMENT"
+        "message": "---------HYBRIDIZE PROBES---------"
       },
       "result": {},
       "status": "succeeded"
@@ -17133,11 +17136,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "---------DEPLETE rRNA---------",
-        "legacyCommandType": "command.COMMENT"
+        "message": "---------DEPLETE rRNA---------"
       },
       "result": {},
       "status": "succeeded"
@@ -17896,11 +17898,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "---------REMOVE PROBES---------",
-        "legacyCommandType": "command.COMMENT"
+        "message": "---------REMOVE PROBES---------"
       },
       "result": {},
       "status": "succeeded"
@@ -19151,11 +19152,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "---------CLEANUP RNA---------",
-        "legacyCommandType": "command.COMMENT"
+        "message": "---------CLEANUP RNA---------"
       },
       "result": {},
       "status": "succeeded"
@@ -23449,11 +23449,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--------Fragment and Denature RNA---------",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--------Fragment and Denature RNA---------"
       },
       "result": {},
       "status": "succeeded"
@@ -24287,11 +24286,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "---------First Strand Synthesis---------",
-        "legacyCommandType": "command.COMMENT"
+        "message": "---------First Strand Synthesis---------"
       },
       "result": {},
       "status": "succeeded"
@@ -25606,11 +25604,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "---------Second Strand Synthesis---------",
-        "legacyCommandType": "command.COMMENT"
+        "message": "---------Second Strand Synthesis---------"
       },
       "result": {},
       "status": "succeeded"
@@ -26374,11 +26371,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "---------CLEANUP cDNA---------",
-        "legacyCommandType": "command.COMMENT"
+        "message": "---------CLEANUP cDNA---------"
       },
       "result": {},
       "status": "succeeded"
@@ -32288,11 +32284,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "---------Adenylate 3-Prime Ends---------",
-        "legacyCommandType": "command.COMMENT"
+        "message": "---------Adenylate 3-Prime Ends---------"
       },
       "result": {},
       "status": "succeeded"
@@ -33034,10 +33029,11 @@
     {
       "commandType": "moveLabware",
       "error": {
-        "detail": "Labware opentrons_96_wellplate_200ul_pcr_full_skirt is already present at moduleId='9e8a2eaa-49f8-4bb3-8f26-5256d779e596'.",
+        "detail": "Labware opentrons_96_wellplate_200ul_pcr_full_skirt is already present at moduleId='907d9440-3385-401b-8bf4-9f3b354a6f8b'.",
         "errorCode": "4000",
         "errorInfo": {},
         "errorType": "LocationIsOccupiedError",
+        "isDefined": false,
         "wrappedErrors": []
       },
       "notes": [],
@@ -33057,22 +33053,25 @@
   },
   "errors": [
     {
-      "detail": "ProtocolCommandFailedError [line 339]: Error 4000 GENERAL_ERROR (ProtocolCommandFailedError): LocationIsOccupiedError: Labware opentrons_96_wellplate_200ul_pcr_full_skirt is already present at moduleId='9e8a2eaa-49f8-4bb3-8f26-5256d779e596'.",
+      "detail": "ProtocolCommandFailedError [line 339]: Error 4000 GENERAL_ERROR (ProtocolCommandFailedError): LocationIsOccupiedError: Labware opentrons_96_wellplate_200ul_pcr_full_skirt is already present at moduleId='907d9440-3385-401b-8bf4-9f3b354a6f8b'.",
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
+      "isDefined": false,
       "wrappedErrors": [
         {
-          "detail": "LocationIsOccupiedError: Labware opentrons_96_wellplate_200ul_pcr_full_skirt is already present at moduleId='9e8a2eaa-49f8-4bb3-8f26-5256d779e596'.",
+          "detail": "LocationIsOccupiedError: Labware opentrons_96_wellplate_200ul_pcr_full_skirt is already present at moduleId='907d9440-3385-401b-8bf4-9f3b354a6f8b'.",
           "errorCode": "4000",
           "errorInfo": {},
           "errorType": "ProtocolCommandFailedError",
+          "isDefined": false,
           "wrappedErrors": [
             {
-              "detail": "Labware opentrons_96_wellplate_200ul_pcr_full_skirt is already present at moduleId='9e8a2eaa-49f8-4bb3-8f26-5256d779e596'.",
+              "detail": "Labware opentrons_96_wellplate_200ul_pcr_full_skirt is already present at moduleId='907d9440-3385-401b-8bf4-9f3b354a6f8b'.",
               "errorCode": "4000",
               "errorInfo": {},
               "errorType": "LocationIsOccupiedError",
+              "isDefined": false,
               "wrappedErrors": []
             }
           ]
@@ -33243,6 +33242,7 @@
       "pipetteName": "p1000_multi_flex"
     }
   ],
+  "result": "not-ok",
   "robotType": "OT-3 Standard",
   "runTimeParameters": [
     {

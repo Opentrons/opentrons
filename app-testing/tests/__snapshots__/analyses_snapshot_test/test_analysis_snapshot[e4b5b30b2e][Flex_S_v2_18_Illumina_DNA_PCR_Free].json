@@ -662,7 +662,7 @@
             }
           ],
           "metadata": {
-            "displayCategory": "adapter",
+            "displayCategory": "aluminumBlock",
             "displayName": "Opentrons 96 Well Aluminum Block",
             "displayVolumeUnits": "µL",
             "tags": []
@@ -6066,6 +6066,11 @@
               "x": 0,
               "y": 0,
               "z": 16.3
+            },
+            "opentrons_96_deep_well_temp_mod_adapter": {
+              "x": 0,
+              "y": 0,
+              "z": 16.1
             }
           },
           "stackingOffsetWithModule": {
@@ -8121,21 +8126,19 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "-------Starting Tagmentation-------",
-        "legacyCommandType": "command.COMMENT"
+        "message": "-------Starting Tagmentation-------"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "**** Mixing and Transfering beads to column 1 ****",
-        "legacyCommandType": "command.COMMENT"
+        "message": "**** Mixing and Transfering beads to column 1 ****"
       },
       "result": {},
       "status": "succeeded"
@@ -9294,41 +9297,37 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Adding 50 ul tip rack #1 to slot A2",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Adding 50 ul tip rack #1 to slot A2"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Column 1",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Column 1"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Available On Deck Slots:4",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Available On Deck Slots:4"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Available Off Deck Slots:4",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Available Off Deck Slots:4"
       },
       "result": {},
       "status": "succeeded"
@@ -9360,11 +9359,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Mix Vol = 25",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Mix Vol = 25"
       },
       "result": {},
       "status": "succeeded"
@@ -10283,11 +10281,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "****Dropping Tip in Waste shoot****",
-        "legacyCommandType": "command.COMMENT"
+        "message": "****Dropping Tip in Waste shoot****"
       },
       "result": {},
       "status": "succeeded"
@@ -10321,11 +10318,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "****Starting TAG Profile (41C for 5 minutes with 100C lid)****",
-        "legacyCommandType": "command.COMMENT"
+        "message": "****Starting TAG Profile (41C for 5 minutes with 100C lid)****"
       },
       "result": {},
       "status": "succeeded"
@@ -10375,11 +10371,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "****Moving Plate to Pre-Warmed TC Module Block****",
-        "legacyCommandType": "command.COMMENT"
+        "message": "****Moving Plate to Pre-Warmed TC Module Block****"
       },
       "result": {},
       "status": "succeeded"
@@ -10452,11 +10447,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "****Moving Plate off of TC****",
-        "legacyCommandType": "command.COMMENT"
+        "message": "****Moving Plate off of TC****"
       },
       "result": {},
       "status": "succeeded"
@@ -10488,51 +10482,46 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "-------Post-Tagmentation Cleanup-------",
-        "legacyCommandType": "command.COMMENT"
+        "message": "-------Post-Tagmentation Cleanup-------"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "**** Adding Stop Solution to Column 1 to Stop Tagmentation ****",
-        "legacyCommandType": "command.COMMENT"
+        "message": "**** Adding Stop Solution to Column 1 to Stop Tagmentation ****"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Column 2",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Column 2"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Available On Deck Slots:4",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Available On Deck Slots:4"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Available Off Deck Slots:4",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Available Off Deck Slots:4"
       },
       "result": {},
       "status": "succeeded"
@@ -11111,11 +11100,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "****Dropping Tip in Waste shoot****",
-        "legacyCommandType": "command.COMMENT"
+        "message": "****Dropping Tip in Waste shoot****"
       },
       "result": {},
       "status": "succeeded"
@@ -11149,11 +11137,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "****Moving Elution Plate from Magnet to TC****",
-        "legacyCommandType": "command.COMMENT"
+        "message": "****Moving Elution Plate from Magnet to TC****"
       },
       "result": {},
       "status": "succeeded"
@@ -11178,11 +11165,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "****Moving Sample Plate to Magnet****",
-        "legacyCommandType": "command.COMMENT"
+        "message": "****Moving Sample Plate to Magnet****"
       },
       "result": {},
       "status": "succeeded"
@@ -11245,11 +11231,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "-------Removing 70ul of Supernatant-------",
-        "legacyCommandType": "command.COMMENT"
+        "message": "-------Removing 70ul of Supernatant-------"
       },
       "result": {},
       "status": "succeeded"
@@ -12408,41 +12393,37 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Adding 200 ul tip rack #1 to slot A3",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Adding 200 ul tip rack #1 to slot A3"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Column 1 (may be negative in certain conditions- use 12 as a base [i.e -5 = column 7])",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Column 1 (may be negative in certain conditions- use 12 as a base [i.e -5 = column 7])"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Available On Deck Slots:3",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Available On Deck Slots:3"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Available Off Deck Slots:4",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Available Off Deck Slots:4"
       },
       "result": {},
       "status": "succeeded"
@@ -12690,11 +12671,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "****Dropping Tip in Waste shoot****",
-        "legacyCommandType": "command.COMMENT"
+        "message": "****Dropping Tip in Waste shoot****"
       },
       "result": {},
       "status": "succeeded"
@@ -12726,41 +12706,37 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "-------Adding TWB-------",
-        "legacyCommandType": "command.COMMENT"
+        "message": "-------Adding TWB-------"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Column 2 (may be negative in certain conditions- use 12 as a base [i.e -5 = column 7])",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Column 2 (may be negative in certain conditions- use 12 as a base [i.e -5 = column 7])"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Available On Deck Slots:3",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Available On Deck Slots:3"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Available Off Deck Slots:4",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Available Off Deck Slots:4"
       },
       "result": {},
       "status": "succeeded"
@@ -12982,11 +12958,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "****Dropping Tip in Waste shoot****",
-        "legacyCommandType": "command.COMMENT"
+        "message": "****Dropping Tip in Waste shoot****"
       },
       "result": {},
       "status": "succeeded"
@@ -13086,41 +13061,37 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "-------Removing 160ul of Supernatant-------",
-        "legacyCommandType": "command.COMMENT"
+        "message": "-------Removing 160ul of Supernatant-------"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Column 3 (may be negative in certain conditions- use 12 as a base [i.e -5 = column 7])",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Column 3 (may be negative in certain conditions- use 12 as a base [i.e -5 = column 7])"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Available On Deck Slots:3",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Available On Deck Slots:3"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Available Off Deck Slots:4",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Available Off Deck Slots:4"
       },
       "result": {},
       "status": "succeeded"
@@ -13368,11 +13339,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "****Dropping Tip in Waste shoot****",
-        "legacyCommandType": "command.COMMENT"
+        "message": "****Dropping Tip in Waste shoot****"
       },
       "result": {},
       "status": "succeeded"
@@ -13404,41 +13374,37 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "-------Ligating Indexes-------",
-        "legacyCommandType": "command.COMMENT"
+        "message": "-------Ligating Indexes-------"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Column 4 (may be negative in certain conditions- use 12 as a base [i.e -5 = column 7])",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Column 4 (may be negative in certain conditions- use 12 as a base [i.e -5 = column 7])"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Available On Deck Slots:3",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Available On Deck Slots:3"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Available Off Deck Slots:4",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Available Off Deck Slots:4"
       },
       "result": {},
       "status": "succeeded"
@@ -13602,51 +13568,46 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "****Dropping Tip in Waste shoot****",
-        "legacyCommandType": "command.COMMENT"
+        "message": "****Dropping Tip in Waste shoot****"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "-------Adding and Mixing Adapters-------",
-        "legacyCommandType": "command.COMMENT"
+        "message": "-------Adding and Mixing Adapters-------"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Column 3",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Column 3"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Available On Deck Slots:3",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Available On Deck Slots:3"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Available Off Deck Slots:4",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Available Off Deck Slots:4"
       },
       "result": {},
       "status": "succeeded"
@@ -14201,11 +14162,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "****Dropping Tip in Waste shoot****",
-        "legacyCommandType": "command.COMMENT"
+        "message": "****Dropping Tip in Waste shoot****"
       },
       "result": {},
       "status": "succeeded"
@@ -14239,11 +14199,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "****Moving FLP Plate off TC****",
-        "legacyCommandType": "command.COMMENT"
+        "message": "****Moving FLP Plate off TC****"
       },
       "result": {},
       "status": "succeeded"
@@ -14259,11 +14218,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "****Starting ELM Profile (37C for 5 minutes, then 50C for 5 minutes with 100C lid)****",
-        "legacyCommandType": "command.COMMENT"
+        "message": "****Starting ELM Profile (37C for 5 minutes, then 50C for 5 minutes with 100C lid)****"
       },
       "result": {},
       "status": "succeeded"
@@ -14315,11 +14273,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "****Moving Sample Plate onto TC****",
-        "legacyCommandType": "command.COMMENT"
+        "message": "****Moving Sample Plate onto TC****"
       },
       "result": {},
       "status": "succeeded"
@@ -14403,11 +14360,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "****Moving Sample Plate back to H-S****",
-        "legacyCommandType": "command.COMMENT"
+        "message": "****Moving Sample Plate back to H-S****"
       },
       "result": {},
       "status": "succeeded"
@@ -14430,11 +14386,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "****Moving FLP Plate back to TC****",
-        "legacyCommandType": "command.COMMENT"
+        "message": "****Moving FLP Plate back to TC****"
       },
       "result": {},
       "status": "succeeded"
@@ -14486,11 +14441,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "****Moving Sample Plate to Magnet for Pelleting****",
-        "legacyCommandType": "command.COMMENT"
+        "message": "****Moving Sample Plate to Magnet for Pelleting****"
       },
       "result": {},
       "status": "succeeded"
@@ -14523,41 +14477,37 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "-------Removing 60ul of Supernatant-------",
-        "legacyCommandType": "command.COMMENT"
+        "message": "-------Removing 60ul of Supernatant-------"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Column 5 (may be negative in certain conditions- use 12 as a base [i.e -5 = column 7])",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Column 5 (may be negative in certain conditions- use 12 as a base [i.e -5 = column 7])"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Available On Deck Slots:3",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Available On Deck Slots:3"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Available Off Deck Slots:4",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Available Off Deck Slots:4"
       },
       "result": {},
       "status": "succeeded"
@@ -14805,11 +14755,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "****Dropping Tip in Waste shoot****",
-        "legacyCommandType": "command.COMMENT"
+        "message": "****Dropping Tip in Waste shoot****"
       },
       "result": {},
       "status": "succeeded"
@@ -14824,11 +14773,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "****Moving Plate back to Heater-Shaker for Wash****",
-        "legacyCommandType": "command.COMMENT"
+        "message": "****Moving Plate back to Heater-Shaker for Wash****"
       },
       "result": {},
       "status": "succeeded"
@@ -14851,41 +14799,37 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "-------Adding TWB-------",
-        "legacyCommandType": "command.COMMENT"
+        "message": "-------Adding TWB-------"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Column 6 (may be negative in certain conditions- use 12 as a base [i.e -5 = column 7])",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Column 6 (may be negative in certain conditions- use 12 as a base [i.e -5 = column 7])"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Available On Deck Slots:3",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Available On Deck Slots:3"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Available Off Deck Slots:4",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Available Off Deck Slots:4"
       },
       "result": {},
       "status": "succeeded"
@@ -15133,11 +15077,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "****Dropping Tip in Waste shoot****",
-        "legacyCommandType": "command.COMMENT"
+        "message": "****Dropping Tip in Waste shoot****"
       },
       "result": {},
       "status": "succeeded"
@@ -15180,11 +15123,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "****Moving Sample Plate to Magnet for Pelleting****",
-        "legacyCommandType": "command.COMMENT"
+        "message": "****Moving Sample Plate to Magnet for Pelleting****"
       },
       "result": {},
       "status": "succeeded"
@@ -15247,41 +15189,37 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "-------Removing 80ul of Supernatant-------",
-        "legacyCommandType": "command.COMMENT"
+        "message": "-------Removing 80ul of Supernatant-------"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Column 7 (may be negative in certain conditions- use 12 as a base [i.e -5 = column 7])",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Column 7 (may be negative in certain conditions- use 12 as a base [i.e -5 = column 7])"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Available On Deck Slots:3",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Available On Deck Slots:3"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Available Off Deck Slots:4",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Available Off Deck Slots:4"
       },
       "result": {},
       "status": "succeeded"
@@ -15529,11 +15467,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "****Dropping Tip in Waste shoot****",
-        "legacyCommandType": "command.COMMENT"
+        "message": "****Dropping Tip in Waste shoot****"
       },
       "result": {},
       "status": "succeeded"
@@ -15558,11 +15495,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "****Removing Sample Plate from Magnet****",
-        "legacyCommandType": "command.COMMENT"
+        "message": "****Removing Sample Plate from Magnet****"
       },
       "result": {},
       "status": "succeeded"
@@ -15585,41 +15521,37 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "-------Adding and Mixing HP3-------",
-        "legacyCommandType": "command.COMMENT"
+        "message": "-------Adding and Mixing HP3-------"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Column 4",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Column 4"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Available On Deck Slots:3",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Available On Deck Slots:3"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Available Off Deck Slots:4",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Available Off Deck Slots:4"
       },
       "result": {},
       "status": "succeeded"
@@ -16148,11 +16080,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "****Dropping Tip in Waste shoot****",
-        "legacyCommandType": "command.COMMENT"
+        "message": "****Dropping Tip in Waste shoot****"
       },
       "result": {},
       "status": "succeeded"
@@ -16186,51 +16117,46 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "-------Starting Cleanup-------",
-        "legacyCommandType": "command.COMMENT"
+        "message": "-------Starting Cleanup-------"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "-------Adding and Mixing Cleanup Beads-------",
-        "legacyCommandType": "command.COMMENT"
+        "message": "-------Adding and Mixing Cleanup Beads-------"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Column 8 (may be negative in certain conditions- use 12 as a base [i.e -5 = column 7])",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Column 8 (may be negative in certain conditions- use 12 as a base [i.e -5 = column 7])"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Available On Deck Slots:3",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Available On Deck Slots:3"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Available Off Deck Slots:4",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Available Off Deck Slots:4"
       },
       "result": {},
       "status": "succeeded"
@@ -16262,11 +16188,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Mix Vol = 40",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Mix Vol = 40"
       },
       "result": {},
       "status": "succeeded"
@@ -16741,11 +16666,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Mix Vol = 36",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Mix Vol = 36"
       },
       "result": {},
       "status": "succeeded"
@@ -17196,11 +17120,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "****Dropping Tip in Waste shoot****",
-        "legacyCommandType": "command.COMMENT"
+        "message": "****Dropping Tip in Waste shoot****"
       },
       "result": {},
       "status": "succeeded"
@@ -17243,11 +17166,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "****Moving Labware to Magnet for Pelleting****",
-        "legacyCommandType": "command.COMMENT"
+        "message": "****Moving Labware to Magnet for Pelleting****"
       },
       "result": {},
       "status": "succeeded"
@@ -17280,41 +17202,37 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "-------Mixing Beads and Transferring to LP2 Wells-------",
-        "legacyCommandType": "command.COMMENT"
+        "message": "-------Mixing Beads and Transferring to LP2 Wells-------"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Column 9 (may be negative in certain conditions- use 12 as a base [i.e -5 = column 7])",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Column 9 (may be negative in certain conditions- use 12 as a base [i.e -5 = column 7])"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Available On Deck Slots:3",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Available On Deck Slots:3"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Available Off Deck Slots:4",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Available Off Deck Slots:4"
       },
       "result": {},
       "status": "succeeded"
@@ -17346,11 +17264,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Mix Vol = 42",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Mix Vol = 42"
       },
       "result": {},
       "status": "succeeded"
@@ -17937,41 +17854,37 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "****Dropping Tip in Waste shoot****",
-        "legacyCommandType": "command.COMMENT"
+        "message": "****Dropping Tip in Waste shoot****"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Column 10 (may be negative in certain conditions- use 12 as a base [i.e -5 = column 7])",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Column 10 (may be negative in certain conditions- use 12 as a base [i.e -5 = column 7])"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Available On Deck Slots:3",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Available On Deck Slots:3"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Available Off Deck Slots:4",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Available Off Deck Slots:4"
       },
       "result": {},
       "status": "succeeded"
@@ -18184,11 +18097,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "****Dropping Tip in Waste shoot****",
-        "legacyCommandType": "command.COMMENT"
+        "message": "****Dropping Tip in Waste shoot****"
       },
       "result": {},
       "status": "succeeded"
@@ -18220,41 +18132,37 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "-------Mixing Beads in LP2 Wells with LP1 Supernatant-------",
-        "legacyCommandType": "command.COMMENT"
+        "message": "-------Mixing Beads in LP2 Wells with LP1 Supernatant-------"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Column 11 (may be negative in certain conditions- use 12 as a base [i.e -5 = column 7])",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Column 11 (may be negative in certain conditions- use 12 as a base [i.e -5 = column 7])"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Available On Deck Slots:3",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Available On Deck Slots:3"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Available Off Deck Slots:4",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Available Off Deck Slots:4"
       },
       "result": {},
       "status": "succeeded"
@@ -18286,11 +18194,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Mix Vol = 42",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Mix Vol = 42"
       },
       "result": {},
       "status": "succeeded"
@@ -18793,11 +18700,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "****Dropping Tip in Waste shoot****",
-        "legacyCommandType": "command.COMMENT"
+        "message": "****Dropping Tip in Waste shoot****"
       },
       "result": {},
       "status": "succeeded"
@@ -18866,41 +18772,37 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "-------Removing 110ul of Supernatant-------",
-        "legacyCommandType": "command.COMMENT"
+        "message": "-------Removing 110ul of Supernatant-------"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Column 12 (may be negative in certain conditions- use 12 as a base [i.e -5 = column 7])",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Column 12 (may be negative in certain conditions- use 12 as a base [i.e -5 = column 7])"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Available On Deck Slots:3",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Available On Deck Slots:3"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Available Off Deck Slots:4",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Available Off Deck Slots:4"
       },
       "result": {},
       "status": "succeeded"
@@ -19148,21 +19050,19 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "****Dropping Tip in Waste shoot****",
-        "legacyCommandType": "command.COMMENT"
+        "message": "****Dropping Tip in Waste shoot****"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "-------Wash # 1 with Ethanol-------",
-        "legacyCommandType": "command.COMMENT"
+        "message": "-------Wash # 1 with Ethanol-------"
       },
       "result": {},
       "status": "succeeded"
@@ -20321,41 +20221,37 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Adding 200 ul tip rack #2 to slot B2",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Adding 200 ul tip rack #2 to slot B2"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Column 1 (may be negative in certain conditions- use 12 as a base [i.e -5 = column 7])",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Column 1 (may be negative in certain conditions- use 12 as a base [i.e -5 = column 7])"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Available On Deck Slots:2",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Available On Deck Slots:2"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Available Off Deck Slots:4",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Available Off Deck Slots:4"
       },
       "result": {},
       "status": "succeeded"
@@ -20544,31 +20440,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Column 2 (may be negative in certain conditions- use 12 as a base [i.e -5 = column 7])",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Column 2 (may be negative in certain conditions- use 12 as a base [i.e -5 = column 7])"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Available On Deck Slots:2",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Available On Deck Slots:2"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Available Off Deck Slots:4",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Available Off Deck Slots:4"
       },
       "result": {},
       "status": "succeeded"
@@ -20749,51 +20642,46 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "****Dropping Tip in Waste shoot****",
-        "legacyCommandType": "command.COMMENT"
+        "message": "****Dropping Tip in Waste shoot****"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "-------Wash # 2 with Ethanol-------",
-        "legacyCommandType": "command.COMMENT"
+        "message": "-------Wash # 2 with Ethanol-------"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Column 3 (may be negative in certain conditions- use 12 as a base [i.e -5 = column 7])",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Column 3 (may be negative in certain conditions- use 12 as a base [i.e -5 = column 7])"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Available On Deck Slots:2",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Available On Deck Slots:2"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Available Off Deck Slots:4",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Available Off Deck Slots:4"
       },
       "result": {},
       "status": "succeeded"
@@ -20982,31 +20870,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Column 4 (may be negative in certain conditions- use 12 as a base [i.e -5 = column 7])",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Column 4 (may be negative in certain conditions- use 12 as a base [i.e -5 = column 7])"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Available On Deck Slots:2",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Available On Deck Slots:2"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Available Off Deck Slots:4",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Available Off Deck Slots:4"
       },
       "result": {},
       "status": "succeeded"
@@ -21187,11 +21072,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "****Dropping Tip in Waste shoot****",
-        "legacyCommandType": "command.COMMENT"
+        "message": "****Dropping Tip in Waste shoot****"
       },
       "result": {},
       "status": "succeeded"
@@ -21207,31 +21091,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Column 5",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Column 5"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Available On Deck Slots:2",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Available On Deck Slots:2"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Available Off Deck Slots:4",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Available Off Deck Slots:4"
       },
       "result": {},
       "status": "succeeded"
@@ -21344,11 +21225,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "****Dropping Tip in Waste shoot****",
-        "legacyCommandType": "command.COMMENT"
+        "message": "****Dropping Tip in Waste shoot****"
       },
       "result": {},
       "status": "succeeded"
@@ -21363,11 +21243,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "****Moving sample plate off of Magnet****",
-        "legacyCommandType": "command.COMMENT"
+        "message": "****Moving sample plate off of Magnet****"
       },
       "result": {},
       "status": "succeeded"
@@ -21390,41 +21269,37 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "****Adding RSB to Columns: 1****",
-        "legacyCommandType": "command.COMMENT"
+        "message": "****Adding RSB to Columns: 1****"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Column 6",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Column 6"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Available On Deck Slots:2",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Available On Deck Slots:2"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Available Off Deck Slots:4",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Available Off Deck Slots:4"
       },
       "result": {},
       "status": "succeeded"
@@ -21508,11 +21383,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Mix Vol = 20",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Mix Vol = 20"
       },
       "result": {},
       "status": "succeeded"
@@ -21807,11 +21681,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "****Dropping Tip in Waste shoot****",
-        "legacyCommandType": "command.COMMENT"
+        "message": "****Dropping Tip in Waste shoot****"
       },
       "result": {},
       "status": "succeeded"
@@ -21864,11 +21737,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "****Move Samples to Magnet for Pelleting****",
-        "legacyCommandType": "command.COMMENT"
+        "message": "****Move Samples to Magnet for Pelleting****"
       },
       "result": {},
       "status": "succeeded"
@@ -21901,31 +21773,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Column 7",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Column 7"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Available On Deck Slots:2",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Available On Deck Slots:2"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Available Off Deck Slots:4",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Available Off Deck Slots:4"
       },
       "result": {},
       "status": "succeeded"
@@ -22139,11 +22008,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "****Dropping Tip in Waste shoot****",
-        "legacyCommandType": "command.COMMENT"
+        "message": "****Dropping Tip in Waste shoot****"
       },
       "result": {},
       "status": "succeeded"
@@ -22359,6 +22227,7 @@
       "pipetteName": "p50_multi_flex"
     }
   ],
+  "result": "ok",
   "robotType": "OT-3 Standard",
   "runTimeParameters": [
     {
