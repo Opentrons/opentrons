@@ -35,7 +35,7 @@ from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
 from opentrons.hardware_control.nozzle_manager import NozzleMap
-from . import deck_conflict
+from . import deck_conflict, overlap_versions
 
 from ..instrument import AbstractInstrument
 from .well import WellCore
@@ -782,7 +782,13 @@ class InstrumentCore(AbstractInstrument[WellCore]):
 
     def configure_for_volume(self, volume: float) -> None:
         self._engine_client.execute_command(
-            cmd.ConfigureForVolumeParams(pipetteId=self._pipette_id, volume=volume)
+            cmd.ConfigureForVolumeParams(
+                pipetteId=self._pipette_id,
+                volume=volume,
+                tipOverlapNotAfterVersion=overlap_versions.overlap_for_api_version(
+                    self._protocol_core.api_version
+                ),
+            )
         )
 
     def prepare_to_aspirate(self) -> None:

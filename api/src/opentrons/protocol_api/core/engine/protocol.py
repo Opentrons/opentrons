@@ -68,8 +68,7 @@ from .module_core import (
     AbsorbanceReaderCore,
 )
 from .exceptions import InvalidModuleLocationError
-from . import load_labware_params
-from . import deck_conflict
+from . import load_labware_params, deck_conflict, overlap_versions
 
 if TYPE_CHECKING:
     from ...labware import Labware
@@ -516,6 +515,9 @@ class ProtocolCore(
             cmd.LoadPipetteParams(
                 pipetteName=instrument_name,
                 mount=engine_mount,
+                tipOverlapNotAfterVersion=overlap_versions.overlap_for_api_version(
+                    self._api_version
+                ),
                 liquidPresenceDetection=liquid_presence_detection,
             )
         )

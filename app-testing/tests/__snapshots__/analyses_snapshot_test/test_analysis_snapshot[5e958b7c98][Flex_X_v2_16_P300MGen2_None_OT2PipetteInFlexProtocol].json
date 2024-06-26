@@ -1168,7 +1168,8 @@
       "params": {
         "liquidPresenceDetection": false,
         "mount": "left",
-        "pipetteName": "p300_multi_gen2"
+        "pipetteName": "p300_multi_gen2",
+        "tipOverlapNotAfterVersion": "v0"
       },
       "status": "failed"
     }
