@@ -260,6 +260,7 @@ export function ProtocolSetupParameters({
   if (enableCsvFile && chooseCsvFileScreen != null) {
     children = (
       <ChooseCsvFile
+        protocolId={protocolId}
         handleGoBack={() => {
           console.log('clicked go back csv')
           setChooseCsvFileScreen(null)

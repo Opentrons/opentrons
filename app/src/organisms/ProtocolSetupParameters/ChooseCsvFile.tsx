@@ -13,6 +13,7 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useAllCsvFilesQuery } from '@opentrons/react-api-client'
 
 import { ChildNavigation } from '../ChildNavigation'
 import { EmptyFile } from './EmptyFile'
@@ -20,8 +21,10 @@ import { RadioButton } from '../../atoms/buttons'
 import { getFilePaths } from '../../redux/shell'
 
 import type { CsvFileParameter } from '@opentrons/shared-data'
+import type { CsvFileData } from '@opentrons/api-client'
 
 interface ChooseCsvFileProps {
+  protocolId: string
   handleGoBack: () => void
   // ToDo (kk:06/18/2024) null will be removed when implemented required part
   parameter: CsvFileParameter | null
@@ -31,6 +34,7 @@ interface ChooseCsvFileProps {
 }
 
 export function ChooseCsvFile({
+  protocolId,
   handleGoBack,
   parameter,
   setParameter,
@@ -40,9 +44,7 @@ export function ChooseCsvFile({
   const { t } = useTranslation('protocol_setup')
   const csvFilesOnUSB = useSelector(getFilePaths).payload.filePaths ?? []
 
-  // ToDo (kk:06/12/2024) get files from the endpoint: GET /protocols/{protocolId}/dataFiles/
-  // return format: https://opentrons.atlassian.net/browse/AUTH-428
-  const csvFilesOnRobot: any[] = []
+  const csvFilesOnRobot = useAllCsvFilesQuery(protocolId).data?.data.files ?? []
 
   // ToDo (06/20/2024) this will removed when working on AUTH-521
   // const handleOnChange = (newValue: string | number | boolean): void => {
@@ -77,12 +79,12 @@ export function ChooseCsvFile({
             </LegacyStyledText>
             <Flex css={LIST_CONTAINER_STYLE}>
               {csvFilesOnRobot.length !== 0 ? (
-                csvFilesOnRobot.map(csv => (
+                csvFilesOnRobot.map((csv: CsvFileData) => (
                   <RadioButton
-                    key={csv.fileId}
-                    data-testid={`${csv.fileId}`}
-                    buttonLabel={csv.displayName}
-                    buttonValue={`${csv.fileId}`}
+                    key={csv.id}
+                    data-testid={`${csv.id}`}
+                    buttonLabel={csv.name}
+                    buttonValue={`${csv.id}`}
                     onChange={() => {}}
                   />
                 ))
