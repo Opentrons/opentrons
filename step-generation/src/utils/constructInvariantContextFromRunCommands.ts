@@ -8,7 +8,12 @@ import type {
   RunTimeCommand,
   PickUpTipRunTimeCommand,
 } from '@opentrons/shared-data'
-import type { InvariantContext } from '../types'
+import type {
+  InvariantContext,
+  LabwareEntities,
+  PipetteEntities,
+  ModuleEntities,
+} from '../types'
 
 export function constructInvariantContextFromRunCommands(
   commands: RunTimeCommand[]
@@ -17,32 +22,34 @@ export function constructInvariantContextFromRunCommands(
     (acc: InvariantContext, command: RunTimeCommand) => {
       if (command.commandType === 'loadLabware' && command.result != null) {
         const result = command.result
+        const labwareEntities: LabwareEntities = {
+          ...acc.labwareEntities,
+          [result.labwareId]: {
+            id: result.labwareId,
+            labwareDefURI: getLabwareDefURI(result.definition),
+            def: result.definition,
+          },
+        }
         return {
           ...acc,
-          labwareEntities: {
-            ...acc.labwareEntities,
-            [result.labwareId]: {
-              id: result.labwareId,
-              labwareDefURI: getLabwareDefURI(result.definition),
-              def: result.definition,
-            },
-          },
+          labwareEntities,
         }
       } else if (
         command.commandType === 'loadModule' &&
         command.result != null
       ) {
         const result = command.result
+        const moduleEntities: ModuleEntities = {
+          ...acc.moduleEntities,
+          [result.moduleId]: {
+            id: result.moduleId,
+            type: getModuleType(command.params.model),
+            model: command.params.model,
+          },
+        }
         return {
           ...acc,
-          moduleEntities: {
-            ...acc.moduleEntities,
-            [result.moduleId]: {
-              id: result.moduleId,
-              type: getModuleType(command.params.model),
-              model: command.params.model,
-            },
-          },
+          moduleEntities,
         }
       } else if (
         command.commandType === 'loadPipette' &&
@@ -67,16 +74,26 @@ export function constructInvariantContextFromRunCommands(
           matchingCommand != null && matchingCommand.result != null
             ? matchingCommand.result.definition ?? null
             : null
+        const specs: any = getPipetteSpecsV2(command.params.pipetteName)
 
+        const pipetteEntities: PipetteEntities = {
+          ...acc.pipetteEntities,
+          [result.pipetteId]: {
+            name: command.params.pipetteName,
+            id: command.params.pipetteId,
+            tiprackLabwareDef:
+              tiprackLabwareDef != null ? [tiprackLabwareDef] : [],
+            //  todo: we support multipel tiprack def uris per pipette entities now
+            tiprackDefURI:
+              tiprackLabwareDef != null
+                ? [getLabwareDefURI(tiprackLabwareDef)]
+                : [],
+            spec: specs,
+          },
+        }
         return {
           ...acc,
-          pipetteEntities: {
-            ...acc.pipetteEntities,
-            [result.pipetteId]: {
-              tiprackLabwareDef,
-              spec: getPipetteSpecsV2(command.params.pipetteName),
-            },
-          },
+          pipetteEntities,
         }
       }
 

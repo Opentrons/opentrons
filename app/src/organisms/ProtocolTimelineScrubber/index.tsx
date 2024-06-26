@@ -182,7 +182,7 @@ export function ProtocolTimelineScrubber(
                       .def
                   : null
               let nestedDef
-              let nestedFill = null
+              let nestedFill
               if (labwareDef != null && labwareTempProperties != null) {
                 nestedDef = labwareDef
                 nestedFill = getWellFillFromLabwareId(
@@ -199,6 +199,9 @@ export function ProtocolTimelineScrubber(
                 nestedDef =
                   invariantContext.labwareEntities[labwareInModuleId]?.def
               }
+
+              //  TODO figure out liquid state for well fill so the well fill updates
+
               return {
                 moduleModel: invariantContext.moduleEntities[moduleId].model,
                 moduleLocation: { slotName: module.slot },
