@@ -3,6 +3,8 @@ import enum
 from numpy import array, dot, double as npdouble
 from numpy.typing import NDArray
 from typing import Optional, List, Tuple, Union, cast, TypeVar, Dict
+from dataclasses import dataclass
+from functools import cached_property
 
 from opentrons.types import Point, DeckSlotName, StagingSlotName, MountType
 
@@ -71,6 +73,12 @@ class _GripperMoveType(enum.Enum):
     DROP_LABWARE = enum.auto()
 
 
+@dataclass
+class _AbsoluteRobotExtents:
+    front_left: Dict[MountType, Point]
+    back_right: Dict[MountType, Point]
+
+
 _LabwareLocation = TypeVar("_LabwareLocation", bound=LabwareLocation)
 
 
@@ -95,9 +103,25 @@ class GeometryView:
         self._addressable_areas = addressable_area_view
         self._last_drop_tip_location_spot: Dict[str, _TipDropSection] = {}
 
-    @property
-    def deck_extents(self) -> Point:
-        return self._addressable_areas.deck_extents
+    @cached_property
+    def absolute_deck_extents(self) -> _AbsoluteRobotExtents:
+        """The absolute deck extents for a given robot deck."""
+        left_offset = self._addressable_areas.mount_offsets["left"]
+        right_offset = self._addressable_areas.mount_offsets["right"]
+        left_changed_x_component = Point(-1 * left_offset.x, left_offset.y, left_offset.z)
+        right_changed_x_component = Point(-1 * right_offset.x, right_offset.y, right_offset.z)
+
+        back_right_abs = {
+            MountType.LEFT: left_changed_x_component,
+            MountType.RIGHT: right_changed_x_component,
+        }
+        front_left_abs = {
+            MountType.LEFT: self._addressable_areas.deck_extents + left_changed_x_component,
+            MountType.RIGHT: self._addressable_areas.deck_extents + right_changed_x_component,
+        }
+        return _AbsoluteRobotExtents(
+            front_left=front_left_abs, back_right=back_right_abs
+        )
 
     def get_labware_highest_z(self, labware_id: str) -> float:
         """Get the highest Z-point of a labware."""
