@@ -99164,10 +99164,6 @@
     {
       "name": "Flex_S_v2_15_P1000S_None_SimpleNormalizeLongRight.py",
       "role": "main"
-    },
-    {
-      "name": "opentrons_ot3_96_tiprack_200ul_rss.json",
-      "role": "labware"
     }
   ],
   "labware": [
