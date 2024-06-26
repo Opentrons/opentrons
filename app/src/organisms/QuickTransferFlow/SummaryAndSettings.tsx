@@ -10,7 +10,7 @@ import {
   COLORS,
   POSITION_FIXED,
   ALIGN_CENTER,
-  Tabs
+  Tabs,
 } from '@opentrons/components'
 import {
   useCreateProtocolMutation,
@@ -129,25 +129,16 @@ export function SummaryAndSettings(
           marginBottom={SPACING.spacing24}
           alignItems={ALIGN_CENTER}
         >
-          <Tabs tabs={displayCategory.map(category => ({
-            text: t(category),
-            onClick: () => {setSelectedCategory(category)},
-            isActive: category === selectedCategory,
-            disabled: false,
-          }))}/>
-          {/* {displayCategory.map(category => (
-            <TabbedButton
-              key={category}
-              title={category}
-              isSelected={category === selectedCategory}
-              onClick={() => {
+          <Tabs
+            tabs={displayCategory.map(category => ({
+              text: t(category),
+              onClick: () => {
                 setSelectedCategory(category)
-              }}
-              height={SPACING.spacing60}
-            >
-              {t(category)}
-            </TabbedButton>
-          ))} */}
+              },
+              isActive: category === selectedCategory,
+              disabled: false,
+            }))}
+          />
         </Flex>
         {selectedCategory === 'overview' ? <Overview state={state} /> : null}
         {selectedCategory === 'tip_management' ? (

@@ -96,26 +96,16 @@ export function SelectSourceLabware(
           marginBottom={SPACING.spacing24}
           alignItems={ALIGN_CENTER}
         >
-          <Tabs tabs={labwareDisplayCategoryFilters.map(category => ({
-            text: t(category),
-            onClick: () => {setSelectedCategory(category)},
-            isActive: category === selectedCategory,
-            disabled: false,
-          }))}/>
-{/*           
-          {labwareDisplayCategoryFilters.map(category => (
-            <TabbedButton
-              key={category}
-              title={category}
-              isSelected={category === selectedCategory}
-              onClick={() => {
+          <Tabs
+            tabs={labwareDisplayCategoryFilters.map(category => ({
+              text: t(category),
+              onClick: () => {
                 setSelectedCategory(category)
-              }}
-              height={SPACING.spacing60}
-            >
-              {t(category)}
-            </TabbedButton>
-          ))} */}
+              },
+              isActive: category === selectedCategory,
+              disabled: false,
+            }))}
+          />
         </Flex>
         <Flex
           gridGap={SPACING.spacing4}
