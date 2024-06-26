@@ -640,7 +640,7 @@ _aspirate_defaults: Dict[int, Dict[int, Dict[int, Dict[int, AspirateSettings]]]]
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
                     leading_air_gap=0,
-                    trailing_air_gap=0.1,
+                    trailing_air_gap=0,
                 ),
                 10: AspirateSettings(  # 10uL
                     z_submerge_depth=_default_submerge_aspirate_mm,
