@@ -23,10 +23,10 @@ requirements = {"robotType": "OT-3", "apiLevel": "2.15"}
 
 def run(ctx: protocol_api.ProtocolContext):
 
-    # temp_mod_on = False
-    # p50_mount = "right"
-    # real_mode = False
-    # rxn_vol = 50
+    temp_mod_on = False
+    p50_mount = "right"
+    real_mode = False
+    rxn_vol = 50
 
     [csv_samp, temp_mod_on, rxn_vol, p50_mount] = get_values("csv_samp", "temp_mod_on", "rxn_vol", "p50_mount")  # noqa: F821
 
