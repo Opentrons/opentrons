@@ -11,11 +11,14 @@ from opentrons.hardware_control.modules import (
     TemperatureStatus,
     HeaterShakerStatus,
     SpeedStatus,
+    AbsorbanceReaderStatus,
 )
 from opentrons.hardware_control.modules.magdeck import OFFSET_TO_LABWARE_BOTTOM
 from opentrons.drivers.types import (
     ThermocyclerLidStatus,
     HeaterShakerLabwareLatchStatus,
+    AbsorbanceReaderLidStatus,
+    AbsorbanceReaderPlatePresence,
 )
 from opentrons.drivers.rpi_drivers.types import USBPort as HardwareUSBPort
 
@@ -34,6 +37,8 @@ from .module_models import (
     ThermocyclerModuleData,
     HeaterShakerModule,
     HeaterShakerModuleData,
+    AbsorbanceReaderModule,
+    AbsorbanceReaderModuleData,
     UsbPort,
 )
 
@@ -130,6 +135,19 @@ class ModuleDataMapper:
                 currentTemperature=cast(float, live_data["data"].get("currentTemp")),
                 targetTemperature=cast(float, live_data["data"].get("targetTemp")),
                 errorDetails=cast(str, live_data["data"].get("errorDetails")),
+            )
+        elif module_type == ModuleType.ABSORBANCE_READER:
+            module_cls = AbsorbanceReaderModule
+            module_data = AbsorbanceReaderModuleData(
+                status=AbsorbanceReaderStatus(live_data["status"]),
+                lidStatus=cast(
+                    AbsorbanceReaderLidStatus, live_data["data"].get("lidStatus")
+                ),
+                platePresence=cast(
+                    AbsorbanceReaderPlatePresence,
+                    live_data["data"].get("platePresence"),
+                ),
+                sampleWavelength=cast(int, live_data["data"].get("sampleWavelength")),
             )
         else:
             assert False, f"Invalid module type {module_type}"

@@ -3,14 +3,15 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
+  LegacyStyledText,
   VIEWPORT,
-  StyledText,
 } from '@opentrons/components'
-import { ListItem } from '.'
-import type { Story, Meta } from '@storybook/react'
+import { ListItem as ListItemComponent } from '.'
+import type { Meta, StoryObj } from '@storybook/react'
 
-export default {
+const meta: Meta<typeof ListItemComponent> = {
   title: 'ODD/Atoms/ListItem',
+  component: ListItemComponent,
   argTypes: {
     type: {
       control: {
@@ -20,26 +21,27 @@ export default {
     },
   },
   parameters: VIEWPORT.touchScreenViewport,
-} as Meta
+}
 
-const ListItemTemplate: Story<React.ComponentProps<typeof ListItem>> = args => (
-  <ListItem {...args} />
-)
+export default meta
 
-export const Item = ListItemTemplate.bind({})
-Item.args = {
-  type: 'noActive',
-  children: (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-      <StyledText as="p">
-        Slot Component: Replace me using the component panel.
-      </StyledText>
-      <StyledText as="p">
-        Slot Component: Replace me using the component panel.
-      </StyledText>
-      <StyledText as="p">
-        Slot Component: Replace me using the component panel.
-      </StyledText>
-    </Flex>
-  ),
+type Story = StoryObj<typeof ListItemComponent>
+
+export const ListItem: Story = {
+  args: {
+    type: 'noActive',
+    children: (
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+        <LegacyStyledText as="p">
+          Slot Component: Replace me using the component panel.
+        </LegacyStyledText>
+        <LegacyStyledText as="p">
+          Slot Component: Replace me using the component panel.
+        </LegacyStyledText>
+        <LegacyStyledText as="p">
+          Slot Component: Replace me using the component panel.
+        </LegacyStyledText>
+      </Flex>
+    ),
+  },
 }

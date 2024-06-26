@@ -32,7 +32,7 @@ import {
   SIZE_1,
   SIZE_5,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -64,6 +64,7 @@ import { useFeatureFlag } from '../../redux/config'
 import { ChooseRobotToRunProtocolSlideout } from '../ChooseRobotToRunProtocolSlideout'
 import { SendProtocolToFlexSlideout } from '../SendProtocolToFlexSlideout'
 import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
+import { ProtocolStatusBanner } from '../ProtocolStatusBanner'
 import {
   getAnalysisStatus,
   getProtocolDisplayName,
@@ -118,7 +119,7 @@ function MetadataDetails({
   protocolType,
 }: MetadataDetailsProps): JSX.Element {
   if (protocolType === 'json') {
-    return <StyledText as="p">{description}</StyledText>
+    return <LegacyStyledText as="p">{description}</LegacyStyledText>
   } else {
     const filteredMetaData = Object.entries(
       omit(metadata, ['description', 'protocolName', 'author', 'apiLevel'])
@@ -130,18 +131,18 @@ function MetadataDetails({
         flexDirection={DIRECTION_COLUMN}
         data-testid="ProtocolDetails_description"
       >
-        <StyledText as="p">{description}</StyledText>
+        <LegacyStyledText as="p">{description}</LegacyStyledText>
         {filteredMetaData.map((item, index) => {
           return (
             <React.Fragment key={index}>
-              <StyledText
+              <LegacyStyledText
                 as="h6"
                 marginTop={SPACING.spacing8}
                 color={COLORS.grey60}
               >
                 {startCase(item.label)}
-              </StyledText>
-              <StyledText as="p">{item.value}</StyledText>
+              </LegacyStyledText>
+              <LegacyStyledText as="p">{item.value}</LegacyStyledText>
             </React.Fragment>
           )
         })}
@@ -167,7 +168,7 @@ const ReadMoreContent = (props: ReadMoreContentProps): JSX.Element => {
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
       {isReadMore ? (
-        <StyledText as="p">{description.slice(0, 160)}</StyledText>
+        <LegacyStyledText as="p">{description.slice(0, 160)}</LegacyStyledText>
       ) : (
         <MetadataDetails
           description={description}
@@ -180,7 +181,9 @@ const ReadMoreContent = (props: ReadMoreContentProps): JSX.Element => {
           role="button"
           css={TYPOGRAPHY.linkPSemiBold}
           marginTop={SPACING.spacing8}
-          onClick={() => setIsReadMore(!isReadMore)}
+          onClick={() => {
+            setIsReadMore(!isReadMore)
+          }}
         >
           {isReadMore
             ? i18n.format(t('read_more'), 'capitalize')
@@ -381,7 +384,9 @@ export function ProtocolDetails(
         ? createPortal(
             <LegacyModal
               title={t('deck_view')}
-              onClose={() => setShowDeckViewModal(false)}
+              onClose={() => {
+                setShowDeckViewModal(false)
+              }}
             >
               {deckMap}
             </LegacyModal>,
@@ -395,13 +400,17 @@ export function ProtocolDetails(
       >
         <ErrorBoundary fallback={UnknownAttachmentError}>
           <ChooseRobotToRunProtocolSlideout
-            onCloseClick={() => setShowChooseRobotToRunProtocolSlideout(false)}
+            onCloseClick={() => {
+              setShowChooseRobotToRunProtocolSlideout(false)
+            }}
             showSlideout={showChooseRobotToRunProtocolSlideout}
             storedProtocolData={props}
           />
           <SendProtocolToFlexSlideout
             isExpanded={showSendProtocolToFlexSlideout}
-            onCloseClick={() => setShowSendProtocolToFlexSlideout(false)}
+            onCloseClick={() => {
+              setShowSendProtocolToFlexSlideout(false)
+            }}
             storedProtocolData={props}
           />
 
@@ -420,6 +429,10 @@ export function ProtocolDetails(
               width="100%"
             >
               {analysisStatus !== 'loading' &&
+              mostRecentAnalysis?.result === 'parameter-value-required' ? (
+                <ProtocolStatusBanner />
+              ) : null}
+              {analysisStatus !== 'loading' &&
               mostRecentAnalysis != null &&
               mostRecentAnalysis.errors.length > 0 ? (
                 <ProtocolAnalysisFailure
@@ -427,53 +440,53 @@ export function ProtocolDetails(
                   errors={mostRecentAnalysis.errors.map(e => e.detail)}
                 />
               ) : null}
-              <StyledText
+              <LegacyStyledText
                 css={TYPOGRAPHY.h2SemiBold}
                 marginBottom={SPACING.spacing16}
                 data-testid={`ProtocolDetails_${protocolDisplayName}`}
                 overflowWrap={OVERFLOW_WRAP_ANYWHERE}
               >
                 {protocolDisplayName}
-              </StyledText>
+              </LegacyStyledText>
               <Flex css={GRID_STYLE}>
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_creationMethod"
                 >
-                  <StyledText as="h6" color={COLORS.grey60}>
+                  <LegacyStyledText as="h6" color={COLORS.grey60}>
                     {t('creation_method')}
-                  </StyledText>
-                  <StyledText as="p">
+                  </LegacyStyledText>
+                  <LegacyStyledText as="p">
                     {analysisStatus === 'loading'
                       ? t('shared:loading')
                       : creationMethod}
-                  </StyledText>
+                  </LegacyStyledText>
                 </Flex>
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_lastUpdated"
                 >
-                  <StyledText as="h6" color={COLORS.grey60}>
+                  <LegacyStyledText as="h6" color={COLORS.grey60}>
                     {t('last_updated')}
-                  </StyledText>
-                  <StyledText as="p">
+                  </LegacyStyledText>
+                  <LegacyStyledText as="p">
                     {analysisStatus === 'loading'
                       ? t('shared:loading')
                       : format(new Date(modified), 'M/d/yy HH:mm')}
-                  </StyledText>
+                  </LegacyStyledText>
                 </Flex>
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_lastAnalyzed"
                 >
-                  <StyledText as="h6" color={COLORS.grey60}>
+                  <LegacyStyledText as="h6" color={COLORS.grey60}>
                     {t('last_analyzed')}
-                  </StyledText>
-                  <StyledText as="p">
+                  </LegacyStyledText>
+                  <LegacyStyledText as="p">
                     {analysisStatus === 'loading'
                       ? t('shared:loading')
                       : lastAnalyzed}
-                  </StyledText>
+                  </LegacyStyledText>
                 </Flex>
                 <Flex
                   css={css`
@@ -482,7 +495,9 @@ export function ProtocolDetails(
                   `}
                 >
                   <PrimaryButton
-                    onClick={() => handleRunProtocolButtonClick()}
+                    onClick={() => {
+                      handleRunProtocolButtonClick()
+                    }}
                     data-testid="ProtocolDetails_runProtocol"
                     disabled={analysisStatus === 'loading'}
                   >
@@ -496,10 +511,10 @@ export function ProtocolDetails(
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_author"
                 >
-                  <StyledText as="h6" color={COLORS.grey60}>
+                  <LegacyStyledText as="h6" color={COLORS.grey60}>
                     {t('org_or_author')}
-                  </StyledText>
-                  <StyledText
+                  </LegacyStyledText>
+                  <LegacyStyledText
                     as="p"
                     marginRight={SPACING.spacing20}
                     overflowWrap={OVERFLOW_WRAP_ANYWHERE}
@@ -507,17 +522,19 @@ export function ProtocolDetails(
                     {analysisStatus === 'loading'
                       ? t('shared:loading')
                       : author}
-                  </StyledText>
+                  </LegacyStyledText>
                 </Flex>
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_description"
                 >
-                  <StyledText as="h6" color={COLORS.grey60}>
+                  <LegacyStyledText as="h6" color={COLORS.grey60}>
                     {t('description')}
-                  </StyledText>
+                  </LegacyStyledText>
                   {analysisStatus === 'loading' ? (
-                    <StyledText as="p">{t('shared:loading')}</StyledText>
+                    <LegacyStyledText as="p">
+                      {t('shared:loading')}
+                    </LegacyStyledText>
                   ) : null}
                   {mostRecentAnalysis != null ? (
                     <ReadMoreContent
@@ -534,12 +551,12 @@ export function ProtocolDetails(
               right={SPACING.spacing2}
             >
               <ProtocolOverflowMenu
-                handleRunProtocol={() =>
+                handleRunProtocol={() => {
                   setShowChooseRobotToRunProtocolSlideout(true)
-                }
-                handleSendProtocolToFlex={() =>
+                }}
+                handleSendProtocolToFlex={() => {
                   setShowSendProtocolToFlexSlideout(true)
-                }
+                }}
                 storedProtocolData={props}
                 data-testid="ProtocolDetails_overFlowMenu"
               />
@@ -563,9 +580,12 @@ export function ProtocolDetails(
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
                 padding={SPACING.spacing16}
               >
-                <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+                <LegacyStyledText
+                  as="h3"
+                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                >
                   {t('deck_view')}
-                </StyledText>
+                </LegacyStyledText>
                 <Btn
                   alignItems={ALIGN_CENTER}
                   disabled={analysisStatus !== 'complete'}
@@ -574,7 +594,9 @@ export function ProtocolDetails(
                   height={SPACING.spacing24}
                   width={SPACING.spacing24}
                   css={ZOOM_ICON_STYLE}
-                  onClick={() => setShowDeckViewModal(true)}
+                  onClick={() => {
+                    setShowDeckViewModal(true)
+                  }}
                 >
                   <Icon
                     name="union"
@@ -608,9 +630,9 @@ export function ProtocolDetails(
                       setCurrentTab('parameters')
                     }}
                   >
-                    <StyledText>
+                    <LegacyStyledText>
                       {i18n.format(t('parameters'), 'capitalize')}
-                    </StyledText>
+                    </LegacyStyledText>
                   </RoundTab>
                 )}
                 <RoundTab
@@ -620,9 +642,9 @@ export function ProtocolDetails(
                     setCurrentTab('robot_config')
                   }}
                 >
-                  <StyledText>
+                  <LegacyStyledText>
                     {i18n.format(t('hardware'), 'capitalize')}
-                  </StyledText>
+                  </LegacyStyledText>
                 </RoundTab>
                 <RoundTab
                   data-testid="ProtocolDetails_labware"
@@ -631,9 +653,9 @@ export function ProtocolDetails(
                     setCurrentTab('labware')
                   }}
                 >
-                  <StyledText>
+                  <LegacyStyledText>
                     {i18n.format(t('labware'), 'capitalize')}
-                  </StyledText>
+                  </LegacyStyledText>
                 </RoundTab>
                 {mostRecentAnalysis != null && (
                   <RoundTab
@@ -643,9 +665,9 @@ export function ProtocolDetails(
                       setCurrentTab('liquids')
                     }}
                   >
-                    <StyledText>
+                    <LegacyStyledText>
                       {i18n.format(t('liquids'), 'capitalize')}
-                    </StyledText>
+                    </LegacyStyledText>
                   </RoundTab>
                 )}
                 {enableProtocolStats && mostRecentAnalysis != null && (
@@ -656,9 +678,9 @@ export function ProtocolDetails(
                       setCurrentTab('stats')
                     }}
                   >
-                    <StyledText>
+                    <LegacyStyledText>
                       {i18n.format(t('stats'), 'capitalize')}
-                    </StyledText>
+                    </LegacyStyledText>
                   </RoundTab>
                 )}
               </Flex>

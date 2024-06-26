@@ -10,7 +10,7 @@ import {
   PrimaryButton,
   RESPONSIVENESS,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { css } from 'styled-components'
@@ -49,10 +49,14 @@ export const ProbeNotAttached = (
         css={ALIGN_BUTTONS}
         gridGap={SPACING.spacing8}
       >
-        <Btn onClick={() => setShowUnableToDetect(false)}>
-          <StyledText css={GO_BACK_BUTTON_STYLE}>
+        <Btn
+          onClick={() => {
+            setShowUnableToDetect(false)
+          }}
+        >
+          <LegacyStyledText css={GO_BACK_BUTTON_STYLE}>
             {t('shared:go_back')}
-          </StyledText>
+          </LegacyStyledText>
         </Btn>
         {isOnDevice ? (
           <SmallButton

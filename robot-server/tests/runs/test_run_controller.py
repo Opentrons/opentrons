@@ -12,7 +12,7 @@ from opentrons.protocol_engine import (
     errors as pe_errors,
 )
 from opentrons.protocol_engine.types import RunTimeParameter, BooleanParameter
-from opentrons.protocol_runner import RunResult, JsonRunner, PythonAndLegacyRunner
+from opentrons.protocol_runner import RunResult
 
 from robot_server.service.notifications import RunsPublisher
 from robot_server.service.task_runner import TaskRunner
@@ -117,9 +117,7 @@ async def test_create_play_action_to_resume(
     subject: RunController,
 ) -> None:
     """It should resume a run."""
-    mock_json_runner = decoy.mock(cls=JsonRunner)
-    decoy.when(mock_engine_store.runner).then_return(mock_json_runner)
-    decoy.when(mock_json_runner.was_started()).then_return(True)
+    decoy.when(mock_engine_store.run_was_started()).then_return(True)
 
     result = subject.create_action(
         action_id="some-action-id",
@@ -135,8 +133,8 @@ async def test_create_play_action_to_resume(
     )
 
     decoy.verify(mock_run_store.insert_action(run_id, result), times=1)
-    decoy.verify(mock_json_runner.play(), times=1)
-    decoy.verify(await mock_json_runner.run(deck_configuration=[]), times=0)
+    decoy.verify(mock_engine_store.play(), times=1)
+    decoy.verify(await mock_engine_store.run(deck_configuration=[]), times=0)
 
 
 async def test_create_play_action_to_start(
@@ -152,9 +150,7 @@ async def test_create_play_action_to_start(
     subject: RunController,
 ) -> None:
     """It should start a run."""
-    mock_python_runner = decoy.mock(cls=PythonAndLegacyRunner)
-    decoy.when(mock_engine_store.runner).then_return(mock_python_runner)
-    decoy.when(mock_python_runner.was_started()).then_return(False)
+    decoy.when(mock_engine_store.run_was_started()).then_return(False)
 
     result = subject.create_action(
         action_id="some-action-id",
@@ -174,7 +170,7 @@ async def test_create_play_action_to_start(
     background_task_captor = matchers.Captor()
     decoy.verify(mock_task_runner.run(background_task_captor, deck_configuration=[]))
 
-    decoy.when(await mock_python_runner.run(deck_configuration=[])).then_return(
+    decoy.when(await mock_engine_store.run(deck_configuration=[])).then_return(
         RunResult(
             commands=protocol_commands,
             state_summary=engine_state_summary,
@@ -218,7 +214,7 @@ def test_create_pause_action(
     )
 
     decoy.verify(mock_run_store.insert_action(run_id, result), times=1)
-    decoy.verify(mock_engine_store.runner.pause(), times=1)
+    decoy.verify(mock_engine_store.pause(), times=1)
 
 
 def test_create_stop_action(
@@ -244,7 +240,7 @@ def test_create_stop_action(
     )
 
     decoy.verify(mock_run_store.insert_action(run_id, result), times=1)
-    decoy.verify(mock_task_runner.run(mock_engine_store.runner.stop), times=1)
+    decoy.verify(mock_task_runner.run(mock_engine_store.stop), times=1)
 
 
 def test_create_resume_from_recovery_action(
@@ -270,7 +266,7 @@ def test_create_resume_from_recovery_action(
     )
 
     decoy.verify(mock_run_store.insert_action(run_id, result), times=1)
-    decoy.verify(mock_engine_store.runner.resume_from_recovery())
+    decoy.verify(mock_engine_store.resume_from_recovery())
 
 
 @pytest.mark.parametrize(
@@ -292,9 +288,9 @@ async def test_action_not_allowed(
     exception: Exception,
 ) -> None:
     """It should raise a RunActionNotAllowedError if a play/pause action is rejected."""
-    decoy.when(mock_engine_store.runner.was_started()).then_return(True)
-    decoy.when(mock_engine_store.runner.play()).then_raise(exception)
-    decoy.when(mock_engine_store.runner.pause()).then_raise(exception)
+    decoy.when(mock_engine_store.run_was_started()).then_return(True)
+    decoy.when(mock_engine_store.play()).then_raise(exception)
+    decoy.when(mock_engine_store.pause()).then_raise(exception)
 
     with pytest.raises(RunActionNotAllowedError, match="oh no"):
         subject.create_action(

@@ -19,7 +19,11 @@ import {
   REQUIRED_FIELD_ERROR,
   MUST_BE_A_NUMBER_ERROR,
 } from './fields'
-import type { LabwareFields, ProcessedLabwareFields } from './fields'
+import type {
+  LabwareFields,
+  LabwareType,
+  ProcessedLabwareFields,
+} from './fields'
 
 // global overrides for Yup's default error messages.
 Yup.setLocale({
@@ -87,6 +91,38 @@ export const labwareFormSchemaBaseObject = Yup.object({
   labwareType: requiredString(LABELS.labwareType).oneOf(
     labwareTypeOptions.map(o => o.value)
   ),
+  compatibleModules: Yup.object()
+    .shape({})
+    .test(
+      'is-valid-compatibleModules',
+      'Please make sure each module selected has a height',
+      value => {
+        for (const [, val] of Object.entries(value)) {
+          if (typeof val !== 'string' && typeof val !== 'number') {
+            return false
+          }
+        }
+
+        return true
+      }
+    )
+    .default({}),
+  compatibleAdapters: Yup.object()
+    .shape({})
+    .test(
+      'is-valid-compatibleAdapters',
+      'Please make sure each labware selected has a height',
+      value => {
+        for (const [, val] of Object.entries(value)) {
+          if (typeof val !== 'string' && typeof val !== 'number') {
+            return false
+          }
+        }
+
+        return true
+      }
+    )
+    .default({}),
   tubeRackInsertLoadName: Yup.mixed().when('labwareType', {
     is: 'tubeRack',
     then: requiredString(LABELS.tubeRackInsertLoadName),
@@ -235,9 +271,9 @@ export const labwareFormSchemaBaseObject = Yup.object({
     .transform(
       (
         currentValue: string | null | undefined,
-        originalValue: string | null | undefined
+        _originalValue: string | null | undefined
       ): ProcessedLabwareFields['brandId'] =>
-        (currentValue || '')
+        (currentValue ?? '')
           .trim()
           .split(',')
           .map(s => s.trim())
@@ -255,9 +291,9 @@ export const labwareFormSchemaBaseObject = Yup.object({
     .transform(
       (
         currentValue: string | null | undefined,
-        originalValue: string | null | undefined
+        _originalValue: string | null | undefined
       ): ProcessedLabwareFields['groupBrandId'] =>
-        (currentValue || '')
+        (currentValue ?? '')
           .trim()
           .split(',')
           .map(s => s.trim())
@@ -280,9 +316,7 @@ export const labwareFormSchemaBaseObject = Yup.object({
       'displayNameDoesNotAlreadyExist',
       nameExistsError('display name'),
       (value: string | null | undefined) =>
-        !ALL_DISPLAY_NAMES.has(
-          (value == null ? '' : value).toLowerCase().trim()
-        ) // case-insensitive and trim-insensitive match
+        !ALL_DISPLAY_NAMES.has((value ?? '').toLowerCase().trim()) // case-insensitive and trim-insensitive match
     )
     .transform(
       (
@@ -294,7 +328,7 @@ export const labwareFormSchemaBaseObject = Yup.object({
 
 // @ts-expect-error(IL, 2021-03-25): something(s) about this schema don't match the flow type (labwareType: string problem??)
 export const labwareFormSchema: Yup.Schema<ProcessedLabwareFields> = labwareFormSchemaBaseObject.transform(
-  (currentValue, originalValue) => {
+  (currentValue, _originalValue) => {
     // "form-level" transforms
     // NOTE: the currentValue does NOT have field-level transforms applied :(
     // TODO: these results are not validated, ideally I could do these transforms in the fields
@@ -302,8 +336,8 @@ export const labwareFormSchema: Yup.Schema<ProcessedLabwareFields> = labwareForm
     // Yup runs transforms before defaults. In order for brand defaulting to work for displayName/loadName
     // creation, we can't do .default() to the brand field, but need to default it here.
     const brand = matchOpentronsTubeRack(
-      currentValue.labwareType,
-      currentValue.tubeRackInsertLoadName
+      currentValue.labwareType as LabwareType | null | undefined,
+      currentValue.tubeRackInsertLoadName as string | null | undefined
     )
       ? DEFAULT_RACK_BRAND
       : currentValue.brand
@@ -312,10 +346,11 @@ export const labwareFormSchema: Yup.Schema<ProcessedLabwareFields> = labwareForm
 
     const displayName =
       currentValue.displayName == null || currentValue.displayName.trim() === ''
-        ? getDefaultDisplayName(nextValues)
+        ? getDefaultDisplayName(nextValues as LabwareFields)
         : currentValue.displayName
 
-    const loadName = currentValue.loadName || getDefaultLoadName(nextValues)
+    const loadName =
+      currentValue.loadName ?? getDefaultLoadName(nextValues as LabwareFields)
 
     return {
       ...currentValue,

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-import { SPACING, TYPOGRAPHY, StyledText } from '@opentrons/components'
+import { SPACING, TYPOGRAPHY, LegacyStyledText } from '@opentrons/components'
 import { getGripperDisplayName } from '@opentrons/shared-data'
 import { useCurrentSubsystemUpdateQuery } from '@opentrons/react-api-client'
 import { Banner } from '../../atoms/Banner'
@@ -118,7 +118,9 @@ export function GripperCard({
           {
             label: t('about_gripper'),
             disabled: attachedGripper == null,
-            onClick: () => setShowAboutGripperSlideout(true),
+            onClick: () => {
+              setShowAboutGripperSlideout(true)
+            },
           },
         ]
   return (
@@ -137,16 +139,16 @@ export function GripperCard({
             attachedGripper?.ok && !isCalibrated ? (
               <Banner type="error" marginBottom={SPACING.spacing4} width="100%">
                 {isEstopNotDisengaged ? (
-                  <StyledText as="p">
+                  <LegacyStyledText as="p">
                     {t('calibration_needed_without_link')}
-                  </StyledText>
+                  </LegacyStyledText>
                 ) : (
                   <Trans
                     t={t}
                     i18nKey={'calibration_needed'}
                     components={{
                       calLink: (
-                        <StyledText
+                        <LegacyStyledText
                           as="p"
                           css={BANNER_LINK_CSS}
                           onClick={handleCalibrate}
@@ -192,7 +194,9 @@ export function GripperCard({
         <GripperWizardFlows
           flowType={openWizardFlowType}
           attachedGripper={attachedGripper}
-          closeFlow={() => setOpenWizardFlowType(null)}
+          closeFlow={() => {
+            setOpenWizardFlowType(null)
+          }}
         />
       ) : null}
       {attachedGripper?.ok && showAboutGripperSlideout && (
@@ -200,7 +204,9 @@ export function GripperCard({
           serialNumber={attachedGripper.serialNumber}
           firmwareVersion={attachedGripper.firmwareVersion}
           isExpanded={showAboutGripperSlideout}
-          onCloseClick={() => setShowAboutGripperSlideout(false)}
+          onCloseClick={() => {
+            setShowAboutGripperSlideout(false)
+          }}
         />
       )}
     </>

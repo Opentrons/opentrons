@@ -81,6 +81,8 @@ export const migrateFile = (
       const tiprackLoadCommands = loadLabwareCommands.filter(
         command => command.params.loadName === tiprackLoadName
       )
+      const tipRackDefURI = pipetteTiprackAssignments[item.pipette]
+
       const xyKeys =
         item.stepType === 'mix'
           ? { mix_x_position: 0, mix_y_position: 0 }
@@ -90,12 +92,12 @@ export const migrateFile = (
               dispense_x_position: 0,
               dispense_y_position: 0,
             }
-      const matchingTiprackCommand = tiprackLoadCommands.find(
-        command => command.params.labwareId === item.tipRack
+      const matchingTiprackCommand = tiprackLoadCommands.find(command =>
+        command.params.labwareId?.includes(tipRackDefURI)
       )
       if (matchingTiprackCommand == null) {
         console.error(
-          `expected to find a tiprack loadname from tiprack ${item.tipRack} but could not `
+          `expected to find a tiprack loadname from tiprack ${tipRackDefURI} but could not `
         )
       }
       const matchingTiprackURI =
@@ -112,7 +114,7 @@ export const migrateFile = (
 
       const defaultBlowOutFlowRate = getDefaultBlowoutFlowRate(
         pipetteName as PipetteName,
-        item.volume,
+        item.volume as number,
         tipLength
       )
 
@@ -120,8 +122,6 @@ export const migrateFile = (
       if (item.blowout_checkbox === false) {
         blowoutFlowRate = null
       }
-
-      const tipRackDefURI = pipetteTiprackAssignments[item.pipette]
 
       acc[item.id] = {
         ...item,

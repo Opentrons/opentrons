@@ -9,7 +9,7 @@ import {
   Icon,
   JUSTIFY_FLEX_END,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -44,7 +44,9 @@ export function ProtocolSetupLiquids({
     <>
       <ODDBackButton
         label={t('liquids')}
-        onClick={() => setSetupScreen('prepare to run')}
+        onClick={() => {
+          setSetupScreen('prepare to run')
+        }}
       />
       <Flex
         flexDirection={DIRECTION_COLUMN}
@@ -89,7 +91,9 @@ export function LiquidsList(props: LiquidsListProps): JSX.Element {
         alignItems={ALIGN_CENTER}
         width="100%"
         gridGap={SPACING.spacing16}
-        onClick={() => setOpenItem(prevOpenItem => !prevOpenItem)}
+        onClick={() => {
+          setOpenItem(prevOpenItem => !prevOpenItem)
+        }}
         aria-label={`Liquids_${liquid.id}`}
       >
         <Flex
@@ -110,9 +114,9 @@ export function LiquidsList(props: LiquidsListProps): JSX.Element {
           flexDirection={DIRECTION_COLUMN}
           alignItems={TYPOGRAPHY.textAlignCenter}
         >
-          <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {liquid.displayName}
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
         <Flex justifyContent={JUSTIFY_FLEX_END} flex="1">
           <Flex

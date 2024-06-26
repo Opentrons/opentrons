@@ -10,7 +10,7 @@ import {
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { ODD_FOCUS_VISIBLE } from './constants'
@@ -155,13 +155,13 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
       {...buttonProps}
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <StyledText css={TYPOGRAPHY.level3HeaderSemiBold}>
+        <LegacyStyledText css={TYPOGRAPHY.level3HeaderSemiBold}>
           {buttonText}
-        </StyledText>
+        </LegacyStyledText>
         {subtext ? (
-          <StyledText css={TYPOGRAPHY.level3HeaderRegular}>
+          <LegacyStyledText css={TYPOGRAPHY.level3HeaderRegular}>
             {subtext}
-          </StyledText>
+          </LegacyStyledText>
         ) : null}
       </Flex>
       {iconName ? (

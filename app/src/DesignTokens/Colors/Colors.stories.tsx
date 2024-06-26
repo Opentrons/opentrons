@@ -1,14 +1,14 @@
 import * as React from 'react'
 import {
-  ALIGN_CENTER,
+  ALIGN_FLEX_START,
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  JUSTIFY_CENTER,
+  JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -24,8 +24,17 @@ interface ColorsStorybookProps {
 
 const Template: Story<ColorsStorybookProps> = args => {
   const targetColors = args.colors
-
-  const [copiedColor, setCopiedColor] = React.useState<string | null>(null)
+  const colorCategories = targetColors.reduce((acc, color) => {
+    const match = color[0].match(/[a-zA-Z]+/)
+    const category = match?.[0]
+    if (category) {
+      if (!acc[category]) {
+        acc[category] = []
+      }
+      acc[category].push(color)
+    }
+    return acc
+  }, {})
 
   const invertColor = (hex: string): string => {
     if (hex.indexOf('#') === 0) {
@@ -47,58 +56,44 @@ const Template: Story<ColorsStorybookProps> = args => {
     return `#${r}${g}${b}`
   }
 
-  const handleClick = (colorName: string): void => {
-    navigator.clipboard.writeText(`COLORS.${colorName}`)
-    setCopiedColor(colorName)
-    setTimeout(() => {
-      setCopiedColor(null)
-    }, 2000)
-  }
-
   return (
-    <Flex
-      flexDirection={DIRECTION_ROW}
-      gridGap={SPACING.spacing8}
-      flexWrap="wrap"
-      padding={SPACING.spacing24}
-    >
-      {targetColors.map((color, index) => (
-        <Flex
-          key={`color_${index}`}
-          flexDirection={DIRECTION_COLUMN}
-          alignItems={ALIGN_CENTER}
-          justifyContent={JUSTIFY_CENTER}
-          backgroundColor={color[1]}
-          padding={SPACING.spacing16}
-          gridGap={SPACING.spacing4}
-          width="20rem"
-          height="6rem"
-          borderRadius={BORDERS.borderRadius8}
-          onClick={() => handleClick(color[0])}
-          style={{ cursor: 'pointer' }}
-          border={`2px solid ${COLORS.black90}`}
-        >
-          <StyledText
-            color={invertColor(color[1])}
-            as="p"
-            fontWeight={TYPOGRAPHY.fontWeightRegular}
-          >
-            {color[0]}
-          </StyledText>
-          <StyledText
-            as="p"
-            color={invertColor(color[1])}
-            fontWeight={TYPOGRAPHY.fontWeightRegular}
-          >
-            {color[1]}
-          </StyledText>
-          <Flex height="1rem">
-            {copiedColor === color[0] ? (
-              <StyledText as="p" color={invertColor(color[1])}>
-                {'copied'}
-              </StyledText>
-            ) : null}
-          </Flex>
+    <Flex flexDirection={DIRECTION_ROW} padding={SPACING.spacing16}>
+      {Object.entries(colorCategories).map(([category, colors], index) => (
+        <Flex key={`category_${index}`} flexDirection={DIRECTION_COLUMN}>
+          {colors.map((color, colorIndex) => (
+            <Flex
+              className={`color_${colorIndex}`}
+              key={`color_${colorIndex}`}
+              flexDirection={DIRECTION_COLUMN}
+              alignItems={ALIGN_FLEX_START}
+              justifyContent={JUSTIFY_SPACE_BETWEEN}
+              backgroundColor={color[1]}
+              padding={SPACING.spacing40}
+              width="12rem"
+              height="12rem"
+              margin={SPACING.spacing2} // Add some margin between color rows
+              borderRadius={BORDERS.borderRadius4}
+              style={{
+                cursor: 'pointer',
+                border: `1px solid ${COLORS.grey20}`,
+              }}
+            >
+              <LegacyStyledText
+                color={invertColor(color[1] as string)}
+                fontSize={TYPOGRAPHY.fontSizeP}
+                fontWeight={TYPOGRAPHY.fontWeightBold}
+              >
+                {color[0]}
+              </LegacyStyledText>
+              <LegacyStyledText
+                fontSize={TYPOGRAPHY.fontSizeP}
+                color={invertColor(color[1] as string)}
+                fontWeight={TYPOGRAPHY.fontWeightRegular}
+              >
+                {color[1]}
+              </LegacyStyledText>
+            </Flex>
+          ))}
         </Flex>
       ))}
     </Flex>
@@ -106,7 +101,35 @@ const Template: Story<ColorsStorybookProps> = args => {
 }
 
 export const AllColors = Template.bind({})
-const allColors = Object.entries(COLORS)
+const order = [
+  'grey',
+  'blue',
+  'red',
+  'purple',
+  'green',
+  'yellow',
+  'flex',
+  'black',
+  'white',
+  'opacity',
+]
+
+const filteredColors = Object.entries(COLORS).filter(([key]) =>
+  order.some(color => key.toLowerCase().includes(color))
+)
+
+const sortedColors = filteredColors.sort((a, b) => {
+  const aOrder = order.findIndex(color => a[0].toLowerCase().includes(color))
+  const bOrder = order.findIndex(color => b[0].toLowerCase().includes(color))
+  const aMatch = a[0].match(/\d+/)
+  const bMatch = b[0].match(/\d+/)
+  const aNumber = aMatch ? parseInt(aMatch[0], 10) : 0
+  const bNumber = bMatch ? parseInt(bMatch[0], 10) : 0
+  return aOrder - bOrder || bNumber - aNumber
+})
+
+console.table(sortedColors)
+
 AllColors.args = {
-  colors: allColors,
+  colors: sortedColors,
 }

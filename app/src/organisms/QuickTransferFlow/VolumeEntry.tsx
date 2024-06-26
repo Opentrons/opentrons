@@ -111,7 +111,9 @@ export function VolumeEntry(props: VolumeEntryProps): JSX.Element {
         >
           <NumericalKeyboard
             keyboardRef={keyboardRef}
-            onChange={e => setVolume(e)}
+            onChange={e => {
+              setVolume(e)
+            }}
           />
         </Flex>
       </Flex>

@@ -15,7 +15,7 @@ import {
   PrimaryButton,
   RESPONSIVENESS,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   useDeckLocationSelect,
 } from '@opentrons/components'
@@ -24,23 +24,17 @@ import { getDeckDefFromRobotType } from '@opentrons/shared-data'
 import { SmallButton } from '../../atoms/buttons'
 import { TwoUpTileLayout } from '../LabwarePositionCheck/TwoUpTileLayout'
 
-import type { CommandData } from '@opentrons/api-client'
-import type { AddressableAreaName, RobotType } from '@opentrons/shared-data'
-import type { ErrorDetails } from './utils'
+import type { AddressableAreaName } from '@opentrons/shared-data'
+import type { DropTipWizardContainerProps } from './types'
 
 // TODO: get help link article URL
 
-interface ChooseLocationProps {
+type ChooseLocationProps = DropTipWizardContainerProps & {
   handleProceed: () => void
   handleGoBack: () => void
   title: string
   body: string | JSX.Element
-  robotType: RobotType
-  moveToAddressableArea: (
-    addressableArea: AddressableAreaName
-  ) => Promise<CommandData | null>
-  isOnDevice: boolean
-  setErrorDetails: (errorDetails: ErrorDetails) => void
+  moveToAddressableArea: (addressableArea: AddressableAreaName) => Promise<void>
 }
 
 export const ChooseLocation = (
@@ -54,7 +48,6 @@ export const ChooseLocation = (
     robotType,
     moveToAddressableArea,
     isOnDevice,
-    setErrorDetails,
   } = props
   const { i18n, t } = useTranslation(['drop_tip_wizard', 'shared'])
   const deckDef = getDeckDefFromRobotType(robotType)
@@ -68,35 +61,29 @@ export const ChooseLocation = (
     )?.id
 
     if (deckSlot != null) {
-      moveToAddressableArea(deckSlot)
-        .then(() => handleProceed())
-        .catch(e => setErrorDetails({ message: `${e.message}` }))
+      void moveToAddressableArea(deckSlot).then(() => {
+        handleProceed()
+      })
     }
   }
 
   if (isOnDevice) {
     return (
-      <Flex
-        padding={SPACING.spacing32}
-        flexDirection={DIRECTION_COLUMN}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-        flex="1"
-      >
-        <Flex
-          flexDirection={DIRECTION_ROW}
-          gridGap={SPACING.spacing24}
-          flex="1"
-        >
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
+        <Flex flexDirection={DIRECTION_ROW} flex="1">
           <Flex
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing8}
             width="100%"
             flex="1"
           >
-            <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+            <LegacyStyledText
+              as="h4"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            >
               {title}
-            </StyledText>
-            <StyledText as="p">{body}</StyledText>
+            </LegacyStyledText>
+            <LegacyStyledText as="p">{body}</LegacyStyledText>
           </Flex>
           <Flex
             flex="1"
@@ -111,11 +98,16 @@ export const ChooseLocation = (
           justifyContent={JUSTIFY_SPACE_BETWEEN}
           css={ALIGN_BUTTONS}
           gridGap={SPACING.spacing8}
+          marginTop="auto"
         >
-          <Btn onClick={() => handleGoBack()}>
-            <StyledText css={GO_BACK_BUTTON_STYLE}>
+          <Btn
+            onClick={() => {
+              handleGoBack()
+            }}
+          >
+            <LegacyStyledText css={GO_BACK_BUTTON_STYLE}>
               {t('shared:go_back')}
-            </StyledText>
+            </LegacyStyledText>
           </Btn>
           <SmallButton
             buttonText={i18n.format(t('move_to_slot'), 'capitalize')}
@@ -137,10 +129,14 @@ export const ChooseLocation = (
               justifyContent={JUSTIFY_SPACE_BETWEEN}
               gridGap={SPACING.spacing8}
             >
-              <Btn onClick={() => handleGoBack()}>
-                <StyledText css={GO_BACK_BUTTON_STYLE}>
+              <Btn
+                onClick={() => {
+                  handleGoBack()
+                }}
+              >
+                <LegacyStyledText css={GO_BACK_BUTTON_STYLE}>
                   {t('shared:go_back')}
-                </StyledText>
+                </LegacyStyledText>
               </Btn>
               <PrimaryButton onClick={handleConfirmPosition}>
                 {i18n.format(t('move_to_slot'), 'capitalize')}
@@ -172,7 +168,7 @@ const GO_BACK_BUTTON_STYLE = css`
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
     font-size: ${TYPOGRAPHY.fontSize22};
-    padding-left: 0rem;
+    padding-left: 0;
     &:hover {
       opacity: 100%;
     }

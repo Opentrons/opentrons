@@ -7,7 +7,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   TYPOGRAPHY,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 export interface WellCountProps {
@@ -26,10 +26,10 @@ export function WellCount(props: WellCountProps): JSX.Element {
       alignItems={ALIGN_CENTER}
       marginBottom={SPACING.spacing16}
     >
-      <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+      <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {t(wellLabel)} {t('count')}
-      </StyledText>
-      <StyledText as="p">{count}</StyledText>
+      </LegacyStyledText>
+      <LegacyStyledText as="p">{count}</LegacyStyledText>
     </Flex>
   )
 }

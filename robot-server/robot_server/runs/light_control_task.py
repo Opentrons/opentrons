@@ -37,7 +37,13 @@ def _engine_status_to_status_bar(
             return StatusBarState.IDLE if initialization_done else StatusBarState.OFF
         case EngineStatus.RUNNING:
             return StatusBarState.RUNNING
-        case EngineStatus.PAUSED | EngineStatus.AWAITING_RECOVERY | EngineStatus.BLOCKED_BY_OPEN_DOOR:
+        case (
+            EngineStatus.PAUSED
+            | EngineStatus.BLOCKED_BY_OPEN_DOOR
+            | EngineStatus.AWAITING_RECOVERY
+            | EngineStatus.AWAITING_RECOVERY_PAUSED
+            | EngineStatus.AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR
+        ):
             return StatusBarState.PAUSED
         case EngineStatus.STOP_REQUESTED | EngineStatus.FINISHING:
             return StatusBarState.UPDATING
@@ -135,7 +141,7 @@ class LightController:
             return None
         current_id = self._engine_store.current_run_id
         if current_id is not None:
-            return self._engine_store.engine.state_view.commands.get_status()
+            return self._engine_store.get_status()
 
         return None
 

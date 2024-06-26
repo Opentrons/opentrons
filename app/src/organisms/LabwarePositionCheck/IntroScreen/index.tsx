@@ -14,7 +14,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { RobotMotionLoader } from '../RobotMotionLoader'
@@ -30,7 +30,7 @@ import { LegacyModalShell } from '../../../molecules/LegacyModal'
 import { SmallButton } from '../../../atoms/buttons'
 import { CALIBRATION_PROBE } from '../../PipetteWizardFlows/constants'
 import { TerseOffsetTable } from '../ResultsSummary'
-import { getLabwareDefinitionsFromCommands } from '../utils/labware'
+import { getLabwareDefinitionsFromCommands } from '../../../molecules/Command/utils/getLabwareDefinitionsFromCommands'
 
 import type { LabwareOffset } from '@opentrons/api-client'
 import type {
@@ -73,7 +73,9 @@ export const IntroScreen = (props: {
   const handleClickStartLPC = (): void => {
     const prepCommands = getPrepCommands(protocolData)
     chainRunCommands(prepCommands, false)
-      .then(() => proceed())
+      .then(() => {
+        proceed()
+      })
       .catch((e: Error) => {
         setFatalError(
           `IntroScreen failed to issue prep commands with message: ${e.message}`
@@ -106,7 +108,7 @@ export const IntroScreen = (props: {
         <Trans
           t={t}
           i18nKey="labware_position_check_description"
-          components={{ block: <StyledText as="p" /> }}
+          components={{ block: <LegacyStyledText as="p" /> }}
         />
       }
       rightElement={
@@ -166,14 +168,16 @@ function ViewOffsets(props: ViewOffsetsProps): JSX.Element {
         display="flex"
         gridGap={SPACING.spacing8}
         alignItems={ALIGN_CENTER}
-        onClick={() => setShowOffsetsModal(true)}
+        onClick={() => {
+          setShowOffsetsModal(true)
+        }}
         css={VIEW_OFFSETS_BUTTON_STYLE}
         aria-label="show labware offsets"
       >
         <Icon name="reticle" size="1.75rem" color={COLORS.black90} />
-        <StyledText as="p">
+        <LegacyStyledText as="p">
           {i18n.format(t('view_current_offsets'), 'capitalize')}
-        </StyledText>
+        </LegacyStyledText>
       </Btn>
       {showOffsetsTable
         ? createPortal(
@@ -185,16 +189,21 @@ function ViewOffsets(props: ViewOffsetsProps): JSX.Element {
               flexDirection={DIRECTION_COLUMN}
               justifyContent={JUSTIFY_SPACE_BETWEEN}
               header={
-                <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightBold}>
+                <LegacyStyledText
+                  as="h4"
+                  fontWeight={TYPOGRAPHY.fontWeightBold}
+                >
                   {i18n.format(t('labware_offset_data'), 'capitalize')}
-                </StyledText>
+                </LegacyStyledText>
               }
               footer={
                 <SmallButton
                   width="100%"
                   textTransform={TYPOGRAPHY.textTransformCapitalize}
                   buttonText={t('shared:close')}
-                  onClick={() => setShowOffsetsModal(false)}
+                  onClick={() => {
+                    setShowOffsetsModal(false)
+                  }}
                 />
               }
             >

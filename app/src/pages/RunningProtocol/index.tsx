@@ -25,6 +25,7 @@ import {
   RUN_STATUS_STOP_REQUESTED,
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_FINISHING,
+  RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
 } from '@opentrons/api-client'
 
 import { StepMeter } from '../../atoms/StepMeter'
@@ -160,9 +161,15 @@ export function RunningProtocol(): JSX.Element {
   return (
     <>
       {isERActive ? (
-        <ErrorRecoveryFlows runId={runId} failedCommand={failedCommand} />
+        <ErrorRecoveryFlows
+          isFlex={true}
+          runId={runId}
+          failedCommand={failedCommand}
+          protocolAnalysis={robotSideAnalysis}
+        />
       ) : null}
-      {runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR ? (
+      {runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR ||
+      runStatus === RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR ? (
         <OpenDoorAlertModal />
       ) : null}
       {runStatus === RUN_STATUS_STOP_REQUESTED ? <CancelingRunModal /> : null}
@@ -209,6 +216,7 @@ export function RunningProtocol(): JSX.Element {
           {robotSideAnalysis != null ? (
             currentOption === 'CurrentRunningProtocolCommand' ? (
               <CurrentRunningProtocolCommand
+                runId={runId}
                 playRun={playRun}
                 pauseRun={pauseRun}
                 setShowConfirmCancelRunModal={setShowConfirmCancelRunModal}

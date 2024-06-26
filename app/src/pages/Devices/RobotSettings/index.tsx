@@ -10,7 +10,7 @@ import {
   Flex,
   SIZE_6,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
@@ -128,9 +128,9 @@ export function RobotSettings(): JSX.Element | null {
           )}
           {showRobotBusyBanner && (
             <Banner type="warning" marginBottom={SPACING.spacing16}>
-              <StyledText as="p">
+              <LegacyStyledText as="p">
                 {t('some_robot_controls_are_not_available')}
-              </StyledText>
+              </LegacyStyledText>
             </Banner>
           )}
           <Flex gridGap={SPACING.spacing16}>

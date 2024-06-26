@@ -7,13 +7,17 @@ on:
     paths:
       - 'Makefile'
       - 'components/**'
-      - 'app/**/*.stories.@(js|jsx|ts|tsx)'
+      - 'app/**/*.stories.*'
+      - 'app/src/atoms/**/*'
+      - 'app/src/molecules/**/*'
       - 'package.json'
       - '.github/workflows/components-test-build-deploy.yaml'
   push:
     paths:
       - 'components/**'
-      - 'app/**/*.stories.@(js|jsx|ts|tsx)'
+      - 'app/**/*.stories.*'
+      - 'app/src/atoms/**/*'
+      - 'app/src/molecules/**/*'
       - 'package.json'
       - '.github/workflows/components-test-build-deploy.yaml'
     branches:
@@ -114,15 +118,18 @@ jobs:
     steps:
       - id: determine-build-type
         run: |
-          echo "Determining build type for event ${{github.event_type}} and ref ${{github.ref}}"
-          if [ "${{ format('{0}', github.ref == 'refs/heads/edge') }}" = "true" ] ; then
-            echo "storybook s3 builds for edge"
+          echo "Determining build type for event ${{github.event_name}} and ref ${{github.ref}}"
+          if [ "${{ format('{0}', github.event_name == 'pull_request') }}" = "true" ] ; then
+            echo "No builds for pull requests"
+            echo 'type=none' >> $GITHUB_OUTPUT
+          elif [ "${{ format('{0}', startsWith(github.ref, 'refs/heads/')) }}" = "true" ] ; then
+            echo "storybook s3 builds for branch ${{ github.ref_name }}"
             echo 'type=storybook' >> $GITHUB_OUTPUT
           elif [ "${{ format('{0}', startsWith(github.ref, 'refs/tags/components')) }}" = "true" ] ; then
             echo "publish builds for components tags"
             echo 'type=publish' >> $GITHUB_OUTPUT
           else
-            echo "No build for ref ${{github.ref}} and event ${{github.event_type}}"
+            echo "No build for ref ${{github.ref}} and event ${{github.event_name}}"
             echo 'type=none' >> $GITHUB_OUTPUT
           fi
 
@@ -162,6 +169,10 @@ jobs:
           AWS_DEFAULT_REGION: us-east-2
         run: |
           aws s3 sync ./dist s3://opentrons-components/${{ env.OT_BRANCH}} --acl public-read
+      - name: 'Set generated URL'
+        run: |
+          echo 'Created component storybook for [${{ env.OT_BRANCH }}](https://s3-us-west-2.amazonaws.com/opentrons-components/${{ env.OT_BRANCH }}/index.html?path=/)' >> $GITHUB_STEP_SUMMARY
+          echo 'Created component storybook for https://s3-us-west-2.amazonaws.com/opentrons-components/${{ env.OT_BRANCH }}/index.html?path=/'
 
   publish-components:
     name: 'publish components package to npm'

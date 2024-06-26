@@ -9,7 +9,7 @@ import {
   PrimaryButton,
   RESPONSIVENESS,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
@@ -99,10 +99,14 @@ export const MountGripper = (
         css={ALIGN_BUTTONS}
         gridGap={SPACING.spacing8}
       >
-        <Btn onClick={() => setShowUnableToDetect(false)}>
-          <StyledText css={GO_BACK_BUTTON_STYLE}>
+        <Btn
+          onClick={() => {
+            setShowUnableToDetect(false)
+          }}
+        >
+          <LegacyStyledText css={GO_BACK_BUTTON_STYLE}>
             {t('shared:go_back')}
-          </StyledText>
+          </LegacyStyledText>
         </Btn>
         {isOnDevice ? (
           <SmallButton
@@ -135,7 +139,9 @@ export const MountGripper = (
         </video>
       }
       bodyText={
-        <StyledText as="p">{t('attached_gripper_and_screw_in')}</StyledText>
+        <LegacyStyledText as="p">
+          {t('attached_gripper_and_screw_in')}
+        </LegacyStyledText>
       }
       proceedButtonText={t('continue')}
       proceedIsDisabled={isPending}

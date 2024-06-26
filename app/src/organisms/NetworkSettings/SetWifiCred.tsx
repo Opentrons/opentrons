@@ -13,7 +13,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   POSITION_FIXED,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -55,7 +55,7 @@ export function SetWifiCred({
         marginTop={isUnboxingFlowOngoing ? undefined : '7.75rem'}
       >
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-          <StyledText as="p">{t('enter_password')}</StyledText>
+          <LegacyStyledText as="p">{t('enter_password')}</LegacyStyledText>
           <Flex
             flexDirection={DIRECTION_ROW}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -88,9 +88,12 @@ export function SetWifiCred({
                 size="3rem"
                 data-testid={showPassword ? 'icon_eye-slash' : 'icon_eye'}
               />
-              <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+              <LegacyStyledText
+                as="p"
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              >
                 {showPassword ? t('hide') : t('show')}
-              </StyledText>
+              </LegacyStyledText>
             </Btn>
           </Flex>
         </Flex>

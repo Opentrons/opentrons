@@ -8,7 +8,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING_AUTO,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -37,14 +37,16 @@ export function DeviceReset({
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
       <Box width="70%">
-        <StyledText
+        <LegacyStyledText
           css={TYPOGRAPHY.pSemiBold}
           marginBottom={SPACING.spacing4}
           id="AdvancedSettings_deviceReset"
         >
           {t('device_reset')}
-        </StyledText>
-        <StyledText as="p">{t('device_reset_description')}</StyledText>
+        </LegacyStyledText>
+        <LegacyStyledText as="p">
+          {t('device_reset_description')}
+        </LegacyStyledText>
       </Box>
       <TertiaryButton
         marginLeft={SPACING_AUTO}

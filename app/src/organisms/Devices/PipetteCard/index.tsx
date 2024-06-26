@@ -12,7 +12,7 @@ import {
   Flex,
   InstrumentDiagram,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   useOnClickOutside,
 } from '@opentrons/components'
@@ -64,7 +64,9 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   } = useMenuHandleClickOutside()
   const pipetteDisplayName = pipetteModelSpecs?.displayName
   const pipetteOverflowWrapperRef = useOnClickOutside<HTMLDivElement>({
-    onClickOutside: () => setShowOverflowMenu(false),
+    onClickOutside: () => {
+      setShowOverflowMenu(false)
+    },
   })
   const [showChangePipette, setChangePipette] = React.useState(false)
   const [showSlideout, setShowSlideout] = React.useState(false)
@@ -98,7 +100,9 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
         <ChangePipette
           robotName={robotName}
           mount={mount}
-          closeModal={() => setChangePipette(false)}
+          closeModal={() => {
+            setChangePipette(false)
+          }}
         />
       )}
       {showDTWiz && pipetteModelSpecs != null ? (
@@ -116,7 +120,9 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
           <PipetteSettingsSlideout
             robotName={robotName}
             pipetteName={pipetteModelSpecs.displayName}
-            onCloseClick={() => setShowSlideout(false)}
+            onCloseClick={() => {
+              setShowSlideout(false)
+            }}
             isExpanded={true}
             pipetteId={pipetteId}
             settings={settings}
@@ -126,7 +132,9 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
         <AboutPipetteSlideout
           pipetteId={pipetteId}
           pipetteName={pipetteModelSpecs.displayName}
-          onCloseClick={() => setShowAboutSlideout(false)}
+          onCloseClick={() => {
+            setShowAboutSlideout(false)
+          }}
           isExpanded={true}
         />
       )}
@@ -149,7 +157,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
               </Flex>
             ) : null}
             <Flex flexDirection={DIRECTION_COLUMN} flex="100%">
-              <StyledText
+              <LegacyStyledText
                 textTransform={TYPOGRAPHY.textTransformUppercase}
                 color={COLORS.grey60}
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
@@ -160,16 +168,16 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
                 {t('mount', {
                   side: mount === LEFT ? t('left') : t('right'),
                 })}
-              </StyledText>
+              </LegacyStyledText>
               <Flex
                 paddingBottom={SPACING.spacing4}
                 data-testid={`PipetteCard_display_name_${String(
                   pipetteDisplayName
                 )}`}
               >
-                <StyledText fontSize={TYPOGRAPHY.fontSizeP}>
+                <LegacyStyledText fontSize={TYPOGRAPHY.fontSizeP}>
                   {pipetteDisplayName ?? t('empty')}
-                </StyledText>
+                </LegacyStyledText>
               </Flex>
             </Flex>
           </Flex>
@@ -190,7 +198,9 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
         <>
           <Box
             ref={pipetteOverflowWrapperRef}
-            onClick={() => setShowOverflowMenu(false)}
+            onClick={() => {
+              setShowOverflowMenu(false)
+            }}
           >
             <PipetteOverflowMenu
               pipetteSpecs={pipetteModelSpecs}

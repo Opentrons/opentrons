@@ -12,7 +12,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING_AUTO,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useHost } from '@opentrons/react-api-client'
@@ -27,17 +27,15 @@ import type { IconProps } from '@opentrons/components'
 
 interface TroubleshootingProps {
   robotName: string
-  isEstopNotDisengaged: boolean
 }
 
 export function Troubleshooting({
   robotName,
-  isEstopNotDisengaged,
 }: TroubleshootingProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const robot = useRobot(robotName)
   const controlDisabled = robot?.status !== CONNECTABLE
-  const logsAvailable = robot?.health != null && robot.health.logs != null
+  const logsAvailable = robot?.health?.logs != null
   const [
     isDownloadingRobotLogs,
     setIsDownloadingRobotLogs,
@@ -49,7 +47,7 @@ export function Troubleshooting({
 
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = () => {
     setIsDownloadingRobotLogs(true)
-    const toastId = makeToast(t('downloading_logs'), INFO_TOAST, {
+    const toastId = makeToast(t('downloading_logs') as string, INFO_TOAST, {
       disableTimeout: true,
       icon: toastIcon,
     })
@@ -110,27 +108,24 @@ export function Troubleshooting({
       marginTop={SPACING.spacing24}
     >
       <Box width="70%">
-        <StyledText
+        <LegacyStyledText
           as="h3"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginBottom={SPACING.spacing20}
         >
           {t('troubleshooting')}
-        </StyledText>
-        <StyledText
+        </LegacyStyledText>
+        <LegacyStyledText
           as="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           data-testid="RobotSettings_Troubleshooting"
         >
           {t('download_logs')}
-        </StyledText>
+        </LegacyStyledText>
       </Box>
       <TertiaryButton
         disabled={
-          controlDisabled ||
-          logsAvailable == null ||
-          isDownloadingRobotLogs ||
-          isEstopNotDisengaged
+          controlDisabled || logsAvailable == null || isDownloadingRobotLogs
         }
         marginLeft={SPACING_AUTO}
         onClick={handleClick}

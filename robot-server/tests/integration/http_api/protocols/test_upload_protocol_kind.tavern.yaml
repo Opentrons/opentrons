@@ -1,0 +1,76 @@
+test_name: Upload protocol with protocol kind form data and verify response.
+
+marks:
+  - ot3_only
+  - usefixtures:
+      - ot3_server_base_url
+
+stages:
+  - name: Upload protocol marked as quick-transfer
+    request:
+      url: '{ot3_server_base_url}/protocols'
+      method: POST
+      data:
+        protocolKind: quick-transfer
+      files:
+        files: 'tests/integration/protocols/empty_ot3.json'
+    response:
+      strict:
+        - json:off
+      save:
+        json:
+          protocol_id: data.id
+          analysis_id: data.analysisSummaries[0].id
+      status_code: 201
+      json:
+        data:
+          id: !anystr
+          protocolType: json
+          protocolKind: quick-transfer
+          robotType: OT-3 Standard
+  - name: Upload protocol marked as standard
+    request:
+      url: '{ot3_server_base_url}/protocols'
+      method: POST
+      data:
+        protocolKind: standard
+      files:
+        files: '../shared-data/protocol/fixtures/8/simpleFlexV8.json'
+    response:
+      strict:
+        - json:off
+      save:
+        json:
+          protocol_id: data.id
+          analysis_id: data.analysisSummaries[0].id
+      status_code: 201
+      json:
+        data:
+          id: !anystr
+          protocolType: json
+          protocolKind: standard
+          robotType: OT-3 Standard
+            
+---
+
+test_name: Make sure we reject invalid protocol kind values.
+
+marks:
+  - ot3_only
+  - usefixtures:
+      - ot3_server_base_url
+
+
+stages:
+  - name: Upload protocol with invalid protocol kind
+    request:
+      url: '{ot3_server_base_url}/protocols'
+      method: POST
+      data:
+        protocolKind: "invalid_value"
+      files:
+        files: 'tests/integration/protocols/empty_ot3.json'
+    response:
+      strict:
+        - json:off
+      status_code: 400

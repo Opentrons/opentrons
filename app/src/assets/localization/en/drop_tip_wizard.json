@@ -32,7 +32,7 @@
   "skip": "Skip",
   "stand_back_blowing_out": "Stand back, robot is blowing out liquid",
   "stand_back_dropping_tips": "Stand back, robot is dropping tips",
-  "stand_back_exiting": "Stand back, robot is in motion",
+  "stand_back_robot_in_motion": "Stand back, robot is in motion",
   "tips_are_attached": "Tips are attached",
   "tips_may_be_attached": "Tips may be attached.",
   "yes_blow_out_liquid": "Yes, blow out liquid in labware"

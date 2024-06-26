@@ -44,8 +44,12 @@ export function MultipleModulesRow(
     moduleOnDeck?.map(module => module.slot) ?? []
   ).join(', ')
 
-  const setCurrentModule = (moduleType: ModuleType, moduleId?: string) => () =>
+  const setCurrentModule = (
+    moduleType: ModuleType,
+    moduleId?: string
+  ) => () => {
     openEditModuleModal(moduleType, moduleId)
+  }
 
   const addRemoveText = moduleOnDeck ? t('shared:remove') : t('shared:add')
 

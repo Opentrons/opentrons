@@ -7,7 +7,7 @@ import {
   Flex,
   Icon,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -26,9 +26,9 @@ export function ODDBackButton(
           width="3rem"
         />
       </Btn>
-      <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
+      <LegacyStyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
         {label}
-      </StyledText>
+      </LegacyStyledText>
     </Flex>
   )
 }

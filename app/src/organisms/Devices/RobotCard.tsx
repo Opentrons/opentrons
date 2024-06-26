@@ -16,7 +16,7 @@ import {
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
@@ -70,7 +70,9 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
       minWidth="36rem"
       padding={SPACING.spacing16}
       position={POSITION_RELATIVE}
-      onClick={() => history.push(`/devices/${robotName}`)}
+      onClick={() => {
+        history.push(`/devices/${robotName}`)
+      }}
     >
       <img
         src={robotModel === 'OT-2' ? OT2_PNG : FLEX_PNG}
@@ -129,13 +131,13 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
 
   return !isModulesQueryLoading && attachedModules.length > 0 ? (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-      <StyledText
+      <LegacyStyledText
         as="h6"
         textTransform={TYPOGRAPHY.textTransformUppercase}
         color={COLORS.grey60}
       >
         {t('modules')}
-      </StyledText>
+      </LegacyStyledText>
       <Flex>
         {attachedModules.map((module, i) => (
           <ModuleIcon
@@ -185,9 +187,9 @@ function AttachedInstruments(props: { robotName: string }): JSX.Element {
       gridGap={SPACING.spacing4}
       minWidth="24rem"
     >
-      <StyledText as="h6" color={COLORS.grey60}>
+      <LegacyStyledText as="h6" color={COLORS.grey60}>
         {t('shared:instruments')}
-      </StyledText>
+      </LegacyStyledText>
 
       {isPipetteQueryLoading || isInstrumentsQueryLoading ? null : (
         <Flex flexWrap={WRAP} gridGap={SPACING.spacing4}>

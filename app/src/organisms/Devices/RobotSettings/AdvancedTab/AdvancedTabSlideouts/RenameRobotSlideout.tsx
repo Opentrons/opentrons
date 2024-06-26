@@ -9,7 +9,7 @@ import {
   Flex,
   PrimaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'
 import {
@@ -181,9 +181,9 @@ export function RenameRobotSlideout({
             {t('rename_robot_prefer_usb_connection')}
           </Banner>
         )}
-        <StyledText as="p" marginBottom={SPACING.spacing16}>
+        <LegacyStyledText as="p" marginBottom={SPACING.spacing16}>
           {t('rename_robot_input_limitation_detail')}
-        </StyledText>
+        </LegacyStyledText>
         <Controller
           control={control}
           name="newRobotName"
@@ -204,17 +204,17 @@ export function RenameRobotSlideout({
             />
           )}
         />
-        <StyledText as="label" color={COLORS.grey50}>
+        <LegacyStyledText as="label" color={COLORS.grey50}>
           {t('characters_max')}
-        </StyledText>
+        </LegacyStyledText>
         {errors.newRobotName != null ? (
-          <StyledText
+          <LegacyStyledText
             as="label"
             color={COLORS.red50}
             marginTop={SPACING.spacing4}
           >
             {errors.newRobotName.message}
-          </StyledText>
+          </LegacyStyledText>
         ) : null}
       </Flex>
     </Slideout>

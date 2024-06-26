@@ -108,14 +108,14 @@ export function SetupTipLengthCalibrationButton({
   ) : (
     <Link
       role="link"
-      onClick={() =>
+      onClick={() => {
         tipLengthCalLauncher({
           params: { mount, tipRackDefinition },
           hasBlockModalResponse: null,
           invalidateHandler:
             offsetCalsToDelete !== undefined ? invalidateHandler : undefined,
         })
-      }
+      }}
       css={TYPOGRAPHY.labelSemiBold}
       id="TipRackCalibration_recalibrateTipRackLink"
     >
@@ -131,12 +131,12 @@ export function SetupTipLengthCalibrationButton({
         ) : (
           <>
             <TertiaryButton
-              onClick={() =>
+              onClick={() => {
                 tipLengthCalLauncher({
                   params: { mount, tipRackDefinition },
                   hasBlockModalResponse: null,
                 })
-              }
+              }}
               id="TipRackCalibration_calibrateTipRackButton"
               disabled={disabled || !isDeckCalibrated}
               {...targetProps}

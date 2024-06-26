@@ -6,7 +6,7 @@ import {
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -42,16 +42,16 @@ export function OpenJupyterControl({
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
       <Box width="70%">
-        <StyledText
+        <LegacyStyledText
           css={TYPOGRAPHY.pSemiBold}
           marginBottom={SPACING.spacing8}
           id="AdvancedSettings_About"
         >
           {t('jupyter_notebook')}
-        </StyledText>
-        <StyledText as="p" marginBottom={SPACING.spacing8}>
+        </LegacyStyledText>
+        <LegacyStyledText as="p" marginBottom={SPACING.spacing8}>
           {t('jupyter_notebook_description')}
-        </StyledText>
+        </LegacyStyledText>
         <ExternalLink href={JUPYTER_NOTEBOOK_LINK}>
           {t('jupyter_notebook_link')}
         </ExternalLink>

@@ -20,7 +20,7 @@ import {
   OVERFLOW_WRAP_ANYWHERE,
   POSITION_STICKY,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   truncateString,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -44,6 +44,7 @@ import {
   getApplyHistoricOffsets,
   getPinnedProtocolIds,
   updateConfigValue,
+  useFeatureFlag,
 } from '../../redux/config'
 import { useOffsetCandidatesForAnalysis } from '../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import {
@@ -82,7 +83,9 @@ const ProtocolHeader = ({
   const { t } = useTranslation(['protocol_info, protocol_details', 'shared'])
   const [truncate, setTruncate] = React.useState<boolean>(true)
   const [startSetup, setStartSetup] = React.useState<boolean>(false)
-  const toggleTruncate = (): void => setTruncate(value => !value)
+  const toggleTruncate = (): void => {
+    setTruncate(value => !value)
+  }
 
   let displayedTitle = title ?? null
   if (displayedTitle !== null && displayedTitle.length > 92 && truncate) {
@@ -110,7 +113,9 @@ const ProtocolHeader = ({
         <Btn
           paddingLeft="0rem"
           paddingRight={SPACING.spacing24}
-          onClick={() => history.push('/protocols')}
+          onClick={() => {
+            history.push('/protocols')
+          }}
           width="3rem"
         >
           <Icon name="back" size="3rem" color={COLORS.black90} />
@@ -131,14 +136,14 @@ const ProtocolHeader = ({
             )}
           </Flex>
           {!isProtocolFetching ? (
-            <StyledText
+            <LegacyStyledText
               as="h2"
               fontWeight={TYPOGRAPHY.fontWeightBold}
               onClick={toggleTruncate}
               overflowWrap={OVERFLOW_WRAP_ANYWHERE}
             >
               {displayedTitle}
-            </StyledText>
+            </LegacyStyledText>
           ) : (
             <ProcotolDetailsHeaderTitleSkeleton />
           )}
@@ -197,7 +202,9 @@ const ProtocolSectionTabs = ({
           <TabbedButton
             isSelected={option === currentOption}
             key={option}
-            onClick={() => setCurrentOption(option)}
+            onClick={() => {
+              setCurrentOption(option)
+            }}
           >
             {option}
           </TabbedButton>
@@ -221,20 +228,20 @@ const Summary = ({ author, description, date }: SummaryProps): JSX.Element => {
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         gridGap={SPACING.spacing4}
       >
-        <StyledText
+        <LegacyStyledText
           as="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        >{`${i18n.format(t('author'), 'capitalize')}: `}</StyledText>
-        <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+        >{`${i18n.format(t('author'), 'capitalize')}: `}</LegacyStyledText>
+        <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {author}
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
-      <StyledText
+      <LegacyStyledText
         as="p"
         color={description === null ? COLORS.grey60 : undefined}
       >
         {description ?? i18n.format(t('no_summary'), 'capitalize')}
-      </StyledText>
+      </LegacyStyledText>
       <Flex
         backgroundColor={COLORS.grey35}
         borderRadius={BORDERS.borderRadius8}
@@ -242,9 +249,9 @@ const Summary = ({ author, description, date }: SummaryProps): JSX.Element => {
         width="max-content"
         padding={`${SPACING.spacing8} ${SPACING.spacing12}`}
       >
-        <StyledText as="p">{`${t('protocol_info:date_added')}: ${
+        <LegacyStyledText as="p">{`${t('protocol_info:date_added')}: ${
           date != null ? formatTimeWithUtcLabel(date) : t('shared:no_data')
-        }`}</StyledText>
+        }`}</LegacyStyledText>
       </Flex>
     </Flex>
   )
@@ -305,15 +312,14 @@ export function ProtocolDetails(): JSX.Element | null {
     'protocol_info',
     'shared',
   ])
+  const enableCsvFile = useFeatureFlag('enableCsvFile')
   const { protocolId } = useParams<OnDeviceRouteParams>()
   const {
     missingProtocolHardware,
     conflictedSlots,
   } = useMissingProtocolHardware(protocolId)
-  const chipText = useHardwareStatusText(
-    missingProtocolHardware,
-    conflictedSlots
-  )
+  let chipText = useHardwareStatusText(missingProtocolHardware, conflictedSlots)
+
   const runTimeParameters = useRunTimeParameters(protocolId)
   const dispatch = useDispatch<Dispatch>()
   const history = useHistory()
@@ -369,13 +375,21 @@ export function ProtocolDetails(): JSX.Element | null {
 
   const { createRun } = useCreateRunMutation({
     onSuccess: data => {
-      queryClient
-        .invalidateQueries([host, 'runs'])
-        .catch((e: Error) =>
-          console.error(`could not invalidate runs cache: ${e.message}`)
-        )
+      queryClient.invalidateQueries([host, 'runs']).catch((e: Error) => {
+        console.error(`could not invalidate runs cache: ${e.message}`)
+      })
     },
   })
+
+  const isRequiredCsv =
+    mostRecentAnalysis?.result === 'parameter-value-required'
+  if (enableCsvFile && isRequiredCsv) {
+    if (chipText === 'Ready to run') {
+      chipText = i18n.format(t('requires_csv'), 'capitalize')
+    } else {
+      chipText = `${chipText} & ${t('requires_csv')}`
+    }
+  }
 
   const handlePinClick = (): void => {
     if (!pinned) {
@@ -383,11 +397,11 @@ export function ProtocolDetails(): JSX.Element | null {
         setShowMaxPinsAlert(true)
       } else {
         pinnedProtocolIds.push(protocolId)
-        makeSnackbar(t('protocol_info:pinned_protocol'))
+        makeSnackbar(t('protocol_info:pinned_protocol') as string)
       }
     } else {
       pinnedProtocolIds = pinnedProtocolIds.filter(p => p !== protocolId)
-      makeSnackbar(t('protocol_info:unpinned_protocol'))
+      makeSnackbar(t('protocol_info:unpinned_protocol') as string)
     }
     dispatch(
       updateConfigValue('protocols.pinnedProtocolIds', pinnedProtocolIds)
@@ -415,7 +429,9 @@ export function ProtocolDetails(): JSX.Element | null {
           Promise.all(referencingRunIds?.map(runId => deleteRun(host, runId)))
         )
         .then(() => deleteProtocol(host, protocolId))
-        .then(() => history.push('/protocols'))
+        .then(() => {
+          history.push('/protocols')
+        })
         .catch((e: Error) => {
           console.error(`error deleting resources: ${e.message}`)
           history.push('/protocols')
@@ -451,20 +467,24 @@ export function ProtocolDetails(): JSX.Element | null {
           {!isProtocolFetching ? (
             <Modal
               modalSize="medium"
-              onOutsideClick={() => setShowConfirmationDeleteProtocol(false)}
+              onOutsideClick={() => {
+                setShowConfirmationDeleteProtocol(false)
+              }}
               header={deleteModalHeader}
             >
               <Flex flexDirection={DIRECTION_COLUMN} width="100%">
-                <StyledText
+                <LegacyStyledText
                   as="h4"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
                   marginBottom={SPACING.spacing40}
                 >
                   {t('delete_protocol_perm', { name: displayName })}
-                </StyledText>
+                </LegacyStyledText>
                 <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
                   <SmallButton
-                    onClick={() => setShowConfirmationDeleteProtocol(false)}
+                    onClick={() => {
+                      setShowConfirmationDeleteProtocol(false)
+                    }}
                     buttonText={i18n.format(t('shared:cancel'), 'capitalize')}
                     width="50%"
                   />
@@ -490,7 +510,9 @@ export function ProtocolDetails(): JSX.Element | null {
             header={t('too_many_pins_header')}
             subText={t('too_many_pins_body')}
             buttonText={i18n.format(t('shared:close'), 'capitalize')}
-            handleCloseMaxPinsAlert={() => setShowMaxPinsAlert(false)}
+            handleCloseMaxPinsAlert={() => {
+              setShowMaxPinsAlert(false)
+            }}
           />
         )}
         {/* Empty box to detect scrolling */}
@@ -540,7 +562,9 @@ export function ProtocolDetails(): JSX.Element | null {
               buttonText={t('protocol_info:delete_protocol')}
               buttonType="alertSecondary"
               iconName="trash"
-              onClick={() => setShowConfirmationDeleteProtocol(true)}
+              onClick={() => {
+                setShowConfirmationDeleteProtocol(true)
+              }}
               width="100%"
             />
           </Flex>

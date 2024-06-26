@@ -8,7 +8,7 @@ import {
   Flex,
   RadioGroup,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -51,16 +51,16 @@ export function OT2AdvancedSettings(): JSX.Element {
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
-      <StyledText css={TYPOGRAPHY.h3SemiBold} id="OT-2_Advanced_Settings">
+      <LegacyStyledText css={TYPOGRAPHY.h3SemiBold} id="OT-2_Advanced_Settings">
         {t('ot2_advanced_settings')}
-      </StyledText>
+      </LegacyStyledText>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-        <StyledText
+        <LegacyStyledText
           css={TYPOGRAPHY.h3SemiBold}
           id="AdvancedSettings_tipLengthCalibration"
         >
           {t('tip_length_cal_method')}
-        </StyledText>
+        </LegacyStyledText>
         <RadioGroup
           useBlueChecked
           css={css`

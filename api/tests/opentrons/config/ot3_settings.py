@@ -119,7 +119,6 @@ ot3_dummy_settings = {
     "gripper_mount_offset": (1, 1, 1),
     "liquid_sense": {
         "starting_mount_height": 80,
-        "max_z_distance": 20,
         "mount_speed": 10,
         "plunger_speed": 10,
         "sensor_threshold_pascals": 17,
@@ -134,6 +133,8 @@ ot3_dummy_settings = {
                 "max_overrun_distance_mm": 2,
                 "speed_mm_per_s": 3,
                 "sensor_threshold_pf": 4,
+                "output_option": OutputOptions.sync_only,
+                "data_files": None,
             },
         },
         "edge_sense": {
@@ -144,6 +145,8 @@ ot3_dummy_settings = {
                 "max_overrun_distance_mm": 5,
                 "speed_mm_per_s": 6,
                 "sensor_threshold_pf": 7,
+                "output_option": OutputOptions.sync_only,
+                "data_files": None,
             },
             "search_initial_tolerance_mm": 18,
             "search_iteration_limit": 3,

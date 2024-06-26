@@ -177,7 +177,6 @@ def _get_liquid_probe_settings(
     ][cfg.tip_volume]
     return LiquidProbeSettings(
         starting_mount_height=well.top().point.z,
-        max_z_distance=min(well.depth, lqid_cfg["max_z_distance"]),
         mount_speed=lqid_cfg["mount_speed"],
         plunger_speed=lqid_cfg["plunger_speed"],
         sensor_threshold_pascals=lqid_cfg["sensor_threshold_pascals"],

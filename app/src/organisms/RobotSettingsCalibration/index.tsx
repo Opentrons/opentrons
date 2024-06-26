@@ -6,7 +6,7 @@ import {
   AlertModal,
   SPACING,
   SpinnerModalPage,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 import {
   useAllPipetteOffsetCalibrationsQuery,
@@ -301,13 +301,15 @@ export function RobotSettingsCalibration({
                 },
               ]}
             >
-              <StyledText>{t('deck_calibration_error_occurred')}</StyledText>
-              <StyledText>
+              <LegacyStyledText>
+                {t('deck_calibration_error_occurred')}
+              </LegacyStyledText>
+              <LegacyStyledText>
                 {createRequest != null &&
                   'error' in createRequest &&
                   createRequest.error != null &&
                   RobotApi.getErrorResponseMessage(createRequest.error)}
-              </StyledText>
+              </LegacyStyledText>
             </AlertModal>
           )}
         </>,
@@ -315,7 +317,9 @@ export function RobotSettingsCalibration({
       )}
       {showHowCalibrationWorksModal ? (
         <HowCalibrationWorksModal
-          onCloseClick={() => setShowHowCalibrationWorksModal(false)}
+          onCloseClick={() => {
+            setShowHowCalibrationWorksModal(false)
+          }}
         />
       ) : null}
       {isFlex ? (

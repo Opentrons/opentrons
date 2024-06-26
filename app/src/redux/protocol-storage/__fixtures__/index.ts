@@ -11,6 +11,26 @@ export const storedProtocolData: StoredProtocolData = {
   modified: 123456789,
 }
 
+export const storedProtocolDataWithCsvRunTimeParameter: StoredProtocolData = {
+  protocolKey: 'protocolKeyStub',
+  mostRecentAnalysis: ({
+    ...simpleAnalysisFileFixture,
+    runTimeParameters: [
+      ...simpleAnalysisFileFixture.runTimeParameters,
+      {
+        displayName: 'mock csv rtp',
+        variable_name: 'my_csv_param',
+        description: '',
+        type: 'csv_file',
+        file: null,
+      },
+    ],
+  } as any) as ProtocolAnalysisOutput,
+  srcFileNames: ['fakeSrcFileName'],
+  srcFiles: ['fakeSrcFile' as any],
+  modified: 123456789,
+}
+
 export const storedProtocolDataWithoutRunTimeParameters: StoredProtocolData = {
   protocolKey: 'protocolKeyStub',
   mostRecentAnalysis: ({

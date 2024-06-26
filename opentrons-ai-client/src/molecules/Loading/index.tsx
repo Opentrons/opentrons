@@ -7,7 +7,7 @@ import {
   Icon,
   JUSTIFY_CENTER,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 export function Loading(): JSX.Element {
@@ -20,7 +20,7 @@ export function Loading(): JSX.Element {
       gridGap={SPACING.spacing16}
       height="100vh"
     >
-      <StyledText as="h3">{t('loading')}</StyledText>
+      <LegacyStyledText as="h3">{t('loading')}</LegacyStyledText>
       <Icon name="ot-spinner" size="3rem" spin />
     </Flex>
   )

@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Flex,
-  StyledText,
+  LegacyStyledText,
   SPACING,
   TYPOGRAPHY,
   DIRECTION_COLUMN,
@@ -39,7 +39,9 @@ export function TipManagement(props: TipManagementProps): JSX.Element | null {
     {
       option: t('change_tip'),
       value: t(`${state.changeTip}`),
-      onClick: () => setSelectedSetting('change_tip'),
+      onClick: () => {
+        setSelectedSetting('change_tip')
+      },
     },
     {
       option: t('tip_drop_location'),
@@ -50,7 +52,9 @@ export function TipManagement(props: TipManagementProps): JSX.Element | null {
             : 'wasteChute'
         }`
       ),
-      onClick: () => setSelectedSetting('tip_drop_location'),
+      onClick: () => {
+        setSelectedSetting('tip_drop_location')
+      },
     },
   ]
 
@@ -68,17 +72,20 @@ export function TipManagement(props: TipManagementProps): JSX.Element | null {
               onClick={displayItem.onClick}
             >
               <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
-                <StyledText css={TYPOGRAPHY.level4HeaderSemiBold} width="20rem">
+                <LegacyStyledText
+                  css={TYPOGRAPHY.level4HeaderSemiBold}
+                  width="20rem"
+                >
                   {displayItem.option}
-                </StyledText>
+                </LegacyStyledText>
                 <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
-                  <StyledText
+                  <LegacyStyledText
                     css={TYPOGRAPHY.level4HeaderRegular}
                     color={COLORS.grey60}
                     textAlign={TEXT_ALIGN_RIGHT}
                   >
                     {displayItem.value}
-                  </StyledText>
+                  </LegacyStyledText>
                   <Icon name="more" size={SIZE_2} />
                 </Flex>
               </Flex>
@@ -89,14 +96,18 @@ export function TipManagement(props: TipManagementProps): JSX.Element | null {
         <ChangeTip
           state={state}
           dispatch={dispatch}
-          onBack={() => setSelectedSetting(null)}
+          onBack={() => {
+            setSelectedSetting(null)
+          }}
         />
       ) : null}
       {selectedSetting === 'tip_drop_location' ? (
         <TipDropLocation
           state={state}
           dispatch={dispatch}
-          onBack={() => setSelectedSetting(null)}
+          onBack={() => {
+            setSelectedSetting(null)
+          }}
         />
       ) : null}
     </Flex>

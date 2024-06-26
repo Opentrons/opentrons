@@ -8,6 +8,7 @@ import {
   MOVABLE_TRASH_ADDRESSABLE_AREAS,
   WASTE_CHUTE_ADDRESSABLE_AREAS,
   FIXED_TRASH_ID,
+  ABSORBANCE_READER_TYPE,
 } from '@opentrons/shared-data'
 import { SPAN7_8_10_11_SLOT } from '../constants'
 import { getStagingAreaAddressableAreas } from '../utils'
@@ -28,6 +29,7 @@ export const SUPPORTED_MODULE_TYPES: ModuleType[] = [
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  ABSORBANCE_READER_TYPE,
 ]
 type SupportedSlotMap = Record<ModuleType, DropdownOption[]>
 export const SUPPORTED_MODULE_SLOTS_OT2: SupportedSlotMap = {
@@ -61,6 +63,7 @@ export const SUPPORTED_MODULE_SLOTS_OT2: SupportedSlotMap = {
       value: '1',
     },
   ],
+  [ABSORBANCE_READER_TYPE]: [],
 }
 export const SUPPORTED_MODULE_SLOTS_FLEX: SupportedSlotMap = {
   [MAGNETIC_MODULE_TYPE]: [
@@ -91,6 +94,12 @@ export const SUPPORTED_MODULE_SLOTS_FLEX: SupportedSlotMap = {
     {
       name: 'Slot D2',
       value: 'D2',
+    },
+  ],
+  [ABSORBANCE_READER_TYPE]: [
+    {
+      name: 'Slot D3',
+      value: 'D3',
     },
   ],
 }

@@ -137,6 +137,7 @@ update-server/LICENSE
 shared-data/python/LICENSE
 shared-data/LICENSE
 robot-server/LICENSE
+performance-metrics/LICENSE
 
 # typescript incremental files
 *.tsbuildinfo
@@ -160,4 +161,5 @@ opentrons-robot-app.tar.gz
 # asdf versions file
 .tool-versions
 mock_dir
+.npm-cache/
 .eslintcache

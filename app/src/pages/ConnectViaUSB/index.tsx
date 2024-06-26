@@ -14,7 +14,7 @@ import {
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useConnectionsQuery } from '@opentrons/react-api-client'
@@ -49,7 +49,9 @@ export function ConnectViaUSB(): JSX.Element {
         >
           <Btn
             left="0"
-            onClick={() => history.push('/network-setup')}
+            onClick={() => {
+              history.push('/network-setup')
+            }}
             position={POSITION_ABSOLUTE}
           >
             <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
@@ -61,9 +63,9 @@ export function ConnectViaUSB(): JSX.Element {
             </Flex>
           </Btn>
           <Flex>
-            <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
+            <LegacyStyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
               {t('usb')}
-            </StyledText>
+            </LegacyStyledText>
           </Flex>
         </Flex>
         {isConnected ? (
@@ -84,21 +86,26 @@ export function ConnectViaUSB(): JSX.Element {
                 flexDirection={DIRECTION_COLUMN}
                 gridGap={SPACING.spacing4}
               >
-                <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+                <LegacyStyledText
+                  as="h3"
+                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                >
                   {t('successfully_connected')}
-                </StyledText>
-                <StyledText
+                </LegacyStyledText>
+                <LegacyStyledText
                   as="h4"
                   color={COLORS.grey60}
                   textAlign={TYPOGRAPHY.textAlignCenter}
                 >
                   {t('branded:find_your_robot')}
-                </StyledText>
+                </LegacyStyledText>
               </Flex>
             </Flex>
             <MediumButton
               buttonText={i18n.format(t('shared:continue'), 'capitalize')}
-              onClick={() => history.push('/emergency-stop')}
+              onClick={() => {
+                history.push('/emergency-stop')
+              }}
             />
           </Flex>
         ) : (
@@ -119,23 +126,26 @@ export function ConnectViaUSB(): JSX.Element {
               gridGap={SPACING.spacing4}
               justifyContent={JUSTIFY_CENTER}
             >
-              <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+              <LegacyStyledText
+                as="h3"
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              >
                 {t('no_connection_found')}
-              </StyledText>
+              </LegacyStyledText>
               <Flex
                 alignItems={ALIGN_CENTER}
                 flexDirection={DIRECTION_COLUMN}
                 gridGap={SPACING.spacing8}
               >
-                <StyledText as="h4" color={COLORS.grey60}>
+                <LegacyStyledText as="h4" color={COLORS.grey60}>
                   {t('connect_via_usb_description_1')}
-                </StyledText>
-                <StyledText as="h4" color={COLORS.grey60}>
+                </LegacyStyledText>
+                <LegacyStyledText as="h4" color={COLORS.grey60}>
                   {t('connect_via_usb_description_2')}
-                </StyledText>
-                <StyledText as="h4" color={COLORS.grey60}>
+                </LegacyStyledText>
+                <LegacyStyledText as="h4" color={COLORS.grey60}>
                   {t('branded:connect_via_usb_description_3')}
-                </StyledText>
+                </LegacyStyledText>
               </Flex>
             </Flex>
           </Flex>

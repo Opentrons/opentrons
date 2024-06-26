@@ -672,6 +672,50 @@
           "zDimension": 0
         },
         "displayName": "Magnetic Block in A3"
+      },
+      {
+        "id": "absorbanceReaderV1D3",
+        "areaType": "absorbanceReader",
+        "offsetFromCutoutFixture": [0.0, 0.0, 10.65],
+        "boundingBox": {
+          "xDimension": 127.8,
+          "yDimension": 85.5,
+          "zDimension": 0
+        },
+        "displayName": "Absorbance Reader in D3"
+      },
+      {
+        "id": "absorbanceReaderV1C3",
+        "areaType": "absorbanceReader",
+        "offsetFromCutoutFixture": [0.0, 0.0, 10.65],
+        "boundingBox": {
+          "xDimension": 127.8,
+          "yDimension": 85.5,
+          "zDimension": 0
+        },
+        "displayName": "Absorbance Reader in C3"
+      },
+      {
+        "id": "absorbanceReaderV1B3",
+        "areaType": "absorbanceReader",
+        "offsetFromCutoutFixture": [0.0, 0.0, 10.65],
+        "boundingBox": {
+          "xDimension": 127.8,
+          "yDimension": 85.5,
+          "zDimension": 0
+        },
+        "displayName": "Absorbance Reader in B3"
+      },
+      {
+        "id": "absorbanceReaderV1A3",
+        "areaType": "absorbanceReader",
+        "offsetFromCutoutFixture": [0.0, 0.0, 10.65],
+        "boundingBox": {
+          "xDimension": 127.8,
+          "yDimension": 85.5,
+          "zDimension": 0
+        },
+        "displayName": "Absorbance Reader in A3"
       }
     ],
     "cutouts": [
@@ -1023,6 +1067,20 @@
       },
       "fixtureGroup": {},
       "height": 38.0
+    },
+    {
+      "id": "absorbanceReaderV1",
+      "expectOpentronsModuleSerialNumber": true,
+      "mayMountTo": ["cutoutD3", "cutoutC3", "cutoutB3", "cutoutA3"],
+      "displayName": "Slot With an Absorbance Reader and a Lid Dock",
+      "providesAddressableAreas": {
+        "cutoutD3": ["absorbanceReaderV1D3"],
+        "cutoutC3": ["absorbanceReaderV1C3"],
+        "cutoutB3": ["absorbanceReaderV1B3"],
+        "cutoutA3": ["absorbanceReaderV1A3"]
+      },
+      "fixtureGroup": {},
+      "height": 10.65
     }
   ],
   "gripperOffsets": {

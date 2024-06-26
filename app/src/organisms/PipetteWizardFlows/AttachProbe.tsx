@@ -6,7 +6,7 @@ import {
   Flex,
   RESPONSIVENESS,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { LEFT, WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
@@ -77,7 +77,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
       {
         commandType: 'verifyTipPresence',
         params: {
-          pipetteId: pipetteId,
+          pipetteId,
           expectedState: 'present',
           followSingularSensor: 'primary',
         },
@@ -87,7 +87,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
       {
         commandType: 'home' as const,
         params: {
-          axes: axes,
+          axes,
         },
       },
       {
@@ -99,13 +99,13 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
       {
         commandType: 'calibration/calibratePipette' as const,
         params: {
-          mount: mount,
+          mount,
         },
       },
       {
         commandType: 'calibration/moveToMaintenancePosition' as const,
         params: {
-          mount: mount,
+          mount,
         },
       },
     ]
@@ -116,7 +116,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
             proceed()
           })
           .catch(error => {
-            setShowErrorMessage(error.message)
+            setShowErrorMessage(error.message as string)
           })
       })
       .catch((e: Error) => {
@@ -167,10 +167,10 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
         }
       >
         {isExiting ? undefined : (
-          <Flex marginX={isOnDevice ? '4.5rem' : '8.5625rem'}>
-            <StyledText css={IN_PROGRESS_STYLE}>
+          <Flex marginX={Boolean(isOnDevice) ? '4.5rem' : '8.5625rem'}>
+            <LegacyStyledText css={IN_PROGRESS_STYLE}>
               {t('calibration_probe_touching', { slotNumber: calSlotNum })}
-            </StyledText>
+            </LegacyStyledText>
           </Flex>
         )}
       </InProgressModal>
@@ -195,9 +195,12 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
           i18nKey={'return_probe_error'}
           values={{ error: errorMessage }}
           components={{
-            block: <StyledText as="p" />,
+            block: <LegacyStyledText as="p" />,
             bold: (
-              <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold} />
+              <LegacyStyledText
+                as="p"
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              />
             ),
           }}
         />
@@ -212,7 +215,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
       })}
       bodyText={
         <>
-          <StyledText css={BODY_STYLE}>
+          <LegacyStyledText css={BODY_STYLE}>
             <Trans
               t={t}
               i18nKey={'install_probe'}
@@ -221,14 +224,16 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
                 bold: <strong />,
               }}
             />
-          </StyledText>
+          </LegacyStyledText>
           {is96Channel && (
             <Banner
-              type={isWasteChuteOnDeck ? 'error' : 'warning'}
-              size={isOnDevice ? '1.5rem' : '1rem'}
-              marginTop={isOnDevice ? SPACING.spacing24 : SPACING.spacing16}
+              type={Boolean(isWasteChuteOnDeck) ? 'error' : 'warning'}
+              size={Boolean(isOnDevice) ? '1.5rem' : '1rem'}
+              marginTop={
+                Boolean(isOnDevice) ? SPACING.spacing24 : SPACING.spacing16
+              }
             >
-              {isWasteChuteOnDeck
+              {Boolean(isWasteChuteOnDeck)
                 ? t('waste_chute_error')
                 : t('waste_chute_warning')}
             </Banner>

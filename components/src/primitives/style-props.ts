@@ -57,6 +57,7 @@ const FLEXBOX_PROPS = [
   'flexWrap',
   'alignSelf',
   'whiteSpace',
+  'gap',
 ] as const
 
 const GRID_PROPS = [
@@ -192,4 +193,4 @@ export const styleProps = (props: Types.StyleProps): CSSObject => ({
 })
 
 export const isntStyleProp = (prop: string | React.ReactText): boolean =>
-  !STYLE_PROPS.includes(prop as any)
+  !STYLE_PROPS.includes(prop as typeof STYLE_PROPS[number])

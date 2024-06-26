@@ -26,12 +26,14 @@ stages:
               role: main
           createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
           robotType: OT-3 Standard
+          protocolKind: standard
           metadata:
             protocolName: Deck Coordinate PAPIv2 Test
           analyses: []
           analysisSummaries:
             - id: !anystr
               status: pending
+              runTimeParameters: []
   - name: Retry until analyses status is completed and result is ok.
     max_retries: 10
     delay_after: 0.1

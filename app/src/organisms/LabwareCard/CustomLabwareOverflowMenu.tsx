@@ -19,7 +19,7 @@ import {
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   useConditionalConfirm,
   useOnClickOutside,
@@ -52,7 +52,9 @@ export function CustomLabwareOverflowMenu(
   const dispatch = useDispatch<Dispatch>()
   const [showOverflowMenu, setShowOverflowMenu] = React.useState<boolean>(false)
   const overflowMenuRef = useOnClickOutside<HTMLDivElement>({
-    onClickOutside: () => setShowOverflowMenu(false),
+    onClickOutside: () => {
+      setShowOverflowMenu(false)
+    },
   })
   const trackEvent = useTrackEvent()
 
@@ -124,14 +126,14 @@ export function CustomLabwareOverflowMenu(
           <MenuItem onClick={handleClickDelete}>{t('delete')}</MenuItem>
           <Divider />
           <MenuItem onClick={handleClickLabwareCreator}>
-            <StyledText css={TYPOGRAPHY.linkPSemiBold}>
+            <LegacyStyledText css={TYPOGRAPHY.linkPSemiBold}>
               {t('open_labware_creator')}
               <Icon
                 name="open-in-new"
                 height="10px"
                 marginLeft={SPACING.spacing6}
               />
-            </StyledText>
+            </LegacyStyledText>
           </MenuItem>
         </Flex>
       )}
@@ -143,10 +145,12 @@ export function CustomLabwareOverflowMenu(
             onClose={handleCancelModal}
           >
             <Flex flexDirection={DIRECTION_COLUMN}>
-              <StyledText as="p">{t('def_moved_to_trash')}</StyledText>
-              <StyledText as="p" paddingTop={SPACING.spacing8}>
+              <LegacyStyledText as="p">
+                {t('def_moved_to_trash')}
+              </LegacyStyledText>
+              <LegacyStyledText as="p" paddingTop={SPACING.spacing8}>
                 {t('cannot-run-python-missing-labware')}
-              </StyledText>
+              </LegacyStyledText>
               <Flex
                 justifyContent={JUSTIFY_FLEX_END}
                 alignItems={ALIGN_CENTER}
