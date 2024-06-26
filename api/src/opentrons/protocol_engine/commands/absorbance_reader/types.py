@@ -21,4 +21,3 @@ class MoveLidResult(BaseModel):
             " so the default of (0, 0, 0) will be used."
         ),
     )
-

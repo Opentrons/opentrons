@@ -11,8 +11,10 @@ from opentrons.protocol_engine.types import (
     LabwareOffsetVector,
     LabwareMovementOffsetData,
     AddressableAreaLocation,
+    ModuleLocation,
 )
 from opentrons.protocol_engine.resources import labware_validation
+from .types import MoveLidResult
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.state import StateView
@@ -41,22 +43,8 @@ class CloseLidParams(BaseModel):
     )
 
 
-class CloseLidResult(BaseModel):
+class CloseLidResult(MoveLidResult):
     """Result data from closing the lid on an aborbance reading."""
-
-    offsetId: Optional[str] = Field(
-        # Default `None` instead of `...` so this field shows up as non-required in
-        # OpenAPI. The server is allowed to omit it or make it null.
-        None,
-        description=(
-            "An ID referencing the labware offset that will apply to this labware"
-            " now that it's in the new location."
-            " This offset will be in effect until the labware is moved"
-            " with another `moveLabware` command."
-            " Null or undefined means no offset applies,"
-            " so the default of (0, 0, 0) will be used."
-        ),
-    )
 
 
 class CloseLidImpl(
@@ -106,7 +94,8 @@ class CloseLidImpl(
         )
 
         # we need to move the lid onto the module
-        new_location = self._state_view.modules.get_location(mod_substate.module_id)
+        new_location = ModuleLocation(moduleId=mod_substate.module_id)
+        # new_location = self._state_view.modules.get_location(mod_substate.module_id)
         validated_new_location = (
             self._state_view.geometry.ensure_valid_gripper_location(new_location)
         )
@@ -131,7 +120,9 @@ class CloseLidImpl(
             labware_location=new_location,
         )
         return SuccessData(
-            public=CloseLidResult(offsetId=new_offset_id),
+            public=CloseLidResult(
+                lidId=loaded_lid.id, newLocation=new_location, offsetId=new_offset_id
+            ),
             private=None,
         )
 

@@ -1,5 +1,5 @@
 """Command models for Absorbance Reader commands."""
-from typing import Union
+from .types import MoveLidResult
 from .close_lid import (
     CloseLidCommandType,
     CloseLidParams,
@@ -32,9 +32,9 @@ from .measure import (
     MeasureAbsorbanceCreate,
 )
 
-MoveLidResult = Union[CloseLidResult, OpenLidResult]
 
 __all__ = [
+    "MoveLidResult",
     # absorbanace_reader/closeLid
     "CloseLidCommandType",
     "CloseLidParams",
@@ -60,5 +60,4 @@ __all__ = [
     "MeasureAbsorbance",
     "MeasureAbsorbanceCreate",
     # union type
-    "MoveLidResult",
 ]

@@ -47,6 +47,7 @@ from ..types import (
     HeaterShakerMovementRestrictors,
     DeckType,
     LabwareMovementOffsetData,
+    AddressableAreaLocation,
 )
 from .addressable_areas import AddressableAreaView
 from .. import errors
@@ -1318,3 +1319,8 @@ class ModuleView(HasState[ModuleState]):
         """Get the location where the lid of a module is docked, if available."""
         lid_slot = self.get_lid_dock_slot(module_id)
         return StagingSlotLocation(slotName=lid_slot)
+
+    def get_lid_dock_location_area(self, module_id: str) -> AddressableAreaLocation:
+        """Get the addressable area where the lid of a module is docked, if available."""
+        lid_slot = self.get_lid_dock_slot(module_id)
+        return AddressableAreaLocation(addressableAreaName=lid_slot.id)

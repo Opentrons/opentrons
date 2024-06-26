@@ -12,6 +12,7 @@ from opentrons.protocol_engine.types import (
     LabwareMovementOffsetData,
     AddressableAreaLocation,
 )
+from .types import MoveLidResult
 from opentrons.protocol_engine.resources import labware_validation
 
 if TYPE_CHECKING:
@@ -41,22 +42,8 @@ class OpenLidParams(BaseModel):
     )
 
 
-class OpenLidResult(BaseModel):
+class OpenLidResult(MoveLidResult):
     """Result data from opening the lid on an aborbance reading."""
-
-    offsetId: Optional[str] = Field(
-        # Default `None` instead of `...` so this field shows up as non-required in
-        # OpenAPI. The server is allowed to omit it or make it null.
-        None,
-        description=(
-            "An ID referencing the labware offset that will apply to this labware"
-            " now that it's in the new location."
-            " This offset will be in effect until the labware is moved"
-            " with another `moveLabware` command."
-            " Null or undefined means no offset applies,"
-            " so the default of (0, 0, 0) will be used."
-        ),
-    )
 
 
 class OpenLidImpl(AbstractCommandImpl[OpenLidParams, SuccessData[OpenLidResult, None]]):
@@ -95,7 +82,7 @@ class OpenLidImpl(AbstractCommandImpl[OpenLidParams, SuccessData[OpenLidResult, 
         )
 
         # we need to move the lid to the lid dock
-        new_location = self._state_view.modules.get_lid_dock_location(
+        new_location = self._state_view.modules.get_lid_dock_location_area(
             mod_substate.module_id
         )
         validated_new_location = (
@@ -119,7 +106,11 @@ class OpenLidImpl(AbstractCommandImpl[OpenLidParams, SuccessData[OpenLidResult, 
             labware_location=new_location,
         )
         return SuccessData(
-            public=OpenLidResult(offsetId=new_offset_id),
+            public=OpenLidResult(
+                lidId=loaded_lid.id,
+                newLocation=validated_new_location,
+                offsetId=new_offset_id,
+            ),
             private=None,
         )
 
