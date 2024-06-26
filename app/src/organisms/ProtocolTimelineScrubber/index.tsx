@@ -16,7 +16,6 @@ import {
   TYPOGRAPHY,
   LegacyStyledText,
   BaseDeck,
-  getLabwareInfoByLiquidId,
   PrimaryButton,
 } from '@opentrons/components'
 import { getResultingTimelineFrameFromRunCommands } from '@opentrons/step-generation'
@@ -26,8 +25,11 @@ import {
   getSimplestDeckConfigForProtocol,
 } from '@opentrons/shared-data'
 import { getCommandTextData } from '../../molecules/Command/utils/getCommandTextData'
-import { getWellFillFromLabwareId } from '../Devices/ProtocolRun/SetupLiquids/utils'
 import { CommandText } from '../../molecules/Command'
+import {
+  getAllWellContentsForActiveItem,
+  wellFillFromWellContents,
+} from './utils'
 
 import type {
   CompletedProtocolAnalysis,
@@ -120,6 +122,14 @@ export function ProtocolTimelineScrubber(
       ? invariantContext.pipetteEntities[rightPipetteId]
       : null
 
+  const allWellContentsForActiveItem = getAllWellContentsForActiveItem(
+    invariantContext.labwareEntities,
+    frame
+  )
+  const liquidDisplayColors = analysis.liquids.map(
+    liquid => liquid.displayColor ?? 'blue'
+  )
+
   return (
     <Flex
       height="95vh"
@@ -182,25 +192,24 @@ export function ProtocolTimelineScrubber(
                       .def
                   : null
               let nestedDef
-              let nestedFill
+              let labwareId = null
               if (labwareDef != null && labwareTempProperties != null) {
+                labwareId = labwareTempProperties[0]
                 nestedDef = labwareDef
-                nestedFill = getWellFillFromLabwareId(
-                  labwareTempProperties[0],
-                  analysis.liquids,
-                  getLabwareInfoByLiquidId(currentCommandsSlice)
-                )
               } else if (labwareInModuleId != null) {
-                nestedFill = getWellFillFromLabwareId(
-                  labwareInModuleId,
-                  analysis.liquids,
-                  getLabwareInfoByLiquidId(currentCommandsSlice)
-                )
+                labwareId = labwareInModuleId
                 nestedDef =
                   invariantContext.labwareEntities[labwareInModuleId]?.def
               }
 
-              //  TODO figure out liquid state for well fill so the well fill updates
+              const wellContents =
+                allWellContentsForActiveItem && labwareId != null
+                  ? allWellContentsForActiveItem[labwareId]
+                  : null
+              const nestedFill = wellFillFromWellContents(
+                wellContents,
+                liquidDisplayColors
+              )
 
               return {
                 moduleModel: invariantContext.moduleEntities[moduleId].model,
@@ -226,14 +235,18 @@ export function ProtocolTimelineScrubber(
               const labwareLocation: LabwareLocation = {
                 slotName: labware.slot,
               }
+              const wellContents =
+                allWellContentsForActiveItem && labwareId != null
+                  ? allWellContentsForActiveItem[labwareId]
+                  : null
+              const wellFill = wellFillFromWellContents(
+                wellContents,
+                liquidDisplayColors
+              )
               const labwareOnDeck: LabwareOnDeck = {
                 labwareLocation,
                 definition,
-                wellFill: getWellFillFromLabwareId(
-                  labwareId,
-                  analysis.liquids,
-                  getLabwareInfoByLiquidId(currentCommandsSlice)
-                ),
+                wellFill,
                 missingTips,
               }
 

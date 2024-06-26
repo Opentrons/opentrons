@@ -12,7 +12,7 @@ import type {
   RobotStateAndWarnings,
 } from '../types'
 
-type RunCommandTimelineFrame = RobotStateAndWarnings & {
+export type RunCommandTimelineFrame = RobotStateAndWarnings & {
   command: RunTimeCommand
 }
 
@@ -65,7 +65,6 @@ export function getResultingTimelineFrameFromRunCommands(
     },
     {}
   )
-  console.log('labwareLocation', labwareLocations)
   const moduleLocations = commands.reduce<RobotState['modules']>(
     (acc, command) => {
       if (command.commandType === 'loadModule' && command.result != null) {

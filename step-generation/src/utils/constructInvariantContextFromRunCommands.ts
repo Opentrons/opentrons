@@ -83,7 +83,6 @@ export function constructInvariantContextFromRunCommands(
             id: command.params.pipetteId,
             tiprackLabwareDef:
               tiprackLabwareDef != null ? [tiprackLabwareDef] : [],
-            //  todo: we support multipel tiprack def uris per pipette entities now
             tiprackDefURI:
               tiprackLabwareDef != null
                 ? [getLabwareDefURI(tiprackLabwareDef)]
