@@ -186,7 +186,11 @@ export function ProtocolSetupParameters({
                   status={
                     parameter.type === 'csv_file' ? 'not ready' : 'inform'
                   }
-                  title={parameter.displayName}
+                  title={
+                    parameter.type === 'csv_file'
+                      ? t('csv_file')
+                      : parameter.displayName
+                  }
                   onClickSetupStep={() => {
                     handleSetParameter(parameter)
                   }}
