@@ -265,6 +265,6 @@ def test_get_pipette_static_config(
         pipette_lld_settings={
             "t50": {"minHeight": 0.5, "minVolume": 0},
             "t200": {"minHeight": 0.5, "minVolume": 0},
-            "t1000": {"minHeight": 0.5, "minVolume": 0}
-            }, 
+            "t1000": {"minHeight": 0.5, "minVolume": 0},
+        },
     )
