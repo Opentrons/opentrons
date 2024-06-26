@@ -333,8 +333,19 @@ class AddressableAreaView(HasState[AddressableAreaState]):
 
     @cached_property
     def deck_extents(self) -> Point:
-        extents = self.state.deck_definition.robot.extents
+        """The maximum space on the deck."""
+        extents = self._state.deck_definition["robot"]["extents"]
         return Point(x=extents[0], y=extents[1], z=extents[2])
+
+    @cached_property
+    def mount_offsets(self) -> Dict[str, Point]:
+        """The left and right mount offsets of the robot."""
+        left_offset = self.state.deck_definition["robot"]["mountOffsets"]["left"]
+        right_offset = self.state.deck_definition["robot"]["mountOffsets"]["right"]
+        return {
+            "left": Point(x=left_offset[0], y=left_offset[1], z=left_offset[2]),
+            "right": Point(x=right_offset[0], y=right_offset[1], z=right_offset[2]),
+        }
 
     def get_addressable_area(self, addressable_area_name: str) -> AddressableArea:
         """Get addressable area."""
