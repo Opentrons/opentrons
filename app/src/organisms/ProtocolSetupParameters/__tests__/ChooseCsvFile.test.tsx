@@ -8,6 +8,7 @@ import { EmptyFile } from '../EmptyFile'
 import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
 import { getLocalRobot } from '../../../redux/discovery'
 import { getFilePaths } from '../../../redux/shell'
+import { useAllCsvFilesQuery } from '@opentrons/react-api-client'
 import { ChooseCsvFile } from '../ChooseCsvFile'
 
 import type { CsvFileParameter } from '@opentrons/shared-data'
@@ -20,6 +21,7 @@ const mockHandleGoBack = vi.fn()
 const mockSetParameter = vi.fn()
 const mockParameter: CsvFileParameter = {} as any
 const mockSetFileInfo = vi.fn()
+const PROTOCOL_ID = 'fake_protocol_id'
 const mockUsbData = {
   type: 'shell:SEND_FILE_PATHS',
   payload: {
@@ -49,6 +51,7 @@ describe('ChooseCsvFile', () => {
   let props: React.ComponentProps<typeof ChooseCsvFile>
   beforeEach(() => {
     props = {
+      protocolId: PROTOCOL_ID,
       handleGoBack: mockHandleGoBack,
       parameter: mockParameter,
       setParameter: mockSetParameter,
@@ -58,6 +61,7 @@ describe('ChooseCsvFile', () => {
     vi.mocked(getLocalRobot).mockReturnValue(mockConnectedRobot)
     vi.mocked(EmptyFile).mockReturnValue(<div>mock EmptyFile</div>)
     vi.mocked(getFilePaths).mockReturnValue(mockUsbData)
+    vi.mocked(useAllCsvFilesQuery)
   })
   it('should render text and buttons', () => {
     render(props)
