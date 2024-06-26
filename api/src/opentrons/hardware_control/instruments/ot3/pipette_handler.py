@@ -235,6 +235,7 @@ class OT3PipetteHandler:
                 "default_dispense_flow_rates",
                 "back_compat_names",
                 "supported_tips",
+                "lld_settings"
             ]
 
             instr_dict = instr.as_dict()
@@ -279,6 +280,7 @@ class OT3PipetteHandler:
             result[
                 "pipette_bounding_box_offsets"
             ] = instr.config.pipette_bounding_box_offsets
+            result["lld_settings"] = instr.config.lld_settings
         return cast(PipetteDict, result)
 
     @property
