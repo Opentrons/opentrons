@@ -6074,14 +6074,14 @@
   },
   "errors": [
     {
-      "detail": "PartialTipMovementNotAllowedError [line 28]: Error 2004 MOTION_PLANNING_FAILURE (PartialTipMovementNotAllowedError): Moving to NEST 96 Well Plate 200 µL Flat in slot A2 with A12 nozzle partial configuration will result in collision with thermocycler lid in deck slot A1.",
+      "detail": "PartialTipMovementNotAllowedError [line 28]: Error 2004 MOTION_PLANNING_FAILURE (PartialTipMovementNotAllowedError): Requested motion with the A12 nozzle partial configuration is outside of robot bounds for the pipette.",
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
       "isDefined": false,
       "wrappedErrors": [
         {
-          "detail": "Moving to NEST 96 Well Plate 200 µL Flat in slot A2 with A12 nozzle partial configuration will result in collision with thermocycler lid in deck slot A1.",
+          "detail": "Requested motion with the A12 nozzle partial configuration is outside of robot bounds for the pipette.",
           "errorCode": "2004",
           "errorInfo": {},
           "errorType": "PartialTipMovementNotAllowedError",
