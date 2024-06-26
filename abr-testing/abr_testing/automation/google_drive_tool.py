@@ -197,6 +197,27 @@ class google_drive:
             fileId=file_id, body=new_permission, transferOwnership=False  # type: ignore
         ).execute()
 
+    def download_single_file(
+        self, save_directory: str, file_id: str, file_name: str, mime_type: str
+    ) -> str:
+        """Download single file."""
+        # google sheets: text/csv
+        file_path = ""
+        if mime_type:
+            request = self.drive_service.files().export_media(
+                fileId=file_id, mimeType=mime_type
+            )
+        else:
+            request = self.drive_service.files().get_media(fileId=file_id)
+        file_path = os.path.join(save_directory, file_name)
+        fh = io.FileIO(file_path, "wb")
+        downloader = MediaIoBaseDownload(fh, request)
+        done = False
+        while done is False:
+            status, done = downloader.next_chunk()
+            print(f"Downloading {file_name}... {int(status.progress() * 100)}%")
+        return file_path
+
     def download_files(
         self, files_to_download: List[Dict[str, Any]], save_directory: str
     ) -> None:
