@@ -84,6 +84,7 @@ class PipetteDict(InstrumentDict):
     tip_length: float
     working_volume: float
     tip_overlap: Dict[str, float]
+    versioned_tip_overlap: Dict[str, Dict[str, float]]
     available_volume: float
     return_tip_height: float
     default_aspirate_flow_rates: Dict[str, float]
