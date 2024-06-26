@@ -352,6 +352,7 @@ export function ProtocolDetails(
     missing: <Box size="14rem" backgroundColor={COLORS.grey30} />,
     loading: <Box size="14rem" backgroundColor={COLORS.grey30} />,
     error: <Box size="14rem" backgroundColor={COLORS.grey30} />,
+    parameterRequired: <Box size="14rem" backgroundColor={COLORS.grey30} />,
     complete: (
       <Box size="14rem" height="auto">
         {deckMap}
@@ -434,7 +435,7 @@ export function ProtocolDetails(
               ) : null}
               {analysisStatus !== 'loading' &&
               mostRecentAnalysis != null &&
-              mostRecentAnalysis.errors.length > 0 ? (
+              analysisStatus === 'error' ? (
                 <ProtocolAnalysisFailure
                   protocolKey={protocolKey}
                   errors={mostRecentAnalysis.errors.map(e => e.detail)}

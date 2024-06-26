@@ -2,7 +2,13 @@ import first from 'lodash/first'
 import { FLEX_STANDARD_MODEL } from '@opentrons/shared-data'
 import type { ProtocolAnalysisOutput, RobotType } from '@opentrons/shared-data'
 
-type AnalysisStatus = 'missing' | 'loading' | 'error' | 'complete' | 'stale'
+type AnalysisStatus =
+  | 'missing'
+  | 'loading'
+  | 'error'
+  | 'complete'
+  | 'stale'
+  | 'parameterRequired'
 
 export function getAnalysisStatus(
   isAnalyzing: boolean,
@@ -16,7 +22,13 @@ export function getAnalysisStatus(
   ) {
     return 'stale'
   } else if (analysis != null) {
-    return analysis.errors.length > 0 ? 'error' : 'complete'
+    if (analysis.result === 'parameter-value-required') {
+      return 'parameterRequired'
+    } else if (analysis.errors.length > 0) {
+      return 'error'
+    } else {
+      return 'complete'
+    }
   } else {
     return 'missing'
   }

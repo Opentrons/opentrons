@@ -405,9 +405,7 @@ export function ChooseRobotSlideout(
               runtimeParam.type === 'float'
             ) {
               const value = runtimeParam.value as number
-              const id = `InputField_${
-                runtimeParam.variableName
-              }_${index.toString()}`
+              const id = `InputField_${runtimeParam.variableName}_${index}`
               const error =
                 (Number.isNaN(value) && !isInputFocused) ||
                 value < runtimeParam.min ||
