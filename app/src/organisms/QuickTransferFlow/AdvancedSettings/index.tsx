@@ -67,8 +67,6 @@ export function AdvancedSettings(
       value: pipettePath,
       enabled: state.transferType !== 'transfer',
       onClick: () => {
-        console.log(state.transferType)
-        console.log(state.path)
         state.transferType !== 'transfer'
           ? setSelectedSetting('pipette_path')
           : null

@@ -60,11 +60,11 @@ export function FlowRateEntry(props: FlowRateEntryProps): JSX.Element {
     // the button will be disabled if this values is null
     if (rateAsNumber != null && flowRateAction != null) {
       dispatch({
-        // set the type based on aspirate or dispense component.
         type: flowRateAction,
         rate: rateAsNumber,
       })
     }
+    onBack()
   }
 
   const error =
