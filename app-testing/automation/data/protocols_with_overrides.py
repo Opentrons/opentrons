@@ -6,8 +6,6 @@ class ProtocolsWithOverrides:
         file_stem="Flex_X_v2_18_NO_PIPETTES_Overrides_BadTypesInRTP",
         file_extension="py",
         robot="Flex",
-        app_error=True,
-        robot_error=True,
         override_variable_name="type_to_test",
         overrides=[
             "wrong_type_in_display_name",
@@ -26,8 +24,6 @@ class ProtocolsWithOverrides:
         file_stem="Flex_X_v2_18_NO_PIPETTES_Overrides_DefaultOutOfRangeRTP",
         file_extension="py",
         robot="Flex",
-        app_error=True,
-        robot_error=True,
         override_variable_name="type_to_test",
         overrides=[
             "default_greater_than_maximum",
@@ -39,8 +35,6 @@ class ProtocolsWithOverrides:
         file_stem="Flex_X_v2_18_NO_PIPETTES_Overrides_DefaultChoiceNoMatchChoice",
         file_extension="py",
         robot="Flex",
-        app_error=True,
-        robot_error=True,
         override_variable_name="type_to_test",
         overrides=["str_default_no_matching_choices", "float_default_no_matching_choices", "int_default_no_matching_choices"],
     )
