@@ -74,30 +74,6 @@
     {
       "name": "Flex_X_v2_16_NO_PIPETTES_TM_ModuleInCol2.py",
       "role": "main"
-    },
-    {
-      "name": "cpx_4_tuberack_100ul.json",
-      "role": "labware"
-    },
-    {
-      "name": "eppendorf_96_well_plate_150.json",
-      "role": "labware"
-    },
-    {
-      "name": "opentrons_ot3_96_tiprack_1000ul_rss.json",
-      "role": "labware"
-    },
-    {
-      "name": "opentrons_ot3_96_tiprack_200ul_rss.json",
-      "role": "labware"
-    },
-    {
-      "name": "opentrons_ot3_96_tiprack_50ul_rss.json",
-      "role": "labware"
-    },
-    {
-      "name": "sample_labware.json",
-      "role": "labware"
     }
   ],
   "labware": [],

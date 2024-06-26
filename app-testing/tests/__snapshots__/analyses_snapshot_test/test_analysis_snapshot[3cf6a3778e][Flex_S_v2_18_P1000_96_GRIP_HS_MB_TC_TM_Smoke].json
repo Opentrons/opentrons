@@ -8179,6 +8179,7 @@
       "commandType": "loadPipette",
       "notes": [],
       "params": {
+        "liquidPresenceDetection": false,
         "mount": "left",
         "pipetteName": "p1000_96",
         "tipOverlapNotAfterVersion": "v0"
@@ -11253,7 +11254,7 @@
       "notes": [],
       "params": {},
       "result": {
-        "offsetId": "4c648c52-1c4b-417f-8a99-9180e1008980"
+        "offsetId": "1b44ed1d-e25b-4b62-a650-40098241758f"
       },
       "status": "succeeded"
     },
@@ -11340,7 +11341,7 @@
       "notes": [],
       "params": {},
       "result": {
-        "offsetId": "0d1e4f1c-f2e9-41a8-b272-a80ef61035fa"
+        "offsetId": "eb38ff66-a097-48f8-b2e4-3da98e6e4c58"
       },
       "status": "succeeded"
     },
@@ -11387,7 +11388,7 @@
         "strategy": "manualMoveWithPause"
       },
       "result": {
-        "offsetId": "4c648c52-1c4b-417f-8a99-9180e1008980"
+        "offsetId": "1b44ed1d-e25b-4b62-a650-40098241758f"
       },
       "status": "succeeded"
     },
@@ -11539,30 +11540,6 @@
     {
       "name": "Flex_S_v2_18_P1000_96_GRIP_HS_MB_TC_TM_Smoke.py",
       "role": "main"
-    },
-    {
-      "name": "cpx_4_tuberack_100ul.json",
-      "role": "labware"
-    },
-    {
-      "name": "eppendorf_96_well_plate_150.json",
-      "role": "labware"
-    },
-    {
-      "name": "opentrons_ot3_96_tiprack_1000ul_rss.json",
-      "role": "labware"
-    },
-    {
-      "name": "opentrons_ot3_96_tiprack_200ul_rss.json",
-      "role": "labware"
-    },
-    {
-      "name": "opentrons_ot3_96_tiprack_50ul_rss.json",
-      "role": "labware"
-    },
-    {
-      "name": "sample_labware.json",
-      "role": "labware"
     }
   ],
   "labware": [

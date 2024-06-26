@@ -11,6 +11,7 @@
       "commandType": "loadPipette",
       "notes": [],
       "params": {
+        "liquidPresenceDetection": false,
         "mount": "left",
         "pipetteName": "p1000_multi_flex",
         "tipOverlapNotAfterVersion": "v0"
@@ -22,6 +23,7 @@
       "commandType": "loadPipette",
       "notes": [],
       "params": {
+        "liquidPresenceDetection": false,
         "mount": "right",
         "pipetteName": "p50_multi_flex",
         "tipOverlapNotAfterVersion": "v0"
@@ -26829,30 +26831,6 @@
     {
       "name": "Flex_S_v2_18_KAPA_Library_Quant.py",
       "role": "main"
-    },
-    {
-      "name": "cpx_4_tuberack_100ul.json",
-      "role": "labware"
-    },
-    {
-      "name": "eppendorf_96_well_plate_150.json",
-      "role": "labware"
-    },
-    {
-      "name": "opentrons_ot3_96_tiprack_1000ul_rss.json",
-      "role": "labware"
-    },
-    {
-      "name": "opentrons_ot3_96_tiprack_200ul_rss.json",
-      "role": "labware"
-    },
-    {
-      "name": "opentrons_ot3_96_tiprack_50ul_rss.json",
-      "role": "labware"
-    },
-    {
-      "name": "sample_labware.json",
-      "role": "labware"
     }
   ],
   "labware": [
