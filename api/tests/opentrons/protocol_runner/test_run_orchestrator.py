@@ -6,7 +6,7 @@ from datetime import datetime
 
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 from decoy import Decoy
-from typing import Union, AsyncGenerator
+from typing import Union, Generator
 
 from opentrons.protocol_engine.errors import RunStoppedError
 from opentrons.protocol_engine.state import StateStore
@@ -509,7 +509,7 @@ async def test_command_generator(
 ) -> None:
     """Should get the next command to execute."""
 
-    def get_next_to_execute() -> AsyncGenerator[str, None]:
+    def get_next_to_execute() -> Generator[str, None, None]:
         yield "command-id-1"
         yield "command-id-2"
         raise RunStoppedError()
