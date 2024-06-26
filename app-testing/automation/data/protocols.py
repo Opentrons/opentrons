@@ -277,26 +277,33 @@ class Protocols:
         file_stem="Flex_S_v2_15_P1000_96_GRIP_HS_TM_QuickZymoMagbeadRNAExtraction",
         file_extension="py",
         robot="Flex",
+        custom_labware=["opentrons_ot3_96_tiprack_1000ul_rss"],
     )
     Flex_S_v2_15_P1000_96_GRIP_HS_MB_TM_OmegaHDQDNAExtraction: Protocol = Protocol(
         file_stem="Flex_S_v2_15_P1000_96_GRIP_HS_MB_TM_OmegaHDQDNAExtraction",
         file_extension="py",
         robot="Flex",
+        custom_labware=["opentrons_ot3_96_tiprack_1000ul_rss"],
+
     )
     Flex_S_v2_15_P1000_96_GRIP_HS_MB_TM_MagMaxRNAExtraction: Protocol = Protocol(
         file_stem="Flex_S_v2_15_P1000_96_GRIP_HS_MB_TM_MagMaxRNAExtraction",
         file_extension="py",
         robot="Flex",
+        custom_labware=["opentrons_ot3_96_tiprack_200ul_rss"],
+
     )
     Flex_S_v2_15_P1000_96_GRIP_HS_MB_TC_TM_IlluminaDNAPrep96PART3: Protocol = Protocol(
         file_stem="Flex_S_v2_15_P1000_96_GRIP_HS_MB_TC_TM_IlluminaDNAPrep96PART3",
         file_extension="py",
         robot="Flex",
+        custom_labware=["opentrons_ot3_96_tiprack_200ul_rss", "opentrons_ot3_96_tiprack_50ul_rss"],
     )
     Flex_S_v2_15_P1000_96_GRIP_HS_MB_TC_TM_IDTXgen96Part1to3: Protocol = Protocol(
         file_stem="Flex_S_v2_15_P1000_96_GRIP_HS_MB_TC_TM_IDTXgen96Part1to3",
         file_extension="py",
         robot="Flex",
+        custom_labware=["opentrons_ot3_96_tiprack_50ul_rss", "opentrons_ot3_96_tiprack_200ul_rss"],
     )
     Flex_S_v2_15_P1000M_P50M_GRIP_HS_MB_TC_TM_IlluminaDNAEnrichmentv4: Protocol = Protocol(
         file_stem="Flex_S_v2_15_P1000M_P50M_GRIP_HS_MB_TC_TM_IlluminaDNAEnrichmentv4",
@@ -319,6 +326,7 @@ class Protocols:
         file_stem="Flex_S_v2_15_P1000S_None_SimpleNormalizeLongRight",
         file_extension="py",
         robot="Flex",
+        custom_labware=["opentrons_ot3_96_tiprack_200ul_rss"],
     )
     Flex_S_v2_15_P50M_P1000M_KAPALibraryQuantLongv2: Protocol = Protocol(
         file_stem="Flex_S_v2_15_P50M_P1000M_KAPALibraryQuantLongv2",
