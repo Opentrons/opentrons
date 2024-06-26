@@ -7,24 +7,8 @@ from datetime import datetime, timedelta
 from abr_testing.data_collection import read_robot_logs
 from typing import Set, Dict, Any, Tuple, List, Union
 from abr_testing.automation import google_drive_tool, google_sheets_tool
+from abr_testing.tools import sync_abr_sheet
 
-def determine_lifetime(robot_list: List[str]):
-    """Record lifetime % of robot per runs."""
-    # Get all data
-    all_google_data = google_sheet.get_all_data()
-    # Go through each line
-    for run in all_google_data:
-        # Go through each robot
-        for robot in robot_list:
-            total_previous_run_time = []
-            run_time = run["Run_Time (min)"]
-            if run["Robot"] == robot:
-                total_previous_run_time.append(run_time)
-                total_run_time = sum(total_previous_run_time)
-                row_num = google_sheet.get_row_index_with_value(run["Start_Time"], 6)
-                lifetime_percent = ((total_run_time / 60) / 3750) * 100
-                print(f"Robot: {robot}, Lifetime: {lifetime_percent}")
-                google_sheet.update_cell("Sheet1", row_num, 48, lifetime_percent)
 
 def get_modules(file_results: Dict[str, str]) -> Dict[str, Any]:
     """Get module IPs and models from run log."""
@@ -221,9 +205,12 @@ if __name__ == "__main__":
     start_row = google_sheet.get_index_row() + 1
     google_sheet.batch_update_cells(transposed_runs_and_robots, "A", start_row, "0")
     # Calculate Robot Lifetimes
+
     # Add LPC to google sheet
     google_sheet_lpc = google_sheets_tool.google_sheet(credentials_path, "ABR-LPC", 0)
     start_row_lpc = google_sheet_lpc.get_index_row() + 1
     google_sheet_lpc.batch_update_cells(
         transposed_runs_and_lpc, "A", start_row_lpc, "0"
     )
+    robots = list(set(google_sheet.get_column(1)))
+    sync_abr_sheet.determine_lifetime(google_sheet)
