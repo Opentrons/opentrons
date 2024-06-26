@@ -161,17 +161,17 @@ describe('pipette data accessors', () => {
         lldSettings: {
           t50: {
             minHeight: 0.5,
-            minVolume: 0
+            minVolume: 0,
           },
           t200: {
             minHeight: 0.5,
-            minVolume: 0
+            minVolume: 0,
           },
           t1000: {
             minHeight: 0.5,
-            minVolume: 0
-          }
-        }
+            minVolume: 0,
+          },
+        },
       } as PipetteV2Specs
       expect(getPipetteSpecsV2('p1000_single_flex')).toStrictEqual(
         mockP1000Specs

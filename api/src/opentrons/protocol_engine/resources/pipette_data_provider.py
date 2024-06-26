@@ -40,7 +40,7 @@ class LoadedStaticPipetteData:
     nozzle_map: NozzleMap
     back_left_corner_offset: Point
     front_right_corner_offset: Point
-    pipette_lld_settings: Dict[str, Dict[str, float]]
+    pipette_lld_settings: Optional[Dict[str, Dict[str, float]]]
 
 
 class VirtualPipetteDataProvider:

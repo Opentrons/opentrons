@@ -235,7 +235,7 @@ class OT3PipetteHandler:
                 "default_dispense_flow_rates",
                 "back_compat_names",
                 "supported_tips",
-                "lld_settings"
+                "lld_settings",
             ]
 
             instr_dict = instr.as_dict()

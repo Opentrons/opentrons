@@ -118,7 +118,7 @@ class StaticPipetteConfig:
     pipette_bounding_box_offsets: PipetteBoundingBoxOffsets
     bounding_nozzle_offsets: BoundingNozzlesOffsets
     default_nozzle_map: NozzleMap
-    lld_settings: Dict[str, Dict[str, float]]
+    lld_settings: Optional[Dict[str, Dict[str, float]]]
 
 
 @dataclass
@@ -620,7 +620,9 @@ class PipetteView(HasState[PipetteState]):
 
         return max(0.0, working_volume - current_volume) if current_volume else None
 
-    def get_pipette_lld_settings(self, pipette_id: str) -> Dict[str, Dict[str, float]]:
+    def get_pipette_lld_settings(
+        self, pipette_id: str
+    ) -> Optional[Dict[str, Dict[str, float]]]:
         """Get the liquid level settings for all possible tips for a single pipette."""
         return self.get_config(pipette_id).lld_settings
 
@@ -631,11 +633,11 @@ class PipetteView(HasState[PipetteState]):
             return 0
         lld_settings = self.get_pipette_lld_settings(pipette_id)
         tipVolume = str(attached_tip.volume)
-        if None in {
-            lld_settings,
-            lld_settings[tipVolume],
-            lld_settings[tipVolume]["minHeight"],
-        }:
+        if (
+            lld_settings is None
+            or lld_settings[tipVolume] is None
+            or lld_settings[tipVolume]["minHeight"] is None
+        ):
             return 0
         return float(lld_settings[tipVolume]["minHeight"])
 
