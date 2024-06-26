@@ -163,7 +163,6 @@ async def test_analyze(
         displayName="Foo", variableName="Bar", default=True, value=False
     )
 
-    # json_runner = decoy.mock(cls=protocol_runner.JsonRunner)
     orchestrator = decoy.mock(cls=protocol_runner.RunOrchestrator)
     subject = ProtocolAnalyzer(
         analysis_store=analysis_store, protocol_resource=protocol_resource
