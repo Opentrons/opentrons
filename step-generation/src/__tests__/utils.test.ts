@@ -271,7 +271,6 @@ describe('makeInitialRobotState', () => {
     expect(
       makeInitialRobotState({
         invariantContext: {
-          liquidEntities: {},
           config: DEFAULT_CONFIG,
           pipetteEntities: {
             p10SingleId: {

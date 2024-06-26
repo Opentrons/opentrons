@@ -1,20 +1,14 @@
 import {
   getModuleType,
   getLabwareDefURI,
-  RunTimeCommand,
   getPipetteNameSpecs,
-  LabwareDefinition2,
-  getAllDefinitions,
 } from '@opentrons/shared-data'
-import { PickUpTipRunTimeCommand } from '@opentrons/shared-data'
-import { LoadLabwareRunTimeCommand } from '@opentrons/shared-data'
-import {
-  InvariantContext,
-  LabwareEntities,
-  LiquidEntities,
-  ModuleEntities,
-  PipetteEntities,
-} from '../types'
+import type {
+  LoadLabwareRunTimeCommand,
+  RunTimeCommand,
+  PickUpTipRunTimeCommand,
+} from '@opentrons/shared-data'
+import type { InvariantContext } from '../types'
 
 export function constructInvariantContextFromRunCommands(
   commands: RunTimeCommand[]
@@ -32,7 +26,7 @@ export function constructInvariantContextFromRunCommands(
               labwareDefURI: getLabwareDefURI(result.definition),
               def: result.definition,
             },
-          } as LabwareEntities,
+          },
         }
       } else if (command.commandType === 'loadModule' && result != null) {
         return {
@@ -44,7 +38,7 @@ export function constructInvariantContextFromRunCommands(
               type: getModuleType(command.params.model),
               model: command.params.model,
             },
-          } as ModuleEntities,
+          },
         }
       } else if (command.commandType === 'loadPipette' && result != null) {
         const labwareId =
@@ -74,20 +68,7 @@ export function constructInvariantContextFromRunCommands(
               tiprackLabwareDef,
               spec: getPipetteNameSpecs(command.params.pipetteName),
             },
-          } as PipetteEntities,
-        }
-      } else if (command.commandType === 'loadLiquid' && result != null) {
-        const { displayColor } = command.params
-        return {
-          ...acc,
-          liquidEntities: {
-            ...acc.liquidEntities,
-            [command.params.labwareId]: {
-              description: 'stub liquid description',
-              displayName: command.params.labwareId,
-              displayColor: '#ffd600'
-            },
-          } as LiquidEntities,
+          },
         }
       }
 
@@ -97,19 +78,8 @@ export function constructInvariantContextFromRunCommands(
       labwareEntities: {},
       moduleEntities: {},
       pipetteEntities: {},
-      liquidEntities: {},
       additionalEquipmentEntities: {},
       config: { OT_PD_DISABLE_MODULE_RESTRICTIONS: true },
     }
   )
-}
-
-// taken from app/src/assets/labware/getLabware
-export function getLatestLabwareDef(
-  loadName: string | null | undefined
-): LabwareDefinition2 | null {
-  const def = Object.values(getAllDefinitions()).find(
-    d => d.parameters.loadName === loadName
-  )
-  return def || null
 }

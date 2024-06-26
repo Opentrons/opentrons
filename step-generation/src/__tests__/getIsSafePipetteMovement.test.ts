@@ -51,7 +51,6 @@ const mockInvariantProperties: InvariantContext = {
     },
   },
   moduleEntities: {},
-  liquidEntities: {},
   additionalEquipmentEntities: {},
   config: {
     OT_PD_DISABLE_MODULE_RESTRICTIONS: false,
@@ -78,7 +77,6 @@ describe('getIsSafePipetteMovement', () => {
       {
         labwareEntities: {},
         pipetteEntities: {},
-        liquidEntities: {},
         moduleEntities: {},
         additionalEquipmentEntities: {
           trashBin: { name: 'trashBin', location: 'A3', id: 'trashBin' },

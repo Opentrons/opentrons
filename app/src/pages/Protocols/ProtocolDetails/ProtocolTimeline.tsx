@@ -6,14 +6,13 @@ import {
   fetchProtocols,
   getStoredProtocol,
 } from '../../../redux/protocol-storage'
-
-import type { Dispatch, State } from '../../../redux/types'
-import type { NavRouteParams } from '../../../App/types'
-
 import { ProtocolTimelineScrubber } from '../../../organisms/ProtocolTimelineScrubber'
 
+import type { Dispatch, State } from '../../../redux/types'
+import type { DesktopRouteParams } from '../../../App/types'
+
 export function ProtocolTimeline(): JSX.Element {
-  const { protocolKey } = useParams<NavRouteParams>()
+  const { protocolKey } = useParams<DesktopRouteParams>()
   const dispatch = useDispatch<Dispatch>()
   const storedProtocol = useSelector((state: State) =>
     getStoredProtocol(state, protocolKey)

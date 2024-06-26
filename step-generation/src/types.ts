@@ -145,15 +145,6 @@ export interface PipetteEntities {
   [pipetteId: string]: PipetteEntity
 }
 
-export interface LiquidEntity {
-  displayName: string
-  description: string
-  displayColor: string
-}
-export interface LiquidEntities {
-  [liquidId: string]: LiquidEntity
-}
-
 // ===== MIX-IN TYPES =====
 export type ChangeTipOptions =
   | 'always'
@@ -482,7 +473,6 @@ export interface InvariantContext {
   labwareEntities: LabwareEntities
   moduleEntities: ModuleEntities
   pipetteEntities: PipetteEntities
-  liquidEntities: LiquidEntities
   additionalEquipmentEntities: AdditionalEquipmentEntities
   config: Config
 }

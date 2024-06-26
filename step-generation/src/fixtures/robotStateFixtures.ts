@@ -34,7 +34,7 @@ import type {
   TEMPERATURE_AT_TARGET,
 } from '../constants'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { AdditionalEquipmentEntities, LiquidEntities } from '../types'
+import type { AdditionalEquipmentEntities } from '../types'
 import type {
   Config,
   InvariantContext,
@@ -187,13 +187,11 @@ export function makeContext(): InvariantContext {
     },
   }
 
-  const liquidEntities: LiquidEntities = {}
   return {
     labwareEntities,
     moduleEntities,
     pipetteEntities,
     additionalEquipmentEntities,
-    liquidEntities,
     config: DEFAULT_CONFIG,
   }
 }

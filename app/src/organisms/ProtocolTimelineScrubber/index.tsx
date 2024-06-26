@@ -136,7 +136,7 @@ export function ProtocolTimelineScrubber(
             labwareOnDeck={map(robotState.labware, (labware, labwareId) => {
               if (
                 labware.slot in robotState.modules ||
-                labwareId === 'fixedTrash' 
+                labwareId === 'fixedTrash'
               ) {
                 return []
               }
@@ -173,7 +173,6 @@ export function ProtocolTimelineScrubber(
           pipetteId={leftPipetteId}
           pipetteEntity={leftPipetteEntity}
           timelineFrame={frame.robotState}
-          invariantContext={invariantContext}
           analysis={analysis}
         />
         <PipetteMountViz
@@ -181,7 +180,6 @@ export function ProtocolTimelineScrubber(
           pipetteId={rightPipetteId}
           pipetteEntity={rightPipetteEntity}
           timelineFrame={frame.robotState}
-          invariantContext={invariantContext}
           analysis={analysis}
         />
       </Flex>
@@ -252,18 +250,10 @@ interface PipetteMountVizProps {
   pipetteEntity: PipetteEntity | null
   mount: string
   timelineFrame: TimelineFrame
-  invariantContext: InvariantContext
   analysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput
 }
 function PipetteMountViz(props: PipetteMountVizProps): JSX.Element | null {
-  const {
-    mount,
-    pipetteEntity,
-    pipetteId,
-    timelineFrame,
-    invariantContext,
-    analysis,
-  } = props
+  const { mount, pipetteEntity, pipetteId, timelineFrame, analysis } = props
   const [showPipetteDetails, setShowPipetteDetails] = React.useState(false)
 
   return pipetteEntity == null ? null : (
@@ -295,7 +285,6 @@ function PipetteMountViz(props: PipetteMountVizProps): JSX.Element | null {
           allNozzleTipContents={Object.values(
             timelineFrame.liquidState.pipettes[pipetteId]
           )}
-          liquidEntities={invariantContext.liquidEntities}
           //  TODO, figure out this max volume thing
           maxVolume={1000}
           // maxVolume={pipetteEntity.spec.liquids[0].maxVolume ?? 0}
@@ -310,20 +299,18 @@ function PipetteMountViz(props: PipetteMountVizProps): JSX.Element | null {
 
 interface SideViewProps {
   allNozzleTipContents: LocationLiquidState[]
-  liquidEntities: InvariantContext['liquidEntities']
   maxVolume: number
   allNozzlesHaveTips: boolean
   analysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput
 }
 function PipetteSideView({
   allNozzleTipContents,
-  liquidEntities,
   maxVolume,
   allNozzlesHaveTips,
   analysis,
 }: SideViewProps): JSX.Element {
   const channelCount = Math.min(Object.keys(allNozzleTipContents).length, 8)
-  console.log(liquidEntities)
+
   return (
     <svg width="4rem" height="16rem" viewBox="0 0 100 200">
       {channelCount <= 1 ? (
@@ -335,7 +322,6 @@ function PipetteSideView({
               x={45}
               y={130}
               tipContents={allNozzleTipContents[0]}
-              liquidEntities={liquidEntities}
               maxVolume={maxVolume}
               analysis={analysis}
             />
@@ -362,7 +348,6 @@ function PipetteSideView({
                   y={130}
                   key={index}
                   tipContents={tipContents}
-                  liquidEntities={liquidEntities}
                   maxVolume={maxVolume}
                   analysis={analysis}
                 />
@@ -384,7 +369,6 @@ function PipetteSideView({
 
 interface TipSideViewProps {
   tipContents: LocationLiquidState
-  liquidEntities: InvariantContext['liquidEntities']
   maxVolume: number
   x: number
   y: number
@@ -392,7 +376,6 @@ interface TipSideViewProps {
 }
 function TipSideView({
   tipContents,
-  liquidEntities,
   maxVolume,
   x,
   y,

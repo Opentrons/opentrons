@@ -137,7 +137,6 @@ export interface ProtocolAnalysisOutput {
   modules: LoadedModule[]
   liquids: Liquid[]
   errors: AnalysisError[]
-  commandAnnotations?: any
   runTimeParameters: RunTimeParameter[]
   robotType?: RobotType
   result: 'ok' | 'not-ok' | 'error' | 'parameter-value-required'

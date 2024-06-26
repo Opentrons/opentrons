@@ -6,7 +6,6 @@ import type {
   LabwareOffset,
   PipetteName,
   ModuleModel,
-  ModuleDefinition,
 } from '../../js'
 
 export interface LoadPipetteCreateCommand extends CommonCommandCreateInfo {
@@ -148,12 +147,8 @@ interface LoadModuleParams {
 }
 interface LoadModuleResult {
   moduleId: string
-  definition: ModuleDefinition
-  model: ModuleModel
-  serialNumber: string
 }
 interface LoadLiquidParams {
-  displayColor: string
   liquidId: string
   labwareId: string
   volumeByWell: { [wellName: string]: number }

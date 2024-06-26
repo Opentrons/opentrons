@@ -5,7 +5,6 @@ import type {
   LabwareOffset,
   PipetteName,
   ModuleModel,
-  ModuleDefinition,
 } from '../../../../js'
 
 export interface LoadPipetteCreateCommand extends CommonCommandCreateInfo {
