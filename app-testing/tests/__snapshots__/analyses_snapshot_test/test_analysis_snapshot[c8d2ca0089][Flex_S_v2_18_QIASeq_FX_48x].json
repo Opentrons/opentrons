@@ -1909,7 +1909,7 @@
             }
           ],
           "metadata": {
-            "displayCategory": "adapter",
+            "displayCategory": "aluminumBlock",
             "displayName": "Opentrons 96 Well Aluminum Block",
             "displayVolumeUnits": "µL",
             "tags": []
@@ -5069,6 +5069,11 @@
               "x": 0,
               "y": 0,
               "z": 16.3
+            },
+            "opentrons_96_deep_well_temp_mod_adapter": {
+              "x": 0,
+              "y": 0,
+              "z": 16.1
             }
           },
           "stackingOffsetWithModule": {
@@ -6117,11 +6122,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "SETTING THERMO and TEMP BLOCK Temperature",
-        "legacyCommandType": "command.COMMENT"
+        "message": "SETTING THERMO and TEMP BLOCK Temperature"
       },
       "result": {},
       "status": "succeeded"
@@ -6198,61 +6202,55 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> FX",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> FX"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding FX",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding FX"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "FIRST RACK",
-        "legacyCommandType": "command.COMMENT"
+        "message": "FIRST RACK"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Adding tiprack_50_1",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Adding tiprack_50_1"
       },
       "result": {},
       "status": "succeeded"
@@ -8822,41 +8820,37 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adapter Ligation",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adapter Ligation"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding Barcodes",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding Barcodes"
       },
       "result": {},
       "status": "succeeded"
@@ -9906,31 +9900,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding Lig",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding Lig"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "FIRST RACK",
-        "legacyCommandType": "command.COMMENT"
+        "message": "FIRST RACK"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Adding tiprack_200_1",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Adding tiprack_200_1"
       },
       "result": {},
       "status": "succeeded"
@@ -13780,41 +13771,37 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Cleanup 1",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Cleanup 1"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> ADDING CleanupBead (0.8x)",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> ADDING CleanupBead (0.8x)"
       },
       "result": {},
       "status": "succeeded"
@@ -14154,11 +14141,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Transferring Samples",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Transferring Samples"
       },
       "result": {},
       "status": "succeeded"
@@ -15144,11 +15130,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Transferring Samples",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Transferring Samples"
       },
       "result": {},
       "status": "succeeded"
@@ -16134,11 +16119,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Transferring Samples",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Transferring Samples"
       },
       "result": {},
       "status": "succeeded"
@@ -16862,11 +16846,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Removing Supernatant",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Removing Supernatant"
       },
       "result": {},
       "status": "succeeded"
@@ -17031,11 +17014,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Adding 1440ul tp 1440",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Adding 1440ul tp 1440"
       },
       "result": {},
       "status": "succeeded"
@@ -17331,11 +17313,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Adding 1440ul tp 2880",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Adding 1440ul tp 2880"
       },
       "result": {},
       "status": "succeeded"
@@ -17631,11 +17612,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Adding 1440ul tp 4320",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Adding 1440ul tp 4320"
       },
       "result": {},
       "status": "succeeded"
@@ -17772,11 +17752,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> ETOH Wash",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> ETOH Wash"
       },
       "result": {},
       "status": "succeeded"
@@ -17808,11 +17787,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Taking 1200ul from 1200",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Taking 1200ul from 1200"
       },
       "result": {},
       "status": "succeeded"
@@ -18126,11 +18104,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Taking 1200ul from 2400",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Taking 1200ul from 2400"
       },
       "result": {},
       "status": "succeeded"
@@ -18444,11 +18421,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Taking 1200ul from 3600",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Taking 1200ul from 3600"
       },
       "result": {},
       "status": "succeeded"
@@ -18745,31 +18721,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Remove ETOH Wash",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Remove ETOH Wash"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "IS THERE AN EMPTY RACK?",
-        "legacyCommandType": "command.COMMENT"
+        "message": "IS THERE AN EMPTY RACK?"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Adding tiprack_200_2",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Adding tiprack_200_2"
       },
       "result": {},
       "status": "succeeded"
@@ -20112,11 +20085,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Adding 1440ul tp 5760",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Adding 1440ul tp 5760"
       },
       "result": {},
       "status": "succeeded"
@@ -20485,11 +20457,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Adding 1440ul tp 7200",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Adding 1440ul tp 7200"
       },
       "result": {},
       "status": "succeeded"
@@ -20858,11 +20829,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Adding 1440ul tp 8640",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Adding 1440ul tp 8640"
       },
       "result": {},
       "status": "succeeded"
@@ -21047,11 +21017,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> ETOH Wash",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> ETOH Wash"
       },
       "result": {},
       "status": "succeeded"
@@ -21083,11 +21052,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Taking 1200ul from 4800",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Taking 1200ul from 4800"
       },
       "result": {},
       "status": "succeeded"
@@ -21401,11 +21369,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Taking 1200ul from 6000",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Taking 1200ul from 6000"
       },
       "result": {},
       "status": "succeeded"
@@ -21719,11 +21686,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Taking 1200ul from 7200",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Taking 1200ul from 7200"
       },
       "result": {},
       "status": "succeeded"
@@ -22020,11 +21986,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Remove ETOH Wash",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Remove ETOH Wash"
       },
       "result": {},
       "status": "succeeded"
@@ -22214,11 +22179,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Adding 1440ul tp 10080",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Adding 1440ul tp 10080"
       },
       "result": {},
       "status": "succeeded"
@@ -22587,11 +22551,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Adding 1440ul tp 11520",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Adding 1440ul tp 11520"
       },
       "result": {},
       "status": "succeeded"
@@ -22960,11 +22923,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Adding 1440ul tp 12960",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Adding 1440ul tp 12960"
       },
       "result": {},
       "status": "succeeded"
@@ -23158,11 +23120,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Removing Residual Wash",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Removing Residual Wash"
       },
       "result": {},
       "status": "succeeded"
@@ -23513,11 +23474,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding RSB",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding RSB"
       },
       "result": {},
       "status": "succeeded"
@@ -24045,11 +24005,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Transferring Supernatant",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Transferring Supernatant"
       },
       "result": {},
       "status": "succeeded"
@@ -24646,31 +24605,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Cleanup 2",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Cleanup 2"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -24685,31 +24641,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> ADDING CleanupBead (0.8x)",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> ADDING CleanupBead (0.8x)"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "IS THERE AN EMPTY RACK?",
-        "legacyCommandType": "command.COMMENT"
+        "message": "IS THERE AN EMPTY RACK?"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Adding tiprack_200_3",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Adding tiprack_200_3"
       },
       "result": {},
       "status": "succeeded"
@@ -28475,11 +28428,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Removing Supernatant",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Removing Supernatant"
       },
       "result": {},
       "status": "succeeded"
@@ -28669,11 +28621,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Adding 1600ul tp 14560",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Adding 1600ul tp 14560"
       },
       "result": {},
       "status": "succeeded"
@@ -29042,11 +28993,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Adding 1600ul tp 16160",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Adding 1600ul tp 16160"
       },
       "result": {},
       "status": "succeeded"
@@ -29415,11 +29365,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Adding 1600ul tp 17760",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Adding 1600ul tp 17760"
       },
       "result": {},
       "status": "succeeded"
@@ -29604,11 +29553,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> ETOH Wash",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> ETOH Wash"
       },
       "result": {},
       "status": "succeeded"
@@ -29640,11 +29588,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Taking 1200ul from 8400",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Taking 1200ul from 8400"
       },
       "result": {},
       "status": "succeeded"
@@ -29958,11 +29905,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Taking 1200ul from 9600",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Taking 1200ul from 9600"
       },
       "result": {},
       "status": "succeeded"
@@ -30276,11 +30222,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Taking 1200ul from 10800",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Taking 1200ul from 10800"
       },
       "result": {},
       "status": "succeeded"
@@ -30577,11 +30522,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Remove ETOH Wash",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Remove ETOH Wash"
       },
       "result": {},
       "status": "succeeded"
@@ -31676,31 +31620,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> ETOH Wash",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> ETOH Wash"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "IS THERE AN EMPTY RACK?",
-        "legacyCommandType": "command.COMMENT"
+        "message": "IS THERE AN EMPTY RACK?"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Adding tiprack_200_4",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Adding tiprack_200_4"
       },
       "result": {},
       "status": "succeeded"
@@ -32885,11 +32826,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Taking 1200ul from 12000",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Taking 1200ul from 12000"
       },
       "result": {},
       "status": "succeeded"
@@ -33203,11 +33143,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Taking 1200ul from 13200",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Taking 1200ul from 13200"
       },
       "result": {},
       "status": "succeeded"
@@ -33521,11 +33460,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Taking 1200ul from 14400",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Taking 1200ul from 14400"
       },
       "result": {},
       "status": "succeeded"
@@ -33822,11 +33760,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Remove ETOH Wash",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Remove ETOH Wash"
       },
       "result": {},
       "status": "succeeded"
@@ -34930,11 +34867,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Removing Residual Wash",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Removing Residual Wash"
       },
       "result": {},
       "status": "succeeded"
@@ -35285,31 +35221,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding RSB",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding RSB"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "IS THERE AN EMPTY RACK?",
-        "legacyCommandType": "command.COMMENT"
+        "message": "IS THERE AN EMPTY RACK?"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Adding tiprack_50_2",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Adding tiprack_50_2"
       },
       "result": {},
       "status": "succeeded"
@@ -37092,41 +37025,37 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Amplification",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Amplification"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding Primer",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding Primer"
       },
       "result": {},
       "status": "succeeded"
@@ -37210,11 +37139,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Transferring Supernatant",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Transferring Supernatant"
       },
       "result": {},
       "status": "succeeded"
@@ -37567,11 +37495,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Transferring Supernatant",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Transferring Supernatant"
       },
       "result": {},
       "status": "succeeded"
@@ -37924,11 +37851,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Transferring Supernatant",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Transferring Supernatant"
       },
       "result": {},
       "status": "succeeded"
@@ -38203,11 +38129,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding PCR",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding PCR"
       },
       "result": {},
       "status": "succeeded"
@@ -40729,31 +40654,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Cleanup 3",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Cleanup 3"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -40795,31 +40717,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> ADDING CleanupBead (0.8x)",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> ADDING CleanupBead (0.8x)"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "IS THERE AN EMPTY RACK?",
-        "legacyCommandType": "command.COMMENT"
+        "message": "IS THERE AN EMPTY RACK?"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Adding tiprack_200_5",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Adding tiprack_200_5"
       },
       "result": {},
       "status": "succeeded"
@@ -42336,11 +42255,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Transferring Samples",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Transferring Samples"
       },
       "result": {},
       "status": "succeeded"
@@ -43326,11 +43244,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Transferring Samples",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Transferring Samples"
       },
       "result": {},
       "status": "succeeded"
@@ -44316,11 +44233,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Transferring Samples",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Transferring Samples"
       },
       "result": {},
       "status": "succeeded"
@@ -45044,11 +44960,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Removing Supernatant",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Removing Supernatant"
       },
       "result": {},
       "status": "succeeded"
@@ -45238,11 +45153,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Adding 1600ul tp 19360",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Adding 1600ul tp 19360"
       },
       "result": {},
       "status": "succeeded"
@@ -45611,11 +45525,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Adding 1600ul tp 20960",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Adding 1600ul tp 20960"
       },
       "result": {},
       "status": "succeeded"
@@ -45984,11 +45897,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Adding 1600ul tp 22560",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Adding 1600ul tp 22560"
       },
       "result": {},
       "status": "succeeded"
@@ -46173,11 +46085,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> ETOH Wash",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> ETOH Wash"
       },
       "result": {},
       "status": "succeeded"
@@ -46209,11 +46120,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Taking 1200ul from 15600",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Taking 1200ul from 15600"
       },
       "result": {},
       "status": "succeeded"
@@ -46527,11 +46437,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Taking 1200ul from 16800",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Taking 1200ul from 16800"
       },
       "result": {},
       "status": "succeeded"
@@ -46845,11 +46754,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Taking 1200ul from 18000",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Taking 1200ul from 18000"
       },
       "result": {},
       "status": "succeeded"
@@ -47146,11 +47054,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Remove ETOH Wash",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Remove ETOH Wash"
       },
       "result": {},
       "status": "succeeded"
@@ -47340,11 +47247,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Adding 1600ul tp 24160",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Adding 1600ul tp 24160"
       },
       "result": {},
       "status": "succeeded"
@@ -47713,11 +47619,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Adding 1600ul tp 25760",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Adding 1600ul tp 25760"
       },
       "result": {},
       "status": "succeeded"
@@ -48086,11 +47991,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Adding 1600ul tp 27360",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Adding 1600ul tp 27360"
       },
       "result": {},
       "status": "succeeded"
@@ -48275,31 +48179,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> ETOH Wash",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> ETOH Wash"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "FIRST RACK",
-        "legacyCommandType": "command.COMMENT"
+        "message": "FIRST RACK"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Adding tiprack_200_6",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Adding tiprack_200_6"
       },
       "result": {},
       "status": "succeeded"
@@ -49508,11 +49409,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Taking 1200ul from 19200",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Taking 1200ul from 19200"
       },
       "result": {},
       "status": "succeeded"
@@ -49826,11 +49726,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Taking 1200ul from 20400",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Taking 1200ul from 20400"
       },
       "result": {},
       "status": "succeeded"
@@ -50144,11 +50043,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Taking 1200ul from 21600",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Taking 1200ul from 21600"
       },
       "result": {},
       "status": "succeeded"
@@ -50445,11 +50343,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Remove ETOH Wash",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Remove ETOH Wash"
       },
       "result": {},
       "status": "succeeded"
@@ -50639,11 +50536,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Adding 1600ul tp 28960",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Adding 1600ul tp 28960"
       },
       "result": {},
       "status": "succeeded"
@@ -51012,11 +50908,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Adding 1600ul tp 30560",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Adding 1600ul tp 30560"
       },
       "result": {},
       "status": "succeeded"
@@ -51385,11 +51280,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Adding 1600ul tp 32160",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Adding 1600ul tp 32160"
       },
       "result": {},
       "status": "succeeded"
@@ -51583,11 +51477,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Removing Residual Wash",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Removing Residual Wash"
       },
       "result": {},
       "status": "succeeded"
@@ -51938,11 +51831,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding RSB",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding RSB"
       },
       "result": {},
       "status": "succeeded"
@@ -52548,11 +52440,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Transferring Supernatant",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Transferring Supernatant"
       },
       "result": {},
       "status": "succeeded"
@@ -53143,31 +53034,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Report",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Report"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -53343,6 +53231,7 @@
       "pipetteName": "p50_multi_flex"
     }
   ],
+  "result": "ok",
   "robotType": "OT-3 Standard",
   "runTimeParameters": [
     {

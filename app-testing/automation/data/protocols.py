@@ -365,6 +365,14 @@ class Protocols:
         robot_error=False,
     )
 
+    OT2_S_v2_18_P300M_P20S_HS_TC_TM_SmokeTestV3: Protocol = Protocol(
+        file_stem="OT2_S_v2_18_P300M_P20S_HS_TC_TM_SmokeTestV3",
+        file_extension="py",
+        robot="OT2",
+        app_error=False,
+        robot_error=False,
+    )
+
     Flex_S_v2_15_P1000_96_GRIP_HS_TM_QuickZymoMagbeadRNAExtraction: Protocol = Protocol(
         file_stem="Flex_S_v2_15_P1000_96_GRIP_HS_TM_QuickZymoMagbeadRNAExtraction",
         file_extension="py",
@@ -859,6 +867,14 @@ class Protocols:
 
     Flex_S_v2_19_Illumina_DNA_PCR_Free: Protocol = Protocol(
         file_stem="Flex_S_v2_19_Illumina_DNA_PCR_Free",
+        file_extension="py",
+        robot="Flex",
+        app_error=False,
+        robot_error=False,
+    )
+
+    Flex_S_v2_18_P1000_96_GRIP_HS_MB_TC_TM_Smoke: Protocol = Protocol(
+        file_stem="Flex_S_v2_18_P1000_96_GRIP_HS_MB_TC_TM_Smoke",
         file_extension="py",
         robot="Flex",
         app_error=False,
