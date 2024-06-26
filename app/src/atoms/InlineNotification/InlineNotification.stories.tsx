@@ -25,17 +25,50 @@ export default {
       },
       defaultValue: true,
     },
+    hasMessage: {
+      control: {
+        type: 'boolean',
+      },
+      defaultValue: true,
+    },
+    message: {
+      control: {
+        type: 'text',
+      },
+      if: { arg: 'hasMessage' },
+    },
   },
   parameters: VIEWPORT.touchScreenViewport,
 } as Meta
 
-const Template: Story<
-  React.ComponentProps<typeof InlineNotification>
-> = args => <InlineNotification {...args} />
+export interface WrapperProps extends React.ComponentProps<InlineNotification> {
+  hasMessage: boolean
+}
+
+function Wrapper(props: WrapperProps): JSX.Element {
+  return (
+    <InlineNotification
+      {...props}
+      onCloseClick={
+        props.onCloseClick
+          ? () => {
+              console.log('Close clicked')
+            }
+          : undefined
+      }
+      message={props.hasMessage ? props.message : undefined}
+    />
+  )
+}
+
+const Template: Story<React.ComponentProps<typeof Wrapper>> = args => (
+  <Wrapper {...args} />
+)
 
 export const InlineNotificationComponent = Template.bind({})
 InlineNotificationComponent.args = {
   heading: 'awesome',
   message: 'you did it',
   type: 'success',
+  hasMessage: true,
 }

@@ -129,7 +129,18 @@ export function InlineNotification(
           data-testid="InlineNotification_close-button"
           onClick={onCloseClick}
         >
-          <Icon aria-label="close_icon" name="close" size="3rem" />
+          <Icon
+            aria-label="close_icon"
+            name="close"
+            css={css`
+              width: 28px;
+              height: 28px;
+              @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+                width: ${SPACING.spacing48};
+                height: ${SPACING.spacing48};
+              }
+            `}
+          />
         </Btn>
       )}
     </Flex>
