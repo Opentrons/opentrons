@@ -17,7 +17,7 @@ from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.opentrons_api.types import OT3Mount, Point, Axis
 
 TIP_VOLUME = 1000
-ASPIRATE_VOLUME = [1000, 20]
+ASPIRATE_VOLUME = [1000, 5]
 NUM_SECONDS_TO_WAIT = 30
 HOVER_HEIGHT_MM = 50
 DEPTH_INTO_RESERVOIR_FOR_ASPIRATE = -24
