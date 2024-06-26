@@ -328,11 +328,13 @@ def _pipette_with_liquid_settings(  # noqa: C901
 
     def _aspirate_on_retract() -> None:
         # add trailing-air-gap
-        pipette.aspirate(liquid_class.aspirate.trailing_air_gap)
+        if liquid_class.aspirate.trailing_air_gap > 0:
+            pipette.aspirate(liquid_class.aspirate.trailing_air_gap)
 
     def _dispense_on_approach() -> None:
         # remove trailing-air-gap
-        pipette.dispense(liquid_class.aspirate.trailing_air_gap)
+        if liquid_class.aspirate.trailing_air_gap > 0:
+            pipette.dispense(liquid_class.aspirate.trailing_air_gap)
 
     def _dispense_on_submerge() -> None:
         callbacks.on_dispensing()
@@ -357,7 +359,8 @@ def _pipette_with_liquid_settings(  # noqa: C901
             pipette.touch_tip(speed=config.TOUCH_TIP_SPEED)
         # NOTE: always do a trailing-air-gap, regardless of if tip is empty or not
         #       to avoid droplets from forming and falling off the tip
-        pipette.aspirate(liquid_class.aspirate.trailing_air_gap)
+        if liquid_class.aspirate.trailing_air_gap > 0:
+            pipette.aspirate(liquid_class.aspirate.trailing_air_gap)
 
     # PHASE 1: APPROACH
     _reset_flow_rates()
