@@ -141,7 +141,8 @@
                   "stagingSlot",
                   "movableTrash",
                   "fixedTrash",
-                  "wasteChute"
+                  "wasteChute",
+                  "lidDock"
                 ]
               },
               "offsetFromCutoutFixture": {
