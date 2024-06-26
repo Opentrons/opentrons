@@ -677,7 +677,6 @@ export interface CompletedProtocolAnalysis {
   liquids: Liquid[]
   commands: RunTimeCommand[]
   errors: AnalysisError[]
-  commandAnnotations?: any
   robotType?: RobotType | null
   runTimeParameters?: RunTimeParameter[]
 }

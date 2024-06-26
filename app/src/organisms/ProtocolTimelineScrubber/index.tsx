@@ -36,7 +36,6 @@ import type {
   RunTimeCommand,
 } from '@opentrons/shared-data'
 import type {
-  InvariantContext,
   LocationLiquidState,
   PipetteEntity,
   TimelineFrame,
