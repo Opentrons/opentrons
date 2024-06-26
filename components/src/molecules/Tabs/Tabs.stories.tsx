@@ -1,12 +1,13 @@
 import * as React from 'react'
 import { useArgs } from '@storybook/preview-api'
+import { VIEWPORT } from '../../ui-style-constants'
 import { Tabs as TabsComponent } from '.'
 import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<typeof TabsComponent> = {
   title: 'Library/Molecules/Tabs',
   component: TabsComponent,
-
+  parameters: VIEWPORT.touchScreenViewport,
   argTypes: {
     tabs: {
       control: {
@@ -54,21 +55,21 @@ export const Tabs: Story = {
       React.ComponentProps<typeof TabsComponent>
     >()
 
-    const modifiedButtons = args.tabs.map((button, index) => {
-      const modifiedButton = {
-        ...button,
+    const modifiedTabs = args.tabs.map((tab, index) => {
+      const modifiedTabs = {
+        ...tab,
         onClick: () => {
           const updatedButtons = args.tabs.map((btn, i) => ({
             ...btn,
             isActive: i === index,
           }))
           setArgs({ ...args, tabs: updatedButtons })
-          button.onClick()
+          tab.onClick()
         },
       }
-      return modifiedButton
+      return modifiedTabs
     })
 
-    return <TabsComponent tabs={modifiedButtons} />
+    return <TabsComponent tabs={modifiedTabs} />
   },
 }

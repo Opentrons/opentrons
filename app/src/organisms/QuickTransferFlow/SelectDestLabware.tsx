@@ -8,9 +8,10 @@ import {
   COLORS,
   POSITION_FIXED,
   ALIGN_CENTER,
+  Tabs
 } from '@opentrons/components'
 
-import { LargeButton, TabbedButton } from '../../atoms/buttons'
+import { LargeButton } from '../../atoms/buttons'
 import { ChildNavigation } from '../ChildNavigation'
 import { getCompatibleLabwareByCategory } from './utils'
 
@@ -94,6 +95,13 @@ export function SelectDestLabware(
           marginBottom={SPACING.spacing24}
           alignItems={ALIGN_CENTER}
         >
+          <Tabs tabs={labwareDisplayCategoryFilters.map(category => ({
+            text: t(category),
+            onClick: () => {setSelectedCategory(category)},
+            isActive: category === selectedCategory,
+            disabled: false,
+          }))}/>
+{/*           
           {labwareDisplayCategoryFilters.map(category => (
             <TabbedButton
               key={category}
@@ -106,7 +114,7 @@ export function SelectDestLabware(
             >
               {t(category)}
             </TabbedButton>
-          ))}
+          ))} */}
         </Flex>
         <Flex
           gridGap={SPACING.spacing4}

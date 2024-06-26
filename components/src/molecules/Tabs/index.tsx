@@ -50,7 +50,7 @@ const CURRENT_TAB_STYLE = css`
     background-color: ${COLORS.purple55};
   }
 `
-const INNER_CONTAINER_STYLE = css`
+const DEFAULT_CONTAINER_STYLE = css`
   grid-gap: ${SPACING.spacing4};
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     grid-gap: ${SPACING.spacing8};
@@ -72,7 +72,7 @@ export function Tabs(props: TabsProps): JSX.Element {
   const { tabs } = props
 
   return (
-    <Flex flexDirection={DIRECTION_ROW} css={INNER_CONTAINER_STYLE}>
+    <Flex flexDirection={DIRECTION_ROW} css={DEFAULT_CONTAINER_STYLE}>
       {tabs.map((tab, index) => (
         <Btn
           data-testid={`tab_${index}_${tab.text}`}
