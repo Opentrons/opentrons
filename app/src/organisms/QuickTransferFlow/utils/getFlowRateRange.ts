@@ -1,21 +1,10 @@
 import type { QuickTransferSummaryState } from '../types'
 
 export function getFlowRateRange(
-    state: QuickTransferSummaryState
-):
-    { min: number, max: number} {
-
-  return { min: 0, max: 100 }  // TODO: actually calculate this
+  state: QuickTransferSummaryState
+): { min: number; max: number } {
+  return { min: 0, max: 100 } // TODO: actually calculate this
 }
-
-
-
-
-
-
-
-
-
 
 /*
 export function getVolumeRange(

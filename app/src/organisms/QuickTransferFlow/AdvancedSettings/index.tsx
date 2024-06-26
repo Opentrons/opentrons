@@ -20,16 +20,16 @@ import { PipettePath } from './PipettePath'
 import type {
   QuickTransferSummaryAction,
   QuickTransferSummaryState,
-  PathOption,
 } from '../types'
-import { single } from 'rxjs/operators'
 
 interface AdvancedSettingsProps {
   state: QuickTransferSummaryState
   dispatch: React.Dispatch<QuickTransferSummaryAction>
 }
 
-export function AdvancedSettings(props: AdvancedSettingsProps): JSX.Element | null {
+export function AdvancedSettings(
+  props: AdvancedSettingsProps
+): JSX.Element | null {
   const { state, dispatch } = props
   const { t } = useTranslation(['quick_transfer', 'shared'])
   const [selectedSetting, setSelectedSetting] = React.useState<string | null>(
@@ -38,17 +38,17 @@ export function AdvancedSettings(props: AdvancedSettingsProps): JSX.Element | nu
 
   let pipettePath: string = ''
   if (state.path === 'single') {
-      pipettePath = t('pipette_path_single')
+    pipettePath = t('pipette_path_single')
   } else if (state.path === 'multiAspirate') {
-      pipettePath = t('pipette_path_multi_aspirate')
+    pipettePath = t('pipette_path_multi_aspirate')
   } else if (state.path === 'multiDispense') {
-      pipettePath = t('pipette_path_multi_dispense')
+    pipettePath = t('pipette_path_multi_dispense')
   }
 
   const displayItems = [
     {
       option: t('aspirate_flow_rate'),
-      value: t('flow_rate_value', { flow_rate: state.aspirateFlowRate}),
+      value: t('flow_rate_value', { flow_rate: state.aspirateFlowRate }),
       enabled: true,
       onClick: () => {
         setSelectedSetting('aspirate_flow_rate')
@@ -56,18 +56,22 @@ export function AdvancedSettings(props: AdvancedSettingsProps): JSX.Element | nu
     },
     {
       option: t('dispense_flow_rate'),
-      value: t('flow_rate_value', { flow_rate: state.dispenseFlowRate}),
+      value: t('flow_rate_value', { flow_rate: state.dispenseFlowRate }),
       enabled: true,
       onClick: () => {
         setSelectedSetting('dispense_flow_rate')
       },
-    },{
+    },
+    {
       option: t('pipette_path'),
       value: pipettePath,
-      enabled: state.transferType === 'transfer',
+      enabled: state.transferType !== 'transfer',
       onClick: () => {
-        state.transferType === 'transfer' 
-        ? setSelectedSetting('pipette_path') : null
+        console.log(state.transferType)
+        console.log(state.path)
+        state.transferType !== 'transfer'
+          ? setSelectedSetting('pipette_path')
+          : null
       },
     },
   ]
@@ -97,7 +101,9 @@ export function AdvancedSettings(props: AdvancedSettingsProps): JSX.Element | nu
                   >
                     {displayItem.value}
                   </StyledText>
-                  {displayItem.enabled ? (<Icon name="more" size={SIZE_2} />) : null}
+                  {displayItem.enabled ? (
+                    <Icon name="more" size={SIZE_2} />
+                  ) : null}
                 </Flex>
               </Flex>
             </ListItem>

@@ -31,7 +31,10 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
   const allowedPipettePathOptions: PathOption[] = ['single']
   if (state.sourceWells.length === 1 && state.destinationWells.length > 1) {
     allowedPipettePathOptions.push('multiDispense')
-  } else if (state.sourceWells.length > 1  && state.destinationWells.length === 1) {
+  } else if (
+    state.sourceWells.length > 1 &&
+    state.destinationWells.length === 1
+  ) {
     allowedPipettePathOptions.push('multiAspirate')
   }
   const [
@@ -39,7 +42,19 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
     setSelectedPipettePathOption,
   ] = React.useState<PathOption>(state.path)
 
-  // TODO: set the user facing option here
+  function getOptionCopy(option: PathOption): string {
+    switch (option) {
+      case 'single':
+        return t('pipette_path_single')
+      case 'multiAspirate':
+        return t('pipette_path_multi_aspirate')
+      case 'multiDispense':
+        return t('pipette_path_multi_dispense')
+      default:
+        return ''
+    }
+  }
+
   const handleClickSave = (): void => {
     if (selectedPipettePathOption !== state.path) {
       dispatch({
@@ -74,7 +89,7 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
             onClick={() => {
               setSelectedPipettePathOption(option)
             }}
-            buttonText={t(`${option}`)}
+            buttonText={getOptionCopy(option)}
           />
         ))}
       </Flex>

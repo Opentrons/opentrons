@@ -23,7 +23,6 @@ import type {
 import { ACTIONS } from '../constants'
 import { createPortal } from 'react-dom'
 
-
 interface FlowRateEntryProps {
   onBack: () => void
   state: QuickTransferSummaryState
@@ -41,8 +40,12 @@ export function FlowRateEntry(props: FlowRateEntryProps): JSX.Element {
   )
   const flowRateRange = getFlowRateRange(state)
   const rateAsNumber = Number(flowRate)
-  let headerCopy: string, textEntryCopy: string = ''
-  let flowRateAction: typeof ACTIONS.SET_ASPIRATE_FLOW_RATE | typeof ACTIONS.SET_DISPENSE_FLOW_RATE | null = null
+  let headerCopy: string = ''
+  let textEntryCopy: string = ''
+  let flowRateAction:
+    | typeof ACTIONS.SET_ASPIRATE_FLOW_RATE
+    | typeof ACTIONS.SET_DISPENSE_FLOW_RATE
+    | null = null
   if (kind === 'aspirate') {
     headerCopy = t('aspirate_flow_rate')
     textEntryCopy = t('aspirate_flow_rate_µL')
