@@ -1,4 +1,4 @@
-"""Support create_protocol_engine module."""
+"""Support for create_protocol_engine module."""
 from . import ProtocolEngine
 from ..hardware_control import HardwareControlAPI
 
