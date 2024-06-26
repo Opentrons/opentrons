@@ -8,6 +8,7 @@ from opentrons_shared_data.labware.labware_definition import WellDefinition
 
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset
+from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import APIVersionError
@@ -178,10 +179,12 @@ def test_load_liquid(
     subject.load_liquid(liquid=mock_liquid, volume=20)
 
     decoy.verify(
-        mock_engine_client.load_liquid(
-            labware_id="labware-id",
-            liquid_id="liquid-id",
-            volume_by_well={"well-name": 20},
+        mock_engine_client.execute_command(
+            cmd.LoadLiquidParams(
+                labwareId="labware-id",
+                liquidId="liquid-id",
+                volumeByWell={"well-name": 20},
+            )
         ),
         times=1,
     )

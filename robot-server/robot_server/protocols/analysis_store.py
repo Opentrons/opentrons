@@ -7,7 +7,12 @@ from typing import Dict, List, Optional
 from typing_extensions import Final
 
 from opentrons_shared_data.robot.dev_types import RobotType
-from opentrons.protocol_engine.types import RunTimeParameter, RunTimeParamValuesType
+from opentrons_shared_data.errors import ErrorCodes
+from opentrons.protocol_engine.types import (
+    RunTimeParameter,
+    RunTimeParamValuesType,
+    CSVParameter,
+)
 from opentrons.protocol_engine import (
     Command,
     ErrorOccurrence,
@@ -16,6 +21,8 @@ from opentrons.protocol_engine import (
     LoadedModule,
     Liquid,
 )
+from opentrons.protocol_engine.protocol_engine import code_in_error_tree
+
 from .analysis_models import (
     AnalysisSummary,
     ProtocolAnalysis,
@@ -24,6 +31,7 @@ from .analysis_models import (
     AnalysisResult,
     AnalysisStatus,
     RunTimeParameterAnalysisData,
+    AnalysisParameterType,
 )
 
 from .completed_analysis_store import CompletedAnalysisStore, CompletedAnalysisResource
@@ -169,7 +177,15 @@ class AnalysisStore:
         ), "Analysis ID to update must be for a valid pending analysis."
 
         if len(errors) > 0:
-            result = AnalysisResult.NOT_OK
+            if any(
+                code_in_error_tree(
+                    root_error=error, code=ErrorCodes.RUNTIME_PARAMETER_VALUE_REQUIRED
+                )
+                for error in errors
+            ):
+                result = AnalysisResult.PARAMETER_VALUE_REQUIRED
+            else:
+                result = AnalysisResult.NOT_OK
         else:
             result = AnalysisResult.OK
 
@@ -289,10 +305,19 @@ class AnalysisStore:
 
         rtp_values_and_defaults = {}
         for param_spec in rtp_list:
+            value: AnalysisParameterType
+            if isinstance(param_spec, CSVParameter):
+                default = None
+                value = param_spec.file.id if param_spec.file is not None else None
+            else:
+                default = param_spec.default
+                value = param_spec.value
+            # TODO(jbl 2024-06-04) we might want to add type here, since CSV files value is a str and right now the only
+            #   thing disambiguating that is that default for that will be None, if we ever want to discern type.
             rtp_values_and_defaults.update(
                 {
                     param_spec.variableName: RunTimeParameterAnalysisData(
-                        value=param_spec.value, default=param_spec.default
+                        value=value, default=default
                     )
                 }
             )

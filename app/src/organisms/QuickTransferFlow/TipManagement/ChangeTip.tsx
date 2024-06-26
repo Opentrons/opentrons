@@ -29,7 +29,10 @@ export function ChangeTip(props: ChangeTipProps): JSX.Element {
   const { t } = useTranslation('quick_transfer')
 
   const allowedChangeTipOptions: ChangeTipOptions[] = ['once']
-  if (state.sourceWells.length <= 96 && state.destinationWells.length <= 96) {
+  if (
+    state.sourceWells.length * state.pipette.channels <= 96 &&
+    state.destinationWells.length * state.pipette.channels <= 96
+  ) {
     allowedChangeTipOptions.push('always')
   }
   if (state.path === 'single' && state.transferType === 'distribute') {

@@ -13,7 +13,7 @@ import {
   JUSTIFY_FLEX_END,
   NewPrimaryBtn,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
@@ -141,12 +141,12 @@ export function RobotUpdateProgressModal({
           alignItems={ALIGN_CENTER}
           padding={SPACING.spacing48}
         >
-          <StyledText>{modalBodyText}</StyledText>
+          <LegacyStyledText>{modalBodyText}</LegacyStyledText>
           <ProgressBar
             percentComplete={progressPercent}
             outerStyles={UPDATE_PROGRESS_BAR_STYLE}
           />
-          <StyledText css={UPDATE_TEXT_STYLE}>
+          <LegacyStyledText css={UPDATE_TEXT_STYLE}>
             {letUserExitUpdate &&
             updateStep !== 'restart' &&
             updateStep !== 'finished' ? (
@@ -164,7 +164,7 @@ export function RobotUpdateProgressModal({
             ) : (
               subProgressBarText
             )}
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
       )}
     </LegacyModal>
@@ -218,9 +218,9 @@ function SuccessOrError({ errorMessage }: SuccessOrErrorProps): JSX.Element {
   return (
     <>
       {renderedImg}
-      <StyledText>
+      <LegacyStyledText>
         {!errorMessage ? t('robot_update_success') : errorMessage}
-      </StyledText>
+      </LegacyStyledText>
     </>
   )
 }

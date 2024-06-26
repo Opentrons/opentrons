@@ -6,7 +6,7 @@ import {
   JUSTIFY_CENTER,
   Link,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -31,7 +31,7 @@ export function useConfirmCrashRecovery(
       justifyContent={JUSTIFY_CENTER}
       gridGap={SPACING.spacing4}
     >
-      <StyledText as="p">{t('jog_too_far_or_bend_tip')}</StyledText>
+      <LegacyStyledText as="p">{t('jog_too_far_or_bend_tip')}</LegacyStyledText>
       <Link
         role="button"
         onClick={() => {

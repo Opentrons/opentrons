@@ -44,6 +44,20 @@
               "wells": []
             }
           ],
+          "liquidProbeParameters": {
+            "minimumHeight": [
+              {
+                "applicableWells": [],
+                "value": 0.5
+              }
+            ],
+            "minimumWellVolume": [
+              {
+                "applicableWells": [],
+                "value": 0.0
+              }
+            ]
+          },
           "metadata": {
             "displayCategory": "adapter",
             "displayName": "Opentrons Flex 96 Tip Rack Adapter",
@@ -1293,6 +1307,7 @@
         "errorCode": "4000",
         "errorInfo": {},
         "errorType": "IncompatibleAddressableAreaError",
+        "isDefined": false,
         "wrappedErrors": []
       },
       "notes": [],
@@ -1318,18 +1333,21 @@
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
+      "isDefined": false,
       "wrappedErrors": [
         {
           "detail": "IncompatibleAddressableAreaError: Cannot use Slot C3, not compatible with one or more of the following fixtures: Trash Bin in C3",
           "errorCode": "4000",
           "errorInfo": {},
           "errorType": "ProtocolCommandFailedError",
+          "isDefined": false,
           "wrappedErrors": [
             {
               "detail": "Cannot use Slot C3, not compatible with one or more of the following fixtures: Trash Bin in C3",
               "errorCode": "4000",
               "errorInfo": {},
               "errorType": "IncompatibleAddressableAreaError",
+              "isDefined": false,
               "wrappedErrors": []
             }
           ]
@@ -1389,6 +1407,7 @@
       "pipetteName": "p1000_96"
     }
   ],
+  "result": "not-ok",
   "robotType": "OT-3 Standard",
   "runTimeParameters": []
 }

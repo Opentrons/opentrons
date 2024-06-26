@@ -9,7 +9,7 @@ import {
   OVERFLOW_AUTO,
   POSITION_FIXED,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
@@ -38,17 +38,19 @@ export function SidePanel(): JSX.Element {
 
       {/* body text */}
       <Flex gridGap={SPACING.spacing24} flexDirection={DIRECTION_COLUMN}>
-        <StyledText css={HEADER_TEXT_STYLE}>
+        <LegacyStyledText css={HEADER_TEXT_STYLE}>
           {t('side_panel_header')}
-        </StyledText>
-        <StyledText css={BODY_TEXT_STYLE}>{t('side_panel_body')}</StyledText>
+        </LegacyStyledText>
+        <LegacyStyledText css={BODY_TEXT_STYLE}>
+          {t('side_panel_body')}
+        </LegacyStyledText>
       </Flex>
 
       {/* buttons */}
       <Flex gridGap={SPACING.spacing24} flexDirection={DIRECTION_COLUMN}>
-        <StyledText css={BUTTON_GUIDE_TEXT_STYLE}>
+        <LegacyStyledText css={BUTTON_GUIDE_TEXT_STYLE}>
           {t('try_example_prompts')}
-        </StyledText>
+        </LegacyStyledText>
 
         <Flex gridGap={SPACING.spacing16} flexWrap={WRAP}>
           <PromptButton buttonText={t('reagent_transfer')} />
@@ -58,13 +60,13 @@ export function SidePanel(): JSX.Element {
         </Flex>
       </Flex>
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <StyledText
+        <LegacyStyledText
           fontSize={TYPOGRAPHY.fontSize20}
           lineHeight={TYPOGRAPHY.lineHeight24}
           color={COLORS.white}
         >
           {t('got_feedback')}
-        </StyledText>
+        </LegacyStyledText>
         <FeedbackLink external href={FEEDBACK_FORM_LINK}>
           {t('share_your_thoughts')}
         </FeedbackLink>

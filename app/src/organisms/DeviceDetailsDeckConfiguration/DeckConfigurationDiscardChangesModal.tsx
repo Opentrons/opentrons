@@ -7,7 +7,7 @@ import {
   DIRECTION_ROW,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 import { SmallButton } from '../../atoms/buttons'
@@ -36,7 +36,9 @@ export function DeckConfigurationDiscardChangesModal({
   return (
     <Modal header={modalHeader}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
-        <StyledText as="p">{t('changes_will_be_lost_description')}</StyledText>
+        <LegacyStyledText as="p">
+          {t('changes_will_be_lost_description')}
+        </LegacyStyledText>
         <Flex
           width="100%"
           flexDirection={DIRECTION_ROW}

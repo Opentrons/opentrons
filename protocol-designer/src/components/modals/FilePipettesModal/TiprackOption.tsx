@@ -7,7 +7,7 @@ import {
   COLORS,
   SPACING,
   ALIGN_CENTER,
-  StyledText,
+  LegacyStyledText,
   BORDERS,
   useHoverTooltip,
   Tooltip,
@@ -89,7 +89,7 @@ export function TiprackOption(props: TiprackOptionProps): JSX.Element {
         cursor={isDisabled ? 'auto' : 'pointer'}
         {...targetProps}
       >
-        <StyledText as="label">{text}</StyledText>
+        <LegacyStyledText as="label">{text}</LegacyStyledText>
       </Flex>
       {isDisabled ? (
         <Tooltip {...tooltipProps}>{t('disabled_no_space_pipette')}</Tooltip>

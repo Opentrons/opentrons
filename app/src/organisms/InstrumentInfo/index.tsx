@@ -9,7 +9,7 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -191,22 +191,22 @@ function InfoItem(props: InfoItemProps): JSX.Element {
       lineHeight={TYPOGRAPHY.lineHeight36}
       {...props}
     >
-      <StyledText
+      <LegacyStyledText
         as="h4"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         fontSize={TYPOGRAPHY.fontSize28}
         textTransform={TYPOGRAPHY.textTransformCapitalize}
       >
         {props.label}
-      </StyledText>
-      <StyledText
+      </LegacyStyledText>
+      <LegacyStyledText
         as="h4"
         color={COLORS.grey60}
         fontSize={TYPOGRAPHY.fontSize28}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
       >
         {props.value}
-      </StyledText>
+      </LegacyStyledText>
     </Flex>
   )
 }

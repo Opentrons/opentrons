@@ -24,7 +24,6 @@ DEFAULT_MODULE_OFFSET = [0.0, 0.0, 0.0]
 
 DEFAULT_LIQUID_PROBE_SETTINGS: Final[LiquidProbeSettings] = LiquidProbeSettings(
     starting_mount_height=100,
-    max_z_distance=40,
     mount_speed=10,
     plunger_speed=5,
     sensor_threshold_pascals=40,
@@ -335,7 +334,6 @@ def _build_default_liquid_probe(
         starting_mount_height=from_conf.get(
             "starting_mount_height", default.starting_mount_height
         ),
-        max_z_distance=from_conf.get("max_z_distance", default.max_z_distance),
         mount_speed=from_conf.get("mount_speed", default.mount_speed),
         plunger_speed=from_conf.get("plunger_speed", default.plunger_speed),
         sensor_threshold_pascals=from_conf.get(

@@ -9,6 +9,21 @@ import os
 import subprocess
 import sys
 import json
+import re
+
+
+def match_error_to_component(
+    project_id: str, error_message: str, components: List[str]
+) -> List[str]:
+    """Match error to component based on error message."""
+    project_components = ticket.get_project_components(project_id)
+    component_names = [proj_comp["name"] for proj_comp in project_components]
+    for component in component_names:
+        pattern = re.compile(component, re.IGNORECASE)
+        matches = pattern.findall(error_message)
+        if matches:
+            components.append(component)
+    return components
 
 
 def get_user_id(user_file_path: str, assignee_name: str) -> str:
@@ -76,9 +91,10 @@ def get_robot_state(
     )
     module_data = response.json()
     for module in module_data["data"]:
-        print(module)
         description[module["moduleType"]] = module
     components = ["Flex-RABR"]
+    components = match_error_to_component("RABR", reported_string, components)
+    print(components)
     whole_description_str = (
         "{"
         + "\n".join("{!r}: {!r},".format(k, v) for k, v in description.items())
@@ -116,6 +132,8 @@ def get_run_error_info_from_robot(
     failure_level = "Level " + str(error_level) + " Failure"
 
     components = [failure_level, "Flex-RABR"]
+    components = match_error_to_component("RABR", error_type, components)
+    print(components)
     affects_version = results["API_Version"]
     parent = results.get("robot_name", "")
     print(parent)
@@ -211,8 +229,8 @@ if __name__ == "__main__":
     except requests.exceptions.InvalidURL:
         print("Invalid IP address.")
         sys.exit()
-    one_run = error_runs[-1]  # Most recent run with error.
     if len(run_or_other) < 1:
+        one_run = error_runs[-1]  # Most recent run with error.
         (
             summary,
             robot,
@@ -234,7 +252,7 @@ if __name__ == "__main__":
         ip, storage_directory
     )
     file_paths = read_robot_logs.get_logs(storage_directory, ip)
-    print(f"Making ticket for run: {one_run} on robot {robot}.")
+    print(f"Making ticket for {summary}.")
     # TODO: make argument or see if I can get rid of with using board_id.
     project_key = "RABR"
     parent_key = project_key + "-" + robot[-1]

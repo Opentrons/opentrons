@@ -231,7 +231,6 @@ class CommandStore(HasState[CommandState], HandlesActions):
             # TODO(mc, 2021-06-22): mypy has trouble with this automatic
             # request > command mapping, figure out how to type precisely
             # (or wait for a future mypy version that can figure it out).
-            # For now, unit tests cover mapping every request type
             queued_command = action.request._CommandCls.construct(
                 id=action.command_id,
                 key=(
@@ -678,10 +677,6 @@ class CommandView(HasState[CommandState]):
     def get_is_door_blocking(self) -> bool:
         """Get whether the robot door is open when 'pause on door open' ff is True."""
         return self._state.is_door_blocking
-
-    def get_is_implicitly_active(self) -> bool:
-        """Get whether the queue is implicitly active, i.e., never 'played'."""
-        return self._state.queue_status == QueueStatus.SETUP
 
     def get_is_running(self) -> bool:
         """Get whether the protocol is running & queued commands should be executed."""

@@ -16,7 +16,7 @@ import {
   OVERFLOW_WRAP_ANYWHERE,
   PrimaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -79,20 +79,20 @@ export function RunFailedModal({
   return (
     <LegacyModal {...modalProps}>
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+        <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {t('error_info', {
             errorType: highestPriorityError.errorType,
             errorCode: highestPriorityError.errorCode,
           })}
-        </StyledText>
+        </LegacyStyledText>
         <Flex css={ERROR_MESSAGE_STYLE}>
-          <StyledText as="p" textAlign={TYPOGRAPHY.textAlignLeft}>
+          <LegacyStyledText as="p" textAlign={TYPOGRAPHY.textAlignLeft}>
             {highestPriorityError.detail}
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
-        <StyledText as="p">
+        <LegacyStyledText as="p">
           {t('branded:run_failed_modal_description_desktop')}
-        </StyledText>
+        </LegacyStyledText>
         <Flex
           marginTop={SPACING.spacing32}
           flexDirection={DIRECTION_ROW}

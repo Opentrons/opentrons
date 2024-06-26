@@ -14,7 +14,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   Link,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   truncateString,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -302,7 +302,7 @@ export function Toast(props: ToastProps): JSX.Element {
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       alignItems={ALIGN_CENTER}
       borderRadius={
-        showODDStyle ? BORDERS.borderRadius12 : BORDERS.borderRadius4
+        showODDStyle ? BORDERS.borderRadius8 : BORDERS.borderRadius4
       }
       borderColor={toastStyleByType[type].color}
       borderWidth={showODDStyle ? BORDERS.borderRadius4 : '1px'}
@@ -348,7 +348,7 @@ export function Toast(props: ToastProps): JSX.Element {
           width={showODDStyle ? 'auto' : '100%'}
         >
           {headingText.length > 0 ? (
-            <StyledText
+            <LegacyStyledText
               color={COLORS.black90}
               fontSize={
                 showODDStyle ? TYPOGRAPHY.fontSize22 : TYPOGRAPHY.fontSizeP
@@ -368,10 +368,10 @@ export function Toast(props: ToastProps): JSX.Element {
               whiteSpace="nowrap"
             >
               {headingText}
-            </StyledText>
+            </LegacyStyledText>
           ) : null}
           <Flex alignItems={ALIGN_CENTER}>
-            <StyledText css={TEXT_STYLE}>{message}</StyledText>
+            <LegacyStyledText css={TEXT_STYLE}>{message}</LegacyStyledText>
             {linkText ? (
               <Link
                 role="button"
@@ -396,8 +396,9 @@ export function Toast(props: ToastProps): JSX.Element {
           onClick={() => {
             onCloseHandler()
           }}
+          padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
         >
-          <StyledText
+          <LegacyStyledText
             color={COLORS.black90}
             fontSize={
               showODDStyle ? TYPOGRAPHY.fontSize22 : TYPOGRAPHY.fontSizeP
@@ -417,7 +418,7 @@ export function Toast(props: ToastProps): JSX.Element {
             whiteSpace="nowrap"
           >
             {closeText}
-          </StyledText>
+          </LegacyStyledText>
         </Link>
       ) : null}
       {!closeText && closeButton ? (

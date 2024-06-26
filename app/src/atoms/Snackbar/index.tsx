@@ -7,7 +7,7 @@ import {
   COLORS,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -84,14 +84,14 @@ export function Snackbar(props: SnackbarProps): JSX.Element {
       data-testid="Snackbar"
       {...styleProps}
     >
-      <StyledText
+      <LegacyStyledText
         color={COLORS.white}
         fontSize={TYPOGRAPHY.fontSize22}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         lineHeight={TYPOGRAPHY.lineHeight28}
       >
         {message}
-      </StyledText>
+      </LegacyStyledText>
     </Flex>
   )
 }

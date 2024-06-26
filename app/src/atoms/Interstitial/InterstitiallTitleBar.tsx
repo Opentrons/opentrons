@@ -9,7 +9,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   POSITION_ABSOLUTE,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -65,7 +65,7 @@ export function InterstitialTitleBar(
           paddingRight={TYPOGRAPHY.fontSizeH6}
           data-testid={`titlebar_${exit.title}`}
         >
-          <StyledText
+          <LegacyStyledText
             paddingRight={SPACING.spacing8}
             paddingTop={SPACING.spacing4}
             fontWeight={TYPOGRAPHY.fontWeightRegular}
@@ -73,7 +73,7 @@ export function InterstitialTitleBar(
             textTransform={TYPOGRAPHY.textTransformCapitalize}
           >
             {exit.title}
-          </StyledText>
+          </LegacyStyledText>
           <Btn
             size="1.5rem"
             onClick={exit.onClick}

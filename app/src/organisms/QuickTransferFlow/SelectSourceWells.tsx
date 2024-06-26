@@ -58,7 +58,7 @@ export function SelectSourceWells(props: SelectSourceWellsProps): JSX.Element {
         onClickBack={onBack}
         buttonText={i18n.format(t('shared:continue'), 'capitalize')}
         onClickButton={handleClickNext}
-        buttonIsDisabled={false}
+        buttonIsDisabled={Object.keys(selectedWells).length === 0}
         secondaryButtonProps={resetButtonProps}
         top={SPACING.spacing8}
       />
@@ -72,24 +72,30 @@ export function SelectSourceWells(props: SelectSourceWellsProps): JSX.Element {
         width="100%"
       >
         {state.source != null ? (
-          <WellSelection
-            definition={state.source}
-            deselectWells={(wells: string[]) => {
-              setSelectedWells(prevWells =>
-                without(Object.keys(prevWells), ...wells).reduce(
-                  (acc, well) => {
-                    return { ...acc, [well]: null }
-                  },
-                  {}
+          <Flex
+            width={
+              state.source.parameters.format === '384Standard' ? '100%' : '75%'
+            }
+          >
+            <WellSelection
+              definition={state.source}
+              deselectWells={(wells: string[]) => {
+                setSelectedWells(prevWells =>
+                  without(Object.keys(prevWells), ...wells).reduce(
+                    (acc, well) => {
+                      return { ...acc, [well]: null }
+                    },
+                    {}
+                  )
                 )
-              )
-            }}
-            selectedPrimaryWells={selectedWells}
-            selectWells={wellGroup => {
-              setSelectedWells(prevWells => ({ ...prevWells, ...wellGroup }))
-            }}
-            channels={state.pipette?.channels ?? 1}
-          />
+              }}
+              selectedPrimaryWells={selectedWells}
+              selectWells={wellGroup => {
+                setSelectedWells(prevWells => ({ ...prevWells, ...wellGroup }))
+              }}
+              channels={state.pipette?.channels ?? 1}
+            />
+          </Flex>
         ) : null}
       </Flex>
     </>

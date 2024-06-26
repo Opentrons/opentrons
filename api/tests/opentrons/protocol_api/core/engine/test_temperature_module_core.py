@@ -6,6 +6,7 @@ from opentrons.hardware_control import SynchronousAdapter
 from opentrons.hardware_control.modules import TempDeck
 from opentrons.hardware_control.modules.types import TemperatureStatus, ModuleType
 
+from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 
 from opentrons.protocol_api.core.engine.module_core import TemperatureModuleCore
@@ -67,8 +68,10 @@ def test_set_target_temperature(
     subject.set_target_temperature(38.9)
 
     decoy.verify(
-        mock_engine_client.temperature_module_set_target_temperature(
-            module_id="1234", celsius=38.9
+        mock_engine_client.execute_command(
+            cmd.temperature_module.SetTargetTemperatureParams(
+                moduleId="1234", celsius=38.9
+            )
         ),
         times=1,
     )
@@ -83,8 +86,10 @@ def test_wait_for_target_temperature(
     subject.wait_for_target_temperature()
 
     decoy.verify(
-        mock_engine_client.temperature_module_wait_for_target_temperature(
-            module_id="1234", celsius=None
+        mock_engine_client.execute_command(
+            cmd.temperature_module.WaitForTemperatureParams(
+                moduleId="1234", celsius=None
+            )
         ),
         times=1,
     )
@@ -99,7 +104,10 @@ def test_deactivate(
     subject.deactivate()
 
     decoy.verify(
-        mock_engine_client.temperature_module_deactivate(module_id="1234"), times=1
+        mock_engine_client.execute_command(
+            cmd.temperature_module.DeactivateTemperatureParams(moduleId="1234")
+        ),
+        times=1,
     )
 
 

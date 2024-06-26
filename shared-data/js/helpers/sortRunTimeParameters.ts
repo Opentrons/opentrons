@@ -10,14 +10,7 @@ import type { RunTimeParameter } from '..'
 export const sortRuntimeParameters = (
   runTimeParameters: RunTimeParameter[]
 ): RunTimeParameter[] => {
-  const copyRunTimeParameters = [...runTimeParameters]
-  const csvIndex = copyRunTimeParameters.findIndex(
-    param => param.type === 'csv_file'
+  return [...runTimeParameters].sort((a, b) =>
+    a.type === 'csv_file' && b.type !== 'csv_file' ? -1 : 0
   )
-  if (csvIndex !== -1) {
-    const csvParam = copyRunTimeParameters.splice(csvIndex, 1)[0]
-    copyRunTimeParameters.unshift(csvParam)
-    return copyRunTimeParameters
-  }
-  return runTimeParameters
 }

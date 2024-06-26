@@ -11,6 +11,8 @@ import type {
 } from '../../../robot-api/operators'
 import type { Action, Epic } from '../../../types'
 import type { FetchTipLengthCalibrationsAction } from '../types'
+import type { AllTipLengthCalibrations } from '../../api-types'
+import type { RobotApiErrorResponse } from '../../../robot-api/types'
 
 const mapActionToRequest: ActionToRequestMapper<FetchTipLengthCalibrationsAction> = action => ({
   method: GET,
@@ -24,8 +26,16 @@ const mapResponseToAction: ResponseToActionMapper<FetchTipLengthCalibrationsActi
   const { host, body, ...responseMeta } = response
   const meta = { ...originalAction.meta, response: responseMeta }
   return response.ok
-    ? Actions.fetchTipLengthCalibrationsSuccess(host.name, body, meta)
-    : Actions.fetchTipLengthCalibrationsFailure(host.name, body, meta)
+    ? Actions.fetchTipLengthCalibrationsSuccess(
+        host.name,
+        body as AllTipLengthCalibrations,
+        meta
+      )
+    : Actions.fetchTipLengthCalibrationsFailure(
+        host.name,
+        body as RobotApiErrorResponse,
+        meta
+      )
 }
 
 export const fetchTipLengthCalibrationsEpic: Epic = (action$, state$) => {

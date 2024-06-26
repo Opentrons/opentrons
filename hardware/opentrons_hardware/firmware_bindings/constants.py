@@ -4,6 +4,7 @@ This file is used as a source for code generation, which does not run in a venv
 by default. Please do not unconditionally import things outside the python standard
 library.
 """
+
 from enum import Enum, unique
 from typing import Union, Dict, List
 
@@ -294,6 +295,7 @@ class ErrorCode(int, Enum):
     door_open = 0x0E
     reed_open = 0x0F
     motor_driver_error_detected = 0x10
+    safety_relay_inactive = 0x11
 
 
 @unique

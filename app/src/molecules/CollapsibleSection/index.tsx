@@ -8,7 +8,7 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import type { StyleProps } from '@opentrons/components'
@@ -45,9 +45,12 @@ export function CollapsibleSection(
           cursor: 'pointer',
         }}
       >
-        <StyledText as="p" textTransform={TYPOGRAPHY.textTransformCapitalize}>
+        <LegacyStyledText
+          as="p"
+          textTransform={TYPOGRAPHY.textTransformCapitalize}
+        >
           {title}
-        </StyledText>
+        </LegacyStyledText>
         <Btn
           onClick={() => {
             setIsExpanded(!isExpanded)

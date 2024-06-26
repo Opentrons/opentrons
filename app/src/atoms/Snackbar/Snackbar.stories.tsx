@@ -7,7 +7,7 @@ import {
   JUSTIFY_CENTER,
   PrimaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   VIEWPORT,
 } from '@opentrons/components'
 
@@ -32,12 +32,12 @@ const DefaultTemplate: Story<React.ComponentProps<typeof Snackbar>> = args => {
       <Flex flexDirection={DIRECTION_ROW} marginY={SPACING.spacing16}>
         <PrimaryButton onClick={handleClick}>Click me</PrimaryButton>
         <Flex flexDirection={DIRECTION_COLUMN} marginLeft={SPACING.spacing8}>
-          <StyledText as="p">
+          <LegacyStyledText as="p">
             When clicking the button, the Snackbar shows up in the bottom.
-          </StyledText>
-          <StyledText as="p">
+          </LegacyStyledText>
+          <LegacyStyledText as="p">
             By default the Snackbar will disappear after 4 seconds.
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
       </Flex>
       {isShowSnackbar && (

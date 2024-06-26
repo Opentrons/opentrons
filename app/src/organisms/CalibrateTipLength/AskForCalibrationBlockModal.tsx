@@ -12,7 +12,7 @@ import {
   PrimaryButton,
   SecondaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useDispatch } from 'react-redux'
@@ -71,15 +71,17 @@ export function AskForCalibrationBlockModal(props: Props): JSX.Element {
       >
         <Flex gridGap={SPACING.spacing8}>
           <Flex flex="1" flexDirection={DIRECTION_COLUMN}>
-            <StyledText as="h1" marginBottom={SPACING.spacing16}>
+            <LegacyStyledText as="h1" marginBottom={SPACING.spacing16}>
               {t('do_you_have_a_cal_block')}
-            </StyledText>
+            </LegacyStyledText>
 
             <Trans
               t={t}
               i18nKey="branded:calibration_block_description"
               components={{
-                block: <StyledText as="p" marginBottom={SPACING.spacing8} />,
+                block: (
+                  <LegacyStyledText as="p" marginBottom={SPACING.spacing8} />
+                ),
                 supportLink: (
                   <Link
                     external
@@ -111,9 +113,9 @@ export function AskForCalibrationBlockModal(props: Props): JSX.Element {
               }}
               value={rememberPreference}
             />
-            <StyledText as="p" marginLeft={SPACING.spacing8}>
+            <LegacyStyledText as="p" marginLeft={SPACING.spacing8}>
               {t('shared:remember_my_selection_and_do_not_ask_again')}
-            </StyledText>
+            </LegacyStyledText>
           </Flex>
           <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
             <SecondaryButton onClick={makeSetHasBlock(false)}>

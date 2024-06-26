@@ -191,7 +191,7 @@ from opentrons_shared_data.errors.exceptions import (
     PipetteOverpressureError,
     FirmwareUpdateRequiredError,
     FailedGripperPickupError,
-    LiquidNotFoundError,
+    PipetteLiquidNotFoundError,
     CommunicationError,
     PythonException,
     UnsupportedHardwareCommand,
@@ -1367,7 +1367,7 @@ class OT3Controller(FlexBackend):
                 self._subsystem_manager.device_info[
                     SubSystem.of_mount(mount)
                 ].revision.tertiary
-                == "1"
+                != "1"
             ):
                 raise UnsupportedHardwareCommand(
                     "Liquid Probe not supported on this pipette firmware"
@@ -1412,7 +1412,7 @@ class OT3Controller(FlexBackend):
             or positions[head_node].move_ack
             == MoveCompleteAck.complete_without_condition
         ):
-            raise LiquidNotFoundError(
+            raise PipetteLiquidNotFoundError(
                 "Liquid not found during probe.",
                 {
                     str(node_to_axis(node)): str(point.motor_position)
