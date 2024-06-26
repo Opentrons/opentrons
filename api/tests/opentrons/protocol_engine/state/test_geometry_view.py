@@ -2077,6 +2077,8 @@ def test_get_next_drop_tip_location(
             pipette_bounding_box_offsets=PipetteBoundingBoxOffsets(
                 back_left_corner=Point(x=10, y=20, z=30),
                 front_right_corner=Point(x=40, y=50, z=60),
+                front_left_corner=Point(x=10, y=50, z=60),
+                back_right_corner=Point(x=40, y=20, z=60),
             ),
             lld_settings={},
         )

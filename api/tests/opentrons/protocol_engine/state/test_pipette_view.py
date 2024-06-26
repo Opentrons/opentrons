@@ -46,7 +46,10 @@ _SAMPLE_NOZZLE_BOUNDS_OFFSETS = BoundingNozzlesOffsets(
     back_left_offset=Point(x=10, y=20, z=30), front_right_offset=Point(x=40, y=50, z=60)
 )
 _SAMPLE_PIPETTE_BOUNDING_BOX_OFFSETS = PipetteBoundingBoxOffsets(
-    back_left_corner=Point(x=10, y=20, z=30), front_right_corner=Point(x=40, y=50, z=60)
+    back_left_corner=Point(x=10, y=20, z=30),
+    front_right_corner=Point(x=40, y=50, z=60),
+    front_left_corner=Point(x=10, y=50, z=60),
+    back_right_corner=Point(x=40, y=20, z=60),
 )
 
 
@@ -594,6 +597,8 @@ _pipette_spec_cases = [
         bounding_box_offsets=PipetteBoundingBoxOffsets(
             back_left_corner=Point(0.0, 31.5, 35.52),
             front_right_corner=Point(0.0, -31.5, 35.52),
+            front_left_corner=Point(0.0, -31.5, 35.52),
+            back_right_corner=Point(0.0, 31.5, 35.52),
         ),
         nozzle_map=NozzleMap.build(
             physical_nozzles=EIGHT_CHANNEL_MAP,
@@ -620,6 +625,8 @@ _pipette_spec_cases = [
         bounding_box_offsets=PipetteBoundingBoxOffsets(
             back_left_corner=Point(0.0, 31.5, 35.52),
             front_right_corner=Point(0.0, -31.5, 35.52),
+            front_left_corner=Point(0.0, -31.5, 35.52),
+            back_right_corner=Point(0.0, 31.5, 35.52),
         ),
         nozzle_map=NozzleMap.build(
             physical_nozzles=EIGHT_CHANNEL_MAP,
@@ -646,6 +653,8 @@ _pipette_spec_cases = [
         bounding_box_offsets=PipetteBoundingBoxOffsets(
             back_left_corner=Point(-36.0, -25.5, -259.15),
             front_right_corner=Point(63.0, -88.5, -259.15),
+            front_left_corner=Point(-36.0, -88.5, -259.15),
+            back_right_corner=Point(63.0, -25.5, -259.15),
         ),
         nozzle_map=NozzleMap.build(
             physical_nozzles=NINETY_SIX_MAP,
@@ -688,6 +697,8 @@ _pipette_spec_cases = [
         bounding_box_offsets=PipetteBoundingBoxOffsets(
             back_left_corner=Point(-36.0, -25.5, -259.15),
             front_right_corner=Point(63.0, -88.5, -259.15),
+            front_left_corner=Point(-36.0, -88.5, -259.15),
+            back_right_corner=Point(63.0, -25.5, -259.15),
         ),
         nozzle_map=NozzleMap.build(
             physical_nozzles=NINETY_SIX_MAP,
@@ -712,6 +723,8 @@ _pipette_spec_cases = [
         bounding_box_offsets=PipetteBoundingBoxOffsets(
             back_left_corner=Point(-36.0, -25.5, -259.15),
             front_right_corner=Point(63.0, -88.5, -259.15),
+            front_left_corner=Point(-36.0, -88.5, -259.15),
+            back_right_corner=Point(63.0, -25.5, -259.15),
         ),
         nozzle_map=NozzleMap.build(
             physical_nozzles=NINETY_SIX_MAP,
@@ -736,6 +749,8 @@ _pipette_spec_cases = [
         bounding_box_offsets=PipetteBoundingBoxOffsets(
             back_left_corner=Point(-36.0, -25.5, -259.15),
             front_right_corner=Point(63.0, -88.5, -259.15),
+            front_left_corner=Point(-36.0, -88.5, -259.15),
+            back_right_corner=Point(63.0, -25.5, -259.15),
         ),
         nozzle_map=NozzleMap.build(
             physical_nozzles=NINETY_SIX_MAP,
