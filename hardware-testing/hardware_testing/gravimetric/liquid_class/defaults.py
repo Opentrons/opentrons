@@ -14,7 +14,7 @@ _default_submerge_dispense_mm = 1.5
 _default_retract_mm = 5.0
 _default_retract_discontinuity = 20
 
-_default_aspirate_delay_seconds = 3.0  # EDIT HERE (6/26)
+_default_aspirate_delay_seconds = 0.0  # EDIT HERE (6/26)
 _default_dispense_delay_seconds = 0.5
 
 _default_accel_p50_ul_sec_sec = 1200
