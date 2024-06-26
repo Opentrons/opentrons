@@ -540,6 +540,8 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         command: Union[
             absorbance_reader.Initialize,
             absorbance_reader.MeasureAbsorbance,
+            absorbance_reader.CloseLid,
+            absorbance_reader.OpenLid,
         ],
     ) -> None:
         module_id = command.params.moduleId
