@@ -24,8 +24,10 @@ import { ChildNavigation } from '../ChildNavigation'
 import { ResetValuesModal } from './ResetValuesModal'
 import { ChooseEnum } from './ChooseEnum'
 import { ChooseNumber } from './ChooseNumber'
+import { useFeatureFlag } from '../../redux/config'
 
 import type {
+  CompletedProtocolAnalysis,
   ChoiceParameter,
   NumberParameter,
   RunTimeParameter,
@@ -37,14 +39,17 @@ interface ProtocolSetupParametersProps {
   protocolId: string
   runTimeParameters: RunTimeParameter[]
   labwareOffsets?: LabwareOffsetCreateData[]
+  mostRecentAnalysis?: CompletedProtocolAnalysis | null
 }
 
 export function ProtocolSetupParameters({
   protocolId,
   labwareOffsets,
   runTimeParameters,
+  mostRecentAnalysis,
 }: ProtocolSetupParametersProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
+  const enableCsvFile = useFeatureFlag('enableCsvFile')
   const history = useHistory()
   const host = useHost()
   const queryClient = useQueryClient()
@@ -184,7 +189,9 @@ export function ProtocolSetupParameters({
                   hasRightIcon={!(parameter.type === 'bool')}
                   hasLeftIcon={false}
                   status={
-                    parameter.type === 'csv_file' ? 'not ready' : 'inform'
+                    enableCsvFile && parameter.type === 'csv_file'
+                      ? 'not ready'
+                      : 'inform'
                   }
                   title={
                     parameter.type === 'csv_file'
@@ -195,7 +202,9 @@ export function ProtocolSetupParameters({
                     handleSetParameter(parameter)
                   }}
                   detail={
-                    parameter.type === 'csv_file'
+                    enableCsvFile && // ToDo this line will be removed
+                    parameter.type === 'csv_file' &&
+                    mostRecentAnalysis?.result === 'parameter-value-required'
                       ? t('required')
                       : formatRunTimeParameterValue(parameter, t)
                   }
