@@ -318,17 +318,6 @@ class Protocols:
         file_extension="py",
         robot="Flex",
     )
-    Flex_S_2_15_P1000M_GRIP_HS_TM_MB_OmegaHDQDNAExtractionBacteria: Protocol = Protocol(
-        file_stem="Flex_S_2_15_P1000M_GRIP_HS_TM_MB_OmegaHDQDNAExtractionBacteria",
-        file_extension="py",
-        robot="Flex",
-    )
-    Flex_S_2_15_P1000M_P50M_GRIP_HS_TM_MB_TC_KAPALibraryQuantv4_8: Protocol = Protocol(
-        file_stem="Flex_S_2_15_P1000M_P50M_GRIP_HS_TM_MB_TC_KAPALibraryQuantv4_8",
-        file_extension="py",
-        robot="Flex",
-    )
-
     Flex_S_v2_18_P1000_96_GRIP_HS_MB_TC_TM_Smoke: Protocol = Protocol(
         file_stem="Flex_S_v2_18_P1000_96_GRIP_HS_MB_TC_TM_Smoke",
         file_extension="py",
