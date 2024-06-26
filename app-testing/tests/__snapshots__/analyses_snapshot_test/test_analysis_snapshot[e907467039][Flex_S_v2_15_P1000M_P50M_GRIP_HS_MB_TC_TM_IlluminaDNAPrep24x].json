@@ -605,20 +605,6 @@
               ]
             }
           ],
-          "liquidProbeParameters": {
-            "minimumHeight": [
-              {
-                "applicableWells": [],
-                "value": 0.5
-              }
-            ],
-            "minimumWellVolume": [
-              {
-                "applicableWells": [],
-                "value": 0.0
-              }
-            ]
-          },
           "metadata": {
             "displayCategory": "wellPlate",
             "displayName": "NEST 96 Well Plate 100 µL PCR Full Skirt",
@@ -3389,20 +3375,6 @@
               ]
             }
           ],
-          "liquidProbeParameters": {
-            "minimumHeight": [
-              {
-                "applicableWells": [],
-                "value": 0.5
-              }
-            ],
-            "minimumWellVolume": [
-              {
-                "applicableWells": [],
-                "value": 0.0
-              }
-            ]
-          },
           "metadata": {
             "displayCategory": "wellPlate",
             "displayName": "NEST 96 Well Plate 100 µL PCR Full Skirt",
@@ -4633,20 +4605,6 @@
               ]
             }
           ],
-          "liquidProbeParameters": {
-            "minimumHeight": [
-              {
-                "applicableWells": [],
-                "value": 0.5
-              }
-            ],
-            "minimumWellVolume": [
-              {
-                "applicableWells": [],
-                "value": 0.0
-              }
-            ]
-          },
           "metadata": {
             "displayCategory": "wellPlate",
             "displayName": "NEST 96 Deep Well Plate 2mL",
@@ -8189,7 +8147,8 @@
       "notes": [],
       "params": {
         "mount": "right",
-        "pipetteName": "p1000_multi_flex"
+        "pipetteName": "p1000_multi_flex",
+        "tipOverlapNotAfterVersion": "v0"
       },
       "result": {},
       "status": "succeeded"
@@ -8199,7 +8158,8 @@
       "notes": [],
       "params": {
         "mount": "left",
-        "pipetteName": "p50_multi_flex"
+        "pipetteName": "p50_multi_flex",
+        "tipOverlapNotAfterVersion": "v0"
       },
       "result": {},
       "status": "succeeded"

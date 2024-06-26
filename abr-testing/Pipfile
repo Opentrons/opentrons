@@ -19,6 +19,7 @@ slack-sdk = "*"
 pandas = "*"
 pandas-stubs = "*"
 
+
 [dev-packages]
 atomicwrites = "==1.4.1"
 colorama = "==0.4.4"

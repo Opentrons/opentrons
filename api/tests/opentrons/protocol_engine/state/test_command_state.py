@@ -11,11 +11,17 @@ import pytest
 
 from opentrons_shared_data.errors import ErrorCodes, PythonException
 
+from opentrons.hardware_control.types import DoorState
 from opentrons.ordered_set import OrderedSet
 from opentrons.protocol_engine import actions, commands, errors
+from opentrons.protocol_engine.actions.actions import PlayAction
+from opentrons.protocol_engine.commands.command import CommandIntent
 from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
 from opentrons.protocol_engine.errors.error_occurrence import ErrorOccurrence
-from opentrons.protocol_engine.errors.exceptions import EStopActivatedError
+from opentrons.protocol_engine.errors.exceptions import (
+    EStopActivatedError,
+    RobotDoorOpenError,
+)
 from opentrons.protocol_engine.notes.notes import CommandNote
 from opentrons.protocol_engine.state.commands import (
     CommandStore,
@@ -202,14 +208,7 @@ def test_command_failure_clears_queues() -> None:
         error_id="error-id",
         failed_at=datetime(year=2023, month=3, day=3),
         error=errors.ProtocolEngineError(message="oh no"),
-        notes=[
-            CommandNote(
-                noteKind="noteKind",
-                shortMessage="shortMessage",
-                longMessage="longMessage",
-                source="source",
-            )
-        ],
+        notes=[],
         type=ErrorRecoveryType.FAIL_RUN,
     )
     subject.handle_action(fail_1)
@@ -275,14 +274,7 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
         error_id="error-id",
         failed_at=datetime(year=2023, month=3, day=3),
         error=errors.ProtocolEngineError(message="oh no"),
-        notes=[
-            CommandNote(
-                noteKind="noteKind",
-                shortMessage="shortMessage",
-                longMessage="longMessage",
-                source="source",
-            )
-        ],
+        notes=[],
         type=ErrorRecoveryType.FAIL_RUN,
     )
     subject.handle_action(fail_2_setup)
@@ -341,23 +333,206 @@ def test_nonfatal_command_failure() -> None:
         error_id="error-id",
         failed_at=datetime(year=2023, month=3, day=3),
         error=errors.ProtocolEngineError(message="oh no"),
-        notes=[
-            CommandNote(
-                noteKind="noteKind",
-                shortMessage="shortMessage",
-                longMessage="longMessage",
-                source="source",
-            )
-        ],
+        notes=[],
         type=ErrorRecoveryType.WAIT_FOR_RECOVERY,
     )
     subject.handle_action(fail_1)
 
+    assert subject_view.get_status() == EngineStatus.AWAITING_RECOVERY
     assert [(c.id, c.status) for c in subject_view.get_all()] == [
         ("command-id-1", commands.CommandStatus.FAILED),
         ("command-id-2", commands.CommandStatus.QUEUED),
     ]
     assert subject_view.get_running_command_id() is None
+
+
+def test_door_during_setup_phase() -> None:
+    """Test behavior when the door is opened during the setup phase."""
+    subject = CommandStore(
+        is_door_open=False,
+        config=Config(
+            block_on_door_open=True,
+            # Choice of robot and deck type are arbitrary.
+            robot_type="OT-2 Standard",
+            deck_type=DeckType.OT2_STANDARD,
+        ),
+    )
+    subject_view = CommandView(subject.state)
+
+    queue_setup_command = actions.QueueCommandAction(
+        request=commands.CommentCreate(
+            params=commands.CommentParams(message=""),
+            key="setup-command-key",
+            intent=commands.CommandIntent.SETUP,
+        ),
+        request_hash=None,
+        created_at=datetime(year=2021, month=1, day=1),
+        command_id="setup-command-id",
+    )
+    subject.handle_action(queue_setup_command)
+
+    subject.handle_action(actions.DoorChangeAction(DoorState.OPEN))
+
+    assert subject_view.get_status() == EngineStatus.IDLE
+    # The door being open should not block the setup command from executing.
+    assert subject_view.get_next_to_execute() == "setup-command-id"
+
+
+def test_door_during_protocol_phase() -> None:
+    """Test behavior when the door is opened during the main protocol phase."""
+    subject = CommandStore(
+        is_door_open=False,
+        config=Config(
+            block_on_door_open=True,
+            # Choice of robot and deck type are arbitrary.
+            robot_type="OT-2 Standard",
+            deck_type=DeckType.OT2_STANDARD,
+        ),
+    )
+    subject_view = CommandView(subject.state)
+
+    queue_protocol_command = actions.QueueCommandAction(
+        request=commands.CommentCreate(
+            params=commands.CommentParams(message=""),
+            key="command-key",
+        ),
+        request_hash=None,
+        created_at=datetime(year=2021, month=1, day=1),
+        command_id="command-id",
+    )
+    subject.handle_action(queue_protocol_command)
+
+    subject.handle_action(
+        actions.PlayAction(requested_at=datetime.now(), deck_configuration=None)
+    )
+
+    play = PlayAction(requested_at=datetime.now(), deck_configuration=None)
+
+    # Test state after we open the door:
+    subject.handle_action(actions.DoorChangeAction(DoorState.OPEN))
+    assert subject_view.get_status() == EngineStatus.BLOCKED_BY_OPEN_DOOR
+    assert subject_view.get_next_to_execute() is None
+    with pytest.raises(RobotDoorOpenError):
+        subject_view.validate_action_allowed(play)
+
+    # Test state after we close the door (with an extra open-close for good measure)
+    subject.handle_action(actions.DoorChangeAction(DoorState.CLOSED))
+    subject.handle_action(actions.DoorChangeAction(DoorState.OPEN))
+    subject.handle_action(actions.DoorChangeAction(DoorState.CLOSED))
+    assert subject_view.get_status() == EngineStatus.PAUSED
+    assert subject_view.get_next_to_execute() is None
+    subject_view.validate_action_allowed(play)  # Should not raise.
+
+    # Test state when we resume:
+    subject.handle_action(play)
+    assert subject_view.get_status() == EngineStatus.RUNNING
+    assert subject_view.get_next_to_execute() == "command-id"
+
+
+def test_door_during_error_recovery() -> None:
+    """Test behavior when the door is opened during error recovery."""
+    subject = CommandStore(
+        is_door_open=False,
+        config=Config(
+            block_on_door_open=True,
+            # Choice of robot and deck type are arbitrary.
+            robot_type="OT-2 Standard",
+            deck_type=DeckType.OT2_STANDARD,
+        ),
+    )
+    subject_view = CommandView(subject.state)
+
+    # Fail a command to put the subject in recovery mode.
+    queue_1 = actions.QueueCommandAction(
+        request=commands.CommentCreate(
+            params=commands.CommentParams(message=""), key="command-key-1"
+        ),
+        request_hash=None,
+        created_at=datetime(year=2021, month=1, day=1),
+        command_id="command-id-1",
+    )
+    subject.handle_action(queue_1)
+    run_1 = actions.RunCommandAction(
+        command_id="command-id-1",
+        started_at=datetime(year=2022, month=2, day=2),
+    )
+    subject.handle_action(run_1)
+    fail_1 = actions.FailCommandAction(
+        command_id="command-id-1",
+        running_command=subject_view.get("command-id-1"),
+        error_id="error-id",
+        failed_at=datetime(year=2023, month=3, day=3),
+        error=errors.ProtocolEngineError(message="oh no"),
+        notes=[],
+        type=ErrorRecoveryType.WAIT_FOR_RECOVERY,
+    )
+    subject.handle_action(fail_1)
+
+    queue_2 = actions.QueueCommandAction(
+        request=commands.CommentCreate(
+            params=commands.CommentParams(message=""),
+            key="command-key-2",
+            intent=CommandIntent.FIXIT,
+        ),
+        request_hash=None,
+        created_at=datetime(year=2021, month=1, day=1),
+        command_id="command-id-2",
+    )
+    subject.handle_action(queue_2)
+    assert subject_view.get_status() == EngineStatus.AWAITING_RECOVERY
+    assert subject_view.get_next_to_execute() == "command-id-2"
+
+    # Test state after we open the door:
+    subject.handle_action(actions.DoorChangeAction(DoorState.OPEN))
+    assert (
+        subject_view.get_status() == EngineStatus.AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR
+    )
+    assert subject_view.get_next_to_execute() is None
+    play = actions.PlayAction(requested_at=datetime.now(), deck_configuration=None)
+    with pytest.raises(RobotDoorOpenError):
+        subject_view.validate_action_allowed(play)
+
+    # Test state after we close the door (with an extra open-close for good measure)
+    subject.handle_action(actions.DoorChangeAction(DoorState.CLOSED))
+    subject.handle_action(actions.DoorChangeAction(DoorState.OPEN))
+    subject.handle_action(actions.DoorChangeAction(DoorState.CLOSED))
+    assert subject_view.get_status() == EngineStatus.AWAITING_RECOVERY_PAUSED
+    assert subject_view.get_next_to_execute() is None
+    subject_view.validate_action_allowed(play)  # Should not raise.
+
+    # Test state when we resume recovery mode:
+    subject.handle_action(play)
+    assert subject_view.get_status() == EngineStatus.AWAITING_RECOVERY
+    assert subject_view.get_next_to_execute() == "command-id-2"
+
+
+@pytest.mark.parametrize(
+    ("door_initially_open", "expected_engine_status_after_play"),
+    [
+        (False, EngineStatus.RUNNING),
+        (True, EngineStatus.BLOCKED_BY_OPEN_DOOR),
+    ],
+)
+def test_door_initially_open(
+    door_initially_open: bool, expected_engine_status_after_play: EngineStatus
+) -> None:
+    """Test open-door blocking behavior given different initial door states."""
+    subject = CommandStore(
+        is_door_open=door_initially_open,
+        config=Config(
+            block_on_door_open=True,
+            # Choice of robot and deck type are arbitrary.
+            robot_type="OT-2 Standard",
+            deck_type=DeckType.OT2_STANDARD,
+        ),
+    )
+    subject_view = CommandView(subject.state)
+
+    assert subject_view.get_status() == EngineStatus.IDLE
+    play = actions.PlayAction(requested_at=datetime.now(), deck_configuration=None)
+    subject_view.validate_action_allowed(play)  # Should not raise.
+    subject.handle_action(play)
+    assert subject_view.get_status() == expected_engine_status_after_play
 
 
 def test_error_recovery_type_tracking() -> None:
@@ -570,4 +745,64 @@ def test_final_state_after_stop() -> None:
     )
 
     assert subject_view.get_status() == EngineStatus.STOPPED
+    assert subject_view.get_error() is None
+
+
+def test_final_state_after_error_recovery_stop() -> None:
+    """Test the final state of the run after it's stopped during error recovery.
+
+    We still want to count this as "stopped," not "failed."
+    """
+    subject = CommandStore(config=_make_config(), is_door_open=False)
+    subject_view = CommandView(subject.state)
+
+    # Fail a command to put the subject in recovery mode.
+    queue_1 = actions.QueueCommandAction(
+        request=commands.CommentCreate(
+            params=commands.CommentParams(message=""), key="command-key-1"
+        ),
+        request_hash=None,
+        created_at=datetime(year=2021, month=1, day=1),
+        command_id="command-id-1",
+    )
+    subject.handle_action(queue_1)
+    run_1 = actions.RunCommandAction(
+        command_id="command-id-1",
+        started_at=datetime(year=2022, month=2, day=2),
+    )
+    subject.handle_action(run_1)
+    fail_1 = actions.FailCommandAction(
+        command_id="command-id-1",
+        running_command=subject_view.get("command-id-1"),
+        error_id="error-id",
+        failed_at=datetime(year=2023, month=3, day=3),
+        error=errors.ProtocolEngineError(message="oh no"),
+        notes=[],
+        type=ErrorRecoveryType.WAIT_FOR_RECOVERY,
+    )
+    subject.handle_action(fail_1)
+    assert subject_view.get_status() == EngineStatus.AWAITING_RECOVERY
+
+    subject.handle_action(actions.StopAction())
+    subject.handle_action(
+        actions.FinishAction(
+            error_details=actions.FinishErrorDetails(
+                error=RuntimeError(
+                    "uh oh I was a command and then I got cancelled because someone"
+                    " stopped the run, and now I'm raising this exception because"
+                    " of that. Woe is me"
+                ),
+                error_id="error-id",
+                created_at=datetime.now(),
+            )
+        )
+    )
+    subject.handle_action(
+        actions.HardwareStoppedAction(
+            completed_at=sentinel.hardware_stopped_action_completed_at,
+            finish_error_details=None,
+        )
+    )
+    assert subject_view.get_status() == EngineStatus.STOPPED
+    assert subject_view.get_recovery_target() is None
     assert subject_view.get_error() is None

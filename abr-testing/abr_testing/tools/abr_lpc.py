@@ -10,7 +10,8 @@ def remove_duplicate_data() -> None:
     seen = set()
     new_values = []
     row_indices = []
-    sheet_data = google_sheet_lpc.get_all_data()
+    headers = google_sheet_lpc.get_row(1)
+    sheet_data = google_sheet_lpc.get_all_data(headers)
     for i, row in enumerate(sheet_data):
         key = (
             row["Robot"],
@@ -49,8 +50,10 @@ if __name__ == "__main__":
     except FileNotFoundError:
         print(f"Add credentials.json file to: {storage_directory}.")
         sys.exit()
+
     google_sheet_lpc = google_sheets_tool.google_sheet(credentials_path, "ABR-LPC", 0)
-    print(len(google_sheet_lpc.get_all_data()))
+    headers = google_sheet_lpc.get_row(1)
+    print(len(google_sheet_lpc.get_all_data(headers)))
     remove_duplicate_data()
-    num_of_rows = print(len(google_sheet_lpc.get_all_data()))
+    num_of_rows = print(len(google_sheet_lpc.get_all_data(headers)))
     # TODO: automate data analysis

@@ -87,6 +87,8 @@ from opentrons.protocols.api_support.deck_type import (
     STANDARD_OT3_DECK,
 )
 
+from ... import versions_below, versions_at_or_above
+
 
 @pytest.fixture(scope="session")
 def ot2_standard_deck_def() -> DeckDefinitionV5:
@@ -236,7 +238,10 @@ def test_get_slot_item_empty(
     assert subject.get_slot_item(DeckSlotName.SLOT_1) is None
 
 
-def test_load_instrument(
+@pytest.mark.parametrize(
+    "api_version", versions_below(APIVersion(2, 19), flex_only=False)
+)
+def test_load_instrument_pre_219(
     decoy: Decoy,
     mock_sync_hardware_api: SyncHardwareAPI,
     mock_engine_client: EngineClient,
@@ -246,7 +251,45 @@ def test_load_instrument(
     decoy.when(
         mock_engine_client.execute_command_without_recovery(
             cmd.LoadPipetteParams(
-                pipetteName=PipetteNameType.P300_SINGLE, mount=MountType.LEFT
+                pipetteName=PipetteNameType.P300_SINGLE,
+                mount=MountType.LEFT,
+                tipOverlapNotAfterVersion="v0",
+            )
+        )
+    ).then_return(commands.LoadPipetteResult(pipetteId="cool-pipette"))
+
+    decoy.when(
+        mock_engine_client.state.pipettes.get_flow_rates("cool-pipette")
+    ).then_return(
+        FlowRates(
+            default_aspirate={"1.1": 22},
+            default_dispense={"3.3": 44},
+            default_blow_out={"5.5": 66},
+        ),
+    )
+
+    result = subject.load_instrument(
+        instrument_name=PipetteNameType.P300_SINGLE, mount=Mount.LEFT
+    )
+
+    assert isinstance(result, InstrumentCore)
+    assert result.pipette_id == "cool-pipette"
+
+
+@pytest.mark.parametrize("api_version", versions_at_or_above(APIVersion(2, 19)))
+def test_load_instrument_post_219(
+    decoy: Decoy,
+    mock_sync_hardware_api: SyncHardwareAPI,
+    mock_engine_client: EngineClient,
+    subject: ProtocolCore,
+) -> None:
+    """It should issue a LoadPipette command."""
+    decoy.when(
+        mock_engine_client.execute_command_without_recovery(
+            cmd.LoadPipetteParams(
+                pipetteName=PipetteNameType.P300_SINGLE,
+                mount=MountType.LEFT,
+                tipOverlapNotAfterVersion="v1",
             )
         )
     ).then_return(commands.LoadPipetteResult(pipetteId="cool-pipette"))

@@ -2,14 +2,14 @@
 
 from pathlib import Path
 from opentrons.util.performance_helpers import (
-    StubbedTracker,
+    _StubbedTracker,
     _get_robot_context_tracker,
 )
 
 
 def test_return_function_unchanged() -> None:
-    """Test that the function is returned unchanged when using StubbedTracker."""
-    tracker = StubbedTracker(Path("/path/to/storage"), True)
+    """Test that the function is returned unchanged when using _StubbedTracker."""
+    tracker = _StubbedTracker(Path("/path/to/storage"), True)
 
     def func_to_track() -> None:
         pass
