@@ -37,12 +37,25 @@ export default {
       },
       if: { arg: 'hasMessage' },
     },
+    hasLink: {
+      control: {
+        type: 'boolean',
+      },
+      defaultValue: false,
+    },
+    linkText: {
+      control: {
+        type: 'text',
+      },
+      if: { arg: 'hasLink' },
+    },
   },
   parameters: VIEWPORT.touchScreenViewport,
 } as Meta
 
 export interface WrapperProps extends React.ComponentProps<InlineNotification> {
   hasMessage: boolean
+  hasLink: boolean
 }
 
 function Wrapper(props: WrapperProps): JSX.Element {
@@ -57,6 +70,14 @@ function Wrapper(props: WrapperProps): JSX.Element {
           : undefined
       }
       message={props.hasMessage ? props.message : undefined}
+      linkText={props.hasLink ? props.linkText : undefined}
+      onLinkClick={
+        props.hasLink
+          ? () => {
+              console.log('Link clicked')
+            }
+          : undefined
+      }
     />
   )
 }
@@ -71,4 +92,15 @@ InlineNotificationComponent.args = {
   message: 'you did it',
   type: 'success',
   hasMessage: true,
+  hasLink: false,
+}
+
+export const InlineNotificationWithLink = Template.bind({})
+InlineNotificationWithLink.args = {
+  heading: 'Something has happened',
+  message: 'Here is an alert about it',
+  type: 'neutral',
+  hasMessage: true,
+  hasLink: true,
+  linkText: 'Link',
 }

@@ -10,17 +10,20 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
+  JUSTIFY_FLEX_START,
+  JUSTIFY_FLEX_END,
   SPACING,
   StyledText,
   TYPOGRAPHY,
   RESPONSIVENESS,
+  Link,
 } from '@opentrons/components'
 
 import type { IconProps, StyleProps } from '@opentrons/components'
 
 type InlineNotificationType = 'alert' | 'error' | 'neutral' | 'success'
 
-export interface InlineNotificationProps extends StyleProps {
+interface InlineNotificationProps extends StyleProps {
   /** name constant of the icon to display */
   type: InlineNotificationType
   /** InlineNotification contents */
@@ -30,6 +33,8 @@ export interface InlineNotificationProps extends StyleProps {
   hug?: boolean
   /** optional handler to show close button/clear alert  */
   onCloseClick?: (() => void) | React.MouseEventHandler<HTMLButtonElement>
+  linkText?: string
+  onLinkClick?: (() => void) | React.MouseEventHandler<HTMLButtonElement>
 }
 
 const INLINE_NOTIFICATION_PROPS_BY_TYPE: Record<
@@ -61,7 +66,15 @@ const INLINE_NOTIFICATION_PROPS_BY_TYPE: Record<
 export function InlineNotification(
   props: InlineNotificationProps
 ): JSX.Element {
-  const { heading, hug = false, onCloseClick, message, type } = props
+  const {
+    heading,
+    hug = false,
+    onCloseClick,
+    message,
+    type,
+    linkText,
+    onLinkClick,
+  } = props
   const fullHeading = `${heading}${message ? '. ' : ''}`
   const fullmessage = `${message}.`
   const inlineNotificationProps = INLINE_NOTIFICATION_PROPS_BY_TYPE[type]
@@ -88,61 +101,85 @@ export function InlineNotification(
         }
       `}
     >
-      <Box
-        css={css`
-          width: ${SPACING.spacing16};
-          height: ${SPACING.spacing16};
-          @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-            width: 1.75rem;
-            height: 1.75rem;
-          }
-        `}
+      <Flex
+        justifyContent={JUSTIFY_FLEX_START}
+        alignItems={ALIGN_CENTER}
+        gap={SPACING.spacing12}
+        flexDirection={DIRECTION_ROW}
       >
-        <Icon {...iconProps} aria-label={`icon_${type}`} />
-      </Box>
-      <Flex flex="1" alignItems={ALIGN_CENTER}>
-        <StyledText
-          oddStyle="bodyTextRegular"
-          desktopStyle="bodyDefaultRegular"
+        <Box
+          css={css`
+            width: ${SPACING.spacing16};
+            height: ${SPACING.spacing16};
+            @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+              width: 1.75rem;
+              height: 1.75rem;
+            }
+          `}
         >
-          <span
-            css={`
-              font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
-            `}
+          <Icon {...iconProps} aria-label={`icon_${type}`} />
+        </Box>
+        <Flex flex="1" alignItems={ALIGN_CENTER}>
+          <StyledText
+            oddStyle="bodyTextRegular"
+            desktopStyle="bodyDefaultRegular"
           >
-            {fullHeading}
-          </span>
-          {/* this break is because the desktop wants this on two lines, but also wants/
+            <span
+              css={`
+                font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
+              `}
+            >
+              {fullHeading}
+            </span>
+            {/* this break is because the desktop wants this on two lines, but also wants/
               inline text layout on ODD. Soooo here you go */}
-          <br
-            css={`
-              @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-                display: none;
-              }
-            `}
-          />
-          {message != null && fullmessage}
-        </StyledText>
+            <br
+              css={`
+                @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+                  display: none;
+                }
+              `}
+            />
+            {message != null && fullmessage}
+          </StyledText>
+        </Flex>
       </Flex>
-      {onCloseClick && (
-        <Btn
-          data-testid="InlineNotification_close-button"
-          onClick={onCloseClick}
-        >
-          <Icon
-            aria-label="close_icon"
-            name="close"
-            css={css`
-              width: 28px;
-              height: 28px;
-              @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-                width: ${SPACING.spacing48};
-                height: ${SPACING.spacing48};
-              }
-            `}
-          />
-        </Btn>
-      )}
+      <Flex
+        alignItems={ALIGN_CENTER}
+        justifyContent={JUSTIFY_FLEX_END}
+        gap={SPACING.spacing16}
+      >
+        {linkText && (
+          <Link onClick={onLinkClick}>
+            <StyledText
+              oddStyle="bodyTextRegular"
+              desktopStyle="bodyDefaultRegular"
+              textDecoration="underline"
+            >
+              {linkText}{' '}
+            </StyledText>
+          </Link>
+        )}
+        {onCloseClick && (
+          <Btn
+            data-testid="InlineNotification_close-button"
+            onClick={onCloseClick}
+          >
+            <Icon
+              aria-label="close_icon"
+              name="close"
+              css={css`
+                width: 28px;
+                height: 28px;
+                @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+                  width: ${SPACING.spacing48};
+                  height: ${SPACING.spacing48};
+                }
+              `}
+            />
+          </Btn>
+        )}
+      </Flex>
     </Flex>
   )
 }
