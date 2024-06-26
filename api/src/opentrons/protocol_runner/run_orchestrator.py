@@ -90,7 +90,7 @@ class RunOrchestrator:
         self._protocol_live_runner = protocol_live_runner
         self._fixit_runner.prepare()
         self._setup_runner.prepare()
-        self._protocol_engine.set_queue_worker_command_generator(self.command_generator)
+        self._protocol_engine.set_and_start_queue_worker(self.command_generator)
 
     @property
     def run_id(self) -> str:
@@ -347,6 +347,7 @@ class RunOrchestrator:
         """Yield next command to execute."""
         while True:
             try:
+                # TODO(tz, 6-26-2024): avoid using private accessor in a follow up pr.
                 command_id = await self._protocol_engine._state_store.wait_for(
                     condition=self._protocol_engine.state_view.commands.get_next_to_execute
                 )

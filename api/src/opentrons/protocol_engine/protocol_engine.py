@@ -623,7 +623,7 @@ class ProtocolEngine:
             for wrapped_error in root_error.wrapping
         )
 
-    def set_queue_worker_command_generator(
+    def set_and_start_queue_worker(
         self, command_generator: Callable[[], AsyncGenerator[str, None]]
     ) -> None:
         """Set QueueWorker and start it."""

@@ -205,9 +205,6 @@ class EngineStore:
         else:
             load_fixed_trash = False
 
-        post_run_hardware_state = PostRunHardwareState.HOME_AND_STAY_ENGAGED
-        drop_tips_after_run = True
-
         if self._run_orchestrator is not None:
             raise EngineConflictError("Another run is currently active.")
         engine = await create_protocol_engine(
@@ -229,8 +226,6 @@ class EngineStore:
             protocol_engine=engine,
             hardware_api=self._hardware_api,
             protocol_config=protocol.source.config if protocol else None,
-            post_run_hardware_state=post_run_hardware_state,
-            drop_tips_after_run=drop_tips_after_run,
         )
 
         runner = self.run_orchestrator.get_protocol_runner()
