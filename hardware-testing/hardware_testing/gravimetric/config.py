@@ -75,9 +75,8 @@ SCALE_SECONDS_TO_TRUE_STABILIZE = 30
 
 LOW_VOLUME_UPPER_LIMIT_UL: Final = 2.0
 
-DISCONTINUITY_DURING_96CH_ASPIRATE = 0.41  # mm/sec
 DELAY_AFTER_BACKLASH_96CH_LOW_VOLUMES = (
-    3.0  # NOTE: %D shifts ~20% during first few seconds after backlash comp
+    0.0  # NOTE: %D can shift <=20% during first few seconds after plunger movement
 )
 
 TOUCH_TIP_SPEED = 30

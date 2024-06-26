@@ -3,7 +3,6 @@ from dataclasses import dataclass
 from typing import Optional, Callable, Tuple
 
 from opentrons.config.defaults_ot3 import (
-    DEFAULT_MAX_SPEED_DISCONTINUITY,
     DEFAULT_MAX_SPEEDS,
 )
 from opentrons.protocol_api import InstrumentContext, ProtocolContext
@@ -122,19 +121,6 @@ def _submerge(
         well.bottom(height).move(channel_offset),
         speed=speed,
     )
-
-
-def _set_96ch_plunger_discontinuity(
-    ctx: ProtocolContext, disc: Optional[float] = None
-) -> None:
-    if not disc:
-        disc = DEFAULT_MAX_SPEED_DISCONTINUITY.high_throughput[OT3AxisKind.P]
-    hw_api = ctx._core.get_hardware()
-    hw_api.config.motion_settings.max_speed_discontinuity.high_throughput[
-        OT3AxisKind.P
-    ] = disc
-    # NOTE: re-setting the gantry-load will reset the move-manager's per-axis constraints
-    hw_api.set_gantry_load(hw_api.gantry_load)
 
 
 def _retract(
@@ -290,18 +276,13 @@ def _pipette_with_liquid_settings(  # noqa: C901
             clear_pipette_ul_per_mm(hw_api, hw_mount)  # type: ignore[arg-type]
         if pipette.channels == 96:
             # NOTE: (sigler) 96ch backlash comp must always run at the same speed (eg: max)
-            #       and use a low discontinuity (eg: <1.0mm/sec)
             _set_96ch_plunger_max_speeds()
-            _set_96ch_plunger_discontinuity(
-                ctx, config.DISCONTINUITY_DURING_96CH_ASPIRATE
-            )
         try:
             hw_api.prepare_for_aspirate(hw_mount)
             if liquid_class.aspirate.leading_air_gap > 0:
                 pipette.aspirate(liquid_class.aspirate.leading_air_gap)
         finally:
             if pipette.channels == 96:
-                _set_96ch_plunger_discontinuity(ctx, None)  # back to default
                 _reset_flow_rates()
         if (
             pipette.channels == 96
@@ -337,15 +318,7 @@ def _pipette_with_liquid_settings(  # noqa: C901
     def _aspirate_on_submerge() -> None:
         # aspirate specified volume
         callbacks.on_aspirating()
-        if pipette.channels == 96:
-            _set_96ch_plunger_discontinuity(
-                ctx, config.DISCONTINUITY_DURING_96CH_ASPIRATE
-            )
-        try:
-            pipette.aspirate(aspirate)
-        finally:
-            if pipette.channels == 96:
-                _set_96ch_plunger_discontinuity(ctx, None)  # back to default
+        pipette.aspirate(aspirate)
         # update liquid-height tracker
         liquid_tracker.update_affected_wells(
             well, aspirate=aspirate, channels=channel_count
