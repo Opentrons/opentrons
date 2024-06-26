@@ -11,7 +11,6 @@ from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons_shared_data.robot.dev_types import RobotTypeEnum
 
 from opentrons.config import feature_flags
-
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import (
     EstopState,
