@@ -1,19 +1,15 @@
 from opentrons import protocol_api
 from opentrons import types
 
-metadata = {
-    "protocolName": "Illumina DNA Enrichment v4",
-    "author": "Opentrons <protocols@opentrons.com>",
-    "source": "Protocol Library",
-}
+metadata = {"protocolName": "Illumina DNA Enrichment v4", "author": "Opentrons <protocols@opentrons.com>", "source": "Protocol Library"}
 
 requirements = {
     "robotType": "OT-3",
-    "apiLevel": "2.15",
+    "apiLevel": "2.18",
 }
 
 # SCRIPT SETTINGS
-DRYRUN = True  # True = skip incubation times, shorten mix, for testing purposes
+DRYRUN = False  # True = skip incubation times, shorten mix, for testing purposes
 USE_GRIPPER = True  # True = Uses Gripper, False = Manual Move
 TIP_TRASH = False  # True = Used tips go in Trash, False = Used tips go back into rack
 HYBRID_PAUSE = True  # True = sets a pause on the Hybridization
@@ -39,33 +35,61 @@ STEP_CLEANUP = 1
 p200_tips = 0
 p50_tips = 0
 
-ABR_TEST = True
-if ABR_TEST == True:
-    DRYRUN = True  # Overrides to only DRYRUN
-    TIP_TRASH = False  # Overrides to only REUSING TIPS
-    RUN = 3  # Repetitions
-else:
-    RUN = 1
+
+TIP_TRASH = False  # Overrides to only REUSING TIPS
+RUN = 1
+
+
+def add_parameters(parameters: protocol_api.Parameters):
+    parameters.add_int(
+        variable_name="heater_shaker_speed",
+        display_name="Heater Shaker Shake Speed",
+        description="Speed to set the heater shaker to",
+        default=2000,
+        minimum=200,
+        maximum=3000,
+        unit="seconds",
+    )
+    parameters.add_float(
+        variable_name="dot_bottom",
+        display_name=".bottom",
+        description="Lowest value pipette will go to.",
+        default=0.3,
+        choices=[
+            {"display_name": "0.0", "value": 0.0},
+            {"display_name": "0.1", "value": 0.1},
+            {"display_name": "0.2", "value": 0.2},
+            {"display_name": "0.3", "value": 0.3},
+            {"display_name": "0.4", "value": 0.4},
+            {"display_name": "0.5", "value": 0.5},
+            {"display_name": "0.6", "value": 0.6},
+            {"display_name": "0.7", "value": 0.7},
+            {"display_name": "0.8", "value": 0.8},
+            {"display_name": "0.9", "value": 0.9},
+            {"display_name": "1.0", "value": 1.0},
+        ],
+    )
 
 
 def run(protocol: protocol_api.ProtocolContext):
+    heater_shaker_speed = protocol.params.heater_shaker_speed
+    dot_bottom = protocol.params.dot_bottom
     global p200_tips
     global p50_tips
 
-    if ABR_TEST == True:
-        protocol.comment("THIS IS A ABR RUN WITH " + str(RUN) + " REPEATS")
     protocol.comment("THIS IS A DRY RUN") if DRYRUN == True else protocol.comment("THIS IS A REACTION RUN")
     protocol.comment("USED TIPS WILL GO IN TRASH") if TIP_TRASH == True else protocol.comment("USED TIPS WILL BE RE-RACKED")
 
     # DECK SETUP AND LABWARE
     # ========== FIRST ROW ===========
     heatershaker = protocol.load_module("heaterShakerModuleV1", "1")
-    sample_plate_2 = heatershaker.load_labware("nest_96_wellplate_2ml_deep")
+    sample_plate_2 = heatershaker.load_labware("thermoscientificnunc_96_wellplate_1300ul")
+
     reservoir = protocol.load_labware("nest_96_wellplate_2ml_deep", "2")
     temp_block = protocol.load_module("temperature module gen2", "3")
     reagent_plate = temp_block.load_labware("nest_96_wellplate_100ul_pcr_full_skirt")
     # ========== SECOND ROW ==========
-    MAG_PLATE_SLOT = 4
+    MAG_PLATE_SLOT = protocol.load_module("magneticBlockV1", "C1")
     tiprack_200_1 = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "5")
     tiprack_50_1 = protocol.load_labware("opentrons_flex_96_tiprack_50ul", "6")
     # ========== THIRD ROW ===========
@@ -132,83 +156,11 @@ def run(protocol: protocol_api.ProtocolContext):
 
     def tipcheck():
         if p200_tips >= 3 * 12:
-            if ABR_TEST == True:
-                p1000.reset_tipracks()
-            else:
-                protocol.pause("RESET p200 TIPS")
-                p1000.reset_tipracks()
+            p1000.reset_tipracks()
             p200_tips == 0
         if p50_tips >= 2 * 12:
-            if ABR_TEST == True:
-                p50.reset_tipracks()
-            else:
-                protocol.pause("RESET p50 TIPS")
-                p50.reset_tipracks()
+            p50.reset_tipracks()
             p50_tips == 0
-
-    def grip_offset(action, item, slot=None):
-        """Grip offset."""
-        from opentrons.types import Point
-
-        # EDIT these values
-        # NOTE: we are still testing to determine our software's defaults
-        #       but we also expect users will want to edit these
-        _pick_up_offsets = {
-            "deck": Point(),
-            "mag-plate": Point(),
-            "heater-shaker": Point(z=1.0),
-            "temp-module": Point(),
-            "thermo-cycler": Point(),
-        }
-        # EDIT these values
-        # NOTE: we are still testing to determine our software's defaults
-        #       but we also expect users will want to edit these
-        _drop_offsets = {
-            "deck": Point(),
-            "mag-plate": Point(x=0.1, y=-0.25, z=0.5),
-            "heater-shaker": Point(y=-0.5),
-            "temp-module": Point(),
-            "thermo-cycler": Point(),
-        }
-        # do NOT edit these values
-        # NOTE: these values will eventually be in our software
-        #       and will not need to be inside a protocol
-        _hw_offsets = {
-            "deck": Point(),
-            "mag-plate": Point(z=34.5),
-            "heater-shaker-right": Point(z=2.5),
-            "heater-shaker-left": Point(z=2.5),
-            "temp-module": Point(z=5.0),
-            "thermo-cycler": Point(z=2.5),
-        }
-        # make sure arguments are correct
-        action_options = ["pick-up", "drop"]
-        item_options = list(_hw_offsets.keys())
-        item_options.remove("heater-shaker-left")
-        item_options.remove("heater-shaker-right")
-        item_options.append("heater-shaker")
-        if action not in action_options:
-            raise ValueError(f'"{action}" not recognized, available options: {action_options}')
-        if item not in item_options:
-            raise ValueError(f'"{item}" not recognized, available options: {item_options}')
-        if item == "heater-shaker":
-            assert slot, 'argument slot= is required when using "heater-shaker"'
-            if slot in [1, 4, 7, 10]:
-                side = "left"
-            elif slot in [3, 6, 9, 12]:
-                side = "right"
-            else:
-                raise ValueError("heater shaker must be on either left or right side")
-            hw_offset = _hw_offsets[f"{item}-{side}"]
-        else:
-            hw_offset = _hw_offsets[item]
-        if action == "pick-up":
-            offset = hw_offset + _pick_up_offsets[item]
-        else:
-            offset = hw_offset + _drop_offsets[item]
-
-        # convert from Point() to dict()
-        return {"x": offset.x, "y": offset.y, "z": offset.z}
 
     ############################################################################################################################################
     ############################################################################################################################################
@@ -248,8 +200,8 @@ def run(protocol: protocol_api.ProtocolContext):
             NHB2Vol = 50
             for loop, X in enumerate(column_1_list):
                 p50.pick_up_tip()
-                p50.aspirate(NHB2Vol, NHB2.bottom())
-                p50.dispense(NHB2Vol, sample_plate_1[X].bottom())
+                p50.aspirate(NHB2Vol, NHB2.bottom(z=dot_bottom))  # original = ()
+                p50.dispense(NHB2Vol, sample_plate_1[X].bottom(z=dot_bottom))  # original = ()
                 p50.return_tip() if TIP_TRASH == False else p50.drop_tip()
                 p50_tips += 1
                 tipcheck()
@@ -258,8 +210,8 @@ def run(protocol: protocol_api.ProtocolContext):
             PanelVol = 10
             for loop, X in enumerate(column_1_list):
                 p50.pick_up_tip()
-                p50.aspirate(PanelVol, Panel.bottom())
-                p50.dispense(PanelVol, sample_plate_1[X].bottom())
+                p50.aspirate(PanelVol, Panel.bottom(z=dot_bottom))  # original = ()
+                p50.dispense(PanelVol, sample_plate_1[X].bottom(z=dot_bottom))  # original = ()
                 p50.return_tip() if TIP_TRASH == False else p50.drop_tip()
                 p50_tips += 1
                 tipcheck()
@@ -270,9 +222,9 @@ def run(protocol: protocol_api.ProtocolContext):
             EHB2MixVol = 90
             for loop, X in enumerate(column_1_list):
                 p1000.pick_up_tip()
-                p1000.aspirate(EHB2Vol, EHB2.bottom())
-                p1000.dispense(EHB2Vol, sample_plate_1[X].bottom())
-                p1000.move_to(sample_plate_1[X].bottom())
+                p1000.aspirate(EHB2Vol, EHB2.bottom(z=dot_bottom))  # original = ()
+                p1000.dispense(EHB2Vol, sample_plate_1[X].bottom(z=dot_bottom))  # original = ()
+                p1000.move_to(sample_plate_1[X].bottom(z=dot_bottom))  # original = ()
                 p1000.mix(EHB2MixRep, EHB2MixVol)
                 p1000.return_tip() if TIP_TRASH == False else p1000.drop_tip()
                 p50_tips += 1
@@ -333,9 +285,9 @@ def run(protocol: protocol_api.ProtocolContext):
             TransferSup = 100
             for loop, X in enumerate(column_1_list):
                 p1000.pick_up_tip()
-                p1000.move_to(sample_plate_1[X].bottom(z=0.25))
+                p1000.move_to(sample_plate_1[X].bottom(z=0.5))
                 p1000.aspirate(TransferSup + 1, rate=0.25)
-                p1000.dispense(TransferSup + 5, sample_plate_2[column_2_list[loop]].bottom(z=1))
+                p1000.dispense(TransferSup + 1, sample_plate_2[column_2_list[loop]].bottom(z=1))
                 p1000.return_tip() if TIP_TRASH == False else p1000.drop_tip()
                 p200_tips += 1
                 tipcheck()
@@ -345,7 +297,7 @@ def run(protocol: protocol_api.ProtocolContext):
             protocol.comment("--> ADDING SMB")
             SMBVol = 250
             SampleVol = 100
-            SMBMixRPM = 2000
+            SMBMixRPM = heater_shaker_speed
             SMBMixRep = 5 * 60 if DRYRUN == False else 0.1 * 60
             SMBPremix = 3 if DRYRUN == False else 1
             # ==============================
@@ -382,13 +334,7 @@ def run(protocol: protocol_api.ProtocolContext):
             # ============================================================================================
             # GRIPPER MOVE sample_plate_2 FROM heatershaker TO MAGPLATE
             heatershaker.open_labware_latch()
-            protocol.move_labware(
-                labware=sample_plate_2,
-                new_location=MAG_PLATE_SLOT,
-                use_gripper=USE_GRIPPER,
-                pick_up_offset=grip_offset("pick-up", "heater-shaker", 1),
-                drop_offset=grip_offset("drop", "mag-plate"),
-            )
+            protocol.move_labware(labware=sample_plate_2, new_location=MAG_PLATE_SLOT, use_gripper=USE_GRIPPER)
             heatershaker.close_labware_latch()
             # ============================================================================================
 
@@ -424,13 +370,7 @@ def run(protocol: protocol_api.ProtocolContext):
             # ============================================================================================
             # GRIPPER MOVE sample_plate_2 FROM MAGPLATE TO heatershaker
             heatershaker.open_labware_latch()
-            protocol.move_labware(
-                labware=sample_plate_2,
-                new_location=heatershaker,
-                use_gripper=USE_GRIPPER,
-                pick_up_offset=grip_offset("pick-up", "mag-plate"),
-                drop_offset=grip_offset("drop", "heater-shaker", 1),
-            )
+            protocol.move_labware(labware=sample_plate_2, new_location=heatershaker, use_gripper=USE_GRIPPER)
             heatershaker.close_labware_latch()
             # ============================================================================================
 
@@ -438,17 +378,18 @@ def run(protocol: protocol_api.ProtocolContext):
             washreps = 3
             washcount = 0
             for wash in range(washreps):
+
                 protocol.comment("--> Adding EEW")
                 EEWVol = 200
                 for loop, X in enumerate(column_2_list):
                     p1000.pick_up_tip()
-                    p1000.aspirate(EEWVol, WASHES[loop].bottom())
-                    p1000.dispense(EEWVol, sample_plate_2[X].bottom())
+                    p1000.aspirate(EEWVol, WASHES[loop].bottom(z=dot_bottom))  # original = ()
+                    p1000.dispense(EEWVol, sample_plate_2[X].bottom(z=dot_bottom))  # original = ()
                     p1000.return_tip() if TIP_TRASH == False else p1000.drop_tip()
                     p200_tips += 1
                     tipcheck()
                 heatershaker.close_labware_latch()
-                heatershaker.set_and_wait_for_shake_speed(rpm=1800)
+                heatershaker.set_and_wait_for_shake_speed(rpm=(heater_shaker_speed * 0.9))
                 if DRYRUN == False:
                     protocol.delay(seconds=4 * 60)
                 heatershaker.deactivate_shaker()
@@ -460,13 +401,7 @@ def run(protocol: protocol_api.ProtocolContext):
                 # ============================================================================================
                 # GRIPPER MOVE sample_plate_2 FROM heatershaker TO MAGPLATE
                 heatershaker.open_labware_latch()
-                protocol.move_labware(
-                    labware=sample_plate_2,
-                    new_location=MAG_PLATE_SLOT,
-                    use_gripper=USE_GRIPPER,
-                    pick_up_offset=grip_offset("pick-up", "heater-shaker", 1),
-                    drop_offset=grip_offset("drop", "mag-plate"),
-                )
+                protocol.move_labware(labware=sample_plate_2, new_location=MAG_PLATE_SLOT, use_gripper=USE_GRIPPER)
                 heatershaker.close_labware_latch()
                 # ============================================================================================
 
@@ -497,13 +432,7 @@ def run(protocol: protocol_api.ProtocolContext):
                 # ============================================================================================
                 # GRIPPER MOVE sample_plate_2 FROM MAGPLATE TO heatershaker
                 heatershaker.open_labware_latch()
-                protocol.move_labware(
-                    labware=sample_plate_2,
-                    new_location=heatershaker,
-                    use_gripper=USE_GRIPPER,
-                    pick_up_offset=grip_offset("pick-up", "mag-plate"),
-                    drop_offset=grip_offset("drop", "heater-shaker", 1),
-                )
+                protocol.move_labware(labware=sample_plate_2, new_location=heatershaker, use_gripper=USE_GRIPPER)
                 heatershaker.close_labware_latch()
                 # ============================================================================================
 
@@ -513,13 +442,13 @@ def run(protocol: protocol_api.ProtocolContext):
             EEWVol = 200
             for loop, X in enumerate(column_2_list):
                 p1000.pick_up_tip()
-                p1000.aspirate(EEWVol, WASHES[loop].bottom())
-                p1000.dispense(EEWVol, sample_plate_2[X].bottom())
+                p1000.aspirate(EEWVol, WASHES[loop].bottom(z=dot_bottom))  # original = ()
+                p1000.dispense(EEWVol, sample_plate_2[X].bottom(z=dot_bottom))  # original = ()
                 p1000.return_tip() if TIP_TRASH == False else p1000.drop_tip()
                 p200_tips += 1
                 tipcheck()
 
-            heatershaker.set_and_wait_for_shake_speed(rpm=1800)
+            heatershaker.set_and_wait_for_shake_speed(rpm=(heater_shaker_speed * 0.9))
             if DRYRUN == False:
                 protocol.delay(seconds=4 * 60)
             heatershaker.deactivate_shaker()
@@ -531,7 +460,7 @@ def run(protocol: protocol_api.ProtocolContext):
             TransferSup = 200
             for loop, X in enumerate(column_2_list):
                 p1000.pick_up_tip()
-                p1000.move_to(sample_plate_2[X].bottom(z=0.25))
+                p1000.move_to(sample_plate_2[X].bottom(z=0.5))
                 p1000.aspirate(TransferSup, rate=0.25)
                 p1000.dispense(TransferSup, sample_plate_2[column_3_list[loop]].bottom(z=1))
                 p1000.return_tip() if TIP_TRASH == False else p1000.drop_tip()
@@ -544,13 +473,7 @@ def run(protocol: protocol_api.ProtocolContext):
             # ============================================================================================
             # GRIPPER MOVE sample_plate_2 FROM heatershaker TO MAGPLATE
             heatershaker.open_labware_latch()
-            protocol.move_labware(
-                labware=sample_plate_2,
-                new_location=MAG_PLATE_SLOT,
-                use_gripper=USE_GRIPPER,
-                pick_up_offset=grip_offset("pick-up", "heater-shaker", 1),
-                drop_offset=grip_offset("drop", "mag-plate"),
-            )
+            protocol.move_labware(labware=sample_plate_2, new_location=MAG_PLATE_SLOT, use_gripper=USE_GRIPPER)
             heatershaker.close_labware_latch()
             # ============================================================================================
 
@@ -558,7 +481,7 @@ def run(protocol: protocol_api.ProtocolContext):
                 protocol.delay(seconds=1 * 60)
 
             protocol.comment("--> Removing Supernatant")
-            RemoveSup = 150
+            RemoveSup = 200
             for loop, X in enumerate(column_3_list):
                 p1000.pick_up_tip()
                 p1000.move_to(sample_plate_2[X].bottom(z=3.5))
@@ -578,10 +501,10 @@ def run(protocol: protocol_api.ProtocolContext):
             protocol.comment("--> Removing Residual")
             for loop, X in enumerate(column_3_list):
                 p50.pick_up_tip()
-                p50.move_to(sample_plate_2[X].bottom(z=0))
+                p50.move_to(sample_plate_2[X].bottom(z=dot_bottom))  # original = z=0
                 p50.aspirate(50, rate=0.25)
                 p50.default_speed = 200
-                p50.dispense(100, Liquid_trash.top(z=-7))
+                p50.dispense(50, Liquid_trash.top(z=-7))
                 protocol.delay(minutes=0.1)
                 p50.blow_out()
                 p50.default_speed = 400
@@ -599,8 +522,8 @@ def run(protocol: protocol_api.ProtocolContext):
             EluteVol = 23
             for loop, X in enumerate(column_3_list):
                 p50.pick_up_tip()
-                p50.aspirate(EluteVol, Elute.bottom())
-                p50.dispense(EluteVol, sample_plate_2[X].bottom())
+                p50.aspirate(EluteVol, Elute.bottom(z=dot_bottom))  # original = ()
+                p50.dispense(EluteVol, sample_plate_2[X].bottom(z=dot_bottom))  # original = ()
                 p50.return_tip() if TIP_TRASH == False else p50.drop_tip()
                 p50_tips += 1
                 tipcheck()
@@ -608,18 +531,12 @@ def run(protocol: protocol_api.ProtocolContext):
             # ============================================================================================
             # GRIPPER MOVE sample_plate_2 FROM MAGPLATE TO heatershaker
             heatershaker.open_labware_latch()
-            protocol.move_labware(
-                labware=sample_plate_2,
-                new_location=heatershaker,
-                use_gripper=USE_GRIPPER,
-                pick_up_offset=grip_offset("pick-up", "mag-plate"),
-                drop_offset=grip_offset("drop", "heater-shaker", 1),
-            )
+            protocol.move_labware(labware=sample_plate_2, new_location=heatershaker, use_gripper=USE_GRIPPER)
             heatershaker.close_labware_latch()
             # ============================================================================================
 
             heatershaker.close_labware_latch()
-            heatershaker.set_and_wait_for_shake_speed(rpm=1800)
+            heatershaker.set_and_wait_for_shake_speed(rpm=(heater_shaker_speed * 0.9))
             if DRYRUN == False:
                 protocol.delay(seconds=2 * 60)
             heatershaker.deactivate_shaker()
@@ -631,13 +548,7 @@ def run(protocol: protocol_api.ProtocolContext):
             # ============================================================================================
             # GRIPPER MOVE sample_plate_2 FROM heatershaker TO MAGPLATE
             heatershaker.open_labware_latch()
-            protocol.move_labware(
-                labware=sample_plate_2,
-                new_location=MAG_PLATE_SLOT,
-                use_gripper=USE_GRIPPER,
-                pick_up_offset=grip_offset("pick-up", "heater-shaker", 1),
-                drop_offset=grip_offset("drop", "mag-plate"),
-            )
+            protocol.move_labware(labware=sample_plate_2, new_location=MAG_PLATE_SLOT, use_gripper=USE_GRIPPER)
             heatershaker.close_labware_latch()
             # ============================================================================================
 
@@ -645,9 +556,9 @@ def run(protocol: protocol_api.ProtocolContext):
             TransferSup = 21
             for loop, X in enumerate(column_3_list):
                 p50.pick_up_tip()
-                p50.move_to(sample_plate_2[X].bottom(z=0.25))
+                p50.move_to(sample_plate_2[X].bottom(z=0.5))
                 p50.aspirate(TransferSup + 1, rate=0.25)
-                p50.dispense(TransferSup + 5, sample_plate_1[column_4_list[loop]].bottom(z=1))
+                p50.dispense(TransferSup + 1, sample_plate_1[column_4_list[loop]].bottom(z=1))
                 p50.return_tip() if TIP_TRASH == False else p50.drop_tip()
                 p50_tips += 1
                 tipcheck()
@@ -658,9 +569,9 @@ def run(protocol: protocol_api.ProtocolContext):
             ET2MixVol = 20
             for loop, X in enumerate(column_4_list):
                 p50.pick_up_tip()
-                p50.aspirate(ET2Vol, ET2.bottom())
-                p50.dispense(ET2Vol, sample_plate_1[X].bottom())
-                p50.move_to(sample_plate_1[X].bottom())
+                p50.aspirate(ET2Vol, ET2.bottom(z=dot_bottom))  # original = ()
+                p50.dispense(ET2Vol, sample_plate_1[X].bottom(z=dot_bottom))  # original = ()
+                p50.move_to(sample_plate_1[X].bottom(z=dot_bottom))  # original = ()
                 p50.mix(ET2MixRep, ET2MixVol)
                 p50.return_tip() if TIP_TRASH == False else p50.drop_tip()
                 p50_tips += 1
@@ -675,8 +586,8 @@ def run(protocol: protocol_api.ProtocolContext):
             PPCVol = 5
             for loop, X in enumerate(column_4_list):
                 p50.pick_up_tip()
-                p50.aspirate(PPCVol, PPC.bottom())
-                p50.dispense(PPCVol, sample_plate_1[X].bottom())
+                p50.aspirate(PPCVol, PPC.bottom(z=dot_bottom))  # original = ()
+                p50.dispense(PPCVol, sample_plate_1[X].bottom(z=dot_bottom))  # original = ()
                 p50.return_tip() if TIP_TRASH == False else p50.drop_tip()
                 p50_tips += 1
                 tipcheck()
@@ -687,9 +598,9 @@ def run(protocol: protocol_api.ProtocolContext):
             EPMMixVol = 45
             for loop, X in enumerate(column_4_list):
                 p50.pick_up_tip()
-                p50.aspirate(EPMVol, EPM.bottom())
-                p50.dispense(EPMVol, sample_plate_1[X].bottom())
-                p50.move_to(sample_plate_1[X].bottom())
+                p50.aspirate(EPMVol, EPM.bottom(z=dot_bottom))  # original = ()
+                p50.dispense(EPMVol, sample_plate_1[X].bottom(z=dot_bottom))  # original = ()
+                p50.move_to(sample_plate_1[X].bottom(z=dot_bottom))  # original = ()
                 p50.mix(EPMMixRep, EPMMixVol)
                 p50.return_tip() if TIP_TRASH == False else p50.drop_tip()
                 p50_tips += 1
@@ -726,13 +637,7 @@ def run(protocol: protocol_api.ProtocolContext):
             # ============================================================================================
             # GRIPPER MOVE sample_plate_2 FROM MAGPLATE TO heatershaker
             heatershaker.open_labware_latch()
-            protocol.move_labware(
-                labware=sample_plate_2,
-                new_location=heatershaker,
-                use_gripper=USE_GRIPPER,
-                pick_up_offset=grip_offset("pick-up", "mag-plate"),
-                drop_offset=grip_offset("drop", "heater-shaker", 1),
-            )
+            protocol.move_labware(labware=sample_plate_2, new_location=heatershaker, use_gripper=USE_GRIPPER)
             heatershaker.close_labware_latch()
             # ============================================================================================
 
@@ -740,9 +645,9 @@ def run(protocol: protocol_api.ProtocolContext):
             TransferSup = 45
             for loop, X in enumerate(column_4_list):
                 p50.pick_up_tip()
-                p50.move_to(sample_plate_1[X].bottom(z=0.25))
+                p50.move_to(sample_plate_1[X].bottom(z=0.5))
                 p50.aspirate(TransferSup + 1, rate=0.25)
-                p50.dispense(TransferSup + 5, sample_plate_2[column_5_list[loop]].bottom(z=1))
+                p50.dispense(TransferSup + 1, sample_plate_2[column_5_list[loop]].bottom(z=1))
                 p50.return_tip() if TIP_TRASH == False else p50.drop_tip()
                 p50_tips += 1
                 tipcheck()
@@ -779,20 +684,14 @@ def run(protocol: protocol_api.ProtocolContext):
                 p200_tips += 1
                 tipcheck()
             # ========NEW HS MIX=========================
-            heatershaker.set_and_wait_for_shake_speed(rpm=1800)
+            heatershaker.set_and_wait_for_shake_speed(rpm=(heater_shaker_speed * 0.9))
             protocol.delay(AMPureMixRep)
             heatershaker.deactivate_shaker()
 
             # ============================================================================================
             # GRIPPER MOVE PLATE FROM HEATER SHAKER TO MAG PLATE
             heatershaker.open_labware_latch()
-            protocol.move_labware(
-                labware=sample_plate_2,
-                new_location=MAG_PLATE_SLOT,
-                use_gripper=USE_GRIPPER,
-                pick_up_offset=grip_offset("pick-up", "heater-shaker", 1),
-                drop_offset=grip_offset("drop", "mag-plate"),
-            )
+            protocol.move_labware(labware=sample_plate_2, new_location=MAG_PLATE_SLOT, use_gripper=USE_GRIPPER)
             heatershaker.close_labware_latch()
             # ============================================================================================
 
@@ -871,10 +770,10 @@ def run(protocol: protocol_api.ProtocolContext):
             protocol.comment("--> Removing Residual ETOH")
             for loop, X in enumerate(column_5_list):
                 p1000.pick_up_tip()
-                p1000.move_to(sample_plate_2[X].bottom(z=0))
+                p1000.move_to(sample_plate_2[X].bottom(z=dot_bottom))  # original = (z=0)
                 p1000.aspirate(50, rate=0.25)
                 p1000.default_speed = 200
-                p1000.dispense(100, Liquid_trash.top(z=-7))
+                p1000.dispense(50, Liquid_trash.top(z=-7))
                 protocol.delay(minutes=0.1)
                 p1000.blow_out()
                 p1000.default_speed = 400
@@ -890,13 +789,7 @@ def run(protocol: protocol_api.ProtocolContext):
             # ============================================================================================
             # GRIPPER MOVE PLATE FROM MAG PLATE TO HEATER SHAKER
             heatershaker.open_labware_latch()
-            protocol.move_labware(
-                labware=sample_plate_2,
-                new_location=heatershaker,
-                use_gripper=USE_GRIPPER,
-                pick_up_offset=grip_offset("pick-up", "mag-plate"),
-                drop_offset=grip_offset("drop", "heater-shaker", 1),
-            )
+            protocol.move_labware(labware=sample_plate_2, new_location=heatershaker, use_gripper=USE_GRIPPER)
             heatershaker.close_labware_latch()
             # ============================================================================================
 
@@ -933,20 +826,14 @@ def run(protocol: protocol_api.ProtocolContext):
                 p200_tips += 1
                 tipcheck()
                 if DRYRUN == False:
-                    heatershaker.set_and_wait_for_shake_speed(rpm=1600)
+                    heatershaker.set_and_wait_for_shake_speed(rpm=(heater_shaker_speed * 0.8))
                     protocol.delay(RSBMixRep)
                     heatershaker.deactivate_shaker()
 
             # ============================================================================================
             # GRIPPER MOVE PLATE FROM HEATER SHAKER TO MAG PLATE
             heatershaker.open_labware_latch()
-            protocol.move_labware(
-                labware=sample_plate_2,
-                new_location=MAG_PLATE_SLOT,
-                use_gripper=USE_GRIPPER,
-                pick_up_offset=grip_offset("pick-up", "heater-shaker", 1),
-                drop_offset=grip_offset("drop", "mag-plate"),
-            )
+            protocol.move_labware(labware=sample_plate_2, new_location=MAG_PLATE_SLOT, use_gripper=USE_GRIPPER)
             heatershaker.close_labware_latch()
             # ============================================================================================
 
@@ -957,110 +844,9 @@ def run(protocol: protocol_api.ProtocolContext):
             TransferSup = 30
             for loop, X in enumerate(column_5_list):
                 p1000.pick_up_tip()
-                p1000.move_to(sample_plate_2[X].bottom(z=0.25))
+                p1000.move_to(sample_plate_2[X].bottom(z=0.5))
                 p1000.aspirate(TransferSup + 1, rate=0.25)
-                p1000.dispense(TransferSup + 5, sample_plate_1[column_6_list[loop]].bottom(z=1))
+                p1000.dispense(TransferSup + 1, sample_plate_1[column_6_list[loop]].bottom(z=1))
                 p1000.return_tip() if TIP_TRASH == False else p1000.drop_tip()
                 p200_tips += 1
                 tipcheck()
-
-        if ABR_TEST == True:
-            protocol.comment("==============================================")
-            protocol.comment("--> Resetting Run")
-            protocol.comment("==============================================")
-
-            # ============================================================================================
-            # GRIPPER MOVE PLATE FROM MAG PLATE TO HEATER SHAKER
-            heatershaker.open_labware_latch()
-            protocol.move_labware(
-                labware=sample_plate_2,
-                new_location=heatershaker,
-                use_gripper=USE_GRIPPER,
-                pick_up_offset=grip_offset("pick-up", "mag-plate"),
-                drop_offset=grip_offset("drop", "heater-shaker", 1),
-            )
-            heatershaker.close_labware_latch()
-            # ============================================================================================
-
-            p1000.pick_up_tip()
-            # Resetting NHB2
-            p1000.aspirate(COLUMNS * 50, Liquid_trash_well_1.bottom(z=1))
-            p1000.dispense(COLUMNS * 50, NHB2.bottom(z=1))
-            # Resetting Panel
-            p1000.aspirate(COLUMNS * 10, Liquid_trash_well_1.bottom(z=1))
-            p1000.dispense(COLUMNS * 10, Panel.bottom(z=1))
-            # Resetting EHB2
-            p1000.aspirate(COLUMNS * 10, Liquid_trash_well_1.bottom(z=1))
-            p1000.dispense(COLUMNS * 10, EHB2.bottom(z=1))
-            # Resetting SMB
-            for X in range(COLUMNS):
-                p1000.aspirate(125, Liquid_trash_well_1.bottom(z=1))
-                p1000.dispense(125, SMB.bottom(z=1))
-                p1000.aspirate(125, Liquid_trash_well_1.bottom(z=1))
-                p1000.dispense(125, SMB.bottom(z=1))
-
-            # Resetting TWB
-            for X in range(COLUMNS):
-                p1000.aspirate(200, Liquid_trash_well_2.bottom(z=1))
-                p1000.dispense(200, EEW_1.bottom(z=1))
-                p1000.aspirate(200, Liquid_trash_well_2.bottom(z=1))
-                p1000.dispense(200, EEW_1.bottom(z=1))
-                p1000.aspirate(200, Liquid_trash_well_2.bottom(z=1))
-                p1000.dispense(200, EEW_2.bottom(z=1))
-                p1000.aspirate(200, Liquid_trash_well_2.bottom(z=1))
-                p1000.dispense(200, EEW_2.bottom(z=1))
-                p1000.aspirate(200, Liquid_trash_well_2.bottom(z=1))
-                p1000.dispense(200, EEW_3.bottom(z=1))
-                p1000.aspirate(200, Liquid_trash_well_2.bottom(z=1))
-                p1000.dispense(200, EEW_3.bottom(z=1))
-                p1000.aspirate(200, Liquid_trash_well_3.bottom(z=1))
-                p1000.dispense(200, EEW_1.bottom(z=1))
-                p1000.aspirate(200, Liquid_trash_well_3.bottom(z=1))
-                p1000.dispense(200, EEW_1.bottom(z=1))
-                p1000.aspirate(200, Liquid_trash_well_3.bottom(z=1))
-                p1000.dispense(200, EEW_2.bottom(z=1))
-                p1000.aspirate(200, Liquid_trash_well_3.bottom(z=1))
-                p1000.dispense(200, EEW_2.bottom(z=1))
-                p1000.aspirate(200, Liquid_trash_well_3.bottom(z=1))
-                p1000.dispense(200, EEW_3.bottom(z=1))
-                p1000.aspirate(200, Liquid_trash_well_3.bottom(z=1))
-                p1000.dispense(200, EEW_3.bottom(z=1))
-            # Resetting ETOH
-            for X in range(COLUMNS):
-                p1000.aspirate(150, Liquid_trash_well_4.bottom(z=1))
-                p1000.dispense(150, EtOH.bottom(z=1))
-                p1000.aspirate(150, Liquid_trash_well_4.bottom(z=1))
-                p1000.dispense(150, EtOH.bottom(z=1))
-            # Resetting AMPURE
-            for X in range(COLUMNS):
-                p1000.aspirate(COLUMNS * 40.5, Liquid_trash_well_4.bottom(z=1))
-                p1000.dispense(COLUMNS * 40.5, AMPure.bottom(z=1))
-            # Resetting Elute
-            p1000.aspirate(COLUMNS * 25, Liquid_trash_well_4.bottom(z=1))
-            p1000.dispense(COLUMNS * 25, Elute.bottom(z=1))
-            # Resetting EPM
-            p1000.aspirate(COLUMNS * 40, Liquid_trash_well_4.bottom(z=1))
-            p1000.dispense(COLUMNS * 40, EPM.bottom(z=1))
-            p1000.return_tip() if TIP_TRASH == False else p1000.drop_tip()
-            p200_tips += 1
-            tipcheck()
-
-            p50.pick_up_tip()
-            # Resetting ET2
-            p50.aspirate(COLUMNS * 4, Liquid_trash_well_4.bottom(z=1))
-            p50.dispense(COLUMNS * 4, ET2.bottom(z=1))
-            # Resetting PPC
-            p50.aspirate(COLUMNS * 5, Liquid_trash_well_4.bottom(z=1))
-            p50.dispense(COLUMNS * 5, PPC.bottom(z=1))
-            # Removing Final Samples
-            for loop, X in enumerate(column_6_list):
-                p50.aspirate(32, sample_plate_1[X].bottom(z=1))
-                p50.dispense(32, Liquid_trash_well_4.bottom(z=1))
-            # Resetting Samples
-            for loop, X in enumerate(column_1_list):
-                p50.aspirate(30, Liquid_trash_well_4.bottom(z=1))
-                p50.dispense(30, sample_plate_1[X].bottom(z=1))
-
-            p50.return_tip() if TIP_TRASH == False else p50.drop_tip()
-            p50_tips += 1
-            tipcheck()
