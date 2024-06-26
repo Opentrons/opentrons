@@ -61,8 +61,8 @@ let rendererLogger: Logger
 app.prependOnceListener('ready', startUp)
 if (config.devtools) app.once('ready', installDevtools)
 
-app.once('window-all-closed', () => {
-  log.debug('all windows closed, quitting the app')
+function quitApplication(): void {
+  app.quit()
   closeBrokerConnection()
     .then(() => {
       app.quit()
@@ -71,6 +71,16 @@ app.once('window-all-closed', () => {
       log.warn('Failed to properly close MQTT connections:', error)
       app.quit()
     })
+}
+
+app.once('window-all-closed', () => {
+  log.debug('all windows closed, quitting the app')
+  quitApplication()
+})
+
+app.once('render-process-gone', (_, __, details) => {
+  log.error('Renderer process has died, quitting the app', details)
+  quitApplication()
 })
 
 function startUp(): void {

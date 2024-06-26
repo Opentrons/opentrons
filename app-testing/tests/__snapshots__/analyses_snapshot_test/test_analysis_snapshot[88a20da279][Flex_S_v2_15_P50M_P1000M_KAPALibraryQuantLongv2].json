@@ -17856,6 +17856,7 @@
       "commandType": "loadPipette",
       "notes": [],
       "params": {
+        "liquidPresenceDetection": false,
         "mount": "left",
         "pipetteName": "p50_multi_flex",
         "tipOverlapNotAfterVersion": "v0"
@@ -17867,6 +17868,7 @@
       "commandType": "loadPipette",
       "notes": [],
       "params": {
+        "liquidPresenceDetection": false,
         "mount": "right",
         "pipetteName": "p1000_multi_flex",
         "tipOverlapNotAfterVersion": "v0"

@@ -56,6 +56,10 @@ class LoadPipetteParams(BaseModel):
         "expressed as vN where N is an integer, counting up from v0. If None, the current "
         "highest version will be used.",
     )
+    liquidPresenceDetection: Optional[bool] = Field(
+        None,
+        description="Enable liquid presence detection for this pipette. Defaults to False.",
+    )
 
 
 class LoadPipetteResult(BaseModel):

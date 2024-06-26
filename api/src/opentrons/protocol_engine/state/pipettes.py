@@ -118,6 +118,7 @@ class StaticPipetteConfig:
     pipette_bounding_box_offsets: PipetteBoundingBoxOffsets
     bounding_nozzle_offsets: BoundingNozzlesOffsets
     default_nozzle_map: NozzleMap
+    lld_settings: Optional[Dict[str, Dict[str, float]]]
 
 
 @dataclass
@@ -133,6 +134,7 @@ class PipetteState:
     static_config_by_id: Dict[str, StaticPipetteConfig]
     flow_rates_by_id: Dict[str, FlowRates]
     nozzle_configuration_by_id: Dict[str, Optional[NozzleMap]]
+    liquid_presence_detection_by_id: Dict[str, bool]
 
 
 class PipetteStore(HasState[PipetteState], HandlesActions):
@@ -152,6 +154,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             static_config_by_id={},
             flow_rates_by_id={},
             nozzle_configuration_by_id={},
+            liquid_presence_detection_by_id={},
         )
 
     def handle_action(self, action: Action) -> None:
@@ -197,6 +200,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                     front_right_offset=config.nozzle_map.front_right_nozzle_offset,
                 ),
                 default_nozzle_map=config.nozzle_map,
+                lld_settings=config.pipette_lld_settings,
             )
             self._state.flow_rates_by_id[private_result.pipette_id] = config.flow_rates
             self._state.nozzle_configuration_by_id[
@@ -214,6 +218,9 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 id=pipette_id,
                 pipetteName=command.params.pipetteName,
                 mount=command.params.mount,
+            )
+            self._state.liquid_presence_detection_by_id[pipette_id] = (
+                command.params.liquidPresenceDetection or False
             )
             self._state.aspirated_volume_by_id[pipette_id] = None
             self._state.movement_speed_by_id[pipette_id] = None
@@ -618,6 +625,27 @@ class PipetteView(HasState[PipetteState]):
 
         return max(0.0, working_volume - current_volume) if current_volume else None
 
+    def get_pipette_lld_settings(
+        self, pipette_id: str
+    ) -> Optional[Dict[str, Dict[str, float]]]:
+        """Get the liquid level settings for all possible tips for a single pipette."""
+        return self.get_config(pipette_id).lld_settings
+
+    def get_current_tip_lld_settings(self, pipette_id: str) -> float:
+        """Get the liquid level settings for pipette and its current tip."""
+        attached_tip = self.get_attached_tip(pipette_id)
+        if attached_tip is None or attached_tip.volume is None:
+            return 0
+        lld_settings = self.get_pipette_lld_settings(pipette_id)
+        tipVolume = str(attached_tip.volume)
+        if (
+            lld_settings is None
+            or lld_settings[tipVolume] is None
+            or lld_settings[tipVolume]["minHeight"] is None
+        ):
+            return 0
+        return float(lld_settings[tipVolume]["minHeight"])
+
     def validate_tip_state(self, pipette_id: str, expected_has_tip: bool) -> None:
         """Validate that a pipette's tip state matches expectations."""
         attached_tip = self.get_attached_tip(pipette_id)
@@ -801,3 +829,12 @@ class PipetteView(HasState[PipetteState]):
             pip_back_right_bound,
             pip_front_left_bound,
         )
+
+    def get_liquid_presence_detection(self, pipette_id: str) -> bool:
+        """Determine if liquid presence detection is enabled for this pipette."""
+        try:
+            return self._state.liquid_presence_detection_by_id[pipette_id]
+        except KeyError as e:
+            raise errors.PipetteNotLoadedError(
+                f"Pipette {pipette_id} not found; unable to determine if pipette liquid presence detection enabled."
+            ) from e

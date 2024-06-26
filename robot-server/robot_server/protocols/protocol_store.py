@@ -217,7 +217,7 @@ class ProtocolStore:
         return protocol_ids
 
     def get_id_by_hash(self, hash: str) -> Optional[str]:
-        """Get all protocol hashes keyed by protocol id."""
+        """Get ID of protocol corresponding to the provided hash."""
         for p in self.get_all():
             if p.source.content_hash == hash:
                 return p.protocol_id
