@@ -23,7 +23,7 @@ import type { IconProps, StyleProps } from '@opentrons/components'
 
 type InlineNotificationType = 'alert' | 'error' | 'neutral' | 'success'
 
-interface InlineNotificationProps extends StyleProps {
+export interface InlineNotificationProps extends StyleProps {
   /** name constant of the icon to display */
   type: InlineNotificationType
   /** InlineNotification contents */
