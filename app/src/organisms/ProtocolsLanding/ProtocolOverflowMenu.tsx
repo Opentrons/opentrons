@@ -15,7 +15,7 @@ import {
   ALIGN_FLEX_END,
   useConditionalConfirm,
 } from '@opentrons/components'
-import { FLEX_DISPLAY_NAME } from '@opentrons/shared-data'
+import { FLEX_DISPLAY_NAME, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '../../App/portal'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
@@ -158,7 +158,7 @@ export function ProtocolOverflowMenu(
           >
             {t('shared:reanalyze')}
           </MenuItem>
-          {enableProtocolTimeline ? (
+          {enableProtocolTimeline && robotType === FLEX_ROBOT_TYPE ? (
             <MenuItem onClick={handleClickTimeline}>
               {t('go_to_timeline')}
             </MenuItem>

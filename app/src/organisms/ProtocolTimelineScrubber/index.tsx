@@ -5,7 +5,6 @@ import ViewportList from 'react-viewport-list'
 import {
   Flex,
   Box,
-  Text,
   DIRECTION_COLUMN,
   SPACING,
   ALIGN_CENTER,
@@ -18,10 +17,12 @@ import {
   LegacyStyledText,
   BaseDeck,
   getLabwareInfoByLiquidId,
+  PrimaryButton,
 } from '@opentrons/components'
 import { getResultingTimelineFrameFromRunCommands } from '@opentrons/step-generation'
 import {
   FLEX_ROBOT_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
   getSimplestDeckConfigForProtocol,
 } from '@opentrons/shared-data'
 import { getCommandTextData } from '../../molecules/Command/utils/getCommandTextData'
@@ -37,11 +38,12 @@ import type {
 } from '@opentrons/shared-data'
 import type {
   LocationLiquidState,
+  ModuleTemporalProperties,
   PipetteEntity,
   TimelineFrame,
 } from '@opentrons/step-generation'
 import type { ViewportListRef } from 'react-viewport-list'
-import type { LabwareOnDeck } from '@opentrons/components'
+import type { LabwareOnDeck, Module } from '@opentrons/components'
 
 const COMMAND_WIDTH_PX = 240
 
@@ -74,11 +76,32 @@ export function ProtocolTimelineScrubber(
   const [currentCommandIndex, setCurrentCommandIndex] = React.useState<number>(
     0
   )
+  const [isPlaying, setIsPlaying] = React.useState<boolean>(true)
 
   const currentCommandsSlice = commands.slice(0, currentCommandIndex + 1)
   const { frame, invariantContext } = getResultingTimelineFrameFromRunCommands(
     currentCommandsSlice
   )
+  const handlePlayPause = (): void => {
+    setIsPlaying(!isPlaying)
+  }
+
+  React.useEffect(() => {
+    if (isPlaying) {
+      const intervalId = setInterval(() => {
+        setCurrentCommandIndex(prev => {
+          const nextIndex = prev < commands.length - 1 ? prev + 1 : 0
+          commandListRef.current?.scrollToIndex(nextIndex)
+          return nextIndex
+        })
+      }, 1000)
+
+      return () => {
+        clearInterval(intervalId)
+      }
+    }
+  }, [isPlaying, commands])
+
   const { robotState } = frame
 
   const [leftPipetteId] = Object.entries(robotState.pipettes).find(
@@ -104,7 +127,7 @@ export function ProtocolTimelineScrubber(
       gridGap={SPACING.spacing8}
     >
       <Flex gridGap={SPACING.spacing8} flex="1 1 0">
-        <Flex flex="1 1 0" width="300px">
+        <Flex flex="1 1 0" width="300px" height="70vh">
           <BaseDeck
             robotType={robotType}
             deckConfig={getSimplestDeckConfigForProtocol(analysis)}
@@ -114,31 +137,77 @@ export function ProtocolTimelineScrubber(
                   ([labwareId, labware]) => labware.slot === moduleId
                 )?.[0] ?? null
 
+              const getModuleInnerProps = (
+                moduleState: ModuleTemporalProperties['moduleState']
+              ): React.ComponentProps<typeof Module>['innerProps'] => {
+                if (moduleState.type === THERMOCYCLER_MODULE_TYPE) {
+                  let lidMotorState = 'unknown'
+                  if (moduleState.lidOpen === true) {
+                    lidMotorState = 'open'
+                  } else if (moduleState.lidOpen === false) {
+                    lidMotorState = 'closed'
+                  }
+                  return {
+                    lidMotorState,
+                    blockTargetTemp: moduleState.blockTargetTemp,
+                  }
+                } else if (
+                  'targetTemperature' in moduleState &&
+                  moduleState.type === 'temperatureModuleType'
+                ) {
+                  return {
+                    targetTemperature: moduleState.targetTemperature,
+                  }
+                } else if ('targetTemp' in moduleState) {
+                  return {
+                    targetTemp: moduleState.targetTemp,
+                  }
+                }
+              }
+
+              const adapterId =
+                labwareInModuleId != null
+                  ? invariantContext.labwareEntities[labwareInModuleId].id
+                  : null
+              const labwareTempProperties =
+                adapterId != null
+                  ? Object.entries(robotState.labware).find(
+                      ([labwareId, labware]) => labware.slot === adapterId
+                    )
+                  : null
+
+              const labwareDef =
+                labwareTempProperties != null
+                  ? invariantContext.labwareEntities[labwareTempProperties[0]]
+                      .def
+                  : null
+              let nestedDef
+              let nestedFill = null
+              if (labwareDef != null && labwareTempProperties != null) {
+                nestedDef = labwareDef
+                nestedFill = getWellFillFromLabwareId(
+                  labwareTempProperties[0],
+                  analysis.liquids,
+                  getLabwareInfoByLiquidId(currentCommandsSlice)
+                )
+              } else if (labwareInModuleId != null) {
+                nestedFill = getWellFillFromLabwareId(
+                  labwareInModuleId,
+                  analysis.liquids,
+                  getLabwareInfoByLiquidId(currentCommandsSlice)
+                )
+                nestedDef =
+                  invariantContext.labwareEntities[labwareInModuleId]?.def
+              }
               return {
                 moduleModel: invariantContext.moduleEntities[moduleId].model,
                 moduleLocation: { slotName: module.slot },
-                nestedLabwareDef:
-                  labwareInModuleId != null
-                    ? invariantContext.labwareEntities[labwareInModuleId]?.def
-                    : null,
-                nestedLabwareWellFill:
-                  labwareInModuleId != null
-                    ? getWellFillFromLabwareId(
-                        labwareInModuleId,
-                        analysis.liquids,
-                        getLabwareInfoByLiquidId(currentCommandsSlice)
-                      )
-                    : undefined,
-                innerProps: {}, // TODO: wire up module state
+                nestedLabwareDef: nestedDef,
+                nestedLabwareWellFill: nestedFill,
+                innerProps: getModuleInnerProps(module.moduleState),
               }
             })}
             labwareOnDeck={map(robotState.labware, (labware, labwareId) => {
-              if (
-                labware.slot in robotState.modules ||
-                labwareId === 'fixedTrash'
-              ) {
-                return []
-              }
               const definition = invariantContext.labwareEntities[labwareId].def
 
               const missingTips = definition.parameters.isTiprack
@@ -151,9 +220,11 @@ export function ProtocolTimelineScrubber(
                     {}
                   )
                 : {}
-
+              const labwareLocation: LabwareLocation = {
+                slotName: labware.slot,
+              }
               const labwareOnDeck: LabwareOnDeck = {
-                labwareLocation: { slotName: labware.slot } as LabwareLocation,
+                labwareLocation,
                 definition,
                 wellFill: getWellFillFromLabwareId(
                   labwareId,
@@ -206,9 +277,14 @@ export function ProtocolTimelineScrubber(
           )}
         </ViewportList>
       </Flex>
-      <LegacyStyledText as="label" marginY={SPACING.spacing8}>
-        Jump to command
-      </LegacyStyledText>
+      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER}>
+        <LegacyStyledText as="label" marginY={SPACING.spacing8}>
+          Jump to command
+        </LegacyStyledText>
+        <PrimaryButton onClick={handlePlayPause} width="max-content">
+          {isPlaying ? 'Pause' : 'Play'}
+        </PrimaryButton>
+      </Flex>
       <input
         type="range"
         min={1}
@@ -221,25 +297,17 @@ export function ProtocolTimelineScrubber(
         }}
       />
       <Flex alignSelf={ALIGN_STRETCH} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-        <Text as="p" fontSize="0.5rem">
-          1
-        </Text>
-        <Text as="p" fontSize="0.5rem">
-          {commands.length}
-        </Text>
+        <LegacyStyledText as="p">1</LegacyStyledText>
+        <LegacyStyledText as="p">{commands.length}</LegacyStyledText>
       </Flex>
       {currentCommandIndex !== 0 &&
       currentCommandIndex !== commands.length - 1 ? (
-        <Text
+        <LegacyStyledText
           as="p"
-          fontSize="0.5rem"
-          marginLeft={
-            (currentCommandIndex / (commands.length - 1)) * 886
-            // (wrapperRef.current?.getBoundingClientRect()?.width - 6 ?? 0)
-          }
+          marginLeft={(currentCommandIndex / (commands.length - 1)) * 886}
         >
           {currentCommandIndex + 1}
-        </Text>
+        </LegacyStyledText>
       ) : null}
     </Flex>
   )
@@ -265,7 +333,9 @@ function PipetteMountViz(props: PipetteMountVizProps): JSX.Element | null {
         as="h1"
         textTransform={TEXT_TRANSFORM_UPPERCASE}
         cursor="pointer"
-        onClick={() => setShowPipetteDetails(!showPipetteDetails)}
+        onClick={() => {
+          setShowPipetteDetails(!showPipetteDetails)
+        }}
       >
         {mount}
       </LegacyStyledText>
@@ -284,9 +354,11 @@ function PipetteMountViz(props: PipetteMountVizProps): JSX.Element | null {
           allNozzleTipContents={Object.values(
             timelineFrame.liquidState.pipettes[pipetteId]
           )}
-          //  TODO, figure out this max volume thing
-          maxVolume={1000}
-          // maxVolume={pipetteEntity.spec.liquids[0].maxVolume ?? 0}
+          maxVolume={
+            pipetteEntity != null
+              ? pipetteEntity.spec.liquids.default.maxVolume
+              : 0
+          }
           analysis={analysis}
         />
       ) : (
@@ -442,6 +514,7 @@ function CommandItem(props: CommandItemProps): JSX.Element {
     analysis,
     robotType,
   } = props
+  const params: RunTimeCommand['params'] = command.params ?? {}
   return (
     <Flex
       key={index}
@@ -465,51 +538,51 @@ function CommandItem(props: CommandItemProps): JSX.Element {
       overflowX="hidden"
       overflowY="scroll"
       cursor="pointer"
-      onClick={() => setCurrentCommandIndex(index)}
+      onClick={() => {
+        setCurrentCommandIndex(index)
+      }}
     >
-      <Text
-        onClick={() => setShowDetails(!showDetails)}
+      <LegacyStyledText
+        onClick={() => {
+          setShowDetails(!showDetails)
+        }}
         as="p"
-        fontSize="0.5rem"
         alignSelf={ALIGN_FLEX_END}
       >
         {index + 1}
-      </Text>
+      </LegacyStyledText>
       <CommandText
         command={command}
         commandTextData={getCommandTextData(analysis)}
         robotType={robotType}
       />
       {showDetails
-        ? Object.entries(command.params ?? {}).map(([key, value]) => (
+        ? Object.entries(params).map(([key, value]) => (
             <Flex
               key={key}
               flexDirection={DIRECTION_COLUMN}
               marginBottom={SPACING.spacing2}
               paddingLeft={SPACING.spacing2}
             >
-              <Text as="label" fontSize="0.6rem" marginRight={SPACING.spacing2}>
+              <LegacyStyledText as="label" marginRight={SPACING.spacing2}>
                 {key}:
-              </Text>
+              </LegacyStyledText>
               {value != null && typeof value === 'object' ? (
+                /*  eslint-disable @typescript-eslint/no-unsafe-argument */
                 Object.entries(value).map(([innerKey, innerValue]) => (
                   <Flex key={innerKey}>
-                    <Text
-                      as="label"
-                      fontSize="0.6rem"
-                      marginRight={SPACING.spacing2}
-                    >
+                    <LegacyStyledText as="label" marginRight={SPACING.spacing2}>
                       {key}:
-                    </Text>
-                    <Text as="p" fontSize="0.6rem" title={String(innerValue)}>
+                    </LegacyStyledText>
+                    <LegacyStyledText as="p" title={String(innerValue)}>
                       {String(innerValue)}
-                    </Text>
+                    </LegacyStyledText>
                   </Flex>
                 ))
               ) : (
-                <Text as="p" fontSize="0.6rem" title={String(value)}>
+                <LegacyStyledText as="p" title={String(value)}>
                   {String(value)}
-                </Text>
+                </LegacyStyledText>
               )}
             </Flex>
           ))

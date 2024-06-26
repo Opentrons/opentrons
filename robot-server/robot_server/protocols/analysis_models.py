@@ -185,10 +185,6 @@ class CompletedAnalysis(BaseModel):
             " but it won't have more than one element."
         ),
     )
-    liquids: List[Liquid] = Field(
-        default_factory=list,
-        description="Liquids used by the protocol",
-    )
 
 
 AnalysisParameterType = Union[float, bool, str, None]

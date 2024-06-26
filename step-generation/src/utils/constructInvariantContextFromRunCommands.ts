@@ -1,7 +1,7 @@
 import {
   getModuleType,
   getLabwareDefURI,
-  getPipetteNameSpecs,
+  getPipetteSpecsV2,
 } from '@opentrons/shared-data'
 import type {
   LoadLabwareRunTimeCommand,
@@ -15,8 +15,8 @@ export function constructInvariantContextFromRunCommands(
 ): InvariantContext {
   return commands.reduce(
     (acc: InvariantContext, command: RunTimeCommand) => {
-      const result = command.result
-      if (command.commandType === 'loadLabware' && result != null) {
+      if (command.commandType === 'loadLabware' && command.result != null) {
+        const result = command.result
         return {
           ...acc,
           labwareEntities: {
@@ -28,7 +28,11 @@ export function constructInvariantContextFromRunCommands(
             },
           },
         }
-      } else if (command.commandType === 'loadModule' && result != null) {
+      } else if (
+        command.commandType === 'loadModule' &&
+        command.result != null
+      ) {
+        const result = command.result
         return {
           ...acc,
           moduleEntities: {
@@ -40,7 +44,11 @@ export function constructInvariantContextFromRunCommands(
             },
           },
         }
-      } else if (command.commandType === 'loadPipette' && result != null) {
+      } else if (
+        command.commandType === 'loadPipette' &&
+        command.result != null
+      ) {
+        const result = command.result
         const labwareId =
           commands.find(
             (c): c is PickUpTipRunTimeCommand =>
@@ -66,7 +74,7 @@ export function constructInvariantContextFromRunCommands(
             ...acc.pipetteEntities,
             [result.pipetteId]: {
               tiprackLabwareDef,
-              spec: getPipetteNameSpecs(command.params.pipetteName),
+              spec: getPipetteSpecsV2(command.params.pipetteName),
             },
           },
         }
