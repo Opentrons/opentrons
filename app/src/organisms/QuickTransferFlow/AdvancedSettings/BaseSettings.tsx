@@ -65,9 +65,8 @@ export function BaseSettings(props: BaseSettingsProps): JSX.Element | null {
       value: pipettePath,
       enabled: state.transferType !== 'transfer',
       onClick: () => {
-        state.transferType !== 'transfer'
-          ? setSelectedSetting('pipette_path')
-          : null
+        if (state.transferType !== 'transfer')
+          setSelectedSetting('pipette_path')
       },
     },
   ]
