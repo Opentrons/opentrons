@@ -162,7 +162,7 @@ AXES_IN_HOMING_ORDER: Tuple[Axis, Axis, Axis, Axis, Axis, Axis, Axis, Axis, Axis
 )
 
 
-TESTING_OVERSHOOT_MM = 0.10  # EDIT HERE (6/26)
+TESTING_OVERSHOOT_MM = 0.20  # EDIT HERE (6/26)
 
 
 class OT3API(
