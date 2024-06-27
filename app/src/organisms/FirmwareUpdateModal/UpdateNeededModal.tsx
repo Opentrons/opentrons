@@ -7,7 +7,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 import {
   useInstrumentsQuery,
@@ -79,7 +79,7 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
   let modalContent = (
     <Modal header={updateNeededHeader}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
-        <StyledText as="p" marginBottom={SPACING.spacing60}>
+        <LegacyStyledText as="p" marginBottom={SPACING.spacing60}>
           <Trans
             t={t}
             i18nKey="firmware_out_of_date"
@@ -91,7 +91,7 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
               bold: <strong />,
             }}
           />
-        </StyledText>
+        </LegacyStyledText>
         <SmallButton
           onClick={() => {
             setInitiatedSubsystemUpdate(subsystem)

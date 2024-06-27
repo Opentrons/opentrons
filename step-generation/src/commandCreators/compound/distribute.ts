@@ -308,6 +308,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
             pipette: args.pipette,
             dropTipLocation: args.dropTipLocation,
             tipRack: args.tipRack,
+            nozzles: args.nozzles ?? undefined,
           }),
         ]
       }

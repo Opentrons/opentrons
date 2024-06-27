@@ -9,7 +9,7 @@ import {
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
   DIRECTION_COLUMN,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 import { getDisplayVolume } from '@opentrons/shared-data'
 
@@ -59,12 +59,12 @@ export function WellProperties(props: WellPropertiesProps): JSX.Element {
           flexDirection={DIRECTION_COLUMN}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
-          <StyledText as="h6">{t('max_volume')}</StyledText>
-          <StyledText as="p">
+          <LegacyStyledText as="h6">{t('max_volume')}</LegacyStyledText>
+          <LegacyStyledText as="p">
             {vol != null
               ? `${String(getDisplayVolume(vol, units, 2))} ${String(units)}`
               : t('various')}
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
         {wellBottomShape != null && wellBottomValue && (
           <Flex flexDirection={DIRECTION_ROW}>
@@ -73,10 +73,10 @@ export function WellProperties(props: WellPropertiesProps): JSX.Element {
               justifyContent={JUSTIFY_SPACE_BETWEEN}
               marginRight={SPACING.spacing16}
             >
-              <StyledText as="h6">
+              <LegacyStyledText as="h6">
                 {t(wellLabel)} {t('shape')}
-              </StyledText>
-              <StyledText as="p">{wellBottomValue}</StyledText>
+              </LegacyStyledText>
+              <LegacyStyledText as="p">{wellBottomValue}</LegacyStyledText>
             </Flex>
             <Icon
               height="1.25rem"

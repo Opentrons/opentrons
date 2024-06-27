@@ -3,7 +3,6 @@ import {
   RUN_ACTION_TYPE_PAUSE,
   RUN_ACTION_TYPE_STOP,
   RUN_STATUS_IDLE,
-  RUN_STATUS_PAUSE_REQUESTED,
   RUN_STATUS_PAUSED,
   RUN_STATUS_RUNNING,
   RUN_STATUS_SUCCEEDED,
@@ -24,32 +23,6 @@ export const mockPausedRun: RunData = {
   createdAt: '2021-10-07T18:44:49.366581+00:00',
   current: true,
   status: RUN_STATUS_PAUSED,
-  protocolId: PROTOCOL_ID,
-  actions: [
-    {
-      id: '1',
-      createdAt: '2021-10-25T12:54:53.366581+00:00',
-      actionType: RUN_ACTION_TYPE_PLAY,
-    },
-    {
-      id: '2',
-      createdAt: '2021-10-25T13:23:31.366581+00:00',
-      actionType: RUN_ACTION_TYPE_PAUSE,
-    },
-  ],
-  errors: [],
-  pipettes: [],
-  labware: [],
-  modules: [],
-  liquids: [],
-  runTimeParameters: [],
-}
-
-export const mockPauseRequestedRun: RunData = {
-  id: RUN_ID_1,
-  createdAt: '2021-10-07T18:44:49.366581+00:00',
-  current: true,
-  status: RUN_STATUS_PAUSE_REQUESTED,
   protocolId: PROTOCOL_ID,
   actions: [
     {

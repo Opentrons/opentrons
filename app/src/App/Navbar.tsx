@@ -16,7 +16,7 @@ import {
   Link,
   SIZE_2,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -134,12 +134,12 @@ export function Navbar({ routes }: { routes: RouteProps[] }): JSX.Element {
         />
         {navRoutes.map(({ name, navLinkTo }: RouteProps) => (
           <NavbarLink key={name} to={navLinkTo as string}>
-            <StyledText
+            <LegacyStyledText
               as="h3"
               margin={`${SPACING.spacing8} 0 ${SPACING.spacing8} ${SPACING.spacing12}`}
             >
               {name}
-            </StyledText>
+            </LegacyStyledText>
           </NavbarLink>
         ))}
       </Flex>

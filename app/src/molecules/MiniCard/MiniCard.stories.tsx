@@ -6,7 +6,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
@@ -37,13 +37,13 @@ const Children = (
     <Box backgroundColor={COLORS.white}>
       <img src={OT2_PNG} style={{ width: '3rem' }} />
     </Box>
-    <StyledText
+    <LegacyStyledText
       as="p"
       marginLeft={SPACING.spacing8}
       fontWeight={TYPOGRAPHY.fontWeightSemiBold}
     >
       MiniCard stories protocol
-    </StyledText>
+    </LegacyStyledText>
   </Flex>
 )
 

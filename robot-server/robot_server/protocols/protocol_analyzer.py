@@ -6,6 +6,7 @@ from opentrons_shared_data.robot.dev_types import RobotType
 
 import opentrons.protocol_runner.create_simulating_orchestrator as simulating_runner
 from opentrons.protocol_engine.errors import ErrorOccurrence
+from opentrons.util.performance_helpers import TrackingFunctions
 from opentrons.protocol_engine.types import RunTimeParamValuesType, RunTimeParameter
 import opentrons.util.helpers as datetime_helper
 from opentrons.protocol_runner import (
@@ -60,6 +61,7 @@ class ProtocolAnalyzer:
 
         return orchestrator
 
+    @TrackingFunctions.track_analysis
     async def analyze(
         self,
         orchestrator: RunOrchestrator,

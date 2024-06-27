@@ -1225,7 +1225,8 @@
       "notes": [],
       "params": {
         "mount": "left",
-        "pipetteName": "p1000_96"
+        "pipetteName": "p1000_96",
+        "tipOverlapNotAfterVersion": "v0"
       },
       "result": {},
       "status": "succeeded"
@@ -1293,6 +1294,7 @@
         "errorCode": "4000",
         "errorInfo": {},
         "errorType": "IncompatibleAddressableAreaError",
+        "isDefined": false,
         "wrappedErrors": []
       },
       "notes": [],
@@ -1318,18 +1320,21 @@
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
+      "isDefined": false,
       "wrappedErrors": [
         {
           "detail": "IncompatibleAddressableAreaError: Cannot use Slot C3, not compatible with one or more of the following fixtures: Trash Bin in C3",
           "errorCode": "4000",
           "errorInfo": {},
           "errorType": "ProtocolCommandFailedError",
+          "isDefined": false,
           "wrappedErrors": [
             {
               "detail": "Cannot use Slot C3, not compatible with one or more of the following fixtures: Trash Bin in C3",
               "errorCode": "4000",
               "errorInfo": {},
               "errorType": "IncompatibleAddressableAreaError",
+              "isDefined": false,
               "wrappedErrors": []
             }
           ]
@@ -1389,6 +1394,7 @@
       "pipetteName": "p1000_96"
     }
   ],
+  "result": "not-ok",
   "robotType": "OT-3 Standard",
   "runTimeParameters": []
 }

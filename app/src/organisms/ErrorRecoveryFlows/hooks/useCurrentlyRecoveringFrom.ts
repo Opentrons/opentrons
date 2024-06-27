@@ -1,4 +1,8 @@
-import { RUN_STATUS_AWAITING_RECOVERY } from '@opentrons/api-client'
+import {
+  RUN_STATUS_AWAITING_RECOVERY,
+  RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
+  RUN_STATUS_AWAITING_RECOVERY_PAUSED,
+} from '@opentrons/api-client'
 import { useCommandQuery } from '@opentrons/react-api-client'
 
 import { useNotifyAllCommandsQuery } from '../../../resources/runs'
@@ -14,15 +18,19 @@ export function useCurrentlyRecoveringFrom(
   runId: string,
   runStatus: RunStatus | null
 ): FailedCommand | null {
-  // There can only be a currentlyRecoveringFrom command when the run is awaiting-recovery.
+  // There can only be a currentlyRecoveringFrom command when the run is in recovery mode.
   // In case we're falling back to polling, only enable queries when that is the case.
-  const isRunStatusAwaitingRecovery = runStatus === RUN_STATUS_AWAITING_RECOVERY
+  const isRunInRecoveryMode = ([
+    RUN_STATUS_AWAITING_RECOVERY,
+    RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
+    RUN_STATUS_AWAITING_RECOVERY_PAUSED,
+  ] as Array<RunStatus | null>).includes(runStatus)
 
   const { data: allCommandsQueryData } = useNotifyAllCommandsQuery(
     runId,
     { cursor: null, pageLength: 0 }, // pageLength 0 because we only care about the links.
     {
-      enabled: isRunStatusAwaitingRecovery,
+      enabled: isRunInRecoveryMode,
       refetchInterval: ALL_COMMANDS_POLL_MS,
     }
   )
@@ -35,10 +43,9 @@ export function useCurrentlyRecoveringFrom(
     currentlyRecoveringFromLink?.meta.runId ?? null,
     currentlyRecoveringFromLink?.meta.commandId ?? null,
     {
-      enabled:
-        currentlyRecoveringFromLink != null && isRunStatusAwaitingRecovery,
+      enabled: currentlyRecoveringFromLink != null && isRunInRecoveryMode,
     }
   )
 
-  return isRunStatusAwaitingRecovery ? commandQueryData?.data ?? null : null
+  return isRunInRecoveryMode ? commandQueryData?.data ?? null : null
 }

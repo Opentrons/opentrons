@@ -15,7 +15,7 @@ import {
   POSITION_RELATIVE,
   SIZE_6,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
@@ -110,9 +110,9 @@ function RoundTab({
   const [targetProps, tooltipProps] = useHoverTooltip()
   return disabled ? (
     <>
-      <StyledText css={disabledRoundTabStyling} {...targetProps}>
+      <LegacyStyledText css={disabledRoundTabStyling} {...targetProps}>
         {tabName}
-      </StyledText>
+      </LegacyStyledText>
       {tabDisabledReason != null ? (
         <Tooltip tooltipProps={tooltipProps}>{tabDisabledReason}</Tooltip>
       ) : null}

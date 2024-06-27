@@ -11,7 +11,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SecondaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -47,11 +47,13 @@ export function ConfirmExit(props: ConfirmExitProps): JSX.Element {
           marginBottom={SPACING.spacing24}
         />
         {heading != null ? (
-          <StyledText as="h1" marginBottom={SPACING.spacing8}>
+          <LegacyStyledText as="h1" marginBottom={SPACING.spacing8}>
             {heading}
-          </StyledText>
+          </LegacyStyledText>
         ) : null}
-        {body != null ? <StyledText as="p">{body}</StyledText> : null}
+        {body != null ? (
+          <LegacyStyledText as="p">{body}</LegacyStyledText>
+        ) : null}
       </Flex>
       <Flex
         flex="0"

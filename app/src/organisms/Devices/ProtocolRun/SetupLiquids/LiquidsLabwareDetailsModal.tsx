@@ -14,7 +14,7 @@ import {
   Flex,
   LabwareRender,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { Modal } from '../../../../molecules/Modal'
@@ -193,39 +193,39 @@ export const LiquidsLabwareDetailsModal = (
           >
             <Flex flexDirection={DIRECTION_ROW}>
               <Flex flexDirection={DIRECTION_COLUMN}>
-                <StyledText
+                <LegacyStyledText
                   as="h6"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
                   color={COLORS.grey50}
                 >
                   {t('slot_number')}
-                </StyledText>
-                <StyledText
+                </LegacyStyledText>
+                <LegacyStyledText
                   as="p"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
                   color={COLORS.black90}
                 >
                   {slotName}
-                </StyledText>
+                </LegacyStyledText>
               </Flex>
               <Flex
                 flexDirection={DIRECTION_COLUMN}
                 marginLeft={SPACING.spacing24}
               >
-                <StyledText
+                <LegacyStyledText
                   as="h6"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
                   color={COLORS.grey50}
                 >
                   {t('labware_name')}
-                </StyledText>
-                <StyledText
+                </LegacyStyledText>
+                <LegacyStyledText
                   as="p"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
                   color={COLORS.black90}
                 >
                   {labwareName}
-                </StyledText>
+                </LegacyStyledText>
               </Flex>
             </Flex>
             <Flex flex="1 1 30rem" flexDirection={DIRECTION_COLUMN}>

@@ -12,7 +12,7 @@ import {
   Icon,
   POSITION_FIXED,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -84,7 +84,7 @@ export function FloatingActionButton(
           name={iconName}
           width="3.75rem"
         />
-        <StyledText>{buttonText}</StyledText>
+        <LegacyStyledText>{buttonText}</LegacyStyledText>
       </Flex>
     </Btn>
   )

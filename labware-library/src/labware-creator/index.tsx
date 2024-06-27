@@ -417,7 +417,7 @@ export const LabwareCreator = (): JSX.Element => {
 
           return (
             <div className={styles.labware_creator}>
-              <h2>Custom Labware Creator BETA</h2>
+              <h2>Custom Labware Creator</h2>
               <IntroCopy />
               <div className={styles.flex_row}>
                 <CreateNewDefinition

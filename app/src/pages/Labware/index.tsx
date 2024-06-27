@@ -18,7 +18,7 @@ import {
   POSITION_ABSOLUTE,
   SecondaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   useOnClickOutside,
 } from '@opentrons/components'
@@ -108,10 +108,14 @@ export function Labware(): JSX.Element {
       })
     } else if (newLabwareName != null) {
       setShowAddLabwareSlideout(false)
-      makeToast(t('imported', { filename: newLabwareName }), SUCCESS_TOAST, {
-        closeButton: true,
-        onClose: clearLabwareName,
-      })
+      makeToast(
+        t('imported', { filename: newLabwareName }) as string,
+        SUCCESS_TOAST,
+        {
+          closeButton: true,
+          onClose: clearLabwareName,
+        }
+      )
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [labwareFailureMessage, newLabwareName])
@@ -125,12 +129,12 @@ export function Labware(): JSX.Element {
           alignItems={ALIGN_CENTER}
           paddingBottom={SPACING.spacing24}
         >
-          <StyledText
+          <LegacyStyledText
             as="h1"
             textTransform={TYPOGRAPHY.textTransformCapitalize}
           >
             {t('labware')}
-          </StyledText>
+          </LegacyStyledText>
           <SecondaryButton
             onClick={() => {
               setShowAddLabwareSlideout(true)
@@ -154,9 +158,9 @@ export function Labware(): JSX.Element {
             title={t('category')}
           />
           <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
-            <StyledText css={TYPOGRAPHY.pSemiBold} color={COLORS.grey50}>
+            <LegacyStyledText css={TYPOGRAPHY.pSemiBold} color={COLORS.grey50}>
               {t('shared:sort_by')}
-            </StyledText>
+            </LegacyStyledText>
             <Flex
               flexDirection={DIRECTION_ROW}
               alignItems={ALIGN_CENTER}
@@ -165,7 +169,7 @@ export function Labware(): JSX.Element {
               css={SORT_BY_BUTTON_STYLE}
               onClick={toggleSetShowSortByMenu}
             >
-              <StyledText
+              <LegacyStyledText
                 css={TYPOGRAPHY.pSemiBold}
                 paddingLeft={SPACING.spacing8}
                 paddingRight={SPACING.spacing4}
@@ -175,7 +179,7 @@ export function Labware(): JSX.Element {
                 {sortBy === 'alphabetical'
                   ? t('shared:alphabetical')
                   : t('shared:reverse')}
-              </StyledText>
+              </LegacyStyledText>
               <Icon
                 paddingRight={SPACING.spacing8}
                 height={TYPOGRAPHY.lineHeight16}
@@ -232,13 +236,13 @@ export function Labware(): JSX.Element {
           alignItems={ALIGN_CENTER}
           marginTop={SPACING.spacing32}
         >
-          <StyledText
+          <LegacyStyledText
             as="p"
             color={COLORS.black90}
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           >
             {t('create_new_def')}
-          </StyledText>
+          </LegacyStyledText>
 
           <Link
             external

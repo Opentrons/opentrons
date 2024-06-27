@@ -20,7 +20,7 @@ import {
   OVERFLOW_WRAP_ANYWHERE,
   POSITION_STICKY,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   truncateString,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -44,6 +44,7 @@ import {
   getApplyHistoricOffsets,
   getPinnedProtocolIds,
   updateConfigValue,
+  useFeatureFlag,
 } from '../../redux/config'
 import { useOffsetCandidatesForAnalysis } from '../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import {
@@ -135,14 +136,14 @@ const ProtocolHeader = ({
             )}
           </Flex>
           {!isProtocolFetching ? (
-            <StyledText
+            <LegacyStyledText
               as="h2"
               fontWeight={TYPOGRAPHY.fontWeightBold}
               onClick={toggleTruncate}
               overflowWrap={OVERFLOW_WRAP_ANYWHERE}
             >
               {displayedTitle}
-            </StyledText>
+            </LegacyStyledText>
           ) : (
             <ProcotolDetailsHeaderTitleSkeleton />
           )}
@@ -227,20 +228,20 @@ const Summary = ({ author, description, date }: SummaryProps): JSX.Element => {
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         gridGap={SPACING.spacing4}
       >
-        <StyledText
+        <LegacyStyledText
           as="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        >{`${i18n.format(t('author'), 'capitalize')}: `}</StyledText>
-        <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+        >{`${i18n.format(t('author'), 'capitalize')}: `}</LegacyStyledText>
+        <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {author}
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
-      <StyledText
+      <LegacyStyledText
         as="p"
         color={description === null ? COLORS.grey60 : undefined}
       >
         {description ?? i18n.format(t('no_summary'), 'capitalize')}
-      </StyledText>
+      </LegacyStyledText>
       <Flex
         backgroundColor={COLORS.grey35}
         borderRadius={BORDERS.borderRadius8}
@@ -248,9 +249,9 @@ const Summary = ({ author, description, date }: SummaryProps): JSX.Element => {
         width="max-content"
         padding={`${SPACING.spacing8} ${SPACING.spacing12}`}
       >
-        <StyledText as="p">{`${t('protocol_info:date_added')}: ${
+        <LegacyStyledText as="p">{`${t('protocol_info:date_added')}: ${
           date != null ? formatTimeWithUtcLabel(date) : t('shared:no_data')
-        }`}</StyledText>
+        }`}</LegacyStyledText>
       </Flex>
     </Flex>
   )
@@ -311,15 +312,14 @@ export function ProtocolDetails(): JSX.Element | null {
     'protocol_info',
     'shared',
   ])
+  const enableCsvFile = useFeatureFlag('enableCsvFile')
   const { protocolId } = useParams<OnDeviceRouteParams>()
   const {
     missingProtocolHardware,
     conflictedSlots,
   } = useMissingProtocolHardware(protocolId)
-  const chipText = useHardwareStatusText(
-    missingProtocolHardware,
-    conflictedSlots
-  )
+  let chipText = useHardwareStatusText(missingProtocolHardware, conflictedSlots)
+
   const runTimeParameters = useRunTimeParameters(protocolId)
   const dispatch = useDispatch<Dispatch>()
   const history = useHistory()
@@ -381,17 +381,27 @@ export function ProtocolDetails(): JSX.Element | null {
     },
   })
 
+  const isRequiredCsv =
+    mostRecentAnalysis?.result === 'parameter-value-required'
+  if (enableCsvFile && isRequiredCsv) {
+    if (chipText === 'Ready to run') {
+      chipText = i18n.format(t('requires_csv'), 'capitalize')
+    } else {
+      chipText = `${chipText} & ${t('requires_csv')}`
+    }
+  }
+
   const handlePinClick = (): void => {
     if (!pinned) {
       if (pinnedProtocolIds.length === MAXIMUM_PINNED_PROTOCOLS) {
         setShowMaxPinsAlert(true)
       } else {
         pinnedProtocolIds.push(protocolId)
-        makeSnackbar(t('protocol_info:pinned_protocol'))
+        makeSnackbar(t('protocol_info:pinned_protocol') as string)
       }
     } else {
       pinnedProtocolIds = pinnedProtocolIds.filter(p => p !== protocolId)
-      makeSnackbar(t('protocol_info:unpinned_protocol'))
+      makeSnackbar(t('protocol_info:unpinned_protocol') as string)
     }
     dispatch(
       updateConfigValue('protocols.pinnedProtocolIds', pinnedProtocolIds)
@@ -463,13 +473,13 @@ export function ProtocolDetails(): JSX.Element | null {
               header={deleteModalHeader}
             >
               <Flex flexDirection={DIRECTION_COLUMN} width="100%">
-                <StyledText
+                <LegacyStyledText
                   as="h4"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
                   marginBottom={SPACING.spacing40}
                 >
                   {t('delete_protocol_perm', { name: displayName })}
-                </StyledText>
+                </LegacyStyledText>
                 <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
                   <SmallButton
                     onClick={() => {

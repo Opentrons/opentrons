@@ -17,41 +17,37 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Let there be light! True 🌠🌠🌠",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Let there be light! True 🌠🌠🌠"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Is the door is closed? True 🚪🚪🚪",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Is the door is closed? True 🚪🚪🚪"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Is this a simulation? True 🔮🔮🔮",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Is this a simulation? True 🔮🔮🔮"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Running against API Version: 2.15",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Running against API Version: 2.15"
       },
       "result": {},
       "status": "succeeded"
@@ -2355,7 +2351,8 @@
       "notes": [],
       "params": {
         "mount": "left",
-        "pipetteName": "p300_multi_gen2"
+        "pipetteName": "p300_multi_gen2",
+        "tipOverlapNotAfterVersion": "v0"
       },
       "result": {},
       "status": "succeeded"
@@ -2365,7 +2362,8 @@
       "notes": [],
       "params": {
         "mount": "right",
-        "pipetteName": "p20_single_gen2"
+        "pipetteName": "p20_single_gen2",
+        "tipOverlapNotAfterVersion": "v0"
       },
       "result": {},
       "status": "succeeded"
@@ -3046,6 +3044,7 @@
       "pipetteName": "p20_single_gen2"
     }
   ],
+  "result": "ok",
   "robotType": "OT-2 Standard",
   "runTimeParameters": []
 }

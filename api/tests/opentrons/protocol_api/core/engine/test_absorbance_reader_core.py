@@ -7,6 +7,7 @@ from opentrons.hardware_control.modules import AbsorbanceReader
 from opentrons.hardware_control.modules.types import (
     ModuleType,
 )
+from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_api.core.engine.module_core import AbsorbanceReaderCore
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
@@ -64,8 +65,11 @@ def test_initialize(
     subject.initialize(wavelength=123)
 
     decoy.verify(
-        mock_engine_client.absorbance_reader_initialize(
-            module_id="1234", wavelength=123
+        mock_engine_client.execute_command(
+            cmd.absorbance_reader.InitializeParams(
+                moduleId="1234",
+                sampleWavelength=123,
+            ),
         ),
         times=1,
     )
@@ -80,7 +84,12 @@ def test_initiate_read(
     subject.initiate_read()
 
     decoy.verify(
-        mock_engine_client.absorbance_reader_measure(module_id="1234", wavelength=123),
+        mock_engine_client.execute_command(
+            cmd.absorbance_reader.MeasureAbsorbanceParams(
+                moduleId="1234",
+                sampleWavelength=123,
+            ),
+        ),
         times=1,
     )
 

@@ -8,11 +8,12 @@ import {
   Flex,
   Icon,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 import { RECOVERY_MAP } from '../constants'
 import { RecoveryFooterButtons, RecoverySingleColumnContent } from '../shared'
+import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 import type { RecoveryContentProps } from '../types'
 import type {
@@ -21,7 +22,25 @@ import type {
   UseRouteUpdateActionsResult,
 } from '../hooks'
 
-export function CancelRun({
+export function CancelRun(props: RecoveryContentProps): JSX.Element {
+  const { recoveryMap } = props
+  const { step, route } = recoveryMap
+  const { CANCEL_RUN } = RECOVERY_MAP
+
+  const buildContent = (): JSX.Element => {
+    switch (step) {
+      case CANCEL_RUN.STEPS.CONFIRM_CANCEL:
+        return <CancelRunConfirmation {...props} />
+      default:
+        console.warn(`${step} in ${route} not explicitly handled. Rerouting.`)
+        return <SelectRecoveryOption {...props} />
+    }
+  }
+
+  return buildContent()
+}
+
+function CancelRunConfirmation({
   isOnDevice,
   routeUpdateActions,
   recoveryCommands,
@@ -56,12 +75,16 @@ export function CancelRun({
             marginTop={SPACING.spacing24}
             color={COLORS.red50}
           />
-          <StyledText as="h3Bold">
+          <LegacyStyledText as="h3Bold">
             {t('are_you_sure_you_want_to_cancel')}
-          </StyledText>
-          <StyledText as="h4" color={COLORS.grey60} textAlign={ALIGN_CENTER}>
+          </LegacyStyledText>
+          <LegacyStyledText
+            as="h4"
+            color={COLORS.grey60}
+            textAlign={ALIGN_CENTER}
+          >
             {t('if_tips_are_attached')}
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
         <RecoveryFooterButtons
           isOnDevice={isOnDevice}

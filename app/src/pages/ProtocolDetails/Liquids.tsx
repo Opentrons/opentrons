@@ -11,7 +11,7 @@ import {
   Flex,
   Icon,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
@@ -120,12 +120,12 @@ export const Liquids = (props: { protocolId: string }): JSX.Element => {
                     />
                   </Flex>
                   <Flex flexDirection={DIRECTION_COLUMN}>
-                    <StyledText as="p">
+                    <LegacyStyledText as="p">
                       {i18n.format(liquid.displayName, 'titleCase')}
-                    </StyledText>
-                    <StyledText as="p" color={COLORS.grey60}>
+                    </LegacyStyledText>
+                    <LegacyStyledText as="p" color={COLORS.grey60}>
                       {i18n.format(liquid.description, 'titleCase')}
-                    </StyledText>
+                    </LegacyStyledText>
                   </Flex>
                 </Flex>
               </TableDatum>

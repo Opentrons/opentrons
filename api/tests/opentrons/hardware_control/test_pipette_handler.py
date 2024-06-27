@@ -137,7 +137,7 @@ def test_plan_check_pick_up_tip_with_presses_argument(
     )
 
     spec, _add_tip_to_instrs = subject.plan_check_pick_up_tip(
-        mount, tip_length, presses, increment
+        mount=mount, tip_length=tip_length, presses=presses, increment=increment
     )
 
     assert len(spec.presses) == expected_array_length

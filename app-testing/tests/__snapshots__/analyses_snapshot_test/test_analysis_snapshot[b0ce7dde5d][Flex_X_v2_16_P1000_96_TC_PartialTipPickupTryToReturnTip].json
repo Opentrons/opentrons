@@ -1164,7 +1164,8 @@
       "notes": [],
       "params": {
         "mount": "left",
-        "pipetteName": "p1000_96"
+        "pipetteName": "p1000_96",
+        "tipOverlapNotAfterVersion": "v0"
       },
       "result": {},
       "status": "succeeded"
@@ -3595,12 +3596,14 @@
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
+      "isDefined": false,
       "wrappedErrors": [
         {
           "detail": "Cannot return tip to a tiprack while the pipette is configured for partial tip.",
           "errorCode": "4000",
           "errorInfo": {},
           "errorType": "UnexpectedProtocolError",
+          "isDefined": false,
           "wrappedErrors": []
         }
       ]
@@ -3664,6 +3667,7 @@
       "pipetteName": "p1000_96"
     }
   ],
+  "result": "not-ok",
   "robotType": "OT-3 Standard",
   "runTimeParameters": []
 }

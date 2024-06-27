@@ -10,7 +10,7 @@ const meta: Meta<typeof ChipComponent> = {
   title: 'Library/Atoms/Chip',
   argTypes: {
     type: {
-      options: ['basic', 'error', 'info', 'neutral', 'success', 'warning'],
+      options: ['error', 'info', 'neutral', 'success', 'warning'],
       control: {
         type: 'select',
       },

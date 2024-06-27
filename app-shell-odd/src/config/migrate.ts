@@ -14,6 +14,7 @@ import type {
   ConfigV19,
   ConfigV20,
   ConfigV21,
+  ConfigV22,
 } from '@opentrons/app/src/redux/config/types'
 // format
 // base config v12 defaults
@@ -187,6 +188,18 @@ const toVersion21 = (prevConfig: ConfigV20): ConfigV21 => {
   }
 }
 
+const toVersion22 = (prevConfig: ConfigV21): ConfigV22 => {
+  const nextConfig = {
+    ...prevConfig,
+    version: 22 as const,
+    analytics: {
+      appId: prevConfig.analytics.appId,
+      optedIn: true,
+    },
+  }
+  return nextConfig
+}
+
 const MIGRATIONS: [
   (prevConfig: ConfigV12) => ConfigV13,
   (prevConfig: ConfigV13) => ConfigV14,
@@ -196,7 +209,8 @@ const MIGRATIONS: [
   (prevConfig: ConfigV17) => ConfigV18,
   (prevConfig: ConfigV18) => ConfigV19,
   (prevConfig: ConfigV19) => ConfigV20,
-  (prevConfig: ConfigV20) => ConfigV21
+  (prevConfig: ConfigV20) => ConfigV21,
+  (prevConfig: ConfigV21) => ConfigV22
 ] = [
   toVersion13,
   toVersion14,
@@ -207,6 +221,7 @@ const MIGRATIONS: [
   toVersion19,
   toVersion20,
   toVersion21,
+  toVersion22,
 ]
 
 export const DEFAULTS: Config = migrate(DEFAULTS_V12)
@@ -223,6 +238,7 @@ export function migrate(
     | ConfigV19
     | ConfigV20
     | ConfigV21
+    | ConfigV22
 ): Config {
   let result = prevConfig
   // loop through the migrations, skipping any migrations that are unnecessary

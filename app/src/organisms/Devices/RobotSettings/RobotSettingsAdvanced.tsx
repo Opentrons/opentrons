@@ -9,7 +9,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   TYPOGRAPHY,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 import { Divider } from '../../../atoms/structure'
@@ -292,10 +292,13 @@ export function FeatureFlagToggle({
       marginBottom={SPACING.spacing16}
     >
       <Box width="70%">
-        <StyledText css={TYPOGRAPHY.pSemiBold} paddingBottom={SPACING.spacing4}>
+        <LegacyStyledText
+          css={TYPOGRAPHY.pSemiBold}
+          paddingBottom={SPACING.spacing4}
+        >
           {title}
-        </StyledText>
-        <StyledText as="p">{description}</StyledText>
+        </LegacyStyledText>
+        <LegacyStyledText as="p">{description}</LegacyStyledText>
       </Box>
       <ToggleButton
         label={title}

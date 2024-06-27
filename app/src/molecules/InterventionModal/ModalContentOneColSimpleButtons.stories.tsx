@@ -25,7 +25,7 @@ type Story = StoryObj<typeof ModalContentOneColSimpleButtonsComponent>
 
 export const ModalContentOneColSimpleButtons: Story = {
   args: {
-    topText: 'This is the top text area.',
+    headline: 'This is the headline area.',
     firstButton: 'This is the first button',
     secondButton: 'This is the second button',
     furtherButtons: ['this is the third button', 'this is the fourth button'],
@@ -33,7 +33,7 @@ export const ModalContentOneColSimpleButtons: Story = {
   render: (args, context) => {
     return (
       <ModalContentOneColSimpleButtonsComponent
-        topText={args.topText}
+        headline={args.headline}
         firstButton={{ label: args.firstButton, value: args.firstButton }}
         secondButton={{ label: args.secondButton, value: args.secondButton }}
         furtherButtons={args.furtherButtons

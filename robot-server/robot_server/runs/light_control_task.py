@@ -37,7 +37,13 @@ def _engine_status_to_status_bar(
             return StatusBarState.IDLE if initialization_done else StatusBarState.OFF
         case EngineStatus.RUNNING:
             return StatusBarState.RUNNING
-        case EngineStatus.PAUSED | EngineStatus.AWAITING_RECOVERY | EngineStatus.BLOCKED_BY_OPEN_DOOR:
+        case (
+            EngineStatus.PAUSED
+            | EngineStatus.BLOCKED_BY_OPEN_DOOR
+            | EngineStatus.AWAITING_RECOVERY
+            | EngineStatus.AWAITING_RECOVERY_PAUSED
+            | EngineStatus.AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR
+        ):
             return StatusBarState.PAUSED
         case EngineStatus.STOP_REQUESTED | EngineStatus.FINISHING:
             return StatusBarState.UPDATING

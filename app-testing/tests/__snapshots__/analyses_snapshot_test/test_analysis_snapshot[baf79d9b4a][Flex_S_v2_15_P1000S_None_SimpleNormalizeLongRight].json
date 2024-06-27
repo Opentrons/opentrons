@@ -8,21 +8,19 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "THIS IS A REACTION RUN",
-        "legacyCommandType": "command.COMMENT"
+        "message": "THIS IS A REACTION RUN"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "THIS IS A NO MODULE RUN",
-        "legacyCommandType": "command.COMMENT"
+        "message": "THIS IS A NO MODULE RUN"
       },
       "result": {},
       "status": "succeeded"
@@ -10688,37 +10686,35 @@
       "notes": [],
       "params": {
         "mount": "right",
-        "pipetteName": "p1000_single_flex"
+        "pipetteName": "p1000_single_flex",
+        "tipOverlapNotAfterVersion": "v0"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Adding Dye Sample Plate 1",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Adding Dye Sample Plate 1"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -10744,7 +10740,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -15714,31 +15710,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Adding Diluent Sample Plate 1",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Adding Diluent Sample Plate 1"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -15764,7 +15757,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -15866,7 +15859,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -15968,7 +15961,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -16070,7 +16063,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -16172,7 +16165,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -16274,7 +16267,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -16376,7 +16369,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -16478,7 +16471,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -16580,7 +16573,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -16682,7 +16675,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -16784,7 +16777,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -16886,7 +16879,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -16988,7 +16981,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -17090,7 +17083,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -17192,7 +17185,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -17294,7 +17287,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -17396,7 +17389,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -17498,7 +17491,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -17600,7 +17593,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -17702,7 +17695,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -17804,7 +17797,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -17906,7 +17899,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -18008,7 +18001,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -18110,7 +18103,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -18212,7 +18205,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -18314,7 +18307,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -18416,7 +18409,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -18518,7 +18511,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -18620,7 +18613,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -18722,7 +18715,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -18824,7 +18817,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -18926,7 +18919,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -19028,7 +19021,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -19130,7 +19123,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -19232,7 +19225,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -19334,7 +19327,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -19436,7 +19429,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -19538,7 +19531,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -19640,7 +19633,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -19742,7 +19735,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -19844,7 +19837,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -19946,7 +19939,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -20048,7 +20041,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -20150,7 +20143,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -20252,7 +20245,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -20354,7 +20347,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -20456,7 +20449,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -20558,7 +20551,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -20660,7 +20653,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -20762,7 +20755,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -20864,7 +20857,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -20966,7 +20959,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -21068,7 +21061,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -21170,7 +21163,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -21272,7 +21265,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -21374,7 +21367,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -21476,7 +21469,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -21578,7 +21571,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -21680,7 +21673,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -21782,7 +21775,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -21884,7 +21877,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -21986,7 +21979,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -22088,7 +22081,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -22190,7 +22183,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -22292,7 +22285,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -22394,7 +22387,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -22496,7 +22489,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -22598,7 +22591,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -22700,7 +22693,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -22802,7 +22795,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -22904,7 +22897,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -23006,7 +22999,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -23108,7 +23101,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -23210,7 +23203,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -23312,7 +23305,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -23414,7 +23407,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -23516,7 +23509,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -23618,7 +23611,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -23720,7 +23713,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -23822,7 +23815,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -23924,7 +23917,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -24026,7 +24019,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -24128,7 +24121,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -24230,7 +24223,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -24332,7 +24325,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -24434,7 +24427,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -24536,7 +24529,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -24638,7 +24631,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -24740,7 +24733,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -24842,7 +24835,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -24944,7 +24937,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -25046,7 +25039,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -25148,7 +25141,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -25250,7 +25243,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -25352,7 +25345,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -25434,31 +25427,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Adding Dye Sample Plate 2",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Adding Dye Sample Plate 2"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -25484,7 +25474,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -30454,31 +30444,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Adding Diluent Sample Plate 2",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Adding Diluent Sample Plate 2"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -30504,7 +30491,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -30606,7 +30593,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -30708,7 +30695,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -30810,7 +30797,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -30912,7 +30899,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -31014,7 +31001,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -31116,7 +31103,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -31218,7 +31205,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -31320,7 +31307,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -31422,7 +31409,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -31524,7 +31511,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -31626,7 +31613,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -31728,7 +31715,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -31830,7 +31817,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -31932,7 +31919,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -32034,7 +32021,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -32136,7 +32123,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -32238,7 +32225,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -32340,7 +32327,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -32442,7 +32429,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -32544,7 +32531,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -32646,7 +32633,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -32748,7 +32735,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -32850,7 +32837,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -32952,7 +32939,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -33054,7 +33041,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -33156,7 +33143,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -33258,7 +33245,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -33360,7 +33347,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -33462,7 +33449,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -33564,7 +33551,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -33666,7 +33653,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -33768,7 +33755,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -33870,7 +33857,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -33972,7 +33959,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -34074,7 +34061,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -34176,7 +34163,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -34278,7 +34265,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -34380,7 +34367,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -34482,7 +34469,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -34584,7 +34571,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -34686,7 +34673,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -34788,7 +34775,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -34890,7 +34877,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -34992,7 +34979,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -35094,7 +35081,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -35196,7 +35183,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -35298,7 +35285,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -35400,7 +35387,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -35502,7 +35489,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -35604,7 +35591,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -35706,7 +35693,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -35808,7 +35795,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -35910,7 +35897,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -36012,7 +35999,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -36114,7 +36101,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -36216,7 +36203,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -36318,7 +36305,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -36420,7 +36407,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -36522,7 +36509,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -36624,7 +36611,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -36726,7 +36713,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -36828,7 +36815,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -36930,7 +36917,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -37032,7 +37019,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -37134,7 +37121,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -37236,7 +37223,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -37338,7 +37325,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -37440,7 +37427,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -37542,7 +37529,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -37644,7 +37631,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -37746,7 +37733,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -37848,7 +37835,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -37950,7 +37937,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -38052,7 +38039,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -38154,7 +38141,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -38256,7 +38243,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -38358,7 +38345,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -38460,7 +38447,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -38562,7 +38549,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -38664,7 +38651,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -38766,7 +38753,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -38868,7 +38855,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -38970,7 +38957,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -39072,7 +39059,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -39174,7 +39161,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -39276,7 +39263,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -39378,7 +39365,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -39480,7 +39467,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -39582,7 +39569,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -39684,7 +39671,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -39786,7 +39773,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -39888,7 +39875,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -39990,7 +39977,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -40092,7 +40079,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -40174,31 +40161,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Adding Dye Sample Plate 3",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Adding Dye Sample Plate 3"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -40224,7 +40208,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -45194,31 +45178,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Adding Diluent Sample Plate 3",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Adding Diluent Sample Plate 3"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -45244,7 +45225,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -45346,7 +45327,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -45448,7 +45429,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -45550,7 +45531,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -45652,7 +45633,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -45754,7 +45735,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -45856,7 +45837,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -45958,7 +45939,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -46060,7 +46041,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -46162,7 +46143,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -46264,7 +46245,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -46366,7 +46347,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -46468,7 +46449,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -46570,7 +46551,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -46672,7 +46653,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -46774,7 +46755,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -46876,7 +46857,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -46978,7 +46959,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -47080,7 +47061,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -47182,7 +47163,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -47284,7 +47265,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -47386,7 +47367,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -47488,7 +47469,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -47590,7 +47571,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -47692,7 +47673,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -47794,7 +47775,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -47896,7 +47877,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -47998,7 +47979,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -48100,7 +48081,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -48202,7 +48183,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -48304,7 +48285,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -48406,7 +48387,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -48508,7 +48489,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -48610,7 +48591,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -48712,7 +48693,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -48814,7 +48795,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -48916,7 +48897,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -49018,7 +48999,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -49120,7 +49101,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -49222,7 +49203,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -49324,7 +49305,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -49426,7 +49407,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -49528,7 +49509,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -49630,7 +49611,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -49732,7 +49713,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -49834,7 +49815,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -49936,7 +49917,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -50038,7 +50019,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -50140,7 +50121,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -50242,7 +50223,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -50344,7 +50325,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -50446,7 +50427,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -50548,7 +50529,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -50650,7 +50631,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -50752,7 +50733,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -50854,7 +50835,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -50956,7 +50937,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -51058,7 +51039,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -51160,7 +51141,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -51262,7 +51243,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -51364,7 +51345,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -51466,7 +51447,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -51568,7 +51549,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -51670,7 +51651,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -51772,7 +51753,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -51874,7 +51855,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -51976,7 +51957,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -52078,7 +52059,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -52180,7 +52161,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -52282,7 +52263,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -52384,7 +52365,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -52486,7 +52467,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -52588,7 +52569,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -52690,7 +52671,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -52792,7 +52773,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -52894,7 +52875,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -52996,7 +52977,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -53098,7 +53079,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -53200,7 +53181,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -53302,7 +53283,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -53404,7 +53385,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -53506,7 +53487,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -53608,7 +53589,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -53710,7 +53691,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -53812,7 +53793,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -53914,7 +53895,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -54016,7 +53997,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -54118,7 +54099,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -54220,7 +54201,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -54322,7 +54303,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -54424,7 +54405,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -54526,7 +54507,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -54628,7 +54609,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -54730,7 +54711,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -54832,7 +54813,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -54914,31 +54895,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Adding Dye Sample Plate 1",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Adding Dye Sample Plate 1"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -54964,7 +54942,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -59934,31 +59912,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Adding Diluent Sample Plate 1",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Adding Diluent Sample Plate 1"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -59984,7 +59959,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -60086,7 +60061,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -60188,7 +60163,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -60290,7 +60265,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -60392,7 +60367,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -60494,7 +60469,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -60596,7 +60571,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -60698,7 +60673,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -60800,7 +60775,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -60902,7 +60877,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -61004,7 +60979,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -61106,7 +61081,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -61208,7 +61183,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -61310,7 +61285,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -61412,7 +61387,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -61514,7 +61489,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -61616,7 +61591,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -61718,7 +61693,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -61820,7 +61795,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -61922,7 +61897,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -62024,7 +61999,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -62126,7 +62101,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -62228,7 +62203,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -62330,7 +62305,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -62432,7 +62407,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -62534,7 +62509,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -62636,7 +62611,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -62738,7 +62713,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -62840,7 +62815,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -62942,7 +62917,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -63044,7 +63019,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -63146,7 +63121,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -63248,7 +63223,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -63350,7 +63325,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -63452,7 +63427,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -63554,7 +63529,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -63656,7 +63631,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -63758,7 +63733,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -63860,7 +63835,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -63962,7 +63937,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -64064,7 +64039,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -64166,7 +64141,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -64268,7 +64243,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -64370,7 +64345,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -64472,7 +64447,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -64574,7 +64549,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -64676,7 +64651,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -64778,7 +64753,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -64880,7 +64855,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -64982,7 +64957,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -65084,7 +65059,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -65186,7 +65161,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -65288,7 +65263,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -65390,7 +65365,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -65492,7 +65467,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -65594,7 +65569,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -65696,7 +65671,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -65798,7 +65773,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -65900,7 +65875,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -66002,7 +65977,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -66104,7 +66079,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -66206,7 +66181,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -66308,7 +66283,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -66410,7 +66385,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -66512,7 +66487,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -66614,7 +66589,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -66716,7 +66691,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -66818,7 +66793,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -66920,7 +66895,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -67022,7 +66997,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -67124,7 +67099,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -67226,7 +67201,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -67328,7 +67303,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -67430,7 +67405,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -67532,7 +67507,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -67634,7 +67609,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -67736,7 +67711,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -67838,7 +67813,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -67940,7 +67915,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -68042,7 +68017,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -68144,7 +68119,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -68246,7 +68221,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -68348,7 +68323,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -68450,7 +68425,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -68552,7 +68527,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -68654,7 +68629,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -68756,7 +68731,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -68858,7 +68833,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -68960,7 +68935,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -69062,7 +69037,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -69164,7 +69139,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -69266,7 +69241,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -69368,7 +69343,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -69470,7 +69445,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -69572,7 +69547,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -69654,31 +69629,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Adding Dye Sample Plate 2",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Adding Dye Sample Plate 2"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -69704,7 +69676,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -74674,31 +74646,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Adding Diluent Sample Plate 2",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Adding Diluent Sample Plate 2"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -74724,7 +74693,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -74826,7 +74795,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -74928,7 +74897,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -75030,7 +74999,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -75132,7 +75101,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -75234,7 +75203,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -75336,7 +75305,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -75438,7 +75407,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -75540,7 +75509,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -75642,7 +75611,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -75744,7 +75713,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -75846,7 +75815,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -75948,7 +75917,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -76050,7 +76019,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -76152,7 +76121,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -76254,7 +76223,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -76356,7 +76325,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -76458,7 +76427,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -76560,7 +76529,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -76662,7 +76631,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -76764,7 +76733,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -76866,7 +76835,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -76968,7 +76937,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -77070,7 +77039,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -77172,7 +77141,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -77274,7 +77243,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -77376,7 +77345,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -77478,7 +77447,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -77580,7 +77549,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -77682,7 +77651,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -77784,7 +77753,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -77886,7 +77855,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -77988,7 +77957,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -78090,7 +78059,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -78192,7 +78161,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -78294,7 +78263,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -78396,7 +78365,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -78498,7 +78467,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -78600,7 +78569,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -78702,7 +78671,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -78804,7 +78773,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -78906,7 +78875,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -79008,7 +78977,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -79110,7 +79079,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -79212,7 +79181,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -79314,7 +79283,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -79416,7 +79385,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -79518,7 +79487,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -79620,7 +79589,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -79722,7 +79691,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -79824,7 +79793,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -79926,7 +79895,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -80028,7 +79997,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -80130,7 +80099,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -80232,7 +80201,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -80334,7 +80303,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -80436,7 +80405,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -80538,7 +80507,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -80640,7 +80609,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -80742,7 +80711,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -80844,7 +80813,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -80946,7 +80915,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -81048,7 +81017,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -81150,7 +81119,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -81252,7 +81221,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -81354,7 +81323,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -81456,7 +81425,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -81558,7 +81527,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -81660,7 +81629,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -81762,7 +81731,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -81864,7 +81833,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -81966,7 +81935,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -82068,7 +82037,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -82170,7 +82139,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -82272,7 +82241,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -82374,7 +82343,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -82476,7 +82445,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -82578,7 +82547,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -82680,7 +82649,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -82782,7 +82751,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -82884,7 +82853,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -82986,7 +82955,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -83088,7 +83057,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -83190,7 +83159,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -83292,7 +83261,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -83394,7 +83363,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -83496,7 +83465,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -83598,7 +83567,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -83700,7 +83669,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -83802,7 +83771,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -83904,7 +83873,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -84006,7 +83975,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -84108,7 +84077,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -84210,7 +84179,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -84312,7 +84281,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -84394,31 +84363,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Adding Dye Sample Plate 3",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Adding Dye Sample Plate 3"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -84444,7 +84410,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -89414,31 +89380,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Adding Diluent Sample Plate 3",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Adding Diluent Sample Plate 3"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -89464,7 +89427,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -89566,7 +89529,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -89668,7 +89631,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -89770,7 +89733,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -89872,7 +89835,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -89974,7 +89937,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -90076,7 +90039,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -90178,7 +90141,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -90280,7 +90243,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -90382,7 +90345,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -90484,7 +90447,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -90586,7 +90549,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -90688,7 +90651,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -90790,7 +90753,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -90892,7 +90855,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -90994,7 +90957,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -91096,7 +91059,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -91198,7 +91161,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -91300,7 +91263,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -91402,7 +91365,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -91504,7 +91467,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -91606,7 +91569,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -91708,7 +91671,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -91810,7 +91773,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -91912,7 +91875,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -92014,7 +91977,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -92116,7 +92079,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -92218,7 +92181,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -92320,7 +92283,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -92422,7 +92385,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -92524,7 +92487,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -92626,7 +92589,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -92728,7 +92691,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -92830,7 +92793,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -92932,7 +92895,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -93034,7 +92997,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -93136,7 +93099,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -93238,7 +93201,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -93340,7 +93303,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -93442,7 +93405,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -93544,7 +93507,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -93646,7 +93609,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -93748,7 +93711,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -93850,7 +93813,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -93952,7 +93915,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -94054,7 +94017,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -94156,7 +94119,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -94258,7 +94221,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -94360,7 +94323,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -94462,7 +94425,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -94564,7 +94527,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -94666,7 +94629,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -94768,7 +94731,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -94870,7 +94833,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -94972,7 +94935,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -95074,7 +95037,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -95176,7 +95139,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -95278,7 +95241,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -95380,7 +95343,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -95482,7 +95445,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -95584,7 +95547,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -95686,7 +95649,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -95788,7 +95751,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -95890,7 +95853,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -95992,7 +95955,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -96094,7 +96057,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -96196,7 +96159,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -96298,7 +96261,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -96400,7 +96363,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -96502,7 +96465,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -96604,7 +96567,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -96706,7 +96669,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -96808,7 +96771,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -96910,7 +96873,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -97012,7 +96975,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -97114,7 +97077,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -97216,7 +97179,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -97318,7 +97281,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -97420,7 +97383,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -97522,7 +97485,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -97624,7 +97587,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -97726,7 +97689,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -97828,7 +97791,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -97930,7 +97893,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -98032,7 +97995,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -98134,7 +98097,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -98236,7 +98199,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -98338,7 +98301,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -98440,7 +98403,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -98542,7 +98505,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -98644,7 +98607,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -98746,7 +98709,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -98848,7 +98811,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -98950,7 +98913,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -99052,7 +99015,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.59,
         "tipVolume": 200.0
       },
       "status": "succeeded"
@@ -99261,6 +99224,7 @@
       "pipetteName": "p1000_single_flex"
     }
   ],
+  "result": "ok",
   "robotType": "OT-3 Standard",
   "runTimeParameters": []
 }

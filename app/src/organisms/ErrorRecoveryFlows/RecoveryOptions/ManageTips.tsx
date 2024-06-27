@@ -6,7 +6,7 @@ import {
   DIRECTION_COLUMN,
   SPACING,
   Flex,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
@@ -14,26 +14,31 @@ import { RadioButton } from '../../../atoms/buttons'
 import { ODD_SECTION_TITLE_STYLE, RECOVERY_MAP } from '../constants'
 import { RecoveryFooterButtons, RecoverySingleColumnContent } from '../shared'
 import { DropTipWizardFlows } from '../../DropTipWizardFlows'
+import { DT_ROUTES } from '../../DropTipWizardFlows/constants'
+import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 import type { PipetteWithTip } from '../../DropTipWizardFlows'
 import type { RecoveryContentProps } from '../types'
 import type { FixitCommandTypeUtils } from '../../DropTipWizardFlows/types'
 
 // The Drop Tip flow entry point. Includes entry from SelectRecoveryOption and CancelRun.
-export function ManageTips(props: RecoveryContentProps): JSX.Element | null {
+export function ManageTips(props: RecoveryContentProps): JSX.Element {
   const { recoveryMap } = props
 
   const buildContent = (): JSX.Element => {
     const { DROP_TIP_FLOWS } = RECOVERY_MAP
-    const { step } = recoveryMap
+    const { step, route } = recoveryMap
 
     switch (step) {
       case DROP_TIP_FLOWS.STEPS.BEGIN_REMOVAL:
         return <BeginRemoval {...props} />
-      case DROP_TIP_FLOWS.STEPS.WIZARD:
+      case DROP_TIP_FLOWS.STEPS.BEFORE_BEGINNING:
+      case DROP_TIP_FLOWS.STEPS.CHOOSE_BLOWOUT:
+      case DROP_TIP_FLOWS.STEPS.CHOOSE_TIP_DROP:
         return <DropTipFlowsContainer {...props} />
       default:
-        return <BeginRemoval {...props} />
+        console.warn(`${step} in ${route} not explicitly handled. Rerouting.`)
+        return <SelectRecoveryOption {...props} />
     }
   }
 
@@ -47,12 +52,18 @@ export function BeginRemoval({
   tipStatusUtils,
   routeUpdateActions,
   recoveryCommands,
+  currentRecoveryOptionUtils,
 }: RecoveryContentProps): JSX.Element | null {
   const { t } = useTranslation('error_recovery')
   const { pipettesWithTip } = tipStatusUtils
-  const { proceedNextStep, setRobotInMotion } = routeUpdateActions
+  const {
+    proceedNextStep,
+    setRobotInMotion,
+    proceedToRouteAndStep,
+  } = routeUpdateActions
   const { cancelRun } = recoveryCommands
-  const { ROBOT_CANCELING } = RECOVERY_MAP
+  const { selectedRecoveryOption } = currentRecoveryOptionUtils
+  const { ROBOT_CANCELING, RETRY_NEW_TIPS } = RECOVERY_MAP
   const mount = head(pipettesWithTip)?.mount
 
   const [selected, setSelected] = React.useState<RemovalOptions>(
@@ -63,18 +74,25 @@ export function BeginRemoval({
     if (selected === 'begin-removal') {
       void proceedNextStep()
     } else {
-      void setRobotInMotion(true, ROBOT_CANCELING.ROUTE).then(() => {
-        cancelRun()
-      })
+      if (selectedRecoveryOption === RETRY_NEW_TIPS.ROUTE) {
+        void proceedToRouteAndStep(
+          RETRY_NEW_TIPS.ROUTE,
+          RETRY_NEW_TIPS.STEPS.REPLACE_TIPS
+        )
+      } else {
+        void setRobotInMotion(true, ROBOT_CANCELING.ROUTE).then(() => {
+          cancelRun()
+        })
+      }
     }
   }
 
   if (isOnDevice) {
     return (
       <RecoverySingleColumnContent>
-        <StyledText css={ODD_SECTION_TITLE_STYLE} as="h4SemiBold">
+        <LegacyStyledText css={ODD_SECTION_TITLE_STYLE} as="h4SemiBold">
           {t('you_may_want_to_remove', { mount })}
-        </StyledText>
+        </LegacyStyledText>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
           <RadioButton
             buttonLabel={t('begin_removal')}
@@ -104,11 +122,20 @@ export function BeginRemoval({
   }
 }
 
-// TODO(jh, 06-07-24): Ensure that ALL errors within DT Flows provide routing back to ER for proper error handling, EXEC-512.
-function DropTipFlowsContainer(props: RecoveryContentProps): JSX.Element {
-  const { tipStatusUtils, routeUpdateActions, recoveryCommands, isFlex } = props
-  const { DROP_TIP_FLOWS, ROBOT_CANCELING } = RECOVERY_MAP
+function DropTipFlowsContainer(
+  props: RecoveryContentProps
+): JSX.Element | null {
+  const {
+    tipStatusUtils,
+    routeUpdateActions,
+    recoveryCommands,
+    isFlex,
+    currentRecoveryOptionUtils,
+    isOnDevice,
+  } = props
+  const { DROP_TIP_FLOWS, ROBOT_CANCELING, RETRY_NEW_TIPS } = RECOVERY_MAP
   const { proceedToRouteAndStep, setRobotInMotion } = routeUpdateActions
+  const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const { setTipStatusResolved } = tipStatusUtils
   const { cancelRun } = recoveryCommands
 
@@ -117,7 +144,14 @@ function DropTipFlowsContainer(props: RecoveryContentProps): JSX.Element {
   ) as PipetteWithTip // Safe as we have to have tips to get to this point in the flow.
 
   const onCloseFlow = (): void => {
-    void setTipStatusResolved(onEmptyCache, onTipsDetected)
+    if (selectedRecoveryOption === RETRY_NEW_TIPS.ROUTE) {
+      void proceedToRouteAndStep(
+        RETRY_NEW_TIPS.ROUTE,
+        RETRY_NEW_TIPS.STEPS.REPLACE_TIPS
+      )
+    } else {
+      void setTipStatusResolved(onEmptyCache, onTipsDetected)
+    }
   }
 
   const onEmptyCache = (): void => {
@@ -130,32 +164,50 @@ function DropTipFlowsContainer(props: RecoveryContentProps): JSX.Element {
     void proceedToRouteAndStep(DROP_TIP_FLOWS.ROUTE)
   }
 
-  return (
-    <RecoverySingleColumnContent>
-      <DropTipWizardFlows
-        robotType={isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE}
-        closeFlow={onCloseFlow}
-        mount={mount}
-        instrumentModelSpecs={specs}
-        fixitCommandTypeUtils={useDropTipFlowUtils(props)}
-      />
-    </RecoverySingleColumnContent>
-  )
+  const fixitCommandTypeUtils = useDropTipFlowUtils(props)
+
+  if (isOnDevice) {
+    return (
+      <RecoverySingleColumnContent>
+        <DropTipWizardFlows
+          robotType={isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE}
+          closeFlow={onCloseFlow}
+          mount={mount}
+          instrumentModelSpecs={specs}
+          fixitCommandTypeUtils={fixitCommandTypeUtils}
+        />
+      </RecoverySingleColumnContent>
+    )
+  } else {
+    return null
+  }
 }
 
 // Builds the overrides injected into DT Wiz.
 export function useDropTipFlowUtils({
   tipStatusUtils,
   failedCommand,
-  previousRoute,
+  currentRecoveryOptionUtils,
   trackExternalMap,
+  routeUpdateActions,
+  recoveryMap,
 }: RecoveryContentProps): FixitCommandTypeUtils {
   const { t } = useTranslation('error_recovery')
+  const {
+    RETRY_NEW_TIPS,
+    ERROR_WHILE_RECOVERING,
+    DROP_TIP_FLOWS,
+  } = RECOVERY_MAP
   const { runId } = tipStatusUtils
+  const { step } = recoveryMap
+  const { selectedRecoveryOption } = currentRecoveryOptionUtils
+  const { proceedToRouteAndStep } = routeUpdateActions
   const failedCommandId = failedCommand?.id ?? '' // We should have a failed command here unless the run is not in AWAITING_RECOVERY.
 
   const buildTipDropCompleteBtn = (): string => {
-    switch (previousRoute) {
+    switch (selectedRecoveryOption) {
+      case RETRY_NEW_TIPS.ROUTE:
+        return t('proceed_to_tip_selection')
       default:
         return t('proceed_to_cancel')
     }
@@ -168,10 +220,44 @@ export function useDropTipFlowUtils({
     }
   }
 
+  const buildErrorOverrides = (): FixitCommandTypeUtils['errorOverrides'] => {
+    return {
+      tipDropFailed: () => {
+        return proceedToRouteAndStep(
+          ERROR_WHILE_RECOVERING.ROUTE,
+          ERROR_WHILE_RECOVERING.STEPS.DROP_TIP_TIP_DROP_FAILED
+        )
+      },
+      blowoutFailed: () => {
+        return proceedToRouteAndStep(
+          ERROR_WHILE_RECOVERING.ROUTE,
+          ERROR_WHILE_RECOVERING.STEPS.DROP_TIP_BLOWOUT_FAILED
+        )
+      },
+      generalFailure: () =>
+        proceedToRouteAndStep(
+          ERROR_WHILE_RECOVERING.ROUTE,
+          ERROR_WHILE_RECOVERING.STEPS.DROP_TIP_GENERAL_ERROR
+        ),
+    }
+  }
+
+  // If a specific step within the DROP_TIP_FLOWS route is selected, begin the Drop Tip Flows at its related route.
+  const buildRouteOverride = (): FixitCommandTypeUtils['routeOverride'] => {
+    switch (step) {
+      case DROP_TIP_FLOWS.STEPS.CHOOSE_TIP_DROP:
+        return DT_ROUTES.DROP_TIP
+      case DROP_TIP_FLOWS.STEPS.CHOOSE_BLOWOUT:
+        return DT_ROUTES.BLOWOUT
+    }
+  }
+
   return {
     runId,
     failedCommandId,
     copyOverrides: buildCopyOverrides(),
     trackCurrentMap: trackExternalMap,
+    errorOverrides: buildErrorOverrides(),
+    routeOverride: buildRouteOverride(),
   }
 }

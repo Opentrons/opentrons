@@ -12,7 +12,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { Slideout } from '../../atoms/Slideout'
@@ -94,27 +94,27 @@ export const HeaterShakerSlideout = (
         />
       }
     >
-      <StyledText
+      <LegacyStyledText
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         fontSize={TYPOGRAPHY.fontSizeP}
         paddingTop={SPACING.spacing4}
         data-testid={`HeaterShakerSlideout_title_${module.serialNumber}`}
       >
         {t('set_target_temp_of_hs')}
-      </StyledText>
+      </LegacyStyledText>
       <Flex
         marginTop={SPACING.spacing16}
         flexDirection={DIRECTION_COLUMN}
         data-testid={`HeaterShakerSlideout_input_field_${module.serialNumber}`}
       >
-        <StyledText
+        <LegacyStyledText
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           fontSize={TYPOGRAPHY.fontSizeH6}
           color={COLORS.grey50}
           marginBottom={SPACING.spacing8}
         >
           {t('set_block_temp')}
-        </StyledText>
+        </LegacyStyledText>
         <form id="HeaterShakerSlideout_submitValue">
           <InputField
             data-testid={`${String(module.moduleModel)}_setTemp`}

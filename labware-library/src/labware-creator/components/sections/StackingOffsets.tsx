@@ -15,7 +15,9 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   TYPOGRAPHY,
-  StyledText,
+  LegacyStyledText,
+  AlertItem,
+  Box,
 } from '@opentrons/components'
 import { isEveryFieldHidden } from '../../utils'
 import { makeMaskToDecimal } from '../../fieldMasks'
@@ -143,6 +145,22 @@ export function StackingOffsets(): JSX.Element | null {
     <div className={styles.new_definition_section}>
       <SectionBody label={label} id="StackingOffsets">
         <>
+          {Object.values(values.compatibleAdapters).length > 0 ||
+          Object.values(values.compatibleModules).length > 0 ? (
+            <Box
+              marginBottom={
+                errors.compatibleAdapters != null ||
+                errors.compatibleModules != null
+                  ? '0rem'
+                  : '-1rem'
+              }
+            >
+              <AlertItem
+                type="warning"
+                title="The stacking offset fields require App version 7.0.0 or higher"
+              />
+            </Box>
+          ) : null}
           <FormAlerts
             values={values}
             touched={touched}
@@ -162,9 +180,12 @@ export function StackingOffsets(): JSX.Element | null {
             </div>
             {modifiedAdapterDefinitions.length === 0 ? null : (
               <Flex gridGap={SPACING.spacing4} flexDirection={DIRECTION_COLUMN}>
-                <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+                <LegacyStyledText
+                  as="h3"
+                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                >
                   Adapters
-                </StyledText>
+                </LegacyStyledText>
                 {modifiedAdapterDefinitions.map((definition, index) => {
                   const key = definition.parameters.loadName
                   const fieldName = `compatibleAdapters.${key}`
@@ -221,12 +242,10 @@ export function StackingOffsets(): JSX.Element | null {
                       </Flex>
                       {key === 'opentrons_flex_96_tiprack_adapter' &&
                       isChecked ? (
-                        //  NOTE(jr, 6/7/24): keeping the yucky classname + inline style to match other
-                        //  LC designs
                         <div
                           style={{
-                            marginTop: '-1.4rem',
-                            height: '2.2rem',
+                            marginTop: '-1.2rem',
+                            height: '2.0rem',
                             fontSize: '0.75rem',
                           }}
                         >
@@ -245,10 +264,14 @@ export function StackingOffsets(): JSX.Element | null {
               <Flex
                 flexDirection={DIRECTION_COLUMN}
                 marginTop={SPACING.spacing4}
+                gridGap={SPACING.spacing4}
               >
-                <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+                <LegacyStyledText
+                  as="h3"
+                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                >
                   Modules
-                </StyledText>
+                </LegacyStyledText>
                 {modifiedModuleModels.map((model, index) => {
                   const fieldName = `compatibleModules.${model}`
                   const isChecked =
@@ -306,8 +329,8 @@ export function StackingOffsets(): JSX.Element | null {
                       {isChecked ? (
                         <div
                           style={{
-                            marginTop: '-1.4rem',
-                            height: '2.2rem',
+                            marginTop: '-1.2rem',
+                            height: '2.0rem',
                             fontSize: '0.75rem',
                           }}
                         >

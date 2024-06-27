@@ -59,7 +59,10 @@ export function getInitialSummaryState(
   }
 
   let changeTip: ChangeTipOptions = 'always'
-  if (state.sourceWells.length > 96 || state.destinationWells.length > 96) {
+  if (
+    state.sourceWells.length * state.pipette.channels > 96 ||
+    state.destinationWells.length * state.pipette.channels > 96
+  ) {
     changeTip = 'once'
   }
 

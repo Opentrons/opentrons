@@ -34,7 +34,8 @@ const uuid: () => string = uuidv1
 
 export function createQuickTransferFile(
   quickTransferState: QuickTransferSummaryState,
-  deckConfig: DeckConfiguration
+  deckConfig: DeckConfiguration,
+  protocolName?: string
 ): File {
   const {
     stepArgs,
@@ -185,11 +186,18 @@ export function createQuickTransferFile(
     ...nonLoadCommands,
     ...finalDropTipCommands,
   ]
+  const sourceLabwareName = quickTransferState.source.metadata.displayName
+  let destinationLabwareName = sourceLabwareName
+  if (quickTransferState.destination !== 'source') {
+    destinationLabwareName = quickTransferState.destination.metadata.displayName
+  }
   const protocolBase = {
     $otSharedSchema: '#/protocol/schemas/8',
     schemaVersion: 8,
     metadata: {
-      protocolName: `Quick Transfer ${quickTransferState.volume}µL`,
+      protocolName:
+        protocolName ?? `Quick Transfer ${quickTransferState.volume}µL`,
+      description: `This quick transfer moves liquids from a ${sourceLabwareName} to a ${destinationLabwareName}`,
       category: null,
       subcategory: null,
       tags: [],

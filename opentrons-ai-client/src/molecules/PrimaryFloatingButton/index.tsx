@@ -10,7 +10,7 @@ import {
   Icon,
   JUSTIFY_CENTER,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -36,13 +36,13 @@ export function PrimaryFloatingButton({
         color={COLORS.white}
         data-testid="PrimaryFloatingButton_Icon"
       />
-      <StyledText
+      <LegacyStyledText
         fontSize={TYPOGRAPHY.fontSizeP}
         lineHeight={TYPOGRAPHY.lineHeight20}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
       >
         {buttonText}
-      </StyledText>
+      </LegacyStyledText>
     </Btn>
   )
 }

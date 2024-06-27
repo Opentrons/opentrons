@@ -126,6 +126,10 @@
       "detail": "Liquid Not Found",
       "category": "roboticsControlError"
     },
+    "2018": {
+      "detail": "Tip Hit Well Bottom",
+      "category": "roboticsControlError"
+    },
     "3000": {
       "detail": "A robotics interaction error occurred.",
       "category": "roboticsInteractionError"
@@ -240,6 +244,10 @@
     },
     "4009": {
       "detail": "Missing configuration data",
+      "category": "generalError"
+    },
+    "4010": {
+      "detail": "Runtime Parameter Value Required",
       "category": "generalError"
     }
   }

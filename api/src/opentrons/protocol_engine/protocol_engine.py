@@ -420,9 +420,9 @@ class ProtocolEngine:
             # We don't use self._hardware_api.get_estop_state() because the E-stop may have been
             # released by the time we get here.
             if isinstance(error, EnumeratedError):
-                if self._code_in_error_tree(
+                if code_in_error_tree(
                     root_error=error, code=ErrorCodes.E_STOP_ACTIVATED
-                ) or self._code_in_error_tree(
+                ) or code_in_error_tree(
                     # Request from the hardware team for the v7.0 betas: to help in-house debugging
                     # of pipette overpressure events, leave the pipette where it was like we do
                     # for E-stops.
@@ -589,40 +589,6 @@ class ProtocolEngine:
         for a in actions:
             self._action_dispatcher.dispatch(a)
 
-    # TODO(tz, 7-12-23): move this to shared data when we dont relay on ErrorOccurrence
-    @staticmethod
-    def _code_in_error_tree(
-        root_error: Union[EnumeratedError, ErrorOccurrence], code: ErrorCodes
-    ) -> bool:
-        if isinstance(root_error, ErrorOccurrence):
-            # ErrorOccurrence is not the same as the enumerated error exceptions. Check the
-            # code by a string value.
-            if root_error.errorCode == code.value.code:
-                return True
-            return any(
-                ProtocolEngine._code_in_error_tree(wrapped, code)
-                for wrapped in root_error.wrappedErrors
-            )
-
-        # From here we have an exception, can just check the code + recurse to wrapped errors.
-        if root_error.code == code:
-            return True
-
-        if (
-            isinstance(root_error, ProtocolCommandFailedError)
-            and root_error.original_error is not None
-        ):
-            # For this specific EnumeratedError child, we recurse on the original_error field
-            # in favor of the general error.wrapping field.
-            return ProtocolEngine._code_in_error_tree(root_error.original_error, code)
-
-        if len(root_error.wrapping) == 0:
-            return False
-        return any(
-            ProtocolEngine._code_in_error_tree(wrapped_error, code)
-            for wrapped_error in root_error.wrapping
-        )
-
     def set_and_start_queue_worker(
         self, command_generator: Callable[[], AsyncGenerator[str, None]]
     ) -> None:
@@ -635,3 +601,36 @@ class ProtocolEngine:
             command_generator=command_generator,
         )
         self._queue_worker.start()
+
+
+# TODO(tz, 7-12-23): move this to shared data when we dont relay on ErrorOccurrence
+def code_in_error_tree(
+    root_error: Union[EnumeratedError, ErrorOccurrence], code: ErrorCodes
+) -> bool:
+    """Check if the specified error code can be found in the given error tree."""
+    if isinstance(root_error, ErrorOccurrence):
+        # ErrorOccurrence is not the same as the enumerated error exceptions. Check the
+        # code by a string value.
+        if root_error.errorCode == code.value.code:
+            return True
+        return any(
+            code_in_error_tree(wrapped, code) for wrapped in root_error.wrappedErrors
+        )
+
+    # From here we have an exception, can just check the code + recurse to wrapped errors.
+    if root_error.code == code:
+        return True
+
+    if (
+        isinstance(root_error, ProtocolCommandFailedError)
+        and root_error.original_error is not None
+    ):
+        # For this specific EnumeratedError child, we recurse on the original_error field
+        # in favor of the general error.wrapping field.
+        return code_in_error_tree(root_error.original_error, code)
+
+    if len(root_error.wrapping) == 0:
+        return False
+    return any(
+        code_in_error_tree(wrapped_error, code) for wrapped_error in root_error.wrapping
+    )
