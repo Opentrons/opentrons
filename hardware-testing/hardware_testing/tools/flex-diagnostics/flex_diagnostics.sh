@@ -8,10 +8,14 @@ instructions() {
     echo "Ex."
     echo "./flex_diagnostics <action> <host-ip>"
     echo ""
-    echo "action = gather"
+    echo "action = gather, set-ntp"
     echo "gather = Gathers all the data, state, and logs from the given robots."
+    echo "set-ntp = Sets the ntp server to the value specified or default."
     echo "host-ip = list of robot ip addresses to perform action on."
 }
+
+DEFAULT_NTP="time.google.com"
+DEFAULT_NTP_CHINA="ntp.tencent.com"
 
 # Script entry-point
 main() {
@@ -29,6 +33,10 @@ main() {
 		gather)
 			echo "Gather Diagnostics data"
 			gather "$ip_addresses"
+            ;;
+        set-ntp)
+            echo "Setting NTP server"
+            set_ntp "$ip_addresses"
             ;;
         *)
             echo "Invalid args: $@"
@@ -103,7 +111,7 @@ gather() {
             ping -c 2 -w 2 time.google.com >> $diag_dir/network/network.txt || true
             ping -c 2 -w 2 ntp.tencent.com >> $diag_dir/network/network.txt || true
             ping -c 2 -w 2 time.amazonaws.cn >> $diag_dir/network/network.txt || true
-
+ 
             echo "Downloading releases.json"
             wget https://builds.opentrons.com/ot3-oe/releases.json -P $diag_dir/network/
 
@@ -127,6 +135,48 @@ EOF
         # clean up
         ssh -q -o stricthostkeychecking=no -o userknownhostsfile=/dev/null \
             root@$ip 'rm -rf *diag*'
+    done
+}
+
+set_ntp() {
+     for ip in $@; do
+        echo "Setting NTP address ${DEFAULT_NTP_CHINA} for ${ip}."
+        ssh -q -o stricthostkeychecking=no -o userknownhostsfile=/dev/null \
+            root@$ip 'bash -s' <<- 'EOF'
+
+            cleanup() {
+                echo "Cleaning up"
+            }
+
+            set -eE -o pipefail
+            trap cleanup ERR
+
+            serial="unknown"
+            if [ -f "/var/serial" ]; then
+                serial=$(cat /var/serial)
+            fi
+            today=$(date '+%Y_%m_%d_%H_%M_%S')
+            filename="${serial}_${today}_ntp.txt"
+
+            echo -e "\n\n timedatectl before setting NTP server" >> $filename
+            timedatectl >> $filename
+
+            mount -o remount,rw /
+            sed -i "s/#FallbackNTP=*/FallbackNTP=ntp.tencent.com /" /etc/systemd/timesyncd.conf
+            systemctl restart systemd-timesyncd
+            echo -e "\n\n timedatectl after setting NTP server" >> $filename
+            sleep 5
+            timedatectl >> $filename
+EOF
+
+    echo "Fetching NTP file output"
+    scp -r -o stricthostkeychecking=no -o userknownhostsfile=/dev/null \
+            root@$ip:*ntp.txt .
+
+    # clean up
+    ssh -q -o stricthostkeychecking=no -o userknownhostsfile=/dev/null \
+        root@$ip 'rm -rf *ntp.txt'
+
     done
 }
 
