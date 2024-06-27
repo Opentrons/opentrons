@@ -61,6 +61,12 @@ export interface AddProtocolAction {
   meta: { shell: true }
 }
 
+export interface AddProtocolFromLibraryAction {
+  type: 'protocolStorage:ADD_PROTOCOL_FROM_LIBRARY'
+  payload: { protocolSlug: string }
+  meta: { shell: true }
+}
+
 export interface RemoveProtocolAction {
   type: 'protocolStorage:REMOVE_PROTOCOL'
   payload: { protocolKey: string }

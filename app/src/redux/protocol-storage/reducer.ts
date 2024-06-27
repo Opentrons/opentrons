@@ -34,6 +34,7 @@ export const protocolStorageReducer: Reducer<ProtocolStorageState, Action> = (
       return { ...state, listFailureMessage: action.payload.message }
     }
 
+    case Actions.ADD_PROTOCOL_FROM_LIBRARY:
     case Actions.ADD_PROTOCOL:
     case Actions.CLEAR_ADD_PROTOCOL_FAILURE: {
       return { ...state, addFailureFile: null, addFailureMessage: null }

@@ -91,7 +91,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
       errors={[UNKNOWN_ATTACHMENT_ERROR]}
     />
   )
-console.log('protocolKey', protocolKey)
+
   return (
     <Box
       backgroundColor={COLORS.white}

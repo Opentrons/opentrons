@@ -1,3 +1,4 @@
+import { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type * as Types from './types'
 
 // action type literals
@@ -13,6 +14,9 @@ export const UPDATE_PROTOCOL_LIST_FAILURE: 'protocolStorage:UPDATE_PROTOCOL_LIST
 
 export const ADD_PROTOCOL: 'protocolStorage:ADD_PROTOCOL' =
   'protocolStorage:ADD_PROTOCOL'
+
+export const ADD_PROTOCOL_FROM_LIBRARY: 'protocolStorage:ADD_PROTOCOL_FROM_LIBRARY' =
+  'protocolStorage:ADD_PROTOCOL_FROM_LIBRARY'
 
 export const REMOVE_PROTOCOL: 'protocolStorage:REMOVE_PROTOCOL' =
   'protocolStorage:REMOVE_PROTOCOL'
@@ -75,6 +79,14 @@ export const addProtocol = (
 ): Types.AddProtocolAction => ({
   type: ADD_PROTOCOL,
   payload: { protocolFilePath },
+  meta: { shell: true },
+})
+
+export const addProtocolFromLibrary = (
+  analysis: CompletedProtocolAnalysis
+): Types.AddProtocolFromLibraryAction => ({
+  type: ADD_PROTOCOL_FROM_LIBRARY,
+  payload: { analysis },
   meta: { shell: true },
 })
 

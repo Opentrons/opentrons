@@ -20,6 +20,7 @@ import type { NetworkingState, NetworkingAction } from './networking/types'
 import type {
   ProtocolStorageState,
   ProtocolStorageAction,
+  AddProtocolFromLibraryAction,
 } from './protocol-storage/types'
 import type { ProtocolAnalysisAction } from './protocol-analysis'
 import type {
@@ -77,6 +78,7 @@ export type Action =
   | SessionsAction
   | CalibrationAction
   | AnalyticsTriggerAction
+  | AddProtocolFromLibraryAction
 
 export type GetState = () => State
 

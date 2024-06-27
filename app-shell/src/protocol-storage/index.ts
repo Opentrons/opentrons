@@ -4,6 +4,7 @@ import { shell } from 'electron'
 
 import {
   ADD_PROTOCOL,
+  ADD_PROTOCOL_FROM_LIBRARY,
   ANALYZE_PROTOCOL,
   FETCH_PROTOCOLS,
   INITIAL,
@@ -170,6 +171,17 @@ export function registerProtocolStorage(dispatch: Dispatch): Dispatch {
       case UI_INITIALIZED: {
         const source = action.type === FETCH_PROTOCOLS ? POLL : INITIAL
         fetchProtocols(dispatch, source)
+        break
+      }
+
+      case ADD_PROTOCOL_FROM_LIBRARY: {
+        FileSystem.addProtocolFileFromLibrary(
+          action.payload.analysis,
+          FileSystem.PROTOCOLS_DIRECTORY_PATH
+        ).then(protocolKey => {
+          fetchProtocols(dispatch, PROTOCOL_ADDITION)
+          dispatch(analyzeProtocol(protocolKey))
+        })
         break
       }
 

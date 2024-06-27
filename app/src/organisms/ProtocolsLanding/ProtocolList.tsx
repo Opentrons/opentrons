@@ -32,21 +32,21 @@ import {
 } from '../../redux/config'
 import { useSortedProtocols } from './hooks'
 import { Slideout } from '../../atoms/Slideout'
+import {
+  addProtocol,
+  addProtocolFromLibrary,
+} from '../../redux/protocol-storage'
 import { ChooseRobotToRunProtocolSlideout } from '../ChooseRobotToRunProtocolSlideout'
 import { SendProtocolToFlexSlideout } from '../SendProtocolToFlexSlideout'
 import { ProtocolUploadInput } from './ProtocolUploadInput'
 import { ProtocolCard } from './ProtocolCard'
 import { EmptyStateLinks } from './EmptyStateLinks'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
+import { MiniCard } from '../../molecules/MiniCard'
 
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { ProtocolSort } from './hooks'
 import type { Dispatch } from '../../redux/types'
-import {
-  CompletedProtocolAnalysis,
-  ProtocolAnalysisOutput,
-} from '@opentrons/shared-data'
-import { MiniCard } from '../../molecules/MiniCard'
 
 const SORT_BY_BUTTON_STYLE = css`
   background-color: ${COLORS.transparent};
@@ -73,6 +73,14 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
     showProtocolsFromLibrary,
     setShowProtocolsFromLibrary,
   ] = React.useState<boolean>(false)
+  const [addedProtocol, setAddedProtocol] = React.useState<string | null>(null)
+  const addLibProtocols = (protocolSlug: string): void => {
+    if (addedProtocol !== protocolSlug) {
+      setAddedProtocol(protocolSlug)
+    } else {
+      setAddedProtocol(null)
+    }
+  }
 
   const [
     showChooseRobotToRunProtocolSlideout,
@@ -95,9 +103,9 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
   )
   console.log('protocols', protocols)
   const { protocol } = useFetchProtocolFromLibrary(
-    loading ? '' : protocols[0].slug
+    addedProtocol != null ? addedProtocol : ''
   )
-
+  console.log('protocol', addedProtocol, protocol)
   const { t } = useTranslation('protocol_info')
   const { storedProtocols } = props
   const [
@@ -354,43 +362,55 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
         onCloseClick={() => {
           setShowProtocolsFromLibrary(false)
         }}
+        footer={
+          <PrimaryButton
+            onClick={() => {
+              // console.log('wire up')
+              if (protocol != null && protocol.analyses != null) {
+                dispatch(addProtocolFromLibrary(protocol?.analyses[0]?.result))
+              }
+            }}
+          >
+            Add protocol
+          </PrimaryButton>
+        }
       >
         {loading ? (
           <LegacyStyledText>loading protocols...</LegacyStyledText>
         ) : (
           <Flex gridGap={SPACING.spacing4} flexDirection={DIRECTION_COLUMN}>
             <Flex gridGap={SPACING.spacing4} justifyContent={JUSTIFY_CENTER}>
-            <PrimaryButton
-              css={css`
-                background-color: ${showFeatured
-                  ? COLORS.blue60
-                  : COLORS.blue50};
-              `}
-              onClick={() => {
-                setShowFeatured(true)
-              }}
-            >
-              Featured
-            </PrimaryButton>
-            <PrimaryButton
-              css={css`
-              background-color: ${!showFeatured
-                ? COLORS.blue60
-                : COLORS.blue50};
-            `}
-              onClick={() => {
-                setShowFeatured(false)
-              }}
-            >
-              All
-            </PrimaryButton>
+              <PrimaryButton
+                css={css`
+                  background-color: ${showFeatured
+                    ? COLORS.blue60
+                    : COLORS.blue50};
+                `}
+                onClick={() => {
+                  setShowFeatured(true)
+                }}
+              >
+                Featured
+              </PrimaryButton>
+              <PrimaryButton
+                css={css`
+                  background-color: ${!showFeatured
+                    ? COLORS.blue60
+                    : COLORS.blue50};
+                `}
+                onClick={() => {
+                  setShowFeatured(false)
+                }}
+              >
+                All
+              </PrimaryButton>
             </Flex>
             {protocols.map(p => {
               return (
                 <MiniCard
-                  isSelected={false}
+                  isSelected={addedProtocol === p.slug}
                   onClick={() => {
-                    console.log('wire up calling the selector to add protocol')
+                    addLibProtocols(p.slug)
                   }}
                 >
                   <LegacyStyledText as="p">{p.name}</LegacyStyledText>

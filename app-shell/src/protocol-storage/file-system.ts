@@ -7,6 +7,7 @@ import { app, shell } from 'electron'
 import type { StoredProtocolDir } from '@opentrons/app/src/redux/protocol-storage'
 import type { Dirent } from 'fs'
 import { analyzeProtocolSource } from '../protocol-analysis'
+import { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 /**
  * Module for managing local protocol files on the host filesystem
@@ -129,6 +130,31 @@ export function addProtocolFile(
     .then(() => protocolKey)
 }
 
+export function addProtocolFileFromLibrary(
+  analysis: CompletedProtocolAnalysis,
+  protocolsDirPath: string
+): Promise<string> {
+  const protocolKey = uuid()
+  const protocolDirPath = path.join(protocolsDirPath, protocolKey)
+
+  const srcDirPath = path.join(protocolDirPath, PROTOCOL_SRC_DIRECTORY_NAME)
+  const analysisDirPath = path.join(
+    protocolDirPath,
+    PROTOCOL_ANALYSIS_DIRECTORY_NAME
+  )
+
+  const mainFileDestPath = path.join(srcDirPath, 'mainFile.json')
+
+  const objectData = JSON.stringify(analysis)
+  console.log('objectData', objectData)
+  console.log('mainFileDestPath ', mainFileDestPath)
+  return fs
+    .mkdir(protocolDirPath, { recursive: true })
+    .then(() => fs.mkdir(srcDirPath, { recursive: true }))
+    .then(() => fs.mkdir(analysisDirPath, { recursive: true }))
+    .then(() => fs.writeFile(mainFileDestPath, objectData))
+    .then(() => protocolKey)
+}
 export function removeProtocolByKey(
   protocolKey: string,
   protocolsDirPath: string
