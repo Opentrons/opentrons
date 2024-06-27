@@ -363,10 +363,10 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
 
     def get_speed(self) -> PlungerSpeeds:
         return self._plunger_speeds
-    
+
     def get_liquid_presence_detection(self) -> bool:
         return self._liquid_presence_detection
-    
+
     def set_liquid_presence_detection(self, enable: bool) -> None:
         self._liquid_presence_detection = enable
 

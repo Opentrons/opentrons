@@ -84,7 +84,9 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         self._flow_rates = FlowRates(self)
 
         self.set_default_speed(speed=default_movement_speed)
-        self._liquid_presence_detection = self._engine_client.state.pipettes.get_liquid_presence_detection(pipette_id)
+        self._liquid_presence_detection = (
+            self._engine_client.state.pipettes.get_liquid_presence_detection(pipette_id)
+        )
 
     @property
     def pipette_id(self) -> str:
@@ -747,7 +749,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         return self._engine_client.state.pipettes.get_nozzle_layout_type(
             self._pipette_id
         )
-        
+
     def get_liquid_presence_detection(self) -> bool:
         return self._liquid_presence_detection
 
@@ -783,7 +785,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         if blow_out is not None:
             assert blow_out > 0
             self._blow_out_flow_rate = blow_out
-            
+
     def set_liquid_presence_detection(self, enable: bool) -> None:
         self._liquid_presence_detection = enable
 

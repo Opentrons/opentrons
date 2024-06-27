@@ -471,7 +471,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
 
     def get_flow_rate(self) -> FlowRates:
         return self._flow_rates
-    
+
     def get_liquid_presence_detection(self) -> bool:
         return self._liquid_presence_detection
 
@@ -500,7 +500,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
             dispense=dispense,
             blow_out=blow_out,
         )
-        
+
     def set_liquid_presence_detection(self, enable: bool) -> None:
         self._protocol_interface.get_hardware().set_liquid_presence_detection(enable)
 
