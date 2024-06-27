@@ -115,11 +115,9 @@ interface ProtocolSetupStepProps {
   // display the reason the setup step is disabled
   disabledReason?: string | null
   //  optional description
-  description?: string | null
-  //  optional removal of the left icon
-  hasLeftIcon?: boolean
-  //  optional removal of the right icon
-  hasRightIcon?: boolean
+  description?: string
+  //  optional removal of the icon
+  hasIcon?: boolean
   //  optional enlarge the font size
   fontSize?: string
 }
@@ -133,8 +131,7 @@ export function ProtocolSetupStep({
   disabled = false,
   disabledReason,
   description,
-  hasRightIcon = true,
-  hasLeftIcon = true,
+  hasIcon = true,
   fontSize = 'p',
 }: ProtocolSetupStepProps): JSX.Element {
   const backgroundColorByStepStatus = {
@@ -178,9 +175,9 @@ export function ProtocolSetupStep({
 
   return (
     <Btn
-      onClick={() => {
+      onClick={() =>
         !disabled ? onClickSetupStep() : makeDisabledReasonSnackbar()
-      }}
+      }
       width="100%"
     >
       <Flex
@@ -196,8 +193,7 @@ export function ProtocolSetupStep({
         {status !== 'general' &&
         !disabled &&
         status !== 'inform' &&
-        !disabled &&
-        hasLeftIcon ? (
+        !disabled ? (
           <Icon
             color={status === 'ready' ? COLORS.green50 : COLORS.yellow50}
             size="2rem"
@@ -215,15 +211,13 @@ export function ProtocolSetupStep({
           >
             {title}
           </StyledText>
-          {description != null ? (
-            <StyledText
-              as="h4"
-              color={disabled ? COLORS.grey50 : COLORS.grey60}
-              maxWidth="35rem"
-            >
-              {description}
-            </StyledText>
-          ) : null}
+          <StyledText
+            as="h4"
+            color={disabled ? COLORS.grey50 : COLORS.grey60}
+            maxWidth="35rem"
+          >
+            {description}
+          </StyledText>
         </Flex>
         <Flex
           flex="1"
@@ -243,7 +237,7 @@ export function ProtocolSetupStep({
             {subDetail}
           </StyledText>
         </Flex>
-        {disabled || !hasRightIcon ? null : (
+        {disabled || !hasIcon ? null : (
           <Icon
             marginLeft={SPACING.spacing8}
             name="more"
@@ -386,8 +380,7 @@ function PrepareToRun({
   const runTimeParameters = mostRecentAnalysis?.runTimeParameters ?? []
   const hasRunTimeParameters = runTimeParameters.length > 0
   const hasCustomRunTimeParameters = runTimeParameters.some(
-    parameter =>
-      parameter.type === 'csv_file' || parameter.value !== parameter.default
+    parameter => parameter.value !== parameter.default
   )
 
   const [
@@ -502,7 +495,7 @@ function PrepareToRun({
     incompleteInstrumentCount === 0 && areModulesReady && areFixturesReady
   const onPlay = (): void => {
     if (isDoorOpen) {
-      makeSnackbar(t('shared:close_robot_door') as string)
+      makeSnackbar(t('shared:close_robot_door'))
     } else {
       if (
         isHeaterShakerInProtocol &&
@@ -515,7 +508,7 @@ function PrepareToRun({
           play()
           trackProtocolRunEvent({
             name: ANALYTICS_PROTOCOL_RUN_ACTION.START,
-            properties: robotAnalyticsData ?? {},
+            properties: robotAnalyticsData != null ? robotAnalyticsData : {},
           })
         } else {
           makeSnackbar(
@@ -697,9 +690,7 @@ function PrepareToRun({
             <CloseButton
               onClose={
                 !isLoading
-                  ? () => {
-                      setShowConfirmCancelModal(true)
-                    }
+                  ? () => setShowConfirmCancelModal(true)
                   : onConfirmCancelClose
               }
             />
@@ -721,18 +712,14 @@ function PrepareToRun({
         {!isLoading ? (
           <>
             <ProtocolSetupStep
-              onClickSetupStep={() => {
-                setSetupScreen('instruments')
-              }}
+              onClickSetupStep={() => setSetupScreen('instruments')}
               title={t('instruments')}
               detail={instrumentsDetail}
               status={instrumentsStatus}
               disabled={speccedInstrumentCount === 0}
             />
             <ProtocolSetupStep
-              onClickSetupStep={() => {
-                setSetupScreen('modules')
-              }}
+              onClickSetupStep={() => setSetupScreen('modules')}
               title={t('deck_hardware')}
               detail={modulesDetail}
               subDetail={modulesSubDetail}
@@ -761,9 +748,7 @@ function PrepareToRun({
               disabledReason={lpcDisabledReason}
             />
             <ProtocolSetupStep
-              onClickSetupStep={() => {
-                setSetupScreen('view only parameters')
-              }}
+              onClickSetupStep={() => setSetupScreen('view only parameters')}
               title={t('parameters')}
               detail={parametersDetail}
               subDetail={null}
@@ -771,9 +756,7 @@ function PrepareToRun({
               disabled={!hasRunTimeParameters}
             />
             <ProtocolSetupStep
-              onClickSetupStep={() => {
-                setSetupScreen('labware')
-              }}
+              onClickSetupStep={() => setSetupScreen('labware')}
               title={t('labware')}
               detail={labwareDetail}
               subDetail={labwareSubDetail}
@@ -781,9 +764,7 @@ function PrepareToRun({
               disabled={labwareDetail == null}
             />
             <ProtocolSetupStep
-              onClickSetupStep={() => {
-                setSetupScreen('liquids')
-              }}
+              onClickSetupStep={() => setSetupScreen('liquids')}
               title={t('liquids')}
               status="general"
               detail={

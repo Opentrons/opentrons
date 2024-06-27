@@ -282,9 +282,9 @@ function useStatusBarAnimation(isError: boolean): void {
     createLiveCommand({
       command: updatingCommand,
       waitUntilComplete: false,
-    }).catch((e: Error) => {
+    }).catch((e: Error) =>
       console.warn(`cannot run status bar animation: ${e.message}`)
-    })
+    )
   }
 
   const startIdleAnimationIfFailed = (): void => {
@@ -292,9 +292,9 @@ function useStatusBarAnimation(isError: boolean): void {
       createLiveCommand({
         command: idleCommand,
         waitUntilComplete: false,
-      }).catch((e: Error) => {
+      }).catch((e: Error) =>
         console.warn(`cannot run status bar animation: ${e.message}`)
-      })
+      )
     }
   }
 

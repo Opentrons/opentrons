@@ -51,7 +51,7 @@ const validateCommands8 = (
         const commandAjv = new Ajv({ allErrors: true, jsonPointers: true })
         const validateCommands = commandAjv.compile(generatedSchema)
         const ok = validateCommands(toValidate.commands)
-        if (ok == null || ok === false) {
+        if (!ok) {
           // eslint-disable-next-line prefer-promise-reject-errors
           reject(validateCommands.errors)
         }
@@ -62,7 +62,7 @@ const validateCommands8 = (
 const validateCommandAnnotations8 = (
   toValidate: ProtocolSchemas.ProtocolStructureV8
 ): Promise<CommandAnnotation[]> =>
-  new Promise<object>((resolve, reject) => {
+  new Promise((resolve, reject) => {
     const requestedSchema = toValidate.commandAnnotationSchemaId
     switch (requestedSchema) {
       case 'opentronsCommandAnnotationSchemaV1':
@@ -80,7 +80,7 @@ const validateCommandAnnotations8 = (
         ])
     }
   }).then(
-    schema =>
+    (schema: any) =>
       new Promise((resolve, reject) => {
         const generatedSchema = {
           type: 'array',
@@ -90,7 +90,7 @@ const validateCommandAnnotations8 = (
         annotationAjv.addSchema(schema)
         const validateAnnotations = annotationAjv.compile(generatedSchema)
         const ok = validateAnnotations(toValidate.commandAnnotations)
-        if (ok == null || ok === false) {
+        if (!ok) {
           // eslint-disable-next-line prefer-promise-reject-errors
           reject(validateAnnotations.errors)
         }
@@ -128,7 +128,7 @@ const validateLiquids8 = (
         const liquidAjv = new Ajv({ allErrors: true, jsonPointers: true })
         const validateLiquids = liquidAjv.compile(generatedSchema)
         const ok = validateLiquids(toValidate.liquids)
-        if (ok == null || ok === false) {
+        if (!ok) {
           // eslint-disable-next-line prefer-promise-reject-errors
           reject(validateLiquids.errors)
         }
@@ -166,7 +166,7 @@ const validateLabware8 = (
         const labwareAjv = new Ajv({ allErrors: true, jsonPointers: true })
         const validateLabware = labwareAjv.compile(generatedSchema)
         const ok = validateLabware(toValidate.labwareDefinitions)
-        if (ok == null || ok === false) {
+        if (!ok) {
           // eslint-disable-next-line prefer-promise-reject-errors
           reject(validateLabware.errors)
         }
@@ -179,7 +179,7 @@ const validate8 = (toValidate: any): Promise<ProtocolSchemas.ProtocolFileV8> =>
     const protoAjv = new Ajv({ allErrors: true, jsonPointers: true })
     const validateProtocol = protoAjv.compile(protocolSchema8)
     const valid = validateProtocol(toValidate)
-    if (valid == null || valid === false) {
+    if (!valid) {
       // eslint-disable-next-line prefer-promise-reject-errors
       reject(validateProtocol.errors)
     }
@@ -218,21 +218,21 @@ const fakeAjvErrorForBadOTSharedSchema = (
 
 type ProtocolFileSub7 =
   | ProtocolSchemas.ProtocolFileV6
-  | ProtocolSchemas.ProtocolFileV5<Record<string, unknown>>
-  | ProtocolSchemas.ProtocolFileV4<Record<string, unknown>>
-  | ProtocolSchemas.ProtocolFileV3<Record<string, unknown>>
-  | ProtocolSchemas.ProtocolFileV1<Record<string, unknown>>
+  | ProtocolSchemas.ProtocolFileV5<{}>
+  | ProtocolSchemas.ProtocolFileV4<{}>
+  | ProtocolSchemas.ProtocolFileV3<{}>
+  | ProtocolSchemas.ProtocolFileV1<{}>
 
 const validateSub7 = (
-  toValidate: object,
-  schemaObj: object
+  toValidate: any,
+  schemaObj: any
 ): Promise<ProtocolFileSub7> =>
   new Promise((resolve, reject) => {
     const ajv = new Ajv({ allErrors: true, jsonPointers: true })
     ajv.addSchema(labwareSchema2)
     const validateProtocol = ajv.compile(schemaObj)
     const ok = validateProtocol(toValidate)
-    if (ok == null || ok === false) {
+    if (!ok) {
       // eslint-disable-next-line prefer-promise-reject-errors
       reject(validateProtocol.errors)
     }
@@ -245,7 +245,7 @@ const validate7 = (toValidate: any): Promise<ProtocolSchemas.ProtocolFileV7> =>
     ajv.addSchema([commandSchema7, labwareSchema2])
     const validateProtocol = ajv.compile(protocolSchema7)
     const ok = validateProtocol(toValidate)
-    if (ok == null || ok === false) {
+    if (!ok) {
       // eslint-disable-next-line prefer-promise-reject-errors
       reject(validateProtocol.errors)
     }
@@ -254,7 +254,7 @@ const validate7 = (toValidate: any): Promise<ProtocolSchemas.ProtocolFileV7> =>
 
 // note: rejects with an array of ajv errors
 export function validate(
-  toValidate: Record<string, unknown>
+  toValidate: any
 ): Promise<ProtocolSchemas.JsonProtocolFile> {
   // eslint-disable-next-line @typescript-eslint/dot-notation
   const requestedProtocolSchema = toValidate['$otSharedSchema']

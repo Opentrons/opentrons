@@ -103,9 +103,11 @@ export function CalibrateDeck(
   }
 
   function cleanUpAndExit(): void {
-    queryClient.invalidateQueries([host, 'calibration']).catch((e: Error) => {
-      console.error(`error invalidating calibration queries: ${e.message}`)
-    })
+    queryClient
+      .invalidateQueries([host, 'calibration'])
+      .catch((e: Error) =>
+        console.error(`error invalidating calibration queries: ${e.message}`)
+      )
     if (
       exitBeforeDeckConfigCompletion &&
       currentStep !== Sessions.DECK_STEP_CALIBRATION_COMPLETE

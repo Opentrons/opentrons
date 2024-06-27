@@ -53,9 +53,7 @@ export const StepCreationButtonComponent = (
   return (
     <div
       className={styles.list_item_button}
-      onMouseLeave={() => {
-        setExpanded(false)
-      }}
+      onMouseLeave={() => setExpanded(false)}
       {...targetProps}
     >
       {disabled && (
@@ -63,9 +61,7 @@ export const StepCreationButtonComponent = (
       )}
       <DeprecatedPrimaryButton
         id="StepCreationButton"
-        onClick={() => {
-          setExpanded(!expanded)
-        }}
+        onClick={() => setExpanded(!expanded)}
         disabled={disabled}
       >
         {t('button:add_step')}
@@ -175,9 +171,7 @@ export const StepCreationButton = (): JSX.Element => {
         createPortal(
           <ConfirmDeleteModal
             modalType={CLOSE_UNSAVED_STEP_FORM}
-            onCancelClick={() => {
-              setEnqueuedStepType(null)
-            }}
+            onCancelClick={() => setEnqueuedStepType(null)}
             onContinueClick={() => {
               if (enqueuedStepType !== null) {
                 addStep(enqueuedStepType)

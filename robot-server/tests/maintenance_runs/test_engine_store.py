@@ -11,16 +11,17 @@ from opentrons.types import DeckSlotName
 from opentrons.hardware_control import API
 from opentrons.hardware_control.types import EstopStateNotification, EstopState
 from opentrons.protocol_engine import (
+    ProtocolEngine,
     StateSummary,
     types as pe_types,
 )
-from opentrons.protocol_runner import RunResult
+from opentrons.protocol_runner import LiveRunner, RunResult
 
 from robot_server.maintenance_runs.maintenance_engine_store import (
     MaintenanceEngineStore,
     EngineConflictError,
+    NoRunnerEnginePairError,
     handle_estop_event,
-    NoRunOrchestrator,
 )
 
 
@@ -54,15 +55,9 @@ async def test_create_engine(subject: MaintenanceEngineStore) -> None:
     )
 
     assert subject.current_run_id == "run-id"
-    assert subject.current_run_created_at is not None
     assert isinstance(result, StateSummary)
-    assert subject.run_orchestrator.get_protocol_runner() is None
-
-
-def test_run_created_at_raises(subject: MaintenanceEngineStore) -> None:
-    """Should raise that the run has not yet created."""
-    with pytest.raises(AssertionError):
-        subject.current_run_created_at
+    assert isinstance(subject.runner, LiveRunner)
+    assert isinstance(subject.engine, ProtocolEngine)
 
 
 @pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
@@ -87,8 +82,8 @@ async def test_create_engine_uses_robot_and_deck_type(
         notify_publishers=mock_notify_publishers,
     )
 
-    assert subject.run_orchestrator.get_robot_type() == robot_type
-    assert subject.run_orchestrator.get_deck_type() == deck_type
+    assert subject.engine.state_view.config.robot_type == robot_type
+    assert subject.engine.state_view.config.deck_type == deck_type
 
 
 async def test_create_engine_with_labware_offsets(
@@ -127,15 +122,17 @@ async def test_clear_engine(subject: MaintenanceEngineStore) -> None:
         created_at=datetime(2023, 5, 1),
         notify_publishers=mock_notify_publishers,
     )
-    await subject.run_orchestrator.run(deck_configuration=[])
+    await subject.runner.run(deck_configuration=[])
     result = await subject.clear()
 
     assert subject.current_run_id is None
-    assert subject._created_at is None
     assert isinstance(result, RunResult)
 
-    with pytest.raises(NoRunOrchestrator):
-        subject.run_orchestrator
+    with pytest.raises(NoRunnerEnginePairError):
+        subject.engine
+
+    with pytest.raises(NoRunnerEnginePairError):
+        subject.runner
 
 
 async def test_clear_engine_not_stopped_or_idle(
@@ -148,7 +145,7 @@ async def test_clear_engine_not_stopped_or_idle(
         created_at=datetime(2023, 6, 1),
         notify_publishers=mock_notify_publishers,
     )
-    subject.run_orchestrator.play()
+    subject.runner.play()
 
     with pytest.raises(EngineConflictError):
         await subject.clear()
@@ -162,13 +159,16 @@ async def test_clear_idle_engine(subject: MaintenanceEngineStore) -> None:
         created_at=datetime(2023, 7, 1),
         notify_publishers=mock_notify_publishers,
     )
-    assert subject._run_orchestrator is not None
+    assert subject.engine is not None
+    assert subject.runner is not None
 
     await subject.clear()
 
     # TODO: test engine finish is called
-    with pytest.raises(NoRunOrchestrator):
-        subject.run_orchestrator
+    with pytest.raises(NoRunnerEnginePairError):
+        subject.engine
+    with pytest.raises(NoRunnerEnginePairError):
+        subject.runner
 
 
 async def test_estop_callback(
@@ -187,12 +187,12 @@ async def test_estop_callback(
     decoy.when(engine_store.current_run_id).then_return(None)
     await handle_estop_event(engine_store, disengage_event)
     decoy.verify(
-        engine_store.run_orchestrator.estop(),
+        engine_store.engine.estop(),
         ignore_extra_args=True,
         times=0,
     )
     decoy.verify(
-        await engine_store.run_orchestrator.finish(),
+        await engine_store.engine.finish(),
         ignore_extra_args=True,
         times=0,
     )
@@ -200,9 +200,7 @@ async def test_estop_callback(
     decoy.when(engine_store.current_run_id).then_return("fake-run-id")
     await handle_estop_event(engine_store, engage_event)
     decoy.verify(
-        engine_store.run_orchestrator.estop(),
-        await engine_store.run_orchestrator.finish(
-            error=matchers.IsA(EStopActivatedError)
-        ),
+        engine_store.engine.estop(),
+        await engine_store.engine.finish(error=matchers.IsA(EStopActivatedError)),
         times=1,
     )

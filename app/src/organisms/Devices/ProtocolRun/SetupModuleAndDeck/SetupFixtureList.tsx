@@ -132,18 +132,14 @@ export function FixtureListItem({
     <>
       {showNotConfiguredModal ? (
         <NotConfiguredModal
-          onCloseClick={() => {
-            setShowNotConfiguredModal(false)
-          }}
+          onCloseClick={() => setShowNotConfiguredModal(false)}
           cutoutId={cutoutId}
           requiredFixtureId={compatibleCutoutFixtureIds[0]}
         />
       ) : null}
       {showLocationConflictModal ? (
         <LocationConflictModal
-          onCloseClick={() => {
-            setShowLocationConflictModal(false)
-          }}
+          onCloseClick={() => setShowLocationConflictModal(false)}
           cutoutId={cutoutId}
           deckDef={deckDef}
           missingLabwareDisplayName={missingLabwareDisplayName}
@@ -204,9 +200,7 @@ export function FixtureListItem({
                   }
                 `}
                 marginTop={SPACING.spacing4}
-                onClick={() => {
-                  setShowSetupInstructionsModal(true)
-                }}
+                onClick={() => setShowSetupInstructionsModal(true)}
               >
                 <StyledText marginLeft={SPACING.spacing4} as="p">
                   {t('view_setup_instructions')}
@@ -226,11 +220,11 @@ export function FixtureListItem({
             {!isCurrentFixtureCompatible ? (
               <TertiaryButton
                 width="max-content"
-                onClick={() => {
+                onClick={() =>
                   isConflictingFixtureConfigured
                     ? setShowLocationConflictModal(true)
                     : setShowNotConfiguredModal(true)
-                }}
+                }
               >
                 <StyledText as="label" cursor="pointer">
                   {t('resolve')}

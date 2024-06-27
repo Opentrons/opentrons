@@ -57,9 +57,7 @@ export function TouchScreenSleep({
     <Flex flexDirection={DIRECTION_COLUMN} ref={screenRef}>
       <ChildNavigation
         header={t('touchscreen_sleep')}
-        onClickBack={() => {
-          setCurrentOption(null)
-        }}
+        onClickBack={() => setCurrentOption(null)}
       />
       <Flex
         flexDirection={DIRECTION_COLUMN}

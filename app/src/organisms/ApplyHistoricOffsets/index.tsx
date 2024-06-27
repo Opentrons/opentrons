@@ -24,7 +24,7 @@ import {
 } from '../../molecules/LegacyModal'
 import { PythonLabwareOffsetSnippet } from '../../molecules/PythonLabwareOffsetSnippet'
 import { LabwareOffsetTabs } from '../LabwareOffsetTabs'
-import { getLabwareDefinitionsFromCommands } from '../../molecules/Command/utils/getLabwareDefinitionsFromCommands'
+import { getLabwareDefinitionsFromCommands } from '../LabwarePositionCheck/utils/labware'
 import { LabwareOffsetTable } from './LabwareOffsetTable'
 import { getIsLabwareOffsetCodeSnippetsOn } from '../../redux/config'
 import type { LabwareOffset } from '@opentrons/api-client'
@@ -103,9 +103,7 @@ export function ApplyHistoricOffsets(
         }
       />
       <Link
-        onClick={() => {
-          setShowOffsetDataModal(true)
-        }}
+        onClick={() => setShowOffsetDataModal(true)}
         css={TYPOGRAPHY.linkPSemiBold}
       >
         {t(noOffsetData ? 'learn_more' : 'view_data')}
@@ -121,9 +119,7 @@ export function ApplyHistoricOffsets(
                       ? 'what_is_labware_offset_data'
                       : 'stored_offset_data'
                   )}
-                  onClose={() => {
-                    setShowOffsetDataModal(false)
-                  }}
+                  onClose={() => setShowOffsetDataModal(false)}
                 />
               }
             >

@@ -17,21 +17,13 @@ const render = (props: React.ComponentProps<typeof CancelRun>) => {
 }
 
 describe('RecoveryFooterButtons', () => {
-  const { CANCEL_RUN, ROBOT_CANCELING, DROP_TIP_FLOWS } = RECOVERY_MAP
+  const { CANCEL_RUN, ROBOT_CANCELING } = RECOVERY_MAP
   let props: React.ComponentProps<typeof CancelRun>
   let mockGoBackPrevStep: Mock
-  let mockSetRobotInMotion: Mock
-  let mockProceedToRouteAndStep: Mock
 
   beforeEach(() => {
     mockGoBackPrevStep = vi.fn()
-    mockSetRobotInMotion = vi.fn(() => Promise.resolve())
-    mockProceedToRouteAndStep = vi.fn()
-    const mockRouteUpdateActions = {
-      goBackPrevStep: mockGoBackPrevStep,
-      setRobotInMotion: mockSetRobotInMotion,
-      proceedToRouteAndStep: mockProceedToRouteAndStep,
-    } as any
+    const mockRouteUpdateActions = { goBackPrevStep: mockGoBackPrevStep } as any
 
     props = {
       ...mockRecoveryContentProps,
@@ -40,11 +32,6 @@ describe('RecoveryFooterButtons', () => {
         route: CANCEL_RUN.ROUTE,
         step: CANCEL_RUN.STEPS.CONFIRM_CANCEL,
       },
-      tipStatusUtils: {
-        isLoadingTipStatus: false,
-        areTipsAttached: false,
-      } as any,
-      recoveryCommands: { cancelRun: vi.fn() } as any,
     }
   })
 
@@ -100,58 +87,5 @@ describe('RecoveryFooterButtons', () => {
     expect(setRobotInMotionMock.mock.invocationCallOrder[0]).toBeLessThan(
       cancelRunMock.mock.invocationCallOrder[0]
     )
-  })
-
-  it('should route the user to ManageTips if tips are attached, tip status is not loading, and the user clicks the appropriate button', () => {
-    props = {
-      ...props,
-      tipStatusUtils: {
-        isLoadingTipStatus: false,
-        areTipsAttached: true,
-      } as any,
-    }
-
-    render(props)
-
-    const primaryBtn = screen.getByRole('button', { name: 'Confirm' })
-
-    fireEvent.click(primaryBtn)
-    expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(DROP_TIP_FLOWS.ROUTE)
-  })
-
-  it('should not yet route the user if the user clicks the appropriate button, but tip detection is still loading', () => {
-    props = {
-      ...props,
-      tipStatusUtils: {
-        isLoadingTipStatus: true,
-        areTipsAttached: false,
-      } as any,
-    }
-
-    render(props)
-
-    const primaryBtn = screen.getByRole('button', { name: 'Confirm' })
-
-    fireEvent.click(primaryBtn)
-    expect(mockProceedToRouteAndStep).not.toHaveBeenCalled()
-    expect(mockSetRobotInMotion).not.toHaveBeenCalled()
-  })
-
-  it('should will cancel the run if no tips are detected', () => {
-    props = {
-      ...props,
-      tipStatusUtils: {
-        isLoadingTipStatus: false,
-        areTipsAttached: false,
-      } as any,
-    }
-
-    render(props)
-
-    const primaryBtn = screen.getByRole('button', { name: 'Confirm' })
-
-    fireEvent.click(primaryBtn)
-    expect(mockProceedToRouteAndStep).not.toHaveBeenCalled()
-    expect(mockSetRobotInMotion).toHaveBeenCalled()
   })
 })

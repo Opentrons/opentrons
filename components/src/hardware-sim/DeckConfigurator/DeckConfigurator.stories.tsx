@@ -80,23 +80,15 @@ const staticFixtures = [
 export const Default = Template.bind({})
 Default.args = {
   deckConfig,
-  handleClickAdd: cutoutId => {
-    console.log(`add at ${cutoutId}`)
-  },
-  handleClickRemove: cutoutId => {
-    console.log(`remove at ${cutoutId}`)
-  },
+  handleClickAdd: cutoutId => console.log(`add at ${cutoutId}`),
+  handleClickRemove: cutoutId => console.log(`remove at ${cutoutId}`),
 }
 
 export const ReadOnly = Template.bind({})
 ReadOnly.args = {
   deckConfig,
-  handleClickAdd: cutoutId => {
-    console.log(`add at ${cutoutId}`)
-  },
-  handleClickRemove: cutoutId => {
-    console.log(`remove at ${cutoutId}`)
-  },
+  handleClickAdd: cutoutId => console.log(`add at ${cutoutId}`),
+  handleClickRemove: cutoutId => console.log(`remove at ${cutoutId}`),
   readOnly: true,
 }
 

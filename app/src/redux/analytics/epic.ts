@@ -15,7 +15,7 @@ import { getAnalyticsConfig, getAnalyticsOptedIn } from './selectors'
 import { initializeMixpanel, setMixpanelTracking, trackEvent } from './mixpanel'
 import { makeEvent } from './make-event'
 
-import type { Observable, OperatorFunction } from 'rxjs'
+import type { Observable } from 'rxjs'
 import type { State, Action, Epic } from '../types'
 import type { ConfigInitializedAction } from '../config/types'
 import type { TrackEventArgs, AnalyticsEvent, AnalyticsConfig } from './types'
@@ -27,7 +27,7 @@ const initializeAnalyticsEpic: Epic = (action$, state$) => {
       const { config } = initAction.payload
       initializeMixpanel(config.analytics, config.isOnDevice)
     }),
-    ignoreElements() as OperatorFunction<ConfigInitializedAction, never>
+    ignoreElements()
   )
 }
 
@@ -45,15 +45,12 @@ const sendAnalyticsEventEpic: Epic = (action$, state$) => {
       AnalyticsConfig
     ] => {
       const [maybeEvent, maybeConfig] = args
-      return Boolean(maybeEvent != null && maybeConfig)
+      return Boolean(maybeEvent && maybeConfig)
     }),
-    tap(([event, config]: [AnalyticsEvent, AnalyticsConfig]) => {
+    tap(([event, config]: [AnalyticsEvent, AnalyticsConfig]) =>
       trackEvent(event, config)
-    }),
-    ignoreElements() as OperatorFunction<
-      [AnalyticsEvent, { appId: string; optedIn: boolean; seenOptIn: boolean }],
-      never
-    >
+    ),
+    ignoreElements()
   )
 }
 
@@ -70,7 +67,7 @@ const optIntoAnalyticsEpic: Epic = (_, state$) => {
       if (state.config?.analytics != null)
         setMixpanelTracking(state.config?.analytics, state.config?.isOnDevice)
     }),
-    ignoreElements() as OperatorFunction<[State, State], never>
+    ignoreElements()
   )
 }
 

@@ -1,13 +1,17 @@
 import * as React from 'react'
 import reduce from 'lodash/reduce'
 
-import { COLORS, Labware, RobotCoordinateSpace } from '@opentrons/components'
+import {
+  COLORS,
+  LabwareRender,
+  RobotCoordinateSpace,
+  WELL_LABEL_OPTIONS,
+} from '@opentrons/components'
 import {
   arrayToWellGroup,
   getCollidingWells,
   getWellSetForMultichannel,
 } from './utils'
-import { Selection384Wells } from './Selection384Wells'
 import { SelectionRect } from './SelectionRect'
 
 import type { WellFill, WellGroup, WellStroke } from '@opentrons/components'
@@ -19,20 +23,14 @@ import type { GenericRect } from './types'
 
 interface WellSelectionProps {
   definition: LabwareDefinition2
-  deselectWells: (wells: string[]) => void
   selectedPrimaryWells: WellGroup
   selectWells: (wellGroup: WellGroup) => unknown
   channels: PipetteChannels
 }
 
 export function WellSelection(props: WellSelectionProps): JSX.Element {
-  const {
-    definition,
-    deselectWells,
-    selectedPrimaryWells,
-    selectWells,
-    channels,
-  } = props
+  const { definition, selectedPrimaryWells, selectWells, channels } = props
+
   const [highlightedWells, setHighlightedWells] = React.useState<WellGroup>({})
 
   const _wellsFromSelected: (
@@ -129,33 +127,21 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
     wellStroke[wellName] = COLORS.transparent
   })
 
-  const labwareRender = (
-    <RobotCoordinateSpace viewBox="0 0 128 86">
-      <Labware
-        definition={definition}
-        hideOutline
-        isInteractive
-        showLabels={true}
-        wellFill={wellFill}
-        wellStroke={wellStroke}
-      />
-    </RobotCoordinateSpace>
-  )
-  return definition.parameters.format === '384Standard' ? (
-    <Selection384Wells
-      allSelectedWells={allSelectedWells}
-      channels={channels}
-      definition={definition}
-      deselectWells={deselectWells}
-      labwareRender={labwareRender}
-      selectWells={selectWells}
-    />
-  ) : (
+  return (
     <SelectionRect
       onSelectionMove={handleSelectionMove}
       onSelectionDone={handleSelectionDone}
     >
-      {labwareRender}
+      <RobotCoordinateSpace viewBox="0 0 128 86">
+        <LabwareRender
+          definition={definition}
+          hideOutline
+          isInteractive
+          wellLabelOption={WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE}
+          wellFill={wellFill}
+          wellStroke={wellStroke}
+        />
+      </RobotCoordinateSpace>
     </SelectionRect>
   )
 }

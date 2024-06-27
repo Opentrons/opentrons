@@ -34,15 +34,10 @@ class AnalysisResult(str, Enum):
         OK: No problems were found during protocol analysis.
         NOT_OK: Problems were found during protocol analysis. Inspect
             `analysis.errors` for error occurrences.
-        PARAMETER_VALUE_REQUIRED: A value is required to be set for a parameter
-            in order for the protocol to be analyzed/run. The absence of this does not
-            inherently mean there are no parameters, as there may be defaults for all
-            or unset parameters are not referenced or handled via try/except clauses.
     """
 
     OK = "ok"
     NOT_OK = "not-ok"
-    PARAMETER_VALUE_REQUIRED = "parameter-value-required"
 
 
 class AnalysisRequest(BaseModel):
@@ -62,16 +57,6 @@ class AnalysisSummary(BaseModel):
 
     id: str = Field(..., description="Unique identifier of this analysis resource")
     status: AnalysisStatus = Field(..., description="Status of the analysis")
-    runTimeParameters: Optional[List[RunTimeParameter]] = Field(
-        default=None,
-        description=(
-            "Run time parameters used during analysis."
-            " These are the parameters that are defined in the protocol, with values"
-            " specified either in the protocol creation request or reanalysis request"
-            " (whichever started this analysis), or default values from the protocol"
-            " if none are specified in the request."
-        ),
-    )
 
 
 class PendingAnalysis(BaseModel):
@@ -81,16 +66,6 @@ class PendingAnalysis(BaseModel):
     status: Literal[AnalysisStatus.PENDING] = Field(
         AnalysisStatus.PENDING,
         description="Status marking the analysis as pending",
-    )
-    runTimeParameters: List[RunTimeParameter] = Field(
-        default_factory=list,
-        description=(
-            "Run time parameters used during analysis."
-            " These are the parameters that are defined in the protocol, with values"
-            " specified either in the protocol creation request or reanalysis request"
-            " (whichever started this analysis), or default values from the protocol"
-            " if none are specified in the request."
-        ),
     )
 
 
@@ -187,14 +162,11 @@ class CompletedAnalysis(BaseModel):
     )
 
 
-AnalysisParameterType = Union[float, bool, str, None]
-
-
 class RunTimeParameterAnalysisData(NamedTuple):
     """Data from analysis of a run-time parameter."""
 
-    value: AnalysisParameterType
-    default: AnalysisParameterType
+    value: Union[float, bool, str]
+    default: Union[float, bool, str]
 
 
 ProtocolAnalysis = Union[PendingAnalysis, CompletedAnalysis]

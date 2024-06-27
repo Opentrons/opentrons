@@ -139,7 +139,6 @@ export interface ProtocolAnalysisOutput {
   errors: AnalysisError[]
   runTimeParameters: RunTimeParameter[]
   robotType?: RobotType
-  result: 'ok' | 'not-ok' | 'error' | 'file-required'
 }
 
 interface AnalysisSourceFile {

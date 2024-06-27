@@ -45,36 +45,22 @@
       "type": "number",
       "enum": [1, 2, 3, 4, 5, 6, 7, 8, 12, 96, 384]
     },
-    "configurationsByNozzleMap": {
+    "distanceByTipCount": {
       "type": "object",
-      "description": "Pipette configurations keyed by validated sets of nozzle layouts. Maps must be ordered from smallest to largest regarding nozzle count.",
-      "items": {
-        "type": "object",
-        "description": "Tip types by which each set of configration values are differentiated.",
-        "required": ["default"],
-        "items": {
-          "speed": { "$ref": "#/definitions/speedRange" },
-          "distance": { "$ref": "#/definitions/distanceRange" },
-          "current": { "$ref": "#/definitions/currentRange" },
-          "tipOverlaps": {
-            "type": "object",
-            "description": "Set of versioned tip overlap values with version 0 acting as the default",
-            "required": ["v0"],
-            "patternProperties": {
-              "^v\\d+$": {
-                "type": "object",
-                "description": "Map of tip overlap values with defaults",
-                "required": ["default"],
-                "$comment": "Other keys in here should be labware URIs",
-                "properties": {
-                  "default": { "type": "number" }
-                },
-                "additionalProperties": { "type": "number" }
-              }
-            },
-            "additionalProperties": false
-          }
-        }
+      "patternProperties": {
+        "\\d+": { "$ref": "#/definitions/distanceRange" }
+      }
+    },
+    "speedByTipCount": {
+      "type": "object",
+      "patternProperties": {
+        "\\d+": { "$ref": "#/definitions/speedRange" }
+      }
+    },
+    "currentByTipCount": {
+      "type": "object",
+      "patternProperties": {
+        "\\d+": { "$ref": "#/definitions/currentRange" }
       }
     }
   },
@@ -193,18 +179,6 @@
         "run": { "$ref": "#/definitions/currentRange" }
       }
     },
-    "validNozzleMaps": {
-      "maps": {
-        "description": "The Opentrons validated map configurations for this pipette.",
-        "type": "object",
-        "additionalProperties": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      }
-    },
     "pickUpTipConfigurations": {
       "description": "Object containing configurations for picking up tips common to all partial configurations",
       "anyOf": [
@@ -214,13 +188,23 @@
           "properties": {
             "pressFit": {
               "type": "object",
-              "required": ["presses", "increment", "configurationsByNozzleMap"],
+              "required": [
+                "presses",
+                "speedByTipCount",
+                "increment",
+                "distanceByTipCount",
+                "currentByTipCount"
+              ],
               "additionalProperties": false,
               "properties": {
                 "presses": { "$ref": "#/definitions/positiveNumber" },
+                "speedByTipCount": { "$ref": "#/definitions/speedByTipCount" },
                 "increment": { "$ref": "#/definitions/positiveNumber" },
-                "configurationsByNozzleMap": {
-                  "$ref": "#/definitions/configurationsByNozzleMap"
+                "distanceByTipCount": {
+                  "$ref": "#/definitions/distanceByTipCount"
+                },
+                "currentByTipCount": {
+                  "$ref": "#/definitions/currentByTipCount"
                 }
               }
             }
@@ -235,7 +219,9 @@
               "required": [
                 "prep_move_distance",
                 "prep_move_speed",
-                "configurationsByNozzleMap"
+                "speed",
+                "distance",
+                "currentByTipCount"
               ],
               "additionalProperties": false,
               "properties": {
@@ -243,8 +229,10 @@
                   "$ref": "#/definitions/positiveNumber"
                 },
                 "prep_move_speed": { "$ref": "#/definitions/positiveNumber" },
-                "configurationsByNozzleMap": {
-                  "$ref": "#/definitions/configurationsByNozzleMap"
+                "speed": { "$ref": "#/definitions/positiveNumber" },
+                "distance": { "$ref": "#/definitions/positiveNumber" },
+                "currentByTipCount": {
+                  "$ref": "#/definitions/currentByTipCount"
                 },
                 "connectTiprackDistanceMM": {
                   "$ref": "#/definitions/positiveNumber"

@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { vi, describe, beforeEach, it } from 'vitest'
-import { fireEvent, screen } from '@testing-library/react'
+import { vi, describe, afterEach, beforeEach, it } from 'vitest'
+import { cleanup, fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '../../__testing-utils__'
 import {
   getCurrentFormHasUnsavedChanges,
@@ -29,6 +29,9 @@ describe('StepCreationButton', () => {
       additionalEquipmentOnDeck: {},
       labware: {},
     })
+  })
+  afterEach(() => {
+    cleanup()
   })
   it('renders the add step button and clicking on it reveals all the button option, no modules', () => {
     render()

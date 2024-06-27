@@ -109,8 +109,9 @@ MessageDefinition = Union[
     defs.SetHepaUVStateRequest,
     defs.GetHepaUVStateRequest,
     defs.GetHepaUVStateResponse,
-    defs.SendAccumulatedSensorDataRequest,
+    defs.SendAccumulatedPressureDataRequest,
     defs.AddSensorLinearMoveRequest,
+    defs.SendAccumulatedPressureDataRequest,
 ]
 
 

@@ -191,9 +191,7 @@ export function DeviceReset({
           heading: t('device_resets_cannot_be_undone'),
           type: 'alert',
         }}
-        onClickBack={() => {
-          setCurrentOption(null)
-        }}
+        onClickBack={() => setCurrentOption(null)}
       />
       <Flex
         gridGap={SPACING.spacing24}
@@ -210,12 +208,12 @@ export function DeviceReset({
                   id={option.id}
                   type="checkbox"
                   value={option.id}
-                  onChange={() => {
+                  onChange={() =>
                     setResetOptions({
                       ...resetOptions,
                       [option.id]: !(resetOptions[option.id] ?? false),
                     })
-                  }}
+                  }
                 />
                 <OptionLabel
                   htmlFor={option.id}

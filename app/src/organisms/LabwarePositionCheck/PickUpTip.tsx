@@ -21,11 +21,11 @@ import { JogToWell } from './JogToWell'
 import { UnorderedList } from '../../molecules/UnorderedList'
 import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
 import { TipConfirmation } from './TipConfirmation'
-import { getLabwareDef } from './utils/labware'
-import { getLabwareDefinitionsFromCommands } from '../../molecules/Command/utils/getLabwareDefinitionsFromCommands'
+import {
+  getLabwareDef,
+  getLabwareDefinitionsFromCommands,
+} from './utils/labware'
 import { getDisplayLocation } from './utils/getDisplayLocation'
-import { useSelector } from 'react-redux'
-import { getIsOnDevice } from '../../redux/config'
 
 import type {
   CompletedProtocolAnalysis,
@@ -41,7 +41,8 @@ import type {
   WorkingOffset,
 } from './types'
 import type { LabwareOffset } from '@opentrons/api-client'
-import type { TFunction } from 'i18next'
+import { useSelector } from 'react-redux'
+import { getIsOnDevice } from '../../redux/config'
 
 interface PickUpTipProps extends PickUpTipStep {
   protocolData: CompletedProtocolAnalysis
@@ -91,7 +92,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
   const displayLocation = getDisplayLocation(
     location,
     getLabwareDefinitionsFromCommands(protocolData.commands),
-    t as TFunction,
+    t,
     i18n
   )
   const labwareDisplayName = getLabwareDisplayName(labwareDef)
@@ -179,8 +180,8 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
         {
           commandType: 'moveToWell' as const,
           params: {
-            pipetteId,
-            labwareId,
+            pipetteId: pipetteId,
+            labwareId: labwareId,
             wellName: 'A1',
             wellLocation: { origin: 'top' as const },
           },
@@ -244,9 +245,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
             ],
             false
           )
-            .then(() => {
-              setShowTipConfirmation(true)
-            })
+            .then(() => setShowTipConfirmation(true))
             .catch((e: Error) => {
               setFatalError(
                 `PickUpTip failed to move from final position with message: ${e.message}`
@@ -267,7 +266,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
           {
             commandType: 'moveLabware' as const,
             params: {
-              labwareId,
+              labwareId: labwareId,
               newLocation: 'offDeck',
               strategy: 'manualMoveWithoutPause',
             },
@@ -285,7 +284,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
           {
             commandType: 'moveLabware' as const,
             params: {
-              labwareId,
+              labwareId: labwareId,
               newLocation: 'offDeck',
               strategy: 'manualMoveWithoutPause',
             },
@@ -313,9 +312,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
       ],
       false
     )
-      .then(() => {
-        proceed()
-      })
+      .then(() => proceed())
       .catch((e: Error) => {
         setFatalError(
           `PickUpTip failed to move to safe location after tip pick up with message: ${e.message}`
@@ -336,8 +333,8 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
         {
           commandType: 'moveToWell' as const,
           params: {
-            pipetteId,
-            labwareId,
+            pipetteId: pipetteId,
+            labwareId: labwareId,
             wellName: 'A1',
             wellLocation: { origin: 'top' as const },
           },
@@ -365,7 +362,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
         {
           commandType: 'moveLabware' as const,
           params: {
-            labwareId,
+            labwareId: labwareId,
             newLocation: 'offDeck',
             strategy: 'manualMoveWithoutPause',
           },

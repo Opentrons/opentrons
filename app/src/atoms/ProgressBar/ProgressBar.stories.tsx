@@ -26,9 +26,7 @@ const Template: Story<React.ComponentProps<typeof ProgressBar>> = args => {
         setProgress(prevProgress => prevProgress + 5)
       }, 200)
 
-      return () => {
-        clearInterval(interval)
-      }
+      return () => clearInterval(interval)
     }
   })
   return (
@@ -40,12 +38,7 @@ const Template: Story<React.ComponentProps<typeof ProgressBar>> = args => {
     >
       <StyledText>{'Add 5% to the current progress every 0.2 sec'}</StyledText>
       <ProgressBar percentComplete={progress} />
-      <SecondaryButton
-        onClick={() => {
-          setProgress(0)
-        }}
-        width="5rem"
-      >
+      <SecondaryButton onClick={() => setProgress(0)} width="5rem">
         {'reset'}
       </SecondaryButton>
     </Flex>

@@ -19,7 +19,3 @@ export const getAllowAllTipracks: Selector<boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ALLOW_ALL_TIPRACKS ?? false
 )
-export const getEnableAbsorbanceReader: Selector<boolean> = createSelector(
-  getFeatureFlagData,
-  flags => flags.OT_PD_ENABLE_ABSORBANCE_READER ?? false
-)

@@ -70,9 +70,7 @@ export const DetachProbe = (props: DetachProbeProps): JSX.Element | null => {
         },
       ],
       false
-    ).catch(error => {
-      setFatalError(error.message as string)
-    })
+    ).catch(error => setFatalError(error.message))
   }, [])
 
   if (pipetteName == null || pipetteMount == null) return null
@@ -100,9 +98,7 @@ export const DetachProbe = (props: DetachProbeProps): JSX.Element | null => {
       ],
       false
     )
-      .then(() => {
-        proceed()
-      })
+      .then(() => proceed())
       .catch((e: Error) => {
         setFatalError(
           `DetachProbe failed to move to safe location after probe detach with message: ${e.message}`

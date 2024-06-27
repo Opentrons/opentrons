@@ -97,7 +97,7 @@ export const DraggableStepItems = (
       stepId,
       ...currentRemoved.slice(targetIndex, currentRemoved.length),
     ]
-    if (confirm(t('confirm_reorder') as string)) {
+    if (confirm(t('confirm_reorder'))) {
       reorderSteps(currentReinserted)
     }
   }

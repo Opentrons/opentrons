@@ -2,13 +2,11 @@ import pytest
 from typing import Optional, List, Union
 
 from opentrons.protocols.parameters.types import (
-    PrimitiveAllowedTypes,
+    AllowedTypes,
     ParameterChoice,
-)
-from opentrons.protocols.parameters.exceptions import (
+    ParameterNameError,
     ParameterValueError,
     ParameterDefinitionError,
-    ParameterNameError,
 )
 
 from opentrons.protocols.parameters import validation as subject
@@ -157,7 +155,7 @@ def test_validate_options_raises_name_error() -> None:
     ],
 )
 def test_ensure_value_type(
-    value: Union[float, bool, str], param_type: type, result: PrimitiveAllowedTypes
+    value: Union[float, bool, str], param_type: type, result: AllowedTypes
 ) -> None:
     """It should ensure that if applicable, the value is coerced into the expected type"""
     assert result == subject.ensure_value_type(value, param_type)
@@ -295,9 +293,9 @@ def test_convert_type_string_for_num_param_raises(param_type: type) -> None:
     ],
 )
 def test_validate_options_raise_definition_error(
-    default: PrimitiveAllowedTypes,
-    minimum: Optional[PrimitiveAllowedTypes],
-    maximum: Optional[PrimitiveAllowedTypes],
+    default: AllowedTypes,
+    minimum: Optional[AllowedTypes],
+    maximum: Optional[AllowedTypes],
     choices: Optional[List[ParameterChoice]],
     parameter_type: type,
     error_text: str,

@@ -7,9 +7,6 @@ module.exports = {
     production: {
       plugins: ['babel-plugin-styled-components', 'babel-plugin-unassert'],
     },
-    staging: {
-      plugins: ['babel-plugin-styled-components'],
-    },
     development: {
       plugins: ['babel-plugin-styled-components'],
     },

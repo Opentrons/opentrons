@@ -123,9 +123,7 @@ export function ProtocolCard(props: {
   const failedAnalysisHeader: ModalHeaderBaseProps = {
     title: i18n.format(t('protocol_analysis_failed'), 'capitalize'),
     hasExitIcon: true,
-    onClick: () => {
-      setShowFailedAnalysisModal(false)
-    },
+    onClick: () => setShowFailedAnalysisModal(false),
   }
 
   const handleDeleteProtocol = (): void => {
@@ -145,9 +143,9 @@ export function ProtocolCard(props: {
         .then(() =>
           queryClient
             .invalidateQueries([host, 'protocols'])
-            .catch((e: Error) => {
+            .catch((e: Error) =>
               console.error(`error invalidating runs query: ${e.message}`)
-            })
+            )
         )
         .then(() => {
           setShowIcon(false)
@@ -179,9 +177,7 @@ export function ProtocolCard(props: {
       borderRadius={BORDERS.borderRadius16}
       marginBottom={SPACING.spacing8}
       gridGap={SPACING.spacing48}
-      onClick={() => {
-        handleProtocolClick(longpress, protocol.id)
-      }}
+      onClick={() => handleProtocolClick(longpress, protocol.id)}
       padding={SPACING.spacing24}
       ref={longpress.ref}
       css={PUSHED_STATE_STYLE}
@@ -227,7 +223,7 @@ export function ProtocolCard(props: {
         </StyledText>
       </Flex>
       <Flex width="9.25rem">
-        <StyledText as="p" color={COLORS.grey60} whiteSpace="nowrap">
+        <StyledText as="p" color={COLORS.grey60}>
           {lastRun != null
             ? formatDistance(new Date(lastRun), new Date(), {
                 addSuffix: true,
@@ -251,9 +247,7 @@ export function ProtocolCard(props: {
           (isFailedAnalysis && longpress.isLongPressed)) && (
           <Modal
             header={failedAnalysisHeader}
-            onOutsideClick={() => {
-              setShowFailedAnalysisModal(false)
-            }}
+            onOutsideClick={() => setShowFailedAnalysisModal(false)}
           >
             <Flex
               flexDirection={DIRECTION_COLUMN}

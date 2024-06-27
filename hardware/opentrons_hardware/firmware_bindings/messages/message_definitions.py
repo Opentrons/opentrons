@@ -1024,13 +1024,13 @@ class GetHepaUVStateResponse(BaseMessage):
 
 
 @dataclass
-class SendAccumulatedSensorDataRequest(BaseMessage):
+class SendAccumulatedPressureDataRequest(BaseMessage):
     """Send all the saved sensor data."""
 
-    payload: payloads.SendAccumulatedSensorDataPayload
+    payload: payloads.SendAccumulatedPressureDataPayload
     payload_type: Type[
-        payloads.SendAccumulatedSensorDataPayload
-    ] = payloads.SendAccumulatedSensorDataPayload
+        payloads.SendAccumulatedPressureDataPayload
+    ] = payloads.SendAccumulatedPressureDataPayload
     message_id: Literal[
-        MessageId.send_accumulated_sensor_data
-    ] = MessageId.send_accumulated_sensor_data
+        MessageId.send_accumulated_pressure_data
+    ] = MessageId.send_accumulated_pressure_data

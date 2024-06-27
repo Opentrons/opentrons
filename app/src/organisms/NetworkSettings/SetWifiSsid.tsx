@@ -49,14 +49,10 @@ export function SetWifiSsid({
           aria-label="wifi_ssid"
           value={inputSsid}
           id="wifiSsid"
-          onChange={e => {
-            setInputSsid(e.target.value)
-          }}
+          onChange={e => setInputSsid(e.target.value)}
           type="text"
           error={errorMessage}
-          onBlur={e => {
-            e.target.focus()
-          }}
+          onBlur={e => e.target.focus()}
           autoFocus
         />
       </Flex>

@@ -65,7 +65,11 @@ def _build_pickup_tip_data(
     )
     return PickUpTipConfigurations(
         pressFit=PressFitPickUpTipConfiguration(
-            presses=presses, increment=increment, configurationsByNozzleMap={}
+            speedByTipCount={},
+            presses=presses,
+            increment=increment,
+            distanceByTipCount={},
+            currentByTipCount={},
         )
     )
 

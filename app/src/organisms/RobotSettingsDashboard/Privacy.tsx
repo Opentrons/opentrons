@@ -49,9 +49,7 @@ export function Privacy({
     <Flex flexDirection={DIRECTION_COLUMN}>
       <ChildNavigation
         header={t('app_settings:privacy')}
-        onClickBack={() => {
-          setCurrentOption(null)
-        }}
+        onClickBack={() => setCurrentOption(null)}
       />
       <Flex
         flexDirection={DIRECTION_COLUMN}

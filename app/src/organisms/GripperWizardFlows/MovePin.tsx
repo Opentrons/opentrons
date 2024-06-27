@@ -96,7 +96,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
                     setErrorMessage(data.error?.detail ?? null)
                   }
                   if (jaw === 'front' && data?.result?.jawOffset != null) {
-                    setFrontJawOffset(data.result.jawOffset as Coordinates)
+                    setFrontJawOffset(data.result.jawOffset)
                   }
                   createRunCommand({
                     maintenanceRunId,
@@ -114,21 +114,13 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
                       }
                       proceed()
                     })
-                    .catch(error => {
-                      setErrorMessage(error.message as string)
-                    })
+                    .catch(error => setErrorMessage(error.message))
                 })
-                .catch(error => {
-                  setErrorMessage(error.message as string)
-                })
+                .catch(error => setErrorMessage(error.message))
             })
-            .catch(error => {
-              setErrorMessage(error.message as string)
-            })
+            .catch(error => setErrorMessage(error.message))
         })
-        .catch(error => {
-          setErrorMessage(error.message as string)
-        })
+        .catch(error => setErrorMessage(error.message))
     }
   }
   const infoByMovement: {

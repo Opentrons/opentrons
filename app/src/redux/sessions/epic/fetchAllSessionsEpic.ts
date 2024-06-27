@@ -11,13 +11,8 @@ import type { Action, Epic } from '../../types'
 import type {
   RobotApiRequestOptions,
   RobotApiResponse,
-  RobotApiV2ErrorResponseBody,
 } from '../../robot-api/types'
-import type {
-  FetchAllSessionsAction,
-  EnsureSessionAction,
-  MultiSessionResponse,
-} from '../types'
+import type { FetchAllSessionsAction, EnsureSessionAction } from '../types'
 
 export const mapActionToRequest = (): RobotApiRequestOptions => ({
   method: GET,
@@ -32,16 +27,8 @@ export const mapResponseToAction = (
   const meta = { ...originalAction.meta, response: responseMeta }
 
   return response.ok
-    ? Actions.fetchAllSessionsSuccess(
-        host.name,
-        body as MultiSessionResponse,
-        meta
-      )
-    : Actions.fetchAllSessionsFailure(
-        host.name,
-        body as RobotApiV2ErrorResponseBody,
-        meta
-      )
+    ? Actions.fetchAllSessionsSuccess(host.name, body, meta)
+    : Actions.fetchAllSessionsFailure(host.name, body, meta)
 }
 
 export const fetchAllSessionsEpic: Epic = (action$, state$) => {

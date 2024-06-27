@@ -80,9 +80,7 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
     currentRunId != null && currentRunStatus != null && displayName != null ? (
       <Flex
         alignItems={ALIGN_CENTER}
-        onClick={(e: React.MouseEvent) => {
-          e.stopPropagation()
-        }}
+        onClick={(e: React.MouseEvent) => e.stopPropagation()}
       >
         <StyledText
           as="label"
@@ -186,9 +184,9 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
               <Btn
                 {...targetProps}
                 marginRight={SPACING.spacing8}
-                onClick={() => {
+                onClick={() =>
                   history.push(`/devices/${name}/robot-settings/networking`)
-                }}
+                }
               >
                 <Icon
                   aria-label={iconName}

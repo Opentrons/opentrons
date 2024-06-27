@@ -10,12 +10,9 @@ import {
   labwareTypeAutofills,
   DEFAULT_RACK_BRAND,
 } from './fields'
+import type { LabwareFields } from './fields'
 import { getIsOpentronsTubeRack } from './utils/getIsOpentronsTubeRack'
 import { getIsCustomTubeRack } from './utils/getIsCustomTubeRack'
-
-import type { LabwareFields } from './fields'
-import type { RegularNameProps } from '@opentrons/shared-data'
-
 // TODO(Ian, 2019-07-24): consolidate `tubeRackAutofills/aluminumBlockAutofills`-getting logic btw here and makeAutofillOnChange
 export const _getIsAutofilled = (
   name: keyof LabwareFields,
@@ -33,14 +30,15 @@ export const _getIsAutofilled = (
   }
 
   if (labwareType === 'aluminumBlock' && aluminumBlockType != null) {
-    return Object.keys(
-      (aluminumBlockAutofills as Record<string, Record<string, string>>)[
-        aluminumBlockType
-      ] ?? {}
-    ).includes(name)
+    return (
+      // @ts-expect-error(IL, 2021-03-18): aluminumBlockType not strictly typed enough
+      Object.keys(aluminumBlockAutofills[aluminumBlockType] || {}).includes(
+        name
+      )
+    )
   } else if (labwareType === 'tubeRack' && tubeRackInsertLoadName != null) {
     return Object.keys(
-      tubeRackAutofills[tubeRackInsertLoadName] ?? {}
+      tubeRackAutofills[tubeRackInsertLoadName] || {}
     ).includes(name)
   }
   return false
@@ -76,41 +74,29 @@ export const getIsHidden = (
 
 // TODO(IL, 2021-03-18): _valuesToCreateNameArgs should return RegularNameProps from shared-data/js/labwareTools/index.js
 const _valuesToCreateNameArgs = (values: LabwareFields): any => {
-  const gridRows = [NaN, 0].includes(Number(values.gridRows))
-    ? 1
-    : Number(values.gridRows)
-  const gridColumns = [NaN, 0].includes(Number(values.gridColumns))
-    ? 1
-    : Number(values.gridColumns)
-  const brand = (values.brand ?? '').trim()
+  const gridRows = Number(values.gridRows) || 1
+  const gridColumns = Number(values.gridColumns) || 1
+  const brand = (values.brand || '').trim()
 
   let brandDefault: string | undefined
 
   return {
     gridColumns,
     gridRows,
-    displayCategory: values.labwareType ?? '',
+    displayCategory: values.labwareType || '',
     displayVolumeUnits: DISPLAY_VOLUME_UNITS,
     brandName: brand === '' ? brandDefault : brand,
-    totalLiquidVolume: [NaN, 0].includes(Number(values.wellVolume))
-      ? 0
-      : Number(values.wellVolume),
+    totalLiquidVolume: Number(values.wellVolume) || 0,
   }
 }
 const _getTubeRackDisplayName = (values: LabwareFields): string => {
-  const rows = [NaN, 0].includes(Number(values.gridRows))
-    ? 1
-    : Number(values.gridRows)
-  const columns = [NaN, 0].includes(Number(values.gridColumns))
-    ? 1
-    : Number(values.gridColumns)
-  const volume = [NaN, 0].includes(Number(values.wellVolume))
-    ? 0
-    : Number(values.wellVolume)
+  const rows = Number(values.gridRows) || 1
+  const columns = Number(values.gridColumns) || 1
+  const volume = Number(values.wellVolume) || 0
   const wellCount = rows * columns
 
-  return `${values.brand ?? 'Generic'} ${wellCount} Tube Rack with ${
-    values.groupBrand ?? 'Generic'
+  return `${values.brand || 'Generic'} ${wellCount} Tube Rack with ${
+    values.groupBrand || 'Generic'
   } ${round(volume / 1000, 2)} mL`
 }
 export const getDefaultLoadName = (values: LabwareFields): string => {
@@ -120,7 +106,7 @@ export const getDefaultLoadName = (values: LabwareFields): string => {
   } else {
     args = _valuesToCreateNameArgs(values)
   }
-  return createRegularLoadName(args as RegularNameProps)
+  return createRegularLoadName(args)
 }
 
 export const getDefaultDisplayName = (values: LabwareFields): string => {
@@ -130,7 +116,5 @@ export const getDefaultDisplayName = (values: LabwareFields): string => {
     return _getTubeRackDisplayName(values)
   }
 
-  return createDefaultDisplayName(
-    _valuesToCreateNameArgs(values) as RegularNameProps
-  )
+  return createDefaultDisplayName(_valuesToCreateNameArgs(values))
 }

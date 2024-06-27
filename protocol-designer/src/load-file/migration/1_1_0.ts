@@ -143,7 +143,7 @@ function _updatePatchPathField(
     if (pipetteCapacity) {
       if (
         !pipetteCapacityExceeded &&
-        ['multiDispense', 'multiAspirate'].includes(appliedPatch.path as string)
+        ['multiDispense', 'multiAspirate'].includes(appliedPatch.path)
       ) {
         const disposalVolume =
           appliedPatch.disposalVolume_checkbox &&

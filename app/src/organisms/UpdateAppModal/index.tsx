@@ -150,9 +150,7 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
       {error != null ? (
         <LegacyModal
           title={UPDATE_ERROR}
-          onClose={() => {
-            closeModal(true)
-          }}
+          onClose={() => closeModal(true)}
           css={LEGACY_MODAL_STYLE}
         >
           <PlaceholderError errorMessage={error.message} />
@@ -181,9 +179,7 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
       {!downloading && !downloaded && error == null ? (
         <LegacyModal
           title={t('branded:opentrons_app_update_available')}
-          onClose={() => {
-            closeModal(true)
-          }}
+          onClose={() => closeModal(true)}
           closeOnOutsideClick={true}
           footer={appUpdateFooter}
           maxHeight="80%"

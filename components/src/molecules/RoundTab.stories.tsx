@@ -27,9 +27,7 @@ const Tabs = (): JSX.Element => {
       <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing4}>
         <RoundTabComponent
           isCurrent={step === 'setup'}
-          onClick={() => {
-            setStep('setup')
-          }}
+          onClick={() => setStep('setup')}
           tabName={'setup'}
         >
           <StyledText textTransform={TYPOGRAPHY.textTransformCapitalize}>
@@ -39,9 +37,7 @@ const Tabs = (): JSX.Element => {
 
         <RoundTabComponent
           isCurrent={step === 'parameters'}
-          onClick={() => {
-            setStep('parameters')
-          }}
+          onClick={() => setStep('parameters')}
         >
           <StyledText textTransform={TYPOGRAPHY.textTransformCapitalize}>
             {'Parameters'}
@@ -50,9 +46,7 @@ const Tabs = (): JSX.Element => {
 
         <RoundTabComponent
           isCurrent={step === 'module controls'}
-          onClick={() => {
-            setStep('module controls')
-          }}
+          onClick={() => setStep('module controls')}
         >
           <StyledText textTransform={TYPOGRAPHY.textTransformCapitalize}>
             {'Module Controls'}
@@ -61,9 +55,7 @@ const Tabs = (): JSX.Element => {
 
         <RoundTabComponent
           isCurrent={step === 'run preview'}
-          onClick={() => {
-            setStep('run preview')
-          }}
+          onClick={() => setStep('run preview')}
         >
           <StyledText textTransform={TYPOGRAPHY.textTransformCapitalize}>
             {'Run Preview'}

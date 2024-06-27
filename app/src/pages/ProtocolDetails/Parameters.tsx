@@ -5,7 +5,6 @@ import {
   formatRunTimeParameterDefaultValue,
   formatRunTimeParameterMinMax,
   orderRuntimeParameterRangeOptions,
-  sortRuntimeParameters,
 } from '@opentrons/shared-data'
 import {
   BORDERS,
@@ -60,7 +59,7 @@ export const Parameters = (props: { protocolId: string }): JSX.Element => {
   const { t, i18n } = useTranslation('protocol_details')
 
   const makeSnack = (): void => {
-    makeSnackbar(t('start_setup_customize_values') as string)
+    makeSnackbar(t('start_setup_customize_values'))
   }
 
   const formatRange = (parameter: RunTimeParameter): string => {
@@ -82,9 +81,6 @@ export const Parameters = (props: { protocolId: string }): JSX.Element => {
       }
       case 'str': {
         return range ?? t('num_choices', { num: numChoices })
-      }
-      case 'csv_file': {
-        return t('n_a')
       }
       default:
         //  Should never hit this case
@@ -114,7 +110,7 @@ export const Parameters = (props: { protocolId: string }): JSX.Element => {
         </tr>
       </thead>
       <tbody>
-        {sortRuntimeParameters(runTimeParameters).map((parameter, index) => {
+        {runTimeParameters.map((parameter, index) => {
           return (
             <TableRow key={index}>
               <TableDatum>
@@ -124,9 +120,7 @@ export const Parameters = (props: { protocolId: string }): JSX.Element => {
               </TableDatum>
               <TableDatum>
                 <Flex paddingLeft={SPACING.spacing24} color={COLORS.grey60}>
-                  {parameter.type === 'csv_file'
-                    ? t('file_required')
-                    : formatRunTimeParameterDefaultValue(parameter, t)}
+                  {formatRunTimeParameterDefaultValue(parameter, t)}
                 </Flex>
               </TableDatum>
               <TableDatum>

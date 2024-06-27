@@ -64,9 +64,7 @@ export function RobotSettingsGripperCalibration(
     setShowOverflowMenu,
   } = useMenuHandleClickOutside()
   const calsOverflowWrapperRef = useOnClickOutside<HTMLDivElement>({
-    onClickOutside: () => {
-      setShowOverflowMenu(false)
-    },
+    onClickOutside: () => setShowOverflowMenu(false),
   })
   const [showWizardFlow, setShowWizardFlow] = React.useState<boolean>(false)
   const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
@@ -134,9 +132,7 @@ export function RobotSettingsGripperCalibration(
                     <GripperWizardFlows
                       flowType={'RECALIBRATE'}
                       attachedGripper={gripper}
-                      closeFlow={() => {
-                        setShowWizardFlow(false)
-                      }}
+                      closeFlow={() => setShowWizardFlow(false)}
                     />
                   ) : null}
                   {showOverflowMenu ? (

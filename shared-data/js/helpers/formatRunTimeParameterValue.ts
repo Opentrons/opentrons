@@ -3,7 +3,7 @@ import type { RunTimeParameter } from '../types'
 /**
  * Formats the runtime parameter value.
  *
- * @param {ValueRunTimeParameter} runTimeParameter - The value runtime parameter to be formatted.
+ * @param {RunTimeParameter} runTimeParameter - The runtime parameter to be formatted.
  * @param {Function} t - A function for localization.
  *
  * @returns {string} The formatted runtime parameter value.
@@ -14,11 +14,7 @@ export const formatRunTimeParameterValue = (
   runTimeParameter: RunTimeParameter,
   t: any
 ): string => {
-  const { type } = runTimeParameter
-  const value =
-    runTimeParameter.type === 'csv_file'
-      ? runTimeParameter.file?.file?.name ?? ''
-      : runTimeParameter.value
+  const { type, value } = runTimeParameter
   const suffix =
     'suffix' in runTimeParameter && runTimeParameter.suffix != null
       ? runTimeParameter.suffix
@@ -43,8 +39,6 @@ export const formatRunTimeParameterValue = (
     case 'bool': {
       return Boolean(value) ? t('on') : t('off')
     }
-    case 'csv_file':
-      return value.toString()
     default:
       break
   }

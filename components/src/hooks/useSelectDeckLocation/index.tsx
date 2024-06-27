@@ -115,10 +115,10 @@ export function DeckLocationSelect({
   ): void => {
     if (isDisabled) {
       setHoveredData({
-        slot,
-        slotPosition,
-        isDisabled,
-        disabledReason,
+        slot: slot,
+        slotPosition: slotPosition,
+        isDisabled: isDisabled,
+        disabledReason: disabledReason,
       })
     } else {
       setHoveredData(null)
@@ -200,24 +200,25 @@ export function DeckLocationSelect({
                     cutoutId={cutoutId}
                     fixtureBaseColor={fill}
                     slotClipColor={COLORS.white}
-                    onClick={() => {
-                      if (!isDisabled && setSelectedLocation != null)
-                        setSelectedLocation(slotLocation)
-                    }}
+                    onClick={() =>
+                      !isDisabled &&
+                      setSelectedLocation != null &&
+                      setSelectedLocation(slotLocation)
+                    }
                     cursor={
                       setSelectedLocation == null || isDisabled || isSelected
                         ? 'default'
                         : 'pointer'
                     }
                     deckDefinition={deckDef}
-                    onMouseEnter={() => {
+                    onMouseEnter={() =>
                       handleMouseEnter(
                         slot,
                         slotPosition,
                         isDisabled,
                         disabledReason
                       )
-                    }}
+                    }
                     onMouseLeave={handleMouseLeave}
                   />
                 </>
@@ -227,10 +228,11 @@ export function DeckLocationSelect({
                   slotBaseColor={fill}
                   slotName={slot.id}
                   slotClipColor={COLORS.white}
-                  onClick={() => {
-                    if (!isDisabled && setSelectedLocation != null)
-                      setSelectedLocation(slotLocation)
-                  }}
+                  onClick={() =>
+                    !isDisabled &&
+                    setSelectedLocation != null &&
+                    setSelectedLocation(slotLocation)
+                  }
                   cursor={
                     setSelectedLocation == null || isDisabled || isSelected
                       ? 'default'

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { vi, it, describe, expect, beforeEach } from 'vitest'
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent } from '@testing-library/react'
 
 import { LEFT } from '@opentrons/shared-data'
 import {
@@ -71,36 +71,34 @@ describe('LevelPipette', () => {
   })
 
   it('renders title and description', () => {
-    render(props)
-    screen.getByText(nestedTextMatcher('Level the pipette'))
-    screen.getByText(
+    const { getByText } = render(props)
+    getByText(nestedTextMatcher('Level the pipette'))
+    getByText(
       nestedTextMatcher(
         'Using your hand, gently and slowly push the pipette up.'
       )
     )
-    screen.getByText(
+    getByText(
       nestedTextMatcher(
         'Place the calibration block in slot 3 with the tall surface on the left side.'
       )
     )
-    screen.getByText(
+    getByText(
       nestedTextMatcher(
         'Pull the pipette down so all 8 nozzles touch the surface of the block.'
       )
     )
-    screen.getByText(
+    getByText(
       nestedTextMatcher(
         'While holding the pipette down, tighten the three screws.'
       )
     )
-    screen.getByText(
-      nestedTextMatcher('Gently and slowly push the pipette back up.')
-    )
+    getByText(nestedTextMatcher('Gently and slowly push the pipette back up.'))
   })
 
   it('the CTA should be clickable', () => {
-    render(props)
-    const cont = screen.getByRole('button', { name: 'Confirm level' })
+    const { getByRole } = render(props)
+    const cont = getByRole('button', { name: 'Confirm level' })
     fireEvent.click(cont)
     expect(props.confirm).toHaveBeenCalled()
   })

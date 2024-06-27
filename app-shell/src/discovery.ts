@@ -152,24 +152,22 @@ export function registerDiscovery(
       case UI_INITIALIZED:
       case DISCOVERY_START: {
         handleRobots()
-        client.start({
+        return client.start({
           healthPollInterval: FAST_POLL_INTERVAL_MS,
         })
-        return
       }
       case DISCOVERY_FINISH: {
-        client.start({
+        return client.start({
           healthPollInterval: SLOW_POLL_INTERVAL_MS,
         })
-        return
       }
       case DISCOVERY_REMOVE: {
-        client.removeRobot((action.payload as { robotName: string }).robotName)
-        return
+        return client.removeRobot(
+          (action.payload as { robotName: string }).robotName
+        )
       }
       case CLEAR_CACHE: {
-        clearCache()
-        return
+        return clearCache()
       }
       case USB_HTTP_REQUESTS_START: {
         const usbHttpAgent = getSerialPortHttpAgent()

@@ -1,5 +1,4 @@
 """Payloads of can bus messages."""
-
 # TODO (amit, 2022-01-26): Figure out why using annotations import ruins
 #  dataclass fields interpretation.
 #  from __future__ import annotations
@@ -494,7 +493,6 @@ class AddSensorLinearMoveBasePayload(AddLinearMoveRequestPayload):
     """A request to add a linear move that also requires sensor reading for its duration."""
 
     sensor_id: SensorIdField
-    sensor_type: SensorTypeField
 
 
 @dataclass(eq=False)
@@ -686,12 +684,10 @@ class GetHepaUVStatePayloadResponse(EmptyPayload):
     uv_light_on: utils.UInt8Field
     remaining_time_s: utils.UInt32Field
     uv_current_ma: utils.UInt16Field
-    safety_relay_active: utils.UInt8Field
 
 
 @dataclass(eq=False)
-class SendAccumulatedSensorDataPayload(EmptyPayload):
+class SendAccumulatedPressureDataPayload(EmptyPayload):
     """Send queued readings from a sensor."""
 
     sensor_id: SensorIdField
-    sensor_type: SensorTypeField

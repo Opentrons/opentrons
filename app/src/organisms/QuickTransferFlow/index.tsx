@@ -37,9 +37,7 @@ export const QuickTransferFlow = (): JSX.Element => {
     confirm: confirmExit,
     showConfirmation: showConfirmExit,
     cancel: cancelExit,
-  } = useConditionalConfirm(() => {
-    history.push('protocols')
-  }, true)
+  } = useConditionalConfirm(() => history.push('protocols'), true)
 
   const exitButtonProps: React.ComponentProps<typeof SmallButton> = {
     buttonType: 'tertiaryLowLight',
@@ -49,21 +47,15 @@ export const QuickTransferFlow = (): JSX.Element => {
   const sharedMiddleStepProps = {
     state,
     dispatch,
-    onBack: () => {
-      setCurrentStep(prevStep => prevStep - 1)
-    },
-    onNext: () => {
-      setCurrentStep(prevStep => prevStep + 1)
-    },
+    onBack: () => setCurrentStep(prevStep => prevStep - 1),
+    onNext: () => setCurrentStep(prevStep => prevStep + 1),
     exitButtonProps,
   }
 
   const contentInOrder: JSX.Element[] = [
     <CreateNewTransfer
       key={0}
-      onNext={() => {
-        setCurrentStep(prevStep => prevStep + 1)
-      }}
+      onNext={() => setCurrentStep(prevStep => prevStep + 1)}
       exitButtonProps={exitButtonProps}
     />,
     <SelectPipette key={1} {...sharedMiddleStepProps} />,

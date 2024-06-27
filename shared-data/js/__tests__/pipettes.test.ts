@@ -63,7 +63,7 @@ describe('pipette data accessors', () => {
   })
 
   describe('getPipetteSpecsV2', () => {
-    it('returns the correct info for p1000_single_flex which should be the latest model version 3.7', () => {
+    it('returns the correct info for p1000_single_flex which should be the latest model version 3.6', () => {
       const mockP1000Specs = {
         $otSharedSchema: '#/pipette/schemas/2/pipetteGeometrySchema.json',
         availableSensors: {
@@ -84,12 +84,12 @@ describe('pipette data accessors', () => {
               '#/pipette/schemas/2/pipetteLiquidPropertiesSchema.json',
             defaultTipOverlapDictionary: {
               default: 10.5,
-              'opentrons/opentrons_flex_96_tiprack_1000ul/1': 9.65,
-              'opentrons/opentrons_flex_96_tiprack_200ul/1': 9.76,
-              'opentrons/opentrons_flex_96_tiprack_50ul/1': 10.09,
-              'opentrons/opentrons_flex_96_filtertiprack_1000ul/1': 9.65,
-              'opentrons/opentrons_flex_96_filtertiprack_200ul/1': 9.76,
-              'opentrons/opentrons_flex_96_filtertiprack_50ul/1': 10.09,
+              'opentrons/opentrons_flex_96_tiprack_1000ul/1': 10.5,
+              'opentrons/opentrons_flex_96_tiprack_200ul/1': 10.5,
+              'opentrons/opentrons_flex_96_tiprack_50ul/1': 10.5,
+              'opentrons/opentrons_flex_96_filtertiprack_1000ul/1': 10.5,
+              'opentrons/opentrons_flex_96_filtertiprack_200ul/1': 10.5,
+              'opentrons/opentrons_flex_96_filtertiprack_50ul/1': 10.5,
             },
             defaultTipracks: [
               'opentrons/opentrons_flex_96_tiprack_1000ul/1',
@@ -108,35 +108,13 @@ describe('pipette data accessors', () => {
         nozzleMap: expect.anything(),
         pathTo3D:
           'pipette/definitions/2/geometry/single_channel/p1000/placeholder.gltf',
-        validNozzleMaps: {
-          maps: {
-            SingleA1: ['A1'],
-          },
-        },
         pickUpTipConfigurations: {
           pressFit: {
+            speedByTipCount: expect.anything(),
             presses: 1,
             increment: 0,
-            configurationsByNozzleMap: {
-              SingleA1: {
-                default: {
-                  speed: 10,
-                  distance: 13,
-                  current: 0.2,
-                  tipOverlaps: {
-                    v0: {
-                      default: 10.5,
-                      'opentrons/opentrons_flex_96_tiprack_1000ul/1': 9.65,
-                      'opentrons/opentrons_flex_96_tiprack_200ul/1': 9.76,
-                      'opentrons/opentrons_flex_96_tiprack_50ul/1': 10.09,
-                      'opentrons/opentrons_flex_96_filtertiprack_1000ul/1': 9.65,
-                      'opentrons/opentrons_flex_96_filtertiprack_200ul/1': 9.76,
-                      'opentrons/opentrons_flex_96_filtertiprack_50ul/1': 10.09,
-                    },
-                  },
-                },
-              },
-            },
+            distanceByTipCount: expect.anything(),
+            currentByTipCount: expect.anything(),
           },
         },
         partialTipConfigurations: {

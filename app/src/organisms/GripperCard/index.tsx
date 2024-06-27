@@ -118,9 +118,7 @@ export function GripperCard({
           {
             label: t('about_gripper'),
             disabled: attachedGripper == null,
-            onClick: () => {
-              setShowAboutGripperSlideout(true)
-            },
+            onClick: () => setShowAboutGripperSlideout(true),
           },
         ]
   return (
@@ -194,9 +192,7 @@ export function GripperCard({
         <GripperWizardFlows
           flowType={openWizardFlowType}
           attachedGripper={attachedGripper}
-          closeFlow={() => {
-            setOpenWizardFlowType(null)
-          }}
+          closeFlow={() => setOpenWizardFlowType(null)}
         />
       ) : null}
       {attachedGripper?.ok && showAboutGripperSlideout && (
@@ -204,9 +200,7 @@ export function GripperCard({
           serialNumber={attachedGripper.serialNumber}
           firmwareVersion={attachedGripper.firmwareVersion}
           isExpanded={showAboutGripperSlideout}
-          onCloseClick={() => {
-            setShowAboutGripperSlideout(false)
-          }}
+          onCloseClick={() => setShowAboutGripperSlideout(false)}
         />
       )}
     </>

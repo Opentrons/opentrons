@@ -49,9 +49,7 @@ export function ConnectViaUSB(): JSX.Element {
         >
           <Btn
             left="0"
-            onClick={() => {
-              history.push('/network-setup')
-            }}
+            onClick={() => history.push('/network-setup')}
             position={POSITION_ABSOLUTE}
           >
             <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
@@ -100,9 +98,7 @@ export function ConnectViaUSB(): JSX.Element {
             </Flex>
             <MediumButton
               buttonText={i18n.format(t('shared:continue'), 'capitalize')}
-              onClick={() => {
-                history.push('/emergency-stop')
-              }}
+              onClick={() => history.push('/emergency-stop')}
             />
           </Flex>
         ) : (

@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { vi, it, describe, beforeEach, afterEach } from 'vitest'
-import { screen } from '@testing-library/react'
 import { renderWithProviders } from '../../../__testing-utils__'
 
 import { i18n } from '../../../i18n'
@@ -51,8 +50,8 @@ describe('ConnectViaEthernet', () => {
   })
 
   it('should render TitleHeader component and DisplayConnectionStatus component', () => {
-    render()
-    screen.getByText('mock TitleHeader')
-    screen.getByText('mock DisplayConnectionStatus')
+    const [{ getByText }] = render()
+    getByText('mock TitleHeader')
+    getByText('mock DisplayConnectionStatus')
   })
 })

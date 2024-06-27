@@ -16,42 +16,41 @@ import {
   OVERFLOW_WRAP_BREAK_WORD,
   DISPLAY_FLEX,
   JUSTIFY_SPACE_BETWEEN,
-  TEXT_ALIGN_CENTER,
 } from '@opentrons/components'
 
 import { getIsOnDevice } from '../../redux/config'
-import { useErrorName } from './hooks'
-import { getErrorKind } from './utils'
+import { getErrorKind, useErrorMessage, useErrorName } from './utils'
 import { LargeButton } from '../../atoms/buttons'
 import { RECOVERY_MAP } from './constants'
-import { StepInfo } from './shared'
 
-import type { RobotType } from '@opentrons/shared-data'
-import type { ErrorRecoveryFlowsProps } from '.'
-import type { ERUtilsResults } from './hooks'
+import type { FailedCommand } from './types'
+import type { UseRouteUpdateActionsResult } from './utils'
 
 export function useRunPausedSplash(): boolean {
   return useSelector(getIsOnDevice)
 }
 
-type RunPausedSplashProps = ERUtilsResults & {
-  failedCommand: ErrorRecoveryFlowsProps['failedCommand']
-  protocolAnalysis: ErrorRecoveryFlowsProps['protocolAnalysis']
-  robotType: RobotType
+interface RunPausedSplashProps {
   toggleERWiz: (launchER: boolean) => Promise<void>
+  routeUpdateActions: UseRouteUpdateActionsResult
+  failedCommand: FailedCommand | null
 }
-export function RunPausedSplash(props: RunPausedSplashProps): JSX.Element {
-  const { toggleERWiz, routeUpdateActions, failedCommand } = props
+export function RunPausedSplash({
+  toggleERWiz,
+  routeUpdateActions,
+  failedCommand,
+}: RunPausedSplashProps): JSX.Element {
   const { t } = useTranslation('error_recovery')
   const errorKind = getErrorKind(failedCommand?.error?.errorType)
   const title = useErrorName(errorKind)
+  const subText = useErrorMessage(errorKind)
 
-  const { proceedToRouteAndStep } = routeUpdateActions
+  const { proceedToRoute } = routeUpdateActions
 
   // Do not launch error recovery, but do utilize the wizard's cancel route.
   const onCancelClick = (): Promise<void> => {
     return toggleERWiz(false).then(() =>
-      proceedToRouteAndStep(RECOVERY_MAP.CANCEL_RUN.ROUTE)
+      proceedToRoute(RECOVERY_MAP.CANCEL_RUN.ROUTE)
     )
   }
 
@@ -60,9 +59,6 @@ export function RunPausedSplash(props: RunPausedSplashProps): JSX.Element {
   // TODO(jh 05-22-24): The hardcoded Z-indexing is non-ideal but must be done to keep the splash page above
   // several components in the RunningProtocol page. Investigate why these components have seemingly arbitrary zIndex values
   // and devise a better solution to layering modals.
-
-  // TODO(jh 06-07-24): Although unlikely, it's possible that the server doesn't return a failedCommand. Need to handle
-  // this here or within ER flows.
   return (
     <Flex
       display={DISPLAY_FLEX}
@@ -73,7 +69,7 @@ export function RunPausedSplash(props: RunPausedSplashProps): JSX.Element {
       position={POSITION_ABSOLUTE}
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing60}
-      paddingY={SPACING.spacing40}
+      padding={SPACING.spacing40}
       backgroundColor={COLORS.red50}
       zIndex={5}
     >
@@ -83,14 +79,7 @@ export function RunPausedSplash(props: RunPausedSplashProps): JSX.Element {
           <SplashHeader>{title}</SplashHeader>
         </Flex>
         <Flex width="49rem" justifyContent={JUSTIFY_CENTER}>
-          <StepInfo
-            {...props}
-            as="h3Bold"
-            overflow="hidden"
-            overflowWrap={OVERFLOW_WRAP_BREAK_WORD}
-            color={COLORS.white}
-            textAlign={TEXT_ALIGN_CENTER}
-          />
+          <SplashBody>{subText}</SplashBody>
         </Flex>
       </SplashFrame>
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} gridGap={SPACING.spacing16}>
@@ -115,9 +104,22 @@ export function RunPausedSplash(props: RunPausedSplashProps): JSX.Element {
 
 const SplashHeader = styled.h1`
   font-weight: ${TYPOGRAPHY.fontWeightBold};
-  text-align: ${TYPOGRAPHY.textAlignCenter};
+  text-align: ${TYPOGRAPHY.textAlignLeft};
   font-size: ${TYPOGRAPHY.fontSize80};
   line-height: ${TYPOGRAPHY.lineHeight96};
+  color: ${COLORS.white};
+`
+const SplashBody = styled.h4`
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  overflow: hidden;
+  overflow-wrap: ${OVERFLOW_WRAP_BREAK_WORD};
+  font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
+  text-align: ${TYPOGRAPHY.textAlignCenter};
+  text-transform: ${TYPOGRAPHY.textTransformCapitalize};
+  font-size: ${TYPOGRAPHY.fontSize32};
+  line-height: ${TYPOGRAPHY.lineHeight42};
   color: ${COLORS.white};
 `
 

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { vi, it, describe, expect, beforeEach } from 'vitest'
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent } from '@testing-library/react'
 
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
 
@@ -105,9 +105,9 @@ describe('ChangePipette', () => {
     vi.mocked(InProgressModal).mockReturnValue(
       <div>mock in progress modal</div>
     )
-    render(props)
-    screen.getByText('Attach a pipette')
-    screen.getByText('mock in progress modal')
+    const { getByText } = render(props)
+    getByText('Attach a pipette')
+    getByText('mock in progress modal')
   })
 
   it('renders the wizard pages for attaching a pipette and clicking on the exit button will render the exit modal', () => {
@@ -116,29 +116,29 @@ describe('ChangePipette', () => {
     )
     vi.mocked(ExitModal).mockReturnValue(<div>mock exit modal</div>)
 
-    render(props)
+    const { getByText, getByLabelText, getByRole } = render(props)
     //  Clear deck modal page
-    let exit = screen.getByLabelText('Exit')
-    screen.getByText('Attach a pipette')
-    screen.getByText('Before you begin')
-    screen.getByText(
+    let exit = getByLabelText('Exit')
+    getByText('Attach a pipette')
+    getByText('Before you begin')
+    getByText(
       'Before starting, remove all labware from the deck and all tips from pipettes. The gantry will move to the front of the robot.'
     )
     fireEvent.click(exit)
     expect(props.closeModal).toHaveBeenCalled()
 
-    const cont = screen.getByRole('button', { name: 'Get started' })
+    const cont = getByRole('button', { name: 'Get started' })
     fireEvent.click(cont)
 
     //  Instructions page
-    screen.getByText('Attach a pipette')
-    screen.getByText('mock pipette selection')
-    exit = screen.getByLabelText('Exit')
+    getByText('Attach a pipette')
+    getByText('mock pipette selection')
+    exit = getByLabelText('Exit')
     fireEvent.click(exit)
 
     //  Exit modal page
-    screen.getByText('mock exit modal')
-    screen.getByText('Attach a pipette')
+    getByText('mock exit modal')
+    getByText('Attach a pipette')
   })
 
   it('the go back button functions as expected', () => {
@@ -146,29 +146,29 @@ describe('ChangePipette', () => {
       <div>mock pipette selection</div>
     )
 
-    render(props)
+    const { getByText, getByRole } = render(props)
     //  Clear deck modal page
-    screen.getByText('Before you begin')
-    const cont = screen.getByRole('button', { name: 'Get started' })
+    getByText('Before you begin')
+    const cont = getByRole('button', { name: 'Get started' })
     fireEvent.click(cont)
 
     //  Instructions page
-    const goBack = screen.getByRole('button', { name: 'Go back' })
+    const goBack = getByRole('button', { name: 'Go back' })
     fireEvent.click(goBack)
-    screen.getByText('Before you begin')
+    getByText('Before you begin')
   })
 
   it('renders the wizard pages for attaching a pipette and goes through flow', () => {
     vi.mocked(PipetteSelection).mockReturnValue(
       <div>mock pipette selection</div>
     )
-    render(props)
+    const { getByText, getByRole } = render(props)
     //  Clear deck modal page
-    const cont = screen.getByRole('button', { name: 'Get started' })
+    const cont = getByRole('button', { name: 'Get started' })
     fireEvent.click(cont)
 
     //  Instructions page
-    screen.getByText('Attach a pipette')
+    getByText('Attach a pipette')
   })
 
   it('renders the wizard pages for detaching a single channel pipette and exits on the 2nd page rendering exit modal', () => {
@@ -186,43 +186,43 @@ describe('ChangePipette', () => {
       left: mockAttachedPipettes as AttachedPipette,
       right: null,
     })
-    render(props)
+    const { getByText, getByLabelText, getByRole } = render(props)
 
     //  Clear deck modal page
-    screen.getByLabelText('Exit')
-    screen.getByText('Detach P300 Single GEN2 from Left Mount')
-    screen.getByText('Before you begin')
-    screen.getByText(
+    getByLabelText('Exit')
+    getByText('Detach P300 Single GEN2 from Left Mount')
+    getByText('Before you begin')
+    getByText(
       'Before starting, remove all labware from the deck and all tips from pipettes. The gantry will move to the front of the robot.'
     )
-    let cont = screen.getByRole('button', { name: 'Get started' })
+    let cont = getByRole('button', { name: 'Get started' })
     fireEvent.click(cont)
 
     //  Instructions page 1
-    screen.getByText('Detach P300 Single GEN2 from Left Mount')
-    screen.getByText('Step 1 / 3')
-    screen.getByText('Loosen the screws')
-    screen.getByText(
+    getByText('Detach P300 Single GEN2 from Left Mount')
+    getByText('Step 1 / 3')
+    getByText('Loosen the screws')
+    getByText(
       'Using a 2.5 mm screwdriver, loosen the three screws on the back of the pipette that is currently attached.'
     )
-    cont = screen.getByRole('button', { name: 'Continue' })
+    cont = getByRole('button', { name: 'Continue' })
     fireEvent.click(cont)
 
     //  Instructions page 2
-    screen.getByText('Detach P300 Single GEN2 from Left Mount')
-    screen.getByText('Step 2 / 3')
-    screen.getByText('Remove the pipette')
-    screen.getByText(
+    getByText('Detach P300 Single GEN2 from Left Mount')
+    getByText('Step 2 / 3')
+    getByText('Remove the pipette')
+    getByText(
       'Hold onto the pipette so it does not fall. Disconnect the pipette from the robot by pulling the white connector tab.'
     )
-    screen.getByLabelText('Confirm')
-    const exit = screen.getByLabelText('Exit')
+    getByLabelText('Confirm')
+    const exit = getByLabelText('Exit')
     fireEvent.click(exit)
 
     //  Exit modal page
-    screen.getByText('Detach P300 Single GEN2 from Left Mount')
-    screen.getByText('Step 2 / 3')
-    screen.getByText('mock exit modal')
+    getByText('Detach P300 Single GEN2 from Left Mount')
+    getByText('Step 2 / 3')
+    getByText('mock exit modal')
   })
 
   it('renders the wizard pages for detaching a single channel pipette and goes through the whole flow', () => {
@@ -231,17 +231,17 @@ describe('ChangePipette', () => {
       left: mockAttachedPipettes as AttachedPipette,
       right: null,
     })
-    render(props)
+    const { getByLabelText, getByRole } = render(props)
 
     //  Clear deck modal page
-    let cont = screen.getByRole('button', { name: 'Get started' })
+    let cont = getByRole('button', { name: 'Get started' })
     fireEvent.click(cont)
 
     //  Instructions page 1
-    cont = screen.getByRole('button', { name: 'Continue' })
+    cont = getByRole('button', { name: 'Continue' })
     fireEvent.click(cont)
 
     //  Instructions page 2
-    screen.getByLabelText('Confirm')
+    getByLabelText('Confirm')
   })
 })

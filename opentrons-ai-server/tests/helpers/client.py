@@ -78,7 +78,7 @@ class Client:
 
     def get_options(self) -> Response:
         """Call the OPTIONS endpoint and return the response."""
-        return self.httpx.options("/chat/completions", headers=self.type_headers)
+        return self.httpx.options("/", headers=self.type_headers)
 
 
 def print_response(response: Response) -> None:

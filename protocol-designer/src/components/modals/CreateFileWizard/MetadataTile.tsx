@@ -101,17 +101,8 @@ export function MetadataTile(props: WizardTileProps): JSX.Element {
           justifyContent={JUSTIFY_SPACE_BETWEEN}
           width="100%"
         >
-          <GoBack
-            onClick={() => {
-              goBack()
-            }}
-          />
-          <PrimaryButton
-            onClick={() => {
-              proceed()
-            }}
-            disabled={disableProceed}
-          >
+          <GoBack onClick={() => goBack()} />
+          <PrimaryButton onClick={() => proceed()} disabled={disableProceed}>
             {t('application:next')}
           </PrimaryButton>
         </Flex>

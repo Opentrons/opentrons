@@ -6,6 +6,7 @@ context('Tubes and Block', () => {
   beforeEach(() => {
     cy.visit('/create')
     cy.viewport('macbook-15')
+    cy.contains('NO').click({ force: true })
 
     cy.get('label')
       .contains('What type of labware are you creating?')

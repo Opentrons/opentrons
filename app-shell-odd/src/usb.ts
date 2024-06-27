@@ -29,9 +29,7 @@ const enumerateMassStorage = (path: string): Promise<string[]> =>
         ? new Promise<void>(resolve =>
             setTimeout(resolve, MOUNT_ENUMERATION_DELAY_MS)
           )
-        : new Promise<void>(resolve => {
-            resolve()
-          })
+        : new Promise<void>(resolve => resolve())
     )
     .then(() => fsPromises.readdir(path, { withFileTypes: true }))
     .then(entries =>
@@ -39,9 +37,9 @@ const enumerateMassStorage = (path: string): Promise<string[]> =>
         entries.map(entry =>
           entry.isDirectory() && !isWeirdDirectoryAndShouldSkip(entry.name)
             ? enumerateMassStorage(join(path, entry.name))
-            : new Promise<string[]>(resolve => {
+            : new Promise<string[]>(resolve =>
                 resolve([join(path, entry.name)])
-              })
+              )
         )
       )
     )

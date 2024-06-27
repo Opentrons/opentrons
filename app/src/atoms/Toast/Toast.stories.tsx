@@ -37,14 +37,7 @@ const TemplateWithTimeout: Story<React.ComponentProps<typeof Toast>> = args => {
           </StyledText>
         </Flex>
       </Flex>
-      {isShowToast && (
-        <Toast
-          {...args}
-          onClose={() => {
-            setIsShowToast(false)
-          }}
-        />
-      )}
+      {isShowToast && <Toast {...args} onClose={() => setIsShowToast(false)} />}
     </>
   )
 }

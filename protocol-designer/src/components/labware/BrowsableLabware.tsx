@@ -22,7 +22,7 @@ interface Props {
 export function BrowsableLabware(props: Props): JSX.Element | null {
   const { definition, ingredNames, wellContents } = props
   const liquidDisplayColors = useSelector(selectors.getLiquidDisplayColors)
-  if (definition == null) {
+  if (!definition) {
     console.assert(definition, 'BrowseLabwareModal expected definition')
     return null
   }
@@ -50,13 +50,14 @@ export function BrowsableLabware(props: Props): JSX.Element | null {
                   {}
                 )
           }
-          onMouseEnterWell={({ event, wellName }) => {
-            if (wellContents !== null)
-              makeHandleMouseEnterWell(
-                wellName,
-                wellContents[wellName].ingreds
-              )(event)
-          }}
+          onMouseEnterWell={({ event, wellName }) =>
+            wellContents === null
+              ? null
+              : makeHandleMouseEnterWell(
+                  wellName,
+                  wellContents[wellName].ingreds
+                )(event)
+          }
           onMouseLeaveWell={handleMouseLeaveWell}
         />
       )}

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { describe, it, beforeEach, afterEach, vi } from 'vitest'
-import { screen } from '@testing-library/react'
+import { screen, cleanup } from '@testing-library/react'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { getHeaterShakerLabwareOptions } from '../../../../ui/modules/selectors'
 import { i18n } from '../../../../localization'
@@ -111,6 +111,7 @@ describe('HeaterShakerForm', () => {
   })
   afterEach(() => {
     vi.restoreAllMocks()
+    cleanup()
   })
   it('should render a title', () => {
     render(props)

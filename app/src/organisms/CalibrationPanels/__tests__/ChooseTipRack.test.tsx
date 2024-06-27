@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent } from '@testing-library/react'
 import { vi, it, describe, expect, beforeEach } from 'vitest'
 
 import { usePipettesQuery } from '@opentrons/react-api-client'
@@ -64,30 +64,30 @@ describe('ChooseTipRack', () => {
   })
 
   it('renders the correct text', () => {
-    render(props)
-    screen.getByText('Choose a tip rack')
-    screen.getByText('select tip rack')
-    screen.getByText('mock select')
-    screen.getByText(
+    const { getByText, getByAltText } = render(props)
+    getByText('Choose a tip rack')
+    getByText('select tip rack')
+    getByText('mock select')
+    getByText(
       'Choose what tip rack you’d like to use to calibrate your tip length.'
     )
-    screen.getByText('Want to use a tip rack that’s not listed here?')
+    getByText('Want to use a tip rack that’s not listed here?')
 
-    screen.getByText(
+    getByText(
       'Opentrons tip racks are highly recommended. Accuracy cannot be guaranteed with other tip racks.'
     )
-    screen.getByText('300ul Tiprack FIXTURE')
-    screen.getByAltText('300ul Tiprack FIXTURE image')
-    screen.getByText(
+    getByText('300ul Tiprack FIXTURE')
+    getByAltText('300ul Tiprack FIXTURE image')
+    getByText(
       'It’s extremely important to perform this calibration using the Opentrons tips and tip racks specified above, as the robot determines accuracy based on the known measurements of these tips.'
     )
   })
 
   it('renders the buttons and they work as expected', () => {
-    render(props)
-    screen.getByRole('link', { name: 'Need help?' })
-    const cancel = screen.getByRole('button', { name: 'cancel' })
-    const confirm = screen.getByRole('button', { name: 'Confirm tip rack' })
+    const { getByRole } = render(props)
+    getByRole('link', { name: 'Need help?' })
+    const cancel = getByRole('button', { name: 'cancel' })
+    const confirm = getByRole('button', { name: 'Confirm tip rack' })
     fireEvent.click(cancel)
     expect(props.closeModal).toHaveBeenCalled()
     fireEvent.click(confirm)

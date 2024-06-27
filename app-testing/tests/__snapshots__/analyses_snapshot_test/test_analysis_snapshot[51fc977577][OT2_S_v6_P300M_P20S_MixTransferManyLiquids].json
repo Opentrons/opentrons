@@ -5408,7 +5408,6 @@
       "pipetteName": "p300_multi_gen2"
     }
   ],
-  "result": "ok",
   "robotType": "OT-2 Standard",
   "runTimeParameters": []
 }

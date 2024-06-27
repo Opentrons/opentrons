@@ -24,9 +24,7 @@ const Template: Story<React.ComponentProps<typeof InputFieldComponent>> = ({
         error={error}
         secondaryCaption={secondaryCaption}
         value={controlledValue}
-        onChange={e => {
-          setControlledValue(e.target.value)
-        }}
+        onChange={e => setControlledValue(e.target.value)}
       />
     </Box>
   )

@@ -62,9 +62,7 @@ export function subscribe(ip: string, topic: NotifyTopic): Promise<void> {
             robotName,
             topic,
           })
-            .then(() => {
-              sendDeserializedRefetch(ip, topic)
-            })
+            .then(() => sendDeserializedRefetch(ip, topic))
             .catch((error: Error) => {
               notifyLog.debug(error.message)
               sendDeserializedGenericError(ip, topic)

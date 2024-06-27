@@ -347,6 +347,8 @@ class OT3Simulator(FlexBackend):
         threshold_pascals: float,
         output_format: OutputOptions = OutputOptions.can_bus_only,
         data_files: Optional[Dict[InstrumentProbeType, str]] = None,
+        auto_zero_sensor: bool = True,
+        num_baseline_reads: int = 10,
         probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
     ) -> float:
         z_axis = Axis.by_mount(mount)
@@ -747,9 +749,7 @@ class OT3Simulator(FlexBackend):
         distance_mm: float,
         speed_mm_per_s: float,
         sensor_threshold_pf: float,
-        probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
-        output_format: OutputOptions = OutputOptions.sync_only,
-        data_files: Optional[Dict[InstrumentProbeType, str]] = None,
+        probe: InstrumentProbeType,
     ) -> bool:
         self._position[moving] += distance_mm
         return True

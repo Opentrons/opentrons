@@ -133,9 +133,7 @@ export function RobotSettingsAdvanced({
         {showRenameRobotSlideout && (
           <RenameRobotSlideout
             isExpanded={showRenameRobotSlideout}
-            onCloseClick={() => {
-              setShowRenameRobotSlideout(false)
-            }}
+            onCloseClick={() => setShowRenameRobotSlideout(false)}
             robotName={robotName}
           />
         )}
@@ -143,9 +141,7 @@ export function RobotSettingsAdvanced({
           <FactoryModeSlideout
             isExpanded={showFactoryModeSlideout}
             isRobotBusy={isRobotBusy || isEstopNotDisengaged}
-            onCloseClick={() => {
-              setShowFactoryModeSlideout(false)
-            }}
+            onCloseClick={() => setShowFactoryModeSlideout(false)}
             robotName={robotName}
             sn={sn}
           />
@@ -153,9 +149,7 @@ export function RobotSettingsAdvanced({
         {showDeviceResetSlideout && (
           <DeviceResetSlideout
             isExpanded={showDeviceResetSlideout}
-            onCloseClick={() => {
-              setShowDeviceResetSlideout(false)
-            }}
+            onCloseClick={() => setShowDeviceResetSlideout(false)}
             robotName={robotName}
             updateResetStatus={updateResetStatus}
           />
@@ -163,9 +157,7 @@ export function RobotSettingsAdvanced({
         {showDeviceResetModal &&
           createPortal(
             <DeviceResetModal
-              closeModal={() => {
-                setShowDeviceResetModal(false)
-              }}
+              closeModal={() => setShowDeviceResetModal(false)}
               isRobotReachable={isRobotReachable}
               robotName={robotName}
               resetOptions={resetOptions}
@@ -215,10 +207,8 @@ export function RobotSettingsAdvanced({
         <Divider marginY={SPACING.spacing16} />
         <UpdateRobotSoftware
           robotName={robotName}
-          isRobotBusy={isRobotBusy}
-          onUpdateStart={() => {
-            handleUpdateBuildroot(robot)
-          }}
+          isRobotBusy={isRobotBusy || isEstopNotDisengaged}
+          onUpdateStart={() => handleUpdateBuildroot(robot)}
         />
         {isFlex ? (
           <>
@@ -230,7 +220,10 @@ export function RobotSettingsAdvanced({
             />
           </>
         ) : null}
-        <Troubleshooting robotName={robotName} />
+        <Troubleshooting
+          robotName={robotName}
+          isEstopNotDisengaged={isEstopNotDisengaged}
+        />
         <Divider marginY={SPACING.spacing16} />
         <DeviceReset
           updateIsExpanded={updateIsExpanded}

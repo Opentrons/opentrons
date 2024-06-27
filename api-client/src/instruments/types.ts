@@ -1,4 +1,4 @@
-import type { PipetteChannels, PipetteModel } from '@opentrons/shared-data'
+import type { PipetteModel } from '@opentrons/shared-data'
 
 export type InstrumentData = PipetteData | GripperData | BadPipette | BadGripper
 
@@ -38,7 +38,7 @@ export interface GripperData {
 }
 export interface PipetteData {
   data: {
-    channels: PipetteChannels
+    channels: number
     min_volume: number
     max_volume: number
     calibratedOffset?: {

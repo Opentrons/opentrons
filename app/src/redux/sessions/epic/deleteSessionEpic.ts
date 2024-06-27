@@ -13,8 +13,7 @@ import type {
   ResponseToActionMapper,
 } from '../../robot-api/operators'
 
-import type { DeleteSessionAction, SessionResponse } from '../types'
-import type { RobotApiV2ErrorResponseBody } from '../../robot-api/types'
+import type { DeleteSessionAction } from '../types'
 
 const mapActionToRequest: ActionToRequestMapper<DeleteSessionAction> = action => ({
   method: DELETE,
@@ -29,11 +28,11 @@ const mapResponseToAction: ResponseToActionMapper<DeleteSessionAction> = (
   const meta = { ...originalAction.meta, response: responseMeta }
 
   return response.ok
-    ? Actions.deleteSessionSuccess(host.name, body as SessionResponse, meta)
+    ? Actions.deleteSessionSuccess(host.name, body, meta)
     : Actions.deleteSessionFailure(
         host.name,
         originalAction.payload.sessionId,
-        body as RobotApiV2ErrorResponseBody,
+        body,
         meta
       )
 }

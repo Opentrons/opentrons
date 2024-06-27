@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { vi, describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 import { BORDERS, COLORS, SPACING } from '@opentrons/components'
 import { renderWithProviders } from '../../../__testing-utils__'
 
@@ -17,7 +17,6 @@ describe('ListItem', () => {
     props = {
       type: 'error',
       children: <div>mock listitem content</div>,
-      onClick: vi.fn(),
     }
   })
 
@@ -63,11 +62,5 @@ describe('ListItem', () => {
       `padding: ${SPACING.spacing16} ${SPACING.spacing24}`
     )
     expect(listItem).toHaveStyle(`borderRadius: ${BORDERS.borderRadius12}`)
-  })
-  it('should call on click when pressed', () => {
-    render(props)
-    const listItem = screen.getByText('mock listitem content')
-    fireEvent.click(listItem)
-    expect(props.onClick).toHaveBeenCalled()
   })
 })

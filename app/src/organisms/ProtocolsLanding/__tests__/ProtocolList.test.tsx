@@ -136,8 +136,8 @@ describe('ProtocolList', () => {
   })
 
   it('renders Alphabetical as the sort key when alphabetical was selected last time', () => {
-    render(props)
-    screen.getByText('Alphabetical')
+    const { getByText } = render(props)
+    getByText('Alphabetical')
   })
 
   it('renders Oldest updates as the sort key when oldest was selected last time', () => {

@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { vi, it, describe, beforeEach } from 'vitest'
-import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
@@ -24,8 +23,8 @@ describe('PipetteSelection', () => {
     vi.mocked(PipetteSelect).mockReturnValue(<div>mock pipette select</div>)
   })
   it('renders the text for pipette selection', () => {
-    render(props)
-    screen.getByText('Choose a pipette to attach')
-    screen.getByText('mock pipette select')
+    const { getByText } = render(props)
+    getByText('Choose a pipette to attach')
+    getByText('mock pipette select')
   })
 })

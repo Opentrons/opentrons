@@ -168,9 +168,7 @@ function TryAgainButton(props: ConfirmPipetteProps): JSX.Element {
       <>
         <SecondaryButton
           marginRight={SPACING.spacing8}
-          onClick={() => {
-            setWrongWantedPipette(actualPipette)
-          }}
+          onClick={() => setWrongWantedPipette(actualPipette)}
           disabled={isDisabled}
         >
           {t('use_attached_pipette')}

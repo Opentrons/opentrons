@@ -15,13 +15,7 @@ import { rootReducer as stepFormsReducer } from './step-forms'
 import { rootReducer as tutorialReducer } from './tutorial'
 import { rootReducer as uiReducer } from './ui'
 import { rootReducer as wellSelectionReducer } from './well-selection/reducers'
-import type {
-  Store,
-  Reducer,
-  CombinedState,
-  StoreEnhancer,
-  Middleware,
-} from 'redux'
+import type { Store, Reducer } from 'redux'
 import type { BaseState, Action } from './types'
 
 const timelineMiddleware = makeTimelineMiddleware()
@@ -42,7 +36,7 @@ function getRootReducer(): Reducer<BaseState, Action> {
   })
   // TODO: Ian 2019-06-25 consider making file loading non-committal
   // so UNDO_LOAD_FILE doesnt' just reset Redux state
-  return (state, action) => {
+  return (state: any, action) => {
     if (
       action.type === 'LOAD_FILE' ||
       action.type === 'CREATE_NEW_PROTOCOL' ||
@@ -59,7 +53,7 @@ function getRootReducer(): Reducer<BaseState, Action> {
           if (e instanceof Error) {
             // something in the reducers went wrong, show it to the user for bug report
             return rootReducer(
-              state as CombinedState<BaseState>,
+              state,
               fileUploadMessage({
                 isError: true,
                 errorType: 'INVALID_JSON_FILE',
@@ -88,12 +82,8 @@ export function configureStore(): StoreType {
     reducer,
     /* preloadedState, */
     composeEnhancers(
-      applyMiddleware(
-        trackEventMiddleware as Middleware<BaseState, Record<string, any>, any>,
-        timelineMiddleware as Middleware<BaseState, Record<string, any>, any>,
-        thunk
-      )
-    ) as StoreEnhancer<unknown, unknown>
+      applyMiddleware(trackEventMiddleware, timelineMiddleware, thunk)
+    )
   )
   // initial rehydration, and persistence subscriber
   store.dispatch(rehydratePersistedAction())

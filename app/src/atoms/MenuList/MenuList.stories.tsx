@@ -1,32 +1,27 @@
 import * as React from 'react'
-import { action } from '@storybook/addon-actions'
-import { MenuList as MenuListComponent } from './index'
+import { MenuList } from './index'
 import { MenuItem } from './MenuItem'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Story, Meta } from '@storybook/react'
+
+export default {
+  title: 'App/Atoms/MenuList',
+  component: MenuList,
+  onClick: { action: 'clicked' },
+} as Meta
+
+const Template: Story<React.ComponentProps<typeof MenuList>> = args => (
+  <MenuList {...args} />
+)
 
 const menuBtn = 'example menu btn'
-
-const meta: Meta<typeof MenuListComponent> = {
-  title: 'App/Atoms/MenuList',
-  component: MenuListComponent,
-  args: {
-    onClick: action('clicked'),
-  },
-}
-
-export default meta
-
-type Story = StoryObj<typeof MenuListComponent>
-
-export const MenuList: Story = {
-  args: {
-    children: (
-      <>
-        <MenuItem>{menuBtn}</MenuItem>
-        <MenuItem>{menuBtn}</MenuItem>
-        <MenuItem>{menuBtn}</MenuItem>
-      </>
-    ),
-  },
+export const Primary = Template.bind({})
+Primary.args = {
+  children: (
+    <>
+      <MenuItem>{menuBtn}</MenuItem>
+      <MenuItem>{menuBtn}</MenuItem>
+      <MenuItem>{menuBtn}</MenuItem>
+    </>
+  ),
 }

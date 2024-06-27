@@ -99,9 +99,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
       css={selectedValue === liquidId ? ACTIVE_STYLE : LIQUID_CARD_ODD_STYLE}
       borderRadius={BORDERS.borderRadius8}
       backgroundColor={COLORS.white}
-      onClick={() => {
-        setSelectedValue(liquidId)
-      }}
+      onClick={() => setSelectedValue(liquidId)}
       width="19.875rem"
       minHeight="max-content"
       aria-label="liquidBox_odd"

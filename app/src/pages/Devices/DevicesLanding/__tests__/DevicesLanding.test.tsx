@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent } from '@testing-library/react'
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
@@ -53,18 +53,18 @@ describe('DevicesLanding', () => {
   })
 
   it('renders a Devices title', () => {
-    render()
+    const [{ getByText }] = render()
 
-    screen.getByText('Devices')
+    getByText('Devices')
   })
 
   it('renders the DevicesEmptyState when no robots are found', () => {
     vi.mocked(getConnectableRobots).mockReturnValue([])
     vi.mocked(getReachableRobots).mockReturnValue([])
     vi.mocked(getUnreachableRobots).mockReturnValue([])
-    render()
+    const [{ getByText }] = render()
 
-    screen.getByText('Mock DevicesEmptyState')
+    getByText('Mock DevicesEmptyState')
   })
 
   it('renders the Looking for robots copy when scanning is true and there are no devices', () => {
@@ -72,9 +72,9 @@ describe('DevicesLanding', () => {
     vi.mocked(getConnectableRobots).mockReturnValue([])
     vi.mocked(getReachableRobots).mockReturnValue([])
     vi.mocked(getUnreachableRobots).mockReturnValue([])
-    render()
+    const [{ getByText }] = render()
 
-    screen.getByText('Looking for robots')
+    getByText('Looking for robots')
   })
 
   it('renders the Icon when scanning is true and there are no devices', () => {
@@ -82,36 +82,36 @@ describe('DevicesLanding', () => {
     vi.mocked(getConnectableRobots).mockReturnValue([])
     vi.mocked(getReachableRobots).mockReturnValue([])
     vi.mocked(getUnreachableRobots).mockReturnValue([])
-    render()
+    const [{ getByLabelText }] = render()
 
-    screen.getByLabelText('ot-spinner')
+    getByLabelText('ot-spinner')
   })
 
   it('renders available and not available sections when both are present', () => {
-    render()
+    const [{ getByText, getByTestId, queryByText }] = render()
 
-    screen.getByText('Mock Robot connectableRobot')
-    screen.getByText('Available (1)')
-    screen.getByText('Not available (2)')
+    getByText('Mock Robot connectableRobot')
+    getByText('Available (1)')
+    getByText('Not available (2)')
 
-    expect(screen.queryByText('Mock Robot unreachableRobot')).toBeNull()
-    expect(screen.queryByText('Mock Robot reachableRobot')).toBeNull()
+    expect(queryByText('Mock Robot unreachableRobot')).toBeNull()
+    expect(queryByText('Mock Robot reachableRobot')).toBeNull()
 
-    const expandButton = screen.getByTestId(
+    const expandButton = getByTestId(
       'CollapsibleSection_expand_Not available (2)'
     )
     fireEvent.click(expandButton)
 
-    screen.getByText('Mock Robot unreachableRobot')
-    screen.getByText('Mock Robot reachableRobot')
+    getByText('Mock Robot unreachableRobot')
+    getByText('Mock Robot reachableRobot')
   })
   it('does not render available or not available sections when none are present', () => {
     vi.mocked(getConnectableRobots).mockReturnValue([])
     vi.mocked(getReachableRobots).mockReturnValue([])
     vi.mocked(getUnreachableRobots).mockReturnValue([])
-    render()
+    const [{ queryByText }] = render()
 
-    expect(screen.queryByText('Available')).toBeNull()
-    expect(screen.queryByText('Not available')).toBeNull()
+    expect(queryByText('Available')).toBeNull()
+    expect(queryByText('Not available')).toBeNull()
   })
 })

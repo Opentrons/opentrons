@@ -76,9 +76,7 @@ export function LiquidDetails(props: LiquidDetailsProps): JSX.Element {
           labwareId={labwareIdModal}
           liquidId={liquid.id}
           runId={runId}
-          closeModal={() => {
-            setLabwareIdModal(null)
-          }}
+          closeModal={() => setLabwareIdModal(null)}
         />
       )}
       <Table>
@@ -99,9 +97,7 @@ export function LiquidDetails(props: LiquidDetailsProps): JSX.Element {
               <TableRow
                 key={labware.labwareId}
                 aria-label={`LiquidDetails_${liquid.id}`}
-                onClick={() => {
-                  setLabwareIdModal(labware.labwareId)
-                }}
+                onClick={() => setLabwareIdModal(labware.labwareId)}
               >
                 <TableDatum>
                   <Flex>

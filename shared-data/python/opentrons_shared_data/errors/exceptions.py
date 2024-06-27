@@ -611,7 +611,7 @@ class MotorDriverError(RoboticsControlError):
         super().__init__(ErrorCodes.MOTOR_DRIVER_ERROR, message, detail, wrapping)
 
 
-class PipetteLiquidNotFoundError(RoboticsControlError):
+class LiquidNotFoundError(RoboticsControlError):
     """Error raised if liquid sensing move completes without detecting liquid."""
 
     def __init__(
@@ -620,27 +620,9 @@ class PipetteLiquidNotFoundError(RoboticsControlError):
         detail: Optional[Dict[str, str]] = None,
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
-        """Initialize PipetteLiquidNotFoundError."""
+        """Initialize LiquidNotFoundError."""
         super().__init__(
-            ErrorCodes.PIPETTE_LIQUID_NOT_FOUND,
-            message,
-            detail,
-            wrapping,
-        )
-
-
-class TipHitWellBottomError(RoboticsControlError):
-    """Error raised if tip hits bottom of well while trying to detect liquid level."""
-
-    def __init__(
-        self,
-        message: Optional[str] = None,
-        detail: Optional[Dict[str, str]] = None,
-        wrapping: Optional[Sequence[EnumeratedError]] = None,
-    ) -> None:
-        """Initialize TipHitWellBottomError."""
-        super().__init__(
-            ErrorCodes.TIP_HIT_WELL_BOTTOM,
+            ErrorCodes.LIQUID_NOT_FOUND,
             message,
             detail,
             wrapping,
@@ -1007,21 +989,3 @@ class InvalidStoredData(GeneralError):
     ) -> None:
         """Build an InvalidStoredData."""
         super().__init__(ErrorCodes.INVALID_STORED_DATA, message, detail, wrapping)
-
-
-class MissingConfigurationData(GeneralError):
-    """An error indicating that provided configuration data is missing or invalid.
-
-    This will usually be because a pipette configuration does not match the ones provided by the pipette definition.
-    """
-
-    def __init__(
-        self,
-        message: Optional[str] = None,
-        detail: Optional[Dict[str, str]] = None,
-        wrapping: Optional[Sequence[EnumeratedError]] = None,
-    ) -> None:
-        """Build an MissingConfigurationData."""
-        super().__init__(
-            ErrorCodes.MISSING_CONFIGURATION_DATA, message, detail, wrapping
-        )

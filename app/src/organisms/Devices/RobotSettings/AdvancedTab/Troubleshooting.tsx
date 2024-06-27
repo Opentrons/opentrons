@@ -27,15 +27,17 @@ import type { IconProps } from '@opentrons/components'
 
 interface TroubleshootingProps {
   robotName: string
+  isEstopNotDisengaged: boolean
 }
 
 export function Troubleshooting({
   robotName,
+  isEstopNotDisengaged,
 }: TroubleshootingProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const robot = useRobot(robotName)
   const controlDisabled = robot?.status !== CONNECTABLE
-  const logsAvailable = robot?.health?.logs != null
+  const logsAvailable = robot?.health != null && robot.health.logs != null
   const [
     isDownloadingRobotLogs,
     setIsDownloadingRobotLogs,
@@ -47,7 +49,7 @@ export function Troubleshooting({
 
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = () => {
     setIsDownloadingRobotLogs(true)
-    const toastId = makeToast(t('downloading_logs') as string, INFO_TOAST, {
+    const toastId = makeToast(t('downloading_logs'), INFO_TOAST, {
       disableTimeout: true,
       icon: toastIcon,
     })
@@ -125,7 +127,10 @@ export function Troubleshooting({
       </Box>
       <TertiaryButton
         disabled={
-          controlDisabled || logsAvailable == null || isDownloadingRobotLogs
+          controlDisabled ||
+          logsAvailable == null ||
+          isDownloadingRobotLogs ||
+          isEstopNotDisengaged
         }
         marginLeft={SPACING_AUTO}
         onClick={handleClick}

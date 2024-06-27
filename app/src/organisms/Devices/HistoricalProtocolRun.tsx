@@ -74,9 +74,7 @@ export function HistoricalProtocolRun(
         width="100%"
       >
         <Box
-          onClick={() => {
-            setOffsetDrawerOpen(!offsetDrawerOpen)
-          }}
+          onClick={() => setOffsetDrawerOpen(!offsetDrawerOpen)}
           role="button"
         >
           <Icon
@@ -90,11 +88,11 @@ export function HistoricalProtocolRun(
           as="p"
           width="25%"
           data-testid={`RecentProtocolRuns_Run_${String(protocolKey)}`}
-          onClick={() => {
+          onClick={() =>
             history.push(
               `${robotName}/protocol-runs/${run.id}/protocolRunDetailsTab?`
             )
-          }}
+          }
           css={css`
             cursor: pointer;
           `}
@@ -107,9 +105,7 @@ export function HistoricalProtocolRun(
             as="p"
             width="35%"
             data-testid={`RecentProtocolRuns_Protocol_${String(protocolKey)}`}
-            onClick={() => {
-              history.push(`/protocols/${protocolKey}`)
-            }}
+            onClick={() => history.push(`/protocols/${protocolKey}`)}
             css={CLICK_STYLE}
             marginRight={SPACING.spacing16}
             color={COLORS.grey60}

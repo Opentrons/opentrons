@@ -8,10 +8,11 @@
       "status": "succeeded"
     },
     {
-      "commandType": "comment",
+      "commandType": "custom",
       "notes": [],
       "params": {
-        "message": "variable pipette has value flex_1channel_50"
+        "legacyCommandText": "variable pipette has value flex_1channel_50",
+        "legacyCommandType": "command.COMMENT"
       },
       "result": {},
       "status": "succeeded"
@@ -58,7 +59,6 @@
   },
   "modules": [],
   "pipettes": [],
-  "result": "ok",
   "robotType": "OT-2 Standard",
   "runTimeParameters": [
     {

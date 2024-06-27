@@ -49,7 +49,6 @@ import {
 } from '../utils'
 
 import type { Reducer } from 'redux'
-import type { Action as ReduxActionsAction } from 'redux-actions'
 import type {
   NormalizedAdditionalEquipmentById,
   NormalizedPipetteById,
@@ -124,7 +123,6 @@ import type {
   SelectTerminalItemAction,
   SelectMultipleStepsAction,
 } from '../../ui/steps/actions/types'
-import type { Action } from '../../types'
 import type {
   NormalizedLabware,
   NormalizedLabwareById,
@@ -370,12 +368,8 @@ export const unsavedForm = (
         unsavedFormState.orderedProfileItems.includes(id) &&
         unsavedFormState.profileItemsById[id].type === PROFILE_STEP
       const filteredItemsById = isTopLevelProfileStep
-        ? omitTopLevelSteps(
-            unsavedFormState.profileItemsById as Record<string, ProfileItem>
-          )
-        : omitCycleSteps(
-            unsavedFormState.profileItemsById as Record<string, ProfileItem>
-          )
+        ? omitTopLevelSteps(unsavedFormState.profileItemsById)
+        : omitCycleSteps(unsavedFormState.profileItemsById)
       const filteredOrderedProfileItems = isTopLevelProfileStep
         ? unsavedFormState.orderedProfileItems.filter(
             (itemId: string) => itemId !== id
@@ -440,7 +434,7 @@ export const unsavedForm = (
         // it's a step in a cycle. Get the cycle id, and the index of our edited step in that cycle's `steps` array
         let editedStepIndex = -1
         const cycleId: string | undefined = Object.keys(
-          unsavedFormState.profileItemsById as Record<string, ProfileItem>
+          unsavedFormState.profileItemsById
         ).find((itemId: string): boolean => {
           const item: ProfileItem = unsavedFormState.profileItemsById[itemId]
 
@@ -533,7 +527,7 @@ export const _editModuleFormUpdate = ({
     savedForm.moduleId === moduleId &&
     savedForm.magnetAction === 'engage'
   ) {
-    const prevEngageHeight = parseFloat(savedForm.engageHeight as string)
+    const prevEngageHeight = parseFloat(savedForm.engageHeight)
 
     if (Number.isFinite(prevEngageHeight)) {
       const initialDeckSetup = _getInitialDeckSetupRootState(rootState)
@@ -653,10 +647,7 @@ export const savedStepForms = (
       const prevInitialDeckSetupStep =
         savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
       const labwareOccupyingDestination = getDeckItemIdInSlot(
-        prevInitialDeckSetupStep.labwareLocationUpdate as Record<
-          string,
-          string
-        >,
+        prevInitialDeckSetupStep.labwareLocationUpdate,
         action.payload.slot
       )
       const moduleId = action.payload.id
@@ -726,19 +717,19 @@ export const savedStepForms = (
             // swap labware/module slots from all manualIntervention steps
             // (or place compatible labware in dest slot onto module)
             const sourceLabwareId = getDeckItemIdInSlot(
-              savedForm.labwareLocationUpdate as Record<string, string>,
+              savedForm.labwareLocationUpdate,
               sourceSlot
             )
             const destLabwareId = getDeckItemIdInSlot(
-              savedForm.labwareLocationUpdate as Record<string, string>,
+              savedForm.labwareLocationUpdate,
               destSlot
             )
             const sourceModuleId = getDeckItemIdInSlot(
-              savedForm.moduleLocationUpdate as Record<string, string>,
+              savedForm.moduleLocationUpdate,
               sourceSlot
             )
             const destModuleId = getDeckItemIdInSlot(
-              savedForm.moduleLocationUpdate as Record<string, string>,
+              savedForm.moduleLocationUpdate,
               destSlot
             )
 
@@ -756,7 +747,7 @@ export const savedStepForms = (
               )
               const moduleIsOccupied =
                 getDeckItemIdInSlot(
-                  savedForm.labwareLocationUpdate as Record<string, string>,
+                  savedForm.labwareLocationUpdate,
                   sourceModuleId
                 ) != null
 
@@ -863,7 +854,7 @@ export const savedStepForms = (
                 deletedPipetteIds
               ),
             }
-          } else if (deletedPipetteIds.includes(form.pipette as string)) {
+          } else if (deletedPipetteIds.includes(form.pipette)) {
             // TODO(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
             return {
               ...form,
@@ -1045,22 +1036,14 @@ export const savedStepForms = (
           let fieldsToUpdate = {}
 
           if (prevStepForm.stepType === 'moveLiquid') {
-            if (
-              labwareIdsToDeselect.includes(
-                prevStepForm.aspirate_labware as string
-              )
-            ) {
+            if (labwareIdsToDeselect.includes(prevStepForm.aspirate_labware)) {
               fieldsToUpdate = {
                 ...fieldsToUpdate,
                 aspirate_wells: defaults.aspirate_wells,
               }
             }
 
-            if (
-              labwareIdsToDeselect.includes(
-                prevStepForm.dispense_labware as string
-              )
-            ) {
+            if (labwareIdsToDeselect.includes(prevStepForm.dispense_labware)) {
               fieldsToUpdate = {
                 ...fieldsToUpdate,
                 dispense_wells: defaults.dispense_wells,
@@ -1068,7 +1051,7 @@ export const savedStepForms = (
             }
           } else if (
             prevStepForm.stepType === 'mix' &&
-            labwareIdsToDeselect.includes(prevStepForm.labware as string)
+            labwareIdsToDeselect.includes(prevStepForm.labware)
           ) {
             fieldsToUpdate = {
               wells: defaults.wells,
@@ -1366,14 +1349,13 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
         command =>
           (command.commandType === 'moveToAddressableArea' &&
             WASTE_CHUTE_ADDRESSABLE_AREAS.includes(
-              command.params.addressableAreaName as AddressableAreaName
+              command.params.addressableAreaName
             )) ||
           (command.commandType === 'moveLabware' &&
             command.params.newLocation !== 'offDeck' &&
             'addressableAreaName' in command.params.newLocation &&
             WASTE_CHUTE_ADDRESSABLE_AREAS.includes(
-              command.params.newLocation
-                .addressableAreaName as AddressableAreaName
+              command.params.newLocation.addressableAreaName
             ))
       )
       const getStagingAreaSlotNames = (
@@ -1387,8 +1369,7 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
               command.params[locationKey] !== 'offDeck' &&
               'addressableAreaName' in command.params[locationKey] &&
               COLUMN_4_SLOTS.includes(
-                command.params[locationKey]
-                  .addressableAreaName as AddressableAreaName
+                command.params[locationKey].addressableAreaName
               )
           )
           .map(command => command.params[locationKey].addressableAreaName)
@@ -1434,7 +1415,7 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
           | MoveToAddressableAreaForDropTipCreateCommand =>
           (command.commandType === 'moveToAddressableArea' &&
             (MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(
-              command.params.addressableAreaName as AddressableAreaName
+              command.params.addressableAreaName
             ) ||
               command.params.addressableAreaName === 'fixedTrash')) ||
           command.commandType === 'moveToAddressableAreaForDropTip'
@@ -1817,22 +1798,19 @@ export const rootReducer: Reducer<RootState, any> = nestedCombineReducers(
     ),
     additionalEquipmentInvariantProperties: additionalEquipmentInvariantProperties(
       prevStateFallback.additionalEquipmentInvariantProperties,
-      action as ReduxActionsAction<NormalizedAdditionalEquipmentById>
+      action
     ),
-    labwareDefs: labwareDefsRootReducer(
-      prevStateFallback.labwareDefs,
-      action as Action
-    ),
+    labwareDefs: labwareDefsRootReducer(prevStateFallback.labwareDefs, action),
     // 'forms' reducers get full rootReducer state
-    savedStepForms: savedStepForms(state, action as SavedStepFormsActions),
-    unsavedForm: unsavedForm(state, action as UnsavedFormActions),
+    savedStepForms: savedStepForms(state, action),
+    unsavedForm: unsavedForm(state, action),
     presavedStepForm: presavedStepForm(
       prevStateFallback.presavedStepForm,
-      action as PresavedStepFormAction
+      action
     ),
     batchEditFormChanges: batchEditFormChanges(
       prevStateFallback.batchEditFormChanges,
-      action as BatchEditFormActions
+      action
     ),
   })
 )

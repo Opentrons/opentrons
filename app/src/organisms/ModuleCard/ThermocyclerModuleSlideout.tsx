@@ -144,9 +144,7 @@ export const ThermocyclerModuleSlideout = (
             units={CELSIUS}
             value={tempValue != null ? Math.round(tempValue) : null}
             autoFocus
-            onChange={e => {
-              setTempValue(e.target.valueAsNumber)
-            }}
+            onChange={e => setTempValue(e.target.valueAsNumber)}
             type="number"
             caption={t('module_status_range', {
               min: tempRanges.min,

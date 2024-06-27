@@ -2,13 +2,11 @@
 from typing import List, Optional, cast
 from typing_extensions import Final, Literal
 
+from anyio import move_on_after
 from fastapi import APIRouter, Depends, Query, status
 
-from opentrons.protocol_engine import CommandIntent
+from opentrons.protocol_engine import ProtocolEngine, CommandIntent
 from opentrons.protocol_engine.errors import CommandDoesNotExistError
-
-from opentrons.protocol_runner import RunOrchestrator
-
 from opentrons_shared_data.errors import ErrorCodes
 
 from robot_server.errors.error_responses import ErrorDetails, ErrorBody
@@ -20,7 +18,7 @@ from robot_server.service.json_api import (
     PydanticResponse,
 )
 
-from .get_default_orchestrator import get_default_orchestrator, RunActive
+from .get_default_engine import get_default_engine, RunActive
 from .stateless_commands import StatelessCommand, StatelessCommandCreate
 
 _DEFAULT_COMMAND_LIST_LENGTH: Final = 20
@@ -93,7 +91,7 @@ async def create_command(
             " the default was 30 seconds, not infinite."
         ),
     ),
-    orchestrator: RunOrchestrator = Depends(get_default_orchestrator),
+    engine: ProtocolEngine = Depends(get_default_engine),
 ) -> PydanticResponse[SimpleBody[StatelessCommand]]:
     """Enqueue and execute a command.
 
@@ -104,14 +102,17 @@ async def create_command(
             Else, return immediately. Comes from a query parameter in the URL.
         timeout: The maximum time, in seconds, to wait before returning.
             Comes from a query parameter in the URL.
-        orchestrator: The `RunOrchestrator` handling engine for command to be enqueued.
+        engine: The `ProtocolEngine` on which the command will be enqueued.
     """
     command_create = request_body.data.copy(update={"intent": CommandIntent.SETUP})
-    command = await orchestrator.add_command_and_wait_for_interval(
-        command=command_create, wait_until_complete=waitUntilComplete, timeout=timeout
-    )
+    command = engine.add_command(command_create)
 
-    response_data = cast(StatelessCommand, orchestrator.get_command(command.id))
+    if waitUntilComplete:
+        timeout_sec = None if timeout is None else timeout / 1000.0
+        with move_on_after(timeout_sec):
+            await engine.wait_for_command(command.id)
+
+    response_data = cast(StatelessCommand, engine.state_view.commands.get(command.id))
 
     return await PydanticResponse.create(
         content=SimpleBody.construct(data=response_data),
@@ -133,7 +134,7 @@ async def create_command(
     },
 )
 async def get_commands_list(
-    orchestrator: RunOrchestrator = Depends(get_default_orchestrator),
+    engine: ProtocolEngine = Depends(get_default_engine),
     cursor: Optional[int] = Query(
         None,
         description=(
@@ -150,11 +151,11 @@ async def get_commands_list(
     """Get a list of stateless commands.
 
     Arguments:
-        orchestrator: Run orchestrator with commands.
+        engine: Protocol engine with commands.
         cursor: Cursor index for the collection response.
         pageLength: Maximum number of items to return.
     """
-    cmd_slice = orchestrator.get_command_slice(cursor=cursor, length=pageLength)
+    cmd_slice = engine.state_view.commands.get_slice(cursor=cursor, length=pageLength)
     commands = cast(List[StatelessCommand], cmd_slice.commands)
     meta = MultiBodyMeta(cursor=cmd_slice.cursor, totalLength=cmd_slice.total_length)
 
@@ -180,16 +181,16 @@ async def get_commands_list(
 )
 async def get_command(
     commandId: str,
-    orchestrator: RunOrchestrator = Depends(get_default_orchestrator),
+    engine: ProtocolEngine = Depends(get_default_engine),
 ) -> PydanticResponse[SimpleBody[StatelessCommand]]:
     """Get a single stateless command.
 
     Arguments:
         commandId: Command identifier from the URL parameter.
-        orchestrator: Run orchestrator with commands.
+        engine: Protocol engine with commands.
     """
     try:
-        command = orchestrator.get_command(commandId)
+        command = engine.state_view.commands.get(commandId)
 
     except CommandDoesNotExistError as e:
         raise CommandNotFound.from_exc(e).as_error(status.HTTP_404_NOT_FOUND) from e

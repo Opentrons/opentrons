@@ -1,13 +1,12 @@
 from typing import Dict, Optional, Any
 
-from opentrons.protocols.parameters.types import UserFacingTypes
-from opentrons.protocols.parameters.exceptions import ParameterNameError
+from opentrons.protocols.parameters.types import AllowedTypes, ParameterNameError
 
 
 class Parameters:
-    def __init__(self, parameters: Optional[Dict[str, UserFacingTypes]] = None) -> None:
+    def __init__(self, parameters: Optional[Dict[str, AllowedTypes]] = None) -> None:
         super().__setattr__("_values", {})
-        self._values: Dict[str, UserFacingTypes] = {}
+        self._values: Dict[str, AllowedTypes] = {}
         if parameters is not None:
             for name, value in parameters.items():
                 self._initialize_parameter(name, value)
@@ -17,7 +16,7 @@ class Parameters:
             raise AttributeError(f"Cannot overwrite protocol defined parameter {key}")
         super().__setattr__(key, value)
 
-    def _initialize_parameter(self, variable_name: str, value: UserFacingTypes) -> None:
+    def _initialize_parameter(self, variable_name: str, value: AllowedTypes) -> None:
         if not hasattr(self, variable_name):
             setattr(self, variable_name, value)
             self._values[variable_name] = value
@@ -27,5 +26,5 @@ class Parameters:
                 f" parameter name, Opentrons reserved function, or Python built-in"
             )
 
-    def get_all(self) -> Dict[str, UserFacingTypes]:
+    def get_all(self) -> Dict[str, AllowedTypes]:
         return self._values

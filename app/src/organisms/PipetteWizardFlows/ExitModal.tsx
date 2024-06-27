@@ -38,8 +38,7 @@ export function ExitModal(props: ExitModalProps): JSX.Element {
       break
     }
   }
-  if (Boolean(isRobotMoving))
-    return <InProgressModal description={t('stand_back')} />
+  if (isRobotMoving) return <InProgressModal description={t('stand_back')} />
 
   return (
     <SimpleWizardBody
@@ -54,7 +53,7 @@ export function ExitModal(props: ExitModalProps): JSX.Element {
           <SmallButton
             marginRight={SPACING.spacing8}
             onClick={proceed}
-            buttonText={capitalize(t('shared:exit') as string)}
+            buttonText={capitalize(t('shared:exit'))}
             buttonType="alert"
           />
 

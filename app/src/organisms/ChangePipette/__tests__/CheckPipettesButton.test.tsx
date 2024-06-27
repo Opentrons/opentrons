@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent } from '@testing-library/react'
 import { vi, it, describe, expect, beforeEach } from 'vitest'
 
 import { usePipettesQuery } from '@opentrons/react-api-client'
@@ -37,9 +37,9 @@ describe('CheckPipettesButton', () => {
       onDone: vi.fn(),
       direction: 'attach',
     }
-    render(props)
-    const btn = screen.getByLabelText('Confirm')
-    screen.getByText('Confirm attachment')
+    const { getByLabelText, getByText } = render(props)
+    const btn = getByLabelText('Confirm')
+    getByText('Confirm attachment')
     fireEvent.click(btn)
     expect(refetch).toHaveBeenCalled()
   })
@@ -55,9 +55,9 @@ describe('CheckPipettesButton', () => {
       onDone: vi.fn(),
       direction: 'detach',
     }
-    render(props)
-    const btn = screen.getByLabelText('Confirm')
-    screen.getByText('Confirm detachment')
+    const { getByLabelText, getByText } = render(props)
+    const btn = getByLabelText('Confirm')
+    getByText('Confirm detachment')
     fireEvent.click(btn)
     expect(refetch).toHaveBeenCalled()
   })
@@ -71,10 +71,10 @@ describe('CheckPipettesButton', () => {
       robotName: 'otie',
       onDone: vi.fn(),
     }
-    render(props)
-    const btn = screen.getByLabelText('Confirm')
+    const { getByLabelText } = render(props)
+    const btn = getByLabelText('Confirm')
     fireEvent.click(btn)
-    expect(screen.getByLabelText('Confirm')).toBeDisabled()
+    expect(getByLabelText('Confirm')).toBeDisabled()
   })
 
   it('renders the confirm detachment btn and with children and clicking on it calls fetchPipettes', () => {
@@ -86,11 +86,11 @@ describe('CheckPipettesButton', () => {
     props = {
       ...props,
     }
-    render(props)
-    const btn = screen.getByLabelText('Confirm')
-    screen.getByText('btn text')
+    const { getByLabelText, getByText } = render(props)
+    const btn = getByLabelText('Confirm')
+    getByText('btn text')
     fireEvent.click(btn)
     expect(refetch).toHaveBeenCalled()
-    expect(screen.getByLabelText('Confirm')).toBeDisabled()
+    expect(getByLabelText('Confirm')).toBeDisabled()
   })
 })

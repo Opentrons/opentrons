@@ -256,9 +256,7 @@ export const TestShakeSlideout = (
               autoFocus
               units={RPM}
               value={shakeValue != null ? Math.round(shakeValue) : null}
-              onChange={e => {
-                setShakeValue(e.target.valueAsNumber)
-              }}
+              onChange={e => setShakeValue(e.target.valueAsNumber)}
               type="number"
               caption={t('min_max_rpm', {
                 min: HS_RPM_MIN,
@@ -295,9 +293,7 @@ export const TestShakeSlideout = (
       </Flex>
       {showModuleSetupModal && (
         <ModuleSetupModal
-          close={() => {
-            setShowModuleSetupModal(false)
-          }}
+          close={() => setShowModuleSetupModal(false)}
           moduleDisplayName={getModuleDisplayName(module.moduleModel)}
         />
       )}
@@ -306,9 +302,7 @@ export const TestShakeSlideout = (
         marginTop={SPACING.spacing4}
         css={TYPOGRAPHY.linkPSemiBold}
         id="HeaterShaker_Attachment_Instructions"
-        onClick={() => {
-          setShowModuleSetupModal(true)
-        }}
+        onClick={() => setShowModuleSetupModal(true)}
       >
         {t('show_attachment_instructions')}
       </Link>

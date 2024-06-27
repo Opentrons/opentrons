@@ -38,9 +38,7 @@ export function CollapsibleSection(
     <Flex flexDirection={DIRECTION_COLUMN} {...styleProps}>
       <Flex
         justifyContent={JUSTIFY_SPACE_BETWEEN}
-        onClick={() => {
-          setIsExpanded(!isExpanded)
-        }}
+        onClick={() => setIsExpanded(!isExpanded)}
         css={{
           cursor: 'pointer',
         }}
@@ -49,9 +47,7 @@ export function CollapsibleSection(
           {title}
         </StyledText>
         <Btn
-          onClick={() => {
-            setIsExpanded(!isExpanded)
-          }}
+          onClick={() => setIsExpanded(!isExpanded)}
           data-testid={
             isExpanded
               ? `CollapsibleSection_collapse_${title}`

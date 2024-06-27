@@ -8,19 +8,21 @@
       "status": "succeeded"
     },
     {
-      "commandType": "comment",
+      "commandType": "custom",
       "notes": [],
       "params": {
-        "message": "THIS IS A DRY RUN"
+        "legacyCommandText": "THIS IS A DRY RUN",
+        "legacyCommandType": "command.COMMENT"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "comment",
+      "commandType": "custom",
       "notes": [],
       "params": {
-        "message": "USED TIPS WILL BE RE-RACKED"
+        "legacyCommandText": "USED TIPS WILL BE RE-RACKED",
+        "legacyCommandType": "command.COMMENT"
       },
       "result": {},
       "status": "succeeded"
@@ -1484,11 +1486,6 @@
               "x": 0,
               "y": 0,
               "z": 16.3
-            },
-            "opentrons_96_deep_well_temp_mod_adapter": {
-              "x": 0,
-              "y": 0,
-              "z": 16.1
             }
           },
           "stackingOffsetWithModule": {
@@ -3979,11 +3976,6 @@
               "x": 0,
               "y": 0,
               "z": 16.3
-            },
-            "opentrons_96_deep_well_temp_mod_adapter": {
-              "x": 0,
-              "y": 0,
-              "z": 16.1
             }
           },
           "stackingOffsetWithModule": {
@@ -7565,11 +7557,6 @@
               "x": 0,
               "y": 0,
               "z": 16.3
-            },
-            "opentrons_96_deep_well_temp_mod_adapter": {
-              "x": 0,
-              "y": 0,
-              "z": 16.1
             }
           },
           "stackingOffsetWithModule": {
@@ -9983,11 +9970,6 @@
               "x": 0,
               "y": 0,
               "z": 16.3
-            },
-            "opentrons_96_deep_well_temp_mod_adapter": {
-              "x": 0,
-              "y": 0,
-              "z": 16.1
             }
           },
           "stackingOffsetWithModule": {
@@ -10984,37 +10966,41 @@
       "status": "succeeded"
     },
     {
-      "commandType": "comment",
+      "commandType": "custom",
       "notes": [],
       "params": {
-        "message": "=============================================="
+        "legacyCommandText": "==============================================",
+        "legacyCommandType": "command.COMMENT"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "comment",
+      "commandType": "custom",
       "notes": [],
       "params": {
-        "message": "--> Fragmenting / End Repair / A-Tailing"
+        "legacyCommandText": "--> Fragmenting / End Repair / A-Tailing",
+        "legacyCommandType": "command.COMMENT"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "comment",
+      "commandType": "custom",
       "notes": [],
       "params": {
-        "message": "=============================================="
+        "legacyCommandText": "==============================================",
+        "legacyCommandType": "command.COMMENT"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "comment",
+      "commandType": "custom",
       "notes": [],
       "params": {
-        "message": "--> Adding FRERAT"
+        "legacyCommandText": "--> Adding FRERAT",
+        "legacyCommandType": "command.COMMENT"
       },
       "result": {},
       "status": "succeeded"
@@ -11033,14 +11019,12 @@
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
-      "isDefined": false,
       "wrappedErrors": [
         {
           "detail": "Opentrons Flex 96 Tip Rack 50 µL  with adapter must be on an Opentrons Flex 96 Tip Rack Adapter in order to pick up or return all 96 tips simultaneously.",
           "errorCode": "2004",
           "errorInfo": {},
           "errorType": "UnsuitableTiprackForPipetteMotion",
-          "isDefined": false,
           "wrappedErrors": []
         }
       ]
@@ -11164,7 +11148,6 @@
       "pipetteName": "p1000_96"
     }
   ],
-  "result": "not-ok",
   "robotType": "OT-3 Standard",
   "runTimeParameters": []
 }

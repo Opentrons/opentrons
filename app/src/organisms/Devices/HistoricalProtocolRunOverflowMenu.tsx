@@ -55,9 +55,7 @@ export function HistoricalProtocolRunOverflowMenu(
     setShowOverflowMenu,
   } = useMenuHandleClickOutside()
   const protocolRunOverflowWrapperRef = useOnClickOutside<HTMLDivElement>({
-    onClickOutside: () => {
-      setShowOverflowMenu(false)
-    },
+    onClickOutside: () => setShowOverflowMenu(false),
   })
   const { downloadRunLog, isRunLogLoading } = useDownloadRunLog(
     robotName,
@@ -120,11 +118,10 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
     })?.autoUpdateAction
   )
   const [targetProps, tooltipProps] = useHoverTooltip()
-  const onResetSuccess = (createRunResponse: Run): void => {
+  const onResetSuccess = (createRunResponse: Run): void =>
     history.push(
       `/devices/${robotName}/protocol-runs/${createRunResponse.data.id}/run-preview`
     )
-  }
   const onDownloadClick: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
     e.stopPropagation()

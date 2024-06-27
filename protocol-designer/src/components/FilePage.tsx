@@ -154,9 +154,7 @@ export const FilePage = (): JSX.Element => {
                     name="protocolName"
                     value={protocolName}
                     onChange={field.onChange}
-                    onClick={() => {
-                      setManualDirty(true)
-                    }}
+                    onClick={() => setManualDirty(true)}
                   />
                 )}
               />
@@ -174,9 +172,7 @@ export const FilePage = (): JSX.Element => {
                     name="author"
                     value={author}
                     onChange={field.onChange}
-                    onClick={() => {
-                      setManualDirty(true)
-                    }}
+                    onClick={() => setManualDirty(true)}
                   />
                 )}
               />
@@ -195,9 +191,7 @@ export const FilePage = (): JSX.Element => {
                   name="description"
                   value={description}
                   onChange={field.onChange}
-                  onClick={() => {
-                    setManualDirty(true)
-                  }}
+                  onClick={() => setManualDirty(true)}
                 />
               )}
             />

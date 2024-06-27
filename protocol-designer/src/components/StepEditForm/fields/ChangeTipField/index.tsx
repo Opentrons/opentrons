@@ -54,9 +54,7 @@ export const ChangeTipField = (props: Props): JSX.Element => {
         name={name}
         options={options}
         value={value ? String(value) : null}
-        onValueChange={(name, value) => {
-          updateValue(value)
-        }}
+        onValueChange={(name, value) => updateValue(value)}
         formatOptionLabel={({ value }) => (
           <ChangeTipOptionLabel value={value} />
         )}

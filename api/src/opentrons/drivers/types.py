@@ -73,13 +73,4 @@ class AbsorbanceReaderPlatePresence(str, Enum):
 
     UNKNOWN = "unknown"
     PRESENT = "present"
-    ABSENT = "absent"
-
-
-class AbsorbanceReaderDeviceState(str, Enum):
-    """Absorbance reader device state."""
-
-    UNKNOWN = "unknown"
-    OK = "ok"
-    BROKEN_FW = "broken_fw"
-    ERROR = "error"
+    ABSENCE = "absence"

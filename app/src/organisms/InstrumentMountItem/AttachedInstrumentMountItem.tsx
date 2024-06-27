@@ -57,9 +57,7 @@ export function AttachedInstrumentMountItem(
             attachedInstrument == null ? `/instruments` : `/instrument/${mount}`
           )
         },
-        closeFlow: () => {
-          setWizardProps(null)
-        },
+        closeFlow: () => setWizardProps(null),
       })
     } else {
       history.push(`/instruments/${mount}`)

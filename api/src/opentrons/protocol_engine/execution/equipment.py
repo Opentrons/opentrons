@@ -14,7 +14,6 @@ from opentrons.hardware_control.modules import (
     HeaterShaker,
     TempDeck,
     Thermocycler,
-    AbsorbanceReader,
 )
 from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.protocol_engine.state.module_substates import (
@@ -22,7 +21,6 @@ from opentrons.protocol_engine.state.module_substates import (
     HeaterShakerModuleId,
     TemperatureModuleId,
     ThermocyclerModuleId,
-    AbsorbanceReaderId,
 )
 from ..errors import (
     FailedToLoadPipetteError,
@@ -488,13 +486,6 @@ class EquipmentHandler:
         self,
         module_id: ThermocyclerModuleId,
     ) -> Optional[Thermocycler]:
-        ...
-
-    @overload
-    def get_module_hardware_api(
-        self,
-        module_id: AbsorbanceReaderId,
-    ) -> Optional[AbsorbanceReader]:
         ...
 
     def get_module_hardware_api(self, module_id: str) -> Optional[AbstractModule]:

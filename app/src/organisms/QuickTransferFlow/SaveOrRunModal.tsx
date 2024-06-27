@@ -10,20 +10,16 @@ import {
 } from '@opentrons/components'
 import { Modal } from '../../molecules/Modal'
 import { SmallButton } from '../../atoms/buttons'
-import { NameQuickTransfer } from './NameQuickTransfer'
 
 interface SaveOrRunModalProps {
-  onSave: (protocolName: string) => void
+  onSave: () => void
   onRun: () => void
 }
 
 export const SaveOrRunModal = (props: SaveOrRunModalProps): JSX.Element => {
   const { t } = useTranslation('quick_transfer')
-  const [showNameTransfer, setShowNameTransfer] = React.useState(false)
 
-  return showNameTransfer ? (
-    <NameQuickTransfer onSave={props.onSave} />
-  ) : (
+  return (
     <Modal
       header={{
         title: t('run_quick_transfer_now'),
@@ -46,9 +42,7 @@ export const SaveOrRunModal = (props: SaveOrRunModalProps): JSX.Element => {
           <SmallButton
             width="50%"
             buttonText={t('save_for_later')}
-            onClick={() => {
-              setShowNameTransfer(true)
-            }}
+            onClick={props.onSave}
             buttonType="secondary"
           />
           <SmallButton

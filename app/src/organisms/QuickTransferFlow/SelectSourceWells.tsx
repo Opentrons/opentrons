@@ -1,12 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import without from 'lodash/without'
-import {
-  Flex,
-  JUSTIFY_CENTER,
-  POSITION_FIXED,
-  SPACING,
-} from '@opentrons/components'
+import { Flex, POSITION_FIXED, SPACING } from '@opentrons/components'
 
 import { ChildNavigation } from '../../organisms/ChildNavigation'
 import { WellSelection } from '../../organisms/WellSelection'
@@ -58,12 +52,11 @@ export function SelectSourceWells(props: SelectSourceWellsProps): JSX.Element {
         onClickBack={onBack}
         buttonText={i18n.format(t('shared:continue'), 'capitalize')}
         onClickButton={handleClickNext}
-        buttonIsDisabled={Object.keys(selectedWells).length === 0}
+        buttonIsDisabled={false}
         secondaryButtonProps={resetButtonProps}
         top={SPACING.spacing8}
       />
       <Flex
-        justifyContent={JUSTIFY_CENTER}
         marginTop={SPACING.spacing120}
         padding={`${SPACING.spacing16} ${SPACING.spacing60} ${SPACING.spacing40} ${SPACING.spacing60}`}
         position={POSITION_FIXED}
@@ -72,26 +65,14 @@ export function SelectSourceWells(props: SelectSourceWellsProps): JSX.Element {
         width="100%"
       >
         {state.source != null ? (
-          <Flex width="75%">
-            <WellSelection
-              definition={state.source}
-              deselectWells={(wells: string[]) => {
-                setSelectedWells(prevWells =>
-                  without(Object.keys(prevWells), ...wells).reduce(
-                    (acc, well) => {
-                      return { ...acc, [well]: null }
-                    },
-                    {}
-                  )
-                )
-              }}
-              selectedPrimaryWells={selectedWells}
-              selectWells={wellGroup => {
-                setSelectedWells(prevWells => ({ ...prevWells, ...wellGroup }))
-              }}
-              channels={state.pipette?.channels ?? 1}
-            />
-          </Flex>
+          <WellSelection
+            definition={state.source}
+            selectedPrimaryWells={selectedWells}
+            selectWells={wellGroup => {
+              setSelectedWells(prevWells => ({ ...prevWells, ...wellGroup }))
+            }}
+            channels={state.pipette?.channels ?? 1}
+          />
         ) : null}
       </Flex>
     </>

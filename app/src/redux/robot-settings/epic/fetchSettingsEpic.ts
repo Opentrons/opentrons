@@ -13,7 +13,7 @@ import type {
   ResponseToActionMapper,
 } from '../../robot-api/operators'
 
-import type { FetchSettingsAction, RobotSettings } from '../types'
+import type { FetchSettingsAction } from '../types'
 
 const mapActionToRequest: ActionToRequestMapper<FetchSettingsAction> = () => ({
   method: GET,
@@ -30,11 +30,11 @@ const mapResponseToAction: ResponseToActionMapper<FetchSettingsAction> = (
   return response.ok
     ? Actions.fetchSettingsSuccess(
         host.name,
-        body.settings as RobotSettings,
-        (body.links?.restart as string | null) ?? null,
+        body.settings,
+        body.links?.restart || null,
         meta
       )
-    : Actions.fetchSettingsFailure(host.name, body as { message: string }, meta)
+    : Actions.fetchSettingsFailure(host.name, body, meta)
 }
 
 export const fetchSettingsEpic: Epic = (action$, state$) => {

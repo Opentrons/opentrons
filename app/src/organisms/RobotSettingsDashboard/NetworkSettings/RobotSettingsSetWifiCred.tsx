@@ -31,9 +31,7 @@ export function RobotSettingsSetWifiCred({
       <ChildNavigation
         buttonText={t('connect')}
         header={t('wifi')}
-        onClickBack={() => {
-          setCurrentOption('RobotSettingsWifi')
-        }}
+        onClickBack={() => setCurrentOption('RobotSettingsWifi')}
         onClickButton={handleConnect}
       />
       <SetWifiCred password={password} setPassword={setPassword} />

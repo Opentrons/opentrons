@@ -42,7 +42,6 @@ describe('write failed analysis', () => {
           pipettes: [],
           liquids: [],
           runTimeParameters: [],
-          result: 'not-ok',
         })
       })
   })

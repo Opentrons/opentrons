@@ -167,9 +167,7 @@ export function LabwareListItem(
                   color: ${COLORS.black90};
                 }
               `}
-              onClick={() => {
-                setSecureLabwareModalType(moduleType)
-              }}
+              onClick={() => setSecureLabwareModalType(moduleType)}
             >
               <Flex flexDirection={DIRECTION_ROW}>
                 <Icon
@@ -348,9 +346,7 @@ export function LabwareListItem(
       {secureLabwareModalType != null && (
         <SecureLabwareModal
           type={secureLabwareModalType as ModuleTypesThatRequireExtraAttention}
-          onCloseClick={() => {
-            setSecureLabwareModalType(null)
-          }}
+          onCloseClick={() => setSecureLabwareModalType(null)}
         />
       )}
     </LabwareRow>

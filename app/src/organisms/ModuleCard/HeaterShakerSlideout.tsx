@@ -122,9 +122,7 @@ export const HeaterShakerSlideout = (
             units={unit}
             autoFocus
             value={hsValue != null ? Math.round(hsValue) : null}
-            onChange={e => {
-              setHsValue(e.target.valueAsNumber)
-            }}
+            onChange={e => setHsValue(e.target.valueAsNumber)}
             type="number"
             caption={t('module_status_range', {
               min: inputMin,

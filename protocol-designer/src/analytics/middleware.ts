@@ -40,9 +40,7 @@ export const reduxActionToAnalyticsEvent = (
       // additional fields for analytics, eg descriptive name for pipettes
       // (these fields are prefixed with double underscore only to make sure they
       // never accidentally overlap with actual fields)
-      const additionalProperties = flattenNestedProperties(
-        (stepArgs as unknown) as Record<string, unknown>
-      )
+      const additionalProperties = flattenNestedProperties(stepArgs)
 
       // Mixpanel wants YYYY-MM-DDTHH:MM:SS for Date type
       additionalProperties.__dateCreated =
@@ -51,8 +49,10 @@ export const reduxActionToAnalyticsEvent = (
           : null
 
       additionalProperties.__protocolName = fileMetadata.protocolName
-      if ('pipette' in stepArgs && stepArgs.pipette != null) {
+      // @ts-expect-error not a valid way to type narrow
+      if (stepArgs.pipette) {
         additionalProperties.__pipetteName =
+          // @ts-expect-error not a valid way to type narrow
           pipetteEntities[stepArgs?.pipette].name
       }
 
@@ -67,9 +67,7 @@ export const reduxActionToAnalyticsEvent = (
     const dateCreatedTimestamp = fileMetadata.created
 
     const { editedFields, stepIds } = action.payload
-    const additionalProperties = flattenNestedProperties(
-      editedFields as Record<string, unknown>
-    )
+    const additionalProperties = flattenNestedProperties(editedFields)
     const savedStepForms = getSavedStepForms(state)
     const batchEditedStepForms: FormData[] = stepIds.map(
       (id: StepIdType) => savedStepForms[id]
@@ -145,9 +143,9 @@ export const trackEventMiddleware: Middleware<BaseState, any> = ({
   // NOTE: this is the Redux state AFTER the action has been fully dispatched
   const state = getState()
 
-  const optedIn = getHasOptedIn(state as BaseState) ?? false
-  const event = reduxActionToAnalyticsEvent(state as BaseState, action)
-  if (event != null) {
+  const optedIn = getHasOptedIn(state) || false
+  const event = reduxActionToAnalyticsEvent(state, action)
+  if (event) {
     // actually report to analytics (trackEvent is responsible for using optedIn)
     trackEvent(event, optedIn)
   }

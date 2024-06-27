@@ -1,5 +1,5 @@
 import React from 'react'
-import { screen } from '@testing-library/react'
+import { screen, findByText } from '@testing-library/react'
 import { describe, it, beforeEach, afterEach, expect, vi } from 'vitest'
 import { when } from 'vitest-when'
 import '@testing-library/jest-dom/vitest'
@@ -66,8 +66,10 @@ describe('IncompatibleModuleTakeover', () => {
   ;['desktop', 'odd'].forEach(target => {
     it(`should render nothing on ${target} when no incompatible modules are attached`, () => {
       getRenderer([])({ ...props, isOnDevice: target === 'odd' })
-      expect(screen.queryByTestId(TOP_PORTAL_ID)).toBeEmptyDOMElement()
-      expect(screen.queryByTestId(MODAL_PORTAL_ID)).toBeEmptyDOMElement()
+      expect(screen.findByTestId(TOP_PORTAL_ID)).resolves.toBeEmptyDOMElement()
+      expect(
+        screen.findByTestId(MODAL_PORTAL_ID)
+      ).resolves.toBeEmptyDOMElement()
       expect(screen.queryByText(/TEST ELEMENT/)).toBeNull()
     })
   })
@@ -77,7 +79,8 @@ describe('IncompatibleModuleTakeover', () => {
       ...props,
       isOnDevice: true,
     })
-    screen.getByText('TEST ELEMENT ODD')
+    const container = await screen.findByTestId(TOP_PORTAL_ID)
+    await findByText(container, 'TEST ELEMENT ODD')
   })
 
   it('should render the modal body on desktop when incompatible modules are attached', async () => {
@@ -85,6 +88,7 @@ describe('IncompatibleModuleTakeover', () => {
       ...props,
       isOnDevice: false,
     })
-    screen.getByText('TEST ELEMENT DESKTOP')
+    const container = await screen.findByTestId(MODAL_PORTAL_ID)
+    await findByText(container, 'TEST ELEMENT DESKTOP')
   })
 })

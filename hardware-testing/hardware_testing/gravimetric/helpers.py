@@ -200,11 +200,11 @@ def _sense_liquid_height(
     lps = config._get_liquid_probe_settings(cfg, well)
     # NOTE: very important that probing is done only 1x time,
     #       with a DRY tip, for reliability
-    probed_z = hwapi.liquid_probe(OT3Mount.LEFT, well.depth, lps)
+    probed_z = hwapi.liquid_probe(OT3Mount.LEFT, lps)
     if ctx.is_simulating():
         probed_z = well.top().point.z - 1
     liq_height = probed_z - well.bottom().point.z
-    if abs(liq_height - well.depth) < 0.01:
+    if abs(liq_height - lps.max_z_distance) < 0.01:
         raise RuntimeError("unable to probe liquid, reach max travel distance")
     return liq_height
 

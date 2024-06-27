@@ -7,7 +7,6 @@ import { formatTimestamp } from '../Devices/utils'
 import { getDisplayLocation } from '../LabwarePositionCheck/utils/getDisplayLocation'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { OffsetCandidate } from './hooks/useOffsetCandidatesForAnalysis'
-import type { TFunction } from 'i18next'
 
 const OffsetTable = styled('table')`
   ${TYPOGRAPHY.labelRegular}
@@ -56,12 +55,7 @@ export function LabwareOffsetTable(
         {offsetCandidates.map(offset => (
           <OffsetTableRow key={offset.id}>
             <OffsetTableDatum>
-              {getDisplayLocation(
-                offset.location,
-                labwareDefinitions,
-                t as TFunction,
-                i18n
-              )}
+              {getDisplayLocation(offset.location, labwareDefinitions, t, i18n)}
             </OffsetTableDatum>
             <OffsetTableDatum>
               {formatTimestamp(offset.runCreatedAt)}

@@ -1,9 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  formatRunTimeParameterValue,
-  sortRuntimeParameters,
-} from '@opentrons/shared-data'
+import { formatRunTimeParameterValue } from '@opentrons/shared-data'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -35,7 +32,7 @@ export function ViewOnlyParameters({
   const { makeSnackbar } = useToaster()
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
   const handleOnClick = (): void => {
-    makeSnackbar(t('reset_setup') as string)
+    makeSnackbar(t('reset_setup'))
   }
 
   const parameters = mostRecentAnalysis?.runTimeParameters ?? []
@@ -44,9 +41,7 @@ export function ViewOnlyParameters({
     <>
       <ChildNavigation
         header={t('parameters')}
-        onClickBack={() => {
-          setSetupScreen('prepare to run')
-        }}
+        onClickBack={() => setSetupScreen('prepare to run')}
         inlineNotification={{
           type: 'neutral',
           heading: t('values_are_view_only'),
@@ -70,7 +65,7 @@ export function ViewOnlyParameters({
           </StyledText>
           <StyledText>{t('value')}</StyledText>
         </Flex>
-        {sortRuntimeParameters(parameters).map((parameter, index) => {
+        {parameters.map((parameter, index) => {
           return (
             <Flex
               onClick={handleOnClick}
@@ -96,8 +91,7 @@ export function ViewOnlyParameters({
                 <StyledText as="p" color={COLORS.grey60}>
                   {formatRunTimeParameterValue(parameter, t)}
                 </StyledText>
-                {parameter.type === 'csv_file' ||
-                parameter.value !== parameter.default ? (
+                {parameter.value !== parameter.default ? (
                   <Chip
                     data-testid={`Chip_${parameter.variableName}`}
                     type="success"

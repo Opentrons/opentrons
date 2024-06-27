@@ -432,7 +432,6 @@ export const FilePipettesModal = (props: Props): JSX.Element => {
     getValues,
   } = useForm<FormState>({
     defaultValues: getInitialValues(),
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     resolver: yupResolver(validationSchema),
   })
   const pipettesByMount = watch('pipettesByMount')
@@ -536,9 +535,7 @@ export const FilePipettesModal = (props: Props): JSX.Element => {
 
           {showEditPipetteConfirmation ? (
             <StepChangesConfirmModal
-              onCancel={() => {
-                setShowEditPipetteConfirmation(false)
-              }}
+              onCancel={() => setShowEditPipetteConfirmation(false)}
               onConfirm={() => handleSubmit(handleFormSubmit)()}
             />
           ) : null}

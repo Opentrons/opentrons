@@ -10,6 +10,7 @@ context('Well Plates', () => {
   before(() => {
     cy.visit('/create')
     cy.viewport('macbook-15')
+    cy.contains('NO').click({ force: true })
   })
 
   describe('Create a well plate', () => {

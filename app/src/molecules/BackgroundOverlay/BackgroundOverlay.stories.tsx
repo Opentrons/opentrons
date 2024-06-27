@@ -21,18 +21,10 @@ const Template: Story<
     <Flex>
       {openOverlay ? (
         <Flex height="80%" width="80%">
-          <BackgroundOverlay
-            onClick={() => {
-              setOpenOverlay(false)
-            }}
-          />
+          <BackgroundOverlay onClick={() => setOpenOverlay(false)} />
         </Flex>
       ) : (
-        <PrimaryButton
-          onClick={() => {
-            setOpenOverlay(true)
-          }}
-        >
+        <PrimaryButton onClick={() => setOpenOverlay(true)}>
           <StyledText as="h4">Click to open the Background Overlay</StyledText>
         </PrimaryButton>
       )}

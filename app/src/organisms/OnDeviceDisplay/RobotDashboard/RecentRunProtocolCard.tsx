@@ -92,9 +92,8 @@ export function ProtocolWithLastRun({
   const trackEvent = useTrackEvent()
   // TODO(BC, 08/29/23): reintroduce this analytics event when we refactor the hook to fetch data lazily (performance concern)
   // const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runData.id)
-  const onResetSuccess = (createRunResponse: Run): void => {
+  const onResetSuccess = (createRunResponse: Run): void =>
     history.push(`runs/${createRunResponse.data.id}/setup`)
-  }
   const { cloneRun } = useCloneRun(runData.id, onResetSuccess)
   const robotInitStatus = useRobotInitializationStatus()
   const isRobotInitializing =

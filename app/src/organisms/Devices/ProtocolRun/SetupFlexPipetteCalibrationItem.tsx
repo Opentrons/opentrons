@@ -74,9 +74,7 @@ export function SetupFlexPipetteCalibrationItem({
       <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
         <TertiaryButton
           id="PipetteCalibration_attachPipetteButton"
-          onClick={() => {
-            setShowFlexPipetteFlow(true)
-          }}
+          onClick={() => setShowFlexPipetteFlow(true)}
         >
           {t('attach_pipette_cta')}
         </TertiaryButton>
@@ -95,9 +93,7 @@ export function SetupFlexPipetteCalibrationItem({
         >
           <TertiaryButton
             id="PipetteCalibration_calibratePipetteButton"
-            onClick={() => {
-              setShowFlexPipetteFlow(true)
-            }}
+            onClick={() => setShowFlexPipetteFlow(true)}
           >
             {t('calibrate_now')}
           </TertiaryButton>
@@ -112,9 +108,7 @@ export function SetupFlexPipetteCalibrationItem({
         <PipetteWizardFlows
           flowType={flowType}
           mount={mount}
-          closeFlow={() => {
-            setShowFlexPipetteFlow(false)
-          }}
+          closeFlow={() => setShowFlexPipetteFlow(false)}
           selectedPipette={
             requestedPipetteSpecs?.channels === 96
               ? NINETY_SIX_CHANNEL

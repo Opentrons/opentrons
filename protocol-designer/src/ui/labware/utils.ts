@@ -46,7 +46,7 @@ export function getLabwareInColumn4(
 
   if (
     moveLabwareStep?.newLocation != null &&
-    COLUMN_4_SLOTS.includes(moveLabwareStep.newLocation as string)
+    COLUMN_4_SLOTS.includes(moveLabwareStep.newLocation)
   ) {
     return true
   } else if (moveLabwareStep == null && isStartingInColumn4) {

@@ -9,9 +9,6 @@ from opentrons.protocols.api_support.definitions import (
     MIN_SUPPORTED_VERSION,
     MIN_SUPPORTED_VERSION_FOR_FLEX,
 )
-from opentrons.protocols.parameters.exceptions import (
-    RuntimeParameterRequired as RuntimeParameterRequiredError,
-)
 
 from .protocol_context import ProtocolContext
 from .deck import Deck
@@ -24,7 +21,6 @@ from .module_contexts import (
     TemperatureModuleContext,
     HeaterShakerContext,
     MagneticBlockContext,
-    AbsorbanceReaderContext,
 )
 from .disposal_locations import TrashBin, WasteChute
 from ._liquid import Liquid
@@ -54,7 +50,6 @@ __all__ = [
     "ThermocyclerContext",
     "HeaterShakerContext",
     "MagneticBlockContext",
-    "AbsorbanceReaderContext",
     "ParameterContext",
     "Labware",
     "TrashBin",
@@ -65,7 +60,6 @@ __all__ = [
     "COLUMN",
     "ALL",
     "OFF_DECK",
-    "RuntimeParameterRequiredError",
     # For internal Opentrons use only:
     "create_protocol_context",
     "ProtocolEngineCoreRequiredError",

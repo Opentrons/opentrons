@@ -33,11 +33,7 @@ export function createNetworkInterfaceMonitor(
 
   const pollId = setInterval(monitorActiveInterfaces, pollInterval)
 
-  return {
-    stop: () => {
-      clearInterval(pollId)
-    },
-  }
+  return { stop: () => clearInterval(pollId) }
 
   function monitorActiveInterfaces(): void {
     const nextIfaces = getActiveInterfaces()

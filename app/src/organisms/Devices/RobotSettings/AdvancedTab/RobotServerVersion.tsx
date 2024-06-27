@@ -88,9 +88,7 @@ export function RobotServerVersion({
               {t('up_to_date')}
             </StyledText>
             <TertiaryButton
-              onClick={() => {
-                handleUpdateBuildroot(robot)
-              }}
+              onClick={() => handleUpdateBuildroot(robot)}
               textTransform={TYPOGRAPHY.textTransformCapitalize}
             >
               {t('reinstall')}

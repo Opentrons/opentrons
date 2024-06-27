@@ -9,7 +9,6 @@ from opentrons.types import Point
 from opentrons_shared_data.pipette.pipette_definition import (
     PipetteGeometryDefinition,
     PipetteRowDefinition,
-    ValidNozzleMaps,
 )
 from opentrons_shared_data.errors import ErrorCodes, GeneralError, PythonException
 
@@ -99,8 +98,6 @@ class NozzleMap:
     # evaluate them to generate serdes code so please only use ordered dicts here
     map_store: Dict[str, Point]
     #: A map of all of the nozzles active in this configuration
-    valid_map_key: str
-    #: A key indicating which valid nozzle map from the pipette definition represents this configuration
     rows: Dict[str, List[str]]
     #: A map of all the rows active in this configuration
     columns: Dict[str, List[str]]
@@ -217,7 +214,7 @@ class NozzleMap:
         return len(self.map_store)
 
     @classmethod
-    def build(  # noqa: C901
+    def build(
         cls,
         physical_nozzles: "OrderedDict[str, Point]",
         physical_rows: "OrderedDict[str, List[str]]",
@@ -225,7 +222,6 @@ class NozzleMap:
         starting_nozzle: str,
         back_left_nozzle: str,
         front_right_nozzle: str,
-        valid_nozzle_maps: ValidNozzleMaps,
     ) -> "NozzleMap":
         try:
             back_left_row_index, back_left_column_index = _row_col_indices_for_nozzle(
@@ -284,20 +280,9 @@ class NozzleMap:
                     f"Partial Nozzle Layouts may not be configured to contain more than {MAXIMUM_NOZZLE_COUNT} channels."
                 )
 
-        validated_map_key = None
-        for map_key in valid_nozzle_maps.maps.keys():
-            if valid_nozzle_maps.maps[map_key] == list(map_store.keys()):
-                validated_map_key = map_key
-                break
-        if validated_map_key is None:
-            raise IncompatibleNozzleConfiguration(
-                "Attempted Nozzle Configuration does not match any approved map layout for the current pipette."
-            )
-
         return cls(
             starting_nozzle=starting_nozzle,
             map_store=map_store,
-            valid_map_key=validated_map_key,
             rows=rows,
             full_instrument_map_store=physical_nozzles,
             full_instrument_rows=physical_rows,
@@ -328,17 +313,15 @@ class IncompatibleNozzleConfiguration(GeneralError):
 
 class NozzleConfigurationManager:
     def __init__(
-        self, nozzle_map: NozzleMap, valid_nozzle_maps: ValidNozzleMaps
+        self,
+        nozzle_map: NozzleMap,
     ) -> None:
         self._physical_nozzle_map = nozzle_map
         self._current_nozzle_configuration = nozzle_map
-        self._valid_nozzle_maps = valid_nozzle_maps
 
     @classmethod
     def build_from_config(
-        cls,
-        pipette_geometry: PipetteGeometryDefinition,
-        valid_nozzle_maps: ValidNozzleMaps,
+        cls, pipette_geometry: PipetteGeometryDefinition
     ) -> "NozzleConfigurationManager":
         sorted_nozzle_map = OrderedDict(
             (
@@ -363,9 +346,8 @@ class NozzleConfigurationManager:
             starting_nozzle=back_left,
             back_left_nozzle=back_left,
             front_right_nozzle=front_right,
-            valid_nozzle_maps=valid_nozzle_maps,
         )
-        return cls(starting_nozzle_config, valid_nozzle_maps)
+        return cls(starting_nozzle_config)
 
     @property
     def starting_nozzle_offset(self) -> Point:
@@ -398,7 +380,6 @@ class NozzleConfigurationManager:
             starting_nozzle=starting_nozzle or back_left_nozzle,
             back_left_nozzle=back_left_nozzle,
             front_right_nozzle=front_right_nozzle,
-            valid_nozzle_maps=self._valid_nozzle_maps,
         )
 
     def get_tip_count(self) -> int:

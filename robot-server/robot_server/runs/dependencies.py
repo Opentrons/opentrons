@@ -27,7 +27,7 @@ from robot_server.service.notifications import (
 )
 
 from .run_auto_deleter import RunAutoDeleter
-from .engine_store import EngineStore, NoRunOrchestrator
+from .engine_store import EngineStore, NoRunnerEngineError
 from .run_store import RunStore
 from .run_data_manager import RunDataManager
 from robot_server.errors.robot_errors import (
@@ -130,10 +130,13 @@ async def get_is_okay_to_create_maintenance_run(
 ) -> bool:
     """Whether a maintenance run can be created if a protocol run already exists."""
     try:
-        orchestrator = engine_store.run_orchestrator
-    except NoRunOrchestrator:
+        protocol_run_state = engine_store.engine.state_view
+    except NoRunnerEngineError:
         return True
-    return not orchestrator.run_has_started() or orchestrator.get_is_run_terminal()
+    return (
+        not protocol_run_state.commands.has_been_played()
+        or protocol_run_state.commands.get_is_terminal()
+    )
 
 
 async def get_run_data_manager(

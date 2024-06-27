@@ -49,11 +49,7 @@ export const ProbeNotAttached = (
         css={ALIGN_BUTTONS}
         gridGap={SPACING.spacing8}
       >
-        <Btn
-          onClick={() => {
-            setShowUnableToDetect(false)
-          }}
-        >
+        <Btn onClick={() => setShowUnableToDetect(false)}>
           <StyledText css={GO_BACK_BUTTON_STYLE}>
             {t('shared:go_back')}
           </StyledText>

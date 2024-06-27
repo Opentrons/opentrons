@@ -12,7 +12,6 @@ import {
   HEATERSHAKER_MODULE_V1_FIXTURE,
   TEMPERATURE_MODULE_V2_FIXTURE,
   MAGNETIC_BLOCK_V1_FIXTURE,
-  ABSORBANCE_READER_V1_FIXTURE,
   STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
 } from '@opentrons/shared-data'
 
@@ -35,7 +34,6 @@ import { TemperatureModuleFixture } from './TemperatureModuleFixture'
 import { HeaterShakerFixture } from './HeaterShakerFixture'
 import { MagneticBlockFixture } from './MagneticBlockFixture'
 import { ThermocyclerFixture } from './ThermocyclerFixture'
-import { AbsorbanceReaderFixture } from './AbsorbanceReaderFixture'
 
 interface DeckConfiguratorProps {
   deckConfig: DeckConfiguration
@@ -106,9 +104,6 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
       MAGNETIC_BLOCK_V1_FIXTURE,
       STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
     ] as CutoutFixtureId[]).includes(cutoutFixtureId)
-  )
-  const absorbanceReaderFixtures = deckConfig.filter(
-    ({ cutoutFixtureId }) => cutoutFixtureId === ABSORBANCE_READER_V1_FIXTURE
   )
 
   return (
@@ -226,18 +221,6 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
       ))}
       {thermocyclerFixtures.map(({ cutoutId, cutoutFixtureId }) => (
         <ThermocyclerFixture
-          key={cutoutId}
-          deckDefinition={deckDef}
-          handleClickRemove={
-            editableCutoutIds.includes(cutoutId) ? handleClickRemove : undefined
-          }
-          fixtureLocation={cutoutId}
-          cutoutFixtureId={cutoutFixtureId}
-          selected={cutoutId === selectedCutoutId}
-        />
-      ))}
-      {absorbanceReaderFixtures.map(({ cutoutId, cutoutFixtureId }) => (
-        <AbsorbanceReaderFixture
           key={cutoutId}
           deckDefinition={deckDef}
           handleClickRemove={

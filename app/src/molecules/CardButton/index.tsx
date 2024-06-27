@@ -80,9 +80,7 @@ export function CardButton(props: CardButtonProps): JSX.Element {
 
   return (
     <Btn
-      onClick={() => {
-        history.push(destinationPath)
-      }}
+      onClick={() => history.push(destinationPath)}
       width="100%"
       css={CARD_BUTTON_STYLE}
       backgroundColor={disabled ? COLORS.grey35 : COLORS.blue35}

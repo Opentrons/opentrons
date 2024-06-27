@@ -80,8 +80,6 @@ class ModuleType(str, Enum):
             return "heaterShakerModuleV1"
         if module_type == ModuleType.MAGNETIC_BLOCK:
             return "magneticBlockV1"
-        if module_type == ModuleType.ABSORBANCE_READER:
-            return "absorbanceReaderV1"
         else:
             raise ValueError(
                 f"Module Type {module_type} does not have a related fixture ID."
@@ -211,11 +209,4 @@ class HeaterShakerStatus(str, Enum):
 class AbsorbanceReaderStatus(str, Enum):
     IDLE = "idle"
     MEASURING = "measuring"
-    ERROR = "error"
-
-
-class LidStatus(str, Enum):
-    ON = "on"
-    OFF = "off"
-    UNKNOWN = "unknown"
     ERROR = "error"

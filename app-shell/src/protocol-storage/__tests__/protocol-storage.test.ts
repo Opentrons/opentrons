@@ -120,7 +120,6 @@ describe('protocol storage directory utilities', () => {
         modules: [],
         labware: [],
         runTimeParameters: [],
-        result: 'not-ok',
       })
     })
   })

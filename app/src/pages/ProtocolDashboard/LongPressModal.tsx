@@ -72,12 +72,12 @@ export function LongPressModal({
       } else {
         pinnedProtocolIds.push(protocolId)
         handlePinnedProtocolIds(pinnedProtocolIds)
-        makeSnackbar(t('pinned_protocol') as string)
+        makeSnackbar(t('pinned_protocol'))
       }
     } else {
       pinnedProtocolIds = pinnedProtocolIds.filter(p => p !== protocolId)
       handlePinnedProtocolIds(pinnedProtocolIds)
-      makeSnackbar(t('unpinned_protocol') as string)
+      makeSnackbar(t('unpinned_protocol'))
     }
   }
 
@@ -100,9 +100,7 @@ export function LongPressModal({
           header={t('too_many_pins_header')}
           subText={t('too_many_pins_body')}
           buttonText={i18n.format(t('shared:close'), 'capitalize')}
-          handleCloseMaxPinsAlert={() => {
-            longpress?.setIsLongPressed(false)
-          }}
+          handleCloseMaxPinsAlert={() => longpress?.setIsLongPressed(false)}
         />
       ) : (
         <MenuList onClick={handleCloseModal} isOnDevice={true}>

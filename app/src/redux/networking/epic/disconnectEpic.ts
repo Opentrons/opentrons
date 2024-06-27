@@ -11,7 +11,6 @@ import type {
 } from '../../robot-api/operators'
 import type { Action, Epic } from '../../types'
 import type { PostWifiDisconnectAction } from '../types'
-import type { RobotApiErrorResponse } from '../../robot-api/types'
 
 const mapActionToRequest: ActionToRequestMapper<PostWifiDisconnectAction> = action => ({
   method: POST,
@@ -28,11 +27,7 @@ const mapResponseToAction: ResponseToActionMapper<PostWifiDisconnectAction> = (
 
   return response.ok
     ? Actions.postWifiDisconnectSuccess(host.name, meta)
-    : Actions.postWifiDisconnectFailure(
-        host.name,
-        body as RobotApiErrorResponse,
-        meta
-      )
+    : Actions.postWifiDisconnectFailure(host.name, body, meta)
 }
 
 const postDisconnectEpic: Epic = (action$, state$) =>

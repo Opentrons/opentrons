@@ -75,7 +75,6 @@ def make_dummy_protocol_resource(protocol_id: str) -> ProtocolResource:
             content_hash="abc123",
         ),
         protocol_key=None,
-        protocol_kind="standard",
     )
 
 

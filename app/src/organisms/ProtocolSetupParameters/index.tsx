@@ -13,10 +13,7 @@ import {
   Flex,
   SPACING,
 } from '@opentrons/components'
-import {
-  formatRunTimeParameterValue,
-  sortRuntimeParameters,
-} from '@opentrons/shared-data'
+import { formatRunTimeParameterValue } from '@opentrons/shared-data'
 
 import { ProtocolSetupStep } from '../../pages/ProtocolSetup'
 import { getRunTimeParameterValuesForRun } from '../Devices/utils'
@@ -25,12 +22,7 @@ import { ResetValuesModal } from './ResetValuesModal'
 import { ChooseEnum } from './ChooseEnum'
 import { ChooseNumber } from './ChooseNumber'
 
-import type {
-  ChoiceParameter,
-  NumberParameter,
-  RunTimeParameter,
-  ValueRunTimeParameter,
-} from '@opentrons/shared-data'
+import type { NumberParameter, RunTimeParameter } from '@opentrons/shared-data'
 import type { LabwareOffsetCreateData } from '@opentrons/api-client'
 
 interface ProtocolSetupParametersProps {
@@ -51,7 +43,7 @@ export function ProtocolSetupParameters({
   const [
     chooseValueScreen,
     setChooseValueScreen,
-  ] = React.useState<ChoiceParameter | null>(null)
+  ] = React.useState<RunTimeParameter | null>(null)
   const [
     showNumericalInputScreen,
     setShowNumericalInputScreen,
@@ -64,13 +56,10 @@ export function ProtocolSetupParameters({
     runTimeParametersOverrides,
     setRunTimeParametersOverrides,
   ] = React.useState<RunTimeParameter[]>(
-    runTimeParameters.map(parameter =>
-      parameter.type === 'csv_file'
-        ? { ...parameter, file: null }
-        : // TODO (nd: 06/13/2024) create individual ChoiceParameter types for correct narrowing
-          // eslint-disable-next-line
-          ({ ...parameter, value: parameter.default } as ValueRunTimeParameter)
-    )
+    // present defaults rather than last-set value
+    runTimeParameters.map(param => {
+      return { ...param, value: param.default }
+    })
   )
 
   const updateParameters = (
@@ -83,13 +72,13 @@ export function ProtocolSetupParameters({
       }
       return parameter
     })
-    setRunTimeParametersOverrides(updatedParameters as RunTimeParameter[])
+    setRunTimeParametersOverrides(updatedParameters)
     if (chooseValueScreen && chooseValueScreen.variableName === variableName) {
       const updatedParameter = updatedParameters.find(
         parameter => parameter.variableName === variableName
       )
-      if (updatedParameter != null && 'choices' in updatedParameter) {
-        setChooseValueScreen(updatedParameter as ChoiceParameter)
+      if (updatedParameter != null) {
+        setChooseValueScreen(updatedParameter)
       }
     }
     if (
@@ -115,9 +104,11 @@ export function ProtocolSetupParameters({
 
   const { createRun, isLoading } = useCreateRunMutation({
     onSuccess: data => {
-      queryClient.invalidateQueries([host, 'runs']).catch((e: Error) => {
-        console.error(`could not invalidate runs cache: ${e.message}`)
-      })
+      queryClient
+        .invalidateQueries([host, 'runs'])
+        .catch((e: Error) =>
+          console.error(`could not invalidate runs cache: ${e.message}`)
+        )
     },
   })
   const handleConfirmValues = (): void => {
@@ -152,9 +143,7 @@ export function ProtocolSetupParameters({
     <>
       <ChildNavigation
         header={t('parameters')}
-        onClickBack={() => {
-          history.goBack()
-        }}
+        onClickBack={() => history.goBack()}
         onClickButton={handleConfirmValues}
         buttonText={t('confirm_values')}
         iconName={isLoading || startSetup ? 'ot-spinner' : undefined}
@@ -163,9 +152,7 @@ export function ProtocolSetupParameters({
           buttonType: 'tertiaryLowLight',
           buttonText: t('restore_defaults'),
           disabled: isLoading || startSetup,
-          onClick: () => {
-            showResetValuesModal(true)
-          },
+          onClick: () => showResetValuesModal(true),
         }}
       />
       <Flex
@@ -176,44 +163,29 @@ export function ProtocolSetupParameters({
         paddingX={SPACING.spacing40}
         paddingBottom={SPACING.spacing40}
       >
-        {sortRuntimeParameters(runTimeParametersOverrides).map(
-          (parameter, index) => {
-            return (
-              <React.Fragment key={`${parameter.displayName}_${index}`}>
-                <ProtocolSetupStep
-                  hasRightIcon={!(parameter.type === 'bool')}
-                  hasLeftIcon={false}
-                  status={
-                    parameter.type === 'csv_file' ? 'not ready' : 'inform'
-                  }
-                  title={parameter.displayName}
-                  onClickSetupStep={() => {
-                    handleSetParameter(parameter)
-                  }}
-                  detail={
-                    parameter.type === 'csv_file'
-                      ? t('required')
-                      : formatRunTimeParameterValue(parameter, t)
-                  }
-                  description={
-                    parameter.type === 'csv_file' ? null : parameter.description
-                  }
-                  fontSize="h4"
-                  disabled={startSetup}
-                />
-              </React.Fragment>
-            )
-          }
-        )}
+        {runTimeParametersOverrides.map((parameter, index) => {
+          return (
+            <React.Fragment key={`${parameter.displayName}_${index}`}>
+              <ProtocolSetupStep
+                hasIcon={!(parameter.type === 'bool')}
+                status="inform"
+                title={parameter.displayName}
+                onClickSetupStep={() => handleSetParameter(parameter)}
+                detail={formatRunTimeParameterValue(parameter, t)}
+                description={parameter.description}
+                fontSize="h4"
+                disabled={startSetup}
+              />
+            </React.Fragment>
+          )
+        })}
       </Flex>
     </>
   )
   if (chooseValueScreen != null) {
     children = (
       <ChooseEnum
-        handleGoBack={() => {
-          setChooseValueScreen(null)
-        }}
+        handleGoBack={() => setChooseValueScreen(null)}
         parameter={chooseValueScreen}
         setParameter={updateParameters}
         rawValue={chooseValueScreen.value}
@@ -223,9 +195,7 @@ export function ProtocolSetupParameters({
   if (showNumericalInputScreen != null) {
     children = (
       <ChooseNumber
-        handleGoBack={() => {
-          setShowNumericalInputScreen(null)
-        }}
+        handleGoBack={() => setShowNumericalInputScreen(null)}
         parameter={showNumericalInputScreen}
         setParameter={updateParameters}
       />
@@ -238,9 +208,7 @@ export function ProtocolSetupParameters({
         <ResetValuesModal
           runTimeParametersOverrides={runTimeParametersOverrides}
           setRunTimeParametersOverrides={setRunTimeParametersOverrides}
-          handleGoBack={() => {
-            showResetValuesModal(false)
-          }}
+          handleGoBack={() => showResetValuesModal(false)}
         />
       ) : null}
       {children}

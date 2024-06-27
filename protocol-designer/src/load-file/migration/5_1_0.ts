@@ -27,10 +27,7 @@ export const migrateFile = (fileData: any): any => {
       data: {
         ...fileData.designerApplication.data,
         savedStepForms: migrateSavedStepForms(
-          fileData.designerApplication.data.savedStepForms as Record<
-            string,
-            any
-          >
+          fileData.designerApplication.data.savedStepForms
         ),
       },
     },

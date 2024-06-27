@@ -13,7 +13,7 @@ import type {
   ResponseToActionMapper,
 } from '../../robot-api/operators'
 
-import type { FetchPipetteSettingsAction, PipetteSettings } from '../types'
+import type { FetchPipetteSettingsAction } from '../types'
 
 const mapActionToRequest: ActionToRequestMapper<FetchPipetteSettingsAction> = action => ({
   method: GET,
@@ -28,16 +28,8 @@ const mapResponseToAction: ResponseToActionMapper<FetchPipetteSettingsAction> = 
   const meta = { ...originalAction.meta, response: responseMeta }
 
   return response.ok
-    ? Actions.fetchPipetteSettingsSuccess(
-        host.name,
-        body as Record<string, PipetteSettings>,
-        meta
-      )
-    : Actions.fetchPipetteSettingsFailure(
-        host.name,
-        body as Record<string, unknown>,
-        meta
-      )
+    ? Actions.fetchPipetteSettingsSuccess(host.name, body, meta)
+    : Actions.fetchPipetteSettingsFailure(host.name, body, meta)
 }
 
 export const fetchPipetteSettingsEpic: Epic = (action$, state$) => {

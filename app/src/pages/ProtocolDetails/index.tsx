@@ -82,9 +82,7 @@ const ProtocolHeader = ({
   const { t } = useTranslation(['protocol_info, protocol_details', 'shared'])
   const [truncate, setTruncate] = React.useState<boolean>(true)
   const [startSetup, setStartSetup] = React.useState<boolean>(false)
-  const toggleTruncate = (): void => {
-    setTruncate(value => !value)
-  }
+  const toggleTruncate = (): void => setTruncate(value => !value)
 
   let displayedTitle = title ?? null
   if (displayedTitle !== null && displayedTitle.length > 92 && truncate) {
@@ -112,9 +110,7 @@ const ProtocolHeader = ({
         <Btn
           paddingLeft="0rem"
           paddingRight={SPACING.spacing24}
-          onClick={() => {
-            history.push('/protocols')
-          }}
+          onClick={() => history.push('/protocols')}
           width="3rem"
         >
           <Icon name="back" size="3rem" color={COLORS.black90} />
@@ -201,9 +197,7 @@ const ProtocolSectionTabs = ({
           <TabbedButton
             isSelected={option === currentOption}
             key={option}
-            onClick={() => {
-              setCurrentOption(option)
-            }}
+            onClick={() => setCurrentOption(option)}
           >
             {option}
           </TabbedButton>
@@ -375,9 +369,11 @@ export function ProtocolDetails(): JSX.Element | null {
 
   const { createRun } = useCreateRunMutation({
     onSuccess: data => {
-      queryClient.invalidateQueries([host, 'runs']).catch((e: Error) => {
-        console.error(`could not invalidate runs cache: ${e.message}`)
-      })
+      queryClient
+        .invalidateQueries([host, 'runs'])
+        .catch((e: Error) =>
+          console.error(`could not invalidate runs cache: ${e.message}`)
+        )
     },
   })
 
@@ -387,11 +383,11 @@ export function ProtocolDetails(): JSX.Element | null {
         setShowMaxPinsAlert(true)
       } else {
         pinnedProtocolIds.push(protocolId)
-        makeSnackbar(t('protocol_info:pinned_protocol') as string)
+        makeSnackbar(t('protocol_info:pinned_protocol'))
       }
     } else {
       pinnedProtocolIds = pinnedProtocolIds.filter(p => p !== protocolId)
-      makeSnackbar(t('protocol_info:unpinned_protocol') as string)
+      makeSnackbar(t('protocol_info:unpinned_protocol'))
     }
     dispatch(
       updateConfigValue('protocols.pinnedProtocolIds', pinnedProtocolIds)
@@ -419,9 +415,7 @@ export function ProtocolDetails(): JSX.Element | null {
           Promise.all(referencingRunIds?.map(runId => deleteRun(host, runId)))
         )
         .then(() => deleteProtocol(host, protocolId))
-        .then(() => {
-          history.push('/protocols')
-        })
+        .then(() => history.push('/protocols'))
         .catch((e: Error) => {
           console.error(`error deleting resources: ${e.message}`)
           history.push('/protocols')
@@ -457,9 +451,7 @@ export function ProtocolDetails(): JSX.Element | null {
           {!isProtocolFetching ? (
             <Modal
               modalSize="medium"
-              onOutsideClick={() => {
-                setShowConfirmationDeleteProtocol(false)
-              }}
+              onOutsideClick={() => setShowConfirmationDeleteProtocol(false)}
               header={deleteModalHeader}
             >
               <Flex flexDirection={DIRECTION_COLUMN} width="100%">
@@ -472,9 +464,7 @@ export function ProtocolDetails(): JSX.Element | null {
                 </StyledText>
                 <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
                   <SmallButton
-                    onClick={() => {
-                      setShowConfirmationDeleteProtocol(false)
-                    }}
+                    onClick={() => setShowConfirmationDeleteProtocol(false)}
                     buttonText={i18n.format(t('shared:cancel'), 'capitalize')}
                     width="50%"
                   />
@@ -500,9 +490,7 @@ export function ProtocolDetails(): JSX.Element | null {
             header={t('too_many_pins_header')}
             subText={t('too_many_pins_body')}
             buttonText={i18n.format(t('shared:close'), 'capitalize')}
-            handleCloseMaxPinsAlert={() => {
-              setShowMaxPinsAlert(false)
-            }}
+            handleCloseMaxPinsAlert={() => setShowMaxPinsAlert(false)}
           />
         )}
         {/* Empty box to detect scrolling */}
@@ -552,9 +540,7 @@ export function ProtocolDetails(): JSX.Element | null {
               buttonText={t('protocol_info:delete_protocol')}
               buttonType="alertSecondary"
               iconName="trash"
-              onClick={() => {
-                setShowConfirmationDeleteProtocol(true)
-              }}
+              onClick={() => setShowConfirmationDeleteProtocol(true)}
               width="100%"
             />
           </Flex>

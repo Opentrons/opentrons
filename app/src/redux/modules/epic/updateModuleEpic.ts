@@ -14,7 +14,6 @@ import type {
 } from '../../robot-api/operators'
 
 import type { UpdateModuleAction } from '../types'
-import type { RobotApiErrorResponse } from '../../robot-api/types'
 
 const mapActionToRequest: ActionToRequestMapper<UpdateModuleAction> = action => ({
   method: POST,
@@ -30,18 +29,8 @@ const mapResponseToAction: ResponseToActionMapper<UpdateModuleAction> = (
   const meta = { ...originalAction.meta, response: responseMeta }
 
   return response.ok
-    ? Actions.updateModuleSuccess(
-        host.name,
-        moduleId,
-        body.message as string,
-        meta
-      )
-    : Actions.updateModuleFailure(
-        host.name,
-        moduleId,
-        body as RobotApiErrorResponse,
-        meta
-      )
+    ? Actions.updateModuleSuccess(host.name, moduleId, body.message, meta)
+    : Actions.updateModuleFailure(host.name, moduleId, body, meta)
 }
 
 export const updateModuleEpic: Epic = (action$, state$) => {

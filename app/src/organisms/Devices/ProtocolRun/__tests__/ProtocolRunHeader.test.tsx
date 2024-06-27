@@ -65,6 +65,7 @@ import { mockConnectableRobot } from '../../../../redux/discovery/__fixtures__'
 import { getRobotUpdateDisplayInfo } from '../../../../redux/robot-update'
 import { getIsHeaterShakerAttached } from '../../../../redux/config'
 import { getRobotSettings } from '../../../../redux/robot-settings'
+
 import {
   useProtocolDetailsForRun,
   useProtocolAnalysisErrors,
@@ -85,16 +86,12 @@ import { ProtocolRunHeader } from '../ProtocolRunHeader'
 import { HeaterShakerIsRunningModal } from '../../HeaterShakerIsRunningModal'
 import { RunFailedModal } from '../RunFailedModal'
 import { DISENGAGED, NOT_PRESENT } from '../../../EmergencyStop'
+import { getPipettesWithTipAttached } from '../../../DropTipWizard/getPipettesWithTipAttached'
 import { getIsFixtureMismatch } from '../../../../resources/deck_configuration/utils'
 import { useDeckConfigurationCompatibility } from '../../../../resources/deck_configuration/hooks'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useMostRecentRunId } from '../../../ProtocolUpload/hooks/useMostRecentRunId'
 import { useNotifyRunQuery } from '../../../../resources/runs'
-import {
-  useDropTipWizardFlows,
-  useTipAttachmentStatus,
-} from '../../../DropTipWizardFlows'
-
 import type { UseQueryResult } from 'react-query'
 import type * as ReactRouterDom from 'react-router-dom'
 import type { Mock } from 'vitest'
@@ -142,7 +139,7 @@ vi.mock('../../../../redux/config')
 vi.mock('../RunFailedModal')
 vi.mock('../../../../redux/robot-update/selectors')
 vi.mock('../../../../redux/robot-settings/selectors')
-vi.mock('../../../DropTipWizardFlows')
+vi.mock('../../../DropTipWizard/getPipettesWithTipAttached')
 vi.mock('../../../../resources/deck_configuration/utils')
 vi.mock('../../../../resources/deck_configuration/hooks')
 vi.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
@@ -227,14 +224,12 @@ const render = () => {
 let mockTrackEvent: Mock
 let mockTrackProtocolRunEvent: Mock
 let mockCloseCurrentRun: Mock
-let mockDetermineTipStatus: Mock
 
 describe('ProtocolRunHeader', () => {
   beforeEach(() => {
     mockTrackEvent = vi.fn()
     mockTrackProtocolRunEvent = vi.fn(() => new Promise(resolve => resolve({})))
     mockCloseCurrentRun = vi.fn()
-    mockDetermineTipStatus = vi.fn()
 
     vi.mocked(useTrackEvent).mockReturnValue(mockTrackEvent)
     vi.mocked(ConfirmCancelModal).mockReturnValue(
@@ -334,19 +329,12 @@ describe('ProtocolRunHeader', () => {
     vi.mocked(getRobotSettings).mockReturnValue([mockSettings])
     vi.mocked(useInstrumentsQuery).mockReturnValue({ data: {} } as any)
     vi.mocked(useHost).mockReturnValue({} as any)
-    vi.mocked(useTipAttachmentStatus).mockReturnValue({
-      pipettesWithTip: [
+    vi.mocked(getPipettesWithTipAttached).mockReturnValue(
+      Promise.resolve([
         instrumentsResponseLeftPipetteFixture,
         instrumentsResponseRightPipetteFixture,
-      ],
-      areTipsAttached: true,
-      determineTipStatus: mockDetermineTipStatus,
-      resetTipStatus: vi.fn(),
-    } as any)
-    vi.mocked(useDropTipWizardFlows).mockReturnValue({
-      showDTWiz: false,
-      toggleDTWiz: vi.fn(),
-    })
+      ]) as any
+    )
     vi.mocked(getPipetteModelSpecs).mockReturnValue('p10_single_v1' as any)
     when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(RUN_ID)
@@ -807,10 +795,6 @@ describe('ProtocolRunHeader', () => {
     when(vi.mocked(useRunStatus))
       .calledWith(RUN_ID)
       .thenReturn(RUN_STATUS_STOPPED)
-    vi.mocked(useTipAttachmentStatus).mockReturnValue({
-      areTipsAttached: false,
-      determineTipStatus: mockDetermineTipStatus,
-    } as any)
     render()
 
     screen.getByText('Run canceled.')
@@ -841,7 +825,7 @@ describe('ProtocolRunHeader', () => {
       .thenReturn(RUN_STATUS_SUCCEEDED)
     render()
 
-    fireEvent.click(screen.queryAllByTestId('Banner_close-button')[0])
+    fireEvent.click(screen.getByTestId('Banner_close-button'))
     expect(mockCloseCurrentRun).toBeCalled()
   })
 
@@ -1046,7 +1030,9 @@ describe('ProtocolRunHeader', () => {
 
     render()
     await waitFor(() => {
-      expect(mockDetermineTipStatus).not.toHaveBeenCalled()
+      expect(
+        screen.queryByText('Tips may be attached.')
+      ).not.toBeInTheDocument()
     })
   })
 })

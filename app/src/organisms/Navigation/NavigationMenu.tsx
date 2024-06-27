@@ -96,9 +96,7 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
         </MenuItem>
         <MenuItem
           key="deck-configuration"
-          onClick={() => {
-            history.push('/deck-configuration')
-          }}
+          onClick={() => history.push('/deck-configuration')}
         >
           <Flex alignItems={ALIGN_CENTER}>
             <Icon name="deck-map" aria-label="deck-map_icon" size="2.5rem" />

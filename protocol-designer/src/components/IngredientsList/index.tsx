@@ -5,7 +5,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import { IconButton, SidePanel, truncateString } from '@opentrons/components'
 import { sortWells } from '@opentrons/shared-data'
 import * as wellSelectionSelectors from '../../top-selectors/well-contents'
-import { removeWellsContents } from '../../labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { PDTitledList, PDListItem } from '../lists'
 import { TitledListNotes } from '../TitledListNotes'
@@ -14,6 +13,7 @@ import { LabwareDetailsCard } from './LabwareDetailsCard/LabwareDetailsCard'
 import styles from './IngredientsList.module.css'
 
 import type { SingleLabwareLiquidState } from '@opentrons/step-generation'
+import type { SelectedContainerId } from '../../labware-ingred/reducers'
 import type { LiquidGroup } from '../../labware-ingred/types'
 import type { ThunkDispatch } from '../../types'
 
@@ -47,9 +47,7 @@ const LiquidGroupCard = (props: LiquidGroupCardProps): JSX.Element | null => {
 
   const [expanded, setExpanded] = React.useState(true)
 
-  const toggleAccordion = (): void => {
-    setExpanded(!expanded)
-  }
+  const toggleAccordion = (): void => setExpanded(!expanded)
 
   const wellsWithIngred = Object.keys(labwareWellContents)
     .sort(sortWells)
@@ -87,10 +85,10 @@ const LiquidGroupCard = (props: LiquidGroupCardProps): JSX.Element | null => {
 
       {wellsWithIngred.map((well, i) => {
         const wellIngredForCard = labwareWellContents[well][groupId]
-        const volume =
-          wellIngredForCard != null ? wellIngredForCard.volume : null
+        const volume = wellIngredForCard && wellIngredForCard.volume
 
         if (volume == null) {
+          // TODO: Ian 2018-06-07 use assert
           console.warn(
             `Got null-ish volume for well: ${well}, ingred: ${groupId}`
           )
@@ -100,7 +98,7 @@ const LiquidGroupCard = (props: LiquidGroupCardProps): JSX.Element | null => {
         return (
           <IngredIndividual
             key={well}
-            name={showName ? `${ingredGroup.name ?? ''} ${i + 1}` : null}
+            name={showName ? `${ingredGroup.name || ''} ${i + 1}` : null}
             wellName={well}
             canDelete
             volume={volume}
@@ -137,22 +135,16 @@ function IngredIndividual(props: IndividProps): JSX.Element {
   return (
     <PDListItem border hoverable>
       <span>{wellName}</span>
-      <span>
-        {Boolean(volume) ? volume + ` ${t('units.microliter')}` : '-'}
-      </span>
-      {name != null ? <span>{name}</span> : null}
+      <span>{volume ? volume + ` ${t('units.microliter')}` : '-'}</span>
+      {name && <span>{name}</span>}
       {canDelete && (
         <IconButton
           className={styles.close_icon}
           name="close"
-          onClick={() => {
-            if (
-              window.confirm(
-                t('are_you_sure_delete_well', { well: wellName }) as string
-              )
-            )
-              removeWellsContents({ liquidGroupId: groupId, wells: [wellName] })
-          }}
+          onClick={() =>
+            window.confirm(t('are_you_sure_delete_well', { well: wellName })) &&
+            removeWellsContents({ liquidGroupId: groupId, wells: [wellName] })
+          }
         />
       )}
     </PDListItem>
@@ -177,10 +169,15 @@ export function IngredientsList(): JSX.Element {
   const dispatch = useDispatch<ThunkDispatch<any>>()
 
   const labwareWellContents =
-    (selectedLabwareId != null
-      ? allLabwareWellContents[selectedLabwareId]
-      : null) ?? {}
+    (selectedLabwareId && allLabwareWellContents[selectedLabwareId]) || {}
 
+  const removeWellsContents = (
+    labwareId?: SelectedContainerId | null
+  ): void => {
+    if (labwareId != null) {
+      dispatch(removeWellsContents(selectedLabwareId))
+    }
+  }
   return (
     <SidePanel title={t('nameAndLiquids')}>
       <LabwareDetailsCard />
@@ -188,17 +185,7 @@ export function IngredientsList(): JSX.Element {
       {Object.keys(liquidGroupsById).map(groupIdForCard => (
         <LiquidGroupCard
           key={groupIdForCard}
-          removeWellsContents={({ liquidGroupId, wells }) => {
-            if (selectedLabwareId != null) {
-              dispatch(
-                removeWellsContents({
-                  labwareId: selectedLabwareId,
-                  liquidGroupId,
-                  wells,
-                })
-              )
-            }
-          }}
+          removeWellsContents={() => removeWellsContents(selectedLabwareId)}
           labwareWellContents={labwareWellContents}
           ingredGroup={liquidGroupsById[groupIdForCard]}
           groupId={groupIdForCard}

@@ -58,8 +58,8 @@ export const LiquidPlacementForm = (): JSX.Element | null => {
   )
 
   const selectionHasLiquids = Boolean(
-    labwareId != null &&
-      liquidLocations[labwareId] != null &&
+    labwareId &&
+      liquidLocations[labwareId] &&
       Object.keys(selectedWellGroups).some(
         well => liquidLocations[labwareId][well]
       )
@@ -67,7 +67,7 @@ export const LiquidPlacementForm = (): JSX.Element | null => {
 
   const getInitialValues: () => ValidFormValues = () => {
     return {
-      selectedLiquidId: commonSelectedLiquidId ?? '',
+      selectedLiquidId: commonSelectedLiquidId || '',
       volume:
         commonSelectedVolume != null ? commonSelectedVolume.toString() : '',
     }
@@ -91,11 +91,11 @@ export const LiquidPlacementForm = (): JSX.Element | null => {
   }
 
   const handleClearWells: () => void = () => {
-    if (labwareId != null && selectedWells != null && selectionHasLiquids) {
-      if (global.confirm(t('application:are_you_sure') as string)) {
+    if (labwareId && selectedWells && selectionHasLiquids) {
+      if (global.confirm(t('application:are_you_sure'))) {
         dispatch(
           removeWellsContents({
-            labwareId,
+            labwareId: labwareId,
             wells: selectedWells,
           })
         )
@@ -123,7 +123,7 @@ export const LiquidPlacementForm = (): JSX.Element | null => {
       'when saving liquid placement form, expected a selected labware ID'
     )
     console.assert(
-      selectedWells != null && selectedWells.length > 0,
+      selectedWells && selectedWells.length > 0,
       `when saving liquid placement form, expected selected wells to be array with length > 0 but got ${String(
         selectedWells
       )}`
@@ -143,8 +143,8 @@ export const LiquidPlacementForm = (): JSX.Element | null => {
       dispatch(
         setWellContents({
           liquidGroupId: selectedLiquidId,
-          labwareId,
-          wells: selectedWells ?? [],
+          labwareId: labwareId,
+          wells: selectedWells || [],
           volume: Number(values.volume),
         })
       )
@@ -160,7 +160,7 @@ export const LiquidPlacementForm = (): JSX.Element | null => {
   if (!showForm) return null
 
   let volumeErrors: string | null = null
-  if (Boolean(touchedFields.volume)) {
+  if (touchedFields.volume) {
     if (volume == null || volume === '0') {
       volumeErrors = t('generic.error.more_than_zero')
     } else if (parseInt(volume) > selectedWellsMaxVolume) {
@@ -190,7 +190,7 @@ export const LiquidPlacementForm = (): JSX.Element | null => {
                   className={stepEditFormStyles.large_field}
                   options={liquidSelectionOptions}
                   error={
-                    Boolean(touchedFields.selectedLiquidId)
+                    touchedFields.selectedLiquidId
                       ? errors.selectedLiquidId?.message
                       : null
                   }
@@ -227,13 +227,7 @@ export const LiquidPlacementForm = (): JSX.Element | null => {
 
         <div className={styles.button_row}>
           <OutlineButton
-            disabled={
-              !(
-                labwareId != null &&
-                selectedWells != null &&
-                selectionHasLiquids
-              )
-            }
+            disabled={!(labwareId && selectedWells && selectionHasLiquids)}
             onClick={handleClearWells}
           >
             {t('button:clear_wells')}

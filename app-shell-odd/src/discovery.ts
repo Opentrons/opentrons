@@ -146,25 +146,20 @@ export function registerDiscovery(
 
     switch (action.type) {
       case UI_INITIALIZED:
-      case DISCOVERY_START: {
+      case DISCOVERY_START:
         handleRobots()
-        client.start({ healthPollInterval: FAST_POLL_INTERVAL_MS })
-        return
-      }
+        return client.start({ healthPollInterval: FAST_POLL_INTERVAL_MS })
 
-      case DISCOVERY_FINISH: {
-        client.start({ healthPollInterval: SLOW_POLL_INTERVAL_MS })
-        return
-      }
+      case DISCOVERY_FINISH:
+        return client.start({ healthPollInterval: SLOW_POLL_INTERVAL_MS })
 
-      case DISCOVERY_REMOVE: {
-        client.removeRobot((action.payload as { robotName: string }).robotName)
-        return
-      }
+      case DISCOVERY_REMOVE:
+        return client.removeRobot(
+          (action.payload as { robotName: string }).robotName
+        )
 
-      case CLEAR_CACHE: {
-        clearCache()
-      }
+      case CLEAR_CACHE:
+        return clearCache()
     }
   }
 

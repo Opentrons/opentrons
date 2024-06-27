@@ -20,9 +20,8 @@ interface ExpandingTitleProps {
 
 export function ExpandingTitle(props: ExpandingTitleProps): JSX.Element {
   const [diagramVisible, setDiagramVisible] = React.useState<boolean>(false)
-  const toggleDiagramVisible = (): void => {
+  const toggleDiagramVisible = (): void =>
     setDiagramVisible(currentDiagramVisible => !currentDiagramVisible)
-  }
   const { label, diagram } = props
 
   return (

@@ -6,11 +6,10 @@ import {
   useCreateRunMutation,
 } from '@opentrons/react-api-client'
 import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
-import { createQuickTransferFile } from '../utils'
+import { createQuickTransferFile } from '../utils/createQuickTransferFile'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { SummaryAndSettings } from '../SummaryAndSettings'
-import { NameQuickTransfer } from '../NameQuickTransfer'
 import { Overview } from '../Overview'
 import type * as ReactRouterDom from 'react-router-dom'
 
@@ -24,7 +23,6 @@ vi.mock('react-router-dom', async importOriginal => {
   }
 })
 vi.mock('../Overview')
-vi.mock('../NameQuickTransfer')
 vi.mock('../utils', async () => {
   const actual = await vi.importActual('../utils')
   return {
@@ -115,13 +113,14 @@ describe('SummaryAndSettings', () => {
     screen.getByText('Do you want to run your quick transfer now?')
     screen.getByText('Save your quick transfer to run it in the future.')
   })
-  it('renders name quick transfer screen when pressing save', () => {
+  it('calls the proper functions when pressing save', () => {
     render(props)
     const continueBtn = screen.getByTestId('ChildNavigation_Primary_Button')
     fireEvent.click(continueBtn)
     const saveBtn = screen.getByText('Save for later')
     fireEvent.click(saveBtn)
-    expect(vi.mocked(NameQuickTransfer)).toHaveBeenCalled()
+    expect(vi.mocked(createQuickTransferFile)).toHaveBeenCalled()
+    expect(vi.mocked(createProtocol)).toHaveBeenCalled()
   })
   it('calls the proper functions when pressing run', () => {
     render(props)

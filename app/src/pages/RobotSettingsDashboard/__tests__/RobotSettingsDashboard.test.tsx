@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 
@@ -84,44 +84,42 @@ describe('RobotSettingsDashboard', () => {
   })
 
   it('should render setting buttons', () => {
-    render()
-    screen.getByText('Robot Name')
-    screen.getByText('opentrons-robot-name')
-    screen.getByText('Robot System Version')
-    screen.getByText('Network Settings')
-    screen.getByText('Status LEDs')
-    screen.getByText(
-      'Control the strip of color lights on the front of the robot.'
-    )
-    screen.getByText('Touchscreen Sleep')
-    screen.getByText('Touchscreen Brightness')
-    screen.getByText('Privacy')
-    screen.getByText('Choose what data to share with Opentrons.')
-    screen.getByText('Device Reset')
-    screen.getByText('Update Channel')
-    screen.getByText('Apply Labware Offsets')
-    screen.getByText('Use stored data when setting up a protocol.')
-    screen.getByText('Developer Tools')
-    screen.getByText('Access additional logging and feature flags.')
+    const [{ getByText }] = render()
+    getByText('Robot Name')
+    getByText('opentrons-robot-name')
+    getByText('Robot System Version')
+    getByText('Network Settings')
+    getByText('Status LEDs')
+    getByText('Control the strip of color lights on the front of the robot.')
+    getByText('Touchscreen Sleep')
+    getByText('Touchscreen Brightness')
+    getByText('Privacy')
+    getByText('Choose what data to share with Opentrons.')
+    getByText('Device Reset')
+    getByText('Update Channel')
+    getByText('Apply Labware Offsets')
+    getByText('Use stored data when setting up a protocol.')
+    getByText('Developer Tools')
+    getByText('Access additional logging and feature flags.')
   })
 
   it('should render component when tapping robot name button', () => {
-    render()
-    const button = screen.getByText('Robot Name')
+    const [{ getByText }] = render()
+    const button = getByText('Robot Name')
     fireEvent.click(button)
-    screen.getByText('Robot Name')
+    getByText('Robot Name')
   })
 
   it('should render component when tapping robot system version', () => {
-    render()
-    const button = screen.getByText('Robot System Version')
+    const [{ getByText }] = render()
+    const button = getByText('Robot System Version')
     fireEvent.click(button)
     expect(vi.mocked(RobotSystemVersion)).toHaveBeenCalled()
   })
 
   it('should render text with lights off and clicking it, calls useLEDLights', () => {
-    render()
-    const lights = screen.getByText('Status LEDs')
+    const [{ getByText }] = render()
+    const lights = getByText('Status LEDs')
     fireEvent.click(lights)
     expect(mockToggleLights).toHaveBeenCalled()
   })
@@ -131,50 +129,50 @@ describe('RobotSettingsDashboard', () => {
       lightsEnabled: true,
       toggleLights: mockToggleLights,
     })
-    render()
+    const [{ getByTestId }] = render()
     expect(
-      screen.getByTestId('RobotSettingButton_display_led_lights')
+      getByTestId('RobotSettingButton_display_led_lights')
     ).toHaveTextContent('On')
   })
 
   it('should render component when tapping network settings', () => {
-    render()
-    const button = screen.getByText('Network Settings')
+    const [{ getByText }] = render()
+    const button = getByText('Network Settings')
     fireEvent.click(button)
     expect(vi.mocked(NetworkSettings)).toHaveBeenCalled()
   })
 
   it('should render component when tapping display touchscreen sleep', () => {
-    render()
-    const button = screen.getByText('Touchscreen Sleep')
+    const [{ getByText }] = render()
+    const button = getByText('Touchscreen Sleep')
     fireEvent.click(button)
     expect(vi.mocked(TouchScreenSleep)).toHaveBeenCalled()
   })
 
   it('should render component when tapping touchscreen brightness', () => {
-    render()
-    const button = screen.getByText('Touchscreen Brightness')
+    const [{ getByText }] = render()
+    const button = getByText('Touchscreen Brightness')
     fireEvent.click(button)
     expect(vi.mocked(TouchscreenBrightness)).toHaveBeenCalled()
   })
 
   it('should render component when tapping privacy', () => {
-    render()
-    const button = screen.getByText('Privacy')
+    const [{ getByText }] = render()
+    const button = getByText('Privacy')
     fireEvent.click(button)
     expect(vi.mocked(Privacy)).toHaveBeenCalled()
   })
 
   it('should render component when tapping device rest', () => {
-    render()
-    const button = screen.getByText('Device Reset')
+    const [{ getByText }] = render()
+    const button = getByText('Device Reset')
     fireEvent.click(button)
     expect(vi.mocked(DeviceReset)).toHaveBeenCalled()
   })
 
   it('should render component when tapping update channel', () => {
-    render()
-    const button = screen.getByText('Update Channel')
+    const [{ getByText }] = render()
+    const button = getByText('Update Channel')
     fireEvent.click(button)
     expect(vi.mocked(UpdateChannel)).toHaveBeenCalled()
   })
@@ -189,29 +187,29 @@ describe('RobotSettingsDashboard', () => {
         value: false,
       },
     ])
-    render()
+    const [{ getByTestId }] = render()
     expect(
-      screen.getByTestId('RobotSettingButton_home_gantry_on_restart')
+      getByTestId('RobotSettingButton_home_gantry_on_restart')
     ).toHaveTextContent('On')
   })
 
   it('should call a mock function when tapping enable historic offset', () => {
-    render()
-    const button = screen.getByText('Apply Labware Offsets')
+    const [{ getByText }] = render()
+    const button = getByText('Apply Labware Offsets')
     fireEvent.click(button)
     expect(vi.mocked(toggleHistoricOffsets)).toHaveBeenCalled()
   })
 
   it('should call a mock function when tapping enable dev tools', () => {
-    render()
-    const button = screen.getByText('Developer Tools')
+    const [{ getByText }] = render()
+    const button = getByText('Developer Tools')
     fireEvent.click(button)
     expect(vi.mocked(toggleDevtools)).toHaveBeenCalled()
   })
 
   it('should return an update available with correct text', () => {
     vi.mocked(getRobotUpdateAvailable).mockReturnValue('upgrade')
-    render()
-    screen.getByText('Update available')
+    const [{ getByText }] = render()
+    getByText('Update available')
   })
 })

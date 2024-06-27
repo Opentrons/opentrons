@@ -2,7 +2,6 @@ import * as React from 'react'
 import { getWellTotalVolume } from '@opentrons/shared-data'
 import { KnowledgeBaseLink } from '../../components/KnowledgeBaseLink'
 import type { FormError } from './errors'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 /*******************
  ** Warning Messages **
@@ -137,9 +136,7 @@ export const belowPipetteMinimumVolume = (
     'lowVolumeDefault' in liquidSpecs
       ? liquidSpecs.lowVolumeDefault.minVolume
       : liquidSpecs.default.minVolume
-  return volume < minVolume
-    ? belowPipetteMinVolumeWarning(minVolume as number)
-    : null
+  return volume < minVolume ? belowPipetteMinVolumeWarning(minVolume) : null
 }
 
 export const maxDispenseWellVolume = (
@@ -153,7 +150,7 @@ export const maxDispenseWellVolume = (
       (dispense_labware.name === 'wasteChute' ||
         dispense_labware.name === 'trashBin')
         ? Infinity // some randomly selected high number since waste chute is huge
-        : getWellTotalVolume(dispense_labware.def as LabwareDefinition2, well)
+        : getWellTotalVolume(dispense_labware.def, well)
     return maximum && volume > maximum
   })
   return hasExceeded ? overMaxWellVolumeWarning() : null
@@ -176,10 +173,10 @@ export const minDisposalVolume = (
       ? liquidSpecs.lowVolumeDefault.minVolume
       : liquidSpecs.default.minVolume
   if (isUnselected) {
-    return belowMinDisposalVolumeWarning(minVolume as number)
+    return belowMinDisposalVolumeWarning(minVolume)
   }
   const isBelowMin = disposalVolume_volume < minVolume
-  return isBelowMin ? belowMinDisposalVolumeWarning(minVolume as number) : null
+  return isBelowMin ? belowMinDisposalVolumeWarning(minVolume) : null
 }
 
 // both aspirate and dispense air gap volumes have the same minimums
@@ -199,7 +196,7 @@ export const _minAirGapVolume = (
       ? liquidSpecs.lowVolumeDefault.minVolume
       : liquidSpecs.default.minVolume
   const isBelowMin = Number(volumeValue) < minVolume
-  return isBelowMin ? belowMinAirGapVolumeWarning(minVolume as number) : null
+  return isBelowMin ? belowMinAirGapVolumeWarning(minVolume) : null
 }
 
 export const minAspirateAirGapVolume: (

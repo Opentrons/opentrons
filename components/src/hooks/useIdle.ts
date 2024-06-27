@@ -53,14 +53,10 @@ export function useIdle(
       }, idleTime)
     }
 
-    events.forEach(event => {
-      document.addEventListener(event, handleEvents)
-    })
+    events.forEach(event => document.addEventListener(event, handleEvents))
 
     return () => {
-      events.forEach(event => {
-        document.removeEventListener(event, handleEvents)
-      })
+      events.forEach(event => document.removeEventListener(event, handleEvents))
     }
   }, [events, idleTime])
 

@@ -79,9 +79,9 @@ export const ConfirmAttachmentModal = (
         }`}
       >
         <CheckboxField
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setIsDismissed(e.currentTarget.checked)
-          }}
+          }
           value={isDismissed}
         />
         <StyledText

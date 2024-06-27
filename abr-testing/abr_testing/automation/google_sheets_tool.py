@@ -15,12 +15,6 @@ Retrieve from https://console.cloud.google.com/apis/credentials.
 """
 
 
-class google_interaction_error(gspread.exceptions.APIError):
-    """Internal use exception so we don't need to import gspread directly in other projects."""
-
-    pass
-
-
 class google_sheet:
     """Google Sheets Tool."""
 

@@ -2,8 +2,6 @@ import * as React from 'react'
 import { vi, describe, it, expect, beforeEach } from 'vitest'
 import { screen, fireEvent } from '@testing-library/react'
 
-import { COLORS } from '@opentrons/components'
-
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { RecoveryFooterButtons } from '../RecoveryFooterButtons'
@@ -20,12 +18,10 @@ describe('RecoveryFooterButtons', () => {
   let props: React.ComponentProps<typeof RecoveryFooterButtons>
   let mockPrimaryBtnOnClick: Mock
   let mockSecondaryBtnOnClick: Mock
-  let mockTertiaryBtnOnClick: Mock
 
   beforeEach(() => {
     mockPrimaryBtnOnClick = vi.fn()
     mockSecondaryBtnOnClick = vi.fn()
-    mockTertiaryBtnOnClick = vi.fn()
     props = {
       isOnDevice: true,
       primaryBtnOnClick: mockPrimaryBtnOnClick,
@@ -60,49 +56,5 @@ describe('RecoveryFooterButtons', () => {
     expect(
       screen.queryByRole('button', { name: 'Go back' })
     ).not.toBeInTheDocument()
-  })
-
-  it('renders correct loading state on the primary button if loading is true', () => {
-    props = { ...props, isLoadingPrimaryBtnAction: true }
-    render(props)
-
-    const primaryBtn = screen.getByRole('button', {
-      name: 'loading indicator Continue',
-    })
-
-    screen.getByLabelText('loading indicator')
-    expect(primaryBtn).toHaveStyle(`background-color: ${COLORS.blue60}`)
-  })
-
-  it('renders the tertiary button when tertiaryBtnOnClick is provided', () => {
-    props = { ...props, tertiaryBtnOnClick: mockTertiaryBtnOnClick }
-    render(props)
-
-    const tertiaryBtn = screen.getByRole('button', { name: '' })
-
-    fireEvent.click(tertiaryBtn)
-
-    expect(mockTertiaryBtnOnClick).toHaveBeenCalled()
-  })
-
-  it('renders the tertiary button with custom text when tertiaryBtnText is provided', () => {
-    props = { ...props, tertiaryBtnText: 'Hey' }
-    render(props)
-
-    screen.getByRole('button', { name: 'Hey' })
-  })
-
-  it('renders the tertiary button as disabled when tertiaryBtnDisabled is true', () => {
-    props = {
-      ...props,
-      tertiaryBtnOnClick: mockTertiaryBtnOnClick,
-      tertiaryBtnDisabled: true,
-      tertiaryBtnText: 'Hi',
-    }
-    render(props)
-
-    const tertiaryBtn = screen.getByRole('button', { name: 'Hi' })
-
-    expect(tertiaryBtn).toBeDisabled()
   })
 })

@@ -17,37 +17,41 @@
       "status": "succeeded"
     },
     {
-      "commandType": "comment",
+      "commandType": "custom",
       "notes": [],
       "params": {
-        "message": "Let there be light! True 🌠🌠🌠"
+        "legacyCommandText": "Let there be light! True 🌠🌠🌠",
+        "legacyCommandType": "command.COMMENT"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "comment",
+      "commandType": "custom",
       "notes": [],
       "params": {
-        "message": "Is the door is closed? True 🚪🚪🚪"
+        "legacyCommandText": "Is the door is closed? True 🚪🚪🚪",
+        "legacyCommandType": "command.COMMENT"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "comment",
+      "commandType": "custom",
       "notes": [],
       "params": {
-        "message": "Is this a simulation? True 🔮🔮🔮"
+        "legacyCommandText": "Is this a simulation? True 🔮🔮🔮",
+        "legacyCommandType": "command.COMMENT"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "comment",
+      "commandType": "custom",
       "notes": [],
       "params": {
-        "message": "Running against API Version: 2.17"
+        "legacyCommandText": "Running against API Version: 2.17",
+        "legacyCommandType": "command.COMMENT"
       },
       "result": {},
       "status": "succeeded"
@@ -2931,7 +2935,6 @@
         "errorCode": "4000",
         "errorInfo": {},
         "errorType": "InvalidDispenseVolumeError",
-        "isDefined": false,
         "wrappedErrors": []
       },
       "notes": [],
@@ -2964,21 +2967,18 @@
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
-      "isDefined": false,
       "wrappedErrors": [
         {
           "detail": "InvalidDispenseVolumeError: Cannot dispense 21.0 µL when only 20.0 µL has been aspirated.",
           "errorCode": "4000",
           "errorInfo": {},
           "errorType": "ProtocolCommandFailedError",
-          "isDefined": false,
           "wrappedErrors": [
             {
               "detail": "Cannot dispense 21.0 µL when only 20.0 µL has been aspirated.",
               "errorCode": "4000",
               "errorInfo": {},
               "errorType": "InvalidDispenseVolumeError",
-              "isDefined": false,
               "wrappedErrors": []
             }
           ]
@@ -3062,7 +3062,6 @@
       "pipetteName": "p20_single_gen2"
     }
   ],
-  "result": "not-ok",
   "robotType": "OT-2 Standard",
   "runTimeParameters": []
 }

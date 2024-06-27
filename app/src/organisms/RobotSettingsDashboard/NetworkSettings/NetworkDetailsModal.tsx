@@ -48,9 +48,7 @@ export function NetworkDetailsModal({
     <Modal
       modalSize="medium"
       header={modalHeader}
-      onOutsideClick={() => {
-        setShowNetworkDetailModal(false)
-      }}
+      onOutsideClick={() => setShowNetworkDetailModal(false)}
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}

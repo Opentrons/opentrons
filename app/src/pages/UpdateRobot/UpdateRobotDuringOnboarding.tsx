@@ -91,9 +91,7 @@ export function UpdateRobotDuringOnboarding(): JSX.Element {
             />
             <MediumButton
               flex="1"
-              onClick={() => {
-                dispatchStartRobotUpdate(robotName)
-              }}
+              onClick={() => dispatchStartRobotUpdate(robotName)}
               buttonText={i18n.format(t('shared:try_again'), 'capitalize')}
             />
           </Flex>
@@ -103,11 +101,7 @@ export function UpdateRobotDuringOnboarding(): JSX.Element {
       ) : localRobot === null ||
         localRobot.status === UNREACHABLE ||
         robotUpdateType !== 'upgrade' ? (
-        <NoUpdateFound
-          onContinue={() => {
-            history.push('/emergency-stop')
-          }}
-        />
+        <NoUpdateFound onContinue={() => history.push('/emergency-stop')} />
       ) : (
         <UpdateRobotSoftware
           localRobot={localRobot}

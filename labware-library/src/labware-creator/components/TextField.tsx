@@ -23,7 +23,7 @@ interface Props {
 // This functionality in TextField may be removed if we clearly don't need it.
 export const TextField = (props: Props): JSX.Element => {
   const { label, caption, placeholder, units } = props
-  const inputMasks = props.inputMasks ?? []
+  const inputMasks = props.inputMasks || []
   // @ts-expect-error(IL, 2021-03-24): formik types need cleanup w LabwareFields
   const makeHandleChange = ({ field, form }) => (
     e: React.FormEvent<HTMLInputElement>
@@ -31,7 +31,7 @@ export const TextField = (props: Props): JSX.Element => {
     const prevValue = field.value
     const rawValue = e.currentTarget.value
     const nextValue = inputMasks.reduce(
-      (acc, maskFn) => maskFn(prevValue as string, acc),
+      (acc, maskFn) => maskFn(prevValue, acc),
       rawValue
     )
     form.setFieldValue(props.name, nextValue)
@@ -40,10 +40,10 @@ export const TextField = (props: Props): JSX.Element => {
   return (
     <Field name={props.name}>
       {({ field, form }: FieldProps) =>
-        getIsHidden(props.name, form.values as LabwareFields) ? null : (
+        getIsHidden(props.name, form.values) ? null : (
           <div className={fieldStyles.field_wrapper}>
             <label className={fieldStyles.field_label}>
-              {label ?? getLabel(props.name, form.values as LabwareFields)}
+              {label !== undefined ? label : getLabel(props.name, form.values)}
               <InputField
                 name={field.name}
                 value={field.value}

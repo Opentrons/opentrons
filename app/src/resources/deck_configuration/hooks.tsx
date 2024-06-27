@@ -191,9 +191,7 @@ export function useDeckConfigurationEditingTools(
       targetCutoutId != null ? (
         <AddFixtureModal
           cutoutId={targetCutoutId}
-          closeModal={() => {
-            setTargetCutoutId(null)
-          }}
+          closeModal={() => setTargetCutoutId(null)}
           isOnDevice={isOnDevice}
         />
       ) : null,

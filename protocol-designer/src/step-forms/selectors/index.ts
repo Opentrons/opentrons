@@ -11,7 +11,6 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
-  ABSORBANCE_READER_TYPE,
   getPipetteSpecsV2,
 } from '@opentrons/shared-data'
 import { TEMPERATURE_DEACTIVATED } from '@opentrons/step-generation'
@@ -50,7 +49,7 @@ import type { ProfileFormError } from '../../steplist/formLevel/profileErrors'
 import type { LabwareDefByDefURI } from '../../labware-defs'
 import type { FormWarning } from '../../steplist/formLevel'
 import type { BaseState, DeckSlot } from '../../types'
-import type { FormData, ProfileItem, StepIdType } from '../../form-types'
+import type { FormData, StepIdType } from '../../form-types'
 import type {
   StepArgsAndErrorsById,
   StepFormErrors,
@@ -69,7 +68,6 @@ import type {
   ThermocyclerModuleState,
   HeaterShakerModuleState,
   MagneticBlockState,
-  AbsorbanceReaderState,
 } from '../types'
 import type {
   PresavedStepFormState,
@@ -207,9 +205,6 @@ const HEATERSHAKER_MODULE_INITIAL_STATE: HeaterShakerModuleState = {
 const MAGNETIC_BLOCK_INITIAL_STATE: MagneticBlockState = {
   type: MAGNETIC_BLOCK_TYPE,
 }
-const ABSORBANCE_READER_INITIAL_STATE: AbsorbanceReaderState = {
-  type: ABSORBANCE_READER_TYPE,
-}
 
 const _getInitialDeckSetup = (
   initialSetupStep: FormData,
@@ -246,8 +241,8 @@ const _getInitialDeckSetup = (
   }, {})
 
   return {
-    labware: mapValues<Record<DeckSlot, string>, LabwareOnDeck>(
-      labwareLocations as Record<DeckSlot, string>,
+    labware: mapValues<{}, LabwareOnDeck>(
+      labwareLocations,
       (slot: DeckSlot, labwareId: string): LabwareOnDeck => {
         return {
           slot,
@@ -255,8 +250,8 @@ const _getInitialDeckSetup = (
         }
       }
     ),
-    modules: mapValues<Record<DeckSlot, string>, ModuleOnDeck>(
-      moduleLocations as Record<DeckSlot, string>,
+    modules: mapValues<{}, ModuleOnDeck>(
+      moduleLocations,
       (slot: DeckSlot, moduleId: string): ModuleOnDeck => {
         const moduleEntity = moduleEntities[moduleId]
 
@@ -301,19 +296,11 @@ const _getInitialDeckSetup = (
               slot,
               moduleState: MAGNETIC_BLOCK_INITIAL_STATE,
             }
-          case ABSORBANCE_READER_TYPE:
-            return {
-              id: moduleEntity.id,
-              model: moduleEntity.model,
-              type: ABSORBANCE_READER_TYPE,
-              slot,
-              moduleState: ABSORBANCE_READER_INITIAL_STATE,
-            }
         }
       }
     ),
     pipettes: mapValues<{}, PipetteOnDeck>(
-      pipetteLocations as Record<Mount, string>,
+      pipetteLocations,
       (mount: Mount, pipetteId: string): PipetteOnDeck => {
         return { mount, ...pipetteEntities[pipetteId] }
       }
@@ -554,7 +541,7 @@ export const _hasFieldLevelErrors = (hydratedForm: FormData): boolean => {
       hydratedForm.stepType === 'thermocycler' &&
       fieldName === 'profileItemsById'
     ) {
-      if (getProfileItemsHaveErrors(value as Record<string, ProfileItem>)) {
+      if (getProfileItemsHaveErrors(value)) {
         return true
       }
     } else {
@@ -612,15 +599,13 @@ export const getInvariantContext: Selector<
   getAdditionalEquipmentEntities,
   featureFlagSelectors.getDisableModuleRestrictions,
   featureFlagSelectors.getAllowAllTipracks,
-  featureFlagSelectors.getEnableAbsorbanceReader,
   (
     labwareEntities,
     moduleEntities,
     pipetteEntities,
     additionalEquipmentEntities,
     disableModuleRestrictions,
-    allowAllTipracks,
-    enableAbsorbanceReader
+    allowAllTipracks
   ) => ({
     labwareEntities,
     moduleEntities,
@@ -629,7 +614,6 @@ export const getInvariantContext: Selector<
     config: {
       OT_PD_ALLOW_ALL_TIPRACKS: Boolean(allowAllTipracks),
       OT_PD_DISABLE_MODULE_RESTRICTIONS: Boolean(disableModuleRestrictions),
-      OT_PD_ENABLE_ABSORBANCE_READER: Boolean(enableAbsorbanceReader),
     },
   })
 )

@@ -32,7 +32,6 @@ export function createFailedAnalysis(
     // analysis that was unable to complete, but is required by
     // ProtocolAnalysisOutput
     config: {} as any,
-    result: 'not-ok',
   }
 }
 

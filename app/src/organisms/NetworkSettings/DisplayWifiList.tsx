@@ -80,9 +80,7 @@ export function DisplayWifiList({
       {isHeader ? (
         <RobotSetupHeader
           header={t('select_a_network')}
-          onClickBack={() => {
-            history.push('/network-setup')
-          }}
+          onClickBack={() => history.push('/network-setup')}
         />
       ) : null}
       <Flex
@@ -97,9 +95,7 @@ export function DisplayWifiList({
                 key={nw.ssid}
                 css={NETWORK_ROW_STYLE}
                 flexDirection={DIRECTION_ROW}
-                onClick={() => {
-                  handleNetworkPress(nw.ssid)
-                }}
+                onClick={() => handleNetworkPress(nw.ssid)}
               >
                 <Icon name="wifi" size="2.5rem" />
                 <StyledText as="h4">{nw.ssid}</StyledText>

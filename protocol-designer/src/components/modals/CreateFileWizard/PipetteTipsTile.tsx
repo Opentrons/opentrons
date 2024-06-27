@@ -93,16 +93,8 @@ export function PipetteTipsTile(props: PipetteTipsTileProps): JSX.Element {
           width="100%"
           paddingTop={SPACING.spacing8}
         >
-          <GoBack
-            onClick={() => {
-              goBack()
-            }}
-          />
-          <PrimaryButton
-            onClick={() => {
-              proceed()
-            }}
-          >
+          <GoBack onClick={() => goBack()} />
+          <PrimaryButton onClick={() => proceed()}>
             {t('application:next')}
           </PrimaryButton>
         </Flex>
@@ -230,9 +222,7 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
       <Flex justifyContent={JUSTIFY_END} alignItems={ALIGN_CENTER}>
         <Btn
           aria-label="PipetteTipsTile_customTipButton"
-          onClick={() => {
-            setShowCustomTipracks(!showCustomTipracks)
-          }}
+          onClick={() => setShowCustomTipracks(!showCustomTipracks)}
         >
           <Icon
             css={ACCORDION_STYLE}

@@ -7,6 +7,7 @@ context('Tubes and Rack', () => {
     before(() => {
       cy.visit('/create')
       cy.viewport('macbook-15')
+      cy.contains('NO').click({ force: true })
       cy.get('label')
         .contains('What type of labware are you creating?')
         .children()
@@ -139,6 +140,7 @@ context('Tubes and Rack', () => {
     before(() => {
       cy.visit('/create')
       cy.viewport('macbook-15')
+      cy.contains('NO').click({ force: true })
 
       cy.get('label')
         .contains('What type of labware are you creating?')
@@ -270,6 +272,7 @@ context('Tubes and Rack', () => {
     before(() => {
       cy.visit('/create')
       cy.viewport('macbook-15')
+      cy.contains('NO').click({ force: true })
 
       cy.get('label')
         .contains('What type of labware are you creating?')

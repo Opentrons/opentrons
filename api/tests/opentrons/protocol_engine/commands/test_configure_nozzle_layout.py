@@ -25,7 +25,6 @@ from opentrons.protocol_engine.types import (
     QuadrantNozzleLayoutConfiguration,
     SingleNozzleLayoutConfiguration,
 )
-from opentrons_shared_data.pipette.pipette_definition import ValidNozzleMaps
 from ..pipette_fixtures import (
     NINETY_SIX_MAP,
     NINETY_SIX_COLS,
@@ -45,7 +44,6 @@ from ..pipette_fixtures import (
                 starting_nozzle="A1",
                 back_left_nozzle="A1",
                 front_right_nozzle="A1",
-                valid_nozzle_maps=ValidNozzleMaps(maps={"A1": ["A1"]}),
             ),
             {"primary_nozzle": "A1"},
         ],
@@ -58,9 +56,6 @@ from ..pipette_fixtures import (
                 starting_nozzle="A1",
                 back_left_nozzle="A1",
                 front_right_nozzle="H1",
-                valid_nozzle_maps=ValidNozzleMaps(
-                    maps={"Column1": NINETY_SIX_COLS["1"]}
-                ),
             ),
             {"primary_nozzle": "A1", "front_right_nozzle": "H1"},
         ],
@@ -75,9 +70,6 @@ from ..pipette_fixtures import (
                 starting_nozzle="A1",
                 back_left_nozzle="A1",
                 front_right_nozzle="E1",
-                valid_nozzle_maps=ValidNozzleMaps(
-                    maps={"A1_E1": ["A1", "B1", "C1", "D1", "E1"]}
-                ),
             ),
             {"primary_nozzle": "A1", "front_right_nozzle": "E1"},
         ],

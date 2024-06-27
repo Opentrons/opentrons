@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { it, describe } from 'vitest'
-import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
 import * as Sessions from '../../../../redux/sessions'
@@ -16,40 +15,40 @@ const render = (props: React.ComponentProps<typeof Body>) => {
 
 describe('Body', () => {
   it('renders correct text for health check', () => {
-    render({
+    const { getByText } = render({
       sessionType: Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
     })
-    screen.getByText(
+    getByText(
       'Calibration Health Check diagnoses problems with Deck, Tip Length, and Pipette Offset Calibration.'
     )
-    screen.getByText(
+    getByText(
       'You will move the pipettes to various positions, which will be compared against your existing calibration data.'
     )
-    screen.getByText(
+    getByText(
       'If there is a large difference, you will be prompted to redo some or all of your calibrations.'
     )
   })
   it('renders correct text for deck cal', () => {
-    render({
+    const { getByText } = render({
       sessionType: Sessions.SESSION_TYPE_DECK_CALIBRATION,
     })
-    screen.getByText(
+    getByText(
       'Deck calibration ensures positional accuracy so that your robot moves as expected. It will accurately establish the OT-2’s deck orientation relative to the gantry.'
     )
   })
   it('renders correct text for pip offset cal', () => {
-    render({
+    const { getByText } = render({
       sessionType: Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION,
     })
-    screen.getByText(
+    getByText(
       'Calibrating pipette offset measures a pipette’s position relative to the pipette mount and the deck.'
     )
   })
   it('renders correct text for tip length cal', () => {
-    render({
+    const { getByText } = render({
       sessionType: Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION,
     })
-    screen.getByText(
+    getByText(
       'Tip length calibration measures the distance between the bottom of the tip and the pipette’s nozzle.'
     )
   })

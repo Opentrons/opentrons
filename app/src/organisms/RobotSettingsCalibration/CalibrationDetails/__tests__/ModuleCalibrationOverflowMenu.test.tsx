@@ -288,9 +288,7 @@ describe('ModuleCalibrationOverflowMenu', () => {
 
   it('should be disabled when e-stop button is pressed', () => {
     when(useIsEstopNotDisengaged).calledWith(ROBOT_NAME).thenReturn(true)
-    render(props)
-    expect(
-      screen.getByLabelText('ModuleCalibrationOverflowMenu')
-    ).toBeDisabled()
+    const [{ getByLabelText }] = render(props)
+    expect(getByLabelText('ModuleCalibrationOverflowMenu')).toBeDisabled()
   })
 })

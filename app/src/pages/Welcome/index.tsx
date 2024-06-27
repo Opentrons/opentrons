@@ -47,9 +47,7 @@ export function Welcome(): JSX.Element {
         <MediumButton
           buttonCategory="rounded"
           buttonText={t('shared:get_started')}
-          onClick={() => {
-            history.push('/network-setup')
-          }}
+          onClick={() => history.push('/network-setup')}
         />
       </Flex>
     </Flex>

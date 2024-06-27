@@ -6,10 +6,7 @@ import { saveAs } from 'file-saver'
 import { reportEvent } from '../analytics'
 import { reportErrors } from './analyticsUtils'
 import { AlertModal } from '@opentrons/components'
-import {
-  getAllDefinitions,
-  labwareSchemaV2 as labwareSchema,
-} from '@opentrons/shared-data'
+import { labwareSchemaV2 as labwareSchema } from '@opentrons/shared-data'
 import {
   aluminumBlockAutofills,
   aluminumBlockChildTypeOptions,
@@ -50,7 +47,6 @@ import { WellShapeAndSides } from './components/sections/WellShapeAndSides'
 import { WellSpacing } from './components/sections/WellSpacing'
 import { getDefaultedDef } from './getDefaultedDef'
 import { getIsXYGeometryChanged } from './utils/getIsXYGeometryChanged'
-import { StackingOffsets } from './components/sections/StackingOffsets'
 
 import styles from './styles.module.css'
 
@@ -71,11 +67,6 @@ export const LabwareCreator = (): JSX.Element => {
     showExportErrorModal,
     _setShowExportErrorModal,
   ] = React.useState<boolean>(false)
-  const labwareDefinitions = getAllDefinitions()
-  const adapterDefinitions = Object.values(
-    labwareDefinitions
-  ).filter(definition => definition.allowedRoles?.includes('adapter'))
-
   const setShowExportErrorModal = React.useMemo(
     () => (v: boolean, fieldValues?: LabwareFields) => {
       // NOTE: values that take a default will remain null in this event
@@ -227,10 +218,7 @@ export const LabwareCreator = (): JSX.Element => {
             })
             return
           }
-          const fields = labwareDefToFields(
-            parsedLabwareDef,
-            adapterDefinitions
-          )
+          const fields = labwareDefToFields(parsedLabwareDef)
           if (fields == null) {
             setImportError(
               { key: 'UNSUPPORTED_LABWARE_PROPERTIES' },
@@ -269,9 +257,7 @@ export const LabwareCreator = (): JSX.Element => {
     <LabwareCreatorComponent>
       {importError != null ? (
         <ImportErrorModal
-          onClose={() => {
-            setImportError(null)
-          }}
+          onClose={() => setImportError(null)}
           importError={importError}
         />
       ) : null}
@@ -279,14 +265,10 @@ export const LabwareCreator = (): JSX.Element => {
         <AlertModal
           className={styles.error_modal}
           heading="Cannot export file"
-          onCloseClick={() => {
-            setShowExportErrorModal(false)
-          }}
+          onCloseClick={() => setShowExportErrorModal(false)}
           buttons={[
             {
-              onClick: () => {
-                setShowExportErrorModal(false)
-              },
+              onClick: () => setShowExportErrorModal(false),
               children: 'close',
             },
           ]}
@@ -305,7 +287,7 @@ export const LabwareCreator = (): JSX.Element => {
           const castValues: ProcessedLabwareFields = labwareFormSchema.cast(
             values
           )
-          const def = fieldsToLabware(castValues, adapterDefinitions)
+          const def = fieldsToLabware(castValues)
           const { displayName } = def.metadata
           const { loadName } = def.parameters
           const blob = new Blob([JSON.stringify(def, null, 4)], {
@@ -448,7 +430,6 @@ export const LabwareCreator = (): JSX.Element => {
                   <WellBottomAndDepth />
                   <WellSpacing />
                   <GridOffset />
-                  <StackingOffsets />
                   <Preview />
                   <Description />
                   <File />

@@ -15,7 +15,7 @@ import {
 } from '../../redux/discovery/constants'
 import { InterventionModal as InterventionModalComponent } from './'
 
-import type { Store, StoreEnhancer } from 'redux'
+import type { Store } from 'redux'
 import type { Story, Meta } from '@storybook/react'
 
 const dummyConfig = {
@@ -44,10 +44,7 @@ const dummyConfig = {
   },
 } as any
 
-const store: Store<any> = createStore(
-  configReducer,
-  dummyConfig as StoreEnhancer
-)
+const store: Store<any> = createStore(configReducer, dummyConfig)
 const queryClient = new QueryClient()
 const now = new Date()
 

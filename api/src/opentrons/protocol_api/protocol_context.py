@@ -50,7 +50,6 @@ from .core.module import (
     AbstractThermocyclerCore,
     AbstractHeaterShakerCore,
     AbstractMagneticBlockCore,
-    AbstractAbsorbanceReaderCore,
 )
 from .core.engine import ENGINE_CORE_API_VERSION
 from .core.legacy.legacy_protocol_core import LegacyProtocolCore
@@ -67,7 +66,6 @@ from .module_contexts import (
     ThermocyclerContext,
     HeaterShakerContext,
     MagneticBlockContext,
-    AbsorbanceReaderContext,
     ModuleContext,
 )
 from ._parameters import Parameters
@@ -82,7 +80,6 @@ ModuleTypes = Union[
     ThermocyclerContext,
     HeaterShakerContext,
     MagneticBlockContext,
-    AbsorbanceReaderContext,
 ]
 
 
@@ -1216,8 +1213,6 @@ def _create_module_context(
         module_cls = HeaterShakerContext
     elif isinstance(module_core, AbstractMagneticBlockCore):
         module_cls = MagneticBlockContext
-    elif isinstance(module_core, AbstractAbsorbanceReaderCore):
-        module_cls = AbsorbanceReaderContext
     else:
         assert False, "Unsupported module type"
 

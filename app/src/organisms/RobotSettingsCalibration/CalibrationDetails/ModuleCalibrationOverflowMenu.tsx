@@ -59,9 +59,7 @@ export function ModuleCalibrationOverflowMenu({
   const [targetProps, tooltipProps] = useHoverTooltip()
 
   const OverflowMenuRef = useOnClickOutside<HTMLDivElement>({
-    onClickOutside: () => {
-      setShowOverflowMenu(false)
-    },
+    onClickOutside: () => setShowOverflowMenu(false),
   })
   const { chainLiveCommands, isCommandMutationLoading } = useChainLiveCommands()
 

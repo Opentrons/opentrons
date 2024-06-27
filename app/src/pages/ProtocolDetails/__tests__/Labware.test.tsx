@@ -13,7 +13,6 @@ import {
 } from '@opentrons/shared-data'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import { screen } from '@testing-library/react'
 
 vi.mock('../../Protocols/hooks')
 
@@ -69,14 +68,14 @@ describe('Labware', () => {
   })
 
   it('should render column headers that indicate where the labware is, what is called, and how many are required', () => {
-    render(props)
-    screen.getByRole('columnheader', { name: 'Labware Name' })
-    screen.getByRole('columnheader', { name: 'Quantity' })
+    const { getByRole } = render(props)[0]
+    getByRole('columnheader', { name: 'Labware Name' })
+    getByRole('columnheader', { name: 'Quantity' })
   })
   it('should render the correct location, name, and connected status in each table row', () => {
-    render(props)
-    screen.getByRole('row', { name: 'Opentrons GEB 10uL Tiprack 2' })
-    screen.getByRole('row', { name: '300ul Tiprack FIXTURE 1' })
-    screen.getByRole('row', { name: 'ANSI 96 Standard Microplate 1' })
+    const { getByRole } = render(props)[0]
+    getByRole('row', { name: 'Opentrons GEB 10uL Tiprack 2' })
+    getByRole('row', { name: '300ul Tiprack FIXTURE 1' })
+    getByRole('row', { name: 'ANSI 96 Standard Microplate 1' })
   })
 })

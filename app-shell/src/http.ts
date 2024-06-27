@@ -75,10 +75,7 @@ export function fetchToFile(
       // its callbacks when the streams are done
       pump(inputStream, progressReader, outputStream, error => {
         // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-        if (error) {
-          reject(error)
-          return
-        }
+        if (error) return reject(error)
         resolve(destination)
       })
     })

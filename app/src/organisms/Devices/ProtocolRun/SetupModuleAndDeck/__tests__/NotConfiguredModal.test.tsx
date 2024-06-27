@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent } from '@testing-library/react'
 import { describe, it, beforeEach, vi, expect } from 'vitest'
 import { renderWithProviders } from '../../../../../__testing-utils__'
 import { TRASH_BIN_ADAPTER_FIXTURE } from '@opentrons/shared-data'
@@ -38,13 +38,13 @@ describe('NotConfiguredModal', () => {
     } as unknown) as UseQueryResult<DeckConfiguration>)
   })
   it('renders the correct text and button works as expected', () => {
-    render(props)
-    screen.getByText('Add Trash bin to B3')
-    screen.getByText(
+    const { getByText, getByRole } = render(props)
+    getByText('Add Trash bin to B3')
+    getByText(
       'Add this hardware to your deck configuration. It will be referenced during protocol analysis.'
     )
-    screen.getByText('Trash bin')
-    fireEvent.click(screen.getByRole('button', { name: 'Add' }))
+    getByText('Trash bin')
+    fireEvent.click(getByRole('button', { name: 'Add' }))
     expect(mockUpdate).toHaveBeenCalled()
   })
 })

@@ -1510,7 +1510,7 @@
       "brand": { "brand": "Opentrons", "brandId": [] },
       "metadata": {
         "displayName": "Opentrons 96 Well Aluminum Block",
-        "displayCategory": "aluminumBlock",
+        "displayCategory": "adapter",
         "displayVolumeUnits": "µL",
         "tags": []
       },

@@ -101,14 +101,11 @@ const copyLabware = (
     const dir = getFullConfig().labware.directory
 
     if (next.type !== VALID_LABWARE_FILE) {
-      dispatch(addCustomLabwareFailure(next))
-      return
+      return dispatch(addCustomLabwareFailure(next))
     }
     return Definitions.addLabwareFile(next.filename, dir)
       .then(() => fetchAndValidateCustomLabware(dispatch, ADD_LABWARE))
-      .then(() => {
-        dispatch(addNewLabwareName(newFile.filename))
-      })
+      .then(() => dispatch(addNewLabwareName(newFile.filename)))
   })
 }
 

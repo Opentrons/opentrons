@@ -22,8 +22,10 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { useSelector } from 'react-redux'
-import { getLabwareDef } from './utils/labware'
-import { getLabwareDefinitionsFromCommands } from '../../molecules/Command/utils/getLabwareDefinitionsFromCommands'
+import {
+  getLabwareDef,
+  getLabwareDefinitionsFromCommands,
+} from './utils/labware'
 import { UnorderedList } from '../../molecules/UnorderedList'
 import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
 import { getIsOnDevice } from '../../redux/config'
@@ -44,7 +46,6 @@ import type {
   WorkingOffset,
 } from './types'
 import type { Jog } from '../../molecules/JogControls/types'
-import type { TFunction } from 'i18next'
 
 const PROBE_LENGTH_MM = 44.5
 
@@ -150,12 +151,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
   const pipetteZMotorAxis: 'leftZ' | 'rightZ' =
     pipetteMount === 'left' ? 'leftZ' : 'rightZ'
   const isTiprack = getIsTiprack(labwareDef)
-  const displayLocation = getDisplayLocation(
-    location,
-    labwareDefs,
-    t as TFunction,
-    i18n
-  )
+  const displayLocation = getDisplayLocation(location, labwareDefs, t, i18n)
   const labwareDisplayName = getLabwareDisplayName(labwareDef)
 
   let placeItemInstruction: JSX.Element = (
@@ -195,7 +191,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
           location: getDisplayLocation(
             omit(location, ['definitionUri']), // only want the adapter's location here
             labwareDefs,
-            t as TFunction,
+            t,
             i18n
           ),
         }}
@@ -313,7 +309,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
           {
             commandType: 'moveLabware' as const,
             params: {
-              labwareId,
+              labwareId: labwareId,
               newLocation: 'offDeck',
               strategy: 'manualMoveWithoutPause',
             },
@@ -331,7 +327,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
           {
             commandType: 'moveLabware' as const,
             params: {
-              labwareId,
+              labwareId: labwareId,
               newLocation: 'offDeck',
               strategy: 'manualMoveWithoutPause',
             },

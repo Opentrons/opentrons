@@ -23,7 +23,6 @@ HERE = os.path.dirname(__file__)
 CWD = HERE or '.'
 
 package_entries = {
-    'abr-testing': PackageEntry('abr_testing'),
     'api': PackageEntry('opentrons_api'),
     'update-server': PackageEntry('update_server'),
     'robot-server': PackageEntry('robot_server'),

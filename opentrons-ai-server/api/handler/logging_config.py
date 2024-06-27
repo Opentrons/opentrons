@@ -11,22 +11,14 @@ FORMAT = (
     "- %(message)s"
 )
 
-LOCAL_FORMAT = "%(asctime)s %(levelname)s [%(name)s] [%(filename)s:%(lineno)d] - %(message)s"
-
 
 def setup_logging() -> None:
-    settings = Settings()
     log_handler = logging.StreamHandler()
-
-    if settings.environment == "local":
-        formatter = logging.Formatter(LOCAL_FORMAT)
-    else:
-        formatter = jsonlogger.JsonFormatter(FORMAT)  # type: ignore
-
+    formatter = jsonlogger.JsonFormatter(FORMAT)  # type: ignore
     log_handler.setFormatter(formatter)
 
     logging.basicConfig(
-        level=settings.log_level.upper(),
+        level=Settings().log_level.upper(),
         handlers=[log_handler],
     )
 

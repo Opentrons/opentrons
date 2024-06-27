@@ -191,7 +191,7 @@ from opentrons_shared_data.errors.exceptions import (
     PipetteOverpressureError,
     FirmwareUpdateRequiredError,
     FailedGripperPickupError,
-    PipetteLiquidNotFoundError,
+    LiquidNotFoundError,
     CommunicationError,
     PythonException,
     UnsupportedHardwareCommand,
@@ -1360,6 +1360,8 @@ class OT3Controller(FlexBackend):
         threshold_pascals: float,
         output_option: OutputOptions = OutputOptions.can_bus_only,
         data_files: Optional[Dict[InstrumentProbeType, str]] = None,
+        auto_zero_sensor: bool = True,
+        num_baseline_reads: int = 10,
         probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
     ) -> float:
         if output_option == OutputOptions.sync_buffer_to_csv:
@@ -1367,7 +1369,7 @@ class OT3Controller(FlexBackend):
                 self._subsystem_manager.device_info[
                     SubSystem.of_mount(mount)
                 ].revision.tertiary
-                != "1"
+                == "1"
             ):
                 raise UnsupportedHardwareCommand(
                     "Liquid Probe not supported on this pipette firmware"
@@ -1402,6 +1404,8 @@ class OT3Controller(FlexBackend):
             sync_buffer_output=sync_buffer_output,
             can_bus_only_output=can_bus_only_output,
             data_files=data_files_transposed,
+            auto_zero_sensor=auto_zero_sensor,
+            num_baseline_reads=num_baseline_reads,
             sensor_id=sensor_id_for_instrument(probe),
         )
         for node, point in positions.items():
@@ -1412,7 +1416,7 @@ class OT3Controller(FlexBackend):
             or positions[head_node].move_ack
             == MoveCompleteAck.complete_without_condition
         ):
-            raise PipetteLiquidNotFoundError(
+            raise LiquidNotFoundError(
                 "Liquid not found during probe.",
                 {
                     str(node_to_axis(node)): str(point.motor_position)
@@ -1428,44 +1432,15 @@ class OT3Controller(FlexBackend):
         distance_mm: float,
         speed_mm_per_s: float,
         sensor_threshold_pf: float,
-        probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
-        output_option: OutputOptions = OutputOptions.sync_only,
-        data_files: Optional[Dict[InstrumentProbeType, str]] = None,
+        probe: InstrumentProbeType,
     ) -> bool:
-        if output_option == OutputOptions.sync_buffer_to_csv:
-            assert (
-                self._subsystem_manager.device_info[
-                    SubSystem.of_mount(mount)
-                ].revision.tertiary
-                == "1"
-            )
-        csv_output = bool(output_option.value & OutputOptions.stream_to_csv.value)
-        sync_buffer_output = bool(
-            output_option.value & OutputOptions.sync_buffer_to_csv.value
-        )
-        can_bus_only_output = bool(
-            output_option.value & OutputOptions.can_bus_only.value
-        )
-        data_files_transposed = (
-            None
-            if data_files is None
-            else {
-                sensor_id_for_instrument(probe): data_files[probe]
-                for probe in data_files.keys()
-            }
-        )
         status = await capacitive_probe(
-            messenger=self._messenger,
-            tool=sensor_node_for_mount(mount),
-            mover=axis_to_node(moving),
-            distance=distance_mm,
-            plunger_speed=speed_mm_per_s,
-            mount_speed=speed_mm_per_s,
-            csv_output=csv_output,
-            sync_buffer_output=sync_buffer_output,
-            can_bus_only_output=can_bus_only_output,
-            data_files=data_files_transposed,
-            sensor_id=sensor_id_for_instrument(probe),
+            self._messenger,
+            sensor_node_for_mount(mount),
+            axis_to_node(moving),
+            distance_mm,
+            speed_mm_per_s,
+            sensor_id_for_instrument(probe),
             relative_threshold_pf=sensor_threshold_pf,
         )
 

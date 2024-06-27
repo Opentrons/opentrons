@@ -23,7 +23,7 @@ export function IncompatibleModuleODDModalBody({
 }: IncompatibleModuleODDModalBodyProps): JSX.Element {
   const { t } = useTranslation('incompatible_modules')
   const incompatibleModuleHeader: ModalHeaderBaseProps = {
-    title: capitalize(t('incompatible_modules_attached') as string),
+    title: capitalize(t('incompatible_modules_attached')),
   }
   return (
     <Modal header={incompatibleModuleHeader}>

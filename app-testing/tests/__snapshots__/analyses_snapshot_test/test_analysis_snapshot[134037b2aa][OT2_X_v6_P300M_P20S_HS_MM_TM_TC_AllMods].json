@@ -7275,7 +7275,6 @@
         "errorCode": "4000",
         "errorInfo": {},
         "errorType": "CannotPerformModuleAction",
-        "isDefined": false,
         "wrappedErrors": []
       },
       "notes": [],
@@ -7293,7 +7292,6 @@
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "CannotPerformModuleAction",
-      "isDefined": false,
       "wrappedErrors": []
     }
   ],
@@ -7428,7 +7426,6 @@
       "pipetteName": "p300_single_gen2"
     }
   ],
-  "result": "not-ok",
   "robotType": "OT-2 Standard",
   "runTimeParameters": []
 }

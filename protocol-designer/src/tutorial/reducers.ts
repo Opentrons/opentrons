@@ -29,7 +29,7 @@ const hints = handleActions(
   },
   []
 )
-export type DismissedHintReducerState = Record<
+type DismissedHintReducerState = Record<
   HintKey,
   {
     rememberDismissal: boolean

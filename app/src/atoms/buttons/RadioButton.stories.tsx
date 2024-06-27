@@ -1,12 +1,11 @@
-import { action } from '@storybook/addon-actions'
+import * as React from 'react'
 import { VIEWPORT } from '@opentrons/components'
 
-import { RadioButton as RadioButtonComponent } from './index'
-import type { Meta, StoryObj } from '@storybook/react'
+import { RadioButton } from './'
+import type { Story, Meta } from '@storybook/react'
 
-const meta: Meta<typeof RadioButtonComponent> = {
+export default {
   title: 'ODD/Atoms/Buttons/RadioButton',
-  component: RadioButtonComponent,
   argTypes: {
     radioButtonType: {
       control: {
@@ -15,21 +14,19 @@ const meta: Meta<typeof RadioButtonComponent> = {
       },
       defaultValue: 'large',
     },
+    onClick: { action: 'clicked' },
   },
   parameters: VIEWPORT.touchScreenViewport,
-  args: {
-    onChange: action('on-change'),
-  },
-}
-export default meta
+} as Meta
 
-type Story = StoryObj<typeof RadioButtonComponent>
+const RadioButtonTemplate: Story<
+  React.ComponentProps<typeof RadioButton>
+> = args => <RadioButton {...args} />
 
-export const RadioButton: Story = {
-  args: {
-    buttonLabel: 'Button text',
-    buttonValue: 1,
-    disabled: false,
-    isSelected: false,
-  },
+export const RadioButtonComponent = RadioButtonTemplate.bind({})
+RadioButtonComponent.args = {
+  buttonLabel: 'Button text',
+  buttonValue: 1,
+  disabled: false,
+  isSelected: false,
 }

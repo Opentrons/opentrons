@@ -2,7 +2,6 @@ import * as React from 'react'
 import { vi, it, describe, beforeEach, afterEach } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import { when } from 'vitest-when'
-import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
@@ -96,24 +95,24 @@ describe('UpdateRobot', () => {
     vi.mocked(RobotUpdate.getRobotUpdateSession).mockReturnValue(
       mockDownloadSession
     )
-    render()
-    screen.getByText('Downloading software...')
+    const [{ getByText }] = render()
+    getByText('Downloading software...')
   })
 
   it('should render NoUpdateFound when there is no upgrade - reinstall', () => {
     vi.mocked(RobotUpdate.getRobotUpdateAvailable).mockReturnValue(
       RobotUpdate.REINSTALL
     )
-    render()
-    screen.getByText('Your software is already up to date!')
+    const [{ getByText }] = render()
+    getByText('Your software is already up to date!')
   })
 
   it('should render mock NoUpdate found when there is no upgrade - downgrade', () => {
     vi.mocked(RobotUpdate.getRobotUpdateAvailable).mockReturnValue(
       RobotUpdate.DOWNGRADE
     )
-    render()
-    screen.getByText('Your software is already up to date!')
+    const [{ getByText }] = render()
+    getByText('Your software is already up to date!')
   })
 
   it('should render mock ErrorUpdateSoftware when an error occurs', () => {
@@ -124,10 +123,10 @@ describe('UpdateRobot', () => {
     vi.mocked(RobotUpdate.getRobotUpdateSession).mockReturnValue(
       mockErrorSession
     )
-    render()
-    screen.getByText('Software update error')
-    screen.getByText('mock error')
-    screen.getByText('Try again')
-    screen.getByText('Cancel software update')
+    const [{ getByText }] = render()
+    getByText('Software update error')
+    getByText('mock error')
+    getByText('Try again')
+    getByText('Cancel software update')
   })
 })

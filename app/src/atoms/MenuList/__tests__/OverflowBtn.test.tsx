@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { vi, it, expect, describe } from 'vitest'
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent } from '@testing-library/react'
 import { COLORS } from '@opentrons/components'
 
 import { renderWithProviders } from '../../../__testing-utils__'
@@ -13,20 +13,21 @@ const render = (props: React.ComponentProps<typeof OverflowBtn>) => {
 describe('OverflowBtn', () => {
   it('renders a clickable button', () => {
     const handleClick = vi.fn()
-    render({
+    const { getByRole } = render({
       onClick: handleClick,
     })
 
-    const button = screen.getByRole('button')
+    const button = getByRole('button')
     fireEvent.click(button)
     expect(handleClick).toHaveBeenCalledTimes(1)
   })
 
   it('renders a hover state', () => {
-    render({
+    const { getByRole } = render({
       onClick: vi.fn(),
     })
-    expect(screen.getByRole('button')).toHaveStyle(
+
+    expect(getByRole('button')).toHaveStyle(
       `background-color: ${COLORS.transparent}`
     )
   })

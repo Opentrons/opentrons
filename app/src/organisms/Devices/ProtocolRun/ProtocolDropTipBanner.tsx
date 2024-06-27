@@ -39,9 +39,7 @@ export function ProtocolDropTipBanner(props: {
           </StyledText>
           <Btn
             textAlign={ALIGN_START}
-            onClick={() => {
-              onLaunchWizardClick(true)
-            }}
+            onClick={() => onLaunchWizardClick(true)}
             aria-label="remove-tips"
           >
             <StyledText

@@ -25,7 +25,6 @@ stages:
           analysisSummaries:
             - id: !anystr
               status: pending
-              runTimeParameters: []
 
   - name: Check that the analysis summary is present in /protocols/:id; retry until it says it's completed
     max_retries: 5
@@ -45,7 +44,6 @@ stages:
           files: !anything
           createdAt: !anything
           robotType: !anything
-          protocolKind: !anything
           metadata: !anything
         links: !anything
 
@@ -105,4 +103,3 @@ stages:
             status: completed
           - id: !anystr
             status: pending
-            runTimeParameters: []

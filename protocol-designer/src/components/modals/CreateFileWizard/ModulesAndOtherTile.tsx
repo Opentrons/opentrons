@@ -25,7 +25,6 @@ import {
   HEATERSHAKER_MODULE_V1,
   MAGNETIC_BLOCK_V1,
   TEMPERATURE_MODULE_V2,
-  ABSORBANCE_READER_V1,
   getModuleDisplayName,
   getModuleType,
   FLEX_ROBOT_TYPE,
@@ -59,14 +58,12 @@ export const DEFAULT_SLOT_MAP: { [moduleModel in ModuleModel]?: string } = {
   [HEATERSHAKER_MODULE_V1]: 'D1',
   [MAGNETIC_BLOCK_V1]: 'D2',
   [TEMPERATURE_MODULE_V2]: 'C1',
-  [ABSORBANCE_READER_V1]: 'D3',
 }
 export const FLEX_SUPPORTED_MODULE_MODELS: ModuleModel[] = [
   THERMOCYCLER_MODULE_V2,
   HEATERSHAKER_MODULE_V1,
   MAGNETIC_BLOCK_V1,
   TEMPERATURE_MODULE_V2,
-  ABSORBANCE_READER_V1,
 ]
 
 export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
@@ -173,9 +170,7 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
             }}
           />
           <PrimaryButton
-            onClick={() => {
-              proceed()
-            }}
+            onClick={() => proceed()}
             disabled={!hasATrash}
             {...targetProps}
           >
@@ -196,9 +191,6 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
   const { watch, setValue } = props
   const modules = watch('modules')
   const additionalEquipment = watch('additionalEquipment')
-  const enableAbsorbanceReader = useSelector(
-    featureFlagSelectors.getEnableAbsorbanceReader
-  )
   const moduleTypesOnDeck =
     modules != null ? Object.values(modules).map(module => module.type) : []
 
@@ -214,16 +206,16 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
     modules,
     trashType: 'trashBin',
   })
+
   React.useEffect(() => {
     if (trashBinDisabled) {
       setValue('additionalEquipment', without(additionalEquipment, 'trashBin'))
     }
   }, [trashBinDisabled, setValue])
+
   return (
     <Flex flexWrap={WRAP} gridGap={SPACING.spacing4} alignSelf={ALIGN_CENTER}>
-      {FLEX_SUPPORTED_MODULE_MODELS.filter(moduleModel =>
-        enableAbsorbanceReader ? true : moduleModel !== 'absorbanceReaderV1'
-      ).map(moduleModel => {
+      {FLEX_SUPPORTED_MODULE_MODELS.map(moduleModel => {
         const moduleType = getModuleType(moduleModel)
         const isModuleOnDeck = moduleTypesOnDeck.includes(moduleType)
 
@@ -324,9 +316,7 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
       })}
       <EquipmentOption
         robotType={FLEX_ROBOT_TYPE}
-        onClick={() => {
-          handleSetEquipmentOption('gripper')
-        }}
+        onClick={() => handleSetEquipmentOption('gripper')}
         isSelected={additionalEquipment.includes('gripper')}
         image={
           <AdditionalItemImage
@@ -340,9 +330,7 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
 
       <EquipmentOption
         robotType={FLEX_ROBOT_TYPE}
-        onClick={() => {
-          handleSetEquipmentOption('wasteChute')
-        }}
+        onClick={() => handleSetEquipmentOption('wasteChute')}
         isSelected={additionalEquipment.includes('wasteChute')}
         disabled={getTrashOptionDisabled({
           additionalEquipment,
@@ -360,9 +348,7 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
       />
       <EquipmentOption
         robotType={FLEX_ROBOT_TYPE}
-        onClick={() => {
-          handleSetEquipmentOption('trashBin')
-        }}
+        onClick={() => handleSetEquipmentOption('trashBin')}
         isSelected={additionalEquipment.includes('trashBin')}
         image={
           <AdditionalItemImage src={trashBinImage} alt="Opentrons Trash Bin" />

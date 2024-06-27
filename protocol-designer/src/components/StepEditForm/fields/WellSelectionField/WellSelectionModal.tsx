@@ -85,7 +85,7 @@ const WellSelectionModalComponent = (
       <div className={styles.top_row}>
         <LabeledValue
           label="Pipette"
-          value={pipetteSpec != null ? pipetteSpec.displayName : ''}
+          value={pipetteSpec ? pipetteSpec.displayName : ''}
           className={styles.inverted_text}
         />
         <OutlineButton onClick={handleSave} inverted>
@@ -93,7 +93,7 @@ const WellSelectionModalComponent = (
         </OutlineButton>
       </div>
 
-      {labwareDef != null ? (
+      {labwareDef && (
         <SelectableLabware
           labwareProps={{
             wellLabelOption: WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE,
@@ -112,7 +112,7 @@ const WellSelectionModalComponent = (
           ingredNames={ingredNames}
           wellContents={wellContents}
         />
-      ) : null}
+      )}
 
       <WellSelectionInstructions />
     </Modal>
@@ -141,12 +141,11 @@ export const WellSelectionModal = (
   const pipetteEntities = useSelector(stepFormSelectors.getPipetteEntities)
 
   // selector-derived data
-  const labwareDef =
-    (labwareId != null ? labwareEntities[labwareId]?.def : null) ?? null
+  const labwareDef = (labwareId && labwareEntities[labwareId]?.def) || null
   const pipette = pipetteId != null ? pipetteEntities[pipetteId] : null
 
   const initialSelectedPrimaryWells = Array.isArray(wellFieldData)
-    ? arrayToWellGroup(wellFieldData as string[])
+    ? arrayToWellGroup(wellFieldData)
     : {}
 
   // component state

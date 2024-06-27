@@ -86,13 +86,7 @@ export function Instructions(props: Props): JSX.Element {
 
   //  hide continue button if no pipette is selected
   const continueButton = noPipetteSelected ? null : (
-    <PrimaryButton
-      onClick={() => {
-        nextStep()
-      }}
-    >
-      {t('continue')}
-    </PrimaryButton>
+    <PrimaryButton onClick={() => nextStep()}>{t('continue')}</PrimaryButton>
   )
 
   return (

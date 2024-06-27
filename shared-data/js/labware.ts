@@ -112,7 +112,6 @@ import opentronsFlex96Tiprack50UlV1Uncasted from '../labware/definitions/2/opent
 import opentronsFlex96TiprackAdapterV1Uncasted from '../labware/definitions/2/opentrons_flex_96_tiprack_adapter/1.json'
 import opentronsUniversalFlatAdapterV1Uncasted from '../labware/definitions/2/opentrons_universal_flat_adapter/1.json'
 import opentronsUniversalFlatAdapterCorning384Wellplate112UlFlatV1Uncasted from '../labware/definitions/2/opentrons_universal_flat_adapter_corning_384_wellplate_112ul_flat/1.json'
-import opentrons96DeepWellTempModAdapterV1Uncasted from '../labware/definitions/2/opentrons_96_deep_well_temp_mod_adapter/1.json'
 import thermoscientificnunc96Wellplate1300UlV1Uncasted from '../labware/definitions/2/thermoscientificnunc_96_wellplate_1300ul/1.json'
 import thermoscientificnunc96Wellplate2000UlV1Uncasted from '../labware/definitions/2/thermoscientificnunc_96_wellplate_2000ul/1.json'
 import tipone96Tiprack200UlV1Uncasted from '../labware/definitions/2/tipone_96_tiprack_200ul/1.json'
@@ -270,7 +269,6 @@ const opentrons96Tiprack300UlV1 = opentrons96Tiprack300UlV1Uncasted as LabwareDe
 const opentrons96WellAluminumBlockV1 = opentrons96WellAluminumBlockV1Uncasted as LabwareDefinition2
 const opentrons96Wellplate200UlPcrFullSkirtV2 = opentrons96Wellplate200UlPcrFullSkirtV2Uncasted as LabwareDefinition2
 const opentrons96Wellplate200UlPcrFullSkirtV1 = opentrons96Wellplate200UlPcrFullSkirtV1Uncasted as LabwareDefinition2
-const opentrons96DeepWellTempModAdapterV1 = opentrons96DeepWellTempModAdapterV1Uncasted as LabwareDefinition2
 const opentronsAluminumFlatBottomPlateV1 = opentronsAluminumFlatBottomPlateV1Uncasted as LabwareDefinition2
 const opentronsCalibrationAdapterHeatershakerModuleV1 = opentronsCalibrationAdapterHeatershakerModuleV1Uncasted as LabwareDefinition2
 const opentronsCalibrationAdapterTemperatureModuleV1 = opentronsCalibrationAdapterTemperatureModuleV1Uncasted as LabwareDefinition2
@@ -414,7 +412,6 @@ const latestDefs = {
   opentrons40AluminumblockEppendorf24X2MlSafelockSnapcapGeneric16X02MlPcrStripV1,
   opentrons6TuberackFalcon50MlConicalV1,
   opentrons6TuberackNest50MlConicalV1,
-  opentrons96DeepWellTempModAdapterV1,
   opentrons96AluminumblockBioradWellplate200UlV1,
   opentrons96AluminumblockGenericPcrStrip200UlV1,
   opentrons96AluminumblockGenericPcrStrip200UlV2,

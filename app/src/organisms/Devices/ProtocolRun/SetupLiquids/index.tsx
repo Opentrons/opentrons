@@ -33,8 +33,8 @@ export function SetupLiquids({
 }: SetupLiquidsProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   const [selectedValue, toggleGroup] = useToggleGroup(
-    t('list_view') as string,
-    t('map_view') as string,
+    t('list_view'),
+    t('map_view'),
     ANALYTICS_LIQUID_SETUP_VIEW_TOGGLE
   )
   return (

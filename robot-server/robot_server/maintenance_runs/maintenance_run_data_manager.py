@@ -178,7 +178,9 @@ class MaintenanceRunDataManager:
         """
         if run_id != self._engine_store.current_run_id:
             raise MaintenanceRunNotFoundError(run_id=run_id)
-        the_slice = self._engine_store.get_command_slice(cursor=cursor, length=length)
+        the_slice = self._engine_store.engine.state_view.commands.get_slice(
+            cursor=cursor, length=length
+        )
         return the_slice
 
     def get_current_command(self, run_id: str) -> Optional[CommandPointer]:
@@ -191,7 +193,7 @@ class MaintenanceRunDataManager:
             run_id: ID of the run.
         """
         if self._engine_store.current_run_id == run_id:
-            return self._engine_store.get_current_command()
+            return self._engine_store.engine.state_view.commands.get_current()
         else:
             # todo(mm, 2024-05-20):
             # For historical runs to behave consistently with the current run,
@@ -207,7 +209,7 @@ class MaintenanceRunDataManager:
             run_id: ID of the run.
         """
         if self._engine_store.current_run_id == run_id:
-            return self._engine_store.get_command_recovery_target()
+            return self._engine_store.engine.state_view.commands.get_recovery_target()
         else:
             # Historical runs can't have any ongoing error recovery.
             return None
@@ -225,7 +227,7 @@ class MaintenanceRunDataManager:
         """
         if run_id != self._engine_store.current_run_id:
             raise MaintenanceRunNotFoundError(run_id=run_id)
-        return self._engine_store.get_command(command_id=command_id)
+        return self._engine_store.engine.state_view.commands.get(command_id=command_id)
 
     def _get_state_summary(self, run_id: str) -> Optional[StateSummary]:
-        return self._engine_store.get_state_summary()
+        return self._engine_store.engine.state_view.get_summary()

@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { when } from 'vitest-when'
-import { screen } from '@testing-library/react'
 import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
 import {
   getLabwareDisplayName,
@@ -104,21 +103,21 @@ describe('LabwareInfoOverlay', () => {
   })
 
   it('should render the labware display name if present', () => {
-    render(props)
-    screen.getByText('fresh tips')
+    const { getByText } = render(props)
+    getByText('fresh tips')
   })
 
   it('should render the labware def display name if no user displayName present', () => {
-    render({
+    const { getByText } = render({
       ...props,
       displayName: null,
     })
-    screen.getByText('mock definition display name')
+    getByText('mock definition display name')
   })
 
   it('should render NOT render the offset data label when offset data does not exist', () => {
-    render(props)
-    expect(screen.queryByText('Labware Offsets')).toBeNull()
+    const { queryByText } = render(props)
+    expect(queryByText('Labware Offsets')).toBeNull()
   })
 
   it('should render the offset data when offset data exists', () => {
@@ -136,10 +135,10 @@ describe('LabwareInfoOverlay', () => {
           ],
         },
       } as any)
-    render(props)
-    screen.getByText('Offset Data')
-    screen.getByText(nestedTextMatcher('X1.0'))
-    screen.getByText(nestedTextMatcher('Y2.0'))
-    screen.getByText(nestedTextMatcher('Z3.0'))
+    const { getByText } = render(props)
+    getByText('Offset Data')
+    getByText(nestedTextMatcher('X1.0'))
+    getByText(nestedTextMatcher('Y2.0'))
+    getByText(nestedTextMatcher('Z3.0'))
   })
 })

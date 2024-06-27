@@ -109,9 +109,7 @@ export const TemperatureModuleSlideout = (
               temperatureValue != null ? Math.round(temperatureValue) : null
             }
             autoFocus
-            onChange={e => {
-              setTemperatureValue(e.target.valueAsNumber)
-            }}
+            onChange={e => setTemperatureValue(e.target.valueAsNumber)}
             type="number"
             caption={t('module_status_range', {
               min: TEMP_MIN,

@@ -159,6 +159,9 @@ test-scripts:
 test-liquid-sense:
 	$(python) -m hardware_testing.liquid_sense --simulate --pipette 1000 --channels 1
 	$(python) -m hardware_testing.liquid_sense --simulate --pipette 50 --channels 1
+	$(python) -m hardware_testing.liquid_sense --simulate --pipette 1000 --channels 8
+	$(python) -m hardware_testing.liquid_sense --simulate --pipette 50 --channels 8
+	$(python) -m hardware_testing.liquid_sense --simulate --pipette 1000 --channels 96
 
 .PHONY: test-integration
 test-integration: test-production-qc test-examples test-scripts test-gravimetric
@@ -195,11 +198,6 @@ push-description-ot3:
 	$(python) -c "from hardware_testing.data import create_git_description_file; create_git_description_file()"
 	scp $(ssh_helper_ot3) ./.hardware-testing-description root@$(host):/data/
 
-.PHONY: push-labware-ot3
-push-labware-ot3:
-	ssh $(ssh_helper_ot3) root@$(host) "mkdir -p /data/labware/v2/custom_definitions/custom_beta"
-	scp $(ssh_helper_ot3) -r hardware_testing/labware/* root@$(host):/data/labware/v2/custom_definitions/custom_beta/
-
 .PHONY: restart
 restart:
 	$(call restart-service,$(host),$(ssh_key),$(ssh_opts),"opentrons-robot-server")
@@ -220,10 +218,10 @@ push-no-restart-ot3: sdist Pipfile.lock
 	$(call push-python-sdist,$(host),$(ssh_key),$(ssh_opts),$(sdist_file),/opt/opentrons-robot-server,"hardware_testing",,,$(version_file))
 
 .PHONY: push-ot3
-push-ot3: push-no-restart-ot3 push-plot-webpage-ot3 push-description-ot3 push-labware-ot3
+push-ot3: push-no-restart-ot3 push-plot-webpage-ot3 push-description-ot3
 
 .PHONY: push-all
-push-all: clean wheel push-no-restart push-plot-webpage-ot3
+push-all: clean wheel push-no-restart push-plot-webpage
 
 .PHONY: term
 term:
@@ -277,16 +275,6 @@ push-ot3-fixture:
 	$(MAKE) remove-patches-fixture
 
 
-.PHONY: push-ot3-lld
-push-ot3-lld:
-	$(MAKE) apply-patches-fixture
-	cd ../ && $(MAKE) -C shared-data push-ot3
-	cd ../ && $(MAKE) -C hardware push-ot3
-	cd ../ && $(MAKE) -C hardware_testing push-ot3
-	cd ../ && $(MAKE) -C api push-ot3
-	$(MAKE) remove-patches-fixture
-
-
 .PHONY: apply-patches-fixture
 apply-patches-fixture:
 	cd ../ && git apply ./hardware-testing/fixture_overrides/*.patch --allow-empty
@@ -306,6 +294,8 @@ sync-ot3: sync-sw-ot3 sync-fw-ot3
 .PHONY: push-ot3-gravimetric
 push-ot3-gravimetric:
 	$(MAKE) push-ot3
+	ssh $(ssh_helper_ot3) root@$(host) "mkdir -p /data/labware/v2/custom_definitions/custom_beta"
+	scp $(ssh_helper_ot3) -r hardware_testing/labware/* root@$(host):/data/labware/v2/custom_definitions/custom_beta/
 	$(MAKE) apply-patches-gravimetric
 	cd ../ && $(MAKE) -C shared-data push-ot3
 	$(MAKE) remove-patches-gravimetric

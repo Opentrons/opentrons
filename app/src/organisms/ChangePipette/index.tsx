@@ -105,9 +105,10 @@ export function ChangePipette(props: Props): JSX.Element | null {
     if (homePipStatus === SUCCESS) closeModal()
   }, [homePipStatus, closeModal])
 
-  const homePipAndExit = React.useCallback(() => {
-    dispatchApiRequests(home(robotName, PIPETTE, mount))
-  }, [dispatchApiRequests, robotName, mount])
+  const homePipAndExit = React.useCallback(
+    () => dispatchApiRequests(home(robotName, PIPETTE, mount)),
+    [dispatchApiRequests, robotName, mount]
+  )
 
   const baseProps = {
     title: t('pipette_setup'),
@@ -142,9 +143,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
 
   const exitModal = (
     <ExitModal
-      back={() => {
-        setConfirmExit(false)
-      }}
+      back={() => setConfirmExit(false)}
       isDisabled={isButtonDisabled}
       exit={homePipAndExit}
       direction={direction}
@@ -223,11 +222,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
           })
     }
 
-    exitWizardHeader = confirmExit
-      ? undefined
-      : () => {
-          setConfirmExit(true)
-        }
+    exitWizardHeader = confirmExit ? undefined : () => setConfirmExit(true)
     wizardTitle = title
 
     contents = confirmExit ? (
@@ -239,19 +234,11 @@ export function ChangePipette(props: Props): JSX.Element | null {
           attachedWrong: attachedIncorrectPipette,
           direction,
           setWantedName,
-          confirm: () => {
-            setWizardStep(CONFIRM)
-          },
-          back: () => {
-            setWizardStep(CLEAR_DECK)
-          },
+          confirm: () => setWizardStep(CONFIRM),
+          back: () => setWizardStep(CLEAR_DECK),
           currentStepCount,
-          nextStep: () => {
-            setCurrentStepCount(currentStepCount + 1)
-          },
-          prevStep: () => {
-            setCurrentStepCount(currentStepCount - 1)
-          },
+          nextStep: () => setCurrentStepCount(currentStepCount + 1),
+          prevStep: () => setCurrentStepCount(currentStepCount - 1),
           totalSteps: eightChannel ? EIGHT_CHANNEL_STEPS : SINGLE_CHANNEL_STEPS,
           title:
             actualPipette?.displayName != null
@@ -271,11 +258,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
     }
 
     exitWizardHeader =
-      success || confirmExit
-        ? undefined
-        : () => {
-            setConfirmExit(true)
-          }
+      success || confirmExit ? undefined : () => setConfirmExit(true)
 
     let wizardTitleConfirmPipette
     if (wantedPipette == null && actualPipette == null) {
@@ -306,9 +289,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
             setWizardStep(INSTRUCTIONS)
             setCurrentStepCount(currentStepCount - 1)
           },
-          nextStep: () => {
-            setCurrentStepCount(currentStepCount + 1)
-          },
+          nextStep: () => setCurrentStepCount(currentStepCount + 1),
           wrongWantedPipette: wrongWantedPipette,
           setWrongWantedPipette: setWrongWantedPipette,
           setConfirmPipetteLevel: setConfirmPipetteLevel,

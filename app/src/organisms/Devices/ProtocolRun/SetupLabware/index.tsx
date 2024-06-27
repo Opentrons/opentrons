@@ -37,8 +37,8 @@ export function SetupLabware(props: SetupLabwareProps): JSX.Element {
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const protocolAnalysis = robotProtocolAnalysis ?? storedProtocolAnalysis
   const [selectedValue, toggleGroup] = useToggleGroup(
-    t('list_view') as string,
-    t('map_view') as string
+    t('list_view'),
+    t('map_view')
   )
   const isFlex = useIsFlex(robotName)
 
@@ -79,11 +79,7 @@ export function SetupLabware(props: SetupLabwareProps): JSX.Element {
             sourceLocation="SetupLabware"
           />
         ) : (
-          <PrimaryButton
-            onClick={() => {
-              expandStep(nextStep)
-            }}
-          >
+          <PrimaryButton onClick={() => expandStep(nextStep)}>
             {t('proceed_to_liquid_setup_step')}
           </PrimaryButton>
         )}

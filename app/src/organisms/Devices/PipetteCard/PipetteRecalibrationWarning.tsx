@@ -22,9 +22,7 @@ export const PipetteRecalibrationWarning = (): JSX.Element | null => {
         iconMarginLeft={SPACING.spacing8}
         type="warning"
         size={SPACING.spacing20}
-        onCloseClick={() => {
-          setShowBanner(false)
-        }}
+        onCloseClick={() => setShowBanner(false)}
       >
         <Flex flexDirection={DIRECTION_COLUMN}>
           <StyledText

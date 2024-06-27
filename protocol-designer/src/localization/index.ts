@@ -28,7 +28,7 @@ i18n.use(initReactI18next).init(
     defaultNS: 'shared',
     interpolation: {
       escapeValue: false, // not needed for react as it escapes by default
-      format: function (value: string, format, lng) {
+      format: function (value, format, lng) {
         if (format === 'upperCase') return value.toUpperCase()
         if (format === 'capitalize') return capitalize(value)
         if (format === 'sentenceCase') return startCase(value)

@@ -100,9 +100,7 @@ export function SelectSourceLabware(
               key={category}
               title={category}
               isSelected={category === selectedCategory}
-              onClick={() => {
-                setSelectedCategory(category)
-              }}
+              onClick={() => setSelectedCategory(category)}
               height={SPACING.spacing60}
             >
               {t(category)}

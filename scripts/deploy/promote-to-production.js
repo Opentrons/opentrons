@@ -2,10 +2,11 @@
 'use strict'
 
 const assert = require('assert')
-const { S3Client } = require('@aws-sdk/client-s3')
+const AWS = require('aws-sdk')
 
 const parseArgs = require('./lib/parseArgs')
 const syncBuckets = require('./lib/syncBuckets')
+const { getDeployMetadata } = require('./lib/deploy-metadata')
 const { getAssumeRole } = require('./assume-role')
 const { getCreateInvalidation } = require('./create-invalidation')
 const { checkCurrentAWSProfile } = require('./check-current-profile')
@@ -57,34 +58,53 @@ async function runPromoteToProduction() {
       process.exit(0)
     }
 
-    const credentials = await getAssumeRole(ROLE_ARN, 'promoteToProduction')
-    const productionCredentials = {
-      accessKeyId: credentials.AccessKeyId,
-      secretAccessKey: credentials.SecretAccessKey,
-      sessionToken: credentials.SessionToken,
-    }
-    const s3Client = new S3Client({
-      apiVersion: '2006-03-01',
-      region: 'us-east-1',
-      credentials: productionCredentials,
-    })
+    await getAssumeRole(ROLE_ARN, 'promoteToProduction')
+      .then(credentials => {
+        const productionCredentials = new AWS.Credentials({
+          accessKeyId: credentials.AccessKeyId,
+          secretAccessKey: credentials.SecretAccessKey,
+          sessionToken: credentials.SessionToken,
+        })
 
-    const stagingBucket = `staging.${projectDomain}`
-    const productionBucket = projectDomain
-    console.log(`Promoting ${projectDomain} from staging to production\n`)
-    await syncBuckets(
-      s3Client,
-      { bucket: stagingBucket },
-      { bucket: productionBucket },
-      dryrun
-    )
-    console.log('Promotion to production done\n')
+        const s3 = new AWS.S3({
+          apiVersion: '2006-03-01',
+          region: 'us-east-1',
+          credentials: productionCredentials,
+        })
 
-    await getCreateInvalidation(productionCredentials, cloudfrontArn, dryrun)
-    console.log(
-      `${dryrun ? 'DRYRUN: ' : ''}Cache invalidation initiated for production\n`
-    )
-    process.exit(0)
+        const stagingBucket = `staging.${projectDomain}`
+        const productionBucket = projectDomain
+
+        getDeployMetadata(s3, stagingBucket)
+          .then(deployMetadata => {
+            const { current } = deployMetadata
+            console.log(
+              `Promoting ${projectDomain} ${current} from staging to production\n`
+            )
+
+            return syncBuckets(
+              s3,
+              { bucket: stagingBucket },
+              { bucket: productionBucket },
+              dryrun
+            )
+          })
+          .then(() => {
+            console.log('Promotion to production done\n')
+            getCreateInvalidation(productionCredentials, cloudfrontArn)
+          })
+          .then(() => {
+            console.log('Cache invalidation initiated for production\n')
+            process.exit(0)
+          })
+          .catch(error => {
+            console.error(error.message)
+            process.exit(1)
+          })
+      })
+      .catch(err => {
+        console.error(err)
+      })
   } catch (error) {
     console.error(error.message)
     process.exit(1)

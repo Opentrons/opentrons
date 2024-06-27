@@ -10,18 +10,16 @@ import {
   PrimaryButton,
 } from '@opentrons/components'
 import { Modal } from '../../molecules/Modal'
-import { Skeleton as SkeletonComponent } from '.'
+import { Skeleton } from '.'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Story, Meta } from '@storybook/react'
 
-const meta: Meta<typeof SkeletonComponent> = {
+export default {
   title: 'App/Atoms/Skeleton',
-  component: SkeletonComponent,
-}
+  component: Skeleton,
+} as Meta
 
-export default meta
-
-const DemoSkeleton = (args): JSX.Element => {
+const Template: Story<React.ComponentProps<typeof Skeleton>> = args => {
   return (
     <Modal width="47rem">
       <Flex flexDirection={DIRECTION_COLUMN} height="24.6rem">
@@ -37,21 +35,13 @@ const DemoSkeleton = (args): JSX.Element => {
             flex="1"
             gridGap={SPACING.spacing16}
           >
-            <SkeletonComponent
-              height="1.5rem"
-              width="100px"
-              backgroundSize="47rem"
-            />
-            <SkeletonComponent {...args} />
-            <SkeletonComponent {...args} />
-            <SkeletonComponent {...args} />
+            <Skeleton height="1.5rem" width="100px" backgroundSize="47rem" />
+            <Skeleton {...args} />
+            <Skeleton {...args} />
+            <Skeleton {...args} />
           </Flex>
           <Flex flex="1" justifyContent={JUSTIFY_CENTER}>
-            <SkeletonComponent
-              height="12.5rem"
-              width="100%"
-              backgroundSize="47rem"
-            />
+            <Skeleton height="12.5rem" width="100%" backgroundSize="47rem" />
           </Flex>
         </Flex>
         <Flex
@@ -68,10 +58,9 @@ const DemoSkeleton = (args): JSX.Element => {
   )
 }
 
-type Story = StoryObj<typeof SkeletonComponent>
-
-export const Skeleton: Story = {
-  render: () => (
-    <DemoSkeleton width="15.625rem" height="1.25rem" backgroundSize="47rem" />
-  ),
+export const Primary = Template.bind({})
+Primary.args = {
+  width: '15.625rem',
+  height: '1.25rem',
+  backgroundSize: '47rem',
 }

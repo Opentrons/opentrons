@@ -32,9 +32,11 @@ export function useDeleteRunMutation(
     (runId: string) =>
       deleteRun(host as HostConfig, runId).then(response => {
         queryClient.removeQueries([host, 'runs', runId])
-        queryClient.invalidateQueries([host, 'runs']).catch((e: Error) => {
-          console.error(`error invalidating runs query: ${e.message}`)
-        })
+        queryClient
+          .invalidateQueries([host, 'runs'])
+          .catch((e: Error) =>
+            console.error(`error invalidating runs query: ${e.message}`)
+          )
         return response.data
       }),
     options

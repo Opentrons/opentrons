@@ -66,9 +66,7 @@ export function ErrorInfo(props: ErrorInfoProps): JSX.Element | null {
           <Btn
             textAlign={ALIGN_START}
             fontSize={TYPOGRAPHY.fontSizeP}
-            onClick={() => {
-              setShowErrorDetails(true)
-            }}
+            onClick={() => setShowErrorDetails(true)}
             aria-label="view_error_details"
           >
             <StyledText
@@ -87,9 +85,7 @@ export function ErrorInfo(props: ErrorInfoProps): JSX.Element | null {
               title={t('module_name_error', {
                 moduleName: getModuleDisplayName(attachedModule.moduleModel),
               })}
-              onClose={() => {
-                setShowErrorDetails(false)
-              }}
+              onClose={() => setShowErrorDetails(false)}
             >
               <Flex flexDirection={DIRECTION_COLUMN}>
                 {errorDetails != null ? (
@@ -101,9 +97,7 @@ export function ErrorInfo(props: ErrorInfoProps): JSX.Element | null {
               </Flex>
               <Flex justifyContent={JUSTIFY_FLEX_END}>
                 <PrimaryButton
-                  onClick={() => {
-                    setShowErrorDetails(false)
-                  }}
+                  onClick={() => setShowErrorDetails(false)}
                   textTransform={TYPOGRAPHY.textTransformCapitalize}
                   marginTop={SPACING.spacing16}
                 >

@@ -241,9 +241,7 @@ const CollapsibleSubstep = (props: CollapsibleSubstepProps): JSX.Element => {
         {props.headerContent}
         <span
           className={styles.inner_carat}
-          onClick={() => {
-            setContentCollapsed(!contentCollapsed)
-          }}
+          onClick={() => setContentCollapsed(!contentCollapsed)}
         >
           <Icon name={contentCollapsed ? 'chevron-down' : 'chevron-up'} />
         </span>

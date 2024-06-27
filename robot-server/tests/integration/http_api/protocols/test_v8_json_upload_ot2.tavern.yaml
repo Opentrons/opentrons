@@ -26,7 +26,6 @@ stages:
           analysisSummaries:
             - id: !anystr
               status: pending
-              runTimeParameters: []
   - name: Retry until analyses status is completed.
     max_retries: 10
     delay_after: 0.1
@@ -57,7 +56,6 @@ stages:
             - name: simpleV8.json
               role: main
           protocolType: json
-          protocolKind: standard
           robotType: OT-2 Standard
           metadata:
             tags:
@@ -650,7 +648,6 @@ stages:
           analysisSummaries:
             - id: !anystr
               status: pending
-              runTimeParameters: []
   - name: Retry until analyses status is completed.
     max_retries: 10
     delay_after: 0.1

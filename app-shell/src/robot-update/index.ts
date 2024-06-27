@@ -97,20 +97,19 @@ export function registerRobotUpdate(dispatch: Dispatch): Dispatch {
         const { host, path, systemFile } = action.payload
 
         if (systemFile == null) {
-          dispatch({
+          return dispatch({
             type: 'robotUpdate:UNEXPECTED_ERROR',
             payload: { message: 'Robot update file missing' },
           })
-          return
         }
 
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        uploadSystemFile(host, path, systemFile, progress => {
+        uploadSystemFile(host, path, systemFile, progress =>
           dispatch({
             type: 'robotUpdate:FILE_UPLOAD_PROGRESS',
             payload: progress,
           })
-        })
+        )
           .then(() => ({
             type: 'robotUpdate:FILE_UPLOAD_DONE' as const,
             payload: host.name,
@@ -244,15 +243,15 @@ export function checkForRobotUpdate(
         )
       )
       .then(filepaths => cacheUpdateSet(filepaths, target))
-      .then(updateInfo => {
+      .then(updateInfo =>
         dispatch({ type: 'robotUpdate:UPDATE_INFO', payload: updateInfo })
-      })
-      .catch((error: Error) => {
+      )
+      .catch((error: Error) =>
         dispatch({
           type: 'robotUpdate:DOWNLOAD_ERROR',
           payload: { error: error.message, target: target },
         })
-      })
+      )
       .then(() =>
         cleanupReleaseFiles(cacheDirForMachineFiles(target), CURRENT_VERSION)
       )

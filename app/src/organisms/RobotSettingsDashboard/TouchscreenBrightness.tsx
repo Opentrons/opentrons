@@ -12,9 +12,12 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
+  Icon,
   JUSTIFY_CENTER,
   SPACING,
+  RESPONSIVENESS,
 } from '@opentrons/components'
+import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
 
 import { ChildNavigation } from '../../organisms/ChildNavigation'
 import {
@@ -24,7 +27,6 @@ import {
 
 import type { Dispatch } from '../../redux/types'
 import type { SetSettingOption } from '../../pages/RobotSettingsDashboard'
-import { IconButton } from '../../atoms/buttons/IconButton'
 
 interface BrightnessTileProps {
   isActive: boolean
@@ -74,9 +76,7 @@ export function TouchscreenBrightness({
     <Flex flexDirection={DIRECTION_COLUMN}>
       <ChildNavigation
         header={t('touchscreen_brightness')}
-        onClickBack={() => {
-          setCurrentOption(null)
-        }}
+        onClickBack={() => setCurrentOption(null)}
       />
       <Flex
         flexDirection={DIRECTION_ROW}
@@ -89,12 +89,11 @@ export function TouchscreenBrightness({
       >
         <IconButton
           disabled={brightness === LOWEST_BRIGHTNESS}
-          onClick={() => {
-            handleClick('down')
-          }}
+          onClick={() => handleClick('down')}
           data-testid="TouchscreenBrightness_decrease"
-          iconName="minus"
-        />
+        >
+          <Icon size="5rem" name="minus" />
+        </IconButton>
         <Flex
           flexDirection={DIRECTION_ROW}
           gridGap={SPACING.spacing8}
@@ -110,13 +109,32 @@ export function TouchscreenBrightness({
 
         <IconButton
           disabled={brightness === HIGHEST_BRIGHTNESS}
-          onClick={() => {
-            handleClick('up')
-          }}
+          onClick={() => handleClick('up')}
           data-testid="TouchscreenBrightness_increase"
-          iconName="plus"
-        />
+        >
+          <Icon size="5rem" name="plus" />
+        </IconButton>
       </Flex>
     </Flex>
   )
 }
+
+const IconButton = styled('button')`
+  border-radius: 50%;
+  max-height: 100%;
+  background-color: ${COLORS.white};
+
+  &:active {
+    background-color: ${COLORS.grey35};
+  }
+  &:focus-visible {
+    box-shadow: ${ODD_FOCUS_VISIBLE};
+    background-color: ${COLORS.grey35};
+  }
+  &:disabled {
+    background-color: transparent;
+  }
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    cursor: default;
+  }
+`

@@ -279,15 +279,13 @@ export const LabwarePositionCheckComponent = (
         maintenanceRunId,
         command: {
           commandType: 'moveRelative',
-          params: { pipetteId, distance: step * dir, axis },
+          params: { pipetteId: pipetteId, distance: step * dir, axis },
         },
         waitUntilComplete: true,
         timeout: JOG_COMMAND_TIMEOUT,
       })
         .then(data => {
-          onSuccess?.(
-            (data?.data?.result?.position ?? null) as Coordinates | null
-          )
+          onSuccess?.(data?.data?.result?.position ?? null)
         })
         .catch((e: Error) => {
           setFatalError(`error issuing jog command: ${e.message}`)

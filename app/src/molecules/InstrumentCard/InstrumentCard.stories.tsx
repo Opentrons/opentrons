@@ -21,15 +21,11 @@ Attached.args = {
   menuOverlayItems: [
     {
       label: 'menu option 1',
-      onClick: () => {
-        console.log('item click 1')
-      },
+      onClick: () => console.log('item click 1'),
     },
     {
       label: 'menu option 2',
-      onClick: () => {
-        console.log('item click 2')
-      },
+      onClick: () => console.log('item click 2'),
     },
   ],
   isEstopNotDisengaged: false,
@@ -45,15 +41,11 @@ Divider.args = {
   menuOverlayItems: [
     {
       label: 'menu option 1',
-      onClick: () => {
-        console.log('item click 1')
-      },
+      onClick: () => console.log('item click 1'),
     },
     {
       label: 'menu option 2',
-      onClick: () => {
-        console.log('item click 2')
-      },
+      onClick: () => console.log('item click 2'),
     },
   ],
   isEstopNotDisengaged: false,
@@ -69,16 +61,12 @@ Empty.args = {
     {
       label: 'menu option 1',
       disabled: true,
-      onClick: () => {
-        console.log('item click 1')
-      },
+      onClick: () => console.log('item click 1'),
     },
     {
       label: 'menu option 2',
       disabled: true,
-      onClick: () => {
-        console.log('item click 2')
-      },
+      onClick: () => console.log('item click 2'),
     },
   ],
   isEstopNotDisengaged: false,

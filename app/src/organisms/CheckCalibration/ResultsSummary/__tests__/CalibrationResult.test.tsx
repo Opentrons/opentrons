@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { vi, it, describe, beforeEach } from 'vitest'
-import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
@@ -27,45 +26,45 @@ describe('PipetteCalibrationResult', () => {
   })
 
   it('should render pipette offset calibration title and RenderResult - isBadCal: false', () => {
-    render(props)
-    screen.getByText('pipette offset calibration')
-    screen.getByText('render result')
+    const { getByText } = render(props)
+    getByText('pipette offset calibration')
+    getByText('render result')
   })
 
   it('should render pipette offset calibration title and RenderResult - isBadCal: true', () => {
     props.isBadCal = true
-    render(props)
-    screen.getByText('pipette offset calibration')
-    screen.getByText('render result')
+    const { getByText } = render(props)
+    getByText('pipette offset calibration')
+    getByText('render result')
   })
 
   it('should render tip length calibration title and RenderResult - isBadCal: false', () => {
     props.calType = 'tipLength'
-    render(props)
-    screen.getByText('tip length calibration')
-    screen.getByText('render result')
+    const { getByText } = render(props)
+    getByText('tip length calibration')
+    getByText('render result')
   })
 
   it('should render tip length calibration title and RenderResult - isBadCal: true', () => {
     props.calType = 'tipLength'
     props.isBadCal = true
-    render(props)
-    screen.getByText('tip length calibration')
-    screen.getByText('render result')
+    const { getByText } = render(props)
+    getByText('tip length calibration')
+    getByText('render result')
   })
 
   it('should render deck calibration title and RenderResult - isBadCal: false', () => {
     props.calType = 'deck'
-    render(props)
-    screen.getByText('Deck Calibration')
-    screen.getByText('render result')
+    const { getByText } = render(props)
+    getByText('Deck Calibration')
+    getByText('render result')
   })
 
   it('should render deck calibration title and RenderResult - isBadCal: true', () => {
     props.calType = 'deck'
     props.isBadCal = true
-    render(props)
-    screen.getByText('Deck Calibration')
-    screen.getByText('render result')
+    const { getByText } = render(props)
+    getByText('Deck Calibration')
+    getByText('render result')
   })
 })

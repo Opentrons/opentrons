@@ -6,17 +6,13 @@ import {
   fixture_96_plate,
   fixture_irregular_example_1,
 } from '@opentrons/shared-data/labware/fixtures/2'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 vi.mock('../../definitions')
 
 describe('labwareDefToFields', () => {
   it('fixture_96_plate', () => {
     const def = fixture_96_plate
-    const result = labwareDefToFields(
-      def as LabwareDefinition2,
-      [def, def] as LabwareDefinition2[]
-    )
+    const result = labwareDefToFields(def as any)
     expect(result).toEqual({
       labwareType: 'wellPlate',
       tubeRackInsertLoadName: null,
@@ -55,19 +51,13 @@ describe('labwareDefToFields', () => {
 
       loadName: null, // should be cleared
       displayName: null, // should be cleared
-
-      compatibleAdapters: {},
-      compatibleModules: {},
     })
   })
 
   it('fixture_12_trough', () => {
     // make sure rectangular wells + single row works as expected
     const def = fixture_12_trough
-    const result = labwareDefToFields(
-      def as LabwareDefinition2,
-      [def, def] as LabwareDefinition2[]
-    )
+    const result = labwareDefToFields(def as any)
 
     expect(result?.labwareType).toEqual('reservoir')
     expect(result?.gridSpacingY).toBe(null) // single row -> null Y-spacing
@@ -77,19 +67,13 @@ describe('labwareDefToFields', () => {
 
   it('fixture_irregular_example_1 should return null (until multi-grid labware is supported in LC)', () => {
     const def = fixture_irregular_example_1
-    const result = labwareDefToFields(
-      def as LabwareDefinition2,
-      [def, def] as LabwareDefinition2[]
-    )
+    const result = labwareDefToFields(def as any)
     expect(result).toEqual(null)
   })
 
   it('fixture_24_tuberack should match snapshot', () => {
     const def = fixture_24_tuberack
-    const result = labwareDefToFields(
-      def as LabwareDefinition2,
-      [def, def] as LabwareDefinition2[]
-    )
+    const result = labwareDefToFields(def as any)
 
     expect(result?.labwareType).toEqual('tubeRack')
     expect(result?.brand).toBe('Opentrons')

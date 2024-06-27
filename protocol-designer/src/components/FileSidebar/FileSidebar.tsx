@@ -323,14 +323,12 @@ export function FileSidebar(): JSX.Element {
   }
   const [showBlockingHint, setShowBlockingHint] = React.useState<boolean>(false)
 
-  const cancelModal = (): void => {
-    setShowExportWarningModal(false)
-  }
+  const cancelModal = (): void => setShowExportWarningModal(false)
 
   const loadFile = (
     fileChangeEvent: React.ChangeEvent<HTMLInputElement>
   ): void => {
-    if (!hasUnsavedChanges || window.confirm(t('confirm_import') as string)) {
+    if (!hasUnsavedChanges || window.confirm(t('confirm_import'))) {
       dispatch(loadFileActions.loadProtocolFile(fileChangeEvent))
     }
   }
@@ -404,9 +402,7 @@ export function FileSidebar(): JSX.Element {
     enabled: showBlockingHint,
     hintKey,
     content,
-    handleCancel: () => {
-      setShowBlockingHint(false)
-    },
+    handleCancel: () => setShowBlockingHint(false),
     handleContinue: () => {
       setShowBlockingHint(false)
       dispatch(loadFileActions.saveProtocolFile())

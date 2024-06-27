@@ -62,9 +62,7 @@ export const PipetteOverflowMenu = (
       >
         {pipetteDisplayName === 'Empty' ? (
           <MenuItem
-            onClick={() => {
-              handleChangePipette()
-            }}
+            onClick={() => handleChangePipette()}
             disabled={isRunActive}
           >
             {t('attach_pipette')}
@@ -72,35 +70,22 @@ export const PipetteOverflowMenu = (
         ) : (
           <>
             <MenuItem
-              onClick={() => {
-                handleChangePipette()
-              }}
+              onClick={() => handleChangePipette()}
               disabled={isRunActive}
             >
               {t('detach_pipette')}
             </MenuItem>
-            <MenuItem
-              onClick={() => {
-                handleAboutSlideout()
-              }}
-            >
+            <MenuItem onClick={() => handleAboutSlideout()}>
               {t('about_pipette')}
             </MenuItem>
-            <MenuItem
-              onClick={() => {
-                handleDropTip()
-              }}
-              disabled={isRunActive}
-            >
+            <MenuItem onClick={() => handleDropTip()} disabled={isRunActive}>
               {i18n.format(t('drop_tips'), 'capitalize')}
             </MenuItem>
             <Divider marginY="0" />
             {pipetteSettings != null ? (
               <MenuItem
                 key={`${pipetteDisplayName}_${mount}_view_settings`}
-                onClick={() => {
-                  handleSettingsSlideout()
-                }}
+                onClick={() => handleSettingsSlideout()}
                 disabled={isRunActive}
               >
                 {t('view_pipette_setting')}

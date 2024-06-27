@@ -67,9 +67,7 @@ const WithClickTemplate: Story<React.ComponentProps<typeof Tooltip>> = args => {
   }
 
   React.useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowToolTip(false)
-    }, 2000)
+    const timer = setTimeout(() => setShowToolTip(false), 2000)
     return () => {
       clearTimeout(timer)
     }

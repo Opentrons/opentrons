@@ -54,15 +54,13 @@ export function WifiConnectStatus({
           <FailedToConnect
             requestState={requestState}
             selectedSsid={selectedSsid}
-            handleTryAgain={() => {
+            handleTryAgain={() =>
               isInvalidPassword
                 ? setCurrentOption('SetWifiCred')
                 : handleConnect()
-            }}
+            }
             isInvalidPassword={isInvalidPassword}
-            handleChangeNetwork={() => {
-              setCurrentOption('WifiList')
-            }}
+            handleChangeNetwork={() => setCurrentOption('WifiList')}
           />
         </Flex>
       </>

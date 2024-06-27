@@ -6,6 +6,7 @@ describe('File Import', () => {
   before(() => {
     cy.visit('/create')
     cy.viewport('macbook-15')
+    cy.contains('NO').click({ force: true })
   })
 
   it('tests the file import flow', () => {

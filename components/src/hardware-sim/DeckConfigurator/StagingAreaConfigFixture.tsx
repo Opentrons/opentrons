@@ -73,9 +73,7 @@ export function StagingAreaConfigFixture(
         cursor={handleClickRemove != null ? 'pointer' : 'default'}
         onClick={
           handleClickRemove != null
-            ? () => {
-                handleClickRemove(fixtureLocation, cutoutFixtureId)
-              }
+            ? () => handleClickRemove(fixtureLocation, cutoutFixtureId)
             : () => {}
         }
       >

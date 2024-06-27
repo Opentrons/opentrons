@@ -109,9 +109,7 @@ export function FeatureFlagCard(): JSX.Element {
             heading={t(
               `experimental_feature_warning.${flagSwitchDirection}.title`
             )}
-            onCancelClick={() => {
-              setModalFlagName(null)
-            }}
+            onCancelClick={() => setModalFlagName(null)}
             onContinueClick={() => {
               setFeatureFlags({
                 [modalFlagName as string]: !flags[modalFlagName],

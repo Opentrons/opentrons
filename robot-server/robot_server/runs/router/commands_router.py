@@ -3,10 +3,13 @@ import textwrap
 from typing import Optional, Union
 from typing_extensions import Final, Literal
 
+from anyio import move_on_after
 from fastapi import APIRouter, Depends, Query, status
+
 
 from opentrons.protocol_engine import (
     CommandPointer,
+    ProtocolEngine,
     commands as pe_commands,
     errors as pe_errors,
 )
@@ -30,7 +33,7 @@ from ..command_models import (
 from ..run_models import RunCommandSummary
 from ..run_data_manager import RunDataManager, PreSerializedCommandsNotAvailableError
 from ..engine_store import EngineStore
-from ..run_store import CommandNotFoundError, RunStore
+from ..run_store import RunStore, CommandNotFoundError
 from ..run_models import RunNotFoundError
 from ..dependencies import get_engine_store, get_run_data_manager, get_run_store
 from .base_router import RunNotFound, RunStopped
@@ -74,12 +77,12 @@ class PreSerializedCommandsNotAvailable(ErrorDetails):
     )
 
 
-async def get_current_run_from_url(
+async def get_current_run_engine_from_url(
     runId: str,
     engine_store: EngineStore = Depends(get_engine_store),
     run_store: RunStore = Depends(get_run_store),
-) -> str:
-    """Get run from url.
+) -> ProtocolEngine:
+    """Get run protocol engine.
 
     Args:
         runId: Run ID to associate the command with.
@@ -96,7 +99,7 @@ async def get_current_run_from_url(
             status.HTTP_409_CONFLICT
         )
 
-    return runId
+    return engine_store.engine
 
 
 @PydanticResponse.wrap_route(
@@ -182,9 +185,8 @@ async def create_run_command(
             "FIXIT command use only. Reference of the failed command id we are trying to fix."
         ),
     ),
-    engine_store: EngineStore = Depends(get_engine_store),
+    protocol_engine: ProtocolEngine = Depends(get_current_run_engine_from_url),
     check_estop: bool = Depends(require_estop_in_good_state),
-    run_id: str = Depends(get_current_run_from_url),
 ) -> PydanticResponse[SimpleBody[pe_commands.Command]]:
     """Enqueue a protocol command.
 
@@ -197,22 +199,17 @@ async def create_run_command(
             Comes from a query parameter in the URL.
         failedCommandId: FIXIT command use only.
             Reference of the failed command id we are trying to fix.
-        engine_store: The run's `EngineStore` on which the new
+        protocol_engine: The run's `ProtocolEngine` on which the new
             command will be enqueued.
         check_estop: Dependency to verify the estop is in a valid state.
-        run_id: Run identification to attach command to.
     """
     # TODO(mc, 2022-05-26): increment the HTTP API version so that default
     # behavior is to pass through `command_intent` without overriding it
     command_intent = request_body.data.intent or pe_commands.CommandIntent.SETUP
     command_create = request_body.data.copy(update={"intent": command_intent})
-
     try:
-        command = await engine_store.add_command_and_wait_for_interval(
-            request=command_create,
-            failed_command_id=failedCommandId,
-            wait_until_complete=waitUntilComplete,
-            timeout=timeout,
+        command = protocol_engine.add_command(
+            request=command_create, failed_command_id=failedCommandId
         )
 
     except pe_errors.SetupCommandNotAllowedError as e:
@@ -222,7 +219,12 @@ async def create_run_command(
     except pe_errors.CommandNotAllowedError as e:
         raise CommandNotAllowed.from_exc(e).as_error(status.HTTP_400_BAD_REQUEST)
 
-    response_data = engine_store.get_command(command.id)
+    if waitUntilComplete:
+        timeout_sec = None if timeout is None else timeout / 1000.0
+        with move_on_after(timeout_sec):
+            await protocol_engine.wait_for_command(command.id)
+
+    response_data = protocol_engine.state_view.commands.get(command.id)
 
     return await PydanticResponse.create(
         content=SimpleBody.construct(data=response_data),
@@ -299,7 +301,6 @@ async def get_run_commands(
             params=c.params,
             error=c.error,
             notes=c.notes,
-            failedCommandId=c.failedCommandId,
         )
         for c in command_slice.commands
     ]

@@ -1,10 +1,7 @@
 import isPlainObject from 'lodash/isPlainObject'
 const SEPARATOR = '__'
 
-const _innerFnFlattenNested = (
-  innerProperties: Record<string, unknown>,
-  prefix: string
-): any => {
+const _innerFnFlattenNested = (innerProperties: any, prefix: string): any => {
   return Object.keys(innerProperties).reduce((acc, key) => {
     // if the key's value is an object, recurse into it
     const nestedValue = innerProperties[key]
@@ -12,10 +9,7 @@ const _innerFnFlattenNested = (
     if (isPlainObject(nestedValue)) {
       return {
         ...acc,
-        ..._innerFnFlattenNested(
-          nestedValue as Record<string, unknown>,
-          `${prefix}${SEPARATOR}${key}`
-        ),
+        ..._innerFnFlattenNested(nestedValue, `${prefix}${SEPARATOR}${key}`),
       }
     }
 
@@ -35,6 +29,5 @@ const _innerFnFlattenNested = (
 // Note that non-nested properties are omitted from the result.
 // Also, the separator will not be escaped, so if you have a field already named '__foo__a'
 // and also have a {foo: {a: 123}}, they'll clash.
-export const flattenNestedProperties = (
-  properties: Record<string | number | symbol, unknown>
-): any => _innerFnFlattenNested(properties, '')
+export const flattenNestedProperties = (properties: any): any =>
+  _innerFnFlattenNested(properties, '')

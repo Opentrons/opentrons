@@ -14,7 +14,6 @@ class Settings:
     SECRET: str
     AUDIENCE: str
     GRANT_TYPE: str
-    HF_API_KEY: str
     CACHED_TOKEN_PATH: str
     # Dynamic properties hard coded or computed
     excluded: list[str] = ["CACHED_TOKEN_PATH"]
@@ -43,7 +42,6 @@ class LocalSettings(Settings):
         "SECRET": "LOCAL_SECRET",
         "AUDIENCE": "LOCAL_AUDIENCE",
         "GRANT_TYPE": "LOCAL_GRANT_TYPE",
-        "HF_API_KEY": "LOCAL_HF_API_KEY",
         "CACHED_TOKEN_PATH": str(Path(Path(__file__).parent, "cached_token.txt")),
     }
 
@@ -61,7 +59,6 @@ class DevSettings(Settings):
         "SECRET": "DEV_SECRET",
         "AUDIENCE": "DEV_AUDIENCE",
         "GRANT_TYPE": "DEV_GRANT_TYPE",
-        "HF_API_KEY": "DEV_HF_API_KEY",
         "CACHED_TOKEN_PATH": str(Path(Path(__file__).parent, "cached_token.txt")),
     }
 
@@ -79,7 +76,6 @@ class SandboxSettings(Settings):
         "SECRET": "SANDBOX_SECRET",
         "AUDIENCE": "SANDBOX_AUDIENCE",
         "GRANT_TYPE": "SANDBOX_GRANT_TYPE",
-        "HF_API_KEY": "SANDBOX_HF_API_KEY",
         "CACHED_TOKEN_PATH": str(Path(Path(__file__).parent, "cached_token.txt")),
     }
 
@@ -97,7 +93,6 @@ class CrtSettings(Settings):
         "SECRET": "CRT_SECRET",
         "AUDIENCE": "CRT_AUDIENCE",
         "GRANT_TYPE": "CRT_GRANT_TYPE",
-        "HF_API_KEY": "CRT_HF_API_KEY",
         "CACHED_TOKEN_PATH": str(Path(Path(__file__).parent, "cached_token.txt")),
     }
 
@@ -115,7 +110,6 @@ class StagingSettings(Settings):
         "SECRET": "STAGING_SECRET",
         "AUDIENCE": "STAGING_AUDIENCE",
         "GRANT_TYPE": "STAGING_GRANT_TYPE",
-        "HF_API_KEY": "STAGING_HF_API_KEY",
         "CACHED_TOKEN_PATH": str(Path(Path(__file__).parent, "staging_cached_token.txt")),
     }
 
@@ -133,7 +127,6 @@ class ProdSettings(Settings):
         "SECRET": "PROD_SECRET",
         "AUDIENCE": "PROD_AUDIENCE",
         "GRANT_TYPE": "PROD_GRANT_TYPE",
-        "HF_API_KEY": "PROD_HF_API_KEY",
         "CACHED_TOKEN_PATH": str(Path(Path(__file__).parent, "prod_cached_token.txt")),
     }
 

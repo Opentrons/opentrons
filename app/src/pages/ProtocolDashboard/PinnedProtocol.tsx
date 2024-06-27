@@ -112,9 +112,7 @@ export function PinnedProtocol(props: {
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       maxWidth={cardStyleBySize[cardSize].width}
       minWidth={cardStyleBySize[cardSize].width}
-      onClick={() => {
-        handleProtocolClick(longpress, protocol.id)
-      }}
+      onClick={() => handleProtocolClick(longpress, protocol.id)}
       overflowWrap={OVERFLOW_WRAP_ANYWHERE}
       padding={SPACING.spacing24}
       ref={longpress.ref}

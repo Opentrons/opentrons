@@ -1161,7 +1161,6 @@
         "errorCode": "4000",
         "errorInfo": {},
         "errorType": "InvalidSpecificationForRobotTypeError",
-        "isDefined": false,
         "wrappedErrors": []
       },
       "notes": [],
@@ -1185,21 +1184,18 @@
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
-      "isDefined": false,
       "wrappedErrors": [
         {
           "detail": "InvalidSpecificationForRobotTypeError: Cannot load a Gen2 pipette on a Flex.",
           "errorCode": "4000",
           "errorInfo": {},
           "errorType": "ProtocolCommandFailedError",
-          "isDefined": false,
           "wrappedErrors": [
             {
               "detail": "Cannot load a Gen2 pipette on a Flex.",
               "errorCode": "4000",
               "errorInfo": {},
               "errorType": "InvalidSpecificationForRobotTypeError",
-              "isDefined": false,
               "wrappedErrors": []
             }
           ]
@@ -1250,7 +1246,6 @@
   },
   "modules": [],
   "pipettes": [],
-  "result": "not-ok",
   "robotType": "OT-3 Standard",
   "runTimeParameters": []
 }

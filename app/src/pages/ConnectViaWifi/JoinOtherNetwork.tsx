@@ -27,7 +27,7 @@ export function JoinOtherNetwork({
       setSelectedSsid(inputSsid)
       setCurrentOption('SelectAuthType')
     } else {
-      setErrorMessage(t('join_other_network_error_message') as string)
+      setErrorMessage(t('join_other_network_error_message'))
     }
   }
 
@@ -36,9 +36,7 @@ export function JoinOtherNetwork({
       <RobotSetupHeader
         buttonText={i18n.format(t('continue'), 'capitalize')}
         header={t('join_other_network')}
-        onClickBack={() => {
-          setCurrentOption('WifiList')
-        }}
+        onClickBack={() => setCurrentOption('WifiList')}
         onClickButton={handleContinue}
       />
       <SetWifiSsid

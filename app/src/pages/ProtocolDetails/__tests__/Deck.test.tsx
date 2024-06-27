@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
-import { screen } from '@testing-library/react'
 import { when } from 'vitest-when'
 
 import { renderWithProviders } from '../../../__testing-utils__'
@@ -173,7 +172,7 @@ describe('Deck', () => {
   })
 
   it('renders deck view section', () => {
-    render(props)
-    expect(screen.getByLabelText('protocol deck map')).toBeInTheDocument()
+    const { getByLabelText } = render(props)[0]
+    expect(getByLabelText('protocol deck map')).toBeInTheDocument()
   })
 })

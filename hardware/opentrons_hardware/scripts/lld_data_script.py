@@ -9,14 +9,15 @@ import numpy
 from abc import ABC, abstractmethod
 
 impossible_pressure = 9001.0
-accepted_error = 0.5
+accepted_error = 0.1
 
 
 class LLDAlgoABC(ABC):
     """An instance of an lld algorithm."""
 
+    @staticmethod
     @abstractmethod
-    def name(self) -> str:
+    def name() -> str:
         """Name of this algorithm."""
         ...
 
@@ -40,15 +41,15 @@ class LLDPresThresh(LLDAlgoABC):
         """Init."""
         self.threshold = thresh
 
-    def name(self) -> str:
+    @staticmethod
+    def name() -> str:
         """Name of this algorithm."""
-        return "{:<40}".format(f"simple threshold {self.threshold}")
+        return "{:<30}".format("simple threshold")
 
     def tick(self, pressures: Tuple[float, float]) -> Tuple[bool, Tuple[float, float]]:
         """Simulate firmware motor interrupt tick."""
         return (
-            abs(pressures[0]) > abs(self.threshold)
-            or abs(pressures[1]) > abs(self.threshold),
+            pressures[0] < self.threshold or pressures[1] < self.threshold,
             pressures,
         )
 
@@ -71,11 +72,10 @@ class LLDSMAT(LLDAlgoABC):
         self.threshold_smat = thresh
         self.reset()
 
-    def name(self) -> str:
+    @staticmethod
+    def name() -> str:
         """Name of this algorithm."""
-        return "{:<40}".format(
-            f"simple moving avg thresh {self.samples_n_smat} {self.threshold_smat}"
-        )
+        return "{:<30}".format("simple moving avg thresh")
 
     def reset(self) -> None:
         """Reset simulator between runs."""
@@ -109,11 +109,6 @@ class LLDSMAT(LLDAlgoABC):
         new_avg_s, self.running_samples_smad_s = LLDSMAT._tick_one_sensor(
             pressures[1], self.samples_n_smat, self.running_samples_smat_s
         )
-        if (
-            abs(new_avg_p) == impossible_pressure
-            or abs(new_avg_s) == impossible_pressure
-        ):
-            return (False, (new_avg_p, new_avg_s))
         return (
             abs(new_avg_p) > self.threshold_smat
             or abs(new_avg_s) > self.threshold_smat,
@@ -135,11 +130,10 @@ class LLDSMAD(LLDAlgoABC):
         self.derivative_threshold_smad = thresh
         self.reset()
 
-    def name(self) -> str:
+    @staticmethod
+    def name() -> str:
         """Name of this algorithm."""
-        return "{:<40}".format(
-            f"simple moving avg der s{self.samples_n_smad} t{self.derivative_threshold_smad}"
-        )
+        return "{:<30}".format("simple moving avg der")
 
     def reset(self) -> None:
         """Reset simulator between runs."""
@@ -199,11 +193,10 @@ class LLDWMAD(LLDAlgoABC):
         self.derivative_threshold_wmad = abs(thresh)
         self.reset()
 
-    def name(self) -> str:
+    @staticmethod
+    def name() -> str:
         """Name of this algorithm."""
-        return "{:<40}".format(
-            f"weighted moving avg der s{self.samples_n_wmad} t{self.derivative_threshold_wmad}"
-        )
+        return "{:<30}".format("weighted moving avg der")
 
     def reset(self) -> None:
         """Reset simulator between runs."""
@@ -272,11 +265,10 @@ class LLDEMAD(LLDAlgoABC):
         self.derivative_threshold_emad = abs(thresh)
         self.reset()
 
-    def name(self) -> str:
+    @staticmethod
+    def name() -> str:
         """Name of this algorithm."""
-        return "{:<40}".format(
-            f"exponential moving avg der {self.smoothing_factor} {self.derivative_threshold_emad}"
-        )
+        return "{:<30}".format("exponential moving avg der")
 
     def reset(self) -> None:
         """Reset simulator between runs."""
@@ -335,20 +327,18 @@ def _running_avg(
     running_avg_p = []
     running_avg_s = []
     return_val = None
-    show_fail_graph = True
     for i in range(1, len(time)):
         prev_avg = average
         found, average = algorithm.tick(
             (float(pressures[i][0]), float(pressures[i][1]))
         )
-        if found and return_val is None:
+        if found:
             # if average < running_avg_threshold:
             # print(f"found z height = {z_travel[i]}")
             # print(f"at time = {time[i]}")
             return_val = time[i], z_travel[i], p_travel[i]
             if no_plot:
                 # once we find it we don't need to keep going
-                show_fail_graph = False
                 break
         if (impossible_pressure not in average) and (
             impossible_pressure not in prev_avg
@@ -378,7 +368,7 @@ def _running_avg(
         running_avg_s
     )
 
-    if not no_plot or show_fail_graph:
+    if not no_plot:
         plot.figure(plot_name)
         avg_ax = plot.subplot(211)
         avg_ax.set_title("Running Average")
@@ -408,15 +398,12 @@ def run(
     final_results: List[Tuple[float, List[float], str, str]] = []
     for report_file in report_files:
         with open(path + report_file, "r") as file:
-            print(report_file)
             reader = csv.reader(file)
             reader_list = list(reader)
 
         number_of_trials = int(reader_list[33][2])
-        z_speed = float(reader_list[37][2])
-        # expected_travel = float(reader_list[43][6])
-        # expected_travel = abs(expected_travel + (z_speed * (1 if expected_travel < 0 else -1)))
-        expected_travel = z_speed
+
+        expected_height = reader_list[44][6]
         # have a time list for each trial so the list lengths can all be equal
         results: List[float] = []
         for trial in range(number_of_trials):
@@ -473,17 +460,17 @@ def run(
                 print("No threshold found {algorithm.name()}")
                 results.append(sys.float_info.max)
         print(
-            f"{algorithm.name()}, expected {expected_travel} max {max(results)} min{min(results)}, avg {sum(results)/len(results)}"
+            f"{algorithm.name()}, expected {expected_height} max {max(results)} min{min(results)}, avg {sum(results)/len(results)}"
         )
         final_results.append(
-            (float(expected_travel), results, f"{algorithm.name()}", f"{report_file}")
+            (float(expected_height), results, f"{algorithm.name()}", f"{report_file}")
         )
     return final_results
 
 
-def _check_for_failure(expected_travel: float, results: List[float]) -> bool:
+def _check_for_failure(expected_height: float, results: List[float]) -> bool:
     for result in results:
-        if abs(expected_travel - result) > accepted_error:
+        if abs(expected_height - result) > accepted_error:
             return True
     return False
 
@@ -512,69 +499,14 @@ def main() -> None:
     )
     parser.add_argument("--no-plot", action="store_true")
     args = parser.parse_args()
-    """ Dont use we want to use the dervative
-    pt_algorithms: List[LLDAlgoABC] = [
-        LLDPresThresh(thresh=20),
-        LLDPresThresh(thresh=30),
-        LLDPresThresh(thresh=40),
-        LLDPresThresh(thresh=50),
-        LLDPresThresh(thresh=60),
-        LLDPresThresh(thresh=70),
-        LLDPresThresh(thresh=80),
-        LLDPresThresh(thresh=90),
-        LLDPresThresh(thresh=100),
-    ]
-    """
-    smad_algorithms: List[LLDAlgoABC] = [
-        LLDSMAD(samples=10, thresh=1.5),
-        LLDSMAD(samples=10, thresh=1.4),
-        LLDSMAD(samples=10, thresh=1.3),
-        LLDSMAD(samples=10, thresh=1.2),
-        LLDSMAD(samples=10, thresh=1.1),
-        LLDSMAD(samples=10, thresh=1),
-        LLDSMAD(samples=10, thresh=0.9),
-        LLDSMAD(samples=10, thresh=0.8),
-        LLDSMAD(samples=10, thresh=0.7),
-    ]
-    """Dont use two proceessor heavy.
-    wmad_algorithms: List[LLDAlgoABC] = [
-        LLDWMAD(thresh=1.3),
-        LLDWMAD(thresh=1.4),
-        LLDWMAD(thresh=1.5),
-    ]
-    """
-    emad_algorithms: List[LLDAlgoABC] = [
-        LLDEMAD(s_factor=0.2, thresh=1),
-        LLDEMAD(s_factor=0.3, thresh=1),
-        LLDEMAD(s_factor=0.4, thresh=1),
-        LLDEMAD(s_factor=0.5, thresh=1),
-        LLDEMAD(s_factor=0.6, thresh=1),
-        LLDEMAD(s_factor=0.7, thresh=1),
-        LLDEMAD(s_factor=0.8, thresh=1),
-        LLDEMAD(s_factor=0.9, thresh=1),
-        LLDEMAD(s_factor=0.05, thresh=1),
-        LLDEMAD(thresh=1.1),
-        LLDEMAD(thresh=1),
-        LLDEMAD(thresh=1.1),
-        LLDEMAD(thresh=1.2),
-        LLDEMAD(thresh=1.3),
-        LLDEMAD(thresh=1.4),
-        LLDEMAD(thresh=1.5),
-        LLDEMAD(thresh=1.6),
-    ]
-    """ Dont use we want to use the dervative
-    smat_algorithms: List[LLDAlgoABC] = [
-        LLDSMAT(thresh=20),
-        LLDSMAT(thresh=30),
-        LLDSMAT(thresh=40),
-        LLDSMAT(thresh=50),
-        LLDSMAT(thresh=60),
-        LLDSMAT(thresh=70),
-        LLDSMAT(thresh=80),
-    ]
-    """
 
-    algorithms: List[LLDAlgoABC] = smad_algorithms + emad_algorithms
+    algorithms: List[LLDAlgoABC] = [
+        LLDPresThresh(),
+        LLDSMAD(),
+        LLDWMAD(),
+        LLDEMAD(),
+        LLDSMAT(),
+    ]
     analysis: List[Tuple[float, List[float], str, str]] = []
     for algorithm in algorithms:
         algorithm_results = run(args, algorithm)
@@ -582,9 +514,7 @@ def main() -> None:
     print("\n\n")
     for result in analysis:
         res_string = (
-            "\033[91mFAILURE\033[0m"
-            if _check_for_failure(result[0], result[1])
-            else "\033[92msuccess\033[0m"
+            "FAILURE" if _check_for_failure(result[0], result[1]) else "success"
         )
         print(f"Algorithm {result[2]} {res_string}")
 
@@ -597,11 +527,11 @@ def main() -> None:
     precision_score: Dict[str, int] = _score(algorithms, precision)
     algorithm_score: Dict[str, int] = {algo.name(): 0 for algo in algorithms}
 
-    print("\nAccuracy Scores")
+    print("Accuracy Scores")
     for a_name in accuracy_score.keys():
         print(f"{a_name} {accuracy_score[a_name]}")
 
-    print("\nPrecision Scores")
+    print("Precision Scores")
     for a_name in precision_score.keys():
         print(f"{a_name} {precision_score[a_name]}")
         # add the two scores together for final score so we can sort before printing
@@ -610,7 +540,7 @@ def main() -> None:
     algorithm_score = dict(
         sorted(algorithm_score.items(), key=lambda item: item[1], reverse=True)
     )
-    print("\nTotal Scores")
+    print("Total Scores")
     for a_name in algorithm_score.keys():
         print(f"{a_name} {algorithm_score[a_name]}")
 

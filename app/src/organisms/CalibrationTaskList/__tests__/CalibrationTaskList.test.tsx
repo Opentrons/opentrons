@@ -67,8 +67,8 @@ describe('CalibrationTaskList', () => {
   })
 
   it('does not show the Calibrations complete screen when viewing a completed task list', () => {
-    render()
-    expect(screen.queryByText('Calibrations complete!')).toBeFalsy()
+    const [{ queryByText }] = render()
+    expect(queryByText('Calibrations complete!')).toBeFalsy()
   })
 
   it('shows the Calibrations complete screen after the calibrations are completed', () => {

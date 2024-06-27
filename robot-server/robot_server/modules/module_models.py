@@ -12,13 +12,10 @@ from opentrons.hardware_control.modules import (
     MagneticStatus,
     HeaterShakerStatus,
     SpeedStatus,
-    AbsorbanceReaderStatus,
 )
 from opentrons.drivers.types import (
     ThermocyclerLidStatus,
     HeaterShakerLabwareLatchStatus,
-    AbsorbanceReaderLidStatus,
-    AbsorbanceReaderPlatePresence,
 )
 from opentrons.protocol_engine import ModuleModel
 from opentrons.protocol_engine.types import Vec3f
@@ -308,47 +305,11 @@ class HeaterShakerModule(
     data: HeaterShakerModuleData
 
 
-class AbsorbanceReaderModuleData(BaseModel):
-    """Live data from an Absorbance Reader module."""
-
-    status: AbsorbanceReaderStatus = Field(
-        ...,
-        description="Overall status of the module.",
-    )
-    lidStatus: AbsorbanceReaderLidStatus = Field(
-        ...,
-        description="Lid status.",
-    )
-    platePresence: AbsorbanceReaderPlatePresence = Field(
-        ...,
-        description="Plate presence status.",
-    )
-    sampleWavelength: int = Field(
-        ...,
-        description="The current sample wavelength, in nanometers.",
-    )
-
-
-class AbsorbanceReaderModule(
-    _GenericModule[
-        Literal[ModuleType.ABSORBANCE_READER],
-        Literal[ModuleModel.ABSORBANCE_READER_V1],
-        AbsorbanceReaderModuleData,
-    ]
-):
-    """An attached Heater-Shaker Module."""
-
-    moduleType: Literal[ModuleType.ABSORBANCE_READER]
-    moduleModel: Literal[ModuleModel.ABSORBANCE_READER_V1]
-    data: AbsorbanceReaderModuleData
-
-
 AttachedModule = Union[
     TemperatureModule,
     MagneticModule,
     ThermocyclerModule,
     HeaterShakerModule,
-    AbsorbanceReaderModule,
 ]
 
 
@@ -357,5 +318,4 @@ AttachedModuleData = Union[
     MagneticModuleData,
     ThermocyclerModuleData,
     HeaterShakerModuleData,
-    AbsorbanceReaderModuleData,
 ]

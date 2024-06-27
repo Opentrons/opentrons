@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { it, describe } from 'vitest'
-import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
@@ -17,14 +16,12 @@ const render = (sessionType: 'tipLengthCalibration' | 'deckCalibration') => {
 
 describe('InvalidationWarning', () => {
   it('renders correct text - deck calibration', () => {
-    render('deckCalibration')
-    screen.getByText('Recalibrating the deck clears pipette offset data')
-    screen.getByText(
-      'Pipette offsets for both mounts will have to be recalibrated.'
-    )
+    const { getByText } = render('deckCalibration')
+    getByText('Recalibrating the deck clears pipette offset data')
+    getByText('Pipette offsets for both mounts will have to be recalibrated.')
   })
   it('renders correct text - tip length calibration', () => {
-    render('tipLengthCalibration')
-    screen.getByText('Recalibrating tip length will clear pipette offset data.')
+    const { getByText } = render('tipLengthCalibration')
+    getByText('Recalibrating tip length will clear pipette offset data.')
   })
 })

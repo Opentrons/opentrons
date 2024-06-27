@@ -33,9 +33,11 @@ export function useCreateLabwareOffsetMutation(): UseCreateLabwareOffsetMutation
     ({ runId, data }) =>
       createLabwareOffset(host as HostConfig, runId, data)
         .then(response => {
-          queryClient.invalidateQueries([host, 'runs']).catch((e: Error) => {
-            console.error(`error invalidating runs query: ${e.message}`)
-          })
+          queryClient
+            .invalidateQueries([host, 'runs'])
+            .catch((e: Error) =>
+              console.error(`error invalidating runs query: ${e.message}`)
+            )
           return response.data
         })
         .catch((e: Error) => {

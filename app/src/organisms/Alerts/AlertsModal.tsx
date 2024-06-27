@@ -55,7 +55,7 @@ export function AlertsModal({ toastIdRef }: AlertsModalProps): JSX.Element {
   React.useEffect(() => {
     if (hasJustUpdated) {
       makeToast(
-        t('branded:opentrons_app_successfully_updated') as string,
+        t('branded:opentrons_app_successfully_updated'),
         SUCCESS_TOAST,
         {
           closeButton: true,
@@ -69,15 +69,13 @@ export function AlertsModal({ toastIdRef }: AlertsModalProps): JSX.Element {
   React.useEffect(() => {
     if (createAppUpdateAvailableToast) {
       toastIdRef.current = makeToast(
-        t('branded:opentrons_app_update_available_variation') as string,
+        t('branded:opentrons_app_update_available_variation'),
         WARNING_TOAST,
         {
           closeButton: true,
           disableTimeout: true,
           linkText: t('view_update'),
-          onLinkClick: () => {
-            setShowUpdateModal(true)
-          },
+          onLinkClick: () => setShowUpdateModal(true),
         }
       )
     } else if (removeToast && toastIdRef.current) {
@@ -95,11 +93,7 @@ export function AlertsModal({ toastIdRef }: AlertsModalProps): JSX.Element {
         <U2EDriverOutdatedAlert dismissAlert={dismissDriverAlert} />
       ) : null}
       {showUpdateModal ? (
-        <UpdateAppModal
-          closeModal={() => {
-            setShowUpdateModal(false)
-          }}
-        />
+        <UpdateAppModal closeModal={() => setShowUpdateModal(false)} />
       ) : null}
     </>
   )

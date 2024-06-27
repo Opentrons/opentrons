@@ -10,8 +10,7 @@ import type {
   ResponseToActionMapper,
 } from '../../robot-api/operators'
 import type { Action, Epic } from '../../types'
-import type { ApiWifiKey, FetchWifiKeysAction } from '../types'
-import type { RobotApiErrorResponse } from '../../robot-api/types'
+import type { FetchWifiKeysAction } from '../types'
 
 const mapActionToRequest: ActionToRequestMapper<FetchWifiKeysAction> = action => ({
   method: GET,
@@ -26,8 +25,8 @@ const mapResponseToAction: ResponseToActionMapper<FetchWifiKeysAction> = (
   const meta = { ...originalAction.meta, response: responseMeta }
 
   return response.ok
-    ? fetchWifiKeysSuccess(host.name, body.keys as ApiWifiKey[], meta)
-    : fetchWifiKeysFailure(host.name, body as RobotApiErrorResponse, meta)
+    ? fetchWifiKeysSuccess(host.name, body.keys, meta)
+    : fetchWifiKeysFailure(host.name, body, meta)
 }
 
 export const fetchWifiKeysEpic: Epic = (action$, state$) => {

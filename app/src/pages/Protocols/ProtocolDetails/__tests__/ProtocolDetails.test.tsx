@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
-import { screen } from '@testing-library/react'
 import { Route, MemoryRouter } from 'react-router-dom'
 import { when } from 'vitest-when'
 import { renderWithProviders } from '../../../../__testing-utils__'
@@ -77,7 +76,7 @@ describe('ProtocolDetails', () => {
     when(vi.mocked(getStoredProtocol))
       .calledWith(MOCK_STATE, mockProtocolKey)
       .thenReturn(null)
-    render('/protocols')
-    screen.getByText('protocols')
+    const { getByText } = render('/protocols')
+    getByText('protocols')
   })
 })

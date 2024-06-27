@@ -11,8 +11,7 @@ export function unsubscribe(ip: string, topic: NotifyTopic): Promise<void> {
         .then(() => {
           const client = connectionStore.getClient(ip)
           if (client == null) {
-            reject(new Error('Expected hostData, received null.'))
-            return
+            return reject(new Error('Expected hostData, received null.'))
           }
 
           client.unsubscribe(topic, {}, (error, result) => {

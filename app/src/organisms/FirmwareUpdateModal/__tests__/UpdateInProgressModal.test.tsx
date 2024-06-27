@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { describe, it, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import { screen } from '@testing-library/react'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { UpdateInProgressModal } from '../UpdateInProgressModal'
@@ -20,14 +19,14 @@ describe('UpdateInProgressModal', () => {
     }
   })
   it('renders pipette text', () => {
-    render(props)
-    screen.getByText('Updating pipette firmware...')
+    const { getByText } = render(props)
+    getByText('Updating pipette firmware...')
   })
   it('renders Hepa/UV text', () => {
     props = {
       subsystem: 'hepa_uv',
     }
-    render(props)
-    screen.getByText('Updating HEPA/UV Module firmware...')
+    const { getByText } = render(props)
+    getByText('Updating HEPA/UV Module firmware...')
   })
 })

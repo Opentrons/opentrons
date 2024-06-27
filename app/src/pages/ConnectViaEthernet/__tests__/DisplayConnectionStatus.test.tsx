@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { vi, it, describe, expect, beforeEach } from 'vitest'
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
@@ -37,39 +37,39 @@ describe('DisplayConnectionStatus', () => {
   })
 
   it('should render text, icon, and buttons when the connection status is connected', () => {
-    render(props)
-    screen.getByTestId('Ethernet_connected_icon')
-    screen.getByText('Successfully connected!')
-    screen.getByText('View network details')
-    screen.getByText('Continue')
+    const [{ getByText, getByTestId }] = render(props)
+    getByTestId('Ethernet_connected_icon')
+    getByText('Successfully connected!')
+    getByText('View network details')
+    getByText('Continue')
   })
 
   it('should render text, icon, and buttons when the connection status is not connected', () => {
     props.isConnected = false
-    render(props)
-    screen.getByTestId('Ethernet_not_connected_icon')
-    screen.getByText('No network found')
-    screen.getByText(
+    const [{ getByText, getByTestId }] = render(props)
+    getByTestId('Ethernet_not_connected_icon')
+    getByText('No network found')
+    getByText(
       'Connect an Ethernet cable to the back of the robot and a network switch or hub.'
     )
-    screen.getByText('View network details')
+    getByText('View network details')
   })
 
   it('should call a mock function when tapping view network details button when the connection status is connected', () => {
-    render(props)
-    fireEvent.click(screen.getByText('View network details'))
+    const [{ getByText }] = render(props)
+    fireEvent.click(getByText('View network details'))
     expect(mockFunc).toHaveBeenCalled()
   })
 
   it('should call a mock function when tapping view network details button when the connection status is not connected', () => {
-    render(props)
-    fireEvent.click(screen.getByText('View network details'))
+    const [{ getByText }] = render(props)
+    fireEvent.click(getByText('View network details'))
     expect(mockFunc).toHaveBeenCalled()
   })
 
   it('should call a mock push when tapping continue button', () => {
-    render(props)
-    fireEvent.click(screen.getByText('Continue'))
+    const [{ getByText }] = render(props)
+    fireEvent.click(getByText('Continue'))
     expect(mockPush).toHaveBeenCalledWith(
       '/robot-settings/update-robot-during-onboarding'
     )

@@ -163,9 +163,7 @@ export function useDashboardCalibrateTipLength(
             }
           }}
           titleBarTitle={t('tip_length_calibration')}
-          closePrompt={() => {
-            setShowCalBlockModal(false)
-          }}
+          closePrompt={() => setShowCalBlockModal(false)}
         />
       ) : null}
       {startingSession ? (

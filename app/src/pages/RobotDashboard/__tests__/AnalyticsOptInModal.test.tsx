@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { vi, it, describe, expect, beforeEach } from 'vitest'
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 
@@ -35,19 +35,19 @@ describe('AnalyticsOptInModal', () => {
   })
 
   it('should render text and button', () => {
-    render(props)
+    const [{ getByText }] = render(props)
 
-    screen.getByText('Want to help out Opentrons?')
-    screen.getByText(
+    getByText('Want to help out Opentrons?')
+    getByText(
       'Automatically send us anonymous diagnostics and usage data. We only use this information to improve our products.'
     )
-    screen.getByText('Opt out')
-    screen.getByText('Opt in')
+    getByText('Opt out')
+    getByText('Opt in')
   })
 
   it('should call a mock function when tapping opt out button', () => {
-    render(props)
-    fireEvent.click(screen.getByText('Opt out'))
+    const [{ getByText }] = render(props)
+    fireEvent.click(getByText('Opt out'))
 
     expect(vi.mocked(updateConfigValue)).toHaveBeenCalledWith(
       'analytics.optedIn',
@@ -62,8 +62,8 @@ describe('AnalyticsOptInModal', () => {
   })
 
   it('should call a mock function when tapping out in button', () => {
-    render(props)
-    fireEvent.click(screen.getByText('Opt in'))
+    const [{ getByText }] = render(props)
+    fireEvent.click(getByText('Opt in'))
 
     expect(vi.mocked(updateConfigValue)).toHaveBeenCalledWith(
       'analytics.optedIn',

@@ -192,12 +192,8 @@ const EditMultipleModulesModalComponent = (
           render={({ field }) => (
             <DeckConfigurator
               deckConfig={updatedSlots}
-              handleClickAdd={cutoutId => {
-                handleClickAdd(cutoutId, field)
-              }}
-              handleClickRemove={cutoutId => {
-                handleClickRemove(cutoutId, field)
-              }}
+              handleClickAdd={cutoutId => handleClickAdd(cutoutId, field)}
+              handleClickRemove={cutoutId => handleClickRemove(cutoutId, field)}
               showExpansion={false}
             />
           )}

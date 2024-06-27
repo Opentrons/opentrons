@@ -182,9 +182,7 @@ function PageContents(props: PageContentsProps): JSX.Element {
 
   React.useEffect(() => {
     if (jumpedIndex != null) {
-      setTimeout(() => {
-        setJumpedIndex(null)
-      }, JUMPED_STEP_HIGHLIGHT_DELAY_MS)
+      setTimeout(() => setJumpedIndex(null), JUMPED_STEP_HIGHLIGHT_DELAY_MS)
     }
   }, [jumpedIndex])
 

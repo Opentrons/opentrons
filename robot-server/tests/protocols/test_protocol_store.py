@@ -70,7 +70,6 @@ async def test_insert_and_get_protocol(
             content_hash="abc123",
         ),
         protocol_key="dummy-data-111",
-        protocol_kind="standard",
     )
 
     assert subject.has("protocol-id") is False
@@ -99,7 +98,6 @@ async def test_insert_with_duplicate_key_raises(
             content_hash="abc123",
         ),
         protocol_key="dummy-data-111",
-        protocol_kind="standard",
     )
     protocol_resource_2 = ProtocolResource(
         protocol_id="protocol-id",
@@ -114,7 +112,6 @@ async def test_insert_with_duplicate_key_raises(
             content_hash="abc123",
         ),
         protocol_key="dummy-data-222",
-        protocol_kind="standard",
     )
     subject.insert(protocol_resource_1)
 
@@ -152,7 +149,6 @@ async def test_get_all_protocols(
             content_hash="abc123",
         ),
         protocol_key="dummy-data-111",
-        protocol_kind="standard",
     )
     resource_2 = ProtocolResource(
         protocol_id="123",
@@ -167,7 +163,6 @@ async def test_get_all_protocols(
             content_hash="abc123",
         ),
         protocol_key="dummy-data-222",
-        protocol_kind="standard",
     )
 
     subject.insert(resource_1)
@@ -204,7 +199,6 @@ async def test_remove_protocol(
             content_hash="abc123",
         ),
         protocol_key="dummy-data-111",
-        protocol_kind="standard",
     )
 
     subject.insert(protocol_resource)
@@ -244,7 +238,6 @@ def test_remove_protocol_conflict(
             content_hash="abc123",
         ),
         protocol_key=None,
-        protocol_kind="standard",
     )
 
     subject.insert(protocol_resource)
@@ -279,7 +272,6 @@ def test_get_usage_info(
             content_hash="abc123",
         ),
         protocol_key=None,
-        protocol_kind="standard",
     )
     protocol_resource_2 = ProtocolResource(
         protocol_id="protocol-id-2",
@@ -294,7 +286,6 @@ def test_get_usage_info(
             content_hash="abc123",
         ),
         protocol_key=None,
-        protocol_kind="standard",
     )
 
     subject.insert(protocol_resource_1)
@@ -364,7 +355,6 @@ def test_get_referencing_run_ids(
             content_hash="abc123",
         ),
         protocol_key=None,
-        protocol_kind="standard",
     )
 
     subject.insert(protocol_resource_1)
@@ -408,7 +398,6 @@ def test_get_protocol_ids(
             content_hash="abc1",
         ),
         protocol_key=None,
-        protocol_kind="standard",
     )
 
     protocol_resource_2 = ProtocolResource(
@@ -424,7 +413,6 @@ def test_get_protocol_ids(
             content_hash="abc2",
         ),
         protocol_key=None,
-        protocol_kind="standard",
     )
 
     assert subject.get_all_ids() == []
@@ -440,33 +428,3 @@ def test_get_protocol_ids(
     subject.remove(protocol_id="protocol-id-2")
 
     assert subject.get_all_ids() == []
-
-
-async def test_insert_and_get_quick_transfer_protocol(
-    protocol_file_directory: Path, subject: ProtocolStore
-) -> None:
-    """It should store a single quick-transfer protocol."""
-    protocol_resource = ProtocolResource(
-        protocol_id="protocol-id",
-        created_at=datetime(year=2024, month=6, day=6, tzinfo=timezone.utc),
-        source=ProtocolSource(
-            directory=protocol_file_directory,
-            main_file=(protocol_file_directory / "abc.json"),
-            config=JsonProtocolConfig(schema_version=123),
-            files=[],
-            metadata={},
-            robot_type="OT-3 Standard",
-            content_hash="abc123",
-        ),
-        protocol_key="dummy-key-111",
-        protocol_kind="quick-transfer",
-    )
-
-    assert subject.has("protocol-id") is False
-
-    subject.insert(protocol_resource)
-    result = subject.get("protocol-id")
-
-    assert result == protocol_resource
-    assert result.protocol_kind == "quick-transfer"
-    assert subject.has("protocol-id") is True

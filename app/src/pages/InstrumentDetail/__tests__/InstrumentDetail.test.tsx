@@ -1,6 +1,5 @@
 import React from 'react'
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
-import { screen } from '@testing-library/react'
 import { useParams } from 'react-router-dom'
 
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
@@ -105,17 +104,17 @@ describe('InstrumentDetail', () => {
   })
 
   it('displays header containing the instrument name and an overflow menu button', () => {
-    render()
+    const [{ getByText, getByLabelText }] = render()
 
-    screen.getByText('mockPipette')
-    screen.getByLabelText('overflow menu button')
+    getByText('mockPipette')
+    getByLabelText('overflow menu button')
   })
 
   it('renders the gripper name if the instrument is a gripper', () => {
     vi.mocked(useParams).mockReturnValue({ mount: 'extension' })
-    render()
+    const [{ getByText }] = render()
 
-    screen.getByText('mockGripper')
+    getByText('mockGripper')
   })
 
   it('does not display the overflow menu button when instrument is not ok', () => {
@@ -131,16 +130,16 @@ describe('InstrumentDetail', () => {
       data: mockInstrumentsQuery,
     } as any)
 
-    render()
+    const [{ queryByText }] = render()
 
-    expect(screen.queryByText('overflow menu button')).not.toBeInTheDocument()
+    expect(queryByText('overflow menu button')).not.toBeInTheDocument()
   })
 
   it('renders calibration date when present', () => {
-    render()
+    const [{ getByText, queryByText }] = render()
 
-    screen.getByText('last calibrated')
-    screen.queryByText('UTC')
+    getByText('last calibrated')
+    queryByText('UTC')
   })
 
   it("renders 'No calibration data' when no calibration data is present", () => {
@@ -154,34 +153,34 @@ describe('InstrumentDetail', () => {
     vi.mocked(useInstrumentsQuery).mockReturnValue({
       data: mockInstrumentsQuery,
     } as any)
-    render()
-    screen.getByText('last calibrated')
-    screen.getByText('No calibration data')
+    const [{ getByText }] = render()
+    getByText('last calibrated')
+    getByText('No calibration data')
   })
 
   it('renders firmware version information', () => {
-    render()
-    screen.getByText('firmware version')
-    screen.getByText('40')
+    const [{ getByText }] = render()
+    getByText('firmware version')
+    getByText('40')
   })
 
   it('renders serial number information', () => {
-    render()
-    screen.getByText('serial number')
-    screen.getByText('P1KSV3420230721')
+    const [{ getByText }] = render()
+    getByText('serial number')
+    getByText('P1KSV3420230721')
   })
 
   it('renders detach and no recalibrate button if calibration data exists for a pipette', () => {
-    render()
-    screen.getByText('detach')
-    expect(screen.queryByText('recalibrate')).not.toBeInTheDocument()
+    const [{ getByText, queryByText }] = render()
+    getByText('detach')
+    expect(queryByText('recalibrate')).not.toBeInTheDocument()
   })
 
   it('renders detach and recalibrate button if calibration data exists for a gripper', () => {
     vi.mocked(useParams).mockReturnValue({ mount: 'extension' })
-    render()
-    screen.getByText('detach')
-    screen.getByText('recalibrate')
+    const [{ getByText }] = render()
+    getByText('detach')
+    getByText('recalibrate')
   })
 
   it('renders detach and calibration buttons if no calibration data exists', () => {
@@ -196,8 +195,8 @@ describe('InstrumentDetail', () => {
       data: mockInstrumentsQuery,
     } as any)
 
-    render()
-    screen.getByText('detach')
-    screen.getByText('calibrate')
+    const [{ getByText }] = render()
+    getByText('detach')
+    getByText('calibrate')
   })
 })

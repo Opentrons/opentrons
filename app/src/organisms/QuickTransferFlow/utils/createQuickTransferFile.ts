@@ -5,13 +5,11 @@ import {
   distribute,
   getWasteChuteAddressableAreaNamePip,
 } from '@opentrons/step-generation'
-import { generateQuickTransferArgs } from './'
+import { generateQuickTransferArgs } from './generateQuickTransferArgs'
 import {
   FLEX_ROBOT_TYPE,
   FLEX_STANDARD_DECKID,
   getDeckDefFromRobotType,
-  TRASH_BIN_ADAPTER_FIXTURE,
-  WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
 import type {
   AddressableAreaName,
@@ -34,8 +32,7 @@ const uuid: () => string = uuidv1
 
 export function createQuickTransferFile(
   quickTransferState: QuickTransferSummaryState,
-  deckConfig: DeckConfiguration,
-  protocolName?: string
+  deckConfig: DeckConfiguration
 ): File {
   const {
     stepArgs,
@@ -132,11 +129,11 @@ export function createQuickTransferFile(
 
   let finalDropTipCommands: CreateCommand[] = []
   let addressableAreaName: AddressableAreaName | null = null
-  if (
-    quickTransferState.dropTipLocation.cutoutFixtureId ===
-    TRASH_BIN_ADAPTER_FIXTURE
-  ) {
-    const trashLocation = quickTransferState.dropTipLocation.cutoutId
+  if (quickTransferState.dropTipLocation === 'trashBin') {
+    const trash = Object.values(
+      invariantContext.additionalEquipmentEntities
+    ).find(aE => aE.name === 'trashBin')
+    const trashLocation = trash != null ? (trash.location as CutoutId) : null
     const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
     const cutouts: Record<CutoutId, AddressableAreaName[]> | null =
       deckDef.cutoutFixtures.find(
@@ -146,11 +143,7 @@ export function createQuickTransferFile(
       trashLocation != null && cutouts != null
         ? cutouts[trashLocation]?.[0] ?? null
         : null
-  } else if (
-    WASTE_CHUTE_FIXTURES.includes(
-      quickTransferState.dropTipLocation.cutoutFixtureId
-    )
-  ) {
+  } else if (quickTransferState.dropTipLocation === 'wasteChute') {
     addressableAreaName = getWasteChuteAddressableAreaNamePip(
       pipetteEntity.spec.channels
     )
@@ -186,18 +179,11 @@ export function createQuickTransferFile(
     ...nonLoadCommands,
     ...finalDropTipCommands,
   ]
-  const sourceLabwareName = quickTransferState.source.metadata.displayName
-  let destinationLabwareName = sourceLabwareName
-  if (quickTransferState.destination !== 'source') {
-    destinationLabwareName = quickTransferState.destination.metadata.displayName
-  }
   const protocolBase = {
     $otSharedSchema: '#/protocol/schemas/8',
     schemaVersion: 8,
     metadata: {
-      protocolName:
-        protocolName ?? `Quick Transfer ${quickTransferState.volume}µL`,
-      description: `This quick transfer moves liquids from a ${sourceLabwareName} to a ${destinationLabwareName}`,
+      protocolName: `Quick Transfer ${quickTransferState.volume}µL`,
       category: null,
       subcategory: null,
       tags: [],

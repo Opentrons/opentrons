@@ -68,12 +68,11 @@ gen-requirements:
 	python -m pipenv requirements > requirements.txt
 
 ENV ?= local
-TAG ?=
 
 .PHONY: deploy
 deploy: gen-requirements
 	@echo "Deploying to environment: $(ENV)"
-	python -m pipenv run python deploy.py --env $(ENV) $(if $(TAG),--tag $(TAG),)
+	python -m pipenv run python deploy.py --env $(ENV)
 
 .PHONY: prompted-deploy
 prompted-deploy: gen-requirements
@@ -90,10 +89,6 @@ print-client-settings-vars:
 .PHONY: live-client
 live-client:
 	python -m pipenv run python -m tests.helpers.client
-
-.PHONY: live-hf
-live-hf:
-	python -m pipenv run python -m tests.helpers.huggingface_client
 
 .PHONY: test-live
 test-live:

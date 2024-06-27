@@ -82,13 +82,7 @@ interface PauseHeaderProps {
 function PauseHeader({ startedAt }: PauseHeaderProps): JSX.Element {
   const { t, i18n } = useTranslation('run_details')
   const [now, setNow] = React.useState(Date())
-  useInterval(
-    () => {
-      setNow(Date())
-    },
-    500,
-    true
-  )
+  useInterval(() => setNow(Date()), 500, true)
 
   const runTime =
     startedAt != null ? formatInterval(startedAt, now) : EMPTY_TIMESTAMP

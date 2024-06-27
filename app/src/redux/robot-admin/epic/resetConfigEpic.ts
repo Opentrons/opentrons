@@ -32,11 +32,7 @@ const mapResponseToAction: ResponseToActionMapper<ResetConfigAction> = (
 
   return response.ok
     ? Actions.resetConfigSuccess(host.name, meta)
-    : Actions.resetConfigFailure(
-        host.name,
-        body as Record<string, unknown>,
-        meta
-      )
+    : Actions.resetConfigFailure(host.name, body, meta)
 }
 
 export const resetConfigEpic: Epic = (action$, state$) => {

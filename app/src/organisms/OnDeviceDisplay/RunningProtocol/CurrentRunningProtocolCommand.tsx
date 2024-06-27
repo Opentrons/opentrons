@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next'
 
 import {
   ALIGN_CENTER,
-  ALIGN_FLEX_END,
   ALIGN_FLEX_START,
   BORDERS,
   COLORS,
@@ -20,14 +19,12 @@ import {
 } from '@opentrons/components'
 import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
 
-import { CommandText } from '../../../molecules/Command'
+import { CommandText } from '../../CommandText'
 import { RunTimer } from '../../Devices/ProtocolRun/RunTimer'
-import { getCommandTextData } from '../../../molecules/Command/utils/getCommandTextData'
+import { getCommandTextData } from '../../CommandText/utils/getCommandTextData'
 import { PlayPauseButton } from './PlayPauseButton'
 import { StopButton } from './StopButton'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '../../../redux/analytics'
-import { useRunningStepCounts } from '../../../resources/protocols/hooks'
-import { useNotifyAllCommandsQuery } from '../../../resources/runs'
 
 import type {
   CompletedProtocolAnalysis,
@@ -111,7 +108,6 @@ interface RunTimerInfo {
 }
 
 interface CurrentRunningProtocolCommandProps {
-  runId: string
   runStatus: RunStatus | null
   robotSideAnalysis: CompletedProtocolAnalysis | null
   robotType: RobotType
@@ -129,7 +125,6 @@ interface CurrentRunningProtocolCommandProps {
 }
 
 export function CurrentRunningProtocolCommand({
-  runId,
   runStatus,
   robotSideAnalysis,
   runTimerInfo,
@@ -146,11 +141,6 @@ export function CurrentRunningProtocolCommand({
   updateLastAnimatedCommand,
 }: CurrentRunningProtocolCommandProps): JSX.Element | null {
   const { t } = useTranslation('run_details')
-  const { data: mostRecentCommandData } = useNotifyAllCommandsQuery(runId, {
-    cursor: null,
-    pageLength: 1,
-  })
-
   const currentCommand =
     robotSideAnalysis?.commands.find(
       (c: RunTimeCommand, index: number) => index === currentRunCommandIndex
@@ -169,14 +159,6 @@ export function CurrentRunningProtocolCommand({
     }
   }
   const currentRunStatus = t(`status_${runStatus}`)
-
-  const { currentStepNumber, totalStepCount } = useRunningStepCounts(
-    runId,
-    mostRecentCommandData
-  )
-  const stepCounterCopy = `${t('step')} ${currentStepNumber ?? '?'}/${
-    totalStepCount ?? '?'
-  }`
 
   const onStop = (): void => {
     if (runStatus === RUN_STATUS_RUNNING) pauseRun()
@@ -225,13 +207,8 @@ export function CurrentRunningProtocolCommand({
           </StyledText>
           <StyledText css={TITLE_TEXT_STYLE}>{protocolName}</StyledText>
         </Flex>
-        <Flex
-          height="100%"
-          alignItems={ALIGN_FLEX_END}
-          flexDirection={DIRECTION_COLUMN}
-        >
+        <Flex height="100%" alignItems={ALIGN_CENTER}>
           <RunTimer {...runTimerInfo} style={RUN_TIMER_STYLE} />
-          <StyledText as="h4SemiBold">{stepCounterCopy}</StyledText>
         </Flex>
       </Flex>
 

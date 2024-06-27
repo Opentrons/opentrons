@@ -7,7 +7,6 @@ import type {
   THERMOCYCLER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
-  ABSORBANCE_READER_TYPE,
   NozzleConfigurationStyle,
 } from '@opentrons/shared-data'
 import type { DeckSlot } from '../types'
@@ -62,9 +61,6 @@ export interface HeaterShakerModuleState {
 export interface MagneticBlockState {
   type: typeof MAGNETIC_BLOCK_TYPE
 }
-export interface AbsorbanceReaderState {
-  type: typeof ABSORBANCE_READER_TYPE
-}
 export interface ModuleTemporalProperties {
   slot: DeckSlot
   moduleState:
@@ -73,7 +69,6 @@ export interface ModuleTemporalProperties {
     | ThermocyclerModuleState
     | HeaterShakerModuleState
     | MagneticBlockState
-    | AbsorbanceReaderState
 }
 export type ModuleOnDeck = ModuleEntity & ModuleTemporalProperties
 export type ModulesForEditModulesCard = Partial<

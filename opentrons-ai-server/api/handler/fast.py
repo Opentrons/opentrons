@@ -1,6 +1,6 @@
 import asyncio
 import os
-from typing import Any, Awaitable, Callable, List, Literal, Union
+from typing import Any, Awaitable, Callable, Literal, Union
 
 import ddtrace
 from ddtrace import tracer
@@ -40,9 +40,9 @@ app = FastAPI(
 # CORS and PREFLIGHT settings
 # ALLOWED_ORIGINS is now an environment variable
 ALLOWED_CREDENTIALS: bool = True
-ALLOWED_METHODS: List[str] = ["GET", "POST", "OPTIONS"]
-ALLOWED_HEADERS: List[str] = ["content-type", "authorization", "origin", "accept"]
-ALLOWED_ACCESS_CONTROL_EXPOSE_HEADERS: List[str] = ["content-type"]
+ALLOWED_METHODS: str = "GET,POST,OPTIONS"
+ALLOWED_HEADERS: str = "content-type,authorization,origin,accept"
+ALLOWED_ACCESS_CONTROL_EXPOSE_HEADERS: str = "content-type"
 ALLOWED_ACCESS_CONTROL_MAX_AGE: str = "600"
 
 # Add CORS middleware
@@ -94,10 +94,10 @@ class TimeoutResponse(BaseModel):
 
 
 class CorsHeadersResponse(BaseModel):
-    Access_Control_Allow_Origin: List[str] | str = Field(alias="Access-Control-Allow-Origin")
-    Access_Control_Allow_Methods: List[str] | str = Field(alias="Access-Control-Allow-Methods")
-    Access_Control_Allow_Headers: List[str] | str = Field(alias="Access-Control-Allow-Headers")
-    Access_Control_Expose_Headers: List[str] | str = Field(alias="Access-Control-Expose-Headers")
+    Access_Control_Allow_Origin: str = Field(alias="Access-Control-Allow-Origin")
+    Access_Control_Allow_Methods: str = Field(alias="Access-Control-Allow-Methods")
+    Access_Control_Allow_Headers: str = Field(alias="Access-Control-Allow-Headers")
+    Access_Control_Expose_Headers: str = Field(alias="Access-Control-Expose-Headers")
     Access_Control_Max_Age: str = Field(alias="Access-Control-Max-Age")
 
 

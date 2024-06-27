@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { action } from '@storybook/addon-actions'
 import {
   COLORS,
   PrimaryBtn,
@@ -7,21 +6,19 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { Slideout as SlideoutComponent } from './index'
+import { Slideout } from './index'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Story, Meta } from '@storybook/react'
 
-const meta: Meta<typeof SlideoutComponent> = {
+export default {
   title: 'App/Atoms/Slideout',
-  component: SlideoutComponent,
-  args: {
-    onCloseClick: action('clicked'),
-  },
-}
+  component: Slideout,
+  argTypes: { onClick: { action: 'clicked' } },
+} as Meta
 
-export default meta
-
-type Story = StoryObj<typeof SlideoutComponent>
+const Template: Story<React.ComponentProps<typeof Slideout>> = args => (
+  <Slideout {...args} />
+)
 
 const Children = (
   <React.Fragment>
@@ -48,10 +45,9 @@ const Children = (
   </React.Fragment>
 )
 
-export const Slideout: Story = {
-  args: {
-    title: 'This is the slideout title with the max width',
-    children: Children,
-    isExpanded: true,
-  },
+export const Primary = Template.bind({})
+Primary.args = {
+  title: 'This is the slideout title with the max width',
+  children: Children,
+  isExpanded: 'true',
 }

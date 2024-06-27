@@ -52,8 +52,8 @@ export const SetupModuleAndDeck = ({
 }: SetupModuleAndDeckProps): JSX.Element => {
   const { t, i18n } = useTranslation('protocol_setup')
   const [selectedValue, toggleGroup] = useToggleGroup(
-    t('list_view') as string,
-    t('map_view') as string
+    t('list_view'),
+    t('map_view')
   )
 
   const robotType = useRobotType(robotName)

@@ -5,8 +5,7 @@ from requests.auth import HTTPBasicAuth
 import json
 import webbrowser
 import argparse
-from typing import List, Dict, Any
-import os
+from typing import List
 
 
 class JiraTicket:
@@ -55,7 +54,6 @@ class JiraTicket:
         description: str,
         project_key: str,
         reporter_id: str,
-        assignee_id: str,
         issue_type: str,
         priority: str,
         components: list,
@@ -69,7 +67,6 @@ class JiraTicket:
                 "issuetype": {"name": issue_type},
                 "summary": summary,
                 "reporter": {"id": reporter_id},
-                "assignee": {"id": assignee_id},
                 "parent": {"key": robot},
                 "priority": {"name": priority},
                 "components": [{"name": component} for component in components],
@@ -125,66 +122,6 @@ class JiraTicket:
             error_message = str(response.content)
             print(f"JSON decoding error occurred. Response content: {error_message}.")
 
-    def get_project_issues(self, project_key: str) -> Dict[str, Any]:
-        """Retrieve all issues for the given project key."""
-        headers = {"Accept": "application/json"}
-        query = {"jql": f"project={project_key}"}
-        response = requests.request(
-            "GET",
-            f"{self.url}/rest/api/3/search",
-            headers=headers,
-            params=query,
-            auth=self.auth,
-        )
-        response.raise_for_status()
-        return response.json()
-
-    def extract_users_from_issues(self, issues: dict) -> Dict[str, Any]:
-        """Extract users from issues."""
-        users = dict()
-        for issue in issues["issues"]:
-            assignee = issue["fields"].get("assignee")
-            if assignee is not None:
-                account_id = assignee["accountId"]
-                users[account_id] = {
-                    "displayName": assignee["displayName"],
-                    "accountId": account_id,
-                }
-            reporter = issue["fields"].get("reporter")
-            if reporter is not None:
-                account_id = reporter["accountId"]
-                users[account_id] = {
-                    "displayName": reporter["displayName"],
-                    "accountId": account_id,
-                }
-        return users
-
-    def save_users_to_file(self, users: Dict[str, Any], storage_directory: str) -> str:
-        """Save users to a JSON file."""
-        file_path = os.path.join(storage_directory, "RABR_Users.json")
-        with open(file_path, mode="w") as file:
-            json.dump(users, file, indent=4)
-        return file_path
-
-    def get_jira_users(self, storage_directory: str) -> str:
-        """Get all Jira users associated with the project key."""
-        try:
-            issues = self.get_project_issues("RABR")
-            users = self.extract_users_from_issues(issues)
-            file_path = self.save_users_to_file(users, storage_directory)
-        except requests.RequestException as e:
-            print(f"Request error occurred: {e}")
-        except json.JSONDecodeError:
-            print("JSON decoding error occurred.")
-        return file_path
-
-    def get_project_components(self, project_id: str) -> List[Dict[str, str]]:
-        """Get list of components on JIRA board."""
-        component_url = f"{self.url}/rest/api/3/project/{project_id}/components"
-        response = requests.get(component_url, headers=self.headers, auth=self.auth)
-        components_list = response.json()
-        return components_list
-
 
 if __name__ == "__main__":
     """Create ticket for specified robot."""
@@ -221,7 +158,6 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
     url = "https://opentrons.atlassian.net"
-
     api_token = args.jira_api_token[0]
     email = args.email[0]
     board_id = args.board_id[0]

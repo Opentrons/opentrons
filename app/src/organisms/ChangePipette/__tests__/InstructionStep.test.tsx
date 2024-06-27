@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { it, describe, beforeEach } from 'vitest'
-import { screen } from '@testing-library/react'
 
 import { GEN1, GEN2, LEFT, RIGHT } from '@opentrons/shared-data'
 
@@ -26,9 +25,9 @@ describe('InstructionStep', () => {
     }
   })
   it('renders the correct image for attaching a gen 1 single channel screw on left mount', () => {
-    render(props)
-    screen.getByText('children')
-    screen.getByAltText('attach-left-single-GEN1-screws')
+    const { getByText, getByAltText } = render(props)
+    getByText('children')
+    getByAltText('attach-left-single-GEN1-screws')
   })
   it('renders the correct image for attaching a gen 2 single channel tab on left mount', () => {
     props = {
@@ -36,9 +35,9 @@ describe('InstructionStep', () => {
       diagram: 'tab',
       displayCategory: GEN2,
     }
-    render(props)
-    screen.getByText('children')
-    screen.getByAltText('attach-left-single-GEN2-tab')
+    const { getByText, getByAltText } = render(props)
+    getByText('children')
+    getByAltText('attach-left-single-GEN2-tab')
   })
   it('renders the correct image for detaching a gen 2 8 channel tab on right mount', () => {
     props = {
@@ -49,8 +48,8 @@ describe('InstructionStep', () => {
       diagram: 'tab',
       displayCategory: GEN2,
     }
-    render(props)
-    screen.getByText('children')
-    screen.getByAltText('detach-right-multi-GEN2-tab')
+    const { getByText, getByAltText } = render(props)
+    getByText('children')
+    getByAltText('detach-right-multi-GEN2-tab')
   })
 })

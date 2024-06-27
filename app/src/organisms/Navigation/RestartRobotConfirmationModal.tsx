@@ -61,9 +61,7 @@ export function RestartRobotConfirmationModal({
           <SmallButton
             flex="1"
             buttonText={t('shared:go_back')}
-            onClick={() => {
-              setShowRestartRobotConfirmationModal(false)
-            }}
+            onClick={() => setShowRestartRobotConfirmationModal(false)}
           />
           <SmallButton
             flex="1"

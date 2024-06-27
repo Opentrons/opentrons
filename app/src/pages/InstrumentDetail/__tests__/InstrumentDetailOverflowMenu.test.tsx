@@ -1,6 +1,6 @@
 import React from 'react'
 import NiceModal from '@ebay/nice-modal-react'
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent } from '@testing-library/react'
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 
 import { renderWithProviders } from '../../../__testing-utils__'
@@ -11,9 +11,8 @@ import { handleInstrumentDetailOverflowMenu } from '../InstrumentDetailOverflowM
 import { useNotifyCurrentMaintenanceRun } from '../../../resources/maintenance_runs'
 import { PipetteWizardFlows } from '../../../organisms/PipetteWizardFlows'
 import { GripperWizardFlows } from '../../../organisms/GripperWizardFlows'
-import { useDropTipWizardFlows } from '../../../organisms/DropTipWizardFlows'
+import { DropTipWizard } from '../../../organisms/DropTipWizard'
 
-import type { Mock } from 'vitest'
 import type {
   PipetteData,
   GripperData,
@@ -31,7 +30,7 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
 vi.mock('../../../resources/maintenance_runs')
 vi.mock('../../../organisms/PipetteWizardFlows')
 vi.mock('../../../organisms/GripperWizardFlows')
-vi.mock('../../../organisms/DropTipWizardFlows')
+vi.mock('../../../organisms/DropTipWizard')
 
 const MOCK_PIPETTE = {
   mount: 'left',
@@ -120,11 +119,7 @@ const render = (pipetteOrGripper: PipetteData | GripperData) => {
   )
 }
 
-let mockToggleDTWiz: Mock
-
 describe('UpdateBuildroot', () => {
-  mockToggleDTWiz = vi.fn()
-
   beforeEach(() => {
     vi.mocked(getPipetteModelSpecs).mockReturnValue({
       displayName: 'mockPipette',
@@ -136,10 +131,6 @@ describe('UpdateBuildroot', () => {
         },
       },
     } as any)
-    vi.mocked(useDropTipWizardFlows).mockReturnValue({
-      showDTWiz: false,
-      toggleDTWiz: mockToggleDTWiz,
-    })
   })
 
   afterEach(() => {
@@ -147,67 +138,67 @@ describe('UpdateBuildroot', () => {
   })
 
   it('renders appropriate options when the instrument is a pipette', () => {
-    render(MOCK_PIPETTE)
-    const btn = screen.getByTestId('testButton')
+    const [{ getByTestId, getByText }] = render(MOCK_PIPETTE)
+    const btn = getByTestId('testButton')
     fireEvent.click(btn)
 
-    screen.getByText('Recalibrate')
-    screen.getByText('Drop tips')
+    getByText('Recalibrate')
+    getByText('Drop tips')
   })
 
   it('renders appropriate options when the instrument is a pipette without calibration', () => {
-    render(MOCK_PIPETTE_WITHOUT_CALIBRATION)
-    const btn = screen.getByTestId('testButton')
+    const [{ getByTestId, getByText, queryByText }] = render(
+      MOCK_PIPETTE_WITHOUT_CALIBRATION
+    )
+    const btn = getByTestId('testButton')
     fireEvent.click(btn)
 
-    expect(screen.queryByText('Recalibrate')).not.toBeInTheDocument()
-    screen.getByText('Drop tips')
+    expect(queryByText('Recalibrate')).not.toBeInTheDocument()
+    getByText('Drop tips')
   })
 
   it('renders appropriate options when the instrument is a gripper', () => {
-    render(MOCK_GRIPPER)
-    const btn = screen.getByTestId('testButton')
+    const [{ getByTestId, getByText, queryByText }] = render(MOCK_GRIPPER)
+    const btn = getByTestId('testButton')
     fireEvent.click(btn)
 
-    screen.getByText('Recalibrate')
-    expect(screen.queryByText('Drop tips')).not.toBeInTheDocument()
+    getByText('Recalibrate')
+    expect(queryByText('Drop tips')).not.toBeInTheDocument()
   })
 
   it('renders the pipette calibration wizard  when recalibrate is clicked', () => {
-    render(MOCK_PIPETTE)
-    const btn = screen.getByTestId('testButton')
+    const [{ getByTestId, getByText }] = render(MOCK_PIPETTE)
+    const btn = getByTestId('testButton')
     fireEvent.click(btn)
-    fireEvent.click(screen.getByText('Recalibrate'))
+    fireEvent.click(getByText('Recalibrate'))
     expect(vi.mocked(PipetteWizardFlows)).toHaveBeenCalled()
   })
 
   it('renders the drop tip wizard  when Drop tips is clicked', () => {
-    render(MOCK_PIPETTE)
-    const btn = screen.getByTestId('testButton')
+    const [{ getByTestId, getByText }] = render(MOCK_PIPETTE)
+    const btn = getByTestId('testButton')
     fireEvent.click(btn)
-    fireEvent.click(screen.getByText('Drop tips'))
+    fireEvent.click(getByText('Drop tips'))
 
-    expect(vi.mocked(mockToggleDTWiz)).toHaveBeenCalled()
+    expect(vi.mocked(DropTipWizard)).toHaveBeenCalled()
   })
 
   it('renders the gripper calibration wizard when recalibrate is clicked', () => {
-    render(MOCK_GRIPPER)
-    const btn = screen.getByTestId('testButton')
+    const [{ getByTestId, getByText }] = render(MOCK_GRIPPER)
+    const btn = getByTestId('testButton')
     fireEvent.click(btn)
-    fireEvent.click(screen.getByText('Recalibrate'))
+    fireEvent.click(getByText('Recalibrate'))
 
     expect(vi.mocked(GripperWizardFlows)).toHaveBeenCalled()
   })
 
   it('closes the overflow menu when a click occurs outside of the overflow menu', () => {
-    render(MOCK_PIPETTE)
-    const btn = screen.getByTestId('testButton')
+    const [{ queryByText, getByTestId, getByLabelText }] = render(MOCK_PIPETTE)
+    const btn = getByTestId('testButton')
     fireEvent.click(btn)
-    const menuListElement = screen.getByLabelText(
-      'BackgroundOverlay_ModalShell'
-    )
+    const menuListElement = getByLabelText('BackgroundOverlay_ModalShell')
     fireEvent.click(menuListElement)
 
-    expect(screen.queryByText('Recalibrate')).not.toBeInTheDocument()
+    expect(queryByText('Recalibrate')).not.toBeInTheDocument()
   })
 })

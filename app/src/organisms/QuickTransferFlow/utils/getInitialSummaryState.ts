@@ -1,15 +1,7 @@
-import {
-  getTipTypeFromTipRackDefinition,
-  TRASH_BIN_ADAPTER_FIXTURE,
-  WASTE_CHUTE_FIXTURES,
-} from '@opentrons/shared-data'
+import { getTipTypeFromTipRackDefinition } from '@opentrons/shared-data'
 import { getVolumeRange } from './'
 
-import type {
-  LabwareDefinition2,
-  PipetteV2Specs,
-  DeckConfiguration,
-} from '@opentrons/shared-data'
+import type { LabwareDefinition2, PipetteV2Specs } from '@opentrons/shared-data'
 import type { Mount } from '@opentrons/api-client'
 import type {
   QuickTransferSummaryState,
@@ -18,75 +10,62 @@ import type {
   ChangeTipOptions,
 } from '../types'
 
-interface InitialSummaryStateProps {
-  state: {
-    pipette: PipetteV2Specs
-    mount: Mount
-    tipRack: LabwareDefinition2
-    source: LabwareDefinition2
-    sourceWells: string[]
-    destination: LabwareDefinition2 | 'source'
-    destinationWells: string[]
-    transferType: TransferType
-    volume: number
-  }
-  deckConfig: DeckConfiguration
-}
-
 // sets up the initial summary state with defaults based on selections made
 // in the wizard flow
-export function getInitialSummaryState(
-  props: InitialSummaryStateProps
-): QuickTransferSummaryState {
-  const { state, deckConfig } = props
-  const tipType = getTipTypeFromTipRackDefinition(state.tipRack)
+export function getInitialSummaryState(props: {
+  pipette: PipetteV2Specs
+  mount: Mount
+  tipRack: LabwareDefinition2
+  source: LabwareDefinition2
+  sourceWells: string[]
+  destination: LabwareDefinition2 | 'source'
+  destinationWells: string[]
+  transferType: TransferType
+  volume: number
+}): QuickTransferSummaryState {
+  const tipType = getTipTypeFromTipRackDefinition(props.tipRack)
   const flowRatesForSupportedTip =
-    state.pipette.liquids.default.supportedTips[tipType]
+    props.pipette.liquids.default.supportedTips[tipType]
 
-  const volumeLimits = getVolumeRange(state)
+  const volumeLimits = getVolumeRange(props)
 
   let path: PathOption = 'single'
   if (
-    state.transferType === 'consolidate' &&
-    volumeLimits.max >= state.volume * 2
+    props.transferType === 'consolidate' &&
+    volumeLimits.max >= props.volume * 2
   ) {
     path = 'multiDispense'
   } else if (
-    state.transferType === 'distribute' &&
-    volumeLimits.max >= state.volume * 2
+    props.transferType === 'distribute' &&
+    volumeLimits.max >= props.volume * 2
   ) {
     path = 'multiAspirate'
   }
 
   let changeTip: ChangeTipOptions = 'always'
-  if (state.sourceWells.length > 96 || state.destinationWells.length > 96) {
+  if (props.sourceWells.length > 96 || props.destinationWells.length > 96) {
     changeTip = 'once'
   }
 
-  const trashConfigCutout = deckConfig.find(
-    configCutout =>
-      WASTE_CHUTE_FIXTURES.includes(configCutout.cutoutFixtureId) ||
-      TRASH_BIN_ADAPTER_FIXTURE === configCutout.cutoutFixtureId
-    // if no trash or waste chute found, default to a trash bin in A3
-  ) ?? { cutoutId: 'cutoutA3', cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE }
-
   return {
-    pipette: state.pipette,
-    mount: state.mount,
-    tipRack: state.tipRack,
-    source: state.source,
-    sourceWells: state.sourceWells,
-    destination: state.destination,
-    destinationWells: state.destinationWells,
-    transferType: state.transferType,
-    volume: state.volume,
+    pipette: props.pipette,
+    mount: props.mount,
+    tipRack: props.tipRack,
+    source: props.source,
+    sourceWells: props.sourceWells,
+    destination: props.destination,
+    destinationWells: props.destinationWells,
+    transferType: props.transferType,
+    volume: props.volume,
     aspirateFlowRate: flowRatesForSupportedTip.defaultAspirateFlowRate.default,
     dispenseFlowRate: flowRatesForSupportedTip.defaultDispenseFlowRate.default,
-    path,
+    path: path,
     tipPositionAspirate: 1,
     preWetTip: false,
     tipPositionDispense: 1,
+    // TODO expand default logic for change tip depending on path, transfer type, number of tips
     changeTip,
-    dropTipLocation: trashConfigCutout,
+    // TODO add default logic for drop tip location depending on deck config
+    dropTipLocation: 'trashBin',
   }
 }

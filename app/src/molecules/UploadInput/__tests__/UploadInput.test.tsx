@@ -3,13 +3,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import { BrowserRouter } from 'react-router-dom'
-import {
-  DIRECTION_ROW,
-  Flex,
-  Icon,
-  SPACING,
-  StyledText,
-} from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { UploadInput } from '..'
 import { renderWithProviders } from '../../../__testing-utils__'
@@ -31,32 +24,6 @@ describe('UploadInput', () => {
     )
 
     expect(screen.getByRole('button', { name: 'Upload' })).toBeTruthy()
-  })
-
-  it('renders text when passing them as props', () => {
-    const mockUploadText = (
-      <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
-        <StyledText>{'CSV file'}</StyledText>
-        <Icon name="information" size="0.75rem" data-testid="mockIcon" />
-      </Flex>
-    )
-
-    renderWithProviders(
-      <BrowserRouter>
-        <UploadInput
-          onUpload={onUpload}
-          uploadButtonText="Choose file"
-          uploadText={mockUploadText}
-        />
-      </BrowserRouter>,
-      {
-        i18nInstance: i18n,
-      }
-    )
-
-    screen.getByText('CSV file')
-    screen.getByTestId('mockIcon')
-    screen.getByText('Choose file')
   })
 
   it('opens file select on button click', () => {

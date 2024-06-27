@@ -25,9 +25,10 @@ import {
   useNotifyAllCommandsAsPreSerializedList,
   useNotifyRunQuery,
 } from '../../resources/runs'
-import { CommandText, CommandIcon } from '../../molecules/Command'
+import { CommandText } from '../CommandText'
 import { Divider } from '../../atoms/structure'
 import { NAV_BAR_WIDTH } from '../../App/constants'
+import { CommandIcon } from './CommandIcon'
 import { useRunStatus } from '../RunTimeControl/hooks'
 import { useLastRunCommand } from '../Devices/hooks/useLastRunCommand'
 

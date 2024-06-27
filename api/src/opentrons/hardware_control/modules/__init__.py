@@ -19,7 +19,6 @@ from .types import (
     TemperatureStatus,
     MagneticStatus,
     HeaterShakerStatus,
-    AbsorbanceReaderStatus,
     SpeedStatus,
     LiveData,
 )
@@ -48,5 +47,4 @@ __all__ = [
     "SpeedStatus",
     "LiveData",
     "AbsorbanceReader",
-    "AbsorbanceReaderStatus",
 ]

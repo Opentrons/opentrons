@@ -8,7 +8,6 @@ from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     PipetteTipActionType,
     MoveStopCondition as MoveStopCondition,
-    SensorType,
     SensorId,
 )
 
@@ -54,7 +53,6 @@ class MoveGroupSingleAxisStep:
     acceleration_mm_sec_sq: np.float64 = np.float64(0)
     stop_condition: MoveStopCondition = MoveStopCondition.none
     move_type: MoveType = MoveType.linear
-    sensor_type: Optional[SensorType] = None
     sensor_id: Optional[SensorId] = None
 
     def is_moving_step(self) -> bool:
@@ -135,8 +133,7 @@ def create_step(
     duration: np.float64,
     present_nodes: Iterable[NodeId],
     stop_condition: MoveStopCondition = MoveStopCondition.none,
-    sensor_type_pass: Optional[SensorType] = None,
-    sensor_id_pass: Optional[SensorId] = None,
+    sensor_to_use: Optional[SensorId] = None,
 ) -> MoveGroupStep:
     """Create a move from a block.
 
@@ -163,8 +160,7 @@ def create_step(
             duration_sec=duration,
             stop_condition=stop_condition,
             move_type=MoveType.get_move_type(stop_condition),
-            sensor_type=sensor_type_pass,
-            sensor_id=sensor_id_pass,
+            sensor_id=sensor_to_use,
         )
     return step
 

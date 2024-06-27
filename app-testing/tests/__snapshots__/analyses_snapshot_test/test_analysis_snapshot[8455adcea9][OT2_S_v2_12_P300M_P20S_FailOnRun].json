@@ -2563,10 +2563,11 @@
       "status": "succeeded"
     },
     {
-      "commandType": "comment",
+      "commandType": "custom",
       "notes": [],
       "params": {
-        "message": "one comment"
+        "legacyCommandText": "one comment",
+        "legacyCommandType": "command.COMMENT"
       },
       "result": {},
       "status": "succeeded"
@@ -2658,7 +2659,6 @@
       "pipetteName": "p300_multi_gen2"
     }
   ],
-  "result": "ok",
   "robotType": "OT-2 Standard",
   "runTimeParameters": []
 }

@@ -63,9 +63,7 @@ export function RunFailedModal({
   return (
     <Modal
       header={modalHeader}
-      onOutsideClick={() => {
-        setShowRunFailedModal(false)
-      }}
+      onOutsideClick={() => setShowRunFailedModal(false)}
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}

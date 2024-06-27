@@ -2,26 +2,14 @@
 import asyncio
 import logging
 from datetime import datetime
-from typing import List, Optional, Callable
+from typing import List, NamedTuple, Optional, Callable
 
 from opentrons.protocol_engine.errors.exceptions import EStopActivatedError
-from opentrons.protocol_engine.types import PostRunHardwareState, DeckConfigurationType
-from opentrons.protocol_engine import (
-    Config as ProtocolEngineConfig,
-    DeckType,
-    LabwareOffsetCreate,
-    StateSummary,
-    create_protocol_engine,
-    CommandSlice,
-    CommandPointer,
-    Command,
-    CommandCreate,
-    LabwareOffset,
-)
-from opentrons.protocol_runner import RunResult, RunOrchestrator
+from opentrons.protocol_engine.types import PostRunHardwareState
+from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.dev_types import RobotTypeEnum
 
 from opentrons.config import feature_flags
-
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import (
     EstopState,
@@ -29,10 +17,18 @@ from opentrons.hardware_control.types import (
     EstopStateNotification,
     HardwareEventHandler,
 )
+from opentrons.protocol_runner import LiveRunner, RunResult
+from opentrons.protocol_engine import (
+    Config as ProtocolEngineConfig,
+    DeckType,
+    LabwareOffsetCreate,
+    ProtocolEngine,
+    StateSummary,
+    create_protocol_engine,
+)
 
-from opentrons_shared_data.robot.dev_types import RobotType, RobotTypeEnum
-from opentrons_shared_data.labware.dev_types import LabwareUri
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons.protocol_engine.types import DeckConfigurationType
+
 
 _log = logging.getLogger(__name__)
 
@@ -49,8 +45,13 @@ class NoRunnerEnginePairError(RuntimeError):
     """Raised if you try to get the current engine or runner while there is none."""
 
 
-class NoRunOrchestrator(RuntimeError):
-    """Raised if you try to get the current run orchestrator while there is none."""
+class RunnerEnginePair(NamedTuple):
+    """A stored ProtocolRunner/ProtocolEngine pair."""
+
+    run_id: str
+    created_at: datetime
+    runner: LiveRunner
+    engine: ProtocolEngine
 
 
 async def handle_estop_event(
@@ -71,8 +72,8 @@ async def handle_estop_event(
                 return
             # todo(mm, 2024-04-17): This estop teardown sequencing belongs in the
             # runner layer.
-            engine_store.run_orchestrator.estop()
-            await engine_store.run_orchestrator.finish(error=EStopActivatedError())
+            engine_store.engine.estop()
+            await engine_store.engine.finish(error=EStopActivatedError())
     except Exception:
         # This is a background task kicked off by a hardware event,
         # so there's no one to propagate this exception to.
@@ -99,9 +100,6 @@ def _get_estop_listener(engine_store: "MaintenanceEngineStore") -> HardwareEvent
 class MaintenanceEngineStore:
     """Factory and in-memory storage for ProtocolEngine."""
 
-    _run_orchestrator: Optional[RunOrchestrator] = None
-    _created_at: Optional[datetime] = None
-
     def __init__(
         self,
         hardware_api: HardwareControlAPI,
@@ -119,27 +117,37 @@ class MaintenanceEngineStore:
         self._hardware_api = hardware_api
         self._robot_type = robot_type
         self._deck_type = deck_type
+        self._runner_engine_pair: Optional[RunnerEnginePair] = None
         hardware_api.register_callback(_get_estop_listener(self))
 
     @property
-    def run_orchestrator(self) -> RunOrchestrator:
-        """Get the "current" RunOrchestrator."""
-        if self._run_orchestrator is None:
-            raise NoRunOrchestrator()
-        return self._run_orchestrator
+    def engine(self) -> ProtocolEngine:
+        """Get the "current" ProtocolEngine."""
+        if self._runner_engine_pair is None:
+            raise NoRunnerEnginePairError()
+        return self._runner_engine_pair.engine
+
+    @property
+    def runner(self) -> LiveRunner:
+        """Get the "current" ProtocolRunner."""
+        if self._runner_engine_pair is None:
+            raise NoRunnerEnginePairError()
+        return self._runner_engine_pair.runner
 
     @property
     def current_run_id(self) -> Optional[str]:
-        """Get the run identifier associated with the current engine."""
+        """Get the run identifier associated with the current engine/runner pair."""
         return (
-            self.run_orchestrator.run_id if self._run_orchestrator is not None else None
+            self._runner_engine_pair.run_id
+            if self._runner_engine_pair is not None
+            else None
         )
 
     @property
     def current_run_created_at(self) -> datetime:
         """Get the run creation datetime."""
-        assert self._created_at is not None, "Run not yet created."
-        return self._created_at
+        assert self._runner_engine_pair is not None, "Run not yet created."
+        return self._runner_engine_pair.created_at
 
     async def create(
         self,
@@ -163,7 +171,7 @@ class MaintenanceEngineStore:
         # Because we will be clearing engine store before creating a new one,
         # the runner-engine pair should be None at this point.
         assert (
-            self._run_orchestrator is None
+            self._runner_engine_pair is None
         ), "There is an active maintenance run that was not cleared correctly."
         engine = await create_protocol_engine(
             hardware_api=self._hardware_api,
@@ -178,16 +186,23 @@ class MaintenanceEngineStore:
             notify_publishers=notify_publishers,
         )
 
+        # Using LiveRunner as the runner to allow for future refactor of maintenance runs
+        # See https://opentrons.atlassian.net/browse/RSS-226
+        runner = LiveRunner(protocol_engine=engine, hardware_api=self._hardware_api)
+
+        # TODO (spp): set live runner start func
+
         for offset in labware_offsets:
             engine.add_labware_offset(offset)
 
-        self._run_orchestrator = RunOrchestrator.build_orchestrator(
-            run_id=run_id, protocol_engine=engine, hardware_api=self._hardware_api
+        self._runner_engine_pair = RunnerEnginePair(
+            run_id=run_id,
+            created_at=created_at,
+            runner=runner,
+            engine=engine,
         )
 
-        self._created_at = created_at
-
-        return self._run_orchestrator.get_state_summary()
+        return engine.state_view.get_summary()
 
     async def clear(self) -> RunResult:
         """Remove the ProtocolEngine.
@@ -196,8 +211,11 @@ class MaintenanceEngineStore:
             EngineConflictError: The current runner/engine pair is not idle, so
             they cannot be cleared.
         """
-        if self.run_orchestrator.get_is_okay_to_clear():
-            await self.run_orchestrator.finish(
+        engine = self.engine
+        state_view = engine.state_view
+
+        if state_view.commands.get_is_okay_to_clear():
+            await engine.finish(
                 drop_tips_after_run=False,
                 set_run_status=False,
                 post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
@@ -205,57 +223,8 @@ class MaintenanceEngineStore:
         else:
             raise EngineConflictError("Current run is not idle or stopped.")
 
-        run_data = self.run_orchestrator.get_state_summary()
-        commands = self.run_orchestrator.get_all_commands()
-        self._run_orchestrator = None
-        self._created_at = None
+        run_data = state_view.get_summary()
+        commands = state_view.commands.get_all()
+        self._runner_engine_pair = None
 
         return RunResult(state_summary=run_data, commands=commands, parameters=[])
-
-    def get_command_slice(
-        self,
-        cursor: Optional[int],
-        length: int,
-    ) -> CommandSlice:
-        """Get a slice of run commands.
-
-        Args:
-            cursor: Requested index of first command in the returned slice.
-            length: Length of slice to return.
-        """
-        return self.run_orchestrator.get_command_slice(cursor=cursor, length=length)
-
-    def get_current_command(self) -> Optional[CommandPointer]:
-        """Get the current running command."""
-        return self.run_orchestrator.get_current_command()
-
-    def get_command_recovery_target(self) -> Optional[CommandPointer]:
-        """Get the current error recovery target."""
-        return self.run_orchestrator.get_command_recovery_target()
-
-    def get_command(self, command_id: str) -> Command:
-        """Get a run's command by ID."""
-        return self.run_orchestrator.get_command(command_id=command_id)
-
-    def get_state_summary(self) -> StateSummary:
-        """Get protocol run data."""
-        return self.run_orchestrator.get_state_summary()
-
-    async def add_command_and_wait_for_interval(
-        self,
-        request: CommandCreate,
-        wait_until_complete: bool = False,
-        timeout: Optional[int] = None,
-    ) -> Command:
-        """Add a new command to execute and wait for it to complete if needed."""
-        return await self.run_orchestrator.add_command_and_wait_for_interval(
-            command=request, wait_until_complete=wait_until_complete, timeout=timeout
-        )
-
-    def add_labware_offset(self, request: LabwareOffsetCreate) -> LabwareOffset:
-        """Add a new labware offset to state."""
-        return self.run_orchestrator.add_labware_offset(request)
-
-    def add_labware_definition(self, definition: LabwareDefinition) -> LabwareUri:
-        """Add a new labware definition to state."""
-        return self.run_orchestrator.add_labware_definition(definition)

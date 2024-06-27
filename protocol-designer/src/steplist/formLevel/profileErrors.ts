@@ -55,7 +55,7 @@ export const getProfileFormErrors = (
     const item = profileItemsById[itemId]
 
     if (item.type === PROFILE_STEP) {
-      addStepErrors(item as ProfileStepItem)
+      addStepErrors(item)
     } else {
       // Cycles themselves don't currently have any form-level errors,
       // so we just validate each cycle's steps

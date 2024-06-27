@@ -16,7 +16,5 @@ export function useTrackEvent(): (e: AnalyticsEvent) => void {
   const config: Config['analytics'] | undefined = useSelector(
     (state: State) => getConfig(state)?.analytics
   )
-  return event => {
-    if (config != null) trackEvent(event, config)
-  }
+  return event => config && trackEvent(event, config)
 }

@@ -3,11 +3,7 @@ from __future__ import annotations
 import asyncio
 from typing import Dict, Optional, List, TYPE_CHECKING
 
-from opentrons.drivers.types import (
-    AbsorbanceReaderLidStatus,
-    AbsorbanceReaderDeviceState,
-    AbsorbanceReaderPlatePresence,
-)
+from opentrons.drivers.types import AbsorbanceReaderLidStatus
 from opentrons.drivers.absorbance_reader.abstract import AbstractAbsorbanceReaderDriver
 from opentrons.drivers.rpi_drivers.types import USBPort
 
@@ -65,8 +61,5 @@ class AbsorbanceReaderDriver(AbstractAbsorbanceReaderDriver):
     async def initialize_measurement(self, wavelength: int) -> None:
         await self._connection.initialize(wavelength)
 
-    async def get_status(self) -> AbsorbanceReaderDeviceState:
-        return await self._connection.get_device_status()
-
-    async def get_plate_presence(self) -> AbsorbanceReaderPlatePresence:
-        return await self._connection.get_plate_presence()
+    async def get_status(self) -> None:
+        pass

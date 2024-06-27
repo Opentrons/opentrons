@@ -17,7 +17,6 @@ from opentrons_shared_data.pipette.pipette_definition import (
     PipetteModelVersionType,
     PipetteNameType,
     PipetteLiquidPropertiesDefinition,
-    PressFitPickUpTipConfiguration,
 )
 from opentrons_shared_data.pipette import (
     load_data as load_pipette_data,
@@ -59,12 +58,6 @@ from opentrons_shared_data.pipette.dev_types import (
 )
 from opentrons.hardware_control.dev_types import InstrumentHardwareConfigs
 
-from opentrons.hardware_control.util import (
-    pick_up_speed_by_configuration,
-    pick_up_distance_by_configuration,
-    pick_up_current_by_configuration,
-    nominal_tip_overlap_dictionary_by_configuration,
-)
 
 RECONFIG_KEYS = {"quirks"}
 
@@ -119,16 +112,9 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             pipette_channels=config.channels,
             pipette_version=config.version,
         )
-        self._valid_nozzle_maps = load_pipette_data.load_valid_nozzle_maps(
-            self._pipette_model.pipette_type,
-            self._pipette_model.pipette_channels,
-            self._pipette_model.pipette_version,
-        )
         self._nozzle_offset = self._config.nozzle_offset
         self._nozzle_manager = (
-            nozzle_manager.NozzleConfigurationManager.build_from_config(
-                self._config, self._valid_nozzle_maps
-            )
+            nozzle_manager.NozzleConfigurationManager.build_from_config(self._config)
         )
         self._current_volume = 0.0
         self._working_volume = float(self._liquid_class.max_volume)
@@ -162,9 +148,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             self._active_tip_settings.default_blowout_flowrate.default
         )
 
-        self._versioned_tip_overlap_dictionary = (
-            self.get_nominal_tip_overlap_dictionary_by_configuration()
-        )
+        self._tip_overlap_lookup = self._liquid_class.tip_overlap_dictionary
 
         if use_old_aspiration_functions:
             self._pipetting_function_version = PIPETTING_FUNCTION_FALLBACK_VERSION
@@ -232,8 +216,8 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         return self._pipette_offset
 
     @property
-    def tip_overlap(self) -> Dict[str, Dict[str, float]]:
-        return self._versioned_tip_overlap_dictionary
+    def tip_overlap(self) -> Dict[str, float]:
+        return self._tip_overlap_lookup
 
     @property
     def channels(self) -> pip_types.PipetteChannelType:
@@ -306,14 +290,9 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             self.active_tip_settings.default_blowout_flowrate.default
         )
 
-        self._versioned_tip_overlap_dictionary = (
-            self.get_nominal_tip_overlap_dictionary_by_configuration()
-        )
-
+        self._tip_overlap_lookup = self.liquid_class.tip_overlap_dictionary
         self._nozzle_manager = (
-            nozzle_manager.NozzleConfigurationManager.build_from_config(
-                self._config, self._valid_nozzle_maps
-            )
+            nozzle_manager.NozzleConfigurationManager.build_from_config(self._config)
         )
 
     def reset_pipette_offset(self, mount: Mount, to_default: bool) -> None:
@@ -541,45 +520,6 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
     def has_tip(self) -> bool:
         return self._has_tip
 
-    def get_pick_up_speed_by_configuration(
-        self,
-        config: PressFitPickUpTipConfiguration,
-    ) -> float:
-        return pick_up_speed_by_configuration(
-            config,
-            self._nozzle_manager.current_configuration.valid_map_key,
-            pip_types.PipetteTipType(self._liquid_class.max_volume),
-        )
-
-    def get_pick_up_distance_by_configuration(
-        self,
-        config: PressFitPickUpTipConfiguration,
-    ) -> float:
-        return pick_up_distance_by_configuration(
-            config,
-            self._nozzle_manager.current_configuration.valid_map_key,
-            pip_types.PipetteTipType(self._liquid_class.max_volume),
-        )
-
-    def get_pick_up_current_by_configuration(
-        self,
-        config: PressFitPickUpTipConfiguration,
-    ) -> float:
-        return pick_up_current_by_configuration(
-            config,
-            self._nozzle_manager.current_configuration.valid_map_key,
-            pip_types.PipetteTipType(self._liquid_class.max_volume),
-        )
-
-    def get_nominal_tip_overlap_dictionary_by_configuration(
-        self,
-    ) -> Dict[str, Dict[str, float]]:
-        return nominal_tip_overlap_dictionary_by_configuration(
-            self._config,
-            self._nozzle_manager.current_configuration.valid_map_key,
-            pip_types.PipetteTipType(self._liquid_class.max_volume),
-        )
-
     # Cache max is chosen somewhat arbitrarily. With a float is input we don't
     # want this to unbounded.
     @functools.lru_cache(maxsize=100)
@@ -631,9 +571,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
                 "default_dispense_flow_rates": self.dispense_flow_rates_lookup,
                 "tip_length": self.current_tip_length,
                 "return_tip_height": self.active_tip_settings.default_return_tip_height,
-                "tip_overlap": self.tip_overlap[
-                    "v0"
-                ],  # TODO(cb, 2024-06-11): hard coded to "v0" - when versioned tip overlaps are fully integrated this must change
+                "tip_overlap": self.tip_overlap,
                 "back_compat_names": self._config.pipette_backcompat_names,
                 "supported_tips": self.liquid_class.supported_tips,
             }

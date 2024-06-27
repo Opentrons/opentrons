@@ -110,9 +110,9 @@ export function CalibrationTaskList({
   return (
     <LegacyModal
       title={`${robotName} ${t('calibration_dashboard')}`}
-      onClose={() => {
+      onClose={() =>
         history.push(`/devices/${robotName}/robot-settings/calibration`)
-      }}
+      }
       fullPage
       backgroundColor={COLORS.grey10}
       childrenPadding={`${SPACING.spacing16} ${SPACING.spacing24} ${SPACING.spacing24} ${SPACING.spacing4}`}
@@ -144,9 +144,9 @@ export function CalibrationTaskList({
             </StyledText>
             <PrimaryButton
               marginTop={SPACING.spacing24}
-              onClick={() => {
+              onClick={() =>
                 history.push(`/devices/${robotName}/robot-settings/calibration`)
-              }}
+              }
             >
               {t('device_settings:done')}
             </PrimaryButton>
@@ -176,9 +176,7 @@ export function CalibrationTaskList({
             activeIndex={activeIndex}
             taskList={taskList}
             taskListStatus={taskListStatus}
-            generalTaskClickHandler={() => {
-              setHasLaunchedWizard(true)
-            }}
+            generalTaskClickHandler={() => setHasLaunchedWizard(true)}
             generalTaskDisabledReason={generalTaskDisabledReason}
           />
         </>

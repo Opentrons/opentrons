@@ -127,14 +127,13 @@ class SensorDriver(AbstractSensorDriver):
         self,
         can_messenger: CanMessenger,
         sensor: ThresholdSensorType,
-        mode: SensorThresholdMode = SensorThresholdMode.absolute,
         timeout: int = 1,
-    ) -> Optional[SensorDataType]:
+    ) -> Optional[SensorReturnType]:
         """Send threshold for stopping a move."""
         write = SensorThresholdInformation(
             sensor.sensor,
             SensorDataType.build(sensor.stop_threshold, sensor.sensor.sensor_type),
-            mode,
+            SensorThresholdMode.absolute,
         )
         threshold_data = await self._scheduler.send_threshold(write, can_messenger)
         if not threshold_data:
@@ -147,7 +146,7 @@ class SensorDriver(AbstractSensorDriver):
         can_messenger: CanMessenger,
         sensor: ThresholdSensorType,
         timeout: int = 1,
-    ) -> Optional[SensorDataType]:
+    ) -> Optional[SensorReturnType]:
         """Send the zero threshold which the offset value is compared to."""
         write = SensorThresholdInformation(
             sensor.sensor,

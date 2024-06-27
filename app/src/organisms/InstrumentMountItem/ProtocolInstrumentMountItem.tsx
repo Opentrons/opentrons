@@ -178,9 +178,7 @@ export function ProtocolInstrumentMountItem(
       {showPipetteWizardFlow ? (
         <PipetteWizardFlows
           flowType={flowType}
-          closeFlow={() => {
-            setShowPipetteWizardFlow(false)
-          }}
+          closeFlow={() => setShowPipetteWizardFlow(false)}
           selectedPipette={selectedPipette}
           mount={mount as Mount}
           pipetteInfo={props.pipetteInfo}
@@ -191,9 +189,7 @@ export function ProtocolInstrumentMountItem(
         <GripperWizardFlows
           attachedGripper={memoizedAttachedGripper}
           flowType={memoizedAttachedGripper != null ? 'RECALIBRATE' : 'ATTACH'}
-          closeFlow={() => {
-            setShowGripperWizardFlow(false)
-          }}
+          closeFlow={() => setShowGripperWizardFlow(false)}
           onComplete={props.instrumentsRefetch}
         />
       ) : null}

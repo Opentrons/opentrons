@@ -275,7 +275,7 @@ export function getHydratedForm(
   invariantContext: InvariantContext
 ): FormData {
   const hydratedForm = mapValues(rawForm, (value, name) =>
-    hydrateField(invariantContext, name, value as string)
+    hydrateField(invariantContext, name, value)
   )
   // TODO(IL, 2020-03-23): separate hydrated/denormalized fields from the other fields.
   // It's confusing that pipette is an ID string before this,
@@ -290,7 +290,7 @@ export function getHydratedForm(
     // @ts-expect-error(sa, 2021-6-14): type this properly in #3161
     hydratedForm.meta.module = getModuleEntity(
       invariantContext,
-      rawForm.moduleId as string
+      rawForm.moduleId
     )
   }
   // @ts-expect-error(sa, 2021-6-14):type this properly in #3161

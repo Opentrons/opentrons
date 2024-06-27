@@ -11,7 +11,6 @@ interface ListItemProps extends StyleProps {
   type: ListItemType
   /** ListItem contents */
   children: React.ReactNode
-  onClick?: () => void
 }
 
 const LISTITEM_PROPS_BY_TYPE: Record<
@@ -33,7 +32,7 @@ const LISTITEM_PROPS_BY_TYPE: Record<
 }
 
 export function ListItem(props: ListItemProps): JSX.Element {
-  const { type, children, onClick, ...styleProps } = props
+  const { type, children, ...styleProps } = props
   const listItemProps = LISTITEM_PROPS_BY_TYPE[type]
 
   return (
@@ -44,7 +43,6 @@ export function ListItem(props: ListItemProps): JSX.Element {
       padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
       backgroundColor={listItemProps.backgroundColor}
       borderRadius={BORDERS.borderRadius12}
-      onClick={onClick}
       {...styleProps}
     >
       {children}

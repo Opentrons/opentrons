@@ -4,7 +4,7 @@ import asyncio
 from dataclasses import dataclass
 from typing import Optional, List, Any, Dict
 
-from opentrons.config.defaults_ot3 import CapacitivePassSettings, OutputOptions
+from opentrons.config.defaults_ot3 import CapacitivePassSettings
 from opentrons.hardware_control.ot3api import OT3API
 
 from hardware_testing.opentrons_api import types
@@ -73,7 +73,6 @@ ALUMINUM_SEAL_SETTINGS = CapacitivePassSettings(
     max_overrun_distance_mm=1,
     speed_mm_per_s=1,
     sensor_threshold_pf=0.5,
-    output_option=OutputOptions.sync_only,
 )
 LABWARE_PROBE_CORNER_TOP_LEFT_XY = {
     "plate": Point(x=5, y=-5),

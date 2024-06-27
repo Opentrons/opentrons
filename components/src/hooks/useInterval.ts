@@ -30,9 +30,7 @@ export function useInterval(
     if (delay !== null && delay > 0) {
       if (immediate) tick()
       const id = setInterval(tick, delay)
-      return () => {
-        clearInterval(id)
-      }
+      return () => clearInterval(id)
     }
   }, [delay, immediate])
 }

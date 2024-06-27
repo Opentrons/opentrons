@@ -1,11 +1,5 @@
 'use strict'
 
-const {
-  S3Client,
-  GetObjectCommand,
-  PutObjectCommand,
-} = require('@aws-sdk/client-s3')
-
 const DEPLOY_METADATA_KEY = '.deploy.json'
 
 const getDeployMetadataKey = path =>
@@ -14,44 +8,33 @@ const getDeployMetadataKey = path =>
 /**
  * Get the deploy metadata of an environment
  *
- * @param {S3Client} s3Client - AWS S3Client instance
+ * @param {S3} s3 - AWS.S3 instance
  * @param {string} bucket - Bucket name
  * @param {string} [path] - Bucket folder (root if unspecified)
  * @returns {Promise<{current: string | null, previous: string | null}>} Promise that resolved with deploy metadata
  */
-async function getDeployMetadata(s3Client, bucket, path) {
-  try {
-    const data = await s3Client.send(
-      new GetObjectCommand({
-        Bucket: bucket,
-        Key: getDeployMetadataKey(path),
-      })
-    )
-
-    return data.Body
-      ? JSON.parse(
-          Buffer.from(
-            await data.Body?.transformToString('base64'),
-            'base64'
-          ).toString('utf-8')
-        )
-      : {}
-  } catch (error) {
-    console.warn(`Error retrieving deploy metadata: ${error.message}`)
-    return {}
-  }
+function getDeployMetadata(s3, bucket, path) {
+  return s3
+    .getObject({ Bucket: bucket, Key: getDeployMetadataKey(path) })
+    .promise()
+    .then(data => (data.Body ? JSON.parse(data.Body) : {}))
+    .catch(error => {
+      console.warn(`Error retrieving deploy metadata: ${error.message}`)
+      return {}
+    })
 }
+
 /**
  * Set the deploy metadata of an environment
  *
- * @param {S3Client} s3Client - AWS S3Client instance
+ * @param {S3} s3 - AWS.S3 instance
  * @param {string} bucket - Bucket name
  * @param {string} [path] - Bucket folder (root if unspecified)
  * @param {{current: string | null, previous: string | null}} metadata - Deploy metadata
  * @param {boolean} [dryrun] - Do not actually update the deploy metadata file
  * @returns {Promise} Promise that resolves when the file has been updated
  */
-async function setDeployMetadata(s3Client, bucket, path, metadata, dryrun) {
+function setDeployMetadata(s3, bucket, path, metadata, dryrun) {
   const key = getDeployMetadataKey(path)
 
   console.log(
@@ -63,19 +46,15 @@ async function setDeployMetadata(s3Client, bucket, path, metadata, dryrun) {
 
   if (dryrun) return Promise.resolve()
 
-  try {
-    await s3Client.send(
-      new PutObjectCommand({
-        Bucket: bucket,
-        Key: key,
-        Body: JSON.stringify(metadata),
-        CacheControl: 'no-store',
-        ContentType: 'application/json',
-      })
-    )
-  } catch (error) {
-    throw new Error(`Error setting deploy metadata: ${error.message}`)
-  }
+  return s3
+    .putObject({
+      Bucket: bucket,
+      Key: getDeployMetadataKey(path),
+      Body: JSON.stringify(metadata),
+      CacheControl: 'no-store',
+      ContentType: 'application/json',
+    })
+    .promise()
 }
 
 module.exports = { getDeployMetadata, setDeployMetadata, getDeployMetadataKey }

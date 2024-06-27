@@ -1,19 +1,13 @@
 """Tests for pipette state changes in the protocol_engine state store."""
 import pytest
 from datetime import datetime
-from typing import Optional, Union
+from typing import Optional
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.pipette import pipette_definition
 
 from opentrons.types import DeckSlotName, MountType, Point
 from opentrons.protocol_engine import commands as cmd
-from opentrons.protocol_engine.commands.command import DefinedErrorData
-from opentrons.protocol_engine.commands.pipetting_common import (
-    OverpressureError,
-    OverpressureErrorInternalData,
-)
-from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
 from opentrons.protocol_engine.types import (
     DeckPoint,
     DeckSlotLocation,
@@ -25,7 +19,6 @@ from opentrons.protocol_engine.types import (
     TipGeometry,
 )
 from opentrons.protocol_engine.actions import (
-    FailCommandAction,
     SetPipetteMovementSpeedAction,
     SucceedCommandAction,
 )
@@ -291,135 +284,81 @@ def test_blow_out_clears_volume(
 
 
 @pytest.mark.parametrize(
-    ("action", "expected_location"),
+    ("command", "expected_location"),
     (
         (
-            SucceedCommandAction(
-                command=create_aspirate_command(
-                    pipette_id="pipette-id",
-                    labware_id="aspirate-labware-id",
-                    well_name="aspirate-well-name",
-                    volume=1337,
-                    flow_rate=1.23,
-                ),
-                private_result=None,
+            create_aspirate_command(
+                pipette_id="aspirate-pipette-id",
+                labware_id="aspirate-labware-id",
+                well_name="aspirate-well-name",
+                volume=1337,
+                flow_rate=1.23,
             ),
             CurrentWell(
-                pipette_id="pipette-id",
+                pipette_id="aspirate-pipette-id",
                 labware_id="aspirate-labware-id",
                 well_name="aspirate-well-name",
             ),
         ),
         (
-            FailCommandAction(
-                running_command=cmd.Aspirate(
-                    params=cmd.AspirateParams(
-                        pipetteId="pipette-id",
-                        labwareId="aspirate-labware-id",
-                        wellName="aspirate-well-name",
-                        volume=99999,
-                        flowRate=1.23,
-                    ),
-                    id="command-id",
-                    key="command-key",
-                    createdAt=datetime.now(),
-                    status=cmd.CommandStatus.RUNNING,
-                ),
-                error=DefinedErrorData(
-                    public=OverpressureError(
-                        id="error-id",
-                        createdAt=datetime.now(),
-                    ),
-                    private=OverpressureErrorInternalData(
-                        position=DeckPoint(x=0, y=0, z=0)
-                    ),
-                ),
-                command_id="command-id",
-                error_id="error-id",
-                failed_at=datetime.now(),
-                notes=[],
-                type=ErrorRecoveryType.WAIT_FOR_RECOVERY,
+            create_dispense_command(
+                pipette_id="dispense-pipette-id",
+                labware_id="dispense-labware-id",
+                well_name="dispense-well-name",
+                volume=1337,
+                flow_rate=1.23,
             ),
             CurrentWell(
-                pipette_id="pipette-id",
-                labware_id="aspirate-labware-id",
-                well_name="aspirate-well-name",
-            ),
-        ),
-        (
-            SucceedCommandAction(
-                command=create_dispense_command(
-                    pipette_id="pipette-id",
-                    labware_id="dispense-labware-id",
-                    well_name="dispense-well-name",
-                    volume=1337,
-                    flow_rate=1.23,
-                ),
-                private_result=None,
-            ),
-            CurrentWell(
-                pipette_id="pipette-id",
+                pipette_id="dispense-pipette-id",
                 labware_id="dispense-labware-id",
                 well_name="dispense-well-name",
             ),
         ),
         (
-            SucceedCommandAction(
-                command=create_pick_up_tip_command(
-                    pipette_id="pipette-id",
-                    labware_id="pick-up-tip-labware-id",
-                    well_name="pick-up-tip-well-name",
-                ),
-                private_result=None,
+            create_pick_up_tip_command(
+                pipette_id="pick-up-tip-pipette-id",
+                labware_id="pick-up-tip-labware-id",
+                well_name="pick-up-tip-well-name",
             ),
             CurrentWell(
-                pipette_id="pipette-id",
+                pipette_id="pick-up-tip-pipette-id",
                 labware_id="pick-up-tip-labware-id",
                 well_name="pick-up-tip-well-name",
             ),
         ),
         (
-            SucceedCommandAction(
-                command=create_drop_tip_command(
-                    pipette_id="pipette-id",
-                    labware_id="drop-tip-labware-id",
-                    well_name="drop-tip-well-name",
-                ),
-                private_result=None,
+            create_drop_tip_command(
+                pipette_id="drop-tip-pipette-id",
+                labware_id="drop-tip-labware-id",
+                well_name="drop-tip-well-name",
             ),
             CurrentWell(
-                pipette_id="pipette-id",
+                pipette_id="drop-tip-pipette-id",
                 labware_id="drop-tip-labware-id",
                 well_name="drop-tip-well-name",
             ),
         ),
         (
-            SucceedCommandAction(
-                command=create_move_to_well_command(
-                    pipette_id="pipette-id",
-                    labware_id="move-to-well-labware-id",
-                    well_name="move-to-well-well-name",
-                ),
-                private_result=None,
+            create_move_to_well_command(
+                pipette_id="move-to-well-pipette-id",
+                labware_id="move-to-well-labware-id",
+                well_name="move-to-well-well-name",
             ),
             CurrentWell(
-                pipette_id="pipette-id",
+                pipette_id="move-to-well-pipette-id",
                 labware_id="move-to-well-labware-id",
                 well_name="move-to-well-well-name",
             ),
         ),
         (
-            SucceedCommandAction(
-                command=create_blow_out_command(
-                    pipette_id="pipette-id",
-                    labware_id="move-to-well-labware-id",
-                    well_name="move-to-well-well-name",
-                    flow_rate=1.23,
-                ),
-                private_result=None,
+            create_blow_out_command(
+                pipette_id="move-to-well-pipette-id",
+                labware_id="move-to-well-labware-id",
+                well_name="move-to-well-well-name",
+                flow_rate=1.23,
             ),
             CurrentWell(
-                pipette_id="pipette-id",
+                pipette_id="move-to-well-pipette-id",
                 labware_id="move-to-well-labware-id",
                 well_name="move-to-well-well-name",
             ),
@@ -427,13 +366,13 @@ def test_blow_out_clears_volume(
     ),
 )
 def test_movement_commands_update_current_well(
-    action: Union[SucceedCommandAction, FailCommandAction],
+    command: cmd.Command,
     expected_location: CurrentWell,
     subject: PipetteStore,
 ) -> None:
     """It should save the last used pipette, labware, and well for movement commands."""
     load_pipette_command = create_load_pipette_command(
-        pipette_id="pipette-id",
+        pipette_id=command.params.pipetteId,  # type: ignore[arg-type, union-attr]
         pipette_name=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
     )
@@ -441,7 +380,7 @@ def test_movement_commands_update_current_well(
     subject.handle_action(
         SucceedCommandAction(private_result=None, command=load_pipette_command)
     )
-    subject.handle_action(action)
+    subject.handle_action(SucceedCommandAction(private_result=None, command=command))
 
     assert subject.state.current_location == expected_location
 
@@ -781,124 +720,67 @@ def test_add_pipette_config(
 
 
 @pytest.mark.parametrize(
-    "action",
+    "command",
     (
-        SucceedCommandAction(
-            command=create_aspirate_command(
-                pipette_id="pipette-id",
-                labware_id="labware-id",
-                well_name="well-name",
-                volume=1337,
-                flow_rate=1.23,
-                destination=DeckPoint(x=11, y=22, z=33),
-            ),
-            private_result=None,
+        create_aspirate_command(
+            pipette_id="pipette-id",
+            labware_id="labware-id",
+            well_name="well-name",
+            volume=1337,
+            flow_rate=1.23,
+            destination=DeckPoint(x=11, y=22, z=33),
         ),
-        FailCommandAction(
-            running_command=cmd.Aspirate(
-                params=cmd.AspirateParams(
-                    pipetteId="pipette-id",
-                    labwareId="labware-id",
-                    wellName="well-name",
-                    volume=99999,
-                    flowRate=1.23,
-                ),
-                id="command-id",
-                key="command-key",
-                createdAt=datetime.now(),
-                status=cmd.CommandStatus.RUNNING,
-            ),
-            error=DefinedErrorData(
-                public=OverpressureError(
-                    id="error-id",
-                    detail="error-detail",
-                    createdAt=datetime.now(),
-                ),
-                private=OverpressureErrorInternalData(
-                    position=DeckPoint(x=11, y=22, z=33)
-                ),
-            ),
-            command_id="command-id",
-            error_id="error-id",
-            failed_at=datetime.now(),
-            notes=[],
-            type=ErrorRecoveryType.WAIT_FOR_RECOVERY,
+        create_dispense_command(
+            pipette_id="pipette-id",
+            labware_id="labware-id",
+            well_name="well-name",
+            volume=1337,
+            flow_rate=1.23,
+            destination=DeckPoint(x=11, y=22, z=33),
         ),
-        SucceedCommandAction(
-            command=create_dispense_command(
-                pipette_id="pipette-id",
-                labware_id="labware-id",
-                well_name="well-name",
-                volume=1337,
-                flow_rate=1.23,
-                destination=DeckPoint(x=11, y=22, z=33),
-            ),
-            private_result=None,
+        create_blow_out_command(
+            pipette_id="pipette-id",
+            labware_id="labware-id",
+            well_name="well-name",
+            flow_rate=1.23,
+            destination=DeckPoint(x=11, y=22, z=33),
         ),
-        SucceedCommandAction(
-            command=create_blow_out_command(
-                pipette_id="pipette-id",
-                labware_id="labware-id",
-                well_name="well-name",
-                flow_rate=1.23,
-                destination=DeckPoint(x=11, y=22, z=33),
-            ),
-            private_result=None,
+        create_pick_up_tip_command(
+            pipette_id="pipette-id",
+            labware_id="labware-id",
+            well_name="well-name",
+            destination=DeckPoint(x=11, y=22, z=33),
         ),
-        SucceedCommandAction(
-            command=create_pick_up_tip_command(
-                pipette_id="pipette-id",
-                labware_id="labware-id",
-                well_name="well-name",
-                destination=DeckPoint(x=11, y=22, z=33),
-            ),
-            private_result=None,
+        create_drop_tip_command(
+            pipette_id="pipette-id",
+            labware_id="labware-id",
+            well_name="well-name",
+            destination=DeckPoint(x=11, y=22, z=33),
         ),
-        SucceedCommandAction(
-            command=create_drop_tip_command(
-                pipette_id="pipette-id",
-                labware_id="labware-id",
-                well_name="well-name",
-                destination=DeckPoint(x=11, y=22, z=33),
-            ),
-            private_result=None,
+        create_touch_tip_command(
+            pipette_id="pipette-id",
+            labware_id="labware-id",
+            well_name="well-name",
+            destination=DeckPoint(x=11, y=22, z=33),
         ),
-        SucceedCommandAction(
-            command=create_touch_tip_command(
-                pipette_id="pipette-id",
-                labware_id="labware-id",
-                well_name="well-name",
-                destination=DeckPoint(x=11, y=22, z=33),
-            ),
-            private_result=None,
+        create_move_to_well_command(
+            pipette_id="pipette-id",
+            labware_id="labware-id",
+            well_name="well-name",
+            destination=DeckPoint(x=11, y=22, z=33),
         ),
-        SucceedCommandAction(
-            command=create_move_to_well_command(
-                pipette_id="pipette-id",
-                labware_id="labware-id",
-                well_name="well-name",
-                destination=DeckPoint(x=11, y=22, z=33),
-            ),
-            private_result=None,
+        create_move_to_coordinates_command(
+            pipette_id="pipette-id",
+            coordinates=DeckPoint(x=11, y=22, z=33),
         ),
-        SucceedCommandAction(
-            command=create_move_to_coordinates_command(
-                pipette_id="pipette-id",
-                coordinates=DeckPoint(x=11, y=22, z=33),
-            ),
-            private_result=None,
-        ),
-        SucceedCommandAction(
-            command=create_move_relative_command(
-                pipette_id="pipette-id",
-                destination=DeckPoint(x=11, y=22, z=33),
-            ),
-            private_result=None,
+        create_move_relative_command(
+            pipette_id="pipette-id",
+            destination=DeckPoint(x=11, y=22, z=33),
         ),
     ),
 )
 def test_movement_commands_update_deck_point(
-    action: Union[SucceedCommandAction, FailCommandAction],
+    command: cmd.Command,
     subject: PipetteStore,
 ) -> None:
     """It should save the last used pipette, labware, and well for movement commands."""
@@ -911,7 +793,7 @@ def test_movement_commands_update_deck_point(
     subject.handle_action(
         SucceedCommandAction(private_result=None, command=load_pipette_command)
     )
-    subject.handle_action(action)
+    subject.handle_action(SucceedCommandAction(private_result=None, command=command))
 
     assert subject.state.current_deck_point == CurrentDeckPoint(
         mount=MountType.LEFT, deck_point=DeckPoint(x=11, y=22, z=33)

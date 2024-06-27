@@ -1,17 +1,8 @@
 import { generateRobotStateTimeline } from './generateRobotStateTimeline'
 import { generateSubsteps } from './generateSubsteps'
 import type { Timeline } from '@opentrons/step-generation'
-import type { GenerateRobotStateTimelineArgs } from './generateRobotStateTimeline'
-import type { GenerateSubstepsArgs } from './generateSubsteps'
 
-type TimelineMessageEvent = MessageEvent<{
-  needsTimeline: boolean
-  timelineArgs: GenerateRobotStateTimelineArgs
-  timeline: Timeline
-  substepsArgs: GenerateSubstepsArgs
-}>
-
-addEventListener('message', (event: TimelineMessageEvent) => {
+addEventListener('message', event => {
   // NOTE: may have performance increase by not sending both
   // eg timelineArgs.initialRobotState and substepsArgs.initialRobotState
   const { data } = event

@@ -283,9 +283,7 @@ export function FactoryModeSlideout({
               {file == null ? (
                 <UploadInput
                   uploadButtonText={t('choose_file')}
-                  onUpload={(file: File) => {
-                    handleChooseFile(file)
-                  }}
+                  onUpload={(file: File) => handleChooseFile(file)}
                   dragAndDropText={
                     <StyledText as="p">
                       <Trans

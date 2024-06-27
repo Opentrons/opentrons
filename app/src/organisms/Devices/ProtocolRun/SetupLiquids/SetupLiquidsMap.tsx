@@ -101,15 +101,11 @@ export function SetupLiquidsMap(
       moduleChildren:
         topLabwareDefinition != null && topLabwareId != null ? (
           <g
-            onMouseEnter={() => {
-              setHoverLabwareId(topLabwareId)
-            }}
-            onMouseLeave={() => {
-              setHoverLabwareId('')
-            }}
-            onClick={() => {
-              if (labwareHasLiquid) setLiquidDetailsLabwareId(topLabwareId)
-            }}
+            onMouseEnter={() => setHoverLabwareId(topLabwareId)}
+            onMouseLeave={() => setHoverLabwareId('')}
+            onClick={() =>
+              labwareHasLiquid ? setLiquidDetailsLabwareId(topLabwareId) : null
+            }
             cursor={labwareHasLiquid ? 'pointer' : ''}
           >
             <LabwareInfoOverlay
@@ -162,16 +158,13 @@ export function SetupLiquidsMap(
               >
                 <g
                   transform={`translate(${x},${y})`}
-                  onMouseEnter={() => {
-                    setHoverLabwareId(topLabwareId)
-                  }}
-                  onMouseLeave={() => {
-                    setHoverLabwareId('')
-                  }}
-                  onClick={() => {
-                    if (labwareHasLiquid)
-                      setLiquidDetailsLabwareId(topLabwareId)
-                  }}
+                  onMouseEnter={() => setHoverLabwareId(topLabwareId)}
+                  onMouseLeave={() => setHoverLabwareId('')}
+                  onClick={() =>
+                    labwareHasLiquid
+                      ? setLiquidDetailsLabwareId(topLabwareId)
+                      : null
+                  }
                   cursor={labwareHasLiquid ? 'pointer' : ''}
                 >
                   <LabwareRender
@@ -197,9 +190,7 @@ export function SetupLiquidsMap(
         <LiquidsLabwareDetailsModal
           labwareId={liquidDetailsLabwareId}
           runId={runId}
-          closeModal={() => {
-            setLiquidDetailsLabwareId(null)
-          }}
+          closeModal={() => setLiquidDetailsLabwareId(null)}
         />
       )}
     </Flex>

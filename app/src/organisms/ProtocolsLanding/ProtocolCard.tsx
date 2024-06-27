@@ -41,7 +41,6 @@ import { getIsProtocolAnalysisInProgress } from '../../redux/protocol-storage'
 import { InstrumentContainer } from '../../atoms/InstrumentContainer'
 import { ProtocolOverflowMenu } from './ProtocolOverflowMenu'
 import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
-import { ProtocolStatusBanner } from '../ProtocolStatusBanner'
 import { getProtocolUsesGripper } from '../ProtocolSetupInstruments/utils'
 import { ProtocolAnalysisStale } from '../ProtocolAnalysisFailure/ProtocolAnalysisStale'
 import {
@@ -100,9 +99,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
       minWidth="36rem"
       padding={SPACING.spacing16}
       position="relative"
-      onClick={() => {
-        history.push(`/protocols/${protocolKey}`)
-      }}
+      onClick={() => history.push(`/protocols/${protocolKey}`)}
     >
       <ErrorBoundary fallback={UnknownAttachmentError}>
         <AnalysisInfo
@@ -217,9 +214,6 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
       >
         {/* error and protocol name section */}
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-          {mostRecentAnalysis?.result === 'file-required' ? (
-            <ProtocolStatusBanner />
-          ) : null}
           {analysisStatus === 'error' ? (
             <ProtocolAnalysisFailure
               protocolKey={protocolKey}

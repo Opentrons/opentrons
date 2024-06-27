@@ -90,9 +90,7 @@ export function establishConnections(
               notifyLog.debug(`Successfully connected to ${robotName} on ${ip}`)
               void connectionStore
                 .setConnected(robotName, client)
-                .then(() => {
-                  establishListeners(client, ip, robotName)
-                })
+                .then(() => establishListeners(client, ip, robotName))
                 .catch((error: Error) => notifyLog.debug(error.message))
             })
             .catch((error: Error) => {
@@ -118,23 +116,17 @@ function connectAsync(brokerURL: string): Promise<mqtt.Client> {
     } = {
       connect: () => {
         removePromiseListeners()
-        resolve(client)
+        return resolve(client)
       },
       // A connection error event will close the connection without a retry.
       error: (error: Error | string) => {
         removePromiseListeners()
         const clientEndPromise = new Promise((resolve, reject) =>
-          client.end(true, {}, () => {
-            resolve(error)
-          })
+          client.end(true, {}, () => resolve(error))
         )
-        return clientEndPromise.then(() => {
-          reject(error)
-        })
+        return clientEndPromise.then(() => reject(error))
       },
-      end: () => {
-        promiseListeners.error(`Couldn't connect to ${brokerURL}`)
-      },
+      end: () => promiseListeners.error(`Couldn't connect to ${brokerURL}`),
     }
 
     function removePromiseListeners(): void {
@@ -220,9 +212,7 @@ export function closeConnectionsForcefullyFor(
     const client = connectionStore.getClient(ip)
     return new Promise<void>((resolve, reject) => {
       if (client != null) {
-        client.end(true, {}, () => {
-          resolve()
-        })
+        client.end(true, {}, () => resolve())
       }
     })
   })

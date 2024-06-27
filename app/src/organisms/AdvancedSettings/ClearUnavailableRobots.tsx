@@ -51,12 +51,9 @@ export function ClearUnavailableRobots(): JSX.Element {
   const handleDeleteUnavailRobots = (): void => {
     if (isUnavailableRobots) {
       dispatch(clearDiscoveryCache())
-      makeToast(
-        t('successfully_deleted_unavail_robots') as string,
-        SUCCESS_TOAST
-      )
+      makeToast(t('successfully_deleted_unavail_robots'), SUCCESS_TOAST)
     } else {
-      makeToast(t('no_unavail_robots_to_clear') as string, ERROR_TOAST)
+      makeToast(t('no_unavail_robots_to_clear'), ERROR_TOAST)
     }
   }
   const {

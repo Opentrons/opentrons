@@ -6,6 +6,7 @@ import { ERROR_TOAST, INFO_TOAST } from '../../../atoms/Toast'
 import { useToaster } from '../../../organisms/ToasterOven'
 import { downloadFile } from '../utils'
 import type { IconProps } from '@opentrons/components'
+import type { HostConfig } from '@opentrons/api-client'
 
 export function useDownloadRunLog(
   robotName: string,
@@ -21,24 +22,24 @@ export function useDownloadRunLog(
 
   const downloadRunLog = (): void => {
     setIsLoading(true)
-    makeToast(t('downloading_run_log') as string, INFO_TOAST, {
+    makeToast(t('downloading_run_log'), INFO_TOAST, {
       icon: toastIcon,
     })
-    if (host == null) return
+
     // first getCommands to get total length of commands
-    getCommands(host, runId, {
+    getCommands(host as HostConfig, runId as string, {
       cursor: null,
       pageLength: 0,
     })
       .then(response => {
         const { totalLength } = response.data.meta
-        getCommands(host, runId, {
+        getCommands(host as HostConfig, runId as string, {
           cursor: 0,
           pageLength: totalLength,
         })
           .then(response => {
             const commands = response.data
-            getRun(host, runId)
+            getRun(host as HostConfig, runId as string)
               .then(response => {
                 const runRecord = response.data
                 const runDetails = {
@@ -54,7 +55,7 @@ export function useDownloadRunLog(
                 }_${createdAt}.json`
 
                 if (protocolId != null) {
-                  getProtocol(host, protocolId)
+                  getProtocol(host as HostConfig, protocolId)
                     .then(response => {
                       const protocolName =
                         response.data.data.metadata.protocolName

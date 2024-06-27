@@ -42,9 +42,8 @@ export const MixForm = (props: StepFormProps): JSX.Element => {
     propsForFields.pipette.value != null &&
     pipettes[String(propsForFields.pipette.value)].name === 'p1000_96'
 
-  const toggleCollapsed = (): void => {
+  const toggleCollapsed = (): void =>
     setCollapsed(prevCollapsed => !prevCollapsed)
-  }
 
   return (
     <div className={styles.form_wrapper}>

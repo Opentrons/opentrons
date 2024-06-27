@@ -31,16 +31,14 @@ export function RobotSettingsWifi({
     <Flex flexDirection={DIRECTION_COLUMN}>
       <ChildNavigation
         header={t('wifi')}
-        onClickBack={() => {
-          setCurrentOption('NetworkSettings')
-        }}
+        onClickBack={() => setCurrentOption('NetworkSettings')}
       />
       <WifiConnectionDetails
         activeSsid={activeSsid}
         connectedWifiAuthType={connectedWifiAuthType}
-        handleJoinAnotherNetwork={() => {
+        handleJoinAnotherNetwork={() =>
           setCurrentOption('RobotSettingsJoinOtherNetwork')
-        }}
+        }
         handleNetworkPress={(ssid: string) => {
           setSelectedSsid(ssid)
           setCurrentOption('RobotSettingsSelectAuthenticationType')

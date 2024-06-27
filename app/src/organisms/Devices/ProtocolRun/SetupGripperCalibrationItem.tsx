@@ -93,9 +93,7 @@ export function SetupGripperCalibrationItem({
         <GripperWizardFlows
           flowType={openWizardFlowType}
           attachedGripper={gripperData}
-          closeFlow={() => {
-            setOpenWizardFlowType(null)
-          }}
+          closeFlow={() => setOpenWizardFlowType(null)}
         />
       ) : null}
     </>

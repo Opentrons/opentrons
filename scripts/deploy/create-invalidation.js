@@ -1,14 +1,8 @@
-const {
-  CloudFrontClient,
-  CreateInvalidationCommand,
-} = require('@aws-sdk/client-cloudfront')
+const AWS = require('aws-sdk')
 
-async function getCreateInvalidation(
-  productionCredentials,
-  cloudfrontArn,
-  dryrun
-) {
-  const client = new CloudFrontClient({
+function getCreateInvalidation(productionCredentials, cloudfrontArn) {
+  const cloudfront = new AWS.CloudFront({
+    apiVersion: '2019-03-26',
     region: 'us-east-1',
     credentials: productionCredentials,
   })
@@ -23,13 +17,7 @@ async function getCreateInvalidation(
       },
     },
   }
-
-  if (dryrun) return
-
-  const data = await client.send(
-    new CreateInvalidationCommand(cloudFrontParams)
-  )
-  return data.Invalidation.Id
+  return cloudfront.createInvalidation(cloudFrontParams).promise()
 }
 
 module.exports = { getCreateInvalidation }

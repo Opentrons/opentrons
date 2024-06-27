@@ -20,9 +20,7 @@ const makeUpdateStateModifier = (
   name: 'updateUsePopperState',
   enabled: true,
   phase: 'write',
-  fn: ({ state }) => {
-    handleStateUpdate(state.placement, state.styles)
-  },
+  fn: ({ state }) => handleStateUpdate(state.placement, state.styles),
 })
 
 const makeOffsetModifier = (offset: number): Partial<PopperModifer<{}>> => ({

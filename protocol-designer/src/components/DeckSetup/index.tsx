@@ -143,9 +143,10 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
     customLabwareDefs,
   })
 
-  const handleHoverEmptySlot = React.useCallback(() => {
-    setHoveredLabware(null)
-  }, [])
+  const handleHoverEmptySlot = React.useCallback(
+    () => setHoveredLabware(null),
+    []
+  )
 
   const slotIdsBlockedBySpanning = getSlotIdsBlockedBySpanning(activeDeckSetup)
 
@@ -237,9 +238,8 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
           moduleOnDeck.slot
         )
 
-        const isAdapter = labwareLoadedOnModule?.def.allowedRoles?.includes(
-          'adapter'
-        )
+        const isAdapter =
+          labwareLoadedOnModule?.def.metadata.displayCategory === 'adapter'
         return (
           <Module
             key={moduleOnDeck.slot}
@@ -384,7 +384,8 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
           console.warn(`no slot ${labware.slot} for labware ${labware.id}!`)
           return null
         }
-        const labwareIsAdapter = labware.def.allowedRoles?.includes('adapter')
+        const labwareIsAdapter =
+          labware.def.metadata.displayCategory === 'adapter'
         return (
           <React.Fragment key={labware.id}>
             <LabwareOnDeck
