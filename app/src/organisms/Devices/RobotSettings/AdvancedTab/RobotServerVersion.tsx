@@ -27,7 +27,7 @@ interface RobotServerVersionProps {
 }
 
 const GITHUB_LINK =
-  'https://github.com/Opentrons/opentrons/blob/edge/app-shell/build/release-notes.md'
+  'https://github.com/Opentrons/opentrons/blob/edge/api/release-notes.md'
 
 export function RobotServerVersion({
   robotName,
