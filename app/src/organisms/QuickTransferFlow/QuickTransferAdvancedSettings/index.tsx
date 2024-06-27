@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
 import { Flex, SPACING, DIRECTION_COLUMN } from '@opentrons/components'
 import { BaseSettings } from './BaseSettings'
 
@@ -8,13 +7,13 @@ import type {
   QuickTransferSummaryState,
 } from '../types'
 
-interface AdvancedSettingsProps {
+interface QuickTransferAdvancedSettingsProps {
   state: QuickTransferSummaryState
   dispatch: React.Dispatch<QuickTransferSummaryAction>
 }
 
-export function AdvancedSettings(
-  props: AdvancedSettingsProps
+export function QuickTransferAdvancedSettings(
+  props: QuickTransferAdvancedSettingsProps
 ): JSX.Element | null {
   const { state, dispatch } = props
 
@@ -22,7 +21,7 @@ export function AdvancedSettings(
     <Flex
       gridGap={SPACING.spacing8}
       flexDirection={DIRECTION_COLUMN}
-      marginTop="192px"
+      marginTop="12rem"
     >
       <BaseSettings state={state} dispatch={dispatch} />
     </Flex>

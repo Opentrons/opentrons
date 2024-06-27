@@ -1,4 +1,5 @@
-import { PipetteName, getPipetteNameSpecs } from '@opentrons/shared-data'
+import { getPipetteNameSpecs } from '@opentrons/shared-data'
+import type { FlowRateSpec, PipetteName } from '@opentrons/shared-data'
 import type { FlowRateKind, QuickTransferSummaryState } from '../types'
 
 export function getFlowRateRange(
@@ -15,13 +16,12 @@ export function getFlowRateRange(
   }
 
   const spec = getPipetteNameSpecs(pipetteName as PipetteName)
-  let defaultFlowRate = undefined
+  let defaultFlowRate: FlowRateSpec | undefined
   if (kind === 'aspirate') defaultFlowRate = spec?.defaultAspirateFlowRate
   else if (kind === 'dispense') defaultFlowRate = spec?.defaultDispenseFlowRate
   else if (kind === 'blowout') defaultFlowRate = spec?.defaultBlowOutFlowRate
-  const min: number =
-    defaultFlowRate?.min !== undefined ? defaultFlowRate.min : 0
+  const min: number = defaultFlowRate?.min != null ? defaultFlowRate.min : 0
   const max: number =
-    defaultFlowRate?.max !== undefined ? defaultFlowRate.max : Infinity
-  return { min: min, max: max }
+    defaultFlowRate?.max != null ? defaultFlowRate.max : Infinity
+  return { min, max }
 }

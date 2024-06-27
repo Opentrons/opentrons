@@ -35,11 +35,14 @@ export function FlowRateEntry(props: FlowRateEntryProps): JSX.Element {
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
   const keyboardRef = React.useRef(null)
 
-  const [flowRate, setFlowRate] = React.useState<string>(
-    state.aspirateFlowRate ? state.aspirateFlowRate.toString() : ''
+  const [flowRate, setFlowRate] = React.useState<number | null>(
+    kind === 'aspirate'
+      ? state.aspirateFlowRate
+      : kind === 'dispense'
+      ? state.dispenseFlowRate
+      : null
   )
   const flowRateRange = getFlowRateRange(state, kind)
-  const rateAsNumber = Number(flowRate)
   let headerCopy: string = ''
   let textEntryCopy: string = ''
   let flowRateAction:
@@ -58,18 +61,18 @@ export function FlowRateEntry(props: FlowRateEntryProps): JSX.Element {
 
   const handleClickSave = (): void => {
     // the button will be disabled if this values is null
-    if (rateAsNumber != null && flowRateAction != null) {
+    if (flowRate != null && flowRateAction != null) {
       dispatch({
         type: flowRateAction,
-        rate: rateAsNumber,
+        rate: flowRate,
       })
     }
     onBack()
   }
 
   const error =
-    flowRate !== '' &&
-    (rateAsNumber < flowRateRange.min || rateAsNumber > flowRateRange.max)
+    flowRate !== null &&
+    (flowRate < flowRateRange.min || flowRate > flowRateRange.max)
       ? t(`value_out_of_range`, {
           min: flowRateRange.min,
           max: flowRateRange.max,
@@ -84,8 +87,9 @@ export function FlowRateEntry(props: FlowRateEntryProps): JSX.Element {
         onClickBack={onBack}
         onClickButton={handleClickSave}
         top={SPACING.spacing8}
-        buttonIsDisabled={error != null || flowRate === ''}
+        buttonIsDisabled={error != null || flowRate === null}
       />
+      test
       <Flex
         alignSelf={ALIGN_CENTER}
         gridGap={SPACING.spacing48}
@@ -103,7 +107,7 @@ export function FlowRateEntry(props: FlowRateEntryProps): JSX.Element {
           marginTop={SPACING.spacing68}
         >
           <InputField
-            type="text"
+            type="number"
             value={flowRate}
             title={textEntryCopy}
             error={error}
@@ -119,7 +123,7 @@ export function FlowRateEntry(props: FlowRateEntryProps): JSX.Element {
           <NumericalKeyboard
             keyboardRef={keyboardRef}
             onChange={e => {
-              setFlowRate(e)
+              setFlowRate(Number(e))
             }}
           />
         </Flex>
