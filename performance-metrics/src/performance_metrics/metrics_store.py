@@ -3,7 +3,7 @@
 import csv
 import typing
 from .data_shapes import MetricsMetadata
-from .types import SupportsCSVStorage
+from .dev_types import SupportsCSVStorage
 
 T = typing.TypeVar("T", bound=SupportsCSVStorage)
 

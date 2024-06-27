@@ -10,7 +10,7 @@ import typing
 
 from .metrics_store import MetricsStore
 from .data_shapes import RawContextData, MetricsMetadata
-from .types import SupportsTracking, RobotContextState
+from .dev_types import SupportsTracking, RobotContextState
 
 _UnderlyingFunctionParameters = typing.ParamSpec("_UnderlyingFunctionParameters")
 _UnderlyingFunctionReturn = typing.TypeVar("_UnderlyingFunctionReturn")
