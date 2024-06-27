@@ -248,11 +248,11 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         ...
         
     @abstractmethod
-    def get_liquid_presence_detection_configuration(self) -> bool:
+    def get_liquid_presence_detection(self) -> bool:
         ...
         
     @abstractmethod
-    def set_liquid_presence_detection_configuration(self, enable: bool) -> None:
+    def set_liquid_presence_detection(self, enable: bool) -> None:
         ...
 
     @abstractmethod

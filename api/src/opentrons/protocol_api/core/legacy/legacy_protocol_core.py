@@ -88,6 +88,8 @@ class LegacyProtocolCore(
         self._module_cores: List[legacy_module_core.LegacyModuleCore] = []
         self._labware_cores: List[LegacyLabwareCore] = [self.fixed_trash]
         self._disposal_locations: List[Union[Labware, TrashBin, WasteChute]] = []
+        self._liquid_presence_detection = False
+        
 
     @property
     def api_version(self) -> APIVersion:

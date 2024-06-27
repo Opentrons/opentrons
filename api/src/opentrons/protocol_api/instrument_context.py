@@ -1681,12 +1681,11 @@ class InstrumentContext(publisher.CommandPublisher):
         
         The default value is False.
         """
-        return self._core.get_liquid_presence_detection_configuration()
+        return self._core.get_liquid_presence_detection()
         
     @liquid_detection.setter
-    def configure_liquid_detection(self, enable: bool) -> None:
-        self._core.set_liquid_presence_detection_configuration(enable)
-        
+    def liquid_detection(self, enable: bool) -> None:
+        self._core.set_liquid_presence_detection(enable)
 
     @property
     @requires_version(2, 0)
