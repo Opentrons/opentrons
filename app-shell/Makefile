@@ -97,6 +97,7 @@ clean:
 .PHONY: lib
 lib: export NODE_ENV := production
 lib:
+	echo "Building app shell JS bundle (electron layer)"
 	vite build
 
 .PHONY: deps
