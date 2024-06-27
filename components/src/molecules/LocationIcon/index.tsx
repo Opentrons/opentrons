@@ -35,7 +35,7 @@ const LOCATION_ICON_STYLE = css<{
   border: 1px solid ${props => props.color ?? COLORS.black90};
   width: ${props => props.width ?? 'max-content'};
   padding: ${SPACING.spacing2} ${SPACING.spacing4};
-  border-radius: 6px;
+  border-radius: ${BORDERS.borderRadius4};
   height: max-content;
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
