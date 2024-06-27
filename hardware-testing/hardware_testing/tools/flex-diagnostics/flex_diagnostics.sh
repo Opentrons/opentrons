@@ -163,6 +163,7 @@ set_ntp() {
 
             mount -o remount,rw /
             sed -i "s/#FallbackNTP=*/FallbackNTP=ntp.tencent.com /" /etc/systemd/timesyncd.conf
+            timedatectl set-ntp true
             systemctl restart systemd-timesyncd
             echo -e "\n\n timedatectl after setting NTP server" >> $filename
             sleep 5
