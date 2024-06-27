@@ -38,7 +38,7 @@ export function FlowRateEntry(props: FlowRateEntryProps): JSX.Element {
   const [flowRate, setFlowRate] = React.useState<string>(
     state.aspirateFlowRate ? state.aspirateFlowRate.toString() : ''
   )
-  const flowRateRange = getFlowRateRange(state)
+  const flowRateRange = getFlowRateRange(state, kind)
   const rateAsNumber = Number(flowRate)
   let headerCopy: string = ''
   let textEntryCopy: string = ''
