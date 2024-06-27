@@ -1,4 +1,5 @@
-import { type PipetteName, getPipetteNameSpecs } from '@opentrons/shared-data'
+import { getPipetteNameSpecs } from '@opentrons/shared-data'
+import type { PipetteName } from '@opentrons/shared-data'
 import type { FlowRateKind, QuickTransferSummaryState } from '../types'
 
 export function getFlowRateRange(
