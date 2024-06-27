@@ -36,20 +36,22 @@ def run(protocol: protocol_api.ProtocolContext):
     # ========== FIRST ROW ===========
     heatershaker = protocol.load_module("heaterShakerModuleV1", "1")
     sample_plate_2 = heatershaker.load_labware("nest_96_wellplate_100ul_pcr_full_skirt")
-    tiprack_200_1 = protocol.load_labware("opentrons_ot3_96_tiprack_200ul_rss", "2")
+    tiprack_200_1_adapter = protocol.load_adapter("opentrons_flex_96_tiprack_adapter", "2")
+    tiprack_200_1 = tiprack_200_1_adapter.load_labware("opentrons_flex_96_tiprack_200ul")
     temp_block = protocol.load_module("temperature module gen2", "3")
     sample_plate_3 = temp_block.load_labware("nest_96_wellplate_100ul_pcr_full_skirt")
     # ========== SECOND ROW ==========
     MAG_PLATE_SLOT = protocol.load_module("magneticBlockV1", "4")
     reservoir_1 = protocol.load_labware("nest_96_wellplate_2ml_deep", "5")
-    reservoir_2 = protocol.load_labware("nest_96_wellplate_2ml_deep", "5")
+    reservoir_2 = protocol.load_labware("nest_96_wellplate_2ml_deep", "6")
     # ========== THIRD ROW ===========
     thermocycler = protocol.load_module("thermocycler module gen2")
     sample_plate_1 = thermocycler.load_labware("nest_96_wellplate_100ul_pcr_full_skirt")
-    tiprack_200_2 = protocol.load_labware("opentrons_ot3_96_tiprack_200ul_rss", "8")
-    reservoir_3 = protocol.load_labware("nest_96_wellplate_2ml_deep", "5")
+    tiprack_200_2_adapter = protocol.load_adapter("opentrons_flex_96_tiprack_adapter", "8")
+    tiprack_200_2 = tiprack_200_2_adapter.load_labware("opentrons_flex_96_tiprack_200ul")
+    reservoir_3 = protocol.load_labware("nest_96_wellplate_2ml_deep", "9")
     # ========== FOURTH ROW ==========
-    reservoir_4 = protocol.load_labware("nest_96_wellplate_2ml_deep", "5")
+    reservoir_4 = protocol.load_labware("nest_96_wellplate_2ml_deep", "11")
 
     # =========== RESERVOIR ==========
     EtOH = reservoir_1["A1"]
@@ -221,12 +223,16 @@ def run(protocol: protocol_api.ProtocolContext):
         p1000.move_to(Liquid_trash.top(z=0))
         p1000.return_tip()  # <---------------- Tip Return
 
-        protocol.pause("RESET TIPRACKS")
-        del tiprack_200_1
-        del tiprack_200_2
+        tiprack_200_3 = protocol.load_labware("opentrons_flex_96_tiprack_200ul", protocol_api.OFF_DECK)
+        tiprack_20_1 = protocol.load_labware("opentrons_flex_96_tiprack_50ul", protocol_api.OFF_DECK)
 
-        tiprack_200_3 = protocol.load_labware("opentrons_ot3_96_tiprack_200ul_rss", "2")
-        tiprack_20_1 = protocol.load_labware("opentrons_ot3_96_tiprack_50ul_rss", "8")
+        protocol.move_labware(labware=tiprack_200_1, new_location=protocol_api.OFF_DECK)
+
+        protocol.move_labware(labware=tiprack_200_2, new_location=protocol_api.OFF_DECK)
+
+        protocol.move_labware(labware=tiprack_200_3, new_location=tiprack_200_1_adapter)
+
+        protocol.move_labware(labware=tiprack_20_1, new_location=tiprack_200_2_adapter)
 
         for X in range(2):
             protocol.comment("--> ETOH Wash")

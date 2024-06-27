@@ -24,11 +24,13 @@ import { ModalContentOneColSimpleButtons } from './ModalContentOneColSimpleButto
 import { TwoColumn } from './TwoColumn'
 import { OneColumn } from './OneColumn'
 import { ModalContentMixed } from './ModalContentMixed'
+import { DescriptionContent } from './DescriptionContent'
 export {
   ModalContentOneColSimpleButtons,
   TwoColumn,
   OneColumn,
   ModalContentMixed,
+  DescriptionContent,
 }
 
 export type ModalType = 'intervention-required' | 'error'

@@ -59,6 +59,7 @@ async def test_configure_for_volume_implementation(
         nozzle_map=get_default_nozzle_map(PipetteNameType.P300_MULTI),
         back_left_corner_offset=Point(10, 20, 30),
         front_right_corner_offset=Point(40, 50, 60),
+        pipette_lld_settings={},
     )
 
     decoy.when(

@@ -46,10 +46,10 @@ describe('LargeButton', () => {
     )
   })
 
-  it('renders the onColor button', () => {
+  it('renders the alertStroke button', () => {
     props = {
       ...props,
-      buttonType: 'onColor',
+      buttonType: 'alertStroke',
     }
     render(props)
     expect(screen.getByRole('button')).toHaveStyle(

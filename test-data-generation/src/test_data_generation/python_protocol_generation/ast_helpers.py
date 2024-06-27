@@ -123,7 +123,7 @@ class CallFunction(BaseCall):
 
     @classmethod
     def load_instrument(
-        cls, instrument_name: str, mount: typing.Literal["left", "right"]
+        cls, instrument_name: str, mount: typing.Literal["left", "right"],
     ) -> "CallFunction":
         """Create a CallFunction for loading an instrument."""
         return cls(
