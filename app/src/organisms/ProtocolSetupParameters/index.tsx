@@ -153,14 +153,6 @@ export function ProtocolSetupParameters({
     }
   }
 
-  console.log('isLoading', isLoading)
-  console.log('startSetup', startSetup)
-  console.log('enableCsvFile', enableCsvFile)
-  console.log(
-    'result',
-    mostRecentAnalysis?.result === 'parameter-value-required'
-  )
-
   let children = (
     <>
       <ChildNavigation
