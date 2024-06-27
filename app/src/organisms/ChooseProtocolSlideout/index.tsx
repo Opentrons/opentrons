@@ -233,7 +233,7 @@ export function ChooseProtocolSlideoutComponent(
             const [response, varName] = responseTuple
             return {
               ...acc,
-              [varName]: { file_id: response.data.id },
+              [varName]: { fileId: response.data.id },
             }
           },
           runTimeParameterValues
