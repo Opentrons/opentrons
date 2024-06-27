@@ -162,6 +162,9 @@ AXES_IN_HOMING_ORDER: Tuple[Axis, Axis, Axis, Axis, Axis, Axis, Axis, Axis, Axis
 )
 
 
+TESTING_OVERSHOOT_MM = 0.0  # EDIT HERE (6/26)
+
+
 class OT3API(
     ExecutionManagerProvider,
     OT3RobotCalibrationProvider,
@@ -1687,6 +1690,11 @@ class OT3API(
         #            The plunger is pre-loaded in the "aspirate" direction
         backlash_pos = target_pos.copy()
         backlash_pos[pip_ax] += instrument.backlash_distance
+
+
+        overshoot_pos = target_pos.copy()
+        overshoot_pos[pip_ax] -= TESTING_OVERSHOOT_MM
+
         # NOTE: plunger position (mm) decreases up towards homing switch
         # NOTE: if already at BOTTOM, we still need to run backlash-compensation movement,
         #       because we do not know if we arrived at BOTTOM from above or below.
@@ -1700,6 +1708,11 @@ class OT3API(
                     speed=(speed_down * rate),
                     acquire_lock=acquire_lock,
                 )
+            await self._move(
+                overshoot_pos,
+                speed=(speed_down * rate),
+                acquire_lock=acquire_lock,
+            )
             # NOTE: This should ALWAYS be moving UP.
             #       There should never be a time that this function is called and
             #       the plunger doesn't physically move UP into it's BOTTOM position.
@@ -1759,7 +1772,7 @@ class OT3API(
 
         # NOTE: overshoot is for HW testing only
         overshoot_pos = target_pos.copy()
-        overshoot_pos[Axis.of_main_tool_actuator(realmount.to_mount())] -= 0.0  # EDIT HERE (6/26)
+        overshoot_pos[Axis.of_main_tool_actuator(realmount.to_mount())] -= TESTING_OVERSHOOT_MM
 
         try:
             await self._backend.set_active_current(
