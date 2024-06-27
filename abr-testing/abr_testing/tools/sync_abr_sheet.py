@@ -14,7 +14,8 @@ from statistics import mean, StatisticsError
 def determine_lifetime(abr_google_sheet: Any) -> None:
     """Record lifetime % of robot, pipettes, and gripper per run."""
     # Get all data
-    all_google_data = abr_google_sheet.get_all_data()
+    headers = abr_google_sheet.get_row(1)
+    all_google_data = abr_google_sheet.get_all_data(expected_headers=headers)
     # Convert dictionary to pandas dataframe
     df_sheet_data = pd.DataFrame.from_dict(all_google_data)
     df_sheet_data["Start_Time"] = pd.to_datetime(
@@ -27,7 +28,10 @@ def determine_lifetime(abr_google_sheet: Any) -> None:
     for index, run in df_sheet_data.iterrows():
         end_time = run["End_Time"]
         robot = run["Robot"]
-        if len(run["Robot Lifetime (%)"]) < 1 and len(run["Run_ID"]) > 1:
+        robot_lifetime = (
+            float(run["Robot Lifetime (%)"]) if run["Robot Lifetime (%)"] != "" else 0
+        )
+        if robot_lifetime < 1 and len(run["Run_ID"]) > 1:
             # Get Robot % Lifetime
             robot_runs_before = df_sheet_data[
                 (df_sheet_data["End_Time"] <= end_time)
