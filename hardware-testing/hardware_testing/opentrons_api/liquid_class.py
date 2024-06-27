@@ -51,7 +51,8 @@ class _PositioningMove:
 
 @dataclass
 class Submerge(_PositioningMove):
-    pass
+    approach_height: ParamType.HEIGHT
+    liquid_level_detection: ParamType.BOOL
 
 
 @dataclass
@@ -69,7 +70,7 @@ class Touch(_PositioningMove):
 class _PipettingMove:
     flow_rate: ParamType.FLOAT
     height: ParamType.HEIGHT
-    z_tracking: ParamType.BOOL
+    liquid_z_tracking: ParamType.BOOL
     delay: ParamType.FLOAT
 
 
@@ -192,7 +193,7 @@ class LiquidClassPipette(InstrumentContext):
             return self
         delay = 0
         if liquid.aspirate:
-            if liquid.aspirate.z_tracking:
+            if liquid.aspirate.liquid_z_tracking:
                 raise NotImplementedError("z-tracking not yet supported")
             if liquid.aspirate.flow_rate is not None:
                 self.flow_rate.aspirate = liquid.aspirate.flow_rate
@@ -215,7 +216,7 @@ class LiquidClassPipette(InstrumentContext):
         if liquid:
             delay = 0
             if liquid.dispense:
-                if liquid.dispense.z_tracking:
+                if liquid.dispense.liquid_z_tracking:
                     raise NotImplementedError("z-tracking not yet supported")
                 if liquid.dispense.flow_rate is not None:
                     self.flow_rate.aspirate = liquid.dispense.flow_rate
@@ -286,6 +287,8 @@ GLYCEROL_50_PERCENT: Dict[str, Dict[str, Liquid]] = {
     "flex_1channel_1000": {
         "opentrons_flex_96_filtertiprack_50ul": Liquid(
             submerge=Submerge(  # required
+                approach_height=Height(1.0, HeightRef.WELL_TOP),
+                liquid_level_detection=True,
                 speed=60,
                 height=Height(1, HeightRef.WELL_BOTTOM),
                 delay=None,
@@ -293,13 +296,13 @@ GLYCEROL_50_PERCENT: Dict[str, Dict[str, Liquid]] = {
             aspirate=Aspirate(  # required
                 flow_rate=50.0,
                 height=Height(1, HeightRef.WELL_BOTTOM),
-                z_tracking=False,
+                liquid_z_tracking=False,
                 delay=0.5,
             ),
             dispense=Dispense(  # required
                 flow_rate=50.0,
                 height=Height(1, HeightRef.WELL_BOTTOM),
-                z_tracking=False,
+                liquid_z_tracking=False,
                 delay=0.5,
                 push_out=7.0,
             ),
