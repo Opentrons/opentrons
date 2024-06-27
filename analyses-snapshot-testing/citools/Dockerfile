@@ -6,15 +6,15 @@ RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y git libsystemd-dev
 
-# Define a build argument for the commit/tag/hash to clone
-ARG OPENTRONS_VERSION=edge
+# Define build arguments
+ARG ANALYSIS_REF=edge
 
 # Set the working directory in the container
 WORKDIR /opentrons
 
 # Clone the Opentrons repository at the specified commit or tag
 ARG CACHEBUST=1
-RUN git clone --branch $OPENTRONS_VERSION --depth 1 https://github.com/Opentrons/opentrons .
+RUN git clone --branch $ANALYSIS_REF --depth 1 https://github.com/Opentrons/opentrons .
 
 # Install packages from local directories
 RUN python -m pip install -U ./shared-data/python
@@ -24,4 +24,3 @@ RUN python -m pip install -U pandas==1.4.3
 
 # The default command to run when starting the container
 CMD ["tail", "-f", "/dev/null"]
-

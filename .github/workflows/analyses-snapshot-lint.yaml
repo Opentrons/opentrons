@@ -1,11 +1,11 @@
-# This workflow runs lint on pull requests that touch anything in the app-testing directory
+# This workflow runs lint on pull requests that touch anything in the analyses-snapshot-testing directory
 
-name: 'app-testing lint'
+name: 'analyses-snapshot-testing lint'
 
 on:
   pull_request:
     paths:
-      - 'app-testing/**'
+      - 'analyses-snapshot-testing/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
@@ -17,7 +17,7 @@ defaults:
 
 jobs:
   lint:
-    name: 'app-testing lint'
+    name: 'analyses-snapshot-testing lint'
     timeout-minutes: 5
     runs-on: 'ubuntu-latest'
     steps:
@@ -29,20 +29,20 @@ jobs:
         with:
           python-version: '3.12'
           cache: 'pipenv'
-          cache-dependency-path: app-testing/Pipfile.lock
+          cache-dependency-path: analyses-snapshot-testing/Pipfile.lock
       - name: Setup
         id: install
-        working-directory: ./app-testing
+        working-directory: ./analyses-snapshot-testing
         run: make setup
       - name: black-check
         if: always() && steps.install.outcome == 'success' || steps.install.outcome == 'skipped'
-        working-directory: ./app-testing
+        working-directory: ./analyses-snapshot-testing
         run: make black-check
       - name: ruff
         if: always() && steps.install.outcome == 'success' || steps.install.outcome == 'skipped'
-        working-directory: ./app-testing
+        working-directory: ./analyses-snapshot-testing
         run: make ruff-check
       - name: mypy
         if: always() && steps.install.outcome == 'success' || steps.install.outcome == 'skipped'
-        working-directory: ./app-testing
+        working-directory: ./analyses-snapshot-testing
         run: make mypy

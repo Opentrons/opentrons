@@ -48,29 +48,43 @@ teardown:
 
 .PHONY: format-readme
 format-readme:
-	yarn prettier --ignore-path .eslintignore --write app-testing/**/*.md
+	yarn prettier --ignore-path .eslintignore --write analyses-snapshot-testing/**/*.md
 
 .PHONY: install-pipenv
 install-pipenv:
 	python -m pip install -U pipenv
 
+ANALYSIS_REF ?= edge
+PROTOCOL_NAMES ?= all
+OVERRIDE_PROTOCOL_NAMES ?= all
+
+export ANALYSIS_REF
+export PROTOCOL_NAMES
+export OVERRIDE_PROTOCOL_NAMES
+
 .PHONY: snapshot-test
 snapshot-test:
+	@echo "ANALYSIS_REF is $(ANALYSIS_REF)"
+	@echo "PROTOCOL_NAMES is $(PROTOCOL_NAMES)"
+	@echo "OVERRIDE_PROTOCOL_NAMES is $(OVERRIDE_PROTOCOL_NAMES)"
 	python -m pipenv run pytest -k analyses_snapshot_test -vv
 
 .PHONY: snapshot-test-update
 snapshot-test-update:
+	@echo "ANALYSIS_REF is $(ANALYSIS_REF)"
+	@echo "PROTOCOL_NAMES is $(PROTOCOL_NAMES)"
+	@echo "OVERRIDE_PROTOCOL_NAMES is $(OVERRIDE_PROTOCOL_NAMES)"
 	python -m pipenv run pytest -k analyses_snapshot_test --snapshot-update
 
-TARGET ?= edge
 CACHEBUST := $(shell date +%s)
 
 .PHONY: build-opentrons-analysis
 build-opentrons-analysis:
-	@echo "Building docker image for $(TARGET)"
-	@echo "If you want to build a different version, run 'make build-opentrons-analysis TARGET=<version>'"
+	@echo "Building docker image for $(ANALYSIS_REF)"
+	@echo "The image will be named opentrons-analysis:$(ANALYSIS_REF)"
+	@echo "If you want to build a different version, run 'make build-opentrons-analysis ANALYSIS_REF=<version>'"
 	@echo "Cache is always busted to ensure latest version of the code is used"
-	docker build --build-arg OPENTRONS_VERSION=$(TARGET) --build-arg CACHEBUST=$(CACHEBUST) -t opentrons-analysis:$(TARGET) citools/.
+	docker build --build-arg OPENTRONS_VERSION=$(ANALYSIS_REF) --build-arg CACHEBUST=$(CACHEBUST) -t opentrons-analysis:$(ANALYSIS_REF) citools/.
 
 .PHONY: generate-protocols
 generate-protocols:

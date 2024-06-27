@@ -34,6 +34,3 @@ skip-magic-trailing-comma = false
 
 # Like Black, automatically detect the appropriate line ending.
 line-ending = "auto"
-
-[tool.ruff.lint.per-file-ignores]
-"automation/driver/base.py" = ["B008"]
