@@ -3,7 +3,7 @@ import { describe, it, beforeEach, expect } from 'vitest'
 import { renderWithProviders } from '../../../testing/utils'
 import { screen } from '@testing-library/react'
 import { SPACING } from '../../../ui-style-constants'
-import { COLORS } from '../../../helix-design-system'
+import { BORDERS, COLORS } from '../../../helix-design-system'
 
 import { LocationIcon } from '..'
 
@@ -29,7 +29,7 @@ describe('LocationIcon', () => {
     expect(locationIcon).toHaveStyle('height: max-content')
     expect(locationIcon).toHaveStyle('width: max-content')
     expect(locationIcon).toHaveStyle(`border: 1px solid ${COLORS.black90}`)
-    expect(locationIcon).toHaveStyle(`border-radius: 6px`)
+    expect(locationIcon).toHaveStyle(`border-radius: ${BORDERS.borderRadius4}`)
   })
 
   it.todo('should render the proper styles - odd style')
