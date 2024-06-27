@@ -1671,7 +1671,7 @@ class InstrumentContext(publisher.CommandPublisher):
         self._tip_racks = racks
 
     @property
-    @requires_version(2, 0)
+    @requires_version(2, 2)
     def liquid_detection(self) -> bool:
         """
         Gets the global setting for liquid level detection.
