@@ -82,6 +82,8 @@ module.exports = async () => ({
     executableName: 'opentrons',
     category: 'Science',
     icon: project === 'robot-stack' ? 'build/icon.icns' : 'build/three.icns',
+  },
+  appImage: {
     license: 'build/license_en.txt',
   },
   publish: publishConfig,
