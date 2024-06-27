@@ -1118,10 +1118,10 @@
       "mayMountTo": ["cutoutD3", "cutoutC3", "cutoutB3", "cutoutA3"],
       "displayName": "Slot With an Absorbance Reader and a Lid Dock",
       "providesAddressableAreas": {
-        "cutoutD3": ["absorbanceReaderV1D3", "absorbanceReaderV1LidDockD4"],
-        "cutoutC3": ["absorbanceReaderV1C3", "absorbanceReaderV1LidDockC4"],
-        "cutoutB3": ["absorbanceReaderV1B3", "absorbanceReaderV1LidDockB4"],
-        "cutoutA3": ["absorbanceReaderV1A3", "absorbanceReaderV1LidDockA4"]
+        "cutoutD3": ["absorbanceReaderV1D3", "absorbanceReaderV1LidDockD4", "D3", "D4"],
+        "cutoutC3": ["absorbanceReaderV1C3", "absorbanceReaderV1LidDockC4", "C3", "C4"],
+        "cutoutB3": ["absorbanceReaderV1B3", "absorbanceReaderV1LidDockB4", "B3", "B4"],
+        "cutoutA3": ["absorbanceReaderV1A3", "absorbanceReaderV1LidDockA4", "A3", "A4"]
       },
       "fixtureGroup": {},
       "height": 10.65,

@@ -1,8 +1,9 @@
 import omitBy from 'lodash/omitBy'
-import { MAGNETIC_BLOCK_TYPE } from '@opentrons/shared-data'
+import { MAGNETIC_BLOCK_TYPE, ABSORBANCE_READER_TYPE } from '@opentrons/shared-data'
 import { useModuleRenderInfoForProtocolById } from './useModuleRenderInfoForProtocolById'
 import { useIsFlex } from './useIsFlex'
 import type { ProtocolCalibrationStatus } from './useRunCalibrationStatus'
+import { ConfirmExitModal } from '../../QuickTransferFlow/ConfirmExitModal'
 
 export function useModuleCalibrationStatus(
   robotName: string,
@@ -13,7 +14,7 @@ export function useModuleCalibrationStatus(
   const moduleRenderInfoForProtocolById = omitBy(
     useModuleRenderInfoForProtocolById(runId),
     moduleRenderInfo =>
-      moduleRenderInfo.moduleDef.moduleType === MAGNETIC_BLOCK_TYPE
+      moduleRenderInfo.moduleDef.moduleType === MAGNETIC_BLOCK_TYPE || moduleRenderInfo.moduleDef.moduleType === ABSORBANCE_READER_TYPE
   )
 
   // only check module calibration for Flex

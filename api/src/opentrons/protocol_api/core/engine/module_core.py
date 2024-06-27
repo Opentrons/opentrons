@@ -18,13 +18,13 @@ from opentrons.drivers.types import (
 )
 
 from opentrons.protocol_engine import commands as cmd
-from opentrons.types import DeckSlotName, StagingSlotName
+from opentrons.types import DeckSlotName, StagingSlotName, Point
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocol_engine.errors.exceptions import (
     LabwareNotLoadedOnModuleError,
     NoMagnetEngageHeightError,
 )
-from opentrons.protocol_engine.types import AddressableAreaLocation
+from opentrons.protocol_engine.types import AddressableAreaLocation, LabwareOffsetVector
 
 from opentrons.protocols.api_support.types import APIVersion
 
@@ -567,7 +567,10 @@ class AbsorbanceReaderCore(ModuleCore, AbstractAbsorbanceReaderCore):
         """Close the Absorbance Reader's lid."""
         self._engine_client.execute_command(
             cmd.absorbance_reader.CloseLidParams(
-                moduleId=self.module_id, pickUpOffset=None, dropOffset=None
+                moduleId=self.module_id,
+                # FIXME: using staging slot for now (wrong z), but this should be the lid dock slot
+                pickUpOffset=LabwareOffsetVector(x=14, y=0, z=-14.5),
+                dropOffset=LabwareOffsetVector(x=14, y=0, z=0)
             )
         )
 
@@ -575,6 +578,9 @@ class AbsorbanceReaderCore(ModuleCore, AbstractAbsorbanceReaderCore):
         """Close the Absorbance Reader's lid."""
         self._engine_client.execute_command(
             cmd.absorbance_reader.OpenLidParams(
-                moduleId=self.module_id, pickUpOffset=None, dropOffset=None
-            )
+                moduleId=self.module_id,
+                pickUpOffset=LabwareOffsetVector(x=14, y=0, z=0),
+                # FIXME: using staging slot for now (wrong z), but this should be the lid dock slot
+                dropOffset=LabwareOffsetVector(x=14, y=0, z=-14.5)
+        )
         )
