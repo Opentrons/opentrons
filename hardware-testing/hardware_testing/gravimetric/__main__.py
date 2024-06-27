@@ -186,7 +186,7 @@ class RunArgs:
         operator_name = helpers._get_operator_name(_ctx.is_simulating())
         robot_serial = helpers._get_robot_serial(_ctx.is_simulating())
         run_id, start_time = create_run_id_and_start_time()
-        environment_sensor = asair_sensor.BuildAsairSensor(_ctx.is_simulating())
+        environment_sensor = asair_sensor.BuildAsairSensor(True)
         git_description = get_git_description()
         if not args.photometric:
             scale = Scale.build(simulate=_ctx.is_simulating())
