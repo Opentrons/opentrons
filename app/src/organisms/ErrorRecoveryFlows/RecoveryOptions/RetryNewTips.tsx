@@ -1,21 +1,13 @@
 import * as React from 'react'
-import { Trans, useTranslation } from 'react-i18next'
-
-import { StyledText } from '@opentrons/components'
 
 import { RECOVERY_MAP } from '../constants'
-import {
-  ReplaceTips,
-  SelectTips,
-  TwoColTextAndFailedStepNextStep,
-} from '../shared'
-import { SelectRecoveryOption } from './SelectRecoveryOption'
+import { ReplaceTips, SelectTips, RetryWithNewTips } from '../shared'
 
 import type { RecoveryContentProps } from '../types'
 
-export function RetryNewTips(props: RecoveryContentProps): JSX.Element {
+export function RetryNewTips(props: RecoveryContentProps): JSX.Element | null {
   const { recoveryMap, routeUpdateActions } = props
-  const { step, route } = recoveryMap
+  const { step } = recoveryMap
   const { RETRY_NEW_TIPS, DROP_TIP_FLOWS } = RECOVERY_MAP
 
   // Do this instead of directly routing to DropTipFlows route first,
@@ -27,7 +19,7 @@ export function RetryNewTips(props: RecoveryContentProps): JSX.Element {
     )
   }
 
-  const buildContent = (): JSX.Element => {
+  const buildContent = (): JSX.Element | null => {
     switch (step) {
       case RETRY_NEW_TIPS.STEPS.REPLACE_TIPS:
         return <ReplaceTips {...props} />
@@ -36,48 +28,9 @@ export function RetryNewTips(props: RecoveryContentProps): JSX.Element {
       case RETRY_NEW_TIPS.STEPS.RETRY:
         return <RetryWithNewTips {...props} />
       default:
-        console.warn(`${step} in ${route} not explicitly handled. Rerouting.`)
-        return <SelectRecoveryOption {...props} />
+        return <ReplaceTips {...props} />
     }
   }
 
   return buildContent()
-}
-
-export function RetryWithNewTips(props: RecoveryContentProps): JSX.Element {
-  const { recoveryCommands, routeUpdateActions } = props
-  const { retryFailedCommand, resumeRun } = recoveryCommands
-  const { setRobotInMotion } = routeUpdateActions
-  const { ROBOT_RETRYING_STEP } = RECOVERY_MAP
-  const { t } = useTranslation('error_recovery')
-
-  const primaryBtnOnClick = (): Promise<void> => {
-    return setRobotInMotion(true, ROBOT_RETRYING_STEP.ROUTE)
-      .then(() => retryFailedCommand())
-      .then(() => {
-        resumeRun()
-      })
-  }
-
-  const buildBodyText = (): JSX.Element => {
-    return (
-      <Trans
-        t={t}
-        i18nKey="robot_will_retry_with_new_tips"
-        components={{
-          block: <StyledText as="p" />,
-        }}
-      />
-    )
-  }
-
-  return (
-    <TwoColTextAndFailedStepNextStep
-      {...props}
-      leftColTitle={t('retry_with_new_tips')}
-      leftColBodyText={buildBodyText()}
-      primaryBtnCopy={t('retry_now')}
-      primaryBtnOnClick={primaryBtnOnClick}
-    />
-  )
 }

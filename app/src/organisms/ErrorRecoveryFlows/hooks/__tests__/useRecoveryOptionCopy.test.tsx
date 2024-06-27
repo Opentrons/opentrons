@@ -45,36 +45,6 @@ describe('useRecoveryOptionCopy', () => {
     screen.getByText('Retry with new tips')
   })
 
-  it(`renders the correct copy for ${RECOVERY_MAP.RETRY_SAME_TIPS.ROUTE}`, () => {
-    render({ route: RECOVERY_MAP.RETRY_SAME_TIPS.ROUTE })
-
-    screen.getByText('Retry with same tips')
-  })
-
-  it(`renders the correct copy for ${RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.ROUTE}`, () => {
-    render({ route: RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.ROUTE })
-
-    screen.getByText('Manually fill well and skip to next step')
-  })
-
-  it(`renders the correct copy for ${RECOVERY_MAP.IGNORE_AND_SKIP.ROUTE}`, () => {
-    render({ route: RECOVERY_MAP.IGNORE_AND_SKIP.ROUTE })
-
-    screen.getByText('Ignore error and skip to next step')
-  })
-
-  it(`renders the correct copy for ${RECOVERY_MAP.SKIP_STEP_WITH_NEW_TIPS.ROUTE}`, () => {
-    render({ route: RECOVERY_MAP.SKIP_STEP_WITH_NEW_TIPS.ROUTE })
-
-    screen.getByText('Skip to next step with new tips')
-  })
-
-  it(`renders the correct copy for ${RECOVERY_MAP.SKIP_STEP_WITH_SAME_TIPS.ROUTE}`, () => {
-    render({ route: RECOVERY_MAP.SKIP_STEP_WITH_SAME_TIPS.ROUTE })
-
-    screen.getByText('Skip to next step with same tips')
-  })
-
   it('renders "Unknown action" for an unknown recovery option', () => {
     render({ route: 'unknown_route' as RecoveryRoute })
 

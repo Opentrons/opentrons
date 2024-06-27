@@ -13,7 +13,7 @@ import type { Mock } from 'vitest'
 
 vi.mock('../TipSelectionModal')
 vi.mock('../TipSelection')
-vi.mock('../LeftColumnLabwareInfo')
+vi.mock('../LeftColumnTipInfo')
 
 const render = (props: React.ComponentProps<typeof SelectTips>) => {
   return renderWithProviders(<SelectTips {...props} />, {

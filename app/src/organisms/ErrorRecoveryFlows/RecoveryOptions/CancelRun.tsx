@@ -13,7 +13,6 @@ import {
 
 import { RECOVERY_MAP } from '../constants'
 import { RecoveryFooterButtons, RecoverySingleColumnContent } from '../shared'
-import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 import type { RecoveryContentProps } from '../types'
 import type {
@@ -22,25 +21,7 @@ import type {
   UseRouteUpdateActionsResult,
 } from '../hooks'
 
-export function CancelRun(props: RecoveryContentProps): JSX.Element {
-  const { recoveryMap } = props
-  const { step, route } = recoveryMap
-  const { CANCEL_RUN } = RECOVERY_MAP
-
-  const buildContent = (): JSX.Element => {
-    switch (step) {
-      case CANCEL_RUN.STEPS.CONFIRM_CANCEL:
-        return <CancelRunConfirmation {...props} />
-      default:
-        console.warn(`${step} in ${route} not explicitly handled. Rerouting.`)
-        return <SelectRecoveryOption {...props} />
-    }
-  }
-
-  return buildContent()
-}
-
-function CancelRunConfirmation({
+export function CancelRun({
   isOnDevice,
   routeUpdateActions,
   recoveryCommands,

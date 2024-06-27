@@ -120,9 +120,7 @@ describe('ProtocolRunRuntimeParameters', () => {
     vi.mocked(useNotifyRunQuery).mockReturnValue(({
       data: { data: mockSucceededRun },
     } as unknown) as UseQueryResult<Run>)
-    when(vi.mocked(useFeatureFlag))
-      .calledWith('enableCsvFile')
-      .thenReturn(false)
+    vi.mocked(useFeatureFlag).mockReturnValue(false)
   })
 
   afterEach(() => {
@@ -187,7 +185,7 @@ describe('ProtocolRunRuntimeParameters', () => {
   })
 
   it('should render csv row if a protocol requires a csv', () => {
-    when(vi.mocked(useFeatureFlag)).calledWith('enableCsvFile').thenReturn(true)
+    vi.mocked(useFeatureFlag).mockReturnValue(true)
     vi.mocked(useMostRecentCompletedAnalysis).mockReturnValue({
       runTimeParameters: [...mockRunTimeParameterData, mockCsvRtp],
     } as CompletedProtocolAnalysis)

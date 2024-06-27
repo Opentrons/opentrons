@@ -15,7 +15,6 @@ export function RecoveryInProgress({
     ROBOT_RESUMING,
     ROBOT_RETRYING_STEP,
     ROBOT_PICKING_UP_TIPS,
-    ROBOT_SKIPPING_STEP,
   } = RECOVERY_MAP
   const { t } = useTranslation('error_recovery')
   const { route } = recoveryMap
@@ -32,8 +31,6 @@ export function RecoveryInProgress({
         return t('stand_back_retrying')
       case ROBOT_PICKING_UP_TIPS.ROUTE:
         return t('stand_back_picking_up_tips')
-      case ROBOT_SKIPPING_STEP.ROUTE:
-        return t('stand_back_skipping_to_next_step')
       default:
         return t('stand_back')
     }

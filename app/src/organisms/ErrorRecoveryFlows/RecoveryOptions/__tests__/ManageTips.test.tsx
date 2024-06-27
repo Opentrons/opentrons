@@ -15,13 +15,11 @@ import { ManageTips, useDropTipFlowUtils } from '../ManageTips'
 import { RECOVERY_MAP } from '../../constants'
 import { DropTipWizardFlows } from '../../../DropTipWizardFlows'
 import { DT_ROUTES } from '../../../DropTipWizardFlows/constants'
-import { SelectRecoveryOption } from '../SelectRecoveryOption'
 
 import type { Mock } from 'vitest'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 
 vi.mock('../../../DropTipWizardFlows')
-vi.mock('../SelectRecoveryOption')
 
 const { DROP_TIP_FLOWS, RETRY_NEW_TIPS } = RECOVERY_MAP
 
@@ -73,17 +71,6 @@ describe('ManageTips', () => {
     vi.mocked(DropTipWizardFlows).mockReturnValue(
       <div>MOCK DROP TIP FLOWS</div>
     )
-
-    vi.mocked(SelectRecoveryOption).mockReturnValue(
-      <div>MOCK SELECT RECOVERY OPTION</div>
-    )
-  })
-
-  it('renders SelectRecoveryOption when the route is unknown', () => {
-    props = { ...props, recoveryMap: { ...props.recoveryMap, step: 'UNKNOWN' } }
-    render(props)
-
-    screen.getByText('MOCK SELECT RECOVERY OPTION')
   })
 
   it(`renders BeginRemoval with correct copy when the step is ${DROP_TIP_FLOWS.STEPS.BEGIN_REMOVAL}`, () => {

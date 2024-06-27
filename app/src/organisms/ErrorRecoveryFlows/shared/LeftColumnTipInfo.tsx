@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 import {
   DIRECTION_COLUMN,
@@ -12,25 +13,21 @@ import { InlineNotification } from '../../../atoms/InlineNotification'
 
 import type { RecoveryContentProps } from '../types'
 
-type LeftColumnLabwareInfoProps = RecoveryContentProps & {
+type LeftColumnTipInfoProps = RecoveryContentProps & {
   title: string
-  moveType: React.ComponentProps<typeof Move>['type']
-  /* Renders a warning InlineNotification if provided. */
-  bannerText?: string
 }
 // TODO(jh, 06-12-24): EXEC-500 & EXEC-501.
 // The left column component adjacent to RecoveryDeckMap/TipSelection.
-export function LeftColumnLabwareInfo({
+export function LeftColumnTipInfo({
   title,
   failedLabwareUtils,
   isOnDevice,
-  moveType,
-  bannerText,
-}: LeftColumnLabwareInfoProps): JSX.Element | null {
-  const { failedLabwareName, failedLabware } = failedLabwareUtils
+}: LeftColumnTipInfoProps): JSX.Element | null {
+  const { pickUpTipLabwareName, pickUpTipLabware } = failedLabwareUtils
+  const { t } = useTranslation('error_recovery')
 
   const buildLabwareLocationSlotName = (): string => {
-    const location = failedLabware?.location
+    const location = pickUpTipLabware?.location
     if (
       location != null &&
       typeof location === 'object' &&
@@ -48,17 +45,15 @@ export function LeftColumnLabwareInfo({
         <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
           <StyledText as="h4SemiBold">{title}</StyledText>
           <Move
-            type={moveType}
-            labwareName={failedLabwareName ?? ''}
+            type={'refill'}
+            labwareName={pickUpTipLabwareName ?? ''}
             currentLocationProps={{ slotName: buildLabwareLocationSlotName() }}
           />
         </Flex>
-        {bannerText != null ? (
-          <InlineNotification
-            type="alert"
-            heading={bannerText}
-          ></InlineNotification>
-        ) : null}
+        <InlineNotification
+          type="alert"
+          heading={t('replace_tips_and_select_location')}
+        ></InlineNotification>
       </Flex>
     )
   } else {

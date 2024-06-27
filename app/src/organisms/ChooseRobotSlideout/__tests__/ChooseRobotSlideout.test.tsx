@@ -19,6 +19,7 @@ import {
   mockReachableRobot,
   mockUnreachableRobot,
 } from '../../../redux/discovery/__fixtures__'
+import { useFeatureFlag } from '../../../redux/config'
 import { getNetworkInterfaces } from '../../../redux/networking'
 import { ChooseRobotSlideout } from '..'
 import { useNotifyDataReady } from '../../../resources/useNotifyDataReady'
@@ -28,6 +29,7 @@ vi.mock('../../../redux/discovery')
 vi.mock('../../../redux/robot-update')
 vi.mock('../../../redux/networking')
 vi.mock('../../../resources/useNotifyDataReady')
+vi.mock('../../../redux/config')
 const render = (props: React.ComponentProps<typeof ChooseRobotSlideout>) => {
   return renderWithProviders(
     <StaticRouter>
@@ -97,6 +99,7 @@ const mockRunTimeParameters: RunTimeParameter[] = [
 
 describe('ChooseRobotSlideout', () => {
   beforeEach(() => {
+    vi.mocked(useFeatureFlag).mockReturnValue(true)
     vi.mocked(getConnectableRobots).mockReturnValue([mockConnectableRobot])
     vi.mocked(getUnreachableRobots).mockReturnValue([mockUnreachableRobot])
     vi.mocked(getReachableRobots).mockReturnValue([mockReachableRobot])

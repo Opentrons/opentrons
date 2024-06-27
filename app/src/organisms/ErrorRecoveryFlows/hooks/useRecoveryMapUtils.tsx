@@ -10,7 +10,7 @@ import {
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 
-import { LabwareHighlight } from '../shared'
+import { LabwareHighlight } from '../shared/RecoveryMap'
 
 import type { Run } from '@opentrons/api-client'
 import type {
@@ -112,13 +112,13 @@ export function getRunCurrentModulesOnDeck({
   failedLabwareUtils: UseRecoveryMapUtilsProps['failedLabwareUtils']
   currentModulesInfo: RunCurrentModuleInfo[]
 }): RunCurrentModulesOnDeck[] {
-  const { failedLabware } = failedLabwareUtils
+  const { pickUpTipLabware } = failedLabwareUtils
 
   return currentModulesInfo.map(
     ({ moduleDef, slotName, nestedLabwareDef, nestedLabwareSlotName }) => {
       const isLabwareMatch = getIsLabwareMatch(
         nestedLabwareSlotName,
-        failedLabware
+        pickUpTipLabware
       )
 
       return {
@@ -152,10 +152,10 @@ export function getRunCurrentLabwareOnDeck({
   failedLabwareUtils: UseRecoveryMapUtilsProps['failedLabwareUtils']
   currentLabwareInfo: RunCurrentLabwareInfo[]
 }): RunCurrentLabwareOnDeck[] {
-  const { failedLabware } = failedLabwareUtils
+  const { pickUpTipLabware } = failedLabwareUtils
 
   return currentLabwareInfo.map(({ slotName, labwareDef, labwareLocation }) => {
-    const isLabwareMatch = getIsLabwareMatch(slotName, failedLabware)
+    const isLabwareMatch = getIsLabwareMatch(slotName, pickUpTipLabware)
 
     return {
       labwareLocation,

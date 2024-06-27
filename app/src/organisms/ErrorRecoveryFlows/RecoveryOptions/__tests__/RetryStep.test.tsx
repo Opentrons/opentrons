@@ -1,18 +1,14 @@
 import * as React from 'react'
-import { describe, it, vi, expect, beforeEach, afterEach } from 'vitest'
+import { vi, describe, it, expect, beforeEach } from 'vitest'
 import { screen, fireEvent, waitFor } from '@testing-library/react'
 
-import { mockRecoveryContentProps } from '../../__fixtures__'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
-import { RetryStep, RetryStepInfo } from '../RetryStep'
+import { mockRecoveryContentProps } from '../../__fixtures__'
+import { RetryStep } from '../RetryStep'
 import { RECOVERY_MAP } from '../../constants'
-import { SelectRecoveryOption } from '../SelectRecoveryOption'
 
 import type { Mock } from 'vitest'
-
-vi.mock('../../../../molecules/Command')
-vi.mock('../SelectRecoveryOption')
 
 const render = (props: React.ComponentProps<typeof RetryStep>) => {
   return renderWithProviders(<RetryStep {...props} />, {
@@ -20,114 +16,87 @@ const render = (props: React.ComponentProps<typeof RetryStep>) => {
   })[0]
 }
 
-const renderRetryStepInfo = (
-  props: React.ComponentProps<typeof RetryStepInfo>
-) => {
-  return renderWithProviders(<RetryStepInfo {...props} />, {
-    i18nInstance: i18n,
-  })[0]
-}
-
-describe('RetryStep', () => {
+describe('RecoveryFooterButtons', () => {
+  const { RETRY_FAILED_COMMAND, ROBOT_RETRYING_STEP } = RECOVERY_MAP
   let props: React.ComponentProps<typeof RetryStep>
+  let mockGoBackPrevStep: Mock
 
   beforeEach(() => {
-    props = {
-      ...mockRecoveryContentProps,
-    }
-
-    vi.mocked(SelectRecoveryOption).mockReturnValue(
-      <div>MOCK_SELECT_RECOVERY_OPTION</div>
-    )
-  })
-
-  afterEach(() => {
-    vi.resetAllMocks()
-  })
-
-  it(`renders RetryStepInfo when step is ${RECOVERY_MAP.RETRY_FAILED_COMMAND.STEPS.CONFIRM_RETRY}`, () => {
-    props = {
-      ...props,
-      recoveryMap: {
-        ...props.recoveryMap,
-        step: RECOVERY_MAP.RETRY_FAILED_COMMAND.STEPS.CONFIRM_RETRY,
-      },
-    }
-    render(props)
-    screen.getByText('Retry step')
-  })
-
-  it('renders SelectRecoveryOption as a fallback', () => {
-    props = {
-      ...props,
-      recoveryMap: {
-        ...props.recoveryMap,
-        step: 'UNKNOWN_STEP',
-      },
-    }
-    render(props)
-    screen.getByText('MOCK_SELECT_RECOVERY_OPTION')
-  })
-})
-
-describe('RetryStepInfo', () => {
-  let props: React.ComponentProps<typeof RetryStepInfo>
-  let mockSetRobotInMotion: Mock
-  let mockRetryFailedCommand: Mock
-  let mockResumeRun: Mock
-
-  beforeEach(() => {
-    mockSetRobotInMotion = vi.fn(() => Promise.resolve())
-    mockRetryFailedCommand = vi.fn(() => Promise.resolve())
-    mockResumeRun = vi.fn()
+    mockGoBackPrevStep = vi.fn()
+    const mockRouteUpdateActions = { goBackPrevStep: mockGoBackPrevStep } as any
 
     props = {
       ...mockRecoveryContentProps,
-      routeUpdateActions: {
-        setRobotInMotion: mockSetRobotInMotion,
-      } as any,
-      recoveryCommands: {
-        retryFailedCommand: mockRetryFailedCommand,
-        resumeRun: mockResumeRun,
-      } as any,
+      routeUpdateActions: mockRouteUpdateActions,
+      recoveryMap: {
+        route: RETRY_FAILED_COMMAND.ROUTE,
+        step: RETRY_FAILED_COMMAND.STEPS.CONFIRM_RETRY,
+      },
     }
   })
 
-  afterEach(() => {
-    vi.resetAllMocks()
-  })
+  it('renders appropriate copy and click behavior', async () => {
+    render(props)
 
-  it('renders the component with the correct text', () => {
-    renderRetryStepInfo(props)
-    screen.getByText('Retry step')
+    screen.getByText('Are you sure you want to resume?')
     screen.queryByText(
-      'First, take any necessary actions to prepare the robot to retry the failed step.'
+      'The run will resume from the point at which the error occurred.'
     )
-    screen.queryByText('Then, close the robot door before proceeding.')
+
+    const secondaryBtn = screen.getByRole('button', { name: 'Go back' })
+
+    fireEvent.click(secondaryBtn)
+
+    expect(mockGoBackPrevStep).toHaveBeenCalled()
   })
 
-  it('calls the correct routeUpdateActions and recoveryCommands in the correct order when the primary button is clicked', async () => {
-    renderRetryStepInfo(props)
-    fireEvent.click(screen.getByRole('button', { name: 'Retry now' }))
+  it('should call commands in the correct order for the primaryOnClick callback', async () => {
+    const setRobotInMotionMock = vi.fn(() => Promise.resolve())
+    const retryFailedCommandMock = vi.fn(() => Promise.resolve())
+    const resumeRunMock = vi.fn()
+
+    const mockRecoveryCommands = {
+      retryFailedCommand: retryFailedCommandMock,
+      resumeRun: resumeRunMock,
+    } as any
+
+    const mockRouteUpdateActions = {
+      setRobotInMotion: setRobotInMotionMock,
+    } as any
+
+    render({
+      ...props,
+      recoveryCommands: mockRecoveryCommands,
+      routeUpdateActions: mockRouteUpdateActions,
+    })
+
+    const primaryBtn = screen.getByRole('button', { name: 'Confirm' })
+    fireEvent.click(primaryBtn)
 
     await waitFor(() => {
-      expect(mockSetRobotInMotion).toHaveBeenCalledWith(
+      expect(setRobotInMotionMock).toHaveBeenCalledTimes(1)
+    })
+    await waitFor(() => {
+      expect(setRobotInMotionMock).toHaveBeenCalledWith(
         true,
-        RECOVERY_MAP.ROBOT_RETRYING_STEP.ROUTE
+        ROBOT_RETRYING_STEP.ROUTE
       )
     })
     await waitFor(() => {
-      expect(mockRetryFailedCommand).toHaveBeenCalled()
+      expect(retryFailedCommandMock).toHaveBeenCalledTimes(1)
     })
     await waitFor(() => {
-      expect(mockResumeRun).toHaveBeenCalled()
+      expect(resumeRunMock).toHaveBeenCalledTimes(1)
     })
 
-    expect(mockSetRobotInMotion.mock.invocationCallOrder[0]).toBeLessThan(
-      mockRetryFailedCommand.mock.invocationCallOrder[0]
+    expect(setRobotInMotionMock.mock.invocationCallOrder[0]).toBeLessThan(
+      retryFailedCommandMock.mock.invocationCallOrder[0]
     )
-    expect(mockRetryFailedCommand.mock.invocationCallOrder[0]).toBeLessThan(
-      mockResumeRun.mock.invocationCallOrder[0]
-    )
+
+    await waitFor(() => {
+      expect(retryFailedCommandMock.mock.invocationCallOrder[0]).toBeLessThan(
+        resumeRunMock.mock.invocationCallOrder[0]
+      )
+    })
   })
 })

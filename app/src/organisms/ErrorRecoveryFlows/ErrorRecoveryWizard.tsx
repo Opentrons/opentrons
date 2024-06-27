@@ -1,9 +1,11 @@
 import * as React from 'react'
 import { createPortal } from 'react-dom'
+import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
 import { StyledText } from '@opentrons/components'
 
+import { getIsOnDevice } from '../../redux/config'
 import { getTopPortalEl } from '../../App/portal'
 import { InterventionModal } from '../../molecules/InterventionModal'
 import { BeforeBeginning } from './BeforeBeginning'
@@ -14,13 +16,7 @@ import {
   CancelRun,
   RetryNewTips,
   ManageTips,
-  FillWellAndSkip,
-  RetrySameTips,
-  SkipStepSameTips,
-  SkipStepNewTips,
-  IgnoreErrorSkipStep,
 } from './RecoveryOptions'
-import { useErrorDetailsModal, ErrorDetailsModal } from './shared'
 import { RecoveryInProgress } from './RecoveryInProgress'
 import { getErrorKind } from './utils'
 import { RECOVERY_MAP } from './constants'
@@ -59,7 +55,6 @@ export function useERWizard(): UseERWizardResult {
 export type ErrorRecoveryWizardProps = ErrorRecoveryFlowsProps &
   ERUtilsResults & {
     robotType: RobotType
-    isOnDevice: boolean
   }
 
 export function ErrorRecoveryWizard(
@@ -72,6 +67,7 @@ export function ErrorRecoveryWizard(
     routeUpdateActions,
   } = props
   const errorKind = getErrorKind(failedCommand?.error?.errorType)
+  const isOnDevice = useSelector(getIsOnDevice)
 
   useInitialPipetteHome({
     hasLaunchedRecovery,
@@ -79,14 +75,19 @@ export function ErrorRecoveryWizard(
     routeUpdateActions,
   })
 
-  return <ErrorRecoveryComponent errorKind={errorKind} {...props} />
+  return (
+    <ErrorRecoveryComponent
+      errorKind={errorKind}
+      isOnDevice={isOnDevice}
+      {...props}
+    />
+  )
 }
 
 export function ErrorRecoveryComponent(
   props: RecoveryContentProps
-): JSX.Element | null {
+): JSX.Element {
   const { t } = useTranslation('error_recovery')
-  const { showModal, toggleModal } = useErrorDetailsModal()
 
   const buildTitleHeading = (): JSX.Element => {
     const titleText = props.hasLaunchedRecovery
@@ -99,25 +100,17 @@ export function ErrorRecoveryComponent(
     <StyledText as="pSemiBold">{t('view_error_details')}</StyledText>
   )
 
-  if (props.isOnDevice) {
-    return createPortal(
-      <InterventionModal
-        iconName="information"
-        iconHeading={buildIconHeading()}
-        titleHeading={buildTitleHeading()}
-        iconHeadingOnClick={toggleModal}
-        type="error"
-      >
-        {showModal ? (
-          <ErrorDetailsModal {...props} toggleModal={toggleModal} />
-        ) : null}
-        <ErrorRecoveryContent {...props} />
-      </InterventionModal>,
-      getTopPortalEl()
-    )
-  } else {
-    return null
-  }
+  return createPortal(
+    <InterventionModal
+      iconName="information"
+      iconHeading={buildIconHeading()}
+      titleHeading={buildTitleHeading()}
+      type="error"
+    >
+      <ErrorRecoveryContent {...props} />
+    </InterventionModal>,
+    getTopPortalEl()
+  )
 }
 
 export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
@@ -153,26 +146,6 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
     return <RetryNewTips {...props} />
   }
 
-  const buildRetrySameTips = (): JSX.Element => {
-    return <RetrySameTips {...props} />
-  }
-
-  const buildFillWellAndSkip = (): JSX.Element => {
-    return <FillWellAndSkip {...props} />
-  }
-
-  const buildSkipStepSameTips = (): JSX.Element => {
-    return <SkipStepSameTips {...props} />
-  }
-
-  const buildSkipStepNewTips = (): JSX.Element => {
-    return <SkipStepNewTips {...props} />
-  }
-
-  const buildIgnoreErrorSkipStep = (): JSX.Element => {
-    return <IgnoreErrorSkipStep {...props} />
-  }
-
   switch (props.recoveryMap.route) {
     case RECOVERY_MAP.BEFORE_BEGINNING.ROUTE:
       return buildBeforeBeginning()
@@ -188,22 +161,11 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
       return buildManageTips()
     case RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE:
       return buildRetryNewTips()
-    case RECOVERY_MAP.RETRY_SAME_TIPS.ROUTE:
-      return buildRetrySameTips()
-    case RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.ROUTE:
-      return buildFillWellAndSkip()
-    case RECOVERY_MAP.SKIP_STEP_WITH_SAME_TIPS.ROUTE:
-      return buildSkipStepSameTips()
-    case RECOVERY_MAP.SKIP_STEP_WITH_NEW_TIPS.ROUTE:
-      return buildSkipStepNewTips()
-    case RECOVERY_MAP.IGNORE_AND_SKIP.ROUTE:
-      return buildIgnoreErrorSkipStep()
     case RECOVERY_MAP.ROBOT_IN_MOTION.ROUTE:
     case RECOVERY_MAP.ROBOT_RESUMING.ROUTE:
     case RECOVERY_MAP.ROBOT_RETRYING_STEP.ROUTE:
     case RECOVERY_MAP.ROBOT_CANCELING.ROUTE:
     case RECOVERY_MAP.ROBOT_PICKING_UP_TIPS.ROUTE:
-    case RECOVERY_MAP.ROBOT_SKIPPING_STEP.ROUTE:
       return buildRecoveryInProgress()
     default:
       return buildSelectRecoveryOption()

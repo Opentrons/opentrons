@@ -44,7 +44,6 @@ import {
   getApplyHistoricOffsets,
   getPinnedProtocolIds,
   updateConfigValue,
-  useFeatureFlag,
 } from '../../redux/config'
 import { useOffsetCandidatesForAnalysis } from '../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import {
@@ -312,14 +311,15 @@ export function ProtocolDetails(): JSX.Element | null {
     'protocol_info',
     'shared',
   ])
-  const enableCsvFile = useFeatureFlag('enableCsvFile')
   const { protocolId } = useParams<OnDeviceRouteParams>()
   const {
     missingProtocolHardware,
     conflictedSlots,
   } = useMissingProtocolHardware(protocolId)
-  let chipText = useHardwareStatusText(missingProtocolHardware, conflictedSlots)
-
+  const chipText = useHardwareStatusText(
+    missingProtocolHardware,
+    conflictedSlots
+  )
   const runTimeParameters = useRunTimeParameters(protocolId)
   const dispatch = useDispatch<Dispatch>()
   const history = useHistory()
@@ -380,16 +380,6 @@ export function ProtocolDetails(): JSX.Element | null {
       })
     },
   })
-
-  const isRequiredCsv =
-    mostRecentAnalysis?.result === 'parameter-value-required'
-  if (enableCsvFile && isRequiredCsv) {
-    if (chipText === 'Ready to run') {
-      chipText = i18n.format(t('requires_csv'), 'capitalize')
-    } else {
-      chipText = `${chipText} & ${t('requires_csv')}`
-    }
-  }
 
   const handlePinClick = (): void => {
     if (!pinned) {

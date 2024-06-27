@@ -15,19 +15,18 @@ import { ODD_SECTION_TITLE_STYLE, RECOVERY_MAP } from '../constants'
 import { RecoveryFooterButtons, RecoverySingleColumnContent } from '../shared'
 import { DropTipWizardFlows } from '../../DropTipWizardFlows'
 import { DT_ROUTES } from '../../DropTipWizardFlows/constants'
-import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 import type { PipetteWithTip } from '../../DropTipWizardFlows'
 import type { RecoveryContentProps } from '../types'
 import type { FixitCommandTypeUtils } from '../../DropTipWizardFlows/types'
 
 // The Drop Tip flow entry point. Includes entry from SelectRecoveryOption and CancelRun.
-export function ManageTips(props: RecoveryContentProps): JSX.Element {
+export function ManageTips(props: RecoveryContentProps): JSX.Element | null {
   const { recoveryMap } = props
 
-  const buildContent = (): JSX.Element => {
+  const buildContent = (): JSX.Element | null => {
     const { DROP_TIP_FLOWS } = RECOVERY_MAP
-    const { step, route } = recoveryMap
+    const { step } = recoveryMap
 
     switch (step) {
       case DROP_TIP_FLOWS.STEPS.BEGIN_REMOVAL:
@@ -37,8 +36,7 @@ export function ManageTips(props: RecoveryContentProps): JSX.Element {
       case DROP_TIP_FLOWS.STEPS.CHOOSE_TIP_DROP:
         return <DropTipFlowsContainer {...props} />
       default:
-        console.warn(`${step} in ${route} not explicitly handled. Rerouting.`)
-        return <SelectRecoveryOption {...props} />
+        return <DropTipFlowsContainer {...props} />
     }
   }
 
@@ -122,16 +120,13 @@ export function BeginRemoval({
   }
 }
 
-function DropTipFlowsContainer(
-  props: RecoveryContentProps
-): JSX.Element | null {
+function DropTipFlowsContainer(props: RecoveryContentProps): JSX.Element {
   const {
     tipStatusUtils,
     routeUpdateActions,
     recoveryCommands,
     isFlex,
     currentRecoveryOptionUtils,
-    isOnDevice,
   } = props
   const { DROP_TIP_FLOWS, ROBOT_CANCELING, RETRY_NEW_TIPS } = RECOVERY_MAP
   const { proceedToRouteAndStep, setRobotInMotion } = routeUpdateActions
@@ -164,23 +159,17 @@ function DropTipFlowsContainer(
     void proceedToRouteAndStep(DROP_TIP_FLOWS.ROUTE)
   }
 
-  const fixitCommandTypeUtils = useDropTipFlowUtils(props)
-
-  if (isOnDevice) {
-    return (
-      <RecoverySingleColumnContent>
-        <DropTipWizardFlows
-          robotType={isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE}
-          closeFlow={onCloseFlow}
-          mount={mount}
-          instrumentModelSpecs={specs}
-          fixitCommandTypeUtils={fixitCommandTypeUtils}
-        />
-      </RecoverySingleColumnContent>
-    )
-  } else {
-    return null
-  }
+  return (
+    <RecoverySingleColumnContent>
+      <DropTipWizardFlows
+        robotType={isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE}
+        closeFlow={onCloseFlow}
+        mount={mount}
+        instrumentModelSpecs={specs}
+        fixitCommandTypeUtils={useDropTipFlowUtils(props)}
+      />
+    </RecoverySingleColumnContent>
+  )
 }
 
 // Builds the overrides injected into DT Wiz.

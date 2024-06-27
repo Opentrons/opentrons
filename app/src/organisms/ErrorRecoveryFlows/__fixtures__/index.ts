@@ -5,7 +5,6 @@ import {
 } from '@opentrons/shared-data'
 
 import { RECOVERY_MAP } from '../constants'
-import { mockRobotSideAnalysis } from '../../../molecules/Command/__fixtures__'
 
 import type { LoadedLabware, LabwareDefinition2 } from '@opentrons/shared-data'
 import type { FailedCommand, RecoveryContentProps } from '../types'
@@ -74,6 +73,4 @@ export const mockRecoveryContentProps: RecoveryContentProps = {
   trackExternalMap: () => null,
   hasLaunchedRecovery: true,
   getRecoveryOptionCopy: () => 'MOCK_COPY',
-  commandAfterFailedCommand:
-    mockRobotSideAnalysis.commands[mockRobotSideAnalysis.commands.length - 1],
 }

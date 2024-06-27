@@ -4,21 +4,9 @@ import { SPACING, TYPOGRAPHY } from '@opentrons/components'
 
 import type { StepOrder } from './types'
 
-// TODO(jh, 06-18-24): Add the correct errorTypes for these errors when they are available.
-// Error types of "defined" errors, those handled explicitly by Error Recovery.
-export const DEFINED_ERROR_TYPES = {
-  NO_LIQUID_DETECTED: 'NO_FLUIDS_OH_NO',
-  PIPETTE_COLLISION: 'AAAAAHHHHHHHHH',
-  OVERPRESSURE_ASPIRATION: 'overpressure',
-  OVERPRESSURE_DISPENSING: 'OVERPRESSURE_DISPENSING',
-}
-
 export const ERROR_KINDS = {
   GENERAL_ERROR: 'GENERAL_ERROR',
-  NO_LIQUID_DETECTED: 'NO_LIQUID_DETECTED',
-  OVERPRESSURE_PREPARE_TO_ASPIRATE: 'OVERPRESSURE_PREPARE_TO_ASPIRATE',
   OVERPRESSURE_WHILE_ASPIRATING: 'OVERPRESSURE_WHILE_ASPIRATING',
-  OVERPRESSURE_WHILE_DISPENSING: 'OVERPRESSURE_WHILE_DISPENSING',
 } as const
 
 // TODO(jh, 05-09-24): Refactor to a directed graph. EXEC-430.
@@ -30,6 +18,10 @@ export const RECOVERY_MAP = {
     STEPS: {
       RECOVERY_DESCRIPTION: 'recovery-description',
     },
+  },
+  CANCEL_RUN: {
+    ROUTE: 'cancel-run',
+    STEPS: { CONFIRM_CANCEL: 'confirm-cancel' },
   },
   DROP_TIP_FLOWS: {
     ROUTE: 'drop-tip',
@@ -47,6 +39,21 @@ export const RECOVERY_MAP = {
       DROP_TIP_BLOWOUT_FAILED: 'drop-tip-blowout-failed',
       DROP_TIP_TIP_DROP_FAILED: 'drop-tip-tip-drop-failed',
       DROP_TIP_GENERAL_ERROR: 'drop-tip-general-error',
+    },
+  },
+  IGNORE_AND_RESUME: { ROUTE: 'ignore-and-resume', STEPS: {} },
+  REFILL_AND_RESUME: { ROUTE: 'refill-and-resume', STEPS: {} },
+  RETRY_FAILED_COMMAND: {
+    ROUTE: 'retry-failed-command',
+    STEPS: { CONFIRM_RETRY: 'confirm-retry' },
+  },
+  RETRY_NEW_TIPS: {
+    ROUTE: 'retry-new-tips',
+    STEPS: {
+      DROP_TIPS: 'drop-tips',
+      REPLACE_TIPS: 'replace-tips',
+      SELECT_TIPS: 'select-tips',
+      RETRY: 'retry',
     },
   },
   ROBOT_CANCELING: {
@@ -79,63 +86,9 @@ export const RECOVERY_MAP = {
       RETRYING: 'retrying',
     },
   },
-  ROBOT_SKIPPING_STEP: {
-    ROUTE: 'robot-skipping-to-next-step',
-    STEPS: {
-      SKIPPING: 'skipping',
-    },
-  },
-  // Recovery options below
   OPTION_SELECTION: {
     ROUTE: 'option-selection',
     STEPS: { SELECT: 'select' },
-  },
-  CANCEL_RUN: {
-    ROUTE: 'cancel-run',
-    STEPS: { CONFIRM_CANCEL: 'confirm-cancel' },
-  },
-  IGNORE_AND_SKIP: {
-    ROUTE: 'ignore-and-skip-step',
-    STEPS: { SELECT_IGNORE_KIND: 'select-ignore' },
-  },
-  FILL_MANUALLY_AND_SKIP: {
-    ROUTE: 'manually-fill-well-and-skip',
-    STEPS: { MANUALLY_FILL: 'manually-fill', SKIP: 'skip' },
-  },
-  REFILL_AND_RESUME: { ROUTE: 'refill-and-resume', STEPS: {} },
-  RETRY_FAILED_COMMAND: {
-    ROUTE: 'retry-failed-command',
-    STEPS: { CONFIRM_RETRY: 'confirm-retry' },
-  },
-  RETRY_NEW_TIPS: {
-    ROUTE: 'retry-new-tips',
-    STEPS: {
-      DROP_TIPS: 'drop-tips',
-      REPLACE_TIPS: 'replace-tips',
-      SELECT_TIPS: 'select-tips',
-      RETRY: 'retry',
-    },
-  },
-  RETRY_SAME_TIPS: {
-    ROUTE: 'retry-same-tips',
-    STEPS: {
-      RETRY: 'retry',
-    },
-  },
-  SKIP_STEP_WITH_NEW_TIPS: {
-    ROUTE: 'skip-to-next-step-new-tips',
-    STEPS: {
-      DROP_TIPS: 'drop-tips',
-      REPLACE_TIPS: 'replace-tips',
-      SELECT_TIPS: 'select-tips',
-      SKIP: 'skip',
-    },
-  },
-  SKIP_STEP_WITH_SAME_TIPS: {
-    ROUTE: 'skip-to-next-step-same-tips',
-    STEPS: {
-      SKIP: 'skip',
-    },
   },
 } as const
 
@@ -148,17 +101,12 @@ const {
   ROBOT_RESUMING,
   ROBOT_IN_MOTION,
   ROBOT_RETRYING_STEP,
-  ROBOT_SKIPPING_STEP,
   DROP_TIP_FLOWS,
   REFILL_AND_RESUME,
-  IGNORE_AND_SKIP,
+  IGNORE_AND_RESUME,
   CANCEL_RUN,
   RETRY_NEW_TIPS,
-  RETRY_SAME_TIPS,
   ERROR_WHILE_RECOVERING,
-  FILL_MANUALLY_AND_SKIP,
-  SKIP_STEP_WITH_NEW_TIPS,
-  SKIP_STEP_WITH_SAME_TIPS,
 } = RECOVERY_MAP
 
 // The deterministic ordering of steps for a given route.
@@ -172,20 +120,11 @@ export const STEP_ORDER: StepOrder = {
     RETRY_NEW_TIPS.STEPS.SELECT_TIPS,
     RETRY_NEW_TIPS.STEPS.RETRY,
   ],
-  [RETRY_SAME_TIPS.ROUTE]: [RETRY_SAME_TIPS.STEPS.RETRY],
-  [SKIP_STEP_WITH_NEW_TIPS.ROUTE]: [
-    SKIP_STEP_WITH_NEW_TIPS.STEPS.DROP_TIPS,
-    SKIP_STEP_WITH_NEW_TIPS.STEPS.REPLACE_TIPS,
-    SKIP_STEP_WITH_NEW_TIPS.STEPS.SELECT_TIPS,
-    SKIP_STEP_WITH_NEW_TIPS.STEPS.SKIP,
-  ],
-  [SKIP_STEP_WITH_SAME_TIPS.ROUTE]: [SKIP_STEP_WITH_SAME_TIPS.STEPS.SKIP],
   [ROBOT_CANCELING.ROUTE]: [ROBOT_CANCELING.STEPS.CANCELING],
   [ROBOT_IN_MOTION.ROUTE]: [ROBOT_IN_MOTION.STEPS.IN_MOTION],
   [ROBOT_PICKING_UP_TIPS.ROUTE]: [ROBOT_PICKING_UP_TIPS.STEPS.PICKING_UP_TIPS],
   [ROBOT_RESUMING.ROUTE]: [ROBOT_RESUMING.STEPS.RESUMING],
   [ROBOT_RETRYING_STEP.ROUTE]: [ROBOT_RETRYING_STEP.STEPS.RETRYING],
-  [ROBOT_SKIPPING_STEP.ROUTE]: [ROBOT_SKIPPING_STEP.STEPS.SKIPPING],
   [DROP_TIP_FLOWS.ROUTE]: [
     DROP_TIP_FLOWS.STEPS.BEGIN_REMOVAL,
     DROP_TIP_FLOWS.STEPS.BEFORE_BEGINNING,
@@ -193,12 +132,8 @@ export const STEP_ORDER: StepOrder = {
     DROP_TIP_FLOWS.STEPS.CHOOSE_TIP_DROP,
   ],
   [REFILL_AND_RESUME.ROUTE]: [],
-  [IGNORE_AND_SKIP.ROUTE]: [IGNORE_AND_SKIP.STEPS.SELECT_IGNORE_KIND],
+  [IGNORE_AND_RESUME.ROUTE]: [],
   [CANCEL_RUN.ROUTE]: [CANCEL_RUN.STEPS.CONFIRM_CANCEL],
-  [FILL_MANUALLY_AND_SKIP.ROUTE]: [
-    FILL_MANUALLY_AND_SKIP.STEPS.MANUALLY_FILL,
-    FILL_MANUALLY_AND_SKIP.STEPS.SKIP,
-  ],
   [ERROR_WHILE_RECOVERING.ROUTE]: [
     ERROR_WHILE_RECOVERING.STEPS.RECOVERY_ACTION_FAILED,
     ERROR_WHILE_RECOVERING.STEPS.DROP_TIP_GENERAL_ERROR,
@@ -212,6 +147,38 @@ export const INVALID = 'INVALID' as const
 /**
  * Styling
  */
+
+// These colors are temp and will be removed as design does design things.
+export const NON_DESIGN_SANCTIONED_COLOR_1 = '#56FF00'
+export const NON_DESIGN_SANCTIONED_COLOR_2 = '#FF00EF'
+
+export const NON_SANCTIONED_RECOVERY_COLOR_STYLE_PRIMARY = css`
+  background-color: ${NON_DESIGN_SANCTIONED_COLOR_1};
+
+  &:active {
+    background-color: ${NON_DESIGN_SANCTIONED_COLOR_2};
+  }
+  &:hover {
+    background-color: ${NON_DESIGN_SANCTIONED_COLOR_1};
+  }
+  &:focus {
+    background-color: ${NON_DESIGN_SANCTIONED_COLOR_2};
+  }
+`
+
+export const NON_SANCTIONED_RECOVERY_COLOR_STYLE_SECONDARY = css`
+  background-color: ${NON_DESIGN_SANCTIONED_COLOR_2};
+
+  &:active {
+    background-color: ${NON_DESIGN_SANCTIONED_COLOR_2};
+  }
+  &:hover {
+    background-color: ${NON_DESIGN_SANCTIONED_COLOR_1};
+  }
+  &:focus {
+    background-color: ${NON_DESIGN_SANCTIONED_COLOR_2};
+  }
+`
 
 export const BODY_TEXT_STYLE = css`
   ${TYPOGRAPHY.bodyTextRegular};

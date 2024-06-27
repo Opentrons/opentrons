@@ -12,9 +12,6 @@ import {
   getRecoveryOptions,
   GENERAL_ERROR_OPTIONS,
   OVERPRESSURE_WHILE_ASPIRATING_OPTIONS,
-  OVERPRESSURE_PREPARE_TO_ASPIRATE,
-  OVERPRESSURE_WHILE_DISPENSING_OPTIONS,
-  NO_LIQUID_DETECTED_OPTIONS,
 } from '../SelectRecoveryOption'
 import { RECOVERY_MAP, ERROR_KINDS } from '../../constants'
 
@@ -74,15 +71,6 @@ describe('SelectRecoveryOption', () => {
     when(mockGetRecoveryOptionCopy)
       .calledWith(RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE)
       .thenReturn('Retry with new tips')
-    when(mockGetRecoveryOptionCopy)
-      .calledWith(RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.ROUTE)
-      .thenReturn('Manually fill well and skip to next step')
-    when(mockGetRecoveryOptionCopy)
-      .calledWith(RECOVERY_MAP.RETRY_SAME_TIPS.ROUTE)
-      .thenReturn('Retry with same tips')
-    when(mockGetRecoveryOptionCopy)
-      .calledWith(RECOVERY_MAP.SKIP_STEP_WITH_SAME_TIPS.ROUTE)
-      .thenReturn('Skip to next step with same tips')
   })
 
   it('sets the selected recovery option when clicking continue', () => {
@@ -138,75 +126,6 @@ describe('SelectRecoveryOption', () => {
 
     expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(RETRY_NEW_TIPS.ROUTE)
   })
-
-  it('renders appropriate "No liquid detected" copy and click behavior', () => {
-    props = {
-      ...props,
-      errorKind: ERROR_KINDS.NO_LIQUID_DETECTED,
-    }
-
-    renderSelectRecoveryOption(props)
-
-    screen.getByText('Choose a recovery action')
-
-    const fillManuallyAndSkip = screen.getByRole('label', {
-      name: 'Manually fill well and skip to next step',
-    })
-    const continueBtn = screen.getByRole('button', { name: 'Continue' })
-
-    fireEvent.click(fillManuallyAndSkip)
-    fireEvent.click(continueBtn)
-
-    expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
-      RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.ROUTE
-    )
-  })
-
-  it('renders appropriate "Overpressure prepare to aspirate" copy and click behavior', () => {
-    props = {
-      ...props,
-      errorKind: ERROR_KINDS.OVERPRESSURE_PREPARE_TO_ASPIRATE,
-    }
-
-    renderSelectRecoveryOption(props)
-
-    screen.getByText('Choose a recovery action')
-
-    const retrySameTips = screen.getByRole('label', {
-      name: 'Retry with same tips',
-    })
-    const continueBtn = screen.getByRole('button', { name: 'Continue' })
-
-    fireEvent.click(retrySameTips)
-    fireEvent.click(continueBtn)
-
-    expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
-      RECOVERY_MAP.RETRY_SAME_TIPS.ROUTE
-    )
-  })
-
-  it('renders appropriate "Overpressure while dispensing" copy and click behavior', () => {
-    props = {
-      ...props,
-      errorKind: ERROR_KINDS.OVERPRESSURE_WHILE_DISPENSING,
-    }
-
-    renderSelectRecoveryOption(props)
-
-    screen.getByText('Choose a recovery action')
-
-    const skipStepWithSameTips = screen.getByRole('label', {
-      name: 'Skip to next step with same tips',
-    })
-    const continueBtn = screen.getByRole('button', { name: 'Continue' })
-
-    fireEvent.click(skipStepWithSameTips)
-    fireEvent.click(continueBtn)
-
-    expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
-      RECOVERY_MAP.SKIP_STEP_WITH_SAME_TIPS.ROUTE
-    )
-  })
 })
 
 describe('RecoveryOptions', () => {
@@ -234,21 +153,6 @@ describe('RecoveryOptions', () => {
     when(mockGetRecoveryOptionCopy)
       .calledWith(RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE)
       .thenReturn('Retry with new tips')
-    when(mockGetRecoveryOptionCopy)
-      .calledWith(RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.ROUTE)
-      .thenReturn('Manually fill well and skip to next step')
-    when(mockGetRecoveryOptionCopy)
-      .calledWith(RECOVERY_MAP.RETRY_SAME_TIPS.ROUTE)
-      .thenReturn('Retry with same tips')
-    when(mockGetRecoveryOptionCopy)
-      .calledWith(RECOVERY_MAP.SKIP_STEP_WITH_SAME_TIPS.ROUTE)
-      .thenReturn('Skip to next step with same tips')
-    when(mockGetRecoveryOptionCopy)
-      .calledWith(RECOVERY_MAP.SKIP_STEP_WITH_NEW_TIPS.ROUTE)
-      .thenReturn('Skip to next step with new tips')
-    when(mockGetRecoveryOptionCopy)
-      .calledWith(RECOVERY_MAP.IGNORE_AND_SKIP.ROUTE)
-      .thenReturn('Ignore error and skip to next step')
   })
 
   it('renders valid recovery options for a general error errorKind', () => {
@@ -279,47 +183,6 @@ describe('RecoveryOptions', () => {
       RECOVERY_MAP.CANCEL_RUN.ROUTE
     )
   })
-
-  it(`renders valid recovery options for a ${ERROR_KINDS.NO_LIQUID_DETECTED} errorKind`, () => {
-    props = {
-      ...props,
-      validRecoveryOptions: NO_LIQUID_DETECTED_OPTIONS,
-    }
-
-    renderRecoveryOptions(props)
-
-    screen.getByRole('label', {
-      name: 'Manually fill well and skip to next step',
-    })
-    screen.getByRole('label', { name: 'Ignore error and skip to next step' })
-    screen.getByRole('label', { name: 'Cancel run' })
-  })
-
-  it(`renders valid recovery options for a ${ERROR_KINDS.OVERPRESSURE_PREPARE_TO_ASPIRATE} errorKind`, () => {
-    props = {
-      ...props,
-      validRecoveryOptions: OVERPRESSURE_PREPARE_TO_ASPIRATE,
-    }
-
-    renderRecoveryOptions(props)
-
-    screen.getByRole('label', { name: 'Retry with new tips' })
-    screen.getByRole('label', { name: 'Retry with same tips' })
-    screen.getByRole('label', { name: 'Cancel run' })
-  })
-
-  it(`renders valid recovery options for a ${ERROR_KINDS.OVERPRESSURE_WHILE_DISPENSING} errorKind`, () => {
-    props = {
-      ...props,
-      validRecoveryOptions: OVERPRESSURE_WHILE_DISPENSING_OPTIONS,
-    }
-
-    renderRecoveryOptions(props)
-
-    screen.getByRole('label', { name: 'Skip to next step with same tips' })
-    screen.getByRole('label', { name: 'Skip to next step with new tips' })
-    screen.getByRole('label', { name: 'Cancel run' })
-  })
 })
 
 describe('getRecoveryOptions', () => {
@@ -333,30 +196,5 @@ describe('getRecoveryOptions', () => {
       ERROR_KINDS.OVERPRESSURE_WHILE_ASPIRATING
     )
     expect(generalErrorOptions).toBe(OVERPRESSURE_WHILE_ASPIRATING_OPTIONS)
-  })
-
-  it(`returns valid options when the errorKind is ${ERROR_KINDS.NO_LIQUID_DETECTED}`, () => {
-    const noLiquidDetectedOptions = getRecoveryOptions(
-      ERROR_KINDS.NO_LIQUID_DETECTED
-    )
-    expect(noLiquidDetectedOptions).toBe(NO_LIQUID_DETECTED_OPTIONS)
-  })
-
-  it(`returns valid options when the errorKind is ${ERROR_KINDS.OVERPRESSURE_PREPARE_TO_ASPIRATE}`, () => {
-    const overpressurePrepareToAspirateOptions = getRecoveryOptions(
-      ERROR_KINDS.OVERPRESSURE_PREPARE_TO_ASPIRATE
-    )
-    expect(overpressurePrepareToAspirateOptions).toBe(
-      OVERPRESSURE_PREPARE_TO_ASPIRATE
-    )
-  })
-
-  it(`returns valid options when the errorKind is ${ERROR_KINDS.OVERPRESSURE_WHILE_DISPENSING}`, () => {
-    const overpressureWhileDispensingOptions = getRecoveryOptions(
-      ERROR_KINDS.OVERPRESSURE_WHILE_DISPENSING
-    )
-    expect(overpressureWhileDispensingOptions).toBe(
-      OVERPRESSURE_WHILE_DISPENSING_OPTIONS
-    )
   })
 })

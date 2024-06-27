@@ -429,7 +429,7 @@ export function ProtocolDetails(
               width="100%"
             >
               {analysisStatus !== 'loading' &&
-              mostRecentAnalysis?.result === 'parameter-value-required' ? (
+              mostRecentAnalysis?.result === 'file-required' ? (
                 <ProtocolStatusBanner />
               ) : null}
               {analysisStatus !== 'loading' &&

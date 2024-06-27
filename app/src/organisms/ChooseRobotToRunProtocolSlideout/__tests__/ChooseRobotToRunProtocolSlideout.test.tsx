@@ -19,6 +19,7 @@ import {
   getUnreachableRobots,
   startDiscovery,
 } from '../../../redux/discovery'
+import { useFeatureFlag } from '../../../redux/config'
 import { getRobotUpdateDisplayInfo } from '../../../redux/robot-update'
 import {
   mockConnectableRobot,
@@ -43,9 +44,11 @@ vi.mock('../../../organisms/RunTimeControl/hooks')
 vi.mock('../../../redux/discovery')
 vi.mock('../../../redux/robot-update')
 vi.mock('../../../redux/networking')
+vi.mock('../../../redux/config')
 vi.mock('../useCreateRunFromProtocol')
 vi.mock('../../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis')
 vi.mock('../../../resources/useNotifyDataReady')
+vi.mock('../../../redux/config')
 
 const render = (
   props: React.ComponentProps<typeof ChooseRobotToRunProtocolSlideout>
@@ -72,6 +75,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     mockTrackCreateProtocolRunEvent = vi.fn(
       () => new Promise(resolve => resolve({}))
     )
+    vi.mocked(useFeatureFlag).mockReturnValue(true)
     vi.mocked(getRobotUpdateDisplayInfo).mockReturnValue({
       autoUpdateAction: '',
       autoUpdateDisabledReason: null,

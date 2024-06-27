@@ -7,11 +7,8 @@ import { i18n } from '../../../../i18n'
 import { mockRecoveryContentProps } from '../../__fixtures__'
 import { CancelRun } from '../CancelRun'
 import { RECOVERY_MAP } from '../../constants'
-import { SelectRecoveryOption } from '../SelectRecoveryOption'
 
 import type { Mock } from 'vitest'
-
-vi.mock('../SelectRecoveryOption')
 
 const render = (props: React.ComponentProps<typeof CancelRun>) => {
   return renderWithProviders(<CancelRun {...props} />, {
@@ -49,17 +46,6 @@ describe('RecoveryFooterButtons', () => {
       } as any,
       recoveryCommands: { cancelRun: vi.fn() } as any,
     }
-
-    vi.mocked(SelectRecoveryOption).mockReturnValue(
-      <div>MOCK SELECT RECOVERY OPTION</div>
-    )
-  })
-
-  it('renders SelectRecoveryOption when the route is unknown', () => {
-    props = { ...props, recoveryMap: { ...props.recoveryMap, step: 'UNKNOWN' } }
-    render(props)
-
-    screen.getByText('MOCK SELECT RECOVERY OPTION')
   })
 
   it('renders appropriate copy and click behavior', async () => {

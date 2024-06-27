@@ -679,8 +679,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
         const missingAnalysisData =
           analysisStatus === 'error' || analysisStatus === 'stale'
         const requiresCsvRunTimeParameter =
-          storedProtocol.mostRecentAnalysis?.result ===
-          'parameter-value-required'
+          storedProtocol.mostRecentAnalysis?.result === 'file-required'
         return (
           <React.Fragment key={storedProtocol.protocolKey}>
             <Flex flexDirection={DIRECTION_COLUMN}>

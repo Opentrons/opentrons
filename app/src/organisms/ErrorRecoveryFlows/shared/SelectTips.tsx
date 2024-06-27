@@ -5,7 +5,7 @@ import { RECOVERY_MAP } from '../constants'
 import { RecoverySingleColumnContent } from './RecoverySingleColumnContent'
 import { TwoColumn } from '../../../molecules/InterventionModal'
 import { RecoveryFooterButtons } from './RecoveryFooterButtons'
-import { LeftColumnLabwareInfo } from './LeftColumnLabwareInfo'
+import { LeftColumnTipInfo } from './LeftColumnTipInfo'
 import { TipSelectionModal } from './TipSelectionModal'
 import { TipSelection } from './TipSelection'
 
@@ -50,11 +50,9 @@ export function SelectTips(props: RecoveryContentProps): JSX.Element | null {
         )}
         <RecoverySingleColumnContent>
           <TwoColumn>
-            <LeftColumnLabwareInfo
+            <LeftColumnTipInfo
               {...props}
               title={t('select_tip_pickup_location')}
-              moveType="refill"
-              bannerText={t('replace_tips_and_select_location')}
             />
             <TipSelection {...props} allowTipSelection={false} />
           </TwoColumn>
