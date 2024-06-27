@@ -3,39 +3,30 @@ name: Analyses Snapshot Test
 on:
   workflow_dispatch:
     inputs:
-      TARGET:
-        description: 'Target branch or tag'
+      ANALYSIS_REF:
+        description: 'Branch or tag that provides the analysis output at test runtime'
         required: true
         default: 'edge'
-      TEST_SOURCE:
-        description: 'Target for the test code'
+      SNAPSHOT_REF:
+        description: 'Branch or tag that provides the snapshot and test code at test runtime'
         required: true
         default: 'edge'
   schedule:
     - cron:  '26 7 * * *' # 7:26 AM UTC
-  pull_request:
-    paths:
-      - 'api/**'
-      - 'shared-data/**/*'
-      - '!shared-data/js/**'
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
 
 jobs:
   build-and-test:
     timeout-minutes: 15
     runs-on: ubuntu-latest
     env:
-      TARGET: ${{ github.event.inputs.TARGET || github.head_ref || 'edge' }}
-      TEST_SOURCE: ${{ github.event.inputs.TEST_SOURCE || github.head_ref || 'edge' }}
+      ANALYSIS_REF: ${{ github.event.inputs.ANALYSIS_REF || 'edge' }}
+      SNAPSHOT_REF: ${{ github.event.inputs.SNAPSHOT_REF || 'edge' }}
 
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v4
       with:
-        ref: ${{ env.TEST_SOURCE }}
+        ref: ${{ env.SNAPSHOT_REF }}
 
     - name: Docker Build
       working-directory: app-testing
@@ -63,32 +54,3 @@ jobs:
       with:
         name: test-report
         path: app-testing/results/
-
-    - name: Handle Test Failure
-      if: failure()
-      working-directory: app-testing
-      run: make snapshot-test-update
-
-    - name: Create Snapshot update Request
-      id: create-pull-request
-      if: failure()
-      uses: peter-evans/create-pull-request@v5
-      with:
-          commit-message: 'fix(app-testing): snapshot failure capture'
-          title: 'fix(app-testing): snapshot failure capture'
-          body: 'This PR is an automated snapshot update request. Please review the changes and merge if they are acceptable or find you bug and fix it.'
-          branch: 'app-testing/${{ env.TARGET }}-from-${{ env.TEST_SOURCE}}'
-          base: ${{ env.TEST_SOURCE}}
-
-    - name: Comment on PR
-      if: failure() && github.event_name == 'pull_request'
-      uses: actions/github-script@v7
-      with:
-        script: |
-          const message = 'A PR has been opened to address analyses snapshot changes. Please review the changes here: https://github.com/${{ github.repository }}/pull/${{ steps.create-pull-request.outputs.pull-request-number }}';
-          github.rest.issues.createComment({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            issue_number: context.issue.number,
-            body: message
-          });
