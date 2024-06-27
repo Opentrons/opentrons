@@ -14,8 +14,7 @@ This release adds support for the [Opentrons Flex HEPA/UV Module](https://opentr
 
 ### Bug Fixes
 
-- Fixed certain string runtime parameter values being interpreted as Boolean values.
-
+- Fixed certain string runtime parameter values being misinterpreted as an incorrect type.
 ---
 
 ## Opentrons Robot Software Changes in 7.3.1
