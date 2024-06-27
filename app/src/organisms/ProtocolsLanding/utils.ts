@@ -16,22 +16,20 @@ export function getAnalysisStatus(
 ): AnalysisStatus {
   if (isAnalyzing) {
     return 'loading'
-  } else if (
-    analysis != null &&
-    (analysis.liquids == null || analysis.runTimeParameters == null)
-  ) {
-    return 'stale'
-  } else if (analysis != null) {
-    if (analysis.result === 'parameter-value-required') {
-      return 'parameterRequired'
-    } else if (analysis.errors.length > 0) {
-      return 'error'
-    } else {
-      return 'complete'
-    }
-  } else {
+  }
+  if (analysis == null || analysis === undefined) {
     return 'missing'
   }
+  if (analysis.liquids == null || analysis.runTimeParameters == null) {
+    return 'stale'
+  }
+  if (analysis.result === 'parameter-value-required') {
+    return 'parameterRequired'
+  }
+  if (analysis.errors.length > 0) {
+    return 'error'
+  }
+  return 'complete'
 }
 
 export function getProtocolDisplayName(

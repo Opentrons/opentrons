@@ -433,9 +433,7 @@ export function ProtocolDetails(
               mostRecentAnalysis?.result === 'parameter-value-required' ? (
                 <ProtocolStatusBanner />
               ) : null}
-              {analysisStatus !== 'loading' &&
-              mostRecentAnalysis != null &&
-              analysisStatus === 'error' ? (
+              {mostRecentAnalysis != null && analysisStatus === 'error' ? (
                 <ProtocolAnalysisFailure
                   protocolKey={protocolKey}
                   errors={mostRecentAnalysis.errors.map(e => e.detail)}
