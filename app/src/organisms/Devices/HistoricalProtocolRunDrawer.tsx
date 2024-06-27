@@ -14,10 +14,11 @@ import {
   Icon,
   InfoScreen,
   JUSTIFY_FLEX_START,
+  LegacyStyledText,
   Link,
+  LocationIcon,
   OVERFLOW_HIDDEN,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -271,19 +272,7 @@ export function HistoricalProtocolRunDrawer(
                   gridGap={SPACING.spacing4}
                   alignItems={ALIGN_CENTER}
                 >
-                  {/* TODO (nd: 06/20/2024) finalize small version of LocationIcon w/ Design and implement below */}
-                  <LegacyStyledText
-                    as="label"
-                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                    borderRadius="6px"
-                    padding="3px"
-                    minWidth="max-content"
-                    css={css`
-                      border: 1px solid;
-                    `}
-                  >
-                    {offset.location.slotName}
-                  </LegacyStyledText>
+                  <LocationIcon slotName={offset.location.slotName} />
                   <LegacyStyledText as="p">
                     {offset.location.moduleModel != null
                       ? getModuleDisplayName(offset.location.moduleModel)
