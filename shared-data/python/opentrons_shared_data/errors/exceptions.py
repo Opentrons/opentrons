@@ -924,10 +924,11 @@ class APIRemoved(GeneralError):
 class IncorrectAPIVersion(GeneralError):
     """An error indicating that a command was issued that is not supported by the API version in use."""
 
-    def __init(
+    def __init__(
         self,
-        api_element: str,
-        until_version: str,
+        api_element: Optional[str] = None,
+        until_version: Optional[str] = None,
+        current_version: Optional[str] = None,
         message: Optional[str] = None,
         detail: Optional[Dict[str, str]] = None,
         wrapping: Optional[Sequence[EnumeratedError]] = None,
@@ -936,10 +937,18 @@ class IncorrectAPIVersion(GeneralError):
         checked_detail: Dict[str, Any] = detail or {}
         checked_detail["identifier"] = api_element
         checked_detail["until_version"] = until_version
-        checked_message = (
-            message
-            or f"{api_element} is not available until version {until_version}."
-        )
+        checked_detail["current_version"] = current_version
+        # make this cleaner?!
+        if api_element and until_version and current_version:
+            checked_message = f"{api_element} is not available until API version {until_version}. You are currently using API version {current_version}."
+        elif api_element and until_version:
+            checked_message = f"{api_element} is not available until API version {until_version}."
+        elif api_element:
+            checked_message = f"{api_element} is not available in the API version in use."
+        elif message:
+            checked_message = message
+        else:
+            checked_message = f"This feature is not available in the API version in use."
         super().__init__(
             ErrorCodes.INCORRECT_API_VERSION, checked_message, checked_detail, wrapping
         )

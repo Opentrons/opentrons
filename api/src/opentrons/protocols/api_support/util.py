@@ -386,10 +386,9 @@ def requires_version(major: int, minor: int) -> Callable[[FuncT], FuncT]:
                 name = getattr(decorated_obj, "__qualname__", str(decorated_obj))
 
                 raise APIVersionError(
-                    f"{name} was added in {added_in}, but your "
-                    f"protocol requested version {current_version}. You "
-                    f"must increase your API version to {added_in} to "
-                    "use this functionality."
+                    api_element=name,
+                    until_version=added_in,
+                    current_version=current_version,
                 )
             return decorated_obj(*args, **kwargs)
 

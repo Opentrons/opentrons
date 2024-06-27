@@ -368,7 +368,9 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         if self.api_version < APIVersion(2, 15) and push_out:
             raise APIVersionError(
-                "Unsupported parameter push_out. Change your API version to 2.15 or above to use this parameter."
+                api_element="Parameter push_out",
+                until_version="2.15",
+                current_version=f"{self.api_version}",
             )
         _log.debug(
             "dispense {} from {} at {}".format(
