@@ -202,8 +202,8 @@ describe('config migration', () => {
     expect(result).toEqual(MOCK_CONFIG_V22)
   })
   it('should keep version 22', () => {
-    const v21Config = MOCK_CONFIG_V22
-    const result = migrate(v21Config)
+    const v22Config = MOCK_CONFIG_V22
+    const result = migrate(v22Config)
 
     expect(result.version).toBe(NEWEST_VERSION)
     expect(result).toEqual(MOCK_CONFIG_V22)
