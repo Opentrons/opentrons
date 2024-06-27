@@ -25,7 +25,7 @@ def parse_fw_version(version: str) -> Version:
             raise InvalidVersion()
     except InvalidVersion:
         device_version = parse("v0.0.0")
-    return device_version
+    return cast(Version, device_version)
 
 
 class AbstractModule(abc.ABC):
