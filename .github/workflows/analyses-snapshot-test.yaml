@@ -76,7 +76,7 @@ jobs:
       with:
           commit-message: 'fix(analyses-snapshot-testing): snapshot failure capture'
           title: 'fix(analyses-snapshot-testing): ${{ env.ANALYSIS_REF }} snapshot failure capture'
-          body: 'This PR is an automated snapshot update request. Please review the changes and merge if they are acceptable or find you bug and fix it.'
+          body: 'This PR is an automated snapshot update request. Please review the changes and merge if they are acceptable or find your bug and fix it.'
           branch: 'analyses-snapshot-testing/${{ env.ANALYSIS_REF }}-from-${{ env.SNAPSHOT_REF}}'
           base: ${{ env.SNAPSHOT_REF}}
 
