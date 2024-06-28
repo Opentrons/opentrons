@@ -15,7 +15,8 @@ instructions() {
 }
 
 DEFAULT_NTP="time.google.com"
-DEFAULT_NTP_CHINA="ntp.tencent.com"
+FALLBACK_NTP="ntp.tencent.com"
+FALLBACK_DNS="2001:da8::666 240c::6666"
 
 # Script entry-point
 main() {
@@ -35,7 +36,7 @@ main() {
 			gather "$ip_addresses"
             ;;
         set-ntp)
-            echo "Setting NTP server"
+            echo "Changing system settings"
             set_ntp "$ip_addresses"
             ;;
         *)
@@ -81,6 +82,7 @@ gather() {
             echo "Gathering /data files"
             cp -r /data/* $diag_dir/data/
             cp -r /etc/VERSION.json $diag_dir/data/
+            cp -r /tmp/.config/Opentrons $diag_dir/data/
             echo $serial > $diag_dir/data/serial.txt
             
             echo "Gathering logs"
@@ -140,9 +142,8 @@ EOF
 
 set_ntp() {
      for ip in $@; do
-        echo "Setting NTP address ${DEFAULT_NTP_CHINA} for ${ip}."
         ssh -q -o stricthostkeychecking=no -o userknownhostsfile=/dev/null \
-            root@$ip 'bash -s' <<- 'EOF'
+            root@$ip "NTP='$FALLBACK_NTP' DNS='$FALLBACK_DNS' bash -s" <<- 'EOF'
 
             cleanup() {
                 echo "Cleaning up"
@@ -158,16 +159,29 @@ set_ntp() {
             today=$(date '+%Y_%m_%d_%H_%M_%S')
             filename="${serial}_${today}_ntp.txt"
 
-            echo -e "\n\n timedatectl before setting NTP server" >> $filename
+            echo "Setting NTP address to $NTP"
+            echo -e "timedatectl before setting NTP server\n" > $filename
             timedatectl >> $filename
 
             mount -o remount,rw /
-            sed -i "s/#FallbackNTP=*/FallbackNTP=ntp.tencent.com /" /etc/systemd/timesyncd.conf
+            sed -i "s/#FallbackNTP=*/FallbackNTP=$NTP /" /etc/systemd/timesyncd.conf
             timedatectl set-ntp true
             systemctl restart systemd-timesyncd
-            echo -e "\n\n timedatectl after setting NTP server" >> $filename
+            echo -e "\ntimedatectl after setting NTP server\n" >> $filename
             sleep 5
             timedatectl >> $filename
+
+            echo "Setting DNS address to $DNS"
+            echo -e "\n\n-----------------------------------------------" >> $filename
+            echo -e "systemd-resolve status before setting DNS\n" >> $filename
+            systemd-resolve --status >> $filename
+            echo -e "\n\n-----------------------------------------------" >> $filename
+            echo -e "\nSetting DNS server" >> $filename
+            sed -i "s/#FallbackDNS=*/FallbackDNS='$DNS' /" /etc/systemd/resolved.conf
+            echo -e "systemd-resolve status after setting DNS\n" >> $filename
+            systemctl restart systemd-resolved
+            sleep 5
+            systemd-resolve --status >> $filename
 EOF
 
     echo "Fetching NTP file output"
