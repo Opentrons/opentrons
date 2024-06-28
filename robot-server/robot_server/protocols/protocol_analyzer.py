@@ -10,11 +10,10 @@ from opentrons.util.performance_helpers import TrackingFunctions
 from opentrons.protocol_engine.types import RunTimeParamValuesType, RunTimeParameter
 import opentrons.util.helpers as datetime_helper
 from opentrons.protocol_runner import (
-    PythonAndLegacyRunner,
-    JsonRunner,
     RunOrchestrator,
 )
 from opentrons.protocols.parse import PythonParseMode
+from opentrons.protocol_reader.protocol_source import PythonProtocolConfig
 
 import robot_server.errors.error_mappers as em
 
@@ -48,17 +47,13 @@ class ProtocolAnalyzer:
             robot_type=self._protocol_resource.source.robot_type,
             protocol_config=self._protocol_resource.source.config,
         )
-        runner = orchestrator.get_protocol_runner()
-        if isinstance(runner, PythonAndLegacyRunner):
-            await orchestrator.load_python(
-                protocol_source=self._protocol_resource.source,
-                python_parse_mode=PythonParseMode.NORMAL,
-                run_time_param_values=run_time_param_values,
-            )
-        else:
-            assert isinstance(runner, JsonRunner), "Unexpected runner type."
-            await orchestrator.load_json(protocol_source=self._protocol_resource.source)
-
+        await orchestrator.load(
+            protocol_source=self._protocol_resource.source,
+            python_parse_mode=PythonParseMode.NORMAL
+            if isinstance(self._protocol_resource.source.config, PythonProtocolConfig)
+            else None,
+            run_time_param_values=run_time_param_values,
+        )
         return orchestrator
 
     @TrackingFunctions.track_analysis

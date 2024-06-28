@@ -33,6 +33,7 @@ from opentrons.protocol_reader import (
     JsonProtocolConfig,
     ProtocolFilesInvalidError,
     ProtocolSource,
+    PythonProtocolConfig,
 )
 from opentrons.protocol_runner.create_simulating_orchestrator import (
     create_simulating_orchestrator,
@@ -244,14 +245,13 @@ async def _do_analyze(protocol_source: ProtocolSource) -> RunResult:
         robot_type=protocol_source.robot_type, protocol_config=protocol_source.config
     )
     try:
-        if isinstance(orchestrator.get_protocol_runner(), PythonAndLegacyRunner):
-            await orchestrator.load_python(
-                protocol_source=protocol_source,
-                python_parse_mode=PythonParseMode.NORMAL,
-                run_time_param_values=None,
-            )
-        elif isinstance(orchestrator.get_protocol_runner(), JsonRunner):
-            await orchestrator.load_json(protocol_source=protocol_source)
+        await orchestrator.load(
+            protocol_source=protocol_source,
+            python_parse_mode=PythonParseMode.NORMAL
+            if isinstance(protocol_source.config, PythonProtocolConfig)
+            else None,
+            run_time_param_values=None,
+        )
     except Exception as error:
         err_id = "analysis-setup-error"
         err_created_at = datetime.now(tz=timezone.utc)

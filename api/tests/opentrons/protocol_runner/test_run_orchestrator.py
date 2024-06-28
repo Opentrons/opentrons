@@ -329,7 +329,11 @@ async def test_load_json(
         config=JsonProtocolConfig(schema_version=6),
         content_hash="abc123",
     )
-    await json_protocol_subject.load_json(protocol_source=protocol_source)
+    await json_protocol_subject.load(
+        protocol_source=protocol_source,
+        run_time_param_values=None,
+        python_parse_mode=None,
+    )
 
     decoy.verify(await mock_protocol_json_runner.load(protocol_source))
 
@@ -350,7 +354,7 @@ async def test_load_python(
         config=JsonProtocolConfig(schema_version=6),
         content_hash="abc123",
     )
-    await python_protocol_subject.load_python(
+    await python_protocol_subject.load(
         protocol_source=protocol_source,
         python_parse_mode=PythonParseMode.NORMAL,
         run_time_param_values=None,
@@ -381,29 +385,10 @@ async def test_load_json_raises_no_protocol(
         content_hash="abc123",
     )
     with pytest.raises(AssertionError):
-        await live_protocol_subject.load_json(protocol_source=protocol_source)
-
-
-async def test_load_json_raises_no_runner_match(
-    decoy: Decoy,
-    json_protocol_subject: RunOrchestrator,
-    mock_protocol_engine: ProtocolEngine,
-) -> None:
-    """Should raise that there is no protocol runner."""
-    protocol_source = ProtocolSource(
-        directory=Path("/dev/null"),
-        main_file=Path("/dev/null/abc.json"),
-        files=[],
-        metadata={},
-        robot_type="OT-2 Standard",
-        config=JsonProtocolConfig(schema_version=6),
-        content_hash="abc123",
-    )
-    with pytest.raises(AssertionError):
-        await json_protocol_subject.load_python(
+        await live_protocol_subject.load(
             protocol_source=protocol_source,
-            python_parse_mode=PythonParseMode.NORMAL,
             run_time_param_values=None,
+            python_parse_mode=None,
         )
 
 

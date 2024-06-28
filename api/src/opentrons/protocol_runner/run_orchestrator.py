@@ -303,29 +303,26 @@ class RunOrchestrator:
         """Get run's protocol runner if any, if not return None."""
         return self._protocol_runner
 
-    async def load_json(
+    async def load(
         self,
         protocol_source: ProtocolSource,
-    ) -> None:
-        """Load a json protocol."""
-        assert self._protocol_runner is not None
-        assert isinstance(self._protocol_runner, JsonRunner)
-        await self._protocol_runner.load(protocol_source=protocol_source)
-
-    async def load_python(
-        self,
-        protocol_source: ProtocolSource,
-        python_parse_mode: PythonParseMode,
         run_time_param_values: Optional[RunTimeParamValuesType],
+        python_parse_mode: Optional[PythonParseMode],
     ) -> None:
-        """Load a python protocol."""
+        """Load a json/python protocol."""
         assert self._protocol_runner is not None
-        assert isinstance(self._protocol_runner, PythonAndLegacyRunner)
-        await self._protocol_runner.load(
-            protocol_source=protocol_source,
-            python_parse_mode=python_parse_mode,
-            run_time_param_values=run_time_param_values,
-        )
+        if isinstance(self._protocol_runner, JsonRunner):
+            await self._protocol_runner.load(protocol_source=protocol_source)
+        elif isinstance(self._protocol_runner, PythonAndLegacyRunner):
+            assert python_parse_mode is not None
+            await self._protocol_runner.load(
+                protocol_source=protocol_source,
+                # Conservatively assume that we're re-running a protocol that
+                # was uploaded before we added stricter validation, and that
+                # doesn't conform to the new rules.
+                python_parse_mode=python_parse_mode,
+                run_time_param_values=run_time_param_values,
+            )
 
     def get_is_okay_to_clear(self) -> bool:
         """Get whether the engine is stopped or sitting idly, so it could be removed."""

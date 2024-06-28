@@ -18,11 +18,9 @@ from opentrons.hardware_control.types import (
     EstopStateNotification,
     HardwareEventHandler,
 )
-from opentrons.protocols.parse import PythonParseMode
 from opentrons.protocols.api_support.deck_type import should_load_fixed_trash
+from opentrons.protocols.parse import PythonParseMode
 from opentrons.protocol_runner import (
-    JsonRunner,
-    PythonAndLegacyRunner,
     RunResult,
     RunOrchestrator,
 )
@@ -44,6 +42,9 @@ from opentrons.protocol_engine.types import (
     DeckConfigurationType,
     RunTimeParamValuesType,
     EngineStatus,
+)
+from opentrons.protocol_reader import (
+    PythonProtocolConfig,
 )
 from opentrons_shared_data.labware.dev_types import LabwareUri
 
@@ -228,28 +229,18 @@ class EngineStore:
             protocol_config=protocol.source.config if protocol else None,
         )
 
-        runner = self.run_orchestrator.get_protocol_runner()
         # FIXME(mm, 2022-12-21): These `await runner.load()`s introduce a
         # concurrency hazard. If two requests simultaneously call this method,
         # they will both "succeed" (with undefined results) instead of one
         # raising EngineConflictError.
-        if isinstance(runner, PythonAndLegacyRunner):
-            assert (
-                protocol is not None
-            ), "A Python protocol should have a protocol source file."
-            await self.run_orchestrator.load_python(
+        if protocol:
+            await self.run_orchestrator.load(
                 protocol.source,
-                # Conservatively assume that we're re-running a protocol that
-                # was uploaded before we added stricter validation, and that
-                # doesn't conform to the new rules.
-                python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
                 run_time_param_values=run_time_param_values,
+                python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS
+                if isinstance(protocol.source.config, PythonProtocolConfig)
+                else None,
             )
-        elif isinstance(runner, JsonRunner):
-            assert (
-                protocol is not None
-            ), "A JSON protocol should have a protocol source file."
-            await self.run_orchestrator.load_json(protocol.source)
         else:
             self.run_orchestrator.prepare()
 

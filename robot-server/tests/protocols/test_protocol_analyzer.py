@@ -105,7 +105,7 @@ async def test_load_runner(
     runner = await subject.load_runner(run_time_param_values={"rtp_var": 123})
     assert runner.get_protocol_runner() == run_orchestrator.get_protocol_runner()
     decoy.verify(
-        await run_orchestrator.load_python(
+        await run_orchestrator.load(
             protocol_source=protocol_source,
             python_parse_mode=PythonParseMode.NORMAL,
             run_time_param_values={"rtp_var": 123},
