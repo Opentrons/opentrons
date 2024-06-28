@@ -139,6 +139,7 @@ export const fetchProtocols = (
           }
           return analysisFilePath
         }, null)
+
         const mostRecentAnalysis =
           mostRecentAnalysisFilePath != null
             ? getParsedAnalysisFromPath(mostRecentAnalysisFilePath) ?? null
@@ -157,6 +158,7 @@ export const fetchProtocols = (
           mostRecentAnalysis,
         }
       })
+
       dispatch(updateProtocolList(storedProtocolsData, source))
     })
     .catch((error: Error) => {

@@ -114,6 +114,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
   ] = React.useState<StoredProtocolData | null>(null)
 
   const sortedStoredProtocols = useSortedProtocols(sortBy, storedProtocols)
+  console.log(sortedStoredProtocols)
   // if (protocol != null && protocol.analyses != null) {
   //   console.log(JSON.stringify(protocol.analyses[0].result))
   //   sortedStoredProtocols.push({

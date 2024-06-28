@@ -134,6 +134,10 @@ export function addProtocolFileFromLibrary(
   analysis: CompletedProtocolAnalysis,
   protocolsDirPath: string
 ): Promise<string> {
+  const updatedAnalysis: CompletedProtocolAnalysis = {
+    ...analysis,
+    result: 'ok',
+  }
   const protocolKey = uuid()
   const protocolDirPath = path.join(protocolsDirPath, protocolKey)
 
@@ -144,17 +148,21 @@ export function addProtocolFileFromLibrary(
   )
 
   const mainFileDestPath = path.join(srcDirPath, 'mainFile.json')
+  const analysisFileDestPath = path.join(analysisDirPath, 'analysis.json')
 
-  const objectData = JSON.stringify(analysis)
+  const objectData = JSON.stringify(updatedAnalysis)
   console.log('objectData', objectData)
   console.log('mainFileDestPath ', mainFileDestPath)
+
   return fs
     .mkdir(protocolDirPath, { recursive: true })
     .then(() => fs.mkdir(srcDirPath, { recursive: true }))
     .then(() => fs.mkdir(analysisDirPath, { recursive: true }))
     .then(() => fs.writeFile(mainFileDestPath, objectData))
+    .then(() => fs.writeFile(analysisFileDestPath, objectData))
     .then(() => protocolKey)
 }
+
 export function removeProtocolByKey(
   protocolKey: string,
   protocolsDirPath: string
