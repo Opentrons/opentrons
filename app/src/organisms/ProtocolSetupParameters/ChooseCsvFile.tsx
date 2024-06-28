@@ -18,7 +18,8 @@ import { useAllCsvFilesQuery } from '@opentrons/react-api-client'
 import { ChildNavigation } from '../ChildNavigation'
 import { EmptyFile } from './EmptyFile'
 import { RadioButton } from '../../atoms/buttons'
-import { getFilePaths } from '../../redux/shell'
+// import { getFilePaths } from '../../redux/shell'
+import { getShellUpdateDataFiles } from '../../redux/shell'
 
 import type { CsvFileParameter } from '@opentrons/shared-data'
 import type { CsvFileData } from '@opentrons/api-client'
@@ -42,7 +43,7 @@ export function ChooseCsvFile({
   setCsvFileInfo,
 }: ChooseCsvFileProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
-  const csvFilesOnUSB = useSelector(getFilePaths).payload.filePaths ?? []
+  const csvFilesOnUSB = useSelector(getShellUpdateDataFiles) ?? []
 
   const csvFilesOnRobot = useAllCsvFilesQuery(protocolId).data?.data.files ?? []
 

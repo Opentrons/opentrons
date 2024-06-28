@@ -13,6 +13,7 @@ import {
   ROBOT_MASS_STORAGE_DEVICE_REMOVED,
 } from './constants'
 import type { Dispatch, Action } from './types'
+import { Console } from 'winston/lib/winston/transports'
 
 const FLEX_USB_MOUNT_DIR = '/media/'
 const FLEX_USB_DEVICE_DIR = '/dev/'
@@ -28,8 +29,8 @@ const isWeirdDirectoryAndShouldSkip = (dirName: string): boolean =>
     .reduce((prev, current) => prev || current, false)
 
 const enumerateMassStorage = (
-  path: string,
-  filterCSV: boolean = false
+  path: string
+  // filterCSV: boolean = false
 ): Promise<string[]> =>
   fsPromises
     .readdir(path)
@@ -56,18 +57,18 @@ const enumerateMassStorage = (
     )
     .catch(() => [])
     .then(flatten)
-    .then(contents => {
-      if (filterCSV) {
-        const regex = /._\w/gm
-        const csvFilePaths =
-          contents.filter(
-            path => !path.match(regex) && path.endsWith('.csv')
-          ) ?? []
-        return csvFilePaths
-      } else {
-        return contents
-      }
-    })
+// .then(contents => {
+//   if (filterCSV) {
+//     const regex = /._\w/gm
+//     const csvFilePaths =
+//       contents.filter(
+//         path => !path.match(regex) && path.endsWith('.csv')
+//       ) ?? []
+//     return csvFilePaths
+//   } else {
+//     return contents
+//   }
+// })
 
 export function watchForMassStorage(dispatch: Dispatch): () => void {
   console.log('watching for mass storage')
@@ -186,22 +187,39 @@ export function watchForMassStorage(dispatch: Dispatch): () => void {
   }
 }
 
-export function registerFilePath(
+const getLatestMassStorageCsvFiles = (
+  filePaths: string[],
+  dispatch: Dispatch
+): void => {
+  console.log(filePaths)
+  // Note (kk:06/28/2024) The following regex is mostly for Resource fork file ex ._test.csv
+  // Resource fork file would be on a usb flash drive if a user uses macOS.
+  const regex = /._\w/gm
+  const csvFilePaths =
+    filePaths.filter(path => !path.match(regex) && path.endsWith('.csv')) ?? []
+  dispatch(sendFilePaths(csvFilePaths))
+}
+
+export function registerDataFiles(
   dispatch: Dispatch
 ): (action: Action) => unknown {
   return function handleAction(action: Action) {
     switch (action.type) {
-      case ROBOT_MASS_STORAGE_DEVICE_ENUMERATED:
-        void enumerateMassStorage(action.payload.rootPath, true).then(
-          csvFilePaths => {
-            dispatch(sendFilePaths(csvFilePaths))
-          }
-        )
-        break
+      case ROBOT_MASS_STORAGE_DEVICE_ENUMERATED: {
+        // console.log('rootPath', action.payload.rootPath)
 
-      case ROBOT_MASS_STORAGE_DEVICE_REMOVED:
+        // watchForMassStorage(dispatch)
+        console.log('filePaths', action.payload.filePaths)
+        getLatestMassStorageCsvFiles(action.payload.filePaths, dispatch)
+        // console.log('csvFiles', csvFilePaths)
+        // dispatch(sendFilePaths(csvFilePaths))
+        break
+      }
+
+      case ROBOT_MASS_STORAGE_DEVICE_REMOVED: {
         dispatch(sendFilePaths([]))
         break
+      }
 
       default:
         break

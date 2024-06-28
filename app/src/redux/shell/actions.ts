@@ -10,10 +10,10 @@ import type {
   RobotMassStorageDeviceRemoved,
   NotifySubscribeAction,
   NotifyTopic,
-  SendFilePathsAction,
+  // SendFilePathsAction,
 } from './types'
 
-import type { State } from '../types'
+// import type { State } from '../types'
 
 export const UI_INITIALIZED: 'shell:UI_INITIALIZED' = 'shell:UI_INITIALIZED'
 export const USB_HTTP_REQUESTS_START: 'shell:USB_HTTP_REQUESTS_START' =
@@ -126,8 +126,8 @@ export const notifySubscribeAction = (
   meta: { shell: true },
 })
 
-export const getFilePaths = (state: State): SendFilePathsAction => ({
-  type: SEND_FILE_PATHS,
-  payload: { filePaths: state.shell.filePaths },
-  meta: { shell: true },
-})
+// export const getFilePaths = (state: State): SendFilePathsAction => ({
+//   type: SEND_FILE_PATHS,
+//   payload: { filePaths: state.shell.filePaths },
+//   meta: { shell: true },
+// })
