@@ -98,7 +98,7 @@ def sort_all_lists(d: Any, sort_key: str | None = None) -> Any:
     protocols_under_test(),
     ids=[x.short_sha for x in protocols_under_test()],
 )
-# @pytest.mark.usefixtures("analyze_protocols")
+@pytest.mark.usefixtures("analyze_protocols")
 def test_analysis_snapshot(snapshot_custom: SerializableData, protocol: Protocol) -> None:
     analysis_ref = os.getenv("ANALYSIS_REF")
     if not analysis_ref:
