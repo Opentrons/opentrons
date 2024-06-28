@@ -64,6 +64,7 @@ from .dependencies import (
     get_protocol_directory,
     get_file_reader_writer,
     get_file_hasher,
+    get_maximum_quick_transfer_protocols,
 )
 
 
@@ -226,6 +227,9 @@ async def create_protocol(  # noqa: C901
     protocol_id: str = Depends(get_unique_id, use_cache=False),
     analysis_id: str = Depends(get_unique_id, use_cache=False),
     created_at: datetime = Depends(get_current_time),
+    maximum_quick_transfer_protocols: int = Depends(
+        get_maximum_quick_transfer_protocols
+    ),
 ) -> PydanticResponse[SimpleBody[Protocol]]:
     """Create a new protocol by uploading its files.
 
@@ -248,6 +252,7 @@ async def create_protocol(  # noqa: C901
         protocol_id: Unique identifier to attach to the protocol resource.
         analysis_id: Unique identifier to attach to the analysis resource.
         created_at: Timestamp to attach to the new resource.
+        maximum_quick_transfer_protocols: Robot setting value limiting stored quick transfers protocols.
     """
     kind = ProtocolKind.from_string(protocol_kind)
     if isinstance(protocol_kind, str) and kind is None:
@@ -255,6 +260,17 @@ async def create_protocol(  # noqa: C901
             status_code=400, detail=f"Invalid protocol_kind: {protocol_kind}"
         )
     kind = kind or ProtocolKind.STANDARD
+
+    quick_transfer_protocols = [
+        protocol
+        for protocol in protocol_store.get_all()
+        if protocol.protocol_kind == "quick_transfer"
+    ]
+    quick_transfer_protocol_count = len(quick_transfer_protocols)
+    if quick_transfer_protocol_count >= maximum_quick_transfer_protocols:
+        raise HTTPException(
+            status_code=409, detail="Maximum quick transfer protocols exceeded"
+        )
 
     for file in files:
         # TODO(mm, 2024-02-07): Investigate whether the filename can actually be None.

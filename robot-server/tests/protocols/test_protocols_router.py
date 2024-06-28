@@ -387,6 +387,7 @@ async def test_create_existing_protocol(
             analysis_summary=completed_analysis, new_rtp_values={}
         )
     ).then_return(True)
+    decoy.when(protocol_store.get_all()).then_return([stored_protocol_resource])
 
     result = await create_protocol(
         files=[protocol_file],
@@ -403,6 +404,7 @@ async def test_create_existing_protocol(
         protocol_id="protocol-id",
         analysis_id="analysis-id",
         created_at=datetime(year=2021, month=1, day=1),
+        maximum_quick_transfer_protocols=20,
     )
 
     assert result.content.data == Protocol(
@@ -507,6 +509,7 @@ async def test_create_protocol(
         protocol_id="protocol-id",
         analysis_id="analysis-id",
         created_at=datetime(year=2021, month=1, day=1),
+        maximum_quick_transfer_protocols=20,
     )
 
     assert result.content.data == Protocol(
@@ -625,6 +628,7 @@ async def test_create_new_protocol_with_run_time_params(
         protocol_id="protocol-id",
         analysis_id="analysis-id",
         created_at=datetime(year=2021, month=1, day=1),
+        maximum_quick_transfer_protocols=20,
     )
 
     decoy.verify(
@@ -697,6 +701,7 @@ async def test_create_existing_protocol_with_no_previous_analysis(
     ).then_return([buffered_file])
 
     decoy.when(await file_hasher.hash(files=[buffered_file])).then_return("a_b_c")
+    decoy.when(protocol_store.get_all()).then_return([])
     decoy.when(protocol_store.get_id_by_hash("a_b_c")).then_return("the-og-proto-id")
     decoy.when(protocol_store.get(protocol_id="the-og-proto-id")).then_return(
         stored_protocol_resource
@@ -729,6 +734,7 @@ async def test_create_existing_protocol_with_no_previous_analysis(
         protocol_id="protocol-id",
         analysis_id="analysis-id",
         created_at=datetime(year=2021, month=1, day=1),
+        maximum_quick_transfer_protocols=20,
     )
 
     assert result.content.data == Protocol(
@@ -814,6 +820,7 @@ async def test_create_existing_protocol_with_different_run_time_params(
         )
     ).then_return([buffered_file])
     decoy.when(await file_hasher.hash(files=[buffered_file])).then_return("a_b_c")
+    decoy.when(protocol_store.get_all()).then_return([])
     decoy.when(protocol_store.get_id_by_hash("a_b_c")).then_return("the-og-proto-id")
     decoy.when(protocol_store.get(protocol_id="the-og-proto-id")).then_return(
         stored_protocol_resource
@@ -850,6 +857,7 @@ async def test_create_existing_protocol_with_different_run_time_params(
         protocol_id="protocol-id",
         analysis_id="analysis-id",
         created_at=datetime(year=2021, month=1, day=1),
+        maximum_quick_transfer_protocols=20,
     )
 
     assert result.content.data == Protocol(
@@ -924,6 +932,7 @@ async def test_create_existing_protocol_with_same_run_time_params(
     ).then_return([buffered_file])
 
     decoy.when(await file_hasher.hash(files=[buffered_file])).then_return("a_b_c")
+    decoy.when(protocol_store.get_all()).then_return([])
     decoy.when(protocol_store.get_id_by_hash("a_b_c")).then_return("the-og-proto-id")
     decoy.when(protocol_store.get(protocol_id="the-og-proto-id")).then_return(
         stored_protocol_resource
@@ -953,6 +962,7 @@ async def test_create_existing_protocol_with_same_run_time_params(
         protocol_id="protocol-id",
         analysis_id="analysis-id",
         created_at=datetime(year=2021, month=1, day=1),
+        maximum_quick_transfer_protocols=20,
     )
 
     assert result.content.data == Protocol(
@@ -1027,6 +1037,7 @@ async def test_create_existing_protocol_with_pending_analysis_raises(
     ).then_return([buffered_file])
 
     decoy.when(await file_hasher.hash(files=[buffered_file])).then_return("a_b_c")
+    decoy.when(protocol_store.get_all()).then_return([])
     decoy.when(protocol_store.get_id_by_hash("a_b_c")).then_return("the-og-proto-id")
     decoy.when(protocol_store.get(protocol_id="the-og-proto-id")).then_return(
         stored_protocol_resource
@@ -1057,6 +1068,7 @@ async def test_create_existing_protocol_with_pending_analysis_raises(
             protocol_id="protocol-id",
             analysis_id="analysis-id",
             created_at=datetime(year=2021, month=1, day=1),
+            maximum_quick_transfer_protocols=20,
         )
 
     assert exc_info.value.status_code == 503
@@ -1093,6 +1105,7 @@ async def test_create_protocol_not_readable(
             protocol_reader=protocol_reader,
             file_hasher=file_hasher,
             protocol_id="protocol-id",
+            maximum_quick_transfer_protocols=20,
         )
 
     assert exc_info.value.status_code == 422
@@ -1145,6 +1158,7 @@ async def test_create_protocol_different_robot_type(
             protocol_reader=protocol_reader,
             file_hasher=file_hasher,
             protocol_id="protocol-id",
+            maximum_quick_transfer_protocols=20,
         )
 
     assert exc_info.value.status_code == 422
@@ -1674,6 +1688,7 @@ async def test_create_protocol_kind_quick_transfer(
         protocol_id="protocol-id",
         analysis_id="analysis-id",
         created_at=datetime(year=2021, month=1, day=1),
+        maximum_quick_transfer_protocols=20,
     )
 
     decoy.verify(
@@ -1728,3 +1743,65 @@ async def test_create_protocol_kind_invalid(
         )
 
         assert exc_info.value.status_code == 400
+
+
+async def test_create_protocol_maximum_quick_transfer_protocols_exceeded(
+    decoy: Decoy,
+    protocol_store: ProtocolStore,
+    analysis_store: AnalysisStore,
+    protocol_reader: ProtocolReader,
+    file_reader_writer: FileReaderWriter,
+    file_hasher: FileHasher,
+    protocol_auto_deleter: ProtocolAutoDeleter,
+) -> None:
+    """It should throw a 409 error if the quick transfer protocols maximum is exceeded."""
+    protocol_directory = Path("/dev/null")
+    content = bytes("some_content", encoding="utf-8")
+    uploaded_file = io.BytesIO(content)
+    protocol_file = UploadFile(filename="foo.json", file=uploaded_file)
+
+    protocol_source = ProtocolSource(
+        directory=protocol_directory,
+        main_file=Path("/dev/null/foo.json"),
+        files=[
+            ProtocolSourceFile(
+                path=Path("/dev/null/foo.json"),
+                role=ProtocolFileRole.MAIN,
+            )
+        ],
+        metadata={"this_is_fake_metadata": True},
+        robot_type="OT-3 Standard",
+        config=JsonProtocolConfig(schema_version=123),
+        content_hash="a_b_c",
+    )
+
+    stored_protocol_resource = ProtocolResource(
+        protocol_id="protocol-id",
+        created_at=datetime(year=2020, month=1, day=1),
+        source=protocol_source,
+        protocol_key="dummy-key-222",
+        protocol_kind=ProtocolKind.QUICK_TRANSFER.value,
+    )
+
+    decoy.when(protocol_store.get_all()).then_return([stored_protocol_resource])
+
+    with pytest.raises(HTTPException) as exc_info:
+        await create_protocol(
+            files=[protocol_file],
+            key="dummy-key-111",
+            protocol_directory=protocol_directory,
+            protocol_store=protocol_store,
+            analysis_store=analysis_store,
+            file_reader_writer=file_reader_writer,
+            protocol_reader=protocol_reader,
+            file_hasher=file_hasher,
+            protocol_auto_deleter=protocol_auto_deleter,
+            robot_type="OT-3 Standard",
+            protocol_id="protocol-id",
+            analysis_id="analysis-id",
+            protocol_kind="quick_transfer",
+            created_at=datetime(year=2021, month=1, day=1),
+            maximum_quick_transfer_protocols=1,
+        )
+
+        assert exc_info.value.status_code == 409
