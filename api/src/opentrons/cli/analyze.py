@@ -33,7 +33,6 @@ from opentrons.protocol_reader import (
     JsonProtocolConfig,
     ProtocolFilesInvalidError,
     ProtocolSource,
-    PythonProtocolConfig,
 )
 from opentrons.protocol_runner.create_simulating_orchestrator import (
     create_simulating_orchestrator,
