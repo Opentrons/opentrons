@@ -11,7 +11,7 @@ import {
   Tabs,
 } from '@opentrons/components'
 
-import { LargeButton } from '../../atoms/buttons'
+import { RadioButton } from '../../atoms/buttons'
 
 import { ChildNavigation } from '../ChildNavigation'
 import { getCompatibleLabwareByCategory } from './utils'
