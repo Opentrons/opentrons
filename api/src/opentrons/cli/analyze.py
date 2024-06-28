@@ -281,9 +281,7 @@ async def _do_analyze(protocol_source: ProtocolSource) -> RunResult:
             parameters=[],
         )
         return analysis
-    return await orchestrator.run(
-        deck_configuration=[], protocol_source=protocol_source
-    )
+    return await orchestrator.run(deck_configuration=[])
 
 
 async def _analyze(
