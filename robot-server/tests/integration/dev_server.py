@@ -17,6 +17,7 @@ class DevServer:
         persistence_directory: Optional[Path] = None,
         maximum_runs: Optional[int] = None,
         maximum_unused_protocols: Optional[int] = None,
+        maximum_quick_transfer_protocols: Optional[int] = None,
     ) -> None:
         """Initialize a dev server."""
         self.port: str = port
@@ -35,6 +36,7 @@ class DevServer:
 
         self.maximum_runs = maximum_runs
         self.maximum_unused_protocols = maximum_unused_protocols
+        self.maximum_quick_transfer_protocols = maximum_quick_transfer_protocols
 
     def __enter__(self) -> DevServer:
         return self
@@ -63,6 +65,10 @@ class DevServer:
         if self.maximum_unused_protocols is not None:
             env["OT_ROBOT_SERVER_maximum_unused_protocols"] = str(
                 self.maximum_unused_protocols
+            )
+        if self.maximum_quick_transfer_protocols is not None:
+            env["OT_ROBOT_SERVER_maximum_quick_transfer_protocols"] = str(
+                self.maximum_quick_transfer_protocols
             )
 
         # In order to collect coverage we run using `coverage`.

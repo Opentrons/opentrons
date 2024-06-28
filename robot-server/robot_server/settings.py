@@ -94,5 +94,14 @@ class RobotServerSettings(BaseSettings):
         ),
     )
 
+    maximum_quick_transfer_protocols: int = Field(
+        default=20,
+        gt=0,
+        description=(
+            'The maximum number of "quick transfer protocols" to allow before auto-deleting'
+            " old ones."
+        ),
+    )
+
     class Config:
         env_prefix = "OT_ROBOT_SERVER_"
