@@ -603,20 +603,6 @@
               ]
             }
           ],
-          "liquidProbeParameters": {
-            "minimumHeight": [
-              {
-                "applicableWells": [],
-                "value": 0.5
-              }
-            ],
-            "minimumWellVolume": [
-              {
-                "applicableWells": [],
-                "value": 0.0
-              }
-            ]
-          },
           "metadata": {
             "displayCategory": "wellPlate",
             "displayName": "NEST 96 Deep Well Plate 2mL",
@@ -1889,20 +1875,6 @@
               ]
             }
           ],
-          "liquidProbeParameters": {
-            "minimumHeight": [
-              {
-                "applicableWells": [],
-                "value": 0.5
-              }
-            ],
-            "minimumWellVolume": [
-              {
-                "applicableWells": [],
-                "value": 0.0
-              }
-            ]
-          },
           "metadata": {
             "displayCategory": "wellPlate",
             "displayName": "NEST 96 Deep Well Plate 2mL",
@@ -3618,20 +3590,6 @@
               ]
             }
           ],
-          "liquidProbeParameters": {
-            "minimumHeight": [
-              {
-                "applicableWells": [],
-                "value": 0.5
-              }
-            ],
-            "minimumWellVolume": [
-              {
-                "applicableWells": [],
-                "value": 0.0
-              }
-            ]
-          },
           "metadata": {
             "displayCategory": "wellPlate",
             "displayName": "Armadillo 96 Well Plate 200 µL PCR Full Skirt",
@@ -4866,20 +4824,6 @@
               ]
             }
           ],
-          "liquidProbeParameters": {
-            "minimumHeight": [
-              {
-                "applicableWells": [],
-                "value": 0.5
-              }
-            ],
-            "minimumWellVolume": [
-              {
-                "applicableWells": [],
-                "value": 0.0
-              }
-            ]
-          },
           "metadata": {
             "displayCategory": "wellPlate",
             "displayName": "NEST 96 Deep Well Plate 2mL",
@@ -6152,20 +6096,6 @@
               ]
             }
           ],
-          "liquidProbeParameters": {
-            "minimumHeight": [
-              {
-                "applicableWells": [],
-                "value": 0.5
-              }
-            ],
-            "minimumWellVolume": [
-              {
-                "applicableWells": [],
-                "value": 0.0
-              }
-            ]
-          },
           "metadata": {
             "displayCategory": "wellPlate",
             "displayName": "NEST 96 Deep Well Plate 2mL",
@@ -7438,20 +7368,6 @@
               ]
             }
           ],
-          "liquidProbeParameters": {
-            "minimumHeight": [
-              {
-                "applicableWells": [],
-                "value": 0.5
-              }
-            ],
-            "minimumWellVolume": [
-              {
-                "applicableWells": [],
-                "value": 0.0
-              }
-            ]
-          },
           "metadata": {
             "displayCategory": "wellPlate",
             "displayName": "NEST 96 Deep Well Plate 2mL",
@@ -8724,20 +8640,6 @@
               ]
             }
           ],
-          "liquidProbeParameters": {
-            "minimumHeight": [
-              {
-                "applicableWells": [],
-                "value": 0.5
-              }
-            ],
-            "minimumWellVolume": [
-              {
-                "applicableWells": [],
-                "value": 0.0
-              }
-            ]
-          },
           "metadata": {
             "displayCategory": "wellPlate",
             "displayName": "NEST 96 Deep Well Plate 2mL",
@@ -10010,20 +9912,6 @@
               ]
             }
           ],
-          "liquidProbeParameters": {
-            "minimumHeight": [
-              {
-                "applicableWells": [],
-                "value": 0.5
-              }
-            ],
-            "minimumWellVolume": [
-              {
-                "applicableWells": [],
-                "value": 0.0
-              }
-            ]
-          },
           "metadata": {
             "displayCategory": "wellPlate",
             "displayName": "NEST 96 Deep Well Plate 2mL",
@@ -13444,8 +13332,10 @@
       "commandType": "loadPipette",
       "notes": [],
       "params": {
+        "liquidPresenceDetection": false,
         "mount": "left",
-        "pipetteName": "p1000_96"
+        "pipetteName": "p1000_96",
+        "tipOverlapNotAfterVersion": "v0"
       },
       "result": {},
       "status": "succeeded"

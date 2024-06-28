@@ -54,6 +54,7 @@ class AnalyzedProtocol:
     host_analysis_file: Path
     container_analysis_file: Path
     tag: str
+    custom_labware_paths: List[str]
     analysis_execution_time: Optional[float] = None
     command_exit_code: Optional[int] = None
     command_output: Optional[str] = None
@@ -185,10 +186,17 @@ def container_analysis_path(protocol_file: Path, tag: str) -> Path:
 
 
 def generate_protocols(tag: str) -> List[AnalyzedProtocol]:
+
+    # Since we do not have the specification for which labware to use
+    # we will use all labware in the host labware directory
+    all_custom_labware_paths = [str(host_path.relative_to(CONTAINER_LABWARE)) for host_path in list(Path(HOST_LABWARE).rglob("*.json"))]
+
     def find_pd_protocols() -> List[AnalyzedProtocol]:
         # Check if the provided path is a valid directory
         if not HOST_PROTOCOLS_ROOT.is_dir():
             raise NotADirectoryError(f"The path {HOST_PROTOCOLS_ROOT} is not a valid directory.")
+
+        nonlocal all_custom_labware_paths
 
         # Recursively find all .json files
         json_files = list(HOST_PROTOCOLS_ROOT.rglob("*.json"))
@@ -198,7 +206,14 @@ def generate_protocols(tag: str) -> List[AnalyzedProtocol]:
             relative_path = path.relative_to(HOST_PROTOCOLS_ROOT)
             updated_path = Path(CONTAINER_PROTOCOLS_ROOT, relative_path)
             pd_protocols.append(
-                AnalyzedProtocol(path, updated_path, host_analysis_path(path, tag), container_analysis_path(path, tag), tag)
+                AnalyzedProtocol(
+                    host_protocol_file=path,
+                    container_protocol_file=updated_path,
+                    host_analysis_file=host_analysis_path(path, tag),
+                    container_analysis_file=container_analysis_path(path, tag),
+                    tag=tag,
+                    custom_labware_paths=all_custom_labware_paths,
+                )
             )
         return pd_protocols
 
@@ -206,6 +221,8 @@ def generate_protocols(tag: str) -> List[AnalyzedProtocol]:
         # Check if the provided path is a valid directory
         if not HOST_PROTOCOLS_ROOT.is_dir():
             raise NotADirectoryError(f"The path {HOST_PROTOCOLS_ROOT} is not a valid directory.")
+
+        nonlocal all_custom_labware_paths
 
         # Recursively find all .py files
         python_files = list(HOST_PROTOCOLS_ROOT.rglob("*.py"))
@@ -215,7 +232,14 @@ def generate_protocols(tag: str) -> List[AnalyzedProtocol]:
             relative_path = path.relative_to(HOST_PROTOCOLS_ROOT)
             container_path = Path(CONTAINER_PROTOCOLS_ROOT, relative_path)
             py_protocols.append(
-                AnalyzedProtocol(path, container_path, host_analysis_path(path, tag), container_analysis_path(path, tag), tag=tag)
+                AnalyzedProtocol(
+                    host_protocol_file=path,
+                    container_protocol_file=container_path,
+                    host_analysis_file=host_analysis_path(path, tag),
+                    container_analysis_file=container_analysis_path(path, tag),
+                    tag=tag,
+                    custom_labware_paths=all_custom_labware_paths,
+                )
             )
         return py_protocols
 
@@ -234,15 +258,20 @@ def remove_all_files_in_directory(directory: Path) -> None:
             console.print(f"Failed to delete {file_path}. Reason: {e}")
 
 
-def container_custom_labware_paths() -> List[str]:
-    if HOST_LABWARE.is_dir():
-        return [os.path.join(CONTAINER_LABWARE, file) for file in os.listdir(HOST_LABWARE) if file.endswith(".json")]
-    return []
+def protocol_custom_labware_paths_in_container(protocol: Protocol) -> List[str]:
+    if not HOST_LABWARE.is_dir() or protocol.custom_labware is None:
+        return []
+
+    return [
+        str(os.path.join(CONTAINER_LABWARE, f"{file}.json"))
+        for file in protocol.custom_labware
+        if f"{file}.json" in os.listdir(HOST_LABWARE)
+    ]
 
 
 def analyze(protocol: AnalyzedProtocol, container: docker.models.containers.Container) -> bool:
     # Run the analyze command
-    command = f"python -I -m opentrons.cli analyze --json-output {protocol.container_analysis_file} {protocol.container_protocol_file} {' '.join(map(str, container_custom_labware_paths()))}"  # noqa: E501
+    command = f"python -I -m opentrons.cli analyze --json-output {protocol.container_analysis_file} {protocol.container_protocol_file} {' '.join(protocol.custom_labware_paths)}"  # noqa: E501
     start_time = time.time()
     timeout_duration = 30  # seconds
     try:
@@ -311,7 +340,14 @@ def generate_analyses_from_test(tag: str, protocols: List[Protocol]) -> None:
             host_analysis_file = host_analysis_path(host_protocol_file, tag)
             container_analysis_file = container_analysis_path(host_protocol_file, tag)
             protocols_to_process.append(
-                AnalyzedProtocol(host_protocol_file, container_protocol_file, host_analysis_file, container_analysis_file, tag)
+                AnalyzedProtocol(
+                    host_protocol_file,
+                    container_protocol_file,
+                    host_analysis_file,
+                    container_analysis_file,
+                    tag,
+                    protocol_custom_labware_paths_in_container(test_protocol),
+                )
             )
         console.print(f"Analyzing {len(protocols_to_process)} protocol(s) against {tag}...")
         container = stop_and_restart_container(image_name)

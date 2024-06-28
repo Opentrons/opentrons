@@ -29,7 +29,10 @@ class LegacyProtocolCoreSimulator(
     _instruments: Dict[Mount, Optional[LegacyInstrumentCoreSimulator]]  # type: ignore[assignment]
 
     def load_instrument(  # type: ignore[override]
-        self, instrument_name: PipetteNameType, mount: Mount
+        self,
+        instrument_name: PipetteNameType,
+        mount: Mount,
+        liquid_presence_detection: bool = False,
     ) -> LegacyInstrumentCoreSimulator:
         """Create a simulating instrument context."""
         pipette_generation = convert_to_pipette_name_type(

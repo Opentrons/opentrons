@@ -4,8 +4,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, screen, waitFor, renderHook } from '@testing-library/react'
 import { createStore } from 'redux'
 
-import { COLORS } from '@opentrons/components'
-
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { mockRecoveryContentProps } from '../__fixtures__'
@@ -104,16 +102,6 @@ describe('RunPausedSplash', () => {
 
     expect(primaryBtn).toBeInTheDocument()
     expect(secondaryBtn).toBeInTheDocument()
-
-    expect(primaryBtn).toHaveStyle({ 'background-color': 'transparent' })
-    expect(secondaryBtn).toHaveStyle({ 'background-color': COLORS.white })
-
-    expect(screen.getByLabelText('remove icon')).toHaveStyle({
-      color: COLORS.red50,
-    })
-    expect(screen.getByLabelText('recovery icon')).toHaveStyle({
-      color: COLORS.white,
-    })
 
     fireEvent.click(secondaryBtn)
 

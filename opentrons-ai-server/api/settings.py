@@ -27,6 +27,8 @@ class Settings(BaseSettings):
     dd_version: str = "hardcoded_default_from_settings"
     allowed_origins: str = "*"
     dd_logs_injection: str = "true"
+    cpu: str = "1028"
+    memory: str = "2048"
 
     # Secrets
     # These come from environment variables in the local and deployed execution environments

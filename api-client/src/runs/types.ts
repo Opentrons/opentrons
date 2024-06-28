@@ -21,6 +21,8 @@ export const RUN_STATUS_FINISHING = 'finishing' as const
 export const RUN_STATUS_SUCCEEDED = 'succeeded' as const
 export const RUN_STATUS_BLOCKED_BY_OPEN_DOOR = 'blocked-by-open-door' as const
 export const RUN_STATUS_AWAITING_RECOVERY = 'awaiting-recovery' as const
+export const RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR = 'awaiting-recovery-blocked-by-open-door' as const
+export const RUN_STATUS_AWAITING_RECOVERY_PAUSED = 'awaiting-recovery-paused' as const
 
 export type RunStatus =
   | typeof RUN_STATUS_IDLE
@@ -33,6 +35,8 @@ export type RunStatus =
   | typeof RUN_STATUS_SUCCEEDED
   | typeof RUN_STATUS_BLOCKED_BY_OPEN_DOOR
   | typeof RUN_STATUS_AWAITING_RECOVERY
+  | typeof RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR
+  | typeof RUN_STATUS_AWAITING_RECOVERY_PAUSED
 
 export interface LegacyGoodRunData {
   id: string
@@ -128,13 +132,11 @@ export interface LabwareOffsetCreateData {
   vector: VectorOffset
 }
 
-type FileRunTimeParameterCreateData = Record<string, string | number | boolean>
-
-type ValueRunTimeParameterCreateData = Record<string, { id: string }>
-
-export type RunTimeParameterCreateData =
-  | FileRunTimeParameterCreateData
-  | ValueRunTimeParameterCreateData
+type RunTimeParameterValueType = string | number | boolean | { fileId: string }
+export type RunTimeParameterCreateData = Record<
+  string,
+  RunTimeParameterValueType
+>
 
 export interface CommandData {
   data: RunTimeCommand

@@ -25,7 +25,7 @@ class RawContextData(SupportsCSVStorage):
     @classmethod
     def headers(self) -> typing.Tuple[str, str, str]:
         """Returns the headers for the raw context data."""
-        return ("state_id", "function_start_time", "duration")
+        return ("state_name", "function_start_time", "duration")
 
     def csv_row(self) -> typing.Tuple[str, int, int]:
         """Returns the raw context data as a string."""

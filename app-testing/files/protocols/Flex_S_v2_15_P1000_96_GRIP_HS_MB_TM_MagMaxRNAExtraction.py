@@ -80,8 +80,8 @@ def run(ctx):
     elution_res = elutionplate.wells()[0]
 
     # Load tips
-    tips = ctx.load_labware("opentrons_ot3_96_tiprack_200ul_rss", "10").wells()[0]
-    tips1 = ctx.load_labware("opentrons_ot3_96_tiprack_200ul_rss", "11").wells()[0]
+    tips = ctx.load_labware("opentrons_flex_96_tiprack_200ul", "10", adapter="opentrons_flex_96_tiprack_adapter").wells()[0]
+    tips1 = ctx.load_labware("opentrons_flex_96_tiprack_200ul", "11", adapter="opentrons_flex_96_tiprack_adapter").wells()[0]
 
     # load 96 channel pipette
     pip = ctx.load_instrument("flex_96channel_1000", mount="left")

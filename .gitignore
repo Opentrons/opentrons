@@ -137,6 +137,7 @@ update-server/LICENSE
 shared-data/python/LICENSE
 shared-data/LICENSE
 robot-server/LICENSE
+performance-metrics/LICENSE
 
 # typescript incremental files
 *.tsbuildinfo

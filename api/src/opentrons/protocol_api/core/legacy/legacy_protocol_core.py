@@ -346,7 +346,10 @@ class LegacyProtocolCore(
         return module_core
 
     def load_instrument(
-        self, instrument_name: PipetteNameType, mount: Mount
+        self,
+        instrument_name: PipetteNameType,
+        mount: Mount,
+        liquid_presence_detection: bool = False,
     ) -> LegacyInstrumentCore:
         """Load an instrument."""
         attached = {
