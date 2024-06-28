@@ -2,15 +2,20 @@
   "commands": [
     {
       "commandType": "home",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "50c7ae73a4e3f7129874f39dfb514803",
       "notes": [],
       "params": {},
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "c9cac9dba72ab541665f112752004fbc",
       "notes": [],
@@ -18,10 +23,13 @@
         "message": "THIS IS A DRY RUN"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadModule",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "c75664edee5254cc6df445fe15caf6a1",
       "notes": [],
@@ -472,10 +480,13 @@
         "moduleId": "UUID",
         "serialNumber": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "440789ab9eb03ba0fe96cc2977c1bb22",
       "notes": [],
@@ -1643,10 +1654,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "e692eefe8e609e4b4f88012c3e838cac",
       "notes": [],
@@ -1709,10 +1723,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "6d8dff826f858dd230b1d3d6f0bae322",
       "notes": [],
@@ -2864,10 +2881,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadModule",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "58af432bee5e93d2e690ebae85fab626",
       "notes": [],
@@ -3320,10 +3340,13 @@
         "moduleId": "UUID",
         "serialNumber": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "dbb9a4a048baba7981f07b6b64b9f6a8",
       "notes": [],
@@ -4491,10 +4514,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadModule",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "9dc6629e65004807f2ebba140fe2616a",
       "notes": [],
@@ -4549,10 +4575,13 @@
         "model": "magneticBlockV1",
         "moduleId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "c33d2c323a78c72e048cc9398633d197",
       "notes": [],
@@ -5824,10 +5853,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "2250ccbc31a6456b7341d1ba77eb24da",
       "notes": [],
@@ -7099,10 +7131,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadModule",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "a644b62e01d5cef786eaabe30d5946e3",
       "notes": [],
@@ -7212,10 +7247,13 @@
         "moduleId": "UUID",
         "serialNumber": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "6c6894e0050b387512dd4750af1079d0",
       "notes": [],
@@ -8383,10 +8421,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "7f379c251ec6d30ec4d1af35d5b03fde",
       "notes": [],
@@ -8449,10 +8490,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "d7f9ce1e80d159ce1923597c4c22cb1a",
       "notes": [],
@@ -9604,10 +9648,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "316f63bd99cfd9b213b9b07e48d3b9dc",
       "notes": [],
@@ -10879,10 +10926,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "a33eb74405da3f523f94e4fe3ff9c675",
       "notes": [],
@@ -12154,10 +12204,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadPipette",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "289f3e9fa6b408a2520637ec25e60b69",
       "notes": [],
@@ -12170,10 +12223,13 @@
       "result": {
         "pipetteId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/openLabwareLatch",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "a397a7b2c151b096d880f01942124265",
       "notes": [],
@@ -12183,10 +12239,13 @@
       "result": {
         "pipetteRetracted": true
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "thermocycler/openLid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "bfec30af6fa9bc25840af8adaeb2057a",
       "notes": [],
@@ -12194,10 +12253,13 @@
         "moduleId": "UUID"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "waitForResume",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "f35fc79e97d79fff6d4886eb31e6d201",
       "notes": [],
@@ -12205,10 +12267,13 @@
         "message": "Ready"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "24663b9a051c66fdd9866b7c9fb3b7fc",
       "notes": [],
@@ -12216,10 +12281,13 @@
         "moduleId": "UUID"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "5f8af44e29084906343ac45cee08d966",
       "notes": [],
@@ -12227,10 +12295,13 @@
         "message": "=============================================="
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "ba89136c4157cd265fba87d98be1d972",
       "notes": [],
@@ -12238,10 +12309,13 @@
         "message": "--> Cleanup"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "afc3d52f98c3c383634fb5aa17e3c159",
       "notes": [],
@@ -12249,10 +12323,13 @@
         "message": "=============================================="
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "ddfbe417c7984bbf2bc1b4dc5067fba6",
       "notes": [],
@@ -12260,10 +12337,13 @@
         "message": "--> Adding H20 and SAMPLE"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "7ca1150e485993f5b49517daeacc4221",
       "notes": [],
@@ -12290,10 +12370,13 @@
         "tipLength": 47.85,
         "tipVolume": 200.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "fd262fd250cc5df05f97742282c6978d",
       "notes": [],
@@ -12320,10 +12403,13 @@
         },
         "volume": 45.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "343bff85923378e53f091d8ecc9a8814",
       "notes": [],
@@ -12350,10 +12436,13 @@
         },
         "volume": 45.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "40b3de6cfd5e72196f715351a61f2c48",
       "notes": [],
@@ -12378,10 +12467,13 @@
           "z": 98.33
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "2e3671e4b1eb813af47ae5a7c434d070",
       "notes": [],
@@ -12389,10 +12481,13 @@
         "message": "--> ADDING AMPure (0.8x)"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "5124373f502ea8bbd64de325850ddd76",
       "notes": [],
@@ -12419,10 +12514,13 @@
         "tipLength": 47.85,
         "tipVolume": 200.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "ebe103e27bb12609ff02cd2b6a0d5304",
       "notes": [],
@@ -12449,10 +12547,13 @@
         },
         "volume": 55.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "fd6abc1b5564c452011de8b787b14b55",
       "notes": [],
@@ -12479,10 +12580,13 @@
         },
         "volume": 55.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "7d69b65d1bdb7078ea9d724d2faf777d",
       "notes": [],
@@ -12509,10 +12613,13 @@
         },
         "volume": 45.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "b12bd6ec384b4bab26f0a61c12f6559d",
       "notes": [],
@@ -12539,10 +12646,13 @@
         },
         "volume": 45.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "16429dd3b9ea0ce34ff4548da73dc35d",
       "notes": [],
@@ -12567,10 +12677,13 @@
           "z": 24.870000000000005
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "ca15269d0918a389b1689d7dd1055ca7",
       "notes": [],
@@ -12597,10 +12710,13 @@
         },
         "volume": 60.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "73c5abd4172905c449f34c7f715c7c5d",
       "notes": [],
@@ -12625,10 +12741,13 @@
           "z": 20.870000000000005
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "dd1cf46ab74321ee79313c5a487d0c14",
       "notes": [],
@@ -12655,10 +12774,13 @@
         },
         "volume": 60.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "162182b44715cdfe7247b180660813e6",
       "notes": [],
@@ -12685,10 +12807,13 @@
         },
         "volume": 60.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "a49e7dab515ce900c4602b01df56d25d",
       "notes": [],
@@ -12713,10 +12838,13 @@
           "z": 24.870000000000005
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "0abbbecb399a13499308aacf0b4da1e2",
       "notes": [],
@@ -12743,10 +12871,13 @@
         },
         "volume": 30.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "a13fc47858989af3af9725a509a6dfc6",
       "notes": [],
@@ -12773,10 +12904,13 @@
         },
         "volume": 60.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "b7c5e4d0bae109c5b9644a1d8060013e",
       "notes": [],
@@ -12801,10 +12935,13 @@
           "z": 20.870000000000005
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "081121743a23ecda30c0ff4292938ad2",
       "notes": [],
@@ -12831,10 +12968,13 @@
         },
         "volume": 60.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "9a513ec038b65339dcd673573fea9df4",
       "notes": [],
@@ -12861,10 +13001,13 @@
         },
         "volume": 60.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "3b6bbc40728b4a40e4f78a2170f31869",
       "notes": [],
@@ -12889,10 +13032,13 @@
           "z": 24.870000000000005
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "db30f7ce3f131577d4a7dc0f158b5fa7",
       "notes": [],
@@ -12919,10 +13065,13 @@
         },
         "volume": 30.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "blowout",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "943e6e4a098b8365279f0419340cf389",
       "notes": [],
@@ -12947,10 +13096,13 @@
           "z": 36.650000000000006
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "9b7c8f7e2d4b71b769ac35a5d23f81af",
       "notes": [],
@@ -12975,10 +13127,13 @@
           "z": 39.650000000000006
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "9ddaf62272dac612285afa22e2c9468a",
       "notes": [],
@@ -13003,10 +13158,13 @@
           "z": 34.65
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "66ca406cfe0b4adcaeb8a8d4dbfb56f9",
       "notes": [],
@@ -13031,10 +13189,13 @@
           "z": 39.650000000000006
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "6711bc200259d328db248528eb865c29",
       "notes": [],
@@ -13059,10 +13220,13 @@
           "z": 98.33
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/setAndWaitForShakeSpeed",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "b6b1f5df27a8187338f2a7ff565e47f7",
       "notes": [],
@@ -13073,10 +13237,13 @@
       "result": {
         "pipetteRetracted": false
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "waitForDuration",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "89a756118f261d6b764e7048cd729f73",
       "notes": [],
@@ -13084,10 +13251,13 @@
         "seconds": 6.0
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/deactivateShaker",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "73381f70d8be6e0956f55c460ce81125",
       "notes": [],
@@ -13095,10 +13265,13 @@
         "moduleId": "UUID"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/openLabwareLatch",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "2f1a9893f81fc10000ebced51aaee401",
       "notes": [],
@@ -13108,10 +13281,13 @@
       "result": {
         "pipetteRetracted": false
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "6bdb95cd9fc261b76173bfa4d8a074bd",
       "notes": [],
@@ -13133,10 +13309,13 @@
         "strategy": "usingGripper"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "d72a7e83e3a71d3ae9b3644c63568bb3",
       "notes": [],
@@ -13144,10 +13323,13 @@
         "moduleId": "UUID"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "6248e8cd56fbd0d4803fa5a65746c958",
       "notes": [],
@@ -13155,10 +13337,13 @@
         "message": "--> Removing Supernatant"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "e5726cc7f765e108bc90bd95a821c90e",
       "notes": [],
@@ -13185,10 +13370,13 @@
         "tipLength": 47.85,
         "tipVolume": 200.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "3f75e1c27107d13e82921dcee2f84907",
       "notes": [],
@@ -13213,10 +13401,13 @@
           "z": 42.42
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "a841e4e7e2434666773ddbb918a005cc",
       "notes": [],
@@ -13243,10 +13434,13 @@
         },
         "volume": 100.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "waitForDuration",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "fc767dca3ee9600a374694494195c9bc",
       "notes": [],
@@ -13254,10 +13448,13 @@
         "seconds": 6.0
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "6616948e4de581bd76fffd3ff15f5762",
       "notes": [],
@@ -13282,10 +13479,13 @@
           "z": 39.42
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "fcc7b79d81d05a66959c0c25dc9cb018",
       "notes": [],
@@ -13312,10 +13512,13 @@
         },
         "volume": 100.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "9eaf317496d182c44fbcbe6ef22cc9e8",
       "notes": [],
@@ -13340,10 +13543,13 @@
           "z": 55.7
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "f716f89b1c85b4769e746f3e0fc2f9c1",
       "notes": [],
@@ -13370,10 +13576,13 @@
         },
         "volume": 200.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "waitForDuration",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "a07b28744b4620a405b3efe875ef29b9",
       "notes": [],
@@ -13381,10 +13590,13 @@
         "seconds": 6.0
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "blowout",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "b4bbc610c7e9eb4c2528307134ecad22",
       "notes": [],
@@ -13409,10 +13621,13 @@
           "z": 41.0
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "a2971b547167916e323618e18626cef3",
       "notes": [],
@@ -13437,10 +13652,13 @@
           "z": 36.0
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "75fec4352fa5b5cd3c594feb1a7e0e36",
       "notes": [],
@@ -13465,10 +13683,13 @@
           "z": 41.0
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "9579748687a68ea5af8a6ff4624f3d44",
       "notes": [],
@@ -13493,10 +13714,13 @@
           "z": 98.33
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "28b208c75124296be9fd9cae6e150e82",
       "notes": [],
@@ -14646,10 +14870,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "e68752b27ca4422152f04750148a71fa",
       "notes": [],
@@ -15799,10 +16026,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "781be80d99b9780f23a96790f656d28c",
       "notes": [],
@@ -15812,10 +16042,13 @@
         "strategy": "manualMoveWithPause"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "5d6ad4482ea9b943ea3ab8a773fdc094",
       "notes": [],
@@ -15825,10 +16058,13 @@
         "strategy": "manualMoveWithPause"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "83e90f8664a01781a910501df7e5fe13",
       "notes": [],
@@ -15840,10 +16076,13 @@
         "strategy": "manualMoveWithPause"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "f15cc6e0ae98a94a3485486a93bf2b40",
       "notes": [],
@@ -15855,10 +16094,13 @@
         "strategy": "manualMoveWithPause"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "d4f69b0b768f5e49284fdb083b788264",
       "notes": [],
@@ -15866,10 +16108,13 @@
         "message": "--> ETOH Wash"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "74b36d628cf92197c2cb01c0d9fdf225",
       "notes": [],
@@ -15896,10 +16141,13 @@
         "tipLength": 47.85,
         "tipVolume": 200.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "95110ad58797572a3517b2e323f99861",
       "notes": [],
@@ -15926,10 +16174,13 @@
         },
         "volume": 150.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "ccee6c06afc8877a7a5d9a2ca18c4275",
       "notes": [],
@@ -15954,10 +16205,13 @@
           "z": 41.0
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "45e8a25a67b292b4a53cfddcd4a6bdbd",
       "notes": [],
@@ -15982,10 +16236,13 @@
           "z": 36.0
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "e4c9e9d302386747b78370abef5b2db2",
       "notes": [],
@@ -16010,10 +16267,13 @@
           "z": 41.0
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "adf1e6dd92b9d90520f09e29587066a8",
       "notes": [],
@@ -16038,10 +16298,13 @@
           "z": 51.7
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "272051b264d0aa06739e01815e769e07",
       "notes": [],
@@ -16068,10 +16331,13 @@
         },
         "volume": 150.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "waitForDuration",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "d9b2e50bdbd6df7f3b1f7d79bc810d44",
       "notes": [],
@@ -16079,10 +16345,13 @@
         "seconds": 6.0
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "blowout",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "86b04231433d41f914517723f3c98596",
       "notes": [],
@@ -16107,10 +16376,13 @@
           "z": 51.7
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "cc1bee90125ecc6e3a6246dfe3b1ea98",
       "notes": [],
@@ -16135,10 +16407,13 @@
           "z": 58.7
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "7c1f87168e5f630cd3ca2d6a68e20f6d",
       "notes": [],
@@ -16163,10 +16438,13 @@
           "z": 53.7
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "3d5411f3d4a879ce73b15477131d3ce3",
       "notes": [],
@@ -16191,10 +16469,13 @@
           "z": 58.7
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "7519c1dd4af20b1d97480c952f26054b",
       "notes": [],
@@ -16219,10 +16500,13 @@
           "z": 98.33
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "8c9440236d821940cc4bbb797dc7d08a",
       "notes": [],
@@ -16230,10 +16514,13 @@
         "message": "--> Remove ETOH Wash"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "e4575c1cdc0ffea085aadc410b32a9ed",
       "notes": [],
@@ -16260,10 +16547,13 @@
         "tipLength": 47.85,
         "tipVolume": 200.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "6f04833d0c3f167e4159beb057b650fa",
       "notes": [],
@@ -16288,10 +16578,13 @@
           "z": 42.42
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "49afb183733c201722e1d28eeafe3fa7",
       "notes": [],
@@ -16318,10 +16611,13 @@
         },
         "volume": 100.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "waitForDuration",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "6c6fb7d2b11c76030642d6e956c01ee1",
       "notes": [],
@@ -16329,10 +16625,13 @@
         "seconds": 6.0
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "51e51dd9f061fc9d3481d253b72ea0f4",
       "notes": [],
@@ -16357,10 +16656,13 @@
           "z": 39.42
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "c83c4194b8d6e292de1e1271e5b06e36",
       "notes": [],
@@ -16387,10 +16689,13 @@
         },
         "volume": 100.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "697306b2ed751cf2ec9ca6e379855274",
       "notes": [],
@@ -16415,10 +16720,13 @@
           "z": 55.7
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "8f96ff0fa6252e013d452dd3c601724a",
       "notes": [],
@@ -16445,10 +16753,13 @@
         },
         "volume": 200.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "waitForDuration",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "423607213ad6b64ff8110794f57caeae",
       "notes": [],
@@ -16456,10 +16767,13 @@
         "seconds": 6.0
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "blowout",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "09c44d888efe62437882250587f14778",
       "notes": [],
@@ -16484,10 +16798,13 @@
           "z": 41.0
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "4a0bc24506d921dff148b519bd303fa0",
       "notes": [],
@@ -16512,10 +16829,13 @@
           "z": 36.0
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "6aae439521b3a0cc41c1e68e39fda194",
       "notes": [],
@@ -16540,10 +16860,13 @@
           "z": 41.0
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "e417248c4ff022db5e35f8075bb9d80d",
       "notes": [],
@@ -16568,10 +16891,13 @@
           "z": 98.33
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "fe63f2aa0de8ff75fed91f3511226eaf",
       "notes": [],
@@ -16579,10 +16905,13 @@
         "message": "--> ETOH Wash"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "f57ad10c6c52718c76a474f054dad143",
       "notes": [],
@@ -16609,10 +16938,13 @@
         "tipLength": 47.85,
         "tipVolume": 200.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "02e68463bf27e179870ef1fe6cb3ca9e",
       "notes": [],
@@ -16639,10 +16971,13 @@
         },
         "volume": 150.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "61cfc81f9d68dfa6b4c6e2000e119a19",
       "notes": [],
@@ -16667,10 +17002,13 @@
           "z": 41.0
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "388fcca332aaeedbb6fae5a443691f1a",
       "notes": [],
@@ -16695,10 +17033,13 @@
           "z": 36.0
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "30a7862cd349acc53e30379332f486d5",
       "notes": [],
@@ -16723,10 +17064,13 @@
           "z": 41.0
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "ec0fca358e38720ed147ed703b8eeb1e",
       "notes": [],
@@ -16751,10 +17095,13 @@
           "z": 51.7
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "d51ee14b04a86f8ba7efd9172f024d8f",
       "notes": [],
@@ -16781,10 +17128,13 @@
         },
         "volume": 150.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "waitForDuration",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "4450dec9ce6008e0b8350a5b2dfac76d",
       "notes": [],
@@ -16792,10 +17142,13 @@
         "seconds": 6.0
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "blowout",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "5d8dc420eef2a07da881da6b1ec8475e",
       "notes": [],
@@ -16820,10 +17173,13 @@
           "z": 51.7
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "8d8a9c2f3935c7407012112451f70319",
       "notes": [],
@@ -16848,10 +17204,13 @@
           "z": 58.7
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "d95308b5a872c3bd2cf1eeb28fdec459",
       "notes": [],
@@ -16876,10 +17235,13 @@
           "z": 53.7
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "90c0339f1a71f0fffcc2d4dc71939115",
       "notes": [],
@@ -16904,10 +17266,13 @@
           "z": 58.7
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "68e08b9a5487d10a5680ad3dab6a9247",
       "notes": [],
@@ -16932,10 +17297,13 @@
           "z": 98.33
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "9cc07f78e5d25d847e6e244156a8320e",
       "notes": [],
@@ -16943,10 +17311,13 @@
         "message": "--> Remove ETOH Wash"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "2b87d02b12b440f716ade861ee0de30b",
       "notes": [],
@@ -16973,10 +17344,13 @@
         "tipLength": 47.85,
         "tipVolume": 200.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "4be4c8aa0b1309cd0264dd2918e7eebe",
       "notes": [],
@@ -17001,10 +17375,13 @@
           "z": 42.42
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "d32fccbafe844997f85ea17e1dfb6185",
       "notes": [],
@@ -17031,10 +17408,13 @@
         },
         "volume": 100.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "waitForDuration",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "41ec3812c92a26a2c9874543e50bdea4",
       "notes": [],
@@ -17042,10 +17422,13 @@
         "seconds": 6.0
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "3a8a04c5d471a6e925d6b2c8b9630189",
       "notes": [],
@@ -17070,10 +17453,13 @@
           "z": 39.42
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "1e1fe2a3c47a4853038813bf292b513c",
       "notes": [],
@@ -17100,10 +17486,13 @@
         },
         "volume": 100.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "7598a14bcb16294527d64e7ac7c365cb",
       "notes": [],
@@ -17128,10 +17517,13 @@
           "z": 55.7
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "d1103db884f7ec6f9d703272d7cdf169",
       "notes": [],
@@ -17158,10 +17550,13 @@
         },
         "volume": 200.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "waitForDuration",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "474e649783f9f7742d5025f90928c8b1",
       "notes": [],
@@ -17169,10 +17564,13 @@
         "seconds": 6.0
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "blowout",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "0cebfdff2684867fc259dba5cb10d891",
       "notes": [],
@@ -17197,10 +17595,13 @@
           "z": 41.0
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "4c62382f98af43ae0482a8d934109c98",
       "notes": [],
@@ -17225,10 +17626,13 @@
           "z": 36.0
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "2bf2e9696dba1e56df47604f92ea9024",
       "notes": [],
@@ -17253,10 +17657,13 @@
           "z": 41.0
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "92c2f44dd8af26a050b5031d52410f11",
       "notes": [],
@@ -17281,10 +17688,13 @@
           "z": 98.33
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "35a883ff7829f4687720198b870b7aa4",
       "notes": [],
@@ -17292,10 +17702,13 @@
         "message": "--> Removing Residual ETOH"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "d9edd008058c4157aeb25f12feb75ca3",
       "notes": [],
@@ -17322,10 +17735,13 @@
         "tipLength": 47.85,
         "tipVolume": 200.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "7e96139ed2163fa7f870805d0b3d14b6",
       "notes": [],
@@ -17350,10 +17766,13 @@
           "z": 38.92
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "2fc4e3b5c5496c9069bfa428594d5b83",
       "notes": [],
@@ -17380,10 +17799,13 @@
         },
         "volume": 50.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "293b75ea0ecbacefa153ed06957d3826",
       "notes": [],
@@ -17410,10 +17832,13 @@
         },
         "volume": 50.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "waitForDuration",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "4af4d6dfa210405e5cda86ca70a2b4cb",
       "notes": [],
@@ -17421,10 +17846,13 @@
         "seconds": 6.0
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "blowout",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "2cc6facd963f1224ab3a1c427ebad360",
       "notes": [],
@@ -17449,10 +17877,13 @@
           "z": 41.0
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "ae58a93b888702ea3d5552a7132259df",
       "notes": [],
@@ -17477,10 +17908,13 @@
           "z": 36.0
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "e8c17bd83a28f7fb554fceccc7739e56",
       "notes": [],
@@ -17505,10 +17939,13 @@
           "z": 41.0
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "ef9b94f267046d3d18f9ceaaf8b588de",
       "notes": [],
@@ -17533,10 +17970,13 @@
           "z": 98.33
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/openLabwareLatch",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "ac51f98a51b8090329bb6c97661ef3f6",
       "notes": [],
@@ -17546,10 +17986,13 @@
       "result": {
         "pipetteRetracted": true
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "1eeb10d9c927d233fbdcd7031c0047c8",
       "notes": [],
@@ -17571,10 +18014,13 @@
         "strategy": "usingGripper"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "cdcab4e78991715e0bd9f7f9f9787e78",
       "notes": [],
@@ -17582,10 +18028,13 @@
         "moduleId": "UUID"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "9e3315bbaf72df202626719681f8ce51",
       "notes": [],
@@ -17593,10 +18042,13 @@
         "message": "--> Adding RSB"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "8c78a5a5e700de468ff2bfdbf04a1805",
       "notes": [],
@@ -17623,10 +18075,13 @@
         "tipLength": 47.4,
         "tipVolume": 50.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "2c72aeeb2fbdbd435fe7cf4375bdf270",
       "notes": [],
@@ -17653,10 +18108,13 @@
         },
         "volume": 32.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "529f6bdecc10296be849fa04c80cab54",
       "notes": [],
@@ -17681,10 +18139,13 @@
           "z": 23.260000000000005
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "808f476d33c89da7e686062ef89e0144",
       "notes": [],
@@ -17711,10 +18172,13 @@
         },
         "volume": 32.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "b190d73bc896ade45ea37cec649f3b01",
       "notes": [],
@@ -17739,10 +18203,13 @@
           "z": 20.870000000000005
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "10aebaf6c91650e96e0109fad6356664",
       "notes": [],
@@ -17769,10 +18236,13 @@
         },
         "volume": 32.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "d271d42ba20c1265c1f9ae67c271b2bc",
       "notes": [],
@@ -17797,10 +18267,13 @@
           "z": 23.260000000000005
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "967ae7e19729a3be3c1088c3bd828eaa",
       "notes": [],
@@ -17827,10 +18300,13 @@
         },
         "volume": 32.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "e8d89c46d2923c53a08d30fbfd2a1aeb",
       "notes": [],
@@ -17855,10 +18331,13 @@
           "z": 20.870000000000005
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "59c1c1d6ab2c03db5e259df571ce465c",
       "notes": [],
@@ -17885,10 +18364,13 @@
         },
         "volume": 32.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "bc0efc7c278528f930177c36ad06dc85",
       "notes": [],
@@ -17913,10 +18395,13 @@
           "z": 23.260000000000005
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "18f440bd39035ecb965dcfea353c0fc7",
       "notes": [],
@@ -17943,10 +18428,13 @@
         },
         "volume": 32.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "441a8c45231b4d0bd3b74b19cf0b6f2e",
       "notes": [],
@@ -17971,10 +18459,13 @@
           "z": 20.870000000000005
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "5b91b3bbb5b42019d65d2928092c97fd",
       "notes": [],
@@ -18001,10 +18492,13 @@
         },
         "volume": 32.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "affaefea06a32b323d65abe188b7189f",
       "notes": [],
@@ -18029,10 +18523,13 @@
           "z": 23.260000000000005
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "4c8bd3ab016b893f1c874f352d5b1096",
       "notes": [],
@@ -18059,10 +18556,13 @@
         },
         "volume": 32.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "f7f03696df895d9193cf13c923514c84",
       "notes": [],
@@ -18087,10 +18587,13 @@
           "z": 20.870000000000005
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "b2fa28a02c50105c9eb3561d3e0884e4",
       "notes": [],
@@ -18117,10 +18620,13 @@
         },
         "volume": 32.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "055e47e1903d32ccfe1d698520e46cbe",
       "notes": [],
@@ -18147,10 +18653,13 @@
         },
         "volume": 32.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "blowout",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "a717aa36dd5fd15117af9e58ec89dc0e",
       "notes": [],
@@ -18175,10 +18684,13 @@
           "z": 27.260000000000005
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "3dafa44bfa9eee7df3c3d6badec818d0",
       "notes": [],
@@ -18203,10 +18715,13 @@
           "z": 39.650000000000006
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "336db1f7801ff0793594c821c00fc6ed",
       "notes": [],
@@ -18231,10 +18746,13 @@
           "z": 34.65
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "05603da7b787a935d2795191fa5939cd",
       "notes": [],
@@ -18259,10 +18777,13 @@
           "z": 39.650000000000006
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "6285fe5cc3b2dbf857d179a0fe4980c3",
       "notes": [],
@@ -18287,10 +18808,13 @@
           "z": 98.42
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/setAndWaitForShakeSpeed",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "f20ecefeef9d0ff676b3a42bad54f7a7",
       "notes": [],
@@ -18301,10 +18825,13 @@
       "result": {
         "pipetteRetracted": false
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "waitForDuration",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "7fc5156557fc1da3a55ffcd9a30d932c",
       "notes": [],
@@ -18312,10 +18839,13 @@
         "seconds": 6.0
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/deactivateShaker",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "072bba5a89de6aafc71b6d4ee9211a6b",
       "notes": [],
@@ -18323,10 +18853,13 @@
         "moduleId": "UUID"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/openLabwareLatch",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "270c2246839a255fcd68d65312799287",
       "notes": [],
@@ -18336,10 +18869,13 @@
       "result": {
         "pipetteRetracted": false
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "f2a883d8cba1af0fc1023bd432929649",
       "notes": [],
@@ -18361,10 +18897,13 @@
         "strategy": "usingGripper"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "24a4cb6ddce3a043fe2d24e05503b0c0",
       "notes": [],
@@ -18372,10 +18911,13 @@
         "moduleId": "UUID"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "2a436f2cf99cf4571f513096b79cd097",
       "notes": [],
@@ -18383,10 +18925,13 @@
         "message": "--> Transferring Supernatant"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "d95fa6c98b0f1bb8a56ec15ccb20aad1",
       "notes": [],
@@ -18413,10 +18958,13 @@
         "tipLength": 47.4,
         "tipVolume": 50.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "69aec81355d6906a53d6332d03d13b57",
       "notes": [],
@@ -18441,10 +18989,13 @@
           "z": 39.17
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "9c4c29f2e23c3e6b80bb890941d5e8e6",
       "notes": [],
@@ -18471,10 +19022,13 @@
         },
         "volume": 31.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "d381169b8dfd5c89cb788046bbb2b0df",
       "notes": [],
@@ -18501,10 +19055,13 @@
         },
         "volume": 31.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "65dbf2a58a2011f0749d994fcc632997",
       "notes": [],
@@ -18529,6 +19086,7 @@
           "z": 98.42
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     }
   ],
@@ -18539,6 +19097,7 @@
     ],
     "protocolType": "python"
   },
+  "createdAt": "TIMESTAMP",
   "errors": [],
   "files": [
     {

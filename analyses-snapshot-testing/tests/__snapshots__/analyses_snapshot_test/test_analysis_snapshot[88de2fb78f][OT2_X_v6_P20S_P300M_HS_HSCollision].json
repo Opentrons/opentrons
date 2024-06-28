@@ -2,15 +2,20 @@
   "commands": [
     {
       "commandType": "home",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "50c7ae73a4e3f7129874f39dfb514803",
       "notes": [],
       "params": {},
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadPipette",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "371f4a86-b9a5-4bc0-8bdd-d28460087c31",
       "notes": [],
@@ -22,10 +27,13 @@
       "result": {
         "pipetteId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadPipette",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "00c0d791-6167-4a8b-8822-0482a6229976",
       "notes": [],
@@ -37,10 +45,13 @@
       "result": {
         "pipetteId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadModule",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "e3a5093f-bfb7-433b-a064-05de0c322c35",
       "notes": [],
@@ -492,10 +503,13 @@
         "moduleId": "UUID",
         "serialNumber": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "1f08132e-50c9-457b-b543-1d3318c5d075",
       "notes": [],
@@ -1643,10 +1657,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "f6ad95f9-6d54-453e-8630-50ee166deb5a",
       "notes": [],
@@ -2901,10 +2918,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "83b274d2-cbf1-4913-95dd-2c29e196983c",
       "notes": [],
@@ -4052,10 +4072,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "10a1df55-87a4-4eb3-ba1c-4e9b6e4ed3e5",
       "notes": [],
@@ -5205,10 +5228,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "99f4bd4a-9385-45cf-b57c-55a619e9b961",
       "notes": [],
@@ -5243,10 +5269,13 @@
         }
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "e5e36a96-61c3-4d73-98a7-17aeb667b727",
       "notes": [],
@@ -5254,10 +5283,13 @@
         "moduleId": "UUID"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/deactivateHeater",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "fe2e39c4-5245-465a-8df8-33096913a07d",
       "notes": [],
@@ -5265,10 +5297,13 @@
         "moduleId": "UUID"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/deactivateShaker",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "b214ab6f-85af-46be-85ea-ec7fbde9cf15",
       "notes": [],
@@ -5276,6 +5311,7 @@
         "moduleId": "UUID"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     }
   ],
@@ -5283,6 +5319,7 @@
     "protocolType": "json",
     "schemaVersion": 6
   },
+  "createdAt": "TIMESTAMP",
   "errors": [],
   "files": [
     {
@@ -5347,7 +5384,9 @@
   "metadata": {
     "author": "",
     "category": null,
+    "created": "TIMESTAMP",
     "description": "",
+    "lastModified": "TIMESTAMP",
     "protocolName": "HS Collision",
     "subcategory": null,
     "tags": []

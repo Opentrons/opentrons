@@ -2,15 +2,20 @@
   "commands": [
     {
       "commandType": "home",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "50c7ae73a4e3f7129874f39dfb514803",
       "notes": [],
       "params": {},
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "73d9d4d55ae8466f3a793ceb70545fa5",
       "notes": [],
@@ -96,10 +101,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "50de88d471ad3910c29207fb6df4502e",
       "notes": [],
@@ -1267,10 +1275,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "a83392f86baf8cd5b4f0157c89d31dbd",
       "notes": [],
@@ -1510,10 +1521,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "596b975cce05f1835b73fd3e2e9c04b0",
       "notes": [],
@@ -2785,10 +2799,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "43c0dcf1828d77562caa82b5e8a8c91e",
       "notes": [],
@@ -2876,10 +2893,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "e490d4b3b82252e91702cf9f8b05b162",
       "notes": [],
@@ -4031,10 +4051,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "d4e25f4227cb87438cd826b7f7e9308e",
       "notes": [],
@@ -5186,10 +5209,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "91f6e9514760acd6826a5f15a4e37fcc",
       "notes": [],
@@ -6341,10 +6367,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "6dd2e0e1126256453f02f8bfd5e6f398",
       "notes": [],
@@ -7496,10 +7525,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "8b0fe9f25900bd6c5e47d590480b6a89",
       "notes": [],
@@ -8651,10 +8683,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "fcc4cb12becf710742642c93962ad529",
       "notes": [],
@@ -9806,10 +9841,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadPipette",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "e3a4df25621e43f00ba244b8cf74c28c",
       "notes": [],
@@ -9822,10 +9860,13 @@
       "result": {
         "pipetteId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "367a1a429fb45efc4aec59ca8c356477",
       "notes": [],
@@ -9852,10 +9893,13 @@
         "tipLength": 47.4,
         "tipVolume": 50.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "6fa23815930c4481c7c3b18d91ad92b9",
       "notes": [],
@@ -9882,10 +9926,13 @@
         },
         "volume": 1.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "72ee90f7e2d204bd3c4b3a4f4147d58c",
       "notes": [],
@@ -9912,10 +9959,13 @@
         },
         "volume": 1.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "a2e6ac47a3f002f9f9a9621f69607713",
       "notes": [],
@@ -9940,10 +9990,13 @@
           "z": 40.0
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "4ce19ecc6f018fb75f0edb3f3b41f4ca",
       "notes": [],
@@ -9970,10 +10023,13 @@
         "tipLength": 47.4,
         "tipVolume": 50.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "24f218c0a242b86aa43860dd48e55ade",
       "notes": [],
@@ -10000,10 +10056,13 @@
         },
         "volume": 3.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "7f9a7b49520272e352774d05c9a37e70",
       "notes": [],
@@ -10030,10 +10089,13 @@
         },
         "volume": 3.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "8bb6127a84d52442b5bfc4caa40fa5aa",
       "notes": [],
@@ -10058,10 +10120,13 @@
           "z": 40.0
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "8d290d63112b8a373ceec78f4e02b5cf",
       "notes": [],
@@ -10088,10 +10153,13 @@
         "tipLength": 47.4,
         "tipVolume": 50.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "ca54aa3e1c37f7ccd324e2d84617a7bd",
       "notes": [],
@@ -10118,10 +10186,13 @@
         },
         "volume": 7.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "f459e78311688e93be1631103559a0c5",
       "notes": [],
@@ -10148,10 +10219,13 @@
         },
         "volume": 7.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "da8532aabec6f9ad3baae80b55a0d977",
       "notes": [],
@@ -10176,6 +10250,7 @@
           "z": 40.0
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     }
   ],
@@ -10186,6 +10261,7 @@
     ],
     "protocolType": "python"
   },
+  "createdAt": "TIMESTAMP",
   "errors": [],
   "files": [
     {

@@ -2,15 +2,20 @@
   "commands": [
     {
       "commandType": "home",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "50c7ae73a4e3f7129874f39dfb514803",
       "notes": [],
       "params": {},
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "73d9d4d55ae8466f3a793ceb70545fa5",
       "notes": [],
@@ -1171,10 +1176,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "50de88d471ad3910c29207fb6df4502e",
       "notes": [],
@@ -1262,10 +1270,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "a83392f86baf8cd5b4f0157c89d31dbd",
       "notes": [],
@@ -2417,10 +2428,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "596b975cce05f1835b73fd3e2e9c04b0",
       "notes": [],
@@ -3572,10 +3586,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "43c0dcf1828d77562caa82b5e8a8c91e",
       "notes": [],
@@ -4727,10 +4744,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "e490d4b3b82252e91702cf9f8b05b162",
       "notes": [],
@@ -5882,10 +5902,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadPipette",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "d10f74f641b2f74aa658fd08a5d79f18",
       "notes": [],
@@ -5898,6 +5921,7 @@
       "result": {
         "pipetteId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     }
   ],
@@ -5908,8 +5932,10 @@
     ],
     "protocolType": "python"
   },
+  "createdAt": "TIMESTAMP",
   "errors": [
     {
+      "createdAt": "TIMESTAMP",
       "detail": "ValueError [line 64]: could not convert string to float: 'Destination Well'",
       "errorCode": "4000",
       "errorInfo": {},
@@ -5918,6 +5944,7 @@
       "isDefined": false,
       "wrappedErrors": [
         {
+          "createdAt": "TIMESTAMP",
           "detail": "ValueError: could not convert string to float: 'Destination Well'",
           "errorCode": "4000",
           "errorInfo": {

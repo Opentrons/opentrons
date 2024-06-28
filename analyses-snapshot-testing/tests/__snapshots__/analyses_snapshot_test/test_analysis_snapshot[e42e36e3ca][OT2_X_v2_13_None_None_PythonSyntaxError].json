@@ -7,8 +7,10 @@
     ],
     "protocolType": "python"
   },
+  "createdAt": "TIMESTAMP",
   "errors": [
     {
+      "createdAt": "TIMESTAMP",
       "detail": "No module named 'superspecialmagic'",
       "errorCode": "4000",
       "errorInfo": {},
@@ -17,6 +19,7 @@
       "isDefined": false,
       "wrappedErrors": [
         {
+          "createdAt": "TIMESTAMP",
           "detail": "ModuleNotFoundError: No module named 'superspecialmagic'",
           "errorCode": "4000",
           "errorInfo": {

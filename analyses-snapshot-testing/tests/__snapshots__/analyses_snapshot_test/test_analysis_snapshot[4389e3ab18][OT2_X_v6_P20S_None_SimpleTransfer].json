@@ -2,15 +2,20 @@
   "commands": [
     {
       "commandType": "home",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "50c7ae73a4e3f7129874f39dfb514803",
       "notes": [],
       "params": {},
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadPipette",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "49c820bc-8a05-404c-a4a0-3ab95c65349b",
       "notes": [],
@@ -22,10 +27,13 @@
       "result": {
         "pipetteId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "0e325072-e6ea-4c37-ac07-e55d1ab210f8",
       "notes": [],
@@ -113,10 +121,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "70203647-b416-4804-9b56-9d7549ef4b08",
       "notes": [],
@@ -358,10 +369,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "109fdf6f-0081-4d1b-8bc8-4951e265b43f",
       "notes": [],
@@ -506,10 +520,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "e4c65555-b593-45fc-814f-78d69d746d36",
       "notes": [],
@@ -1657,10 +1674,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "d0002adb-4fbf-44fb-b694-289ee8157a32",
       "notes": [],
@@ -1677,10 +1697,13 @@
         }
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "be957653-f452-45b7-ae84-65e6b509f460",
       "notes": [],
@@ -1692,10 +1715,13 @@
         }
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "a78e5288-8306-4960-bf2a-86055d91f738",
       "notes": [],
@@ -1722,11 +1748,15 @@
         "tipLength": 30.950000000000003,
         "tipVolume": 20.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "error": {
+        "createdAt": "TIMESTAMP",
         "detail": "Cannot aspirate 21.0 µL when only 20.0 is available.",
         "errorCode": "4000",
         "errorInfo": {
@@ -1758,6 +1788,7 @@
         },
         "wellName": "A1"
       },
+      "startedAt": "TIMESTAMP",
       "status": "failed"
     }
   ],
@@ -1765,8 +1796,10 @@
     "protocolType": "json",
     "schemaVersion": 6
   },
+  "createdAt": "TIMESTAMP",
   "errors": [
     {
+      "createdAt": "TIMESTAMP",
       "detail": "Cannot aspirate 21.0 µL when only 20.0 is available.",
       "errorCode": "4000",
       "errorInfo": {
@@ -1850,7 +1883,9 @@
   "metadata": {
     "author": "",
     "category": null,
+    "created": "TIMESTAMP",
     "description": "",
+    "lastModified": "TIMESTAMP",
     "protocolName": "Have Pipette",
     "subcategory": null,
     "tags": []

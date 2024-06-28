@@ -2,15 +2,20 @@
   "commands": [
     {
       "commandType": "home",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "50c7ae73a4e3f7129874f39dfb514803",
       "notes": [],
       "params": {},
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "73d9d4d55ae8466f3a793ceb70545fa5",
       "notes": [],
@@ -1162,10 +1167,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadPipette",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "bd403a1c851a75b4b68ce34796d713fa",
       "notes": [],
@@ -1178,10 +1186,13 @@
       "result": {
         "pipetteId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "7c77a98dddc4874b48391d51187c8469",
       "notes": [],
@@ -2342,10 +2353,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "eee58b6cdafa99f793ac3ecc4b853bb2",
       "notes": [],
@@ -3506,6 +3520,7 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     }
   ],
@@ -3516,8 +3531,10 @@
     ],
     "protocolType": "python"
   },
+  "createdAt": "TIMESTAMP",
   "errors": [
     {
+      "createdAt": "TIMESTAMP",
       "detail": "ValueError [line 16]: Nozzle layout configuration of style SINGLE is currently unsupported.",
       "errorCode": "4000",
       "errorInfo": {},
@@ -3526,6 +3543,7 @@
       "isDefined": false,
       "wrappedErrors": [
         {
+          "createdAt": "TIMESTAMP",
           "detail": "ValueError: Nozzle layout configuration of style SINGLE is currently unsupported.",
           "errorCode": "4000",
           "errorInfo": {

@@ -17,7 +17,7 @@ class CustomJSONSnapshotExtension(JSONSnapshotExtension):
                 (r"line \d+,", "line N,"),
             ],
         }
-        self.keys_to_replace = [
+        self.id_keys_to_replace = [
             "id",
             "pipetteId",
             "labwareId",
@@ -25,6 +25,13 @@ class CustomJSONSnapshotExtension(JSONSnapshotExtension):
             "moduleId",
             "liquidId",
             "offsetId",
+        ]
+        self.timestamp_keys_to_replace = [
+            "createdAt",
+            "startedAt",
+            "completedAt",
+            "lastModified",
+            "created",
         ]
 
     def serialize(self, data: Any, **kwargs: Any) -> str:
@@ -39,8 +46,10 @@ class CustomJSONSnapshotExtension(JSONSnapshotExtension):
         return data
 
     def process_field(self, key: str, value: Union[str, Any]) -> Union[str, Any]:
-        if key in self.keys_to_replace:
+        if key in self.id_keys_to_replace:
             return "UUID"
+        if key in self.timestamp_keys_to_replace:
+            return "TIMESTAMP"
         if isinstance(value, str):
             patterns = self.replacement_patterns.get(key, [])
             for pattern, replacement in patterns:

@@ -2,15 +2,20 @@
   "commands": [
     {
       "commandType": "home",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "50c7ae73a4e3f7129874f39dfb514803",
       "notes": [],
       "params": {},
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "c9cac9dba72ab541665f112752004fbc",
       "notes": [],
@@ -18,10 +23,13 @@
         "message": "variable min_max_all_fields has value 6"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "2c70a990bdc4d6e06f98204ffb9f5b3a",
       "notes": [],
@@ -29,10 +37,13 @@
         "message": "variable int_min_max_without_unit has value 1"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "c2ca5a8a358795ff36c54b47b04ff5dd",
       "notes": [],
@@ -40,10 +51,13 @@
         "message": "variable int_min_max_without_description has value 1"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "932da4a7e22bed6dc0e9d8368d5c1e13",
       "notes": [],
@@ -51,10 +65,13 @@
         "message": "variable int_min_max_without_unit_and_description has value 1"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "d9d6d2044cb052abad52fd971c5ed6f2",
       "notes": [],
@@ -62,10 +79,13 @@
         "message": "variable int_choices_all_fields has value 20"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "fff498474415f5f2d18d52844a902bc0",
       "notes": [],
@@ -73,10 +93,13 @@
         "message": "variable int_choice_no_unit has value 6"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "4528d0588e2eb6fefde59fa436183ec7",
       "notes": [],
@@ -84,10 +107,13 @@
         "message": "variable int_choice_no_unit_desc has value 10"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "7ac9b2d52077fed6f890b6084e2b7fca",
       "notes": [],
@@ -95,10 +121,13 @@
         "message": "variable float_min_max_all_fields has value 30.0"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "d475f05751c57c92ed83131e497bc37c",
       "notes": [],
@@ -106,10 +135,13 @@
         "message": "variable float_min_max_no_unit has value 1.8"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "ba460ff1240a904a0301d302b9a10662",
       "notes": [],
@@ -117,10 +149,13 @@
         "message": "variable float_min_max_no_unit_or_desc has value 1.8"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "030e598566d2109cb88b5475c18d8891",
       "notes": [],
@@ -128,10 +163,13 @@
         "message": "variable float_choices_all_fields has value 20.0"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "02c216f1cf65cf814491736f6d7df945",
       "notes": [],
@@ -139,10 +177,13 @@
         "message": "variable float_choices_no_unit has value 10.0"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "cb391d760f0e9d37d6ea927abdb76991",
       "notes": [],
@@ -150,10 +191,13 @@
         "message": "variable float_choices_no_description has value 20.0"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "03894b0dd556aaa05985c02077784f66",
       "notes": [],
@@ -161,10 +205,13 @@
         "message": "variable float_choices_no_unit_or_desc has value 20.0"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "3db29881666bd32ac30c0e3ac6da60d5",
       "notes": [],
@@ -172,10 +219,13 @@
         "message": "variable bool_all_fields has value False"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "6737c86259de7f9822ce96dfae711ea6",
       "notes": [],
@@ -183,10 +233,13 @@
         "message": "variable bool_no_desc has value False"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "e185251c69b3a774efa938717bf54463",
       "notes": [],
@@ -194,10 +247,13 @@
         "message": "variable str_choices_all_fields has value flex_1channel_50"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "2105cd0529d1a09159563e5cbf21bd09",
       "notes": [],
@@ -205,10 +261,13 @@
         "message": "variable str_choices_all_many_fields has value E"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "ac96101154447a6c6539ce734d6fc597",
       "notes": [],
@@ -216,6 +275,7 @@
         "message": "variable str_choices_no_desc has value flex_1channel_50"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     }
   ],
@@ -226,6 +286,7 @@
     ],
     "protocolType": "python"
   },
+  "createdAt": "TIMESTAMP",
   "errors": [],
   "files": [
     {

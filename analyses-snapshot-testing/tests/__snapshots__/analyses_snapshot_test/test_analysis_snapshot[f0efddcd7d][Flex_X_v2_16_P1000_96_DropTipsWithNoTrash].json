@@ -2,15 +2,20 @@
   "commands": [
     {
       "commandType": "home",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "50c7ae73a4e3f7129874f39dfb514803",
       "notes": [],
       "params": {},
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "73d9d4d55ae8466f3a793ceb70545fa5",
       "notes": [],
@@ -97,10 +102,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "50de88d471ad3910c29207fb6df4502e",
       "notes": [],
@@ -163,10 +171,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "a83392f86baf8cd5b4f0157c89d31dbd",
       "notes": [],
@@ -1318,10 +1329,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadPipette",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "7d6a90a14623439c6f8429028cf86ee9",
       "notes": [],
@@ -1334,10 +1348,13 @@
       "result": {
         "pipetteId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "cad13a2f1b62a0098e493e055a774396",
       "notes": [],
@@ -1364,6 +1381,7 @@
         "tipLength": 85.1,
         "tipVolume": 1000.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     }
   ],
@@ -1374,8 +1392,10 @@
     ],
     "protocolType": "python"
   },
+  "createdAt": "TIMESTAMP",
   "errors": [
     {
+      "createdAt": "TIMESTAMP",
       "detail": "NoTrashDefinedError [line 23]: Error 4000 GENERAL_ERROR (NoTrashDefinedError): No trash container has been defined in this protocol.",
       "errorCode": "4000",
       "errorInfo": {},
@@ -1384,6 +1404,7 @@
       "isDefined": false,
       "wrappedErrors": [
         {
+          "createdAt": "TIMESTAMP",
           "detail": "No trash container has been defined in this protocol.",
           "errorCode": "4000",
           "errorInfo": {},

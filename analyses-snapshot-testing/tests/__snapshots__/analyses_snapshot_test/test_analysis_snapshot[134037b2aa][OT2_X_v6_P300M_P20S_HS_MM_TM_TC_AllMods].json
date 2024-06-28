@@ -2,15 +2,20 @@
   "commands": [
     {
       "commandType": "home",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "50c7ae73a4e3f7129874f39dfb514803",
       "notes": [],
       "params": {},
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadPipette",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "9fb4e8f4-186e-4063-aafe-847b7f5f5cad",
       "notes": [],
@@ -22,10 +27,13 @@
       "result": {
         "pipetteId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadPipette",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "789dde75-0ec2-490c-ab51-16f0d162e638",
       "notes": [],
@@ -37,10 +45,13 @@
       "result": {
         "pipetteId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadModule",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "42b2a4d7-403c-43bd-bc44-e61930576339",
       "notes": [],
@@ -492,10 +503,13 @@
         "moduleId": "UUID",
         "serialNumber": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadModule",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "5518b369-b938-4ac4-b2ba-adde29927e2a",
       "notes": [],
@@ -535,10 +549,13 @@
         "moduleId": "UUID",
         "serialNumber": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadModule",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "40f6b56d-05f1-46ab-a262-24601afb0f51",
       "notes": [],
@@ -580,10 +597,13 @@
         "moduleId": "UUID",
         "serialNumber": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadModule",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "3ae25b1b-2242-423a-8fb4-3f682dececd0",
       "notes": [],
@@ -626,10 +646,13 @@
         "moduleId": "UUID",
         "serialNumber": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "d458d31a-bf76-40ec-97e5-113e27bea5fd",
       "notes": [],
@@ -1777,10 +1800,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "4cc07fbd-92e7-4454-ab09-2d150afbfee6",
       "notes": [],
@@ -3035,10 +3061,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "7084ef04-3926-4bdb-bfba-0cef939464bd",
       "notes": [],
@@ -3389,10 +3418,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "416661fd-3da9-4f83-9401-18454a9a18e2",
       "notes": [],
@@ -4543,10 +4575,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "f9b8458a-cf8b-47f9-8726-70364a361821",
       "notes": [],
@@ -5697,10 +5732,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "e6b14558-83dd-46a0-88a8-7e7dc38a8869",
       "notes": [],
@@ -5788,10 +5826,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "2da37722-8a55-4955-aace-409ba03378df",
       "notes": [],
@@ -5810,10 +5851,13 @@
         }
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "8c92f196-8a7f-47b2-83d3-1526db9a39db",
       "notes": [],
@@ -5848,10 +5892,13 @@
         }
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "9d29b8c9-0f68-4d9a-89ac-c3509674d6ab",
       "notes": [],
@@ -5910,10 +5957,13 @@
         }
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "d9c86281-67c0-432a-8fb2-3a200f280e5e",
       "notes": [],
@@ -5972,10 +6022,13 @@
         }
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "b000cefe-8e3e-45d3-85e3-efe29e8ed4ec",
       "notes": [],
@@ -5987,10 +6040,13 @@
         }
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "57a860ec-3a3f-4b94-804d-dc4ebc3913cb",
       "notes": [],
@@ -5998,10 +6054,13 @@
         "moduleId": "UUID"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/deactivateHeater",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "30cddb2c-0a38-4d81-a8aa-1f355895dbe9",
       "notes": [],
@@ -6009,10 +6068,13 @@
         "moduleId": "UUID"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/deactivateShaker",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "ef4ce9a1-61e7-4aed-a4ae-24c066236368",
       "notes": [],
@@ -6020,10 +6082,13 @@
         "moduleId": "UUID"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "thermocycler/openLid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "8f2eb96e-eb4c-476e-8bdf-0d27684beb09",
       "notes": [],
@@ -6031,10 +6096,13 @@
         "moduleId": "UUID"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "9583b372-b0a7-407a-b4a5-e847dd691beb",
       "notes": [],
@@ -6061,10 +6129,13 @@
         "tipLength": 51.099999999999994,
         "tipVolume": 300.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "55fc7a88-02c8-45ef-87f6-a44c8f3d11db",
       "notes": [],
@@ -6091,10 +6162,13 @@
         },
         "volume": 20.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "e004e404-9481-4c56-ad5a-96a37a6b81c9",
       "notes": [],
@@ -6121,10 +6195,13 @@
         },
         "volume": 20.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "fa620ea5-73c3-419f-8c37-197bbfb45d45",
       "notes": [],
@@ -6149,10 +6226,13 @@
           "z": 82.0
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "37f23342-5406-43c4-9d2b-4f8e66a9b372",
       "notes": [],
@@ -6179,10 +6259,13 @@
         "tipLength": 51.099999999999994,
         "tipVolume": 300.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "3d949fd7-45f8-4b57-a02d-3e5462d92483",
       "notes": [],
@@ -6209,10 +6292,13 @@
         },
         "volume": 20.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "39106345-35da-49ce-9683-8f0d551cb98f",
       "notes": [],
@@ -6239,10 +6325,13 @@
         },
         "volume": 20.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "9b7b49e5-8923-4e11-bf18-3da29a7ddf77",
       "notes": [],
@@ -6267,10 +6356,13 @@
           "z": 82.0
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "0c165af0-08c0-4c5d-937a-4709e02ca85f",
       "notes": [],
@@ -6297,10 +6389,13 @@
         "tipLength": 51.099999999999994,
         "tipVolume": 300.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "aaeae20e-8acb-4af0-a03e-676ed9451166",
       "notes": [],
@@ -6327,10 +6422,13 @@
         },
         "volume": 25.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "a36a645b-9d7f-41c3-b04b-1785fb3001b9",
       "notes": [],
@@ -6357,10 +6455,13 @@
         },
         "volume": 25.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "f1816015-6ada-48e7-b879-4a2ea647339e",
       "notes": [],
@@ -6385,10 +6486,13 @@
           "z": 82.0
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "f731b034-77de-4a42-bf48-3bb52b28bd45",
       "notes": [],
@@ -6415,10 +6519,13 @@
         "tipLength": 51.099999999999994,
         "tipVolume": 300.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "0abfe1b2-89a4-4e6c-8078-a811dace2224",
       "notes": [],
@@ -6445,10 +6552,13 @@
         },
         "volume": 25.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "961ab4c8-da15-4350-ae65-470efc9b2238",
       "notes": [],
@@ -6475,10 +6585,13 @@
         },
         "volume": 25.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "cbd55095-b432-41eb-ab53-109553e27b6a",
       "notes": [],
@@ -6503,10 +6616,13 @@
           "z": 82.0
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "2144b06e-e692-466d-a802-6f60db8d6df3",
       "notes": [],
@@ -6533,10 +6649,13 @@
         "tipLength": 51.099999999999994,
         "tipVolume": 300.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "fc30f4e1-2e26-4cfc-95b7-abd1cdab5add",
       "notes": [],
@@ -6563,10 +6682,13 @@
         },
         "volume": 25.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "81707a0d-d590-4c95-9ea2-288e61244e23",
       "notes": [],
@@ -6593,10 +6715,13 @@
         },
         "volume": 25.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "e86624e9-17b4-4e4c-a818-99aa3b7203b4",
       "notes": [],
@@ -6621,10 +6746,13 @@
           "z": 82.0
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "05753124-aa01-48c8-805f-ff3c76b50ad2",
       "notes": [],
@@ -6651,10 +6779,13 @@
         "tipLength": 51.099999999999994,
         "tipVolume": 300.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "e56550a7-3894-4060-b8e9-6133aba946de",
       "notes": [],
@@ -6681,10 +6812,13 @@
         },
         "volume": 25.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "b241d60c-4cec-4a73-b9c4-d787747125f5",
       "notes": [],
@@ -6711,10 +6845,13 @@
         },
         "volume": 25.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "3df64ca9-dc43-4eb6-94b6-09ad696e3e2e",
       "notes": [],
@@ -6739,10 +6876,13 @@
           "z": 82.0
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "7d471a9a-2a78-4cab-85d9-ef537f01135e",
       "notes": [],
@@ -6769,10 +6909,13 @@
         "tipLength": 51.099999999999994,
         "tipVolume": 300.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "1ebef344-1ba8-40dc-b233-c71095d643a1",
       "notes": [],
@@ -6799,10 +6942,13 @@
         },
         "volume": 22.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "aee40692-f291-49f5-bb64-051378a356c7",
       "notes": [],
@@ -6829,10 +6975,13 @@
         },
         "volume": 22.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "12e5aed2-bcca-4b5b-968b-9cce7d9cb6c7",
       "notes": [],
@@ -6857,10 +7006,13 @@
           "z": 82.0
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "676d87a5-ed43-48b6-9fd7-b17fff53c880",
       "notes": [],
@@ -6887,10 +7039,13 @@
         "tipLength": 51.099999999999994,
         "tipVolume": 300.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "5adde3d5-486c-479a-a629-4fd1cd87fa55",
       "notes": [],
@@ -6917,10 +7072,13 @@
         },
         "volume": 22.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "c21b4b82-8815-4515-9fa4-7097dec1bae2",
       "notes": [],
@@ -6947,10 +7105,13 @@
         },
         "volume": 22.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "cb2f4bdf-a782-4a68-8bbd-75b65d850d0f",
       "notes": [],
@@ -6975,10 +7136,13 @@
           "z": 82.0
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "aed095a1-b724-40f8-a1d9-f24820f168ef",
       "notes": [],
@@ -7005,10 +7169,13 @@
         "tipLength": 51.099999999999994,
         "tipVolume": 300.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "046acfb4-c45e-473c-bfce-7a213e8f2974",
       "notes": [],
@@ -7035,10 +7202,13 @@
         },
         "volume": 22.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "56c2571e-dde2-4d24-9337-9003e81bee74",
       "notes": [],
@@ -7065,10 +7235,13 @@
         },
         "volume": 22.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "f1f78069-805a-4db6-90d6-cb81e937d763",
       "notes": [],
@@ -7093,10 +7266,13 @@
           "z": 82.0
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "daa6b107-d891-4a54-9d68-61fc7a1e3107",
       "notes": [],
@@ -7123,10 +7299,13 @@
         "tipLength": 51.099999999999994,
         "tipVolume": 300.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "cd45c8ac-3dd7-4d86-b613-9fcd6f7d5542",
       "notes": [],
@@ -7153,10 +7332,13 @@
         },
         "volume": 22.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "638e754d-5b83-40c0-a6da-3fcdf5da9dda",
       "notes": [],
@@ -7183,10 +7365,13 @@
         },
         "volume": 22.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "a4fbcb43-71a0-4794-84fe-39a01fb6c5e4",
       "notes": [],
@@ -7211,10 +7396,13 @@
           "z": 82.0
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "c6d2672b-fcaa-4ff1-a12b-7d9b4fd5d89e",
       "notes": [],
@@ -7241,10 +7429,13 @@
         "tipLength": 51.099999999999994,
         "tipVolume": 300.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "590a191d-51ab-4915-a1a4-944bb8142356",
       "notes": [],
@@ -7271,10 +7462,13 @@
         },
         "volume": 22.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "edac7a4f-a283-475c-8c59-bbf91a26c7f3",
       "notes": [],
@@ -7301,10 +7495,13 @@
         },
         "volume": 22.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "d1f57a8a-040d-4f1d-996a-b8b612ee8fe7",
       "notes": [],
@@ -7329,10 +7526,13 @@
           "z": 82.0
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "703ed8a5-52d8-45a4-a2e3-965c042b0491",
       "notes": [],
@@ -7359,10 +7559,13 @@
         "tipLength": 51.099999999999994,
         "tipVolume": 300.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "04316379-9994-4d5b-ac86-99fb532eefb5",
       "notes": [],
@@ -7389,10 +7592,13 @@
         },
         "volume": 22.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "3a8ea7f4-fc66-4654-ba04-dbd9f221e6a7",
       "notes": [],
@@ -7419,10 +7625,13 @@
         },
         "volume": 22.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "09d2d84e-f07b-4459-b0fe-b0216d254008",
       "notes": [],
@@ -7447,10 +7656,13 @@
           "z": 82.0
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "thermocycler/closeLid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "a2fc04dc-f0bf-4b71-a5fb-1334c98197ef",
       "notes": [],
@@ -7458,10 +7670,13 @@
         "moduleId": "UUID"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "thermocycler/setTargetBlockTemperature",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "d08d218d-1fc4-40c2-9d19-96adcbb9736e",
       "notes": [],
@@ -7472,10 +7687,13 @@
       "result": {
         "targetBlockTemperature": 55.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "thermocycler/waitForBlockTemperature",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "20955b73-7ec4-4170-a05f-329aefefc1ad",
       "notes": [],
@@ -7483,10 +7701,13 @@
         "moduleId": "UUID"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "thermocycler/setTargetLidTemperature",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "16621d7f-c322-493b-9d2b-b2a90a685ed0",
       "notes": [],
@@ -7497,10 +7718,13 @@
       "result": {
         "targetLidTemperature": 50.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "thermocycler/waitForLidTemperature",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "50451d2b-8f9a-4101-b6ad-e3308d492276",
       "notes": [],
@@ -7508,10 +7732,13 @@
         "moduleId": "UUID"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "c4232439-eaf7-4e03-a834-35949ebceced",
       "notes": [],
@@ -7519,10 +7746,13 @@
         "moduleId": "UUID"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/setTargetTemperature",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "c055f48a-6e1f-40e7-a254-b1e379c8ff43",
       "notes": [],
@@ -7531,10 +7761,13 @@
         "moduleId": "UUID"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/waitForTemperature",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "be5b2593-b645-4b0f-9593-c0186d5a340d",
       "notes": [],
@@ -7542,10 +7775,13 @@
         "moduleId": "UUID"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/setAndWaitForShakeSpeed",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "bf177287-c03d-4ba6-b8ab-27eb63d58dc4",
       "notes": [],
@@ -7556,10 +7792,13 @@
       "result": {
         "pipetteRetracted": true
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/waitForTemperature",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "a08dddce-7364-44c9-bce7-8e7ecb0f35c2",
       "notes": [],
@@ -7567,10 +7806,13 @@
         "moduleId": "UUID"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "magneticModule/engage",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "b1b75cbb-e388-4f3a-aa0f-297ecadf1ae4",
       "notes": [],
@@ -7579,10 +7821,13 @@
         "moduleId": "UUID"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "temperatureModule/setTargetTemperature",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "8d2e3b47-7396-4c30-aa08-4b590bcbc967",
       "notes": [],
@@ -7593,10 +7838,13 @@
       "result": {
         "targetTemperature": 80.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/waitForTemperature",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "39aba9eb-2506-4ecf-9c98-adcfd0e7aac6",
       "notes": [],
@@ -7604,11 +7852,15 @@
         "moduleId": "UUID"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/openLabwareLatch",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "error": {
+        "createdAt": "TIMESTAMP",
         "detail": "Heater-Shaker cannot open its labware latch while it is shaking.",
         "errorCode": "4000",
         "errorInfo": {},
@@ -7623,6 +7875,7 @@
       "params": {
         "moduleId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "failed"
     }
   ],
@@ -7630,8 +7883,10 @@
     "protocolType": "json",
     "schemaVersion": 6
   },
+  "createdAt": "TIMESTAMP",
   "errors": [
     {
+      "createdAt": "TIMESTAMP",
       "detail": "Heater-Shaker cannot open its labware latch while it is shaking.",
       "errorCode": "4000",
       "errorInfo": {},
@@ -7728,7 +7983,9 @@
   "metadata": {
     "author": "",
     "category": null,
+    "created": "TIMESTAMP",
     "description": "",
+    "lastModified": "TIMESTAMP",
     "protocolName": "All mods",
     "subcategory": null,
     "tags": []

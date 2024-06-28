@@ -7,8 +7,10 @@
     ],
     "protocolType": "python"
   },
+  "createdAt": "TIMESTAMP",
   "errors": [
     {
+      "createdAt": "TIMESTAMP",
       "detail": "ParameterValueError [line 36]: Parameter must be set to one of the allowed values of [100.0, 160.0, 200.0].",
       "errorCode": "4000",
       "errorInfo": {},
@@ -17,6 +19,7 @@
       "isDefined": false,
       "wrappedErrors": [
         {
+          "createdAt": "TIMESTAMP",
           "detail": "opentrons.protocols.parameters.exceptions.ParameterValueError: Parameter must be set to one of the allowed values of [100.0, 160.0, 200.0].",
           "errorCode": "4000",
           "errorInfo": {

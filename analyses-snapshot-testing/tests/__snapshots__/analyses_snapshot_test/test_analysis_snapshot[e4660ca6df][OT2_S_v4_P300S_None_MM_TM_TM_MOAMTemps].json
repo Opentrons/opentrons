@@ -2,15 +2,20 @@
   "commands": [
     {
       "commandType": "home",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "50c7ae73a4e3f7129874f39dfb514803",
       "notes": [],
       "params": {},
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadPipette",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "commands.LOAD_PIPETTE-0",
       "notes": [],
@@ -21,10 +26,13 @@
       "result": {
         "pipetteId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadModule",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "commands.LOAD_MODULE-0",
       "notes": [],
@@ -237,10 +245,13 @@
         "moduleId": "UUID",
         "serialNumber": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadModule",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "commands.LOAD_MODULE-1",
       "notes": [],
@@ -694,10 +705,13 @@
         "moduleId": "UUID",
         "serialNumber": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadModule",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "commands.LOAD_MODULE-2",
       "notes": [],
@@ -1151,10 +1165,13 @@
         "moduleId": "UUID",
         "serialNumber": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "commands.LOAD_LABWARE-0",
       "notes": [],
@@ -1234,10 +1251,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "commands.LOAD_LABWARE-1",
       "notes": [],
@@ -2384,10 +2404,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "command.PICK_UP_TIP-0",
       "notes": [],
@@ -2414,10 +2437,13 @@
         "tipLength": 51.099999999999994,
         "tipVolume": 300
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "command.ASPIRATE-0",
       "notes": [],
@@ -2444,10 +2470,13 @@
         },
         "volume": 100.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "command.DISPENSE-0",
       "notes": [],
@@ -2474,10 +2503,13 @@
         },
         "volume": 100.0
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "dropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "command.DROP_TIP-0",
       "notes": [],
@@ -2502,6 +2534,7 @@
           "z": 0.0
         }
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     }
   ],
@@ -2509,6 +2542,7 @@
     "protocolType": "json",
     "schemaVersion": 4
   },
+  "createdAt": "TIMESTAMP",
   "errors": [],
   "files": [
     {
@@ -2548,7 +2582,9 @@
   "metadata": {
     "author": "AA BB",
     "category": null,
+    "created": "TIMESTAMP",
     "description": "Module - PUR",
+    "lastModified": "TIMESTAMP",
     "protocolName": "MoaM",
     "subcategory": null,
     "tags": []

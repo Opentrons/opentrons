@@ -2,16 +2,22 @@
   "commands": [
     {
       "commandType": "home",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "50c7ae73a4e3f7129874f39dfb514803",
       "notes": [],
       "params": {},
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadModule",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "error": {
+        "createdAt": "TIMESTAMP",
         "detail": "ValueError: Module Type magneticModuleType does not have a related fixture ID.",
         "errorCode": "4000",
         "errorInfo": {
@@ -33,6 +39,7 @@
         },
         "model": "magneticModuleV2"
       },
+      "startedAt": "TIMESTAMP",
       "status": "failed"
     }
   ],
@@ -43,8 +50,10 @@
     ],
     "protocolType": "python"
   },
+  "createdAt": "TIMESTAMP",
   "errors": [
     {
+      "createdAt": "TIMESTAMP",
       "detail": "ProtocolCommandFailedError [line 15]: Error 4000 GENERAL_ERROR (ProtocolCommandFailedError): PythonException: ValueError: Module Type magneticModuleType does not have a related fixture ID.",
       "errorCode": "4000",
       "errorInfo": {},
@@ -53,6 +62,7 @@
       "isDefined": false,
       "wrappedErrors": [
         {
+          "createdAt": "TIMESTAMP",
           "detail": "PythonException: ValueError: Module Type magneticModuleType does not have a related fixture ID.",
           "errorCode": "4000",
           "errorInfo": {},
@@ -61,6 +71,7 @@
           "isDefined": false,
           "wrappedErrors": [
             {
+              "createdAt": "TIMESTAMP",
               "detail": "ValueError: Module Type magneticModuleType does not have a related fixture ID.",
               "errorCode": "4000",
               "errorInfo": {

@@ -2,15 +2,20 @@
   "commands": [
     {
       "commandType": "home",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "50c7ae73a4e3f7129874f39dfb514803",
       "notes": [],
       "params": {},
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadModule",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "8511b05ba5565bf0e6dcccd800e2ee23",
       "notes": [],
@@ -463,10 +468,13 @@
         "moduleId": "UUID",
         "serialNumber": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "b9563ff54d4bfe61c469a7da06e79f42",
       "notes": [],
@@ -1625,10 +1633,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "07af6536632377008ed92723cc8c5072",
       "notes": [],
@@ -2800,10 +2811,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadModule",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "622b887e764dd42ee615758c6b1636cc",
       "notes": [],
@@ -2858,10 +2872,13 @@
         "model": "magneticBlockV1",
         "moduleId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadModule",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "66e7423fa9207a88540082af4bf9286a",
       "notes": [],
@@ -2971,10 +2988,13 @@
         "moduleId": "UUID",
         "serialNumber": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "a865ce2bd83cdeaa411c3c0c7931114e",
       "notes": [],
@@ -4246,11 +4266,15 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "error": {
+        "createdAt": "TIMESTAMP",
         "detail": "FileNotFoundError: Labware \"eppendorf_96_wellplate_150ul\" not found with version 1 in namespace \"opentrons\".",
         "errorCode": "4000",
         "errorInfo": {
@@ -4267,6 +4291,7 @@
         "isDefined": false,
         "wrappedErrors": [
           {
+            "createdAt": "TIMESTAMP",
             "detail": "opentrons.protocol_engine.errors.exceptions.LabwareDefinitionDoesNotExistError: Error 4000 GENERAL_ERROR (LabwareDefinitionDoesNotExistError): Labware definition for matching opentrons/eppendorf_96_wellplate_150ul/1 not found.",
             "errorCode": "4000",
             "errorInfo": {
@@ -4283,6 +4308,7 @@
             "isDefined": false,
             "wrappedErrors": [
               {
+                "createdAt": "TIMESTAMP",
                 "detail": "KeyError: 'opentrons/eppendorf_96_wellplate_150ul/1'",
                 "errorCode": "4000",
                 "errorInfo": {
@@ -4296,6 +4322,7 @@
                 "wrappedErrors": []
               },
               {
+                "createdAt": "TIMESTAMP",
                 "detail": "KeyError: 'opentrons/eppendorf_96_wellplate_150ul/1'",
                 "errorCode": "4000",
                 "errorInfo": {
@@ -4324,6 +4351,7 @@
         "namespace": "opentrons",
         "version": 1
       },
+      "startedAt": "TIMESTAMP",
       "status": "failed"
     }
   ],
@@ -4334,8 +4362,10 @@
     ],
     "protocolType": "python"
   },
+  "createdAt": "TIMESTAMP",
   "errors": [
     {
+      "createdAt": "TIMESTAMP",
       "detail": "ProtocolCommandFailedError [line 83]: Error 4000 GENERAL_ERROR (ProtocolCommandFailedError): PythonException: FileNotFoundError: Labware \"eppendorf_96_wellplate_150ul\" not found with version 1 in namespace \"opentrons\".",
       "errorCode": "4000",
       "errorInfo": {},
@@ -4344,6 +4374,7 @@
       "isDefined": false,
       "wrappedErrors": [
         {
+          "createdAt": "TIMESTAMP",
           "detail": "PythonException: FileNotFoundError: Labware \"eppendorf_96_wellplate_150ul\" not found with version 1 in namespace \"opentrons\".",
           "errorCode": "4000",
           "errorInfo": {},
@@ -4352,6 +4383,7 @@
           "isDefined": false,
           "wrappedErrors": [
             {
+              "createdAt": "TIMESTAMP",
               "detail": "FileNotFoundError: Labware \"eppendorf_96_wellplate_150ul\" not found with version 1 in namespace \"opentrons\".",
               "errorCode": "4000",
               "errorInfo": {
@@ -4368,6 +4400,7 @@
               "isDefined": false,
               "wrappedErrors": [
                 {
+                  "createdAt": "TIMESTAMP",
                   "detail": "opentrons.protocol_engine.errors.exceptions.LabwareDefinitionDoesNotExistError: Error 4000 GENERAL_ERROR (LabwareDefinitionDoesNotExistError): Labware definition for matching opentrons/eppendorf_96_wellplate_150ul/1 not found.",
                   "errorCode": "4000",
                   "errorInfo": {
@@ -4384,6 +4417,7 @@
                   "isDefined": false,
                   "wrappedErrors": [
                     {
+                      "createdAt": "TIMESTAMP",
                       "detail": "KeyError: 'opentrons/eppendorf_96_wellplate_150ul/1'",
                       "errorCode": "4000",
                       "errorInfo": {
@@ -4397,6 +4431,7 @@
                       "wrappedErrors": []
                     },
                     {
+                      "createdAt": "TIMESTAMP",
                       "detail": "KeyError: 'opentrons/eppendorf_96_wellplate_150ul/1'",
                       "errorCode": "4000",
                       "errorInfo": {

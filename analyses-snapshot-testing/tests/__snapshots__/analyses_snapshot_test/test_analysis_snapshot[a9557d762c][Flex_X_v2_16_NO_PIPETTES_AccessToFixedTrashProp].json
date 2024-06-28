@@ -2,11 +2,14 @@
   "commands": [
     {
       "commandType": "home",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "50c7ae73a4e3f7129874f39dfb514803",
       "notes": [],
       "params": {},
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     }
   ],
@@ -17,8 +20,10 @@
     ],
     "protocolType": "python"
   },
+  "createdAt": "TIMESTAMP",
   "errors": [
     {
+      "createdAt": "TIMESTAMP",
       "detail": "APIVersionError [line 15]: Fixed Trash is not supported on Flex protocols in API Version 2.16 and above.",
       "errorCode": "4000",
       "errorInfo": {},
@@ -27,6 +32,7 @@
       "isDefined": false,
       "wrappedErrors": [
         {
+          "createdAt": "TIMESTAMP",
           "detail": "opentrons.protocols.api_support.util.APIVersionError: Fixed Trash is not supported on Flex protocols in API Version 2.16 and above.",
           "errorCode": "4000",
           "errorInfo": {

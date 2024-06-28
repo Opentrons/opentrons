@@ -2,15 +2,20 @@
   "commands": [
     {
       "commandType": "home",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "50c7ae73a4e3f7129874f39dfb514803",
       "notes": [],
       "params": {},
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadModule",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "8511b05ba5565bf0e6dcccd800e2ee23",
       "notes": [],
@@ -120,10 +125,13 @@
         "moduleId": "UUID",
         "serialNumber": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "b9563ff54d4bfe61c469a7da06e79f42",
       "notes": [],
@@ -1275,10 +1283,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadPipette",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "2763353e564ce1df96aeccf789058132",
       "notes": [],
@@ -1291,10 +1302,13 @@
       "result": {
         "pipetteId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "thermocycler/openLid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "84b4c579938df8f175f906cc96862819",
       "notes": [],
@@ -1302,10 +1316,13 @@
         "moduleId": "UUID"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "configureNozzleLayout",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "673662e4c61ebd3e36a12c1efcaed8e9",
       "notes": [],
@@ -1317,6 +1334,7 @@
         "pipetteId": "UUID"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     }
   ],
@@ -1327,8 +1345,10 @@
     ],
     "protocolType": "python"
   },
+  "createdAt": "TIMESTAMP",
   "errors": [
     {
+      "createdAt": "TIMESTAMP",
       "detail": "PartialTipMovementNotAllowedError [line 20]: Error 2004 MOTION_PLANNING_FAILURE (PartialTipMovementNotAllowedError): Moving to Opentrons Flex 96 Tip Rack 200 µL in slot A2 with A12 nozzle partial configuration will result in collision with thermocycler lid in deck slot A1.",
       "errorCode": "4000",
       "errorInfo": {},
@@ -1337,6 +1357,7 @@
       "isDefined": false,
       "wrappedErrors": [
         {
+          "createdAt": "TIMESTAMP",
           "detail": "Moving to Opentrons Flex 96 Tip Rack 200 µL in slot A2 with A12 nozzle partial configuration will result in collision with thermocycler lid in deck slot A1.",
           "errorCode": "2004",
           "errorInfo": {},

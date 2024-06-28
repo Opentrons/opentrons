@@ -2,15 +2,20 @@
   "commands": [
     {
       "commandType": "home",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "50c7ae73a4e3f7129874f39dfb514803",
       "notes": [],
       "params": {},
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadPipette",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "commands.LOAD_PIPETTE-0",
       "notes": [],
@@ -21,10 +26,13 @@
       "result": {
         "pipetteId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadPipette",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "commands.LOAD_PIPETTE-1",
       "notes": [],
@@ -35,10 +43,13 @@
       "result": {
         "pipetteId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadModule",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "commands.LOAD_MODULE-0",
       "notes": [],
@@ -251,10 +262,13 @@
         "moduleId": "UUID",
         "serialNumber": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadModule",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "commands.LOAD_MODULE-1",
       "notes": [],
@@ -708,10 +722,13 @@
         "moduleId": "UUID",
         "serialNumber": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadModule",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "commands.LOAD_MODULE-2",
       "notes": [],
@@ -754,10 +771,13 @@
         "moduleId": "UUID",
         "serialNumber": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "commands.LOAD_LABWARE-0",
       "notes": [],
@@ -837,10 +857,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "commands.LOAD_LABWARE-1",
       "notes": [],
@@ -1987,10 +2010,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "commands.LOAD_LABWARE-2",
       "notes": [],
@@ -3137,10 +3163,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "commands.LOAD_LABWARE-3",
       "notes": [],
@@ -3227,10 +3256,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "commands.LOAD_LABWARE-4",
       "notes": [],
@@ -3471,10 +3503,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "commands.LOAD_LABWARE-5",
       "notes": [],
@@ -4624,10 +4659,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "commands.LOAD_LABWARE-6",
       "notes": [],
@@ -5785,10 +5823,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "commands.LOAD_LABWARE-7",
       "notes": [],
@@ -6935,10 +6976,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "command.PICK_UP_TIP-0",
       "notes": [],
@@ -6965,11 +7009,15 @@
         "tipLength": 51.099999999999994,
         "tipVolume": 300
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "error": {
+        "createdAt": "TIMESTAMP",
         "detail": "Cannot aspirate more than pipette max volume",
         "errorCode": "4000",
         "errorInfo": {},
@@ -6978,6 +7026,7 @@
         "isDefined": false,
         "wrappedErrors": [
           {
+            "createdAt": "TIMESTAMP",
             "detail": "AssertionError: Cannot aspirate more than pipette max volume",
             "errorCode": "4000",
             "errorInfo": {
@@ -7010,6 +7059,7 @@
         },
         "wellName": "A1"
       },
+      "startedAt": "TIMESTAMP",
       "status": "failed"
     }
   ],
@@ -7017,8 +7067,10 @@
     "protocolType": "json",
     "schemaVersion": 4
   },
+  "createdAt": "TIMESTAMP",
   "errors": [
     {
+      "createdAt": "TIMESTAMP",
       "detail": "Cannot aspirate more than pipette max volume",
       "errorCode": "4000",
       "errorInfo": {},
@@ -7027,6 +7079,7 @@
       "isDefined": false,
       "wrappedErrors": [
         {
+          "createdAt": "TIMESTAMP",
           "detail": "AssertionError: Cannot aspirate more than pipette max volume",
           "errorCode": "4000",
           "errorInfo": {
@@ -7134,7 +7187,9 @@
   "metadata": {
     "author": "NN MM",
     "category": null,
+    "created": "TIMESTAMP",
     "description": "Protocol for e2e tests",
+    "lastModified": "TIMESTAMP",
     "protocolName": "script_pur_sample_1",
     "subcategory": null,
     "tags": []

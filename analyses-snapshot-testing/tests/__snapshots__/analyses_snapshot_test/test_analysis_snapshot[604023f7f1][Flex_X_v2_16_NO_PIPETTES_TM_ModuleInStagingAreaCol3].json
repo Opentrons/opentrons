@@ -2,15 +2,20 @@
   "commands": [
     {
       "commandType": "home",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "50c7ae73a4e3f7129874f39dfb514803",
       "notes": [],
       "params": {},
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "73d9d4d55ae8466f3a793ceb70545fa5",
       "notes": [],
@@ -97,11 +102,15 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadModule",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "error": {
+        "createdAt": "TIMESTAMP",
         "detail": "Cannot use Temperature Module in C3, not compatible with one or more of the following fixtures: Slot C4",
         "errorCode": "4000",
         "errorInfo": {},
@@ -119,6 +128,7 @@
         },
         "model": "temperatureModuleV2"
       },
+      "startedAt": "TIMESTAMP",
       "status": "failed"
     }
   ],
@@ -129,8 +139,10 @@
     ],
     "protocolType": "python"
   },
+  "createdAt": "TIMESTAMP",
   "errors": [
     {
+      "createdAt": "TIMESTAMP",
       "detail": "ProtocolCommandFailedError [line 17]: Error 4000 GENERAL_ERROR (ProtocolCommandFailedError): IncompatibleAddressableAreaError: Cannot use Temperature Module in C3, not compatible with one or more of the following fixtures: Slot C4",
       "errorCode": "4000",
       "errorInfo": {},
@@ -139,6 +151,7 @@
       "isDefined": false,
       "wrappedErrors": [
         {
+          "createdAt": "TIMESTAMP",
           "detail": "IncompatibleAddressableAreaError: Cannot use Temperature Module in C3, not compatible with one or more of the following fixtures: Slot C4",
           "errorCode": "4000",
           "errorInfo": {},
@@ -147,6 +160,7 @@
           "isDefined": false,
           "wrappedErrors": [
             {
+              "createdAt": "TIMESTAMP",
               "detail": "Cannot use Temperature Module in C3, not compatible with one or more of the following fixtures: Slot C4",
               "errorCode": "4000",
               "errorInfo": {},

@@ -2,15 +2,20 @@
   "commands": [
     {
       "commandType": "home",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "50c7ae73a4e3f7129874f39dfb514803",
       "notes": [],
       "params": {},
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "setRailLights",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "c0f556802f0eafbdbce20c171f217b13",
       "notes": [],
@@ -18,10 +23,13 @@
         "on": true
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "b0ba40f2987795790258bb3b52aef419",
       "notes": [],
@@ -29,10 +37,13 @@
         "message": "Let there be light! True 🌠🌠🌠"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "f69df71d649b9cbb0f560491504b17bf",
       "notes": [],
@@ -40,10 +51,13 @@
         "message": "Is the door is closed? True 🚪🚪🚪"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "252352128dcb2c6ac11f78895872a7bb",
       "notes": [],
@@ -51,10 +65,13 @@
         "message": "Is this a simulation? True 🔮🔮🔮"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "22812ba0d8d8f561d6f94d12dbd191a6",
       "notes": [],
@@ -62,10 +79,13 @@
         "message": "Running against API Version: 2.18"
       },
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "2fef6b1c39bcc1af9b9d88c5ae54d919",
       "notes": [],
@@ -1212,10 +1232,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "641d89a1769e495364a6511b4123aaee",
       "notes": [],
@@ -2362,10 +2385,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadPipette",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "2925ebb53a28d20bb95d53e4773e40c6",
       "notes": [],
@@ -2378,10 +2404,13 @@
       "result": {
         "pipetteId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadPipette",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "3b864d00b2bf4e88edb0dc034c1afeaf",
       "notes": [],
@@ -2394,10 +2423,13 @@
       "result": {
         "pipetteId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadModule",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "be987e9fdcf2dbe0234a88c9fa47f418",
       "notes": [],
@@ -2848,10 +2880,13 @@
         "moduleId": "UUID",
         "serialNumber": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadModule",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "53acfbfde5c1f9c0e34b2d3ac8d26926",
       "notes": [],
@@ -3304,10 +3339,13 @@
         "moduleId": "UUID",
         "serialNumber": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadModule",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "dc701dc10e773175dfe266b65d1ff3e6",
       "notes": [],
@@ -3417,10 +3455,13 @@
         "moduleId": "UUID",
         "serialNumber": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "760eaed99cc2a56688adb15cc79ca09b",
       "notes": [],
@@ -4579,10 +4620,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "018c33eefca131b3f7a2381ee5dd4451",
       "notes": [],
@@ -5751,10 +5795,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "c721864b5eca3153a587771422848a84",
       "notes": [],
@@ -6913,10 +6960,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "0137be81e4cddff6b188c578784942ec",
       "notes": [],
@@ -8084,10 +8134,13 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "7feed4cbc55e2030e0692ba1082065f4",
       "notes": [],
@@ -9255,11 +9308,15 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "error": {
+        "createdAt": "TIMESTAMP",
         "detail": "FileNotFoundError: Labware \"cpx_4_tuberack_100ul\" not found with version 1 in namespace \"opentrons\".",
         "errorCode": "4000",
         "errorInfo": {
@@ -9276,6 +9333,7 @@
         "isDefined": false,
         "wrappedErrors": [
           {
+            "createdAt": "TIMESTAMP",
             "detail": "opentrons.protocol_engine.errors.exceptions.LabwareDefinitionDoesNotExistError: Error 4000 GENERAL_ERROR (LabwareDefinitionDoesNotExistError): Labware definition for matching opentrons/cpx_4_tuberack_100ul/1 not found.",
             "errorCode": "4000",
             "errorInfo": {
@@ -9292,6 +9350,7 @@
             "isDefined": false,
             "wrappedErrors": [
               {
+                "createdAt": "TIMESTAMP",
                 "detail": "KeyError: 'opentrons/cpx_4_tuberack_100ul/1'",
                 "errorCode": "4000",
                 "errorInfo": {
@@ -9305,6 +9364,7 @@
                 "wrappedErrors": []
               },
               {
+                "createdAt": "TIMESTAMP",
                 "detail": "KeyError: 'opentrons/cpx_4_tuberack_100ul/1'",
                 "errorCode": "4000",
                 "errorInfo": {
@@ -9333,6 +9393,7 @@
         "namespace": "opentrons",
         "version": 1
       },
+      "startedAt": "TIMESTAMP",
       "status": "failed"
     }
   ],
@@ -9343,8 +9404,10 @@
     ],
     "protocolType": "python"
   },
+  "createdAt": "TIMESTAMP",
   "errors": [
     {
+      "createdAt": "TIMESTAMP",
       "detail": "ProtocolCommandFailedError [line 222]: Error 4000 GENERAL_ERROR (ProtocolCommandFailedError): PythonException: FileNotFoundError: Labware \"cpx_4_tuberack_100ul\" not found with version 1 in namespace \"opentrons\".",
       "errorCode": "4000",
       "errorInfo": {},
@@ -9353,6 +9416,7 @@
       "isDefined": false,
       "wrappedErrors": [
         {
+          "createdAt": "TIMESTAMP",
           "detail": "PythonException: FileNotFoundError: Labware \"cpx_4_tuberack_100ul\" not found with version 1 in namespace \"opentrons\".",
           "errorCode": "4000",
           "errorInfo": {},
@@ -9361,6 +9425,7 @@
           "isDefined": false,
           "wrappedErrors": [
             {
+              "createdAt": "TIMESTAMP",
               "detail": "FileNotFoundError: Labware \"cpx_4_tuberack_100ul\" not found with version 1 in namespace \"opentrons\".",
               "errorCode": "4000",
               "errorInfo": {
@@ -9377,6 +9442,7 @@
               "isDefined": false,
               "wrappedErrors": [
                 {
+                  "createdAt": "TIMESTAMP",
                   "detail": "opentrons.protocol_engine.errors.exceptions.LabwareDefinitionDoesNotExistError: Error 4000 GENERAL_ERROR (LabwareDefinitionDoesNotExistError): Labware definition for matching opentrons/cpx_4_tuberack_100ul/1 not found.",
                   "errorCode": "4000",
                   "errorInfo": {
@@ -9393,6 +9459,7 @@
                   "isDefined": false,
                   "wrappedErrors": [
                     {
+                      "createdAt": "TIMESTAMP",
                       "detail": "KeyError: 'opentrons/cpx_4_tuberack_100ul/1'",
                       "errorCode": "4000",
                       "errorInfo": {
@@ -9406,6 +9473,7 @@
                       "wrappedErrors": []
                     },
                     {
+                      "createdAt": "TIMESTAMP",
                       "detail": "KeyError: 'opentrons/cpx_4_tuberack_100ul/1'",
                       "errorCode": "4000",
                       "errorInfo": {

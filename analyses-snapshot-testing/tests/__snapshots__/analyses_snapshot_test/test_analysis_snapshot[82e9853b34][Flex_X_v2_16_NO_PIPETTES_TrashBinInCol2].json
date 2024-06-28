@@ -2,11 +2,14 @@
   "commands": [
     {
       "commandType": "home",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "50c7ae73a4e3f7129874f39dfb514803",
       "notes": [],
       "params": {},
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     }
   ],
@@ -17,8 +20,10 @@
     ],
     "protocolType": "python"
   },
+  "createdAt": "TIMESTAMP",
   "errors": [
     {
+      "createdAt": "TIMESTAMP",
       "detail": "InvalidTrashBinLocationError [line 15]: Invalid location for trash bin: C2.\nValid slots: Any slot in column 1 or 3.",
       "errorCode": "4000",
       "errorInfo": {},
@@ -27,6 +32,7 @@
       "isDefined": false,
       "wrappedErrors": [
         {
+          "createdAt": "TIMESTAMP",
           "detail": "opentrons.protocol_api.validation.InvalidTrashBinLocationError: Invalid location for trash bin: C2.\nValid slots: Any slot in column 1 or 3.",
           "errorCode": "4000",
           "errorInfo": {

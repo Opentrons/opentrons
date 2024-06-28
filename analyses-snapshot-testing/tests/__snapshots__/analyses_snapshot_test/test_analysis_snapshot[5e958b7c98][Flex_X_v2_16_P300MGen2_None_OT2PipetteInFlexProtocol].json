@@ -2,15 +2,20 @@
   "commands": [
     {
       "commandType": "home",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "50c7ae73a4e3f7129874f39dfb514803",
       "notes": [],
       "params": {},
       "result": {},
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "id": "UUID",
       "key": "73d9d4d55ae8466f3a793ceb70545fa5",
       "notes": [],
@@ -1157,11 +1162,15 @@
         },
         "labwareId": "UUID"
       },
+      "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
       "commandType": "loadPipette",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
       "error": {
+        "createdAt": "TIMESTAMP",
         "detail": "Cannot load a Gen2 pipette on a Flex.",
         "errorCode": "4000",
         "errorInfo": {},
@@ -1179,6 +1188,7 @@
         "pipetteName": "p300_multi_gen2",
         "tipOverlapNotAfterVersion": "v0"
       },
+      "startedAt": "TIMESTAMP",
       "status": "failed"
     }
   ],
@@ -1189,8 +1199,10 @@
     ],
     "protocolType": "python"
   },
+  "createdAt": "TIMESTAMP",
   "errors": [
     {
+      "createdAt": "TIMESTAMP",
       "detail": "ProtocolCommandFailedError [line 22]: Error 4000 GENERAL_ERROR (ProtocolCommandFailedError): InvalidSpecificationForRobotTypeError: Cannot load a Gen2 pipette on a Flex.",
       "errorCode": "4000",
       "errorInfo": {},
@@ -1199,6 +1211,7 @@
       "isDefined": false,
       "wrappedErrors": [
         {
+          "createdAt": "TIMESTAMP",
           "detail": "InvalidSpecificationForRobotTypeError: Cannot load a Gen2 pipette on a Flex.",
           "errorCode": "4000",
           "errorInfo": {},
@@ -1207,6 +1220,7 @@
           "isDefined": false,
           "wrappedErrors": [
             {
+              "createdAt": "TIMESTAMP",
               "detail": "Cannot load a Gen2 pipette on a Flex.",
               "errorCode": "4000",
               "errorInfo": {},

@@ -8,7 +8,6 @@ from automation.data.protocol import Protocol
 from automation.data.protocol_registry import ProtocolRegistry
 from citools.generate_analyses import ANALYSIS_SUFFIX, generate_analyses_from_test
 from rich.console import Console
-from syrupy.filters import props
 from syrupy.types import SerializableData
 
 from tests.custom_json_snapshot_extension import CustomJSONSnapshotExtension
@@ -30,24 +29,9 @@ def protocols_under_test() -> List[Protocol]:
     return protocol_registry.protocols_to_test
 
 
-# not included in the snapshot
-exclude = props(
-    "createdAt",
-    "startedAt",
-    "completedAt",
-    "lastModified",
-    "created",
-)
-
-
 @pytest.fixture
-def snapshot_exclude(snapshot: SerializableData) -> SerializableData:
-    return snapshot.with_defaults(exclude=exclude)
-
-
-@pytest.fixture
-def snapshot_custom(snapshot_exclude: SerializableData) -> SerializableData:
-    return snapshot_exclude.with_defaults(extension_class=CustomJSONSnapshotExtension)
+def snapshot_custom(snapshot: SerializableData) -> SerializableData:
+    return snapshot.with_defaults(extension_class=CustomJSONSnapshotExtension)
 
 
 @pytest.fixture(scope="session")
