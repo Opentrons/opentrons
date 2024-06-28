@@ -1065,7 +1065,9 @@ def test_liquid_presence_detection(
     """It should have a default liquid presence detection boolean set to False."""
     decoy.when(mock_instrument_core.get_liquid_presence_detection()).then_return(False)
     assert subject.liquid_detection is False
-    decoy.when(mock_instrument_core.set_liquid_presence_detection(True)).then_return()
+    subject.liquid_detection = True
+    decoy.when(mock_instrument_core.get_liquid_presence_detection()).then_return(True)
+    decoy.when(mock_instrument_core.set_liquid_presence_detection(False)).then_return()
 
 
 @pytest.mark.parametrize("api_version", [APIVersion(2, 13)])
