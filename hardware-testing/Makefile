@@ -31,7 +31,7 @@ ssh_key ?= $(default_ssh_key)
 ssh_opts ?= $(default_ssh_opts)
 # Helper to safely bundle ssh options
 ssh_helper = $(if $(ssh_key),-i $(ssh_key)) $(ssh_opts)
-ssh_helper_ot3 = $(ssh_helper) -o HostkeyAlgorithms=+ssh-rsa -o PubkeyAcceptedAlgorithms=+ssh-rsa
+ssh_helper_ot3 = $(ssh_helper) -o HostkeyAlgorithms=+ssh-rsa
 
 # Source discovery
 # For the python sources
@@ -322,7 +322,7 @@ update-patches-gravimetric:
 
 .PHONY: push-photometric-ot2
 push-photometric-ot2:
-	scp $(ssh_helper_ot3) -r -O photometric-ot2/photometric_ot2 root@$(host):/data/user_storage
+	scp $(ssh_helper_ot3) -r -o photometric-ot2/photometric_ot2 root@$(host):/data/user_storage
 
 .PHONY: get-latest-tag
 get-latest-tag:
