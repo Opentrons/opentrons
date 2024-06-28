@@ -71,6 +71,12 @@ export function analyzeProtocolSource(
   return Promise.all([getPythonPath(), getValidLabwareFilePaths()])
     .then(([pythonPath, customLabwarePaths]) => {
       const sourcePaths = [sourcePath, ...customLabwarePaths]
+      console.log(
+        'sourcePath from analyseProtocol',
+        pythonPath,
+        outputPath,
+        sourcePaths
+      )
       return executeAnalyzeCli(pythonPath, outputPath, sourcePaths)
     })
     .then(() => {

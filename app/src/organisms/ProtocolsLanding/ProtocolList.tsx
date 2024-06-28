@@ -32,10 +32,7 @@ import {
 } from '../../redux/config'
 import { useSortedProtocols } from './hooks'
 import { Slideout } from '../../atoms/Slideout'
-import {
-  addProtocol,
-  addProtocolFromLibrary,
-} from '../../redux/protocol-storage'
+import { addProtocolFromLibrary } from '../../redux/protocol-storage'
 import { ChooseRobotToRunProtocolSlideout } from '../ChooseRobotToRunProtocolSlideout'
 import { SendProtocolToFlexSlideout } from '../SendProtocolToFlexSlideout'
 import { ProtocolUploadInput } from './ProtocolUploadInput'
@@ -101,11 +98,9 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
     false,
     20
   )
-  console.log('protocols', protocols)
   const { protocol } = useFetchProtocolFromLibrary(
     addedProtocol != null ? addedProtocol : ''
   )
-  console.log('protocol', addedProtocol, protocol)
   const { t } = useTranslation('protocol_info')
   const { storedProtocols } = props
   const [
@@ -114,23 +109,6 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
   ] = React.useState<StoredProtocolData | null>(null)
 
   const sortedStoredProtocols = useSortedProtocols(sortBy, storedProtocols)
-  console.log(sortedStoredProtocols)
-  // if (protocol != null && protocol.analyses != null) {
-  //   console.log(JSON.stringify(protocol.analyses[0].result))
-  //   sortedStoredProtocols.push({
-  //     protocolKey: protocol.creatingUserUuid,
-  //     modified: 1718983380195.7026,
-  //     srcFiles: [],
-  //     srcFileNames: ['fakeFileName'],
-  //     mostRecentAnalysis: {
-  //       ...protocol.analyses[0].result,
-  //       runTimeParameters: [],
-  //       result: 'ok',
-  //     },
-  //   })
-  // }
-
-  // console.log('sortedStoredProtocols', sortedStoredProtocols)
 
   const dispatch = useDispatch<Dispatch>()
 
@@ -318,6 +296,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
             {t('import')}
           </SecondaryButton>
           <PrimaryButton
+            marginLeft={SPACING.spacing4}
             onClick={() => {
               setShowProtocolsFromLibrary(true)
             }}
@@ -366,9 +345,14 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
         footer={
           <PrimaryButton
             onClick={() => {
-              // console.log('wire up')
               if (protocol != null && protocol.analyses != null) {
-                dispatch(addProtocolFromLibrary(protocol?.analyses[0]?.result))
+                dispatch(
+                  addProtocolFromLibrary(
+                    protocol?.analyses[0]?.result
+                    // protocol.analyses.files[0].name
+                  )
+                )
+                setShowProtocolsFromLibrary(false)
               }
             }}
           >

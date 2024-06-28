@@ -1,6 +1,9 @@
 // common types
 
-import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
+import type {
+  CompletedProtocolAnalysis,
+  ProtocolAnalysisOutput,
+} from '@opentrons/shared-data'
 
 export interface StoredProtocolDir {
   dirPath: string
@@ -63,7 +66,7 @@ export interface AddProtocolAction {
 
 export interface AddProtocolFromLibraryAction {
   type: 'protocolStorage:ADD_PROTOCOL_FROM_LIBRARY'
-  payload: { protocolSlug: string }
+  payload: { analysis: CompletedProtocolAnalysis }
   meta: { shell: true }
 }
 

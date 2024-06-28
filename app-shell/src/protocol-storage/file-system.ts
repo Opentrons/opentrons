@@ -132,11 +132,14 @@ export function addProtocolFile(
 
 export function addProtocolFileFromLibrary(
   analysis: CompletedProtocolAnalysis,
+  // fileName: string,
   protocolsDirPath: string
 ): Promise<string> {
+  // console.log('file name', fileName)
   const updatedAnalysis: CompletedProtocolAnalysis = {
     ...analysis,
     result: 'ok',
+    runTimeParameters: analysis.runTimeParameters ?? [],
   }
   const protocolKey = uuid()
   const protocolDirPath = path.join(protocolsDirPath, protocolKey)
@@ -147,12 +150,11 @@ export function addProtocolFileFromLibrary(
     PROTOCOL_ANALYSIS_DIRECTORY_NAME
   )
 
-  const mainFileDestPath = path.join(srcDirPath, 'mainFile.json')
+  // TODO - wire up file path name in place of test.json
+  const mainFileDestPath = path.join(srcDirPath, `test.json`)
   const analysisFileDestPath = path.join(analysisDirPath, 'analysis.json')
 
   const objectData = JSON.stringify(updatedAnalysis)
-  console.log('objectData', objectData)
-  console.log('mainFileDestPath ', mainFileDestPath)
 
   return fs
     .mkdir(protocolDirPath, { recursive: true })
@@ -193,6 +195,7 @@ export function analyzeProtocolByKey(
     PROTOCOL_ANALYSIS_DIRECTORY_NAME
   )
   const destFilePath = makeAnalysisFilePath(analysisDirPath)
+  console.log('destFilePath', destFilePath, srcDirPath)
   return analyzeProtocolSource(srcDirPath, destFilePath)
 }
 

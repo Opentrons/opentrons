@@ -115,55 +115,57 @@ export const fetchProtocols = (
   dispatch: Dispatch,
   source: ListSource
 ): Promise<void> => {
-  return ensureDir(FileSystem.PROTOCOLS_DIRECTORY_PATH)
-    .then(() => migrateProtocolsFromTempDirectory())
-    .then(() =>
-      FileSystem.readDirectoriesWithinDirectory(
-        FileSystem.PROTOCOLS_DIRECTORY_PATH
+  return (
+    ensureDir(FileSystem.PROTOCOLS_DIRECTORY_PATH)
+      // .then(() => migrateProtocolsFromTempDirectory())
+      .then(() =>
+        FileSystem.readDirectoriesWithinDirectory(
+          FileSystem.PROTOCOLS_DIRECTORY_PATH
+        )
       )
-    )
-    .then(FileSystem.parseProtocolDirs)
-    .then(storedProtocols => {
-      const storedProtocolsData = storedProtocols.map(storedProtocolDir => {
-        const mostRecentAnalysisFilePath = storedProtocolDir.analysisFilePaths.reduce<
-          string | null
-        >((acc, analysisFilePath) => {
-          if (acc !== null) {
-            if (
-              getUnixTimeFromAnalysisPath(analysisFilePath) >
-              getUnixTimeFromAnalysisPath(acc)
-            ) {
-              return analysisFilePath
+      .then(FileSystem.parseProtocolDirs)
+      .then(storedProtocols => {
+        const storedProtocolsData = storedProtocols.map(storedProtocolDir => {
+          const mostRecentAnalysisFilePath = storedProtocolDir.analysisFilePaths.reduce<
+            string | null
+          >((acc, analysisFilePath) => {
+            if (acc !== null) {
+              if (
+                getUnixTimeFromAnalysisPath(analysisFilePath) >
+                getUnixTimeFromAnalysisPath(acc)
+              ) {
+                return analysisFilePath
+              }
+              return acc
             }
-            return acc
+            return analysisFilePath
+          }, null)
+
+          const mostRecentAnalysis =
+            mostRecentAnalysisFilePath != null
+              ? getParsedAnalysisFromPath(mostRecentAnalysisFilePath) ?? null
+              : null
+
+          return {
+            protocolKey: path.parse(storedProtocolDir.dirPath).base,
+            modified: storedProtocolDir.modified,
+            srcFileNames: storedProtocolDir.srcFilePaths.map(
+              filePath => path.parse(filePath).base
+            ),
+            srcFiles: storedProtocolDir.srcFilePaths.map(srcFilePath => {
+              const buffer = fse.readFileSync(srcFilePath)
+              return Buffer.from(buffer, buffer.byteOffset, buffer.byteLength)
+            }),
+            mostRecentAnalysis,
           }
-          return analysisFilePath
-        }, null)
+        })
 
-        const mostRecentAnalysis =
-          mostRecentAnalysisFilePath != null
-            ? getParsedAnalysisFromPath(mostRecentAnalysisFilePath) ?? null
-            : null
-
-        return {
-          protocolKey: path.parse(storedProtocolDir.dirPath).base,
-          modified: storedProtocolDir.modified,
-          srcFileNames: storedProtocolDir.srcFilePaths.map(
-            filePath => path.parse(filePath).base
-          ),
-          srcFiles: storedProtocolDir.srcFilePaths.map(srcFilePath => {
-            const buffer = fse.readFileSync(srcFilePath)
-            return Buffer.from(buffer, buffer.byteOffset, buffer.byteLength)
-          }),
-          mostRecentAnalysis,
-        }
+        dispatch(updateProtocolList(storedProtocolsData, source))
       })
-
-      dispatch(updateProtocolList(storedProtocolsData, source))
-    })
-    .catch((error: Error) => {
-      dispatch(updateProtocolListFailure(error.message, source))
-    })
+      .catch((error: Error) => {
+        dispatch(updateProtocolListFailure(error.message, source))
+      })
+  )
 }
 
 export function registerProtocolStorage(dispatch: Dispatch): Dispatch {
@@ -179,10 +181,11 @@ export function registerProtocolStorage(dispatch: Dispatch): Dispatch {
       case ADD_PROTOCOL_FROM_LIBRARY: {
         FileSystem.addProtocolFileFromLibrary(
           action.payload.analysis,
+          // action.payload.fileName,
           FileSystem.PROTOCOLS_DIRECTORY_PATH
         ).then(protocolKey => {
           fetchProtocols(dispatch, PROTOCOL_ADDITION)
-          dispatch(analyzeProtocol(protocolKey))
+          // dispatch(analyzeProtocol(protocolKey))
         })
         break
       }

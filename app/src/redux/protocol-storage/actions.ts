@@ -84,6 +84,7 @@ export const addProtocol = (
 
 export const addProtocolFromLibrary = (
   analysis: CompletedProtocolAnalysis
+  // fileName: string
 ): Types.AddProtocolFromLibraryAction => ({
   type: ADD_PROTOCOL_FROM_LIBRARY,
   payload: { analysis },
