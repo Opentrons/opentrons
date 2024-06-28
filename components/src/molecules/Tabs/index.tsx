@@ -24,6 +24,10 @@ const DEFAULT_TAB_STYLE = css`
   &:disabled {
     background-color: ${COLORS.grey30};
     color: ${COLORS.grey40};
+
+    &:hover {
+      background-color: ${COLORS.grey30};
+    }
   }
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
