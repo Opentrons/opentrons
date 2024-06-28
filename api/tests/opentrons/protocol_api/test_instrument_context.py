@@ -1059,6 +1059,15 @@ def test_flow_rate(
     assert result == flow_rates
 
 
+def test_liquid_presence_detection(
+    decoy: Decoy, mock_instrument_core: InstrumentCore, subject: InstrumentContext
+) -> None:
+    """It should have a default liquid presence detection boolean set to False."""
+    decoy.when(mock_instrument_core.get_liquid_presence_detection()).then_return(False)
+    assert subject.liquid_detection == False
+    decoy.when(mock_instrument_core.set_liquid_presence_detection(True)).then_return()
+
+
 @pytest.mark.parametrize("api_version", [APIVersion(2, 13)])
 @pytest.mark.parametrize(
     "mock_instrument_core",
