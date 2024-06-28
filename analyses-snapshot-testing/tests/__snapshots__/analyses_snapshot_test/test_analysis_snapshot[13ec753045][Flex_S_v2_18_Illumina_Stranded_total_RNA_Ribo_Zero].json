@@ -2,6 +2,8 @@
   "commands": [
     {
       "commandType": "home",
+      "id": "UUID",
+      "key": "50c7ae73a4e3f7129874f39dfb514803",
       "notes": [],
       "params": {},
       "result": {},
@@ -9,6 +11,8 @@
     },
     {
       "commandType": "loadModule",
+      "id": "UUID",
+      "key": "8511b05ba5565bf0e6dcccd800e2ee23",
       "notes": [],
       "params": {
         "location": {
@@ -455,16 +459,22 @@
             }
           }
         },
-        "model": "temperatureModuleV2"
+        "model": "temperatureModuleV2",
+        "moduleId": "UUID",
+        "serialNumber": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "b9563ff54d4bfe61c469a7da06e79f42",
       "notes": [],
       "params": {
         "loadName": "opentrons_96_well_aluminum_block",
-        "location": {},
+        "location": {
+          "moduleId": "UUID"
+        },
         "namespace": "opentrons",
         "version": 1
       },
@@ -1612,16 +1622,21 @@
               "z": 3.38
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "07af6536632377008ed92723cc8c5072",
       "notes": [],
       "params": {
         "loadName": "opentrons_96_wellplate_200ul_pcr_full_skirt",
-        "location": {},
+        "location": {
+          "labwareId": "UUID"
+        },
         "namespace": "opentrons",
         "version": 2
       },
@@ -2782,12 +2797,15 @@
               "z": 1.05
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadModule",
+      "id": "UUID",
+      "key": "622b887e764dd42ee615758c6b1636cc",
       "notes": [],
       "params": {
         "location": {
@@ -2837,12 +2855,15 @@
             "ot3_standard": {}
           }
         },
-        "model": "magneticBlockV1"
+        "model": "magneticBlockV1",
+        "moduleId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadModule",
+      "id": "UUID",
+      "key": "66e7423fa9207a88540082af4bf9286a",
       "notes": [],
       "params": {
         "location": {
@@ -2946,12 +2967,16 @@
             }
           }
         },
-        "model": "thermocyclerModuleV2"
+        "model": "thermocyclerModuleV2",
+        "moduleId": "UUID",
+        "serialNumber": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "a865ce2bd83cdeaa411c3c0c7931114e",
       "notes": [],
       "params": {
         "loadName": "nest_96_wellplate_2ml_deep",
@@ -4218,7 +4243,8 @@
               "z": 3
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
@@ -4237,6 +4263,7 @@
           "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/execution/command_executor.py\", line N, in execute\n    result = await command_impl.execute(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/commands/load_labware.py\", line N, in execute\n    loaded_labware = await self._equipment.load_labware(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/execution/equipment.py\", line N, in load_labware\n    definition = await self._labware_data_provider.get_labware_definition(\n\n  File \"/usr/local/lib/python3.10/site-packages/anyio/_backends/_asyncio.py\", line N, in run_sync_in_worker_thread\n    return await future\n\n  File \"/usr/local/lib/python3.10/site-packages/anyio/_backends/_asyncio.py\", line N, in run\n    result = context.run(func, *args)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/resources/labware_data_provider.py\", line N, in _get_labware_definition_sync\n    get_labware_definition(load_name, namespace, version)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/labware.py\", line N, in get_labware_definition\n    return _get_standard_labware_definition(load_name, namespace, version)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/labware.py\", line N, in _get_standard_labware_definition\n    raise FileNotFoundError(\n"
         },
         "errorType": "PythonException",
+        "id": "UUID",
         "isDefined": false,
         "wrappedErrors": [
           {
@@ -4252,6 +4279,7 @@
               "wrapping": "[]"
             },
             "errorType": "PythonException",
+            "id": "UUID",
             "isDefined": false,
             "wrappedErrors": [
               {
@@ -4263,6 +4291,7 @@
                   "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/state/labware.py\", line N, in get_definition_by_uri\n    return self._state.definitions_by_uri[uri]\n"
                 },
                 "errorType": "PythonException",
+                "id": "UUID",
                 "isDefined": false,
                 "wrappedErrors": []
               },
@@ -4275,6 +4304,7 @@
                   "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/state/labware.py\", line N, in get_definition_by_uri\n    return self._state.definitions_by_uri[uri]\n"
                 },
                 "errorType": "PythonException",
+                "id": "UUID",
                 "isDefined": false,
                 "wrappedErrors": []
               }
@@ -4282,6 +4312,8 @@
           }
         ]
       },
+      "id": "UUID",
+      "key": "bccdb28e967f574dfbe472004101d7f9",
       "notes": [],
       "params": {
         "displayName": "Index Anchors",
@@ -4308,6 +4340,7 @@
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
+      "id": "UUID",
       "isDefined": false,
       "wrappedErrors": [
         {
@@ -4315,6 +4348,7 @@
           "errorCode": "4000",
           "errorInfo": {},
           "errorType": "ProtocolCommandFailedError",
+          "id": "UUID",
           "isDefined": false,
           "wrappedErrors": [
             {
@@ -4330,6 +4364,7 @@
                 "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/execution/command_executor.py\", line N, in execute\n    result = await command_impl.execute(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/commands/load_labware.py\", line N, in execute\n    loaded_labware = await self._equipment.load_labware(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/execution/equipment.py\", line N, in load_labware\n    definition = await self._labware_data_provider.get_labware_definition(\n\n  File \"/usr/local/lib/python3.10/site-packages/anyio/_backends/_asyncio.py\", line N, in run_sync_in_worker_thread\n    return await future\n\n  File \"/usr/local/lib/python3.10/site-packages/anyio/_backends/_asyncio.py\", line N, in run\n    result = context.run(func, *args)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/resources/labware_data_provider.py\", line N, in _get_labware_definition_sync\n    get_labware_definition(load_name, namespace, version)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/labware.py\", line N, in get_labware_definition\n    return _get_standard_labware_definition(load_name, namespace, version)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/labware.py\", line N, in _get_standard_labware_definition\n    raise FileNotFoundError(\n"
               },
               "errorType": "PythonException",
+              "id": "UUID",
               "isDefined": false,
               "wrappedErrors": [
                 {
@@ -4345,6 +4380,7 @@
                     "wrapping": "[]"
                   },
                   "errorType": "PythonException",
+                  "id": "UUID",
                   "isDefined": false,
                   "wrappedErrors": [
                     {
@@ -4356,6 +4392,7 @@
                         "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/state/labware.py\", line N, in get_definition_by_uri\n    return self._state.definitions_by_uri[uri]\n"
                       },
                       "errorType": "PythonException",
+                      "id": "UUID",
                       "isDefined": false,
                       "wrappedErrors": []
                     },
@@ -4368,6 +4405,7 @@
                         "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/state/labware.py\", line N, in get_definition_by_uri\n    return self._state.definitions_by_uri[uri]\n"
                       },
                       "errorType": "PythonException",
+                      "id": "UUID",
                       "isDefined": false,
                       "wrappedErrors": []
                     }
@@ -4389,16 +4427,23 @@
   "labware": [
     {
       "definitionUri": "opentrons/opentrons_96_well_aluminum_block/1",
+      "id": "UUID",
       "loadName": "opentrons_96_well_aluminum_block",
-      "location": {}
+      "location": {
+        "moduleId": "UUID"
+      }
     },
     {
       "definitionUri": "opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/2",
+      "id": "UUID",
       "loadName": "opentrons_96_wellplate_200ul_pcr_full_skirt",
-      "location": {}
+      "location": {
+        "labwareId": "UUID"
+      }
     },
     {
       "definitionUri": "opentrons/nest_96_wellplate_2ml_deep/2",
+      "id": "UUID",
       "loadName": "nest_96_wellplate_2ml_deep",
       "location": {
         "slotName": "A2"
@@ -4413,22 +4458,27 @@
   },
   "modules": [
     {
+      "id": "UUID",
       "location": {
         "slotName": "D1"
       },
-      "model": "temperatureModuleV2"
+      "model": "temperatureModuleV2",
+      "serialNumber": "UUID"
     },
     {
+      "id": "UUID",
       "location": {
         "slotName": "A3"
       },
       "model": "magneticBlockV1"
     },
     {
+      "id": "UUID",
       "location": {
         "slotName": "B1"
       },
-      "model": "thermocyclerModuleV2"
+      "model": "thermocyclerModuleV2",
+      "serialNumber": "UUID"
     }
   ],
   "pipettes": [],

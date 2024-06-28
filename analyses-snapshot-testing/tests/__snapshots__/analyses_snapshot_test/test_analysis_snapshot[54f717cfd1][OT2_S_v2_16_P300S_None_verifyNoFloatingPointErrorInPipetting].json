@@ -2,6 +2,8 @@
   "commands": [
     {
       "commandType": "home",
+      "id": "UUID",
+      "key": "50c7ae73a4e3f7129874f39dfb514803",
       "notes": [],
       "params": {},
       "result": {},
@@ -9,6 +11,8 @@
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "73d9d4d55ae8466f3a793ceb70545fa5",
       "notes": [],
       "params": {
         "loadName": "opentrons_96_tiprack_300ul",
@@ -1149,12 +1153,15 @@
               "z": 5.39
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "50de88d471ad3910c29207fb6df4502e",
       "notes": [],
       "params": {
         "loadName": "opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap",
@@ -1510,12 +1517,15 @@
               "z": 42.05
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadPipette",
+      "id": "UUID",
+      "key": "54fddab1eb921f6e1d3aa7e96d2ac307",
       "notes": [],
       "params": {
         "liquidPresenceDetection": false,
@@ -1523,13 +1533,19 @@
         "pipetteName": "p300_single_gen2",
         "tipOverlapNotAfterVersion": "v0"
       },
-      "result": {},
+      "result": {
+        "pipetteId": "UUID"
+      },
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "id": "UUID",
+      "key": "edfad9623f53264d713b6020c8a9e4e1",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "wellLocation": {
           "offset": {
             "x": 0.0,
@@ -1554,9 +1570,13 @@
     },
     {
       "commandType": "aspirate",
+      "id": "UUID",
+      "key": "d605d706af7883c674712230de65b227",
       "notes": [],
       "params": {
         "flowRate": 92.86,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 45.4,
         "wellLocation": {
           "offset": {
@@ -1580,9 +1600,13 @@
     },
     {
       "commandType": "moveToWell",
+      "id": "UUID",
+      "key": "31cbee488a586627c2f14e4ff31267fb",
       "notes": [],
       "params": {
         "forceDirect": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "wellLocation": {
           "offset": {
             "x": 0.0,
@@ -1604,9 +1628,13 @@
     },
     {
       "commandType": "aspirate",
+      "id": "UUID",
+      "key": "766b897ca1ca77b7abd8f08158426aa9",
       "notes": [],
       "params": {
         "flowRate": 92.86,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 10.0,
         "wellLocation": {
           "offset": {
@@ -1630,9 +1658,13 @@
     },
     {
       "commandType": "dispense",
+      "id": "UUID",
+      "key": "4350e0ad040c51cc52b61277b5e2b39c",
       "notes": [],
       "params": {
         "flowRate": 92.86,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 32.7,
         "wellLocation": {
           "offset": {
@@ -1656,9 +1688,13 @@
     },
     {
       "commandType": "moveToWell",
+      "id": "UUID",
+      "key": "708c94cef21aca228bc0da89fc3ce725",
       "notes": [],
       "params": {
         "forceDirect": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "wellLocation": {
           "offset": {
             "x": 0.0,
@@ -1680,9 +1716,13 @@
     },
     {
       "commandType": "aspirate",
+      "id": "UUID",
+      "key": "09c1223bdf13aee9b67594ba819898e7",
       "notes": [],
       "params": {
         "flowRate": 92.86,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 10.0,
         "wellLocation": {
           "offset": {
@@ -1706,9 +1746,13 @@
     },
     {
       "commandType": "dispense",
+      "id": "UUID",
+      "key": "67ec30fc58a094ff2f68fe7f7731126f",
       "notes": [],
       "params": {
         "flowRate": 92.86,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 32.699999999999996,
         "wellLocation": {
           "offset": {
@@ -1732,6 +1776,8 @@
     },
     {
       "commandType": "moveToAddressableAreaForDropTip",
+      "id": "UUID",
+      "key": "38d6283a4e301637e33b8441fb3be449",
       "notes": [],
       "params": {
         "addressableAreaName": "fixedTrash",
@@ -1742,7 +1788,8 @@
           "x": 0.0,
           "y": 0.0,
           "z": 0.0
-        }
+        },
+        "pipetteId": "UUID"
       },
       "result": {
         "position": {
@@ -1755,8 +1802,12 @@
     },
     {
       "commandType": "dropTipInPlace",
+      "id": "UUID",
+      "key": "11dc6f65cf3d35d4b8f6c3097521e3e8",
       "notes": [],
-      "params": {},
+      "params": {
+        "pipetteId": "UUID"
+      },
       "result": {},
       "status": "succeeded"
     }
@@ -1778,6 +1829,7 @@
   "labware": [
     {
       "definitionUri": "opentrons/opentrons_96_tiprack_300ul/1",
+      "id": "UUID",
       "loadName": "opentrons_96_tiprack_300ul",
       "location": {
         "slotName": "9"
@@ -1785,6 +1837,7 @@
     },
     {
       "definitionUri": "opentrons/opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap/1",
+      "id": "UUID",
       "loadName": "opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap",
       "location": {
         "slotName": "10"
@@ -1796,6 +1849,7 @@
   "modules": [],
   "pipettes": [
     {
+      "id": "UUID",
       "mount": "left",
       "pipetteName": "p300_single_gen2"
     }

@@ -13,6 +13,7 @@
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
+      "id": "UUID",
       "isDefined": false,
       "wrappedErrors": [
         {
@@ -24,6 +25,7 @@
             "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line N, in _parse_and_set_parameters\n    exec(\"add_parameters(__param_context)\", new_globs)\n\n  File \"<string>\", line N, in <module>\n\n  File \"Flex_X_v2_18_NO_PIPETTES_Overrides_BadTypesInRTP_Override_wrong_type_in_minimum.py\", line N, in add_parameters\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/_parameter_context.py\", line N, in add_int\n    parameter = parameter_definition.create_int_parameter(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/parameter_definition.py\", line N, in create_int_parameter\n    return ParameterDefinition(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/parameter_definition.py\", line N, in __init__\n    validation.validate_options(default, minimum, maximum, choices, parameter_type)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/validation.py\", line N, in validate_options\n    _validate_min_and_max(minimum, maximum, parameter_type)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/validation.py\", line N, in _validate_min_and_max\n    raise ParameterDefinitionError(\n"
           },
           "errorType": "PythonException",
+          "id": "UUID",
           "isDefined": false,
           "wrappedErrors": []
         }

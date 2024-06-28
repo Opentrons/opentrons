@@ -2,6 +2,8 @@
   "commands": [
     {
       "commandType": "home",
+      "id": "UUID",
+      "key": "50c7ae73a4e3f7129874f39dfb514803",
       "notes": [],
       "params": {},
       "result": {},
@@ -9,6 +11,8 @@
     },
     {
       "commandType": "loadModule",
+      "id": "UUID",
+      "key": "8511b05ba5565bf0e6dcccd800e2ee23",
       "notes": [],
       "params": {
         "location": {
@@ -112,12 +116,16 @@
             }
           }
         },
-        "model": "thermocyclerModuleV2"
+        "model": "thermocyclerModuleV2",
+        "moduleId": "UUID",
+        "serialNumber": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "b9563ff54d4bfe61c469a7da06e79f42",
       "notes": [],
       "params": {
         "loadName": "opentrons_flex_96_tiprack_200ul",
@@ -1264,12 +1272,15 @@
               "z": 1.5
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadPipette",
+      "id": "UUID",
+      "key": "2763353e564ce1df96aeccf789058132",
       "notes": [],
       "params": {
         "liquidPresenceDetection": false,
@@ -1277,24 +1288,33 @@
         "pipetteName": "p1000_96",
         "tipOverlapNotAfterVersion": "v0"
       },
-      "result": {},
+      "result": {
+        "pipetteId": "UUID"
+      },
       "status": "succeeded"
     },
     {
       "commandType": "thermocycler/openLid",
+      "id": "UUID",
+      "key": "84b4c579938df8f175f906cc96862819",
       "notes": [],
-      "params": {},
+      "params": {
+        "moduleId": "UUID"
+      },
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "configureNozzleLayout",
+      "id": "UUID",
+      "key": "673662e4c61ebd3e36a12c1efcaed8e9",
       "notes": [],
       "params": {
         "configurationParams": {
           "primaryNozzle": "A12",
           "style": "COLUMN"
-        }
+        },
+        "pipetteId": "UUID"
       },
       "result": {},
       "status": "succeeded"
@@ -1313,6 +1333,7 @@
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
+      "id": "UUID",
       "isDefined": false,
       "wrappedErrors": [
         {
@@ -1320,6 +1341,7 @@
           "errorCode": "2004",
           "errorInfo": {},
           "errorType": "PartialTipMovementNotAllowedError",
+          "id": "UUID",
           "isDefined": false,
           "wrappedErrors": []
         }
@@ -1335,6 +1357,7 @@
   "labware": [
     {
       "definitionUri": "opentrons/opentrons_flex_96_tiprack_200ul/1",
+      "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_200ul",
       "location": {
         "slotName": "A2"
@@ -1345,14 +1368,17 @@
   "metadata": {},
   "modules": [
     {
+      "id": "UUID",
       "location": {
         "slotName": "B1"
       },
-      "model": "thermocyclerModuleV2"
+      "model": "thermocyclerModuleV2",
+      "serialNumber": "UUID"
     }
   ],
   "pipettes": [
     {
+      "id": "UUID",
       "mount": "left",
       "pipetteName": "p1000_96"
     }

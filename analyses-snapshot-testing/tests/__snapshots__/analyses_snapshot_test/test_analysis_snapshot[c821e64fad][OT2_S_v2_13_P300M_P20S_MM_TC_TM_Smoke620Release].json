@@ -2,6 +2,8 @@
   "commands": [
     {
       "commandType": "home",
+      "id": "UUID",
+      "key": "50c7ae73a4e3f7129874f39dfb514803",
       "notes": [],
       "params": {},
       "result": {},
@@ -9,6 +11,8 @@
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "commands.LOAD_LABWARE-0",
       "notes": [],
       "params": {
         "displayName": "300ul tips",
@@ -1150,12 +1154,15 @@
               "z": 5.39
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "commands.LOAD_LABWARE-1",
       "notes": [],
       "params": {
         "displayName": "20ul tips",
@@ -2297,38 +2304,50 @@
               "z": 25.49
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadPipette",
+      "id": "UUID",
+      "key": "commands.LOAD_PIPETTE-0",
       "notes": [],
       "params": {
         "mount": "right",
         "pipetteName": "p20_single_gen2"
       },
-      "result": {},
+      "result": {
+        "pipetteId": "UUID"
+      },
       "status": "succeeded"
     },
     {
       "commandType": "loadPipette",
+      "id": "UUID",
+      "key": "commands.LOAD_PIPETTE-1",
       "notes": [],
       "params": {
         "mount": "left",
         "pipetteName": "p300_multi_gen2"
       },
-      "result": {},
+      "result": {
+        "pipetteId": "UUID"
+      },
       "status": "succeeded"
     },
     {
       "commandType": "loadModule",
+      "id": "UUID",
+      "key": "commands.LOAD_MODULE-0",
       "notes": [],
       "params": {
         "location": {
           "slotName": "9"
         },
-        "model": "magneticModuleV2"
+        "model": "magneticModuleV2",
+        "moduleId": "UUID"
       },
       "result": {
         "definition": {
@@ -2528,18 +2547,23 @@
             }
           }
         },
-        "model": "magneticModuleV2"
+        "model": "magneticModuleV2",
+        "moduleId": "UUID",
+        "serialNumber": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadModule",
+      "id": "UUID",
+      "key": "commands.LOAD_MODULE-1",
       "notes": [],
       "params": {
         "location": {
           "slotName": "4"
         },
-        "model": "temperatureModuleV1"
+        "model": "temperatureModuleV1",
+        "moduleId": "UUID"
       },
       "result": {
         "definition": {
@@ -2568,18 +2592,23 @@
           "quirks": [],
           "slotTransforms": {}
         },
-        "model": "temperatureModuleV1"
+        "model": "temperatureModuleV1",
+        "moduleId": "UUID",
+        "serialNumber": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadModule",
+      "id": "UUID",
+      "key": "commands.LOAD_MODULE-2",
       "notes": [],
       "params": {
         "location": {
           "slotName": "7"
         },
-        "model": "thermocyclerModuleV2"
+        "model": "thermocyclerModuleV2",
+        "moduleId": "UUID"
       },
       "result": {
         "definition": {
@@ -2677,17 +2706,23 @@
             }
           }
         },
-        "model": "thermocyclerModuleV2"
+        "model": "thermocyclerModuleV2",
+        "moduleId": "UUID",
+        "serialNumber": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "commands.LOAD_LABWARE-2",
       "notes": [],
       "params": {
         "displayName": "Temperature-Controlled plate",
         "loadName": "opentrons_96_aluminumblock_nest_wellplate_100ul",
-        "location": {},
+        "location": {
+          "moduleId": "UUID"
+        },
         "namespace": "opentrons",
         "version": 1
       },
@@ -3836,16 +3871,21 @@
               "z": 6.42
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "commands.LOAD_LABWARE-3",
       "notes": [],
       "params": {
         "loadName": "nest_96_wellplate_100ul_pcr_full_skirt",
-        "location": {},
+        "location": {
+          "moduleId": "UUID"
+        },
         "namespace": "opentrons",
         "version": 1
       },
@@ -4983,16 +5023,21 @@
               "z": 0.92
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "commands.LOAD_LABWARE-4",
       "notes": [],
       "params": {
         "loadName": "nest_96_wellplate_100ul_pcr_full_skirt",
-        "location": {},
+        "location": {
+          "moduleId": "UUID"
+        },
         "namespace": "opentrons",
         "version": 1
       },
@@ -6130,12 +6175,15 @@
               "z": 0.92
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "commands.LOAD_LABWARE-5",
       "notes": [],
       "params": {
         "displayName": "4 tubes",
@@ -6248,12 +6296,15 @@
               "z": 17
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "commands.LOAD_LABWARE-6",
       "notes": [],
       "params": {
         "displayName": "logo destination",
@@ -7398,12 +7449,15 @@
               "z": 0.92
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "commands.LOAD_LABWARE-7",
       "notes": [],
       "params": {
         "displayName": "dye container",
@@ -7639,14 +7693,19 @@
               "z": 4.55
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "id": "UUID",
+      "key": "command.PICK_UP_TIP-0",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "wellLocation": {
           "offset": {
             "x": 0,
@@ -7671,9 +7730,13 @@
     },
     {
       "commandType": "aspirate",
+      "id": "UUID",
+      "key": "command.ASPIRATE-0",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 19.0,
         "wellLocation": {
           "offset": {
@@ -7697,9 +7760,13 @@
     },
     {
       "commandType": "dispense",
+      "id": "UUID",
+      "key": "command.DISPENSE-0",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 18.0,
         "wellLocation": {
           "offset": {
@@ -7723,9 +7790,13 @@
     },
     {
       "commandType": "blowout",
+      "id": "UUID",
+      "key": "command.BLOW_OUT-0",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "wellLocation": {
           "offset": {
             "x": 0,
@@ -7747,9 +7818,13 @@
     },
     {
       "commandType": "aspirate",
+      "id": "UUID",
+      "key": "command.ASPIRATE-1",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 19.0,
         "wellLocation": {
           "offset": {
@@ -7773,9 +7848,13 @@
     },
     {
       "commandType": "dispense",
+      "id": "UUID",
+      "key": "command.DISPENSE-1",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 18.0,
         "wellLocation": {
           "offset": {
@@ -7799,9 +7878,13 @@
     },
     {
       "commandType": "blowout",
+      "id": "UUID",
+      "key": "command.BLOW_OUT-1",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "wellLocation": {
           "offset": {
             "x": 0,
@@ -7823,9 +7906,13 @@
     },
     {
       "commandType": "aspirate",
+      "id": "UUID",
+      "key": "command.ASPIRATE-2",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 19.0,
         "wellLocation": {
           "offset": {
@@ -7849,9 +7936,13 @@
     },
     {
       "commandType": "dispense",
+      "id": "UUID",
+      "key": "command.DISPENSE-2",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 18.0,
         "wellLocation": {
           "offset": {
@@ -7875,9 +7966,13 @@
     },
     {
       "commandType": "blowout",
+      "id": "UUID",
+      "key": "command.BLOW_OUT-2",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "wellLocation": {
           "offset": {
             "x": 0,
@@ -7899,9 +7994,13 @@
     },
     {
       "commandType": "aspirate",
+      "id": "UUID",
+      "key": "command.ASPIRATE-3",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 19.0,
         "wellLocation": {
           "offset": {
@@ -7925,9 +8024,13 @@
     },
     {
       "commandType": "dispense",
+      "id": "UUID",
+      "key": "command.DISPENSE-3",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 18.0,
         "wellLocation": {
           "offset": {
@@ -7951,9 +8054,13 @@
     },
     {
       "commandType": "blowout",
+      "id": "UUID",
+      "key": "command.BLOW_OUT-3",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "wellLocation": {
           "offset": {
             "x": 0,
@@ -7975,9 +8082,13 @@
     },
     {
       "commandType": "aspirate",
+      "id": "UUID",
+      "key": "command.ASPIRATE-4",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 19.0,
         "wellLocation": {
           "offset": {
@@ -8001,9 +8112,13 @@
     },
     {
       "commandType": "dispense",
+      "id": "UUID",
+      "key": "command.DISPENSE-4",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 18.0,
         "wellLocation": {
           "offset": {
@@ -8027,9 +8142,13 @@
     },
     {
       "commandType": "blowout",
+      "id": "UUID",
+      "key": "command.BLOW_OUT-4",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "wellLocation": {
           "offset": {
             "x": 0,
@@ -8051,9 +8170,13 @@
     },
     {
       "commandType": "aspirate",
+      "id": "UUID",
+      "key": "command.ASPIRATE-5",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 19.0,
         "wellLocation": {
           "offset": {
@@ -8077,9 +8200,13 @@
     },
     {
       "commandType": "dispense",
+      "id": "UUID",
+      "key": "command.DISPENSE-5",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 18.0,
         "wellLocation": {
           "offset": {
@@ -8103,9 +8230,13 @@
     },
     {
       "commandType": "blowout",
+      "id": "UUID",
+      "key": "command.BLOW_OUT-5",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "wellLocation": {
           "offset": {
             "x": 0,
@@ -8127,9 +8258,13 @@
     },
     {
       "commandType": "aspirate",
+      "id": "UUID",
+      "key": "command.ASPIRATE-6",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 19.0,
         "wellLocation": {
           "offset": {
@@ -8153,9 +8288,13 @@
     },
     {
       "commandType": "dispense",
+      "id": "UUID",
+      "key": "command.DISPENSE-6",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 18.0,
         "wellLocation": {
           "offset": {
@@ -8179,9 +8318,13 @@
     },
     {
       "commandType": "blowout",
+      "id": "UUID",
+      "key": "command.BLOW_OUT-6",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "wellLocation": {
           "offset": {
             "x": 0,
@@ -8203,9 +8346,13 @@
     },
     {
       "commandType": "aspirate",
+      "id": "UUID",
+      "key": "command.ASPIRATE-7",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 19.0,
         "wellLocation": {
           "offset": {
@@ -8229,9 +8376,13 @@
     },
     {
       "commandType": "dispense",
+      "id": "UUID",
+      "key": "command.DISPENSE-7",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 18.0,
         "wellLocation": {
           "offset": {
@@ -8255,9 +8406,13 @@
     },
     {
       "commandType": "blowout",
+      "id": "UUID",
+      "key": "command.BLOW_OUT-7",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "wellLocation": {
           "offset": {
             "x": 0,
@@ -8279,9 +8434,13 @@
     },
     {
       "commandType": "aspirate",
+      "id": "UUID",
+      "key": "command.ASPIRATE-8",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 19.0,
         "wellLocation": {
           "offset": {
@@ -8305,9 +8464,13 @@
     },
     {
       "commandType": "dispense",
+      "id": "UUID",
+      "key": "command.DISPENSE-8",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 18.0,
         "wellLocation": {
           "offset": {
@@ -8331,9 +8494,13 @@
     },
     {
       "commandType": "blowout",
+      "id": "UUID",
+      "key": "command.BLOW_OUT-8",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "wellLocation": {
           "offset": {
             "x": 0,
@@ -8355,9 +8522,13 @@
     },
     {
       "commandType": "aspirate",
+      "id": "UUID",
+      "key": "command.ASPIRATE-9",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 19.0,
         "wellLocation": {
           "offset": {
@@ -8381,9 +8552,13 @@
     },
     {
       "commandType": "dispense",
+      "id": "UUID",
+      "key": "command.DISPENSE-9",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 18.0,
         "wellLocation": {
           "offset": {
@@ -8407,9 +8582,13 @@
     },
     {
       "commandType": "blowout",
+      "id": "UUID",
+      "key": "command.BLOW_OUT-9",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "wellLocation": {
           "offset": {
             "x": 0,
@@ -8431,9 +8610,13 @@
     },
     {
       "commandType": "aspirate",
+      "id": "UUID",
+      "key": "command.ASPIRATE-10",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 19.0,
         "wellLocation": {
           "offset": {
@@ -8457,9 +8640,13 @@
     },
     {
       "commandType": "dispense",
+      "id": "UUID",
+      "key": "command.DISPENSE-10",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 18.0,
         "wellLocation": {
           "offset": {
@@ -8483,9 +8670,13 @@
     },
     {
       "commandType": "blowout",
+      "id": "UUID",
+      "key": "command.BLOW_OUT-10",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "wellLocation": {
           "offset": {
             "x": 0,
@@ -8507,9 +8698,13 @@
     },
     {
       "commandType": "aspirate",
+      "id": "UUID",
+      "key": "command.ASPIRATE-11",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 19.0,
         "wellLocation": {
           "offset": {
@@ -8533,9 +8728,13 @@
     },
     {
       "commandType": "dispense",
+      "id": "UUID",
+      "key": "command.DISPENSE-11",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 18.0,
         "wellLocation": {
           "offset": {
@@ -8559,9 +8758,13 @@
     },
     {
       "commandType": "blowout",
+      "id": "UUID",
+      "key": "command.BLOW_OUT-11",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "wellLocation": {
           "offset": {
             "x": 0,
@@ -8583,9 +8786,13 @@
     },
     {
       "commandType": "aspirate",
+      "id": "UUID",
+      "key": "command.ASPIRATE-12",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 19.0,
         "wellLocation": {
           "offset": {
@@ -8609,9 +8816,13 @@
     },
     {
       "commandType": "dispense",
+      "id": "UUID",
+      "key": "command.DISPENSE-12",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 18.0,
         "wellLocation": {
           "offset": {
@@ -8635,9 +8846,13 @@
     },
     {
       "commandType": "blowout",
+      "id": "UUID",
+      "key": "command.BLOW_OUT-12",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "wellLocation": {
           "offset": {
             "x": 0,
@@ -8659,9 +8874,13 @@
     },
     {
       "commandType": "aspirate",
+      "id": "UUID",
+      "key": "command.ASPIRATE-13",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 19.0,
         "wellLocation": {
           "offset": {
@@ -8685,9 +8904,13 @@
     },
     {
       "commandType": "dispense",
+      "id": "UUID",
+      "key": "command.DISPENSE-13",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 18.0,
         "wellLocation": {
           "offset": {
@@ -8711,9 +8934,13 @@
     },
     {
       "commandType": "blowout",
+      "id": "UUID",
+      "key": "command.BLOW_OUT-13",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "wellLocation": {
           "offset": {
             "x": 0,
@@ -8735,9 +8962,13 @@
     },
     {
       "commandType": "aspirate",
+      "id": "UUID",
+      "key": "command.ASPIRATE-14",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 19.0,
         "wellLocation": {
           "offset": {
@@ -8761,9 +8992,13 @@
     },
     {
       "commandType": "dispense",
+      "id": "UUID",
+      "key": "command.DISPENSE-14",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 18.0,
         "wellLocation": {
           "offset": {
@@ -8787,9 +9022,13 @@
     },
     {
       "commandType": "blowout",
+      "id": "UUID",
+      "key": "command.BLOW_OUT-14",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "wellLocation": {
           "offset": {
             "x": 0,
@@ -8811,9 +9050,13 @@
     },
     {
       "commandType": "aspirate",
+      "id": "UUID",
+      "key": "command.ASPIRATE-15",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 19.0,
         "wellLocation": {
           "offset": {
@@ -8837,9 +9080,13 @@
     },
     {
       "commandType": "dispense",
+      "id": "UUID",
+      "key": "command.DISPENSE-15",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 18.0,
         "wellLocation": {
           "offset": {
@@ -8863,9 +9110,13 @@
     },
     {
       "commandType": "blowout",
+      "id": "UUID",
+      "key": "command.BLOW_OUT-15",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "wellLocation": {
           "offset": {
             "x": 0,
@@ -8887,9 +9138,13 @@
     },
     {
       "commandType": "aspirate",
+      "id": "UUID",
+      "key": "command.ASPIRATE-16",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 19.0,
         "wellLocation": {
           "offset": {
@@ -8913,9 +9168,13 @@
     },
     {
       "commandType": "dispense",
+      "id": "UUID",
+      "key": "command.DISPENSE-16",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 18.0,
         "wellLocation": {
           "offset": {
@@ -8939,9 +9198,13 @@
     },
     {
       "commandType": "blowout",
+      "id": "UUID",
+      "key": "command.BLOW_OUT-16",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "wellLocation": {
           "offset": {
             "x": 0,
@@ -8963,9 +9226,13 @@
     },
     {
       "commandType": "dropTip",
+      "id": "UUID",
+      "key": "command.DROP_TIP-0",
       "notes": [],
       "params": {
         "alternateDropLocation": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "wellLocation": {
           "offset": {
             "x": 0,
@@ -8987,6 +9254,8 @@
     },
     {
       "commandType": "custom",
+      "id": "UUID",
+      "key": "command.TEMPDECK_AWAIT_TEMP-0",
       "notes": [],
       "params": {
         "legacyCommandText": "Waiting for Temperature Module to reach temperature 25.0 °C (rounded off to nearest integer)",
@@ -8997,6 +9266,8 @@
     },
     {
       "commandType": "custom",
+      "id": "UUID",
+      "key": "command.MAGDECK_ENGAGE-0",
       "notes": [],
       "params": {
         "legacyCommandText": "Engaging Magnetic Module",
@@ -9007,6 +9278,8 @@
     },
     {
       "commandType": "custom",
+      "id": "UUID",
+      "key": "command.DELAY-0",
       "notes": [],
       "params": {
         "legacyCommandText": "Delaying for 0 minutes and 0.3 seconds",
@@ -9017,6 +9290,8 @@
     },
     {
       "commandType": "custom",
+      "id": "UUID",
+      "key": "command.MAGDECK_ENGAGE-1",
       "notes": [],
       "params": {
         "legacyCommandText": "Engaging Magnetic Module",
@@ -9027,6 +9302,8 @@
     },
     {
       "commandType": "custom",
+      "id": "UUID",
+      "key": "command.DELAY-1",
       "notes": [],
       "params": {
         "legacyCommandText": "Delaying for 0 minutes and 0.3 seconds",
@@ -9037,6 +9314,8 @@
     },
     {
       "commandType": "custom",
+      "id": "UUID",
+      "key": "command.MAGDECK_ENGAGE-2",
       "notes": [],
       "params": {
         "legacyCommandText": "Engaging Magnetic Module",
@@ -9047,6 +9326,8 @@
     },
     {
       "commandType": "custom",
+      "id": "UUID",
+      "key": "command.DELAY-2",
       "notes": [],
       "params": {
         "legacyCommandText": "Delaying for 0 minutes and 0.3 seconds",
@@ -9057,6 +9338,8 @@
     },
     {
       "commandType": "custom",
+      "id": "UUID",
+      "key": "command.MAGDECK_ENGAGE-3",
       "notes": [],
       "params": {
         "legacyCommandText": "Engaging Magnetic Module",
@@ -9067,6 +9350,8 @@
     },
     {
       "commandType": "custom",
+      "id": "UUID",
+      "key": "command.DELAY-3",
       "notes": [],
       "params": {
         "legacyCommandText": "Delaying for 0 minutes and 0.3 seconds",
@@ -9077,6 +9362,8 @@
     },
     {
       "commandType": "custom",
+      "id": "UUID",
+      "key": "command.MAGDECK_ENGAGE-4",
       "notes": [],
       "params": {
         "legacyCommandText": "Engaging Magnetic Module",
@@ -9087,6 +9374,8 @@
     },
     {
       "commandType": "custom",
+      "id": "UUID",
+      "key": "command.DELAY-4",
       "notes": [],
       "params": {
         "legacyCommandText": "Delaying for 0 minutes and 0.3 seconds",
@@ -9097,6 +9386,8 @@
     },
     {
       "commandType": "custom",
+      "id": "UUID",
+      "key": "command.MAGDECK_ENGAGE-5",
       "notes": [],
       "params": {
         "legacyCommandText": "Engaging Magnetic Module",
@@ -9107,6 +9398,8 @@
     },
     {
       "commandType": "custom",
+      "id": "UUID",
+      "key": "command.DELAY-5",
       "notes": [],
       "params": {
         "legacyCommandText": "Delaying for 0 minutes and 0.3 seconds",
@@ -9117,6 +9410,8 @@
     },
     {
       "commandType": "custom",
+      "id": "UUID",
+      "key": "command.MAGDECK_ENGAGE-6",
       "notes": [],
       "params": {
         "legacyCommandText": "Engaging Magnetic Module",
@@ -9127,6 +9422,8 @@
     },
     {
       "commandType": "custom",
+      "id": "UUID",
+      "key": "command.DELAY-6",
       "notes": [],
       "params": {
         "legacyCommandText": "Delaying for 0 minutes and 0.3 seconds",
@@ -9137,6 +9434,8 @@
     },
     {
       "commandType": "custom",
+      "id": "UUID",
+      "key": "command.MAGDECK_ENGAGE-7",
       "notes": [],
       "params": {
         "legacyCommandText": "Engaging Magnetic Module",
@@ -9147,6 +9446,8 @@
     },
     {
       "commandType": "custom",
+      "id": "UUID",
+      "key": "command.DELAY-7",
       "notes": [],
       "params": {
         "legacyCommandText": "Delaying for 0 minutes and 0.3 seconds",
@@ -9157,6 +9458,8 @@
     },
     {
       "commandType": "custom",
+      "id": "UUID",
+      "key": "command.MAGDECK_ENGAGE-8",
       "notes": [],
       "params": {
         "legacyCommandText": "Engaging Magnetic Module",
@@ -9167,6 +9470,8 @@
     },
     {
       "commandType": "custom",
+      "id": "UUID",
+      "key": "command.DELAY-8",
       "notes": [],
       "params": {
         "legacyCommandText": "Delaying for 0 minutes and 0.3 seconds",
@@ -9177,6 +9482,8 @@
     },
     {
       "commandType": "custom",
+      "id": "UUID",
+      "key": "command.MAGDECK_ENGAGE-9",
       "notes": [],
       "params": {
         "legacyCommandText": "Engaging Magnetic Module",
@@ -9187,6 +9494,8 @@
     },
     {
       "commandType": "custom",
+      "id": "UUID",
+      "key": "command.DELAY-9",
       "notes": [],
       "params": {
         "legacyCommandText": "Delaying for 0 minutes and 0.3 seconds",
@@ -9197,6 +9506,8 @@
     },
     {
       "commandType": "custom",
+      "id": "UUID",
+      "key": "command.MAGDECK_ENGAGE-10",
       "notes": [],
       "params": {
         "legacyCommandText": "Engaging Magnetic Module",
@@ -9207,6 +9518,8 @@
     },
     {
       "commandType": "custom",
+      "id": "UUID",
+      "key": "command.DELAY-10",
       "notes": [],
       "params": {
         "legacyCommandText": "Delaying for 0 minutes and 0.3 seconds",
@@ -9217,6 +9530,8 @@
     },
     {
       "commandType": "custom",
+      "id": "UUID",
+      "key": "command.MAGDECK_ENGAGE-11",
       "notes": [],
       "params": {
         "legacyCommandText": "Engaging Magnetic Module",
@@ -9227,6 +9542,8 @@
     },
     {
       "commandType": "custom",
+      "id": "UUID",
+      "key": "command.DELAY-11",
       "notes": [],
       "params": {
         "legacyCommandText": "Delaying for 0 minutes and 0.3 seconds",
@@ -9237,6 +9554,8 @@
     },
     {
       "commandType": "custom",
+      "id": "UUID",
+      "key": "command.MAGDECK_ENGAGE-12",
       "notes": [],
       "params": {
         "legacyCommandText": "Engaging Magnetic Module",
@@ -9247,6 +9566,8 @@
     },
     {
       "commandType": "custom",
+      "id": "UUID",
+      "key": "command.DELAY-12",
       "notes": [],
       "params": {
         "legacyCommandText": "Delaying for 0 minutes and 0.3 seconds",
@@ -9257,6 +9578,8 @@
     },
     {
       "commandType": "custom",
+      "id": "UUID",
+      "key": "command.MAGDECK_ENGAGE-13",
       "notes": [],
       "params": {
         "legacyCommandText": "Engaging Magnetic Module",
@@ -9267,6 +9590,8 @@
     },
     {
       "commandType": "custom",
+      "id": "UUID",
+      "key": "command.DELAY-13",
       "notes": [],
       "params": {
         "legacyCommandText": "Delaying for 0 minutes and 0.3 seconds",
@@ -9277,6 +9602,8 @@
     },
     {
       "commandType": "custom",
+      "id": "UUID",
+      "key": "command.MAGDECK_ENGAGE-14",
       "notes": [],
       "params": {
         "legacyCommandText": "Engaging Magnetic Module",
@@ -9287,6 +9614,8 @@
     },
     {
       "commandType": "custom",
+      "id": "UUID",
+      "key": "command.DELAY-14",
       "notes": [],
       "params": {
         "legacyCommandText": "Delaying for 0 minutes and 0.3 seconds",
@@ -9297,6 +9626,8 @@
     },
     {
       "commandType": "custom",
+      "id": "UUID",
+      "key": "command.MAGDECK_ENGAGE-15",
       "notes": [],
       "params": {
         "legacyCommandText": "Engaging Magnetic Module",
@@ -9307,6 +9638,8 @@
     },
     {
       "commandType": "custom",
+      "id": "UUID",
+      "key": "command.DELAY-15",
       "notes": [],
       "params": {
         "legacyCommandText": "Delaying for 0 minutes and 0.3 seconds",
@@ -9317,6 +9650,8 @@
     },
     {
       "commandType": "custom",
+      "id": "UUID",
+      "key": "command.MAGDECK_ENGAGE-16",
       "notes": [],
       "params": {
         "legacyCommandText": "Engaging Magnetic Module",
@@ -9327,6 +9662,8 @@
     },
     {
       "commandType": "custom",
+      "id": "UUID",
+      "key": "command.DELAY-16",
       "notes": [],
       "params": {
         "legacyCommandText": "Delaying for 0 minutes and 0.3 seconds",
@@ -9337,6 +9674,8 @@
     },
     {
       "commandType": "custom",
+      "id": "UUID",
+      "key": "command.MAGDECK_DISENGAGE-0",
       "notes": [],
       "params": {
         "legacyCommandText": "Disengaging Magnetic Module",
@@ -9347,6 +9686,8 @@
     },
     {
       "commandType": "custom",
+      "id": "UUID",
+      "key": "command.THERMOCYCLER_OPEN-0",
       "notes": [],
       "params": {
         "legacyCommandText": "Opening Thermocycler lid",
@@ -9357,6 +9698,8 @@
     },
     {
       "commandType": "custom",
+      "id": "UUID",
+      "key": "command.THERMOCYCLER_CLOSE-0",
       "notes": [],
       "params": {
         "legacyCommandText": "Closing Thermocycler lid",
@@ -9367,6 +9710,8 @@
     },
     {
       "commandType": "custom",
+      "id": "UUID",
+      "key": "command.THERMOCYCLER_SET_LID_TEMP-0",
       "notes": [],
       "params": {
         "legacyCommandText": "Setting Thermocycler lid temperature to 38.0 °C",
@@ -9377,6 +9722,8 @@
     },
     {
       "commandType": "custom",
+      "id": "UUID",
+      "key": "command.THERMOCYCLER_SET_BLOCK_TEMP-0",
       "notes": [],
       "params": {
         "legacyCommandText": "Setting Thermocycler well block temperature to 28.0 °C with a hold time of 5 seconds",
@@ -9387,6 +9734,8 @@
     },
     {
       "commandType": "custom",
+      "id": "UUID",
+      "key": "command.THERMOCYCLER_DEACTIVATE_BLOCK-0",
       "notes": [],
       "params": {
         "legacyCommandText": "Deactivating Thermocycler well block heating",
@@ -9397,6 +9746,8 @@
     },
     {
       "commandType": "custom",
+      "id": "UUID",
+      "key": "command.THERMOCYCLER_DEACTIVATE_LID-0",
       "notes": [],
       "params": {
         "legacyCommandText": "Deactivating Thermocycler lid heating",
@@ -9407,6 +9758,8 @@
     },
     {
       "commandType": "custom",
+      "id": "UUID",
+      "key": "command.THERMOCYCLER_OPEN-1",
       "notes": [],
       "params": {
         "legacyCommandText": "Opening Thermocycler lid",
@@ -9417,8 +9770,12 @@
     },
     {
       "commandType": "pickUpTip",
+      "id": "UUID",
+      "key": "command.PICK_UP_TIP-1",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "wellLocation": {
           "offset": {
             "x": 0,
@@ -9443,9 +9800,13 @@
     },
     {
       "commandType": "aspirate",
+      "id": "UUID",
+      "key": "command.ASPIRATE-17",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 18.0,
         "wellLocation": {
           "offset": {
@@ -9469,9 +9830,13 @@
     },
     {
       "commandType": "dispense",
+      "id": "UUID",
+      "key": "command.DISPENSE-17",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 18.0,
         "wellLocation": {
           "offset": {
@@ -9495,9 +9860,13 @@
     },
     {
       "commandType": "dropTip",
+      "id": "UUID",
+      "key": "command.DROP_TIP-1",
       "notes": [],
       "params": {
         "alternateDropLocation": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "wellLocation": {
           "offset": {
             "x": 0,
@@ -9519,8 +9888,12 @@
     },
     {
       "commandType": "pickUpTip",
+      "id": "UUID",
+      "key": "command.PICK_UP_TIP-2",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "wellLocation": {
           "offset": {
             "x": 0,
@@ -9545,9 +9918,13 @@
     },
     {
       "commandType": "aspirate",
+      "id": "UUID",
+      "key": "command.ASPIRATE-18",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 15.0,
         "wellLocation": {
           "offset": {
@@ -9571,9 +9948,13 @@
     },
     {
       "commandType": "dispense",
+      "id": "UUID",
+      "key": "command.DISPENSE-18",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 15.0,
         "wellLocation": {
           "offset": {
@@ -9597,9 +9978,13 @@
     },
     {
       "commandType": "dropTip",
+      "id": "UUID",
+      "key": "command.DROP_TIP-2",
       "notes": [],
       "params": {
         "alternateDropLocation": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "wellLocation": {
           "offset": {
             "x": 0,
@@ -9621,8 +10006,12 @@
     },
     {
       "commandType": "pickUpTip",
+      "id": "UUID",
+      "key": "command.PICK_UP_TIP-3",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "wellLocation": {
           "offset": {
             "x": 0,
@@ -9647,9 +10036,13 @@
     },
     {
       "commandType": "aspirate",
+      "id": "UUID",
+      "key": "command.ASPIRATE-19",
       "notes": [],
       "params": {
         "flowRate": 15.12,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 10.0,
         "wellLocation": {
           "offset": {
@@ -9673,9 +10066,13 @@
     },
     {
       "commandType": "dispense",
+      "id": "UUID",
+      "key": "command.DISPENSE-19",
       "notes": [],
       "params": {
         "flowRate": 11.34,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 10.0,
         "wellLocation": {
           "offset": {
@@ -9699,9 +10096,13 @@
     },
     {
       "commandType": "dropTip",
+      "id": "UUID",
+      "key": "command.DROP_TIP-3",
       "notes": [],
       "params": {
         "alternateDropLocation": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "wellLocation": {
           "offset": {
             "x": 0,
@@ -9723,8 +10124,12 @@
     },
     {
       "commandType": "pickUpTip",
+      "id": "UUID",
+      "key": "command.PICK_UP_TIP-4",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "wellLocation": {
           "offset": {
             "x": 0,
@@ -9749,9 +10154,13 @@
     },
     {
       "commandType": "aspirate",
+      "id": "UUID",
+      "key": "command.ASPIRATE-20",
       "notes": [],
       "params": {
         "flowRate": 94.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 75.0,
         "wellLocation": {
           "offset": {
@@ -9775,9 +10184,13 @@
     },
     {
       "commandType": "dispense",
+      "id": "UUID",
+      "key": "command.DISPENSE-20",
       "notes": [],
       "params": {
         "flowRate": 94.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 60.0,
         "wellLocation": {
           "offset": {
@@ -9801,9 +10214,13 @@
     },
     {
       "commandType": "dropTip",
+      "id": "UUID",
+      "key": "command.DROP_TIP-4",
       "notes": [],
       "params": {
         "alternateDropLocation": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "wellLocation": {
           "offset": {
             "x": 0,
@@ -9845,6 +10262,7 @@
   "labware": [
     {
       "definitionUri": "opentrons/opentrons_1_trash_1100ml_fixed/1",
+      "id": "UUID",
       "loadName": "opentrons_1_trash_1100ml_fixed",
       "location": {
         "slotName": "12"
@@ -9853,6 +10271,7 @@
     {
       "definitionUri": "opentrons/opentrons_96_tiprack_300ul/1",
       "displayName": "300ul tips",
+      "id": "UUID",
       "loadName": "opentrons_96_tiprack_300ul",
       "location": {
         "slotName": "1"
@@ -9861,6 +10280,7 @@
     {
       "definitionUri": "opentrons/opentrons_96_tiprack_20ul/1",
       "displayName": "20ul tips",
+      "id": "UUID",
       "loadName": "opentrons_96_tiprack_20ul",
       "location": {
         "slotName": "5"
@@ -9869,22 +10289,32 @@
     {
       "definitionUri": "opentrons/opentrons_96_aluminumblock_nest_wellplate_100ul/1",
       "displayName": "Temperature-Controlled plate",
+      "id": "UUID",
       "loadName": "opentrons_96_aluminumblock_nest_wellplate_100ul",
-      "location": {}
+      "location": {
+        "moduleId": "UUID"
+      }
     },
     {
       "definitionUri": "opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1",
+      "id": "UUID",
       "loadName": "nest_96_wellplate_100ul_pcr_full_skirt",
-      "location": {}
+      "location": {
+        "moduleId": "UUID"
+      }
     },
     {
       "definitionUri": "opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1",
+      "id": "UUID",
       "loadName": "nest_96_wellplate_100ul_pcr_full_skirt",
-      "location": {}
+      "location": {
+        "moduleId": "UUID"
+      }
     },
     {
       "definitionUri": "custom_beta/cpx_4_tuberack_100ul/1",
       "displayName": "4 tubes",
+      "id": "UUID",
       "loadName": "cpx_4_tuberack_100ul",
       "location": {
         "slotName": "6"
@@ -9893,6 +10323,7 @@
     {
       "definitionUri": "opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1",
       "displayName": "logo destination",
+      "id": "UUID",
       "loadName": "nest_96_wellplate_100ul_pcr_full_skirt",
       "location": {
         "slotName": "3"
@@ -9901,6 +10332,7 @@
     {
       "definitionUri": "opentrons/nest_12_reservoir_15ml/1",
       "displayName": "dye container",
+      "id": "UUID",
       "loadName": "nest_12_reservoir_15ml",
       "location": {
         "slotName": "2"
@@ -9917,30 +10349,38 @@
   },
   "modules": [
     {
+      "id": "UUID",
       "location": {
         "slotName": "9"
       },
-      "model": "magneticModuleV2"
+      "model": "magneticModuleV2",
+      "serialNumber": "UUID"
     },
     {
+      "id": "UUID",
       "location": {
         "slotName": "4"
       },
-      "model": "temperatureModuleV1"
+      "model": "temperatureModuleV1",
+      "serialNumber": "UUID"
     },
     {
+      "id": "UUID",
       "location": {
         "slotName": "7"
       },
-      "model": "thermocyclerModuleV2"
+      "model": "thermocyclerModuleV2",
+      "serialNumber": "UUID"
     }
   ],
   "pipettes": [
     {
+      "id": "UUID",
       "mount": "right",
       "pipetteName": "p20_single_gen2"
     },
     {
+      "id": "UUID",
       "mount": "left",
       "pipetteName": "p300_multi_gen2"
     }

@@ -2,6 +2,8 @@
   "commands": [
     {
       "commandType": "home",
+      "id": "UUID",
+      "key": "50c7ae73a4e3f7129874f39dfb514803",
       "notes": [],
       "params": {},
       "result": {},
@@ -9,6 +11,8 @@
     },
     {
       "commandType": "setRailLights",
+      "id": "UUID",
+      "key": "c0f556802f0eafbdbce20c171f217b13",
       "notes": [],
       "params": {
         "on": true
@@ -18,6 +22,8 @@
     },
     {
       "commandType": "comment",
+      "id": "UUID",
+      "key": "b0ba40f2987795790258bb3b52aef419",
       "notes": [],
       "params": {
         "message": "Let there be light! True 🌠🌠🌠"
@@ -27,6 +33,8 @@
     },
     {
       "commandType": "comment",
+      "id": "UUID",
+      "key": "f69df71d649b9cbb0f560491504b17bf",
       "notes": [],
       "params": {
         "message": "Is the door is closed? True 🚪🚪🚪"
@@ -36,6 +44,8 @@
     },
     {
       "commandType": "comment",
+      "id": "UUID",
+      "key": "252352128dcb2c6ac11f78895872a7bb",
       "notes": [],
       "params": {
         "message": "Is this a simulation? True 🔮🔮🔮"
@@ -45,6 +55,8 @@
     },
     {
       "commandType": "comment",
+      "id": "UUID",
+      "key": "22812ba0d8d8f561d6f94d12dbd191a6",
       "notes": [],
       "params": {
         "message": "Running against API Version: 2.16"
@@ -54,6 +66,8 @@
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "2fef6b1c39bcc1af9b9d88c5ae54d919",
       "notes": [],
       "params": {
         "displayName": "300ul tips",
@@ -1195,12 +1209,15 @@
               "z": 5.39
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "641d89a1769e495364a6511b4123aaee",
       "notes": [],
       "params": {
         "displayName": "20ul tips",
@@ -2342,12 +2359,15 @@
               "z": 25.49
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadPipette",
+      "id": "UUID",
+      "key": "2925ebb53a28d20bb95d53e4773e40c6",
       "notes": [],
       "params": {
         "liquidPresenceDetection": false,
@@ -2355,11 +2375,15 @@
         "pipetteName": "p300_multi_gen2",
         "tipOverlapNotAfterVersion": "v0"
       },
-      "result": {},
+      "result": {
+        "pipetteId": "UUID"
+      },
       "status": "succeeded"
     },
     {
       "commandType": "loadPipette",
+      "id": "UUID",
+      "key": "3b864d00b2bf4e88edb0dc034c1afeaf",
       "notes": [],
       "params": {
         "liquidPresenceDetection": false,
@@ -2367,11 +2391,15 @@
         "pipetteName": "p20_single_gen2",
         "tipOverlapNotAfterVersion": "v0"
       },
-      "result": {},
+      "result": {
+        "pipetteId": "UUID"
+      },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "c950aa6a432c37b56160c7ef20e25afe",
       "notes": [],
       "params": {
         "loadName": "nest_12_reservoir_15ml",
@@ -2606,12 +2634,15 @@
               "z": 4.55
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "514569d3efbb82f290874cce55b21efb",
       "notes": [],
       "params": {
         "loadName": "nest_12_reservoir_15ml",
@@ -2846,14 +2877,19 @@
               "z": 4.55
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "id": "UUID",
+      "key": "f302c8fec904cd92eafac1950273a296",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "wellLocation": {
           "offset": {
             "x": 0.0,
@@ -2878,9 +2914,13 @@
     },
     {
       "commandType": "aspirate",
+      "id": "UUID",
+      "key": "b7db49ff2519cb406bbfbce586cac3d4",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 20.0,
         "wellLocation": {
           "offset": {
@@ -2904,9 +2944,13 @@
     },
     {
       "commandType": "dispense",
+      "id": "UUID",
+      "key": "e5095a66b323544441b6883fe68a5c38",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 0.0,
         "wellLocation": {
           "offset": {
@@ -2930,9 +2974,13 @@
     },
     {
       "commandType": "dispense",
+      "id": "UUID",
+      "key": "0bd3f36a944ee534e422ee69360a9501",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 20.0,
         "wellLocation": {
           "offset": {
@@ -2973,6 +3021,7 @@
     {
       "definitionUri": "opentrons/opentrons_96_tiprack_300ul/1",
       "displayName": "300ul tips",
+      "id": "UUID",
       "loadName": "opentrons_96_tiprack_300ul",
       "location": {
         "slotName": "5"
@@ -2981,6 +3030,7 @@
     {
       "definitionUri": "opentrons/opentrons_96_tiprack_20ul/1",
       "displayName": "20ul tips",
+      "id": "UUID",
       "loadName": "opentrons_96_tiprack_20ul",
       "location": {
         "slotName": "4"
@@ -2988,6 +3038,7 @@
     },
     {
       "definitionUri": "opentrons/nest_12_reservoir_15ml/1",
+      "id": "UUID",
       "loadName": "nest_12_reservoir_15ml",
       "location": {
         "slotName": "3"
@@ -2995,6 +3046,7 @@
     },
     {
       "definitionUri": "opentrons/nest_12_reservoir_15ml/1",
+      "id": "UUID",
       "loadName": "nest_12_reservoir_15ml",
       "location": {
         "slotName": "2"
@@ -3011,10 +3063,12 @@
   "modules": [],
   "pipettes": [
     {
+      "id": "UUID",
       "mount": "left",
       "pipetteName": "p300_multi_gen2"
     },
     {
+      "id": "UUID",
       "mount": "right",
       "pipetteName": "p20_single_gen2"
     }

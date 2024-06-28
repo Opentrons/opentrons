@@ -32,18 +32,11 @@ def protocols_under_test() -> List[Protocol]:
 
 # not included in the snapshot
 exclude = props(
-    "id",
     "createdAt",
     "startedAt",
     "completedAt",
     "lastModified",
     "created",
-    "key",
-    "pipetteId",
-    "labwareId",
-    "serialNumber",
-    "moduleId",
-    "liquidId",
 )
 
 

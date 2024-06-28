@@ -2,6 +2,8 @@
   "commands": [
     {
       "commandType": "home",
+      "id": "UUID",
+      "key": "50c7ae73a4e3f7129874f39dfb514803",
       "notes": [],
       "params": {},
       "result": {},
@@ -9,22 +11,30 @@
     },
     {
       "commandType": "loadPipette",
+      "id": "UUID",
+      "key": "7784d8f3-3850-43d8-b777-eb8c1caea744",
       "notes": [],
       "params": {
         "mount": "left",
+        "pipetteId": "UUID",
         "pipetteName": "p1000_96"
       },
-      "result": {},
+      "result": {
+        "pipetteId": "UUID"
+      },
       "status": "succeeded"
     },
     {
       "commandType": "loadModule",
+      "id": "UUID",
+      "key": "06525f07-d477-48d6-b02c-376d81912849",
       "notes": [],
       "params": {
         "location": {
           "slotName": "D1"
         },
-        "model": "heaterShakerModuleV1"
+        "model": "heaterShakerModuleV1",
+        "moduleId": "UUID"
       },
       "result": {
         "definition": {
@@ -463,18 +473,23 @@
             }
           }
         },
-        "model": "heaterShakerModuleV1"
+        "model": "heaterShakerModuleV1",
+        "moduleId": "UUID",
+        "serialNumber": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadModule",
+      "id": "UUID",
+      "key": "6aa037ec-82ec-4089-bea7-31f1cf3517ed",
       "notes": [],
       "params": {
         "location": {
           "slotName": "D3"
         },
-        "model": "temperatureModuleV2"
+        "model": "temperatureModuleV2",
+        "moduleId": "UUID"
       },
       "result": {
         "definition": {
@@ -915,18 +930,23 @@
             }
           }
         },
-        "model": "temperatureModuleV2"
+        "model": "temperatureModuleV2",
+        "moduleId": "UUID",
+        "serialNumber": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadModule",
+      "id": "UUID",
+      "key": "fb69a5a6-5a3a-4d4a-a321-73291759806d",
       "notes": [],
       "params": {
         "location": {
           "slotName": "B1"
         },
-        "model": "thermocyclerModuleV2"
+        "model": "thermocyclerModuleV2",
+        "moduleId": "UUID"
       },
       "result": {
         "definition": {
@@ -1024,15 +1044,20 @@
             }
           }
         },
-        "model": "thermocyclerModuleV2"
+        "model": "thermocyclerModuleV2",
+        "moduleId": "UUID",
+        "serialNumber": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "f652c3a5-a2c2-461c-8eca-4f4b2c83f84c",
       "notes": [],
       "params": {
         "displayName": "Opentrons Flex 96 Tip Rack Adapter",
+        "labwareId": "UUID",
         "loadName": "opentrons_flex_96_tiprack_adapter",
         "location": {
           "slotName": "C2"
@@ -1086,15 +1111,19 @@
           "stackingOffsetWithModule": {},
           "version": 1,
           "wells": {}
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "eccc9310-4828-499d-8f95-4875d4a6fe70",
       "notes": [],
       "params": {
         "displayName": "Opentrons Flex 96 Tip Rack Adapter",
+        "labwareId": "UUID",
         "loadName": "opentrons_flex_96_tiprack_adapter",
         "location": {
           "slotName": "C1"
@@ -1148,15 +1177,19 @@
           "stackingOffsetWithModule": {},
           "version": 1,
           "wells": {}
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "9d9df016-5e8b-4db1-aee9-fca656151382",
       "notes": [],
       "params": {
         "displayName": "Opentrons Flex 96 Tip Rack Adapter",
+        "labwareId": "UUID",
         "loadName": "opentrons_flex_96_tiprack_adapter",
         "location": {
           "slotName": "A2"
@@ -1210,17 +1243,23 @@
           "stackingOffsetWithModule": {},
           "version": 1,
           "wells": {}
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "bc448abb-7a68-477f-835b-e3dab356214c",
       "notes": [],
       "params": {
         "displayName": "Opentrons 96 PCR Heater-Shaker Adapter",
+        "labwareId": "UUID",
         "loadName": "opentrons_96_pcr_adapter",
-        "location": {},
+        "location": {
+          "moduleId": "UUID"
+        },
         "namespace": "opentrons",
         "version": 1
       },
@@ -2368,17 +2407,23 @@
               "z": 1.85
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "ef215318-917d-44ad-8617-87f4d3ee86d3",
       "notes": [],
       "params": {
         "displayName": "Opentrons 96 Well Aluminum Block",
+        "labwareId": "UUID",
         "loadName": "opentrons_96_well_aluminum_block",
-        "location": {},
+        "location": {
+          "moduleId": "UUID"
+        },
         "namespace": "opentrons",
         "version": 1
       },
@@ -3526,17 +3571,23 @@
               "z": 3.38
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "a49cec22-3d8b-4be1-9544-d10be9efad8b",
       "notes": [],
       "params": {
         "displayName": "Opentrons Flex 96 Tip Rack 200 µL",
+        "labwareId": "UUID",
         "loadName": "opentrons_flex_96_tiprack_200ul",
-        "location": {},
+        "location": {
+          "labwareId": "UUID"
+        },
         "namespace": "opentrons",
         "version": 1
       },
@@ -4677,15 +4728,19 @@
               "z": 1.5
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "ddc3ee72-571e-4eeb-b306-24cebe1cc915",
       "notes": [],
       "params": {
         "displayName": "NEST 1 Well Reservoir 290 mL",
+        "labwareId": "UUID",
         "loadName": "nest_1_reservoir_290ml",
         "location": {
           "slotName": "C3"
@@ -4765,15 +4820,19 @@
               "z": 4.85
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "257206bb-c2f2-46cd-98c9-f94564515ac5",
       "notes": [],
       "params": {
         "displayName": "Agilent 1 Well Reservoir 290 mL",
+        "labwareId": "UUID",
         "loadName": "agilent_1_reservoir_290ml",
         "location": {
           "slotName": "B3"
@@ -4852,17 +4911,23 @@
               "z": 4.82
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "7880ed84-6971-4a92-8c30-2c4b0fc4e53e",
       "notes": [],
       "params": {
         "displayName": "Opentrons Flex 96 Tip Rack 200 µL (2)",
+        "labwareId": "UUID",
         "loadName": "opentrons_flex_96_tiprack_200ul",
-        "location": {},
+        "location": {
+          "labwareId": "UUID"
+        },
         "namespace": "opentrons",
         "version": 1
       },
@@ -6003,17 +6068,23 @@
               "z": 1.5
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "c302b3fa-035e-48cb-92bc-7090f70c81d9",
       "notes": [],
       "params": {
         "displayName": "Opentrons Flex 96 Tip Rack 200 µL (3)",
+        "labwareId": "UUID",
         "loadName": "opentrons_flex_96_tiprack_200ul",
-        "location": {},
+        "location": {
+          "labwareId": "UUID"
+        },
         "namespace": "opentrons",
         "version": 1
       },
@@ -7154,15 +7225,19 @@
               "z": 1.5
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "4b74a06b-7d3b-4f56-95c9-154ea5560054",
       "notes": [],
       "params": {
         "displayName": "Non-mix",
+        "labwareId": "UUID",
         "loadName": "opentrons_96_wellplate_200ul_pcr_full_skirt",
         "location": {
           "slotName": "B2"
@@ -8327,15 +8402,19 @@
               "z": 1.05
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "0b8dc726-3e36-4415-8cb5-fb00d7c103c5",
       "notes": [],
       "params": {
         "displayName": "Mix",
+        "labwareId": "UUID",
         "loadName": "biorad_96_wellplate_200ul_pcr",
         "location": {
           "slotName": "D2"
@@ -9501,15 +9580,19 @@
               "z": 1.25
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "40844e84-098a-4fed-af60-bca7624e3e9c",
       "notes": [],
       "params": {
         "displayName": "Opentrons Flex 96 Tip Rack 200 µL (4)",
+        "labwareId": "UUID",
         "loadName": "opentrons_flex_96_tiprack_200ul",
         "location": {
           "addressableAreaName": "B4"
@@ -10654,15 +10737,19 @@
               "z": 1.5
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "b51c70ec-179f-4bc8-a709-76af131f1163",
       "notes": [],
       "params": {
         "displayName": "Opentrons Flex 96 Tip Rack 200 µL (5)",
+        "labwareId": "UUID",
         "loadName": "opentrons_flex_96_tiprack_200ul",
         "location": {
           "addressableAreaName": "C4"
@@ -11807,14 +11894,19 @@
               "z": 1.5
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "057f85c5-28ca-4a1c-aa2b-b69fe5422446",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "A1": 290000.0
         }
@@ -11824,8 +11916,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "2819a5ca-d14e-47cc-a03f-45dae72de6b6",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "A1": 290000.0
         }
@@ -11835,19 +11931,26 @@
     },
     {
       "commandType": "configureNozzleLayout",
+      "id": "UUID",
+      "key": "2d58501c-204c-4a4e-bdcc-c5d2a32d6047",
       "notes": [],
       "params": {
         "configurationParams": {
           "style": "ALL"
-        }
+        },
+        "pipetteId": "UUID"
       },
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "id": "UUID",
+      "key": "dd0d03a1-5e81-49d7-8105-3b1906046282",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "wellLocation": {
           "offset": {
             "x": 0,
@@ -11872,9 +11975,13 @@
     },
     {
       "commandType": "aspirate",
+      "id": "UUID",
+      "key": "78c85766-1162-491e-b184-5a81303e90fe",
       "notes": [],
       "params": {
         "flowRate": 6.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 100.0,
         "wellLocation": {
           "offset": {
@@ -11898,9 +12005,13 @@
     },
     {
       "commandType": "dispense",
+      "id": "UUID",
+      "key": "2a7371d1-de5c-4eec-a8b3-cf4c0912997f",
       "notes": [],
       "params": {
         "flowRate": 6.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 100.0,
         "wellLocation": {
           "offset": {
@@ -11924,6 +12035,8 @@
     },
     {
       "commandType": "moveToAddressableArea",
+      "id": "UUID",
+      "key": "023803de-fa5d-4fc9-9c90-d6669ca0e22f",
       "notes": [],
       "params": {
         "addressableAreaName": "movableTrashA3",
@@ -11933,6 +12046,7 @@
           "y": 0.0,
           "z": 0.0
         },
+        "pipetteId": "UUID",
         "stayAtHighestPossibleZ": false
       },
       "result": {
@@ -11946,15 +12060,23 @@
     },
     {
       "commandType": "dropTipInPlace",
+      "id": "UUID",
+      "key": "cd970c8b-6702-466d-801c-cc6f1754fe99",
       "notes": [],
-      "params": {},
+      "params": {
+        "pipetteId": "UUID"
+      },
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "id": "UUID",
+      "key": "b4d0cd8c-24ae-4726-a70d-cbaffe679bee",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "wellLocation": {
           "offset": {
             "x": 0,
@@ -11979,9 +12101,13 @@
     },
     {
       "commandType": "aspirate",
+      "id": "UUID",
+      "key": "e455aaa3-b216-488a-9350-d48803f76f58",
       "notes": [],
       "params": {
         "flowRate": 6.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 100.0,
         "wellLocation": {
           "offset": {
@@ -12005,9 +12131,13 @@
     },
     {
       "commandType": "dispense",
+      "id": "UUID",
+      "key": "836048ac-7025-4e72-8748-441b7930b9ca",
       "notes": [],
       "params": {
         "flowRate": 6.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 100.0,
         "wellLocation": {
           "offset": {
@@ -12031,6 +12161,8 @@
     },
     {
       "commandType": "moveToAddressableArea",
+      "id": "UUID",
+      "key": "ced579c2-1f4d-4104-956e-63d5ea4e2f11",
       "notes": [],
       "params": {
         "addressableAreaName": "movableTrashA3",
@@ -12040,6 +12172,7 @@
           "y": 0.0,
           "z": 0.0
         },
+        "pipetteId": "UUID",
         "stayAtHighestPossibleZ": false
       },
       "result": {
@@ -12053,22 +12186,34 @@
     },
     {
       "commandType": "dropTipInPlace",
+      "id": "UUID",
+      "key": "46535c9c-0f76-44f3-8bf6-8302df4c7587",
       "notes": [],
-      "params": {},
+      "params": {
+        "pipetteId": "UUID"
+      },
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "thermocycler/openLid",
+      "id": "UUID",
+      "key": "6c71c0d2-080f-4013-8c67-ca04b97cf708",
       "notes": [],
-      "params": {},
+      "params": {
+        "moduleId": "UUID"
+      },
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "id": "UUID",
+      "key": "ba5c71eb-7e31-44f8-a269-5a73169d4301",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "wellLocation": {
           "offset": {
             "x": 0,
@@ -12093,9 +12238,13 @@
     },
     {
       "commandType": "aspirate",
+      "id": "UUID",
+      "key": "efafa14f-a822-4936-aa4b-f1816fbce0cf",
       "notes": [],
       "params": {
         "flowRate": 6.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 200.0,
         "wellLocation": {
           "offset": {
@@ -12119,9 +12268,13 @@
     },
     {
       "commandType": "dispense",
+      "id": "UUID",
+      "key": "331b1293-2ea7-4bec-8764-ce5e681076e8",
       "notes": [],
       "params": {
         "flowRate": 6.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 200.0,
         "wellLocation": {
           "offset": {
@@ -12145,9 +12298,14 @@
     },
     {
       "commandType": "moveLabware",
+      "id": "UUID",
+      "key": "52dfeaa8-15a4-4f60-bad2-fc5f4e613505",
       "notes": [],
       "params": {
-        "newLocation": {},
+        "labwareId": "UUID",
+        "newLocation": {
+          "moduleId": "UUID"
+        },
         "strategy": "usingGripper"
       },
       "result": {},
@@ -12155,16 +12313,23 @@
     },
     {
       "commandType": "thermocycler/closeLid",
+      "id": "UUID",
+      "key": "0b39c9f9-feba-4c65-9738-1faf9d262bc1",
       "notes": [],
-      "params": {},
+      "params": {
+        "moduleId": "UUID"
+      },
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "thermocycler/setTargetBlockTemperature",
+      "id": "UUID",
+      "key": "ccf7fe2a-afed-4cfc-b627-46f0ba33527a",
       "notes": [],
       "params": {
-        "celsius": 30.0
+        "celsius": 30.0,
+        "moduleId": "UUID"
       },
       "result": {
         "targetBlockTemperature": 30.0
@@ -12173,16 +12338,23 @@
     },
     {
       "commandType": "thermocycler/waitForBlockTemperature",
+      "id": "UUID",
+      "key": "0ac9eca4-cdf1-4bec-81e1-c4006efd6406",
       "notes": [],
-      "params": {},
+      "params": {
+        "moduleId": "UUID"
+      },
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "thermocycler/setTargetLidTemperature",
+      "id": "UUID",
+      "key": "8be969b0-0f50-4c25-afa9-7308d8192bc6",
       "notes": [],
       "params": {
-        "celsius": 80.0
+        "celsius": 80.0,
+        "moduleId": "UUID"
       },
       "result": {
         "targetLidTemperature": 80.0
@@ -12191,16 +12363,25 @@
     },
     {
       "commandType": "thermocycler/waitForLidTemperature",
+      "id": "UUID",
+      "key": "8555b372-ab4b-4ead-8751-3a1ad9f2d21e",
       "notes": [],
-      "params": {},
+      "params": {
+        "moduleId": "UUID"
+      },
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "moveLabware",
+      "id": "UUID",
+      "key": "f9a41767-e274-4251-89c5-ca1a60053924",
       "notes": [],
       "params": {
-        "newLocation": {},
+        "labwareId": "UUID",
+        "newLocation": {
+          "labwareId": "UUID"
+        },
         "strategy": "usingGripper"
       },
       "result": {},
@@ -12208,9 +12389,12 @@
     },
     {
       "commandType": "temperatureModule/setTargetTemperature",
+      "id": "UUID",
+      "key": "2a6ef56f-d5ba-4818-8f5d-8bca66ad2cb9",
       "notes": [],
       "params": {
-        "celsius": 50.0
+        "celsius": 50.0,
+        "moduleId": "UUID"
       },
       "result": {
         "targetTemperature": 50.0
@@ -12219,8 +12403,11 @@
     },
     {
       "commandType": "moveLabware",
+      "id": "UUID",
+      "key": "6037a29b-2009-4262-9be5-ae440d2a9f92",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
         "newLocation": "offDeck",
         "strategy": "manualMoveWithPause"
       },
@@ -12229,8 +12416,11 @@
     },
     {
       "commandType": "moveLabware",
+      "id": "UUID",
+      "key": "f179b3b6-eb5f-405c-ba97-e4a6511f7a90",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
         "newLocation": "offDeck",
         "strategy": "manualMoveWithPause"
       },
@@ -12244,12 +12434,18 @@
         "errorCode": "4000",
         "errorInfo": {},
         "errorType": "LabwareMovementNotAllowedError",
+        "id": "UUID",
         "isDefined": false,
         "wrappedErrors": []
       },
+      "id": "UUID",
+      "key": "702caca4-12c8-4f26-a68e-138134723f09",
       "notes": [],
       "params": {
-        "newLocation": {},
+        "labwareId": "UUID",
+        "newLocation": {
+          "labwareId": "UUID"
+        },
         "strategy": "usingGripper"
       },
       "status": "failed"
@@ -12265,6 +12461,7 @@
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "LabwareMovementNotAllowedError",
+      "id": "UUID",
       "isDefined": false,
       "wrappedErrors": []
     }
@@ -12279,6 +12476,7 @@
     {
       "definitionUri": "opentrons/opentrons_flex_96_tiprack_adapter/1",
       "displayName": "Opentrons Flex 96 Tip Rack Adapter",
+      "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_adapter",
       "location": {
         "slotName": "C2"
@@ -12287,6 +12485,7 @@
     {
       "definitionUri": "opentrons/opentrons_flex_96_tiprack_adapter/1",
       "displayName": "Opentrons Flex 96 Tip Rack Adapter",
+      "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_adapter",
       "location": {
         "slotName": "C1"
@@ -12295,6 +12494,7 @@
     {
       "definitionUri": "opentrons/opentrons_flex_96_tiprack_adapter/1",
       "displayName": "Opentrons Flex 96 Tip Rack Adapter",
+      "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_adapter",
       "location": {
         "slotName": "A2"
@@ -12303,24 +12503,32 @@
     {
       "definitionUri": "opentrons/opentrons_96_pcr_adapter/1",
       "displayName": "Opentrons 96 PCR Heater-Shaker Adapter",
+      "id": "UUID",
       "loadName": "opentrons_96_pcr_adapter",
-      "location": {}
+      "location": {
+        "moduleId": "UUID"
+      }
     },
     {
       "definitionUri": "opentrons/opentrons_96_well_aluminum_block/1",
       "displayName": "Opentrons 96 Well Aluminum Block",
+      "id": "UUID",
       "loadName": "opentrons_96_well_aluminum_block",
-      "location": {}
+      "location": {
+        "moduleId": "UUID"
+      }
     },
     {
       "definitionUri": "opentrons/opentrons_flex_96_tiprack_200ul/1",
       "displayName": "Opentrons Flex 96 Tip Rack 200 µL",
+      "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_200ul",
       "location": "offDeck"
     },
     {
       "definitionUri": "opentrons/nest_1_reservoir_290ml/1",
       "displayName": "NEST 1 Well Reservoir 290 mL",
+      "id": "UUID",
       "loadName": "nest_1_reservoir_290ml",
       "location": {
         "slotName": "C3"
@@ -12329,6 +12537,7 @@
     {
       "definitionUri": "opentrons/agilent_1_reservoir_290ml/1",
       "displayName": "Agilent 1 Well Reservoir 290 mL",
+      "id": "UUID",
       "loadName": "agilent_1_reservoir_290ml",
       "location": {
         "slotName": "B3"
@@ -12337,30 +12546,41 @@
     {
       "definitionUri": "opentrons/opentrons_flex_96_tiprack_200ul/1",
       "displayName": "Opentrons Flex 96 Tip Rack 200 µL (2)",
+      "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_200ul",
-      "location": {}
+      "location": {
+        "labwareId": "UUID"
+      }
     },
     {
       "definitionUri": "opentrons/opentrons_flex_96_tiprack_200ul/1",
       "displayName": "Opentrons Flex 96 Tip Rack 200 µL (3)",
+      "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_200ul",
       "location": "offDeck"
     },
     {
       "definitionUri": "opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/2",
       "displayName": "Non-mix",
+      "id": "UUID",
       "loadName": "opentrons_96_wellplate_200ul_pcr_full_skirt",
-      "location": {}
+      "location": {
+        "moduleId": "UUID"
+      }
     },
     {
       "definitionUri": "opentrons/biorad_96_wellplate_200ul_pcr/2",
       "displayName": "Mix",
+      "id": "UUID",
       "loadName": "biorad_96_wellplate_200ul_pcr",
-      "location": {}
+      "location": {
+        "labwareId": "UUID"
+      }
     },
     {
       "definitionUri": "opentrons/opentrons_flex_96_tiprack_200ul/1",
       "displayName": "Opentrons Flex 96 Tip Rack 200 µL (4)",
+      "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_200ul",
       "location": {
         "addressableAreaName": "B4"
@@ -12369,6 +12589,7 @@
     {
       "definitionUri": "opentrons/opentrons_flex_96_tiprack_200ul/1",
       "displayName": "Opentrons Flex 96 Tip Rack 200 µL (5)",
+      "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_200ul",
       "location": {
         "addressableAreaName": "C4"
@@ -12379,12 +12600,14 @@
     {
       "description": "",
       "displayColor": "#50d5ff",
-      "displayName": "Water"
+      "displayName": "Water",
+      "id": "UUID"
     },
     {
       "description": "",
       "displayColor": "#ffd600",
-      "displayName": "Not Water"
+      "displayName": "Not Water",
+      "id": "UUID"
     }
   ],
   "metadata": {
@@ -12397,26 +12620,33 @@
   },
   "modules": [
     {
+      "id": "UUID",
       "location": {
         "slotName": "D1"
       },
-      "model": "heaterShakerModuleV1"
+      "model": "heaterShakerModuleV1",
+      "serialNumber": "UUID"
     },
     {
+      "id": "UUID",
       "location": {
         "slotName": "D3"
       },
-      "model": "temperatureModuleV2"
+      "model": "temperatureModuleV2",
+      "serialNumber": "UUID"
     },
     {
+      "id": "UUID",
       "location": {
         "slotName": "B1"
       },
-      "model": "thermocyclerModuleV2"
+      "model": "thermocyclerModuleV2",
+      "serialNumber": "UUID"
     }
   ],
   "pipettes": [
     {
+      "id": "UUID",
       "mount": "left",
       "pipetteName": "p1000_96"
     }

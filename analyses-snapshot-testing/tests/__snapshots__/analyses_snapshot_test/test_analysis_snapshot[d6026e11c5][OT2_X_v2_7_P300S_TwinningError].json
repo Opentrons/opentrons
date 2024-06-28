@@ -2,6 +2,8 @@
   "commands": [
     {
       "commandType": "home",
+      "id": "UUID",
+      "key": "50c7ae73a4e3f7129874f39dfb514803",
       "notes": [],
       "params": {},
       "result": {},
@@ -9,6 +11,8 @@
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "commands.LOAD_LABWARE-0",
       "notes": [],
       "params": {
         "loadName": "opentrons_96_tiprack_300ul",
@@ -1149,12 +1153,15 @@
               "z": 5.39
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "commands.LOAD_LABWARE-1",
       "notes": [],
       "params": {
         "loadName": "usascientific_12_reservoir_22ml",
@@ -1389,12 +1396,15 @@
               "z": 2.29
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "commands.LOAD_LABWARE-2",
       "notes": [],
       "params": {
         "loadName": "corning_96_wellplate_360ul_flat",
@@ -2565,34 +2575,47 @@
               "z": 3.55
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadPipette",
+      "id": "UUID",
+      "key": "commands.LOAD_PIPETTE-0",
       "notes": [],
       "params": {
         "mount": "right",
         "pipetteName": "p300_single_gen2"
       },
-      "result": {},
+      "result": {
+        "pipetteId": "UUID"
+      },
       "status": "succeeded"
     },
     {
       "commandType": "loadPipette",
+      "id": "UUID",
+      "key": "commands.LOAD_PIPETTE-1",
       "notes": [],
       "params": {
         "mount": "left",
         "pipetteName": "p300_single_gen2"
       },
-      "result": {},
+      "result": {
+        "pipetteId": "UUID"
+      },
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "id": "UUID",
+      "key": "command.PICK_UP_TIP-0",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "wellLocation": {
           "offset": {
             "x": 0,
@@ -2617,9 +2640,13 @@
     },
     {
       "commandType": "aspirate",
+      "id": "UUID",
+      "key": "command.ASPIRATE-0",
       "notes": [],
       "params": {
         "flowRate": 92.86,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 20.0,
         "wellLocation": {
           "offset": {
@@ -2643,9 +2670,13 @@
     },
     {
       "commandType": "dispense",
+      "id": "UUID",
+      "key": "command.DISPENSE-0",
       "notes": [],
       "params": {
         "flowRate": 92.86,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 20.0,
         "wellLocation": {
           "offset": {
@@ -2669,9 +2700,13 @@
     },
     {
       "commandType": "dropTip",
+      "id": "UUID",
+      "key": "command.DROP_TIP-0",
       "notes": [],
       "params": {
         "alternateDropLocation": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "wellLocation": {
           "offset": {
             "x": 0,
@@ -2705,6 +2740,7 @@
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
+      "id": "UUID",
       "isDefined": false,
       "wrappedErrors": [
         {
@@ -2718,6 +2754,7 @@
             "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line N, in exec_run\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line N, in <module>\n\n  File \"OT2_X_v2_7_P300S_TwinningError.py\", line N, in run\n"
           },
           "errorType": "PythonException",
+          "id": "UUID",
           "isDefined": false,
           "wrappedErrors": []
         }
@@ -2733,6 +2770,7 @@
   "labware": [
     {
       "definitionUri": "opentrons/opentrons_1_trash_1100ml_fixed/1",
+      "id": "UUID",
       "loadName": "opentrons_1_trash_1100ml_fixed",
       "location": {
         "slotName": "12"
@@ -2740,6 +2778,7 @@
     },
     {
       "definitionUri": "opentrons/opentrons_96_tiprack_300ul/1",
+      "id": "UUID",
       "loadName": "opentrons_96_tiprack_300ul",
       "location": {
         "slotName": "1"
@@ -2747,6 +2786,7 @@
     },
     {
       "definitionUri": "opentrons/usascientific_12_reservoir_22ml/1",
+      "id": "UUID",
       "loadName": "usascientific_12_reservoir_22ml",
       "location": {
         "slotName": "2"
@@ -2754,6 +2794,7 @@
     },
     {
       "definitionUri": "opentrons/corning_96_wellplate_360ul_flat/1",
+      "id": "UUID",
       "loadName": "corning_96_wellplate_360ul_flat",
       "location": {
         "slotName": "3"
@@ -2770,10 +2811,12 @@
   "modules": [],
   "pipettes": [
     {
+      "id": "UUID",
       "mount": "right",
       "pipetteName": "p300_single_gen2"
     },
     {
+      "id": "UUID",
       "mount": "left",
       "pipetteName": "p300_single_gen2"
     }

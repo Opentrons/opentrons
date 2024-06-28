@@ -2,6 +2,8 @@
   "commands": [
     {
       "commandType": "home",
+      "id": "UUID",
+      "key": "50c7ae73a4e3f7129874f39dfb514803",
       "notes": [],
       "params": {},
       "result": {},
@@ -9,6 +11,8 @@
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "73d9d4d55ae8466f3a793ceb70545fa5",
       "notes": [],
       "params": {
         "loadName": "nest_1_reservoir_290ml",
@@ -90,7 +94,8 @@
               "z": 4.85
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     }
@@ -108,6 +113,7 @@
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
+      "id": "UUID",
       "isDefined": false,
       "wrappedErrors": [
         {
@@ -115,6 +121,7 @@
           "errorCode": "4000",
           "errorInfo": {},
           "errorType": "IncompatibleAddressableAreaError",
+          "id": "UUID",
           "isDefined": false,
           "wrappedErrors": []
         }
@@ -130,6 +137,7 @@
   "labware": [
     {
       "definitionUri": "opentrons/nest_1_reservoir_290ml/1",
+      "id": "UUID",
       "loadName": "nest_1_reservoir_290ml",
       "location": {
         "addressableAreaName": "C4"

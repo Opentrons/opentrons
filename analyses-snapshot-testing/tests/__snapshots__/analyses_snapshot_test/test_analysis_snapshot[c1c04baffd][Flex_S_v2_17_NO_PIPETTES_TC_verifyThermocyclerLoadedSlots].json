@@ -2,6 +2,8 @@
   "commands": [
     {
       "commandType": "home",
+      "id": "UUID",
+      "key": "50c7ae73a4e3f7129874f39dfb514803",
       "notes": [],
       "params": {},
       "result": {},
@@ -9,6 +11,8 @@
     },
     {
       "commandType": "loadModule",
+      "id": "UUID",
+      "key": "8511b05ba5565bf0e6dcccd800e2ee23",
       "notes": [],
       "params": {
         "location": {
@@ -112,7 +116,9 @@
             }
           }
         },
-        "model": "thermocyclerModuleV2"
+        "model": "thermocyclerModuleV2",
+        "moduleId": "UUID",
+        "serialNumber": "UUID"
       },
       "status": "succeeded"
     }
@@ -130,6 +136,7 @@
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
+      "id": "UUID",
       "isDefined": false,
       "wrappedErrors": [
         {
@@ -141,6 +148,7 @@
             "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line N, in exec_run\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line N, in <module>\n\n  File \"Flex_S_v2_17_NO_PIPETTES_TC_verifyThermocyclerLoadedSlots.py\", line N, in run\n"
           },
           "errorType": "PythonException",
+          "id": "UUID",
           "isDefined": false,
           "wrappedErrors": []
         }
@@ -158,10 +166,12 @@
   "metadata": {},
   "modules": [
     {
+      "id": "UUID",
       "location": {
         "slotName": "B1"
       },
-      "model": "thermocyclerModuleV2"
+      "model": "thermocyclerModuleV2",
+      "serialNumber": "UUID"
     }
   ],
   "pipettes": [],

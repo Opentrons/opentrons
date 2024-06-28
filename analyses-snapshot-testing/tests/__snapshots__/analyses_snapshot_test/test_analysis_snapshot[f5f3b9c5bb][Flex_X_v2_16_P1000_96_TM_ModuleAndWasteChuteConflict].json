@@ -2,6 +2,8 @@
   "commands": [
     {
       "commandType": "home",
+      "id": "UUID",
+      "key": "50c7ae73a4e3f7129874f39dfb514803",
       "notes": [],
       "params": {},
       "result": {},
@@ -9,6 +11,8 @@
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "73d9d4d55ae8466f3a793ceb70545fa5",
       "notes": [],
       "params": {
         "loadName": "opentrons_flex_96_tiprack_adapter",
@@ -66,16 +70,21 @@
           "stackingOffsetWithModule": {},
           "version": 1,
           "wells": {}
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "50de88d471ad3910c29207fb6df4502e",
       "notes": [],
       "params": {
         "loadName": "opentrons_flex_96_tiprack_1000ul",
-        "location": {},
+        "location": {
+          "labwareId": "UUID"
+        },
         "namespace": "opentrons",
         "version": 1
       },
@@ -1216,7 +1225,8 @@
               "z": 1.5
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
@@ -1227,9 +1237,12 @@
         "errorCode": "4000",
         "errorInfo": {},
         "errorType": "IncompatibleAddressableAreaError",
+        "id": "UUID",
         "isDefined": false,
         "wrappedErrors": []
       },
+      "id": "UUID",
+      "key": "c55807b45b6b1d4ea04e12b0ee553f78",
       "notes": [],
       "params": {
         "location": {
@@ -1253,6 +1266,7 @@
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
+      "id": "UUID",
       "isDefined": false,
       "wrappedErrors": [
         {
@@ -1260,6 +1274,7 @@
           "errorCode": "4000",
           "errorInfo": {},
           "errorType": "ProtocolCommandFailedError",
+          "id": "UUID",
           "isDefined": false,
           "wrappedErrors": [
             {
@@ -1267,6 +1282,7 @@
               "errorCode": "4000",
               "errorInfo": {},
               "errorType": "IncompatibleAddressableAreaError",
+              "id": "UUID",
               "isDefined": false,
               "wrappedErrors": []
             }
@@ -1284,6 +1300,7 @@
   "labware": [
     {
       "definitionUri": "opentrons/opentrons_flex_96_tiprack_adapter/1",
+      "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_adapter",
       "location": {
         "slotName": "A1"
@@ -1291,8 +1308,11 @@
     },
     {
       "definitionUri": "opentrons/opentrons_flex_96_tiprack_1000ul/1",
+      "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_1000ul",
-      "location": {}
+      "location": {
+        "labwareId": "UUID"
+      }
     }
   ],
   "liquids": [],

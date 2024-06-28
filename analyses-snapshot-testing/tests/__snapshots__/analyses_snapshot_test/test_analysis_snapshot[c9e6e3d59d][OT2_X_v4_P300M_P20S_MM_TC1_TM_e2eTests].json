@@ -2,6 +2,8 @@
   "commands": [
     {
       "commandType": "home",
+      "id": "UUID",
+      "key": "50c7ae73a4e3f7129874f39dfb514803",
       "notes": [],
       "params": {},
       "result": {},
@@ -9,32 +11,43 @@
     },
     {
       "commandType": "loadPipette",
+      "id": "UUID",
+      "key": "commands.LOAD_PIPETTE-0",
       "notes": [],
       "params": {
         "mount": "left",
         "pipetteName": "p300_multi_gen2"
       },
-      "result": {},
+      "result": {
+        "pipetteId": "UUID"
+      },
       "status": "succeeded"
     },
     {
       "commandType": "loadPipette",
+      "id": "UUID",
+      "key": "commands.LOAD_PIPETTE-1",
       "notes": [],
       "params": {
         "mount": "right",
         "pipetteName": "p20_single_gen2"
       },
-      "result": {},
+      "result": {
+        "pipetteId": "UUID"
+      },
       "status": "succeeded"
     },
     {
       "commandType": "loadModule",
+      "id": "UUID",
+      "key": "commands.LOAD_MODULE-0",
       "notes": [],
       "params": {
         "location": {
           "slotName": "1"
         },
-        "model": "magneticModuleV2"
+        "model": "magneticModuleV2",
+        "moduleId": "UUID"
       },
       "result": {
         "definition": {
@@ -234,18 +247,23 @@
             }
           }
         },
-        "model": "magneticModuleV2"
+        "model": "magneticModuleV2",
+        "moduleId": "UUID",
+        "serialNumber": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadModule",
+      "id": "UUID",
+      "key": "commands.LOAD_MODULE-1",
       "notes": [],
       "params": {
         "location": {
           "slotName": "3"
         },
-        "model": "temperatureModuleV2"
+        "model": "temperatureModuleV2",
+        "moduleId": "UUID"
       },
       "result": {
         "definition": {
@@ -686,18 +704,23 @@
             }
           }
         },
-        "model": "temperatureModuleV2"
+        "model": "temperatureModuleV2",
+        "moduleId": "UUID",
+        "serialNumber": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadModule",
+      "id": "UUID",
+      "key": "commands.LOAD_MODULE-2",
       "notes": [],
       "params": {
         "location": {
           "slotName": "7"
         },
-        "model": "thermocyclerModuleV1"
+        "model": "thermocyclerModuleV1",
+        "moduleId": "UUID"
       },
       "result": {
         "definition": {
@@ -727,12 +750,16 @@
           "quirks": [],
           "slotTransforms": {}
         },
-        "model": "thermocyclerModuleV1"
+        "model": "thermocyclerModuleV1",
+        "moduleId": "UUID",
+        "serialNumber": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "commands.LOAD_LABWARE-0",
       "notes": [],
       "params": {
         "displayName": "Trash",
@@ -807,12 +834,15 @@
               "z": 82
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "commands.LOAD_LABWARE-1",
       "notes": [],
       "params": {
         "displayName": "Opentrons 96 Tip Rack 10 µL",
@@ -1954,12 +1984,15 @@
               "z": 25.49
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "commands.LOAD_LABWARE-2",
       "notes": [],
       "params": {
         "displayName": "Opentrons 96 Tip Rack 300 µL",
@@ -3101,12 +3134,15 @@
               "z": 5.39
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "commands.LOAD_LABWARE-3",
       "notes": [],
       "params": {
         "displayName": "A1",
@@ -3188,12 +3224,15 @@
               "z": 4.82
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "commands.LOAD_LABWARE-4",
       "notes": [],
       "params": {
         "displayName": "A2",
@@ -3429,17 +3468,22 @@
               "z": 4.55
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "commands.LOAD_LABWARE-5",
       "notes": [],
       "params": {
         "displayName": "Mag Labware",
         "loadName": "nest_96_wellplate_100ul_pcr_full_skirt",
-        "location": {},
+        "location": {
+          "moduleId": "UUID"
+        },
         "namespace": "opentrons",
         "version": 1
       },
@@ -4577,17 +4621,22 @@
               "z": 0.92
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "commands.LOAD_LABWARE-6",
       "notes": [],
       "params": {
         "displayName": "TempDeck LW",
         "loadName": "opentrons_96_aluminumblock_nest_wellplate_100ul",
-        "location": {},
+        "location": {
+          "moduleId": "UUID"
+        },
         "namespace": "opentrons",
         "version": 1
       },
@@ -5733,12 +5782,15 @@
               "z": 6.42
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "commands.LOAD_LABWARE-7",
       "notes": [],
       "params": {
         "displayName": "Opentrons 96 Tip Rack 20 µL",
@@ -6880,14 +6932,19 @@
               "z": 25.49
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "id": "UUID",
+      "key": "command.PICK_UP_TIP-0",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "wellLocation": {
           "offset": {
             "x": 0,
@@ -6917,6 +6974,7 @@
         "errorCode": "4000",
         "errorInfo": {},
         "errorType": "LegacyContextCommandError",
+        "id": "UUID",
         "isDefined": false,
         "wrappedErrors": [
           {
@@ -6928,14 +6986,19 @@
               "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/legacy_commands/publisher.py\", line N, in publish_context\n    yield\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/instrument_context.py\", line N, in aspirate\n    self._core.aspirate(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/core/legacy_simulator/legacy_instrument_core.py\", line N, in aspirate\n    new_volume <= self._pipette_dict[\"working_volume\"]\n"
             },
             "errorType": "PythonException",
+            "id": "UUID",
             "isDefined": false,
             "wrappedErrors": []
           }
         ]
       },
+      "id": "UUID",
+      "key": "command.ASPIRATE-0",
       "notes": [],
       "params": {
         "flowRate": 94.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 1000.0,
         "wellLocation": {
           "offset": {
@@ -6960,6 +7023,7 @@
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "UnexpectedProtocolError",
+      "id": "UUID",
       "isDefined": false,
       "wrappedErrors": [
         {
@@ -6971,6 +7035,7 @@
             "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_runner/task_queue.py\", line N, in _run\n    await self._run_func()\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_runner/task_queue.py\", line N, in _do_run\n    await func(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_runner/protocol_runner.py\", line N, in run_func\n    await self._protocol_executor.execute(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_runner/python_protocol_wrappers.py\", line N, in execute\n    await to_thread.run_sync(\n\n  File \"/usr/local/lib/python3.10/site-packages/anyio/to_thread.py\", line N, in run_sync\n    return await get_asynclib().run_sync_in_worker_thread(\n\n  File \"/usr/local/lib/python3.10/site-packages/anyio/_backends/_asyncio.py\", line N, in run_sync_in_worker_thread\n    return await future\n\n  File \"/usr/local/lib/python3.10/site-packages/anyio/_backends/_asyncio.py\", line N, in run\n    result = context.run(func, *args)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute.py\", line N, in run_protocol\n    execute_json_v4.dispatch_json(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_json_v4.py\", line N, in dispatch_json\n    pipette_command_map[command_type](  # type: ignore\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_json_v3.py\", line N, in _aspirate\n    pipette.aspirate(volume, location)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/api_support/util.py\", line N, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/instrument_context.py\", line N, in aspirate\n    self._core.aspirate(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/core/legacy_simulator/legacy_instrument_core.py\", line N, in aspirate\n    new_volume <= self._pipette_dict[\"working_volume\"]\n"
           },
           "errorType": "PythonException",
+          "id": "UUID",
           "isDefined": false,
           "wrappedErrors": []
         }
@@ -6986,6 +7051,7 @@
   "labware": [
     {
       "definitionUri": "opentrons/opentrons_1_trash_1100ml_fixed/1",
+      "id": "UUID",
       "loadName": "opentrons_1_trash_1100ml_fixed",
       "location": {
         "slotName": "12"
@@ -6994,6 +7060,7 @@
     {
       "definitionUri": "opentrons/opentrons_1_trash_1100ml_fixed/1",
       "displayName": "Trash",
+      "id": "UUID",
       "loadName": "opentrons_1_trash_1100ml_fixed",
       "location": {
         "slotName": "12"
@@ -7002,6 +7069,7 @@
     {
       "definitionUri": "opentrons/opentrons_96_tiprack_10ul/1",
       "displayName": "Opentrons 96 Tip Rack 10 µL",
+      "id": "UUID",
       "loadName": "opentrons_96_tiprack_10ul",
       "location": {
         "slotName": "2"
@@ -7010,6 +7078,7 @@
     {
       "definitionUri": "opentrons/opentrons_96_tiprack_300ul/1",
       "displayName": "Opentrons 96 Tip Rack 300 µL",
+      "id": "UUID",
       "loadName": "opentrons_96_tiprack_300ul",
       "location": {
         "slotName": "4"
@@ -7018,6 +7087,7 @@
     {
       "definitionUri": "opentrons/agilent_1_reservoir_290ml/1",
       "displayName": "A1",
+      "id": "UUID",
       "loadName": "agilent_1_reservoir_290ml",
       "location": {
         "slotName": "5"
@@ -7026,6 +7096,7 @@
     {
       "definitionUri": "opentrons/nest_12_reservoir_15ml/1",
       "displayName": "A2",
+      "id": "UUID",
       "loadName": "nest_12_reservoir_15ml",
       "location": {
         "slotName": "6"
@@ -7034,18 +7105,25 @@
     {
       "definitionUri": "opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1",
       "displayName": "Mag Labware",
+      "id": "UUID",
       "loadName": "nest_96_wellplate_100ul_pcr_full_skirt",
-      "location": {}
+      "location": {
+        "moduleId": "UUID"
+      }
     },
     {
       "definitionUri": "opentrons/opentrons_96_aluminumblock_nest_wellplate_100ul/1",
       "displayName": "TempDeck LW",
+      "id": "UUID",
       "loadName": "opentrons_96_aluminumblock_nest_wellplate_100ul",
-      "location": {}
+      "location": {
+        "moduleId": "UUID"
+      }
     },
     {
       "definitionUri": "opentrons/opentrons_96_tiprack_20ul/1",
       "displayName": "Opentrons 96 Tip Rack 20 µL",
+      "id": "UUID",
       "loadName": "opentrons_96_tiprack_20ul",
       "location": {
         "slotName": "9"
@@ -7063,30 +7141,38 @@
   },
   "modules": [
     {
+      "id": "UUID",
       "location": {
         "slotName": "1"
       },
-      "model": "magneticModuleV2"
+      "model": "magneticModuleV2",
+      "serialNumber": "UUID"
     },
     {
+      "id": "UUID",
       "location": {
         "slotName": "3"
       },
-      "model": "temperatureModuleV2"
+      "model": "temperatureModuleV2",
+      "serialNumber": "UUID"
     },
     {
+      "id": "UUID",
       "location": {
         "slotName": "7"
       },
-      "model": "thermocyclerModuleV1"
+      "model": "thermocyclerModuleV1",
+      "serialNumber": "UUID"
     }
   ],
   "pipettes": [
     {
+      "id": "UUID",
       "mount": "left",
       "pipetteName": "p300_multi_gen2"
     },
     {
+      "id": "UUID",
       "mount": "right",
       "pipetteName": "p20_single_gen2"
     }

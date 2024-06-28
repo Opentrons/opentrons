@@ -2,6 +2,8 @@
   "commands": [
     {
       "commandType": "home",
+      "id": "UUID",
+      "key": "50c7ae73a4e3f7129874f39dfb514803",
       "notes": [],
       "params": {},
       "result": {},
@@ -9,6 +11,8 @@
     },
     {
       "commandType": "comment",
+      "id": "UUID",
+      "key": "c9cac9dba72ab541665f112752004fbc",
       "notes": [],
       "params": {
         "message": "variable dilutions has value 1"

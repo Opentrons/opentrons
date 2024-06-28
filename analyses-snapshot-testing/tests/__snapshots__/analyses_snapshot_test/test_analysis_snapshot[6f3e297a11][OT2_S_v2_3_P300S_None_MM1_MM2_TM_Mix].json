@@ -2,6 +2,8 @@
   "commands": [
     {
       "commandType": "home",
+      "id": "UUID",
+      "key": "50c7ae73a4e3f7129874f39dfb514803",
       "notes": [],
       "params": {},
       "result": {},
@@ -9,6 +11,8 @@
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "commands.LOAD_LABWARE-0",
       "notes": [],
       "params": {
         "loadName": "corning_96_wellplate_360ul_flat",
@@ -1179,12 +1183,15 @@
               "z": 3.55
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "commands.LOAD_LABWARE-1",
       "notes": [],
       "params": {
         "loadName": "opentrons_96_tiprack_300ul",
@@ -2325,28 +2332,36 @@
               "z": 5.39
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadPipette",
+      "id": "UUID",
+      "key": "commands.LOAD_PIPETTE-0",
       "notes": [],
       "params": {
         "mount": "left",
         "pipetteName": "p300_single_gen2"
       },
-      "result": {},
+      "result": {
+        "pipetteId": "UUID"
+      },
       "status": "succeeded"
     },
     {
       "commandType": "loadModule",
+      "id": "UUID",
+      "key": "commands.LOAD_MODULE-0",
       "notes": [],
       "params": {
         "location": {
           "slotName": "1"
         },
-        "model": "magneticModuleV1"
+        "model": "magneticModuleV1",
+        "moduleId": "UUID"
       },
       "result": {
         "definition": {
@@ -2373,18 +2388,23 @@
           "quirks": [],
           "slotTransforms": {}
         },
-        "model": "magneticModuleV1"
+        "model": "magneticModuleV1",
+        "moduleId": "UUID",
+        "serialNumber": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadModule",
+      "id": "UUID",
+      "key": "commands.LOAD_MODULE-1",
       "notes": [],
       "params": {
         "location": {
           "slotName": "4"
         },
-        "model": "magneticModuleV2"
+        "model": "magneticModuleV2",
+        "moduleId": "UUID"
       },
       "result": {
         "definition": {
@@ -2584,18 +2604,23 @@
             }
           }
         },
-        "model": "magneticModuleV2"
+        "model": "magneticModuleV2",
+        "moduleId": "UUID",
+        "serialNumber": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadModule",
+      "id": "UUID",
+      "key": "commands.LOAD_MODULE-2",
       "notes": [],
       "params": {
         "location": {
           "slotName": "6"
         },
-        "model": "temperatureModuleV2"
+        "model": "temperatureModuleV2",
+        "moduleId": "UUID"
       },
       "result": {
         "definition": {
@@ -3036,14 +3061,20 @@
             }
           }
         },
-        "model": "temperatureModuleV2"
+        "model": "temperatureModuleV2",
+        "moduleId": "UUID",
+        "serialNumber": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "id": "UUID",
+      "key": "command.PICK_UP_TIP-0",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "wellLocation": {
           "offset": {
             "x": 0,
@@ -3068,9 +3099,13 @@
     },
     {
       "commandType": "aspirate",
+      "id": "UUID",
+      "key": "command.ASPIRATE-0",
       "notes": [],
       "params": {
         "flowRate": 46.43,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 100.0,
         "wellLocation": {
           "offset": {
@@ -3094,9 +3129,13 @@
     },
     {
       "commandType": "dispense",
+      "id": "UUID",
+      "key": "command.DISPENSE-0",
       "notes": [],
       "params": {
         "flowRate": 46.43,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 100.0,
         "wellLocation": {
           "offset": {
@@ -3120,9 +3159,13 @@
     },
     {
       "commandType": "aspirate",
+      "id": "UUID",
+      "key": "command.ASPIRATE-1",
       "notes": [],
       "params": {
         "flowRate": 46.43,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 100.0,
         "wellLocation": {
           "offset": {
@@ -3146,9 +3189,13 @@
     },
     {
       "commandType": "dispense",
+      "id": "UUID",
+      "key": "command.DISPENSE-1",
       "notes": [],
       "params": {
         "flowRate": 46.43,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 100.0,
         "wellLocation": {
           "offset": {
@@ -3172,9 +3219,13 @@
     },
     {
       "commandType": "aspirate",
+      "id": "UUID",
+      "key": "command.ASPIRATE-2",
       "notes": [],
       "params": {
         "flowRate": 46.43,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 100.0,
         "wellLocation": {
           "offset": {
@@ -3198,9 +3249,13 @@
     },
     {
       "commandType": "dispense",
+      "id": "UUID",
+      "key": "command.DISPENSE-2",
       "notes": [],
       "params": {
         "flowRate": 46.43,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 100.0,
         "wellLocation": {
           "offset": {
@@ -3224,9 +3279,13 @@
     },
     {
       "commandType": "aspirate",
+      "id": "UUID",
+      "key": "command.ASPIRATE-3",
       "notes": [],
       "params": {
         "flowRate": 46.43,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 100.0,
         "wellLocation": {
           "offset": {
@@ -3250,9 +3309,13 @@
     },
     {
       "commandType": "dispense",
+      "id": "UUID",
+      "key": "command.DISPENSE-3",
       "notes": [],
       "params": {
         "flowRate": 46.43,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 100.0,
         "wellLocation": {
           "offset": {
@@ -3292,6 +3355,7 @@
   "labware": [
     {
       "definitionUri": "opentrons/opentrons_1_trash_1100ml_fixed/1",
+      "id": "UUID",
       "loadName": "opentrons_1_trash_1100ml_fixed",
       "location": {
         "slotName": "12"
@@ -3299,6 +3363,7 @@
     },
     {
       "definitionUri": "opentrons/corning_96_wellplate_360ul_flat/1",
+      "id": "UUID",
       "loadName": "corning_96_wellplate_360ul_flat",
       "location": {
         "slotName": "2"
@@ -3306,6 +3371,7 @@
     },
     {
       "definitionUri": "opentrons/opentrons_96_tiprack_300ul/1",
+      "id": "UUID",
       "loadName": "opentrons_96_tiprack_300ul",
       "location": {
         "slotName": "5"
@@ -3318,26 +3384,33 @@
   },
   "modules": [
     {
+      "id": "UUID",
       "location": {
         "slotName": "1"
       },
-      "model": "magneticModuleV1"
+      "model": "magneticModuleV1",
+      "serialNumber": "UUID"
     },
     {
+      "id": "UUID",
       "location": {
         "slotName": "4"
       },
-      "model": "magneticModuleV2"
+      "model": "magneticModuleV2",
+      "serialNumber": "UUID"
     },
     {
+      "id": "UUID",
       "location": {
         "slotName": "6"
       },
-      "model": "temperatureModuleV2"
+      "model": "temperatureModuleV2",
+      "serialNumber": "UUID"
     }
   ],
   "pipettes": [
     {
+      "id": "UUID",
       "mount": "left",
       "pipetteName": "p300_single_gen2"
     }

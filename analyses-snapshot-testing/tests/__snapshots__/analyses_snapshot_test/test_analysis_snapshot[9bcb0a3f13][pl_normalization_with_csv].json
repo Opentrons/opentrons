@@ -2,6 +2,8 @@
   "commands": [
     {
       "commandType": "home",
+      "id": "UUID",
+      "key": "50c7ae73a4e3f7129874f39dfb514803",
       "notes": [],
       "params": {},
       "result": {},
@@ -9,6 +11,8 @@
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "73d9d4d55ae8466f3a793ceb70545fa5",
       "notes": [],
       "params": {
         "loadName": "nest_96_wellplate_200ul_flat",
@@ -1164,12 +1168,15 @@
               "z": 3.5
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "50de88d471ad3910c29207fb6df4502e",
       "notes": [],
       "params": {
         "loadName": "nest_1_reservoir_195ml",
@@ -1252,12 +1259,15 @@
               "z": 4.55
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "a83392f86baf8cd5b4f0157c89d31dbd",
       "notes": [],
       "params": {
         "loadName": "opentrons_flex_96_filtertiprack_200ul",
@@ -2404,12 +2414,15 @@
               "z": 1.5
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "596b975cce05f1835b73fd3e2e9c04b0",
       "notes": [],
       "params": {
         "loadName": "opentrons_flex_96_filtertiprack_200ul",
@@ -3556,12 +3569,15 @@
               "z": 1.5
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "43c0dcf1828d77562caa82b5e8a8c91e",
       "notes": [],
       "params": {
         "loadName": "opentrons_flex_96_filtertiprack_200ul",
@@ -4708,12 +4724,15 @@
               "z": 1.5
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "e490d4b3b82252e91702cf9f8b05b162",
       "notes": [],
       "params": {
         "loadName": "opentrons_flex_96_filtertiprack_200ul",
@@ -5860,12 +5879,15 @@
               "z": 1.5
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadPipette",
+      "id": "UUID",
+      "key": "d10f74f641b2f74aa658fd08a5d79f18",
       "notes": [],
       "params": {
         "liquidPresenceDetection": false,
@@ -5873,7 +5895,9 @@
         "pipetteName": "p50_single_flex",
         "tipOverlapNotAfterVersion": "v0"
       },
-      "result": {},
+      "result": {
+        "pipetteId": "UUID"
+      },
       "status": "succeeded"
     }
   ],
@@ -5890,6 +5914,7 @@
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
+      "id": "UUID",
       "isDefined": false,
       "wrappedErrors": [
         {
@@ -5901,6 +5926,7 @@
             "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line N, in exec_run\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line N, in <module>\n\n  File \"pl_normalization_with_csv.py\", line N, in run\n\n  File \"pl_normalization_with_csv.py\", line N, in <listcomp>\n"
           },
           "errorType": "PythonException",
+          "id": "UUID",
           "isDefined": false,
           "wrappedErrors": []
         }
@@ -5916,6 +5942,7 @@
   "labware": [
     {
       "definitionUri": "opentrons/opentrons_1_trash_3200ml_fixed/1",
+      "id": "UUID",
       "loadName": "opentrons_1_trash_3200ml_fixed",
       "location": {
         "slotName": "A3"
@@ -5923,6 +5950,7 @@
     },
     {
       "definitionUri": "opentrons/nest_96_wellplate_200ul_flat/2",
+      "id": "UUID",
       "loadName": "nest_96_wellplate_200ul_flat",
       "location": {
         "slotName": "C1"
@@ -5930,6 +5958,7 @@
     },
     {
       "definitionUri": "opentrons/nest_1_reservoir_195ml/2",
+      "id": "UUID",
       "loadName": "nest_1_reservoir_195ml",
       "location": {
         "slotName": "C2"
@@ -5937,6 +5966,7 @@
     },
     {
       "definitionUri": "opentrons/opentrons_flex_96_filtertiprack_200ul/1",
+      "id": "UUID",
       "loadName": "opentrons_flex_96_filtertiprack_200ul",
       "location": {
         "slotName": "A1"
@@ -5944,6 +5974,7 @@
     },
     {
       "definitionUri": "opentrons/opentrons_flex_96_filtertiprack_200ul/1",
+      "id": "UUID",
       "loadName": "opentrons_flex_96_filtertiprack_200ul",
       "location": {
         "slotName": "A2"
@@ -5951,6 +5982,7 @@
     },
     {
       "definitionUri": "opentrons/opentrons_flex_96_filtertiprack_200ul/1",
+      "id": "UUID",
       "loadName": "opentrons_flex_96_filtertiprack_200ul",
       "location": {
         "slotName": "B1"
@@ -5958,6 +5990,7 @@
     },
     {
       "definitionUri": "opentrons/opentrons_flex_96_filtertiprack_200ul/1",
+      "id": "UUID",
       "loadName": "opentrons_flex_96_filtertiprack_200ul",
       "location": {
         "slotName": "B2"
@@ -5972,6 +6005,7 @@
   "modules": [],
   "pipettes": [
     {
+      "id": "UUID",
       "mount": "right",
       "pipetteName": "p50_single_flex"
     }

@@ -2,6 +2,8 @@
   "commands": [
     {
       "commandType": "home",
+      "id": "UUID",
+      "key": "50c7ae73a4e3f7129874f39dfb514803",
       "notes": [],
       "params": {},
       "result": {},
@@ -9,6 +11,8 @@
     },
     {
       "commandType": "loadModule",
+      "id": "UUID",
+      "key": "8511b05ba5565bf0e6dcccd800e2ee23",
       "notes": [],
       "params": {
         "location": {
@@ -455,16 +459,22 @@
             }
           }
         },
-        "model": "temperatureModuleV2"
+        "model": "temperatureModuleV2",
+        "moduleId": "UUID",
+        "serialNumber": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "b9563ff54d4bfe61c469a7da06e79f42",
       "notes": [],
       "params": {
         "loadName": "opentrons_96_well_aluminum_block",
-        "location": {},
+        "location": {
+          "moduleId": "UUID"
+        },
         "namespace": "opentrons",
         "version": 1
       },
@@ -1612,16 +1622,21 @@
               "z": 3.38
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "07af6536632377008ed92723cc8c5072",
       "notes": [],
       "params": {
         "loadName": "biorad_96_wellplate_200ul_pcr",
-        "location": {},
+        "location": {
+          "labwareId": "UUID"
+        },
         "namespace": "opentrons",
         "version": 2
       },
@@ -2783,12 +2798,15 @@
               "z": 1.25
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "8eec906a29ce38c4567cc9831a24cd13",
       "notes": [],
       "params": {
         "loadName": "biorad_96_wellplate_200ul_pcr",
@@ -3956,12 +3974,15 @@
               "z": 1.25
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "e8c3a9e08a3edebc1bf4357cf91f0858",
       "notes": [],
       "params": {
         "loadName": "agilent_1_reservoir_290ml",
@@ -4042,12 +4063,15 @@
               "z": 4.82
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "fe736e8fd68b689ef8c9e17799013015",
       "notes": [],
       "params": {
         "loadName": "opentrons_flex_96_tiprack_adapter",
@@ -4105,16 +4129,21 @@
           "stackingOffsetWithModule": {},
           "version": 1,
           "wells": {}
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "d5318e887f52cc9b0ee426ca554dd4f1",
       "notes": [],
       "params": {
         "loadName": "opentrons_flex_96_tiprack_50ul",
-        "location": {},
+        "location": {
+          "labwareId": "UUID"
+        },
         "namespace": "opentrons",
         "version": 1
       },
@@ -5255,12 +5284,15 @@
               "z": 1.5
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadPipette",
+      "id": "UUID",
+      "key": "99487be83355310f85f03a1c5d16c995",
       "notes": [],
       "params": {
         "liquidPresenceDetection": false,
@@ -5268,13 +5300,19 @@
         "pipetteName": "p1000_96",
         "tipOverlapNotAfterVersion": "v0"
       },
-      "result": {},
+      "result": {
+        "pipetteId": "UUID"
+      },
       "status": "succeeded"
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "b4a16dbb07216e9e9057e3d92a08a67c",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "A1": 200.0
         }
@@ -5284,8 +5322,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "040da86c8dcfe0b3c3e0d94855549b51",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "B1": 200.0
         }
@@ -5295,8 +5337,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "2e80024c76dd58fdfd7d2f08852e1df2",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "C1": 200.0
         }
@@ -5306,8 +5352,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "4da35060c85299647e4fd433f2bc2358",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "D1": 200.0
         }
@@ -5317,8 +5367,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "48565234969cfd9a558f04db77943978",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "E1": 200.0
         }
@@ -5328,8 +5382,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "e8e63ecd3f32c8337d6f3ae7c743eb8b",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "F1": 200.0
         }
@@ -5339,8 +5397,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "8882457e6224060e2c252de0f5385234",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "G1": 200.0
         }
@@ -5350,8 +5412,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "a66b327992d49a699c429b5d6b9c431f",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "H1": 200.0
         }
@@ -5361,8 +5427,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "fb0552d9f86e183d951fb0e99215f41b",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "A2": 200.0
         }
@@ -5372,8 +5442,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "a2aa1a5be8b3066e8f52a4cf2a0689ba",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "B2": 200.0
         }
@@ -5383,8 +5457,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "24d1e76b79123435565989fb93c6469d",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "C2": 200.0
         }
@@ -5394,8 +5472,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "f9f23e040a097ff571374ea368bde3af",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "D2": 200.0
         }
@@ -5405,8 +5487,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "fd7e0159dafc038a15aff9f8cd37b8b2",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "E2": 200.0
         }
@@ -5416,8 +5502,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "857f412bc4d4674130eb1b0000ddb2e6",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "F2": 200.0
         }
@@ -5427,8 +5517,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "12c5ecb521147ee7636eab769928d985",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "G2": 200.0
         }
@@ -5438,8 +5532,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "b90cdcbddec29e9aaff23f32965e9c43",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "H2": 200.0
         }
@@ -5449,8 +5547,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "bf941546e756cc728b79444237575507",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "A3": 200.0
         }
@@ -5460,8 +5562,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "63a9cf3a1d3d952141ad333264a36845",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "B3": 200.0
         }
@@ -5471,8 +5577,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "e6b04fed036b0974d0c66285ce54a5dd",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "C3": 200.0
         }
@@ -5482,8 +5592,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "4a0cbcaa2176c743c020a6c025fa427f",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "D3": 200.0
         }
@@ -5493,8 +5607,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "99c2685afb6f90c5631cf18be8ae7fca",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "E3": 200.0
         }
@@ -5504,8 +5622,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "19fb50e494ec918b184d38f86275c81e",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "F3": 200.0
         }
@@ -5515,8 +5637,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "628fc776f32a878e731a482d46dfb884",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "G3": 200.0
         }
@@ -5526,8 +5652,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "459cb4e7fa9c8c12e70c0838d4b071fe",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "H3": 200.0
         }
@@ -5537,8 +5667,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "3ffb0af443b208bc77891add45ef8802",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "A4": 200.0
         }
@@ -5548,8 +5682,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "3ae12716cb41f644aae47b4e683a0abd",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "B4": 200.0
         }
@@ -5559,8 +5697,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "e52fef94664bc0bc139c012caa06407b",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "C4": 200.0
         }
@@ -5570,8 +5712,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "324c894ce3bf47820baa7456f16ed449",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "D4": 200.0
         }
@@ -5581,8 +5727,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "95f5e37f642b9b6cd15ee414ea8861d5",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "E4": 200.0
         }
@@ -5592,8 +5742,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "137b744ea4b2f2d4d5821f4ad0ca06c1",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "F4": 200.0
         }
@@ -5603,8 +5757,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "751b13cd1aaa3a0bb5b450f76177ec0e",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "G4": 200.0
         }
@@ -5614,8 +5772,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "9a81d54851dd6592902982b456ece7dc",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "H4": 200.0
         }
@@ -5625,8 +5787,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "f7e67b672ddd276d3b39c43e1ab39863",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "A5": 200.0
         }
@@ -5636,8 +5802,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "f5651f6a84803f1fd5f19f9e515b66ef",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "B5": 200.0
         }
@@ -5647,8 +5817,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "bdcf8fa9205d14826f480606b5427b12",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "C5": 200.0
         }
@@ -5658,8 +5832,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "5101d3509b12024bff3c3795be7fa74b",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "D5": 200.0
         }
@@ -5669,8 +5847,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "6dd8bc02f2b17b61819a28a8a08722ae",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "E5": 200.0
         }
@@ -5680,8 +5862,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "0d72d156858b11a052e5855959300d08",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "F5": 200.0
         }
@@ -5691,8 +5877,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "499bb6f18dd32162b10a840f263cbb59",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "G5": 200.0
         }
@@ -5702,8 +5892,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "55fa44e291e0726130136b1c4041850c",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "H5": 200.0
         }
@@ -5713,8 +5907,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "0cec518ea2c3c08c3f023d486a289c56",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "A6": 200.0
         }
@@ -5724,8 +5922,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "da19c2d4bfe36f6138157728b10ace0c",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "B6": 200.0
         }
@@ -5735,8 +5937,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "b61fc5b74f787d3a5b85830d9cd7d5c0",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "C6": 200.0
         }
@@ -5746,8 +5952,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "167bdc0aeb7e811a9f2e19cefe6ab877",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "D6": 200.0
         }
@@ -5757,8 +5967,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "02b4a6787ee0b76e50b59f4407f85bd4",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "E6": 200.0
         }
@@ -5768,8 +5982,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "50a625ffa36dcbec2cf83f78d915ff91",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "F6": 200.0
         }
@@ -5779,8 +5997,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "cb49afc7c35ea98271237988d9bb5bb7",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "G6": 200.0
         }
@@ -5790,8 +6012,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "d83477b29f85d1a2d7d5804ef410da6c",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "H6": 200.0
         }
@@ -5801,8 +6027,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "eab02c7630f1e69fef9b729d5c17bc6a",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "A7": 200.0
         }
@@ -5812,8 +6042,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "86405dc2d7a3ed33abcaf52577e821c2",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "B7": 200.0
         }
@@ -5823,8 +6057,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "9d49789e0118ea9cce8d22df787db59d",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "C7": 200.0
         }
@@ -5834,8 +6072,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "123727980140a0282ec1a12279c3d6e3",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "D7": 200.0
         }
@@ -5845,8 +6087,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "d7b87959970d0256366698c26f9ab9a9",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "E7": 200.0
         }
@@ -5856,8 +6102,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "d9c2bfe5b259d3229b84f1532c645c01",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "F7": 200.0
         }
@@ -5867,8 +6117,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "e1e41bd945c90d2adbaa7292b7c77aa0",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "G7": 200.0
         }
@@ -5878,8 +6132,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "33ac1cacebf3016ffc74db7f5a8eaf5b",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "H7": 200.0
         }
@@ -5889,8 +6147,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "d71af308f3349e0f5885c8ba638534f1",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "A8": 200.0
         }
@@ -5900,8 +6162,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "f443c8c628a5cd48c2be88e39ba0f60c",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "B8": 200.0
         }
@@ -5911,8 +6177,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "5c18c2fc8ec99e3084d5f374a4bd0201",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "C8": 200.0
         }
@@ -5922,8 +6192,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "948bc26a4e38281548718c4755c398b8",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "D8": 200.0
         }
@@ -5933,8 +6207,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "00a868e23c26a37d637a4ff827ad59ab",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "E8": 200.0
         }
@@ -5944,8 +6222,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "920d37cb028b07bdcac2753992719e57",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "F8": 200.0
         }
@@ -5955,8 +6237,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "1acab6d71779583aab472d0216134e3d",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "G8": 200.0
         }
@@ -5966,8 +6252,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "313e1c891a44f6590fd03b164dc7a336",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "H8": 200.0
         }
@@ -5977,8 +6267,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "0c816753849aa94d0488794edfed8738",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "A9": 200.0
         }
@@ -5988,8 +6282,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "5f8457276f49a73a2d637b046baf8e11",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "B9": 200.0
         }
@@ -5999,8 +6297,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "002f371a9204825c2976bafd46bc387f",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "C9": 200.0
         }
@@ -6010,8 +6312,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "69632c6efc3f1a69a7d56c6070a8af39",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "D9": 200.0
         }
@@ -6021,8 +6327,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "e8fec4954d6ad1f090042b0adab806f5",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "E9": 200.0
         }
@@ -6032,8 +6342,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "9af87ff85298ad062c59fe347a6be7a2",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "F9": 200.0
         }
@@ -6043,8 +6357,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "c4bd653f71e5fc83c9dfa7c8f08db45f",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "G9": 200.0
         }
@@ -6054,8 +6372,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "00a0de9f4085cd75ebadaa5e349a5a7b",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "H9": 200.0
         }
@@ -6065,8 +6387,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "a2013e576bab876184493ab3f709e49b",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "A10": 200.0
         }
@@ -6076,8 +6402,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "e48ba359bfcabc4ae01ef9c48b033cc7",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "B10": 200.0
         }
@@ -6087,8 +6417,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "80128ddc93441f46ccd00d9c65816bac",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "C10": 200.0
         }
@@ -6098,8 +6432,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "1e9b675ccfb3e3a072ae004e08c61330",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "D10": 200.0
         }
@@ -6109,8 +6447,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "02c541b3a2430c280aa9ca67a3aef0ea",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "E10": 200.0
         }
@@ -6120,8 +6462,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "cc0c34a459a1ec6b792198b67ee3bc0d",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "F10": 200.0
         }
@@ -6131,8 +6477,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "6c5e732b1be32db82da854ddc5b5f69e",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "G10": 200.0
         }
@@ -6142,8 +6492,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "2ce7d10eb7be0366eeed0631ae68a7d1",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "H10": 200.0
         }
@@ -6153,8 +6507,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "e38d6d80722aae9bda73c4c5c32913f7",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "A11": 200.0
         }
@@ -6164,8 +6522,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "b48e23ff6c6687497a72f825531a4d1f",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "B11": 200.0
         }
@@ -6175,8 +6537,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "fb82a39743ce4757f27d0358f4b1ba54",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "C11": 200.0
         }
@@ -6186,8 +6552,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "02872f5bb1d028895c4b4135aad6eb67",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "D11": 200.0
         }
@@ -6197,8 +6567,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "bc1fa04164db7efa7728f969ac4a52c3",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "E11": 200.0
         }
@@ -6208,8 +6582,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "634c1a738df240b4f44d8d4c5e8fb91d",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "F11": 200.0
         }
@@ -6219,8 +6597,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "a8d2771bcfb95195b985532482d2dd22",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "G11": 200.0
         }
@@ -6230,8 +6612,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "a8c690cf5a2ec47e0736d1e56048089d",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "H11": 200.0
         }
@@ -6241,8 +6627,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "7edc29252c4df4d0f13bf9a78dc6ce44",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "A12": 200.0
         }
@@ -6252,8 +6642,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "265ac992a51d2d8201d09662654d84ec",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "B12": 200.0
         }
@@ -6263,8 +6657,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "7ac404e0c822d964e78db2d700797bfb",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "C12": 200.0
         }
@@ -6274,8 +6672,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "c998d476675075cca9b1d4a4fbe0b33f",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "D12": 200.0
         }
@@ -6285,8 +6687,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "6b1da6defb197488c586a0cf68c312eb",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "E12": 200.0
         }
@@ -6296,8 +6702,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "726cf946b2111ea80c3eeae45f419740",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "F12": 200.0
         }
@@ -6307,8 +6717,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "582ac86ff4aa34bc2a848decf49788cd",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "G12": 200.0
         }
@@ -6318,8 +6732,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "d97d0040cabaeaad0e38a8e126b728fd",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "H12": 200.0
         }
@@ -6329,8 +6747,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "9405a1ccc11dde24bf89e587288666a3",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "A1": 200.0
         }
@@ -6340,8 +6762,12 @@
     },
     {
       "commandType": "pickUpTip",
+      "id": "UUID",
+      "key": "ab461d97bac13b914d92c3ac9e2f3f22",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "wellLocation": {
           "offset": {
             "x": 0.0,
@@ -6366,9 +6792,13 @@
     },
     {
       "commandType": "aspirate",
+      "id": "UUID",
+      "key": "5f5d8d98efc5d4f0fe7c634ff275fae6",
       "notes": [],
       "params": {
         "flowRate": 64.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 40.0,
         "wellLocation": {
           "offset": {
@@ -6392,9 +6822,13 @@
     },
     {
       "commandType": "dispense",
+      "id": "UUID",
+      "key": "f3cdd962b699257f6dbb9e18f19ade32",
       "notes": [],
       "params": {
         "flowRate": 160.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 40.0,
         "wellLocation": {
           "offset": {
@@ -6418,9 +6852,13 @@
     },
     {
       "commandType": "blowout",
+      "id": "UUID",
+      "key": "66d8324766f92e250fe881f6ec9612db",
       "notes": [],
       "params": {
         "flowRate": 80.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "wellLocation": {
           "offset": {
             "x": 0.0,
@@ -6442,9 +6880,13 @@
     },
     {
       "commandType": "aspirate",
+      "id": "UUID",
+      "key": "7de854c900b928456d12434bc16a69dc",
       "notes": [],
       "params": {
         "flowRate": 16.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 40.0,
         "wellLocation": {
           "offset": {
@@ -6468,9 +6910,13 @@
     },
     {
       "commandType": "dispense",
+      "id": "UUID",
+      "key": "660be9aec4cfa3bbfdcc63f8ee88ff8b",
       "notes": [],
       "params": {
         "flowRate": 160.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 40.0,
         "wellLocation": {
           "offset": {
@@ -6494,9 +6940,13 @@
     },
     {
       "commandType": "aspirate",
+      "id": "UUID",
+      "key": "01e8b60c57090d9d697b30c14535a4d4",
       "notes": [],
       "params": {
         "flowRate": 48.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 50.0,
         "wellLocation": {
           "offset": {
@@ -6520,9 +6970,13 @@
     },
     {
       "commandType": "dispense",
+      "id": "UUID",
+      "key": "308d19b3cd9df6cdc6cddd15bcbae301",
       "notes": [],
       "params": {
         "flowRate": 48.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "pushOut": 0.0,
         "volume": 50.0,
         "wellLocation": {
@@ -6547,9 +7001,13 @@
     },
     {
       "commandType": "aspirate",
+      "id": "UUID",
+      "key": "eb8ae6cb4c25d9922b51fb35ada546c3",
       "notes": [],
       "params": {
         "flowRate": 48.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 50.0,
         "wellLocation": {
           "offset": {
@@ -6573,9 +7031,13 @@
     },
     {
       "commandType": "dispense",
+      "id": "UUID",
+      "key": "478aaa06d4bf8b11ce231a0f5f85f0ac",
       "notes": [],
       "params": {
         "flowRate": 48.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "pushOut": 0.0,
         "volume": 50.0,
         "wellLocation": {
@@ -6600,9 +7062,13 @@
     },
     {
       "commandType": "aspirate",
+      "id": "UUID",
+      "key": "a3517f93f014e4b6b6dc7b3ab5871265",
       "notes": [],
       "params": {
         "flowRate": 48.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 50.0,
         "wellLocation": {
           "offset": {
@@ -6626,9 +7092,13 @@
     },
     {
       "commandType": "dispense",
+      "id": "UUID",
+      "key": "97d14eacc5cefb72a6ab7a4a9fe5618c",
       "notes": [],
       "params": {
         "flowRate": 48.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "pushOut": 0.0,
         "volume": 50.0,
         "wellLocation": {
@@ -6653,9 +7123,13 @@
     },
     {
       "commandType": "aspirate",
+      "id": "UUID",
+      "key": "41a4b8e3c2805a03f4df30235e175c9c",
       "notes": [],
       "params": {
         "flowRate": 48.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 50.0,
         "wellLocation": {
           "offset": {
@@ -6679,9 +7153,13 @@
     },
     {
       "commandType": "dispense",
+      "id": "UUID",
+      "key": "4616314bfe9fda29ecf3fe9f309f31c3",
       "notes": [],
       "params": {
         "flowRate": 48.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 50.0,
         "wellLocation": {
           "offset": {
@@ -6705,9 +7183,13 @@
     },
     {
       "commandType": "blowout",
+      "id": "UUID",
+      "key": "2d0162cb149a68bbf7497839eecc333a",
       "notes": [],
       "params": {
         "flowRate": 80.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "wellLocation": {
           "offset": {
             "x": 0.0,
@@ -6729,6 +7211,8 @@
     },
     {
       "commandType": "moveToAddressableAreaForDropTip",
+      "id": "UUID",
+      "key": "dbcf7b08d6adae7c756d59c3df5b0d87",
       "notes": [],
       "params": {
         "addressableAreaName": "movableTrashA3",
@@ -6739,7 +7223,8 @@
           "x": 0.0,
           "y": 0.0,
           "z": 0.0
-        }
+        },
+        "pipetteId": "UUID"
       },
       "result": {
         "position": {
@@ -6752,8 +7237,12 @@
     },
     {
       "commandType": "dropTipInPlace",
+      "id": "UUID",
+      "key": "ad0d4c10fb9650544d779560d768bd0e",
       "notes": [],
-      "params": {},
+      "params": {
+        "pipetteId": "UUID"
+      },
       "result": {},
       "status": "succeeded"
     }
@@ -6775,16 +7264,23 @@
   "labware": [
     {
       "definitionUri": "opentrons/opentrons_96_well_aluminum_block/1",
+      "id": "UUID",
       "loadName": "opentrons_96_well_aluminum_block",
-      "location": {}
+      "location": {
+        "moduleId": "UUID"
+      }
     },
     {
       "definitionUri": "opentrons/biorad_96_wellplate_200ul_pcr/2",
+      "id": "UUID",
       "loadName": "biorad_96_wellplate_200ul_pcr",
-      "location": {}
+      "location": {
+        "labwareId": "UUID"
+      }
     },
     {
       "definitionUri": "opentrons/biorad_96_wellplate_200ul_pcr/2",
+      "id": "UUID",
       "loadName": "biorad_96_wellplate_200ul_pcr",
       "location": {
         "slotName": "D3"
@@ -6792,6 +7288,7 @@
     },
     {
       "definitionUri": "opentrons/agilent_1_reservoir_290ml/1",
+      "id": "UUID",
       "loadName": "agilent_1_reservoir_290ml",
       "location": {
         "slotName": "C2"
@@ -6799,6 +7296,7 @@
     },
     {
       "definitionUri": "opentrons/opentrons_flex_96_tiprack_adapter/1",
+      "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_adapter",
       "location": {
         "slotName": "A1"
@@ -6806,20 +7304,25 @@
     },
     {
       "definitionUri": "opentrons/opentrons_flex_96_tiprack_50ul/1",
+      "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_50ul",
-      "location": {}
+      "location": {
+        "labwareId": "UUID"
+      }
     }
   ],
   "liquids": [
     {
       "description": "Samples",
       "displayColor": "#7EFF42",
-      "displayName": "Samples"
+      "displayName": "Samples",
+      "id": "UUID"
     },
     {
       "description": "Water",
       "displayColor": "#50D5FF",
-      "displayName": "Water"
+      "displayName": "Water",
+      "id": "UUID"
     }
   ],
   "metadata": {
@@ -6828,14 +7331,17 @@
   },
   "modules": [
     {
+      "id": "UUID",
       "location": {
         "slotName": "D1"
       },
-      "model": "temperatureModuleV2"
+      "model": "temperatureModuleV2",
+      "serialNumber": "UUID"
     }
   ],
   "pipettes": [
     {
+      "id": "UUID",
       "mount": "left",
       "pipetteName": "p1000_96"
     }

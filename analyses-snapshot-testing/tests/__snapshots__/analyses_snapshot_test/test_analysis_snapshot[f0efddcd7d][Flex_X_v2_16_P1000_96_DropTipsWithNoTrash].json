@@ -2,6 +2,8 @@
   "commands": [
     {
       "commandType": "home",
+      "id": "UUID",
+      "key": "50c7ae73a4e3f7129874f39dfb514803",
       "notes": [],
       "params": {},
       "result": {},
@@ -9,6 +11,8 @@
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "73d9d4d55ae8466f3a793ceb70545fa5",
       "notes": [],
       "params": {
         "loadName": "nest_1_reservoir_290ml",
@@ -90,12 +94,15 @@
               "z": 4.85
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "50de88d471ad3910c29207fb6df4502e",
       "notes": [],
       "params": {
         "loadName": "opentrons_flex_96_tiprack_adapter",
@@ -153,16 +160,21 @@
           "stackingOffsetWithModule": {},
           "version": 1,
           "wells": {}
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "a83392f86baf8cd5b4f0157c89d31dbd",
       "notes": [],
       "params": {
         "loadName": "opentrons_flex_96_tiprack_1000ul",
-        "location": {},
+        "location": {
+          "labwareId": "UUID"
+        },
         "namespace": "opentrons",
         "version": 1
       },
@@ -1303,12 +1315,15 @@
               "z": 1.5
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadPipette",
+      "id": "UUID",
+      "key": "7d6a90a14623439c6f8429028cf86ee9",
       "notes": [],
       "params": {
         "liquidPresenceDetection": false,
@@ -1316,13 +1331,19 @@
         "pipetteName": "p1000_96",
         "tipOverlapNotAfterVersion": "v0"
       },
-      "result": {},
+      "result": {
+        "pipetteId": "UUID"
+      },
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "id": "UUID",
+      "key": "cad13a2f1b62a0098e493e055a774396",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "wellLocation": {
           "offset": {
             "x": 0.0,
@@ -1359,6 +1380,7 @@
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
+      "id": "UUID",
       "isDefined": false,
       "wrappedErrors": [
         {
@@ -1366,6 +1388,7 @@
           "errorCode": "4000",
           "errorInfo": {},
           "errorType": "NoTrashDefinedError",
+          "id": "UUID",
           "isDefined": false,
           "wrappedErrors": []
         }
@@ -1381,6 +1404,7 @@
   "labware": [
     {
       "definitionUri": "opentrons/nest_1_reservoir_290ml/1",
+      "id": "UUID",
       "loadName": "nest_1_reservoir_290ml",
       "location": {
         "addressableAreaName": "C4"
@@ -1388,6 +1412,7 @@
     },
     {
       "definitionUri": "opentrons/opentrons_flex_96_tiprack_adapter/1",
+      "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_adapter",
       "location": {
         "slotName": "D3"
@@ -1395,8 +1420,11 @@
     },
     {
       "definitionUri": "opentrons/opentrons_flex_96_tiprack_1000ul/1",
+      "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_1000ul",
-      "location": {}
+      "location": {
+        "labwareId": "UUID"
+      }
     }
   ],
   "liquids": [],
@@ -1407,6 +1435,7 @@
   "modules": [],
   "pipettes": [
     {
+      "id": "UUID",
       "mount": "left",
       "pipetteName": "p1000_96"
     }

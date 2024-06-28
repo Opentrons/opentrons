@@ -2,6 +2,8 @@
   "commands": [
     {
       "commandType": "home",
+      "id": "UUID",
+      "key": "50c7ae73a4e3f7129874f39dfb514803",
       "notes": [],
       "params": {},
       "result": {},
@@ -9,6 +11,8 @@
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "73d9d4d55ae8466f3a793ceb70545fa5",
       "notes": [],
       "params": {
         "loadName": "opentrons_flex_96_tiprack_adapter",
@@ -66,16 +70,21 @@
           "stackingOffsetWithModule": {},
           "version": 1,
           "wells": {}
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "50de88d471ad3910c29207fb6df4502e",
       "notes": [],
       "params": {
         "loadName": "opentrons_flex_96_tiprack_50ul",
-        "location": {},
+        "location": {
+          "labwareId": "UUID"
+        },
         "namespace": "opentrons",
         "version": 1
       },
@@ -1216,12 +1225,15 @@
               "z": 1.5
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "a83392f86baf8cd5b4f0157c89d31dbd",
       "notes": [],
       "params": {
         "loadName": "opentrons_flex_96_tiprack_50ul",
@@ -2368,12 +2380,15 @@
               "z": 1.5
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadPipette",
+      "id": "UUID",
+      "key": "7d6a90a14623439c6f8429028cf86ee9",
       "notes": [],
       "params": {
         "liquidPresenceDetection": false,
@@ -2381,11 +2396,15 @@
         "pipetteName": "p1000_96",
         "tipOverlapNotAfterVersion": "v0"
       },
-      "result": {},
+      "result": {
+        "pipetteId": "UUID"
+      },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "64cde0859e866d74d9ae86670ef205e8",
       "notes": [],
       "params": {
         "loadName": "nest_96_wellplate_200ul_flat",
@@ -3541,12 +3560,15 @@
               "z": 3.5
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "48654631ff6df1794060f1f85ffa178c",
       "notes": [],
       "params": {
         "loadName": "nest_96_wellplate_200ul_flat",
@@ -4702,12 +4724,15 @@
               "z": 3.5
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadModule",
+      "id": "UUID",
+      "key": "93002e38003725479de8991866fe5c0f",
       "notes": [],
       "params": {
         "location": {
@@ -4811,12 +4836,16 @@
             }
           }
         },
-        "model": "thermocyclerModuleV2"
+        "model": "thermocyclerModuleV2",
+        "moduleId": "UUID",
+        "serialNumber": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "507878bbfa5b31005e2b5c5d2ad2f778",
       "notes": [],
       "params": {
         "loadName": "nest_96_wellplate_200ul_flat",
@@ -5972,26 +6001,34 @@
               "z": 3.5
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "configureNozzleLayout",
+      "id": "UUID",
+      "key": "9056ad92e3df61f43adfa750aaccfeff",
       "notes": [],
       "params": {
         "configurationParams": {
           "primaryNozzle": "A12",
           "style": "COLUMN"
-        }
+        },
+        "pipetteId": "UUID"
       },
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "id": "UUID",
+      "key": "7c4f2bf57d986dcd4276b051f7630d5b",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "wellLocation": {
           "offset": {
             "x": 0.0,
@@ -6016,9 +6053,13 @@
     },
     {
       "commandType": "aspirate",
+      "id": "UUID",
+      "key": "2c0ab71a784376ac05b5728d72a6a57d",
       "notes": [],
       "params": {
         "flowRate": 160.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 50.0,
         "wellLocation": {
           "offset": {
@@ -6042,9 +6083,13 @@
     },
     {
       "commandType": "dispense",
+      "id": "UUID",
+      "key": "e1b16944e3d0ff8ae0a964f7e638c1b3",
       "notes": [],
       "params": {
         "flowRate": 160.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 20.0,
         "wellLocation": {
           "offset": {
@@ -6080,6 +6125,7 @@
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
+      "id": "UUID",
       "isDefined": false,
       "wrappedErrors": [
         {
@@ -6087,6 +6133,7 @@
           "errorCode": "2004",
           "errorInfo": {},
           "errorType": "PartialTipMovementNotAllowedError",
+          "id": "UUID",
           "isDefined": false,
           "wrappedErrors": []
         }
@@ -6102,6 +6149,7 @@
   "labware": [
     {
       "definitionUri": "opentrons/opentrons_flex_96_tiprack_adapter/1",
+      "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_adapter",
       "location": {
         "slotName": "B3"
@@ -6109,11 +6157,15 @@
     },
     {
       "definitionUri": "opentrons/opentrons_flex_96_tiprack_50ul/1",
+      "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_50ul",
-      "location": {}
+      "location": {
+        "labwareId": "UUID"
+      }
     },
     {
       "definitionUri": "opentrons/opentrons_flex_96_tiprack_50ul/1",
+      "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_50ul",
       "location": {
         "slotName": "D3"
@@ -6121,6 +6173,7 @@
     },
     {
       "definitionUri": "opentrons/nest_96_wellplate_200ul_flat/2",
+      "id": "UUID",
       "loadName": "nest_96_wellplate_200ul_flat",
       "location": {
         "slotName": "C2"
@@ -6128,6 +6181,7 @@
     },
     {
       "definitionUri": "opentrons/nest_96_wellplate_200ul_flat/2",
+      "id": "UUID",
       "loadName": "nest_96_wellplate_200ul_flat",
       "location": {
         "slotName": "C1"
@@ -6135,6 +6189,7 @@
     },
     {
       "definitionUri": "opentrons/nest_96_wellplate_200ul_flat/2",
+      "id": "UUID",
       "loadName": "nest_96_wellplate_200ul_flat",
       "location": {
         "slotName": "A2"
@@ -6145,14 +6200,17 @@
   "metadata": {},
   "modules": [
     {
+      "id": "UUID",
       "location": {
         "slotName": "B1"
       },
-      "model": "thermocyclerModuleV2"
+      "model": "thermocyclerModuleV2",
+      "serialNumber": "UUID"
     }
   ],
   "pipettes": [
     {
+      "id": "UUID",
       "mount": "left",
       "pipetteName": "p1000_96"
     }

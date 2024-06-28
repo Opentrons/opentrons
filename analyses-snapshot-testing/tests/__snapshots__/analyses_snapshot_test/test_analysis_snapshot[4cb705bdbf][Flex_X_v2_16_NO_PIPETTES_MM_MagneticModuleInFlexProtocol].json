@@ -2,6 +2,8 @@
   "commands": [
     {
       "commandType": "home",
+      "id": "UUID",
+      "key": "50c7ae73a4e3f7129874f39dfb514803",
       "notes": [],
       "params": {},
       "result": {},
@@ -18,9 +20,12 @@
           "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/execution/command_executor.py\", line N, in execute\n    result = await command_impl.execute(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/commands/load_module.py\", line N, in execute\n    self._ensure_module_location(params.location.slotName, module_type)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/commands/load_module.py\", line N, in _ensure_module_location\n    cutout_fixture_id = ModuleType.to_module_fixture_id(module_type)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/hardware_control/modules/types.py\", line N, in to_module_fixture_id\n    raise ValueError(\n"
         },
         "errorType": "PythonException",
+        "id": "UUID",
         "isDefined": false,
         "wrappedErrors": []
       },
+      "id": "UUID",
+      "key": "8511b05ba5565bf0e6dcccd800e2ee23",
       "notes": [],
       "params": {
         "location": {
@@ -44,6 +49,7 @@
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
+      "id": "UUID",
       "isDefined": false,
       "wrappedErrors": [
         {
@@ -51,6 +57,7 @@
           "errorCode": "4000",
           "errorInfo": {},
           "errorType": "ProtocolCommandFailedError",
+          "id": "UUID",
           "isDefined": false,
           "wrappedErrors": [
             {
@@ -62,6 +69,7 @@
                 "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/execution/command_executor.py\", line N, in execute\n    result = await command_impl.execute(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/commands/load_module.py\", line N, in execute\n    self._ensure_module_location(params.location.slotName, module_type)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/commands/load_module.py\", line N, in _ensure_module_location\n    cutout_fixture_id = ModuleType.to_module_fixture_id(module_type)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/hardware_control/modules/types.py\", line N, in to_module_fixture_id\n    raise ValueError(\n"
               },
               "errorType": "PythonException",
+              "id": "UUID",
               "isDefined": false,
               "wrappedErrors": []
             }

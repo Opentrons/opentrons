@@ -2,6 +2,8 @@
   "commands": [
     {
       "commandType": "home",
+      "id": "UUID",
+      "key": "50c7ae73a4e3f7129874f39dfb514803",
       "notes": [],
       "params": {},
       "result": {},
@@ -9,6 +11,8 @@
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "73d9d4d55ae8466f3a793ceb70545fa5",
       "notes": [],
       "params": {
         "displayName": "300ul tips",
@@ -1150,7 +1154,8 @@
               "z": 5.39
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
@@ -1161,9 +1166,12 @@
         "errorCode": "4000",
         "errorInfo": {},
         "errorType": "InvalidSpecificationForRobotTypeError",
+        "id": "UUID",
         "isDefined": false,
         "wrappedErrors": []
       },
+      "id": "UUID",
+      "key": "bd403a1c851a75b4b68ce34796d713fa",
       "notes": [],
       "params": {
         "liquidPresenceDetection": false,
@@ -1187,6 +1195,7 @@
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
+      "id": "UUID",
       "isDefined": false,
       "wrappedErrors": [
         {
@@ -1194,6 +1203,7 @@
           "errorCode": "4000",
           "errorInfo": {},
           "errorType": "ProtocolCommandFailedError",
+          "id": "UUID",
           "isDefined": false,
           "wrappedErrors": [
             {
@@ -1201,6 +1211,7 @@
               "errorCode": "4000",
               "errorInfo": {},
               "errorType": "InvalidSpecificationForRobotTypeError",
+              "id": "UUID",
               "isDefined": false,
               "wrappedErrors": []
             }
@@ -1219,6 +1230,7 @@
     {
       "definitionUri": "opentrons/opentrons_96_tiprack_300ul/1",
       "displayName": "300ul tips",
+      "id": "UUID",
       "loadName": "opentrons_96_tiprack_300ul",
       "location": {
         "slotName": "A1"

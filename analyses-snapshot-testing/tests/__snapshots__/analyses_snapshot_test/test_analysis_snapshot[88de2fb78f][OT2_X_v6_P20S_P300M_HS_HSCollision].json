@@ -2,6 +2,8 @@
   "commands": [
     {
       "commandType": "home",
+      "id": "UUID",
+      "key": "50c7ae73a4e3f7129874f39dfb514803",
       "notes": [],
       "params": {},
       "result": {},
@@ -9,32 +11,45 @@
     },
     {
       "commandType": "loadPipette",
+      "id": "UUID",
+      "key": "371f4a86-b9a5-4bc0-8bdd-d28460087c31",
       "notes": [],
       "params": {
         "mount": "left",
+        "pipetteId": "UUID",
         "pipetteName": "p300_single_gen2"
       },
-      "result": {},
+      "result": {
+        "pipetteId": "UUID"
+      },
       "status": "succeeded"
     },
     {
       "commandType": "loadPipette",
+      "id": "UUID",
+      "key": "00c0d791-6167-4a8b-8822-0482a6229976",
       "notes": [],
       "params": {
         "mount": "right",
+        "pipetteId": "UUID",
         "pipetteName": "p300_multi_gen2"
       },
-      "result": {},
+      "result": {
+        "pipetteId": "UUID"
+      },
       "status": "succeeded"
     },
     {
       "commandType": "loadModule",
+      "id": "UUID",
+      "key": "e3a5093f-bfb7-433b-a064-05de0c322c35",
       "notes": [],
       "params": {
         "location": {
           "slotName": "1"
         },
-        "model": "heaterShakerModuleV1"
+        "model": "heaterShakerModuleV1",
+        "moduleId": "UUID"
       },
       "result": {
         "definition": {
@@ -473,15 +488,20 @@
             }
           }
         },
-        "model": "heaterShakerModuleV1"
+        "model": "heaterShakerModuleV1",
+        "moduleId": "UUID",
+        "serialNumber": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "1f08132e-50c9-457b-b543-1d3318c5d075",
       "notes": [],
       "params": {
         "displayName": "Opentrons 96 Tip Rack 300 µL",
+        "labwareId": "UUID",
         "loadName": "opentrons_96_tiprack_300ul",
         "location": {
           "slotName": "2"
@@ -1620,17 +1640,23 @@
               "z": 5.39
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "f6ad95f9-6d54-453e-8630-50ee166deb5a",
       "notes": [],
       "params": {
         "displayName": "H/S",
+        "labwareId": "UUID",
         "loadName": "opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep",
-        "location": {},
+        "location": {
+          "moduleId": "UUID"
+        },
         "namespace": "opentrons",
         "version": 1
       },
@@ -2872,15 +2898,19 @@
               "z": 4.25
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "83b274d2-cbf1-4913-95dd-2c29e196983c",
       "notes": [],
       "params": {
         "displayName": "Opentrons 96 Tip Rack 300 µL (1)",
+        "labwareId": "UUID",
         "loadName": "opentrons_96_tiprack_300ul",
         "location": {
           "slotName": "4"
@@ -4019,15 +4049,19 @@
               "z": 5.39
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "10a1df55-87a4-4eb3-ba1c-4e9b6e4ed3e5",
       "notes": [],
       "params": {
         "displayName": "1",
+        "labwareId": "UUID",
         "loadName": "armadillo_96_wellplate_200ul_pcr_full_skirt",
         "location": {
           "slotName": "5"
@@ -5168,14 +5202,19 @@
               "z": 1.05
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "99f4bd4a-9385-45cf-b57c-55a619e9b961",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "A1": 100.0,
           "A2": 100.0,
@@ -5208,22 +5247,34 @@
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
+      "id": "UUID",
+      "key": "e5e36a96-61c3-4d73-98a7-17aeb667b727",
       "notes": [],
-      "params": {},
+      "params": {
+        "moduleId": "UUID"
+      },
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/deactivateHeater",
+      "id": "UUID",
+      "key": "fe2e39c4-5245-465a-8df8-33096913a07d",
       "notes": [],
-      "params": {},
+      "params": {
+        "moduleId": "UUID"
+      },
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/deactivateShaker",
+      "id": "UUID",
+      "key": "b214ab6f-85af-46be-85ea-ec7fbde9cf15",
       "notes": [],
-      "params": {},
+      "params": {
+        "moduleId": "UUID"
+      },
       "result": {},
       "status": "succeeded"
     }
@@ -5242,6 +5293,7 @@
   "labware": [
     {
       "definitionUri": "opentrons/opentrons_1_trash_1100ml_fixed/1",
+      "id": "UUID",
       "loadName": "opentrons_1_trash_1100ml_fixed",
       "location": {
         "slotName": "12"
@@ -5250,6 +5302,7 @@
     {
       "definitionUri": "opentrons/opentrons_96_tiprack_300ul/1",
       "displayName": "Opentrons 96 Tip Rack 300 µL",
+      "id": "UUID",
       "loadName": "opentrons_96_tiprack_300ul",
       "location": {
         "slotName": "2"
@@ -5258,12 +5311,16 @@
     {
       "definitionUri": "opentrons/opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep/1",
       "displayName": "H/S",
+      "id": "UUID",
       "loadName": "opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep",
-      "location": {}
+      "location": {
+        "moduleId": "UUID"
+      }
     },
     {
       "definitionUri": "opentrons/opentrons_96_tiprack_300ul/1",
       "displayName": "Opentrons 96 Tip Rack 300 µL (1)",
+      "id": "UUID",
       "loadName": "opentrons_96_tiprack_300ul",
       "location": {
         "slotName": "4"
@@ -5272,6 +5329,7 @@
     {
       "definitionUri": "opentrons/armadillo_96_wellplate_200ul_pcr_full_skirt/1",
       "displayName": "1",
+      "id": "UUID",
       "loadName": "armadillo_96_wellplate_200ul_pcr_full_skirt",
       "location": {
         "slotName": "5"
@@ -5282,7 +5340,8 @@
     {
       "description": "",
       "displayColor": "#b925ff",
-      "displayName": "Water"
+      "displayName": "Water",
+      "id": "UUID"
     }
   ],
   "metadata": {
@@ -5295,18 +5354,22 @@
   },
   "modules": [
     {
+      "id": "UUID",
       "location": {
         "slotName": "1"
       },
-      "model": "heaterShakerModuleV1"
+      "model": "heaterShakerModuleV1",
+      "serialNumber": "UUID"
     }
   ],
   "pipettes": [
     {
+      "id": "UUID",
       "mount": "left",
       "pipetteName": "p300_single_gen2"
     },
     {
+      "id": "UUID",
       "mount": "right",
       "pipetteName": "p300_multi_gen2"
     }

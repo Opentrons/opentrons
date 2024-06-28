@@ -2,6 +2,8 @@
   "commands": [
     {
       "commandType": "home",
+      "id": "UUID",
+      "key": "50c7ae73a4e3f7129874f39dfb514803",
       "notes": [],
       "params": {},
       "result": {},
@@ -9,6 +11,8 @@
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "73d9d4d55ae8466f3a793ceb70545fa5",
       "notes": [],
       "params": {
         "loadName": "opentrons_flex_96_tiprack_adapter",
@@ -66,16 +70,21 @@
           "stackingOffsetWithModule": {},
           "version": 1,
           "wells": {}
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "50de88d471ad3910c29207fb6df4502e",
       "notes": [],
       "params": {
         "loadName": "opentrons_flex_96_tiprack_1000ul",
-        "location": {},
+        "location": {
+          "labwareId": "UUID"
+        },
         "namespace": "opentrons",
         "version": 1
       },
@@ -1216,12 +1225,15 @@
               "z": 1.5
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadPipette",
+      "id": "UUID",
+      "key": "54fddab1eb921f6e1d3aa7e96d2ac307",
       "notes": [],
       "params": {
         "liquidPresenceDetection": false,
@@ -1229,13 +1241,19 @@
         "pipetteName": "p1000_96",
         "tipOverlapNotAfterVersion": "v0"
       },
-      "result": {},
+      "result": {
+        "pipetteId": "UUID"
+      },
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "id": "UUID",
+      "key": "edfad9623f53264d713b6020c8a9e4e1",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "wellLocation": {
           "offset": {
             "x": 0.0,
@@ -1260,6 +1278,8 @@
     },
     {
       "commandType": "moveToAddressableAreaForDropTip",
+      "id": "UUID",
+      "key": "e4dedd023ceb8e9bd1edc42605bcd4b4",
       "notes": [],
       "params": {
         "addressableAreaName": "movableTrashC3",
@@ -1270,7 +1290,8 @@
           "x": 0.0,
           "y": 0.0,
           "z": 0.0
-        }
+        },
+        "pipetteId": "UUID"
       },
       "result": {
         "position": {
@@ -1283,8 +1304,12 @@
     },
     {
       "commandType": "dropTipInPlace",
+      "id": "UUID",
+      "key": "25e4e54d39447230ffef89db7313c02f",
       "notes": [],
-      "params": {},
+      "params": {
+        "pipetteId": "UUID"
+      },
       "result": {},
       "status": "succeeded"
     },
@@ -1295,11 +1320,15 @@
         "errorCode": "4000",
         "errorInfo": {},
         "errorType": "IncompatibleAddressableAreaError",
+        "id": "UUID",
         "isDefined": false,
         "wrappedErrors": []
       },
+      "id": "UUID",
+      "key": "4cca9753dc59d176eee1522349363a75",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
         "newLocation": {
           "slotName": "C3"
         },
@@ -1321,6 +1350,7 @@
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
+      "id": "UUID",
       "isDefined": false,
       "wrappedErrors": [
         {
@@ -1328,6 +1358,7 @@
           "errorCode": "4000",
           "errorInfo": {},
           "errorType": "ProtocolCommandFailedError",
+          "id": "UUID",
           "isDefined": false,
           "wrappedErrors": [
             {
@@ -1335,6 +1366,7 @@
               "errorCode": "4000",
               "errorInfo": {},
               "errorType": "IncompatibleAddressableAreaError",
+              "id": "UUID",
               "isDefined": false,
               "wrappedErrors": []
             }
@@ -1352,6 +1384,7 @@
   "labware": [
     {
       "definitionUri": "opentrons/opentrons_flex_96_tiprack_adapter/1",
+      "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_adapter",
       "location": {
         "slotName": "A1"
@@ -1359,8 +1392,11 @@
     },
     {
       "definitionUri": "opentrons/opentrons_flex_96_tiprack_1000ul/1",
+      "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_1000ul",
-      "location": {}
+      "location": {
+        "labwareId": "UUID"
+      }
     }
   ],
   "liquids": [],
@@ -1371,6 +1407,7 @@
   "modules": [],
   "pipettes": [
     {
+      "id": "UUID",
       "mount": "left",
       "pipetteName": "p1000_96"
     }

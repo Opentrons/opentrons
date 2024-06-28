@@ -2,6 +2,8 @@
   "commands": [
     {
       "commandType": "home",
+      "id": "UUID",
+      "key": "50c7ae73a4e3f7129874f39dfb514803",
       "notes": [],
       "params": {},
       "result": {},
@@ -9,19 +11,27 @@
     },
     {
       "commandType": "loadPipette",
+      "id": "UUID",
+      "key": "49c820bc-8a05-404c-a4a0-3ab95c65349b",
       "notes": [],
       "params": {
         "mount": "right",
+        "pipetteId": "UUID",
         "pipetteName": "p20_single_gen2"
       },
-      "result": {},
+      "result": {
+        "pipetteId": "UUID"
+      },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "0e325072-e6ea-4c37-ac07-e55d1ab210f8",
       "notes": [],
       "params": {
         "displayName": "gold",
+        "labwareId": "UUID",
         "loadName": "axygen_1_reservoir_90ml",
         "location": {
           "slotName": "7"
@@ -100,15 +110,19 @@
               "z": 6.63
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "70203647-b416-4804-9b56-9d7549ef4b08",
       "notes": [],
       "params": {
         "displayName": "SILVER",
+        "labwareId": "UUID",
         "loadName": "nest_12_reservoir_15ml",
         "location": {
           "slotName": "8"
@@ -341,15 +355,19 @@
               "z": 4.55
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "109fdf6f-0081-4d1b-8bc8-4951e265b43f",
       "notes": [],
       "params": {
         "displayName": "round",
+        "labwareId": "UUID",
         "loadName": "corning_6_wellplate_16.8ml_flat",
         "location": {
           "slotName": "3"
@@ -485,15 +503,19 @@
               "z": 2.87
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "e4c65555-b593-45fc-814f-78d69d746d36",
       "notes": [],
       "params": {
         "displayName": "Opentrons 96 Tip Rack 20 µL",
+        "labwareId": "UUID",
         "loadName": "opentrons_96_tiprack_20ul",
         "location": {
           "slotName": "1"
@@ -1632,14 +1654,19 @@
               "z": 25.49
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "d0002adb-4fbf-44fb-b694-289ee8157a32",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "A10": 1000.0,
           "A5": 1000.0,
@@ -1654,8 +1681,12 @@
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "be957653-f452-45b7-ae84-65e6b509f460",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "A1": 5000.0
         }
@@ -1665,8 +1696,12 @@
     },
     {
       "commandType": "pickUpTip",
+      "id": "UUID",
+      "key": "a78e5288-8306-4960-bf2a-86055d91f738",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "wellLocation": {
           "offset": {
             "x": 0,
@@ -1701,12 +1736,17 @@
           "max_tip_volume": 20.0
         },
         "errorType": "InvalidAspirateVolumeError",
+        "id": "UUID",
         "isDefined": false,
         "wrappedErrors": []
       },
+      "id": "UUID",
+      "key": "c2e4fa67-3c04-4d22-b3fa-5d61e956c488",
       "notes": [],
       "params": {
         "flowRate": 3.78,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 21.0,
         "wellLocation": {
           "offset": {
@@ -1736,6 +1776,7 @@
         "max_tip_volume": 20.0
       },
       "errorType": "InvalidAspirateVolumeError",
+      "id": "UUID",
       "isDefined": false,
       "wrappedErrors": []
     }
@@ -1749,6 +1790,7 @@
   "labware": [
     {
       "definitionUri": "opentrons/opentrons_1_trash_1100ml_fixed/1",
+      "id": "UUID",
       "loadName": "opentrons_1_trash_1100ml_fixed",
       "location": {
         "slotName": "12"
@@ -1757,6 +1799,7 @@
     {
       "definitionUri": "opentrons/axygen_1_reservoir_90ml/1",
       "displayName": "gold",
+      "id": "UUID",
       "loadName": "axygen_1_reservoir_90ml",
       "location": {
         "slotName": "7"
@@ -1765,6 +1808,7 @@
     {
       "definitionUri": "opentrons/nest_12_reservoir_15ml/1",
       "displayName": "SILVER",
+      "id": "UUID",
       "loadName": "nest_12_reservoir_15ml",
       "location": {
         "slotName": "8"
@@ -1773,6 +1817,7 @@
     {
       "definitionUri": "opentrons/corning_6_wellplate_16.8ml_flat/1",
       "displayName": "round",
+      "id": "UUID",
       "loadName": "corning_6_wellplate_16.8ml_flat",
       "location": {
         "slotName": "3"
@@ -1781,6 +1826,7 @@
     {
       "definitionUri": "opentrons/opentrons_96_tiprack_20ul/1",
       "displayName": "Opentrons 96 Tip Rack 20 µL",
+      "id": "UUID",
       "loadName": "opentrons_96_tiprack_20ul",
       "location": {
         "slotName": "1"
@@ -1791,12 +1837,14 @@
     {
       "description": "",
       "displayColor": "#b925ff",
-      "displayName": "GOLD"
+      "displayName": "GOLD",
+      "id": "UUID"
     },
     {
       "description": "",
       "displayColor": "#ffd600",
-      "displayName": "SILVER"
+      "displayName": "SILVER",
+      "id": "UUID"
     }
   ],
   "metadata": {
@@ -1810,6 +1858,7 @@
   "modules": [],
   "pipettes": [
     {
+      "id": "UUID",
       "mount": "right",
       "pipetteName": "p20_single_gen2"
     }

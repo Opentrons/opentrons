@@ -2,6 +2,8 @@
   "commands": [
     {
       "commandType": "home",
+      "id": "UUID",
+      "key": "50c7ae73a4e3f7129874f39dfb514803",
       "notes": [],
       "params": {},
       "result": {},
@@ -9,6 +11,8 @@
     },
     {
       "commandType": "setRailLights",
+      "id": "UUID",
+      "key": "c0f556802f0eafbdbce20c171f217b13",
       "notes": [],
       "params": {
         "on": true
@@ -18,6 +22,8 @@
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "f07d6c0ca912ee1c593fcd7e38b7230a",
       "notes": [],
       "params": {
         "displayName": "300ul tips",
@@ -1159,12 +1165,15 @@
               "z": 5.39
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "b47065c436042010ad56a724df341b57",
       "notes": [],
       "params": {
         "displayName": "20ul tips",
@@ -2306,12 +2315,15 @@
               "z": 25.49
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadPipette",
+      "id": "UUID",
+      "key": "c8b4dce27370f8f974076ce2e173e636",
       "notes": [],
       "params": {
         "liquidPresenceDetection": false,
@@ -2319,11 +2331,15 @@
         "pipetteName": "p300_multi_gen2",
         "tipOverlapNotAfterVersion": "v0"
       },
-      "result": {},
+      "result": {
+        "pipetteId": "UUID"
+      },
       "status": "succeeded"
     },
     {
       "commandType": "loadPipette",
+      "id": "UUID",
+      "key": "5effea2cf44c42e87fbf9507bb133913",
       "notes": [],
       "params": {
         "liquidPresenceDetection": false,
@@ -2331,11 +2347,15 @@
         "pipetteName": "p20_single_gen2",
         "tipOverlapNotAfterVersion": "v0"
       },
-      "result": {},
+      "result": {
+        "pipetteId": "UUID"
+      },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "e234a9608dd4c86ff847a70096a816ab",
       "notes": [],
       "params": {
         "displayName": "dye container",
@@ -2571,14 +2591,19 @@
               "z": 4.55
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLiquid",
+      "id": "UUID",
+      "key": "d7d0820cd6cd657e3d3e9985ce8388bb",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
         "volumeByWell": {
           "A1": 20.0
         }
@@ -2588,8 +2613,12 @@
     },
     {
       "commandType": "pickUpTip",
+      "id": "UUID",
+      "key": "b17b7f959bbcfc25b356bccb864fc9f1",
       "notes": [],
       "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "wellLocation": {
           "offset": {
             "x": 0.0,
@@ -2614,9 +2643,13 @@
     },
     {
       "commandType": "aspirate",
+      "id": "UUID",
+      "key": "93396a54e2fe378281b00d4202b3c66c",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 0.0,
         "wellLocation": {
           "offset": {
@@ -2640,9 +2673,13 @@
     },
     {
       "commandType": "dispense",
+      "id": "UUID",
+      "key": "1c1b6f3826220ce8b2b74d64e78366a0",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 0.0,
         "wellLocation": {
           "offset": {
@@ -2666,9 +2703,13 @@
     },
     {
       "commandType": "aspirate",
+      "id": "UUID",
+      "key": "185f4924664f4a709a068c990f408811",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 20.0,
         "wellLocation": {
           "offset": {
@@ -2692,9 +2733,13 @@
     },
     {
       "commandType": "dispense",
+      "id": "UUID",
+      "key": "dd5f08f445c0c281a7cf213df461df7c",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 0.0,
         "wellLocation": {
           "offset": {
@@ -2718,9 +2763,13 @@
     },
     {
       "commandType": "aspirate",
+      "id": "UUID",
+      "key": "57c02393b69cd21eb1944eccce0094c0",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 0.0,
         "wellLocation": {
           "offset": {
@@ -2744,9 +2793,13 @@
     },
     {
       "commandType": "dispense",
+      "id": "UUID",
+      "key": "618fc22cee89d2ba5967d3df4b244b4e",
       "notes": [],
       "params": {
         "flowRate": 7.56,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
         "volume": 0.0,
         "wellLocation": {
           "offset": {
@@ -2787,6 +2840,7 @@
     {
       "definitionUri": "opentrons/opentrons_96_tiprack_300ul/1",
       "displayName": "300ul tips",
+      "id": "UUID",
       "loadName": "opentrons_96_tiprack_300ul",
       "location": {
         "slotName": "5"
@@ -2795,6 +2849,7 @@
     {
       "definitionUri": "opentrons/opentrons_96_tiprack_20ul/1",
       "displayName": "20ul tips",
+      "id": "UUID",
       "loadName": "opentrons_96_tiprack_20ul",
       "location": {
         "slotName": "4"
@@ -2803,6 +2858,7 @@
     {
       "definitionUri": "opentrons/nest_12_reservoir_15ml/1",
       "displayName": "dye container",
+      "id": "UUID",
       "loadName": "nest_12_reservoir_15ml",
       "location": {
         "slotName": "3"
@@ -2813,7 +2869,8 @@
     {
       "description": "H₂O",
       "displayColor": "#42AB2D",
-      "displayName": "water"
+      "displayName": "water",
+      "id": "UUID"
     }
   ],
   "metadata": {
@@ -2824,10 +2881,12 @@
   "modules": [],
   "pipettes": [
     {
+      "id": "UUID",
       "mount": "left",
       "pipetteName": "p300_multi_gen2"
     },
     {
+      "id": "UUID",
       "mount": "right",
       "pipetteName": "p20_single_gen2"
     }

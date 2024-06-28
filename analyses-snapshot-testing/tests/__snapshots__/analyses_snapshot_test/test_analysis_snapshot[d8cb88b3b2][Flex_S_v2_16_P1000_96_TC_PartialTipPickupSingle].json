@@ -2,6 +2,8 @@
   "commands": [
     {
       "commandType": "home",
+      "id": "UUID",
+      "key": "50c7ae73a4e3f7129874f39dfb514803",
       "notes": [],
       "params": {},
       "result": {},
@@ -9,6 +11,8 @@
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "73d9d4d55ae8466f3a793ceb70545fa5",
       "notes": [],
       "params": {
         "loadName": "opentrons_flex_96_tiprack_50ul",
@@ -1155,12 +1159,15 @@
               "z": 1.5
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadPipette",
+      "id": "UUID",
+      "key": "bd403a1c851a75b4b68ce34796d713fa",
       "notes": [],
       "params": {
         "liquidPresenceDetection": false,
@@ -1168,11 +1175,15 @@
         "pipetteName": "p1000_96",
         "tipOverlapNotAfterVersion": "v0"
       },
-      "result": {},
+      "result": {
+        "pipetteId": "UUID"
+      },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "7c77a98dddc4874b48391d51187c8469",
       "notes": [],
       "params": {
         "loadName": "nest_96_wellplate_200ul_flat",
@@ -2328,12 +2339,15 @@
               "z": 3.5
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "id": "UUID",
+      "key": "eee58b6cdafa99f793ac3ecc4b853bb2",
       "notes": [],
       "params": {
         "loadName": "nest_96_wellplate_200ul_flat",
@@ -3489,7 +3503,8 @@
               "z": 3.5
             }
           }
-        }
+        },
+        "labwareId": "UUID"
       },
       "status": "succeeded"
     }
@@ -3507,6 +3522,7 @@
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
+      "id": "UUID",
       "isDefined": false,
       "wrappedErrors": [
         {
@@ -3518,6 +3534,7 @@
             "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line N, in exec_run\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line N, in <module>\n\n  File \"Flex_S_v2_16_P1000_96_TC_PartialTipPickupSingle.py\", line N, in run\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/api_support/util.py\", line N, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/instrument_context.py\", line N, in configure_nozzle_layout\n    raise ValueError(\n"
           },
           "errorType": "PythonException",
+          "id": "UUID",
           "isDefined": false,
           "wrappedErrors": []
         }
@@ -3533,6 +3550,7 @@
   "labware": [
     {
       "definitionUri": "opentrons/opentrons_flex_96_tiprack_50ul/1",
+      "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_50ul",
       "location": {
         "slotName": "C3"
@@ -3540,6 +3558,7 @@
     },
     {
       "definitionUri": "opentrons/nest_96_wellplate_200ul_flat/2",
+      "id": "UUID",
       "loadName": "nest_96_wellplate_200ul_flat",
       "location": {
         "slotName": "C2"
@@ -3547,6 +3566,7 @@
     },
     {
       "definitionUri": "opentrons/nest_96_wellplate_200ul_flat/2",
+      "id": "UUID",
       "loadName": "nest_96_wellplate_200ul_flat",
       "location": {
         "slotName": "C1"
@@ -3558,6 +3578,7 @@
   "modules": [],
   "pipettes": [
     {
+      "id": "UUID",
       "mount": "left",
       "pipetteName": "p1000_96"
     }
