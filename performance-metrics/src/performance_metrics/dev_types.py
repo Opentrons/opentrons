@@ -18,13 +18,6 @@ RobotContextState = typing.Literal[
     "ROBOT_SHUTTING_DOWN",
 ]
 
-SystemResourceMetricName = typing.Literal[
-    "COMMAND_PATH",
-    "RUNNING_SINCE",
-    "CPU_PERCENT",
-    "MEMORY_PERCENT",
-]
-
 
 class SupportsTracking(typing.Protocol):
     """Protocol for classes that support tracking of robot context."""
