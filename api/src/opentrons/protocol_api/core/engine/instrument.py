@@ -84,7 +84,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         self._flow_rates = FlowRates(self)
 
         self.set_default_speed(speed=default_movement_speed)
-        self._liquid_presence_detection = (
+        self._liquid_presence_detection = bool(
             self._engine_client.state.pipettes.get_liquid_presence_detection(pipette_id)
         )
 

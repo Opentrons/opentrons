@@ -1066,8 +1066,7 @@ def test_liquid_presence_detection(
     decoy.when(mock_instrument_core.get_liquid_presence_detection()).then_return(False)
     assert subject.liquid_detection is False
     subject.liquid_detection = True
-    decoy.when(mock_instrument_core.get_liquid_presence_detection()).then_return(True)
-    decoy.when(mock_instrument_core.set_liquid_presence_detection(False)).then_return()
+    decoy.verify(mock_instrument_core.set_liquid_presence_detection(True), times=1)
 
 
 @pytest.mark.parametrize("api_version", [APIVersion(2, 13)])

@@ -1149,6 +1149,20 @@ def test_has_tip(
     assert subject.has_tip() is True
 
 
+def test_liquid_presence_detection(
+    decoy: Decoy,
+    subject: InstrumentCore,
+    mock_engine_client: EngineClient,
+) -> None:
+    """It should have a default liquid presence detection boolean set to False."""
+    decoy.when(
+        mock_engine_client.state.pipettes.get_liquid_presence_detection(
+            subject.pipette_id
+        )
+    ).then_return(False)
+    assert subject.get_liquid_presence_detection() is False
+
+
 @pytest.mark.parametrize(
     argnames=["style", "primary_nozzle", "front_right_nozzle", "expected_model"],
     argvalues=[
