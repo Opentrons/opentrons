@@ -8,9 +8,10 @@ from automation.data.protocol import Protocol
 from automation.data.protocol_registry import ProtocolRegistry
 from citools.generate_analyses import ANALYSIS_SUFFIX, generate_analyses_from_test
 from rich.console import Console
-from syrupy.extensions.json import JSONSnapshotExtension
 from syrupy.filters import props
 from syrupy.types import SerializableData
+
+from tests.custom_json_snapshot_extension import CustomJSONSnapshotExtension
 
 console = Console()
 
@@ -52,8 +53,8 @@ def snapshot_exclude(snapshot: SerializableData) -> SerializableData:
 
 
 @pytest.fixture
-def snapshot_json(snapshot_exclude: SerializableData) -> SerializableData:
-    return snapshot_exclude.with_defaults(extension_class=JSONSnapshotExtension)
+def snapshot_custom(snapshot_exclude: SerializableData) -> SerializableData:
+    return snapshot_exclude.with_defaults(extension_class=CustomJSONSnapshotExtension)
 
 
 @pytest.fixture(scope="session")
@@ -97,8 +98,8 @@ def sort_all_lists(d: Any, sort_key: str | None = None) -> Any:
     protocols_under_test(),
     ids=[x.short_sha for x in protocols_under_test()],
 )
-@pytest.mark.usefixtures("analyze_protocols")
-def test_analysis_snapshot(snapshot_json: SerializableData, protocol: Protocol) -> None:
+# @pytest.mark.usefixtures("analyze_protocols")
+def test_analysis_snapshot(snapshot_custom: SerializableData, protocol: Protocol) -> None:
     analysis_ref = os.getenv("ANALYSIS_REF")
     if not analysis_ref:
         raise AssertionError("Environment variable TARGET not set.")
@@ -113,6 +114,6 @@ def test_analysis_snapshot(snapshot_json: SerializableData, protocol: Protocol) 
             data = json.load(f)
             print(f"Test name: {protocol.file_stem}")
             data = sort_all_lists(data, sort_key="name")
-        assert snapshot_json(name=protocol.file_stem) == data
+        assert snapshot_custom(name=protocol.file_stem) == data
     else:
         raise AssertionError(f"Analysis file not found: {analysis}")

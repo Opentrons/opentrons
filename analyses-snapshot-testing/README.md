@@ -10,7 +10,7 @@
 
 ## Concepts
 
-- If working locally the branch you have checked out is the test code and snapshots you are working with.
+- If working locally the branch you have checked out is the test code/snapshots you are working with.
   - In CI this is the `SNAPSHOT_REF`. This is the branch or tag of the test code/snapshots that analyses generated will be compared to.
 - The `ANALYSIS_REF` is the branch or tag that you want analyses generated from.
 
@@ -33,7 +33,7 @@
 
 ## Running the tests against specific protocols
 
-> Note that we are omitting ANALYSIS_REF=edge because we can, it is the default in the Makefile
+> We are omitting ANALYSIS_REF=edge because we can, it is the default in the Makefile
 
 - `make snapshot-test PROTOCOL_NAMES=Flex_S_v2_19_Illumina_DNA_PCR_Free OVERRIDE_PROTOCOL_NAMES=none`
 - `make snapshot-test PROTOCOL_NAMES=none OVERRIDE_PROTOCOL_NAMES=Flex_X_v2_18_NO_PIPETTES_Overrides_BadTypesInRTP`

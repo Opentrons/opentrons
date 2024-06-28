@@ -21,7 +21,7 @@
           "errorInfo": {
             "args": "(\"ParameterContext.add_int() missing 1 required positional argument: 'display_name'\",)",
             "class": "TypeError",
-            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 80, in _parse_and_set_parameters\n    exec(\"add_parameters(__param_context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"OT2_X_v2_18_None_None_NoRTPdisplay_name.py\", line 11, in add_parameters\n"
+            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line N, in _parse_and_set_parameters\n    exec(\"add_parameters(__param_context)\", new_globs)\n\n  File \"<string>\", line N, in <module>\n\n  File \"OT2_X_v2_18_None_None_NoRTPdisplay_name.py\", line N, in add_parameters\n"
           },
           "errorType": "PythonException",
           "isDefined": false,

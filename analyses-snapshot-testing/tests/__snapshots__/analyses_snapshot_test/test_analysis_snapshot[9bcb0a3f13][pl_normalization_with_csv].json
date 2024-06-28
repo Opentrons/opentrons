@@ -5898,7 +5898,7 @@
           "errorInfo": {
             "args": "(\"could not convert string to float: 'Destination Well'\",)",
             "class": "ValueError",
-            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 147, in exec_run\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"pl_normalization_with_csv.py\", line 64, in run\n\n  File \"pl_normalization_with_csv.py\", line 64, in <listcomp>\n"
+            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line N, in exec_run\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line N, in <module>\n\n  File \"pl_normalization_with_csv.py\", line N, in run\n\n  File \"pl_normalization_with_csv.py\", line N, in <listcomp>\n"
           },
           "errorType": "PythonException",
           "isDefined": false,

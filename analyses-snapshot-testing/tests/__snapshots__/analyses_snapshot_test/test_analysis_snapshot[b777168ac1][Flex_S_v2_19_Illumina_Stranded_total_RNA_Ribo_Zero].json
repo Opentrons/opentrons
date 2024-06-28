@@ -4234,7 +4234,7 @@
           "filename": "None",
           "filename2": "None",
           "strerror": "None",
-          "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/execution/command_executor.py\", line 146, in execute\n    result = await command_impl.execute(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/commands/load_labware.py\", line 133, in execute\n    loaded_labware = await self._equipment.load_labware(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/execution/equipment.py\", line 168, in load_labware\n    definition = await self._labware_data_provider.get_labware_definition(\n\n  File \"/usr/local/lib/python3.10/site-packages/anyio/_backends/_asyncio.py\", line 877, in run_sync_in_worker_thread\n    return await future\n\n  File \"/usr/local/lib/python3.10/site-packages/anyio/_backends/_asyncio.py\", line 807, in run\n    result = context.run(func, *args)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/resources/labware_data_provider.py\", line 48, in _get_labware_definition_sync\n    get_labware_definition(load_name, namespace, version)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/labware.py\", line 63, in get_labware_definition\n    return _get_standard_labware_definition(load_name, namespace, version)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/labware.py\", line 243, in _get_standard_labware_definition\n    raise FileNotFoundError(\n"
+          "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/execution/command_executor.py\", line N, in execute\n    result = await command_impl.execute(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/commands/load_labware.py\", line N, in execute\n    loaded_labware = await self._equipment.load_labware(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/execution/equipment.py\", line N, in load_labware\n    definition = await self._labware_data_provider.get_labware_definition(\n\n  File \"/usr/local/lib/python3.10/site-packages/anyio/_backends/_asyncio.py\", line N, in run_sync_in_worker_thread\n    return await future\n\n  File \"/usr/local/lib/python3.10/site-packages/anyio/_backends/_asyncio.py\", line N, in run\n    result = context.run(func, *args)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/resources/labware_data_provider.py\", line N, in _get_labware_definition_sync\n    get_labware_definition(load_name, namespace, version)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/labware.py\", line N, in get_labware_definition\n    return _get_standard_labware_definition(load_name, namespace, version)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/labware.py\", line N, in _get_standard_labware_definition\n    raise FileNotFoundError(\n"
         },
         "errorType": "PythonException",
         "isDefined": false,
@@ -4248,7 +4248,7 @@
               "code": "ErrorCodes.GENERAL_ERROR",
               "detail": "{}",
               "message": "Labware definition for matching opentrons/eppendorf_96_wellplate_150ul/1 not found.",
-              "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/execution/equipment.py\", line 166, in load_labware\n    definition = self._state_store.labware.get_definition_by_uri(definition_uri)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/state/labware.py\", line 346, in get_definition_by_uri\n    raise errors.LabwareDefinitionDoesNotExistError(\n",
+              "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/execution/equipment.py\", line N, in load_labware\n    definition = self._state_store.labware.get_definition_by_uri(definition_uri)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/state/labware.py\", line N, in get_definition_by_uri\n    raise errors.LabwareDefinitionDoesNotExistError(\n",
               "wrapping": "[]"
             },
             "errorType": "PythonException",
@@ -4260,7 +4260,7 @@
                 "errorInfo": {
                   "args": "('opentrons/eppendorf_96_wellplate_150ul/1',)",
                   "class": "KeyError",
-                  "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/state/labware.py\", line 344, in get_definition_by_uri\n    return self._state.definitions_by_uri[uri]\n"
+                  "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/state/labware.py\", line N, in get_definition_by_uri\n    return self._state.definitions_by_uri[uri]\n"
                 },
                 "errorType": "PythonException",
                 "isDefined": false,
@@ -4272,7 +4272,7 @@
                 "errorInfo": {
                   "args": "('opentrons/eppendorf_96_wellplate_150ul/1',)",
                   "class": "KeyError",
-                  "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/state/labware.py\", line 344, in get_definition_by_uri\n    return self._state.definitions_by_uri[uri]\n"
+                  "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/state/labware.py\", line N, in get_definition_by_uri\n    return self._state.definitions_by_uri[uri]\n"
                 },
                 "errorType": "PythonException",
                 "isDefined": false,
@@ -4327,7 +4327,7 @@
                 "filename": "None",
                 "filename2": "None",
                 "strerror": "None",
-                "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/execution/command_executor.py\", line 146, in execute\n    result = await command_impl.execute(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/commands/load_labware.py\", line 133, in execute\n    loaded_labware = await self._equipment.load_labware(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/execution/equipment.py\", line 168, in load_labware\n    definition = await self._labware_data_provider.get_labware_definition(\n\n  File \"/usr/local/lib/python3.10/site-packages/anyio/_backends/_asyncio.py\", line 877, in run_sync_in_worker_thread\n    return await future\n\n  File \"/usr/local/lib/python3.10/site-packages/anyio/_backends/_asyncio.py\", line 807, in run\n    result = context.run(func, *args)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/resources/labware_data_provider.py\", line 48, in _get_labware_definition_sync\n    get_labware_definition(load_name, namespace, version)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/labware.py\", line 63, in get_labware_definition\n    return _get_standard_labware_definition(load_name, namespace, version)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/labware.py\", line 243, in _get_standard_labware_definition\n    raise FileNotFoundError(\n"
+                "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/execution/command_executor.py\", line N, in execute\n    result = await command_impl.execute(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/commands/load_labware.py\", line N, in execute\n    loaded_labware = await self._equipment.load_labware(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/execution/equipment.py\", line N, in load_labware\n    definition = await self._labware_data_provider.get_labware_definition(\n\n  File \"/usr/local/lib/python3.10/site-packages/anyio/_backends/_asyncio.py\", line N, in run_sync_in_worker_thread\n    return await future\n\n  File \"/usr/local/lib/python3.10/site-packages/anyio/_backends/_asyncio.py\", line N, in run\n    result = context.run(func, *args)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/resources/labware_data_provider.py\", line N, in _get_labware_definition_sync\n    get_labware_definition(load_name, namespace, version)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/labware.py\", line N, in get_labware_definition\n    return _get_standard_labware_definition(load_name, namespace, version)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/labware.py\", line N, in _get_standard_labware_definition\n    raise FileNotFoundError(\n"
               },
               "errorType": "PythonException",
               "isDefined": false,
@@ -4341,7 +4341,7 @@
                     "code": "ErrorCodes.GENERAL_ERROR",
                     "detail": "{}",
                     "message": "Labware definition for matching opentrons/eppendorf_96_wellplate_150ul/1 not found.",
-                    "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/execution/equipment.py\", line 166, in load_labware\n    definition = self._state_store.labware.get_definition_by_uri(definition_uri)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/state/labware.py\", line 346, in get_definition_by_uri\n    raise errors.LabwareDefinitionDoesNotExistError(\n",
+                    "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/execution/equipment.py\", line N, in load_labware\n    definition = self._state_store.labware.get_definition_by_uri(definition_uri)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/state/labware.py\", line N, in get_definition_by_uri\n    raise errors.LabwareDefinitionDoesNotExistError(\n",
                     "wrapping": "[]"
                   },
                   "errorType": "PythonException",
@@ -4353,7 +4353,7 @@
                       "errorInfo": {
                         "args": "('opentrons/eppendorf_96_wellplate_150ul/1',)",
                         "class": "KeyError",
-                        "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/state/labware.py\", line 344, in get_definition_by_uri\n    return self._state.definitions_by_uri[uri]\n"
+                        "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/state/labware.py\", line N, in get_definition_by_uri\n    return self._state.definitions_by_uri[uri]\n"
                       },
                       "errorType": "PythonException",
                       "isDefined": false,
@@ -4365,7 +4365,7 @@
                       "errorInfo": {
                         "args": "('opentrons/eppendorf_96_wellplate_150ul/1',)",
                         "class": "KeyError",
-                        "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/state/labware.py\", line 344, in get_definition_by_uri\n    return self._state.definitions_by_uri[uri]\n"
+                        "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/state/labware.py\", line N, in get_definition_by_uri\n    return self._state.definitions_by_uri[uri]\n"
                       },
                       "errorType": "PythonException",
                       "isDefined": false,

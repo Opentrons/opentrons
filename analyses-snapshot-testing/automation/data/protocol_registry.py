@@ -46,5 +46,9 @@ class ProtocolRegistry:
     def all_defined_protocols(self) -> list[Protocol]:
         return [getattr(self.protocols, prop) for prop in dir(self.protocols) if "__" not in prop]
 
-    def all_defined_protocols_with_overrides(self) -> list[ProtocolWithOverrides]:
-        return [getattr(self.protocols_with_overrides, prop) for prop in dir(self.protocols_with_overrides) if "__" not in prop]
+    def all_defined_protocols_with_overrides(self) -> list[Protocol]:
+        protocols_with_overrides = [
+            getattr(self.protocols_with_overrides, prop) for prop in dir(self.protocols_with_overrides) if "__" not in prop
+        ]
+        # Flatten the list of lists into a single list of protocols
+        return [protocol for protocol_with_overrides in protocols_with_overrides for protocol in protocol_with_overrides.protocols]

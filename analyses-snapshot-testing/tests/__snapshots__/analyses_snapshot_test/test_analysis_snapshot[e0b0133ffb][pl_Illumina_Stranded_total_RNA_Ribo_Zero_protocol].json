@@ -33031,7 +33031,7 @@
     {
       "commandType": "moveLabware",
       "error": {
-        "detail": "Labware opentrons_96_wellplate_200ul_pcr_full_skirt is already present at moduleId='2e304e14-998d-49fb-8d5e-9a85855ee896'.",
+        "detail": "Labware opentrons_96_wellplate_200ul_pcr_full_skirt is already present at moduleId='UUID'.",
         "errorCode": "4000",
         "errorInfo": {},
         "errorType": "LocationIsOccupiedError",
@@ -33055,21 +33055,21 @@
   },
   "errors": [
     {
-      "detail": "ProtocolCommandFailedError [line 339]: Error 4000 GENERAL_ERROR (ProtocolCommandFailedError): LocationIsOccupiedError: Labware opentrons_96_wellplate_200ul_pcr_full_skirt is already present at moduleId='2e304e14-998d-49fb-8d5e-9a85855ee896'.",
+      "detail": "ProtocolCommandFailedError [line 339]: Error 4000 GENERAL_ERROR (ProtocolCommandFailedError): LocationIsOccupiedError: Labware opentrons_96_wellplate_200ul_pcr_full_skirt is already present at moduleId='UUID'.",
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
       "isDefined": false,
       "wrappedErrors": [
         {
-          "detail": "LocationIsOccupiedError: Labware opentrons_96_wellplate_200ul_pcr_full_skirt is already present at moduleId='2e304e14-998d-49fb-8d5e-9a85855ee896'.",
+          "detail": "LocationIsOccupiedError: Labware opentrons_96_wellplate_200ul_pcr_full_skirt is already present at moduleId='UUID'.",
           "errorCode": "4000",
           "errorInfo": {},
           "errorType": "ProtocolCommandFailedError",
           "isDefined": false,
           "wrappedErrors": [
             {
-              "detail": "Labware opentrons_96_wellplate_200ul_pcr_full_skirt is already present at moduleId='2e304e14-998d-49fb-8d5e-9a85855ee896'.",
+              "detail": "Labware opentrons_96_wellplate_200ul_pcr_full_skirt is already present at moduleId='UUID'.",
               "errorCode": "4000",
               "errorInfo": {},
               "errorType": "LocationIsOccupiedError",
