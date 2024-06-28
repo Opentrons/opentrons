@@ -5,7 +5,6 @@ from datetime import datetime
 from pathlib import Path
 
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.parse import PythonParseMode
 from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
@@ -24,6 +23,8 @@ from opentrons.protocol_reader import (
     JsonProtocolConfig,
     PythonProtocolConfig,
 )
+from opentrons.protocol_runner.run_orchestrator import ParseMode
+
 import opentrons.util.helpers as datetime_helper
 
 from robot_server.protocols.analysis_store import AnalysisStore
@@ -107,7 +108,7 @@ async def test_load_runner(
     decoy.verify(
         await run_orchestrator.load(
             protocol_source=protocol_source,
-            python_parse_mode=PythonParseMode.NORMAL,
+            parse_mode=ParseMode.NORMAL,
             run_time_param_values={"rtp_var": 123},
         ),
         times=1,

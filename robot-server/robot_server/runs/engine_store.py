@@ -19,11 +19,11 @@ from opentrons.hardware_control.types import (
     HardwareEventHandler,
 )
 from opentrons.protocols.api_support.deck_type import should_load_fixed_trash
-from opentrons.protocols.parse import PythonParseMode
 from opentrons.protocol_runner import (
     RunResult,
     RunOrchestrator,
 )
+from opentrons.protocol_runner.run_orchestrator import ParseMode
 from opentrons.protocol_engine import (
     DeckType,
     LabwareOffsetCreate,
@@ -42,9 +42,6 @@ from opentrons.protocol_engine.types import (
     DeckConfigurationType,
     RunTimeParamValuesType,
     EngineStatus,
-)
-from opentrons.protocol_reader import (
-    PythonProtocolConfig,
 )
 from opentrons_shared_data.labware.dev_types import LabwareUri
 
@@ -237,9 +234,7 @@ class EngineStore:
             await self.run_orchestrator.load(
                 protocol.source,
                 run_time_param_values=run_time_param_values,
-                python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS
-                if isinstance(protocol.source.config, PythonProtocolConfig)
-                else None,
+                parse_mode=ParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
             )
         else:
             self.run_orchestrator.prepare()

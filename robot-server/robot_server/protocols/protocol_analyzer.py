@@ -12,8 +12,8 @@ import opentrons.util.helpers as datetime_helper
 from opentrons.protocol_runner import (
     RunOrchestrator,
 )
-from opentrons.protocols.parse import PythonParseMode
-from opentrons.protocol_reader.protocol_source import PythonProtocolConfig
+from opentrons.protocol_runner.run_orchestrator import ParseMode
+
 
 import robot_server.errors.error_mappers as em
 
@@ -49,9 +49,7 @@ class ProtocolAnalyzer:
         )
         await orchestrator.load(
             protocol_source=self._protocol_resource.source,
-            python_parse_mode=PythonParseMode.NORMAL
-            if isinstance(self._protocol_resource.source.config, PythonProtocolConfig)
-            else None,
+            parse_mode=ParseMode.NORMAL,
             run_time_param_values=run_time_param_values,
         )
         return orchestrator

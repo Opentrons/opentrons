@@ -38,7 +38,8 @@ from opentrons.protocol_reader import (
 from opentrons.protocol_runner.create_simulating_orchestrator import (
     create_simulating_orchestrator,
 )
-from opentrons.protocol_runner import RunResult, PythonAndLegacyRunner, JsonRunner
+from opentrons.protocol_runner import RunResult
+from opentrons.protocol_runner.run_orchestrator import ParseMode
 
 from opentrons.protocol_engine import (
     Command,
@@ -59,7 +60,6 @@ from opentrons_shared_data.errors.exceptions import (
     PythonException,
 )
 
-from opentrons.protocols.parse import PythonParseMode
 
 OutputKind = Literal["json", "human-json"]
 
@@ -247,9 +247,7 @@ async def _do_analyze(protocol_source: ProtocolSource) -> RunResult:
     try:
         await orchestrator.load(
             protocol_source=protocol_source,
-            python_parse_mode=PythonParseMode.NORMAL
-            if isinstance(protocol_source.config, PythonProtocolConfig)
-            else None,
+            parse_mode=ParseMode.NORMAL,
             run_time_param_values=None,
         )
     except Exception as error:

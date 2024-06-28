@@ -1,5 +1,7 @@
 """Engine/Runner provider."""
 from __future__ import annotations
+
+import enum
 from typing import Optional, Union, List, Dict, AsyncGenerator
 
 from anyio import move_on_after
@@ -41,6 +43,13 @@ class NoProtocolRunAvailable(RuntimeError):
 
 class RunNotFound(GeneralError):
     """An error raised if there is no run associated."""
+
+
+class ParseMode(enum.Enum):
+    """Configure optional rules for when `opentrons.protocols.parse.parse()` parses protocols."""
+
+    NORMAL = enum.auto()
+    ALLOW_LEGACY_METADATA_AND_REQUIREMENTS = enum.auto()
 
 
 class RunOrchestrator:
@@ -307,14 +316,14 @@ class RunOrchestrator:
         self,
         protocol_source: ProtocolSource,
         run_time_param_values: Optional[RunTimeParamValuesType],
-        python_parse_mode: Optional[PythonParseMode],
+        parse_mode: ParseMode,
     ) -> None:
         """Load a json/python protocol."""
         assert self._protocol_runner is not None
         if isinstance(self._protocol_runner, JsonRunner):
             await self._protocol_runner.load(protocol_source=protocol_source)
         elif isinstance(self._protocol_runner, PythonAndLegacyRunner):
-            assert python_parse_mode is not None
+            python_parse_mode = self._map_parse_mode_to_python_parse_mode(parse_mode)
             await self._protocol_runner.load(
                 protocol_source=protocol_source,
                 # Conservatively assume that we're re-running a protocol that
@@ -356,3 +365,10 @@ class RunOrchestrator:
                 # There are no more commands that we should execute, either because the run has
                 # completed on its own, or because a client requested it to stop.
                 break
+
+    @staticmethod
+    def _map_parse_mode_to_python_parse_mode(parse_mode: ParseMode) -> PythonParseMode:
+        if parse_mode == ParseMode.NORMAL:
+            return PythonParseMode.NORMAL
+        else:
+            return PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS

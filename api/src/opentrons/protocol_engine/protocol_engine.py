@@ -134,7 +134,7 @@ class ProtocolEngine:
         return self._state_store
 
     @property
-    def queue_worker(self) -> QueueWorker:
+    def _get_queue_worker(self) -> QueueWorker:
         """Get the queue worker instance."""
         assert self._queue_worker is not None
         return self._queue_worker
@@ -327,7 +327,7 @@ class ProtocolEngine:
         # against the E-stop exception propagating up from lower layers. But we need to
         # do this because we want to make sure non-hardware commands, like
         # `waitForDuration`, are also interrupted.
-        self.queue_worker.cancel()
+        self._get_queue_worker.cancel()
         # Unlike self.request_stop(), we don't need to do
         # self._hardware_api.cancel_execution_and_running_tasks(). Since this was an
         # E-stop event, the hardware API already knows.
@@ -347,7 +347,7 @@ class ProtocolEngine:
         """
         action = self._state_store.commands.validate_action_allowed(StopAction())
         self._action_dispatcher.dispatch(action)
-        self.queue_worker.cancel()
+        self._get_queue_worker.cancel()
         if self._hardware_api.is_movement_execution_taskified():
             # We 'taskify' hardware controller movement functions when running protocols
             # that are not backed by the engine. Such runs cannot be stopped by cancelling
@@ -468,7 +468,7 @@ class ProtocolEngine:
             self._hardware_stopper.do_halt,
             disengage_before_stopping=disengage_before_stopping,
         )
-        exit_stack.push_async_callback(self.queue_worker.join)  # First step.
+        exit_stack.push_async_callback(self._get_queue_worker.join)  # First step.
         try:
             # If any teardown steps failed, this will raise something.
             await exit_stack.aclose()

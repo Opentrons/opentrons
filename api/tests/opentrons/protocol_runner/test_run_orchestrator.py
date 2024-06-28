@@ -20,7 +20,11 @@ from opentrons.protocol_reader import (
     PythonProtocolConfig,
     ProtocolSource,
 )
-from opentrons.protocol_runner.run_orchestrator import RunOrchestrator, RunNotFound
+from opentrons.protocol_runner.run_orchestrator import (
+    RunOrchestrator,
+    RunNotFound,
+    ParseMode,
+)
 from opentrons import protocol_runner
 from opentrons.protocol_runner.protocol_runner import (
     JsonRunner,
@@ -332,7 +336,7 @@ async def test_load_json(
     await json_protocol_subject.load(
         protocol_source=protocol_source,
         run_time_param_values=None,
-        python_parse_mode=None,
+        parse_mode=ParseMode.NORMAL,
     )
 
     decoy.verify(await mock_protocol_json_runner.load(protocol_source))
@@ -356,7 +360,7 @@ async def test_load_python(
     )
     await python_protocol_subject.load(
         protocol_source=protocol_source,
-        python_parse_mode=PythonParseMode.NORMAL,
+        parse_mode=ParseMode.NORMAL,
         run_time_param_values=None,
     )
 
@@ -388,7 +392,7 @@ async def test_load_json_raises_no_protocol(
         await live_protocol_subject.load(
             protocol_source=protocol_source,
             run_time_param_values=None,
-            python_parse_mode=None,
+            parse_mode=ParseMode.NORMAL,
         )
 
 
