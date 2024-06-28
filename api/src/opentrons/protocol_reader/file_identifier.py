@@ -173,11 +173,11 @@ async def _analyze_json(
             original_file=json_file,
             json_contents=json_contents,
         )
-    else:
-        raise FileIdentificationError(
-            message=f"{json_file.name} is not a known Opentrons format.",
-            detail={"type": "no-schema-match", "file": json_file.name},
-        )
+    # else:
+    #     raise FileIdentificationError(
+    #         message=f"{json_file.name} is not a known Opentrons format.",
+    #         detail={"type": "no-schema-match", "file": json_file.name},
+    #     )
 
 
 def _json_seems_like_labware(json: JsonDict) -> bool:

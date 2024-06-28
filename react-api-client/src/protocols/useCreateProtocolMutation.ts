@@ -62,6 +62,7 @@ export function useCreateProtocolMutation(
       )
         .then(response => {
           const protocolId = response.data.data.id
+          console.log('protocolid', response, protocolId)
           queryClient
             .invalidateQueries([host, 'protocols'])
             .then(() =>

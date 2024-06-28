@@ -133,6 +133,8 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
   )
   const handleProceed: React.MouseEventHandler<HTMLButtonElement> = () => {
     trackCreateProtocolRunEvent({ name: 'createProtocolRecordRequest' })
+    console.log('runCreationError', srcFileObjects)
+
     createRunFromProtocolSource({ files: srcFileObjects, protocolKey })
   }
 
@@ -156,10 +158,13 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
     // TODO: do more robust corrupt file catching and handling here
     return null
   }
+  console.log('srcFiles', srcFiles)
   const srcFileObjects = srcFiles.map((srcFileBuffer, index) => {
     const srcFilePath = srcFileNames[index]
+    console.log('srcFileNames', srcFileNames, srcFilePath)
     return new File([srcFileBuffer], _getFileBaseName(srcFilePath))
   })
+  console.log('srcFileObjects ', srcFileObjects)
   const protocolDisplayName =
     mostRecentAnalysis?.metadata?.protocolName ??
     first(srcFileNames) ??

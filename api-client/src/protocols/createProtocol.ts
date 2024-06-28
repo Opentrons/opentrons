@@ -20,6 +20,6 @@ export function createProtocol(
       'runTimeParameterValues',
       JSON.stringify(runTimeParameterValues)
     )
-
+console.log('formData from createProcoll', formData)
   return request<Protocol, FormData>(POST, '/protocols', formData, config)
 }

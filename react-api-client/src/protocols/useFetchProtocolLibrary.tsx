@@ -136,7 +136,6 @@ export async function fetchProtocols(
         variables: { isFeatured, shuffle, limit },
       }
     )
-    console.log('response', response.data)
     return response.data.data.getProtocols
   } catch (error: any) {
     throw new Error(
@@ -169,7 +168,6 @@ export const useFetchProtocolLibrary = (
           shuffle,
           limit ?? undefined
         )
-        console.log('data', data)
         setProtocols(data)
       } catch (err) {
         console.log('err', err)
@@ -192,7 +190,6 @@ export async function fetchProtocol(slug: string): Promise<any> {
         variables: { slug },
       }
     )
-    console.log('response', response.data)
     return response.data.data.getProtocolBySlug
   } catch (error: any) {
     throw new Error(
@@ -219,7 +216,6 @@ export const useFetchProtocolFromLibrary = (
     async function getProtocol() {
       try {
         const data = await fetchProtocol(slug)
-        console.log('data', data)
         setProtocol(data)
       } catch (err) {
         console.log('err', err)
