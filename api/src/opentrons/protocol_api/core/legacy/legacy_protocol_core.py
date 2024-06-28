@@ -88,6 +88,7 @@ class LegacyProtocolCore(
         self._module_cores: List[legacy_module_core.LegacyModuleCore] = []
         self._labware_cores: List[LegacyLabwareCore] = [self.fixed_trash]
         self._disposal_locations: List[Union[Labware, TrashBin, WasteChute]] = []
+        self._liquid_presence_detection = False
 
     @property
     def api_version(self) -> APIVersion:
@@ -346,7 +347,10 @@ class LegacyProtocolCore(
         return module_core
 
     def load_instrument(
-        self, instrument_name: PipetteNameType, mount: Mount
+        self,
+        instrument_name: PipetteNameType,
+        mount: Mount,
+        liquid_presence_detection: bool = False,
     ) -> LegacyInstrumentCore:
         """Load an instrument."""
         attached = {

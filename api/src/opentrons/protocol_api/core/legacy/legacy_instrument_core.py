@@ -61,6 +61,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
             blow_out_defaults=pipette_state["default_blow_out_flow_rates"],
             api_level=self._api_version,
         )
+        self._liquid_presence_detection = False
 
     def get_default_speed(self) -> float:
         """Gets the speed at which the robot's gantry moves."""
@@ -471,6 +472,9 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
     def get_flow_rate(self) -> FlowRates:
         return self._flow_rates
 
+    def get_liquid_presence_detection(self) -> bool:
+        return self._liquid_presence_detection
+
     def get_aspirate_flow_rate(self, rate: float = 1.0) -> float:
         return self.get_hardware_state()["aspirate_flow_rate"] * rate
 
@@ -496,6 +500,9 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
             dispense=dispense,
             blow_out=blow_out,
         )
+
+    def set_liquid_presence_detection(self, enable: bool) -> None:
+        self._protocol_interface.get_hardware().set_liquid_presence_detection(enable)
 
     def set_pipette_speed(
         self,

@@ -10,7 +10,7 @@ import {
   ALIGN_CENTER,
 } from '@opentrons/components'
 
-import { LargeButton, TabbedButton } from '../../atoms/buttons'
+import { RadioButton, TabbedButton } from '../../atoms/buttons'
 import { ChildNavigation } from '../ChildNavigation'
 import { getCompatibleLabwareByCategory } from './utils'
 
@@ -116,18 +116,17 @@ export function SelectSourceLabware(
         >
           {compatibleLabwareDefinitions?.map(definition => {
             return definition.metadata.displayName != null ? (
-              <LargeButton
+              <RadioButton
                 key={`${selectedCategory}-${definition.metadata.displayName}`}
-                buttonType={
+                isSelected={
                   selectedLabware?.metadata.displayName ===
                   definition.metadata.displayName
-                    ? 'primary'
-                    : 'secondary'
                 }
-                onClick={() => {
+                onChange={() => {
                   setSelectedLabware(definition)
                 }}
-                buttonText={definition.metadata.displayName}
+                buttonValue={definition.metadata.displayName}
+                buttonLabel={definition.metadata.displayName}
               />
             ) : null
           })}

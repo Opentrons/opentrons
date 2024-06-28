@@ -8,15 +8,15 @@ import type { ThunkAction } from '../types'
 interface CreateModuleWithNoSloArgs {
   type: ModuleType
   model: ModuleModel
+  isMagneticBlock: boolean
 }
 export const createModuleWithNoSlot: (
   args: CreateModuleWithNoSloArgs
 ) => ThunkAction<CreateModuleAction> = args => (dispatch, getState) => {
-  const { model, type } = args
+  const { model, type, isMagneticBlock } = args
   const state = getState()
   const initialDeckSetup = stepFormSelectors.getInitialDeckSetup(state)
-  const slot = getNextAvailableModuleSlot(initialDeckSetup)
-
+  const slot = getNextAvailableModuleSlot(initialDeckSetup, isMagneticBlock)
   if (slot == null) {
     console.assert(slot, 'expected to find available slot but could not')
   }

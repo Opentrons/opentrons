@@ -15,6 +15,8 @@ import {
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_AWAITING_RECOVERY,
   RUN_STATUSES_TERMINAL,
+  RUN_STATUS_AWAITING_RECOVERY_PAUSED,
+  RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
 } from '@opentrons/api-client'
 import {
   useModulesQuery,
@@ -115,6 +117,8 @@ const CANCELLABLE_STATUSES = [
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_IDLE,
   RUN_STATUS_AWAITING_RECOVERY,
+  RUN_STATUS_AWAITING_RECOVERY_PAUSED,
+  RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
 ]
 
 interface ProtocolRunHeaderProps {
@@ -336,7 +340,8 @@ export function ProtocolRunHeader({
         {analysisErrors != null && analysisErrors.length > 0 && (
           <ProtocolAnalysisErrorBanner errors={analysisErrors} />
         )}
-        {runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR ? (
+        {runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR ||
+        runStatus === RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR ? (
           <Banner type="warning" iconMarginLeft={SPACING.spacing4}>
             {t('close_door_to_resume')}
           </Banner>
@@ -349,6 +354,7 @@ export function ProtocolRunHeader({
         {/* Note: This banner is for before running a protocol */}
         {isDoorOpen &&
         runStatus !== RUN_STATUS_BLOCKED_BY_OPEN_DOOR &&
+        runStatus !== RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR &&
         runStatus != null &&
         CANCELLABLE_STATUSES.includes(runStatus) ? (
           <Banner type="warning" iconMarginLeft={SPACING.spacing4}>
@@ -530,6 +536,7 @@ const DISABLED_STATUSES: RunStatus[] = [
   RUN_STATUS_FINISHING,
   RUN_STATUS_STOP_REQUESTED,
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
+  RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
 ]
 interface ActionButtonProps {
   runId: string
@@ -610,8 +617,10 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
     isFixtureMismatch ||
     (runStatus != null && DISABLED_STATUSES.includes(runStatus)) ||
     isRobotOnWrongVersionOfSoftware ||
+    // For before running a protocol, "close door to begin".
     (isDoorOpen &&
       runStatus !== RUN_STATUS_BLOCKED_BY_OPEN_DOOR &&
+      runStatus !== RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR &&
       runStatus != null &&
       CANCELLABLE_STATUSES.includes(runStatus))
   const robot = useRobot(robotName)

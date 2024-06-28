@@ -1671,6 +1671,24 @@ class InstrumentContext(publisher.CommandPublisher):
         self._tip_racks = racks
 
     @property
+    @requires_version(2, 20)
+    def liquid_detection(self) -> bool:
+        """
+        Gets the global setting for liquid level detection.
+
+        When True, `liquid_probe` will be called before
+        aspirates and dispenses to bring the tip to the liquid level.
+
+        The default value is False.
+        """
+        return self._core.get_liquid_presence_detection()
+
+    @liquid_detection.setter
+    @requires_version(2, 20)
+    def liquid_detection(self, enable: bool) -> None:
+        self._core.set_liquid_presence_detection(enable)
+
+    @property
     @requires_version(2, 0)
     def trash_container(self) -> Union[labware.Labware, TrashBin, WasteChute]:
         """The trash container associated with this pipette.

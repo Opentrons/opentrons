@@ -153,7 +153,7 @@ export function EditModulesCard(props: Props): JSX.Element {
               <MultipleModulesRow
                 moduleType={moduleType}
                 moduleOnDeck={moduleData}
-                key={`${moduleType}_${i}`}
+                key={`${moduleType}_${i}_${moduleData[0].id}`}
                 moduleOnDeckType={moduleData[0].type}
                 moduleOnDeckModel={moduleData[0].model}
                 openEditModuleModal={openEditModuleModal}

@@ -631,9 +631,8 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
                 "default_dispense_flow_rates": self.dispense_flow_rates_lookup,
                 "tip_length": self.current_tip_length,
                 "return_tip_height": self.active_tip_settings.default_return_tip_height,
-                "tip_overlap": self.tip_overlap[
-                    "v0"
-                ],  # TODO(cb, 2024-06-11): hard coded to "v0" - when versioned tip overlaps are fully integrated this must change
+                "tip_overlap": self.tip_overlap["v0"],
+                "versioned_tip_overlap": self.tip_overlap,
                 "back_compat_names": self._config.pipette_backcompat_names,
                 "supported_tips": self.liquid_class.supported_tips,
             }

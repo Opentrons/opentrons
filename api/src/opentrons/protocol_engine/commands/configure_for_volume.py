@@ -25,6 +25,13 @@ class ConfigureForVolumeParams(PipetteIdMixin):
         "than a pipette-specific maximum volume.",
         ge=0,
     )
+    tipOverlapNotAfterVersion: Optional[str] = Field(
+        None,
+        description="A version of tip overlap data to not exceed. The highest-versioned "
+        "tip overlap data that does not exceed this version will be used. Versions are "
+        "expressed as vN where N is an integer, counting up from v0. If None, the current "
+        "highest version will be used.",
+    )
 
 
 class ConfigureForVolumePrivateResult(PipetteConfigUpdateResultMixin):
@@ -57,6 +64,7 @@ class ConfigureForVolumeImplementation(
         pipette_result = await self._equipment.configure_for_volume(
             pipette_id=params.pipetteId,
             volume=params.volume,
+            tip_overlap_version=params.tipOverlapNotAfterVersion,
         )
 
         return SuccessData(

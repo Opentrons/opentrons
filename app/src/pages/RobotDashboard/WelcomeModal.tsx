@@ -20,12 +20,10 @@ import welcomeModalImage from '../../assets/images/on-device-display/welcome_das
 import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
 
 interface WelcomeModalProps {
-  setShowAnalyticsOptInModal: (showAnalyticsOptInModal: boolean) => void
   setShowWelcomeModal: (showWelcomeModal: boolean) => void
 }
 
 export function WelcomeModal({
-  setShowAnalyticsOptInModal,
   setShowWelcomeModal,
 }: WelcomeModalProps): JSX.Element {
   const { t } = useTranslation(['device_details', 'shared'])
@@ -47,7 +45,6 @@ export function WelcomeModal({
 
   const handleCloseModal = (): void => {
     setShowWelcomeModal(false)
-    setShowAnalyticsOptInModal(true)
   }
 
   React.useEffect(startDiscoAnimation, [])

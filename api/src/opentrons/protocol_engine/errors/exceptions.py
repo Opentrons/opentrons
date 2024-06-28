@@ -128,7 +128,7 @@ class TipNotAttachedError(ProtocolEngineError):
         details: Optional[Dict[str, Any]] = None,
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
-        """Build a PIpetteNotAttachedError."""
+        """Build a PipetteNotAttachedError."""
         super().__init__(ErrorCodes.UNEXPECTED_TIP_REMOVAL, message, details, wrapping)
 
 
