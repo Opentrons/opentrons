@@ -76,15 +76,18 @@ export const getNumSlotsAvailable = (
   const hasTC = Object.values(modules || {}).some(
     module => module.type === THERMOCYCLER_MODULE_TYPE
   )
-  const hasMagneticBlock = Object.values(modules || {}).some(
+  const magneticBlocks = Object.values(modules || {}).filter(
     module => module.type === MAGNETIC_BLOCK_TYPE
   )
   let filteredModuleLength = modules != null ? Object.keys(modules).length : 0
   if (hasTC) {
     filteredModuleLength = filteredModuleLength + 1
   }
-  if (hasMagneticBlock) {
-    filteredModuleLength = filteredModuleLength - 1
+  if (magneticBlocks.length > 0) {
+    //  once blocks exceed 4, then we dont' want to subtract the amount available
+    //  because block can go into the center slots where all other modules/trashes can not
+    const numBlocks = magneticBlocks.length > 4 ? 4 : magneticBlocks.length
+    filteredModuleLength = filteredModuleLength - numBlocks
   }
 
   const hasWasteChute = additionalEquipment.some(equipment =>

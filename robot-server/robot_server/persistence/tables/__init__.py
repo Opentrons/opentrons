@@ -8,6 +8,7 @@ from .schema_5 import (
     run_table,
     run_command_table,
     action_table,
+    data_files_table,
 )
 
 
@@ -18,4 +19,5 @@ __all__ = [
     "run_table",
     "run_command_table",
     "action_table",
+    "data_files_table",
 ]

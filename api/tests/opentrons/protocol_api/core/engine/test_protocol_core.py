@@ -254,6 +254,7 @@ def test_load_instrument_pre_219(
                 pipetteName=PipetteNameType.P300_SINGLE,
                 mount=MountType.LEFT,
                 tipOverlapNotAfterVersion="v0",
+                liquidPresenceDetection=False,
             )
         )
     ).then_return(commands.LoadPipetteResult(pipetteId="cool-pipette"))
@@ -290,6 +291,7 @@ def test_load_instrument_post_219(
                 pipetteName=PipetteNameType.P300_SINGLE,
                 mount=MountType.LEFT,
                 tipOverlapNotAfterVersion="v1",
+                liquidPresenceDetection=False,
             )
         )
     ).then_return(commands.LoadPipetteResult(pipetteId="cool-pipette"))

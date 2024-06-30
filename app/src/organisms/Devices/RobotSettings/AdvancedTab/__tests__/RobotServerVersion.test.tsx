@@ -86,7 +86,7 @@ describe('RobotSettings RobotServerVersion', () => {
   it('the link should have the correct href', () => {
     render()
     const GITHUB_LINK =
-      'https://github.com/Opentrons/opentrons/blob/edge/app-shell/build/release-notes.md'
+      'https://github.com/Opentrons/opentrons/blob/edge/api/release-notes.md'
     const githubLink = screen.getByText('GitHub')
     expect(githubLink.getAttribute('href')).toBe(GITHUB_LINK)
   })

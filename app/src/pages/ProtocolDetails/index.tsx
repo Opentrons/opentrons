@@ -459,6 +459,7 @@ export function ProtocolDetails(): JSX.Element | null {
       protocolId={protocolId}
       labwareOffsets={labwareOffsets}
       runTimeParameters={runTimeParameters}
+      mostRecentAnalysis={mostRecentAnalysis}
     />
   ) : (
     <>

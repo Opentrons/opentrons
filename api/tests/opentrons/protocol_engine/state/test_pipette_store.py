@@ -82,6 +82,7 @@ def test_sets_initial_state(subject: PipetteStore) -> None:
         static_config_by_id={},
         flow_rates_by_id={},
         nozzle_configuration_by_id={},
+        liquid_presence_detection_by_id={},
     )
 
 
@@ -748,6 +749,7 @@ def test_add_pipette_config(
             nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE),
             back_left_corner_offset=Point(x=1, y=2, z=3),
             front_right_corner_offset=Point(x=4, y=5, z=6),
+            pipette_lld_settings={},
         ),
     )
     subject.handle_action(
@@ -774,6 +776,7 @@ def test_add_pipette_config(
             back_left_corner=Point(x=1, y=2, z=3),
             front_right_corner=Point(x=4, y=5, z=6),
         ),
+        lld_settings={},
     )
     assert subject.state.flow_rates_by_id["pipette-id"].default_aspirate == {"a": 1.0}
     assert subject.state.flow_rates_by_id["pipette-id"].default_dispense == {"b": 2.0}
