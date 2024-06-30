@@ -41,6 +41,10 @@ class NoProtocolRunAvailable(RuntimeError):
     """An error raised if there is no protocol run available."""
 
 
+class UnknownProtocolParseMode(RuntimeError):
+    """An error raised if given an unknown protocol parse mode."""
+
+
 class RunNotFound(GeneralError):
     """An error raised if there is no run associated."""
 
@@ -370,5 +374,7 @@ class RunOrchestrator:
     def _map_parse_mode_to_python_parse_mode(parse_mode: ParseMode) -> PythonParseMode:
         if parse_mode == ParseMode.NORMAL:
             return PythonParseMode.NORMAL
-        else:
+        elif parse_mode == ParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS:
             return PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS
+        else:
+            raise UnknownProtocolParseMode()
