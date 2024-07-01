@@ -2055,7 +2055,7 @@ class InstrumentContext(publisher.CommandPublisher):
         :returns: A boolean.
         """
         if well is None:
-            raise WellDoesNotExistError
+            raise WellDoesNotExistError()
 
         try:
             height = self._core.find_liquid_level(well._core)
@@ -2072,7 +2072,7 @@ class InstrumentContext(publisher.CommandPublisher):
         :returns: None.
         """
         if well is None:
-            raise WellDoesNotExistError
+            raise WellDoesNotExistError()
 
         try:
             self._core.find_liquid_level(well._core)
@@ -2086,7 +2086,7 @@ class InstrumentContext(publisher.CommandPublisher):
         :returns: A float representing the height of the liquid.
         """
         if well is None:
-            raise WellDoesNotExistError
+            raise WellDoesNotExistError()
 
         try:
             height = self._core.find_liquid_level(well._core)
