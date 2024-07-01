@@ -2,6 +2,7 @@ import {
   getModuleType,
   getLabwareDefURI,
   getPipetteSpecsV2,
+  STAGING_AREA_CUTOUTS,
 } from '@opentrons/shared-data'
 import type {
   LoadLabwareRunTimeCommand,
@@ -13,7 +14,10 @@ import type {
   LabwareEntities,
   PipetteEntities,
   ModuleEntities,
+  AdditionalEquipmentEntities,
+  AdditionalEquipmentName,
 } from '../types'
+import { uuid } from '.'
 
 export function constructInvariantContextFromRunCommands(
   commands: RunTimeCommand[]
@@ -93,6 +97,34 @@ export function constructInvariantContextFromRunCommands(
         return {
           ...acc,
           pipetteEntities,
+        }
+      } else if (
+        command.commandType === 'moveToAddressableArea' ||
+        command.commandType === 'moveToAddressableAreaForDropTip'
+      ) {
+        const addressableAreaName = command.params.addressableAreaName
+        const id = `${uuid()}:${addressableAreaName}`
+        let name: AdditionalEquipmentName = 'trashBin'
+        let location
+        if (addressableAreaName === 'fixedTrash') {
+          location = '12'
+        } else if (addressableAreaName.includes('WasteChute')) {
+          location = 'D3'
+          name = 'wasteChute'
+        } else if (addressableAreaName.includes('movableTrash')) {
+          location = addressableAreaName.split('movableTrash')[1]
+        }
+        const additionalEquipmentEntities: AdditionalEquipmentEntities = {
+          ...acc.additionalEquipmentEntities,
+          [id]: {
+            name,
+            id,
+            location,
+          },
+        }
+        return {
+          ...acc,
+          additionalEquipmentEntities,
         }
       }
 
