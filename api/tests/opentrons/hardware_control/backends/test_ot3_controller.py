@@ -728,11 +728,12 @@ async def test_liquid_probe(
     move_groups = mock_move_group_run.call_args_list[0][0][0]._move_groups
     head_node = axis_to_node(Axis.by_mount(mount))
     tool_node = sensor_node_for_mount(mount)
-    assert move_groups[0][0][head_node].stop_condition == MoveStopCondition.none
-    assert len(move_groups) == 3
-    assert move_groups[0][0][head_node]
-    assert move_groups[1][0][tool_node]
-    assert move_groups[2][0][head_node], move_groups[2][0][tool_node]
+    #  in tool_sensors, pipette moves down, then sensor move goes
+    assert move_groups[0][0][tool_node].stop_condition == MoveStopCondition.none
+    assert move_groups[1][0][tool_node].stop_condition == MoveStopCondition.sync_line
+    assert len(move_groups) == 2
+    assert move_groups[0][0][tool_node]
+    assert move_groups[1][0][head_node], move_groups[2][0][tool_node]
 
 
 async def test_tip_action(

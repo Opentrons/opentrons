@@ -424,14 +424,6 @@ async def liquid_probe(
             stop_condition=MoveStopCondition.sync_line,
         )
 
-    raise_z_axis = create_step(
-        distance={head_node: float64(-Z_SOLO_MOVE_DISTANCE)},
-        velocity={head_node: float64(-mount_speed)},
-        acceleration={},
-        duration=float64(abs(-Z_SOLO_MOVE_DISTANCE) / (mount_speed)),
-        present_nodes=[head_node],
-    )
-
     lower_plunger = create_step(
         distance={tool: float64(PLUNGER_SOLO_MOVE_TIME * plunger_speed)},
         velocity={tool: float64(plunger_speed)},
@@ -440,9 +432,7 @@ async def liquid_probe(
         present_nodes=[tool],
     )
 
-    sensor_runner = MoveGroupRunner(
-        move_groups=[[raise_z_axis], [lower_plunger], [sensor_group]]
-    )
+    sensor_runner = MoveGroupRunner(move_groups=[[lower_plunger], [sensor_group]])
     if csv_output:
         return await run_stream_output_to_csv(
             messenger,

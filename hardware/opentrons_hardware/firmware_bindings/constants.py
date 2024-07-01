@@ -46,7 +46,7 @@ class NodeId(int, Enum):
         """Mapping between bootloader_node and nodes.
 
         Note: The ordering of the Node list matters as the first element
-        represents the core appliaction node for that given node. For example
+        represents the core application node for that given node. For example
 
         NodeId.head_bootloader : [NodeId.head, NodeId.head_l, NodeId.head_r]
 
