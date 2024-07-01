@@ -146,8 +146,8 @@ dist-ot3: package-deps
 .PHONY: dist-macos-latest
 dist-macos-latest: dist-osx
 
-.PHONY: dist-macos-11
-dist-macos-11: dist-osx
+.PHONY: dist-macos-12
+dist-macos-12: dist-osx
 
 .PHONY: dist-ubuntu-latest
 dist-ubuntu-latest: dist-linux
