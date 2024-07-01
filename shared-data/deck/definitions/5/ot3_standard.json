@@ -199,7 +199,7 @@
       {
         "id": "D4",
         "areaType": "stagingSlot",
-        "offsetFromCutoutFixture": [164.0, 0.0, 14.5],
+        "offsetFromCutoutFixture": [164.0, 0.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,

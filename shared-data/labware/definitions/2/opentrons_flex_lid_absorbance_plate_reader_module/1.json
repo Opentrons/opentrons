@@ -32,8 +32,8 @@
   "namespace": "opentrons",
   "version": 1,
   "schemaVersion": 2,
-  "gripForce": 15.0,
-  "gripHeightFromLabwareBottom": 47.0,
+  "gripForce": 20.0,
+  "gripHeightFromLabwareBottom": 53.0,
   "cornerOffsetFromSlot": {
     "x": 0,
     "y": 0,

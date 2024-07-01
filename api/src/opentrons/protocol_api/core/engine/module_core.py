@@ -569,7 +569,7 @@ class AbsorbanceReaderCore(ModuleCore, AbstractAbsorbanceReaderCore):
             cmd.absorbance_reader.CloseLidParams(
                 moduleId=self.module_id,
                 # FIXME: using staging slot for now (wrong z), but this should be the lid dock slot
-                pickUpOffset=LabwareOffsetVector(x=14, y=0, z=-14.5),
+                pickUpOffset=LabwareOffsetVector(x=14, y=0, z=0),
                 dropOffset=LabwareOffsetVector(x=14, y=0, z=0)
             )
         )
@@ -581,6 +581,6 @@ class AbsorbanceReaderCore(ModuleCore, AbstractAbsorbanceReaderCore):
                 moduleId=self.module_id,
                 pickUpOffset=LabwareOffsetVector(x=14, y=0, z=0),
                 # FIXME: using staging slot for now (wrong z), but this should be the lid dock slot
-                dropOffset=LabwareOffsetVector(x=14, y=0, z=-14.5)
+            dropOffset=LabwareOffsetVector(x=14, y=0, z=1)
         )
         )
