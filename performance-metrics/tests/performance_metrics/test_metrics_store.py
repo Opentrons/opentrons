@@ -3,7 +3,7 @@
 from pathlib import Path
 from time import sleep
 
-from performance_metrics.robot_context_tracker import RobotContextTracker
+from performance_metrics._robot_context_tracker import RobotContextTracker
 from performance_metrics.data_shapes import RawContextData
 
 # Corrected times in seconds
@@ -40,7 +40,9 @@ async def test_storing_to_file(tmp_path: Path) -> None:
         lines = file.readlines()
         assert len(lines) == 3, "All stored data should be written to the file."
 
-        split_lines: list[list[str]] = [line.strip().split(",") for line in lines]
+        split_lines: list[list[str]] = [
+            line.replace('"', "").strip().split(",") for line in lines
+        ]
         assert all(
             RawContextData.from_csv_row(line) for line in split_lines
         ), "All lines should be valid RawContextData instances."
