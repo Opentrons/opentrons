@@ -28,6 +28,7 @@ import { ChooseCsvFile } from './ChooseCsvFile'
 import { useFeatureFlag } from '../../redux/config'
 
 import type {
+  CompletedProtocolAnalysis,
   ChoiceParameter,
   CsvFileParameter,
   NumberParameter,
@@ -40,14 +41,17 @@ interface ProtocolSetupParametersProps {
   protocolId: string
   runTimeParameters: RunTimeParameter[]
   labwareOffsets?: LabwareOffsetCreateData[]
+  mostRecentAnalysis?: CompletedProtocolAnalysis | null
 }
 
 export function ProtocolSetupParameters({
   protocolId,
   labwareOffsets,
   runTimeParameters,
+  mostRecentAnalysis,
 }: ProtocolSetupParametersProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
+  const enableCsvFile = useFeatureFlag('enableCsvFile')
   const history = useHistory()
   const host = useHost()
   const queryClient = useQueryClient()
@@ -85,10 +89,6 @@ export function ProtocolSetupParameters({
   )
   const initialFileInfo = csvFileParameter?.file?.id ?? ''
   const [csvFileInfo, setCSVFileInfo] = React.useState<string>(initialFileInfo)
-
-  // ToDo (kk:06/18/2024) this will be removed when we freeze the code
-  const enableCsvFile = useFeatureFlag('enableCsvFile')
-
   const updateParameters = (
     value: boolean | string | number,
     variableName: string
@@ -204,6 +204,10 @@ export function ProtocolSetupParameters({
         }}
         onClickButton={handleConfirmValues}
         buttonText={t('confirm_values')}
+        buttonIsDisabled={
+          enableCsvFile &&
+          mostRecentAnalysis?.result === 'parameter-value-required'
+        }
         iconName={isLoading || startSetup ? 'ot-spinner' : undefined}
         iconPlacement="startIcon"
         secondaryButtonProps={{
@@ -223,35 +227,58 @@ export function ProtocolSetupParameters({
         paddingX={SPACING.spacing40}
         paddingBottom={SPACING.spacing40}
       >
-        {sortRuntimeParameters(
-          enableCsvFile
-            ? runTimeParametersOverridesWithMockCSV
-            : runTimeParametersOverrides
-        ).map((parameter, index) => {
-          return (
-            <React.Fragment key={`${parameter.displayName}_${index}`}>
-              <ProtocolSetupStep
-                hasRightIcon={!(parameter.type === 'bool')}
-                hasLeftIcon={false}
-                status={parameter.type === 'csv_file' ? 'not ready' : 'inform'}
-                title={parameter.displayName}
-                onClickSetupStep={() => {
-                  handleSetParameter(parameter)
-                }}
-                detail={
-                  parameter.type === 'csv_file'
-                    ? t('required')
-                    : formatRunTimeParameterValue(parameter, t)
-                }
-                description={
-                  parameter.type === 'csv_file' ? null : parameter.description
-                }
-                fontSize="h4"
-                disabled={startSetup}
-              />
-            </React.Fragment>
-          )
-        })}
+        {sortRuntimeParameters(runTimeParametersOverrides).map(
+          (parameter, index) => {
+            const detailLabelForCsv =
+              mostRecentAnalysis?.result === 'parameter-value-required'
+                ? t('required')
+                : parameter.displayName
+
+            let setupStatus: 'ready' | 'not ready' | 'general' | 'inform' =
+              'inform'
+            if (
+              enableCsvFile &&
+              parameter.type === 'csv_file' &&
+              mostRecentAnalysis?.result === 'parameter-value-required'
+            ) {
+              setupStatus = 'not ready'
+            }
+            if (
+              enableCsvFile &&
+              parameter.type === 'csv_file' &&
+              mostRecentAnalysis?.result === 'ok'
+            ) {
+              setupStatus = 'ready'
+            }
+            return (
+              <React.Fragment key={`${parameter.displayName}_${index}`}>
+                <ProtocolSetupStep
+                  hasRightIcon={!(parameter.type === 'bool')}
+                  hasLeftIcon={false}
+                  status={setupStatus}
+                  title={
+                    parameter.type === 'csv_file'
+                      ? t('csv_file')
+                      : parameter.displayName
+                  }
+                  onClickSetupStep={() => {
+                    handleSetParameter(parameter)
+                  }}
+                  detail={
+                    enableCsvFile && parameter.type === 'csv_file'
+                      ? detailLabelForCsv
+                      : formatRunTimeParameterValue(parameter, t)
+                  }
+                  description={
+                    parameter.type === 'csv_file' ? null : parameter.description
+                  }
+                  fontSize="h4"
+                  disabled={startSetup}
+                />
+              </React.Fragment>
+            )
+          }
+        )}
       </Flex>
     </>
   )

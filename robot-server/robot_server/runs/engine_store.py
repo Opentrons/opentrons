@@ -18,26 +18,24 @@ from opentrons.hardware_control.types import (
     EstopStateNotification,
     HardwareEventHandler,
 )
-from opentrons.protocols.parse import PythonParseMode
 from opentrons.protocols.api_support.deck_type import should_load_fixed_trash
 from opentrons.protocol_runner import (
-    JsonRunner,
-    PythonAndLegacyRunner,
     RunResult,
     RunOrchestrator,
 )
+from opentrons.protocol_runner.run_orchestrator import ParseMode
 from opentrons.protocol_engine import (
-    Config as ProtocolEngineConfig,
     DeckType,
     LabwareOffsetCreate,
     StateSummary,
-    create_protocol_engine,
     CommandSlice,
     CommandPointer,
     Command,
     CommandCreate,
     LabwareOffset,
+    Config as ProtocolEngineConfig,
 )
+from opentrons.protocol_engine.create_protocol_engine import create_protocol_engine
 
 from robot_server.protocols.protocol_store import ProtocolResource
 from opentrons.protocol_engine.types import (
@@ -160,7 +158,6 @@ class EngineStore:
 
         default_orchestrator = self._default_run_orchestrator
         if default_orchestrator is None:
-            # TODO(mc, 2022-03-21): potential race condition
             engine = await create_protocol_engine(
                 hardware_api=self._hardware_api,
                 config=ProtocolEngineConfig(
@@ -206,6 +203,8 @@ class EngineStore:
         else:
             load_fixed_trash = False
 
+        if self._run_orchestrator is not None:
+            raise EngineConflictError("Another run is currently active.")
         engine = await create_protocol_engine(
             hardware_api=self._hardware_api,
             config=ProtocolEngineConfig(
@@ -220,43 +219,23 @@ class EngineStore:
             notify_publishers=notify_publishers,
         )
 
-        post_run_hardware_state = PostRunHardwareState.HOME_AND_STAY_ENGAGED
-        drop_tips_after_run = True
-
-        if self._run_orchestrator is not None:
-            raise EngineConflictError("Another run is currently active.")
-
         self._run_orchestrator = RunOrchestrator.build_orchestrator(
             run_id=run_id,
             protocol_engine=engine,
             hardware_api=self._hardware_api,
             protocol_config=protocol.source.config if protocol else None,
-            post_run_hardware_state=post_run_hardware_state,
-            drop_tips_after_run=drop_tips_after_run,
         )
 
-        runner = self.run_orchestrator.get_protocol_runner()
         # FIXME(mm, 2022-12-21): These `await runner.load()`s introduce a
         # concurrency hazard. If two requests simultaneously call this method,
         # they will both "succeed" (with undefined results) instead of one
         # raising EngineConflictError.
-        if isinstance(runner, PythonAndLegacyRunner):
-            assert (
-                protocol is not None
-            ), "A Python protocol should have a protocol source file."
-            await self.run_orchestrator.load_python(
+        if protocol:
+            await self.run_orchestrator.load(
                 protocol.source,
-                # Conservatively assume that we're re-running a protocol that
-                # was uploaded before we added stricter validation, and that
-                # doesn't conform to the new rules.
-                python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
                 run_time_param_values=run_time_param_values,
+                parse_mode=ParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
             )
-        elif isinstance(runner, JsonRunner):
-            assert (
-                protocol is not None
-            ), "A JSON protocol should have a protocol source file."
-            await self.run_orchestrator.load_json(protocol.source)
         else:
             self.run_orchestrator.prepare()
 

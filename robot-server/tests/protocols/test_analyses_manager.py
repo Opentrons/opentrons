@@ -4,7 +4,8 @@ from decoy import Decoy
 from datetime import datetime
 from pathlib import Path
 
-from opentrons import protocol_runner
+from opentrons.protocol_runner import RunOrchestrator
+import opentrons.protocol_runner.create_simulating_orchestrator as simulating_runner
 from opentrons.protocol_engine.types import BooleanParameter
 from opentrons.protocol_reader import ProtocolSource, JsonProtocolConfig
 from opentrons_shared_data.robot.dev_types import RobotType
@@ -44,12 +45,12 @@ def patch_mock_create_protocol_analyzer(
 
 
 @pytest.fixture(autouse=True)
-def patch_mock_create_simulating_runner(
+def patch_mock_create_simulating_orchestrator(
     decoy: Decoy, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Replace protocol_runner.check() with a mock."""
-    mock = decoy.mock(func=protocol_runner.create_simulating_runner)
-    monkeypatch.setattr(protocol_runner, "create_simulating_runner", mock)
+    mock = decoy.mock(func=simulating_runner.create_simulating_orchestrator)
+    monkeypatch.setattr(simulating_runner, "create_simulating_orchestrator", mock)
 
 
 @pytest.fixture
@@ -86,7 +87,7 @@ async def test_start_analysis(
     )
     pending_analysis = PendingAnalysis(id="analysis-id")
     analyzer = decoy.mock(cls=protocol_analyzer.ProtocolAnalyzer)
-    runner = decoy.mock(cls=protocol_runner.JsonRunner)
+    orchestrator = decoy.mock(cls=RunOrchestrator)
     decoy.when(
         protocol_analyzer.create_protocol_analyzer(
             analysis_store=analysis_store,
@@ -101,8 +102,8 @@ async def test_start_analysis(
     ).then_return(pending_analysis)
     decoy.when(
         await analyzer.load_runner(run_time_param_values={"baz": True})
-    ).then_return(runner)
-    decoy.when(runner.run_time_parameters).then_return([bool_parameter])
+    ).then_return(orchestrator)
+    decoy.when(orchestrator.get_run_time_parameters()).then_return([bool_parameter])
     analysis_summary_result = await subject.start_analysis(
         analysis_id="analysis-id",
         protocol_resource=protocol_resource,
@@ -117,7 +118,7 @@ async def test_start_analysis(
     decoy.verify(
         task_runner.run(
             analyzer.analyze,
-            runner=runner,
+            orchestrator=orchestrator,
             analysis_id="analysis-id",
             run_time_parameters=[bool_parameter],
         )

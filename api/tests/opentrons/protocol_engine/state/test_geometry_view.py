@@ -2078,6 +2078,7 @@ def test_get_next_drop_tip_location(
                 back_left_corner=Point(x=10, y=20, z=30),
                 front_right_corner=Point(x=40, y=50, z=60),
             ),
+            lld_settings={},
         )
     )
     decoy.when(mock_pipette_view.get_mount("pip-123")).then_return(pipette_mount)

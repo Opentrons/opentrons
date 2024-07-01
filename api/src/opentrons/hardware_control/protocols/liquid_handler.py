@@ -130,6 +130,14 @@ class LiquidHandler(
         """
         ...
 
+    async def tip_pickup_moves(
+        self,
+        mount: MountArgType,
+        presses: Optional[int] = None,
+        increment: Optional[float] = None,
+    ) -> None:
+        ...
+
     async def pick_up_tip(
         self,
         mount: MountArgType,

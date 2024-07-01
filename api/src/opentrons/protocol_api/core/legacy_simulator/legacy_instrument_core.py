@@ -74,6 +74,7 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
         self._instrument_max_height = (
             protocol_interface.get_hardware().get_instrument_max_height(self._mount)
         )
+        self._liquid_presence_detection = False
 
     def get_default_speed(self) -> float:
         return self._default_speed
@@ -362,6 +363,12 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
 
     def get_speed(self) -> PlungerSpeeds:
         return self._plunger_speeds
+
+    def get_liquid_presence_detection(self) -> bool:
+        return self._liquid_presence_detection
+
+    def set_liquid_presence_detection(self, enable: bool) -> None:
+        self._liquid_presence_detection = enable
 
     def get_flow_rate(self) -> FlowRates:
         return self._flow_rate

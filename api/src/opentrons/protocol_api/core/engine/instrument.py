@@ -35,7 +35,7 @@ from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
 from opentrons.hardware_control.nozzle_manager import NozzleMap
-from . import deck_conflict
+from . import deck_conflict, overlap_versions
 
 from ..instrument import AbstractInstrument
 from .well import WellCore
@@ -84,6 +84,9 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         self._flow_rates = FlowRates(self)
 
         self.set_default_speed(speed=default_movement_speed)
+        self._liquid_presence_detection = bool(
+            self._engine_client.state.pipettes.get_liquid_presence_detection(pipette_id)
+        )
 
     @property
     def pipette_id(self) -> str:
@@ -747,6 +750,9 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             self._pipette_id
         )
 
+    def get_liquid_presence_detection(self) -> bool:
+        return self._liquid_presence_detection
+
     def is_tip_tracking_available(self) -> bool:
         primary_nozzle = self._engine_client.state.pipettes.get_primary_nozzle(
             self._pipette_id
@@ -780,9 +786,18 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             assert blow_out > 0
             self._blow_out_flow_rate = blow_out
 
+    def set_liquid_presence_detection(self, enable: bool) -> None:
+        self._liquid_presence_detection = enable
+
     def configure_for_volume(self, volume: float) -> None:
         self._engine_client.execute_command(
-            cmd.ConfigureForVolumeParams(pipetteId=self._pipette_id, volume=volume)
+            cmd.ConfigureForVolumeParams(
+                pipetteId=self._pipette_id,
+                volume=volume,
+                tipOverlapNotAfterVersion=overlap_versions.overlap_for_api_version(
+                    self._protocol_core.api_version
+                ),
+            )
         )
 
     def prepare_to_aspirate(self) -> None:

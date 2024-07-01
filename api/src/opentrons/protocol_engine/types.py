@@ -33,26 +33,71 @@ from opentrons_shared_data.pipette.dev_types import (  # noqa: F401
 from opentrons_shared_data.module.dev_types import ModuleType as SharedDataModuleType
 
 
+# todo(mm, 2024-06-24): This monolithic status field is getting to be a bit much.
+# We should consider splitting this up into multiple fields.
 class EngineStatus(str, Enum):
-    """Current execution status of a ProtocolEngine."""
+    """Current execution status of a ProtocolEngine.
+
+    This is a high-level summary of what the robot is doing and what interactions are
+    appropriate.
+    """
+
+    # Statuses for an ongoing run:
 
     IDLE = "idle"
+    """The protocol has not been started yet.
+
+    The robot may truly be idle, or it may be executing commands with `intent: "setup"`.
+    """
+
     RUNNING = "running"
+    """The engine is actively running the protocol."""
+
     PAUSED = "paused"
+    """A pause has been requested. Activity is paused, or will pause soon.
+
+    (There is currently no way to tell which.)
+    """
+
     BLOCKED_BY_OPEN_DOOR = "blocked-by-open-door"
+    """The robot's door is open. Activity is paused, or will pause soon."""
+
     STOP_REQUESTED = "stop-requested"
-    STOPPED = "stopped"
+    """A stop has been requested. Activity will stop soon."""
+
     FINISHING = "finishing"
-    FAILED = "failed"
-    SUCCEEDED = "succeeded"
+    """The robot is doing post-run cleanup, like homing and dropping tips."""
+
+    # Statuses for error recovery mode:
 
     AWAITING_RECOVERY = "awaiting-recovery"
     """The engine is waiting for external input to recover from a nonfatal error.
 
-    New fixup commands may be enqueued, which will run immediately.
+    New commands with `intent: "fixit"` may be enqueued, which will run immediately.
     The run can't be paused in this state, but it can be canceled, or resumed from the
     next protocol command if recovery is complete.
     """
+
+    AWAITING_RECOVERY_PAUSED = "awaiting-recovery-paused"
+    """The engine is paused while in error recovery mode. Activity is paused, or will pause soon.
+
+    This state is not possible to enter manually. It happens when an open door
+    gets closed during error recovery.
+    """
+
+    AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR = "awaiting-recovery-blocked-by-open-door"
+    """The robot's door is open while in recovery mode. Activity is paused, or will pause soon."""
+
+    # Terminal statuses:
+
+    STOPPED = "stopped"
+    """All activity is over; it was stopped by an explicit external request."""
+
+    FAILED = "failed"
+    """All activity is over; there was a fatal error."""
+
+    SUCCEEDED = "succeeded"
+    """All activity is over; things completed without any fatal error."""
 
 
 class DeckSlotLocation(BaseModel):

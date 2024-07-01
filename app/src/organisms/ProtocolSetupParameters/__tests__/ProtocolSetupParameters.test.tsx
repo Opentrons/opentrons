@@ -18,6 +18,10 @@ import { ProtocolSetupParameters } from '..'
 
 import type * as ReactRouterDom from 'react-router-dom'
 import type { HostConfig } from '@opentrons/api-client'
+import type {
+  CompletedProtocolAnalysis,
+  RunTimeParameter,
+} from '@opentrons/shared-data'
 
 const mockGoBack = vi.fn()
 
@@ -34,9 +38,16 @@ vi.mock('react-router-dom', async importOriginal => {
     useHistory: () => ({ goBack: mockGoBack } as any),
   }
 })
+vi.mock('../../../redux/config')
+
 const MOCK_HOST_CONFIG: HostConfig = { hostname: 'MOCK_HOST' }
 const mockCreateProtocolAnalysis = vi.fn()
 const mockCreateRun = vi.fn()
+const mockMostRecentAnalysis = ({
+  commands: [],
+  labware: [],
+} as unknown) as CompletedProtocolAnalysis
+
 const render = (
   props: React.ComponentProps<typeof ProtocolSetupParameters>
 ) => {
@@ -44,6 +55,7 @@ const render = (
     i18nInstance: i18n,
   })
 }
+
 describe('ProtocolSetupParameters', () => {
   let props: React.ComponentProps<typeof ProtocolSetupParameters>
 
@@ -52,6 +64,7 @@ describe('ProtocolSetupParameters', () => {
       protocolId: 'mockId',
       labwareOffsets: [],
       runTimeParameters: mockRunTimeParameterData,
+      mostRecentAnalysis: mockMostRecentAnalysis,
     }
     vi.mocked(ChooseEnum).mockReturnValue(<div>mock ChooseEnum</div>)
     vi.mocked(ChooseNumber).mockReturnValue(<div>mock ChooseNumber</div>)
@@ -64,6 +77,9 @@ describe('ProtocolSetupParameters', () => {
     when(vi.mocked(useCreateRunMutation))
       .calledWith(expect.anything())
       .thenReturn({ createRun: mockCreateRun } as any)
+    when(vi.mocked(useFeatureFlag))
+      .calledWith('enableCsvFile')
+      .thenReturn(false)
   })
 
   it('renders the parameters labels and mock data', () => {
@@ -152,4 +168,38 @@ describe('ProtocolSetupParameters', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Go back' }))
     expect(title).not.toBeInTheDocument()
   })
+
+  it('render csv file when a protocol requires a csv file', () => {
+    when(vi.mocked(useFeatureFlag)).calledWith('enableCsvFile').thenReturn(true)
+    const mockMostRecentAnalysisForCsv = ({
+      commands: [],
+      labware: [],
+      result: 'parameter-value-required',
+    } as unknown) as CompletedProtocolAnalysis
+    const mockCSVData = {
+      file: { id: 'test', file: { name: 'mock.csv' } as File },
+      displayName: 'My CSV File',
+      variableName: 'CSVFILE',
+      description: 'CSV File for a protocol',
+      type: 'csv_file' as const,
+    } as RunTimeParameter
+    const mockRunTimeParameterDataForCsv = [
+      ...mockRunTimeParameterData,
+      mockCSVData,
+    ]
+
+    render({
+      ...props,
+      runTimeParameters: mockRunTimeParameterDataForCsv,
+      mostRecentAnalysis: mockMostRecentAnalysisForCsv,
+    })
+    screen.getByText('CSV File')
+    screen.getByText('Required')
+    const button = screen.getByRole('button', { name: 'Confirm values' })
+    expect(button).toBeDisabled()
+  })
+
+  it.todo(
+    'render csv file name when a protocol analysis result is not parameter-value-required'
+  )
 })

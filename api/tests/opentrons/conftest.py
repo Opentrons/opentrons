@@ -61,11 +61,10 @@ from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabware
 from opentrons.protocol_api.core.legacy.deck import (
     DEFAULT_LEGACY_DECK_DEFINITION_VERSION,
 )
-from opentrons.protocol_engine import (
+from opentrons.protocol_engine.create_protocol_engine import (
     create_protocol_engine_in_thread,
-    Config as ProtocolEngineConfig,
-    DeckType,
 )
+from opentrons.protocol_engine import Config as ProtocolEngineConfig, DeckType
 from opentrons.protocols.api_support import deck_type
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION

@@ -2,6 +2,8 @@ import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import {
   FLEX_ROBOT_TYPE,
+  HEATERSHAKER_MODULE_TYPE,
+  MAGNETIC_BLOCK_TYPE,
   TEMPERATURE_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import {
@@ -29,13 +31,19 @@ export interface ModelModuleInfo {
   slot: string
 }
 
+const MOAM_MODULE_TYPES: ModuleType[] = [
+  TEMPERATURE_MODULE_TYPE,
+  HEATERSHAKER_MODULE_TYPE,
+  MAGNETIC_BLOCK_TYPE,
+]
+
 export const EditModules = (props: EditModulesProps): JSX.Element => {
   const { onCloseClick, moduleToEdit } = props
   const { moduleId, moduleType } = moduleToEdit
   const _initialDeckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
   const robotType = useSelector(getRobotType)
   const showMultipleModuleModal =
-    robotType === FLEX_ROBOT_TYPE && moduleType === TEMPERATURE_MODULE_TYPE
+    robotType === FLEX_ROBOT_TYPE && MOAM_MODULE_TYPES.includes(moduleType)
 
   const moduleOnDeck = moduleId ? _initialDeckSetup.modules[moduleId] : null
   const [

@@ -8,7 +8,6 @@ import { getHasJustUpdated, toggleConfigValue } from '../../redux/config'
 import { getAvailableShellUpdate } from '../../redux/shell'
 import { SUCCESS_TOAST, WARNING_TOAST } from '../../atoms/Toast'
 import { useToaster } from '../ToasterOven'
-import { AnalyticsSettingsModal } from '../AnalyticsSettingsModal'
 import { UpdateAppModal } from '../UpdateAppModal'
 import { U2EDriverOutdatedAlert } from './U2EDriverOutdatedAlert'
 import { useRemoveActiveAppUpdateToast } from '.'
@@ -87,10 +86,6 @@ export function AlertsModal({ toastIdRef }: AlertsModalProps): JSX.Element {
 
   return (
     <>
-      {/* TODO(mc, 2020-05-07): AnalyticsSettingsModal currently controls its
-            own render; move its logic into `state.alerts` */}
-      <AnalyticsSettingsModal />
-
       {activeAlertId === AppAlerts.ALERT_U2E_DRIVER_OUTDATED ? (
         <U2EDriverOutdatedAlert dismissAlert={dismissDriverAlert} />
       ) : null}
