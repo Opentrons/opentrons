@@ -8,6 +8,8 @@ from opentrons_shared_data.errors.exceptions import (
     CommandParameterLimitViolated,
     UnexpectedTipRemovalError,
 )
+from opentrons.protocol_engine.errors.exceptions import WellDoesNotExistError
+from opentrons.protocol_engine.commands.pipetting_common import LiquidNotFoundError
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons import types
@@ -2046,3 +2048,31 @@ class InstrumentContext(publisher.CommandPublisher):
         )
         # TODO (spp, 2023-12-05): verify that tipracks are on adapters for only full 96 channel config
         self._tip_racks = tip_racks or []
+
+    @requires_version(2, 20)
+    def detect_liquid(self, well: labware.Well) -> bool:
+        """Check if there is liquid in a well.
+
+        :returns: A boolean.
+        """
+        if well is None:
+            raise WellDoesNotExistError
+
+        try:
+            height = self._core.find_liquid_level(well._core)
+            if height > 0:
+                return True
+            return False  # it should never get here
+        except Exception as e:
+            return False
+
+    @requires_version(2, 20)
+    def require_liquid(self, well: labware.Well) -> None:
+        """If there is no liquid in a well, raise an error.
+
+        :returns: None.
+        """
+        try:
+            self._core.find_liquid_level(well._core)
+        except Exception as e:
+            raise e

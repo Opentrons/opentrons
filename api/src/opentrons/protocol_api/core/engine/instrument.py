@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from typing import Optional, TYPE_CHECKING, cast, Union
+from opentrons.protocol_engine.commands.liquid_probe import LiquidProbeResult
 from opentrons.protocols.api_support.types import APIVersion
 
 from opentrons.types import Location, Mount
@@ -843,3 +844,23 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         """Retract this instrument to the top of the gantry."""
         z_axis = self._engine_client.state.pipettes.get_z_axis(self._pipette_id)
         self._engine_client.execute_command(cmd.HomeParams(axes=[z_axis]))
+
+    def find_liquid_level(self, well_core: WellCore) -> float:
+        labware_id = well_core.labware_id
+        well_name = well_core.get_name()
+        well_location = WellLocation(
+            origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0)
+        )
+        result = self._engine_client.execute_command_without_recovery(
+            cmd.LiquidProbeParams(
+                labwareId=labware_id,
+                wellName=well_name,
+                wellLocation=well_location,
+                pipetteId=self.pipette_id,
+            )
+        )
+        # result will either be a LiquidProbeResult or a LiquidNotFoundError
+        try:
+            return float(result.z_position)
+        except:
+            raise BaseException(result)
