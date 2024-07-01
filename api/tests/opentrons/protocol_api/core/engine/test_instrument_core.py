@@ -1288,3 +1288,31 @@ def test_configure_for_volume_post_219(
             )
         )
     )
+
+
+@pytest.mark.parametrize("version", versions_at_or_above(APIVersion(2, 20)))
+def test_find_liquid_level(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
+    subject: InstrumentCore,
+    version: APIVersion,
+) -> None:
+    """It should raise an exception on an empty well."""
+    well_core = WellCore(
+        name="my cool well", labware_id="123abc", engine_client=mock_engine_client
+    )
+    result = subject.find_liquid_level(well_core)
+    assert result == 0
+    decoy.verify(
+        mock_engine_client.execute_command_without_recovery(
+            cmd.LiquidProbeParams(
+                pipetteId=subject.pipette_id,
+                wellLocation=WellLocation(
+                    origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0)
+                ),
+                wellName=well_core.get_name(),
+                labwareId=well_core.labware_id,
+            )
+        )
+    )

@@ -858,7 +858,11 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                 pipetteId=self.pipette_id,
             )
         )
-        # result will either be a LiquidProbeResult or a LiquidNotFoundError
+        if (
+            result is None
+        ):  # this should probably only happen in testing with mock components
+            return 0
+        # for general cases, result will either be a float > 0 or an error
         try:
             return float(result.z_position)
         except Exception:

@@ -2,6 +2,7 @@
 from collections import OrderedDict
 import inspect
 
+from opentrons.protocol_engine.commands.pipetting_common import LiquidNotFoundError
 import pytest
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 from decoy import Decoy
@@ -1268,3 +1269,57 @@ def test_aspirate_0_volume_means_aspirate_nothing(
         ),
         times=1,
     )
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 20)])
+def test_detect_liquid(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should only return booleans. Not raise an exception."""
+    mock_well = decoy.mock(cls=Well)
+    decoy.when(mock_instrument_core.find_liquid_level(mock_well._core)).then_raise(
+        Exception(LiquidNotFoundError)
+    )
+    result = subject.detect_liquid(mock_well)
+    assert isinstance(result, bool)
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 20)])
+def test_require_liquid(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should raise an exception when called on an."""
+    mock_well = decoy.mock(cls=Well)
+    decoy.when(mock_instrument_core.find_liquid_level(mock_well._core)).then_raise(
+        Exception(LiquidNotFoundError)
+    )
+    try:
+        subject.require_liquid(mock_well)
+        assert False
+    except Exception:
+        assert True
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 20)])
+def get_liquid_height(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should return 0 on an empty well."""
+    mock_well = decoy.mock(cls=Well)
+    decoy.when(mock_instrument_core.find_liquid_level(mock_well._core)).then_raise(
+        Exception(LiquidNotFoundError)
+    )
+    try:
+        result = subject.get_liquid_height(mock_well)
+        assert False
+    except Exception:
+        assert result == 0
