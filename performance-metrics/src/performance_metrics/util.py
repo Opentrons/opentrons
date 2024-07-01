@@ -1,10 +1,14 @@
+"""Utility functions."""
+
 import typing
 import platform
 from functools import partial
 
+
 def format_command(cmd_list: typing.List[str]) -> str:
     """Format the command line for the given process."""
-    return " ".join(cmd_list).strip()
+    return " ".join([cmd.strip() for cmd in cmd_list]).strip()
+
 
 def get_timing_function() -> typing.Callable[[], int]:
     """Returns a timing function for the current platform."""
