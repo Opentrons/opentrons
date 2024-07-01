@@ -2636,9 +2636,11 @@ class OT3API(
             probe_settings = self.config.liquid_sense
 
         pos = await self.gantry_position(checked_mount, refresh=True)
-        probe_start_pos = pos._replace(z=probe_settings.starting_mount_height)
+        probe_start_pos = pos._replace(z=probe_settings.starting_mount_height - 2)
         await self.move_to(checked_mount, probe_start_pos)
         total_z_travel = max_z_dist
+
+        # split z travel into moves
         z_travels = self._get_probe_distances(
             checked_mount,
             total_z_travel,
@@ -2651,21 +2653,13 @@ class OT3API(
             if probe_settings.aspirate_while_sensing:
                 await self._move_to_plunger_bottom(checked_mount, rate=1.0)
             else:
-                # find the ideal travel distance by multiplying the plunger speed
-                # by the time it will take to complete the z move.
-                ideal_travel = probe_settings.plunger_speed * (
-                    z_travel / probe_settings.mount_speed
+                target_pos, speed = await self._get_liquid_probe_prep_plunger_motion(
+                    mount=checked_mount,
+                    instrument=instrument,
+                    z_travel_dist=z_travel,
+                    z_speed=probe_settings.mount_speed,
+                    plunger_speed=probe_settings.plunger_speed,
                 )
-                assert (
-                    instrument.plunger_positions.bottom - ideal_travel
-                    >= instrument.plunger_positions.top
-                )
-                target_point = instrument.plunger_positions.bottom - ideal_travel
-                target_pos = target_position_from_plunger(
-                    checked_mount, target_point, self._current_position
-                )
-                max_speeds = self.config.motion_settings.default_max_speed
-                speed = max_speeds[self.gantry_load][OT3AxisKind.P]
                 await self._move(target_pos, speed=speed, acquire_lock=True)
             try:
                 height = await self._liquid_probe_pass(
@@ -2679,11 +2673,38 @@ class OT3API(
                 break
             except PipetteLiquidNotFoundError as lnfe:
                 error = lnfe
+                # move the z axis back up 0.5 mm
+                pos = await self.gantry_position(checked_mount, refresh=True)
+                await self.move_to(checked_mount, pos._replace(z=(pos.z - 0.5)))
         await self.move_to(checked_mount, probe_start_pos)
         if error is not None:
-            # if we never found an liquid raise an error
+            # if we never found liquid raise an error
             raise error
         return height
+
+    async def _get_liquid_probe_prep_plunger_motion(
+        self,
+        mount: OT3Mount,
+        instrument: Any,
+        z_travel_dist: float,
+        z_speed: float,
+        plunger_speed: float,
+    ) -> Tuple[OrderedDict[Axis, float], float]:
+        # find the ideal travel distance by multiplying the plunger speed
+        # by the time it will take to complete the z move.
+        ideal_plunger_distance = plunger_speed * (z_travel_dist / z_speed)
+        assert (
+            instrument.plunger_positions.bottom - ideal_plunger_distance
+            >= instrument.plunger_positions.top
+        )
+        target_point = instrument.plunger_positions.bottom - ideal_plunger_distance
+        target_pos = target_position_from_plunger(
+            mount, target_point, self._current_position
+        )
+        max_speeds = self.config.motion_settings.default_max_speed
+        speed = max_speeds[self.gantry_load][OT3AxisKind.P]
+
+        return target_pos, speed
 
     async def capacitive_probe(
         self,
