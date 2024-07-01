@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import {
   Flex,
@@ -8,20 +9,20 @@ import {
   POSITION_FIXED,
   COLORS,
 } from '@opentrons/components'
+import type { SupportedTip } from '@opentrons/shared-data'
+import { getTipTypeFromTipRackDefinition } from '@opentrons/shared-data'
+
 import { getTopPortalEl } from '../../../App/portal'
 import { ChildNavigation } from '../../ChildNavigation'
 import { InputField } from '../../../atoms/InputField'
 import { NumericalKeyboard } from '../../../atoms/SoftwareKeyboard'
-import { getFlowRateRange } from '../utils'
 
+import { ACTIONS } from '../constants'
 import type {
   QuickTransferSummaryState,
   QuickTransferSummaryAction,
   FlowRateKind,
 } from '../types'
-
-import { ACTIONS } from '../constants'
-import { createPortal } from 'react-dom'
 
 interface FlowRateEntryProps {
   onBack: () => void
@@ -35,11 +36,26 @@ export function FlowRateEntry(props: FlowRateEntryProps): JSX.Element {
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
   const keyboardRef = React.useRef(null)
 
-  const [flowRate, setFlowRate] = React.useState<string>(
-    state.aspirateFlowRate ? state.aspirateFlowRate.toString() : ''
+  const [flowRate, setFlowRate] = React.useState<number | null>(
+    kind === 'aspirate'
+      ? state.aspirateFlowRate
+      : kind === 'dispense'
+      ? state.dispenseFlowRate
+      : null
   )
-  const flowRateRange = getFlowRateRange(state, kind)
-  const rateAsNumber = Number(flowRate)
+
+  // use lowVolume for volumes lower than 5ml
+  const tipType = getTipTypeFromTipRackDefinition(state.tipRack)
+  const flowRatesForSupportedTip: SupportedTip | undefined =
+    state.volume < 5
+      ? state.pipette.liquids.lowVolumeDefaults.supportedTips[tipType]
+      : state.pipette.liquids.default.supportedTips[tipType]
+  const minFlowRate = 0.1
+  const maxFlowRate =
+    flowRatesForSupportedTip?.uiMaxFlowRate !== undefined
+      ? flowRatesForSupportedTip?.uiMaxFlowRate
+      : Infinity
+
   let headerCopy: string = ''
   let textEntryCopy: string = ''
   let flowRateAction:
@@ -58,21 +74,20 @@ export function FlowRateEntry(props: FlowRateEntryProps): JSX.Element {
 
   const handleClickSave = (): void => {
     // the button will be disabled if this values is null
-    if (rateAsNumber != null && flowRateAction != null) {
+    if (flowRate != null && flowRateAction != null) {
       dispatch({
         type: flowRateAction,
-        rate: rateAsNumber,
+        rate: flowRate,
       })
     }
     onBack()
   }
 
   const error =
-    flowRate !== '' &&
-    (rateAsNumber < flowRateRange.min || rateAsNumber > flowRateRange.max)
+    flowRate !== null && (flowRate < minFlowRate || flowRate > maxFlowRate)
       ? t(`value_out_of_range`, {
-          min: flowRateRange.min,
-          max: flowRateRange.max,
+          min: minFlowRate,
+          max: maxFlowRate,
         })
       : null
 
@@ -84,7 +99,7 @@ export function FlowRateEntry(props: FlowRateEntryProps): JSX.Element {
         onClickBack={onBack}
         onClickButton={handleClickSave}
         top={SPACING.spacing8}
-        buttonIsDisabled={error != null || flowRate === ''}
+        buttonIsDisabled={error != null || flowRate === null}
       />
       <Flex
         alignSelf={ALIGN_CENTER}
@@ -103,7 +118,7 @@ export function FlowRateEntry(props: FlowRateEntryProps): JSX.Element {
           marginTop={SPACING.spacing68}
         >
           <InputField
-            type="text"
+            type="number"
             value={flowRate}
             title={textEntryCopy}
             error={error}
@@ -119,7 +134,7 @@ export function FlowRateEntry(props: FlowRateEntryProps): JSX.Element {
           <NumericalKeyboard
             keyboardRef={keyboardRef}
             onChange={e => {
-              setFlowRate(e)
+              setFlowRate(Number(e))
             }}
           />
         </Flex>

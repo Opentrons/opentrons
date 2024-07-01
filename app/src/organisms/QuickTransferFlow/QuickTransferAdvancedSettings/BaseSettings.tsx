@@ -102,7 +102,7 @@ export function BaseSettings(props: BaseSettingsProps): JSX.Element | null {
         : null}
       {selectedSetting === 'aspirate_flow_rate' ? (
         <FlowRateEntry
-          kind={'aspirate'}
+          kind="aspirate"
           state={state}
           dispatch={dispatch}
           onBack={() => {
@@ -112,7 +112,7 @@ export function BaseSettings(props: BaseSettingsProps): JSX.Element | null {
       ) : null}
       {selectedSetting === 'dispense_flow_rate' ? (
         <FlowRateEntry
-          kind={'dispense'}
+          kind="dispense"
           state={state}
           dispatch={dispatch}
           onBack={() => {
