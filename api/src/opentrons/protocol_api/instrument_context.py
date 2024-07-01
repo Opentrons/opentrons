@@ -111,6 +111,7 @@ class InstrumentContext(publisher.CommandPublisher):
             labware.Labware, TrashBin, WasteChute, None
         ] = trash
         self.requested_as = requested_as
+        self._liquid_presence_state: Optional[types.LiquidPresenceState] = None
 
     @property
     @requires_version(2, 0)
@@ -1641,6 +1642,16 @@ class InstrumentContext(publisher.CommandPublisher):
 
         """
         return self._core.get_flow_rate()
+
+    @property
+    @requires_version(2, 0)
+    def liquid_presence_state(self) -> Optional[types.LiquidPresenceState]:
+        return self._liquid_presence_state
+
+    @liquid_presence_state.setter
+    @requires_version(2, 0)
+    def liquid_presence_state(self, state: types.LiquidPresenceState) -> None:
+        self._liquid_presence_state = state
 
     @property
     @requires_version(2, 0)

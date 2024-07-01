@@ -199,6 +199,12 @@ class Mount(enum.Enum):
             return cls.EXTENSION
 
 
+class LiquidPresenceState(str, enum.Enum):
+    PRESENT = "present"
+    ABSENT = "absent"
+    UNKNOWN = "unknown"
+
+
 class MountType(str, enum.Enum):
     LEFT = "left"
     RIGHT = "right"
