@@ -170,12 +170,13 @@ export function StackingOffsets(): JSX.Element | null {
           <div className={styles.flex_row_no_columns}>
             <div className={styles.instructions_column}>
               <p>
-                Select which adapters or modules this labware will be placed on.
+                Stacking offset is only required for labware that can be placed
+                on an adapter or module. Select the compatible adapters or
+                modules below.
               </p>
               <p>
-                Stacking offset is required for labware to be placed on modules
-                and adapters. Measure from the bottom of the adapter to the
-                highest part of the labware using a pair of calipers.
+                Stack the labware onto the adapter or module and then make the
+                required measurement with calipers.
               </p>
             </div>
             {modifiedAdapterDefinitions.length === 0 ? null : (
@@ -251,10 +252,24 @@ export function StackingOffsets(): JSX.Element | null {
                         >
                           <p>
                             Measure from the bottom of the tip rack adapter to
-                            the top of the tip rack.
+                            the highest part of the tip rack, not including the
+                            tips themselves.
                           </p>
                         </div>
-                      ) : null}
+                      ) : (
+                        <div
+                          style={{
+                            marginTop: '-1.2rem',
+                            height: '2.0rem',
+                            fontSize: '0.75rem',
+                          }}
+                        >
+                          <p>
+                            Measure from the bottom of the adapter to the
+                            highest part of the labware.
+                          </p>
+                        </div>
+                      )}
                     </Flex>
                   )
                 })}
@@ -337,7 +352,7 @@ export function StackingOffsets(): JSX.Element | null {
                           <p>
                             {model === MAGNETIC_BLOCK_V1
                               ? 'Measure from the bottom of the Magnetic Block to the top of the labware.'
-                              : 'Measure the inside of the Thermocycler using the narrow side of a pair of calipers from the bottom of the block to the top of the labware.'}
+                              : 'Measure from the bottom of the Thermocycler block to the top of the labware. Use the narrow side of the calipers.'}
                           </p>
                         </div>
                       ) : null}
