@@ -34,12 +34,12 @@ from opentrons.protocol_reader import (
     ProtocolFilesInvalidError,
     ProtocolSource,
 )
-from opentrons.protocol_runner import (
-    create_simulating_runner,
-    RunResult,
-    PythonAndLegacyRunner,
-    JsonRunner,
+from opentrons.protocol_runner.create_simulating_orchestrator import (
+    create_simulating_orchestrator,
 )
+from opentrons.protocol_runner import RunResult
+from opentrons.protocol_runner.run_orchestrator import ParseMode
+
 from opentrons.protocol_engine import (
     Command,
     ErrorOccurrence,
@@ -59,7 +59,6 @@ from opentrons_shared_data.errors.exceptions import (
     PythonException,
 )
 
-from opentrons.protocols.parse import PythonParseMode
 
 OutputKind = Literal["json", "human-json"]
 
@@ -241,19 +240,15 @@ class UnexpectedAnalysisError(EnumeratedError):
 
 async def _do_analyze(protocol_source: ProtocolSource) -> RunResult:
 
-    runner = await create_simulating_runner(
+    orchestrator = await create_simulating_orchestrator(
         robot_type=protocol_source.robot_type, protocol_config=protocol_source.config
     )
-
     try:
-        if isinstance(runner, PythonAndLegacyRunner):
-            await runner.load(
-                protocol_source=protocol_source,
-                python_parse_mode=PythonParseMode.NORMAL,
-                run_time_param_values=None,
-            )
-        elif isinstance(runner, JsonRunner):
-            await runner.load(protocol_source=protocol_source)
+        await orchestrator.load(
+            protocol_source=protocol_source,
+            parse_mode=ParseMode.NORMAL,
+            run_time_param_values=None,
+        )
     except Exception as error:
         err_id = "analysis-setup-error"
         err_created_at = datetime.now(tz=timezone.utc)
@@ -283,7 +278,7 @@ async def _do_analyze(protocol_source: ProtocolSource) -> RunResult:
             parameters=[],
         )
         return analysis
-    return await runner.run(deck_configuration=[])
+    return await orchestrator.run(deck_configuration=[])
 
 
 async def _analyze(
