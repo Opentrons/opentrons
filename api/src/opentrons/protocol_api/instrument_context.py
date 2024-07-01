@@ -2073,7 +2073,7 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         if well is None:
             raise WellDoesNotExistError
-        
+
         try:
             self._core.find_liquid_level(well._core)
         except Exception as e:
@@ -2087,7 +2087,7 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         if well is None:
             raise WellDoesNotExistError
-        
+
         try:
             height = self._core.find_liquid_level(well._core)
             return float(height)
