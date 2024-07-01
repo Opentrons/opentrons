@@ -1,9 +1,9 @@
-"""Tests for the RobotContextTracker class in performance_metrics.robot_context_tracker."""
+"""Tests for the RobotContextTracker class in performance_metrics._robot_context_tracker."""
 
 import asyncio
 from pathlib import Path
 import pytest
-from performance_metrics.robot_context_tracker import RobotContextTracker
+from performance_metrics._robot_context_tracker import RobotContextTracker
 from time import sleep, time_ns
 from unittest.mock import patch
 

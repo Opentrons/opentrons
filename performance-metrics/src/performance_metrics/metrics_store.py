@@ -3,7 +3,7 @@
 import csv
 import typing
 from .data_shapes import MetricsMetadata
-from .dev_types import SupportsCSVStorage
+from ._types import SupportsCSVStorage
 
 T = typing.TypeVar("T", bound=SupportsCSVStorage)
 
@@ -20,6 +20,10 @@ class MetricsStore(typing.Generic[T]):
         """Add data to the store."""
         self._data.append(context_data)
 
+    def add_all(self, context_data: typing.Iterable[T]) -> None:
+        """Add data to the store."""
+        self._data.extend(context_data)
+
     def setup(self) -> None:
         """Set up the data store."""
         self.metadata.storage_dir.mkdir(parents=True, exist_ok=True)
@@ -33,5 +37,5 @@ class MetricsStore(typing.Generic[T]):
         self._data.clear()
         rows_to_write = [context_data.csv_row() for context_data in stored_data]
         with open(self.metadata.data_file_location, "a") as storage_file:
-            writer = csv.writer(storage_file)
+            writer = csv.writer(storage_file, quoting=csv.QUOTE_ALL)
             writer.writerows(rows_to_write)
