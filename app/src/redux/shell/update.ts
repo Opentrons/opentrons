@@ -29,7 +29,6 @@ export function getShellUpdateState(state: State): ShellUpdateState {
 }
 
 export function getShellUpdateDataFiles(state: State): string[] {
-  console.log(state.shell)
   return state.shell.filePaths
 }
 
