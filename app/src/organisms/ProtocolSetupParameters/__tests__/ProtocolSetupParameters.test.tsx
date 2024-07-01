@@ -176,21 +176,9 @@ describe('ProtocolSetupParameters', () => {
       labware: [],
       result: 'parameter-value-required',
     } as unknown) as CompletedProtocolAnalysis
-    const mockCSVData = {
-      file: { id: 'test', file: { name: 'mock.csv' } as File },
-      displayName: 'My CSV File',
-      variableName: 'CSVFILE',
-      description: 'CSV File for a protocol',
-      type: 'csv_file' as const,
-    } as RunTimeParameter
-    const mockRunTimeParameterDataForCsv = [
-      ...mockRunTimeParameterData,
-      mockCSVData,
-    ]
-
     render({
       ...props,
-      runTimeParameters: mockRunTimeParameterDataForCsv,
+      runTimeParameters: mockRunTimeParameterData,
       mostRecentAnalysis: mockMostRecentAnalysisForCsv,
     })
     screen.getByText('CSV File')
