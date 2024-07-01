@@ -162,6 +162,38 @@ export function analyzeProtocolByKey(
   return analyzeProtocolSource(srcDirPath, destFilePath)
 }
 
+export function analyzeProtocolFromCode(
+  code: string,
+  protocolsDirPath: string
+): Promise<string> {
+  const protocolKey = uuid()
+  const protocolDirPath = path.join(protocolsDirPath, protocolKey)
+  const srcDirPath = path.join(protocolDirPath, PROTOCOL_SRC_DIRECTORY_NAME)
+  const analysisDirPath = path.join(
+    protocolDirPath,
+    PROTOCOL_ANALYSIS_DIRECTORY_NAME
+  )
+  //  TODO, probably need to adjust the dest file path!!!
+  const destFilePath = path.join(srcDirPath, 'protocol.py')
+  const outputPath = makeAnalysisFilePath(analysisDirPath)
+
+  return fs
+    .mkdir(srcDirPath, { recursive: true })
+    .then(() => fs.mkdir(analysisDirPath, { recursive: true }))
+    .then(() => fs.writeFile(destFilePath, code))
+    .then(() => {
+      return analyzeProtocolSource(srcDirPath, outputPath)
+    })
+    .then(() => {
+      // Read the contents of the file at outputPath and return it
+      return fs.readFile(outputPath, 'utf8')
+    })
+    .catch(error => {
+      console.error('Error saving Python code or analyzing protocol:', error)
+      throw error
+    })
+}
+
 export function viewProtocolSourceFolder(
   protocolKey: string,
   protocolsDirPath: string

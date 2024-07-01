@@ -4,6 +4,7 @@ import { shell } from 'electron'
 
 import {
   ADD_PROTOCOL,
+  ANALYZE_CREATE_PROTOCOL,
   ANALYZE_PROTOCOL,
   FETCH_PROTOCOLS,
   INITIAL,
@@ -15,6 +16,7 @@ import {
   VIEW_PROTOCOL_SOURCE_FOLDER,
 } from '../constants'
 import {
+  addAnalysis,
   analyzeProtocol,
   analyzeProtocolFailure,
   analyzeProtocolSuccess,
@@ -181,6 +183,20 @@ export function registerProtocolStorage(dispatch: Dispatch): Dispatch {
           fetchProtocols(dispatch, PROTOCOL_ADDITION)
           dispatch(analyzeProtocol(protocolKey))
         })
+        break
+      }
+
+      case ANALYZE_CREATE_PROTOCOL: {
+        FileSystem.analyzeProtocolFromCode(
+          action.payload.code,
+          FileSystem.PROTOCOLS_DIRECTORY_PATH
+        )
+          .then(result => {
+            dispatch(addAnalysis(result))
+          })
+          .catch(error => {
+            console.error('Unexpected protocol analysis failure', { error })
+          })
         break
       }
 
