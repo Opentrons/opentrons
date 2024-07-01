@@ -155,24 +155,19 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
           return Promise.all([fileResponse, varName])
         })
       ).then(responseTuples => {
+        const mappedResolvedCsvVariableToFileId = responseTuples.reduce<
+          Record<string, string>
+        >((acc, [uploadedFileResponse, variableName]) => {
+          return { ...acc, [variableName]: uploadedFileResponse.data.id }
+        }, {})
         const runTimeParameterValues = getRunTimeParameterValuesForRun(
-          runTimeParametersOverrides
-        )
-
-        const runTimeParameterValuesWithFiles = responseTuples.reduce(
-          (acc, responseTuple) => {
-            const [response, varName] = responseTuple
-            return {
-              ...acc,
-              [varName]: { fileId: response.data.id },
-            }
-          },
-          runTimeParameterValues
+          runTimeParametersOverrides,
+          mappedResolvedCsvVariableToFileId
         )
         createRunFromProtocolSource({
           files: srcFileObjects,
           protocolKey,
-          runTimeParameterValues: runTimeParameterValuesWithFiles,
+          runTimeParameterValues,
         })
       })
     } else {
