@@ -1,36 +1,41 @@
+"""Test process resource tracker."""
+
 import typing
-import pytest
 import psutil
 from unittest.mock import patch, MagicMock
-from performance_metrics.process_resource_tracker import ProcessResourceTracker
-from performance_metrics.util import get_timing_function, format_command
+from performance_metrics.system_resource_tracker import SystemResourceTracker
 
 
-def mock_process_iter(attrs=None) -> typing.List[psutil.Process]:
+def mock_process_iter(attrs: typing.List[str]) -> typing.List[psutil.Process]:
+    """Mock psutil.process_iter to return a list of mocked processes."""
     mock_procs = []
-    
-    def create_mock_process(pid, cmdline):
+
+    def create_mock_process(pid: int, cmdline: typing.List[str]) -> psutil.Process:
         mock_proc = MagicMock(spec=psutil.Process)
         mock_proc.pid = pid
         mock_proc.info = {"cmdline": cmdline}
         mock_proc.cmdline.return_value = cmdline
         return mock_proc
-    
+
     mock_procs.append(create_mock_process(1, ["python", "my_script.py"]))
     mock_procs.append(create_mock_process(2, ["bash", "another_script.sh"]))
     mock_procs.append(create_mock_process(3, ["python", "yet_another_script.py"]))
     mock_procs.append(create_mock_process(4, ["java", "my_java_app.jar"]))
-    
+
     return mock_procs
 
-@patch('psutil.process_iter', mock_process_iter)
-def test_process_filtering():
-    tracker = ProcessResourceTracker(process_filters=["*my_script.py", "*another_script*"])
-    
-    tracker._refresh_processes()
-    filtered_processes = tracker._processes
-    
-    assert len(filtered_processes) == 3
-    assert filtered_processes[0].pid == 1
-    assert filtered_processes[1].pid == 2
-    assert filtered_processes[2].pid == 3
+
+@patch("psutil.process_iter", mock_process_iter)
+def test_process_filtering() -> None:
+    """Test process filtering."""
+    tracker = SystemResourceTracker(
+        process_filters=["*my_script.py", "*another_script*"],
+        storage_location=MagicMock(),
+    )
+
+    tracker.refresh_processes()
+    snapshots = tracker.snapshots
+    assert len(snapshots) == 3
+    assert snapshots[0].command == "python my_script.py"
+    assert snapshots[1].command == "bash another_script.sh"
+    assert snapshots[2].command == "python yet_another_script.py"
