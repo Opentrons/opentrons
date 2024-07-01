@@ -1644,7 +1644,7 @@ class InstrumentContext(publisher.CommandPublisher):
         return self._core.get_flow_rate()
 
     @property
-    @requires_version(2, 0)
+    @requires_version(2, 20)
     def liquid_presence_state(self) -> Optional[types.LiquidPresenceState]:
         return self._liquid_presence_state
 
