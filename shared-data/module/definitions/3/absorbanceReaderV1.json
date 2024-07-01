@@ -26,20 +26,6 @@
     "y": 64.93,
     "z": 97.8
   },
-  "gripperOffsets": {
-    "default": {
-      "pickUpOffset": {
-        "x": 0,
-        "y": 0,
-        "z": 0
-      },
-      "dropOffset": {
-        "x": 2,
-        "y": 0,
-        "z": 1
-      }
-    }
-  },
   "displayName": "Absorbance Plate Reader Module GEN1",
   "quirks": [],
   "slotTransforms": {
