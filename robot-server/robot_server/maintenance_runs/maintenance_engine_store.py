@@ -7,17 +7,17 @@ from typing import List, Optional, Callable
 from opentrons.protocol_engine.errors.exceptions import EStopActivatedError
 from opentrons.protocol_engine.types import PostRunHardwareState, DeckConfigurationType
 from opentrons.protocol_engine import (
-    Config as ProtocolEngineConfig,
     DeckType,
     LabwareOffsetCreate,
     StateSummary,
-    create_protocol_engine,
     CommandSlice,
     CommandPointer,
     Command,
     CommandCreate,
     LabwareOffset,
+    Config as ProtocolEngineConfig,
 )
+from opentrons.protocol_engine.create_protocol_engine import create_protocol_engine
 from opentrons.protocol_runner import RunResult, RunOrchestrator
 
 from opentrons.config import feature_flags
@@ -177,13 +177,14 @@ class MaintenanceEngineStore:
             deck_configuration=deck_configuration,
             notify_publishers=notify_publishers,
         )
+        self._run_orchestrator = RunOrchestrator.build_orchestrator(
+            run_id=run_id,
+            hardware_api=self._hardware_api,
+            protocol_engine=engine,
+        )
 
         for offset in labware_offsets:
-            engine.add_labware_offset(offset)
-
-        self._run_orchestrator = RunOrchestrator.build_orchestrator(
-            run_id=run_id, protocol_engine=engine, hardware_api=self._hardware_api
-        )
+            self._run_orchestrator.add_labware_offset(offset)
 
         self._created_at = created_at
 

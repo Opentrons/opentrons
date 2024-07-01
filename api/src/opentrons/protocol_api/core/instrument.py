@@ -248,6 +248,14 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         ...
 
     @abstractmethod
+    def get_liquid_presence_detection(self) -> bool:
+        ...
+
+    @abstractmethod
+    def set_liquid_presence_detection(self, enable: bool) -> None:
+        ...
+
+    @abstractmethod
     def set_flow_rate(
         self,
         aspirate: Optional[float] = None,
