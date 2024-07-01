@@ -26,9 +26,12 @@ export const CLEAR_ADD_PROTOCOL_FAILURE: 'protocolStorage:CLEAR_ADD_PROTOCOL_FAI
 export const OPEN_PROTOCOL_DIRECTORY: 'protocolStorage:OPEN_PROTOCOL_DIRECTORY' =
   'protocolStorage:OPEN_PROTOCOL_DIRECTORY'
 
+export const ADD_ANALYSIS: 'protocolStorage:ADD_ANALYSIS' =
+  'protocolStorage:ADD_ANALYSIS'
 export const ANALYZE_PROTOCOL: 'protocolStorage:ANALYZE_PROTOCOL' =
   'protocolStorage:ANALYZE_PROTOCOL'
-
+export const ANALYZE_CREATE_PROTOCOL: 'protocolStorage:ANALYZE_CREATE_PROTOCOL' =
+  'protocolStorage:ANALYZE_CREATE_PROTOCOL'
 export const ANALYZE_PROTOCOL_SUCCESS: 'protocolStorage:ANALYZE_PROTOCOL_SUCCESS' =
   'protocolStorage:ANALYZE_PROTOCOL_SUCCESS'
 
@@ -108,6 +111,20 @@ export const analyzeProtocol = (
 ): Types.AnalyzeProtocolAction => ({
   type: ANALYZE_PROTOCOL,
   payload: { protocolKey },
+  meta: { shell: true },
+})
+
+export const addAnalysis = (analysis: string): Types.AddAnalysisAction => ({
+  type: ADD_ANALYSIS,
+  payload: { analysis },
+  meta: { shell: true },
+})
+
+export const analyzeCreateProtocol = (
+  code: string
+): Types.AnalyzeCreateProtocolAction => ({
+  type: ANALYZE_CREATE_PROTOCOL,
+  payload: { code },
   meta: { shell: true },
 })
 

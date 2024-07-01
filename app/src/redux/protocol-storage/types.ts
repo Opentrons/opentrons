@@ -28,6 +28,8 @@ export interface ProtocolStorageState {
   readonly addFailureFile: StoredProtocolDir | null
   readonly addFailureMessage: string | null
   readonly listFailureMessage: string | null
+  readonly code: string | null
+  readonly analysis: string | null
 }
 
 // action types
@@ -84,6 +86,18 @@ export interface OpenProtocolDirectoryAction {
 export interface AnalyzeProtocolAction {
   type: 'protocolStorage:ANALYZE_PROTOCOL'
   payload: { protocolKey: string }
+  meta: { shell: true }
+}
+
+export interface AddAnalysisAction {
+  type: 'protocolStorage:ADD_ANALYSIS'
+  payload: { analysis: string }
+  meta: { shell: true }
+}
+
+export interface AnalyzeCreateProtocolAction {
+  type: 'protocolStorage:ANALYZE_CREATE_PROTOCOL'
+  payload: { code: string }
   meta: { shell: true }
 }
 

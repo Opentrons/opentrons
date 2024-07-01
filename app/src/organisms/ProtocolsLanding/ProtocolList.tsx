@@ -19,6 +19,7 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
+  PrimaryButton,
 } from '@opentrons/components'
 
 import {
@@ -37,6 +38,7 @@ import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { ProtocolSort } from './hooks'
 import type { Dispatch } from '../../redux/types'
+import { CreateProtocol } from './CreateProtocol'
 
 const SORT_BY_BUTTON_STYLE = css`
   background-color: ${COLORS.transparent};
@@ -59,6 +61,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
     showImportProtocolSlideout,
     setShowImportProtocolSlideout,
   ] = React.useState<boolean>(false)
+  const [showCreate, setShowCreate] = React.useState<boolean>(false)
   const [
     showChooseRobotToRunProtocolSlideout,
     setShowChooseRobotToRunProtocolSlideout,
@@ -130,7 +133,13 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
     setShowSendProtocolToFlexSlideout(true)
   }
 
-  return (
+  return showCreate ? (
+    <CreateProtocol
+      goBack={() => {
+        setShowCreate(false)
+      }}
+    />
+  ) : (
     <Box padding={SPACING.spacing16}>
       {selectedProtocol != null ? (
         <>
@@ -197,6 +206,13 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
                 name={showSortByMenu ? 'chevron-up' : 'chevron-down'}
               />
             </Flex>
+            <PrimaryButton
+              onClick={() => {
+                setShowCreate(true)
+              }}
+            >
+              Create
+            </PrimaryButton>
           </Flex>
           {showSortByMenu && (
             <Flex

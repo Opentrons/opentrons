@@ -20,8 +20,10 @@ import type {
   UpdateConfigValueAction,
 } from '@opentrons/app/src/redux/config'
 import type {
+  AddAnalysisAction,
   AddProtocolAction,
   AddProtocolFailureAction,
+  AnalyzeCreateProtocolAction,
   AnalyzeProtocolAction,
   AnalyzeProtocolFailureAction,
   AnalyzeProtocolSuccessAction,
@@ -80,6 +82,8 @@ import {
   ROBOT_MASS_STORAGE_DEVICE_ENUMERATED,
   ROBOT_MASS_STORAGE_DEVICE_REMOVED,
   UPDATE_BRIGHTNESS,
+  ADD_ANALYSIS,
+  ANALYZE_CREATE_PROTOCOL,
 } from '../constants'
 import type {
   InitializedAction,
@@ -106,6 +110,7 @@ import type {
   UpdateBrightnessAction,
   UsbRequestsAction,
 } from '@opentrons/app/src/redux/shell/types'
+import { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 // config file has been initialized
 export const configInitialized = (config: Config): ConfigInitializedAction => ({
@@ -269,6 +274,20 @@ export const clearAddProtocolFailure = (): ClearAddProtocolFailureAction => ({
 
 export const openProtocolDirectory = (): OpenProtocolDirectoryAction => ({
   type: OPEN_PROTOCOL_DIRECTORY,
+  meta: { shell: true },
+})
+
+export const addAnalysis = (analysis: string): AddAnalysisAction => ({
+  type: ADD_ANALYSIS,
+  payload: { analysis },
+  meta: { shell: true },
+})
+
+export const analyzeCreateProtocol = (
+  code: string
+): AnalyzeCreateProtocolAction => ({
+  type: ANALYZE_CREATE_PROTOCOL,
+  payload: { code },
   meta: { shell: true },
 })
 
