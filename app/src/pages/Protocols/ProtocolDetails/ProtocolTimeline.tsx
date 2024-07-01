@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { Icon, SIZE_4, Box, SPACING } from '@opentrons/components'
+import { Icon, Box, SPACING } from '@opentrons/components'
 import {
   fetchProtocols,
   getStoredProtocol,
@@ -31,6 +31,6 @@ export function ProtocolTimeline(): JSX.Element {
       />
     </Box>
   ) : (
-    <Icon size={SIZE_4} name="ot-spinner" spin />
+    <Icon size="8rem" name="ot-spinner" spin />
   )
 }

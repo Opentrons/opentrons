@@ -10,6 +10,7 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
+  OVERFLOW_AUTO,
 } from '@opentrons/components'
 import { CommandIcon, CommandText } from '../../molecules/Command'
 
@@ -38,7 +39,7 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
       flexDirection={DIRECTION_COLUMN}
       maxHeight="82vh"
       flex="1 1 0"
-      overflowY="auto"
+      overflowY={OVERFLOW_AUTO}
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}

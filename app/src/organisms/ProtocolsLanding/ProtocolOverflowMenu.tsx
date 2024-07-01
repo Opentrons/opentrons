@@ -115,7 +115,7 @@ export function ProtocolOverflowMenu(
   const handleClickTimeline: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
     history.push(`/protocols/${protocolKey}/timeline`)
-    setShowOverflowMenu(!showOverflowMenu)
+    setShowOverflowMenu(prevShowOverflowMenu => !prevShowOverflowMenu)
   }
   return (
     <Flex
