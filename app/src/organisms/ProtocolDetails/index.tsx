@@ -685,12 +685,7 @@ export function ProtocolDetails(
               </Flex>
               <Box
                 backgroundColor={COLORS.white}
-                // remove left upper corner border radius when first tab is active
-                borderRadius={`${
-                  currentTab === 'robot_config' ? '0' : BORDERS.borderRadius4
-                } ${BORDERS.borderRadius4} ${BORDERS.borderRadius4} ${
-                  BORDERS.borderRadius4
-                }`}
+                borderRadius={BORDERS.borderRadius8}
                 padding={SPACING.spacing16}
               >
                 {contentsByTabName[currentTab]}
