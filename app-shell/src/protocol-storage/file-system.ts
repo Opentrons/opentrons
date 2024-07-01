@@ -177,21 +177,29 @@ export function analyzeProtocolFromCode(
   const destFilePath = path.join(srcDirPath, 'protocol.py')
   const outputPath = makeAnalysisFilePath(analysisDirPath)
 
-  return fs
-    .mkdir(srcDirPath, { recursive: true })
-    .then(() => fs.mkdir(analysisDirPath, { recursive: true }))
-    .then(() => fs.writeFile(destFilePath, code))
-    .then(() => {
-      return analyzeProtocolSource(srcDirPath, outputPath)
-    })
-    .then(() => {
-      // Read the contents of the file at outputPath and return it
-      return fs.readFile(outputPath, 'utf8')
-    })
-    .catch(error => {
-      console.error('Error saving Python code or analyzing protocol:', error)
-      throw error
-    })
+  return (
+    fs
+      .mkdir(srcDirPath, { recursive: true })
+      .then(() => fs.mkdir(analysisDirPath, { recursive: true }))
+      .then(() => fs.writeFile(destFilePath, code))
+      .then(() => {
+        return analyzeProtocolSource(srcDirPath, outputPath)
+      })
+      // read contents of the outputPath
+      .then(() => fs.readFile(outputPath, 'utf8'))
+      //   delete outPath and analysis dir
+      .then(content => {
+        return fs
+          .unlink(outputPath)
+          .then(() => fs.rmdir(srcDirPath, { recursive: true }))
+          .then(() => fs.rmdir(analysisDirPath, { recursive: true }))
+          .then(() => content)
+      })
+      .catch(error => {
+        console.error('Error saving Python code or analyzing protocol:', error)
+        throw error
+      })
+  )
 }
 
 export function viewProtocolSourceFolder(

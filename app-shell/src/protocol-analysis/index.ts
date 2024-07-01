@@ -1,3 +1,4 @@
+import fs from 'fs-extra'
 import { createLogger } from '../log'
 import { getConfig, handleConfigChange } from '../config'
 import { updateConfigValue } from '../config/actions'

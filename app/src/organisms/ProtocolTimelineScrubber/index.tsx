@@ -66,8 +66,8 @@ export const DECK_LAYER_BLOCKLIST = [
 ]
 export const VIEWBOX_MIN_X = -84
 export const VIEWBOX_MIN_Y = -10
-export const VIEWBOX_WIDTH = 600
-export const VIEWBOX_HEIGHT = 460
+export const VIEWBOX_WIDTH = 300
+export const VIEWBOX_HEIGHT = 230
 
 export function ProtocolTimelineScrubber(
   props: ProtocolTimelineScrubberProps
