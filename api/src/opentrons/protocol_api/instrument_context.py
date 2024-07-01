@@ -6,6 +6,7 @@ from typing import Any, List, Optional, Sequence, Union, cast, Dict
 from opentrons_shared_data.errors.exceptions import (
     CommandPreconditionViolated,
     CommandParameterLimitViolated,
+    PipetteLiquidNotFoundError,
     UnexpectedTipRemovalError,
 )
 from opentrons.protocol_engine.errors.exceptions import WellDoesNotExistError
@@ -2055,14 +2056,14 @@ class InstrumentContext(publisher.CommandPublisher):
         :returns: A boolean.
         """
         if well is None:
-            raise WellDoesNotExistError()
+            raise WellDoesNotExistError() from BaseException
 
         try:
             height = self._core.find_liquid_level(well._core)
             if height > 0:
                 return True
             return False  # it should never get here
-        except Exception:
+        except PipetteLiquidNotFoundError:
             return False
 
     @requires_version(2, 20)
@@ -2072,11 +2073,11 @@ class InstrumentContext(publisher.CommandPublisher):
         :returns: None.
         """
         if well is None:
-            raise WellDoesNotExistError()
+            raise WellDoesNotExistError("Well type was none.")
 
         try:
             self._core.find_liquid_level(well._core)
-        except Exception as e:
+        except PipetteLiquidNotFoundError as e:
             raise e
 
     @requires_version(2, 20)
@@ -2091,5 +2092,5 @@ class InstrumentContext(publisher.CommandPublisher):
         try:
             height = self._core.find_liquid_level(well._core)
             return float(height)
-        except Exception:
+        except PipetteLiquidNotFoundError:
             return 0

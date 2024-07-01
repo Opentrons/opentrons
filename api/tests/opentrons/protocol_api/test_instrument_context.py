@@ -1,8 +1,6 @@
 """Tests for the InstrumentContext public interface."""
 from collections import OrderedDict
 import inspect
-
-from opentrons.protocol_engine.commands.pipetting_common import LiquidNotFoundError
 import pytest
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 from decoy import Decoy
@@ -40,6 +38,7 @@ from opentrons.types import Location, Mount, Point
 
 from opentrons_shared_data.errors.exceptions import (
     CommandPreconditionViolated,
+    PipetteLiquidNotFoundError,
 )
 
 
@@ -1281,7 +1280,7 @@ def test_detect_liquid(
     """It should only return booleans. Not raise an exception."""
     mock_well = decoy.mock(cls=Well)
     decoy.when(mock_instrument_core.find_liquid_level(mock_well._core)).then_raise(
-        Exception(LiquidNotFoundError)
+        Exception(PipetteLiquidNotFoundError)
     )
     result = subject.detect_liquid(mock_well)
     assert isinstance(result, bool)
@@ -1297,17 +1296,17 @@ def test_require_liquid(
     """It should raise an exception when called on an."""
     mock_well = decoy.mock(cls=Well)
     decoy.when(mock_instrument_core.find_liquid_level(mock_well._core)).then_raise(
-        Exception(LiquidNotFoundError)
+        Exception(PipetteLiquidNotFoundError)
     )
     try:
         subject.require_liquid(mock_well)
         assert False
-    except Exception:
+    except PipetteLiquidNotFoundError:
         assert True
 
 
 @pytest.mark.parametrize("api_version", [APIVersion(2, 20)])
-def get_liquid_height(
+def test_get_liquid_height(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
     subject: InstrumentContext,
@@ -1316,10 +1315,10 @@ def get_liquid_height(
     """It should return 0 on an empty well."""
     mock_well = decoy.mock(cls=Well)
     decoy.when(mock_instrument_core.find_liquid_level(mock_well._core)).then_raise(
-        Exception(LiquidNotFoundError)
+        Exception(PipetteLiquidNotFoundError)
     )
     try:
         result = subject.get_liquid_height(mock_well)
         assert False
-    except Exception:
+    except PipetteLiquidNotFoundError:
         assert result == 0

@@ -31,6 +31,7 @@ from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
+from opentrons_shared_data.errors.exceptions import PipetteLiquidNotFoundError
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
@@ -862,8 +863,8 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             result is None
         ):  # this should probably only happen in testing with mock components
             return 0
-        # for general cases, result will either be a float > 0 or an error
+        # for general cases, result will either be a float > 0 or a PipetteLiquidNotFoundError
         try:
             return float(result.z_position)
-        except Exception:
-            raise BaseException(result)
+        except KeyError: 
+            raise PipetteLiquidNotFoundError()
