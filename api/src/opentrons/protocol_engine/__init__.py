@@ -7,10 +7,6 @@ protocol state and side-effects like robot movements.
 The main interface is the `ProtocolEngine` class.
 """
 
-from .create_protocol_engine import (
-    create_protocol_engine,
-    create_protocol_engine_in_thread,
-)
 from .protocol_engine import ProtocolEngine
 from .errors import ProtocolEngineError, ErrorOccurrence
 from .notes import CommandNote
