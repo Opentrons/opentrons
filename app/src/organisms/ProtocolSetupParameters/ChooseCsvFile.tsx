@@ -18,7 +18,6 @@ import { useAllCsvFilesQuery } from '@opentrons/react-api-client'
 import { ChildNavigation } from '../ChildNavigation'
 import { EmptyFile } from './EmptyFile'
 import { RadioButton } from '../../atoms/buttons'
-// import { getFilePaths } from '../../redux/shell'
 import { getShellUpdateDataFiles } from '../../redux/shell'
 
 import type { CsvFileParameter } from '@opentrons/shared-data'
@@ -61,7 +60,7 @@ export function ChooseCsvFile({
       <ChildNavigation
         header={t('choose_csv_file')}
         onClickBack={handleGoBack}
-        buttonType="tertiaryLowLight"
+        buttonType="primary"
         buttonText={t('confirm_selection')}
         onClickButton={handleConfirmSelection}
       />

@@ -87,8 +87,8 @@ export function ProtocolSetupParameters({
   const csvFileParameter = runTimeParameters.find(
     (param): param is CsvFileParameter => param.type === 'csv_file'
   )
-  const initialFileInfo: string = csvFileParameter?.file?.id ?? ''
-  const [csvFileInfo, setCSVFileInfo] = React.useState<string>(initialFileInfo)
+  const initialFileId: string = csvFileParameter?.file?.id ?? ''
+  const [csvFileInfo, setCSVFileInfo] = React.useState<string>(initialFileId)
 
   const updateParameters = (
     value: boolean | string | number,

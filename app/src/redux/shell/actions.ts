@@ -125,9 +125,3 @@ export const notifySubscribeAction = (
   },
   meta: { shell: true },
 })
-
-// export const getFilePaths = (state: State): SendFilePathsAction => ({
-//   type: SEND_FILE_PATHS,
-//   payload: { filePaths: state.shell.filePaths },
-//   meta: { shell: true },
-// })
