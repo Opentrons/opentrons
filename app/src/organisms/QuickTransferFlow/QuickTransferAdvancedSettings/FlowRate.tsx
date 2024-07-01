@@ -9,22 +9,20 @@ import {
   POSITION_FIXED,
   COLORS,
 } from '@opentrons/components'
+import type { SupportedTip } from '@opentrons/shared-data'
+import { getTipTypeFromTipRackDefinition } from '@opentrons/shared-data'
+
 import { getTopPortalEl } from '../../../App/portal'
 import { ChildNavigation } from '../../ChildNavigation'
 import { InputField } from '../../../atoms/InputField'
 import { NumericalKeyboard } from '../../../atoms/SoftwareKeyboard'
 
+import { ACTIONS } from '../constants'
 import type {
   QuickTransferSummaryState,
   QuickTransferSummaryAction,
   FlowRateKind,
 } from '../types'
-
-import { ACTIONS } from '../constants'
-import {
-  type SupportedTip,
-  getTipTypeFromTipRackDefinition,
-} from '@opentrons/shared-data'
 
 interface FlowRateEntryProps {
   onBack: () => void
