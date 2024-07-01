@@ -2,7 +2,6 @@ import {
   getModuleType,
   getLabwareDefURI,
   getPipetteSpecsV2,
-  STAGING_AREA_CUTOUTS,
 } from '@opentrons/shared-data'
 import type {
   LoadLabwareRunTimeCommand,
