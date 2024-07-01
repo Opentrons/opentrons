@@ -1,6 +1,6 @@
 from .types import APIVersion
 
-MAX_SUPPORTED_VERSION = APIVersion(2, 19)
+MAX_SUPPORTED_VERSION = APIVersion(2, 21)
 """The maximum supported protocol API version in this release."""
 
 MIN_SUPPORTED_VERSION = APIVersion(2, 0)
