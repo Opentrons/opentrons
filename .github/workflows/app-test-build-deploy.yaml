@@ -98,6 +98,7 @@ jobs:
       matrix:
         os: ['windows-2022', 'ubuntu-22.04', 'macos-11']
     name: 'opentrons app backend unit tests on ${{matrix.os}}'
+    timeout-minutes: 60
     runs-on: ${{ matrix.os }}
     steps:
       - uses: 'actions/checkout@v3'
