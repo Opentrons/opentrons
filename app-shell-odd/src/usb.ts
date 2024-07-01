@@ -17,13 +17,12 @@ import type { Dispatch, Action } from './types'
 const FLEX_USB_MOUNT_DIR = '/media/'
 const FLEX_USB_DEVICE_DIR = '/dev/'
 const FLEX_USB_MOUNT_FILTER = /sd[a-z]+[0-9]+$/
-// const MOUNT_ENUMERATION_DELAY_MS = 3000
 
 // These are for backoff algorithm
+// apply the delay from 1 sec 64 sec
 const MAX_TRIES = 6
 const wait = (ms: number): Promise<void> =>
   new Promise((resolve, reject) => setTimeout(resolve, ms))
-// apply the delay from 1 sec 64 sec
 const callWithRetry = async (
   fn: () => Promise<any>,
   depth: number = 0
@@ -50,22 +49,8 @@ const isWeirdDirectoryAndShouldSkip = (dirName: string): boolean =>
     .reduce((prev, current) => prev || current, false)
 
 const enumerateMassStorage = (path: string): Promise<string[]> => {
-  console.log(`Enumerating mass storage at path: ${path}`)
-  // return fsPromises
-  //   .readdir(path)
-  //   .then(entries => {
-  //     console.log('Initial entries', entries)
-  //     return entries.length === 0
-  //       ? new Promise<void>(resolve =>
-  //           setTimeout(resolve, MOUNT_ENUMERATION_DELAY_MS)
-  //         )
-  //       : new Promise<void>(resolve => {
-  //           resolve()
-  //         })
-  //   })
   return callWithRetry(() =>
     fsPromises.readdir(path).then(entries => {
-      console.log('Initial entries', entries)
       if (entries.length === 0) {
         throw new Error('No entries found, retrying...')
       }
@@ -90,7 +75,6 @@ const enumerateMassStorage = (path: string): Promise<string[]> => {
     })
     .then(flatten)
     .then(result => {
-      console.log('Final result', result)
       return result
     })
 }
@@ -215,7 +199,6 @@ const getLatestMassStorageCsvFiles = (
   filePaths: string[],
   dispatch: Dispatch
 ): void => {
-  console.log('getLatestMassStorageCsvFiles', filePaths)
   // Note (kk:06/28/2024) The following regex is mostly for Resource fork file ex ._test.csv
   // Resource fork file would be on a usb flash drive if a user uses macOS.
   const regex = /._\w/gm
@@ -230,14 +213,7 @@ export function registerDataFiles(
   return function handleAction(action: Action) {
     switch (action.type) {
       case ROBOT_MASS_STORAGE_DEVICE_ENUMERATED: {
-        console.log('registerDataFiles rootPath', action.payload.rootPath)
-        console.log('registerDataFiles filePaths', action.payload.filePaths)
-        // const mock = ['test1.csv', 'test2.csv', 'test3.csv']
-        // getLatestMassStorageCsvFiles(mock, dispatch)
-        // if (action.payload.rootPath.match(FLEX_USB_MOUNT_FILTER))
         getLatestMassStorageCsvFiles(action.payload.filePaths, dispatch)
-        // console.log('csvFiles', csvFilePaths)
-        // dispatch(sendFilePaths(csvFilePaths))
         break
       }
 
