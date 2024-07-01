@@ -24,7 +24,7 @@ interface AnnotatedStepsProps {
   currentCommandIndex?: number
 }
 
-export const AnnotatedSteps = (props: AnnotatedStepsProps): JSX.Element => {
+export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
   const { analysis, currentCommandIndex } = props
   const HIDE_SCROLLBAR = css`
     ::-webkit-scrollbar {

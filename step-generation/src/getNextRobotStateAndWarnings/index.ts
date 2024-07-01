@@ -119,6 +119,7 @@ function _getNextRobotStateAndWarningsSingleCommand(
     case 'pause': // deprecated, use waitForResume instead
     case 'delay': // deprecated, use waitForDuration instead
     case 'custom': // fall-back
+    case 'comment':
       break
 
     case 'loadLiquid':
