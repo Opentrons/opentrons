@@ -49,7 +49,6 @@ export const protocolStorageReducer: Reducer<ProtocolStorageState, Action> = (
       }
     }
     case Actions.ADD_ANALYSIS: {
-      console.log('analysis from reducer', action.payload.analysis)
       return {
         ...state,
         analysis: action.payload.analysis,
