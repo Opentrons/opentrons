@@ -129,7 +129,7 @@ describe('useCloneRun hook', () => {
       runTimeParameterValues: {
         number_param: 2,
         boolean_param: false,
-        file_param: { fileId: 'fileId_123' },
+        file_param: { id: 'fileId_123' },
       },
     })
   })

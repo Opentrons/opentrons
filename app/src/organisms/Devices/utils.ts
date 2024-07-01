@@ -99,13 +99,13 @@ export function getRunTimeParameterValuesForRun(
   return runTimeParameters.reduce((acc, param) => {
     const { variableName } = param
     if (param.type === 'csv_file' && param.file?.id != null) {
-      return { ...acc, [variableName]: { fileId: param.file.id } }
+      return { ...acc, [variableName]: { id: param.file.id } }
     } else if (
       param.type === 'csv_file' &&
       fileIdMap != null &&
       variableName in fileIdMap
     ) {
-      return { ...acc, [variableName]: { fileId: fileIdMap[variableName] } }
+      return { ...acc, [variableName]: { id: fileIdMap[variableName] } }
     } else if (param.type !== 'csv_file' && param.value !== param.default) {
       return { ...acc, [variableName]: param.value }
     }
