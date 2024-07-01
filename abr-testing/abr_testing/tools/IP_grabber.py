@@ -5,19 +5,18 @@ import os
 import json
 import requests
 import sys
-from abr_testing.data_collection import read_robot_logs
-from abr_testing.automation import google_drive_tool
 
-storage_directory = args.storage_directory[0] #make sure this is above where storage directory is called
+storage_directory = "C:\Users\NicholasShiland\ABR_Liquid_Measurement_Data"
+
 
 def get_ips(storage_directory: str) -> None:
-    """GET ALL RUN LOGS.
+    """GET ALL ROBOT IP's AND VOLUMES
 
-    Connect to each ABR robot to read run log data.
-    Read each robot's list of unique run log IDs and compare them to all IDs in storage.
-    Any ID that is not in storage, download the run log and put it in storage.
+    DO some things idk
     """
-    ip_json_file = os.path.join(storage_directory, "IPs.json")
+    #setup IP sheet
+    ip_json_file = os.path.join(storage_directory, "IP_N_Volumes.json")
+    #try to create an array copying the contents of IP_N_Volumes
     try:
         ip_file = json.load(open(ip_json_file))
     except FileNotFoundError:
@@ -28,19 +27,9 @@ def get_ips(storage_directory: str) -> None:
         print("haha")
         #do smth to grab ip ad
 
-# Set up IP sheet
-    try:
-        ip_path = os.path.join(storage_directory, "IP_addy.json")
-    except FileNotFoundError:
-        print("No IP sheet. Add IP addresses to storage notebook.")
-    # google_sheet = google_sheets_tool.google_sheet(
-    #     credentials_path, file_name, tab_number=0
-    #)
 
 """notes
-could storage dir be "C:\Users\NicholasShiland\Desktop\ABR" - IT IS YAY
+OKAY, so basically I need to make a JSON source file with the robot name, IP's, and corresponding volume changes and put it into the thing
 
-OKAY, so basically I need to make a JSON source file with the robot name, IP's, and corresponding volume changes and put it into the "
-
-
+need to find out how to read from a json file properly
 """
