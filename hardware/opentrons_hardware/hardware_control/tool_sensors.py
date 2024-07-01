@@ -94,7 +94,14 @@ def _fix_pass_step_for_buffer(
     sensor_type: SensorType,
     sensor_id: SensorId,
     stop_condition: MoveStopCondition = MoveStopCondition.sync_line,
+    binding_flags: Optional[int] = None,
 ) -> MoveGroupStep:
+    if binding_flags is None:
+        binding_flags = (
+            SensorOutputBinding.auto_baseline_report
+            + SensorOutputBinding.sync
+            + SensorOutputBinding.report
+        )
     tool_nodes = [
         i
         for i in movers
@@ -114,6 +121,7 @@ def _fix_pass_step_for_buffer(
             stop_condition=MoveStopCondition.sensor_report,
             sensor_type_pass=sensor_type,
             sensor_id_pass=sensor_id,
+            sensor_binding_flags=binding_flags,
         )
     elif sensor_type == SensorType.capacitive:
         tool_move = create_step(
@@ -127,6 +135,7 @@ def _fix_pass_step_for_buffer(
             stop_condition=MoveStopCondition.sensor_report,
             sensor_type_pass=sensor_type,
             sensor_id_pass=sensor_id,
+            sensor_binding_flags=binding_flags,
         )
     for node in tool_nodes:
         move_group[node] = tool_move[node]
@@ -140,6 +149,7 @@ def _build_pass_step(
     sensor_type: SensorType,
     sensor_id: SensorId,
     stop_condition: MoveStopCondition = MoveStopCondition.sync_line,
+    binding_flags: Optional[int] = None,
 ) -> MoveGroupStep:
     move_group = create_step(
         distance={ax: float64(abs(distance[ax])) for ax in movers},
@@ -154,6 +164,7 @@ def _build_pass_step(
         stop_condition=stop_condition,
         sensor_type_pass=sensor_type,
         sensor_id_pass=sensor_id,
+        sensor_binding_flags=binding_flags,
     )
     return move_group
 
@@ -388,6 +399,7 @@ async def liquid_probe(
     can_bus_only_output: bool = False,
     data_files: Optional[Dict[SensorId, str]] = None,
     sensor_id: SensorId = SensorId.S0,
+    force_both_sensors: bool = False,
 ) -> Dict[NodeId, MotorPositionStatus]:
     """Move the mount and pipette simultaneously while reading from the pressure sensor."""
     log_files: Dict[SensorId, str] = {} if not data_files else data_files
@@ -395,6 +407,16 @@ async def liquid_probe(
     threshold_fixed_point = threshold_pascals * sensor_fixed_point_conversion
     # How many samples to take to level out the sensor
     num_baseline_reads = 20
+    sensor_binding = None
+    if sensor_id == SensorId.BOTH and force_both_sensors:
+        # this covers the case when we want to use both sensors in an AND configuration
+        # we don't think we'll use this but we want the ability to override the standard OR configuration
+        sensor_binding = (
+            SensorOutputBinding.auto_baseline_report
+            + SensorOutputBinding.sync
+            + SensorOutputBinding.report
+            + SensorOutputBinding.multi_sensor_sync
+        )
     pressure_sensors = await _setup_pressure_sensors(
         messenger,
         sensor_id,
@@ -412,6 +434,7 @@ async def liquid_probe(
         sensor_type=SensorType.pressure,
         sensor_id=sensor_id,
         stop_condition=MoveStopCondition.sync_line,
+        binding_flags=sensor_binding,
     )
     if sync_buffer_output:
         sensor_group = _fix_pass_step_for_buffer(
@@ -422,6 +445,7 @@ async def liquid_probe(
             sensor_type=SensorType.pressure,
             sensor_id=sensor_id,
             stop_condition=MoveStopCondition.sync_line,
+            binding_flags=sensor_binding,
         )
 
     raise_z_axis = create_step(
