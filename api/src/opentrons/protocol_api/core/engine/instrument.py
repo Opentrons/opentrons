@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 from typing import Optional, TYPE_CHECKING, cast, Union
-from opentrons.protocol_engine.commands.liquid_probe import LiquidProbeResult
 from opentrons.protocols.api_support.types import APIVersion
 
 from opentrons.types import Location, Mount
@@ -862,5 +861,5 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         # result will either be a LiquidProbeResult or a LiquidNotFoundError
         try:
             return float(result.z_position)
-        except:
+        except Exception:
             raise BaseException(result)

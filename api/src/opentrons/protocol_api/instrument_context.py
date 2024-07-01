@@ -9,7 +9,6 @@ from opentrons_shared_data.errors.exceptions import (
     UnexpectedTipRemovalError,
 )
 from opentrons.protocol_engine.errors.exceptions import WellDoesNotExistError
-from opentrons.protocol_engine.commands.pipetting_common import LiquidNotFoundError
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons import types
@@ -2063,7 +2062,7 @@ class InstrumentContext(publisher.CommandPublisher):
             if height > 0:
                 return True
             return False  # it should never get here
-        except Exception as e:
+        except Exception:
             return False
 
     @requires_version(2, 20)
