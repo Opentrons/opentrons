@@ -246,7 +246,6 @@ export const getLatestMassStorageUpdateFiles = (
     )
     if (update === null) {
       console.log('no updates found in mass storage device')
-      console.log('getLatestMassStorageUpdateFiles', filePaths)
     } else {
       console.log(`found update to version ${update.version} on mass storage`)
       const releaseNotes = fakeReleaseNotesForMassStorage(update.version)

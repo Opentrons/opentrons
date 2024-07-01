@@ -290,7 +290,6 @@ export function ProtocolSetupParameters({
       <ChooseCsvFile
         protocolId={protocolId}
         handleGoBack={() => {
-          console.log('clicked go back csv')
           setChooseCsvFileScreen(null)
         }}
         parameter={chooseCsvFileScreen}
