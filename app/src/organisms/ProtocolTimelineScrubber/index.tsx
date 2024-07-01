@@ -7,14 +7,13 @@ import {
   DIRECTION_COLUMN,
   SPACING,
   ALIGN_CENTER,
-  ALIGN_FLEX_END,
-  COLORS,
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_STRETCH,
   LegacyStyledText,
   BaseDeck,
   PrimaryButton,
   OVERFLOW_SCROLL,
+  COLORS,
 } from '@opentrons/components'
 import { getResultingTimelineFrameFromRunCommands } from '@opentrons/step-generation'
 import {
@@ -22,13 +21,12 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   getSimplestDeckConfigForProtocol,
 } from '@opentrons/shared-data'
-import { getCommandTextData } from '../../molecules/Command/utils/getCommandTextData'
-import { CommandText } from '../../molecules/Command'
 import { PipetteMountViz } from './PipetteVisuals'
 import {
   getAllWellContentsForActiveItem,
   wellFillFromWellContents,
 } from './utils'
+import { CommandItem } from './CommandItem'
 
 import type { ViewportListRef } from 'react-viewport-list'
 import type {
@@ -122,7 +120,7 @@ export function ProtocolTimelineScrubber(
     frame
   )
   const liquidDisplayColors = analysis.liquids.map(
-    liquid => liquid.displayColor ?? 'blue'
+    liquid => liquid.displayColor ?? COLORS.blue50
   )
 
   return (
@@ -132,7 +130,7 @@ export function ProtocolTimelineScrubber(
       gridGap={SPACING.spacing8}
     >
       <Flex gridGap={SPACING.spacing8} flex="1 1 0">
-        <Flex flex="1 1 0" width="18.75rem" height="70vh">
+        <Flex height="60vh">
           <BaseDeck
             robotType={robotType}
             deckConfig={getSimplestDeckConfigForProtocol(analysis)}
@@ -320,101 +318,6 @@ export function ProtocolTimelineScrubber(
           {currentCommandIndex + 1}
         </LegacyStyledText>
       ) : null}
-    </Flex>
-  )
-}
-
-interface CommandItemProps {
-  command: RunTimeCommand
-  index: number
-  currentCommandIndex: number
-  setCurrentCommandIndex: (index: number) => void
-  analysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput
-  robotType: RobotType
-}
-function CommandItem(props: CommandItemProps): JSX.Element {
-  const [showDetails, setShowDetails] = React.useState(false)
-  const {
-    index,
-    command,
-    currentCommandIndex,
-    setCurrentCommandIndex,
-    analysis,
-    robotType,
-  } = props
-  const params: RunTimeCommand['params'] = command.params ?? {}
-  return (
-    <Flex
-      key={index}
-      backgroundColor={
-        index === currentCommandIndex
-          ? COLORS.blue35
-          : index < currentCommandIndex
-          ? '#00002222'
-          : COLORS.white
-      }
-      border={
-        index === currentCommandIndex
-          ? `1px solid ${COLORS.blue35}`
-          : '1px solid #000'
-      }
-      padding={SPACING.spacing4}
-      flexDirection={DIRECTION_COLUMN}
-      minWidth={`${COMMAND_WIDTH_PX}px`}
-      width={`${COMMAND_WIDTH_PX}px`}
-      height="6rem"
-      overflowX="hidden"
-      overflowY={OVERFLOW_SCROLL}
-      cursor="pointer"
-      onClick={() => {
-        setCurrentCommandIndex(index)
-      }}
-    >
-      <LegacyStyledText
-        onClick={() => {
-          setShowDetails(!showDetails)
-        }}
-        as="p"
-        alignSelf={ALIGN_FLEX_END}
-      >
-        {index + 1}
-      </LegacyStyledText>
-      <CommandText
-        command={command}
-        commandTextData={getCommandTextData(analysis)}
-        robotType={robotType}
-      />
-      {showDetails
-        ? Object.entries(params).map(([key, value]) => (
-            <Flex
-              key={key}
-              flexDirection={DIRECTION_COLUMN}
-              marginBottom={SPACING.spacing2}
-              paddingLeft={SPACING.spacing2}
-            >
-              <LegacyStyledText as="label" marginRight={SPACING.spacing2}>
-                {key}:
-              </LegacyStyledText>
-              {value != null && typeof value === 'object' ? (
-                /*  eslint-disable @typescript-eslint/no-unsafe-argument */
-                Object.entries(value).map(([innerKey, innerValue]) => (
-                  <Flex key={innerKey}>
-                    <LegacyStyledText as="label" marginRight={SPACING.spacing2}>
-                      {key}:
-                    </LegacyStyledText>
-                    <LegacyStyledText as="p" title={String(innerValue)}>
-                      {String(innerValue)}
-                    </LegacyStyledText>
-                  </Flex>
-                ))
-              ) : (
-                <LegacyStyledText as="p" title={String(value)}>
-                  {String(value)}
-                </LegacyStyledText>
-              )}
-            </Flex>
-          ))
-        : null}
     </Flex>
   )
 }
