@@ -14,8 +14,9 @@ from opentrons.protocol_engine import (
     ProtocolEngine,
     Config as EngineConfig,
     DeckType,
-    create_protocol_engine,
 )
+from opentrons.protocol_engine.create_protocol_engine import create_protocol_engine
+
 from opentrons.protocol_engine.types import DeckSlotLocation, LoadedLabware
 from opentrons.types import DeckSlotName
 

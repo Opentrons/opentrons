@@ -23,7 +23,15 @@ import type { IconName } from '@opentrons/components'
 import { ModalContentOneColSimpleButtons } from './ModalContentOneColSimpleButtons'
 import { TwoColumn } from './TwoColumn'
 import { OneColumn } from './OneColumn'
-export { ModalContentOneColSimpleButtons, TwoColumn, OneColumn }
+import { ModalContentMixed } from './ModalContentMixed'
+import { DescriptionContent } from './DescriptionContent'
+export {
+  ModalContentOneColSimpleButtons,
+  TwoColumn,
+  OneColumn,
+  ModalContentMixed,
+  DescriptionContent,
+}
 
 export type ModalType = 'intervention-required' | 'error'
 

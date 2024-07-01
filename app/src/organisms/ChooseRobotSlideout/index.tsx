@@ -306,7 +306,7 @@ export function ChooseRobotSlideout(
                   color={COLORS.red60}
                   overflowWrap={OVERFLOW_WRAP_ANYWHERE}
                   display={DISPLAY_INLINE_BLOCK}
-                  marginTop={`-${SPACING.spacing8}`}
+                  marginTop={`-${SPACING.spacing4}`}
                   marginBottom={SPACING.spacing8}
                 >
                   {runCreationErrorCode === 409 ? (
@@ -405,9 +405,7 @@ export function ChooseRobotSlideout(
               runtimeParam.type === 'float'
             ) {
               const value = runtimeParam.value as number
-              const id = `InputField_${
-                runtimeParam.variableName
-              }_${index.toString()}`
+              const id = `InputField_${runtimeParam.variableName}_${index}`
               const error =
                 (Number.isNaN(value) && !isInputFocused) ||
                 value < runtimeParam.min ||

@@ -803,6 +803,21 @@ class InstrumentContext(publisher.CommandPublisher):
         :py:meth:`.Labware.wells`. To adjust where the sequence starts, use
         :py:obj:`.starting_tip`.
 
+        The exact position for tip pickup accounts for the length of the tip and how
+        much the tip overlaps with the pipette nozzle. These measurements are fixed
+        values on Flex, and are based on the results of tip length calibration on OT-2.
+
+        .. note::
+            API version 2.19 updates the tip overlap values for Flex. When updating a
+            protocol from 2.18 (or lower) to 2.19 (or higher), pipette performance
+            should improve without additional changes to your protocol. Nevertheless, it
+            is good practice after updating to do the following:
+
+            - Run Labware Position Check.
+            - Perform a dry run of your protocol.
+            - If tip position is slightly higher than expected, adjust the ``location``
+              parameter of pipetting actions to achieve the desired result.
+
         :param location: The location from which to pick up a tip. The ``location``
                          argument can be specified in several ways:
 
@@ -864,6 +879,9 @@ class InstrumentContext(publisher.CommandPublisher):
             can't prepare itself for aspiration during :py:meth:`.pick_up_tip`, and will
             instead always prepare during :py:meth:`.aspirate`. Version 2.12 and earlier
             will raise an ``APIVersionError`` if a value is set for ``prep_after``.
+
+        .. versionchanged:: 2.19
+            Uses new values for how much a tip overlaps with the pipette nozzle.
 
         :returns: This instance.
         """
@@ -1651,6 +1669,24 @@ class InstrumentContext(publisher.CommandPublisher):
     @tip_racks.setter
     def tip_racks(self, racks: List[labware.Labware]) -> None:
         self._tip_racks = racks
+
+    @property
+    @requires_version(2, 20)
+    def liquid_detection(self) -> bool:
+        """
+        Gets the global setting for liquid level detection.
+
+        When True, `liquid_probe` will be called before
+        aspirates and dispenses to bring the tip to the liquid level.
+
+        The default value is False.
+        """
+        return self._core.get_liquid_presence_detection()
+
+    @liquid_detection.setter
+    @requires_version(2, 20)
+    def liquid_detection(self, enable: bool) -> None:
+        self._core.set_liquid_presence_detection(enable)
 
     @property
     @requires_version(2, 0)

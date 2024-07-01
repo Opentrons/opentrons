@@ -8,7 +8,6 @@ import {
   RUN_STATUS_IDLE,
   RUN_STATUS_RUNNING,
   RUN_STATUS_PAUSED,
-  RUN_STATUS_PAUSE_REQUESTED,
   RUN_STATUS_STOP_REQUESTED,
   RUN_STATUS_STOPPED,
   RUN_STATUS_FAILED,
@@ -49,7 +48,6 @@ import {
   mockFailedRun,
   mockIdleUnstartedRun,
   mockPausedRun,
-  mockPauseRequestedRun,
   mockRunningRun,
   mockStoppedRun,
   mockStopRequestedRun,
@@ -589,24 +587,6 @@ describe('ProtocolRunHeader', () => {
       name: ANALYTICS_PROTOCOL_RUN_ACTION.RESUME,
       properties: {},
     })
-  })
-
-  it('renders a disabled Resume Run button and when pause requested', () => {
-    when(vi.mocked(useNotifyRunQuery))
-      .calledWith(RUN_ID)
-      .thenReturn({
-        data: { data: mockPauseRequestedRun },
-      } as UseQueryResult<OpentronsApiClient.Run>)
-    when(vi.mocked(useRunStatus))
-      .calledWith(RUN_ID)
-      .thenReturn(RUN_STATUS_PAUSE_REQUESTED)
-
-    render()
-
-    const button = screen.getByRole('button', { name: 'Resume run' })
-    expect(button).toBeDisabled()
-    screen.getByRole('button', { name: 'Cancel run' })
-    screen.getByText('Pause requested')
   })
 
   it('renders a disabled Canceling Run button and when stop requested', () => {

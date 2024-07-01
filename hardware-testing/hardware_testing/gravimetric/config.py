@@ -49,6 +49,7 @@ class GravimetricConfig(VolumetricConfig):
     scale_delay: int
     isolate_channels: List[int]
     isolate_volumes: List[float]
+    liquid: str
 
 
 @dataclass
@@ -92,7 +93,7 @@ LIQUID_PROBE_SETTINGS: Dict[int, Dict[int, Dict[int, Dict[str, int]]]] = {
                 "max_z_distance": 20,
                 "mount_speed": 11,
                 "plunger_speed": 21,
-                "sensor_threshold_pascals": 150,
+                "sensor_threshold_pascals": 15,
             },
         },
         8: {
@@ -100,7 +101,7 @@ LIQUID_PROBE_SETTINGS: Dict[int, Dict[int, Dict[int, Dict[str, int]]]] = {
                 "max_z_distance": 20,
                 "mount_speed": 11,
                 "plunger_speed": 21,
-                "sensor_threshold_pascals": 150,
+                "sensor_threshold_pascals": 15,
             },
         },
     },
@@ -110,19 +111,19 @@ LIQUID_PROBE_SETTINGS: Dict[int, Dict[int, Dict[int, Dict[str, int]]]] = {
                 "max_z_distance": 20,
                 "mount_speed": 5,
                 "plunger_speed": 10,
-                "sensor_threshold_pascals": 200,
+                "sensor_threshold_pascals": 15,
             },
             200: {
                 "max_z_distance": 20,
                 "mount_speed": 5,
                 "plunger_speed": 10,
-                "sensor_threshold_pascals": 200,
+                "sensor_threshold_pascals": 15,
             },
             1000: {
                 "max_z_distance": 20,
                 "mount_speed": 5,
                 "plunger_speed": 11,
-                "sensor_threshold_pascals": 150,
+                "sensor_threshold_pascals": 15,
             },
         },
         8: {
@@ -130,19 +131,19 @@ LIQUID_PROBE_SETTINGS: Dict[int, Dict[int, Dict[int, Dict[str, int]]]] = {
                 "max_z_distance": 20,
                 "mount_speed": 5,
                 "plunger_speed": 10,
-                "sensor_threshold_pascals": 200,
+                "sensor_threshold_pascals": 15,
             },
             200: {
                 "max_z_distance": 20,
                 "mount_speed": 5,
                 "plunger_speed": 10,
-                "sensor_threshold_pascals": 200,
+                "sensor_threshold_pascals": 15,
             },
             1000: {
                 "max_z_distance": 20,
                 "mount_speed": 5,
                 "plunger_speed": 11,
-                "sensor_threshold_pascals": 150,
+                "sensor_threshold_pascals": 15,
             },
         },
         96: {
@@ -150,19 +151,19 @@ LIQUID_PROBE_SETTINGS: Dict[int, Dict[int, Dict[int, Dict[str, int]]]] = {
                 "max_z_distance": 20,
                 "mount_speed": 5,
                 "plunger_speed": 10,
-                "sensor_threshold_pascals": 200,
+                "sensor_threshold_pascals": 15,
             },
             200: {
                 "max_z_distance": 20,
                 "mount_speed": 5,
                 "plunger_speed": 10,
-                "sensor_threshold_pascals": 200,
+                "sensor_threshold_pascals": 15,
             },
             1000: {
                 "max_z_distance": 20,
                 "mount_speed": 5,
                 "plunger_speed": 11,
-                "sensor_threshold_pascals": 150,
+                "sensor_threshold_pascals": 15,
             },
         },
     },

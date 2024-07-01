@@ -9,7 +9,7 @@ import {
   DIRECTION_COLUMN,
   DISPLAY_FLEX,
   Flex,
-  JUSTIFY_SPACE_AROUND,
+  JUSTIFY_FLEX_START,
   SIZE_4,
   SPACING,
   LegacyStyledText,
@@ -20,6 +20,7 @@ import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { HistoricalProtocolRun } from './HistoricalProtocolRun'
 import { useIsRobotViewable, useRunStatuses } from './hooks'
 import { useNotifyAllRunsQuery } from '../../resources/runs'
+import { useFeatureFlag } from '../../redux/config'
 
 interface RecentProtocolRunsProps {
   robotName: string
@@ -36,6 +37,7 @@ export function RecentProtocolRuns({
   const currentRunId = useCurrentRunId()
   const { isRunTerminal } = useRunStatuses()
   const robotIsBusy = currentRunId != null ? !isRunTerminal : false
+  const enableCsvFile = useFeatureFlag('enableCsvFile')
 
   return (
     <Flex
@@ -68,42 +70,46 @@ export function RecentProtocolRuns({
         {isRobotViewable && runs && runs.length > 0 && (
           <>
             <Flex
-              justifyContent={JUSTIFY_SPACE_AROUND}
+              justifyContent={JUSTIFY_FLEX_START}
               padding={SPACING.spacing8}
-              width="100%"
+              width="88%"
+              marginRight="12%"
+              gridGap={SPACING.spacing20}
+              color={COLORS.grey60}
             >
               <LegacyStyledText
-                marginLeft={SPACING.spacing24}
+                as="p"
                 width="25%"
-                as="label"
-                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 data-testid="RecentProtocolRuns_RunTitle"
               >
                 {t('run')}
               </LegacyStyledText>
-
               <LegacyStyledText
-                as="label"
-                width="35%"
-                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                as="p"
+                width="27%"
                 data-testid="RecentProtocolRuns_ProtocolTitle"
               >
                 {t('protocol')}
               </LegacyStyledText>
-
+              {enableCsvFile ? (
+                <LegacyStyledText
+                  as="p"
+                  width="5%"
+                  data-testid="RecentProtocolRuns_FilesTitle"
+                >
+                  {t('files')}
+                </LegacyStyledText>
+              ) : null}
               <LegacyStyledText
-                as="label"
-                width="20%"
-                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                as="p"
+                width="14%"
                 data-testid="RecentProtocolRuns_StatusTitle"
               >
                 {t('status')}
               </LegacyStyledText>
               <LegacyStyledText
-                as="label"
-                width="20%"
-                marginRight="20px"
-                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                as="p"
+                width="14%"
                 data-testid="RecentProtocolRuns_DurationTitle"
               >
                 {t('run_duration')}

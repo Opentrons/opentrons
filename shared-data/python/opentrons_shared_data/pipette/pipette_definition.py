@@ -6,6 +6,10 @@ from dataclasses import dataclass
 
 from . import types as pip_types, dev_types
 
+# The highest and lowest existing overlap version values.
+TIP_OVERLAP_VERSION_MINIMUM = 0
+TIP_OVERLAP_VERSION_MAXIMUM = 1
+
 PLUNGER_CURRENT_MINIMUM = 0.1
 PLUNGER_CURRENT_MAXIMUM = 1.5
 
@@ -354,7 +358,6 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
         description="The distance the high throughput tip motors will travel to check tip status.",
         alias="tipPresenceCheckDistanceMM",
     )
-
     end_tip_action_retract_distance_mm: float = Field(
         default=0.0,
         description="The distance to move the head up after a tip drop or pickup.",
@@ -436,6 +439,7 @@ class PipetteGeometryDefinition(BaseModel):
     )
     ordered_columns: List[PipetteColumnDefinition] = Field(..., alias="orderedColumns")
     ordered_rows: List[PipetteRowDefinition] = Field(..., alias="orderedRows")
+    lld_settings: Dict[str, Dict[str, float]] = Field(..., alias="lldSettings")
 
     @validator("nozzle_map", pre=True)
     def check_nonempty_strings(
@@ -454,11 +458,6 @@ class PipetteLiquidPropertiesDefinition(BaseModel):
 
     supported_tips: Dict[pip_types.PipetteTipType, SupportedTipsDefinition] = Field(
         ..., alias="supportedTips"
-    )
-    tip_overlap_dictionary: Dict[str, float] = Field(
-        ...,
-        description="The default tip overlap associated with this tip type.",
-        alias="defaultTipOverlapDictionary",
     )
     max_volume: int = Field(
         ...,

@@ -138,7 +138,7 @@ export function RunPausedSplash(
             buttonText={t('launch_recovery_mode')}
             css={SHARED_BUTTON_STYLE_ODD}
             iconName={'recovery'}
-            buttonType="onColor"
+            buttonType="alertStroke"
           />
         </Flex>
       </Flex>

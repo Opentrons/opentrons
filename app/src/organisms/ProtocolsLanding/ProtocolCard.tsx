@@ -194,6 +194,13 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                 borderRadius={SPACING.spacing8}
               />
             ),
+            parameterRequired: (
+              <Box
+                size="6rem"
+                backgroundColor={COLORS.grey30}
+                borderRadius={SPACING.spacing8}
+              />
+            ),
             stale: (
               <Box
                 size="6rem"
@@ -217,7 +224,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
       >
         {/* error and protocol name section */}
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-          {mostRecentAnalysis?.result === 'parameter-value-required' ? (
+          {analysisStatus === 'parameterRequired' ? (
             <ProtocolStatusBanner />
           ) : null}
           {analysisStatus === 'error' ? (
@@ -279,6 +286,9 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                       <LegacyStyledText as="p">{t('no_data')}</LegacyStyledText>
                     ),
                     error: (
+                      <LegacyStyledText as="p">{t('no_data')}</LegacyStyledText>
+                    ),
+                    parameterRequired: (
                       <LegacyStyledText as="p">{t('no_data')}</LegacyStyledText>
                     ),
                     stale: (

@@ -24,8 +24,10 @@ import { ChildNavigation } from '../ChildNavigation'
 import { ResetValuesModal } from './ResetValuesModal'
 import { ChooseEnum } from './ChooseEnum'
 import { ChooseNumber } from './ChooseNumber'
+import { useFeatureFlag } from '../../redux/config'
 
 import type {
+  CompletedProtocolAnalysis,
   ChoiceParameter,
   NumberParameter,
   RunTimeParameter,
@@ -37,14 +39,17 @@ interface ProtocolSetupParametersProps {
   protocolId: string
   runTimeParameters: RunTimeParameter[]
   labwareOffsets?: LabwareOffsetCreateData[]
+  mostRecentAnalysis?: CompletedProtocolAnalysis | null
 }
 
 export function ProtocolSetupParameters({
   protocolId,
   labwareOffsets,
   runTimeParameters,
+  mostRecentAnalysis,
 }: ProtocolSetupParametersProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
+  const enableCsvFile = useFeatureFlag('enableCsvFile')
   const history = useHistory()
   const host = useHost()
   const queryClient = useQueryClient()
@@ -157,6 +162,10 @@ export function ProtocolSetupParameters({
         }}
         onClickButton={handleConfirmValues}
         buttonText={t('confirm_values')}
+        buttonIsDisabled={
+          enableCsvFile &&
+          mostRecentAnalysis?.result === 'parameter-value-required'
+        }
         iconName={isLoading || startSetup ? 'ot-spinner' : undefined}
         iconPlacement="startIcon"
         secondaryButtonProps={{
@@ -178,21 +187,44 @@ export function ProtocolSetupParameters({
       >
         {sortRuntimeParameters(runTimeParametersOverrides).map(
           (parameter, index) => {
+            const detailLabelForCsv =
+              mostRecentAnalysis?.result === 'parameter-value-required'
+                ? t('required')
+                : parameter.displayName
+
+            let setupStatus: 'ready' | 'not ready' | 'general' | 'inform' =
+              'inform'
+            if (
+              enableCsvFile &&
+              parameter.type === 'csv_file' &&
+              mostRecentAnalysis?.result === 'parameter-value-required'
+            ) {
+              setupStatus = 'not ready'
+            }
+            if (
+              enableCsvFile &&
+              parameter.type === 'csv_file' &&
+              mostRecentAnalysis?.result === 'ok'
+            ) {
+              setupStatus = 'ready'
+            }
             return (
               <React.Fragment key={`${parameter.displayName}_${index}`}>
                 <ProtocolSetupStep
                   hasRightIcon={!(parameter.type === 'bool')}
                   hasLeftIcon={false}
-                  status={
-                    parameter.type === 'csv_file' ? 'not ready' : 'inform'
+                  status={setupStatus}
+                  title={
+                    parameter.type === 'csv_file'
+                      ? t('csv_file')
+                      : parameter.displayName
                   }
-                  title={parameter.displayName}
                   onClickSetupStep={() => {
                     handleSetParameter(parameter)
                   }}
                   detail={
-                    parameter.type === 'csv_file'
-                      ? t('required')
+                    enableCsvFile && parameter.type === 'csv_file'
+                      ? detailLabelForCsv
                       : formatRunTimeParameterValue(parameter, t)
                   }
                   description={

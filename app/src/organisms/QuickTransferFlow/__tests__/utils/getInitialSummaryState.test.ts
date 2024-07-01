@@ -8,6 +8,7 @@ describe('getInitialSummaryState', () => {
   const props = {
     state: {
       pipette: {
+        channels: 1,
         liquids: {
           default: {
             supportedTips: {
