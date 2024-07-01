@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import {
   Flex,
@@ -12,7 +13,6 @@ import { getTopPortalEl } from '../../../App/portal'
 import { ChildNavigation } from '../../ChildNavigation'
 import { InputField } from '../../../atoms/InputField'
 import { NumericalKeyboard } from '../../../atoms/SoftwareKeyboard'
-import { getFlowRateRange } from '../utils'
 
 import type {
   QuickTransferSummaryState,
@@ -21,7 +21,10 @@ import type {
 } from '../types'
 
 import { ACTIONS } from '../constants'
-import { createPortal } from 'react-dom'
+import {
+  type SupportedTip,
+  getTipTypeFromTipRackDefinition,
+} from '@opentrons/shared-data'
 
 interface FlowRateEntryProps {
   onBack: () => void
@@ -42,7 +45,19 @@ export function FlowRateEntry(props: FlowRateEntryProps): JSX.Element {
       ? state.dispenseFlowRate
       : null
   )
-  const flowRateRange = getFlowRateRange(state, kind)
+
+  // use lowVolume for volumes lower than 5ml
+  const tipType = getTipTypeFromTipRackDefinition(state.tipRack)
+  const flowRatesForSupportedTip: SupportedTip | undefined =
+    state.volume < 5
+      ? state.pipette.liquids.lowVolumeDefaults.supportedTips[tipType]
+      : state.pipette.liquids.default.supportedTips[tipType]
+  const minFlowRate = 0.1
+  const maxFlowRate =
+    flowRatesForSupportedTip?.uiMaxFlowRate !== undefined
+      ? flowRatesForSupportedTip?.uiMaxFlowRate
+      : Infinity
+
   let headerCopy: string = ''
   let textEntryCopy: string = ''
   let flowRateAction:
@@ -71,11 +86,10 @@ export function FlowRateEntry(props: FlowRateEntryProps): JSX.Element {
   }
 
   const error =
-    flowRate !== null &&
-    (flowRate < flowRateRange.min || flowRate > flowRateRange.max)
+    flowRate !== null && (flowRate < minFlowRate || flowRate > maxFlowRate)
       ? t(`value_out_of_range`, {
-          min: flowRateRange.min,
-          max: flowRateRange.max,
+          min: minFlowRate,
+          max: maxFlowRate,
         })
       : null
 
@@ -89,7 +103,6 @@ export function FlowRateEntry(props: FlowRateEntryProps): JSX.Element {
         top={SPACING.spacing8}
         buttonIsDisabled={error != null || flowRate === null}
       />
-      test
       <Flex
         alignSelf={ALIGN_CENTER}
         gridGap={SPACING.spacing48}
