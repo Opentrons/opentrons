@@ -2075,3 +2075,15 @@ class InstrumentContext(publisher.CommandPublisher):
             self._core.find_liquid_level(well._core)
         except Exception as e:
             raise e
+
+    @requires_version(2, 20)
+    def get_liquid_height(self, well: labware.Well) -> float:
+        """Check the height of the liquid within a well.
+
+        :returns: A float representing the height of the liquid.
+        """
+        try:
+            height = self._core.find_liquid_level(well._core)
+            return float(height)
+        except Exception:
+            return 0
