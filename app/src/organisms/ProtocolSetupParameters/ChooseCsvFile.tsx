@@ -43,6 +43,7 @@ export function ChooseCsvFile({
 }: ChooseCsvFileProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   const csvFilesOnUSB = useSelector(getShellUpdateDataFiles) ?? []
+  console.log('csvFilesOnUSB', csvFilesOnUSB)
 
   const csvFilesOnRobot = useAllCsvFilesQuery(protocolId).data?.data.files ?? []
 

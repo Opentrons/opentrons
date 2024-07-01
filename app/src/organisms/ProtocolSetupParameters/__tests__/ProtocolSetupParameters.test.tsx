@@ -18,10 +18,7 @@ import { ProtocolSetupParameters } from '..'
 
 import type * as ReactRouterDom from 'react-router-dom'
 import type { HostConfig } from '@opentrons/api-client'
-import type {
-  CompletedProtocolAnalysis,
-  RunTimeParameter,
-} from '@opentrons/shared-data'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 const mockGoBack = vi.fn()
 
