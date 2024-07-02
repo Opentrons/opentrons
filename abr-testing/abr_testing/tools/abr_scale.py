@@ -42,13 +42,7 @@ def get_protocol_step_as_int(storage_directory, robot) -> Tuple[int, float, str]
         exp_volume = robot_info["volume"]
         #sets return variables equal to those grabbed from the sheet
         ip = IP_add
-        while True:
-            try:
-                expected_liquid_moved = float(exp_volume)
-                if expected_liquid_moved >= 0 or expected_liquid_moved <= 0:
-                    break
-            except ValueError:
-                print("Expected liquid moved volume should be an float.")
+        expected_liquid_moved = float(exp_volume)
 
     return protocol_step, expected_liquid_moved, ip
 
