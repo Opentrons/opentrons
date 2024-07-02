@@ -39,7 +39,7 @@ class RobotContextTracker(SupportsTracking):
             )
         )
         self._should_track = should_track
-        
+
         if self._should_track:
             self._store.setup()
 

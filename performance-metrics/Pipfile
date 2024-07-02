@@ -7,6 +7,7 @@ name        = "pypi"
 opentrons-shared-data = {file = "../shared-data/python", editable = true}
 performance-metrics = {file = ".", editable = true}
 psutil = "6.0.0"
+systemd-python = "*"
 
 [dev-packages]
 pytest  = "==7.4.4"
