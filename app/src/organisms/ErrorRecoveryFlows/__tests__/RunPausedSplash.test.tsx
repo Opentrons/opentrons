@@ -84,7 +84,8 @@ describe('RunPausedSplash', () => {
       ...props,
       failedCommand: {
         ...props.failedCommand,
-        error: { errorType: 'overpressure' },
+        commandType: 'aspirate',
+        error: { isDefined: true, errorType: 'overpressure' },
       } as any,
     }
     render(props)

@@ -58,7 +58,7 @@ export function ErrorDetailsModalODD(
   props: ErrorDetailsModalProps
 ): JSX.Element {
   const { failedCommand, toggleModal, isOnDevice } = props
-  const errorKind = getErrorKind(failedCommand?.error?.errorType)
+  const errorKind = getErrorKind(failedCommand)
   const errorName = useErrorName(errorKind)
 
   const getIsOverpressureErrorKind = (): boolean => {

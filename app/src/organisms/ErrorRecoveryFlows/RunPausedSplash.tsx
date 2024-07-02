@@ -46,7 +46,7 @@ export function RunPausedSplash(
 ): JSX.Element | null {
   const { toggleERWiz, routeUpdateActions, failedCommand } = props
   const { t } = useTranslation('error_recovery')
-  const errorKind = getErrorKind(failedCommand?.error?.errorType)
+  const errorKind = getErrorKind(failedCommand)
   const title = useErrorName(errorKind)
 
   const { proceedToRouteAndStep } = routeUpdateActions
