@@ -1,5 +1,9 @@
 import flatMap from 'lodash/flatMap'
-import { LOW_VOLUME_PIPETTES, COLUMN } from '@opentrons/shared-data'
+import {
+  LOW_VOLUME_PIPETTES,
+  COLUMN,
+  GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
+} from '@opentrons/shared-data'
 import {
   repeatArray,
   blowoutUtil,
@@ -176,7 +180,10 @@ export const mix: CommandCreator<MixArgs> = (
     invariantContext.additionalEquipmentEntities
   )
 
-  if (hasWasteChute && initialLabwareSlot === 'gripperWasteChute') {
+  if (
+    hasWasteChute &&
+    initialLabwareSlot === GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA
+  ) {
     return { errors: [errorCreators.labwareDiscarded()] }
   }
 

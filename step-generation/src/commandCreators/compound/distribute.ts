@@ -5,6 +5,7 @@ import {
   COLUMN,
   getWellDepth,
   LOW_VOLUME_PIPETTES,
+  GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
 } from '@opentrons/shared-data'
 import { AIR_GAP_OFFSET_FROM_TOP } from '../../constants'
 import * as errorCreators from '../../errorCreators'
@@ -110,8 +111,8 @@ export const distribute: CommandCreator<DistributeArgs> = (
 
   if (
     hasWasteChute &&
-    (initialDestLabwareSlot === 'gripperWasteChute' ||
-      initialSourceLabwareSlot === 'gripperWasteChute')
+    (initialDestLabwareSlot === GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA ||
+      initialSourceLabwareSlot === GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA)
   ) {
     errors.push(errorCreators.labwareDiscarded())
   }
