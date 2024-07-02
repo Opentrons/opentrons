@@ -84,7 +84,6 @@ describe('useRecoveryCommands', () => {
         failedCommand: mockFailedCommand,
         failedLabwareUtils: mockFailedLabwareUtils,
         routeUpdateActions: mockRouteUpdateActions,
-
       })
     )
 

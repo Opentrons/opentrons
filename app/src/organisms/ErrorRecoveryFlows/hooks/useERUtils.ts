@@ -136,6 +136,6 @@ export function useERUtils({
     recoveryMapUtils,
     getRecoveryOptionCopy,
     stepCounts,
-    commandAfterFailedCommand
+    commandAfterFailedCommand,
   }
 }
