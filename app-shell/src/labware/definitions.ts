@@ -97,10 +97,10 @@ export function addLabwareFile(file: string, dir: string): Promise<void> {
 export function addLabwareFileFromCreator(
   fileContent: string,
   dir: string,
-  filename: string
+  fileName: string
 ): Promise<void> {
-  const extname = path.extname(filename)
-  const basename = path.basename(filename, extname)
+  const extname = path.extname(fileName)
+  const basename = path.basename(fileName, extname)
 
   return getFileName(dir, basename, extname).then(destName => {
     const data = JSON.parse(fileContent)
