@@ -1,34 +1,33 @@
 """IP Grabber Test"""
 from typing import Set, Dict, Any
-import argparse
 import os
 import json
-import requests
 import sys
 
-storage_directory = "C:\Users\NicholasShiland\ABR_Liquid_Measurement_Data"
+storage_directory = r"C:\Users\NicholasShiland\ABR_Liquid_Measurement_Data"
 
 
-def get_ips(storage_directory: str) -> None:
-    """GET ALL ROBOT IP's AND VOLUMES
+"""GET ALL ROBOT IP's AND VOLUMES
 
-    DO some things idk
-    """
-    robot = input("Robot: ")
-    #setup IP sheet
-    ip_json_file = os.path.join(storage_directory, "IP_N_Volumes.json")
-    #try to create an array copying the contents of IP_N_Volumes
-    try:
-        ip_file = json.load(open(ip_json_file))
-    except FileNotFoundError:
-        print(f"Add .json file with robot IPs to: {storage_directory}.")
-        sys.exit()
-    robot_info = ip_file[robot]
-    
-    
-    for ip in robot_info:
-        print("haha")
-        #do smth to grab ip ad
+DO some things idk
+"""
+robot = "PVT1ABR8"
+#setup IP sheet
+ip_json_file = os.path.join(storage_directory, "IP_N_VOLUMES.json")
+#try to create an array copying the contents of IP_N_Volumes
+try:
+    ip_file = json.load(open(ip_json_file))
+except FileNotFoundError:
+    print(f"Add .json file with robot IPs to: {storage_directory}.")
+    sys.exit()
+robot_info = ip_file[robot]
+IP_add = robot_info["IP"]
+exp_volume = robot_info["volume"]
+
+print(IP_add)
+print(exp_volume)
+
+    #do smth to grab ip ad
 
 
 """notes
@@ -36,16 +35,40 @@ OKAY, so basically I need to make a JSON source file with the robot name, IP's, 
 
 need to find out how to read from a json file properly
 
-{'DVT1ABR1': 'IP address' : 'volume displaced'}
-{'DVT1ABR2': 'IP address' : ''}
-{'DVT1ABR3': 'IP address' : ''}
-{'DVT1ABR4': 'IP address' : 'volume displaced'}
-{'DVT2ABR5': 'IP address' : ''}
-{'DVT2ABR6': 'IP address' : ''}
-{'PVT1ABR7': 'IP address' : 'volume displaced'}
-{'PVT1ABR8': 'IP address' : 'volume displaced'}
-{'PVT1ABR9': 'IP address' : 'volume displaced'}
-{'PVT1ABR10': 'IP address' : 'volume displaced'}
-{'PVT1ABR11': 'IP address' : 'volume displaced'}
-{'PVT1ABR12': 'IP address' : ''}
+{"DVT1ABR1" : {
+	"IP": "ABR1's IP",
+	"volume": "some volume"
+	}
+}
+
+{"DVT1ABR4" : {
+	"IP": "ABR4's IP",
+	"volume": "some volume"
+	}
+}
+
+{"PVT1ABR8" : {
+	"IP": "ABR8's IP",
+	"volume": "-495.6"
+	}
+}
+
+{"PVT1ABR9" : {
+	"IP": "ABR9's IP",
+	"volume": "-47520"
+	}
+}
+
+{"PVT1ABR10" : {
+	"IP": "ABR10's IP",
+	"volume": "-14400"
+	}
+}
+
+{"PVT1ABR11" : {
+	"IP": "ABR11's IP",
+	"volume": "-19200"
+	}
+}
+
 """
