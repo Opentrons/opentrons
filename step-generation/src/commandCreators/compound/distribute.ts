@@ -5,6 +5,7 @@ import {
   COLUMN,
   getWellDepth,
   LOW_VOLUME_PIPETTES,
+  GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
 } from '@opentrons/shared-data'
 import { AIR_GAP_OFFSET_FROM_TOP } from '../../constants'
 import * as errorCreators from '../../errorCreators'
@@ -18,6 +19,7 @@ import {
   getDispenseAirGapLocation,
   getIsSafePipetteMovement,
   getWasteChuteAddressableAreaNamePip,
+  getHasWasteChute,
 } from '../../utils'
 import {
   aspirate,
@@ -98,6 +100,21 @@ export const distribute: CommandCreator<DistributeArgs> = (
         labware: args.sourceLabware,
       })
     )
+  }
+
+  const initialDestLabwareSlot = prevRobotState.labware[args.destLabware]?.slot
+  const initialSourceLabwareSlot =
+    prevRobotState.labware[args.sourceLabware]?.slot
+  const hasWasteChute = getHasWasteChute(
+    invariantContext.additionalEquipmentEntities
+  )
+
+  if (
+    hasWasteChute &&
+    (initialDestLabwareSlot === GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA ||
+      initialSourceLabwareSlot === GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA)
+  ) {
+    errors.push(errorCreators.labwareDiscarded())
   }
 
   if (

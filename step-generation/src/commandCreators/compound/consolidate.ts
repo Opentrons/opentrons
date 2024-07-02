@@ -4,6 +4,7 @@ import {
   COLUMN,
   getWellDepth,
   LOW_VOLUME_PIPETTES,
+  GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
 } from '@opentrons/shared-data'
 import { AIR_GAP_OFFSET_FROM_TOP } from '../../constants'
 import * as errorCreators from '../../errorCreators'
@@ -20,6 +21,7 @@ import {
   moveHelper,
   getIsSafePipetteMovement,
   getWasteChuteAddressableAreaNamePip,
+  getHasWasteChute,
 } from '../../utils'
 import {
   aspirate,
@@ -78,6 +80,8 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     aspirateYOffset,
     dispenseXOffset,
     dispenseYOffset,
+    destLabware,
+    sourceLabware,
   } = args
 
   const actionName = 'consolidate'
@@ -103,6 +107,20 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
       !invariantContext.additionalEquipmentEntities[args.destLabware])
   ) {
     return { errors: [errorCreators.equipmentDoesNotExist()] }
+  }
+
+  const initialDestLabwareSlot = prevRobotState.labware[destLabware]?.slot
+  const initialSourceLabwareSlot = prevRobotState.labware[sourceLabware]?.slot
+  const hasWasteChute = getHasWasteChute(
+    invariantContext.additionalEquipmentEntities
+  )
+
+  if (
+    hasWasteChute &&
+    (initialDestLabwareSlot === GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA ||
+      initialSourceLabwareSlot === GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA)
+  ) {
+    return { errors: [errorCreators.labwareDiscarded()] }
   }
 
   if (

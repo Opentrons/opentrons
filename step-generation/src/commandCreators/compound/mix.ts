@@ -1,11 +1,16 @@
 import flatMap from 'lodash/flatMap'
-import { LOW_VOLUME_PIPETTES, COLUMN } from '@opentrons/shared-data'
+import {
+  LOW_VOLUME_PIPETTES,
+  COLUMN,
+  GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
+} from '@opentrons/shared-data'
 import {
   repeatArray,
   blowoutUtil,
   curryCommandCreator,
   reduceCommandCreators,
   getIsSafePipetteMovement,
+  getHasWasteChute,
 } from '../../utils'
 import * as errorCreators from '../../errorCreators'
 import {
@@ -168,6 +173,18 @@ export const mix: CommandCreator<MixArgs> = (
         }),
       ],
     }
+  }
+
+  const initialLabwareSlot = prevRobotState.labware[labware]?.slot
+  const hasWasteChute = getHasWasteChute(
+    invariantContext.additionalEquipmentEntities
+  )
+
+  if (
+    hasWasteChute &&
+    initialLabwareSlot === GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA
+  ) {
+    return { errors: [errorCreators.labwareDiscarded()] }
   }
 
   if (
