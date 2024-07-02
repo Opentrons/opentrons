@@ -35,10 +35,7 @@ const HEADER_CONTAINER_STYLE = css`
   justify-content: ${JUSTIFY_SPACE_BETWEEN};
   padding: ${SPACING.spacing16} ${SPACING.spacing32};
 `
-const HEADER_TEXT_STYLE = css`
-  ${TYPOGRAPHY.pSemiBold}
-`
-const STEP_TEXT_STYLE = css`
+const TEXT_STYLE = css`
   ${TYPOGRAPHY.pSemiBold}
 `
 
@@ -48,12 +45,12 @@ export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
     <Box backgroundColor={COLORS.white}>
       <Flex css={HEADER_CONTAINER_STYLE}>
         <Flex flexDirection={DIRECTION_ROW}>
-          <Text css={HEADER_TEXT_STYLE} marginRight={SPACING.spacing8}>
+          <Text css={TEXT_STYLE} marginRight={SPACING.spacing8}>
             {title}
           </Text>
 
           {currentStep != null && totalSteps != null && currentStep > 0 ? (
-            <Text css={STEP_TEXT_STYLE} color={COLORS.grey50}>
+            <Text css={TEXT_STYLE} color={COLORS.grey50}>
               {`Steps: ${currentStep}/${totalSteps}`}
             </Text>
           ) : null}

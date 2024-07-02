@@ -51,7 +51,9 @@ function UploadInput(props: UploadInputProps): JSX.Element {
   return (
     <div className={styles.upload} onDragOver={stopEvent} onDrop={stopEvent}>
       <Label {...labelProps}>
-        {!isButton && <Icon name="upload" className={styles.file_drop_icon} />}
+        {!isButton ? (
+          <Icon name="upload" className={styles.file_drop_icon} />
+        ) : null}
         <span className={styles.label_text}>{labelText}</span>
         <input
           className={styles.file_input}
