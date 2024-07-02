@@ -29,17 +29,18 @@ def get_protocol_step_as_int(storage_directory, robot) -> Tuple[int, float, str]
     if int(protocol_step) == 3:
         #setup IP sheet
         ip_json_file = os.path.join(storage_directory, "IP_N_VOLUMES.json")
-        #try to create an array copying the contents of IP_N_Volumes
+        #create an dict copying the contents of IP_N_Volumes
         try:
             ip_file = json.load(open(ip_json_file))
         except FileNotFoundError:
             print(f"Please add json file with robot IPs and expected volumes to: {storage_directory}.")
             sys.exit()
+        #grab IP and volume from the dict
         tot_info = ip_file["information"]
         robot_info = tot_info[robot]
         IP_add = robot_info["IP"]
         exp_volume = robot_info["volume"]
-        
+        #sets return variables equal to those grabbed from the sheet
         ip = IP_add
         while True:
             try:
