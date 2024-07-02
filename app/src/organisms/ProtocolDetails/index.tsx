@@ -34,7 +34,6 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
-  Tabs,
 } from '@opentrons/components'
 import {
   parseInitialPipetteNamesByMount,
