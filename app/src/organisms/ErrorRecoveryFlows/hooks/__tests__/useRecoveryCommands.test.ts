@@ -33,16 +33,13 @@ const mockRouteUpdateActions = {
 } as any
 
 describe('useRecoveryCommands', () => {
-  const mockMakeSuccessToast = vi.fn()
-  const mockResumeRunFromRecovery = vi.fn(() =>
-    Promise.resolve(mockMakeSuccessToast())
-  )
+  const mockResumeRunFromRecovery = vi.fn()
   const mockStopRun = vi.fn()
   const mockChainRunCommands = vi.fn().mockResolvedValue([])
 
   beforeEach(() => {
     vi.mocked(useResumeRunFromRecoveryMutation).mockReturnValue({
-      mutateAsync: mockResumeRunFromRecovery,
+      resumeRunFromRecovery: mockResumeRunFromRecovery,
     } as any)
     vi.mocked(useStopRunMutation).mockReturnValue({
       stopRun: mockStopRun,
@@ -123,7 +120,7 @@ describe('useRecoveryCommands', () => {
     )
   })
 
-  it('should call resumeRun with runId and show success toast on success', async () => {
+  it('should call resumeRun with runId', () => {
     const { result } = renderHook(() =>
       useRecoveryCommands({
         runId: mockRunId,
@@ -133,12 +130,9 @@ describe('useRecoveryCommands', () => {
       })
     )
 
-    await act(async () => {
-      await result.current.resumeRun()
-    })
+    result.current.resumeRun()
 
     expect(mockResumeRunFromRecovery).toHaveBeenCalledWith(mockRunId)
-    expect(mockMakeSuccessToast).toHaveBeenCalled()
   })
 
   it('should call cancelRun with runId', () => {
