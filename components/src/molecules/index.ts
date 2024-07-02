@@ -1,4 +1,4 @@
 export * from './LocationIcon'
-export * from './RoundTab'
+export * from './Tabs'
 export * from './ParametersTable'
 export * from './ParametersTable/InfoScreen'
