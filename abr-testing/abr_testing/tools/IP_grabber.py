@@ -11,7 +11,7 @@ storage_directory = r"C:\Users\NicholasShiland\ABR_Liquid_Measurement_Data"
 
 DO some things idk
 """
-robot = "PVT1ABR8"
+robot = "PVT1ABR7"
 #setup IP sheet
 ip_json_file = os.path.join(storage_directory, "IP_N_VOLUMES.json")
 #try to create an array copying the contents of IP_N_Volumes
@@ -20,7 +20,8 @@ try:
 except FileNotFoundError:
     print(f"Add .json file with robot IPs to: {storage_directory}.")
     sys.exit()
-robot_info = ip_file[robot]
+tot_info = ip_file["STUFF"]
+robot_info = tot_info[robot]
 IP_add = robot_info["IP"]
 exp_volume = robot_info["volume"]
 
