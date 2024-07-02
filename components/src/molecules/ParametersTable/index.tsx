@@ -16,7 +16,7 @@ import { StyledText } from '../../atoms/StyledText'
 import { Tooltip, useHoverTooltip } from '../../tooltips'
 import { Icon } from '../../icons'
 import { Flex } from '../../primitives'
-import { DISPLAY_INLINE, FLEX_MAX_CONTENT, SIZE_1 } from '../../styles'
+import { DISPLAY_INLINE, FLEX_MAX_CONTENT } from '../../styles'
 
 import type { RunTimeParameter } from '@opentrons/shared-data'
 
@@ -140,7 +140,7 @@ const ParameterName = (props: ParameterNameProps): JSX.Element => {
           <Flex display={DISPLAY_INLINE} {...targetProps}>
             <Icon
               name="information"
-              size={SIZE_1}
+              size="1rem"
               color={COLORS.grey60}
               data-testid={`Icon_${index}`}
               paddingTop={SPACING.spacing4}
