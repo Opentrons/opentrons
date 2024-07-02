@@ -92,6 +92,7 @@ def _stop_indicator_thread() -> None:
 def _zero_indicator_and_plunger() -> None:
     global ZERO_ON_NEXT_WRITE
     ZERO_ON_NEXT_WRITE = True
+    time.sleep(1)
 
 
 @asynccontextmanager
