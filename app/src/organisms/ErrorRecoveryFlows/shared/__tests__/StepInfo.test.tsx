@@ -22,7 +22,7 @@ describe('StepInfo', () => {
   beforeEach(() => {
     props = {
       ...mockRecoveryContentProps,
-      as: 'h4',
+      textStyle: 'h4',
       stepCounts: {
         currentStepNumber: 5,
         totalStepCount: 10,

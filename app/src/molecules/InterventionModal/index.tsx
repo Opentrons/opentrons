@@ -71,7 +71,7 @@ const MODAL_ODD_STYLE = {
   height: '35.5rem',
 } as const
 
-const HEADER_STYLE = {
+const BASE_HEADER_STYLE = {
   alignItems: ALIGN_CENTER,
   padding: `${SPACING.spacing20} ${SPACING.spacing32}`,
   color: COLORS.white,
@@ -79,6 +79,11 @@ const HEADER_STYLE = {
   top: 0,
   'data-testid': '__otInterventionModalHeader',
 } as const
+
+const DESKTOP_HEADER_STYLE = {
+  ...BASE_HEADER_STYLE,
+  height: '3.25rem',
+}
 
 const WRAPPER_STYLE = {
   position: POSITION_ABSOLUTE,
@@ -129,6 +134,7 @@ export function InterventionModal({
 
   const isOnDevice = useSelector(getIsOnDevice)
   const modalStyle = isOnDevice ? MODAL_ODD_STYLE : MODAL_DESKTOP_STYLE
+  const headerStyle = isOnDevice ? BASE_HEADER_STYLE : DESKTOP_HEADER_STYLE
 
   return (
     <Flex {...WRAPPER_STYLE}>
@@ -141,7 +147,7 @@ export function InterventionModal({
           }}
         >
           <Flex
-            {...HEADER_STYLE}
+            {...headerStyle}
             backgroundColor={headerColor}
             justifyContent={headerJustifyContent}
             onClick={iconHeadingOnClick}
