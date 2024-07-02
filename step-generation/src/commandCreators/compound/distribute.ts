@@ -18,6 +18,7 @@ import {
   getDispenseAirGapLocation,
   getIsSafePipetteMovement,
   getWasteChuteAddressableAreaNamePip,
+  getHasWasteChute,
 } from '../../utils'
 import {
   aspirate,
@@ -98,6 +99,21 @@ export const distribute: CommandCreator<DistributeArgs> = (
         labware: args.sourceLabware,
       })
     )
+  }
+
+  const initialDestLabwareSlot = prevRobotState.labware[args.destLabware]?.slot
+  const initialSourceLabwareSlot =
+    prevRobotState.labware[args.sourceLabware]?.slot
+  const hasWasteChute = getHasWasteChute(
+    invariantContext.additionalEquipmentEntities
+  )
+
+  if (
+    hasWasteChute &&
+    (initialDestLabwareSlot === 'gripperWasteChute' ||
+      initialSourceLabwareSlot === 'gripperWasteChute')
+  ) {
+    errors.push(errorCreators.labwareDiscarded())
   }
 
   if (

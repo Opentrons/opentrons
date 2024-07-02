@@ -20,6 +20,7 @@ import {
   moveHelper,
   getIsSafePipetteMovement,
   getWasteChuteAddressableAreaNamePip,
+  getHasWasteChute,
 } from '../../utils'
 import {
   aspirate,
@@ -79,6 +80,8 @@ export const transfer: CommandCreator<TransferArgs> = (
     tipRack,
     aspirateXOffset,
     aspirateYOffset,
+    destLabware,
+    sourceLabware,
     dispenseXOffset,
     dispenseYOffset,
   } = args
@@ -130,6 +133,20 @@ export const transfer: CommandCreator<TransferArgs> = (
         labware: args.sourceLabware,
       })
     )
+  }
+
+  const initialDestLabwareSlot = prevRobotState.labware[destLabware]?.slot
+  const initialSourceLabwareSlot = prevRobotState.labware[sourceLabware]?.slot
+  const hasWasteChute = getHasWasteChute(
+    invariantContext.additionalEquipmentEntities
+  )
+
+  if (
+    hasWasteChute &&
+    (initialDestLabwareSlot === 'gripperWasteChute' ||
+      initialSourceLabwareSlot === 'gripperWasteChute')
+  ) {
+    errors.push(errorCreators.labwareDiscarded())
   }
 
   if (

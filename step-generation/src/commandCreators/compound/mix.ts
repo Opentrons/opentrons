@@ -6,6 +6,7 @@ import {
   curryCommandCreator,
   reduceCommandCreators,
   getIsSafePipetteMovement,
+  getHasWasteChute,
 } from '../../utils'
 import * as errorCreators from '../../errorCreators'
 import {
@@ -168,6 +169,15 @@ export const mix: CommandCreator<MixArgs> = (
         }),
       ],
     }
+  }
+
+  const initialLabwareSlot = prevRobotState.labware[labware]?.slot
+  const hasWasteChute = getHasWasteChute(
+    invariantContext.additionalEquipmentEntities
+  )
+
+  if (hasWasteChute && initialLabwareSlot === 'gripperWasteChute') {
+    return { errors: [errorCreators.labwareDiscarded()] }
   }
 
   if (

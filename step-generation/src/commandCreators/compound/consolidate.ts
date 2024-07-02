@@ -20,6 +20,7 @@ import {
   moveHelper,
   getIsSafePipetteMovement,
   getWasteChuteAddressableAreaNamePip,
+  getHasWasteChute,
 } from '../../utils'
 import {
   aspirate,
@@ -78,6 +79,8 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     aspirateYOffset,
     dispenseXOffset,
     dispenseYOffset,
+    destLabware,
+    sourceLabware,
   } = args
 
   const actionName = 'consolidate'
@@ -103,6 +106,20 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
       !invariantContext.additionalEquipmentEntities[args.destLabware])
   ) {
     return { errors: [errorCreators.equipmentDoesNotExist()] }
+  }
+
+  const initialDestLabwareSlot = prevRobotState.labware[destLabware]?.slot
+  const initialSourceLabwareSlot = prevRobotState.labware[sourceLabware]?.slot
+  const hasWasteChute = getHasWasteChute(
+    invariantContext.additionalEquipmentEntities
+  )
+
+  if (
+    hasWasteChute &&
+    (initialDestLabwareSlot === 'gripperWasteChute' ||
+      initialSourceLabwareSlot === 'gripperWasteChute')
+  ) {
+    return { errors: [errorCreators.labwareDiscarded()] }
   }
 
   if (
