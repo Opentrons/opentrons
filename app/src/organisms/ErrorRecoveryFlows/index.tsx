@@ -115,7 +115,6 @@ export function ErrorRecoveryFlows(
     ...props,
     hasLaunchedRecovery,
     toggleERWizard,
-    isOnDevice,
   })
 
   // if (!enableRunNotes) {
