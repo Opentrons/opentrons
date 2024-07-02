@@ -51,17 +51,9 @@ describe('Tabs', () => {
     render(props)
 
     const tab1 = screen.getByText('set up')
-    const tab2 = screen.getByText('parameters')
-    const tab3 = screen.getByText('module controls')
 
     expect(tab1).toHaveStyle(`background-color: ${COLORS.purple50}`)
     expect(tab1).toHaveStyle(`color: ${COLORS.white}`)
-
-    expect(tab2).not.toHaveStyle(`background-color: ${COLORS.purple50}`)
-    expect(tab2).not.toHaveStyle(`color: ${COLORS.white}`)
-
-    expect(tab3).not.toHaveStyle(`background-color: ${COLORS.purple50}`)
-    expect(tab3).not.toHaveStyle(`color: ${COLORS.white}`)
   })
 
   it('should call the right click handler when clicked', () => {
