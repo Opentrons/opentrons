@@ -78,6 +78,7 @@ export function CreateProtocol(props: { goBack: () => void }): JSX.Element {
         {jsonAnalysis != null && code !== '' ? (
           <Box width="50%" padding={SPACING.spacing16}>
             <ProtocolTimelineScrubber
+              isCreateMode
               commands={jsonAnalysis.commands}
               analysis={jsonAnalysis}
               robotType={jsonAnalysis.robotType ?? 'OT-3 Standard'}

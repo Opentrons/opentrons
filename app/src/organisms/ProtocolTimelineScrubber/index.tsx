@@ -45,6 +45,7 @@ export const COMMAND_WIDTH_PX = 240
 interface ProtocolTimelineScrubberProps {
   commands: RunTimeCommand[]
   analysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput
+  isCreateMode?: boolean
   robotType?: RobotType
 }
 
@@ -65,7 +66,12 @@ export const VIEWBOX_HEIGHT = 230
 export function ProtocolTimelineScrubber(
   props: ProtocolTimelineScrubberProps
 ): JSX.Element {
-  const { commands, analysis, robotType = FLEX_ROBOT_TYPE } = props
+  const {
+    commands,
+    analysis,
+    robotType = FLEX_ROBOT_TYPE,
+    isCreateMode = false,
+  } = props
   const wrapperRef = React.useRef<HTMLDivElement>(null)
   const commandListRef = React.useRef<ViewportListRef>(null)
   const [currentCommandIndex, setCurrentCommandIndex] = React.useState<number>(
@@ -130,7 +136,7 @@ export function ProtocolTimelineScrubber(
       gridGap={SPACING.spacing8}
     >
       <Flex gridGap={SPACING.spacing8} flex="1 1 0">
-        <Flex height="60vh">
+        <Flex height="60vh" width={isCreateMode ? '55vh' : 'auto'}>
           <BaseDeck
             robotType={robotType}
             deckConfig={getSimplestDeckConfigForProtocol(analysis)}
