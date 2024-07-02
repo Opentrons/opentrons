@@ -30,7 +30,17 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
 describe('StackingOffsets', () => {
   beforeEach(() => {
     vi.mocked(getAllDefinitions).mockReturnValue({
-      adapter1: fixtureTiprackAdapter as SharedData.LabwareDefinition2,
+      adapter1: {
+        ...fixtureTiprackAdapter,
+        parameters: {
+          ...fixtureTiprackAdapter.parameters,
+          loadName: 'opentrons_flex_96_tiprack_adapter',
+        },
+        metadata: {
+          ...fixtureTiprackAdapter.metadata,
+          displayName: 'Opentrons Flex 96 Tip Rack Adapter',
+        },
+      } as SharedData.LabwareDefinition2,
       adapter2: fixture96Plate as SharedData.LabwareDefinition2,
     })
     vi.mocked(useFormikContext).mockReturnValue({
@@ -61,13 +71,50 @@ describe('StackingOffsets', () => {
   it('renders main text and no modules if is tiprack is true', () => {
     render(<StackingOffsets />)
     screen.getByText(
-      'Select which adapters or modules this labware will be placed on.'
+      'Stacking offset is only required for labware that can be placed on an adapter or module. Select the compatible adapters or modules below.'
     )
     screen.getByText(
-      'Stacking offset is required for labware to be placed on modules and adapters. Measure from the bottom of the adapter to the highest part of the labware using a pair of calipers.'
+      'Stack the labware onto the adapter or module and then make the required measurement with calipers.'
     )
     screen.getByText('Stacking Offset (Optional)')
   })
+
+  it('renders the adapters section if is tiprack is true', () => {
+    const mockFieldValue = vi.fn()
+    vi.mocked(useFormikContext).mockReturnValue({
+      values: {
+        labwareType: 'tipRack',
+        wellBottomShape: 'u',
+        wellShape: 'circular',
+        labwareXDimension: '10',
+        gridColumns: '12',
+        gridRows: '8',
+        compatibleAdapters: {},
+        compatibleModules: {},
+      },
+      touched: {
+        labwareType: true,
+        wellBottomShape: true,
+        wellShape: true,
+        labwareXDimension: true,
+        gridColumns: true,
+        gridRows: true,
+        compatibleAdapters: {},
+        compatibleModules: {},
+      },
+      errors: {},
+      setFieldValue: mockFieldValue,
+    } as any)
+    render(<StackingOffsets />)
+
+    screen.getByText('Adapters')
+    screen.getByText('Opentrons Flex 96 Tip Rack Adapter')
+    fireEvent.click(screen.getAllByRole('checkbox')[0])
+    expect(mockFieldValue).toHaveBeenCalledWith('compatibleAdapters', {
+      opentrons_flex_96_tiprack_adapter: 0,
+    })
+  })
+
   it('renders the modules section and clicking on one reveals the text field', () => {
     const mockFieldValue = vi.fn()
     vi.mocked(useFormikContext).mockReturnValue({

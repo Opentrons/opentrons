@@ -22,6 +22,7 @@ import { TabbedButton } from '../../atoms/buttons'
 import { ChildNavigation } from '../ChildNavigation'
 import { Overview } from './Overview'
 import { TipManagement } from './TipManagement'
+import { QuickTransferAdvancedSettings } from './QuickTransferAdvancedSettings'
 import { SaveOrRunModal } from './SaveOrRunModal'
 import { getInitialSummaryState, createQuickTransferFile } from './utils'
 import { quickTransferSummaryReducer } from './reducers'
@@ -144,6 +145,9 @@ export function SummaryAndSettings(
           ))}
         </Flex>
         {selectedCategory === 'overview' ? <Overview state={state} /> : null}
+        {selectedCategory === 'advanced_settings' ? (
+          <QuickTransferAdvancedSettings state={state} dispatch={dispatch} />
+        ) : null}
         {selectedCategory === 'tip_management' ? (
           <TipManagement state={state} dispatch={dispatch} />
         ) : null}

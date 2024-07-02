@@ -16,7 +16,7 @@ describe('Create a Tip Rack', () => {
       .first()
       .trigger('mousedown')
     cy.get('*[class^="_option_label"]').contains('Tip Rack').click()
-    cy.get('button').contains('start creating labware').click({ force: true })
+    cy.get('button').contains('Start creating labware').click({ force: true })
 
     // Custom Tip Racks Are Not Recommended
     cy.get('#CustomTiprackWarning p')

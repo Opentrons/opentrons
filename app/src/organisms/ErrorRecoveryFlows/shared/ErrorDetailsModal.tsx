@@ -94,7 +94,7 @@ export function ErrorDetailsModalODD(
           borderRadius={BORDERS.borderRadius8}
           padding={`${SPACING.spacing16} ${SPACING.spacing20}`}
         >
-          <StepInfo {...props} as="label" />
+          <StepInfo {...props} textStyle="label" />
         </Flex>
       </Flex>
     </Modal>,

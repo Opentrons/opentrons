@@ -97,6 +97,12 @@ export interface AddCustomLabwareFileAction {
   meta: { shell: true }
 }
 
+export interface AddCustomLabwareFromCreatorAction {
+  type: 'labware:ADD_CUSTOM_LABWARE_FILE_BLOB'
+  payload: { file: string }
+  meta: { shell: true }
+}
+
 export interface DeleteCustomLabwareFileAction {
   type: 'labware:DELETE_CUSTOM_LABWARE_FILE'
   payload: { filePath: string }
