@@ -37,7 +37,7 @@ export function CreateProtocol(props: { goBack: () => void }): JSX.Element {
   )
   const [code, setCode] = React.useState<string>(savedCode ?? '')
 
-  const onChange = (newValue: any): void => {
+  const onChange = (newValue: string): void => {
     setCode(newValue)
   }
   const onExecute = (): void => {
@@ -58,8 +58,8 @@ export function CreateProtocol(props: { goBack: () => void }): JSX.Element {
       transform="translateY(25%)"
     >
       <LegacyStyledText as="h2">
-        No protocol timeline to display. Create a protocol and press "Execute"
-        to see the timeline.
+        No protocol timeline to display. Create a protocol and press Execute to
+        see the timeline.
       </LegacyStyledText>
     </Flex>
   )
@@ -89,8 +89,12 @@ export function CreateProtocol(props: { goBack: () => void }): JSX.Element {
         width="50%"
         transform="translateY(25%)"
       >
-        {jsonAnalysis.errors.map(error => (
-          <LegacyStyledText as="h2" color={COLORS.red50}>
+        {jsonAnalysis.errors.map((error, index) => (
+          <LegacyStyledText
+            as="h2"
+            color={COLORS.red50}
+            key={`${index}_${error.id}`}
+          >
             {error.errorType}
             {error.detail}
           </LegacyStyledText>
@@ -133,7 +137,7 @@ export function CreateProtocol(props: { goBack: () => void }): JSX.Element {
               error != null
             }
             onClick={() => {
-              goBack
+              goBack()
               console.log(
                 'wire this up but should save the protocol and add to the robot list'
               )

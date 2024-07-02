@@ -195,7 +195,7 @@ export function registerProtocolStorage(dispatch: Dispatch): Dispatch {
           .then(result => {
             dispatch(addAnalysis(result))
           })
-          .catch(error => {
+          .catch((error: Error) => {
             dispatch(analyzeCreateProtocolError(error.message))
           })
         break

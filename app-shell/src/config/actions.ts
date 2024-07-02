@@ -112,7 +112,6 @@ import type {
   UpdateBrightnessAction,
   UsbRequestsAction,
 } from '@opentrons/app/src/redux/shell/types'
-import { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 // config file has been initialized
 export const configInitialized = (config: Config): ConfigInitializedAction => ({
