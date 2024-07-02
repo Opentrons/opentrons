@@ -76,6 +76,7 @@ import { ProtocolLabwareDetails } from './ProtocolLabwareDetails'
 import { ProtocolLiquidsDetails } from './ProtocolLiquidsDetails'
 import { RobotConfigurationDetails } from './RobotConfigurationDetails'
 import { ProtocolParameters } from './ProtocolParameters'
+import { AnnotatedSteps } from './AnnotatedSteps'
 
 import type { JsonConfig, PythonConfig } from '@opentrons/shared-data'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
@@ -204,10 +205,11 @@ export function ProtocolDetails(
   const { protocolKey, srcFileNames, mostRecentAnalysis, modified } = props
   const { t, i18n } = useTranslation(['protocol_details', 'shared'])
   const enableProtocolStats = useFeatureFlag('protocolStats')
+  const enableProtocolTimeline = useFeatureFlag('protocolTimeline')
   const runTimeParameters = mostRecentAnalysis?.runTimeParameters ?? []
   const hasRunTimeParameters = runTimeParameters.length > 0
   const [currentTab, setCurrentTab] = React.useState<
-    'robot_config' | 'labware' | 'liquids' | 'stats' | 'parameters'
+    'robot_config' | 'labware' | 'liquids' | 'stats' | 'parameters' | 'timeline'
   >(hasRunTimeParameters ? 'parameters' : 'robot_config')
   const [
     showChooseRobotToRunProtocolSlideout,
@@ -342,6 +344,10 @@ export function ProtocolDetails(
     stats: enableProtocolStats ? (
       <ProtocolStats analysis={mostRecentAnalysis} />
     ) : null,
+    timeline:
+      enableProtocolTimeline && mostRecentAnalysis != null ? (
+        <AnnotatedSteps analysis={mostRecentAnalysis} />
+      ) : null,
     parameters: <ProtocolParameters runTimeParameters={runTimeParameters} />,
   }
 
@@ -682,6 +688,19 @@ export function ProtocolDetails(
                       },
                     ]}
                   />
+                )}
+                {enableProtocolTimeline && mostRecentAnalysis != null && (
+                  <RoundTab
+                    data-testid="ProtocolDetails_stats"
+                    isCurrent={currentTab === 'timeline'}
+                    onClick={() => {
+                      setCurrentTab('timeline')
+                    }}
+                  >
+                    <LegacyStyledText>
+                      {i18n.format(t('timeline'), 'capitalize')}
+                    </LegacyStyledText>
+                  </RoundTab>
                 )}
               </Flex>
               <Box

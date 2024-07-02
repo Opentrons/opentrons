@@ -9,6 +9,8 @@ import { LabwareCreator } from './labware-creator'
 import { getPublicPath } from './public-path'
 import './styles.global.module.css'
 
+export * from './labware-creator'
+
 const $root = document.getElementById('root')
 
 if (!$root) {

@@ -5,7 +5,6 @@ from datetime import datetime
 from pathlib import Path
 
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.parse import PythonParseMode
 from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
@@ -18,11 +17,14 @@ from opentrons.protocol_engine import (
     types as pe_types,
 )
 import opentrons.protocol_runner as protocol_runner
+import opentrons.protocol_runner.create_simulating_orchestrator as simulating_runner
 from opentrons.protocol_reader import (
     ProtocolSource,
     JsonProtocolConfig,
     PythonProtocolConfig,
 )
+from opentrons.protocol_runner.run_orchestrator import ParseMode
+
 import opentrons.util.helpers as datetime_helper
 
 from robot_server.protocols.analysis_store import AnalysisStore
@@ -51,12 +53,12 @@ def patch_mock_get_utc_datetime(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -
 
 
 @pytest.fixture(autouse=True)
-def patch_mock_create_simulating_runner(
+def patch_mock_create_simulating_orchestrator(
     decoy: Decoy, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Replace protocol_runner.check() with a mock."""
-    mock = decoy.mock(func=protocol_runner.create_simulating_runner)
-    monkeypatch.setattr(protocol_runner, "create_simulating_runner", mock)
+    mock = decoy.mock(func=simulating_runner.create_simulating_orchestrator)
+    monkeypatch.setattr(simulating_runner, "create_simulating_orchestrator", mock)
 
 
 @pytest.fixture
@@ -92,19 +94,21 @@ async def test_load_runner(
         analysis_store=analysis_store, protocol_resource=protocol_resource
     )
 
+    run_orchestrator = decoy.mock(cls=protocol_runner.RunOrchestrator)
     python_runner = decoy.mock(cls=protocol_runner.PythonAndLegacyRunner)
+    decoy.when(run_orchestrator.get_protocol_runner()).then_return(python_runner)
     decoy.when(
-        await protocol_runner.create_simulating_runner(
+        await simulating_runner.create_simulating_orchestrator(
             robot_type=robot_type,
             protocol_config=PythonProtocolConfig(api_version=APIVersion(100, 200)),
         )
-    ).then_return(python_runner)
+    ).then_return(run_orchestrator)
     runner = await subject.load_runner(run_time_param_values={"rtp_var": 123})
-    assert runner == python_runner
+    assert runner.get_protocol_runner() == run_orchestrator.get_protocol_runner()
     decoy.verify(
-        await python_runner.load(
+        await run_orchestrator.load(
             protocol_source=protocol_source,
-            python_parse_mode=PythonParseMode.NORMAL,
+            parse_mode=ParseMode.NORMAL,
             run_time_param_values={"rtp_var": 123},
         ),
         times=1,
@@ -160,12 +164,12 @@ async def test_analyze(
         displayName="Foo", variableName="Bar", default=True, value=False
     )
 
-    json_runner = decoy.mock(cls=protocol_runner.JsonRunner)
+    orchestrator = decoy.mock(cls=protocol_runner.RunOrchestrator)
     subject = ProtocolAnalyzer(
         analysis_store=analysis_store, protocol_resource=protocol_resource
     )
 
-    decoy.when(await json_runner.run(deck_configuration=[],)).then_return(
+    decoy.when(await orchestrator.run(deck_configuration=[],)).then_return(
         protocol_runner.RunResult(
             commands=[analysis_command],
             state_summary=StateSummary(
@@ -183,7 +187,7 @@ async def test_analyze(
 
     await subject.analyze(
         analysis_id="analysis-id",
-        runner=json_runner,
+        orchestrator=orchestrator,
         run_time_parameters=[bool_parameter],
     )
     decoy.verify(
@@ -238,13 +242,14 @@ async def test_analyze_updates_pending_on_error(
         message="You got me!!",
     )
 
-    json_runner = decoy.mock(cls=protocol_runner.JsonRunner)
+    # json_runner = decoy.mock(cls=protocol_runner.JsonRunner)
+    orchestrator = decoy.mock(cls=protocol_runner.RunOrchestrator)
     subject = ProtocolAnalyzer(
         analysis_store=analysis_store, protocol_resource=protocol_resource
     )
 
     decoy.when(
-        await json_runner.run(
+        await orchestrator.run(
             deck_configuration=[],
         )
     ).then_raise(raised_exception)
@@ -258,7 +263,7 @@ async def test_analyze_updates_pending_on_error(
     )
 
     await subject.analyze(
-        runner=json_runner,
+        orchestrator=orchestrator,
         analysis_id="analysis-id",
     )
 

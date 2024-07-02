@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { screen } from '@testing-library/react'
+import { when } from 'vitest-when'
 import { vi, describe, beforeEach, afterEach, expect, it } from 'vitest'
 
 import { renderWithProviders } from '../../__testing-utils__'
@@ -14,7 +15,9 @@ import { ProtocolRunDetails } from '../../pages/Devices/ProtocolRunDetails'
 import { RobotSettings } from '../../pages/Devices/RobotSettings'
 import { GeneralSettings } from '../../pages/AppSettings/GeneralSettings'
 import { AlertsModal } from '../../organisms/Alerts/AlertsModal'
+import { useFeatureFlag } from '../../redux/config'
 import { useIsFlex } from '../../organisms/Devices/hooks'
+import { ProtocolTimeline } from '../../pages/Protocols/ProtocolDetails/ProtocolTimeline'
 import { useSoftwareUpdatePoll } from '../hooks'
 import { DesktopApp } from '../DesktopApp'
 
@@ -27,8 +30,10 @@ vi.mock('../../pages/Devices/DevicesLanding')
 vi.mock('../../pages/Protocols/ProtocolsLanding')
 vi.mock('../../pages/Devices/ProtocolRunDetails')
 vi.mock('../../pages/Devices/RobotSettings')
-vi.mock('../hooks')
 vi.mock('../../organisms/Alerts/AlertsModal')
+vi.mock('../../pages/Protocols/ProtocolDetails/ProtocolTimeline')
+vi.mock('../../redux/config')
+vi.mock('../hooks')
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -41,6 +46,9 @@ const render = (path = '/') => {
 
 describe('DesktopApp', () => {
   beforeEach(() => {
+    when(vi.mocked(useFeatureFlag))
+      .calledWith('protocolTimeline')
+      .thenReturn(true)
     vi.mocked(CalibrationDashboard).mockReturnValue(
       <div>Mock CalibrationDashboard</div>
     )
@@ -51,6 +59,9 @@ describe('DesktopApp', () => {
     )
     vi.mocked(ProtocolRunDetails).mockReturnValue(
       <div>Mock ProtocolRunDetails</div>
+    )
+    vi.mocked(ProtocolTimeline).mockReturnValue(
+      <div>Mock ProtocolTimeline</div>
     )
     vi.mocked(RobotSettings).mockReturnValue(<div>Mock RobotSettings</div>)
     vi.mocked(GeneralSettings).mockReturnValue(<div>Mock AppSettings</div>)
@@ -94,6 +105,11 @@ describe('DesktopApp', () => {
   it('renders a ProtocolsLanding component from /protocols', () => {
     render('/protocols')
     screen.getByText('Mock ProtocolsLanding')
+  })
+
+  it('renders a ProtocolsTimeline component from /protocolTimeline', () => {
+    render(`/protocols/95e67900-bc9f-4fbf-92c6-cc4d7226a51b/timeline`)
+    screen.getByText('Mock ProtocolTimeline')
   })
 
   it('renders a ProtocolRunDetails component from /devices/:robotName/protocol-runs/:runId/:protocolRunDetailsTab', () => {
