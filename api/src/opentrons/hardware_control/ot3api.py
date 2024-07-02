@@ -1802,6 +1802,7 @@ class OT3API(
         rate: float,
         acquire_lock: bool = True,
         check_current_vol: bool = True,
+        overshoot: float = 0.0,
     ) -> None:
         """
         Move an instrument's plunger to its bottom position, while no liquids
@@ -1861,21 +1862,27 @@ class OT3API(
         # NOTE: plunger position (mm) decreases up towards homing switch
         # NOTE: if already at BOTTOM, we still need to run backlash-compensation movement,
         #       because we do not know if we arrived at BOTTOM from above or below.
+        overshoot_pos = target_pos.copy()
+        overshoot_pos[pip_ax] -= overshoot
         async with self._backend.motor_current(
             run_currents={
                 pip_ax: instrument.config.plunger_homing_configurations.current
             }
         ):
-            if self._current_position[pip_ax] < backlash_pos[pip_ax]:
-                await self._move(
-                    backlash_pos,
-                    speed=(speed_down * rate),
-                    acquire_lock=acquire_lock,
-                )
+            await self._move(
+                backlash_pos,
+                speed=(speed_down * rate),
+                acquire_lock=acquire_lock,
+            )
             # NOTE: This should ALWAYS be moving UP.
             #       There should never be a time that this function is called and
             #       the plunger doesn't physically move UP into it's BOTTOM position.
             #       This is to make sure we are always engaged at the beginning of aspirate.
+            await self._move(
+                overshoot_pos,
+                speed=(speed_up * rate),
+                acquire_lock=acquire_lock,
+            )
             await self._move(
                 target_pos,
                 speed=(speed_up * rate),
