@@ -56,34 +56,38 @@ class ProcessResourceUsageSnapshot(SupportsCSVStorage):
     - query_time (int): The time in nanoseconds since the process started.
     - command (str): The command that was executed.
     - running_since (float): The time in nanoseconds since the process started.
-    - cpu_percent (float): The CPU usage percentage.
+    - user_cpu_time (float): The user CPU time in seconds.
+    - system_cpu_time (float): The system CPU time in seconds.
     - memory_percent (float): The memory usage percentage.
     """
 
     query_time: int  # nanoseconds
     command: str
     running_since: float  # seconds
-    cpu_percent: float
+    user_cpu_time: float  # seconds
+    system_cpu_time: float  # seconds
     memory_percent: float
 
     @classmethod
-    def headers(self) -> typing.Tuple[str, str, str, str, str]:
+    def headers(self) -> typing.Tuple[str, str, str, str, str, str]:
         """Returns the headers for the process resource usage data."""
         return (
             "query_time",
             "command",
             "running_since",
-            "cpu_percent",
+            "user_cpu_time",
+            "system_cpu_time",
             "memory_percent",
         )
 
-    def csv_row(self) -> typing.Tuple[int, str, float, float, float]:
+    def csv_row(self) -> typing.Tuple[int, str, float, float, float, float]:
         """Returns the process resource usage data as a string."""
         return (
             self.query_time,
             self.command,
             self.running_since,
-            self.cpu_percent,
+            self.user_cpu_time,
+            self.system_cpu_time,
             self.memory_percent,
         )
 
@@ -94,7 +98,8 @@ class ProcessResourceUsageSnapshot(SupportsCSVStorage):
             query_time=int(row[0]),
             command=str(row[1]),
             running_since=float(row[2]),
-            cpu_percent=float(row[3]),
+            user_cpu_time=float(row[3]),
+            system_cpu_time=float(row[4]),
             memory_percent=float(row[4]),
         )
 
