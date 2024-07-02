@@ -34,6 +34,7 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
+  Tabs,
 } from '@opentrons/components'
 import {
   parseInitialPipetteNamesByMount,
@@ -690,17 +691,18 @@ export function ProtocolDetails(
                   />
                 )}
                 {enableProtocolTimeline && mostRecentAnalysis != null && (
-                  <RoundTab
-                    data-testid="ProtocolDetails_stats"
-                    isCurrent={currentTab === 'timeline'}
-                    onClick={() => {
-                      setCurrentTab('timeline')
-                    }}
-                  >
-                    <LegacyStyledText>
-                      {i18n.format(t('timeline'), 'capitalize')}
-                    </LegacyStyledText>
-                  </RoundTab>
+                  <Tabs
+                    tabs={[
+                      {
+                        text: i18n.format(t('timeline'), 'capitalize'),
+                        isActive: currentTab === 'timeline',
+                        disabled: false,
+                        onClick: () => {
+                          setCurrentTab('timeline')
+                        },
+                      },
+                    ]}
+                  />
                 )}
               </Flex>
               <Box
