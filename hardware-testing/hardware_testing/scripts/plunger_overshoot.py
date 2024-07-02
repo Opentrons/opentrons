@@ -99,7 +99,7 @@ async def _set_move_flags(new_pos: float, simulate: bool) -> AsyncIterator[None]
     global MOVING, PLUNGER_POS
     MOVING = True
     PLUNGER_POS = new_pos
-    print("Plunger:", PLUNGER_POS)
+    print("Plunger:", round(PLUNGER_POS, 3))
     try:
         yield
         if simulate:
