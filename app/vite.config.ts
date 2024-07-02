@@ -10,7 +10,7 @@ import { versionForProject } from '../scripts/git-version.mjs'
 import type { UserConfig } from 'vite'
 
 export default defineConfig(
-  async(): Promise<UserConfig> => {
+  async (): Promise<UserConfig> => {
     const project = process.env.OPENTRONS_PROJECT ?? 'robot-stack'
     const version = await versionForProject(project)
     return {
@@ -61,6 +61,9 @@ export default defineConfig(
           '@opentrons/step-generation': path.resolve(
             '../step-generation/src/index.ts'
           ),
+          '@opentrons/labware-library': path.resolve(
+            '../labware-library/src/labware-creator'
+          ),
           '@opentrons/api-client': path.resolve('../api-client/src/index.ts'),
           '@opentrons/react-api-client': path.resolve(
             '../react-api-client/src/index.ts'
@@ -68,4 +71,5 @@ export default defineConfig(
         },
       },
     }
-  })
+  }
+)

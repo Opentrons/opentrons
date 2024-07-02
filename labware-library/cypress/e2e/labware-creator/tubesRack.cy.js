@@ -21,7 +21,7 @@ context('Tubes and Rack', () => {
         .trigger('mousedown')
       cy.get('*[class^="_option_label"]').contains('6 tubes').click()
 
-      cy.contains('start creating labware').click({ force: true })
+      cy.contains('Start creating labware').click({ force: true })
     })
 
     it('creates a tuberack with 16 tubes', () => {
@@ -154,7 +154,7 @@ context('Tubes and Rack', () => {
         .trigger('mousedown')
       cy.get('*[class^="_option_label"]').contains('15 tubes').click()
 
-      cy.contains('start creating labware').click({ force: true })
+      cy.contains('Start creating labware').click({ force: true })
     })
 
     it('creates a tuberack with 15 tubes', () => {
@@ -285,7 +285,7 @@ context('Tubes and Rack', () => {
         .trigger('mousedown')
       cy.get('*[class^="_option_label"]').contains('24 tubes').click()
 
-      cy.contains('start creating labware').click({ force: true })
+      cy.contains('Start creating labware').click({ force: true })
     })
 
     it('create a tuberack with 24 tubes', () => {

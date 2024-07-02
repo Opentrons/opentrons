@@ -28,7 +28,7 @@ context('Tubes and Rack', () => {
         .contains('Non-Opentrons tube rack')
         .click()
 
-      cy.contains('start creating labware').click({ force: true })
+      cy.contains('Start creating labware').click({ force: true })
 
       // no preview image yet
       cy.contains('Add missing info to see labware preview').should('exist')
