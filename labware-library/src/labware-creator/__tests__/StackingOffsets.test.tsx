@@ -80,13 +80,39 @@ describe('StackingOffsets', () => {
   })
 
   it('renders the adapters section if is tiprack is true', () => {
+    const mockFieldValue = vi.fn()
+    vi.mocked(useFormikContext).mockReturnValue({
+      values: {
+        labwareType: 'tipRack',
+        wellBottomShape: 'u',
+        wellShape: 'circular',
+        labwareXDimension: '10',
+        gridColumns: '12',
+        gridRows: '8',
+        compatibleAdapters: {},
+        compatibleModules: {},
+      },
+      touched: {
+        labwareType: true,
+        wellBottomShape: true,
+        wellShape: true,
+        labwareXDimension: true,
+        gridColumns: true,
+        gridRows: true,
+        compatibleAdapters: {},
+        compatibleModules: {},
+      },
+      errors: {},
+      setFieldValue: mockFieldValue,
+    } as any)
     render(<StackingOffsets />)
 
     screen.getByText('Adapters')
     screen.getByText('Opentrons Flex 96 Tip Rack Adapter')
-    screen.getByText(
-      'Measure from the bottom of the adapter to the highest part of the labware.'
-    )
+    fireEvent.click(screen.getAllByRole('checkbox')[0])
+    expect(mockFieldValue).toHaveBeenCalledWith('compatibleAdapters', {
+      opentrons_flex_96_tiprack_adapter: 0,
+    })
   })
 
   it('renders the modules section and clicking on one reveals the text field', () => {

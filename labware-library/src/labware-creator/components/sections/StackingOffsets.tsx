@@ -241,8 +241,7 @@ export function StackingOffsets(): JSX.Element | null {
                           ) : null}
                         </div>
                       </Flex>
-                      {key === 'opentrons_flex_96_tiprack_adapter' &&
-                      isChecked ? (
+                      {isChecked ? (
                         <div
                           style={{
                             marginTop: '-1.2rem',
@@ -251,25 +250,12 @@ export function StackingOffsets(): JSX.Element | null {
                           }}
                         >
                           <p>
-                            Measure from the bottom of the tip rack adapter to
-                            the highest part of the tip rack, not including the
-                            tips themselves.
+                            {key === 'opentrons_flex_96_tiprack_adapter'
+                              ? 'Measure from the bottom of the tip rack adapter to the highest part of the tip rack, not including the tips themselves.'
+                              : 'Measure from the bottom of the adapter to the highest part of the labware.'}
                           </p>
                         </div>
-                      ) : (
-                        <div
-                          style={{
-                            marginTop: '-1.2rem',
-                            height: '2.0rem',
-                            fontSize: '0.75rem',
-                          }}
-                        >
-                          <p>
-                            Measure from the bottom of the adapter to the
-                            highest part of the labware.
-                          </p>
-                        </div>
-                      )}
+                      ) : null}
                     </Flex>
                   )
                 })}
