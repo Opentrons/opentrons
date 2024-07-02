@@ -26,6 +26,7 @@ from hardware_testing.data import (
     get_git_description,
     get_testing_data_directory,
 )
+from opentrons_hardware.hardware_control.motion_planning import move_utils
 
 from opentrons.protocol_api import InstrumentContext, ProtocolContext
 from opentrons.protocol_engine.types import LabwareOffset
@@ -256,6 +257,8 @@ class RunArgs:
 
 
 if __name__ == "__main__":
+    move_utils.MINIMUM_DISPLACEMENT = 0.01
+
     parser = argparse.ArgumentParser("Pipette Testing")
     parser.add_argument("--simulate", action="store_true")
     parser.add_argument("--pipette", type=int, choices=[50, 1000], required=True)
