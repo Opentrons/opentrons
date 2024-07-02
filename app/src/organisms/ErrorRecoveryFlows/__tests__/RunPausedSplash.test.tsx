@@ -35,7 +35,7 @@ describe('useRunPausedSplash', () => {
   })
 
   it('returns true if on the ODD', () => {
-    const { result } = renderHook(() => useRunPausedSplash(), { wrapper })
+    const { result } = renderHook(() => useRunPausedSplash(isOnDevice=true, showERWizard=true), { wrapper })
     expect(result.current).toEqual(true)
   })
 })

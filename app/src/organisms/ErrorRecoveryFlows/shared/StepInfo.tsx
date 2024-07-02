@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import { useTranslation } from 'react-i18next'
 
-import { Flex, DISPLAY_INLINE, StyledText } from '@opentrons/components'
+import { Flex, DISPLAY_INLINE, LegacyStyledText } from '@opentrons/components'
 
 import { CommandText } from '../../../molecules/Command'
 
@@ -10,9 +10,7 @@ import type { StyleProps } from '@opentrons/components'
 import type { RecoveryContentProps } from '../types'
 
 interface StepInfoProps extends StyleProps {
-  textStyle: React.ComponentProps<typeof StyledText>[
-    | 'desktopStyle'
-    | 'oddStyle']
+  textStyle: React.ComponentProps<typeof LegacyStyledText>['as']
   stepCounts: RecoveryContentProps['stepCounts']
   failedCommand: RecoveryContentProps['failedCommand']
   robotType: RecoveryContentProps['robotType']
@@ -39,9 +37,9 @@ export function StepInfo({
 
   return (
     <Flex display={DISPLAY_INLINE} {...styleProps}>
-      <StyledText as={textStyle} display={DISPLAY_INLINE}>
+      <LegacyStyledText as={textStyle} display={DISPLAY_INLINE}>
         {`${t('at_step')} ${currentCopy}/${totalCopy}: `}
-      </StyledText>
+      </LegacyStyledText>
       {analysisCommand != null && protocolAnalysis != null ? (
         <CommandText
           command={analysisCommand}

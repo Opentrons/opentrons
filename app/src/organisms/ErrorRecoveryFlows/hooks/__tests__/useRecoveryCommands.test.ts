@@ -59,7 +59,6 @@ describe('useRecoveryCommands', () => {
         failedCommand: mockFailedCommand,
         failedLabwareUtils: mockFailedLabwareUtils,
         routeUpdateActions: mockRouteUpdateActions,
-        recoveryToastUtils: {} as any,
       })
     )
 
@@ -85,7 +84,7 @@ describe('useRecoveryCommands', () => {
         failedCommand: mockFailedCommand,
         failedLabwareUtils: mockFailedLabwareUtils,
         routeUpdateActions: mockRouteUpdateActions,
-        recoveryToastUtils: {} as any,
+
       })
     )
 
@@ -112,7 +111,6 @@ describe('useRecoveryCommands', () => {
         failedCommand: mockFailedCommand,
         failedLabwareUtils: mockFailedLabwareUtils,
         routeUpdateActions: mockRouteUpdateActions,
-        recoveryToastUtils: {} as any,
       })
     )
 
@@ -133,7 +131,6 @@ describe('useRecoveryCommands', () => {
         failedCommand: mockFailedCommand,
         failedLabwareUtils: mockFailedLabwareUtils,
         routeUpdateActions: mockRouteUpdateActions,
-        recoveryToastUtils: { makeSuccessToast: mockMakeSuccessToast } as any,
       })
     )
 
@@ -152,7 +149,6 @@ describe('useRecoveryCommands', () => {
         failedCommand: mockFailedCommand,
         failedLabwareUtils: mockFailedLabwareUtils,
         routeUpdateActions: mockRouteUpdateActions,
-        recoveryToastUtils: {} as any,
       })
     )
 
@@ -168,7 +164,6 @@ describe('useRecoveryCommands', () => {
         failedCommand: mockFailedCommand,
         failedLabwareUtils: mockFailedLabwareUtils,
         routeUpdateActions: mockRouteUpdateActions,
-        recoveryToastUtils: {} as any,
       })
     )
 
@@ -207,7 +202,6 @@ describe('useRecoveryCommands', () => {
           failedLabware: mockFailedLabware,
         },
         routeUpdateActions: mockRouteUpdateActions,
-        recoveryToastUtils: {} as any,
       })
     )
 
@@ -228,7 +222,6 @@ describe('useRecoveryCommands', () => {
         failedCommand: mockFailedCommand,
         failedLabwareUtils: mockFailedLabwareUtils,
         routeUpdateActions: mockRouteUpdateActions,
-        recoveryToastUtils: {} as any,
       })
     )
 
@@ -249,7 +242,6 @@ describe('useRecoveryCommands', () => {
         failedCommand: mockFailedCommand,
         failedLabwareUtils: mockFailedLabwareUtils,
         routeUpdateActions: mockRouteUpdateActions,
-        recoveryToastUtils: {} as any,
       })
     )
 
