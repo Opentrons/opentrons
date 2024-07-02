@@ -145,7 +145,6 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
           : `${SPACING.spacing16} ${SPACING.spacing24}`
       }
       {...buttonProps}
-      aria-disabled={disabled}
     >
       <Flex
         flexDirection={DIRECTION_ROW}
