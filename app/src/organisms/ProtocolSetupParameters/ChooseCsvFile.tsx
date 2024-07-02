@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
-import { last } from 'lodash'
+import last from 'lodash/last'
 
 import {
   ALIGN_CENTER,
@@ -16,9 +16,9 @@ import {
 import { useAllCsvFilesQuery } from '@opentrons/react-api-client'
 
 import { ChildNavigation } from '../ChildNavigation'
-import { EmptyFile } from './EmptyFile'
 import { RadioButton } from '../../atoms/buttons'
 import { getShellUpdateDataFiles } from '../../redux/shell'
+import { EmptyFile } from './EmptyFile'
 
 import type { CsvFileParameter } from '@opentrons/shared-data'
 import type { CsvFileData } from '@opentrons/api-client'

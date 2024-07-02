@@ -7,10 +7,10 @@ import { useAllCsvFilesQuery } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../i18n'
 import { renderWithProviders } from '../../../__testing-utils__'
-import { EmptyFile } from '../EmptyFile'
 import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
 import { getLocalRobot } from '../../../redux/discovery'
 import { getShellUpdateDataFiles } from '../../../redux/shell'
+import { EmptyFile } from '../EmptyFile'
 import { ChooseCsvFile } from '../ChooseCsvFile'
 
 import type { CsvFileParameter } from '@opentrons/shared-data'

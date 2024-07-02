@@ -174,27 +174,9 @@ export function ProtocolSetupParameters({
       setChooseCsvFileScreen(parameter)
     } else {
       // bad param
-      console.log('error')
+      console.error('error: bad param. not expected to reach this')
     }
   }
-
-  // ToDo (kk:06/18/2024)
-  // This mock variable will be removed when be is ready
-  // const mockCsvRtp = {
-  //   displayName: 'CSV File',
-  //   variableName: 'csv_file_var',
-  //   description: '',
-  //   type: 'csv_file',
-  //   file: {
-  //     id: 'mockFileId',
-  //     file: new File([], 'mock.csv'),
-  //   },
-  // }
-
-  // const runTimeParametersOverridesWithMockCSV = [
-  //   ...runTimeParametersOverrides,
-  //   mockCsvRtp,
-  // ] as RunTimeParameter[]
 
   let children = (
     <>

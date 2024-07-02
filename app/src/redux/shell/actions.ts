@@ -10,10 +10,7 @@ import type {
   RobotMassStorageDeviceRemoved,
   NotifySubscribeAction,
   NotifyTopic,
-  // SendFilePathsAction,
 } from './types'
-
-// import type { State } from '../types'
 
 export const UI_INITIALIZED: 'shell:UI_INITIALIZED' = 'shell:UI_INITIALIZED'
 export const USB_HTTP_REQUESTS_START: 'shell:USB_HTTP_REQUESTS_START' =
