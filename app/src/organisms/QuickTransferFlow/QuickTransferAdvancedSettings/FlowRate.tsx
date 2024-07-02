@@ -9,8 +9,10 @@ import {
   POSITION_FIXED,
   COLORS,
 } from '@opentrons/components'
-import type { SupportedTip } from '@opentrons/shared-data'
-import { getTipTypeFromTipRackDefinition } from '@opentrons/shared-data'
+import {
+  LOW_VOLUME_PIPETTES,
+  getTipTypeFromTipRackDefinition,
+} from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '../../../App/portal'
 import { ChildNavigation } from '../../ChildNavigation'
@@ -18,6 +20,7 @@ import { InputField } from '../../../atoms/InputField'
 import { NumericalKeyboard } from '../../../atoms/SoftwareKeyboard'
 
 import { ACTIONS } from '../constants'
+import type { SupportedTip } from '@opentrons/shared-data'
 import type {
   QuickTransferSummaryState,
   QuickTransferSummaryAction,
@@ -44,17 +47,27 @@ export function FlowRateEntry(props: FlowRateEntryProps): JSX.Element {
       : null
   )
 
+  // TODO (ba, 2024-07-02): use the pipette name once we add it to the v2 spec
+  let pipetteName = state.pipette.model
+  if (state.pipette.channels === 1) {
+    pipetteName = pipetteName + `_single_flex`
+  } else if (state.pipette.channels === 8) {
+    pipetteName = pipetteName + `_multi_flex`
+  } else {
+    pipetteName = pipetteName + `_96`
+  }
+
   // use lowVolume for volumes lower than 5ml
+  const liquidSpecs = state.pipette.liquids
   const tipType = getTipTypeFromTipRackDefinition(state.tipRack)
   const flowRatesForSupportedTip: SupportedTip | undefined =
-    state.volume < 5
-      ? state.pipette.liquids.lowVolumeDefaults.supportedTips[tipType]
-      : state.pipette.liquids.default.supportedTips[tipType]
+    state.volume < 5 &&
+    `lowVolumeDefault` in liquidSpecs &&
+    LOW_VOLUME_PIPETTES.includes(pipetteName)
+      ? liquidSpecs.lowVolumeDefault.supportedTips[tipType]
+      : liquidSpecs.default.supportedTips[tipType]
   const minFlowRate = 0.1
-  const maxFlowRate =
-    flowRatesForSupportedTip?.uiMaxFlowRate !== undefined
-      ? flowRatesForSupportedTip?.uiMaxFlowRate
-      : Infinity
+  const maxFlowRate = flowRatesForSupportedTip?.uiMaxFlowRate ?? 0
 
   let headerCopy: string = ''
   let textEntryCopy: string = ''
