@@ -357,7 +357,7 @@ if __name__ == "__main__":
                     run_args.run_id,
                     sheet_id,
                     new_folder_name,
-                    make_graph=True,
+                    make_graph=False,
                 )
                 # Log to Google Sheet
                 if args.aspirate is False:

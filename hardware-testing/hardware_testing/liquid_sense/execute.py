@@ -39,13 +39,6 @@ except ImportError:
     pass
 
 
-PROBE_MAX_TIME: Dict[int, float] = {
-    1: 2.75,
-    8: 1.75,
-    96: 0.85,
-}
-
-
 def _load_tipracks(
     ctx: ProtocolContext, pipette_channels: int, protocol_cfg: Any, tip: int
 ) -> List[Labware]:
@@ -357,11 +350,9 @@ def find_max_z_distances(
     max_z_distance = starting_mount_height - well.bottom().point.z
     plunger_travel = get_plunger_travel(run_args)
     if p_speed == 0:
-        p_travel_time = PROBE_MAX_TIME[run_args.pipette_channels]
+        p_travel_time = 10.0
     else:
-        p_travel_time = min(
-            plunger_travel / p_speed, PROBE_MAX_TIME[run_args.pipette_channels]
-        )
+        p_travel_time = plunger_travel / p_speed
 
     z_travels: List[float] = []
     while max_z_distance > 0:
