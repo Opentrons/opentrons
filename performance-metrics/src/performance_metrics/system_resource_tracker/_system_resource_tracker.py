@@ -1,35 +1,40 @@
 """System resource tracker."""
 
+import logging
 import typing
 import psutil
 import fnmatch
+import time
 
-from pathlib import Path
-from .util import format_command, get_timing_function
-from .data_shapes import ProcessResourceUsageSnapshot, MetricsMetadata
-from .metrics_store import MetricsStore
+from ..util import format_command, get_timing_function
+from ..data_shapes import ProcessResourceUsageSnapshot, MetricsMetadata
+from ..metrics_store import MetricsStore
+from ._config import SystemResourceTrackerConfiguration
+from .logging_config import log_init
 
 _timing_function = get_timing_function()
-SHOULD_TRACK_ENV_VAR_NAME: typing.Final[str] = "OT_PERFORMANCE_METRICS_SHOULD_TRACK"
+
+log_init()
+logger = logging.getLogger(__name__)
+log_level = SystemResourceTrackerConfiguration.parse_logging_level()
+
+if log_level is not None:
+    logger.setLevel(log_level)
 
 
 class SystemResourceTracker:
     """Tracks system resource usage."""
 
-    def __init__(
-        self,
-        process_filters: typing.List[str],
-        storage_location: Path,
-    ) -> None:
+    def __init__(self, config: SystemResourceTrackerConfiguration) -> None:
         """Initialize the tracker."""
-        self._process_filters = process_filters
+        self.config = config
         self._processes: typing.List[
             psutil.Process
         ]  # intentionally not public as process.kill can be called
         self._store = MetricsStore[ProcessResourceUsageSnapshot](
             MetricsMetadata(
                 name="system_resource_data",
-                storage_dir=storage_location,
+                storage_dir=self.config.storage_dir,
                 headers=ProcessResourceUsageSnapshot.headers(),
             )
         )
@@ -37,20 +42,7 @@ class SystemResourceTracker:
         self.refresh_processes()
 
     def refresh_processes(self) -> None:
-        """Filter processes by their command line path with globbing support.
-
-        Returns:
-            list of psutil.Process: List of processes that match the filters.
-        """
-        # Note that psutil.process_iter caches the list of processes
-        # As long as the process is alive, it will be cached and reused on the next call to process_iter.
-
-        # Ensure that when calling process_iter you specify at least one attribute to the attr list.
-        # Otherwise all processes info will be retrieved which is slow.
-        # Ideally you will only specify the attributes that you want to filter on.
-
-        # See https://psutil.readthedocs.io/en/latest/#psutil.process_iter
-
+        """Filter processes by their command line path with globbing support."""
         processes = []
         for process in psutil.process_iter(attrs=["cmdline"]):
             try:
@@ -68,7 +60,7 @@ class SystemResourceTracker:
 
             if any(
                 fnmatch.fnmatch(formatted_cmdline, pattern)
-                for pattern in self._process_filters
+                for pattern in self.config.process_filters
             ):
                 processes.append(process)
 
@@ -80,12 +72,14 @@ class SystemResourceTracker:
         snapshots: typing.List[ProcessResourceUsageSnapshot] = []
         for process in self._processes:
             with process.oneshot():
+                cpu_time = process.cpu_times()
                 snapshots.append(
                     ProcessResourceUsageSnapshot(
                         query_time=_timing_function(),
                         command=format_command(process.cmdline()),
                         running_since=process.create_time(),
-                        cpu_percent=process.cpu_percent(),
+                        system_cpu_time=cpu_time.system,
+                        user_cpu_time=cpu_time.user,
                         memory_percent=process.memory_percent(),
                     )
                 )
@@ -94,15 +88,42 @@ class SystemResourceTracker:
 
     def get_and_store_system_data_snapshots(self) -> None:
         """Get and store system data snapshots."""
-        self.refresh_processes()
-        self._store.add_all(self.snapshots)
-        self._store.store()
+        if self.config.should_track:
+            self.refresh_processes()
+            self._store.add_all(self.snapshots)
+            self._store.store()
+
+    def update_changes_to_config(
+        self, new_config: SystemResourceTrackerConfiguration
+    ) -> None:
+        """Update config."""
+        if new_config != self.config:
+            self.config = new_config
+            logger.info("Config updated: %s", new_config)
+
+
+def main() -> None:
+    """Main function."""
+    logger.info("Starting system resource tracker...")
+    config = SystemResourceTrackerConfiguration()
+    tracker = SystemResourceTracker(config)
+
+    try:
+        while True:
+            refreshed_config = SystemResourceTrackerConfiguration.from_env()
+
+            if tracker.config.logging_level_update_needed(refreshed_config):
+                logger.setLevel(refreshed_config.logging_level)
+
+            tracker.update_changes_to_config(refreshed_config)
+            tracker.get_and_store_system_data_snapshots()
+
+            time.sleep(tracker.config.refresh_interval)
+    except Exception as e:
+        logger.error("Exception occurred: %s", str(e))
+    finally:
+        logger.info("System resource tracker is stopping.")
 
 
 if __name__ == "__main__":
-    # TODO: (dm: 2024-07-01) - replace with service startup logic
-    tracker = SystemResourceTracker(
-        process_filters=["/opt/opentrons*", "python3*"],
-        storage_location=Path("/data/performance_metrics_data/"),
-    )
-    tracker.get_and_store_system_data_snapshots()
+    main()
