@@ -15,7 +15,7 @@ import {
 } from '@opentrons/api-client'
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { getIsOnDevice, useFeatureFlag } from '../../redux/config'
+import { getIsOnDevice } from '../../redux/config'
 import { ErrorRecoveryWizard, useERWizard } from './ErrorRecoveryWizard'
 import { RunPausedSplash, useRunPausedSplash } from './RunPausedSplash'
 import { useCurrentlyRecoveringFrom, useERUtils } from './hooks'
