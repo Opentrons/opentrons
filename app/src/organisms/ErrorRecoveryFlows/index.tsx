@@ -108,7 +108,6 @@ export interface ErrorRecoveryFlowsProps {
 export function ErrorRecoveryFlows(
   props: ErrorRecoveryFlowsProps
 ): JSX.Element | null {
-  const enableRunNotes = useFeatureFlag('enableRunNotes')
   const { hasLaunchedRecovery, toggleERWizard, showERWizard } = useERWizard()
 
   const recoveryUtils = useERUtils({
