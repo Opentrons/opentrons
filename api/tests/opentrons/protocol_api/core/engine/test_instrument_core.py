@@ -1305,7 +1305,7 @@ def test_find_liquid_level(
     result = subject.find_liquid_level(well_core)
     assert result == 0
     decoy.verify(
-        mock_engine_client.execute_command_without_recovery(
+        mock_engine_client.execute_command_with_result(
             cmd.LiquidProbeParams(
                 pipetteId=subject.pipette_id,
                 wellLocation=WellLocation(

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from typing import Optional, TYPE_CHECKING, cast, Union
+from opentrons.protocol_engine.commands.liquid_probe import LiquidProbeResult
 from opentrons.protocols.api_support.types import APIVersion
 
 from opentrons.types import Location, Mount
@@ -851,7 +852,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         well_location = WellLocation(
             origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0)
         )
-        result = self._engine_client.execute_command_without_recovery(
+        result = self._engine_client.execute_command_with_result(
             cmd.LiquidProbeParams(
                 labwareId=labware_id,
                 wellName=well_name,
@@ -859,12 +860,9 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                 pipetteId=self.pipette_id,
             )
         )
-        if (
-            result is None
-        ):  # this should probably only happen in testing with mock components
-            return 0
-        # for general cases, result will either be a float > 0 or a PipetteLiquidNotFoundError
-        try:
-            return float(result.z_position)
-        except KeyError: 
-            raise PipetteLiquidNotFoundError()
+        if result is not None and isinstance(result, LiquidProbeResult):
+            return result.z_position
+        # should never get here
+        raise PipetteLiquidNotFoundError(
+            "Error while trying to find liquid level.",
+        )

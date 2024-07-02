@@ -1271,7 +1271,7 @@ def test_aspirate_0_volume_means_aspirate_nothing(
 
 
 @pytest.mark.parametrize("api_version", [APIVersion(2, 20)])
-def test_detect_liquid(
+def test_detect_liquid_presence(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
     subject: InstrumentContext,
@@ -1280,9 +1280,9 @@ def test_detect_liquid(
     """It should only return booleans. Not raise an exception."""
     mock_well = decoy.mock(cls=Well)
     decoy.when(mock_instrument_core.find_liquid_level(mock_well._core)).then_raise(
-        Exception(PipetteLiquidNotFoundError)
+        PipetteLiquidNotFoundError()
     )
-    result = subject.detect_liquid(mock_well)
+    result = subject.detect_liquid_presence(mock_well)
     assert isinstance(result, bool)
 
 
@@ -1293,32 +1293,28 @@ def test_require_liquid(
     subject: InstrumentContext,
     mock_protocol_core: ProtocolCore,
 ) -> None:
-    """It should raise an exception when called on an."""
+    """It should raise an exception when called."""
     mock_well = decoy.mock(cls=Well)
+    decoy.when(mock_instrument_core.find_liquid_level(mock_well._core))
+    subject.require_liquid(mock_well)
     decoy.when(mock_instrument_core.find_liquid_level(mock_well._core)).then_raise(
-        Exception(PipetteLiquidNotFoundError)
+        PipetteLiquidNotFoundError()
     )
-    try:
+    with pytest.raises(PipetteLiquidNotFoundError):
         subject.require_liquid(mock_well)
-        assert False
-    except PipetteLiquidNotFoundError:
-        assert True
 
 
 @pytest.mark.parametrize("api_version", [APIVersion(2, 20)])
-def test_get_liquid_height(
+def test_measure_liquid_height(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
     subject: InstrumentContext,
     mock_protocol_core: ProtocolCore,
 ) -> None:
-    """It should return 0 on an empty well."""
+    """It should raise an exception when called."""
     mock_well = decoy.mock(cls=Well)
     decoy.when(mock_instrument_core.find_liquid_level(mock_well._core)).then_raise(
-        Exception(PipetteLiquidNotFoundError)
+        PipetteLiquidNotFoundError()
     )
-    try:
-        result = subject.get_liquid_height(mock_well)
-        assert False
-    except PipetteLiquidNotFoundError:
-        assert result == 0
+    with pytest.raises(PipetteLiquidNotFoundError):
+        subject.require_liquid(mock_well)

@@ -1,5 +1,4 @@
 from __future__ import annotations
-
 import logging
 from contextlib import ExitStack
 from typing import Any, List, Optional, Sequence, Union, cast, Dict
@@ -2050,14 +2049,13 @@ class InstrumentContext(publisher.CommandPublisher):
         self._tip_racks = tip_racks or []
 
     @requires_version(2, 20)
-    def detect_liquid(self, well: labware.Well) -> bool:
+    def detect_liquid_presence(self, well: labware.Well) -> bool:
         """Check if there is liquid in a well.
 
         :returns: A boolean.
         """
-        if well is None:
-            raise WellDoesNotExistError() from BaseException
-
+        if not isinstance(well, labware.Well):
+            raise WellDoesNotExistError("You must provide a valid well to check.")
         try:
             height = self._core.find_liquid_level(well._core)
             if height > 0:
@@ -2065,6 +2063,8 @@ class InstrumentContext(publisher.CommandPublisher):
             return False  # it should never get here
         except PipetteLiquidNotFoundError:
             return False
+        except Exception as e:
+            raise e
 
     @requires_version(2, 20)
     def require_liquid(self, well: labware.Well) -> None:
@@ -2072,25 +2072,19 @@ class InstrumentContext(publisher.CommandPublisher):
 
         :returns: None.
         """
-        if well is None:
-            raise WellDoesNotExistError("Well type was none.")
+        if not isinstance(well, labware.Well):
+            raise WellDoesNotExistError("You must provide a valid well to check.")
 
-        try:
-            self._core.find_liquid_level(well._core)
-        except PipetteLiquidNotFoundError as e:
-            raise e
+        self._core.find_liquid_level(well._core)
 
     @requires_version(2, 20)
-    def get_liquid_height(self, well: labware.Well) -> float:
+    def measure_liquid_height(self, well: labware.Well) -> float:
         """Check the height of the liquid within a well.
 
-        :returns: A float representing the height of the liquid.
+        :returns: The height, in mm, of the liquid from the deck.
         """
-        if well is None:
-            raise WellDoesNotExistError()
+        if not isinstance(well, labware.Well):
+            raise WellDoesNotExistError("You must provide a valid well to check.")
 
-        try:
-            height = self._core.find_liquid_level(well._core)
-            return float(height)
-        except PipetteLiquidNotFoundError:
-            return 0
+        height = self._core.find_liquid_level(well._core)
+        return float(height)

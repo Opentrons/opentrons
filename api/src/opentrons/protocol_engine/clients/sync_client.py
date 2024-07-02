@@ -2,6 +2,7 @@
 
 from typing import cast, Any, Optional, overload
 
+from opentrons.protocol_engine.errors.error_occurrence import ProtocolCommandFailedError
 from opentrons_shared_data.labware.dev_types import LabwareUri
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
@@ -12,7 +13,7 @@ from ..types import (
     Liquid,
     LabwareOffsetCreate,
 )
-from .transports import ChildThreadTransport
+from .transports import ChildThreadTransport, RunStoppedBeforeCommandError
 
 
 class SyncClient:
@@ -77,12 +78,6 @@ class SyncClient:
     ) -> commands.LoadPipetteResult:
         pass
 
-    @overload
-    def execute_command_without_recovery(
-        self, params: commands.LiquidProbeParams
-    ) -> commands.LiquidProbeResult:
-        pass
-
     def execute_command_without_recovery(
         self, params: commands.CommandParams
     ) -> commands.CommandResult:
@@ -94,6 +89,29 @@ class SyncClient:
         CreateType = CREATE_TYPES_BY_PARAMS_TYPE[type(params)]
         create_request = CreateType(params=cast(Any, params))
         return self._transport.execute_command(create_request)
+
+    def execute_command_with_result(
+        self, params: commands.CommandParams
+    ) -> Optional[commands.CommandResult]:
+        """Execute a ProtocolEngine command, including error recovery, and return a result.
+
+        See `ChildThreadTransport.execute_command_wait_for_recovery()` for exact
+        behavior.
+        """
+        CreateType = CREATE_TYPES_BY_PARAMS_TYPE[type(params)]
+        create_request = CreateType(params=cast(Any, params))
+        try:
+            result = self._transport.execute_command_wait_for_recovery(create_request)
+            if result.error is None:
+                return result.result
+            if isinstance(result.error, BaseException):  # necessary to pass lint
+                raise result.error
+            raise ProtocolCommandFailedError(
+                original_error=result.error,
+                message=f"{result.error.errorType}: {result.error.detail}",
+            )
+        except (ProtocolCommandFailedError, RunStoppedBeforeCommandError) as e:
+            raise e
 
     @property
     def state(self) -> StateView:
