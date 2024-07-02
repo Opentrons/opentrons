@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { css } from 'styled-components'
+import styled, { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -8,23 +8,24 @@ import {
   Btn,
   COLORS,
   DIRECTION_COLUMN,
-  DIRECTION_ROW,
   Flex,
-  JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
   RESPONSIVENESS,
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
-  useDeckLocationSelect,
+  DISPLAY_INLINE_BLOCK,
 } from '@opentrons/components'
 import { getDeckDefFromRobotType } from '@opentrons/shared-data'
 
 import { SmallButton } from '../../atoms/buttons'
-import { TwoUpTileLayout } from '../LabwarePositionCheck/TwoUpTileLayout'
+import { TwoColumn, DeckMapContent } from '../../molecules/InterventionModal'
 
-import type { AddressableAreaName } from '@opentrons/shared-data'
+import type {
+  AddressableAreaName,
+  ModuleLocation,
+} from '@opentrons/shared-data'
 import type { DropTipWizardContainerProps } from './types'
 
 // TODO: get help link article URL
@@ -36,6 +37,16 @@ type ChooseLocationProps = DropTipWizardContainerProps & {
   body: string | JSX.Element
   moveToAddressableArea: (addressableArea: AddressableAreaName) => Promise<void>
 }
+const Title = styled.h1`
+  ${TYPOGRAPHY.h1Default};
+  margin-bottom: ${SPACING.spacing8};
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    ${TYPOGRAPHY.level4HeaderSemiBold};
+    margin-bottom: 0;
+    height: ${SPACING.spacing40};
+    display: ${DISPLAY_INLINE_BLOCK};
+  }
+`
 
 export const ChooseLocation = (
   props: ChooseLocationProps
@@ -47,17 +58,17 @@ export const ChooseLocation = (
     body,
     robotType,
     moveToAddressableArea,
-    isOnDevice,
   } = props
   const { i18n, t } = useTranslation(['drop_tip_wizard', 'shared'])
+  const [
+    selectedLocation,
+    setSelectedLocation,
+  ] = React.useState<ModuleLocation>()
   const deckDef = getDeckDefFromRobotType(robotType)
-  const { DeckLocationSelect, selectedLocation } = useDeckLocationSelect(
-    robotType
-  )
 
   const handleConfirmPosition = (): void => {
     const deckSlot = deckDef.locations.addressableAreas.find(
-      l => l.id === selectedLocation.slotName
+      l => l.id === selectedLocation?.slotName
     )?.id
 
     if (deckSlot != null) {
@@ -66,97 +77,59 @@ export const ChooseLocation = (
       })
     }
   }
-
-  if (isOnDevice) {
-    return (
-      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
-        <Flex flexDirection={DIRECTION_ROW} flex="1">
-          <Flex
-            flexDirection={DIRECTION_COLUMN}
-            gridGap={SPACING.spacing8}
-            width="100%"
-            flex="1"
-          >
-            <LegacyStyledText
-              as="h4"
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            >
-              {title}
-            </LegacyStyledText>
-            <LegacyStyledText as="p">{body}</LegacyStyledText>
-          </Flex>
-          <Flex
-            flex="1"
-            justifyContent={JUSTIFY_CENTER}
-            paddingLeft={SPACING.spacing24}
-          >
-            {DeckLocationSelect}
-          </Flex>
+  return (
+    <Flex>
+      <TwoColumn>
+        <Flex flexDirection={DIRECTION_COLUMN} flex="1" gap={SPACING.spacing16}>
+          <Title>{title}</Title>
+          <LegacyStyledText as="p">{body}</LegacyStyledText>
         </Flex>
-        <Flex
-          width="100%"
-          justifyContent={JUSTIFY_SPACE_BETWEEN}
-          css={ALIGN_BUTTONS}
-          gridGap={SPACING.spacing8}
-          marginTop="auto"
+        <DeckMapContent
+          kind={'deck-config'}
+          setSelectedLocation={setSelectedLocation}
+          robotType={robotType}
+        />
+      </TwoColumn>
+      <Flex
+        width="100%"
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+        css={ALIGN_BUTTONS}
+        gridGap={SPACING.spacing8}
+        marginTop="auto"
+      >
+        <Btn
+          onClick={() => {
+            handleGoBack()
+          }}
         >
-          <Btn
-            onClick={() => {
-              handleGoBack()
-            }}
-          >
-            <LegacyStyledText css={GO_BACK_BUTTON_STYLE}>
-              {t('shared:go_back')}
-            </LegacyStyledText>
-          </Btn>
-          <SmallButton
-            buttonText={i18n.format(t('move_to_slot'), 'capitalize')}
-            onClick={handleConfirmPosition}
-          />
-        </Flex>
-      </Flex>
-    )
-  } else {
-    return (
-      <Flex css={TILE_CONTAINER_STYLE}>
-        <TwoUpTileLayout
-          title={title}
-          body={body}
-          rightElement={DeckLocationSelect}
-          footer={
-            <Flex
-              width="100%"
-              justifyContent={JUSTIFY_SPACE_BETWEEN}
-              gridGap={SPACING.spacing8}
-            >
-              <Btn
-                onClick={() => {
-                  handleGoBack()
-                }}
-              >
-                <LegacyStyledText css={GO_BACK_BUTTON_STYLE}>
-                  {t('shared:go_back')}
-                </LegacyStyledText>
-              </Btn>
-              <PrimaryButton onClick={handleConfirmPosition}>
-                {i18n.format(t('move_to_slot'), 'capitalize')}
-              </PrimaryButton>
-            </Flex>
-          }
+          <LegacyStyledText css={GO_BACK_BUTTON_STYLE}>
+            {t('shared:go_back')}
+          </LegacyStyledText>
+        </Btn>
+        <PrimaryButton
+          onClick={handleConfirmPosition}
+          css={css`
+            @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+              display: none;
+            }
+          `}
+        >
+          {i18n.format(t('move_to_slot'), 'capitalize')}
+        </PrimaryButton>
+        <SmallButton
+          buttonText={i18n.format(t('move_to_slot'), 'capitalize')}
+          onClick={handleConfirmPosition}
+          css={css`
+            @media not ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+              display: none;
+            }
+          `}
         />
       </Flex>
-    )
-  }
+    </Flex>
+  )
 }
 
-const TILE_CONTAINER_STYLE = css`
-  flex-direction: ${DIRECTION_COLUMN};
-  justify-content: ${JUSTIFY_SPACE_BETWEEN};
-  height: 24.625rem;
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    height: 29.5rem;
-  }
-`
 const GO_BACK_BUTTON_STYLE = css`
   ${TYPOGRAPHY.pSemiBold};
   color: ${COLORS.grey50};
