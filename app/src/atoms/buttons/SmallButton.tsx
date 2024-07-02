@@ -135,28 +135,10 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
     }
   `
 
-  const DISABLED_STYLE = css`
-    background-color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType]
-      .disabledBackgroundColor};
-    color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType].disabledColor};
-    cursor: not-allowed;
-    border-radius: ${buttonCategory === 'rounded'
-      ? BORDERS.borderRadius40
-      : BORDERS.borderRadius16};
-    box-shadow: none;
-    ${TYPOGRAPHY.pSemiBold}
-
-    &:focus-visible {
-      box-shadow: ${ODD_FOCUS_VISIBLE};
-      background-color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType]
-        .defaultBackgroundColor};
-    }
-  `
-
   return (
     <Btn
-      css={disabled ? DISABLED_STYLE : SMALL_BUTTON_STYLE}
-      // disabled={disabled}
+      css={SMALL_BUTTON_STYLE}
+      disabled={disabled}
       padding={
         iconPlacement != null
           ? SPACING.spacing16
