@@ -402,29 +402,25 @@ def _run_trial(
     z_distances: List[float] = find_max_z_distances(
         run_args, well, plunger_speed, starting_mount_height
     )
-    z_distances = z_distances[: run_args.multi_passes]
-    for z_dist in z_distances:
-        lps = LiquidProbeSettings(
-            mount_speed=run_args.z_speed,
-            plunger_speed=plunger_speed,
-            plunger_impulse_time=0.2,
-            sensor_threshold_pascals=lqid_cfg["sensor_threshold_pascals"],
-            output_option=OutputOptions.sync_buffer_to_csv,
-            aspirate_while_sensing=run_args.aspirate,
-            data_files=data_files,
-        )
+    z_distance = sum(z_distances[: run_args.multi_passes])
+    lps = LiquidProbeSettings(
+        starting_mount_height=start_height,
+        mount_speed=run_args.z_speed,
+        plunger_speed=plunger_speed,
+        sensor_threshold_pascals=lqid_cfg["sensor_threshold_pascals"],
+        output_option=OutputOptions.sync_buffer_to_csv,
+        aspirate_while_sensing=run_args.aspirate,
+        data_files=data_files,
+    )
 
-        hw_mount = OT3Mount.LEFT if run_args.pipette.mount == "left" else OT3Mount.RIGHT
-        run_args.recorder.set_sample_tag(f"trial-{trial}-{tip}ul")
-        # TODO add in stuff for secondary probe
-        try:
-            height = hw_api.liquid_probe(hw_mount, z_dist, lps, probe_target)
-        except PipetteLiquidNotFoundError as lnf:
-            ui.print_info(f"Liquid not found current position {lnf.detail}")
-            start_height -= z_dist
-        else:
-            break
-        run_args.recorder.clear_sample_tag()
+    hw_mount = OT3Mount.LEFT if run_args.pipette.mount == "left" else OT3Mount.RIGHT
+    run_args.recorder.set_sample_tag(f"trial-{trial}-{tip}ul")
+    # TODO add in stuff for secondary probe
+    try:
+        height = hw_api.liquid_probe(hw_mount, z_distance, lps, probe_target)
+    except PipetteLiquidNotFoundError as lnf:
+        ui.print_info(f"Liquid not found current position {lnf.detail}")
+    run_args.recorder.clear_sample_tag()
 
     ui.print_info(f"Trial {trial} complete")
     return height
