@@ -4,8 +4,10 @@ import typing
 import psutil
 from pathlib import Path
 from unittest.mock import patch, MagicMock
+from performance_metrics.system_resource_tracker._system_resource_tracker import (
+    _SystemResourceTracker,
+)
 from performance_metrics import (
-    SystemResourceTracker,
     SystemResourceTrackerConfiguration,
 )
 
@@ -38,7 +40,7 @@ def test_process_filtering(tmp_path: Path) -> None:
     config = SystemResourceTrackerConfiguration(
         process_filters=("*my_script.py", "*another_script*"), storage_dir=tmp_path
     )
-    tracker = SystemResourceTracker(config)
+    tracker = _SystemResourceTracker(config)
 
     tracker.refresh_processes()
     snapshots = tracker.snapshots

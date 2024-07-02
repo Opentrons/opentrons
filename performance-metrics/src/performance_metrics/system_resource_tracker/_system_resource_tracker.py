@@ -4,25 +4,18 @@ import logging
 import typing
 import psutil
 import fnmatch
-import time
 
 from ..util import format_command, get_timing_function
 from ..data_shapes import ProcessResourceUsageSnapshot, MetricsMetadata
 from ..metrics_store import MetricsStore
 from ._config import SystemResourceTrackerConfiguration
-from .logging_config import log_init
 
 _timing_function = get_timing_function()
 
-log_init()
 logger = logging.getLogger(__name__)
-log_level = SystemResourceTrackerConfiguration.parse_logging_level()
-
-if log_level is not None:
-    logger.setLevel(log_level)
 
 
-class SystemResourceTracker:
+class _SystemResourceTracker:
     """Tracks system resource usage."""
 
     def __init__(self, config: SystemResourceTrackerConfiguration) -> None:
@@ -100,30 +93,3 @@ class SystemResourceTracker:
         if new_config != self.config:
             self.config = new_config
             logger.info("Config updated: %s", new_config)
-
-
-def main() -> None:
-    """Main function."""
-    logger.info("Starting system resource tracker...")
-    config = SystemResourceTrackerConfiguration()
-    tracker = SystemResourceTracker(config)
-
-    try:
-        while True:
-            refreshed_config = SystemResourceTrackerConfiguration.from_env()
-
-            if tracker.config.logging_level_update_needed(refreshed_config):
-                logger.setLevel(refreshed_config.logging_level)
-
-            tracker.update_changes_to_config(refreshed_config)
-            tracker.get_and_store_system_data_snapshots()
-
-            time.sleep(tracker.config.refresh_interval)
-    except Exception as e:
-        logger.error("Exception occurred: %s", str(e))
-    finally:
-        logger.info("System resource tracker is stopping.")
-
-
-if __name__ == "__main__":
-    main()
