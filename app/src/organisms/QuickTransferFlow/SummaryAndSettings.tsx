@@ -88,14 +88,20 @@ export function SummaryAndSettings(
       deckConfig,
       protocolName
     )
-    createProtocolAsync({ files: [protocolFile] }).then(data => {
-      history.push(`protocols/${data.data.id}`)
+    createProtocolAsync({
+      files: [protocolFile],
+      protocolKind: 'quick-transfer',
+    }).then(() => {
+      history.push(`/quick-transfer`)
     })
   }
 
   const handleClickRun = (): void => {
     const protocolFile = createQuickTransferFile(state, deckConfig)
-    createProtocolAsync({ files: [protocolFile] }).then(data => {
+    createProtocolAsync({
+      files: [protocolFile],
+      protocolKind: 'quick-transfer',
+    }).then(data => {
       createRun({
         protocolId: data.data.id,
       })
