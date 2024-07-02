@@ -32,6 +32,8 @@ export const ANALYZE_PROTOCOL: 'protocolStorage:ANALYZE_PROTOCOL' =
   'protocolStorage:ANALYZE_PROTOCOL'
 export const ANALYZE_CREATE_PROTOCOL: 'protocolStorage:ANALYZE_CREATE_PROTOCOL' =
   'protocolStorage:ANALYZE_CREATE_PROTOCOL'
+export const ANALYZE_CREATE_PROTOCOL_ERROR: 'protocolStorage:ANALYZE_CREATE_PROTOCOL_ERROR' =
+  'protocolStorage:ANALYZE_CREATE_PROTOCOL_ERROR'
 export const ANALYZE_PROTOCOL_SUCCESS: 'protocolStorage:ANALYZE_PROTOCOL_SUCCESS' =
   'protocolStorage:ANALYZE_PROTOCOL_SUCCESS'
 
@@ -125,6 +127,14 @@ export const analyzeCreateProtocol = (
 ): Types.AnalyzeCreateProtocolAction => ({
   type: ANALYZE_CREATE_PROTOCOL,
   payload: { code },
+  meta: { shell: true },
+})
+
+export const analyzeCreateProtocolError = (
+  errorMessage: string
+): Types.AnalyzeCreateProtocolErrorAction => ({
+  type: ANALYZE_CREATE_PROTOCOL_ERROR,
+  payload: { errorMessage },
   meta: { shell: true },
 })
 

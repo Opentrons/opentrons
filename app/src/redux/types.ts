@@ -22,6 +22,7 @@ import type {
   ProtocolStorageAction,
   AnalyzeCreateProtocolAction,
   AddAnalysisAction,
+  AnalyzeCreateProtocolErrorAction,
 } from './protocol-storage/types'
 import type { ProtocolAnalysisAction } from './protocol-analysis'
 import type {
@@ -81,6 +82,7 @@ export type Action =
   | AnalyticsTriggerAction
   | AnalyzeCreateProtocolAction
   | AddAnalysisAction
+  | AnalyzeCreateProtocolErrorAction
 
 export type GetState = () => State
 

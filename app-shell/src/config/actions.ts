@@ -24,6 +24,7 @@ import type {
   AddProtocolAction,
   AddProtocolFailureAction,
   AnalyzeCreateProtocolAction,
+  AnalyzeCreateProtocolErrorAction,
   AnalyzeProtocolAction,
   AnalyzeProtocolFailureAction,
   AnalyzeProtocolSuccessAction,
@@ -84,6 +85,7 @@ import {
   UPDATE_BRIGHTNESS,
   ADD_ANALYSIS,
   ANALYZE_CREATE_PROTOCOL,
+  ANALYZE_CREATE_PROTOCOL_ERROR,
 } from '../constants'
 import type {
   InitializedAction,
@@ -288,6 +290,14 @@ export const analyzeCreateProtocol = (
 ): AnalyzeCreateProtocolAction => ({
   type: ANALYZE_CREATE_PROTOCOL,
   payload: { code },
+  meta: { shell: true },
+})
+
+export const analyzeCreateProtocolError = (
+  errorMessage: string
+): AnalyzeCreateProtocolErrorAction => ({
+  type: ANALYZE_CREATE_PROTOCOL_ERROR,
+  payload: { errorMessage },
   meta: { shell: true },
 })
 

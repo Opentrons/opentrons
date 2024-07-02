@@ -30,6 +30,7 @@ export interface ProtocolStorageState {
   readonly listFailureMessage: string | null
   readonly code: string | null
   readonly analysis: string | null
+  readonly codeError: string | null
 }
 
 // action types
@@ -98,6 +99,12 @@ export interface AddAnalysisAction {
 export interface AnalyzeCreateProtocolAction {
   type: 'protocolStorage:ANALYZE_CREATE_PROTOCOL'
   payload: { code: string }
+  meta: { shell: true }
+}
+
+export interface AnalyzeCreateProtocolErrorAction {
+  type: 'protocolStorage:ANALYZE_CREATE_PROTOCOL_ERROR'
+  payload: { errorMessage: string }
   meta: { shell: true }
 }
 

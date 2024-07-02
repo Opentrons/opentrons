@@ -16,6 +16,7 @@ export const INITIAL_STATE: ProtocolStorageState = {
   listFailureMessage: null,
   code: null,
   analysis: null,
+  codeError: null,
 }
 
 export const protocolStorageReducer: Reducer<ProtocolStorageState, Action> = (
@@ -52,6 +53,12 @@ export const protocolStorageReducer: Reducer<ProtocolStorageState, Action> = (
       return {
         ...state,
         analysis: action.payload.analysis,
+      }
+    }
+    case Actions.ANALYZE_CREATE_PROTOCOL_ERROR: {
+      return {
+        ...state,
+        codeError: action.payload.errorMessage,
       }
     }
     case Actions.ANALYZE_CREATE_PROTOCOL: {

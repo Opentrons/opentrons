@@ -17,6 +17,7 @@ import {
 } from '../constants'
 import {
   addAnalysis,
+  analyzeCreateProtocolError,
   analyzeProtocol,
   analyzeProtocolFailure,
   analyzeProtocolSuccess,
@@ -195,7 +196,7 @@ export function registerProtocolStorage(dispatch: Dispatch): Dispatch {
             dispatch(addAnalysis(result))
           })
           .catch(error => {
-            console.error('Unexpected protocol analysis failure', { error })
+            dispatch(analyzeCreateProtocolError(error.message))
           })
         break
       }

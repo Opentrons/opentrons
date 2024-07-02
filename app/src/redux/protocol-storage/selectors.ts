@@ -14,10 +14,17 @@ export const getStoredProtocols: (
       .filter((file): file is StoredProtocolData => file != null)
 )
 
-export const getCodeAnalysis: (state: State) => string | null = createSelector(
+interface CodeInfo {
+  analysis: string | null
+  code: string | null
+  error: string | null
+}
+export const getCodeAnalysis: (state: State) => CodeInfo = createSelector(
   state => state.protocolStorage.analysis,
-  analysis => {
-    return analysis
+  state => state.protocolStorage.code,
+  state => state.protocolStorage.codeError,
+  (analysis, code, error) => {
+    return { analysis, code, error }
   }
 )
 

@@ -25,20 +25,21 @@ import {
 import {
   getProtocolsDesktopSortKey,
   updateConfigValue,
+  useFeatureFlag,
 } from '../../redux/config'
 import { useSortedProtocols } from './hooks'
 import { Slideout } from '../../atoms/Slideout'
+import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { ChooseRobotToRunProtocolSlideout } from '../ChooseRobotToRunProtocolSlideout'
 import { SendProtocolToFlexSlideout } from '../SendProtocolToFlexSlideout'
 import { ProtocolUploadInput } from './ProtocolUploadInput'
 import { ProtocolCard } from './ProtocolCard'
 import { EmptyStateLinks } from './EmptyStateLinks'
-import { MenuItem } from '../../atoms/MenuList/MenuItem'
+import { CreateProtocol } from './CreateProtocol'
 
 import type { StoredProtocolData } from '../../redux/protocol-storage'
-import type { ProtocolSort } from './hooks'
 import type { Dispatch } from '../../redux/types'
-import { CreateProtocol } from './CreateProtocol'
+import type { ProtocolSort } from './hooks'
 
 const SORT_BY_BUTTON_STYLE = css`
   background-color: ${COLORS.transparent};
@@ -61,6 +62,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
     showImportProtocolSlideout,
     setShowImportProtocolSlideout,
   ] = React.useState<boolean>(false)
+  const enableTimeline = useFeatureFlag('protocolTimeline')
   const [showCreate, setShowCreate] = React.useState<boolean>(false)
   const [
     showChooseRobotToRunProtocolSlideout,
@@ -206,13 +208,15 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
                 name={showSortByMenu ? 'chevron-up' : 'chevron-down'}
               />
             </Flex>
-            <PrimaryButton
-              onClick={() => {
-                setShowCreate(true)
-              }}
-            >
-              Create
-            </PrimaryButton>
+            {enableTimeline ? (
+              <PrimaryButton
+                onClick={() => {
+                  setShowCreate(true)
+                }}
+              >
+                {t('create')}
+              </PrimaryButton>
+            ) : null}
           </Flex>
           {showSortByMenu && (
             <Flex
