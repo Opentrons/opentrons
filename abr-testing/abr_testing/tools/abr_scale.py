@@ -9,9 +9,10 @@ from abr_testing.automation import google_sheets_tool
 import requests
 from typing import Any, Tuple
 import sys
+import json
 
 
-def get_protocol_step_as_int() -> Tuple[int, float, str]:
+def get_protocol_step_as_int(storage_directory, robot) -> Tuple[int, float, str]:
     """Get user input as integer."""
     expected_liquid_moved = 0.0
     ip = ""
@@ -26,14 +27,28 @@ def get_protocol_step_as_int() -> Tuple[int, float, str]:
             print("Protocol step should be an integer value 1, 2, or 3.")
 
     if int(protocol_step) == 3:
-        ip = input("Robot IP: ")
+        #setup IP sheet
+        ip_json_file = os.path.join(storage_directory, "IP_N_VOLUMES.json")
+        #try to create an array copying the contents of IP_N_Volumes
+        try:
+            ip_file = json.load(open(ip_json_file))
+        except FileNotFoundError:
+            print(f"Please add json file with robot IPs and expected volumes to: {storage_directory}.")
+            sys.exit()
+        tot_info = ip_file["information"]
+        robot_info = tot_info[robot]
+        IP_add = robot_info["IP"]
+        exp_volume = robot_info["volume"]
+        
+        ip = IP_add
         while True:
             try:
-                expected_liquid_moved = float(input("Expected volume moved: "))
+                expected_liquid_moved = float(exp_volume)
                 if expected_liquid_moved >= 0 or expected_liquid_moved <= 0:
                     break
             except ValueError:
                 print("Expected liquid moved volume should be an float.")
+
     return protocol_step, expected_liquid_moved, ip
 
 
@@ -168,8 +183,9 @@ if __name__ == "__main__":
     )
     robot = input("Robot: ")
     labware = input("Labware: ")
-    protocol_step, expected_liquid_moved, ip = get_protocol_step_as_int()
-
+    protocol_step, expected_liquid_moved, ip = get_protocol_step_as_int(storage_directory, robot)
+    print(ip)
+    print(expected_liquid_moved)
     # Scale Loop
     grams, is_stable = scale.read_mass()
     grams, is_stable = scale.read_mass()
