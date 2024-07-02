@@ -12,6 +12,7 @@ export type DevInternalFlag =
   | 'protocolStats'
   | 'enableRunNotes'
   | 'enableQuickTransfer'
+  | 'protocolTimeline'
   | 'enableCsvFile'
 
 export type FeatureFlags = Partial<Record<DevInternalFlag, boolean | undefined>>
