@@ -6,14 +6,17 @@ import {
   orderRuntimeParameterRangeOptions,
 } from '@opentrons/shared-data'
 import { BORDERS, COLORS } from '../../helix-design-system'
-import { SPACING, TYPOGRAPHY } from '../../ui-style-constants/index'
-import { TYPOGRAPHY as HELIX_TYPOGRAPHY } from '../../helix-design-system/product'
+import {
+  SPACING,
+  TYPOGRAPHY as LEGACY_TYPOGERAPHY,
+} from '../../ui-style-constants/index'
+import { TYPOGRAPHY } from '../../helix-design-system/product'
 import { Chip } from '../../atoms/Chip'
 import { StyledText } from '../../atoms/StyledText'
 import { Tooltip, useHoverTooltip } from '../../tooltips'
 import { Icon } from '../../icons'
 import { Flex } from '../../primitives'
-import { DISPLAY_INLINE, FLEX_MAX_CONTENT } from '../../styles'
+import { DISPLAY_INLINE, FLEX_MAX_CONTENT, SIZE_1 } from '../../styles'
 
 import type { RunTimeParameter } from '@opentrons/shared-data'
 
@@ -137,7 +140,7 @@ const ParameterName = (props: ParameterNameProps): JSX.Element => {
           <Flex display={DISPLAY_INLINE} {...targetProps}>
             <Icon
               name="information"
-              size={SPACING.spacing16}
+              size={SIZE_1}
               color={COLORS.grey60}
               data-testid={`Icon_${index}`}
               paddingTop={SPACING.spacing4}
@@ -146,7 +149,7 @@ const ParameterName = (props: ParameterNameProps): JSX.Element => {
           <Tooltip
             {...tooltipProps}
             backgroundColor={COLORS.black90}
-            css={TYPOGRAPHY.labelRegular}
+            css={LEGACY_TYPOGERAPHY.labelRegular}
             width="8.75rem"
           >
             {description}
@@ -164,7 +167,7 @@ const StyledTable = styled.table`
 `
 
 const StyledTableHeader = styled.th`
-  font: ${HELIX_TYPOGRAPHY.fontStyleBodyDefaultRegular};
+  font: ${TYPOGRAPHY.fontStyleBodyDefaultRegular};
   color: ${COLORS.grey60};
   grid-gap: ${SPACING.spacing16};
   padding-bottom: ${SPACING.spacing8};

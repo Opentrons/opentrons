@@ -305,11 +305,11 @@ export const LiquidsListItemDetails = (
     <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
       <Flex
         css={LIQUID_BORDER_STYLE}
-        padding="0.55rem"
+        padding="0.5rem"
         height="max-content"
         backgroundColor={COLORS.white}
       >
-        <Icon name="circle" color={displayColor} size="0.55rem" />
+        <Icon name="circle" color={displayColor} size="0.5rem" />
       </Flex>
       <Flex flexDirection={DIRECTION_COLUMN} justifyContent={JUSTIFY_CENTER}>
         <LegacyStyledText
