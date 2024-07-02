@@ -2574,6 +2574,7 @@ class OT3API(
         probe_settings: LiquidProbeSettings,
         probe: InstrumentProbeType,
         z_distance: float,
+        force_both_sensors: bool = False,
     ) -> float:
         plunger_direction = -1 if probe_settings.aspirate_while_sensing else 1
         await self._backend.liquid_probe(
@@ -2585,6 +2586,7 @@ class OT3API(
             probe_settings.output_option,
             probe_settings.data_files,
             probe=probe,
+            force_both_sensors=force_both_sensors,
         )
         end_pos = await self.gantry_position(mount, refresh=True)
         return end_pos.z
@@ -2607,6 +2609,7 @@ class OT3API(
         max_z_dist: float,
         probe_settings: Optional[LiquidProbeSettings] = None,
         probe: Optional[InstrumentProbeType] = None,
+        force_both_sensors: bool = False,
     ) -> float:
         """Search for and return liquid level height.
 

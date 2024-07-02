@@ -375,6 +375,7 @@ class SensorOutputBinding(int, Enum):
     report = 0x02
     max_threshold_sync = 0x04
     auto_baseline_report = 0x08
+    multi_sensor_sync = 0x10
 
 
 @unique
