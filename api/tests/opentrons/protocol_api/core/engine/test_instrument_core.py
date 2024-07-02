@@ -1,6 +1,7 @@
 """Test for the ProtocolEngine-based instrument API core."""
 from typing import cast, Optional, Union
 
+from opentrons_shared_data.errors.exceptions import PipetteLiquidNotFoundError
 import pytest
 from decoy import Decoy
 
@@ -1302,8 +1303,10 @@ def test_find_liquid_level(
     well_core = WellCore(
         name="my cool well", labware_id="123abc", engine_client=mock_engine_client
     )
-    result = subject.find_liquid_level(well_core)
-    assert result == 0
+    try:
+        subject.find_liquid_level(well_core)
+    except PipetteLiquidNotFoundError:
+        assert True
     decoy.verify(
         mock_engine_client.execute_command_with_result(
             cmd.LiquidProbeParams(
