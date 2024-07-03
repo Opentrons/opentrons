@@ -66,7 +66,7 @@ from ..pipette_fixtures import (
         ],
         [
             QuadrantNozzleLayoutConfiguration(
-                primaryNozzle="A1", frontRightNozzle="E1"
+                primaryNozzle="A1", frontRightNozzle="E1", backLeftNozzle="A1"
             ),
             NozzleMap.build(
                 physical_nozzles=NINETY_SIX_MAP,

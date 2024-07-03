@@ -876,7 +876,12 @@ class QuadrantNozzleLayoutConfiguration(BaseModel):
         ...,
         description="The primary nozzle to use in the layout configuration. This nozzle will update the critical point of the current pipette. For now, this is also the back left corner of your rectangle.",
     )
-    frontRightNozzle: str = Field(
+    frontRightNozzle: Optional[str] = Field(
+        ...,
+        regex=NOZZLE_NAME_REGEX,
+        description="The front right nozzle in your configuration.",
+    )
+    backLeftNozzle: Optional[str] = Field(
         ...,
         regex=NOZZLE_NAME_REGEX,
         description="The front right nozzle in your configuration.",

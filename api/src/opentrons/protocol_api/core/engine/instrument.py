@@ -810,6 +810,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         style: NozzleLayout,
         primary_nozzle: Optional[str],
         front_right_nozzle: Optional[str],
+        back_left_nozzle: Optional[str],
     ) -> None:
         if style == NozzleLayout.COLUMN:
             configuration_model: NozzleLayoutConfigurationType = (
@@ -817,15 +818,25 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                     primaryNozzle=cast(PRIMARY_NOZZLE_LITERAL, primary_nozzle)
                 )
             )
+        elif style == NozzleLayout.PARTIAL_COLUMN:
+            assert primary_nozzle is not None
+            assert front_right_nozzle is not None or back_left_nozzle is not None
+            configuration_model = QuadrantNozzleLayoutConfiguration(
+                primaryNozzle=cast(PRIMARY_NOZZLE_LITERAL, primary_nozzle),
+                frontRightNozzle=front_right_nozzle,
+                backLeftNozzle=back_left_nozzle,
+            )
         elif style == NozzleLayout.ROW:
             configuration_model = RowNozzleLayoutConfiguration(
                 primaryNozzle=cast(PRIMARY_NOZZLE_LITERAL, primary_nozzle)
             )
         elif style == NozzleLayout.QUADRANT:
-            assert front_right_nozzle is not None
+            # TODO: reassess the assert logic here to be similar to partial column, we must have at least front right or back left
+            assert front_right_nozzle is not None or back_left_nozzle is not None
             configuration_model = QuadrantNozzleLayoutConfiguration(
                 primaryNozzle=cast(PRIMARY_NOZZLE_LITERAL, primary_nozzle),
                 frontRightNozzle=front_right_nozzle,
+                backLeftNozzle=back_left_nozzle,
             )
         elif style == NozzleLayout.SINGLE:
             configuration_model = SingleNozzleLayoutConfiguration(

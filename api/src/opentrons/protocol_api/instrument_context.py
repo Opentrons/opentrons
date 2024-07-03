@@ -62,6 +62,8 @@ _PARTIAL_NOZZLE_CONFIGURATION_AUTOMATIC_TIP_TRACKING_IN = APIVersion(2, 18)
 """The version after which automatic tip tracking supported partially configured nozzle layouts."""
 _DISPOSAL_LOCATION_OFFSET_ADDED_IN = APIVersion(2, 18)
 """The version after which offsets for deck configured trash containers and changes to alternating tip drop behavior were introduced."""
+_PARTIAL_NOZZLE_CONFIGURATION_SINGLE_ROW_PARTIAL_COLUMN_ADDED_IN = APIVersion(2, 20)
+"""The version after which partial nozzle configurations of single, row, and partial column layouts became available."""
 
 
 class InstrumentContext(publisher.CommandPublisher):
@@ -1963,11 +1965,13 @@ class InstrumentContext(publisher.CommandPublisher):
         self._core.prepare_to_aspirate()
 
     @requires_version(2, 16)
-    def configure_nozzle_layout(
+    def configure_nozzle_layout(  # noqa: C901
         self,
         style: NozzleLayout,
         start: Optional[str] = None,
+        end: Optional[str] = None,
         front_right: Optional[str] = None,
+        back_left: Optional[str] = None,
         tip_racks: Optional[List[labware.Labware]] = None,
     ) -> None:
         """Configure how many tips the 96-channel pipette will pick up.
@@ -2015,9 +2019,8 @@ class InstrumentContext(publisher.CommandPublisher):
         #       NOTE: Disabled layouts error case can be removed once desired map configurations
         #       have appropriate data regarding tip-type to map current values added to the
         #       pipette definitions.
+
         disabled_layouts = [
-            NozzleLayout.ROW,
-            NozzleLayout.SINGLE,
             NozzleLayout.QUADRANT,
         ]
         if style in disabled_layouts:
@@ -2039,10 +2042,37 @@ class InstrumentContext(publisher.CommandPublisher):
                 raise ValueError(
                     "Cannot configure a QUADRANT layout without a front right nozzle."
                 )
-        self._core.configure_nozzle_layout(
-            style,
-            primary_nozzle=start,
-            front_right_nozzle=front_right,
-        )
+        original_enabled_layouts = [NozzleLayout.COLUMN, NozzleLayout.ALL]
+        if (
+            self._api_version
+            < _PARTIAL_NOZZLE_CONFIGURATION_SINGLE_ROW_PARTIAL_COLUMN_ADDED_IN
+        ):
+            if style not in original_enabled_layouts:
+                raise ValueError(
+                    f"Nozzle layout configuration of style {style.value} is unsupported in API Versions lower than {_PARTIAL_NOZZLE_CONFIGURATION_SINGLE_ROW_PARTIAL_COLUMN_ADDED_IN}."
+                )
+
+        if style == NozzleLayout.PARTIAL_COLUMN:
+            if start == "H1" or start == "H12":
+                self._core.configure_nozzle_layout(
+                    style,
+                    primary_nozzle=start,
+                    front_right_nozzle=front_right,
+                    back_left_nozzle=end,
+                )
+            elif start == "A1" or start == "A12":
+                self._core.configure_nozzle_layout(
+                    style,
+                    primary_nozzle=start,
+                    front_right_nozzle=end,
+                    back_left_nozzle=back_left,
+                )
+        else:
+            self._core.configure_nozzle_layout(
+                style,
+                primary_nozzle=start,
+                front_right_nozzle=front_right,
+                back_left_nozzle=back_left,
+            )
         # TODO (spp, 2023-12-05): verify that tipracks are on adapters for only full 96 channel config
         self._tip_racks = tip_racks or []

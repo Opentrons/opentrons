@@ -1193,10 +1193,13 @@ def test_configure_nozzle_layout(
     style: NozzleLayout,
     primary_nozzle: Optional[str],
     front_right_nozzle: Optional[str],
+    back_left_nozzle: Optional[str],
     expected_model: NozzleLayoutConfigurationType,
 ) -> None:
     """The correct model is passed to the engine client."""
-    subject.configure_nozzle_layout(style, primary_nozzle, front_right_nozzle)
+    subject.configure_nozzle_layout(
+        style, primary_nozzle, front_right_nozzle, back_left_nozzle
+    )
 
     decoy.verify(
         mock_engine_client.execute_command(
