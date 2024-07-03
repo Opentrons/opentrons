@@ -148,7 +148,7 @@ class MaintenanceRunDataManager:
             run_id: The identifier of the run to remove.
 
         Raises:
-            EngineConflictError: If deleting the current run, the current run
+            RunConflictError: If deleting the current run, the current run
                 is not idle and cannot be deleted.
             RunNotFoundError: The given run identifier was not found.
         """

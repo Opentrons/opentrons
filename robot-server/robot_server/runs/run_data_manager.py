@@ -169,7 +169,7 @@ class RunDataManager:
             The run resource.
 
         Raise:
-            EngineConflictError: There is a currently active run that cannot
+            RunConflictError: There is a currently active run that cannot
                 be superceded by this new run.
         """
         prev_run_id = self._run_orchestrator_store.current_run_id
@@ -282,7 +282,7 @@ class RunDataManager:
             run_id: The identifier of the run to remove.
 
         Raises:
-            EngineConflictError: If deleting the current run, the current run
+            RunConflictError: If deleting the current run, the current run
                 is not idle and cannot be deleted.
             RunNotFoundError: The given run identifier was not found in the database.
         """
@@ -311,7 +311,7 @@ class RunDataManager:
         Raises:
             RunNotFoundError: The run identifier was not found in the database.
             RunNotCurrentError: The run is not the current run.
-            EngineConflictError: The run cannot be updated because it is not idle.
+            RunConflictError: The run cannot be updated because it is not idle.
         """
         if run_id != self._run_orchestrator_store.current_run_id:
             raise RunNotCurrentError(

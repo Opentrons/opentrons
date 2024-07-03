@@ -108,7 +108,7 @@ class MaintenanceRunOrchestratorStore:
         robot_type: RobotType,
         deck_type: DeckType,
     ) -> None:
-        """Initialize an engine storage interface.
+        """Initialize a run orchestrator storage interface.
 
         Arguments:
             hardware_api: Hardware control API instance used for ProtocolEngine
@@ -130,7 +130,7 @@ class MaintenanceRunOrchestratorStore:
 
     @property
     def current_run_id(self) -> Optional[str]:
-        """Get the run identifier associated with the current engine."""
+        """Get the run identifier associated with the current run orchestrator."""
         return (
             self.run_orchestrator.run_id if self._run_orchestrator is not None else None
         )
@@ -152,16 +152,16 @@ class MaintenanceRunOrchestratorStore:
         """Create and store a ProtocolRunner and ProtocolEngine for a given Run.
 
         Args:
-            run_id: The run resource the engine is assigned to.
+            run_id: The run resource the run orchestrator is assigned to.
             created_at: Run creation datetime
-            labware_offsets: Labware offsets to create the engine with.
+            labware_offsets: Labware offsets to create the run with.
             notify_publishers: Utilized by the engine to notify publishers of state changes.
 
         Returns:
             The initial equipment and status summary of the engine.
         """
-        # Because we will be clearing engine store before creating a new one,
-        # the runner-engine pair should be None at this point.
+        # Because we will be clearing run orchestrator store before creating a new one,
+        # the run orchestrator should be None at this point.
         assert (
             self._run_orchestrator is None
         ), "There is an active maintenance run that was not cleared correctly."
@@ -194,8 +194,8 @@ class MaintenanceRunOrchestratorStore:
         """Remove the ProtocolEngine.
 
         Raises:
-            EngineConflictError: The current runner/engine pair is not idle, so
-            they cannot be cleared.
+            RunConflictError: The current run orchestrator is not idle, so
+            it cannot be cleared.
         """
         if self.run_orchestrator.get_is_okay_to_clear():
             await self.run_orchestrator.finish(
