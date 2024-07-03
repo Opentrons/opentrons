@@ -23,6 +23,7 @@ import {
   LegacyStyledText,
   truncateString,
   TYPOGRAPHY,
+  Tabs,
 } from '@opentrons/components'
 import {
   useCreateRunMutation,
@@ -31,7 +32,7 @@ import {
   useProtocolQuery,
 } from '@opentrons/react-api-client'
 import { MAXIMUM_PINNED_PROTOCOLS } from '../../App/constants'
-import { MediumButton, SmallButton, TabbedButton } from '../../atoms/buttons'
+import { MediumButton, SmallButton } from '../../atoms/buttons'
 import {
   ProtocolDetailsHeaderChipSkeleton,
   ProcotolDetailsHeaderTitleSkeleton,
@@ -193,23 +194,18 @@ const ProtocolSectionTabs = ({
   currentOption,
   setCurrentOption,
 }: ProtocolSectionTabsProps): JSX.Element => {
-  const options = protocolSectionTabOptions
-
   return (
     <Flex gridGap={SPACING.spacing8}>
-      {options.map(option => {
-        return (
-          <TabbedButton
-            isSelected={option === currentOption}
-            key={option}
-            onClick={() => {
-              setCurrentOption(option)
-            }}
-          >
-            {option}
-          </TabbedButton>
-        )
-      })}
+      <Tabs
+        tabs={protocolSectionTabOptions.map(option => ({
+          text: option,
+          onClick: () => {
+            setCurrentOption(option)
+          },
+          isActive: option === currentOption,
+          disabled: false,
+        }))}
+      />
     </Flex>
   )
 }

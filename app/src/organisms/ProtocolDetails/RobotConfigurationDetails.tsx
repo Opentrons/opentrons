@@ -10,7 +10,7 @@ import {
   ModuleIcon,
   SIZE_1,
   SPACING,
-  LegacyStyledText,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -64,12 +64,17 @@ export const RobotConfigurationDetails = (
   const { t } = useTranslation(['protocol_details', 'shared'])
 
   const loadingText = (
-    <LegacyStyledText as="p">{t('shared:loading')}</LegacyStyledText>
+    <StyledText desktopStyle="bodyDefaultRegular">
+      {t('shared:loading')}
+    </StyledText>
   )
   const emptyText = (
-    <LegacyStyledText as="p" textTransform={TYPOGRAPHY.textTransformCapitalize}>
+    <StyledText
+      desktopStyle="bodyDefaultRegular"
+      textTransform={TYPOGRAPHY.textTransformCapitalize}
+    >
       {t('shared:empty')}
-    </LegacyStyledText>
+    </StyledText>
   )
 
   const is96PipetteUsed = leftMountPipetteName === 'p1000_96'
@@ -117,15 +122,15 @@ export const RobotConfigurationDetails = (
           isLoading ? (
             loadingText
           ) : (
-            <LegacyStyledText as="p">
+            <StyledText desktopStyle="bodyDefaultRegular">
               {getRobotTypeDisplayName(robotType)}
-            </LegacyStyledText>
+            </StyledText>
           )
         }
       />
       <Divider marginY={SPACING.spacing12} width="100%" />
       <RobotConfigurationDetailsItem
-        label={is96PipetteUsed ? t('both_mounts') : t('left_mount')}
+        label={is96PipetteUsed ? t('left_and_right_mounts') : t('left_mount')}
         item={isLoading ? loadingText : leftMountItem}
       />
       {!is96PipetteUsed && (
@@ -151,11 +156,11 @@ export const RobotConfigurationDetails = (
           <React.Fragment key={`module_${index}`}>
             <Divider marginY={SPACING.spacing12} width="100%" />
             <RobotConfigurationDetailsItem
-              label={
+              label={`${t('slot')} ${
                 getModuleType(module.params.model) === THERMOCYCLER_MODULE_TYPE
                   ? getSlotsForThermocycler(robotType)
                   : module.params.location.slotName
-              }
+              }`}
               item={
                 <>
                   <ModuleIcon
@@ -168,9 +173,9 @@ export const RobotConfigurationDetails = (
                     minWidth={SIZE_1}
                     minHeight={SIZE_1}
                   />
-                  <LegacyStyledText as="p">
+                  <StyledText desktopStyle="bodyDefaultRegular">
                     {getModuleDisplayName(module.params.model)}
-                  </LegacyStyledText>
+                  </StyledText>
                 </>
               }
             />
@@ -182,7 +187,7 @@ export const RobotConfigurationDetails = (
           <React.Fragment key={`fixture_${index}`}>
             <Divider marginY={SPACING.spacing12} width="100%" />
             <RobotConfigurationDetailsItem
-              label={getCutoutDisplayName(fixture.cutoutId)}
+              label={`${t('slot')} ${getCutoutDisplayName(fixture.cutoutId)}`}
               item={
                 <>
                   {MAGNETIC_BLOCK_FIXTURES.includes(fixture.cutoutFixtureId) ? (
@@ -197,9 +202,9 @@ export const RobotConfigurationDetails = (
                       minHeight={SIZE_1}
                     />
                   ) : null}
-                  <LegacyStyledText as="p">
+                  <StyledText desktopStyle="bodyDefaultRegular">
                     {getFixtureDisplayName(fixture.cutoutFixtureId)}
-                  </LegacyStyledText>
+                  </StyledText>
                 </>
               }
             />
@@ -225,17 +230,16 @@ export const RobotConfigurationDetailsItem = (
       flexDirection={DIRECTION_ROW}
       alignItems={ALIGN_CENTER}
     >
-      <LegacyStyledText
-        as="label"
+      <StyledText
+        desktopStyle="bodyDefaultRegular"
         flex="0 0 auto"
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         marginRight={SPACING.spacing16}
         color={COLORS.grey60}
         textTransform={TYPOGRAPHY.textTransformCapitalize}
-        width="4.625rem"
+        width="9.375rem"
       >
         {label}
-      </LegacyStyledText>
+      </StyledText>
       <Flex data-testid={`RobotConfigurationDetails_${label}`}>{item}</Flex>
     </Flex>
   )

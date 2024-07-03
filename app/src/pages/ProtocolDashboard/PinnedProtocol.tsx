@@ -13,11 +13,11 @@ import {
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   OVERFLOW_WRAP_ANYWHERE,
   SPACING,
   TYPOGRAPHY,
   useLongPress,
-  LegacyStyledText,
 } from '@opentrons/components'
 
 import { LongPressModal } from './LongPressModal'
@@ -88,7 +88,7 @@ export function PinnedProtocol(props: PinnedProtocolProps): JSX.Element {
   const protocolName = protocol.metadata.protocolName ?? protocol.files[0].name
   const { t } = useTranslation('protocol_info')
 
-  // ToDo (kk:06/18/2024) this will be removed when we freeze the code
+  // ToDo (kk:06/18/2024) this will be removed later
   const enableCsvFile = useFeatureFlag('enableCsvFile')
 
   const handleProtocolClick = (
