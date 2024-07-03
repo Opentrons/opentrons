@@ -181,6 +181,9 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
     ),
     castValue: Number,
   },
+  message: {
+    getErrors: composeErrors(requiredField),
+  },
   aspirate_labware: {
     getErrors: composeErrors(requiredField),
     hydrate: getLabwareOrAdditionalEquipmentEntity,
