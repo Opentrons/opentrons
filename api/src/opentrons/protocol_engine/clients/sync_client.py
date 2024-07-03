@@ -13,7 +13,7 @@ from ..types import (
     Liquid,
     LabwareOffsetCreate,
 )
-from .transports import ChildThreadTransport, RunStoppedBeforeCommandError
+from .transports import ChildThreadTransport
 
 
 class SyncClient:
