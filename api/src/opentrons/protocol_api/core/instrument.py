@@ -298,8 +298,14 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
     def is_tip_tracking_available(self) -> bool:
         """Return whether auto tip tracking is available for the pipette's current nozzle configuration."""
 
+    @abstractmethod
     def retract(self) -> None:
         """Retract this instrument to the top of the gantry."""
+        ...
+
+    @abstractmethod
+    def find_liquid_level(self, well_core: WellCoreType, error_recovery: bool) -> float:
+        """Do a liquid probe to find the level of the liquid in the well."""
         ...
 
 
