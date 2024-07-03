@@ -67,7 +67,7 @@ export function SummaryAndSettings(
     quickTransferSummaryReducer,
     initialSummaryState
   )
-  // TODO: adjust this mutation to add the quick transfer query parameter
+
   const { mutateAsync: createProtocolAsync } = useCreateProtocolMutation()
 
   const { createRun } = useCreateRunMutation(

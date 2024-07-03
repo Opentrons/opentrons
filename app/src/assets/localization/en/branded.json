@@ -15,6 +15,7 @@
   "contact_support_for_connection_help": "If none of these work, contact Opentrons Support for help (via the question mark link in this app, or by emailing {{support_email}}.)",
   "deck_fixture_setup_modal_bottom_description": "For details on installing different fixture types, scan the QR code or search for “deck configuration” on support.opentrons.com",
   "delete_protocol_from_app": "Delete the protocol, make changes to address the error, and resend the protocol to this robot from the Opentrons App.",
+  "delete_transfer_from_app": "Delete the quick transfer, make changes to address the error, and recreate to this transfer on the Flex display.",
   "error_boundary_description": "You need to restart the touchscreen. Then download the robot logs from the Opentrons App and send them to support@opentrons.com for assistance.",
   "estop_pressed_description": "First, safely clear the deck of any labware or spills. Then, twist the E-stop button clockwise. Finally, have Flex move the gantry to its home position.",
   "find_your_robot": "Find your robot in the Opentrons App to install software updates.",

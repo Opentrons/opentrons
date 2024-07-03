@@ -217,7 +217,27 @@ describe('shell selectors', () => {
       expect(Selectors.getPinnedProtocolIds(state)).toEqual([])
     })
   })
+  describe('pinnedQuickTransferIds', () => {
+    it('should return id list if pinnedQuickTransferIds is selected', () => {
+      const state: State = {
+        config: {
+          protocols: {
+            pinnedProtocolIds: ['2b790468-5d72-45ba-b5da-2fd2e6d93a0e'],
+          },
+        },
+      } as any
+      expect(Selectors.getPinnedQuickTransferIds(state)).toEqual([
+        '2b790468-5d72-45ba-b5da-2fd2e6d93a0e',
+      ])
+    })
 
+    it('should return empty array if saved value in config is empty array', () => {
+      const state: State = {
+        config: { protocols: { pinnedQuickTransferIds: [] } },
+      } as any
+      expect(Selectors.getPinnedQuickTransferIds(state)).toEqual([])
+    })
+  })
   describe('getOnDeviceDisplaySettings', () => {
     it('should return the initial settings OnDeviceDisplaySettings, when starting the unbox flow', () => {
       const state: State = {

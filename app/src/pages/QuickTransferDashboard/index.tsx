@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useHistory } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
@@ -9,6 +10,7 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
+  JUSTIFY_SPACE_BETWEEN,
   POSITION_STATIC,
   POSITION_STICKY,
   SPACING,
@@ -16,28 +18,27 @@ import {
 } from '@opentrons/components'
 import { useAllProtocolsQuery } from '@opentrons/react-api-client'
 
-import { SmallButton } from '../../atoms/buttons'
+import { SmallButton, FloatingActionButton } from '../../atoms/buttons'
 import { Navigation } from '../../organisms/Navigation'
 import {
-  getPinnedProtocolIds,
-  getProtocolsOnDeviceSortKey,
+  getPinnedQuickTransferIds,
+  getQuickTransfersOnDeviceSortKey,
   updateConfigValue,
 } from '../../redux/config'
-import { PinnedProtocolCarousel } from './PinnedProtocolCarousel'
-import { sortProtocols } from './utils'
-import { ProtocolCard } from './ProtocolCard'
-import { NoProtocols } from './NoProtocols'
-import { DeleteProtocolConfirmationModal } from './DeleteProtocolConfirmationModal'
-import { useNotifyAllRunsQuery } from '../../resources/runs'
+import { PinnedTransferCarousel } from './PinnedTransferCarousel'
+import { sortQuickTransfers } from './utils'
+import { QuickTransferCard } from './QuickTransferCard'
+import { NoQuickTransfers } from './NoQuickTransfers'
+import { DeleteTransferConfirmationModal } from './DeleteTransferConfirmationModal'
 
 import type { Dispatch } from '../../redux/types'
-import type { ProtocolsOnDeviceSortKey } from '../../redux/config/types'
+import type { QuickTransfersOnDeviceSortKey } from '../../redux/config/types'
 import type { ProtocolResource } from '@opentrons/shared-data'
 
-export function ProtocolDashboard(): JSX.Element {
+export function QuickTransferDashboard(): JSX.Element {
   const protocols = useAllProtocolsQuery()
-  const runs = useNotifyAllRunsQuery()
-  const { t } = useTranslation('protocol_info')
+  const history = useHistory()
+  const { t } = useTranslation(['quick_transfer', 'protocol_info'])
   const dispatch = useDispatch<Dispatch>()
   const [navMenuIsOpened, setNavMenuIsOpened] = React.useState<boolean>(false)
   const [
@@ -48,25 +49,27 @@ export function ProtocolDashboard(): JSX.Element {
     showDeleteConfirmationModal,
     setShowDeleteConfirmationModal,
   ] = React.useState<boolean>(false)
-  const [targetProtocolId, setTargetProtocolId] = React.useState<string>('')
-  const [isRequiredCSV, setIsRequiredCSV] = React.useState<boolean>(false)
-  const sortBy = useSelector(getProtocolsOnDeviceSortKey) ?? 'alphabetical'
-  const protocolsData =
-    protocols.data?.data.filter(protocol => {
-      protocol.protocolKind !== 'quick-transfer'
-    }) ?? []
-  let unpinnedProtocols: ProtocolResource[] = protocolsData
+  const [targetTransferId, setTargetTransferId] = React.useState<string>('')
+  const sortBy = useSelector(getQuickTransfersOnDeviceSortKey) ?? 'alphabetical'
+  const quickTransfersData = protocols.data?.data ?? []
+  let quickTransfers: ProtocolResource[] = quickTransfersData.filter(
+    protocol => {
+      return protocol.protocolKind === 'quick-transfer'
+    }
+  )
+
+  let unpinnedTransfers: ProtocolResource[] = quickTransfersData
 
   // The pinned protocols are stored as an array of IDs in config
-  const pinnedProtocolIds = useSelector(getPinnedProtocolIds) ?? []
-  const pinnedProtocols: ProtocolResource[] = []
+  const pinnedTransferIds = useSelector(getPinnedQuickTransferIds) ?? []
+  const pinnedTransfers: ProtocolResource[] = []
 
   // We only need to grab out the pinned protocol data once all the protocols load
   // and if we have pinned ids stored in config.
-  if (protocolsData.length > 0 && pinnedProtocolIds.length > 0) {
+  if (quickTransfersData.length > 0 && pinnedTransferIds.length > 0) {
     // First: if they're not in the list, they're not pinned.
-    unpinnedProtocols = protocolsData.filter(
-      p => !pinnedProtocolIds.includes(p.id)
+    unpinnedTransfers = quickTransfersData.filter(
+      p => !pinnedTransferIds.includes(p.id)
     )
     // We want an array of protocols in the same order as the
     // array of IDs we stored. There are many ways to sort
@@ -78,10 +81,10 @@ export function ProtocolDashboard(): JSX.Element {
     // If that happens, there's no way to unpin them so let's sync the config
     // back up with the actual protocols we have on hand.
     const missingIds: string[] = []
-    for (const id of pinnedProtocolIds) {
-      const protocol = protocolsData.find(p => p.id === id)
-      if (protocol !== undefined) {
-        pinnedProtocols.push(protocol)
+    for (const id of pinnedTransferIds) {
+      const transfer = quickTransfersData.find(p => p.id === id)
+      if (transfer !== undefined) {
+        pinnedTransfers.push(transfer)
       } else {
         missingIds.push(id)
       }
@@ -89,59 +92,45 @@ export function ProtocolDashboard(): JSX.Element {
 
     // Here's where we'll fix the config if we need to.
     if (missingIds.length > 0) {
-      const actualPinnedIds = pinnedProtocolIds.filter(
+      const actualPinnedIds = pinnedTransferIds.filter(
         id => !missingIds.includes(id)
       )
       dispatch(
-        updateConfigValue('protocols.pinnedProtocolIds', actualPinnedIds)
+        updateConfigValue('protocols.pinnedTransferIds', actualPinnedIds)
       )
     }
   }
 
-  const runData = runs.data?.data != null ? runs.data?.data : []
-  const allRunsNewestFirst = runData.sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  )
-  const sortedProtocols = sortProtocols(
-    sortBy,
-    unpinnedProtocols,
-    allRunsNewestFirst
-  )
-  const handleProtocolsBySortKey = (
-    sortKey: ProtocolsOnDeviceSortKey
+  const sortedTransfers = sortQuickTransfers(sortBy, unpinnedTransfers)
+  const handleTransfersBySortKey = (
+    sortKey: QuickTransfersOnDeviceSortKey
   ): void => {
-    dispatch(updateConfigValue('protocols.protocolsOnDeviceSortKey', sortKey))
+    dispatch(
+      updateConfigValue('protocols.quickTransfersOnDeviceSortKey', sortKey)
+    )
   }
 
   const handleSortByName = (): void => {
     if (sortBy === 'alphabetical') {
-      handleProtocolsBySortKey('reverse')
+      handleTransfersBySortKey('reverse')
     } else {
-      handleProtocolsBySortKey('alphabetical')
-    }
-  }
-
-  const handleSortByLastRun = (): void => {
-    if (sortBy === 'recentRun') {
-      handleProtocolsBySortKey('oldRun')
-    } else {
-      handleProtocolsBySortKey('recentRun')
+      handleTransfersBySortKey('alphabetical')
     }
   }
 
   const handleSortByDate = (): void => {
     if (sortBy === 'recentCreated') {
-      handleProtocolsBySortKey('oldCreated')
+      handleTransfersBySortKey('oldCreated')
     } else {
-      handleProtocolsBySortKey('recentCreated')
+      handleTransfersBySortKey('recentCreated')
     }
   }
 
   return (
     <>
       {showDeleteConfirmationModal ? (
-        <DeleteProtocolConfirmationModal
-          protocolId={targetProtocolId}
+        <DeleteTransferConfirmationModal
+          protocolId={targetTransferId}
           setShowDeleteConfirmationModal={setShowDeleteConfirmationModal}
         />
       ) : null}
@@ -155,7 +144,7 @@ export function ProtocolDashboard(): JSX.Element {
           longPressModalIsOpened={longPressModalIsOpened}
         />
         <Box paddingX={SPACING.spacing40}>
-          {pinnedProtocols.length > 0 && (
+          {pinnedTransfers.length > 0 && (
             <Flex
               flexDirection={DIRECTION_COLUMN}
               marginBottom={SPACING.spacing32}
@@ -165,21 +154,21 @@ export function ProtocolDashboard(): JSX.Element {
                 marginBottom={SPACING.spacing8}
                 color={COLORS.grey60}
               >
-                {t('pinned_protocols')}
+                {t('pinned_transfers')}
               </LegacyStyledText>
-              <PinnedProtocolCarousel
-                pinnedProtocols={pinnedProtocols}
+              <PinnedTransferCarousel
+                pinnedTransfers={pinnedTransfers}
                 longPress={setLongPressModalOpened}
                 setShowDeleteConfirmationModal={setShowDeleteConfirmationModal}
-                setTargetProtocolId={setTargetProtocolId}
-                isRequiredCSV={isRequiredCSV}
+                setTargetTransferId={setTargetTransferId}
               />
             </Flex>
           )}
-          {sortedProtocols.length > 0 ? (
+          {sortedTransfers.length > 0 ? (
             <>
               <Flex
                 alignItems={ALIGN_CENTER}
+                justifyContent={JUSTIFY_SPACE_BETWEEN}
                 backgroundColor={COLORS.white}
                 flexDirection={DIRECTION_ROW}
                 paddingBottom={SPACING.spacing16}
@@ -194,7 +183,7 @@ export function ProtocolDashboard(): JSX.Element {
               >
                 <Flex width="32.3125rem">
                   <SmallButton
-                    buttonText={t('protocol_name_title')}
+                    buttonText={t('transfer_name')}
                     buttonType={
                       sortBy === 'alphabetical' || sortBy === 'reverse'
                         ? 'secondary'
@@ -211,28 +200,9 @@ export function ProtocolDashboard(): JSX.Element {
                     onClick={handleSortByName}
                   />
                 </Flex>
-                <Flex width="12rem">
-                  <SmallButton
-                    buttonText={t('last_run')}
-                    buttonType={
-                      sortBy === 'recentRun' || sortBy === 'oldRun'
-                        ? 'secondary'
-                        : 'tertiaryLowLight'
-                    }
-                    iconName={
-                      sortBy === 'recentRun' || sortBy === 'oldRun'
-                        ? sortBy === 'recentRun'
-                          ? 'arrow-down'
-                          : 'arrow-up'
-                        : undefined
-                    }
-                    iconPlacement="endIcon"
-                    onClick={handleSortByLastRun}
-                  />
-                </Flex>
                 <Flex width="14.625rem">
                   <SmallButton
-                    buttonText={t('date_added')}
+                    buttonText={t('protocol_info:date_added')}
                     buttonType={
                       sortBy === 'recentCreated' || sortBy === 'oldCreated'
                         ? 'secondary'
@@ -251,32 +221,33 @@ export function ProtocolDashboard(): JSX.Element {
                 </Flex>
               </Flex>
               <Flex flexDirection={DIRECTION_COLUMN}>
-                {sortedProtocols.map(protocol => {
-                  const lastRun = runs.data?.data.find(
-                    run => run.protocolId === protocol.id
-                  )?.createdAt
-
+                {sortedTransfers.map(transfer => {
                   return (
-                    <ProtocolCard
-                      key={protocol.id}
-                      lastRun={lastRun}
-                      protocol={protocol}
+                    <QuickTransferCard
+                      key={transfer.id}
+                      quickTransfer={transfer}
                       longPress={setLongPressModalOpened}
                       setShowDeleteConfirmationModal={
                         setShowDeleteConfirmationModal
                       }
-                      setTargetProtocolId={setTargetProtocolId}
-                      setIsRequiredCSV={setIsRequiredCSV}
+                      setTargetTransferId={setTargetTransferId}
                     />
                   )
                 })}
               </Flex>
             </>
-          ) : pinnedProtocols.length === 0 ? (
-            <NoProtocols />
+          ) : pinnedTransfers.length === 0 ? (
+            <NoQuickTransfers />
           ) : null}
         </Box>
       </Flex>
+      <FloatingActionButton
+        buttonText={t('quick_transfer')}
+        iconName="plus"
+        onClick={() => {
+          history.push('/quick-transfer/new')
+        }}
+      />
     </>
   )
 }
