@@ -49,13 +49,6 @@ const HIDE_SCROLLBAR = css`
   }
 `
 
-const LIQUID_BORDER_STYLE = css`
-  border-style: ${BORDERS.styleSolid};
-  border-width: 1px;
-  border-color: ${COLORS.grey30};
-  border-radius: ${BORDERS.borderRadius8};
-`
-
 export const CARD_OUTLINE_BORDER_STYLE = css`
   border-style: ${BORDERS.styleSolid};
   border-width: 1px;
