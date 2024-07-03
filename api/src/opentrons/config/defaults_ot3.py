@@ -23,7 +23,7 @@ DEFAULT_PIPETTE_OFFSET = [0.0, 0.0, 0.0]
 DEFAULT_MODULE_OFFSET = [0.0, 0.0, 0.0]
 
 DEFAULT_LIQUID_PROBE_SETTINGS: Final[LiquidProbeSettings] = LiquidProbeSettings(
-    starting_mount_height=98,
+    starting_mount_height=100,
     mount_speed=10,
     plunger_speed=5,
     sensor_threshold_pascals=40,
