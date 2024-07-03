@@ -82,6 +82,11 @@ class _SystemResourceTracker:
         """Get snapshots."""
         snapshots: typing.List[ProcessResourceUsageSnapshot] = []
         for process in self.processes:
+            # It is very important to use oneshot context manager when querying for
+            # process resource usage. Doing this ensure that all the process data is 
+            # only queried once per process instead of once per metric captured.
+
+            # https://psutil.readthedocs.io/en/latest/#psutil.Process.oneshot
             with process.oneshot():
                 cpu_time = process.cpu_times()
                 snapshots.append(
