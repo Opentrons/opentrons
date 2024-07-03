@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { Flex } from '../../primitives'
 import { SPACING } from '../../ui-style-constants'
-import { GlobalStyle } from '../../../../app/src/atoms/GlobalStyle'
 import { customViewports } from '../../../../.storybook/preview'
 import { LiquidIcon } from '.'
 import type { Meta, StoryObj } from '@storybook/react'
@@ -31,7 +30,6 @@ const meta: Meta<typeof LiquidIcon> = {
   decorators: [
     Story => (
       <Flex padding={SPACING.spacing16} width="15rem" height="5rem">
-        <GlobalStyle />
         <Story />
       </Flex>
     ),

@@ -9,7 +9,7 @@ type LiquidIconSize = 'small' | 'medium'
 
 interface LiquidIconProps {
   color: string
-  size: LiquidIconSize
+  size?: LiquidIconSize
 }
 
 const LIQUID_ICON_CONTAINER_STYLE = css`
@@ -23,7 +23,7 @@ const LIQUID_ICON_CONTAINER_STYLE = css`
 `
 
 export function LiquidIcon(props: LiquidIconProps): JSX.Element {
-  const { color, size } = props
+  const { color, size = 'small' } = props
   return (
     <Flex
       css={LIQUID_ICON_CONTAINER_STYLE}
