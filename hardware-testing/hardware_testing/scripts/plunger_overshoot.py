@@ -28,7 +28,7 @@ MNT = OT3Mount.LEFT
 DIAL_THREAD = Optional[Thread]
 DIAL_THREAD_RUNNING = Event()
 
-DIAL_INDICATOR_READ_SECONDS = 0.1
+DIAL_INDICATOR_READ_SECONDS = 0.05
 
 ZERO_ON_NEXT_WRITE = False
 
@@ -51,6 +51,7 @@ def _dial_thread(simulate: bool, csv_file_name: str) -> None:
     read_timestamp = start_timestamp
     dial_zero = 0.0
     plunger_zero = 0.0
+    data_buffer = []
     while DIAL_THREAD_RUNNING.is_set():  # continue until flag is cleared
         time.sleep(0.01)  # give time to main thread
         if read_timestamp + DIAL_INDICATOR_READ_SECONDS < time.time():
@@ -70,9 +71,11 @@ def _dial_thread(simulate: bool, csv_file_name: str) -> None:
                 new_data_line = f"{t}\t\t{dial_pos_zeroed}\t\t{plunger_pos_zeroed}"
             else:
                 new_data_line = f"{t}\t{dial_pos_zeroed}\t\t{plunger_pos_zeroed}\t"
-            data.append_data_to_file(
-                TEST_NAME, RUN_ID, csv_file_name, f"{new_data_line}\n"
-            )
+            data_buffer.append(new_data_line)
+        if len(data_buffer) > 100:
+            lines_str = "\n".join(data_buffer)
+            data.append_data_to_file(TEST_NAME, RUN_ID, csv_file_name, f"{lines_str}\n")
+            data_buffer = []
 
 
 def _start_indicator_thread(simulate: bool, csv_file_name: str) -> None:
@@ -96,11 +99,9 @@ def _zero_indicator_and_plunger() -> None:
 
 
 @asynccontextmanager
-async def _set_move_flags(new_pos: float, simulate: bool) -> AsyncIterator[None]:
-    global MOVING, PLUNGER_POS
+async def _set_move_flags(simulate: bool) -> AsyncIterator[None]:
+    global MOVING
     MOVING = True
-    PLUNGER_POS = new_pos
-    print("Plunger:", round(PLUNGER_POS, 3))
     try:
         yield
         if simulate:
@@ -110,22 +111,33 @@ async def _set_move_flags(new_pos: float, simulate: bool) -> AsyncIterator[None]
 
 
 async def _run_test_loop(api: OT3API) -> None:
+    global PLUNGER_POS
+    overshoot = 0.0
     bottom = api.hardware_pipettes[MNT.to_mount()].plunger_positions.bottom
     min_pos = bottom - MAX_DIST_MM
     max_pos = bottom + MAX_DIST_MM
     prev_inp = ""
     while True:
-        inp_str = input("p=PREP, numbers=JOG, z=ZERO, enter=REPEAT: ")
+        inp_str = input("enter command, or ENTER to repeat: ")
         if not inp_str:
             inp_str = prev_inp
         prev_inp = inp_str
         inputs = [i for i in inp_str.strip().lower().split(" ") if i]
         for inp in inputs:
             if inp == "p":
-                async with _set_move_flags(bottom, api.is_simulator):
+                async with _set_move_flags(api.is_simulator):
                     await api._move_to_plunger_bottom(MNT, rate=1.0)
+                    PLUNGER_POS = bottom
             elif inp == "z":
                 _zero_indicator_and_plunger()
+            elif inp[0] == "o":
+                inp = inp[1:]
+                try:
+                    overshoot = float(inp)
+                    assert 0 <= overshoot <= 1
+                    print("new overshoot value:", overshoot)
+                except ValueError as e:
+                    print(e)
             elif inp[0] == "d":
                 inp = inp[1:]
                 try:
@@ -137,29 +149,49 @@ async def _run_test_loop(api: OT3API) -> None:
                 try:
                     delta = float(inp) * -1
                     new_pos = max(min(PLUNGER_POS + delta, max_pos), min_pos)
-                    async with _set_move_flags(new_pos, api.is_simulator):
+                    use_overshoot = new_pos < PLUNGER_POS  # if closer to endstop (up)
+                    async with _set_move_flags(api.is_simulator):
+                        if use_overshoot and overshoot > 0:
+                            print("Overshoot:", round(new_pos + overshoot, 3))
+                            await helpers_ot3.move_plunger_absolute_ot3(
+                                api, MNT, new_pos - overshoot, speed=SPEED
+                            )
+                        print("Plunger:", round(new_pos, 3))
                         await helpers_ot3.move_plunger_absolute_ot3(
                             api, MNT, new_pos, speed=SPEED
                         )
+                        PLUNGER_POS = new_pos
                 except ValueError as e:
                     print(e)
 
 
 async def _main(simulate: bool):
-    global PIP_SN
+    global PIP_SN, PLUNGER_POS
+
+    # create OT3API
     api = await helpers_ot3.build_async_ot3_hardware_api(
         is_simulating=simulate, pipette_left="p1000_96_v3.5"
     )
     pip = api.hardware_pipettes[MNT.to_mount()]
     await api.add_tip(MNT, 60)
     api.set_pipette_speed(MNT, aspirate=SPEED, dispense=SPEED, blow_out=SPEED)
-    # if ui.get_user_answer("home plunger"):
-    #     async with _set_move_flags(pip.plunger_positions.bottom, simulate):
-    #         await api.home_plunger(MNT)
+
+    # very carefully home
+    if ui.get_user_answer("home plunger"):
+        if ui.get_user_answer("are you SURE you want to HOME?"):
+            if ui.get_user_answer("did you REMOVE the DIAL-INDICATOR?"):
+                if ui.get_user_answer("ready (last chance!)?"):
+                    async with _set_move_flags(simulate):
+                        await api.home_plunger(MNT)
+                        PLUNGER_POS = pip.plunger_positions.bottom
+
+    # create CSV file
     PIP_SN = helpers_ot3.get_pipette_serial_ot3(pip)
     csv = data.create_file_name(TEST_NAME, RUN_ID, f"{PIP_SN}")
     data.dump_data_to_file(TEST_NAME, RUN_ID, csv, f"{CSV_HEADER}\n")
 
+    # start thread which reads from dial-indicator in a loop
+    # while this thread continues on to running a basic UI for jogging
     if not simulate:
         ui.get_user_ready("install dial-indicator and connect to OT3")
     try:
