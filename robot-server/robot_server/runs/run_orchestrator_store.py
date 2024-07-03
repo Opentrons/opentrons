@@ -49,11 +49,10 @@ from opentrons_shared_data.labware.dev_types import LabwareUri
 _log = logging.getLogger(__name__)
 
 
-class EngineConflictError(RuntimeError):
-    """An error raised if an active engine is already initialized.
+class RunConflictError(RuntimeError):
+    """An error raised if an active run is already initialized.
 
-    The store will not create a new engine unless the "current" runner/engine
-    pair is idle.
+    The store will not create a new run orchestrator unless the "current" one is idle.
     """
 
 
@@ -61,7 +60,9 @@ class NoRunOrchestrator(RuntimeError):
     """Raised if you try to get the current run orchestrator while there is none."""
 
 
-async def handle_estop_event(engine_store: "EngineStore", event: HardwareEvent) -> None:
+async def handle_estop_event(
+    run_orchestrator_store: "RunOrchestratorStore", event: HardwareEvent
+) -> None:
     """Handle an E-stop event from the hardware API.
 
     This is meant to run in the engine's thread and asyncio event loop.
@@ -73,19 +74,23 @@ async def handle_estop_event(engine_store: "EngineStore", event: HardwareEvent) 
         if isinstance(event, EstopStateNotification):
             if event.new_state is not EstopState.PHYSICALLY_ENGAGED:
                 return
-            if engine_store.current_run_id is None:
+            if run_orchestrator_store.current_run_id is None:
                 return
             # todo(mm, 2024-04-17): This estop teardown sequencing belongs in the
             # runner layer.
-            engine_store.run_orchestrator.estop()
-            await engine_store.run_orchestrator.finish(error=EStopActivatedError())
+            run_orchestrator_store.run_orchestrator.estop()
+            await run_orchestrator_store.run_orchestrator.finish(
+                error=EStopActivatedError()
+            )
     except Exception:
         # This is a background task kicked off by a hardware event,
         # so there's no one to propagate this exception to.
         _log.exception("Exception handling E-stop event.")
 
 
-def _get_estop_listener(engine_store: "EngineStore") -> HardwareEventHandler:
+def _get_estop_listener(
+    run_orchestrator_store: "RunOrchestratorStore",
+) -> HardwareEventHandler:
     """Create a callback for estop events.
 
     The returned callback is meant to run in the hardware API's thread.
@@ -96,13 +101,13 @@ def _get_estop_listener(engine_store: "EngineStore") -> HardwareEventHandler:
         event: HardwareEvent,
     ) -> None:
         asyncio.run_coroutine_threadsafe(
-            handle_estop_event(engine_store, event), engine_loop
+            handle_estop_event(run_orchestrator_store, event), engine_loop
         )
 
     return run_handler_in_engine_thread_from_hardware_thread
 
 
-class EngineStore:
+class RunOrchestratorStore:
     """Factory and in-memory storage for ProtocolEngine."""
 
     _run_orchestrator: Optional[RunOrchestrator] = None
@@ -154,7 +159,7 @@ class EngineStore:
             and self.run_orchestrator.run_has_started()
             and not self.run_orchestrator.run_has_stopped()
         ):
-            raise EngineConflictError("An engine for a run is currently active")
+            raise RunConflictError("An engine for a run is currently active")
 
         default_orchestrator = self._default_run_orchestrator
         if default_orchestrator is None:
@@ -204,7 +209,7 @@ class EngineStore:
             load_fixed_trash = False
 
         if self._run_orchestrator is not None:
-            raise EngineConflictError("Another run is currently active.")
+            raise RunConflictError("Another run is currently active.")
         engine = await create_protocol_engine(
             hardware_api=self._hardware_api,
             config=ProtocolEngineConfig(
@@ -258,7 +263,7 @@ class EngineStore:
                 post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
             )
         else:
-            raise EngineConflictError("Current run is not idle or stopped.")
+            raise RunConflictError("Current run is not idle or stopped.")
 
         run_data = self.run_orchestrator.get_state_summary()
         commands = self.run_orchestrator.get_all_commands()

@@ -10,8 +10,11 @@ from opentrons_shared_data.errors import ErrorCodes
 
 from robot_server.errors.error_responses import ErrorDetails
 from robot_server.hardware import get_hardware
-from robot_server.runs.dependencies import get_engine_store
-from robot_server.runs.engine_store import EngineStore, EngineConflictError
+from robot_server.runs.dependencies import get_run_orchestrator_store
+from robot_server.runs.run_orchestrator_store import (
+    RunOrchestratorStore,
+    RunConflictError,
+)
 from robot_server.modules.module_identifier import ModuleIdentifier
 
 
@@ -31,14 +34,14 @@ class RunActive(ErrorDetails):
 
 
 async def get_default_orchestrator(
-    engine_store: EngineStore = Depends(get_engine_store),
+    run_orchestrator_store: RunOrchestratorStore = Depends(get_run_orchestrator_store),
     hardware_api: HardwareControlAPI = Depends(get_hardware),
     module_identifier: ModuleIdentifier = Depends(ModuleIdentifier),
 ) -> RunOrchestrator:
     """Get the default run orchestrator with attached modules loaded."""
     try:
-        orchestrator = await engine_store.get_default_orchestrator()
-    except EngineConflictError as e:
+        orchestrator = await run_orchestrator_store.get_default_orchestrator()
+    except RunConflictError as e:
         raise RunActive.from_exc(e).as_error(status.HTTP_409_CONFLICT) from e
 
     attached_modules = hardware_api.attached_modules

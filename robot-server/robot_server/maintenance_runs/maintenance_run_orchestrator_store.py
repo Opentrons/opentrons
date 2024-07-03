@@ -37,16 +37,11 @@ from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 _log = logging.getLogger(__name__)
 
 
-class EngineConflictError(RuntimeError):
-    """An error raised if an active engine is already initialized.
+class RunConflictError(RuntimeError):
+    """An error raised if an active run is already initialized.
 
-    The store will not create a new engine unless the "current" runner/engine
-    pair is idle.
+    The store will not create a new run orchestrator unless the "current" one is idle.
     """
-
-
-class NoRunnerEnginePairError(RuntimeError):
-    """Raised if you try to get the current engine or runner while there is none."""
 
 
 class NoRunOrchestrator(RuntimeError):
@@ -54,7 +49,8 @@ class NoRunOrchestrator(RuntimeError):
 
 
 async def handle_estop_event(
-    engine_store: "MaintenanceEngineStore", event: HardwareEvent
+    maintenance_run_orchestraotr_store: "MaintenanceRunOrchestratorStore",
+    event: HardwareEvent,
 ) -> None:
     """Handle an E-stop event from the hardware API.
 
@@ -67,19 +63,23 @@ async def handle_estop_event(
         if isinstance(event, EstopStateNotification):
             if event.new_state is not EstopState.PHYSICALLY_ENGAGED:
                 return
-            if engine_store.current_run_id is None:
+            if maintenance_run_orchestraotr_store.current_run_id is None:
                 return
             # todo(mm, 2024-04-17): This estop teardown sequencing belongs in the
             # runner layer.
-            engine_store.run_orchestrator.estop()
-            await engine_store.run_orchestrator.finish(error=EStopActivatedError())
+            maintenance_run_orchestraotr_store.run_orchestrator.estop()
+            await maintenance_run_orchestraotr_store.run_orchestrator.finish(
+                error=EStopActivatedError()
+            )
     except Exception:
         # This is a background task kicked off by a hardware event,
         # so there's no one to propagate this exception to.
         _log.exception("Exception handling E-stop event.")
 
 
-def _get_estop_listener(engine_store: "MaintenanceEngineStore") -> HardwareEventHandler:
+def _get_estop_listener(
+    maintenance_run_orchestrator_store: "MaintenanceRunOrchestratorStore",
+) -> HardwareEventHandler:
     """Create a callback for estop events.
 
     The returned callback is meant to run in the hardware API's thread.
@@ -90,13 +90,13 @@ def _get_estop_listener(engine_store: "MaintenanceEngineStore") -> HardwareEvent
         event: HardwareEvent,
     ) -> None:
         asyncio.run_coroutine_threadsafe(
-            handle_estop_event(engine_store, event), engine_loop
+            handle_estop_event(maintenance_run_orchestrator_store, event), engine_loop
         )
 
     return run_handler_in_engine_thread_from_hardware_thread
 
 
-class MaintenanceEngineStore:
+class MaintenanceRunOrchestratorStore:
     """Factory and in-memory storage for ProtocolEngine."""
 
     _run_orchestrator: Optional[RunOrchestrator] = None
@@ -204,7 +204,7 @@ class MaintenanceEngineStore:
                 post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
             )
         else:
-            raise EngineConflictError("Current run is not idle or stopped.")
+            raise RunConflictError("Current run is not idle or stopped.")
 
         run_data = self.run_orchestrator.get_state_summary()
         commands = self.run_orchestrator.get_all_commands()
