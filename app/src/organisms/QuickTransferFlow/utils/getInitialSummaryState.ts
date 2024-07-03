@@ -48,13 +48,11 @@ export function getInitialSummaryState(
   let path: PathOption = 'single'
   if (
     state.transferType === 'consolidate' &&
-    state.destinationWells.length > 1 &&
     volumeLimits.max >= state.volume * 3
   ) {
     path = 'multiDispense'
   } else if (
     state.transferType === 'distribute' &&
-    state.sourceWells.length > 1 &&
     volumeLimits.max >= state.volume * 2
   ) {
     path = 'multiAspirate'
