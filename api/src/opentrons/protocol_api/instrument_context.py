@@ -2067,7 +2067,7 @@ class InstrumentContext(publisher.CommandPublisher):
             raise e
 
     @requires_version(2, 20)
-    def require_liquid(self, well: labware.Well) -> None:
+    def require_liquid_presence(self, well: labware.Well) -> None:
         """If there is no liquid in a well, raise an error.
 
         :returns: None.

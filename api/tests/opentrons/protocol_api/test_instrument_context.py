@@ -1287,7 +1287,7 @@ def test_detect_liquid_presence(
 
 
 @pytest.mark.parametrize("api_version", [APIVersion(2, 20)])
-def test_require_liquid(
+def test_require_liquid_presence(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
     subject: InstrumentContext,
@@ -1296,12 +1296,12 @@ def test_require_liquid(
     """It should raise an exception when called."""
     mock_well = decoy.mock(cls=Well)
     decoy.when(mock_instrument_core.find_liquid_level(mock_well._core))
-    subject.require_liquid(mock_well)
+    subject.require_liquid_presence(mock_well)
     decoy.when(mock_instrument_core.find_liquid_level(mock_well._core)).then_raise(
         PipetteLiquidNotFoundError()
     )
     with pytest.raises(PipetteLiquidNotFoundError):
-        subject.require_liquid(mock_well)
+        subject.require_liquid_presence(mock_well)
 
 
 @pytest.mark.parametrize("api_version", [APIVersion(2, 20)])
@@ -1317,4 +1317,4 @@ def test_measure_liquid_height(
         PipetteLiquidNotFoundError()
     )
     with pytest.raises(PipetteLiquidNotFoundError):
-        subject.require_liquid(mock_well)
+        subject.measure_liquid_height(mock_well)
