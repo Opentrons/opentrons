@@ -34,6 +34,7 @@ interface SmallButtonProps extends StyleProps {
   iconName?: IconName | null
   buttonCategory?: ButtonCategory // if not specified, it will be 'default'
   disabled?: boolean
+  ariaDisabled: boolean
 }
 
 export function SmallButton(props: SmallButtonProps): JSX.Element {
@@ -44,6 +45,7 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
     disabled,
     iconPlacement,
     iconName,
+    ariaDisabled = false,
     ...buttonProps
   } = props
 
@@ -133,6 +135,10 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
         .disabledBackgroundColor};
       color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType].disabledColor};
     }
+
+    &[aria-disabled='true'] {
+      background-color: red;
+    }
   `
 
   return (
@@ -145,6 +151,7 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
           : `${SPACING.spacing16} ${SPACING.spacing24}`
       }
       {...buttonProps}
+      aria-disabled={ariaDisabled}
     >
       <Flex
         flexDirection={DIRECTION_ROW}

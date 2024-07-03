@@ -1,5 +1,5 @@
 import * as React from 'react'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
@@ -38,6 +38,7 @@ interface ChildNavigationProps extends StyleProps {
   iconName?: IconName
   iconPlacement?: IconPlacement
   secondaryButtonProps?: React.ComponentProps<typeof SmallButton>
+  ariaDisabled?: boolean
 }
 
 export function ChildNavigation({
@@ -51,6 +52,7 @@ export function ChildNavigation({
   iconPlacement,
   secondaryButtonProps,
   buttonIsDisabled,
+  ariaDisabled = false,
   ...styleProps
 }: ChildNavigationProps): JSX.Element {
   return (
@@ -98,6 +100,7 @@ export function ChildNavigation({
             iconPlacement={iconPlacement}
             disabled={buttonIsDisabled}
             data-testid="ChildNavigation_Primary_Button"
+            ariaDisabled={ariaDisabled}
           />
         </Flex>
       ) : null}
@@ -126,5 +129,11 @@ const IconButton = styled('button')`
   }
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     cursor: default;
+  }
+`
+
+const DISABLED_BUTTON_STYLE = css`
+  &[aria-disabled='true'] {
+    background-color: red;
   }
 `

@@ -73,5 +73,6 @@ export const TitleWithTwoButtons: Story = {
     onClickButton: () => {},
     secondaryButtonProps,
     onClickBack: () => {},
+    ariaDisabled: true,
   },
 }
