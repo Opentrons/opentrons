@@ -2,6 +2,7 @@ from __future__ import annotations
 import logging
 from contextlib import ExitStack
 from typing import Any, List, Optional, Sequence, Union, cast, Dict
+from opentrons.protocol_engine.errors.error_occurrence import ProtocolCommandFailedError
 from opentrons_shared_data.errors.exceptions import (
     CommandPreconditionViolated,
     CommandParameterLimitViolated,
@@ -2057,14 +2058,14 @@ class InstrumentContext(publisher.CommandPublisher):
         if not isinstance(well, labware.Well):
             raise WellDoesNotExistError("You must provide a valid well to check.")
         try:
-            height = self._core.find_liquid_level(
-                well_core=well._core, error_recovery=False
-            )
-            if height > 0:
-                return True
-            return False  # it should never get here
+            self._core.find_liquid_level_without_recovery(well._core)
+            return True
         except PipetteLiquidNotFoundError:
             return False
+        except ProtocolCommandFailedError as e:
+            if isinstance(e.original_error, PipetteLiquidNotFoundError):
+                return False
+            raise e
         except Exception as e:
             raise e
 
@@ -2077,18 +2078,20 @@ class InstrumentContext(publisher.CommandPublisher):
         if not isinstance(well, labware.Well):
             raise WellDoesNotExistError("You must provide a valid well to check.")
 
-        self._core.find_liquid_level(well_core=well._core, error_recovery=True)
+        self._core.find_liquid_presence_with_recovery(well._core)
 
     @requires_version(2, 20)
     def measure_liquid_height(self, well: labware.Well) -> float:
         """Check the height of the liquid within a well.
 
         :returns: The height, in mm, of the liquid from the deck.
+
+        :meta private:
+
+        This is intended for Opentrons internal use only and is not a guaranteed API.
         """
         if not isinstance(well, labware.Well):
             raise WellDoesNotExistError("You must provide a valid well to check.")
 
-        height = self._core.find_liquid_level(
-            well_core=well._core, error_recovery=False
-        )
+        height = self._core.find_liquid_level_without_recovery(well._core)
         return float(height)

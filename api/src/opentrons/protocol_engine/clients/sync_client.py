@@ -96,26 +96,6 @@ class SyncClient:
         create_request = CreateType(params=cast(Any, params))
         return self._transport.execute_command(create_request)
 
-    def execute_command_with_result(
-        self, params: commands.CommandParams
-    ) -> Optional[commands.CommandResult]:
-        """Execute a ProtocolEngine command, including error recovery, and return a result.
-
-        See `ChildThreadTransport.execute_command_wait_for_recovery()` for exact
-        behavior.
-        """
-        CreateType = CREATE_TYPES_BY_PARAMS_TYPE[type(params)]
-        create_request = CreateType(params=cast(Any, params))
-        result = self._transport.execute_command_wait_for_recovery(create_request)
-        if result.error is None:
-            return result.result
-        if isinstance(result.error, BaseException):  # necessary to pass lint
-            raise result.error
-        raise ProtocolCommandFailedError(
-            original_error=result.error,
-            message=f"{result.error.errorType}: {result.error.detail}",
-        )
-
     @property
     def state(self) -> StateView:
         """Get a view of the engine's state."""

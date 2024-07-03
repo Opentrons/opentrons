@@ -1292,7 +1292,7 @@ def test_configure_for_volume_post_219(
 
 
 @pytest.mark.parametrize("version", versions_at_or_above(APIVersion(2, 20)))
-def test_find_liquid_level(
+def test_find_liquid_level_without_recovery(
     decoy: Decoy,
     mock_engine_client: EngineClient,
     mock_protocol_core: ProtocolCore,
@@ -1304,11 +1304,11 @@ def test_find_liquid_level(
         name="my cool well", labware_id="123abc", engine_client=mock_engine_client
     )
     try:
-        subject.find_liquid_level(well_core=well_core, error_recovery=True)
+        subject.find_liquid_level_without_recovery(well_core=well_core)
     except PipetteLiquidNotFoundError:
         assert True
     decoy.verify(
-        mock_engine_client.execute_command_with_result(
+        mock_engine_client.execute_command_without_recovery(
             cmd.LiquidProbeParams(
                 pipetteId=subject.pipette_id,
                 wellLocation=WellLocation(
@@ -1319,12 +1319,26 @@ def test_find_liquid_level(
             )
         )
     )
+
+
+@pytest.mark.parametrize("version", versions_at_or_above(APIVersion(2, 20)))
+def test_find_liquid_presence_with_recovery(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
+    subject: InstrumentCore,
+    version: APIVersion,
+) -> None:
+    """It should raise an exception on an empty well."""
+    well_core = WellCore(
+        name="my cool well", labware_id="123abc", engine_client=mock_engine_client
+    )
     try:
-        subject.find_liquid_level(well_core=well_core, error_recovery=False)
+        subject.find_liquid_presence_with_recovery(well_core=well_core)
     except PipetteLiquidNotFoundError:
         assert True
     decoy.verify(
-        mock_engine_client.execute_command_without_recovery(
+        mock_engine_client.execute_command(
             cmd.LiquidProbeParams(
                 pipetteId=subject.pipette_id,
                 wellLocation=WellLocation(

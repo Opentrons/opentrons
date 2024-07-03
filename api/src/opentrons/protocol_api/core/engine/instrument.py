@@ -846,30 +846,37 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         z_axis = self._engine_client.state.pipettes.get_z_axis(self._pipette_id)
         self._engine_client.execute_command(cmd.HomeParams(axes=[z_axis]))
 
-    def find_liquid_level(self, well_core: WellCore, error_recovery: bool) -> float:
+    def find_liquid_presence_with_recovery(self, well_core: WellCore) -> None:
         labware_id = well_core.labware_id
         well_name = well_core.get_name()
         well_location = WellLocation(
             origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0)
         )
-        if error_recovery:
-            result = self._engine_client.execute_command_with_result(
-                cmd.LiquidProbeParams(
-                    labwareId=labware_id,
-                    wellName=well_name,
-                    wellLocation=well_location,
-                    pipetteId=self.pipette_id,
-                )
+
+        self._engine_client.execute_command(
+            cmd.LiquidProbeParams(
+                labwareId=labware_id,
+                wellName=well_name,
+                wellLocation=well_location,
+                pipetteId=self.pipette_id,
             )
-        else:
-            result = self._engine_client.execute_command_without_recovery(
-                cmd.LiquidProbeParams(
-                    labwareId=labware_id,
-                    wellName=well_name,
-                    wellLocation=well_location,
-                    pipetteId=self.pipette_id,
-                )
+        )
+
+    def find_liquid_level_without_recovery(self, well_core: WellCore) -> float:
+        labware_id = well_core.labware_id
+        well_name = well_core.get_name()
+        well_location = WellLocation(
+            origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0)
+        )
+
+        result = self._engine_client.execute_command_without_recovery(
+            cmd.LiquidProbeParams(
+                labwareId=labware_id,
+                wellName=well_name,
+                wellLocation=well_location,
+                pipetteId=self.pipette_id,
             )
+        )
 
         if result is not None and isinstance(result, LiquidProbeResult):
             return result.z_position
