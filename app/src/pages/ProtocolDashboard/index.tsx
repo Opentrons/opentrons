@@ -52,6 +52,7 @@ export function ProtocolDashboard(): JSX.Element {
     setShowDeleteConfirmationModal,
   ] = React.useState<boolean>(false)
   const [targetProtocolId, setTargetProtocolId] = React.useState<string>('')
+  const [isRequiredCSV, setIsRequiredCSV] = React.useState<boolean>(false)
   const sortBy = useSelector(getProtocolsOnDeviceSortKey) ?? 'alphabetical'
   const protocolsData = protocols.data?.data ?? []
   let unpinnedProtocols: ProtocolResource[] = protocolsData
@@ -176,6 +177,7 @@ export function ProtocolDashboard(): JSX.Element {
                 longPress={setLongPressModalOpened}
                 setShowDeleteConfirmationModal={setShowDeleteConfirmationModal}
                 setTargetProtocolId={setTargetProtocolId}
+                isRequiredCSV={isRequiredCSV}
               />
             </Flex>
           )}
@@ -269,6 +271,7 @@ export function ProtocolDashboard(): JSX.Element {
                         setShowDeleteConfirmationModal
                       }
                       setTargetProtocolId={setTargetProtocolId}
+                      setIsRequiredCSV={setIsRequiredCSV}
                     />
                   )
                 })}
