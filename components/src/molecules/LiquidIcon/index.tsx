@@ -5,11 +5,11 @@ import { BORDERS, COLORS } from '../../helix-design-system'
 import { css } from 'styled-components'
 import { Icon } from '../../icons'
 
-type liquidIconSize = 'small' | 'medium'
+type LiquidIconSize = 'small' | 'medium'
 
 interface LiquidIconProps {
   color: string
-  size: liquidIconSize
+  size: LiquidIconSize
 }
 
 const LIQUID_ICON_CONTAINER_STYLE = css`
