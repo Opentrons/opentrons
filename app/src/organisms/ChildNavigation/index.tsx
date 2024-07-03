@@ -95,7 +95,7 @@ export function ChildNavigation({
             buttonType={buttonType}
             buttonCategory={buttonType === 'primary' ? 'rounded' : 'default'}
             buttonText={buttonText}
-            onClick={onClickButton}
+            onClick={ariaDisabled ? () => {} : onClickButton}
             iconName={iconName}
             iconPlacement={iconPlacement}
             disabled={buttonIsDisabled}
@@ -129,11 +129,5 @@ const IconButton = styled('button')`
   }
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     cursor: default;
-  }
-`
-
-const DISABLED_BUTTON_STYLE = css`
-  &[aria-disabled='true'] {
-    background-color: red;
   }
 `
