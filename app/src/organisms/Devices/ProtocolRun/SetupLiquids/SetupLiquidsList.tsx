@@ -297,7 +297,7 @@ export const LiquidsListItemDetails = (
   } = props
   return (
     <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
-      <LiquidIcon color={displayColor} size="small"></LiquidIcon>
+      <LiquidIcon color={displayColor} />
       <Flex flexDirection={DIRECTION_COLUMN} justifyContent={JUSTIFY_CENTER}>
         <StyledText
           desktopStyle="bodyDefaultSemiBold"
