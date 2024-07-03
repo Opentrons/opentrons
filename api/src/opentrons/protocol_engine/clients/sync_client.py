@@ -100,18 +100,15 @@ class SyncClient:
         """
         CreateType = CREATE_TYPES_BY_PARAMS_TYPE[type(params)]
         create_request = CreateType(params=cast(Any, params))
-        try:
-            result = self._transport.execute_command_wait_for_recovery(create_request)
-            if result.error is None:
-                return result.result
-            if isinstance(result.error, BaseException):  # necessary to pass lint
-                raise result.error
-            raise ProtocolCommandFailedError(
-                original_error=result.error,
-                message=f"{result.error.errorType}: {result.error.detail}",
-            )
-        except (ProtocolCommandFailedError, RunStoppedBeforeCommandError) as e:
-            raise e
+        result = self._transport.execute_command_wait_for_recovery(create_request)
+        if result.error is None:
+            return result.result
+        if isinstance(result.error, BaseException):  # necessary to pass lint
+            raise result.error
+        raise ProtocolCommandFailedError(
+            original_error=result.error,
+            message=f"{result.error.errorType}: {result.error.detail}",
+        )
 
     @property
     def state(self) -> StateView:
