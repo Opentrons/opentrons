@@ -82,7 +82,6 @@ capacitive_output_file_heading = [
 # FIXME we should organize all of these functions to use the sensor drivers.
 # FIXME we should restrict some of these functions by instrument type.
 
-Z_SOLO_MOVE_DISTANCE = 0.5
 PLUNGER_SOLO_MOVE_TIME = 0.2
 
 
@@ -390,7 +389,7 @@ async def liquid_probe(
     messenger: CanMessenger,
     tool: PipetteProbeTarget,
     head_node: NodeId,
-    max_z_distance: float,
+    max_p_distance: float,
     plunger_speed: float,
     mount_speed: float,
     threshold_pascals: float,
@@ -426,10 +425,20 @@ async def liquid_probe(
         sensor_driver,
         True,
     )
+    p_prep_distance = float64(PLUNGER_SOLO_MOVE_TIME * plunger_speed)
+    p_pass_distance = float64(max_p_distance - p_prep_distance)
+    max_z_distance = (p_pass_distance / plunger_speed) * z_speed
 
+    lower_plunger = create_step(
+        distance={tool: p_prep_distance},
+        velocity={tool: float64(plunger_speed)},
+        acceleration={},
+        duration=float64(PLUNGER_SOLO_MOVE_TIME),
+        present_nodes=[tool],
+    )
     sensor_group = _build_pass_step(
         movers=[head_node, tool],
-        distance={head_node: max_z_distance, tool: max_z_distance},
+        distance={head_node: max_z_distance, tool: p_pass_distance},
         speed={head_node: mount_speed, tool: plunger_speed},
         sensor_type=SensorType.pressure,
         sensor_id=sensor_id,
@@ -440,21 +449,13 @@ async def liquid_probe(
         sensor_group = _fix_pass_step_for_buffer(
             sensor_group,
             movers=[head_node, tool],
-            distance={head_node: max_z_distance, tool: max_z_distance},
+            distance={head_node: max_z_distance, tool: p_pass_distance},
             speed={head_node: mount_speed, tool: plunger_speed},
             sensor_type=SensorType.pressure,
             sensor_id=sensor_id,
             stop_condition=MoveStopCondition.sync_line,
             binding_flags=sensor_binding,
         )
-
-    lower_plunger = create_step(
-        distance={tool: float64(PLUNGER_SOLO_MOVE_TIME * plunger_speed)},
-        velocity={tool: float64(plunger_speed)},
-        acceleration={},
-        duration=float64(PLUNGER_SOLO_MOVE_TIME),
-        present_nodes=[tool],
-    )
 
     sensor_runner = MoveGroupRunner(move_groups=[[lower_plunger], [sensor_group]])
     if csv_output:

@@ -23,11 +23,11 @@ DEFAULT_PIPETTE_OFFSET = [0.0, 0.0, 0.0]
 DEFAULT_MODULE_OFFSET = [0.0, 0.0, 0.0]
 
 DEFAULT_LIQUID_PROBE_SETTINGS: Final[LiquidProbeSettings] = LiquidProbeSettings(
-    starting_mount_height=100,
     mount_speed=10,
     plunger_speed=5,
+    plunger_impulse_time=0.2
     sensor_threshold_pascals=40,
-    output_option=OutputOptions.stream_to_csv,
+    output_option=OutputOptions.sync_buffer_to_csv,
     aspirate_while_sensing=False,
     data_files={InstrumentProbeType.PRIMARY: "/data/pressure_sensor_data.csv"},
 )
