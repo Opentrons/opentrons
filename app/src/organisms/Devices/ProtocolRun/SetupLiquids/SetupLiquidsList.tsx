@@ -14,9 +14,9 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  Icon,
   JUSTIFY_CENTER,
   JUSTIFY_FLEX_START,
+  LiquidIcon,
   SIZE_AUTO,
   SPACING,
   LegacyStyledText,
@@ -304,14 +304,7 @@ export const LiquidsListItemDetails = (
   } = props
   return (
     <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
-      <Flex
-        css={LIQUID_BORDER_STYLE}
-        padding="0.5rem"
-        height="max-content"
-        backgroundColor={COLORS.white}
-      >
-        <Icon name="circle" color={displayColor} size="0.5rem" />
-      </Flex>
+      <LiquidIcon color={displayColor} size="small"></LiquidIcon>
       <Flex flexDirection={DIRECTION_COLUMN} justifyContent={JUSTIFY_CENTER}>
         <StyledText
           desktopStyle="bodyDefaultSemiBold"
