@@ -3,7 +3,7 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
-import { getVolumeRange } from './'
+import { getVolumeRange, getSelectedWellCount } from './'
 
 import type {
   LabwareDefinition2,
@@ -48,11 +48,13 @@ export function getInitialSummaryState(
   let path: PathOption = 'single'
   if (
     state.transferType === 'consolidate' &&
-    volumeLimits.max >= state.volume * 2
+    state.destinationWells.length > 1 &&
+    volumeLimits.max >= state.volume * 3
   ) {
     path = 'multiDispense'
   } else if (
     state.transferType === 'distribute' &&
+    state.sourceWells.length > 1 &&
     volumeLimits.max >= state.volume * 2
   ) {
     path = 'multiAspirate'

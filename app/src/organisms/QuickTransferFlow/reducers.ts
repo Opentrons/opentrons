@@ -1,3 +1,4 @@
+import { getSelectedWellCount } from './utils'
 import { CONSOLIDATE, DISTRIBUTE, TRANSFER } from './constants'
 import type {
   QuickTransferWizardState,
@@ -6,6 +7,7 @@ import type {
   QuickTransferSummaryAction,
   TransferType,
 } from './types'
+import { LabwareDefinition2, PipetteV2Specs } from '@opentrons/shared-data'
 
 export function quickTransferWizardReducer(
   state: QuickTransferWizardState,
@@ -54,15 +56,21 @@ export function quickTransferWizardReducer(
     }
     case 'SET_DEST_WELLS': {
       let transferType: TransferType = TRANSFER
-      if (
-        state.sourceWells != null &&
-        state.sourceWells.length > action.wells.length
-      ) {
+      const sourceWellCount = getSelectedWellCount(
+        state.pipette as PipetteV2Specs,
+        state.source as LabwareDefinition2,
+        state.sourceWells as string[]
+      )
+      const destLabwareDefinition =
+        state.destination === 'source' ? state.source : state.destination
+      const destWellCount = getSelectedWellCount(
+        state.pipette as PipetteV2Specs,
+        destLabwareDefinition as LabwareDefinition2,
+        action.wells
+      )
+      if (state.sourceWells != null && sourceWellCount > destWellCount) {
         transferType = DISTRIBUTE
-      } else if (
-        state.sourceWells != null &&
-        state.sourceWells.length < action.wells.length
-      ) {
+      } else if (state.sourceWells != null && sourceWellCount < destWellCount) {
         transferType = CONSOLIDATE
       }
       return {

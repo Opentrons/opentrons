@@ -211,6 +211,8 @@ export function generateQuickTransferArgs(
     quickTransferState.destinationWells,
     destLabwareDefinition
   )
+
+  // ask jethary about this logic
   if (destWells != null) {
     if (
       quickTransferState.path === 'single' &&
