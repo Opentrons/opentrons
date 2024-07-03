@@ -2636,7 +2636,8 @@ class OT3API(
             probe_settings = self.config.liquid_sense
 
         pos = await self.gantry_position(checked_mount, refresh=True)
-        probe_start_pos = pos._replace(z=probe_settings.starting_mount_height - 2)
+
+        probe_start_pos = pos._replace(z=(pos.z - 2))
         await self.move_to(checked_mount, probe_start_pos)
         total_z_travel = max_z_dist
 
