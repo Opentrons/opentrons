@@ -45,6 +45,15 @@ class _SystemResourceTracker:
 
     def refresh_processes(self) -> None:
         """Filter processes by their command line path with globbing support."""
+        # Note that psutil.process_iter caches the list of processes
+        # As long as the process is alive, it will be cached and reused on the next call to process_iter.
+
+        # Ensure that when calling process_iter you specify at least one attribute to the attr list.
+        # Otherwise all processes info will be retrieved which is slow.
+        # Ideally you will only specify the attributes that you want to filter on.
+
+        # See https://psutil.readthedocs.io/en/latest/#psutil.process_iter
+
         processes = []
         for process in psutil.process_iter(attrs=["cmdline"]):
             try:
