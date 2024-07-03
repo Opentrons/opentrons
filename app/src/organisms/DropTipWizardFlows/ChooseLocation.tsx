@@ -10,6 +10,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
+  JUSTIFY_FLEX_START,
   PrimaryButton,
   RESPONSIVENESS,
   SPACING,
@@ -78,7 +79,7 @@ export const ChooseLocation = (
     }
   }
   return (
-    <Flex>
+    <Flex css={CONTAINER_STYLE}>
       <TwoColumn>
         <Flex flexDirection={DIRECTION_COLUMN} flex="1" gap={SPACING.spacing16}>
           <Title>{title}</Title>
@@ -95,7 +96,6 @@ export const ChooseLocation = (
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         css={ALIGN_BUTTONS}
         gridGap={SPACING.spacing8}
-        marginTop="auto"
       >
         <Btn
           onClick={() => {
@@ -120,7 +120,7 @@ export const ChooseLocation = (
           buttonText={i18n.format(t('move_to_slot'), 'capitalize')}
           onClick={handleConfirmPosition}
           css={css`
-            @media not ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+            @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
               display: none;
             }
           `}
@@ -153,5 +153,18 @@ const ALIGN_BUTTONS = css`
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     align-items: ${ALIGN_CENTER};
+  }
+`
+
+const CONTAINER_STYLE = css`
+  flex-direction: ${DIRECTION_COLUMN};
+  justify-content: ${JUSTIFY_SPACE_BETWEEN};
+  padding: ${SPACING.spacing32};
+  height: 24.625rem;
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    justify-content: ${JUSTIFY_FLEX_START};
+    gap: ${SPACING.spacing32};
+    padding: none;
+    height: 29.5rem;
   }
 `
