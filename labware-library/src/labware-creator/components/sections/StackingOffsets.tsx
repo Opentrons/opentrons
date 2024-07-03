@@ -6,6 +6,7 @@ import {
   getAllDefinitions,
   getModuleDisplayName,
 } from '@opentrons/shared-data'
+import src from '../../../images/stacking_offsets.svg'
 import {
   ALIGN_CENTER,
   CheckboxField,
@@ -179,6 +180,7 @@ export function StackingOffsets(): JSX.Element | null {
                 required measurement with calipers.
               </p>
             </div>
+            <img src={src} alt="Stacking offset image" />
             {modifiedAdapterDefinitions.length === 0 ? null : (
               <Flex gridGap={SPACING.spacing4} flexDirection={DIRECTION_COLUMN}>
                 <LegacyStyledText
