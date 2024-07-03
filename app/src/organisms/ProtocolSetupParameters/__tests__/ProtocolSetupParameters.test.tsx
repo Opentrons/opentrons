@@ -11,6 +11,7 @@ import { i18n } from '../../../i18n'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { ChooseEnum } from '../ChooseEnum'
 import { ChooseNumber } from '../ChooseNumber'
+import { ChooseCsvFile } from '../ChooseCsvFile'
 import { mockRunTimeParameterData } from '../../../pages/ProtocolDetails/fixtures'
 import { useFeatureFlag } from '../../../redux/config'
 import { ProtocolSetupParameters } from '..'
@@ -23,6 +24,7 @@ const mockGoBack = vi.fn()
 
 vi.mock('../ChooseEnum')
 vi.mock('../ChooseNumber')
+vi.mock('../ChooseCsvFile')
 vi.mock('../../../redux/config')
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
@@ -63,6 +65,7 @@ describe('ProtocolSetupParameters', () => {
     }
     vi.mocked(ChooseEnum).mockReturnValue(<div>mock ChooseEnum</div>)
     vi.mocked(ChooseNumber).mockReturnValue(<div>mock ChooseNumber</div>)
+    vi.mocked(ChooseCsvFile).mockReturnValue(<div>mock ChooseCsvFile</div>)
     vi.mocked(useFeatureFlag).mockReturnValue(false)
     vi.mocked(useHost).mockReturnValue(MOCK_HOST_CONFIG)
     when(vi.mocked(useCreateProtocolAnalysisMutation))

@@ -24,11 +24,13 @@ import { ChildNavigation } from '../ChildNavigation'
 import { ResetValuesModal } from './ResetValuesModal'
 import { ChooseEnum } from './ChooseEnum'
 import { ChooseNumber } from './ChooseNumber'
+import { ChooseCsvFile } from './ChooseCsvFile'
 import { useFeatureFlag } from '../../redux/config'
 
 import type {
   CompletedProtocolAnalysis,
   ChoiceParameter,
+  CsvFileParameter,
   NumberParameter,
   RunTimeParameter,
   ValueRunTimeParameter,
@@ -61,6 +63,10 @@ export function ProtocolSetupParameters({
     showNumericalInputScreen,
     setShowNumericalInputScreen,
   ] = React.useState<NumberParameter | null>(null)
+  const [
+    chooseCsvFileScreen,
+    setChooseCsvFileScreen,
+  ] = React.useState<CsvFileParameter | null>(null)
   const [resetValuesModal, showResetValuesModal] = React.useState<boolean>(
     false
   )
@@ -77,6 +83,12 @@ export function ProtocolSetupParameters({
           ({ ...parameter, value: parameter.default } as ValueRunTimeParameter)
     )
   )
+
+  const csvFileParameter = runTimeParameters.find(
+    (param): param is CsvFileParameter => param.type === 'csv_file'
+  )
+  const initialFileId: string = csvFileParameter?.file?.id ?? ''
+  const [csvFileInfo, setCSVFileInfo] = React.useState<string>(initialFileId)
 
   const updateParameters = (
     value: boolean | string | number,
@@ -106,6 +118,17 @@ export function ProtocolSetupParameters({
       )
       if (updatedParameter != null) {
         setShowNumericalInputScreen(updatedParameter as NumberParameter)
+      }
+    }
+    if (
+      chooseCsvFileScreen &&
+      chooseCsvFileScreen.variableName === variableName
+    ) {
+      const updatedParameter = updatedParameters.find(
+        parameter => parameter.variableName === variableName
+      )
+      if (updatedParameter != null && updatedParameter.type === 'csv_file') {
+        setChooseCsvFileScreen(updatedParameter as CsvFileParameter)
       }
     }
   }
@@ -147,9 +170,11 @@ export function ProtocolSetupParameters({
       updateParameters(!parameter.value, parameter.variableName)
     } else if (parameter.type === 'int' || parameter.type === 'float') {
       setShowNumericalInputScreen(parameter)
+    } else if (parameter.type === 'csv_file') {
+      setChooseCsvFileScreen(parameter)
     } else {
       // bad param
-      console.log('error')
+      console.error('error: bad param. not expected to reach this')
     }
   }
 
@@ -240,6 +265,22 @@ export function ProtocolSetupParameters({
       </Flex>
     </>
   )
+
+  // ToDo (kk:06/18/2024) ff will be removed when we freeze the code
+  if (enableCsvFile && chooseCsvFileScreen != null) {
+    children = (
+      <ChooseCsvFile
+        protocolId={protocolId}
+        handleGoBack={() => {
+          setChooseCsvFileScreen(null)
+        }}
+        parameter={chooseCsvFileScreen}
+        setParameter={updateParameters}
+        csvFileInfo={csvFileInfo}
+        setCsvFileInfo={setCSVFileInfo}
+      />
+    )
+  }
   if (chooseValueScreen != null) {
     children = (
       <ChooseEnum

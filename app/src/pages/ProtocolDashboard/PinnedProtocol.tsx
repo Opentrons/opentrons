@@ -45,6 +45,7 @@ const cardStyleBySize: {
     fontWeight: TYPOGRAPHY.fontWeightBold,
     width: '59rem',
   },
+  // Note (kk:06/13/2024) height has been updated from 10.75rem because of a protocol with RTP CSV file
   half: {
     fontSize: TYPOGRAPHY.fontSize28,
     height: '13.25rem',
