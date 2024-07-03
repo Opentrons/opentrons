@@ -2,7 +2,6 @@
 
 from typing import cast, Any, Optional, overload
 
-from opentrons.protocol_engine.errors.error_occurrence import ProtocolCommandFailedError
 from opentrons_shared_data.labware.dev_types import LabwareUri
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
