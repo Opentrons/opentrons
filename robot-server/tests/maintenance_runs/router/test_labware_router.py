@@ -14,8 +14,8 @@ from robot_server.maintenance_runs.maintenance_run_models import (
     MaintenanceRun,
     LabwareDefinitionSummary,
 )
-from robot_server.maintenance_runs.maintenance_engine_store import (
-    MaintenanceEngineStore,
+from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
+    MaintenanceRunOrchestratorStore,
 )
 from robot_server.maintenance_runs.router.labware_router import (
     add_labware_offset,
@@ -49,7 +49,7 @@ def labware_definition(minimal_labware_def: LabwareDefDict) -> LabwareDefinition
 
 async def test_add_labware_offset(
     decoy: Decoy,
-    mock_maintenance_engine_store: MaintenanceEngineStore,
+    mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
     run: MaintenanceRun,
 ) -> None:
     """It should add the labware offset to the engine, assuming the run is current."""
@@ -68,12 +68,14 @@ async def test_add_labware_offset(
     )
 
     decoy.when(
-        mock_maintenance_engine_store.add_labware_offset(labware_offset_request)
+        mock_maintenance_run_orchestrator_store.add_labware_offset(
+            labware_offset_request
+        )
     ).then_return(labware_offset)
 
     result = await add_labware_offset(
         request_body=RequestModel(data=labware_offset_request),
-        engine_store=mock_maintenance_engine_store,
+        run_orchestrator_store=mock_maintenance_run_orchestrator_store,
         run=run,
     )
 
@@ -83,7 +85,7 @@ async def test_add_labware_offset(
 
 async def test_add_labware_definition(
     decoy: Decoy,
-    mock_maintenance_engine_store: MaintenanceEngineStore,
+    mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
     run: MaintenanceRun,
     labware_definition: LabwareDefinition,
 ) -> None:
@@ -91,11 +93,13 @@ async def test_add_labware_definition(
     uri = pe_types.LabwareUri("some/definition/uri")
 
     decoy.when(
-        mock_maintenance_engine_store.add_labware_definition(labware_definition)
+        mock_maintenance_run_orchestrator_store.add_labware_definition(
+            labware_definition
+        )
     ).then_return(uri)
 
     result = await add_labware_definition(
-        engine_store=mock_maintenance_engine_store,
+        run_orchestrator_store=mock_maintenance_run_orchestrator_store,
         run=run,
         request_body=RequestModel(data=labware_definition),
     )

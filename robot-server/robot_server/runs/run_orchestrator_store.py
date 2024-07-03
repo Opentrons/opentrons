@@ -49,11 +49,10 @@ from opentrons_shared_data.labware.dev_types import LabwareUri
 _log = logging.getLogger(__name__)
 
 
-class EngineConflictError(RuntimeError):
-    """An error raised if an active engine is already initialized.
+class RunConflictError(RuntimeError):
+    """An error raised if an active run is already initialized.
 
-    The store will not create a new engine unless the "current" runner/engine
-    pair is idle.
+    The store will not create a new run orchestrator unless the "current" one is idle.
     """
 
 
@@ -61,7 +60,9 @@ class NoRunOrchestrator(RuntimeError):
     """Raised if you try to get the current run orchestrator while there is none."""
 
 
-async def handle_estop_event(engine_store: "EngineStore", event: HardwareEvent) -> None:
+async def handle_estop_event(
+    run_orchestrator_store: "RunOrchestratorStore", event: HardwareEvent
+) -> None:
     """Handle an E-stop event from the hardware API.
 
     This is meant to run in the engine's thread and asyncio event loop.
@@ -73,19 +74,23 @@ async def handle_estop_event(engine_store: "EngineStore", event: HardwareEvent) 
         if isinstance(event, EstopStateNotification):
             if event.new_state is not EstopState.PHYSICALLY_ENGAGED:
                 return
-            if engine_store.current_run_id is None:
+            if run_orchestrator_store.current_run_id is None:
                 return
             # todo(mm, 2024-04-17): This estop teardown sequencing belongs in the
             # runner layer.
-            engine_store.run_orchestrator.estop()
-            await engine_store.run_orchestrator.finish(error=EStopActivatedError())
+            run_orchestrator_store.run_orchestrator.estop()
+            await run_orchestrator_store.run_orchestrator.finish(
+                error=EStopActivatedError()
+            )
     except Exception:
         # This is a background task kicked off by a hardware event,
         # so there's no one to propagate this exception to.
         _log.exception("Exception handling E-stop event.")
 
 
-def _get_estop_listener(engine_store: "EngineStore") -> HardwareEventHandler:
+def _get_estop_listener(
+    run_orchestrator_store: "RunOrchestratorStore",
+) -> HardwareEventHandler:
     """Create a callback for estop events.
 
     The returned callback is meant to run in the hardware API's thread.
@@ -96,13 +101,13 @@ def _get_estop_listener(engine_store: "EngineStore") -> HardwareEventHandler:
         event: HardwareEvent,
     ) -> None:
         asyncio.run_coroutine_threadsafe(
-            handle_estop_event(engine_store, event), engine_loop
+            handle_estop_event(run_orchestrator_store, event), engine_loop
         )
 
     return run_handler_in_engine_thread_from_hardware_thread
 
 
-class EngineStore:
+class RunOrchestratorStore:
     """Factory and in-memory storage for ProtocolEngine."""
 
     _run_orchestrator: Optional[RunOrchestrator] = None
@@ -113,7 +118,7 @@ class EngineStore:
         robot_type: RobotType,
         deck_type: DeckType,
     ) -> None:
-        """Initialize an engine storage interface.
+        """Initialize a run orchestrator storage interface.
 
         Arguments:
             hardware_api: Hardware control API instance used for ProtocolEngine
@@ -136,7 +141,7 @@ class EngineStore:
 
     @property
     def current_run_id(self) -> Optional[str]:
-        """Get the run identifier associated with the current engine."""
+        """Get the run identifier associated with the current run orchestrator."""
         return (
             self.run_orchestrator.run_id if self._run_orchestrator is not None else None
         )
@@ -147,14 +152,14 @@ class EngineStore:
         """Get a "default" RunOrchestrator to use outside the context of a run.
 
         Raises:
-            EngineConflictError: if a run-specific engine is active.
+            RunConflictError: if a run-specific run orchestrator is active.
         """
         if (
             self._run_orchestrator is not None
             and self.run_orchestrator.run_has_started()
             and not self.run_orchestrator.run_has_stopped()
         ):
-            raise EngineConflictError("An engine for a run is currently active")
+            raise RunConflictError("A run is currently active")
 
         default_orchestrator = self._default_run_orchestrator
         if default_orchestrator is None:
@@ -184,8 +189,8 @@ class EngineStore:
         """Create and store a ProtocolRunner and ProtocolEngine for a given Run.
 
         Args:
-            run_id: The run resource the engine is assigned to.
-            labware_offsets: Labware offsets to create the engine with.
+            run_id: The run resource the run orchestrator is assigned to.
+            labware_offsets: Labware offsets to create the run with.
             deck_configuration: A mapping of fixtures to cutout fixtures the deck will be loaded with.
             notify_publishers: Utilized by the engine to notify publishers of state changes.
             protocol: The protocol to load the runner with, if any.
@@ -195,8 +200,8 @@ class EngineStore:
             The initial equipment and status summary of the engine.
 
         Raises:
-            EngineConflictError: The current runner/engine pair is not idle, so
-            a new set may not be created.
+            RunConflictError: The current run orchestrator is not idle, so
+            a new one may not be created.
         """
         if protocol is not None:
             load_fixed_trash = should_load_fixed_trash(protocol.source.config)
@@ -204,7 +209,7 @@ class EngineStore:
             load_fixed_trash = False
 
         if self._run_orchestrator is not None:
-            raise EngineConflictError("Another run is currently active.")
+            raise RunConflictError("Another run is currently active.")
         engine = await create_protocol_engine(
             hardware_api=self._hardware_api,
             config=ProtocolEngineConfig(
@@ -229,7 +234,7 @@ class EngineStore:
         # FIXME(mm, 2022-12-21): These `await runner.load()`s introduce a
         # concurrency hazard. If two requests simultaneously call this method,
         # they will both "succeed" (with undefined results) instead of one
-        # raising EngineConflictError.
+        # raising RunConflictError.
         if protocol:
             await self.run_orchestrator.load(
                 protocol.source,
@@ -245,11 +250,11 @@ class EngineStore:
         return self.run_orchestrator.get_state_summary()
 
     async def clear(self) -> RunResult:
-        """Remove the persisted ProtocolEngine.
+        """Remove the current run orchestrator.
 
         Raises:
-            EngineConflictError: The current runner/engine pair is not idle, so
-            they cannot be cleared.
+            RunConflictError: The current run orchestrator is not idle, so it cannot
+                be cleared.
         """
         if self.run_orchestrator.get_is_okay_to_clear():
             await self.run_orchestrator.finish(
@@ -258,7 +263,7 @@ class EngineStore:
                 post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
             )
         else:
-            raise EngineConflictError("Current run is not idle or stopped.")
+            raise RunConflictError("Current run is not idle or stopped.")
 
         run_data = self.run_orchestrator.get_state_summary()
         commands = self.run_orchestrator.get_all_commands()
@@ -332,11 +337,11 @@ class EngineStore:
         return self.run_orchestrator.get_command(command_id=command_id)
 
     def get_status(self) -> EngineStatus:
-        """Get the current execution status of the engine."""
+        """Get the current execution status of the run."""
         return self.run_orchestrator.get_run_status()
 
     def get_is_run_terminal(self) -> bool:
-        """Get whether engine is in a terminal state."""
+        """Get whether run is in a terminal state."""
         return self.run_orchestrator.get_is_run_terminal()
 
     def run_was_started(self) -> bool:

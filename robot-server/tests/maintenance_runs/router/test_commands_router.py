@@ -15,8 +15,8 @@ from opentrons.protocol_engine.errors import CommandDoesNotExistError
 from robot_server.errors.error_responses import ApiError
 from robot_server.service.json_api import MultiBodyMeta
 
-from robot_server.maintenance_runs.maintenance_engine_store import (
-    MaintenanceEngineStore,
+from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
+    MaintenanceRunOrchestratorStore,
 )
 from robot_server.maintenance_runs.maintenance_run_data_manager import (
     MaintenanceRunDataManager,
@@ -41,14 +41,16 @@ from robot_server.runs.run_models import RunCommandSummary
 
 async def test_get_current_run_from_url(
     decoy: Decoy,
-    mock_maintenance_engine_store: MaintenanceEngineStore,
+    mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
 ) -> None:
     """Should get an instance of a maintenance run protocol engine."""
-    decoy.when(mock_maintenance_engine_store.current_run_id).then_return("run-id")
+    decoy.when(mock_maintenance_run_orchestrator_store.current_run_id).then_return(
+        "run-id"
+    )
 
     result = await get_current_run_from_url(
         runId="run-id",
-        engine_store=mock_maintenance_engine_store,
+        run_orchestrator_store=mock_maintenance_run_orchestrator_store,
     )
 
     assert result == "run-id"
@@ -56,17 +58,17 @@ async def test_get_current_run_from_url(
 
 async def test_get_current_run_from_url_not_current(
     decoy: Decoy,
-    mock_maintenance_engine_store: MaintenanceEngineStore,
+    mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
 ) -> None:
     """It should 404 if you try to add commands to non-current/non-existent run."""
-    decoy.when(mock_maintenance_engine_store.current_run_id).then_return(
+    decoy.when(mock_maintenance_run_orchestrator_store.current_run_id).then_return(
         "some-other-run-id"
     )
 
     with pytest.raises(ApiError) as exc_info:
         await get_current_run_from_url(
             runId="run-id",
-            engine_store=mock_maintenance_engine_store,
+            run_orchestrator_store=mock_maintenance_run_orchestrator_store,
         )
 
     assert exc_info.value.status_code == 404
@@ -75,7 +77,7 @@ async def test_get_current_run_from_url_not_current(
 
 async def test_create_run_command(
     decoy: Decoy,
-    mock_maintenance_engine_store: MaintenanceEngineStore,
+    mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
 ) -> None:
     """It should add the requested command to the ProtocolEngine and return it."""
     command_request = pe_commands.WaitForResumeCreate(
@@ -91,7 +93,7 @@ async def test_create_run_command(
     )
 
     decoy.when(
-        await mock_maintenance_engine_store.add_command_and_wait_for_interval(
+        await mock_maintenance_run_orchestrator_store.add_command_and_wait_for_interval(
             request=pe_commands.WaitForResumeCreate(
                 params=pe_commands.WaitForResumeParams(message="Hello"),
                 intent=pe_commands.CommandIntent.SETUP,
@@ -101,14 +103,14 @@ async def test_create_run_command(
         )
     ).then_return(command_once_added)
 
-    decoy.when(mock_maintenance_engine_store.get_command("command-id")).then_return(
-        command_once_added
-    )
+    decoy.when(
+        mock_maintenance_run_orchestrator_store.get_command("command-id")
+    ).then_return(command_once_added)
 
     result = await create_run_command(
         request_body=RequestModelWithCommandCreate(data=command_request),
         waitUntilComplete=False,
-        engine_store=mock_maintenance_engine_store,
+        run_orchestrator_store=mock_maintenance_run_orchestrator_store,
         timeout=None,
     )
 
@@ -118,7 +120,7 @@ async def test_create_run_command(
 
 async def test_create_run_command_blocking_completion(
     decoy: Decoy,
-    mock_maintenance_engine_store: MaintenanceEngineStore,
+    mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
 ) -> None:
     """It should be able to create a command and wait for it to execute."""
     command_request = pe_commands.WaitForResumeCreate(
@@ -136,20 +138,20 @@ async def test_create_run_command_blocking_completion(
     )
 
     decoy.when(
-        await mock_maintenance_engine_store.add_command_and_wait_for_interval(
+        await mock_maintenance_run_orchestrator_store.add_command_and_wait_for_interval(
             request=command_request, wait_until_complete=True, timeout=999
         )
     ).then_return(command_once_completed)
 
-    decoy.when(mock_maintenance_engine_store.get_command("command-id")).then_return(
-        command_once_completed
-    )
+    decoy.when(
+        mock_maintenance_run_orchestrator_store.get_command("command-id")
+    ).then_return(command_once_completed)
 
     result = await create_run_command(
         request_body=RequestModelWithCommandCreate(data=command_request),
         waitUntilComplete=True,
         timeout=999,
-        engine_store=mock_maintenance_engine_store,
+        run_orchestrator_store=mock_maintenance_run_orchestrator_store,
     )
 
     assert result.content.data == command_once_completed
