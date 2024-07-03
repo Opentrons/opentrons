@@ -77,6 +77,7 @@ describe('StackingOffsets', () => {
       'Stack the labware onto the adapter or module and then make the required measurement with calipers.'
     )
     screen.getByText('Stacking Offset (Optional)')
+    screen.getByAltText('Stacking offset image')
   })
 
   it('renders the adapters section if is tiprack is true', () => {
