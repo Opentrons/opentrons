@@ -393,7 +393,10 @@ def _run_trial(
     z_distances: List[float] = find_max_z_distances(
         run_args, well, plunger_speed, starting_mount_height
     )
-    z_distance = sum(z_distances[: run_args.multi_passes])
+    if (run_args.no_multi_pass) :
+        z_distance = z_distances[0]
+    else:
+        z_distance = sum(z_distances)
     lps = LiquidProbeSettings(
         starting_mount_height=start_height,
         mount_speed=run_args.z_speed,

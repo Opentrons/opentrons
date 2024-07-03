@@ -117,7 +117,7 @@ class RunArgs:
     dial_indicator: Optional[mitutoyo_digimatic_indicator.Mitutoyo_Digimatic_Indicator]
     plunger_speed: float
     trials_before_jog: int
-    multi_passes: int
+    no_multi_pass: int
     test_well: str
 
     @classmethod
@@ -251,7 +251,7 @@ class RunArgs:
             dial_indicator=dial,
             plunger_speed=args.plunger_speed,
             trials_before_jog=args.trials_before_jog,
-            multi_passes=args.multi_passes,
+            no_multi_pass=args.no_multi_pass,
             test_well=args.test_well,
         )
 
@@ -272,7 +272,7 @@ if __name__ == "__main__":
     parser.add_argument("--z-speed", type=float, default=1)
     parser.add_argument("--aspirate", action="store_true")
     parser.add_argument("--plunger-speed", type=float, default=-1.0)
-    parser.add_argument("--multi-passes", type=int, default=1)
+    parser.add_argument("--no-multi-pass", action="store_true")
     parser.add_argument("--starting-tip", type=str, default="A1")
     parser.add_argument("--test-well", type=str, default="A1")
     parser.add_argument("--google-sheet-name", type=str, default="LLD-Shared-Data")
