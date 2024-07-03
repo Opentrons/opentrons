@@ -4,7 +4,10 @@ import dataclasses
 import typing
 from pathlib import Path
 
-from .types import SupportsCSVStorage, StorableData, RobotContextState
+from ._types import SupportsCSVStorage, StorableData, RobotContextState
+from .util import get_timing_function
+
+_timing_function = get_timing_function()
 
 
 @dataclasses.dataclass(frozen=True)
@@ -42,6 +45,62 @@ class RawContextData(SupportsCSVStorage):
             state=typing.cast(RobotContextState, row[0]),
             func_start=int(row[1]),
             duration=int(row[2]),
+        )
+
+
+@dataclasses.dataclass(frozen=True)
+class ProcessResourceUsageSnapshot(SupportsCSVStorage):
+    """Represents process resource usage data.
+
+    Attributes:
+    - query_time (int): The time in nanoseconds since the process started.
+    - command (str): The command that was executed.
+    - running_since (float): The time in nanoseconds since the process started.
+    - user_cpu_time (float): The user CPU time in seconds.
+    - system_cpu_time (float): The system CPU time in seconds.
+    - memory_percent (float): The memory usage percentage.
+    """
+
+    query_time: int  # nanoseconds
+    command: str
+    running_since: float  # seconds
+    user_cpu_time: float  # seconds
+    system_cpu_time: float  # seconds
+    memory_percent: float
+
+    @classmethod
+    def headers(self) -> typing.Tuple[str, str, str, str, str, str]:
+        """Returns the headers for the process resource usage data."""
+        return (
+            "query_time",
+            "command",
+            "running_since",
+            "user_cpu_time",
+            "system_cpu_time",
+            "memory_percent",
+        )
+
+    def csv_row(self) -> typing.Tuple[int, str, float, float, float, float]:
+        """Returns the process resource usage data as a string."""
+        return (
+            self.query_time,
+            self.command,
+            self.running_since,
+            self.user_cpu_time,
+            self.system_cpu_time,
+            self.memory_percent,
+        )
+
+    @classmethod
+    def from_csv_row(cls, row: typing.Sequence[StorableData]) -> SupportsCSVStorage:
+        """Returns a ProcessResourceUsageData object from a CSV row."""
+        return cls(
+            query_time=int(row[0]),
+            command=str(row[1]),
+            running_since=float(row[2]),
+            user_cpu_time=float(row[3]),
+            system_cpu_time=float(row[4]),
+            memory_percent=float(row[4]),
         )
 
 

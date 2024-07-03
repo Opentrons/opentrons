@@ -1,9 +1,9 @@
-"""Tests for the RobotContextTracker class in performance_metrics.robot_context_tracker."""
+"""Tests for the RobotContextTracker class in performance_metrics._robot_context_tracker."""
 
 import asyncio
 from pathlib import Path
 import pytest
-from performance_metrics.robot_context_tracker import RobotContextTracker
+from performance_metrics._robot_context_tracker import RobotContextTracker
 from time import sleep, time_ns
 from unittest.mock import patch
 
@@ -273,7 +273,7 @@ def test_sync_exception_handling_when_not_tracking(tmp_path: Path) -> None:
 
 
 @patch(
-    "performance_metrics.robot_context_tracker._get_timing_function",
+    "performance_metrics.util.get_timing_function",
     return_value=time_ns,
 )
 def test_using_non_linux_time_functions(tmp_path: Path) -> None:
