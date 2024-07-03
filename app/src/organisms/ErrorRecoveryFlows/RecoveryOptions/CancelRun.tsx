@@ -96,7 +96,44 @@ function CancelRunConfirmation({
       </RecoverySingleColumnContent>
     )
   } else {
-    return null
+    return (
+      <RecoverySingleColumnContent
+        gridGap={SPACING.spacing24}
+        alignItems={ALIGN_CENTER}
+      >
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          alignItems={ALIGN_CENTER}
+          gridGap={SPACING.spacing24}
+          height="100%"
+          width="848px"
+        >
+          <Icon
+            name="ot-alert"
+            size="3.75rem"
+            marginTop={SPACING.spacing24}
+            color={COLORS.red50}
+          />
+          <LegacyStyledText as="h3Bold">
+            {t('are_you_sure_you_want_to_cancel')}
+          </LegacyStyledText>
+          <LegacyStyledText
+            as="h4"
+            color={COLORS.grey60}
+            textAlign={ALIGN_CENTER}
+          >
+            {t('if_tips_are_attached')}
+          </LegacyStyledText>
+        </Flex>
+        <RecoveryFooterButtons
+          isOnDevice={isOnDevice}
+          primaryBtnOnClick={handleCancelRunClick}
+          secondaryBtnOnClick={goBackPrevStep}
+          primaryBtnTextOverride={t('confirm')}
+          isLoadingPrimaryBtnAction={showBtnLoadingState}
+        />
+      </RecoverySingleColumnContent>
+    )
   }
 }
 
