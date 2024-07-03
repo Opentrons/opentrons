@@ -1304,11 +1304,27 @@ def test_find_liquid_level(
         name="my cool well", labware_id="123abc", engine_client=mock_engine_client
     )
     try:
-        subject.find_liquid_level(well_core)
+        subject.find_liquid_level(well_core=well_core, error_recovery=True)
     except PipetteLiquidNotFoundError:
         assert True
     decoy.verify(
         mock_engine_client.execute_command_with_result(
+            cmd.LiquidProbeParams(
+                pipetteId=subject.pipette_id,
+                wellLocation=WellLocation(
+                    origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0)
+                ),
+                wellName=well_core.get_name(),
+                labwareId=well_core.labware_id,
+            )
+        )
+    )
+    try:
+        subject.find_liquid_level(well_core=well_core, error_recovery=False)
+    except PipetteLiquidNotFoundError:
+        assert True
+    decoy.verify(
+        mock_engine_client.execute_command_without_recovery(
             cmd.LiquidProbeParams(
                 pipetteId=subject.pipette_id,
                 wellLocation=WellLocation(

@@ -489,6 +489,6 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
         """Retract this instrument to the top of the gantry."""
         self._protocol_interface.get_hardware.retract(self._mount)  # type: ignore [attr-defined]
 
-    def find_liquid_level(self, well_core: WellCore) -> float:
+    def find_liquid_level(self, well_core: WellCore, error_recovery: bool) -> float:
         """This will never be called because it was added in API 2.20."""
         assert False, "find_liquid_level only supported in API 2.20 & later"

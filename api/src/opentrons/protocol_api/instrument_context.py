@@ -2057,7 +2057,9 @@ class InstrumentContext(publisher.CommandPublisher):
         if not isinstance(well, labware.Well):
             raise WellDoesNotExistError("You must provide a valid well to check.")
         try:
-            height = self._core.find_liquid_level(well._core)
+            height = self._core.find_liquid_level(
+                well_core=well._core, error_recovery=False
+            )
             if height > 0:
                 return True
             return False  # it should never get here
@@ -2075,7 +2077,7 @@ class InstrumentContext(publisher.CommandPublisher):
         if not isinstance(well, labware.Well):
             raise WellDoesNotExistError("You must provide a valid well to check.")
 
-        self._core.find_liquid_level(well._core)
+        self._core.find_liquid_level(well_core=well._core, error_recovery=True)
 
     @requires_version(2, 20)
     def measure_liquid_height(self, well: labware.Well) -> float:
@@ -2086,5 +2088,7 @@ class InstrumentContext(publisher.CommandPublisher):
         if not isinstance(well, labware.Well):
             raise WellDoesNotExistError("You must provide a valid well to check.")
 
-        height = self._core.find_liquid_level(well._core)
+        height = self._core.find_liquid_level(
+            well_core=well._core, error_recovery=False
+        )
         return float(height)

@@ -1279,9 +1279,9 @@ def test_detect_liquid_presence(
 ) -> None:
     """It should only return booleans. Not raise an exception."""
     mock_well = decoy.mock(cls=Well)
-    decoy.when(mock_instrument_core.find_liquid_level(mock_well._core)).then_raise(
-        PipetteLiquidNotFoundError()
-    )
+    decoy.when(
+        mock_instrument_core.find_liquid_level(mock_well._core, False)
+    ).then_raise(PipetteLiquidNotFoundError())
     result = subject.detect_liquid_presence(mock_well)
     assert isinstance(result, bool)
 
@@ -1295,11 +1295,11 @@ def test_require_liquid_presence(
 ) -> None:
     """It should raise an exception when called."""
     mock_well = decoy.mock(cls=Well)
-    decoy.when(mock_instrument_core.find_liquid_level(mock_well._core))
+    decoy.when(mock_instrument_core.find_liquid_level(mock_well._core, True))
     subject.require_liquid_presence(mock_well)
-    decoy.when(mock_instrument_core.find_liquid_level(mock_well._core)).then_raise(
-        PipetteLiquidNotFoundError()
-    )
+    decoy.when(
+        mock_instrument_core.find_liquid_level(mock_well._core, True)
+    ).then_raise(PipetteLiquidNotFoundError())
     with pytest.raises(PipetteLiquidNotFoundError):
         subject.require_liquid_presence(mock_well)
 
@@ -1313,8 +1313,8 @@ def test_measure_liquid_height(
 ) -> None:
     """It should raise an exception when called."""
     mock_well = decoy.mock(cls=Well)
-    decoy.when(mock_instrument_core.find_liquid_level(mock_well._core)).then_raise(
-        PipetteLiquidNotFoundError()
-    )
+    decoy.when(
+        mock_instrument_core.find_liquid_level(mock_well._core, False)
+    ).then_raise(PipetteLiquidNotFoundError())
     with pytest.raises(PipetteLiquidNotFoundError):
         subject.measure_liquid_height(mock_well)

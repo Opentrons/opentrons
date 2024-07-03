@@ -304,7 +304,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         ...
 
     @abstractmethod
-    def find_liquid_level(self, well_core: WellCoreType) -> float:
+    def find_liquid_level(self, well_core: WellCoreType, error_recovery: bool) -> float:
         """Do a liquid probe to find the level of the liquid in the well."""
         ...
 
