@@ -15,10 +15,11 @@ describe('LiquidIcon', () => {
   let props: React.ComponentProps<typeof LiquidIcon>
 
   it('should render the proper style for large icon', () => {
-    render({
+    props = {
       size: 'medium',
       color: COLORS.red50,
-    })
+    }
+    render(props)
     const LiquidIcon = screen.getByTestId(`LiquidIcon_${COLORS.red50}`)
     expect(LiquidIcon).toHaveStyle(`padding: ${SPACING.spacing12}`)
     expect(LiquidIcon).toHaveStyle('height: max-content')
@@ -31,10 +32,11 @@ describe('LiquidIcon', () => {
   })
 
   it('should render the proper style for large icon', () => {
-    render({
+    props = {
       size: 'small',
       color: COLORS.blue50,
-    })
+    }
+    render(props)
     const LiquidIcon = screen.getByTestId(`LiquidIcon_${COLORS.blue50}`)
     expect(LiquidIcon).toHaveStyle(`padding: ${SPACING.spacing8}`)
     expect(LiquidIcon).toHaveStyle('height: max-content')
