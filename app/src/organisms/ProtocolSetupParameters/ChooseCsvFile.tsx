@@ -15,9 +15,9 @@ import {
 } from '@opentrons/components'
 import { useAllCsvFilesQuery } from '@opentrons/react-api-client'
 
-import { ChildNavigation } from '../ChildNavigation'
 import { RadioButton } from '../../atoms/buttons'
 import { getShellUpdateDataFiles } from '../../redux/shell'
+import { ChildNavigation } from '../ChildNavigation'
 import { EmptyFile } from './EmptyFile'
 
 import type { CsvFileParameter } from '@opentrons/shared-data'
