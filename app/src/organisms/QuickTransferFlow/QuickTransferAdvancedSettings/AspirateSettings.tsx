@@ -114,15 +114,17 @@ export function AspirateSettings(
 
   return (
     <Flex gridGap={SPACING.spacing16} flexDirection={DIRECTION_COLUMN}>
-      <StyledText
-        css={TYPOGRAPHY.level4HeaderSemiBold}
-        color={COLORS.grey60}
-        textAlign={TEXT_ALIGN_LEFT}
-      >
-        {t('aspirate_settings')}
-      </StyledText>
+      {selectedSetting === null ? (
+        <StyledText
+          css={TYPOGRAPHY.level4HeaderSemiBold}
+          color={COLORS.grey60}
+          textAlign={TEXT_ALIGN_LEFT}
+        >
+          {t('aspirate_settings')}
+        </StyledText>
+      ) : null}
       <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
-        {selectedSetting == null
+        {selectedSetting === null
           ? displayItems.map(displayItem => (
               <ListItem
                 type="noActive"
@@ -165,7 +167,7 @@ export function AspirateSettings(
           />
         ) : null}
         {selectedSetting === 'aspirate_pre_wet_tip' ? (
-          <TipPositionEntry  // WRONG COMPONENT
+          <TipPositionEntry // WRONG COMPONENT
             kind={'aspirate'}
             state={state}
             dispatch={dispatch}

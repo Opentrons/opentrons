@@ -7,18 +7,21 @@ import {
   DIRECTION_COLUMN,
   POSITION_FIXED,
   COLORS,
+  ALIGN_CENTER,
 } from '@opentrons/components'
 import { getTopPortalEl } from '../../../App/portal'
 import { LargeButton } from '../../../atoms/buttons'
 import { ChildNavigation } from '../../ChildNavigation'
+import { InputField } from '../../../atoms/InputField'
 import { ACTIONS } from '../constants'
 
 import type {
-  PathOption,
   QuickTransferSummaryState,
   QuickTransferSummaryAction,
   FlowRateKind,
 } from '../types'
+import { i18n } from '../../../i18n'
+import { NumericalKeyboard } from '../../../atoms/SoftwareKeyboard'
 
 interface MixProps {
   onBack: () => void
@@ -30,89 +33,222 @@ interface MixProps {
 export function Mix(props: MixProps): JSX.Element {
   const { kind, onBack, state, dispatch } = props
   const { t } = useTranslation('quick_transfer')
+  const keyboardRef = React.useRef(null)
 
-  let headerCopy = ''
-  let textEntryCopy = ''
+  const [selectedOption, setSelectedOption] = React.useState<string>('')
+  const [mixVolume, setMixVolume] = React.useState<number | null>(
+    kind === 'aspirate'
+      ? state.mixOnAspirate?.mixVolume ?? null
+      : kind === 'dispense'
+      ? state.mixOnDispense?.mixVolume ?? null
+      : null
+  )
+  const [mixReps, setMixReps] = React.useState<number | null>(
+    kind === 'aspirate'
+      ? state.mixOnAspirate?.repititions ?? null
+      : kind === 'dispense'
+      ? state.mixOnDispense?.repititions ?? null
+      : null
+  )
+  const [currentStep, setCurrentStep] = React.useState<number>(0)
+
+  let headerCopy: string = ''
   let MixAction:
-    | typeof ACTIONS.SET_ASPIRATE_FLOW_RATE
-    | typeof ACTIONS.SET_DISPENSE_FLOW_RATE
+    | typeof ACTIONS.SET_MIX_ON_ASPIRATE
+    | typeof ACTIONS.SET_MIX_ON_DISPENSE
     | null = null
- 
+
   if (kind === 'aspirate') {
-    headerCopy = t('aspirate_flow_rate')
-    textEntryCopy = t('aspirate_flow_rate_µL')
-    MixAction = ACTIONS.SET_ASPIRATE_FLOW_RATE
+    headerCopy = t('mix_before_aspirating')
+    MixAction = ACTIONS.SET_MIX_ON_ASPIRATE
   } else if (kind === 'dispense') {
-    headerCopy = t('dispense_flow_rate')
-    textEntryCopy = t('dispense_flow_rate_µL')
-    MixAction = ACTIONS.SET_DISPENSE_FLOW_RATE
+    headerCopy = t('mix_before_dispensing')
+    MixAction = ACTIONS.SET_MIX_ON_ASPIRATE
   }
 
-  const allowedPipettePathOptions: PathOption[] = ['single']
-  if (state.sourceWells.length === 1 && state.destinationWells.length > 1) {
-    allowedPipettePathOptions.push('multiDispense')
-  } else if (
-    state.sourceWells.length > 1 &&
-    state.destinationWells.length === 1
-  ) {
-    allowedPipettePathOptions.push('multiAspirate')
-  }
-  const [
-    selectedPipettePathOption,
-    setSelectedPipettePathOption,
-  ] = React.useState<PathOption>(state.path)
+  const displayItems = [
+    {
+      option: 'Enabled',
+      value: t('option_enabled'),
+      onClick: () => {
+        setSelectedOption('option_enabled')
+      },
+    },
+    {
+      option: 'Disabled',
+      value: t('option_disabled'),
+      onClick: () => {
+        setSelectedOption('option_disabled')
+      },
+    },
+  ]
 
-  function getOptionCopy(option: PathOption): string {
-    switch (option) {
-      case 'single':
-        return t('pipette_path_single')
-      case 'multiAspirate':
-        return t('pipette_path_multi_aspirate')
-      case 'multiDispense':
-        return t('pipette_path_multi_dispense')
-      default:
-        return ''
+  const flowSteps: string[] = ['enable_mix', 'select_volume', 'select_reps']
+
+  const handleClickBackOrExit = (): void => {
+    currentStep > 0 ? setCurrentStep(currentStep - 1) : onBack()
+  }
+
+  const handleClickSaveOrContinue = (): void => {
+    if (selectedOption === 'Enabled') {
+      if (currentStep < flowSteps.length - 1) {
+        setCurrentStep(currentStep + 1)
+      } else {
+        if (MixAction != null && mixVolume != null && mixReps != null) {
+          dispatch({
+            type: MixAction,
+            mixSettings: { mixVolume: mixVolume, repititions: mixReps },
+          })
+        }
+        onBack()
+      }
+    } else {
+      if (MixAction != null) {
+        dispatch({
+          type: MixAction,
+          mixSettings: undefined,
+        })
+      }
+      onBack()
     }
   }
 
-  const handleClickSave = (): void => {
-    if (selectedPipettePathOption !== state.path) {
-      dispatch({
-        type: 'SET_PIPETTE_PATH',
-        path: selectedPipettePathOption,
-      })
-    }
-    onBack()
+  const setSaveOrContinueButtonText = (): string => {
+    return t(
+      selectedOption === 'Enabled' && currentStep < flowSteps.length - 1
+        ? 'shared:continue'
+        : 'shared:save'
+    )
   }
+
+  // TODO: find the actual min and max for these values.
+  const minVolume = 1
+  const maxVolume = 100
+  const minReps = 1
+  const maxReps = 100
+
+  const error =
+    // TODO: This error does not take into account min/maxReps
+    (mixVolume !== null && (mixVolume < minVolume || mixVolume > maxVolume)) ||
+    (mixReps !== null && (mixReps < minReps || mixReps > maxReps))
+      ? t(`value_out_of_range`, {
+          min: minVolume,
+          max: maxVolume,
+        })
+      : null
+
   return createPortal(
     <Flex position={POSITION_FIXED} backgroundColor={COLORS.white} width="100%">
       <ChildNavigation
-        header={t('pipette_path')}
-        buttonText={t('save')}
-        onClickBack={onBack}
-        onClickButton={handleClickSave}
-        buttonIsDisabled={selectedPipettePathOption == null}
+        header={headerCopy}
+        buttonText={i18n.format(setSaveOrContinueButtonText(), 'capitalize')}
+        onClickBack={handleClickBackOrExit}
+        onClickButton={handleClickSaveOrContinue}
+        top={SPACING.spacing8}
+        buttonIsDisabled={error !== null || selectedOption === ''}
       />
-      <Flex
-        marginTop={SPACING.spacing120}
-        flexDirection={DIRECTION_COLUMN}
-        padding={`${SPACING.spacing16} ${SPACING.spacing60} ${SPACING.spacing40} ${SPACING.spacing60}`}
-        gridGap={SPACING.spacing4}
-        width="100%"
-      >
-        {allowedPipettePathOptions.map(option => (
-          <LargeButton
-            key={option}
-            buttonType={
-              selectedPipettePathOption === option ? 'primary' : 'secondary'
-            }
-            onClick={() => {
-              setSelectedPipettePathOption(option)
-            }}
-            buttonText={getOptionCopy(option)}
-          />
-        ))}
-      </Flex>
+      {flowSteps[currentStep] === 'enable_mix' ? (
+        <Flex
+          marginTop={SPACING.spacing120}
+          flexDirection={DIRECTION_COLUMN}
+          padding={`${SPACING.spacing16} ${SPACING.spacing60} ${SPACING.spacing40} ${SPACING.spacing60}`}
+          gridGap={SPACING.spacing4}
+          width="100%"
+        >
+          {displayItems.map(option => (
+            <LargeButton
+              key={option.option}
+              buttonType={
+                selectedOption === option.option ? 'primary' : 'secondary'
+              }
+              onClick={() => {
+                setSelectedOption(option.option)
+              }}
+              buttonText={option.value}
+            />
+          ))}
+        </Flex>
+      ) : null}
+      {flowSteps[currentStep] === 'select_volume' ? (
+        <Flex
+          alignSelf={ALIGN_CENTER}
+          gridGap={SPACING.spacing48}
+          paddingX={SPACING.spacing40}
+          padding={`${SPACING.spacing16} ${SPACING.spacing40} ${SPACING.spacing40}`}
+          marginTop="7.75rem" // using margin rather than justify due to content moving with error message
+          alignItems={ALIGN_CENTER}
+          height="22rem"
+        >
+          <Flex
+            width="30.5rem"
+            height="100%"
+            gridGap={SPACING.spacing24}
+            flexDirection={DIRECTION_COLUMN}
+            marginTop={SPACING.spacing68}
+          >
+            <InputField
+              type="number"
+              value={mixVolume}
+              title={t('mix_volume_µL')}
+              error={error}
+              readOnly
+            />
+          </Flex>
+          <Flex
+            paddingX={SPACING.spacing24}
+            height="21.25rem"
+            marginTop="7.75rem"
+            borderRadius="0"
+          >
+            <NumericalKeyboard
+              keyboardRef={keyboardRef}
+              onChange={e => {
+                setMixVolume(Number(e))
+              }}
+            />
+          </Flex>
+        </Flex>
+      ) : null}
+      {flowSteps[currentStep] === 'select_reps' ? (
+        <Flex
+          alignSelf={ALIGN_CENTER}
+          gridGap={SPACING.spacing48}
+          paddingX={SPACING.spacing40}
+          padding={`${SPACING.spacing16} ${SPACING.spacing40} ${SPACING.spacing40}`}
+          marginTop="7.75rem" // using margin rather than justify due to content moving with error message
+          alignItems={ALIGN_CENTER}
+          height="22rem"
+        >
+          <Flex
+            width="30.5rem"
+            height="100%"
+            gridGap={SPACING.spacing24}
+            flexDirection={DIRECTION_COLUMN}
+            marginTop={SPACING.spacing68}
+          >
+            <InputField
+              type="number"
+              value={mixReps}
+              title={t('mix_repetitions')}
+              error={error}
+              readOnly
+            />
+          </Flex>
+          <Flex
+            paddingX={SPACING.spacing24}
+            height="21.25rem"
+            marginTop="7.75rem"
+            borderRadius="0"
+          >
+            <NumericalKeyboard
+              keyboardRef={keyboardRef}
+              onChange={e => {
+                setMixReps(Number(e))
+              }}
+            />
+          </Flex>
+        </Flex>
+      ) : null}
     </Flex>,
     getTopPortalEl()
   )

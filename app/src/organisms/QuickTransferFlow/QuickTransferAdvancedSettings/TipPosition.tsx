@@ -12,7 +12,6 @@ import { getTopPortalEl } from '../../../App/portal'
 import { ChildNavigation } from '../../ChildNavigation'
 import { InputField } from '../../../atoms/InputField'
 import { NumericalKeyboard } from '../../../atoms/SoftwareKeyboard'
-import { getFlowRateRange } from '../utils'
 
 import type {
   QuickTransferSummaryState,
@@ -27,7 +26,7 @@ interface TipPositionEntryProps {
   onBack: () => void
   state: QuickTransferSummaryState
   dispatch: React.Dispatch<QuickTransferSummaryAction>
-  kind: FlowRateKind
+  kind: FlowRateKind // TODO: rename flowRateKind to be generic
 }
 
 export function TipPositionEntry(props: TipPositionEntryProps): JSX.Element {
@@ -35,44 +34,45 @@ export function TipPositionEntry(props: TipPositionEntryProps): JSX.Element {
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
   const keyboardRef = React.useRef(null)
 
-  const [flowRate, setFlowRate] = React.useState<string>(
-    state.aspirateFlowRate ? state.aspirateFlowRate.toString() : ''
+  const [tipPosition, setTipPosition] = React.useState<number | null>(
+    kind === 'aspirate'
+      ? state.tipPositionAspirate
+      : kind === 'dispense'
+      ? state.tipPositionDispense
+      : null
   )
-  const flowRateRange = getFlowRateRange(state, kind)
-  const rateAsNumber = Number(flowRate)
+  const tipPositionRange = { min: 1, max: 2 } // TODO: set this based on range
   let headerCopy: string = ''
-  let textEntryCopy: string = ''
-  let flowRateAction:
-    | typeof ACTIONS.SET_ASPIRATE_FLOW_RATE
-    | typeof ACTIONS.SET_DISPENSE_FLOW_RATE
+  let textEntryCopy: string = t('distance_bottom_of_well_mm')
+  let tipPositionAction:
+    | typeof ACTIONS.SET_ASPIRATE_TIP_POSITION
+    | typeof ACTIONS.SET_DISPENSE_TIP_POSITION
     | null = null
   if (kind === 'aspirate') {
-    headerCopy = t('aspirate_flow_rate')
-    textEntryCopy = t('aspirate_flow_rate_µL')
-    flowRateAction = ACTIONS.SET_ASPIRATE_FLOW_RATE
+    headerCopy = t('aspirate_tip_position')
+    tipPositionAction = ACTIONS.SET_ASPIRATE_TIP_POSITION
   } else if (kind === 'dispense') {
-    headerCopy = t('dispense_flow_rate')
-    textEntryCopy = t('dispense_flow_rate_µL')
-    flowRateAction = ACTIONS.SET_DISPENSE_FLOW_RATE
+    headerCopy = t('dispense_tip_position')
+    tipPositionAction = ACTIONS.SET_DISPENSE_TIP_POSITION
   }
 
   const handleClickSave = (): void => {
     // the button will be disabled if this values is null
-    if (rateAsNumber != null && flowRateAction != null) {
+    if (tipPosition != null && tipPositionAction != null) {
       dispatch({
-        type: flowRateAction,
-        rate: rateAsNumber,
+        type: tipPositionAction,
+        position: tipPosition,
       })
     }
     onBack()
   }
 
   const error =
-    flowRate !== '' &&
-    (rateAsNumber < flowRateRange.min || rateAsNumber > flowRateRange.max)
+    tipPosition !== null &&
+    (tipPosition < tipPositionRange.min || tipPosition > tipPositionRange.max)
       ? t(`value_out_of_range`, {
-          min: flowRateRange.min,
-          max: flowRateRange.max,
+          min: tipPositionRange.min,
+          max: tipPositionRange.max,
         })
       : null
 
@@ -84,7 +84,7 @@ export function TipPositionEntry(props: TipPositionEntryProps): JSX.Element {
         onClickBack={onBack}
         onClickButton={handleClickSave}
         top={SPACING.spacing8}
-        buttonIsDisabled={error != null || flowRate === ''}
+        buttonIsDisabled={error != null || tipPosition === null}
       />
       <Flex
         alignSelf={ALIGN_CENTER}
@@ -104,7 +104,7 @@ export function TipPositionEntry(props: TipPositionEntryProps): JSX.Element {
         >
           <InputField
             type="text"
-            value={flowRate}
+            value={tipPosition}
             title={textEntryCopy}
             error={error}
             readOnly
@@ -119,7 +119,7 @@ export function TipPositionEntry(props: TipPositionEntryProps): JSX.Element {
           <NumericalKeyboard
             keyboardRef={keyboardRef}
             onChange={e => {
-              setFlowRate(e)
+              setTipPosition(Number(e))
             }}
           />
         </Flex>
