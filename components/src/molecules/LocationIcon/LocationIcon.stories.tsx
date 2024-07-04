@@ -1,10 +1,10 @@
 import * as React from 'react'
+import { customViewports } from '../../../../.storybook/preview'
 import { Flex } from '../../primitives'
 import { SPACING } from '../../ui-style-constants'
-import { GlobalStyle } from '../../../../app/src/atoms/GlobalStyle'
-import { customViewports } from '../../../../.storybook/preview'
 import { ICON_DATA_BY_NAME } from '../../icons'
 import { LocationIcon } from '.'
+
 import type { Meta, StoryObj } from '@storybook/react'
 
 const slots = [
