@@ -52,7 +52,6 @@ const meta: Meta<typeof LocationIcon> = {
   decorators: [
     Story => (
       <Flex padding={SPACING.spacing16} width="15rem" height="5rem">
-        <GlobalStyle />
         <Story />
       </Flex>
     ),
