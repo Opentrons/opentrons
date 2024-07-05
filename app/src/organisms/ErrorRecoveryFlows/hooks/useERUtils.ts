@@ -43,9 +43,10 @@ export interface ERUtilsResults {
   hasLaunchedRecovery: boolean
   trackExternalMap: (map: Record<string, any>) => void
   stepCounts: StepCounts
-  commandAfterFailedCommand: ReturnType<typeof getNextStep>
+  commandsAfterFailedCommand: Array<ReturnType<typeof getNextStep>>
 }
 
+const SUBSEQUENT_COMMAND_DEPTH = 2
 // Builds various Error Recovery utilities.
 export function useERUtils({
   isFlex,
@@ -117,7 +118,21 @@ export function useERUtils({
   })
 
   const stepCounts = useRunningStepCounts(runId, runCommands)
-  const commandAfterFailedCommand = getNextStep(failedCommand, protocolAnalysis)
+  const subsequentCommands = (
+    afterCommand: ReturnType<typeof getNextStep>,
+    remaining: number,
+    acc: Array<ReturnType<typeof getNextStep>>
+  ): Array<ReturnType<typeof getNextStep>> =>
+    afterCommand == null
+      ? acc
+      : remaining === 0
+      ? [...acc, getNextStep(afterCommand, protocolAnalysis)]
+      : [...subsequentCommands(acc.at(-1) ?? null, remaining - 1, acc)]
+  const commandsAfterFailedCommand = subsequentCommands(
+    failedCommand,
+    SUBSEQUENT_COMMAND_DEPTH,
+    []
+  )
 
   // TODO(jh, 06-14-24): Ensure other string build utilities that are internal to ErrorRecoveryFlows are exported under
   // one utility object in useERUtils.
@@ -136,6 +151,6 @@ export function useERUtils({
     deckMapUtils,
     getRecoveryOptionCopy,
     stepCounts,
-    commandAfterFailedCommand,
+    commandsAfterFailedCommand,
   }
 }

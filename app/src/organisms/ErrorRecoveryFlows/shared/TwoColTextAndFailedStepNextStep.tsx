@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 import {
   DIRECTION_COLUMN,
@@ -7,12 +8,14 @@ import {
   LegacyStyledText,
 } from '@opentrons/components'
 
-import { RecoverySingleColumnContent } from './RecoverySingleColumnContent'
-import { TwoColumn } from '../../../molecules/InterventionModal'
+import { RecoveryContentWrapper } from './RecoveryContentWrapper'
+import {
+  TwoColumn,
+  CategorizedStepContent,
+} from '../../../molecules/InterventionModal'
 import { RecoveryFooterButtons } from './RecoveryFooterButtons'
 
 import type { RecoveryContentProps } from '../types'
-import { FailedStepNextStep } from './FailedStepNextStep'
 
 type TwoColTextAndFailedStepNextStepProps = RecoveryContentProps & {
   leftColTitle: string
@@ -36,22 +39,54 @@ export function TwoColTextAndFailedStepNextStep({
   secondaryBtnOnClickCopyOverride,
   isOnDevice,
   routeUpdateActions,
-  ...rest
+  failedCommand,
+  stepCounts,
+  commandsAfterFailedCommand,
+  protocolAnalysis,
+  robotType,
 }: TwoColTextAndFailedStepNextStepProps): JSX.Element | null {
   const { goBackPrevStep } = routeUpdateActions
-
+  const { t } = useTranslation('error_recovery')
+  const nthStepAfter = (n: number): number | undefined =>
+    stepCounts.currentStepNumber == null
+      ? undefined
+      : stepCounts.currentStepNumber + n
+  const commandsAfter = [
+    commandsAfterFailedCommand.length > 0
+      ? commandsAfterFailedCommand[0] == null
+        ? null
+        : { command: commandsAfterFailedCommand[0], index: nthStepAfter(1) }
+      : null,
+    commandsAfterFailedCommand.length > 1
+      ? commandsAfterFailedCommand[1] == null
+        ? null
+        : { command: commandsAfterFailedCommand[1], index: nthStepAfter(2) }
+      : null,
+  ] as const
   if (isOnDevice) {
     return (
-      <RecoverySingleColumnContent>
+      <RecoveryContentWrapper>
         <TwoColumn>
           <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
             <LegacyStyledText as="h4SemiBold">{leftColTitle}</LegacyStyledText>
             {leftColBodyText}
           </Flex>
-          <FailedStepNextStep
-            {...rest}
-            isOnDevice={isOnDevice}
-            routeUpdateActions={routeUpdateActions}
+          <CategorizedStepContent
+            commandTextData={protocolAnalysis}
+            robotType={robotType}
+            topCategoryHeadline={t('failed_step')}
+            topCategory="failed"
+            topCategoryCommand={
+              failedCommand == null
+                ? null
+                : {
+                    command: failedCommand,
+                    index: stepCounts.currentStepNumber ?? undefined,
+                  }
+            }
+            bottomCategoryHeadline={t('next_step')}
+            bottomCategory="future"
+            bottomCategoryCommands={commandsAfter}
           />
         </TwoColumn>
         <RecoveryFooterButtons
@@ -60,7 +95,7 @@ export function TwoColTextAndFailedStepNextStep({
           primaryBtnTextOverride={primaryBtnCopy}
           secondaryBtnOnClick={secondaryBtnOnClickOverride ?? goBackPrevStep}
         />
-      </RecoverySingleColumnContent>
+      </RecoveryContentWrapper>
     )
   } else {
     return null
