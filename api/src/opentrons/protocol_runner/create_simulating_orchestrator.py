@@ -61,7 +61,7 @@ async def create_simulating_orchestrator(
             use_simulated_deck_config=True,
             use_virtual_pipettes=True,
         ),
-        error_recovery_policy=error_recovery_policy.error_recovery_by_ff,
+        error_recovery_policy=error_recovery_policy.never_recover,
         load_fixed_trash=should_load_fixed_trash(protocol_config),
     )
 

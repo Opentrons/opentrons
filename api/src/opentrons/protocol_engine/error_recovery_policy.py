@@ -72,3 +72,16 @@ def error_recovery_by_ff(
         return ErrorRecoveryType.WAIT_FOR_RECOVERY
     else:
         return ErrorRecoveryType.FAIL_RUN
+
+
+def never_recover(
+    failed_command: Command,
+    defined_error_data: Optional[CommandDefinedErrorData],
+) -> ErrorRecoveryType:
+    """An error recovery policy where error recovery is never attempted.
+
+    This makes sense for things like the `opentrons_simulate` and `opentrons_execute`
+    CLIs. Those don't expose any way to bring the run out of recovery mode after it's
+    been entered, so we need to avoid entering recovery mode in the first place.
+    """
+    return ErrorRecoveryType.FAIL_RUN

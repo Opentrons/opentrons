@@ -316,7 +316,7 @@ def _make_ot3_pe_ctx(
             use_simulated_deck_config=True,
             block_on_door_open=False,
         ),
-        error_recovery_policy=error_recovery_policy.error_recovery_by_ff,
+        error_recovery_policy=error_recovery_policy.never_recover,
         drop_tips_after_run=False,
         post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
         # TODO(jbl 10-30-2023) load_fixed_trash being hardcoded to True will be refactored once we need tests to have

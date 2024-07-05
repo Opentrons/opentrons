@@ -171,7 +171,9 @@ class RunOrchestratorStore:
                     deck_type=self._deck_type,
                     block_on_door_open=False,
                 ),
-                error_recovery_policy=error_recovery_policy.error_recovery_by_ff,
+                # todo(mm, 2024-07-05): It's unclear what error recovery policy
+                # makes sense for the default orchestrator.
+                error_recovery_policy=error_recovery_policy.never_recover,
             )
             self._default_run_orchestrator = RunOrchestrator.build_orchestrator(
                 protocol_engine=engine, hardware_api=self._hardware_api

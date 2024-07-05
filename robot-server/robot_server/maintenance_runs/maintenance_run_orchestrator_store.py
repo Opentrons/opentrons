@@ -175,7 +175,7 @@ class MaintenanceRunOrchestratorStore:
                     RobotTypeEnum.robot_literal_to_enum(self._robot_type)
                 ),
             ),
-            error_recovery_policy=error_recovery_policy.error_recovery_by_ff,
+            error_recovery_policy=error_recovery_policy.never_recover,
             deck_configuration=deck_configuration,
             notify_publishers=notify_publishers,
         )
