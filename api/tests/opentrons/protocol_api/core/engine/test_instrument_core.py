@@ -1232,7 +1232,7 @@ def test_configure_nozzle_layout(
         (8, NozzleConfigurationType.FULL, "A1", True),
         (8, NozzleConfigurationType.FULL, None, True),
         (8, NozzleConfigurationType.SINGLE, "H1", True),
-        (8, NozzleConfigurationType.SINGLE, "A1", False),
+        (8, NozzleConfigurationType.SINGLE, "A1", True),
         (1, NozzleConfigurationType.FULL, None, True),
     ],
 )
