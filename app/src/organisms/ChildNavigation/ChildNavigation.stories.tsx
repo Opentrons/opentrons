@@ -73,6 +73,16 @@ export const TitleWithTwoButtons: Story = {
     onClickButton: () => {},
     secondaryButtonProps,
     onClickBack: () => {},
+  },
+}
+
+export const TitleWithTwoButtonsDisabled: Story = {
+  args: {
+    header: 'Header',
+    buttonText: 'ButtonText',
+    onClickButton: () => {},
+    secondaryButtonProps,
+    onClickBack: () => {},
     ariaDisabled: true,
   },
 }

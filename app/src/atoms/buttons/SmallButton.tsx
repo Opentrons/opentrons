@@ -137,7 +137,9 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
     }
 
     &[aria-disabled='true'] {
-      background-color: red;
+      background-color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType]
+        .disabledBackgroundColor};
+      color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType].disabledColor};
     }
   `
 
