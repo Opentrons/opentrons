@@ -1293,6 +1293,7 @@ def test_detect_liquid_presence(
     ).then_raise(errorToRaise)
     result = subject.detect_liquid_presence(mock_well)
     assert isinstance(result, bool)
+    assert not result
 
 
 @pytest.mark.parametrize("api_version", [APIVersion(2, 20)])
@@ -1316,8 +1317,7 @@ def test_require_liquid_presence(
     ).then_raise(errorToRaise)
     with pytest.raises(ProtocolCommandFailedError) as pcfe:
         subject.require_liquid_presence(mock_well)
-    assert pcfe.value.original_error is not None
-    assert pcfe.value.original_error.errorType == "liquidNotFound"
+    assert pcfe.value is errorToRaise
 
 
 @pytest.mark.parametrize("api_version", [APIVersion(2, 20)])
@@ -1339,5 +1339,4 @@ def test_measure_liquid_height(
     ).then_raise(errorToRaise)
     with pytest.raises(ProtocolCommandFailedError) as pcfe:
         subject.measure_liquid_height(mock_well)
-    assert pcfe.value.original_error is not None
-    assert pcfe.value.original_error.errorType == "liquidNotFound"
+    assert pcfe.value is errorToRaise

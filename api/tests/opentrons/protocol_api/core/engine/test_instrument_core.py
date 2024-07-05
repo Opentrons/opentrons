@@ -1303,10 +1303,8 @@ def test_liquid_probe_without_recovery(
     well_core = WellCore(
         name="my cool well", labware_id="123abc", engine_client=mock_engine_client
     )
-    try:
+    with pytest.raises(PipetteLiquidNotFoundError):
         subject.liquid_probe_without_recovery(well_core=well_core)
-    except PipetteLiquidNotFoundError:
-        assert True
     decoy.verify(
         mock_engine_client.execute_command_without_recovery(
             cmd.LiquidProbeParams(
@@ -1329,14 +1327,11 @@ def test_liquid_probe_with_recovery(
     subject: InstrumentCore,
     version: APIVersion,
 ) -> None:
-    """It should raise an exception on an empty well."""
+    """It should not raise an exception on an empty well."""
     well_core = WellCore(
         name="my cool well", labware_id="123abc", engine_client=mock_engine_client
     )
-    try:
-        subject.liquid_probe_with_recovery(well_core=well_core)
-    except PipetteLiquidNotFoundError:
-        assert True
+    subject.liquid_probe_with_recovery(well_core=well_core)
     decoy.verify(
         mock_engine_client.execute_command(
             cmd.LiquidProbeParams(

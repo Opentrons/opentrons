@@ -881,6 +881,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         if result is not None and isinstance(result, LiquidProbeResult):
             return result.z_position
         # should never get here
+        print("I got here")
         raise PipetteLiquidNotFoundError(
             "Error while trying to find liquid level.",
         )
