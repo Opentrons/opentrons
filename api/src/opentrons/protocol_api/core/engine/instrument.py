@@ -846,7 +846,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         z_axis = self._engine_client.state.pipettes.get_z_axis(self._pipette_id)
         self._engine_client.execute_command(cmd.HomeParams(axes=[z_axis]))
 
-    def find_liquid_presence_with_recovery(self, well_core: WellCore) -> None:
+    def liquid_probe_with_recovery(self, well_core: WellCore) -> None:
         labware_id = well_core.labware_id
         well_name = well_core.get_name()
         well_location = WellLocation(
@@ -862,7 +862,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             )
         )
 
-    def find_liquid_level_without_recovery(self, well_core: WellCore) -> float:
+    def liquid_probe_without_recovery(self, well_core: WellCore) -> float:
         labware_id = well_core.labware_id
         well_name = well_core.get_name()
         well_location = WellLocation(

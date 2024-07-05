@@ -1,6 +1,11 @@
 """Tests for the InstrumentContext public interface."""
 from collections import OrderedDict
+from datetime import datetime
 import inspect
+from opentrons.protocol_engine.commands.pipetting_common import LiquidNotFoundError
+from opentrons.protocol_engine.errors.error_occurrence import (
+    ProtocolCommandFailedError,
+)
 import pytest
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 from decoy import Decoy
@@ -38,7 +43,6 @@ from opentrons.types import Location, Mount, Point
 
 from opentrons_shared_data.errors.exceptions import (
     CommandPreconditionViolated,
-    PipetteLiquidNotFoundError,
 )
 
 
@@ -1279,9 +1283,14 @@ def test_detect_liquid_presence(
 ) -> None:
     """It should only return booleans. Not raise an exception."""
     mock_well = decoy.mock(cls=Well)
+    lnfe = LiquidNotFoundError(id="1234", createdAt=datetime.now())
+    errorToRaise = ProtocolCommandFailedError(
+        original_error=lnfe,
+        message=f"{lnfe.errorType}: {lnfe.detail}",
+    )
     decoy.when(
-        mock_instrument_core.find_liquid_level_without_recovery(mock_well._core)
-    ).then_raise(PipetteLiquidNotFoundError())
+        mock_instrument_core.liquid_probe_without_recovery(mock_well._core)
+    ).then_raise(errorToRaise)
     result = subject.detect_liquid_presence(mock_well)
     assert isinstance(result, bool)
 
@@ -1295,13 +1304,20 @@ def test_require_liquid_presence(
 ) -> None:
     """It should raise an exception when called."""
     mock_well = decoy.mock(cls=Well)
-    decoy.when(mock_instrument_core.find_liquid_presence_with_recovery(mock_well._core))
+    lnfe = LiquidNotFoundError(id="1234", createdAt=datetime.now())
+    errorToRaise = ProtocolCommandFailedError(
+        original_error=lnfe,
+        message=f"{lnfe.errorType}: {lnfe.detail}",
+    )
+    decoy.when(mock_instrument_core.liquid_probe_with_recovery(mock_well._core))
     subject.require_liquid_presence(mock_well)
     decoy.when(
-        mock_instrument_core.find_liquid_presence_with_recovery(mock_well._core)
-    ).then_raise(PipetteLiquidNotFoundError())
-    with pytest.raises(PipetteLiquidNotFoundError):
+        mock_instrument_core.liquid_probe_with_recovery(mock_well._core)
+    ).then_raise(errorToRaise)
+    with pytest.raises(ProtocolCommandFailedError) as pcfe:
         subject.require_liquid_presence(mock_well)
+    assert pcfe.value.original_error is not None
+    assert pcfe.value.original_error.errorType == "liquidNotFound"
 
 
 @pytest.mark.parametrize("api_version", [APIVersion(2, 20)])
@@ -1313,8 +1329,15 @@ def test_measure_liquid_height(
 ) -> None:
     """It should raise an exception when called."""
     mock_well = decoy.mock(cls=Well)
+    lnfe = LiquidNotFoundError(id="1234", createdAt=datetime.now())
+    errorToRaise = ProtocolCommandFailedError(
+        original_error=lnfe,
+        message=f"{lnfe.errorType}: {lnfe.detail}",
+    )
     decoy.when(
-        mock_instrument_core.find_liquid_level_without_recovery(mock_well._core)
-    ).then_raise(PipetteLiquidNotFoundError())
-    with pytest.raises(PipetteLiquidNotFoundError):
+        mock_instrument_core.liquid_probe_without_recovery(mock_well._core)
+    ).then_raise(errorToRaise)
+    with pytest.raises(ProtocolCommandFailedError) as pcfe:
         subject.measure_liquid_height(mock_well)
+    assert pcfe.value.original_error is not None
+    assert pcfe.value.original_error.errorType == "liquidNotFound"

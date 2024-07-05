@@ -1292,7 +1292,7 @@ def test_configure_for_volume_post_219(
 
 
 @pytest.mark.parametrize("version", versions_at_or_above(APIVersion(2, 20)))
-def test_find_liquid_level_without_recovery(
+def test_liquid_probe_without_recovery(
     decoy: Decoy,
     mock_engine_client: EngineClient,
     mock_protocol_core: ProtocolCore,
@@ -1304,7 +1304,7 @@ def test_find_liquid_level_without_recovery(
         name="my cool well", labware_id="123abc", engine_client=mock_engine_client
     )
     try:
-        subject.find_liquid_level_without_recovery(well_core=well_core)
+        subject.liquid_probe_without_recovery(well_core=well_core)
     except PipetteLiquidNotFoundError:
         assert True
     decoy.verify(
@@ -1322,7 +1322,7 @@ def test_find_liquid_level_without_recovery(
 
 
 @pytest.mark.parametrize("version", versions_at_or_above(APIVersion(2, 20)))
-def test_find_liquid_presence_with_recovery(
+def test_liquid_probe_with_recovery(
     decoy: Decoy,
     mock_engine_client: EngineClient,
     mock_protocol_core: ProtocolCore,
@@ -1334,7 +1334,7 @@ def test_find_liquid_presence_with_recovery(
         name="my cool well", labware_id="123abc", engine_client=mock_engine_client
     )
     try:
-        subject.find_liquid_presence_with_recovery(well_core=well_core)
+        subject.liquid_probe_with_recovery(well_core=well_core)
     except PipetteLiquidNotFoundError:
         assert True
     decoy.verify(
