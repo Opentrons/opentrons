@@ -223,7 +223,6 @@
   "recommended": "Recommended",
   "required_instrument_calibrations": "required instrument calibrations",
   "required_tip_racks_title": "Required Tip Length Calibrations",
-  "required": "Required",
   "reset_parameter_values_body": "This will discard any changes you have made. All parameters will have their default values.",
   "reset_parameter_values": "Reset parameter values?",
   "reset_setup": "Restart setup to edit",
