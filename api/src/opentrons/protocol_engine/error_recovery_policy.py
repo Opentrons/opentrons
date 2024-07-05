@@ -3,7 +3,6 @@
 import enum
 from typing import Optional, Protocol
 
-from opentrons.config import feature_flags as ff
 from opentrons.protocol_engine.commands import (
     Command,
     CommandDefinedErrorData,
@@ -53,22 +52,20 @@ class ErrorRecoveryPolicy(Protocol):
         ...
 
 
-def error_recovery_by_ff(
+# todo(mm, 2024-07-05): This "static" policy will need to somehow become dynamic for
+# https://opentrons.atlassian.net/browse/EXEC-589.
+def standard_run_policy(
     failed_command: Command, defined_error_data: Optional[CommandDefinedErrorData]
 ) -> ErrorRecoveryType:
-    """Use API feature flags to decide how to handle an error.
-
-    This is just for development. This should be replaced by a proper config
-    system exposed through robot-server's HTTP API.
-    """
+    """An error recovery policy suitable for normal protocol runs via robot-server."""
     # todo(mm, 2024-03-18): Do we need to do anything explicit here to disable
     # error recovery on the OT-2?
     error_is_defined = defined_error_data is not None
     # If the error is defined, we're taking that to mean that we should
-    # WAIT_FOR_RECOVERY. This is not necessarily the right production logic--we might
+    # WAIT_FOR_RECOVERY. This is not necessarily the right long-term logic--we might
     # want to FAIL_RUN on certain defined errors and WAIT_FOR_RECOVERY on certain
-    # undefined errors--but this is convenient for development.
-    if ff.enable_error_recovery_experiments() and error_is_defined:
+    # undefined errors--but this is convenient for now.
+    if error_is_defined:
         return ErrorRecoveryType.WAIT_FOR_RECOVERY
     else:
         return ErrorRecoveryType.FAIL_RUN

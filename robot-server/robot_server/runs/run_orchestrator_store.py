@@ -223,7 +223,7 @@ class RunOrchestratorStore:
                     RobotTypeEnum.robot_literal_to_enum(self._robot_type)
                 ),
             ),
-            error_recovery_policy=error_recovery_policy.error_recovery_by_ff,
+            error_recovery_policy=error_recovery_policy.standard_run_policy,
             load_fixed_trash=load_fixed_trash,
             deck_configuration=deck_configuration,
             notify_publishers=notify_publishers,
