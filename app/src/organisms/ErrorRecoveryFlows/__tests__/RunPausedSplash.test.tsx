@@ -34,11 +34,20 @@ describe('useRunPausedSplash', () => {
     )
   })
 
-  it('returns true if on the ODD', () => {
-    const { result } = renderHook(() => useRunPausedSplash(true, true), {
-      wrapper,
+  const IS_WIZARD_SHOWN = [false, true]
+  IS_WIZARD_SHOWN.forEach(val => {
+    it(`returns ${!val} if on the ODD and showERWizard is ${val}`, () => {
+      const { result } = renderHook(() => useRunPausedSplash(true, val), {
+        wrapper,
+      })
+      expect(result.current).toEqual(!val)
     })
-    expect(result.current).toEqual(true)
+    it(`always returns false if on desktop and showERWizard is ${val}`, () => {
+      const { result } = renderHook(() => useRunPausedSplash(false, val), {
+        wrapper,
+      })
+      expect(result.current).toEqual(false)
+    })
   })
 })
 
