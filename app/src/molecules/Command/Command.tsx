@@ -1,7 +1,6 @@
 import * as React from 'react'
 import {
   Flex,
-  Box,
   JUSTIFY_CENTER,
   JUSTIFY_FLEX_START,
   ALIGN_CENTER,
@@ -19,11 +18,12 @@ import type { StyleProps } from '@opentrons/components'
 import { omit } from 'lodash'
 
 export type CommandState = NonSkeletonCommandState | 'loading'
-type NonSkeletonCommandState = 'current' | 'failed' | 'future'
+export type NonSkeletonCommandState = 'current' | 'failed' | 'future'
 
 interface FundamentalProps {
   robotType: RobotType
   aligned: 'left' | 'center'
+  forceTwoLineClip?: boolean
 }
 
 interface SkeletonCommandProps extends FundamentalProps {
@@ -106,31 +106,28 @@ export function CenteredCommand(
     <Flex
       justifyContent={JUSTIFY_CENTER}
       alignItems={ALIGN_CENTER}
+      width="100%"
       {...PROPS_BY_STATE[props.state].container}
     >
       <CommandIcon
         command={props.command}
         {...PROPS_BY_STATE[props.state].icon}
       />
-      <Box minHeight={ICON_SIZE} alignItems={ALIGN_CENTER} width="100%">
+      <Flex minHeight={ICON_SIZE} alignItems={ALIGN_CENTER} width="100%">
         <CommandText
           {...props}
+          propagateTextLimit={props.forceTwoLineClip}
           css={`
-            @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-              display: -webkit-box;
-              -webkit-box-orient: vertical;
-              overflow: hidden;
-              text-overflow: ellipsis;
-              word-wrap: break-word;
-              -webkit-line-clamp: 2;
-            }
+            ${props.forceTwoLineClip === true
+              ? TEXT_CLIP_STYLE
+              : ODD_ONLY_TEXT_CLIP_STYLE}
             @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
               max-height: 240px;
               overflow: auto;
             } ;
           `}
         />
-      </Box>
+      </Flex>
     </Flex>
   )
 }
@@ -142,31 +139,43 @@ export function LeftAlignedCommand(
     <Flex
       justifyContent={JUSTIFY_FLEX_START}
       alignItems={ALIGN_CENTER}
+      width="100%"
       {...PROPS_BY_STATE[props.state].container}
     >
       <CommandIcon
         command={props.command}
         {...PROPS_BY_STATE[props.state].icon}
       />
-      <Box minHeight={ICON_SIZE} alignItems={ALIGN_CENTER} width="100%">
+      <Flex minHeight={ICON_SIZE} alignItems={ALIGN_CENTER} width="100%">
         <CommandText
           {...omit(props, ['isOnDevice'])}
+          propagateTextLimit={props.forceTwoLineClip}
           css={`
-            @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-              display: -webkit-box;
-              -webkit-box-orient: vertical;
-              -webkit-line-clamp: 14;
-              overflow: hidden;
-              text-overflow: ellipsis;
-              word-wrap: break-word;
-            }
+            ${props.forceTwoLineClip === true
+              ? TEXT_CLIP_STYLE
+              : ODD_ONLY_TEXT_CLIP_STYLE}
             @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
               max-height: 240px;
               overflow: auto;
             } ;
           `}
         />
-      </Box>
+      </Flex>
     </Flex>
   )
 }
+
+const TEXT_CLIP_STYLE = `
+   display: -webkit-box;
+                       -webkit-box-orient: vertical;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              word-wrap: break-word;
+              -webkit-line-clamp: 2;
+}
+`
+const ODD_ONLY_TEXT_CLIP_STYLE = `
+   @media (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+     ${TEXT_CLIP_STYLE}
+}
+`
