@@ -1,5 +1,4 @@
 """Protocol run control and management."""
-import asyncio
 from typing import List, NamedTuple, Optional, Union
 
 from abc import ABC, abstractmethod
@@ -23,6 +22,7 @@ from opentrons.protocol_engine import (
     commands as pe_commands,
 )
 from opentrons.protocols.parse import PythonParseMode
+from opentrons.util.async_helpers import asyncio_yield
 from opentrons.util.broker import Broker
 
 from .task_queue import TaskQueue
@@ -339,7 +339,7 @@ class JsonRunner(AbstractRunner):
                 description=liquid.description,
                 color=liquid.displayColor,
             )
-            await _yield()
+            await asyncio_yield()
 
         initial_home_command = pe_commands.HomeCreate(
             params=pe_commands.HomeParams(axes=None)
@@ -463,8 +463,3 @@ def create_protocol_runner(
             post_run_hardware_state=post_run_hardware_state,
             drop_tips_after_run=drop_tips_after_run,
         )
-
-
-async def _yield() -> None:
-    """Yield execution to the event loop, giving other tasks a chance to run."""
-    await asyncio.sleep(0)
