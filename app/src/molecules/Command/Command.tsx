@@ -52,7 +52,8 @@ export function Command(props: CommandProps): JSX.Element {
   )
 }
 
-const ICON_SIZE = SPACING.spacing32
+const ICON_SIZE_ODD = SPACING.spacing32
+const ICON_SIZE_DESKTOP = SPACING.spacing16
 const CONTAINER_Y_PADDING = SPACING.spacing12
 const SKELETON_HEIGHT = '3.5rem' // spacing32 + spacing12 + spacing12, not otherwise a constant
 const UNIVERSAL_CONTAINER_STYLES = {
@@ -61,40 +62,51 @@ const UNIVERSAL_CONTAINER_STYLES = {
   paddingY: CONTAINER_Y_PADDING,
 } as const
 
-const UNIVERSAL_ICON_STYLES = {
-  size: ICON_SIZE,
-  marginRight: SPACING.spacing12,
-} as const
-
 const PROPS_BY_STATE: Record<
   NonSkeletonCommandState,
-  { container: StyleProps; icon: StyleProps }
+  { container: { props: StyleProps; style: string } }
 > = {
   current: {
     container: {
-      backgroundColor: COLORS.blue35,
-      ...UNIVERSAL_CONTAINER_STYLES,
-    },
-    icon: {
-      ...UNIVERSAL_ICON_STYLES,
+      style: `
+      padding: ${SPACING.spacing8};
+      @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+         padding: ${SPACING.spacing12} ${SPACING.spacing24};
+      }
+      `,
+      props: {
+        ...UNIVERSAL_CONTAINER_STYLES,
+        backgroundColor: COLORS.blue35,
+      },
     },
   },
   failed: {
     container: {
-      backgroundColor: COLORS.red35,
-      ...UNIVERSAL_CONTAINER_STYLES,
-    },
-    icon: {
-      ...UNIVERSAL_ICON_STYLES,
+      style: `
+      padding: ${SPACING.spacing8};
+      @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+         padding: ${SPACING.spacing12} ${SPACING.spacing24};
+      }
+      `,
+      props: {
+        ...UNIVERSAL_CONTAINER_STYLES,
+        backgroundColor: COLORS.red35,
+      },
     },
   },
   future: {
     container: {
-      backgroundColor: COLORS.grey35,
-      ...UNIVERSAL_CONTAINER_STYLES,
-    },
-    icon: {
-      ...UNIVERSAL_ICON_STYLES,
+      style: `
+      background-color: ${COLORS.grey20};
+      padding: ${SPACING.spacing8};
+      @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+         background-color: ${COLORS.grey35};
+         padding: ${SPACING.spacing12} ${SPACING.spacing24};
+      }
+      `,
+      props: {
+        ...UNIVERSAL_CONTAINER_STYLES,
+      },
     },
   },
 }
@@ -107,13 +119,32 @@ export function CenteredCommand(
       justifyContent={JUSTIFY_CENTER}
       alignItems={ALIGN_CENTER}
       width="100%"
-      {...PROPS_BY_STATE[props.state].container}
+      {...PROPS_BY_STATE[props.state].container.props}
+      css={PROPS_BY_STATE[props.state].container.style}
     >
-      <CommandIcon
-        command={props.command}
-        {...PROPS_BY_STATE[props.state].icon}
-      />
-      <Flex minHeight={ICON_SIZE} alignItems={ALIGN_CENTER} width="100%">
+      <Flex
+        alignItems={ALIGN_CENTER}
+        justifyContent={JUSTIFY_CENTER}
+        css={`
+          margin-right: ${SPACING.spacing12};
+          height: ${ICON_SIZE_DESKTOP};
+          @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+            height: ${ICON_SIZE_ODD};
+          }
+        `}
+      >
+        <CommandIcon command={props.command} size="100%" />
+      </Flex>
+      <Flex
+        alignItems={ALIGN_CENTER}
+        width="100%"
+        css={`
+          min-height: ${ICON_SIZE_DESKTOP};
+          @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+            min-height: ${ICON_SIZE_ODD};
+          }
+        `}
+      >
         <CommandText
           {...props}
           propagateTextLimit={props.forceTwoLineClip}
@@ -140,13 +171,32 @@ export function LeftAlignedCommand(
       justifyContent={JUSTIFY_FLEX_START}
       alignItems={ALIGN_CENTER}
       width="100%"
-      {...PROPS_BY_STATE[props.state].container}
+      {...PROPS_BY_STATE[props.state].container.props}
+      css={PROPS_BY_STATE[props.state].container.style}
     >
-      <CommandIcon
-        command={props.command}
-        {...PROPS_BY_STATE[props.state].icon}
-      />
-      <Flex minHeight={ICON_SIZE} alignItems={ALIGN_CENTER} width="100%">
+      <Flex
+        alignItems={ALIGN_CENTER}
+        justifyContent={JUSTIFY_CENTER}
+        css={`
+          margin-right: ${SPACING.spacing12};
+          height: ${ICON_SIZE_DESKTOP};
+          @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+            height: ${ICON_SIZE_ODD};
+          }
+        `}
+      >
+        <CommandIcon command={props.command} size="100%" />
+      </Flex>
+      <Flex
+        alignItems={ALIGN_CENTER}
+        width="100%"
+        css={`
+          min-height: ${ICON_SIZE_DESKTOP};
+          @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+            min-height: ${ICON_SIZE_ODD};
+          }
+        `}
+      >
         <CommandText
           {...omit(props, ['isOnDevice'])}
           propagateTextLimit={props.forceTwoLineClip}
