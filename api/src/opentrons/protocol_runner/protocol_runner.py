@@ -10,6 +10,8 @@ from opentrons import protocol_reader
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.protocol_api import ParameterContext
 from opentrons.protocol_api.core.legacy.load_info import LoadInfo
+from opentrons.protocol_engine.commands.command import CommandStatus
+from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
 from opentrons.protocol_reader import (
     ProtocolSource,
     JsonProtocolConfig,
@@ -371,13 +373,31 @@ class JsonRunner(AbstractRunner):
         return RunResult(commands=commands, state_summary=run_data, parameters=[])
 
     async def _add_command_and_execute(self) -> None:
-        for command in self._queued_commands:
-            result = await self._protocol_engine.add_and_execute_command(command)
-            if result and result.error:
-                raise ProtocolCommandFailedError(
-                    original_error=result.error,
-                    message=f"{result.error.errorType}: {result.error.detail}",
+        for command_request in self._queued_commands:
+            # todo(mm, 2024-07-05): This logic to handle the various execution results
+            # mirrors PAPI's ChildThreadTransport. Simplify or deduplicate it.
+            executed_command = (
+                await self._protocol_engine.add_and_execute_command_wait_for_recovery(
+                    command_request
                 )
+            )
+            if executed_command.error is not None:
+                error_was_recovered_from = (
+                    self._protocol_engine.state_view.commands.get_error_recovery_type(
+                        executed_command.id
+                    )
+                    == ErrorRecoveryType.WAIT_FOR_RECOVERY
+                )
+                if not error_was_recovered_from:
+                    raise ProtocolCommandFailedError(
+                        original_error=executed_command.error,
+                        message=f"{executed_command.error.errorType}: {executed_command.error.detail}",
+                    )
+            elif executed_command.status == CommandStatus.QUEUED:
+                raise RuntimeError(
+                    "Run stopped before command could start"
+                )  # FIX BEFORE MERGE
+                # Does this even need to raise anything or should we just break the loop?
 
 
 class LiveRunner(AbstractRunner):
