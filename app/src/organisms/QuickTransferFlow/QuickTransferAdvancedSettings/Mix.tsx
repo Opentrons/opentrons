@@ -63,7 +63,7 @@ export function Mix(props: MixProps): JSX.Element {
     MixAction = ACTIONS.SET_MIX_ON_ASPIRATE
   } else if (kind === 'dispense') {
     headerCopy = t('mix_before_dispensing')
-    MixAction = ACTIONS.SET_MIX_ON_ASPIRATE
+    MixAction = ACTIONS.SET_MIX_ON_DISPENSE
   }
 
   const displayItems = [

@@ -15,6 +15,7 @@ import {
 } from '@opentrons/components'
 
 import type {
+  BlowOutLocation,
   QuickTransferSummaryAction,
   QuickTransferSummaryState,
 } from '../types'
@@ -28,6 +29,7 @@ import { Mix } from './Mix'
 import { Delay } from './Delay'
 import { TouchTip } from './TouchTip'
 import { AirGap } from './AirGap'
+import { BlowOut } from './BlowOut'
 
 interface QuickTransferAdvancedSettingsProps {
   state: QuickTransferSummaryState
@@ -50,6 +52,21 @@ export function QuickTransferAdvancedSettings(
     pipettePath = t('pipette_path_multi_aspirate')
   } else if (state.path === 'multiDispense') {
     pipettePath = t('pipette_path_multi_dispense')
+  }
+
+  function getBlowoutValueCopy(): string {
+    switch (state.blowOut) {
+      case 'trashBin':
+        return t('blow_out_into_trash_bin')
+      case 'wasteChute':
+        return t('blow_out_into_waste_chute')
+      case 'dest_well':
+        return t('blow_out_into_destination_well')
+      case 'source_well':
+        return t('blow_out_into_source_well')
+      default:
+        return ''
+    }
   }
 
   const baseSettingsItems = [
@@ -146,6 +163,73 @@ export function QuickTransferAdvancedSettings(
       enabled: true,
       onClick: () => {
         setSelectedSetting('aspirate_air_gap')
+      },
+    },
+  ]
+
+  const dispenseSettingsItems = [
+    {
+      option: t('tip_position'),
+      value: state.tipPositionDispense
+        ? t('tip_position_value', { position: state.tipPositionDispense })
+        : '',
+      enabled: true,
+      onClick: () => {
+        setSelectedSetting('dispense_tip_position')
+      },
+    },
+    {
+      option: t('mix'),
+      value: state.mixOnDispense
+        ? t('mix_value', {
+            volume: state.mixOnDispense?.mixVolume,
+            reps: state.mixOnDispense?.repititions,
+          })
+        : '',
+      enabled: true,
+      onClick: () => {
+        setSelectedSetting('dispense_mix')
+      },
+    },
+    {
+      option: t('delay'),
+      value: state.delayDispense
+        ? t('delay_value', {
+            delay: state.delayDispense.delayDuration,
+            position: state.delayDispense.positionFromBottom,
+          })
+        : '',
+      enabled: true,
+      onClick: () => {
+        setSelectedSetting('dispense_delay')
+      },
+    },
+    {
+      option: t('touch_tip'),
+      value: state.touchTipDispense
+        ? t('touch_tip_value', { position: state.touchTipDispense })
+        : '',
+      enabled: true,
+      onClick: () => {
+        setSelectedSetting('dispense_touch_tip')
+      },
+    },
+    {
+      option: t('air_gap'),
+      value: state.airGapDispense
+        ? t('air_gap_value', { volume: state.airGapDispense })
+        : '',
+      enabled: true,
+      onClick: () => {
+        setSelectedSetting('dispense_air_gap')
+      },
+    },
+    {
+      option: t('blow_out'),
+      value: getBlowoutValueCopy(),
+      enabled: true,
+      onClick: () => {
+        setSelectedSetting('dispense_blow_out')
       },
     },
   ]
@@ -306,6 +390,113 @@ export function QuickTransferAdvancedSettings(
           {selectedSetting === 'aspirate_air_gap' ? (
             <AirGap
               kind={'aspirate'}
+              state={state}
+              dispatch={dispatch}
+              onBack={() => {
+                setSelectedSetting(null)
+              }}
+            />
+          ) : null}
+        </Flex>
+      </Flex>
+
+      {/*Dispense Settings*/}
+      <Flex gridGap={SPACING.spacing16} flexDirection={DIRECTION_COLUMN}>
+        {selectedSetting === null ? (
+          <StyledText
+            css={TYPOGRAPHY.level4HeaderSemiBold}
+            color={COLORS.grey60}
+            textAlign={TEXT_ALIGN_LEFT}
+          >
+            {t('dispense_settings')}
+          </StyledText>
+        ) : null}
+        <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
+          {selectedSetting === null
+            ? dispenseSettingsItems.map(displayItem => (
+                <ListItem
+                  type="noActive"
+                  key={displayItem.option}
+                  onClick={displayItem.onClick}
+                >
+                  <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
+                    <StyledText
+                      css={TYPOGRAPHY.level4HeaderSemiBold}
+                      width="20rem"
+                    >
+                      {displayItem.option}
+                    </StyledText>
+                    <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
+                      <StyledText
+                        css={TYPOGRAPHY.level4HeaderRegular}
+                        color={COLORS.grey60}
+                        textAlign={TEXT_ALIGN_RIGHT}
+                      >
+                        {displayItem.value !== ''
+                          ? displayItem.value
+                          : t('option_disabled')}
+                      </StyledText>
+                      {displayItem.enabled ? (
+                        <Icon name="more" size={SIZE_2} />
+                      ) : null}
+                    </Flex>
+                  </Flex>
+                </ListItem>
+              ))
+            : null}
+          {selectedSetting === 'dispense_tip_position' ? (
+            <TipPositionEntry
+              kind={'dispense'}
+              state={state}
+              dispatch={dispatch}
+              onBack={() => {
+                setSelectedSetting(null)
+              }}
+            />
+          ) : null}
+          {selectedSetting === 'dispense_mix' ? (
+            <Mix
+              kind={'dispense'}
+              state={state}
+              dispatch={dispatch}
+              onBack={() => {
+                setSelectedSetting(null)
+              }}
+            />
+          ) : null}
+          {selectedSetting === 'dispense_delay' ? (
+            <Delay
+              kind={'dispense'}
+              state={state}
+              dispatch={dispatch}
+              onBack={() => {
+                setSelectedSetting(null)
+              }}
+            />
+          ) : null}
+          {selectedSetting === 'dispense_touch_tip' ? (
+            <TouchTip
+              kind={'dispense'}
+              state={state}
+              dispatch={dispatch}
+              onBack={() => {
+                setSelectedSetting(null)
+              }}
+            />
+          ) : null}
+          {selectedSetting === 'dispense_air_gap' ? (
+            <AirGap
+              kind={'dispense'}
+              state={state}
+              dispatch={dispatch}
+              onBack={() => {
+                setSelectedSetting(null)
+              }}
+            />
+          ) : null}
+          {selectedSetting === 'dispense_blow_out' ? (
+            <BlowOut
+              kind={'dispense'}
               state={state}
               dispatch={dispatch}
               onBack={() => {
