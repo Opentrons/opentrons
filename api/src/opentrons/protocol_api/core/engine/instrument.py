@@ -754,20 +754,13 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         return self._liquid_presence_detection
 
     def is_tip_tracking_available(self) -> bool:
-        primary_nozzle = self._engine_client.state.pipettes.get_primary_nozzle(
-            self._pipette_id
-        )
         if self.get_nozzle_configuration() == NozzleConfigurationType.FULL:
             return True
         else:
             if self.get_channels() == 96:
                 return True
             if self.get_channels() == 8:
-                # TODO: (cb, 03/06/24): Enable automatic tip tracking on the 8 channel pipettes once PAPI support exists
-                return (
-                    self.get_nozzle_configuration() == NozzleConfigurationType.SINGLE
-                    and primary_nozzle == "H1"
-                )
+                return True
         return False
 
     def set_flow_rate(
