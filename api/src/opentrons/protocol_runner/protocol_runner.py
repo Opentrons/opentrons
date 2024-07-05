@@ -284,7 +284,6 @@ class JsonRunner(AbstractRunner):
         """Initialize the JsonRunner with its dependencies."""
         super().__init__(protocol_engine)
         self._protocol_engine = protocol_engine
-        self._hardware_api = hardware_api
         self._json_file_reader = json_file_reader or JsonFileReader()
         self._json_translator = json_translator or JsonTranslator()
         # TODO(mc, 2022-01-11): replace task queue with specific implementations
@@ -298,7 +297,7 @@ class JsonRunner(AbstractRunner):
             post_run_hardware_state=post_run_hardware_state,
         )
 
-        self._hardware_api.should_taskify_movement_execution(taskify=False)
+        hardware_api.should_taskify_movement_execution(taskify=False)
         self._queued_commands: List[pe_commands.CommandCreate] = []
 
     async def load(self, protocol_source: ProtocolSource) -> None:
