@@ -18,12 +18,16 @@ import type {
   QuickTransferSummaryAction,
   QuickTransferSummaryState,
 } from '../types'
+import { ACTIONS } from '../constants'
 import { useTranslation } from 'react-i18next'
 import { ListItem } from '../../../atoms/ListItem'
 import { FlowRateEntry } from './FlowRate'
 import { PipettePath } from './PipettePath'
 import { TipPositionEntry } from './TipPosition'
 import { Mix } from './Mix'
+import { Delay } from './Delay'
+import { TouchTip } from './TouchTip'
+import { AirGap } from './AirGap'
 
 interface QuickTransferAdvancedSettingsProps {
   state: QuickTransferSummaryState
@@ -76,59 +80,49 @@ export function QuickTransferAdvancedSettings(
     },
   ]
 
-  // Aspirate Settings
-  let tipPositionValueCopy = state.tipPositionAspirate
-    ? t('tip_position_value', { position: state.tipPositionAspirate })
-    : ''
-  let preWetTipValueCopy = state.preWetTip ? t('option_enabled') : ''
-  let aspirateMixValueCopy = state.mixOnAspirate
-    ? t('aspirate_mix_value', {
-        volume: state.mixOnAspirate?.mixVolume,
-        reps: state.mixOnAspirate?.repititions,
-      })
-    : ''
-  let aspirateDelayValueCopy =
-    state.delayAspirate && state.tipPositionAspirate
-      ? t('aspirate_delay_value', {
-          delay: state.delayAspirate,
-          position: state.tipPositionAspirate,
-        })
-      : ''
-  let touchTipValueCopy = state.touchTipAspirate
-    ? t('touch_tip_aspirate_value')
-    : ''
-  let airGapValueCopy = state.airGapAspirate
-    ? t('air_gap_value', { volume: state.airGapAspirate })
-    : ''
-
   const aspirateSettingsItems = [
     {
       option: t('tip_position'),
-      value: tipPositionValueCopy,
+      value: state.tipPositionAspirate
+        ? t('tip_position_value', { position: state.tipPositionAspirate })
+        : '',
       enabled: true,
       onClick: () => {
         setSelectedSetting('aspirate_tip_position')
       },
     },
     {
-      option: t('aspirate_pre_wet_tip'),
-      value: preWetTipValueCopy,
+      option: t('pre_wet_tip'),
+      value: state.preWetTip ? t('option_enabled') : '',
       enabled: true,
       onClick: () => {
-        setSelectedSetting('aspirate_pre_wet_tip')
+        dispatch({
+          type: ACTIONS.SET_PRE_WET_TIP,
+          preWetTip: !state.preWetTip,
+        })
       },
     },
     {
-      option: t('aspirate_mix'),
-      value: aspirateMixValueCopy,
+      option: t('mix'),
+      value: state.mixOnAspirate
+        ? t('mix_value', {
+            volume: state.mixOnAspirate?.mixVolume,
+            reps: state.mixOnAspirate?.repititions,
+          })
+        : '',
       enabled: true,
       onClick: () => {
         setSelectedSetting('aspirate_mix')
       },
     },
     {
-      option: t('aspirate_delay'),
-      value: aspirateDelayValueCopy,
+      option: t('delay'),
+      value: state.delayAspirate
+        ? t('delay_value', {
+            delay: state.delayAspirate.delayDuration,
+            position: state.delayAspirate.positionFromBottom,
+          })
+        : '',
       enabled: true,
       onClick: () => {
         setSelectedSetting('aspirate_delay')
@@ -136,7 +130,9 @@ export function QuickTransferAdvancedSettings(
     },
     {
       option: t('touch_tip'),
-      value: touchTipValueCopy,
+      value: state.touchTipAspirate
+        ? t('touch_tip_value', { position: state.touchTipAspirate })
+        : '',
       enabled: true,
       onClick: () => {
         setSelectedSetting('aspirate_touch_tip')
@@ -144,7 +140,9 @@ export function QuickTransferAdvancedSettings(
     },
     {
       option: t('air_gap'),
-      value: airGapValueCopy,
+      value: state.airGapAspirate
+        ? t('air_gap_value', { volume: state.airGapAspirate })
+        : '',
       enabled: true,
       onClick: () => {
         setSelectedSetting('aspirate_air_gap')
@@ -275,8 +273,8 @@ export function QuickTransferAdvancedSettings(
               }}
             />
           ) : null}
-          {selectedSetting === 'aspirate_pre_wet_tip' ? (
-            <TipPositionEntry // TODO: WRONG COMPONENT
+          {selectedSetting === 'aspirate_mix' ? (
+            <Mix
               kind={'aspirate'}
               state={state}
               dispatch={dispatch}
@@ -285,8 +283,28 @@ export function QuickTransferAdvancedSettings(
               }}
             />
           ) : null}
-          {selectedSetting === 'aspirate_mix' ? (
-            <Mix
+          {selectedSetting === 'aspirate_delay' ? (
+            <Delay
+              kind={'aspirate'}
+              state={state}
+              dispatch={dispatch}
+              onBack={() => {
+                setSelectedSetting(null)
+              }}
+            />
+          ) : null}
+          {selectedSetting === 'aspirate_touch_tip' ? (
+            <TouchTip
+              kind={'aspirate'}
+              state={state}
+              dispatch={dispatch}
+              onBack={() => {
+                setSelectedSetting(null)
+              }}
+            />
+          ) : null}
+          {selectedSetting === 'aspirate_air_gap' ? (
+            <AirGap
               kind={'aspirate'}
               state={state}
               dispatch={dispatch}

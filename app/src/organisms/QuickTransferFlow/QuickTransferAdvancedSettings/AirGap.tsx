@@ -23,47 +23,40 @@ import type {
 import { i18n } from '../../../i18n'
 import { NumericalKeyboard } from '../../../atoms/SoftwareKeyboard'
 
-interface MixProps {
+interface AirGapProps {
   onBack: () => void
   state: QuickTransferSummaryState
   dispatch: React.Dispatch<QuickTransferSummaryAction>
   kind: FlowRateKind
 }
 
-export function Mix(props: MixProps): JSX.Element {
+export function AirGap(props: AirGapProps): JSX.Element {
   const { kind, onBack, state, dispatch } = props
   const { t } = useTranslation('quick_transfer')
   const keyboardRef = React.useRef(null)
 
   const [selectedOption, setSelectedOption] = React.useState<string>('')
   const [currentStep, setCurrentStep] = React.useState<number>(0)
-  const [mixVolume, setMixVolume] = React.useState<number | null>(
+  const [volume, setVolume] = React.useState<number | null>(
     kind === 'aspirate'
-      ? state.mixOnAspirate?.mixVolume ?? null
+      ? state.airGapAspirate ?? null
       : kind === 'dispense'
-      ? state.mixOnDispense?.mixVolume ?? null
-      : null
-  )
-  const [mixReps, setMixReps] = React.useState<number | null>(
-    kind === 'aspirate'
-      ? state.mixOnAspirate?.repititions ?? null
-      : kind === 'dispense'
-      ? state.mixOnDispense?.repititions ?? null
+      ? state.airGapDispense ?? null
       : null
   )
 
   let headerCopy: string = ''
-  let MixAction:
-    | typeof ACTIONS.SET_MIX_ON_ASPIRATE
-    | typeof ACTIONS.SET_MIX_ON_DISPENSE
+  let Action:
+    | typeof ACTIONS.SET_AIR_GAP_ASPIRATE
+    | typeof ACTIONS.SET_AIR_GAP_DISPENSE
     | null = null
 
   if (kind === 'aspirate') {
-    headerCopy = t('mix_before_aspirating')
-    MixAction = ACTIONS.SET_MIX_ON_ASPIRATE
+    headerCopy = t('air_gap_before_aspirating')
+    Action = ACTIONS.SET_AIR_GAP_ASPIRATE
   } else if (kind === 'dispense') {
-    headerCopy = t('mix_before_dispensing')
-    MixAction = ACTIONS.SET_MIX_ON_ASPIRATE
+    headerCopy = t('air_gap_before_dispensing')
+    Action = ACTIONS.SET_AIR_GAP_DISPENSE
   }
 
   const displayItems = [
@@ -83,7 +76,7 @@ export function Mix(props: MixProps): JSX.Element {
     },
   ]
 
-  const flowSteps: string[] = ['enable_mix', 'select_volume', 'select_reps']
+  const flowSteps: string[] = ['enable_air_gap', 'select_volume']
 
   const handleClickBackOrExit = (): void => {
     currentStep > 0 ? setCurrentStep(currentStep - 1) : onBack()
@@ -94,20 +87,14 @@ export function Mix(props: MixProps): JSX.Element {
       if (currentStep < flowSteps.length - 1) {
         setCurrentStep(currentStep + 1)
       } else {
-        if (MixAction != null && mixVolume != null && mixReps != null) {
-          dispatch({
-            type: MixAction,
-            mixSettings: { mixVolume: mixVolume, repititions: mixReps },
-          })
+        if (Action != null && volume != null) {
+          dispatch({ type: Action, volume: volume })
         }
         onBack()
       }
     } else {
-      if (MixAction != null) {
-        dispatch({
-          type: MixAction,
-          mixSettings: undefined,
-        })
+      if (Action != null) {
+        dispatch({ type: Action, volume: undefined })
       }
       onBack()
     }
@@ -122,18 +109,12 @@ export function Mix(props: MixProps): JSX.Element {
   }
 
   // TODO: find the actual min and max for these values.
-  const minVolume = 1
-  const maxVolume = 100
-  const minReps = 1
-  const maxReps = 100
-
-  const error =
-    // TODO: This error does not take into account min/maxReps
-    (mixVolume !== null && (mixVolume < minVolume || mixVolume > maxVolume)) ||
-    (mixReps !== null && (mixReps < minReps || mixReps > maxReps))
+  const volumeRange = { min: 1, max: 100 }
+  const volumeError =
+    volume !== null && (volume < volumeRange.min || volume > volumeRange.max)
       ? t(`value_out_of_range`, {
-          min: minVolume,
-          max: maxVolume,
+          min: volumeRange.min,
+          max: volumeRange.max,
         })
       : null
 
@@ -145,9 +126,9 @@ export function Mix(props: MixProps): JSX.Element {
         onClickBack={handleClickBackOrExit}
         onClickButton={handleClickSaveOrContinue}
         top={SPACING.spacing8}
-        buttonIsDisabled={error !== null || selectedOption === ''}
+        buttonIsDisabled={volumeError != null || selectedOption === ''}
       />
-      {flowSteps[currentStep] === 'enable_mix' ? (
+      {flowSteps[currentStep] === 'enable_air_gap' ? (
         <Flex
           marginTop={SPACING.spacing120}
           flexDirection={DIRECTION_COLUMN}
@@ -188,9 +169,9 @@ export function Mix(props: MixProps): JSX.Element {
           >
             <InputField
               type="number"
-              value={mixVolume}
-              title={t('mix_volume_µL')}
-              error={error}
+              value={volume}
+              title={t('air_gap_volume_µL')}
+              error={volumeError}
               readOnly
             />
           </Flex>
@@ -203,47 +184,7 @@ export function Mix(props: MixProps): JSX.Element {
             <NumericalKeyboard
               keyboardRef={keyboardRef}
               onChange={e => {
-                setMixVolume(Number(e))
-              }}
-            />
-          </Flex>
-        </Flex>
-      ) : null}
-      {flowSteps[currentStep] === 'select_reps' ? (
-        <Flex
-          alignSelf={ALIGN_CENTER}
-          gridGap={SPACING.spacing48}
-          paddingX={SPACING.spacing40}
-          padding={`${SPACING.spacing16} ${SPACING.spacing40} ${SPACING.spacing40}`}
-          marginTop="7.75rem" // using margin rather than justify due to content moving with error message
-          alignItems={ALIGN_CENTER}
-          height="22rem"
-        >
-          <Flex
-            width="30.5rem"
-            height="100%"
-            gridGap={SPACING.spacing24}
-            flexDirection={DIRECTION_COLUMN}
-            marginTop={SPACING.spacing68}
-          >
-            <InputField
-              type="number"
-              value={mixReps}
-              title={t('mix_repetitions')}
-              error={error}
-              readOnly
-            />
-          </Flex>
-          <Flex
-            paddingX={SPACING.spacing24}
-            height="21.25rem"
-            marginTop="7.75rem"
-            borderRadius="0"
-          >
-            <NumericalKeyboard
-              keyboardRef={keyboardRef}
-              onChange={e => {
-                setMixReps(Number(e))
+                setVolume(Number(e))
               }}
             />
           </Flex>

@@ -42,6 +42,7 @@ export function TipPositionEntry(props: TipPositionEntryProps): JSX.Element {
       : null
   )
   const tipPositionRange = { min: 1, max: 2 } // TODO: set this based on range
+
   let headerCopy: string = ''
   let textEntryCopy: string = t('distance_bottom_of_well_mm')
   let tipPositionAction:
