@@ -13,11 +13,11 @@ from .state import Config, StateStore
 from .types import PostRunHardwareState, DeckConfigurationType
 
 
-# TODO(mm, 2023-06-16): Arguably, this not being a context manager makes us prone to forgetting to
-# clean it up properly, especially in tests. See e.g. https://opentrons.atlassian.net/browse/RSS-222
 from .engine_support import create_run_orchestrator
 
 
+# TODO(mm, 2023-06-16): Arguably, this not being a context manager makes us prone to forgetting to
+# clean it up properly, especially in tests. See e.g. https://opentrons.atlassian.net/browse/RSS-222
 async def create_protocol_engine(
     hardware_api: HardwareControlAPI,
     config: Config,
