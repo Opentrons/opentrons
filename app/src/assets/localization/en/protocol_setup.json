@@ -254,7 +254,6 @@
   "slot_number": "Slot Number",
   "status": "Status",
   "step": "STEP {{index}}",
-  "test": "This protocol requires a CSV file. Tap the CSV row below to select one.",
   "there_are_no_unconfigured_modules": "No {{module}} is connected. Attach one and place it in {{slot}}.",
   "there_are_other_configured_modules": "A {{module}} is already configured in a different slot. Exit run setup and update your deck configuration to move to an already connected module. Or attach another {{module}} to continue setup.",
   "tip_length_cal_description_bullet": "Perform Tip Length Calibration for each new tip type used on a pipette.",
