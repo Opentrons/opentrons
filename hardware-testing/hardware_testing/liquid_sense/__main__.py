@@ -112,7 +112,6 @@ class RunArgs:
     ctx: ProtocolContext
     protocol_cfg: Any
     test_report: CSVReport
-    probe_seconds_before_contact: float
     aspirate: bool
     dial_indicator: Optional[mitutoyo_digimatic_indicator.Mitutoyo_Digimatic_Indicator]
     plunger_speed: float
@@ -227,7 +226,6 @@ class RunArgs:
             args.liquid,
             protocol_cfg.LABWARE_ON_SCALE,  # type: ignore[union-attr]
             args.z_speed,
-            args.probe_seconds_before_contact,
         )
         return RunArgs(
             tip_volumes=tip_volumes,
@@ -246,7 +244,6 @@ class RunArgs:
             ctx=_ctx,
             protocol_cfg=protocol_cfg,
             test_report=report,
-            probe_seconds_before_contact=args.probe_seconds_before_contact,
             aspirate=args.aspirate,
             dial_indicator=dial,
             plunger_speed=args.plunger_speed,
@@ -265,7 +262,6 @@ if __name__ == "__main__":
     parser.add_argument("--mount", type=str, choices=["left", "right"], default="left")
     parser.add_argument("--channels", type=int, choices=[1, 8, 96], default=1)
     parser.add_argument("--tip", type=int, choices=[0, 50, 200, 1000], default=0)
-    parser.add_argument("--probe-seconds-before-contact", type=float, default=1.0)
     parser.add_argument("--return-tip", action="store_true")
     parser.add_argument("--trials", type=int, default=7)
     parser.add_argument("--trials-before-jog", type=int, default=7)
@@ -284,9 +280,6 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    assert (
-        0.0 < args.probe_seconds_before_contact <= MAX_PROBE_SECONDS
-    ), f"'--probe-seconds-before-contact' must be between 0.0-{MAX_PROBE_SECONDS}"
     run_args = RunArgs.build_run_args(args)
     exit_error = 0
     serial_logger: Optional[subprocess.Popen] = None
