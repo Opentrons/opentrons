@@ -16,6 +16,7 @@ from opentrons.protocol_engine import (
     CommandCreate,
     LabwareOffset,
     Config as ProtocolEngineConfig,
+    error_recovery_policy,
 )
 from opentrons.protocol_engine.create_protocol_engine import create_protocol_engine
 from opentrons.protocol_runner import RunResult, RunOrchestrator
@@ -174,6 +175,7 @@ class MaintenanceRunOrchestratorStore:
                     RobotTypeEnum.robot_literal_to_enum(self._robot_type)
                 ),
             ),
+            error_recovery_policy=error_recovery_policy.error_recovery_by_ff,
             deck_configuration=deck_configuration,
             notify_publishers=notify_publishers,
         )

@@ -8,7 +8,6 @@ import pytest
 from decoy import Decoy
 
 from opentrons_shared_data.robot.dev_types import RobotType
-from opentrons.protocol_engine.actions.actions import ResumeFromRecoveryAction
 
 from opentrons.types import DeckSlotName
 from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
@@ -33,6 +32,7 @@ from opentrons.protocol_engine.types import (
     PostRunHardwareState,
     AddressableAreaLocation,
 )
+from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
 from opentrons.protocol_engine.execution import (
     QueueWorker,
     HardwareStopper,
@@ -53,6 +53,7 @@ from opentrons.protocol_engine.actions import (
     PlayAction,
     PauseAction,
     PauseSource,
+    ResumeFromRecoveryAction,
     StopAction,
     FinishAction,
     FinishErrorDetails,
@@ -116,6 +117,12 @@ def module_data_provider(decoy: Decoy) -> ModuleDataProvider:
     return decoy.mock(cls=ModuleDataProvider)
 
 
+@pytest.fixture
+def error_recovery_policy(decoy: Decoy) -> ErrorRecoveryPolicy:
+    """Get a mock ErrorRecoveryPolicy."""
+    return decoy.mock(cls=ErrorRecoveryPolicy)
+
+
 @pytest.fixture(autouse=True)
 def _mock_slot_standardization_module(
     decoy: Decoy, monkeypatch: pytest.MonkeyPatch
@@ -139,6 +146,7 @@ def _mock_hash_command_params_module(
 def subject(
     hardware_api: HardwareControlAPI,
     state_store: StateStore,
+    error_recovery_policy: ErrorRecoveryPolicy,
     action_dispatcher: ActionDispatcher,
     plugin_starter: PluginStarter,
     queue_worker: QueueWorker,
@@ -151,6 +159,7 @@ def subject(
     return ProtocolEngine(
         hardware_api=hardware_api,
         state_store=state_store,
+        error_recovery_policy=error_recovery_policy,
         action_dispatcher=action_dispatcher,
         plugin_starter=plugin_starter,
         queue_worker=queue_worker,

@@ -6,6 +6,7 @@ from opentrons.protocols.api_support.deck_type import should_load_fixed_trash
 from opentrons.protocol_engine import (
     Config as ProtocolEngineConfig,
     DeckType,
+    error_recovery_policy,
 )
 from opentrons.protocol_engine.create_protocol_engine import create_protocol_engine
 from opentrons.protocol_reader.protocol_source import ProtocolConfig
@@ -60,6 +61,7 @@ async def create_simulating_orchestrator(
             use_simulated_deck_config=True,
             use_virtual_pipettes=True,
         ),
+        error_recovery_policy=error_recovery_policy.error_recovery_by_ff,
         load_fixed_trash=should_load_fixed_trash(protocol_config),
     )
 
