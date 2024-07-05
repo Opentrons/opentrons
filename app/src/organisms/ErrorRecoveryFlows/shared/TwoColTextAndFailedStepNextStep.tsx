@@ -1,11 +1,12 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-
+import { css } from 'styled-components'
 import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  LegacyStyledText,
+  StyledText,
+  RESPONSIVENESS,
 } from '@opentrons/components'
 
 import { RecoveryContentWrapper } from './RecoveryContentWrapper'
@@ -63,41 +64,55 @@ export function TwoColTextAndFailedStepNextStep({
         : { command: commandsAfterFailedCommand[1], index: nthStepAfter(2) }
       : null,
   ] as const
-  if (isOnDevice) {
-    return (
-      <RecoveryContentWrapper>
-        <TwoColumn>
-          <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
-            <LegacyStyledText as="h4SemiBold">{leftColTitle}</LegacyStyledText>
-            {leftColBodyText}
-          </Flex>
-          <CategorizedStepContent
-            commandTextData={protocolAnalysis}
-            robotType={robotType}
-            topCategoryHeadline={t('failed_step')}
-            topCategory="failed"
-            topCategoryCommand={
-              failedCommand == null
-                ? null
-                : {
-                    command: failedCommand,
-                    index: stepCounts.currentStepNumber ?? undefined,
-                  }
+  return (
+    <RecoveryContentWrapper>
+      <TwoColumn>
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          css={css`
+            gap=${SPACING.spacing16};
+            @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+               gap=${SPACING.spacing8}
             }
-            bottomCategoryHeadline={t('next_step')}
-            bottomCategory="future"
-            bottomCategoryCommands={commandsAfter}
-          />
-        </TwoColumn>
-        <RecoveryFooterButtons
-          isOnDevice={isOnDevice}
-          primaryBtnOnClick={primaryBtnOnClick}
-          primaryBtnTextOverride={primaryBtnCopy}
-          secondaryBtnOnClick={secondaryBtnOnClickOverride ?? goBackPrevStep}
+          `}
+        >
+          <StyledText
+            oddStyle="level4HeaderSemiBold"
+            desktopStyle="headingSmallBold"
+          >
+            {leftColTitle}
+          </StyledText>
+          <StyledText
+            oddStyle="bodyTextRegular"
+            desktopStyle="bodyDefaultRegular"
+          >
+            {leftColBodyText}
+          </StyledText>
+        </Flex>
+        <CategorizedStepContent
+          commandTextData={protocolAnalysis}
+          robotType={robotType}
+          topCategoryHeadline={t('failed_step')}
+          topCategory="failed"
+          topCategoryCommand={
+            failedCommand == null
+              ? null
+              : {
+                  command: failedCommand,
+                  index: stepCounts.currentStepNumber ?? undefined,
+                }
+          }
+          bottomCategoryHeadline={t('next_step')}
+          bottomCategory="future"
+          bottomCategoryCommands={commandsAfter}
         />
-      </RecoveryContentWrapper>
-    )
-  } else {
-    return null
-  }
+      </TwoColumn>
+      <RecoveryFooterButtons
+        isOnDevice={isOnDevice}
+        primaryBtnOnClick={primaryBtnOnClick}
+        primaryBtnTextOverride={primaryBtnCopy}
+        secondaryBtnOnClick={secondaryBtnOnClickOverride ?? goBackPrevStep}
+      />
+    </RecoveryContentWrapper>
+  )
 }
