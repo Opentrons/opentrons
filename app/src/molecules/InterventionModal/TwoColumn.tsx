@@ -14,7 +14,7 @@ export function TwoColumn({
       <Box flex="1" minWidth="17.1875rem">
         {leftElement}
       </Box>
-      <Box flex="1" minWidth="275px">
+      <Box flex="1" minWidth="17.1875rem">
         {rightElement}
       </Box>
     </Flex>

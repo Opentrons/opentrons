@@ -3,7 +3,7 @@ import { css } from 'styled-components'
 
 import { Icon } from '../../icons'
 import { Flex, Text } from '../../primitives'
-import { ALIGN_CENTER } from '../../styles'
+import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../styles'
 import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { BORDERS, COLORS } from '../../helix-design-system'
 
@@ -36,6 +36,7 @@ const LOCATION_ICON_STYLE = css<{
   width: ${props => props.width ?? 'max-content'};
   padding: ${SPACING.spacing2} ${SPACING.spacing4};
   border-radius: ${BORDERS.borderRadius4};
+  justify-content: ${JUSTIFY_CENTER};
   height: max-content;
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
@@ -48,13 +49,7 @@ const LOCATION_ICON_STYLE = css<{
 `
 
 const SLOT_NAME_TEXT_STYLE = css`
-  font-size: ${TYPOGRAPHY.fontSizeCaption};
-  line-height: ${TYPOGRAPHY.lineHeightNormal};
-  font-weight: ${TYPOGRAPHY.fontWeightBold};
-
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    ${TYPOGRAPHY.smallBodyTextBold}
-  }
+  ${TYPOGRAPHY.smallBodyTextBold}
 `
 
 export function LocationIcon({
