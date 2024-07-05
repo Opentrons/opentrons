@@ -831,7 +831,6 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                 primaryNozzle=cast(PRIMARY_NOZZLE_LITERAL, primary_nozzle)
             )
         elif style == NozzleLayout.QUADRANT:
-            # TODO: reassess the assert logic here to be similar to partial column, we must have at least front right or back left
             assert front_right_nozzle is not None or back_left_nozzle is not None
             configuration_model = QuadrantNozzleLayoutConfiguration(
                 primaryNozzle=cast(PRIMARY_NOZZLE_LITERAL, primary_nozzle),

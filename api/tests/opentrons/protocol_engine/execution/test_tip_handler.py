@@ -372,9 +372,6 @@ async def test_available_nozzle_layout(
         virtual_result = await virtual_subject.available_for_nozzle_layout(
             "pipette-id", style, primary_nozzle, front_nozzle, back_nozzle
         )
-        # raise ValueError(
-        #     f"hw result = {hw_result} \nvirtual result = {virtual_result} \nexpected result = {expected_result}"
-        # )
         assert hw_result == virtual_result == expected_result
 
 
