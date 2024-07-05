@@ -64,6 +64,7 @@ const secondaryButtonProps: React.ComponentProps<typeof SmallButton> = {
   buttonType: 'tertiaryLowLight',
   iconName: 'information',
   iconPlacement: 'startIcon',
+  ariaDisabled: false,
 }
 
 export const TitleWithTwoButtons: Story = {
