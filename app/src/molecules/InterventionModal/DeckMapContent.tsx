@@ -108,7 +108,7 @@ function DeckConfigStyleDeckMapContent({
     'default'
   )
   React.useEffect(() => {
-    setSelectedLocation(selectedLocation)
+    setSelectedLocation != null && setSelectedLocation(selectedLocation)
   }, [selectedLocation, setSelectedLocation])
   return <>{DeckLocationSelect}</>
 }
