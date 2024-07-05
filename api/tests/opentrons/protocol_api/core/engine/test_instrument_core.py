@@ -1164,23 +1164,32 @@ def test_liquid_presence_detection(
 
 
 @pytest.mark.parametrize(
-    argnames=["style", "primary_nozzle", "front_right_nozzle", "expected_model"],
+    argnames=[
+        "style",
+        "primary_nozzle",
+        "front_right_nozzle",
+        "back_left_nozzle",
+        "expected_model",
+    ],
     argvalues=[
         [
             NozzleLayout.COLUMN,
             "A1",
             "H1",
+            None,
             ColumnNozzleLayoutConfiguration(primaryNozzle="A1"),
         ],
         [
             NozzleLayout.SINGLE,
             "H12",
             None,
+            None,
             SingleNozzleLayoutConfiguration(primaryNozzle="H12"),
         ],
         [
             NozzleLayout.ROW,
             "A12",
+            None,
             None,
             RowNozzleLayoutConfiguration(primaryNozzle="A12"),
         ],

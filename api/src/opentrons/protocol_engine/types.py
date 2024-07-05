@@ -884,7 +884,7 @@ class QuadrantNozzleLayoutConfiguration(BaseModel):
     backLeftNozzle: Optional[str] = Field(
         ...,
         regex=NOZZLE_NAME_REGEX,
-        description="The front right nozzle in your configuration.",
+        description="The back left nozzle in your configuration.",
     )
 
 

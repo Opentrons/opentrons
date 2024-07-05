@@ -115,6 +115,11 @@ async def test_configure_nozzle_layout_implementation(
         if isinstance(request_model, QuadrantNozzleLayoutConfiguration)
         else None
     )
+    back_left_nozzle = (
+        request_model.backLeftNozzle
+        if isinstance(request_model, QuadrantNozzleLayoutConfiguration)
+        else None
+    )
 
     decoy.when(
         await tip_handler.available_for_nozzle_layout(
@@ -122,6 +127,7 @@ async def test_configure_nozzle_layout_implementation(
             style=request_model.style,
             primary_nozzle=primary_nozzle,
             front_right_nozzle=front_right_nozzle,
+            back_left_nozzle=back_left_nozzle,
         )
     ).then_return(nozzle_params)
 

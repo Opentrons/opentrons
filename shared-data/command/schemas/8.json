@@ -635,9 +635,15 @@
           "description": "The front right nozzle in your configuration.",
           "pattern": "[A-Z]\\d{1,2}",
           "type": "string"
+        },
+        "backLeftNozzle": {
+          "title": "Backleftnozzle",
+          "description": "The back left nozzle in your configuration.",
+          "pattern": "[A-Z]\\d{1,2}",
+          "type": "string"
         }
       },
-      "required": ["primaryNozzle", "frontRightNozzle"]
+      "required": ["primaryNozzle", "frontRightNozzle", "backLeftNozzle"]
     },
     "ConfigureNozzleLayoutParams": {
       "title": "ConfigureNozzleLayoutParams",
