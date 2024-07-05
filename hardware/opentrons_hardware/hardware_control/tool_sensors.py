@@ -425,12 +425,12 @@ async def liquid_probe(
         sensor_driver,
         True,
     )
-    p_prep_distance = float64(PLUNGER_SOLO_MOVE_TIME * plunger_speed)
-    p_pass_distance = float64(max_p_distance - p_prep_distance)
-    max_z_distance = (p_pass_distance / plunger_speed) * z_speed
+    p_prep_distance = float(PLUNGER_SOLO_MOVE_TIME * plunger_speed)
+    p_pass_distance = float(max_p_distance - p_prep_distance)
+    max_z_distance = (p_pass_distance / plunger_speed) * mount_speed
 
     lower_plunger = create_step(
-        distance={tool: p_prep_distance},
+        distance={tool: float64(p_prep_distance)},
         velocity={tool: float64(plunger_speed)},
         acceleration={},
         duration=float64(PLUNGER_SOLO_MOVE_TIME),

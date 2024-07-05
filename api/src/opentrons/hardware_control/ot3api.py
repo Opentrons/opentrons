@@ -2625,7 +2625,9 @@ class OT3API(
 
         probe_start_pos = await self.gantry_position(checked_mount, refresh=True)
 
-        p_travel = instrument.plunger_positions.bottom - instrument.plunger_positions.top
+        p_travel = (
+            instrument.plunger_positions.bottom - instrument.plunger_positions.top
+        )
         max_speeds = self.config.motion_settings.default_max_speed
         p_prep_speed = max_speeds[self.gantry_load][OT3AxisKind.P]
 
@@ -2637,7 +2639,7 @@ class OT3API(
             # overlap amount we want to use between passes
             pass_start_pos = pos._replace(z=(pos.z - 0.5))
 
-            #Prep the plunger
+            # Prep the plunger
             await self.move_to(checked_mount, safe_plunger_pos)
             if probe_settings.aspirate_while_sensing:
                 await self._move_to_plunger_bottom(checked_mount, rate=p_prep_speed)
