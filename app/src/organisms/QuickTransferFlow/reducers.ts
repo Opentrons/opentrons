@@ -199,5 +199,11 @@ export function quickTransferSummaryReducer(
         dropTipLocation: action.location,
       }
     }
+    case 'SET_VOLUME': {
+      return {
+        ...state,
+        volume: action.volume,
+      }
+    }
   }
 }

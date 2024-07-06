@@ -97,7 +97,7 @@ export function Mix(props: MixProps): JSX.Element {
         if (MixAction != null && mixVolume != null && mixReps != null) {
           dispatch({
             type: MixAction,
-            mixSettings: { mixVolume: mixVolume, repititions: mixReps },
+            mixSettings: { mixVolume, repititions: mixReps },
           })
         }
         onBack()

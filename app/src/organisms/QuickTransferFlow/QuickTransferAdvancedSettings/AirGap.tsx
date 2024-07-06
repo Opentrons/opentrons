@@ -88,7 +88,7 @@ export function AirGap(props: AirGapProps): JSX.Element {
         setCurrentStep(currentStep + 1)
       } else {
         if (Action != null && volume != null) {
-          dispatch({ type: Action, volume: volume })
+          dispatch({ type: Action, volume })
         }
         onBack()
       }

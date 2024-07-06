@@ -102,7 +102,7 @@ export function Delay(props: DelayProps): JSX.Element {
           dispatch({
             type: Action,
             delaySettings: {
-              delayDuration: delayDuration,
+              delayDuration,
               positionFromBottom: position,
             },
           })

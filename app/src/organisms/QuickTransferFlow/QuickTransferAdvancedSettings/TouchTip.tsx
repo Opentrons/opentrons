@@ -88,7 +88,7 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
         setCurrentStep(currentStep + 1)
       } else {
         if (Action != null && position != null) {
-          dispatch({ type: Action, position: position })
+          dispatch({ type: Action, position })
         }
         onBack()
       }

@@ -15,7 +15,6 @@ import {
 } from '@opentrons/components'
 
 import type {
-  BlowOutLocation,
   QuickTransferSummaryAction,
   QuickTransferSummaryState,
 } from '../types'
@@ -100,9 +99,10 @@ export function QuickTransferAdvancedSettings(
   const aspirateSettingsItems = [
     {
       option: t('tip_position'),
-      value: state.tipPositionAspirate
-        ? t('tip_position_value', { position: state.tipPositionAspirate })
-        : '',
+      value:
+        state.tipPositionAspirate !== null
+          ? t('tip_position_value', { position: state.tipPositionAspirate })
+          : '',
       enabled: true,
       onClick: () => {
         setSelectedSetting('aspirate_tip_position')
@@ -121,12 +121,13 @@ export function QuickTransferAdvancedSettings(
     },
     {
       option: t('mix'),
-      value: state.mixOnAspirate
-        ? t('mix_value', {
-            volume: state.mixOnAspirate?.mixVolume,
-            reps: state.mixOnAspirate?.repititions,
-          })
-        : '',
+      value:
+        state.mixOnAspirate !== null
+          ? t('mix_value', {
+              volume: state.mixOnAspirate?.mixVolume,
+              reps: state.mixOnAspirate?.repititions,
+            })
+          : '',
       enabled: true,
       onClick: () => {
         setSelectedSetting('aspirate_mix')
@@ -134,12 +135,13 @@ export function QuickTransferAdvancedSettings(
     },
     {
       option: t('delay'),
-      value: state.delayAspirate
-        ? t('delay_value', {
-            delay: state.delayAspirate.delayDuration,
-            position: state.delayAspirate.positionFromBottom,
-          })
-        : '',
+      value:
+        state.delayAspirate !== undefined
+          ? t('delay_value', {
+              delay: state.delayAspirate.delayDuration,
+              position: state.delayAspirate.positionFromBottom,
+            })
+          : '',
       enabled: true,
       onClick: () => {
         setSelectedSetting('aspirate_delay')
@@ -147,9 +149,10 @@ export function QuickTransferAdvancedSettings(
     },
     {
       option: t('touch_tip'),
-      value: state.touchTipAspirate
-        ? t('touch_tip_value', { position: state.touchTipAspirate })
-        : '',
+      value:
+        state.touchTipAspirate !== null
+          ? t('touch_tip_value', { position: state.touchTipAspirate })
+          : '',
       enabled: true,
       onClick: () => {
         setSelectedSetting('aspirate_touch_tip')
@@ -157,9 +160,10 @@ export function QuickTransferAdvancedSettings(
     },
     {
       option: t('air_gap'),
-      value: state.airGapAspirate
-        ? t('air_gap_value', { volume: state.airGapAspirate })
-        : '',
+      value:
+        state.airGapAspirate !== null
+          ? t('air_gap_value', { volume: state.airGapAspirate })
+          : '',
       enabled: true,
       onClick: () => {
         setSelectedSetting('aspirate_air_gap')
@@ -170,9 +174,10 @@ export function QuickTransferAdvancedSettings(
   const dispenseSettingsItems = [
     {
       option: t('tip_position'),
-      value: state.tipPositionDispense
-        ? t('tip_position_value', { position: state.tipPositionDispense })
-        : '',
+      value:
+        state.tipPositionDispense !== null
+          ? t('tip_position_value', { position: state.tipPositionDispense })
+          : '',
       enabled: true,
       onClick: () => {
         setSelectedSetting('dispense_tip_position')
@@ -180,12 +185,13 @@ export function QuickTransferAdvancedSettings(
     },
     {
       option: t('mix'),
-      value: state.mixOnDispense
-        ? t('mix_value', {
-            volume: state.mixOnDispense?.mixVolume,
-            reps: state.mixOnDispense?.repititions,
-          })
-        : '',
+      value:
+        state.mixOnDispense !== null
+          ? t('mix_value', {
+              volume: state.mixOnDispense?.mixVolume,
+              reps: state.mixOnDispense?.repititions,
+            })
+          : '',
       enabled: true,
       onClick: () => {
         setSelectedSetting('dispense_mix')
@@ -193,12 +199,13 @@ export function QuickTransferAdvancedSettings(
     },
     {
       option: t('delay'),
-      value: state.delayDispense
-        ? t('delay_value', {
-            delay: state.delayDispense.delayDuration,
-            position: state.delayDispense.positionFromBottom,
-          })
-        : '',
+      value:
+        state.delayDispense !== undefined
+          ? t('delay_value', {
+              delay: state.delayDispense.delayDuration,
+              position: state.delayDispense.positionFromBottom,
+            })
+          : '',
       enabled: true,
       onClick: () => {
         setSelectedSetting('dispense_delay')
@@ -206,9 +213,10 @@ export function QuickTransferAdvancedSettings(
     },
     {
       option: t('touch_tip'),
-      value: state.touchTipDispense
-        ? t('touch_tip_value', { position: state.touchTipDispense })
-        : '',
+      value:
+        state.touchTipDispense !== null
+          ? t('touch_tip_value', { position: state.touchTipDispense })
+          : '',
       enabled: true,
       onClick: () => {
         setSelectedSetting('dispense_touch_tip')
@@ -216,9 +224,10 @@ export function QuickTransferAdvancedSettings(
     },
     {
       option: t('air_gap'),
-      value: state.airGapDispense
-        ? t('air_gap_value', { volume: state.airGapDispense })
-        : '',
+      value:
+        state.airGapDispense !== null
+          ? t('air_gap_value', { volume: state.airGapDispense })
+          : '',
       enabled: true,
       onClick: () => {
         setSelectedSetting('dispense_air_gap')
@@ -240,7 +249,7 @@ export function QuickTransferAdvancedSettings(
       flexDirection={DIRECTION_COLUMN}
       marginTop="12rem"
     >
-      {/*Base Settings*/}
+      {/* Base Settings */}
       <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
         {selectedSetting == null
           ? baseSettingsItems.map(displayItem => (
@@ -303,7 +312,7 @@ export function QuickTransferAdvancedSettings(
         ) : null}
       </Flex>
 
-      {/*Aspirate Settings*/}
+      {/* Aspirate Settings */}
       <Flex gridGap={SPACING.spacing16} flexDirection={DIRECTION_COLUMN}>
         {selectedSetting === null ? (
           <StyledText
@@ -400,7 +409,7 @@ export function QuickTransferAdvancedSettings(
         </Flex>
       </Flex>
 
-      {/*Dispense Settings*/}
+      {/* Dispense Settings */}
       <Flex gridGap={SPACING.spacing16} flexDirection={DIRECTION_COLUMN}>
         {selectedSetting === null ? (
           <StyledText
