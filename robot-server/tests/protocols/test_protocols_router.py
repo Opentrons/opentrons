@@ -1710,41 +1710,6 @@ async def test_create_protocol_kind_quick_transfer(
     assert result.status_code == 201
 
 
-async def test_create_protocol_kind_invalid(
-    protocol_store: ProtocolStore,
-    analysis_store: AnalysisStore,
-    protocol_reader: ProtocolReader,
-    file_reader_writer: FileReaderWriter,
-    file_hasher: FileHasher,
-    protocol_auto_deleter: ProtocolAutoDeleter,
-) -> None:
-    """It should throw a 400 error if the protocol kind is invalid."""
-    protocol_directory = Path("/dev/null")
-    content = bytes("some_content", encoding="utf-8")
-    uploaded_file = io.BytesIO(content)
-    protocol_file = UploadFile(filename="foo.json", file=uploaded_file)
-
-    with pytest.raises(HTTPException) as exc_info:
-        await create_protocol(
-            files=[protocol_file],
-            key="dummy-key-111",
-            protocol_directory=protocol_directory,
-            protocol_store=protocol_store,
-            analysis_store=analysis_store,
-            file_reader_writer=file_reader_writer,
-            protocol_reader=protocol_reader,
-            file_hasher=file_hasher,
-            protocol_auto_deleter=protocol_auto_deleter,
-            robot_type="OT-3 Standard",
-            protocol_id="protocol-id",
-            analysis_id="analysis-id",
-            protocol_kind="invalid",
-            created_at=datetime(year=2021, month=1, day=1),
-        )
-
-        assert exc_info.value.status_code == 400
-
-
 async def test_create_protocol_maximum_quick_transfer_protocols_exceeded(
     decoy: Decoy,
     protocol_store: ProtocolStore,
@@ -1799,7 +1764,7 @@ async def test_create_protocol_maximum_quick_transfer_protocols_exceeded(
             robot_type="OT-3 Standard",
             protocol_id="protocol-id",
             analysis_id="analysis-id",
-            protocol_kind="quick_transfer",
+            protocol_kind=ProtocolKind.QUICK_TRANSFER,
             created_at=datetime(year=2021, month=1, day=1),
             maximum_quick_transfer_protocols=1,
         )

@@ -207,7 +207,7 @@ async def create_protocol(  # noqa: C901
         " always trigger an analysis (for now).",
         alias="runTimeParameterValues",
     ),
-    protocol_kind: Optional[str] = Form(
+    protocol_kind: Optional[ProtocolKind] = Form(
         default=None,
         description=(
             "Whether this is a `standard` protocol or a `quick-transfer` protocol."
@@ -254,23 +254,17 @@ async def create_protocol(  # noqa: C901
         created_at: Timestamp to attach to the new resource.
         maximum_quick_transfer_protocols: Robot setting value limiting stored quick transfers protocols.
     """
-    kind = ProtocolKind.from_string(protocol_kind)
-    if isinstance(protocol_kind, str) and kind is None:
-        raise HTTPException(
-            status_code=400, detail=f"Invalid protocol_kind: {protocol_kind}"
-        )
-    kind = kind or ProtocolKind.STANDARD
-
-    quick_transfer_protocols = [
-        protocol
-        for protocol in protocol_store.get_all()
-        if protocol.protocol_kind == "quick_transfer"
-    ]
-    quick_transfer_protocol_count = len(quick_transfer_protocols)
-    if quick_transfer_protocol_count >= maximum_quick_transfer_protocols:
-        raise HTTPException(
-            status_code=409, detail="Maximum quick transfer protocols exceeded"
-        )
+    kind = ProtocolKind.from_string(protocol_kind) or ProtocolKind.STANDARD
+    if kind == ProtocolKind.QUICK_TRANSFER:
+        quick_transfer_protocols = [
+            protocol
+            for protocol in protocol_store.get_all()
+            if protocol.protocol_kind == ProtocolKind.QUICK_TRANSFER.value
+        ]
+        if len(quick_transfer_protocols) >= maximum_quick_transfer_protocols:
+            raise HTTPException(
+                status_code=409, detail="Maximum quick transfer protocols exceeded"
+            )
 
     for file in files:
         # TODO(mm, 2024-02-07): Investigate whether the filename can actually be None.
