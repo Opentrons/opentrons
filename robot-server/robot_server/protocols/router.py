@@ -17,6 +17,7 @@ from fastapi import (
     Depends,
     File,
     HTTPException,
+    Query,
     UploadFile,
     status,
     Form,
@@ -426,16 +427,33 @@ async def _start_new_analysis_if_necessary(
     protocols_router.get,
     path="/protocols",
     summary="Get uploaded protocols",
-    description="Return all stored protocols, in order from first-uploaded to last-uploaded.",
+    description="""
+    Return all stored protocols by default, in order from first-uploaded to last-uploaded.
+    You can provide the kind of protocol with the `protocol_kind` query arg
+        The protocol kind can be:
+
+        - `quick-transfer` for Quick Transfer protocols
+        - `standard`       for non Quick transfer protocols
+        Note: all protocols will be provided if the `protocol_kind` query arg is ommited.
+    """,
     responses={status.HTTP_200_OK: {"model": SimpleMultiBody[Protocol]}},
 )
 async def get_protocols(
+    protocol_kind: Optional[ProtocolKind] = Query(
+        None,
+        description=(
+            "Specify the kind of protocols you want to return."
+            " protocol kind can be `quick-transfer` or `standard` "
+            " If this is omitted or `null`, all protocols will be returned."
+        ),
+    ),
     protocol_store: ProtocolStore = Depends(get_protocol_store),
     analysis_store: AnalysisStore = Depends(get_analysis_store),
 ) -> PydanticResponse[SimpleMultiBody[Protocol]]:
     """Get a list of all currently uploaded protocols.
 
     Args:
+        protocol_kind: Query arg to filter the kind of protocol.
         protocol_store: In-memory database of protocol resources.
         analysis_store: In-memory database of protocol analyses.
     """
@@ -453,6 +471,7 @@ async def get_protocols(
             files=[ProtocolFile(name=f.path.name, role=f.role) for f in r.source.files],
         )
         for r in protocol_resources
+        if (protocol_kind in [None, r.protocol_kind])
     ]
     meta = MultiBodyMeta(cursor=0, totalLength=len(data))
 
