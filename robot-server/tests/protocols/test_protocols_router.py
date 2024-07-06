@@ -181,7 +181,6 @@ async def test_get_protocols(
         protocol_kind=ProtocolKind.QUICK_TRANSFER.value,
     )
 
-
     analysis_1 = AnalysisSummary(id="analysis-id-abc", status=AnalysisStatus.PENDING)
     analysis_2 = AnalysisSummary(id="analysis-id-123", status=AnalysisStatus.PENDING)
     analysis_3 = AnalysisSummary(id="analysis-id-333", status=AnalysisStatus.PENDING)
@@ -220,7 +219,9 @@ async def test_get_protocols(
         key="dummy-key-333",
     )
 
-    decoy.when(protocol_store.get_all()).then_return([resource_1, resource_2, resource_3])
+    decoy.when(protocol_store.get_all()).then_return(
+        [resource_1, resource_2, resource_3]
+    )
     decoy.when(analysis_store.get_summaries_by_protocol("abc")).then_return(
         [analysis_1]
     )
@@ -238,7 +239,11 @@ async def test_get_protocols(
         analysis_store=analysis_store,
     )
 
-    assert result.content.data == [expected_protocol_1, expected_protocol_2, expected_protocol_3]
+    assert result.content.data == [
+        expected_protocol_1,
+        expected_protocol_2,
+        expected_protocol_3,
+    ]
     assert result.content.meta == MultiBodyMeta(cursor=0, totalLength=3)
     assert result.status_code == 200
 
