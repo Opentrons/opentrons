@@ -1684,7 +1684,7 @@ async def test_create_protocol_kind_quick_transfer(
         analyses_manager=analyses_manager,
         protocol_auto_deleter=protocol_auto_deleter,
         robot_type="OT-3 Standard",
-        protocol_kind=ProtocolKind.QUICK_TRANSFER.value,
+        protocol_kind=ProtocolKind.QUICK_TRANSFER,
         protocol_id="protocol-id",
         analysis_id="analysis-id",
         created_at=datetime(year=2021, month=1, day=1),
