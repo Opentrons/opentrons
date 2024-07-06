@@ -20,6 +20,7 @@ import type {
 } from '../types'
 import { ACTIONS } from '../constants'
 import { useTranslation } from 'react-i18next'
+import { useToaster } from '../../../organisms/ToasterOven'
 import { ListItem } from '../../../atoms/ListItem'
 import { FlowRateEntry } from './FlowRate'
 import { PipettePath } from './PipettePath'
@@ -40,9 +41,13 @@ export function QuickTransferAdvancedSettings(
 ): JSX.Element | null {
   const { state, dispatch } = props
   const { t } = useTranslation(['quick_transfer', 'shared'])
+  const { makeSnackbar } = useToaster()
   const [selectedSetting, setSelectedSetting] = React.useState<string | null>(
     null
   )
+
+  // TODO: Determine when we need to display snackbar
+  // makeSnackbar(t('advanced_setting_disabled'))
 
   let pipettePath: string = ''
   if (state.path === 'single') {
@@ -122,7 +127,7 @@ export function QuickTransferAdvancedSettings(
     {
       option: t('mix'),
       value:
-        state.mixOnAspirate !== null
+        state.mixOnAspirate !== undefined
           ? t('mix_value', {
               volume: state.mixOnAspirate?.mixVolume,
               reps: state.mixOnAspirate?.repititions,
@@ -150,7 +155,7 @@ export function QuickTransferAdvancedSettings(
     {
       option: t('touch_tip'),
       value:
-        state.touchTipAspirate !== null
+        state.touchTipAspirate !== undefined
           ? t('touch_tip_value', { position: state.touchTipAspirate })
           : '',
       enabled: true,
@@ -161,7 +166,7 @@ export function QuickTransferAdvancedSettings(
     {
       option: t('air_gap'),
       value:
-        state.airGapAspirate !== null
+        state.airGapAspirate !== undefined
           ? t('air_gap_value', { volume: state.airGapAspirate })
           : '',
       enabled: true,
@@ -175,7 +180,7 @@ export function QuickTransferAdvancedSettings(
     {
       option: t('tip_position'),
       value:
-        state.tipPositionDispense !== null
+        state.tipPositionDispense !== undefined
           ? t('tip_position_value', { position: state.tipPositionDispense })
           : '',
       enabled: true,
@@ -186,7 +191,7 @@ export function QuickTransferAdvancedSettings(
     {
       option: t('mix'),
       value:
-        state.mixOnDispense !== null
+        state.mixOnDispense !== undefined
           ? t('mix_value', {
               volume: state.mixOnDispense?.mixVolume,
               reps: state.mixOnDispense?.repititions,
@@ -214,7 +219,7 @@ export function QuickTransferAdvancedSettings(
     {
       option: t('touch_tip'),
       value:
-        state.touchTipDispense !== null
+        state.touchTipDispense !== undefined
           ? t('touch_tip_value', { position: state.touchTipDispense })
           : '',
       enabled: true,
@@ -225,7 +230,7 @@ export function QuickTransferAdvancedSettings(
     {
       option: t('air_gap'),
       value:
-        state.airGapDispense !== null
+        state.airGapDispense !== undefined
           ? t('air_gap_value', { volume: state.airGapDispense })
           : '',
       enabled: true,
