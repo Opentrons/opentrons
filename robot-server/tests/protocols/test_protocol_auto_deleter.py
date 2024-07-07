@@ -81,7 +81,7 @@ def test_make_room_for_new_protocol_exclude_quick_transfer(
         deletion_planner=mock_deletion_planner,
     )
 
-    usage_info = [
+    usage_info_all = [
         ProtocolUsageInfo(protocol_id="protocol-id-1", is_used_by_run=True),
         ProtocolUsageInfo(protocol_id="protocol-id-2", is_used_by_run=False),
         ProtocolUsageInfo(protocol_id="protocol-id-3", is_used_by_run=True),
@@ -89,7 +89,12 @@ def test_make_room_for_new_protocol_exclude_quick_transfer(
         ProtocolUsageInfo(protocol_id="protocol-id-5", is_used_by_run=False),
     ]
 
-    deletion_plan = set(p.protocol_id for p in usage_info)
+    usage_info_call = [
+        p
+        for p in usage_info_all
+        if p.protocol_id not in ["protocol-id-4", "protocol-id-5"]
+    ]
+    deletion_plan = {"protocol-id-1", "protocol-id-2", "protocol-id-3"}
 
     stored_protocol_resources = [
         ProtocolResource(
@@ -101,13 +106,13 @@ def test_make_room_for_new_protocol_exclude_quick_transfer(
             if idx not in [3, 4]
             else ProtocolKind.QUICK_TRANSFER.value,
         )
-        for idx, p in enumerate(usage_info)
+        for idx, p in enumerate(usage_info_all)
     ]
 
     decoy.when(mock_protocol_store.get_all()).then_return(stored_protocol_resources)
-    decoy.when(mock_protocol_store.get_usage_info()).then_return(usage_info)
+    decoy.when(mock_protocol_store.get_usage_info()).then_return(usage_info_all)
     decoy.when(
-        mock_deletion_planner.plan_for_new_protocol(existing_protocols=usage_info)
+        mock_deletion_planner.plan_for_new_protocol(existing_protocols=usage_info_call)
     ).then_return(deletion_plan)
 
     # Run the subject, capturing log messages at least as severe as INFO.
@@ -124,5 +129,3 @@ def test_make_room_for_new_protocol_exclude_quick_transfer(
     assert "protocol-id-3" in caplog.text
     assert "protocol-id-4" not in caplog.text
     assert "protocol-id-5" not in caplog.text
-
-    # make sure only quick transfer protocols remain

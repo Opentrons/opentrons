@@ -29,18 +29,21 @@ class ProtocolAutoDeleter:  # noqa: D101
         arg: exclude_kind: Excludes the this ProtocolKind from being deleted
 
         """
-        protocol_run_usage_info = self._protocol_store.get_usage_info()
         exclude_protocols = {
             p.protocol_id
             for p in self._protocol_store.get_all()
             if p.protocol_kind == exclude_kind
         }
+        protocol_run_usage_info = [
+            p
+            for p in self._protocol_store.get_usage_info()
+            if p.protocol_id not in exclude_protocols
+        ]
 
         protocol_ids_to_delete = self._deletion_planner.plan_for_new_protocol(
             existing_protocols=protocol_run_usage_info,
         )
 
-        protocol_ids_to_delete = protocol_ids_to_delete - exclude_protocols
         if protocol_ids_to_delete:
             _log.info(
                 f"Auto-deleting these protocols to make room for a new one:"
