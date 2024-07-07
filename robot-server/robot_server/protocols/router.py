@@ -354,7 +354,9 @@ async def create_protocol(  # noqa: C901
         protocol_kind=kind.value,
     )
 
-    protocol_auto_deleter.make_room_for_new_protocol()
+    protocol_auto_deleter.make_room_for_new_protocol(
+        exclude_kind=ProtocolKind.QUICK_TRANSFER
+    )
     protocol_store.insert(protocol_resource)
 
     new_analysis_summary = await analyses_manager.start_analysis(

@@ -526,7 +526,9 @@ async def test_create_protocol(
     assert result.status_code == 201
 
     decoy.verify(
-        protocol_auto_deleter.make_room_for_new_protocol(),
+        protocol_auto_deleter.make_room_for_new_protocol(
+            exclude_kind=ProtocolKind.QUICK_TRANSFER
+        ),
         protocol_store.insert(protocol_resource),
     )
 
@@ -632,7 +634,9 @@ async def test_create_new_protocol_with_run_time_params(
     )
 
     decoy.verify(
-        protocol_auto_deleter.make_room_for_new_protocol(),
+        protocol_auto_deleter.make_room_for_new_protocol(
+            exclude_kind=ProtocolKind.QUICK_TRANSFER
+        ),
         protocol_store.insert(protocol_resource),
     )
 
@@ -1692,7 +1696,9 @@ async def test_create_protocol_kind_quick_transfer(
     )
 
     decoy.verify(
-        protocol_auto_deleter.make_room_for_new_protocol(),
+        protocol_auto_deleter.make_room_for_new_protocol(
+            exclude_kind=ProtocolKind.QUICK_TRANSFER
+        ),
         protocol_store.insert(protocol_resource),
     )
 

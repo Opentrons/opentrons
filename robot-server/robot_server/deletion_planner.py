@@ -70,6 +70,8 @@ class ProtocolDeletionPlanner:  # noqa: D101
         Args:
             existing_protocols: Information about all protocols that currently exist.
                 Must be in order from oldest first!
+            exclude_kind: Exclude these kids  of protocols when taking into account
+                which protocols to delete.
 
         Returns:
             IDs of protocols to delete.
