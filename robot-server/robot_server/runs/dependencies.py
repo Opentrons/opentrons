@@ -1,5 +1,7 @@
 """Run router dependency-injection wire-up."""
 from fastapi import Depends, status
+from robot_server.protocols.dependencies import get_protocol_store
+from robot_server.protocols.protocol_store import ProtocolStore
 from sqlalchemy.engine import Engine as SQLEngine
 
 from opentrons_shared_data.robot.dev_types import RobotType
@@ -153,9 +155,11 @@ async def get_run_data_manager(
 
 async def get_run_auto_deleter(
     run_store: RunStore = Depends(get_run_store),
+    protocol_store: ProtocolStore = Depends(get_protocol_store),
 ) -> RunAutoDeleter:
     """Get an `AutoDeleter` to delete old runs."""
     return RunAutoDeleter(
         run_store=run_store,
+        protocol_store=protocol_store,
         deletion_planner=RunDeletionPlanner(maximum_runs=get_settings().maximum_runs),
     )
