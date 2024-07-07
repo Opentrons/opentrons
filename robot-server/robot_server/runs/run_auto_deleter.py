@@ -27,7 +27,6 @@ class RunAutoDeleter:  # noqa: D101
     def make_room_for_new_run(  # noqa: D102
         self, exclude_kind: Optional[ProtocolKind] = None
     ) -> None:
-        _log.warning(f"ALL_PROTOCOLS: {self._protocol_store.get_all()}")
         excluded_protocols = [
             p.protocol_id
             for p in self._protocol_store.get_all()
