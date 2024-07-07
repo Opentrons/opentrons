@@ -15,20 +15,17 @@ import type { WellGroup } from '@opentrons/components'
 import type { FailedCommand } from '../types'
 import type { UseFailedLabwareUtilsResult } from './useFailedLabwareUtils'
 import type { UseRouteUpdateActionsResult } from './useRouteUpdateActions'
-import type { RecoveryToasts } from './useRecoveryToasts'
 
 interface UseRecoveryCommandsParams {
   runId: string
   failedCommand: FailedCommand | null
   failedLabwareUtils: UseFailedLabwareUtilsResult
   routeUpdateActions: UseRouteUpdateActionsResult
-  recoveryToastUtils: RecoveryToasts
 }
 export interface UseRecoveryCommandsResult {
   /* A terminal recovery command that causes ER to exit as the run status becomes "running" */
   resumeRun: () => void
-  /* A terminal recovery command that causes ER to exit when the run status becomes "cancelled". ER still renders while
-   * in a "stop-requested" state */
+  /* A terminal recovery command that causes ER to exit as the run status becomes "stop-requested" */
   cancelRun: () => void
   /* A non-terminal recovery command, but should generally be chained with a resumeRun. */
   skipFailedCommand: () => Promise<void>
@@ -47,15 +44,11 @@ export function useRecoveryCommands({
   failedCommand,
   failedLabwareUtils,
   routeUpdateActions,
-  recoveryToastUtils,
 }: UseRecoveryCommandsParams): UseRecoveryCommandsResult {
   const { proceedToRouteAndStep } = routeUpdateActions
   const { chainRunCommands } = useChainRunCommands(runId, failedCommand?.id)
-  const {
-    mutateAsync: resumeRunFromRecovery,
-  } = useResumeRunFromRecoveryMutation()
+  const { resumeRunFromRecovery } = useResumeRunFromRecoveryMutation()
   const { stopRun } = useStopRunMutation()
-  const { makeSuccessToast } = recoveryToastUtils
 
   const chainRunRecoveryCommands = React.useCallback(
     (
@@ -103,10 +96,8 @@ export function useRecoveryCommands({
   }, [chainRunRecoveryCommands, failedCommand, failedLabwareUtils])
 
   const resumeRun = React.useCallback((): void => {
-    void resumeRunFromRecovery(runId).then(() => {
-      makeSuccessToast()
-    })
-  }, [runId, resumeRunFromRecovery, makeSuccessToast])
+    resumeRunFromRecovery(runId)
+  }, [runId, resumeRunFromRecovery])
 
   const cancelRun = React.useCallback((): void => {
     stopRun(runId)

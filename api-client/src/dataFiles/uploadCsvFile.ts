@@ -27,9 +27,11 @@ export function uploadCsvFile(
   const fileId = uuidv4()
   const stub = {
     data: {
-      id: fileId,
-      createdAt: '2024-06-07T19:19:56.268029+00:00',
-      name: 'rtp_mock_file.csv',
+      data: {
+        id: fileId,
+        createdAt: '2024-06-07T19:19:56.268029+00:00',
+        name: 'rtp_mock_file.csv',
+      },
     },
   }
   return Promise.resolve(stub)

@@ -15,7 +15,7 @@ import {
 } from '@opentrons/api-client'
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { getIsOnDevice, useFeatureFlag } from '../../redux/config'
+import { getIsOnDevice } from '../../redux/config'
 import { ErrorRecoveryWizard, useERWizard } from './ErrorRecoveryWizard'
 import { RunPausedSplash, useRunPausedSplash } from './RunPausedSplash'
 import { useCurrentlyRecoveringFrom, useERUtils } from './hooks'
@@ -108,24 +108,22 @@ export interface ErrorRecoveryFlowsProps {
 export function ErrorRecoveryFlows(
   props: ErrorRecoveryFlowsProps
 ): JSX.Element | null {
-  const enableRunNotes = useFeatureFlag('enableRunNotes')
   const { hasLaunchedRecovery, toggleERWizard, showERWizard } = useERWizard()
-  const showSplash = useRunPausedSplash()
-  const isOnDevice = useSelector(getIsOnDevice)
 
   const recoveryUtils = useERUtils({
     ...props,
     hasLaunchedRecovery,
     toggleERWizard,
-    isOnDevice,
   })
+
+  // if (!enableRunNotes) {
+  //   return null
+  // }
 
   const { protocolAnalysis } = props
   const robotType = protocolAnalysis?.robotType ?? OT2_ROBOT_TYPE
-
-  if (!enableRunNotes) {
-    return null
-  }
+  const isOnDevice = useSelector(getIsOnDevice)
+  const showSplash = useRunPausedSplash(isOnDevice, showERWizard)
 
   return (
     <>

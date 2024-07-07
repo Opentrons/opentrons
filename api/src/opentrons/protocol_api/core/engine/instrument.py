@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from typing import Optional, TYPE_CHECKING, cast, Union
+from opentrons.protocol_engine.commands.liquid_probe import LiquidProbeResult
 from opentrons.protocols.api_support.types import APIVersion
 
 from opentrons.types import Location, Mount
@@ -31,6 +32,7 @@ from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
+from opentrons_shared_data.errors.exceptions import PipetteLiquidNotFoundError
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
@@ -84,6 +86,9 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         self._flow_rates = FlowRates(self)
 
         self.set_default_speed(speed=default_movement_speed)
+        self._liquid_presence_detection = bool(
+            self._engine_client.state.pipettes.get_liquid_presence_detection(pipette_id)
+        )
 
     @property
     def pipette_id(self) -> str:
@@ -747,6 +752,9 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             self._pipette_id
         )
 
+    def get_liquid_presence_detection(self) -> bool:
+        return self._liquid_presence_detection
+
     def is_tip_tracking_available(self) -> bool:
         primary_nozzle = self._engine_client.state.pipettes.get_primary_nozzle(
             self._pipette_id
@@ -779,6 +787,9 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         if blow_out is not None:
             assert blow_out > 0
             self._blow_out_flow_rate = blow_out
+
+    def set_liquid_presence_detection(self, enable: bool) -> None:
+        self._liquid_presence_detection = enable
 
     def configure_for_volume(self, volume: float) -> None:
         self._engine_client.execute_command(
@@ -834,3 +845,35 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         """Retract this instrument to the top of the gantry."""
         z_axis = self._engine_client.state.pipettes.get_z_axis(self._pipette_id)
         self._engine_client.execute_command(cmd.HomeParams(axes=[z_axis]))
+
+    def find_liquid_level(self, well_core: WellCore, error_recovery: bool) -> float:
+        labware_id = well_core.labware_id
+        well_name = well_core.get_name()
+        well_location = WellLocation(
+            origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0)
+        )
+        if error_recovery:
+            result = self._engine_client.execute_command_with_result(
+                cmd.LiquidProbeParams(
+                    labwareId=labware_id,
+                    wellName=well_name,
+                    wellLocation=well_location,
+                    pipetteId=self.pipette_id,
+                )
+            )
+        else:
+            result = self._engine_client.execute_command_without_recovery(
+                cmd.LiquidProbeParams(
+                    labwareId=labware_id,
+                    wellName=well_name,
+                    wellLocation=well_location,
+                    pipetteId=self.pipette_id,
+                )
+            )
+
+        if result is not None and isinstance(result, LiquidProbeResult):
+            return result.z_position
+        # should never get here
+        raise PipetteLiquidNotFoundError(
+            "Error while trying to find liquid level.",
+        )

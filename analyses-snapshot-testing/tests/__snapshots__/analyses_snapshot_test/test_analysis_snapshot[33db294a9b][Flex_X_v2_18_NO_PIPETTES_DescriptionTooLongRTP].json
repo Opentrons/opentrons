@@ -1,0 +1,66 @@
+{
+  "commands": [
+    {
+      "commandType": "home",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "50c7ae73a4e3f7129874f39dfb514803",
+      "notes": [],
+      "params": {},
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "c9cac9dba72ab541665f112752004fbc",
+      "notes": [],
+      "params": {
+        "message": "variable dilutions has value 1"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    }
+  ],
+  "config": {
+    "apiVersion": [
+      2,
+      18
+    ],
+    "protocolType": "python"
+  },
+  "createdAt": "TIMESTAMP",
+  "errors": [],
+  "files": [
+    {
+      "name": "Flex_X_v2_18_NO_PIPETTES_DescriptionTooLongRTP.py",
+      "role": "main"
+    }
+  ],
+  "labware": [],
+  "liquids": [],
+  "metadata": {
+    "protocolName": "Description too long"
+  },
+  "modules": [],
+  "pipettes": [],
+  "result": "ok",
+  "robotType": "OT-3 Standard",
+  "runTimeParameters": [
+    {
+      "default": 1.0,
+      "description": "This is a description that is longer than 30 characters.",
+      "displayName": "display name",
+      "max": 3.0,
+      "min": 1.0,
+      "type": "int",
+      "value": 1.0,
+      "variableName": "dilutions"
+    }
+  ]
+}

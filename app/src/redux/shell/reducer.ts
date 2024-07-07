@@ -51,8 +51,21 @@ export function shellUpdateReducer(
 
   return state
 }
+
+export function massStorageReducer(
+  state = [] as string[],
+  action: Action
+): string[] {
+  switch (action.type) {
+    case 'shell:SEND_FILE_PATHS':
+      return action.payload.filePaths
+  }
+  return state
+}
+
 // TODO: (sa 2021-15-18: remove any typed state in combineReducers)
 export const shellReducer = combineReducers<ShellState, Action>({
   update: shellUpdateReducer,
   isReady: robotSystemReducer,
+  filePaths: massStorageReducer,
 })

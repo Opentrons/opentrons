@@ -22,7 +22,8 @@ export const ADD_CUSTOM_LABWARE: 'labware:ADD_CUSTOM_LABWARE' =
 
 export const ADD_CUSTOM_LABWARE_FILE: 'labware:ADD_CUSTOM_LABWARE_FILE' =
   'labware:ADD_CUSTOM_LABWARE_FILE'
-
+export const ADD_CUSTOM_LABWARE_FILE_FROM_CREATOR: 'labware:ADD_CUSTOM_LABWARE_FILE_BLOB' =
+  'labware:ADD_CUSTOM_LABWARE_FILE_BLOB'
 export const ADD_CUSTOM_LABWARE_FAILURE: 'labware:ADD_CUSTOM_LABWARE_FAILURE' =
   'labware:ADD_CUSTOM_LABWARE_FAILURE'
 
@@ -96,6 +97,12 @@ export const addCustomLabwareFile = (
 ): Types.AddCustomLabwareFileAction => ({
   type: ADD_CUSTOM_LABWARE_FILE,
   payload: { filePath },
+  meta: { shell: true },
+})
+
+export const addCustomLabwareFileFromCreator = (file: string): any => ({
+  type: ADD_CUSTOM_LABWARE_FILE_FROM_CREATOR,
+  payload: { file },
   meta: { shell: true },
 })
 

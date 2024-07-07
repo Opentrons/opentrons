@@ -31,11 +31,9 @@ export function validateLabwareFiles(
 ): CheckedLabwareFile[] {
   const validated = files.map<CheckedLabwareFile>(file => {
     const { filename, data, modified } = file
-
     // check file against the schema
     // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
     const definition = data && validateLabwareDefinition(data)
-
     if (definition === null) {
       return { filename, modified, type: INVALID_LABWARE_FILE }
     }
@@ -60,7 +58,6 @@ export function validateLabwareFiles(
         return { type: DUPLICATE_LABWARE_FILE, ...props }
       }
     }
-
     return v
   })
 }

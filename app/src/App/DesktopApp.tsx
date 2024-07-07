@@ -32,6 +32,7 @@ import { IncompatibleModuleTakeover } from '../organisms/IncompatibleModule'
 import { OPENTRONS_USB } from '../redux/discovery'
 import { appShellRequestor } from '../redux/shell/remote'
 import { useRobot, useIsFlex } from '../organisms/Devices/hooks'
+import { ProtocolTimeline } from '../pages/Protocols/ProtocolDetails/ProtocolTimeline'
 import { PortalRoot as ModalPortalRoot } from './portal'
 import { DesktopAppFallback } from './DesktopAppFallback'
 
@@ -57,6 +58,12 @@ export const DesktopApp = (): JSX.Element => {
       exact: true,
       name: 'Protocol Details',
       path: '/protocols/:protocolKey',
+    },
+    {
+      Component: ProtocolTimeline,
+      exact: true,
+      name: 'Protocol Timeline',
+      path: '/protocols/:protocolKey/timeline',
     },
     {
       Component: Labware,

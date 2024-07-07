@@ -12,8 +12,7 @@ import {
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
-  LegacyStyledText,
-  TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 import { getLabwareDefURI } from '@opentrons/shared-data'
 import { Divider } from '../../atoms/structure'
@@ -60,22 +59,22 @@ export const ProtocolLabwareDetails = (
       {labwareDetails.length > 0 ? (
         <Flex flexDirection={DIRECTION_COLUMN} width="100%">
           <Flex flexDirection={DIRECTION_ROW}>
-            <LegacyStyledText
-              as="label"
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            <StyledText
+              desktopStyle="bodyDefaultRegular"
+              color={COLORS.grey60}
               marginBottom={SPACING.spacing8}
               data-testid="ProtocolLabwareDetails_labware_name"
               width="66%"
             >
               {t('labware_name')}
-            </LegacyStyledText>
-            <LegacyStyledText
-              as="label"
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            </StyledText>
+            <StyledText
+              desktopStyle="bodyDefaultRegular"
+              color={COLORS.grey60}
               data-testid="ProtocolLabwareDetails_quantity"
             >
               {t('quantity')}
-            </LegacyStyledText>
+            </StyledText>
           </Flex>
           {labwareDetails?.map((labware, index) => (
             <ProtocolLabwareDetailItem
@@ -124,19 +123,22 @@ export const ProtocolLabwareDetailItem = (
             <Icon
               color={COLORS.blue50}
               name="check-decagram"
-              height="0.75rem"
-              minHeight="0.75rem"
-              minWidth="0.75rem"
-              marginRight={SPACING.spacing8}
+              height="1rem"
+              minHeight="1rem"
+              minWidth="1rem"
+              marginRight={SPACING.spacing4}
             />
           ) : (
             <Flex marginLeft={SPACING.spacing20} />
           )}
-          <LegacyStyledText as="p" paddingRight={SPACING.spacing32}>
+          <StyledText
+            desktopStyle="bodyDefaultRegular"
+            paddingRight={SPACING.spacing32}
+          >
             {displayName}
-          </LegacyStyledText>
+          </StyledText>
         </Flex>
-        <LegacyStyledText as="p">{quantity}</LegacyStyledText>
+        <StyledText desktopStyle="bodyDefaultRegular">{quantity}</StyledText>
         <LabwareDetailOverflowMenu labware={labware} />
       </Flex>
     </>

@@ -9,21 +9,23 @@ import {
 } from '@opentrons/react-api-client'
 import { i18n } from '../../../i18n'
 import { renderWithProviders } from '../../../__testing-utils__'
-import { ProtocolSetupParameters } from '..'
 import { ChooseEnum } from '../ChooseEnum'
+import { ChooseNumber } from '../ChooseNumber'
+import { ChooseCsvFile } from '../ChooseCsvFile'
 import { mockRunTimeParameterData } from '../../../pages/ProtocolDetails/fixtures'
 import { useFeatureFlag } from '../../../redux/config'
+import { ProtocolSetupParameters } from '..'
 
 import type * as ReactRouterDom from 'react-router-dom'
 import type { HostConfig } from '@opentrons/api-client'
-import type {
-  CompletedProtocolAnalysis,
-  RunTimeParameter,
-} from '@opentrons/shared-data'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 const mockGoBack = vi.fn()
 
 vi.mock('../ChooseEnum')
+vi.mock('../ChooseNumber')
+vi.mock('../ChooseCsvFile')
+vi.mock('../../../redux/config')
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 vi.mock('react-router-dom', async importOriginal => {
@@ -62,6 +64,9 @@ describe('ProtocolSetupParameters', () => {
       mostRecentAnalysis: mockMostRecentAnalysis,
     }
     vi.mocked(ChooseEnum).mockReturnValue(<div>mock ChooseEnum</div>)
+    vi.mocked(ChooseNumber).mockReturnValue(<div>mock ChooseNumber</div>)
+    vi.mocked(ChooseCsvFile).mockReturnValue(<div>mock ChooseCsvFile</div>)
+    vi.mocked(useFeatureFlag).mockReturnValue(false)
     vi.mocked(useHost).mockReturnValue(MOCK_HOST_CONFIG)
     when(vi.mocked(useCreateProtocolAnalysisMutation))
       .calledWith(expect.anything(), expect.anything())
@@ -89,12 +94,45 @@ describe('ProtocolSetupParameters', () => {
     screen.getByText('mock ChooseEnum')
   })
 
+  it('renders the ChooseNumber component when a str param is selected', () => {
+    render(props)
+    fireEvent.click(screen.getByText('PCR Cycles'))
+    screen.getByText('mock ChooseNumber')
+  })
+
+  // ToDo (kk:06/18/2024) comment-out will be removed in a following PR.
+  // it('renders the ChooseCsvFile component when a str param is selected', () => {
+  //   vi.mocked(useFeatureFlag).mockReturnValue(true)
+  //   render(props)
+  //   fireEvent.click(screen.getByText('CSV File'))
+  //   screen.getByText('mock ChooseCsvFile')
+  // })
+
   it('renders the other setting when boolean param is selected', () => {
     render(props)
     expect(screen.getAllByText('On')).toHaveLength(2)
     fireEvent.click(screen.getByText('Dry Run'))
     expect(screen.getAllByText('On')).toHaveLength(3)
   })
+
+  it('renders the other setting when int param', () => {
+    render(props)
+    screen.getByText('4 mL')
+    screen.getByText('Columns of Samples')
+  })
+
+  it('renders the other setting when float param', () => {
+    render(props)
+    screen.getByText('6.5')
+    screen.getByText('EtoH Volume')
+  })
+
+  // ToDo (kk:06/18/2024) comment-out will be removed in a following PR.
+  // it('renders the other setting when csv param', () => {
+  //   vi.mocked(useFeatureFlag).mockReturnValue(true)
+  //   render(props)
+  //   screen.getByText('CSV File')
+  // })
 
   it('renders the back icon and calls useHistory', () => {
     render(props)
@@ -135,21 +173,9 @@ describe('ProtocolSetupParameters', () => {
       labware: [],
       result: 'parameter-value-required',
     } as unknown) as CompletedProtocolAnalysis
-    const mockCSVData = {
-      file: { id: 'test', file: { name: 'mock.csv' } as File },
-      displayName: 'My CSV File',
-      variableName: 'CSVFILE',
-      description: 'CSV File for a protocol',
-      type: 'csv_file' as const,
-    } as RunTimeParameter
-    const mockRunTimeParameterDataForCsv = [
-      ...mockRunTimeParameterData,
-      mockCSVData,
-    ]
-
     render({
       ...props,
-      runTimeParameters: mockRunTimeParameterDataForCsv,
+      runTimeParameters: mockRunTimeParameterData,
       mostRecentAnalysis: mockMostRecentAnalysisForCsv,
     })
     screen.getByText('CSV File')

@@ -41,7 +41,6 @@ export function QuickTransferAdvancedSettings(
 ): JSX.Element | null {
   const { state, dispatch } = props
   const { t } = useTranslation(['quick_transfer', 'shared'])
-  const { makeSnackbar } = useToaster()
   const [selectedSetting, setSelectedSetting] = React.useState<string | null>(
     null
   )

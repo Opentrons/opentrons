@@ -14,8 +14,8 @@ from robot_server.runs.action_models import (
 )
 from robot_server.runs.router.actions_router import create_run_action
 
-from robot_server.maintenance_runs.maintenance_engine_store import (
-    MaintenanceEngineStore,
+from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
+    MaintenanceRunOrchestratorStore,
 )
 from robot_server.deck_configuration.store import DeckConfigurationStore
 
@@ -29,7 +29,7 @@ def mock_run_controller(decoy: Decoy) -> RunController:
 async def test_create_run_action(
     decoy: Decoy,
     mock_run_controller: RunController,
-    mock_maintenance_engine_store: MaintenanceEngineStore,
+    mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
     mock_deck_configuration_store: DeckConfigurationStore,
 ) -> None:
     """It should create a run action."""
@@ -46,7 +46,7 @@ async def test_create_run_action(
     decoy.when(
         await mock_deck_configuration_store.get_deck_configuration()
     ).then_return([])
-    decoy.when(mock_maintenance_engine_store.current_run_id).then_return(None)
+    decoy.when(mock_maintenance_run_orchestrator_store.current_run_id).then_return(None)
     decoy.when(
         mock_run_controller.create_action(
             action_id=action_id,
@@ -62,7 +62,7 @@ async def test_create_run_action(
         run_controller=mock_run_controller,
         action_id=action_id,
         created_at=created_at,
-        maintenance_engine_store=mock_maintenance_engine_store,
+        maintenance_run_orchestrator_store=mock_maintenance_run_orchestrator_store,
         deck_configuration_store=mock_deck_configuration_store,
     )
 
@@ -73,7 +73,7 @@ async def test_create_run_action(
 async def test_play_action_clears_maintenance_run(
     decoy: Decoy,
     mock_run_controller: RunController,
-    mock_maintenance_engine_store: MaintenanceEngineStore,
+    mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
     mock_deck_configuration_store: DeckConfigurationStore,
 ) -> None:
     """It should clear an existing maintenance run before issuing play action."""
@@ -90,7 +90,9 @@ async def test_play_action_clears_maintenance_run(
     decoy.when(
         await mock_deck_configuration_store.get_deck_configuration()
     ).then_return([])
-    decoy.when(mock_maintenance_engine_store.current_run_id).then_return("some-id")
+    decoy.when(mock_maintenance_run_orchestrator_store.current_run_id).then_return(
+        "some-id"
+    )
     decoy.when(
         mock_run_controller.create_action(
             action_id=action_id,
@@ -106,11 +108,11 @@ async def test_play_action_clears_maintenance_run(
         run_controller=mock_run_controller,
         action_id=action_id,
         created_at=created_at,
-        maintenance_engine_store=mock_maintenance_engine_store,
+        maintenance_run_orchestrator_store=mock_maintenance_run_orchestrator_store,
         deck_configuration_store=mock_deck_configuration_store,
     )
 
-    decoy.verify(await mock_maintenance_engine_store.clear(), times=1)
+    decoy.verify(await mock_maintenance_run_orchestrator_store.clear(), times=1)
     assert result.content.data == expected_result
     assert result.status_code == 201
 
@@ -128,7 +130,7 @@ async def test_create_play_action_not_allowed(
     exception: Exception,
     expected_error_id: str,
     expected_status_code: int,
-    mock_maintenance_engine_store: MaintenanceEngineStore,
+    mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
     mock_deck_configuration_store: DeckConfigurationStore,
 ) -> None:
     """It should 409 if the runner is not able to handle the action."""
@@ -141,7 +143,7 @@ async def test_create_play_action_not_allowed(
     decoy.when(
         await mock_deck_configuration_store.get_deck_configuration()
     ).then_return([])
-    decoy.when(mock_maintenance_engine_store.current_run_id).then_return(None)
+    decoy.when(mock_maintenance_run_orchestrator_store.current_run_id).then_return(None)
     decoy.when(
         mock_run_controller.create_action(
             action_id=action_id,
@@ -158,7 +160,7 @@ async def test_create_play_action_not_allowed(
             run_controller=mock_run_controller,
             action_id=action_id,
             created_at=created_at,
-            maintenance_engine_store=mock_maintenance_engine_store,
+            maintenance_run_orchestrator_store=mock_maintenance_run_orchestrator_store,
             deck_configuration_store=mock_deck_configuration_store,
         )
 

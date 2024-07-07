@@ -8,9 +8,11 @@ import {
   COLORS,
   POSITION_FIXED,
   ALIGN_CENTER,
+  Tabs,
 } from '@opentrons/components'
 
-import { RadioButton, TabbedButton } from '../../atoms/buttons'
+import { RadioButton } from '../../atoms/buttons'
+
 import { ChildNavigation } from '../ChildNavigation'
 import { getCompatibleLabwareByCategory } from './utils'
 
@@ -94,19 +96,16 @@ export function SelectDestLabware(
           marginBottom={SPACING.spacing24}
           alignItems={ALIGN_CENTER}
         >
-          {labwareDisplayCategoryFilters.map(category => (
-            <TabbedButton
-              key={category}
-              title={category}
-              isSelected={category === selectedCategory}
-              onClick={() => {
+          <Tabs
+            tabs={labwareDisplayCategoryFilters.map(category => ({
+              text: t(category),
+              onClick: () => {
                 setSelectedCategory(category)
-              }}
-              height={SPACING.spacing60}
-            >
-              {t(category)}
-            </TabbedButton>
-          ))}
+              },
+              isActive: category === selectedCategory,
+              disabled: false,
+            }))}
+          />
         </Flex>
         <Flex
           gridGap={SPACING.spacing4}
