@@ -137,6 +137,7 @@ def create_data_dictionary(
                     file_results, row_for_lpc, runs_and_lpc
                 )
             else:
+                print("tester")
                 continue
     transposed_runs_and_robots = list(map(list, zip(*runs_and_robots)))
     transposed_runs_and_lpc = list(map(list, zip(*runs_and_lpc)))
