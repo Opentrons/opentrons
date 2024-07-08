@@ -131,26 +131,29 @@ async def _run_test_loop(api: OT3API) -> None:
             elif inp == "z":
                 _zero_indicator_and_plunger()
             elif inp[0] == "o":
-                inp = inp[1:]
                 try:
-                    overshoot = float(inp)
+                    overshoot = float(inp[1:])
                     assert 0 <= overshoot <= 1
                     print("new overshoot value:", overshoot)
                 except ValueError as e:
                     print(e)
             elif inp[0] == "d":
-                inp = inp[1:]
                 try:
-                    time.sleep(float(inp))
+                    time.sleep(float(inp[1:]))
                 except ValueError as e:
                     print(e)
-            elif inp[0] == "j":
-                inp = inp[1:]
+            elif inp[0] in ["j", "a"]:
+                cmd = inp[0]
                 try:
-                    delta = float(inp) * -1
+                    delta = float(inp[1:]) * -1.0  # UP is negative
+                    if cmd == "a":
+                        pip = api.hardware_pipettes[MNT.to_mount()]
+                        delta = delta / pip.ul_per_mm(delta, "aspirate")
                     new_pos = max(min(PLUNGER_POS + delta, max_pos), min_pos)
                     use_overshoot = new_pos < PLUNGER_POS  # if closer to endstop (up)
-                    async with _set_move_flags(api.is_simulator):
+
+                    async def _run_move() -> None:
+                        global PLUNGER_POS
                         if use_overshoot and overshoot > 0:
                             print("Overshoot:", round(new_pos + overshoot, 3))
                             await helpers_ot3.move_plunger_absolute_ot3(
@@ -161,6 +164,16 @@ async def _run_test_loop(api: OT3API) -> None:
                             api, MNT, new_pos, speed=SPEED
                         )
                         PLUNGER_POS = new_pos
+
+                    async with _set_move_flags(api.is_simulator):
+                        if cmd == "a":
+                            async with api.restore_system_constrants():
+                                await api.set_system_constraints_for_plunger_acceleration(
+                                    MNT, (16000.0 / 15.904)
+                                )
+                                await _run_move()
+                        else:
+                            await _run_move()
                 except ValueError as e:
                     print(e)
 
@@ -174,6 +187,7 @@ async def _main(simulate: bool):
     )
     pip = api.hardware_pipettes[MNT.to_mount()]
     await api.add_tip(MNT, 60)
+    pip.working_volume = 50  # 50ul tip
     api.set_pipette_speed(MNT, aspirate=SPEED, dispense=SPEED, blow_out=SPEED)
 
     # very carefully home
