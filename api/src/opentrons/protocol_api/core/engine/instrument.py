@@ -31,8 +31,6 @@ from opentrons.protocol_engine.types import (
 from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
-
-from opentrons_shared_data.errors.exceptions import PipetteLiquidNotFoundError
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
@@ -880,8 +878,3 @@ class InstrumentCore(AbstractInstrument[WellCore]):
 
         if result is not None and isinstance(result, LiquidProbeResult):
             return result.z_position
-        # should never get here
-        print("I got here")
-        raise PipetteLiquidNotFoundError(
-            "Error while trying to find liquid level.",
-        )

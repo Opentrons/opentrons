@@ -1,6 +1,7 @@
 """Test for the ProtocolEngine-based instrument API core."""
 from typing import cast, Optional, Union
 
+from opentrons.protocol_engine.commands.liquid_probe import LiquidProbeResult
 from opentrons_shared_data.errors.exceptions import PipetteLiquidNotFoundError
 import pytest
 from decoy import Decoy
@@ -1299,13 +1300,11 @@ def test_liquid_probe_without_recovery(
     subject: InstrumentCore,
     version: APIVersion,
 ) -> None:
-    """It should raise an exception on an empty well."""
+    """It should raise an exception on an empty well and return a float on a valid well."""
     well_core = WellCore(
         name="my cool well", labware_id="123abc", engine_client=mock_engine_client
     )
-    with pytest.raises(PipetteLiquidNotFoundError):
-        subject.liquid_probe_without_recovery(well_core=well_core)
-    decoy.verify(
+    decoy.when(
         mock_engine_client.execute_command_without_recovery(
             cmd.LiquidProbeParams(
                 pipetteId=subject.pipette_id,
@@ -1316,7 +1315,30 @@ def test_liquid_probe_without_recovery(
                 labwareId=well_core.labware_id,
             )
         )
-    )
+    ).then_raise(PipetteLiquidNotFoundError())
+    try:
+        subject.liquid_probe_without_recovery(well_core=well_core)
+    except PipetteLiquidNotFoundError:
+        assert True
+    else:
+        assert False
+
+    decoy.reset()
+
+    lpr = LiquidProbeResult(z_position=5.0)
+    decoy.when(
+        mock_engine_client.execute_command_without_recovery(
+            cmd.LiquidProbeParams(
+                pipetteId=subject.pipette_id,
+                wellLocation=WellLocation(
+                    origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0)
+                ),
+                wellName=well_core.get_name(),
+                labwareId=well_core.labware_id,
+            )
+        )
+    ).then_return(lpr)
+    assert subject.liquid_probe_without_recovery(well_core=well_core) == 5.0
 
 
 @pytest.mark.parametrize("version", versions_at_or_above(APIVersion(2, 20)))
