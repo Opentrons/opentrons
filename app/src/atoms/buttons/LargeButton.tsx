@@ -13,21 +13,19 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { ODD_FOCUS_VISIBLE } from './constants'
 import type { IconName, StyleProps } from '@opentrons/components'
 
 type LargeButtonTypes =
   | 'primary'
   | 'secondary'
   | 'alert'
-  | 'onColor'
+  | 'alertStroke'
   | 'alertAlt'
 interface LargeButtonProps extends StyleProps {
   onClick: () => void
   buttonType?: LargeButtonTypes
   buttonText: React.ReactNode
   iconName?: IconName
-  subtext?: string
   disabled?: boolean
 }
 
@@ -36,7 +34,6 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     buttonType = 'primary',
     buttonText,
     iconName,
-    subtext,
     disabled = false,
     ...buttonProps
   } = props
@@ -51,8 +48,11 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
       disabledColor: string
       iconColor: string
       disabledIconColor: string
-      border?: string
-      disabledBorder?: string
+      focusVisibleOutlineColor: string
+      focusVisibleBackgroundColor: string
+      activeIconColor?: string
+      isInverse?: boolean
+      activeColor?: string
     }
   > = {
     secondary: {
@@ -63,6 +63,8 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
       disabledBackgroundColor: COLORS.grey35,
       iconColor: COLORS.blue50,
       disabledIconColor: COLORS.grey50,
+      focusVisibleOutlineColor: COLORS.blue50,
+      focusVisibleBackgroundColor: COLORS.blue40,
     },
     alert: {
       defaultColor: COLORS.red60,
@@ -72,6 +74,8 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
       disabledBackgroundColor: COLORS.grey35,
       iconColor: COLORS.red60,
       disabledIconColor: COLORS.grey50,
+      focusVisibleOutlineColor: COLORS.blue50,
+      focusVisibleBackgroundColor: COLORS.red40,
     },
     primary: {
       defaultColor: COLORS.white,
@@ -81,29 +85,49 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
       disabledBackgroundColor: COLORS.grey35,
       iconColor: COLORS.white,
       disabledIconColor: COLORS.grey50,
+      focusVisibleOutlineColor: COLORS.blue55,
+      focusVisibleBackgroundColor: COLORS.blue55,
     },
-    onColor: {
+    alertStroke: {
       defaultColor: COLORS.white,
       disabledColor: COLORS.grey40,
+      activeColor: COLORS.red60,
       defaultBackgroundColor: COLORS.transparent,
-      activeBackgroundColor: COLORS.transparent,
+      activeBackgroundColor: COLORS.red35,
       disabledBackgroundColor: COLORS.transparent,
       iconColor: COLORS.white,
       disabledIconColor: COLORS.grey40,
-      border: `${BORDERS.borderRadius4} solid ${COLORS.white}`,
-      disabledBorder: `${BORDERS.borderRadius4} solid ${COLORS.grey35}`,
+      isInverse: true,
+      activeIconColor: COLORS.red60,
+      focusVisibleOutlineColor: COLORS.blue50,
+      focusVisibleBackgroundColor: COLORS.red40,
     },
     alertAlt: {
       defaultColor: COLORS.red50,
       disabledColor: COLORS.grey50,
       defaultBackgroundColor: COLORS.white,
-      activeBackgroundColor: COLORS.white,
+      activeBackgroundColor: COLORS.red35,
       disabledBackgroundColor: COLORS.grey35,
       iconColor: COLORS.red50,
       disabledIconColor: COLORS.grey50,
+      activeIconColor: COLORS.red60,
+      activeColor: COLORS.red60,
+      focusVisibleOutlineColor: COLORS.blue50,
+      focusVisibleBackgroundColor: COLORS.red40,
     },
   }
-
+  const activeColorFor = (
+    style: keyof typeof LARGE_BUTTON_PROPS_BY_TYPE
+  ): string =>
+    LARGE_BUTTON_PROPS_BY_TYPE[style].activeColor
+      ? `color: ${LARGE_BUTTON_PROPS_BY_TYPE[style].activeColor}`
+      : ''
+  const activeIconStyle = (
+    style: keyof typeof LARGE_BUTTON_PROPS_BY_TYPE
+  ): string =>
+    LARGE_BUTTON_PROPS_BY_TYPE[style].activeIconColor
+      ? `color: ${LARGE_BUTTON_PROPS_BY_TYPE[style].activeIconColor}`
+      : ''
   const LARGE_BUTTON_STYLE = css`
     text-align: ${TYPOGRAPHY.textAlignLeft};
     color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor};
@@ -114,29 +138,41 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     box-shadow: none;
     padding: ${SPACING.spacing24};
     line-height: ${TYPOGRAPHY.lineHeight20};
-    border: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].border};
+    gap: ${SPACING.spacing60};
+    border: ${BORDERS.borderRadius4} solid
+      ${!!LARGE_BUTTON_PROPS_BY_TYPE[buttonType].isInverse
+        ? LARGE_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor
+        : LARGE_BUTTON_PROPS_BY_TYPE[buttonType].defaultBackgroundColor};
+
     ${TYPOGRAPHY.pSemiBold}
 
-    &:focus {
-      background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
-        .activeBackgroundColor};
-      box-shadow: none;
+    #btn-icon: {
+      color: ${disabled
+        ? LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledIconColor
+        : LARGE_BUTTON_PROPS_BY_TYPE[buttonType].iconColor};
     }
-    &:hover {
-      border: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].border};
-      box-shadow: none;
-      background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
-        .defaultBackgroundColor};
-      color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor};
-    }
-    &:focus-visible {
-      box-shadow: ${ODD_FOCUS_VISIBLE};
-      background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
-        .defaultBackgroundColor};
-    }
+
     &:active {
       background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
         .activeBackgroundColor};
+      ${activeColorFor(buttonType)};
+      border: ${BORDERS.borderRadius4} solid
+        ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].activeBackgroundColor};
+    }
+    &:active #btn-icon {
+      ${activeIconStyle(buttonType)};
+    }
+
+    &:focus-visible {
+      background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
+        .focusVisibleBackgroundColor};
+      ${activeColorFor(buttonType)};
+      padding: calc(${SPACING.spacing24} + ${SPACING.spacing2});
+      border: ${SPACING.spacing2} solid ${COLORS.transparent};
+      outline: 3px solid
+        ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].focusVisibleOutlineColor};
+      background-clip: padding-box;
+      box-shadow: none;
     }
 
     &:disabled {
@@ -158,22 +194,13 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
         <LegacyStyledText css={TYPOGRAPHY.level3HeaderSemiBold}>
           {buttonText}
         </LegacyStyledText>
-        {subtext ? (
-          <LegacyStyledText css={TYPOGRAPHY.level3HeaderRegular}>
-            {subtext}
-          </LegacyStyledText>
-        ) : null}
       </Flex>
       {iconName ? (
         <Icon
           name={iconName}
           aria-label={`${iconName} icon`}
-          color={
-            disabled
-              ? LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledIconColor
-              : LARGE_BUTTON_PROPS_BY_TYPE[buttonType].iconColor
-          }
           size="5rem"
+          id={`btn-icon`}
         />
       ) : null}
     </Btn>

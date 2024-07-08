@@ -843,6 +843,7 @@ async def test_liquid_probe(
             fake_settings_aspirate.output_option,
             fake_settings_aspirate.data_files,
             probe=InstrumentProbeType.PRIMARY,
+            force_both_sensors=False,
         )
 
         return_dict[head_node], return_dict[pipette_node] = 142, 142
@@ -913,6 +914,7 @@ async def test_multi_liquid_probe(
             fake_settings_aspirate.output_option,
             fake_settings_aspirate.data_files,
             probe=InstrumentProbeType.PRIMARY,
+            force_both_sensors=False,
         )
         assert mock_liquid_probe.call_count == 3
 
@@ -982,6 +984,7 @@ async def test_liquid_not_found(
             fake_settings_aspirate.output_option,
             fake_settings_aspirate.data_files,
             probe=InstrumentProbeType.PRIMARY,
+            force_both_sensors=False,
         )
         assert mock_liquid_probe.call_count == 3
 

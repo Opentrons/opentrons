@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Optional, Union
 from opentrons import types
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control.types import HardwareAction
+from opentrons.protocol_api.core.common import WellCore
 from opentrons.protocols.api_support import instrument as instrument_support
 from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.api_support.types import APIVersion
@@ -74,6 +75,7 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
         self._instrument_max_height = (
             protocol_interface.get_hardware().get_instrument_max_height(self._mount)
         )
+        self._liquid_presence_detection = False
 
     def get_default_speed(self) -> float:
         return self._default_speed
@@ -357,6 +359,12 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
     def get_speed(self) -> PlungerSpeeds:
         return self._plunger_speeds
 
+    def get_liquid_presence_detection(self) -> bool:
+        return self._liquid_presence_detection
+
+    def set_liquid_presence_detection(self, enable: bool) -> None:
+        self._liquid_presence_detection = enable
+
     def get_flow_rate(self) -> FlowRates:
         return self._flow_rate
 
@@ -474,3 +482,7 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
     def retract(self) -> None:
         """Retract this instrument to the top of the gantry."""
         self._protocol_interface.get_hardware.retract(self._mount)  # type: ignore [attr-defined]
+
+    def find_liquid_level(self, well_core: WellCore, error_recovery: bool) -> float:
+        """This will never be called because it was added in API 2.20."""
+        assert False, "find_liquid_level only supported in API 2.20 & later"

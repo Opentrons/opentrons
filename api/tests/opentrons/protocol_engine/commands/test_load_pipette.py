@@ -63,6 +63,7 @@ async def test_load_pipette_implementation(
         nozzle_map=get_default_nozzle_map(PipetteNameType.P300_MULTI),
         back_left_corner_offset=Point(x=1, y=2, z=3),
         front_right_corner_offset=Point(x=4, y=5, z=6),
+        pipette_lld_settings={},
     )
 
     decoy.when(
@@ -119,6 +120,7 @@ async def test_load_pipette_implementation_96_channel(
         nozzle_map=get_default_nozzle_map(PipetteNameType.P1000_96),
         back_left_corner_offset=Point(x=1, y=2, z=3),
         front_right_corner_offset=Point(x=4, y=5, z=6),
+        pipette_lld_settings={},
     )
 
     decoy.when(

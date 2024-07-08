@@ -348,6 +348,7 @@ class OT3Simulator(FlexBackend):
         output_format: OutputOptions = OutputOptions.can_bus_only,
         data_files: Optional[Dict[InstrumentProbeType, str]] = None,
         probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
+        force_both_sensors: bool = False,
     ) -> float:
         z_axis = Axis.by_mount(mount)
         pos = self._position

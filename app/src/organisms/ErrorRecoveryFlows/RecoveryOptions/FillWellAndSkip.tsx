@@ -14,10 +14,9 @@ import {
   RecoveryFooterButtons,
   RecoverySingleColumnContent,
   LeftColumnLabwareInfo,
-  RecoveryMap,
   TwoColTextAndFailedStepNextStep,
 } from '../shared'
-import { TwoColumn } from '../../../molecules/InterventionModal'
+import { TwoColumn, DeckMapContent } from '../../../molecules/InterventionModal'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 import type { RecoveryContentProps } from '../types'
@@ -45,7 +44,12 @@ export function FillWellAndSkip(props: RecoveryContentProps): JSX.Element {
 }
 
 export function FillWell(props: RecoveryContentProps): JSX.Element | null {
-  const { isOnDevice, routeUpdateActions, failedLabwareUtils } = props
+  const {
+    isOnDevice,
+    routeUpdateActions,
+    failedLabwareUtils,
+    deckMapUtils,
+  } = props
   const { t } = useTranslation('error_recovery')
   const { goBackPrevStep, proceedNextStep } = routeUpdateActions
 
@@ -63,7 +67,7 @@ export function FillWell(props: RecoveryContentProps): JSX.Element | null {
             />
           </Flex>
           <Flex marginTop="1.742rem">
-            <RecoveryMap {...props} />
+            <DeckMapContent {...deckMapUtils} />
           </Flex>
         </TwoColumn>
         <RecoveryFooterButtons

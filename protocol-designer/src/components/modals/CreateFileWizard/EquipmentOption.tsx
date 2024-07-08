@@ -1,7 +1,11 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import {
+  FLEX_ROBOT_TYPE,
+  MAGNETIC_BLOCK_TYPE,
+  OT2_ROBOT_TYPE,
+} from '@opentrons/shared-data'
 
 import {
   Flex,
@@ -19,8 +23,9 @@ import {
   Box,
   LegacyStyledText,
 } from '@opentrons/components'
+import { MAX_MAGNETIC_BLOCKS, MAX_MOAM_MODULES } from './ModulesAndOtherTile'
 import type { StyleProps } from '@opentrons/components'
-import type { RobotType } from '@opentrons/shared-data'
+import type { ModuleType, RobotType } from '@opentrons/shared-data'
 
 const ARROW_STYLE = css`
   color: ${COLORS.grey50};
@@ -43,6 +48,7 @@ const ARROW_STYLE_DISABLED = css`
 `
 
 interface MultiplesProps {
+  moduleType: ModuleType
   numItems: number
   maxItems: number
   setValue: (num: number) => void
@@ -74,7 +80,7 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
   } = props
   const { t } = useTranslation(['tooltip', 'shared'])
   const [equipmentTargetProps, equipmentTooltipProps] = useHoverTooltip()
-  const [tempTargetProps, tempTooltipProps] = useHoverTooltip()
+  const [moamTargetProps, moamTooltipProps] = useHoverTooltip()
   const [numMultiples, setNumMultiples] = React.useState<number>(
     multiples?.numItems ?? 0
   )
@@ -154,6 +160,10 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
       downArrowStyle = ARROW_STYLE_ACTIVE
     }
 
+    let maxMoam = MAX_MOAM_MODULES
+    if (multiples.moduleType === MAGNETIC_BLOCK_TYPE) {
+      maxMoam = MAX_MAGNETIC_BLOCKS
+    }
     iconInfo = (
       <Flex
         flexDirection={DIRECTION_COLUMN}
@@ -162,10 +172,10 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
         alignItems={ALIGN_CENTER}
       >
         <Flex
-          {...tempTargetProps}
+          {...moamTargetProps}
           data-testid="EquipmentOption_upArrow"
           onClick={
-            isDisabled || numMultiples === 7
+            isDisabled || numMultiples === maxMoam
               ? undefined
               : () => {
                   multiples.setValue(numMultiples + 1)
@@ -192,9 +202,9 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
             name="ot-arrow-down"
           />
         </Flex>
-        {isDisabled || numMultiples === 7 ? (
-          <Tooltip {...tempTooltipProps}>
-            {t('not_enough_space_for_temp')}
+        {isDisabled || numMultiples === maxMoam ? (
+          <Tooltip {...moamTooltipProps}>
+            {t(`not_enough_space_for_${multiples.moduleType}`)}
           </Tooltip>
         ) : null}
       </Flex>

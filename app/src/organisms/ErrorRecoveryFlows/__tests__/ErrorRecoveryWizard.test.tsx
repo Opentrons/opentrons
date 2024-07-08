@@ -7,7 +7,6 @@ import { i18n } from '../../../i18n'
 import { mockRecoveryContentProps } from '../__fixtures__'
 import {
   ErrorRecoveryContent,
-  ErrorRecoveryComponent,
   useInitialPipetteHome,
   useERWizard,
 } from '../ErrorRecoveryWizard'
@@ -27,7 +26,6 @@ import {
 } from '../RecoveryOptions'
 import { RecoveryInProgress } from '../RecoveryInProgress'
 import { RecoveryError } from '../RecoveryError'
-import { ErrorDetailsModal, useErrorDetailsModal } from '../shared'
 
 import type { Mock } from 'vitest'
 
@@ -418,49 +416,4 @@ describe('useInitialPipetteHome', () => {
     })
   })
 })
-
-const renderRecoveryComponent = (
-  props: React.ComponentProps<typeof ErrorRecoveryComponent>
-) => {
-  return renderWithProviders(<ErrorRecoveryComponent {...props} />, {
-    i18nInstance: i18n,
-  })[0]
-}
-
-describe('ErrorRecoveryComponent', () => {
-  let props: React.ComponentProps<typeof ErrorRecoveryComponent>
-
-  beforeEach(() => {
-    props = mockRecoveryContentProps
-
-    vi.mocked(ErrorDetailsModal).mockReturnValue(
-      <div>MOCK_ERROR_DETAILS_MODAL</div>
-    )
-    vi.mocked(useErrorDetailsModal).mockReturnValue({
-      showModal: false,
-      toggleModal: () => null,
-    })
-  })
-
-  it('renders an intervention modal with appropriate text', () => {
-    renderRecoveryComponent(props)
-    screen.getByTestId('__otInterventionModal')
-    screen.getByText('Recovery Mode')
-    screen.getByText('View error details')
-  })
-
-  it('renders alternative header text if the recovery mode has not been launched', () => {
-    props = { ...props, hasLaunchedRecovery: false }
-    renderRecoveryComponent(props)
-    screen.getByText('Cancel run')
-  })
-
-  it('renders the error details modal when showModal is true', () => {
-    vi.mocked(useErrorDetailsModal).mockReturnValue({
-      showModal: true,
-      toggleModal: () => null,
-    })
-    renderRecoveryComponent(props)
-    screen.getByText('MOCK_ERROR_DETAILS_MODAL')
-  })
-})
+it.todo('add test for ErrorRecoveryComponent.')

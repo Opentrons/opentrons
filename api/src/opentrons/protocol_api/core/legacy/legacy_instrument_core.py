@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Optional, Union
 from opentrons import types
 from opentrons.hardware_control import CriticalPoint
 from opentrons.hardware_control.dev_types import PipetteDict
+from opentrons.protocol_api.core.common import WellCore
 from opentrons.protocols.api_support import instrument as instrument_support
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.api_support.labware_like import LabwareLike
@@ -61,6 +62,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
             blow_out_defaults=pipette_state["default_blow_out_flow_rates"],
             api_level=self._api_version,
         )
+        self._liquid_presence_detection = False
 
     def get_default_speed(self) -> float:
         """Gets the speed at which the robot's gantry moves."""
@@ -465,6 +467,9 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
     def get_flow_rate(self) -> FlowRates:
         return self._flow_rates
 
+    def get_liquid_presence_detection(self) -> bool:
+        return self._liquid_presence_detection
+
     def get_aspirate_flow_rate(self, rate: float = 1.0) -> float:
         return self.get_hardware_state()["aspirate_flow_rate"] * rate
 
@@ -490,6 +495,9 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
             dispense=dispense,
             blow_out=blow_out,
         )
+
+    def set_liquid_presence_detection(self, enable: bool) -> None:
+        self._protocol_interface.get_hardware().set_liquid_presence_detection(enable)
 
     def set_pipette_speed(
         self,
@@ -556,3 +564,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
     def retract(self) -> None:
         """Retract this instrument to the top of the gantry."""
         self._protocol_interface.get_hardware.retract(self._mount)  # type: ignore [attr-defined]
+
+    def find_liquid_level(self, well_core: WellCore, error_recovery: bool) -> float:
+        """This will never be called because it was added in API 2.20."""
+        assert False, "find_liquid_level only supported in API 2.20 & later"

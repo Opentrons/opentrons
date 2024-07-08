@@ -3,12 +3,12 @@ name: Analyses Snapshot Test
 on:
   workflow_dispatch:
     inputs:
-      TARGET:
-        description: 'Target branch or tag'
+      ANALYSIS_REF:
+        description: 'Branch or tag that provides the analysis output at test runtime'
         required: true
         default: 'edge'
-      TEST_SOURCE:
-        description: 'Target for the test code'
+      SNAPSHOT_REF:
+        description: 'Branch or tag that provides the snapshot and test code at test runtime'
         required: true
         default: 'edge'
   schedule:
@@ -16,6 +16,8 @@ on:
   pull_request:
     paths:
       - 'api/**'
+      - '!api/tests/**'
+      - '!api/docs/**'
       - 'shared-data/**/*'
       - '!shared-data/js/**'
 
@@ -28,17 +30,17 @@ jobs:
     timeout-minutes: 15
     runs-on: ubuntu-latest
     env:
-      TARGET: ${{ github.event.inputs.TARGET || github.head_ref || 'edge' }}
-      TEST_SOURCE: ${{ github.event.inputs.TEST_SOURCE || github.head_ref || 'edge' }}
+      ANALYSIS_REF: ${{ github.event.inputs.ANALYSIS_REF || github.head_ref || 'edge' }}
+      SNAPSHOT_REF: ${{ github.event.inputs.SNAPSHOT_REF || github.head_ref || 'edge' }}
 
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v4
       with:
-        ref: ${{ env.TEST_SOURCE }}
+        ref: ${{ env.SNAPSHOT_REF }}
 
     - name: Docker Build
-      working-directory: app-testing
+      working-directory: analyses-snapshot-testing
       run: make build-opentrons-analysis
 
     - name: Set up Python 3.12
@@ -46,15 +48,15 @@ jobs:
       with:
         python-version: '3.12'
         cache: 'pipenv'
-        cache-dependency-path: app-testing/Pipfile.lock
+        cache-dependency-path: analyses-snapshot-testing/Pipfile.lock
 
     - name: Setup Python Dependencies
-      working-directory: app-testing
+      working-directory: analyses-snapshot-testing
       run: make setup
 
     - name: Run Test
       id: run_test
-      working-directory: app-testing
+      working-directory: analyses-snapshot-testing
       run: make snapshot-test
 
     - name: Upload Report
@@ -62,26 +64,27 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: test-report
-        path: app-testing/results/
+        path: analyses-snapshot-testing/results/
 
     - name: Handle Test Failure
-      if: failure()
-      working-directory: app-testing
+      id: handle_failure
+      if: steps.run_test.outcome == 'failure'
+      working-directory: analyses-snapshot-testing
       run: make snapshot-test-update
 
     - name: Create Snapshot update Request
-      id: create-pull-request
-      if: failure()
-      uses: peter-evans/create-pull-request@v5
+      id: create_pull_request
+      if: steps.handle_failure.outcome == 'success'
+      uses: peter-evans/create-pull-request@v6
       with:
-          commit-message: 'fix(app-testing): snapshot failure capture'
-          title: 'fix(app-testing): snapshot failure capture'
-          body: 'This PR is an automated snapshot update request. Please review the changes and merge if they are acceptable or find you bug and fix it.'
-          branch: 'app-testing/${{ env.TARGET }}-from-${{ env.TEST_SOURCE}}'
-          base: ${{ env.TEST_SOURCE}}
+          commit-message: 'fix(analyses-snapshot-testing): snapshot failure capture'
+          title: 'fix(analyses-snapshot-testing): ${{ env.ANALYSIS_REF }} snapshot failure capture'
+          body: 'This PR is an automated snapshot update request. Please review the changes and merge if they are acceptable or find your bug and fix it.'
+          branch: 'analyses-snapshot-testing/${{ env.ANALYSIS_REF }}-from-${{ env.SNAPSHOT_REF}}'
+          base: ${{ env.SNAPSHOT_REF}}
 
     - name: Comment on PR
-      if: failure() && github.event_name == 'pull_request'
+      if: steps.create_pull_request.outcome == 'success' && github.event_name == 'pull_request'
       uses: actions/github-script@v7
       with:
         script: |

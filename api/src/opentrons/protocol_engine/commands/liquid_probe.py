@@ -43,6 +43,7 @@ class LiquidProbeResult(DestinationPositionResult):
     z_position: float = Field(
         ..., description="The Z coordinate, in mm, of the found liquid in deck space."
     )
+    # New fields should use camelCase. z_position is snake_case for historical reasons.
 
 
 _ExecuteReturn = Union[

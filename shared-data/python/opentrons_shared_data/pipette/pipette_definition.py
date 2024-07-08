@@ -358,7 +358,6 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
         description="The distance the high throughput tip motors will travel to check tip status.",
         alias="tipPresenceCheckDistanceMM",
     )
-
     end_tip_action_retract_distance_mm: float = Field(
         default=0.0,
         description="The distance to move the head up after a tip drop or pickup.",
@@ -440,6 +439,7 @@ class PipetteGeometryDefinition(BaseModel):
     )
     ordered_columns: List[PipetteColumnDefinition] = Field(..., alias="orderedColumns")
     ordered_rows: List[PipetteRowDefinition] = Field(..., alias="orderedRows")
+    lld_settings: Dict[str, Dict[str, float]] = Field(..., alias="lldSettings")
 
     @validator("nozzle_map", pre=True)
     def check_nonempty_strings(

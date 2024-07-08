@@ -4,10 +4,9 @@ import { Flex } from '@opentrons/components'
 
 import { useTranslation } from 'react-i18next'
 import { RecoverySingleColumnContent } from './RecoverySingleColumnContent'
-import { TwoColumn } from '../../../molecules/InterventionModal'
+import { TwoColumn, DeckMapContent } from '../../../molecules/InterventionModal'
 import { RecoveryFooterButtons } from './RecoveryFooterButtons'
 import { LeftColumnLabwareInfo } from './LeftColumnLabwareInfo'
-import { RecoveryMap } from './RecoveryMap'
 
 import type { RecoveryContentProps } from '../types'
 
@@ -17,6 +16,7 @@ export function ReplaceTips(props: RecoveryContentProps): JSX.Element | null {
     routeUpdateActions,
     failedPipetteInfo,
     failedLabwareUtils,
+    deckMapUtils,
   } = props
   const { relevantWellName } = failedLabwareUtils
   const { proceedNextStep } = routeUpdateActions
@@ -47,7 +47,7 @@ export function ReplaceTips(props: RecoveryContentProps): JSX.Element | null {
             bannerText={t('replace_tips_and_select_location')}
           />
           <Flex marginTop="1.742rem">
-            <RecoveryMap {...props} />
+            <DeckMapContent {...deckMapUtils} />
           </Flex>
         </TwoColumn>
         <RecoveryFooterButtons

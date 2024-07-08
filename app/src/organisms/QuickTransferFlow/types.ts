@@ -24,6 +24,7 @@ export type ChangeTipOptions =
   | 'never'
   | 'perDest'
   | 'perSource'
+export type FlowRateKind = 'aspirate' | 'dispense' | 'blowout'
 
 export interface QuickTransferSummaryState {
   pipette: PipetteV2Specs

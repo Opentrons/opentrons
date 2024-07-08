@@ -1,6 +1,7 @@
 """Test for the ProtocolEngine-based instrument API core."""
 from typing import cast, Optional, Union
 
+from opentrons_shared_data.errors.exceptions import PipetteLiquidNotFoundError
 import pytest
 from decoy import Decoy
 
@@ -1149,6 +1150,20 @@ def test_has_tip(
     assert subject.has_tip() is True
 
 
+def test_liquid_presence_detection(
+    decoy: Decoy,
+    subject: InstrumentCore,
+    mock_engine_client: EngineClient,
+) -> None:
+    """It should have a default liquid presence detection boolean set to False."""
+    decoy.when(
+        mock_engine_client.state.pipettes.get_liquid_presence_detection(
+            subject.pipette_id
+        )
+    ).then_return(False)
+    assert subject.get_liquid_presence_detection() is False
+
+
 @pytest.mark.parametrize(
     argnames=["style", "primary_nozzle", "front_right_nozzle", "expected_model"],
     argvalues=[
@@ -1271,6 +1286,52 @@ def test_configure_for_volume_post_219(
                 pipetteId=subject.pipette_id,
                 volume=123.0,
                 tipOverlapNotAfterVersion="v1",
+            )
+        )
+    )
+
+
+@pytest.mark.parametrize("version", versions_at_or_above(APIVersion(2, 20)))
+def test_find_liquid_level(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
+    subject: InstrumentCore,
+    version: APIVersion,
+) -> None:
+    """It should raise an exception on an empty well."""
+    well_core = WellCore(
+        name="my cool well", labware_id="123abc", engine_client=mock_engine_client
+    )
+    try:
+        subject.find_liquid_level(well_core=well_core, error_recovery=True)
+    except PipetteLiquidNotFoundError:
+        assert True
+    decoy.verify(
+        mock_engine_client.execute_command_with_result(
+            cmd.LiquidProbeParams(
+                pipetteId=subject.pipette_id,
+                wellLocation=WellLocation(
+                    origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0)
+                ),
+                wellName=well_core.get_name(),
+                labwareId=well_core.labware_id,
+            )
+        )
+    )
+    try:
+        subject.find_liquid_level(well_core=well_core, error_recovery=False)
+    except PipetteLiquidNotFoundError:
+        assert True
+    decoy.verify(
+        mock_engine_client.execute_command_without_recovery(
+            cmd.LiquidProbeParams(
+                pipetteId=subject.pipette_id,
+                wellLocation=WellLocation(
+                    origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0)
+                ),
+                wellName=well_core.get_name(),
+                labwareId=well_core.labware_id,
             )
         )
     )

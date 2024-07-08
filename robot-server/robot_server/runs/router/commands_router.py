@@ -29,10 +29,14 @@ from ..command_models import (
 )
 from ..run_models import RunCommandSummary
 from ..run_data_manager import RunDataManager, PreSerializedCommandsNotAvailableError
-from ..engine_store import EngineStore
+from ..run_orchestrator_store import RunOrchestratorStore
 from ..run_store import CommandNotFoundError, RunStore
 from ..run_models import RunNotFoundError
-from ..dependencies import get_engine_store, get_run_data_manager, get_run_store
+from ..dependencies import (
+    get_run_orchestrator_store,
+    get_run_data_manager,
+    get_run_store,
+)
 from .base_router import RunNotFound, RunStopped
 
 
@@ -76,14 +80,14 @@ class PreSerializedCommandsNotAvailable(ErrorDetails):
 
 async def get_current_run_from_url(
     runId: str,
-    engine_store: EngineStore = Depends(get_engine_store),
+    run_orchestrator_store: RunOrchestratorStore = Depends(get_run_orchestrator_store),
     run_store: RunStore = Depends(get_run_store),
 ) -> str:
     """Get run from url.
 
     Args:
         runId: Run ID to associate the command with.
-        engine_store: Engine store to pull current run ProtocolEngine.
+        run_orchestrator_store: Engine store to pull current run ProtocolEngine.
         run_store: Run data storage.
     """
     if not run_store.has(runId):
@@ -91,7 +95,7 @@ async def get_current_run_from_url(
             status.HTTP_404_NOT_FOUND
         )
 
-    if runId != engine_store.current_run_id:
+    if runId != run_orchestrator_store.current_run_id:
         raise RunStopped(detail=f"Run {runId} is not the current run").as_error(
             status.HTTP_409_CONFLICT
         )
@@ -182,7 +186,7 @@ async def create_run_command(
             "FIXIT command use only. Reference of the failed command id we are trying to fix."
         ),
     ),
-    engine_store: EngineStore = Depends(get_engine_store),
+    run_orchestrator_store: RunOrchestratorStore = Depends(get_run_orchestrator_store),
     check_estop: bool = Depends(require_estop_in_good_state),
     run_id: str = Depends(get_current_run_from_url),
 ) -> PydanticResponse[SimpleBody[pe_commands.Command]]:
@@ -197,7 +201,7 @@ async def create_run_command(
             Comes from a query parameter in the URL.
         failedCommandId: FIXIT command use only.
             Reference of the failed command id we are trying to fix.
-        engine_store: The run's `EngineStore` on which the new
+        run_orchestrator_store: The run's `EngineStore` on which the new
             command will be enqueued.
         check_estop: Dependency to verify the estop is in a valid state.
         run_id: Run identification to attach command to.
@@ -208,7 +212,7 @@ async def create_run_command(
     command_create = request_body.data.copy(update={"intent": command_intent})
 
     try:
-        command = await engine_store.add_command_and_wait_for_interval(
+        command = await run_orchestrator_store.add_command_and_wait_for_interval(
             request=command_create,
             failed_command_id=failedCommandId,
             wait_until_complete=waitUntilComplete,
@@ -222,7 +226,7 @@ async def create_run_command(
     except pe_errors.CommandNotAllowedError as e:
         raise CommandNotAllowed.from_exc(e).as_error(status.HTTP_400_BAD_REQUEST)
 
-    response_data = engine_store.get_command(command.id)
+    response_data = run_orchestrator_store.get_command(command.id)
 
     return await PydanticResponse.create(
         content=SimpleBody.construct(data=response_data),
