@@ -67,6 +67,7 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
       disabledBackgroundColor: `${COLORS.grey35}`,
       disabledColor: `${COLORS.grey50}`,
     },
+
     alert: {
       defaultColor: COLORS.white,
       defaultBackgroundColor: COLORS.red50,
@@ -74,6 +75,7 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
       disabledBackgroundColor: `${COLORS.grey35}`,
       disabledColor: `${COLORS.grey50}`,
     },
+
     primary: {
       defaultColor: COLORS.white,
       defaultBackgroundColor: COLORS.blue50,
@@ -81,6 +83,7 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
       disabledBackgroundColor: `${COLORS.grey35}`,
       disabledColor: `${COLORS.grey50}`,
     },
+
     tertiaryHighLight: {
       defaultColor: COLORS.black90,
       defaultBackgroundColor: `${COLORS.blue50}00`,
@@ -88,6 +91,7 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
       disabledBackgroundColor: `${COLORS.blue50}00`,
       disabledColor: `${COLORS.grey50}`,
     },
+
     tertiaryLowLight: {
       defaultColor: `${COLORS.grey60}`,
       defaultBackgroundColor: ` ${COLORS.blue50}00`,

@@ -256,7 +256,7 @@ export function ProtocolSetupParameters({
                   status={setupStatus}
                   title={
                     parameter.type === 'csv_file'
-                      ? t('test')
+                      ? t('csv_file')
                       : parameter.displayName
                   }
                   onClickSetupStep={() => {
