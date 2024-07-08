@@ -34,6 +34,7 @@ from opentrons.protocol_engine import (
     CommandCreate,
     LabwareOffset,
     Config as ProtocolEngineConfig,
+    error_recovery_policy,
 )
 from opentrons.protocol_engine.create_protocol_engine import create_protocol_engine
 
@@ -170,6 +171,7 @@ class RunOrchestratorStore:
                     deck_type=self._deck_type,
                     block_on_door_open=False,
                 ),
+                error_recovery_policy=error_recovery_policy.never_recover,
             )
             self._default_run_orchestrator = RunOrchestrator.build_orchestrator(
                 protocol_engine=engine, hardware_api=self._hardware_api
@@ -219,6 +221,7 @@ class RunOrchestratorStore:
                     RobotTypeEnum.robot_literal_to_enum(self._robot_type)
                 ),
             ),
+            error_recovery_policy=error_recovery_policy.standard_run_policy,
             load_fixed_trash=load_fixed_trash,
             deck_configuration=deck_configuration,
             notify_publishers=notify_publishers,
