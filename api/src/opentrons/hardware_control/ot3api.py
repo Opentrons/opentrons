@@ -2661,7 +2661,6 @@ class OT3API(
             except PipetteLiquidNotFoundError as lnfe:
                 error = lnfe
             pos = await self.gantry_position(checked_mount, refresh=True)
-            print(f"loop ctl {probe_start_pos.z} {pos.z} {max_z_dist}")
         await self.move_to(checked_mount, probe_start_pos)
         if error is not None:
             # if we never found liquid raise an error

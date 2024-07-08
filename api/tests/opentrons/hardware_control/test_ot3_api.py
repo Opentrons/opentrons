@@ -951,7 +951,7 @@ async def test_liquid_not_found(
     await ot3_hardware.move_to(OT3Mount.LEFT, Point(10, 10, 10))
 
     async def _fake_pos_update_and_raise(
-        self,
+        self: OT3Simulator,
         mount: OT3Mount,
         max_p_distance: float,
         mount_speed: float,
@@ -963,17 +963,13 @@ async def test_liquid_not_found(
         force_both_sensors: bool = False,
     ) -> float:
         pos = self._position
-        print(
-            f"{pos[Axis.by_mount(mount)]} - {mount_speed * (abs(max_p_distance/plunger_speed)-0.2)} = "
-        )
         pos[Axis.by_mount(mount)] += mount_speed * (
             abs(max_p_distance / plunger_speed) - 0.2
         )
-        print(pos[Axis.by_mount(mount)])
         await self.update_position()
         raise PipetteLiquidNotFoundError()
 
-    hardware_backend.liquid_probe = types.MethodType(
+    hardware_backend.liquid_probe = types.MethodType(  # type: ignore[method-assign]
         _fake_pos_update_and_raise, hardware_backend
     )
 
