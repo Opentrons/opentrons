@@ -37,8 +37,8 @@ clean_all_cmd = $(clean_cmd) dist
 .PHONY: lint
 lint:
 	$(python) -m black --check .
-	$(python) -m flake8 .
 	$(python) -m mypy .
+	$(python) -m flake8 .
 
 .PHONY: format
 format:

@@ -10,8 +10,6 @@ import {
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 
-import { LabwareHighlight } from '../shared'
-
 import type { Run } from '@opentrons/api-client'
 import type {
   DeckDefinition,
@@ -21,29 +19,33 @@ import type {
   LabwareLocation,
   CutoutConfigProtocolSpec,
   LoadedLabware,
+  RobotType,
 } from '@opentrons/shared-data'
 import type { ErrorRecoveryFlowsProps } from '..'
 import type { UseFailedLabwareUtilsResult } from './useFailedLabwareUtils'
 
-interface UseRecoveryMapUtilsProps {
+interface UseDeckMapUtilsProps {
   runId: ErrorRecoveryFlowsProps['runId']
   protocolAnalysis: ErrorRecoveryFlowsProps['protocolAnalysis']
   failedLabwareUtils: UseFailedLabwareUtilsResult
   runRecord?: Run
 }
 
-export interface UseRecoveryMapUtilsResult {
+export interface UseDeckMapUtilsResult {
   deckConfig: CutoutConfigProtocolSpec[]
-  runCurrentModules: RunCurrentModulesOnDeck[]
-  runCurrentLabware: RunCurrentLabwareOnDeck[]
+  modulesOnDeck: RunCurrentModulesOnDeck[]
+  labwareOnDeck: RunCurrentLabwareOnDeck[]
+  highlightLabwareEventuallyIn: string[]
+  kind: 'intervention'
+  robotType: RobotType
 }
 // Returns the utilities needed by the Recovery Deck Map.
-export function useRecoveryMapUtils({
+export function useDeckMapUtils({
   protocolAnalysis,
   runRecord,
   runId,
   failedLabwareUtils,
-}: UseRecoveryMapUtilsProps): UseRecoveryMapUtilsResult {
+}: UseDeckMapUtilsProps): UseDeckMapUtilsResult {
   const robotType = protocolAnalysis?.robotType ?? OT2_ROBOT_TYPE
   const deckConfig = getSimplestDeckConfigForProtocol(protocolAnalysis)
   const deckDef = getDeckDefFromRobotType(robotType)
@@ -83,8 +85,23 @@ export function useRecoveryMapUtils({
 
   return {
     deckConfig,
-    runCurrentModules,
-    runCurrentLabware,
+    modulesOnDeck: runCurrentModules.map(
+      ({ moduleModel, moduleLocation, innerProps, nestedLabwareDef }) => ({
+        moduleModel,
+        moduleLocation,
+        innerProps,
+        nestedLabwareDef,
+      })
+    ),
+    labwareOnDeck: runCurrentLabware.map(({ labwareLocation, definition }) => ({
+      labwareLocation,
+      definition,
+    })),
+    highlightLabwareEventuallyIn: [...runCurrentModules, ...runCurrentLabware]
+      .map(el => el.highlight)
+      .filter(maybeSlot => maybeSlot != null) as string[],
+    kind: 'intervention',
+    robotType,
   }
 }
 
@@ -101,7 +118,6 @@ interface RunCurrentModulesOnDeck {
         lidMotorState?: undefined
       }
   nestedLabwareDef: LabwareDefinition2 | null
-  moduleChildren: JSX.Element | null
 }
 
 // Builds the necessary module object expected by BaseDeck.
@@ -109,62 +125,49 @@ export function getRunCurrentModulesOnDeck({
   failedLabwareUtils,
   currentModulesInfo,
 }: {
-  failedLabwareUtils: UseRecoveryMapUtilsProps['failedLabwareUtils']
+  failedLabwareUtils: UseDeckMapUtilsProps['failedLabwareUtils']
   currentModulesInfo: RunCurrentModuleInfo[]
-}): RunCurrentModulesOnDeck[] {
+}): Array<RunCurrentModulesOnDeck & { highlight: string | null }> {
   const { failedLabware } = failedLabwareUtils
 
   return currentModulesInfo.map(
-    ({ moduleDef, slotName, nestedLabwareDef, nestedLabwareSlotName }) => {
-      const isLabwareMatch = getIsLabwareMatch(
-        nestedLabwareSlotName,
-        failedLabware
-      )
+    ({ moduleDef, slotName, nestedLabwareDef, nestedLabwareSlotName }) => ({
+      moduleModel: moduleDef.model,
+      moduleLocation: { slotName },
+      innerProps:
+        moduleDef.model === THERMOCYCLER_MODULE_V1
+          ? { lidMotorState: 'open' }
+          : {},
 
-      return {
-        moduleModel: moduleDef.model,
-        moduleLocation: { slotName },
-        innerProps:
-          moduleDef.model === THERMOCYCLER_MODULE_V1
-            ? { lidMotorState: 'open' }
-            : {},
-
-        nestedLabwareDef,
-        moduleChildren:
-          isLabwareMatch && nestedLabwareDef != null ? (
-            <LabwareHighlight highlight={true} definition={nestedLabwareDef} />
-          ) : null,
-      }
-    }
+      nestedLabwareDef,
+      highlight: getIsLabwareMatch(nestedLabwareSlotName, failedLabware)
+        ? nestedLabwareSlotName
+        : null,
+    })
   )
 }
 
 interface RunCurrentLabwareOnDeck {
   labwareLocation: LabwareLocation
   definition: LabwareDefinition2
-  labwareChildren: JSX.Element | null
 }
 // Builds the necessary labware object expected by BaseDeck.
 export function getRunCurrentLabwareOnDeck({
   currentLabwareInfo,
   failedLabwareUtils,
 }: {
-  failedLabwareUtils: UseRecoveryMapUtilsProps['failedLabwareUtils']
+  failedLabwareUtils: UseDeckMapUtilsProps['failedLabwareUtils']
   currentLabwareInfo: RunCurrentLabwareInfo[]
-}): RunCurrentLabwareOnDeck[] {
+}): Array<RunCurrentLabwareOnDeck & { highlight: string | null }> {
   const { failedLabware } = failedLabwareUtils
 
-  return currentLabwareInfo.map(({ slotName, labwareDef, labwareLocation }) => {
-    const isLabwareMatch = getIsLabwareMatch(slotName, failedLabware)
-
-    return {
+  return currentLabwareInfo.map(
+    ({ slotName, labwareDef, labwareLocation }) => ({
       labwareLocation,
       definition: labwareDef,
-      labwareChildren: isLabwareMatch ? (
-        <LabwareHighlight highlight={true} definition={labwareDef} />
-      ) : null,
-    }
-  })
+      highlight: getIsLabwareMatch(slotName, failedLabware) ? slotName : null,
+    })
+  )
 }
 
 interface RunCurrentModuleInfo {
@@ -181,8 +184,8 @@ export const getRunCurrentModulesInfo = ({
   deckDef,
   protocolAnalysis,
 }: {
-  protocolAnalysis: UseRecoveryMapUtilsProps['protocolAnalysis']
-  runRecord: UseRecoveryMapUtilsProps['runRecord']
+  protocolAnalysis: UseDeckMapUtilsProps['protocolAnalysis']
+  runRecord: UseDeckMapUtilsProps['runRecord']
   deckDef: DeckDefinition
 }): RunCurrentModuleInfo[] => {
   if (runRecord == null || protocolAnalysis == null) {
@@ -248,8 +251,8 @@ export function getRunCurrentLabwareInfo({
   runRecord,
   protocolAnalysis,
 }: {
-  runRecord: UseRecoveryMapUtilsProps['runRecord']
-  protocolAnalysis: UseRecoveryMapUtilsProps['protocolAnalysis']
+  runRecord: UseDeckMapUtilsProps['runRecord']
+  protocolAnalysis: UseDeckMapUtilsProps['protocolAnalysis']
 }): RunCurrentLabwareInfo[] {
   if (runRecord == null || protocolAnalysis == null) {
     return []

@@ -5,6 +5,7 @@ import typing
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import DoorState
+from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
 from opentrons.util.async_helpers import async_context_manager_in_thread
 
 from .protocol_engine import ProtocolEngine
@@ -12,15 +13,15 @@ from .resources import DeckDataProvider, ModuleDataProvider
 from .state import Config, StateStore
 from .types import PostRunHardwareState, DeckConfigurationType
 
-
-# TODO(mm, 2023-06-16): Arguably, this not being a context manager makes us prone to forgetting to
-# clean it up properly, especially in tests. See e.g. https://opentrons.atlassian.net/browse/RSS-222
 from .engine_support import create_run_orchestrator
 
 
+# TODO(mm, 2023-06-16): Arguably, this not being a context manager makes us prone to forgetting to
+# clean it up properly, especially in tests. See e.g. https://opentrons.atlassian.net/browse/RSS-222
 async def create_protocol_engine(
     hardware_api: HardwareControlAPI,
     config: Config,
+    error_recovery_policy: ErrorRecoveryPolicy,
     load_fixed_trash: bool = False,
     deck_configuration: typing.Optional[DeckConfigurationType] = None,
     notify_publishers: typing.Optional[typing.Callable[[], None]] = None,
@@ -30,6 +31,8 @@ async def create_protocol_engine(
     Arguments:
         hardware_api: Hardware control API to pass down to dependencies.
         config: ProtocolEngine configuration.
+        error_recovery_policy: The error recovery policy to create the engine with.
+            See documentation on `ErrorRecoveryPolicy`.
         load_fixed_trash: Automatically load fixed trash labware in engine.
         deck_configuration: The initial deck configuration the engine will be instantiated with.
         notify_publishers: Notifies robot server publishers of internal state change.
@@ -56,6 +59,7 @@ async def create_protocol_engine(
     return ProtocolEngine(
         state_store=state_store,
         hardware_api=hardware_api,
+        error_recovery_policy=error_recovery_policy,
     )
 
 
@@ -63,6 +67,7 @@ async def create_protocol_engine(
 def create_protocol_engine_in_thread(
     hardware_api: HardwareControlAPI,
     config: Config,
+    error_recovery_policy: ErrorRecoveryPolicy,
     drop_tips_after_run: bool,
     post_run_hardware_state: PostRunHardwareState,
     load_fixed_trash: bool = False,
@@ -90,6 +95,7 @@ def create_protocol_engine_in_thread(
         _protocol_engine(
             hardware_api,
             config,
+            error_recovery_policy,
             drop_tips_after_run,
             post_run_hardware_state,
             load_fixed_trash,
@@ -105,6 +111,7 @@ def create_protocol_engine_in_thread(
 async def _protocol_engine(
     hardware_api: HardwareControlAPI,
     config: Config,
+    error_recovery_policy: ErrorRecoveryPolicy,
     drop_tips_after_run: bool,
     post_run_hardware_state: PostRunHardwareState,
     load_fixed_trash: bool = False,
@@ -112,6 +119,7 @@ async def _protocol_engine(
     protocol_engine = await create_protocol_engine(
         hardware_api=hardware_api,
         config=config,
+        error_recovery_policy=error_recovery_policy,
         load_fixed_trash=load_fixed_trash,
     )
 

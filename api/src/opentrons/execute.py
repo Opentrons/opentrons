@@ -58,6 +58,7 @@ from opentrons.protocol_engine import (
     Config,
     DeckType,
     EngineStatus,
+    error_recovery_policy,
 )
 from opentrons.protocol_engine.create_protocol_engine import (
     create_protocol_engine_in_thread,
@@ -545,6 +546,7 @@ def _create_live_context_pe(
         create_protocol_engine_in_thread(
             hardware_api=hardware_api_wrapped,
             config=_get_protocol_engine_config(),
+            error_recovery_policy=error_recovery_policy.never_recover,
             drop_tips_after_run=False,
             post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
             load_fixed_trash=should_load_fixed_trash_labware_for_python_protocol(
@@ -628,6 +630,7 @@ def _run_file_pe(
         protocol_engine = await create_protocol_engine(
             hardware_api=hardware_api_wrapped,
             config=_get_protocol_engine_config(),
+            error_recovery_policy=error_recovery_policy.never_recover,
             load_fixed_trash=should_load_fixed_trash(protocol_source.config),
         )
 
