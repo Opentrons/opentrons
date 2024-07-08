@@ -208,16 +208,21 @@ if __name__ == "__main__":
                 get_most_recent_run_and_record(ip, storage_directory, labware, accuracy)
 
             is_stable = False
-            y_or_no = input("Do you want to weigh another sample? (Y/N): ")
-            if y_or_no == "Y":
-                # Uses same storage directory and file.
-                grams, is_stable = scale.read_mass()
-                is_stable = False
-                robot = input("Robot: ")
-                labware = input("Labware: ")
-                protocol_step, expected_liquid_moved, ip = get_protocol_step_as_int()
-                grams, is_stable = scale.read_mass()
-            elif y_or_no == "N":
-                break_all = True
+            while True:    
+                y_or_no = input("Do you want to weigh another sample? (Y/N): ")
+                if y_or_no == "Y" or y_or_no == "y":
+                    # Uses same storage directory and file.
+                    grams, is_stable = scale.read_mass()
+                    is_stable = False
+                    robot = input("Robot: ")
+                    labware = input("Labware: ")
+                    protocol_step, expected_liquid_moved, ip = get_protocol_step_as_int(storage_directory, robot)
+                    grams, is_stable = scale.read_mass()
+                    break
+                elif y_or_no == "N" or y_or_no == "n":
+                    break_all = True
+                    break
+                else:
+                    print("Please Choose a Valid Option")
         if break_all:
             break
