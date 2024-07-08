@@ -1,12 +1,16 @@
 """Liquid-probe command for OT3 hardware. request, result, and implementation models."""
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Type, Union
-from opentrons_shared_data.errors.exceptions import PipetteLiquidNotFoundError
+from opentrons.types import MountType
+from opentrons_shared_data.errors.exceptions import (
+    PipetteLiquidNotFoundError,
+    PositionUnknownError,
+)
 from typing_extensions import Literal
 
 from pydantic import Field
 
-from ..types import WellLocation, WellOrigin, CurrentWell, DeckPoint
+from ..types import CurrentWell, DeckPoint
 from .pipetting_common import (
     LiquidNotFoundError,
     LiquidNotFoundErrorInternalData,
@@ -21,6 +25,7 @@ from .command import (
     DefinedErrorData,
     SuccessData,
 )
+
 from ..errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
@@ -78,23 +83,24 @@ class LiquidProbeImplementation(AbstractCommandImpl[LiquidProbeParams, _ExecuteR
         labware_id = params.labwareId
         well_name = params.wellName
 
-        ready_to_probe = self._pipetting.get_is_ready_to_aspirate(pipette_id=pipette_id)
+        # throw error if pipette has no tip
+        # _validate_tip_attached in pipetting.py is a private method so we're using
+        # get_is_ready_to_aspirate as an indirect way to throw the NoTipAttachedError
+        self._pipetting.get_is_ready_to_aspirate(pipette_id=pipette_id)
 
-        current_well = None
+        # throw error if pipette has a working volume volume
 
-        if not ready_to_probe:
-            await self._movement.move_to_well(
-                pipette_id=pipette_id,
-                labware_id=labware_id,
-                well_name=well_name,
-                well_location=WellLocation(origin=WellOrigin.TOP),
+        # throw error if plunger not homed
+        if await self._movement.check_for_valid_position(mount=MountType.LEFT) is False:
+            raise PositionUnknownError(
+                message="Current position of pipette is invalid. Please home."
             )
 
-            current_well = CurrentWell(
-                pipette_id=pipette_id,
-                labware_id=labware_id,
-                well_name=well_name,
-            )
+        current_well = CurrentWell(
+            pipette_id=pipette_id,
+            labware_id=labware_id,
+            well_name=well_name,
+        )
 
         # liquid_probe process start position
         position = await self._movement.move_to_well(
