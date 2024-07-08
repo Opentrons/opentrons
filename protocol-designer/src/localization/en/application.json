@@ -29,6 +29,7 @@
   "module_and_slot": "{{moduleLongName}} in Slot {{slotName}}",
   "stepType": {
     "mix": "mix",
+    "comment": "comment",
     "moveLabware": "move labware",
     "moveLiquid": "transfer",
     "pause": "pause",

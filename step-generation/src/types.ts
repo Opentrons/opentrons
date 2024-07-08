@@ -437,6 +437,11 @@ export interface MoveLabwareArgs extends CommonArgs {
   newLocation: LabwareLocation
 }
 
+export interface CommentArgs extends CommonArgs {
+  commandCreatorFnName: 'comment'
+  message: string
+}
+
 export type CommandCreatorArgs =
   | ConsolidateArgs
   | DistributeArgs
@@ -452,6 +457,7 @@ export type CommandCreatorArgs =
   | ThermocyclerStateStepArgs
   | HeaterShakerArgs
   | MoveLabwareArgs
+  | CommentArgs
 
 export interface LocationLiquidState {
   [ingredGroup: string]: { volume: number }
