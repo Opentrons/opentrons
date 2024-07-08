@@ -351,7 +351,7 @@ class JsonRunner(AbstractRunner):
 
         self._queued_commands = commands
 
-        self._task_queue.set_run_func(func=self._add_command_and_execute)
+        self._task_queue.set_run_func(func=self._add_and_execute_commands)
 
     async def run(  # noqa: D102
         self,
@@ -372,7 +372,7 @@ class JsonRunner(AbstractRunner):
         commands = self._protocol_engine.state_view.commands.get_all()
         return RunResult(commands=commands, state_summary=run_data, parameters=[])
 
-    async def _add_command_and_execute(self) -> None:
+    async def _add_and_execute_commands(self) -> None:
         for command_request in self._queued_commands:
             # todo(mm, 2024-07-05): This logic to handle the various command execution
             # outcomes mirrors PAPI's ChildThreadTransport. Simplify or deduplicate it.
