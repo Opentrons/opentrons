@@ -138,7 +138,7 @@ class LegacyProtocolCore(
     ) -> None:
         if isinstance(disposal_location, (TrashBin, WasteChute)):
             raise APIVersionError(
-                "Trash Bin and Waste Chute Disposal locations are not supported in this API Version."
+                api_element="Trash Bin and Waste Chute Disposal locations"
             )
         self._disposal_locations.append(disposal_location)
 
@@ -173,14 +173,17 @@ class LegacyProtocolCore(
         """Load a labware using its identifying parameters."""
         if isinstance(location, OffDeckType):
             raise APIVersionError(
-                "Loading a labware off deck is only supported with apiLevel 2.15 and newer."
+                api_element="Loading a labware off deck", until_version="2.15"
             )
         elif isinstance(location, LegacyLabwareCore):
             raise APIVersionError(
-                "Loading a labware onto another labware or adapter is only supported with api version 2.15 and above"
+                api_element="Loading a labware onto another labware or adapter",
+                until_version="2.15",
             )
         elif isinstance(location, StagingSlotName):
-            raise APIVersionError("Using a staging deck slot requires apiLevel 2.16.")
+            raise APIVersionError(
+                api_element="Using a staging deck slot", until_version="2.16"
+            )
 
         deck_slot = (
             location if isinstance(location, DeckSlotName) else location.get_deck_slot()
@@ -261,7 +264,7 @@ class LegacyProtocolCore(
         version: Optional[int],
     ) -> LegacyLabwareCore:
         """Load an adapter using its identifying parameters"""
-        raise APIVersionError("Loading adapter is not supported in this API version.")
+        raise APIVersionError(api_element="Loading adapter")
 
     # TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
     def move_labware(
@@ -281,7 +284,7 @@ class LegacyProtocolCore(
         drop_offset: Optional[Tuple[float, float, float]],
     ) -> None:
         """Move labware to new location."""
-        raise APIVersionError("Labware movement is not supported in this API version")
+        raise APIVersionError(api_element="Labware movement")
 
     def load_module(
         self,
@@ -382,19 +385,15 @@ class LegacyProtocolCore(
         return new_instr
 
     def load_trash_bin(self, slot_name: DeckSlotName, area_name: str) -> TrashBin:
-        raise APIVersionError(
-            "Loading deck configured trash bin is not supported in this API version."
-        )
+        raise APIVersionError(api_element="Loading deck configured trash bin")
 
     def load_ot2_fixed_trash_bin(self) -> None:
         raise APIVersionError(
-            "Loading deck configured OT-2 fixed trash bin is not supported in this API version."
+            api_element="Loading deck configured OT-2 fixed trash bin"
         )
 
     def load_waste_chute(self) -> WasteChute:
-        raise APIVersionError(
-            "Loading waste chute is not supported in this API version."
-        )
+        raise APIVersionError(api_element="Loading waste chute")
 
     def get_loaded_instruments(
         self,

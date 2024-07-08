@@ -8,7 +8,7 @@ from decoy import Decoy
 from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
 
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.util import APIVersionError
+from opentrons.protocols.api_support.util import UnsupportedAPIError
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION, Labware, Well
 from opentrons.protocol_api.core import well_grid
 from opentrons.protocol_api.core.common import (
@@ -342,7 +342,7 @@ def test_set_offset_raises_on_intermediate_api_version(
     mock_labware_core: LabwareCore,
 ) -> None:
     """It should raise an error, on high API versions."""
-    with pytest.raises(APIVersionError):
+    with pytest.raises(UnsupportedAPIError):
         subject.set_offset(1, 2, 3)
 
 
@@ -362,5 +362,5 @@ def test_separate_calibration_raises_on_high_api_version(
     mock_labware_core: LabwareCore,
 ) -> None:
     """It should raise an error, on high API versions."""
-    with pytest.raises(APIVersionError):
+    with pytest.raises(UnsupportedAPIError):
         subject.separate_calibration
