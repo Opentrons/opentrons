@@ -7,7 +7,7 @@ from unittest.mock import patch, MagicMock
 from performance_metrics.system_resource_tracker._system_resource_tracker import (
     SystemResourceTracker,
 )
-from performance_metrics import (
+from performance_metrics.system_resource_tracker._config import (
     SystemResourceTrackerConfiguration,
 )
 
