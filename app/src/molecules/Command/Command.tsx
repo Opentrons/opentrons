@@ -57,7 +57,6 @@ const ICON_SIZE_DESKTOP = SPACING.spacing16
 const CONTAINER_Y_PADDING = SPACING.spacing12
 const SKELETON_HEIGHT = '3.5rem' // spacing32 + spacing12 + spacing12, not otherwise a constant
 const UNIVERSAL_CONTAINER_STYLES = {
-  borderRadius: BORDERS.borderRadius8,
   paddingX: SPACING.spacing24,
   paddingY: CONTAINER_Y_PADDING,
 } as const
@@ -69,8 +68,10 @@ const PROPS_BY_STATE: Record<
   current: {
     container: {
       style: `
+      border-radius: ${SPACING.spacing4};
       padding: ${SPACING.spacing8};
       @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+         border-radius: ${SPACING.spacing8};
          padding: ${SPACING.spacing12} ${SPACING.spacing24};
       }
       `,
@@ -84,9 +85,11 @@ const PROPS_BY_STATE: Record<
   failed: {
     container: {
       style: `
+      border-radius: ${SPACING.spacing4};
       padding: ${SPACING.spacing8};
       background-color: ${COLORS.red20};
       @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+         border-radius: ${SPACING.spacing8};
          padding: ${SPACING.spacing12} ${SPACING.spacing24};
          background-color: ${COLORS.red35};
       }
@@ -101,8 +104,10 @@ const PROPS_BY_STATE: Record<
     container: {
       style: `
       background-color: ${COLORS.grey20};
+      border-radius: ${SPACING.spacing4};
       padding: ${SPACING.spacing8};
       @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+         border-radius: ${SPACING.spacing8};
          background-color: ${COLORS.grey35};
          padding: ${SPACING.spacing12} ${SPACING.spacing24};
       }
