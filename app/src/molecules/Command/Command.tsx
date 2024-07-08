@@ -64,7 +64,7 @@ const UNIVERSAL_CONTAINER_STYLES = {
 
 const PROPS_BY_STATE: Record<
   NonSkeletonCommandState,
-  { container: { props: StyleProps; style: string } }
+  { container: { props: StyleProps; style: string }; icon: { color: string } }
 > = {
   current: {
     container: {
@@ -79,20 +79,23 @@ const PROPS_BY_STATE: Record<
         backgroundColor: COLORS.blue35,
       },
     },
+    icon: { color: COLORS.blue60 },
   },
   failed: {
     container: {
       style: `
       padding: ${SPACING.spacing8};
+      background-color: ${COLORS.red20};
       @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
          padding: ${SPACING.spacing12} ${SPACING.spacing24};
+         background-color: ${COLORS.red35};
       }
       `,
       props: {
         ...UNIVERSAL_CONTAINER_STYLES,
-        backgroundColor: COLORS.red35,
       },
     },
+    icon: { color: COLORS.red60 },
   },
   future: {
     container: {
@@ -108,6 +111,7 @@ const PROPS_BY_STATE: Record<
         ...UNIVERSAL_CONTAINER_STYLES,
       },
     },
+    icon: { color: COLORS.grey60 },
   },
 }
 
@@ -136,7 +140,11 @@ export function CenteredCommand(
           }
         `}
       >
-        <CommandIcon command={props.command} size="100%" />
+        <CommandIcon
+          command={props.command}
+          size="100%"
+          {...PROPS_BY_STATE[props.state].icon}
+        />
       </Flex>
       <Flex
         alignItems={ALIGN_CENTER}
@@ -192,7 +200,11 @@ export function LeftAlignedCommand(
           }
         `}
       >
-        <CommandIcon command={props.command} size="100%" />
+        <CommandIcon
+          command={props.command}
+          size="100%"
+          {...PROPS_BY_STATE[props.state].icon}
+        />
       </Flex>
       <Flex
         alignItems={ALIGN_CENTER}
