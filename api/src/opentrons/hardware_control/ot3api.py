@@ -2601,8 +2601,9 @@ class OT3API(
     ) -> float:
         """Search for and return liquid level height.
 
-        This function begins by moving the mount the distance specified by starting_mount_height in the
-        LiquidProbeSettings. After this, the mount and plunger motors will move simultaneously while
+        This function begins by moving the mount 2 mm upward to protect against a case where the tip starts right at a
+        liquid meniscus.
+        After this, the mount and plunger motors will move simultaneously while
         reading from the pressure sensor.
 
         If the move is completed without the specified threshold being triggered, a

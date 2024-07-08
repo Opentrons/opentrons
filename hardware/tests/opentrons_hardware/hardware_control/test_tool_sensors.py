@@ -209,7 +209,6 @@ async def test_liquid_probe(
 
     message_send_loopback.add_responder(move_responder)
 
-    # problem is with tool_sensors somewhere
     position = await liquid_probe(
         messenger=mock_messenger,
         tool=target_node,

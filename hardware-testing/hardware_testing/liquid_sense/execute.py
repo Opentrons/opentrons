@@ -405,9 +405,9 @@ def _run_trial(
     z_distances = z_distances[: run_args.multi_passes]
     for z_dist in z_distances:
         lps = LiquidProbeSettings(
-            starting_mount_height=start_height,
             mount_speed=run_args.z_speed,
             plunger_speed=plunger_speed,
+            plunger_impulse_time=0.2,
             sensor_threshold_pascals=lqid_cfg["sensor_threshold_pascals"],
             output_option=OutputOptions.sync_buffer_to_csv,
             aspirate_while_sensing=run_args.aspirate,
