@@ -802,7 +802,7 @@ class CommandView(HasState[CommandState]):
         (see `ProtocolEngine.finish()`) for JSON and live HTTP protocols.
 
         This isn't useful for Python protocols, which have to account for the
-        fatal error of the overall coming from anywhere in the Python script,
+        fatal error of the overall run coming from anywhere in the Python script,
         including in between commands.
         """
         failed_command = self.state.failed_command
