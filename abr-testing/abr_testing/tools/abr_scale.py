@@ -12,7 +12,7 @@ import sys
 import json
 
 
-def get_protocol_step_as_int(storage_directory, robot) -> Tuple[int, float, str]:
+def get_protocol_step_as_int(storage_directory: str, robot: str) -> Tuple[int, float, str]:
     """Get user input as integer."""
     expected_liquid_moved = 0.0
     ip = ""
@@ -27,20 +27,22 @@ def get_protocol_step_as_int(storage_directory, robot) -> Tuple[int, float, str]
             print("Protocol step should be an integer value 1, 2, or 3.")
 
     if int(protocol_step) == 3:
-        #setup IP sheet
+        # setup IP sheet
         ip_json_file = os.path.join(storage_directory, "IP_N_VOLUMES.json")
-        #create an dict copying the contents of IP_N_Volumes
+        # create an dict copying the contents of IP_N_Volumes
         try:
             ip_file = json.load(open(ip_json_file))
         except FileNotFoundError:
-            print(f"Please add json file with robot IPs and expected volumes to: {storage_directory}.")
+            print(
+                f"Please add json file with robot IPs and expected volumes to: {storage_directory}."
+            )
             sys.exit()
-        #grab IP and volume from the dict
+        # grab IP and volume from the dict
         tot_info = ip_file["information"]
         robot_info = tot_info[robot]
         IP_add = robot_info["IP"]
         exp_volume = robot_info["volume"]
-        #sets return variables equal to those grabbed from the sheet
+        # sets return variables equal to those grabbed from the sheet
         ip = IP_add
         expected_liquid_moved = float(exp_volume)
 
@@ -178,7 +180,9 @@ if __name__ == "__main__":
     )
     robot = input("Robot: ")
     labware = input("Labware: ")
-    protocol_step, expected_liquid_moved, ip = get_protocol_step_as_int(storage_directory, robot)
+    protocol_step, expected_liquid_moved, ip = get_protocol_step_as_int(
+        storage_directory, robot
+    )
     print(ip)
     print(expected_liquid_moved)
     # Scale Loop
@@ -208,7 +212,7 @@ if __name__ == "__main__":
                 get_most_recent_run_and_record(ip, storage_directory, labware, accuracy)
 
             is_stable = False
-            while True:    
+            while True:
                 y_or_no = input("Do you want to weigh another sample? (Y/N): ")
                 if y_or_no == "Y" or y_or_no == "y":
                     # Uses same storage directory and file.
@@ -216,7 +220,9 @@ if __name__ == "__main__":
                     is_stable = False
                     robot = input("Robot: ")
                     labware = input("Labware: ")
-                    protocol_step, expected_liquid_moved, ip = get_protocol_step_as_int(storage_directory, robot)
+                    protocol_step, expected_liquid_moved, ip = get_protocol_step_as_int(
+                        storage_directory, robot
+                    )
                     grams, is_stable = scale.read_mass()
                     break
                 elif y_or_no == "N" or y_or_no == "n":
