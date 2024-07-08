@@ -323,10 +323,7 @@ def get_plunger_travel(run_args: RunArgs) -> float:
 
 
 def find_max_z_distances(
-    run_args: RunArgs,
-    well: Well,
-    p_speed: float,
-    tip: float
+    run_args: RunArgs, well: Well, p_speed: float, tip: float
 ) -> List[float]:
     """Returns a list of max z distances for each probe.
 
@@ -344,7 +341,7 @@ def find_max_z_distances(
     max_z_distance = (
         well.top().point.z
         - well.bottom().point.z
-        - lld_settings[f"t{run_args.tip}"]["minHeight"]
+        - lld_settings[f"t{int(tip)}"]["minHeight"]
     )
     plunger_travel = get_plunger_travel(run_args)
     if p_speed == 0:
@@ -361,7 +358,11 @@ def find_max_z_distances(
 
 
 def _run_trial(
-    run_args: RunArgs, tip: int, well: Well, trial: int, start_pos: Dict[Axis, float], tip: float,
+    run_args: RunArgs,
+    tip: int,
+    well: Well,
+    trial: int,
+    start_pos: Dict[Axis, float],
 ) -> float:
     hw_api = get_sync_hw_api(run_args.ctx)
     lqid_cfg: Dict[str, int] = LIQUID_PROBE_SETTINGS[run_args.pipette_volume][
@@ -397,6 +398,7 @@ def _run_trial(
     lps = LiquidProbeSettings(
         mount_speed=run_args.z_speed,
         plunger_speed=plunger_speed,
+        plunger_impulse_time=0.2,
         sensor_threshold_pascals=lqid_cfg["sensor_threshold_pascals"],
         output_option=OutputOptions.sync_buffer_to_csv,
         aspirate_while_sensing=run_args.aspirate,
