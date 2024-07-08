@@ -130,7 +130,7 @@ export function QuickTransferDashboard(): JSX.Element {
     <>
       {showDeleteConfirmationModal ? (
         <DeleteTransferConfirmationModal
-          protocolId={targetTransferId}
+          transferId={targetTransferId}
           setShowDeleteConfirmationModal={setShowDeleteConfirmationModal}
         />
       ) : null}

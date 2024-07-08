@@ -44,7 +44,7 @@
   "perDest": "Per destination well",
   "perSource": "Per source well",
   "pin_transfer": "Pin quick transfer",
-  "pinned_transfer": "Pinned transfer",
+  "pinned_transfer": "Pinned quick transfer",
   "pinned_transfers": "Pinned Quick Transfers",
   "pipette": "Pipette",
   "pipette_path": "Pipette path",
@@ -87,7 +87,7 @@
   "trashBin_location": "Trash bin in {{slotName}}",
   "tubeRack": "Tube racks",
   "unpin_transfer": "Unpin quick transfer",
-  "unpinned_transfer": "Unpinned transfer",
+  "unpinned_transfer": "Unpinned quick transfer",
   "volume_per_well": "Volume per well",
   "volume_per_well_µL": "Volume per well (µL)",
   "value_out_of_range": "Value must be between {{min}}-{{max}}",
@@ -100,5 +100,5 @@
   "well_ratio": "Quick transfers with multiple source wells can either be one-to-one (select {{wells}} for this transfer) or consolidate (select 1 destination well).",
   "well": "well",
   "wells": "wells",
-  "will_be_deleted": "will be permanently deleted."
+  "will_be_deleted": " will be permanently deleted."
 }

@@ -56,14 +56,14 @@ export function useCreateProtocolMutation(
     ({
       files: protocolFiles,
       protocolKey,
-      protocolKind,
+      protocolKind = 'standard',
       runTimeParameterValues,
     }) =>
       createProtocol(
         host as HostConfig,
         protocolFiles,
         protocolKey,
-        protocolKind ?? 'standard',
+        protocolKind,
         runTimeParameterValues
       )
         .then(response => {

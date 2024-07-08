@@ -108,8 +108,7 @@ export function QuickTransferCard(props: {
     if (isFailedAnalysis) {
       setShowFailedAnalysisModal(true)
     } else if (!longpress.isLongPressed) {
-      // todo change to transfer url
-      history.push(`/protocols/${transferId}`)
+      history.push(`/quick-transfer/${transferId}`)
     }
   }
 

@@ -35,6 +35,7 @@ import { ProtocolDashboard } from '../pages/ProtocolDashboard'
 import { ProtocolDetails } from '../pages/ProtocolDetails'
 import { QuickTransferFlow } from '../organisms/QuickTransferFlow'
 import { QuickTransferDashboard } from '../pages/QuickTransferDashboard'
+import { QuickTransferDetails } from '../pages/QuickTransferDetails'
 import { RunningProtocol } from '../pages/RunningProtocol'
 import { RunSummary } from '../pages/RunSummary'
 import { UpdateRobot } from '../pages/UpdateRobot/UpdateRobot'
@@ -78,6 +79,7 @@ export const ON_DEVICE_DISPLAY_PATHS = [
   '/protocols/:protocolId',
   '/quick-transfer',
   '/quick-transfer/new',
+  '/quick-transfer/:quickTransferId',
   '/robot-settings',
   '/robot-settings/rename-robot',
   '/robot-settings/update-robot',
@@ -118,6 +120,8 @@ function getPathComponent(
       return <QuickTransferDashboard />
     case '/quick-transfer/new':
       return <QuickTransferFlow />
+    case '/quick-transfer/:quickTransferId':
+      return <QuickTransferDetails />
     case '/robot-settings':
       return <RobotSettingsDashboard />
     case '/robot-settings/rename-robot':

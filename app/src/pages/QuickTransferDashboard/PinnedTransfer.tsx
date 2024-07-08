@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
 import styled, { css } from 'styled-components'
 
@@ -76,13 +75,12 @@ export function PinnedTransfer(props: {
   const longpress = useLongPress()
   const transferName = transfer.metadata.protocolName ?? transfer.files[0].name
 
-  const handleProtocolClick = (
+  const handleTransferClick = (
     longpress: UseLongPressResult,
-    protocolId: string
+    transferId: string
   ): void => {
     if (!longpress.isLongPressed) {
-      // change this to quick transfer url
-      history.push(`/protocols/${protocolId}`)
+      history.push(`/quick-transfer/${transferId}`)
     }
   }
   React.useEffect(() => {
@@ -110,7 +108,7 @@ export function PinnedTransfer(props: {
       maxWidth={cardStyleBySize[cardSize].width}
       minWidth={cardStyleBySize[cardSize].width}
       onClick={() => {
-        handleProtocolClick(longpress, transfer.id)
+        handleTransferClick(longpress, transfer.id)
       }}
       overflowWrap={OVERFLOW_WRAP_ANYWHERE}
       padding={SPACING.spacing24}
