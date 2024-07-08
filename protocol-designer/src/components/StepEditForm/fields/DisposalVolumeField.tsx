@@ -69,7 +69,6 @@ export const DisposalVolumeField = (
 
   const disposalOptions = useSelector(uiLabwareSelectors.getDisposalOptions)
   const pipetteEntities = useSelector(stepFormSelectors.getPipetteEntities)
-  const labwareEntities = useSelector(stepFormSelectors.getLabwareEntities)
   const blowoutLocationOptions = getBlowoutLocationOptionsForForm({
     path,
     stepType,
@@ -83,8 +82,7 @@ export const DisposalVolumeField = (
       volume,
       tipRack,
     },
-    pipetteEntities,
-    labwareEntities
+    pipetteEntities
   )
   const disposalDestinationOptions = [
     ...disposalOptions,

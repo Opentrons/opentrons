@@ -124,7 +124,6 @@ export const PathField = (props: PathFieldProps): JSX.Element => {
   } = props
   const { t } = useTranslation('form')
   const pipetteEntities = useSelector(stepFormSelectors.getPipetteEntities)
-  const labwareEntities = useSelector(stepFormSelectors.getLabwareEntities)
   const disabledPathMap = getDisabledPathMap(
     {
       aspirate_airGap_checkbox,
@@ -137,7 +136,6 @@ export const PathField = (props: PathFieldProps): JSX.Element => {
       tipRack,
     },
     pipetteEntities,
-    labwareEntities,
     t
   )
   return (
