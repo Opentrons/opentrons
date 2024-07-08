@@ -46,10 +46,10 @@ export const getPipetteCapacity = (
       break
     }
   }
-  const tiprackTipVol = getTiprackVolume(chosenTipRack ?? tipRackDefs[0])
+  const tipRackTipVol = getTiprackVolume(chosenTipRack ?? tipRackDefs[0])
 
-  if (maxVolume != null && tiprackTipVol != null) {
-    return Math.min(maxVolume, tiprackTipVol)
+  if (maxVolume != null && tipRackTipVol != null) {
+    return Math.min(maxVolume, tipRackTipVol)
   }
   console.assert(
     false,
