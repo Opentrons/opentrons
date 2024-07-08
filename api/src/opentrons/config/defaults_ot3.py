@@ -331,11 +331,11 @@ def _build_default_liquid_probe(
             from_conf.get("data_files", {}), default.data_files
         )
     return LiquidProbeSettings(
-        starting_mount_height=from_conf.get(
-            "starting_mount_height", default.starting_mount_height
-        ),
         mount_speed=from_conf.get("mount_speed", default.mount_speed),
         plunger_speed=from_conf.get("plunger_speed", default.plunger_speed),
+        plunger_impulse_time=from_conf.get(
+            "plunger_impulse_time", default.plunger_impulse_time
+        ),
         sensor_threshold_pascals=from_conf.get(
             "sensor_threshold_pascals", default.sensor_threshold_pascals
         ),

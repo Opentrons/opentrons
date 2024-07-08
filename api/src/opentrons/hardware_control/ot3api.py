@@ -2635,9 +2635,9 @@ class OT3API(
         pos = await self.gantry_position(checked_mount, refresh=True)
         while (probe_start_pos.z - pos.z) < max_z_dist:
             # safe distance so we don't accidentally aspirate liquid if we're already close to liquid
-            safe_plunger_pos = pos._replace(z=(pos.z - 2))
+            safe_plunger_pos = pos._replace(z=(pos.z + 2))
             # overlap amount we want to use between passes
-            pass_start_pos = pos._replace(z=(pos.z - 0.5))
+            pass_start_pos = pos._replace(z=(pos.z + 0.5))
 
             # Prep the plunger
             await self.move_to(checked_mount, safe_plunger_pos)
@@ -2661,6 +2661,7 @@ class OT3API(
             except PipetteLiquidNotFoundError as lnfe:
                 error = lnfe
             pos = await self.gantry_position(checked_mount, refresh=True)
+            print(f"loop ctl {probe_start_pos.z} {pos.z} {max_z_dist}")
         await self.move_to(checked_mount, probe_start_pos)
         if error is not None:
             # if we never found liquid raise an error
@@ -2673,7 +2674,7 @@ class OT3API(
         rate: float,
         acquire_lock: bool = True,
     ) -> None:
-        instrument = self._pipette_handler.get_pipette(checked_mount)
+        instrument = self._pipette_handler.get_pipette(mount)
         target_pos = target_position_from_plunger(
             OT3Mount.from_mount(mount),
             instrument.plunger_positions.top,
