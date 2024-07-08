@@ -85,12 +85,12 @@ class LiquidProbeImplementation(AbstractCommandImpl[LiquidProbeParams, _ExecuteR
 
         # throw error if pipette has no tip
         # _validate_tip_attached in pipetting.py is a private method so we're using
-        # get_is_ready_to_aspirate as an indirect way to throw the NoTipAttachedError
+        # get_is_ready_to_aspirate as an indirect way to throw the TipNotAttachedError
         self._pipetting.get_is_ready_to_aspirate(pipette_id=pipette_id)
 
-        # throw error if pipette has a working volume volume
+        # throw error if pipette has a working volume == max volume
 
-        # throw error if plunger not homed
+        # throw error if plunger isn't in valid position
         if await self._movement.check_for_valid_position(mount=MountType.LEFT) is False:
             raise PositionUnknownError(
                 message="Current position of pipette is invalid. Please home."

@@ -1,7 +1,8 @@
 """Test LiquidProbe commands."""
 from datetime import datetime
 
-from opentrons_shared_data.errors.exceptions import PipetteLiquidNotFoundError
+from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
+from opentrons_shared_data.errors.exceptions import PipetteLiquidNotFoundError, PositionUnknownError
 from decoy import matchers, Decoy
 import pytest
 
@@ -212,3 +213,72 @@ async def test_liquid_not_found_error(
             position=DeckPoint(x=position.x, y=position.y, z=position.z)
         ),
     )
+    
+async def test_liquid_probe_tip_checking(
+    decoy: Decoy,
+    movement: MovementHandler,
+    pipetting: PipettingHandler,
+    subject: LiquidProbeImplementation,
+    model_utils: ModelUtils,
+) -> None:
+    pipette_id = "pipette-id"
+    labware_id = "labware-id"
+    well_name = "well-name"
+    well_location = WellLocation(
+        origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1)
+    )
+
+    data = LiquidProbeParams(
+        pipetteId=pipette_id,
+        labwareId=labware_id,
+        wellName=well_name,
+        wellLocation=well_location,
+    )
+    decoy.when(
+        await pipetting.get_is_ready_to_aspirate(
+            pipette_id=pipette_id,
+        ),
+    ).then_raise(TipNotAttachedError)
+    try:
+        result = await subject.execute(data)
+        assert False
+    except TipNotAttachedError:
+        assert True
+        
+async def test_liquid_probe_volume_checking(
+    decoy: Decoy,
+    movement: MovementHandler,
+    pipetting: PipettingHandler,
+    subject: LiquidProbeImplementation,
+    model_utils: ModelUtils,
+) -> None:
+    #Once this check is implemented in the original function, this test will be too
+    assert True
+        
+async def test_liquid_probe_location_checking(
+    decoy: Decoy,
+    movement: MovementHandler,
+    pipetting: PipettingHandler,
+    subject: LiquidProbeImplementation,
+    model_utils: ModelUtils,
+) -> None:
+    pipette_id = "pipette-id"
+    labware_id = "labware-id"
+    well_name = "well-name"
+    well_location = WellLocation(
+        origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1)
+    )
+
+    data = LiquidProbeParams(
+        pipetteId=pipette_id,
+        labwareId=labware_id,
+        wellName=well_name,
+        wellLocation=well_location,
+    )
+    decoy.when(
+        await movement.check_for_valid_position(
+            mount=MountType.LEFT,
+        ),
+    ).then_return(False)
+    result = await subject.execute(data)
+    return not result
