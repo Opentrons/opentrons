@@ -99,11 +99,3 @@ class SystemResourceTracker:
             self.refresh_processes()
             self._store.add_all(self.snapshots)
             self._store.store()
-
-    def update_changes_to_config(
-        self, new_config: SystemResourceTrackerConfiguration
-    ) -> None:
-        """Update config."""
-        if new_config != self.config:
-            self.config = new_config
-            logger.info("Config updated: %s", new_config)
