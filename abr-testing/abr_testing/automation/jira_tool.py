@@ -63,6 +63,7 @@ class JiraTicket:
         robot: str,
     ) -> Tuple[str, str]:
         """Create ticket."""
+        # Check if software version is a field on JIRA, if not replaces with existing version
         data = {
             "fields": {
                 "project": {"id": "10273", "key": project_key},
@@ -73,7 +74,6 @@ class JiraTicket:
                 "parent": {"key": robot},
                 "priority": {"name": priority},
                 "components": [{"name": component} for component in components],
-                "versions": [{"name": affects_versions}],
                 "description": {
                     "content": [
                         {
@@ -87,6 +87,12 @@ class JiraTicket:
                 # Include other required fields as needed
             }
         }
+        available_versions = self.get_project_versions(project_key)
+        if affects_versions in available_versions:
+            data["fields"]["versions"] = [{"name": affects_versions}]
+            print(f"Software version {affects_versions} added.")
+        else:
+            print("Software version of robot not in jira releases.")
         try:
             response = requests.post(
                 f"{self.url}/rest/api/3/issue",
@@ -139,6 +145,17 @@ class JiraTicket:
         response.raise_for_status()
         return response.json()
 
+    def get_project_versions(self, project_key: str) -> List[str]:
+        """Get all project software versions."""
+        url = f"{self.url}/rest/api/3/project/{project_key}/versions"
+        headers = {"Accept": "application/json"}
+        version_list = []
+        response = requests.request("GET", url, headers=headers, auth=self.auth)
+        versions = response.json()
+        for version in versions:
+            version_list.append(version["name"])
+        return version_list
+
     def extract_users_from_issues(self, issues: dict) -> Dict[str, Any]:
         """Extract users from issues."""
         users = dict()
@@ -185,7 +202,7 @@ class JiraTicket:
         components_list = response.json()
         return components_list
 
-    def comment(self, comment_str: str, issue_url: str, comment_type: str) -> None:
+    def comment(self, content_list: List[Dict[str, Any]], issue_url: str) -> None:
         """Leave comment on JIRA Ticket."""
         comment_url = issue_url + "/comment"
         payload = json.dumps(
@@ -193,12 +210,7 @@ class JiraTicket:
                 "body": {
                     "type": "doc",
                     "version": 1,
-                    "content": [
-                        {
-                            "type": comment_type,
-                            "content": [{"type": "text", "text": comment_str}],
-                        }
-                    ],
+                    "content": content_list,
                 }
             }
         )

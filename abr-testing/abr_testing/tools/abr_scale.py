@@ -117,7 +117,9 @@ def get_most_recent_run_and_record(
     google_sheet_abr_data.batch_update_cells(runs_and_robots, "A", start_row, "0")
     print("Wrote run to ABR-run-data")
     # Add LPC to google sheet
-    google_sheet_lpc = google_sheets_tool.google_sheet(credentials_path, "ABR-LPC", 0)
+    google_sheet_lpc = google_sheets_tool.google_sheet(
+        credentials_path, "ABR-LPC", tab_number=0
+    )
     start_row_lpc = google_sheet_lpc.get_index_row() + 1
     google_sheet_lpc.batch_update_cells(runs_and_lpc, "A", start_row_lpc, "0")
 
