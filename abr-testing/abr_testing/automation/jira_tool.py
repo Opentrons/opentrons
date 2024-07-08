@@ -5,7 +5,7 @@ from requests.auth import HTTPBasicAuth
 import json
 import webbrowser
 import argparse
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Tuple
 import os
 
 
@@ -61,7 +61,7 @@ class JiraTicket:
         components: list,
         affects_versions: str,
         robot: str,
-    ) -> str:
+    ) -> Tuple[str, str]:
         """Create ticket."""
         data = {
             "fields": {
@@ -98,15 +98,15 @@ class JiraTicket:
             response_str = str(response.content)
             issue_url = response.json().get("self")
             issue_key = response.json().get("key")
-            print(f"issue key {issue_key}")
-            print(f"issue url{issue_url}")
+            print(f"issue key: {issue_key}")
+            print(f"issue url: {issue_url}")
             if issue_key is None:
                 print("Error: Could not create issue. No key returned.")
         except requests.exceptions.HTTPError:
             print(f"HTTP error occurred. Response content: {response_str}")
         except json.JSONDecodeError:
             print(f"JSON decoding error occurred. Response content: {response_str}")
-        return issue_key
+        return issue_key, issue_url
 
     def post_attachment_to_ticket(self, issue_id: str, attachment_path: str) -> None:
         """Adds attachments to ticket."""
@@ -184,6 +184,27 @@ class JiraTicket:
         response = requests.get(component_url, headers=self.headers, auth=self.auth)
         components_list = response.json()
         return components_list
+
+    def comment(self, comment_str: str, issue_url: str, comment_type: str) -> None:
+        """Leave comment on JIRA Ticket."""
+        comment_url = issue_url + "/comment"
+        payload = json.dumps(
+            {
+                "body": {
+                    "type": "doc",
+                    "version": 1,
+                    "content": [
+                        {
+                            "type": comment_type,
+                            "content": [{"type": "text", "text": comment_str}],
+                        }
+                    ],
+                }
+            }
+        )
+        requests.request(
+            "POST", comment_url, data=payload, headers=self.headers, auth=self.auth
+        )
 
 
 if __name__ == "__main__":
