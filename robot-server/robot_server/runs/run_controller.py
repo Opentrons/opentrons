@@ -7,7 +7,7 @@ from opentrons_shared_data.errors.exceptions import RoboticsInteractionError
 
 from robot_server.service.task_runner import TaskRunner
 
-from .engine_store import EngineStore
+from .run_orchestrator_store import RunOrchestratorStore
 from .run_store import RunStore
 from .action_models import RunAction, RunActionType
 
@@ -29,13 +29,13 @@ class RunController:
         self,
         run_id: str,
         task_runner: TaskRunner,
-        engine_store: EngineStore,
+        run_orchestrator_store: RunOrchestratorStore,
         run_store: RunStore,
         runs_publisher: RunsPublisher,
     ) -> None:
         self._run_id = run_id
         self._task_runner = task_runner
-        self._engine_store = engine_store
+        self._run_orchestrator_store = run_orchestrator_store
         self._run_store = run_store
         self._runs_publisher = runs_publisher
 
@@ -60,19 +60,19 @@ class RunController:
             RunActionNotAllowed: The following operation is not allowed
         """
         assert (
-            self._run_id == self._engine_store.current_run_id
+            self._run_id == self._run_orchestrator_store.current_run_id
         ), "Expected RunController to be bound to current run"
 
         action = RunAction(id=action_id, actionType=action_type, createdAt=created_at)
 
         try:
             if action_type == RunActionType.PLAY:
-                if self._engine_store.run_was_started():
+                if self._run_orchestrator_store.run_was_started():
                     log.info(f'Resuming run "{self._run_id}".')
-                    self._engine_store.play()
+                    self._run_orchestrator_store.play()
                 else:
                     log.info(f'Starting run "{self._run_id}".')
-                    # TODO(mc, 2022-05-13): engine_store.runner.run could raise
+                    # TODO(mc, 2022-05-13): run_orchestrator_store.runner.run could raise
                     # the same errors as runner.play, but we are unable to catch them.
                     # This unlikely to occur in production, but should be addressed.
 
@@ -83,14 +83,14 @@ class RunController:
 
             elif action_type == RunActionType.PAUSE:
                 log.info(f'Pausing run "{self._run_id}".')
-                self._engine_store.pause()
+                self._run_orchestrator_store.pause()
 
             elif action_type == RunActionType.STOP:
                 log.info(f'Stopping run "{self._run_id}".')
-                self._task_runner.run(self._engine_store.stop)
+                self._task_runner.run(self._run_orchestrator_store.stop)
 
             elif action_type == RunActionType.RESUME_FROM_RECOVERY:
-                self._engine_store.resume_from_recovery()
+                self._run_orchestrator_store.resume_from_recovery()
 
         except ProtocolEngineError as e:
             raise RunActionNotAllowedError(message=e.message, wrapping=[e]) from e
@@ -103,7 +103,7 @@ class RunController:
     async def _run_protocol_and_insert_result(
         self, deck_configuration: DeckConfigurationType
     ) -> None:
-        result = await self._engine_store.run(
+        result = await self._run_orchestrator_store.run(
             deck_configuration=deck_configuration,
         )
         self._run_store.update_run_state(

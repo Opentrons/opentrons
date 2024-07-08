@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
 import {
@@ -17,8 +16,7 @@ import {
   getRunCurrentModulesInfo,
   getRunCurrentLabwareOnDeck,
   getRunCurrentModulesOnDeck,
-} from '../useRecoveryMapUtils'
-import { LabwareHighlight } from '../../shared'
+} from '../useDeckMapUtils'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
@@ -78,13 +76,11 @@ describe('getRunCurrentModulesOnDeck', () => {
         moduleLocation: { slotName: 'A1' },
         innerProps: {},
         nestedLabwareDef: mockLabwareDef,
-        moduleChildren: (
-          <LabwareHighlight highlight={true} definition={mockLabwareDef} />
-        ),
+        highlight: 'MOCK_MODULE_ID',
       },
     ])
   })
-  it('should set moduleChildren to null if getIsLabwareMatch returns false', () => {
+  it('should set highlight to null if getIsLabwareMatch returns false', () => {
     const result = getRunCurrentModulesOnDeck({
       failedLabwareUtils: mockFailedLabwareUtils,
       currentModulesInfo: [
@@ -95,10 +91,10 @@ describe('getRunCurrentModulesOnDeck', () => {
       ],
     })
 
-    expect(result[0].moduleChildren).toBeNull()
+    expect(result[0].highlight).toBeNull()
   })
 
-  it('should set moduleChildren to null if nestedLabwareDef is null', () => {
+  it('should set highlight to null if nestedLabwareDef is null', () => {
     const result = getRunCurrentModulesOnDeck({
       failedLabwareUtils: mockFailedLabwareUtils,
       currentModulesInfo: [
@@ -106,7 +102,7 @@ describe('getRunCurrentModulesOnDeck', () => {
       ],
     })
 
-    expect(result[0].moduleChildren).toBeNull()
+    expect(result[0].highlight).toBeNull()
   })
 })
 
@@ -139,14 +135,12 @@ describe('getRunCurrentLabwareOnDeck', () => {
       {
         labwareLocation: { slotName: 'A1' },
         definition: mockLabwareDef,
-        labwareChildren: (
-          <LabwareHighlight highlight={true} definition={mockLabwareDef} />
-        ),
+        highlight: 'A1',
       },
     ])
   })
 
-  it('should set labwareChildren to null if getIsLabwareMatch returns false', () => {
+  it('should set highlight to null if getIsLabwareMatch returns false', () => {
     const result = getRunCurrentLabwareOnDeck({
       failedLabwareUtils: {
         ...mockFailedLabwareUtils,
@@ -158,7 +152,7 @@ describe('getRunCurrentLabwareOnDeck', () => {
       currentLabwareInfo: [mockCurrentLabwareInfo],
     })
 
-    expect(result[0].labwareChildren).toBeNull()
+    expect(result[0].highlight).toBeNull()
   })
 })
 

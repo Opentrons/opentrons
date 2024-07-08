@@ -13,7 +13,7 @@ from robot_server.errors.error_responses import ApiError
 from robot_server.service.json_api import RequestModel, SimpleBody
 from robot_server.runs.run_models import Run, LabwareDefinitionSummary
 from robot_server.runs.run_data_manager import RunDataManager
-from robot_server.runs.engine_store import EngineStore
+from robot_server.runs.run_orchestrator_store import RunOrchestratorStore
 from robot_server.runs.router.labware_router import (
     add_labware_offset,
     add_labware_definition,
@@ -51,7 +51,7 @@ def labware_definition(minimal_labware_def: LabwareDefDict) -> LabwareDefinition
 
 async def test_add_labware_offset(
     decoy: Decoy,
-    mock_engine_store: EngineStore,
+    mock_run_orchestrator_store: RunOrchestratorStore,
     run: Run,
 ) -> None:
     """It should add the labware offset to the engine, assuming the run is current."""
@@ -70,12 +70,12 @@ async def test_add_labware_offset(
     )
 
     decoy.when(
-        mock_engine_store.add_labware_offset(labware_offset_request)
+        mock_run_orchestrator_store.add_labware_offset(labware_offset_request)
     ).then_return(labware_offset)
 
     result = await add_labware_offset(
         request_body=RequestModel(data=labware_offset_request),
-        engine_store=mock_engine_store,
+        run_orchestrator_store=mock_run_orchestrator_store,
         run=run,
     )
 
@@ -85,7 +85,7 @@ async def test_add_labware_offset(
 
 async def test_add_labware_offset_not_current(
     decoy: Decoy,
-    mock_engine_store: EngineStore,
+    mock_run_orchestrator_store: RunOrchestratorStore,
     run: Run,
 ) -> None:
     """It should 409 if the run is not current."""
@@ -100,7 +100,7 @@ async def test_add_labware_offset_not_current(
     with pytest.raises(ApiError) as exc_info:
         await add_labware_offset(
             request_body=RequestModel(data=labware_offset_request),
-            engine_store=mock_engine_store,
+            run_orchestrator_store=mock_run_orchestrator_store,
             run=not_current_run,
         )
 
@@ -110,7 +110,7 @@ async def test_add_labware_offset_not_current(
 
 async def test_add_labware_definition(
     decoy: Decoy,
-    mock_engine_store: EngineStore,
+    mock_run_orchestrator_store: RunOrchestratorStore,
     run: Run,
     labware_definition: LabwareDefinition,
 ) -> None:
@@ -118,11 +118,11 @@ async def test_add_labware_definition(
     uri = pe_types.LabwareUri("some/definition/uri")
 
     decoy.when(
-        mock_engine_store.add_labware_definition(labware_definition)
+        mock_run_orchestrator_store.add_labware_definition(labware_definition)
     ).then_return(uri)
 
     result = await add_labware_definition(
-        engine_store=mock_engine_store,
+        run_orchestrator_store=mock_run_orchestrator_store,
         run=run,
         request_body=RequestModel(data=labware_definition),
     )
@@ -133,7 +133,7 @@ async def test_add_labware_definition(
 
 async def test_add_labware_definition_not_current(
     decoy: Decoy,
-    mock_engine_store: EngineStore,
+    mock_run_orchestrator_store: RunOrchestratorStore,
     run: Run,
     labware_definition: LabwareDefinition,
 ) -> None:
@@ -142,7 +142,7 @@ async def test_add_labware_definition_not_current(
 
     with pytest.raises(ApiError) as exc_info:
         await add_labware_definition(
-            engine_store=mock_engine_store,
+            run_orchestrator_store=mock_run_orchestrator_store,
             run=not_current_run,
             request_body=RequestModel(data=labware_definition),
         )

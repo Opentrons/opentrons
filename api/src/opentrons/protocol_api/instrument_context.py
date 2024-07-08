@@ -1,13 +1,14 @@
 from __future__ import annotations
-
 import logging
 from contextlib import ExitStack
 from typing import Any, List, Optional, Sequence, Union, cast, Dict
 from opentrons_shared_data.errors.exceptions import (
     CommandPreconditionViolated,
     CommandParameterLimitViolated,
+    PipetteLiquidNotFoundError,
     UnexpectedTipRemovalError,
 )
+from opentrons.protocol_engine.errors.exceptions import WellDoesNotExistError
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons import types
@@ -2046,3 +2047,48 @@ class InstrumentContext(publisher.CommandPublisher):
         )
         # TODO (spp, 2023-12-05): verify that tipracks are on adapters for only full 96 channel config
         self._tip_racks = tip_racks or []
+
+    @requires_version(2, 20)
+    def detect_liquid_presence(self, well: labware.Well) -> bool:
+        """Check if there is liquid in a well.
+
+        :returns: A boolean.
+        """
+        if not isinstance(well, labware.Well):
+            raise WellDoesNotExistError("You must provide a valid well to check.")
+        try:
+            height = self._core.find_liquid_level(
+                well_core=well._core, error_recovery=False
+            )
+            if height > 0:
+                return True
+            return False  # it should never get here
+        except PipetteLiquidNotFoundError:
+            return False
+        except Exception as e:
+            raise e
+
+    @requires_version(2, 20)
+    def require_liquid_presence(self, well: labware.Well) -> None:
+        """If there is no liquid in a well, raise an error.
+
+        :returns: None.
+        """
+        if not isinstance(well, labware.Well):
+            raise WellDoesNotExistError("You must provide a valid well to check.")
+
+        self._core.find_liquid_level(well_core=well._core, error_recovery=True)
+
+    @requires_version(2, 20)
+    def measure_liquid_height(self, well: labware.Well) -> float:
+        """Check the height of the liquid within a well.
+
+        :returns: The height, in mm, of the liquid from the deck.
+        """
+        if not isinstance(well, labware.Well):
+            raise WellDoesNotExistError("You must provide a valid well to check.")
+
+        height = self._core.find_liquid_level(
+            well_core=well._core, error_recovery=False
+        )
+        return float(height)

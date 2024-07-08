@@ -28,10 +28,10 @@ import { useOffsetCandidatesForAnalysis } from '../ApplyHistoricOffsets/hooks/us
 import { ChooseRobotSlideout } from '../ChooseRobotSlideout'
 import { useCreateRunFromProtocol } from './useCreateRunFromProtocol'
 import type { StyleProps } from '@opentrons/components'
+import type { RunTimeParameter } from '@opentrons/shared-data'
 import type { State } from '../../redux/types'
 import type { Robot } from '../../redux/discovery/types'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
-import type { RunTimeParameter } from '@opentrons/shared-data'
 
 const _getFileBaseName = (filePath: string): string => {
   return filePath.split('/').reverse()[0]

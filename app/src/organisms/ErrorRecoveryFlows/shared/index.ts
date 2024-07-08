@@ -6,7 +6,6 @@ export {
 export { ReplaceTips } from './ReplaceTips'
 export { SelectTips } from './SelectTips'
 export { TwoColTextAndFailedStepNextStep } from './TwoColTextAndFailedStepNextStep'
-export { RecoveryMap, LabwareHighlight } from './RecoveryMap'
 export { LeftColumnLabwareInfo } from './LeftColumnLabwareInfo'
 export { TipSelection } from './TipSelection'
 export { TipSelectionModal } from './TipSelectionModal'

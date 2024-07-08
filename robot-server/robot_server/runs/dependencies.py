@@ -27,7 +27,7 @@ from robot_server.service.notifications import (
 )
 
 from .run_auto_deleter import RunAutoDeleter
-from .engine_store import EngineStore, NoRunOrchestrator
+from .run_orchestrator_store import RunOrchestratorStore, NoRunOrchestrator
 from .run_store import RunStore
 from .run_data_manager import RunDataManager
 from robot_server.errors.robot_errors import (
@@ -36,7 +36,9 @@ from robot_server.errors.robot_errors import (
 from .light_control_task import LightController, run_light_task
 
 _run_store_accessor = AppStateAccessor[RunStore]("run_store")
-_engine_store_accessor = AppStateAccessor[EngineStore]("engine_store")
+_run_orchestrator_store_accessor = AppStateAccessor[RunOrchestratorStore](
+    "run_orchestrator_store"
+)
 _light_control_accessor = AppStateAccessor[LightController]("light_controller")
 
 
@@ -67,7 +69,9 @@ async def start_light_control_task(
     light_controller = _light_control_accessor.get_from(app_state)
 
     if light_controller is None:
-        light_controller = LightController(api=hardware_api, engine_store=None)
+        light_controller = LightController(
+            api=hardware_api, run_orchestrator_store=None
+        )
         get_task_runner(app_state=app_state).run(
             run_light_task, driver=light_controller
         )
@@ -104,33 +108,35 @@ async def get_light_controller(
     return controller
 
 
-async def get_engine_store(
+async def get_run_orchestrator_store(
     app_state: AppState = Depends(get_app_state),
     hardware_api: HardwareControlAPI = Depends(get_hardware),
     robot_type: RobotType = Depends(get_robot_type),
     deck_type: DeckType = Depends(get_deck_type),
     light_controller: LightController = Depends(get_light_controller),
-) -> EngineStore:
+) -> RunOrchestratorStore:
     """Get a singleton EngineStore to keep track of created engines / runners."""
-    engine_store = _engine_store_accessor.get_from(app_state)
+    run_orchestrator_store = _run_orchestrator_store_accessor.get_from(app_state)
 
-    if engine_store is None:
-        engine_store = EngineStore(
+    if run_orchestrator_store is None:
+        run_orchestrator_store = RunOrchestratorStore(
             hardware_api=hardware_api, robot_type=robot_type, deck_type=deck_type
         )
-        _engine_store_accessor.set_on(app_state, engine_store)
+        _run_orchestrator_store_accessor.set_on(app_state, run_orchestrator_store)
         # Provide the engine store to the light controller
-        light_controller.update_engine_store(engine_store=engine_store)
+        light_controller.update_run_orchestrator_store(
+            run_orchestrator_store=run_orchestrator_store
+        )
 
-    return engine_store
+    return run_orchestrator_store
 
 
 async def get_is_okay_to_create_maintenance_run(
-    engine_store: EngineStore = Depends(get_engine_store),
+    run_orchestrator_store: RunOrchestratorStore = Depends(get_run_orchestrator_store),
 ) -> bool:
     """Whether a maintenance run can be created if a protocol run already exists."""
     try:
-        orchestrator = engine_store.run_orchestrator
+        orchestrator = run_orchestrator_store.run_orchestrator
     except NoRunOrchestrator:
         return True
     return not orchestrator.run_has_started() or orchestrator.get_is_run_terminal()
@@ -138,14 +144,14 @@ async def get_is_okay_to_create_maintenance_run(
 
 async def get_run_data_manager(
     task_runner: TaskRunner = Depends(get_task_runner),
-    engine_store: EngineStore = Depends(get_engine_store),
+    run_orchestrator_store: RunOrchestratorStore = Depends(get_run_orchestrator_store),
     run_store: RunStore = Depends(get_run_store),
     runs_publisher: RunsPublisher = Depends(get_runs_publisher),
 ) -> RunDataManager:
     """Get a run data manager to keep track of current/historical run data."""
     return RunDataManager(
         task_runner=task_runner,
-        engine_store=engine_store,
+        run_orchestrator_store=run_orchestrator_store,
         run_store=run_store,
         runs_publisher=runs_publisher,
     )

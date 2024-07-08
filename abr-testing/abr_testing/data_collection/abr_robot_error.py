@@ -12,6 +12,30 @@ import json
 import re
 
 
+def read_each_log(folder_path: str, issue_url: str) -> None:
+    """Read log and comment error portion on JIRA ticket."""
+    for file_name in os.listdir(folder_path):
+        file_path = os.path.join(folder_path, file_name)
+        print(file_path)
+        if file_path.endswith(".log"):
+            with open(file_path) as file:
+                lines = file.readlines()
+            word = "error"
+            error_lines = ""
+            for line_index, line in enumerate(lines):
+                if word in line:
+                    lines_before = max(0, line_index - 20)
+                    lines_after = min(len(lines), line_index + 20)
+                    print("Line Number:", line_index + 1)
+                    error_lines = "".join(lines[lines_before:lines_after])
+                    message = f"Error found in {file_path}"
+                    ticket.comment(error_lines, issue_url, "codeBlock")
+                    break
+            if len(error_lines) < 1:
+                message = f"No error found in {file_name}"
+                ticket.comment(message, issue_url, "paragraph")
+
+
 def match_error_to_component(
     project_id: str, error_message: str, components: List[str]
 ) -> List[str]:
@@ -252,6 +276,7 @@ if __name__ == "__main__":
         ip, storage_directory
     )
     file_paths = read_robot_logs.get_logs(storage_directory, ip)
+
     print(f"Making ticket for {summary}.")
     # TODO: make argument or see if I can get rid of with using board_id.
     project_key = "RABR"
@@ -259,7 +284,7 @@ if __name__ == "__main__":
     parent_key = project_key + "-" + robot.split("ABR")[1]
     # TODO: read board to see if ticket for run id already exists.
     # CREATE TICKET
-    issue_key = ticket.create_ticket(
+    issue_key, raw_issue_url = ticket.create_ticket(
         summary,
         whole_description_str,
         project_key,
@@ -288,7 +313,8 @@ if __name__ == "__main__":
             continue
     # OPEN FOLDER DIRECTORY
     subprocess.Popen(["explorer", error_folder_path])
-
+    # ADD ERROR COMMENTS TO TICKET
+    read_each_log(error_folder_path, raw_issue_url)
     # WRITE ERRORED RUN TO GOOGLE SHEET
     if len(run_or_other) < 1:
         # CONNECT TO GOOGLE DRIVE
