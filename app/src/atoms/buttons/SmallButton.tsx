@@ -146,7 +146,7 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
   return (
     <Btn
       css={SMALL_BUTTON_STYLE}
-      disabled={disabled}
+      disabled={ariaDisabled ? false : disabled}
       padding={
         iconPlacement != null
           ? SPACING.spacing16

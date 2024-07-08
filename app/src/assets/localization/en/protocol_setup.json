@@ -214,6 +214,7 @@
   "proceed_to_run": "Proceed to run",
   "protocol_analysis_failed": "Protocol analysis failed",
   "protocol_can_be_closed": "This protocol can now be closed.",
+  "protocol_requires_csv": "This protocol requires a CSV file. Tap the CSV row below to select one.",
   "protocol_run_canceled": "Protocol run canceled.",
   "protocol_run_complete": "Protocol run complete.",
   "protocol_run_failed": "Protocol run failed.",

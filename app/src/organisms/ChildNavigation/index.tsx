@@ -95,7 +95,7 @@ export function ChildNavigation({
             buttonType={buttonType}
             buttonCategory={buttonType === 'primary' ? 'rounded' : 'default'}
             buttonText={buttonText}
-            onClick={ariaDisabled ? () => {} : onClickButton}
+            onClick={onClickButton}
             iconName={iconName}
             iconPlacement={iconPlacement}
             disabled={buttonIsDisabled}
