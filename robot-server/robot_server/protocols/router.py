@@ -212,7 +212,7 @@ async def create_protocol(  # noqa: C901
         default=None,
         description=(
             "Whether this is a `standard` protocol or a `quick-transfer` protocol."
-            "if ommited, the protocol will be `standard` by default."
+            "if omitted, the protocol will be `standard` by default."
         ),
         alias="protocolKind",
     ),
@@ -429,12 +429,7 @@ async def _start_new_analysis_if_necessary(
     summary="Get uploaded protocols",
     description="""
     Return all stored protocols by default, in order from first-uploaded to last-uploaded.
-    You can provide the kind of protocol with the `protocol_kind` query arg
-        The protocol kind can be:
-
-        - `quick-transfer` for Quick Transfer protocols
-        - `standard`       for non Quick transfer protocols
-        Note: all protocols will be provided if the `protocol_kind` query arg is ommited.
+    You can provide the kind of protocol with the `protocolKind` query arg
     """,
     responses={status.HTTP_200_OK: {"model": SimpleMultiBody[Protocol]}},
 )
@@ -446,6 +441,7 @@ async def get_protocols(
             " protocol kind can be `quick-transfer` or `standard` "
             " If this is omitted or `null`, all protocols will be returned."
         ),
+        alias="protocolKind",
     ),
     protocol_store: ProtocolStore = Depends(get_protocol_store),
     analysis_store: AnalysisStore = Depends(get_analysis_store),
