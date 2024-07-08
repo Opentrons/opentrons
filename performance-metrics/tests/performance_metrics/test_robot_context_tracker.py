@@ -273,7 +273,7 @@ def test_sync_exception_handling_when_not_tracking(tmp_path: Path) -> None:
 
 
 @patch(
-    "performance_metrics.util.get_timing_function",
+    "performance_metrics._util.get_timing_function",
     return_value=time_ns,
 )
 def test_using_non_linux_time_functions(tmp_path: Path) -> None:

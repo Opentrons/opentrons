@@ -2,7 +2,7 @@
 
 import typing
 import pytest
-from performance_metrics.util import format_command
+from performance_metrics._util import format_command
 
 
 @pytest.mark.parametrize(

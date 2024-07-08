@@ -7,10 +7,10 @@ from functools import wraps
 from time import perf_counter_ns
 import typing
 
-from .metrics_store import MetricsStore
-from .data_shapes import RawContextData, MetricsMetadata
+from ._metrics_store import MetricsStore
+from ._data_shapes import RawContextData, MetricsMetadata
 from ._types import SupportsTracking, RobotContextState
-from .util import get_timing_function
+from ._util import get_timing_function
 
 _UnderlyingFunctionParameters = typing.ParamSpec("_UnderlyingFunctionParameters")
 _UnderlyingFunctionReturn = typing.TypeVar("_UnderlyingFunctionReturn")

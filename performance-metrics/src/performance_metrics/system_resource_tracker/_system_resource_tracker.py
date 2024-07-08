@@ -6,16 +6,16 @@ import psutil
 import fnmatch
 
 from pathlib import Path
-from ..util import format_command, get_timing_function
-from ..data_shapes import ProcessResourceUsageSnapshot, MetricsMetadata
-from ..metrics_store import MetricsStore
+from .._util import format_command, get_timing_function
+from .._data_shapes import ProcessResourceUsageSnapshot, MetricsMetadata
+from .._metrics_store import MetricsStore
 
 _timing_function = get_timing_function()
 
 logger = logging.getLogger(__name__)
 
 
-class _SystemResourceTracker:
+class SystemResourceTracker:
     """Tracks system resource usage."""
 
     def __init__(

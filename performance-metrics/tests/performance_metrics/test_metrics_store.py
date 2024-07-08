@@ -4,7 +4,7 @@ from pathlib import Path
 from time import sleep
 
 from performance_metrics._robot_context_tracker import RobotContextTracker
-from performance_metrics.data_shapes import RawContextData
+from performance_metrics._data_shapes import RawContextData
 
 # Corrected times in seconds
 STARTING_TIME = 0.001

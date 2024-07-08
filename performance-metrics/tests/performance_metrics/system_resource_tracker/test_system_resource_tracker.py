@@ -5,7 +5,7 @@ import psutil
 from pathlib import Path
 from unittest.mock import patch, MagicMock
 from performance_metrics.system_resource_tracker._system_resource_tracker import (
-    _SystemResourceTracker,
+    SystemResourceTracker,
 )
 
 
@@ -34,7 +34,7 @@ def mock_process_iter(
 @patch("psutil.process_iter", mock_process_iter)
 def test_process_filtering(tmp_path: Path) -> None:
     """Test process filtering."""
-    tracker = _SystemResourceTracker(
+    tracker = SystemResourceTracker(
         refresh_interval=1,
         should_track=True,
         process_filters=("*my_script.py", "*another_script*"),

@@ -5,7 +5,7 @@ import typing
 from pathlib import Path
 
 from ._types import SupportsCSVStorage, StorableData, RobotContextState
-from .util import get_timing_function
+from ._util import get_timing_function
 
 _timing_function = get_timing_function()
 

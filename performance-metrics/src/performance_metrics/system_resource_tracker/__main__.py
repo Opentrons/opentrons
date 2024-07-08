@@ -4,7 +4,7 @@ import logging
 import time
 from pathlib import Path
 from ._logging_config import log_init
-from ._system_resource_tracker import _SystemResourceTracker
+from ._system_resource_tracker import SystemResourceTracker
 
 log_init()
 logger = logging.getLogger(__name__)
@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 if __name__ == "__main__":
     logger.info("Starting system resource tracker...")
-    tracker = _SystemResourceTracker(
+    tracker = SystemResourceTracker(
         storage_dir=Path("/data/performance_metrics_data"),
         process_filters=("/opt/opentrons*", "python3*"),
         should_track=True,
