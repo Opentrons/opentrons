@@ -16,24 +16,57 @@ def read_each_log(folder_path: str, issue_url: str) -> None:
     """Read log and comment error portion on JIRA ticket."""
     for file_name in os.listdir(folder_path):
         file_path = os.path.join(folder_path, file_name)
+        not_found_words = []
         print(file_path)
         if file_path.endswith(".log"):
             with open(file_path) as file:
                 lines = file.readlines()
-            word = "error"
+            words = [
+                "error",
+                "traceback",
+                "error frame encountered",
+                "did not receive",
+                "collision_detected",
+                "fail",
+                "warning",
+                "failure",
+                "homingfail",
+                "timed out",
+                "exception",
+            ]
             error_lines = ""
-            for line_index, line in enumerate(lines):
-                if word in line:
-                    lines_before = max(0, line_index - 20)
-                    lines_after = min(len(lines), line_index + 20)
-                    print("Line Number:", line_index + 1)
-                    error_lines = "".join(lines[lines_before:lines_after])
-                    message = f"Error found in {file_path}"
-                    ticket.comment(error_lines, issue_url, "codeBlock")
-                    break
-            if len(error_lines) < 1:
-                message = f"No error found in {file_name}"
-                ticket.comment(message, issue_url, "paragraph")
+            for word in words:
+                content_list = []
+                for line_index, line in enumerate(lines):
+                    if word in line.lower():
+                        lines_before = max(0, line_index - 10)
+                        lines_after = min(len(lines), line_index + 10)
+                        error_lines = "".join(lines[lines_before:lines_after])
+                        code_lines = {
+                            "type": "codeBlock",
+                            "content": [{"type": "text", "text": error_lines}],
+                        }
+                        content_list.append(code_lines)
+                num_times = len(content_list)
+                if num_times == 0:
+                    not_found_words.append(word)
+                else:
+                    message = f"Key word '{word.upper()}' found in {file_name} {num_times} TIMES."
+                    line_1 = {
+                        "type": "paragraph",
+                        "content": [{"type": "text", "text": message}],
+                    }
+                    content_list.insert(0, line_1)
+                    ticket.comment(content_list, issue_url)
+            no_word_found_message = (
+                f"Key words '{not_found_words} were not found in {file_name}."
+            )
+            no_word_found_dict = {
+                "type": "paragraph",
+                "content": [{"type": "text", "text": no_word_found_message}],
+            }
+            content_list.append(no_word_found_dict)
+            ticket.comment(content_list, issue_url)
 
 
 def match_error_to_component(
@@ -282,6 +315,7 @@ if __name__ == "__main__":
     project_key = "RABR"
     print(robot)
     parent_key = project_key + "-" + robot.split("ABR")[1]
+
     # TODO: read board to see if ticket for run id already exists.
     # CREATE TICKET
     issue_key, raw_issue_url = ticket.create_ticket(
