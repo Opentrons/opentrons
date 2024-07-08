@@ -374,8 +374,8 @@ class JsonRunner(AbstractRunner):
 
     async def _add_command_and_execute(self) -> None:
         for command_request in self._queued_commands:
-            # todo(mm, 2024-07-05): This logic to handle the various execution results
-            # mirrors PAPI's ChildThreadTransport. Simplify or deduplicate it.
+            # todo(mm, 2024-07-05): This logic to handle the various command execution
+            # outcomes mirrors PAPI's ChildThreadTransport. Simplify or deduplicate it.
             executed_command = (
                 await self._protocol_engine.add_and_execute_command_wait_for_recovery(
                     command_request
@@ -394,10 +394,10 @@ class JsonRunner(AbstractRunner):
                         message=f"{executed_command.error.errorType}: {executed_command.error.detail}",
                     )
             elif executed_command.status == CommandStatus.QUEUED:
-                raise RuntimeError(
-                    "Run stopped before command could start"
-                )  # FIX BEFORE MERGE
-                # Does this even need to raise anything or should we just break the loop?
+                # This can happen if another task stops the ProtocolEngine before
+                # the ProtocolEngine gets around to executing this command.
+                # See docs on add_and_execute_command_wait_for_recovery().
+                break
 
 
 class LiveRunner(AbstractRunner):
