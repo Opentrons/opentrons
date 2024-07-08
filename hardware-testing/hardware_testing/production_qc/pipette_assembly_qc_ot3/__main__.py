@@ -1185,10 +1185,10 @@ async def _test_diagnostics_pressure(
     
     if "p50" in pipptype[OT3Mount.LEFT]['name']:
         CHTYPE_PIPPETE = 50
-        # if "single" in pipptype[OT3Mount.LEFT]['name']:
-        #     movez = -155.5   
-        #     current_val = PRESSURE_THRESH_current[pip_channels][CHTYPE_PIPPETE][1]
-        if "multi" in pipptype[OT3Mount.LEFT]['name']:
+        if "single" in pipptype[OT3Mount.LEFT]['name']:
+            movez = -155.5   
+            current_val = PRESSURE_THRESH_current[pip_channels][CHTYPE_PIPPETE][1]
+        elif "multi" in pipptype[OT3Mount.LEFT]['name']:
             movez = -154.8
             current_val = PRESSURE_THRESH_current[pip_channels][CHTYPE_PIPPETE][2]
             print("current_val",current_val)
@@ -1198,9 +1198,9 @@ async def _test_diagnostics_pressure(
         CHTYPE_PIPPETE = 1000
         movez = -117
 
-        # if "single" in pipptype[OT3Mount.LEFT]['name']:  
-        #     current_val = PRESSURE_THRESH_current[pip_channels][CHTYPE_PIPPETE][1]
-        if "multi" in pipptype[OT3Mount.LEFT]['name']:
+        if "single" in pipptype[OT3Mount.LEFT]['name']:  
+            current_val = PRESSURE_THRESH_current[pip_channels][CHTYPE_PIPPETE][1]
+        elif "multi" in pipptype[OT3Mount.LEFT]['name']:
             current_val = PRESSURE_THRESH_current[pip_channels][CHTYPE_PIPPETE][2]
             print("current_val",current_val)
             await helpers_ot3.update_pick_up_current(api,mount,current_val)
