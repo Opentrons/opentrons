@@ -130,7 +130,6 @@ export function volumeInCapacityForMultiDispense(args: {
   airGapVolume: number
 }): boolean {
   const { volume, pipetteCapacity, airGapVolume } = args
-  console.log('pipetteCapacity', pipetteCapacity, volume)
 
   return (
     volume > 0 &&
