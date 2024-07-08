@@ -127,9 +127,11 @@ export function CenteredCommand(
         justifyContent={JUSTIFY_CENTER}
         css={`
           margin-right: ${SPACING.spacing12};
-          height: ${ICON_SIZE_DESKTOP};
+          max-height: ${ICON_SIZE_DESKTOP};
+          max-width: ${ICON_SIZE_DESKTOP};
           @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-            height: ${ICON_SIZE_ODD};
+            max-height: ${ICON_SIZE_ODD};
+            max-width: ${ICON_SIZE_ODD};
           }
         `}
       >
@@ -179,9 +181,11 @@ export function LeftAlignedCommand(
         justifyContent={JUSTIFY_CENTER}
         css={`
           margin-right: ${SPACING.spacing12};
-          height: ${ICON_SIZE_DESKTOP};
+          max-height: ${ICON_SIZE_DESKTOP};
+          max-width: ${ICON_SIZE_DESKTOP};
           @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-            height: ${ICON_SIZE_ODD};
+            max-height: ${ICON_SIZE_ODD};
+            max-width: ${ICON_SIZE_ODD};
           }
         `}
       >
