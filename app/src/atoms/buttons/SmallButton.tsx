@@ -34,7 +34,8 @@ interface SmallButtonProps extends StyleProps {
   iconName?: IconName | null
   buttonCategory?: ButtonCategory // if not specified, it will be 'default'
   disabled?: boolean
-  ariaDisabled: boolean
+  /** aria-disabled for displaying snack bar */
+  ariaDisabled?: boolean
 }
 
 export function SmallButton(props: SmallButtonProps): JSX.Element {
