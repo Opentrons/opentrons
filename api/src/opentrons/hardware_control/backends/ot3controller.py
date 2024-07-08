@@ -1354,7 +1354,7 @@ class OT3Controller(FlexBackend):
     async def liquid_probe(
         self,
         mount: OT3Mount,
-        max_z_distance: float,
+        max_p_distance: float,
         mount_speed: float,
         plunger_speed: float,
         threshold_pascals: float,
@@ -1395,7 +1395,7 @@ class OT3Controller(FlexBackend):
             messenger=self._messenger,
             tool=tool,
             head_node=head_node,
-            max_z_distance=max_z_distance,
+            max_p_distance=max_p_distance,
             plunger_speed=plunger_speed,
             mount_speed=mount_speed,
             threshold_pascals=threshold_pascals,
