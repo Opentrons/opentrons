@@ -6,9 +6,13 @@ import {
   orderRuntimeParameterRangeOptions,
 } from '@opentrons/shared-data'
 import { BORDERS, COLORS } from '../../helix-design-system'
-import { SPACING, TYPOGRAPHY } from '../../ui-style-constants/index'
+import {
+  SPACING,
+  TYPOGRAPHY as LEGACY_TYPOGERAPHY,
+} from '../../ui-style-constants/index'
+import { TYPOGRAPHY } from '../../helix-design-system/product'
 import { Chip } from '../../atoms/Chip'
-import { LegacyStyledText } from '../../atoms/StyledText'
+import { StyledText } from '../../atoms/StyledText'
 import { Tooltip, useHoverTooltip } from '../../tooltips'
 import { Icon } from '../../icons'
 import { Flex } from '../../primitives'
@@ -89,17 +93,17 @@ export function ParametersTable({
                       width={FLEX_MAX_CONTENT}
                     />
                   ) : (
-                    <LegacyStyledText as="p">
+                    <StyledText desktopStyle="bodyDefaultRegular">
                       {formatRunTimeParameterDefaultValue(parameter, t)}
-                    </LegacyStyledText>
+                    </StyledText>
                   )}
                 </StyledTableCell>
                 <StyledTableCell isLast={isLast} paddingRight="0">
-                  <LegacyStyledText as="p">
+                  <StyledText desktopStyle="bodyDefaultRegular">
                     {parameter.type === 'csv_file'
                       ? t('n_a')
                       : formatRange(parameter)}
-                  </LegacyStyledText>
+                  </StyledText>
                 </StyledTableCell>
               </StyledTableRow>
             )
@@ -122,29 +126,30 @@ const ParameterName = (props: ParameterNameProps): JSX.Element => {
 
   return (
     <StyledTableCell display="span" isLast={isLast}>
-      <LegacyStyledText
-        as="p"
+      <StyledText
+        desktopStyle="bodyDefaultRegular"
         css={css`
           display: ${DISPLAY_INLINE};
           padding-right: ${SPACING.spacing8};
         `}
       >
         {displayName}
-      </LegacyStyledText>
+      </StyledText>
       {description != null ? (
         <>
           <Flex display={DISPLAY_INLINE} {...targetProps}>
             <Icon
               name="information"
-              size={SPACING.spacing12}
+              size="1rem"
               color={COLORS.grey60}
               data-testid={`Icon_${index}`}
+              paddingTop={SPACING.spacing4}
             />
           </Flex>
           <Tooltip
             {...tooltipProps}
             backgroundColor={COLORS.black90}
-            css={TYPOGRAPHY.labelRegular}
+            css={LEGACY_TYPOGERAPHY.labelRegular}
             width="8.75rem"
           >
             {description}
@@ -162,7 +167,8 @@ const StyledTable = styled.table`
 `
 
 const StyledTableHeader = styled.th`
-  ${TYPOGRAPHY.labelSemiBold}
+  font: ${TYPOGRAPHY.fontStyleBodyDefaultRegular};
+  color: ${COLORS.grey60};
   grid-gap: ${SPACING.spacing16};
   padding-bottom: ${SPACING.spacing8};
   border-bottom: ${BORDERS.lineBorder};

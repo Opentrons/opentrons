@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 from abr_testing.data_collection import read_robot_logs
 from typing import Set, Dict, Any, Tuple, List, Union
 from abr_testing.automation import google_drive_tool, google_sheets_tool
+from abr_testing.tools import sync_abr_sheet
 
 
 def get_modules(file_results: Dict[str, str]) -> Dict[str, Any]:
@@ -184,10 +185,10 @@ if __name__ == "__main__":
     google_sheet = google_sheets_tool.google_sheet(
         credentials_path, google_sheet_name, 0
     )
-
-    run_ids_on_gs = google_sheet.get_column(2)
-    run_ids_on_gs = set(run_ids_on_gs)
-
+    # Get run ids on google sheet
+    run_ids_on_gs = set(google_sheet.get_column(2))
+    # Get robots on google sheet
+    robots = list(set(google_sheet.get_column(1)))
     # Uploads files that are not in google drive directory
     google_drive.upload_missing_files(storage_directory)
 
@@ -203,10 +204,10 @@ if __name__ == "__main__":
         transposed_runs_and_lpc,
         headers_lpc,
     ) = create_data_dictionary(missing_runs_from_gs, storage_directory, "", "", "")
-
     start_row = google_sheet.get_index_row() + 1
     print(start_row)
     google_sheet.batch_update_cells(transposed_runs_and_robots, "A", start_row, "0")
+    # Calculate Robot Lifetimes
 
     # Add LPC to google sheet
     google_sheet_lpc = google_sheets_tool.google_sheet(credentials_path, "ABR-LPC", 0)
@@ -214,3 +215,5 @@ if __name__ == "__main__":
     google_sheet_lpc.batch_update_cells(
         transposed_runs_and_lpc, "A", start_row_lpc, "0"
     )
+    robots = list(set(google_sheet.get_column(1)))
+    sync_abr_sheet.determine_lifetime(google_sheet)

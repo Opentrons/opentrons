@@ -7,7 +7,7 @@
 
 export type FileData = File | string
 
-interface CsvFileData {
+export interface CsvFileData {
   id: string
   createdAt: string
   name: string

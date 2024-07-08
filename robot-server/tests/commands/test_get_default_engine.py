@@ -7,7 +7,10 @@ from opentrons.hardware_control.modules import MagDeck, TempDeck
 from opentrons.protocol_runner import RunOrchestrator
 
 from robot_server.errors.error_responses import ApiError
-from robot_server.runs.engine_store import EngineStore, EngineConflictError
+from robot_server.runs.run_orchestrator_store import (
+    RunOrchestratorStore,
+    RunConflictError,
+)
 from robot_server.modules.module_identifier import ModuleIdentifier, ModuleIdentity
 from robot_server.commands.get_default_orchestrator import get_default_orchestrator
 
@@ -19,9 +22,9 @@ def run_orchestrator(decoy: Decoy) -> RunOrchestrator:
 
 
 @pytest.fixture()
-def engine_store(decoy: Decoy) -> EngineStore:
+def run_orchestrator_store(decoy: Decoy) -> RunOrchestratorStore:
     """Get a mocked out EngineStore."""
-    return decoy.mock(cls=EngineStore)
+    return decoy.mock(cls=RunOrchestratorStore)
 
 
 @pytest.fixture()
@@ -32,7 +35,7 @@ def module_identifier(decoy: Decoy) -> ModuleIdentifier:
 
 async def test_get_default_orchestrator(
     decoy: Decoy,
-    engine_store: EngineStore,
+    run_orchestrator_store: RunOrchestratorStore,
     hardware_api: HardwareControlAPI,
     run_orchestrator: RunOrchestrator,
     module_identifier: ModuleIdentifier,
@@ -63,12 +66,12 @@ async def test_get_default_orchestrator(
 
     decoy.when(hardware_api.attached_modules).then_return([mod_1, mod_2])
 
-    decoy.when(await engine_store.get_default_orchestrator()).then_return(
+    decoy.when(await run_orchestrator_store.get_default_orchestrator()).then_return(
         run_orchestrator
     )
 
     result = await get_default_orchestrator(
-        engine_store=engine_store,
+        run_orchestrator_store=run_orchestrator_store,
         hardware_api=hardware_api,
         module_identifier=module_identifier,
     )
@@ -81,14 +84,16 @@ async def test_get_default_orchestrator(
     )
 
 
-async def test_raises_conflict(decoy: Decoy, engine_store: EngineStore) -> None:
+async def test_raises_conflict(
+    decoy: Decoy, run_orchestrator_store: RunOrchestratorStore
+) -> None:
     """It should raise a 409 conflict if the default engine is not availble."""
-    decoy.when(await engine_store.get_default_orchestrator()).then_raise(
-        EngineConflictError("oh no")
+    decoy.when(await run_orchestrator_store.get_default_orchestrator()).then_raise(
+        RunConflictError("oh no")
     )
 
     with pytest.raises(ApiError) as exc_info:
-        await get_default_orchestrator(engine_store=engine_store)
+        await get_default_orchestrator(run_orchestrator_store=run_orchestrator_store)
 
     assert exc_info.value.status_code == 409
     assert exc_info.value.content["errors"][0]["id"] == "RunActive"

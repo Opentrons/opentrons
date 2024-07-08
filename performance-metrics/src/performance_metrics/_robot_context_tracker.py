@@ -2,15 +2,15 @@
 
 import inspect
 from pathlib import Path
-import platform
 
-from functools import partial, wraps
+from functools import wraps
 from time import perf_counter_ns
 import typing
 
-from .metrics_store import MetricsStore
-from .data_shapes import RawContextData, MetricsMetadata
-from .types import SupportsTracking, RobotContextState
+from ._metrics_store import MetricsStore
+from ._data_shapes import RawContextData, MetricsMetadata
+from ._types import SupportsTracking, RobotContextState
+from ._util import get_timing_function
 
 _UnderlyingFunctionParameters = typing.ParamSpec("_UnderlyingFunctionParameters")
 _UnderlyingFunctionReturn = typing.TypeVar("_UnderlyingFunctionReturn")
@@ -19,24 +19,7 @@ _UnderlyingFunction = typing.Callable[
 ]
 
 
-def _get_timing_function() -> typing.Callable[[], int]:
-    """Returns a timing function for the current platform."""
-    time_function: typing.Callable[[], int]
-    if platform.system() == "Linux":
-        from time import clock_gettime_ns, CLOCK_REALTIME
-
-        time_function = typing.cast(
-            typing.Callable[[], int], partial(clock_gettime_ns, CLOCK_REALTIME)
-        )
-    else:
-        from time import time_ns
-
-        time_function = time_ns
-
-    return time_function
-
-
-timing_function = _get_timing_function()
+_timing_function = get_timing_function()
 
 
 class RobotContextTracker(SupportsTracking):
@@ -99,7 +82,7 @@ class RobotContextTracker(SupportsTracking):
                     *args: _UnderlyingFunctionParameters.args,
                     **kwargs: _UnderlyingFunctionParameters.kwargs
                 ) -> _UnderlyingFunctionReturn:
-                    function_start_time = timing_function()
+                    function_start_time = _timing_function()
                     duration_start_time = perf_counter_ns()
                     try:
                         result = await func_to_track(*args, **kwargs)
@@ -124,7 +107,7 @@ class RobotContextTracker(SupportsTracking):
                     *args: _UnderlyingFunctionParameters.args,
                     **kwargs: _UnderlyingFunctionParameters.kwargs
                 ) -> _UnderlyingFunctionReturn:
-                    function_start_time = timing_function()
+                    function_start_time = _timing_function()
                     duration_start_time = perf_counter_ns()
 
                     try:

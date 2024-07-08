@@ -14,14 +14,14 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  Icon,
   JUSTIFY_CENTER,
   JUSTIFY_FLEX_START,
-  SIZE_1,
+  LiquidIcon,
   SIZE_AUTO,
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 import { getModuleDisplayName, MICRO_LITERS } from '@opentrons/shared-data'
 import {
@@ -47,13 +47,6 @@ const HIDE_SCROLLBAR = css`
   ::-webkit-scrollbar {
     display: none;
   }
-`
-
-const LIQUID_BORDER_STYLE = css`
-  border-style: ${BORDERS.styleSolid};
-  border-width: 1px;
-  border-color: ${COLORS.grey30};
-  border-radius: ${BORDERS.borderRadius8};
 `
 
 export const CARD_OUTLINE_BORDER_STYLE = css`
@@ -303,45 +296,35 @@ export const LiquidsListItemDetails = (
     description,
   } = props
   return (
-    <Flex flexDirection={DIRECTION_ROW}>
-      <Flex
-        css={LIQUID_BORDER_STYLE}
-        padding={SPACING.spacing12}
-        height="max-content"
-        backgroundColor={COLORS.white}
-      >
-        <Icon name="circle" color={displayColor} size={SIZE_1} />
-      </Flex>
+    <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
+      <LiquidIcon color={displayColor} />
       <Flex flexDirection={DIRECTION_COLUMN} justifyContent={JUSTIFY_CENTER}>
-        <LegacyStyledText
-          as="p"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+        <StyledText
+          desktopStyle="bodyDefaultSemiBold"
           marginX={SPACING.spacing16}
         >
           {displayName}
-        </LegacyStyledText>
-        <LegacyStyledText
-          as="p"
-          fontWeight={TYPOGRAPHY.fontWeightRegular}
+        </StyledText>
+        <StyledText
+          desktopStyle="bodyDefaultRegular"
           color={COLORS.grey60}
           marginX={SPACING.spacing16}
         >
           {description != null ? description : null}
-        </LegacyStyledText>
+        </StyledText>
       </Flex>
       <Flex
-        backgroundColor={COLORS.black90 + '1A'}
-        borderRadius={BORDERS.borderRadius8}
+        backgroundColor={`${COLORS.black90}${COLORS.opacity20HexCode}`}
+        borderRadius={BORDERS.borderRadius4}
         height="max-content"
-        paddingY={SPACING.spacing4}
-        paddingX={SPACING.spacing8}
+        padding={`${SPACING.spacing2} ${SPACING.spacing8}`}
         alignSelf={ALIGN_CENTER}
         marginLeft={SIZE_AUTO}
       >
-        <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightRegular}>
+        <StyledText desktopStyle="bodyDefaultRegular">
           {getTotalVolumePerLiquidId(liquidId, labwareByLiquidId).toFixed(1)}{' '}
           {MICRO_LITERS}
-        </LegacyStyledText>
+        </StyledText>
       </Flex>
     </Flex>
   )

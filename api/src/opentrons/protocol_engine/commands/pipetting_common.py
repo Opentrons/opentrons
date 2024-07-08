@@ -155,7 +155,7 @@ class LiquidNotFoundError(ErrorOccurrence):
 
     isDefined: bool = True
 
-    errorType: Literal["LiquidNotFound"] = "LiquidNotFound"
+    errorType: Literal["liquidNotFound"] = "liquidNotFound"
 
     errorCode: str = ErrorCodes.PIPETTE_LIQUID_NOT_FOUND.value.code
     detail: str = ErrorCodes.PIPETTE_LIQUID_NOT_FOUND.value.detail

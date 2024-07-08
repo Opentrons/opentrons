@@ -22,9 +22,11 @@ vi.mock('../../shared', async () => {
         <span data-testid="labware-info-title">{props.title}</span>
       </div>
     )),
-    RecoveryMap: vi.fn(() => <div>MOCK_RECOVERY_MAP</div>),
   }
 })
+vi.mock('../../../../molecules/InterventionModal/DeckMapContent', () => ({
+  DeckMapContent: vi.fn(() => <div>MOCK_RECOVERY_MAP</div>),
+}))
 vi.mock('../CancelRun')
 vi.mock('../SelectRecoveryOption')
 vi.mock('../../../../molecules/Command')

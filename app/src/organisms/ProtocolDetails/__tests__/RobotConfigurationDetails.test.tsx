@@ -176,7 +176,7 @@ describe('RobotConfigurationDetails', () => {
     }
 
     render(props)
-    screen.getByText('1')
+    screen.getByText('Slot 1')
     screen.getByText('Magnetic Module GEN2')
   })
 

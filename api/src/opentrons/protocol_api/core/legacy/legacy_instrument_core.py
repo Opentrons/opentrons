@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Optional, Union
 from opentrons import types
 from opentrons.hardware_control import CriticalPoint
 from opentrons.hardware_control.dev_types import PipetteDict
+from opentrons.protocol_api.core.common import WellCore
 from opentrons.protocols.api_support import instrument as instrument_support
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.api_support.labware_like import LabwareLike
@@ -570,3 +571,11 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
     def retract(self) -> None:
         """Retract this instrument to the top of the gantry."""
         self._protocol_interface.get_hardware.retract(self._mount)  # type: ignore [attr-defined]
+
+    def liquid_probe_with_recovery(self, well_core: WellCore) -> None:
+        """This will never be called because it was added in API 2.20."""
+        assert False, "liquid_probe_with_recovery only supported in API 2.20 & later"
+
+    def liquid_probe_without_recovery(self, well_core: WellCore) -> float:
+        """This will never be called because it was added in API 2.20."""
+        assert False, "liquid_probe_without_recovery only supported in API 2.20 & later"
