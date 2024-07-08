@@ -46,8 +46,25 @@ extensions = [
     'sphinx_tabs.tabs',
     # todo(mm, 2021-09-30): Remove numpydoc when we're done transitioning to
     # Google-style docstrings. github.com/Opentrons/opentrons/issues/7051
-    'numpydoc'
+    'numpydoc',
+    'myst_parser',
+]
 
+myst_enable_extensions = [
+    "amsmath",
+    "attrs_inline",
+    "colen_fence",
+    "deflist",
+    "dollarmath",
+    "fieldlist",
+    "html_admonition",
+    "html_image",
+    "linkify",
+    "replacements",
+    "smartquotes",
+    "strikethrough",
+    "substitution",
+    "tasklist",
 ]
 
 
@@ -60,8 +77,8 @@ templates_path = ['../templates', '../templates/v2']
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 #
-# source_suffix = ['.rst', '.md']
-source_suffix = '.rst'
+source_suffix = ['.rst', '.md']
+# source_suffix = '.rst'
 
 # The encoding of source files.
 #
