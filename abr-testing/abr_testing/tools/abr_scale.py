@@ -12,7 +12,9 @@ import sys
 import json
 
 
-def get_protocol_step_as_int(storage_directory: str, robot: str) -> Tuple[int, float, str]:
+def get_protocol_step_as_int(
+    storage_directory: str, robot: str
+) -> Tuple[int, float, str]:
     """Get user input as integer."""
     expected_liquid_moved = 0.0
     ip = ""
