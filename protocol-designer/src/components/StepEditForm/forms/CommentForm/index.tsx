@@ -1,12 +1,12 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { FormGroup } from '@opentrons/components'
+import { FormGroup, SPACING } from '@opentrons/components'
 import { TextField } from '../../fields'
 import type { StepFormProps } from '../../types'
 
 import styles from '../../StepEditForm.module.css'
 
-export const CommentForm = (props: StepFormProps): JSX.Element => {
+export function CommentForm(props: StepFormProps): JSX.Element {
   const { t } = useTranslation(['tooltip', 'application', 'form'])
 
   const { propsForFields } = props
@@ -18,7 +18,10 @@ export const CommentForm = (props: StepFormProps): JSX.Element => {
           {t('application:stepType.comment')}
         </span>
       </div>
-      <div className={styles.section_wrapper} style={{ paddingTop: '1rem' }}>
+      <div
+        className={styles.section_wrapper}
+        style={{ paddingTop: SPACING.spacing16 }}
+      >
         <FormGroup label={t('form:step_edit_form.field.comment.label')}>
           <TextField
             {...propsForFields.message}

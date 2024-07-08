@@ -7,7 +7,6 @@ export const commentFormToArgs = (
   const { fields, stepName, stepDetails } = hydratedFormData
   const { message } = fields
 
-  console.log('comment', message)
   return {
     commandCreatorFnName: 'comment',
     description: stepDetails,

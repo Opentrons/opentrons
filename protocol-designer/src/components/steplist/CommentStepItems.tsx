@@ -1,6 +1,8 @@
 import * as React from 'react'
-import styles from './StepItem.module.css'
 import type { CommentArgs } from '@opentrons/step-generation'
+
+import styles from './StepItem.module.css'
+
 interface CommentStepItemProps {
   commentArgs: CommentArgs
 }
@@ -13,10 +15,10 @@ export function CommentStepItems(
 
   return (
     <>
-      <li className={styles.substep_header}>
+      <div className={styles.substep_header}>
         <span>Comment</span>
-      </li>
-      <li className={styles.substep_content}>&quot;{message}&quot;</li>
+      </div>
+      <div className={styles.substep_content}>{`"${message}"`}</div>
     </>
   )
 }
