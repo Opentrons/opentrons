@@ -2643,6 +2643,7 @@ class OT3API(
             # Prep the plunger
             await self.move_to(checked_mount, safe_plunger_pos)
             if probe_settings.aspirate_while_sensing:
+                # TODO(cm, 7/8/24): remove p_prep_speed from the rate at some point
                 await self._move_to_plunger_bottom(checked_mount, rate=p_prep_speed)
             else:
                 await self._move_to_plunger_top(checked_mount, rate=p_prep_speed)
