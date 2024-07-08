@@ -5,7 +5,7 @@ import {
 } from '@opentrons/shared-data'
 import type { PipetteName } from '@opentrons/shared-data'
 import type { Options } from '@opentrons/components'
-import type { LabwareEntities, PipetteEntity } from '@opentrons/step-generation'
+import type { PipetteEntity } from '@opentrons/step-generation'
 import type { DropdownOption } from '../../../components/lib/forms/DropdownField.d'
 const supportedPipetteNames: PipetteName[] = [
   'p10_single',
@@ -35,36 +35,27 @@ export const pipetteOptions: Options = supportedPipetteNames
 // NOTE: this is similar to getPipetteWithTipMaxVol, the fns
 export const getPipetteCapacity = (
   pipetteEntity: PipetteEntity,
-  labwareEntities: LabwareEntities,
-  tipRack?: string | null
+  tipRackDefUri?: string | null
 ): number => {
-  const spec = pipetteEntity.spec
-  const tiprackDefs = pipetteEntity.tiprackLabwareDef
-  const tipRackDefUri =
-    tipRack != null && labwareEntities[tipRack] != null
-      ? labwareEntities[tipRack]?.labwareDefURI
-      : ''
+  const maxVolume = pipetteEntity.spec.liquids.default.maxVolume
+  const tipRackDefs = pipetteEntity.tiprackLabwareDef
   let chosenTipRack = null
-
-  for (const def of tiprackDefs) {
+  for (const def of tipRackDefs) {
     if (getLabwareDefURI(def) === tipRackDefUri) {
       chosenTipRack = def
       break
     }
   }
-  if (spec && tiprackDefs) {
-    return Math.min(
-      spec.liquids.default.maxVolume,
-      //  not sure if this is a good way to handle this. chosenTipRack is null until you select it
-      getTiprackVolume(chosenTipRack ?? tiprackDefs[0])
-    )
-  }
+  const tipRackTipVol = getTiprackVolume(chosenTipRack ?? tipRackDefs[0])
 
+  if (maxVolume != null && tipRackTipVol != null) {
+    return Math.min(maxVolume, tipRackTipVol)
+  }
   console.assert(
     false,
     `Expected spec and tiprack def for pipette ${
       pipetteEntity ? pipetteEntity.id : '???'
-    } and ${tipRack ?? '???'}`
+    } and ${tipRackDefUri ?? '???'}`
   )
   return NaN
 }

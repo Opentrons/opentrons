@@ -238,18 +238,11 @@ export const wellRatioMoveLiquid = (
     ? null
     : wellRatioFormError
 }
-export const volumeTooHigh = (
-  fields: HydratedFormData,
-  labwareEntities?: LabwareEntities
-): FormError | null => {
+export const volumeTooHigh = (fields: HydratedFormData): FormError | null => {
   const { pipette, tipRack } = fields
   const volume = Number(fields.volume)
 
-  const pipetteCapacity = getPipetteCapacity(
-    pipette,
-    labwareEntities ?? {},
-    tipRack
-  )
+  const pipetteCapacity = getPipetteCapacity(pipette, tipRack)
   if (
     !Number.isNaN(volume) &&
     !Number.isNaN(pipetteCapacity) &&
