@@ -1,10 +1,10 @@
 """Liquid-probe command for OT3 hardware. request, result, and implementation models."""
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Type, Union
+from opentrons.protocol_engine.errors.exceptions import MustHomeError, TipNotEmptyError
 from opentrons.types import MountType
 from opentrons_shared_data.errors.exceptions import (
     PipetteLiquidNotFoundError,
-    PositionUnknownError,
 )
 from typing_extensions import Literal
 
@@ -77,6 +77,8 @@ class LiquidProbeImplementation(AbstractCommandImpl[LiquidProbeParams, _ExecuteR
         Return the z-position of the found liquid.
 
         Raises:
+            TipNotAttachedError: if there is not tip attached to the pipette
+            PositionUnknownError: if the plunger is not in a valid position
             LiquidNotFoundError: if liquid is not found during the probe process.
         """
         pipette_id = params.pipetteId
@@ -88,11 +90,15 @@ class LiquidProbeImplementation(AbstractCommandImpl[LiquidProbeParams, _ExecuteR
         # get_is_ready_to_aspirate as an indirect way to throw the TipNotAttachedError
         self._pipetting.get_is_ready_to_aspirate(pipette_id=pipette_id)
 
-        # throw error if pipette has a working volume == max volume
+        # throw error if pipette has a working volume != 0
+        if self._pipetting.get_is_empty(pipette_id=pipette_id) is False:
+            raise TipNotEmptyError(
+                message="This operation requires a tip with no liquid in it."
+            )
 
         # throw error if plunger isn't in valid position
         if await self._movement.check_for_valid_position(mount=MountType.LEFT) is False:
-            raise PositionUnknownError(
+            raise MustHomeError(
                 message="Current position of pipette is invalid. Please home."
             )
 

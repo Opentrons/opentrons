@@ -1,10 +1,13 @@
 """Test LiquidProbe commands."""
 from datetime import datetime
 
-from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
+from opentrons.protocol_engine.errors.exceptions import (
+    MustHomeError,
+    TipNotAttachedError,
+    TipNotEmptyError,
+)
 from opentrons_shared_data.errors.exceptions import (
     PipetteLiquidNotFoundError,
-    PositionUnknownError,
 )
 from decoy import matchers, Decoy
 import pytest
@@ -261,9 +264,28 @@ async def test_liquid_probe_volume_checking(
     subject: LiquidProbeImplementation,
     model_utils: ModelUtils,
 ) -> None:
-    """It should return some error that has not been decided yet."""
-    # Once this check is implemented in the original function, this test will be too
-    assert True
+    """It should return a TipNotEmptyError if the hardware API indicates that."""
+    pipette_id = "pipette-id"
+    labware_id = "labware-id"
+    well_name = "well-name"
+    well_location = WellLocation(
+        origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1)
+    )
+
+    data = LiquidProbeParams(
+        pipetteId=pipette_id,
+        labwareId=labware_id,
+        wellName=well_name,
+        wellLocation=well_location,
+    )
+    decoy.when(
+        pipetting.get_is_empty(pipette_id=pipette_id),
+    ).then_return(False)
+    try:
+        await subject.execute(data)
+        assert False
+    except TipNotEmptyError:
+        assert True
 
 
 async def test_liquid_probe_location_checking(
@@ -295,5 +317,5 @@ async def test_liquid_probe_location_checking(
     try:
         await subject.execute(data)
         assert False
-    except PositionUnknownError:
+    except MustHomeError:
         assert True
