@@ -23,7 +23,9 @@ if __name__ == "__main__":
         while True:
             tracker.get_and_store_system_data_snapshots()
             time.sleep(tracker.refresh_interval)
-    except Exception as e:
-        logger.error("Exception occurred: %s", str(e))
+    except KeyboardInterrupt:
+        logger.info("Manually stopped.")
+    except Exception:
+        logger.error("Exception occurred: ", exc_info=True)
     finally:
         logger.info("System resource tracker is stopping.")
