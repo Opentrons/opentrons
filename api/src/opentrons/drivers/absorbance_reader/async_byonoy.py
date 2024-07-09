@@ -306,9 +306,9 @@ class AsyncByonoy:
         slot_state: SlotStateNames,
     ) -> AbsorbanceReaderPlatePresence:
         state_map: Dict[SlotStateNames, AbsorbanceReaderPlatePresence] = {
-            "BYONOY_SLOT_UNKNOWN": AbsorbanceReaderPlatePresence.UNKNOWN,
-            "BYONOY_SLOT_EMPTY": AbsorbanceReaderPlatePresence.ABSENT,
-            "BYONOY_SLOT_OCCUPIED": AbsorbanceReaderPlatePresence.PRESENT,
-            "BYONOY_SLOT_UNDETERMINED": AbsorbanceReaderPlatePresence.UNKNOWN,
+            "UNKNOWN": AbsorbanceReaderPlatePresence.UNKNOWN,
+            "EMPTY": AbsorbanceReaderPlatePresence.ABSENT,
+            "OCCUPIED": AbsorbanceReaderPlatePresence.PRESENT,
+            "UNDETERMINED": AbsorbanceReaderPlatePresence.UNKNOWN,
         }
         return state_map[slot_state]
