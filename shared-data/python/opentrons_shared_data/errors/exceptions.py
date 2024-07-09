@@ -936,7 +936,6 @@ class APIRemoved(GeneralError):
         )
 
 
-# write tests
 class IncorrectAPIVersion(GeneralError):
     """An error indicating that a command was issued that is not supported by the API version in use."""
 
