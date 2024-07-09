@@ -76,6 +76,7 @@ const getPipetteBoundsAtSpecifiedMoveToPosition = (
   tipLength: number,
   destinationPosition: Point
 ): Point[] => {
+  console.log(pipetteEntity.spec.nozzleMap)
   const primaryNozzleOffset =
     pipetteEntity.spec.nozzleMap != null
       ? pipetteEntity.spec.nozzleMap.A1
@@ -89,6 +90,7 @@ const getPipetteBoundsAtSpecifiedMoveToPosition = (
   const backLeftBound = {
     x:
       primaryNozzlePosition.x -
+      99 -
       primaryNozzleOffset[0] +
       pipetteBoundsOffsets.backLeftCorner[0],
     y:
@@ -103,6 +105,7 @@ const getPipetteBoundsAtSpecifiedMoveToPosition = (
   const frontRightBound = {
     x:
       primaryNozzlePosition.x -
+      99 -
       primaryNozzleOffset[0] +
       pipetteBoundsOffsets.frontRightCorner[0],
     y:
@@ -134,6 +137,10 @@ const getHasOverlappingRectangles = (
   rectangle1: Point[],
   rectangle2: Point[]
 ): boolean => {
+  console.log({
+    pipetteBounds: rectangle1,
+    rectangle2,
+  })
   const xCoords = [
     rectangle1[0].x,
     rectangle1[1].x,
@@ -157,7 +164,13 @@ const getHasOverlappingRectangles = (
     Math.abs(Math.max(...yCoordinates) - Math.min(...yCoordinates)) <
     yLengthRect1 + yLengthRect2
 
-  return overlappingInX && overlappingInY
+  const oneLeftOfTwo = rectangle1[1].x < rectangle2[0].x
+  const oneRightOfTwo = rectangle1[0].x > rectangle2[1].x
+  const oneUnderTwo = rectangle1[0].y < rectangle2[1].y
+  const oneOverTwo = rectangle1[1].y > rectangle2[0].y
+
+  console.log({ oneLeftOfTwo, oneRightOfTwo, oneUnderTwo, oneOverTwo })
+  return !(oneLeftOfTwo || oneRightOfTwo || oneUnderTwo || oneOverTwo)
 }
 
 //  check the highest Z-point of all items stacked given a deck slot (including modules,
@@ -231,11 +244,24 @@ const getSlotHasPotentialCollidingObject = (
       y: slotBounds.yDimension + slotPosition[1],
       z: slotPosition[2],
     }
+    console.group('FRAME ', slot.addressableArea?.id)
+    const xFrontRight = slotBounds.xDimension + slotPosition[0]
+    const xDim = slotBounds.xDimension
+    console.log('🚀 ~ xFrontRight:', xFrontRight)
+    console.log('🚀 ~ xDim:', xDim)
     const frontRightCoords = {
-      x: slotPosition[0] + slotBounds.xDimension,
+      x: xFrontRight,
       y: slotPosition[1],
       z: slotPosition[2],
     }
+    console.log({
+      backLeftCoords,
+      frontRightCoords,
+      xDim: slotBounds.xDimension,
+      slot: slot.addressableArea?.id,
+    })
+    console.groupEnd()
+
     // Check for overlapping rectangles and pipette z-coordinate if slot overlaps with pipette bounds
     if (
       getHasOverlappingRectangles(
@@ -257,6 +283,7 @@ const getSlotHasPotentialCollidingObject = (
               lwIdInSurroundingSlot
             )
       if (highestZInSlot >= pipetteBounds[0]?.z) {
+        console.log('BAD SLOT', slot.addressableArea?.id)
         return true
       }
     }
