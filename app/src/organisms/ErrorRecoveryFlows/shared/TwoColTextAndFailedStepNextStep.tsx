@@ -53,12 +53,16 @@ export function TwoColTextAndFailedStepNextStep({
       ? undefined
       : stepCounts.currentStepNumber + n
   const commandsAfter = [
-    commandsAfterFailedCommand.length > 0
+    commandsAfterFailedCommand == null
+      ? null
+      : commandsAfterFailedCommand?.length > 0
       ? commandsAfterFailedCommand[0] == null
         ? null
         : { command: commandsAfterFailedCommand[0], index: nthStepAfter(1) }
       : null,
-    commandsAfterFailedCommand.length > 1
+    commandsAfterFailedCommand == null
+      ? null
+      : commandsAfterFailedCommand.length > 1
       ? commandsAfterFailedCommand[1] == null
         ? null
         : { command: commandsAfterFailedCommand[1], index: nthStepAfter(2) }

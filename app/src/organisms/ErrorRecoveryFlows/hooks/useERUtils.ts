@@ -5,7 +5,7 @@ import { useRecoveryCommands } from './useRecoveryCommands'
 import { useRecoveryTipStatus } from './useRecoveryTipStatus'
 import { useRecoveryRouting } from './useRecoveryRouting'
 import { useFailedLabwareUtils } from './useFailedLabwareUtils'
-import { getFailedCommandPipetteInfo, getNextStep } from '../utils'
+import { getFailedCommandPipetteInfo, getNextSteps } from '../utils'
 import { useDeckMapUtils } from './useDeckMapUtils'
 import {
   useNotifyAllCommandsQuery,
@@ -43,7 +43,7 @@ export interface ERUtilsResults {
   hasLaunchedRecovery: boolean
   trackExternalMap: (map: Record<string, any>) => void
   stepCounts: StepCounts
-  commandsAfterFailedCommand: Array<ReturnType<typeof getNextStep>>
+  commandsAfterFailedCommand: ReturnType<typeof getNextSteps>
 }
 
 const SUBSEQUENT_COMMAND_DEPTH = 2
@@ -118,26 +118,15 @@ export function useERUtils({
   })
 
   const stepCounts = useRunningStepCounts(runId, runCommands)
-  const subsequentCommands = (
-    afterCommand: ReturnType<typeof getNextStep>,
-    remaining: number,
-    acc: Array<ReturnType<typeof getNextStep>>
-  ): Array<ReturnType<typeof getNextStep>> =>
-    afterCommand == null
-      ? acc
-      : remaining === 0
-      ? [...acc, getNextStep(afterCommand, protocolAnalysis)]
-      : [...subsequentCommands(acc.at(-1) ?? null, remaining - 1, acc)]
-  const commandsAfterFailedCommand = subsequentCommands(
-    failedCommand,
-    SUBSEQUENT_COMMAND_DEPTH,
-    []
-  )
 
   // TODO(jh, 06-14-24): Ensure other string build utilities that are internal to ErrorRecoveryFlows are exported under
   // one utility object in useERUtils.
   const getRecoveryOptionCopy = useRecoveryOptionCopy()
-
+  const commandsAfterFailedCommand = getNextSteps(
+    failedCommand,
+    protocolAnalysis,
+    SUBSEQUENT_COMMAND_DEPTH
+  )
   return {
     recoveryMap,
     trackExternalMap,
