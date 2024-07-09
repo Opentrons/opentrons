@@ -1,0 +1,17 @@
+[Unit]
+Description=Opentrons System Resource Tracker
+After=opentrons-robot-server.service
+
+[Service]
+Type=notify
+ExecStart=python3 -m performance_metrics.system_resource_tracker
+StateDirectory=system-resource-tracker
+Environment=PYTHONPATH=/opt/opentrons-robot-server
+Environment=OT_SYSTEM_RESOURCE_TRACKER_ENABLED=true
+Environment=OT_SYSTEM_RESOURCE_TRACKER_REFRESH_INTERVAL=15.0
+
+Restart=no
+TimeoutSec=10s
+
+[Install]
+WantedBy=multi-user.target
