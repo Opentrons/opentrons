@@ -105,7 +105,7 @@ export const mockRunTimeParameterData: RunTimeParameter[] = [
     value: '2',
   },
   {
-    displayName: 'CSV File',
+    displayName: 'Mock Csv',
     variableName: 'csv_file_var',
     description: '',
     type: 'csv_file',
