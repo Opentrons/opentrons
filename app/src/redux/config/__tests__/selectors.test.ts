@@ -222,7 +222,7 @@ describe('shell selectors', () => {
       const state: State = {
         config: {
           protocols: {
-            pinnedProtocolIds: ['2b790468-5d72-45ba-b5da-2fd2e6d93a0e'],
+            pinnedQuickTransferIds: ['2b790468-5d72-45ba-b5da-2fd2e6d93a0e'],
           },
         },
       } as any

@@ -7,12 +7,15 @@ import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { getLocalRobot } from '../../../redux/discovery'
 import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
+import { useFeatureFlag } from '../../../redux/config'
 import { useNetworkConnection } from '../../../resources/networking/hooks/useNetworkConnection'
 import { NavigationMenu } from '../NavigationMenu'
 import { Navigation } from '..'
+import { when } from 'vitest-when'
 
 vi.mock('../../../resources/networking/hooks/useNetworkConnection')
 vi.mock('../../../redux/discovery')
+vi.mock('../../../redux/config')
 vi.mock('../NavigationMenu')
 
 mockConnectedRobot.name = '12345678901234567'
@@ -60,7 +63,7 @@ describe('Navigation', () => {
   it('should render text and they have attribute', () => {
     render(props)
     screen.getByRole('link', { name: '123456789012...' }) // because of the truncate function
-    const allProtocols = screen.getByRole('link', { name: 'All Protocols' })
+    const allProtocols = screen.getByRole('link', { name: 'Protocols' })
     expect(allProtocols).toHaveAttribute('href', '/protocols')
 
     const instruments = screen.getByRole('link', { name: 'Instruments' })
@@ -71,6 +74,15 @@ describe('Navigation', () => {
 
     expect(screen.queryByText('Get started')).not.toBeInTheDocument()
     expect(screen.queryByLabelText('network icon')).not.toBeInTheDocument()
+  })
+  it('should render quick transfer tab if feature flag is on', () => {
+    when(vi.mocked(useFeatureFlag))
+      .calledWith('enableQuickTransfer')
+      .thenReturn(true)
+    render(props)
+    screen.getByRole('link', { name: '123456789012...' }) // because of the truncate function
+    const quickTransfer = screen.getByRole('link', { name: 'Quick Transfers' })
+    expect(quickTransfer).toHaveAttribute('href', '/quick-transfer')
   })
   it('should render a network icon', () => {
     vi.mocked(useNetworkConnection).mockReturnValue({
