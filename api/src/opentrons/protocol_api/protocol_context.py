@@ -974,7 +974,7 @@ class ProtocolContext(CommandPublisher):
         trash: Optional[Union[Labware, TrashBin]]
         try:
             trash = self.fixed_trash
-        except (NoTrashDefinedError, APIVersionError):
+        except (NoTrashDefinedError, UnsupportedAPIError):
             trash = None
 
         instrument = InstrumentContext(
