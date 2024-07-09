@@ -1689,7 +1689,7 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         return self._core.get_liquid_presence_detection()
 
-    @liquid_detection.setter
+    @liquid_presence_detection.setter
     @requires_version(2, 20)
     def liquid_presence_detection(self, enable: bool) -> None:
         self._core.set_liquid_presence_detection(enable)
