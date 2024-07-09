@@ -85,18 +85,15 @@ class LiquidProbeImplementation(AbstractCommandImpl[LiquidProbeParams, _ExecuteR
         labware_id = params.labwareId
         well_name = params.wellName
 
-        # throw error if pipette has no tip
         # _validate_tip_attached in pipetting.py is a private method so we're using
-        # get_is_ready_to_aspirate as an indirect way to throw the TipNotAttachedError
+        # get_is_ready_to_aspirate as an indirect way to throw a TipNotAttachedError if appropriate
         self._pipetting.get_is_ready_to_aspirate(pipette_id=pipette_id)
 
-        # throw error if pipette has a working volume != 0
         if self._pipetting.get_is_empty(pipette_id=pipette_id) is False:
             raise TipNotEmptyError(
                 message="This operation requires a tip with no liquid in it."
             )
 
-        # throw error if plunger isn't in valid position
         if await self._movement.check_for_valid_position(mount=MountType.LEFT) is False:
             raise MustHomeError(
                 message="Current position of pipette is invalid. Please home."
