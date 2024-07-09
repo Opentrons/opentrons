@@ -81,7 +81,7 @@ describe('Navigation', () => {
       .thenReturn(true)
     render(props)
     screen.getByRole('link', { name: '123456789012...' }) // because of the truncate function
-    const quickTransfer = screen.getByRole('link', { name: 'Quick Transfers' })
+    const quickTransfer = screen.getByRole('link', { name: 'Quick Transfer' })
     expect(quickTransfer).toHaveAttribute('href', '/quick-transfer')
   })
   it('should render a network icon', () => {
