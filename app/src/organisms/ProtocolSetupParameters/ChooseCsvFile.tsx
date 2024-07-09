@@ -95,7 +95,7 @@ export function ChooseCsvFile({
                 csvFilesOnRobot.map((csv: CsvFileData) => (
                   <RadioButton
                     key={csv.id}
-                    data-testid={`${csv.id}`}
+                    data-testid={csv.id}
                     buttonLabel={csv.name}
                     buttonValue={`${csv.id}`}
                     isSelected={csvFileSelected?.id === csv.id}

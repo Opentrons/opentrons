@@ -26,6 +26,7 @@ import { ChooseEnum } from './ChooseEnum'
 import { ChooseNumber } from './ChooseNumber'
 import { ChooseCsvFile } from './ChooseCsvFile'
 import { useFeatureFlag } from '../../redux/config'
+import { useToaster } from '../ToasterOven'
 
 import type {
   CompletedProtocolAnalysis,
@@ -84,6 +85,7 @@ export function ProtocolSetupParameters({
           ({ ...parameter, value: parameter.default } as ValueRunTimeParameter)
     )
   )
+  const { makeSnackbar } = useToaster()
 
   const csvFileParameter = runTimeParameters.find(
     (param): param is CsvFileParameter => param.type === 'csv_file'
@@ -151,18 +153,25 @@ export function ProtocolSetupParameters({
     },
   })
   const handleConfirmValues = (): void => {
-    setStartSetup(true)
-    createProtocolAnalysis({
-      protocolKey: protocolId,
-      runTimeParameterValues: runTimeParameterValues,
-    })
-    createRun({
-      protocolId,
-      labwareOffsets,
-      runTimeParameterValues: getRunTimeParameterValuesForRun(
-        runTimeParametersOverrides
-      ),
-    })
+    if (
+      enableCsvFile &&
+      mostRecentAnalysis?.result === 'parameter-value-required'
+    ) {
+      makeSnackbar(t('protocol_requires_csv') as string)
+    } else {
+      setStartSetup(true)
+      createProtocolAnalysis({
+        protocolKey: protocolId,
+        runTimeParameterValues: runTimeParameterValues,
+      })
+      createRun({
+        protocolId,
+        labwareOffsets,
+        runTimeParameterValues: getRunTimeParameterValuesForRun(
+          runTimeParametersOverrides
+        ),
+      })
+    }
   }
 
   const handleSetParameter = (parameter: RunTimeParameter): void => {
@@ -189,6 +198,10 @@ export function ProtocolSetupParameters({
         }}
         onClickButton={handleConfirmValues}
         buttonText={t('confirm_values')}
+        ariaDisabled={
+          enableCsvFile &&
+          mostRecentAnalysis?.result === 'parameter-value-required'
+        }
         buttonIsDisabled={
           enableCsvFile &&
           mostRecentAnalysis?.result === 'parameter-value-required'
