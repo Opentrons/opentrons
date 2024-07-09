@@ -3,14 +3,14 @@
 import pytest
 from pathlib import Path, PurePosixPath
 from performance_metrics.system_resource_tracker._config import (
-    _eval_should_track,
+    _eval_enabled,
     _eval_process_filters,
     _eval_refresh_interval,
     _eval_storage_dir,
     _eval_logging_level,
     SystemResourceTrackerConfiguration,
     EnvironmentParseError,
-    SHOULD_TRACK_ENV_VAR_NAME,
+    ENABLED_ENV_VAR_NAME,
     PROCESS_FILTERS_ENV_VAR_NAME,
     REFRESH_INTERVAL_ENV_VAR_NAME,
     STORAGE_DIR_ENV_VAR_NAME,
@@ -18,12 +18,12 @@ from performance_metrics.system_resource_tracker._config import (
 )
 
 
-def test_eval_should_track() -> None:
-    """Test parsing of the should track environment variable."""
-    assert _eval_should_track("true") is True
-    assert _eval_should_track("false") is False
+def test_eval_enabled() -> None:
+    """Test parsing of the enabled environment variable."""
+    assert _eval_enabled("true") is True
+    assert _eval_enabled("false") is False
     with pytest.raises(EnvironmentParseError):
-        _eval_should_track("invalid")
+        _eval_enabled("invalid")
 
 
 def test_eval_process_filters() -> None:
@@ -67,7 +67,7 @@ def test_system_resource_tracker_configuration_from_env(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Test creating a SystemResourceTrackerConfiguration instance from environment variables."""
-    monkeypatch.setenv(SHOULD_TRACK_ENV_VAR_NAME, "true")
+    monkeypatch.setenv(ENABLED_ENV_VAR_NAME, "true")
     monkeypatch.setenv(PROCESS_FILTERS_ENV_VAR_NAME, "python3, /opt/opentrons")
     monkeypatch.setenv(REFRESH_INTERVAL_ENV_VAR_NAME, "10.5")
     monkeypatch.setenv(STORAGE_DIR_ENV_VAR_NAME, "/data/performance_metrics_data")
@@ -75,7 +75,7 @@ def test_system_resource_tracker_configuration_from_env(
 
     config = SystemResourceTrackerConfiguration.from_env()
 
-    assert config.should_track is True
+    assert config.enabled is True
     assert config.process_filters == ("python3", "/opt/opentrons")
     assert config.refresh_interval == 10.5
     assert config.storage_dir == Path("/data/performance_metrics_data")
@@ -88,16 +88,16 @@ def test_system_resource_tracker_configuration_from_env_defaults(
     """Test creating a SystemResourceTrackerConfiguration instance with default values."""
     config = SystemResourceTrackerConfiguration.from_env()
 
-    assert config.should_track is False
+    assert config.enabled is False
     assert config.process_filters == ("/opt/opentrons*", "python3*")
     assert config.refresh_interval == 10.0
     assert config.storage_dir == Path("/data/performance_metrics_data/")
     assert config.logging_level == "INFO"
 
 
-def test_eval_should_track_invalid(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_eval_enabled_invalid(monkeypatch: pytest.MonkeyPatch) -> None:
     """Test handling of invalid should track environment variable."""
-    monkeypatch.setenv(SHOULD_TRACK_ENV_VAR_NAME, "invalid")
+    monkeypatch.setenv(ENABLED_ENV_VAR_NAME, "invalid")
     with pytest.raises(EnvironmentParseError):
         SystemResourceTrackerConfiguration.from_env()
 

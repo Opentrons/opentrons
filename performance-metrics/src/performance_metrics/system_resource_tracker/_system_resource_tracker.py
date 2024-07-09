@@ -95,7 +95,7 @@ class SystemResourceTracker:
 
     def get_and_store_system_data_snapshots(self) -> None:
         """Get and store system data snapshots."""
-        if self.config.should_track:
+        if self.config.enabled:
             self.refresh_processes()
             self._store.add_all(self.snapshots)
             self._store.store()

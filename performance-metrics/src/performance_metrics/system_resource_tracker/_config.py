@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 _ENV_VAR_PREFIX: typing.Final[str] = "OT_SYSTEM_RESOURCE_TRACKER"
 
-SHOULD_TRACK_ENV_VAR_NAME: typing.Final[str] = f"{_ENV_VAR_PREFIX}_ENABLED"
+ENABLED_ENV_VAR_NAME: typing.Final[str] = f"{_ENV_VAR_PREFIX}_ENABLED"
 PROCESS_FILTERS_ENV_VAR_NAME: typing.Final[str] = f"{_ENV_VAR_PREFIX}_PROCESS_FILTERS"
 REFRESH_INTERVAL_ENV_VAR_NAME: typing.Final[str] = f"{_ENV_VAR_PREFIX}_REFRESH_INTERVAL"
 STORAGE_DIR_ENV_VAR_NAME: typing.Final[str] = f"{_ENV_VAR_PREFIX}_STORAGE_DIR"
@@ -27,21 +27,21 @@ class EnvironmentParseError(Exception):
     ...
 
 
-def _eval_should_track(value: str) -> bool:
-    """Parse the should track environment variable.
+def _eval_enabled(value: str) -> bool:
+    """Parse the enabled environment variable.
 
     Returns:
         bool: The parsed value or None if the environment variable is not set.
     """
-    if (coerced_should_track := value.lower()) not in ("true", "false"):
+    if (coerced_enabled := value.lower()) not in ("true", "false"):
         raise EnvironmentParseError(
-            f"{SHOULD_TRACK_ENV_VAR_NAME} environment variable must be 'true' or 'false.' "
+            f"{ENABLED_ENV_VAR_NAME} environment variable must be 'true' or 'false.' "
             f"You specified: {value}"
         )
 
-    should_track = coerced_should_track == "true"
-    logger.debug(f"Should track: {should_track}")
-    return should_track
+    enabled = coerced_enabled == "true"
+    logger.debug(f"Enabled: {enabled}")
+    return enabled
 
 
 def _eval_process_filters(value: str) -> typing.Tuple[str, ...]:
@@ -126,7 +126,7 @@ def _eval_logging_level(value: str) -> str:
 class SystemResourceTrackerConfiguration:
     """Environment variables for the system resource tracker."""
 
-    should_track: bool = False
+    enabled: bool = False
     process_filters: typing.Tuple[str, ...] = dataclasses.field(
         default_factory=default_filters
     )
@@ -138,7 +138,7 @@ class SystemResourceTrackerConfiguration:
         """Get a string representation of the configuration."""
         return (
             "\n"
-            f"should_track={self.should_track}\n"
+            f"enabled={self.enabled}\n"
             f"process_filters={self.process_filters}\n"
             f"refresh_interval={self.refresh_interval}\n"
             f"storage_dir={self.storage_dir}\n"
@@ -154,8 +154,8 @@ class SystemResourceTrackerConfiguration:
         """
         kwargs: typing.Dict[str, typing.Any] = {}
 
-        if (should_track := os.environ.get(SHOULD_TRACK_ENV_VAR_NAME)) is not None:
-            kwargs["should_track"] = _eval_should_track(should_track)
+        if (enabled := os.environ.get(ENABLED_ENV_VAR_NAME)) is not None:
+            kwargs["enabled"] = _eval_enabled(enabled)
 
         if (
             process_filters := os.environ.get(PROCESS_FILTERS_ENV_VAR_NAME)
