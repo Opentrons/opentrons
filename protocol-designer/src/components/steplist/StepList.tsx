@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { SidePanel } from '@opentrons/components'
+import { Flex, SidePanel } from '@opentrons/components'
 
 import { END_TERMINAL_TITLE } from '../../constants'
 import {
@@ -60,8 +60,9 @@ export const StepList = (): JSX.Element => {
   }, [])
 
   return (
-    <SidePanel title="Protocol Timeline">
-      <MultiSelectToolbar isMultiSelectMode={Boolean(isMultiSelectMode)} />
+    // <SidePanel title="Protocol Timeline">
+    <Flex flexDirection='row'>
+      {/* <MultiSelectToolbar isMultiSelectMode={Boolean(isMultiSelectMode)} /> */}
 
       <StartingDeckStateTerminalItem />
       <DraggableStepItems
@@ -70,9 +71,10 @@ export const StepList = (): JSX.Element => {
           dispatch(steplistActions.reorderSteps(stepIds))
         }}
       />
-      <PresavedStepItem />
-      <StepCreationButton />
+      {/* <PresavedStepItem /> */}
+      {/* <StepCreationButton /> */}
       <TerminalItem id={END_TERMINAL_ITEM_ID} title={END_TERMINAL_TITLE} />
-    </SidePanel>
+    </Flex>
+    // </SidePanel>
   )
 }

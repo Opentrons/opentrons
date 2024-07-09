@@ -7,6 +7,7 @@ import {
 import { DeckSetup } from './DeckSetup'
 import { NullDeckState } from './DeckSetup/NullDeckState'
 import { OffDeckLabwareButton } from './OffDeckLabwareButton'
+import { StepList } from './steplist'
 
 export const DeckSetupManager = (): JSX.Element => {
   const batchEditSelectedStepTypes = useSelector(getBatchEditSelectedStepTypes)
@@ -18,6 +19,7 @@ export const DeckSetupManager = (): JSX.Element => {
       <>
         <OffDeckLabwareButton />
         <DeckSetup />
+        <StepList />
       </>
     )
   } else {

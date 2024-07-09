@@ -26,7 +26,7 @@
 }
 
 .swap_button {
-  display: block;
+  display: flex;
   margin: 0 0.5rem;
   width: 8rem;
 
@@ -36,7 +36,7 @@
 }
 
 .edit_button {
-  display: block;
+  display: flex;
   margin: 0 0.5rem;
   width: 8rem;
 }

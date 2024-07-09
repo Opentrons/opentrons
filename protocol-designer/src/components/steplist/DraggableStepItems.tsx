@@ -13,6 +13,7 @@ import styles from './StepItem.module.css'
 import type { DragLayerMonitor, DropTargetOptions } from 'react-dnd'
 import type { StepIdType } from '../../form-types'
 import type { ConnectedStepItemProps } from '../../containers/ConnectedStepItem'
+import { Flex } from '@opentrons/components'
 
 interface DragDropStepItemProps extends ConnectedStepItemProps {
   stepId: StepIdType
@@ -103,25 +104,22 @@ export const DraggableStepItems = (
   }
 
   return (
-    <>
-      <ContextMenu>
-        {({ makeStepOnContextMenu }) =>
-          orderedStepIds.map((stepId: StepIdType, index: number) => (
-            <DragDropStepItem
-              key={`${stepId}_${index}`}
-              stepNumber={index + 1}
-              stepId={stepId}
-              //  @ts-expect-error
-              onStepContextMenu={makeStepOnContextMenu(stepId)}
-              moveStep={moveStep}
-              findStepIndex={findStepIndex}
-              orderedStepIds={orderedStepIds}
-            />
-          ))
-        }
-      </ContextMenu>
+    <Flex flexDirection="row">
+      {orderedStepIds.map((stepId: StepIdType, index: number) => (
+        <DragDropStepItem
+          key={`${stepId}_${index}`}
+          stepNumber={index + 1}
+          stepId={stepId}
+          //  @ts-expect-error
+          // onStepContextMenu={makeStepOnContextMenu(stepId)}
+          moveStep={moveStep}
+          findStepIndex={findStepIndex}
+          orderedStepIds={orderedStepIds}
+        />
+      ))}
+
       <StepDragPreview />
-    </>
+    </Flex>
   )
 }
 
@@ -131,7 +129,6 @@ const StepDragPreview = (): JSX.Element | null => {
   const [{ isDragging, itemType, item, currentOffset }] = useDrag(() => ({
     type: DND_TYPES.STEP_ITEM,
     collect: (monitor: DragLayerMonitor) => ({
-      currentOffset: monitor.getSourceClientOffset(),
       isDragging: monitor.isDragging(),
       itemType: monitor.getItemType(),
       item: monitor.getItem() as { stepId: StepIdType },
@@ -151,7 +148,7 @@ const StepDragPreview = (): JSX.Element | null => {
     return null
   return (
     <div
-      className={styles.step_drag_preview}
+      // className={styles.step_drag_preview}
       style={{ left: currentOffset.x - NAV_OFFSET, top: currentOffset.y }}
     >
       <PDTitledList

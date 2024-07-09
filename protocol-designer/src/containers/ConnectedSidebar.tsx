@@ -19,7 +19,7 @@ export function Sidebar(): JSX.Element | null {
     case 'liquids':
       return <LiquidsSidebar />
     case 'steplist':
-      return liquidPlacementMode ? <IngredientsList /> : <StepList />
+      // return liquidPlacementMode ? <IngredientsList /> : <StepList />
     case 'file-splash':
     case 'file-detail':
       return <FileSidebar />

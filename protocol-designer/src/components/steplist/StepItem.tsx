@@ -100,7 +100,7 @@ export const StepItem = (props: StepItemProps): JSX.Element => {
 
   return (
     <TitledStepList
-      className={cx(styles.step_item_wrapper)}
+      // className={cx(styles.step_item_wrapper)}
       description={Description}
       iconName={error || warning ? 'alert-circle' : iconName}
       iconProps={{ className: iconClassName }}
