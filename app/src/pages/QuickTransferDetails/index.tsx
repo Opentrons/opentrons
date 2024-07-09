@@ -21,6 +21,7 @@ import {
   SPACING,
   LegacyStyledText,
   truncateString,
+  Tabs,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -30,7 +31,7 @@ import {
   useProtocolQuery,
 } from '@opentrons/react-api-client'
 import { MAXIMUM_PINNED_PROTOCOLS } from '../../App/constants'
-import { MediumButton, SmallButton, TabbedButton } from '../../atoms/buttons'
+import { MediumButton, SmallButton } from '../../atoms/buttons'
 import {
   ProtocolDetailsHeaderChipSkeleton,
   ProcotolDetailsHeaderTitleSkeleton,
@@ -178,19 +179,16 @@ const TransferSectionTabs = ({
 
   return (
     <Flex gridGap={SPACING.spacing8}>
-      {options.map(option => {
-        return (
-          <TabbedButton
-            isSelected={option === currentOption}
-            key={option}
-            onClick={() => {
-              setCurrentOption(option)
-            }}
-          >
-            {option}
-          </TabbedButton>
-        )
-      })}
+      <Tabs
+        tabs={options.map(option => ({
+          text: option,
+          onClick: () => {
+            setCurrentOption(option)
+          },
+          isActive: option === currentOption,
+          disabled: false,
+        }))}
+      />
     </Flex>
   )
 }
