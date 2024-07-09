@@ -2,8 +2,12 @@
 
 import csv
 import typing
+import logging
 from ._data_shapes import MetricsMetadata
 from ._types import SupportsCSVStorage
+from ._logging_config import LOGGER_NAME
+
+logger = logging.getLogger(LOGGER_NAME)
 
 T = typing.TypeVar("T", bound=SupportsCSVStorage)
 
@@ -26,6 +30,9 @@ class MetricsStore(typing.Generic[T]):
 
     def setup(self) -> None:
         """Set up the data store."""
+        logger.info(
+            f"Setting up metrics store for {self.metadata.name} at {self.metadata.storage_dir}"
+        )
         self.metadata.storage_dir.mkdir(parents=True, exist_ok=True)
         self.metadata.data_file_location.touch(exist_ok=True)
         self.metadata.headers_file_location.touch(exist_ok=True)
@@ -37,5 +44,8 @@ class MetricsStore(typing.Generic[T]):
         self._data.clear()
         rows_to_write = [context_data.csv_row() for context_data in stored_data]
         with open(self.metadata.data_file_location, "a") as storage_file:
+            logger.debug(
+                f"Writing {len(rows_to_write)} rows to {self.metadata.data_file_location}"
+            )
             writer = csv.writer(storage_file, quoting=csv.QUOTE_ALL)
             writer.writerows(rows_to_write)

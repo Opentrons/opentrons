@@ -3,9 +3,10 @@ import typing
 import dataclasses
 from pathlib import Path, PurePosixPath
 import logging
+from .._logging_config import LOGGER_NAME
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(LOGGER_NAME)
 
 _ENV_VAR_PREFIX: typing.Final[str] = "OT_SYSTEM_RESOURCE_TRACKER"
 

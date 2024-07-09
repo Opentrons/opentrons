@@ -6,13 +6,14 @@ import psutil
 import fnmatch
 
 from ._config import SystemResourceTrackerConfiguration
+from .._logging_config import LOGGER_NAME
 from .._util import format_command, get_timing_function
 from .._data_shapes import ProcessResourceUsageSnapshot, MetricsMetadata
 from .._metrics_store import MetricsStore
 
 _timing_function = get_timing_function()
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(LOGGER_NAME)
 
 
 class SystemResourceTracker:
@@ -54,7 +55,6 @@ class SystemResourceTracker:
 
             if not process_cmdline:
                 continue
-
             formatted_cmdline: str = format_command(process_cmdline)
 
             if not formatted_cmdline:
@@ -64,6 +64,7 @@ class SystemResourceTracker:
                 fnmatch.fnmatch(formatted_cmdline, pattern)
                 for pattern in self.config.process_filters
             ):
+                logger.debug(f"Matched process: {formatted_cmdline}")
                 processes.append(process)
 
         self._processes = processes
