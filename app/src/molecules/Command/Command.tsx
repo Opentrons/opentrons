@@ -68,10 +68,10 @@ const PROPS_BY_STATE: Record<
   current: {
     container: {
       style: `
-      border-radius: ${SPACING.spacing4};
+      border-radius: ${BORDERS.borderRadius4};
       padding: ${SPACING.spacing8};
       @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-         border-radius: ${SPACING.spacing8};
+         border-radius: ${BORDERS.borderRadius8};
          padding: ${SPACING.spacing12} ${SPACING.spacing24};
       }
       `,
@@ -85,11 +85,11 @@ const PROPS_BY_STATE: Record<
   failed: {
     container: {
       style: `
-      border-radius: ${SPACING.spacing4};
+      border-radius: ${BORDERS.borderRadius4};
       padding: ${SPACING.spacing8};
       background-color: ${COLORS.red20};
       @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-         border-radius: ${SPACING.spacing8};
+         border-radius: ${BORDERS.borderRadius8};
          padding: ${SPACING.spacing12} ${SPACING.spacing24};
          background-color: ${COLORS.red35};
       }
@@ -104,10 +104,10 @@ const PROPS_BY_STATE: Record<
     container: {
       style: `
       background-color: ${COLORS.grey20};
-      border-radius: ${SPACING.spacing4};
+      border-radius: ${BORDERS.borderRadius4};
       padding: ${SPACING.spacing8};
       @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-         border-radius: ${SPACING.spacing8};
+         border-radius: ${BORDERS.borderRadius8};
          background-color: ${COLORS.grey35};
          padding: ${SPACING.spacing12} ${SPACING.spacing24};
       }
