@@ -505,6 +505,7 @@ async def test_create_protocol(
         file_hasher=file_hasher,
         analyses_manager=analyses_manager,
         protocol_auto_deleter=protocol_auto_deleter,
+        quick_transfer_protocol_auto_deleter=protocol_auto_deleter,
         robot_type="OT-2 Standard",
         protocol_id="protocol-id",
         analysis_id="analysis-id",
@@ -526,9 +527,7 @@ async def test_create_protocol(
     assert result.status_code == 201
 
     decoy.verify(
-        protocol_auto_deleter.make_room_for_new_protocol(
-            exclude_kind=ProtocolKind.QUICK_TRANSFER
-        ),
+        protocol_auto_deleter.make_room_for_new_protocol(),
         protocol_store.insert(protocol_resource),
     )
 
@@ -634,9 +633,7 @@ async def test_create_new_protocol_with_run_time_params(
     )
 
     decoy.verify(
-        protocol_auto_deleter.make_room_for_new_protocol(
-            exclude_kind=ProtocolKind.QUICK_TRANSFER
-        ),
+        protocol_auto_deleter.make_room_for_new_protocol(),
         protocol_store.insert(protocol_resource),
     )
 
@@ -1686,7 +1683,7 @@ async def test_create_protocol_kind_quick_transfer(
         protocol_reader=protocol_reader,
         file_hasher=file_hasher,
         analyses_manager=analyses_manager,
-        protocol_auto_deleter=protocol_auto_deleter,
+        quick_transfer_protocol_auto_deleter=protocol_auto_deleter,
         robot_type="OT-3 Standard",
         protocol_kind=ProtocolKind.QUICK_TRANSFER,
         protocol_id="protocol-id",
@@ -1696,9 +1693,7 @@ async def test_create_protocol_kind_quick_transfer(
     )
 
     decoy.verify(
-        protocol_auto_deleter.make_room_for_new_protocol(
-            exclude_kind=ProtocolKind.QUICK_TRANSFER
-        ),
+        protocol_auto_deleter.make_room_for_new_protocol(),
         protocol_store.insert(protocol_resource),
     )
 
