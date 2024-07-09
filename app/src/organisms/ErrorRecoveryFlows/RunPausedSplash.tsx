@@ -40,7 +40,7 @@ import type { ERUtilsResults } from './hooks'
 import { useHost } from '@opentrons/react-api-client'
 
 export function useRunPausedSplash(showERWizard: boolean): boolean {
-  // Don't show the splash when desktop ER wizard is active.
+  // Don't show the splash when the ER wizard is active.
   return !showERWizard
 }
 
