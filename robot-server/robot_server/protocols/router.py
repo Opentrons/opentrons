@@ -57,6 +57,7 @@ from .protocol_store import (
 )
 from .dependencies import (
     get_protocol_auto_deleter,
+    get_quick_transfer_protocol_auto_deleter,
     get_protocol_reader,
     get_protocol_store,
     get_analysis_store,
@@ -223,6 +224,9 @@ async def create_protocol(  # noqa: C901
     file_hasher: FileHasher = Depends(get_file_hasher),
     analyses_manager: AnalysesManager = Depends(get_analyses_manager),
     protocol_auto_deleter: ProtocolAutoDeleter = Depends(get_protocol_auto_deleter),
+    quick_transfer_protocol_auto_deleter: ProtocolAutoDeleter = Depends(
+        get_quick_transfer_protocol_auto_deleter
+    ),
     robot_type: RobotType = Depends(get_robot_type),
     protocol_id: str = Depends(get_unique_id, use_cache=False),
     analysis_id: str = Depends(get_unique_id, use_cache=False),
@@ -247,6 +251,8 @@ async def create_protocol(  # noqa: C901
         analyses_manager: Protocol analysis managing interface.
         protocol_auto_deleter: An interface to delete old resources to make room for
             the new protocol.
+        quick_transfer_protocol_auto_deleter: An interface to delete old quick
+            transfer resources to make room for the new protocol.
         robot_type: The type of this robot. Protocols meant for other robot types
             are rejected.
         protocol_id: Unique identifier to attach to the protocol resource.
@@ -354,9 +360,10 @@ async def create_protocol(  # noqa: C901
         protocol_kind=kind.value,
     )
 
-    protocol_auto_deleter.make_room_for_new_protocol(
-        exclude_kind=ProtocolKind.QUICK_TRANSFER
-    )
+    protocol_deleter: ProtocolAutoDeleter = protocol_auto_deleter
+    if kind == ProtocolKind.QUICK_TRANSFER:
+        protocol_deleter = quick_transfer_protocol_auto_deleter
+    protocol_deleter.make_room_for_new_protocol()
     protocol_store.insert(protocol_resource)
 
     new_analysis_summary = await analyses_manager.start_analysis(

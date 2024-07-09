@@ -2,7 +2,6 @@
 
 
 from logging import getLogger
-from typing import Optional
 
 from robot_server.deletion_planner import ProtocolDeletionPlanner
 from robot_server.protocols.protocol_models import ProtocolKind
@@ -17,27 +16,24 @@ class ProtocolAutoDeleter:  # noqa: D101
         self,
         protocol_store: ProtocolStore,
         deletion_planner: ProtocolDeletionPlanner,
+        protocol_kind: ProtocolKind,
     ) -> None:
         self._protocol_store = protocol_store
         self._deletion_planner = deletion_planner
+        self._protocol_kind = protocol_kind
 
-    def make_room_for_new_protocol(
-        self, exclude_kind: Optional[ProtocolKind] = None
-    ) -> None:
-        """Finds unused protocols and deletes them.
-
-        arg: exclude_kind: Excludes the this ProtocolKind from being deleted
-
-        """
-        exclude_protocols = {
+    def make_room_for_new_protocol(self) -> None:
+        """Finds unused protocols and deletes them."""
+        protocols = {
             p.protocol_id
             for p in self._protocol_store.get_all()
-            if p.protocol_kind == exclude_kind
+            if p.protocol_kind == self._protocol_kind.value
         }
+
         protocol_run_usage_info = [
             p
             for p in self._protocol_store.get_usage_info()
-            if p.protocol_id not in exclude_protocols
+            if p.protocol_id in protocols
         ]
 
         protocol_ids_to_delete = self._deletion_planner.plan_for_new_protocol(
@@ -49,5 +45,5 @@ class ProtocolAutoDeleter:  # noqa: D101
                 f"Auto-deleting these protocols to make room for a new one:"
                 f" {protocol_ids_to_delete}"
             )
-        for protocol_id in protocol_ids_to_delete:
-            self._protocol_store.remove(protocol_id=protocol_id)
+            for protocol_id in protocol_ids_to_delete:
+                self._protocol_store.remove(protocol_id=protocol_id)
