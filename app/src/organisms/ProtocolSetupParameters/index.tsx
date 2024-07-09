@@ -155,8 +155,6 @@ export function ProtocolSetupParameters({
       enableCsvFile &&
       mostRecentAnalysis?.result === 'parameter-value-required'
     ) {
-      console.log('tapped')
-      // display snackbar
       makeSnackbar(t('protocol_requires_csv') as string)
     } else {
       setStartSetup(true)

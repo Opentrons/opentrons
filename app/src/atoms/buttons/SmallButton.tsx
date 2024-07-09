@@ -34,7 +34,7 @@ interface SmallButtonProps extends StyleProps {
   iconName?: IconName | null
   buttonCategory?: ButtonCategory // if not specified, it will be 'default'
   disabled?: boolean
-  /** aria-disabled for displaying snack bar */
+  /** aria-disabled for displaying snack bar, used for ODD only at this time. */
   ariaDisabled?: boolean
 }
 
