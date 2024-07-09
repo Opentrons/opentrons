@@ -52,9 +52,9 @@ export function ProtocolDashboard(): JSX.Element {
   const [isRequiredCSV, setIsRequiredCSV] = React.useState<boolean>(false)
   const sortBy = useSelector(getProtocolsOnDeviceSortKey) ?? 'alphabetical'
   const protocolsData =
-    protocols.data?.data.filter(protocol => {
-      protocol.protocolKind !== 'quick-transfer'
-    }) ?? []
+    protocols.data?.data.filter(
+      protocol => protocol.protocolKind !== 'quick-transfer'
+    ) ?? []
   let unpinnedProtocols: ProtocolResource[] = protocolsData
 
   // The pinned protocols are stored as an array of IDs in config

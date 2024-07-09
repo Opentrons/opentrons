@@ -3,7 +3,7 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
-import { getVolumeRange, getSelectedWellCount } from './'
+import { getVolumeRange } from './'
 
 import type {
   LabwareDefinition2,

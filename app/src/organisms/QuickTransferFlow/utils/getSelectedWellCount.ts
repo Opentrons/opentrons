@@ -1,4 +1,4 @@
-import { LabwareDefinition2, PipetteV2Specs } from '@opentrons/shared-data'
+import type { LabwareDefinition2, PipetteV2Specs } from '@opentrons/shared-data'
 
 export function getSelectedWellCount(
   pipette: PipetteV2Specs,
@@ -19,7 +19,6 @@ export function getSelectedWellCount(
     if (pipette.channels === 8) {
       return wells.length
     } else if (pipette.channels === 96) {
-      // this is technically true but will happen all at once, so maybe this should be one?
       return 12
     }
   }

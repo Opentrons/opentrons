@@ -51,13 +51,10 @@ export function QuickTransferDashboard(): JSX.Element {
   ] = React.useState<boolean>(false)
   const [targetTransferId, setTargetTransferId] = React.useState<string>('')
   const sortBy = useSelector(getQuickTransfersOnDeviceSortKey) ?? 'alphabetical'
-  const quickTransfersData = protocols.data?.data ?? []
-  let quickTransfers: ProtocolResource[] = quickTransfersData.filter(
-    protocol => {
+  const quickTransfersData =
+    protocols.data?.data.filter(protocol => {
       return protocol.protocolKind === 'quick-transfer'
-    }
-  )
-
+    }) ?? []
   let unpinnedTransfers: ProtocolResource[] = quickTransfersData
 
   // The pinned protocols are stored as an array of IDs in config

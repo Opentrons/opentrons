@@ -278,7 +278,10 @@ export function QuickTransferDetails(): JSX.Element | null {
     missingProtocolHardware,
     conflictedSlots,
   } = useMissingProtocolHardware(transferId)
-  let chipText = useHardwareStatusText(missingProtocolHardware, conflictedSlots)
+  const chipText = useHardwareStatusText(
+    missingProtocolHardware,
+    conflictedSlots
+  )
 
   const dispatch = useDispatch<Dispatch>()
   const host = useHost()
