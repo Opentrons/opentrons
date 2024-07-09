@@ -255,6 +255,8 @@ async def test_liquid_probe_tip_checking(
         assert False
     except TipNotAttachedError:
         assert True
+    except Exception:
+        assert False
 
 
 async def test_liquid_probe_volume_checking(
@@ -286,6 +288,8 @@ async def test_liquid_probe_volume_checking(
         assert False
     except TipNotEmptyError:
         assert True
+    except Exception:
+        assert False
 
 
 async def test_liquid_probe_location_checking(
@@ -319,3 +323,5 @@ async def test_liquid_probe_location_checking(
         assert False
     except MustHomeError:
         assert True
+    except Exception:
+        assert False
