@@ -1,11 +1,16 @@
 """Plunger overshoot."""
 import argparse
-from asyncio import run, sleep as async_sleep
+from asyncio import run, sleep as async_sleep, wait_for, TimeoutError, Event as AsyncEvent
 from contextlib import asynccontextmanager
 from random import random
 from threading import Thread, Event
 import time
 from typing import Optional, AsyncIterator
+
+from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
+from opentrons_hardware.firmware_bindings.constants import NodeId, MessageId, MotorUsageValueType
+from opentrons_hardware.firmware_bindings.messages import MessageDefinition
+from opentrons_hardware.firmware_bindings.messages.message_definitions import GetMotorUsageRequest, GetMotorUsageResponse
 
 from opentrons.hardware_control.ot3api import OT3API
 
@@ -117,6 +122,24 @@ async def _run_test_loop(api: OT3API) -> None:
     min_pos = bottom - MAX_DIST_MM
     max_pos = bottom + MAX_DIST_MM
     prev_inp = ""
+
+    event: Optional[AsyncEvent] = None
+
+    def _listener(message: MessageDefinition, arb_id: ArbitrationId) -> None:
+        nonlocal event
+        assert event is not None
+        if isinstance(message, GetMotorUsageResponse):
+            usage_elements = message.payload.usage_elements
+            for m in usage_elements:
+                if m.key == MotorUsageValueType.linear_motor_distance:
+                    print("usage", m.usage_value)
+                    event.set()
+
+    def _filter(arb_id: ArbitrationId) -> bool:
+        return (NodeId(arb_id.parts.originating_node_id) == NodeId.pipette_left) and (
+            MessageId(arb_id.parts.message_id) == MessageId.get_motor_usage_response
+        )
+
     while True:
         inp_str = input("enter command, or ENTER to repeat: ")
         if not inp_str:
@@ -128,6 +151,17 @@ async def _run_test_loop(api: OT3API) -> None:
                 async with _set_move_flags(api.is_simulator):
                     await api._move_to_plunger_bottom(MNT, rate=1.0)
                     PLUNGER_POS = bottom
+            elif inp == "u":
+                event = AsyncEvent()
+                can_messenger = api._backend._messenger
+                can_messenger.add_listener(_listener, _filter)
+                await can_messenger.send(node_id=NodeId.pipette_left, message=GetMotorUsageRequest())
+                try:
+                    await wait_for(event.wait(), 1.0)
+                except TimeoutError:
+                    print("CAN message timed out")
+                finally:
+                    can_messenger.remove_listener(_listener)
             elif inp == "z":
                 _zero_indicator_and_plunger()
             elif inp[0] == "o":
