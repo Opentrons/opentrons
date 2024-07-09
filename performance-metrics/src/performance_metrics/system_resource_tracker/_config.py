@@ -169,7 +169,7 @@ class SystemResourceTrackerConfiguration:
             kwargs["refresh_interval"] = _eval_refresh_interval(refresh_interval)
 
         if (storage_dir := os.environ.get(STORAGE_DIR_ENV_VAR_NAME)) is not None:
-            kwargs["storage_dir"] = _eval_storage_dir(storage_dir)
+            kwargs["storage_dir"] = Path(_eval_storage_dir(storage_dir))
 
         if (logging_level := os.environ.get(LOGGING_LEVEL_ENV_VAR_NAME)) is not None:
             kwargs["logging_level"] = _eval_logging_level(logging_level)
