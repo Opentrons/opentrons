@@ -2,7 +2,7 @@
 
 import logging
 import time
-import systemd.daemon
+import systemd.daemon  # type: ignore [import-untyped]
 from .._logging_config import log_init, LOGGER_NAME
 from ._config import SystemResourceTrackerConfiguration
 from ._system_resource_tracker import SystemResourceTracker
