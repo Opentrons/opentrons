@@ -14,7 +14,11 @@ from opentrons.legacy_broker import LegacyBroker
 from opentrons.hardware_control.modules.types import ModuleType, TemperatureModuleModel
 from opentrons.protocols.api_support import instrument as mock_instrument_support
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.util import APIVersionError, RobotTypeError
+from opentrons.protocols.api_support.util import (
+    APIVersionError,
+    RobotTypeError,
+    UnsupportedAPIError,
+)
 from opentrons.protocol_api import (
     MAX_SUPPORTED_VERSION,
     ProtocolContext,
@@ -1070,7 +1074,7 @@ def test_load_module_default_location(
 @pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
 def test_load_module_with_configuration(subject: ProtocolContext) -> None:
     """It should raise an APIVersionError if the deprecated `configuration` argument is used."""
-    with pytest.raises(APIVersionError, match="removed"):
+    with pytest.raises(UnsupportedAPIError):
         subject.load_module(
             module_name="spline reticulator",
             location=42,
@@ -1081,7 +1085,7 @@ def test_load_module_with_configuration(subject: ProtocolContext) -> None:
 @pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
 def test_load_module_with_mag_block_raises(subject: ProtocolContext) -> None:
     """It should raise an APIVersionError if loading a magnetic block."""
-    with pytest.raises(APIVersionError):
+    with pytest.raises(UnsupportedAPIError):
         subject.load_module(
             module_name="magneticBlockV1",
             location=42,
