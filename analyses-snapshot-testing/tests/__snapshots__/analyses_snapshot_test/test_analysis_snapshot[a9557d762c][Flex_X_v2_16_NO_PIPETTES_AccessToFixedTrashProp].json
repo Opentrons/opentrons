@@ -24,7 +24,7 @@
   "errors": [
     {
       "createdAt": "TIMESTAMP",
-      "detail": "APIVersionError [line 15]: Fixed Trash is not supported on Flex protocols in API Version 2.16 and above.",
+      "detail": "UnsupportedAPIError [line 15]: Error 4002 API_REMOVED (UnsupportedAPIError): Fixed Trash is not available after API version 2.16. You are currently using API version 2.16. Fixed trash is no longer supported on Flex protocols.",
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
@@ -33,14 +33,14 @@
       "wrappedErrors": [
         {
           "createdAt": "TIMESTAMP",
-          "detail": "opentrons.protocols.api_support.util.APIVersionError: Fixed Trash is not supported on Flex protocols in API Version 2.16 and above.",
-          "errorCode": "4000",
+          "detail": "Fixed Trash is not available after API version 2.16. You are currently using API version 2.16. Fixed trash is no longer supported on Flex protocols.",
+          "errorCode": "4002",
           "errorInfo": {
-            "args": "('Fixed Trash is not supported on Flex protocols in API Version 2.16 and above.',)",
-            "class": "APIVersionError",
-            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line N, in exec_run\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line N, in <module>\n\n  File \"Flex_X_v2_16_NO_PIPETTES_AccessToFixedTrashProp.py\", line N, in run\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/api_support/util.py\", line N, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/protocol_context.py\", line N, in fixed_trash\n    raise APIVersionError(\n"
+            "current_version": "2.16",
+            "identifier": "Fixed Trash",
+            "since_version": "2.16"
           },
-          "errorType": "PythonException",
+          "errorType": "UnsupportedAPIError",
           "id": "UUID",
           "isDefined": false,
           "wrappedErrors": []
