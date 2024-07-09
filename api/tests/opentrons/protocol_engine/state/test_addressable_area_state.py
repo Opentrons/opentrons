@@ -4,11 +4,9 @@ The trifecta is tested here as a single unit, treating AddressableAreaState as a
 implementation detail.
 """
 
-from datetime import datetime
-
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
 
-from opentrons.protocol_engine.actions.actions import PlayAction
+from opentrons.protocol_engine.actions.actions import SetDeckConfigurationAction
 from opentrons.protocol_engine.state.addressable_areas import (
     AddressableAreaStore,
     AddressableAreaView,
@@ -20,7 +18,7 @@ from opentrons.protocol_engine.types import DeckType
 def test_deck_configuration_setting(
     ot3_standard_deck_def: DeckDefinitionV5,
 ) -> None:
-    """You should be able to set the deck configuration with a PlayAction."""
+    """You should be able to set the deck configuration with a SetDeckConfigurationAction."""
     subject = AddressableAreaStore(
         deck_configuration=[("cutoutA3", "trashBinAdapter", None)],
         config=Config(
@@ -37,8 +35,7 @@ def test_deck_configuration_setting(
 
     # The new deck configuration should overwrite the old one.
     subject.handle_action(
-        PlayAction(
-            requested_at=datetime.now(),
+        SetDeckConfigurationAction(
             deck_configuration=[
                 ("cutoutA3", "trashBinAdapter", None),
                 ("cutoutB3", "singleRightSlot", None),
@@ -52,8 +49,7 @@ def test_deck_configuration_setting(
 
     # Deck configurations of None should no-op.
     subject.handle_action(
-        PlayAction(
-            requested_at=datetime.now(),
+        SetDeckConfigurationAction(
             deck_configuration=None,
         )
     )
