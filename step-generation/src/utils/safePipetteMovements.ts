@@ -244,12 +244,21 @@ const getSlotHasPotentialCollidingObject = (
       ) &&
       pipetteBounds[0].z != null
     ) {
-      const highestZInSlot = getHighestZInSlot(
-        robotState,
-        invariantContext,
-        labwareId
-      )
-      return highestZInSlot >= pipetteBounds[0]?.z
+      const lwIdInSurroundingSlot =
+        Object.keys(robotState.labware).find(
+          lwId => robotState.labware[lwId].slot === slot.addressableArea?.id
+        ) ?? null
+      const highestZInSlot =
+        lwIdInSurroundingSlot == null
+          ? slotBounds.zDimension ?? 0
+          : getHighestZInSlot(
+              robotState,
+              invariantContext,
+              lwIdInSurroundingSlot
+            )
+      if (highestZInSlot >= pipetteBounds[0]?.z) {
+        return true
+      }
     }
   }
   return false
@@ -346,7 +355,7 @@ export const getIsSafePipetteMovement = (
     const pipetteBoundsAtWellLocation = getPipetteBoundsAtSpecifiedMoveToPosition(
       pipetteEntity,
       tipLength,
-      wellLocationOffset
+      wellLocationPoint
     )
     const surroundingSlots = getFlexSurroundingSlots(
       labwareSlot,
