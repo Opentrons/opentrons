@@ -1,7 +1,14 @@
 """Test LiquidProbe commands."""
 from datetime import datetime
 
-from opentrons_shared_data.errors.exceptions import PipetteLiquidNotFoundError
+from opentrons.protocol_engine.errors.exceptions import (
+    MustHomeError,
+    TipNotAttachedError,
+    TipNotEmptyError,
+)
+from opentrons_shared_data.errors.exceptions import (
+    PipetteLiquidNotFoundError,
+)
 from decoy import matchers, Decoy
 import pytest
 
@@ -51,6 +58,7 @@ async def test_liquid_probe_implementation_no_prep(
 ) -> None:
     """A Liquid Probe should have an execution implementation without preparing to aspirate."""
     location = WellLocation(origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1))
+    current_well = CurrentWell(pipette_id="abc", labware_id="123", well_name="A3")
 
     data = LiquidProbeParams(
         pipetteId="abc",
@@ -67,7 +75,7 @@ async def test_liquid_probe_implementation_no_prep(
             labware_id="123",
             well_name="A3",
             well_location=location,
-            current_well=None,
+            current_well=current_well,
         ),
     ).then_return(Point(x=1, y=2, z=3))
 
@@ -95,7 +103,8 @@ async def test_liquid_probe_implementation_with_prep(
     subject: LiquidProbeImplementation,
 ) -> None:
     """A Liquid Probe should have an execution implementation with preparing to aspirate."""
-    location = WellLocation(origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1))
+    location = WellLocation(origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0))
+    current_well = CurrentWell(pipette_id="abc", labware_id="123", well_name="A3")
 
     data = LiquidProbeParams(
         pipetteId="abc",
@@ -117,11 +126,7 @@ async def test_liquid_probe_implementation_with_prep(
             labware_id="123",
             well_name="A3",
             well_location=location,
-            current_well=CurrentWell(
-                pipette_id="abc",
-                labware_id="123",
-                well_name="A3",
-            ),
+            current_well=current_well,
         ),
     ).then_return(Point(x=1, y=2, z=3))
 
@@ -146,6 +151,7 @@ async def test_liquid_probe_implementation_with_prep(
             labware_id="123",
             well_name="A3",
             well_location=WellLocation(origin=WellOrigin.TOP),
+            current_well=current_well,
         ),
     )
 
@@ -163,6 +169,9 @@ async def test_liquid_not_found_error(
     well_name = "well-name"
     well_location = WellLocation(
         origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1)
+    )
+    current_well = CurrentWell(
+        pipette_id=pipette_id, labware_id=labware_id, well_name=well_name
     )
 
     position = Point(x=1, y=2, z=3)
@@ -187,7 +196,7 @@ async def test_liquid_not_found_error(
             labware_id=labware_id,
             well_name=well_name,
             well_location=well_location,
-            current_well=None,
+            current_well=current_well,
         ),
     ).then_return(position)
 
@@ -212,3 +221,107 @@ async def test_liquid_not_found_error(
             position=DeckPoint(x=position.x, y=position.y, z=position.z)
         ),
     )
+
+
+async def test_liquid_probe_tip_checking(
+    decoy: Decoy,
+    movement: MovementHandler,
+    pipetting: PipettingHandler,
+    subject: LiquidProbeImplementation,
+    model_utils: ModelUtils,
+) -> None:
+    """It should return a TipNotAttached error if the hardware API indicates that."""
+    pipette_id = "pipette-id"
+    labware_id = "labware-id"
+    well_name = "well-name"
+    well_location = WellLocation(
+        origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1)
+    )
+
+    data = LiquidProbeParams(
+        pipetteId=pipette_id,
+        labwareId=labware_id,
+        wellName=well_name,
+        wellLocation=well_location,
+    )
+
+    decoy.when(
+        pipetting.get_is_ready_to_aspirate(
+            pipette_id=pipette_id,
+        ),
+    ).then_raise(TipNotAttachedError())
+    try:
+        await subject.execute(data)
+        assert False
+    except TipNotAttachedError:
+        assert True
+    except Exception:
+        assert False
+
+
+async def test_liquid_probe_volume_checking(
+    decoy: Decoy,
+    movement: MovementHandler,
+    pipetting: PipettingHandler,
+    subject: LiquidProbeImplementation,
+    model_utils: ModelUtils,
+) -> None:
+    """It should return a TipNotEmptyError if the hardware API indicates that."""
+    pipette_id = "pipette-id"
+    labware_id = "labware-id"
+    well_name = "well-name"
+    well_location = WellLocation(
+        origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1)
+    )
+
+    data = LiquidProbeParams(
+        pipetteId=pipette_id,
+        labwareId=labware_id,
+        wellName=well_name,
+        wellLocation=well_location,
+    )
+    decoy.when(
+        pipetting.get_is_empty(pipette_id=pipette_id),
+    ).then_return(False)
+    try:
+        await subject.execute(data)
+        assert False
+    except TipNotEmptyError:
+        assert True
+    except Exception:
+        assert False
+
+
+async def test_liquid_probe_location_checking(
+    decoy: Decoy,
+    movement: MovementHandler,
+    pipetting: PipettingHandler,
+    subject: LiquidProbeImplementation,
+    model_utils: ModelUtils,
+) -> None:
+    """It should return a PositionUnkownError if the hardware API indicates that."""
+    pipette_id = "pipette-id"
+    labware_id = "labware-id"
+    well_name = "well-name"
+    well_location = WellLocation(
+        origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1)
+    )
+
+    data = LiquidProbeParams(
+        pipetteId=pipette_id,
+        labwareId=labware_id,
+        wellName=well_name,
+        wellLocation=well_location,
+    )
+    decoy.when(
+        await movement.check_for_valid_position(
+            mount=MountType.LEFT,
+        ),
+    ).then_return(False)
+    try:
+        await subject.execute(data)
+        assert False
+    except MustHomeError:
+        assert True
+    except Exception:
+        assert False
