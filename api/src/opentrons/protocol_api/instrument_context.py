@@ -2055,8 +2055,6 @@ class InstrumentContext(publisher.CommandPublisher):
 
         :returns: A boolean.
         """
-        if not isinstance(well, labware.Well):
-            raise WellDoesNotExistError("You must provide a valid well to check.")
         try:
             self._core.liquid_probe_without_recovery(well._core)
         except ProtocolCommandFailedError as e:
@@ -2072,9 +2070,6 @@ class InstrumentContext(publisher.CommandPublisher):
 
         :returns: None.
         """
-        if not isinstance(well, labware.Well):
-            raise WellDoesNotExistError("You must provide a valid well to check.")
-
         self._core.liquid_probe_with_recovery(well._core)
 
     @requires_version(2, 20)
@@ -2087,8 +2082,5 @@ class InstrumentContext(publisher.CommandPublisher):
 
         This is intended for Opentrons internal use only and is not a guaranteed API.
         """
-        if not isinstance(well, labware.Well):
-            raise WellDoesNotExistError("You must provide a valid well to check.")
-
         height = self._core.liquid_probe_without_recovery(well._core)
         return height

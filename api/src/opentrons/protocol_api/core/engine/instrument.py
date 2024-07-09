@@ -850,6 +850,8 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         well_location = WellLocation(
             origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0)
         )
+        
+        self.retract()
 
         self._engine_client.execute_command(
             cmd.LiquidProbeParams(
@@ -866,6 +868,8 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         well_location = WellLocation(
             origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0)
         )
+        
+        self.retract()
 
         result = self._engine_client.execute_command_without_recovery(
             cmd.LiquidProbeParams(
