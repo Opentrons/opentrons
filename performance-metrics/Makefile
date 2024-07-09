@@ -97,6 +97,7 @@ override-robot-version:
 .PHONY: set-performance-metrics-ff
 set-performance-metrics-ff:
 	@curl \
+	--silent \
     -H "opentrons-version: *" \
     -X POST $(host):31950/settings \
     -H "content-type: application/json" \
@@ -105,6 +106,7 @@ set-performance-metrics-ff:
 .PHONY: unset-performance-metrics-ff
 unset-performance-metrics-ff:
 	@curl \
+	--silent \
 	-H "opentrons-version: *" \
 	-X POST $(host):31950/settings \
 	-H "content-type: application/json" \
@@ -128,6 +130,9 @@ setup-remote-flex:
 	@echo "Pushing robot-server to Flex"
 	@$(MAKE) -C ../robot-server push-ot3 host=$(host) ssh_key=$(ssh_key) 2>&1 | grep -v "Permanently added" > /dev/null
 
+	@echo "Setting performance metrics feature flag"
+	@$(MAKE) set-performance-metrics-ff host=$(host) 2>&1 > /dev/null
+
 
 .PHONY: start-remote-system-resource-tracker
 start-remote-system-resource-tracker:
@@ -140,3 +145,59 @@ start-remote-system-resource-tracker:
 		$${storage_dir:+OT_SYSTEM_RESOURCE_TRACKER_STORAGE_DIR=$$storage_dir} \
 		$${logging_level:+OT_SYSTEM_RESOURCE_TRACKER_LOGGING_LEVEL=$$logging_level} \
 		python3 -m performance_metrics.system_resource_tracker"
+
+
+.PHONY: setup-system-resource-tracker-systemd-service
+setup-system-resource-tracker-systemd-service:
+	@echo "Configuring remote file system to read/write"
+	@ssh -i $(ssh_key) root@$(host) "mount -o remount,rw /"
+
+	@echo "Pushing $(FILENAME) to remote"
+	@scp -i $(ssh_key) $(FILENAME) root@$(host):/etc/systemd/system/system-resource-tracker.service
+
+	@echo "Enabling, restarting, and checking systemd service status, then remounting filesystem as read-only"
+	@ssh -i $(ssh_key) root@$(host) "\
+		systemctl enable system-resource-tracker; \
+		systemctl restart system-resource-tracker; \
+		systemctl is-active system-resource-tracker; \
+		mount -o remount,ro /"
+
+.PHONY: setup-prod-system-resource-tracker-systemd-service
+setup-prod-system-resource-tracker-systemd-service: FILENAME=system-resource-tracker.service
+setup-prod-system-resource-tracker-systemd-service: setup-system-resource-tracker-systemd-service
+
+.PHONY: setup-dev-system-resource-tracker-systemd-service
+setup-dev-system-resource-tracker-systemd-service: FILENAME=system-resource-tracker-dev.service
+setup-dev-system-resource-tracker-systemd-service: setup-system-resource-tracker-systemd-service
+
+
+.PHONY: cleanup-remote-server
+# Default value for the data folder path
+DATA_FOLDER ?= /data/performance_metrics_data
+DEV_DATA_FOLDER ?= /data/performance_metrics_data_dev
+
+cleanup-remote-server:
+	@echo "Cleaning up performance metrics on host $(host)..."
+	
+	@ssh -i $(ssh_key) root@$(host) "\
+		echo "Configuring remote file system to read/write"; \
+		mount -o remount,rw /; \
+		echo "Stopping system-resource-tracker"; \
+		systemctl stop system-resource-tracker; \
+		echo "Disabling system-resource-tracker"; \
+		systemctl disable system-resource-tracker; \
+		echo "Reloading daemon"; \
+		systemctl daemon-reload; \
+		echo "Checking system-resource-tracker status"; \
+		systemctl is-active system-resource-tracker; \
+		echo "Removing service file, data folders, and performance_metrics package"; \
+		rm -rf \
+			/etc/systemd/system/system-resource-tracker.service \
+			$(DATA_FOLDER) \
+			$(DEV_DATA_FOLDER) \
+			/opt/opentrons-robot-server/performance_metrics*; \
+		echo "Remounting filesystem as read-only"; \
+		mount -o remount,ro /"
+
+	@echo "Unsetting performance metrics feature flag"
+	@$(MAKE) unset-performance-metrics-ff host=$(host) 2>&1 > /dev/null
