@@ -811,20 +811,11 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                     primaryNozzle=cast(PRIMARY_NOZZLE_LITERAL, primary_nozzle)
                 )
             )
-        elif style == NozzleLayout.PARTIAL_COLUMN:
-            assert primary_nozzle is not None
-            assert front_right_nozzle is not None or back_left_nozzle is not None
-            configuration_model = QuadrantNozzleLayoutConfiguration(
-                primaryNozzle=cast(PRIMARY_NOZZLE_LITERAL, primary_nozzle),
-                frontRightNozzle=front_right_nozzle,
-                backLeftNozzle=back_left_nozzle,
-            )
         elif style == NozzleLayout.ROW:
             configuration_model = RowNozzleLayoutConfiguration(
                 primaryNozzle=cast(PRIMARY_NOZZLE_LITERAL, primary_nozzle)
             )
-        elif style == NozzleLayout.QUADRANT:
-            assert front_right_nozzle is not None or back_left_nozzle is not None
+        elif style == NozzleLayout.QUADRANT or style == NozzleLayout.PARTIAL_COLUMN:
             configuration_model = QuadrantNozzleLayoutConfiguration(
                 primaryNozzle=cast(PRIMARY_NOZZLE_LITERAL, primary_nozzle),
                 frontRightNozzle=front_right_nozzle,

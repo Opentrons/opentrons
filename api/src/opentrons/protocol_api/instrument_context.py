@@ -2030,6 +2030,15 @@ class InstrumentContext(publisher.CommandPublisher):
                 f"Nozzle layout configuration of style {style.value} is currently unsupported."
             )
 
+        original_enabled_layouts = [NozzleLayout.COLUMN, NozzleLayout.ALL]
+        if (
+            self._api_version
+            < _PARTIAL_NOZZLE_CONFIGURATION_SINGLE_ROW_PARTIAL_COLUMN_ADDED_IN
+        ) and (style not in original_enabled_layouts):
+            raise ValueError(
+                f"Nozzle layout configuration of style {style.value} is unsupported in API Versions lower than {_PARTIAL_NOZZLE_CONFIGURATION_SINGLE_ROW_PARTIAL_COLUMN_ADDED_IN}."
+            )
+
         if style != NozzleLayout.ALL:
             if start is None:
                 raise ValueError(
@@ -2040,43 +2049,35 @@ class InstrumentContext(publisher.CommandPublisher):
                     f"Starting nozzle specified is not one of {types.ALLOWED_PRIMARY_NOZZLES}"
                 )
         if style == NozzleLayout.QUADRANT:
-            if front_right is None:
+            if front_right is None and back_left is None:
                 raise ValueError(
-                    "Cannot configure a QUADRANT layout without a front right nozzle."
-                )
-        original_enabled_layouts = [NozzleLayout.COLUMN, NozzleLayout.ALL]
-        if (
-            self._api_version
-            < _PARTIAL_NOZZLE_CONFIGURATION_SINGLE_ROW_PARTIAL_COLUMN_ADDED_IN
-        ):
-            if style not in original_enabled_layouts:
-                raise ValueError(
-                    f"Nozzle layout configuration of style {style.value} is unsupported in API Versions lower than {_PARTIAL_NOZZLE_CONFIGURATION_SINGLE_ROW_PARTIAL_COLUMN_ADDED_IN}."
+                    "Cannot configure a QUADRANT layout without a front right or back left nozzle."
                 )
 
+        front_right_resolved = front_right
+        back_left_resolved = back_left
         if style == NozzleLayout.PARTIAL_COLUMN:
+            if end is None:
+                raise ValueError(
+                    "Parameter 'end' is required for Partial Column Nozzle Configuration Layout."
+                )
+            if front_right is not None or back_left is not None:
+                raise ValueError(
+                    "Parameters 'front_right' and 'back_left' cannot be used with Partial Column Nozzle Configuration Layout."
+                )
+
+            # Determine if 'end' will be configured as front_right or back_left
             if start == "H1" or start == "H12":
-                self._core.configure_nozzle_layout(
-                    style,
-                    primary_nozzle=start,
-                    front_right_nozzle=front_right,
-                    back_left_nozzle=end,
-                )
+                back_left_resolved = end
             elif start == "A1" or start == "A12":
-                self._core.configure_nozzle_layout(
-                    style,
-                    primary_nozzle=start,
-                    front_right_nozzle=end,
-                    back_left_nozzle=back_left,
-                )
-        else:
-            self._core.configure_nozzle_layout(
-                style,
-                primary_nozzle=start,
-                front_right_nozzle=front_right,
-                back_left_nozzle=back_left,
-            )
-        # TODO (spp, 2023-12-05): verify that tipracks are on adapters for only full 96 channel config
+                front_right_resolved = end
+
+        self._core.configure_nozzle_layout(
+            style,
+            primary_nozzle=start,
+            front_right_nozzle=front_right_resolved,
+            back_left_nozzle=back_left_resolved,
+        )
         self._tip_racks = tip_racks or []
 
     @requires_version(2, 20)
