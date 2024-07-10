@@ -31,6 +31,7 @@ interface ChooseCsvFileProps {
   setParameter: (value: boolean | string | number, variableName: string) => void
   csvFileInfo: string
   setCsvFileInfo: (fileInfo: string) => void
+  setChooseValueScreen: (value: CsvFileParameter | null ) => void
 }
 
 export function ChooseCsvFile({
@@ -40,20 +41,32 @@ export function ChooseCsvFile({
   setParameter,
   csvFileInfo,
   setCsvFileInfo,
+  setChooseValueScreen
 }: ChooseCsvFileProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
+  
   const csvFilesOnUSB = useSelector(getShellUpdateDataFiles) ?? []
 
   const csvFilesOnRobot = useAllCsvFilesQuery(protocolId).data?.data.files ?? []
 
+
   // ToDo (06/20/2024) this will removed when working on AUTH-521
-  // const handleOnChange = (newValue: string | number | boolean): void => {
+  // const handleOnChange = (newValue: string): void => {
+  //   setCsvFileInfo(newValue)
   //   setParameter(newValue, parameter?.variableName ?? 'csvFileId')
   // }
 
+  // const [ csvFileSelected, setCsvFileSelected ] = React.useState<string>(parameter.)
+
   const handleConfirmSelection = (): void => {
     // ToDo (kk:06/18/2024) wire up later
+ 
+    setParameter(csvFileInfo, parameter.variableName) 
+    setChooseValueScreen(null)
+    
   }
+
+
 
   return (
     <>
@@ -85,7 +98,10 @@ export function ChooseCsvFile({
                     data-testid={`${csv.id}`}
                     buttonLabel={csv.name}
                     buttonValue={`${csv.id}`}
-                    onChange={() => {}}
+                    isSelected={csvFileInfo === csv.id}
+                    onChange={() => { 
+                      setCsvFileInfo(csv.id)
+                    }}
                   />
                 ))
               ) : (
@@ -107,6 +123,7 @@ export function ChooseCsvFile({
                         data-testid={`${last(csv.split('/'))}`}
                         buttonLabel={last(csv.split('/')) ?? 'default'}
                         buttonValue={csv}
+                        isSelected={ csvFileInfo === csv }
                         onChange={() => {
                           // ToDO this will be implemented AUTH-521
                           // handleOnChange(option.value)
