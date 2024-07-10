@@ -712,10 +712,12 @@ class LabwareView(HasState[LabwareState]):
     def is_fixed_trash(self, labware_id: str) -> bool:
         """Check if labware is fixed trash."""
         return self.get_has_quirk(labware_id, "fixedTrash")
-    
+
     def is_absorbance_reader_lid(self, labware_id: str) -> bool:
         """Check if labware is an absorbance reader lid."""
-        return labware_validation.is_absorbance_reader_lid(self.get(labware_id).loadName)
+        return labware_validation.is_absorbance_reader_lid(
+            self.get(labware_id).loadName
+        )
 
     def raise_if_labware_inaccessible_by_pipette(self, labware_id: str) -> None:
         """Raise an error if the specified location cannot be reached via a pipette."""

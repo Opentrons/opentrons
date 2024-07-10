@@ -220,7 +220,9 @@ class GeometryView:
             addressable_area_name = self._get_staging_slot_name(labware_id)
         except errors.LocationIsLidDockSlotError:
             addressable_area_name = self._get_lid_dock_slot_name(labware_id)
-        slot_pos = self._addressable_areas.get_addressable_area_position(addressable_area_name)
+        slot_pos = self._addressable_areas.get_addressable_area_position(
+            addressable_area_name
+        )
         labware_data = self._labware.get(labware_id)
 
         offset = self._get_labware_position_offset(labware_id, labware_data.location)
@@ -561,7 +563,7 @@ class GeometryView:
             raise ValueError(
                 "Cannot get staging slot name for labware not on staging slot."
             )
-        
+
     def _get_lid_dock_slot_name(self, labware_id: str) -> str:
         """Get the staging slot name that the labware is on."""
         labware_location = self._labware.get(labware_id).location
