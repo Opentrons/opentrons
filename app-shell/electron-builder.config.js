@@ -1,5 +1,4 @@
 'use strict'
-const { arch } = require('os')
 const path = require('path')
 
 const {
