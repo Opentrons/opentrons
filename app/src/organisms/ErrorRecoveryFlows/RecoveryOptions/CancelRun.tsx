@@ -65,14 +65,14 @@ function CancelRunConfirmation({
         <Flex
           flexDirection={DIRECTION_COLUMN}
           alignItems={ALIGN_CENTER}
-          gridGap={SPACING.spacing24}
+          gridGap={SPACING.spacing16}
           height="100%"
-          width="848px"
+          width="666px"
         >
           <Icon
             name="ot-alert"
-            size="3.75rem"
-            marginTop={SPACING.spacing24}
+            size="2.5rem"
+            marginTop={SPACING.spacing16}
             color={COLORS.red50}
           />
           <LegacyStyledText as="h3Bold">
