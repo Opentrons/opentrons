@@ -172,12 +172,12 @@ setup-dev-system-resource-tracker-systemd-service: FILENAME=system-resource-trac
 setup-dev-system-resource-tracker-systemd-service: setup-system-resource-tracker-systemd-service
 
 
-.PHONY: cleanup-remote-server
+.PHONY: cleanup-remote-flex
 # Default value for the data folder path
 DATA_FOLDER ?= /data/performance_metrics_data
 DEV_DATA_FOLDER ?= /data/performance_metrics_data_dev
 
-cleanup-remote-server:
+cleanup-remote-flex:
 	@echo "Cleaning up performance metrics on host $(host)..."
 	
 	# Note not using || to exit on error because it only looks to see 
