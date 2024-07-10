@@ -1,8 +1,10 @@
 from typing import List, Dict, Any, Optional
+from enum import Enum
 import sys
 from datetime import datetime
 from opentrons.protocol_api import ProtocolContext, Labware
 import requests
+from opentrons.drivers.command_builder import CommandBuilder
 
 metadata = {"protocolName": "tc-lid-march-2024-v1"}
 requirements = {"robotType": "Flex", "apiLevel": "2.16"}
@@ -28,8 +30,8 @@ LID_DEFINITION = "tc_lid_march_2024_v1"
 LID_BOTTOM_DEFINITION = "tc_lid_march_2024_v1"
 ip = "10.14.19.38"
 
-EVAP_TEST = False
-QUICK_TEST = True
+EVAP_TEST = True
+QUICK_TEST = False
 LONG_HOLD_TEST = False
 
 OFFSET_DECK = {
@@ -41,8 +43,16 @@ OFFSET_THERMOCYCLER = {
     "drop": {"x": 0, "y": 0, "z": 0}
 }
 
+# THERMOCYLCER VARIABLES
+SERIAL_ACK = "\r\n"
+TC_COMMAND_TERMINATOR = SERIAL_ACK
+TC_ACK = "ok" + SERIAL_ACK + "ok" + SERIAL_ACK
+DEFAULT_TC_TIMEOUT = 40
+DEFAULT_COMMAND_RETRIES = 3
+class GCODE(str, Enum):
+    PLATE_LIFT_CODE = "M128"
 
-    
+
 def _move_labware_with_offset(
     protocol: ProtocolContext,
     labware: Labware,
@@ -59,6 +69,29 @@ def _move_labware_with_offset(
     )
 
 def run(protocol: ProtocolContext):
+    
+    # PLATE LIFT FUNCTIONS
+    async def _driver_plate_lift():
+        """Get Raw Power Output for each Thermocycler element."""
+        c = (
+            CommandBuilder(terminator=TC_COMMAND_TERMINATOR)
+            .add_gcode(gcode=GCODE.PLATE_LIFT_CODE)
+        )
+        if not protocol.is_simulating():
+            response = await tc_driver._connection.send_command(command=c, retries=DEFAULT_COMMAND_RETRIES)
+        else:
+            response = TC_ACK  # SimulatingDriver has no `._connection` so need to return _something_ for that case
+        return response
+
+    async def _get_plate_lift():
+        await tc_async_module_hardware.wait_for_is_running()
+        response = await _driver_plate_lift()
+        return str(response)
+    
+    def tc_plate_lift():
+        tc_async_module_hardware._get_plate_lift = _get_plate_lift
+        tc_sync_module_hardware._get_plate_lift()
+    
     # GET SERIAL NUMBERS
     # THERMOCYCLER
     response = requests.get(
@@ -96,9 +129,12 @@ def run(protocol: ProtocolContext):
         )
     date = datetime.now()
     data_row = [date, thermocycler_serial, pipette, gripper]
-    google_sheet.write_to_row(data_row)
+    #google_sheet.write_to_row(data_row)
     # SETUP
     thermocycler = protocol.load_module("thermocyclerModuleV2")
+    tc_sync_module_hardware = thermocycler._core._sync_module_hardware
+    tc_async_module_hardware = tc_sync_module_hardware._obj_to_adapt
+    tc_driver = tc_async_module_hardware._driver
     tiprack_50_1    = protocol.load_labware('opentrons_flex_96_tiprack_50ul', 'D1')
     p1000 = protocol.load_instrument("flex_8channel_1000", "left", tip_racks = [tiprack_50_1])
     trashA1 = protocol.load_trash_bin("A3") 
@@ -154,12 +190,16 @@ def run(protocol: ProtocolContext):
     def move_lid():
         # Move lid from thermocycler to deck to stack to waste chute
         thermocycler.open_lid()
+        tc_plate_lift()
         # Move Lid to Deck
         _move_labware_with_offset(protocol, top_lid, "B2", pick_up_offset = OFFSET_THERMOCYCLER["pick-up"], drop_offset=OFFSET_DECK["drop"])
+        #google_sheet.update_cell("Sheet1", 2, 6, "Y")
         # Move Lid to Stack
         _move_labware_with_offset(protocol, top_lid, bottom_lid, pick_up_offset = OFFSET_THERMOCYCLER["pick-up"], drop_offset=OFFSET_DECK["drop"])
+        #google_sheet.update_cell("Sheet1", 2, 7, "Y")
         # Move Lid to Waste Chute
         _move_labware_with_offset(protocol, top_lid, wasteChute, pick_up_offset = OFFSET_DECK["pick-up"])
+        #google_sheet.update_cell("Sheet1", 2, 8, "Y")
     thermocycler.set_block_temperature(4)
     thermocycler.set_lid_temperature(105)
         
@@ -173,10 +213,6 @@ def run(protocol: ProtocolContext):
         thermocycler.set_lid_temperature(105)
         _move_labware_with_offset(protocol, top_lid, plate_in_cycler, pick_up_offset = OFFSET_DECK["pick-up"], drop_offset=OFFSET_THERMOCYCLER["drop"])
         thermocycler.close_lid()
-        thermocycler.execute_profile(steps = profile_TAG, repetitions = 1,block_max_volume=50)
-        # # # Cool to 4° 
-        thermocycler.set_block_temperature(4)
-        thermocycler.set_lid_temperature(105)
     
     if LONG_HOLD_TEST:
         _move_labware_with_offset(protocol, top_lid, plate_in_cycler, pick_up_offset = OFFSET_DECK["pick-up"], drop_offset=OFFSET_THERMOCYCLER["drop"])
@@ -190,6 +226,9 @@ def run(protocol: ProtocolContext):
         
     # Go through PCR cycle
     if EVAP_TEST:
+        fill_with_liquid_and_measure()
+        _move_labware_with_offset(protocol, top_lid, plate_in_cycler, pick_up_offset = OFFSET_DECK["pick-up"], drop_offset=OFFSET_THERMOCYCLER["drop"])
+        thermocycler.close_lid()
         thermocycler.execute_profile(steps = profile_TAG, repetitions = 1,block_max_volume=50)
         pcr_cycle()
         thermocycler.execute_profile(steps = profile_TAG3, repetitions = 1,block_max_volume=50)
