@@ -1,20 +1,12 @@
 import * as React from 'react'
 
-import {
-  DIRECTION_COLUMN,
-  Flex,
-  SPACING,
-  LegacyStyledText,
-} from '@opentrons/components'
-
-import { InterventionInfo } from '../../../molecules/InterventionModal/InterventionContent'
-import { InlineNotification } from '../../../atoms/InlineNotification'
+import { InterventionContent } from '../../../molecules/InterventionModal/InterventionContent'
 
 import type { RecoveryContentProps } from '../types'
 
 type LeftColumnLabwareInfoProps = RecoveryContentProps & {
   title: string
-  type: React.ComponentProps<typeof InterventionInfo>['type']
+  type: React.ComponentProps<typeof InterventionContent>['infoProps']['type']
   /* Renders a warning InlineNotification if provided. */
   bannerText?: string
 }
@@ -46,27 +38,18 @@ export function LeftColumnLabwareInfo({
     }
   }
 
-  if (isOnDevice) {
-    return (
-      <Flex gridGap={SPACING.spacing24} flexDirection={DIRECTION_COLUMN}>
-        <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
-          <LegacyStyledText as="h4SemiBold">{title}</LegacyStyledText>
-          <InterventionInfo
-            type={type}
-            labwareName={failedLabwareName ?? ''}
-            labwareNickname={failedLabwareNickname ?? ''}
-            currentLocationProps={{ slotName: buildLabwareLocationSlotName() }}
-          />
-        </Flex>
-        {bannerText != null ? (
-          <InlineNotification
-            type="alert"
-            heading={bannerText}
-          ></InlineNotification>
-        ) : null}
-      </Flex>
-    )
-  } else {
-    return null
-  }
+  return (
+    <InterventionContent
+      headline={title}
+      infoProps={{
+        type,
+        labwareName: failedLabwareName ?? '',
+        labwareNickname: failedLabwareNickname ?? '',
+        currentLocationProps: { slotName: buildLabwareLocationSlotName() },
+      }}
+      notificationProps={
+        bannerText ? { type: 'alert', heading: bannerText } : undefined
+      }
+    />
+  )
 }
