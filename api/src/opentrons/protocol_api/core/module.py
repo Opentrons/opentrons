@@ -361,3 +361,11 @@ class AbstractAbsorbanceReaderCore(AbstractModuleCore):
     @abstractmethod
     def initiate_read(self) -> None:
         """Initiate read on the Absorbance Reader."""
+
+    @abstractmethod
+    def close_lid(self) -> None:
+        """Close the Absorbance Reader's lid."""
+
+    @abstractmethod
+    def open_lid(self) -> None:
+        """Open the Absorbance Reader's lid."""
