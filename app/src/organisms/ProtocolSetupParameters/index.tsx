@@ -232,6 +232,8 @@ export function ProtocolSetupParameters({
                 ? t('required')
                 : parameter.displayName
 
+            console.log("confirm: "+csvFileInfo)
+
             let setupStatus: 'ready' | 'not ready' | 'general' | 'inform' =
               'inform'
             if (
