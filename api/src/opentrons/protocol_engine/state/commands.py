@@ -715,7 +715,9 @@ class CommandView(HasState[CommandState]):
             else:
                 return self._state.command_history.get_prev(tail_command.command.id)
         else:
-            most_recently_finalized = self._state.command_history.get_terminal_command()
+            most_recently_finalized = (
+                self._state.command_history.get_most_recently_completed_command()
+            )
             # This iteration is effectively O(1) as we'll only ever have to iterate one or two times at most.
             while most_recently_finalized is not None:
                 next_command = self._state.command_history.get_next(

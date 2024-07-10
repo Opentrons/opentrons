@@ -39,7 +39,7 @@ class CommandHistory:
     _running_command_id: Optional[str]
     """The ID of the currently running command, if any"""
 
-    _terminal_command_id: Optional[str]
+    _most_recently_completed_command_id: Optional[str]
     """ID of the most recent command that SUCCEEDED or FAILED, if any"""
 
     def __init__(self) -> None:
@@ -49,7 +49,7 @@ class CommandHistory:
         self._queued_fixit_command_ids = OrderedSet()
         self._commands_by_id = OrderedDict()
         self._running_command_id = None
-        self._terminal_command_id = None
+        self._most_recently_completed_command_id = None
 
     def length(self) -> int:
         """Get the length of all elements added to the history."""
@@ -113,10 +113,10 @@ class CommandHistory:
         else:
             return None
 
-    def get_terminal_command(self) -> Optional[CommandEntry]:
+    def get_most_recently_completed_command(self) -> Optional[CommandEntry]:
         """Get the command most recently marked as SUCCEEDED or FAILED."""
-        if self._terminal_command_id is not None:
-            return self._commands_by_id[self._terminal_command_id]
+        if self._most_recently_completed_command_id is not None:
+            return self._commands_by_id[self._most_recently_completed_command_id]
         else:
             return None
 
@@ -210,7 +210,7 @@ class CommandHistory:
 
         self._remove_queue_id(command.id)
         self._remove_setup_queue_id(command.id)
-        self._set_terminal_command_id(command.id)
+        self._set_most_recently_completed_command_id(command.id)
 
     def set_command_failed(self, command: Command) -> None:
         """Validate and mark a command as failed in the command history."""
@@ -227,7 +227,7 @@ class CommandHistory:
             command_entry=CommandEntry(index=index, command=command),
         )
 
-        self._set_terminal_command_id(command.id)
+        self._set_most_recently_completed_command_id(command.id)
 
         running_command_entry = self.get_running_command()
         if (
@@ -266,9 +266,9 @@ class CommandHistory:
         """Remove a specific command from the queued fixit command ids structure."""
         self._queued_fixit_command_ids.discard(command_id)
 
-    def _set_terminal_command_id(self, command_id: str) -> None:
+    def _set_most_recently_completed_command_id(self, command_id: str) -> None:
         """Set the ID of the most recently dequeued command."""
-        self._terminal_command_id = command_id
+        self._most_recently_completed_command_id = command_id
 
     def _set_running_command_id(self, command_id: Optional[str]) -> None:
         """Set the ID of the currently running command."""

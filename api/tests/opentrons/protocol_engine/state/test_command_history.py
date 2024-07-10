@@ -131,11 +131,11 @@ def test_get_tail_command(command_history: CommandHistory) -> None:
 
 def test_get_recently_dequeued_command(command_history: CommandHistory) -> None:
     """It should return the most recently dequeued command."""
-    assert command_history.get_terminal_command() is None
+    assert command_history.get_most_recently_completed_command() is None
     command_entry = create_queued_command_entry()
     command_history._add("0", command_entry)
-    command_history._set_terminal_command_id("0")
-    assert command_history.get_terminal_command() == command_entry
+    command_history._set_most_recently_completed_command_id("0")
+    assert command_history.get_most_recently_completed_command() == command_entry
 
 
 def test_get_running_command(command_history: CommandHistory) -> None:
@@ -182,8 +182,8 @@ def test_set_recent_dequeued_command_id(command_history: CommandHistory) -> None
     """It should set the ID of the most recently dequeued command."""
     command_entry = create_queued_command_entry()
     command_history._add("0", command_entry)
-    command_history._set_terminal_command_id("0")
-    assert command_history.get_terminal_command() == command_entry
+    command_history._set_most_recently_completed_command_id("0")
+    assert command_history.get_most_recently_completed_command() == command_entry
 
 
 def test_set_running_command_id(command_history: CommandHistory) -> None:
