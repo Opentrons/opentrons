@@ -104,8 +104,6 @@ class LiquidProbeImplementation(AbstractCommandImpl[LiquidProbeParams, _ExecuteR
             labware_id=labware_id,
             well_name=well_name,
         )
-        
-        self._movement.retract_axis('leftZ')
 
         # liquid_probe process start position
         position = await self._movement.move_to_well(

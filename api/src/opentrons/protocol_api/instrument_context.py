@@ -9,7 +9,6 @@ from opentrons_shared_data.errors.exceptions import (
     CommandParameterLimitViolated,
     UnexpectedTipRemovalError,
 )
-from opentrons.protocol_engine.errors.exceptions import WellDoesNotExistError
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons import types

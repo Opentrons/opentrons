@@ -1363,16 +1363,16 @@ class OT3Controller(FlexBackend):
         probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
         force_both_sensors: bool = False,
     ) -> float:
-        if output_option == OutputOptions.sync_buffer_to_csv:
-            if (
-                self._subsystem_manager.device_info[
-                    SubSystem.of_mount(mount)
-                ].revision.tertiary
-                != "1"
-            ):
-                raise UnsupportedHardwareCommand(
-                    "Liquid Probe not supported on this pipette firmware"
-                )
+        # if output_option == OutputOptions.sync_buffer_to_csv:
+        #     if (
+        #         self._subsystem_manager.device_info[
+        #             SubSystem.of_mount(mount)
+        #         ].revision.tertiary
+        #         != "1"
+        #     ):
+        #         raise UnsupportedHardwareCommand(
+        #             "Liquid Probe not supported on this pipette firmware"
+        #         )
 
         head_node = axis_to_node(Axis.by_mount(mount))
         tool = sensor_node_for_pipette(OT3Mount(mount.value))
