@@ -107,9 +107,36 @@ export function AirGap(props: AirGapProps): JSX.Element {
         : 'shared:save'
     )
   }
+  const maxPipetteVolume = Object.values(state.pipette.liquids)[0].maxVolume
+  const tipVolume = Object.values(state.tipRack.wells)[0].totalLiquidVolume
 
-  // TODO: find the actual min and max for these values.
-  const volumeRange = { min: 1, max: 100 }
+  // dispense air gap is performed whenever a tip is on its way to the trash, so
+  // we can have the max be at the max tip capacity
+  let maxAvailableCapacity = Math.min(maxPipetteVolume, tipVolume)
+
+  // for aspirate, air gap behaves differently depending on the path
+  if (kind === 'aspirate') {
+    if (state.path === 'single') {
+      // for a single path, air gap capacity is just the difference between the
+      // pipette/tip capacity and the volume per well
+      maxAvailableCapacity =
+        Math.min(maxPipetteVolume, tipVolume) - state.volume
+    } else if (state.path === 'multiAspirate') {
+      // an aspirate air gap for multi aspirate will aspirate an air gap
+      // after each aspirate action, so we need to halve the available capacity for single path
+      // to get the amount available, assuming a min of 2 aspirates per dispense
+      maxAvailableCapacity =
+        (Math.min(maxPipetteVolume, tipVolume) - state.volume) / 2
+    } else {
+      // aspirate air gap for multi dispense occurs once per asprirate and
+      // available volume is max capacity - volume*3 assuming a min of 2 dispenses
+      // per aspirate plus 1x the volume for disposal
+      maxAvailableCapacity =
+        Math.min(maxPipetteVolume, tipVolume) - state.volume / 3
+    }
+  }
+
+  const volumeRange = { min: 1, max: maxAvailableCapacity }
   const volumeError =
     volume !== null && (volume < volumeRange.min || volume > volumeRange.max)
       ? t(`value_out_of_range`, {
@@ -117,6 +144,11 @@ export function AirGap(props: AirGapProps): JSX.Element {
           max: volumeRange.max,
         })
       : null
+
+  let buttonIsDisabled = selectedOption === ''
+  if (flowSteps[currentStep] === 'select_volume') {
+    buttonIsDisabled = volumeError != null || volume == null
+  }
 
   return createPortal(
     <Flex position={POSITION_FIXED} backgroundColor={COLORS.white} width="100%">
@@ -126,7 +158,7 @@ export function AirGap(props: AirGapProps): JSX.Element {
         onClickBack={handleClickBackOrExit}
         onClickButton={handleClickSaveOrContinue}
         top={SPACING.spacing8}
-        buttonIsDisabled={volumeError != null || selectedOption === ''}
+        buttonIsDisabled={buttonIsDisabled}
       />
       {flowSteps[currentStep] === 'enable_air_gap' ? (
         <Flex

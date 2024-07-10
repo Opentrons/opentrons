@@ -121,21 +121,25 @@ export function Mix(props: MixProps): JSX.Element {
     )
   }
 
-  // TODO: find the actual min and max for these values.
-  const minVolume = 1
-  const maxVolume = 100
-  const minReps = 1
-  const maxReps = 100
+  const maxPipetteVolume = Object.values(state.pipette.liquids)[0].maxVolume
+  const tipVolume = Object.values(state.tipRack.wells)[0].totalLiquidVolume
 
-  const error =
-    // TODO: This error does not take into account min/maxReps
-    (mixVolume !== null && (mixVolume < minVolume || mixVolume > maxVolume)) ||
-    (mixReps !== null && (mixReps < minReps || mixReps > maxReps))
+  const volumeRange = { min: 1, max: Math.min(maxPipetteVolume, tipVolume) }
+  const volumeError =
+    mixVolume !== null &&
+    (mixVolume < volumeRange.min || mixVolume > volumeRange.max)
       ? t(`value_out_of_range`, {
-          min: minVolume,
-          max: maxVolume,
+          min: volumeRange.min,
+          max: volumeRange.max,
         })
       : null
+
+  let buttonIsDisabled = selectedOption === ''
+  if (flowSteps[currentStep] === 'select_volume') {
+    buttonIsDisabled = mixVolume == null || volumeError != null
+  } else if (flowSteps[currentStep] === 'select_reps') {
+    buttonIsDisabled = mixReps == null
+  }
 
   return createPortal(
     <Flex position={POSITION_FIXED} backgroundColor={COLORS.white} width="100%">
@@ -145,7 +149,7 @@ export function Mix(props: MixProps): JSX.Element {
         onClickBack={handleClickBackOrExit}
         onClickButton={handleClickSaveOrContinue}
         top={SPACING.spacing8}
-        buttonIsDisabled={error !== null || selectedOption === ''}
+        buttonIsDisabled={volumeError !== null || selectedOption === ''}
       />
       {flowSteps[currentStep] === 'enable_mix' ? (
         <Flex
@@ -190,7 +194,7 @@ export function Mix(props: MixProps): JSX.Element {
               type="number"
               value={mixVolume}
               title={t('mix_volume_µL')}
-              error={error}
+              error={volumeError}
               readOnly
             />
           </Flex>
@@ -230,7 +234,6 @@ export function Mix(props: MixProps): JSX.Element {
               type="number"
               value={mixReps}
               title={t('mix_repetitions')}
-              error={error}
               readOnly
             />
           </Flex>

@@ -107,9 +107,25 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
         : 'shared:save'
     )
   }
+  let wellHeight = 1
+  if (kind === 'aspirate') {
+    wellHeight = Math.max(
+      ...state.sourceWells.map(well =>
+        state.source ? state.source.wells[well].depth : 0
+      )
+    )
+  } else if (kind === 'dispense') {
+    const destLabwareDefinition =
+      state.destination === 'source' ? state.source : state.destination
+    wellHeight = Math.max(
+      ...state.destinationWells.map(well =>
+        destLabwareDefinition ? destLabwareDefinition.wells[well].depth : 0
+      )
+    )
+  }
 
-  // TODO: find the actual min and max for these values.
-  const positionRange = { min: 1, max: 100 }
+  // the allowed range for touch tip is half the height of the well to 1x the height
+  const positionRange = { min: Math.round(wellHeight / 2), max: wellHeight }
   const positionError =
     position !== null &&
     (position < positionRange.min || position > positionRange.max)
@@ -119,6 +135,11 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
         })
       : null
 
+  let buttonIsDisabled = selectedOption === ''
+  if (flowSteps[currentStep] === 'select_position') {
+    buttonIsDisabled = position == null || positionError != null
+  }
+
   return createPortal(
     <Flex position={POSITION_FIXED} backgroundColor={COLORS.white} width="100%">
       <ChildNavigation
@@ -127,7 +148,7 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
         onClickBack={handleClickBackOrExit}
         onClickButton={handleClickSaveOrContinue}
         top={SPACING.spacing8}
-        buttonIsDisabled={positionError != null || selectedOption === ''}
+        buttonIsDisabled={buttonIsDisabled}
       />
       {flowSteps[currentStep] === 'enable_touch_tip' ? (
         <Flex

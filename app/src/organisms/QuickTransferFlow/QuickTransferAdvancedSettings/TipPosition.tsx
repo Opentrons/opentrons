@@ -41,7 +41,26 @@ export function TipPositionEntry(props: TipPositionEntryProps): JSX.Element {
       ? state.tipPositionDispense
       : null
   )
-  const tipPositionRange = { min: 1, max: 2 } // TODO: set this based on range
+
+  let wellHeight = 1
+  if (kind === 'aspirate') {
+    wellHeight = Math.max(
+      ...state.sourceWells.map(well =>
+        state.source ? state.source.wells[well].depth : 0
+      )
+    )
+  } else if (kind === 'dispense') {
+    const destLabwareDefinition =
+      state.destination === 'source' ? state.source : state.destination
+    wellHeight = Math.max(
+      ...state.destinationWells.map(well =>
+        destLabwareDefinition ? destLabwareDefinition.wells[well].depth : 0
+      )
+    )
+  }
+
+  // the maxiumum allowed position is 2x the height of the well
+  const tipPositionRange = { min: 1, max: Math.floor(wellHeight * 2) } // TODO: set this based on range
 
   let headerCopy: string = ''
   const textEntryCopy: string = t('distance_bottom_of_well_mm')
@@ -85,7 +104,7 @@ export function TipPositionEntry(props: TipPositionEntryProps): JSX.Element {
         onClickBack={onBack}
         onClickButton={handleClickSave}
         top={SPACING.spacing8}
-        buttonIsDisabled={error != null || tipPosition === null}
+        buttonIsDisabled={error != null || tipPosition == null}
       />
       <Flex
         alignSelf={ALIGN_CENTER}

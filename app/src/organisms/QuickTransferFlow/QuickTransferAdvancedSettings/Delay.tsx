@@ -128,19 +128,25 @@ export function Delay(props: DelayProps): JSX.Element {
     )
   }
 
-  // TODO: find the actual min and max for these values.
-  const delayRange = { min: 1, max: 100 }
+  let wellHeight = 1
+  if (kind === 'aspirate') {
+    wellHeight = Math.max(
+      ...state.sourceWells.map(well =>
+        state.source ? state.source.wells[well].depth : 0
+      )
+    )
+  } else if (kind === 'dispense') {
+    const destLabwareDefinition =
+      state.destination === 'source' ? state.source : state.destination
+    wellHeight = Math.max(
+      ...state.destinationWells.map(well =>
+        destLabwareDefinition ? destLabwareDefinition.wells[well].depth : 0
+      )
+    )
+  }
 
-  const delayError =
-    delayDuration !== null &&
-    (delayDuration < delayRange.min || delayDuration > delayRange.max)
-      ? t(`value_out_of_range`, {
-          min: delayRange.min,
-          max: delayRange.max,
-        })
-      : null
-
-  const positionRange = { min: 1, max: 100 }
+  // the maxiumum allowed position for delay is 2x the height of the well
+  const positionRange = { min: 1, max: Math.floor(wellHeight * 2) }
   const positionError =
     position !== null &&
     (position < positionRange.min || position > positionRange.max)
@@ -150,6 +156,13 @@ export function Delay(props: DelayProps): JSX.Element {
         })
       : null
 
+  let buttonIsDisabled = selectedOption === ''
+  if (flowSteps[currentStep] === 'select_delay') {
+    buttonIsDisabled = delayDuration == null
+  } else if (flowSteps[currentStep] === 'select_position') {
+    buttonIsDisabled = positionError != null || position == null
+  }
+
   return createPortal(
     <Flex position={POSITION_FIXED} backgroundColor={COLORS.white} width="100%">
       <ChildNavigation
@@ -158,9 +171,7 @@ export function Delay(props: DelayProps): JSX.Element {
         onClickBack={handleClickBackOrExit}
         onClickButton={handleClickSaveOrContinue}
         top={SPACING.spacing8}
-        buttonIsDisabled={
-          delayError !== null || positionError != null || selectedOption === ''
-        }
+        buttonIsDisabled={buttonIsDisabled}
       />
       {flowSteps[currentStep] === 'enable_delay' ? (
         <Flex
@@ -205,7 +216,6 @@ export function Delay(props: DelayProps): JSX.Element {
               type="number"
               value={delayDuration}
               title={t('delay_duration_s')}
-              error={delayError}
               readOnly
             />
           </Flex>
