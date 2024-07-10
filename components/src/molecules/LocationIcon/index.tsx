@@ -49,7 +49,11 @@ const LOCATION_ICON_STYLE = css<{
 `
 
 const SLOT_NAME_TEXT_STYLE = css`
-  ${TYPOGRAPHY.smallBodyTextBold}
+  font-size: ${TYPOGRAPHY.fontSizeCaption};
+  line-height: normal;
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    ${TYPOGRAPHY.smallBodyTextBold}
+  }
 `
 
 export function LocationIcon({
