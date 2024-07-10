@@ -19,7 +19,7 @@ class CommandEntry:
 
 @dataclass  # dataclass for __eq__() autogeneration.
 class CommandHistory:
-    """Command state container for command data."""
+    """Provides O(1) amortized access to commands of interest."""
 
     _all_command_ids: List[str]
     """All command IDs, in insertion order."""
