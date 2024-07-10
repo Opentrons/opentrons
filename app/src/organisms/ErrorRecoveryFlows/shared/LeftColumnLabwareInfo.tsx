@@ -27,7 +27,11 @@ export function LeftColumnLabwareInfo({
   type,
   bannerText,
 }: LeftColumnLabwareInfoProps): JSX.Element | null {
-  const { failedLabwareName, failedLabware } = failedLabwareUtils
+  const {
+    failedLabwareName,
+    failedLabware,
+    failedLabwareNickname,
+  } = failedLabwareUtils
 
   const buildLabwareLocationSlotName = (): string => {
     const location = failedLabware?.location
@@ -50,6 +54,7 @@ export function LeftColumnLabwareInfo({
           <InterventionInfo
             type={type}
             labwareName={failedLabwareName ?? ''}
+            labwareNickname={failedLabwareNickname ?? ''}
             currentLocationProps={{ slotName: buildLabwareLocationSlotName() }}
           />
         </Flex>
