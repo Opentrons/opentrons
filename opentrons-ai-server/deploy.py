@@ -190,8 +190,8 @@ class Deploy:
             "executionRoleArn": task_definition["executionRoleArn"],
             "networkMode": task_definition["networkMode"],
             "requiresCompatibilities": task_definition["requiresCompatibilities"],
-            "cpu": "1024",
-            "memory": "2048",
+            "cpu": self.env_variables.cpu,
+            "memory": self.env_variables.memory,
         }
         print("New task definition:")
         print(new_task_definition)

@@ -5,7 +5,7 @@ import type { AxiosError } from 'axios'
 import type {
   UseMutationResult,
   UseMutationOptions,
-  UseMutateFunction,
+  UseMutateAsyncFunction,
 } from 'react-query'
 import type {
   ErrorResponse,
@@ -19,7 +19,7 @@ export type UseUploadCsvFileMutationResult = UseMutationResult<
   AxiosError<ErrorResponse>,
   FileData
 > & {
-  uploadCsvFile: UseMutateFunction<
+  uploadCsvFile: UseMutateAsyncFunction<
     UploadedCsvFileResponse,
     AxiosError<ErrorResponse>,
     FileData
@@ -33,11 +33,12 @@ export type UseUploadCsvFileMutationOption = UseMutationOptions<
 >
 
 export function useUploadCsvFileMutation(
-  fileData: FileData,
   options: UseUploadCsvFileMutationOption = {},
   hostOverride?: HostConfig | null
 ): UseUploadCsvFileMutationResult {
-  const host = useHost()
+  const contextHost = useHost()
+  const host =
+    hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
   const queryClient = useQueryClient()
 
   const mutation = useMutation<
@@ -61,6 +62,6 @@ export function useUploadCsvFileMutation(
   )
   return {
     ...mutation,
-    uploadCsvFile: mutation.mutate,
+    uploadCsvFile: mutation.mutateAsync,
   }
 }

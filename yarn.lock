@@ -3240,6 +3240,7 @@
     "@fontsource/public-sans" "5.0.3"
     "@opentrons/api-client" "link:api-client"
     "@opentrons/components" "link:components"
+    "@opentrons/labware-library" "link:labware-library"
     "@opentrons/react-api-client" "link:react-api-client"
     "@opentrons/shared-data" "link:shared-data"
     "@opentrons/step-generation" "link:step-generation"
@@ -3320,6 +3321,25 @@
     stable "0.1.8"
     to-regex "3.0.2"
     yargs "15.4.0"
+
+"@opentrons/labware-library@link:labware-library":
+  version "0.0.0-dev"
+  dependencies:
+    "@opentrons/components" "link:components"
+    ajv "6.12.3"
+    classnames "2.2.5"
+    cookie "0.4.0"
+    core-js "3.2.1"
+    file-saver "2.0.1"
+    formik "2.1.4"
+    jszip "3.2.2"
+    lodash "4.17.21"
+    mixpanel-browser "2.29.1"
+    query-string "6.2.0"
+    react "18.2.0"
+    react-dom "18.2.0"
+    react-router-dom "5.3.4"
+    yup "0.32.9"
 
 "@opentrons/react-api-client@link:react-api-client":
   version "0.0.0-dev"

@@ -181,6 +181,14 @@ const ODDStyleMap = {
       }
     `,
   },
+  level4HeaderSemiBold: {
+    as: 'h4',
+    style: css`
+      @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+        ${TYPOGRAPHY.level4HeaderSemiBold}
+      }
+    `,
+  },
   level4HeaderBold: {
     as: 'h4',
     style: css`

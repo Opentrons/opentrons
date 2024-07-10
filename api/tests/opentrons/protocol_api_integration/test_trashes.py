@@ -3,10 +3,12 @@
 
 from opentrons import protocol_api, simulate
 from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.util import UnsupportedAPIError
 
 import contextlib
 from typing import ContextManager, Optional, Type
 from typing_extensions import Literal
+import re
 
 import pytest
 
@@ -55,8 +57,10 @@ def test_fixed_trash_presence(
 
     if expected_trash_class is None:
         with pytest.raises(
-            Exception,
-            match="Fixed Trash is not supported on Flex protocols in API Version 2.16 and above.",
+            UnsupportedAPIError,
+            match=re.escape(
+                "Error 4002 API_REMOVED (UnsupportedAPIError): Fixed Trash is not available after API version 2.16. You are currently using API version 2.16. Fixed trash is no longer supported on Flex protocols."
+            ),
         ):
             protocol.fixed_trash
         with pytest.raises(Exception, match="No trash container has been defined"):
@@ -75,8 +79,10 @@ def test_trash_search() -> None:
 
     # By default, there should be no trash.
     with pytest.raises(
-        Exception,
-        match="Fixed Trash is not supported on Flex protocols in API Version 2.16 and above.",
+        UnsupportedAPIError,
+        match=re.escape(
+            "Error 4002 API_REMOVED (UnsupportedAPIError): Fixed Trash is not available after API version 2.16. You are currently using API version 2.16. Fixed trash is no longer supported on Flex protocols."
+        ),
     ):
         protocol.fixed_trash
     with pytest.raises(Exception, match="No trash container has been defined"):
@@ -87,8 +93,10 @@ def test_trash_search() -> None:
 
     # After loading some trashes, there should still be no protocol.fixed_trash...
     with pytest.raises(
-        Exception,
-        match="Fixed Trash is not supported on Flex protocols in API Version 2.16 and above.",
+        UnsupportedAPIError,
+        match=re.escape(
+            "Error 4002 API_REMOVED (UnsupportedAPIError): Fixed Trash is not available after API version 2.16. You are currently using API version 2.16. Fixed trash is no longer supported on Flex protocols."
+        ),
     ):
         protocol.fixed_trash
     # ...but instrument.trash_container should automatically update to point to

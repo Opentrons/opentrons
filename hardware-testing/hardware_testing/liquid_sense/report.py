@@ -76,7 +76,6 @@ def build_config_section() -> CSVSection:
             CSVLine("liquid", [str]),
             CSVLine("labware_type", [str]),
             CSVLine("speed", [str]),
-            CSVLine("probe_seconds_before_contact", [str]),
         ],
     )
 
@@ -151,7 +150,6 @@ def store_config(
     liquid: str,
     labware_type: str,
     speed: str,
-    probe_seconds_before_contact: str,
 ) -> None:
     """Report config."""
     report("CONFIG", "protocol_name", [protocol_name])
@@ -166,7 +164,6 @@ def store_config(
     report("CONFIG", "liquid", [liquid])
     report("CONFIG", "labware_type", [labware_type])
     report("CONFIG", "speed", [speed])
-    report("CONFIG", "probe_seconds_before_contact", [probe_seconds_before_contact])
 
 
 def store_baseline_trial(

@@ -67,6 +67,7 @@ export type ShellUpdateAction =
 export interface ShellState {
   update: ShellUpdateState
   isReady: boolean
+  filePaths: string[]
 }
 
 export interface UiInitializedAction {
@@ -153,6 +154,14 @@ export interface NotifySubscribeAction {
   meta: { shell: true }
 }
 
+export interface SendFilePathsAction {
+  type: 'shell:SEND_FILE_PATHS'
+  payload: {
+    filePaths: string[]
+  }
+  meta: { shell: true }
+}
+
 export type ShellAction =
   | UiInitializedAction
   | ShellUpdateAction
@@ -166,6 +175,7 @@ export type ShellAction =
   | RobotMassStorageDeviceEnumerated
   | RobotMassStorageDeviceRemoved
   | NotifySubscribeAction
+  | SendFilePathsAction
 
 export type IPCSafeFormDataEntry =
   | {

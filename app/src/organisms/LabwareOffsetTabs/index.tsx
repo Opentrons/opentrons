@@ -6,9 +6,8 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  RoundTab,
+  Tabs,
   SPACING,
-  LegacyStyledText,
 } from '@opentrons/components'
 
 import type { StyleProps } from '@opentrons/components'
@@ -43,30 +42,34 @@ export function LabwareOffsetTabs({
       {...styleProps}
     >
       <Flex gridGap={SPACING.spacing4} marginY={SPACING.spacing8}>
-        <RoundTab
-          isCurrent={currentTab === 'table'}
-          onClick={() => {
-            setCurrentTab('table')
-          }}
-        >
-          <LegacyStyledText>{t('table_view')}</LegacyStyledText>
-        </RoundTab>
-        <RoundTab
-          isCurrent={currentTab === 'jupyter'}
-          onClick={() => {
-            setCurrentTab('jupyter')
-          }}
-        >
-          <LegacyStyledText>{t('jupyter_notebook')}</LegacyStyledText>
-        </RoundTab>
-        <RoundTab
-          isCurrent={currentTab === 'cli'}
-          onClick={() => {
-            setCurrentTab('cli')
-          }}
-        >
-          <LegacyStyledText>{t('cli_ssh')}</LegacyStyledText>
-        </RoundTab>
+        <Tabs
+          tabs={[
+            {
+              text: t('table_view'),
+              isActive: currentTab === 'table',
+              disabled: false,
+              onClick: () => {
+                setCurrentTab('table')
+              },
+            },
+            {
+              text: t('jupyter_notebook'),
+              isActive: currentTab === 'jupyter',
+              disabled: false,
+              onClick: () => {
+                setCurrentTab('jupyter')
+              },
+            },
+            {
+              text: t('cli_ssh'),
+              isActive: currentTab === 'cli',
+              disabled: false,
+              onClick: () => {
+                setCurrentTab('cli')
+              },
+            },
+          ]}
+        />
       </Flex>
       <Box
         backgroundColor={COLORS.white}

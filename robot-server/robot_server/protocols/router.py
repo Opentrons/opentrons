@@ -9,6 +9,7 @@ from typing import List, Optional, Union, Tuple
 
 from opentrons.protocol_engine.types import RunTimeParamValuesType
 from opentrons_shared_data.robot import user_facing_robot_type
+from opentrons.util.performance_helpers import TrackingFunctions
 from typing_extensions import Literal
 
 from fastapi import (
@@ -16,6 +17,7 @@ from fastapi import (
     Depends,
     File,
     HTTPException,
+    Query,
     UploadFile,
     status,
     Form,
@@ -212,7 +214,7 @@ async def create_protocol(  # noqa: C901
         default=None,
         description=(
             "Whether this is a `standard` protocol or a `quick-transfer` protocol."
-            "if ommited, the protocol will be `standard` by default."
+            "if omitted, the protocol will be `standard` by default."
         ),
         alias="protocolKind",
     ),
@@ -289,48 +291,54 @@ async def create_protocol(  # noqa: C901
     cached_protocol_id = protocol_store.get_id_by_hash(content_hash)
 
     if cached_protocol_id is not None:
-        resource = protocol_store.get(protocol_id=cached_protocol_id)
 
-        try:
-            analysis_summaries, _ = await _start_new_analysis_if_necessary(
-                protocol_id=cached_protocol_id,
-                analysis_id=analysis_id,
-                rtp_values=parsed_rtp,
-                force_reanalyze=False,
-                protocol_store=protocol_store,
-                analysis_store=analysis_store,
-                analyses_manager=analyses_manager,
+        @TrackingFunctions.track_getting_cached_protocol_analysis
+        async def _get_cached_protocol_analysis() -> PydanticResponse[
+            SimpleBody[Protocol]
+        ]:
+            resource = protocol_store.get(protocol_id=cached_protocol_id)
+            try:
+                analysis_summaries, _ = await _start_new_analysis_if_necessary(
+                    protocol_id=cached_protocol_id,
+                    analysis_id=analysis_id,
+                    rtp_values=parsed_rtp,
+                    force_reanalyze=False,
+                    protocol_store=protocol_store,
+                    analysis_store=analysis_store,
+                    analyses_manager=analyses_manager,
+                )
+            except AnalysisIsPendingError as error:
+                raise LastAnalysisPending(detail=str(error)).as_error(
+                    status.HTTP_503_SERVICE_UNAVAILABLE
+                ) from error
+
+            data = Protocol.construct(
+                id=cached_protocol_id,
+                createdAt=resource.created_at,
+                protocolKind=ProtocolKind.from_string(resource.protocol_kind),
+                protocolType=resource.source.config.protocol_type,
+                robotType=resource.source.robot_type,
+                metadata=Metadata.parse_obj(resource.source.metadata),
+                analysisSummaries=analysis_summaries,
+                key=resource.protocol_key,
+                files=[
+                    ProtocolFile(name=f.path.name, role=f.role)
+                    for f in resource.source.files
+                ],
             )
-        except AnalysisIsPendingError as error:
-            raise LastAnalysisPending(detail=str(error)).as_error(
-                status.HTTP_503_SERVICE_UNAVAILABLE
-            ) from error
 
-        data = Protocol.construct(
-            id=cached_protocol_id,
-            createdAt=resource.created_at,
-            protocolKind=ProtocolKind.from_string(resource.protocol_kind),
-            protocolType=resource.source.config.protocol_type,
-            robotType=resource.source.robot_type,
-            metadata=Metadata.parse_obj(resource.source.metadata),
-            analysisSummaries=analysis_summaries,
-            key=resource.protocol_key,
-            files=[
-                ProtocolFile(name=f.path.name, role=f.role)
-                for f in resource.source.files
-            ],
-        )
+            log.info(
+                f'Protocol with id "{cached_protocol_id}" with same contents already exists.'
+                f" Returning existing protocol data in response payload."
+            )
 
-        log.info(
-            f'Protocol with id "{cached_protocol_id}" with same contents already exists.'
-            f" Returning existing protocol data in response payload."
-        )
+            return await PydanticResponse.create(
+                content=SimpleBody.construct(data=data),
+                # not returning a 201 because we're not actually creating a new resource
+                status_code=status.HTTP_200_OK,
+            )
 
-        return await PydanticResponse.create(
-            content=SimpleBody.construct(data=data),
-            # not returning a 201 because we're not actually creating a new resource
-            status_code=status.HTTP_200_OK,
-        )
+        return await _get_cached_protocol_analysis()
 
     try:
         source = await protocol_reader.save(
@@ -438,16 +446,29 @@ async def _start_new_analysis_if_necessary(
     protocols_router.get,
     path="/protocols",
     summary="Get uploaded protocols",
-    description="Return all stored protocols, in order from first-uploaded to last-uploaded.",
+    description="""
+    Return all stored protocols by default, in order from first-uploaded to last-uploaded.
+    You can provide the kind of protocol with the `protocolKind` query arg
+    """,
     responses={status.HTTP_200_OK: {"model": SimpleMultiBody[Protocol]}},
 )
 async def get_protocols(
+    protocol_kind: Optional[ProtocolKind] = Query(
+        None,
+        description=(
+            "Specify the kind of protocols you want to return."
+            " protocol kind can be `quick-transfer` or `standard` "
+            " If this is omitted or `null`, all protocols will be returned."
+        ),
+        alias="protocolKind",
+    ),
     protocol_store: ProtocolStore = Depends(get_protocol_store),
     analysis_store: AnalysisStore = Depends(get_analysis_store),
 ) -> PydanticResponse[SimpleMultiBody[Protocol]]:
     """Get a list of all currently uploaded protocols.
 
     Args:
+        protocol_kind: Query arg to filter the kind of protocol.
         protocol_store: In-memory database of protocol resources.
         analysis_store: In-memory database of protocol analyses.
     """
@@ -465,6 +486,7 @@ async def get_protocols(
             files=[ProtocolFile(name=f.path.name, role=f.role) for f in r.source.files],
         )
         for r in protocol_resources
+        if (protocol_kind in [None, r.protocol_kind])
     ]
     meta = MultiBodyMeta(cursor=0, totalLength=len(data))
 

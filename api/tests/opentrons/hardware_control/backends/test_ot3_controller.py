@@ -176,9 +176,9 @@ def controller(
 @pytest.fixture
 def fake_liquid_settings() -> LiquidProbeSettings:
     return LiquidProbeSettings(
-        starting_mount_height=100,
         mount_speed=40,
         plunger_speed=10,
+        plunger_impulse_time=0.2,
         sensor_threshold_pascals=15,
         output_option=OutputOptions.can_bus_only,
         aspirate_while_sensing=False,
@@ -711,11 +711,11 @@ async def test_liquid_probe(
     mock_move_group_run: mock.AsyncMock,
     mock_send_stop_threshold: mock.AsyncMock,
 ) -> None:
-    fake_max_z_dist = 15.0
+    fake_max_p_dist = 70
     try:
         await controller.liquid_probe(
             mount=mount,
-            max_z_distance=fake_max_z_dist,
+            max_p_distance=fake_max_p_dist,
             mount_speed=fake_liquid_settings.mount_speed,
             plunger_speed=fake_liquid_settings.plunger_speed,
             threshold_pascals=fake_liquid_settings.sensor_threshold_pascals,
@@ -728,11 +728,12 @@ async def test_liquid_probe(
     move_groups = mock_move_group_run.call_args_list[0][0][0]._move_groups
     head_node = axis_to_node(Axis.by_mount(mount))
     tool_node = sensor_node_for_mount(mount)
-    assert move_groups[0][0][head_node].stop_condition == MoveStopCondition.none
-    assert len(move_groups) == 3
-    assert move_groups[0][0][head_node]
-    assert move_groups[1][0][tool_node]
-    assert move_groups[2][0][head_node], move_groups[2][0][tool_node]
+    #  in tool_sensors, pipette moves down, then sensor move goes
+    assert move_groups[0][0][tool_node].stop_condition == MoveStopCondition.none
+    assert move_groups[1][0][tool_node].stop_condition == MoveStopCondition.sync_line
+    assert len(move_groups) == 2
+    assert move_groups[0][0][tool_node]
+    assert move_groups[1][0][head_node], move_groups[2][0][tool_node]
 
 
 async def test_tip_action(

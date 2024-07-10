@@ -33,7 +33,6 @@ class DevServer:
             if persistence_directory is not None
             else Path(tempfile.mkdtemp())
         )
-
         self.maximum_runs = maximum_runs
         self.maximum_unused_protocols = maximum_unused_protocols
         self.maximum_quick_transfer_protocols = maximum_quick_transfer_protocols

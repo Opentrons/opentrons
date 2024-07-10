@@ -35,6 +35,7 @@ export const lineHeight20 = '1.25rem' // 20px
 export const lineHeight18 = '1.125rem' // 18px
 export const lineHeight16 = '1rem' // 16px
 export const lineHeight12 = '0.75rem' // 12px
+export const lineHeightNormal = 'normal' // normal
 
 // font styles
 export const fontStyleNormal = 'normal'

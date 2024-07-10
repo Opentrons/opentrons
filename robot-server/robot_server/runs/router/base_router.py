@@ -38,7 +38,7 @@ from robot_server.protocols.router import ProtocolNotFound
 from ..run_models import RunNotFoundError
 from ..run_auto_deleter import RunAutoDeleter
 from ..run_models import Run, BadRun, RunCreate, RunUpdate
-from ..engine_store import EngineConflictError
+from ..run_orchestrator_store import RunConflictError
 from ..run_data_manager import RunDataManager, RunNotCurrentError
 from ..dependencies import (
     get_run_data_manager,
@@ -208,7 +208,7 @@ async def create_run(
             protocol=protocol_resource,
             notify_publishers=notify_publishers,
         )
-    except EngineConflictError as e:
+    except RunConflictError as e:
         raise RunAlreadyActive(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e
     except ProtocolNotFoundError as e:
         raise ProtocolNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
@@ -312,7 +312,7 @@ async def remove_run(
     try:
         await run_data_manager.delete(runId)
 
-    except EngineConflictError as e:
+    except RunConflictError as e:
         raise RunNotIdle().as_error(status.HTTP_409_CONFLICT) from e
 
     except RunNotFoundError as e:
@@ -351,7 +351,7 @@ async def update_run(
         run_data = await run_data_manager.update(
             runId, current=request_body.data.current
         )
-    except EngineConflictError as e:
+    except RunConflictError as e:
         raise RunNotIdle(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e
     except RunNotCurrentError as e:
         raise RunStopped(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e

@@ -4,15 +4,14 @@ import { SPACING, TYPOGRAPHY } from '@opentrons/components'
 
 import type { StepOrder } from './types'
 
-// TODO(jh, 06-18-24): Add the correct errorTypes for these errors when they are available.
-// Error types of "defined" errors, those handled explicitly by Error Recovery.
+// Server-defined error types.
+// (Values for the .error.errorType property of a run command.)
 export const DEFINED_ERROR_TYPES = {
-  NO_LIQUID_DETECTED: 'NO_FLUIDS_OH_NO',
-  PIPETTE_COLLISION: 'AAAAAHHHHHHHHH',
-  OVERPRESSURE_ASPIRATION: 'overpressure',
-  OVERPRESSURE_DISPENSING: 'OVERPRESSURE_DISPENSING',
+  OVERPRESSURE: 'overpressure',
+  LIQUID_NOT_FOUND: 'liquidNotFound',
 }
 
+// Client-defined error-handling flows.
 export const ERROR_KINDS = {
   GENERAL_ERROR: 'GENERAL_ERROR',
   NO_LIQUID_DETECTED: 'NO_LIQUID_DETECTED',

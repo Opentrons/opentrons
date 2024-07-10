@@ -358,7 +358,7 @@ export function CommandText(props: Props): JSX.Element | null {
       const { seconds, message } = command.params
       return (
         <LegacyStyledText as={as} {...styleProps}>
-          {t('wait_for_duration', { seconds, message })}
+          {t('wait_for_duration', { seconds, message: message ?? '' })}
         </LegacyStyledText>
       )
     }

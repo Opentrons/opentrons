@@ -12,7 +12,9 @@ export type DevInternalFlag =
   | 'protocolStats'
   | 'enableRunNotes'
   | 'enableQuickTransfer'
+  | 'protocolTimeline'
   | 'enableCsvFile'
+  | 'enableLabwareCreator'
 
 export type FeatureFlags = Partial<Record<DevInternalFlag, boolean | undefined>>
 
@@ -244,4 +246,12 @@ export type ConfigV21 = Omit<ConfigV20, 'version'> & {
   version: 21
 }
 
-export type Config = ConfigV21
+export type ConfigV22 = Omit<ConfigV21, 'version' | 'analytics'> & {
+  version: 22
+  analytics: {
+    appId: string
+    optedIn: boolean
+  }
+}
+
+export type Config = ConfigV22

@@ -1,0 +1,173 @@
+{
+  "commands": [
+    {
+      "commandType": "home",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "50c7ae73a4e3f7129874f39dfb514803",
+      "notes": [],
+      "params": {},
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadModule",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "8511b05ba5565bf0e6dcccd800e2ee23",
+      "notes": [],
+      "params": {
+        "location": {
+          "slotName": "7"
+        },
+        "model": "thermocyclerModuleV2"
+      },
+      "result": {
+        "definition": {
+          "calibrationPoint": {
+            "x": 14.4,
+            "y": 64.93,
+            "z": 97.8
+          },
+          "compatibleWith": [],
+          "dimensions": {
+            "bareOverallHeight": 108.96,
+            "lidHeight": 61.7,
+            "overLabwareHeight": 0.0
+          },
+          "displayName": "Thermocycler Module GEN2",
+          "gripperOffsets": {
+            "default": {
+              "dropOffset": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 5.6
+              },
+              "pickUpOffset": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 4.6
+              }
+            }
+          },
+          "labwareOffset": {
+            "x": 0.0,
+            "y": 68.8,
+            "z": 108.96
+          },
+          "model": "thermocyclerModuleV2",
+          "moduleType": "thermocyclerModuleType",
+          "otSharedSchema": "module/schemas/2",
+          "quirks": [],
+          "slotTransforms": {
+            "ot3_standard": {
+              "B1": {
+                "cornerOffsetFromSlot": [
+                  [
+                    -98,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    -20.005,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    -0.84,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ]
+                ],
+                "labwareOffset": [
+                  [
+                    -98,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    -20.005,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    -0.84,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            }
+          }
+        },
+        "model": "thermocyclerModuleV2",
+        "moduleId": "UUID",
+        "serialNumber": "UUID"
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    }
+  ],
+  "config": {
+    "apiVersion": [
+      2,
+      14
+    ],
+    "protocolType": "python"
+  },
+  "createdAt": "TIMESTAMP",
+  "errors": [],
+  "files": [
+    {
+      "name": "OT2_S_v2_14_NO_PIPETTES_TC_VerifyThermocyclerLoadedSlots.py",
+      "role": "main"
+    }
+  ],
+  "labware": [
+    {
+      "definitionUri": "opentrons/opentrons_1_trash_1100ml_fixed/1",
+      "id": "UUID",
+      "loadName": "opentrons_1_trash_1100ml_fixed",
+      "location": {
+        "slotName": "12"
+      }
+    }
+  ],
+  "liquids": [],
+  "metadata": {},
+  "modules": [
+    {
+      "id": "UUID",
+      "location": {
+        "slotName": "7"
+      },
+      "model": "thermocyclerModuleV2",
+      "serialNumber": "UUID"
+    }
+  ],
+  "pipettes": [],
+  "result": "ok",
+  "robotType": "OT-2 Standard",
+  "runTimeParameters": []
+}
