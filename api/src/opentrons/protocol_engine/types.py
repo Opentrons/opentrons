@@ -786,6 +786,7 @@ class AreaType(Enum):
     TEMPERATURE = "temperatureModule"
     MAGNETICBLOCK = "magneticBlock"
     ABSORBANCE_READER = "absorbanceReader"
+    LID_DOCK = "lidDock"
 
 
 @dataclass(frozen=True)

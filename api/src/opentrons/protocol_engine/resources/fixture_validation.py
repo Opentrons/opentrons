@@ -46,3 +46,8 @@ def is_deck_slot(addressable_area_name: str) -> bool:
     except ValueError:
         return False
     return True
+
+
+def is_abs_reader_lid_dock(addressable_area_name: str) -> bool:
+    """Check if an addressable area is an absorbance plate reader lid dock."""
+    return "absorbanceReaderV1LidDock" in addressable_area_name
