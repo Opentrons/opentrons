@@ -4,7 +4,7 @@ import {
   COLORS,
   PrimaryBtn,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { Slideout as SlideoutComponent } from './index'
@@ -25,25 +25,25 @@ type Story = StoryObj<typeof SlideoutComponent>
 
 const Children = (
   <React.Fragment>
-    <StyledText
+    <LegacyStyledText
       fontWeight={TYPOGRAPHY.fontWeightSemiBold}
       fontSize={TYPOGRAPHY.fontSizeP}
       paddingTop={SPACING.spacing4}
     >
       {'this is where the slideout body goes'}
-    </StyledText>
+    </LegacyStyledText>
 
     <PrimaryBtn
       backgroundColor={COLORS.blue50}
       marginTop="28rem"
       textTransform={TYPOGRAPHY.textTransformNone}
     >
-      <StyledText
+      <LegacyStyledText
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         fontSize={TYPOGRAPHY.fontSizeP}
       >
         {'btn text'}
-      </StyledText>
+      </LegacyStyledText>
     </PrimaryBtn>
   </React.Fragment>
 )

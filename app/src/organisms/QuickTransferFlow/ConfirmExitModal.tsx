@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import {
   SPACING,
   COLORS,
-  StyledText,
+  LegacyStyledText,
   Flex,
   DIRECTION_COLUMN,
   TYPOGRAPHY,
@@ -32,9 +32,9 @@ export const ConfirmExitModal = (props: ConfirmExitModalProps): JSX.Element => {
         gridGap={SPACING.spacing10}
         width="100%"
       >
-        <StyledText css={TYPOGRAPHY.bodyTextRegular}>
+        <LegacyStyledText css={TYPOGRAPHY.bodyTextRegular}>
           {t('lose_all_progress')}
-        </StyledText>
+        </LegacyStyledText>
         <Flex gridGap={SPACING.spacing8}>
           <SmallButton
             width="50%"

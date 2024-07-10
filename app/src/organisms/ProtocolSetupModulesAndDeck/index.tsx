@@ -7,7 +7,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -164,11 +164,11 @@ export function ProtocolSetupModulesAndDeck({
             lineHeight={TYPOGRAPHY.lineHeight28}
             paddingX={SPACING.spacing24}
           >
-            <StyledText flex="3.5 0 0">
+            <LegacyStyledText flex="3.5 0 0">
               {i18n.format(t('deck_hardware'), 'titleCase')}
-            </StyledText>
-            <StyledText flex="2 0 0">{t('location')}</StyledText>
-            <StyledText flex="4 0 0"> {t('status')}</StyledText>
+            </LegacyStyledText>
+            <LegacyStyledText flex="2 0 0">{t('location')}</LegacyStyledText>
+            <LegacyStyledText flex="4 0 0"> {t('status')}</LegacyStyledText>
           </Flex>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
             {hasModules ? (

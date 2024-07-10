@@ -11,7 +11,7 @@ import {
   Icon,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TEXT_TRANSFORM_CAPITALIZE,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -54,7 +54,7 @@ export function LabeledMount(props: LabeledMountProps): JSX.Element {
           alignItems={ALIGN_CENTER}
           gridGap={SPACING.spacing24}
         >
-          <StyledText
+          <LegacyStyledText
             as="h4"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             textAlign={TYPOGRAPHY.textAlignLeft}
@@ -63,8 +63,8 @@ export function LabeledMount(props: LabeledMountProps): JSX.Element {
             width="15.625rem"
           >
             {isNinetySixChannel ? t('left_right') : t('mount', { side: mount })}
-          </StyledText>
-          <StyledText
+          </LegacyStyledText>
+          <LegacyStyledText
             flex="5"
             as="h4"
             color={COLORS.grey60}
@@ -73,7 +73,7 @@ export function LabeledMount(props: LabeledMountProps): JSX.Element {
             fontSize={TYPOGRAPHY.fontSize28}
           >
             {instrumentName == null ? t('empty') : instrumentName}
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
         <Icon name="more" size="3rem" />
       </Flex>

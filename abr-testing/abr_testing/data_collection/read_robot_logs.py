@@ -5,6 +5,7 @@ and uploading to a google sheet using credentials and google_sheets_tools module
 saved in a local directory.
 """
 import csv
+import subprocess
 from datetime import datetime
 import os
 from abr_testing.data_collection.error_levels import ERROR_LEVELS_PATH
@@ -383,6 +384,9 @@ def get_error_info(file_results: Dict[str, Any]) -> Tuple[int, str, str, str, st
         error_str = 0
     if error_str > 1:
         error_type = run_command_error["error"].get("errorType", "")
+        if error_type == "PythonException":
+            # Reassign error_type to be more descriptive
+            error_type = run_command_error.get("detail", "").split(":")[0]
         error_code = run_command_error["error"].get("errorCode", "")
         try:
             # Instrument Error
@@ -584,4 +588,30 @@ def get_logs(storage_directory: str, ip: str) -> List[str]:
             print(f"Request exception. Did not save {log_type}")
             continue
         all_paths.append(file_path)
+    # Get weston.log using scp
+    # Split the path into parts
+    parts = storage_directory.split(os.sep)
+    # Find the index of 'Users'
+    index = parts.index("Users")
+    user_name = parts[index + 1]
+    # Define the SCP command
+    scp_command = [
+        "scp",
+        "-r",
+        "-i",
+        f"C:\\Users\\{user_name}\\.ssh\\robot_key",
+        f"root@{ip}:/var/log/weston.log",
+        storage_directory,
+    ]
+    # Execute the SCP command
+    try:
+        subprocess.run(scp_command, check=True, capture_output=True, text=True)
+        file_path = os.path.join(storage_directory, "weston.log")
+        all_paths.append(file_path)
+    except subprocess.CalledProcessError as e:
+        print("Error during SCP command execution")
+        print("Return code:", e.returncode)
+        print("Output:", e.output)
+        print("Error output:", e.stderr)
+        subprocess.run(["scp", "weston.log", "root@10.14.19.40:/var/log/weston.log"])
     return all_paths

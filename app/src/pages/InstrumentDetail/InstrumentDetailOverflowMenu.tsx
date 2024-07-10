@@ -7,7 +7,7 @@ import {
   Flex,
   Icon,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -109,13 +109,13 @@ const InstrumentDetailsOverflowMenu = NiceModal.create(
                   color={COLORS.black90}
                   aria-label="restart_icon"
                 />
-                <StyledText
+                <LegacyStyledText
                   as="h4"
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   marginLeft={SPACING.spacing12}
                 >
                   {t('recalibrate')}
-                </StyledText>
+                </LegacyStyledText>
               </Flex>
             </MenuItem>
           ) : null}
@@ -127,13 +127,13 @@ const InstrumentDetailsOverflowMenu = NiceModal.create(
                   aria-label="reset-position_icon"
                   size="2.5rem"
                 />
-                <StyledText
+                <LegacyStyledText
                   as="h4"
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   marginLeft={SPACING.spacing12}
                 >
                   {t('drop_tips')}
-                </StyledText>
+                </LegacyStyledText>
               </Flex>
             </MenuItem>
           ) : null}

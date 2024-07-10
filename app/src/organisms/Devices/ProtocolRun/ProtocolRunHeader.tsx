@@ -6,7 +6,6 @@ import { Link, useHistory } from 'react-router-dom'
 import {
   RUN_STATUS_IDLE,
   RUN_STATUS_RUNNING,
-  RUN_STATUS_PAUSE_REQUESTED,
   RUN_STATUS_PAUSED,
   RUN_STATUS_STOP_REQUESTED,
   RUN_STATUS_STOPPED,
@@ -16,6 +15,8 @@ import {
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_AWAITING_RECOVERY,
   RUN_STATUSES_TERMINAL,
+  RUN_STATUS_AWAITING_RECOVERY_PAUSED,
+  RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
 } from '@opentrons/api-client'
 import {
   useModulesQuery,
@@ -41,7 +42,7 @@ import {
   SecondaryButton,
   SIZE_1,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   useConditionalConfirm,
   useHoverTooltip,
@@ -103,6 +104,10 @@ import { useDeckConfigurationCompatibility } from '../../../resources/deck_confi
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useMostRecentRunId } from '../../ProtocolUpload/hooks/useMostRecentRunId'
 import { useNotifyRunQuery } from '../../../resources/runs'
+import {
+  useErrorRecoveryFlows,
+  ErrorRecoveryFlows,
+} from '../../ErrorRecoveryFlows'
 
 import type { Run, RunError, RunStatus } from '@opentrons/api-client'
 import type { IconName } from '@opentrons/components'
@@ -113,10 +118,11 @@ const EQUIPMENT_POLL_MS = 5000
 const CANCELLABLE_STATUSES = [
   RUN_STATUS_RUNNING,
   RUN_STATUS_PAUSED,
-  RUN_STATUS_PAUSE_REQUESTED,
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_IDLE,
   RUN_STATUS_AWAITING_RECOVERY,
+  RUN_STATUS_AWAITING_RECOVERY_PAUSED,
+  RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
 ]
 
 interface ProtocolRunHeaderProps {
@@ -173,6 +179,7 @@ export function ProtocolRunHeader({
     robotProtocolAnalysis
   )
   const isFixtureMismatch = getIsFixtureMismatch(deckConfigCompatibility)
+  const { isERActive, failedCommand } = useErrorRecoveryFlows(runId, runStatus)
 
   const doorSafetySetting = robotSettings.find(
     setting => setting.id === 'enableDoorSafetySwitch'
@@ -288,6 +295,14 @@ export function ProtocolRunHeader({
 
   return (
     <>
+      {isERActive ? (
+        <ErrorRecoveryFlows
+          isFlex={true}
+          runId={runId}
+          failedCommand={failedCommand}
+          protocolAnalysis={robotProtocolAnalysis}
+        />
+      ) : null}
       {showRunFailedModal ? (
         <RunFailedModal
           robotName={robotName}
@@ -318,24 +333,28 @@ export function ProtocolRunHeader({
         <Flex>
           {protocolKey != null ? (
             <Link to={`/protocols/${protocolKey}`}>
-              <StyledText
+              <LegacyStyledText
                 as="h2"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 color={COLORS.blue50}
               >
                 {displayName}
-              </StyledText>
+              </LegacyStyledText>
             </Link>
           ) : (
-            <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+            <LegacyStyledText
+              as="h2"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            >
               {displayName}
-            </StyledText>
+            </LegacyStyledText>
           )}
         </Flex>
         {analysisErrors != null && analysisErrors.length > 0 && (
           <ProtocolAnalysisErrorBanner errors={analysisErrors} />
         )}
-        {runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR ? (
+        {runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR ||
+        runStatus === RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR ? (
           <Banner type="warning" iconMarginLeft={SPACING.spacing4}>
             {t('close_door_to_resume')}
           </Banner>
@@ -348,6 +367,7 @@ export function ProtocolRunHeader({
         {/* Note: This banner is for before running a protocol */}
         {isDoorOpen &&
         runStatus !== RUN_STATUS_BLOCKED_BY_OPEN_DOOR &&
+        runStatus !== RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR &&
         runStatus != null &&
         CANCELLABLE_STATUSES.includes(runStatus) ? (
           <Banner type="warning" iconMarginLeft={SPACING.spacing4}>
@@ -470,11 +490,11 @@ interface LabeledValueProps {
 function LabeledValue(props: LabeledValueProps): JSX.Element {
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-      <StyledText as="h6" color={COLORS.grey60}>
+      <LegacyStyledText as="h6" color={COLORS.grey60}>
         {props.label}
-      </StyledText>
+      </LegacyStyledText>
       {typeof props.value === 'string' ? (
-        <StyledText as="p">{props.value}</StyledText>
+        <LegacyStyledText as="p">{props.value}</LegacyStyledText>
       ) : (
         props.value
       )}
@@ -507,9 +527,9 @@ function DisplayRunStatus(props: DisplayRunStatusProps): JSX.Element {
           />
         </Icon>
       ) : null}
-      <StyledText as="p">
+      <LegacyStyledText as="p">
         {props.runStatus != null ? t(`status_${String(props.runStatus)}`) : ''}
-      </StyledText>
+      </LegacyStyledText>
     </Flex>
   )
 }
@@ -517,7 +537,6 @@ function DisplayRunStatus(props: DisplayRunStatusProps): JSX.Element {
 const START_RUN_STATUSES: RunStatus[] = [
   RUN_STATUS_IDLE,
   RUN_STATUS_PAUSED,
-  RUN_STATUS_PAUSE_REQUESTED,
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
 ]
 const RUN_AGAIN_STATUSES: RunStatus[] = [
@@ -528,9 +547,9 @@ const RUN_AGAIN_STATUSES: RunStatus[] = [
 ]
 const DISABLED_STATUSES: RunStatus[] = [
   RUN_STATUS_FINISHING,
-  RUN_STATUS_PAUSE_REQUESTED,
   RUN_STATUS_STOP_REQUESTED,
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
+  RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
 ]
 interface ActionButtonProps {
   runId: string
@@ -611,8 +630,10 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
     isFixtureMismatch ||
     (runStatus != null && DISABLED_STATUSES.includes(runStatus)) ||
     isRobotOnWrongVersionOfSoftware ||
+    // For before running a protocol, "close door to begin".
     (isDoorOpen &&
       runStatus !== RUN_STATUS_BLOCKED_BY_OPEN_DOOR &&
+      runStatus !== RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR &&
       runStatus != null &&
       CANCELLABLE_STATUSES.includes(runStatus))
   const robot = useRobot(robotName)
@@ -749,7 +770,9 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
             }
           />
         ) : null}
-        <StyledText css={TYPOGRAPHY.pSemiBold}>{buttonText}</StyledText>
+        <LegacyStyledText css={TYPOGRAPHY.pSemiBold}>
+          {buttonText}
+        </LegacyStyledText>
       </PrimaryButton>
       {disableReason != null && (
         <Tooltip tooltipProps={tooltipProps} width="auto" maxWidth="8rem">
@@ -829,12 +852,12 @@ function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
     return (
       <Banner type="error" iconMarginLeft={SPACING.spacing4}>
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
-          <StyledText>
+          <LegacyStyledText>
             {t('error_info', {
               errorType: highestPriorityError?.errorType,
               errorCode: highestPriorityError?.errorCode,
             })}
-          </StyledText>
+          </LegacyStyledText>
 
           <LinkButton
             onClick={handleFailedRunClick}

@@ -6,7 +6,7 @@ from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset
 from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
-from opentrons.protocols.api_support.util import APIVersionError
+from opentrons.protocols.api_support.util import UnsupportedAPIError
 from opentrons.types import Point
 
 from . import point_calculations
@@ -69,8 +69,8 @@ class WellCore(AbstractWellCore):
 
     def set_has_tip(self, value: bool) -> None:
         """Set the well as containing or not containing a tip."""
-        raise APIVersionError(
-            "Manually setting the tip state of a well in a tip rack has been deprecated."
+        raise UnsupportedAPIError(
+            api_element="Manually setting the tip state of a well in a tip rack",
         )
 
     def get_display_name(self) -> str:

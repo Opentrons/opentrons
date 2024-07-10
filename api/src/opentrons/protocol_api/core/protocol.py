@@ -124,7 +124,10 @@ class AbstractProtocol(
 
     @abstractmethod
     def load_instrument(
-        self, instrument_name: PipetteNameType, mount: Mount
+        self,
+        instrument_name: PipetteNameType,
+        mount: Mount,
+        liquid_presence_detection: bool = False,
     ) -> InstrumentCoreType:
         ...
 

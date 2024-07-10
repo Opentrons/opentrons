@@ -14,7 +14,7 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
 } from '@opentrons/shared-data'
 import { getTopPortalEl } from '../../../App/portal'
-import { LargeButton } from '../../../atoms/buttons'
+import { RadioButton } from '../../../atoms/buttons'
 import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
 import { ChildNavigation } from '../../ChildNavigation'
 
@@ -80,17 +80,14 @@ export function TipDropLocation(props: TipDropLocationProps): JSX.Element {
         width="100%"
       >
         {tipDropLocationOptions.map(option => (
-          <LargeButton
+          <RadioButton
             key={option.cutoutId}
-            buttonType={
-              selectedTipDropLocation.cutoutId === option.cutoutId
-                ? 'primary'
-                : 'secondary'
-            }
-            onClick={() => {
+            isSelected={selectedTipDropLocation.cutoutId === option.cutoutId}
+            onChange={() => {
               setSelectedTipDropLocation(option)
             }}
-            buttonText={t(
+            buttonValue={option.cutoutId}
+            buttonLabel={t(
               `${
                 option.cutoutFixtureId === TRASH_BIN_ADAPTER_FIXTURE
                   ? 'trashBin'

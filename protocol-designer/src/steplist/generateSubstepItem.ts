@@ -376,6 +376,13 @@ export function generateSubstepItem(
     }
   }
 
+  if (stepArgs.commandCreatorFnName === 'comment') {
+    return {
+      substepType: 'comment',
+      commentStepArgs: stepArgs,
+    }
+  }
+
   if (
     stepArgs.commandCreatorFnName === 'consolidate' ||
     stepArgs.commandCreatorFnName === 'distribute' ||

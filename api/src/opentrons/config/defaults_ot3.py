@@ -23,12 +23,11 @@ DEFAULT_PIPETTE_OFFSET = [0.0, 0.0, 0.0]
 DEFAULT_MODULE_OFFSET = [0.0, 0.0, 0.0]
 
 DEFAULT_LIQUID_PROBE_SETTINGS: Final[LiquidProbeSettings] = LiquidProbeSettings(
-    starting_mount_height=100,
-    max_z_distance=40,
     mount_speed=10,
     plunger_speed=5,
-    sensor_threshold_pascals=40,
-    output_option=OutputOptions.stream_to_csv,
+    plunger_impulse_time=0.2,
+    sensor_threshold_pascals=15,
+    output_option=OutputOptions.sync_buffer_to_csv,
     aspirate_while_sensing=False,
     data_files={InstrumentProbeType.PRIMARY: "/data/pressure_sensor_data.csv"},
 )
@@ -332,12 +331,11 @@ def _build_default_liquid_probe(
             from_conf.get("data_files", {}), default.data_files
         )
     return LiquidProbeSettings(
-        starting_mount_height=from_conf.get(
-            "starting_mount_height", default.starting_mount_height
-        ),
-        max_z_distance=from_conf.get("max_z_distance", default.max_z_distance),
         mount_speed=from_conf.get("mount_speed", default.mount_speed),
         plunger_speed=from_conf.get("plunger_speed", default.plunger_speed),
+        plunger_impulse_time=from_conf.get(
+            "plunger_impulse_time", default.plunger_impulse_time
+        ),
         sensor_threshold_pascals=from_conf.get(
             "sensor_threshold_pascals", default.sensor_threshold_pascals
         ),

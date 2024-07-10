@@ -8,7 +8,9 @@
     "wasteChute": "Waste Chute"
   },
   "module_display_names": {
-    "multipleTemperatureModuleTypes": "Multiple Temperatures",
+    "multipleheaterShakerModuleTypes": "Multiple Heater-Shakers",
+    "multipletemperatureModuleTypes": "Multiple Temperatures",
+    "multiplemagneticBlockTypes": "Multiple Magnetic Blocks",
     "temperatureModuleType": "Temperature",
     "magneticModuleType": "Magnetic",
     "thermocyclerModuleType": "Thermocycler",

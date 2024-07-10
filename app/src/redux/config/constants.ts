@@ -5,7 +5,9 @@ export const DEV_INTERNAL_FLAGS: DevInternalFlag[] = [
   'protocolStats',
   'enableRunNotes',
   'enableQuickTransfer',
+  'protocolTimeline',
   'enableCsvFile',
+  'enableLabwareCreator',
 ]
 
 // action type constants

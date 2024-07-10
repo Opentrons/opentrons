@@ -4,19 +4,19 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, screen, waitFor, renderHook } from '@testing-library/react'
 import { createStore } from 'redux'
 
-import { COLORS } from '@opentrons/components'
-
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
-import { mockFailedCommand } from '../__fixtures__'
+import { mockRecoveryContentProps } from '../__fixtures__'
 import { getIsOnDevice } from '../../../redux/config'
 import { useRunPausedSplash, RunPausedSplash } from '../RunPausedSplash'
+import { StepInfo } from '../shared'
 
 import type { Store } from 'redux'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { Provider } from 'react-redux'
 
 vi.mock('../../../redux/config')
+vi.mock('../shared')
 
 const store: Store<any> = createStore(vi.fn(), {})
 
@@ -34,9 +34,14 @@ describe('useRunPausedSplash', () => {
     )
   })
 
-  it('returns true if on the ODD', () => {
-    const { result } = renderHook(() => useRunPausedSplash(), { wrapper })
-    expect(result.current).toEqual(true)
+  const IS_WIZARD_SHOWN = [false, true]
+  IS_WIZARD_SHOWN.forEach(val => {
+    it(`returns ${!val} if showERWizard is ${val}`, () => {
+      const { result } = renderHook(() => useRunPausedSplash(val), {
+        wrapper,
+      })
+      expect(result.current).toEqual(!val)
+    })
   })
 })
 
@@ -51,7 +56,7 @@ const render = (props: React.ComponentProps<typeof RunPausedSplash>) => {
   )
 }
 
-describe('ConfirmCancelRunModal', () => {
+describe('RunPausedSplash', () => {
   let props: React.ComponentProps<typeof RunPausedSplash>
   const mockToggleERWiz = vi.fn(() => Promise.resolve())
   const mockProceedToRouteAndStep = vi.fn()
@@ -61,10 +66,12 @@ describe('ConfirmCancelRunModal', () => {
 
   beforeEach(() => {
     props = {
+      ...mockRecoveryContentProps,
       toggleERWiz: mockToggleERWiz,
       routeUpdateActions: mockRouteUpdateActions,
-      failedCommand: mockFailedCommand,
     }
+
+    vi.mocked(StepInfo).mockReturnValue(<div>MOCK STEP INFO</div>)
   })
 
   afterEach(() => {
@@ -73,8 +80,22 @@ describe('ConfirmCancelRunModal', () => {
 
   it('should render a generic paused screen if there is no handled errorType', () => {
     render(props)
-    screen.getByText('General error')
-    screen.getByText('<Placeholder>')
+    screen.getByText('Error')
+    screen.getByText('MOCK STEP INFO')
+  })
+
+  it('should render an overpressure error type if the errorType is overpressure', () => {
+    props = {
+      ...props,
+      failedCommand: {
+        ...props.failedCommand,
+        commandType: 'aspirate',
+        error: { isDefined: true, errorType: 'overpressure' },
+      } as any,
+    }
+    render(props)
+    screen.getByText('Pipette overpressure')
+    screen.getByText('MOCK STEP INFO')
   })
 
   it('should contain buttons with expected appearance and behavior', async () => {
@@ -87,16 +108,6 @@ describe('ConfirmCancelRunModal', () => {
 
     expect(primaryBtn).toBeInTheDocument()
     expect(secondaryBtn).toBeInTheDocument()
-
-    expect(primaryBtn).toHaveStyle({ 'background-color': 'transparent' })
-    expect(secondaryBtn).toHaveStyle({ 'background-color': COLORS.white })
-
-    expect(screen.getByLabelText('remove icon')).toHaveStyle({
-      color: COLORS.red50,
-    })
-    expect(screen.getByLabelText('recovery icon')).toHaveStyle({
-      color: COLORS.white,
-    })
 
     fireEvent.click(secondaryBtn)
 

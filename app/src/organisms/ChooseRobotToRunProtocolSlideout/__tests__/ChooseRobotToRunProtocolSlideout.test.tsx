@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { StaticRouter } from 'react-router-dom'
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { when } from 'vitest-when'
 
 import { renderWithProviders } from '../../../__testing-utils__'
@@ -19,7 +19,6 @@ import {
   getUnreachableRobots,
   startDiscovery,
 } from '../../../redux/discovery'
-import { useFeatureFlag } from '../../../redux/config'
 import { getRobotUpdateDisplayInfo } from '../../../redux/robot-update'
 import {
   mockConnectableRobot,
@@ -27,7 +26,10 @@ import {
   mockUnreachableRobot,
 } from '../../../redux/discovery/__fixtures__'
 import { getNetworkInterfaces } from '../../../redux/networking'
-import { storedProtocolData as storedProtocolDataFixture } from '../../../redux/protocol-storage/__fixtures__'
+import {
+  storedProtocolData as storedProtocolDataFixture,
+  storedProtocolDataWithCsvRunTimeParameter,
+} from '../../../redux/protocol-storage/__fixtures__'
 import { useCreateRunFromProtocol } from '../useCreateRunFromProtocol'
 import { useOffsetCandidatesForAnalysis } from '../../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { ChooseRobotToRunProtocolSlideout } from '../'
@@ -41,11 +43,9 @@ vi.mock('../../../organisms/RunTimeControl/hooks')
 vi.mock('../../../redux/discovery')
 vi.mock('../../../redux/robot-update')
 vi.mock('../../../redux/networking')
-vi.mock('../../../redux/config')
 vi.mock('../useCreateRunFromProtocol')
 vi.mock('../../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis')
 vi.mock('../../../resources/useNotifyDataReady')
-vi.mock('../../../redux/config')
 
 const render = (
   props: React.ComponentProps<typeof ChooseRobotToRunProtocolSlideout>
@@ -72,7 +72,6 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     mockTrackCreateProtocolRunEvent = vi.fn(
       () => new Promise(resolve => resolve({}))
     )
-    vi.mocked(useFeatureFlag).mockReturnValue(true)
     vi.mocked(getRobotUpdateDisplayInfo).mockReturnValue({
       autoUpdateAction: '',
       autoUpdateDisabledReason: null,
@@ -95,20 +94,14 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
       .calledWith(
         expect.any(Object),
         { hostname: expect.any(String) },
-        expect.any(Array),
-        expect.any(Object)
+        expect.any(Array)
       )
       .thenReturn({
         createRunFromProtocolSource: mockCreateRunFromProtocolSource,
         reset: mockResetCreateRun,
       } as any)
     when(vi.mocked(useCreateRunFromProtocol))
-      .calledWith(
-        expect.any(Object),
-        null,
-        expect.any(Array),
-        expect.any(Object)
-      )
+      .calledWith(expect.any(Object), null, expect.any(Array))
       .thenReturn({
         createRunFromProtocolSource: mockCreateRunFromProtocolSource,
         reset: mockResetCreateRun,
@@ -122,6 +115,18 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     when(vi.mocked(useOffsetCandidatesForAnalysis))
       .calledWith(
         storedProtocolDataFixture.mostRecentAnalysis,
+        expect.any(String)
+      )
+      .thenReturn([])
+    when(vi.mocked(useOffsetCandidatesForAnalysis))
+      .calledWith(
+        storedProtocolDataWithCsvRunTimeParameter.mostRecentAnalysis,
+        null
+      )
+      .thenReturn([])
+    when(vi.mocked(useOffsetCandidatesForAnalysis))
+      .calledWith(
+        storedProtocolDataWithCsvRunTimeParameter.mostRecentAnalysis,
         expect.any(String)
       )
       .thenReturn([])
@@ -181,7 +186,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     expect(vi.mocked(startDiscovery)).toHaveBeenCalled()
     expect(dispatch).toHaveBeenCalledWith({ type: 'mockStartDiscovery' })
   })
-  it('defaults to first available robot and allows an available robot to be selected', () => {
+  it('defaults to first available robot and allows an available robot to be selected', async () => {
     vi.mocked(getConnectableRobots).mockReturnValue([
       { ...mockConnectableRobot, name: 'otherRobot', ip: 'otherIp' },
       mockConnectableRobot,
@@ -203,10 +208,13 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     const confirm = screen.getByRole('button', { name: 'Confirm values' })
     expect(confirm).not.toBeDisabled()
     fireEvent.click(confirm)
-    expect(mockCreateRunFromProtocolSource).toHaveBeenCalledWith({
-      files: [expect.any(File)],
-      protocolKey: storedProtocolDataFixture.protocolKey,
-    })
+    await waitFor(() =>
+      expect(mockCreateRunFromProtocolSource).toHaveBeenCalledWith({
+        files: [expect.any(File)],
+        protocolKey: storedProtocolDataFixture.protocolKey,
+        runTimeParameterValues: expect.any(Object),
+      })
+    )
     expect(mockTrackCreateProtocolRunEvent).toHaveBeenCalled()
   })
   it('if selected robot is on a different version of the software than the app, disable CTA and show link to device details in options', () => {
@@ -231,7 +239,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     fireEvent.click(linkToRobotDetails)
   })
 
-  it('renders error state when there is a run creation error', () => {
+  it('renders error state when there is a run creation error', async () => {
     vi.mocked(useCreateRunFromProtocol).mockReturnValue({
       runCreationError: 'run creation error',
       createRunFromProtocolSource: mockCreateRunFromProtocolSource,
@@ -249,16 +257,19 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     })
     fireEvent.click(proceedButton)
     fireEvent.click(screen.getByRole('button', { name: 'Confirm values' }))
-    expect(mockCreateRunFromProtocolSource).toHaveBeenCalledWith({
-      files: [expect.any(File)],
-      protocolKey: storedProtocolDataFixture.protocolKey,
-    })
+    await waitFor(() =>
+      expect(mockCreateRunFromProtocolSource).toHaveBeenCalledWith({
+        files: [expect.any(File)],
+        protocolKey: storedProtocolDataFixture.protocolKey,
+        runTimeParameterValues: expect.any(Object),
+      })
+    )
     expect(mockTrackCreateProtocolRunEvent).toHaveBeenCalled()
     // TODO( jr, 3.13.24): fix this when page 2 is completed of the multislideout
     // expect(screen.getByText('run creation error')).toBeInTheDocument()
   })
 
-  it('renders error state when run creation error code is 409', () => {
+  it('renders error state when run creation error code is 409', async () => {
     vi.mocked(useCreateRunFromProtocol).mockReturnValue({
       runCreationError: 'Current run is not idle or stopped.',
       createRunFromProtocolSource: mockCreateRunFromProtocolSource,
@@ -279,10 +290,13 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     expect(link.getAttribute('href')).toEqual('/devices/opentrons-robot-name')
     fireEvent.click(proceedButton)
     fireEvent.click(screen.getByRole('button', { name: 'Confirm values' }))
-    expect(mockCreateRunFromProtocolSource).toHaveBeenCalledWith({
-      files: [expect.any(File)],
-      protocolKey: storedProtocolDataFixture.protocolKey,
-    })
+    await waitFor(() =>
+      expect(mockCreateRunFromProtocolSource).toHaveBeenCalledWith({
+        files: [expect.any(File)],
+        protocolKey: storedProtocolDataFixture.protocolKey,
+        runTimeParameterValues: expect.any(Object),
+      })
+    )
     expect(mockTrackCreateProtocolRunEvent).toHaveBeenCalled()
     // TODO( jr, 3.13.24): fix this when page 2 is completed of the multislideout
     // screen.getByText(
@@ -290,7 +304,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     // )
   })
 
-  it('renders apply historic offsets as determinate if candidates available', () => {
+  it('renders apply historic offsets as determinate if candidates available', async () => {
     const mockOffsetCandidate = {
       id: 'third_offset_id',
       labwareDisplayName: 'Third Fake Labware Display Name',
@@ -321,8 +335,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
           location: mockOffsetCandidate.location,
           definitionUri: mockOffsetCandidate.definitionUri,
         },
-      ],
-      {}
+      ]
     )
     expect(screen.getByRole('checkbox')).toBeChecked()
     const proceedButton = screen.getByRole('button', {
@@ -330,9 +343,12 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     })
     fireEvent.click(proceedButton)
     fireEvent.click(screen.getByRole('button', { name: 'Confirm values' }))
-    expect(mockCreateRunFromProtocolSource).toHaveBeenCalledWith({
-      files: [expect.any(File)],
-      protocolKey: storedProtocolDataFixture.protocolKey,
+    await waitFor(() => {
+      expect(mockCreateRunFromProtocolSource).toHaveBeenCalledWith({
+        files: [expect.any(File)],
+        protocolKey: storedProtocolDataFixture.protocolKey,
+        runTimeParameterValues: expect.any(Object),
+      })
     })
   })
 
@@ -380,14 +396,12 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
           location: mockOffsetCandidate.location,
           definitionUri: mockOffsetCandidate.definitionUri,
         },
-      ],
-      {}
+      ]
     )
     expect(vi.mocked(useCreateRunFromProtocol)).toHaveBeenLastCalledWith(
       expect.any(Object),
       { hostname: 'otherIp' },
-      [],
-      {}
+      []
     )
   })
 
@@ -415,6 +429,24 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     fireEvent.click(learnMoreLink)
     screen.getByText(
       'Labware offset data references previous protocol run labware locations to save you time. If all the labware in this protocol have been checked in previous runs, that data will be applied to this run.'
+    )
+  })
+
+  it('Disables confirm values button if file parameter missing', async () => {
+    vi.mocked(useOffsetCandidatesForAnalysis).mockReturnValue([])
+    render({
+      storedProtocolData: storedProtocolDataWithCsvRunTimeParameter,
+      onCloseClick: vi.fn(),
+      showSlideout: true,
+    })
+    const proceedButton = screen.getByRole('button', {
+      name: 'Continue to parameters',
+    })
+    fireEvent.click(proceedButton)
+    const confirm = screen.getByRole('button', { name: 'Confirm values' })
+    fireEvent.pointerEnter(confirm)
+    await waitFor(() =>
+      screen.findByText('Add the required CSV file to continue.')
     )
   })
 })

@@ -12,7 +12,7 @@ import {
   JUSTIFY_CENTER,
   PrimaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -137,11 +137,11 @@ export function CalibrationTaskList({
             ) : (
               <Icon name="ot-check" size="3rem" color={COLORS.green50} />
             )}
-            <StyledText as="h1" marginTop={SPACING.spacing24}>
+            <LegacyStyledText as="h1" marginTop={SPACING.spacing24}>
               {exitBeforeDeckConfigCompletion
                 ? t('using_current_calibrations')
                 : t('calibrations_complete')}
-            </StyledText>
+            </LegacyStyledText>
             <PrimaryButton
               marginTop={SPACING.spacing24}
               onClick={() => {
@@ -160,9 +160,9 @@ export function CalibrationTaskList({
             padding={SPACING.spacing16}
             paddingBottom={SPACING.spacing32}
           >
-            <StyledText css={TYPOGRAPHY.h2SemiBold}>
+            <LegacyStyledText css={TYPOGRAPHY.h2SemiBold}>
               {t('calibration_status')}
-            </StyledText>
+            </LegacyStyledText>
             <StatusLabel
               status={statusLabelText}
               backgroundColor={statusLabelBackgroundColor}

@@ -56,6 +56,7 @@ class MoveGroupSingleAxisStep:
     move_type: MoveType = MoveType.linear
     sensor_type: Optional[SensorType] = None
     sensor_id: Optional[SensorId] = None
+    sensor_binding_flags: Optional[int] = None
 
     def is_moving_step(self) -> bool:
         """Check if this step involves any actual movement."""
@@ -137,6 +138,7 @@ def create_step(
     stop_condition: MoveStopCondition = MoveStopCondition.none,
     sensor_type_pass: Optional[SensorType] = None,
     sensor_id_pass: Optional[SensorId] = None,
+    sensor_binding_flags: Optional[int] = None,
 ) -> MoveGroupStep:
     """Create a move from a block.
 
@@ -165,6 +167,7 @@ def create_step(
             move_type=MoveType.get_move_type(stop_condition),
             sensor_type=sensor_type_pass,
             sensor_id=sensor_id_pass,
+            sensor_binding_flags=sensor_binding_flags,
         )
     return step
 

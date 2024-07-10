@@ -6,7 +6,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   RESPONSIVENESS,
 } from '@opentrons/components'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
@@ -24,6 +24,7 @@ import { MoveLabwareCommandText } from './MoveLabwareCommandText'
 import type { RobotType, RunTimeCommand } from '@opentrons/shared-data'
 import type { StyleProps } from '@opentrons/components'
 import type { CommandTextData } from './types'
+import type { TFunction } from 'i18next'
 
 const SIMPLE_TRANSLATION_KEY_BY_COMMAND_TYPE: {
   [commandType in RunTimeCommand['commandType']]?: string
@@ -52,6 +53,7 @@ interface Props extends StyleProps {
   command: RunTimeCommand
   commandTextData: CommandTextData
   robotType: RobotType
+  as?: React.ComponentProps<typeof LegacyStyledText>['as']
   isOnDevice?: boolean
   propagateCenter?: boolean
   propagateTextLimit?: boolean
@@ -63,6 +65,7 @@ export function CommandText(props: Props): JSX.Element | null {
     robotType,
     propagateCenter = false,
     propagateTextLimit = false,
+    as = 'p',
     ...styleProps
   } = props
   const { t } = useTranslation('protocol_command_text')
@@ -81,9 +84,9 @@ export function CommandText(props: Props): JSX.Element | null {
     case 'dropTipInPlace':
     case 'pickUpTip': {
       return (
-        <StyledText as="p" {...styleProps}>
+        <LegacyStyledText as={as} {...styleProps}>
           <PipettingCommandText {...{ command, commandTextData, robotType }} />
-        </StyledText>
+        </LegacyStyledText>
       )
     }
     case 'loadLabware':
@@ -91,9 +94,9 @@ export function CommandText(props: Props): JSX.Element | null {
     case 'loadModule':
     case 'loadLiquid': {
       return (
-        <StyledText as="p" {...styleProps}>
+        <LegacyStyledText as={as} {...styleProps}>
           <LoadCommandText {...{ command, commandTextData, robotType }} />
-        </StyledText>
+        </LegacyStyledText>
       )
     }
     case 'temperatureModule/setTargetTemperature':
@@ -102,9 +105,9 @@ export function CommandText(props: Props): JSX.Element | null {
     case 'thermocycler/setTargetLidTemperature':
     case 'heaterShaker/setTargetTemperature': {
       return (
-        <StyledText as="p" {...styleProps}>
+        <LegacyStyledText as={as} {...styleProps}>
           <TemperatureCommandText command={command} />
-        </StyledText>
+        </LegacyStyledText>
       )
     }
     case 'thermocycler/runProfile': {
@@ -112,7 +115,7 @@ export function CommandText(props: Props): JSX.Element | null {
       const steps = profile.map(
         ({ holdSeconds, celsius }: { holdSeconds: number; celsius: number }) =>
           t('tc_run_profile_steps', {
-            celsius: celsius,
+            celsius,
             seconds: holdSeconds,
           }).trim()
       )
@@ -135,12 +138,16 @@ export function CommandText(props: Props): JSX.Element | null {
             } ;
           `}
         >
-          <StyledText as="p" marginBottom={SPACING.spacing4} {...styleProps}>
+          <LegacyStyledText
+            as={as}
+            marginBottom={SPACING.spacing4}
+            {...styleProps}
+          >
             {t('tc_starting_profile', {
               repetitions: Object.keys(steps).length,
             })}
-          </StyledText>
-          <StyledText as="p" marginLeft={SPACING.spacing16}>
+          </LegacyStyledText>
+          <LegacyStyledText as={as} marginLeft={SPACING.spacing16}>
             <ul>
               {shouldPropagateTextLimit ? (
                 <li
@@ -164,40 +171,40 @@ export function CommandText(props: Props): JSX.Element | null {
                 ))
               )}
             </ul>
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
       )
     }
     case 'heaterShaker/setAndWaitForShakeSpeed': {
       const { rpm } = command.params
       return (
-        <StyledText as="p" {...styleProps}>
+        <LegacyStyledText as={as} {...styleProps}>
           {t('set_and_await_hs_shake', { rpm })}
-        </StyledText>
+        </LegacyStyledText>
       )
     }
     case 'moveToSlot': {
       const { slotName } = command.params
       return (
-        <StyledText as="p" {...styleProps}>
+        <LegacyStyledText as={as} {...styleProps}>
           {t('move_to_slot', { slot_name: slotName })}
-        </StyledText>
+        </LegacyStyledText>
       )
     }
     case 'moveRelative': {
       const { axis, distance } = command.params
       return (
-        <StyledText as="p" {...styleProps}>
+        <LegacyStyledText as={as} {...styleProps}>
           {t('move_relative', { axis, distance })}
-        </StyledText>
+        </LegacyStyledText>
       )
     }
     case 'moveToCoordinates': {
       const { coordinates } = command.params
       return (
-        <StyledText as="p" {...styleProps}>
+        <LegacyStyledText as={as} {...styleProps}>
           {t('move_to_coordinates', coordinates)}
-        </StyledText>
+        </LegacyStyledText>
       )
     }
     case 'moveToWell': {
@@ -215,27 +222,27 @@ export function CommandText(props: Props): JSX.Element | null {
           ? getLabwareDisplayLocation(
               commandTextData,
               labwareLocation,
-              t,
+              t as TFunction,
               robotType
             )
           : ''
       return (
-        <StyledText as="p" {...styleProps}>
+        <LegacyStyledText as={as} {...styleProps}>
           {t('move_to_well', {
             well_name: wellName,
             labware: getLabwareName(commandTextData, labwareId),
             labware_location: displayLocation,
           })}
-        </StyledText>
+        </LegacyStyledText>
       )
     }
     case 'moveLabware': {
       return (
-        <StyledText as="p" {...styleProps}>
+        <LegacyStyledText as={as} {...styleProps}>
           <MoveLabwareCommandText
             {...{ command, commandTextData, robotType }}
           />
-        </StyledText>
+        </LegacyStyledText>
       )
     }
     case 'configureForVolume': {
@@ -245,7 +252,7 @@ export function CommandText(props: Props): JSX.Element | null {
       )?.pipetteName
 
       return (
-        <StyledText as="p" {...styleProps}>
+        <LegacyStyledText as={as} {...styleProps}>
           {t('configure_for_volume', {
             volume,
             pipette:
@@ -253,7 +260,7 @@ export function CommandText(props: Props): JSX.Element | null {
                 ? getPipetteNameSpecs(pipetteName)?.displayName
                 : '',
           })}
-        </StyledText>
+        </LegacyStyledText>
       )
     }
     case 'configureNozzleLayout': {
@@ -264,7 +271,7 @@ export function CommandText(props: Props): JSX.Element | null {
 
       // TODO (sb, 11/9/23): Add support for other configurations when needed
       return (
-        <StyledText as="p" {...styleProps}>
+        <LegacyStyledText as={as} {...styleProps}>
           {t('configure_nozzle_layout', {
             amount: configurationParams.style === 'COLUMN' ? '8' : 'all',
             pipette:
@@ -272,7 +279,7 @@ export function CommandText(props: Props): JSX.Element | null {
                 ? getPipetteNameSpecs(pipetteName)?.displayName
                 : '',
           })}
-        </StyledText>
+        </LegacyStyledText>
       )
     }
     case 'prepareToAspirate': {
@@ -282,43 +289,43 @@ export function CommandText(props: Props): JSX.Element | null {
       )?.pipetteName
 
       return (
-        <StyledText as="p" {...styleProps}>
+        <LegacyStyledText as={as} {...styleProps}>
           {t('prepare_to_aspirate', {
             pipette:
               pipetteName != null
                 ? getPipetteNameSpecs(pipetteName)?.displayName
                 : '',
           })}
-        </StyledText>
+        </LegacyStyledText>
       )
     }
     case 'moveToAddressableArea': {
       const addressableAreaDisplayName = getAddressableAreaDisplayName(
         commandTextData,
         command.id,
-        t
+        t as TFunction
       )
 
       return (
-        <StyledText as="p" {...styleProps}>
+        <LegacyStyledText as={as} {...styleProps}>
           {t('move_to_addressable_area', {
             addressable_area: addressableAreaDisplayName,
           })}
-        </StyledText>
+        </LegacyStyledText>
       )
     }
     case 'moveToAddressableAreaForDropTip': {
       const addressableAreaDisplayName = getAddressableAreaDisplayName(
         commandTextData,
         command.id,
-        t
+        t as TFunction
       )
       return (
-        <StyledText as="p" {...styleProps}>
+        <LegacyStyledText as={as} {...styleProps}>
           {t('move_to_addressable_area_drop_tip', {
             addressable_area: addressableAreaDisplayName,
           })}
-        </StyledText>
+        </LegacyStyledText>
       )
     }
     case 'touchTip':
@@ -342,27 +349,27 @@ export function CommandText(props: Props): JSX.Element | null {
       const simpleTKey =
         SIMPLE_TRANSLATION_KEY_BY_COMMAND_TYPE[command.commandType]
       return (
-        <StyledText as="p" {...styleProps}>
+        <LegacyStyledText as={as} {...styleProps}>
           {simpleTKey != null ? t(simpleTKey) : null}
-        </StyledText>
+        </LegacyStyledText>
       )
     }
     case 'waitForDuration': {
       const { seconds, message } = command.params
       return (
-        <StyledText as="p" {...styleProps}>
-          {t('wait_for_duration', { seconds, message })}
-        </StyledText>
+        <LegacyStyledText as={as} {...styleProps}>
+          {t('wait_for_duration', { seconds, message: message ?? '' })}
+        </LegacyStyledText>
       )
     }
     case 'pause': // legacy pause command
     case 'waitForResume': {
       return (
-        <StyledText as="p" {...styleProps}>
-          {command.params?.message && command.params.message !== ''
+        <LegacyStyledText as={as} {...styleProps}>
+          {command.params?.message != null && command.params.message !== ''
             ? command.params.message
             : t('wait_for_resume')}
-        </StyledText>
+        </LegacyStyledText>
       )
     }
     case 'delay': {
@@ -370,29 +377,29 @@ export function CommandText(props: Props): JSX.Element | null {
       const { message = '' } = command.params
       if ('waitForResume' in command.params) {
         return (
-          <StyledText as="p" {...styleProps}>
-            {command.params?.message && command.params.message !== ''
+          <LegacyStyledText as={as} {...styleProps}>
+            {command.params?.message != null && command.params.message !== ''
               ? command.params.message
               : t('wait_for_resume')}
-          </StyledText>
+          </LegacyStyledText>
         )
       } else {
         return (
-          <StyledText as="p" {...styleProps}>
+          <LegacyStyledText as={as} {...styleProps}>
             {t('wait_for_duration', {
               seconds: command.params.seconds,
               message,
             })}
-          </StyledText>
+          </LegacyStyledText>
         )
       }
     }
     case 'comment': {
       const { message } = command.params
       return (
-        <StyledText as="p" {...styleProps}>
+        <LegacyStyledText as={as} {...styleProps}>
           {message}
-        </StyledText>
+        </LegacyStyledText>
       )
     }
     case 'custom': {
@@ -402,11 +409,11 @@ export function CommandText(props: Props): JSX.Element | null {
           ? JSON.stringify(legacyCommandText)
           : String(legacyCommandText)
       return (
-        <StyledText as="p" {...styleProps}>
+        <LegacyStyledText as={as} {...styleProps}>
           {legacyCommandText != null
             ? sanitizedCommandText
             : `${command.commandType}: ${JSON.stringify(command.params)}`}
-        </StyledText>
+        </LegacyStyledText>
       )
     }
     default: {
@@ -415,9 +422,9 @@ export function CommandText(props: Props): JSX.Element | null {
         command
       )
       return (
-        <StyledText as="p" {...styleProps}>
+        <LegacyStyledText as={as} {...styleProps}>
           {JSON.stringify(command)}
-        </StyledText>
+        </LegacyStyledText>
       )
     }
   }

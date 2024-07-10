@@ -189,7 +189,9 @@ def ensure_and_convert_deck_slot(
     if str(deck_slot).upper() in {"A4", "B4", "C4", "D4"}:
         if api_version < APIVersion(2, 16):
             raise APIVersionError(
-                f"Using a staging deck slot requires apiLevel {_STAGING_DECK_SLOT_VERSION_GATE}."
+                api_element="Using a staging deck slot",
+                until_version=f"{_STAGING_DECK_SLOT_VERSION_GATE}",
+                current_version=f"{api_version}",
             )
         # Don't need a try/except since we're already pre-validating this
         parsed_staging_slot = StagingSlotName.from_primitive(str(deck_slot))
@@ -203,9 +205,10 @@ def ensure_and_convert_deck_slot(
         if not is_ot2_style and api_version < _COORDINATE_DECK_LABEL_VERSION_GATE:
             alternative = parsed_slot.to_ot2_equivalent().id
             raise APIVersionError(
-                f'Specifying a deck slot like "{deck_slot}" requires apiLevel'
-                f" {_COORDINATE_DECK_LABEL_VERSION_GATE}."
-                f' Increase your protocol\'s apiLevel, or use slot "{alternative}" instead.'
+                api_element=f"Specifying a deck slot like '{deck_slot}'",
+                until_version=f"{_COORDINATE_DECK_LABEL_VERSION_GATE}",
+                current_version=f"{api_version}",
+                message=f" Increase your protocol's apiLevel, or use slot '{alternative}' instead.",
             )
 
         return parsed_slot.to_equivalent_for_robot_type(robot_type)

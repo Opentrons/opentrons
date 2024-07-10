@@ -6,12 +6,11 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { ChildNavigation } from '../../organisms/ChildNavigation'
-import { ROBOT_ANALYTICS_SETTING_ID } from '../../pages/RobotDashboard/AnalyticsOptInModal'
 import { RobotSettingButton } from '../../pages/RobotSettingsDashboard/RobotSettingButton'
 import { OnOffToggle } from '../../pages/RobotSettingsDashboard/RobotSettingsList'
 import {
@@ -22,6 +21,8 @@ import { getRobotSettings, updateSetting } from '../../redux/robot-settings'
 
 import type { Dispatch, State } from '../../redux/types'
 import type { SetSettingOption } from '../../pages/RobotSettingsDashboard'
+
+const ROBOT_ANALYTICS_SETTING_ID = 'disableLogAggregation'
 
 interface PrivacyProps {
   robotName: string
@@ -59,13 +60,13 @@ export function Privacy({
         paddingX={SPACING.spacing40}
         marginTop="7.75rem"
       >
-        <StyledText
+        <LegacyStyledText
           fontSize={TYPOGRAPHY.fontSize28}
           lineHeight={TYPOGRAPHY.lineHeight36}
           fontWeight={TYPOGRAPHY.fontWeightRegular}
         >
           {t('branded:opentrons_cares_about_privacy')}
-        </StyledText>
+        </LegacyStyledText>
         <Flex flexDirection={DIRECTION_COLUMN}>
           <RobotSettingButton
             settingName={t('share_robot_logs')}

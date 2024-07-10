@@ -72,7 +72,11 @@ export function SelectSourceWells(props: SelectSourceWellsProps): JSX.Element {
         width="100%"
       >
         {state.source != null ? (
-          <Flex width="75%">
+          <Flex
+            width={
+              state.source.parameters.format === '384Standard' ? '100%' : '75%'
+            }
+          >
             <WellSelection
               definition={state.source}
               deselectWells={(wells: string[]) => {

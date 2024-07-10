@@ -6,6 +6,7 @@ import {
   getAllDefinitions,
   getModuleDisplayName,
 } from '@opentrons/shared-data'
+import src from '../../../images/stacking_offsets.svg'
 import {
   ALIGN_CENTER,
   CheckboxField,
@@ -15,7 +16,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   TYPOGRAPHY,
-  StyledText,
+  LegacyStyledText,
   AlertItem,
   Box,
 } from '@opentrons/components'
@@ -170,19 +171,24 @@ export function StackingOffsets(): JSX.Element | null {
           <div className={styles.flex_row_no_columns}>
             <div className={styles.instructions_column}>
               <p>
-                Select which adapters or modules this labware will be placed on.
+                Stacking offset is only required for labware that can be placed
+                on an adapter or module. Select the compatible adapters or
+                modules below.
               </p>
               <p>
-                Stacking offset is required for labware to be placed on modules
-                and adapters. Measure from the bottom of the adapter to the
-                highest part of the labware using a pair of calipers.
+                Stack the labware onto the adapter or module and then make the
+                required measurement with calipers.
               </p>
             </div>
+            <img src={src} alt="Stacking offset image" />
             {modifiedAdapterDefinitions.length === 0 ? null : (
               <Flex gridGap={SPACING.spacing4} flexDirection={DIRECTION_COLUMN}>
-                <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+                <LegacyStyledText
+                  as="h3"
+                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                >
                   Adapters
-                </StyledText>
+                </LegacyStyledText>
                 {modifiedAdapterDefinitions.map((definition, index) => {
                   const key = definition.parameters.loadName
                   const fieldName = `compatibleAdapters.${key}`
@@ -237,18 +243,18 @@ export function StackingOffsets(): JSX.Element | null {
                           ) : null}
                         </div>
                       </Flex>
-                      {key === 'opentrons_flex_96_tiprack_adapter' &&
-                      isChecked ? (
+                      {isChecked ? (
                         <div
                           style={{
-                            marginTop: '-1.4rem',
-                            height: '2.2rem',
+                            marginTop: '-1.2rem',
+                            height: '2.0rem',
                             fontSize: '0.75rem',
                           }}
                         >
                           <p>
-                            Measure from the bottom of the tip rack adapter to
-                            the top of the tip rack.
+                            {key === 'opentrons_flex_96_tiprack_adapter'
+                              ? 'Measure from the bottom of the tip rack adapter to the highest part of the tip rack, not including the tips themselves.'
+                              : 'Measure from the bottom of the adapter to the highest part of the labware.'}
                           </p>
                         </div>
                       ) : null}
@@ -261,10 +267,14 @@ export function StackingOffsets(): JSX.Element | null {
               <Flex
                 flexDirection={DIRECTION_COLUMN}
                 marginTop={SPACING.spacing4}
+                gridGap={SPACING.spacing4}
               >
-                <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+                <LegacyStyledText
+                  as="h3"
+                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                >
                   Modules
-                </StyledText>
+                </LegacyStyledText>
                 {modifiedModuleModels.map((model, index) => {
                   const fieldName = `compatibleModules.${model}`
                   const isChecked =
@@ -322,15 +332,15 @@ export function StackingOffsets(): JSX.Element | null {
                       {isChecked ? (
                         <div
                           style={{
-                            marginTop: '-1.4rem',
-                            height: '2.2rem',
+                            marginTop: '-1.2rem',
+                            height: '2.0rem',
                             fontSize: '0.75rem',
                           }}
                         >
                           <p>
                             {model === MAGNETIC_BLOCK_V1
                               ? 'Measure from the bottom of the Magnetic Block to the top of the labware.'
-                              : 'Measure the inside of the Thermocycler using the narrow side of a pair of calipers from the bottom of the block to the top of the labware.'}
+                              : 'Measure from the bottom of the Thermocycler block to the top of the labware. Use the narrow side of the calipers.'}
                           </p>
                         </div>
                       ) : null}

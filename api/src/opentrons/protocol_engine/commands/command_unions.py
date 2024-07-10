@@ -7,7 +7,12 @@ from pydantic import Field
 from opentrons.util.get_union_elements import get_union_elements
 
 from .command import DefinedErrorData
-from .pipetting_common import OverpressureError, OverpressureErrorInternalData
+from .pipetting_common import (
+    OverpressureError,
+    OverpressureErrorInternalData,
+    LiquidNotFoundError,
+    LiquidNotFoundErrorInternalData,
+)
 
 from . import absorbance_reader
 from . import heater_shaker
@@ -302,6 +307,14 @@ from .get_tip_presence import (
     GetTipPresenceCommandType,
 )
 
+from .liquid_probe import (
+    LiquidProbe,
+    LiquidProbeParams,
+    LiquidProbeCreate,
+    LiquidProbeResult,
+    LiquidProbeCommandType,
+)
+
 Command = Annotated[
     Union[
         Aspirate,
@@ -339,6 +352,7 @@ Command = Annotated[
         SetStatusBar,
         VerifyTipPresence,
         GetTipPresence,
+        LiquidProbe,
         heater_shaker.WaitForTemperature,
         heater_shaker.SetTargetTemperature,
         heater_shaker.DeactivateHeater,
@@ -406,6 +420,7 @@ CommandParams = Union[
     SetStatusBarParams,
     VerifyTipPresenceParams,
     GetTipPresenceParams,
+    LiquidProbeParams,
     heater_shaker.WaitForTemperatureParams,
     heater_shaker.SetTargetTemperatureParams,
     heater_shaker.DeactivateHeaterParams,
@@ -471,6 +486,7 @@ CommandType = Union[
     SetStatusBarCommandType,
     VerifyTipPresenceCommandType,
     GetTipPresenceCommandType,
+    LiquidProbeCommandType,
     heater_shaker.WaitForTemperatureCommandType,
     heater_shaker.SetTargetTemperatureCommandType,
     heater_shaker.DeactivateHeaterCommandType,
@@ -537,6 +553,7 @@ CommandCreate = Annotated[
         SetStatusBarCreate,
         VerifyTipPresenceCreate,
         GetTipPresenceCreate,
+        LiquidProbeCreate,
         heater_shaker.WaitForTemperatureCreate,
         heater_shaker.SetTargetTemperatureCreate,
         heater_shaker.DeactivateHeaterCreate,
@@ -604,6 +621,7 @@ CommandResult = Union[
     SetStatusBarResult,
     VerifyTipPresenceResult,
     GetTipPresenceResult,
+    LiquidProbeResult,
     heater_shaker.WaitForTemperatureResult,
     heater_shaker.SetTargetTemperatureResult,
     heater_shaker.DeactivateHeaterResult,
@@ -648,6 +666,7 @@ CommandPrivateResult = Union[
 CommandDefinedErrorData = Union[
     DefinedErrorData[TipPhysicallyMissingError, TipPhysicallyMissingErrorInternalData],
     DefinedErrorData[OverpressureError, OverpressureErrorInternalData],
+    DefinedErrorData[LiquidNotFoundError, LiquidNotFoundErrorInternalData],
 ]
 
 

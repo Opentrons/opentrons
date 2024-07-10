@@ -6,7 +6,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useAllTipLengthCalibrationsQuery } from '@opentrons/react-api-client'
@@ -84,9 +84,9 @@ export function RobotSettingsTipLengthCalibration({
       paddingY={SPACING.spacing24}
       gridGap={SPACING.spacing8}
     >
-      <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+      <LegacyStyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {t('tip_length_calibrations_title')}
-      </StyledText>
+      </LegacyStyledText>
       <TipLengthCalibrationItems
         robotName={robotName}
         formattedPipetteOffsetCalibrations={formattedPipetteOffsetCalibrations}

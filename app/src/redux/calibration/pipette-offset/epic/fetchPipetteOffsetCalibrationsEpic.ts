@@ -11,6 +11,8 @@ import type {
 } from '../../../robot-api/operators'
 import type { Action, Epic } from '../../../types'
 import type { FetchPipetteOffsetCalibrationsAction } from '../types'
+import type { AllPipetteOffsetCalibrations } from '../../api-types'
+import type { RobotApiErrorResponse } from '../../../robot-api/types'
 
 const mapActionToRequest: ActionToRequestMapper<FetchPipetteOffsetCalibrationsAction> = action => ({
   method: GET,
@@ -24,8 +26,16 @@ const mapResponseToAction: ResponseToActionMapper<FetchPipetteOffsetCalibrations
   const { host, body, ...responseMeta } = response
   const meta = { ...originalAction.meta, response: responseMeta }
   return response.ok
-    ? Actions.fetchPipetteOffsetCalibrationsSuccess(host.name, body, meta)
-    : Actions.fetchPipetteOffsetCalibrationsFailure(host.name, body, meta)
+    ? Actions.fetchPipetteOffsetCalibrationsSuccess(
+        host.name,
+        body as AllPipetteOffsetCalibrations,
+        meta
+      )
+    : Actions.fetchPipetteOffsetCalibrationsFailure(
+        host.name,
+        body as RobotApiErrorResponse,
+        meta
+      )
 }
 
 export const fetchPipetteOffsetCalibrationsEpic: Epic = (action$, state$) => {

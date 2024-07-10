@@ -10,7 +10,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 import * as Sessions from '../../redux/sessions'
@@ -98,14 +98,16 @@ export function SaveZPoint(props: CalibrationPanelProps): JSX.Element {
           gridGap={SPACING.spacing8}
         >
           <Flex flexDirection={DIRECTION_COLUMN} flex="1">
-            <StyledText as="h1" marginBottom={SPACING.spacing16}>
+            <LegacyStyledText as="h1" marginBottom={SPACING.spacing16}>
               {title}
-            </StyledText>
+            </LegacyStyledText>
             <Trans
               t={t}
               i18nKey={bodyTranslationKey}
               components={{
-                block: <StyledText as="p" marginBottom={SPACING.spacing8} />,
+                block: (
+                  <LegacyStyledText as="p" marginBottom={SPACING.spacing8} />
+                ),
               }}
             />
           </Flex>

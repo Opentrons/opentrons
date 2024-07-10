@@ -5,6 +5,7 @@ from anyio import run
 from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import datetime, timezone
+from enum import Enum
 from pathlib import Path
 from pydantic import BaseModel
 from typing import (
@@ -33,12 +34,12 @@ from opentrons.protocol_reader import (
     ProtocolFilesInvalidError,
     ProtocolSource,
 )
-from opentrons.protocol_runner import (
-    create_simulating_runner,
-    RunResult,
-    PythonAndLegacyRunner,
-    JsonRunner,
+from opentrons.protocol_runner.create_simulating_orchestrator import (
+    create_simulating_orchestrator,
 )
+from opentrons.protocol_runner import RunResult
+from opentrons.protocol_runner.run_orchestrator import ParseMode
+
 from opentrons.protocol_engine import (
     Command,
     ErrorOccurrence,
@@ -48,6 +49,7 @@ from opentrons.protocol_engine import (
     Liquid,
     StateSummary,
 )
+from opentrons.protocol_engine.protocol_engine import code_in_error_tree
 
 from opentrons_shared_data.robot.dev_types import RobotType
 
@@ -57,7 +59,6 @@ from opentrons_shared_data.errors.exceptions import (
     PythonException,
 )
 
-from opentrons.protocols.parse import PythonParseMode
 
 OutputKind = Literal["json", "human-json"]
 
@@ -239,19 +240,15 @@ class UnexpectedAnalysisError(EnumeratedError):
 
 async def _do_analyze(protocol_source: ProtocolSource) -> RunResult:
 
-    runner = await create_simulating_runner(
+    orchestrator = await create_simulating_orchestrator(
         robot_type=protocol_source.robot_type, protocol_config=protocol_source.config
     )
-
     try:
-        if isinstance(runner, PythonAndLegacyRunner):
-            await runner.load(
-                protocol_source=protocol_source,
-                python_parse_mode=PythonParseMode.NORMAL,
-                run_time_param_values=None,
-            )
-        elif isinstance(runner, JsonRunner):
-            await runner.load(protocol_source=protocol_source)
+        await orchestrator.load(
+            protocol_source=protocol_source,
+            parse_mode=ParseMode.NORMAL,
+            run_time_param_values=None,
+        )
     except Exception as error:
         err_id = "analysis-setup-error"
         err_created_at = datetime.now(tz=timezone.utc)
@@ -281,7 +278,7 @@ async def _do_analyze(protocol_source: ProtocolSource) -> RunResult:
             parameters=[],
         )
         return analysis
-    return await runner.run(deck_configuration=[])
+    return await orchestrator.run(deck_configuration=[])
 
 
 async def _analyze(
@@ -302,6 +299,19 @@ async def _analyze(
     if not outputs:
         return return_code
 
+    if len(analysis.state_summary.errors) > 0:
+        if any(
+            code_in_error_tree(
+                root_error=error, code=ErrorCodes.RUNTIME_PARAMETER_VALUE_REQUIRED
+            )
+            for error in analysis.state_summary.errors
+        ):
+            result = AnalysisResult.PARAMETER_VALUE_REQUIRED
+        else:
+            result = AnalysisResult.NOT_OK
+    else:
+        result = AnalysisResult.OK
+
     results = AnalyzeResults.construct(
         createdAt=datetime.now(tz=timezone.utc),
         files=[
@@ -313,6 +323,7 @@ async def _analyze(
             if isinstance(protocol_source.config, JsonProtocolConfig)
             else PythonConfig.construct(apiVersion=protocol_source.config.api_version)
         ),
+        result=result,
         metadata=protocol_source.metadata,
         robotType=protocol_source.robot_type,
         runTimeParameters=analysis.parameters,
@@ -365,6 +376,26 @@ class PythonConfig(BaseModel):
     apiVersion: APIVersion
 
 
+class AnalysisResult(str, Enum):
+    """Result of a completed protocol analysis.
+
+    The result indicates whether the protocol is expected to run successfully.
+
+    Properties:
+        OK: No problems were found during protocol analysis.
+        NOT_OK: Problems were found during protocol analysis. Inspect
+            `analysis.errors` for error occurrences.
+        PARAMETER_VALUE_REQUIRED: A value is required to be set for a parameter
+            in order for the protocol to be analyzed/run. The absence of this does not
+            inherently mean there are no parameters, as there may be defaults for all
+            or unset parameters are not referenced or handled via try/except clauses.
+    """
+
+    OK = "ok"
+    NOT_OK = "not-ok"
+    PARAMETER_VALUE_REQUIRED = "parameter-value-required"
+
+
 class AnalyzeResults(BaseModel):
     """Results of a protocol analysis.
 
@@ -381,6 +412,7 @@ class AnalyzeResults(BaseModel):
     metadata: Dict[str, Any]
 
     # Fields that should match robot-server:
+    result: AnalysisResult
     robotType: RobotType
     runTimeParameters: List[RunTimeParameter]
     commands: List[Command]

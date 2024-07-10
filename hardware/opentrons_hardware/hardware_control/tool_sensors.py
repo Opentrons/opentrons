@@ -82,6 +82,8 @@ capacitive_output_file_heading = [
 # FIXME we should organize all of these functions to use the sensor drivers.
 # FIXME we should restrict some of these functions by instrument type.
 
+PLUNGER_SOLO_MOVE_TIME = 0.2
+
 
 def _fix_pass_step_for_buffer(
     move_group: MoveGroupStep,
@@ -91,7 +93,14 @@ def _fix_pass_step_for_buffer(
     sensor_type: SensorType,
     sensor_id: SensorId,
     stop_condition: MoveStopCondition = MoveStopCondition.sync_line,
+    binding_flags: Optional[int] = None,
 ) -> MoveGroupStep:
+    if binding_flags is None:
+        binding_flags = (
+            SensorOutputBinding.auto_baseline_report
+            + SensorOutputBinding.sync
+            + SensorOutputBinding.report
+        )
     tool_nodes = [
         i
         for i in movers
@@ -111,6 +120,7 @@ def _fix_pass_step_for_buffer(
             stop_condition=MoveStopCondition.sensor_report,
             sensor_type_pass=sensor_type,
             sensor_id_pass=sensor_id,
+            sensor_binding_flags=binding_flags,
         )
     elif sensor_type == SensorType.capacitive:
         tool_move = create_step(
@@ -124,6 +134,7 @@ def _fix_pass_step_for_buffer(
             stop_condition=MoveStopCondition.sensor_report,
             sensor_type_pass=sensor_type,
             sensor_id_pass=sensor_id,
+            sensor_binding_flags=binding_flags,
         )
     for node in tool_nodes:
         move_group[node] = tool_move[node]
@@ -137,6 +148,7 @@ def _build_pass_step(
     sensor_type: SensorType,
     sensor_id: SensorId,
     stop_condition: MoveStopCondition = MoveStopCondition.sync_line,
+    binding_flags: Optional[int] = None,
 ) -> MoveGroupStep:
     move_group = create_step(
         distance={ax: float64(abs(distance[ax])) for ax in movers},
@@ -151,6 +163,7 @@ def _build_pass_step(
         stop_condition=stop_condition,
         sensor_type_pass=sensor_type,
         sensor_id_pass=sensor_id,
+        sensor_binding_flags=binding_flags,
     )
     return move_group
 
@@ -170,6 +183,20 @@ async def run_sync_buffer_to_csv(
     """Runs the sensor pass move group and creates a csv file with the results."""
     sensor_metadata = [0, 0, mount_speed, plunger_speed, threshold]
     positions = await move_group.run(can_messenger=messenger)
+    # wait a little to see the dropoff curve
+    await asyncio.sleep(0.15)
+    for sensor_id in log_files.keys():
+        await messenger.ensure_send(
+            node_id=tool,
+            message=BindSensorOutputRequest(
+                payload=BindSensorOutputRequestPayload(
+                    sensor=SensorTypeField(sensor_type),
+                    sensor_id=SensorIdField(sensor_id),
+                    binding=SensorOutputBindingField(SensorOutputBinding.none),
+                )
+            ),
+            expected_nodes=[tool],
+        )
     for sensor_id in log_files.keys():
         sensor_capturer = LogListener(
             mount=head_node,
@@ -179,27 +206,20 @@ async def run_sync_buffer_to_csv(
         )
         async with sensor_capturer:
             messenger.add_listener(sensor_capturer, None)
+            request = SendAccumulatedSensorDataRequest(
+                payload=SendAccumulatedSensorDataPayload(
+                    sensor_id=SensorIdField(sensor_id),
+                    sensor_type=SensorTypeField(sensor_type),
+                )
+            )
             await messenger.send(
                 node_id=tool,
-                message=SendAccumulatedSensorDataRequest(
-                    payload=SendAccumulatedSensorDataPayload(
-                        sensor_id=SensorIdField(sensor_id),
-                        sensor_type=SensorTypeField(sensor_type),
-                    )
-                ),
+                message=request,
             )
-            await sensor_capturer.wait_for_complete()
+            await sensor_capturer.wait_for_complete(
+                message_index=request.payload.message_index.value
+            )
             messenger.remove_listener(sensor_capturer)
-        await messenger.send(
-            node_id=tool,
-            message=BindSensorOutputRequest(
-                payload=BindSensorOutputRequestPayload(
-                    sensor=SensorTypeField(sensor_type),
-                    sensor_id=SensorIdField(sensor_id),
-                    binding=SensorOutputBindingField(SensorOutputBinding.none),
-                )
-            ),
-        )
     return positions
 
 
@@ -228,7 +248,7 @@ async def run_stream_output_to_csv(
     binding_field = SensorOutputBindingField.from_flags(binding)
     for sensor_id in sensors.keys():
         sensor_info = sensors[sensor_id].sensor
-        await messenger.send(
+        await messenger.ensure_send(
             node_id=sensor_info.node_id,
             message=BindSensorOutputRequest(
                 payload=BindSensorOutputRequestPayload(
@@ -237,6 +257,7 @@ async def run_stream_output_to_csv(
                     binding=binding_field,
                 )
             ),
+            expected_nodes=[sensor_info.node_id],
         )
 
     messenger.add_listener(sensor_capturer, None)
@@ -246,7 +267,7 @@ async def run_stream_output_to_csv(
 
     for sensor_id in sensors.keys():
         sensor_info = sensors[sensor_id].sensor
-        await messenger.send(
+        await messenger.ensure_send(
             node_id=sensor_info.node_id,
             message=BindSensorOutputRequest(
                 payload=BindSensorOutputRequestPayload(
@@ -255,6 +276,7 @@ async def run_stream_output_to_csv(
                     binding=SensorOutputBindingField(SensorOutputBinding.none),
                 )
             ),
+            expected_nodes=[sensor_info.node_id],
         )
     return positions
 
@@ -334,7 +356,7 @@ async def _run_with_binding(
     binding_field = SensorOutputBindingField.from_flags(binding)
     for sensor_id in sensors.keys():
         sensor_info = sensors[sensor_id].sensor
-        await messenger.send(
+        await messenger.ensure_send(
             node_id=sensor_info.node_id,
             message=BindSensorOutputRequest(
                 payload=BindSensorOutputRequestPayload(
@@ -343,12 +365,13 @@ async def _run_with_binding(
                     binding=binding_field,
                 )
             ),
+            expected_nodes=[sensor_info.node_id],
         )
 
     result = await sensor_runner.run(can_messenger=messenger)
     for sensor_id in sensors.keys():
         sensor_info = sensors[sensor_id].sensor
-        await messenger.send(
+        await messenger.ensure_send(
             node_id=sensor_info.node_id,
             message=BindSensorOutputRequest(
                 payload=BindSensorOutputRequestPayload(
@@ -357,6 +380,7 @@ async def _run_with_binding(
                     binding=SensorOutputBindingField(SensorOutputBinding.none),
                 )
             ),
+            expected_nodes=[sensor_info.node_id],
         )
     return result
 
@@ -365,7 +389,7 @@ async def liquid_probe(
     messenger: CanMessenger,
     tool: PipetteProbeTarget,
     head_node: NodeId,
-    max_z_distance: float,
+    max_p_distance: float,
     plunger_speed: float,
     mount_speed: float,
     threshold_pascals: float,
@@ -374,6 +398,7 @@ async def liquid_probe(
     can_bus_only_output: bool = False,
     data_files: Optional[Dict[SensorId, str]] = None,
     sensor_id: SensorId = SensorId.S0,
+    force_both_sensors: bool = False,
 ) -> Dict[NodeId, MotorPositionStatus]:
     """Move the mount and pipette simultaneously while reading from the pressure sensor."""
     log_files: Dict[SensorId, str] = {} if not data_files else data_files
@@ -381,6 +406,16 @@ async def liquid_probe(
     threshold_fixed_point = threshold_pascals * sensor_fixed_point_conversion
     # How many samples to take to level out the sensor
     num_baseline_reads = 20
+    sensor_binding = None
+    if sensor_id == SensorId.BOTH and force_both_sensors:
+        # this covers the case when we want to use both sensors in an AND configuration
+        # we don't think we'll use this but we want the ability to override the standard OR configuration
+        sensor_binding = (
+            SensorOutputBinding.auto_baseline_report
+            + SensorOutputBinding.sync
+            + SensorOutputBinding.report
+            + SensorOutputBinding.multi_sensor_sync
+        )
     pressure_sensors = await _setup_pressure_sensors(
         messenger,
         sensor_id,
@@ -390,27 +425,39 @@ async def liquid_probe(
         sensor_driver,
         True,
     )
+    p_prep_distance = float(PLUNGER_SOLO_MOVE_TIME * plunger_speed)
+    p_pass_distance = float(max_p_distance - p_prep_distance)
+    max_z_distance = (p_pass_distance / plunger_speed) * mount_speed
 
+    lower_plunger = create_step(
+        distance={tool: float64(p_prep_distance)},
+        velocity={tool: float64(plunger_speed)},
+        acceleration={},
+        duration=float64(PLUNGER_SOLO_MOVE_TIME),
+        present_nodes=[tool],
+    )
     sensor_group = _build_pass_step(
         movers=[head_node, tool],
-        distance={head_node: max_z_distance, tool: max_z_distance},
+        distance={head_node: max_z_distance, tool: p_pass_distance},
         speed={head_node: mount_speed, tool: plunger_speed},
         sensor_type=SensorType.pressure,
         sensor_id=sensor_id,
         stop_condition=MoveStopCondition.sync_line,
+        binding_flags=sensor_binding,
     )
     if sync_buffer_output:
         sensor_group = _fix_pass_step_for_buffer(
             sensor_group,
             movers=[head_node, tool],
-            distance={head_node: max_z_distance, tool: max_z_distance},
+            distance={head_node: max_z_distance, tool: p_pass_distance},
             speed={head_node: mount_speed, tool: plunger_speed},
             sensor_type=SensorType.pressure,
             sensor_id=sensor_id,
             stop_condition=MoveStopCondition.sync_line,
+            binding_flags=sensor_binding,
         )
 
-    sensor_runner = MoveGroupRunner(move_groups=[[sensor_group]])
+    sensor_runner = MoveGroupRunner(move_groups=[[lower_plunger], [sensor_group]])
     if csv_output:
         return await run_stream_output_to_csv(
             messenger,

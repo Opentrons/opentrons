@@ -17,9 +17,9 @@ from opentrons.protocol_engine import (
     LabwareOffset,
 )
 
-from robot_server.maintenance_runs.maintenance_engine_store import (
-    MaintenanceEngineStore,
-    EngineConflictError,
+from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
+    MaintenanceRunOrchestratorStore,
+    RunConflictError,
 )
 from robot_server.maintenance_runs.maintenance_run_data_manager import (
     MaintenanceRunDataManager,
@@ -41,9 +41,11 @@ def mock_notify_publishers() -> None:
 
 
 @pytest.fixture
-def mock_maintenance_engine_store(decoy: Decoy) -> MaintenanceEngineStore:
-    """Get a mock MaintenanceEngineStore."""
-    mock = decoy.mock(cls=MaintenanceEngineStore)
+def mock_maintenance_run_orchestrator_store(
+    decoy: Decoy,
+) -> MaintenanceRunOrchestratorStore:
+    """Get a mock MaintenanceRunOrchestratorStore."""
+    mock = decoy.mock(cls=MaintenanceRunOrchestratorStore)
     decoy.when(mock.current_run_id).then_return(None)
     return mock
 
@@ -83,19 +85,19 @@ def run_command() -> commands.Command:
 
 @pytest.fixture
 def subject(
-    mock_maintenance_engine_store: MaintenanceEngineStore,
+    mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
     mock_maintenance_runs_publisher: MaintenanceRunsPublisher,
 ) -> MaintenanceRunDataManager:
     """Get a MaintenanceRunDataManager test subject."""
     return MaintenanceRunDataManager(
-        engine_store=mock_maintenance_engine_store,
+        run_orchestrator_store=mock_maintenance_run_orchestrator_store,
         maintenance_runs_publisher=mock_maintenance_runs_publisher,
     )
 
 
 async def test_create(
     decoy: Decoy,
-    mock_maintenance_engine_store: MaintenanceEngineStore,
+    mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
     subject: MaintenanceRunDataManager,
     engine_state_summary: StateSummary,
 ) -> None:
@@ -104,7 +106,7 @@ async def test_create(
     created_at = datetime(year=2021, month=1, day=1)
 
     decoy.when(
-        await mock_maintenance_engine_store.create(
+        await mock_maintenance_run_orchestrator_store.create(
             run_id=run_id,
             labware_offsets=[],
             created_at=created_at,
@@ -112,9 +114,9 @@ async def test_create(
             notify_publishers=mock_notify_publishers,
         )
     ).then_return(engine_state_summary)
-    decoy.when(mock_maintenance_engine_store.current_run_created_at).then_return(
-        created_at
-    )
+    decoy.when(
+        mock_maintenance_run_orchestrator_store.current_run_created_at
+    ).then_return(created_at)
     result = await subject.create(
         run_id=run_id,
         created_at=created_at,
@@ -140,7 +142,7 @@ async def test_create(
 
 async def test_create_with_options(
     decoy: Decoy,
-    mock_maintenance_engine_store: MaintenanceEngineStore,
+    mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
     subject: MaintenanceRunDataManager,
     engine_state_summary: StateSummary,
 ) -> None:
@@ -155,7 +157,7 @@ async def test_create_with_options(
     )
 
     decoy.when(
-        await mock_maintenance_engine_store.create(
+        await mock_maintenance_run_orchestrator_store.create(
             run_id=run_id,
             labware_offsets=[labware_offset],
             created_at=created_at,
@@ -163,9 +165,9 @@ async def test_create_with_options(
             notify_publishers=mock_notify_publishers,
         )
     ).then_return(engine_state_summary)
-    decoy.when(mock_maintenance_engine_store.current_run_created_at).then_return(
-        created_at
-    )
+    decoy.when(
+        mock_maintenance_run_orchestrator_store.current_run_created_at
+    ).then_return(created_at)
 
     result = await subject.create(
         run_id=run_id,
@@ -192,7 +194,7 @@ async def test_create_with_options(
 
 async def test_create_engine_error(
     decoy: Decoy,
-    mock_maintenance_engine_store: MaintenanceEngineStore,
+    mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
     subject: MaintenanceRunDataManager,
 ) -> None:
     """It should not create a resource if engine creation fails."""
@@ -200,19 +202,19 @@ async def test_create_engine_error(
     created_at = datetime(year=2021, month=1, day=1)
 
     decoy.when(
-        await mock_maintenance_engine_store.create(
+        await mock_maintenance_run_orchestrator_store.create(
             run_id,
             labware_offsets=[],
             created_at=created_at,
             deck_configuration=[],
             notify_publishers=mock_notify_publishers,
         )
-    ).then_raise(EngineConflictError("oh no"))
-    decoy.when(mock_maintenance_engine_store.current_run_created_at).then_return(
-        created_at
-    )
+    ).then_raise(RunConflictError("oh no"))
+    decoy.when(
+        mock_maintenance_run_orchestrator_store.current_run_created_at
+    ).then_return(created_at)
 
-    with pytest.raises(EngineConflictError):
+    with pytest.raises(RunConflictError):
         await subject.create(
             run_id=run_id,
             created_at=created_at,
@@ -224,20 +226,22 @@ async def test_create_engine_error(
 
 async def test_get_current_run(
     decoy: Decoy,
-    mock_maintenance_engine_store: MaintenanceEngineStore,
+    mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
     subject: MaintenanceRunDataManager,
     engine_state_summary: StateSummary,
 ) -> None:
     """It should get the current run from the engine."""
     run_id = "hello world"
 
-    decoy.when(mock_maintenance_engine_store.current_run_id).then_return(run_id)
-    decoy.when(mock_maintenance_engine_store.get_state_summary()).then_return(
+    decoy.when(mock_maintenance_run_orchestrator_store.current_run_id).then_return(
+        run_id
+    )
+    decoy.when(mock_maintenance_run_orchestrator_store.get_state_summary()).then_return(
         engine_state_summary
     )
-    decoy.when(mock_maintenance_engine_store.current_run_created_at).then_return(
-        datetime(2023, 1, 1)
-    )
+    decoy.when(
+        mock_maintenance_run_orchestrator_store.current_run_created_at
+    ).then_return(datetime(2023, 1, 1))
 
     result = subject.get(run_id=run_id)
 
@@ -259,14 +263,14 @@ async def test_get_current_run(
 
 async def test_get_run_not_current(
     decoy: Decoy,
-    mock_maintenance_engine_store: MaintenanceEngineStore,
+    mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
     subject: MaintenanceRunDataManager,
     engine_state_summary: StateSummary,
 ) -> None:
     """It should raise a MaintenanceRunNotFoundError."""
     run_id = "hello world"
 
-    decoy.when(mock_maintenance_engine_store.current_run_id).then_return(
+    decoy.when(mock_maintenance_run_orchestrator_store.current_run_id).then_return(
         "not-current-id"
     )
     with pytest.raises(MaintenanceRunNotFoundError):
@@ -275,24 +279,26 @@ async def test_get_run_not_current(
 
 async def test_delete_current_run(
     decoy: Decoy,
-    mock_maintenance_engine_store: MaintenanceEngineStore,
+    mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
     subject: MaintenanceRunDataManager,
 ) -> None:
     """It should delete the current run from the engine."""
     run_id = "hello world"
-    decoy.when(mock_maintenance_engine_store.current_run_id).then_return(run_id)
+    decoy.when(mock_maintenance_run_orchestrator_store.current_run_id).then_return(
+        run_id
+    )
 
     await subject.delete(run_id=run_id)
 
     decoy.verify(
-        await mock_maintenance_engine_store.clear(),
+        await mock_maintenance_run_orchestrator_store.clear(),
     )
 
 
 def test_get_commands_slice_current_run(
     decoy: Decoy,
     subject: MaintenanceRunDataManager,
-    mock_maintenance_engine_store: MaintenanceEngineStore,
+    mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
     run_command: commands.Command,
 ) -> None:
     """Should get a sliced command list from engine store."""
@@ -310,10 +316,12 @@ def test_get_commands_slice_current_run(
     expected_command_slice = CommandSlice(
         commands=expected_commands_result, cursor=1, total_length=3
     )
-    decoy.when(mock_maintenance_engine_store.current_run_id).then_return("run-id")
-    decoy.when(mock_maintenance_engine_store.get_command_slice(1, 2)).then_return(
-        expected_command_slice
+    decoy.when(mock_maintenance_run_orchestrator_store.current_run_id).then_return(
+        "run-id"
     )
+    decoy.when(
+        mock_maintenance_run_orchestrator_store.get_command_slice(1, 2)
+    ).then_return(expected_command_slice)
 
     result = subject.get_commands_slice("run-id", 1, 2)
 

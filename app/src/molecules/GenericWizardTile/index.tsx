@@ -18,7 +18,7 @@ import {
   PrimaryButton,
   RESPONSIVENESS,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
@@ -149,7 +149,7 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
       <Flex justifyContent={buttonPositioning} css={ALIGN_BUTTONS}>
         {back != null ? (
           <Btn onClick={back} disabled={backIsDisabled} aria-label="back">
-            <StyledText
+            <LegacyStyledText
               css={
                 backIsDisabled ?? false
                   ? GO_BACK_BUTTON_DISABLED_STYLE
@@ -157,7 +157,7 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
               }
             >
               {t('go_back')}
-            </StyledText>
+            </LegacyStyledText>
           </Btn>
         ) : null}
         {getHelp != null ? <NeedHelpLink href={getHelp} /> : null}

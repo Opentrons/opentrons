@@ -12,7 +12,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SIZE_1,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -50,7 +50,7 @@ export function SetupCalibrationItem({
       : t('not_calibrated')
 
   const calibrationDataNotAvailableText = runHasStarted ? (
-    <StyledText>{t('calibration_data_not_available')}</StyledText>
+    <LegacyStyledText>{t('calibration_data_not_available')}</LegacyStyledText>
   ) : null
   return (
     <Flex
@@ -73,23 +73,23 @@ export function SetupCalibrationItem({
           ) : null}
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
             {label != null && (
-              <StyledText
+              <LegacyStyledText
                 color={COLORS.grey60}
                 css={TYPOGRAPHY.h6SemiBold}
                 textTransform={TYPOGRAPHY.textTransformUppercase}
                 id={id}
               >
                 {label}
-              </StyledText>
+              </LegacyStyledText>
             )}
             {title != null && (
-              <StyledText as="p" color={COLORS.black90} id={id}>
+              <LegacyStyledText as="p" color={COLORS.black90} id={id}>
                 {title}
-              </StyledText>
+              </LegacyStyledText>
             )}
-            <StyledText as="label" color={COLORS.grey60}>
+            <LegacyStyledText as="label" color={COLORS.grey60}>
               {calibrationDataNotAvailableText ?? subText ?? calibratedText}
-            </StyledText>
+            </LegacyStyledText>
           </Flex>
         </Flex>
       </Flex>

@@ -13,6 +13,8 @@ interface SingleColumnContentWrapperProps extends StyleProps {
   children: React.ReactNode
 }
 // For flex-direction: column recovery content with one column only.
+//
+// For ODD use only.
 export function RecoverySingleColumnContent({
   children,
   ...styleProps
@@ -23,6 +25,23 @@ export function RecoverySingleColumnContent({
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       height="29.25rem"
+      {...styleProps}
+    >
+      {children}
+    </Flex>
+  )
+}
+
+export function RecoverySingleColumnContentDesktop({
+  children,
+  ...styleProps
+}: SingleColumnContentWrapperProps): JSX.Element {
+  return (
+    <Flex
+      padding={SPACING.spacing32}
+      gridGap={SPACING.spacing24}
+      flexDirection={DIRECTION_COLUMN}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
       {...styleProps}
     >
       {children}

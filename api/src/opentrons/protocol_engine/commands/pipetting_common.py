@@ -145,3 +145,25 @@ class OverpressureErrorInternalData:
 
     position: DeckPoint
     """Same meaning as DestinationPositionResult.position."""
+
+
+class LiquidNotFoundError(ErrorOccurrence):
+    """Returned when no liquid is detected during the liquid probe process/move.
+
+    After a failed probing, the pipette returns to the process start position.
+    """
+
+    isDefined: bool = True
+
+    errorType: Literal["liquidNotFound"] = "liquidNotFound"
+
+    errorCode: str = ErrorCodes.PIPETTE_LIQUID_NOT_FOUND.value.code
+    detail: str = ErrorCodes.PIPETTE_LIQUID_NOT_FOUND.value.detail
+
+
+@dataclass(frozen=True)
+class LiquidNotFoundErrorInternalData:
+    """Internal-to-ProtocolEngine data about a LiquidNotFoundError."""
+
+    position: DeckPoint
+    """Same meaning as DestinationPositionResult.position."""

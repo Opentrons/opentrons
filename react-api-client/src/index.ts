@@ -2,6 +2,7 @@
 export * from './api'
 export * from './calibration'
 export * from './deck_configuration'
+export * from './dataFiles'
 export * from './health'
 export * from './instruments'
 export * from './maintenance_runs'

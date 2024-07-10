@@ -521,7 +521,6 @@ export interface SupportedTips {
 export interface PipetteV2LiquidSpecs {
   $otSharedSchema: string
   supportedTips: SupportedTips
-  defaultTipOverlapDictionary: Record<string, number>
   maxVolume: number
   minVolume: number
   defaultTipracks: string[]
@@ -671,7 +670,7 @@ export type RunTimeParameter =
 export interface CompletedProtocolAnalysis {
   id: string
   status?: 'completed'
-  result: 'ok' | 'not-ok' | 'error'
+  result: 'ok' | 'not-ok' | 'error' | 'parameter-value-required'
   pipettes: LoadedPipette[]
   labware: LoadedLabware[]
   modules: LoadedModule[]

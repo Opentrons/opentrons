@@ -9,7 +9,7 @@ import {
   Flex,
   JUSTIFY_CENTER,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -54,27 +54,27 @@ export function NetworkSetupMenu(): JSX.Element {
           alignItems={ALIGN_CENTER}
           marginBottom="3.09375rem"
         >
-          <StyledText
+          <LegacyStyledText
             as="h2"
             fontWeight={TYPOGRAPHY.fontWeightBold}
             color={COLORS.black90}
           >
             {t('choose_network_type')}
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
         <Flex
           justifyContent={JUSTIFY_CENTER}
           alignItems={ALIGN_CENTER}
           marginBottom={SPACING.spacing40}
         >
-          <StyledText
+          <LegacyStyledText
             as="h4"
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             color={COLORS.grey60}
             textAlign={TYPOGRAPHY.textAlignCenter}
           >
             {t('branded:network_setup_menu_description')}
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
         <Flex
           flexDirection={DIRECTION_ROW}

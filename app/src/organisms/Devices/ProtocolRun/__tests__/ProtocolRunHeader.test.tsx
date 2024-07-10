@@ -8,7 +8,6 @@ import {
   RUN_STATUS_IDLE,
   RUN_STATUS_RUNNING,
   RUN_STATUS_PAUSED,
-  RUN_STATUS_PAUSE_REQUESTED,
   RUN_STATUS_STOP_REQUESTED,
   RUN_STATUS_STOPPED,
   RUN_STATUS_FAILED,
@@ -49,7 +48,6 @@ import {
   mockFailedRun,
   mockIdleUnstartedRun,
   mockPausedRun,
-  mockPauseRequestedRun,
   mockRunningRun,
   mockStoppedRun,
   mockStopRequestedRun,
@@ -94,6 +92,10 @@ import {
   useDropTipWizardFlows,
   useTipAttachmentStatus,
 } from '../../../DropTipWizardFlows'
+import {
+  useErrorRecoveryFlows,
+  ErrorRecoveryFlows,
+} from '../../../ErrorRecoveryFlows'
 
 import type { UseQueryResult } from 'react-query'
 import type * as ReactRouterDom from 'react-router-dom'
@@ -148,6 +150,7 @@ vi.mock('../../../../resources/deck_configuration/hooks')
 vi.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 vi.mock('../../../ProtocolUpload/hooks/useMostRecentRunId')
 vi.mock('../../../../resources/runs')
+vi.mock('../../../ErrorRecoveryFlows')
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '95e67900-bc9f-4fbf-92c6-cc4d7226a51b'
@@ -364,6 +367,13 @@ describe('ProtocolRunHeader', () => {
         robot_serial: MOCK_ROBOT_SERIAL_NUMBER,
       },
     })
+    vi.mocked(useErrorRecoveryFlows).mockReturnValue({
+      isERActive: false,
+      failedCommand: {},
+    } as any)
+    vi.mocked(ErrorRecoveryFlows).mockReturnValue(
+      <div>MOCK_ERROR_RECOVERY</div>
+    )
   })
 
   afterEach(() => {
@@ -577,24 +587,6 @@ describe('ProtocolRunHeader', () => {
       name: ANALYTICS_PROTOCOL_RUN_ACTION.RESUME,
       properties: {},
     })
-  })
-
-  it('renders a disabled Resume Run button and when pause requested', () => {
-    when(vi.mocked(useNotifyRunQuery))
-      .calledWith(RUN_ID)
-      .thenReturn({
-        data: { data: mockPauseRequestedRun },
-      } as UseQueryResult<OpentronsApiClient.Run>)
-    when(vi.mocked(useRunStatus))
-      .calledWith(RUN_ID)
-      .thenReturn(RUN_STATUS_PAUSE_REQUESTED)
-
-    render()
-
-    const button = screen.getByRole('button', { name: 'Resume run' })
-    expect(button).toBeDisabled()
-    screen.getByRole('button', { name: 'Cancel run' })
-    screen.getByText('Pause requested')
   })
 
   it('renders a disabled Canceling Run button and when stop requested', () => {
@@ -1048,5 +1040,15 @@ describe('ProtocolRunHeader', () => {
     await waitFor(() => {
       expect(mockDetermineTipStatus).not.toHaveBeenCalled()
     })
+  })
+
+  it('renders Error Recovery Flows when isERActive is true', () => {
+    vi.mocked(useErrorRecoveryFlows).mockReturnValue({
+      isERActive: true,
+      failedCommand: {},
+    } as any)
+
+    render()
+    screen.getByText('MOCK_ERROR_RECOVERY')
   })
 })

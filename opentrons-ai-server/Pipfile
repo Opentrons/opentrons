@@ -7,11 +7,11 @@ name = "pypi"
 openai = "==1.25.1"
 python-dotenv = "==1.0.1"
 httpx = "==0.27.0"
-llama-index = "==0.10.24"
-pydantic = "==2.7.1"
+llama-index = "==0.10.51"
+pydantic = "==2.7.4"
 fastapi = "==0.111.0"
-ddtrace = "==2.8.5"
-pydantic-settings = "==2.2.1"
+ddtrace = "==2.9.2"
+pydantic-settings = "==2.3.4"
 pyjwt = {extras = ["crypto"], version = "*"}
 python-json-logger = "==2.0.7"
 
@@ -30,4 +30,4 @@ types-docker = "==7.0.0.20240528"
 
 [requires]
 python_version = "3.12"
-python_full_version = "3.12.3"
+python_full_version = "3.12.4"

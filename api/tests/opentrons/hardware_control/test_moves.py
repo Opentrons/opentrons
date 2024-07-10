@@ -289,22 +289,22 @@ async def test_tip_pickup_routine(hardware_api, monkeypatch):
     await hardware_api.cache_instruments()
     mount = types.Mount.RIGHT
 
-    spec, _ = hardware_api.plan_check_pick_up_tip(
-        mount=mount, tip_length=40.0, presses=None, increment=None
-    )
-    await hardware_api.tip_pickup_moves(mount, spec)
+    presses = 1
+    await hardware_api.tip_pickup_moves(mount, presses=presses)
 
-    tip_motor_routine_num_moves = 2 * len(spec.presses)
+    # tip pickup moves has an initial move to above the tip, then 2
+    # moves for each press
+    tip_motor_routine_num_moves = 2 * presses + 1
 
-    # the tip motor routine should only make the immediate 'press' moves happen
     assert len(_move.call_args_list) == tip_motor_routine_num_moves
     _move.reset_mock()
 
     # pick_up_tip should have the press moves + a plunger move both before and after
     await hardware_api.pick_up_tip(
-        mount=mount, tip_length=40.0, presses=None, increment=None, prep_after=True
+        mount=mount, tip_length=40.0, presses=1, increment=None, prep_after=True
     )
-    assert len(_move.call_args_list) == tip_motor_routine_num_moves + 2
+    # pick_up_tip contains an additional retract
+    assert len(_move.call_args_list) == tip_motor_routine_num_moves + 1
 
 
 async def test_new_critical_point_applied(hardware_api):

@@ -294,11 +294,29 @@ export function getAllModuleSlotsByType(
 }
 
 const FLEX_MODULE_SLOTS = ['D1', 'D3', 'C1', 'C3', 'B1', 'B3', 'A1', 'A3']
+const MAGNETIC_BLOCK_MODULE_SLOTS = [
+  'D2',
+  'C2',
+  'B2',
+  'A2',
+  'D1',
+  'D3',
+  'C1',
+  'C3',
+  'B1',
+  'B3',
+  'A1',
+  'A3',
+]
 
 export function getNextAvailableModuleSlot(
-  initialDeckSetup: InitialDeckSetup
+  initialDeckSetup: InitialDeckSetup,
+  isMagneticBlock: boolean
 ): DeckSlot | undefined {
-  return FLEX_MODULE_SLOTS.find(slot => {
+  return (isMagneticBlock
+    ? MAGNETIC_BLOCK_MODULE_SLOTS
+    : FLEX_MODULE_SLOTS
+  ).find(slot => {
     const cutoutIds = Object.values(initialDeckSetup.additionalEquipmentOnDeck)
       .filter(ae => ae.name === 'stagingArea')
       .map(ae => ae.location as CutoutId)

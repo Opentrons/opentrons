@@ -22,7 +22,7 @@ import {
   SIZE_1,
   SIZE_4,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   useTooltip,
 } from '@opentrons/components'
@@ -123,6 +123,7 @@ interface ChooseRobotSlideoutProps
   multiSlideout?: { currentPage: number } | null
   setHasParamError?: (isError: boolean) => void
   resetRunTimeParameters?: () => void
+  setHasMissingFileParam?: (isMissing: boolean) => void
 }
 
 export function ChooseRobotSlideout(
@@ -150,6 +151,7 @@ export function ChooseRobotSlideout(
     setRunTimeParametersOverrides,
     setHasParamError,
     resetRunTimeParameters,
+    setHasMissingFileParam,
   } = props
   const enableCsvFile = useFeatureFlag('enableCsvFile')
 
@@ -237,13 +239,13 @@ export function ChooseRobotSlideout(
       <Flex alignSelf={ALIGN_FLEX_END} marginY={SPACING.spacing4}>
         {isScanning ? (
           <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
-            <StyledText
+            <LegacyStyledText
               as="p"
               color={COLORS.grey60}
               marginRight={SPACING.spacing12}
             >
               {t('app_settings:searching')}
-            </StyledText>
+            </LegacyStyledText>
             <Icon name="ot-spinner" spin size="1.25rem" color={COLORS.grey60} />
           </Flex>
         ) : (
@@ -272,9 +274,9 @@ export function ChooseRobotSlideout(
           gridGap={SPACING.spacing8}
         >
           <Icon name="alert-circle" size={SIZE_1} />
-          <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {t('no_available_robots_found')}
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
       ) : (
         healthyReachableRobots.map(robot => {
@@ -299,12 +301,12 @@ export function ChooseRobotSlideout(
                 registerRobotBusyStatus={registerRobotBusyStatus}
               />
               {runCreationError != null && isSelected && (
-                <StyledText
+                <LegacyStyledText
                   as="label"
                   color={COLORS.red60}
                   overflowWrap={OVERFLOW_WRAP_ANYWHERE}
                   display={DISPLAY_INLINE_BLOCK}
-                  marginTop={`-${SPACING.spacing8}`}
+                  marginTop={`-${SPACING.spacing4}`}
                   marginBottom={SPACING.spacing8}
                 >
                   {runCreationErrorCode === 409 ? (
@@ -326,7 +328,7 @@ export function ChooseRobotSlideout(
                   ) : (
                     runCreationError
                   )}
-                </StyledText>
+                </LegacyStyledText>
               )}
             </React.Fragment>
           )
@@ -339,7 +341,7 @@ export function ChooseRobotSlideout(
           textAlign={TYPOGRAPHY.textAlignCenter}
           marginTop={SPACING.spacing24}
         >
-          <StyledText as="p" color={COLORS.grey50}>
+          <LegacyStyledText as="p" color={COLORS.grey50}>
             {showIdleOnly
               ? t('unavailable_or_busy_robot_not_listed', {
                   count: unavailableCount + reducerBusyCount,
@@ -347,7 +349,7 @@ export function ChooseRobotSlideout(
               : t('unavailable_robot_not_listed', {
                   count: unavailableCount,
                 })}
-          </StyledText>
+          </LegacyStyledText>
           <NavLink to="/devices" css={TYPOGRAPHY.linkPSemiBold}>
             {t('view_unavailable_robots')}
           </NavLink>
@@ -403,9 +405,7 @@ export function ChooseRobotSlideout(
               runtimeParam.type === 'float'
             ) {
               const value = runtimeParam.value as number
-              const id = `InputField_${
-                runtimeParam.variableName
-              }_${index.toString()}`
+              const id = `InputField_${runtimeParam.variableName}_${index}`
               const error =
                 (Number.isNaN(value) && !isInputFocused) ||
                 value < runtimeParam.min ||
@@ -422,7 +422,7 @@ export function ChooseRobotSlideout(
                     })
                   : null
               if (error != null) {
-                errors.push(error)
+                errors.push(error as string)
               }
               return (
                 <InputField
@@ -474,13 +474,13 @@ export function ChooseRobotSlideout(
                   flexDirection={DIRECTION_COLUMN}
                   key={runtimeParam.variableName}
                 >
-                  <StyledText
+                  <LegacyStyledText
                     as="label"
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     paddingBottom={SPACING.spacing8}
                   >
                     {runtimeParam.displayName}
-                  </StyledText>
+                  </LegacyStyledText>
                   <Flex
                     gridGap={SPACING.spacing8}
                     justifyContent={JUSTIFY_FLEX_START}
@@ -498,7 +498,7 @@ export function ChooseRobotSlideout(
                             ) {
                               return {
                                 ...parameter,
-                                value: !parameter.value,
+                                value: !Boolean(parameter.value),
                               }
                             }
                             return parameter
@@ -507,25 +507,28 @@ export function ChooseRobotSlideout(
                         setRunTimeParametersOverrides?.(clone)
                       }}
                       height="0.813rem"
-                      label={runtimeParam.value ? t('on') : t('off')}
+                      label={Boolean(runtimeParam.value) ? t('on') : t('off')}
                       paddingTop={SPACING.spacing2} // manual alignment of SVG with value label
                     />
-                    <StyledText as="p">
-                      {runtimeParam.value ? t('on') : t('off')}
-                    </StyledText>
+                    <LegacyStyledText as="p">
+                      {Boolean(runtimeParam.value) ? t('on') : t('off')}
+                    </LegacyStyledText>
                   </Flex>
-                  <StyledText as="label" paddingTop={SPACING.spacing8}>
+                  <LegacyStyledText as="label" paddingTop={SPACING.spacing8}>
                     {runtimeParam.description}
-                  </StyledText>
+                  </LegacyStyledText>
                 </Flex>
               )
             } else if (runtimeParam.type === 'csv_file') {
+              if (runtimeParam.file?.file != null) {
+                setHasMissingFileParam?.(false)
+              }
               const error =
                 runtimeParam.file?.file?.type === 'text/csv'
                   ? null
                   : t('csv_file_type_required')
               if (error != null) {
-                errors.push(error)
+                errors.push(error as string)
               }
               return !enableCsvFile ? null : (
                 <Flex
@@ -539,13 +542,15 @@ export function ChooseRobotSlideout(
                     width="100%"
                     marginBottom={SPACING.spacing16}
                   >
-                    <StyledText
+                    <LegacyStyledText
                       as="h3"
                       fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     >
                       {t('csv_file')}
-                    </StyledText>
-                    <StyledText as="p">{t('csv_required')}</StyledText>
+                    </LegacyStyledText>
+                    <LegacyStyledText as="p">
+                      {t('csv_required')}
+                    </LegacyStyledText>
                   </Flex>
                   {runtimeParam.file == null ? (
                     <UploadInput
@@ -559,7 +564,7 @@ export function ChooseRobotSlideout(
                             ) {
                               return {
                                 ...parameter,
-                                file: { file: file },
+                                file: { file },
                               }
                             }
                             return parameter
@@ -568,7 +573,7 @@ export function ChooseRobotSlideout(
                         setRunTimeParametersOverrides?.(clone)
                       }}
                       dragAndDropText={
-                        <StyledText as="p">
+                        <LegacyStyledText as="p">
                           <Trans
                             t={t}
                             i18nKey="shared:drag_and_drop"
@@ -576,7 +581,7 @@ export function ChooseRobotSlideout(
                               a: <Link color={COLORS.blue55} role="button" />,
                             }}
                           />
-                        </StyledText>
+                        </LegacyStyledText>
                       }
                     />
                   ) : (

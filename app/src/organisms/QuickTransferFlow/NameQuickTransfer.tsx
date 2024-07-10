@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
 import {
   Flex,
-  StyledText,
+  LegacyStyledText,
   SPACING,
   DIRECTION_COLUMN,
   POSITION_FIXED,
@@ -53,22 +53,22 @@ export function NameQuickTransfer(props: NameQuickTransferProps): JSX.Element {
           value={name}
           textAlign={TYPOGRAPHY.textAlignCenter}
         />
-        <StyledText
+        <LegacyStyledText
           as="p"
           color={COLORS.grey60}
           fontWeight={TYPOGRAPHY.fontWeightRegular}
           textAlign={TYPOGRAPHY.textAlignCenter}
         >
           {t('enter_characters')}
-        </StyledText>
-        <StyledText
+        </LegacyStyledText>
+        <LegacyStyledText
           as="p"
           color={COLORS.red50}
           fontWeight={TYPOGRAPHY.fontWeightRegular}
           textAlign={TYPOGRAPHY.textAlignCenter}
         >
           {error}
-        </StyledText>
+        </LegacyStyledText>
         <Flex width="100%" position={POSITION_FIXED} left="0" bottom="0">
           <AlphanumericKeyboard
             onChange={(input: string) => {

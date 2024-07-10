@@ -9,6 +9,78 @@ import os
 import subprocess
 import sys
 import json
+import re
+
+
+def read_each_log(folder_path: str, issue_url: str) -> None:
+    """Read log and comment error portion on JIRA ticket."""
+    for file_name in os.listdir(folder_path):
+        file_path = os.path.join(folder_path, file_name)
+        not_found_words = []
+        print(file_path)
+        if file_path.endswith(".log"):
+            with open(file_path) as file:
+                lines = file.readlines()
+            words = [
+                "error",
+                "traceback",
+                "error frame encountered",
+                "did not receive",
+                "collision_detected",
+                "fail",
+                "warning",
+                "failure",
+                "homingfail",
+                "timed out",
+                "exception",
+            ]
+            error_lines = ""
+            for word in words:
+                content_list = []
+                for line_index, line in enumerate(lines):
+                    if word in line.lower():
+                        lines_before = max(0, line_index - 10)
+                        lines_after = min(len(lines), line_index + 10)
+                        error_lines = "".join(lines[lines_before:lines_after])
+                        code_lines = {
+                            "type": "codeBlock",
+                            "content": [{"type": "text", "text": error_lines}],
+                        }
+                        content_list.append(code_lines)
+                num_times = len(content_list)
+                if num_times == 0:
+                    not_found_words.append(word)
+                else:
+                    message = f"Key word '{word.upper()}' found in {file_name} {num_times} TIMES."
+                    line_1 = {
+                        "type": "paragraph",
+                        "content": [{"type": "text", "text": message}],
+                    }
+                    content_list.insert(0, line_1)
+                    ticket.comment(content_list, issue_url)
+            no_word_found_message = (
+                f"Key words '{not_found_words} were not found in {file_name}."
+            )
+            no_word_found_dict = {
+                "type": "paragraph",
+                "content": [{"type": "text", "text": no_word_found_message}],
+            }
+            content_list.append(no_word_found_dict)
+            ticket.comment(content_list, issue_url)
+
+
+def match_error_to_component(
+    project_id: str, error_message: str, components: List[str]
+) -> List[str]:
+    """Match error to component based on error message."""
+    project_components = ticket.get_project_components(project_id)
+    component_names = [proj_comp["name"] for proj_comp in project_components]
+    for component in component_names:
+        pattern = re.compile(component, re.IGNORECASE)
+        matches = pattern.findall(error_message)
+        if matches:
+            components.append(component)
+    return components
 
 
 def get_user_id(user_file_path: str, assignee_name: str) -> str:
@@ -76,9 +148,10 @@ def get_robot_state(
     )
     module_data = response.json()
     for module in module_data["data"]:
-        print(module)
         description[module["moduleType"]] = module
     components = ["Flex-RABR"]
+    components = match_error_to_component("RABR", reported_string, components)
+    print(components)
     whole_description_str = (
         "{"
         + "\n".join("{!r}: {!r},".format(k, v) for k, v in description.items())
@@ -116,6 +189,8 @@ def get_run_error_info_from_robot(
     failure_level = "Level " + str(error_level) + " Failure"
 
     components = [failure_level, "Flex-RABR"]
+    components = match_error_to_component("RABR", error_type, components)
+    print(components)
     affects_version = results["API_Version"]
     parent = results.get("robot_name", "")
     print(parent)
@@ -211,8 +286,8 @@ if __name__ == "__main__":
     except requests.exceptions.InvalidURL:
         print("Invalid IP address.")
         sys.exit()
-    one_run = error_runs[-1]  # Most recent run with error.
     if len(run_or_other) < 1:
+        one_run = error_runs[-1]  # Most recent run with error.
         (
             summary,
             robot,
@@ -234,13 +309,16 @@ if __name__ == "__main__":
         ip, storage_directory
     )
     file_paths = read_robot_logs.get_logs(storage_directory, ip)
-    print(f"Making ticket for run: {one_run} on robot {robot}.")
+
+    print(f"Making ticket for {summary}.")
     # TODO: make argument or see if I can get rid of with using board_id.
     project_key = "RABR"
-    parent_key = project_key + "-" + robot[-1]
+    print(robot)
+    parent_key = project_key + "-" + robot.split("ABR")[1]
+
     # TODO: read board to see if ticket for run id already exists.
     # CREATE TICKET
-    issue_key = ticket.create_ticket(
+    issue_key, raw_issue_url = ticket.create_ticket(
         summary,
         whole_description_str,
         project_key,
@@ -269,7 +347,8 @@ if __name__ == "__main__":
             continue
     # OPEN FOLDER DIRECTORY
     subprocess.Popen(["explorer", error_folder_path])
-
+    # ADD ERROR COMMENTS TO TICKET
+    read_each_log(error_folder_path, raw_issue_url)
     # WRITE ERRORED RUN TO GOOGLE SHEET
     if len(run_or_other) < 1:
         # CONNECT TO GOOGLE DRIVE

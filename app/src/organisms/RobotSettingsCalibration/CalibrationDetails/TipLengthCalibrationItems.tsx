@@ -7,7 +7,7 @@ import {
   BORDERS,
   COLORS,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -99,24 +99,28 @@ export function TipLengthCalibrationItems({
         {tipLengthCalibrations.map((calibration, index) => (
           <StyledTableRow key={index}>
             <StyledTableCell>
-              <StyledText as="p">
+              <LegacyStyledText as="p">
                 {calibration.tiprackDefURI &&
                   getDisplayNameForTipRack(
                     calibration.tiprackDefURI,
                     customLabwareDefs
                   )}
-              </StyledText>
+              </LegacyStyledText>
             </StyledTableCell>
             <StyledTableCell>
-              <StyledText as="p">{calibration.modelName}</StyledText>
-              <StyledText as="p">{calibration.serialNumber}</StyledText>
+              <LegacyStyledText as="p">
+                {calibration.modelName}
+              </LegacyStyledText>
+              <LegacyStyledText as="p">
+                {calibration.serialNumber}
+              </LegacyStyledText>
             </StyledTableCell>
             <StyledTableCell>
-              <StyledText as="p">
+              <LegacyStyledText as="p">
                 {calibration.lastCalibrated !== undefined
                   ? formatLastCalibrated(calibration.lastCalibrated)
                   : 'Not calibrated'}
-              </StyledText>
+              </LegacyStyledText>
             </StyledTableCell>
             <StyledTableCell>
               <OverflowMenu
