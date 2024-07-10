@@ -123,7 +123,7 @@ dist-posix: package-deps
 
 .PHONY: dist-osx
 dist-osx: package-deps
-	$(builder) --mac
+	$(builder) --mac --x64
 	$(MAKE) _dist-collect-artifacts
 
 .PHONY: dist-linux

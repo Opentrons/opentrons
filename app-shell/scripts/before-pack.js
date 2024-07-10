@@ -116,15 +116,9 @@ module.exports = function beforeBuild(context) {
           ? PYTHON_SITE_PACKAGES_TARGET_WINDOWS
           : PYTHON_SITE_PACKAGES_TARGET_POSIX
 
-      const downloadedPythonPath = path.join(
-        PYTHON_DESTINATION,
-        'bin',
-        'python'
-      )
-      // Install packages using the downloaded Python
-      return execa('arch', [
-        '-x86_64',
-        downloadedPythonPath,
+      // TODO(mc, 2022-05-16): explore virtualenvs for a more reliable
+      // implementation of this install
+      return execa(HOST_PYTHON, [
         '-m',
         'pip',
         'install',
