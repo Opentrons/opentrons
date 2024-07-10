@@ -10,6 +10,7 @@ import {
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { QuickTransferCard } from '../QuickTransferCard'
+import { LongPressModal } from '../LongPressModal'
 import type * as ReactRouterDom from 'react-router-dom'
 import type { UseQueryResult } from 'react-query'
 import type {
@@ -27,6 +28,7 @@ vi.mock('react-router-dom', async importOriginal => {
   }
 })
 vi.mock('@opentrons/react-api-client')
+vi.mock('../LongPressModal')
 
 const mockTransfer: ProtocolResource = {
   protocolKind: 'quick-transfer',
@@ -113,9 +115,7 @@ describe('QuickTransferCard', () => {
       vi.advanceTimersByTime(1005)
     })
     expect(props.longPress).toHaveBeenCalled()
-    screen.getByText('Run quick transfer')
-    screen.getByText('Pin quick transfer')
-    screen.getByText('Delete quick transfer')
+    expect(vi.mocked(LongPressModal)).toHaveBeenCalled()
   })
 
   it('should display the analysis failed error modal when clicking on the transfer when doing a long pressing', async () => {
