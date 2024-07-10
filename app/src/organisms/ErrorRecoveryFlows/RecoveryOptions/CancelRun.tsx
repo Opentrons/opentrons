@@ -65,14 +65,14 @@ function CancelRunConfirmation({
         <Flex
           flexDirection={DIRECTION_COLUMN}
           alignItems={ALIGN_CENTER}
-          gridGap={SPACING.spacing16}
+          gridGap={SPACING.spacing24}
           height="100%"
-          width="666px"
+          width="848px"
         >
           <Icon
             name="ot-alert"
-            size="2.5rem"
-            marginTop={SPACING.spacing16}
+            size="3.75rem"
+            marginTop={SPACING.spacing24}
             color={COLORS.red50}
           />
           <LegacyStyledText as="h3Bold">
@@ -104,22 +104,22 @@ function CancelRunConfirmation({
         <Flex
           flexDirection={DIRECTION_COLUMN}
           alignItems={ALIGN_CENTER}
-          gridGap={SPACING.spacing24}
+          gridGap={SPACING.spacing16}
           height="100%"
-          width="848px"
+          width="666px"
         >
           <Icon
             name="ot-alert"
-            size="3.75rem"
-            marginTop={SPACING.spacing24}
+            size="2.5rem"
+            marginTop={SPACING.spacing16}
             color={COLORS.red50}
           />
-          <LegacyStyledText as="h3Bold">
+          <LegacyStyledText as="h3DesktopBold">
             {t('are_you_sure_you_want_to_cancel')}
           </LegacyStyledText>
           <LegacyStyledText
             as="h4"
-            color={COLORS.grey60}
+            color={COLORS.black90}
             textAlign={ALIGN_CENTER}
           >
             {t('if_tips_are_attached')}

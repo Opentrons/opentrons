@@ -29,6 +29,7 @@ const styleMap: { [tag: string]: FlattenSimpleInterpolation } = {
     }
   `,
   h4: css`
+    ${TYPOGRAPHY.level4DesktopHeaderRegular}
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
       ${TYPOGRAPHY.level4HeaderRegular};
     }
@@ -75,6 +76,7 @@ const styleMap: { [tag: string]: FlattenSimpleInterpolation } = {
   `,
   h2Bold: TYPOGRAPHY.level2HeaderBold,
   h3Bold: TYPOGRAPHY.level3HeaderBold,
+  h3DesktopBold: TYPOGRAPHY.level3HeaderBold,
   h4Bold: TYPOGRAPHY.level4HeaderBold,
   pBold: TYPOGRAPHY.bodyTextBold,
   labelBold: TYPOGRAPHY.smallBodyTextBold,

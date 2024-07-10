@@ -8,6 +8,8 @@ export const fontSize32 = '2rem' // 32px
 export const fontSize28 = '1.75rem' // 28px
 export const fontSize22 = '1.375rem' // 22px
 export const fontSize20 = '1.25rem' // 20px
+export const fontSize18 = '1.125rem' // 18px
+export const fontSize14 = '0.875rem' // 14px
 export const fontSizeH1 = '1.188rem' // 19px
 export const fontSizeH2 = '0.9375rem' // 15px
 export const fontSizeH3 = '0.875rem' // 14px
@@ -164,6 +166,12 @@ export const level3HeaderBold = css`
   font-weight: ${fontWeightBold};
 `
 
+export const levelDesktop3HeaderBold = css`
+  font-size: ${fontSize32};
+  line-height: ${lineHeight42};
+  font-weight: ${fontWeightBold};
+`
+
 export const level3HeaderSemiBold = css`
   font-size: ${fontSize32};
   line-height: ${lineHeight42};
@@ -191,6 +199,12 @@ export const level4HeaderSemiBold = css`
 export const level4HeaderRegular = css`
   font-size: ${fontSize28};
   line-height: ${lineHeight36};
+  font-weight: ${fontWeightRegular};
+`
+
+export const level4DesktopHeaderRegular = css`
+  font-size: ${fontSize14};
+  line-height: ${lineHeight20};
   font-weight: ${fontWeightRegular};
 `
 
