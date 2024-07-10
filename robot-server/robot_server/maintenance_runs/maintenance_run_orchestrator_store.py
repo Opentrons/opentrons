@@ -16,6 +16,7 @@ from opentrons.protocol_engine import (
     CommandCreate,
     LabwareOffset,
     Config as ProtocolEngineConfig,
+    error_recovery_policy,
 )
 from opentrons.protocol_engine.create_protocol_engine import create_protocol_engine
 from opentrons.protocol_runner import RunResult, RunOrchestrator
@@ -37,16 +38,11 @@ from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 _log = logging.getLogger(__name__)
 
 
-class EngineConflictError(RuntimeError):
-    """An error raised if an active engine is already initialized.
+class RunConflictError(RuntimeError):
+    """An error raised if an active run is already initialized.
 
-    The store will not create a new engine unless the "current" runner/engine
-    pair is idle.
+    The store will not create a new run orchestrator unless the "current" one is idle.
     """
-
-
-class NoRunnerEnginePairError(RuntimeError):
-    """Raised if you try to get the current engine or runner while there is none."""
 
 
 class NoRunOrchestrator(RuntimeError):
@@ -54,7 +50,8 @@ class NoRunOrchestrator(RuntimeError):
 
 
 async def handle_estop_event(
-    engine_store: "MaintenanceEngineStore", event: HardwareEvent
+    maintenance_run_orchestraotr_store: "MaintenanceRunOrchestratorStore",
+    event: HardwareEvent,
 ) -> None:
     """Handle an E-stop event from the hardware API.
 
@@ -67,19 +64,23 @@ async def handle_estop_event(
         if isinstance(event, EstopStateNotification):
             if event.new_state is not EstopState.PHYSICALLY_ENGAGED:
                 return
-            if engine_store.current_run_id is None:
+            if maintenance_run_orchestraotr_store.current_run_id is None:
                 return
             # todo(mm, 2024-04-17): This estop teardown sequencing belongs in the
             # runner layer.
-            engine_store.run_orchestrator.estop()
-            await engine_store.run_orchestrator.finish(error=EStopActivatedError())
+            maintenance_run_orchestraotr_store.run_orchestrator.estop()
+            await maintenance_run_orchestraotr_store.run_orchestrator.finish(
+                error=EStopActivatedError()
+            )
     except Exception:
         # This is a background task kicked off by a hardware event,
         # so there's no one to propagate this exception to.
         _log.exception("Exception handling E-stop event.")
 
 
-def _get_estop_listener(engine_store: "MaintenanceEngineStore") -> HardwareEventHandler:
+def _get_estop_listener(
+    maintenance_run_orchestrator_store: "MaintenanceRunOrchestratorStore",
+) -> HardwareEventHandler:
     """Create a callback for estop events.
 
     The returned callback is meant to run in the hardware API's thread.
@@ -90,13 +91,13 @@ def _get_estop_listener(engine_store: "MaintenanceEngineStore") -> HardwareEvent
         event: HardwareEvent,
     ) -> None:
         asyncio.run_coroutine_threadsafe(
-            handle_estop_event(engine_store, event), engine_loop
+            handle_estop_event(maintenance_run_orchestrator_store, event), engine_loop
         )
 
     return run_handler_in_engine_thread_from_hardware_thread
 
 
-class MaintenanceEngineStore:
+class MaintenanceRunOrchestratorStore:
     """Factory and in-memory storage for ProtocolEngine."""
 
     _run_orchestrator: Optional[RunOrchestrator] = None
@@ -108,7 +109,7 @@ class MaintenanceEngineStore:
         robot_type: RobotType,
         deck_type: DeckType,
     ) -> None:
-        """Initialize an engine storage interface.
+        """Initialize a run orchestrator storage interface.
 
         Arguments:
             hardware_api: Hardware control API instance used for ProtocolEngine
@@ -130,7 +131,7 @@ class MaintenanceEngineStore:
 
     @property
     def current_run_id(self) -> Optional[str]:
-        """Get the run identifier associated with the current engine."""
+        """Get the run identifier associated with the current run orchestrator."""
         return (
             self.run_orchestrator.run_id if self._run_orchestrator is not None else None
         )
@@ -152,16 +153,16 @@ class MaintenanceEngineStore:
         """Create and store a ProtocolRunner and ProtocolEngine for a given Run.
 
         Args:
-            run_id: The run resource the engine is assigned to.
+            run_id: The run resource the run orchestrator is assigned to.
             created_at: Run creation datetime
-            labware_offsets: Labware offsets to create the engine with.
+            labware_offsets: Labware offsets to create the run with.
             notify_publishers: Utilized by the engine to notify publishers of state changes.
 
         Returns:
             The initial equipment and status summary of the engine.
         """
-        # Because we will be clearing engine store before creating a new one,
-        # the runner-engine pair should be None at this point.
+        # Because we will be clearing run orchestrator store before creating a new one,
+        # the run orchestrator should be None at this point.
         assert (
             self._run_orchestrator is None
         ), "There is an active maintenance run that was not cleared correctly."
@@ -174,6 +175,7 @@ class MaintenanceEngineStore:
                     RobotTypeEnum.robot_literal_to_enum(self._robot_type)
                 ),
             ),
+            error_recovery_policy=error_recovery_policy.never_recover,
             deck_configuration=deck_configuration,
             notify_publishers=notify_publishers,
         )
@@ -194,8 +196,8 @@ class MaintenanceEngineStore:
         """Remove the ProtocolEngine.
 
         Raises:
-            EngineConflictError: The current runner/engine pair is not idle, so
-            they cannot be cleared.
+            RunConflictError: The current run orchestrator is not idle, so
+            it cannot be cleared.
         """
         if self.run_orchestrator.get_is_okay_to_clear():
             await self.run_orchestrator.finish(
@@ -204,7 +206,7 @@ class MaintenanceEngineStore:
                 post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
             )
         else:
-            raise EngineConflictError("Current run is not idle or stopped.")
+            raise RunConflictError("Current run is not idle or stopped.")
 
         run_data = self.run_orchestrator.get_state_summary()
         commands = self.run_orchestrator.get_all_commands()

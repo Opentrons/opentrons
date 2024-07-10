@@ -39,12 +39,9 @@ import type { ErrorRecoveryFlowsProps } from '.'
 import type { ERUtilsResults } from './hooks'
 import { useHost } from '@opentrons/react-api-client'
 
-export function useRunPausedSplash(
-  isOnDevice: boolean,
-  showERWizard: boolean
-): boolean {
-  // Don't show the splash when desktop ER wizard is active.
-  return !(!isOnDevice && showERWizard)
+export function useRunPausedSplash(showERWizard: boolean): boolean {
+  // Don't show the splash when the ER wizard is active.
+  return !showERWizard
 }
 
 type RunPausedSplashProps = ERUtilsResults & {
@@ -59,7 +56,7 @@ export function RunPausedSplash(
 ): JSX.Element | null {
   const { toggleERWiz, routeUpdateActions, failedCommand } = props
   const { t } = useTranslation('error_recovery')
-  const errorKind = getErrorKind(failedCommand?.error?.errorType)
+  const errorKind = getErrorKind(failedCommand)
   const title = useErrorName(errorKind)
   const host = useHost()
 

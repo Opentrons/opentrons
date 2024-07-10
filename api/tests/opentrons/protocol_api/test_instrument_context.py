@@ -1,7 +1,11 @@
 """Tests for the InstrumentContext public interface."""
 from collections import OrderedDict
+from datetime import datetime
 import inspect
-
+from opentrons.protocol_engine.commands.pipetting_common import LiquidNotFoundError
+from opentrons.protocol_engine.errors.error_occurrence import (
+    ProtocolCommandFailedError,
+)
 import pytest
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 from decoy import Decoy
@@ -14,6 +18,7 @@ from opentrons.protocols.api_support import instrument as mock_instrument_suppor
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import (
     APIVersionError,
+    UnsupportedAPIError,
     FlowRates,
     PlungerSpeeds,
 )
@@ -265,7 +270,7 @@ def test_pick_up_from_well_deprecated_args(
     """It should pick up a specific tip."""
     mock_well = decoy.mock(cls=Well)
 
-    with pytest.raises(APIVersionError):
+    with pytest.raises(UnsupportedAPIError):
         subject.pick_up_tip(mock_well, presses=1, increment=2.0, prep_after=False)
 
 
@@ -1091,7 +1096,7 @@ def test_plunger_speed(
 @pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
 def test_plunger_speed_removed(subject: InstrumentContext) -> None:
     """It should raise an error on PAPI >= v2.14."""
-    with pytest.raises(APIVersionError):
+    with pytest.raises(UnsupportedAPIError):
         subject.speed
 
 
@@ -1268,3 +1273,71 @@ def test_aspirate_0_volume_means_aspirate_nothing(
         ),
         times=1,
     )
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 20)])
+def test_detect_liquid_presence(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should only return booleans. Not raise an exception."""
+    mock_well = decoy.mock(cls=Well)
+    lnfe = LiquidNotFoundError(id="1234", createdAt=datetime.now())
+    errorToRaise = ProtocolCommandFailedError(
+        original_error=lnfe,
+        message=f"{lnfe.errorType}: {lnfe.detail}",
+    )
+    decoy.when(
+        mock_instrument_core.liquid_probe_without_recovery(mock_well._core)
+    ).then_raise(errorToRaise)
+    result = subject.detect_liquid_presence(mock_well)
+    assert isinstance(result, bool)
+    assert not result
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 20)])
+def test_require_liquid_presence(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should raise an exception when called."""
+    mock_well = decoy.mock(cls=Well)
+    lnfe = LiquidNotFoundError(id="1234", createdAt=datetime.now())
+    errorToRaise = ProtocolCommandFailedError(
+        original_error=lnfe,
+        message=f"{lnfe.errorType}: {lnfe.detail}",
+    )
+    decoy.when(mock_instrument_core.liquid_probe_with_recovery(mock_well._core))
+    subject.require_liquid_presence(mock_well)
+    decoy.when(
+        mock_instrument_core.liquid_probe_with_recovery(mock_well._core)
+    ).then_raise(errorToRaise)
+    with pytest.raises(ProtocolCommandFailedError) as pcfe:
+        subject.require_liquid_presence(mock_well)
+    assert pcfe.value is errorToRaise
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 20)])
+def test_measure_liquid_height(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should raise an exception when called."""
+    mock_well = decoy.mock(cls=Well)
+    lnfe = LiquidNotFoundError(id="1234", createdAt=datetime.now())
+    errorToRaise = ProtocolCommandFailedError(
+        original_error=lnfe,
+        message=f"{lnfe.errorType}: {lnfe.detail}",
+    )
+    decoy.when(
+        mock_instrument_core.liquid_probe_without_recovery(mock_well._core)
+    ).then_raise(errorToRaise)
+    with pytest.raises(ProtocolCommandFailedError) as pcfe:
+        subject.measure_liquid_height(mock_well)
+    assert pcfe.value is errorToRaise

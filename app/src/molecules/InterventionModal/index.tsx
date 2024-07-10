@@ -25,12 +25,14 @@ import { TwoColumn } from './TwoColumn'
 import { OneColumn } from './OneColumn'
 import { ModalContentMixed } from './ModalContentMixed'
 import { DescriptionContent } from './DescriptionContent'
+import { DeckMapContent } from './DeckMapContent'
 export {
   ModalContentOneColSimpleButtons,
   TwoColumn,
   OneColumn,
   ModalContentMixed,
   DescriptionContent,
+  DeckMapContent,
 }
 
 export type ModalType = 'intervention-required' | 'error'

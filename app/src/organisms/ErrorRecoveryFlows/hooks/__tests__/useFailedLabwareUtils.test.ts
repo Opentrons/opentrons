@@ -4,7 +4,7 @@ import {
   getRelevantWellName,
   getRelevantFailedLabwareCmdFrom,
 } from '../useFailedLabwareUtils'
-import { ERROR_KINDS, DEFINED_ERROR_TYPES } from '../../constants'
+import { DEFINED_ERROR_TYPES } from '../../constants'
 
 describe('getRelevantWellName', () => {
   const failedPipetteInfo = {
@@ -67,7 +67,7 @@ describe('getRelevantWellName', () => {
 describe('getRelevantFailedLabwareCmdFrom', () => {
   const failedCommand = {
     error: {
-      errorType: DEFINED_ERROR_TYPES.NO_LIQUID_DETECTED,
+      errorType: DEFINED_ERROR_TYPES.LIQUID_NOT_FOUND,
     },
     params: {
       wellName: 'A1',
@@ -76,13 +76,18 @@ describe('getRelevantFailedLabwareCmdFrom', () => {
   } as any
 
   it('should return the failedCommand for NO_LIQUID_DETECTED error kind', () => {
-    const result = getRelevantFailedLabwareCmdFrom({
-      failedCommand: {
-        ...failedCommand,
-        error: { errorType: DEFINED_ERROR_TYPES.NO_LIQUID_DETECTED },
+    const failedLiquidProbeCommand = {
+      ...failedCommand,
+      commandType: 'liquidProbe',
+      error: {
+        isDefined: true,
+        errorType: DEFINED_ERROR_TYPES.LIQUID_NOT_FOUND,
       },
+    }
+    const result = getRelevantFailedLabwareCmdFrom({
+      failedCommand: failedLiquidProbeCommand,
     })
-    expect(result).toEqual(failedCommand)
+    expect(result).toEqual(failedLiquidProbeCommand)
   })
 
   it('should return the relevant pickUpTip command for overpressure error kinds', () => {
@@ -99,23 +104,17 @@ describe('getRelevantFailedLabwareCmdFrom', () => {
     } as any
 
     const overpressureErrorKinds = [
-      [
-        ERROR_KINDS.OVERPRESSURE_PREPARE_TO_ASPIRATE,
-        DEFINED_ERROR_TYPES.PIPETTE_COLLISION,
-      ],
-      [
-        ERROR_KINDS.OVERPRESSURE_WHILE_ASPIRATING,
-        DEFINED_ERROR_TYPES.OVERPRESSURE_ASPIRATION,
-      ],
-      [
-        ERROR_KINDS.OVERPRESSURE_WHILE_DISPENSING,
-        DEFINED_ERROR_TYPES.OVERPRESSURE_DISPENSING,
-      ],
+      ['aspirate', DEFINED_ERROR_TYPES.OVERPRESSURE],
+      ['dispense', DEFINED_ERROR_TYPES.OVERPRESSURE],
     ]
 
-    overpressureErrorKinds.forEach(([errorKind, errorType]) => {
+    overpressureErrorKinds.forEach(([commandType, errorType]) => {
       const result = getRelevantFailedLabwareCmdFrom({
-        failedCommand: { ...failedCommand, error: { errorType } },
+        failedCommand: {
+          ...failedCommand,
+          commandType,
+          error: { isDefined: true, errorType },
+        },
         runCommands,
       })
       expect(result).toBe(pickUpTipCommand)

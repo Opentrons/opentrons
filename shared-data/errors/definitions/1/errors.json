@@ -249,6 +249,10 @@
     "4010": {
       "detail": "Runtime Parameter Value Required",
       "category": "generalError"
+    },
+    "4011": {
+      "detail": "Incorrect API Version",
+      "category": "generalError"
     }
   }
 }

@@ -218,7 +218,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     - **exc**: The validation exception that was raised.
     - **returns**: A JSON response with a 422 status code and error details.
     """
-    logger.error(f"Validation error for route {request.url.path}: {exc}")
+    logger.error(f"Validation error for route {request.url.path}: {exc}", exc_info=True)
     return JSONResponse(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, content={"message": "Validation error", "details": exc.errors()})
 
 
@@ -231,7 +231,7 @@ async def custom_404_middleware(request: Request, call_next: Callable[[Request],
             return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"detail": f"Route '{request.url.path}' not found"})
         return response
     except Exception as exc:
-        logger.error(f"Error processing request: {exc}")
+        logger.error(f"Error processing request: {exc}", exc_info=True)
         raise exc
 
 
