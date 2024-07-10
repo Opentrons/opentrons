@@ -113,3 +113,30 @@ unset-performance-metrics-ff:
 .PHONY: test
 test:
 	$(pytest) tests
+
+.PHONY: setup-remote-flex
+setup-remote-flex:
+
+	@echo "Setting up remote Flex..."
+	@echo "Pushing performance_metrics to Flex"	
+
+	@$(MAKE) push-no-restart-ot3 host=$(host) ssh_key=$(ssh_key) 2>&1 | grep -v "Permanently added" > /dev/null
+
+	@echo "Pushing api to Flex"
+	@$(MAKE) -C ../api push-no-restart-ot3 host=$(host) ssh_key=$(ssh_key) 2>&1 | grep -v "Permanently added" > /dev/null
+
+	@echo "Pushing robot-server to Flex"
+	@$(MAKE) -C ../robot-server push-ot3 host=$(host) ssh_key=$(ssh_key) 2>&1 | grep -v "Permanently added" > /dev/null
+
+
+.PHONY: start-remote-system-resource-tracker
+start-remote-system-resource-tracker:
+	@echo "Triggering system resource tracker on host $(host)..."
+	@ssh -i $(ssh_key) root@$(host) \
+		"cd /opt/opentrons-robot-server; \
+		OT_SYSTEM_RESOURCE_TRACKER_ENABLED=true \
+		$${refresh_interval:+OT_SYSTEM_RESOURCE_TRACKER_REFRESH_INTERVAL=$$refresh_interval} \
+		$${process_filters:+OT_SYSTEM_RESOURCE_TRACKER_PROCESS_FILTERS=$$process_filters} \
+		$${storage_dir:+OT_SYSTEM_RESOURCE_TRACKER_STORAGE_DIR=$$storage_dir} \
+		$${logging_level:+OT_SYSTEM_RESOURCE_TRACKER_LOGGING_LEVEL=$$logging_level} \
+		python3 -m performance_metrics.system_resource_tracker"

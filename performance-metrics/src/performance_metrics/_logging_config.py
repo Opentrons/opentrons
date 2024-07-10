@@ -3,15 +3,17 @@
 import logging
 import logging.config
 
+LOGGER_NAME = "performance_metrics"
+
 
 def log_init(level_value: int = logging.INFO) -> None:
-    """Initialize logging for the system resource tracker."""
+    """Initialize logging for performance-metrics."""
     logging_config = {
         "version": 1,
         "disable_existing_loggers": False,
         "formatters": {
             "standard": {
-                "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+                "format": "%(asctime)s - %(module)s - %(funcName)s() - %(levelname)s - %(message)s"
             },
         },
         "handlers": {
