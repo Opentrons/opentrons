@@ -533,11 +533,8 @@ def simulate(
             extra_data=extra_data,
         )
     except parse.JSONSchemaVersionTooNewError as e:
-        if e.attempted_schema_version == 6:
-            # See Jira RCORE-535.
-            raise NotImplementedError(_JSON_TOO_NEW_MESSAGE) from e
-        else:
-            raise
+        # See https://opentrons.atlassian.net/browse/PLAT-94.
+        raise NotImplementedError(_JSON_TOO_NEW_MESSAGE) from e
 
     if protocol.api_level < APIVersion(2, 0):
         raise ApiDeprecationError(version=protocol.api_level)
