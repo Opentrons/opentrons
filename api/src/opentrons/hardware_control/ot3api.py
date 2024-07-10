@@ -2635,9 +2635,6 @@ class OT3API(
         error: Optional[PipetteLiquidNotFoundError] = None
         pos = await self.gantry_position(checked_mount, refresh=True)
         while (probe_start_pos.z - pos.z) < max_z_dist:
-            mod_log.info(
-                f"distance moved{(probe_start_pos.z - pos.z)} start{probe_start_pos.z } current{pos.z} max_z_distance{max_z_dist}"
-            )
             # safe distance so we don't accidentally aspirate liquid if we're already close to liquid
             safe_plunger_pos = top_types.Point(pos.x, pos.y, pos.z + 2)
             # overlap amount we want to use between passes
@@ -2657,7 +2654,6 @@ class OT3API(
             try:
                 # move to where we want to start a pass and run a pass
                 await self.move_to(checked_mount, pass_start_pos)
-                mod_log.info(f"max z time {max_z_time} max p travel {pass_travel}")
                 height = await self._liquid_probe_pass(
                     checked_mount,
                     probe_settings,
