@@ -112,7 +112,7 @@ async def test_create_run(
     assert result.content.data == expected_response
     assert result.status_code == 201
 
-    decoy.verify(mock_run_auto_deleter.make_room_for_new_run(None), times=1)
+    decoy.verify(mock_run_auto_deleter.make_room_for_new_run(), times=1)
 
 
 async def test_create_protocol_run(
@@ -194,7 +194,7 @@ async def test_create_protocol_run(
     assert result.content.data == expected_response
     assert result.status_code == 201
 
-    decoy.verify(mock_run_auto_deleter.make_room_for_new_run(None), times=1)
+    decoy.verify(mock_run_auto_deleter.make_room_for_new_run(), times=1)
 
 
 async def test_create_protocol_run_bad_protocol_id(

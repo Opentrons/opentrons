@@ -38,6 +38,7 @@ def test_make_room_for_new_run(decoy: Decoy, caplog: pytest.LogCaptureFixture) -
         run_store=mock_run_store,
         protocol_store=mock_protocol_store,
         deletion_planner=RunDeletionPlanner(1),
+        protocol_kind=ProtocolKind.STANDARD,
     )
 
     protocol_resources: List[ProtocolResource] = [
@@ -74,11 +75,11 @@ def test_make_room_for_new_run(decoy: Decoy, caplog: pytest.LogCaptureFixture) -
     assert "run-id-3" in caplog.text
 
 
-def test_ignore_quick_transfer_protocol_runs(
+def test_quick_transfer_protocol_runs(
     decoy: Decoy,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
-    """It should delete all runs but the specified protocol kind."""
+    """It should delete runs of the specified protocol kind."""
     mock_run_store = decoy.mock(cls=RunStore)
     mock_protocol_store = decoy.mock(cls=ProtocolStore)
     mock_protocol_source = decoy.mock(cls=ProtocolSource)
@@ -86,7 +87,8 @@ def test_ignore_quick_transfer_protocol_runs(
     subject = RunAutoDeleter(
         run_store=mock_run_store,
         protocol_store=mock_protocol_store,
-        deletion_planner=RunDeletionPlanner(2),
+        deletion_planner=RunDeletionPlanner(1),
+        protocol_kind=ProtocolKind.QUICK_TRANSFER,
     )
 
     protocol_resources: List[ProtocolResource] = [
@@ -116,16 +118,17 @@ def test_ignore_quick_transfer_protocol_runs(
 
     # Run the subject, capturing log messages at least as severe as INFO.
     with caplog.at_level(logging.INFO):
-        subject.make_room_for_new_run(exclude_kind=ProtocolKind.QUICK_TRANSFER)
+        subject.make_room_for_new_run()
 
-    decoy.verify(mock_run_store.remove(run_id="run-id-1"))
-    decoy.verify(mock_run_store.remove(run_id="run-id-3"))
-    decoy.verify(mock_run_store.remove(run_id="run-id-4"))
+    decoy.verify(mock_run_store.remove(run_id="run-id-2"))
+    decoy.verify(mock_run_store.remove(run_id="run-id-5"))
 
-    # It should log the runs that it deleted.
-    assert "run-id-1" in caplog.text
-    assert "run-id-3" in caplog.text
-    assert "run-id-4" in caplog.text
-    # Make sure we did not delete quick-transfer protocols
-    assert "run-id-2" not in caplog.text
-    assert "run-id-5" not in caplog.text
+    # It should log the quick-transfer runs deleted
+    assert "run-id-2" in caplog.text
+    assert "run-id-5" in caplog.text
+    # Make sure we delete quick-transfer protocol runs
+    assert "run-id-1" not in caplog.text
+    assert "run-id-3" not in caplog.text
+    assert "run-id-4" not in caplog.text
+    # Make sure we delete runs without a protocol
+    assert "run-id-6" in caplog.text
