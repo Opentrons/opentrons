@@ -28,10 +28,11 @@ interface ChooseCsvFileProps {
   handleGoBack: () => void
   // ToDo (kk:06/18/2024) null will be removed when implemented required part
   parameter: CsvFileParameter
-  setParameter: (value: boolean | string | number | CsvFileFileType, variableName: string) => void
-  csvFileInfo: string
-  setCsvFileInfo: (fileInfo: string) => void
-  setChooseValueScreen: (value: CsvFileParameter | null ) => void
+  setParameter: (
+    value: boolean | string | number | CsvFileFileType,
+    variableName: string
+  ) => void
+  setChooseValueScreen: (value: CsvFileParameter | null) => void
 }
 
 export function ChooseCsvFile({
@@ -39,32 +40,21 @@ export function ChooseCsvFile({
   handleGoBack,
   parameter,
   setParameter,
-  csvFileInfo,
-  setCsvFileInfo,
-  setChooseValueScreen
+  setChooseValueScreen,
 }: ChooseCsvFileProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
-  
+
   const csvFilesOnUSB = useSelector(getShellUpdateDataFiles) ?? []
 
   const csvFilesOnRobot = useAllCsvFilesQuery(protocolId).data?.data.files ?? []
 
-
-  // ToDo (06/20/2024) this will removed when working on AUTH-521
-  // const handleOnChange = (newValue: string): void => {
-  //   setCsvFileInfo(newValue)
-  //   setParameter(newValue, parameter?.variableName ?? 'csvFileId')
-  // }
-
-  
-  const [ csvFileSelected, setCsvFileSelected ] = React.useState<CsvFileFileType>({})
+  const initialFileObject: CsvFileFileType = parameter.file ?? {}
+  const [csvFileSelected, setCsvFileSelected] = React.useState<CsvFileFileType>(
+    initialFileObject
+  )
 
   const handleConfirmSelection = (): void => {
-    // ToDo (kk:06/18/2024) wire up later
-    
-    setParameter(csvFileSelected, parameter.variableName) 
-    
-    console.log("csv name: ", csvFileSelected.fileName)
+    setParameter(csvFileSelected, parameter.variableName)
     setChooseValueScreen(null)
   }
 
@@ -98,10 +88,10 @@ export function ChooseCsvFile({
                     data-testid={csv.id}
                     buttonLabel={csv.name}
                     buttonValue={`${csv.id}`}
-                    isSelected={csvFileSelected?.id === csv.id}
-                    onChange={() => { 
-                      setCsvFileSelected({id: csv.id, fileName: csv.name})
+                    onChange={() => {
+                      setCsvFileSelected({ id: csv.id, fileName: csv.name })
                     }}
+                    isSelected={csvFileSelected?.id === csv.id}
                   />
                 ))
               ) : (
@@ -115,24 +105,28 @@ export function ChooseCsvFile({
             </LegacyStyledText>
             <Flex css={LIST_CONTAINER_STYLE}>
               {csvFilesOnUSB.length !== 0 ? (
-                csvFilesOnUSB.map(csv => (
-                  <>
-                    {csv.length !== 0 && last(csv.split('/')) !== undefined ? (
-                      <RadioButton
-                        key={last(csv.split('/'))}
-                        data-testid={`${last(csv.split('/'))}`}
-                        buttonLabel={last(csv.split('/')) ?? 'default'}
-                        buttonValue={csv}
-                        isSelected={ csvFileSelected?.filePath === csv }
-                        onChange={() => {
-                          // ToDO this will be implemented AUTH-521
-                          // handleOnChange(option.value)
-                          setCsvFileSelected({filePath: csv, fileName: last(csv.split('/'))})
-                        }}
-                      />
-                    ) : null}
-                  </>
-                ))
+                csvFilesOnUSB.map(csv => {
+                  const fileNameOnUsb = last(csv.split('/'))
+                  return (
+                    <>
+                      {csv.length !== 0 && fileNameOnUsb !== undefined ? (
+                        <RadioButton
+                          key={fileNameOnUsb}
+                          data-testid={`${fileNameOnUsb}`}
+                          buttonLabel={fileNameOnUsb ?? 'default'}
+                          buttonValue={csv}
+                          onChange={() => {
+                            setCsvFileSelected({
+                              filePath: csv,
+                              fileName: fileNameOnUsb,
+                            })
+                          }}
+                          isSelected={csvFileSelected?.filePath === csv}
+                        />
+                      ) : null}
+                    </>
+                  )
+                })
               ) : (
                 <EmptyFile />
               )}
