@@ -2,7 +2,7 @@ import * as React from 'react'
 import { describe, it, beforeEach, expect } from 'vitest'
 import { renderWithProviders } from '../../../testing/utils'
 import { screen } from '@testing-library/react'
-import { SPACING } from '../../../ui-style-constants'
+import { SPACING, TYPOGRAPHY } from '../../../ui-style-constants'
 import { BORDERS, COLORS } from '../../../helix-design-system'
 
 import { LocationIcon } from '..'
@@ -36,7 +36,9 @@ describe('LocationIcon', () => {
 
   it('should render slot name', () => {
     render(props)
-    screen.getByText('A1')
+    const text = screen.getByText('A1')
+    expect(text).toHaveStyle(`font-size: ${TYPOGRAPHY.fontSizeCaption}`)
+    expect(text).toHaveStyle('line-height: normal')
   })
 
   it('should render an icon', () => {
