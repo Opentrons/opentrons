@@ -9,6 +9,7 @@ _UnderlyingFunction = typing.Callable[
     _UnderlyingFunctionParameters, _UnderlyingFunctionReturn
 ]
 
+
 RobotContextState = typing.Literal[
     "ANALYZING_PROTOCOL",
     "GETTING_CACHED_ANALYSIS",
