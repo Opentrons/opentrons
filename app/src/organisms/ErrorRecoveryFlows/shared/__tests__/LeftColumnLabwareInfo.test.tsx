@@ -9,7 +9,9 @@ import { LeftColumnLabwareInfo } from '../LeftColumnLabwareInfo'
 import { InterventionInfo } from '../../../../molecules/InterventionModal/InterventionContent/InterventionInfo'
 import { InlineNotification } from '../../../../atoms/InlineNotification'
 
-vi.mock('../../../../molecules/InterventionModal/InterventionInfo')
+vi.mock(
+  '../../../../molecules/InterventionModal/InterventionContent/InterventionInfo'
+)
 vi.mock('../../../../atoms/InlineNotification')
 
 const render = (props: React.ComponentProps<typeof LeftColumnLabwareInfo>) => {
@@ -31,7 +33,7 @@ describe('LeftColumnLabwareInfo', () => {
           location: { slotName: 'A1' },
         },
       } as any,
-      moveType: 'refill',
+      type: 'location',
       bannerText: 'MOCK_BANNER_TEXT',
     }
 
@@ -48,7 +50,7 @@ describe('LeftColumnLabwareInfo', () => {
     screen.getByText('MOCK_MOVE')
     expect(vi.mocked(InterventionInfo)).toHaveBeenCalledWith(
       expect.objectContaining({
-        type: 'refill',
+        type: 'location',
         labwareName: 'MOCK_LW_NAME',
         currentLocationProps: { slotName: 'A1' },
       }),

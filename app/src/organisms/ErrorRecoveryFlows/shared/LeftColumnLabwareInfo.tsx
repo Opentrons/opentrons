@@ -14,7 +14,7 @@ import type { RecoveryContentProps } from '../types'
 
 type LeftColumnLabwareInfoProps = RecoveryContentProps & {
   title: string
-  moveType: React.ComponentProps<typeof InterventionInfo>['type']
+  type: React.ComponentProps<typeof InterventionInfo>['type']
   /* Renders a warning InlineNotification if provided. */
   bannerText?: string
 }
@@ -24,7 +24,7 @@ export function LeftColumnLabwareInfo({
   title,
   failedLabwareUtils,
   isOnDevice,
-  moveType,
+  type,
   bannerText,
 }: LeftColumnLabwareInfoProps): JSX.Element | null {
   const { failedLabwareName, failedLabware } = failedLabwareUtils
@@ -48,7 +48,7 @@ export function LeftColumnLabwareInfo({
         <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
           <LegacyStyledText as="h4SemiBold">{title}</LegacyStyledText>
           <InterventionInfo
-            type={moveType}
+            type={type}
             labwareName={failedLabwareName ?? ''}
             currentLocationProps={{ slotName: buildLabwareLocationSlotName() }}
           />

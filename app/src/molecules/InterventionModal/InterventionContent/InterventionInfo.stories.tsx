@@ -13,8 +13,12 @@ const meta: Meta<typeof InterventionInfo> = {
     type: {
       control: {
         type: 'select',
-        options: ['move', 'refill', 'select'],
       },
+      options: [
+        'location',
+        'location-arrow-location',
+        'location-column-location',
+      ],
     },
     labwareName: {
       control: 'text',
@@ -29,8 +33,8 @@ const meta: Meta<typeof InterventionInfo> = {
       iconName: {
         control: {
           type: 'select',
-          options: Object.keys(ICON_DATA_BY_NAME),
         },
+        options: Object.keys(ICON_DATA_BY_NAME),
       },
     },
     newLocationProps: {
@@ -43,11 +47,23 @@ const meta: Meta<typeof InterventionInfo> = {
       iconName: {
         control: {
           type: 'select',
-          options: Object.keys(ICON_DATA_BY_NAME),
         },
+        options: Object.keys(ICON_DATA_BY_NAME),
+      },
+    },
+    labwareNickname: {
+      control: {
+        type: 'text',
       },
     },
   },
+  decorators: [
+    Story => (
+      <Box width="27rem">
+        <Story />
+      </Box>
+    ),
+  ],
 }
 
 export default meta
@@ -56,7 +72,7 @@ type Story = StoryObj<typeof InterventionInfo>
 
 export const MoveBetweenSlots: Story = {
   args: {
-    type: 'move',
+    type: 'location-arrow-location',
     labwareName: 'Plate',
     currentLocationProps: {
       slotName: 'A1',
@@ -65,31 +81,21 @@ export const MoveBetweenSlots: Story = {
       slotName: 'B2',
     },
   },
-  render: args => (
-    <Box width="27rem">
-      <InterventionInfo {...args} />
-    </Box>
-  ),
 }
 
 export const Refill: Story = {
   args: {
-    type: 'refill',
+    type: 'location',
     labwareName: 'Tip Rack',
     currentLocationProps: {
       slotName: 'A1',
     },
   },
-  render: args => (
-    <Box width="27rem">
-      <InterventionInfo {...args} />
-    </Box>
-  ),
 }
 
 export const Select: Story = {
   args: {
-    type: 'select',
+    type: 'location-colon-location',
     labwareName: 'Well',
     currentLocationProps: {
       slotName: 'A1',
@@ -98,9 +104,4 @@ export const Select: Story = {
       slotName: 'B1',
     },
   },
-  render: args => (
-    <Box width="27rem">
-      <InterventionInfo {...args} />
-    </Box>
-  ),
 }

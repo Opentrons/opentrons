@@ -53,7 +53,7 @@ export function SelectTips(props: RecoveryContentProps): JSX.Element | null {
             <LeftColumnLabwareInfo
               {...props}
               title={t('select_tip_pickup_location')}
-              moveType="refill"
+              type="location"
               bannerText={t('replace_tips_and_select_location')}
             />
             <TipSelection {...props} allowTipSelection={false} />
