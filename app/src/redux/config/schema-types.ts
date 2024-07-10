@@ -264,6 +264,7 @@ export type ConfigV23 = Omit<ConfigV22, 'version'> & {
   protocols: ConfigV22['protocols'] & {
     pinnedQuickTransferIds: string[]
     quickTransfersOnDeviceSortKey: QuickTransfersOnDeviceSortKey | null
+    hasDismissedQuickTransferIntro: boolean
   }
 }
 

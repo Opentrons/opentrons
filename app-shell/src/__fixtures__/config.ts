@@ -287,5 +287,6 @@ export const MOCK_CONFIG_V23: ConfigV23 = {
     ...MOCK_CONFIG_V22.protocols,
     pinnedQuickTransferIds: [],
     quickTransfersOnDeviceSortKey: null,
+    hasDismissedQuickTransferIntro: false,
   },
 }

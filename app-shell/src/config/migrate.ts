@@ -412,6 +412,7 @@ const toVersion23 = (prevConfig: ConfigV22): ConfigV23 => {
       ...prevConfig.protocols,
       pinnedQuickTransferIds: [],
       quickTransfersOnDeviceSortKey: null,
+      hasDismissedQuickTransferIntro: false,
     },
   }
   return nextConfig

@@ -117,6 +117,13 @@ export const getQuickTransfersOnDeviceSortKey: (
   config => config?.protocols.quickTransfersOnDeviceSortKey ?? null
 )
 
+export const getHasDismissedQuickTransferIntro: (
+  state: State
+) => boolean = createSelector(
+  getConfig,
+  config => config?.protocols.hasDismissedQuickTransferIntro ?? false
+)
+
 export const getOnDeviceDisplaySettings: (
   state: State
 ) => OnDeviceDisplaySettings = createSelector(getConfig, config => {
