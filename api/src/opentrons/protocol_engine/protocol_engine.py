@@ -157,7 +157,7 @@ class ProtocolEngine:
         """
         self._action_dispatcher.dispatch(SetDeckConfigurationAction(deck_configuration))
 
-    def play(self, deck_configuration: Optional[DeckConfigurationType] = None) -> None:
+    def play(self) -> None:
         """Start or resume executing commands in the queue."""
         requested_at = self._model_utils.get_timestamp()
         # TODO(mc, 2021-08-05): if starting, ensure plungers motors are
