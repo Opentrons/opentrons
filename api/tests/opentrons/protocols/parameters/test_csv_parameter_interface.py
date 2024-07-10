@@ -43,6 +43,15 @@ def csv_file_mixed_quotes() -> TextIO:
     return temp_file
 
 
+@pytest.fixture
+def csv_file_different_delimiter() -> TextIO:
+    temp_file = tempfile.TemporaryFile("r+")
+    contents = "x:y:z\na,:1,:2\nb,:3,:4\nc,:5,:6"
+    temp_file.write(contents)
+    temp_file.seek(0)
+    return temp_file
+
+
 def test_csv_parameter(csv_file_basic: TextIO) -> None:
     """It should load the CSV parameter and provide access to the file, contents, and rows."""
     subject = CSVParameter(csv_file_basic)
@@ -61,15 +70,32 @@ def test_csv_parameter(csv_file_basic: TextIO) -> None:
 def test_csv_parameter_rows(csv_file: TextIO) -> None:
     """It should load the rows as all strings even with no quotes or leading spaces."""
     subject = CSVParameter(csv_file)
-    assert len(subject.rows()) == 4
-    assert subject.rows()[0] == ["x", "y", "z"]
-    assert subject.rows()[1] == ["a", "1", "2"]
+    assert len(subject.parse_as_csv()) == 4
+    assert subject.parse_as_csv()[0] == ["x", "y", "z"]
+    assert subject.parse_as_csv()[1] == ["a", "1", "2"]
 
 
 def test_csv_parameter_mixed_quotes(csv_file_mixed_quotes: TextIO) -> None:
     """It should load the rows with no quotes, quotes and escaped quotes with double quotes."""
     subject = CSVParameter(csv_file_mixed_quotes)
-    assert len(subject.rows()) == 3
-    assert subject.rows()[0] == ["head", "er"]
-    assert subject.rows()[1] == ["a,b,c", "def"]
-    assert subject.rows()[2] == ['"ghi"', "jkl"]
+    assert len(subject.parse_as_csv()) == 3
+    assert subject.parse_as_csv()[0] == ["head", "er"]
+    assert subject.parse_as_csv()[1] == ["a,b,c", "def"]
+    assert subject.parse_as_csv()[2] == ['"ghi"', "jkl"]
+
+
+def test_csv_parameter_additional_kwargs(csv_file_different_delimiter: TextIO) -> None:
+    """It should load the rows with a different delimiter."""
+    subject = CSVParameter(csv_file_different_delimiter)
+    rows = subject.parse_as_csv(delimiter=':')
+    assert len(rows) == 4
+    assert rows[0] == ["x", "y", "z"]
+    assert rows[1] == ["a,", "1,", "2"]
+
+
+def test_csv_parameter_dont_detect_dialect(csv_file_preceding_spaces: TextIO) -> None:
+    """It should load the rows without trying to detect the dialect."""
+    subject = CSVParameter(csv_file_preceding_spaces)
+    rows = subject.parse_as_csv(detect_dialect=False)
+    assert rows[0] == ['x', ' "y"', ' "z"']
+    assert rows[1] == ['a', ' 1', ' 2']
