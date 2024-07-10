@@ -1,4 +1,5 @@
 """Tests for the PythonAndLegacyRunner, JsonRunner & LiveRunner classes."""
+from unittest.mock import sentinel
 from datetime import datetime
 
 import pytest
@@ -218,9 +219,12 @@ def test_play_starts_run(
     subject: AnyRunner,
 ) -> None:
     """It should start a protocol run with play."""
-    subject.play(deck_configuration=[])
-
-    decoy.verify(protocol_engine.play(deck_configuration=[]), times=1)
+    subject.play(sentinel.deck_configuration)
+    decoy.verify(
+        protocol_engine.set_deck_configuration(sentinel.deck_configuration),
+        protocol_engine.play(),
+        times=1,
+    )
 
 
 @pytest.mark.parametrize(
@@ -326,11 +330,12 @@ async def test_run_json_runner(
     )
 
     assert json_runner_subject.was_started() is False
-    await json_runner_subject.run(deck_configuration=[])
+    await json_runner_subject.run(deck_configuration=sentinel.deck_configuration)
     assert json_runner_subject.was_started() is True
 
     decoy.verify(
-        protocol_engine.play(deck_configuration=[]),
+        protocol_engine.set_deck_configuration(sentinel.deck_configuration),
+        protocol_engine.play(),
         task_queue.start(),
         await task_queue.join(),
     )
@@ -814,11 +819,12 @@ async def test_run_python_runner(
     )
 
     assert python_runner_subject.was_started() is False
-    await python_runner_subject.run(deck_configuration=[])
+    await python_runner_subject.run(deck_configuration=sentinel.deck_configuration)
     assert python_runner_subject.was_started() is True
 
     decoy.verify(
-        protocol_engine.play(deck_configuration=[]),
+        protocol_engine.set_deck_configuration(sentinel.deck_configuration),
+        protocol_engine.play(),
         task_queue.start(),
         await task_queue.join(),
     )
@@ -837,12 +843,13 @@ async def test_run_live_runner(
     )
 
     assert live_runner_subject.was_started() is False
-    await live_runner_subject.run(deck_configuration=[])
+    await live_runner_subject.run(deck_configuration=sentinel.deck_configuration)
     assert live_runner_subject.was_started() is True
 
     decoy.verify(
         await hardware_api.home(),
-        protocol_engine.play(deck_configuration=[]),
+        protocol_engine.set_deck_configuration(sentinel.deck_configuration),
+        protocol_engine.play(),
         task_queue.start(),
         await task_queue.join(),
     )
