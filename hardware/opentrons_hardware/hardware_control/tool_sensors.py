@@ -319,6 +319,7 @@ async def _setup_pressure_sensors(
 async def _setup_capacitive_sensors(
     messenger: CanMessenger,
     sensor_id: SensorId,
+    # node: NodeId,
     tool: InstrumentProbeTarget,
     relative_threshold_pf: float,
     sensor_driver: SensorDriver,
@@ -334,6 +335,10 @@ async def _setup_capacitive_sensors(
     for sensor in sensors:
         capacitive_sensor = CapacitiveSensor.build(
             sensor_id=sensor,
+            # this is bad and I dont like it
+
+            # it only works when it gets passed a InstumentProbeTarget
+            # but the function param is a NodeId ????
             node_id=tool,
             stop_threshold=relative_threshold_pf,
         )
@@ -513,7 +518,11 @@ async def check_overpressure(
         sensor_scheduler.monitor_exceed_max_threshold, sensor_info, messenger
     )
 
+# we should be able to use this with one or more sensors on the pipette
+# or the gripper (it broke the gripper)
 
+# the pipette plunger move when it uses the pipette should j be a 0 velocity one
+# so the plunger wont actually move but can still set the sync line
 async def capacitive_probe(
     messenger: CanMessenger,
     tool: InstrumentProbeTarget,
@@ -542,14 +551,15 @@ async def capacitive_probe(
         messenger,
         sensor_id,
         tool,
+        # mover,
         relative_threshold_pf,
         sensor_driver,
     )
 
     sensor_group = _build_pass_step(
-        movers=[mover, tool],
-        distance={mover: distance, tool: 0.0},
-        speed={mover: mount_speed, tool: 0.0},
+        movers=[mover],
+        distance={mover: distance},
+        speed={mover: mount_speed},
         sensor_type=SensorType.capacitive,
         sensor_id=sensor_id,
         stop_condition=MoveStopCondition.sync_line,
@@ -557,9 +567,9 @@ async def capacitive_probe(
     if sync_buffer_output:
         sensor_group = _fix_pass_step_for_buffer(
             sensor_group,
-            movers=[mover, tool],
-            distance={mover: distance, tool: distance},
-            speed={mover: mount_speed, tool: plunger_speed},
+            movers=[mover],
+            distance={mover: distance},
+            speed={mover: mount_speed},
             sensor_type=SensorType.capacitive,
             sensor_id=sensor_id,
             stop_condition=MoveStopCondition.sync_line,
