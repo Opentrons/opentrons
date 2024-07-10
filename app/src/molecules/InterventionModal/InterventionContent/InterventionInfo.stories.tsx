@@ -2,13 +2,13 @@ import * as React from 'react'
 
 import { Box, ICON_DATA_BY_NAME } from '@opentrons/components'
 
-import { Move } from './Move'
+import { InterventionInfo } from './InterventionInfo'
 
 import type { Meta, StoryObj } from '@storybook/react'
 
-const meta: Meta<typeof Move> = {
-  title: 'App/Organisms/InterventionModal/InterventionStep/Move',
-  component: Move,
+const meta: Meta<typeof InterventionInfo> = {
+  title: 'App/Molecules/InterventionModal/InterventionContent/InterventionInfo',
+  component: InterventionInfo,
   argTypes: {
     type: {
       control: {
@@ -52,7 +52,7 @@ const meta: Meta<typeof Move> = {
 
 export default meta
 
-type Story = StoryObj<typeof Move>
+type Story = StoryObj<typeof InterventionInfo>
 
 export const MoveBetweenSlots: Story = {
   args: {
@@ -67,7 +67,7 @@ export const MoveBetweenSlots: Story = {
   },
   render: args => (
     <Box width="27rem">
-      <Move {...args} />
+      <InterventionInfo {...args} />
     </Box>
   ),
 }
@@ -82,7 +82,7 @@ export const Refill: Story = {
   },
   render: args => (
     <Box width="27rem">
-      <Move {...args} />
+      <InterventionInfo {...args} />
     </Box>
   ),
 }
@@ -100,7 +100,7 @@ export const Select: Story = {
   },
   render: args => (
     <Box width="27rem">
-      <Move {...args} />
+      <InterventionInfo {...args} />
     </Box>
   ),
 }

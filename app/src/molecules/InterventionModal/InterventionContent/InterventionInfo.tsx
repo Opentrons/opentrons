@@ -15,14 +15,14 @@ import {
 
 import type { LocationIconProps } from '@opentrons/components'
 
-export interface MoveProps {
+export interface InterventionInfoProps {
   type: 'move' | 'refill' | 'select'
   labwareName: string
   currentLocationProps: LocationIconProps
   newLocationProps?: LocationIconProps
 }
 
-export function Move(props: MoveProps): JSX.Element {
+export function InterventionInfo(props: InterventionInfoProps): JSX.Element {
   const content = buildContent(props)
 
   return (
@@ -33,7 +33,7 @@ export function Move(props: MoveProps): JSX.Element {
   )
 }
 
-const buildContent = (props: MoveProps): JSX.Element => {
+const buildContent = (props: InterventionInfoProps): JSX.Element => {
   switch (props.type) {
     case 'move':
       return buildMove(props)
@@ -44,7 +44,7 @@ const buildContent = (props: MoveProps): JSX.Element => {
   }
 }
 
-const buildMove = (props: MoveProps): JSX.Element => {
+const buildMove = (props: InterventionInfoProps): JSX.Element => {
   const { currentLocationProps, newLocationProps } = props
 
   if (newLocationProps != null) {
@@ -60,7 +60,9 @@ const buildMove = (props: MoveProps): JSX.Element => {
   }
 }
 
-const buildRefill = ({ currentLocationProps }: MoveProps): JSX.Element => {
+const buildRefill = ({
+  currentLocationProps,
+}: InterventionInfoProps): JSX.Element => {
   return (
     <Flex gridGap={SPACING.spacing8}>
       <LocationIcon {...currentLocationProps} />
@@ -68,7 +70,7 @@ const buildRefill = ({ currentLocationProps }: MoveProps): JSX.Element => {
   )
 }
 
-const buildSelect = (props: MoveProps): JSX.Element => {
+const buildSelect = (props: InterventionInfoProps): JSX.Element => {
   const { currentLocationProps, newLocationProps } = props
 
   if (newLocationProps != null) {

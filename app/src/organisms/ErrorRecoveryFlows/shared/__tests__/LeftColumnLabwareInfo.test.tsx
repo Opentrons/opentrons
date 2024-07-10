@@ -6,10 +6,10 @@ import { renderWithProviders } from '../../../../__testing-utils__'
 import { mockRecoveryContentProps } from '../../__fixtures__'
 import { i18n } from '../../../../i18n'
 import { LeftColumnLabwareInfo } from '../LeftColumnLabwareInfo'
-import { Move } from '../../../../molecules/InterventionModal/InterventionStep'
+import { InterventionInfo } from '../../../../molecules/InterventionModal/InterventionContent/InterventionInfo'
 import { InlineNotification } from '../../../../atoms/InlineNotification'
 
-vi.mock('../../../../molecules/InterventionModal/InterventionStep')
+vi.mock('../../../../molecules/InterventionModal/InterventionInfo')
 vi.mock('../../../../atoms/InlineNotification')
 
 const render = (props: React.ComponentProps<typeof LeftColumnLabwareInfo>) => {
@@ -35,18 +35,18 @@ describe('LeftColumnLabwareInfo', () => {
       bannerText: 'MOCK_BANNER_TEXT',
     }
 
-    vi.mocked(Move).mockReturnValue(<div>MOCK_MOVE</div>)
+    vi.mocked(InterventionInfo).mockReturnValue(<div>MOCK_MOVE</div>)
     vi.mocked(InlineNotification).mockReturnValue(
       <div>MOCK_INLINE_NOTIFICATION</div>
     )
   })
 
-  it('renders the title, Move component, and InlineNotification when bannerText is provided', () => {
+  it('renders the title, InterventionInfo component, and InlineNotification when bannerText is provided', () => {
     render(props)
 
     screen.getByText('MOCK_TITLE')
     screen.getByText('MOCK_MOVE')
-    expect(vi.mocked(Move)).toHaveBeenCalledWith(
+    expect(vi.mocked(InterventionInfo)).toHaveBeenCalledWith(
       expect.objectContaining({
         type: 'refill',
         labwareName: 'MOCK_LW_NAME',
@@ -78,7 +78,7 @@ describe('LeftColumnLabwareInfo', () => {
     props.failedLabwareUtils.failedLabware.location = 'offDeck'
     render(props)
 
-    expect(vi.mocked(Move)).toHaveBeenCalledWith(
+    expect(vi.mocked(InterventionInfo)).toHaveBeenCalledWith(
       expect.objectContaining({
         currentLocationProps: { slotName: '' },
       }),

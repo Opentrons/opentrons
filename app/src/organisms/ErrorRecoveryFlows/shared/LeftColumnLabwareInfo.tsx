@@ -7,14 +7,14 @@ import {
   LegacyStyledText,
 } from '@opentrons/components'
 
-import { Move } from '../../../molecules/InterventionModal/InterventionStep'
+import { InterventionInfo } from '../../../molecules/InterventionModal/InterventionContent'
 import { InlineNotification } from '../../../atoms/InlineNotification'
 
 import type { RecoveryContentProps } from '../types'
 
 type LeftColumnLabwareInfoProps = RecoveryContentProps & {
   title: string
-  moveType: React.ComponentProps<typeof Move>['type']
+  moveType: React.ComponentProps<typeof InterventionInfo>['type']
   /* Renders a warning InlineNotification if provided. */
   bannerText?: string
 }
@@ -47,7 +47,7 @@ export function LeftColumnLabwareInfo({
       <Flex gridGap={SPACING.spacing24} flexDirection={DIRECTION_COLUMN}>
         <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
           <LegacyStyledText as="h4SemiBold">{title}</LegacyStyledText>
-          <Move
+          <InterventionInfo
             type={moveType}
             labwareName={failedLabwareName ?? ''}
             currentLocationProps={{ slotName: buildLabwareLocationSlotName() }}
