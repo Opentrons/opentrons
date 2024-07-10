@@ -194,7 +194,6 @@ from opentrons_shared_data.errors.exceptions import (
     PipetteLiquidNotFoundError,
     CommunicationError,
     PythonException,
-    UnsupportedHardwareCommand,
 )
 
 from .subsystem_manager import SubsystemManager
