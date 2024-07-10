@@ -52,6 +52,7 @@ export const PD_DO_NOT_LIST = [
   'opentrons_calibrationblock_short_side_right',
   'opentrons_96_aluminumblock_biorad_wellplate_200ul',
   'opentrons_96_aluminumblock_nest_wellplate_100ul',
+  'opentrons_flex_lid_absorbance_plate_reader_module',
 ]
 
 export function getIsLabwareV1Tiprack(def: LabwareDefinition1): boolean {
