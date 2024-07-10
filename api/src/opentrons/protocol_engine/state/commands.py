@@ -283,6 +283,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
             else:
                 public_error_occurrence = action.error.public
 
+            prev_entry = self.state.command_history.get(action.command_id)
             self._update_to_failed(
                 command_id=action.command_id,
                 failed_at=action.failed_at,
@@ -295,7 +296,6 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 action.command_id
             )
 
-            prev_entry = self.state.command_history.get(action.command_id)
             if prev_entry.command.intent == CommandIntent.SETUP:
                 other_command_ids_to_fail = list(
                     # Copy to avoid it mutating as we remove elements below.
