@@ -165,9 +165,25 @@ async def test_get_protocols(
         protocol_key="dummy-key-222",
         protocol_kind=ProtocolKind.STANDARD.value,
     )
+    resource_3 = ProtocolResource(
+        protocol_id="333",
+        created_at=created_at_2,
+        source=ProtocolSource(
+            directory=Path("/dev/null"),
+            main_file=Path("/dev/null/333.json"),
+            config=JsonProtocolConfig(schema_version=1234),
+            files=[],
+            metadata={},
+            robot_type="OT-3 Standard",
+            content_hash="3_3_3",
+        ),
+        protocol_key="dummy-key-333",
+        protocol_kind=ProtocolKind.QUICK_TRANSFER.value,
+    )
 
     analysis_1 = AnalysisSummary(id="analysis-id-abc", status=AnalysisStatus.PENDING)
     analysis_2 = AnalysisSummary(id="analysis-id-123", status=AnalysisStatus.PENDING)
+    analysis_3 = AnalysisSummary(id="analysis-id-333", status=AnalysisStatus.PENDING)
 
     expected_protocol_1 = Protocol(
         id="abc",
@@ -191,22 +207,66 @@ async def test_get_protocols(
         files=[],
         key="dummy-key-222",
     )
+    expected_protocol_3 = Protocol(
+        id="333",
+        createdAt=created_at_2,
+        protocolKind=ProtocolKind.QUICK_TRANSFER,
+        protocolType=ProtocolType.JSON,
+        metadata=Metadata(),
+        robotType="OT-3 Standard",
+        analysisSummaries=[analysis_3],
+        files=[],
+        key="dummy-key-333",
+    )
 
-    decoy.when(protocol_store.get_all()).then_return([resource_1, resource_2])
+    decoy.when(protocol_store.get_all()).then_return(
+        [resource_1, resource_2, resource_3]
+    )
     decoy.when(analysis_store.get_summaries_by_protocol("abc")).then_return(
         [analysis_1]
     )
     decoy.when(analysis_store.get_summaries_by_protocol("123")).then_return(
         [analysis_2]
     )
+    decoy.when(analysis_store.get_summaries_by_protocol("333")).then_return(
+        [analysis_3]
+    )
 
+    # Test GET all protocols
     result = await get_protocols(
+        protocol_kind=None,
+        protocol_store=protocol_store,
+        analysis_store=analysis_store,
+    )
+
+    assert result.content.data == [
+        expected_protocol_1,
+        expected_protocol_2,
+        expected_protocol_3,
+    ]
+    assert result.content.meta == MultiBodyMeta(cursor=0, totalLength=3)
+    assert result.status_code == 200
+
+    # Test GET standard protocols
+    result = await get_protocols(
+        protocol_kind=ProtocolKind.STANDARD,
         protocol_store=protocol_store,
         analysis_store=analysis_store,
     )
 
     assert result.content.data == [expected_protocol_1, expected_protocol_2]
     assert result.content.meta == MultiBodyMeta(cursor=0, totalLength=2)
+    assert result.status_code == 200
+
+    # Test GET Quick transfer protocols
+    result = await get_protocols(
+        protocol_kind=ProtocolKind.QUICK_TRANSFER,
+        protocol_store=protocol_store,
+        analysis_store=analysis_store,
+    )
+
+    assert result.content.data == [expected_protocol_3]
+    assert result.content.meta == MultiBodyMeta(cursor=0, totalLength=1)
     assert result.status_code == 200
 
 
