@@ -138,3 +138,8 @@ async def get_protocol_auto_deleter(
             maximum_unused_protocols=get_settings().maximum_unused_protocols
         ),
     )
+
+
+def get_maximum_quick_transfer_protocols() -> int:
+    """Get the maximum quick transfer protocol setting."""
+    return get_settings().maximum_quick_transfer_protocols
