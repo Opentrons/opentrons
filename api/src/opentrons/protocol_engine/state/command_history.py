@@ -90,10 +90,6 @@ class CommandHistory:
         except IndexError:
             return None
 
-    def get_if_present(self, command_id: str) -> Optional[CommandEntry]:
-        """Get a command entry, if present."""
-        return self._commands_by_id.get(command_id)
-
     def get_all_commands(self) -> List[Command]:
         """Get all commands."""
         return [

@@ -81,14 +81,6 @@ def test_get_prev(command_history: CommandHistory) -> None:
     assert command_history.get_prev("1") == command_entry_1
 
 
-def test_get_if_present(command_history: CommandHistory) -> None:
-    """It should return the command entry for the given ID if it exists, None otherwise."""
-    assert command_history.get_if_present("0") is None
-    command_entry = create_queued_command_entry()
-    command_history._add("0", command_entry)
-    assert command_history.get_if_present("0") == command_entry
-
-
 def test_get_all_commands(command_history: CommandHistory) -> None:
     """It should return a list of all commands."""
     assert command_history.get_all_commands() == []
