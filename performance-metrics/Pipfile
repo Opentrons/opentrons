@@ -6,6 +6,7 @@ name        = "pypi"
 [packages]
 performance-metrics = {file = ".", editable = true}
 psutil = "==6.0.0"
+systemd-python = "234"
 
 [dev-packages]
 pytest  = "==7.4.4"
