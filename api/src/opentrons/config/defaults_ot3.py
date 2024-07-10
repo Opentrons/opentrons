@@ -328,7 +328,7 @@ def _build_default_liquid_probe(
         or output_option is OutputOptions.stream_to_csv
     ):
         data_files = _build_log_files_with_default(
-            from_conf.get("data_files", {}), default.data_files
+            from_conf.get("data_files", None), default.data_files
         )
     return LiquidProbeSettings(
         mount_speed=from_conf.get("mount_speed", default.mount_speed),
