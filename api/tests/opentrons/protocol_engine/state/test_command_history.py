@@ -248,35 +248,6 @@ def test_add_to_fixit_queue(command_history: CommandHistory) -> None:
     assert command_history.get_fixit_queue_ids() == OrderedSet(["command-id"])
 
 
-def test_clear_queue(command_history: CommandHistory) -> None:
-    """It should clear all commands in the queue."""
-    command_history._add_to_queue("0")
-    command_history._add_to_queue("1")
-    command_history.clear_queue()
-    assert command_history.get_queue_ids() == OrderedSet()
-
-
-def test_clear_setup_queue(command_history: CommandHistory) -> None:
-    """It should clear all commands in the setup queue."""
-    command_history._add_to_setup_queue("0")
-    command_history._add_to_setup_queue("1")
-    command_history.clear_setup_queue()
-    assert command_history.get_setup_queue_ids() == OrderedSet()
-
-
-def test_clear_fixit_queue(command_history: CommandHistory) -> None:
-    """It should clear all commands in the setup queue."""
-    command_history.append_queued_command(
-        create_queued_command(command_id="0", intent=CommandIntent.FIXIT)
-    )
-    command_history.append_queued_command(
-        create_queued_command(command_id="1", intent=CommandIntent.FIXIT)
-    )
-    assert command_history.get_fixit_queue_ids() == OrderedSet(["0", "1"])
-    command_history.clear_fixit_queue()
-    assert command_history.get_fixit_queue_ids() == OrderedSet()
-
-
 def test_remove_id_from_queue(command_history: CommandHistory) -> None:
     """It should remove the given ID from the queue."""
     command_history._add_to_queue("0")

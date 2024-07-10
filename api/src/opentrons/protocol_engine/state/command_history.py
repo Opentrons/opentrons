@@ -139,18 +139,6 @@ class CommandHistory:
         """Get the IDs of all queued fixit commands, in FIFO order."""
         return self._queued_fixit_command_ids
 
-    def clear_queue(self) -> None:
-        """Clears all commands within the queued command ids structure."""
-        self._queued_command_ids.clear()
-
-    def clear_setup_queue(self) -> None:
-        """Clears all commands within the queued setup command ids structure."""
-        self._queued_setup_command_ids.clear()
-
-    def clear_fixit_queue(self) -> None:
-        """Clears all commands within the queued setup command ids structure."""
-        self._queued_fixit_command_ids.clear()
-
     def append_queued_command(self, command: Command) -> None:
         """Validate and mark a command as queued in the command history."""
         assert command.status == CommandStatus.QUEUED
@@ -227,14 +215,16 @@ class CommandHistory:
             command_entry=CommandEntry(index=index, command=command),
         )
 
-        self._set_most_recently_completed_command_id(command.id)
-
         running_command_entry = self.get_running_command()
         if (
             running_command_entry is not None
             and running_command_entry.command.id == command.id
         ):
             self._set_running_command_id(None)
+
+        self._remove_queue_id(command.id)
+        self._remove_setup_queue_id(command.id)
+        self._set_most_recently_completed_command_id(command.id)
 
     def _add(self, command_id: str, command_entry: CommandEntry) -> None:
         """Create or update a command entry."""

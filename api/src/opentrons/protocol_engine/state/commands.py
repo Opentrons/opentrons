@@ -297,7 +297,8 @@ class CommandStore(HasState[CommandState], HandlesActions):
 
             prev_entry = self.state.command_history.get(action.command_id)
             if prev_entry.command.intent == CommandIntent.SETUP:
-                other_command_ids_to_fail = (
+                other_command_ids_to_fail = list(
+                    # Copy to avoid it mutating as we remove elements below.
                     self._state.command_history.get_setup_queue_ids()
                 )
                 for command_id in other_command_ids_to_fail:
@@ -309,7 +310,6 @@ class CommandStore(HasState[CommandState], HandlesActions):
                         error_recovery_type=None,
                         notes=None,
                     )
-                self._state.command_history.clear_setup_queue()
             elif (
                 prev_entry.command.intent == CommandIntent.PROTOCOL
                 or prev_entry.command.intent is None
@@ -318,7 +318,8 @@ class CommandStore(HasState[CommandState], HandlesActions):
                     self._state.queue_status = QueueStatus.AWAITING_RECOVERY
                     self._state.recovery_target_command_id = action.command_id
                 elif action.type == ErrorRecoveryType.FAIL_RUN:
-                    other_command_ids_to_fail = (
+                    other_command_ids_to_fail = list(
+                        # Copy to avoid it mutating as we remove elements below.
                         self._state.command_history.get_queue_ids()
                     )
                     for command_id in other_command_ids_to_fail:
@@ -330,11 +331,11 @@ class CommandStore(HasState[CommandState], HandlesActions):
                             error_recovery_type=None,
                             notes=None,
                         )
-                    self._state.command_history.clear_queue()
                 else:
                     assert_never(action.type)
             elif prev_entry.command.intent == CommandIntent.FIXIT:
-                other_command_ids_to_fail = (
+                other_command_ids_to_fail = list(
+                    # Copy to avoid it mutating as we remove elements below.
                     self._state.command_history.get_fixit_queue_ids()
                 )
                 for command_id in other_command_ids_to_fail:
@@ -346,7 +347,6 @@ class CommandStore(HasState[CommandState], HandlesActions):
                         error_recovery_type=None,
                         notes=None,
                     )
-                self._state.command_history.clear_fixit_queue()
             else:
                 assert_never(prev_entry.command.intent)
 
@@ -374,7 +374,6 @@ class CommandStore(HasState[CommandState], HandlesActions):
             self._state.queue_status = QueueStatus.PAUSED
 
         elif isinstance(action, ResumeFromRecoveryAction):
-            self._state.command_history.clear_fixit_queue()
             self._state.queue_status = QueueStatus.RUNNING
             self._state.recovery_target_command_id = None
 
