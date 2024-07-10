@@ -37,7 +37,8 @@ let NAV_LINKS: Array<typeof ON_DEVICE_DISPLAY_PATHS[number]> = [
   '/robot-settings',
 ]
 
-// TODO: update this wrapper to fade on both sides only when not scrolled completely to that side
+// TODO(sb:7/10/24): update this wrapper to fade on both sides only when not scrolled completely to that side
+// This will be accomplished in PLAT-399
 const CarouselWrapper = styled.div`
   display: flex;
   flex-direction: ${DIRECTION_ROW};

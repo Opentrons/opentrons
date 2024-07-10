@@ -60,9 +60,9 @@ const cardStyleBySize: {
 export function PinnedTransfer(props: {
   transfer: ProtocolResource
   longPress: React.Dispatch<React.SetStateAction<boolean>>
-  cardSize?: CardSizeType
   setShowDeleteConfirmationModal: (showDeleteConfirmationModal: boolean) => void
   setTargetTransferId: (targetProtocolId: string) => void
+  cardSize?: CardSizeType
 }): JSX.Element {
   const {
     transfer,

@@ -80,8 +80,6 @@ const getHardwareLocation = (
   }
 }
 
-// convert to anon
-
 const useHardwareName = (protocolHardware: ProtocolHardware): string => {
   const gripperDisplayName = useGripperDisplayName(GRIPPER_V1_2)
 

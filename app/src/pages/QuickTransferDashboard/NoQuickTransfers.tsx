@@ -10,7 +10,6 @@ import {
   JUSTIFY_CENTER,
   SPACING,
   StyledText,
-  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import imgSrc from '../../assets/images/on-device-display/empty_quick_transfer_dashboard.png'
@@ -28,14 +27,16 @@ export function NoQuickTransfers(): JSX.Element {
     >
       <img alt={t('none_to_show')} src={imgSrc} width="284px" height="166px" />
       <StyledText
-        as="h3"
-        fontWeight={TYPOGRAPHY.fontWeightBold}
+        oddStyle="level3HeaderBold"
         marginTop={SPACING.spacing16}
         marginBottom={SPACING.spacing8}
       >
         {t('none_to_show')}
       </StyledText>
-      <StyledText as="h4" color={COLORS.grey60}>
+      <StyledText
+        oddStyle="level4HeaderRegular"
+        color={`${COLORS.black70}${COLORS.opacity60HexCode}`}
+      >
         {t('create_to_get_started')}
       </StyledText>
     </Flex>

@@ -41,6 +41,9 @@ const render = (longPress: UseLongPressResult) => {
 describe('Long Press Modal', () => {
   beforeEach(() => {
     when(vi.mocked(useHost)).calledWith().thenReturn(MOCK_HOST_CONFIG)
+    when(vi.mocked(useCreateRunMutation))
+      .calledWith(expect.anything())
+      .thenReturn({ createRun: mockCreateRun } as any)
   })
   afterEach(() => {
     vi.resetAllMocks()
@@ -65,10 +68,6 @@ describe('Long Press Modal', () => {
   })
 
   it('should launch run when clicking run quick transfer button', () => {
-    vi.mocked(useCreateRunMutation).mockReturnValue({
-      createRun: mockCreateRun,
-    } as any)
-
     const { result } = renderHook(() => useLongPress())
     result.current.isLongPressed = true
     render(result.current)

@@ -41,22 +41,12 @@ export function LongPressModal({
 
   const [showMaxPinsAlert, setShowMaxPinsAlert] = React.useState<boolean>(false)
 
-  // This looks totally bonkers, and it is. This construction is to make
-  // it easier to use in unit tests, where we have to mock both the mutation
-  // and the createRun function. The real code didn't like the mock:
-  //
-  // TypeError: Cannot read properties of undefined (reading 'createRun')
-  //
-  // Having the empty function fallback lets the mocks get called. In real use it
-  // shouldn't ever get needed.
-  const createRunUse = useCreateRunMutation({
+  const { createRun } = useCreateRunMutation({
     onSuccess: data => {
       const runId: string = data.data.id
       history.push(`/runs/${runId}/setup`)
     },
   })
-  const createRun =
-    createRunUse?.createRun !== undefined ? createRunUse.createRun : () => {}
 
   const handleCloseModal = (): void => {
     longpress.setIsLongPressed(false)

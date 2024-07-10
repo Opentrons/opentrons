@@ -124,7 +124,7 @@ describe('getSelectedWellCount', () => {
     )
     expect(result).toEqual(12)
   })
-  it('calculates the selected well count for a well plate and multi channel pipette', () => {
+  it('calculates the selected well count for a well plate and 96-channel pipette', () => {
     props = {
       pipette: {
         channels: 96,
@@ -133,11 +133,6 @@ describe('getSelectedWellCount', () => {
         metadata: {
           displayCategory: 'well_plate',
         },
-        groups: [
-          {
-            wells: ['A1'],
-          },
-        ] as any,
       } as any,
       wells: ['A1', 'B1'],
     }
@@ -147,5 +142,24 @@ describe('getSelectedWellCount', () => {
       props.wells
     )
     expect(result).toEqual(192)
+  })
+  it('calculates the selected well count for a well plate and multi channel pipette', () => {
+    props = {
+      pipette: {
+        channels: 8,
+      } as any,
+      labware: {
+        metadata: {
+          displayCategory: 'well_plate',
+        },
+      } as any,
+      wells: ['A1', 'B1'],
+    }
+    const result = getSelectedWellCount(
+      props.pipette,
+      props.labware,
+      props.wells
+    )
+    expect(result).toEqual(16)
   })
 })

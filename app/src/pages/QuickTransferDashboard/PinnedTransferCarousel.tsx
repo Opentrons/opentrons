@@ -1,4 +1,5 @@
 import * as React from 'react'
+import styled from 'styled-components'
 import {
   ALIGN_FLEX_START,
   DIRECTION_ROW,
@@ -10,7 +11,6 @@ import { PinnedTransfer } from './PinnedTransfer'
 
 import type { ProtocolResource } from '@opentrons/shared-data'
 import type { CardSizeType } from './PinnedTransfer'
-import styled from 'styled-components'
 
 export function PinnedTransferCarousel(props: {
   pinnedTransfers: ProtocolResource[]

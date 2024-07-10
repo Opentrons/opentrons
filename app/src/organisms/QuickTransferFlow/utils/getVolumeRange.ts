@@ -81,6 +81,5 @@ export function getVolumeRange(
       ]
     )
   }
-
-  return { min: minPipetteVolume, max: maxVolume }
+  return { min: minPipetteVolume, max: Math.floor(maxVolume) }
 }
