@@ -455,12 +455,16 @@ class ProtocolCore(
                     module_id=module_core.module_id
                 )
             )
-            self.load_labware(
+            lid = self.load_labware(
                 load_name="opentrons_flex_lid_absorbance_plate_reader_module",
                 location=lid_slot,
                 namespace="opentrons",
                 version=1,
                 label="Absorbance Reader Lid",
+            )
+            self._engine_client.add_absorbance_reader_lid(
+                module_id=module_core.module_id,
+                lid_id=lid.labware_id,
             )
 
     def _create_non_connected_module_core(

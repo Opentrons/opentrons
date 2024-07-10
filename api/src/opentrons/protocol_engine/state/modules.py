@@ -59,7 +59,12 @@ from ..commands import (
     thermocycler,
     absorbance_reader,
 )
-from ..actions import Action, SucceedCommandAction, AddModuleAction
+from ..actions import (
+    Action,
+    SucceedCommandAction,
+    AddModuleAction,
+    AddAbsorbanceReaderLidAction,
+)
 from .abstract_store import HasState, HandlesActions
 from .module_substates import (
     MagneticModuleSubState,
@@ -214,6 +219,11 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 requested_model=None,
                 module_live_data=action.module_live_data,
             )
+        elif isinstance(action, AddAbsorbanceReaderLidAction):
+            self._update_absorbance_reader_lid_id(
+                module_id=action.module_id,
+                lid_id=action.lid_id,
+            )
 
     def _handle_command(self, command: Command) -> None:
         if isinstance(command.result, LoadModuleResult):
@@ -279,6 +289,27 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             ),
         ):
             self._handle_absorbance_reader_commands(command)
+
+    def _update_absorbance_reader_lid_id(
+        self,
+        module_id: str,
+        lid_id: str,
+    ) -> None:
+        abs_substate = self._state.substate_by_module_id.get(module_id)
+        assert isinstance(
+            abs_substate, AbsorbanceReaderSubState
+        ), f"{module_id} is not an absorbance plate reader."
+
+        prev_state: AbsorbanceReaderSubState = abs_substate
+        self._state.substate_by_module_id[module_id] = AbsorbanceReaderSubState(
+            module_id=AbsorbanceReaderId(module_id),
+            configured=prev_state.configured,
+            measured=prev_state.measured,
+            is_lid_on=prev_state.is_lid_on,
+            data=prev_state.data,
+            configured_wavelength=prev_state.configured_wavelength,
+            lid_id=lid_id,
+        )
 
     def _add_module_substate(
         self,
@@ -346,6 +377,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 is_lid_on=False,
                 data=None,
                 configured_wavelength=None,
+                lid_id=None,
             )
 
     def _update_additional_slots_occupied_by_thermocycler(
@@ -554,6 +586,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         configured = absorbance_reader_substate.configured
         configured_wavelength = absorbance_reader_substate.configured_wavelength
         is_lid_on = absorbance_reader_substate.is_lid_on
+        lid_id = absorbance_reader_substate.lid_id
 
         if isinstance(command.result, absorbance_reader.InitializeResult):
             self._state.substate_by_module_id[module_id] = AbsorbanceReaderSubState(
@@ -563,6 +596,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 is_lid_on=is_lid_on,
                 data=None,
                 configured_wavelength=command.params.sampleWavelength,
+                lid_id=lid_id,
             )
         elif isinstance(command.result, absorbance_reader.MeasureAbsorbanceResult):
             self._state.substate_by_module_id[module_id] = AbsorbanceReaderSubState(
@@ -572,6 +606,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 is_lid_on=is_lid_on,
                 measured=True,
                 data=command.result.data,
+                lid_id=lid_id,
             )
 
         elif isinstance(command.result, absorbance_reader.OpenLidResult):
@@ -582,6 +617,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 is_lid_on=False,
                 measured=True,
                 data=None,
+                lid_id=lid_id,
             )
 
         elif isinstance(command.result, absorbance_reader.CloseLidResult):
@@ -592,6 +628,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 is_lid_on=True,
                 measured=True,
                 data=None,
+                lid_id=lid_id,
             )
 
 

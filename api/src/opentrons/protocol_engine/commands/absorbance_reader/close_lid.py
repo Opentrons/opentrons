@@ -78,13 +78,8 @@ class CloseLidImpl(
         mod_hw = self._equipment.get_module_hardware_api(mod_substate.module_id)
 
         # lid should currently be docked
-        lid_dock_slot = self._state_view.modules.absorbance_reader_dock_location_name(
-            mod_substate.module_id
-        )
-        loaded_lid = self._state_view.labware.get_by_slot(lid_dock_slot)
-        assert (
-            loaded_lid is not None
-        ), "Absorbance Reader lid is not present in the lid dock."
+        assert mod_substate.lid_id is not None
+        loaded_lid = self._state_view.labware.get(mod_substate.lid_id)
         assert labware_validation.is_absorbance_reader_lid(loaded_lid.loadName)
 
         current_location = loaded_lid.location

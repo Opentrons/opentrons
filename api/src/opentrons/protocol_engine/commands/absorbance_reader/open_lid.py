@@ -72,8 +72,8 @@ class OpenLidImpl(AbstractCommandImpl[OpenLidParams, SuccessData[OpenLidResult, 
         mod_hw = self._equipment.get_module_hardware_api(mod_substate.module_id)
 
         # lid should currently be on the module
-        lid_id = self._state_view.labware.get_id_by_module(mod_substate.module_id)
-        loaded_lid = self._state_view.labware.get(lid_id)
+        assert mod_substate.lid_id is not None
+        loaded_lid = self._state_view.labware.get(mod_substate.lid_id)
         assert labware_validation.is_absorbance_reader_lid(loaded_lid.loadName)
 
         current_location = loaded_lid.location

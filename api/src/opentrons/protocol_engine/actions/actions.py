@@ -260,6 +260,17 @@ class SetPipetteMovementSpeedAction:
     speed: Optional[float]
 
 
+@dataclass(frozen=True)
+class AddAbsorbanceReaderLidAction:
+    """Add the absorbance reader lid id to the absorbance reader module substate.
+
+    This action is dispatched the absorbance reader module is first loaded.
+    """
+
+    module_id: str
+    lid_id: str
+
+
 Action = Union[
     PlayAction,
     PauseAction,
@@ -279,4 +290,5 @@ Action = Union[
     AddLiquidAction,
     ResetTipsAction,
     SetPipetteMovementSpeedAction,
+    AddAbsorbanceReaderLidAction,
 ]
