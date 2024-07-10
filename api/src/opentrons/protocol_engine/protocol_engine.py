@@ -141,8 +141,6 @@ class ProtocolEngine:
         """Add a plugin to the engine to customize behavior."""
         self._plugin_starter.start(plugin)
 
-    # todo(mm, 2024-07-09): The interaction between this and Config.use_simulated_deck_config
-    # is pretty confusing. Can we unify the two mechanisms?
     def set_deck_configuration(
         self, deck_configuration: Optional[DeckConfigurationType]
     ) -> None:
