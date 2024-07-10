@@ -10,7 +10,7 @@ SHX := npx shx
 # Host key location for robot
 ssh_key ?= $(default_ssh_key)
 # Other SSH args for robot
-ssh_opts ?= $(default_ssh_opts)
+ssh_opts ?= $(default_ssh_opts) -q
 # Helper to safely bundle ssh options
 ssh_helper = $(if $(ssh_key),-i $(ssh_key)) $(ssh_opts)
 
@@ -97,6 +97,7 @@ override-robot-version:
 .PHONY: set-performance-metrics-ff
 set-performance-metrics-ff:
 	@curl \
+	--silent \
     -H "opentrons-version: *" \
     -X POST $(host):31950/settings \
     -H "content-type: application/json" \
@@ -105,6 +106,7 @@ set-performance-metrics-ff:
 .PHONY: unset-performance-metrics-ff
 unset-performance-metrics-ff:
 	@curl \
+	--silent \
 	-H "opentrons-version: *" \
 	-X POST $(host):31950/settings \
 	-H "content-type: application/json" \
@@ -118,15 +120,18 @@ test:
 setup-remote-flex:
 
 	@echo "Setting up remote Flex..."
-	@echo "Pushing performance_metrics to Flex"	
+	@echo "Pushing performance-metrics package to Flex"	
 
 	@$(MAKE) push-no-restart-ot3 host=$(host) ssh_key=$(ssh_key) 2>&1 | grep -v "Permanently added" > /dev/null
 
-	@echo "Pushing api to Flex"
+	@echo "Pushing api package to Flex"
 	@$(MAKE) -C ../api push-no-restart-ot3 host=$(host) ssh_key=$(ssh_key) 2>&1 | grep -v "Permanently added" > /dev/null
 
-	@echo "Pushing robot-server to Flex"
+	@echo "Pushing robot-server package to Flex and restarting robot server"
 	@$(MAKE) -C ../robot-server push-ot3 host=$(host) ssh_key=$(ssh_key) 2>&1 | grep -v "Permanently added" > /dev/null
+
+	@echo "Setting performance metrics feature flag"
+	@$(MAKE) set-performance-metrics-ff host=$(host) 2>&1 > /dev/null
 
 
 .PHONY: start-remote-system-resource-tracker
@@ -140,3 +145,67 @@ start-remote-system-resource-tracker:
 		$${storage_dir:+OT_SYSTEM_RESOURCE_TRACKER_STORAGE_DIR=$$storage_dir} \
 		$${logging_level:+OT_SYSTEM_RESOURCE_TRACKER_LOGGING_LEVEL=$$logging_level} \
 		python3 -m performance_metrics.system_resource_tracker"
+
+
+.PHONY: setup-system-resource-tracker-systemd-service
+setup-system-resource-tracker-systemd-service:
+	@echo "Setting up system resource tracker systemd service"
+	@$(call push-systemd-unit ,$(host),$(ssh_key),$(ssh_opts),$(FILENAME))
+
+
+	@echo "Enabling system resource tracker service"
+	@ssh -i $(ssh_key) root@$(host) "\
+		mount -o remount,rw / && \
+		systemctl enable system-resource-tracker --quiet || \
+		mount -o remount,ro /"
+
+	@echo "Starting system resource tracker service"
+	@$(call restart-service,$(host),$(ssh_key),$(ssh_opts),system-resource-tracker)
+
+
+.PHONY: setup-prod-system-resource-tracker-systemd-service
+setup-prod-system-resource-tracker-systemd-service: FILENAME=system-resource-tracker.service
+setup-prod-system-resource-tracker-systemd-service: setup-system-resource-tracker-systemd-service
+
+.PHONY: setup-dev-system-resource-tracker-systemd-service
+setup-dev-system-resource-tracker-systemd-service: FILENAME=system-resource-tracker-dev.service
+setup-dev-system-resource-tracker-systemd-service: setup-system-resource-tracker-systemd-service
+
+
+.PHONY: cleanup-remote-flex
+# Default value for the data folder path
+DATA_FOLDER ?= /data/performance_metrics_data
+DEV_DATA_FOLDER ?= /data/performance_metrics_data_dev
+
+cleanup-remote-flex:
+	@echo "Cleaning up performance metrics on host $(host)..."
+	
+	# Note not using || to exit on error because it only looks to see 
+	# if the previous command failed, whereas we want to catch any error or a successful exit
+
+	@ssh -i $(ssh_key) root@$(host) "\
+		trap 'echo \"Remounting filesystem as read-only\" && mount -o remount,ro /' EXIT ERR && \
+		echo 'Configuring remote file system to read/write' && \
+		mount -o remount,rw / && \
+		echo 'Stopping system-resource-tracker' && \
+		systemctl stop system-resource-tracker && \
+		echo 'Disabling system-resource-tracker' && \
+		systemctl disable system-resource-tracker && \
+		echo 'Removing service file, data folders, and performance_metrics package' && \
+		rm -rf \
+			/etc/systemd/system/system-resource-tracker.service \
+			$(DATA_FOLDER) \
+			$(DEV_DATA_FOLDER) \
+			/opt/opentrons-robot-server/performance_metrics* && \
+		echo 'Reloading daemon' && \
+		systemctl daemon-reload && \
+		echo 'Checking system-resource-tracker status' && \
+		if systemctl is-active system-resource-tracker --quiet; then \
+			echo 'Error: system-resource-tracker is still active'; \
+			exit 1; \
+		else \
+			echo 'system-resource-tracker is not active'; \
+		fi"		
+
+	@echo "Unsetting performance metrics feature flag"
+	@$(MAKE) unset-performance-metrics-ff host=$(host) 2>&1 > /dev/null

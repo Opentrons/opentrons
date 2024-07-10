@@ -2,6 +2,7 @@
 
 import logging
 import time
+import systemd.daemon  # type: ignore [import-untyped]
 from .._logging_config import log_init, LOGGER_NAME
 from ._config import SystemResourceTrackerConfiguration
 from ._system_resource_tracker import SystemResourceTracker
@@ -20,6 +21,9 @@ def main() -> None:
     tracker = SystemResourceTracker(config)
 
     logger.info("Starting system resource tracker...")
+
+    systemd.daemon.notify("READY=1")
+
     try:
         while True:
             tracker.get_and_store_system_data_snapshots()
