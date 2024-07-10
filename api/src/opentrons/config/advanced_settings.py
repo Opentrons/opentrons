@@ -722,6 +722,15 @@ def _migrate33to34(previous: SettingsMap) -> SettingsMap:
     newmap = {k: v for k, v in previous.items() if k not in removals}
     return newmap
 
+def _migrate34to35(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 35 of the feature flags file.
+
+    - sets the disableLogAggregation config element default to false.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["disableLogAggregation"] = False
+    return newmap
+
 
 _MIGRATIONS = [
     _migrate0to1,
@@ -758,6 +767,7 @@ _MIGRATIONS = [
     _migrate31to32,
     _migrate32to33,
     _migrate33to34,
+    _migrate34to35,
 ]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below
