@@ -20,7 +20,7 @@ context('Well Plates', () => {
         .first()
         .trigger('mousedown')
       cy.get('*[class^="_option_label"]').contains('Well Plate').click()
-      cy.get('button').contains('start creating labware').click({ force: true })
+      cy.get('button').contains('Start creating labware').click({ force: true })
     })
     it('creates a wellplate', () => {
       cy.contains('Add missing info to see labware preview').should('exist')

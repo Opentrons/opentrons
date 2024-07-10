@@ -18,6 +18,7 @@ import {
   FLEX_ROBOT_TYPE,
   WASTE_CHUTE_CUTOUT,
   getAreSlotsAdjacent,
+  MAGNETIC_BLOCK_TYPE,
 } from '@opentrons/shared-data'
 import { actions as stepFormActions } from '../../../step-forms'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../../constants'
@@ -256,6 +257,7 @@ export function CreateFileWizard(): JSX.Element | null {
               createModuleWithNoSlot({
                 model: moduleArgs.model,
                 type: moduleArgs.type,
+                isMagneticBlock: moduleArgs.type === MAGNETIC_BLOCK_TYPE,
               })
             )
       })
@@ -268,7 +270,10 @@ export function CreateFileWizard(): JSX.Element | null {
       const newTiprackModels: string[] = uniq(
         pipettes.flatMap(pipette => pipette.tiprackDefURI)
       )
-      const FLEX_MIDDLE_SLOTS = ['C2', 'B2', 'A2']
+      const hasMagneticBlock = modules.some(
+        module => module.type === MAGNETIC_BLOCK_TYPE
+      )
+      const FLEX_MIDDLE_SLOTS = hasMagneticBlock ? [] : ['C2', 'B2', 'A2']
       const hasOt2TC = modules.find(
         module => module.type === THERMOCYCLER_MODULE_TYPE
       )

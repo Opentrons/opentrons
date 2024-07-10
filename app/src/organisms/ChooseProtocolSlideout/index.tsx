@@ -29,7 +29,10 @@ import {
   useTooltip,
   useHoverTooltip,
 } from '@opentrons/components'
-import { ApiHostProvider } from '@opentrons/react-api-client'
+import {
+  ApiHostProvider,
+  useUploadCsvFileMutation,
+} from '@opentrons/react-api-client'
 import { sortRuntimeParameters } from '@opentrons/shared-data'
 
 import { useLogger } from '../../logger'
@@ -147,6 +150,17 @@ export function ChooseProtocolSlideoutComponent(
     robot.ip
   )
 
+  const { uploadCsvFile } = useUploadCsvFileMutation(
+    {},
+    robot != null
+      ? {
+          hostname: robot.ip,
+          requestor:
+            robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined,
+        }
+      : null
+  )
+
   const srcFileObjects =
     selectedProtocol != null
       ? selectedProtocol.srcFiles.map((srcFileBuffer, index) => {
@@ -189,15 +203,41 @@ export function ChooseProtocolSlideoutComponent(
           location,
           definitionUri,
         }))
-      : [],
-    getRunTimeParameterValuesForRun(runTimeParametersOverrides)
+      : []
   )
   const handleProceed: React.MouseEventHandler<HTMLButtonElement> = () => {
     if (selectedProtocol != null) {
       trackCreateProtocolRunEvent({ name: 'createProtocolRecordRequest' })
-      createRunFromProtocolSource({
-        files: srcFileObjects,
-        protocolKey: selectedProtocol.protocolKey,
+      const dataFilesForProtocolMap = runTimeParametersOverrides.reduce<
+        Record<string, File>
+      >(
+        (acc, parameter) =>
+          parameter.type === 'csv_file' && parameter.file?.file != null
+            ? { ...acc, [parameter.variableName]: parameter.file.file }
+            : acc,
+        {}
+      )
+      Promise.all(
+        Object.entries(dataFilesForProtocolMap).map(([key, file]) => {
+          const fileResponse = uploadCsvFile(file)
+          const varName = Promise.resolve(key)
+          return Promise.all([fileResponse, varName])
+        })
+      ).then(responseTuples => {
+        const mappedResolvedCsvVariableToFileId = responseTuples.reduce<
+          Record<string, string>
+        >((acc, [uploadedFileResponse, variableName]) => {
+          return { ...acc, [variableName]: uploadedFileResponse.data.id }
+        }, {})
+        const runTimeParameterValues = getRunTimeParameterValuesForRun(
+          runTimeParametersOverrides,
+          mappedResolvedCsvVariableToFileId
+        )
+        createRunFromProtocolSource({
+          files: srcFileObjects,
+          protocolKey: selectedProtocol.protocolKey,
+          runTimeParameterValues,
+        })
       })
     } else {
       logger.warn('failed to create protocol, no protocol selected')
@@ -679,8 +719,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
         const missingAnalysisData =
           analysisStatus === 'error' || analysisStatus === 'stale'
         const requiresCsvRunTimeParameter =
-          storedProtocol.mostRecentAnalysis?.result ===
-          'parameter-value-required'
+          analysisStatus === 'parameterRequired'
         return (
           <React.Fragment key={storedProtocol.protocolKey}>
             <Flex flexDirection={DIRECTION_COLUMN}>
@@ -784,7 +823,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                 color={COLORS.yellow60}
                 overflowWrap="anywhere"
                 display={DISPLAY_BLOCK}
-                marginTop={`-${SPACING.spacing8}`}
+                marginTop={`-${SPACING.spacing4}`}
                 marginBottom={SPACING.spacing8}
               >
                 {t('csv_required_for_analysis')}
@@ -796,7 +835,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                 color={COLORS.yellow60}
                 overflowWrap="anywhere"
                 display={DISPLAY_BLOCK}
-                marginTop={`-${SPACING.spacing8}`}
+                marginTop={`-${SPACING.spacing4}`}
                 marginBottom={SPACING.spacing8}
               >
                 {analysisStatus === 'stale'

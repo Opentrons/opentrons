@@ -96,8 +96,9 @@ jobs:
   backend-unit-test:
     strategy:
       matrix:
-        os: ['windows-2022', 'ubuntu-22.04', 'macos-11']
+        os: ['windows-2022', 'ubuntu-22.04', 'macos-latest']
     name: 'opentrons app backend unit tests on ${{matrix.os}}'
+    timeout-minutes: 60
     runs-on: ${{ matrix.os }}
     steps:
       - uses: 'actions/checkout@v3'
@@ -207,13 +208,13 @@ jobs:
     if: needs.determine-build-type.outputs.variants != '[]'
     strategy:
       matrix:
-        os: ['windows-2022', 'ubuntu-22.04', 'macos-11']
+        os: ['windows-2022', 'ubuntu-22.04', 'macos-latest']
         variant: ${{fromJSON(needs.determine-build-type.outputs.variants)}}
         target: ['desktop', 'odd']
         exclude:
           - os: 'windows-2022'
             target: 'odd'
-          - os: 'macos-11'
+          - os: 'macos-latest'
             target: 'odd'
 
     runs-on: ${{ matrix.os }}

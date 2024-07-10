@@ -88,13 +88,20 @@ class QueueStatus(enum.Enum):
     New fixup commands may be enqueued and will execute immediately.
     """
 
+    AWAITING_RECOVERY_PAUSED = enum.auto()
+    """Execution of fixit commands has been paused.
 
-class RunResult(str, enum.Enum):
+    New protocol and fixit commands may be enqueued, but will wait to execute.
+    New setup commands may not be enqueued.
+    """
+
+
+class RunResult(enum.Enum):
     """Result of the run."""
 
-    SUCCEEDED = "succeeded"
-    FAILED = "failed"
-    STOPPED = "stopped"
+    SUCCEEDED = enum.auto()
+    FAILED = enum.auto()
+    STOPPED = enum.auto()
 
 
 @dataclass(frozen=True)
@@ -348,11 +355,20 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 self._state.run_started_at = (
                     self._state.run_started_at or action.requested_at
                 )
-                if self._state.is_door_blocking:
-                    # Always inactivate queue when door is blocking
-                    self._state.queue_status = QueueStatus.PAUSED
-                else:
-                    self._state.queue_status = QueueStatus.RUNNING
+                match self._state.queue_status:
+                    case QueueStatus.SETUP:
+                        self._state.queue_status = (
+                            QueueStatus.PAUSED
+                            if self._state.is_door_blocking
+                            else QueueStatus.RUNNING
+                        )
+                    case QueueStatus.AWAITING_RECOVERY_PAUSED:
+                        self._state.queue_status = QueueStatus.AWAITING_RECOVERY
+                    case QueueStatus.PAUSED:
+                        self._state.queue_status = QueueStatus.RUNNING
+                    case QueueStatus.RUNNING | QueueStatus.AWAITING_RECOVERY:
+                        # Nothing for the play action to do. No-op.
+                        pass
 
         elif isinstance(action, PauseAction):
             self._state.queue_status = QueueStatus.PAUSED
@@ -364,8 +380,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
 
         elif isinstance(action, StopAction):
             if not self._state.run_result:
-                if self._state.queue_status == QueueStatus.AWAITING_RECOVERY:
-                    self._state.recovery_target_command_id = None
+                self._state.recovery_target_command_id = None
 
                 self._state.queue_status = QueueStatus.PAUSED
                 if action.from_estop:
@@ -422,10 +437,15 @@ class CommandStore(HasState[CommandState], HandlesActions):
             if self._config.block_on_door_open:
                 if action.door_state == DoorState.OPEN:
                     self._state.is_door_blocking = True
-                    # todo(mm, 2024-03-19): It's unclear how the door should interact
-                    # with error recovery (QueueStatus.AWAITING_RECOVERY).
-                    if self._state.queue_status != QueueStatus.SETUP:
-                        self._state.queue_status = QueueStatus.PAUSED
+                    match self._state.queue_status:
+                        case QueueStatus.SETUP:
+                            pass
+                        case QueueStatus.RUNNING | QueueStatus.PAUSED:
+                            self._state.queue_status = QueueStatus.PAUSED
+                        case QueueStatus.AWAITING_RECOVERY | QueueStatus.AWAITING_RECOVERY_PAUSED:
+                            self._state.queue_status = (
+                                QueueStatus.AWAITING_RECOVERY_PAUSED
+                            )
                 elif action.door_state == DoorState.CLOSED:
                     self._state.is_door_blocking = False
 
@@ -782,7 +802,7 @@ class CommandView(HasState[CommandState]):
         (see `ProtocolEngine.finish()`) for JSON and live HTTP protocols.
 
         This isn't useful for Python protocols, which have to account for the
-        fatal error of the overall coming from anywhere in the Python script,
+        fatal error of the overall run coming from anywhere in the Python script,
         including in between commands.
         """
         failed_command = self.state.failed_command
@@ -847,10 +867,11 @@ class CommandView(HasState[CommandState]):
             raise RunStoppedError("The run has already stopped.")
 
         elif isinstance(action, PlayAction):
-            if self.get_status() == EngineStatus.BLOCKED_BY_OPEN_DOOR:
+            if self.get_status() in (
+                EngineStatus.BLOCKED_BY_OPEN_DOOR,
+                EngineStatus.AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
+            ):
                 raise RobotDoorOpenError("Front door or top window is currently open.")
-            elif self.get_status() == EngineStatus.AWAITING_RECOVERY:
-                raise NotImplementedError()
             else:
                 return action
 
@@ -858,7 +879,7 @@ class CommandView(HasState[CommandState]):
             if not self.get_is_running():
                 raise PauseNotAllowedError("Cannot pause a run that is not running.")
             elif self.get_status() == EngineStatus.AWAITING_RECOVERY:
-                raise NotImplementedError()
+                raise PauseNotAllowedError("Cannot pause a run in recovery mode.")
             else:
                 return action
 
@@ -901,7 +922,7 @@ class CommandView(HasState[CommandState]):
         else:
             assert_never(action)
 
-    def get_status(self) -> EngineStatus:
+    def get_status(self) -> EngineStatus:  # noqa: C901
         """Get the current execution status of the engine."""
         if self._state.run_result:
             # The main part of the run is over, or will be over soon.
@@ -935,6 +956,12 @@ class CommandView(HasState[CommandState]):
                 return EngineStatus.BLOCKED_BY_OPEN_DOOR
             else:
                 return EngineStatus.PAUSED
+
+        elif self._state.queue_status == QueueStatus.AWAITING_RECOVERY_PAUSED:
+            if self._state.is_door_blocking:
+                return EngineStatus.AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR
+            else:
+                return EngineStatus.AWAITING_RECOVERY_PAUSED
 
         elif self._state.queue_status == QueueStatus.AWAITING_RECOVERY:
             return EngineStatus.AWAITING_RECOVERY

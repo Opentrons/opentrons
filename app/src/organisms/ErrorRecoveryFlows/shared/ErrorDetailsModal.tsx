@@ -58,7 +58,7 @@ export function ErrorDetailsModalODD(
   props: ErrorDetailsModalProps
 ): JSX.Element {
   const { failedCommand, toggleModal, isOnDevice } = props
-  const errorKind = getErrorKind(failedCommand?.error?.errorType)
+  const errorKind = getErrorKind(failedCommand)
   const errorName = useErrorName(errorKind)
 
   const getIsOverpressureErrorKind = (): boolean => {
@@ -94,7 +94,7 @@ export function ErrorDetailsModalODD(
           borderRadius={BORDERS.borderRadius8}
           padding={`${SPACING.spacing16} ${SPACING.spacing20}`}
         >
-          <StepInfo {...props} as="label" />
+          <StepInfo {...props} textStyle="label" />
         </Flex>
       </Flex>
     </Modal>,

@@ -310,6 +310,7 @@ class MoveGroupRunner:
             # stop_condition = step.stop_condition.value
             assert step.sensor_type is not None
             assert step.sensor_id is not None
+            assert step.sensor_binding_flags is not None
             stop_condition = MoveStopCondition.sync_line
             sensor_move_payload = AddSensorLinearMoveBasePayload(
                 request_stop_condition=MoveStopConditionField(stop_condition),
@@ -332,6 +333,7 @@ class MoveGroupRunner:
                 ),
                 sensor_type=SensorTypeField(step.sensor_type),
                 sensor_id=SensorIdField(step.sensor_id),
+                sensor_binding_flags=UInt8Field(step.sensor_binding_flags),
             )
             return AddSensorLinearMoveRequest(payload=sensor_move_payload)
         else:

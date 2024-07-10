@@ -68,8 +68,7 @@ from .module_core import (
     AbsorbanceReaderCore,
 )
 from .exceptions import InvalidModuleLocationError
-from . import load_labware_params
-from . import deck_conflict
+from . import load_labware_params, deck_conflict, overlap_versions
 
 if TYPE_CHECKING:
     from ...labware import Labware
@@ -497,7 +496,10 @@ class ProtocolCore(
             )
 
     def load_instrument(
-        self, instrument_name: PipetteNameType, mount: Mount
+        self,
+        instrument_name: PipetteNameType,
+        mount: Mount,
+        liquid_presence_detection: bool = False,
     ) -> InstrumentCore:
         """Load an instrument into the protocol.
 
@@ -510,7 +512,14 @@ class ProtocolCore(
         """
         engine_mount = MountType[mount.name]
         load_result = self._engine_client.execute_command_without_recovery(
-            cmd.LoadPipetteParams(pipetteName=instrument_name, mount=engine_mount)
+            cmd.LoadPipetteParams(
+                pipetteName=instrument_name,
+                mount=engine_mount,
+                tipOverlapNotAfterVersion=overlap_versions.overlap_for_api_version(
+                    self._api_version
+                ),
+                liquidPresenceDetection=liquid_presence_detection,
+            )
         )
 
         return InstrumentCore(

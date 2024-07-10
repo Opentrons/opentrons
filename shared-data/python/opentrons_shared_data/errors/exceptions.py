@@ -902,8 +902,9 @@ class APIRemoved(GeneralError):
 
     def __init__(
         self,
-        api_element: str,
-        since_version: str,
+        api_element: Optional[str] = None,
+        since_version: Optional[str] = None,
+        current_version: Optional[str] = None,
         message: Optional[str] = None,
         detail: Optional[Dict[str, str]] = None,
         wrapping: Optional[Sequence[EnumeratedError]] = None,
@@ -912,12 +913,64 @@ class APIRemoved(GeneralError):
         checked_detail: Dict[str, Any] = detail or {}
         checked_detail["identifier"] = api_element
         checked_detail["since_version"] = since_version
+        checked_detail["current_version"] = current_version
+        checked_message = ""
+        if api_element and since_version and current_version:
+            checked_message = f"{api_element} is not available after API version {since_version}. You are currently using API version {current_version}."
+        elif api_element and since_version:
+            checked_message = (
+                f"{api_element} is not available after API version {since_version}."
+            )
+        elif api_element:
+            checked_message = (
+                f"{api_element} is no longer available in the API version in use."
+            )
+        if message:
+            checked_message = checked_message + message
         checked_message = (
-            message
-            or f"{api_element} is no longer available since version {since_version}."
+            checked_message
+            or "This feature is no longer available in the API version in use."
         )
         super().__init__(
             ErrorCodes.API_REMOVED, checked_message, checked_detail, wrapping
+        )
+
+
+class IncorrectAPIVersion(GeneralError):
+    """An error indicating that a command was issued that is not supported by the API version in use."""
+
+    def __init__(
+        self,
+        api_element: Optional[str] = None,
+        until_version: Optional[str] = None,
+        current_version: Optional[str] = None,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an IncorrectAPIVersion error."""
+        checked_detail: Dict[str, Any] = detail or {}
+        checked_detail["identifier"] = api_element
+        checked_detail["until_version"] = until_version
+        checked_detail["current_version"] = current_version
+        if api_element and until_version and current_version:
+            checked_message = f"{api_element} is not available until API version {until_version}. You are currently using API version {current_version}."
+        elif api_element and until_version:
+            checked_message = (
+                f"{api_element} is not available until API version {until_version}."
+            )
+        elif api_element:
+            checked_message = (
+                f"{api_element} is not yet available in the API version in use."
+            )
+        if message:
+            checked_message = checked_message + message
+        checked_message = (
+            checked_message
+            or "This feature is not yet available in the API version in use."
+        )
+        super().__init__(
+            ErrorCodes.INCORRECT_API_VERSION, checked_message, checked_detail, wrapping
         )
 
 

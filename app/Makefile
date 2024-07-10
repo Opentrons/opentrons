@@ -46,6 +46,7 @@ clean:
 .PHONY: dist
 dist: export NODE_ENV := production
 dist:
+	echo "Building app JS bundle (browser layer)"
 	vite build
 
 # development

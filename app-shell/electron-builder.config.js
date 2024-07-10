@@ -75,12 +75,16 @@ module.exports = async () => ({
   },
   nsis: {
     oneClick: false,
+    license: 'build/license_en.txt',
   },
   linux: {
     target: ['AppImage'],
     executableName: 'opentrons',
     category: 'Science',
     icon: project === 'robot-stack' ? 'build/icon.icns' : 'build/three.icns',
+  },
+  appImage: {
+    license: 'build/license_en.txt',
   },
   publish: publishConfig,
   generateUpdatesFilesForAllChannels: true,

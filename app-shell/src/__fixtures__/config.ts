@@ -21,6 +21,7 @@ import type {
   ConfigV19,
   ConfigV20,
   ConfigV21,
+  ConfigV22,
 } from '@opentrons/app/src/redux/config/types'
 
 export const MOCK_CONFIG_V0: ConfigV0 = {
@@ -267,4 +268,13 @@ export const MOCK_CONFIG_V20: ConfigV20 = {
 export const MOCK_CONFIG_V21: ConfigV21 = {
   ...MOCK_CONFIG_V20,
   version: 21,
+}
+
+export const MOCK_CONFIG_V22: ConfigV22 = {
+  ...MOCK_CONFIG_V21,
+  version: 22,
+  analytics: {
+    appId: MOCK_CONFIG_V21.analytics.appId,
+    optedIn: true,
+  },
 }

@@ -12,6 +12,7 @@ from .instruments.router import instruments_router
 from .maintenance_runs.router import maintenance_runs_router
 from .modules.router import modules_router
 from .protocols.router import protocols_router
+from .data_files.router import datafiles_router
 from .robot.router import robot_router
 from .runs.router import runs_router
 from .service.labware.router import router as labware_router
@@ -64,6 +65,11 @@ router.include_router(
     dependencies=[Depends(check_version_header)],
 )
 
+router.include_router(
+    router=datafiles_router,
+    tags=["Data files Management"],
+    dependencies=[Depends(check_version_header)],
+)
 router.include_router(
     router=commands_router,
     tags=["Simple Commands"],

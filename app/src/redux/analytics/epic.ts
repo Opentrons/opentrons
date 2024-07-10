@@ -51,7 +51,7 @@ const sendAnalyticsEventEpic: Epic = (action$, state$) => {
       trackEvent(event, config)
     }),
     ignoreElements() as OperatorFunction<
-      [AnalyticsEvent, { appId: string; optedIn: boolean; seenOptIn: boolean }],
+      [AnalyticsEvent, { appId: string; optedIn: boolean }],
       never
     >
   )

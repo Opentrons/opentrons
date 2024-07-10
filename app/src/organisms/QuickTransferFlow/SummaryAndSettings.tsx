@@ -10,6 +10,7 @@ import {
   COLORS,
   POSITION_FIXED,
   ALIGN_CENTER,
+  Tabs,
 } from '@opentrons/components'
 import {
   useCreateProtocolMutation,
@@ -18,10 +19,10 @@ import {
 } from '@opentrons/react-api-client'
 import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
 
-import { TabbedButton } from '../../atoms/buttons'
 import { ChildNavigation } from '../ChildNavigation'
 import { Overview } from './Overview'
 import { TipManagement } from './TipManagement'
+import { QuickTransferAdvancedSettings } from './QuickTransferAdvancedSettings'
 import { SaveOrRunModal } from './SaveOrRunModal'
 import { getInitialSummaryState, createQuickTransferFile } from './utils'
 import { quickTransferSummaryReducer } from './reducers'
@@ -129,21 +130,21 @@ export function SummaryAndSettings(
           marginBottom={SPACING.spacing24}
           alignItems={ALIGN_CENTER}
         >
-          {displayCategory.map(category => (
-            <TabbedButton
-              key={category}
-              title={category}
-              isSelected={category === selectedCategory}
-              onClick={() => {
+          <Tabs
+            tabs={displayCategory.map(category => ({
+              text: t(category),
+              onClick: () => {
                 setSelectedCategory(category)
-              }}
-              height={SPACING.spacing60}
-            >
-              {t(category)}
-            </TabbedButton>
-          ))}
+              },
+              isActive: category === selectedCategory,
+              disabled: false,
+            }))}
+          />
         </Flex>
         {selectedCategory === 'overview' ? <Overview state={state} /> : null}
+        {selectedCategory === 'advanced_settings' ? (
+          <QuickTransferAdvancedSettings state={state} dispatch={dispatch} />
+        ) : null}
         {selectedCategory === 'tip_management' ? (
           <TipManagement state={state} dispatch={dispatch} />
         ) : null}

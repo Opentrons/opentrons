@@ -29,6 +29,9 @@ _VOLUME_ROUNDING_ERROR_TOLERANCE = 1e-9
 class PipettingHandler(TypingProtocol):
     """Liquid handling commands."""
 
+    def get_is_empty(self, pipette_id: str) -> bool:
+        """Get whether a pipette has a working volume equal to 0."""
+
     def get_is_ready_to_aspirate(self, pipette_id: str) -> bool:
         """Get whether a pipette is ready to aspirate."""
 
@@ -76,6 +79,10 @@ class HardwarePipettingHandler(PipettingHandler):
         """Initialize a PipettingHandler instance."""
         self._state_view = state_view
         self._hardware_api = hardware_api
+
+    def get_is_empty(self, pipette_id: str) -> bool:
+        """Get whether a pipette has a working volume equal to 0."""
+        return self._state_view.pipettes.get_working_volume(pipette_id) == 0
 
     def get_is_ready_to_aspirate(self, pipette_id: str) -> bool:
         """Get whether a pipette is ready to aspirate."""
@@ -177,8 +184,11 @@ class HardwarePipettingHandler(PipettingHandler):
         )
         well_def = self._state_view.labware.get_well_definition(labware_id, well_name)
         well_depth = well_def.depth
+        lld_min_height = self._state_view.pipettes.get_current_tip_lld_settings(
+            pipette_id=pipette_id
+        )
         z_pos = await self._hardware_api.liquid_probe(
-            mount=hw_pipette.mount, max_z_dist=well_depth
+            mount=hw_pipette.mount, max_z_dist=well_depth - lld_min_height
         )
         return float(z_pos)
 
@@ -222,6 +232,10 @@ class VirtualPipettingHandler(PipettingHandler):
     ) -> None:
         """Initialize a PipettingHandler instance."""
         self._state_view = state_view
+
+    def get_is_empty(self, pipette_id: str) -> bool:
+        """Get whether a pipette has a working volume equal to 0."""
+        return self._state_view.pipettes.get_working_volume(pipette_id) == 0
 
     def get_is_ready_to_aspirate(self, pipette_id: str) -> bool:
         """Get whether a pipette is ready to aspirate."""

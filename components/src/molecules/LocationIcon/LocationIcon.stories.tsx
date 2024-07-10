@@ -1,10 +1,10 @@
 import * as React from 'react'
+import { customViewports } from '../../../../.storybook/preview'
 import { Flex } from '../../primitives'
 import { SPACING } from '../../ui-style-constants'
-import { GlobalStyle } from '../../../../app/src/atoms/GlobalStyle'
-import { customViewports } from '../../../../.storybook/preview'
 import { ICON_DATA_BY_NAME } from '../../icons'
 import { LocationIcon } from '.'
+
 import type { Meta, StoryObj } from '@storybook/react'
 
 const slots = [
@@ -52,7 +52,6 @@ const meta: Meta<typeof LocationIcon> = {
   decorators: [
     Story => (
       <Flex padding={SPACING.spacing16} width="15rem" height="5rem">
-        <GlobalStyle isOnDevice />
         <Story />
       </Flex>
     ),

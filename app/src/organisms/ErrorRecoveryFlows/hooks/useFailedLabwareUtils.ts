@@ -18,6 +18,7 @@ import type {
   PickUpTipRunTimeCommand,
   AspirateRunTimeCommand,
   DispenseRunTimeCommand,
+  LiquidProbeRunTimeCommand,
 } from '@opentrons/shared-data'
 import type { ErrorRecoveryFlowsProps } from '..'
 
@@ -88,8 +89,9 @@ export function useFailedLabwareUtils({
 
 type FailedCommandRelevantLabware =
   | Omit<AspirateRunTimeCommand, 'result'>
-  | Omit<PickUpTipRunTimeCommand, 'result'>
   | Omit<DispenseRunTimeCommand, 'result'>
+  | Omit<LiquidProbeRunTimeCommand, 'result'>
+  | Omit<PickUpTipRunTimeCommand, 'result'>
   | null
 
 interface RelevantFailedLabwareCmd {
@@ -102,11 +104,11 @@ export function getRelevantFailedLabwareCmdFrom({
   failedCommand,
   runCommands,
 }: RelevantFailedLabwareCmd): FailedCommandRelevantLabware {
-  const errorKind = getErrorKind(failedCommand?.error?.errorType)
+  const errorKind = getErrorKind(failedCommand)
 
   switch (errorKind) {
     case ERROR_KINDS.NO_LIQUID_DETECTED:
-      return failedCommand as Omit<AspirateRunTimeCommand, 'result'>
+      return failedCommand as LiquidProbeRunTimeCommand
     case ERROR_KINDS.OVERPRESSURE_PREPARE_TO_ASPIRATE:
     case ERROR_KINDS.OVERPRESSURE_WHILE_ASPIRATING:
     case ERROR_KINDS.OVERPRESSURE_WHILE_DISPENSING:

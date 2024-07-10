@@ -1372,12 +1372,11 @@ async def _test_liquid_probe(
         await _pick_up_tip_for_tip_volume(api, mount, tip_volume)
         for probe in probes:
             await _move_to_above_plate_liquid(api, mount, probe, height_mm=hover_mm)
-            start_pos = await api.gantry_position(mount)
             probe_cfg = PROBE_SETTINGS[pip_vol][tip_volume]
             probe_settings = LiquidProbeSettings(
-                starting_mount_height=start_pos.z,
                 mount_speed=probe_cfg.mount_speed,
                 plunger_speed=probe_cfg.plunger_speed,
+                plunger_impulse_time=0.2,
                 sensor_threshold_pascals=probe_cfg.sensor_threshold_pascals,
                 output_option=OutputOptions.can_bus_only,  # FIXME: remove
                 aspirate_while_sensing=False,
