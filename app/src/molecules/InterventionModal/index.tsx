@@ -155,9 +155,10 @@ export function InterventionModal({
             onClick={iconHeadingOnClick}
           >
             {titleHeading}
-            <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing12}>
+            {/* revert this change after device logic is complete */}
+            <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing4}>
               {iconName != null ? (
-                <Icon name={iconName} size={SPACING.spacing32} />
+                <Icon width={16} height={16} name={iconName} size={SPACING.spacing32} />  //change this to className
               ) : null}
               {iconHeading != null ? iconHeading : null}
             </Flex>

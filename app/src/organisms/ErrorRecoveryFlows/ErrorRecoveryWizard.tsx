@@ -94,7 +94,9 @@ export function ErrorRecoveryComponent(
     const titleText = props.hasLaunchedRecovery
       ? t('recovery_mode')
       : t('cancel_run')
-    return <LegacyStyledText as="h4Bold">{titleText}</LegacyStyledText>
+      // change this to default typography
+    const deviceStyle = props.isOnDevice ? "h4Bold" : "h4DesktopBold"
+    return <LegacyStyledText as={deviceStyle}>{titleText}</LegacyStyledText>
   }
 
   const buildIconHeading = (): JSX.Element => (

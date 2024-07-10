@@ -76,8 +76,9 @@ const styleMap: { [tag: string]: FlattenSimpleInterpolation } = {
   `,
   h2Bold: TYPOGRAPHY.level2HeaderBold,
   h3Bold: TYPOGRAPHY.level3HeaderBold,
-  h3DesktopBold: TYPOGRAPHY.level3HeaderBold,
+  h3DesktopBold: TYPOGRAPHY.levelDesktop3HeaderBold,
   h4Bold: TYPOGRAPHY.level4HeaderBold,
+  h4DesktopBold: TYPOGRAPHY.level4DesketopHeaderBold,
   pBold: TYPOGRAPHY.bodyTextBold,
   labelBold: TYPOGRAPHY.smallBodyTextBold,
 }
