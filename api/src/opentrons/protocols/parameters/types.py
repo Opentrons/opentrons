@@ -42,7 +42,9 @@ class CSVParameter:
                 self.file.seek(0)
                 reader = csv.reader(self.file, dialect, **kwargs)
             except (UnicodeDecodeError, csv.Error):
-                raise ParameterValueError("Cannot parse dialect or contents from provided CSV file.")
+                raise ParameterValueError(
+                    "Cannot parse dialect or contents from provided CSV file."
+                )
         else:
             try:
                 reader = csv.reader(self.file, **kwargs)

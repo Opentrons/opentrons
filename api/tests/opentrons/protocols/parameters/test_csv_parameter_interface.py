@@ -87,7 +87,7 @@ def test_csv_parameter_mixed_quotes(csv_file_mixed_quotes: TextIO) -> None:
 def test_csv_parameter_additional_kwargs(csv_file_different_delimiter: TextIO) -> None:
     """It should load the rows with a different delimiter."""
     subject = CSVParameter(csv_file_different_delimiter)
-    rows = subject.parse_as_csv(delimiter=':')
+    rows = subject.parse_as_csv(delimiter=":")
     assert len(rows) == 4
     assert rows[0] == ["x", "y", "z"]
     assert rows[1] == ["a,", "1,", "2"]
@@ -97,5 +97,5 @@ def test_csv_parameter_dont_detect_dialect(csv_file_preceding_spaces: TextIO) ->
     """It should load the rows without trying to detect the dialect."""
     subject = CSVParameter(csv_file_preceding_spaces)
     rows = subject.parse_as_csv(detect_dialect=False)
-    assert rows[0] == ['x', ' "y"', ' "z"']
-    assert rows[1] == ['a', ' 1', ' 2']
+    assert rows[0] == ["x", ' "y"', ' "z"']
+    assert rows[1] == ["a", " 1", " 2"]
