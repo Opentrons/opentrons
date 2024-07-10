@@ -256,7 +256,6 @@ class EngineStore:
             assert (
                 protocol is not None
             ), "A JSON protocol should have a protocol source file."
-            _log.warning(f"LOAD JSON: {protocol}")
             await self.run_orchestrator.load_json(protocol.source)
 
         else:
