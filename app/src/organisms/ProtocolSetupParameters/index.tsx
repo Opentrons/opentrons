@@ -34,6 +34,7 @@ import type {
   NumberParameter,
   RunTimeParameter,
   ValueRunTimeParameter,
+  CsvFileFileType
 } from '@opentrons/shared-data'
 import type { LabwareOffsetCreateData } from '@opentrons/api-client'
 
@@ -91,10 +92,11 @@ export function ProtocolSetupParameters({
   const [csvFileInfo, setCSVFileInfo] = React.useState<string>(initialFileId)
 
   const updateParameters = (
-    value: boolean | string | number,
+    value: boolean | string | number | CsvFileFileType,
     variableName: string
   ): void => {
     const updatedParameters = runTimeParametersOverrides.map(parameter => {
+      console.log("parameter: ", parameter)
       if (parameter.variableName === variableName) {
         return { ...parameter, value }
       }
@@ -216,8 +218,6 @@ export function ProtocolSetupParameters({
               mostRecentAnalysis?.result === 'parameter-value-required'
                 ? t('required')
                 : parameter.displayName
-
-            console.log("confirm: "+csvFileInfo)
 
             let setupStatus: 'ready' | 'not ready' | 'general' | 'inform' =
               'inform'

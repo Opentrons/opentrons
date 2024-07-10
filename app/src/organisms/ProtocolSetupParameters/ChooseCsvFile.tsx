@@ -20,15 +20,15 @@ import { getShellUpdateDataFiles } from '../../redux/shell'
 import { ChildNavigation } from '../ChildNavigation'
 import { EmptyFile } from './EmptyFile'
 
-import type { CsvFileParameter } from '@opentrons/shared-data'
+import type { CsvFileParameter, CsvFileFileType } from '@opentrons/shared-data'
 import type { CsvFileData } from '@opentrons/api-client'
 
 interface ChooseCsvFileProps {
   protocolId: string
   handleGoBack: () => void
   // ToDo (kk:06/18/2024) null will be removed when implemented required part
-  parameter: CsvFileParameter | null
-  setParameter: (value: boolean | string | number, variableName: string) => void
+  parameter: CsvFileParameter
+  setParameter: (value: boolean | string | number | CsvFileFileType, variableName: string) => void
   csvFileInfo: string
   setCsvFileInfo: (fileInfo: string) => void
   setChooseValueScreen: (value: CsvFileParameter | null ) => void
@@ -56,17 +56,17 @@ export function ChooseCsvFile({
   //   setParameter(newValue, parameter?.variableName ?? 'csvFileId')
   // }
 
-  // const [ csvFileSelected, setCsvFileSelected ] = React.useState<string>(parameter.)
+  
+  const [ csvFileSelected, setCsvFileSelected ] = React.useState<CsvFileFileType>({})
 
   const handleConfirmSelection = (): void => {
     // ToDo (kk:06/18/2024) wire up later
- 
-    setParameter(csvFileInfo, parameter.variableName) 
-    setChooseValueScreen(null)
     
+    setParameter(csvFileSelected, parameter.variableName) 
+    
+    console.log("csv name: ", csvFileSelected.fileName)
+    setChooseValueScreen(null)
   }
-
-
 
   return (
     <>
@@ -98,9 +98,9 @@ export function ChooseCsvFile({
                     data-testid={`${csv.id}`}
                     buttonLabel={csv.name}
                     buttonValue={`${csv.id}`}
-                    isSelected={csvFileInfo === csv.id}
+                    isSelected={csvFileSelected?.id === csv.id}
                     onChange={() => { 
-                      setCsvFileInfo(csv.id)
+                      setCsvFileSelected({id: csv.id, fileName: csv.name})
                     }}
                   />
                 ))
@@ -123,11 +123,11 @@ export function ChooseCsvFile({
                         data-testid={`${last(csv.split('/'))}`}
                         buttonLabel={last(csv.split('/')) ?? 'default'}
                         buttonValue={csv}
-                        isSelected={ csvFileInfo === csv }
+                        isSelected={ csvFileSelected?.filePath === csv }
                         onChange={() => {
                           // ToDO this will be implemented AUTH-521
                           // handleOnChange(option.value)
-                          setCsvFileInfo(csv)
+                          setCsvFileSelected({filePath: csv, fileName: last(csv.split('/'))})
                         }}
                       />
                     ) : null}

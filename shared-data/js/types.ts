@@ -641,9 +641,16 @@ interface BooleanParameter extends BaseRunTimeParameter {
   value: boolean
 }
 
+export interface CsvFileFileType {
+  id?: string
+  file?: File | null
+  filePath?: string
+  fileName?: string
+}
+
 export interface CsvFileParameter extends BaseRunTimeParameter {
   type: CsvFileParameterType
-  file?: { id?: string; file?: File | null } | null
+  file?: CsvFileFileType | null
 }
 
 type NumberParameterType = 'int' | 'float'
