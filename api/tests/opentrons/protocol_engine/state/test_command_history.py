@@ -197,7 +197,7 @@ def test_set_running_command_id(command_history: CommandHistory) -> None:
 def test_set_fixit_running_command_id(command_history: CommandHistory) -> None:
     """It should set the ID of the currently running fixit command."""
     command_entry = create_queued_command()
-    command_history.set_command_queued(command_entry)
+    command_history.append_queued_command(command_entry)
     running_command = command_entry.copy(
         update={
             "status": CommandStatus.RUNNING,
@@ -213,7 +213,7 @@ def test_set_fixit_running_command_id(command_history: CommandHistory) -> None:
     fixit_command_entry = create_queued_command(
         command_id="fixit-id", intent=CommandIntent.FIXIT
     )
-    command_history.set_command_queued(fixit_command_entry)
+    command_history.append_queued_command(fixit_command_entry)
     fixit_running_command = fixit_command_entry.copy(
         update={
             "status": CommandStatus.RUNNING,
@@ -244,7 +244,7 @@ def test_add_to_setup_queue(command_history: CommandHistory) -> None:
 def test_add_to_fixit_queue(command_history: CommandHistory) -> None:
     """It should add the given ID to the setup queue."""
     fixit_command = create_queued_command(intent=CommandIntent.FIXIT)
-    command_history.set_command_queued(fixit_command)
+    command_history.append_queued_command(fixit_command)
     assert command_history.get_fixit_queue_ids() == OrderedSet(["command-id"])
 
 
@@ -266,10 +266,10 @@ def test_clear_setup_queue(command_history: CommandHistory) -> None:
 
 def test_clear_fixit_queue(command_history: CommandHistory) -> None:
     """It should clear all commands in the setup queue."""
-    command_history.set_command_queued(
+    command_history.append_queued_command(
         create_queued_command(command_id="0", intent=CommandIntent.FIXIT)
     )
-    command_history.set_command_queued(
+    command_history.append_queued_command(
         create_queued_command(command_id="1", intent=CommandIntent.FIXIT)
     )
     assert command_history.get_fixit_queue_ids() == OrderedSet(["0", "1"])

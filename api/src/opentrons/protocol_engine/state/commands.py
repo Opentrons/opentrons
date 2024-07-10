@@ -252,7 +252,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 failedCommandId=action.failed_command_id,
             )
 
-            self._state.command_history.set_command_queued(queued_command)
+            self._state.command_history.append_queued_command(queued_command)
 
             if action.request_hash is not None:
                 self._state.latest_protocol_command_hash = action.request_hash

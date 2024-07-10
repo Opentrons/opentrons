@@ -151,7 +151,7 @@ class CommandHistory:
         """Clears all commands within the queued setup command ids structure."""
         self._queued_fixit_command_ids.clear()
 
-    def set_command_queued(self, command: Command) -> None:
+    def append_queued_command(self, command: Command) -> None:
         """Validate and mark a command as queued in the command history."""
         assert command.status == CommandStatus.QUEUED
         assert not self.has(command.id)
