@@ -182,8 +182,10 @@ async def run_sync_buffer_to_csv(
 ) -> Dict[NodeId, MotorPositionStatus]:
     """Runs the sensor pass move group and creates a csv file with the results."""
     sensor_metadata = [0, 0, mount_speed, plunger_speed, threshold]
+    LOG.info("running move")
     positions = await move_group.run(can_messenger=messenger)
     # wait a little to see the dropoff curve
+    LOG.info("Stoping sync")
     await asyncio.sleep(0.15)
     for sensor_id in log_files.keys():
         await messenger.ensure_send(
@@ -197,6 +199,7 @@ async def run_sync_buffer_to_csv(
             ),
             expected_nodes=[tool],
         )
+    LOG.info("fetching data")
     for sensor_id in log_files.keys():
         sensor_capturer = LogListener(
             mount=head_node,
@@ -402,6 +405,10 @@ async def liquid_probe(
 ) -> Dict[NodeId, MotorPositionStatus]:
     """Move the mount and pipette simultaneously while reading from the pressure sensor."""
     log_files: Dict[SensorId, str] = {} if not data_files else data_files
+    LOG.info(
+        f"/n/n/n/n/nTool Sensors liquid probe head {head_node} p distance {max_p_distance} p speed {plunger_speed} mount_speed {mount_speed} threshold {threshold_pascals} sensor {sensor_id}"
+    )
+    LOG.info(f"sync buffer {sync_buffer_output} can_only {can_bus_only_output} data files {data_files}/n/n/n/n/n")
     sensor_driver = SensorDriver()
     threshold_fixed_point = threshold_pascals * sensor_fixed_point_conversion
     # How many samples to take to level out the sensor
@@ -428,6 +435,9 @@ async def liquid_probe(
     p_prep_distance = float(PLUNGER_SOLO_MOVE_TIME * plunger_speed)
     p_pass_distance = float(max_p_distance - p_prep_distance)
     max_z_distance = (p_pass_distance / plunger_speed) * mount_speed
+    LOG.debug(
+        f"Tool Sensors liquid probe p prep distance {p_prep_distance} p pass distance {p_pass_distance} max z distance {max_z_distance}"
+    )
 
     lower_plunger = create_step(
         distance={tool: float64(p_prep_distance)},
