@@ -3,15 +3,15 @@ import * as React from 'react'
 import SuccessIcon from '../../assets/images/icon_success.png'
 
 import {
-  StyledText,
+  LegacyStyledText,
   Flex,
   DIRECTION_COLUMN,
   Box,
-  BORDERS,
 } from '@opentrons/components'
 import { InlineNotification } from '../../atoms/InlineNotification'
 
 import { TwoColumn as TwoColumnComponent } from './'
+import { StandInContent } from './story-utils/StandIn'
 
 import type { Meta, StoryObj } from '@storybook/react'
 
@@ -28,18 +28,6 @@ interface StorybookArgs {
   rightNotificationType: 'alert' | 'error' | 'neutral'
   leftText?: string
   rightText?: string
-}
-
-function StandInContent(): JSX.Element {
-  return (
-    <Box
-      border={'4px dashed #A864FFFF'}
-      borderRadius={BORDERS.borderRadius8}
-      margin={SPACING.spacing16}
-      height="104px"
-      backgroundColor="#A864FF19"
-    />
-  )
 }
 
 interface NotificationProps {
@@ -65,7 +53,7 @@ interface TextProps {
 }
 function Text({ text }: TextProps): JSX.Element | null {
   const hasComponent = text != null && text.length > 0
-  return hasComponent ? <StyledText>{text}</StyledText> : null
+  return hasComponent ? <LegacyStyledText>{text}</LegacyStyledText> : null
 }
 
 interface ImageProps {

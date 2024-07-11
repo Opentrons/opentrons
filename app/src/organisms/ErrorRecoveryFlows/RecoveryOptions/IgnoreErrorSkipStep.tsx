@@ -6,7 +6,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 import { ODD_SECTION_TITLE_STYLE, RECOVERY_MAP } from '../constants'
@@ -81,9 +81,9 @@ export function IgnoreErrorStepHome({
   if (isOnDevice) {
     return (
       <RecoverySingleColumnContent>
-        <StyledText css={ODD_SECTION_TITLE_STYLE} as="h4SemiBold">
+        <LegacyStyledText css={ODD_SECTION_TITLE_STYLE} as="h4SemiBold">
           {t('ignore_similar_errors_later_in_run')}
-        </StyledText>
+        </LegacyStyledText>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
           <IgnoreOptions
             ignoreOptions={IGNORE_OPTIONS_IN_ORDER}

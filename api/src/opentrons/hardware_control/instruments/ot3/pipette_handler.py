@@ -228,6 +228,7 @@ class OT3PipetteHandler:
                 "blow_out_flow_rate",
                 "working_volume",
                 "tip_overlap",
+                "versioned_tip_overlap",
                 "available_volume",
                 "return_tip_height",
                 "default_aspirate_flow_rates",
@@ -235,6 +236,7 @@ class OT3PipetteHandler:
                 "default_dispense_flow_rates",
                 "back_compat_names",
                 "supported_tips",
+                "lld_settings",
             ]
 
             instr_dict = instr.as_dict()
@@ -279,6 +281,7 @@ class OT3PipetteHandler:
             result[
                 "pipette_bounding_box_offsets"
             ] = instr.config.pipette_bounding_box_offsets
+            result["lld_settings"] = instr.config.lld_settings
         return cast(PipetteDict, result)
 
     @property

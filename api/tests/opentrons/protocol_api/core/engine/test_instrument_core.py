@@ -1,6 +1,8 @@
 """Test for the ProtocolEngine-based instrument API core."""
 from typing import cast, Optional, Union
 
+from opentrons.protocol_engine.commands.liquid_probe import LiquidProbeResult
+from opentrons_shared_data.errors.exceptions import PipetteLiquidNotFoundError
 import pytest
 from decoy import Decoy
 
@@ -47,6 +49,8 @@ from opentrons.protocol_api.core.engine import (
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.types import Location, Mount, MountType, Point
+
+from ... import versions_below, versions_at_or_above
 
 
 @pytest.fixture
@@ -1147,6 +1151,20 @@ def test_has_tip(
     assert subject.has_tip() is True
 
 
+def test_liquid_presence_detection(
+    decoy: Decoy,
+    subject: InstrumentCore,
+    mock_engine_client: EngineClient,
+) -> None:
+    """It should have a default liquid presence detection boolean set to False."""
+    decoy.when(
+        mock_engine_client.state.pipettes.get_liquid_presence_detection(
+            subject.pipette_id
+        )
+    ).then_return(False)
+    assert subject.get_liquid_presence_detection() is False
+
+
 @pytest.mark.parametrize(
     argnames=["style", "primary_nozzle", "front_right_nozzle", "expected_model"],
     argvalues=[
@@ -1228,3 +1246,123 @@ def test_is_tip_tracking_available(
         mock_engine_client.state.pipettes.get_primary_nozzle(subject.pipette_id)
     ).then_return(primary_nozzle)
     assert subject.is_tip_tracking_available() == expected_result
+
+
+@pytest.mark.parametrize("version", versions_below(APIVersion(2, 19), flex_only=False))
+def test_configure_for_volume_pre_219(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
+    subject: InstrumentCore,
+    version: APIVersion,
+) -> None:
+    """Configure_for_volume should specify overlap version."""
+    decoy.when(mock_protocol_core.api_version).then_return(version)
+    subject.configure_for_volume(123.0)
+    decoy.verify(
+        mock_engine_client.execute_command(
+            cmd.ConfigureForVolumeParams(
+                pipetteId=subject.pipette_id,
+                volume=123.0,
+                tipOverlapNotAfterVersion="v0",
+            )
+        )
+    )
+
+
+@pytest.mark.parametrize("version", versions_at_or_above(APIVersion(2, 19)))
+def test_configure_for_volume_post_219(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
+    subject: InstrumentCore,
+    version: APIVersion,
+) -> None:
+    """Configure_for_volume should specify overlap version."""
+    decoy.when(mock_protocol_core.api_version).then_return(version)
+    subject.configure_for_volume(123.0)
+    decoy.verify(
+        mock_engine_client.execute_command(
+            cmd.ConfigureForVolumeParams(
+                pipetteId=subject.pipette_id,
+                volume=123.0,
+                tipOverlapNotAfterVersion="v1",
+            )
+        )
+    )
+
+
+@pytest.mark.parametrize("version", versions_at_or_above(APIVersion(2, 20)))
+def test_liquid_probe_without_recovery(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
+    subject: InstrumentCore,
+    version: APIVersion,
+) -> None:
+    """It should raise an exception on an empty well and return a float on a valid well."""
+    well_core = WellCore(
+        name="my cool well", labware_id="123abc", engine_client=mock_engine_client
+    )
+    decoy.when(
+        mock_engine_client.execute_command_without_recovery(
+            cmd.LiquidProbeParams(
+                pipetteId=subject.pipette_id,
+                wellLocation=WellLocation(
+                    origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0)
+                ),
+                wellName=well_core.get_name(),
+                labwareId=well_core.labware_id,
+            )
+        )
+    ).then_raise(PipetteLiquidNotFoundError())
+    try:
+        subject.liquid_probe_without_recovery(well_core=well_core)
+    except PipetteLiquidNotFoundError:
+        assert True
+    else:
+        assert False
+
+    decoy.reset()
+
+    lpr = LiquidProbeResult(z_position=5.0)
+    decoy.when(
+        mock_engine_client.execute_command_without_recovery(
+            cmd.LiquidProbeParams(
+                pipetteId=subject.pipette_id,
+                wellLocation=WellLocation(
+                    origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0)
+                ),
+                wellName=well_core.get_name(),
+                labwareId=well_core.labware_id,
+            )
+        )
+    ).then_return(lpr)
+    assert subject.liquid_probe_without_recovery(well_core=well_core) == 5.0
+
+
+@pytest.mark.parametrize("version", versions_at_or_above(APIVersion(2, 20)))
+def test_liquid_probe_with_recovery(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
+    subject: InstrumentCore,
+    version: APIVersion,
+) -> None:
+    """It should not raise an exception on an empty well."""
+    well_core = WellCore(
+        name="my cool well", labware_id="123abc", engine_client=mock_engine_client
+    )
+    subject.liquid_probe_with_recovery(well_core=well_core)
+    decoy.verify(
+        mock_engine_client.execute_command(
+            cmd.LiquidProbeParams(
+                pipetteId=subject.pipette_id,
+                wellLocation=WellLocation(
+                    origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0)
+                ),
+                wellName=well_core.get_name(),
+                labwareId=well_core.labware_id,
+            )
+        )
+    )

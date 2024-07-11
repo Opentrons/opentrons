@@ -16,7 +16,7 @@ import {
   OVERFLOW_WRAP_ANYWHERE,
   RobotWorkSpace,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -66,9 +66,9 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
       </Box>
       {/* labware category name min:7.5 rem for the longest, Aluminum Block  */}
       <Box marginRight={SPACING.spacing16}>
-        <StyledText css={TYPOGRAPHY.pSemiBold} id="displayCategory">
+        <LegacyStyledText css={TYPOGRAPHY.pSemiBold} id="displayCategory">
           {displayCategory}
-        </StyledText>
+        </LegacyStyledText>
       </Box>
       {/* labware info */}
       <Box>
@@ -77,17 +77,17 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
           <Box>
-            <StyledText as="h3" id="LabwareCard_labwareName">
+            <LegacyStyledText as="h3" id="LabwareCard_labwareName">
               {displayName}
-            </StyledText>
+            </LegacyStyledText>
             {isCustomDefinition ? (
-              <StyledText
+              <LegacyStyledText
                 as="label"
                 color={COLORS.grey50}
                 id="LabwareCard_customDef"
               >
                 {t('custom_def')}
-              </StyledText>
+              </LegacyStyledText>
             ) : (
               <Flex alignItems={ALIGN_CENTER} marginTop={SPACING.spacing4}>
                 <Icon
@@ -95,28 +95,28 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
                   name="check-decagram"
                   height=".7rem"
                 />
-                <StyledText
+                <LegacyStyledText
                   as="label"
                   id="LabwareCard_opentronsDef"
                   marginLeft={SPACING.spacing4}
                 >
                   {t('branded:opentrons_def')}
-                </StyledText>
+                </LegacyStyledText>
               </Flex>
             )}
           </Box>
           <Box paddingTop={SPACING.spacing16}>
-            <StyledText
+            <LegacyStyledText
               as="h6"
               textTransform={TYPOGRAPHY.textTransformUppercase}
               color={COLORS.grey60}
               id="LabwareCard_apiName"
             >
               {t('api_name')}
-            </StyledText>
+            </LegacyStyledText>
 
             <Box overflowWrap={OVERFLOW_WRAP_ANYWHERE}>
-              <StyledText as="p">{apiName}</StyledText>
+              <LegacyStyledText as="p">{apiName}</LegacyStyledText>
             </Box>
           </Box>
         </Flex>
@@ -134,20 +134,20 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
           >
             <CustomLabwareOverflowMenu filename={filename} />
             <Flex flexDirection={DIRECTION_COLUMN}>
-              <StyledText
+              <LegacyStyledText
                 as="label"
                 color={COLORS.grey50}
                 textAlign={TYPOGRAPHY.textAlignRight}
               >
                 {t('date_added')}
-              </StyledText>
-              <StyledText
+              </LegacyStyledText>
+              <LegacyStyledText
                 as="label"
                 color={COLORS.grey50}
                 id="LabwareCard_dateAdded"
               >
                 {format(new Date(modified), 'MM/dd/yyyy')}
-              </StyledText>
+              </LegacyStyledText>
             </Flex>
           </Flex>
         )}

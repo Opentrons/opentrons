@@ -5,7 +5,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 import { RECOVERY_MAP } from '../constants'
@@ -14,10 +14,9 @@ import {
   RecoveryFooterButtons,
   RecoverySingleColumnContent,
   LeftColumnLabwareInfo,
-  RecoveryMap,
   TwoColTextAndFailedStepNextStep,
 } from '../shared'
-import { TwoColumn } from '../../../molecules/InterventionModal'
+import { TwoColumn, DeckMapContent } from '../../../molecules/InterventionModal'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 import type { RecoveryContentProps } from '../types'
@@ -45,7 +44,12 @@ export function FillWellAndSkip(props: RecoveryContentProps): JSX.Element {
 }
 
 export function FillWell(props: RecoveryContentProps): JSX.Element | null {
-  const { isOnDevice, routeUpdateActions, failedLabwareUtils } = props
+  const {
+    isOnDevice,
+    routeUpdateActions,
+    failedLabwareUtils,
+    deckMapUtils,
+  } = props
   const { t } = useTranslation('error_recovery')
   const { goBackPrevStep, proceedNextStep } = routeUpdateActions
 
@@ -63,7 +67,7 @@ export function FillWell(props: RecoveryContentProps): JSX.Element | null {
             />
           </Flex>
           <Flex marginTop="1.742rem">
-            <RecoveryMap {...props} />
+            <DeckMapContent {...deckMapUtils} />
           </Flex>
         </TwoColumn>
         <RecoveryFooterButtons
@@ -119,7 +123,7 @@ export function SkipToNextStep(
         t={t}
         i18nKey="robot_will_not_check_for_liquid"
         components={{
-          block: <StyledText as="p" />,
+          block: <LegacyStyledText as="p" />,
         }}
       />
     )

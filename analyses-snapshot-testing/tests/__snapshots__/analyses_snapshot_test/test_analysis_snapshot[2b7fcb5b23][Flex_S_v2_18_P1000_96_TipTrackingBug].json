@@ -1,0 +1,4257 @@
+{
+  "commands": [
+    {
+      "commandType": "home",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "50c7ae73a4e3f7129874f39dfb514803",
+      "notes": [],
+      "params": {},
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "73d9d4d55ae8466f3a793ceb70545fa5",
+      "notes": [],
+      "params": {
+        "loadName": "opentrons_flex_96_tiprack_1000ul",
+        "location": {
+          "slotName": "B2"
+        },
+        "namespace": "opentrons",
+        "version": 1
+      },
+      "result": {
+        "definition": {
+          "allowedRoles": [],
+          "brand": {
+            "brand": "Opentrons",
+            "brandId": []
+          },
+          "cornerOffsetFromSlot": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "dimensions": {
+            "xDimension": 127.75,
+            "yDimension": 85.75,
+            "zDimension": 99
+          },
+          "gripForce": 16.0,
+          "gripHeightFromLabwareBottom": 23.9,
+          "gripperOffsets": {},
+          "groups": [
+            {
+              "metadata": {},
+              "wells": [
+                "A1",
+                "A10",
+                "A11",
+                "A12",
+                "A2",
+                "A3",
+                "A4",
+                "A5",
+                "A6",
+                "A7",
+                "A8",
+                "A9",
+                "B1",
+                "B10",
+                "B11",
+                "B12",
+                "B2",
+                "B3",
+                "B4",
+                "B5",
+                "B6",
+                "B7",
+                "B8",
+                "B9",
+                "C1",
+                "C10",
+                "C11",
+                "C12",
+                "C2",
+                "C3",
+                "C4",
+                "C5",
+                "C6",
+                "C7",
+                "C8",
+                "C9",
+                "D1",
+                "D10",
+                "D11",
+                "D12",
+                "D2",
+                "D3",
+                "D4",
+                "D5",
+                "D6",
+                "D7",
+                "D8",
+                "D9",
+                "E1",
+                "E10",
+                "E11",
+                "E12",
+                "E2",
+                "E3",
+                "E4",
+                "E5",
+                "E6",
+                "E7",
+                "E8",
+                "E9",
+                "F1",
+                "F10",
+                "F11",
+                "F12",
+                "F2",
+                "F3",
+                "F4",
+                "F5",
+                "F6",
+                "F7",
+                "F8",
+                "F9",
+                "G1",
+                "G10",
+                "G11",
+                "G12",
+                "G2",
+                "G3",
+                "G4",
+                "G5",
+                "G6",
+                "G7",
+                "G8",
+                "G9",
+                "H1",
+                "H10",
+                "H11",
+                "H12",
+                "H2",
+                "H3",
+                "H4",
+                "H5",
+                "H6",
+                "H7",
+                "H8",
+                "H9"
+              ]
+            }
+          ],
+          "metadata": {
+            "displayCategory": "tipRack",
+            "displayName": "Opentrons Flex 96 Tip Rack 1000 µL",
+            "displayVolumeUnits": "µL",
+            "tags": []
+          },
+          "namespace": "opentrons",
+          "ordering": [
+            [
+              "A1",
+              "B1",
+              "C1",
+              "D1",
+              "E1",
+              "F1",
+              "G1",
+              "H1"
+            ],
+            [
+              "A10",
+              "B10",
+              "C10",
+              "D10",
+              "E10",
+              "F10",
+              "G10",
+              "H10"
+            ],
+            [
+              "A11",
+              "B11",
+              "C11",
+              "D11",
+              "E11",
+              "F11",
+              "G11",
+              "H11"
+            ],
+            [
+              "A12",
+              "B12",
+              "C12",
+              "D12",
+              "E12",
+              "F12",
+              "G12",
+              "H12"
+            ],
+            [
+              "A2",
+              "B2",
+              "C2",
+              "D2",
+              "E2",
+              "F2",
+              "G2",
+              "H2"
+            ],
+            [
+              "A3",
+              "B3",
+              "C3",
+              "D3",
+              "E3",
+              "F3",
+              "G3",
+              "H3"
+            ],
+            [
+              "A4",
+              "B4",
+              "C4",
+              "D4",
+              "E4",
+              "F4",
+              "G4",
+              "H4"
+            ],
+            [
+              "A5",
+              "B5",
+              "C5",
+              "D5",
+              "E5",
+              "F5",
+              "G5",
+              "H5"
+            ],
+            [
+              "A6",
+              "B6",
+              "C6",
+              "D6",
+              "E6",
+              "F6",
+              "G6",
+              "H6"
+            ],
+            [
+              "A7",
+              "B7",
+              "C7",
+              "D7",
+              "E7",
+              "F7",
+              "G7",
+              "H7"
+            ],
+            [
+              "A8",
+              "B8",
+              "C8",
+              "D8",
+              "E8",
+              "F8",
+              "G8",
+              "H8"
+            ],
+            [
+              "A9",
+              "B9",
+              "C9",
+              "D9",
+              "E9",
+              "F9",
+              "G9",
+              "H9"
+            ]
+          ],
+          "parameters": {
+            "format": "96Standard",
+            "isMagneticModuleCompatible": false,
+            "isTiprack": true,
+            "loadName": "opentrons_flex_96_tiprack_1000ul",
+            "quirks": [],
+            "tipLength": 95.6,
+            "tipOverlap": 10.5
+          },
+          "schemaVersion": 2,
+          "stackingOffsetWithLabware": {
+            "opentrons_flex_96_tiprack_adapter": {
+              "x": 0,
+              "y": 0,
+              "z": 121
+            }
+          },
+          "stackingOffsetWithModule": {},
+          "version": 1,
+          "wells": {
+            "A1": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 14.38,
+              "y": 74.38,
+              "z": 1.5
+            },
+            "A10": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 95.38,
+              "y": 74.38,
+              "z": 1.5
+            },
+            "A11": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 104.38,
+              "y": 74.38,
+              "z": 1.5
+            },
+            "A12": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 113.38,
+              "y": 74.38,
+              "z": 1.5
+            },
+            "A2": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 23.38,
+              "y": 74.38,
+              "z": 1.5
+            },
+            "A3": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 32.38,
+              "y": 74.38,
+              "z": 1.5
+            },
+            "A4": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 41.38,
+              "y": 74.38,
+              "z": 1.5
+            },
+            "A5": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 50.38,
+              "y": 74.38,
+              "z": 1.5
+            },
+            "A6": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 59.38,
+              "y": 74.38,
+              "z": 1.5
+            },
+            "A7": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 68.38,
+              "y": 74.38,
+              "z": 1.5
+            },
+            "A8": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 77.38,
+              "y": 74.38,
+              "z": 1.5
+            },
+            "A9": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 86.38,
+              "y": 74.38,
+              "z": 1.5
+            },
+            "B1": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 14.38,
+              "y": 65.38,
+              "z": 1.5
+            },
+            "B10": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 95.38,
+              "y": 65.38,
+              "z": 1.5
+            },
+            "B11": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 104.38,
+              "y": 65.38,
+              "z": 1.5
+            },
+            "B12": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 113.38,
+              "y": 65.38,
+              "z": 1.5
+            },
+            "B2": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 23.38,
+              "y": 65.38,
+              "z": 1.5
+            },
+            "B3": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 32.38,
+              "y": 65.38,
+              "z": 1.5
+            },
+            "B4": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 41.38,
+              "y": 65.38,
+              "z": 1.5
+            },
+            "B5": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 50.38,
+              "y": 65.38,
+              "z": 1.5
+            },
+            "B6": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 59.38,
+              "y": 65.38,
+              "z": 1.5
+            },
+            "B7": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 68.38,
+              "y": 65.38,
+              "z": 1.5
+            },
+            "B8": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 77.38,
+              "y": 65.38,
+              "z": 1.5
+            },
+            "B9": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 86.38,
+              "y": 65.38,
+              "z": 1.5
+            },
+            "C1": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 14.38,
+              "y": 56.38,
+              "z": 1.5
+            },
+            "C10": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 95.38,
+              "y": 56.38,
+              "z": 1.5
+            },
+            "C11": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 104.38,
+              "y": 56.38,
+              "z": 1.5
+            },
+            "C12": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 113.38,
+              "y": 56.38,
+              "z": 1.5
+            },
+            "C2": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 23.38,
+              "y": 56.38,
+              "z": 1.5
+            },
+            "C3": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 32.38,
+              "y": 56.38,
+              "z": 1.5
+            },
+            "C4": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 41.38,
+              "y": 56.38,
+              "z": 1.5
+            },
+            "C5": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 50.38,
+              "y": 56.38,
+              "z": 1.5
+            },
+            "C6": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 59.38,
+              "y": 56.38,
+              "z": 1.5
+            },
+            "C7": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 68.38,
+              "y": 56.38,
+              "z": 1.5
+            },
+            "C8": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 77.38,
+              "y": 56.38,
+              "z": 1.5
+            },
+            "C9": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 86.38,
+              "y": 56.38,
+              "z": 1.5
+            },
+            "D1": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 14.38,
+              "y": 47.38,
+              "z": 1.5
+            },
+            "D10": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 95.38,
+              "y": 47.38,
+              "z": 1.5
+            },
+            "D11": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 104.38,
+              "y": 47.38,
+              "z": 1.5
+            },
+            "D12": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 113.38,
+              "y": 47.38,
+              "z": 1.5
+            },
+            "D2": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 23.38,
+              "y": 47.38,
+              "z": 1.5
+            },
+            "D3": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 32.38,
+              "y": 47.38,
+              "z": 1.5
+            },
+            "D4": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 41.38,
+              "y": 47.38,
+              "z": 1.5
+            },
+            "D5": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 50.38,
+              "y": 47.38,
+              "z": 1.5
+            },
+            "D6": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 59.38,
+              "y": 47.38,
+              "z": 1.5
+            },
+            "D7": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 68.38,
+              "y": 47.38,
+              "z": 1.5
+            },
+            "D8": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 77.38,
+              "y": 47.38,
+              "z": 1.5
+            },
+            "D9": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 86.38,
+              "y": 47.38,
+              "z": 1.5
+            },
+            "E1": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 14.38,
+              "y": 38.38,
+              "z": 1.5
+            },
+            "E10": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 95.38,
+              "y": 38.38,
+              "z": 1.5
+            },
+            "E11": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 104.38,
+              "y": 38.38,
+              "z": 1.5
+            },
+            "E12": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 113.38,
+              "y": 38.38,
+              "z": 1.5
+            },
+            "E2": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 23.38,
+              "y": 38.38,
+              "z": 1.5
+            },
+            "E3": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 32.38,
+              "y": 38.38,
+              "z": 1.5
+            },
+            "E4": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 41.38,
+              "y": 38.38,
+              "z": 1.5
+            },
+            "E5": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 50.38,
+              "y": 38.38,
+              "z": 1.5
+            },
+            "E6": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 59.38,
+              "y": 38.38,
+              "z": 1.5
+            },
+            "E7": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 68.38,
+              "y": 38.38,
+              "z": 1.5
+            },
+            "E8": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 77.38,
+              "y": 38.38,
+              "z": 1.5
+            },
+            "E9": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 86.38,
+              "y": 38.38,
+              "z": 1.5
+            },
+            "F1": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 14.38,
+              "y": 29.38,
+              "z": 1.5
+            },
+            "F10": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 95.38,
+              "y": 29.38,
+              "z": 1.5
+            },
+            "F11": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 104.38,
+              "y": 29.38,
+              "z": 1.5
+            },
+            "F12": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 113.38,
+              "y": 29.38,
+              "z": 1.5
+            },
+            "F2": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 23.38,
+              "y": 29.38,
+              "z": 1.5
+            },
+            "F3": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 32.38,
+              "y": 29.38,
+              "z": 1.5
+            },
+            "F4": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 41.38,
+              "y": 29.38,
+              "z": 1.5
+            },
+            "F5": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 50.38,
+              "y": 29.38,
+              "z": 1.5
+            },
+            "F6": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 59.38,
+              "y": 29.38,
+              "z": 1.5
+            },
+            "F7": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 68.38,
+              "y": 29.38,
+              "z": 1.5
+            },
+            "F8": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 77.38,
+              "y": 29.38,
+              "z": 1.5
+            },
+            "F9": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 86.38,
+              "y": 29.38,
+              "z": 1.5
+            },
+            "G1": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 14.38,
+              "y": 20.38,
+              "z": 1.5
+            },
+            "G10": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 95.38,
+              "y": 20.38,
+              "z": 1.5
+            },
+            "G11": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 104.38,
+              "y": 20.38,
+              "z": 1.5
+            },
+            "G12": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 113.38,
+              "y": 20.38,
+              "z": 1.5
+            },
+            "G2": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 23.38,
+              "y": 20.38,
+              "z": 1.5
+            },
+            "G3": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 32.38,
+              "y": 20.38,
+              "z": 1.5
+            },
+            "G4": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 41.38,
+              "y": 20.38,
+              "z": 1.5
+            },
+            "G5": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 50.38,
+              "y": 20.38,
+              "z": 1.5
+            },
+            "G6": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 59.38,
+              "y": 20.38,
+              "z": 1.5
+            },
+            "G7": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 68.38,
+              "y": 20.38,
+              "z": 1.5
+            },
+            "G8": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 77.38,
+              "y": 20.38,
+              "z": 1.5
+            },
+            "G9": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 86.38,
+              "y": 20.38,
+              "z": 1.5
+            },
+            "H1": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 14.38,
+              "y": 11.38,
+              "z": 1.5
+            },
+            "H10": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 95.38,
+              "y": 11.38,
+              "z": 1.5
+            },
+            "H11": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 104.38,
+              "y": 11.38,
+              "z": 1.5
+            },
+            "H12": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 113.38,
+              "y": 11.38,
+              "z": 1.5
+            },
+            "H2": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 23.38,
+              "y": 11.38,
+              "z": 1.5
+            },
+            "H3": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 32.38,
+              "y": 11.38,
+              "z": 1.5
+            },
+            "H4": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 41.38,
+              "y": 11.38,
+              "z": 1.5
+            },
+            "H5": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 50.38,
+              "y": 11.38,
+              "z": 1.5
+            },
+            "H6": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 59.38,
+              "y": 11.38,
+              "z": 1.5
+            },
+            "H7": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 68.38,
+              "y": 11.38,
+              "z": 1.5
+            },
+            "H8": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 77.38,
+              "y": 11.38,
+              "z": 1.5
+            },
+            "H9": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 86.38,
+              "y": 11.38,
+              "z": 1.5
+            }
+          }
+        },
+        "labwareId": "UUID"
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "50de88d471ad3910c29207fb6df4502e",
+      "notes": [],
+      "params": {
+        "loadName": "opentrons_flex_96_tiprack_1000ul",
+        "location": {
+          "slotName": "C2"
+        },
+        "namespace": "opentrons",
+        "version": 1
+      },
+      "result": {
+        "definition": {
+          "allowedRoles": [],
+          "brand": {
+            "brand": "Opentrons",
+            "brandId": []
+          },
+          "cornerOffsetFromSlot": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "dimensions": {
+            "xDimension": 127.75,
+            "yDimension": 85.75,
+            "zDimension": 99
+          },
+          "gripForce": 16.0,
+          "gripHeightFromLabwareBottom": 23.9,
+          "gripperOffsets": {},
+          "groups": [
+            {
+              "metadata": {},
+              "wells": [
+                "A1",
+                "A10",
+                "A11",
+                "A12",
+                "A2",
+                "A3",
+                "A4",
+                "A5",
+                "A6",
+                "A7",
+                "A8",
+                "A9",
+                "B1",
+                "B10",
+                "B11",
+                "B12",
+                "B2",
+                "B3",
+                "B4",
+                "B5",
+                "B6",
+                "B7",
+                "B8",
+                "B9",
+                "C1",
+                "C10",
+                "C11",
+                "C12",
+                "C2",
+                "C3",
+                "C4",
+                "C5",
+                "C6",
+                "C7",
+                "C8",
+                "C9",
+                "D1",
+                "D10",
+                "D11",
+                "D12",
+                "D2",
+                "D3",
+                "D4",
+                "D5",
+                "D6",
+                "D7",
+                "D8",
+                "D9",
+                "E1",
+                "E10",
+                "E11",
+                "E12",
+                "E2",
+                "E3",
+                "E4",
+                "E5",
+                "E6",
+                "E7",
+                "E8",
+                "E9",
+                "F1",
+                "F10",
+                "F11",
+                "F12",
+                "F2",
+                "F3",
+                "F4",
+                "F5",
+                "F6",
+                "F7",
+                "F8",
+                "F9",
+                "G1",
+                "G10",
+                "G11",
+                "G12",
+                "G2",
+                "G3",
+                "G4",
+                "G5",
+                "G6",
+                "G7",
+                "G8",
+                "G9",
+                "H1",
+                "H10",
+                "H11",
+                "H12",
+                "H2",
+                "H3",
+                "H4",
+                "H5",
+                "H6",
+                "H7",
+                "H8",
+                "H9"
+              ]
+            }
+          ],
+          "metadata": {
+            "displayCategory": "tipRack",
+            "displayName": "Opentrons Flex 96 Tip Rack 1000 µL",
+            "displayVolumeUnits": "µL",
+            "tags": []
+          },
+          "namespace": "opentrons",
+          "ordering": [
+            [
+              "A1",
+              "B1",
+              "C1",
+              "D1",
+              "E1",
+              "F1",
+              "G1",
+              "H1"
+            ],
+            [
+              "A10",
+              "B10",
+              "C10",
+              "D10",
+              "E10",
+              "F10",
+              "G10",
+              "H10"
+            ],
+            [
+              "A11",
+              "B11",
+              "C11",
+              "D11",
+              "E11",
+              "F11",
+              "G11",
+              "H11"
+            ],
+            [
+              "A12",
+              "B12",
+              "C12",
+              "D12",
+              "E12",
+              "F12",
+              "G12",
+              "H12"
+            ],
+            [
+              "A2",
+              "B2",
+              "C2",
+              "D2",
+              "E2",
+              "F2",
+              "G2",
+              "H2"
+            ],
+            [
+              "A3",
+              "B3",
+              "C3",
+              "D3",
+              "E3",
+              "F3",
+              "G3",
+              "H3"
+            ],
+            [
+              "A4",
+              "B4",
+              "C4",
+              "D4",
+              "E4",
+              "F4",
+              "G4",
+              "H4"
+            ],
+            [
+              "A5",
+              "B5",
+              "C5",
+              "D5",
+              "E5",
+              "F5",
+              "G5",
+              "H5"
+            ],
+            [
+              "A6",
+              "B6",
+              "C6",
+              "D6",
+              "E6",
+              "F6",
+              "G6",
+              "H6"
+            ],
+            [
+              "A7",
+              "B7",
+              "C7",
+              "D7",
+              "E7",
+              "F7",
+              "G7",
+              "H7"
+            ],
+            [
+              "A8",
+              "B8",
+              "C8",
+              "D8",
+              "E8",
+              "F8",
+              "G8",
+              "H8"
+            ],
+            [
+              "A9",
+              "B9",
+              "C9",
+              "D9",
+              "E9",
+              "F9",
+              "G9",
+              "H9"
+            ]
+          ],
+          "parameters": {
+            "format": "96Standard",
+            "isMagneticModuleCompatible": false,
+            "isTiprack": true,
+            "loadName": "opentrons_flex_96_tiprack_1000ul",
+            "quirks": [],
+            "tipLength": 95.6,
+            "tipOverlap": 10.5
+          },
+          "schemaVersion": 2,
+          "stackingOffsetWithLabware": {
+            "opentrons_flex_96_tiprack_adapter": {
+              "x": 0,
+              "y": 0,
+              "z": 121
+            }
+          },
+          "stackingOffsetWithModule": {},
+          "version": 1,
+          "wells": {
+            "A1": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 14.38,
+              "y": 74.38,
+              "z": 1.5
+            },
+            "A10": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 95.38,
+              "y": 74.38,
+              "z": 1.5
+            },
+            "A11": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 104.38,
+              "y": 74.38,
+              "z": 1.5
+            },
+            "A12": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 113.38,
+              "y": 74.38,
+              "z": 1.5
+            },
+            "A2": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 23.38,
+              "y": 74.38,
+              "z": 1.5
+            },
+            "A3": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 32.38,
+              "y": 74.38,
+              "z": 1.5
+            },
+            "A4": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 41.38,
+              "y": 74.38,
+              "z": 1.5
+            },
+            "A5": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 50.38,
+              "y": 74.38,
+              "z": 1.5
+            },
+            "A6": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 59.38,
+              "y": 74.38,
+              "z": 1.5
+            },
+            "A7": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 68.38,
+              "y": 74.38,
+              "z": 1.5
+            },
+            "A8": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 77.38,
+              "y": 74.38,
+              "z": 1.5
+            },
+            "A9": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 86.38,
+              "y": 74.38,
+              "z": 1.5
+            },
+            "B1": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 14.38,
+              "y": 65.38,
+              "z": 1.5
+            },
+            "B10": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 95.38,
+              "y": 65.38,
+              "z": 1.5
+            },
+            "B11": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 104.38,
+              "y": 65.38,
+              "z": 1.5
+            },
+            "B12": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 113.38,
+              "y": 65.38,
+              "z": 1.5
+            },
+            "B2": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 23.38,
+              "y": 65.38,
+              "z": 1.5
+            },
+            "B3": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 32.38,
+              "y": 65.38,
+              "z": 1.5
+            },
+            "B4": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 41.38,
+              "y": 65.38,
+              "z": 1.5
+            },
+            "B5": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 50.38,
+              "y": 65.38,
+              "z": 1.5
+            },
+            "B6": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 59.38,
+              "y": 65.38,
+              "z": 1.5
+            },
+            "B7": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 68.38,
+              "y": 65.38,
+              "z": 1.5
+            },
+            "B8": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 77.38,
+              "y": 65.38,
+              "z": 1.5
+            },
+            "B9": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 86.38,
+              "y": 65.38,
+              "z": 1.5
+            },
+            "C1": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 14.38,
+              "y": 56.38,
+              "z": 1.5
+            },
+            "C10": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 95.38,
+              "y": 56.38,
+              "z": 1.5
+            },
+            "C11": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 104.38,
+              "y": 56.38,
+              "z": 1.5
+            },
+            "C12": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 113.38,
+              "y": 56.38,
+              "z": 1.5
+            },
+            "C2": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 23.38,
+              "y": 56.38,
+              "z": 1.5
+            },
+            "C3": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 32.38,
+              "y": 56.38,
+              "z": 1.5
+            },
+            "C4": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 41.38,
+              "y": 56.38,
+              "z": 1.5
+            },
+            "C5": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 50.38,
+              "y": 56.38,
+              "z": 1.5
+            },
+            "C6": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 59.38,
+              "y": 56.38,
+              "z": 1.5
+            },
+            "C7": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 68.38,
+              "y": 56.38,
+              "z": 1.5
+            },
+            "C8": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 77.38,
+              "y": 56.38,
+              "z": 1.5
+            },
+            "C9": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 86.38,
+              "y": 56.38,
+              "z": 1.5
+            },
+            "D1": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 14.38,
+              "y": 47.38,
+              "z": 1.5
+            },
+            "D10": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 95.38,
+              "y": 47.38,
+              "z": 1.5
+            },
+            "D11": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 104.38,
+              "y": 47.38,
+              "z": 1.5
+            },
+            "D12": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 113.38,
+              "y": 47.38,
+              "z": 1.5
+            },
+            "D2": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 23.38,
+              "y": 47.38,
+              "z": 1.5
+            },
+            "D3": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 32.38,
+              "y": 47.38,
+              "z": 1.5
+            },
+            "D4": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 41.38,
+              "y": 47.38,
+              "z": 1.5
+            },
+            "D5": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 50.38,
+              "y": 47.38,
+              "z": 1.5
+            },
+            "D6": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 59.38,
+              "y": 47.38,
+              "z": 1.5
+            },
+            "D7": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 68.38,
+              "y": 47.38,
+              "z": 1.5
+            },
+            "D8": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 77.38,
+              "y": 47.38,
+              "z": 1.5
+            },
+            "D9": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 86.38,
+              "y": 47.38,
+              "z": 1.5
+            },
+            "E1": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 14.38,
+              "y": 38.38,
+              "z": 1.5
+            },
+            "E10": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 95.38,
+              "y": 38.38,
+              "z": 1.5
+            },
+            "E11": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 104.38,
+              "y": 38.38,
+              "z": 1.5
+            },
+            "E12": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 113.38,
+              "y": 38.38,
+              "z": 1.5
+            },
+            "E2": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 23.38,
+              "y": 38.38,
+              "z": 1.5
+            },
+            "E3": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 32.38,
+              "y": 38.38,
+              "z": 1.5
+            },
+            "E4": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 41.38,
+              "y": 38.38,
+              "z": 1.5
+            },
+            "E5": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 50.38,
+              "y": 38.38,
+              "z": 1.5
+            },
+            "E6": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 59.38,
+              "y": 38.38,
+              "z": 1.5
+            },
+            "E7": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 68.38,
+              "y": 38.38,
+              "z": 1.5
+            },
+            "E8": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 77.38,
+              "y": 38.38,
+              "z": 1.5
+            },
+            "E9": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 86.38,
+              "y": 38.38,
+              "z": 1.5
+            },
+            "F1": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 14.38,
+              "y": 29.38,
+              "z": 1.5
+            },
+            "F10": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 95.38,
+              "y": 29.38,
+              "z": 1.5
+            },
+            "F11": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 104.38,
+              "y": 29.38,
+              "z": 1.5
+            },
+            "F12": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 113.38,
+              "y": 29.38,
+              "z": 1.5
+            },
+            "F2": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 23.38,
+              "y": 29.38,
+              "z": 1.5
+            },
+            "F3": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 32.38,
+              "y": 29.38,
+              "z": 1.5
+            },
+            "F4": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 41.38,
+              "y": 29.38,
+              "z": 1.5
+            },
+            "F5": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 50.38,
+              "y": 29.38,
+              "z": 1.5
+            },
+            "F6": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 59.38,
+              "y": 29.38,
+              "z": 1.5
+            },
+            "F7": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 68.38,
+              "y": 29.38,
+              "z": 1.5
+            },
+            "F8": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 77.38,
+              "y": 29.38,
+              "z": 1.5
+            },
+            "F9": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 86.38,
+              "y": 29.38,
+              "z": 1.5
+            },
+            "G1": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 14.38,
+              "y": 20.38,
+              "z": 1.5
+            },
+            "G10": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 95.38,
+              "y": 20.38,
+              "z": 1.5
+            },
+            "G11": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 104.38,
+              "y": 20.38,
+              "z": 1.5
+            },
+            "G12": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 113.38,
+              "y": 20.38,
+              "z": 1.5
+            },
+            "G2": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 23.38,
+              "y": 20.38,
+              "z": 1.5
+            },
+            "G3": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 32.38,
+              "y": 20.38,
+              "z": 1.5
+            },
+            "G4": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 41.38,
+              "y": 20.38,
+              "z": 1.5
+            },
+            "G5": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 50.38,
+              "y": 20.38,
+              "z": 1.5
+            },
+            "G6": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 59.38,
+              "y": 20.38,
+              "z": 1.5
+            },
+            "G7": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 68.38,
+              "y": 20.38,
+              "z": 1.5
+            },
+            "G8": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 77.38,
+              "y": 20.38,
+              "z": 1.5
+            },
+            "G9": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 86.38,
+              "y": 20.38,
+              "z": 1.5
+            },
+            "H1": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 14.38,
+              "y": 11.38,
+              "z": 1.5
+            },
+            "H10": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 95.38,
+              "y": 11.38,
+              "z": 1.5
+            },
+            "H11": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 104.38,
+              "y": 11.38,
+              "z": 1.5
+            },
+            "H12": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 113.38,
+              "y": 11.38,
+              "z": 1.5
+            },
+            "H2": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 23.38,
+              "y": 11.38,
+              "z": 1.5
+            },
+            "H3": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 32.38,
+              "y": 11.38,
+              "z": 1.5
+            },
+            "H4": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 41.38,
+              "y": 11.38,
+              "z": 1.5
+            },
+            "H5": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 50.38,
+              "y": 11.38,
+              "z": 1.5
+            },
+            "H6": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 59.38,
+              "y": 11.38,
+              "z": 1.5
+            },
+            "H7": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 68.38,
+              "y": 11.38,
+              "z": 1.5
+            },
+            "H8": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 77.38,
+              "y": 11.38,
+              "z": 1.5
+            },
+            "H9": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 86.38,
+              "y": 11.38,
+              "z": 1.5
+            }
+          }
+        },
+        "labwareId": "UUID"
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadPipette",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "54fddab1eb921f6e1d3aa7e96d2ac307",
+      "notes": [],
+      "params": {
+        "liquidPresenceDetection": false,
+        "mount": "left",
+        "pipetteName": "p1000_96",
+        "tipOverlapNotAfterVersion": "v0"
+      },
+      "result": {
+        "pipetteId": "UUID"
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "configureNozzleLayout",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "4b1d27a6f17f312dd76668f0c48ed406",
+      "notes": [],
+      "params": {
+        "configurationParams": {
+          "primaryNozzle": "A12",
+          "style": "COLUMN"
+        },
+        "pipetteId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "52883042e12b2ef11bd74f6366c4632a",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 178.38,
+          "y": 288.38,
+          "z": 99.0
+        },
+        "tipDiameter": 5.47,
+        "tipLength": 85.1,
+        "tipVolume": 1000.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToAddressableAreaForDropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "9b52cbcb1bb5735ed87c17e06431d417",
+      "notes": [],
+      "params": {
+        "addressableAreaName": "movableTrashA3",
+        "alternateDropLocation": true,
+        "forceDirect": false,
+        "ignoreTipConfiguration": true,
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "pipetteId": "UUID"
+      },
+      "result": {
+        "position": {
+          "x": 466.25,
+          "y": 364.0,
+          "z": 40.0
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "14f6aa0df6e9dd52638c3e0647a63937",
+      "notes": [],
+      "params": {
+        "pipetteId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "dcfea8d14bd59502e4464ce731251217",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A2"
+      },
+      "result": {
+        "position": {
+          "x": 187.38,
+          "y": 288.38,
+          "z": 99.0
+        },
+        "tipDiameter": 5.47,
+        "tipLength": 85.1,
+        "tipVolume": 1000.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToAddressableAreaForDropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "f45674d6617cfa6b784cb6966464d246",
+      "notes": [],
+      "params": {
+        "addressableAreaName": "movableTrashA3",
+        "alternateDropLocation": true,
+        "forceDirect": false,
+        "ignoreTipConfiguration": true,
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "pipetteId": "UUID"
+      },
+      "result": {
+        "position": {
+          "x": 402.25,
+          "y": 364.0,
+          "z": 40.0
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "63f7ce20d69beab5144bb5a11d21a6d6",
+      "notes": [],
+      "params": {
+        "pipetteId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "f0d288290a68e705d8bc878e9a4a1391",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A3"
+      },
+      "result": {
+        "position": {
+          "x": 196.38,
+          "y": 288.38,
+          "z": 99.0
+        },
+        "tipDiameter": 5.47,
+        "tipLength": 85.1,
+        "tipVolume": 1000.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToAddressableAreaForDropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "73c775600b2922c590e9e688453f68f1",
+      "notes": [],
+      "params": {
+        "addressableAreaName": "movableTrashA3",
+        "alternateDropLocation": true,
+        "forceDirect": false,
+        "ignoreTipConfiguration": true,
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "pipetteId": "UUID"
+      },
+      "result": {
+        "position": {
+          "x": 466.25,
+          "y": 364.0,
+          "z": 40.0
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "794166aa7bbf20da799dc67c323f42ef",
+      "notes": [],
+      "params": {
+        "pipetteId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "290f61800cf1f5a5117a91941b30b1c7",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A4"
+      },
+      "result": {
+        "position": {
+          "x": 205.38,
+          "y": 288.38,
+          "z": 99.0
+        },
+        "tipDiameter": 5.47,
+        "tipLength": 85.1,
+        "tipVolume": 1000.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToAddressableAreaForDropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "715d29894492d00b2a5213d0532d7fb8",
+      "notes": [],
+      "params": {
+        "addressableAreaName": "movableTrashA3",
+        "alternateDropLocation": true,
+        "forceDirect": false,
+        "ignoreTipConfiguration": true,
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "pipetteId": "UUID"
+      },
+      "result": {
+        "position": {
+          "x": 402.25,
+          "y": 364.0,
+          "z": 40.0
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "9ac9aeb97029b9d72b9f1a3a88a90611",
+      "notes": [],
+      "params": {
+        "pipetteId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "631ac1fa58e97028b958784a70546bc6",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A5"
+      },
+      "result": {
+        "position": {
+          "x": 214.38,
+          "y": 288.38,
+          "z": 99.0
+        },
+        "tipDiameter": 5.47,
+        "tipLength": 85.1,
+        "tipVolume": 1000.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToAddressableAreaForDropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "00973ae4a9ef925162e6f7c7f61cdd04",
+      "notes": [],
+      "params": {
+        "addressableAreaName": "movableTrashA3",
+        "alternateDropLocation": true,
+        "forceDirect": false,
+        "ignoreTipConfiguration": true,
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "pipetteId": "UUID"
+      },
+      "result": {
+        "position": {
+          "x": 466.25,
+          "y": 364.0,
+          "z": 40.0
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "7ec5886a59ee1f1f6a19c62d699e280c",
+      "notes": [],
+      "params": {
+        "pipetteId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "0b115e3c541292e29f94786ac78222b0",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A6"
+      },
+      "result": {
+        "position": {
+          "x": 223.38,
+          "y": 288.38,
+          "z": 99.0
+        },
+        "tipDiameter": 5.47,
+        "tipLength": 85.1,
+        "tipVolume": 1000.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToAddressableAreaForDropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "42f47edd916ded2f708cd6b46bf9f1a9",
+      "notes": [],
+      "params": {
+        "addressableAreaName": "movableTrashA3",
+        "alternateDropLocation": true,
+        "forceDirect": false,
+        "ignoreTipConfiguration": true,
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "pipetteId": "UUID"
+      },
+      "result": {
+        "position": {
+          "x": 402.25,
+          "y": 364.0,
+          "z": 40.0
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "691744649cf4494dc4116df89a8e34f0",
+      "notes": [],
+      "params": {
+        "pipetteId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "d50017af409c3a8899edb1f2f8b7378c",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A7"
+      },
+      "result": {
+        "position": {
+          "x": 232.38,
+          "y": 288.38,
+          "z": 99.0
+        },
+        "tipDiameter": 5.47,
+        "tipLength": 85.1,
+        "tipVolume": 1000.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToAddressableAreaForDropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "630b504bd02d8030f6a7d9a18a9043fb",
+      "notes": [],
+      "params": {
+        "addressableAreaName": "movableTrashA3",
+        "alternateDropLocation": true,
+        "forceDirect": false,
+        "ignoreTipConfiguration": true,
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "pipetteId": "UUID"
+      },
+      "result": {
+        "position": {
+          "x": 466.25,
+          "y": 364.0,
+          "z": 40.0
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "23ce4695d6ec709a3f1651d07a186bcc",
+      "notes": [],
+      "params": {
+        "pipetteId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "11d2f1f0c06b7a4103a1537ba6c9051d",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A8"
+      },
+      "result": {
+        "position": {
+          "x": 241.38,
+          "y": 288.38,
+          "z": 99.0
+        },
+        "tipDiameter": 5.47,
+        "tipLength": 85.1,
+        "tipVolume": 1000.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToAddressableAreaForDropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "ea34788a1adf50a2c352027862610abf",
+      "notes": [],
+      "params": {
+        "addressableAreaName": "movableTrashA3",
+        "alternateDropLocation": true,
+        "forceDirect": false,
+        "ignoreTipConfiguration": true,
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "pipetteId": "UUID"
+      },
+      "result": {
+        "position": {
+          "x": 402.25,
+          "y": 364.0,
+          "z": 40.0
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "65b855cb4305615370c5994cc760322e",
+      "notes": [],
+      "params": {
+        "pipetteId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "c6964280bc9bcec57b32268b787074ff",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A9"
+      },
+      "result": {
+        "position": {
+          "x": 250.38,
+          "y": 288.38,
+          "z": 99.0
+        },
+        "tipDiameter": 5.47,
+        "tipLength": 85.1,
+        "tipVolume": 1000.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToAddressableAreaForDropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "c2b93e36f2728161f14299a1f986629b",
+      "notes": [],
+      "params": {
+        "addressableAreaName": "movableTrashA3",
+        "alternateDropLocation": true,
+        "forceDirect": false,
+        "ignoreTipConfiguration": true,
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "pipetteId": "UUID"
+      },
+      "result": {
+        "position": {
+          "x": 466.25,
+          "y": 364.0,
+          "z": 40.0
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "5e382e9fd0093f1494b1402d32558f0e",
+      "notes": [],
+      "params": {
+        "pipetteId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "5d77dceaaf4fdc55a6c612137b96823c",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A10"
+      },
+      "result": {
+        "position": {
+          "x": 259.38,
+          "y": 288.38,
+          "z": 99.0
+        },
+        "tipDiameter": 5.47,
+        "tipLength": 85.1,
+        "tipVolume": 1000.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToAddressableAreaForDropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "c43317a89dce9607f27b4053ca37b8a8",
+      "notes": [],
+      "params": {
+        "addressableAreaName": "movableTrashA3",
+        "alternateDropLocation": true,
+        "forceDirect": false,
+        "ignoreTipConfiguration": true,
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "pipetteId": "UUID"
+      },
+      "result": {
+        "position": {
+          "x": 402.25,
+          "y": 364.0,
+          "z": 40.0
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "40d02a42c47d1e58206a24e8fa568882",
+      "notes": [],
+      "params": {
+        "pipetteId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "8b5f2b27d50b1dc72cc7ac71cc4e3e30",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A11"
+      },
+      "result": {
+        "position": {
+          "x": 268.38,
+          "y": 288.38,
+          "z": 99.0
+        },
+        "tipDiameter": 5.47,
+        "tipLength": 85.1,
+        "tipVolume": 1000.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToAddressableAreaForDropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "9b8caecd60b040473cc20d10f250dd8a",
+      "notes": [],
+      "params": {
+        "addressableAreaName": "movableTrashA3",
+        "alternateDropLocation": true,
+        "forceDirect": false,
+        "ignoreTipConfiguration": true,
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "pipetteId": "UUID"
+      },
+      "result": {
+        "position": {
+          "x": 466.25,
+          "y": 364.0,
+          "z": 40.0
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "76e29e24b98b6779bf317e5f374da1b6",
+      "notes": [],
+      "params": {
+        "pipetteId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "82e35e1cb609cd5df5b998065900f726",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A12"
+      },
+      "result": {
+        "position": {
+          "x": 277.38,
+          "y": 288.38,
+          "z": 99.0
+        },
+        "tipDiameter": 5.47,
+        "tipLength": 85.1,
+        "tipVolume": 1000.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToAddressableAreaForDropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "1e2a4187925f88830b8fc06426e0083c",
+      "notes": [],
+      "params": {
+        "addressableAreaName": "movableTrashA3",
+        "alternateDropLocation": true,
+        "forceDirect": false,
+        "ignoreTipConfiguration": true,
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "pipetteId": "UUID"
+      },
+      "result": {
+        "position": {
+          "x": 402.25,
+          "y": 364.0,
+          "z": 40.0
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "9511860ddb6ab44b7c7d776a1a97e456",
+      "notes": [],
+      "params": {
+        "pipetteId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "23ce67708c3440f822c5a0b787564f7a",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 178.38,
+          "y": 181.38,
+          "z": 99.0
+        },
+        "tipDiameter": 5.47,
+        "tipLength": 85.1,
+        "tipVolume": 1000.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToAddressableAreaForDropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "c997f85b5bafd7df796b8ec8e061a5b9",
+      "notes": [],
+      "params": {
+        "addressableAreaName": "movableTrashA3",
+        "alternateDropLocation": true,
+        "forceDirect": false,
+        "ignoreTipConfiguration": true,
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "pipetteId": "UUID"
+      },
+      "result": {
+        "position": {
+          "x": 466.25,
+          "y": 364.0,
+          "z": 40.0
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "314d4b226946d50222c5864a7064a039",
+      "notes": [],
+      "params": {
+        "pipetteId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "configureNozzleLayout",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "5358d0b6011dd5e2f7677a28e0b33c55",
+      "notes": [],
+      "params": {
+        "configurationParams": {
+          "primaryNozzle": "A1",
+          "style": "COLUMN"
+        },
+        "pipetteId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "dcc04471cfbda613651b0162338b7800",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A12"
+      },
+      "result": {
+        "position": {
+          "x": 277.38,
+          "y": 181.38,
+          "z": 99.0
+        },
+        "tipDiameter": 5.47,
+        "tipLength": 85.1,
+        "tipVolume": 1000.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToAddressableAreaForDropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "de7d038c2cab0637dbd60ca76890bf50",
+      "notes": [],
+      "params": {
+        "addressableAreaName": "movableTrashA3",
+        "alternateDropLocation": true,
+        "forceDirect": false,
+        "ignoreTipConfiguration": true,
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "pipetteId": "UUID"
+      },
+      "result": {
+        "position": {
+          "x": 402.25,
+          "y": 364.0,
+          "z": 40.0
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "732073a1a02027cecd6e1e02cae5337b",
+      "notes": [],
+      "params": {
+        "pipetteId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "b73668f72b7da441d40b96bd0e289f81",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A11"
+      },
+      "result": {
+        "position": {
+          "x": 268.38,
+          "y": 181.38,
+          "z": 99.0
+        },
+        "tipDiameter": 5.47,
+        "tipLength": 85.1,
+        "tipVolume": 1000.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToAddressableAreaForDropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "9024e6ec45206e1cfe185f9585917fbd",
+      "notes": [],
+      "params": {
+        "addressableAreaName": "movableTrashA3",
+        "alternateDropLocation": true,
+        "forceDirect": false,
+        "ignoreTipConfiguration": true,
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "pipetteId": "UUID"
+      },
+      "result": {
+        "position": {
+          "x": 466.25,
+          "y": 364.0,
+          "z": 40.0
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "d3551107b4df537ea7090c3fa0eaee55",
+      "notes": [],
+      "params": {
+        "pipetteId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "b63b101d022392398fc16f186c3712f7",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A10"
+      },
+      "result": {
+        "position": {
+          "x": 259.38,
+          "y": 181.38,
+          "z": 99.0
+        },
+        "tipDiameter": 5.47,
+        "tipLength": 85.1,
+        "tipVolume": 1000.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToAddressableAreaForDropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "da2e9567f8885086e9690fe60698b7cf",
+      "notes": [],
+      "params": {
+        "addressableAreaName": "movableTrashA3",
+        "alternateDropLocation": true,
+        "forceDirect": false,
+        "ignoreTipConfiguration": true,
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "pipetteId": "UUID"
+      },
+      "result": {
+        "position": {
+          "x": 402.25,
+          "y": 364.0,
+          "z": 40.0
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "f6c3bc6e0b4da18342306d1ea4692858",
+      "notes": [],
+      "params": {
+        "pipetteId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "b548f576f283957d2e4065121208d7ef",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A9"
+      },
+      "result": {
+        "position": {
+          "x": 250.38,
+          "y": 181.38,
+          "z": 99.0
+        },
+        "tipDiameter": 5.47,
+        "tipLength": 85.1,
+        "tipVolume": 1000.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToAddressableAreaForDropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "f4683727fcc0d654b28108d4770be5d5",
+      "notes": [],
+      "params": {
+        "addressableAreaName": "movableTrashA3",
+        "alternateDropLocation": true,
+        "forceDirect": false,
+        "ignoreTipConfiguration": true,
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "pipetteId": "UUID"
+      },
+      "result": {
+        "position": {
+          "x": 466.25,
+          "y": 364.0,
+          "z": 40.0
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "73611dce556cab6b8373a89ed030ae5a",
+      "notes": [],
+      "params": {
+        "pipetteId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "5f8c193c3520c29f8a310953d6ba1084",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A8"
+      },
+      "result": {
+        "position": {
+          "x": 241.38,
+          "y": 181.38,
+          "z": 99.0
+        },
+        "tipDiameter": 5.47,
+        "tipLength": 85.1,
+        "tipVolume": 1000.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToAddressableAreaForDropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "3a81a3ab4ebf6d5f94e552e6c52bd33f",
+      "notes": [],
+      "params": {
+        "addressableAreaName": "movableTrashA3",
+        "alternateDropLocation": true,
+        "forceDirect": false,
+        "ignoreTipConfiguration": true,
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "pipetteId": "UUID"
+      },
+      "result": {
+        "position": {
+          "x": 402.25,
+          "y": 364.0,
+          "z": 40.0
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "390145e4e0df0ffa21590dbb6930d70c",
+      "notes": [],
+      "params": {
+        "pipetteId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "926c17e149900b8bcb38ab4bb86d44af",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A7"
+      },
+      "result": {
+        "position": {
+          "x": 232.38,
+          "y": 181.38,
+          "z": 99.0
+        },
+        "tipDiameter": 5.47,
+        "tipLength": 85.1,
+        "tipVolume": 1000.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToAddressableAreaForDropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "68dd3911c773b3d5cc11cc2f54edb1d0",
+      "notes": [],
+      "params": {
+        "addressableAreaName": "movableTrashA3",
+        "alternateDropLocation": true,
+        "forceDirect": false,
+        "ignoreTipConfiguration": true,
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "pipetteId": "UUID"
+      },
+      "result": {
+        "position": {
+          "x": 466.25,
+          "y": 364.0,
+          "z": 40.0
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "d55c43b1e723c192ccae37d55b08849a",
+      "notes": [],
+      "params": {
+        "pipetteId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "c2de17b70d5f71a3808ae2083f978310",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A6"
+      },
+      "result": {
+        "position": {
+          "x": 223.38,
+          "y": 181.38,
+          "z": 99.0
+        },
+        "tipDiameter": 5.47,
+        "tipLength": 85.1,
+        "tipVolume": 1000.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToAddressableAreaForDropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "4c7b7b838e8318c92a361dc1dcba4b27",
+      "notes": [],
+      "params": {
+        "addressableAreaName": "movableTrashA3",
+        "alternateDropLocation": true,
+        "forceDirect": false,
+        "ignoreTipConfiguration": true,
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "pipetteId": "UUID"
+      },
+      "result": {
+        "position": {
+          "x": 402.25,
+          "y": 364.0,
+          "z": 40.0
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "843c43a3876aafa81e3a0fcb8379651a",
+      "notes": [],
+      "params": {
+        "pipetteId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "22169074b8b729b27e317ea53d77c5e8",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A5"
+      },
+      "result": {
+        "position": {
+          "x": 214.38,
+          "y": 181.38,
+          "z": 99.0
+        },
+        "tipDiameter": 5.47,
+        "tipLength": 85.1,
+        "tipVolume": 1000.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToAddressableAreaForDropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "08fabd3cbd8797e1cd94926a6d627f7f",
+      "notes": [],
+      "params": {
+        "addressableAreaName": "movableTrashA3",
+        "alternateDropLocation": true,
+        "forceDirect": false,
+        "ignoreTipConfiguration": true,
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "pipetteId": "UUID"
+      },
+      "result": {
+        "position": {
+          "x": 466.25,
+          "y": 364.0,
+          "z": 40.0
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "cab6d1758a59ac78f8df921d20f0153a",
+      "notes": [],
+      "params": {
+        "pipetteId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "541756ecd5bd8e5d178e00399cec6f58",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A4"
+      },
+      "result": {
+        "position": {
+          "x": 205.38,
+          "y": 181.38,
+          "z": 99.0
+        },
+        "tipDiameter": 5.47,
+        "tipLength": 85.1,
+        "tipVolume": 1000.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToAddressableAreaForDropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "a0fa10db19282c6c7f57de0592c0be42",
+      "notes": [],
+      "params": {
+        "addressableAreaName": "movableTrashA3",
+        "alternateDropLocation": true,
+        "forceDirect": false,
+        "ignoreTipConfiguration": true,
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "pipetteId": "UUID"
+      },
+      "result": {
+        "position": {
+          "x": 402.25,
+          "y": 364.0,
+          "z": 40.0
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "c3e8cefa414fb644973719fe4c73fb39",
+      "notes": [],
+      "params": {
+        "pipetteId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "ce7ef4052e5ef5bbc14cca4f613b2e29",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A3"
+      },
+      "result": {
+        "position": {
+          "x": 196.38,
+          "y": 181.38,
+          "z": 99.0
+        },
+        "tipDiameter": 5.47,
+        "tipLength": 85.1,
+        "tipVolume": 1000.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToAddressableAreaForDropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "9eabb3c7221734f83d3c2d5998708b19",
+      "notes": [],
+      "params": {
+        "addressableAreaName": "movableTrashA3",
+        "alternateDropLocation": true,
+        "forceDirect": false,
+        "ignoreTipConfiguration": true,
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "pipetteId": "UUID"
+      },
+      "result": {
+        "position": {
+          "x": 466.25,
+          "y": 364.0,
+          "z": 40.0
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "350e88c2fea1c74bb2976ffc0bafe67d",
+      "notes": [],
+      "params": {
+        "pipetteId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "6c8d77e97eab26bf43b91400696867e1",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A2"
+      },
+      "result": {
+        "position": {
+          "x": 187.38,
+          "y": 181.38,
+          "z": 99.0
+        },
+        "tipDiameter": 5.47,
+        "tipLength": 85.1,
+        "tipVolume": 1000.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToAddressableAreaForDropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "caaf3f5a2d4693ff69e09667cc2e2aff",
+      "notes": [],
+      "params": {
+        "addressableAreaName": "movableTrashA3",
+        "alternateDropLocation": true,
+        "forceDirect": false,
+        "ignoreTipConfiguration": true,
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "pipetteId": "UUID"
+      },
+      "result": {
+        "position": {
+          "x": 402.25,
+          "y": 364.0,
+          "z": 40.0
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "a0c37d888fff7829513730276eebbd3c",
+      "notes": [],
+      "params": {
+        "pipetteId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    }
+  ],
+  "config": {
+    "apiVersion": [
+      2,
+      18
+    ],
+    "protocolType": "python"
+  },
+  "createdAt": "TIMESTAMP",
+  "errors": [],
+  "files": [
+    {
+      "name": "Flex_S_v2_18_P1000_96_TipTrackingBug.py",
+      "role": "main"
+    }
+  ],
+  "labware": [
+    {
+      "definitionUri": "opentrons/opentrons_flex_96_tiprack_1000ul/1",
+      "id": "UUID",
+      "loadName": "opentrons_flex_96_tiprack_1000ul",
+      "location": {
+        "slotName": "B2"
+      }
+    },
+    {
+      "definitionUri": "opentrons/opentrons_flex_96_tiprack_1000ul/1",
+      "id": "UUID",
+      "loadName": "opentrons_flex_96_tiprack_1000ul",
+      "location": {
+        "slotName": "C2"
+      }
+    }
+  ],
+  "liquids": [],
+  "metadata": {},
+  "modules": [],
+  "pipettes": [
+    {
+      "id": "UUID",
+      "mount": "left",
+      "pipetteName": "p1000_96"
+    }
+  ],
+  "result": "ok",
+  "robotType": "OT-3 Standard",
+  "runTimeParameters": []
+}

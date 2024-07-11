@@ -498,9 +498,9 @@ async def test_execute_undefined_error(
         datetime(year=2023, month=3, day=3),
     )
 
-    decoy.when(error_recovery_policy(matchers.Anything(), None)).then_return(
-        ErrorRecoveryType.WAIT_FOR_RECOVERY
-    )
+    decoy.when(
+        error_recovery_policy(matchers.Anything(), matchers.Anything(), None)
+    ).then_return(ErrorRecoveryType.WAIT_FOR_RECOVERY)
 
     decoy.when(command_note_tracker.get_notes()).then_return(command_notes)
 
@@ -636,6 +636,7 @@ async def test_execute_defined_error(
 
     decoy.when(
         error_recovery_policy(
+            matchers.Anything(),
             matchers.Anything(),
             returned_error,  # type: ignore[arg-type]
         )

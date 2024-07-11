@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import startCase from 'lodash/startCase'
 import { css } from 'styled-components'
+import { useDispatch } from 'react-redux'
 
 import {
   ALIGN_CENTER,
@@ -16,24 +17,27 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   Link,
   POSITION_ABSOLUTE,
+  PrimaryButton,
   SecondaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   useOnClickOutside,
 } from '@opentrons/components'
-
+import { LabwareCreator } from '@opentrons/labware-library'
 import { ERROR_TOAST, SUCCESS_TOAST } from '../../atoms/Toast'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import {
   useTrackEvent,
   ANALYTICS_OPEN_LABWARE_CREATOR_FROM_BOTTOM_OF_LABWARE_LIBRARY_LIST,
 } from '../../redux/analytics'
+import { addCustomLabwareFileFromCreator } from '../../redux/custom-labware'
 import { DropdownMenu } from '../../atoms/MenuList/DropdownMenu'
 import { LabwareCard } from '../../organisms/LabwareCard'
 import { AddCustomLabwareSlideout } from '../../organisms/AddCustomLabwareSlideout'
 import { LabwareDetails } from '../../organisms/LabwareDetails'
 import { useToaster } from '../../organisms/ToasterOven'
+import { useFeatureFlag } from '../../redux/config'
 import { useAllLabware, useLabwareFailure, useNewLabwareName } from './hooks'
 
 import type { DropdownOption } from '../../atoms/MenuList/DropdownMenu'
@@ -73,12 +77,14 @@ const SORT_BY_BUTTON_STYLE = css`
 
 export function Labware(): JSX.Element {
   const { t } = useTranslation(['labware_landing', 'shared'])
-
+  const enableLabwareCreator = useFeatureFlag('enableLabwareCreator')
   const [sortBy, setSortBy] = React.useState<LabwareSort>('alphabetical')
   const [showSortByMenu, setShowSortByMenu] = React.useState<boolean>(false)
   const toggleSetShowSortByMenu = (): void => {
     setShowSortByMenu(!showSortByMenu)
   }
+  const dispatch = useDispatch()
+  const [showLC, setShowLC] = React.useState<boolean>(false)
   const trackEvent = useTrackEvent()
   const [filterBy, setFilterBy] = React.useState<LabwareFilter>('all')
   const { makeToast } = useToaster()
@@ -89,6 +95,7 @@ export function Labware(): JSX.Element {
   const [showAddLabwareSlideout, setShowAddLabwareSlideout] = React.useState(
     false
   )
+
   const [
     currentLabwareDef,
     setCurrentLabwareDef,
@@ -122,6 +129,17 @@ export function Labware(): JSX.Element {
 
   return (
     <>
+      {showLC ? (
+        <LabwareCreator
+          goBack={() => {
+            setShowLC(false)
+          }}
+          save={(file: string) => {
+            dispatch(addCustomLabwareFileFromCreator(file))
+          }}
+          isOnRunApp
+        />
+      ) : null}
       <Box paddingX={SPACING.spacing16} paddingY={SPACING.spacing16}>
         <Flex
           flexDirection={DIRECTION_ROW}
@@ -129,19 +147,30 @@ export function Labware(): JSX.Element {
           alignItems={ALIGN_CENTER}
           paddingBottom={SPACING.spacing24}
         >
-          <StyledText
+          <LegacyStyledText
             as="h1"
             textTransform={TYPOGRAPHY.textTransformCapitalize}
           >
             {t('labware')}
-          </StyledText>
-          <SecondaryButton
-            onClick={() => {
-              setShowAddLabwareSlideout(true)
-            }}
-          >
-            {t('import')}
-          </SecondaryButton>
+          </LegacyStyledText>
+          <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing4}>
+            <SecondaryButton
+              onClick={() => {
+                setShowAddLabwareSlideout(true)
+              }}
+            >
+              {t('import')}
+            </SecondaryButton>
+            {enableLabwareCreator ? (
+              <PrimaryButton
+                onClick={() => {
+                  setShowLC(true)
+                }}
+              >
+                Open Labware Creator
+              </PrimaryButton>
+            ) : null}
+          </Flex>
         </Flex>
         <Flex
           flexDirection={DIRECTION_ROW}
@@ -158,9 +187,9 @@ export function Labware(): JSX.Element {
             title={t('category')}
           />
           <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
-            <StyledText css={TYPOGRAPHY.pSemiBold} color={COLORS.grey50}>
+            <LegacyStyledText css={TYPOGRAPHY.pSemiBold} color={COLORS.grey50}>
               {t('shared:sort_by')}
-            </StyledText>
+            </LegacyStyledText>
             <Flex
               flexDirection={DIRECTION_ROW}
               alignItems={ALIGN_CENTER}
@@ -169,7 +198,7 @@ export function Labware(): JSX.Element {
               css={SORT_BY_BUTTON_STYLE}
               onClick={toggleSetShowSortByMenu}
             >
-              <StyledText
+              <LegacyStyledText
                 css={TYPOGRAPHY.pSemiBold}
                 paddingLeft={SPACING.spacing8}
                 paddingRight={SPACING.spacing4}
@@ -179,7 +208,7 @@ export function Labware(): JSX.Element {
                 {sortBy === 'alphabetical'
                   ? t('shared:alphabetical')
                   : t('shared:reverse')}
-              </StyledText>
+              </LegacyStyledText>
               <Icon
                 paddingRight={SPACING.spacing8}
                 height={TYPOGRAPHY.lineHeight16}
@@ -236,13 +265,13 @@ export function Labware(): JSX.Element {
           alignItems={ALIGN_CENTER}
           marginTop={SPACING.spacing32}
         >
-          <StyledText
+          <LegacyStyledText
             as="p"
             color={COLORS.black90}
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           >
             {t('create_new_def')}
-          </StyledText>
+          </LegacyStyledText>
 
           <Link
             external

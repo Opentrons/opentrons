@@ -5,7 +5,7 @@ import { Flex } from '../../primitives'
 import { ALIGN_CENTER, DIRECTION_ROW } from '../../styles'
 import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { Icon } from '../../icons'
-import { StyledText } from '../StyledText'
+import { LegacyStyledText } from '../StyledText'
 
 import type { IconName } from '../../icons'
 
@@ -102,7 +102,7 @@ export function Tag(props: TagProps): JSX.Element {
           css={ICON_STYLE}
         />
       ) : null}
-      <StyledText css={TEXT_STYLE}>{text}</StyledText>
+      <LegacyStyledText css={TEXT_STYLE}>{text}</LegacyStyledText>
       {iconName != null && iconPosition === 'right' ? (
         <Icon
           name={iconName}

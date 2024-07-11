@@ -1,0 +1,54 @@
+{
+  "commands": [],
+  "config": {
+    "apiVersion": [
+      2,
+      18
+    ],
+    "protocolType": "python"
+  },
+  "createdAt": "TIMESTAMP",
+  "errors": [
+    {
+      "createdAt": "TIMESTAMP",
+      "detail": "ParameterNameError [line 39]: Variable name must be a string.",
+      "errorCode": "4000",
+      "errorInfo": {},
+      "errorType": "ExceptionInProtocolError",
+      "id": "UUID",
+      "isDefined": false,
+      "wrappedErrors": [
+        {
+          "createdAt": "TIMESTAMP",
+          "detail": "opentrons.protocols.parameters.exceptions.ParameterNameError: Variable name must be a string.",
+          "errorCode": "4000",
+          "errorInfo": {
+            "args": "('Variable name must be a string.',)",
+            "class": "ParameterNameError",
+            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line N, in _parse_and_set_parameters\n    exec(\"add_parameters(__param_context)\", new_globs)\n\n  File \"<string>\", line N, in <module>\n\n  File \"Flex_X_v2_18_NO_PIPETTES_Overrides_BadTypesInRTP_Override_wrong_type_in_variable_name.py\", line N, in add_parameters\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/_parameter_context.py\", line N, in add_float\n    parameter = parameter_definition.create_float_parameter(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/parameter_definition.py\", line N, in create_float_parameter\n    return ParameterDefinition(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/parameter_definition.py\", line N, in __init__\n    self._variable_name = validation.ensure_variable_name(variable_name)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/validation.py\", line N, in ensure_variable_name\n    raise ParameterNameError(\"Variable name must be a string.\")\n"
+          },
+          "errorType": "PythonException",
+          "id": "UUID",
+          "isDefined": false,
+          "wrappedErrors": []
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "name": "Flex_X_v2_18_NO_PIPETTES_Overrides_BadTypesInRTP_Override_wrong_type_in_variable_name.py",
+      "role": "main"
+    }
+  ],
+  "labware": [],
+  "liquids": [],
+  "metadata": {
+    "protocolName": "Description Too Long 2.18"
+  },
+  "modules": [],
+  "pipettes": [],
+  "result": "not-ok",
+  "robotType": "OT-3 Standard",
+  "runTimeParameters": []
+}

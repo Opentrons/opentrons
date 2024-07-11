@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 
-import { StyledText } from '@opentrons/components'
+import { LegacyStyledText } from '@opentrons/components'
 
 import { RECOVERY_MAP } from '../constants'
 import { TwoColTextAndFailedStepNextStep } from '../shared'
@@ -49,7 +49,7 @@ export function RetryStepInfo(props: RecoveryContentProps): JSX.Element {
         t={t}
         i18nKey="first_take_any_necessary_actions"
         components={{
-          block: <StyledText as="p" />,
+          block: <LegacyStyledText as="p" />,
         }}
       />
     )

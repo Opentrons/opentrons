@@ -1,9 +1,11 @@
-FROM --platform=linux/amd64 python:3.12-slim
+FROM --platform=linux/amd64 python:3.12.4-slim
 
 ENV PYTHONUNBUFFERED True
 ENV DOCKER_RUNNING True
 
 WORKDIR /code
+
+ARG CACHEBUST=1
 
 COPY ./requirements.txt /code/requirements.txt
 

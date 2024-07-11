@@ -84,6 +84,8 @@ This table lists the correspondence between Protocol API versions and robot soft
 +-------------+------------------------------+
 | API Version | Introduced in Robot Software |
 +=============+==============================+
+|     2.19    |          7.3.1               |
++-------------+------------------------------+
 |     2.18    |          7.3.0               |
 +-------------+------------------------------+
 |     2.17    |          7.2.0               |
@@ -129,6 +131,13 @@ This table lists the correspondence between Protocol API versions and robot soft
 
 Changes in API Versions
 =======================
+
+Version 2.19
+------------
+
+Opentrons recommends updating protocols from ``apiLevel`` 2.18 to 2.19 to take advantage of improved pipetting behavior.
+
+- This version uses new values for how much a tip overlaps with the pipette nozzle when the pipette picks up tips. This can correct errors caused by the robot positioning the tip slightly lower than intended, potentially making contact with labware. See :py:meth:`.pick_up_tip` for additional details.
 
 Version 2.18
 ------------

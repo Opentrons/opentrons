@@ -41,14 +41,16 @@ from opentrons.hardware_control.types import HardwareFeatureFlags
 from opentrons.hardware_control.simulator_setup import load_simulator
 from opentrons.protocol_api.core.engine import ENGINE_CORE_API_VERSION
 from opentrons.protocol_api.protocol_context import ProtocolContext
-from opentrons.protocol_engine import create_protocol_engine
 from opentrons.protocol_engine.create_protocol_engine import (
     create_protocol_engine_in_thread,
+    create_protocol_engine,
 )
+from opentrons.protocol_engine import error_recovery_policy
 from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.types import DeckType, EngineStatus, PostRunHardwareState
 from opentrons.protocol_reader.protocol_source import ProtocolSource
-from opentrons.protocol_runner.protocol_runner import create_protocol_runner
+from opentrons.protocol_runner.protocol_runner import create_protocol_runner, LiveRunner
+from opentrons.protocol_runner import RunOrchestrator
 from opentrons.protocols.duration import DurationEstimator
 from opentrons.protocols.execution import execute
 from opentrons.legacy_broker import LegacyBroker
@@ -797,14 +799,15 @@ def _create_live_context_pe(
 ) -> ProtocolContext:
     """Return a live ProtocolContext that controls the robot through ProtocolEngine."""
     assert api_version >= ENGINE_CORE_API_VERSION
-
+    hardware_api_wrapped = hardware_api.wrapped()
     global _LIVE_PROTOCOL_ENGINE_CONTEXTS
     pe, loop = _LIVE_PROTOCOL_ENGINE_CONTEXTS.enter_context(
         create_protocol_engine_in_thread(
-            hardware_api=hardware_api.wrapped(),
+            hardware_api=hardware_api_wrapped,
             config=_get_protocol_engine_config(
                 robot_type, virtual=use_virtual_hardware
             ),
+            error_recovery_policy=error_recovery_policy.never_recover,
             drop_tips_after_run=False,
             post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
             load_fixed_trash=should_load_fixed_trash_labware_for_python_protocol(
@@ -905,21 +908,38 @@ def _run_file_pe(
     """Run a protocol file with Protocol Engine."""
 
     async def run(protocol_source: ProtocolSource) -> _SimulateResult:
+        hardware_api_wrapped = hardware_api.wrapped()
         protocol_engine = await create_protocol_engine(
-            hardware_api=hardware_api.wrapped(),
+            hardware_api=hardware_api_wrapped,
             config=_get_protocol_engine_config(robot_type, virtual=True),
+            error_recovery_policy=error_recovery_policy.never_recover,
             load_fixed_trash=should_load_fixed_trash(protocol_source.config),
         )
 
         protocol_runner = create_protocol_runner(
             protocol_config=protocol_source.config,
             protocol_engine=protocol_engine,
-            hardware_api=hardware_api.wrapped(),
+            hardware_api=hardware_api_wrapped,
+        )
+
+        orchestrator = RunOrchestrator(
+            hardware_api=hardware_api_wrapped,
+            protocol_engine=protocol_engine,
+            json_or_python_protocol_runner=protocol_runner,
+            fixit_runner=LiveRunner(
+                protocol_engine=protocol_engine, hardware_api=hardware_api_wrapped
+            ),
+            setup_runner=LiveRunner(
+                protocol_engine=protocol_engine, hardware_api=hardware_api_wrapped
+            ),
+            protocol_live_runner=LiveRunner(
+                protocol_engine=protocol_engine, hardware_api=hardware_api_wrapped
+            ),
         )
 
         scraper = _CommandScraper(stack_logger, log_level, protocol_runner.broker)
         with scraper.scrape():
-            result = await protocol_runner.run(
+            result = await orchestrator.run(
                 # deck_configuration=[] is a placeholder value, ignored because
                 # the Protocol Engine config specifies use_simulated_deck_config=True.
                 deck_configuration=[],

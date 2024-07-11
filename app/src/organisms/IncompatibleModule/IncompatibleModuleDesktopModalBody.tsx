@@ -7,7 +7,7 @@ import {
   JUSTIFY_FLEX_START,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   OVERFLOW_SCROLL,
   Icon,
@@ -64,7 +64,7 @@ export function IncompatibleModuleDesktopModalBody({
                   size={SPACING.spacing32}
                   color={COLORS.red50}
                 />
-                <StyledText
+                <LegacyStyledText
                   as="p"
                   key={module.id}
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
@@ -78,14 +78,14 @@ export function IncompatibleModuleDesktopModalBody({
                     }}
                     t={t}
                   />
-                </StyledText>
+                </LegacyStyledText>
               </Flex>
             </li>
           ))}
         </Flex>
-        <StyledText as="p" paddingTop={SPACING.spacing12}>
+        <LegacyStyledText as="p" paddingTop={SPACING.spacing12}>
           <Trans t={t} i18nKey="remove_before_using" />
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
     </InterventionModal>
   )

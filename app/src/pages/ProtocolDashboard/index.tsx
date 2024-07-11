@@ -13,7 +13,7 @@ import {
   POSITION_STATIC,
   POSITION_STICKY,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 import { useAllProtocolsQuery } from '@opentrons/react-api-client'
 
@@ -52,6 +52,7 @@ export function ProtocolDashboard(): JSX.Element {
     setShowDeleteConfirmationModal,
   ] = React.useState<boolean>(false)
   const [targetProtocolId, setTargetProtocolId] = React.useState<string>('')
+  const [isRequiredCSV, setIsRequiredCSV] = React.useState<boolean>(false)
   const sortBy = useSelector(getProtocolsOnDeviceSortKey) ?? 'alphabetical'
   const protocolsData = protocols.data?.data ?? []
   let unpinnedProtocols: ProtocolResource[] = protocolsData
@@ -164,18 +165,19 @@ export function ProtocolDashboard(): JSX.Element {
               flexDirection={DIRECTION_COLUMN}
               marginBottom={SPACING.spacing32}
             >
-              <StyledText
+              <LegacyStyledText
                 as="p"
                 marginBottom={SPACING.spacing8}
                 color={COLORS.grey60}
               >
                 {t('pinned_protocols')}
-              </StyledText>
+              </LegacyStyledText>
               <PinnedProtocolCarousel
                 pinnedProtocols={pinnedProtocols}
                 longPress={setLongPressModalOpened}
                 setShowDeleteConfirmationModal={setShowDeleteConfirmationModal}
                 setTargetProtocolId={setTargetProtocolId}
+                isRequiredCSV={isRequiredCSV}
               />
             </Flex>
           )}
@@ -269,6 +271,7 @@ export function ProtocolDashboard(): JSX.Element {
                         setShowDeleteConfirmationModal
                       }
                       setTargetProtocolId={setTargetProtocolId}
+                      setIsRequiredCSV={setIsRequiredCSV}
                     />
                   )
                 })}

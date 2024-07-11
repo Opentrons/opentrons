@@ -10,7 +10,7 @@ import {
   Icon,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   truncateString,
 } from '@opentrons/components'
 import type { CsvFileParameter, RunTimeParameter } from '@opentrons/shared-data'
@@ -44,7 +44,7 @@ export function FileCard(props: FileCardProps): JSX.Element {
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
       >
-        <StyledText
+        <LegacyStyledText
           as="p"
           css={css`
             overflow: hidden;
@@ -52,7 +52,7 @@ export function FileCard(props: FileCardProps): JSX.Element {
           `}
         >
           {truncateString(fileRunTimeParameter?.file?.file?.name ?? '', 35, 18)}
-        </StyledText>
+        </LegacyStyledText>
         <Flex alignItems={ALIGN_CENTER}>
           <Btn
             data-testid="close_button"
@@ -87,9 +87,9 @@ export function FileCard(props: FileCardProps): JSX.Element {
         </Flex>
       </Flex>
       {error != null ? (
-        <StyledText as="label" color={COLORS.red50}>
+        <LegacyStyledText as="label" color={COLORS.red50}>
           {error}
-        </StyledText>
+        </LegacyStyledText>
       ) : null}
     </Flex>
   )

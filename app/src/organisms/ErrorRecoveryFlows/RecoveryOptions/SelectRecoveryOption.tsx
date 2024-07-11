@@ -6,7 +6,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 import {
@@ -61,9 +61,9 @@ export function SelectRecoveryOptionHome({
   if (isOnDevice) {
     return (
       <RecoverySingleColumnContent>
-        <StyledText css={ODD_SECTION_TITLE_STYLE} as="h4SemiBold">
+        <LegacyStyledText css={ODD_SECTION_TITLE_STYLE} as="h4SemiBold">
           {t('choose_a_recovery_action')}
-        </StyledText>
+        </LegacyStyledText>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
           <RecoveryOptions
             validRecoveryOptions={validRecoveryOptions}

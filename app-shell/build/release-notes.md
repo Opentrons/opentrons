@@ -6,6 +6,18 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
+## Opentrons App Changes in 7.3.1
+
+Welcome to the v7.3.1 release of the Opentrons App!
+
+There are no changes to the Opentrons App in v7.3.1, but it is required for updating the robot software to improve some features.
+
+### Known Issue
+
+- Robots that have completed a run won't appear as available until you clear the run completion notification. This appears as a banner on the protocol run screen in the app, or as a splash screen on the Flex touchscreen.
+
+---
+
 ## Opentrons App Changes in 7.3.0
 
 Welcome to the v7.3.0 release of the Opentrons App! This release adds support for Python protocols with runtime parameters, letting you change the behavior of a protocol each time you run it.

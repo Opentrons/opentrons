@@ -39,8 +39,7 @@ export type UseCreateProtocolMutationOptions = UseMutationOptions<
 
 export function useCreateProtocolMutation(
   options: UseCreateProtocolMutationOptions = {},
-  hostOverride?: HostConfig | null,
-  runTimeParameterValues?: RunTimeParameterCreateData
+  hostOverride?: HostConfig | null
 ): UseCreateProtocolMutationResult {
   const contextHost = useHost()
   const host =
@@ -53,7 +52,7 @@ export function useCreateProtocolMutation(
     CreateProtocolVariables
   >(
     [host, 'protocols'],
-    ({ files: protocolFiles, protocolKey }) =>
+    ({ files: protocolFiles, protocolKey, runTimeParameterValues }) =>
       createProtocol(
         host as HostConfig,
         protocolFiles,

@@ -6,8 +6,10 @@ from datetime import datetime
 
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 from decoy import Decoy
-from typing import Union
+from typing import Union, Generator
 
+from opentrons.protocol_engine.errors import RunStoppedError
+from opentrons.protocol_engine.state import StateStore
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_engine import ProtocolEngine
 from opentrons.protocol_engine.types import PostRunHardwareState
@@ -18,7 +20,11 @@ from opentrons.protocol_reader import (
     PythonProtocolConfig,
     ProtocolSource,
 )
-from opentrons.protocol_runner.run_orchestrator import RunOrchestrator, RunNotFound
+from opentrons.protocol_runner.run_orchestrator import (
+    RunOrchestrator,
+    RunNotFound,
+    ParseMode,
+)
 from opentrons import protocol_runner
 from opentrons.protocol_runner.protocol_runner import (
     JsonRunner,
@@ -202,7 +208,11 @@ async def test_run_calls_protocol_runner(
 ) -> None:
     """Should call protocol runner run method."""
     await subject.run(deck_configuration=[])
-    decoy.verify(await runner.run(deck_configuration=[]))
+    decoy.verify(
+        await runner.run(
+            deck_configuration=[], run_time_param_values=None, protocol_source=None
+        )
+    )
 
 
 async def test_run_calls_protocol_live_runner(
@@ -323,7 +333,11 @@ async def test_load_json(
         config=JsonProtocolConfig(schema_version=6),
         content_hash="abc123",
     )
-    await json_protocol_subject.load_json(protocol_source=protocol_source)
+    await json_protocol_subject.load(
+        protocol_source=protocol_source,
+        run_time_param_values=None,
+        parse_mode=ParseMode.NORMAL,
+    )
 
     decoy.verify(await mock_protocol_json_runner.load(protocol_source))
 
@@ -344,9 +358,9 @@ async def test_load_python(
         config=JsonProtocolConfig(schema_version=6),
         content_hash="abc123",
     )
-    await python_protocol_subject.load_python(
+    await python_protocol_subject.load(
         protocol_source=protocol_source,
-        python_parse_mode=PythonParseMode.NORMAL,
+        parse_mode=ParseMode.NORMAL,
         run_time_param_values=None,
     )
 
@@ -375,29 +389,10 @@ async def test_load_json_raises_no_protocol(
         content_hash="abc123",
     )
     with pytest.raises(AssertionError):
-        await live_protocol_subject.load_json(protocol_source=protocol_source)
-
-
-async def test_load_json_raises_no_runner_match(
-    decoy: Decoy,
-    json_protocol_subject: RunOrchestrator,
-    mock_protocol_engine: ProtocolEngine,
-) -> None:
-    """Should raise that there is no protocol runner."""
-    protocol_source = ProtocolSource(
-        directory=Path("/dev/null"),
-        main_file=Path("/dev/null/abc.json"),
-        files=[],
-        metadata={},
-        robot_type="OT-2 Standard",
-        config=JsonProtocolConfig(schema_version=6),
-        content_hash="abc123",
-    )
-    with pytest.raises(AssertionError):
-        await json_protocol_subject.load_python(
+        await live_protocol_subject.load(
             protocol_source=protocol_source,
-            python_parse_mode=PythonParseMode.NORMAL,
             run_time_param_values=None,
+            parse_mode=ParseMode.NORMAL,
         )
 
 
@@ -494,3 +489,32 @@ async def test_stop(
             post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
         )
     )
+
+
+async def test_command_generator(
+    decoy: Decoy,
+    mock_protocol_engine: ProtocolEngine,
+    live_protocol_subject: RunOrchestrator,
+) -> None:
+    """Should get the next command to execute."""
+
+    def get_next_to_execute() -> Generator[str, None, None]:
+        yield "command-id-1"
+        yield "command-id-2"
+        raise RunStoppedError()
+
+    get_next_to_execute_results = get_next_to_execute()
+
+    mock_state_store = decoy.mock(cls=StateStore)
+    decoy.when(mock_protocol_engine._state_store).then_return(mock_state_store)
+
+    decoy.when(
+        await mock_protocol_engine._state_store.wait_for(
+            condition=mock_protocol_engine.state_view.commands.get_next_to_execute
+        )
+    ).then_do(lambda *args, **kwargs: next(get_next_to_execute_results))
+
+    index = 1
+    async for command in live_protocol_subject.command_generator():
+        assert command == f"command-id-{index}"
+        index = index + 1

@@ -13,7 +13,7 @@ import {
   Flex,
   Icon,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { Divider } from '../../atoms/structure'
@@ -81,9 +81,9 @@ export const ProtocolLiquidsDetails = (
             name="ot-alert"
             aria-label="ProtocolLIquidsDetails_noLiquidsIcon"
           />
-          <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {i18n.format(t('liquids_not_in_protocol'), 'capitalize')}
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
       )}
     </Flex>

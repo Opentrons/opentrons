@@ -9,7 +9,7 @@ import {
   ALIGN_CENTER,
   PrimaryButton,
   SecondaryButton,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 import * as Sessions from '../../../redux/sessions'
@@ -140,9 +140,9 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing8}
         >
-          <StyledText as="h1" marginBottom={SPACING.spacing16}>
+          <LegacyStyledText as="h1" marginBottom={SPACING.spacing16}>
             {t('before_you_begin')}
-          </StyledText>
+          </LegacyStyledText>
 
           {(sessionType === Sessions.SESSION_TYPE_DECK_CALIBRATION ||
             sessionType === Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION) &&

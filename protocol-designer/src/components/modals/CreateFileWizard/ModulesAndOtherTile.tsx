@@ -49,10 +49,17 @@ import {
 import { EquipmentOption } from './EquipmentOption'
 import { HandleEnter } from './HandleEnter'
 
-import type { ModuleModel, PipetteName } from '@opentrons/shared-data'
+import type {
+  ModuleModel,
+  ModuleType,
+  PipetteName,
+} from '@opentrons/shared-data'
 import type { AdditionalEquipment, WizardTileProps } from './types'
 
-const MAX_TEMPERATURE_MODULES = 7
+export const MAX_MOAM_MODULES = 7
+//  limiting 10 instead of 11 to make space for a single default tiprack
+//  to be auto-generated
+export const MAX_MAGNETIC_BLOCKS = 10
 
 export const DEFAULT_SLOT_MAP: { [moduleModel in ModuleModel]?: string } = {
   [THERMOCYCLER_MODULE_V2]: 'B1',
@@ -199,6 +206,11 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
   const enableAbsorbanceReader = useSelector(
     featureFlagSelectors.getEnableAbsorbanceReader
   )
+  const MOAM_MODULE_TYPES: ModuleType[] = [
+    TEMPERATURE_MODULE_TYPE,
+    HEATERSHAKER_MODULE_TYPE,
+    MAGNETIC_BLOCK_TYPE,
+  ]
   const moduleTypesOnDeck =
     modules != null ? Object.values(modules).map(module => module.type) : []
 
@@ -234,16 +246,18 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
           isDisabled = getNumSlotsAvailable(modules, additionalEquipment) <= 1
         }
 
-        const handleMultiplesClick = (num: number): void => {
-          const temperatureModules =
+        const handleMultiplesClick = (
+          num: number,
+          moduleType: ModuleType
+        ): void => {
+          const moamModules =
             modules != null
               ? Object.entries(modules).filter(
-                  ([key, module]) => module.type === TEMPERATURE_MODULE_TYPE
+                  ([key, module]) => module.type === moduleType
                 )
               : []
-
-          if (num > temperatureModules.length) {
-            for (let i = 0; i < num - temperatureModules.length; i++) {
+          if (num > moamModules.length) {
+            for (let i = 0; i < num - moamModules.length; i++) {
               setValue('modules', {
                 ...modules,
                 [uuid()]: {
@@ -253,11 +267,10 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
                 },
               })
             }
-          } else if (num < temperatureModules.length) {
-            const modulesToRemove = temperatureModules.length - num
+          } else if (num < moamModules.length) {
+            const modulesToRemove = moamModules.length - num
             for (let i = 0; i < modulesToRemove; i++) {
-              const lastTempKey =
-                temperatureModules[temperatureModules.length - 1 - i][0]
+              const lastTempKey = moamModules[moamModules.length - 1 - i][0]
               //  @ts-expect-error: TS can't determine modules's type correctly
               const { [lastTempKey]: omit, ...rest } = modules
               setValue('modules', rest)
@@ -266,7 +279,7 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
         }
 
         const handleOnClick = (): void => {
-          if (moduleType !== TEMPERATURE_MODULE_TYPE) {
+          if (!MOAM_MODULE_TYPES.includes(moduleType)) {
             if (isModuleOnDeck) {
               const updatedModules =
                 modules != null
@@ -297,28 +310,30 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
             isSelected={isModuleOnDeck}
             image={<ModuleDiagram type={moduleType} model={moduleModel} />}
             text={getModuleDisplayName(moduleModel)}
-            disabled={
-              moduleType === MAGNETIC_BLOCK_TYPE
-                ? false
-                : isDisabled && !isModuleOnDeck
-            }
+            disabled={isDisabled && !isModuleOnDeck}
             onClick={handleOnClick}
             multiples={
-              moduleType === TEMPERATURE_MODULE_TYPE
+              MOAM_MODULE_TYPES.includes(moduleType)
                 ? {
-                    maxItems: MAX_TEMPERATURE_MODULES,
-                    setValue: handleMultiplesClick,
+                    moduleType,
+                    maxItems:
+                      moduleType === MAGNETIC_BLOCK_TYPE
+                        ? MAX_MAGNETIC_BLOCKS
+                        : MAX_MOAM_MODULES,
+                    setValue: (num: number) => {
+                      handleMultiplesClick(num, moduleType)
+                    },
                     numItems:
                       modules != null
                         ? Object.values(modules).filter(
-                            module => module.type === TEMPERATURE_MODULE_TYPE
+                            module => module.type === moduleType
                           ).length
                         : 0,
                     isDisabled: isDisabled ?? false,
                   }
                 : undefined
             }
-            showCheckbox={moduleType !== TEMPERATURE_MODULE_TYPE}
+            showCheckbox={!MOAM_MODULE_TYPES.includes(moduleType)}
           />
         )
       })}

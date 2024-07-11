@@ -29,9 +29,9 @@ from robot_server.runs.run_models import RunCommandSummary
 
 from ..maintenance_run_models import MaintenanceRunNotFoundError
 from ..maintenance_run_data_manager import MaintenanceRunDataManager
-from ..maintenance_engine_store import MaintenanceEngineStore
+from ..maintenance_run_orchestrator_store import MaintenanceRunOrchestratorStore
 from ..dependencies import (
-    get_maintenance_engine_store,
+    get_maintenance_run_orchestrator_store,
     get_maintenance_run_data_manager,
 )
 from .base_router import RunNotFound
@@ -58,15 +58,17 @@ class CommandNotAllowed(ErrorDetails):
 
 async def get_current_run_from_url(
     runId: str,
-    engine_store: MaintenanceEngineStore = Depends(get_maintenance_engine_store),
+    run_orchestrator_store: MaintenanceRunOrchestratorStore = Depends(
+        get_maintenance_run_orchestrator_store
+    ),
 ) -> str:
     """Get run from url.
 
     Args:
         runId: Run ID to associate the command with.
-        engine_store: Engine store to pull current run ProtocolEngine.
+        run_orchestrator_store: Engine store to pull current run ProtocolEngine.
     """
-    if runId != engine_store.current_run_id:
+    if runId != run_orchestrator_store.current_run_id:
         raise RunNotFound(
             detail=f"Run {runId} not found. "
             f"Note that only one maintenance run can exist at a time."
@@ -106,7 +108,9 @@ async def create_run_command(
             " or when the timeout is reached. See the `timeout` query parameter."
         ),
     ),
-    engine_store: MaintenanceEngineStore = Depends(get_maintenance_engine_store),
+    run_orchestrator_store: MaintenanceRunOrchestratorStore = Depends(
+        get_maintenance_run_orchestrator_store
+    ),
     timeout: Optional[int] = Query(
         default=None,
         gt=0,
@@ -139,7 +143,7 @@ async def create_run_command(
             Else, return immediately. Comes from a query parameter in the URL.
         timeout: The maximum time, in seconds, to wait before returning.
             Comes from a query parameter in the URL.
-        engine_store: The run's `EngineStore` on which the new
+        run_orchestrator_store: The run's `EngineStore` on which the new
             command will be enqueued.
         check_estop: Dependency to verify the estop is in a valid state.
         run_id: Run identification to attach command to.
@@ -151,11 +155,11 @@ async def create_run_command(
 
     # TODO (spp): re-add `RunStoppedError` exception catching if/when maintenance runs
     #  have actions.
-    command = await engine_store.add_command_and_wait_for_interval(
+    command = await run_orchestrator_store.add_command_and_wait_for_interval(
         request=command_create, wait_until_complete=waitUntilComplete, timeout=timeout
     )
 
-    response_data = engine_store.get_command(command.id)
+    response_data = run_orchestrator_store.get_command(command.id)
 
     return await PydanticResponse.create(
         content=SimpleBody.construct(data=response_data),

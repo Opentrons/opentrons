@@ -5,7 +5,7 @@ import {
   Flex,
   DIRECTION_COLUMN,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 import { Command } from '../../../molecules/Command'
@@ -25,7 +25,7 @@ export function FailedStepNextStep({
     return (
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-          <StyledText as="pSemiBold">{t('failed_step')}</StyledText>
+          <LegacyStyledText as="pSemiBold">{t('failed_step')}</LegacyStyledText>
           {failedCommand != null && protocolAnalysis != null ? (
             <Command
               state="failed"
@@ -37,7 +37,7 @@ export function FailedStepNextStep({
           ) : null}
         </Flex>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-          <StyledText as="pSemiBold">{t('next_step')}</StyledText>
+          <LegacyStyledText as="pSemiBold">{t('next_step')}</LegacyStyledText>
           {commandAfterFailedCommand != null && protocolAnalysis != null ? (
             <Command
               state="future"

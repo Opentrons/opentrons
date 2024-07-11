@@ -1,0 +1,54 @@
+{
+  "commands": [],
+  "config": {
+    "apiVersion": [
+      2,
+      18
+    ],
+    "protocolType": "python"
+  },
+  "createdAt": "TIMESTAMP",
+  "errors": [
+    {
+      "createdAt": "TIMESTAMP",
+      "detail": "ParameterValueError [line 23]: Parameter must be between 1 and 3 inclusive.",
+      "errorCode": "4000",
+      "errorInfo": {},
+      "errorType": "ExceptionInProtocolError",
+      "id": "UUID",
+      "isDefined": false,
+      "wrappedErrors": [
+        {
+          "createdAt": "TIMESTAMP",
+          "detail": "opentrons.protocols.parameters.exceptions.ParameterValueError: Parameter must be between 1 and 3 inclusive.",
+          "errorCode": "4000",
+          "errorInfo": {
+            "args": "('Parameter must be between 1 and 3 inclusive.',)",
+            "class": "ParameterValueError",
+            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line N, in _parse_and_set_parameters\n    exec(\"add_parameters(__param_context)\", new_globs)\n\n  File \"<string>\", line N, in <module>\n\n  File \"Flex_X_v2_18_NO_PIPETTES_Overrides_DefaultOutOfRangeRTP_Override_default_greater_than_maximum.py\", line N, in add_parameters\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/_parameter_context.py\", line N, in add_int\n    parameter = parameter_definition.create_int_parameter(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/parameter_definition.py\", line N, in create_int_parameter\n    return ParameterDefinition(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/parameter_definition.py\", line N, in __init__\n    self.value: PrimitiveAllowedTypes = default\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/parameter_definition.py\", line N, in value\n    raise ParameterValueError(\n"
+          },
+          "errorType": "PythonException",
+          "id": "UUID",
+          "isDefined": false,
+          "wrappedErrors": []
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "name": "Flex_X_v2_18_NO_PIPETTES_Overrides_DefaultOutOfRangeRTP_Override_default_greater_than_maximum.py",
+      "role": "main"
+    }
+  ],
+  "labware": [],
+  "liquids": [],
+  "metadata": {
+    "protocolName": "Default not in range"
+  },
+  "modules": [],
+  "pipettes": [],
+  "result": "not-ok",
+  "robotType": "OT-3 Standard",
+  "runTimeParameters": []
+}

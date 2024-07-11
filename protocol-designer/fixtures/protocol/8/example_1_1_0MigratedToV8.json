@@ -6,7 +6,7 @@
     "author": "Author name",
     "description": "Description here",
     "created": 1560957631666,
-    "lastModified": 1718980249011,
+    "lastModified": 1718200660693,
     "category": null,
     "subcategory": null,
     "tags": []
@@ -15,7 +15,7 @@
     "name": "opentrons/protocol-designer",
     "version": "8.1.0",
     "data": {
-      "_internalAppBuildDate": "Fri, 21 Jun 2024 14:25:33 GMT",
+      "_internalAppBuildDate": "Wed, 12 Jun 2024 13:56:36 GMT",
       "defaultValues": {
         "aspirate_mmFromBottom": 1,
         "dispense_mmFromBottom": 1,
@@ -30,10 +30,7 @@
           "opentrons/tipone_96_tiprack_200ul/1"
         ]
       },
-      "dismissedWarnings": {
-        "form": [],
-        "timeline": []
-      },
+      "dismissedWarnings": { "form": [], "timeline": [] },
       "ingredients": {
         "0": {
           "name": "samples",
@@ -50,54 +47,22 @@
       },
       "ingredLocations": {
         "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well": {
-          "A1": {
-            "0": {
-              "volume": 121
-            }
-          },
-          "B1": {
-            "0": {
-              "volume": 121
-            }
-          },
-          "C1": {
-            "0": {
-              "volume": 121
-            }
-          },
-          "D1": {
-            "0": {
-              "volume": 121
-            }
-          },
-          "E1": {
-            "0": {
-              "volume": 121
-            }
-          },
-          "F1": {
-            "1": {
-              "volume": 44
-            }
-          },
-          "G1": {
-            "1": {
-              "volume": 44
-            }
-          },
-          "H1": {
-            "1": {
-              "volume": 44
-            }
-          }
+          "A1": { "0": { "volume": 121 } },
+          "B1": { "0": { "volume": 121 } },
+          "C1": { "0": { "volume": 121 } },
+          "D1": { "0": { "volume": 121 } },
+          "E1": { "0": { "volume": 121 } },
+          "F1": { "1": { "volume": 44 } },
+          "G1": { "1": { "volume": 44 } },
+          "H1": { "1": { "volume": 44 } }
         }
       },
       "savedStepForms": {
         "__INITIAL_DECK_SETUP_STEP__": {
           "labwareLocationUpdate": {
-            "c6f4ec70-92a5-11e9-ac62-1b173f839d9e:tiprack-10ul": "1",
-            "c6f51380-92a5-11e9-ac62-1b173f839d9e:tiprack-200ul": "2",
-            "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well": "10"
+            "c6f4ec70-92a5-11e9-ac62-1b173f839d9e:tiprack-10ul:opentrons/opentrons_96_tiprack_10ul/1": "1",
+            "c6f51380-92a5-11e9-ac62-1b173f839d9e:tiprack-200ul:opentrons/tipone_96_tiprack_200ul/1": "2",
+            "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1": "10"
           },
           "pipetteLocationUpdate": {
             "c6f45030-92a5-11e9-ac62-1b173f839d9e": "left",
@@ -115,7 +80,7 @@
           "path": "single",
           "aspirate_wells_grouped": false,
           "aspirate_flowRate": 0.6,
-          "aspirate_labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+          "aspirate_labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
           "aspirate_wells": ["A1"],
           "aspirate_wellOrder_first": "t2b",
           "aspirate_wellOrder_second": "l2r",
@@ -126,7 +91,7 @@
           "aspirate_touchTip_checkbox": true,
           "aspirate_touchTip_mmFromBottom": 28.5,
           "dispense_flowRate": null,
-          "dispense_labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+          "dispense_labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
           "dispense_wells": [
             "C6",
             "D6",
@@ -149,7 +114,7 @@
           "disposalVolume_checkbox": true,
           "disposalVolume_volume": "1",
           "blowout_checkbox": true,
-          "blowout_location": "9b1c0d01-9d4f-4016-afe6-9e08b46acf5e:trashBin",
+          "blowout_location": "756ef516-7632-4441-901c-31e55bd2816a:trashBin",
           "preWetTip": false,
           "aspirate_airGap_checkbox": false,
           "aspirate_airGap_volume": null,
@@ -161,7 +126,7 @@
           "dispense_delay_checkbox": false,
           "dispense_delay_seconds": "1",
           "dispense_delay_mmFromBottom": "0.5",
-          "dropTip_location": "9b1c0d01-9d4f-4016-afe6-9e08b46acf5e:trashBin",
+          "dropTip_location": "756ef516-7632-4441-901c-31e55bd2816a:trashBin",
           "nozzles": null,
           "dispense_x_position": 0,
           "dispense_y_position": 0,
@@ -177,7 +142,7 @@
         "18113c80-92a6-11e9-ac62-1b173f839d9e": {
           "times": 3,
           "changeTip": "always",
-          "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+          "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
           "mix_wellOrder_first": "t2b",
           "mix_wellOrder_second": "l2r",
           "blowout_checkbox": true,
@@ -194,7 +159,7 @@
           "dispense_delay_seconds": "1",
           "mix_touchTip_checkbox": true,
           "mix_touchTip_mmFromBottom": 30.5,
-          "dropTip_location": "9b1c0d01-9d4f-4016-afe6-9e08b46acf5e:trashBin",
+          "dropTip_location": "756ef516-7632-4441-901c-31e55bd2816a:trashBin",
           "nozzles": null,
           "tipRack": "opentrons/opentrons_96_tiprack_10ul/1",
           "mix_x_position": 0,
@@ -227,10 +192,7 @@
       ]
     }
   },
-  "robot": {
-    "model": "OT-2 Standard",
-    "deckId": "ot2_standard"
-  },
+  "robot": { "model": "OT-2 Standard", "deckId": "ot2_standard" },
   "labwareDefinitionSchemaId": "opentronsLabwareSchemaV2",
   "labwareDefinitions": {
     "opentrons/opentrons_96_tiprack_10ul/1": {
@@ -1246,11 +1208,7 @@
       "namespace": "opentrons",
       "version": 1,
       "schemaVersion": 2,
-      "cornerOffsetFromSlot": {
-        "x": 0,
-        "y": 0,
-        "z": 0
-      }
+      "cornerOffsetFromSlot": { "x": 0, "y": 0, "z": 0 }
     },
     "opentrons/tipone_96_tiprack_200ul/1": {
       "ordering": [
@@ -2263,11 +2221,7 @@
           "metadata": {}
         }
       ],
-      "cornerOffsetFromSlot": {
-        "x": 0,
-        "y": 0,
-        "z": 0
-      }
+      "cornerOffsetFromSlot": { "x": 0, "y": 0, "z": 0 }
     },
     "opentrons/usascientific_96_wellplate_2.4ml_deep/1": {
       "ordering": [
@@ -3364,9 +3318,7 @@
             "G12",
             "H12"
           ],
-          "metadata": {
-            "wellBottomShape": "u"
-          }
+          "metadata": { "wellBottomShape": "u" }
         }
       ],
       "parameters": {
@@ -3379,25 +3331,7 @@
       "namespace": "opentrons",
       "version": 1,
       "schemaVersion": 2,
-      "cornerOffsetFromSlot": {
-        "x": 0,
-        "y": 0,
-        "z": 0
-      },
-      "liquidProbeParameters": {
-        "minimumHeight": [
-          {
-            "value": 0.5,
-            "applicableWells": []
-          }
-        ],
-        "minimumWellVolume": [
-          {
-            "value": 0,
-            "applicableWells": []
-          }
-        ]
-      }
+      "cornerOffsetFromSlot": { "x": 0, "y": 0, "z": 0 }
     }
   },
   "liquidSchemaId": "opentronsLiquidSchemaV1",
@@ -3407,16 +3341,12 @@
       "description": "",
       "displayColor": "#b925ff"
     },
-    "1": {
-      "displayName": "dna",
-      "description": "",
-      "displayColor": "#ffd600"
-    }
+    "1": { "displayName": "dna", "description": "", "displayColor": "#ffd600" }
   },
   "commandSchemaId": "opentronsCommandSchemaV8",
   "commands": [
     {
-      "key": "1b5d62da-72a8-424e-b20a-23559b974fc7",
+      "key": "e88d9578-5b27-4b30-8ccc-4e9d20c7fb74",
       "commandType": "loadPipette",
       "params": {
         "pipetteName": "p10_single",
@@ -3425,7 +3355,7 @@
       }
     },
     {
-      "key": "507b5531-e026-4256-b4dc-a319f8f1c65e",
+      "key": "78be1f0b-0b34-42d1-9cc1-717827621ef3",
       "commandType": "loadPipette",
       "params": {
         "pipetteName": "p50_single",
@@ -3434,63 +3364,53 @@
       }
     },
     {
-      "key": "60c8f5dd-f5e8-428c-a606-6ec408dabe8a",
+      "key": "17dbaf45-4053-41b4-8383-f1a343f28135",
       "commandType": "loadLabware",
       "params": {
         "displayName": "tiprack 10ul (1)",
-        "labwareId": "c6f4ec70-92a5-11e9-ac62-1b173f839d9e:tiprack-10ul",
+        "labwareId": "c6f4ec70-92a5-11e9-ac62-1b173f839d9e:tiprack-10ul:opentrons/opentrons_96_tiprack_10ul/1",
         "loadName": "opentrons_96_tiprack_10ul",
         "namespace": "opentrons",
         "version": 1,
-        "location": {
-          "slotName": "1"
-        }
+        "location": { "slotName": "1" }
       }
     },
     {
-      "key": "17a1d74a-9d0f-4bd6-a7e0-6938b8d54bef",
+      "key": "145d4b57-d2fa-4e35-9979-30f612b13d87",
       "commandType": "loadLabware",
       "params": {
         "displayName": "tiprack 200ul (1)",
-        "labwareId": "c6f51380-92a5-11e9-ac62-1b173f839d9e:tiprack-200ul",
+        "labwareId": "c6f51380-92a5-11e9-ac62-1b173f839d9e:tiprack-200ul:opentrons/tipone_96_tiprack_200ul/1",
         "loadName": "tipone_96_tiprack_200ul",
         "namespace": "opentrons",
         "version": 1,
-        "location": {
-          "slotName": "2"
-        }
+        "location": { "slotName": "2" }
       }
     },
     {
-      "key": "6023a25b-593c-4171-a741-a7c9efe7cc15",
+      "key": "de11d0ac-5ce7-4501-b8c4-2d252c268870",
       "commandType": "loadLabware",
       "params": {
         "displayName": "96 deep well (1)",
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "loadName": "usascientific_96_wellplate_2.4ml_deep",
         "namespace": "opentrons",
         "version": 1,
-        "location": {
-          "slotName": "10"
-        }
+        "location": { "slotName": "10" }
       }
     },
     {
       "commandType": "loadLiquid",
-      "key": "4a653925-dee4-419d-913f-f7b5445b9d0b",
+      "key": "02619748-f892-4748-9596-f821ddff6e15",
       "params": {
         "liquidId": "1",
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
-        "volumeByWell": {
-          "F1": 44,
-          "G1": 44,
-          "H1": 44
-        }
+        "volumeByWell": { "F1": 44, "G1": 44, "H1": 44 }
       }
     },
     {
       "commandType": "loadLiquid",
-      "key": "34ff7969-2951-4a6c-ac4b-0ef4de9b8a30",
+      "key": "ba462279-0d89-43de-b4e8-f15332750465",
       "params": {
         "liquidId": "0",
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
@@ -3505,272 +3425,215 @@
     },
     {
       "commandType": "pickUpTip",
-      "key": "fa849727-c72a-43f5-8ba2-a24d7015514b",
+      "key": "a7ecd51d-6e21-4d77-9580-fe882abf925b",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
-        "labwareId": "c6f4ec70-92a5-11e9-ac62-1b173f839d9e:tiprack-10ul",
+        "labwareId": "c6f4ec70-92a5-11e9-ac62-1b173f839d9e:tiprack-10ul:opentrons/opentrons_96_tiprack_10ul/1",
         "wellName": "A1"
       }
     },
     {
       "commandType": "aspirate",
-      "key": "11fa7020-ec9e-43b4-98f4-a5f60f0e95d1",
+      "key": "e6cf36cc-4ff7-4238-aa43-a40ccb7220ea",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "dispense",
-      "key": "d7840333-7716-423a-b3db-05c4b397e8fe",
+      "key": "bf5b7fa2-57b4-4460-ac12-789fcbdc3e61",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "aspirate",
-      "key": "31c18384-c5a4-456b-a216-74c7f302f2ee",
+      "key": "8172a3b2-0199-4656-8879-46152f7f4aa7",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "dispense",
-      "key": "979e4d07-6329-419a-8688-a34724a8673c",
+      "key": "820e89f0-4214-4f76-be18-3cbf6c26a1e0",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "aspirate",
-      "key": "30cf3ab4-ccf5-4904-95fd-6d2527384249",
+      "key": "25de5082-1ab1-48b7-bc4b-58d9f838c6dc",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "dispense",
-      "key": "8019475e-5d8b-4e98-b253-11fc2a6120de",
+      "key": "244c8dd7-f5a2-47a7-9fa6-69f719ef30b0",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "aspirate",
-      "key": "7b37f89a-80ae-4397-ab5e-a9eb138f5e01",
+      "key": "7588e50b-ff7e-4c9d-9204-a03641aa16a6",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 6,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "touchTip",
-      "key": "0df1f885-8714-4ff9-92be-39d7f330a941",
+      "key": "eb15b3fb-5fc2-4659-a168-0c722e111a7a",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
-        "wellLocation": {
-          "origin": "bottom",
-          "offset": {
-            "z": 28.5
-          }
-        }
+        "wellLocation": { "origin": "bottom", "offset": { "z": 28.5 } }
       }
     },
     {
       "commandType": "dispense",
-      "key": "15336784-aa20-4752-b4d5-b14b5c7f28cd",
+      "key": "24d3bed4-bacf-4bce-9b4c-6b28f7b6fbc5",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 6,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "E8",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 2.5,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "aspirate",
-      "key": "1f05e701-9c13-4e6f-ba97-bb1658ec74e8",
+      "key": "9453c37a-a7c3-467b-b28a-b0abff7c9185",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 3,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "E8",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 2.5,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "dispense",
-      "key": "53829cc2-4a0b-443b-8142-5308aec80d06",
+      "key": "5270cb61-3341-4d1e-abf4-d8f89bb7eb93",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 3,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "E8",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 2.5,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "aspirate",
-      "key": "63dd2e03-3fd4-4f9f-abdf-b0ef9d4c5e12",
+      "key": "452fe139-4c12-4895-970d-87e14d9c0cdf",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 3,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "E8",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 2.5,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "dispense",
-      "key": "6a476f2f-150a-4424-bd4f-80a5652b35cd",
+      "key": "865eba3b-02b6-4ffd-a7c3-b9d464f6536c",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 3,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "E8",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 2.5,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "moveToAddressableArea",
-      "key": "ba0408c2-eae2-4701-8e8e-0a24c7f0502e",
+      "key": "26fbf52a-36dd-4da6-baf4-53dfaa33b7f1",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "addressableAreaName": "fixedTrash",
-        "offset": {
-          "x": 0,
-          "y": 0,
-          "z": 0
-        }
+        "offset": { "x": 0, "y": 0, "z": 0 }
       }
     },
     {
       "commandType": "blowOutInPlace",
-      "key": "abf19d5f-2bc3-4719-a086-0dfebf91976b",
+      "key": "ebb9f1b0-154a-49ee-bf0c-35e16ac49ac6",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "flowRate": 1000
@@ -3778,308 +3641,240 @@
     },
     {
       "commandType": "touchTip",
-      "key": "e313d762-41d3-48fc-bf6f-85e26f081a86",
+      "key": "0cead70f-9586-4527-b006-97d02409b795",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "E8",
-        "wellLocation": {
-          "origin": "bottom",
-          "offset": {
-            "z": 40.3
-          }
-        }
+        "wellLocation": { "origin": "bottom", "offset": { "z": 40.3 } }
       }
     },
     {
       "commandType": "moveToAddressableAreaForDropTip",
-      "key": "caba9464-64b3-4688-ba8f-e815b58647de",
+      "key": "2c6b2309-acda-4207-a921-4da3d5eb6aab",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "addressableAreaName": "fixedTrash",
-        "offset": {
-          "x": 0,
-          "y": 0,
-          "z": 0
-        },
+        "offset": { "x": 0, "y": 0, "z": 0 },
         "alternateDropLocation": true
       }
     },
     {
       "commandType": "dropTipInPlace",
-      "key": "5b1643de-d54d-455f-b46b-db0465de4ba2",
-      "params": {
-        "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e"
-      }
+      "key": "f32165fb-84ad-4f95-baa6-7fa6798e7d7a",
+      "params": { "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e" }
     },
     {
       "commandType": "pickUpTip",
-      "key": "cffd6763-5920-415f-870b-f847ecbf6655",
+      "key": "a9a4a3f9-6324-4277-be01-b94c3d92ea46",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
-        "labwareId": "c6f4ec70-92a5-11e9-ac62-1b173f839d9e:tiprack-10ul",
+        "labwareId": "c6f4ec70-92a5-11e9-ac62-1b173f839d9e:tiprack-10ul:opentrons/opentrons_96_tiprack_10ul/1",
         "wellName": "B1"
       }
     },
     {
       "commandType": "aspirate",
-      "key": "e4a9eeeb-038d-4edc-bba4-a19519d2fec2",
+      "key": "b7c58798-3235-4491-a2b4-cca61d4b08a9",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "dispense",
-      "key": "ad7e45f2-665d-4056-bc6e-b224bd3d88bf",
+      "key": "4bac02bb-146b-493e-b526-347a00a22260",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "aspirate",
-      "key": "cd572598-a6a6-451c-a01d-16b4e7a763ac",
+      "key": "661e7c97-481c-45ff-8af0-29b548ffb130",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "dispense",
-      "key": "a69fbb5f-8561-4449-9bb8-c8d363b9cb4a",
+      "key": "56f5748e-037a-4825-a83f-2eed20c08e26",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "aspirate",
-      "key": "4d4a58d9-b65e-41dd-a355-8ae1cfd00aae",
+      "key": "915bc54a-619f-4424-8276-5852481b8bb9",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "dispense",
-      "key": "bb4d3d6b-78f0-47f6-b354-eb1fb9aeace7",
+      "key": "580214c5-5695-470c-9775-eef55a78b672",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "aspirate",
-      "key": "d9ec07f8-b876-44a6-ae97-4af1cb30a94c",
+      "key": "8adfcd4d-7560-4f8e-b91d-4dc1460f26de",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 6,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "touchTip",
-      "key": "d0172a3b-51ef-4b4d-860d-32040527ba43",
+      "key": "cb27cb03-b7fc-4bc8-8595-f2fd3821c1df",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
-        "wellLocation": {
-          "origin": "bottom",
-          "offset": {
-            "z": 28.5
-          }
-        }
+        "wellLocation": { "origin": "bottom", "offset": { "z": 28.5 } }
       }
     },
     {
       "commandType": "dispense",
-      "key": "0800f491-7770-438e-8da1-d9978f1003dc",
+      "key": "f48d4bdd-27e7-4b93-8adb-36c718bfd5e2",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 6,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "D8",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 2.5,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "aspirate",
-      "key": "ee5f1d0b-225b-44da-aea4-2bf7253aea12",
+      "key": "335a4684-328e-464a-9ca8-713b45951caa",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 3,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "D8",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 2.5,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "dispense",
-      "key": "f668ed77-f06f-4e2b-a6f8-8622fff0362d",
+      "key": "35daf263-f2eb-4edc-828e-3e6b06a7931d",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 3,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "D8",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 2.5,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "aspirate",
-      "key": "765d7bc2-6b32-4472-803a-681067ed416c",
+      "key": "6f3c7e87-e0d3-41c8-a681-cd86cd08618b",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 3,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "D8",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 2.5,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "dispense",
-      "key": "75decc76-5c46-4e3d-b136-96da98f5bf6c",
+      "key": "a9552e8b-c3cd-44a0-ab47-d9b025d51122",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 3,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "D8",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 2.5,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "moveToAddressableArea",
-      "key": "ef3349db-223b-4da9-8c9f-b60fbec57f7b",
+      "key": "42652626-e9b8-4b94-8843-26956bbf38f8",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "addressableAreaName": "fixedTrash",
-        "offset": {
-          "x": 0,
-          "y": 0,
-          "z": 0
-        }
+        "offset": { "x": 0, "y": 0, "z": 0 }
       }
     },
     {
       "commandType": "blowOutInPlace",
-      "key": "66ebd799-2f03-4aa9-a82b-6fe8fc788594",
+      "key": "cdded12c-93af-4124-b5be-c1f0c724d08e",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "flowRate": 1000
@@ -4087,308 +3882,240 @@
     },
     {
       "commandType": "touchTip",
-      "key": "adee18ea-6488-4492-b1e1-06e17483d9ed",
+      "key": "b152f069-2729-4b41-bc62-38c671d85288",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "D8",
-        "wellLocation": {
-          "origin": "bottom",
-          "offset": {
-            "z": 40.3
-          }
-        }
+        "wellLocation": { "origin": "bottom", "offset": { "z": 40.3 } }
       }
     },
     {
       "commandType": "moveToAddressableAreaForDropTip",
-      "key": "d842a9b9-d741-4d26-afad-51c3184e4820",
+      "key": "325c0a62-bf85-4361-ac54-7430538ba83c",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "addressableAreaName": "fixedTrash",
-        "offset": {
-          "x": 0,
-          "y": 0,
-          "z": 0
-        },
+        "offset": { "x": 0, "y": 0, "z": 0 },
         "alternateDropLocation": true
       }
     },
     {
       "commandType": "dropTipInPlace",
-      "key": "e4ca97c4-6b2f-481b-8634-5a30fc533e18",
-      "params": {
-        "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e"
-      }
+      "key": "f01ebf9b-1581-4db9-bd45-e9d08bb860b2",
+      "params": { "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e" }
     },
     {
       "commandType": "pickUpTip",
-      "key": "3cbcc872-57af-471d-9c62-c63cc274dc4c",
+      "key": "92267aca-3cdb-4f0b-8425-fcdb6a8966a2",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
-        "labwareId": "c6f4ec70-92a5-11e9-ac62-1b173f839d9e:tiprack-10ul",
+        "labwareId": "c6f4ec70-92a5-11e9-ac62-1b173f839d9e:tiprack-10ul:opentrons/opentrons_96_tiprack_10ul/1",
         "wellName": "C1"
       }
     },
     {
       "commandType": "aspirate",
-      "key": "d218e231-3056-46b0-b434-4c0bd30fe60d",
+      "key": "f4daf3bb-248d-462d-9a8e-35317229c0c8",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "dispense",
-      "key": "c2dbe82b-1838-45e4-8da8-b23a7b25ce3e",
+      "key": "83a515b5-4656-42c7-be01-418600e15c10",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "aspirate",
-      "key": "6c2b0eeb-5d05-473c-ba3f-3219882719ba",
+      "key": "8a3dd70c-130c-4a29-b372-5d2835ca074b",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "dispense",
-      "key": "1dc330eb-b47f-417d-a721-906ffc5ea98d",
+      "key": "8c4040b4-5bf6-4fee-b32f-4af80dd6f0b0",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "aspirate",
-      "key": "c4591633-b02e-40d7-85fc-3017f7c521da",
+      "key": "89315eb6-53d2-4e2c-bb62-db2d5e81c3e4",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "dispense",
-      "key": "dad9f3c5-83e7-4b98-a781-a42fbc1107e2",
+      "key": "fe0b9024-c1cc-44b1-a69e-fb093583823e",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "aspirate",
-      "key": "0242ba8e-5ad9-47b6-8e9d-5aaa406c15f9",
+      "key": "1b3249e8-db43-429c-94ce-aa62187c75dc",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 6,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "touchTip",
-      "key": "60c38feb-1038-45f1-925c-50b21b8501a7",
+      "key": "7c38cd21-16bc-4380-8b96-a47c9c8fd865",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
-        "wellLocation": {
-          "origin": "bottom",
-          "offset": {
-            "z": 28.5
-          }
-        }
+        "wellLocation": { "origin": "bottom", "offset": { "z": 28.5 } }
       }
     },
     {
       "commandType": "dispense",
-      "key": "f28914de-2128-4c58-bc0d-b5a5d3e5431a",
+      "key": "3d1e4994-3152-4f42-987b-cc1d33d8d3bd",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 6,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "C8",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 2.5,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "aspirate",
-      "key": "c40c221f-a3cb-4ba8-ab99-5d770118f8e3",
+      "key": "06fb34b5-5752-4825-a95b-51458dde1c95",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 3,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "C8",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 2.5,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "dispense",
-      "key": "b8af0543-0f1c-474b-86f3-cf8920254d2a",
+      "key": "9d5e32c3-4128-4d40-b7bb-00be4ee033cb",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 3,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "C8",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 2.5,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "aspirate",
-      "key": "fefd6dbe-31aa-4edd-a0f4-aa6645b05024",
+      "key": "f0e82b14-2d6d-4523-ad25-aeaa7d067d38",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 3,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "C8",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 2.5,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "dispense",
-      "key": "74c6aed0-cd9f-4087-a233-e6f575f02b35",
+      "key": "da15debb-d7e8-4970-961a-07c0250d165c",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 3,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "C8",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 2.5,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "moveToAddressableArea",
-      "key": "93298e58-482a-4122-87d2-f9e07137d85e",
+      "key": "8124634c-d4eb-445a-a1e7-f502a2e0cfaa",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "addressableAreaName": "fixedTrash",
-        "offset": {
-          "x": 0,
-          "y": 0,
-          "z": 0
-        }
+        "offset": { "x": 0, "y": 0, "z": 0 }
       }
     },
     {
       "commandType": "blowOutInPlace",
-      "key": "3acfbf91-867f-4d9c-8f97-a50da01594be",
+      "key": "b3eecc43-e38f-4239-9302-e26876fd6317",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "flowRate": 1000
@@ -4396,308 +4123,240 @@
     },
     {
       "commandType": "touchTip",
-      "key": "268cbc06-d580-490d-9b5c-82f7008d0dae",
+      "key": "83510de2-2360-4622-b844-b59b148c62bd",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "C8",
-        "wellLocation": {
-          "origin": "bottom",
-          "offset": {
-            "z": 40.3
-          }
-        }
+        "wellLocation": { "origin": "bottom", "offset": { "z": 40.3 } }
       }
     },
     {
       "commandType": "moveToAddressableAreaForDropTip",
-      "key": "12d0740c-5a31-4a6a-beed-2af55920d257",
+      "key": "f928fd80-0e33-4c3b-ab16-7ae0c679da98",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "addressableAreaName": "fixedTrash",
-        "offset": {
-          "x": 0,
-          "y": 0,
-          "z": 0
-        },
+        "offset": { "x": 0, "y": 0, "z": 0 },
         "alternateDropLocation": true
       }
     },
     {
       "commandType": "dropTipInPlace",
-      "key": "8dc7e657-22dc-405e-9450-691a6e49480c",
-      "params": {
-        "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e"
-      }
+      "key": "24e85219-6194-4d5e-b07f-5fc73ce20af0",
+      "params": { "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e" }
     },
     {
       "commandType": "pickUpTip",
-      "key": "c9a24fec-489d-4020-a310-e4e988949533",
+      "key": "296c90a4-37ac-48d8-b650-9f7380cb4f98",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
-        "labwareId": "c6f4ec70-92a5-11e9-ac62-1b173f839d9e:tiprack-10ul",
+        "labwareId": "c6f4ec70-92a5-11e9-ac62-1b173f839d9e:tiprack-10ul:opentrons/opentrons_96_tiprack_10ul/1",
         "wellName": "D1"
       }
     },
     {
       "commandType": "aspirate",
-      "key": "fe850ce7-f700-431b-9b9a-e1fa1b3f3b84",
+      "key": "e3f510c6-25cd-4c75-b62d-42e34488d0c2",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "dispense",
-      "key": "6d6e0009-a99a-4e55-abbc-d6d8a2a720ab",
+      "key": "fbe1fdbd-9daf-4e46-b967-c336dd28e428",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "aspirate",
-      "key": "3df5ca3d-c553-4b4d-bd53-302a856e53c3",
+      "key": "a390e437-c143-4d01-9cdc-2791a1d7899c",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "dispense",
-      "key": "3e99e64d-5471-4029-a318-adb061e4256e",
+      "key": "53ac166f-dabe-4837-a4e9-6dbd4d0840ba",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "aspirate",
-      "key": "8a93237d-981d-46c7-a6aa-20af9c90bbd9",
+      "key": "792ef436-63de-49d0-9e7e-4deb26bb1e34",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "dispense",
-      "key": "b165b1f9-ddb4-4030-b7fe-263643713d1d",
+      "key": "0d7f5ac2-ad6d-467d-ab48-af6fe3d648c3",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "aspirate",
-      "key": "4cb7f4c9-98e9-435c-8137-92aab36cde8b",
+      "key": "1b868534-a0e1-41ea-8968-6ede87d3e652",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 6,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "touchTip",
-      "key": "b55f325f-236e-409b-8304-d50f50a6bb59",
+      "key": "d37b309f-fbbb-45b9-a927-fd375a457c0c",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
-        "wellLocation": {
-          "origin": "bottom",
-          "offset": {
-            "z": 28.5
-          }
-        }
+        "wellLocation": { "origin": "bottom", "offset": { "z": 28.5 } }
       }
     },
     {
       "commandType": "dispense",
-      "key": "94f1ca36-ed74-4bd4-9447-a66af634dfcb",
+      "key": "306c1a4d-3968-4a7e-8a55-97b4140abf5e",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 6,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "E7",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 2.5,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "aspirate",
-      "key": "28151295-b16f-4487-a828-1807323a86ed",
+      "key": "1f500ac1-f752-4011-be0f-bb459b48baba",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 3,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "E7",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 2.5,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "dispense",
-      "key": "ce4ddeb2-f07a-4491-b216-dfaaa493883e",
+      "key": "6a95b228-c1ce-4fe7-8d51-b458bce32691",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 3,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "E7",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 2.5,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "aspirate",
-      "key": "cc1fa1b7-581b-4f94-bee8-66f53d2aba06",
+      "key": "9a2acde6-7226-4ecb-b2af-7e436252b5a3",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 3,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "E7",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 2.5,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "dispense",
-      "key": "430a46c1-23f0-4796-9cad-6bc5ebe7d6b3",
+      "key": "cfdd9fa2-ef26-43fa-a6dc-77c0080eae8f",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 3,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "E7",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 2.5,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "moveToAddressableArea",
-      "key": "b6573afb-234c-47a1-b655-86d300059012",
+      "key": "27af1b49-c875-44c1-8f38-26936f156a73",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "addressableAreaName": "fixedTrash",
-        "offset": {
-          "x": 0,
-          "y": 0,
-          "z": 0
-        }
+        "offset": { "x": 0, "y": 0, "z": 0 }
       }
     },
     {
       "commandType": "blowOutInPlace",
-      "key": "cf9595f6-7ed7-4efc-8ea2-751c5ef7efa4",
+      "key": "4e2ebeec-e947-45d8-bfca-51e3229a46ce",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "flowRate": 1000
@@ -4705,308 +4364,240 @@
     },
     {
       "commandType": "touchTip",
-      "key": "681de2d5-10d0-4b49-9189-957e2ae12080",
+      "key": "1d2322d1-dc77-4a70-9281-74da343eeddb",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "E7",
-        "wellLocation": {
-          "origin": "bottom",
-          "offset": {
-            "z": 40.3
-          }
-        }
+        "wellLocation": { "origin": "bottom", "offset": { "z": 40.3 } }
       }
     },
     {
       "commandType": "moveToAddressableAreaForDropTip",
-      "key": "2ced7473-06c9-4fdf-b590-366902ed5ddd",
+      "key": "cd0303a8-2e97-43e4-afb9-f9fbde71b076",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "addressableAreaName": "fixedTrash",
-        "offset": {
-          "x": 0,
-          "y": 0,
-          "z": 0
-        },
+        "offset": { "x": 0, "y": 0, "z": 0 },
         "alternateDropLocation": true
       }
     },
     {
       "commandType": "dropTipInPlace",
-      "key": "cb1b50c7-5bd0-4290-bd87-a7a3530a4d8b",
-      "params": {
-        "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e"
-      }
+      "key": "8cafac21-165c-4a42-b0a1-b843fc3ee535",
+      "params": { "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e" }
     },
     {
       "commandType": "pickUpTip",
-      "key": "69a85e60-eaf5-4c53-80b4-901f57b076d0",
+      "key": "a2dddae1-bafe-4ca1-9a6a-08c661454e59",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
-        "labwareId": "c6f4ec70-92a5-11e9-ac62-1b173f839d9e:tiprack-10ul",
+        "labwareId": "c6f4ec70-92a5-11e9-ac62-1b173f839d9e:tiprack-10ul:opentrons/opentrons_96_tiprack_10ul/1",
         "wellName": "E1"
       }
     },
     {
       "commandType": "aspirate",
-      "key": "69c355d6-1ced-4952-bd0a-46109c4551a0",
+      "key": "54186d69-4388-4f73-b575-6fde65d98b09",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "dispense",
-      "key": "adc9dc34-9ae1-47d5-8562-98f4d67a104e",
+      "key": "cae9d37e-f4a2-4b4e-a7d3-317ce4bb37d9",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "aspirate",
-      "key": "ff16f750-f99d-459d-9efd-d167bbc5bd46",
+      "key": "f9fb7499-a596-46eb-b73e-fbffb48c74a7",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "dispense",
-      "key": "a77a5529-45c0-47ce-9bcf-1be1dac9b5a9",
+      "key": "4ac882f9-60b7-49a9-8de9-88eb7fb6573e",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "aspirate",
-      "key": "cb98ade6-d104-47dc-b140-a0d368d9295e",
+      "key": "3e4cd5eb-c934-4e6c-9066-36fb6abb4b47",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "dispense",
-      "key": "daf9539e-8e91-4223-b6fe-5f75ab0260b3",
+      "key": "0cf40718-fcbc-4321-8fc0-d50bdbf7435b",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "aspirate",
-      "key": "0f094c83-da27-4269-8ff7-4b339047ee05",
+      "key": "75a8e440-21e6-467b-8fec-f36eb80b6906",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 6,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "touchTip",
-      "key": "5cb7aa23-cbe9-43b4-93d5-51731e9a6fd5",
+      "key": "355d5292-3a51-4ea6-aee2-2ec11e60f323",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
-        "wellLocation": {
-          "origin": "bottom",
-          "offset": {
-            "z": 28.5
-          }
-        }
+        "wellLocation": { "origin": "bottom", "offset": { "z": 28.5 } }
       }
     },
     {
       "commandType": "dispense",
-      "key": "58d2452e-360c-4be9-bbee-d27ea970c8d0",
+      "key": "bc716cad-839b-4fb3-8dbd-2e53a37db51b",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 6,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "D7",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 2.5,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "aspirate",
-      "key": "e11c485b-5400-4301-8d19-2f35970e80d3",
+      "key": "f9b4273e-142a-4d67-b990-c18116ab3d39",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 3,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "D7",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 2.5,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "dispense",
-      "key": "3684d3ed-e283-4a31-b9b3-de182b950da5",
+      "key": "6f81ba2d-7686-4c1a-9012-166de0fbac8d",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 3,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "D7",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 2.5,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "aspirate",
-      "key": "850924a1-7425-45b1-920b-85f8afb397e6",
+      "key": "d0515f57-fa3b-43eb-a577-5fe94d5c95fb",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 3,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "D7",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 2.5,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "dispense",
-      "key": "1746dd38-10ee-4e3f-96b7-155e2fe0c302",
+      "key": "49a958e5-b352-4a18-b5dd-b923bd0145da",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 3,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "D7",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 2.5,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "moveToAddressableArea",
-      "key": "27cd8266-797f-46ed-ad8f-636406efc89e",
+      "key": "40bd47e2-3bcd-4aa3-93f0-016216c30d0e",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "addressableAreaName": "fixedTrash",
-        "offset": {
-          "x": 0,
-          "y": 0,
-          "z": 0
-        }
+        "offset": { "x": 0, "y": 0, "z": 0 }
       }
     },
     {
       "commandType": "blowOutInPlace",
-      "key": "9109e5b1-7db4-463f-9e20-a02d6413e936",
+      "key": "60658693-516f-421f-bede-3e0e18e7eb3b",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "flowRate": 1000
@@ -5014,308 +4605,240 @@
     },
     {
       "commandType": "touchTip",
-      "key": "c38e42dc-4a3a-4d8f-bb00-fafcb2fda04c",
+      "key": "e7bc3896-a92f-4cf0-b48b-a568137bbdf0",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "D7",
-        "wellLocation": {
-          "origin": "bottom",
-          "offset": {
-            "z": 40.3
-          }
-        }
+        "wellLocation": { "origin": "bottom", "offset": { "z": 40.3 } }
       }
     },
     {
       "commandType": "moveToAddressableAreaForDropTip",
-      "key": "214ceb8a-0c21-4f3b-bdf9-6f35614c94ee",
+      "key": "d703ba99-9183-4bd4-96bf-cf58d09c4f95",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "addressableAreaName": "fixedTrash",
-        "offset": {
-          "x": 0,
-          "y": 0,
-          "z": 0
-        },
+        "offset": { "x": 0, "y": 0, "z": 0 },
         "alternateDropLocation": true
       }
     },
     {
       "commandType": "dropTipInPlace",
-      "key": "78842571-dfd0-41b6-bb02-7dda9176a301",
-      "params": {
-        "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e"
-      }
+      "key": "7f869579-75ad-4ad4-a2f2-d0ec5114ceea",
+      "params": { "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e" }
     },
     {
       "commandType": "pickUpTip",
-      "key": "83e5adac-b778-4da1-82c3-95b9732ace2d",
+      "key": "f9c03886-f7db-4ab2-813f-a7880f1874ee",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
-        "labwareId": "c6f4ec70-92a5-11e9-ac62-1b173f839d9e:tiprack-10ul",
+        "labwareId": "c6f4ec70-92a5-11e9-ac62-1b173f839d9e:tiprack-10ul:opentrons/opentrons_96_tiprack_10ul/1",
         "wellName": "F1"
       }
     },
     {
       "commandType": "aspirate",
-      "key": "59a722af-b25f-4f06-8588-c63289d26822",
+      "key": "e4c64a21-4c42-49ac-a74d-2cf4714c46c5",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "dispense",
-      "key": "fab1a859-20e1-433d-a5da-6d3d51b57fe9",
+      "key": "b85e9483-9e66-4ca1-ad41-752a5451c59c",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "aspirate",
-      "key": "fd78d534-efff-45a5-903b-64d6d2878a52",
+      "key": "a59e0c7f-b2f9-4b6d-8fb1-6578c1b7f97b",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "dispense",
-      "key": "dc6517cc-25da-4bee-b296-e201c46d6894",
+      "key": "25740cb0-4ee8-4e7d-a6d2-9fe6c22d5113",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "aspirate",
-      "key": "159bdac2-53e9-45f7-b4cc-abe9329ed861",
+      "key": "40c841a0-019a-418b-b61d-f02075a913fa",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "dispense",
-      "key": "620594d5-92b9-462f-837a-ad47ad022c0c",
+      "key": "3ae40c78-b0da-453b-b97f-7cac04202d92",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "aspirate",
-      "key": "9c6f39a2-4340-4f5a-8e49-5b0a9ef4dfc0",
+      "key": "fc69a736-0705-45bc-8edb-8b0987e07f61",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 6,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "touchTip",
-      "key": "20036d1d-fa34-4861-96af-75c64a2e39c7",
+      "key": "58ed0f7a-0aae-439f-9e9d-c8d9c1d401d4",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
-        "wellLocation": {
-          "origin": "bottom",
-          "offset": {
-            "z": 28.5
-          }
-        }
+        "wellLocation": { "origin": "bottom", "offset": { "z": 28.5 } }
       }
     },
     {
       "commandType": "dispense",
-      "key": "9befdd7b-2c0e-4648-9b35-0114b0b73849",
+      "key": "a5bae401-a728-451e-b026-ace6da5ce82e",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 6,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "C7",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 2.5,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "aspirate",
-      "key": "22abd970-be1c-4983-a866-866edaed4ef1",
+      "key": "537c7de1-f8c7-40d8-a3e0-aa82404d0a1f",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 3,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "C7",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 2.5,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "dispense",
-      "key": "ab09a480-c9c8-4636-8bb0-4c0eeac91dae",
+      "key": "15f38e4a-205d-4427-b7db-407ffc8c9f9c",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 3,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "C7",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 2.5,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "aspirate",
-      "key": "1dc3b3cb-50e2-4a1f-9b7f-630f7b0da5b1",
+      "key": "15761a52-dea8-4e97-b235-aacd16371fe9",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 3,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "C7",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 2.5,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "dispense",
-      "key": "a410b0e8-4427-49c0-917e-54734b1d7c0b",
+      "key": "771329bb-bda2-4b8e-8196-ea429a27bc6f",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 3,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "C7",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 2.5,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "moveToAddressableArea",
-      "key": "bc5dc980-7867-4761-b05d-7a37ccbf10b1",
+      "key": "e1e9a42f-9961-4fae-95a3-11e7b6047931",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "addressableAreaName": "fixedTrash",
-        "offset": {
-          "x": 0,
-          "y": 0,
-          "z": 0
-        }
+        "offset": { "x": 0, "y": 0, "z": 0 }
       }
     },
     {
       "commandType": "blowOutInPlace",
-      "key": "5a7890f5-f987-4861-8dcd-a84582a191aa",
+      "key": "d88d149d-a530-483d-ab44-be0664631d16",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "flowRate": 1000
@@ -5323,308 +4846,240 @@
     },
     {
       "commandType": "touchTip",
-      "key": "fb2cd0f4-d8ff-46f5-8b78-db0674862d31",
+      "key": "fb85c3c9-2aab-4500-ae69-c937f024ab76",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "C7",
-        "wellLocation": {
-          "origin": "bottom",
-          "offset": {
-            "z": 40.3
-          }
-        }
+        "wellLocation": { "origin": "bottom", "offset": { "z": 40.3 } }
       }
     },
     {
       "commandType": "moveToAddressableAreaForDropTip",
-      "key": "9afc98a3-3cdc-4bbc-9913-e52ce12ebb2a",
+      "key": "b61ba036-600f-452f-81d3-4ecea6d31cde",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "addressableAreaName": "fixedTrash",
-        "offset": {
-          "x": 0,
-          "y": 0,
-          "z": 0
-        },
+        "offset": { "x": 0, "y": 0, "z": 0 },
         "alternateDropLocation": true
       }
     },
     {
       "commandType": "dropTipInPlace",
-      "key": "14f1222a-ddc5-4f00-9f7c-fa32287e76ca",
-      "params": {
-        "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e"
-      }
+      "key": "c123789f-dded-4855-9776-e4416800daf7",
+      "params": { "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e" }
     },
     {
       "commandType": "pickUpTip",
-      "key": "2f61906c-e3fd-4c2b-9535-87942094757a",
+      "key": "9987a819-e186-411a-8418-6fe5ecdd7f31",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
-        "labwareId": "c6f4ec70-92a5-11e9-ac62-1b173f839d9e:tiprack-10ul",
+        "labwareId": "c6f4ec70-92a5-11e9-ac62-1b173f839d9e:tiprack-10ul:opentrons/opentrons_96_tiprack_10ul/1",
         "wellName": "G1"
       }
     },
     {
       "commandType": "aspirate",
-      "key": "705821bd-acae-4489-b901-e20de36b6ef7",
+      "key": "894cd396-9398-41dc-8a7e-974ec4b4426d",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "dispense",
-      "key": "b535b8f7-0776-408a-b3f0-897ebb01e13f",
+      "key": "54707bad-df03-4e91-84b7-21cc85563db9",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "aspirate",
-      "key": "2784fa66-e15b-49b7-9a7d-6496a5c1a9d8",
+      "key": "43ed7f68-446d-4ee4-a47a-78333639c264",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "dispense",
-      "key": "74c95f4f-7819-455a-a925-2fcae51d9744",
+      "key": "c3514f4d-36a9-4807-a886-2e50fa5885db",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "aspirate",
-      "key": "2ae33761-5cf1-4f7a-8818-f94a76c0084d",
+      "key": "a084925d-acff-4919-8fcd-f472dc43037b",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "dispense",
-      "key": "a6b53d34-c228-4f7f-9c7b-42fd213571d4",
+      "key": "4e4cfa5d-1a7f-4871-afba-139e29e2f37a",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "aspirate",
-      "key": "50f5eed9-9b63-4901-a0d5-c4cd4119e6fc",
+      "key": "8b271083-1396-4b91-af10-2e10ced03f01",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 6,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "touchTip",
-      "key": "5a90314a-7699-4024-9a17-62bde627a596",
+      "key": "af5f0c47-6fe6-47da-adca-c7681e9ec78e",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
-        "wellLocation": {
-          "origin": "bottom",
-          "offset": {
-            "z": 28.5
-          }
-        }
+        "wellLocation": { "origin": "bottom", "offset": { "z": 28.5 } }
       }
     },
     {
       "commandType": "dispense",
-      "key": "8bb55e91-d7c0-46b6-970c-95ec7adf552f",
+      "key": "313d6bb4-11ac-4fc2-a4a0-c390b3568547",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 6,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "E6",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 2.5,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "aspirate",
-      "key": "828667a0-f6ab-40b7-b95b-1c4fd612f0eb",
+      "key": "fd6d7f9d-2482-402a-8a5d-8754dcf9a320",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 3,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "E6",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 2.5,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "dispense",
-      "key": "85ef4214-79f2-49ca-b909-c07582a71827",
+      "key": "59b1015c-e34a-43b3-97d4-cc2d867d0c9b",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 3,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "E6",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 2.5,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "aspirate",
-      "key": "7485df64-b0a4-42de-8015-246407cba32d",
+      "key": "a3d1acc3-7cf8-4d93-90ec-b9f760ba10ca",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 3,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "E6",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 2.5,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "dispense",
-      "key": "924f259d-5d8e-4ac8-a3aa-55b70e3dc5f8",
+      "key": "34e837da-fd19-488b-a0d1-2bec86887a3c",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 3,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "E6",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 2.5,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "moveToAddressableArea",
-      "key": "d40d442a-1ce4-4d0e-87d1-be7bd14f0fe8",
+      "key": "65563f3e-a480-4d08-a010-72982df7e2bc",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "addressableAreaName": "fixedTrash",
-        "offset": {
-          "x": 0,
-          "y": 0,
-          "z": 0
-        }
+        "offset": { "x": 0, "y": 0, "z": 0 }
       }
     },
     {
       "commandType": "blowOutInPlace",
-      "key": "db51e24a-49da-41b0-aee0-e8701a18ce5b",
+      "key": "c8c2b730-35c3-4142-9e0c-f7410c1b976d",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "flowRate": 1000
@@ -5632,308 +5087,240 @@
     },
     {
       "commandType": "touchTip",
-      "key": "1eb233c7-5c66-42bb-b94e-7e62de8ccc6d",
+      "key": "ccba4dc4-b96b-412f-a5b0-1d7bbd37b5bc",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "E6",
-        "wellLocation": {
-          "origin": "bottom",
-          "offset": {
-            "z": 40.3
-          }
-        }
+        "wellLocation": { "origin": "bottom", "offset": { "z": 40.3 } }
       }
     },
     {
       "commandType": "moveToAddressableAreaForDropTip",
-      "key": "354ef896-6834-4cda-b49b-cbf5be5bb866",
+      "key": "40c2cc9d-515d-4ae3-b934-3228ffe1ba47",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "addressableAreaName": "fixedTrash",
-        "offset": {
-          "x": 0,
-          "y": 0,
-          "z": 0
-        },
+        "offset": { "x": 0, "y": 0, "z": 0 },
         "alternateDropLocation": true
       }
     },
     {
       "commandType": "dropTipInPlace",
-      "key": "23118fb7-a2b2-4221-becb-05ac0d49d8c7",
-      "params": {
-        "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e"
-      }
+      "key": "0bc5ae55-64af-45f5-b754-41b2a8bc1be4",
+      "params": { "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e" }
     },
     {
       "commandType": "pickUpTip",
-      "key": "78d8598f-5593-4b7a-9eb7-835b173022e8",
+      "key": "ef50fbaa-e49a-428f-9f68-5cf2f1f98db6",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
-        "labwareId": "c6f4ec70-92a5-11e9-ac62-1b173f839d9e:tiprack-10ul",
+        "labwareId": "c6f4ec70-92a5-11e9-ac62-1b173f839d9e:tiprack-10ul:opentrons/opentrons_96_tiprack_10ul/1",
         "wellName": "H1"
       }
     },
     {
       "commandType": "aspirate",
-      "key": "886f53bf-d850-475e-b7e7-23c8f2715e32",
+      "key": "1cac337a-22d0-42ed-aa8b-6cc247a30778",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "dispense",
-      "key": "4de6a798-81c1-44f2-af37-626d68c8366b",
+      "key": "e996f70f-6e06-45a4-b279-015d3c25a10f",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "aspirate",
-      "key": "00a0bd01-791d-47fd-8652-b10338ca41d7",
+      "key": "aaec7655-9dea-4110-803a-692498472521",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "dispense",
-      "key": "2bad8b28-9a3c-409a-8e9c-aef61aa2a04a",
+      "key": "91526182-e07c-45c5-ab62-c073886ecc63",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "aspirate",
-      "key": "5279cbb8-771e-4064-8295-2528381a0f8c",
+      "key": "46715cd8-6077-45bb-984c-51af91b3957e",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "dispense",
-      "key": "cd1020fc-c00e-43df-bd5f-538772cbf61f",
+      "key": "0226e399-c03c-4b0c-b986-9f1df0209add",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "aspirate",
-      "key": "e2008dd0-4c8c-41cb-b3f7-75c277776f7a",
+      "key": "cd393fc9-085f-422f-bfae-8b0edc80da23",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 6,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "touchTip",
-      "key": "36e0437e-5b7f-4164-a3b0-9cd860a1a01c",
+      "key": "9942ea4e-9184-4690-931a-44afef679d9f",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
-        "wellLocation": {
-          "origin": "bottom",
-          "offset": {
-            "z": 28.5
-          }
-        }
+        "wellLocation": { "origin": "bottom", "offset": { "z": 28.5 } }
       }
     },
     {
       "commandType": "dispense",
-      "key": "c32f0df7-1df0-43c3-8529-2f4e9d482c95",
+      "key": "45f5072a-145c-4a3e-8e5c-eef1fbb26f25",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 6,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "D6",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 2.5,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "aspirate",
-      "key": "46176739-de8a-4cee-8e63-7b38cfcc2383",
+      "key": "c779b1d9-f37c-4efc-841a-4b6d46bec2ca",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 3,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "D6",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 2.5,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "dispense",
-      "key": "ca33fb0b-3197-4f60-ad76-bab5969a1633",
+      "key": "f2a43512-287d-4293-968a-bcd6d257d80a",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 3,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "D6",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 2.5,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "aspirate",
-      "key": "88c3e0e4-9fd3-4cd7-9fa0-acbfb84dba1c",
+      "key": "c5b2be11-639f-49bf-8d27-8c5b00cb1beb",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 3,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "D6",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 2.5,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "dispense",
-      "key": "a927fdad-a685-4363-b09b-9e41388d362a",
+      "key": "8d8bbc97-fdb7-4879-9cf3-906861ad3680",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 3,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "D6",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 2.5,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "moveToAddressableArea",
-      "key": "39b2107d-fdb2-426b-a5f7-7393bbb52dbf",
+      "key": "181934e7-9559-43c8-a234-b9b69f53ee54",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "addressableAreaName": "fixedTrash",
-        "offset": {
-          "x": 0,
-          "y": 0,
-          "z": 0
-        }
+        "offset": { "x": 0, "y": 0, "z": 0 }
       }
     },
     {
       "commandType": "blowOutInPlace",
-      "key": "2494252f-3f9b-486f-b76a-f2610b05cf1c",
+      "key": "8621c4b1-c574-4bf0-9ad9-dfde498ec4f9",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "flowRate": 1000
@@ -5941,308 +5328,240 @@
     },
     {
       "commandType": "touchTip",
-      "key": "acd6dec1-0737-44ee-8435-0f5ce1cf16b3",
+      "key": "7810ea77-112e-4ebf-8113-3b09df2ffce7",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "D6",
-        "wellLocation": {
-          "origin": "bottom",
-          "offset": {
-            "z": 40.3
-          }
-        }
+        "wellLocation": { "origin": "bottom", "offset": { "z": 40.3 } }
       }
     },
     {
       "commandType": "moveToAddressableAreaForDropTip",
-      "key": "038081f2-05b9-4907-ade3-8d6a865195cc",
+      "key": "ea1ae0ab-5b10-4ff9-9b73-825896835fdd",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "addressableAreaName": "fixedTrash",
-        "offset": {
-          "x": 0,
-          "y": 0,
-          "z": 0
-        },
+        "offset": { "x": 0, "y": 0, "z": 0 },
         "alternateDropLocation": true
       }
     },
     {
       "commandType": "dropTipInPlace",
-      "key": "3cb0c40a-8a46-4878-bdbe-3757db5f5916",
-      "params": {
-        "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e"
-      }
+      "key": "ab102ce0-c0e8-457e-95a9-7a278f370bb3",
+      "params": { "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e" }
     },
     {
       "commandType": "pickUpTip",
-      "key": "b44a33a3-f911-4324-a1c0-232c95df403e",
+      "key": "ffd53981-4b91-4c75-8e86-403578c8a366",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
-        "labwareId": "c6f4ec70-92a5-11e9-ac62-1b173f839d9e:tiprack-10ul",
+        "labwareId": "c6f4ec70-92a5-11e9-ac62-1b173f839d9e:tiprack-10ul:opentrons/opentrons_96_tiprack_10ul/1",
         "wellName": "A2"
       }
     },
     {
       "commandType": "aspirate",
-      "key": "d33d0e7b-ae8d-4d14-8913-2f7900f6cc83",
+      "key": "55b20d0d-7fa3-47b7-ac33-769a31667785",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "dispense",
-      "key": "16e06780-44b7-4f6a-aa17-250b9c2e0c47",
+      "key": "4fde7d1a-6e00-49b9-b8b6-102652fb8068",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "aspirate",
-      "key": "0bc5693b-6727-4ac8-a18e-a0a17dea6544",
+      "key": "9e77c484-bf33-4a58-82c2-d1684b1da606",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "dispense",
-      "key": "04907d83-c15d-4aba-8520-633559075ea9",
+      "key": "cf8941bd-b164-4f86-89de-0a82685a618f",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "aspirate",
-      "key": "e00d3877-4b0c-4d5f-9e7e-7bfd5cfa133c",
+      "key": "d17bf303-1712-4ea1-931c-c00db1088fbe",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "dispense",
-      "key": "fa9b4eba-c9e2-4e9c-be05-5f2d52303de3",
+      "key": "8a02a18a-ed6e-4e4f-a392-17894b9bae3f",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 2,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "aspirate",
-      "key": "c73fb6d5-65d7-49f0-9de6-5f477df8f438",
+      "key": "b1d9d0bd-2c1f-42c7-b6f3-a1f6f6314e51",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 6,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 1,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "touchTip",
-      "key": "8fa5530b-d555-46e1-992d-663abe4c9a20",
+      "key": "cc2eddcd-e96a-4d19-a3fc-d6b9e27f2402",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "A1",
-        "wellLocation": {
-          "origin": "bottom",
-          "offset": {
-            "z": 28.5
-          }
-        }
+        "wellLocation": { "origin": "bottom", "offset": { "z": 28.5 } }
       }
     },
     {
       "commandType": "dispense",
-      "key": "621a15c3-ad5e-452f-bff1-283a9d97c870",
+      "key": "97fc8bf9-7e12-4f80-ac62-da65666764a3",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 6,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "C6",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 2.5,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "aspirate",
-      "key": "595ccf2c-3ec5-4df9-a8c5-96aa661d3188",
+      "key": "19bbf6b5-23da-411a-88cf-71c545989192",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 3,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "C6",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 2.5,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "dispense",
-      "key": "c9cc6d7a-7338-441c-9413-93d8d4de7d65",
+      "key": "c2286eb2-fc00-4f3a-88cd-c55745f1b5a0",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 3,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "C6",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 2.5,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "aspirate",
-      "key": "363936c9-679f-4361-b8b1-31e8a9451077",
+      "key": "a2a3306e-149d-4b70-aadf-97aef4dfecb8",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 3,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "C6",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 2.5,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
         },
         "flowRate": 0.6
       }
     },
     {
       "commandType": "dispense",
-      "key": "02e21f28-cee6-4b9a-b796-6c761170b7e3",
+      "key": "a26b75dc-fbc2-45c7-87a3-33a7fe0b8dec",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 3,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "C6",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 2.5,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
         },
         "flowRate": 10
       }
     },
     {
       "commandType": "moveToAddressableArea",
-      "key": "4ba99918-0a0a-4da5-a2e2-e708f9d5eb64",
+      "key": "68d84f24-b345-4d82-92de-df51e81392e6",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "addressableAreaName": "fixedTrash",
-        "offset": {
-          "x": 0,
-          "y": 0,
-          "z": 0
-        }
+        "offset": { "x": 0, "y": 0, "z": 0 }
       }
     },
     {
       "commandType": "blowOutInPlace",
-      "key": "1c285d40-6c7c-409f-8076-6a4e08240b4c",
+      "key": "fd2ead1b-7aa7-484e-949e-9316b44dbf0c",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "flowRate": 1000
@@ -6250,222 +5569,174 @@
     },
     {
       "commandType": "touchTip",
-      "key": "05ace09f-d343-48d8-a373-ba2448465b9c",
+      "key": "d2000644-51ea-4259-b73e-50f4d69b5735",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "C6",
-        "wellLocation": {
-          "origin": "bottom",
-          "offset": {
-            "z": 40.3
-          }
-        }
+        "wellLocation": { "origin": "bottom", "offset": { "z": 40.3 } }
       }
     },
     {
       "commandType": "moveToAddressableAreaForDropTip",
-      "key": "1be4af87-3ca1-471a-a321-0e8495cdbf4f",
+      "key": "9cdcbf02-6bb4-4e87-908f-b6b61de85343",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "addressableAreaName": "fixedTrash",
-        "offset": {
-          "x": 0,
-          "y": 0,
-          "z": 0
-        },
+        "offset": { "x": 0, "y": 0, "z": 0 },
         "alternateDropLocation": true
       }
     },
     {
       "commandType": "dropTipInPlace",
-      "key": "845e81d4-1593-4157-a182-41314f05c325",
-      "params": {
-        "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e"
-      }
+      "key": "f13c7e33-55e9-4228-a613-f1e66b5b49af",
+      "params": { "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e" }
     },
     {
       "commandType": "pickUpTip",
-      "key": "4e02a922-9a6c-45d3-9640-bfbf0a6e4ef4",
+      "key": "005a3cf6-8756-4c57-a805-534caa9cd5ed",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
-        "labwareId": "c6f4ec70-92a5-11e9-ac62-1b173f839d9e:tiprack-10ul",
+        "labwareId": "c6f4ec70-92a5-11e9-ac62-1b173f839d9e:tiprack-10ul:opentrons/opentrons_96_tiprack_10ul/1",
         "wellName": "B2"
       }
     },
     {
       "commandType": "aspirate",
-      "key": "cb6aa500-359a-43da-aad6-2af78e70673e",
+      "key": "5052b45c-ea8b-437f-80db-429f8d276359",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 5.5,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "F1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 0.5,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 0.5, "x": 0, "y": 0 }
         },
         "flowRate": 8
       }
     },
     {
       "commandType": "dispense",
-      "key": "582f8c80-7418-4d4b-8f10-d7b268721f51",
+      "key": "e22cacfa-1d07-4d3c-93c0-a32f7500d81f",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 5.5,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "F1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 0.5,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 0.5, "x": 0, "y": 0 }
         },
         "flowRate": 7
       }
     },
     {
       "commandType": "aspirate",
-      "key": "f09ea53f-a943-4cad-8046-d68739be9913",
+      "key": "e78794bb-a16a-441b-babb-8e31cb2a3685",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 5.5,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "F1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 0.5,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 0.5, "x": 0, "y": 0 }
         },
         "flowRate": 8
       }
     },
     {
       "commandType": "dispense",
-      "key": "c3ff80b8-4334-4277-9371-5533d6d0aae7",
+      "key": "a4722827-a605-4b8d-8875-e2c368c0d807",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 5.5,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "F1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 0.5,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 0.5, "x": 0, "y": 0 }
         },
         "flowRate": 7
       }
     },
     {
       "commandType": "aspirate",
-      "key": "0a6cfd79-a5bc-4d24-a61d-c67fdd126a27",
+      "key": "218ce3cf-c6a5-441a-998d-d90c679a6737",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 5.5,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "F1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 0.5,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 0.5, "x": 0, "y": 0 }
         },
         "flowRate": 8
       }
     },
     {
       "commandType": "dispense",
-      "key": "1713a45c-dc9d-4785-a496-f0b081763f48",
+      "key": "2b873cb7-ae25-4ac3-b435-f603d318831c",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 5.5,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "F1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": {
-            "z": 0.5,
-            "x": 0,
-            "y": 0
-          }
+          "offset": { "z": 0.5, "x": 0, "y": 0 }
         },
         "flowRate": 7
       }
     },
     {
-      "commandType": "blowout",
-      "key": "7c60c859-ab94-4c2d-a2fa-ad83e49e84c4",
+      "commandType": "moveToAddressableArea",
+      "key": "4a2e696e-b591-458c-85ef-1e07cd83f289",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
-        "wellName": "A1",
-        "flowRate": 1000,
-        "wellLocation": {
-          "origin": "top",
-          "offset": {
-            "z": 0
-          }
-        }
+        "addressableAreaName": "fixedTrash",
+        "offset": { "x": 0, "y": 0, "z": 0 }
+      }
+    },
+    {
+      "commandType": "blowOutInPlace",
+      "key": "884876d1-8a0f-48e2-ba59-bd0b6de5aace",
+      "params": {
+        "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+        "flowRate": 1000
       }
     },
     {
       "commandType": "touchTip",
-      "key": "4445c173-2ac6-4d98-93da-04303b13618d",
+      "key": "72e18358-9e53-49b6-b0db-936546ea0ae7",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
         "wellName": "F1",
-        "wellLocation": {
-          "origin": "bottom",
-          "offset": {
-            "z": 30.5
-          }
-        }
+        "wellLocation": { "origin": "bottom", "offset": { "z": 30.5 } }
       }
     },
     {
       "commandType": "moveToAddressableAreaForDropTip",
-      "key": "3efd4b7e-6227-49ea-8490-bf70ffeb83de",
+      "key": "78d8d81c-4d60-49c5-9fec-6bce14925e57",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "addressableAreaName": "fixedTrash",
-        "offset": {
-          "x": 0,
-          "y": 0,
-          "z": 0
-        },
+        "offset": { "x": 0, "y": 0, "z": 0 },
         "alternateDropLocation": true
       }
     },
     {
       "commandType": "dropTipInPlace",
-      "key": "7429c639-19c3-43ef-b75d-ceb01948d762",
-      "params": {
-        "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e"
-      }
+      "key": "18b4cb99-dcbf-4d07-8653-312a0e2a831c",
+      "params": { "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e" }
     },
     {
       "commandType": "waitForDuration",
-      "key": "ead761ab-cf50-43de-87ef-5e5e174701b6",
-      "params": {
-        "seconds": 3723,
-        "message": "Delay plz"
-      }
+      "key": "31de1fda-2aca-46b2-b1d8-8e1974b4c175",
+      "params": { "seconds": 3723, "message": "Delay plz" }
     }
   ],
   "commandAnnotationSchemaId": "opentronsCommandAnnotationSchemaV1",

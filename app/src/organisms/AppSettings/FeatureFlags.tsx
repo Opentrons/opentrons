@@ -7,7 +7,7 @@ import {
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { Divider } from '../../atoms/structure'
@@ -37,13 +37,13 @@ export function FeatureFlags(): JSX.Element {
             alignItems={ALIGN_CENTER}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
           >
-            <StyledText
+            <LegacyStyledText
               as="h3"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               id={`FeatureFlags_${flag}_text`}
             >
               {t(`__dev_internal__${flag}`)}
-            </StyledText>
+            </LegacyStyledText>
             <ToggleButton
               label={`${flag}-toggle`}
               toggledOn={Boolean(devInternalFlags?.[flag])}

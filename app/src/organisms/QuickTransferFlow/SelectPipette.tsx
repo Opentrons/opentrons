@@ -3,13 +3,13 @@ import { useTranslation } from 'react-i18next'
 import {
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { getPipetteSpecsV2, RIGHT, LEFT } from '@opentrons/shared-data'
-import { LargeButton } from '../../atoms/buttons'
+import { RadioButton } from '../../atoms/buttons'
 import { ChildNavigation } from '../ChildNavigation'
 
 import type { PipetteData, Mount } from '@opentrons/api-client'
@@ -82,34 +82,36 @@ export function SelectPipette(props: SelectPipetteProps): JSX.Element {
         padding={`${SPACING.spacing16} ${SPACING.spacing60} ${SPACING.spacing40} ${SPACING.spacing60}`}
         gridGap={SPACING.spacing4}
       >
-        <StyledText
+        <LegacyStyledText
           css={TYPOGRAPHY.level4HeaderRegular}
           paddingBottom={SPACING.spacing8}
         >
           {t('pipette_currently_attached')}
-        </StyledText>
+        </LegacyStyledText>
         {leftPipetteSpecs != null ? (
-          <LargeButton
-            buttonType={selectedPipette === LEFT ? 'primary' : 'secondary'}
-            onClick={() => {
+          <RadioButton
+            isSelected={selectedPipette === LEFT}
+            onChange={() => {
               setSelectedPipette(LEFT)
             }}
-            buttonText={
+            buttonValue={LEFT}
+            buttonLabel={
               leftPipetteSpecs.channels === 96
                 ? t('both_mounts')
                 : t('left_mount')
             }
-            subtext={leftPipetteSpecs.displayName}
+            subButtonLabel={leftPipetteSpecs.displayName}
           />
         ) : null}
         {rightPipetteSpecs != null ? (
-          <LargeButton
-            buttonType={selectedPipette === RIGHT ? 'primary' : 'secondary'}
-            onClick={() => {
+          <RadioButton
+            isSelected={selectedPipette === RIGHT}
+            onChange={() => {
               setSelectedPipette(RIGHT)
             }}
-            buttonText={t('right_mount')}
-            subtext={rightPipetteSpecs.displayName}
+            buttonValue={RIGHT}
+            buttonLabel={t('right_mount')}
+            subButtonLabel={rightPipetteSpecs.displayName}
           />
         ) : null}
       </Flex>

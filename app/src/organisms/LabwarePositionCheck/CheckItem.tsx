@@ -5,7 +5,7 @@ import { Trans, useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
   Flex,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { RobotMotionLoader } from './RobotMotionLoader'
@@ -165,7 +165,10 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
       tOptions={{ labware: labwareDisplayName, location: displayLocation }}
       components={{
         bold: (
-          <StyledText as="span" fontWeight={TYPOGRAPHY.fontWeightSemiBold} />
+          <LegacyStyledText
+            as="span"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          />
         ),
       }}
     />
@@ -179,7 +182,10 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
         tOptions={{ tip_rack: labwareDisplayName, location: displayLocation }}
         components={{
           bold: (
-            <StyledText as="span" fontWeight={TYPOGRAPHY.fontWeightSemiBold} />
+            <LegacyStyledText
+              as="span"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            />
           ),
         }}
       />
@@ -201,7 +207,10 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
         }}
         components={{
           bold: (
-            <StyledText as="span" fontWeight={TYPOGRAPHY.fontWeightSemiBold} />
+            <LegacyStyledText
+              as="span"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            />
           ),
         }}
       />
@@ -454,7 +463,10 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
                   ? t('check_tip_location')
                   : t('check_well_location'),
               }}
-              components={{ block: <StyledText as="p" />, bold: <strong /> }}
+              components={{
+                block: <LegacyStyledText as="p" />,
+                bold: <strong />,
+              }}
             />
           }
           labwareDef={labwareDef}

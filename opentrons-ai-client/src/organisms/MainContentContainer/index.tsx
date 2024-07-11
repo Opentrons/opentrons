@@ -9,7 +9,7 @@ import {
   Flex,
   OVERFLOW_AUTO,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 import { PromptGuide } from '../../molecules/PromptGuide'
 import { ChatDisplay } from '../../molecules/ChatDisplay'
@@ -51,7 +51,7 @@ export function MainContentContainer(): JSX.Element {
       >
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
           {/* Prompt Guide remain as a reference for users. */}
-          <StyledText>{t('opentronsai')}</StyledText>
+          <LegacyStyledText>{t('opentronsai')}</LegacyStyledText>
           <PromptGuide />
         </Flex>
         <ChatDataContainer>

@@ -10,7 +10,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING_AUTO,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
@@ -69,16 +69,16 @@ export function UpdateRobotSoftware({
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
       <Box width="70%">
-        <StyledText
+        <LegacyStyledText
           css={TYPOGRAPHY.pSemiBold}
           marginBottom={SPACING.spacing8}
           id="AdvancedSettings_updateRobotSoftware"
         >
           {t('update_robot_software')}
-        </StyledText>
-        <StyledText as="p" marginBottom={SPACING.spacing8}>
+        </LegacyStyledText>
+        <LegacyStyledText as="p" marginBottom={SPACING.spacing8}>
           {t('branded:update_robot_software_description')}
-        </StyledText>
+        </LegacyStyledText>
         <ExternalLink href={OT_APP_UPDATE_PAGE_LINK}>
           {t('branded:update_robot_software_link')}
         </ExternalLink>

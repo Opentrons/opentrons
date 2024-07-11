@@ -6,7 +6,7 @@ import { useRecoveryTipStatus } from './useRecoveryTipStatus'
 import { useRecoveryRouting } from './useRecoveryRouting'
 import { useFailedLabwareUtils } from './useFailedLabwareUtils'
 import { getFailedCommandPipetteInfo, getNextStep } from '../utils'
-import { useRecoveryMapUtils } from './useRecoveryMapUtils'
+import { useDeckMapUtils } from './useDeckMapUtils'
 import {
   useNotifyAllCommandsQuery,
   useNotifyRunQuery,
@@ -21,7 +21,7 @@ import type { UseRouteUpdateActionsResult } from './useRouteUpdateActions'
 import type { UseRecoveryCommandsResult } from './useRecoveryCommands'
 import type { RecoveryTipStatusUtils } from './useRecoveryTipStatus'
 import type { UseFailedLabwareUtilsResult } from './useFailedLabwareUtils'
-import type { UseRecoveryMapUtilsResult } from './useRecoveryMapUtils'
+import type { UseDeckMapUtilsResult } from './useDeckMapUtils'
 import type { CurrentRecoveryOptionUtils } from './useRecoveryRouting'
 import type { StepCounts } from '../../../resources/protocols/hooks'
 
@@ -37,7 +37,7 @@ export interface ERUtilsResults {
   recoveryCommands: UseRecoveryCommandsResult
   tipStatusUtils: RecoveryTipStatusUtils
   failedLabwareUtils: UseFailedLabwareUtilsResult
-  recoveryMapUtils: UseRecoveryMapUtilsResult
+  deckMapUtils: UseDeckMapUtilsResult
   getRecoveryOptionCopy: ReturnType<typeof useRecoveryOptionCopy>
   failedPipetteInfo: PipetteData | null
   hasLaunchedRecovery: boolean
@@ -109,7 +109,7 @@ export function useERUtils({
     routeUpdateActions,
   })
 
-  const recoveryMapUtils = useRecoveryMapUtils({
+  const deckMapUtils = useDeckMapUtils({
     runId,
     runRecord,
     protocolAnalysis,
@@ -133,7 +133,7 @@ export function useERUtils({
     tipStatusUtils,
     failedLabwareUtils,
     failedPipetteInfo,
-    recoveryMapUtils,
+    deckMapUtils,
     getRecoveryOptionCopy,
     stepCounts,
     commandAfterFailedCommand,

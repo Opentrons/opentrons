@@ -11,7 +11,7 @@ from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset
 from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.util import APIVersionError
+from opentrons.protocols.api_support.util import UnsupportedAPIError
 from opentrons.types import Point
 
 from opentrons.protocol_api._liquid import Liquid
@@ -164,7 +164,7 @@ def test_has_tip(
 
 def test_set_has_tip(subject: WellCore) -> None:
     """Trying to set the has tip state should raise an error."""
-    with pytest.raises(APIVersionError):
+    with pytest.raises(UnsupportedAPIError):
         subject.set_has_tip(True)
 
 

@@ -1354,13 +1354,14 @@ class OT3Controller(FlexBackend):
     async def liquid_probe(
         self,
         mount: OT3Mount,
-        max_z_distance: float,
+        max_p_distance: float,
         mount_speed: float,
         plunger_speed: float,
         threshold_pascals: float,
         output_option: OutputOptions = OutputOptions.can_bus_only,
         data_files: Optional[Dict[InstrumentProbeType, str]] = None,
         probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
+        force_both_sensors: bool = False,
     ) -> float:
         if output_option == OutputOptions.sync_buffer_to_csv:
             if (
@@ -1394,7 +1395,7 @@ class OT3Controller(FlexBackend):
             messenger=self._messenger,
             tool=tool,
             head_node=head_node,
-            max_z_distance=max_z_distance,
+            max_p_distance=max_p_distance,
             plunger_speed=plunger_speed,
             mount_speed=mount_speed,
             threshold_pascals=threshold_pascals,
@@ -1403,6 +1404,7 @@ class OT3Controller(FlexBackend):
             can_bus_only_output=can_bus_only_output,
             data_files=data_files_transposed,
             sensor_id=sensor_id_for_instrument(probe),
+            force_both_sensors=force_both_sensors,
         )
         for node, point in positions.items():
             self._position.update({node: point.motor_position})

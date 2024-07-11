@@ -1,12 +1,9 @@
 """ProtocolEngine class definition."""
 from contextlib import AsyncExitStack
 from logging import getLogger
-from typing import Dict, Optional, Union
+from typing import Dict, Optional, Union, AsyncGenerator, Callable
 from opentrons.protocol_engine.actions.actions import ResumeFromRecoveryAction
-from opentrons.protocol_engine.error_recovery_policy import (
-    ErrorRecoveryPolicy,
-    error_recovery_by_ff,
-)
+from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
 
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control import HardwareControlAPI
@@ -86,6 +83,7 @@ class ProtocolEngine:
         self,
         hardware_api: HardwareControlAPI,
         state_store: StateStore,
+        error_recovery_policy: ErrorRecoveryPolicy,
         action_dispatcher: Optional[ActionDispatcher] = None,
         plugin_starter: Optional[PluginStarter] = None,
         queue_worker: Optional[QueueWorker] = None,
@@ -93,7 +91,6 @@ class ProtocolEngine:
         hardware_stopper: Optional[HardwareStopper] = None,
         door_watcher: Optional[DoorWatcher] = None,
         module_data_provider: Optional[ModuleDataProvider] = None,
-        error_recovery_policy: ErrorRecoveryPolicy = error_recovery_by_ff,
     ) -> None:
         """Initialize a ProtocolEngine instance.
 
@@ -105,19 +102,13 @@ class ProtocolEngine:
         self._hardware_api = hardware_api
         self._state_store = state_store
         self._model_utils = model_utils or ModelUtils()
-
+        self._error_recovery_policy = error_recovery_policy
         self._action_dispatcher = action_dispatcher or ActionDispatcher(
             sink=self._state_store
         )
         self._plugin_starter = plugin_starter or PluginStarter(
             state=self._state_store,
             action_dispatcher=self._action_dispatcher,
-        )
-        self._queue_worker = queue_worker or create_queue_worker(
-            hardware_api=hardware_api,
-            state_store=self._state_store,
-            action_dispatcher=self._action_dispatcher,
-            error_recovery_policy=error_recovery_policy,
         )
         self._hardware_stopper = hardware_stopper or HardwareStopper(
             hardware_api=hardware_api,
@@ -129,14 +120,21 @@ class ProtocolEngine:
             action_dispatcher=self._action_dispatcher,
         )
         self._module_data_provider = module_data_provider or ModuleDataProvider()
-
-        self._queue_worker.start()
+        self._queue_worker = queue_worker
+        if self._queue_worker:
+            self._queue_worker.start()
         self._door_watcher.start()
 
     @property
     def state_view(self) -> StateView:
         """Get an interface to retrieve calculated state values."""
         return self._state_store
+
+    @property
+    def _get_queue_worker(self) -> QueueWorker:
+        """Get the queue worker instance."""
+        assert self._queue_worker is not None
+        return self._queue_worker
 
     def add_plugin(self, plugin: AbstractPlugin) -> None:
         """Add a plugin to the engine to customize behavior."""
@@ -326,7 +324,7 @@ class ProtocolEngine:
         # against the E-stop exception propagating up from lower layers. But we need to
         # do this because we want to make sure non-hardware commands, like
         # `waitForDuration`, are also interrupted.
-        self._queue_worker.cancel()
+        self._get_queue_worker.cancel()
         # Unlike self.request_stop(), we don't need to do
         # self._hardware_api.cancel_execution_and_running_tasks(). Since this was an
         # E-stop event, the hardware API already knows.
@@ -346,7 +344,7 @@ class ProtocolEngine:
         """
         action = self._state_store.commands.validate_action_allowed(StopAction())
         self._action_dispatcher.dispatch(action)
-        self._queue_worker.cancel()
+        self._get_queue_worker.cancel()
         if self._hardware_api.is_movement_execution_taskified():
             # We 'taskify' hardware controller movement functions when running protocols
             # that are not backed by the engine. Such runs cannot be stopped by cancelling
@@ -467,7 +465,7 @@ class ProtocolEngine:
             self._hardware_stopper.do_halt,
             disengage_before_stopping=disengage_before_stopping,
         )
-        exit_stack.push_async_callback(self._queue_worker.join)  # First step.
+        exit_stack.push_async_callback(self._get_queue_worker.join)  # First step.
         try:
             # If any teardown steps failed, this will raise something.
             await exit_stack.aclose()
@@ -587,6 +585,19 @@ class ProtocolEngine:
 
         for a in actions:
             self._action_dispatcher.dispatch(a)
+
+    def set_and_start_queue_worker(
+        self, command_generator: Callable[[], AsyncGenerator[str, None]]
+    ) -> None:
+        """Set QueueWorker and start it."""
+        self._queue_worker = create_queue_worker(
+            hardware_api=self._hardware_api,
+            state_store=self._state_store,
+            action_dispatcher=self._action_dispatcher,
+            error_recovery_policy=self._error_recovery_policy,
+            command_generator=command_generator,
+        )
+        self._queue_worker.start()
 
 
 # TODO(tz, 7-12-23): move this to shared data when we dont relay on ErrorOccurrence

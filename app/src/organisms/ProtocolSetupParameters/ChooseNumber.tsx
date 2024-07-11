@@ -5,7 +5,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { InputField } from '../../atoms/InputField'
@@ -116,9 +116,9 @@ export function ChooseNumber({
           flexDirection={DIRECTION_COLUMN}
           marginTop="7.75rem"
         >
-          <StyledText as="h4" textAlign={TYPOGRAPHY.textAlignLeft}>
+          <LegacyStyledText as="h4" textAlign={TYPOGRAPHY.textAlignLeft}>
             {parameter.description}
-          </StyledText>
+          </LegacyStyledText>
           <InputField
             autoFocus
             type="text"
