@@ -50,10 +50,10 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
   )
   const volumeLimits = getVolumeRange(state)
 
-  const allowedPipettePathOptions: {
+  const allowedPipettePathOptions: Array<{
     pathOption: PathOption
     description: string
-  }[] = [{ pathOption: 'single', description: t('pipette_path_single') }]
+  }> = [{ pathOption: 'single', description: t('pipette_path_single') }]
   if (
     state.transferType === 'distribute' &&
     volumeLimits.max >= state.volume * 3
@@ -81,7 +81,7 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
   )
 
   const handleClickBackOrExit = (): void => {
-    currentStep > 0 ? setCurrentStep(currentStep - 1) : onBack()
+    currentStep > 1 ? setCurrentStep(currentStep - 1) : onBack()
   }
 
   const handleClickSaveOrContinue = (): void => {

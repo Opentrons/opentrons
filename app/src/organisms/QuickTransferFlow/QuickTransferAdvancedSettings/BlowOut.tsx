@@ -12,7 +12,7 @@ import {
   WASTE_CHUTE_FIXTURES,
   FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
   TRASH_BIN_ADAPTER_FIXTURE,
-  DeckConfiguration,
+  type DeckConfiguration,
 } from '@opentrons/shared-data'
 import { getTopPortalEl } from '../../../App/portal'
 import { LargeButton } from '../../../atoms/buttons'
@@ -39,7 +39,7 @@ interface BlowOutProps {
 export const useBlowOutLocationOptions = (
   deckConfig: DeckConfiguration,
   transferType: TransferType
-): { location: BlowOutLocation; description: string }[] => {
+): Array<{ location: BlowOutLocation; description: string }> => {
   const { t } = useTranslation('quick_transfer')
 
   const trashLocations = deckConfig.filter(
@@ -55,10 +55,10 @@ export const useBlowOutLocationOptions = (
       cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
     })
   }
-  const blowOutLocationItems: {
+  const blowOutLocationItems: Array<{
     location: BlowOutLocation
     description: string
-  }[] = []
+  }> = []
   if (transferType !== 'distribute') {
     blowOutLocationItems.push({
       location: 'source_well',
@@ -71,9 +71,9 @@ export const useBlowOutLocationOptions = (
       description: t('blow_out_destination_well'),
     })
   }
-  trashLocations.map(location => {
+  trashLocations.forEach(location => {
     blowOutLocationItems.push({
-      location: location,
+      location,
       description:
         location.cutoutFixtureId === TRASH_BIN_ADAPTER_FIXTURE
           ? t('trashBin_location', {
@@ -147,7 +147,7 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
   }
 
   const saveOrContinueButtonText =
-    isBlowOutEnabled === true && currentStep < 2
+    isBlowOutEnabled && currentStep < 2
       ? t('shared:continue')
       : t('shared:save')
 

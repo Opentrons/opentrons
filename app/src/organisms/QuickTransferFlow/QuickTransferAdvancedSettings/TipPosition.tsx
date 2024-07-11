@@ -42,7 +42,7 @@ export function TipPositionEntry(props: TipPositionEntryProps): JSX.Element {
   if (kind === 'aspirate') {
     wellHeight = Math.max(
       ...state.sourceWells.map(well =>
-        state.source ? state.source.wells[well].depth : 0
+        state.source !== null ? state.source.wells[well].depth : 0
       )
     )
   } else if (kind === 'dispense') {
@@ -50,7 +50,7 @@ export function TipPositionEntry(props: TipPositionEntryProps): JSX.Element {
       state.destination === 'source' ? state.source : state.destination
     wellHeight = Math.max(
       ...state.destinationWells.map(well =>
-        destLabwareDefinition ? destLabwareDefinition.wells[well].depth : 0
+        destLabwareDefinition !== null ? destLabwareDefinition.wells[well].depth : 0
       )
     )
   }

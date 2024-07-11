@@ -48,9 +48,7 @@ export function QuickTransferAdvancedSettings(
   const [selectedSetting, setSelectedSetting] = React.useState<string | null>(
     null
   )
-
-  // TODO: Determine when we need to display snackbar
-  // makeSnackbar(t('advanced_setting_disabled'))
+  const { makeSnackbar } = useToaster()
 
   function getBlowoutValueCopy(): string | undefined {
     if (state.blowOut === 'dest_well') {
@@ -84,7 +82,8 @@ export function QuickTransferAdvancedSettings(
 
   const baseSettingsItems = [
     {
-      option: t('aspirate_flow_rate'),
+      option: 'aspirate_flow_rate',
+      copy: t('aspirate_flow_rate'),
       value: t('flow_rate_value', { flow_rate: state.aspirateFlowRate }),
       enabled: true,
       onClick: () => {
@@ -92,7 +91,8 @@ export function QuickTransferAdvancedSettings(
       },
     },
     {
-      option: t('dispense_flow_rate'),
+      option: 'dispense_flow_rate',
+      copy: t('dispense_flow_rate'),
       value: t('flow_rate_value', { flow_rate: state.dispenseFlowRate }),
       enabled: true,
       onClick: () => {
@@ -100,19 +100,24 @@ export function QuickTransferAdvancedSettings(
       },
     },
     {
-      option: t('pipette_path'),
+      option: 'pipette_path',
+      copy: t('pipette_path'),
       value: pipettePathValue,
       enabled: state.transferType !== 'transfer',
       onClick: () => {
-        if (state.transferType !== 'transfer')
+        if (state.transferType !== 'transfer') {
           setSelectedSetting('pipette_path')
+        } else {
+          makeSnackbar(t('advanced_setting_disabled') as string)
+        }
       },
     },
   ]
 
   const aspirateSettingsItems = [
     {
-      option: t('tip_position'),
+      option: 'tip_position',
+      copy: t('tip_position'),
       value:
         state.tipPositionAspirate !== null
           ? t('tip_position_value', { position: state.tipPositionAspirate })
@@ -123,7 +128,8 @@ export function QuickTransferAdvancedSettings(
       },
     },
     {
-      option: t('pre_wet_tip'),
+      option: 'pre_wet_tip',
+      copy: t('pre_wet_tip'),
       value: state.preWetTip ? t('option_enabled') : '',
       enabled: true,
       onClick: () => {
@@ -134,7 +140,8 @@ export function QuickTransferAdvancedSettings(
       },
     },
     {
-      option: t('mix'),
+      option: 'aspirate_mix',
+      copy: t('mix'),
       value:
         state.mixOnAspirate !== undefined
           ? t('mix_value', {
@@ -142,13 +149,18 @@ export function QuickTransferAdvancedSettings(
               reps: state.mixOnAspirate?.repititions,
             })
           : '',
-      enabled: true,
+      enabled: state.transferType === 'transfer',
       onClick: () => {
-        setSelectedSetting('aspirate_mix')
+        if (state.transferType === 'transfer') {
+          setSelectedSetting('aspirate_mix')
+        } else {
+          makeSnackbar(t('advanced_setting_disabled') as string)
+        }
       },
     },
     {
-      option: t('delay'),
+      option: 'aspirate_delay',
+      copy: t('delay'),
       value:
         state.delayAspirate !== undefined
           ? t('delay_value', {
@@ -162,18 +174,25 @@ export function QuickTransferAdvancedSettings(
       },
     },
     {
-      option: t('touch_tip'),
+      option: 'aspirate_touch_tip',
+      copy: t('touch_tip'),
       value:
         state.touchTipAspirate !== undefined
           ? t('touch_tip_value', { position: state.touchTipAspirate })
           : '',
-      enabled: true,
+      enabled: state.sourceWells.length > 1,
       onClick: () => {
-        setSelectedSetting('aspirate_touch_tip')
+        // disable for reservoir
+        if (state.sourceWells.length > 1) {
+          setSelectedSetting('aspirate_touch_tip')
+        } else {
+          makeSnackbar(t('advanced_setting_disabled') as string)
+        }
       },
     },
     {
-      option: t('air_gap'),
+      option: 'aspirate_air_gap',
+      copy: t('air_gap'),
       value:
         state.airGapAspirate !== undefined
           ? t('air_gap_value', { volume: state.airGapAspirate })
@@ -187,7 +206,8 @@ export function QuickTransferAdvancedSettings(
 
   const dispenseSettingsItems = [
     {
-      option: t('tip_position'),
+      option: 'dispense_tip_position',
+      copy: t('tip_position'),
       value:
         state.tipPositionDispense !== undefined
           ? t('tip_position_value', { position: state.tipPositionDispense })
@@ -198,7 +218,8 @@ export function QuickTransferAdvancedSettings(
       },
     },
     {
-      option: t('mix'),
+      option: 'dispense_mix',
+      copy: t('mix'),
       value:
         state.mixOnDispense !== undefined
           ? t('mix_value', {
@@ -206,13 +227,18 @@ export function QuickTransferAdvancedSettings(
               reps: state.mixOnDispense?.repititions,
             })
           : '',
-      enabled: true,
+      enabled: state.transferType === 'transfer',
       onClick: () => {
-        setSelectedSetting('dispense_mix')
+        if (state.transferType === 'transfer') {
+          setSelectedSetting('dispense_mix')
+        } else {
+          makeSnackbar(t('advanced_setting_disabled') as string)
+        }
       },
     },
     {
-      option: t('delay'),
+      option: 'dispense_delay',
+      copy: t('delay'),
       value:
         state.delayDispense !== undefined
           ? t('delay_value', {
@@ -226,7 +252,8 @@ export function QuickTransferAdvancedSettings(
       },
     },
     {
-      option: t('touch_tip'),
+      option: 'dispense_touch_tip',
+      copy: t('touch_tip'),
       value:
         state.touchTipDispense !== undefined
           ? t('touch_tip_value', { position: state.touchTipDispense })
@@ -237,7 +264,8 @@ export function QuickTransferAdvancedSettings(
       },
     },
     {
-      option: t('air_gap'),
+      option: 'dispense_air_gap',
+      copy: t('air_gap'),
       value:
         state.airGapDispense !== undefined
           ? t('air_gap_value', { volume: state.airGapDispense })
@@ -248,11 +276,16 @@ export function QuickTransferAdvancedSettings(
       },
     },
     {
-      option: t('blow_out'),
+      option: 'dispense_blow_out',
+      copy: t('blow_out'),
       value: i18n.format(getBlowoutValueCopy(), 'capitalize'),
-      enabled: true,
+      enabled: state.transferType !== 'distribute',
       onClick: () => {
-        setSelectedSetting('dispense_blow_out')
+        if (state.transferType === 'distribute') {
+          makeSnackbar(t('advanced_setting_disabled') as string)
+        } else {
+          setSelectedSetting('dispense_blow_out')
+        }
       },
     },
   ]
@@ -276,13 +309,16 @@ export function QuickTransferAdvancedSettings(
                   <StyledText
                     css={TYPOGRAPHY.level4HeaderSemiBold}
                     width="20rem"
+                    color={displayItem.enabled ? COLORS.black90 : COLORS.grey50}
                   >
-                    {displayItem.option}
+                    {displayItem.copy}
                   </StyledText>
                   <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
                     <StyledText
                       css={TYPOGRAPHY.level4HeaderRegular}
-                      color={COLORS.grey60}
+                      color={
+                        displayItem.enabled ? COLORS.grey60 : COLORS.grey50
+                      }
                       textAlign={TEXT_ALIGN_RIGHT}
                     >
                       {displayItem.value}
@@ -349,21 +385,33 @@ export function QuickTransferAdvancedSettings(
                     <StyledText
                       css={TYPOGRAPHY.level4HeaderSemiBold}
                       width="20rem"
+                      color={
+                        displayItem.enabled ? COLORS.black90 : COLORS.grey50
+                      }
                     >
-                      {displayItem.option}
+                      {displayItem.copy}
                     </StyledText>
                     <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
                       <StyledText
                         css={TYPOGRAPHY.level4HeaderRegular}
-                        color={COLORS.grey60}
+                        color={
+                          displayItem.enabled ? COLORS.grey60 : COLORS.grey50
+                        }
                         textAlign={TEXT_ALIGN_RIGHT}
                       >
                         {displayItem.value !== ''
                           ? displayItem.value
                           : t('option_disabled')}
                       </StyledText>
-                      {displayItem.enabled ? (
-                        <Icon name="more" size={SIZE_2} />
+
+                      {displayItem.option !== 'pre_wet_tip' ? (
+                        <Icon
+                          name="more"
+                          size={SIZE_2}
+                          color={
+                            displayItem.enabled ? COLORS.black90 : COLORS.grey50
+                          }
+                        />
                       ) : null}
                     </Flex>
                   </Flex>
@@ -446,22 +494,31 @@ export function QuickTransferAdvancedSettings(
                     <StyledText
                       css={TYPOGRAPHY.level4HeaderSemiBold}
                       width="20rem"
+                      color={
+                        displayItem.enabled ? COLORS.black90 : COLORS.grey50
+                      }
                     >
-                      {displayItem.option}
+                      {displayItem.copy}
                     </StyledText>
                     <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
                       <StyledText
                         css={TYPOGRAPHY.level4HeaderRegular}
-                        color={COLORS.grey60}
+                        color={
+                          displayItem.enabled ? COLORS.grey60 : COLORS.grey50
+                        }
                         textAlign={TEXT_ALIGN_RIGHT}
                       >
                         {displayItem.value !== ''
                           ? displayItem.value
                           : t('option_disabled')}
                       </StyledText>
-                      {displayItem.enabled ? (
-                        <Icon name="more" size={SIZE_2} />
-                      ) : null}
+                      <Icon
+                        name="more"
+                        size={SIZE_2}
+                        color={
+                          displayItem.enabled ? COLORS.black90 : COLORS.grey50
+                        }
+                      />
                     </Flex>
                   </Flex>
                 </ListItem>
