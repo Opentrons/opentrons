@@ -549,12 +549,14 @@ async def capacitive_probe(
 
     probe_distance = {mover: distance}
     probe_speed = {mover: mount_speed}
+    movers = [mover]
     if pipette_present:
         probe_distance[tool] = 0.0
         probe_speed[tool] = 0.0
+        movers.append(tool)
 
     sensor_group = _build_pass_step(
-        movers=[mover],
+        movers=movers,
         distance=probe_distance,
         speed=probe_speed,
         sensor_type=SensorType.capacitive,
@@ -564,7 +566,7 @@ async def capacitive_probe(
     if sync_buffer_output:
         sensor_group = _fix_pass_step_for_buffer(
             sensor_group,
-            movers=[mover],
+            movers=movers,
             distance=probe_distance,
             speed=probe_speed,
             sensor_type=SensorType.capacitive,
