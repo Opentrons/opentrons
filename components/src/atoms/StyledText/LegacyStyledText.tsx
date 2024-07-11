@@ -75,10 +75,18 @@ const styleMap: { [tag: string]: FlattenSimpleInterpolation } = {
     }
   `,
   h2Bold: TYPOGRAPHY.level2HeaderBold,
-  h3Bold: TYPOGRAPHY.level3HeaderBold,
-  h3DesktopBold: TYPOGRAPHY.levelDesktop3HeaderBold,
-  h4Bold: TYPOGRAPHY.level4HeaderBold,
-  h4DesktopBold: TYPOGRAPHY.level4DesketopHeaderBold,
+  h3Bold: css`
+    ${TYPOGRAPHY.levelDesktop3HeaderBold}
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      ${TYPOGRAPHY.level3HeaderBold}
+    }
+  `,
+  h4Bold: css`
+    ${TYPOGRAPHY.level4DesketopHeaderBold}
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      ${TYPOGRAPHY.level4HeaderBold}
+    }
+  `,
   pBold: TYPOGRAPHY.bodyTextBold,
   labelBold: TYPOGRAPHY.smallBodyTextBold,
 }

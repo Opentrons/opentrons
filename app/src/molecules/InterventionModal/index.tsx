@@ -137,6 +137,7 @@ export function InterventionModal({
   const isOnDevice = useSelector(getIsOnDevice)
   const modalStyle = isOnDevice ? MODAL_ODD_STYLE : MODAL_DESKTOP_STYLE
   const headerStyle = isOnDevice ? BASE_HEADER_STYLE : DESKTOP_HEADER_STYLE
+  const titleSpacing = isOnDevice ? SPACING.spacing12 : SPACING.spacing4
 
   return (
     <Flex {...WRAPPER_STYLE}>
@@ -155,10 +156,18 @@ export function InterventionModal({
             onClick={iconHeadingOnClick}
           >
             {titleHeading}
-            {/* revert this change after device logic is complete */}
-            <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing4}>
+            <Flex alignItems={ALIGN_CENTER} gridGap={titleSpacing}>
               {iconName != null ? (
-                <Icon width={16} height={16} name={iconName} size={SPACING.spacing32} />  //change this to className
+                isOnDevice ? (
+                  <Icon name={iconName} size={SPACING.spacing32} />
+                ) : (
+                  <Icon
+                    width={16}
+                    height={16}
+                    name={iconName}
+                    size={SPACING.spacing32}
+                  />
+                )
               ) : null}
               {iconHeading != null ? iconHeading : null}
             </Flex>
