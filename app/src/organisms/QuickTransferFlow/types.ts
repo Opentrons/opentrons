@@ -101,7 +101,6 @@ export type QuickTransferSummaryAction =
   | SetAirGapDispense
   | SetChangeTip
   | SetDropTipLocation
-  | SetVolumeAction
 
 interface SetAspirateFlowRateAction {
   type: typeof ACTIONS.SET_ASPIRATE_FLOW_RATE

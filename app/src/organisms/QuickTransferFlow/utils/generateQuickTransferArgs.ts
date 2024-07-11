@@ -320,8 +320,8 @@ export function generateQuickTransferArgs(
   const commonFields = {
     pipette: pipetteEntity.id,
     volume: quickTransferState.volume,
-    sourceLabware: sourceLabwareEntity?.id!,
-    destLabware: destLabwareEntity?.id!,
+    sourceLabware: sourceLabwareEntity?.id! as string,
+    destLabware: destLabwareEntity?.id! as string,
     tipRack: pipetteEntity.tiprackDefURI[0],
     aspirateFlowRateUlSec: quickTransferState.aspirateFlowRate,
     dispenseFlowRateUlSec: quickTransferState.dispenseFlowRate,

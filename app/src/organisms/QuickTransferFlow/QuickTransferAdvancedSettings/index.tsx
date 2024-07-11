@@ -82,8 +82,9 @@ export function QuickTransferAdvancedSettings(
 
   const destinationLabwareDef =
     state.destination === 'source' ? state.source : state.destination
-  const isReservoir =
-    state.source.metadata.displayCategory === 'reservoir' ||
+  const sourceIsReservoir =
+    state.source.metadata.displayCategory === 'reservoir'
+  const destIsReservoir =
     destinationLabwareDef.metadata.displayCategory === 'reservoir'
 
   const baseSettingsItems = [
@@ -186,10 +187,10 @@ export function QuickTransferAdvancedSettings(
         state.touchTipAspirate !== undefined
           ? t('touch_tip_value', { position: state.touchTipAspirate })
           : '',
-      enabled: !isReservoir,
+      enabled: !sourceIsReservoir,
       onClick: () => {
         // disable for reservoir
-        if (!isReservoir) {
+        if (!sourceIsReservoir) {
           setSelectedSetting('aspirate_touch_tip')
         } else {
           makeSnackbar(t('advanced_setting_disabled') as string)
@@ -264,9 +265,13 @@ export function QuickTransferAdvancedSettings(
         state.touchTipDispense !== undefined
           ? t('touch_tip_value', { position: state.touchTipDispense })
           : '',
-      enabled: true,
+      enabled: !destIsReservoir,
       onClick: () => {
-        setSelectedSetting('dispense_touch_tip')
+        if (!destIsReservoir) {
+          setSelectedSetting('dispense_touch_tip')
+        } else {
+          makeSnackbar(t('advanced_setting_disabled') as string)
+        }
       },
     },
     {
