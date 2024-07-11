@@ -35,7 +35,12 @@ export function InterventionContent({
         }
       `}
     >
-      <StyledText oddStyle="level4HeaderSemiBold">{headline}</StyledText>
+      <StyledText
+        oddStyle="level4HeaderSemiBold"
+        desktopStyle="headingSmallBold"
+      >
+        {headline}
+      </StyledText>
       <Flex
         flexDirection={DIRECTION_COLUMN}
         css={`
