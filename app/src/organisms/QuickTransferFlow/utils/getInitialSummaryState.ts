@@ -49,13 +49,13 @@ export function getInitialSummaryState(
   // for multiDispense the volume capacity must be at least 3x the volume per well
   // to account for the 1x volume per well disposal volume default
   if (
-    state.transferType === 'consolidate' &&
+    state.transferType === 'distribute' &&
     volumeLimits.max >= state.volume * 3
   ) {
     path = 'multiDispense'
     // for multiAspirate the volume capacity must be at least 2x the volume per well
   } else if (
-    state.transferType === 'distribute' &&
+    state.transferType === 'consolidate' &&
     volumeLimits.max >= state.volume * 2
   ) {
     path = 'multiAspirate'
