@@ -15,6 +15,7 @@
   "contact_support_for_connection_help": "If none of these work, contact support for help (via the question mark link in this app, or by emailing {{support_email}}.)",
   "deck_fixture_setup_modal_bottom_description": "For details on installing different fixture types, contact support.",
   "delete_protocol_from_app": "Delete the protocol, make changes to address the error, and resend the protocol to this robot from the desktop app.",
+  "delete_transfer_from_app": "Delete the quick transfer, make changes to address the error, and recreate this transfer on the robot display.",
   "error_boundary_description": "You need to restart the touchscreen. Contact support for assistance.",
   "estop_pressed_description": "First, safely clear the deck of any labware or spills. Then, twist the E-stop button clockwise. Finally, have the robot move the gantry to its home position.",
   "find_your_robot": "Find your robot in the Devices section of the app to install software updates.",

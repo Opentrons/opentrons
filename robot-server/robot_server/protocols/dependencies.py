@@ -8,6 +8,7 @@ import logging
 
 from anyio import Path as AsyncPath
 from fastapi import Depends
+from robot_server.protocols.protocol_models import ProtocolKind
 from sqlalchemy.engine import Engine as SQLEngine
 
 from opentrons.protocol_reader import ProtocolReader, FileReaderWriter, FileHasher
@@ -137,6 +138,20 @@ async def get_protocol_auto_deleter(
         deletion_planner=ProtocolDeletionPlanner(
             maximum_unused_protocols=get_settings().maximum_unused_protocols
         ),
+        protocol_kind=ProtocolKind.STANDARD,
+    )
+
+
+async def get_quick_transfer_protocol_auto_deleter(
+    protocol_store: ProtocolStore = Depends(get_protocol_store),
+) -> ProtocolAutoDeleter:
+    """Get a `ProtocolAutoDeleter` to delete old quick transfer protocols."""
+    return ProtocolAutoDeleter(
+        protocol_store=protocol_store,
+        deletion_planner=ProtocolDeletionPlanner(
+            maximum_unused_protocols=get_settings().maximum_quick_transfer_protocols
+        ),
+        protocol_kind=ProtocolKind.QUICK_TRANSFER,
     )
 
 

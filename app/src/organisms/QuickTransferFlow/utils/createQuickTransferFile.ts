@@ -218,7 +218,7 @@ export function createQuickTransferFile(
 
   const labwareDefinitions = Object.values(
     invariantContext.labwareEntities
-  ).reduce<{ [x: string]: LabwareDefinition2 }>((acc, entity) => {
+  ).reduce<Record<string, LabwareDefinition2>>((acc, entity) => {
     return { ...acc, [entity.labwareDefURI]: entity.def }
   }, {})
 

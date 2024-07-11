@@ -10,7 +10,7 @@ import {
 
 import { SmallButton } from '../../atoms/buttons'
 import { BODY_TEXT_STYLE, ODD_SECTION_TITLE_STYLE } from './constants'
-import { RecoverySingleColumnContent } from './shared'
+import { RecoveryContentWrapper } from './shared'
 
 import type { RecoveryContentProps } from './types'
 
@@ -23,7 +23,7 @@ export function BeforeBeginning({
 
   if (isOnDevice) {
     return (
-      <RecoverySingleColumnContent>
+      <RecoveryContentWrapper>
         <Flex flexDirection={DIRECTION_COLUMN} height="100%">
           <LegacyStyledText css={ODD_SECTION_TITLE_STYLE} as="h4SemiBold">
             {t('before_you_begin')}
@@ -43,7 +43,7 @@ export function BeforeBeginning({
             marginTop="auto"
           />
         </Flex>
-      </RecoverySingleColumnContent>
+      </RecoveryContentWrapper>
     )
   } else {
     return null
