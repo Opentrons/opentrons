@@ -8,9 +8,11 @@ import { thermocyclerFormToArgs } from './thermocyclerFormToArgs'
 import { heaterShakerFormToArgs } from './heaterShakerFormToArgs'
 import { moveLiquidFormToArgs } from './moveLiquidFormToArgs'
 import { moveLabwareFormToArgs } from './moveLabwareFormToArgs'
+import { commentFormToArgs } from './commentFormToArgs'
 import type { CommandCreatorArgs } from '@opentrons/step-generation'
 import type {
   FormData,
+  HydratedCommentFormData,
   HydratedHeaterShakerFormData,
   HydratedMagnetFormData,
   HydratedMixFormDataLegacy,
@@ -62,6 +64,14 @@ export const stepFormToArgs = (hydratedForm: FormData): StepArgs => {
         fields: castForm,
       }
       return moveLabwareFormToArgs(moveLabwareFormData)
+    }
+
+    case 'comment': {
+      const commentFormData: HydratedCommentFormData = {
+        ...castForm,
+        fields: castForm,
+      }
+      return commentFormToArgs(commentFormData)
     }
 
     default:

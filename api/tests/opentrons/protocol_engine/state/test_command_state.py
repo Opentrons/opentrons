@@ -286,9 +286,7 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
     ]
     assert subject_view.get_running_command_id() is None
 
-    subject.handle_action(
-        actions.PlayAction(requested_at=datetime.now(), deck_configuration=None)
-    )
+    subject.handle_action(actions.PlayAction(requested_at=datetime.now()))
     assert subject_view.get_next_to_execute() == "command-id-1"
 
 
@@ -402,11 +400,9 @@ def test_door_during_protocol_phase() -> None:
     )
     subject.handle_action(queue_protocol_command)
 
-    subject.handle_action(
-        actions.PlayAction(requested_at=datetime.now(), deck_configuration=None)
-    )
+    subject.handle_action(actions.PlayAction(requested_at=datetime.now()))
 
-    play = PlayAction(requested_at=datetime.now(), deck_configuration=None)
+    play = PlayAction(requested_at=datetime.now())
 
     # Test state after we open the door:
     subject.handle_action(actions.DoorChangeAction(DoorState.OPEN))
@@ -488,7 +484,7 @@ def test_door_during_error_recovery() -> None:
         subject_view.get_status() == EngineStatus.AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR
     )
     assert subject_view.get_next_to_execute() is None
-    play = actions.PlayAction(requested_at=datetime.now(), deck_configuration=None)
+    play = actions.PlayAction(requested_at=datetime.now())
     with pytest.raises(RobotDoorOpenError):
         subject_view.validate_action_allowed(play)
 
@@ -529,7 +525,7 @@ def test_door_initially_open(
     subject_view = CommandView(subject.state)
 
     assert subject_view.get_status() == EngineStatus.IDLE
-    play = actions.PlayAction(requested_at=datetime.now(), deck_configuration=None)
+    play = actions.PlayAction(requested_at=datetime.now())
     subject_view.validate_action_allowed(play)  # Should not raise.
     subject.handle_action(play)
     assert subject_view.get_status() == expected_engine_status_after_play

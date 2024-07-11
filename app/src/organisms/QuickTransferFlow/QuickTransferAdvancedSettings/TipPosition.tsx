@@ -50,7 +50,9 @@ export function TipPositionEntry(props: TipPositionEntryProps): JSX.Element {
       state.destination === 'source' ? state.source : state.destination
     wellHeight = Math.max(
       ...state.destinationWells.map(well =>
-        destLabwareDefinition !== null ? destLabwareDefinition.wells[well].depth : 0
+        destLabwareDefinition !== null
+          ? destLabwareDefinition.wells[well].depth
+          : 0
       )
     )
   }

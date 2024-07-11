@@ -12,7 +12,7 @@ import {
 } from '@opentrons/components'
 
 import { RECOVERY_MAP } from '../constants'
-import { RecoveryFooterButtons, RecoverySingleColumnContent } from '../shared'
+import { RecoveryFooterButtons, RecoveryContentWrapper } from '../shared'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 import type { RecoveryContentProps } from '../types'
@@ -58,7 +58,7 @@ function CancelRunConfirmation({
 
   if (isOnDevice) {
     return (
-      <RecoverySingleColumnContent
+      <RecoveryContentWrapper
         gridGap={SPACING.spacing24}
         alignItems={ALIGN_CENTER}
       >
@@ -93,7 +93,7 @@ function CancelRunConfirmation({
           primaryBtnTextOverride={t('confirm')}
           isLoadingPrimaryBtnAction={showBtnLoadingState}
         />
-      </RecoverySingleColumnContent>
+      </RecoveryContentWrapper>
     )
   } else {
     return null

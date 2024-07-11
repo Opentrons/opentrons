@@ -86,6 +86,7 @@ export type StepFieldName = string
 // | 'mix_y_position
 // TODO Ian 2019-01-16 factor out to some constants.js ? See #2926
 export type StepType =
+  | 'comment'
   | 'moveLabware'
   | 'moveLiquid'
   | 'mix'
@@ -96,6 +97,7 @@ export type StepType =
   | 'thermocycler'
   | 'heaterShaker'
 export const stepIconsByType: Record<StepType, IconName> = {
+  comment: 'comment',
   moveLabware: 'move-xy',
   moveLiquid: 'ot-transfer',
   mix: 'ot-mix',
@@ -248,6 +250,17 @@ export interface HydratedMoveLabwareFormData {
     useGripper: boolean
   }
 }
+
+export interface HydratedCommentFormData {
+  id: string
+  stepType: 'comment'
+  stepName: string
+  stepDetails?: string | null
+  fields: {
+    message: string
+  }
+}
+
 export interface HydratedMixFormDataLegacy {
   id: string
   stepType: 'mix'

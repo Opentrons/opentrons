@@ -123,8 +123,7 @@ export function ErrorRecoveryFlows(
   const { protocolAnalysis } = props
   const robotType = protocolAnalysis?.robotType ?? OT2_ROBOT_TYPE
   const isOnDevice = useSelector(getIsOnDevice)
-  const showSplash = useRunPausedSplash(isOnDevice, showERWizard)
-
+  const showSplash = useRunPausedSplash(showERWizard)
   return (
     <>
       {showERWizard ? (

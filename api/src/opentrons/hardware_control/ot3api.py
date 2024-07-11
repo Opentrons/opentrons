@@ -2573,13 +2573,13 @@ class OT3API(
         mount: OT3Mount,
         probe_settings: LiquidProbeSettings,
         probe: InstrumentProbeType,
-        z_distance: float,
+        p_travel: float,
         force_both_sensors: bool = False,
     ) -> float:
         plunger_direction = -1 if probe_settings.aspirate_while_sensing else 1
         await self._backend.liquid_probe(
             mount,
-            z_distance,
+            p_travel,
             probe_settings.mount_speed,
             (probe_settings.plunger_speed * plunger_direction),
             probe_settings.sensor_threshold_pascals,
@@ -2591,18 +2591,6 @@ class OT3API(
         end_pos = await self.gantry_position(mount, refresh=True)
         return end_pos.z
 
-    def _get_probe_distances(
-        self, mount: OT3Mount, max_z_distance: float, p_speed: float, z_speed: float
-    ) -> List[float]:
-        z_travels: List[float] = []
-        plunger_positions = self._pipette_handler.get_pipette(mount).plunger_positions
-        plunger_travel = plunger_positions.bottom - plunger_positions.top
-        p_travel_time = plunger_travel / p_speed
-        while max_z_distance > sum(z_travels):
-            next_travel = min(p_travel_time * z_speed, max_z_distance - sum(z_travels))
-            z_travels.append(next_travel)
-        return z_travels
-
     async def liquid_probe(
         self,
         mount: Union[top_types.Mount, OT3Mount],
@@ -2613,8 +2601,9 @@ class OT3API(
     ) -> float:
         """Search for and return liquid level height.
 
-        This function begins by moving the mount the distance specified by starting_mount_height in the
-        LiquidProbeSettings. After this, the mount and plunger motors will move simultaneously while
+        This function begins by moving the mount 2 mm upward to protect against a case where the tip starts right at a
+        liquid meniscus.
+        After this, the mount and plunger motors will move simultaneously while
         reading from the pressure sensor.
 
         If the move is completed without the specified threshold being triggered, a
@@ -2635,55 +2624,64 @@ class OT3API(
         if not probe_settings:
             probe_settings = self.config.liquid_sense
 
-        pos = await self.gantry_position(checked_mount, refresh=True)
-        probe_start_pos = pos._replace(z=probe_settings.starting_mount_height)
-        await self.move_to(checked_mount, probe_start_pos)
-        total_z_travel = max_z_dist
-        z_travels = self._get_probe_distances(
-            checked_mount,
-            total_z_travel,
-            probe_settings.plunger_speed,
-            probe_settings.mount_speed,
-        )
-        error: Optional[PipetteLiquidNotFoundError] = None
-        for z_travel in z_travels:
+        probe_start_pos = await self.gantry_position(checked_mount, refresh=True)
 
+        p_travel = (
+            instrument.plunger_positions.bottom - instrument.plunger_positions.top
+        )
+        max_speeds = self.config.motion_settings.default_max_speed
+        p_prep_speed = max_speeds[self.gantry_load][OT3AxisKind.P]
+
+        error: Optional[PipetteLiquidNotFoundError] = None
+        pos = await self.gantry_position(checked_mount, refresh=True)
+        while (probe_start_pos.z - pos.z) < max_z_dist:
+            # safe distance so we don't accidentally aspirate liquid if we're already close to liquid
+            safe_plunger_pos = pos._replace(z=(pos.z + 2))
+            # overlap amount we want to use between passes
+            pass_start_pos = pos._replace(z=(pos.z + 0.5))
+
+            # Prep the plunger
+            await self.move_to(checked_mount, safe_plunger_pos)
             if probe_settings.aspirate_while_sensing:
-                await self._move_to_plunger_bottom(checked_mount, rate=1.0)
+                # TODO(cm, 7/8/24): remove p_prep_speed from the rate at some point
+                await self._move_to_plunger_bottom(checked_mount, rate=p_prep_speed)
             else:
-                # find the ideal travel distance by multiplying the plunger speed
-                # by the time it will take to complete the z move.
-                ideal_travel = probe_settings.plunger_speed * (
-                    z_travel / probe_settings.mount_speed
-                )
-                assert (
-                    instrument.plunger_positions.bottom - ideal_travel
-                    >= instrument.plunger_positions.top
-                )
-                target_point = instrument.plunger_positions.bottom - ideal_travel
-                target_pos = target_position_from_plunger(
-                    checked_mount, target_point, self._current_position
-                )
-                max_speeds = self.config.motion_settings.default_max_speed
-                speed = max_speeds[self.gantry_load][OT3AxisKind.P]
-                await self._move(target_pos, speed=speed, acquire_lock=True)
+                await self._move_to_plunger_top(checked_mount, rate=p_prep_speed)
+
             try:
+                # move to where we want to start a pass and run a pass
+                await self.move_to(checked_mount, pass_start_pos)
                 height = await self._liquid_probe_pass(
                     checked_mount,
                     probe_settings,
                     probe if probe else InstrumentProbeType.PRIMARY,
-                    z_travel,
+                    p_travel,
                 )
                 # if we made it here without an error we found the liquid
                 error = None
                 break
             except PipetteLiquidNotFoundError as lnfe:
                 error = lnfe
+            pos = await self.gantry_position(checked_mount, refresh=True)
         await self.move_to(checked_mount, probe_start_pos)
         if error is not None:
-            # if we never found an liquid raise an error
+            # if we never found liquid raise an error
             raise error
         return height
+
+    async def _move_to_plunger_top(
+        self,
+        mount: OT3Mount,
+        rate: float,
+        acquire_lock: bool = True,
+    ) -> None:
+        instrument = self._pipette_handler.get_pipette(mount)
+        target_pos = target_position_from_plunger(
+            OT3Mount.from_mount(mount),
+            instrument.plunger_positions.top,
+            self._current_position,
+        )
+        await self._move(target_pos, speed=rate, acquire_lock=acquire_lock)
 
     async def capacitive_probe(
         self,

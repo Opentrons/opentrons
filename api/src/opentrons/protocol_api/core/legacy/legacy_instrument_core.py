@@ -135,10 +135,10 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
         """
         if isinstance(location, (TrashBin, WasteChute)):
             raise APIVersionError(
-                "Dispense in Moveable Trash or Waste Chute are not supported in this API Version."
+                api_element="Dispense in Moveable Trash or Waste Chute"
             )
         if push_out:
-            raise APIVersionError("push_out is not supported in this API version.")
+            raise APIVersionError(api_element="push_out")
         if not in_place:
             self.move_to(location=location)
 
@@ -159,7 +159,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
         """
         if isinstance(location, (TrashBin, WasteChute)):
             raise APIVersionError(
-                "Blow Out in Moveable Trash or Waste Chute are not supported in this API Version."
+                api_element="Blow Out in Moveable Trash or Waste Chute"
             )
 
         if not in_place:
@@ -249,9 +249,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
             home_after: Whether to home the pipette after the tip is dropped.
         """
         if alternate_drop_location:
-            raise APIVersionError(
-                "Tip drop randomization is not supported in this API version."
-            )
+            raise APIVersionError(api_element="Tip drop randomization")
         labware_core = well_core.geometry.parent
 
         if location is None:
@@ -302,9 +300,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
         home_after: Optional[bool],
         alternate_tip_drop: bool = False,
     ) -> None:
-        raise APIVersionError(
-            "Dropping tips in a trash bin or waste chute is not supported in this API Version."
-        )
+        raise APIVersionError(api_element="Dropping tips in a trash bin or waste chute")
 
     def home(self) -> None:
         """Home the mount"""
@@ -342,9 +338,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
                 the computed safe travel height.
         """
         if isinstance(location, (TrashBin, WasteChute)):
-            raise APIVersionError(
-                "Move To Trash Bin and Waste Chute are not supported in this API Version."
-            )
+            raise APIVersionError(api_element="Move To Trash Bin and Waste Chute")
         self.flag_unsafe_move(location)
 
         # prevent direct movement bugs in PAPI version >= 2.10
@@ -571,6 +565,10 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
         """Retract this instrument to the top of the gantry."""
         self._protocol_interface.get_hardware.retract(self._mount)  # type: ignore [attr-defined]
 
-    def find_liquid_level(self, well_core: WellCore, error_recovery: bool) -> float:
+    def liquid_probe_with_recovery(self, well_core: WellCore) -> None:
         """This will never be called because it was added in API 2.20."""
-        assert False, "find_liquid_level only supported in API 2.20 & later"
+        assert False, "liquid_probe_with_recovery only supported in API 2.20 & later"
+
+    def liquid_probe_without_recovery(self, well_core: WellCore) -> float:
+        """This will never be called because it was added in API 2.20."""
+        assert False, "liquid_probe_without_recovery only supported in API 2.20 & later"

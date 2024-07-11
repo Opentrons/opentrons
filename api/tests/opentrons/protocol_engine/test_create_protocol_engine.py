@@ -14,6 +14,7 @@ from opentrons.protocol_engine import (
     ProtocolEngine,
     Config as EngineConfig,
     DeckType,
+    error_recovery_policy,
 )
 from opentrons.protocol_engine.create_protocol_engine import create_protocol_engine
 
@@ -83,6 +84,7 @@ async def test_create_engine_initializes_state_with_no_fixed_trash(
             robot_type=robot_type,
             deck_type=deck_type,
         ),
+        error_recovery_policy=error_recovery_policy.never_recover,
         load_fixed_trash=False,
     )
     state = engine.state_view
@@ -140,6 +142,7 @@ async def test_create_engine_initializes_state_with_fixed_trash(
             robot_type=robot_type,
             deck_type=deck_type,
         ),
+        error_recovery_policy=error_recovery_policy.never_recover,
         load_fixed_trash=True,
     )
     state = engine.state_view
@@ -174,6 +177,7 @@ async def test_create_engine_initializes_state_with_door_state(
             robot_type="OT-2 Standard",
             deck_type=DeckType.OT2_SHORT_TRASH,
         ),
+        error_recovery_policy=error_recovery_policy.never_recover,
     )
     state = engine.state_view
     assert state.commands.get_is_door_blocking() is True

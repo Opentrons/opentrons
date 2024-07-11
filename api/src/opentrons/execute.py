@@ -58,6 +58,7 @@ from opentrons.protocol_engine import (
     Config,
     DeckType,
     EngineStatus,
+    error_recovery_policy,
 )
 from opentrons.protocol_engine.create_protocol_engine import (
     create_protocol_engine_in_thread,
@@ -287,7 +288,7 @@ def get_arguments(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
     return parser
 
 
-def execute(  # noqa: C901
+def execute(
     protocol_file: Union[BinaryIO, TextIO],
     protocol_name: str,
     propagate_logs: bool = False,
@@ -393,11 +394,10 @@ def execute(  # noqa: C901
             extra_data=extra_data,
         )
     except parse.JSONSchemaVersionTooNewError as e:
-        if e.attempted_schema_version == 6:
-            # See Jira RCORE-535.
-            raise NotImplementedError(_JSON_TOO_NEW_MESSAGE) from e
-        else:
-            raise
+        # opentrons.protocols.parse() doesn't support new JSON protocols.
+        # The code to do that should be moved from opentrons.protocol_reader.
+        # See https://opentrons.atlassian.net/browse/PLAT-94.
+        raise NotImplementedError(_JSON_TOO_NEW_MESSAGE) from e
 
     if protocol.api_level < APIVersion(2, 0):
         raise ApiDeprecationError(version=protocol.api_level)
@@ -545,6 +545,7 @@ def _create_live_context_pe(
         create_protocol_engine_in_thread(
             hardware_api=hardware_api_wrapped,
             config=_get_protocol_engine_config(),
+            error_recovery_policy=error_recovery_policy.never_recover,
             drop_tips_after_run=False,
             post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
             load_fixed_trash=should_load_fixed_trash_labware_for_python_protocol(
@@ -628,6 +629,7 @@ def _run_file_pe(
         protocol_engine = await create_protocol_engine(
             hardware_api=hardware_api_wrapped,
             config=_get_protocol_engine_config(),
+            error_recovery_policy=error_recovery_policy.never_recover,
             load_fixed_trash=should_load_fixed_trash(protocol_source.config),
         )
 

@@ -211,11 +211,8 @@ settings = [
         title="Enable error recovery experiments",
         description=(
             "Do not enable."
-            " This is an Opentrons internal setting to experiment with"
+            " This is an Opentrons internal setting to enable additional,"
             " in-development error recovery features."
-            " This will interfere with your protocol runs,"
-            " corrupt your robot's storage,"
-            " bring misfortune and pestilence upon you and your livestock, etc."
         ),
         robot_type=[RobotTypeEnum.FLEX],
         internal_only=True,

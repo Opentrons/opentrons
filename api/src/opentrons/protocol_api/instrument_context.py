@@ -2,10 +2,11 @@ from __future__ import annotations
 import logging
 from contextlib import ExitStack
 from typing import Any, List, Optional, Sequence, Union, cast, Dict
+from opentrons.protocol_engine.commands.pipetting_common import LiquidNotFoundError
+from opentrons.protocol_engine.errors.error_occurrence import ProtocolCommandFailedError
 from opentrons_shared_data.errors.exceptions import (
     CommandPreconditionViolated,
     CommandParameterLimitViolated,
-    PipetteLiquidNotFoundError,
     UnexpectedTipRemovalError,
 )
 from opentrons.protocol_engine.errors.exceptions import WellDoesNotExistError
@@ -27,6 +28,7 @@ from opentrons.protocols.api_support.util import (
     clamp_value,
     requires_version,
     APIVersionError,
+    UnsupportedAPIError,
 )
 from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
 
@@ -369,7 +371,9 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         if self.api_version < APIVersion(2, 15) and push_out:
             raise APIVersionError(
-                "Unsupported parameter push_out. Change your API version to 2.15 or above to use this parameter."
+                api_element="Parameter push_out",
+                until_version="2.15",
+                current_version=f"{self.api_version}",
             )
         _log.debug(
             "dispense {} from {} at {}".format(
@@ -888,21 +892,24 @@ class InstrumentContext(publisher.CommandPublisher):
         """
 
         if presses is not None and self._api_version >= _PRESSES_INCREMENT_REMOVED_IN:
-            raise APIVersionError(
-                f"presses is only available in API versions lower than {_PRESSES_INCREMENT_REMOVED_IN},"
-                f" but you are using API {self._api_version}."
+            raise UnsupportedAPIError(
+                api_element="presses",
+                since_version=f"{_PRESSES_INCREMENT_REMOVED_IN}",
+                current_version=f"{self._api_version}",
             )
 
         if increment is not None and self._api_version >= _PRESSES_INCREMENT_REMOVED_IN:
-            raise APIVersionError(
-                f"increment is only available in API versions lower than {_PRESSES_INCREMENT_REMOVED_IN},"
-                f" but you are using API {self._api_version}."
+            raise UnsupportedAPIError(
+                api_element="increment",
+                since_version=f"{_PRESSES_INCREMENT_REMOVED_IN}",
+                current_version=f"{self._api_version}",
             )
 
         if prep_after is not None and self._api_version < _PREP_AFTER_ADDED_IN:
             raise APIVersionError(
-                f"prep_after is only available in API {_PREP_AFTER_ADDED_IN} and newer,"
-                f" but you are using API {self._api_version}."
+                api_element="prep_after",
+                until_version=f"{_PREP_AFTER_ADDED_IN}",
+                current_version=f"{self._api_version}",
             )
 
         well: labware.Well
@@ -1494,9 +1501,8 @@ class InstrumentContext(publisher.CommandPublisher):
             # would get a TypeError if they tried to call it like delay(minutes=10).
             # Without changing the ultimate behavior that such a call fails the
             # protocol, we can provide a more descriptive message as a courtesy.
-            raise APIVersionError(
-                "InstrumentContext.delay() is not supported in Python Protocol API v2."
-                " Use ProtocolContext.delay() instead."
+            raise UnsupportedAPIError(
+                message="InstrumentContext.delay() is not supported in Python Protocol API v2. Use ProtocolContext.delay() instead."
             )
         else:
             # Former implementations of this method, when called without any args,
@@ -1616,9 +1622,8 @@ class InstrumentContext(publisher.CommandPublisher):
             :py:attr:`.flow_rate` instead.
         """
         if self._api_version >= ENGINE_CORE_API_VERSION:
-            raise APIVersionError(
-                "InstrumentContext.speed has been removed."
-                " Use InstrumentContext.flow_rate, instead."
+            raise UnsupportedAPIError(
+                message="InstrumentContext.speed has been removed. Use InstrumentContext.flow_rate, instead."
             )
 
         # TODO(mc, 2023-02-13): this assert should be enough for mypy
@@ -2057,16 +2062,13 @@ class InstrumentContext(publisher.CommandPublisher):
         if not isinstance(well, labware.Well):
             raise WellDoesNotExistError("You must provide a valid well to check.")
         try:
-            height = self._core.find_liquid_level(
-                well_core=well._core, error_recovery=False
-            )
-            if height > 0:
-                return True
-            return False  # it should never get here
-        except PipetteLiquidNotFoundError:
-            return False
-        except Exception as e:
+            self._core.liquid_probe_without_recovery(well._core)
+        except ProtocolCommandFailedError as e:
+            if isinstance(e.original_error, LiquidNotFoundError):
+                return False
             raise e
+        else:
+            return True
 
     @requires_version(2, 20)
     def require_liquid_presence(self, well: labware.Well) -> None:
@@ -2077,18 +2079,20 @@ class InstrumentContext(publisher.CommandPublisher):
         if not isinstance(well, labware.Well):
             raise WellDoesNotExistError("You must provide a valid well to check.")
 
-        self._core.find_liquid_level(well_core=well._core, error_recovery=True)
+        self._core.liquid_probe_with_recovery(well._core)
 
     @requires_version(2, 20)
     def measure_liquid_height(self, well: labware.Well) -> float:
         """Check the height of the liquid within a well.
 
         :returns: The height, in mm, of the liquid from the deck.
+
+        :meta private:
+
+        This is intended for Opentrons internal use only and is not a guaranteed API.
         """
         if not isinstance(well, labware.Well):
             raise WellDoesNotExistError("You must provide a valid well to check.")
 
-        height = self._core.find_liquid_level(
-            well_core=well._core, error_recovery=False
-        )
-        return float(height)
+        height = self._core.liquid_probe_without_recovery(well._core)
+        return height

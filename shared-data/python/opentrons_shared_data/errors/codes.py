@@ -92,6 +92,7 @@ class ErrorCodes(Enum):
     INVALID_STORED_DATA = _code_from_dict_entry("4008")
     MISSING_CONFIGURATION_DATA = _code_from_dict_entry("4009")
     RUNTIME_PARAMETER_VALUE_REQUIRED = _code_from_dict_entry("4010")
+    INCORRECT_API_VERSION = _code_from_dict_entry("4011")
 
     @classmethod
     @lru_cache(25)

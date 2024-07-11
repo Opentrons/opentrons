@@ -3,10 +3,7 @@ from contextlib import AsyncExitStack
 from logging import getLogger
 from typing import Dict, Optional, Union, AsyncGenerator, Callable
 from opentrons.protocol_engine.actions.actions import ResumeFromRecoveryAction
-from opentrons.protocol_engine.error_recovery_policy import (
-    ErrorRecoveryPolicy,
-    error_recovery_by_ff,
-)
+from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
 
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control import HardwareControlAPI
@@ -52,6 +49,7 @@ from .actions import (
     AddLabwareOffsetAction,
     AddLabwareDefinitionAction,
     AddLiquidAction,
+    SetDeckConfigurationAction,
     AddAddressableAreaAction,
     AddModuleAction,
     HardwareStoppedAction,
@@ -86,6 +84,7 @@ class ProtocolEngine:
         self,
         hardware_api: HardwareControlAPI,
         state_store: StateStore,
+        error_recovery_policy: ErrorRecoveryPolicy,
         action_dispatcher: Optional[ActionDispatcher] = None,
         plugin_starter: Optional[PluginStarter] = None,
         queue_worker: Optional[QueueWorker] = None,
@@ -93,7 +92,6 @@ class ProtocolEngine:
         hardware_stopper: Optional[HardwareStopper] = None,
         door_watcher: Optional[DoorWatcher] = None,
         module_data_provider: Optional[ModuleDataProvider] = None,
-        error_recovery_policy: ErrorRecoveryPolicy = error_recovery_by_ff,
     ) -> None:
         """Initialize a ProtocolEngine instance.
 
@@ -143,13 +141,27 @@ class ProtocolEngine:
         """Add a plugin to the engine to customize behavior."""
         self._plugin_starter.start(plugin)
 
-    def play(self, deck_configuration: Optional[DeckConfigurationType] = None) -> None:
+    def set_deck_configuration(
+        self, deck_configuration: Optional[DeckConfigurationType]
+    ) -> None:
+        """Inform the engine of the robot's current deck configuration.
+
+        If `Config.use_simulated_deck_config` is `True`, this is meaningless and unused.
+        You can call this with `None` if you want to be explicit--it will no-op.
+
+        If `Config.use_simulated_deck_config` is `False`, you should call this with the
+        robot's actual, full, non-`None` deck configuration, before you play the run for
+        the first time. Do not call this in the middle of a run.
+        """
+        self._action_dispatcher.dispatch(SetDeckConfigurationAction(deck_configuration))
+
+    def play(self) -> None:
         """Start or resume executing commands in the queue."""
         requested_at = self._model_utils.get_timestamp()
         # TODO(mc, 2021-08-05): if starting, ensure plungers motors are
         # homed if necessary
         action = self._state_store.commands.validate_action_allowed(
-            PlayAction(requested_at=requested_at, deck_configuration=deck_configuration)
+            PlayAction(requested_at=requested_at)
         )
         self._action_dispatcher.dispatch(action)
 

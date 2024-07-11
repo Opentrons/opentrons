@@ -1017,3 +1017,16 @@ class NotSupportedOnRobotType(ProtocolEngineError):
         super().__init__(
             ErrorCodes.NOT_SUPPORTED_ON_ROBOT_TYPE, message, details, wrapping
         )
+
+
+class TipNotEmptyError(ProtocolEngineError):
+    """Raised when an operation requires an empty tip but is provided a tip with liquid."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a TipNotEmptyError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)

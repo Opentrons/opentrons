@@ -45,6 +45,7 @@ from opentrons.protocol_engine.create_protocol_engine import (
     create_protocol_engine_in_thread,
     create_protocol_engine,
 )
+from opentrons.protocol_engine import error_recovery_policy
 from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.types import DeckType, EngineStatus, PostRunHardwareState
 from opentrons.protocol_reader.protocol_source import ProtocolSource
@@ -532,11 +533,10 @@ def simulate(
             extra_data=extra_data,
         )
     except parse.JSONSchemaVersionTooNewError as e:
-        if e.attempted_schema_version == 6:
-            # See Jira RCORE-535.
-            raise NotImplementedError(_JSON_TOO_NEW_MESSAGE) from e
-        else:
-            raise
+        # opentrons.protocols.parse() doesn't support new JSON protocols.
+        # The code to do that should be moved from opentrons.protocol_reader.
+        # See https://opentrons.atlassian.net/browse/PLAT-94.
+        raise NotImplementedError(_JSON_TOO_NEW_MESSAGE) from e
 
     if protocol.api_level < APIVersion(2, 0):
         raise ApiDeprecationError(version=protocol.api_level)
@@ -806,6 +806,7 @@ def _create_live_context_pe(
             config=_get_protocol_engine_config(
                 robot_type, virtual=use_virtual_hardware
             ),
+            error_recovery_policy=error_recovery_policy.never_recover,
             drop_tips_after_run=False,
             post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
             load_fixed_trash=should_load_fixed_trash_labware_for_python_protocol(
@@ -910,6 +911,7 @@ def _run_file_pe(
         protocol_engine = await create_protocol_engine(
             hardware_api=hardware_api_wrapped,
             config=_get_protocol_engine_config(robot_type, virtual=True),
+            error_recovery_policy=error_recovery_policy.never_recover,
             load_fixed_trash=should_load_fixed_trash(protocol_source.config),
         )
 

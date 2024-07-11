@@ -16,6 +16,7 @@ from opentrons.protocol_engine import (
     CommandCreate,
     LabwareOffset,
     Config as ProtocolEngineConfig,
+    error_recovery_policy,
 )
 from opentrons.protocol_engine.create_protocol_engine import create_protocol_engine
 from opentrons.protocol_runner import RunResult, RunOrchestrator
@@ -174,6 +175,7 @@ class MaintenanceRunOrchestratorStore:
                     RobotTypeEnum.robot_literal_to_enum(self._robot_type)
                 ),
             ),
+            error_recovery_policy=error_recovery_policy.never_recover,
             deck_configuration=deck_configuration,
             notify_publishers=notify_publishers,
         )
@@ -227,7 +229,7 @@ class MaintenanceRunOrchestratorStore:
         return self.run_orchestrator.get_command_slice(cursor=cursor, length=length)
 
     def get_current_command(self) -> Optional[CommandPointer]:
-        """Get the current running command."""
+        """Get the "current" command, if any."""
         return self.run_orchestrator.get_current_command()
 
     def get_command_recovery_target(self) -> Optional[CommandPointer]:

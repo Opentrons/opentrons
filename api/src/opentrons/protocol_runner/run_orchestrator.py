@@ -74,6 +74,7 @@ class RunOrchestrator:
     def __init__(
         self,
         protocol_engine: ProtocolEngine,
+        # todo(mm, 2024-07-05): This hardware_api param looks unused?
         hardware_api: HardwareControlAPI,
         fixit_runner: protocol_runner.LiveRunner,
         setup_runner: protocol_runner.LiveRunner,
@@ -96,7 +97,6 @@ class RunOrchestrator:
         """
         self._run_id = run_id
         self._protocol_engine = protocol_engine
-        self._hardware_api = hardware_api
         self._protocol_runner = json_or_python_protocol_runner
         self._setup_runner = setup_runner
         self._fixit_runner = fixit_runner
@@ -158,7 +158,11 @@ class RunOrchestrator:
 
     def play(self, deck_configuration: Optional[DeckConfigurationType] = None) -> None:
         """Start or resume the run."""
-        self._protocol_engine.play(deck_configuration=deck_configuration)
+        # todo(mm, 2024-07-09): The deck configuration is set at the same time here for
+        # historical reasons. It's unsafe to change the deck configuration mid-run
+        # and we're relying on the caller to not do that.
+        self._protocol_engine.set_deck_configuration(deck_configuration)
+        self._protocol_engine.play()
 
     async def run(
         self,
@@ -231,7 +235,7 @@ class RunOrchestrator:
         )
 
     def get_current_command(self) -> Optional[CommandPointer]:
-        """Get the current running command."""
+        """Get the "current" command, if any."""
         return self._protocol_engine.state_view.commands.get_current()
 
     def get_command_slice(

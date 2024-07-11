@@ -30,7 +30,7 @@ import { LargeButton } from '../../atoms/buttons'
 import { RECOVERY_MAP } from './constants'
 import {
   RecoveryInterventionModal,
-  RecoverySingleColumnContentDesktop,
+  RecoveryContentWrapper,
   StepInfo,
 } from './shared'
 
@@ -39,12 +39,9 @@ import type { ErrorRecoveryFlowsProps } from '.'
 import type { ERUtilsResults } from './hooks'
 import { useHost } from '@opentrons/react-api-client'
 
-export function useRunPausedSplash(
-  isOnDevice: boolean,
-  showERWizard: boolean
-): boolean {
-  // Don't show the splash when desktop ER wizard is active.
-  return isOnDevice && !showERWizard
+export function useRunPausedSplash(showERWizard: boolean): boolean {
+  // Don't show the splash when the ER wizard is active.
+  return !showERWizard
 }
 
 type RunPausedSplashProps = ERUtilsResults & {
@@ -149,7 +146,7 @@ export function RunPausedSplash(
         desktopType="desktop-small"
         titleHeading={buildTitleHeadingDesktop()}
       >
-        <RecoverySingleColumnContentDesktop>
+        <RecoveryContentWrapper>
           <Flex
             gridGap={SPACING.spacing24}
             flexDirection={DIRECTION_COLUMN}
@@ -204,7 +201,7 @@ export function RunPausedSplash(
               </StyledText>
             </PrimaryButton>
           </Flex>
-        </RecoverySingleColumnContentDesktop>
+        </RecoveryContentWrapper>
       </RecoveryInterventionModal>
     )
   }

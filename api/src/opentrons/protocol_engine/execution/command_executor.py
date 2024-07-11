@@ -169,6 +169,7 @@ class CommandExecutor:
                     failed_at=self._model_utils.get_timestamp(),
                     notes=note_tracker.get_notes(),
                     type=self._error_recovery_policy(
+                        self._state_store.config,
                         running_command,
                         None,
                     ),
@@ -199,6 +200,10 @@ class CommandExecutor:
                         error_id=result.public.id,
                         failed_at=result.public.createdAt,
                         notes=note_tracker.get_notes(),
-                        type=self._error_recovery_policy(running_command, result),
+                        type=self._error_recovery_policy(
+                            self._state_store.config,
+                            running_command,
+                            result,
+                        ),
                     )
                 )

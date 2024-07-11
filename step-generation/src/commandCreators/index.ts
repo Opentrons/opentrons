@@ -24,4 +24,5 @@ export {
   touchTip,
   moveLabware,
   moveToAddressableArea,
+  comment,
 } from './atomic'
