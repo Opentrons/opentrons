@@ -47,7 +47,12 @@ export function InterventionInfo(props: InterventionInfoProps): JSX.Element {
             oddStyle="hidden"
             desktopStyle="bodyDefaultRegular"
             color={COLORS.grey60}
-            css={LINE_CLAMP_STYLE}
+            css={css`
+              ${LINE_CLAMP_STYLE}
+              @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+                display: none;
+              }
+            `}
           >
             {props.labwareNickname}{' '}
           </StyledText>
