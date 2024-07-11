@@ -537,7 +537,7 @@ async def capacitive_probe(
     """
     log_files: Dict[SensorId, str] = {} if not data_files else data_files
     sensor_driver = SensorDriver()
-    pipette_present = tool is NodeId.pipette_left or tool is NodeId.pipette_right
+    pipette_present = tool in [NodeId.pipette_left, NodeId.pipette_right]
 
     capacitive_sensors = await _setup_capacitive_sensors(
         messenger,
