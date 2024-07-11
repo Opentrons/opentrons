@@ -76,7 +76,7 @@ describe('SummaryAndSettings', () => {
       mutateAsync: createProtocol,
     } as any)
     vi.mocked(useCreateRunMutation).mockReturnValue({
-      createRun: createRun,
+      createRun,
     } as any)
     vi.mocked(createQuickTransferFile).mockReturnValue('' as any)
     createProtocol.mockResolvedValue({
