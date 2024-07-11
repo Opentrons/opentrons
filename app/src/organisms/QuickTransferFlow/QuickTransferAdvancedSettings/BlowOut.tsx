@@ -8,8 +8,15 @@ import {
   POSITION_FIXED,
   COLORS,
 } from '@opentrons/components'
+import {
+  WASTE_CHUTE_FIXTURES,
+  FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
+  TRASH_BIN_ADAPTER_FIXTURE,
+  DeckConfiguration,
+} from '@opentrons/shared-data'
 import { getTopPortalEl } from '../../../App/portal'
 import { LargeButton } from '../../../atoms/buttons'
+import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
 import { ChildNavigation } from '../../ChildNavigation'
 import { ACTIONS } from '../constants'
 
@@ -18,6 +25,7 @@ import type {
   QuickTransferSummaryAction,
   FlowRateKind,
   BlowOutLocation,
+  TransferType,
 } from '../types'
 import { i18n } from '../../../i18n'
 
@@ -28,74 +36,127 @@ interface BlowOutProps {
   kind: FlowRateKind
 }
 
+export const useBlowOutLocationOptions = (
+  deckConfig: DeckConfiguration,
+  transferType: TransferType
+): { location: BlowOutLocation; description: string }[] => {
+  const { t } = useTranslation('quick_transfer')
+
+  const trashLocations = deckConfig.filter(
+    cutoutConfig =>
+      WASTE_CHUTE_FIXTURES.includes(cutoutConfig.cutoutFixtureId) ||
+      TRASH_BIN_ADAPTER_FIXTURE === cutoutConfig.cutoutFixtureId
+  )
+
+  // add trash bin in A3 if no trash or waste chute configured
+  if (trashLocations.length === 0) {
+    trashLocations.push({
+      cutoutId: 'cutoutA3',
+      cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
+    })
+  }
+  const blowOutLocationItems: {
+    location: BlowOutLocation
+    description: string
+  }[] = []
+  if (transferType !== 'distribute') {
+    blowOutLocationItems.push({
+      location: 'source_well',
+      description: t('blow_out_source_well'),
+    })
+  }
+  if (transferType !== 'consolidate') {
+    blowOutLocationItems.push({
+      location: 'dest_well',
+      description: t('blow_out_destination_well'),
+    })
+  }
+  trashLocations.map(location => {
+    blowOutLocationItems.push({
+      location: location,
+      description:
+        location.cutoutFixtureId === TRASH_BIN_ADAPTER_FIXTURE
+          ? t('trashBin_location', {
+              slotName: FLEX_SINGLE_SLOT_BY_CUTOUT_ID[location.cutoutId],
+            })
+          : t('wasteChute_location', {
+              slotName: FLEX_SINGLE_SLOT_BY_CUTOUT_ID[location.cutoutId],
+            }),
+    })
+  })
+  return blowOutLocationItems
+}
+
 export function BlowOut(props: BlowOutProps): JSX.Element {
   const { onBack, state, dispatch } = props
   const { t } = useTranslation('quick_transfer')
+  const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
 
-  const [selectedOption, setSelectedOption] = React.useState<string>('')
-  const [currentStep, setCurrentStep] = React.useState<number>(0)
-  const [blowOutLocation, setBlowOutLocation] = React.useState<string>(
-    state.blowOut ?? 'trashBin'
+  const [isBlowOutEnabled, setisBlowOutEnabled] = React.useState<boolean>(
+    state.blowOut != null
+  )
+  const [currentStep, setCurrentStep] = React.useState<number>(1)
+  const [blowOutLocation, setBlowOutLocation] = React.useState<
+    BlowOutLocation | undefined
+  >(state.blowOut)
+
+  const enableBlowOutOptions = [
+    {
+      value: true,
+      description: t('option_enabled'),
+      onClick: () => {
+        setisBlowOutEnabled(true)
+      },
+    },
+    {
+      value: false,
+      description: t('option_disabled'),
+      onClick: () => {
+        setisBlowOutEnabled(false)
+      },
+    },
+  ]
+
+  const blowOutLocationItems = useBlowOutLocationOptions(
+    deckConfig,
+    state.transferType
   )
 
-  const Action = ACTIONS.SET_BLOW_OUT
-  const displayItems = [
-    {
-      option: 'Enabled',
-      value: t('option_enabled'),
-      onClick: () => {
-        setSelectedOption('option_enabled')
-      },
-    },
-    {
-      option: 'Disabled',
-      value: t('option_disabled'),
-      onClick: () => {
-        setSelectedOption('option_disabled')
-      },
-    },
-  ]
-
-  const blowOutLocationItems = [
-    { option: 'trashBin', value: t('blow_out_trash_bin') },
-    { option: 'wasteChute', value: t('blow_out_waste_chute') },
-    { option: 'source_well', value: t('blow_out_source_well') },
-    { option: 'dest_well', value: t('blow_out_destination_well') },
-  ]
-
-  const flowSteps: string[] = ['enable_blowout', 'select_location']
-
   const handleClickBackOrExit = (): void => {
-    currentStep > 0 ? setCurrentStep(currentStep - 1) : onBack()
+    currentStep > 1 ? setCurrentStep(currentStep - 1) : onBack()
   }
 
   const handleClickSaveOrContinue = (): void => {
-    if (selectedOption === 'Enabled') {
-      if (currentStep < flowSteps.length - 1) {
-        setCurrentStep(currentStep + 1)
-      } else {
-        if (Action != null && blowOutLocation != null) {
-          dispatch({
-            type: Action,
-            location: blowOutLocation as BlowOutLocation,
-          })
-        }
+    if (currentStep === 1) {
+      if (!isBlowOutEnabled) {
+        dispatch({
+          type: ACTIONS.SET_BLOW_OUT,
+          location: undefined,
+        })
         onBack()
+      } else {
+        setCurrentStep(currentStep + 1)
       }
     } else {
-      if (Action != null) {
-        dispatch({ type: Action, location: undefined })
-      }
+      dispatch({
+        type: ACTIONS.SET_BLOW_OUT,
+        location: blowOutLocation,
+      })
       onBack()
     }
   }
 
   const setSaveOrContinueButtonText = (): string => {
     return t(
-      selectedOption === 'Enabled' && currentStep < flowSteps.length - 1
+      isBlowOutEnabled === true && currentStep < 2
         ? 'shared:continue'
         : 'shared:save'
     )
+  }
+
+  let buttonIsDisabled = false
+  if (currentStep === 2) {
+    buttonIsDisabled = blowOutLocation == null
   }
 
   return createPortal(
@@ -106,9 +167,9 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
         onClickBack={handleClickBackOrExit}
         onClickButton={handleClickSaveOrContinue}
         top={SPACING.spacing8}
-        buttonIsDisabled={selectedOption === ''}
+        buttonIsDisabled={buttonIsDisabled}
       />
-      {flowSteps[currentStep] === 'enable_blowout' ? (
+      {currentStep === 1 ? (
         <Flex
           marginTop={SPACING.spacing120}
           flexDirection={DIRECTION_COLUMN}
@@ -116,21 +177,21 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
           gridGap={SPACING.spacing4}
           width="100%"
         >
-          {displayItems.map(option => (
+          {enableBlowOutOptions.map(option => (
             <LargeButton
-              key={option.option}
+              key={option.description}
               buttonType={
-                selectedOption === option.option ? 'primary' : 'secondary'
+                option.value === isBlowOutEnabled ? 'primary' : 'secondary'
               }
               onClick={() => {
-                setSelectedOption(option.option)
+                setisBlowOutEnabled(option.value)
               }}
-              buttonText={option.value}
+              buttonText={option.description}
             />
           ))}
         </Flex>
       ) : null}
-      {flowSteps[currentStep] === 'select_location' ? (
+      {currentStep === 2 ? (
         <Flex
           marginTop={SPACING.spacing120}
           flexDirection={DIRECTION_COLUMN}
@@ -138,16 +199,20 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
           gridGap={SPACING.spacing4}
           width="100%"
         >
-          {blowOutLocationItems.map(option => (
+          {blowOutLocationItems.map(blowOutLocationItem => (
             <LargeButton
-              key={option.option}
+              key={blowOutLocationItem.description}
               buttonType={
-                blowOutLocation === option.option ? 'primary' : 'secondary'
+                blowOutLocation === blowOutLocationItem.location
+                  ? 'primary'
+                  : 'secondary'
               }
               onClick={() => {
-                setBlowOutLocation(option.option)
+                setBlowOutLocation(
+                  blowOutLocationItem.location as BlowOutLocation
+                )
               }}
-              buttonText={option.value}
+              buttonText={blowOutLocationItem.description}
             />
           ))}
         </Flex>

@@ -46,8 +46,7 @@ function getOrderedWells(
 }
 
 function getInvariantContextAndRobotState(
-  quickTransferState: QuickTransferSummaryState,
-  deckConfig: DeckConfiguration
+  quickTransferState: QuickTransferSummaryState
 ): { invariantContext: InvariantContext; robotState: RobotState } {
   const tipRackDefURI = getLabwareDefURI(quickTransferState.tipRack)
   let pipetteName = quickTransferState.pipette.model
@@ -140,10 +139,11 @@ function getInvariantContextAndRobotState(
     }
   }
   let additionalEquipmentEntities: AdditionalEquipmentEntities = {}
-  // TODO add check for blowout location here
+
   if (
     quickTransferState.dropTipLocation.cutoutFixtureId ===
-    TRASH_BIN_ADAPTER_FIXTURE
+      TRASH_BIN_ADAPTER_FIXTURE ||
+    quickTransferState.blowOut?.cutoutFixtureId === TRASH_BIN_ADAPTER_FIXTURE
   ) {
     const trashLocation = quickTransferState.dropTipLocation.cutoutId
     const trashId = `${uuid()}_trashBin`
@@ -155,11 +155,12 @@ function getInvariantContextAndRobotState(
       },
     }
   }
-  // TODO add check for blowout location here
+
   if (
     WASTE_CHUTE_FIXTURES.includes(
       quickTransferState.dropTipLocation.cutoutFixtureId
-    )
+    ) ||
+    WASTE_CHUTE_FIXTURES.includes(quickTransferState.blowOut?.cutoutFixtureId)
   ) {
     const wasteChuteLocation = quickTransferState.dropTipLocation.cutoutId
     const wasteChuteId = `${uuid()}_wasteChute`
@@ -224,22 +225,22 @@ export function generateQuickTransferArgs(
     }
   }
   const { invariantContext, robotState } = getInvariantContextAndRobotState(
-    quickTransferState,
-    deckConfig
+    quickTransferState
   )
 
-  // this cannot be 'dest_well' for multiDispense
-  let blowoutLocation = quickTransferState.blowOut
-  if (quickTransferState.blowOut === 'trashBin') {
-    const trashBinEntity = Object.values(
+  let blowoutLocation: string | undefined
+  if (
+    quickTransferState?.blowOut != null &&
+    quickTransferState.blowOut !== 'source_well' &&
+    quickTransferState.blowOut !== 'dest_well' &&
+    'cutoutId' in quickTransferState.blowOut
+  ) {
+    const entity = Object.values(
       invariantContext.additionalEquipmentEntities
-    ).find(entity => entity.name === 'trashBin')
-    blowoutLocation = trashBinEntity?.id
-  } else if (quickTransferState.blowOut === 'wasteChute') {
-    const wasteChuteEntity = Object.values(
-      invariantContext.additionalEquipmentEntities
-    ).find(entity => entity.name === 'wasteChute')
-    blowoutLocation = wasteChuteEntity?.id
+    ).find(entity => entity.location === quickTransferState.blowOut?.cutoutId)
+    blowoutLocation = entity?.id
+  } else {
+    blowoutLocation = quickTransferState.blowOut
   }
 
   const dropTipLocationEntity = Object.values(
@@ -390,7 +391,7 @@ export function generateQuickTransferArgs(
       const distributeStepArguments: DistributeArgs = {
         ...commonFields,
         commandCreatorFnName: 'distribute',
-        disposalVolume: quickTransferState.volume,
+        disposalVolume: quickTransferState.disposalVolume as number,
         mixBeforeAspirate:
           quickTransferState.mixOnAspirate != null
             ? {

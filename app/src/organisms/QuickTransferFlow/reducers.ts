@@ -58,12 +58,12 @@ export function quickTransferWizardReducer(
         state.sourceWells != null &&
         state.sourceWells.length > action.wells.length
       ) {
-        transferType = DISTRIBUTE
+        transferType = CONSOLIDATE
       } else if (
         state.sourceWells != null &&
         state.sourceWells.length < action.wells.length
       ) {
-        transferType = CONSOLIDATE
+        transferType = DISTRIBUTE
       }
       return {
         pipette: state.pipette,
@@ -110,9 +110,19 @@ export function quickTransferSummaryReducer(
       }
     }
     case 'SET_PIPETTE_PATH': {
-      return {
-        ...state,
-        path: action.path,
+      if (action.path === 'multiDispense') {
+        return {
+          ...state,
+          path: action.path,
+          disposalVolume: action.disposalVolume,
+          blowOut: action.blowOutLocation,
+        }
+      } else {
+        return {
+          ...state,
+          path: action.path,
+          disposalVolume: undefined,
+        }
       }
     }
     case 'SET_ASPIRATE_TIP_POSITION': {

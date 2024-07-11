@@ -47,12 +47,12 @@ export function getInitialSummaryState(
 
   let path: PathOption = 'single'
   if (
-    state.transferType === 'consolidate' &&
-    volumeLimits.max >= state.volume * 2
+    state.transferType === 'distribute' &&
+    volumeLimits.max >= state.volume * 3
   ) {
     path = 'multiDispense'
   } else if (
-    state.transferType === 'distribute' &&
+    state.transferType === 'consolidate' &&
     volumeLimits.max >= state.volume * 2
   ) {
     path = 'multiAspirate'
@@ -86,6 +86,8 @@ export function getInitialSummaryState(
     aspirateFlowRate: flowRatesForSupportedTip.defaultAspirateFlowRate.default,
     dispenseFlowRate: flowRatesForSupportedTip.defaultDispenseFlowRate.default,
     path,
+    disposalVolume: path === 'multiDispense' ? state.volume : undefined,
+    blowOut: path === 'multiDispense' ? trashConfigCutout : undefined,
     tipPositionAspirate: 1,
     preWetTip: false,
     tipPositionDispense: 1,

@@ -9,9 +9,12 @@ import {
   COLORS,
   ALIGN_CENTER,
 } from '@opentrons/components'
+import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
 import { getTopPortalEl } from '../../../App/portal'
 import { LargeButton } from '../../../atoms/buttons'
 import { ChildNavigation } from '../../ChildNavigation'
+import { useBlowOutLocationOptions } from './BlowOut'
+import { getVolumeRange } from '../utils'
 
 import type {
   PathOption,
@@ -34,94 +37,104 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
   const { onBack, state, dispatch } = props
   const { t } = useTranslation('quick_transfer')
   const keyboardRef = React.useRef(null)
+  const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
 
-  const [selectedOption, setSelectedOption] = React.useState<PathOption>(
-    state.path
+  const [selectedPath, setSelectedPath] = React.useState<PathOption>(state.path)
+  const [currentStep, setCurrentStep] = React.useState<number>(1)
+  const [blowOutLocation, setBlowOutLocation] = React.useState<
+    BlowOutLocation | undefined
+  >(state.blowOut)
+  console.log(state.disposalVolume)
+  console.log(state.blowOut)
+  const [disposalVolume, setDisposalVolume] = React.useState<number>(
+    state.volume
   )
-  const [currentStep, setCurrentStep] = React.useState<number>(0)
-  const [blowOutLocation, setBlowOutLocation] = React.useState<string>(
-    state.blowOut ?? 'trashBin'
-  )
-  const [volume, setVolume] = React.useState<number>(state.volume)
+  const volumeLimits = getVolumeRange(state)
 
-  const allowedPipettePathOptions: PathOption[] = ['single']
-  if (state.sourceWells.length === 1 && state.destinationWells.length > 1) {
-    allowedPipettePathOptions.push('multiDispense')
-  } else if (
-    state.sourceWells.length > 1 &&
-    state.destinationWells.length === 1
+  const allowedPipettePathOptions: {
+    pathOption: PathOption
+    description: string
+  }[] = [{ pathOption: 'single', description: t('pipette_path_single') }]
+  if (
+    state.transferType === 'distribute' &&
+    volumeLimits.max >= state.volume * 3
   ) {
-    allowedPipettePathOptions.push('multiAspirate')
+    // we have the capacity for a multi dispense if we can fit at least 2x the volume per well
+    // for aspiration plus 1x the volume per well for disposal volume
+    allowedPipettePathOptions.push({
+      pathOption: 'multiDispense',
+      description: t('pipette_path_multi_dispense'),
+    })
+    // for multi aspirate we only need at least 2x the volume per well
+  } else if (
+    state.transferType === 'consolidate' &&
+    volumeLimits.max >= state.volume * 2
+  ) {
+    allowedPipettePathOptions.push({
+      pathOption: 'multiAspirate',
+      description: t('pipette_path_multi_aspirate'),
+    })
   }
 
-  function getOptionCopy(option: PathOption): string {
-    switch (option) {
-      case 'single':
-        return t('pipette_path_single')
-      case 'multiAspirate':
-        return t('pipette_path_multi_aspirate')
-      case 'multiDispense':
-        return t('pipette_path_multi_dispense')
-      default:
-        return ''
-    }
-  }
-
-  const blowOutLocationItems = [
-    { option: 'trashBin', value: t('blow_out_trash_bin') },
-    { option: 'wasteChute', value: t('blow_out_waste_chute') },
-    { option: 'source_well', value: t('blow_out_source_well') },
-    { option: 'dest_well', value: t('blow_out_destination_well') },
-  ]
-
-  const flowSteps: string[] = ['select_path', 'select_volume', 'select_blowout']
+  const blowOutLocationItems = useBlowOutLocationOptions(
+    deckConfig,
+    state.transferType
+  )
 
   const handleClickBackOrExit = (): void => {
     currentStep > 0 ? setCurrentStep(currentStep - 1) : onBack()
   }
 
   const handleClickSaveOrContinue = (): void => {
-    if (selectedOption === 'multiAspirate') {
-      if (currentStep < flowSteps.length - 1) {
-        setCurrentStep(currentStep + 1)
-      } else {
-        console.log({ selectedOption, volume, blowOutLocation })
-        if (blowOutLocation != null && volume != null) {
-          dispatch({
-            type: ACTIONS.SET_PIPETTE_PATH,
-            path: selectedOption as PathOption,
-          })
-          dispatch({
-            type: ACTIONS.SET_BLOW_OUT,
-            location: blowOutLocation as BlowOutLocation,
-          })
-          dispatch({ type: ACTIONS.SET_VOLUME, volume })
-        }
+    if (currentStep === 1) {
+      if (selectedPath !== 'multiDispense') {
+        dispatch({
+          type: ACTIONS.SET_PIPETTE_PATH,
+          path: selectedPath,
+        })
         onBack()
+      } else {
+        setCurrentStep(2)
       }
+    } else if (currentStep === 2) {
+      setCurrentStep(3)
     } else {
-      dispatch({ type: ACTIONS.SET_PIPETTE_PATH, path: selectedOption })
+      dispatch({
+        type: ACTIONS.SET_PIPETTE_PATH,
+        path: selectedPath as PathOption,
+        disposalVolume,
+        blowOutLocation,
+      })
       onBack()
     }
   }
 
   const setSaveOrContinueButtonText = (): string => {
     return t(
-      selectedOption === 'multiAspirate' && currentStep < flowSteps.length - 1
+      selectedPath === 'multiDispense' && currentStep < 3
         ? 'shared:continue'
         : 'shared:save'
     )
   }
 
-  // TODO: find the actual min and max for these values.
-  const volumeRange = { min: 1, max: 100 }
-  const error =
-    volume !== null && (volume < volumeRange.min || volume > volumeRange.max)
+  const maxVolumeCapacity = volumeLimits.max - state.volume * 2
+  const volumeRange = { min: 1, max: maxVolumeCapacity }
+
+  const volumeError =
+    disposalVolume !== null &&
+    (disposalVolume < volumeRange.min || disposalVolume > volumeRange.max)
       ? t(`value_out_of_range`, {
           min: volumeRange.min,
           max: volumeRange.max,
         })
       : null
+
+  let buttonIsDisabled = false
+  if (currentStep === 2) {
+    buttonIsDisabled = disposalVolume == null || volumeError != null
+  } else if (currentStep === 3) {
+    buttonIsDisabled = blowOutLocation == null
+  }
 
   return createPortal(
     <Flex position={POSITION_FIXED} backgroundColor={COLORS.white} width="100%">
@@ -130,9 +143,9 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
         buttonText={i18n.format(setSaveOrContinueButtonText(), 'capitalize')}
         onClickBack={handleClickBackOrExit}
         onClickButton={handleClickSaveOrContinue}
-        buttonIsDisabled={selectedOption === null}
+        buttonIsDisabled={buttonIsDisabled}
       />
-      {flowSteps[currentStep] === 'select_path' ? (
+      {currentStep === 1 ? (
         <Flex
           marginTop={SPACING.spacing120}
           flexDirection={DIRECTION_COLUMN}
@@ -142,23 +155,25 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
         >
           {allowedPipettePathOptions.map(option => (
             <LargeButton
-              key={option}
-              buttonType={selectedOption === option ? 'primary' : 'secondary'}
+              key={option.pathOption}
+              buttonType={
+                selectedPath === option.pathOption ? 'primary' : 'secondary'
+              }
               onClick={() => {
-                setSelectedOption(option)
+                setSelectedPath(option.pathOption)
               }}
-              buttonText={getOptionCopy(option)}
+              buttonText={option.description}
             />
           ))}
         </Flex>
       ) : null}
-      {flowSteps[currentStep] === 'select_volume' ? (
+      {currentStep === 2 ? (
         <Flex
           alignSelf={ALIGN_CENTER}
           gridGap={SPACING.spacing48}
           paddingX={SPACING.spacing40}
           padding={`${SPACING.spacing16} ${SPACING.spacing40} ${SPACING.spacing40}`}
-          marginTop="7.75rem" // using margin rather than justify due to content moving with error message
+          marginTop="7.75rem" // using margin rather than justify due to content moving with volumeError message
           alignItems={ALIGN_CENTER}
           height="22rem"
         >
@@ -171,9 +186,9 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
           >
             <InputField
               type="number"
-              value={volume}
+              value={disposalVolume}
               title={t('disposal_volume_µL')}
-              error={error}
+              error={volumeError}
               readOnly
             />
           </Flex>
@@ -186,13 +201,13 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
             <NumericalKeyboard
               keyboardRef={keyboardRef}
               onChange={e => {
-                setVolume(Number(e))
+                setDisposalVolume(Number(e))
               }}
             />
           </Flex>
         </Flex>
       ) : null}
-      {flowSteps[currentStep] === 'select_blowout' ? (
+      {currentStep === 3 ? (
         <Flex
           marginTop={SPACING.spacing120}
           flexDirection={DIRECTION_COLUMN}
@@ -202,14 +217,14 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
         >
           {blowOutLocationItems.map(option => (
             <LargeButton
-              key={option.option}
+              key={option.description}
               buttonType={
-                blowOutLocation === option.option ? 'primary' : 'secondary'
+                blowOutLocation === option.location ? 'primary' : 'secondary'
               }
               onClick={() => {
-                setBlowOutLocation(option.option)
+                setBlowOutLocation(option.location)
               }}
-              buttonText={option.value}
+              buttonText={option.description}
             />
           ))}
         </Flex>

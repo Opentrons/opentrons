@@ -25,11 +25,7 @@ export type ChangeTipOptions =
   | 'perDest'
   | 'perSource'
 export type FlowRateKind = 'aspirate' | 'dispense' | 'blowout'
-export type BlowOutLocation =
-  | 'source_well'
-  | 'dest_well'
-  | 'trashBin'
-  | 'wasteChute'
+export type BlowOutLocation = 'source_well' | 'dest_well' | CutoutConfig
 
 export interface QuickTransferSummaryState {
   pipette: PipetteV2Specs
@@ -66,7 +62,8 @@ export interface QuickTransferSummaryState {
     positionFromBottom: number
   }
   touchTipDispense?: number
-  blowOut?: string // trashBin or wasteChute or 'SOURCE_WELL' or 'DEST_WELL'
+  disposalVolume?: number
+  blowOut?: BlowOutLocation // trashBin or wasteChute or 'SOURCE_WELL' or 'DEST_WELL'
   airGapDispense?: number
   changeTip: ChangeTipOptions
   dropTipLocation: CutoutConfig
@@ -117,6 +114,8 @@ interface SetDispenseFlowRateAction {
 interface SetPipettePath {
   type: typeof ACTIONS.SET_PIPETTE_PATH
   path: PathOption
+  disposalVolume?: number
+  blowOutLocation?: BlowOutLocation
 }
 interface SetAspirateTipPosition {
   type: typeof ACTIONS.SET_ASPIRATE_TIP_POSITION
