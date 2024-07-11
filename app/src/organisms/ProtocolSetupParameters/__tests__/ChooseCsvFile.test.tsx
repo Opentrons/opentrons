@@ -129,7 +129,9 @@ describe('ChooseCsvFile', () => {
     const csvFileOnRobot = screen.getByRole('label', {
       name: 'rtp_mock_file2.csv',
     })
-    const confirmButton = screen.getByRole('button', {name: 'Confirm selection'})
+    const confirmButton = screen.getByRole('button', {
+      name: 'Confirm selection',
+    })
 
     fireEvent.click(csvFileOnRobot)
     fireEvent.click(confirmButton)
@@ -147,7 +149,9 @@ describe('ChooseCsvFile', () => {
     render(props)
 
     const csvFileOnUsb = screen.getByRole('label', { name: 'mock-file1.csv' })
-    const confirmButton = screen.getByRole('button', {name: 'Confirm selection'})
+    const confirmButton = screen.getByRole('button', {
+      name: 'Confirm selection',
+    })
 
     fireEvent.click(csvFileOnUsb)
     fireEvent.click(confirmButton)
