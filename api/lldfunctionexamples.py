@@ -64,7 +64,7 @@ def run(ctx: protocol_api.ProtocolContext):
     pipette.pick_up_tip(tiprack["A3"])
     
     print(pipette.liquid_detection) #should be: False
-    pipette.require_liquid_presence(plate["A4"]) #should run without error
+    pipette.require_liquid_presence(plate["A5"]) #should run without error
     pipette.drop_tip(trash_bin)
     
     
