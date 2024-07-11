@@ -866,7 +866,7 @@ def test_get_current() -> None:
         created_at=datetime(year=2022, month=2, day=2),
     )
     subject = get_command_view(commands=[command_1, command_2])
-    subject.state.command_history._set_terminal_command_id(command_1.id)
+    subject.state.command_history._set_most_recently_completed_command_id(command_1.id)
 
     assert subject.get_current() == CommandPointer(
         index=1,
@@ -886,7 +886,7 @@ def test_get_current() -> None:
         created_at=datetime(year=2022, month=2, day=2),
     )
     subject = get_command_view(commands=[command_1, command_2])
-    subject.state.command_history._set_terminal_command_id(command_1.id)
+    subject.state.command_history._set_most_recently_completed_command_id(command_1.id)
 
     assert subject.get_current() == CommandPointer(
         index=1,

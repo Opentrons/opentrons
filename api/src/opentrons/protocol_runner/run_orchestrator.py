@@ -231,7 +231,7 @@ class RunOrchestrator:
         )
 
     def get_current_command(self) -> Optional[CommandPointer]:
-        """Get the current running command."""
+        """Get the "current" command, if any."""
         return self._protocol_engine.state_view.commands.get_current()
 
     def get_command_slice(
