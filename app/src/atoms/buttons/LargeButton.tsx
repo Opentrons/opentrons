@@ -51,7 +51,6 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
       focusVisibleOutlineColor: string
       focusVisibleBackgroundColor: string
       activeIconColor?: string
-      isInverse?: boolean
       activeColor?: string
     }
   > = {
@@ -97,7 +96,6 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
       disabledBackgroundColor: COLORS.grey35,
       iconColor: COLORS.white,
       disabledIconColor: COLORS.grey50,
-      isInverse: true,
       activeIconColor: COLORS.red60,
       focusVisibleOutlineColor: COLORS.blue50,
       focusVisibleBackgroundColor: COLORS.red40,
