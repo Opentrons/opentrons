@@ -3,7 +3,6 @@ import { describe, it, beforeEach, vi, expect } from 'vitest'
 import { screen, fireEvent } from '@testing-library/react'
 import { when } from 'vitest-when'
 
-import { COLORS } from '@opentrons/components'
 import { useAllCsvFilesQuery } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../i18n'
