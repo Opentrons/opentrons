@@ -319,7 +319,6 @@ async def _setup_pressure_sensors(
 async def _setup_capacitive_sensors(
     messenger: CanMessenger,
     sensor_id: SensorId,
-    # node: NodeId,
     tool: InstrumentProbeTarget,
     relative_threshold_pf: float,
     sensor_driver: SensorDriver,
@@ -335,9 +334,6 @@ async def _setup_capacitive_sensors(
     for sensor in sensors:
         capacitive_sensor = CapacitiveSensor.build(
             sensor_id=sensor,
-            # this is bad and I dont like it
-            # it only works when it gets passed a InstumentProbeTarget
-            # but the function param is a NodeId ????
             node_id=tool,
             stop_threshold=relative_threshold_pf,
         )
