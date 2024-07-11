@@ -93,7 +93,7 @@ export function RunningProtocol(): JSX.Element {
     setInterventionModalCommandKey,
   ] = React.useState<string | null>(null)
   const lastAnimatedCommand = React.useRef<string | null>(null)
-  const swipe = useSwipe()
+  const { ref, style, swipeType, setSwipeType } = useSwipe()
   const robotSideAnalysis = useMostRecentCompletedAnalysis(runId)
   const lastRunCommand = useLastRunCommand(runId, {
     refetchInterval: LIVE_RUN_COMMANDS_POLL_MS,
@@ -126,20 +126,20 @@ export function RunningProtocol(): JSX.Element {
   React.useEffect(() => {
     if (
       currentOption === 'CurrentRunningProtocolCommand' &&
-      swipe.swipeType === 'swipe-left'
+      swipeType === 'swipe-left'
     ) {
       setCurrentOption('RunningProtocolCommandList')
-      swipe.setSwipeType('')
+      setSwipeType('')
     }
 
     if (
       currentOption === 'RunningProtocolCommandList' &&
-      swipe.swipeType === 'swipe-right'
+      swipeType === 'swipe-right'
     ) {
       setCurrentOption('CurrentRunningProtocolCommand')
-      swipe.setSwipeType('')
+      setSwipeType('')
     }
-  }, [currentOption, swipe, swipe.setSwipeType])
+  }, [currentOption, swipeType, setSwipeType])
 
   React.useEffect(() => {
     if (
@@ -209,7 +209,8 @@ export function RunningProtocol(): JSX.Element {
           />
         ) : null}
         <Flex
-          ref={swipe.ref}
+          ref={ref}
+          style={style}
           padding={`1.75rem ${SPACING.spacing40} ${SPACING.spacing40}`}
           flexDirection={DIRECTION_COLUMN}
         >
