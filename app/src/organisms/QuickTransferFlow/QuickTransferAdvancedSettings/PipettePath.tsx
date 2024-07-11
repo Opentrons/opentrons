@@ -44,8 +44,7 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
   const [blowOutLocation, setBlowOutLocation] = React.useState<
     BlowOutLocation | undefined
   >(state.blowOut)
-  console.log(state.disposalVolume)
-  console.log(state.blowOut)
+
   const [disposalVolume, setDisposalVolume] = React.useState<number>(
     state.volume
   )
@@ -109,13 +108,10 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
     }
   }
 
-  const setSaveOrContinueButtonText = (): string => {
-    return t(
-      selectedPath === 'multiDispense' && currentStep < 3
-        ? 'shared:continue'
-        : 'shared:save'
-    )
-  }
+  const saveOrContinueButtonText =
+    selectedPath === 'multiDispense' && currentStep < 3
+      ? t('shared:continue')
+      : t('shared:save')
 
   const maxVolumeCapacity = volumeLimits.max - state.volume * 2
   const volumeRange = { min: 1, max: maxVolumeCapacity }
@@ -140,7 +136,7 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
     <Flex position={POSITION_FIXED} backgroundColor={COLORS.white} width="100%">
       <ChildNavigation
         header={t('pipette_path')}
-        buttonText={i18n.format(setSaveOrContinueButtonText(), 'capitalize')}
+        buttonText={i18n.format(saveOrContinueButtonText, 'capitalize')}
         onClickBack={handleClickBackOrExit}
         onClickButton={handleClickSaveOrContinue}
         buttonIsDisabled={buttonIsDisabled}
@@ -173,7 +169,7 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
           gridGap={SPACING.spacing48}
           paddingX={SPACING.spacing40}
           padding={`${SPACING.spacing16} ${SPACING.spacing40} ${SPACING.spacing40}`}
-          marginTop="7.75rem" // using margin rather than justify due to content moving with volumeError message
+          marginTop="7.75rem" // using margin rather than justify due to content moving with error message
           alignItems={ALIGN_CENTER}
           height="22rem"
         >

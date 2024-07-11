@@ -35,98 +35,81 @@ export function Mix(props: MixProps): JSX.Element {
   const { t } = useTranslation('quick_transfer')
   const keyboardRef = React.useRef(null)
 
-  const [selectedOption, setSelectedOption] = React.useState<string>('')
-  const [currentStep, setCurrentStep] = React.useState<number>(0)
+  const [mixIsEnabled, setMixIsEnabled] = React.useState<boolean>(
+    kind === 'aspirate'
+      ? state.mixOnAspirate != null
+      : state.mixOnDispense != null
+  )
+  const [currentStep, setCurrentStep] = React.useState<number>(1)
   const [mixVolume, setMixVolume] = React.useState<number | null>(
     kind === 'aspirate'
       ? state.mixOnAspirate?.mixVolume ?? null
-      : kind === 'dispense'
-      ? state.mixOnDispense?.mixVolume ?? null
-      : null
+      : state.mixOnDispense?.mixVolume ?? null
   )
   const [mixReps, setMixReps] = React.useState<number | null>(
     kind === 'aspirate'
       ? state.mixOnAspirate?.repititions ?? null
-      : kind === 'dispense'
-      ? state.mixOnDispense?.repititions ?? null
-      : null
+      : state.mixOnDispense?.repititions ?? null
   )
 
-  let headerCopy: string = ''
-  let MixAction:
-    | typeof ACTIONS.SET_MIX_ON_ASPIRATE
-    | typeof ACTIONS.SET_MIX_ON_DISPENSE
-    | null = null
+  const mixAction =
+    kind === 'aspirate'
+      ? ACTIONS.SET_MIX_ON_ASPIRATE
+      : ACTIONS.SET_MIX_ON_DISPENSE
 
-  if (kind === 'aspirate') {
-    headerCopy = t('mix_before_aspirating')
-    MixAction = ACTIONS.SET_MIX_ON_ASPIRATE
-  } else if (kind === 'dispense') {
-    headerCopy = t('mix_before_dispensing')
-    MixAction = ACTIONS.SET_MIX_ON_DISPENSE
-  }
-
-  const displayItems = [
+  const enableMixDisplayItems = [
     {
-      option: 'Enabled',
-      value: t('option_enabled'),
+      option: true,
+      description: t('option_enabled'),
       onClick: () => {
-        setSelectedOption('option_enabled')
+        setMixIsEnabled(true)
       },
     },
     {
-      option: 'Disabled',
-      value: t('option_disabled'),
+      option: false,
+      description: t('option_disabled'),
       onClick: () => {
-        setSelectedOption('option_disabled')
+        setMixIsEnabled(false)
       },
     },
   ]
 
-  const flowSteps: string[] = ['enable_mix', 'select_volume', 'select_reps']
-
   const handleClickBackOrExit = (): void => {
-    currentStep > 0 ? setCurrentStep(currentStep - 1) : onBack()
+    currentStep > 1 ? setCurrentStep(currentStep - 1) : onBack()
   }
 
   const handleClickSaveOrContinue = (): void => {
-    if (selectedOption === 'Enabled') {
-      if (currentStep < flowSteps.length - 1) {
-        setCurrentStep(currentStep + 1)
-      } else {
-        if (MixAction != null && mixVolume != null && mixReps != null) {
-          dispatch({
-            type: MixAction,
-            mixSettings: { mixVolume, repititions: mixReps },
-          })
-        }
-        onBack()
-      }
-    } else {
-      if (MixAction != null) {
+    if (currentStep === 1) {
+      if (!mixIsEnabled) {
         dispatch({
-          type: MixAction,
+          type: mixAction,
           mixSettings: undefined,
+        })
+      } else {
+        setCurrentStep(2)
+      }
+    } else if (currentStep === 2) {
+      setCurrentStep(3)
+    } else if (currentStep === 3) {
+      if (mixVolume != null && mixReps != null) {
+        dispatch({
+          type: mixAction,
+          mixSettings: { mixVolume, repititions: mixReps },
         })
       }
       onBack()
     }
   }
 
-  const setSaveOrContinueButtonText = (): string => {
-    return t(
-      selectedOption === 'Enabled' && currentStep < flowSteps.length - 1
-        ? 'shared:continue'
-        : 'shared:save'
-    )
-  }
+  const setSaveOrContinueButtonText =
+    mixIsEnabled && currentStep < 3 ? t('shared:continue') : t('shared:save')
 
   const maxPipetteVolume = Object.values(state.pipette.liquids)[0].maxVolume
   const tipVolume = Object.values(state.tipRack.wells)[0].totalLiquidVolume
 
   const volumeRange = { min: 1, max: Math.min(maxPipetteVolume, tipVolume) }
   const volumeError =
-    mixVolume !== null &&
+    mixVolume != null &&
     (mixVolume < volumeRange.min || mixVolume > volumeRange.max)
       ? t(`value_out_of_range`, {
           min: volumeRange.min,
@@ -134,24 +117,28 @@ export function Mix(props: MixProps): JSX.Element {
         })
       : null
 
-  let buttonIsDisabled = selectedOption === ''
-  if (flowSteps[currentStep] === 'select_volume') {
+  let buttonIsDisabled = false
+  if (currentStep === 2) {
     buttonIsDisabled = mixVolume == null || volumeError != null
-  } else if (flowSteps[currentStep] === 'select_reps') {
+  } else if (currentStep === 3) {
     buttonIsDisabled = mixReps == null
   }
 
   return createPortal(
     <Flex position={POSITION_FIXED} backgroundColor={COLORS.white} width="100%">
       <ChildNavigation
-        header={headerCopy}
-        buttonText={i18n.format(setSaveOrContinueButtonText(), 'capitalize')}
+        header={
+          kind === 'aspirate'
+            ? t('mix_before_aspirating')
+            : t('mix_before_dispensing')
+        }
+        buttonText={i18n.format(setSaveOrContinueButtonText, 'capitalize')}
         onClickBack={handleClickBackOrExit}
         onClickButton={handleClickSaveOrContinue}
         top={SPACING.spacing8}
-        buttonIsDisabled={volumeError !== null || selectedOption === ''}
+        buttonIsDisabled={buttonIsDisabled}
       />
-      {flowSteps[currentStep] === 'enable_mix' ? (
+      {currentStep === 1 ? (
         <Flex
           marginTop={SPACING.spacing120}
           flexDirection={DIRECTION_COLUMN}
@@ -159,21 +146,19 @@ export function Mix(props: MixProps): JSX.Element {
           gridGap={SPACING.spacing4}
           width="100%"
         >
-          {displayItems.map(option => (
+          {enableMixDisplayItems.map(displayItem => (
             <LargeButton
-              key={option.option}
+              key={displayItem.description}
               buttonType={
-                selectedOption === option.option ? 'primary' : 'secondary'
+                mixIsEnabled === displayItem.option ? 'primary' : 'secondary'
               }
-              onClick={() => {
-                setSelectedOption(option.option)
-              }}
-              buttonText={option.value}
+              onClick={displayItem.onClick}
+              buttonText={displayItem.description}
             />
           ))}
         </Flex>
       ) : null}
-      {flowSteps[currentStep] === 'select_volume' ? (
+      {currentStep === 2 ? (
         <Flex
           alignSelf={ALIGN_CENTER}
           gridGap={SPACING.spacing48}
@@ -213,7 +198,7 @@ export function Mix(props: MixProps): JSX.Element {
           </Flex>
         </Flex>
       ) : null}
-      {flowSteps[currentStep] === 'select_reps' ? (
+      {currentStep === 3 ? (
         <Flex
           alignSelf={ALIGN_CENTER}
           gridGap={SPACING.spacing48}

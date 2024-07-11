@@ -30,6 +30,10 @@ import { Delay } from './Delay'
 import { TouchTip } from './TouchTip'
 import { AirGap } from './AirGap'
 import { BlowOut } from './BlowOut'
+import {
+  TRASH_BIN_ADAPTER_FIXTURE,
+  WASTE_CHUTE_FIXTURES,
+} from '@opentrons/shared-data'
 
 interface QuickTransferAdvancedSettingsProps {
   state: QuickTransferSummaryState
@@ -40,7 +44,7 @@ export function QuickTransferAdvancedSettings(
   props: QuickTransferAdvancedSettingsProps
 ): JSX.Element | null {
   const { state, dispatch } = props
-  const { t } = useTranslation(['quick_transfer', 'shared'])
+  const { t, i18n } = useTranslation(['quick_transfer', 'shared'])
   const [selectedSetting, setSelectedSetting] = React.useState<string | null>(
     null
   )
@@ -48,28 +52,34 @@ export function QuickTransferAdvancedSettings(
   // TODO: Determine when we need to display snackbar
   // makeSnackbar(t('advanced_setting_disabled'))
 
-  let pipettePath: string = ''
-  if (state.path === 'single') {
-    pipettePath = t('pipette_path_single')
-  } else if (state.path === 'multiAspirate') {
-    pipettePath = t('pipette_path_multi_aspirate')
-  } else if (state.path === 'multiDispense') {
-    pipettePath = t('pipette_path_multi_dispense')
+  function getBlowoutValueCopy(): string | undefined {
+    if (state.blowOut === 'dest_well') {
+      return t('blow_out_into_destination_well')
+    } else if (state.blowOut === 'source_well') {
+      return t('blow_out_into_source_well')
+    } else if (
+      state.blowOut != null &&
+      state.blowOut.cutoutFixtureId === TRASH_BIN_ADAPTER_FIXTURE
+    ) {
+      return t('blow_out_into_trash_bin')
+    } else if (
+      state.blowOut != null &&
+      WASTE_CHUTE_FIXTURES.includes(state.blowOut.cutoutFixtureId)
+    ) {
+      return t('blow_out_into_waste_chute')
+    }
   }
 
-  function getBlowoutValueCopy(): string {
-    switch (state.blowOut) {
-      case 'trashBin':
-        return t('blow_out_into_trash_bin')
-      case 'wasteChute':
-        return t('blow_out_into_waste_chute')
-      case 'dest_well':
-        return t('blow_out_into_destination_well')
-      case 'source_well':
-        return t('blow_out_into_source_well')
-      default:
-        return ''
-    }
+  let pipettePathValue: string = ''
+  if (state.path === 'single') {
+    pipettePathValue = t('pipette_path_single')
+  } else if (state.path === 'multiAspirate') {
+    pipettePathValue = t('pipette_path_multi_aspirate')
+  } else if (state.path === 'multiDispense') {
+    pipettePathValue = t('pipette_path_multi_dispense', {
+      volume: state.disposalVolume,
+      blowOutLocation: getBlowoutValueCopy(),
+    })
   }
 
   const baseSettingsItems = [
@@ -91,7 +101,7 @@ export function QuickTransferAdvancedSettings(
     },
     {
       option: t('pipette_path'),
-      value: pipettePath,
+      value: pipettePathValue,
       enabled: state.transferType !== 'transfer',
       onClick: () => {
         if (state.transferType !== 'transfer')
@@ -239,7 +249,7 @@ export function QuickTransferAdvancedSettings(
     },
     {
       option: t('blow_out'),
-      value: getBlowoutValueCopy(),
+      value: i18n.format(getBlowoutValueCopy(), 'capitalize'),
       enabled: true,
       onClick: () => {
         setSelectedSetting('dispense_blow_out')

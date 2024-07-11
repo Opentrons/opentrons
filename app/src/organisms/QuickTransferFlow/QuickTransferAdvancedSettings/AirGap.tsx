@@ -35,78 +35,61 @@ export function AirGap(props: AirGapProps): JSX.Element {
   const { t } = useTranslation('quick_transfer')
   const keyboardRef = React.useRef(null)
 
-  const [selectedOption, setSelectedOption] = React.useState<string>('')
-  const [currentStep, setCurrentStep] = React.useState<number>(0)
+  const [airGapEnabled, setAirGapEnabled] = React.useState<boolean>(
+    kind === 'aspirate'
+      ? state.airGapAspirate != null
+      : state.airGapDispense != null
+  )
+  const [currentStep, setCurrentStep] = React.useState<number>(1)
   const [volume, setVolume] = React.useState<number | null>(
     kind === 'aspirate'
       ? state.airGapAspirate ?? null
-      : kind === 'dispense'
-      ? state.airGapDispense ?? null
-      : null
+      : state.airGapDispense ?? null
   )
 
-  let headerCopy: string = ''
-  let Action:
-    | typeof ACTIONS.SET_AIR_GAP_ASPIRATE
-    | typeof ACTIONS.SET_AIR_GAP_DISPENSE
-    | null = null
+  const action =
+    kind === 'aspirate'
+      ? ACTIONS.SET_AIR_GAP_ASPIRATE
+      : ACTIONS.SET_AIR_GAP_DISPENSE
 
-  if (kind === 'aspirate') {
-    headerCopy = t('air_gap_before_aspirating')
-    Action = ACTIONS.SET_AIR_GAP_ASPIRATE
-  } else if (kind === 'dispense') {
-    headerCopy = t('air_gap_before_dispensing')
-    Action = ACTIONS.SET_AIR_GAP_DISPENSE
-  }
-
-  const displayItems = [
+  const enableAirGapDisplayItems = [
     {
-      option: 'Enabled',
-      value: t('option_enabled'),
+      option: true,
+      description: t('option_enabled'),
       onClick: () => {
-        setSelectedOption('option_enabled')
+        setAirGapEnabled(true)
       },
     },
     {
-      option: 'Disabled',
-      value: t('option_disabled'),
+      option: false,
+      description: t('option_disabled'),
       onClick: () => {
-        setSelectedOption('option_disabled')
+        setAirGapEnabled(false)
       },
     },
   ]
 
-  const flowSteps: string[] = ['enable_air_gap', 'select_volume']
-
   const handleClickBackOrExit = (): void => {
-    currentStep > 0 ? setCurrentStep(currentStep - 1) : onBack()
+    currentStep > 1 ? setCurrentStep(currentStep - 1) : onBack()
   }
 
   const handleClickSaveOrContinue = (): void => {
-    if (selectedOption === 'Enabled') {
-      if (currentStep < flowSteps.length - 1) {
+    if (currentStep === 1) {
+      if (airGapEnabled) {
         setCurrentStep(currentStep + 1)
       } else {
-        if (Action != null && volume != null) {
-          dispatch({ type: Action, volume })
-        }
+        dispatch({ type: action, volume: undefined })
         onBack()
       }
-    } else {
-      if (Action != null) {
-        dispatch({ type: Action, volume: undefined })
-      }
+    } else if (currentStep === 2) {
+      dispatch({ type: action, volume: volume ?? undefined })
       onBack()
     }
   }
 
-  const setSaveOrContinueButtonText = (): string => {
-    return t(
-      selectedOption === 'Enabled' && currentStep < flowSteps.length - 1
-        ? 'shared:continue'
-        : 'shared:save'
-    )
-  }
+  const setSaveOrContinueButtonText =
+    airGapEnabled && currentStep < 2 ? t('shared:continue') : t('shared:save')
+
   const maxPipetteVolume = Object.values(state.pipette.liquids)[0].maxVolume
   const tipVolume = Object.values(state.tipRack.wells)[0].totalLiquidVolume
 
@@ -136,7 +119,7 @@ export function AirGap(props: AirGapProps): JSX.Element {
     }
   }
 
-  const volumeRange = { min: 1, max: maxAvailableCapacity }
+  const volumeRange = { min: 1, max: Math.floor(maxAvailableCapacity) }
   const volumeError =
     volume !== null && (volume < volumeRange.min || volume > volumeRange.max)
       ? t(`value_out_of_range`, {
@@ -145,22 +128,26 @@ export function AirGap(props: AirGapProps): JSX.Element {
         })
       : null
 
-  let buttonIsDisabled = selectedOption === ''
-  if (flowSteps[currentStep] === 'select_volume') {
-    buttonIsDisabled = volumeError != null || volume == null
+  let buttonIsDisabled = false
+  if (currentStep === 2) {
+    buttonIsDisabled = volume == null || volumeError != null
   }
 
   return createPortal(
     <Flex position={POSITION_FIXED} backgroundColor={COLORS.white} width="100%">
       <ChildNavigation
-        header={headerCopy}
-        buttonText={i18n.format(setSaveOrContinueButtonText(), 'capitalize')}
+        header={
+          kind === 'aspirate'
+            ? t('air_gap_before_aspirating')
+            : t('air_gap_before_dispensing')
+        }
+        buttonText={i18n.format(setSaveOrContinueButtonText, 'capitalize')}
         onClickBack={handleClickBackOrExit}
         onClickButton={handleClickSaveOrContinue}
         top={SPACING.spacing8}
         buttonIsDisabled={buttonIsDisabled}
       />
-      {flowSteps[currentStep] === 'enable_air_gap' ? (
+      {currentStep === 1 ? (
         <Flex
           marginTop={SPACING.spacing120}
           flexDirection={DIRECTION_COLUMN}
@@ -168,21 +155,19 @@ export function AirGap(props: AirGapProps): JSX.Element {
           gridGap={SPACING.spacing4}
           width="100%"
         >
-          {displayItems.map(option => (
+          {enableAirGapDisplayItems.map(displayItem => (
             <LargeButton
-              key={option.option}
+              key={displayItem.description}
               buttonType={
-                selectedOption === option.option ? 'primary' : 'secondary'
+                airGapEnabled === displayItem.option ? 'primary' : 'secondary'
               }
-              onClick={() => {
-                setSelectedOption(option.option)
-              }}
-              buttonText={option.value}
+              onClick={displayItem.onClick}
+              buttonText={displayItem.description}
             />
           ))}
         </Flex>
       ) : null}
-      {flowSteps[currentStep] === 'select_volume' ? (
+      {currentStep === 2 ? (
         <Flex
           alignSelf={ALIGN_CENTER}
           gridGap={SPACING.spacing48}

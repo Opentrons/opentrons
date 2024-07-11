@@ -35,78 +35,63 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
   const { t } = useTranslation('quick_transfer')
   const keyboardRef = React.useRef(null)
 
-  const [selectedOption, setSelectedOption] = React.useState<string>('')
-  const [currentStep, setCurrentStep] = React.useState<number>(0)
+  const [touchTipIsEnabled, setTouchTipIsEnabled] = React.useState<boolean>(
+    kind === 'aspirate'
+      ? state.touchTipAspirate != null
+      : state.touchTipDispense != null
+  )
+  const [currentStep, setCurrentStep] = React.useState<number>(1)
   const [position, setPosition] = React.useState<number | null>(
     kind === 'aspirate'
       ? state.touchTipAspirate ?? null
-      : kind === 'dispense'
-      ? state.touchTipDispense ?? null
-      : null
+      : state.touchTipDispense ?? null
   )
 
-  let headerCopy: string = ''
-  let Action:
-    | typeof ACTIONS.SET_TOUCH_TIP_ASPIRATE
-    | typeof ACTIONS.SET_TOUCH_TIP_DISPENSE
-    | null = null
+  const touchTipAction =
+    kind === 'aspirate'
+      ? ACTIONS.SET_TOUCH_TIP_ASPIRATE
+      : ACTIONS.SET_TOUCH_TIP_DISPENSE
 
-  if (kind === 'aspirate') {
-    headerCopy = t('touch_tip_before_aspirating')
-    Action = ACTIONS.SET_TOUCH_TIP_ASPIRATE
-  } else if (kind === 'dispense') {
-    headerCopy = t('touch_tip_before_dispensing')
-    Action = ACTIONS.SET_TOUCH_TIP_DISPENSE
-  }
-
-  const displayItems = [
+  const enableTouchTipDisplayItems = [
     {
-      option: 'Enabled',
-      value: t('option_enabled'),
+      option: true,
+      description: t('option_enabled'),
       onClick: () => {
-        setSelectedOption('option_enabled')
+        setTouchTipIsEnabled(true)
       },
     },
     {
-      option: 'Disabled',
-      value: t('option_disabled'),
+      option: false,
+      description: t('option_disabled'),
       onClick: () => {
-        setSelectedOption('option_disabled')
+        setTouchTipIsEnabled(false)
       },
     },
   ]
 
-  const flowSteps: string[] = ['enable_touch_tip', 'select_position']
-
   const handleClickBackOrExit = (): void => {
-    currentStep > 0 ? setCurrentStep(currentStep - 1) : onBack()
+    currentStep > 1 ? setCurrentStep(currentStep - 1) : onBack()
   }
 
   const handleClickSaveOrContinue = (): void => {
-    if (selectedOption === 'Enabled') {
-      if (currentStep < flowSteps.length - 1) {
-        setCurrentStep(currentStep + 1)
-      } else {
-        if (Action != null && position != null) {
-          dispatch({ type: Action, position })
-        }
+    if (currentStep === 1) {
+      if (!touchTipIsEnabled) {
+        dispatch({ type: touchTipAction, position: undefined })
         onBack()
+      } else {
+        setCurrentStep(2)
       }
-    } else {
-      if (Action != null) {
-        dispatch({ type: Action, position: undefined })
-      }
+    } else if (currentStep === 2) {
+      dispatch({ type: touchTipAction, position: position ?? undefined })
       onBack()
     }
   }
 
-  const setSaveOrContinueButtonText = (): string => {
-    return t(
-      selectedOption === 'Enabled' && currentStep < flowSteps.length - 1
-        ? 'shared:continue'
-        : 'shared:save'
-    )
-  }
+  const setSaveOrContinueButtonText =
+    touchTipIsEnabled && currentStep < 2
+      ? t('shared:continue')
+      : t('shared:save')
+
   let wellHeight = 1
   if (kind === 'aspirate') {
     wellHeight = Math.max(
@@ -131,26 +116,30 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
     (position < positionRange.min || position > positionRange.max)
       ? t(`value_out_of_range`, {
           min: positionRange.min,
-          max: positionRange.max,
+          max: Math.floor(positionRange.max),
         })
       : null
 
-  let buttonIsDisabled = selectedOption === ''
-  if (flowSteps[currentStep] === 'select_position') {
+  let buttonIsDisabled = false
+  if (currentStep === 2) {
     buttonIsDisabled = position == null || positionError != null
   }
 
   return createPortal(
     <Flex position={POSITION_FIXED} backgroundColor={COLORS.white} width="100%">
       <ChildNavigation
-        header={headerCopy}
-        buttonText={i18n.format(setSaveOrContinueButtonText(), 'capitalize')}
+        header={
+          kind === 'aspirate'
+            ? t('touch_tip_before_aspirating')
+            : t('touch_tip_before_dispensing')
+        }
+        buttonText={i18n.format(setSaveOrContinueButtonText, 'capitalize')}
         onClickBack={handleClickBackOrExit}
         onClickButton={handleClickSaveOrContinue}
         top={SPACING.spacing8}
         buttonIsDisabled={buttonIsDisabled}
       />
-      {flowSteps[currentStep] === 'enable_touch_tip' ? (
+      {currentStep === 1 ? (
         <Flex
           marginTop={SPACING.spacing120}
           flexDirection={DIRECTION_COLUMN}
@@ -158,21 +147,21 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
           gridGap={SPACING.spacing4}
           width="100%"
         >
-          {displayItems.map(option => (
+          {enableTouchTipDisplayItems.map(displayItem => (
             <LargeButton
-              key={option.option}
+              key={displayItem.description}
               buttonType={
-                selectedOption === option.option ? 'primary' : 'secondary'
+                touchTipIsEnabled === displayItem.option
+                  ? 'primary'
+                  : 'secondary'
               }
-              onClick={() => {
-                setSelectedOption(option.option)
-              }}
-              buttonText={option.value}
+              onClick={displayItem.onClick}
+              buttonText={displayItem.description}
             />
           ))}
         </Flex>
       ) : null}
-      {flowSteps[currentStep] === 'select_position' ? (
+      {currentStep === 2 ? (
         <Flex
           alignSelf={ALIGN_CENTER}
           gridGap={SPACING.spacing48}

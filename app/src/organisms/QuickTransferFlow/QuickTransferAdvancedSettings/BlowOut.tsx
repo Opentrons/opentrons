@@ -100,7 +100,7 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
     BlowOutLocation | undefined
   >(state.blowOut)
 
-  const enableBlowOutOptions = [
+  const enableBlowOutDisplayItems = [
     {
       value: true,
       description: t('option_enabled'),
@@ -146,13 +146,10 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
     }
   }
 
-  const setSaveOrContinueButtonText = (): string => {
-    return t(
-      isBlowOutEnabled === true && currentStep < 2
-        ? 'shared:continue'
-        : 'shared:save'
-    )
-  }
+  const saveOrContinueButtonText =
+    isBlowOutEnabled === true && currentStep < 2
+      ? t('shared:continue')
+      : t('shared:save')
 
   let buttonIsDisabled = false
   if (currentStep === 2) {
@@ -163,7 +160,7 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
     <Flex position={POSITION_FIXED} backgroundColor={COLORS.white} width="100%">
       <ChildNavigation
         header={t('blow_out_after_dispensing')}
-        buttonText={i18n.format(setSaveOrContinueButtonText(), 'capitalize')}
+        buttonText={i18n.format(saveOrContinueButtonText, 'capitalize')}
         onClickBack={handleClickBackOrExit}
         onClickButton={handleClickSaveOrContinue}
         top={SPACING.spacing8}
@@ -177,16 +174,16 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
           gridGap={SPACING.spacing4}
           width="100%"
         >
-          {enableBlowOutOptions.map(option => (
+          {enableBlowOutDisplayItems.map(displayItem => (
             <LargeButton
-              key={option.description}
+              key={displayItem.description}
               buttonType={
-                option.value === isBlowOutEnabled ? 'primary' : 'secondary'
+                displayItem.value === isBlowOutEnabled ? 'primary' : 'secondary'
               }
               onClick={() => {
-                setisBlowOutEnabled(option.value)
+                setisBlowOutEnabled(displayItem.value)
               }}
-              buttonText={option.description}
+              buttonText={displayItem.description}
             />
           ))}
         </Flex>

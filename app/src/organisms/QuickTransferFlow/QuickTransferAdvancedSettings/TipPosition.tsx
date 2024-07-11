@@ -34,12 +34,8 @@ export function TipPositionEntry(props: TipPositionEntryProps): JSX.Element {
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
   const keyboardRef = React.useRef(null)
 
-  const [tipPosition, setTipPosition] = React.useState<number | null>(
-    kind === 'aspirate'
-      ? state.tipPositionAspirate
-      : kind === 'dispense'
-      ? state.tipPositionDispense
-      : null
+  const [tipPosition, setTipPosition] = React.useState<number>(
+    kind === 'aspirate' ? state.tipPositionAspirate : state.tipPositionDispense
   )
 
   let wellHeight = 1
@@ -62,23 +58,15 @@ export function TipPositionEntry(props: TipPositionEntryProps): JSX.Element {
   // the maxiumum allowed position is 2x the height of the well
   const tipPositionRange = { min: 1, max: Math.floor(wellHeight * 2) } // TODO: set this based on range
 
-  let headerCopy: string = ''
   const textEntryCopy: string = t('distance_bottom_of_well_mm')
-  let tipPositionAction:
-    | typeof ACTIONS.SET_ASPIRATE_TIP_POSITION
-    | typeof ACTIONS.SET_DISPENSE_TIP_POSITION
-    | null = null
-  if (kind === 'aspirate') {
-    headerCopy = t('aspirate_tip_position')
-    tipPositionAction = ACTIONS.SET_ASPIRATE_TIP_POSITION
-  } else if (kind === 'dispense') {
-    headerCopy = t('dispense_tip_position')
-    tipPositionAction = ACTIONS.SET_DISPENSE_TIP_POSITION
-  }
+  const tipPositionAction =
+    kind === 'aspirate'
+      ? ACTIONS.SET_ASPIRATE_TIP_POSITION
+      : ACTIONS.SET_DISPENSE_TIP_POSITION
 
   const handleClickSave = (): void => {
     // the button will be disabled if this values is null
-    if (tipPosition != null && tipPositionAction != null) {
+    if (tipPosition != null) {
       dispatch({
         type: tipPositionAction,
         position: tipPosition,
@@ -88,18 +76,22 @@ export function TipPositionEntry(props: TipPositionEntryProps): JSX.Element {
   }
 
   const error =
-    tipPosition !== null &&
+    tipPosition != null &&
     (tipPosition < tipPositionRange.min || tipPosition > tipPositionRange.max)
       ? t(`value_out_of_range`, {
-          min: tipPositionRange.min,
-          max: tipPositionRange.max,
+          min: Math.floor(tipPositionRange.min),
+          max: Math.floor(tipPositionRange.max),
         })
       : null
 
   return createPortal(
     <Flex position={POSITION_FIXED} backgroundColor={COLORS.white} width="100%">
       <ChildNavigation
-        header={headerCopy}
+        header={
+          kind === 'aspirate'
+            ? t('aspirate_tip_position')
+            : t('dispense_tip_position')
+        }
         buttonText={i18n.format(t('shared:save'), 'capitalize')}
         onClickBack={onBack}
         onClickButton={handleClickSave}

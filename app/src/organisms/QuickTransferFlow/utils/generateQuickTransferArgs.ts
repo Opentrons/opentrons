@@ -8,6 +8,7 @@ import {
   getTipTypeFromTipRackDefinition,
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_FIXTURES,
+  CutoutConfig,
 } from '@opentrons/shared-data'
 import { makeInitialRobotState } from '@opentrons/step-generation'
 import {
@@ -142,8 +143,7 @@ function getInvariantContextAndRobotState(
 
   if (
     quickTransferState.dropTipLocation.cutoutFixtureId ===
-      TRASH_BIN_ADAPTER_FIXTURE ||
-    quickTransferState.blowOut?.cutoutFixtureId === TRASH_BIN_ADAPTER_FIXTURE
+    TRASH_BIN_ADAPTER_FIXTURE
   ) {
     const trashLocation = quickTransferState.dropTipLocation.cutoutId
     const trashId = `${uuid()}_trashBin`
@@ -155,12 +155,33 @@ function getInvariantContextAndRobotState(
       },
     }
   }
+  if (
+    quickTransferState.blowOut != null &&
+    quickTransferState.blowOut !== 'source_well' &&
+    quickTransferState.blowOut !== 'dest_well' &&
+    quickTransferState.blowOut?.cutoutFixtureId === TRASH_BIN_ADAPTER_FIXTURE
+  ) {
+    const trashLocation = quickTransferState.blowOut.cutoutId
+    const isSameTrash = Object.values(additionalEquipmentEntities).some(
+      entity => entity.location === trashLocation
+    )
+    if (!isSameTrash) {
+      const trashId = `${uuid()}_trashBin`
+      additionalEquipmentEntities = {
+        ...additionalEquipmentEntities,
+        [trashId]: {
+          name: 'trashBin',
+          id: trashId,
+          location: trashLocation,
+        },
+      }
+    }
+  }
 
   if (
     WASTE_CHUTE_FIXTURES.includes(
       quickTransferState.dropTipLocation.cutoutFixtureId
-    ) ||
-    WASTE_CHUTE_FIXTURES.includes(quickTransferState.blowOut?.cutoutFixtureId)
+    )
   ) {
     const wasteChuteLocation = quickTransferState.dropTipLocation.cutoutId
     const wasteChuteId = `${uuid()}_wasteChute`
@@ -173,7 +194,28 @@ function getInvariantContextAndRobotState(
       },
     }
   }
-
+  if (
+    quickTransferState.blowOut != null &&
+    quickTransferState.blowOut !== 'source_well' &&
+    quickTransferState.blowOut !== 'dest_well' &&
+    WASTE_CHUTE_FIXTURES.includes(quickTransferState.blowOut.cutoutFixtureId)
+  ) {
+    const wasteChuteLocation = quickTransferState.dropTipLocation.cutoutId
+    const isSameChute = Object.values(additionalEquipmentEntities).some(
+      entity => entity.location === wasteChuteLocation
+    )
+    if (!isSameChute) {
+      const wasteChuteId = `${uuid()}_wasteChute`
+      additionalEquipmentEntities = {
+        ...additionalEquipmentEntities,
+        [wasteChuteId]: {
+          name: 'wasteChute',
+          id: wasteChuteId,
+          location: wasteChuteLocation,
+        },
+      }
+    }
+  }
   const invariantContext = {
     labwareEntities,
     moduleEntities: {},
@@ -237,7 +279,10 @@ export function generateQuickTransferArgs(
   ) {
     const entity = Object.values(
       invariantContext.additionalEquipmentEntities
-    ).find(entity => entity.location === quickTransferState.blowOut?.cutoutId)
+    ).find(entity => {
+      const blowoutObject = quickTransferState.blowOut as CutoutConfig
+      return entity.location === blowoutObject.cutoutId
+    })
     blowoutLocation = entity?.id
   } else {
     blowoutLocation = quickTransferState.blowOut

@@ -35,98 +35,78 @@ export function Delay(props: DelayProps): JSX.Element {
   const { t } = useTranslation('quick_transfer')
   const keyboardRef = React.useRef(null)
 
-  const [selectedOption, setSelectedOption] = React.useState<string>('')
-  const [currentStep, setCurrentStep] = React.useState<number>(0)
+  const [currentStep, setCurrentStep] = React.useState<number>(1)
+  const [delayIsEnabled, setDelayIsEnabled] = React.useState<boolean>(
+    kind === 'aspirate'
+      ? state.delayAspirate != null
+      : state.delayDispense != null
+  )
   const [delayDuration, setDelayDuration] = React.useState<number | null>(
     kind === 'aspirate'
       ? state.delayAspirate?.delayDuration ?? null
-      : kind === 'dispense'
-      ? state.delayDispense?.delayDuration ?? null
-      : null
+      : state.delayDispense?.delayDuration ?? null
   )
   const [position, setPosition] = React.useState<number | null>(
     kind === 'aspirate'
       ? state.delayAspirate?.positionFromBottom ?? null
-      : kind === 'dispense'
-      ? state.delayDispense?.positionFromBottom ?? null
-      : null
+      : state.delayDispense?.positionFromBottom ?? null
   )
 
-  let headerCopy: string = ''
-  let Action:
-    | typeof ACTIONS.SET_DELAY_ASPIRATE
-    | typeof ACTIONS.SET_DELAY_DISPENSE
-    | null = null
+  const action =
+    kind === 'aspirate'
+      ? ACTIONS.SET_DELAY_ASPIRATE
+      : ACTIONS.SET_DELAY_DISPENSE
 
-  if (kind === 'aspirate') {
-    headerCopy = t('delay_before_aspirating')
-    Action = ACTIONS.SET_DELAY_ASPIRATE
-  } else if (kind === 'dispense') {
-    headerCopy = t('delay_before_dispensing')
-    Action = ACTIONS.SET_DELAY_DISPENSE
-  }
-
-  const displayItems = [
+  const delayEnabledDisplayItems = [
     {
-      option: 'Enabled',
-      value: t('option_enabled'),
+      option: true,
+      description: t('option_enabled'),
       onClick: () => {
-        setSelectedOption('option_enabled')
+        setDelayIsEnabled(true)
       },
     },
     {
-      option: 'Disabled',
-      value: t('option_disabled'),
+      option: false,
+      description: t('option_disabled'),
       onClick: () => {
-        setSelectedOption('option_disabled')
+        setDelayIsEnabled(false)
       },
     },
-  ]
-
-  const flowSteps: string[] = [
-    'enable_delay',
-    'select_delay',
-    'select_position',
   ]
 
   const handleClickBackOrExit = (): void => {
-    currentStep > 0 ? setCurrentStep(currentStep - 1) : onBack()
+    currentStep > 1 ? setCurrentStep(currentStep - 1) : onBack()
   }
 
   const handleClickSaveOrContinue = (): void => {
-    if (selectedOption === 'Enabled') {
-      if (currentStep < flowSteps.length - 1) {
-        setCurrentStep(currentStep + 1)
-      } else {
-        if (Action != null && delayDuration != null && position != null) {
-          dispatch({
-            type: Action,
-            delaySettings: {
-              delayDuration,
-              positionFromBottom: position,
-            },
-          })
-        }
-        onBack()
-      }
-    } else {
-      if (Action != null) {
+    if (currentStep === 1) {
+      if (!delayIsEnabled) {
         dispatch({
-          type: Action,
+          type: action,
           delaySettings: undefined,
+        })
+        onBack()
+      } else {
+        setCurrentStep(2)
+      }
+    } else if (currentStep === 2) {
+      setCurrentStep(3)
+    } else {
+      if (delayDuration != null && position != null) {
+        dispatch({
+          type: action,
+          delaySettings: {
+            delayDuration,
+            positionFromBottom: position,
+          },
         })
       }
       onBack()
     }
   }
 
-  const setSaveOrContinueButtonText = (): string => {
-    return t(
-      selectedOption === 'Enabled' && currentStep < flowSteps.length - 1
-        ? 'shared:continue'
-        : 'shared:save'
-    )
-  }
+  const setSaveOrContinueButtonText =
+    delayIsEnabled && currentStep < 3 ? t('shared:continue') : t('shared:save')
 
   let wellHeight = 1
   if (kind === 'aspirate') {
@@ -156,24 +136,28 @@ export function Delay(props: DelayProps): JSX.Element {
         })
       : null
 
-  let buttonIsDisabled = selectedOption === ''
-  if (flowSteps[currentStep] === 'select_delay') {
+  let buttonIsDisabled = false
+  if (currentStep === 2) {
     buttonIsDisabled = delayDuration == null
-  } else if (flowSteps[currentStep] === 'select_position') {
+  } else if (currentStep === 3) {
     buttonIsDisabled = positionError != null || position == null
   }
 
   return createPortal(
     <Flex position={POSITION_FIXED} backgroundColor={COLORS.white} width="100%">
       <ChildNavigation
-        header={headerCopy}
-        buttonText={i18n.format(setSaveOrContinueButtonText(), 'capitalize')}
+        header={
+          kind === 'aspirate'
+            ? t('delay_before_aspirating')
+            : t('delay_before_dispensing')
+        }
+        buttonText={i18n.format(setSaveOrContinueButtonText, 'capitalize')}
         onClickBack={handleClickBackOrExit}
         onClickButton={handleClickSaveOrContinue}
         top={SPACING.spacing8}
         buttonIsDisabled={buttonIsDisabled}
       />
-      {flowSteps[currentStep] === 'enable_delay' ? (
+      {currentStep === 1 ? (
         <Flex
           marginTop={SPACING.spacing120}
           flexDirection={DIRECTION_COLUMN}
@@ -181,21 +165,19 @@ export function Delay(props: DelayProps): JSX.Element {
           gridGap={SPACING.spacing4}
           width="100%"
         >
-          {displayItems.map(option => (
+          {delayEnabledDisplayItems.map(displayItem => (
             <LargeButton
-              key={option.option}
+              key={displayItem.description}
               buttonType={
-                selectedOption === option.option ? 'primary' : 'secondary'
+                delayIsEnabled === displayItem.option ? 'primary' : 'secondary'
               }
-              onClick={() => {
-                setSelectedOption(option.option)
-              }}
-              buttonText={option.value}
+              onClick={displayItem.onClick}
+              buttonText={displayItem.description}
             />
           ))}
         </Flex>
       ) : null}
-      {flowSteps[currentStep] === 'select_delay' ? (
+      {currentStep === 2 ? (
         <Flex
           alignSelf={ALIGN_CENTER}
           gridGap={SPACING.spacing48}
@@ -234,7 +216,7 @@ export function Delay(props: DelayProps): JSX.Element {
           </Flex>
         </Flex>
       ) : null}
-      {flowSteps[currentStep] === 'select_position' ? (
+      {currentStep === 3 ? (
         <Flex
           alignSelf={ALIGN_CENTER}
           gridGap={SPACING.spacing48}
