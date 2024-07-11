@@ -38,6 +38,7 @@ watch ?= false
 cover ?= true
 updateSnapshot ?= false
 quiet ?= false
+cache ?= true
 
 FORMAT_FILE_GLOB = ".*.@(js|ts|tsx|yml)" "**/*.@(ts|tsx|js|json|md|yml)"
 
@@ -219,11 +220,11 @@ lint-js: lint-js-eslint lint-js-prettier
 
 .PHONY: lint-js-eslint
 lint-js-eslint:
-	yarn eslint --quiet=$(quiet) --ignore-pattern "node_modules/" ".*.@(js|ts|tsx)" "**/*.@(js|ts|tsx)"
+	yarn eslint --cache=$(cache) --quiet=$(quiet) --ignore-pattern "node_modules/" ".*.@(js|ts|tsx)" "**/*.@(js|ts|tsx)"
 
 .PHONY: lint-js-prettier
 lint-js-prettier:
-	yarn prettier --ignore-path .eslintignore --check $(FORMAT_FILE_GLOB)
+	yarn prettier --cache=$(cache) --ignore-path .eslintignore --check $(FORMAT_FILE_GLOB)
 
 
 .PHONY: lint-json
