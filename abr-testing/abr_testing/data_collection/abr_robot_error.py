@@ -1,5 +1,5 @@
 """Create ticket for robot with error."""
-from typing import List, Tuple, Any
+from typing import List, Tuple, Any, Dict
 from abr_testing.data_collection import read_robot_logs, abr_google_drive, get_run_logs
 import requests
 import argparse
@@ -10,6 +10,49 @@ import subprocess
 import sys
 import json
 import re
+import pandas as pd
+
+
+def compare_lpc_to_historical_data(
+    labware_dict: Dict[str, Any], robot: str, storage_directory: str
+) -> str:
+    """Compare LPC data of slot error occurred in to historical relevant data."""
+    # Connect to LPC Google Sheet and get data.
+    credentials_path = os.path.join(storage_directory, "credentials.json")
+    google_sheet_lpc = google_sheets_tool.google_sheet(credentials_path, "ABR-LPC", 0)
+    headers = google_sheet_lpc.get_row(1)
+    all_lpc_data = google_sheet_lpc.get_all_data(expected_headers=headers)
+    df_lpc_data = pd.DataFrame(all_lpc_data)
+    labware = labware_dict["Labware Type"]
+    slot = labware_dict["Slot"]
+    # Filter data to match to appropriate labware and slot.
+    # Discludes any run with an error.
+    relevant_lpc = df_lpc_data[
+        (df_lpc_data["Slot"] == slot)
+        & (df_lpc_data["Labware Type"] == labware)
+        & (df_lpc_data["Robot"] == robot)
+        & (df_lpc_data["Module"] == labware_dict["Module"])
+        & (df_lpc_data["Adapter"] == labware_dict["Adapter"])
+        & (df_lpc_data["Errors"] < 1)
+    ]
+    # Converts coordinates to floats and finds averages.
+    x_float = [float(value) for value in relevant_lpc["X"]]
+    y_float = [float(value) for value in relevant_lpc["Y"]]
+    z_float = [float(value) for value in relevant_lpc["Z"]]
+    current_x = round(labware_dict["X"], 2)
+    current_y = round(labware_dict["Y"], 2)
+    current_z = round(labware_dict["Z"], 2)
+    avg_x = round(sum(x_float) / len(x_float), 2)
+    avg_y = round(sum(y_float) / len(y_float), 2)
+    avg_z = round(sum(z_float) / len(z_float), 2)
+
+    # Formats LPC message for ticket.
+    lpc_message = (
+        f"There were {len(x_float)} LPC coords found for {labware} at {slot}. "
+        f"AVERAGE POSITION: ({avg_x}, {avg_y}, {avg_z}). "
+        f"CURRENT POSITION: ({current_x}, {current_y}, {current_z})"
+    )
+    return lpc_message
 
 
 def read_each_log(folder_path: str, issue_url: str) -> None:
@@ -199,11 +242,44 @@ def get_run_error_info_from_robot(
     description["protocol_name"] = results["protocol"]["metadata"].get(
         "protocolName", ""
     )
+    # Get LPC coordinates of labware of failure
+    lpc_dict = results["labwareOffsets"]
+    labware_dict = results["labware"]
     description["error"] = " ".join([error_code, error_type, error_instrument])
-    description["protocol_step"] = list(results["commands"])[-1]
+    protocol_step = list(results["commands"])[-1]
+    errored_labware_id = protocol_step["params"].get("labwareId", "")
+    errored_labware_dict = {}
+    lpc_message = ""
+    # If there is labware included in the error message, its LPC coords will be extracted.
+    if len(errored_labware_id) > 0:
+        for labware in labware_dict:
+            if labware["id"] == errored_labware_id:
+                errored_labware_dict["Slot"] = labware["location"].get("slotName", "")
+                errored_labware_dict["Labware Type"] = labware.get("definitionUri", "")
+                offset_id = labware.get("offsetId", "")
+                for lpc in lpc_dict:
+                    if lpc.get("id", "") == offset_id:
+                        errored_labware_dict["X"] = lpc["vector"].get("x", "")
+                        errored_labware_dict["Y"] = lpc["vector"].get("y", "")
+                        errored_labware_dict["Z"] = lpc["vector"].get("z", "")
+                        errored_labware_dict["Module"] = lpc["location"].get(
+                            "moduleModel", ""
+                        )
+                        errored_labware_dict["Adapter"] = lpc["location"].get(
+                            "definitionUri", ""
+                        )
+
+                        lpc_message = compare_lpc_to_historical_data(
+                            errored_labware_dict, parent, storage_directory
+                        )
+
+    description["protocol_step"] = protocol_step
     description["right_mount"] = results.get("right", "No attachment")
     description["left_mount"] = results.get("left", "No attachment")
     description["gripper"] = results.get("extension", "No attachment")
+    if len(lpc_message) < 1:
+        lpc_message = "No LPC coordinates found in relation to error."
+    description["LPC Comparison"] = lpc_message
     all_modules = abr_google_drive.get_modules(results)
     whole_description = {**description, **all_modules}
     whole_description_str = (
