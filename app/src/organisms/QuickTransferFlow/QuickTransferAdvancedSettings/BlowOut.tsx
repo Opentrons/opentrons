@@ -12,7 +12,6 @@ import {
   WASTE_CHUTE_FIXTURES,
   FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
   TRASH_BIN_ADAPTER_FIXTURE,
-  type DeckConfiguration,
 } from '@opentrons/shared-data'
 import { getTopPortalEl } from '../../../App/portal'
 import { LargeButton } from '../../../atoms/buttons'
@@ -20,6 +19,7 @@ import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configu
 import { ChildNavigation } from '../../ChildNavigation'
 import { ACTIONS } from '../constants'
 
+import type { DeckConfiguration } from '@opentrons/shared-data'
 import type {
   QuickTransferSummaryState,
   QuickTransferSummaryAction,

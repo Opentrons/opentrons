@@ -63,7 +63,7 @@ export interface QuickTransferSummaryState {
   }
   touchTipDispense?: number
   disposalVolume?: number
-  blowOut?: BlowOutLocation // trashBin or wasteChute or 'SOURCE_WELL' or 'DEST_WELL'
+  blowOut?: BlowOutLocation
   airGapDispense?: number
   changeTip: ChangeTipOptions
   dropTipLocation: CutoutConfig

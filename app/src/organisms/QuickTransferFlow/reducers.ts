@@ -73,7 +73,7 @@ export function quickTransferWizardReducer(
         sourceWells: state.sourceWells,
         destination: state.destination,
         destinationWells: action.wells,
-        transferType: transferType,
+        transferType,
       }
     }
     case 'SET_VOLUME': {
@@ -207,12 +207,6 @@ export function quickTransferSummaryReducer(
       return {
         ...state,
         dropTipLocation: action.location,
-      }
-    }
-    case 'SET_VOLUME': {
-      return {
-        ...state,
-        volume: action.volume,
       }
     }
   }

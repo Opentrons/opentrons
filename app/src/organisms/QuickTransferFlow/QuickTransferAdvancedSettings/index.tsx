@@ -80,6 +80,12 @@ export function QuickTransferAdvancedSettings(
     })
   }
 
+  const isReservoir = () => {
+  const destinationLabwareDef = state.destination === 'source' ? state.source : state.destination
+  return (state.source.metadata.displayCategory === 'reservoir' ||
+        destinationLabwareDef.metadata.displayCategory === 'reservoir')
+  }
+
   const baseSettingsItems = [
     {
       option: 'aspirate_flow_rate',
@@ -180,10 +186,10 @@ export function QuickTransferAdvancedSettings(
         state.touchTipAspirate !== undefined
           ? t('touch_tip_value', { position: state.touchTipAspirate })
           : '',
-      enabled: state.sourceWells.length > 1,
+      enabled: !isReservoir,
       onClick: () => {
         // disable for reservoir
-        if (state.sourceWells.length > 1) {
+        if (!isReservoir) {
           setSelectedSetting('aspirate_touch_tip')
         } else {
           makeSnackbar(t('advanced_setting_disabled') as string)

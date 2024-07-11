@@ -7,21 +7,19 @@ import {
   getWellsDepth,
   getTipTypeFromTipRackDefinition,
   TRASH_BIN_ADAPTER_FIXTURE,
-  WASTE_CHUTE_FIXTURES,
-  CutoutConfig,
-} from '@opentrons/shared-data'
+  WASTE_CHUTE_FIXTURES } from '@opentrons/shared-data'
 import { makeInitialRobotState } from '@opentrons/step-generation'
 import {
   DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
 } from '../constants'
-import type { QuickTransferSummaryState } from '../types'
 import type {
+  CutoutConfig,
   LabwareDefinition2,
   DeckConfiguration,
   PipetteName,
-  NozzleConfigurationStyle,
-} from '@opentrons/shared-data'
+  NozzleConfigurationStyle } from '@opentrons/shared-data'
+import type { QuickTransferSummaryState } from '../types'
 import type {
   ConsolidateArgs,
   DistributeArgs,
@@ -114,7 +112,7 @@ function getInvariantContextAndRobotState(
   labwareLocations = {
     ...labwareLocations,
     [tipRackId]: {
-      slot: adapterId != null ? adapterId : 'B2',
+      slot: adapterId ?? 'B2',
     },
     [sourceLabwareId]: {
       slot: 'C2',
@@ -220,7 +218,7 @@ function getInvariantContextAndRobotState(
     labwareEntities,
     moduleEntities: {},
     pipetteEntities,
-    additionalEquipmentEntities: additionalEquipmentEntities,
+    additionalEquipmentEntities,
     config: { OT_PD_DISABLE_MODULE_RESTRICTIONS: false },
   }
   const moduleLocations = {}
@@ -320,8 +318,8 @@ export function generateQuickTransferArgs(
   const commonFields = {
     pipette: pipetteEntity.id,
     volume: quickTransferState.volume,
-    sourceLabware: sourceLabwareEntity?.id as string,
-    destLabware: destLabwareEntity?.id as string,
+    sourceLabware: sourceLabwareEntity?.id!,
+    destLabware: destLabwareEntity?.id!,
     tipRack: pipetteEntity.tiprackDefURI[0],
     aspirateFlowRateUlSec: quickTransferState.aspirateFlowRate,
     dispenseFlowRateUlSec: quickTransferState.dispenseFlowRate,
@@ -436,7 +434,7 @@ export function generateQuickTransferArgs(
       const distributeStepArguments: DistributeArgs = {
         ...commonFields,
         commandCreatorFnName: 'distribute',
-        disposalVolume: quickTransferState.disposalVolume as number,
+        disposalVolume: quickTransferState.disposalVolume!,
         mixBeforeAspirate:
           quickTransferState.mixOnAspirate != null
             ? {
@@ -445,7 +443,7 @@ export function generateQuickTransferArgs(
               }
             : null,
         sourceWell: sourceWells[0],
-        destWells: destWells,
+        destWells,
       }
       return {
         stepArgs: distributeStepArguments,

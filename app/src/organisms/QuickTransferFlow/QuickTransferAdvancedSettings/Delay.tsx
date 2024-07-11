@@ -112,7 +112,7 @@ export function Delay(props: DelayProps): JSX.Element {
   if (kind === 'aspirate') {
     wellHeight = Math.max(
       ...state.sourceWells.map(well =>
-        state.source !== null ? state.source.wells[well].depth : 0
+        state.source != null ? state.source.wells[well].depth : 0
       )
     )
   } else if (kind === 'dispense') {
@@ -120,7 +120,7 @@ export function Delay(props: DelayProps): JSX.Element {
       state.destination === 'source' ? state.source : state.destination
     wellHeight = Math.max(
       ...state.destinationWells.map(well =>
-        destLabwareDefinition !== null
+        destLabwareDefinition != null
           ? destLabwareDefinition.wells[well].depth
           : 0
       )
@@ -130,7 +130,7 @@ export function Delay(props: DelayProps): JSX.Element {
   // the maxiumum allowed position for delay is 2x the height of the well
   const positionRange = { min: 1, max: Math.floor(wellHeight * 2) }
   const positionError =
-    position !== null &&
+    position != null &&
     (position < positionRange.min || position > positionRange.max)
       ? t(`value_out_of_range`, {
           min: positionRange.min,
