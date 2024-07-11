@@ -32,13 +32,19 @@ export interface CategorizedStepContentProps {
   ]
 }
 
+const EMPTY_COMMAND = {
+  command: null,
+  state: 'loading',
+  commandTextData: null,
+} as const
+
 type MappedState =
   | {
       command: RunTimeCommand
       state: NonSkeletonCommandState
       commandTextData: CommandTextData
     }
-  | { command: null; state: 'loading'; commandTextData: null }
+  | typeof EMPTY_COMMAND
 
 const commandAndState = (
   command: CommandWithIndex | null,
@@ -46,7 +52,7 @@ const commandAndState = (
   commandTextData: CommandTextData | null
 ): MappedState =>
   command == null || commandTextData == null
-    ? { state: 'loading', command: null, commandTextData: null }
+    ? EMPTY_COMMAND
     : { state, command: command.command, commandTextData }
 
 export function CategorizedStepContent(
