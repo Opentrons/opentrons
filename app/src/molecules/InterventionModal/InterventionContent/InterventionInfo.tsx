@@ -131,8 +131,12 @@ const buildLocColonLoc = (props: InterventionInfoProps): JSX.Element => {
 }
 
 const ICON_STYLE = css`
-  width: ${SPACING.spacing40};
-  height: ${SPACING.spacing40};
+  width: ${SPACING.spacing24};
+  height: ${SPACING.spacing24};
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    width: ${SPACING.spacing40};
+    height: ${SPACING.spacing40};
+  }
 `
 
 const CARD_STYLE = css`
