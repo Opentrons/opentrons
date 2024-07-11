@@ -2,7 +2,7 @@ import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { css } from 'styled-components'
 
-import { Flex, RESPONSIVENESS } from '@opentrons/components'
+import { Flex, RESPONSIVENESS, SPACING } from '@opentrons/components'
 
 import { InterventionModal } from '../../../molecules/InterventionModal'
 import { getModalPortalEl } from '../../../App/portal'
@@ -36,6 +36,7 @@ export function RecoveryInterventionModal({
             ? SMALL_MODAL_STYLE
             : LARGE_MODAL_STYLE
         }
+        padding={SPACING.spacing32}
       >
         {children}
       </Flex>
