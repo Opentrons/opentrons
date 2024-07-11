@@ -38,7 +38,7 @@ export const QuickTransferFlow = (): JSX.Element => {
     showConfirmation: showConfirmExit,
     cancel: cancelExit,
   } = useConditionalConfirm(() => {
-    history.push('protocols')
+    history.push('/quick-transfer')
   }, true)
 
   const exitButtonProps: React.ComponentProps<typeof SmallButton> = {

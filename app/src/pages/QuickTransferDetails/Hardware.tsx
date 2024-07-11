@@ -28,10 +28,9 @@ import {
   usePipetteNameSpecs,
 } from '../../resources/instruments/hooks'
 import { useRequiredProtocolHardware } from '../Protocols/hooks'
-import { EmptySection } from './EmptySection'
 
-import type { TFunction } from 'i18next'
 import type { ProtocolHardware, ProtocolPipette } from '../Protocols/hooks'
+import type { TFunction } from 'i18next'
 
 const Table = styled('table')`
   ${TYPOGRAPHY.labelRegular}
@@ -79,6 +78,8 @@ const getHardwareLocation = (
     return 'location unknown'
   }
 }
+
+// convert to anon
 
 const useHardwareName = (protocolHardware: ProtocolHardware): string => {
   const gripperDisplayName = useGripperDisplayName(GRIPPER_V1_2)
@@ -153,15 +154,13 @@ function HardwareItem({
   )
 }
 
-export const Hardware = (props: { protocolId: string }): JSX.Element => {
+export const Hardware = (props: { transferId: string }): JSX.Element => {
   const { requiredProtocolHardware } = useRequiredProtocolHardware(
-    props.protocolId
+    props.transferId
   )
   const { t, i18n } = useTranslation('protocol_details')
 
-  return requiredProtocolHardware.length === 0 ? (
-    <EmptySection section="hardware" />
-  ) : (
+  return (
     <Table>
       <thead>
         <tr>

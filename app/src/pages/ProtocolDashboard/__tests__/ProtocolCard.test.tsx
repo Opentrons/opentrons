@@ -37,6 +37,7 @@ const mockProtocol: ProtocolResource = {
   id: 'mockProtocol1',
   createdAt: '2022-05-03T21:36:12.494778+00:00',
   protocolType: 'json',
+  protocolKind: 'standard',
   robotType: 'OT-3 Standard',
   metadata: {
     protocolName: 'yay mock protocol',
@@ -54,6 +55,7 @@ const mockProtocolWithCSV: ProtocolResource = {
   id: 'mockProtocol2',
   createdAt: '2022-05-03T21:36:12.494778+00:00',
   protocolType: 'json',
+  protocolKind: 'standard',
   robotType: 'OT-3 Standard',
   metadata: {
     protocolName: 'yay mock RTP protocol',
