@@ -35,7 +35,11 @@ export function InterventionInfo(props: InterventionInfoProps): JSX.Element {
       css={CARD_STYLE}
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <StyledText oddStyle="bodyTextBold" desktopStyle="bodyDefaultSemiBold">
+        <StyledText
+          oddStyle="bodyTextBold"
+          desktopStyle="bodyDefaultSemiBold"
+          css={LINE_CLAMP_STYLE}
+        >
           {props.labwareName}
         </StyledText>
         {props.labwareNickname != null ? (
@@ -43,6 +47,7 @@ export function InterventionInfo(props: InterventionInfoProps): JSX.Element {
             oddStyle="hidden"
             desktopStyle="bodyDefaultRegular"
             color={COLORS.grey60}
+            css={LINE_CLAMP_STYLE}
           >
             {props.labwareNickname}{' '}
           </StyledText>
@@ -147,4 +152,13 @@ const CARD_STYLE = css`
     background-color: ${COLORS.grey35};
     border-radius: ${BORDERS.borderRadius8};
   }
+`
+
+const LINE_CLAMP_STYLE = css`
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-wrap: break-word;
+  -webkit-line-clamp: 2;
 `
