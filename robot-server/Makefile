@@ -174,6 +174,7 @@ push: wheel
 .PHONY: push-ot3
 push-ot3: sdist
 	$(call push-python-sdist,$(host),$(ssh_key),$(ssh_opts),$(sdist_file),"/opt/opentrons-robot-server","robot_server",,,$(version_file))
+	$(call restart-service,$(host),$(ssh_key),$(ssh_opts),opentrons-robot-server)
 
 .PHONY: install-key
 install-key:
