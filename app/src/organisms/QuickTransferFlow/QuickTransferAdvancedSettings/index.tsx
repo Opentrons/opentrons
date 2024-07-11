@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   Flex,
   SPACING,
@@ -19,7 +20,6 @@ import type {
   QuickTransferSummaryState,
 } from '../types'
 import { ACTIONS } from '../constants'
-import { useTranslation } from 'react-i18next'
 import { useToaster } from '../../../organisms/ToasterOven'
 import { ListItem } from '../../../atoms/ListItem'
 import { FlowRateEntry } from './FlowRate'
