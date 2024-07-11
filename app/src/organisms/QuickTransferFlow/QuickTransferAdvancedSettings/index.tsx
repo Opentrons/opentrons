@@ -80,11 +80,11 @@ export function QuickTransferAdvancedSettings(
     })
   }
 
-  const isReservoir = () => {
-  const destinationLabwareDef = state.destination === 'source' ? state.source : state.destination
-  return (state.source.metadata.displayCategory === 'reservoir' ||
-        destinationLabwareDef.metadata.displayCategory === 'reservoir')
-  }
+  const destinationLabwareDef =
+    state.destination === 'source' ? state.source : state.destination
+  const isReservoir =
+    state.source.metadata.displayCategory === 'reservoir' ||
+    destinationLabwareDef.metadata.displayCategory === 'reservoir'
 
   const baseSettingsItems = [
     {

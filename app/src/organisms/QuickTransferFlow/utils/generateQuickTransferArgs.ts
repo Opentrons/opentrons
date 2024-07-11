@@ -7,7 +7,8 @@ import {
   getWellsDepth,
   getTipTypeFromTipRackDefinition,
   TRASH_BIN_ADAPTER_FIXTURE,
-  WASTE_CHUTE_FIXTURES } from '@opentrons/shared-data'
+  WASTE_CHUTE_FIXTURES,
+} from '@opentrons/shared-data'
 import { makeInitialRobotState } from '@opentrons/step-generation'
 import {
   DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
@@ -18,7 +19,8 @@ import type {
   LabwareDefinition2,
   DeckConfiguration,
   PipetteName,
-  NozzleConfigurationStyle } from '@opentrons/shared-data'
+  NozzleConfigurationStyle,
+} from '@opentrons/shared-data'
 import type { QuickTransferSummaryState } from '../types'
 import type {
   ConsolidateArgs,
