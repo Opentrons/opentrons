@@ -336,7 +336,6 @@ async def _setup_capacitive_sensors(
         capacitive_sensor = CapacitiveSensor.build(
             sensor_id=sensor,
             # this is bad and I dont like it
-
             # it only works when it gets passed a InstumentProbeTarget
             # but the function param is a NodeId ????
             node_id=tool,
@@ -518,17 +517,12 @@ async def check_overpressure(
         sensor_scheduler.monitor_exceed_max_threshold, sensor_info, messenger
     )
 
-# we should be able to use this with one or more sensors on the pipette
-# or the gripper (it broke the gripper)
 
-# the pipette plunger move when it uses the pipette should j be a 0 velocity one
-# so the plunger wont actually move but can still set the sync line
 async def capacitive_probe(
     messenger: CanMessenger,
     tool: InstrumentProbeTarget,
     mover: NodeId,
     distance: float,
-    plunger_speed: float,
     mount_speed: float,
     sensor_id: SensorId = SensorId.S0,
     relative_threshold_pf: float = 1.0,
@@ -547,19 +541,26 @@ async def capacitive_probe(
     """
     log_files: Dict[SensorId, str] = {} if not data_files else data_files
     sensor_driver = SensorDriver()
+    pipette_present = tool is NodeId.pipette_left or tool is NodeId.pipette_right
+
     capacitive_sensors = await _setup_capacitive_sensors(
         messenger,
         sensor_id,
         tool,
-        # mover,
         relative_threshold_pf,
         sensor_driver,
     )
 
+    probe_distance = {mover: distance}
+    probe_speed = {mover: mount_speed}
+    if pipette_present:
+        probe_distance[tool] = 0.0
+        probe_speed[tool] = 0.0
+
     sensor_group = _build_pass_step(
         movers=[mover],
-        distance={mover: distance},
-        speed={mover: mount_speed},
+        distance=probe_distance,
+        speed=probe_speed,
         sensor_type=SensorType.capacitive,
         sensor_id=sensor_id,
         stop_condition=MoveStopCondition.sync_line,
@@ -568,8 +569,8 @@ async def capacitive_probe(
         sensor_group = _fix_pass_step_for_buffer(
             sensor_group,
             movers=[mover],
-            distance={mover: distance},
-            speed={mover: mount_speed},
+            distance=probe_distance,
+            speed=probe_speed,
             sensor_type=SensorType.capacitive,
             sensor_id=sensor_id,
             stop_condition=MoveStopCondition.sync_line,
