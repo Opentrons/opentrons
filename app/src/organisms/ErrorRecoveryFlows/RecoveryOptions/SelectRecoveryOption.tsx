@@ -15,7 +15,7 @@ import {
   ODD_SECTION_TITLE_STYLE,
 } from '../constants'
 import { RadioButton } from '../../../atoms/buttons'
-import { RecoveryFooterButtons, RecoverySingleColumnContent } from '../shared'
+import { RecoveryFooterButtons, RecoveryContentWrapper } from '../shared'
 
 import type { ErrorKind, RecoveryContentProps, RecoveryRoute } from '../types'
 import type { PipetteWithTip } from '../../DropTipWizardFlows'
@@ -60,7 +60,7 @@ export function SelectRecoveryOptionHome({
 
   if (isOnDevice) {
     return (
-      <RecoverySingleColumnContent>
+      <RecoveryContentWrapper>
         <LegacyStyledText css={ODD_SECTION_TITLE_STYLE} as="h4SemiBold">
           {t('choose_a_recovery_action')}
         </LegacyStyledText>
@@ -79,7 +79,7 @@ export function SelectRecoveryOptionHome({
             void proceedToRouteAndStep(selectedRoute as RecoveryRoute)
           }}
         />
-      </RecoverySingleColumnContent>
+      </RecoveryContentWrapper>
     )
   } else {
     return null
