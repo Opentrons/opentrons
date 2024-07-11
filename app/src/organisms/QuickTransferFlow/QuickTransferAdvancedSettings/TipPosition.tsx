@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import {
   Flex,
@@ -9,105 +8,97 @@ import {
   POSITION_FIXED,
   COLORS,
 } from '@opentrons/components'
-import {
-  LOW_VOLUME_PIPETTES,
-  getTipTypeFromTipRackDefinition,
-} from '@opentrons/shared-data'
-
 import { getTopPortalEl } from '../../../App/portal'
 import { ChildNavigation } from '../../ChildNavigation'
 import { InputField } from '../../../atoms/InputField'
 import { NumericalKeyboard } from '../../../atoms/SoftwareKeyboard'
 
-import { ACTIONS } from '../constants'
-import type { SupportedTip } from '@opentrons/shared-data'
 import type {
   QuickTransferSummaryState,
   QuickTransferSummaryAction,
   FlowRateKind,
 } from '../types'
 
-interface FlowRateEntryProps {
+import { ACTIONS } from '../constants'
+import { createPortal } from 'react-dom'
+
+interface TipPositionEntryProps {
   onBack: () => void
   state: QuickTransferSummaryState
   dispatch: React.Dispatch<QuickTransferSummaryAction>
-  kind: FlowRateKind
+  kind: FlowRateKind // TODO: rename flowRateKind to be generic
 }
 
-export function FlowRateEntry(props: FlowRateEntryProps): JSX.Element {
+export function TipPositionEntry(props: TipPositionEntryProps): JSX.Element {
   const { onBack, state, dispatch, kind } = props
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
   const keyboardRef = React.useRef(null)
 
-  const [flowRate, setFlowRate] = React.useState<number>(
-    kind === 'aspirate' ? state.aspirateFlowRate : state.dispenseFlowRate
+  const [tipPosition, setTipPosition] = React.useState<number>(
+    kind === 'aspirate' ? state.tipPositionAspirate : state.tipPositionDispense
   )
 
-  // TODO (ba, 2024-07-02): use the pipette name once we add it to the v2 spec
-  let pipetteName = state.pipette.model
-  if (state.pipette.channels === 1) {
-    pipetteName = pipetteName + `_single_flex`
-  } else if (state.pipette.channels === 8) {
-    pipetteName = pipetteName + `_multi_flex`
-  } else {
-    pipetteName = pipetteName + `_96`
-  }
-
-  // use lowVolume for volumes lower than 5ml
-  const liquidSpecs = state.pipette.liquids
-  const tipType = getTipTypeFromTipRackDefinition(state.tipRack)
-  const flowRatesForSupportedTip: SupportedTip | undefined =
-    state.volume < 5 &&
-    `lowVolumeDefault` in liquidSpecs &&
-    LOW_VOLUME_PIPETTES.includes(pipetteName)
-      ? liquidSpecs.lowVolumeDefault.supportedTips[tipType]
-      : liquidSpecs.default.supportedTips[tipType]
-  const minFlowRate = 1
-  const maxFlowRate = Math.floor(flowRatesForSupportedTip?.uiMaxFlowRate ?? 0)
-
-  const flowRateAction =
-    kind === 'aspirate'
-      ? ACTIONS.SET_ASPIRATE_FLOW_RATE
-      : ACTIONS.SET_DISPENSE_FLOW_RATE
-
-  let headerCopy: string = ''
-  let textEntryCopy: string = ''
+  let wellHeight = 1
   if (kind === 'aspirate') {
-    headerCopy = t('aspirate_flow_rate')
-    textEntryCopy = t('aspirate_flow_rate_µL')
+    wellHeight = Math.max(
+      ...state.sourceWells.map(well =>
+        state.source != null ? state.source.wells[well].depth : 0
+      )
+    )
   } else if (kind === 'dispense') {
-    headerCopy = t('dispense_flow_rate')
-    textEntryCopy = t('dispense_flow_rate_µL')
+    const destLabwareDefinition =
+      state.destination === 'source' ? state.source : state.destination
+    wellHeight = Math.max(
+      ...state.destinationWells.map(well =>
+        destLabwareDefinition != null
+          ? destLabwareDefinition.wells[well].depth
+          : 0
+      )
+    )
   }
+
+  // the maxiumum allowed position is 2x the height of the well
+  const tipPositionRange = { min: 1, max: Math.floor(wellHeight * 2) } // TODO: set this based on range
+
+  const textEntryCopy: string = t('distance_bottom_of_well_mm')
+  const tipPositionAction =
+    kind === 'aspirate'
+      ? ACTIONS.SET_ASPIRATE_TIP_POSITION
+      : ACTIONS.SET_DISPENSE_TIP_POSITION
 
   const handleClickSave = (): void => {
     // the button will be disabled if this values is null
-    if (flowRate != null) {
+    if (tipPosition != null) {
       dispatch({
-        type: flowRateAction,
-        rate: flowRate,
+        type: tipPositionAction,
+        position: tipPosition,
       })
     }
     onBack()
   }
 
   const error =
-    flowRate != null && (flowRate < minFlowRate || flowRate > maxFlowRate)
+    tipPosition != null &&
+    (tipPosition < tipPositionRange.min || tipPosition > tipPositionRange.max)
       ? t(`value_out_of_range`, {
-          min: minFlowRate,
-          max: maxFlowRate,
+          min: Math.floor(tipPositionRange.min),
+          max: Math.floor(tipPositionRange.max),
         })
       : null
 
   return createPortal(
     <Flex position={POSITION_FIXED} backgroundColor={COLORS.white} width="100%">
       <ChildNavigation
-        header={headerCopy}
+        header={
+          kind === 'aspirate'
+            ? t('aspirate_tip_position')
+            : t('dispense_tip_position')
+        }
         buttonText={i18n.format(t('shared:save'), 'capitalize')}
         onClickBack={onBack}
         onClickButton={handleClickSave}
         top={SPACING.spacing8}
-        buttonIsDisabled={error != null || flowRate == null}
+        buttonIsDisabled={error != null || tipPosition == null}
       />
       <Flex
         alignSelf={ALIGN_CENTER}
@@ -126,8 +117,8 @@ export function FlowRateEntry(props: FlowRateEntryProps): JSX.Element {
           marginTop={SPACING.spacing68}
         >
           <InputField
-            type="number"
-            value={flowRate}
+            type="text"
+            value={tipPosition}
             title={textEntryCopy}
             error={error}
             readOnly
@@ -142,7 +133,7 @@ export function FlowRateEntry(props: FlowRateEntryProps): JSX.Element {
           <NumericalKeyboard
             keyboardRef={keyboardRef}
             onChange={e => {
-              setFlowRate(Number(e))
+              setTipPosition(Number(e))
             }}
           />
         </Flex>
