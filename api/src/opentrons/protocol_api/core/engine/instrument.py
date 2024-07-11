@@ -850,17 +850,6 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         well_location = WellLocation(
             origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0)
         )
-
-        loc = Location(well_core.get_top(10), "Well")
-
-        self.move_to(
-            location=loc,
-            well_core=well_core,
-            force_direct=False,
-            minimum_z_height=None,
-            speed=None,
-        )
-
         self._engine_client.execute_command(
             cmd.LiquidProbeParams(
                 labwareId=labware_id,
@@ -869,6 +858,9 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                 pipetteId=self.pipette_id,
             )
         )
+        
+        #TODO: fix this. i'm not even sure what set_last_location is used for
+        self._protocol_core.set_last_location(location=Location(well_core.get_top(0), "Well"), mount=self.get_mount())
 
     def liquid_probe_without_recovery(self, well_core: WellCore) -> float:
         labware_id = well_core.labware_id
@@ -876,17 +868,6 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         well_location = WellLocation(
             origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0)
         )
-
-        loc = Location(well_core.get_top(10), "Well")
-
-        self.move_to(
-            location=loc,
-            well_core=well_core,
-            force_direct=False,
-            minimum_z_height=None,
-            speed=None,
-        )
-
         result = self._engine_client.execute_command_without_recovery(
             cmd.LiquidProbeParams(
                 labwareId=labware_id,
@@ -895,6 +876,9 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                 pipetteId=self.pipette_id,
             )
         )
+        
+        #TODO: fix this. i'm not even sure what set_last_location is used for
+        self._protocol_core.set_last_location(location=Location(well_core.get_top(0), "Well"), mount=self.get_mount())
 
         if result is not None and isinstance(result, LiquidProbeResult):
             return result.z_position

@@ -10,7 +10,7 @@ from typing_extensions import Literal
 
 from pydantic import Field
 
-from ..types import CurrentWell, DeckPoint
+from ..types import CurrentWell, DeckPoint, WellLocation, WellOrigin
 from .pipetting_common import (
     LiquidNotFoundError,
     LiquidNotFoundErrorInternalData,
@@ -100,19 +100,12 @@ class LiquidProbeImplementation(AbstractCommandImpl[LiquidProbeParams, _ExecuteR
                 message="Current position of pipette is invalid. Please home."
             )
 
-        current_well = CurrentWell(
-            pipette_id=pipette_id,
-            labware_id=labware_id,
-            well_name=well_name,
-        )
-
         # liquid_probe process start position
         position = await self._movement.move_to_well(
             pipette_id=pipette_id,
             labware_id=labware_id,
             well_name=well_name,
             well_location=params.wellLocation,
-            current_well=current_well,
         )
 
         try:
