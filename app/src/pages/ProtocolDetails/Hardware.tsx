@@ -109,7 +109,7 @@ function HardwareItem({
 
   let location: JSX.Element = (
     <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-      {i18n.format(getHardwareLocation(hardware, t), 'titleCase')}
+      {i18n.format(getHardwareLocation(hardware, t as TFunction), 'titleCase')}
     </LegacyStyledText>
   )
   if (hardware.hardwareType === 'module') {
