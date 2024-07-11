@@ -37,7 +37,7 @@ const LOCATION_ICON_STYLE = css<{
   padding: ${SPACING.spacing2} ${SPACING.spacing4};
   border-radius: ${BORDERS.borderRadius4};
   justify-content: ${JUSTIFY_CENTER};
-  height: max-content;
+  height: max-content; // prevents the icon from being squished
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     border: 2px solid ${props => props.color ?? COLORS.black90};
@@ -51,6 +51,8 @@ const LOCATION_ICON_STYLE = css<{
 const SLOT_NAME_TEXT_STYLE = css`
   font-size: ${TYPOGRAPHY.fontSizeCaption};
   line-height: normal;
+  font-weight: ${TYPOGRAPHY.fontWeightBold};
+
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     ${TYPOGRAPHY.smallBodyTextBold}
   }
