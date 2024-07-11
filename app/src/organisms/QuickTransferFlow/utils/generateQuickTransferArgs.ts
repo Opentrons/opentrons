@@ -320,8 +320,8 @@ export function generateQuickTransferArgs(
   const commonFields = {
     pipette: pipetteEntity.id,
     volume: quickTransferState.volume,
-    sourceLabware: sourceLabwareEntity?.id! as string,
-    destLabware: destLabwareEntity?.id! as string,
+    sourceLabware: sourceLabwareEntity?.id as string,
+    destLabware: destLabwareEntity?.id as string,
     tipRack: pipetteEntity.tiprackDefURI[0],
     aspirateFlowRateUlSec: quickTransferState.aspirateFlowRate,
     dispenseFlowRateUlSec: quickTransferState.dispenseFlowRate,
@@ -351,20 +351,18 @@ export function generateQuickTransferArgs(
     dispenseAirGapVolume: quickTransferState.airGapDispense ?? null,
     touchTipAfterAspirate: quickTransferState.touchTipAspirate != null,
     touchTipAfterAspirateOffsetMmFromBottom:
-      quickTransferState.touchTipAspirate != null
-        ? quickTransferState.touchTipAspirate
-        : getWellsDepth(quickTransferState.source, sourceWells) +
-          DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
+      quickTransferState.touchTipAspirate ??
+      getWellsDepth(quickTransferState.source, sourceWells) +
+        DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
     touchTipAfterDispense: quickTransferState.touchTipDispense != null,
     touchTipAfterDispenseOffsetMmFromBottom:
-      quickTransferState.touchTipDispense != null
-        ? quickTransferState.touchTipDispense
-        : getWellsDepth(
-            quickTransferState.destination === 'source'
-              ? quickTransferState.source
-              : quickTransferState.destination,
-            destWells
-          ) + DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
+      quickTransferState.touchTipDispense ??
+      getWellsDepth(
+        quickTransferState.destination === 'source'
+          ? quickTransferState.source
+          : quickTransferState.destination,
+        destWells
+      ) + DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
     dropTipLocation,
     aspirateXOffset: 0,
     aspirateYOffset: 0,
@@ -436,7 +434,7 @@ export function generateQuickTransferArgs(
       const distributeStepArguments: DistributeArgs = {
         ...commonFields,
         commandCreatorFnName: 'distribute',
-        disposalVolume: quickTransferState.disposalVolume!,
+        disposalVolume: quickTransferState.disposalVolume,
         mixBeforeAspirate:
           quickTransferState.mixOnAspirate != null
             ? {
