@@ -1998,7 +1998,7 @@ class InstrumentContext(publisher.CommandPublisher):
             - ``COLUMN`` sets the pipette to use 8 nozzles, aligned from front to back
               with respect to the deck. This corresponds to a column of wells on labware.
             - ``PARTIAL_COLUMN`` sets the pipette to use 2-7 nozzles, aligned from front to back
-            with respect to the deck.
+              with respect to the deck.
             - ``ROW`` sets the pipette to use 12 nozzles, aligned from left to right
               with respect to the deck. This corresponds to a row of wells on labware.
             - ``ALL`` resets the pipette to use all of its nozzles. Calling
