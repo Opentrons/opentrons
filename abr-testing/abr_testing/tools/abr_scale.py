@@ -34,7 +34,7 @@ def get_protocol_step_as_int(
         # create an dict copying the contents of IP_N_Volumes
         try:
             ip_file = json.load(open(ip_json_file))
-            try:    
+            try:
                 # grab IP and volume from the dict
                 tot_info = ip_file["information"]
                 robot_info = tot_info[robot]
