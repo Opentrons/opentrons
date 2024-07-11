@@ -39,7 +39,11 @@ export function InterventionInfo(props: InterventionInfoProps): JSX.Element {
           {props.labwareName}
         </StyledText>
         {props.labwareNickname != null ? (
-          <StyledText oddStyle="hidden" desktopStyle="bodyDefaultRegular">
+          <StyledText
+            oddStyle="hidden"
+            desktopStyle="bodyDefaultRegular"
+            color={COLORS.grey60}
+          >
             {props.labwareNickname}{' '}
           </StyledText>
         ) : null}
