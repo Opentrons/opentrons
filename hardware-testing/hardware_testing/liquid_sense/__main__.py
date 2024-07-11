@@ -37,7 +37,7 @@ from .post_process import process_csv_directory, process_google_sheet
 
 from hardware_testing.protocols.liquid_sense_lpc import (
     liquid_sense_ot3_p50_single_vial,
-    liquid_sense_ot3_p1000_single_vial,
+    liquid_sense_ot3_p1000_96_well,
 )
 
 try:
@@ -73,7 +73,7 @@ LIQUID_SENSE_CFG = {
         8: None,
     },
     1000: {
-        1: liquid_sense_ot3_p1000_single_vial,
+        1: liquid_sense_ot3_p1000_96_well,
         8: None,
         96: None,
     },
