@@ -23,6 +23,8 @@ from opentrons.hardware_control.types import Axis
 from opentrons.hardware_control.util import ot2_axis_to_string
 from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons_shared_data.errors.exceptions import (
+    APIRemoved,
+    IncorrectAPIVersion,
     UnsupportedHardwareCommand,
 )
 
@@ -46,13 +48,13 @@ class RobotTypeError(UnsupportedHardwareCommand):
     pass
 
 
-class APIVersionError(Exception):
+class APIVersionError(IncorrectAPIVersion):
     """Error raised when a protocol attempts to access behavior not implemented in the API in use."""
 
     pass
 
 
-class UnsupportedAPIError(Exception):
+class UnsupportedAPIError(APIRemoved):
     """Error raised when a protocol attempts to use unsupported API."""
 
     pass
@@ -384,10 +386,9 @@ def requires_version(major: int, minor: int) -> Callable[[FuncT], FuncT]:
                 name = getattr(decorated_obj, "__qualname__", str(decorated_obj))
 
                 raise APIVersionError(
-                    f"{name} was added in {added_in}, but your "
-                    f"protocol requested version {current_version}. You "
-                    f"must increase your API version to {added_in} to "
-                    "use this functionality."
+                    api_element=name,
+                    until_version=added_in,
+                    current_version=current_version,
                 )
             return decorated_obj(*args, **kwargs)
 

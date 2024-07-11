@@ -26,6 +26,7 @@ from hardware_testing.data import (
     get_git_description,
     get_testing_data_directory,
 )
+from opentrons_hardware.hardware_control.motion_planning import move_utils
 
 from opentrons.protocol_api import InstrumentContext, ProtocolContext
 from opentrons.protocol_engine.types import LabwareOffset
@@ -111,12 +112,11 @@ class RunArgs:
     ctx: ProtocolContext
     protocol_cfg: Any
     test_report: CSVReport
-    probe_seconds_before_contact: float
     aspirate: bool
     dial_indicator: Optional[mitutoyo_digimatic_indicator.Mitutoyo_Digimatic_Indicator]
     plunger_speed: float
     trials_before_jog: int
-    multi_passes: int
+    no_multi_pass: int
     test_well: str
 
     @classmethod
@@ -226,7 +226,6 @@ class RunArgs:
             args.liquid,
             protocol_cfg.LABWARE_ON_SCALE,  # type: ignore[union-attr]
             args.z_speed,
-            args.probe_seconds_before_contact,
         )
         return RunArgs(
             tip_volumes=tip_volumes,
@@ -245,31 +244,31 @@ class RunArgs:
             ctx=_ctx,
             protocol_cfg=protocol_cfg,
             test_report=report,
-            probe_seconds_before_contact=args.probe_seconds_before_contact,
             aspirate=args.aspirate,
             dial_indicator=dial,
             plunger_speed=args.plunger_speed,
             trials_before_jog=args.trials_before_jog,
-            multi_passes=args.multi_passes,
+            no_multi_pass=args.no_multi_pass,
             test_well=args.test_well,
         )
 
 
 if __name__ == "__main__":
+    move_utils.MINIMUM_DISPLACEMENT = 0.01
+
     parser = argparse.ArgumentParser("Pipette Testing")
     parser.add_argument("--simulate", action="store_true")
     parser.add_argument("--pipette", type=int, choices=[50, 1000], required=True)
     parser.add_argument("--mount", type=str, choices=["left", "right"], default="left")
     parser.add_argument("--channels", type=int, choices=[1, 8, 96], default=1)
     parser.add_argument("--tip", type=int, choices=[0, 50, 200, 1000], default=0)
-    parser.add_argument("--probe-seconds-before-contact", type=float, default=1.0)
     parser.add_argument("--return-tip", action="store_true")
     parser.add_argument("--trials", type=int, default=7)
     parser.add_argument("--trials-before-jog", type=int, default=7)
     parser.add_argument("--z-speed", type=float, default=1)
     parser.add_argument("--aspirate", action="store_true")
     parser.add_argument("--plunger-speed", type=float, default=-1.0)
-    parser.add_argument("--multi-passes", type=int, default=1)
+    parser.add_argument("--no-multi-pass", action="store_true")
     parser.add_argument("--starting-tip", type=str, default="A1")
     parser.add_argument("--test-well", type=str, default="A1")
     parser.add_argument("--google-sheet-name", type=str, default="LLD-Shared-Data")
@@ -281,9 +280,6 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    assert (
-        0.0 < args.probe_seconds_before_contact <= MAX_PROBE_SECONDS
-    ), f"'--probe-seconds-before-contact' must be between 0.0-{MAX_PROBE_SECONDS}"
     run_args = RunArgs.build_run_args(args)
     exit_error = 0
     serial_logger: Optional[subprocess.Popen] = None
@@ -357,7 +353,7 @@ if __name__ == "__main__":
                     run_args.run_id,
                     sheet_id,
                     new_folder_name,
-                    make_graph=True,
+                    make_graph=False,
                 )
                 # Log to Google Sheet
                 if args.aspirate is False:

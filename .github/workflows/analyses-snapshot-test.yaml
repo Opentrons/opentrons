@@ -68,13 +68,13 @@ jobs:
 
     - name: Handle Test Failure
       id: handle_failure
-      if: steps.run_test.outcome == 'failure'
+      if: always() && steps.run_test.outcome == 'failure'
       working-directory: analyses-snapshot-testing
       run: make snapshot-test-update
 
     - name: Create Snapshot update Request
       id: create_pull_request
-      if: steps.handle_failure.outcome == 'success'
+      if: always() && steps.handle_failure.outcome == 'success'
       uses: peter-evans/create-pull-request@v6
       with:
           commit-message: 'fix(analyses-snapshot-testing): snapshot failure capture'
@@ -84,7 +84,7 @@ jobs:
           base: ${{ env.SNAPSHOT_REF}}
 
     - name: Comment on PR
-      if: steps.create_pull_request.outcome == 'success' && github.event_name == 'pull_request'
+      if: always() && steps.create_pull_request.outcome == 'success' && github.event_name == 'pull_request'
       uses: actions/github-script@v7
       with:
         script: |

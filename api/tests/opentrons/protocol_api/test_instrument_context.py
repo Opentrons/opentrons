@@ -18,6 +18,7 @@ from opentrons.protocols.api_support import instrument as mock_instrument_suppor
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import (
     APIVersionError,
+    UnsupportedAPIError,
     FlowRates,
     PlungerSpeeds,
 )
@@ -269,7 +270,7 @@ def test_pick_up_from_well_deprecated_args(
     """It should pick up a specific tip."""
     mock_well = decoy.mock(cls=Well)
 
-    with pytest.raises(APIVersionError):
+    with pytest.raises(UnsupportedAPIError):
         subject.pick_up_tip(mock_well, presses=1, increment=2.0, prep_after=False)
 
 
@@ -1095,7 +1096,7 @@ def test_plunger_speed(
 @pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
 def test_plunger_speed_removed(subject: InstrumentContext) -> None:
     """It should raise an error on PAPI >= v2.14."""
-    with pytest.raises(APIVersionError):
+    with pytest.raises(UnsupportedAPIError):
         subject.speed
 
 

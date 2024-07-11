@@ -1,12 +1,16 @@
 """Liquid-probe command for OT3 hardware. request, result, and implementation models."""
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Type, Union
-from opentrons_shared_data.errors.exceptions import PipetteLiquidNotFoundError
+from opentrons.protocol_engine.errors.exceptions import MustHomeError, TipNotEmptyError
+from opentrons.types import MountType
+from opentrons_shared_data.errors.exceptions import (
+    PipetteLiquidNotFoundError,
+)
 from typing_extensions import Literal
 
 from pydantic import Field
 
-from ..types import WellLocation, WellOrigin, CurrentWell, DeckPoint
+from ..types import CurrentWell, DeckPoint
 from .pipetting_common import (
     LiquidNotFoundError,
     LiquidNotFoundErrorInternalData,
@@ -21,6 +25,7 @@ from .command import (
     DefinedErrorData,
     SuccessData,
 )
+
 from ..errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
@@ -72,29 +77,33 @@ class LiquidProbeImplementation(AbstractCommandImpl[LiquidProbeParams, _ExecuteR
         Return the z-position of the found liquid.
 
         Raises:
+            TipNotAttachedError: if there is not tip attached to the pipette
+            MustHomeError: if the plunger is not in a valid position
             LiquidNotFoundError: if liquid is not found during the probe process.
         """
         pipette_id = params.pipetteId
         labware_id = params.labwareId
         well_name = params.wellName
 
-        ready_to_probe = self._pipetting.get_is_ready_to_aspirate(pipette_id=pipette_id)
+        # _validate_tip_attached in pipetting.py is a private method so we're using
+        # get_is_ready_to_aspirate as an indirect way to throw a TipNotAttachedError if appropriate
+        self._pipetting.get_is_ready_to_aspirate(pipette_id=pipette_id)
 
-        current_well = None
-
-        if not ready_to_probe:
-            await self._movement.move_to_well(
-                pipette_id=pipette_id,
-                labware_id=labware_id,
-                well_name=well_name,
-                well_location=WellLocation(origin=WellOrigin.TOP),
+        if self._pipetting.get_is_empty(pipette_id=pipette_id) is False:
+            raise TipNotEmptyError(
+                message="This operation requires a tip with no liquid in it."
             )
 
-            current_well = CurrentWell(
-                pipette_id=pipette_id,
-                labware_id=labware_id,
-                well_name=well_name,
+        if await self._movement.check_for_valid_position(mount=MountType.LEFT) is False:
+            raise MustHomeError(
+                message="Current position of pipette is invalid. Please home."
             )
+
+        current_well = CurrentWell(
+            pipette_id=pipette_id,
+            labware_id=labware_id,
+            well_name=well_name,
+        )
 
         # liquid_probe process start position
         position = await self._movement.move_to_well(

@@ -135,7 +135,7 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
     ) -> None:
         if isinstance(location, (TrashBin, WasteChute)):
             raise APIVersionError(
-                "Dispense in Moveable Trash or Waste Chute are not supported in this API Version."
+                api_element="Dispense in Moveable Trash or Waste Chute"
             )
         if not in_place:
             self.move_to(location=location, well_core=well_core)
@@ -150,7 +150,7 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
     ) -> None:
         if isinstance(location, (TrashBin, WasteChute)):
             raise APIVersionError(
-                "Blow Out in Moveable Trash or Waste Chute are not supported in this API Version."
+                api_element="Blow Out in Moveable Trash or Waste Chute"
             )
         if not in_place:
             self.move_to(location=location, well_core=well_core)
@@ -215,9 +215,7 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
         alternate_drop_location: Optional[bool] = False,
     ) -> None:
         if alternate_drop_location:
-            raise APIVersionError(
-                "Tip drop alternation is not supported in this API version."
-            )
+            raise APIVersionError(api_element="Tip drop alternation")
         labware_core = well_core.geometry.parent
 
         if location is None:
@@ -270,9 +268,7 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
         home_after: Optional[bool],
         alternate_tip_drop: bool = False,
     ) -> None:
-        raise APIVersionError(
-            "Dropping tips in a trash bin or waste chute is not supported in this API Version."
-        )
+        raise APIVersionError(api_element="Dropping tips in a trash bin or waste chute")
 
     def home(self) -> None:
         self._protocol_interface.set_last_location(None)
@@ -290,9 +286,7 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
     ) -> None:
         """Simulation of only the motion planning portion of move_to."""
         if isinstance(location, (TrashBin, WasteChute)):
-            raise APIVersionError(
-                "Move To Trash Bin and Waste Chute are not supported in this API Version."
-            )
+            raise APIVersionError(api_element="Move To Trash Bin and Waste Chute")
 
         self.flag_unsafe_move(location)
 

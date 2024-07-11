@@ -2,30 +2,39 @@
 
 import logging
 import time
-from pathlib import Path
-from ._logging_config import log_init
+import systemd.daemon  # type: ignore [import-untyped]
+from .._logging_config import log_init, LOGGER_NAME
+from ._config import SystemResourceTrackerConfiguration
 from ._system_resource_tracker import SystemResourceTracker
 
-log_init()
-logger = logging.getLogger(__name__)
 
+def main() -> None:
+    """Main function."""
+    config = SystemResourceTrackerConfiguration.from_env()
 
-if __name__ == "__main__":
+    log_init(logging._nameToLevel[config.logging_level])
+    logger = logging.getLogger(LOGGER_NAME)
+    logger.setLevel(config.logging_level)
+
+    logger.info(f"Running with the following configuration: {config}")
+
+    tracker = SystemResourceTracker(config)
+
     logger.info("Starting system resource tracker...")
-    tracker = SystemResourceTracker(
-        storage_dir=Path("/data/performance_metrics_data"),
-        process_filters=("/opt/opentrons*", "python3*"),
-        should_track=True,
-        refresh_interval=5,
-    )
+
+    systemd.daemon.notify("READY=1")
 
     try:
         while True:
             tracker.get_and_store_system_data_snapshots()
-            time.sleep(tracker.refresh_interval)
+            time.sleep(tracker.config.refresh_interval)
     except KeyboardInterrupt:
         logger.info("Manually stopped.")
     except Exception:
         logger.error("Exception occurred: ", exc_info=True)
     finally:
         logger.info("System resource tracker is stopping.")
+
+
+if __name__ == "__main__":
+    main()

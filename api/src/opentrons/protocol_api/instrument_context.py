@@ -28,6 +28,7 @@ from opentrons.protocols.api_support.util import (
     clamp_value,
     requires_version,
     APIVersionError,
+    UnsupportedAPIError,
 )
 from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
 
@@ -372,7 +373,9 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         if self.api_version < APIVersion(2, 15) and push_out:
             raise APIVersionError(
-                "Unsupported parameter push_out. Change your API version to 2.15 or above to use this parameter."
+                api_element="Parameter push_out",
+                until_version="2.15",
+                current_version=f"{self.api_version}",
             )
         _log.debug(
             "dispense {} from {} at {}".format(
@@ -891,21 +894,24 @@ class InstrumentContext(publisher.CommandPublisher):
         """
 
         if presses is not None and self._api_version >= _PRESSES_INCREMENT_REMOVED_IN:
-            raise APIVersionError(
-                f"presses is only available in API versions lower than {_PRESSES_INCREMENT_REMOVED_IN},"
-                f" but you are using API {self._api_version}."
+            raise UnsupportedAPIError(
+                api_element="presses",
+                since_version=f"{_PRESSES_INCREMENT_REMOVED_IN}",
+                current_version=f"{self._api_version}",
             )
 
         if increment is not None and self._api_version >= _PRESSES_INCREMENT_REMOVED_IN:
-            raise APIVersionError(
-                f"increment is only available in API versions lower than {_PRESSES_INCREMENT_REMOVED_IN},"
-                f" but you are using API {self._api_version}."
+            raise UnsupportedAPIError(
+                api_element="increment",
+                since_version=f"{_PRESSES_INCREMENT_REMOVED_IN}",
+                current_version=f"{self._api_version}",
             )
 
         if prep_after is not None and self._api_version < _PREP_AFTER_ADDED_IN:
             raise APIVersionError(
-                f"prep_after is only available in API {_PREP_AFTER_ADDED_IN} and newer,"
-                f" but you are using API {self._api_version}."
+                api_element="prep_after",
+                until_version=f"{_PREP_AFTER_ADDED_IN}",
+                current_version=f"{self._api_version}",
             )
 
         well: labware.Well
@@ -1497,9 +1503,8 @@ class InstrumentContext(publisher.CommandPublisher):
             # would get a TypeError if they tried to call it like delay(minutes=10).
             # Without changing the ultimate behavior that such a call fails the
             # protocol, we can provide a more descriptive message as a courtesy.
-            raise APIVersionError(
-                "InstrumentContext.delay() is not supported in Python Protocol API v2."
-                " Use ProtocolContext.delay() instead."
+            raise UnsupportedAPIError(
+                message="InstrumentContext.delay() is not supported in Python Protocol API v2. Use ProtocolContext.delay() instead."
             )
         else:
             # Former implementations of this method, when called without any args,
@@ -1619,9 +1624,8 @@ class InstrumentContext(publisher.CommandPublisher):
             :py:attr:`.flow_rate` instead.
         """
         if self._api_version >= ENGINE_CORE_API_VERSION:
-            raise APIVersionError(
-                "InstrumentContext.speed has been removed."
-                " Use InstrumentContext.flow_rate, instead."
+            raise UnsupportedAPIError(
+                message="InstrumentContext.speed has been removed. Use InstrumentContext.flow_rate, instead."
             )
 
         # TODO(mc, 2023-02-13): this assert should be enough for mypy

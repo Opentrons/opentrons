@@ -142,7 +142,7 @@ class FlexBackend(Protocol):
     async def liquid_probe(
         self,
         mount: OT3Mount,
-        max_z_distance: float,
+        max_p_distance: float,
         mount_speed: float,
         plunger_speed: float,
         threshold_pascals: float,
