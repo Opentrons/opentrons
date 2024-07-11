@@ -1980,7 +1980,7 @@ class InstrumentContext(publisher.CommandPublisher):
         back_left: Optional[str] = None,
         tip_racks: Optional[List[labware.Labware]] = None,
     ) -> None:
-        """Configure how many tips the 96-channel pipette will pick up.
+        """Configure how many tips the 8-channel or 96-channel pipette will pick up.
 
         Changing the nozzle layout will affect gantry movement for all subsequent
         pipetting actions that the pipette performs. It also alters the pipette's
@@ -1994,13 +1994,18 @@ class InstrumentContext(publisher.CommandPublisher):
 
         :param style: The shape of the nozzle layout.
 
+            - ``SINGLE`` sets the pipette to use 1 nozzle. This corresponds to a single of well on labware.
             - ``COLUMN`` sets the pipette to use 8 nozzles, aligned from front to back
               with respect to the deck. This corresponds to a column of wells on labware.
+            - ``PARTIAL_COLUMN`` sets the pipette to use 2-7 nozzles, aligned from front to back
+            with respect to the deck.
+            - ``ROW`` sets the pipette to use 12 nozzles, aligned from left to right
+              with respect to the deck. This corresponds to a row of wells on labware.
             - ``ALL`` resets the pipette to use all of its nozzles. Calling
               ``configure_nozzle_layout`` with no arguments also resets the pipette.
 
         :type style: ``NozzleLayout`` or ``None``
-        :param start: The nozzle at the back left of the layout, which the robot uses
+        :param start: The primary nozzle of the layout, which the robot uses
             to determine how it will move to different locations on the deck. The string
             should be of the same format used when identifying wells by name.
             Required unless setting ``style=ALL``.
@@ -2010,6 +2015,16 @@ class InstrumentContext(publisher.CommandPublisher):
                 tips *from the same rack*. Doing so can affect positional accuracy.
 
         :type start: str or ``None``
+        :param end: The nozzle at the end of a linear layout, which is used
+            to determine how many tips will be picked up by a pipette. The string
+            should be of the same format used when identifying wells by name.
+            Required when setting ``style=PARTIAL_COLUMN``.
+
+            .. note::
+                Nozzle layouts numbering between 2-7 nozzles, account for the distance from
+                ``start``. For example, 4 nozzles would require ``start="H1"`` and ``end="E1"``.
+
+        :type end: str or ``None``
         :param tip_racks: Behaves the same as setting the ``tip_racks`` parameter of
             :py:meth:`.load_instrument`. If not specified, the new configuration resets
             :py:obj:`.InstrumentContext.tip_racks` and you must specify the location
