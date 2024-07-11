@@ -2072,6 +2072,10 @@ class InstrumentContext(publisher.CommandPublisher):
                 raise ValueError(
                     "Cannot configure a QUADRANT layout without a front right or back left nozzle."
                 )
+        elif not (front_right is None and back_left is None):
+            raise ValueError(
+                f"Parameters 'front_right' and 'back_left' cannot be used with {style.value} Nozzle Configuration Layout."
+            )
 
         front_right_resolved = front_right
         back_left_resolved = back_left
@@ -2079,10 +2083,6 @@ class InstrumentContext(publisher.CommandPublisher):
             if end is None:
                 raise ValueError(
                     "Parameter 'end' is required for Partial Column Nozzle Configuration Layout."
-                )
-            if front_right is not None or back_left is not None:
-                raise ValueError(
-                    "Parameters 'front_right' and 'back_left' cannot be used with Partial Column Nozzle Configuration Layout."
                 )
 
             # Determine if 'end' will be configured as front_right or back_left
