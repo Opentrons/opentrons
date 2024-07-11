@@ -16,7 +16,7 @@ from typing import (
     List,
 )
 
-from opentrons.config import CONFIG, ARCHITECTURE, SystemArchitecture
+from opentrons.config import CONFIG
 from opentrons_shared_data.robot.dev_types import RobotTypeEnum
 
 if TYPE_CHECKING:
