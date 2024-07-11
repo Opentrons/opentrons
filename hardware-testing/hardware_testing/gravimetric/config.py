@@ -90,17 +90,15 @@ LIQUID_PROBE_SETTINGS: Dict[int, Dict[int, Dict[int, Dict[str, int]]]] = {
     50: {
         1: {
             50: {
-                "max_z_distance": 20,
-                "mount_speed": 11,
-                "plunger_speed": 21,
+                "mount_speed": 5,
+                "plunger_speed": 20,
                 "sensor_threshold_pascals": 15,
             },
         },
         8: {
             50: {
-                "max_z_distance": 20,
-                "mount_speed": 11,
-                "plunger_speed": 21,
+                "mount_speed": 5,
+                "plunger_speed": 20,
                 "sensor_threshold_pascals": 15,
             },
         },
@@ -108,61 +106,52 @@ LIQUID_PROBE_SETTINGS: Dict[int, Dict[int, Dict[int, Dict[str, int]]]] = {
     1000: {
         1: {
             50: {
-                "max_z_distance": 20,
                 "mount_speed": 5,
-                "plunger_speed": 10,
+                "plunger_speed": 20,
                 "sensor_threshold_pascals": 15,
             },
             200: {
-                "max_z_distance": 20,
                 "mount_speed": 5,
-                "plunger_speed": 10,
+                "plunger_speed": 20,
                 "sensor_threshold_pascals": 15,
             },
             1000: {
-                "max_z_distance": 20,
                 "mount_speed": 5,
-                "plunger_speed": 11,
+                "plunger_speed": 20,
                 "sensor_threshold_pascals": 15,
             },
         },
         8: {
             50: {
-                "max_z_distance": 20,
                 "mount_speed": 5,
-                "plunger_speed": 10,
+                "plunger_speed": 20,
                 "sensor_threshold_pascals": 15,
             },
             200: {
-                "max_z_distance": 20,
                 "mount_speed": 5,
-                "plunger_speed": 10,
+                "plunger_speed": 20,
                 "sensor_threshold_pascals": 15,
             },
             1000: {
-                "max_z_distance": 20,
                 "mount_speed": 5,
-                "plunger_speed": 11,
+                "plunger_speed": 20,
                 "sensor_threshold_pascals": 15,
             },
         },
         96: {
             50: {
-                "max_z_distance": 20,
                 "mount_speed": 5,
-                "plunger_speed": 10,
+                "plunger_speed": 20,
                 "sensor_threshold_pascals": 15,
             },
             200: {
-                "max_z_distance": 20,
                 "mount_speed": 5,
-                "plunger_speed": 10,
+                "plunger_speed": 20,
                 "sensor_threshold_pascals": 15,
             },
             1000: {
-                "max_z_distance": 20,
                 "mount_speed": 5,
-                "plunger_speed": 11,
+                "plunger_speed": 20,
                 "sensor_threshold_pascals": 15,
             },
         },
