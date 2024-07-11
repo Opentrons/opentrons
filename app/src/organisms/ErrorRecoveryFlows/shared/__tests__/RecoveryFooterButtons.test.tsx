@@ -27,7 +27,6 @@ describe('RecoveryFooterButtons', () => {
     mockSecondaryBtnOnClick = vi.fn()
     mockTertiaryBtnOnClick = vi.fn()
     props = {
-      isOnDevice: true,
       primaryBtnOnClick: mockPrimaryBtnOnClick,
       secondaryBtnOnClick: mockSecondaryBtnOnClick,
     }
