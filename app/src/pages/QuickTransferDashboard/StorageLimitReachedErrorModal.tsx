@@ -30,7 +30,7 @@ export const StorageLimitReachedErrorModal = (
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing10}
+        gridGap={SPACING.spacing32}
         width="100%"
       >
         <LegacyStyledText css={TYPOGRAPHY.bodyTextRegular}>
