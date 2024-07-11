@@ -50,24 +50,26 @@ export function TwoColTextAndFailedStepNextStep({
   const { t } = useTranslation('error_recovery')
   const nthStepAfter = (n: number): number | undefined =>
     stepCounts.currentStepNumber == null
-      ? undefined
-      : stepCounts.currentStepNumber + n
-  const commandsAfter = [
-    commandsAfterFailedCommand == null
-      ? null
-      : commandsAfterFailedCommand?.length > 0
-      ? commandsAfterFailedCommand[0] == null
-        ? null
-        : { command: commandsAfterFailedCommand[0], index: nthStepAfter(1) }
-      : null,
-    commandsAfterFailedCommand == null
-      ? null
-      : commandsAfterFailedCommand.length > 1
-      ? commandsAfterFailedCommand[1] == null
-        ? null
-        : { command: commandsAfterFailedCommand[1], index: nthStepAfter(2) }
+    ? undefined
+    : stepCounts.currentStepNumber + n
+  const nthCommand = (n: number): typeof failedCommand =>
+    commandsAfterFailedCommand != null
+    ? n < commandsAfterFailedCommand.length
+        ? commandsAfterFailedCommand[n]
+        : null
+        : null
+
+  const commandsAfter = [nthCommand(0), nthCommand(1)] as const
+
+  const indexedCommandsAfter = [
+    commandsAfter[0] != null
+    ? { command: commandsAfter[0], index: nthStepAfter(1) }
+    : null,
+    commandsAfter[1] != null
+    ? { command: commandsAfter[1], index: nthStepAfter(2) }
       : null,
   ] as const
+
   return (
     <RecoveryContentWrapper>
       <TwoColumn>
@@ -108,7 +110,7 @@ export function TwoColTextAndFailedStepNextStep({
           }
           bottomCategoryHeadline={t('next_step')}
           bottomCategory="future"
-          bottomCategoryCommands={commandsAfter}
+          bottomCategoryCommands={indexedCommandsAfter}
         />
       </TwoColumn>
       <RecoveryFooterButtons
