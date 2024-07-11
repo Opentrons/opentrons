@@ -33,61 +33,49 @@ def run(ctx: protocol_api.ProtocolContext):
 
     
     # ####### FIRST CYCLE, SHOULD NOT DO LLD #######
-    # pipette.pick_up_tip(tiprack["A1"])
-    
-    # # Liquid presence detection does not take place in the following aspirate command
-    # # because the pipette was loaded in with liquid_presence_detection = False
-    # pipette.aspirate(5, reservoir["A1"])
-    # pipette.dispense(5, plate["A1"])
-    
-    # #Make sure to get a new tip each time before attempting liquid presence detection
-    # pipette.drop_tip(trash_bin) 
+    pipette.pick_up_tip(tiprack["A1"])
+    pipette.aspirate(100, reservoir["A1"])
+    pipette.dispense(100, plate["B2"])
+    pipette.drop_tip(trash_bin) 
     
     
-    
-    
-    
-    # ####### SECOND CYCLE, SHOULD NOT DO LLD #######
-    # pipette.pick_up_tip(tiprack["A2"])
-    
-    # print(pipette.liquid_detection) #should be: False
-    # pipette.liquid_detection = True
-    # print(pipette.liquid_detection) #should be: True
-    # pipette.aspirate(5, reservoir["A2"])
-    # pipette.dispense(5, plate["A1"])
-    # pipette.drop_tip(trash_bin)
-    
-    
-    
-    
-    ####### THIRD CYCLE, SHOULD DO LLD #######
-    pipette.pick_up_tip(tiprack["A3"])
-    
-    print(pipette.liquid_detection) #should be: False
-    pipette.require_liquid_presence(plate["A5"]) #should run without error
+    ####### SECOND CYCLE, SHOULD DO LLD #######
+    pipette.liquid_detection = True
+    pipette.pick_up_tip(tiprack["A2"])
+    pipette.aspirate(100, reservoir["A2"])
+    pipette.dispense(100, plate["A10"])
     pipette.drop_tip(trash_bin)
     
     
+    ####### THIRD CYCLE, SHOULD NOT DO LLD #######
+    pipette.liquid_detection = False
+    pipette.pick_up_tip(tiprack["A3"])
+    pipette.aspirate(100, reservoir["A3"])
+    pipette.dispense(100, plate["A11"])
+    pipette.drop_tip(trash_bin)
+    
+    ###### FOURTH CYCLE, SHOULD DO LLD #######
+    pipette.pick_up_tip(tiprack["A4"])
+    pipette.require_liquid_presence(plate["A6"]) #should run without error
+    pipette.drop_tip(trash_bin)
     
     
-    # ####### FOURTH CYCLE, SHOULD TRY TO DO LLD #######
-    # pipette.pick_up_tip(tiprack["A4"])
-    
-    # pipette.require_liquid_presence(plate["A2"]) #should error because no liquid in there but provide chance for recovery
-    
-    # pipette.drop_tip(trash_bin)
+    ####### FIFTH CYCLE, SHOULD TRY TO DO LLD #######
+    pipette.pick_up_tip(tiprack["A5"])
+    pipette.require_liquid_presence(plate["D10"]) #should error because no liquid in there but provide chance for recovery
+    pipette.drop_tip(trash_bin)
     
     
+    ####### SIXTH CYCLE, SHOULD DO LLD #######
+    pipette.pick_up_tip(tiprack["A6"])
+    assert pipette.detect_liquid_presence(plate["A2"]) is True
+    pipette.drop_tip(trash_bin)
     
-    # ####### FIFTH CYCLE, SHOULD DO LLD #######
-    # pipette.pick_up_tip(tiprack["A5"])
     
-    # assert pipette.detect_liquid_presence(plate["A1"]) == True
-    
-    # pipette.drop_tip(trash_bin)
-    # pipette.pick_up_tip(tiprack["A6"])
-    
-    # #assert pipette.detect_liquid_presence(plate["A2"]) == False
-    
-    # pipette.drop_tip(trash_bin)
+    ####### SEVENTH CYCLE, SHOULD DO LLD #######
+    pipette.pick_up_tip(tiprack["A7"])
+    if pipette.detect_liquid_presence(plate["H7"]) is False:
+        pipette.drop_tip(trash_bin)
+    ### THE BELOW LINE IS A PROBLEM
+    # assert pipette.detect_liquid_presence(plate["H7"]) is False
     

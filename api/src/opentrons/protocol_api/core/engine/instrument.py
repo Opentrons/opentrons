@@ -876,7 +876,6 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                 pipetteId=self.pipette_id,
             )
         )
-        
         #TODO: fix this. i'm not even sure what set_last_location is used for
         self._protocol_core.set_last_location(location=Location(well_core.get_top(0), "Well"), mount=self.get_mount())
 

@@ -222,7 +222,6 @@ class InstrumentContext(publisher.CommandPublisher):
 
         well: Optional[labware.Well] = None
         move_to_location: types.Location
-
         last_location = self._get_last_location_by_api_version()
         try:
             target = validation.validate_location(
@@ -259,6 +258,11 @@ class InstrumentContext(publisher.CommandPublisher):
         else:
             c_vol = self._core.get_available_volume() if not volume else volume
         flow_rate = self._core.get_aspirate_flow_rate(rate)
+        
+        if self.api_version >= APIVersion(2, 20) and well is not None:
+            if self._core.get_liquid_presence_detection():
+                self.require_liquid_presence(well=well)
+                self.prepare_to_aspirate()
 
         with publisher.publish_context(
             broker=self.broker,

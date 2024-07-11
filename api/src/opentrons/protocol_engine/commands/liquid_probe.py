@@ -111,7 +111,7 @@ class LiquidProbeImplementation(AbstractCommandImpl[LiquidProbeParams, _ExecuteR
         try:
             z_pos = await self._pipetting.liquid_probe_in_place(
                 pipette_id=pipette_id, labware_id=labware_id, well_name=well_name
-            )
+            )   
         except PipetteLiquidNotFoundError as e:
             return DefinedErrorData(
                 public=LiquidNotFoundError(
