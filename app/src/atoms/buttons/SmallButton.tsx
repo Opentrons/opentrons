@@ -1,4 +1,6 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
+
 import { css } from 'styled-components'
 import {
   ALIGN_CENTER,
@@ -11,10 +13,11 @@ import {
   JUSTIFY_CENTER,
   SPACING,
   LegacyStyledText,
-  TYPOGRAPHY,
+  TYPOGRAPHY
 } from '@opentrons/components'
 import { ODD_FOCUS_VISIBLE } from './constants'
 import type { IconName, StyleProps } from '@opentrons/components'
+import { getIsOnDevice } from '../../redux/config'
 
 export type SmallButtonTypes =
   | 'alert'
@@ -49,6 +52,8 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
     ariaDisabled = false,
     ...buttonProps
   } = props
+
+  const isOnDevice = useSelector(getIsOnDevice)
 
   const SMALL_BUTTON_PROPS_BY_TYPE: Record<
     SmallButtonTypes,
@@ -148,6 +153,8 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
     }
   `
 
+  const TEXT_SIZE = isOnDevice ? "1.375rem": "0.875rem"
+
   return (
     <Btn
       css={SMALL_BUTTON_STYLE}
@@ -181,8 +188,8 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
         ) : null}
 
         <LegacyStyledText
-          fontSize="1.375rem"
-          lineHeight={TYPOGRAPHY.lineHeight28}
+          fontSize={TEXT_SIZE}
+          lineHeight={isOnDevice ? TYPOGRAPHY.lineHeight28: TYPOGRAPHY.lineHeight20}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         >
           {buttonText}

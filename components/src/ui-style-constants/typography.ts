@@ -194,7 +194,7 @@ export const level4HeaderBold = css`
 export const level4DesketopHeaderBold = css`
   font-size: ${fontSize16};
   line-height: ${lineHeight24};
-  font-weight: ${fontWeightBold};
+  font-weight: ${fontWeightRegular};
 `
 
 export const level4HeaderSemiBold = css`

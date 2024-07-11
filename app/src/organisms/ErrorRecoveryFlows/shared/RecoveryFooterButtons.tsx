@@ -56,7 +56,27 @@ export function RecoveryFooterButtons(
       </Flex>
     )
   } else {
-    return null
+    return (
+      <Flex
+        width="100%"
+        height="100%"
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+        alignItems={ALIGN_CENTER}
+        gridGap={SPACING.spacing8}
+      >
+        <Flex marginTop="auto">
+          {showGoBackBtn ? (
+            <SmallButton
+              buttonType="tertiaryLowLight"
+              buttonText={t('go_back')}
+              onClick={secondaryBtnOnClick}
+              marginTop="auto"
+            />
+          ) : null}
+        </Flex>
+        <PrimaryButtonGroup {...props} />
+      </Flex>
+    )
   }
 }
 

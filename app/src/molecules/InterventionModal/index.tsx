@@ -169,7 +169,7 @@ export function InterventionModal({
                   />
                 )
               ) : null}
-              {iconHeading != null ? iconHeading : null}
+              {iconHeading ?? null}
             </Flex>
           </Flex>
           {children}

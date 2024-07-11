@@ -100,6 +100,7 @@ function CancelRunConfirmation({
       <RecoverySingleColumnContent
         gridGap={SPACING.spacing24}
         alignItems={ALIGN_CENTER}
+        height="22rem"
       >
         <Flex
           flexDirection={DIRECTION_COLUMN}
@@ -114,7 +115,7 @@ function CancelRunConfirmation({
             marginTop={SPACING.spacing16}
             color={COLORS.red50}
           />
-          <LegacyStyledText as="h3DesktopBold">
+          <LegacyStyledText as="h3Bold">
             {t('are_you_sure_you_want_to_cancel')}
           </LegacyStyledText>
           <LegacyStyledText
