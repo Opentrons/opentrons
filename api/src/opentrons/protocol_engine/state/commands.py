@@ -232,30 +232,33 @@ class CommandStore(HasState[CommandState], HandlesActions):
             stopped_by_estop=False,
         )
 
-    def handle_action(self, action: Action) -> None:  # noqa: C901
+    def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""
-        if isinstance(action, QueueCommandAction):
-            self._handle_queue_command_action(action)
-        elif isinstance(action, RunCommandAction):
-            self._handle_run_command_action(action)
-        elif isinstance(action, SucceedCommandAction):
-            self._handle_succeed_command_action(action)
-        elif isinstance(action, FailCommandAction):
-            self._handle_fail_command_action(action)
-        elif isinstance(action, PlayAction):
-            self._handle_play_action(action)
-        elif isinstance(action, PauseAction):
-            self._handle_pause_action(action)
-        elif isinstance(action, ResumeFromRecoveryAction):
-            self._handle_resume_from_recovery_action(action)
-        elif isinstance(action, StopAction):
-            self._handle_stop_action(action)
-        elif isinstance(action, FinishAction):
-            self._handle_finish_action(action)
-        elif isinstance(action, HardwareStoppedAction):
-            self._handle_hardware_stopped_action(action)
-        elif isinstance(action, DoorChangeAction):
-            self._handle_door_change_action(action)
+        match action:
+            case QueueCommandAction():
+                self._handle_queue_command_action(action)
+            case RunCommandAction():
+                self._handle_run_command_action(action)
+            case SucceedCommandAction():
+                self._handle_succeed_command_action(action)
+            case FailCommandAction():
+                self._handle_fail_command_action(action)
+            case PlayAction():
+                self._handle_play_action(action)
+            case PauseAction():
+                self._handle_pause_action(action)
+            case ResumeFromRecoveryAction():
+                self._handle_resume_from_recovery_action(action)
+            case StopAction():
+                self._handle_stop_action(action)
+            case FinishAction():
+                self._handle_finish_action(action)
+            case HardwareStoppedAction():
+                self._handle_hardware_stopped_action(action)
+            case DoorChangeAction():
+                self._handle_door_change_action(action)
+            case _:
+                pass
 
     def _handle_queue_command_action(self, action: QueueCommandAction) -> None:
         # TODO(mc, 2021-06-22): mypy has trouble with this automatic
