@@ -225,7 +225,6 @@ settings = [
 ]
 
 
-
 settings_by_id: Dict[str, SettingDefinition] = {s.id: s for s in settings}
 settings_by_old_id: Dict[str, SettingDefinition] = {
     s.old_id: s for s in settings if s.old_id
@@ -705,6 +704,7 @@ def _migrate33to34(previous: SettingsMap) -> SettingsMap:
     newmap = {k: v for k, v in previous.items() if k not in removals}
     return newmap
 
+
 def _migrate34to35(previous: SettingsMap) -> SettingsMap:
     """Migrate to version 35 of the feature flags file.
 
@@ -750,7 +750,7 @@ _MIGRATIONS = [
     _migrate31to32,
     _migrate32to33,
     _migrate33to34,
-    _migrate34to35
+    _migrate34to35,
 ]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below

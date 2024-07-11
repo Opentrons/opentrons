@@ -523,9 +523,7 @@ def test_ignores_invalid_keys(
 
 
 def test_ensures_config() -> None:
-    assert _ensure(
-        {"_version": 3, "shortFixedTrash": False}
-    ) == {
+    assert _ensure({"_version": 3, "shortFixedTrash": False}) == {
         "_version": 3,
         "shortFixedTrash": False,
         "deckCalibrationDots": None,
