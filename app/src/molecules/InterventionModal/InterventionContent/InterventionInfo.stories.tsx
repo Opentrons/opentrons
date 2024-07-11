@@ -17,7 +17,7 @@ const meta: Meta<typeof InterventionInfo> = {
       options: [
         'location',
         'location-arrow-location',
-        'location-column-location',
+        'location-colon-location',
       ],
     },
     labwareName: {
