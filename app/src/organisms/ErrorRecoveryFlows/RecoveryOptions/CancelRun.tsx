@@ -12,7 +12,7 @@ import {
 } from '@opentrons/components'
 
 import { RECOVERY_MAP } from '../constants'
-import { RecoveryFooterButtons, RecoverySingleColumnContent } from '../shared'
+import { RecoveryFooterButtons, RecoverySingleColumnContent, RecoverySingleColumnContentDesktop } from '../shared'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 import type { RecoveryContentProps } from '../types'
@@ -97,10 +97,9 @@ function CancelRunConfirmation({
     )
   } else {
     return (
-      <RecoverySingleColumnContent
+      <RecoverySingleColumnContentDesktop
         gridGap={SPACING.spacing24}
         alignItems={ALIGN_CENTER}
-        height="22rem"
       >
         <Flex
           flexDirection={DIRECTION_COLUMN}
@@ -133,7 +132,7 @@ function CancelRunConfirmation({
           primaryBtnTextOverride={t('confirm')}
           isLoadingPrimaryBtnAction={showBtnLoadingState}
         />
-      </RecoverySingleColumnContent>
+      </RecoverySingleColumnContentDesktop>
     )
   }
 }
