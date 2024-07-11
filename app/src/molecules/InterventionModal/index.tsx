@@ -153,10 +153,9 @@ export function InterventionModal({
             {...headerStyle}
             backgroundColor={headerColor}
             justifyContent={headerJustifyContent}
-            onClick={iconHeadingOnClick}
           >
             {titleHeading}
-            <Flex alignItems={ALIGN_CENTER} gridGap={titleSpacing}>
+            <Flex alignItems={ALIGN_CENTER} gridGap={titleSpacing} onClick={iconHeadingOnClick}>
               {iconName != null ? (
                 isOnDevice ? (
                   <Icon name={iconName} size={SPACING.spacing32} />
