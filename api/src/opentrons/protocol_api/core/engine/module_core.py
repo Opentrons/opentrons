@@ -18,13 +18,13 @@ from opentrons.drivers.types import (
 )
 
 from opentrons.protocol_engine import commands as cmd
-from opentrons.types import DeckSlotName, StagingSlotName, Point
+from opentrons.types import DeckSlotName
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocol_engine.errors.exceptions import (
     LabwareNotLoadedOnModuleError,
     NoMagnetEngageHeightError,
 )
-from opentrons.protocol_engine.types import AddressableAreaLocation, LabwareOffsetVector
+from opentrons.protocol_engine.types import LabwareOffsetVector
 
 from opentrons.protocols.api_support.types import APIVersion
 

@@ -10,7 +10,6 @@ from ...errors.error_occurrence import ErrorOccurrence
 from opentrons.protocol_engine.types import (
     LabwareOffsetVector,
     LabwareMovementOffsetData,
-    AddressableAreaLocation,
 )
 from .types import MoveLidResult
 from opentrons.protocol_engine.resources import labware_validation
@@ -69,7 +68,7 @@ class OpenLidImpl(AbstractCommandImpl[OpenLidParams, SuccessData[OpenLidResult, 
         mod_substate.raise_if_lid_status_not_expected(lid_on_expected=True)
 
         # Allow propagation of ModuleNotAttachedError.
-        mod_hw = self._equipment.get_module_hardware_api(mod_substate.module_id)
+        _ = self._equipment.get_module_hardware_api(mod_substate.module_id)
 
         # lid should currently be on the module
         assert mod_substate.lid_id is not None

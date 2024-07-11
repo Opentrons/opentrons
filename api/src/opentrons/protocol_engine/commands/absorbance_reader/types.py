@@ -1,3 +1,5 @@
+"""Move Lid Result model."""
+
 from typing import Optional
 from pydantic import BaseModel, Field
 from opentrons.protocol_engine.types import LabwareLocation

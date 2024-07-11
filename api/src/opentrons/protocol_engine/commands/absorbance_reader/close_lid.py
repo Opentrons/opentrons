@@ -10,7 +10,6 @@ from ...errors.error_occurrence import ErrorOccurrence
 from opentrons.protocol_engine.types import (
     LabwareOffsetVector,
     LabwareMovementOffsetData,
-    AddressableAreaLocation,
     ModuleLocation,
 )
 from opentrons.protocol_engine.resources import labware_validation
@@ -67,7 +66,6 @@ class CloseLidImpl(
         self, params: CloseLidParams
     ) -> SuccessData[CloseLidResult, None]:
         """Execute the close lid command."""
-
         mod_substate = self._state_view.modules.get_absorbance_reader_substate(
             module_id=params.moduleId
         )
@@ -75,7 +73,7 @@ class CloseLidImpl(
         mod_substate.raise_if_lid_status_not_expected(lid_on_expected=False)
 
         # Allow propagation of ModuleNotAttachedError.
-        mod_hw = self._equipment.get_module_hardware_api(mod_substate.module_id)
+        _ = self._equipment.get_module_hardware_api(mod_substate.module_id)
 
         # lid should currently be docked
         assert mod_substate.lid_id is not None

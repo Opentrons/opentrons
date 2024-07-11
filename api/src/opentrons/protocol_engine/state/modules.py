@@ -40,7 +40,6 @@ from ..types import (
     ModuleType,
     ModuleDefinition,
     DeckSlotLocation,
-    StagingSlotLocation,
     ModuleDimensions,
     LabwareOffsetVector,
     HeaterShakerLatchStatus,
