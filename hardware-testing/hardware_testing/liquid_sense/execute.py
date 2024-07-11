@@ -16,6 +16,7 @@ from opentrons.hardware_control.types import (
     Axis,
     top_types,
 )
+from opentrons.hardware_control.dev_types import PipetteDict
 
 from hardware_testing.gravimetric.measurement.scale import Scale
 from hardware_testing.gravimetric.measurement.record import (
@@ -335,7 +336,8 @@ def find_max_z_distances(
     """
     hw_mount = OT3Mount.LEFT if run_args.pipette.mount == "left" else OT3Mount.RIGHT
     hw_api = get_sync_hw_api(run_args.ctx)
-    lld_settings = hw_api._pipette_handler.get_pipette(hw_mount).lld_settings
+    attached_instrument: PipetteDict = hw_api._pipette_handler.get_attached_instrument(hw_mount)
+    lld_settings = attached_instrument['lld_settings']
 
     z_speed = run_args.z_speed
     max_z_distance = (
