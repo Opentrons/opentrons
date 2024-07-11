@@ -102,9 +102,15 @@ import type {
 import type { ProtocolModuleInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 
 const FETCH_DURATION_MS = 5000
+
+export type ProtocolSetupStepStatus =
+  | 'ready'
+  | 'not ready'
+  | 'general'
+  | 'inform'
 interface ProtocolSetupStepProps {
   onClickSetupStep: () => void
-  status: 'ready' | 'not ready' | 'general' | 'inform'
+  status: ProtocolSetupStepStatus
   title: string
   // first line of detail text
   detail?: string | null

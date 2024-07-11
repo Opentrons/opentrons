@@ -92,6 +92,12 @@ export function getShowPipetteCalibrationWarning(
   )
 }
 
+/**
+ * prepares object to send to endpoints requiring RunTimeParameterCreateData
+ * @param {RunTimeParameter[]} runTimeParameters array of updated RunTimeParameter overrides
+ * @param {Record<string, string>} [fileIdMap] mapping of variable name to file ID created and returned by robot server
+ * @returns {RunTimeParameterCreateData} object mapping variable name to value or file information
+ */
 export function getRunTimeParameterValuesForRun(
   runTimeParameters: RunTimeParameter[],
   fileIdMap?: Record<string, string>

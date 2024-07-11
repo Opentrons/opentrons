@@ -623,17 +623,48 @@ export interface NumberParameter extends BaseRunTimeParameter {
   value: number
 }
 
-export interface Choice {
+export interface NumberChoice {
   displayName: string
-  value: number | boolean | string
+  value: number
 }
 
-export interface ChoiceParameter extends BaseRunTimeParameter {
-  type: NumberParameterType | BooleanParameterType | StringParameterType
-  choices: Choice[]
-  default: number | boolean | string
-  value: number | boolean | string
+export interface BooleanChoice {
+  displayName: string
+  value: boolean
 }
+
+export interface StringChoice {
+  displayName: string
+  value: string
+}
+
+export type Choice = NumberChoice | BooleanChoice | StringChoice
+
+interface NumberChoiceParameter extends BaseRunTimeParameter {
+  type: NumberParameterType
+  choices: NumberChoice[]
+  default: number
+  value: number
+}
+
+interface BooleanChoiceParameter extends BaseRunTimeParameter {
+  type: BooleanParameterType
+  choices: BooleanChoice[]
+  default: boolean
+  value: boolean
+}
+
+interface StringChoiceParameter extends BaseRunTimeParameter {
+  type: StringParameterType
+  choices: StringChoice[]
+  default: string
+  value: string
+}
+
+export type ChoiceParameter =
+  | NumberChoiceParameter
+  | BooleanChoiceParameter
+  | StringChoiceParameter
 
 interface BooleanParameter extends BaseRunTimeParameter {
   type: BooleanParameterType
@@ -641,9 +672,16 @@ interface BooleanParameter extends BaseRunTimeParameter {
   value: boolean
 }
 
+export interface CsvFileParameterFileData {
+  id?: string
+  file?: File | null
+  filePath?: string
+  fileName?: string
+}
+
 export interface CsvFileParameter extends BaseRunTimeParameter {
   type: CsvFileParameterType
-  file?: { id?: string; file?: File | null } | null
+  file?: CsvFileParameterFileData | null
 }
 
 type NumberParameterType = 'int' | 'float'

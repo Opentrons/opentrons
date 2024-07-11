@@ -5,6 +5,7 @@ import {
   useCreateProtocolAnalysisMutation,
   useCreateRunMutation,
   useHost,
+  useUploadCsvFileMutation,
 } from '@opentrons/react-api-client'
 import { useQueryClient } from 'react-query'
 import {
@@ -18,7 +19,6 @@ import {
   sortRuntimeParameters,
 } from '@opentrons/shared-data'
 
-import { ProtocolSetupStep } from '../../pages/ProtocolSetup'
 import { getRunTimeParameterValuesForRun } from '../Devices/utils'
 import { ChildNavigation } from '../ChildNavigation'
 import { ResetValuesModal } from './ResetValuesModal'
@@ -27,7 +27,7 @@ import { ChooseNumber } from './ChooseNumber'
 import { ChooseCsvFile } from './ChooseCsvFile'
 import { useFeatureFlag } from '../../redux/config'
 import { useToaster } from '../ToasterOven'
-
+import { ProtocolSetupStep } from '../../pages/ProtocolSetup'
 import type {
   CompletedProtocolAnalysis,
   ChoiceParameter,
@@ -35,8 +35,10 @@ import type {
   NumberParameter,
   RunTimeParameter,
   ValueRunTimeParameter,
+  CsvFileParameterFileData,
 } from '@opentrons/shared-data'
-import type { LabwareOffsetCreateData } from '@opentrons/api-client'
+import type { ProtocolSetupStepStatus } from '../../pages/ProtocolSetup'
+import type { FileData, LabwareOffsetCreateData } from '@opentrons/api-client'
 
 interface ProtocolSetupParametersProps {
   protocolId: string
@@ -84,6 +86,14 @@ export function ProtocolSetupParameters({
           ({ ...parameter, value: parameter.default } as ValueRunTimeParameter)
     )
   )
+  const hasMissingFileParam =
+    runTimeParametersOverrides?.some(
+      parameter =>
+        parameter.type === 'csv_file' &&
+        parameter.file?.id == null &&
+        parameter.file?.file == null &&
+        parameter.file?.filePath == null
+    ) ?? false
   const { makeSnackbar } = useToaster()
 
   const csvFileParameter = runTimeParameters.find(
@@ -93,7 +103,7 @@ export function ProtocolSetupParameters({
   const [csvFileInfo, setCSVFileInfo] = React.useState<string>(initialFileId)
 
   const updateParameters = (
-    value: boolean | string | number,
+    value: boolean | string | number | CsvFileParameterFileData,
     variableName: string
   ): void => {
     const updatedParameters = runTimeParametersOverrides.map(parameter => {
@@ -143,6 +153,8 @@ export function ProtocolSetupParameters({
     host
   )
 
+  const { uploadCsvFile } = useUploadCsvFileMutation({}, host)
+
   const { createRun, isLoading } = useCreateRunMutation({
     onSuccess: data => {
       queryClient.invalidateQueries([host, 'runs']).catch((e: Error) => {
@@ -151,11 +163,56 @@ export function ProtocolSetupParameters({
     },
   })
   const handleConfirmValues = (): void => {
-    if (
-      enableCsvFile &&
-      mostRecentAnalysis?.result === 'parameter-value-required'
-    ) {
-      makeSnackbar(t('protocol_requires_csv') as string)
+    if (enableCsvFile) {
+      if (hasMissingFileParam) {
+        makeSnackbar(t('protocol_requires_csv') as string)
+      } else {
+        const dataFilesForProtocolMap = runTimeParametersOverrides.reduce<
+          Record<string, FileData>
+        >((acc, parameter) => {
+          // create {variableName: FileData} map for sending to /dataFiles endpoint
+          if (
+            parameter.type === 'csv_file' &&
+            parameter.file?.id == null &&
+            parameter.file?.file != null
+          ) {
+            return { [parameter.variableName]: parameter.file.file }
+          } else if (
+            parameter.type === 'csv_file' &&
+            parameter.file?.id == null &&
+            parameter.file?.filePath != null
+          ) {
+            return { [parameter.variableName]: parameter.file.filePath }
+          }
+          return acc
+        }, {})
+        Promise.all(
+          Object.entries(dataFilesForProtocolMap).map(([key, fileData]) => {
+            const fileResponse = uploadCsvFile(fileData)
+            const varName = Promise.resolve(key)
+            return Promise.all([fileResponse, varName])
+          })
+        ).then(responseTuples => {
+          const mappedResolvedCsvVariableToFileId = responseTuples.reduce<
+            Record<string, string>
+          >((acc, [uploadedFileResponse, variableName]) => {
+            return { ...acc, [variableName]: uploadedFileResponse.data.id }
+          }, {})
+          const runTimeParameterValues = getRunTimeParameterValuesForRun(
+            runTimeParametersOverrides,
+            mappedResolvedCsvVariableToFileId
+          )
+          createProtocolAnalysis({
+            protocolKey: protocolId,
+            runTimeParameterValues,
+          })
+          createRun({
+            protocolId,
+            labwareOffsets,
+            runTimeParameterValues,
+          })
+        })
+      }
     } else {
       setStartSetup(true)
       createProtocolAnalysis({
@@ -196,14 +253,8 @@ export function ProtocolSetupParameters({
         }}
         onClickButton={handleConfirmValues}
         buttonText={t('confirm_values')}
-        ariaDisabled={
-          enableCsvFile &&
-          mostRecentAnalysis?.result === 'parameter-value-required'
-        }
-        buttonIsDisabled={
-          enableCsvFile &&
-          mostRecentAnalysis?.result === 'parameter-value-required'
-        }
+        ariaDisabled={enableCsvFile && hasMissingFileParam}
+        buttonIsDisabled={enableCsvFile && hasMissingFileParam}
         iconName={isLoading || startSetup ? 'ot-spinner' : undefined}
         iconPlacement="startIcon"
         secondaryButtonProps={{
@@ -225,26 +276,19 @@ export function ProtocolSetupParameters({
       >
         {sortRuntimeParameters(runTimeParametersOverrides).map(
           (parameter, index) => {
-            const detailLabelForCsv =
-              mostRecentAnalysis?.result === 'parameter-value-required'
-                ? t('required')
-                : parameter.displayName
-
-            let setupStatus: 'ready' | 'not ready' | 'general' | 'inform' =
-              'inform'
-            if (
-              enableCsvFile &&
-              parameter.type === 'csv_file' &&
-              mostRecentAnalysis?.result === 'parameter-value-required'
-            ) {
-              setupStatus = 'not ready'
-            }
-            if (
-              enableCsvFile &&
-              parameter.type === 'csv_file' &&
-              mostRecentAnalysis?.result === 'ok'
-            ) {
-              setupStatus = 'ready'
+            let detail: string = ''
+            let setupStatus: ProtocolSetupStepStatus
+            if (parameter.type === 'csv_file') {
+              if (parameter.file?.fileName == null) {
+                detail = t('required')
+                setupStatus = 'not ready'
+              } else {
+                detail = parameter.file.fileName
+                setupStatus = 'ready'
+              }
+            } else {
+              detail = formatRunTimeParameterValue(parameter, t)
+              setupStatus = 'inform'
             }
             return (
               <React.Fragment key={`${parameter.displayName}_${index}`}>
@@ -260,11 +304,7 @@ export function ProtocolSetupParameters({
                   onClickSetupStep={() => {
                     handleSetParameter(parameter)
                   }}
-                  detail={
-                    enableCsvFile && parameter.type === 'csv_file'
-                      ? detailLabelForCsv
-                      : formatRunTimeParameterValue(parameter, t)
-                  }
+                  detail={detail}
                   description={
                     parameter.type === 'csv_file' ? null : parameter.description
                   }
