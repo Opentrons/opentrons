@@ -3,7 +3,9 @@ import styled from 'styled-components'
 import {
   ALIGN_FLEX_START,
   DIRECTION_ROW,
+  DISPLAY_FLEX,
   Flex,
+  OVERFLOW_SCROLL,
   SPACING,
 } from '@opentrons/components'
 
@@ -57,12 +59,12 @@ export function PinnedTransferCarousel(props: {
 }
 
 const CarouselWrapper = styled.div`
-  display: flex;
+  display: ${DISPLAY_FLEX};
   flex-direction: ${DIRECTION_ROW};
   align-items: ${ALIGN_FLEX_START};
   margin-right: -${SPACING.spacing40};
   margin-left: -${SPACING.spacing40};
-  overflow-x: scroll;
+  overflow-x: ${OVERFLOW_SCROLL};
 
   &::-webkit-scrollbar {
     display: none;

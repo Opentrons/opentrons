@@ -16,12 +16,14 @@ import {
   truncateString,
   TYPOGRAPHY,
   DIRECTION_COLUMN,
+  DISPLAY_FLEX,
   ALIGN_FLEX_START,
   POSITION_STICKY,
   POSITION_ABSOLUTE,
   POSITION_STATIC,
   BORDERS,
   RESPONSIVENESS,
+  OVERFLOW_SCROLL,
 } from '@opentrons/components'
 import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
 
@@ -40,11 +42,11 @@ let NAV_LINKS: Array<typeof ON_DEVICE_DISPLAY_PATHS[number]> = [
 // TODO(sb:7/10/24): update this wrapper to fade on both sides only when not scrolled completely to that side
 // This will be accomplished in PLAT-399
 const CarouselWrapper = styled.div`
-  display: flex;
+  display: ${DISPLAY_FLEX};
   flex-direction: ${DIRECTION_ROW};
   align-items: ${ALIGN_FLEX_START};
-  width: 650px;
-  overflow-x: scroll;
+  width: 42.25rem;
+  overflow-x: ${OVERFLOW_SCROLL};
   -webkit-mask-image: linear-gradient(90deg, #000 90%, transparent);
   &::-webkit-scrollbar {
     display: none;
@@ -161,7 +163,7 @@ export function Navigation(props: NavigationProps): JSX.Element {
           <CarouselWrapper>
             <Flex
               flexDirection={DIRECTION_ROW}
-              gridGap={SPACING.spacing20}
+              gridGap={SPACING.spacing32}
               marginRight={SPACING.spacing32}
             >
               {NAV_LINKS.map(path => (

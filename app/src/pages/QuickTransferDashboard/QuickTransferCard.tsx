@@ -17,11 +17,11 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   OVERFLOW_WRAP_ANYWHERE,
   OVERFLOW_WRAP_BREAK_WORD,
-  SIZE_2,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   useLongPress,
+  OVERFLOW_HIDDEN,
 } from '@opentrons/components'
 import {
   useHost,
@@ -186,7 +186,7 @@ export function QuickTransferCard(props: {
           name="ot-spinner"
           aria-label="Transfer is loading"
           spin
-          size={SIZE_2}
+          size="2rem"
           marginY="-1.5rem"
           opacity={0.7}
         />
@@ -208,23 +208,23 @@ export function QuickTransferCard(props: {
               size="1.5rem"
               aria-label="failedAnalysis_icon"
             />
-            <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+            <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
               {i18n.format(t('failed_analysis'), 'capitalize')}
-            </StyledText>
+            </LegacyStyledText>
           </Flex>
         ) : null}
-        <StyledText
+        <LegacyStyledText
           as="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           opacity={isPendingAnalysis ? 0.7 : 1}
         >
           {transferName}
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
       <Flex width="12.5rem" whiteSpace="nowrap">
-        <StyledText as="p" color={COLORS.grey60}>
+        <LegacyStyledText as="p" color={COLORS.grey60}>
           {formatTimeWithUtcLabel(quickTransfer.createdAt)}
-        </StyledText>
+        </LegacyStyledText>
         {longpress.isLongPressed && !isFailedAnalysis && (
           <LongPressModal
             longpress={longpress}
@@ -257,13 +257,13 @@ export function QuickTransferCard(props: {
                   i18nKey={t('error_analyzing', { transferName })}
                   components={{
                     block: (
-                      <StyledText
+                      <LegacyStyledText
                         as="p"
                         css={css`
                           display: -webkit-box;
                           -webkit-box-orient: vertical;
                           -webkit-line-clamp: 3;
-                          overflow: hidden;
+                          overflow: ${OVERFLOW_HIDDEN};
                           overflow-wrap: ${OVERFLOW_WRAP_BREAK_WORD};
                           height: max-content;
                         `}
@@ -273,9 +273,9 @@ export function QuickTransferCard(props: {
                   }}
                 />
 
-                <StyledText as="p">
+                <LegacyStyledText as="p">
                   {t('branded:delete_transfer_from_app')}
-                </StyledText>
+                </LegacyStyledText>
               </Flex>
               <SmallButton
                 onClick={handleDeleteTransfer}

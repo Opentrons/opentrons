@@ -31,9 +31,9 @@ import { QuickTransferCard } from './QuickTransferCard'
 import { NoQuickTransfers } from './NoQuickTransfers'
 import { DeleteTransferConfirmationModal } from './DeleteTransferConfirmationModal'
 
+import type { ProtocolResource } from '@opentrons/shared-data'
 import type { Dispatch } from '../../redux/types'
 import type { QuickTransfersOnDeviceSortKey } from '../../redux/config/types'
-import type { ProtocolResource } from '@opentrons/shared-data'
 
 export function QuickTransferDashboard(): JSX.Element {
   const protocols = useAllProtocolsQuery()
@@ -141,7 +141,7 @@ export function QuickTransferDashboard(): JSX.Element {
           longPressModalIsOpened={longPressModalIsOpened}
         />
         <Box paddingX={SPACING.spacing40}>
-          {pinnedTransfers.length > 0 && (
+          {pinnedTransfers.length > 0 ? (
             <Flex
               flexDirection={DIRECTION_COLUMN}
               marginBottom={SPACING.spacing32}
@@ -160,7 +160,7 @@ export function QuickTransferDashboard(): JSX.Element {
                 setTargetTransferId={setTargetTransferId}
               />
             </Flex>
-          )}
+          ) : null}
           {sortedTransfers.length > 0 ? (
             <>
               <Flex

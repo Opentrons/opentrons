@@ -92,7 +92,7 @@ export function SummaryAndSettings(
       files: [protocolFile],
       protocolKind: 'quick-transfer',
     }).then(() => {
-      history.push(`/quick-transfer`)
+      history.push('/quick-transfer')
     })
   }
 

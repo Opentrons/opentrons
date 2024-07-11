@@ -10,8 +10,9 @@ import { useHost, useProtocolQuery } from '@opentrons/react-api-client'
 import { i18n } from '../../../i18n'
 import { useToaster } from '../../../organisms/ToasterOven'
 import { DeleteTransferConfirmationModal } from '../DeleteTransferConfirmationModal'
-import type { HostConfig } from '@opentrons/api-client'
+
 import type * as ReactRouterDom from 'react-router-dom'
+import type { HostConfig } from '@opentrons/api-client'
 
 const mockPush = vi.fn()
 

@@ -30,8 +30,8 @@ import {
 import { useRequiredProtocolHardware } from '../Protocols/hooks'
 import { EmptySection } from './EmptySection'
 
-import type { ProtocolHardware, ProtocolPipette } from '../Protocols/hooks'
 import type { TFunction } from 'i18next'
+import type { ProtocolHardware, ProtocolPipette } from '../Protocols/hooks'
 
 const Table = styled('table')`
   ${TYPOGRAPHY.labelRegular}
@@ -109,7 +109,7 @@ function HardwareItem({
 
   let location: JSX.Element = (
     <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-      {i18n.format(getHardwareLocation(hardware, t as TFunction), 'titleCase')}
+      {i18n.format(getHardwareLocation(hardware, t), 'titleCase')}
     </LegacyStyledText>
   )
   if (hardware.hardwareType === 'module') {

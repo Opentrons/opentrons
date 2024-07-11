@@ -91,7 +91,7 @@ export const Labware = (props: { transferId: string }): JSX.Element => {
               paddingRight={SPACING.spacing12}
               textAlign={TYPOGRAPHY.textAlignCenter}
             >
-              {i18n.format(t('quantity'), 'sentenceCase')}
+              {t('quantity')}
             </LegacyStyledText>
           </TableHeader>
         </tr>

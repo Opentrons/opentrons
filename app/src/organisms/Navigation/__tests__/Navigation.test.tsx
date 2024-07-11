@@ -2,6 +2,7 @@ import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
@@ -11,7 +12,6 @@ import { useFeatureFlag } from '../../../redux/config'
 import { useNetworkConnection } from '../../../resources/networking/hooks/useNetworkConnection'
 import { NavigationMenu } from '../NavigationMenu'
 import { Navigation } from '..'
-import { when } from 'vitest-when'
 
 vi.mock('../../../resources/networking/hooks/useNetworkConnection')
 vi.mock('../../../redux/discovery')

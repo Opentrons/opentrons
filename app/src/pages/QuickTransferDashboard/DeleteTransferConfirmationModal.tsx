@@ -12,6 +12,7 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
+  OVERFLOW_HIDDEN,
   OVERFLOW_WRAP_ANYWHERE,
   SPACING,
   TYPOGRAPHY,
@@ -128,7 +129,7 @@ const TransferNameText = styled.span`
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
-  overflow: hidden;
+  overflow: ${OVERFLOW_HIDDEN};
   overflow-wrap: ${OVERFLOW_WRAP_ANYWHERE};
   font-weight: ${TYPOGRAPHY.fontWeightBold};
   font-size: ${TYPOGRAPHY.fontSize22};

@@ -2,23 +2,23 @@ import { describe, it, expect } from 'vitest'
 import { getSelectedWellCount } from '../../utils'
 
 describe('getSelectedWellCount', () => {
-  let props = {
-    pipette: {
-      channels: 1,
-    } as any,
-    labware: {
-      metadata: {
-        displayCategory: 'well_plate',
-      },
-      groups: [
-        {
-          wells: ['A1'],
-        },
-      ] as any,
-    } as any,
-    wells: ['A1'],
-  }
   it('calculates the selected well count for a single channel pipette', () => {
+    const props = {
+      pipette: {
+        channels: 1,
+      } as any,
+      labware: {
+        metadata: {
+          displayCategory: 'well_plate',
+        },
+        groups: [
+          {
+            wells: ['A1'],
+          },
+        ] as any,
+      } as any,
+      wells: ['A1'],
+    }
     const result = getSelectedWellCount(
       props.pipette,
       props.labware,
@@ -27,7 +27,7 @@ describe('getSelectedWellCount', () => {
     expect(result).toEqual(1)
   })
   it('calculates the selected well count for a single well reservoir', () => {
-    props = {
+    const props = {
       pipette: {
         channels: 8,
       } as any,
@@ -51,7 +51,7 @@ describe('getSelectedWellCount', () => {
     expect(result).toEqual(1)
   })
   it('calculates the selected well count for a 12 well reservoir and 8 channel pipette', () => {
-    props = {
+    const props = {
       pipette: {
         channels: 8,
       } as any,
@@ -88,7 +88,7 @@ describe('getSelectedWellCount', () => {
     expect(result).toEqual(3)
   })
   it('calculates the selected well count for a 12 well reservoir and 96 channel pipette', () => {
-    props = {
+    const props = {
       pipette: {
         channels: 96,
       } as any,
@@ -125,7 +125,7 @@ describe('getSelectedWellCount', () => {
     expect(result).toEqual(12)
   })
   it('calculates the selected well count for a well plate and 96-channel pipette', () => {
-    props = {
+    const props = {
       pipette: {
         channels: 96,
       } as any,
@@ -144,7 +144,7 @@ describe('getSelectedWellCount', () => {
     expect(result).toEqual(192)
   })
   it('calculates the selected well count for a well plate and multi channel pipette', () => {
-    props = {
+    const props = {
       pipette: {
         channels: 8,
       } as any,
