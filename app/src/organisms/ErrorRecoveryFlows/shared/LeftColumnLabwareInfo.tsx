@@ -15,7 +15,6 @@ type LeftColumnLabwareInfoProps = RecoveryContentProps & {
 export function LeftColumnLabwareInfo({
   title,
   failedLabwareUtils,
-  isOnDevice,
   type,
   bannerText,
 }: LeftColumnLabwareInfoProps): JSX.Element | null {

@@ -12,7 +12,6 @@ import type { RecoveryContentProps } from '../types'
 
 export function ReplaceTips(props: RecoveryContentProps): JSX.Element | null {
   const {
-    isOnDevice,
     routeUpdateActions,
     failedPipetteInfo,
     failedLabwareUtils,
@@ -36,27 +35,20 @@ export function ReplaceTips(props: RecoveryContentProps): JSX.Element | null {
     }
   }
 
-  if (isOnDevice) {
-    return (
-      <RecoveryContentWrapper>
-        <TwoColumn>
-          <LeftColumnLabwareInfo
-            {...props}
-            title={buildTitle()}
-            type="location"
-            bannerText={t('replace_tips_and_select_location')}
-          />
-          <Flex marginTop="1.742rem">
-            <DeckMapContent {...deckMapUtils} />
-          </Flex>
-        </TwoColumn>
-        <RecoveryFooterButtons
-          isOnDevice={isOnDevice}
-          primaryBtnOnClick={primaryOnClick}
+  return (
+    <RecoveryContentWrapper>
+      <TwoColumn>
+        <LeftColumnLabwareInfo
+          {...props}
+          title={buildTitle()}
+          type="location"
+          bannerText={t('replace_tips_and_select_location')}
         />
-      </RecoveryContentWrapper>
-    )
-  } else {
-    return null
-  }
+        <Flex marginTop="1.742rem">
+          <DeckMapContent {...deckMapUtils} />
+        </Flex>
+      </TwoColumn>
+      <RecoveryFooterButtons primaryBtnOnClick={primaryOnClick} />
+    </RecoveryContentWrapper>
+  )
 }

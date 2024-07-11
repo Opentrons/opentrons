@@ -38,7 +38,6 @@ export function TwoColTextAndFailedStepNextStep({
   primaryBtnOnClick,
   secondaryBtnOnClickOverride,
   secondaryBtnOnClickCopyOverride,
-  isOnDevice,
   routeUpdateActions,
   failedCommand,
   stepCounts,
@@ -114,7 +113,6 @@ export function TwoColTextAndFailedStepNextStep({
         />
       </TwoColumn>
       <RecoveryFooterButtons
-        isOnDevice={isOnDevice}
         primaryBtnOnClick={primaryBtnOnClick}
         primaryBtnTextOverride={primaryBtnCopy}
         secondaryBtnOnClick={secondaryBtnOnClickOverride ?? goBackPrevStep}
