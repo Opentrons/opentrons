@@ -445,7 +445,7 @@ async def test_capacitive_probe(
     message_send_loopback.add_responder(move_responder)
 
     status = await capacitive_probe(
-        mock_messenger, target_node, motor_node, distance, speed, speed
+        mock_messenger, target_node, motor_node, distance, speed
     )
     assert status.motor_position == 10  # this comes from the current_position_um above
     assert status.encoder_position == 10
