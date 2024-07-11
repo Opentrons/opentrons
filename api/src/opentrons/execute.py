@@ -394,7 +394,9 @@ def execute(
             extra_data=extra_data,
         )
     except parse.JSONSchemaVersionTooNewError as e:
-        # See https://opentrons.atlassian.net/browse/PLAT-94
+        # opentrons.protocols.parse() doesn't support new JSON protocols.
+        # The code to do that should be moved from opentrons.protocol_reader.
+        # See https://opentrons.atlassian.net/browse/PLAT-94.
         raise NotImplementedError(_JSON_TOO_NEW_MESSAGE) from e
 
     if protocol.api_level < APIVersion(2, 0):

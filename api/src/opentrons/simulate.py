@@ -533,6 +533,8 @@ def simulate(
             extra_data=extra_data,
         )
     except parse.JSONSchemaVersionTooNewError as e:
+        # opentrons.protocols.parse() doesn't support new JSON protocols.
+        # The code to do that should be moved from opentrons.protocol_reader.
         # See https://opentrons.atlassian.net/browse/PLAT-94.
         raise NotImplementedError(_JSON_TOO_NEW_MESSAGE) from e
 
