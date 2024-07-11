@@ -299,9 +299,9 @@ class CommandStore(HasState[CommandState], HandlesActions):
         succeeded_command = action.command
         self._state.command_history.set_command_succeeded(succeeded_command)
 
-    def _handle_fail_command_action(  # noqa: C901
-        self, action: FailCommandAction
-    ) -> None:
+    def _handle_fail_command_action(self, action: FailCommandAction) -> None:
+        prev_entry = self.state.command_history.get(action.command_id)
+
         if isinstance(action.error, EnumeratedError):
             public_error_occurrence = ErrorOccurrence.from_failed(
                 id=action.error_id,
@@ -311,7 +311,6 @@ class CommandStore(HasState[CommandState], HandlesActions):
         else:
             public_error_occurrence = action.error.public
 
-        prev_entry = self.state.command_history.get(action.command_id)
         self._update_to_failed(
             command_id=action.command_id,
             failed_at=action.failed_at,
@@ -319,62 +318,47 @@ class CommandStore(HasState[CommandState], HandlesActions):
             error_recovery_type=action.type,
             notes=action.notes,
         )
-
         self._state.failed_command = self._state.command_history.get(action.command_id)
 
+        other_command_ids_to_fail: List[str]
         if prev_entry.command.intent == CommandIntent.SETUP:
             other_command_ids_to_fail = list(
-                # Copy to avoid it mutating as we remove elements below.
                 self._state.command_history.get_setup_queue_ids()
             )
-            for command_id in other_command_ids_to_fail:
-                # TODO(mc, 2022-06-06): add new "cancelled" status or similar
-                self._update_to_failed(
-                    command_id=command_id,
-                    failed_at=action.failed_at,
-                    error_occurrence=None,
-                    error_recovery_type=None,
-                    notes=None,
-                )
+        elif prev_entry.command.intent == CommandIntent.FIXIT:
+            other_command_ids_to_fail = list(
+                self._state.command_history.get_fixit_queue_ids()
+            )
         elif (
             prev_entry.command.intent == CommandIntent.PROTOCOL
             or prev_entry.command.intent is None
         ):
-            if action.type == ErrorRecoveryType.WAIT_FOR_RECOVERY:
-                self._state.queue_status = QueueStatus.AWAITING_RECOVERY
-                self._state.recovery_target_command_id = action.command_id
-            elif action.type == ErrorRecoveryType.FAIL_RUN:
+            if action.type == ErrorRecoveryType.FAIL_RUN:
                 other_command_ids_to_fail = list(
-                    # Copy to avoid it mutating as we remove elements below.
                     self._state.command_history.get_queue_ids()
                 )
-                for command_id in other_command_ids_to_fail:
-                    # TODO(mc, 2022-06-06): add new "cancelled" status or similar
-                    self._update_to_failed(
-                        command_id=command_id,
-                        failed_at=action.failed_at,
-                        error_occurrence=None,
-                        error_recovery_type=None,
-                        notes=None,
-                    )
+            elif action.type == ErrorRecoveryType.WAIT_FOR_RECOVERY:
+                other_command_ids_to_fail = []
             else:
                 assert_never(action.type)
-        elif prev_entry.command.intent == CommandIntent.FIXIT:
-            other_command_ids_to_fail = list(
-                # Copy to avoid it mutating as we remove elements below.
-                self._state.command_history.get_fixit_queue_ids()
-            )
-            for command_id in other_command_ids_to_fail:
-                # TODO(mc, 2022-06-06): add new "cancelled" status or similar
-                self._update_to_failed(
-                    command_id=command_id,
-                    failed_at=action.failed_at,
-                    error_occurrence=None,
-                    error_recovery_type=None,
-                    notes=None,
-                )
         else:
             assert_never(prev_entry.command.intent)
+        for command_id in other_command_ids_to_fail:
+            # TODO(mc, 2022-06-06): add new "cancelled" status or similar
+            self._update_to_failed(
+                command_id=command_id,
+                failed_at=action.failed_at,
+                error_occurrence=None,
+                error_recovery_type=None,
+                notes=None,
+            )
+
+        if (
+            prev_entry.command.intent in (CommandIntent.PROTOCOL, None)
+            and action.type == ErrorRecoveryType.WAIT_FOR_RECOVERY
+        ):
+            self._state.queue_status = QueueStatus.AWAITING_RECOVERY
+            self._state.recovery_target_command_id = action.command_id
 
     def _handle_play_action(self, action: PlayAction) -> None:
         if not self._state.run_result:
