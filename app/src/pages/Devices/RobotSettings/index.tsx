@@ -42,7 +42,6 @@ export function RobotSettings(): JSX.Element | null {
   const { robotName, robotSettingsTab } = useParams<DesktopRouteParams>()
   const robot = useRobot(robotName)
   const isCalibrationDisabled = robot?.status !== CONNECTABLE
-  const isPrivacyDisabled = robot?.status === UNREACHABLE
   const isNetworkingDisabled = robot?.status === UNREACHABLE
   const [showRobotBusyBanner, setShowRobotBusyBanner] = React.useState<boolean>(
     false
