@@ -11,7 +11,7 @@ SLOTS_TIPRACK = {
     200: [3],
     1000: [3],
 }
-LABWARE_ON_SCALE = "radwag_pipette_calibration_vial"
+LABWARE_ON_SCALE = "corning_96_wellplate_360ul_flat"
 
 
 def run(ctx: ProtocolContext) -> None:
