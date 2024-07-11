@@ -39,6 +39,7 @@ describe('LocationIcon', () => {
     const text = screen.getByText('A1')
     expect(text).toHaveStyle(`font-size: ${TYPOGRAPHY.fontSizeCaption}`)
     expect(text).toHaveStyle('line-height: normal')
+    expect(text).toHaveStyle(`  font-weight: ${TYPOGRAPHY.fontWeightBold}`)
   })
 
   it('should render an icon', () => {
