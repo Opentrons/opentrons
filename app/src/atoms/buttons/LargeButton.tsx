@@ -90,13 +90,13 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     },
     alertStroke: {
       defaultColor: COLORS.white,
-      disabledColor: COLORS.grey40,
+      disabledColor: COLORS.grey50,
       activeColor: COLORS.red60,
       defaultBackgroundColor: COLORS.transparent,
       activeBackgroundColor: COLORS.red35,
-      disabledBackgroundColor: COLORS.transparent,
+      disabledBackgroundColor: COLORS.grey35,
       iconColor: COLORS.white,
-      disabledIconColor: COLORS.grey40,
+      disabledIconColor: COLORS.grey50,
       isInverse: true,
       activeIconColor: COLORS.red60,
       focusVisibleOutlineColor: COLORS.blue50,
@@ -140,9 +140,9 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     line-height: ${TYPOGRAPHY.lineHeight20};
     gap: ${SPACING.spacing60};
     border: ${BORDERS.borderRadius4} solid
-      ${!!LARGE_BUTTON_PROPS_BY_TYPE[buttonType].isInverse
+      ${buttonType === 'alertStroke' && !disabled
         ? LARGE_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor
-        : LARGE_BUTTON_PROPS_BY_TYPE[buttonType].defaultBackgroundColor};
+        : 'none'};
 
     ${TYPOGRAPHY.pSemiBold}
 
