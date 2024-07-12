@@ -336,15 +336,17 @@ def find_max_z_distances(
     """
     hw_mount = OT3Mount.LEFT if run_args.pipette.mount == "left" else OT3Mount.RIGHT
     hw_api = get_sync_hw_api(run_args.ctx)
-    attached_instrument: PipetteDict = hw_api._pipette_handler.get_attached_instrument(hw_mount)
-    lld_settings = attached_instrument['lld_settings']
-
-    z_speed = run_args.z_speed
-    max_z_distance = (
-        well.top().point.z
-        - well.bottom().point.z
-        - lld_settings[f"t{int(tip)}"]["minHeight"]
+    attached_instrument: PipetteDict = hw_api._pipette_handler.get_attached_instrument(
+        hw_mount
     )
+    lld_settings = attached_instrument["lld_settings"]
+    z_speed = run_args.z_speed
+    if lld_settings is not None:
+        min_height = lld_settings[f"t{int(tip)}"]["minHeight"]
+    else:
+        ui.print_warning("No minimum height for pipette")
+        min_height = 0.5
+    max_z_distance = well.top().point.z - well.bottom().point.z - min_height
     plunger_travel = get_plunger_travel(run_args)
     if p_speed == 0:
         p_travel_time = 10.0
