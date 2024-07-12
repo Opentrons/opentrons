@@ -284,7 +284,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 absorbance_reader.CloseLidResult,
                 absorbance_reader.OpenLidResult,
                 absorbance_reader.InitializeResult,
-                absorbance_reader.MeasureAbsorbanceResult,
+                absorbance_reader.ReadAbsorbanceResult,
             ),
         ):
             self._handle_absorbance_reader_commands(command)
@@ -570,7 +570,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         self,
         command: Union[
             absorbance_reader.Initialize,
-            absorbance_reader.MeasureAbsorbance,
+            absorbance_reader.ReadAbsorbance,
             absorbance_reader.CloseLid,
             absorbance_reader.OpenLid,
         ],
@@ -597,7 +597,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 configured_wavelength=command.params.sampleWavelength,
                 lid_id=lid_id,
             )
-        elif isinstance(command.result, absorbance_reader.MeasureAbsorbanceResult):
+        elif isinstance(command.result, absorbance_reader.ReadAbsorbanceResult):
             self._state.substate_by_module_id[module_id] = AbsorbanceReaderSubState(
                 module_id=AbsorbanceReaderId(module_id),
                 configured=configured,

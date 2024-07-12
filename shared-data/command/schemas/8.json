@@ -65,7 +65,7 @@
       "absorbanceReader/closeLid": "#/definitions/opentrons__protocol_engine__commands__absorbance_reader__close_lid__CloseLidCreate",
       "absorbanceReader/openLid": "#/definitions/opentrons__protocol_engine__commands__absorbance_reader__open_lid__OpenLidCreate",
       "absorbanceReader/initialize": "#/definitions/InitializeCreate",
-      "absorbanceReader/measure": "#/definitions/MeasureAbsorbanceCreate",
+      "absorbanceReader/measure": "#/definitions/ReadAbsorbanceCreate",
       "calibration/calibrateGripper": "#/definitions/CalibrateGripperCreate",
       "calibration/calibratePipette": "#/definitions/CalibratePipetteCreate",
       "calibration/calibrateModule": "#/definitions/CalibrateModuleCreate",
@@ -254,7 +254,7 @@
       "$ref": "#/definitions/InitializeCreate"
     },
     {
-      "$ref": "#/definitions/MeasureAbsorbanceCreate"
+      "$ref": "#/definitions/ReadAbsorbanceCreate"
     },
     {
       "$ref": "#/definitions/CalibrateGripperCreate"
@@ -3989,8 +3989,8 @@
       },
       "required": ["params"]
     },
-    "MeasureAbsorbanceParams": {
-      "title": "MeasureAbsorbanceParams",
+    "ReadAbsorbanceParams": {
+      "title": "ReadAbsorbanceParams",
       "description": "Input parameters for a single absorbance reading.",
       "type": "object",
       "properties": {
@@ -4007,8 +4007,8 @@
       },
       "required": ["moduleId", "sampleWavelength"]
     },
-    "MeasureAbsorbanceCreate": {
-      "title": "MeasureAbsorbanceCreate",
+    "ReadAbsorbanceCreate": {
+      "title": "ReadAbsorbanceCreate",
       "description": "A request to execute an Absorbance Reader measurement.",
       "type": "object",
       "properties": {
@@ -4019,7 +4019,7 @@
           "type": "string"
         },
         "params": {
-          "$ref": "#/definitions/MeasureAbsorbanceParams"
+          "$ref": "#/definitions/ReadAbsorbanceParams"
         },
         "intent": {
           "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",

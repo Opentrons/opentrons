@@ -1003,6 +1003,6 @@ class AbsorbanceReaderContext(ModuleContext):
         self._core.initialize(wavelength)
 
     @requires_version(2, 21)
-    def initiate_read(self) -> None:
+    def read(self) -> None:
         """Initiate read on the Absorbance Reader."""
-        self._core.initiate_read()
+        self._core.read()

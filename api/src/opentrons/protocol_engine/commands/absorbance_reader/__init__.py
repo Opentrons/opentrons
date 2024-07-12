@@ -24,12 +24,12 @@ from .initialize import (
     InitializeCreate,
 )
 
-from .measure import (
-    MeasureAbsorbanceCommandType,
-    MeasureAbsorbanceParams,
-    MeasureAbsorbanceResult,
-    MeasureAbsorbance,
-    MeasureAbsorbanceCreate,
+from .read import (
+    ReadAbsorbanceCommandType,
+    ReadAbsorbanceParams,
+    ReadAbsorbanceResult,
+    ReadAbsorbance,
+    ReadAbsorbanceCreate,
 )
 
 
@@ -54,10 +54,10 @@ __all__ = [
     "Initialize",
     "InitializeCreate",
     # absorbanace_reader/measure
-    "MeasureAbsorbanceCommandType",
-    "MeasureAbsorbanceParams",
-    "MeasureAbsorbanceResult",
-    "MeasureAbsorbance",
-    "MeasureAbsorbanceCreate",
+    "ReadAbsorbanceCommandType",
+    "ReadAbsorbanceParams",
+    "ReadAbsorbanceResult",
+    "ReadAbsorbance",
+    "ReadAbsorbanceCreate",
     # union type
 ]

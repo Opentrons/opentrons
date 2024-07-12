@@ -359,8 +359,8 @@ class AbstractAbsorbanceReaderCore(AbstractModuleCore):
         """Initialize the Absorbance Reader by taking zero reading."""
 
     @abstractmethod
-    def initiate_read(self) -> None:
-        """Initiate read on the Absorbance Reader."""
+    def read(self) -> None:
+        """Get an absorbance reading from the Absorbance Reader."""
 
     @abstractmethod
     def close_lid(self) -> None:
