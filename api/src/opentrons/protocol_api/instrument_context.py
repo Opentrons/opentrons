@@ -65,6 +65,8 @@ _PARTIAL_NOZZLE_CONFIGURATION_AUTOMATIC_TIP_TRACKING_IN = APIVersion(2, 18)
 """The version after which automatic tip tracking supported partially configured nozzle layouts."""
 _DISPOSAL_LOCATION_OFFSET_ADDED_IN = APIVersion(2, 18)
 """The version after which offsets for deck configured trash containers and changes to alternating tip drop behavior were introduced."""
+_PARTIAL_NOZZLE_CONFIGURATION_SINGLE_ROW_PARTIAL_COLUMN_ADDED_IN = APIVersion(2, 20)
+"""The version after which partial nozzle configurations of single, row, and partial column layouts became available."""
 
 
 class InstrumentContext(publisher.CommandPublisher):
@@ -1969,14 +1971,16 @@ class InstrumentContext(publisher.CommandPublisher):
         self._core.prepare_to_aspirate()
 
     @requires_version(2, 16)
-    def configure_nozzle_layout(
+    def configure_nozzle_layout(  # noqa: C901
         self,
         style: NozzleLayout,
         start: Optional[str] = None,
+        end: Optional[str] = None,
         front_right: Optional[str] = None,
+        back_left: Optional[str] = None,
         tip_racks: Optional[List[labware.Labware]] = None,
     ) -> None:
-        """Configure how many tips the 96-channel pipette will pick up.
+        """Configure how many tips the 8-channel or 96-channel pipette will pick up.
 
         Changing the nozzle layout will affect gantry movement for all subsequent
         pipetting actions that the pipette performs. It also alters the pipette's
@@ -1990,13 +1994,18 @@ class InstrumentContext(publisher.CommandPublisher):
 
         :param style: The shape of the nozzle layout.
 
+            - ``SINGLE`` sets the pipette to use 1 nozzle. This corresponds to a single of well on labware.
             - ``COLUMN`` sets the pipette to use 8 nozzles, aligned from front to back
               with respect to the deck. This corresponds to a column of wells on labware.
+            - ``PARTIAL_COLUMN`` sets the pipette to use 2-7 nozzles, aligned from front to back
+              with respect to the deck.
+            - ``ROW`` sets the pipette to use 12 nozzles, aligned from left to right
+              with respect to the deck. This corresponds to a row of wells on labware.
             - ``ALL`` resets the pipette to use all of its nozzles. Calling
               ``configure_nozzle_layout`` with no arguments also resets the pipette.
 
         :type style: ``NozzleLayout`` or ``None``
-        :param start: The nozzle at the back left of the layout, which the robot uses
+        :param start: The primary nozzle of the layout, which the robot uses
             to determine how it will move to different locations on the deck. The string
             should be of the same format used when identifying wells by name.
             Required unless setting ``style=ALL``.
@@ -2006,6 +2015,16 @@ class InstrumentContext(publisher.CommandPublisher):
                 tips *from the same rack*. Doing so can affect positional accuracy.
 
         :type start: str or ``None``
+        :param end: The nozzle at the end of a linear layout, which is used
+            to determine how many tips will be picked up by a pipette. The string
+            should be of the same format used when identifying wells by name.
+            Required when setting ``style=PARTIAL_COLUMN``.
+
+            .. note::
+                Nozzle layouts numbering between 2-7 nozzles, account for the distance from
+                ``start``. For example, 4 nozzles would require ``start="H1"`` and ``end="E1"``.
+
+        :type end: str or ``None``
         :param tip_racks: Behaves the same as setting the ``tip_racks`` parameter of
             :py:meth:`.load_instrument`. If not specified, the new configuration resets
             :py:obj:`.InstrumentContext.tip_racks` and you must specify the location
@@ -2021,14 +2040,22 @@ class InstrumentContext(publisher.CommandPublisher):
         #       NOTE: Disabled layouts error case can be removed once desired map configurations
         #       have appropriate data regarding tip-type to map current values added to the
         #       pipette definitions.
+
         disabled_layouts = [
-            NozzleLayout.ROW,
-            NozzleLayout.SINGLE,
             NozzleLayout.QUADRANT,
         ]
         if style in disabled_layouts:
             raise ValueError(
                 f"Nozzle layout configuration of style {style.value} is currently unsupported."
+            )
+
+        original_enabled_layouts = [NozzleLayout.COLUMN, NozzleLayout.ALL]
+        if (
+            self._api_version
+            < _PARTIAL_NOZZLE_CONFIGURATION_SINGLE_ROW_PARTIAL_COLUMN_ADDED_IN
+        ) and (style not in original_enabled_layouts):
+            raise ValueError(
+                f"Nozzle layout configuration of style {style.value} is unsupported in API Versions lower than {_PARTIAL_NOZZLE_CONFIGURATION_SINGLE_ROW_PARTIAL_COLUMN_ADDED_IN}."
             )
 
         if style != NozzleLayout.ALL:
@@ -2041,16 +2068,35 @@ class InstrumentContext(publisher.CommandPublisher):
                     f"Starting nozzle specified is not one of {types.ALLOWED_PRIMARY_NOZZLES}"
                 )
         if style == NozzleLayout.QUADRANT:
-            if front_right is None:
+            if front_right is None and back_left is None:
                 raise ValueError(
-                    "Cannot configure a QUADRANT layout without a front right nozzle."
+                    "Cannot configure a QUADRANT layout without a front right or back left nozzle."
                 )
+        elif not (front_right is None and back_left is None):
+            raise ValueError(
+                f"Parameters 'front_right' and 'back_left' cannot be used with {style.value} Nozzle Configuration Layout."
+            )
+
+        front_right_resolved = front_right
+        back_left_resolved = back_left
+        if style == NozzleLayout.PARTIAL_COLUMN:
+            if end is None:
+                raise ValueError(
+                    "Parameter 'end' is required for Partial Column Nozzle Configuration Layout."
+                )
+
+            # Determine if 'end' will be configured as front_right or back_left
+            if start == "H1" or start == "H12":
+                back_left_resolved = end
+            elif start == "A1" or start == "A12":
+                front_right_resolved = end
+
         self._core.configure_nozzle_layout(
             style,
             primary_nozzle=start,
-            front_right_nozzle=front_right,
+            front_right_nozzle=front_right_resolved,
+            back_left_nozzle=back_left_resolved,
         )
-        # TODO (spp, 2023-12-05): verify that tipracks are on adapters for only full 96 channel config
         self._tip_racks = tip_racks or []
 
     @requires_version(2, 20)

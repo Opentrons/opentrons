@@ -275,6 +275,7 @@ async def test_add_tip(
         "style",
         "primary_nozzle",
         "front_nozzle",
+        "back_nozzle",
         "exception",
         "expected_result",
         "tip_result",
@@ -285,8 +286,13 @@ async def test_add_tip(
             "COLUMN",
             "A1",
             None,
+            None,
             does_not_raise(),
-            {"primary_nozzle": "A1", "front_right_nozzle": "H1"},
+            {
+                "primary_nozzle": "A1",
+                "front_right_nozzle": "H1",
+                "back_left_nozzle": "A1",
+            },
             None,
         ],
         [
@@ -294,15 +300,26 @@ async def test_add_tip(
             "ROW",
             "A1",
             None,
+            None,
             pytest.raises(CommandParameterLimitViolated),
             None,
             None,
         ],
-        [8, "SINGLE", "A1", None, does_not_raise(), {"primary_nozzle": "A1"}, None],
+        [
+            8,
+            "SINGLE",
+            "A1",
+            None,
+            None,
+            does_not_raise(),
+            {"primary_nozzle": "A1"},
+            None,
+        ],
         [
             1,
             "SINGLE",
             "A1",
+            None,
             None,
             pytest.raises(CommandPreconditionViolated),
             None,
@@ -312,6 +329,7 @@ async def test_add_tip(
             8,
             "COLUMN",
             "A1",
+            None,
             None,
             pytest.raises(CommandPreconditionViolated),
             None,
@@ -328,6 +346,7 @@ async def test_available_nozzle_layout(
     style: str,
     primary_nozzle: Optional[str],
     front_nozzle: Optional[str],
+    back_nozzle: Optional[str],
     exception: ContextManager[None],
     expected_result: Optional[Dict[str, str]],
     tip_result: Optional[TipGeometry],
@@ -348,12 +367,11 @@ async def test_available_nozzle_layout(
 
     with exception:
         hw_result = await hw_subject.available_for_nozzle_layout(
-            "pipette-id", style, primary_nozzle, front_nozzle
+            "pipette-id", style, primary_nozzle, front_nozzle, back_nozzle
         )
         virtual_result = await virtual_subject.available_for_nozzle_layout(
-            "pipette-id", style, primary_nozzle, front_nozzle
+            "pipette-id", style, primary_nozzle, front_nozzle, back_nozzle
         )
-
         assert hw_result == virtual_result == expected_result
 
 

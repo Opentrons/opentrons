@@ -317,8 +317,8 @@ class TipView(HasState[TipState]):
                         return result
                     elif isinstance(result, int) and result == -1:
                         return None
-                if critical_row + active_rows < len(columns[0]):
-                    critical_row = critical_row + active_rows
+                if critical_row + 1 < len(columns[0]):
+                    critical_row = critical_row + 1
                 else:
                     critical_column += 1
                     critical_row = active_rows - 1
@@ -341,8 +341,8 @@ class TipView(HasState[TipState]):
                         return result
                     elif isinstance(result, int) and result == -1:
                         return None
-                if critical_row + active_rows < len(columns[0]):
-                    critical_row = critical_row + active_rows
+                if critical_row + 1 < len(columns[0]):
+                    critical_row = critical_row + 1
                 else:
                     critical_column -= 1
                     critical_row = active_rows - 1
@@ -365,8 +365,8 @@ class TipView(HasState[TipState]):
                         return result
                     elif isinstance(result, int) and result == -1:
                         return None
-                if critical_row - active_rows >= 0:
-                    critical_row = critical_row - active_rows
+                if critical_row - 1 >= 0:
+                    critical_row = critical_row - 1
                 else:
                     critical_column += 1
                     if critical_column >= len(columns):
@@ -391,8 +391,8 @@ class TipView(HasState[TipState]):
                         return result
                     elif isinstance(result, int) and result == -1:
                         return None
-                if critical_row - active_rows >= 0:
-                    critical_row = critical_row - active_rows
+                if critical_row - 1 >= 0:
+                    critical_row = critical_row - 1
                 else:
                     critical_column -= 1
                     if critical_column < 0:

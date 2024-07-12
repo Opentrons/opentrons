@@ -4,6 +4,7 @@ import enum
 
 class NozzleLayout(enum.Enum):
     COLUMN = "COLUMN"
+    PARTIAL_COLUMN = "PARTIAL_COLUMN"
     SINGLE = "SINGLE"
     ROW = "ROW"
     QUADRANT = "QUADRANT"
@@ -11,6 +12,9 @@ class NozzleLayout(enum.Enum):
 
 
 COLUMN: Final = NozzleLayout.COLUMN
+PARTIAL_COLUMN: Final = NozzleLayout.PARTIAL_COLUMN
+SINGLE: Final = NozzleLayout.SINGLE
+ROW: Final = NozzleLayout.ROW
 ALL: Final = NozzleLayout.ALL
 
 # Set __doc__ manually as a workaround. When this docstring is written the normal way, right after
