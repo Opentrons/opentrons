@@ -128,7 +128,6 @@ export function useOnCancelRun({
 
   React.useEffect(() => {
     if (hasUserClicked) {
-      debugger
       if (!isLoadingTipStatus) {
         if (areTipsAttached) {
           void proceedToRouteAndStep(DROP_TIP_FLOWS.ROUTE)

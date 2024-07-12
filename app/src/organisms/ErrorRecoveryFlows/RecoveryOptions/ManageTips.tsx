@@ -87,7 +87,6 @@ export function BeginRemoval({
     }
   }
 
-  if (isOnDevice) {
     return (
       <RecoverySingleColumnContent>
         <LegacyStyledText css={ODD_SECTION_TITLE_STYLE} as="h4SemiBold">
@@ -117,9 +116,6 @@ export function BeginRemoval({
         />
       </RecoverySingleColumnContent>
     )
-  } else {
-    return null
-  }
 }
 
 function DropTipFlowsContainer(

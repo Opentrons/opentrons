@@ -59,7 +59,13 @@ const styleMap: { [tag: string]: FlattenSimpleInterpolation } = {
       ${TYPOGRAPHY.level3HeaderSemiBold}
     }
   `,
-  h4SemiBold: TYPOGRAPHY.level4HeaderSemiBold,
+  h4SemiBold: css`
+        ${TYPOGRAPHY.level4HeaderDesktopSemiBold}
+      @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+          ${TYPOGRAPHY.level4HeaderSemiBold},
+
+    }
+  `,
   h6SemiBold: TYPOGRAPHY.h6SemiBold,
   pSemiBold: css`
     ${TYPOGRAPHY.pSemiBold}
