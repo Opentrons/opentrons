@@ -284,7 +284,6 @@ export function ProtocolSetupParameters({
         }}
         parameter={chooseCsvFileScreen}
         setParameter={updateParameters}
-        setChooseValueScreen={setChooseCsvFileScreen}
       />
     )
   }

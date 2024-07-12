@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
+import isEqual from 'lodash/isEqual'
 import last from 'lodash/last'
 
 import {
@@ -32,7 +33,6 @@ interface ChooseCsvFileProps {
     value: boolean | string | number | CsvFileFileType,
     variableName: string
   ) => void
-  setChooseValueScreen: (value: CsvFileParameter | null) => void
 }
 
 export function ChooseCsvFile({
@@ -40,7 +40,6 @@ export function ChooseCsvFile({
   handleGoBack,
   parameter,
   setParameter,
-  setChooseValueScreen,
 }: ChooseCsvFileProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
 
@@ -53,19 +52,22 @@ export function ChooseCsvFile({
     initialFileObject
   )
 
-  const handleConfirmSelection = (): void => {
-    setParameter(csvFileSelected, parameter.variableName)
-    setChooseValueScreen(null)
+  const handleBackButton = (): void => {
+    if (!isEqual(csvFileSelected, setCsvFileSelected)) {
+      setParameter(csvFileSelected, parameter.variableName)
+    }
+    handleGoBack()
   }
 
   return (
     <>
       <ChildNavigation
         header={t('choose_csv_file')}
-        onClickBack={handleGoBack}
-        buttonType="primary"
-        buttonText={t('confirm_selection')}
-        onClickButton={handleConfirmSelection}
+        onClickBack={handleBackButton}
+        inlineNotification={{
+          type: 'neutral',
+          heading: t('usb_drive_notification'),
+        }}
       />
       <Flex
         marginTop="7.75rem"
