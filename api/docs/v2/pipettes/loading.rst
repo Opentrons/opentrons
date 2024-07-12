@@ -222,31 +222,49 @@ Liquid Level Detection
 All Opentrons Flex pipettes use pressure sensors to detect the presence or absence of a liquid in a well plate or reservoir. When added to a protocol, liquid level detection (LLD) stops the pipette tip at the surface of a liquid sample before aspirating. You can use LLD to avoid and recover from protocol errors or just check for the presence or absence of a fluid with or without interrupting a protocol run. For Opentrons Flex 8-Channel pipettes, the sensors are located in channels 1 and 8. For Opentrons Flex 96-Channel pipettes, the sensors are located in channels 1 and 96.   
 
 .. note::
-    LLD requires fresh, clean, and dry pipette tips. After aspirating, your pipette must always discard the used tip (call :py:meth:`~.InstrumentContext.drop_tip`) and pick up a new one to perform additional LLD checks.
+    LLD requires fresh, clean, and dry pipette tips. After aspirating, your pipette must always discard the used tip (call :py:meth:`~.InstrumentContext.drop_tip`) and pick up a new tip (call :py:meth:`~InstrumentContext.pick_up_tip`) to perform additional LLD checks.
 
 Section Needs a Title
 ---------------------
 
-You enable LLD globally by setting ``liquid_presence_detection=True`` in :py:meth:`.ProtocolContext.load_instrument`. You can also turn this off later, or or make it explicitly ``False`` and activate it later in a protocol. Using sample protocol at the top of the page, this example adds LLD to the left-mounted, 1-Channel pipette.
+LLD is disabled by default. You enable LLD globally by setting ``liquid_presence_detection=True`` in :py:meth:`.ProtocolContext.load_instrument`. You can also deactivate LLD for individual aspirations, or or make it globally ``False`` and activate it later in a protocol. This example modifies the sample protocol used at the top of the page by adding some additional labware and enables LLD on the left-mounted, 1-Channel pipette. 
 
 .. code-block:: python
 
+def run(protocol: protocol_api.ProtocolContext):
+    tiprack1 = protocol.load_labware(
+        load_name="opentrons_flex_96_tiprack_1000ul", location="D1")
+    reservoir = protocol.load_labware("nest_12_reservoir_15ml", location="D2")
+    plate = protocol.load_labware("nest_96_wellplate_200ul_flat", location="D3")
     left = protocol.load_instrument(
         instrument_name="flex_1channel_1000",
         mount="left",
         tip_racks=[tiprack1],
         liquid_presence_detection=True
     )
+    reservoir.load_liquid(volume=10000)
+    
+Now, let's add some commands and start the cycle. First, tell the robot to pick up a new, clean tip::
+    
+    pipette.pick_up_tip()
 
-Liquid presence detection occurs when your protocol calls :py:meth:`.InstrumentContext.aspirate`. As the pressure sensor detects a liquid, the code returns ``True``, the pipette pauses, raises itself slightly above the surface of the liquid, and then moves into the liquid to continue the aspiration. If a pipette doesn't detect a liquid, it returns ``False``, raises an error, and stops the protocol.
+Next, tell the robot to aspirate some liquid from the reservoir. LLD takes place during this step::
 
-Turning it off
---------------
+    pipette.aspirate(100, plate["A1"])
 
+During aspiration, as the pipette's pressure sensor detects a liquid, the code returns ``True``, the pipette pauses, raises itself slightly above the surface of the liquid, and then moves into the liquid to continue the aspiration.  
+
+
+
+theLLD occurs when your protocol calls :py:meth:`.InstrumentContext.aspirate` and works as follows: as the pipette's pressure sensor detects a liquid, the code returns ``True``, the pipette pauses, raises itself slightly above the surface of the liquid, and then moves into the liquid to continue the aspiration. If a pipette doesn't detect a liquid, it returns ``False``, raises an error, and stops the protocol.
+
+Did You Try Turing it Off and Then On Again
+-------------------------------------------
 .. 
-    Needs better title
-Turn it off 
+    Needs better title. IT Crowd :)
+    
+In the previous example, the robot checks for liquid every single time time. If this is too frequent, you can override the global setting and disable LLD for a particular aspiration. To override the global behavior, set the pipette's `liquid_presence_detection` property to `False`. Let's take a look at this starting from the 
 
 .. code-block:: python
     
-    pipette.liquid_detection = False
+    pipette.liquid_presence_detection = False
