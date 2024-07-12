@@ -1461,7 +1461,6 @@ class OT3Controller(FlexBackend):
             tool=sensor_node_for_mount(mount),
             mover=axis_to_node(moving),
             distance=distance_mm,
-            plunger_speed=speed_mm_per_s,
             mount_speed=speed_mm_per_s,
             csv_output=csv_output,
             sync_buffer_output=sync_buffer_output,

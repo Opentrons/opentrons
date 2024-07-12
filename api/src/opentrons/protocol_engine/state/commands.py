@@ -252,7 +252,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 failedCommandId=action.failed_command_id,
             )
 
-            self._state.command_history.set_command_queued(queued_command)
+            self._state.command_history.append_queued_command(queued_command)
 
             if action.request_hash is not None:
                 self._state.latest_protocol_command_hash = action.request_hash
@@ -283,6 +283,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
             else:
                 public_error_occurrence = action.error.public
 
+            prev_entry = self.state.command_history.get(action.command_id)
             self._update_to_failed(
                 command_id=action.command_id,
                 failed_at=action.failed_at,
@@ -295,9 +296,9 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 action.command_id
             )
 
-            prev_entry = self.state.command_history.get(action.command_id)
             if prev_entry.command.intent == CommandIntent.SETUP:
-                other_command_ids_to_fail = (
+                other_command_ids_to_fail = list(
+                    # Copy to avoid it mutating as we remove elements below.
                     self._state.command_history.get_setup_queue_ids()
                 )
                 for command_id in other_command_ids_to_fail:
@@ -309,7 +310,6 @@ class CommandStore(HasState[CommandState], HandlesActions):
                         error_recovery_type=None,
                         notes=None,
                     )
-                self._state.command_history.clear_setup_queue()
             elif (
                 prev_entry.command.intent == CommandIntent.PROTOCOL
                 or prev_entry.command.intent is None
@@ -318,7 +318,8 @@ class CommandStore(HasState[CommandState], HandlesActions):
                     self._state.queue_status = QueueStatus.AWAITING_RECOVERY
                     self._state.recovery_target_command_id = action.command_id
                 elif action.type == ErrorRecoveryType.FAIL_RUN:
-                    other_command_ids_to_fail = (
+                    other_command_ids_to_fail = list(
+                        # Copy to avoid it mutating as we remove elements below.
                         self._state.command_history.get_queue_ids()
                     )
                     for command_id in other_command_ids_to_fail:
@@ -330,11 +331,11 @@ class CommandStore(HasState[CommandState], HandlesActions):
                             error_recovery_type=None,
                             notes=None,
                         )
-                    self._state.command_history.clear_queue()
                 else:
                     assert_never(action.type)
             elif prev_entry.command.intent == CommandIntent.FIXIT:
-                other_command_ids_to_fail = (
+                other_command_ids_to_fail = list(
+                    # Copy to avoid it mutating as we remove elements below.
                     self._state.command_history.get_fixit_queue_ids()
                 )
                 for command_id in other_command_ids_to_fail:
@@ -346,7 +347,6 @@ class CommandStore(HasState[CommandState], HandlesActions):
                         error_recovery_type=None,
                         notes=None,
                     )
-                self._state.command_history.clear_fixit_queue()
             else:
                 assert_never(prev_entry.command.intent)
 
@@ -374,7 +374,6 @@ class CommandStore(HasState[CommandState], HandlesActions):
             self._state.queue_status = QueueStatus.PAUSED
 
         elif isinstance(action, ResumeFromRecoveryAction):
-            self._state.command_history.clear_fixit_queue()
             self._state.queue_status = QueueStatus.RUNNING
             self._state.recovery_target_command_id = None
 
@@ -715,7 +714,9 @@ class CommandView(HasState[CommandState]):
             else:
                 return self._state.command_history.get_prev(tail_command.command.id)
         else:
-            most_recently_finalized = self._state.command_history.get_terminal_command()
+            most_recently_finalized = (
+                self._state.command_history.get_most_recently_completed_command()
+            )
             # This iteration is effectively O(1) as we'll only ever have to iterate one or two times at most.
             while most_recently_finalized is not None:
                 next_command = self._state.command_history.get_next(

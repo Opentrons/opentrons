@@ -17,18 +17,18 @@ import {
   JUSTIFY_FLEX_START,
   JUSTIFY_SPACE_AROUND,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   POSITION_ABSOLUTE,
   PrimaryButton,
   RESPONSIVENESS,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   EIGHT_CHANNEL,
+  LEFT,
   NINETY_SIX_CHANNEL,
   RIGHT,
-  LEFT,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
 import { i18n } from '../../i18n'
@@ -81,6 +81,7 @@ const UNSELECTED_OPTIONS_STYLE = css`
     }
   }
 `
+
 const SELECTED_OPTIONS_STYLE = css`
   ${UNSELECTED_OPTIONS_STYLE}
   border: 1px solid ${COLORS.blue50};
@@ -235,8 +236,8 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
                 >
                   <img
                     src={singleChannelAndEightChannel}
-                    width="138.78px"
-                    height="160px"
+                    width="168px"
+                    height="150.99px"
                     alt={singleMount}
                   />
                   <LegacyStyledText
@@ -255,8 +256,8 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
                 >
                   <img
                     src={ninetySixChannel}
-                    width="138.78px"
-                    height="160px"
+                    width="168px"
+                    height="151.2px"
                     alt={bothMounts}
                   />
                   <LegacyStyledText

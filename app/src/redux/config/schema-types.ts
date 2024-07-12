@@ -26,6 +26,12 @@ export type ProtocolsOnDeviceSortKey =
   | 'recentCreated'
   | 'oldCreated'
 
+export type QuickTransfersOnDeviceSortKey =
+  | 'alphabetical'
+  | 'reverse'
+  | 'recentCreated'
+  | 'oldCreated'
+
 export interface OnDeviceDisplaySettings {
   sleepMs: number
   brightness: number
@@ -253,5 +259,13 @@ export type ConfigV22 = Omit<ConfigV21, 'version' | 'analytics'> & {
     optedIn: boolean
   }
 }
+export type ConfigV23 = Omit<ConfigV22, 'version'> & {
+  version: 23
+  protocols: ConfigV22['protocols'] & {
+    pinnedQuickTransferIds: string[]
+    quickTransfersOnDeviceSortKey: QuickTransfersOnDeviceSortKey | null
+    hasDismissedQuickTransferIntro: boolean
+  }
+}
 
-export type Config = ConfigV22
+export type Config = ConfigV23

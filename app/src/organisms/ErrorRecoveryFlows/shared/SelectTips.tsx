@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { RECOVERY_MAP } from '../constants'
-import { RecoverySingleColumnContent } from './RecoverySingleColumnContent'
+import { RecoveryContentWrapper } from './RecoveryContentWrapper'
 import { TwoColumn } from '../../../molecules/InterventionModal'
 import { RecoveryFooterButtons } from './RecoveryFooterButtons'
 import { LeftColumnLabwareInfo } from './LeftColumnLabwareInfo'
@@ -48,7 +48,7 @@ export function SelectTips(props: RecoveryContentProps): JSX.Element | null {
             toggleModal={toggleModal}
           />
         )}
-        <RecoverySingleColumnContent>
+        <RecoveryContentWrapper>
           <TwoColumn>
             <LeftColumnLabwareInfo
               {...props}
@@ -67,7 +67,7 @@ export function SelectTips(props: RecoveryContentProps): JSX.Element | null {
             tertiaryBtnOnClick={toggleModal}
             tertiaryBtnText={t('change_location')}
           />
-        </RecoverySingleColumnContent>
+        </RecoveryContentWrapper>
       </>
     )
   } else {

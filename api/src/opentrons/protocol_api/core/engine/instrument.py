@@ -754,20 +754,13 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         return self._liquid_presence_detection
 
     def is_tip_tracking_available(self) -> bool:
-        primary_nozzle = self._engine_client.state.pipettes.get_primary_nozzle(
-            self._pipette_id
-        )
         if self.get_nozzle_configuration() == NozzleConfigurationType.FULL:
             return True
         else:
             if self.get_channels() == 96:
                 return True
             if self.get_channels() == 8:
-                # TODO: (cb, 03/06/24): Enable automatic tip tracking on the 8 channel pipettes once PAPI support exists
-                return (
-                    self.get_nozzle_configuration() == NozzleConfigurationType.SINGLE
-                    and primary_nozzle == "H1"
-                )
+                return True
         return False
 
     def set_flow_rate(
@@ -810,6 +803,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         style: NozzleLayout,
         primary_nozzle: Optional[str],
         front_right_nozzle: Optional[str],
+        back_left_nozzle: Optional[str],
     ) -> None:
         if style == NozzleLayout.COLUMN:
             configuration_model: NozzleLayoutConfigurationType = (
@@ -821,11 +815,11 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             configuration_model = RowNozzleLayoutConfiguration(
                 primaryNozzle=cast(PRIMARY_NOZZLE_LITERAL, primary_nozzle)
             )
-        elif style == NozzleLayout.QUADRANT:
-            assert front_right_nozzle is not None
+        elif style == NozzleLayout.QUADRANT or style == NozzleLayout.PARTIAL_COLUMN:
             configuration_model = QuadrantNozzleLayoutConfiguration(
                 primaryNozzle=cast(PRIMARY_NOZZLE_LITERAL, primary_nozzle),
                 frontRightNozzle=front_right_nozzle,
+                backLeftNozzle=back_left_nozzle,
             )
         elif style == NozzleLayout.SINGLE:
             configuration_model = SingleNozzleLayoutConfiguration(

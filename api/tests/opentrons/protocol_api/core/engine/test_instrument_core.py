@@ -1166,23 +1166,32 @@ def test_liquid_presence_detection(
 
 
 @pytest.mark.parametrize(
-    argnames=["style", "primary_nozzle", "front_right_nozzle", "expected_model"],
+    argnames=[
+        "style",
+        "primary_nozzle",
+        "front_right_nozzle",
+        "back_left_nozzle",
+        "expected_model",
+    ],
     argvalues=[
         [
             NozzleLayout.COLUMN,
             "A1",
             "H1",
+            None,
             ColumnNozzleLayoutConfiguration(primaryNozzle="A1"),
         ],
         [
             NozzleLayout.SINGLE,
             "H12",
             None,
+            None,
             SingleNozzleLayoutConfiguration(primaryNozzle="H12"),
         ],
         [
             NozzleLayout.ROW,
             "A12",
+            None,
             None,
             RowNozzleLayoutConfiguration(primaryNozzle="A12"),
         ],
@@ -1195,10 +1204,13 @@ def test_configure_nozzle_layout(
     style: NozzleLayout,
     primary_nozzle: Optional[str],
     front_right_nozzle: Optional[str],
+    back_left_nozzle: Optional[str],
     expected_model: NozzleLayoutConfigurationType,
 ) -> None:
     """The correct model is passed to the engine client."""
-    subject.configure_nozzle_layout(style, primary_nozzle, front_right_nozzle)
+    subject.configure_nozzle_layout(
+        style, primary_nozzle, front_right_nozzle, back_left_nozzle
+    )
 
     decoy.verify(
         mock_engine_client.execute_command(
@@ -1222,7 +1234,7 @@ def test_configure_nozzle_layout(
         (8, NozzleConfigurationType.FULL, "A1", True),
         (8, NozzleConfigurationType.FULL, None, True),
         (8, NozzleConfigurationType.SINGLE, "H1", True),
-        (8, NozzleConfigurationType.SINGLE, "A1", False),
+        (8, NozzleConfigurationType.SINGLE, "A1", True),
         (1, NozzleConfigurationType.FULL, None, True),
     ],
 )

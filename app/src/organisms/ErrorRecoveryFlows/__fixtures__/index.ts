@@ -74,6 +74,8 @@ export const mockRecoveryContentProps: RecoveryContentProps = {
   trackExternalMap: () => null,
   hasLaunchedRecovery: true,
   getRecoveryOptionCopy: () => 'MOCK_COPY',
-  commandAfterFailedCommand:
+  commandsAfterFailedCommand: [
+    mockRobotSideAnalysis.commands[mockRobotSideAnalysis.commands.length - 2],
     mockRobotSideAnalysis.commands[mockRobotSideAnalysis.commands.length - 1],
+  ],
 }

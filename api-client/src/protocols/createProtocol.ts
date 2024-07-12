@@ -8,12 +8,14 @@ export function createProtocol(
   config: HostConfig,
   files: File[],
   protocolKey?: string,
+  protocolKind?: string,
   runTimeParameterValues?: RunTimeParameterCreateData
 ): ResponsePromise<Protocol> {
   const formData = new FormData()
   files.forEach(file => {
     formData.append('files', file, file.name)
   })
+  if (protocolKind != null) formData.append('protocolKind', protocolKind)
   if (protocolKey != null) formData.append('key', protocolKey)
   if (runTimeParameterValues != null)
     formData.append(

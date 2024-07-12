@@ -545,6 +545,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
         style: NozzleLayout,
         primary_nozzle: Optional[str],
         front_right_nozzle: Optional[str],
+        back_left_nozzle: Optional[str],
     ) -> None:
         """This will never be called because it was added in API 2.16."""
         pass

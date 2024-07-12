@@ -71,11 +71,13 @@ class ConfigureNozzleLayoutImplementation(
         """Check that requested pipette can support the requested nozzle layout."""
         primary_nozzle = params.configurationParams.dict().get("primaryNozzle")
         front_right_nozzle = params.configurationParams.dict().get("frontRightNozzle")
+        back_left_nozzle = params.configurationParams.dict().get("backLeftNozzle")
         nozzle_params = await self._tip_handler.available_for_nozzle_layout(
             pipette_id=params.pipetteId,
             style=params.configurationParams.style,
             primary_nozzle=primary_nozzle,
             front_right_nozzle=front_right_nozzle,
+            back_left_nozzle=back_left_nozzle,
         )
 
         nozzle_map = await self._equipment.configure_nozzle_layout(

@@ -100,7 +100,11 @@ class AbstractRunner(ABC):
 
     def play(self, deck_configuration: Optional[DeckConfigurationType] = None) -> None:
         """Start or resume the run."""
-        self._protocol_engine.play(deck_configuration=deck_configuration)
+        # todo(mm, 2024-07-09): The deck configuration is set at the same time here for
+        # historical reasons. It's unsafe to change the deck configuration mid-run
+        # and we're relying on the caller to not do that.
+        self._protocol_engine.set_deck_configuration(deck_configuration)
+        self._protocol_engine.play()
 
     def pause(self) -> None:
         """Pause the run."""
