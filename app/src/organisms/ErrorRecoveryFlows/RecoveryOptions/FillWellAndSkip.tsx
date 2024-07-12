@@ -63,7 +63,7 @@ export function FillWell(props: RecoveryContentProps): JSX.Element | null {
               title={t('manually_fill_liquid_in_well', {
                 well: failedLabwareUtils.relevantWellName,
               })}
-              moveType="refill"
+              type="location"
             />
           </Flex>
           <Flex marginTop="1.742rem">

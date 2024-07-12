@@ -43,7 +43,7 @@ export function ReplaceTips(props: RecoveryContentProps): JSX.Element | null {
           <LeftColumnLabwareInfo
             {...props}
             title={buildTitle()}
-            moveType="refill"
+            type="location"
             bannerText={t('replace_tips_and_select_location')}
           />
           <Flex marginTop="1.742rem">
