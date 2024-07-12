@@ -215,3 +215,12 @@ Another example is a Flex protocol that uses a waste chute. Say you want to only
 .. versionadded:: 2.0
 .. versionchanged:: 2.16
     Added support for ``TrashBin`` and ``WasteChute`` objects.
+
+Liquid Level Detection
+======================
+
+All Opentrons Flex pipettes have pressure sensors that detect the presence or absence of a liquid in a well plate, reservoir, or other types of labware containers. With liquid level detection (LLD) enabled in your protocols, the robot can stop a pipette at at or just below the surface of a liquid sample before aspirating. Also, the various LLD methods described here can help you avoid and recover from protocol errors or just check for the presence or absence of a fluid with or without interrupting a protocol run. For Opentrons Flex 8-Channel pipettes, the sensors are located in channels 1 and 8. For Opentrons Flex 96-Channel pipettes, the sensors are located in channels 1 and 96.   
+
+.. note::
+    LLD requires a clean, dry pipette tip. This means you must discard a tip after every aspirate/dispsense cycle and pickup a fresh tip before the next cycle.
+
