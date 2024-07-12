@@ -8,12 +8,14 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   COLORS,
+  SecondaryButton,
+  PrimaryButton,
+  RESPONSIVENESS,
 } from '@opentrons/components'
 
 import { SmallButton } from '../../../atoms/buttons'
 
 interface RecoveryFooterButtonProps {
-  isOnDevice: boolean
   primaryBtnOnClick: () => void
   /* The "Go back" button */
   secondaryBtnOnClick?: () => void
@@ -28,45 +30,46 @@ interface RecoveryFooterButtonProps {
 export function RecoveryFooterButtons(
   props: RecoveryFooterButtonProps
 ): JSX.Element | null {
-  const { isOnDevice, secondaryBtnOnClick } = props
-  const { t } = useTranslation('error_recovery')
+  return (
+    <Flex
+      width="100%"
+      height="100%"
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      alignItems={ALIGN_CENTER}
+      gridGap={SPACING.spacing8}
+    >
+      <RecoveryGoBackButton {...props} />
+      <PrimaryButtonGroup {...props} />
+    </Flex>
+  )
+}
 
+function RecoveryGoBackButton({
+  secondaryBtnOnClick,
+}: RecoveryFooterButtonProps): JSX.Element | null {
   const showGoBackBtn = secondaryBtnOnClick != null
-
-  if (isOnDevice) {
-    return (
-      <Flex
-        width="100%"
-        height="100%"
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-        alignItems={ALIGN_CENTER}
-        gridGap={SPACING.spacing8}
-      >
-        <Flex marginTop="auto">
-          {showGoBackBtn ? (
-            <SmallButton
-              buttonType="tertiaryLowLight"
-              buttonText={t('go_back')}
-              onClick={secondaryBtnOnClick}
-              marginTop="auto"
-            />
-          ) : null}
-        </Flex>
-        <PrimaryButtonGroup {...props} />
-      </Flex>
-    )
-  } else {
-    return null
-  }
+  const { t } = useTranslation('error_recovery')
+  return showGoBackBtn ? (
+    <Flex marginTop="auto">
+      <SmallButton
+        buttonType="tertiaryLowLight"
+        buttonText={t('go_back')}
+        onClick={secondaryBtnOnClick}
+        marginTop="auto"
+        css={ODD_ONLY_BUTTON}
+      />
+      <SecondaryButton onClick={secondaryBtnOnClick} css={DESKTOP_ONLY_BUTTON}>
+        {t('go_back')}
+      </SecondaryButton>
+    </Flex>
+  ) : null
 }
 
 function PrimaryButtonGroup(props: RecoveryFooterButtonProps): JSX.Element {
-  const { tertiaryBtnDisabled, tertiaryBtnOnClick, tertiaryBtnText } = props
+  const { tertiaryBtnOnClick, tertiaryBtnText } = props
 
   const renderTertiaryBtn =
     tertiaryBtnOnClick != null || tertiaryBtnText != null
-
-  const tertiaryBtnDefaultOnClick = (): null => null
 
   if (!renderTertiaryBtn) {
     return (
@@ -77,12 +80,7 @@ function PrimaryButtonGroup(props: RecoveryFooterButtonProps): JSX.Element {
   } else {
     return (
       <Flex gridGap={SPACING.spacing8} marginTop="auto">
-        <SmallButton
-          buttonType="secondary"
-          onClick={tertiaryBtnOnClick ?? tertiaryBtnDefaultOnClick}
-          buttonText={tertiaryBtnText}
-          disabled={tertiaryBtnDisabled}
-        />
+        <RecoveryTertiaryBtn {...props} />
         <RecoveryPrimaryBtn {...props} />
       </Flex>
     )
@@ -97,15 +95,57 @@ function RecoveryPrimaryBtn({
   const { t } = useTranslation('error_recovery')
 
   return (
-    <SmallButton
-      css={isLoadingPrimaryBtnAction ? PRESSED_LOADING_STATE : undefined}
-      iconName={isLoadingPrimaryBtnAction ? 'ot-spinner' : null}
-      iconPlacement={isLoadingPrimaryBtnAction ? 'startIcon' : null}
-      buttonType="primary"
-      buttonText={primaryBtnTextOverride ?? t('continue')}
-      onClick={primaryBtnOnClick}
-      marginTop="auto"
-    />
+    <>
+      <SmallButton
+        css={
+          isLoadingPrimaryBtnAction
+            ? css`
+                ${PRESSED_LOADING_STATE} ${ODD_ONLY_BUTTON}
+              `
+            : ODD_ONLY_BUTTON
+        }
+        iconName={isLoadingPrimaryBtnAction ? 'ot-spinner' : null}
+        iconPlacement={isLoadingPrimaryBtnAction ? 'startIcon' : null}
+        buttonType="primary"
+        buttonText={primaryBtnTextOverride ?? t('continue')}
+        onClick={primaryBtnOnClick}
+        marginTop="auto"
+      />
+      <PrimaryButton
+        css={DESKTOP_ONLY_BUTTON}
+        onClick={primaryBtnOnClick}
+        disabled={isLoadingPrimaryBtnAction}
+      >
+        {primaryBtnTextOverride ?? t('continue')}
+      </PrimaryButton>
+    </>
+  )
+}
+
+function RecoveryTertiaryBtn({
+  tertiaryBtnOnClick,
+  tertiaryBtnText,
+  tertiaryBtnDisabled,
+}: RecoveryFooterButtonProps): JSX.Element {
+  const tertiaryBtnDefaultOnClick = (): null => null
+
+  return (
+    <>
+      <SmallButton
+        buttonType="secondary"
+        onClick={tertiaryBtnOnClick ?? tertiaryBtnDefaultOnClick}
+        buttonText={tertiaryBtnText}
+        disabled={tertiaryBtnDisabled}
+        css={ODD_ONLY_BUTTON}
+      />
+      <SecondaryButton
+        onClick={tertiaryBtnOnClick ?? tertiaryBtnDefaultOnClick}
+        disabled={tertiaryBtnDisabled}
+        css={DESKTOP_ONLY_BUTTON}
+      >
+        {tertiaryBtnText}
+      </SecondaryButton>
+    </>
   )
 }
 
@@ -122,5 +162,17 @@ const PRESSED_LOADING_STATE = css`
   }
   &:active {
     background-color: ${COLORS.blue60};
+  }
+`
+
+const ODD_ONLY_BUTTON = css`
+  @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+    display: none;
+  }
+`
+
+const DESKTOP_ONLY_BUTTON = css`
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    display: none;
   }
 `

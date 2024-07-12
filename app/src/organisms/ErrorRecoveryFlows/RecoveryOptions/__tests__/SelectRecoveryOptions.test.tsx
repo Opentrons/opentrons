@@ -17,6 +17,7 @@ import {
   NO_LIQUID_DETECTED_OPTIONS,
 } from '../SelectRecoveryOption'
 import { RECOVERY_MAP, ERROR_KINDS } from '../../constants'
+import { clickButtonLabeled } from '../../__tests__/util'
 
 import type { Mock } from 'vitest'
 
@@ -88,8 +89,7 @@ describe('SelectRecoveryOption', () => {
   it('sets the selected recovery option when clicking continue', () => {
     renderSelectRecoveryOption(props)
 
-    const continueBtn = screen.getByRole('button', { name: 'Continue' })
-    fireEvent.click(continueBtn)
+    clickButtonLabeled('Continue')
 
     expect(mockSetSelectedRecoveryOption).toHaveBeenCalledWith(
       RETRY_FAILED_COMMAND.ROUTE
@@ -102,13 +102,13 @@ describe('SelectRecoveryOption', () => {
     screen.getByText('Choose a recovery action')
 
     const retryStepOption = screen.getByRole('label', { name: 'Retry step' })
-    const continueBtn = screen.getByRole('button', { name: 'Continue' })
+    clickButtonLabeled('Continue')
     expect(
       screen.queryByRole('button', { name: 'Go back' })
     ).not.toBeInTheDocument()
 
     fireEvent.click(retryStepOption)
-    fireEvent.click(continueBtn)
+    clickButtonLabeled('Continue')
 
     expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
       RETRY_FAILED_COMMAND.ROUTE
@@ -128,13 +128,12 @@ describe('SelectRecoveryOption', () => {
     const retryNewTips = screen.getByRole('label', {
       name: 'Retry with new tips',
     })
-    const continueBtn = screen.getByRole('button', { name: 'Continue' })
     expect(
       screen.queryByRole('button', { name: 'Go back' })
     ).not.toBeInTheDocument()
 
     fireEvent.click(retryNewTips)
-    fireEvent.click(continueBtn)
+    clickButtonLabeled('Continue')
 
     expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(RETRY_NEW_TIPS.ROUTE)
   })
@@ -152,10 +151,9 @@ describe('SelectRecoveryOption', () => {
     const fillManuallyAndSkip = screen.getByRole('label', {
       name: 'Manually fill well and skip to next step',
     })
-    const continueBtn = screen.getByRole('button', { name: 'Continue' })
 
     fireEvent.click(fillManuallyAndSkip)
-    fireEvent.click(continueBtn)
+    clickButtonLabeled('Continue')
 
     expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
       RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.ROUTE
@@ -175,10 +173,9 @@ describe('SelectRecoveryOption', () => {
     const retrySameTips = screen.getByRole('label', {
       name: 'Retry with same tips',
     })
-    const continueBtn = screen.getByRole('button', { name: 'Continue' })
 
     fireEvent.click(retrySameTips)
-    fireEvent.click(continueBtn)
+    clickButtonLabeled('Continue')
 
     expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
       RECOVERY_MAP.RETRY_SAME_TIPS.ROUTE
@@ -198,10 +195,9 @@ describe('SelectRecoveryOption', () => {
     const skipStepWithSameTips = screen.getByRole('label', {
       name: 'Skip to next step with same tips',
     })
-    const continueBtn = screen.getByRole('button', { name: 'Continue' })
 
     fireEvent.click(skipStepWithSameTips)
-    fireEvent.click(continueBtn)
+    clickButtonLabeled('Continue')
 
     expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
       RECOVERY_MAP.SKIP_STEP_WITH_SAME_TIPS.ROUTE
