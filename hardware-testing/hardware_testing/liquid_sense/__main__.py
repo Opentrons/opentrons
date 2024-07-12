@@ -118,6 +118,7 @@ class RunArgs:
     trials_before_jog: int
     no_multi_pass: int
     test_well: str
+    wet: bool
 
     @classmethod
     def _get_protocol_context(cls, args: argparse.Namespace) -> ProtocolContext:
@@ -250,6 +251,7 @@ class RunArgs:
             trials_before_jog=args.trials_before_jog,
             no_multi_pass=args.no_multi_pass,
             test_well=args.test_well,
+            wet=args.wet,
         )
 
 
@@ -269,6 +271,7 @@ if __name__ == "__main__":
     parser.add_argument("--aspirate", action="store_true")
     parser.add_argument("--plunger-speed", type=float, default=20)
     parser.add_argument("--no-multi-pass", action="store_true")
+    parser.add_argument("--wet", action="store_true")
     parser.add_argument("--starting-tip", type=str, default="A1")
     parser.add_argument("--test-well", type=str, default="A1")
     parser.add_argument("--google-sheet-name", type=str, default="LLD-Shared-Data")
