@@ -27,6 +27,7 @@ from hardware_testing.data import (
     get_testing_data_directory,
 )
 from opentrons_hardware.hardware_control.motion_planning import move_utils
+from opentrons_hardware.hardware_control import tool_sensors
 
 from opentrons.protocol_api import InstrumentContext, ProtocolContext
 from opentrons.protocol_engine.types import LabwareOffset
@@ -228,6 +229,7 @@ class RunArgs:
             protocol_cfg.LABWARE_ON_SCALE,  # type: ignore[union-attr]
             args.z_speed,
         )
+        tool_sensors.PLUNGER_SOLO_MOVE_TIME = args.p_solo_time
         return RunArgs(
             tip_volumes=tip_volumes,
             run_id=run_id,
@@ -274,6 +276,9 @@ if __name__ == "__main__":
     parser.add_argument("--wet", action="store_true")
     parser.add_argument("--starting-tip", type=str, default="A1")
     parser.add_argument("--test-well", type=str, default="A1")
+    parser.add_argument(
+        "--p-solo-time", type=float, default=tool_sensors.PLUNGER_SOLO_MOVE_TIME
+    )
     parser.add_argument("--google-sheet-name", type=str, default="LLD-Shared-Data")
     parser.add_argument(
         "--gd-parent-folder", type=str, default="1b2V85fDPA0tNqjEhyHOGCWRZYgn8KsGf"
