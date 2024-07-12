@@ -35,21 +35,32 @@ describe('RecoveryFooterButtons', () => {
   it('renders default button copy and click behavior', () => {
     render(props)
 
-    const primaryBtn = screen.getByRole('button', { name: 'Continue' })
-    const secondaryBtn = screen.getByRole('button', { name: 'Go back' })
+    const primaryBtns = screen.getAllByRole('button', { name: 'Continue' })
+    const secondaryBtns = screen.getAllByRole('button', { name: 'Go back' })
+    expect(primaryBtns.length).toBe(2)
+    expect(secondaryBtns.length).toBe(2)
 
-    fireEvent.click(primaryBtn)
-    fireEvent.click(secondaryBtn)
+    primaryBtns.forEach(btn => {
+      mockPrimaryBtnOnClick.mockReset()
+      fireEvent.click(btn)
+      expect(mockPrimaryBtnOnClick).toHaveBeenCalled()
+    })
 
-    expect(mockPrimaryBtnOnClick).toHaveBeenCalled()
-    expect(mockSecondaryBtnOnClick).toHaveBeenCalled()
+    secondaryBtns.forEach(btn => {
+      mockSecondaryBtnOnClick.mockReset()
+      fireEvent.click(btn)
+      expect(mockSecondaryBtnOnClick).toHaveBeenCalled()
+    })
   })
 
   it('renders alternative button text when supplied', () => {
     props = { ...props, primaryBtnTextOverride: 'MOCK_OVERRIDE_TEXT' }
     render(props)
 
-    screen.getByRole('button', { name: 'MOCK_OVERRIDE_TEXT' })
+    const secondaries = screen.getAllByRole('button', {
+      name: 'MOCK_OVERRIDE_TEXT',
+    })
+    expect(secondaries.length).toBe(2)
   })
 
   it('does not render the secondary button if no on click handler is supplied', () => {
@@ -65,30 +76,36 @@ describe('RecoveryFooterButtons', () => {
     props = { ...props, isLoadingPrimaryBtnAction: true }
     render(props)
 
-    const primaryBtn = screen.getByRole('button', {
+    const primaryBtns = screen.getAllByRole('button', {
       name: 'loading indicator Continue',
     })
 
     screen.getByLabelText('loading indicator')
-    expect(primaryBtn).toHaveStyle(`background-color: ${COLORS.blue60}`)
+    primaryBtns.forEach(btn => {
+      expect(btn).toHaveStyle(`background-color: ${COLORS.blue60}`)
+    })
   })
 
   it('renders the tertiary button when tertiaryBtnOnClick is provided', () => {
     props = { ...props, tertiaryBtnOnClick: mockTertiaryBtnOnClick }
     render(props)
 
-    const tertiaryBtn = screen.getByRole('button', { name: '' })
+    const tertiaryBtns = screen.getAllByRole('button', { name: '' })
+    expect(tertiaryBtns.length).toBe(2)
 
-    fireEvent.click(tertiaryBtn)
-
-    expect(mockTertiaryBtnOnClick).toHaveBeenCalled()
+    tertiaryBtns.forEach(btn => {
+      mockTertiaryBtnOnClick.mockReset()
+      fireEvent.click(btn)
+      expect(mockTertiaryBtnOnClick).toHaveBeenCalled()
+    })
   })
 
   it('renders the tertiary button with custom text when tertiaryBtnText is provided', () => {
     props = { ...props, tertiaryBtnText: 'Hey' }
     render(props)
 
-    screen.getByRole('button', { name: 'Hey' })
+    const tertiaryBtns = screen.getAllByRole('button', { name: 'Hey' })
+    expect(tertiaryBtns.length).toBe(2)
   })
 
   it('renders the tertiary button as disabled when tertiaryBtnDisabled is true', () => {
@@ -100,8 +117,10 @@ describe('RecoveryFooterButtons', () => {
     }
     render(props)
 
-    const tertiaryBtn = screen.getByRole('button', { name: 'Hi' })
+    const tertiaryBtns = screen.getAllByRole('button', { name: 'Hi' })
 
-    expect(tertiaryBtn).toBeDisabled()
+    tertiaryBtns.forEach(btn => {
+      expect(btn).toBeDisabled()
+    })
   })
 })

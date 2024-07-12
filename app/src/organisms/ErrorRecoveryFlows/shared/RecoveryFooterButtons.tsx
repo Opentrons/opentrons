@@ -30,11 +30,6 @@ interface RecoveryFooterButtonProps {
 export function RecoveryFooterButtons(
   props: RecoveryFooterButtonProps
 ): JSX.Element | null {
-  const { secondaryBtnOnClick } = props
-  const { t } = useTranslation('error_recovery')
-
-  const showGoBackBtn = secondaryBtnOnClick != null
-
   return (
     <Flex
       width="100%"
@@ -43,19 +38,31 @@ export function RecoveryFooterButtons(
       alignItems={ALIGN_CENTER}
       gridGap={SPACING.spacing8}
     >
-      <Flex marginTop="auto">
-        {showGoBackBtn ? (
-          <SmallButton
-            buttonType="tertiaryLowLight"
-            buttonText={t('go_back')}
-            onClick={secondaryBtnOnClick}
-            marginTop="auto"
-          />
-        ) : null}
-      </Flex>
+      <RecoveryGoBackButton {...props} />
       <PrimaryButtonGroup {...props} />
     </Flex>
   )
+}
+
+function RecoveryGoBackButton({
+  secondaryBtnOnClick,
+}: RecoveryFooterButtonProps): JSX.Element | null {
+  const showGoBackBtn = secondaryBtnOnClick != null
+  const { t } = useTranslation('error_recovery')
+  return showGoBackBtn ? (
+    <Flex marginTop="auto">
+      <SmallButton
+        buttonType="tertiaryLowLight"
+        buttonText={t('go_back')}
+        onClick={secondaryBtnOnClick}
+        marginTop="auto"
+        css={ODD_ONLY_BUTTON}
+      />
+      <SecondaryButton onClick={secondaryBtnOnClick} css={DESKTOP_ONLY_BUTTON}>
+        {t('go_back')}
+      </SecondaryButton>
+    </Flex>
+  ) : null
 }
 
 function PrimaryButtonGroup(props: RecoveryFooterButtonProps): JSX.Element {
