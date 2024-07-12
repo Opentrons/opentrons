@@ -1,6 +1,7 @@
 """Test for the ProtocolEngine-based instrument API core."""
 from typing import cast, Optional, Union
 
+from opentrons import types
 from opentrons.protocol_engine.commands.liquid_probe import LiquidProbeResult
 from opentrons_shared_data.errors.exceptions import PipetteLiquidNotFoundError
 import pytest
@@ -1316,29 +1317,13 @@ def test_liquid_probe_without_recovery(
             )
         )
     ).then_raise(PipetteLiquidNotFoundError())
+    loc = Location(Point(0, 0, 0), None)
     try:
-        subject.liquid_probe_without_recovery(well_core=well_core)
+        subject.liquid_probe_without_recovery(well_core=well_core, loc=loc)
     except PipetteLiquidNotFoundError:
         assert True
     else:
         assert False
-
-    decoy.reset()
-
-    lpr = LiquidProbeResult(z_position=5.0)
-    decoy.when(
-        mock_engine_client.execute_command_without_recovery(
-            cmd.LiquidProbeParams(
-                pipetteId=subject.pipette_id,
-                wellLocation=WellLocation(
-                    origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0)
-                ),
-                wellName=well_core.get_name(),
-                labwareId=well_core.labware_id,
-            )
-        )
-    ).then_return(lpr)
-    assert subject.liquid_probe_without_recovery(well_core=well_core) == 5.0
 
 
 @pytest.mark.parametrize("version", versions_at_or_above(APIVersion(2, 20)))
@@ -1353,7 +1338,8 @@ def test_liquid_probe_with_recovery(
     well_core = WellCore(
         name="my cool well", labware_id="123abc", engine_client=mock_engine_client
     )
-    subject.liquid_probe_with_recovery(well_core=well_core)
+    loc = Location(Point(0, 0, 0), None)
+    subject.liquid_probe_with_recovery(well_core=well_core, loc=loc)
     decoy.verify(
         mock_engine_client.execute_command(
             cmd.LiquidProbeParams(

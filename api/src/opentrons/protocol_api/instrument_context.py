@@ -7,6 +7,7 @@ from opentrons.protocol_engine.errors.error_occurrence import ProtocolCommandFai
 from opentrons_shared_data.errors.exceptions import (
     CommandPreconditionViolated,
     CommandParameterLimitViolated,
+    StallOrCollisionDetectedError,
     UnexpectedTipRemovalError,
 )
 from opentrons.legacy_broker import LegacyBroker
@@ -258,7 +259,7 @@ class InstrumentContext(publisher.CommandPublisher):
         else:
             c_vol = self._core.get_available_volume() if not volume else volume
         flow_rate = self._core.get_aspirate_flow_rate(rate)
-        
+
         if self.api_version >= APIVersion(2, 20) and well is not None:
             if self._core.get_liquid_presence_detection():
                 self.require_liquid_presence(well=well)
@@ -2058,10 +2059,14 @@ class InstrumentContext(publisher.CommandPublisher):
 
         :returns: A boolean.
         """
+        loc = well.top()
         try:
-            self._core.liquid_probe_without_recovery(well._core)
+            self._core.liquid_probe_without_recovery(well._core, loc)
         except ProtocolCommandFailedError as e:
-            if isinstance(e.original_error, LiquidNotFoundError):
+            # if we handle the error, we change the protocl state from error to valid
+            if isinstance(e.original_error, LiquidNotFoundError) or isinstance(
+                e.original_error, StallOrCollisionDetectedError
+            ):
                 return False
             raise e
         else:
@@ -2073,7 +2078,8 @@ class InstrumentContext(publisher.CommandPublisher):
 
         :returns: None.
         """
-        self._core.liquid_probe_with_recovery(well._core)
+        loc = well.top()
+        self._core.liquid_probe_with_recovery(well._core, loc)
 
     @requires_version(2, 20)
     def measure_liquid_height(self, well: labware.Well) -> float:
@@ -2085,5 +2091,6 @@ class InstrumentContext(publisher.CommandPublisher):
 
         This is intended for Opentrons internal use only and is not a guaranteed API.
         """
-        height = self._core.liquid_probe_without_recovery(well._core)
+        loc = well.top()
+        height = self._core.liquid_probe_without_recovery(well._core, loc)
         return height

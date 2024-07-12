@@ -844,7 +844,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         z_axis = self._engine_client.state.pipettes.get_z_axis(self._pipette_id)
         self._engine_client.execute_command(cmd.HomeParams(axes=[z_axis]))
 
-    def liquid_probe_with_recovery(self, well_core: WellCore) -> None:
+    def liquid_probe_with_recovery(self, well_core: WellCore, loc: Location) -> None:
         labware_id = well_core.labware_id
         well_name = well_core.get_name()
         well_location = WellLocation(
@@ -858,11 +858,12 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                 pipetteId=self.pipette_id,
             )
         )
-        
-        #TODO: fix this. i'm not even sure what set_last_location is used for
-        self._protocol_core.set_last_location(location=Location(well_core.get_top(0), "Well"), mount=self.get_mount())
 
-    def liquid_probe_without_recovery(self, well_core: WellCore) -> float:
+        self._protocol_core.set_last_location(location=loc, mount=self.get_mount())
+
+    def liquid_probe_without_recovery(
+        self, well_core: WellCore, loc: Location
+    ) -> float:
         labware_id = well_core.labware_id
         well_name = well_core.get_name()
         well_location = WellLocation(
@@ -876,8 +877,8 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                 pipetteId=self.pipette_id,
             )
         )
-        #TODO: fix this. i'm not even sure what set_last_location is used for
-        self._protocol_core.set_last_location(location=Location(well_core.get_top(0), "Well"), mount=self.get_mount())
+
+        self._protocol_core.set_last_location(location=loc, mount=self.get_mount())
 
         if result is not None and isinstance(result, LiquidProbeResult):
             return result.z_position
