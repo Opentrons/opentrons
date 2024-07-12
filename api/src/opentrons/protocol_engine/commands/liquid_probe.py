@@ -79,7 +79,7 @@ class LiquidProbeImplementation(AbstractCommandImpl[LiquidProbeParams, _ExecuteR
         Raises:
             TipNotAttachedError: if there is no tip attached to the pipette
             MustHomeError: if the plunger is not in a valid position
-            TipNotEmptyError: if the tip starts with liquid in it(AKA it's wet and unusable for LLD)
+            TipNotEmptyError: if the tip starts with liquid in it
             LiquidNotFoundError: if liquid is not found during the probe process.
         """
         pipette_id = params.pipetteId
