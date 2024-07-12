@@ -1678,7 +1678,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
     @property
     @requires_version(2, 20)
-    def liquid_detection(self) -> bool:
+    def liquid_presence_detection(self) -> bool:
         """
         Gets the global setting for liquid level detection.
 
@@ -1689,9 +1689,9 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         return self._core.get_liquid_presence_detection()
 
-    @liquid_detection.setter
+    @liquid_presence_detection.setter
     @requires_version(2, 20)
-    def liquid_detection(self, enable: bool) -> None:
+    def liquid_presence_detection(self, enable: bool) -> None:
         self._core.set_liquid_presence_detection(enable)
 
     @property

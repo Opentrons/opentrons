@@ -1069,8 +1069,8 @@ def test_liquid_presence_detection(
 ) -> None:
     """It should have a default liquid presence detection boolean set to False."""
     decoy.when(mock_instrument_core.get_liquid_presence_detection()).then_return(False)
-    assert subject.liquid_detection is False
-    subject.liquid_detection = True
+    assert subject.liquid_presence_detection is False
+    subject.liquid_presence_detection = True
     decoy.verify(mock_instrument_core.set_liquid_presence_detection(True), times=1)
 
 
