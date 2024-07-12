@@ -43,7 +43,7 @@ class LiquidProbeParams(PipetteIdMixin, WellLocationMixin):
 
 
 class LiquidProbeResult(DestinationPositionResult):
-    """Result data from the execution of a liquid-probe command."""
+    """Result data from the execution of a liquidProbe command."""
 
     z_position: float = Field(
         ..., description="The Z coordinate, in mm, of the found liquid in deck space."
@@ -145,7 +145,9 @@ class LiquidProbeImplementation(AbstractCommandImpl[LiquidProbeParams, _ExecuteR
             )
 
 
-class LiquidProbe(BaseCommand[LiquidProbeParams, LiquidProbeResult, ErrorOccurrence]):
+class LiquidProbe(
+    BaseCommand[LiquidProbeParams, LiquidProbeResult, LiquidNotFoundError]
+):
     """LiquidProbe command model."""
 
     commandType: LiquidProbeCommandType = "liquidProbe"
