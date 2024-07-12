@@ -222,7 +222,7 @@ Liquid Level Detection
 All Opentrons Flex pipettes use pressure sensors to detect the presence or absence of a liquid in a well plate or reservoir. When added to a protocol, liquid level detection (LLD) stops the pipette tip at the surface of a liquid sample before aspirating. You can use LLD to avoid and recover from protocol errors or just check for the presence or absence of a fluid with or without interrupting a protocol run. For Opentrons Flex 8-Channel pipettes, the sensors are located in channels 1 and 8. For Opentrons Flex 96-Channel pipettes, the sensors are located in channels 1 and 96.   
 
 .. note::
-    LLD requires fresh, clean, and dry pipette tips. After aspirating, your pipette must discard the used tip and pick up a new one to perform additional LLD checks.
+    LLD requires fresh, clean, and dry pipette tips. After aspirating, your pipette must always discard the used tip (call :py:meth:`~.InstrumentContext.drop_tip`) and pick up a new one to perform additional LLD checks.
 
 Section Needs a Title
 ---------------------
@@ -240,5 +240,13 @@ You enable LLD globally by setting ``liquid_presence_detection=True`` in :py:met
 
 Liquid presence detection occurs when your protocol calls :py:meth:`.InstrumentContext.aspirate`. As the pressure sensor detects a liquid, the code returns ``True``, the pipette pauses, raises itself slightly above the surface of the liquid, and then moves into the liquid to continue the aspiration. If a pipette doesn't detect a liquid, it returns ``False``, raises an error, and stops the protocol.
 
-And remember, LLD always requires a fresh tip. Call :py:meth:`~.InstrumentContext.drop_tip` in your protocol to throw the used tip away and pick up a new tip before every aspiration.
+Turning it off
+--------------
 
+.. 
+    Needs better title
+Turn it off 
+
+.. code-block:: python
+    
+    pipette.liquid_detection = False
