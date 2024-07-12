@@ -259,6 +259,9 @@ def run(
             del tips[: run_args.pipette_channels]
 
             run_args.pipette.move_to(test_well.top())
+            if run_args.wet:
+                run_args.pipette.move_to(test_well.bottom(1))
+                run_args.pipette.move_to(test_well.top())
             start_pos = hw_api.current_position_ot3(OT3Mount.LEFT)
             height = _run_trial(run_args, tip, test_well, trial, start_pos)
             end_pos = hw_api.current_position_ot3(OT3Mount.LEFT)
