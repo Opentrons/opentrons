@@ -7,6 +7,7 @@ from abr_testing.automation import jira_tool, google_sheets_tool, google_drive_t
 import shutil
 import os
 import subprocess
+from datetime import datetime, timedelta
 import sys
 import json
 import re
@@ -242,6 +243,18 @@ def get_run_error_info_from_robot(
     description["protocol_name"] = results["protocol"]["metadata"].get(
         "protocolName", ""
     )
+    # Get start and end time of run
+    start_time = datetime.strptime(
+        results.get("startedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
+    )
+    adjusted_start_time = start_time - timedelta(hours=4)
+    start_date = str(adjusted_start_time.date())
+    start_time_str = str(adjusted_start_time).split("+")[0]
+    complete_time = datetime.strptime(
+        results.get("completedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
+    )
+    adjusted_complete_time = complete_time - timedelta(hours=4)
+    
     # Get LPC coordinates of labware of failure
     lpc_dict = results["labwareOffsets"]
     labware_dict = results["labware"]
@@ -272,6 +285,7 @@ def get_run_error_info_from_robot(
                         lpc_message = compare_lpc_to_historical_data(
                             errored_labware_dict, parent, storage_directory
                         )
+    # Get average temp and rh of robot and protocol the error occurred on.
 
     description["protocol_step"] = protocol_step
     description["right_mount"] = results.get("right", "No attachment")
