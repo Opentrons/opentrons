@@ -1,10 +1,12 @@
 import * as React from 'react'
+import { css } from 'styled-components'
 
 import {
   DIRECTION_COLUMN,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   Flex,
+  RESPONSIVENESS,
 } from '@opentrons/components'
 
 import type { StyleProps } from '@opentrons/components'
@@ -24,7 +26,7 @@ export function RecoverySingleColumnContent({
       padding={SPACING.spacing32}
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      height="29.25rem"
+      css={FLEX_HEIGHT}
       {...styleProps}
     >
       {children}
@@ -32,19 +34,8 @@ export function RecoverySingleColumnContent({
   )
 }
 
-export function RecoverySingleColumnContentDesktop({
-  children,
-  ...styleProps
-}: SingleColumnContentWrapperProps): JSX.Element {
-  return (
-    <Flex
-      padding={SPACING.spacing32}
-      gridGap={SPACING.spacing24}
-      flexDirection={DIRECTION_COLUMN}
-      justifyContent={JUSTIFY_SPACE_BETWEEN}
-      {...styleProps}
-    >
-      {children}
-    </Flex>
-  )
-}
+const FLEX_HEIGHT = css`
+  @media (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+    height= 29.25rem
+  }
+`

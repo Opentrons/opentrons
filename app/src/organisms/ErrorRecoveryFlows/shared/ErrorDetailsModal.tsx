@@ -102,7 +102,6 @@ export function ErrorDetailsModalODD(
   )
 }
 
-
 export function ErrorDetailsModalDesktop(
   props: ErrorDetailsModalProps
 ): JSX.Element {

@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
@@ -9,10 +10,14 @@ import {
   Icon,
   SPACING,
   LegacyStyledText,
+  RESPONSIVENESS,
 } from '@opentrons/components'
 
 import { RECOVERY_MAP } from '../constants'
-import { RecoveryFooterButtons, RecoverySingleColumnContent, RecoverySingleColumnContentDesktop } from '../shared'
+import {
+  RecoveryFooterButtons,
+  RecoverySingleColumnContent,
+} from '../shared'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 import type { RecoveryContentProps } from '../types'
@@ -55,86 +60,44 @@ function CancelRunConfirmation({
     routeUpdateActions,
     tipStatusUtils,
   })
-
-  if (isOnDevice) {
-    return (
-      <RecoverySingleColumnContent
-        gridGap={SPACING.spacing24}
+  return (
+    <RecoverySingleColumnContent
+      gridGap={SPACING.spacing24}
+      alignItems={ALIGN_CENTER}
+    >
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
         alignItems={ALIGN_CENTER}
-      >
-        <Flex
-          flexDirection={DIRECTION_COLUMN}
-          alignItems={ALIGN_CENTER}
-          gridGap={SPACING.spacing24}
-          height="100%"
-          width="848px"
-        >
-          <Icon
-            name="ot-alert"
-            size="3.75rem"
-            marginTop={SPACING.spacing24}
-            color={COLORS.red50}
-          />
-          <LegacyStyledText as="h3Bold">
-            {t('are_you_sure_you_want_to_cancel')}
-          </LegacyStyledText>
-          <LegacyStyledText
-            as="h4"
-            color={COLORS.grey60}
-            textAlign={ALIGN_CENTER}
-          >
-            {t('if_tips_are_attached')}
-          </LegacyStyledText>
-        </Flex>
-        <RecoveryFooterButtons
-          isOnDevice={isOnDevice}
-          primaryBtnOnClick={handleCancelRunClick}
-          secondaryBtnOnClick={goBackPrevStep}
-          primaryBtnTextOverride={t('confirm')}
-          isLoadingPrimaryBtnAction={showBtnLoadingState}
-        />
-      </RecoverySingleColumnContent>
-    )
-  } else {
-    return (
-      <RecoverySingleColumnContentDesktop
         gridGap={SPACING.spacing24}
-        alignItems={ALIGN_CENTER}
+        height="100%"
+        css={FLEX_WIDTH}
       >
-        <Flex
-          flexDirection={DIRECTION_COLUMN}
-          alignItems={ALIGN_CENTER}
-          gridGap={SPACING.spacing16}
-          height="100%"
-          width="666px"
-        >
-          <Icon
-            name="ot-alert"
-            size="2.5rem"
-            marginTop={SPACING.spacing16}
-            color={COLORS.red50}
-          />
-          <LegacyStyledText as="h3Bold">
-            {t('are_you_sure_you_want_to_cancel')}
-          </LegacyStyledText>
-          <LegacyStyledText
-            as="h4"
-            color={COLORS.black90}
-            textAlign={ALIGN_CENTER}
-          >
-            {t('if_tips_are_attached')}
-          </LegacyStyledText>
-        </Flex>
-        <RecoveryFooterButtons
-          isOnDevice={isOnDevice}
-          primaryBtnOnClick={handleCancelRunClick}
-          secondaryBtnOnClick={goBackPrevStep}
-          primaryBtnTextOverride={t('confirm')}
-          isLoadingPrimaryBtnAction={showBtnLoadingState}
+        <Icon
+          name="ot-alert"
+          css={ICON_SIZE}
+          marginTop={SPACING.spacing24}
+          color={COLORS.red50}
         />
-      </RecoverySingleColumnContentDesktop>
-    )
-  }
+        <LegacyStyledText as="h3Bold">
+          {t('are_you_sure_you_want_to_cancel')}
+        </LegacyStyledText>
+        <LegacyStyledText
+          as="h4"
+          color={COLORS.grey60}
+          textAlign={ALIGN_CENTER}
+        >
+          {t('if_tips_are_attached')}
+        </LegacyStyledText>
+      </Flex>
+      <RecoveryFooterButtons
+        isOnDevice={isOnDevice}
+        primaryBtnOnClick={handleCancelRunClick}
+        secondaryBtnOnClick={goBackPrevStep}
+        primaryBtnTextOverride={t('confirm')}
+        isLoadingPrimaryBtnAction={showBtnLoadingState}
+      />
+    </RecoverySingleColumnContent>
+  )
 }
 
 interface OnCancelRunProps {
@@ -165,6 +128,7 @@ export function useOnCancelRun({
 
   React.useEffect(() => {
     if (hasUserClicked) {
+      debugger
       if (!isLoadingTipStatus) {
         if (areTipsAttached) {
           void proceedToRouteAndStep(DROP_TIP_FLOWS.ROUTE)
@@ -183,3 +147,19 @@ export function useOnCancelRun({
 
   return { showBtnLoadingState, handleCancelRunClick }
 }
+
+const FLEX_WIDTH = css`
+  width: 666px;
+  @media (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+    width: 848px;
+  }
+`
+
+const ICON_SIZE = css`
+  width: 2.5rem;
+  height: 2.5rem;
+  @media (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+    width: 3.75rem;
+    height: 3.75rem;
+  }
+`

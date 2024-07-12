@@ -13,7 +13,7 @@ import {
   JUSTIFY_CENTER,
   SPACING,
   LegacyStyledText,
-  TYPOGRAPHY
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { ODD_FOCUS_VISIBLE } from './constants'
 import type { IconName, StyleProps } from '@opentrons/components'
@@ -153,7 +153,7 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
     }
   `
 
-  const TEXT_SIZE = isOnDevice ? "1.375rem": "0.875rem"
+  const TEXT_SIZE = isOnDevice ? '1.375rem' : '0.875rem'
 
   return (
     <Btn
@@ -189,7 +189,9 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
 
         <LegacyStyledText
           fontSize={TEXT_SIZE}
-          lineHeight={isOnDevice ? TYPOGRAPHY.lineHeight28: TYPOGRAPHY.lineHeight20}
+          lineHeight={
+            isOnDevice ? TYPOGRAPHY.lineHeight28 : TYPOGRAPHY.lineHeight20
+          }
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         >
           {buttonText}
