@@ -219,8 +219,29 @@ Another example is a Flex protocol that uses a waste chute. Say you want to only
 Liquid Level Detection
 ======================
 
-All Opentrons Flex pipettes have pressure sensors that detect the presence or absence of a liquid in a well plate, reservoir, or other types of labware containers. With liquid level detection (LLD) enabled in your protocols, the robot can stop a pipette at at or just below the surface of a liquid sample before aspirating. Also, the various LLD methods described here can help you avoid and recover from protocol errors or just check for the presence or absence of a fluid with or without interrupting a protocol run. For Opentrons Flex 8-Channel pipettes, the sensors are located in channels 1 and 8. For Opentrons Flex 96-Channel pipettes, the sensors are located in channels 1 and 96.   
+All Opentrons Flex pipettes use pressure sensors to detect the presence or absence of a liquid in a well plate or reservoir. When added to a protocol, liquid level detection (LLD) stops the pipette tip at the surface of a liquid sample before aspirating. You can use LLD to avoid and recover from protocol errors or just check for the presence or absence of a fluid with or without interrupting a protocol run. For Opentrons Flex 8-Channel pipettes, the sensors are located in channels 1 and 8. For Opentrons Flex 96-Channel pipettes, the sensors are located in channels 1 and 96.   
 
 .. note::
-    LLD requires a clean, dry pipette tip. This means you must discard a tip after every aspirate/dispsense cycle and pickup a fresh tip before the next cycle.
+    LLD requires fresh, clean, and dry pipette tips. After aspirating, your pipette must discard the used tip and pick up a new one to perform additional LLD checks.
+
+Section Needs a Title
+---------------------
+
+You enable LLD globally by setting ``liquid_presence_detection=True`` in :py:meth:`.ProtocolContext.load_instrument`. You can also turn this off later, or or make it explicitly ``False`` and activate it later in a protocol. Using sample protocol at the top of the page, this example adds LLD to the left-mounted, 1-Channel pipette.
+
+.. code-block:: python
+
+    left = protocol.load_instrument(
+        instrument_name="flex_1channel_1000",
+        mount="left",
+        tip_racks=[tiprack1],
+        liquid_presence_detection=True
+    )
+
+Liquid presence detection occurs when your protocol calls :py:meth:`.InstrumentContext.aspirate`. When the pressure sensor detects a liquid the code returns ``True`` and the pipette pauses, raises itself slightly above the surface of the liquid, and then moves into the liquid to continue the aspiration. If a pipette doesn't detect a liquid, it returns ``False``, raises an error, and stops the protocol.
+
+And remember, LLD requires a fresh tip for every aspiration. To continue LLD throughout the protocol, call the :py:meth:`~.InstrumentContext.drop_tip` method with no arguments::
+    
+    pipette.drop_tip(trash_bin)
+
 
