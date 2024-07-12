@@ -238,10 +238,7 @@ You enable LLD globally by setting ``liquid_presence_detection=True`` in :py:met
         liquid_presence_detection=True
     )
 
-Liquid presence detection occurs when your protocol calls :py:meth:`.InstrumentContext.aspirate`. When the pressure sensor detects a liquid the code returns ``True`` and the pipette pauses, raises itself slightly above the surface of the liquid, and then moves into the liquid to continue the aspiration. If a pipette doesn't detect a liquid, it returns ``False``, raises an error, and stops the protocol.
+Liquid presence detection occurs when your protocol calls :py:meth:`.InstrumentContext.aspirate`. As the pressure sensor detects a liquid, the code returns ``True``, the pipette pauses, raises itself slightly above the surface of the liquid, and then moves into the liquid to continue the aspiration. If a pipette doesn't detect a liquid, it returns ``False``, raises an error, and stops the protocol.
 
-And remember, LLD requires a fresh tip for every aspiration. To continue LLD throughout the protocol, call the :py:meth:`~.InstrumentContext.drop_tip` method with no arguments::
-    
-    pipette.drop_tip(trash_bin)
-
+And remember, LLD always requires a fresh tip. Call :py:meth:`~.InstrumentContext.drop_tip` in your protocol to throw the used tip away and pick up a new tip before every aspiration.
 
