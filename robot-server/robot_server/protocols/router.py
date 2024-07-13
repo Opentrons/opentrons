@@ -426,8 +426,8 @@ async def _start_new_analysis_if_necessary(
         len(analyses) == 0
         or
         # The most recent analysis was done using different RTP values
-        not await analysis_store.matching_rtp_values_in_analysis(
-            analysis_summary=analyses[-1], new_rtp_values=rtp_values
+        not await analysis_store.matching_primitive_rtp_values_in_analysis(
+            last_analysis_summary=analyses[-1], new_parameters=[]
         )
     ):
         started_new_analysis = True

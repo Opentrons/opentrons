@@ -7,7 +7,15 @@ from typing import List, NamedTuple
 
 import pytest
 from decoy import Decoy
-from opentrons.protocol_engine.types import RunTimeParamValuesType
+from opentrons.protocol_engine.types import (
+    RunTimeParamValuesType,
+    RunTimeParameter,
+    NumberParameter,
+    EnumParameter,
+    EnumChoice,
+    BooleanParameter,
+)
+from opentrons.protocols.parameters.types import PrimitiveAllowedTypes
 
 from sqlalchemy.engine import Engine as SQLEngine
 
@@ -47,6 +55,7 @@ from robot_server.protocols.protocol_store import (
     ProtocolStore,
     ProtocolResource,
 )
+from robot_server.protocols.rtp_resources import PrimitiveParameterResource
 
 
 @pytest.fixture
@@ -257,7 +266,7 @@ async def test_update_adds_details_and_completes_analysis(
     }
 
 
-async def test_update_adds_rtp_values_and_defaults_to_completed_store(
+async def test_update_adds_rtp_values_to_completed_store(
     decoy: Decoy, sql_engine: SQLEngine, protocol_store: ProtocolStore
 ) -> None:
     """It should add RTP values and defaults to completed analysis store."""
@@ -298,10 +307,6 @@ async def test_update_adds_rtp_values_and_defaults_to_completed_store(
             errors=[],
             liquids=[],
         ),
-        run_time_parameter_values_and_defaults={
-            "cool_param": RunTimeParameterAnalysisData(value=2.0, default=3.0),
-            "cooler_param": RunTimeParameterAnalysisData(value="baz", default="blah"),
-        },
     )
 
     mock_completed_store = decoy.mock(cls=CompletedAnalysisStore)
@@ -322,7 +327,21 @@ async def test_update_adds_rtp_values_and_defaults_to_completed_store(
     )
     decoy.verify(
         await mock_completed_store.make_room_and_add(
-            completed_analysis_resource=expected_completed_analysis_resource
+            completed_analysis_resource=expected_completed_analysis_resource,
+            primitive_rtp_resources=[
+                PrimitiveParameterResource(
+                    analysis_id="analysis-id",
+                    parameter_variable_name="cool_param",
+                    parameter_type="int",
+                    parameter_value=2.0,
+                ),
+                PrimitiveParameterResource(
+                    analysis_id="analysis-id",
+                    parameter_variable_name="cooler_param",
+                    parameter_type="str",
+                    parameter_value="baz",
+                ),
+            ],
         )
     )
 
@@ -405,30 +424,73 @@ async def test_update_infers_status_from_errors(
     assert analysis.result == expected_result
 
 
+def mock_number_param(name: str, value: float) -> NumberParameter:
+    return NumberParameter(
+        variableName=name,
+        displayName="num param",
+        value=value,
+        default=3.0,
+        max=10,
+        min=0,
+        type="float",
+    )
+
+
+def mock_enum_param(name: str, value: str) -> EnumParameter:
+    return EnumParameter(
+        variableName=name,
+        displayName="enum param",
+        type="str",
+        value=value,
+        default="blah",
+        choices=[EnumChoice(displayName="floo", value="barr")],
+    )
+
+
+def mock_bool_param(name: str, value: bool) -> BooleanParameter:
+    return BooleanParameter(
+        variableName=name,
+        displayName="enum param",
+        type="bool",
+        value=value,
+        default=False,
+    )
+
+
 @pytest.mark.parametrize(
-    argnames=["rtp_values_from_client", "expected_match"],
+    argnames=["parameters_from_client", "expected_match"],
     argvalues=[
-        ({"cool_param": 2.0, "cooler_param": "baz", "uncool_param": 5}, True),
         (
-            {"cool_param": 2, "cooler_param": "baz"},
+            [
+                mock_number_param("cool_param", 2.0),
+                mock_enum_param("cooler_param", "baz"),
+                mock_bool_param("uncool_param", True),
+            ],
             True,
         ),
         (
-            {"cool_param": 2, "cooler_param": "buzzzzzzz"},
+            [
+                mock_number_param("cool_param", 2),
+                mock_enum_param("cooler_param", "buzzzzz"),
+                mock_bool_param("uncool_param", False),
+            ],
             False,
         ),
         (
-            {"cool_param": 2.0, "cooler_param": "baz", "weird_param": 5},
-            False,
+            [
+                mock_enum_param("cooler_param", "baz"),
+                mock_bool_param("uncool_param", True),
+                mock_number_param("cool_param", 2),
+            ],
+            True,
         ),
-        ({}, False),
     ],
 )
 async def test_matching_rtp_values_in_analysis(
     decoy: Decoy,
     sql_engine: SQLEngine,
     protocol_store: ProtocolStore,
-    rtp_values_from_client: RunTimeParamValuesType,
+    parameters_from_client: List[RunTimeParameter],
     expected_match: bool,
 ) -> None:
     """It should return whether the client's RTP values match with those in the last analysis of protocol."""
@@ -437,24 +499,20 @@ async def test_matching_rtp_values_in_analysis(
     protocol_store.insert(make_dummy_protocol_resource(protocol_id="protocol-id"))
 
     decoy.when(
-        await mock_completed_store.get_rtp_values_and_defaults_by_analysis_id(
-            "analysis-2"
-        )
+        mock_completed_store.get_primitive_rtps_by_analysis_id("analysis-2")
     ).then_return(
         {
-            "cool_param": RunTimeParameterAnalysisData(value=2.0, default=3.0),
-            "cooler_param": RunTimeParameterAnalysisData(
-                value="baz", default="very cool"
-            ),
-            "uncool_param": RunTimeParameterAnalysisData(value=5, default=5),
+            "cool_param": 2.0,
+            "cooler_param": "baz",
+            "uncool_param": True,
         }
     )
     assert (
-        await subject.matching_rtp_values_in_analysis(
-            analysis_summary=AnalysisSummary(
+        await subject.matching_primitive_rtp_values_in_analysis(
+            last_analysis_summary=AnalysisSummary(
                 id="analysis-2", status=AnalysisStatus.COMPLETED
             ),
-            new_rtp_values=rtp_values_from_client,
+            new_parameters=parameters_from_client,
         )
         == expected_match
     )
@@ -477,17 +535,17 @@ async def test_matching_default_rtp_values_in_analysis_with_no_client_rtp_values
     subject = AnalysisStore(sql_engine=sql_engine, completed_store=mock_completed_store)
     protocol_store.insert(make_dummy_protocol_resource(protocol_id="protocol-id"))
 
-    decoy.when(
-        await mock_completed_store.get_rtp_values_and_defaults_by_analysis_id(
-            "analysis-2"
-        )
-    ).then_return(params_with_only_default_values)
+    # decoy.when(
+    #     await mock_completed_store.get_rtp_values_and_defaults_by_analysis_id(
+    #         "analysis-2"
+    #     )
+    # ).then_return(params_with_only_default_values)
     assert (
-        await subject.matching_rtp_values_in_analysis(
-            analysis_summary=AnalysisSummary(
+        await subject.matching_primitive_rtp_values_in_analysis(
+            last_analysis_summary=AnalysisSummary(
                 id="analysis-2", status=AnalysisStatus.COMPLETED
             ),
-            new_rtp_values={},
+            new_parameters=[],
         )
         is True
     )
@@ -498,6 +556,6 @@ async def test_matching_default_rtp_values_in_analysis_with_pending_analysis(
 ) -> None:
     """It should raise an error if analysis is pending."""
     with pytest.raises(AnalysisIsPendingError):
-        await subject.matching_rtp_values_in_analysis(
-            AnalysisSummary(id="analysis-id", status=AnalysisStatus.PENDING), {}
+        await subject.matching_primitive_rtp_values_in_analysis(
+            AnalysisSummary(id="analysis-id", status=AnalysisStatus.PENDING), []
         )

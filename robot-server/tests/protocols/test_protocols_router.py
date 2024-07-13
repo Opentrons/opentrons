@@ -443,8 +443,8 @@ async def test_create_existing_protocol(
         analysis_store.get_summaries_by_protocol(protocol_id="the-og-proto-id")
     ).then_return([completed_analysis])
     decoy.when(
-        await analysis_store.matching_rtp_values_in_analysis(
-            analysis_summary=completed_analysis, new_rtp_values={}
+        await analysis_store.matching_primitive_rtp_values_in_analysis(
+            last_analysis_summary=completed_analysis, new_parameters=[]
         )
     ).then_return(True)
     decoy.when(protocol_store.get_all()).then_return([stored_protocol_resource])
@@ -890,7 +890,7 @@ async def test_create_existing_protocol_with_different_run_time_params(
         analysis_store.get_summaries_by_protocol(protocol_id="the-og-proto-id")
     ).then_return([completed_summary])
     decoy.when(
-        await analysis_store.matching_rtp_values_in_analysis(
+        await analysis_store.matching_primitive_rtp_values_in_analysis(
             completed_summary, {"vol": 123, "dry_run": True, "mount": "left"}
         )
     ).then_return(False)
@@ -1002,7 +1002,7 @@ async def test_create_existing_protocol_with_same_run_time_params(
         analysis_store.get_summaries_by_protocol(protocol_id="the-og-proto-id")
     ).then_return(analysis_summaries)
     decoy.when(
-        await analysis_store.matching_rtp_values_in_analysis(
+        await analysis_store.matching_primitive_rtp_values_in_analysis(
             analysis_summaries[-1], {"vol": 123, "dry_run": True, "mount": "left"}
         )
     ).then_return(True)
@@ -1107,7 +1107,7 @@ async def test_create_existing_protocol_with_pending_analysis_raises(
         analysis_store.get_summaries_by_protocol(protocol_id="the-og-proto-id")
     ).then_return(analysis_summaries)
     decoy.when(
-        await analysis_store.matching_rtp_values_in_analysis(
+        await analysis_store.matching_primitive_rtp_values_in_analysis(
             analysis_summaries[-1], {"vol": 123, "dry_run": True, "mount": "left"}
         )
     ).then_raise(AnalysisIsPendingError("a-id"))
@@ -1475,7 +1475,7 @@ async def test_create_protocol_analyses_with_same_rtp_values(
         analysis_store.get_summaries_by_protocol(protocol_id="protocol-id")
     ).then_return(analysis_summaries)
     decoy.when(
-        await analysis_store.matching_rtp_values_in_analysis(
+        await analysis_store.matching_primitive_rtp_values_in_analysis(
             analysis_summaries[-1], rtp_values
         )
     ).then_return(True)
@@ -1544,7 +1544,7 @@ async def test_update_protocol_analyses_with_new_rtp_values(
         analysis_store.get_summaries_by_protocol(protocol_id="protocol-id")
     ).then_return(analysis_summaries)
     decoy.when(
-        await analysis_store.matching_rtp_values_in_analysis(
+        await analysis_store.matching_primitive_rtp_values_in_analysis(
             analysis_summaries[-1], rtp_values
         )
     ).then_return(False)
