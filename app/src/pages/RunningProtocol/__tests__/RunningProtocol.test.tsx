@@ -37,7 +37,6 @@ import {
   useNotifyRunQuery,
   useNotifyAllCommandsQuery,
 } from '../../../resources/runs'
-import { useFeatureFlag } from '../../../redux/config'
 import {
   ErrorRecoveryFlows,
   useErrorRecoveryFlows,
@@ -148,9 +147,6 @@ describe('RunningProtocol', () => {
     vi.mocked(useLastRunCommand).mockReturnValue({
       key: 'FAKE_COMMAND_KEY',
     } as RunCommandSummary)
-    when(vi.mocked(useFeatureFlag))
-      .calledWith('enableRunNotes')
-      .thenReturn(true)
     vi.mocked(ErrorRecoveryFlows).mockReturnValue(
       <div>MOCK ERROR RECOVERY</div>
     )

@@ -10,7 +10,6 @@ export type DiscoveryCandidates = string[]
 export type DevInternalFlag =
   | 'forceHttpPolling'
   | 'protocolStats'
-  | 'enableRunNotes'
   | 'enableQuickTransfer'
   | 'protocolTimeline'
   | 'enableCsvFile'

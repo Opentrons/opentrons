@@ -116,10 +116,6 @@ export function ErrorRecoveryFlows(
     toggleERWizard,
   })
 
-  // if (!enableRunNotes) {
-  //   return null
-  // }
-
   const { protocolAnalysis } = props
   const robotType = protocolAnalysis?.robotType ?? OT2_ROBOT_TYPE
   const isOnDevice = useSelector(getIsOnDevice)
