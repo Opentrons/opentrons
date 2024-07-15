@@ -73,8 +73,7 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
   // TODO: (ew, 2023-04-21): button is not tabbable, so focus state
   // is not possible on ODD. It's testable in storybook but not in real life.
   const SettingButtonLabel = styled.label`
-    font: ${TYPOGRAPHY.bodyTextRegular};
-
+    padding: 4px;
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     border-radius: ${BORDERS.borderRadius16};
     cursor: pointer;
@@ -90,6 +89,12 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
 }
   `
 
+const DesktopLabelStyle = css`
+    font-size: ${TYPOGRAPHY.fontSize14};
+    font-weight: 400;
+    line-height: 20px;
+`
+
   return (
     <Flex width="100%">
       <SettingButton
@@ -102,11 +107,8 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
       />
       <SettingButtonLabel role="label" htmlFor={buttonLabel}>
         <LegacyStyledText
-          fontSize={isLarge ? TYPOGRAPHY.fontSize28 : TYPOGRAPHY.fontSize22}
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          lineHeight={
-            isLarge ? TYPOGRAPHY.lineHeight36 : TYPOGRAPHY.lineHeight28
-          }
+          oddStyle={isLarge? "level4HeaderRegular" : "bodyTextRegular"}
+          desktopStyle="bodyDefaultRegular"
         >
           {buttonLabel}
         </LegacyStyledText>
