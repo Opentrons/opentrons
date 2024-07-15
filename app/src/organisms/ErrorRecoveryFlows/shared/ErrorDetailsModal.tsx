@@ -45,17 +45,6 @@ type ErrorDetailsModalProps = ErrorRecoveryFlowsProps &
 
 export function ErrorDetailsModal(
   props: ErrorDetailsModalProps
-): JSX.Element | null {
-  if (props.isOnDevice) {
-    return <ErrorDetailsModalODD {...props} />
-  } else {
-    return <ErrorDetailsModalDesktop {...props} />
-  }
-}
-
-// For ODD use only.
-export function ErrorDetailsModalODD(
-  props: ErrorDetailsModalProps
 ): JSX.Element {
   const { failedCommand, toggleModal, isOnDevice } = props
   const errorKind = getErrorKind(failedCommand)
@@ -83,53 +72,6 @@ export function ErrorDetailsModalODD(
       onOutsideClick={toggleModal}
       zIndex={15}
       gridGap={SPACING.spacing32}
-    >
-      <Flex gridGap={SPACING.spacing24} flexDirection={DIRECTION_COLUMN}>
-        {getIsOverpressureErrorKind() ? (
-          <OverpressureBanner isOnDevice={isOnDevice} />
-        ) : null}
-        <Flex
-          gridGap={SPACING.spacing16}
-          backgroundColor={COLORS.grey35}
-          borderRadius={BORDERS.borderRadius8}
-          padding={`${SPACING.spacing16} ${SPACING.spacing20}`}
-        >
-          <StepInfo {...props} textStyle="label" />
-        </Flex>
-      </Flex>
-    </Modal>,
-    getTopPortalEl()
-  )
-}
-
-export function ErrorDetailsModalDesktop(
-  props: ErrorDetailsModalProps
-): JSX.Element {
-  const { failedCommand, toggleModal, isOnDevice } = props
-  const errorKind = getErrorKind(failedCommand)
-  const errorName = useErrorName(errorKind)
-
-  const getIsOverpressureErrorKind = (): boolean => {
-    switch (errorKind) {
-      case ERROR_KINDS.OVERPRESSURE_PREPARE_TO_ASPIRATE:
-      case ERROR_KINDS.OVERPRESSURE_WHILE_ASPIRATING:
-      case ERROR_KINDS.OVERPRESSURE_WHILE_DISPENSING:
-        return true
-      default:
-        return false
-    }
-  }
-
-  const modalHeader: ModalHeaderBaseProps = {
-    title: errorName,
-    hasExitIcon: true,
-  }
-
-  return createPortal(
-    <Modal
-      header={modalHeader}
-      onOutsideClick={toggleModal}
-      // gridGap={SPACING.spacing32}
     >
       <Flex gridGap={SPACING.spacing24} flexDirection={DIRECTION_COLUMN}>
         {getIsOverpressureErrorKind() ? (
