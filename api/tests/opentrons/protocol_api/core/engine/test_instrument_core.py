@@ -1,8 +1,6 @@
 """Test for the ProtocolEngine-based instrument API core."""
 from typing import cast, Optional, Union
 
-from opentrons import types
-from opentrons.protocol_engine.commands.liquid_probe import LiquidProbeResult
 from opentrons_shared_data.errors.exceptions import PipetteLiquidNotFoundError
 import pytest
 from decoy import Decoy

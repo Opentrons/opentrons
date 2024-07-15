@@ -10,7 +10,7 @@ from typing_extensions import Literal
 
 from pydantic import Field
 
-from ..types import CurrentWell, DeckPoint, WellLocation, WellOrigin
+from ..types import DeckPoint
 from .pipetting_common import (
     LiquidNotFoundError,
     LiquidNotFoundErrorInternalData,
