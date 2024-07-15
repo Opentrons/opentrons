@@ -848,7 +848,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         labware_id = well_core.labware_id
         well_name = well_core.get_name()
         well_location = WellLocation(
-            origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0)
+            origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=2)
         )
 
         self._engine_client.execute_command(
@@ -864,7 +864,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         labware_id = well_core.labware_id
         well_name = well_core.get_name()
         well_location = WellLocation(
-            origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0)
+            origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=2)
         )
 
         result = self._engine_client.execute_command_without_recovery(
