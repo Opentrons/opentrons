@@ -49,9 +49,11 @@ class NamedOffset(TypedDict):
 class GripperOffsets(TypedDict):
     pickUpOffset: NamedOffset
     dropOffset: NamedOffset
-    
+
+
 class WellState(TypedDict):
     lastMeasuredLiquidHeight: float
+
 
 class LabwareParameters(TypedDict, total=False):
     format: LabwareFormat
@@ -117,6 +119,7 @@ class WellGroup(TypedDict, total=False):
     wells: List[str]
     metadata: WellGroupMetadata
     brand: LabwareBrandData
+
 
 class _RequiredLabwareDefinition(TypedDict):
     schemaVersion: Literal[2]

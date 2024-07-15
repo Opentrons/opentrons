@@ -350,7 +350,7 @@ class NoLiquidHeightDataError(ProtocolEngineError):
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a NoLiquidHeightDataError."""
-        super().__init__(ErrorCodes.NO_LIQUID_HEIGHT_DATA, message, details, wrapping)
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
 class PipetteNotLoadedError(ProtocolEngineError):
