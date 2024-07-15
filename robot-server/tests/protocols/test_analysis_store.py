@@ -8,14 +8,12 @@ from typing import List, NamedTuple
 import pytest
 from decoy import Decoy
 from opentrons.protocol_engine.types import (
-    RunTimeParamValuesType,
     RunTimeParameter,
     NumberParameter,
     EnumParameter,
     EnumChoice,
     BooleanParameter,
 )
-from opentrons.protocols.parameters.types import PrimitiveAllowedTypes
 
 from sqlalchemy.engine import Engine as SQLEngine
 
@@ -39,7 +37,6 @@ from robot_server.protocols.analysis_models import (
     AnalysisSummary,
     PendingAnalysis,
     CompletedAnalysis,
-    RunTimeParameterAnalysisData,
 )
 from robot_server.protocols.analysis_store import (
     AnalysisStore,
@@ -98,6 +95,42 @@ def make_dummy_protocol_resource(protocol_id: str) -> ProtocolResource:
     )
 
 
+def mock_number_param(name: str, value: float) -> NumberParameter:
+    """Return a NumberParameter."""
+    return NumberParameter(
+        variableName=name,
+        displayName="num param",
+        value=value,
+        default=3.0,
+        max=10,
+        min=0,
+        type="float",
+    )
+
+
+def mock_enum_param(name: str, value: str) -> EnumParameter:
+    """Return a EnumParameter."""
+    return EnumParameter(
+        variableName=name,
+        displayName="enum param",
+        type="str",
+        value=value,
+        default="blah",
+        choices=[EnumChoice(displayName="floo", value="barr")],
+    )
+
+
+def mock_bool_param(name: str, value: bool) -> BooleanParameter:
+    """Return a BooleanParameter."""
+    return BooleanParameter(
+        variableName=name,
+        displayName="enum param",
+        type="bool",
+        value=value,
+        default=False,
+    )
+
+
 async def test_get_empty(subject: AnalysisStore, protocol_store: ProtocolStore) -> None:
     """It should return an empty list if no analysis saved."""
     protocol_store.insert(make_dummy_protocol_resource("protocol-id"))
@@ -124,11 +157,10 @@ async def test_add_pending(
         status=AnalysisStatus.PENDING,
     )
 
-    result = subject.add_pending(protocol_id="protocol-id", analysis_id="analysis-id")
-    assert result == expected_analysis
+    subject.add_pending(
+        protocol_id="protocol-id", analysis_id="analysis-id", run_time_parameters=[]
+    )
 
-    analysis_result = await subject.get("analysis-id")
-    assert analysis_result == expected_analysis
     assert await subject.get_by_protocol("protocol-id") == [expected_analysis]
     assert subject.get_summaries_by_protocol("protocol-id") == [expected_summary]
     with pytest.raises(AnalysisNotFoundError, match="analysis-id"):
@@ -143,7 +175,9 @@ async def test_returned_in_order_added(
     protocol_store.insert(make_dummy_protocol_resource(protocol_id="protocol-id"))
 
     for analysis_id in ["analysis-id-1", "analysis-id-2", "analysis-id-3"]:
-        subject.add_pending(protocol_id="protocol-id", analysis_id=analysis_id)
+        subject.add_pending(
+            protocol_id="protocol-id", analysis_id=analysis_id, run_time_parameters=[]
+        )
         await subject.update(
             analysis_id=analysis_id,
             robot_type="OT-2 Standard",
@@ -156,7 +190,9 @@ async def test_returned_in_order_added(
             liquids=[],
         )
 
-    subject.add_pending(protocol_id="protocol-id", analysis_id="analysis-id-4")
+    subject.add_pending(
+        protocol_id="protocol-id", analysis_id="analysis-id-4", run_time_parameters=[]
+    )
     # Leave as pending, to test that we interleave completed & pending analyses
     # in the correct order.
 
@@ -200,7 +236,9 @@ async def test_update_adds_details_and_completes_analysis(
         value=2.0,
         default=3.0,
     )
-    subject.add_pending(protocol_id="protocol-id", analysis_id="analysis-id")
+    subject.add_pending(
+        protocol_id="protocol-id", analysis_id="analysis-id", run_time_parameters=[]
+    )
     await subject.update(
         analysis_id="analysis-id",
         robot_type="OT-2 Standard",
@@ -313,7 +351,9 @@ async def test_update_adds_rtp_values_to_completed_store(
     subject = AnalysisStore(sql_engine=sql_engine, completed_store=mock_completed_store)
     protocol_store.insert(make_dummy_protocol_resource(protocol_id="protocol-id"))
 
-    subject.add_pending(protocol_id="protocol-id", analysis_id="analysis-id")
+    subject.add_pending(
+        protocol_id="protocol-id", analysis_id="analysis-id", run_time_parameters=[]
+    )
     await subject.update(
         analysis_id="analysis-id",
         robot_type="OT-2 Standard",
@@ -407,7 +447,9 @@ async def test_update_infers_status_from_errors(
 ) -> None:
     """It should decide the analysis result based on whether there are errors."""
     protocol_store.insert(make_dummy_protocol_resource(protocol_id="protocol-id"))
-    subject.add_pending(protocol_id="protocol-id", analysis_id="analysis-id")
+    subject.add_pending(
+        protocol_id="protocol-id", analysis_id="analysis-id", run_time_parameters=[]
+    )
     await subject.update(
         analysis_id="analysis-id",
         robot_type="OT-2 Standard",
@@ -424,36 +466,50 @@ async def test_update_infers_status_from_errors(
     assert analysis.result == expected_result
 
 
-def mock_number_param(name: str, value: float) -> NumberParameter:
-    return NumberParameter(
-        variableName=name,
-        displayName="num param",
-        value=value,
-        default=3.0,
-        max=10,
-        min=0,
-        type="float",
+async def test_save_initialization_failed_analysis(
+    decoy: Decoy, sql_engine: SQLEngine, protocol_store: ProtocolStore
+) -> None:
+    """It should save the analysis that failed during analyzer initialization."""
+    error_occurence = pe_errors.ErrorOccurrence(
+        id="error-id",
+        createdAt=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        errorType="BadError",
+        detail="oh no",
+    )
+    expected_completed_analysis_resource = CompletedAnalysisResource(
+        id="analysis-id",
+        protocol_id="protocol-id",
+        analyzer_version=_CURRENT_ANALYZER_VERSION,
+        completed_analysis=CompletedAnalysis(
+            id="analysis-id",
+            status=AnalysisStatus.COMPLETED,
+            result=AnalysisResult.NOT_OK,
+            robotType="OT-2 Standard",
+            runTimeParameters=[],
+            labware=[],
+            pipettes=[],
+            modules=[],
+            commands=[],
+            errors=[error_occurence],
+            liquids=[],
+        ),
     )
 
+    mock_completed_store = decoy.mock(cls=CompletedAnalysisStore)
+    subject = AnalysisStore(sql_engine=sql_engine, completed_store=mock_completed_store)
+    protocol_store.insert(make_dummy_protocol_resource(protocol_id="protocol-id"))
 
-def mock_enum_param(name: str, value: str) -> EnumParameter:
-    return EnumParameter(
-        variableName=name,
-        displayName="enum param",
-        type="str",
-        value=value,
-        default="blah",
-        choices=[EnumChoice(displayName="floo", value="barr")],
+    await subject.save_initialization_failed_analysis(
+        protocol_id="protocol-id",
+        analysis_id="analysis-id",
+        robot_type="OT-2 Standard",
+        errors=[error_occurence],
     )
-
-
-def mock_bool_param(name: str, value: bool) -> BooleanParameter:
-    return BooleanParameter(
-        variableName=name,
-        displayName="enum param",
-        type="bool",
-        value=value,
-        default=False,
+    decoy.verify(
+        await mock_completed_store.make_room_and_add(
+            completed_analysis_resource=expected_completed_analysis_resource,
+            primitive_rtp_resources=[],
+        )
     )
 
 
@@ -508,7 +564,7 @@ async def test_matching_rtp_values_in_analysis(
         }
     )
     assert (
-        await subject.matching_primitive_rtp_values_in_analysis(
+        await subject.matching_rtp_values_in_analysis(
             last_analysis_summary=AnalysisSummary(
                 id="analysis-2", status=AnalysisStatus.COMPLETED
             ),
@@ -518,44 +574,11 @@ async def test_matching_rtp_values_in_analysis(
     )
 
 
-async def test_matching_default_rtp_values_in_analysis_with_no_client_rtp_values(
-    decoy: Decoy,
-    sql_engine: SQLEngine,
-    protocol_store: ProtocolStore,
-) -> None:
-    """It should return a match when client sends no RTP values and last analysis used all default values."""
-    params_with_only_default_values = {
-        "cool_param": RunTimeParameterAnalysisData(value=2.0, default=2.0),
-        "cooler_param": RunTimeParameterAnalysisData(
-            value="very cool", default="very cool"
-        ),
-        "uncool_param": RunTimeParameterAnalysisData(value=True, default=True),
-    }
-    mock_completed_store = decoy.mock(cls=CompletedAnalysisStore)
-    subject = AnalysisStore(sql_engine=sql_engine, completed_store=mock_completed_store)
-    protocol_store.insert(make_dummy_protocol_resource(protocol_id="protocol-id"))
-
-    # decoy.when(
-    #     await mock_completed_store.get_rtp_values_and_defaults_by_analysis_id(
-    #         "analysis-2"
-    #     )
-    # ).then_return(params_with_only_default_values)
-    assert (
-        await subject.matching_primitive_rtp_values_in_analysis(
-            last_analysis_summary=AnalysisSummary(
-                id="analysis-2", status=AnalysisStatus.COMPLETED
-            ),
-            new_parameters=[],
-        )
-        is True
-    )
-
-
 async def test_matching_default_rtp_values_in_analysis_with_pending_analysis(
     subject: AnalysisStore, protocol_store: ProtocolStore
 ) -> None:
     """It should raise an error if analysis is pending."""
     with pytest.raises(AnalysisIsPendingError):
-        await subject.matching_primitive_rtp_values_in_analysis(
+        await subject.matching_rtp_values_in_analysis(
             AnalysisSummary(id="analysis-id", status=AnalysisStatus.PENDING), []
         )

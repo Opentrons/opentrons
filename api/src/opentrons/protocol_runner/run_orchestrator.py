@@ -31,7 +31,7 @@ from ..protocol_engine.types import (
     LabwareOffset,
     DeckConfigurationType,
     RunTimeParameter,
-    RunTimeParamValuesType,
+    PrimitiveRunTimeParamValuesType,
 )
 from ..protocol_reader import JsonProtocolConfig, PythonProtocolConfig, ProtocolSource
 from ..protocols.parse import PythonParseMode
@@ -168,7 +168,7 @@ class RunOrchestrator:
         self,
         deck_configuration: DeckConfigurationType,
         protocol_source: Optional[ProtocolSource] = None,
-        run_time_param_values: Optional[RunTimeParamValuesType] = None,
+        run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
     ) -> RunResult:
         """Start the run."""
         if self._protocol_runner:
@@ -323,7 +323,7 @@ class RunOrchestrator:
     async def load(
         self,
         protocol_source: ProtocolSource,
-        run_time_param_values: Optional[RunTimeParamValuesType],
+        run_time_param_values: Optional[PrimitiveRunTimeParamValuesType],
         parse_mode: ParseMode,
     ) -> None:
         """Load a json/python protocol."""

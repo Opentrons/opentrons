@@ -10,7 +10,7 @@ from opentrons.protocol_api import ProtocolContext, ParameterContext
 from opentrons.protocol_api._parameters import Parameters
 from opentrons.protocols.execution.errors import ExceptionInProtocolError
 from opentrons.protocols.types import PythonProtocol, MalformedPythonProtocolError
-from opentrons.protocol_engine.types import RunTimeParamValuesType
+from opentrons.protocol_engine.types import PrimitiveRunTimeParamValuesType
 
 
 from opentrons_shared_data.errors.exceptions import ExecutionCancelledError
@@ -67,7 +67,7 @@ def _raise_pretty_protocol_error(exception: Exception, filename: str) -> None:
 
 def _parse_and_set_parameters(
     parameter_context: ParameterContext,
-    run_time_param_overrides: Optional[RunTimeParamValuesType],
+    run_time_param_overrides: Optional[PrimitiveRunTimeParamValuesType],
     new_globs: Dict[Any, Any],
     filename: str,
 ) -> Parameters:
@@ -104,7 +104,7 @@ def _get_filename(
 def exec_add_parameters(
     protocol: PythonProtocol,
     parameter_context: ParameterContext,
-    run_time_param_overrides: Optional[RunTimeParamValuesType],
+    run_time_param_overrides: Optional[PrimitiveRunTimeParamValuesType],
 ) -> Optional[Parameters]:
     """Exec the add_parameters function and get the final run time parameters with overrides."""
     new_globs: Dict[Any, Any] = {}

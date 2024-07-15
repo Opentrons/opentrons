@@ -15,7 +15,7 @@ from opentrons.protocols.parameters.types import (
 from opentrons.protocols.parameters.exceptions import ParameterDefinitionError
 from opentrons.protocol_engine.types import (
     RunTimeParameter,
-    RunTimeParamValuesType,
+    PrimitiveRunTimeParamValuesType,
 )
 
 from ._parameters import Parameters
@@ -185,7 +185,7 @@ class ParameterContext:
         )
         self._parameters[parameter.variable_name] = parameter
 
-    def set_parameters(self, parameter_overrides: RunTimeParamValuesType) -> None:
+    def set_parameters(self, parameter_overrides: PrimitiveRunTimeParamValuesType) -> None:
         """Sets parameters to values given by client, validating them as well.
 
         :meta private:

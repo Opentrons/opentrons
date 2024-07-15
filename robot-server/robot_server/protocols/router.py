@@ -7,7 +7,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import List, Optional, Union, Tuple
 
-from opentrons.protocol_engine.types import RunTimeParamValuesType
+from opentrons.protocol_engine.types import PrimitiveRunTimeParamValuesType
 from opentrons_shared_data.robot import user_facing_robot_type
 from opentrons.util.performance_helpers import TrackingFunctions
 from typing_extensions import Literal
@@ -45,12 +45,17 @@ from robot_server.service.json_api import (
     PydanticResponse,
     RequestModel,
 )
-from .analyses_manager import AnalysesManager
+from .analyses_manager import AnalysesManager, FailedToInitializeAnalyzer
 
 from .protocol_auto_deleter import ProtocolAutoDeleter
 from .protocol_models import Protocol, ProtocolFile, Metadata, ProtocolKind
 from .analysis_store import AnalysisStore, AnalysisNotFoundError, AnalysisIsPendingError
-from .analysis_models import ProtocolAnalysis, AnalysisRequest, AnalysisSummary
+from .analysis_models import (
+    ProtocolAnalysis,
+    AnalysisRequest,
+    AnalysisSummary,
+    AnalysisStatus,
+)
 from .protocol_store import (
     ProtocolStore,
     ProtocolResource,
@@ -301,8 +306,11 @@ async def create_protocol(  # noqa: C901
                 analysis_summaries, _ = await _start_new_analysis_if_necessary(
                     protocol_id=cached_protocol_id,
                     analysis_id=analysis_id,
+                    force_analyze=False,
                     rtp_values=parsed_rtp,
-                    force_reanalyze=False,
+                    protocol_resource=protocol_store.get(
+                        protocol_id=cached_protocol_id
+                    ),
                     protocol_store=protocol_store,
                     analysis_store=analysis_store,
                     analyses_manager=analyses_manager,
@@ -374,10 +382,15 @@ async def create_protocol(  # noqa: C901
     protocol_deleter.make_room_for_new_protocol()
     protocol_store.insert(protocol_resource)
 
-    new_analysis_summary = await analyses_manager.start_analysis(
+    analysis_summaries, _ = await _start_new_analysis_if_necessary(
+        protocol_id=protocol_id,
         analysis_id=analysis_id,
+        force_analyze=True,
+        rtp_values=parsed_rtp,
         protocol_resource=protocol_resource,
-        run_time_param_values=parsed_rtp,
+        protocol_store=protocol_store,
+        analysis_store=analysis_store,
+        analyses_manager=analyses_manager,
     )
 
     data = Protocol(
@@ -387,7 +400,7 @@ async def create_protocol(  # noqa: C901
         protocolType=source.config.protocol_type,
         robotType=source.robot_type,
         metadata=Metadata.parse_obj(source.metadata),
-        analysisSummaries=[new_analysis_summary],
+        analysisSummaries=analysis_summaries,
         key=key,
         files=[ProtocolFile(name=f.path.name, role=f.role) for f in source.files],
     )
@@ -403,8 +416,9 @@ async def create_protocol(  # noqa: C901
 async def _start_new_analysis_if_necessary(
     protocol_id: str,
     analysis_id: str,
-    force_reanalyze: bool,
-    rtp_values: RunTimeParamValuesType,
+    force_analyze: bool,
+    rtp_values: PrimitiveRunTimeParamValuesType,
+    protocol_resource: ProtocolResource,
     protocol_store: ProtocolStore,
     analysis_store: AnalysisStore,
     analyses_manager: AnalysesManager,
@@ -414,30 +428,44 @@ async def _start_new_analysis_if_necessary(
     Returns a tuple of the latest list of analysis summaries (including any newly
     started analysis) and whether a new analysis was started.
     """
-    resource = protocol_store.get(protocol_id=protocol_id)
     analyses = analysis_store.get_summaries_by_protocol(protocol_id=protocol_id)
     started_new_analysis = False
-    if (
-        force_reanalyze
-        or
-        # Unexpected situations, like powering off the robot after a protocol upload
-        # but before the analysis is complete, can leave the protocol resource
-        # without an associated analysis.
-        len(analyses) == 0
-        or
-        # The most recent analysis was done using different RTP values
-        not await analysis_store.matching_primitive_rtp_values_in_analysis(
-            last_analysis_summary=analyses[-1], new_parameters=[]
+
+    try:
+        analyzer = await analyses_manager.initialize_analyzer(
+            analysis_id=analysis_id,
+            protocol_resource=protocol_resource,
+            run_time_param_values=rtp_values,
         )
-    ):
-        started_new_analysis = True
+    except FailedToInitializeAnalyzer:
         analyses.append(
-            await analyses_manager.start_analysis(
-                analysis_id=analysis_id,
-                protocol_resource=resource,
-                run_time_param_values=rtp_values,
+            AnalysisSummary(
+                id=analysis_id,
+                status=AnalysisStatus.COMPLETED,
             )
         )
+    else:
+        if (
+            force_analyze
+            or
+            # Unexpected situations, like powering off the robot after a protocol upload
+            # but before the analysis is complete, can leave the protocol resource
+            # without an associated analysis.
+            len(analyses) == 0
+            or
+            # The most recent analysis was done using different RTP values
+            not await analysis_store.matching_rtp_values_in_analysis(
+                last_analysis_summary=analyses[-1],
+                new_parameters=analyzer.get_verified_run_time_parameters(),
+            )
+        ):
+            started_new_analysis = True
+            analyses.append(
+                await analyses_manager.start_analysis(
+                    analysis_id=analysis_id,
+                    analyzer=analyzer,
+                )
+            )
 
     return analyses, started_new_analysis
 
@@ -669,8 +697,9 @@ async def create_protocol_analysis(
         ) = await _start_new_analysis_if_necessary(
             protocol_id=protocolId,
             analysis_id=analysis_id,
+            force_analyze=request_body.data.forceReAnalyze if request_body else False,
             rtp_values=request_body.data.runTimeParameterValues if request_body else {},
-            force_reanalyze=request_body.data.forceReAnalyze if request_body else False,
+            protocol_resource=protocol_store.get(protocol_id=protocolId),
             protocol_store=protocol_store,
             analysis_store=analysis_store,
             analyses_manager=analyses_manager,

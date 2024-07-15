@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import asyncio
-import json
 from typing import Dict, List, Optional
 from logging import getLogger
 from dataclasses import dataclass
@@ -10,7 +9,6 @@ from dataclasses import dataclass
 import sqlalchemy
 import anyio
 from opentrons.protocols.parameters.types import PrimitiveAllowedTypes
-from pydantic import parse_raw_as
 
 from robot_server.persistence.database import sqlite_rowid
 from robot_server.persistence.tables import (
@@ -19,7 +17,7 @@ from robot_server.persistence.tables import (
 )
 from robot_server.persistence.pydantic import json_to_pydantic, pydantic_to_json
 
-from .analysis_models import CompletedAnalysis, RunTimeParameterAnalysisData
+from .analysis_models import CompletedAnalysis
 from .analysis_memcache import MemoryCache
 from .rtp_resources import PrimitiveParameterResource
 

@@ -41,7 +41,7 @@ from opentrons.protocol_engine.create_protocol_engine import create_protocol_eng
 from robot_server.protocols.protocol_store import ProtocolResource
 from opentrons.protocol_engine.types import (
     DeckConfigurationType,
-    RunTimeParamValuesType,
+    PrimitiveRunTimeParamValuesType,
     EngineStatus,
 )
 from opentrons_shared_data.labware.dev_types import LabwareUri
@@ -186,7 +186,7 @@ class RunOrchestratorStore:
         deck_configuration: DeckConfigurationType,
         notify_publishers: Callable[[], None],
         protocol: Optional[ProtocolResource],
-        run_time_param_values: Optional[RunTimeParamValuesType] = None,
+        run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
     ) -> StateSummary:
         """Create and store a ProtocolRunner and ProtocolEngine for a given Run.
 

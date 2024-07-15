@@ -10,7 +10,6 @@ from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons_shared_data.errors import ErrorCodes
 from opentrons.protocol_engine.types import (
     RunTimeParameter,
-    RunTimeParamValuesType,
     CSVParameter,
 )
 from opentrons.protocol_engine import (
@@ -30,8 +29,6 @@ from .analysis_models import (
     CompletedAnalysis,
     AnalysisResult,
     AnalysisStatus,
-    RunTimeParameterAnalysisData,
-    AnalysisParameterType,
 )
 
 from .completed_analysis_store import CompletedAnalysisStore, CompletedAnalysisResource
@@ -124,7 +121,8 @@ class AnalysisStore:
         self,
         protocol_id: str,
         analysis_id: str,
-    ) -> PendingAnalysis:
+        run_time_parameters: Optional[List[RunTimeParameter]],
+    ) -> None:
         """Add a new pending analysis to the store.
 
         Args:
@@ -137,9 +135,10 @@ class AnalysisStore:
         Returns:
             A summary of the just-added analysis.
         """
-        return self._pending_store.add(
+        self._pending_store.add(
             protocol_id=protocol_id,
             analysis_id=analysis_id,
+            run_time_parameters=run_time_parameters or [],
         )
 
     async def update(
@@ -219,6 +218,38 @@ class AnalysisStore:
 
         self._pending_store.remove(analysis_id=analysis_id)
 
+    async def save_initialization_failed_analysis(
+        self,
+        protocol_id: str,
+        analysis_id: str,
+        robot_type: RobotType,
+        errors: List[ErrorOccurrence],
+    ) -> None:
+        """Commit the failed analysis to store."""
+        completed_analysis = CompletedAnalysis.construct(
+            id=analysis_id,
+            result=AnalysisResult.NOT_OK,
+            robotType=robot_type,
+            status=AnalysisStatus.COMPLETED,
+            runTimeParameters=[],
+            commands=[],
+            labware=[],
+            modules=[],
+            pipettes=[],
+            errors=errors,
+            liquids=[],
+        )
+        completed_analysis_resource = CompletedAnalysisResource(
+            id=completed_analysis.id,
+            protocol_id=protocol_id,
+            analyzer_version=_CURRENT_ANALYZER_VERSION,
+            completed_analysis=completed_analysis,
+        )
+        await self._completed_store.make_room_and_add(
+            completed_analysis_resource=completed_analysis_resource,
+            primitive_rtp_resources=[],
+        )
+
     async def get(self, analysis_id: str) -> ProtocolAnalysis:
         """Get a single protocol analysis by its ID.
 
@@ -260,9 +291,6 @@ class AnalysisStore:
         completed_analysis_ids = self._completed_store.get_ids_by_protocol(
             protocol_id=protocol_id
         )
-        # TODO (spp, 2024-06-05): populate runTimeParameters in the completed analysis summaries once
-        #  we start saving RTPs to their own table. Currently, fetching RTPs from a
-        #  completed analysis requires de-serializing the full analysis resource.
         completed_analysis_summaries = [
             AnalysisSummary.construct(id=analysis_id, status=AnalysisStatus.COMPLETED)
             for analysis_id in completed_analysis_ids
@@ -310,7 +338,7 @@ class AnalysisStore:
             if not isinstance(param, CSVParameter)
         ]
 
-    async def matching_primitive_rtp_values_in_analysis(
+    async def matching_rtp_values_in_analysis(
         self,
         last_analysis_summary: AnalysisSummary,
         new_parameters: List[RunTimeParameter],
@@ -375,7 +403,8 @@ class _PendingAnalysisStore:
         self,
         protocol_id: str,
         analysis_id: str,
-    ) -> PendingAnalysis:
+        run_time_parameters: List[RunTimeParameter],
+    ) -> None:
         """Add a new pending analysis and associate it with the given protocol."""
         assert (
             protocol_id not in self._analysis_ids_by_protocol_id
@@ -383,13 +412,12 @@ class _PendingAnalysisStore:
 
         new_pending_analysis = PendingAnalysis.construct(
             id=analysis_id,
+            runTimeParameters=run_time_parameters,
         )
 
         self._analyses_by_id[analysis_id] = new_pending_analysis
         self._analysis_ids_by_protocol_id[protocol_id] = analysis_id
         self._protocol_ids_by_analysis_id[analysis_id] = protocol_id
-
-        return new_pending_analysis
 
     def remove(self, analysis_id: str) -> None:
         """Remove the pending analysis with the given ID.
