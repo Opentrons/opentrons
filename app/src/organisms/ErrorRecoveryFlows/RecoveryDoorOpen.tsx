@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -6,10 +7,12 @@ import {
   DIRECTION_COLUMN,
   Flex,
   Icon,
-  LegacyStyledText,
+  StyledText,
   SPACING,
   ALIGN_CENTER,
   JUSTIFY_END,
+  RESPONSIVENESS,
+  TEXT_ALIGN_CENTER,
 } from '@opentrons/components'
 import { RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR } from '@opentrons/api-client'
 
@@ -17,6 +20,7 @@ import { RecoveryContentWrapper, RecoveryFooterButtons } from './shared'
 
 import type { RecoveryContentProps } from './types'
 
+// TODO(jh, 07-16-24): Revisit making RecoveryDoorOpen a route to avoid the zIndex offset.
 export function RecoveryDoorOpen({
   recoveryActionMutationUtils,
   runStatus,
@@ -38,23 +42,23 @@ export function RecoveryDoorOpen({
         flex="1"
       >
         <Icon
+          css={ICON_STYLE}
           name="alert-circle"
-          size={SPACING.spacing60}
-          color={COLORS.yellow50}
           data-testid="recovery_door_alert_icon"
         />
-        <Flex
-          gridGap={SPACING.spacing4}
-          flexDirection={DIRECTION_COLUMN}
-          alignItems={ALIGN_CENTER}
-          textAlign={ALIGN_CENTER}
-        >
-          <LegacyStyledText as="h3Bold">
+        <Flex css={TEXT_STYLE}>
+          <StyledText
+            desktopStyle="headingSmallBold"
+            oddStyle="level3HeaderBold"
+          >
             {t('robot_door_is_open')}
-          </LegacyStyledText>
-          <LegacyStyledText as="h4">
+          </StyledText>
+          <StyledText
+            desktopStyle="bodyDefaultRegular"
+            oddStyle="level4HeaderRegular"
+          >
             {t('close_the_robot_door')}
-          </LegacyStyledText>
+          </StyledText>
         </Flex>
       </Flex>
       <Flex justifyContent={JUSTIFY_END}>
@@ -70,3 +74,25 @@ export function RecoveryDoorOpen({
     </RecoveryContentWrapper>
   )
 }
+
+const TEXT_STYLE = css`
+  flex-direction: ${DIRECTION_COLUMN};
+  grid-gap: ${SPACING.spacing8};
+  align-items: ${ALIGN_CENTER};
+  text-align: ${TEXT_ALIGN_CENTER};
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    grid-gap: ${SPACING.spacing4};
+  }
+`
+
+const ICON_STYLE = css`
+  height: ${SPACING.spacing40};
+  width: ${SPACING.spacing40};
+  color: ${COLORS.yellow50};
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    height: ${SPACING.spacing60};
+    width: ${SPACING.spacing60};
+  }
+`

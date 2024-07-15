@@ -5,7 +5,7 @@ import { css } from 'styled-components'
 import { Flex, RESPONSIVENESS, SPACING } from '@opentrons/components'
 
 import { InterventionModal } from '../../../molecules/InterventionModal'
-import { getModalPortalEl } from '../../../App/portal'
+import { getTopPortalEl } from '../../../App/portal'
 
 import type { ModalType } from '../../../molecules/InterventionModal'
 
@@ -41,7 +41,7 @@ export function RecoveryInterventionModal({
         {children}
       </Flex>
     </InterventionModal>,
-    getModalPortalEl()
+    getTopPortalEl()
   )
 }
 

@@ -99,9 +99,20 @@ export function ErrorRecoveryComponent(
     </LegacyStyledText>
   )
 
+  // TODO(jh, 07-16-24): Revisit making RecoveryDoorOpen a route.
+  const buildInterventionContent = (): JSX.Element => {
+    if (isDoorOpen) {
+      return <RecoveryDoorOpen {...props} />
+    } else {
+      return <ErrorRecoveryContent {...props} />
+    }
+  }
+
   const isLargeDesktopStyle =
+    !isDoorOpen &&
     route === RECOVERY_MAP.DROP_TIP_FLOWS.ROUTE &&
     step !== RECOVERY_MAP.DROP_TIP_FLOWS.STEPS.BEGIN_REMOVAL
+
   return (
     <RecoveryInterventionModal
       iconHeading={buildIconHeading()}
@@ -113,11 +124,7 @@ export function ErrorRecoveryComponent(
       {showModal ? (
         <ErrorDetailsModal {...props} toggleModal={toggleModal} />
       ) : null}
-      {isDoorOpen ? (
-        <RecoveryDoorOpen {...props} />
-      ) : (
-        <ErrorRecoveryContent {...props} />
-      )}
+      {buildInterventionContent()}
     </RecoveryInterventionModal>
   )
 }

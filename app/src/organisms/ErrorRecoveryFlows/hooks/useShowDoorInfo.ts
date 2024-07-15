@@ -23,16 +23,13 @@ export function useShowDoorInfo({
   React.useEffect(() => {
     if (runStatus === RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR) {
       setShowDoorInfo(true)
-    }
-    // Render the splash page if the "door status" was shown and the user hasn't begun recovery.
-    else if (
-      runStatus !== RUN_STATUS_AWAITING_RECOVERY_PAUSED &&
-      showERWizard &&
-      !hasLaunchedRecovery
+    } else if (
+      showDoorInfo &&
+      runStatus !== RUN_STATUS_AWAITING_RECOVERY_PAUSED
     ) {
       setShowDoorInfo(false)
     }
-  }, [hasLaunchedRecovery, runStatus, showERWizard])
+  }, [hasLaunchedRecovery, runStatus, showDoorInfo, showERWizard])
 
   return showDoorInfo
 }

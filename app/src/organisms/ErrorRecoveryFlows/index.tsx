@@ -122,8 +122,6 @@ export function ErrorRecoveryFlows(
     showERWizard,
     hasLaunchedRecovery,
   })
-  console.log('=>(index.tsx:121) isDoorOpen', isDoorOpen)
-  console.log('=>(useIsDoorOpen.ts:24) runStatus', runStatus)
 
   const recoveryUtils = useERUtils({
     ...props,
