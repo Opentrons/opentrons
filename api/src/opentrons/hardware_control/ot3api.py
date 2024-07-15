@@ -1808,7 +1808,7 @@ class OT3API(
         realmount = OT3Mount.from_mount(mount)
         instrument = self._pipette_handler.get_pipette(realmount)
 
-        self._move_to_plunger_bottom(realmount, rate=1.0)
+        await self._move_to_plunger_bottom(realmount, rate=1.0)
 
         if (
             self.gantry_load == GantryLoad.HIGH_THROUGHPUT
