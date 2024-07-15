@@ -11,5 +11,5 @@ export interface RouteProps {
   /** the path for navigation linking, for example to push to a default tab
    */
   path: string
-  navLinkTo?: string
+  navLinkTo: string
 }
