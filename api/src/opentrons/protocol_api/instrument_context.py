@@ -2067,9 +2067,7 @@ class InstrumentContext(publisher.CommandPublisher):
             self._core.liquid_probe_without_recovery(well._core, loc)
         except ProtocolCommandFailedError as e:
             # if we handle the error, we change the protocl state from error to valid
-            if isinstance(e.original_error, LiquidNotFoundError) or isinstance(
-                e.original_error, StallOrCollisionDetectedError
-            ):
+            if isinstance(e.original_error, LiquidNotFoundError):
                 return False
             raise e
         else:
