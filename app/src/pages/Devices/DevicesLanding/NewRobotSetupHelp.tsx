@@ -16,8 +16,7 @@ import { getTopPortalEl } from '../../../App/portal'
 import { LegacyModal } from '../../../molecules/LegacyModal'
 import { ExternalLink } from '../../../atoms/Link/ExternalLink'
 
-const NEW_ROBOT_SETUP_SUPPORT_ARTICLE_HREF =
-  'https://support.opentrons.com/s/ot2-get-started'
+const NEW_ROBOT_SETUP_SUPPORT_ARTICLE_HREF = 'https://support.opentrons.com/s/'
 
 export function NewRobotSetupHelp(): JSX.Element {
   const { t } = useTranslation(['devices_landing', 'shared'])

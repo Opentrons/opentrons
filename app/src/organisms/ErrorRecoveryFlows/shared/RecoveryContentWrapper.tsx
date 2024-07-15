@@ -25,7 +25,6 @@ export function RecoveryContentWrapper({
 }: SingleColumnContentWrapperProps): JSX.Element {
   return (
     <Flex
-      padding={SPACING.spacing32}
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       css={STYLE}
@@ -37,10 +36,10 @@ export function RecoveryContentWrapper({
 }
 
 const STYLE = css`
-  padding: ${SPACING.spacing32};
   gap: ${SPACING.spacing24};
+  width: 100%;
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     gap: none;
-    height: 29.25rem;
+    height: 100%;
   }
 `

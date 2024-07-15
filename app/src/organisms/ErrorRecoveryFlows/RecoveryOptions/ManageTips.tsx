@@ -48,7 +48,6 @@ export function ManageTips(props: RecoveryContentProps): JSX.Element {
 type RemovalOptions = 'begin-removal' | 'skip'
 
 export function BeginRemoval({
-  isOnDevice,
   tipStatusUtils,
   routeUpdateActions,
   recoveryCommands,
@@ -87,39 +86,32 @@ export function BeginRemoval({
     }
   }
 
-  if (isOnDevice) {
-    return (
-      <RecoveryContentWrapper>
-        <LegacyStyledText css={ODD_SECTION_TITLE_STYLE} as="h4SemiBold">
-          {t('you_may_want_to_remove', { mount })}
-        </LegacyStyledText>
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-          <RadioButton
-            buttonLabel={t('begin_removal')}
-            buttonValue={t('begin_removal')}
-            onChange={() => {
-              setSelected('begin-removal')
-            }}
-            isSelected={selected === 'begin-removal'}
-          />
-          <RadioButton
-            buttonLabel={t('skip')}
-            buttonValue={t('skip')}
-            onChange={() => {
-              setSelected('skip')
-            }}
-            isSelected={selected === 'skip'}
-          />
-        </Flex>
-        <RecoveryFooterButtons
-          isOnDevice={isOnDevice}
-          primaryBtnOnClick={primaryOnClick}
+  return (
+    <RecoveryContentWrapper>
+      <LegacyStyledText css={ODD_SECTION_TITLE_STYLE} as="h4SemiBold">
+        {t('you_may_want_to_remove', { mount })}
+      </LegacyStyledText>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+        <RadioButton
+          buttonLabel={t('begin_removal')}
+          buttonValue={t('begin_removal')}
+          onChange={() => {
+            setSelected('begin-removal')
+          }}
+          isSelected={selected === 'begin-removal'}
         />
-      </RecoveryContentWrapper>
-    )
-  } else {
-    return null
-  }
+        <RadioButton
+          buttonLabel={t('skip')}
+          buttonValue={t('skip')}
+          onChange={() => {
+            setSelected('skip')
+          }}
+          isSelected={selected === 'skip'}
+        />
+      </Flex>
+      <RecoveryFooterButtons primaryBtnOnClick={primaryOnClick} />
+    </RecoveryContentWrapper>
+  )
 }
 
 function DropTipFlowsContainer(
@@ -131,7 +123,6 @@ function DropTipFlowsContainer(
     recoveryCommands,
     isFlex,
     currentRecoveryOptionUtils,
-    isOnDevice,
   } = props
   const { DROP_TIP_FLOWS, ROBOT_CANCELING, RETRY_NEW_TIPS } = RECOVERY_MAP
   const { proceedToRouteAndStep, setRobotInMotion } = routeUpdateActions
@@ -166,21 +157,17 @@ function DropTipFlowsContainer(
 
   const fixitCommandTypeUtils = useDropTipFlowUtils(props)
 
-  if (isOnDevice) {
-    return (
-      <RecoveryContentWrapper>
-        <DropTipWizardFlows
-          robotType={isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE}
-          closeFlow={onCloseFlow}
-          mount={mount}
-          instrumentModelSpecs={specs}
-          fixitCommandTypeUtils={fixitCommandTypeUtils}
-        />
-      </RecoveryContentWrapper>
-    )
-  } else {
-    return null
-  }
+  return (
+    <RecoveryContentWrapper>
+      <DropTipWizardFlows
+        robotType={isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE}
+        closeFlow={onCloseFlow}
+        mount={mount}
+        instrumentModelSpecs={specs}
+        fixitCommandTypeUtils={fixitCommandTypeUtils}
+      />
+    </RecoveryContentWrapper>
+  )
 }
 
 // Builds the overrides injected into DT Wiz.

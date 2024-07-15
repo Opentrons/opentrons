@@ -16,6 +16,7 @@ import { RECOVERY_MAP } from '../../constants'
 import { DropTipWizardFlows } from '../../../DropTipWizardFlows'
 import { DT_ROUTES } from '../../../DropTipWizardFlows/constants'
 import { SelectRecoveryOption } from '../SelectRecoveryOption'
+import { clickButtonLabeled } from '../../__tests__/util'
 
 import type { Mock } from 'vitest'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
@@ -94,7 +95,7 @@ describe('ManageTips', () => {
     )
     screen.getByText('Begin removal')
     screen.getByText('Skip')
-    screen.getByText('Continue')
+    expect(screen.getAllByText('Continue').length).toBe(2)
   })
 
   it('routes correctly when continuing on BeginRemoval', () => {
@@ -102,15 +103,14 @@ describe('ManageTips', () => {
 
     const beginRemovalBtn = screen.getByText('Begin removal')
     const skipBtn = screen.getByText('Skip')
-    const continueBtn = screen.getByRole('button', { name: 'Continue' })
 
     fireEvent.click(beginRemovalBtn)
-    fireEvent.click(continueBtn)
+    clickButtonLabeled('Continue')
 
     expect(mockProceedNextStep).toHaveBeenCalled()
 
     fireEvent.click(skipBtn)
-    fireEvent.click(continueBtn)
+    clickButtonLabeled('Continue')
 
     expect(mockSetRobotInMotion).toHaveBeenCalled()
   })
@@ -125,10 +125,9 @@ describe('ManageTips', () => {
     render(props)
 
     const skipBtn = screen.getByText('Skip')
-    const continueBtn = screen.getByRole('button', { name: 'Continue' })
 
     fireEvent.click(skipBtn)
-    fireEvent.click(continueBtn)
+    clickButtonLabeled('Continue')
 
     expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
       RETRY_NEW_TIPS.ROUTE,

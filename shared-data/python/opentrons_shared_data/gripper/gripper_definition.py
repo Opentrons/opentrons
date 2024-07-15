@@ -24,6 +24,7 @@ class GripperModel(str, Enum):
     v1 = "gripperV1"
     v1_1 = "gripperV1.1"
     v1_2 = "gripperV1.2"
+    v1_3 = "gripperV1.3"
 
     def __str__(self) -> str:
         """Model name."""
@@ -31,6 +32,7 @@ class GripperModel(str, Enum):
             self.__class__.v1: "gripperV1",
             self.__class__.v1_1: "gripperV1.1",
             self.__class__.v1_2: "gripperV1.2",
+            self.__class__.v1_3: "gripperV1.3",
         }
         return enum_to_str[self]
 
