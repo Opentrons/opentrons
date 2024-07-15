@@ -155,6 +155,7 @@ export function Selection384Wells({
             selectWells={selectWells}
             startingWellState={startingWellState}
             setStartingWellState={setStartingWellState}
+            wells={wells}
           />
         )}
         <ButtonControls
@@ -235,6 +236,7 @@ function StartingWell({
   selectWells,
   startingWellState,
   setStartingWellState,
+  wells,
 }: {
   channels: PipetteChannels
   deselectWells: (wells: string[]) => void
@@ -243,6 +245,7 @@ function StartingWell({
   setStartingWellState: React.Dispatch<
     React.SetStateAction<Record<StartingWellOption, boolean>>
   >
+  wells: string[]
 }): JSX.Element {
   const { t, i18n } = useTranslation('quick_transfer')
 
@@ -251,6 +254,9 @@ function StartingWell({
 
   // on mount, select A1 well group for 96-channel
   React.useEffect(() => {
+    // deselect all wells on mount; clears well selection when navigating back within quick transfer flow
+    // otherwise, selected wells and lastSelectedIndex pointer will be out of sync
+    deselectWells(wells)
     if (channels === 96) {
       selectWells({ A1: null })
     }
