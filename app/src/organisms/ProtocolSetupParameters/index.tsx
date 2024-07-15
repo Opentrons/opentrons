@@ -90,9 +90,8 @@ export function ProtocolSetupParameters({
     runTimeParametersOverrides?.some(
       parameter =>
         parameter.type === 'csv_file' &&
-        parameter.file?.id == null &&
-        parameter.file?.file == null &&
-        parameter.file?.filePath == null
+        ((parameter.file?.id == null && parameter.file?.file == null) ||
+          parameter.file?.filePath == null)
     ) ?? false
   const { makeSnackbar } = useToaster()
 
@@ -186,7 +185,7 @@ export function ProtocolSetupParameters({
           }
           return acc
         }, {})
-        Promise.all(
+        void Promise.all(
           Object.entries(dataFilesForProtocolMap).map(([key, fileData]) => {
             const fileResponse = uploadCsvFile(fileData)
             const varName = Promise.resolve(key)
@@ -278,7 +277,7 @@ export function ProtocolSetupParameters({
           (parameter, index) => {
             let detail: string = ''
             let setupStatus: ProtocolSetupStepStatus
-            if (parameter.type === 'csv_file') {
+            if (enableCsvFile && parameter.type === 'csv_file') {
               if (parameter.file?.fileName == null) {
                 detail = t('required')
                 setupStatus = 'not ready'
