@@ -11,7 +11,7 @@ import {
   PrimaryButton,
   SPACING,
 } from '@opentrons/components'
-import { getRedesign } from '../feature-flags/selectors'
+import { getEnableRedesign } from '../feature-flags/selectors'
 import { setFeatureFlags } from '../feature-flags/actions'
 import { ComputingSpinner } from '../components/ComputingSpinner'
 import { ConnectedNav } from '../containers/ConnectedNav'
@@ -35,7 +35,7 @@ const showGateModal =
   process.env.NODE_ENV === 'production' || process.env.OT_PD_SHOW_GATE
 
 function ProtocolEditorComponent(): JSX.Element {
-  const enableRedesign = useSelector(getRedesign)
+  const enableRedesign = useSelector(getEnableRedesign)
   const dispatch = useDispatch()
 
   return (
@@ -47,10 +47,9 @@ function ProtocolEditorComponent(): JSX.Element {
       {enableRedesign ? (
         <Flex flexDirection={DIRECTION_COLUMN}>
           <Flex padding={SPACING.spacing12} flexDirection={DIRECTION_ROW}>
-            you enabled redesign
             <PrimaryButton
               onClick={() => {
-                dispatch(setFeatureFlags({ OT_PD_REDESIGN: null }))
+                dispatch(setFeatureFlags({ OT_PD_ENABLE_REDESIGN: null }))
               }}
             >
               turn off redesign

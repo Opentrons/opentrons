@@ -13,12 +13,6 @@ import type { RouteProps } from './types'
 
 const pdRoutes: RouteProps[] = [
   {
-    Component: Landing,
-    name: 'Landing',
-    navLinkTo: '/',
-    path: '/',
-  },
-  {
     Component: ProtocolOverview,
     name: 'Protocol overview',
     navLinkTo: '/protocolOverview',
@@ -53,16 +47,24 @@ const pdRoutes: RouteProps[] = [
 export function ProtocolRoutes(): JSX.Element {
   const location = useLocation()
   const currentPath = location.pathname
+  const landingPage: RouteProps = {
+    Component: Landing,
+    name: 'Landing',
+    navLinkTo: '/',
+    path: '/',
+  }
+  const allRoutes = [...pdRoutes, landingPage]
+  const landingRoute = '/'
 
   return (
     <>
-      {currentPath !== '/' ? <Navbar routes={pdRoutes} /> : null}
+      {currentPath === landingRoute ? null : <Navbar routes={pdRoutes} />}
       <Box width="100%">
         <Routes>
-          {pdRoutes.map(({ Component, path }: RouteProps) => {
+          {allRoutes.map(({ Component, path }: RouteProps) => {
             return <Route key={path} path={path} element={<Component />} />
           })}
-          <Route path="*" element={<Navigate to="/" />} />
+          <Route path="*" element={<Navigate to={landingRoute} />} />
         </Routes>
       </Box>
     </>

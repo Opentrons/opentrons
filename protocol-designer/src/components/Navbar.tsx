@@ -36,19 +36,16 @@ export function Navbar({ routes }: { routes: RouteProps[] }): JSX.Element {
         alignItems={ALIGN_FLEX_START}
         alignSelf={ALIGN_STRETCH}
       >
-        {navRoutes.map(({ name, navLinkTo }: RouteProps) =>
-          //  NOTE: '/' is the initial landing page which is not in the navBar
-          navLinkTo === '/' ? null : (
-            <NavbarLink key={name} to={navLinkTo as string}>
-              <LegacyStyledText
-                as="h3"
-                margin={`${SPACING.spacing8} 0 ${SPACING.spacing8} ${SPACING.spacing12}`}
-              >
-                {name}
-              </LegacyStyledText>
-            </NavbarLink>
-          )
-        )}
+        {navRoutes.map(({ name, navLinkTo }: RouteProps) => (
+          <NavbarLink key={name} to={navLinkTo as string}>
+            <LegacyStyledText
+              as="h3"
+              margin={`${SPACING.spacing8} 0 ${SPACING.spacing8} ${SPACING.spacing12}`}
+            >
+              {name}
+            </LegacyStyledText>
+          </NavbarLink>
+        ))}
       </Flex>
     </Flex>
   )
