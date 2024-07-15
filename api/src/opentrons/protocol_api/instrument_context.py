@@ -7,7 +7,6 @@ from opentrons.protocol_engine.errors.error_occurrence import ProtocolCommandFai
 from opentrons_shared_data.errors.exceptions import (
     CommandPreconditionViolated,
     CommandParameterLimitViolated,
-    StallOrCollisionDetectedError,
     UnexpectedTipRemovalError,
 )
 from opentrons.legacy_broker import LegacyBroker
