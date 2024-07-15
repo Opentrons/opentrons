@@ -4,7 +4,7 @@ from __future__ import annotations
 import sqlalchemy
 
 from dataclasses import dataclass
-from typing import Dict
+from typing import Dict, Callable, Union
 
 from opentrons.protocols.parameters.types import PrimitiveAllowedTypes
 
@@ -46,12 +46,23 @@ class PrimitiveParameterResource:
         parameter_type = sql_row.parameter_type
         assert isinstance(parameter_type, str)
 
-        param_types = {"str": str, "int": int, "float": float, "bool": bool}
-        parameter_value = (
-            param_types[parameter_type](sql_row.parameter_value)
-            if sql_row.parameter_value is not None
-            else None
-        )
+        parameter_val_str = sql_row.parameter_value
+        assert isinstance(parameter_val_str, str)
+
+        def _int_converter(value: str) -> float:
+            try:
+                converted_num = int(value)
+            except ValueError:
+                return float(value)
+            return converted_num
+
+        param_types: Dict[str, Callable[[str], Union[str, float, bool]]] = {
+            "str": str,
+            "int": _int_converter,
+            "float": float,
+            "bool": bool,
+        }
+        parameter_value = param_types[parameter_type](sql_row.parameter_value)
 
         return cls(
             analysis_id=analysis_id,
