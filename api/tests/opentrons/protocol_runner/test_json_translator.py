@@ -1,4 +1,5 @@
 """Tests for the JSON JsonTranslator interface."""
+from opentrons_shared_data.labware.labware_definition import WellState
 import pytest
 from typing import Dict, List
 
@@ -697,6 +698,7 @@ def _load_labware_definition_data() -> LabwareDefinition:
             isMagneticModuleCompatible=False,
             format="irregular",
         ),
+        wellStates={"A1": WellState(lastMeasuredLiquidHeight=5)},
     )
 
 

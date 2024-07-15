@@ -15,6 +15,7 @@ from typing import (
     Union,
 )
 
+from opentrons.protocol_engine.errors.exceptions import NoLiquidHeightDataError
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
 from opentrons_shared_data.gripper.constants import LABWARE_GRIP_FORCE
 from opentrons_shared_data.labware.labware_definition import LabwareRole
@@ -842,6 +843,21 @@ class LabwareView(HasState[LabwareState]):
             if recommended_height is not None
             else self.get_dimensions(labware_id).z / 2
         )
+
+    def get_well_last_measured_liquid_height(
+        self, labware_id: str, well_name: str
+    ) -> float:
+        """Returns the height of the liquid, according to the most recent liquid level probe done on this well."""
+        try:
+            return (
+                self.get_definition(labware_id)
+                .wellStates[well_name]
+                .lastMeasuredLiquidHeight
+            )
+        except (AttributeError, KeyError) as e:
+            raise NoLiquidHeightDataError(
+                f"{well_name} in {labware_id} has not been probed and does not have liquid height data."
+            ) from e
 
     @staticmethod
     def _max_x_of_well(well_defn: WellDefinition) -> float:

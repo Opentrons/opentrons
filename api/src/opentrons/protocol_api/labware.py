@@ -858,6 +858,17 @@ class Labware:
         """
         return self._core.highest_z
 
+    @requires_version(2, 20)
+    def get_well_last_measured_liquid_height(self, well: Well) -> Optional[float]:
+        """
+        Returns the height of the liquid, according to the most recent liquid level probe done on this well.
+
+        If no liquid height measurement has been done, return None.
+
+        If last liquid height measurement found no liquid, return 0.
+        """
+        return self._core.get_well_last_measured_liquid_height(well_name=well.well_name)
+
     @property
     def _is_tiprack(self) -> bool:
         """as is_tiprack but not subject to version checking for speed"""

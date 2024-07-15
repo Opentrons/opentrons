@@ -130,5 +130,11 @@ class AbstractLabware(ABC, Generic[WellCoreType]):
     def get_deck_slot(self) -> Optional[DeckSlotName]:
         """Get the deck slot the labware or its parent is in, if any."""
 
+    @abstractmethod
+    def get_well_last_measured_liquid_height(self, well_name: str) -> Optional[float]:
+        """
+        Returns the height of the liquid, according to the most recent liquid level probe done on this well.
+        """
+
 
 LabwareCoreType = TypeVar("LabwareCoreType", bound=AbstractLabware[Any])

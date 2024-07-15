@@ -1,6 +1,7 @@
 """ProtocolEngine-based Labware core implementations."""
 from typing import List, Optional, cast
 
+from opentrons.protocol_engine.errors.exceptions import NoLiquidHeightDataError
 from opentrons_shared_data.labware.dev_types import (
     LabwareParameters as LabwareParametersDict,
     LabwareDefinition as LabwareDefinitionDict,
@@ -186,4 +187,17 @@ class LabwareCore(AbstractLabware[WellCore]):
                 self.labware_id
             )
         except (LabwareNotOnDeckError, ModuleNotOnDeckError):
+            return None
+
+    def get_well_last_measured_liquid_height(self, well_name: str) -> Optional[float]:
+        """
+        Returns the height of the liquid, according to the most recent liquid level probe done on this well.
+        """
+        try:
+            return (
+                self._engine_client.state.labware.get_well_last_measured_liquid_height(
+                    labware_id=self._labware_id, well_name=well_name
+                )
+            )
+        except NoLiquidHeightDataError:
             return None

@@ -50,6 +50,7 @@ class LegacyLabwareCore(AbstractLabware[LegacyWellCore]):
         self._display_name = f"{dn} on {str(parent.labware)}"
         # Directly from definition
         self._well_definition = definition["wells"]
+        self._well_states = definition["wellStates"]
         self._parameters = definition["parameters"]
         self._definition = definition
 
@@ -215,3 +216,9 @@ class LegacyLabwareCore(AbstractLabware[LegacyWellCore]):
         """Get the deck slot the labware is in, if in a deck slot."""
         slot = self._geometry.parent.labware.first_parent()
         return DeckSlotName.from_primitive(slot) if slot is not None else None
+
+    def get_well_last_measured_liquid_height(self, well_name: str) -> Optional[float]:
+        well_state = self._well_states[well_name]
+        return (
+            well_state["lastMeasuredLiquidHeight"] if well_state is not None else None
+        )

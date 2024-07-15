@@ -340,6 +340,19 @@ class WellDoesNotExistError(ProtocolEngineError):
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
+class NoLiquidHeightDataError(ProtocolEngineError):
+    """Raised when trying to access the height of a liquid in a well that hasn't been probed."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a NoLiquidHeightDataError."""
+        super().__init__(ErrorCodes.NO_LIQUID_HEIGHT_DATA, message, details, wrapping)
+
+
 class PipetteNotLoadedError(ProtocolEngineError):
     """Raised when referencing a pipette that has not been loaded."""
 

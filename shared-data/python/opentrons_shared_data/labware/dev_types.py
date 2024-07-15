@@ -49,7 +49,9 @@ class NamedOffset(TypedDict):
 class GripperOffsets(TypedDict):
     pickUpOffset: NamedOffset
     dropOffset: NamedOffset
-
+    
+class WellState(TypedDict):
+    lastMeasuredLiquidHeight: float
 
 class LabwareParameters(TypedDict, total=False):
     format: LabwareFormat
@@ -116,7 +118,6 @@ class WellGroup(TypedDict, total=False):
     metadata: WellGroupMetadata
     brand: LabwareBrandData
 
-
 class _RequiredLabwareDefinition(TypedDict):
     schemaVersion: Literal[2]
     version: int
@@ -138,3 +139,4 @@ class LabwareDefinition(_RequiredLabwareDefinition, total=False):
     gripperOffsets: Dict[str, GripperOffsets]
     gripForce: float
     gripHeightFromLabwareBottom: float
+    wellStates: Dict[str, WellState]

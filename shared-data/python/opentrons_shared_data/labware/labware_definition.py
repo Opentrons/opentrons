@@ -82,6 +82,12 @@ class GripperOffsets(BaseModel):
     pickUpOffset: OffsetVector
     dropOffset: OffsetVector
 
+class WellState(BaseModel):
+    """
+    Used to track changing variables in a well, such as liquid height.
+    """
+    
+    lastMeasuredLiquidHeight: float
 
 class BrandData(BaseModel):
     brand: str = Field(..., description="Brand/manufacturer name")
@@ -170,6 +176,7 @@ class Parameters(BaseModel):
     magneticModuleEngageHeight: Optional[_NonNegativeNumber] = Field(
         None, description="Distance to move magnetic module magnets to engage"
     )
+    
 
 
 class Dimensions(BaseModel):
@@ -325,4 +332,8 @@ class LabwareDefinition(BaseModel):
     gripForce: Optional[float] = Field(
         default_factory=None,
         description="Force, in Newtons, with which the gripper should grip the labware.",
+    )
+    wellStates: Dict[str, WellState] = Field(
+        default_factor=dict,
+        description="Current liquid height, according to most recent liquid level probe on this well,"
     )

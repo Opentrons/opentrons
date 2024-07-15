@@ -190,6 +190,9 @@ class HardwarePipettingHandler(PipettingHandler):
         z_pos = await self._hardware_api.liquid_probe(
             mount=hw_pipette.mount, max_z_dist=well_depth - lld_min_height
         )
+        self._state_view.labware.get_definition(labware_id=labware_id).wellStates[
+            well_name
+        ].lastMeasuredLiquidHeight = z_pos
         return float(z_pos)
 
     @contextmanager
