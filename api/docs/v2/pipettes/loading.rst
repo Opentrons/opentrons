@@ -227,20 +227,22 @@ All Opentrons Flex pipettes use pressure sensors to detect the presence or absen
 Section Needs a Title
 ---------------------
 
-LLD is disabled by default. You enable LLD globally by setting ``liquid_presence_detection=True`` in :py:meth:`.ProtocolContext.load_instrument`. You can also deactivate LLD for individual aspirations, or or make it globally ``False`` and activate it later in a protocol. This example modifies the sample protocol used at the top of the page by adding some additional labware and enables LLD on the left-mounted, 1-Channel pipette. 
+LLD is disabled by default. You enable LLD globally by setting ``liquid_presence_detection=True`` in :py:meth:`.ProtocolContext.load_instrument`. You can also deactivate LLD for individual aspirations, or or make it globally ``False`` and activate it later in a protocol. This example modifies the sample protocol used at the top of the page by adding some additional labware and enables LLD on the left-mounted, 1-Channel pipette.
+
+.. code sample too long, shorten
 
 .. code-block:: python
     
     def run(protocol: protocol_api.ProtocolContext):
         tiprack1 = protocol.load_labware(
-        load_name="opentrons_flex_96_tiprack_1000ul", location="D1")
+            load_name="opentrons_flex_96_tiprack_1000ul", location="D1")
         reservoir = protocol.load_labware("nest_12_reservoir_15ml", location="D2")
         plate = protocol.load_labware("nest_96_wellplate_200ul_flat", location="D3")
         left = protocol.load_instrument(
-        instrument_name="flex_1channel_1000",
-        mount="left",
-        tip_racks=[tiprack1],
-        liquid_presence_detection=True
+            instrument_name="flex_1channel_1000",
+            mount="left",
+            tip_racks=[tiprack1],
+            liquid_presence_detection=True
     )
     reservoir.load_liquid(volume=10000)
 
@@ -267,7 +269,7 @@ Did You Try Turing it Off and Then On Again
 .. 
     Needs better title.
     
-If using LLD on on every aspirate is too frequent, you can disable and enable it as required. To do this, set the pipette's `liquid_presence_detection` property to `False` for one or more aspirations. This overrides the global argument, ``liquid_presence_detection=True`` that we set on :py:meth:`~.ProtocolContext.load_instrument`. Let's take a look at this starting after picking up a new tip. 
+If using LLD on on every aspirate is too frequent, you can disable and enable it as required. To do this, set the pipette's ``liquid_presence_detection`` property to ``False`` for one or more aspirations. This overrides the global argument, ``liquid_presence_detection=True`` that we set on :py:meth:`~.ProtocolContext.load_instrument`. Let's take a look at this starting after picking up a new tip. 
 
 .. code-block:: python
     
