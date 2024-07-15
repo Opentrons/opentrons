@@ -313,6 +313,10 @@ from .liquid_probe import (
     LiquidProbeCreate,
     LiquidProbeResult,
     LiquidProbeCommandType,
+    TryLiquidProbe,
+    TryLiquidProbeCreate,
+    TryLiquidProbeResult,
+    TryLiquidProbeCommandType,
 )
 
 Command = Annotated[
@@ -353,6 +357,7 @@ Command = Annotated[
         VerifyTipPresence,
         GetTipPresence,
         LiquidProbe,
+        TryLiquidProbe,
         heater_shaker.WaitForTemperature,
         heater_shaker.SetTargetTemperature,
         heater_shaker.DeactivateHeater,
@@ -487,6 +492,7 @@ CommandType = Union[
     VerifyTipPresenceCommandType,
     GetTipPresenceCommandType,
     LiquidProbeCommandType,
+    TryLiquidProbeCommandType,
     heater_shaker.WaitForTemperatureCommandType,
     heater_shaker.SetTargetTemperatureCommandType,
     heater_shaker.DeactivateHeaterCommandType,
@@ -554,6 +560,7 @@ CommandCreate = Annotated[
         VerifyTipPresenceCreate,
         GetTipPresenceCreate,
         LiquidProbeCreate,
+        TryLiquidProbeCreate,
         heater_shaker.WaitForTemperatureCreate,
         heater_shaker.SetTargetTemperatureCreate,
         heater_shaker.DeactivateHeaterCreate,
@@ -622,6 +629,7 @@ CommandResult = Union[
     VerifyTipPresenceResult,
     GetTipPresenceResult,
     LiquidProbeResult,
+    TryLiquidProbeResult,
     heater_shaker.WaitForTemperatureResult,
     heater_shaker.SetTargetTemperatureResult,
     heater_shaker.DeactivateHeaterResult,
