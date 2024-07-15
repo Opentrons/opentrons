@@ -33,7 +33,7 @@ from opentrons.protocol_engine.execution import (
     PipettingHandler,
 )
 from opentrons.protocol_engine.resources.model_utils import ModelUtils
-from opentrons.protocol_engine.types import CurrentWell, LoadedPipette
+from opentrons.protocol_engine.types import LoadedPipette
 
 
 @pytest.fixture
