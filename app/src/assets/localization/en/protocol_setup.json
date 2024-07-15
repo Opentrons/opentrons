@@ -269,6 +269,7 @@
   "update_deck": "Update deck",
   "updated": "Updated",
   "usb_connected_no_port_info": "USB Port Connected",
+  "usb_drive_notification": "Leave USB drive attached until run starts",
   "usb_port_connected": "USB Port {{port}}",
   "usb_port_number": "USB-{{port}}",
   "value_out_of_range_generic": "Value must be in range",

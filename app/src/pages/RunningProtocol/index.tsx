@@ -173,10 +173,15 @@ export function RunningProtocol(): JSX.Element {
         <OpenDoorAlertModal />
       ) : null}
       {runStatus === RUN_STATUS_STOP_REQUESTED ? <CancelingRunModal /> : null}
+      {/* note: this zindex is here to establish a zindex context for the bullets
+          so they're relatively-above this flex but not anything else like error
+          recovery
+        */}
       <Flex
         flexDirection={DIRECTION_COLUMN}
         position={POSITION_RELATIVE}
         overflow={OVERFLOW_HIDDEN}
+        zIndex="0"
       >
         {robotSideAnalysis != null ? (
           <StepMeter

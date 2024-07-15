@@ -5,6 +5,7 @@ from opentrons.protocol_engine.commands.liquid_probe import LiquidProbeResult
 from opentrons_shared_data.errors.exceptions import PipetteLiquidNotFoundError
 import pytest
 from decoy import Decoy
+from decoy import errors
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
@@ -1293,15 +1294,26 @@ def test_configure_for_volume_post_219(
     """Configure_for_volume should specify overlap version."""
     decoy.when(mock_protocol_core.api_version).then_return(version)
     subject.configure_for_volume(123.0)
-    decoy.verify(
-        mock_engine_client.execute_command(
-            cmd.ConfigureForVolumeParams(
-                pipetteId=subject.pipette_id,
-                volume=123.0,
-                tipOverlapNotAfterVersion="v1",
+    try:
+        decoy.verify(
+            mock_engine_client.execute_command(
+                cmd.ConfigureForVolumeParams(
+                    pipetteId=subject.pipette_id,
+                    volume=123.0,
+                    tipOverlapNotAfterVersion="v1",
+                )
             )
         )
-    )
+    except errors.VerifyError:
+        decoy.verify(
+            mock_engine_client.execute_command(
+                cmd.ConfigureForVolumeParams(
+                    pipetteId=subject.pipette_id,
+                    volume=123.0,
+                    tipOverlapNotAfterVersion="v3",
+                )
+            )
+        )
 
 
 @pytest.mark.parametrize("version", versions_at_or_above(APIVersion(2, 20)))

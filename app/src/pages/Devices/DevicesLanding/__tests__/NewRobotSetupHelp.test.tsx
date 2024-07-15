@@ -43,4 +43,15 @@ describe('NewRobotSetupHelp', () => {
 
     expect(screen.queryByText('How to setup a new robot')).toBeFalsy()
   })
+
+  it('renders the link and it has the correct href attribute', () => {
+    render()
+    const link = screen.getByText('See how to set up a new robot')
+    fireEvent.click(link)
+    const targetLinkUrl = 'https://support.opentrons.com/s/'
+    const supportLink = screen.getByRole('link', {
+      name: 'Learn more about setting up a new robot',
+    })
+    expect(supportLink).toHaveAttribute('href', targetLinkUrl)
+  })
 })
