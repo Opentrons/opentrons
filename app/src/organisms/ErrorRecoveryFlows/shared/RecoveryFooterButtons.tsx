@@ -21,6 +21,7 @@ interface RecoveryFooterButtonProps {
   /* The "Go back" button */
   secondaryBtnOnClick?: () => void
   primaryBtnTextOverride?: string
+  primaryBtnDisabled?: boolean
   /* If true, render pressed state and a spinner icon for the primary button. */
   isLoadingPrimaryBtnAction?: boolean
   /* To the left of the primary button. */
@@ -93,10 +94,12 @@ function PrimaryButtonGroup(props: RecoveryFooterButtonProps): JSX.Element {
 function RecoveryPrimaryBtn({
   isLoadingPrimaryBtnAction,
   primaryBtnOnClick,
+  primaryBtnDisabled,
   primaryBtnTextOverride,
 }: RecoveryFooterButtonProps): JSX.Element {
   const { t } = useTranslation('error_recovery')
 
+  //TOME: You need a loading state on the desktop button!
   return (
     <>
       <SmallButton
@@ -112,11 +115,12 @@ function RecoveryPrimaryBtn({
         buttonType="primary"
         buttonText={primaryBtnTextOverride ?? t('continue')}
         onClick={primaryBtnOnClick}
+        disabled={primaryBtnDisabled}
       />
       <PrimaryButton
         css={DESKTOP_ONLY_BUTTON}
         onClick={primaryBtnOnClick}
-        disabled={isLoadingPrimaryBtnAction}
+        disabled={primaryBtnDisabled}
       >
         {primaryBtnTextOverride ?? t('continue')}
       </PrimaryButton>
