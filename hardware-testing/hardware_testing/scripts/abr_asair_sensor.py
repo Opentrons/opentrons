@@ -9,7 +9,6 @@ from typing import List
 import os
 import argparse
 import pytz
-from datetime import timedelta
 
 
 class _ABRAsairSensor:
