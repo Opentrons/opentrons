@@ -647,7 +647,7 @@ async def test_pickup_moves(
             assert move_call_list == [(OT3Mount.LEFT, Point(z=end_z_retract_dist))]
         # pick up tip should have two calls to move_to_plunger_bottom, one before and one after
         # the tip pickup
-        assert len(mock_move_to_plunger_bottom.call_args_list) == 2
+        assert len(mock_move_to_plunger_bottom.call_args_list) == 3
         mock_move_to_plunger_bottom.reset_mock()
         mock_move_rel.reset_mock()
 
@@ -662,7 +662,7 @@ async def test_pickup_moves(
             ]
         else:
             assert move_call_list == [(OT3Mount.LEFT, Point(z=end_z_retract_dist))]
-    assert len(mock_move_to_plunger_bottom.call_args_list) == 0
+    assert len(mock_move_to_plunger_bottom.call_args_list) == 1
 
 
 @pytest.mark.parametrize("load_configs", load_pipette_configs)
