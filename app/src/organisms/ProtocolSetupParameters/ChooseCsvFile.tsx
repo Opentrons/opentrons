@@ -106,23 +106,23 @@ export function ChooseCsvFile({
             </LegacyStyledText>
             <Flex css={LIST_CONTAINER_STYLE}>
               {csvFilesOnUSB.length !== 0 ? (
-                csvFilesOnUSB.map(csv => {
-                  const fileName = last(csv.split('/'))
+                csvFilesOnUSB.map(csvFilePath => {
+                  const fileName = last(csvFilePath.split('/'))
                   return (
                     <>
-                      {csv.length !== 0 && fileName !== undefined ? (
+                      {csvFilePath.length !== 0 && fileName !== undefined ? (
                         <RadioButton
                           key={fileName}
                           data-testid={fileName}
                           buttonLabel={fileName ?? 'default'}
-                          buttonValue={csv}
+                          buttonValue={csvFilePath}
                           onChange={() => {
                             setCsvFileSelected({
-                              filePath: csv,
+                              filePath: csvFilePath,
                               fileName: fileName,
                             })
                           }}
-                          isSelected={csvFileSelected?.filePath === csv}
+                          isSelected={csvFileSelected?.filePath === csvFilePath}
                         />
                       ) : null}
                     </>
