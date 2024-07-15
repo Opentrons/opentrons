@@ -121,10 +121,7 @@ async def test_liquid_probe_implementation_with_prep(
     )
     decoy.when(
         await movement.move_to_well(
-            pipette_id="abc",
-            labware_id="123",
-            well_name="A3",
-            well_location=location
+            pipette_id="abc", labware_id="123", well_name="A3", well_location=location
         ),
     ).then_return(Point(x=1, y=2, z=3))
 
@@ -148,7 +145,7 @@ async def test_liquid_probe_implementation_with_prep(
             pipette_id="abc",
             labware_id="123",
             well_name="A3",
-            well_location=WellLocation(origin=WellOrigin.TOP)
+            well_location=WellLocation(origin=WellOrigin.TOP),
         ),
     )
 
@@ -192,7 +189,7 @@ async def test_liquid_not_found_error(
             pipette_id=pipette_id,
             labware_id=labware_id,
             well_name=well_name,
-            well_location=well_location
+            well_location=well_location,
         ),
     ).then_return(position)
 
