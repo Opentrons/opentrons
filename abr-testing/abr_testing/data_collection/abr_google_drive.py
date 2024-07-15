@@ -147,13 +147,10 @@ def create_data_dictionary(
                 )
             else:
                 continue
+    num_of_runs_read = len(runs_and_robots)
+    print(f"Number of runs read: {num_of_runs_read}")
     transposed_runs_and_robots = list(map(list, zip(*runs_and_robots)))
     transposed_runs_and_lpc = list(map(list, zip(*runs_and_lpc)))
-    try:
-        num_of_runs_added = len(runs_and_robots)
-        print(f"{num_of_runs_added} run(s) added.")
-    except UnboundLocalError:
-        print("No runs added.")
     return transposed_runs_and_robots, headers, transposed_runs_and_lpc, headers_lpc
 
 
