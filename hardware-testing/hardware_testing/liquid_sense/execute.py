@@ -266,14 +266,13 @@ def run(
             run_args.pipette.pick_up_tip(tips[0])
             del tips[: run_args.pipette_channels]
 
-            run_args.pipette.move_to(test_well.top())
+            run_args.pipette.move_to(test_well.top(z=2))
             if run_args.wet:
                 run_args.pipette.move_to(test_well.bottom(1))
-                run_args.pipette.move_to(test_well.top())
+                run_args.pipette.move_to(test_well.top(z=2))
             start_pos = hw_api.current_position_ot3(OT3Mount.LEFT)
             height, result = _run_trial(run_args, tip, test_well, trial, start_pos)
             end_pos = hw_api.current_position_ot3(OT3Mount.LEFT)
-            run_args.pipette.blow_out()
             tip_length_offset = 0.0
             if run_args.dial_indicator is not None:
                 run_args.pipette._retract()
@@ -358,7 +357,7 @@ def find_max_z_distances(
     else:
         ui.print_warning("No minimum height for pipette")
         min_height = 0.5
-    max_z_distance = well.top().point.z - well.bottom().point.z - min_height
+    max_z_distance = well.top().point.z - well.bottom().point.z - min_height + 2
     plunger_travel = get_plunger_travel(run_args)
     if p_speed == 0:
         p_travel_time = 10.0
@@ -437,10 +436,11 @@ def _run_trial(
     try:
         height = hw_api.liquid_probe(hw_mount, z_distance, lps, probe_target)
         result: LLDResult = LLDResult.success
-        for probe in data_files:
-            if _test_for_blockage(data_files[probe], lps.sensor_threshold_pascals):
-                result = LLDResult.blockage
-                break
+        if not run_args.ctx.is_simulating():
+            for probe in data_files:
+                if _test_for_blockage(data_files[probe], lps.sensor_threshold_pascals):
+                    result = LLDResult.blockage
+                    break
     except PipetteLiquidNotFoundError as lnf:
         ui.print_info(f"Liquid not found current position {lnf.detail}")
         result = LLDResult.not_found
