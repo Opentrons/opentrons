@@ -1,9 +1,16 @@
 import * as React from 'react'
 import cx from 'classnames'
 import { DndProvider } from 'react-dnd'
+import { BrowserRouter } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { HTML5Backend } from 'react-dnd-html5-backend'
-import { PrimaryButton } from '@opentrons/components'
+import {
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
+  PrimaryButton,
+  SPACING,
+} from '@opentrons/components'
 import { getRedesign } from '../feature-flags/selectors'
 import { setFeatureFlags } from '../feature-flags/actions'
 import { ComputingSpinner } from '../components/ComputingSpinner'
@@ -20,6 +27,8 @@ import { LabwareUploadMessageModal } from './modals/LabwareUploadMessageModal/La
 import { GateModal } from './modals/GateModal'
 import { CreateFileWizard } from './modals/CreateFileWizard'
 import { AnnouncementModal } from './modals/AnnouncementModal'
+import { ProtocolRoutes } from './ProtocolRoutes'
+
 import styles from './ProtocolEditor.module.css'
 
 const showGateModal =
@@ -36,16 +45,21 @@ function ProtocolEditorComponent(): JSX.Element {
       {showGateModal ? <GateModal /> : null}
       <PrereleaseModeIndicator />
       {enableRedesign ? (
-        <div>
-          you enabled redesign
-          <PrimaryButton
-            onClick={() => {
-              dispatch(setFeatureFlags({ OT_PD_REDESIGN: null }))
-            }}
-          >
-            turn off redesign
-          </PrimaryButton>
-        </div>
+        <Flex flexDirection={DIRECTION_COLUMN}>
+          <Flex padding={SPACING.spacing12} flexDirection={DIRECTION_ROW}>
+            you enabled redesign
+            <PrimaryButton
+              onClick={() => {
+                dispatch(setFeatureFlags({ OT_PD_REDESIGN: null }))
+              }}
+            >
+              turn off redesign
+            </PrimaryButton>
+          </Flex>
+          <BrowserRouter>
+            <ProtocolRoutes />
+          </BrowserRouter>
+        </Flex>
       ) : (
         <div className={styles.wrapper}>
           <ConnectedNav />

@@ -3,7 +3,7 @@ import { getFlagsFromQueryParams } from './utils'
 import type { BaseState, Selector } from '../types'
 import type { Flags } from './types'
 
-const selectFeatureFlags = (state: BaseState) => state.featureFlags.flags
+const selectFeatureFlags = (state: BaseState): Flags => state.featureFlags.flags
 
 export const getFeatureFlagData: Selector<Flags> = createSelector(
   [selectFeatureFlags, getFlagsFromQueryParams],
