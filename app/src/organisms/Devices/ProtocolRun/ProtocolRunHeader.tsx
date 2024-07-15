@@ -298,6 +298,7 @@ export function ProtocolRunHeader({
       {isERActive ? (
         <ErrorRecoveryFlows
           isFlex={true}
+          runStatus={runStatus}
           runId={runId}
           failedCommand={failedCommand}
           protocolAnalysis={robotProtocolAnalysis}
