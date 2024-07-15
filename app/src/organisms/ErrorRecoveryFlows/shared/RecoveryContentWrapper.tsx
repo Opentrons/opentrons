@@ -8,7 +8,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   Flex,
-  RESPONSIVENESS
+  RESPONSIVENESS,
 } from '@opentrons/components'
 
 import type { StyleProps } from '@opentrons/components'

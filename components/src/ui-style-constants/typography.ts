@@ -179,8 +179,6 @@ export const level3HeaderSemiBold = css`
   font-weight: ${fontWeightSemiBold};
 `
 
-
-
 export const level3HeaderRegular = css`
   font-size: ${fontSize32};
   line-height: ${lineHeight42};
@@ -205,10 +203,10 @@ export const level4HeaderSemiBold = css`
   font-weight: ${fontWeightSemiBold};
 `
 
-export const level4HeaderDesktopSemiBold=css`
-font-size: ${fontSize18};
-line-height: ${lineHeight24};
-font-weight: ${fontWeightSemiBold};
+export const level4HeaderDesktopSemiBold = css`
+  font-size: ${fontSize18};
+  line-height: ${lineHeight24};
+  font-weight: ${fontWeightSemiBold};
 `
 
 export const level4HeaderRegular = css`
