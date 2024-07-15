@@ -250,21 +250,32 @@ Now, let's add some commands and start the cycle. First, tell the robot to pick 
 
 Next, tell the robot to aspirate some liquid from the reservoir. LLD takes place during this step::
 
-    pipette.aspirate(100, plate["A1"])
+    pipette.aspirate(100, reservoir["A1"])
+    pipette.dispense(100, plate["A1"])
 
-During aspiration, as the pipette's pressure sensor detects a liquid, the code returns ``True``, the pipette pauses, raises itself slightly above the surface of the liquid, and then moves into the liquid to continue the aspiration.  
+During aspiration, as the pipette's pressure sensor detects a liquid, the code returns ``True``, the pipette pauses, raises itself slightly above the surface of the liquid, and then moves into the liquid to continue the aspiration. If a pipette doesn't detect a liquid, it returns ``False``, raises an error, and stops the protocol.
 
+Finally, be sure to dispose of the tip and pick up a new one after each aspiration/dispense cycle::
 
+pipette.drop_tip()
+pipette.pick_up_tip(tiprack1["A2"])
 
-theLLD occurs when your protocol calls :py:meth:`.InstrumentContext.aspirate` and works as follows: as the pipette's pressure sensor detects a liquid, the code returns ``True``, the pipette pauses, raises itself slightly above the surface of the liquid, and then moves into the liquid to continue the aspiration. If a pipette doesn't detect a liquid, it returns ``False``, raises an error, and stops the protocol.
+LLD will not work with used tips.
 
 Did You Try Turing it Off and Then On Again
 -------------------------------------------
 .. 
-    Needs better title. IT Crowd :)
+    Needs better title.
     
-In the previous example, the robot checks for liquid every single time time. If this is too frequent, you can override the global setting and disable LLD for a particular aspiration. To override the global behavior, set the pipette's `liquid_presence_detection` property to `False`. Let's take a look at this starting from the 
+If using LLD on on every aspirate is too frequent, you can disable and enable it as required. To do this, set the pipette's `liquid_presence_detection` property to `False` for one or more aspirations. This overrides the global argument, ``liquid_presence_detection=True`` that we set on :py:meth:`~.ProtocolContext.load_instrument`. Let's take a look at this starting after picking up a new tip. 
 
 .. code-block:: python
     
+    pipette.pick_up_tip(tiprack1["A2"])
     pipette.liquid_presence_detection = False
+
+After this, the pipette will not do LLD check for subsequent aspirations. To re-activate LLD set ``pipette.liquid_presence_detection=True`` later in your protocol.
+
+Require Liquid Presence
+-----------------------
+
