@@ -98,8 +98,7 @@ export function Selection384Wells({
 
     if (selectBy === 'columns') {
       if (channels === 8) {
-        // for 8-channel, select first and second member of column (all rows) unless only one starting well option is selected
-        if (startingWellState.A1 === startingWellState.B1) {
+        if (startingWellState.A1 && startingWellState.B1) {
           selectWells({
             [columns[nextIndex][0]]: null,
             [columns[nextIndex][1]]: null,
@@ -152,7 +151,6 @@ export function Selection384Wells({
         ) : (
           <StartingWell
             channels={channels}
-            columns={columns}
             deselectWells={deselectWells}
             selectWells={selectWells}
             startingWellState={startingWellState}
@@ -163,8 +161,16 @@ export function Selection384Wells({
           channels={channels}
           handleMinus={handleMinus}
           handlePlus={handlePlus}
-          lastSelectedIndex={lastSelectedIndex}
-          selectBy={selectBy}
+          minusDisabled={lastSelectedIndex == null}
+          plusDisabled={
+            // disable 8-channel plus if no starting well selected
+            (channels === 8 &&
+              !startingWellState.A1 &&
+              !startingWellState.B1) ||
+            (selectBy === 'columns'
+              ? lastSelectedIndex === COLUMN_COUNT_384 - 1
+              : lastSelectedIndex === WELL_COUNT_384 - 1)
+          }
         />
       </Flex>
     </Flex>
@@ -225,14 +231,12 @@ type StartingWellOption = 'A1' | 'B1' | 'A2' | 'B2'
 
 function StartingWell({
   channels,
-  columns,
   deselectWells,
   selectWells,
   startingWellState,
   setStartingWellState,
 }: {
   channels: PipetteChannels
-  columns: string[][]
   deselectWells: (wells: string[]) => void
   selectWells: (wellGroup: WellGroup) => void
   startingWellState: Record<StartingWellOption, boolean>
@@ -288,8 +292,8 @@ interface ButtonControlsProps {
   channels: PipetteChannels
   handleMinus: () => void
   handlePlus: () => void
-  lastSelectedIndex: number | null
-  selectBy: 'columns' | 'wells'
+  minusDisabled: boolean
+  plusDisabled: boolean
 }
 
 function ButtonControls(props: ButtonControlsProps): JSX.Element {
@@ -297,8 +301,8 @@ function ButtonControls(props: ButtonControlsProps): JSX.Element {
     channels,
     handleMinus,
     handlePlus,
-    lastSelectedIndex,
-    selectBy,
+    minusDisabled,
+    plusDisabled,
   } = props
   const { t, i18n } = useTranslation('quick_transfer')
 
@@ -313,18 +317,14 @@ function ButtonControls(props: ButtonControlsProps): JSX.Element {
         </LegacyStyledText>
         <Flex gridGap={SPACING.spacing16}>
           <IconButton
-            disabled={lastSelectedIndex == null}
+            disabled={minusDisabled}
             onClick={handleMinus}
             iconName="minus"
             hasBackground
             flex="1"
           />
           <IconButton
-            disabled={
-              selectBy === 'columns'
-                ? lastSelectedIndex === COLUMN_COUNT_384 - 1
-                : lastSelectedIndex === WELL_COUNT_384 - 1
-            }
+            disabled={plusDisabled}
             onClick={handlePlus}
             iconName="plus"
             hasBackground
