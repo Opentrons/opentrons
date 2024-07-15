@@ -25,8 +25,6 @@ export interface LegacyModalShellProps extends StyleProps {
   footer?: React.ReactNode
   /** Optional full page takeover */
   fullPage?: boolean
-  /** Modal z-index */
-  zIndex: number
 }
 
 /**

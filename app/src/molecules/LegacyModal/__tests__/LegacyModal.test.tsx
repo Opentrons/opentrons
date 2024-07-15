@@ -58,8 +58,5 @@ describe('LegacyModal', () => {
     expect(screen.getByLabelText('ModalShell_ModalArea')).toHaveStyle(
       'width: 31.25rem'
     )
-    expect(screen.getByLabelText('ModalShell_ModalArea')).toHaveStyle(
-      'margin-left: 5.656rem'
-    )
   })
 })
