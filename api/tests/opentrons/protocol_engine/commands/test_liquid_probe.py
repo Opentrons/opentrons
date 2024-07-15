@@ -148,8 +148,7 @@ async def test_liquid_probe_implementation_with_prep(
             pipette_id="abc",
             labware_id="123",
             well_name="A3",
-            well_location=WellLocation(origin=WellOrigin.TOP),
-            current_well=current_well,
+            well_location=WellLocation(origin=WellOrigin.TOP)
         ),
     )
 
