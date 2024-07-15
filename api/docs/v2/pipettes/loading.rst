@@ -230,20 +230,20 @@ Section Needs a Title
 LLD is disabled by default. You enable LLD globally by setting ``liquid_presence_detection=True`` in :py:meth:`.ProtocolContext.load_instrument`. You can also deactivate LLD for individual aspirations, or or make it globally ``False`` and activate it later in a protocol. This example modifies the sample protocol used at the top of the page by adding some additional labware and enables LLD on the left-mounted, 1-Channel pipette. 
 
 .. code-block:: python
-
-def run(protocol: protocol_api.ProtocolContext):
-    tiprack1 = protocol.load_labware(
+    
+    def run(protocol: protocol_api.ProtocolContext):
+        tiprack1 = protocol.load_labware(
         load_name="opentrons_flex_96_tiprack_1000ul", location="D1")
-    reservoir = protocol.load_labware("nest_12_reservoir_15ml", location="D2")
-    plate = protocol.load_labware("nest_96_wellplate_200ul_flat", location="D3")
-    left = protocol.load_instrument(
+        reservoir = protocol.load_labware("nest_12_reservoir_15ml", location="D2")
+        plate = protocol.load_labware("nest_96_wellplate_200ul_flat", location="D3")
+        left = protocol.load_instrument(
         instrument_name="flex_1channel_1000",
         mount="left",
         tip_racks=[tiprack1],
         liquid_presence_detection=True
     )
     reservoir.load_liquid(volume=10000)
-    
+
 Now, let's add some commands and start the cycle. First, tell the robot to pick up a new, clean tip::
     
     pipette.pick_up_tip()
@@ -257,8 +257,8 @@ During aspiration, as the pipette's pressure sensor detects a liquid, the code r
 
 Finally, be sure to dispose of the tip and pick up a new one after each aspiration/dispense cycle::
 
-pipette.drop_tip()
-pipette.pick_up_tip(tiprack1["A2"])
+    pipette.drop_tip()
+    pipette.pick_up_tip(tiprack1["A2"])
 
 LLD will not work with used tips.
 
@@ -274,9 +274,9 @@ If using LLD on on every aspirate is too frequent, you can disable and enable it
     pipette.pick_up_tip(tiprack1["A2"])
     pipette.liquid_presence_detection = False
 
-After this, the pipette will not do LLD check for subsequent aspirations. To re-activate LLD set ``pipette.liquid_presence_detection=True`` later in your protocol.
+After this, the pipette will not do LLD check during subsequent aspirations. To re-activate LLD, set ``pipette.liquid_presence_detection=True`` later in your protocol.
 
 Require Liquid Presence
 -----------------------
 
-The `` just check the liquid status of a well, use 
+The ``foo thing`` just check the liquid status of a well, use 
