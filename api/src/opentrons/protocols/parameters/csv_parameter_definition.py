@@ -8,7 +8,6 @@ from opentrons.protocol_engine.types import (
 )
 
 from . import validation
-from .exceptions import ParameterDefinitionError
 from .parameter_definition import AbstractParameterDefinition
 from .types import CSVParameter
 
@@ -44,10 +43,6 @@ class CSVParameterDefinition(AbstractParameterDefinition[Optional[TextIO]]):
 
     @value.setter
     def value(self, new_file: TextIO) -> None:
-        if not new_file.name.endswith(".csv"):
-            raise ParameterDefinitionError(
-                f"CSV parameter {self._variable_name} was given non csv file {new_file.name}"
-            )
         self._value = new_file
 
     @property

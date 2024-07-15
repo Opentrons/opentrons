@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { describe, it, vi, expect, beforeEach, afterEach } from 'vitest'
-import { screen, fireEvent, waitFor } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 
 import { mockRecoveryContentProps } from '../../__fixtures__'
 import { renderWithProviders } from '../../../../__testing-utils__'
@@ -8,6 +8,7 @@ import { i18n } from '../../../../i18n'
 import { RetrySameTips, RetrySameTipsInfo } from '../RetrySameTips'
 import { RECOVERY_MAP } from '../../constants'
 import { SelectRecoveryOption } from '../SelectRecoveryOption'
+import { clickButtonLabeled } from '../../__tests__/util'
 
 import type { Mock } from 'vitest'
 
@@ -106,7 +107,8 @@ describe('RetrySameTipsInfo', () => {
 
   it('calls the correct routeUpdateActions and recoveryCommands in the correct order when the primary button is clicked', async () => {
     renderRetrySameTipsInfo(props)
-    fireEvent.click(screen.getByRole('button', { name: 'Retry now' }))
+
+    clickButtonLabeled('Retry now')
 
     await waitFor(() => {
       expect(mockSetRobotInMotion).toHaveBeenCalledWith(
