@@ -2,7 +2,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 import {
   COLORS,
-  POSITION_ABSOLUTE,
+  POSITION_FIXED,
   ALIGN_CENTER,
   JUSTIFY_CENTER,
   POSITION_RELATIVE,
@@ -25,6 +25,8 @@ export interface LegacyModalShellProps extends StyleProps {
   footer?: React.ReactNode
   /** Optional full page takeover */
   fullPage?: boolean
+  /** Modal z-index */
+  zIndex: number
 }
 
 /**
@@ -75,9 +77,10 @@ export function LegacyModalShell(props: LegacyModalShellProps): JSX.Element {
 }
 
 const Overlay = styled.div`
-  position: ${POSITION_ABSOLUTE};
-  left: 0;
+  position: ${POSITION_FIXED};
+  left: 90;
   right: 0;
+  width: 91.5%;
   top: 0;
   bottom: 0;
   z-index: 1;
@@ -86,14 +89,14 @@ const Overlay = styled.div`
 `
 const ContentArea = styled.div<{ zIndex: string | number }>`
   display: flex;
-  position: ${POSITION_ABSOLUTE};
+  position: ${POSITION_FIXED};
   align-items: ${ALIGN_CENTER};
   justify-content: ${JUSTIFY_CENTER};
   top: 0;
   right: 0;
   bottom: 0;
-  left: 0;
-  width: 100%;
+  left: 90;
+  width: 91.5%;
   height: 100%;
   z-index: ${({ zIndex }) => zIndex};
   padding: ${SPACING.spacing16};
