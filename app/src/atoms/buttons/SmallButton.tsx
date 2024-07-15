@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
 
 import { css } from 'styled-components'
 import {
@@ -14,10 +13,10 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
+  RESPONSIVENESS
 } from '@opentrons/components'
 import { ODD_FOCUS_VISIBLE } from './constants'
 import type { IconName, StyleProps } from '@opentrons/components'
-import { getIsOnDevice } from '../../redux/config'
 
 export type SmallButtonTypes =
   | 'alert'
@@ -52,8 +51,6 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
     ariaDisabled = false,
     ...buttonProps
   } = props
-
-  const isOnDevice = useSelector(getIsOnDevice)
 
   const SMALL_BUTTON_PROPS_BY_TYPE: Record<
     SmallButtonTypes,
@@ -152,8 +149,15 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
       color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType].disabledColor};
     }
   `
-
-  const TEXT_SIZE = isOnDevice ? '1.375rem' : '0.875rem'
+  
+  const TEXT_STYLE = css`
+    font-size: 0.875rem;
+    line-height: ${TYPOGRAPHY.lineHeight20}
+    fontWeight: ${TYPOGRAPHY.fontWeightSemiBold}
+      @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    font-size: 1.37rem;
+    line-height: ${TYPOGRAPHY.lineHeight28}
+  `
 
   return (
     <Btn
@@ -188,11 +192,7 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
         ) : null}
 
         <LegacyStyledText
-          fontSize={TEXT_SIZE}
-          lineHeight={
-            isOnDevice ? TYPOGRAPHY.lineHeight28 : TYPOGRAPHY.lineHeight20
-          }
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          css={TEXT_STYLE}
         >
           {buttonText}
         </LegacyStyledText>
