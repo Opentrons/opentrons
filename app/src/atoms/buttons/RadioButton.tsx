@@ -38,30 +38,28 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
   const SettingButton = styled.input`
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
       display: none;
-}
+    }
   `
 
   const AVAILABLE_BUTTON_STYLE = css`
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      background: ${COLORS.blue35};
 
-    background: ${COLORS.blue35};
-
-    &:active {
-      background-color: ${COLORS.blue40};
+      &:active {
+        background-color: ${COLORS.blue40};
+      }
     }
-}
   `
 
   const SELECTED_BUTTON_STYLE = css`
-      @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      background: ${COLORS.blue50};
+      color: ${COLORS.white};
 
-    background: ${COLORS.blue50};
-    color: ${COLORS.white};
-
-    &:active {
-      background-color: ${COLORS.blue60};
+      &:active {
+        background-color: ${COLORS.blue60};
+      }
     }
-}
   `
 
   const DISABLED_BUTTON_STYLE = css`
@@ -73,27 +71,21 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
   // TODO: (ew, 2023-04-21): button is not tabbable, so focus state
   // is not possible on ODD. It's testable in storybook but not in real life.
   const SettingButtonLabel = styled.label`
-    padding: 4px;
+    padding: ${SPACING.spacing4};
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    border-radius: ${BORDERS.borderRadius16};
-    cursor: pointer;
-    padding: ${isLarge ? SPACING.spacing24 : SPACING.spacing20};
-    width: 100%;
+      border-radius: ${BORDERS.borderRadius16};
+      cursor: pointer;
+      padding: ${isLarge ? SPACING.spacing24 : SPACING.spacing20};
+      width: 100%;
 
-    ${isSelected ? SELECTED_BUTTON_STYLE : AVAILABLE_BUTTON_STYLE}
-    ${disabled && DISABLED_BUTTON_STYLE}
+      ${isSelected ? SELECTED_BUTTON_STYLE : AVAILABLE_BUTTON_STYLE}
+      ${disabled && DISABLED_BUTTON_STYLE}
 
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-      cursor: default;
+        cursor: default;
+      }
     }
-}
   `
-
-const DesktopLabelStyle = css`
-    font-size: ${TYPOGRAPHY.fontSize14};
-    font-weight: 400;
-    line-height: 20px;
-`
 
   return (
     <Flex width="100%">
@@ -107,7 +99,7 @@ const DesktopLabelStyle = css`
       />
       <SettingButtonLabel role="label" htmlFor={buttonLabel}>
         <LegacyStyledText
-          oddStyle={isLarge? "level4HeaderRegular" : "bodyTextRegular"}
+          oddStyle={isLarge ? 'level4HeaderRegular' : 'bodyTextRegular'}
           desktopStyle="bodyDefaultRegular"
         >
           {buttonLabel}
