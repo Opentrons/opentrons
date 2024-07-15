@@ -222,6 +222,8 @@ class HardwareTipHandler(TipHandler):
             nominal_fallback=nominal_tip_geometry.length,
         )
 
+        await self._hardware_api._move_to_plunger_bottom(hw_mount, rate=1.0)
+
         await self._hardware_api.tip_pickup_moves(
             mount=hw_mount, presses=None, increment=None
         )
