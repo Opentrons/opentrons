@@ -15,5 +15,9 @@
   "OT_PD_ENABLE_ABSORBANCE_READER": {
     "title": "Enable absorbance plate reader",
     "description": "Enable absorbance plate reader support."
+  },
+  "OT_PD_REDESIGN": {
+    "title": "Enable redesign",
+    "description": "A whole new world."
   }
 }

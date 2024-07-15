@@ -1,7 +1,11 @@
 import * as React from 'react'
 import cx from 'classnames'
 import { DndProvider } from 'react-dnd'
+import { useDispatch, useSelector } from 'react-redux'
 import { HTML5Backend } from 'react-dnd-html5-backend'
+import { PrimaryButton } from '@opentrons/components'
+import { getRedesign } from '../feature-flags/selectors'
+import { setFeatureFlags } from '../feature-flags/actions'
 import { ComputingSpinner } from '../components/ComputingSpinner'
 import { ConnectedNav } from '../containers/ConnectedNav'
 import { Sidebar } from '../containers/ConnectedSidebar'
@@ -14,43 +18,59 @@ import { PortalRoot as TopPortalRoot } from './portals/TopPortal'
 import { FileUploadMessageModal } from './modals/FileUploadMessageModal/FileUploadMessageModal'
 import { LabwareUploadMessageModal } from './modals/LabwareUploadMessageModal/LabwareUploadMessageModal'
 import { GateModal } from './modals/GateModal'
+import { CreateFileWizard } from './modals/CreateFileWizard'
 import { AnnouncementModal } from './modals/AnnouncementModal'
 import styles from './ProtocolEditor.module.css'
-import { CreateFileWizard } from './modals/CreateFileWizard'
 
 const showGateModal =
   process.env.NODE_ENV === 'production' || process.env.OT_PD_SHOW_GATE
 
 function ProtocolEditorComponent(): JSX.Element {
+  const enableRedesign = useSelector(getRedesign)
+  const dispatch = useDispatch()
+
   return (
     <div id="protocol-editor">
       <ComputingSpinner />
       <TopPortalRoot />
       {showGateModal ? <GateModal /> : null}
       <PrereleaseModeIndicator />
-      <div className={styles.wrapper}>
-        <ConnectedNav />
-        <Sidebar />
-        <div className={styles.main_page_wrapper}>
-          <ConnectedTitleBar />
-
-          <div
-            id="main-page"
-            className={cx(
-              styles.main_page_content,
-              MAIN_CONTENT_FORCED_SCROLL_CLASSNAME
-            )}
+      {enableRedesign ? (
+        <div>
+          you enabled redesign
+          <PrimaryButton
+            onClick={() => {
+              dispatch(setFeatureFlags({ OT_PD_REDESIGN: null }))
+            }}
           >
-            <AnnouncementModal />
-            <CreateFileWizard />
-            <FileUploadMessageModal />
+            turn off redesign
+          </PrimaryButton>
+        </div>
+      ) : (
+        <div className={styles.wrapper}>
+          <ConnectedNav />
+          <Sidebar />
+          <div className={styles.main_page_wrapper}>
+            <ConnectedTitleBar />
 
-            <MainPageModalPortalRoot />
-            <LabwareUploadMessageModal />
-            <MainPanel />
+            <div
+              id="main-page"
+              className={cx(
+                styles.main_page_content,
+                MAIN_CONTENT_FORCED_SCROLL_CLASSNAME
+              )}
+            >
+              <AnnouncementModal />
+              <CreateFileWizard />
+              <FileUploadMessageModal />
+
+              <MainPageModalPortalRoot />
+              <LabwareUploadMessageModal />
+              <MainPanel />
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }
