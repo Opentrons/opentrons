@@ -54,7 +54,7 @@ class _ABRAsairSensor:
             env_data = sensor.get_reading()
             timestamp = datetime.datetime.now()
             # Time adjustment for ABR robot timezone
-            new_timestamp = timestamp - datetime.timedelta(hours=5)
+            new_timestamp = timestamp - datetime.timedelta(hours=4)
             date = new_timestamp.date()
             time = new_timestamp.time()
             temp = env_data.temperature
