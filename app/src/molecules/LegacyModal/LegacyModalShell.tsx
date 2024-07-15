@@ -80,7 +80,7 @@ const Overlay = styled.div`
   position: ${POSITION_FIXED};
   left: 90;
   right: 0;
-  width: 91.5%;
+  width: calc(100% - 90px);
   top: 0;
   bottom: 0;
   z-index: 1;
@@ -96,7 +96,7 @@ const ContentArea = styled.div<{ zIndex: string | number }>`
   right: 0;
   bottom: 0;
   left: 90;
-  width: 91.5%;
+  width: calc(100% - 90px);
   height: 100%;
   z-index: ${({ zIndex }) => zIndex};
   padding: ${SPACING.spacing16};
