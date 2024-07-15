@@ -221,50 +221,6 @@ async def test_get_by_protocol(
     assert resources == [resource_1, resource_2]
 
 
-# async def test_get_rtp_values_and_defaults_by_analysis_id_prefers_memcache(
-#     subject: CompletedAnalysisStore,
-#     memcache: MemoryCache[str, CompletedAnalysisResource],
-#     protocol_store: ProtocolStore,
-#     decoy: Decoy,
-# ) -> None:
-#     """It should return RTP values and defaults dict from memcache."""
-#     resource = _completed_analysis_resource(
-#         analysis_id="analysis-id",
-#         protocol_id="protocol-id",
-#         rtp_values_and_defaults={
-#             "abc": RunTimeParameterAnalysisData(value=123, default=234)
-#         },
-#     )
-#     protocol_store.insert(make_dummy_protocol_resource("protocol-id"))
-#     # When we retrieve a resource via its id we should see it query the cache, and it should
-#     # return the identity-same resource
-#     decoy.when(memcache.get("analysis-id")).then_return(resource)
-#     result = await subject.get_rtp_values_and_defaults_by_analysis_id("analysis-id")
-#     assert result == resource.run_time_parameter_values_and_defaults
-#
-
-# async def test_get_rtp_values_and_defaults_by_analysis_from_db(
-#     subject: CompletedAnalysisStore,
-#     memcache: MemoryCache[str, CompletedAnalysisResource],
-#     protocol_store: ProtocolStore,
-#     decoy: Decoy,
-# ) -> None:
-#     """It should fetch the RTP values and defaults dict from database if not present in cache."""
-#     resource = _completed_analysis_resource(
-#         analysis_id="analysis-id",
-#         protocol_id="protocol-id",
-#         rtp_values_and_defaults={
-#             "xyz": RunTimeParameterAnalysisData(value=123, default=234)
-#         },
-#     )
-#     protocol_store.insert(make_dummy_protocol_resource("protocol-id"))
-#     # await subject.make_room_and_add(resource, )
-#     # Not in memcache
-#     decoy.when(memcache.get("analysis-id")).then_raise(KeyError())
-#     result = await subject.get_rtp_values_and_defaults_by_analysis_id("analysis-id")
-#     assert result == resource.run_time_parameter_values_and_defaults
-
-
 async def test_store_and_get_primitive_rtps_by_analysis(
     subject: CompletedAnalysisStore,
     protocol_store: ProtocolStore,
