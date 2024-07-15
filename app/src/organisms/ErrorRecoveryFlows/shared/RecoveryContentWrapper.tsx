@@ -35,23 +35,6 @@ export function RecoveryContentWrapper({
   )
 }
 
-export function RecoverySingleColumnContentDesktop({
-  children,
-  ...styleProps
-}: SingleColumnContentWrapperProps): JSX.Element {
-  return (
-    <Flex
-      padding={SPACING.spacing32}
-      gridGap={SPACING.spacing24}
-      flexDirection={DIRECTION_COLUMN}
-      justifyContent={JUSTIFY_SPACE_BETWEEN}
-      {...styleProps}
-    >
-      {children}
-    </Flex>
-  )
-}
-
 const STYLE = css`
   gap: ${SPACING.spacing24};
   width: 100%;
