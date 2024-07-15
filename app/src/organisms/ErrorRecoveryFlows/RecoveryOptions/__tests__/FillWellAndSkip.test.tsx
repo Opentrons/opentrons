@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { describe, it, vi, expect, beforeEach } from 'vitest'
-import { screen, fireEvent, waitFor } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 
 import { mockRecoveryContentProps } from '../../__fixtures__'
 import { renderWithProviders } from '../../../../__testing-utils__'
@@ -9,6 +9,7 @@ import { FillWellAndSkip, FillWell, SkipToNextStep } from '../FillWellAndSkip'
 import { RECOVERY_MAP } from '../../constants'
 import { CancelRun } from '../CancelRun'
 import { SelectRecoveryOption } from '../SelectRecoveryOption'
+import { clickButtonLabeled } from '../../__tests__/util'
 
 import type { Mock } from 'vitest'
 
@@ -172,7 +173,7 @@ describe('SkipToNextStep', () => {
       },
     }
     renderSkipToNextStep(props)
-    fireEvent.click(screen.getByRole('button', { name: 'Go back' }))
+    clickButtonLabeled('Go back')
     expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
       RECOVERY_MAP.IGNORE_AND_SKIP.ROUTE
     )
@@ -180,14 +181,13 @@ describe('SkipToNextStep', () => {
 
   it('calls goBackPrevStep when selectedRecoveryOption is not IGNORE_AND_SKIP and secondary button is clicked', () => {
     renderSkipToNextStep(props)
-    fireEvent.click(screen.getByRole('button', { name: 'Go back' }))
+    clickButtonLabeled('Go back')
     expect(mockGoBackPrevStep).toHaveBeenCalled()
   })
 
   it('calls the correct routeUpdateActions and recoveryCommands in the correct order when the primary button is clicked', async () => {
     renderSkipToNextStep(props)
-    fireEvent.click(screen.getByRole('button', { name: 'Continue run now' }))
-
+    clickButtonLabeled('Continue run now')
     await waitFor(() => {
       expect(mockSetRobotInMotion).toHaveBeenCalledWith(
         true,

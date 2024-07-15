@@ -15,7 +15,7 @@ import {
   ODD_SECTION_TITLE_STYLE,
 } from '../constants'
 import { RadioButton } from '../../../atoms/buttons'
-import { RecoveryFooterButtons, RecoverySingleColumnContent } from '../shared'
+import { RecoveryFooterButtons, RecoveryContentWrapper } from '../shared'
 
 import type { ErrorKind, RecoveryContentProps, RecoveryRoute } from '../types'
 import type { PipetteWithTip } from '../../DropTipWizardFlows'
@@ -40,7 +40,6 @@ export function SelectRecoveryOption(props: RecoveryContentProps): JSX.Element {
 }
 
 export function SelectRecoveryOptionHome({
-  isOnDevice,
   errorKind,
   routeUpdateActions,
   tipStatusUtils,
@@ -58,32 +57,27 @@ export function SelectRecoveryOptionHome({
 
   useCurrentTipStatus(determineTipStatus)
 
-  if (isOnDevice) {
-    return (
-      <RecoverySingleColumnContent>
-        <LegacyStyledText css={ODD_SECTION_TITLE_STYLE} as="h4SemiBold">
-          {t('choose_a_recovery_action')}
-        </LegacyStyledText>
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-          <RecoveryOptions
-            validRecoveryOptions={validRecoveryOptions}
-            setSelectedRoute={setSelectedRoute}
-            selectedRoute={selectedRoute}
-            getRecoveryOptionCopy={getRecoveryOptionCopy}
-          />
-        </Flex>
-        <RecoveryFooterButtons
-          isOnDevice={isOnDevice}
-          primaryBtnOnClick={() => {
-            setSelectedRecoveryOption(selectedRoute)
-            void proceedToRouteAndStep(selectedRoute as RecoveryRoute)
-          }}
+  return (
+    <RecoveryContentWrapper>
+      <LegacyStyledText css={ODD_SECTION_TITLE_STYLE} as="h4SemiBold">
+        {t('choose_a_recovery_action')}
+      </LegacyStyledText>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+        <RecoveryOptions
+          validRecoveryOptions={validRecoveryOptions}
+          setSelectedRoute={setSelectedRoute}
+          selectedRoute={selectedRoute}
+          getRecoveryOptionCopy={getRecoveryOptionCopy}
         />
-      </RecoverySingleColumnContent>
-    )
-  } else {
-    return null
-  }
+      </Flex>
+      <RecoveryFooterButtons
+        primaryBtnOnClick={() => {
+          setSelectedRecoveryOption(selectedRoute)
+          void proceedToRouteAndStep(selectedRoute as RecoveryRoute)
+        }}
+      />
+    </RecoveryContentWrapper>
+  )
 }
 
 interface RecoveryOptionsProps {

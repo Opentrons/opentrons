@@ -12,10 +12,7 @@ from opentrons.protocols.parameters.csv_parameter_definition import (
     create_csv_parameter,
     CSVParameterDefinition,
 )
-from opentrons.protocols.parameters.exceptions import (
-    ParameterDefinitionError,
-    RuntimeParameterRequired,
-)
+from opentrons.protocols.parameters.exceptions import RuntimeParameterRequired
 
 
 @pytest.fixture(autouse=True)
@@ -64,17 +61,6 @@ def test_set_csv_value(
 
     csv_parameter_subject.value = mock_file
     assert csv_parameter_subject.value is mock_file
-
-
-def test_set_csv_value_raises(
-    decoy: Decoy, csv_parameter_subject: CSVParameterDefinition
-) -> None:
-    """It should raise if the file set to does not end in '.csv'."""
-    mock_file = decoy.mock(cls=TextIOWrapper)
-    decoy.when(mock_file.name).then_return("mock.txt")
-
-    with pytest.raises(ParameterDefinitionError):
-        csv_parameter_subject.value = mock_file
 
 
 def test_csv_parameter_as_protocol_engine_type(

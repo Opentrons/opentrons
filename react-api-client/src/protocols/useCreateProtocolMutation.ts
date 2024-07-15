@@ -17,6 +17,7 @@ import type {
 export interface CreateProtocolVariables {
   files: File[]
   protocolKey?: string
+  protocolKind?: string
   runTimeParameterValues?: RunTimeParameterCreateData
 }
 export type UseCreateProtocolMutationResult = UseMutationResult<
@@ -52,11 +53,17 @@ export function useCreateProtocolMutation(
     CreateProtocolVariables
   >(
     [host, 'protocols'],
-    ({ files: protocolFiles, protocolKey, runTimeParameterValues }) =>
+    ({
+      files: protocolFiles,
+      protocolKey,
+      protocolKind = 'standard',
+      runTimeParameterValues,
+    }) =>
       createProtocol(
         host as HostConfig,
         protocolFiles,
         protocolKey,
+        protocolKind,
         runTimeParameterValues
       )
         .then(response => {

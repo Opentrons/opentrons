@@ -14,10 +14,8 @@ import {
 } from '@opentrons/components'
 
 import { RECOVERY_MAP } from '../constants'
-import {
-  RecoveryFooterButtons,
-  RecoverySingleColumnContent,
-} from '../shared'
+import { RecoveryFooterButtons, RecoveryContentWrapper } from '../shared'
+
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 import type { RecoveryContentProps } from '../types'
@@ -46,7 +44,6 @@ export function CancelRun(props: RecoveryContentProps): JSX.Element {
 }
 
 function CancelRunConfirmation({
-  isOnDevice,
   routeUpdateActions,
   recoveryCommands,
   tipStatusUtils,
@@ -60,8 +57,9 @@ function CancelRunConfirmation({
     routeUpdateActions,
     tipStatusUtils,
   })
+
   return (
-    <RecoverySingleColumnContent
+    <RecoveryContentWrapper
       gridGap={SPACING.spacing24}
       alignItems={ALIGN_CENTER}
     >
@@ -90,13 +88,12 @@ function CancelRunConfirmation({
         </LegacyStyledText>
       </Flex>
       <RecoveryFooterButtons
-        isOnDevice={isOnDevice}
         primaryBtnOnClick={handleCancelRunClick}
         secondaryBtnOnClick={goBackPrevStep}
         primaryBtnTextOverride={t('confirm')}
         isLoadingPrimaryBtnAction={showBtnLoadingState}
       />
-    </RecoverySingleColumnContent>
+    </RecoveryContentWrapper>
   )
 }
 

@@ -26,6 +26,7 @@ import { OneColumn } from './OneColumn'
 import { ModalContentMixed } from './ModalContentMixed'
 import { DescriptionContent } from './DescriptionContent'
 import { DeckMapContent } from './DeckMapContent'
+import { CategorizedStepContent } from './CategorizedStepContent'
 export {
   ModalContentOneColSimpleButtons,
   TwoColumn,
@@ -33,6 +34,7 @@ export {
   ModalContentMixed,
   DescriptionContent,
   DeckMapContent,
+  CategorizedStepContent,
 }
 
 export type ModalType = 'intervention-required' | 'error'

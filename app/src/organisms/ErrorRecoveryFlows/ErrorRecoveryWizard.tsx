@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 
 import { LegacyStyledText } from '@opentrons/components'
 
-import { BeforeBeginning } from './BeforeBeginning'
 import { RecoveryError } from './RecoveryError'
 import {
   SelectRecoveryOption,
@@ -107,7 +106,6 @@ export function ErrorRecoveryComponent(
   const isLargeDesktopStyle =
     route === RECOVERY_MAP.DROP_TIP_FLOWS.ROUTE &&
     step !== RECOVERY_MAP.DROP_TIP_FLOWS.STEPS.BEGIN_REMOVAL
-
   return (
     <RecoveryInterventionModal
       iconHeading={buildIconHeading()}
@@ -125,10 +123,6 @@ export function ErrorRecoveryComponent(
 }
 
 export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
-  const buildBeforeBeginning = (): JSX.Element => {
-    return <BeforeBeginning {...props} />
-  }
-
   const buildSelectRecoveryOption = (): JSX.Element => {
     return <SelectRecoveryOption {...props} />
   }
@@ -176,10 +170,7 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
   const buildIgnoreErrorSkipStep = (): JSX.Element => {
     return <IgnoreErrorSkipStep {...props} />
   }
-
   switch (props.recoveryMap.route) {
-    case RECOVERY_MAP.BEFORE_BEGINNING.ROUTE:
-      return buildBeforeBeginning()
     case RECOVERY_MAP.OPTION_SELECTION.ROUTE:
       return buildSelectRecoveryOption()
     case RECOVERY_MAP.ERROR_WHILE_RECOVERING.ROUTE:

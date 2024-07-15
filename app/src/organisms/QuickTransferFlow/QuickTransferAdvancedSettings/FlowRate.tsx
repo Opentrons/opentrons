@@ -39,12 +39,8 @@ export function FlowRateEntry(props: FlowRateEntryProps): JSX.Element {
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
   const keyboardRef = React.useRef(null)
 
-  const [flowRate, setFlowRate] = React.useState<number | null>(
-    kind === 'aspirate'
-      ? state.aspirateFlowRate
-      : kind === 'dispense'
-      ? state.dispenseFlowRate
-      : null
+  const [flowRate, setFlowRate] = React.useState<number>(
+    kind === 'aspirate' ? state.aspirateFlowRate : state.dispenseFlowRate
   )
 
   // TODO (ba, 2024-07-02): use the pipette name once we add it to the v2 spec
@@ -66,28 +62,27 @@ export function FlowRateEntry(props: FlowRateEntryProps): JSX.Element {
     LOW_VOLUME_PIPETTES.includes(pipetteName)
       ? liquidSpecs.lowVolumeDefault.supportedTips[tipType]
       : liquidSpecs.default.supportedTips[tipType]
-  const minFlowRate = 0.1
-  const maxFlowRate = flowRatesForSupportedTip?.uiMaxFlowRate ?? 0
+  const minFlowRate = 1
+  const maxFlowRate = Math.floor(flowRatesForSupportedTip?.uiMaxFlowRate ?? 0)
+
+  const flowRateAction =
+    kind === 'aspirate'
+      ? ACTIONS.SET_ASPIRATE_FLOW_RATE
+      : ACTIONS.SET_DISPENSE_FLOW_RATE
 
   let headerCopy: string = ''
   let textEntryCopy: string = ''
-  let flowRateAction:
-    | typeof ACTIONS.SET_ASPIRATE_FLOW_RATE
-    | typeof ACTIONS.SET_DISPENSE_FLOW_RATE
-    | null = null
   if (kind === 'aspirate') {
     headerCopy = t('aspirate_flow_rate')
     textEntryCopy = t('aspirate_flow_rate_µL')
-    flowRateAction = ACTIONS.SET_ASPIRATE_FLOW_RATE
   } else if (kind === 'dispense') {
     headerCopy = t('dispense_flow_rate')
     textEntryCopy = t('dispense_flow_rate_µL')
-    flowRateAction = ACTIONS.SET_DISPENSE_FLOW_RATE
   }
 
   const handleClickSave = (): void => {
     // the button will be disabled if this values is null
-    if (flowRate != null && flowRateAction != null) {
+    if (flowRate != null) {
       dispatch({
         type: flowRateAction,
         rate: flowRate,
@@ -97,7 +92,7 @@ export function FlowRateEntry(props: FlowRateEntryProps): JSX.Element {
   }
 
   const error =
-    flowRate !== null && (flowRate < minFlowRate || flowRate > maxFlowRate)
+    flowRate != null && (flowRate < minFlowRate || flowRate > maxFlowRate)
       ? t(`value_out_of_range`, {
           min: minFlowRate,
           max: maxFlowRate,
@@ -112,7 +107,7 @@ export function FlowRateEntry(props: FlowRateEntryProps): JSX.Element {
         onClickBack={onBack}
         onClickButton={handleClickSave}
         top={SPACING.spacing8}
-        buttonIsDisabled={error != null || flowRate === null}
+        buttonIsDisabled={error != null || flowRate == null}
       />
       <Flex
         alignSelf={ALIGN_CENTER}

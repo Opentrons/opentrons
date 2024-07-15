@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { RECOVERY_MAP } from './constants'
+import { Flex, ALIGN_CENTER, JUSTIFY_CENTER } from '@opentrons/components'
 
 import type { RobotMovingRoute, RecoveryContentProps } from './types'
 
@@ -41,5 +42,13 @@ export function RecoveryInProgress({
 
   const description = buildDescription()
 
-  return <InProgressModal description={description} />
+  return (
+    <Flex
+      alignItems={ALIGN_CENTER}
+      justifyContent={JUSTIFY_CENTER}
+      width="100%"
+    >
+      <InProgressModal description={description} />
+    </Flex>
+  )
 }

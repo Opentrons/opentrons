@@ -1,6 +1,8 @@
-import * as React from 'react'
-import {css} from 'styled-components'
+// TODO: replace this by making these props true of interventionmodal content wrappers
+// once error recovery uses interventionmodal consistently
 
+import * as React from 'react'
+import { css } from 'styled-components'
 import {
   DIRECTION_COLUMN,
   JUSTIFY_SPACE_BETWEEN,
@@ -17,16 +19,15 @@ interface SingleColumnContentWrapperProps extends StyleProps {
 // For flex-direction: column recovery content with one column only.
 //
 // For ODD use only.
-export function RecoverySingleColumnContent({
+export function RecoveryContentWrapper({
   children,
   ...styleProps
 }: SingleColumnContentWrapperProps): JSX.Element {
   return (
     <Flex
-      padding={SPACING.spacing32}
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      css={FLEX_HEIGHT}
+      css={STYLE}
       {...styleProps}
     >
       {children}
@@ -51,8 +52,11 @@ export function RecoverySingleColumnContentDesktop({
   )
 }
 
-const FLEX_HEIGHT = css`
-  @media (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
-    height= 29.25rem
+const STYLE = css`
+  gap: ${SPACING.spacing24};
+  width: 100%;
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    gap: none;
+    height: 29.25rem;
   }
 `
