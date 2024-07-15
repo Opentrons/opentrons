@@ -93,7 +93,6 @@ export function ErrorRecoveryComponent(
     const titleText = props.hasLaunchedRecovery
       ? t('recovery_mode')
       : t('cancel_run')
-    // change this to default typography
     return <LegacyStyledText as={'h4Bold'}>{titleText}</LegacyStyledText>
   }
 
