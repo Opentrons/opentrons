@@ -35,6 +35,7 @@ import type {
   NumberParameter,
   RunTimeParameter,
   ValueRunTimeParameter,
+  CsvFileFileType,
 } from '@opentrons/shared-data'
 import type { LabwareOffsetCreateData } from '@opentrons/api-client'
 
@@ -86,14 +87,8 @@ export function ProtocolSetupParameters({
   )
   const { makeSnackbar } = useToaster()
 
-  const csvFileParameter = runTimeParameters.find(
-    (param): param is CsvFileParameter => param.type === 'csv_file'
-  )
-  const initialFileId: string = csvFileParameter?.file?.id ?? ''
-  const [csvFileInfo, setCSVFileInfo] = React.useState<string>(initialFileId)
-
   const updateParameters = (
-    value: boolean | string | number,
+    value: boolean | string | number | CsvFileFileType,
     variableName: string
   ): void => {
     const updatedParameters = runTimeParametersOverrides.map(parameter => {
@@ -289,8 +284,6 @@ export function ProtocolSetupParameters({
         }}
         parameter={chooseCsvFileScreen}
         setParameter={updateParameters}
-        csvFileInfo={csvFileInfo}
-        setCsvFileInfo={setCSVFileInfo}
       />
     )
   }
