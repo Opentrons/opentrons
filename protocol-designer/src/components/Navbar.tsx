@@ -18,15 +18,6 @@ import {
 
 import type { RouteProps } from './types'
 
-const NavbarLink = styled(NavLink)`
-  color: ${COLORS.black90};
-  text-decoration: none;
-  align-self: ${ALIGN_STRETCH};
-  &:hover {
-    color: ${COLORS.black70};
-  }
-`
-
 export function Navbar({ routes }: { routes: RouteProps[] }): JSX.Element {
   const navRoutes = routes.filter(
     ({ navLinkTo }: RouteProps) => navLinkTo != null
@@ -62,3 +53,12 @@ export function Navbar({ routes }: { routes: RouteProps[] }): JSX.Element {
     </Flex>
   )
 }
+
+const NavbarLink = styled(NavLink)`
+  color: ${COLORS.black90};
+  text-decoration: none;
+  align-self: ${ALIGN_STRETCH};
+  &:hover {
+    color: ${COLORS.black70};
+  }
+`
