@@ -53,7 +53,7 @@ export function ChooseCsvFile({
   )
 
   const handleBackButton = (): void => {
-    if (!isEqual(csvFileSelected, setCsvFileSelected)) {
+    if (!isEqual(csvFileSelected, initialFileObject)) {
       setParameter(csvFileSelected, parameter.variableName)
     }
     handleGoBack()
