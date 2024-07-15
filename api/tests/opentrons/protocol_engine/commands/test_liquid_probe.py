@@ -250,13 +250,8 @@ async def test_liquid_probe_tip_checking(
             pipette_id=pipette_id,
         ),
     ).then_raise(TipNotAttachedError())
-    try:
+    with pytest.raises(TipNotAttachedError):
         await subject.execute(data)
-        assert False
-    except TipNotAttachedError:
-        assert True
-    except Exception:
-        assert False
 
 
 async def test_liquid_probe_volume_checking(
@@ -283,13 +278,8 @@ async def test_liquid_probe_volume_checking(
     decoy.when(
         pipetting.get_is_empty(pipette_id=pipette_id),
     ).then_return(False)
-    try:
+    with pytest.raises(TipNotEmptyError):
         await subject.execute(data)
-        assert False
-    except TipNotEmptyError:
-        assert True
-    except Exception:
-        assert False
 
 
 async def test_liquid_probe_location_checking(
@@ -318,10 +308,5 @@ async def test_liquid_probe_location_checking(
             mount=MountType.LEFT,
         ),
     ).then_return(False)
-    try:
+    with pytest.raises(MustHomeError):
         await subject.execute(data)
-        assert False
-    except MustHomeError:
-        assert True
-    except Exception:
-        assert False
