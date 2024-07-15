@@ -27,7 +27,6 @@ import type { CsvFileData } from '@opentrons/api-client'
 interface ChooseCsvFileProps {
   protocolId: string
   handleGoBack: () => void
-  // ToDo (kk:06/18/2024) null will be removed when implemented required part
   parameter: CsvFileParameter
   setParameter: (
     value: boolean | string | number | CsvFileFileType,
@@ -108,19 +107,19 @@ export function ChooseCsvFile({
             <Flex css={LIST_CONTAINER_STYLE}>
               {csvFilesOnUSB.length !== 0 ? (
                 csvFilesOnUSB.map(csv => {
-                  const fileNameOnUsb = last(csv.split('/'))
+                  const fileName = last(csv.split('/'))
                   return (
                     <>
-                      {csv.length !== 0 && fileNameOnUsb !== undefined ? (
+                      {csv.length !== 0 && fileName !== undefined ? (
                         <RadioButton
-                          key={fileNameOnUsb}
-                          data-testid={`${fileNameOnUsb}`}
-                          buttonLabel={fileNameOnUsb ?? 'default'}
+                          key={fileName}
+                          data-testid={fileName}
+                          buttonLabel={fileName ?? 'default'}
                           buttonValue={csv}
                           onChange={() => {
                             setCsvFileSelected({
                               filePath: csv,
-                              fileName: fileNameOnUsb,
+                              fileName: fileName,
                             })
                           }}
                           isSelected={csvFileSelected?.filePath === csv}
