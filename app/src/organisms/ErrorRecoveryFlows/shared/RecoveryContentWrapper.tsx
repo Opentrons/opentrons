@@ -40,6 +40,6 @@ const STYLE = css`
   width: 100%;
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     gap: none;
-    height: 29.25rem;
+    height: 100%;
   }
 `

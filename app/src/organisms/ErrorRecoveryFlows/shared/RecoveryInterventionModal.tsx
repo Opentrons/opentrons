@@ -53,11 +53,9 @@ const ODD_STYLE = `
 
 const SMALL_MODAL_STYLE = css`
   height: 25.25rem;
-
   ${ODD_STYLE}
 `
 const LARGE_MODAL_STYLE = css`
   height: 30rem;
-
   ${ODD_STYLE}
 `

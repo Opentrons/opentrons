@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
-  ALIGN_CENTER,
+  ALIGN_FLEX_END,
+  Box,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
@@ -35,7 +36,7 @@ export function RecoveryFooterButtons(
       width="100%"
       height="100%"
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      alignItems={ALIGN_CENTER}
+      alignItems={ALIGN_FLEX_END}
       gridGap={SPACING.spacing8}
     >
       <RecoveryGoBackButton {...props} />
@@ -50,7 +51,7 @@ function RecoveryGoBackButton({
   const showGoBackBtn = secondaryBtnOnClick != null
   const { t } = useTranslation('error_recovery')
   return showGoBackBtn ? (
-    <Flex marginTop="auto">
+    <Flex>
       <SmallButton
         buttonType="tertiaryLowLight"
         buttonText={t('go_back')}
@@ -62,7 +63,9 @@ function RecoveryGoBackButton({
         {t('go_back')}
       </SecondaryButton>
     </Flex>
-  ) : null
+  ) : (
+    <Box />
+  )
 }
 
 function PrimaryButtonGroup(props: RecoveryFooterButtonProps): JSX.Element {
@@ -73,13 +76,13 @@ function PrimaryButtonGroup(props: RecoveryFooterButtonProps): JSX.Element {
 
   if (!renderTertiaryBtn) {
     return (
-      <Flex marginTop="auto">
+      <Flex>
         <RecoveryPrimaryBtn {...props} />
       </Flex>
     )
   } else {
     return (
-      <Flex gridGap={SPACING.spacing8} marginTop="auto">
+      <Flex gridGap={SPACING.spacing8}>
         <RecoveryTertiaryBtn {...props} />
         <RecoveryPrimaryBtn {...props} />
       </Flex>
@@ -109,7 +112,6 @@ function RecoveryPrimaryBtn({
         buttonType="primary"
         buttonText={primaryBtnTextOverride ?? t('continue')}
         onClick={primaryBtnOnClick}
-        marginTop="auto"
       />
       <PrimaryButton
         css={DESKTOP_ONLY_BUTTON}
