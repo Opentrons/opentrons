@@ -260,10 +260,13 @@ class InstrumentContext(publisher.CommandPublisher):
             c_vol = self._core.get_available_volume() if not volume else volume
         flow_rate = self._core.get_aspirate_flow_rate(rate)
 
-        if self.api_version >= APIVersion(2, 20) and well is not None:
-            if self._core.get_liquid_presence_detection():
-                self.require_liquid_presence(well=well)
-                self.prepare_to_aspirate()
+        if (
+            self.api_version >= APIVersion(2, 20)
+            and well is not None
+            and self.liquid_presence_detection
+        ):
+            self.require_liquid_presence(well=well)
+            self.prepare_to_aspirate()
 
         with publisher.publish_context(
             broker=self.broker,
@@ -1678,7 +1681,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
     @property
     @requires_version(2, 20)
-    def liquid_detection(self) -> bool:
+    def liquid_presence_detection(self) -> bool:
         """
         Gets the global setting for liquid level detection.
 
@@ -1689,9 +1692,9 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         return self._core.get_liquid_presence_detection()
 
-    @liquid_detection.setter
+    @liquid_presence_detection.setter
     @requires_version(2, 20)
-    def liquid_detection(self, enable: bool) -> None:
+    def liquid_presence_detection(self, enable: bool) -> None:
         self._core.set_liquid_presence_detection(enable)
 
     @property

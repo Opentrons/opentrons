@@ -1068,8 +1068,8 @@ def test_liquid_presence_detection(
 ) -> None:
     """It should have a default liquid presence detection boolean set to False."""
     decoy.when(mock_instrument_core.get_liquid_presence_detection()).then_return(False)
-    assert subject.liquid_detection is False
-    subject.liquid_detection = True
+    assert subject.liquid_presence_detection is False
+    subject.liquid_presence_detection = True
     decoy.verify(mock_instrument_core.set_liquid_presence_detection(True), times=1)
 
 
@@ -1307,7 +1307,6 @@ def test_require_liquid_presence(
 ) -> None:
     """It should raise an exception when called."""
     mock_well = decoy.mock(cls=Well)
-    loc = Location(Point(0, 0, 0), None)
     lnfe = LiquidNotFoundError(id="1234", createdAt=datetime.now())
     errorToRaise = ProtocolCommandFailedError(
         original_error=lnfe,
