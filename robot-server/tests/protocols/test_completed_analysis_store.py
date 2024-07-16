@@ -8,7 +8,10 @@ import pytest
 from sqlalchemy.engine import Engine
 from decoy import Decoy
 
-from robot_server.persistence.tables import analysis_table
+from robot_server.persistence.tables import (
+    analysis_table,
+    analysis_primitive_type_rtp_table,
+)
 from robot_server.protocols.completed_analysis_store import (
     CompletedAnalysisResource,
     CompletedAnalysisStore,
@@ -358,3 +361,81 @@ async def test_add_makes_room_for_new_analysis(
     ]
     for analysis_id in removed_ids:
         decoy.verify(memcache.remove(analysis_id))
+
+
+async def test_make_room_and_add_handles_rtp_tables_correctly(
+    subject: CompletedAnalysisStore,
+    memcache: MemoryCache[str, CompletedAnalysisResource],
+    protocol_store: ProtocolStore,
+    sql_engine: Engine,
+) -> None:
+    """It should delete any RTP table entries that reference the analyses being deleted, and then insert new RTP entries."""
+    existing_analysis_ids = [
+        "analysis-id-0",
+        "analysis-id-1",
+        "analysis-id-2",
+        "analysis-id-3",
+        "analysis-id-4",
+    ]
+
+    protocol_store.insert(make_dummy_protocol_resource("protocol-id"))
+
+    # Set up the database with existing analyses
+    resources = [
+        _completed_analysis_resource(
+            analysis_id=analysis_id,
+            protocol_id="protocol-id",
+        )
+        for analysis_id in existing_analysis_ids
+    ]
+    primitive_rtp_resources = [
+        PrimitiveParameterResource(
+            analysis_id="analysis-id-0",
+            parameter_variable_name="foo",
+            parameter_type="int",
+            parameter_value=10,
+        ),
+        PrimitiveParameterResource(
+            analysis_id="analysis-id-2",
+            parameter_variable_name="bar",
+            parameter_type="bool",
+            parameter_value=True,
+        ),
+    ]
+    for resource in resources:
+        statement = analysis_table.insert().values(await resource.to_sql_values())
+        with sql_engine.begin() as transaction:
+            transaction.execute(statement)
+    for primitive_rtp_resource in primitive_rtp_resources:
+        statement = analysis_primitive_type_rtp_table.insert().values(
+            primitive_rtp_resource.to_sql_values()
+        )
+        with sql_engine.begin() as transaction:
+            transaction.execute(statement)
+
+    assert subject.get_ids_by_protocol("protocol-id") == existing_analysis_ids
+    await subject.make_room_and_add(
+        _completed_analysis_resource(
+            analysis_id="new-analysis-id",
+            protocol_id="protocol-id",
+        ),
+        [
+            PrimitiveParameterResource(
+                analysis_id="new-analysis-id",
+                parameter_variable_name="baz",
+                parameter_type="str",
+                parameter_value="10",
+            )
+        ],
+    )
+    assert subject.get_ids_by_protocol("protocol-id") == [
+        "analysis-id-1",
+        "analysis-id-2",
+        "analysis-id-3",
+        "analysis-id-4",
+        "new-analysis-id",
+    ]
+
+    assert subject.get_primitive_rtps_by_analysis_id("analysis-id-2") == {"bar": True}
+    assert subject.get_primitive_rtps_by_analysis_id("analysis-id-0") == {}
+    assert subject.get_primitive_rtps_by_analysis_id("new-analysis-id") == {"baz": "10"}

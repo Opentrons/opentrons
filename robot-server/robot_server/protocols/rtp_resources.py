@@ -19,11 +19,7 @@ class PrimitiveParameterResource:
     parameter_value: PrimitiveAllowedTypes
 
     def to_sql_values(self) -> Dict[str, object]:
-        """Return this data as a dict that can be passed to an SQLAlchemy insert.
-
-        Avoid calling this from inside an SQL transaction since it involves
-        some serialization and might be slow.
-        """
+        """Return this data as a dict that can be passed to an SQLAlchemy insert."""
         return {
             "analysis_id": self.analysis_id,
             "parameter_variable_name": self.parameter_variable_name,

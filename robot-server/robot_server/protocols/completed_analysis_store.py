@@ -305,6 +305,13 @@ class CompletedAnalysisStore:
         analyses_to_delete = analyses_ids[: -MAX_ANALYSES_TO_STORE + 1]
         for analysis_id in analyses_to_delete:
             self._memcache.remove(analysis_id)
+
+        # Delete the RTP table rows that reference the analyses being deleted
+        delete_primitive_rtp_statement = (
+            analysis_primitive_type_rtp_table.delete().where(
+                analysis_primitive_type_rtp_table.c.analysis_id.in_(analyses_to_delete)
+            )
+        )
         delete_statement = analysis_table.delete().where(
             analysis_table.c.id.in_(analyses_to_delete)
         )
@@ -315,6 +322,7 @@ class CompletedAnalysisStore:
         insert_rtp_statement = analysis_primitive_type_rtp_table.insert()
 
         with self._sql_engine.begin() as transaction:
+            transaction.execute(delete_primitive_rtp_statement)
             transaction.execute(delete_statement)
             transaction.execute(insert_statement)
             for param in primitive_rtp_resources:
