@@ -89,13 +89,13 @@ export function BeginRemoval({
     }
   }
 
-  const ODD_ONLY_BUTTON = css`
+  const ODD_ONLY = css`
     @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
       display: none;
     }
   `
 
-  const DESKTOP_ONLY_BUTTON = css`
+  const DESKTOP_ONLY = css`
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
       display: none;
     }
@@ -113,7 +113,7 @@ export function BeginRemoval({
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing4}
-        css={ODD_ONLY_BUTTON}
+        css={ODD_ONLY}
       >
         <RadioButton
           buttonLabel={t('begin_removal')}
@@ -135,35 +135,26 @@ export function BeginRemoval({
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing4}
-        css={DESKTOP_ONLY_BUTTON}
+        css={DESKTOP_ONLY}
       >
         <RadioGroup
           useBlueChecked
           css={css`
             padding: ${SPACING.spacing4};
           `}
-          // value={
-          //   selected === 'skip'
-          //     ? t('skip')
-          //     : selected === 'begin removal'
-          //     ? ALWAYS_BLOCK
-          //     : ALWAYS_PROMPT
-          // }
+          value={selected}
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            // you know this is a limited-selection field whose values are only
-            // the elements of BlockSelection; i know this is a limited-selection
-            // field whose values are only the elements of BlockSelection; but sadly,
-            // neither of us can get Flow to know it
-            console.log(event)
+            const newValue = event.target.value;
+            console.log("newValue " + newValue)
             setSelected('skip')
           }}
           options={[
-            { name: t('begin_removal'), value: t('begin_removal') },
-            { name: t('skip'), value: t('skip') },
+            { name: '', value: t('begin_removal'), children: <StyledText desktopStyle="bodyDefaultRegular">{t('begin_removal')}</StyledText> },
+            { name: '', value: t('skip'), children: <StyledText desktopStyle="bodyDefaultRegular">{t('skip')}</StyledText> },
           ]}
         ></RadioGroup>
       </Flex>
-      <RecoveryFooterButtons primaryBtnOnClick={primaryOnClick} />
+      <RecoveryFooterButtons primaryBtnOnClick={primaryOnClick}/>
     </RecoveryContentWrapper>
   )
 }

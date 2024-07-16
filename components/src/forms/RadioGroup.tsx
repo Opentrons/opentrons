@@ -1,6 +1,5 @@
 import * as React from 'react'
 import cx from 'classnames'
-import { StyledText } from '@opentrons/components'
 import { Icon } from '../icons'
 import styles from './forms.module.css'
 
@@ -76,11 +75,8 @@ export function RadioGroup(props: RadioGroupProps): JSX.Element {
               onBlur={props.onBlur}
               onChange={props.onChange}
             />
-            <div
-              className={cx(props.labelTextClassName)}>
-              <StyledText desktopStyle="bodyDefaultRegular">
-                {radio.name}
-              </StyledText>
+            <div className={cx(props.labelTextClassName, styles.label_text)}>
+            {radio.name}  
             </div>
             {radio.children}
           </label>
