@@ -6,6 +6,7 @@ import {
   useCreateProtocolAnalysisMutation,
   useCreateRunMutation,
   useHost,
+  useUploadCsvFileMutation,
 } from '@opentrons/react-api-client'
 import { COLORS } from '@opentrons/components'
 
@@ -43,6 +44,7 @@ vi.mock('../../../redux/config')
 
 const MOCK_HOST_CONFIG: HostConfig = { hostname: 'MOCK_HOST' }
 const mockCreateProtocolAnalysis = vi.fn()
+const mockUploadCsvFile = vi.fn()
 const mockCreateRun = vi.fn()
 const mockMostRecentAnalysis = ({
   commands: [],
@@ -79,6 +81,9 @@ describe('ProtocolSetupParameters', () => {
     when(vi.mocked(useCreateRunMutation))
       .calledWith(expect.anything())
       .thenReturn({ createRun: mockCreateRun } as any)
+    when(vi.mocked(useUploadCsvFileMutation))
+      .calledWith(expect.anything(), expect.anything())
+      .thenReturn({ uploadCsvFile: mockUploadCsvFile } as any)
     when(vi.mocked(useFeatureFlag))
       .calledWith('enableCsvFile')
       .thenReturn(false)

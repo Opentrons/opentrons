@@ -285,7 +285,7 @@ export function ChooseProtocolSlideoutComponent(
                       }
                       return parameter
                     })
-                    setRunTimeParametersOverrides?.(clone)
+                    setRunTimeParametersOverrides?.(clone as RunTimeParameter[])
                   }}
                   title={runtimeParam.displayName}
                   width="100%"
