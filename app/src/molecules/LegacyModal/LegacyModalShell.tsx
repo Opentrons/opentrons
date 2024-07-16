@@ -1,18 +1,17 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import {
-  COLORS,
-  POSITION_FIXED,
   ALIGN_CENTER,
-  JUSTIFY_CENTER,
-  POSITION_RELATIVE,
-  OVERFLOW_AUTO,
-  POSITION_STICKY,
   BORDERS,
-  RESPONSIVENESS,
-  styleProps,
-  SPACING,
+  COLORS,
+  JUSTIFY_CENTER,
+  OVERFLOW_AUTO,
   POSITION_ABSOLUTE,
+  POSITION_RELATIVE,
+  POSITION_STICKY,
+  RESPONSIVENESS,
+  SPACING,
+  styleProps,
 } from '@opentrons/components'
 import type { StyleProps } from '@opentrons/components'
 export interface LegacyModalShellProps extends StyleProps {

@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-import { createPortal } from 'react-dom'
 
 import {
   ALIGN_CENTER,
@@ -12,8 +11,8 @@ import {
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -53,7 +52,6 @@ import { TertiaryButton } from '../../atoms/buttons'
 import { Modal } from '../../molecules/Modal'
 import { LegacyModal } from '../../molecules/LegacyModal'
 import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration/'
-import { getModalPortalEl } from '../../App/portal'
 
 import type {
   CutoutConfig,
@@ -334,7 +332,7 @@ export function AddFixtureModal({
     />
   ))
 
-  return createPortal(
+  return (
     <>
       {isOnDevice ? (
         <Modal
@@ -381,8 +379,7 @@ export function AddFixtureModal({
           ) : null}
         </LegacyModal>
       )}
-    </>,
-    getModalPortalEl()
+    </>
   )
 }
 
