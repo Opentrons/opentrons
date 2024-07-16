@@ -78,7 +78,6 @@ const Overlay = styled.div`
   position: ${POSITION_ABSOLUTE};
   left: 0;
   right: 0;
-  width: 100%;
   top: 0;
   bottom: 0;
   z-index: 1;
