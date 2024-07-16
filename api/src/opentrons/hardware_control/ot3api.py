@@ -1935,6 +1935,37 @@ class OT3API(
                 acquire_lock=acquire_lock,
             )
 
+    async def _move_to_plunger_top_for_liquid_probe(
+        self,
+        mount: OT3Mount,
+        rate: float,
+        acquire_lock: bool = True,
+    ) -> None:
+        """
+        Move an instrument's plunger to the top, to prepare for a following
+        liquid probe action.
+
+        The plunger backlash distance (mm) is used to ensure the plunger is pre-loaded
+        in the downward direction. This means that the final position will not be
+        the plunger's configured "top" position, but "top" plus the "backlashDistance".
+        """
+        max_speeds = self.config.motion_settings.default_max_speed
+        speed = max_speeds[self.gantry_load][OT3AxisKind.P]
+        instrument = self._pipette_handler.get_pipette(mount)
+        top_plunger_pos = target_position_from_plunger(
+            OT3Mount.from_mount(mount),
+            instrument.plunger_positions.top,
+            self._current_position,
+        )
+        target_pos = top_plunger_pos.copy()
+        target_pos[Axis.of_main_tool_actuator(mount)] += instrument.backlash_distance
+        await self._move(top_plunger_pos, speed=speed * rate, acquire_lock=acquire_lock)
+        # NOTE: This should ALWAYS be moving DOWN.
+        #       There should never be a time that this function is called and
+        #       the plunger doesn't physically move DOWN.
+        #       This is to make sure we are always engaged at the beginning of liquid-probe.
+        await self._move(target_pos, speed=speed * rate, acquire_lock=acquire_lock)
+
     async def configure_for_volume(
         self, mount: Union[top_types.Mount, OT3Mount], volume: float
     ) -> None:
