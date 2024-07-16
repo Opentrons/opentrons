@@ -1,12 +1,15 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import head from 'lodash/head'
+import { css } from 'styled-components'
 
 import {
   DIRECTION_COLUMN,
   SPACING,
   Flex,
   StyledText,
+  RadioGroup,
+  RESPONSIVENESS,
 } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
@@ -86,6 +89,18 @@ export function BeginRemoval({
     }
   }
 
+  const ODD_ONLY_BUTTON = css`
+    @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+      display: none;
+    }
+  `
+
+  const DESKTOP_ONLY_BUTTON = css`
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      display: none;
+    }
+  `
+
   return (
     <RecoveryContentWrapper>
       <StyledText
@@ -95,7 +110,11 @@ export function BeginRemoval({
       >
         {t('you_may_want_to_remove', { mount })}
       </StyledText>
-      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing4}
+        css={ODD_ONLY_BUTTON}
+      >
         <RadioButton
           buttonLabel={t('begin_removal')}
           buttonValue={t('begin_removal')}
@@ -112,6 +131,37 @@ export function BeginRemoval({
           }}
           isSelected={selected === 'skip'}
         />
+      </Flex>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing4}
+        css={DESKTOP_ONLY_BUTTON}
+      >
+        <RadioGroup
+          useBlueChecked
+          css={css`
+            padding: ${SPACING.spacing4};
+          `}
+          // value={
+          //   selected === 'skip'
+          //     ? t('skip')
+          //     : selected === 'begin removal'
+          //     ? ALWAYS_BLOCK
+          //     : ALWAYS_PROMPT
+          // }
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+            // you know this is a limited-selection field whose values are only
+            // the elements of BlockSelection; i know this is a limited-selection
+            // field whose values are only the elements of BlockSelection; but sadly,
+            // neither of us can get Flow to know it
+            console.log(event)
+            setSelected('skip')
+          }}
+          options={[
+            { name: t('begin_removal'), value: t('begin_removal') },
+            { name: t('skip'), value: t('skip') },
+          ]}
+        ></RadioGroup>
       </Flex>
       <RecoveryFooterButtons primaryBtnOnClick={primaryOnClick} />
     </RecoveryContentWrapper>

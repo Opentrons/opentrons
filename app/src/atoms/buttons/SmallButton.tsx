@@ -11,7 +11,7 @@ import {
   Icon,
   JUSTIFY_CENTER,
   SPACING,
-  LegacyStyledText,
+  StyledText,
   TYPOGRAPHY,
   RESPONSIVENESS,
 } from '@opentrons/components'
@@ -150,15 +150,6 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
     }
   `
 
-  const TEXT_STYLE = css`
-    font-size: 0.875rem;
-    line-height: ${TYPOGRAPHY.lineHeight20}
-    fontWeight: ${TYPOGRAPHY.fontWeightSemiBold}
-      @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    font-size: 1.37rem;
-    line-height: ${TYPOGRAPHY.lineHeight28}
-  `
-
   return (
     <Btn
       css={SMALL_BUTTON_STYLE}
@@ -191,7 +182,12 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
           </Flex>
         ) : null}
 
-        <LegacyStyledText css={TEXT_STYLE}>{buttonText}</LegacyStyledText>
+        <StyledText
+          oddStyle="bodyTextSemiBold"
+          desktopStyle="bodyDefaultSemiBold"
+        >
+          {buttonText}
+        </StyledText>
         {iconPlacement === 'endIcon' && iconName != null ? (
           <Flex
             aria-label={
