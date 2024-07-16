@@ -316,6 +316,10 @@ class WellDetails(BaseModel):
     labware_id: str
     well_name: str
 
+    def __hash__(self) -> int:
+        """Needed to make WellDetails a key in WellState dictionaries."""
+        return hash((self.labware_id, self.well_name))
+
 
 @dataclass(frozen=True)
 class CurrentAddressableArea:
