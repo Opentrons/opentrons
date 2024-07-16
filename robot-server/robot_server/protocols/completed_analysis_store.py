@@ -8,7 +8,6 @@ from dataclasses import dataclass
 
 import sqlalchemy
 import anyio
-from opentrons.protocol_engine.types import CsvRunTimeParamFilesType
 from opentrons.protocols.parameters.types import PrimitiveAllowedTypes
 
 from robot_server.persistence.database import sqlite_rowid
@@ -291,7 +290,7 @@ class CompletedAnalysisStore:
         self,
         analysis_id: str,
     ) -> Mapping[str, Union[str, None]]:
-        """Get the saved CSV RTP file IDs from database"""
+        """Get the saved CSV RTP file IDs from database."""
         statement = (
             sqlalchemy.select(analysis_csv_rtp_table)
             .where(analysis_csv_rtp_table.c.analysis_id == analysis_id)
