@@ -2583,6 +2583,7 @@ class OT3API(
             probe_settings.mount_speed,
             (probe_settings.plunger_speed * plunger_direction),
             probe_settings.sensor_threshold_pascals,
+            probe_settings.plunger_impulse_time,
             probe_settings.output_option,
             probe_settings.data_files,
             probe=probe,
@@ -2626,11 +2627,15 @@ class OT3API(
 
         probe_start_pos = await self.gantry_position(checked_mount, refresh=True)
 
-        p_travel = (
+        # plunger travel distance is from TOP->BOTTOM (minus the backlash distance + impulse)
+        p_impulse_mm = (
+            probe_settings.plunger_impulse_time * probe_settings.plunger_speed
+        )
+        p_total_mm = (
             instrument.plunger_positions.bottom - instrument.plunger_positions.top
         )
+
         max_speeds = self.config.motion_settings.default_max_speed
-        p_prep_speed = max_speeds[self.gantry_load][OT3AxisKind.P]
         # We need to significatly slow down the 96 channel liquid probe
         if self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
             max_plunger_speed = self.config.motion_settings.max_speed_discontinuity[
@@ -2639,6 +2644,28 @@ class OT3API(
             probe_settings.plunger_speed = min(
                 max_plunger_speed, probe_settings.plunger_speed
             )
+        p_working_mm = p_total_mm - (instrument.backlash_distance - p_impulse_mm)
+
+        # NOTE: (sigler) the 0.5 seconds is indeed a magic number, edit carefully.
+        #       The Z axis probing motion uses the first 20 samples to calculate
+        #       a baseline for all following samples, making the very beginning of
+        #       that Z motion unable to detect liquid. The sensor is configured for
+        #       4ms sample readings, and so we then assume it takes ~80ms to complete.
+        #       If the Z is moving at 5mm/sec, then ~80ms equates to ~0.4
+        baseline_during_z_sample_num = 20  # FIXME: (sigler) shouldn't be defined here?
+        sample_time_sec = 0.004  # FIXME: (sigler) shouldn't be defined here?
+        baseline_duration_sec = baseline_during_z_sample_num * sample_time_sec
+        non_responsive_z_mm = baseline_duration_sec * probe_settings.mount_speed
+
+        # height where probe action will begin
+        # TODO: (sigler) add this to pipette's liquid def (per tip)
+        probe_pass_overlap_mm = 0.1
+        probe_pass_z_offset_mm = non_responsive_z_mm + probe_pass_overlap_mm
+
+        # height that is considered safe to reset the plunger without disturbing liquid
+        # this usually needs to at least 1-2mm from liquid, to avoid splashes from air
+        # TODO: (sigler) add this to pipette's liquid def (per tip)
+        probe_safe_reset_mm = max(2.0, probe_pass_z_offset_mm)
 
         error: Optional[PipetteLiquidNotFoundError] = None
         pos = await self.gantry_position(checked_mount, refresh=True)
@@ -2650,7 +2677,8 @@ class OT3API(
             max_z_time = (
                 max_z_dist - (probe_start_pos.z - safe_plunger_pos.z)
             ) / probe_settings.mount_speed
-            pass_travel = min(max_z_time * probe_settings.plunger_speed, p_travel)
+            p_travel_required_for_z = max_z_time * probe_settings.plunger_speed
+            p_pass_travel = min(p_travel_required_for_z, p_working_mm)
             # Prep the plunger
             await self.move_to(checked_mount, safe_plunger_pos)
             if probe_settings.aspirate_while_sensing:
@@ -2666,7 +2694,7 @@ class OT3API(
                     checked_mount,
                     probe_settings,
                     probe if probe else InstrumentProbeType.PRIMARY,
-                    pass_travel,
+                    p_pass_travel + p_impulse_mm,
                 )
                 # if we made it here without an error we found the liquid
                 error = None
