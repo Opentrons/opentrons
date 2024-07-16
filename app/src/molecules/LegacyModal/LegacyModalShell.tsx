@@ -12,6 +12,7 @@ import {
   RESPONSIVENESS,
   styleProps,
   SPACING,
+  POSITION_ABSOLUTE,
 } from '@opentrons/components'
 import type { StyleProps } from '@opentrons/components'
 export interface LegacyModalShellProps extends StyleProps {
@@ -75,11 +76,11 @@ export function LegacyModalShell(props: LegacyModalShellProps): JSX.Element {
 }
 
 const Overlay = styled.div`
-  position: ${POSITION_FIXED};
-  left: 90px;
+  position: ${POSITION_ABSOLUTE};
+  left: 0;
   right: 0;
-  width: calc(100% - 90px);
-  top: 21px;
+  width: 100%;
+  top: 0;
   bottom: 0;
   z-index: 1;
   background-color: ${COLORS.black90}${COLORS.opacity40HexCode};
@@ -87,14 +88,14 @@ const Overlay = styled.div`
 `
 const ContentArea = styled.div<{ zIndex: string | number }>`
   display: flex;
-  position: ${POSITION_FIXED};
+  position: ${POSITION_ABSOLUTE};
   align-items: ${ALIGN_CENTER};
   justify-content: ${JUSTIFY_CENTER};
-  top: 21px;
+  top: 0;
   right: 0;
   bottom: 0;
-  left: 90px;
-  width: calc(100% - 90px);
+  left: 0;
+  width: 100%;
   height: 100%;
   z-index: ${({ zIndex }) => zIndex};
   padding: ${SPACING.spacing16};

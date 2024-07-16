@@ -129,6 +129,7 @@ export const DesktopApp = (): JSX.Element => {
                         return (
                           <Route key={path} exact={exact} path={path}>
                             <Breadcrumbs />
+                            <ModalPortalRoot />
                             <Box
                               position={POSITION_RELATIVE}
                               width="100%"
@@ -136,7 +137,6 @@ export const DesktopApp = (): JSX.Element => {
                               backgroundColor={COLORS.grey10}
                               overflow={OVERFLOW_AUTO}
                             >
-                              <ModalPortalRoot />
                               <Component />
                             </Box>
                           </Route>
