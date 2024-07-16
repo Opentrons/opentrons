@@ -26,6 +26,13 @@ describe('useShowDoorInfo', () => {
     expect(result.current).toBe(true)
   })
 
+  it(`should return true when runStatus is ${RUN_STATUS_AWAITING_RECOVERY_PAUSED}`, () => {
+    const props = RUN_STATUS_AWAITING_RECOVERY_PAUSED
+
+    const { result } = renderHook(() => useShowDoorInfo(props))
+    expect(result.current).toBe(true)
+  })
+
   it(`should keep returning true when runStatus changes from ${RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR} to ${RUN_STATUS_AWAITING_RECOVERY_PAUSED}`, () => {
     const { result, rerender } = renderHook(props => useShowDoorInfo(props), {
       initialProps,
