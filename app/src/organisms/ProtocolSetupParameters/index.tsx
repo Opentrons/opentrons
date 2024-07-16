@@ -101,7 +101,9 @@ export function ProtocolSetupParameters({
   ): void => {
     const updatedParameters = runTimeParametersOverrides.map(parameter => {
       if (parameter.variableName === variableName) {
-        return { ...parameter, value }
+        return parameter.type === 'csv_file'
+          ? { ...parameter, file: value }
+          : { ...parameter, value }
       }
       return parameter
     })
