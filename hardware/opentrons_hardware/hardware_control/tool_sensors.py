@@ -384,6 +384,7 @@ async def _run_with_binding(
 
 
 def liquid_probe_non_responsive_z_distance(z_speed: float) -> float:
+    """Calculate the Z distance travelled where the LLD pass will be unresponsive."""
     # NOTE: (sigler) Here lye some magic numbers.
     #       The Z axis probing motion uses the first 20 samples to calculate
     #       a baseline for all following samples, making the very beginning of
