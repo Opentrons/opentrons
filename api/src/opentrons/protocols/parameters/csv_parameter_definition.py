@@ -3,7 +3,6 @@ from typing import Optional, TextIO
 
 from opentrons.protocol_engine.types import (
     RunTimeParameter,
-    FileId,
     CSVParameter as ProtocolEngineCSVParameter,
 )
 
@@ -62,7 +61,7 @@ class CSVParameterDefinition(AbstractParameterDefinition[Optional[TextIO]]):
             displayName=self._display_name,
             variableName=self._variable_name,
             description=self._description,
-            file=FileId(id=self._id) if self._id is not None else None,
+            fileId=self._id,
         )
 
 

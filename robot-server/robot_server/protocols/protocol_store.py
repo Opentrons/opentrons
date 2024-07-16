@@ -20,6 +20,7 @@ from robot_server.persistence.tables import (
     protocol_table,
     run_table,
     analysis_primitive_type_rtp_table,
+    analysis_csv_rtp_table,
 )
 
 
@@ -360,6 +361,9 @@ class ProtocolStore:
                 select_referencing_analysis_ids
             )
         )
+        delete_analysis_csv_rtps_statement = sqlalchemy.delete(
+            analysis_csv_rtp_table
+        ).where(analysis_csv_rtp_table.c.analysis_id.in_(analyses_using_protocol))
         delete_analyses_statement = sqlalchemy.delete(analysis_table).where(
             analysis_table.c.protocol_id == protocol_id
         )
@@ -379,6 +383,7 @@ class ProtocolStore:
             #  * Switch from SQLAlchemy Core to ORM and use cascade deletes.
             try:
                 transaction.execute(delete_analysis_rtps_statement)
+                transaction.execute(delete_analysis_csv_rtps_statement)
                 transaction.execute(delete_analyses_statement)
                 result = transaction.execute(delete_protocol_statement)
             except sqlalchemy.exc.IntegrityError as e:
