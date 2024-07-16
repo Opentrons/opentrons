@@ -267,7 +267,7 @@ Remember, LLD will not work with used tips.
 Turing LLD Off and On
 ---------------------
 
-You can turn LLD off and on throughout a protocol. To turn off LLD, add ``pipette.liquid_presence_detection=False`` at the point in a protocol where it needs to be disabled, usually between picking up a new tip and aspirating a liquid. This overrides the global argument, ``liquid_presence_detection=True`` that we set on :py:meth:`~.ProtocolContext.load_instrument`. Let's try this starting after picking up a new tip. 
+You can turn LLD off and on throughout a protocol. To turn LLD off, add ``pipette.liquid_presence_detection=False`` at the point in a protocol where it needs to be disabled, usually between picking up a new tip and aspirating a liquid. This overrides the global argument, ``liquid_presence_detection=True`` that we set on :py:meth:`~.ProtocolContext.load_instrument`. Let's try this starting after picking up a new tip. 
 
 .. code-block:: python
     
@@ -275,9 +275,9 @@ You can turn LLD off and on throughout a protocol. To turn off LLD, add ``pipett
     pipette.liquid_presence_detection=False
     pipette.aspirate(100, reservoir["A2"])
 
-Going forward, the pipette will not perform an LLD check until you turn this feature back on. 
+Going forward, the pipette will not perform LLD until you turn this feature back on. 
 
-To reactivate LLD, add ``pipette.liquid_presence_detection=True`` at the point in a protocol where it needs to be enabled, usually between picking up a new tip and aspirating a liquid.
+To turn LLD on after deactivating it, add ``pipette.liquid_presence_detection=True`` at the point in a protocol where it needs to be enabled, usually between picking up a new tip and aspirating a liquid.
 
 .. code-block:: python
 
