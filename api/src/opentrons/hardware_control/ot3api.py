@@ -2628,6 +2628,7 @@ class OT3API(
         probe_start_pos = await self.gantry_position(checked_mount, refresh=True)
 
         # plunger travel distance is from TOP->BOTTOM (minus the backlash distance + impulse)
+        # FIXME: logic for how plunger moves is divided between here and tool_sensors.py
         p_impulse_mm = (
             probe_settings.plunger_impulse_time * probe_settings.plunger_speed
         )
@@ -2644,9 +2645,10 @@ class OT3API(
             probe_settings.plunger_speed = min(
                 max_plunger_speed, probe_settings.plunger_speed
             )
-        p_working_mm = p_total_mm - (instrument.backlash_distance - p_impulse_mm)
 
-        # NOTE: (sigler) the 0.5 seconds is indeed a magic number, edit carefully.
+        p_working_mm = p_total_mm - (instrument.backlash_distance + p_impulse_mm)
+
+        # NOTE: (sigler) Here lye some magic numbers.
         #       The Z axis probing motion uses the first 20 samples to calculate
         #       a baseline for all following samples, making the very beginning of
         #       that Z motion unable to detect liquid. The sensor is configured for
