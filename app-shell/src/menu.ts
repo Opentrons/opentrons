@@ -47,8 +47,11 @@ const helpMenu: MenuItemConstructorOptions = {
     {
       label: 'View Privacy Policy',
       click: () => {
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        shell.openExternal(EULA_URL)
+        shell.openExternal(EULA_URL).catch((e: Error) => {
+          console.error(
+            `could not open end user license agreement: ${e.message}`
+          )
+        })
       },
     },
   ],
