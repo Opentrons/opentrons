@@ -32,6 +32,7 @@ def _build_run(
         pipettes=[],
         modules=[],
         liquids=[],
+        wells=[],
     )
     return MaintenanceRun.construct(
         id=run_id,
