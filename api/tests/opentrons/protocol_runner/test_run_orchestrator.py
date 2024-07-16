@@ -336,6 +336,7 @@ async def test_load_json(
     await json_protocol_subject.load(
         protocol_source=protocol_source,
         run_time_param_values=None,
+        run_time_param_files=None,
         parse_mode=ParseMode.NORMAL,
     )
 
@@ -362,6 +363,7 @@ async def test_load_python(
         protocol_source=protocol_source,
         parse_mode=ParseMode.NORMAL,
         run_time_param_values=None,
+        run_time_param_files=None,
     )
 
     decoy.verify(
@@ -369,6 +371,7 @@ async def test_load_python(
             protocol_source=protocol_source,
             python_parse_mode=PythonParseMode.NORMAL,
             run_time_param_values=None,
+            run_time_param_files=None,
         )
     )
 
@@ -392,6 +395,7 @@ async def test_load_json_raises_no_protocol(
         await live_protocol_subject.load(
             protocol_source=protocol_source,
             run_time_param_values=None,
+            run_time_param_files=None,
             parse_mode=ParseMode.NORMAL,
         )
 
