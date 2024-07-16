@@ -132,11 +132,12 @@ export interface LabwareOffsetCreateData {
   vector: VectorOffset
 }
 
-type RunTimeParameterValueType = string | number | boolean | { id: string }
-export type RunTimeParameterCreateData = Record<
+type RunTimeParameterValuesType = string | number | boolean | { id: string }
+export type RunTimeParameterValuesCreateData = Record<
   string,
-  RunTimeParameterValueType
+  RunTimeParameterValuesType
 >
+export type RunTimeParameterFilesCreateData = Record<string, string>
 
 export interface CommandData {
   data: RunTimeCommand
