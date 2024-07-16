@@ -117,11 +117,7 @@ export function ErrorRecoveryFlows(
 
   const { hasLaunchedRecovery, toggleERWizard, showERWizard } = useERWizard()
 
-  const isDoorOpen = useShowDoorInfo({
-    runStatus,
-    showERWizard,
-    hasLaunchedRecovery,
-  })
+  const isDoorOpen = useShowDoorInfo(runStatus)
 
   const recoveryUtils = useERUtils({
     ...props,

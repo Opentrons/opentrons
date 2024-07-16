@@ -20,7 +20,6 @@ import { RecoveryContentWrapper, RecoveryFooterButtons } from './shared'
 
 import type { RecoveryContentProps } from './types'
 
-// TODO(jh, 07-16-24): Revisit making RecoveryDoorOpen a route to avoid the zIndex offset.
 export function RecoveryDoorOpen({
   recoveryActionMutationUtils,
   runStatus,

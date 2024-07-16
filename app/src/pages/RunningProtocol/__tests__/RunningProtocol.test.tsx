@@ -9,6 +9,7 @@ import {
   RUN_STATUS_IDLE,
   RUN_STATUS_STOP_REQUESTED,
   RUN_STATUS_AWAITING_RECOVERY,
+  RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
 } from '@opentrons/api-client'
 import {
   useProtocolAnalysesQuery,
@@ -189,6 +190,14 @@ describe('RunningProtocol', () => {
       .thenReturn(RUN_STATUS_BLOCKED_BY_OPEN_DOOR)
     render(`/runs/${RUN_ID}/run`)
     expect(vi.mocked(OpenDoorAlertModal)).toHaveBeenCalled()
+  })
+
+  it(`should render not open door alert modal, when run status is ${RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR}`, () => {
+    when(vi.mocked(useRunStatus))
+      .calledWith(RUN_ID, { refetchInterval: 5000 })
+      .thenReturn(RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR)
+    render(`/runs/${RUN_ID}/run`)
+    expect(vi.mocked(OpenDoorAlertModal)).not.toHaveBeenCalled()
   })
 
   it(`should display a Run Paused splash screen if the run status is "${RUN_STATUS_AWAITING_RECOVERY}"`, () => {

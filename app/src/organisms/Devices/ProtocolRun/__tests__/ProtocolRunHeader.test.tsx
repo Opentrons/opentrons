@@ -13,6 +13,7 @@ import {
   RUN_STATUS_FAILED,
   RUN_STATUS_SUCCEEDED,
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
+  RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
   instrumentsResponseLeftPipetteFixture,
   instrumentsResponseRightPipetteFixture,
 } from '@opentrons/api-client'
