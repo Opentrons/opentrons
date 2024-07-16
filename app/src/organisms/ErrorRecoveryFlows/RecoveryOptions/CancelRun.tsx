@@ -76,12 +76,12 @@ function CancelRunConfirmation({
           marginTop={SPACING.spacing24}
           color={COLORS.red50}
         />
-        <StyledText oddStyle="level3HeaderBold" desktopStyle='headingSmallBold'>
+        <StyledText oddStyle="level3HeaderBold" desktopStyle="headingSmallBold">
           {t('are_you_sure_you_want_to_cancel')}
         </StyledText>
         <StyledText
           oddStyle="level4HeaderRegular"
-          desktopStyle='bodyDefaultRegular'
+          desktopStyle="bodyDefaultRegular"
           color={COLORS.grey60}
           textAlign={ALIGN_CENTER}
         >
@@ -146,9 +146,9 @@ export function useOnCancelRun({
 }
 
 const FLEX_WIDTH = css`
-  width: 666px;
+  width: 41.625rem;
   @media (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
-    width: 848px;
+    width: 53rem;
   }
 `
 

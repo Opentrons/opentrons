@@ -93,11 +93,18 @@ export function ErrorRecoveryComponent(
     const titleText = props.hasLaunchedRecovery
       ? t('recovery_mode')
       : t('cancel_run')
-    return <StyledText oddStyle='level4HeaderBold' desktopStyle='headingSmallRegular'>{titleText}</StyledText>
+    return (
+      <StyledText
+        oddStyle="level4HeaderBold"
+        desktopStyle="headingSmallRegular"
+      >
+        {titleText}
+      </StyledText>
+    )
   }
 
   const buildIconHeading = (): JSX.Element => (
-    <StyledText oddStyle="bodyTextSemiBold" desktopStyle='bodyDefaultSemiBold'>
+    <StyledText oddStyle="bodyTextSemiBold" desktopStyle="bodyDefaultSemiBold">
       {t('view_error_details')}
     </StyledText>
   )

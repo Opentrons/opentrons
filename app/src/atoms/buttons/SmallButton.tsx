@@ -13,7 +13,7 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
-  RESPONSIVENESS
+  RESPONSIVENESS,
 } from '@opentrons/components'
 import { ODD_FOCUS_VISIBLE } from './constants'
 import type { IconName, StyleProps } from '@opentrons/components'
@@ -149,7 +149,7 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
       color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType].disabledColor};
     }
   `
-  
+
   const TEXT_STYLE = css`
     font-size: 0.875rem;
     line-height: ${TYPOGRAPHY.lineHeight20}
@@ -191,11 +191,7 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
           </Flex>
         ) : null}
 
-        <LegacyStyledText
-          css={TEXT_STYLE}
-        >
-          {buttonText}
-        </LegacyStyledText>
+        <LegacyStyledText css={TEXT_STYLE}>{buttonText}</LegacyStyledText>
         {iconPlacement === 'endIcon' && iconName != null ? (
           <Flex
             aria-label={

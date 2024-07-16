@@ -88,7 +88,11 @@ export function BeginRemoval({
 
   return (
     <RecoveryContentWrapper>
-      <StyledText css={ODD_SECTION_TITLE_STYLE} oddStyle="level4HeaderSemiBold" desktopStyle='headingSmallSemiBold'>
+      <StyledText
+        css={ODD_SECTION_TITLE_STYLE}
+        oddStyle="level4HeaderSemiBold"
+        desktopStyle="headingSmallSemiBold"
+      >
         {t('you_may_want_to_remove', { mount })}
       </StyledText>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
