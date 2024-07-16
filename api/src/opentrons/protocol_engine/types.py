@@ -13,7 +13,17 @@ from pydantic import (
     StrictStr,
     validator,
 )
-from typing import Optional, Union, List, Dict, Any, NamedTuple, Tuple, FrozenSet
+from typing import (
+    Optional,
+    Union,
+    List,
+    Dict,
+    Any,
+    NamedTuple,
+    Tuple,
+    FrozenSet,
+    Mapping,
+)
 from typing_extensions import Literal, TypeGuard
 
 from opentrons_shared_data.pipette.types import PipetteNameType
@@ -1044,8 +1054,8 @@ class CSVParameter(RTPBase):
 
 RunTimeParameter = Union[NumberParameter, EnumParameter, BooleanParameter, CSVParameter]
 
-PrimitiveRunTimeParamValuesType = Dict[
+PrimitiveRunTimeParamValuesType = Mapping[
     StrictStr, Union[StrictInt, StrictFloat, StrictBool, StrictStr]
 ]  # update value types as more RTP types are added
 
-CsvRunTimeParamFilesType = Dict[StrictStr, StrictStr]
+CsvRunTimeParamFilesType = Mapping[StrictStr, StrictStr]

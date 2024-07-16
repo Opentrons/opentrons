@@ -3,7 +3,10 @@ from typing import Optional
 
 from opentrons.util import helpers as datetime_helper
 
-from opentrons.protocol_engine.types import PrimitiveRunTimeParamValuesType
+from opentrons.protocol_engine.types import (
+    PrimitiveRunTimeParamValuesType,
+    CsvRunTimeParamFilesType,
+)
 from opentrons.protocol_engine.errors import ErrorOccurrence
 
 from robot_server.protocols.analysis_models import (
@@ -37,8 +40,9 @@ class AnalysesManager:
         analysis_id: str,
         protocol_resource: ProtocolResource,
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType],
+        run_time_param_files: Optional[CsvRunTimeParamFilesType],
     ) -> protocol_analyzer.ProtocolAnalyzer:
-        """Initialize the protocol analyzer with protocol resource and run time parameter values.
+        """Initialize the protocol analyzer with protocol resource and run time parameter values & fileIds.
 
         If an error is raised during initialization, then we abandon the analysis process
         and save the failed analysis, along with the error message, to the database.
@@ -56,7 +60,8 @@ class AnalysesManager:
         )
         try:
             await analyzer.load_orchestrator(
-                run_time_param_values=run_time_param_values
+                run_time_param_values=run_time_param_values,
+                run_time_param_files=run_time_param_files,
             )
         except Exception as error:
             internal_error = em.map_unexpected_error(error)

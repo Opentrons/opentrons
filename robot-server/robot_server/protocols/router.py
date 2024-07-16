@@ -7,7 +7,10 @@ from datetime import datetime
 from pathlib import Path
 from typing import List, Optional, Union, Tuple
 
-from opentrons.protocol_engine.types import PrimitiveRunTimeParamValuesType
+from opentrons.protocol_engine.types import (
+    PrimitiveRunTimeParamValuesType,
+    CsvRunTimeParamFilesType,
+)
 from opentrons_shared_data.robot import user_facing_robot_type
 from opentrons.util.performance_helpers import TrackingFunctions
 from typing_extensions import Literal
@@ -223,6 +226,11 @@ async def create_protocol(  # noqa: C901
         ),
         alias="protocolKind",
     ),
+    run_time_parameter_files: Optional[str] = Form(
+        default=None,
+        description="Param-file pairs of CSV run-time parameters defined in the protocol.",
+        alias="runTimeParameterFiles",
+    ),
     protocol_directory: Path = Depends(get_protocol_directory),
     protocol_store: ProtocolStore = Depends(get_protocol_store),
     analysis_store: AnalysisStore = Depends(get_analysis_store),
@@ -247,7 +255,8 @@ async def create_protocol(  # noqa: C901
     Arguments:
         files: List of uploaded files, from form-data.
         key: Optional key for cli-side tracking
-        run_time_parameter_values: Key value pairs of run-time parameters defined in a protocol.
+        run_time_parameter_values: Key value pairs of primitive run-time parameters defined in a protocol.
+        run_time_parameter_files: Stringified dictionary of CSV parameters and their file IDs
         protocol_kind: Optional key representing the kind of protocol.
         protocol_directory: Location to store uploaded files.
         protocol_store: In-memory database of protocol resources.
@@ -283,15 +292,22 @@ async def create_protocol(  # noqa: C901
         # TODO(mm, 2024-02-07): Investigate whether the filename can actually be None.
         assert file.filename is not None
     buffered_files = await file_reader_writer.read(files=files)  # type: ignore[arg-type]
-    if isinstance(run_time_parameter_values, str):
-        # We have to do this isinstance check because if `runTimeParameterValues` is
-        # not specified in the request, then it gets assigned a Form(None) value
-        # instead of just a None. \(O.o)/
-        # TODO: check if we can make our own "RTP multipart-form field" Pydantic type
-        #  so we can validate the data contents and return a better error response.
-        parsed_rtp = json.loads(run_time_parameter_values)
-    else:
-        parsed_rtp = {}
+
+    # We have to do this isinstance check because if `runTimeParameterValues` is
+    # not specified in the request, then it gets assigned a Form(None) value
+    # instead of just a None. \(O.o)/
+    # TODO: check if we can make our own "RTP multipart-form field" Pydantic type
+    #  so we can validate the data contents and return a better error response.
+    parsed_rtp_values = (
+        json.loads(run_time_parameter_values)
+        if isinstance(run_time_parameter_values, str)
+        else {}
+    )
+    parsed_rtp_files = (
+        json.loads(run_time_parameter_files)
+        if isinstance(run_time_parameter_files, str)
+        else {}
+    )
     content_hash = await file_hasher.hash(buffered_files)
     cached_protocol_id = protocol_store.get_id_by_hash(content_hash)
 
@@ -307,11 +323,11 @@ async def create_protocol(  # noqa: C901
                     protocol_id=cached_protocol_id,
                     analysis_id=analysis_id,
                     force_analyze=False,
-                    rtp_values=parsed_rtp,
+                    rtp_values=parsed_rtp_values,
+                    rtp_files=parsed_rtp_files,
                     protocol_resource=protocol_store.get(
                         protocol_id=cached_protocol_id
                     ),
-                    protocol_store=protocol_store,
                     analysis_store=analysis_store,
                     analyses_manager=analyses_manager,
                 )
@@ -386,9 +402,9 @@ async def create_protocol(  # noqa: C901
         protocol_id=protocol_id,
         analysis_id=analysis_id,
         force_analyze=True,
-        rtp_values=parsed_rtp,
+        rtp_values=parsed_rtp_values,
+        rtp_files=parsed_rtp_files,
         protocol_resource=protocol_resource,
-        protocol_store=protocol_store,
         analysis_store=analysis_store,
         analyses_manager=analyses_manager,
     )
@@ -418,8 +434,8 @@ async def _start_new_analysis_if_necessary(
     analysis_id: str,
     force_analyze: bool,
     rtp_values: PrimitiveRunTimeParamValuesType,
+    rtp_files: CsvRunTimeParamFilesType,
     protocol_resource: ProtocolResource,
-    protocol_store: ProtocolStore,
     analysis_store: AnalysisStore,
     analyses_manager: AnalysesManager,
 ) -> Tuple[List[AnalysisSummary], bool]:
@@ -436,6 +452,7 @@ async def _start_new_analysis_if_necessary(
             analysis_id=analysis_id,
             protocol_resource=protocol_resource,
             run_time_param_values=rtp_values,
+            run_time_param_files=rtp_files,
         )
     except FailedToInitializeAnalyzer:
         analyses.append(
@@ -676,7 +693,7 @@ async def create_protocol_analysis(
     """Start a new analysis for the given existing protocol.
 
     Starts a new analysis for the protocol along with the provided run-time parameter
-    values (if any), and appends it to the existing analyses.
+    values (if any) and file IDs (if any), and appends it to the existing analyses.
 
     If the last analysis in the existing analyses used the same RTP values, then a new
     analysis is not created.
@@ -699,8 +716,8 @@ async def create_protocol_analysis(
             analysis_id=analysis_id,
             force_analyze=request_body.data.forceReAnalyze if request_body else False,
             rtp_values=request_body.data.runTimeParameterValues if request_body else {},
+            rtp_files=request_body.data.runTimeParameterFiles if request_body else {},
             protocol_resource=protocol_store.get(protocol_id=protocolId),
-            protocol_store=protocol_store,
             analysis_store=analysis_store,
             analyses_manager=analyses_manager,
         )
