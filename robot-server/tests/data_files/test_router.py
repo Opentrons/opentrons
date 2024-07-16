@@ -9,8 +9,8 @@ from fastapi import UploadFile
 from opentrons.protocol_reader import FileHasher, FileReaderWriter, BufferedFile
 
 from robot_server.data_files.data_files_store import DataFilesStore, DataFileInfo
-from robot_server.data_files.models import DataFile
-from robot_server.data_files.router import upload_data_file
+from robot_server.data_files.models import DataFile, FileIdNotFoundError
+from robot_server.data_files.router import upload_data_file, get_data_file_info_by_id
 from robot_server.errors.error_responses import ApiError
 
 
@@ -231,3 +231,47 @@ async def test_upload_non_csv_file(
         )
     assert exc_info.value.status_code == 422
     assert exc_info.value.content["errors"][0]["id"] == "UnexpectedFileFormat"
+
+
+async def test_get_data_file_info(
+    decoy: Decoy,
+    data_files_store: DataFilesStore,
+) -> None:
+    """It should get the data file info from the provided data file id."""
+    decoy.when(data_files_store.get("data-file-id")).then_return(
+        DataFileInfo(
+            id="qwerty",
+            name="abc.xyz",
+            file_hash="123",
+            created_at=datetime(year=2024, month=7, day=15),
+        )
+    )
+
+    result = await get_data_file_info_by_id(
+        "data-file-id",
+        data_files_store=data_files_store,
+    )
+    assert result.status_code == 200
+    assert result.content.data == DataFile(
+        id="qwerty",
+        name="abc.xyz",
+        createdAt=datetime(year=2024, month=7, day=15),
+    )
+
+
+async def test_get_data_file_info_nonexistant(
+    decoy: Decoy,
+    data_files_store: DataFilesStore,
+) -> None:
+    """It should return a 404 with a FileIdNotFound error."""
+    decoy.when(data_files_store.get("data-file-id")).then_raise(
+        FileIdNotFoundError("oops")
+    )
+
+    with pytest.raises(ApiError) as exc_info:
+        await get_data_file_info_by_id(
+            "data-file-id",
+            data_files_store=data_files_store,
+        )
+    assert exc_info.value.status_code == 404
+    assert exc_info.value.content["errors"][0]["id"] == "FileIdNotFound"

@@ -14,7 +14,7 @@ from robot_server.service.json_api import (
 from robot_server.errors.error_responses import ErrorDetails, ErrorBody
 from .dependencies import get_data_files_directory, get_data_files_store
 from .data_files_store import DataFilesStore, DataFileInfo
-from .models import DataFile
+from .models import DataFile, FileIdNotFoundError
 from ..protocols.dependencies import get_file_hasher, get_file_reader_writer
 from ..service.dependencies import get_current_time, get_unique_id
 
@@ -40,6 +40,13 @@ class FileNotFound(ErrorDetails):
 
     id: Literal["FileNotFound"] = "FileNotFound"
     title: str = "Specified file path not found on the robot"
+
+
+class FileIdNotFound(ErrorDetails):
+    """An error returned when specified file id was not found on the robot."""
+
+    id: Literal["FileIdNotFound"] = "FileIdNotFound"
+    title: str = "Specified file id not found on the robot"
 
 
 class UnexpectedFileFormat(ErrorDetails):
@@ -140,4 +147,40 @@ async def upload_data_file(
             )
         ),
         status_code=status.HTTP_201_CREATED,
+    )
+
+
+@PydanticResponse.wrap_route(
+    datafiles_router.get,
+    path="/dataFiles/{dataFileId}",
+    summary="Get an uploaded data file",
+    responses={
+        status.HTTP_200_OK: {"model": SimpleBody[DataFile]},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorBody[FileIdNotFound]},
+    },
+)
+async def get_data_file_info_by_id(
+    dataFileId: str,
+    data_files_store: DataFilesStore = Depends(get_data_files_store),
+) -> PydanticResponse[SimpleBody[DataFile]]:
+    """Get data file info by ID.
+
+    Args:
+        dataFileId: Data file identifier to fetch.
+        data_files_store: In-memory database of data file resources.
+    """
+    try:
+        resource = data_files_store.get(dataFileId)
+    except FileIdNotFoundError as e:
+        raise FileIdNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
+
+    return await PydanticResponse.create(
+        content=SimpleBody.construct(
+            data=DataFile.construct(
+                id=resource.id,
+                name=resource.name,
+                createdAt=resource.created_at,
+            )
+        ),
+        status_code=status.HTTP_200_OK,
     )
