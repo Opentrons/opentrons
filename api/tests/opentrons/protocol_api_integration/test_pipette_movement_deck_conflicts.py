@@ -61,8 +61,14 @@ def test_deck_conflicts_for_96_ch_a12_column_configuration() -> None:
     ):
         instrument.pick_up_tip(badly_placed_tiprack.wells_by_name()["A1"])
 
-    # No error since no tall item in west slot of destination slot
-    instrument.pick_up_tip(well_placed_tiprack.wells_by_name()["A1"])
+    with pytest.raises(
+        PartialTipMovementNotAllowedError, match="outside of robot bounds"
+    ):
+        # Picking up from A1 in an east-most slot using a configuration with column 12 would
+        # result in a collision with the side of the robot.
+        instrument.pick_up_tip(well_placed_tiprack.wells_by_name()["A1"])
+
+    instrument.pick_up_tip(well_placed_tiprack.wells_by_name()["A12"])
     instrument.aspirate(50, well_placed_labware.wells_by_name()["A4"])
 
     with pytest.raises(
@@ -75,15 +81,19 @@ def test_deck_conflicts_for_96_ch_a12_column_configuration() -> None:
     ):
         instrument.dispense(10, tc_adjacent_plate.wells_by_name()["A1"])
 
+    instrument.dispense(10, tc_adjacent_plate.wells_by_name()["H2"])
+
     # No error cuz dispensing from high above plate, so it clears tuberack in west slot
     instrument.dispense(15, badly_placed_labware.wells_by_name()["A1"].top(150))
 
     thermocycler.open_lid()  # type: ignore[union-attr]
 
-    # Will NOT raise error since first column of TC labware is accessible
-    # (it is just a few mm away from the left bound)
-    # TODO Confirm if this location is valid after bounds updates
-    instrument.dispense(25, accessible_plate.wells_by_name()["A1"])
+    with pytest.raises(
+        PartialTipMovementNotAllowedError, match="outside of robot bounds"
+    ):
+        # Dispensing to A1 in an east-most slot using a configuration with column 12 would
+        # result in a collision with the side of the robot.
+        instrument.dispense(25, accessible_plate.wells_by_name()["A1"])
 
     instrument.drop_tip()
 
@@ -181,7 +191,14 @@ def test_deck_conflicts_for_96_ch_a1_column_configuration() -> None:
     with pytest.raises(
         PartialTipMovementNotAllowedError, match="outside of robot bounds"
     ):
+        # Moving the 96 channel in column configuration with column 1
+        # is incompatible with moving to a plate in B3 in the right most
+        # column. 
         instrument.aspirate(25, well_placed_plate.wells_by_name()["A11"])
+
+    # No error because we're moving to column 1 of the plate with
+    # column 1 of the 96 channel.
+    instrument.aspirate(25, well_placed_plate.wells_by_name()["A1"])
 
     # No error cuz no taller labware on the right
     instrument.aspirate(10, my_tuberack.wells_by_name()["A1"])

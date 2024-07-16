@@ -228,8 +228,13 @@ def check_safe_for_pipette_movement(
     )
     primary_nozzle = engine_state.pipettes.get_primary_nozzle(pipette_id)
 
+    pipette_bounds_at_well_location = (
+        engine_state.pipettes.get_pipette_bounds_at_specified_move_to_position(
+            pipette_id=pipette_id, destination_position=well_location_point
+        )
+    )
     if not _is_within_pipette_extents(
-        engine_state=engine_state, pipette_id=pipette_id, location=well_location_point
+        engine_state=engine_state, pipette_id=pipette_id, pipette_bounding_box_at_loc=pipette_bounds_at_well_location
     ):
         raise PartialTipMovementNotAllowedError(
             f"Requested motion with the {primary_nozzle} nozzle partial configuration"
@@ -237,11 +242,7 @@ def check_safe_for_pipette_movement(
         )
 
     labware_slot = engine_state.geometry.get_ancestor_slot_name(labware_id)
-    pipette_bounds_at_well_location = (
-        engine_state.pipettes.get_pipette_bounds_at_specified_move_to_position(
-            pipette_id=pipette_id, destination_position=well_location_point
-        )
-    )
+
     surrounding_slots = adjacent_slots_getters.get_surrounding_slots(
         slot=labware_slot.as_int(), robot_type=engine_state.config.robot_type
     )
@@ -410,21 +411,25 @@ def check_safe_for_tip_pickup_and_return(
 def _is_within_pipette_extents(
     engine_state: StateView,
     pipette_id: str,
-    location: Point,
+    pipette_bounding_box_at_loc: Tuple[Point, Point, Point, Point],
 ) -> bool:
     """Whether a given point is within the extents of a configured pipette on the specified robot."""
     mount = engine_state.pipettes.get_mount(pipette_id)
-    robot_extents = engine_state.geometry.absolute_deck_extents
+    robot_extent_per_mount = engine_state.geometry.absolute_deck_extents
+    pip_back_left_bound, pip_front_right_bound, _, _ = pipette_bounding_box_at_loc
     pipette_bounds_offsets = engine_state.pipettes.get_pipette_bounding_box(pipette_id)
     from_back_right = (
-        robot_extents.back_right[mount] - pipette_bounds_offsets.back_right_corner
+        robot_extent_per_mount.back_right[mount] + pipette_bounds_offsets.back_right_corner
     )
     from_front_left = (
-        robot_extents.front_left[mount] + pipette_bounds_offsets.front_left_corner
+        robot_extent_per_mount.front_left[mount] + pipette_bounds_offsets.front_left_corner
     )
+
     return (
-        from_back_right.x <= location.x <= from_front_left.x
-        and from_back_right.y <= location.y <= from_front_left.y
+        from_back_right.x >= pip_back_left_bound.x >= from_front_left.x
+        and from_back_right.y >= pip_back_left_bound.y >= from_front_left.y and
+        from_back_right.x >= pip_front_right_bound.x >= from_front_left.x and
+        from_back_right.y >= pip_front_right_bound.y >= from_front_left.y
     )
 
 

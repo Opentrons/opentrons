@@ -469,7 +469,7 @@ module = LoadedModule(
                 deck_conflict.PartialTipMovementNotAllowedError,
                 match="collision with items in staging slot C4",
             ),
-            0,
+            170,
         ),
         (  # Collision with robot
             (
@@ -515,11 +515,11 @@ def test_deck_conflict_raises_for_bad_pipette_move(
     )
     decoy.when(mock_state_view.geometry.absolute_deck_extents).then_return(
         _AbsoluteRobotExtents(
-            back_right={
+            front_left={
                 MountType.LEFT: Point(13.5, -60.5, 0.0),
                 MountType.RIGHT: Point(-40.5, -60.5, 0.0),
             },
-            front_left={
+            back_right={
                 MountType.LEFT: Point(463.7, 433.3, 0.0),
                 MountType.RIGHT: Point(517.7, 433.3),
             },

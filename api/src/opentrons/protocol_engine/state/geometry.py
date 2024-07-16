@@ -108,16 +108,14 @@ class GeometryView:
         """The absolute deck extents for a given robot deck."""
         left_offset = self._addressable_areas.mount_offsets["left"]
         right_offset = self._addressable_areas.mount_offsets["right"]
-        left_changed_x_component = Point(-1 * left_offset.x, left_offset.y, left_offset.z)
-        right_changed_x_component = Point(-1 * right_offset.x, right_offset.y, right_offset.z)
 
-        back_right_abs = {
-            MountType.LEFT: left_changed_x_component,
-            MountType.RIGHT: right_changed_x_component,
-        }
         front_left_abs = {
-            MountType.LEFT: self._addressable_areas.deck_extents + left_changed_x_component,
-            MountType.RIGHT: self._addressable_areas.deck_extents + right_changed_x_component,
+            MountType.LEFT: left_offset,
+            MountType.RIGHT: right_offset,
+        }
+        back_right_abs = {
+            MountType.LEFT: self._addressable_areas.deck_extents + left_offset,
+            MountType.RIGHT: self._addressable_areas.deck_extents + right_offset,
         }
         return _AbsoluteRobotExtents(
             front_left=front_left_abs, back_right=back_right_abs
