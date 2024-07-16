@@ -1295,7 +1295,9 @@ def test_detect_liquid_presence(
         message=f"{lnfe.errorType}: {lnfe.detail}",
     )
     decoy.when(
-        mock_instrument_core.liquid_probe_without_recovery(mock_well._core)
+        mock_instrument_core.liquid_probe_without_recovery(
+            mock_well._core, mock_well.top()
+        )
     ).then_raise(errorToRaise)
     result = subject.detect_liquid_presence(mock_well)
     assert isinstance(result, bool)
@@ -1316,10 +1318,16 @@ def test_require_liquid_presence(
         original_error=lnfe,
         message=f"{lnfe.errorType}: {lnfe.detail}",
     )
-    decoy.when(mock_instrument_core.liquid_probe_with_recovery(mock_well._core))
+    decoy.when(
+        mock_instrument_core.liquid_probe_with_recovery(
+            mock_well._core, mock_well.top()
+        )
+    )
     subject.require_liquid_presence(mock_well)
     decoy.when(
-        mock_instrument_core.liquid_probe_with_recovery(mock_well._core)
+        mock_instrument_core.liquid_probe_with_recovery(
+            mock_well._core, mock_well.top()
+        )
     ).then_raise(errorToRaise)
     with pytest.raises(ProtocolCommandFailedError) as pcfe:
         subject.require_liquid_presence(mock_well)
@@ -1341,7 +1349,9 @@ def test_measure_liquid_height(
         message=f"{lnfe.errorType}: {lnfe.detail}",
     )
     decoy.when(
-        mock_instrument_core.liquid_probe_without_recovery(mock_well._core)
+        mock_instrument_core.liquid_probe_without_recovery(
+            mock_well._core, mock_well.top()
+        )
     ).then_raise(errorToRaise)
     with pytest.raises(ProtocolCommandFailedError) as pcfe:
         subject.measure_liquid_height(mock_well)

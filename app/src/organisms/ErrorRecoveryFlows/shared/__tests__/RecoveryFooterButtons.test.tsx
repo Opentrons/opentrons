@@ -38,7 +38,7 @@ describe('RecoveryFooterButtons', () => {
     const primaryBtns = screen.getAllByRole('button', { name: 'Continue' })
     const secondaryBtns = screen.getAllByRole('button', { name: 'Go back' })
     expect(primaryBtns.length).toBe(2)
-    expect(secondaryBtns.length).toBe(2)
+    expect(secondaryBtns.length).toBe(1)
 
     primaryBtns.forEach(btn => {
       mockPrimaryBtnOnClick.mockReset()
