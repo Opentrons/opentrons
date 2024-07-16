@@ -43,6 +43,8 @@ except ImportError:
 
 
 class LLDResult(Enum):
+    """Result Strings."""
+
     success = "success"
     not_found = "not found"
     blockage = "blockage"

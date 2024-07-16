@@ -2666,7 +2666,7 @@ class OT3API(
             except PipetteLiquidNotFoundError as lnfe:
                 error = lnfe
             pos = await self.gantry_position(checked_mount, refresh=True)
-        await self.move_to(checked_mount, probe_start_pos+top_types.Point(z=2))
+        await self.move_to(checked_mount, probe_start_pos + top_types.Point(z=2))
         await self.prepare_for_aspirate(checked_mount)
         await self.move_to(checked_mount, probe_start_pos)
         if error is not None:
