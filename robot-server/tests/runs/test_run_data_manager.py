@@ -198,7 +198,6 @@ async def test_create(
         pipettes=engine_state_summary.pipettes,
         modules=engine_state_summary.modules,
         liquids=engine_state_summary.liquids,
-        wells=engine_state_summary.wells,
     )
 
 
@@ -270,7 +269,6 @@ async def test_create_with_options(
         pipettes=engine_state_summary.pipettes,
         modules=engine_state_summary.modules,
         liquids=engine_state_summary.liquids,
-        wells=engine_state_summary.wells,
     )
 
 
@@ -352,7 +350,6 @@ async def test_get_current_run(
         pipettes=engine_state_summary.pipettes,
         modules=engine_state_summary.modules,
         liquids=engine_state_summary.liquids,
-        wells=engine_state_summary.wells,
         runTimeParameters=run_time_parameters,
     )
     assert subject.current_run_id == run_id
@@ -394,7 +391,6 @@ async def test_get_historical_run(
         pipettes=engine_state_summary.pipettes,
         modules=engine_state_summary.modules,
         liquids=engine_state_summary.liquids,
-        wells=engine_state_summary.wells,
         runTimeParameters=run_time_parameters,
     )
 
@@ -637,7 +633,6 @@ async def test_update_current(
         pipettes=engine_state_summary.pipettes,
         modules=engine_state_summary.modules,
         liquids=engine_state_summary.liquids,
-        wells=engine_state_summary.wells,
         runTimeParameters=run_time_parameters,
     )
 
@@ -693,7 +688,6 @@ async def test_update_current_noop(
         pipettes=engine_state_summary.pipettes,
         modules=engine_state_summary.modules,
         liquids=engine_state_summary.liquids,
-        wells=engine_state_summary.wells,
         runTimeParameters=run_time_parameters,
     )
 
