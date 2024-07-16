@@ -1,3 +1,3 @@
 import { it } from 'vitest'
 
-it.todo('write test fore CreateNewProtocol')
+it.todo('write test for CreateNewProtocol')

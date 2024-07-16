@@ -1,5 +1,8 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 export function ProtocolSteps(): JSX.Element {
-  return <div>Protocol steps</div>
+  const { t } = useTranslation('protocol_steps')
+
+  return <div>{t('protocol_steps')}</div>
 }

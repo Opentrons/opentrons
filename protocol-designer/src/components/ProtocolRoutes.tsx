@@ -11,6 +11,7 @@ import { Navbar } from './Navbar'
 
 import type { RouteProps } from './types'
 
+const LANDING_ROUTE = '/'
 const pdRoutes: RouteProps[] = [
   {
     Component: ProtocolOverview,
@@ -53,18 +54,17 @@ export function ProtocolRoutes(): JSX.Element {
     navLinkTo: '/',
     path: '/',
   }
-  const allRoutes = [...pdRoutes, landingPage]
-  const landingRoute = '/'
+  const allRoutes: RouteProps[] = [...pdRoutes, landingPage]
 
   return (
     <>
-      {currentPath === landingRoute ? null : <Navbar routes={pdRoutes} />}
+      {currentPath === LANDING_ROUTE ? null : <Navbar routes={pdRoutes} />}
       <Box width="100%">
         <Routes>
           {allRoutes.map(({ Component, path }: RouteProps) => {
             return <Route key={path} path={path} element={<Component />} />
           })}
-          <Route path="*" element={<Navigate to={landingRoute} />} />
+          <Route path="*" element={<Navigate to={LANDING_ROUTE} />} />
         </Routes>
       </Box>
     </>

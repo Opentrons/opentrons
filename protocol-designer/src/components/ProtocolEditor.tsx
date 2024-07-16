@@ -30,6 +30,7 @@ import { AnnouncementModal } from './modals/AnnouncementModal'
 import { ProtocolRoutes } from './ProtocolRoutes'
 
 import styles from './ProtocolEditor.module.css'
+import '../css/reset.module.css'
 
 const showGateModal =
   process.env.NODE_ENV === 'production' || process.env.OT_PD_SHOW_GATE
@@ -40,16 +41,13 @@ function ProtocolEditorComponent(): JSX.Element {
 
   return (
     <div id="protocol-editor">
-      <ComputingSpinner />
       <TopPortalRoot />
-      {showGateModal ? <GateModal /> : null}
-      <PrereleaseModeIndicator />
       {enableRedesign ? (
         <Flex flexDirection={DIRECTION_COLUMN}>
           <Flex padding={SPACING.spacing12} flexDirection={DIRECTION_ROW}>
             <PrimaryButton
               onClick={() => {
-                dispatch(setFeatureFlags({ OT_PD_ENABLE_REDESIGN: null }))
+                dispatch(setFeatureFlags({ OT_PD_ENABLE_REDESIGN: false }))
               }}
             >
               turn off redesign
@@ -60,26 +58,32 @@ function ProtocolEditorComponent(): JSX.Element {
           </BrowserRouter>
         </Flex>
       ) : (
-        <div className={styles.wrapper}>
-          <ConnectedNav />
-          <Sidebar />
-          <div className={styles.main_page_wrapper}>
-            <ConnectedTitleBar />
+        <div className="container">
+          <ComputingSpinner />
+          <TopPortalRoot />
+          {showGateModal ? <GateModal /> : null}
+          <PrereleaseModeIndicator />
+          <div className={styles.wrapper}>
+            <ConnectedNav />
+            <Sidebar />
+            <div className={styles.main_page_wrapper}>
+              <ConnectedTitleBar />
 
-            <div
-              id="main-page"
-              className={cx(
-                styles.main_page_content,
-                MAIN_CONTENT_FORCED_SCROLL_CLASSNAME
-              )}
-            >
-              <AnnouncementModal />
-              <CreateFileWizard />
-              <FileUploadMessageModal />
+              <div
+                id="main-page"
+                className={cx(
+                  styles.main_page_content,
+                  MAIN_CONTENT_FORCED_SCROLL_CLASSNAME
+                )}
+              >
+                <AnnouncementModal />
+                <CreateFileWizard />
+                <FileUploadMessageModal />
 
-              <MainPageModalPortalRoot />
-              <LabwareUploadMessageModal />
-              <MainPanel />
+                <MainPageModalPortalRoot />
+                <LabwareUploadMessageModal />
+                <MainPanel />
+              </div>
             </div>
           </div>
         </div>
