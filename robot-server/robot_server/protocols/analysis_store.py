@@ -33,7 +33,7 @@ from .analysis_models import (
 
 from .completed_analysis_store import CompletedAnalysisStore, CompletedAnalysisResource
 from .analysis_memcache import MemoryCache
-from .rtp_resources import PrimitiveParameterResource
+from .rtp_resources import PrimitiveParameterResource, CsvParameterResource
 
 _log = getLogger(__name__)
 
@@ -211,9 +211,11 @@ class AnalysisStore:
         primitive_rtp_resources = self._extract_primitive_run_time_params(
             completed_analysis
         )
+        csv_rtp_resources = self._extract_csv_run_time_params(completed_analysis)
         await self._completed_store.make_room_and_add(
             completed_analysis_resource=completed_analysis_resource,
             primitive_rtp_resources=primitive_rtp_resources,
+            csv_rtp_resources=csv_rtp_resources,
         )
 
         self._pending_store.remove(analysis_id=analysis_id)
@@ -248,6 +250,7 @@ class AnalysisStore:
         await self._completed_store.make_room_and_add(
             completed_analysis_resource=completed_analysis_resource,
             primitive_rtp_resources=[],
+            csv_rtp_resources=[],
         )
 
     async def get(self, analysis_id: str) -> ProtocolAnalysis:
@@ -338,6 +341,22 @@ class AnalysisStore:
             if not isinstance(param, CSVParameter)
         ]
 
+    @staticmethod
+    def _extract_csv_run_time_params(
+        completed_analysis: CompletedAnalysis,
+    ) -> List[CsvParameterResource]:
+        """Extract the Primitive Run Time Parameters from analysis for saving in DB."""
+        csv_rtp_list = completed_analysis.runTimeParameters
+        return [
+            CsvParameterResource(
+                analysis_id=completed_analysis.id,
+                parameter_variable_name=param.variableName,
+                file_id=param.fileId,
+            )
+            for param in csv_rtp_list
+            if isinstance(param, CSVParameter)
+        ]
+
     async def matching_rtp_values_in_analysis(
         self,
         last_analysis_summary: AnalysisSummary,
@@ -372,14 +391,20 @@ class AnalysisStore:
                 last_analysis_summary.id
             )
         )
-        assert set(param.variableName for param in new_parameters) == set(
+        csv_rtps_in_last_analysis = self._completed_store.get_csv_rtps_by_analysis_id(
+            last_analysis_summary.id
+        )
+        total_params_in_last_analysis = list(
             primitive_rtps_in_last_analysis.keys()
+        ) + list(csv_rtps_in_last_analysis.keys())
+        assert set(param.variableName for param in new_parameters) == set(
+            total_params_in_last_analysis
         ), "Mismatch in parameters found in the current request vs. last saved parameters."  # Indicates internal bug
         for param in new_parameters:
-            if (
-                not isinstance(param, CSVParameter)
-                and primitive_rtps_in_last_analysis[param.variableName] != param.value
-            ):
+            if isinstance(param, CSVParameter):
+                if csv_rtps_in_last_analysis[param.variableName] != param.fileId:
+                    return False
+            elif primitive_rtps_in_last_analysis[param.variableName] != param.value:
                 return False
         return True
 
