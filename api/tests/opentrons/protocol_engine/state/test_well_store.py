@@ -1,4 +1,4 @@
-"""Liquid state store tests."""
+"""Well state store tests."""
 import pytest
 from opentrons.protocol_engine.state.wells import WellStore
 from opentrons.protocol_engine.types import WellDetails
@@ -9,7 +9,7 @@ from .command_fixtures import create_liquid_probe_command
 
 @pytest.fixture
 def subject() -> WellStore:
-    """Liquid store test subject."""
+    """Well store test subject."""
     return WellStore()
 
 
