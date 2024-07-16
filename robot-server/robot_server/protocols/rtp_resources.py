@@ -66,3 +66,41 @@ class PrimitiveParameterResource:
             parameter_type=parameter_type,
             parameter_value=parameter_value,
         )
+
+
+@dataclass
+class CsvParameterResource:
+    """A CSV runtime parameter from a completed analysis, storable in a SQL database."""
+
+    analysis_id: str
+    parameter_variable_name: str
+    file_id: Union[str, None]
+
+    def to_sql_values(self) -> Dict[str, object]:
+        """Return this data as a dict that can be passed to an SQLAlchemy insert."""
+        return {
+            "analysis_id": self.analysis_id,
+            "parameter_variable_name": self.parameter_variable_name,
+            "file_id": self.file_id,
+        }
+
+    @classmethod
+    def from_sql_row(
+        cls,
+        sql_row: sqlalchemy.engine.Row,
+    ) -> CsvParameterResource:
+        """Extract CSV resource data from SQLAlchemy row object."""
+        analysis_id = sql_row.analysis_id
+        assert isinstance(analysis_id, str)
+
+        parameter_variable_name = sql_row.parameter_variable_name
+        assert isinstance(parameter_variable_name, str)
+
+        csv_file_id = sql_row.file_id
+        assert isinstance(csv_file_id, str) or csv_file_id is None
+
+        return cls(
+            analysis_id=analysis_id,
+            parameter_variable_name=parameter_variable_name,
+            file_id=csv_file_id,
+        )

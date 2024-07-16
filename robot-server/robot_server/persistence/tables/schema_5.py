@@ -81,6 +81,31 @@ analysis_primitive_type_rtp_table = sqlalchemy.Table(
     ),
 )
 
+analysis_csv_rtp_table = sqlalchemy.Table(
+    "analysis_csv_parameter",
+    metadata,
+    sqlalchemy.Column(
+        "row_id",
+        sqlalchemy.Integer,
+        primary_key=True,
+    ),
+    sqlalchemy.Column(
+        "analysis_id",
+        sqlalchemy.ForeignKey("analysis.id"),
+        nullable=False,
+    ),
+    sqlalchemy.Column(
+        "parameter_variable_name",
+        sqlalchemy.String,
+        nullable=False,
+    ),
+    sqlalchemy.Column(
+        "file_id",
+        sqlalchemy.ForeignKey("data_files.id"),
+        nullable=True,
+    ),
+)
+
 run_table = sqlalchemy.Table(
     "run",
     metadata,
