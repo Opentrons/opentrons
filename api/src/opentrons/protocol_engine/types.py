@@ -300,6 +300,13 @@ class CurrentWell:
     well_name: str
 
 
+class WellDetails(BaseModel):
+    """Identifying information needed for well state tracking."""
+
+    labware_id: str
+    well_name: str
+
+
 @dataclass(frozen=True)
 class CurrentAddressableArea:
     """The latest addressable area the robot has accessed."""
