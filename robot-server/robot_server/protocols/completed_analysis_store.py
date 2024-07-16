@@ -2,24 +2,26 @@
 from __future__ import annotations
 
 import asyncio
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union, Mapping
 from logging import getLogger
 from dataclasses import dataclass
 
 import sqlalchemy
 import anyio
+from opentrons.protocol_engine.types import CsvRunTimeParamFilesType
 from opentrons.protocols.parameters.types import PrimitiveAllowedTypes
 
 from robot_server.persistence.database import sqlite_rowid
 from robot_server.persistence.tables import (
     analysis_table,
     analysis_primitive_type_rtp_table,
+    analysis_csv_rtp_table,
 )
 from robot_server.persistence.pydantic import json_to_pydantic, pydantic_to_json
 
 from .analysis_models import CompletedAnalysis
 from .analysis_memcache import MemoryCache
-from .rtp_resources import PrimitiveParameterResource
+from .rtp_resources import PrimitiveParameterResource, CsvParameterResource
 
 _log = getLogger(__name__)
 
@@ -285,10 +287,30 @@ class CompletedAnalysisStore:
             rtps.update({param.parameter_variable_name: param.parameter_value})
         return rtps
 
+    def get_csv_rtps_by_analysis_id(
+        self,
+        analysis_id: str,
+    ) -> Mapping[str, Union[str, None]]:
+        """Get the saved CSV RTP file IDs from database"""
+        statement = (
+            sqlalchemy.select(analysis_csv_rtp_table)
+            .where(analysis_csv_rtp_table.c.analysis_id == analysis_id)
+            .order_by(sqlite_rowid)
+        )
+        with self._sql_engine.begin() as transaction:
+            results = transaction.execute(statement).all()
+
+        csv_rtps: Dict[str, Union[str, None]] = {}
+        for row in results:
+            param = CsvParameterResource.from_sql_row(row)
+            csv_rtps.update({param.parameter_variable_name: param.file_id})
+        return csv_rtps
+
     async def make_room_and_add(
         self,
         completed_analysis_resource: CompletedAnalysisResource,
         primitive_rtp_resources: List[PrimitiveParameterResource],
+        csv_rtp_resources: List[CsvParameterResource],
     ) -> None:
         """Make room and add a resource to the store.
 
@@ -312,6 +334,9 @@ class CompletedAnalysisStore:
                 analysis_primitive_type_rtp_table.c.analysis_id.in_(analyses_to_delete)
             )
         )
+        delete_csv_rtp_statement = analysis_csv_rtp_table.delete().where(
+            analysis_csv_rtp_table.c.analysis_id.in_(analyses_to_delete)
+        )
         delete_statement = analysis_table.delete().where(
             analysis_table.c.id.in_(analyses_to_delete)
         )
@@ -320,15 +345,23 @@ class CompletedAnalysisStore:
             await completed_analysis_resource.to_sql_values()
         )
         insert_rtp_statement = analysis_primitive_type_rtp_table.insert()
+        insert_csv_rtp_statement = analysis_csv_rtp_table.insert()
 
         with self._sql_engine.begin() as transaction:
             transaction.execute(delete_primitive_rtp_statement)
+            transaction.execute(delete_csv_rtp_statement)
+            transaction.execute(delete_csv_rtp_statement)
             transaction.execute(delete_statement)
             transaction.execute(insert_statement)
             for param in primitive_rtp_resources:
                 transaction.execute(
                     insert_rtp_statement,
-                    PrimitiveParameterResource.to_sql_values(param),
+                    param.to_sql_values(),
+                )
+            for csv_param in csv_rtp_resources:
+                transaction.execute(
+                    insert_csv_rtp_statement,
+                    csv_param.to_sql_values(),
                 )
         self._memcache.insert(
             completed_analysis_resource.id, completed_analysis_resource
