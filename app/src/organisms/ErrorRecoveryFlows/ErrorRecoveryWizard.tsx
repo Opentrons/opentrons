@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { LegacyStyledText } from '@opentrons/components'
+import { StyledText } from '@opentrons/components'
 
 import { RecoveryError } from './RecoveryError'
 import {
@@ -93,13 +93,13 @@ export function ErrorRecoveryComponent(
     const titleText = props.hasLaunchedRecovery
       ? t('recovery_mode')
       : t('cancel_run')
-    return <LegacyStyledText as={'h4Bold'}>{titleText}</LegacyStyledText>
+    return <StyledText oddStyle='level4HeaderBold' desktopStyle='headingSmallRegular'>{titleText}</StyledText>
   }
 
   const buildIconHeading = (): JSX.Element => (
-    <LegacyStyledText as="pSemiBold">
+    <StyledText oddStyle="bodyTextSemiBold" desktopStyle='bodyDefaultSemiBold'>
       {t('view_error_details')}
-    </LegacyStyledText>
+    </StyledText>
   )
 
   const isLargeDesktopStyle =

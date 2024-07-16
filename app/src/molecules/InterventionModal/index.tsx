@@ -167,10 +167,9 @@ export function InterventionModal({
                   <Icon name={iconName} size={SPACING.spacing32} />
                 ) : (
                   <Icon
-                    width={16}
-                    height={16}
+                    width={SPACING.spacing16}
+                    height={SPACING.spacing16}
                     name={iconName}
-                    size={SPACING.spacing32}
                   />
                 )
               ) : null}

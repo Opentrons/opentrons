@@ -6,7 +6,7 @@ import {
   DIRECTION_COLUMN,
   SPACING,
   Flex,
-  LegacyStyledText,
+  StyledText,
 } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
@@ -88,9 +88,9 @@ export function BeginRemoval({
 
   return (
     <RecoveryContentWrapper>
-      <LegacyStyledText css={ODD_SECTION_TITLE_STYLE} as="h4SemiBold">
+      <StyledText css={ODD_SECTION_TITLE_STYLE} oddStyle="level4HeaderSemiBold" desktopStyle='headingSmallSemiBold'>
         {t('you_may_want_to_remove', { mount })}
-      </LegacyStyledText>
+      </StyledText>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
         <RadioButton
           buttonLabel={t('begin_removal')}

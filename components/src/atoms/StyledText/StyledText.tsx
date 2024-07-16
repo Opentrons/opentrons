@@ -31,6 +31,14 @@ const helixProductStyleMap = {
       }
     `,
   },
+  headingMediumBold: {
+    as: 'h3',
+    style: css`
+      @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+        font: ${HELIX_TYPOGRAPHY.fontStyleHeadingMediumBold};
+      }
+    `,
+  },
   headingMediumSemiBold: {
     as: 'h3',
     style: css`
@@ -48,6 +56,14 @@ const helixProductStyleMap = {
     `,
   },
   headingSmallBold: {
+    as: 'h4',
+    style: css`
+      @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+        font: ${HELIX_TYPOGRAPHY.fontStyleHeadingSmallBold};
+      }
+    `,
+  },
+  headingSmallSemiBold: {
     as: 'h4',
     style: css`
       @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
@@ -171,7 +187,6 @@ const ODDStyleMap = {
       }
     `,
   },
-
   level3HeaderBold: {
     as: 'h3',
     style: css`

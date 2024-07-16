@@ -9,7 +9,7 @@ import {
   Flex,
   Icon,
   SPACING,
-  LegacyStyledText,
+  StyledText,
   RESPONSIVENESS,
 } from '@opentrons/components'
 
@@ -76,16 +76,17 @@ function CancelRunConfirmation({
           marginTop={SPACING.spacing24}
           color={COLORS.red50}
         />
-        <LegacyStyledText as="h3Bold">
+        <StyledText oddStyle="level3HeaderBold" desktopStyle='headingSmallBold'>
           {t('are_you_sure_you_want_to_cancel')}
-        </LegacyStyledText>
-        <LegacyStyledText
-          as="h4"
+        </StyledText>
+        <StyledText
+          oddStyle="level4HeaderRegular"
+          desktopStyle='bodyDefaultRegular'
           color={COLORS.grey60}
           textAlign={ALIGN_CENTER}
         >
           {t('if_tips_are_attached')}
-        </LegacyStyledText>
+        </StyledText>
       </Flex>
       <RecoveryFooterButtons
         primaryBtnOnClick={handleCancelRunClick}

@@ -29,7 +29,6 @@ const styleMap: { [tag: string]: FlattenSimpleInterpolation } = {
     }
   `,
   h4: css`
-    ${TYPOGRAPHY.level4DesktopHeaderRegular}
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
       ${TYPOGRAPHY.level4HeaderRegular};
     }
@@ -60,7 +59,6 @@ const styleMap: { [tag: string]: FlattenSimpleInterpolation } = {
     }
   `,
   h4SemiBold: css`
-    ${TYPOGRAPHY.level4HeaderDesktopSemiBold}
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
       ${TYPOGRAPHY.level4HeaderSemiBold},
     }
@@ -81,13 +79,11 @@ const styleMap: { [tag: string]: FlattenSimpleInterpolation } = {
   `,
   h2Bold: TYPOGRAPHY.level2HeaderBold,
   h3Bold: css`
-    ${TYPOGRAPHY.levelDesktop3HeaderBold}
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
       ${TYPOGRAPHY.level3HeaderBold}
     }
   `,
   h4Bold: css`
-    ${TYPOGRAPHY.level4DesketopHeaderBold}
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
       ${TYPOGRAPHY.level4HeaderBold}
     }
