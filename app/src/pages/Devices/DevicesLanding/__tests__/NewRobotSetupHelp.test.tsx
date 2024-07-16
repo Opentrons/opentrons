@@ -24,7 +24,7 @@ describe('NewRobotSetupHelp', () => {
 
     const link = screen.getByText('See how to set up a new robot')
     fireEvent.click(link)
-    screen.getByText('How to setup a new robot')
+    screen.getByText('How to set up a new robot')
 
     const closeButton = screen.getByRole('button', { name: 'close' })
     fireEvent.click(closeButton)
@@ -36,22 +36,30 @@ describe('NewRobotSetupHelp', () => {
 
     const link = screen.getByText('See how to set up a new robot')
     fireEvent.click(link)
-    expect(screen.getByText('How to setup a new robot')).toBeInTheDocument()
+    expect(screen.getByText('How to set up a new robot')).toBeInTheDocument()
 
     const xButton = screen.getByRole('button', { name: '' })
     fireEvent.click(xButton)
 
-    expect(screen.queryByText('How to setup a new robot')).toBeFalsy()
+    expect(screen.queryByText('How to set up a new robot')).toBeFalsy()
   })
 
   it('renders the link and it has the correct href attribute', () => {
     render()
     const link = screen.getByText('See how to set up a new robot')
     fireEvent.click(link)
-    const targetLinkUrl = 'https://support.opentrons.com/s/'
-    const supportLink = screen.getByRole('link', {
-      name: 'Learn more about setting up a new robot',
+    const targetLinkUrlFlex =
+      'https://insights.opentrons.com/hubfs/Products/Flex/Opentrons%20Flex%20Quickstart%20Guide.pdf'
+    const supportLinkFlex = screen.getByRole('link', {
+      name: 'Opentrons Flex Quickstart Guide',
     })
-    expect(supportLink).toHaveAttribute('href', targetLinkUrl)
+    expect(supportLinkFlex).toHaveAttribute('href', targetLinkUrlFlex)
+
+    const targetLinkUrlOt2 =
+      'https://insights.opentrons.com/hubfs/Products/OT-2/OT-2%20Quick%20Start%20Guide.pdf'
+    const supportLinkOt2 = screen.getByRole('link', {
+      name: 'OT-2 Quickstart Guide',
+    })
+    expect(supportLinkOt2).toHaveAttribute('href', targetLinkUrlOt2)
   })
 })
