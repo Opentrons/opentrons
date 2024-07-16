@@ -39,9 +39,13 @@ import type { ErrorRecoveryFlowsProps } from '.'
 import type { ERUtilsResults } from './hooks'
 import { useHost } from '@opentrons/react-api-client'
 
-export function useRunPausedSplash(showERWizard: boolean): boolean {
-  // Don't show the splash when the ER wizard is active.
-  return !showERWizard
+export function useRunPausedSplash(
+  isOnDevice: boolean,
+  showERWizard: boolean
+): boolean {
+  // Don't show the splash when desktop ER wizard is active,
+  // but always show it on the ODD (with or without the wizard rendered above it).
+  return !(!isOnDevice && showERWizard)
 }
 
 type RunPausedSplashProps = ERUtilsResults & {
@@ -54,7 +58,7 @@ type RunPausedSplashProps = ERUtilsResults & {
 export function RunPausedSplash(
   props: RunPausedSplashProps
 ): JSX.Element | null {
-  const { toggleERWiz, routeUpdateActions, failedCommand } = props
+  const { isOnDevice, toggleERWiz, routeUpdateActions, failedCommand } = props
   const { t } = useTranslation('error_recovery')
   const errorKind = getErrorKind(failedCommand)
   const title = useErrorName(errorKind)
@@ -88,7 +92,7 @@ export function RunPausedSplash(
 
   // TODO(jh 06-18-24): Instead of passing stepCount internally, we probably want to
   // pass it in as a prop to ErrorRecoveryFlows to ameliorate blippy "step = ? -> step = 24" behavior.
-  if (props.isOnDevice) {
+  if (isOnDevice) {
     return (
       <Flex
         display={DISPLAY_FLEX}
@@ -145,6 +149,7 @@ export function RunPausedSplash(
       <RecoveryInterventionModal
         desktopType="desktop-small"
         titleHeading={buildTitleHeadingDesktop()}
+        isOnDevice={isOnDevice}
       >
         <RecoveryContentWrapper>
           <Flex
