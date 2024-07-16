@@ -1943,7 +1943,7 @@ class OT3API(
 
         The plunger backlash distance (mm) is used to ensure the plunger is pre-loaded
         in the downward direction. This means that the final position will not be
-        the plunger's configured "top" position, but "top" plust the "backlashDistance".
+        the plunger's configured "top" position, but "top" plus the "backlashDistance".
         """
         max_speeds = self.config.motion_settings.default_max_speed
         speed = max_speeds[self.gantry_load][OT3AxisKind.P]
