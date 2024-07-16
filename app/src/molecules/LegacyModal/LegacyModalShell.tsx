@@ -76,10 +76,10 @@ export function LegacyModalShell(props: LegacyModalShellProps): JSX.Element {
 
 const Overlay = styled.div`
   position: ${POSITION_FIXED};
-  left: 90;
+  left: 90px;
   right: 0;
   width: calc(100% - 90px);
-  top: 0;
+  top: 21px;
   bottom: 0;
   z-index: 1;
   background-color: ${COLORS.black90}${COLORS.opacity40HexCode};
@@ -90,10 +90,10 @@ const ContentArea = styled.div<{ zIndex: string | number }>`
   position: ${POSITION_FIXED};
   align-items: ${ALIGN_CENTER};
   justify-content: ${JUSTIFY_CENTER};
-  top: 0;
+  top: 21px;
   right: 0;
   bottom: 0;
-  left: 90;
+  left: 90px;
   width: calc(100% - 90px);
   height: 100%;
   z-index: ${({ zIndex }) => zIndex};
