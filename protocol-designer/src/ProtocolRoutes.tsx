@@ -16,8 +16,8 @@ const pdRoutes: RouteProps[] = [
   {
     Component: ProtocolOverview,
     name: 'Protocol overview',
-    navLinkTo: '/protocolOverview',
-    path: '/protocolOverview',
+    navLinkTo: '/overview',
+    path: '/overview',
   },
   {
     Component: Liquids,
@@ -34,14 +34,14 @@ const pdRoutes: RouteProps[] = [
   {
     Component: ProtocolSteps,
     name: 'Protocol steps',
-    navLinkTo: '/protocolSteps',
-    path: '/protocolSteps',
+    navLinkTo: '/steps',
+    path: '/steps',
   },
   {
     Component: CreateNewProtocol,
     name: 'Create new protocol',
-    navLinkTo: '/createNewProtocol',
-    path: '/createNewProtocol',
+    navLinkTo: '/createNew',
+    path: '/createNew',
   },
 ]
 

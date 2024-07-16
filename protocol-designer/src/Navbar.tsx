@@ -37,7 +37,7 @@ export function Navbar({ routes }: { routes: RouteProps[] }): JSX.Element {
         alignSelf={ALIGN_STRETCH}
       >
         {navRoutes.map(({ name, navLinkTo }: RouteProps) => (
-          <NavbarLink key={name} to={navLinkTo as string}>
+          <NavbarLink key={name} to={navLinkTo}>
             <LegacyStyledText
               as="h3"
               margin={`${SPACING.spacing8} 0 ${SPACING.spacing8} ${SPACING.spacing12}`}
