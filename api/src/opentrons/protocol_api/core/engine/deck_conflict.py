@@ -428,6 +428,7 @@ def _is_within_pipette_extents(
         robot_extent_per_mount.front_left[mount]
         + pipette_bounds_offsets.front_left_corner
     )
+
     return (
         from_back_right.x >= pip_back_left_bound.x >= from_front_left.x
         and from_back_right.y >= pip_back_left_bound.y >= from_front_left.y
