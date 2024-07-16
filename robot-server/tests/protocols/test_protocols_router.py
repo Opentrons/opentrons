@@ -11,6 +11,8 @@ from pathlib import Path
 from opentrons.protocol_engine.types import (
     PrimitiveRunTimeParamValuesType,
     NumberParameter,
+    CSVParameter,
+    CsvRunTimeParamFilesType,
 )
 from opentrons.protocols.api_support.types import APIVersion
 
@@ -451,6 +453,7 @@ async def test_create_existing_protocol(
             analysis_id="analysis-id",
             protocol_resource=stored_protocol_resource,
             run_time_param_values={},
+            run_time_param_files={},
         )
     ).then_return(analyzer)
     decoy.when(analyzer.get_verified_run_time_parameters()).then_return([])
@@ -566,6 +569,7 @@ async def test_create_protocol(
             analysis_id="analysis-id",
             protocol_resource=protocol_resource,
             run_time_param_values={},
+            run_time_param_files={},
         )
     ).then_return(analyzer)
     decoy.when(analyzer.get_verified_run_time_parameters()).then_return([])
@@ -695,6 +699,7 @@ async def test_create_new_protocol_with_run_time_params(
             analysis_id="analysis-id",
             protocol_resource=protocol_resource,
             run_time_param_values={"vol": 123, "dry_run": True, "mount": "left"},
+            run_time_param_files={"my_csv_file": "file-id"},
         )
     ).then_return(analyzer)
     decoy.when(
@@ -709,6 +714,7 @@ async def test_create_new_protocol_with_run_time_params(
         files=[protocol_file],
         key="dummy-key-111",
         run_time_parameter_values='{"vol": 123, "dry_run": true, "mount": "left"}',
+        run_time_parameter_files='{"my_csv_file": "file-id"}',
         protocol_directory=protocol_directory,
         protocol_store=protocol_store,
         analysis_store=analysis_store,
@@ -808,6 +814,7 @@ async def test_create_existing_protocol_with_no_previous_analysis(
             analysis_id="analysis-id",
             protocol_resource=stored_protocol_resource,
             run_time_param_values={"vol": 123, "dry_run": True, "mount": "left"},
+            run_time_param_files={},
         )
     ).then_return(analyzer)
 
@@ -934,6 +941,7 @@ async def test_create_existing_protocol_with_different_run_time_params(
             analysis_id="analysis-id",
             protocol_resource=stored_protocol_resource,
             run_time_param_values={"vol": 123, "dry_run": True, "mount": "left"},
+            run_time_param_files={"my_csv_file": "csv-file-id"},
         )
     ).then_return(analyzer)
     decoy.when(analyzer.get_verified_run_time_parameters()).then_return(
@@ -955,6 +963,7 @@ async def test_create_existing_protocol_with_different_run_time_params(
         files=[protocol_file],
         key="dummy-key-111",
         run_time_parameter_values='{"vol": 123, "dry_run": true, "mount": "left"}',
+        run_time_parameter_files='{"my_csv_file": "csv-file-id"}',
         protocol_directory=protocol_directory,
         protocol_store=protocol_store,
         analysis_store=analysis_store,
@@ -1063,6 +1072,7 @@ async def test_create_existing_protocol_with_same_run_time_params(
             analysis_id="analysis-id",
             protocol_resource=stored_protocol_resource,
             run_time_param_values={"vol": 123, "dry_run": True, "mount": "left"},
+            run_time_param_files={},
         )
     ).then_return(analyzer)
     decoy.when(analyzer.get_verified_run_time_parameters()).then_return(
@@ -1187,6 +1197,7 @@ async def test_create_existing_protocol_with_pending_analysis_raises(
             analysis_id="analysis-id",
             protocol_resource=stored_protocol_resource,
             run_time_param_values={"vol": 123, "dry_run": True, "mount": "left"},
+            run_time_param_files={},
         )
     ).then_return(analyzer)
     decoy.when(analyzer.get_verified_run_time_parameters()).then_return(
@@ -1604,6 +1615,7 @@ async def test_create_protocol_analyses_with_same_rtp_values(
             analysis_id="analysis-id-2",
             protocol_resource=stored_protocol_resource,
             run_time_param_values=rtp_values,
+            run_time_param_files={},
         )
     ).then_return(analyzer)
     decoy.when(analyzer.get_verified_run_time_parameters()).then_return(
@@ -1640,6 +1652,9 @@ async def test_update_protocol_analyses_with_new_rtp_values(
         "vol": 123,
         "dry_run": True,
         "mount": "left",
+    }
+    rtp_files: CsvRunTimeParamFilesType = {
+        "csv_param": "file-id",
     }
     protocol_source = ProtocolSource(
         directory=Path("/dev/null"),
@@ -1678,6 +1693,9 @@ async def test_update_protocol_analyses_with_new_rtp_values(
         value=2.0,
         default=3.0,
     )
+    csv_parameter = CSVParameter(
+        displayName="CSV parameter", variableName="csv_param", fileId="file-id"
+    )
     decoy.when(protocol_store.has(protocol_id="protocol-id")).then_return(True)
     decoy.when(protocol_store.get(protocol_id="protocol-id")).then_return(
         stored_protocol_resource
@@ -1691,14 +1709,15 @@ async def test_update_protocol_analyses_with_new_rtp_values(
             analysis_id="analysis-id-2",
             protocol_resource=stored_protocol_resource,
             run_time_param_values=rtp_values,
+            run_time_param_files=rtp_files,
         )
     ).then_return(analyzer)
     decoy.when(analyzer.get_verified_run_time_parameters()).then_return(
-        [run_time_parameter]
+        [run_time_parameter, csv_parameter]
     )
     decoy.when(
         await analysis_store.matching_rtp_values_in_analysis(
-            analysis_summaries[-1], [run_time_parameter]
+            analysis_summaries[-1], [run_time_parameter, csv_parameter]
         )
     ).then_return(False)
     decoy.when(
@@ -1710,14 +1729,16 @@ async def test_update_protocol_analyses_with_new_rtp_values(
         AnalysisSummary(
             id="analysis-id-2",
             status=AnalysisStatus.PENDING,
-            runTimeParameters=[run_time_parameter],
+            runTimeParameters=[run_time_parameter, csv_parameter],
         )
     )
 
     result = await create_protocol_analysis(
         protocolId="protocol-id",
         request_body=RequestModel(
-            data=AnalysisRequest(runTimeParameterValues=rtp_values)
+            data=AnalysisRequest(
+                runTimeParameterValues=rtp_values, runTimeParameterFiles=rtp_files
+            )
         ),
         protocol_store=protocol_store,
         analysis_store=analysis_store,
@@ -1729,7 +1750,7 @@ async def test_update_protocol_analyses_with_new_rtp_values(
         AnalysisSummary(
             id="analysis-id-2",
             status=AnalysisStatus.PENDING,
-            runTimeParameters=[run_time_parameter],
+            runTimeParameters=[run_time_parameter, csv_parameter],
         ),
     ]
     assert result.status_code == 201
@@ -1783,6 +1804,7 @@ async def test_update_protocol_analyses_with_forced_reanalysis(
             analysis_id="analysis-id-2",
             protocol_resource=stored_protocol_resource,
             run_time_param_values={},
+            run_time_param_files={},
         )
     ).then_return(analyzer)
     decoy.when(
@@ -1888,6 +1910,7 @@ async def test_create_protocol_kind_quick_transfer(
             analysis_id="analysis-id",
             protocol_resource=protocol_resource,
             run_time_param_values={},
+            run_time_param_files={},
         )
     ).then_return(analyzer)
     decoy.when(

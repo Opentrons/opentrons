@@ -32,6 +32,7 @@ from ..protocol_engine.types import (
     DeckConfigurationType,
     RunTimeParameter,
     PrimitiveRunTimeParamValuesType,
+    CsvRunTimeParamFilesType,
 )
 from ..protocol_reader import JsonProtocolConfig, PythonProtocolConfig, ProtocolSource
 from ..protocols.parse import PythonParseMode
@@ -324,6 +325,7 @@ class RunOrchestrator:
         self,
         protocol_source: ProtocolSource,
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType],
+        run_time_param_files: Optional[CsvRunTimeParamFilesType],
         parse_mode: ParseMode,
     ) -> None:
         """Load a json/python protocol."""
@@ -339,6 +341,7 @@ class RunOrchestrator:
                 # doesn't conform to the new rules.
                 python_parse_mode=python_parse_mode,
                 run_time_param_values=run_time_param_values,
+                run_time_param_files=run_time_param_files,
             )
 
     def get_is_okay_to_clear(self) -> bool:

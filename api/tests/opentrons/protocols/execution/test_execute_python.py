@@ -98,6 +98,7 @@ metadata={"apiLevel": "2.0"};
     assert "Exception [line 5]: hi" in str(e.value)
 
 
+# TODO (spp, 2024-7-16): add a test for CSV rtp extraction
 @pytest.mark.ot2_only
 @pytest.mark.parametrize("protocol_file", ["testosaur_with_rtp.py"])
 def test_rtp_extraction(protocol, protocol_file) -> None:
@@ -109,4 +110,5 @@ def test_rtp_extraction(protocol, protocol_file) -> None:
         protocol=proto,
         parameter_context=parameter_context,
         run_time_param_overrides=run_time_param_overrides,
+        run_time_param_file_overrides={},
     ).get_all() == {"sample_count": 2, "mount": "left"}
