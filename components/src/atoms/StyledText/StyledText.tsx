@@ -111,6 +111,14 @@ const helixProductStyleMap = {
       }
     `,
   },
+  hidden: {
+    as: 'none',
+    style: css`
+      @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+        display: none;
+      }
+    `,
+  },
 } as const
 
 const ODDStyleMap = {
@@ -246,6 +254,14 @@ const ODDStyleMap = {
     style: css`
       @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
         ${TYPOGRAPHY.smallBodyTextBold}
+      }
+    `,
+  },
+  hidden: {
+    as: 'none',
+    style: css`
+      @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+        display: none;
       }
     `,
   },

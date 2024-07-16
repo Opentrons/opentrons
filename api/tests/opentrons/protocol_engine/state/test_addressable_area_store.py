@@ -1,4 +1,10 @@
-"""Addressable area state store tests."""
+"""Addressable area state store tests.
+
+DEPRECATED: Testing AddressableAreaStore independently of AddressableAreaView is no
+longer helpful. Add new tests to test_addressable_area_state.py, where they can be
+tested together.
+"""
+
 import pytest
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV5

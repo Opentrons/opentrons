@@ -14,6 +14,7 @@ from pydantic import BaseModel, Field
 from opentrons_shared_data.errors import ErrorCodes
 
 from robot_server.errors.error_responses import ErrorDetails, ErrorBody
+from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.service.dependencies import get_current_time, get_unique_id
 from robot_server.robot.control.dependencies import require_estop_in_good_state
 
@@ -39,7 +40,11 @@ from ..run_auto_deleter import RunAutoDeleter
 from ..run_models import Run, BadRun, RunCreate, RunUpdate
 from ..run_orchestrator_store import RunConflictError
 from ..run_data_manager import RunDataManager, RunNotCurrentError
-from ..dependencies import get_run_data_manager, get_run_auto_deleter
+from ..dependencies import (
+    get_run_data_manager,
+    get_run_auto_deleter,
+    get_quick_transfer_run_auto_deleter,
+)
 
 from robot_server.deck_configuration.fastapi_dependencies import (
     get_deck_configuration_store,
@@ -140,6 +145,9 @@ async def create_run(
     run_id: str = Depends(get_unique_id),
     created_at: datetime = Depends(get_current_time),
     run_auto_deleter: RunAutoDeleter = Depends(get_run_auto_deleter),
+    quick_transfer_run_auto_deleter: RunAutoDeleter = Depends(
+        get_quick_transfer_run_auto_deleter
+    ),
     check_estop: bool = Depends(require_estop_in_good_state),
     deck_configuration_store: DeckConfigurationStore = Depends(
         get_deck_configuration_store
@@ -156,6 +164,8 @@ async def create_run(
         created_at: Timestamp to attach to created run.
         run_auto_deleter: An interface to delete old resources to make room for
             the new run.
+        quick_transfer_run_auto_deleter: An interface to delete old quick-transfer
+        resources to make room for the new run.
         check_estop: Dependency to verify the estop is in a valid state.
         deck_configuration_store: Dependency to fetch the deck configuration.
         notify_publishers: Utilized by the engine to notify publishers of state changes.
@@ -180,7 +190,13 @@ async def create_run(
     # TODO(mc, 2022-05-13): move inside `RunDataManager` or return data
     # to pass to `RunDataManager.create`. Right now, runs may be deleted
     # even if a new create is unable to succeed due to a conflict
-    run_auto_deleter.make_room_for_new_run()
+    run_deleter: RunAutoDeleter = run_auto_deleter
+    if (
+        protocol_resource
+        and protocol_resource.protocol_kind == ProtocolKind.QUICK_TRANSFER
+    ):
+        run_deleter = quick_transfer_run_auto_deleter
+    run_deleter.make_room_for_new_run()
 
     try:
         run_data = await run_data_manager.create(

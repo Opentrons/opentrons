@@ -95,12 +95,6 @@ export function ProtocolSetupParameters({
     ) ?? false
   const { makeSnackbar } = useToaster()
 
-  const csvFileParameter = runTimeParameters.find(
-    (param): param is CsvFileParameter => param.type === 'csv_file'
-  )
-  const initialFileId: string = csvFileParameter?.file?.id ?? ''
-  const [csvFileInfo, setCSVFileInfo] = React.useState<string>(initialFileId)
-
   const updateParameters = (
     value: boolean | string | number | CsvFileParameterFileData,
     variableName: string
@@ -328,8 +322,6 @@ export function ProtocolSetupParameters({
         }}
         parameter={chooseCsvFileScreen}
         setParameter={updateParameters}
-        csvFileInfo={csvFileInfo}
-        setCsvFileInfo={setCSVFileInfo}
       />
     )
   }

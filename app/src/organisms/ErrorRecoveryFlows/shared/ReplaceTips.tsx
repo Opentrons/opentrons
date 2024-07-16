@@ -3,7 +3,7 @@ import * as React from 'react'
 import { Flex } from '@opentrons/components'
 
 import { useTranslation } from 'react-i18next'
-import { RecoverySingleColumnContent } from './RecoverySingleColumnContent'
+import { RecoveryContentWrapper } from './RecoveryContentWrapper'
 import { TwoColumn, DeckMapContent } from '../../../molecules/InterventionModal'
 import { RecoveryFooterButtons } from './RecoveryFooterButtons'
 import { LeftColumnLabwareInfo } from './LeftColumnLabwareInfo'
@@ -12,7 +12,6 @@ import type { RecoveryContentProps } from '../types'
 
 export function ReplaceTips(props: RecoveryContentProps): JSX.Element | null {
   const {
-    isOnDevice,
     routeUpdateActions,
     failedPipetteInfo,
     failedLabwareUtils,
@@ -36,27 +35,20 @@ export function ReplaceTips(props: RecoveryContentProps): JSX.Element | null {
     }
   }
 
-  if (isOnDevice) {
-    return (
-      <RecoverySingleColumnContent>
-        <TwoColumn>
-          <LeftColumnLabwareInfo
-            {...props}
-            title={buildTitle()}
-            moveType="refill"
-            bannerText={t('replace_tips_and_select_location')}
-          />
-          <Flex marginTop="1.742rem">
-            <DeckMapContent {...deckMapUtils} />
-          </Flex>
-        </TwoColumn>
-        <RecoveryFooterButtons
-          isOnDevice={isOnDevice}
-          primaryBtnOnClick={primaryOnClick}
+  return (
+    <RecoveryContentWrapper>
+      <TwoColumn>
+        <LeftColumnLabwareInfo
+          {...props}
+          title={buildTitle()}
+          type="location"
+          bannerText={t('replace_tips_and_select_location')}
         />
-      </RecoverySingleColumnContent>
-    )
-  } else {
-    return null
-  }
+        <Flex marginTop="1.742rem">
+          <DeckMapContent {...deckMapUtils} />
+        </Flex>
+      </TwoColumn>
+      <RecoveryFooterButtons primaryBtnOnClick={primaryOnClick} />
+    </RecoveryContentWrapper>
+  )
 }

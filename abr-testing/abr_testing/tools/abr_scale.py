@@ -34,19 +34,29 @@ def get_protocol_step_as_int(
         # create an dict copying the contents of IP_N_Volumes
         try:
             ip_file = json.load(open(ip_json_file))
+            try:
+                # grab IP and volume from the dict
+                tot_info = ip_file["information"]
+                robot_info = tot_info[robot]
+                IP_add = robot_info["IP"]
+                exp_volume = robot_info["volume"]
+                # sets return variables equal to those grabbed from the sheet
+                ip = IP_add
+                expected_liquid_moved = float(exp_volume)
+            except KeyError:
+                ip = input("Robot IP: ")
+                while True:
+                    try:
+                        expected_liquid_moved = float(input("Expected volume moved: "))
+                        if expected_liquid_moved >= 0 or expected_liquid_moved <= 0:
+                            break
+                    except ValueError:
+                        print("Expected liquid moved volume should be an float.")
         except FileNotFoundError:
             print(
                 f"Please add json file with robot IPs and expected volumes to: {storage_directory}."
             )
             sys.exit()
-        # grab IP and volume from the dict
-        tot_info = ip_file["information"]
-        robot_info = tot_info[robot]
-        IP_add = robot_info["IP"]
-        exp_volume = robot_info["volume"]
-        # sets return variables equal to those grabbed from the sheet
-        ip = IP_add
-        expected_liquid_moved = float(exp_volume)
 
     return protocol_step, expected_liquid_moved, ip
 

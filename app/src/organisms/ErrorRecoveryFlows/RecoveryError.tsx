@@ -13,7 +13,7 @@ import {
 } from '@opentrons/components'
 
 import { RECOVERY_MAP } from './constants'
-import { RecoverySingleColumnContent } from './shared'
+import { RecoveryContentWrapper } from './shared'
 
 import type { RecoveryContentProps } from './types'
 import { SmallButton } from '../../atoms/buttons'
@@ -167,39 +167,35 @@ export function ErrorContent({
   btnText: string
   btnOnClick: () => void
 }): JSX.Element | null {
-  if (isOnDevice) {
-    return (
-      <RecoverySingleColumnContent>
+  return (
+    <RecoveryContentWrapper>
+      <Flex
+        padding={SPACING.spacing40}
+        gridGap={SPACING.spacing24}
+        flexDirection={DIRECTION_COLUMN}
+        alignItems={ALIGN_CENTER}
+        justifyContent={ALIGN_CENTER}
+        flex="1"
+      >
+        <Icon
+          name="alert-circle"
+          size={SPACING.spacing60}
+          color={COLORS.red50}
+          data-testid="recovery_error_alert_icon"
+        />
         <Flex
-          padding={SPACING.spacing40}
-          gridGap={SPACING.spacing24}
+          gridGap={SPACING.spacing4}
           flexDirection={DIRECTION_COLUMN}
           alignItems={ALIGN_CENTER}
-          justifyContent={ALIGN_CENTER}
-          flex="1"
+          textAlign={ALIGN_CENTER}
         >
-          <Icon
-            name="alert-circle"
-            size={SPACING.spacing60}
-            color={COLORS.red50}
-            data-testid="recovery_error_alert_icon"
-          />
-          <Flex
-            gridGap={SPACING.spacing4}
-            flexDirection={DIRECTION_COLUMN}
-            alignItems={ALIGN_CENTER}
-            textAlign={ALIGN_CENTER}
-          >
-            <LegacyStyledText as="h3Bold">{title}</LegacyStyledText>
-            <LegacyStyledText as="h4">{subTitle}</LegacyStyledText>
-          </Flex>
+          <LegacyStyledText as="h3Bold">{title}</LegacyStyledText>
+          <LegacyStyledText as="h4">{subTitle}</LegacyStyledText>
         </Flex>
-        <Flex justifyContent={JUSTIFY_END}>
-          <SmallButton onClick={btnOnClick} buttonText={btnText} />
-        </Flex>
-      </RecoverySingleColumnContent>
-    )
-  } else {
-    return null
-  }
+      </Flex>
+      <Flex justifyContent={JUSTIFY_END}>
+        <SmallButton onClick={btnOnClick} buttonText={btnText} />
+      </Flex>
+    </RecoveryContentWrapper>
+  )
 }

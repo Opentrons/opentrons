@@ -277,8 +277,8 @@ def test_load_instrument_pre_219(
     assert result.pipette_id == "cool-pipette"
 
 
-@pytest.mark.parametrize("api_version", versions_at_or_above(APIVersion(2, 19)))
-def test_load_instrument_post_219(
+@pytest.mark.parametrize("api_version", versions_at_or_above(APIVersion(2, 20)))
+def test_load_instrument_post_220(
     decoy: Decoy,
     mock_sync_hardware_api: SyncHardwareAPI,
     mock_engine_client: EngineClient,
@@ -290,7 +290,7 @@ def test_load_instrument_post_219(
             cmd.LoadPipetteParams(
                 pipetteName=PipetteNameType.P300_SINGLE,
                 mount=MountType.LEFT,
-                tipOverlapNotAfterVersion="v1",
+                tipOverlapNotAfterVersion="v3",
                 liquidPresenceDetection=False,
             )
         )

@@ -1069,8 +1069,8 @@ def test_liquid_presence_detection(
 ) -> None:
     """It should have a default liquid presence detection boolean set to False."""
     decoy.when(mock_instrument_core.get_liquid_presence_detection()).then_return(False)
-    assert subject.liquid_detection is False
-    subject.liquid_detection = True
+    assert subject.liquid_presence_detection is False
+    subject.liquid_presence_detection = True
     decoy.verify(mock_instrument_core.set_liquid_presence_detection(True), times=1)
 
 
@@ -1119,11 +1119,13 @@ def test_prepare_to_aspirate_checks_volume(
 
 
 @pytest.mark.parametrize(
-    argnames=["style", "primary_nozzle", "front_right_nozzle", "exception"],
+    argnames=["style", "primary_nozzle", "front_right_nozzle", "end", "exception"],
     argvalues=[
-        [NozzleLayout.COLUMN, "A1", "H1", does_not_raise()],
-        [NozzleLayout.SINGLE, None, None, pytest.raises(ValueError)],
-        [NozzleLayout.ROW, "E1", None, pytest.raises(ValueError)],
+        [NozzleLayout.COLUMN, "A1", None, None, does_not_raise()],
+        [NozzleLayout.SINGLE, None, None, None, pytest.raises(ValueError)],
+        [NozzleLayout.ROW, "E1", None, None, pytest.raises(ValueError)],
+        [NozzleLayout.PARTIAL_COLUMN, "H1", None, "G1", does_not_raise()],
+        [NozzleLayout.PARTIAL_COLUMN, "H1", "H1", "G1", pytest.raises(ValueError)],
     ],
 )
 def test_configure_nozzle_layout(
@@ -1131,11 +1133,14 @@ def test_configure_nozzle_layout(
     style: NozzleLayout,
     primary_nozzle: Optional[str],
     front_right_nozzle: Optional[str],
+    end: Optional[str],
     exception: ContextManager[None],
 ) -> None:
     """The correct model is passed to the engine client."""
     with exception:
-        subject.configure_nozzle_layout(style, primary_nozzle, front_right_nozzle)
+        subject.configure_nozzle_layout(
+            style=style, start=primary_nozzle, end=end, front_right=front_right_nozzle
+        )
 
 
 @pytest.mark.parametrize("api_version", [APIVersion(2, 15)])
@@ -1290,7 +1295,9 @@ def test_detect_liquid_presence(
         message=f"{lnfe.errorType}: {lnfe.detail}",
     )
     decoy.when(
-        mock_instrument_core.liquid_probe_without_recovery(mock_well._core)
+        mock_instrument_core.liquid_probe_without_recovery(
+            mock_well._core, mock_well.top()
+        )
     ).then_raise(errorToRaise)
     result = subject.detect_liquid_presence(mock_well)
     assert isinstance(result, bool)
@@ -1311,10 +1318,16 @@ def test_require_liquid_presence(
         original_error=lnfe,
         message=f"{lnfe.errorType}: {lnfe.detail}",
     )
-    decoy.when(mock_instrument_core.liquid_probe_with_recovery(mock_well._core))
+    decoy.when(
+        mock_instrument_core.liquid_probe_with_recovery(
+            mock_well._core, mock_well.top()
+        )
+    )
     subject.require_liquid_presence(mock_well)
     decoy.when(
-        mock_instrument_core.liquid_probe_with_recovery(mock_well._core)
+        mock_instrument_core.liquid_probe_with_recovery(
+            mock_well._core, mock_well.top()
+        )
     ).then_raise(errorToRaise)
     with pytest.raises(ProtocolCommandFailedError) as pcfe:
         subject.require_liquid_presence(mock_well)
@@ -1336,7 +1349,9 @@ def test_measure_liquid_height(
         message=f"{lnfe.errorType}: {lnfe.detail}",
     )
     decoy.when(
-        mock_instrument_core.liquid_probe_without_recovery(mock_well._core)
+        mock_instrument_core.liquid_probe_without_recovery(
+            mock_well._core, mock_well.top()
+        )
     ).then_raise(errorToRaise)
     with pytest.raises(ProtocolCommandFailedError) as pcfe:
         subject.measure_liquid_height(mock_well)

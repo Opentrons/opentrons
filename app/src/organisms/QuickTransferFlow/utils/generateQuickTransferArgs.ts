@@ -14,13 +14,14 @@ import {
   DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
 } from '../constants'
-import type { QuickTransferSummaryState } from '../types'
 import type {
+  CutoutConfig,
   LabwareDefinition2,
   DeckConfiguration,
   PipetteName,
   NozzleConfigurationStyle,
 } from '@opentrons/shared-data'
+import type { QuickTransferSummaryState } from '../types'
 import type {
   ConsolidateArgs,
   DistributeArgs,
@@ -46,8 +47,7 @@ function getOrderedWells(
 }
 
 function getInvariantContextAndRobotState(
-  quickTransferState: QuickTransferSummaryState,
-  deckConfig: DeckConfiguration
+  quickTransferState: QuickTransferSummaryState
 ): { invariantContext: InvariantContext; robotState: RobotState } {
   const tipRackDefURI = getLabwareDefURI(quickTransferState.tipRack)
   let pipetteName = quickTransferState.pipette.model
@@ -114,7 +114,7 @@ function getInvariantContextAndRobotState(
   labwareLocations = {
     ...labwareLocations,
     [tipRackId]: {
-      slot: adapterId != null ? adapterId : 'B2',
+      slot: adapterId ?? 'B2',
     },
     [sourceLabwareId]: {
       slot: 'C2',
@@ -140,7 +140,7 @@ function getInvariantContextAndRobotState(
     }
   }
   let additionalEquipmentEntities: AdditionalEquipmentEntities = {}
-  // TODO add check for blowout location here
+
   if (
     quickTransferState.dropTipLocation.cutoutFixtureId ===
     TRASH_BIN_ADAPTER_FIXTURE
@@ -155,7 +155,29 @@ function getInvariantContextAndRobotState(
       },
     }
   }
-  // TODO add check for blowout location here
+  if (
+    quickTransferState.blowOut != null &&
+    quickTransferState.blowOut !== 'source_well' &&
+    quickTransferState.blowOut !== 'dest_well' &&
+    quickTransferState.blowOut?.cutoutFixtureId === TRASH_BIN_ADAPTER_FIXTURE
+  ) {
+    const trashLocation = quickTransferState.blowOut.cutoutId
+    const isSameTrash = Object.values(additionalEquipmentEntities).some(
+      entity => entity.location === trashLocation
+    )
+    if (!isSameTrash) {
+      const trashId = `${uuid()}_trashBin`
+      additionalEquipmentEntities = {
+        ...additionalEquipmentEntities,
+        [trashId]: {
+          name: 'trashBin',
+          id: trashId,
+          location: trashLocation,
+        },
+      }
+    }
+  }
+
   if (
     WASTE_CHUTE_FIXTURES.includes(
       quickTransferState.dropTipLocation.cutoutFixtureId
@@ -172,12 +194,33 @@ function getInvariantContextAndRobotState(
       },
     }
   }
-
+  if (
+    quickTransferState.blowOut != null &&
+    quickTransferState.blowOut !== 'source_well' &&
+    quickTransferState.blowOut !== 'dest_well' &&
+    WASTE_CHUTE_FIXTURES.includes(quickTransferState.blowOut.cutoutFixtureId)
+  ) {
+    const wasteChuteLocation = quickTransferState.dropTipLocation.cutoutId
+    const isSameChute = Object.values(additionalEquipmentEntities).some(
+      entity => entity.location === wasteChuteLocation
+    )
+    if (!isSameChute) {
+      const wasteChuteId = `${uuid()}_wasteChute`
+      additionalEquipmentEntities = {
+        ...additionalEquipmentEntities,
+        [wasteChuteId]: {
+          name: 'wasteChute',
+          id: wasteChuteId,
+          location: wasteChuteLocation,
+        },
+      }
+    }
+  }
   const invariantContext = {
     labwareEntities,
     moduleEntities: {},
     pipetteEntities,
-    additionalEquipmentEntities: additionalEquipmentEntities,
+    additionalEquipmentEntities,
     config: { OT_PD_DISABLE_MODULE_RESTRICTIONS: false },
   }
   const moduleLocations = {}
@@ -224,22 +267,25 @@ export function generateQuickTransferArgs(
     }
   }
   const { invariantContext, robotState } = getInvariantContextAndRobotState(
-    quickTransferState,
-    deckConfig
+    quickTransferState
   )
 
-  // this cannot be 'dest_well' for multiDispense
-  let blowoutLocation = quickTransferState.blowOut
-  if (quickTransferState.blowOut === 'trashBin') {
-    const trashBinEntity = Object.values(
+  let blowoutLocation: string | undefined
+  if (
+    quickTransferState?.blowOut != null &&
+    quickTransferState.blowOut !== 'source_well' &&
+    quickTransferState.blowOut !== 'dest_well' &&
+    'cutoutId' in quickTransferState.blowOut
+  ) {
+    const entity = Object.values(
       invariantContext.additionalEquipmentEntities
-    ).find(entity => entity.name === 'trashBin')
-    blowoutLocation = trashBinEntity?.id
-  } else if (quickTransferState.blowOut === 'wasteChute') {
-    const wasteChuteEntity = Object.values(
-      invariantContext.additionalEquipmentEntities
-    ).find(entity => entity.name === 'wasteChute')
-    blowoutLocation = wasteChuteEntity?.id
+    ).find(entity => {
+      const blowoutObject = quickTransferState.blowOut as CutoutConfig
+      return entity.location === blowoutObject.cutoutId
+    })
+    blowoutLocation = entity?.id
+  } else {
+    blowoutLocation = quickTransferState.blowOut
   }
 
   const dropTipLocationEntity = Object.values(
@@ -305,20 +351,18 @@ export function generateQuickTransferArgs(
     dispenseAirGapVolume: quickTransferState.airGapDispense ?? null,
     touchTipAfterAspirate: quickTransferState.touchTipAspirate != null,
     touchTipAfterAspirateOffsetMmFromBottom:
-      quickTransferState.touchTipAspirate != null
-        ? quickTransferState.touchTipAspirate
-        : getWellsDepth(quickTransferState.source, sourceWells) +
-          DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
+      quickTransferState.touchTipAspirate ??
+      getWellsDepth(quickTransferState.source, sourceWells) +
+        DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
     touchTipAfterDispense: quickTransferState.touchTipDispense != null,
     touchTipAfterDispenseOffsetMmFromBottom:
-      quickTransferState.touchTipDispense != null
-        ? quickTransferState.touchTipDispense
-        : getWellsDepth(
-            quickTransferState.destination === 'source'
-              ? quickTransferState.source
-              : quickTransferState.destination,
-            destWells
-          ) + DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
+      quickTransferState.touchTipDispense ??
+      getWellsDepth(
+        quickTransferState.destination === 'source'
+          ? quickTransferState.source
+          : quickTransferState.destination,
+        destWells
+      ) + DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
     dropTipLocation,
     aspirateXOffset: 0,
     aspirateYOffset: 0,
@@ -390,7 +434,7 @@ export function generateQuickTransferArgs(
       const distributeStepArguments: DistributeArgs = {
         ...commonFields,
         commandCreatorFnName: 'distribute',
-        disposalVolume: quickTransferState.volume,
+        disposalVolume: quickTransferState.disposalVolume,
         mixBeforeAspirate:
           quickTransferState.mixOnAspirate != null
             ? {
@@ -399,7 +443,7 @@ export function generateQuickTransferArgs(
               }
             : null,
         sourceWell: sourceWells[0],
-        destWells: destWells,
+        destWells,
       }
       return {
         stepArgs: distributeStepArguments,

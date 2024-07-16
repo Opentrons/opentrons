@@ -12,6 +12,7 @@ import {
 } from '../IgnoreErrorSkipStep'
 import { RECOVERY_MAP } from '../../constants'
 import { SelectRecoveryOption } from '../SelectRecoveryOption'
+import { clickButtonLabeled } from '../../__tests__/util'
 
 import type { Mock } from 'vitest'
 
@@ -19,7 +20,7 @@ vi.mock('../shared', async () => {
   const actual = await vi.importActual('../shared')
   return {
     ...actual,
-    RecoverySingleColumnContent: vi.fn(({ children }) => <div>{children}</div>),
+    RecoveryContentWrapper: vi.fn(({ children }) => <div>{children}</div>),
   }
 })
 vi.mock('../SelectRecoveryOption')
@@ -103,7 +104,7 @@ describe('IgnoreErrorStepHome', () => {
   it('calls ignoreOnce when "ignore_only_this_error" is selected and primary button is clicked', async () => {
     renderIgnoreErrorStepHome(props)
     fireEvent.click(screen.getByText('Ignore only this error'))
-    fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
+    clickButtonLabeled('Continue')
     await waitFor(() => {
       expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
         RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.ROUTE,
@@ -115,7 +116,7 @@ describe('IgnoreErrorStepHome', () => {
   it('calls ignoreAlways when "ignore_all_errors_of_this_type" is selected and primary button is clicked', async () => {
     renderIgnoreErrorStepHome(props)
     fireEvent.click(screen.getByText('Ignore all errors of this type'))
-    fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
+    clickButtonLabeled('Continue')
     await waitFor(() => {
       expect(mockIgnoreErrorKindThisRun).toHaveBeenCalled()
     })
@@ -129,7 +130,7 @@ describe('IgnoreErrorStepHome', () => {
 
   it('calls goBackPrevStep when secondary button is clicked', () => {
     renderIgnoreErrorStepHome(props)
-    fireEvent.click(screen.getByRole('button', { name: 'Go back' }))
+    clickButtonLabeled('Go back')
     expect(mockGoBackPrevStep).toHaveBeenCalled()
   })
 })

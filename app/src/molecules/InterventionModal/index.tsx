@@ -4,7 +4,6 @@ import { useSelector } from 'react-redux'
 import {
   ALIGN_CENTER,
   BORDERS,
-  Box,
   COLORS,
   Flex,
   Icon,
@@ -15,6 +14,7 @@ import {
   POSITION_RELATIVE,
   POSITION_STICKY,
   SPACING,
+  DIRECTION_COLUMN,
 } from '@opentrons/components'
 
 import { getIsOnDevice } from '../../redux/config'
@@ -26,6 +26,7 @@ import { OneColumn } from './OneColumn'
 import { ModalContentMixed } from './ModalContentMixed'
 import { DescriptionContent } from './DescriptionContent'
 import { DeckMapContent } from './DeckMapContent'
+import { CategorizedStepContent } from './CategorizedStepContent'
 export {
   ModalContentOneColSimpleButtons,
   TwoColumn,
@@ -33,6 +34,7 @@ export {
   ModalContentMixed,
   DescriptionContent,
   DeckMapContent,
+  CategorizedStepContent,
 }
 
 export type ModalType = 'intervention-required' | 'error'
@@ -141,8 +143,9 @@ export function InterventionModal({
   return (
     <Flex {...WRAPPER_STYLE}>
       <Flex {...BASE_STYLE} zIndex={10}>
-        <Box
+        <Flex
           {...modalStyle}
+          flexDirection={DIRECTION_COLUMN}
           border={border}
           onClick={(e: React.MouseEvent) => {
             e.stopPropagation()
@@ -163,7 +166,7 @@ export function InterventionModal({
             </Flex>
           </Flex>
           {children}
-        </Box>
+        </Flex>
       </Flex>
     </Flex>
   )

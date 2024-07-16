@@ -229,7 +229,7 @@ class MaintenanceRunOrchestratorStore:
         return self.run_orchestrator.get_command_slice(cursor=cursor, length=length)
 
     def get_current_command(self) -> Optional[CommandPointer]:
-        """Get the current running command."""
+        """Get the "current" command, if any."""
         return self.run_orchestrator.get_current_command()
 
     def get_command_recovery_target(self) -> Optional[CommandPointer]:

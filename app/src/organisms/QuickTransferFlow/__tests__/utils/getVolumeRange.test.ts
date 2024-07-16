@@ -6,6 +6,7 @@ import type { QuickTransferWizardState } from '../../types'
 describe('getVolumeRange', () => {
   const state: QuickTransferWizardState = {
     pipette: {
+      channels: 1,
       liquids: [
         {
           maxVolume: 1000,
@@ -21,6 +22,9 @@ describe('getVolumeRange', () => {
       } as any,
     } as any,
     source: {
+      metadata: {
+        displayCategory: 'well_plate',
+      },
       wells: {
         A1: {
           totalLiquidVolume: 200,
@@ -35,6 +39,9 @@ describe('getVolumeRange', () => {
     } as any,
     sourceWells: ['A1'],
     destination: {
+      metadata: {
+        displayCategory: 'well_plate',
+      },
       wells: {
         A1: {
           totalLiquidVolume: 1000,

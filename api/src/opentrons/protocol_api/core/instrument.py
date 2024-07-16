@@ -284,6 +284,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         style: NozzleLayout,
         primary_nozzle: Optional[str],
         front_right_nozzle: Optional[str],
+        back_left_nozzle: Optional[str],
     ) -> None:
         """Configure the pipette to a specific nozzle layout.
 
@@ -291,6 +292,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
             style: The type of configuration you wish to build.
             primary_nozzle: The nozzle that will determine a pipette's critical point.
             front_right_nozzle: The front right most nozzle in the requested layout.
+            back_left_nozzle: The back left most nozzle in the requested layout.
         """
         ...
 
@@ -304,12 +306,16 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         ...
 
     @abstractmethod
-    def liquid_probe_with_recovery(self, well_core: WellCoreType) -> None:
+    def liquid_probe_with_recovery(
+        self, well_core: WellCoreType, loc: types.Location
+    ) -> None:
         """Do a liquid probe to detect the presence of liquid in the well."""
         ...
 
     @abstractmethod
-    def liquid_probe_without_recovery(self, well_core: WellCoreType) -> float:
+    def liquid_probe_without_recovery(
+        self, well_core: WellCoreType, loc: types.Location
+    ) -> float:
         """Do a liquid probe to find the level of the liquid in the well."""
         ...
 

@@ -637,7 +637,7 @@ class PipetteView(HasState[PipetteState]):
         if attached_tip is None or attached_tip.volume is None:
             return 0
         lld_settings = self.get_pipette_lld_settings(pipette_id)
-        tipVolume = str(attached_tip.volume)
+        tipVolume = "t" + str(int(attached_tip.volume))
         if (
             lld_settings is None
             or lld_settings[tipVolume] is None
