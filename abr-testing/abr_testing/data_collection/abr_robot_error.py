@@ -50,8 +50,8 @@ def compare_current_trh_to_average(
         avg_rh = round(mean(relevant_temp_rhs["Relative Humidity (%)"]), 2)
     except StatisticsError:
         # If there is one value assign it as the average.
-        if len(relevant_temp_rhs["Temp oC"]) == 1:
-            avg_temp = relevant_temp_rhs["Temp oC"][0]
+        if len(relevant_temp_rhs["Temp (oC)"]) == 1:
+            avg_temp = relevant_temp_rhs["Temp (oC)"][0]
             avg_rh = relevant_temp_rhs["Relative Humidity (%)"][0]
         else:
             avg_temp = None
