@@ -26,6 +26,9 @@ from opentrons.hardware_control.modules.module_calibration import (
 )
 
 
+from opentrons_hardware.hardware_control.tool_sensors import (
+    liquid_probe_non_responsive_z_distance,
+)
 from opentrons_shared_data.pipette.dev_types import (
     PipetteName,
 )
@@ -2664,20 +2667,12 @@ class OT3API(
         )
         p_working_mm = p_total_mm - (instrument.backlash_distance + p_impulse_mm)
 
-        # NOTE: (sigler) Here lye some magic numbers.
-        #       The Z axis probing motion uses the first 20 samples to calculate
-        #       a baseline for all following samples, making the very beginning of
-        #       that Z motion unable to detect liquid. The sensor is configured for
-        #       4ms sample readings, and so we then assume it takes ~80ms to complete.
-        #       If the Z is moving at 5mm/sec, then ~80ms equates to ~0.4
-        baseline_during_z_sample_num = 20  # FIXME: (sigler) shouldn't be defined here?
-        sample_time_sec = 0.004  # FIXME: (sigler) shouldn't be defined here?
-        baseline_duration_sec = baseline_during_z_sample_num * sample_time_sec
-        non_responsive_z_mm = baseline_duration_sec * probe_settings.mount_speed
-
         # height where probe action will begin
         # TODO: (sigler) add this to pipette's liquid def (per tip)
         probe_pass_overlap_mm = 0.1
+        non_responsive_z_mm = liquid_probe_non_responsive_z_distance(
+            probe_settings.mount_speed
+        )
         probe_pass_z_offset_mm = non_responsive_z_mm + probe_pass_overlap_mm
 
         # height that is considered safe to reset the plunger without disturbing liquid
