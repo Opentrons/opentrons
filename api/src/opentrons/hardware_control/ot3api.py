@@ -2610,6 +2610,7 @@ class OT3API(
             probe_settings.mount_speed,
             (probe_settings.plunger_speed * plunger_direction),
             probe_settings.sensor_threshold_pascals,
+            probe_settings.plunger_impulse_time,
             probe_settings.output_option,
             probe_settings.data_files,
             probe=probe,
@@ -2653,10 +2654,14 @@ class OT3API(
 
         probe_start_pos = await self.gantry_position(checked_mount, refresh=True)
 
-        # plunger travel distance is from TOP->BOTTOM (minus the backlash distance)
-        p_travel = (
+        # plunger travel distance is from TOP->BOTTOM (minus the backlash distance + impulse)
+        p_impulse_mm = (
+            probe_settings.plunger_impulse_time * probe_settings.plunger_speed
+        )
+        p_total_mm = (
             instrument.plunger_positions.bottom - instrument.plunger_positions.top
-        ) - instrument.backlash_distance
+        )
+        p_working_mm = p_total_mm - (instrument.backlash_distance - p_impulse_mm)
 
         # NOTE: (sigler) the 0.5 seconds is indeed a magic number, edit carefully.
         #       The Z axis probing motion uses the first 20 samples to calculate
@@ -2693,7 +2698,8 @@ class OT3API(
             max_z_time = (
                 max_z_dist - (probe_start_pos.z - safe_plunger_pos.z)
             ) / probe_settings.mount_speed
-            pass_travel = min(max_z_time * probe_settings.plunger_speed, p_travel)
+            p_travel_required_for_z = max_z_time * probe_settings.plunger_speed
+            p_pass_travel = min(p_travel_required_for_z, p_working_mm)
             # Prep the plunger
             await self.move_to(checked_mount, safe_plunger_pos)
             if probe_settings.aspirate_while_sensing:
@@ -2710,7 +2716,7 @@ class OT3API(
                     checked_mount,
                     probe_settings,
                     probe if probe else InstrumentProbeType.PRIMARY,
-                    pass_travel,
+                    p_pass_travel + p_impulse_mm,
                 )
                 # if we made it here without an error we found the liquid
                 error = None
