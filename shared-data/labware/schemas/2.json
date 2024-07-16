@@ -367,6 +367,25 @@
     "gripHeightFromLabwareBottom": {
       "type": "number",
       "description": "Recommended Z-height, from labware bottom to the center of gripper pads, when gripping the labware."
+    },
+    "wellStates": {
+      "type": "object",
+      "description": "The current state of each individual well. For example, the current height of the liquid in the well.",
+      "properties": {
+        "wellName": {
+          "type": "string",
+          "description": "The name of the well."
+        },
+        "wellState": {
+          "type": "object",
+          "properties": {
+            "lastMeasuredLiquidHeight": {
+              "description": "The liquid height as measured by the most recent liquid level probe into this well.",
+              "$ref": "#/definitions/positiveNumber"
+            }
+          }
+        }
+      }
     }
   }
 }
