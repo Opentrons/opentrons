@@ -117,6 +117,7 @@ def state_summary() -> StateSummary:
         labwareOffsets=[],
         status=EngineStatus.IDLE,
         liquids=liquids,
+        wells=[],
     )
 
 
@@ -192,6 +193,7 @@ def invalid_state_summary() -> StateSummary:
         labwareOffsets=[],
         status=EngineStatus.IDLE,
         liquids=liquids,
+        wells=[],
     )
 
 

@@ -180,6 +180,7 @@ async def test_analyze(
                 modules=[],
                 labwareOffsets=[],
                 liquids=[],
+                wells=[],
             ),
             parameters=[bool_parameter],
         )

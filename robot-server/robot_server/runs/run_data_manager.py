@@ -63,6 +63,7 @@ def _build_run(
             pipettes=[],
             modules=[],
             liquids=[],
+            wells=[],
         )
         errors.append(state_summary.dataError)
     else:
