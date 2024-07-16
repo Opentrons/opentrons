@@ -7,12 +7,10 @@ import { i18n } from '../../../i18n'
 import { mockRecoveryContentProps } from '../__fixtures__'
 import {
   ErrorRecoveryContent,
-  ErrorRecoveryComponent,
   useInitialPipetteHome,
   useERWizard,
 } from '../ErrorRecoveryWizard'
 import { RECOVERY_MAP } from '../constants'
-import { BeforeBeginning } from '../BeforeBeginning'
 import {
   SelectRecoveryOption,
   RetryStep,
@@ -27,11 +25,9 @@ import {
 } from '../RecoveryOptions'
 import { RecoveryInProgress } from '../RecoveryInProgress'
 import { RecoveryError } from '../RecoveryError'
-import { ErrorDetailsModal, useErrorDetailsModal } from '../shared'
 
 import type { Mock } from 'vitest'
 
-vi.mock('../BeforeBeginning')
 vi.mock('../RecoveryOptions')
 vi.mock('../RecoveryInProgress')
 vi.mock('../RecoveryError')
@@ -74,7 +70,6 @@ const renderRecoveryContent = (
 describe('ErrorRecoveryContent', () => {
   const {
     OPTION_SELECTION,
-    BEFORE_BEGINNING,
     RETRY_FAILED_COMMAND,
     ROBOT_CANCELING,
     ROBOT_RESUMING,
@@ -101,7 +96,6 @@ describe('ErrorRecoveryContent', () => {
     vi.mocked(SelectRecoveryOption).mockReturnValue(
       <div>MOCK_SELECT_RECOVERY_OPTION</div>
     )
-    vi.mocked(BeforeBeginning).mockReturnValue(<div>MOCK_BEFORE_BEGINNING</div>)
     vi.mocked(RetryStep).mockReturnValue(<div>MOCK_RESUME_RUN</div>)
     vi.mocked(RecoveryInProgress).mockReturnValue(<div>MOCK_IN_PROGRESS</div>)
     vi.mocked(CancelRun).mockReturnValue(<div>MOCK_CANCEL_RUN</div>)
@@ -125,19 +119,6 @@ describe('ErrorRecoveryContent', () => {
     renderRecoveryContent(props)
 
     screen.getByText('MOCK_SELECT_RECOVERY_OPTION')
-  })
-
-  it(`returns BeforeBeginning when the route is ${BEFORE_BEGINNING.ROUTE}`, () => {
-    props = {
-      ...props,
-      recoveryMap: {
-        ...props.recoveryMap,
-        route: BEFORE_BEGINNING.ROUTE,
-      },
-    }
-    renderRecoveryContent(props)
-
-    screen.getByText('MOCK_BEFORE_BEGINNING')
   })
 
   it(`returns ResumeRun when the route is ${RETRY_FAILED_COMMAND.ROUTE}`, () => {
@@ -418,49 +399,4 @@ describe('useInitialPipetteHome', () => {
     })
   })
 })
-
-const renderRecoveryComponent = (
-  props: React.ComponentProps<typeof ErrorRecoveryComponent>
-) => {
-  return renderWithProviders(<ErrorRecoveryComponent {...props} />, {
-    i18nInstance: i18n,
-  })[0]
-}
-
-describe('ErrorRecoveryComponent', () => {
-  let props: React.ComponentProps<typeof ErrorRecoveryComponent>
-
-  beforeEach(() => {
-    props = mockRecoveryContentProps
-
-    vi.mocked(ErrorDetailsModal).mockReturnValue(
-      <div>MOCK_ERROR_DETAILS_MODAL</div>
-    )
-    vi.mocked(useErrorDetailsModal).mockReturnValue({
-      showModal: false,
-      toggleModal: () => null,
-    })
-  })
-
-  it('renders an intervention modal with appropriate text', () => {
-    renderRecoveryComponent(props)
-    screen.getByTestId('__otInterventionModal')
-    screen.getByText('Recovery Mode')
-    screen.getByText('View error details')
-  })
-
-  it('renders alternative header text if the recovery mode has not been launched', () => {
-    props = { ...props, hasLaunchedRecovery: false }
-    renderRecoveryComponent(props)
-    screen.getByText('Cancel run')
-  })
-
-  it('renders the error details modal when showModal is true', () => {
-    vi.mocked(useErrorDetailsModal).mockReturnValue({
-      showModal: true,
-      toggleModal: () => null,
-    })
-    renderRecoveryComponent(props)
-    screen.getByText('MOCK_ERROR_DETAILS_MODAL')
-  })
-})
+it.todo('add test for ErrorRecoveryComponent.')

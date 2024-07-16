@@ -68,12 +68,14 @@ export const mockRecoveryContentProps: RecoveryContentProps = {
   currentRecoveryOptionUtils: {} as any,
   failedLabwareUtils: { pickUpTipLabware: mockPickUpTipLabware } as any,
   failedPipetteInfo: {} as any,
-  recoveryMapUtils: {} as any,
+  deckMapUtils: { setSelectedLocation: () => {} } as any,
   stepCounts: {} as any,
   protocolAnalysis: { commands: [mockFailedCommand] } as any,
   trackExternalMap: () => null,
   hasLaunchedRecovery: true,
   getRecoveryOptionCopy: () => 'MOCK_COPY',
-  commandAfterFailedCommand:
+  commandsAfterFailedCommand: [
+    mockRobotSideAnalysis.commands[mockRobotSideAnalysis.commands.length - 2],
     mockRobotSideAnalysis.commands[mockRobotSideAnalysis.commands.length - 1],
+  ],
 }

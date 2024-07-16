@@ -12,12 +12,11 @@ import { RECOVERY_MAP } from '../constants'
 import { CancelRun } from './CancelRun'
 import {
   RecoveryFooterButtons,
-  RecoverySingleColumnContent,
+  RecoveryContentWrapper,
   LeftColumnLabwareInfo,
-  RecoveryMap,
   TwoColTextAndFailedStepNextStep,
 } from '../shared'
-import { TwoColumn } from '../../../molecules/InterventionModal'
+import { TwoColumn, DeckMapContent } from '../../../molecules/InterventionModal'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 import type { RecoveryContentProps } from '../types'
@@ -45,37 +44,32 @@ export function FillWellAndSkip(props: RecoveryContentProps): JSX.Element {
 }
 
 export function FillWell(props: RecoveryContentProps): JSX.Element | null {
-  const { isOnDevice, routeUpdateActions, failedLabwareUtils } = props
+  const { routeUpdateActions, failedLabwareUtils, deckMapUtils } = props
   const { t } = useTranslation('error_recovery')
   const { goBackPrevStep, proceedNextStep } = routeUpdateActions
 
-  if (isOnDevice) {
-    return (
-      <RecoverySingleColumnContent>
-        <TwoColumn>
-          <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
-            <LeftColumnLabwareInfo
-              {...props}
-              title={t('manually_fill_liquid_in_well', {
-                well: failedLabwareUtils.relevantWellName,
-              })}
-              moveType="refill"
-            />
-          </Flex>
-          <Flex marginTop="1.742rem">
-            <RecoveryMap {...props} />
-          </Flex>
-        </TwoColumn>
-        <RecoveryFooterButtons
-          isOnDevice={isOnDevice}
-          primaryBtnOnClick={proceedNextStep}
-          secondaryBtnOnClick={goBackPrevStep}
-        />
-      </RecoverySingleColumnContent>
-    )
-  } else {
-    return null
-  }
+  return (
+    <RecoveryContentWrapper>
+      <TwoColumn>
+        <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
+          <LeftColumnLabwareInfo
+            {...props}
+            title={t('manually_fill_liquid_in_well', {
+              well: failedLabwareUtils.relevantWellName,
+            })}
+            type="location"
+          />
+        </Flex>
+        <Flex marginTop="1.742rem">
+          <DeckMapContent {...deckMapUtils} />
+        </Flex>
+      </TwoColumn>
+      <RecoveryFooterButtons
+        primaryBtnOnClick={proceedNextStep}
+        secondaryBtnOnClick={goBackPrevStep}
+      />
+    </RecoveryContentWrapper>
+  )
 }
 
 export function SkipToNextStep(

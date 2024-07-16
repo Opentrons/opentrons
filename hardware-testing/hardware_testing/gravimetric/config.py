@@ -49,6 +49,7 @@ class GravimetricConfig(VolumetricConfig):
     scale_delay: int
     isolate_channels: List[int]
     isolate_volumes: List[float]
+    liquid: str
 
 
 @dataclass
@@ -176,9 +177,9 @@ def _get_liquid_probe_settings(
         cfg.pipette_channels
     ][cfg.tip_volume]
     return LiquidProbeSettings(
-        starting_mount_height=well.top().point.z,
         mount_speed=lqid_cfg["mount_speed"],
         plunger_speed=lqid_cfg["plunger_speed"],
+        plunger_impulse_time=0.2,
         sensor_threshold_pascals=lqid_cfg["sensor_threshold_pascals"],
         output_option=OutputOptions.sync_only,
         aspirate_while_sensing=False,

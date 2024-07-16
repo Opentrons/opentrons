@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { vi, describe, it, expect, beforeEach } from 'vitest'
-import { screen, fireEvent, waitFor } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
@@ -8,7 +8,7 @@ import { mockRecoveryContentProps } from '../../__fixtures__'
 import { CancelRun } from '../CancelRun'
 import { RECOVERY_MAP } from '../../constants'
 import { SelectRecoveryOption } from '../SelectRecoveryOption'
-
+import { clickButtonLabeled } from '../../__tests__/util'
 import type { Mock } from 'vitest'
 
 vi.mock('../SelectRecoveryOption')
@@ -70,9 +70,7 @@ describe('RecoveryFooterButtons', () => {
       'If tips are attached, you can choose to blowout any aspirated liquid and drop tips before the run is terminated.'
     )
 
-    const secondaryBtn = screen.getByRole('button', { name: 'Go back' })
-
-    fireEvent.click(secondaryBtn)
+    clickButtonLabeled('Go back')
 
     expect(mockGoBackPrevStep).toHaveBeenCalled()
   })
@@ -95,8 +93,7 @@ describe('RecoveryFooterButtons', () => {
       routeUpdateActions: mockRouteUpdateActions,
     })
 
-    const primaryBtn = screen.getByRole('button', { name: 'Confirm' })
-    fireEvent.click(primaryBtn)
+    clickButtonLabeled('Confirm')
 
     await waitFor(() => {
       expect(setRobotInMotionMock).toHaveBeenCalledTimes(1)
@@ -127,9 +124,7 @@ describe('RecoveryFooterButtons', () => {
 
     render(props)
 
-    const primaryBtn = screen.getByRole('button', { name: 'Confirm' })
-
-    fireEvent.click(primaryBtn)
+    clickButtonLabeled('Confirm')
     expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(DROP_TIP_FLOWS.ROUTE)
   })
 
@@ -144,9 +139,7 @@ describe('RecoveryFooterButtons', () => {
 
     render(props)
 
-    const primaryBtn = screen.getByRole('button', { name: 'Confirm' })
-
-    fireEvent.click(primaryBtn)
+    clickButtonLabeled('Confirm')
     expect(mockProceedToRouteAndStep).not.toHaveBeenCalled()
     expect(mockSetRobotInMotion).not.toHaveBeenCalled()
   })
@@ -162,9 +155,7 @@ describe('RecoveryFooterButtons', () => {
 
     render(props)
 
-    const primaryBtn = screen.getByRole('button', { name: 'Confirm' })
-
-    fireEvent.click(primaryBtn)
+    clickButtonLabeled('Confirm')
     expect(mockProceedToRouteAndStep).not.toHaveBeenCalled()
     expect(mockSetRobotInMotion).toHaveBeenCalled()
   })

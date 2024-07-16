@@ -4,7 +4,6 @@ import { useSelector } from 'react-redux'
 import {
   ALIGN_CENTER,
   BORDERS,
-  Box,
   COLORS,
   Flex,
   Icon,
@@ -15,6 +14,7 @@ import {
   POSITION_RELATIVE,
   POSITION_STICKY,
   SPACING,
+  DIRECTION_COLUMN,
 } from '@opentrons/components'
 
 import { getIsOnDevice } from '../../redux/config'
@@ -25,12 +25,16 @@ import { TwoColumn } from './TwoColumn'
 import { OneColumn } from './OneColumn'
 import { ModalContentMixed } from './ModalContentMixed'
 import { DescriptionContent } from './DescriptionContent'
+import { DeckMapContent } from './DeckMapContent'
+import { CategorizedStepContent } from './CategorizedStepContent'
 export {
   ModalContentOneColSimpleButtons,
   TwoColumn,
   OneColumn,
   ModalContentMixed,
   DescriptionContent,
+  DeckMapContent,
+  CategorizedStepContent,
 }
 
 export type ModalType = 'intervention-required' | 'error'
@@ -71,7 +75,7 @@ const MODAL_ODD_STYLE = {
   height: '35.5rem',
 } as const
 
-const HEADER_STYLE = {
+const BASE_HEADER_STYLE = {
   alignItems: ALIGN_CENTER,
   padding: `${SPACING.spacing20} ${SPACING.spacing32}`,
   color: COLORS.white,
@@ -79,6 +83,11 @@ const HEADER_STYLE = {
   top: 0,
   'data-testid': '__otInterventionModalHeader',
 } as const
+
+const DESKTOP_HEADER_STYLE = {
+  ...BASE_HEADER_STYLE,
+  height: '3.25rem',
+}
 
 const WRAPPER_STYLE = {
   position: POSITION_ABSOLUTE,
@@ -129,19 +138,21 @@ export function InterventionModal({
 
   const isOnDevice = useSelector(getIsOnDevice)
   const modalStyle = isOnDevice ? MODAL_ODD_STYLE : MODAL_DESKTOP_STYLE
+  const headerStyle = isOnDevice ? BASE_HEADER_STYLE : DESKTOP_HEADER_STYLE
 
   return (
     <Flex {...WRAPPER_STYLE}>
       <Flex {...BASE_STYLE} zIndex={10}>
-        <Box
+        <Flex
           {...modalStyle}
+          flexDirection={DIRECTION_COLUMN}
           border={border}
           onClick={(e: React.MouseEvent) => {
             e.stopPropagation()
           }}
         >
           <Flex
-            {...HEADER_STYLE}
+            {...headerStyle}
             backgroundColor={headerColor}
             justifyContent={headerJustifyContent}
             onClick={iconHeadingOnClick}
@@ -155,7 +166,7 @@ export function InterventionModal({
             </Flex>
           </Flex>
           {children}
-        </Box>
+        </Flex>
       </Flex>
     </Flex>
   )

@@ -34,9 +34,14 @@ describe('useRunPausedSplash', () => {
     )
   })
 
-  it('returns true if on the ODD', () => {
-    const { result } = renderHook(() => useRunPausedSplash(), { wrapper })
-    expect(result.current).toEqual(true)
+  const IS_WIZARD_SHOWN = [false, true]
+  IS_WIZARD_SHOWN.forEach(val => {
+    it(`returns ${!val} if showERWizard is ${val}`, () => {
+      const { result } = renderHook(() => useRunPausedSplash(val), {
+        wrapper,
+      })
+      expect(result.current).toEqual(!val)
+    })
   })
 })
 
@@ -84,7 +89,8 @@ describe('RunPausedSplash', () => {
       ...props,
       failedCommand: {
         ...props.failedCommand,
-        error: { errorType: 'overpressure' },
+        commandType: 'aspirate',
+        error: { isDefined: true, errorType: 'overpressure' },
       } as any,
     }
     render(props)

@@ -28,7 +28,7 @@ import {
   POSITION_RELATIVE,
   PrimaryButton,
   ProtocolDeck,
-  RoundTab,
+  Tabs,
   SIZE_1,
   SIZE_5,
   SPACING,
@@ -76,6 +76,7 @@ import { ProtocolLabwareDetails } from './ProtocolLabwareDetails'
 import { ProtocolLiquidsDetails } from './ProtocolLiquidsDetails'
 import { RobotConfigurationDetails } from './RobotConfigurationDetails'
 import { ProtocolParameters } from './ProtocolParameters'
+import { AnnotatedSteps } from './AnnotatedSteps'
 
 import type { JsonConfig, PythonConfig } from '@opentrons/shared-data'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
@@ -204,10 +205,11 @@ export function ProtocolDetails(
   const { protocolKey, srcFileNames, mostRecentAnalysis, modified } = props
   const { t, i18n } = useTranslation(['protocol_details', 'shared'])
   const enableProtocolStats = useFeatureFlag('protocolStats')
+  const enableProtocolTimeline = useFeatureFlag('protocolTimeline')
   const runTimeParameters = mostRecentAnalysis?.runTimeParameters ?? []
   const hasRunTimeParameters = runTimeParameters.length > 0
   const [currentTab, setCurrentTab] = React.useState<
-    'robot_config' | 'labware' | 'liquids' | 'stats' | 'parameters'
+    'robot_config' | 'labware' | 'liquids' | 'stats' | 'parameters' | 'timeline'
   >(hasRunTimeParameters ? 'parameters' : 'robot_config')
   const [
     showChooseRobotToRunProtocolSlideout,
@@ -342,6 +344,10 @@ export function ProtocolDetails(
     stats: enableProtocolStats ? (
       <ProtocolStats analysis={mostRecentAnalysis} />
     ) : null,
+    timeline:
+      enableProtocolTimeline && mostRecentAnalysis != null ? (
+        <AnnotatedSteps analysis={mostRecentAnalysis} />
+      ) : null,
     parameters: <ProtocolParameters runTimeParameters={runTimeParameters} />,
   }
 
@@ -622,75 +628,85 @@ export function ProtocolDetails(
             >
               <Flex gridGap={SPACING.spacing4}>
                 {mostRecentAnalysis != null && (
-                  <RoundTab
-                    data-testid="ProtocolDetails_parameters"
-                    isCurrent={currentTab === 'parameters'}
-                    onClick={() => {
-                      setCurrentTab('parameters')
-                    }}
-                  >
-                    <LegacyStyledText>
-                      {i18n.format(t('parameters'), 'capitalize')}
-                    </LegacyStyledText>
-                  </RoundTab>
+                  <Tabs
+                    tabs={[
+                      {
+                        text: i18n.format(t('parameters'), 'capitalize'),
+                        isActive: currentTab === 'parameters',
+                        disabled: false,
+                        onClick: () => {
+                          setCurrentTab('parameters')
+                        },
+                      },
+                    ]}
+                  />
                 )}
-                <RoundTab
-                  data-testid="ProtocolDetails_robotConfig"
-                  isCurrent={currentTab === 'robot_config'}
-                  onClick={() => {
-                    setCurrentTab('robot_config')
-                  }}
-                >
-                  <LegacyStyledText>
-                    {i18n.format(t('hardware'), 'capitalize')}
-                  </LegacyStyledText>
-                </RoundTab>
-                <RoundTab
-                  data-testid="ProtocolDetails_labware"
-                  isCurrent={currentTab === 'labware'}
-                  onClick={() => {
-                    setCurrentTab('labware')
-                  }}
-                >
-                  <LegacyStyledText>
-                    {i18n.format(t('labware'), 'capitalize')}
-                  </LegacyStyledText>
-                </RoundTab>
+                <Tabs
+                  tabs={[
+                    {
+                      text: i18n.format(t('hardware'), 'capitalize'),
+                      isActive: currentTab === 'robot_config',
+                      disabled: false,
+                      onClick: () => {
+                        setCurrentTab('robot_config')
+                      },
+                    },
+                    {
+                      text: i18n.format(t('labware'), 'capitalize'),
+                      isActive: currentTab === 'labware',
+                      disabled: false,
+                      onClick: () => {
+                        setCurrentTab('labware')
+                      },
+                    },
+                  ]}
+                />
                 {mostRecentAnalysis != null && (
-                  <RoundTab
-                    data-testid="ProtocolDetails_liquids"
-                    isCurrent={currentTab === 'liquids'}
-                    onClick={() => {
-                      setCurrentTab('liquids')
-                    }}
-                  >
-                    <LegacyStyledText>
-                      {i18n.format(t('liquids'), 'capitalize')}
-                    </LegacyStyledText>
-                  </RoundTab>
+                  <Tabs
+                    tabs={[
+                      {
+                        text: i18n.format(t('liquids'), 'capitalize'),
+                        isActive: currentTab === 'liquids',
+                        disabled: false,
+                        onClick: () => {
+                          setCurrentTab('liquids')
+                        },
+                      },
+                    ]}
+                  />
                 )}
                 {enableProtocolStats && mostRecentAnalysis != null && (
-                  <RoundTab
-                    data-testid="ProtocolDetails_stats"
-                    isCurrent={currentTab === 'stats'}
-                    onClick={() => {
-                      setCurrentTab('stats')
-                    }}
-                  >
-                    <LegacyStyledText>
-                      {i18n.format(t('stats'), 'capitalize')}
-                    </LegacyStyledText>
-                  </RoundTab>
+                  <Tabs
+                    tabs={[
+                      {
+                        text: i18n.format(t('stats'), 'capitalize'),
+                        isActive: currentTab === 'stats',
+                        disabled: false,
+                        onClick: () => {
+                          setCurrentTab('stats')
+                        },
+                      },
+                    ]}
+                  />
+                )}
+                {enableProtocolTimeline && mostRecentAnalysis != null && (
+                  <Tabs
+                    tabs={[
+                      {
+                        text: i18n.format(t('timeline'), 'capitalize'),
+                        isActive: currentTab === 'timeline',
+                        disabled: false,
+                        onClick: () => {
+                          setCurrentTab('timeline')
+                        },
+                      },
+                    ]}
+                  />
                 )}
               </Flex>
               <Box
                 backgroundColor={COLORS.white}
-                // remove left upper corner border radius when first tab is active
-                borderRadius={`${
-                  currentTab === 'robot_config' ? '0' : BORDERS.borderRadius4
-                } ${BORDERS.borderRadius4} ${BORDERS.borderRadius4} ${
-                  BORDERS.borderRadius4
-                }`}
+                borderRadius={BORDERS.borderRadius8}
                 padding={SPACING.spacing16}
               >
                 {contentsByTabName[currentTab]}

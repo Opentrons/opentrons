@@ -24,6 +24,7 @@ import type {
   GRIPPER_V1,
   GRIPPER_V1_1,
   GRIPPER_V1_2,
+  GRIPPER_V1_3,
   EXTENSION,
   MAGNETIC_BLOCK_V1,
 } from './constants'
@@ -238,6 +239,7 @@ export type GripperModel =
   | typeof GRIPPER_V1
   | typeof GRIPPER_V1_1
   | typeof GRIPPER_V1_2
+  | typeof GRIPPER_V1_3
 
 export type ModuleModelWithLegacy =
   | ModuleModel
@@ -641,9 +643,16 @@ interface BooleanParameter extends BaseRunTimeParameter {
   value: boolean
 }
 
+export interface CsvFileFileType {
+  id?: string
+  file?: File | null
+  filePath?: string
+  fileName?: string
+}
+
 export interface CsvFileParameter extends BaseRunTimeParameter {
   type: CsvFileParameterType
-  file?: { id?: string; file?: File | null } | null
+  file?: CsvFileFileType | null
 }
 
 type NumberParameterType = 'int' | 'float'
@@ -689,6 +698,7 @@ export interface ProtocolResource {
   id: string
   createdAt: string
   protocolType: 'json' | 'python'
+  protocolKind: 'standard' | 'quick-transfer'
   robotType: RobotType
   metadata: ProtocolMetadata
   analysisSummaries: ProtocolAnalysisSummary[]

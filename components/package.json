@@ -33,7 +33,7 @@
     "@types/styled-components": "^5.1.26",
     "@types/webpack-env": "^1.16.0",
     "classnames": "2.2.5",
-    "interactjs": "^1.10.17",
+    "interactjs": "^1.10.27",
     "lodash": "4.17.21",
     "react-i18next": "13.5.0",
     "react-popper": "1.0.0",

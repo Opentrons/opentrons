@@ -7,23 +7,29 @@ import {
   useCreateRunMutation,
   useHost,
 } from '@opentrons/react-api-client'
+import { COLORS } from '@opentrons/components'
+
 import { i18n } from '../../../i18n'
 import { renderWithProviders } from '../../../__testing-utils__'
-import { ProtocolSetupParameters } from '..'
 import { ChooseEnum } from '../ChooseEnum'
+import { ChooseNumber } from '../ChooseNumber'
+import { ChooseCsvFile } from '../ChooseCsvFile'
 import { mockRunTimeParameterData } from '../../../pages/ProtocolDetails/fixtures'
+import { useToaster } from '../../ToasterOven'
 import { useFeatureFlag } from '../../../redux/config'
+import { ProtocolSetupParameters } from '..'
 
 import type * as ReactRouterDom from 'react-router-dom'
 import type { HostConfig } from '@opentrons/api-client'
-import type {
-  CompletedProtocolAnalysis,
-  RunTimeParameter,
-} from '@opentrons/shared-data'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 const mockGoBack = vi.fn()
 
 vi.mock('../ChooseEnum')
+vi.mock('../ChooseNumber')
+vi.mock('../ChooseCsvFile')
+vi.mock('../../../redux/config')
+vi.mock('../../ToasterOven')
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 vi.mock('react-router-dom', async importOriginal => {
@@ -42,6 +48,7 @@ const mockMostRecentAnalysis = ({
   commands: [],
   labware: [],
 } as unknown) as CompletedProtocolAnalysis
+const mockMakeSnackbar = vi.fn()
 
 const render = (
   props: React.ComponentProps<typeof ProtocolSetupParameters>
@@ -62,6 +69,9 @@ describe('ProtocolSetupParameters', () => {
       mostRecentAnalysis: mockMostRecentAnalysis,
     }
     vi.mocked(ChooseEnum).mockReturnValue(<div>mock ChooseEnum</div>)
+    vi.mocked(ChooseNumber).mockReturnValue(<div>mock ChooseNumber</div>)
+    vi.mocked(ChooseCsvFile).mockReturnValue(<div>mock ChooseCsvFile</div>)
+    vi.mocked(useFeatureFlag).mockReturnValue(false)
     vi.mocked(useHost).mockReturnValue(MOCK_HOST_CONFIG)
     when(vi.mocked(useCreateProtocolAnalysisMutation))
       .calledWith(expect.anything(), expect.anything())
@@ -72,6 +82,11 @@ describe('ProtocolSetupParameters', () => {
     when(vi.mocked(useFeatureFlag))
       .calledWith('enableCsvFile')
       .thenReturn(false)
+    vi.mocked(useToaster).mockReturnValue({
+      makeSnackbar: mockMakeSnackbar,
+      makeToast: vi.fn(),
+      eatToast: vi.fn(),
+    })
   })
 
   it('renders the parameters labels and mock data', () => {
@@ -89,12 +104,44 @@ describe('ProtocolSetupParameters', () => {
     screen.getByText('mock ChooseEnum')
   })
 
+  it('renders the ChooseNumber component when a str param is selected', () => {
+    render(props)
+    fireEvent.click(screen.getByText('PCR Cycles'))
+    screen.getByText('mock ChooseNumber')
+  })
+
+  it('renders the ChooseCsvFile component when a str param is selected', () => {
+    vi.mocked(useFeatureFlag).mockReturnValue(true)
+    render(props)
+    fireEvent.click(screen.getByText('CSV File'))
+    screen.getByText('mock ChooseCsvFile')
+  })
+
   it('renders the other setting when boolean param is selected', () => {
     render(props)
     expect(screen.getAllByText('On')).toHaveLength(2)
     fireEvent.click(screen.getByText('Dry Run'))
     expect(screen.getAllByText('On')).toHaveLength(3)
   })
+
+  it('renders the other setting when int param', () => {
+    render(props)
+    screen.getByText('4 mL')
+    screen.getByText('Columns of Samples')
+  })
+
+  it('renders the other setting when float param', () => {
+    render(props)
+    screen.getByText('6.5')
+    screen.getByText('EtoH Volume')
+  })
+
+  // ToDo (kk:06/18/2024) comment-out will be removed in a following PR.
+  // it('renders the other setting when csv param', () => {
+  //   vi.mocked(useFeatureFlag).mockReturnValue(true)
+  //   render(props)
+  //   screen.getByText('CSV File')
+  // })
 
   it('renders the back icon and calls useHistory', () => {
     render(props)
@@ -128,37 +175,42 @@ describe('ProtocolSetupParameters', () => {
     expect(title).not.toBeInTheDocument()
   })
 
-  it('render csv file when a protocol requires a csv file', () => {
+  it('render csv file when a protocol requires a csv file and confirm values button has the disabled style', () => {
     when(vi.mocked(useFeatureFlag)).calledWith('enableCsvFile').thenReturn(true)
     const mockMostRecentAnalysisForCsv = ({
       commands: [],
       labware: [],
       result: 'parameter-value-required',
     } as unknown) as CompletedProtocolAnalysis
-    const mockCSVData = {
-      file: { id: 'test', file: { name: 'mock.csv' } as File },
-      displayName: 'My CSV File',
-      variableName: 'CSVFILE',
-      description: 'CSV File for a protocol',
-      type: 'csv_file' as const,
-    } as RunTimeParameter
-    const mockRunTimeParameterDataForCsv = [
-      ...mockRunTimeParameterData,
-      mockCSVData,
-    ]
-
     render({
       ...props,
-      runTimeParameters: mockRunTimeParameterDataForCsv,
+      runTimeParameters: mockRunTimeParameterData,
       mostRecentAnalysis: mockMostRecentAnalysisForCsv,
     })
     screen.getByText('CSV File')
     screen.getByText('Required')
     const button = screen.getByRole('button', { name: 'Confirm values' })
-    expect(button).toBeDisabled()
+    expect(button).toHaveStyle(`background-color: ${COLORS.grey35}`)
+    expect(button).toHaveStyle(`color: ${COLORS.grey50}`)
   })
 
-  it.todo(
-    'render csv file name when a protocol analysis result is not parameter-value-required'
-  )
+  it('when tapping aria-disabled button, snack bar will show up', () => {
+    when(vi.mocked(useFeatureFlag)).calledWith('enableCsvFile').thenReturn(true)
+    const mockMostRecentAnalysisForCsv = ({
+      commands: [],
+      labware: [],
+      result: 'parameter-value-required',
+    } as unknown) as CompletedProtocolAnalysis
+    render({
+      ...props,
+      runTimeParameters: mockRunTimeParameterData,
+      mostRecentAnalysis: mockMostRecentAnalysisForCsv,
+    })
+
+    const button = screen.getByRole('button', { name: 'Confirm values' })
+    fireEvent.click(button)
+    expect(mockMakeSnackbar).toBeCalledWith(
+      'This protocol requires a CSV file. Tap the CSV row below to select one.'
+    )
+  })
 })

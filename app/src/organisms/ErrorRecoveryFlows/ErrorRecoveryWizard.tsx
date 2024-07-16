@@ -1,12 +1,8 @@
 import * as React from 'react'
-import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 
 import { LegacyStyledText } from '@opentrons/components'
 
-import { getTopPortalEl } from '../../App/portal'
-import { InterventionModal } from '../../molecules/InterventionModal'
-import { BeforeBeginning } from './BeforeBeginning'
 import { RecoveryError } from './RecoveryError'
 import {
   SelectRecoveryOption,
@@ -20,7 +16,11 @@ import {
   SkipStepNewTips,
   IgnoreErrorSkipStep,
 } from './RecoveryOptions'
-import { useErrorDetailsModal, ErrorDetailsModal } from './shared'
+import {
+  useErrorDetailsModal,
+  ErrorDetailsModal,
+  RecoveryInterventionModal,
+} from './shared'
 import { RecoveryInProgress } from './RecoveryInProgress'
 import { getErrorKind } from './utils'
 import { RECOVERY_MAP } from './constants'
@@ -71,7 +71,7 @@ export function ErrorRecoveryWizard(
     recoveryCommands,
     routeUpdateActions,
   } = props
-  const errorKind = getErrorKind(failedCommand?.error?.errorType)
+  const errorKind = getErrorKind(failedCommand)
 
   useInitialPipetteHome({
     hasLaunchedRecovery,
@@ -84,7 +84,8 @@ export function ErrorRecoveryWizard(
 
 export function ErrorRecoveryComponent(
   props: RecoveryContentProps
-): JSX.Element | null {
+): JSX.Element {
+  const { route, step } = props.recoveryMap
   const { t } = useTranslation('error_recovery')
   const { showModal, toggleModal } = useErrorDetailsModal()
 
@@ -101,32 +102,26 @@ export function ErrorRecoveryComponent(
     </LegacyStyledText>
   )
 
-  if (props.isOnDevice) {
-    return createPortal(
-      <InterventionModal
-        iconName="information"
-        iconHeading={buildIconHeading()}
-        titleHeading={buildTitleHeading()}
-        iconHeadingOnClick={toggleModal}
-        type="error"
-      >
-        {showModal ? (
-          <ErrorDetailsModal {...props} toggleModal={toggleModal} />
-        ) : null}
-        <ErrorRecoveryContent {...props} />
-      </InterventionModal>,
-      getTopPortalEl()
-    )
-  } else {
-    return null
-  }
+  const isLargeDesktopStyle =
+    route === RECOVERY_MAP.DROP_TIP_FLOWS.ROUTE &&
+    step !== RECOVERY_MAP.DROP_TIP_FLOWS.STEPS.BEGIN_REMOVAL
+  return (
+    <RecoveryInterventionModal
+      iconHeading={buildIconHeading()}
+      titleHeading={buildTitleHeading()}
+      iconHeadingOnClick={toggleModal}
+      iconName="information"
+      desktopType={isLargeDesktopStyle ? 'desktop-large' : 'desktop-small'}
+    >
+      {showModal ? (
+        <ErrorDetailsModal {...props} toggleModal={toggleModal} />
+      ) : null}
+      <ErrorRecoveryContent {...props} />
+    </RecoveryInterventionModal>
+  )
 }
 
 export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
-  const buildBeforeBeginning = (): JSX.Element => {
-    return <BeforeBeginning {...props} />
-  }
-
   const buildSelectRecoveryOption = (): JSX.Element => {
     return <SelectRecoveryOption {...props} />
   }
@@ -174,10 +169,7 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
   const buildIgnoreErrorSkipStep = (): JSX.Element => {
     return <IgnoreErrorSkipStep {...props} />
   }
-
   switch (props.recoveryMap.route) {
-    case RECOVERY_MAP.BEFORE_BEGINNING.ROUTE:
-      return buildBeforeBeginning()
     case RECOVERY_MAP.OPTION_SELECTION.ROUTE:
       return buildSelectRecoveryOption()
     case RECOVERY_MAP.ERROR_WHILE_RECOVERING.ROUTE:

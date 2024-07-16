@@ -4,15 +4,14 @@ import { SPACING, TYPOGRAPHY } from '@opentrons/components'
 
 import type { StepOrder } from './types'
 
-// TODO(jh, 06-18-24): Add the correct errorTypes for these errors when they are available.
-// Error types of "defined" errors, those handled explicitly by Error Recovery.
+// Server-defined error types.
+// (Values for the .error.errorType property of a run command.)
 export const DEFINED_ERROR_TYPES = {
-  NO_LIQUID_DETECTED: 'NO_FLUIDS_OH_NO',
-  PIPETTE_COLLISION: 'AAAAAHHHHHHHHH',
-  OVERPRESSURE_ASPIRATION: 'overpressure',
-  OVERPRESSURE_DISPENSING: 'OVERPRESSURE_DISPENSING',
+  OVERPRESSURE: 'overpressure',
+  LIQUID_NOT_FOUND: 'liquidNotFound',
 }
 
+// Client-defined error-handling flows.
 export const ERROR_KINDS = {
   GENERAL_ERROR: 'GENERAL_ERROR',
   NO_LIQUID_DETECTED: 'NO_LIQUID_DETECTED',
@@ -25,12 +24,6 @@ export const ERROR_KINDS = {
 // TODO(jh, 06-14-24): Consolidate motion routes to a single route with several steps.
 // Valid recovery routes and steps.
 export const RECOVERY_MAP = {
-  BEFORE_BEGINNING: {
-    ROUTE: 'before-beginning',
-    STEPS: {
-      RECOVERY_DESCRIPTION: 'recovery-description',
-    },
-  },
   DROP_TIP_FLOWS: {
     ROUTE: 'drop-tip',
     STEPS: {
@@ -140,7 +133,6 @@ export const RECOVERY_MAP = {
 } as const
 
 const {
-  BEFORE_BEGINNING,
   OPTION_SELECTION,
   RETRY_FAILED_COMMAND,
   ROBOT_CANCELING,
@@ -163,7 +155,6 @@ const {
 
 // The deterministic ordering of steps for a given route.
 export const STEP_ORDER: StepOrder = {
-  [BEFORE_BEGINNING.ROUTE]: [BEFORE_BEGINNING.STEPS.RECOVERY_DESCRIPTION],
   [OPTION_SELECTION.ROUTE]: [OPTION_SELECTION.STEPS.SELECT],
   [RETRY_FAILED_COMMAND.ROUTE]: [RETRY_FAILED_COMMAND.STEPS.CONFIRM_RETRY],
   [RETRY_NEW_TIPS.ROUTE]: [

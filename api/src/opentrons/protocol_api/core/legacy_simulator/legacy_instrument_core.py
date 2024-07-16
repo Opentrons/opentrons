@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Optional, Union
 from opentrons import types
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control.types import HardwareAction
+from opentrons.protocol_api.core.common import WellCore
 from opentrons.protocols.api_support import instrument as instrument_support
 from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.api_support.types import APIVersion
@@ -134,7 +135,7 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
     ) -> None:
         if isinstance(location, (TrashBin, WasteChute)):
             raise APIVersionError(
-                "Dispense in Moveable Trash or Waste Chute are not supported in this API Version."
+                api_element="Dispense in Moveable Trash or Waste Chute"
             )
         if not in_place:
             self.move_to(location=location, well_core=well_core)
@@ -149,7 +150,7 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
     ) -> None:
         if isinstance(location, (TrashBin, WasteChute)):
             raise APIVersionError(
-                "Blow Out in Moveable Trash or Waste Chute are not supported in this API Version."
+                api_element="Blow Out in Moveable Trash or Waste Chute"
             )
         if not in_place:
             self.move_to(location=location, well_core=well_core)
@@ -214,9 +215,7 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
         alternate_drop_location: Optional[bool] = False,
     ) -> None:
         if alternate_drop_location:
-            raise APIVersionError(
-                "Tip drop alternation is not supported in this API version."
-            )
+            raise APIVersionError(api_element="Tip drop alternation")
         labware_core = well_core.geometry.parent
 
         if location is None:
@@ -269,9 +268,7 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
         home_after: Optional[bool],
         alternate_tip_drop: bool = False,
     ) -> None:
-        raise APIVersionError(
-            "Dropping tips in a trash bin or waste chute is not supported in this API Version."
-        )
+        raise APIVersionError(api_element="Dropping tips in a trash bin or waste chute")
 
     def home(self) -> None:
         self._protocol_interface.set_last_location(None)
@@ -289,9 +286,7 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
     ) -> None:
         """Simulation of only the motion planning portion of move_to."""
         if isinstance(location, (TrashBin, WasteChute)):
-            raise APIVersionError(
-                "Move To Trash Bin and Waste Chute are not supported in this API Version."
-            )
+            raise APIVersionError(api_element="Move To Trash Bin and Waste Chute")
 
         self.flag_unsafe_move(location)
 
@@ -468,6 +463,7 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
         style: NozzleLayout,
         primary_nozzle: Optional[str],
         front_right_nozzle: Optional[str],
+        back_left_nozzle: Optional[str],
     ) -> None:
         """This will never be called because it was added in API 2.15."""
         pass
@@ -487,3 +483,15 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
     def retract(self) -> None:
         """Retract this instrument to the top of the gantry."""
         self._protocol_interface.get_hardware.retract(self._mount)  # type: ignore [attr-defined]
+
+    def liquid_probe_with_recovery(
+        self, well_core: WellCore, loc: types.Location
+    ) -> None:
+        """This will never be called because it was added in API 2.20."""
+        assert False, "liquid_probe_with_recovery only supported in API 2.20 & later"
+
+    def liquid_probe_without_recovery(
+        self, well_core: WellCore, loc: types.Location
+    ) -> float:
+        """This will never be called because it was added in API 2.20."""
+        assert False, "liquid_probe_without_recovery only supported in API 2.20 & later"

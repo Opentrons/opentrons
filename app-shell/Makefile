@@ -97,6 +97,7 @@ clean:
 .PHONY: lib
 lib: export NODE_ENV := production
 lib:
+	echo "Building app shell JS bundle (electron layer)"
 	vite build
 
 .PHONY: deps
@@ -122,7 +123,7 @@ dist-posix: package-deps
 
 .PHONY: dist-osx
 dist-osx: package-deps
-	$(builder) --mac
+	$(builder) --mac --x64
 	$(MAKE) _dist-collect-artifacts
 
 .PHONY: dist-linux
@@ -144,9 +145,6 @@ dist-ot3: package-deps
 # workflows
 .PHONY: dist-macos-latest
 dist-macos-latest: dist-osx
-
-.PHONY: dist-macos-11
-dist-macos-11: dist-osx
 
 .PHONY: dist-ubuntu-latest
 dist-ubuntu-latest: dist-linux

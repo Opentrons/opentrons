@@ -74,18 +74,21 @@ export interface HeaterShakerModuleState {
 export interface MagneticBlockState {
   type: typeof MAGNETIC_BLOCK_TYPE
 }
+
 export interface AbsorbanceReaderState {
   type: typeof ABSORBANCE_READER_TYPE
 }
+
+export type ModuleState =
+  | MagneticModuleState
+  | TemperatureModuleState
+  | ThermocyclerModuleState
+  | HeaterShakerModuleState
+  | MagneticBlockState
+  | AbsorbanceReaderState
 export interface ModuleTemporalProperties {
   slot: DeckSlot
-  moduleState:
-    | MagneticModuleState
-    | TemperatureModuleState
-    | ThermocyclerModuleState
-    | HeaterShakerModuleState
-    | MagneticBlockState
-    | AbsorbanceReaderState
+  moduleState: ModuleState
 }
 
 export interface LabwareEntity {
@@ -115,9 +118,14 @@ export interface NormalizedPipetteById {
   }
 }
 
+export type AdditionalEquipmentName =
+  | 'gripper'
+  | 'wasteChute'
+  | 'stagingArea'
+  | 'trashBin'
 export interface NormalizedAdditionalEquipmentById {
   [additionalEquipmentId: string]: {
-    name: 'gripper' | 'wasteChute' | 'stagingArea' | 'trashBin'
+    name: AdditionalEquipmentName
     id: string
     location?: string
   }
@@ -141,6 +149,7 @@ export type PipetteEntity = NormalizedPipette & {
 export interface PipetteEntities {
   [pipetteId: string]: PipetteEntity
 }
+
 // ===== MIX-IN TYPES =====
 export type ChangeTipOptions =
   | 'always'
@@ -428,6 +437,11 @@ export interface MoveLabwareArgs extends CommonArgs {
   newLocation: LabwareLocation
 }
 
+export interface CommentArgs extends CommonArgs {
+  commandCreatorFnName: 'comment'
+  message: string
+}
+
 export type CommandCreatorArgs =
   | ConsolidateArgs
   | DistributeArgs
@@ -443,6 +457,7 @@ export type CommandCreatorArgs =
   | ThermocyclerStateStepArgs
   | HeaterShakerArgs
   | MoveLabwareArgs
+  | CommentArgs
 
 export interface LocationLiquidState {
   [ingredGroup: string]: { volume: number }
@@ -473,8 +488,7 @@ export interface InvariantContext {
   config: Config
 }
 
-// TODO Ian 2018-02-09 Rename this so it's less ambigious with what we call "robot state": `TimelineFrame`?
-export interface RobotState {
+export interface TimelineFrame {
   pipettes: {
     [pipetteId: string]: PipetteTemporalProperties
   }
@@ -514,6 +528,7 @@ export interface RobotState {
     }
   }
 }
+export type RobotState = TimelineFrame // legacy name alias
 
 export type ErrorType =
   | 'CANNOT_MOVE_WITH_GRIPPER'

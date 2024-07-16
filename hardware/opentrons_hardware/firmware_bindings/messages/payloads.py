@@ -495,6 +495,7 @@ class AddSensorLinearMoveBasePayload(AddLinearMoveRequestPayload):
 
     sensor_id: SensorIdField
     sensor_type: SensorTypeField
+    sensor_binding_flags: utils.UInt8Field
 
 
 @dataclass(eq=False)

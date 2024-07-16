@@ -64,6 +64,7 @@ const secondaryButtonProps: React.ComponentProps<typeof SmallButton> = {
   buttonType: 'tertiaryLowLight',
   iconName: 'information',
   iconPlacement: 'startIcon',
+  ariaDisabled: false,
 }
 
 export const TitleWithTwoButtons: Story = {
@@ -73,5 +74,27 @@ export const TitleWithTwoButtons: Story = {
     onClickButton: () => {},
     secondaryButtonProps,
     onClickBack: () => {},
+  },
+}
+
+export const TitleWithTwoButtonsDisabled: Story = {
+  args: {
+    header: 'Header',
+    buttonText: 'ButtonText',
+    onClickButton: () => {},
+    secondaryButtonProps,
+    onClickBack: () => {},
+    ariaDisabled: true,
+  },
+}
+
+export const TitleWithInlineNotification: Story = {
+  args: {
+    header: 'Header',
+    onClickBack: () => {},
+    inlineNotification: {
+      type: 'neutral',
+      heading: 'Inline notification',
+    },
   },
 }

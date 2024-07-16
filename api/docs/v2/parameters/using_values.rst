@@ -88,7 +88,7 @@ An example of such an action is applying labware offset data. Say you have a par
 
     # within run()
     plate = protocol.load_labware(
-        load_name="protocol.params.plate_type", location="D2"
+        load_name=protocol.params.plate_type, location="D2"
     )
 
 When performing run setup, you're prompted to apply offsets before selecting parameter values. This is your only opportunity to apply offsets, so they're applied for the default parameter values — in this case, the Corning plate. If you then change the "Well plate type" parameter to the NEST plate, the NEST plate will have default offset values (0.0 on all axes). You can fix this by running Labware Position Check, since it takes place after reanalysis, or by using :py:meth:`.Labware.set_offset` in your protocol.

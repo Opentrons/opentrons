@@ -35,7 +35,12 @@ from ..types import (
     DeckConfigurationType,
     Dimensions,
 )
-from ..actions import Action, SucceedCommandAction, PlayAction, AddAddressableAreaAction
+from ..actions import (
+    Action,
+    SucceedCommandAction,
+    SetDeckConfigurationAction,
+    AddAddressableAreaAction,
+)
 from .config import Config
 from .abstract_store import HasState, HandlesActions
 
@@ -186,7 +191,7 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
             self._handle_command(action.command)
         elif isinstance(action, AddAddressableAreaAction):
             self._check_location_is_addressable_area(action.addressable_area)
-        elif isinstance(action, PlayAction):
+        elif isinstance(action, SetDeckConfigurationAction):
             current_state = self._state
             if (
                 action.deck_configuration is not None

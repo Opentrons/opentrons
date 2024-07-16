@@ -149,7 +149,7 @@ async def test_liquid_probe(
                         ack_id=UInt8Field(1),
                     )
                 ),
-                motor_node,
+                target_node,
             )
         ]
 
@@ -166,26 +166,6 @@ async def test_liquid_probe(
                         current_position_um=UInt32Field(14000),
                         encoder_position_um=Int32Field(14000),
                         position_flags=MotorPositionFlagsField(0),
-                        ack_id=UInt8Field(1),
-                    )
-                ),
-                target_node,
-            )
-        ]
-
-    def check_third_move(
-        node_id: NodeId, message: MessageDefinition
-    ) -> List[Tuple[NodeId, MessageDefinition, NodeId]]:
-        return [
-            (
-                NodeId.host,
-                MoveCompleted(
-                    payload=MoveCompletedPayload(
-                        group_id=UInt8Field(2),
-                        seq_id=UInt8Field(0),
-                        current_position_um=UInt32Field(14000),
-                        encoder_position_um=Int32Field(14000),
-                        position_flags=MotorPositionFlagsField(0),
                         ack_id=UInt8Field(2),
                     )
                 ),
@@ -195,7 +175,7 @@ async def test_liquid_probe(
                 NodeId.host,
                 MoveCompleted(
                     payload=MoveCompletedPayload(
-                        group_id=UInt8Field(2),
+                        group_id=UInt8Field(1),
                         seq_id=UInt8Field(0),
                         current_position_um=UInt32Field(14000),
                         encoder_position_um=Int32Field(14000),
@@ -214,7 +194,6 @@ async def test_liquid_probe(
     ]:
         yield check_first_move
         yield check_second_move
-        yield check_third_move
 
     responder_getter = get_responder()
 
@@ -234,7 +213,7 @@ async def test_liquid_probe(
         messenger=mock_messenger,
         tool=target_node,
         head_node=motor_node,
-        max_z_distance=40,
+        max_p_distance=70,
         mount_speed=10,
         plunger_speed=8,
         threshold_pascals=threshold_pascals,
@@ -293,7 +272,7 @@ async def test_liquid_probe_output_options(
                         ack_id=UInt8Field(1),
                     )
                 ),
-                NodeId.head_l,
+                NodeId.pipette_left,
             )
         ]
 
@@ -310,26 +289,6 @@ async def test_liquid_probe_output_options(
                         current_position_um=UInt32Field(14000),
                         encoder_position_um=Int32Field(14000),
                         position_flags=MotorPositionFlagsField(0),
-                        ack_id=UInt8Field(1),
-                    )
-                ),
-                NodeId.pipette_left,
-            )
-        ]
-
-    def check_third_move(
-        node_id: NodeId, message: MessageDefinition
-    ) -> List[Tuple[NodeId, MessageDefinition, NodeId]]:
-        return [
-            (
-                NodeId.host,
-                MoveCompleted(
-                    payload=MoveCompletedPayload(
-                        group_id=UInt8Field(2),
-                        seq_id=UInt8Field(0),
-                        current_position_um=UInt32Field(14000),
-                        encoder_position_um=Int32Field(14000),
-                        position_flags=MotorPositionFlagsField(0),
                         ack_id=UInt8Field(2),
                     )
                 ),
@@ -339,7 +298,7 @@ async def test_liquid_probe_output_options(
                 NodeId.host,
                 MoveCompleted(
                     payload=MoveCompletedPayload(
-                        group_id=UInt8Field(2),
+                        group_id=UInt8Field(1),
                         seq_id=UInt8Field(0),
                         current_position_um=UInt32Field(14000),
                         encoder_position_um=Int32Field(14000),
@@ -358,7 +317,6 @@ async def test_liquid_probe_output_options(
     ]:
         yield check_first_move
         yield check_second_move
-        yield check_third_move
 
     responder_getter = get_responder()
 
@@ -386,7 +344,7 @@ async def test_liquid_probe_output_options(
             messenger=mock_messenger,
             tool=NodeId.pipette_left,
             head_node=NodeId.head_l,
-            max_z_distance=40,
+            max_p_distance=70,
             mount_speed=10,
             plunger_speed=8,
             threshold_pascals=14,
@@ -487,7 +445,7 @@ async def test_capacitive_probe(
     message_send_loopback.add_responder(move_responder)
 
     status = await capacitive_probe(
-        mock_messenger, target_node, motor_node, distance, speed, speed
+        mock_messenger, target_node, motor_node, distance, speed
     )
     assert status.motor_position == 10  # this comes from the current_position_um above
     assert status.encoder_position == 10

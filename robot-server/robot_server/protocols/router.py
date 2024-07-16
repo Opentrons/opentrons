@@ -17,6 +17,7 @@ from fastapi import (
     Depends,
     File,
     HTTPException,
+    Query,
     UploadFile,
     status,
     Form,
@@ -58,6 +59,7 @@ from .protocol_store import (
 )
 from .dependencies import (
     get_protocol_auto_deleter,
+    get_quick_transfer_protocol_auto_deleter,
     get_protocol_reader,
     get_protocol_store,
     get_analysis_store,
@@ -65,6 +67,7 @@ from .dependencies import (
     get_protocol_directory,
     get_file_reader_writer,
     get_file_hasher,
+    get_maximum_quick_transfer_protocols,
 )
 
 
@@ -207,11 +210,11 @@ async def create_protocol(  # noqa: C901
         " always trigger an analysis (for now).",
         alias="runTimeParameterValues",
     ),
-    protocol_kind: Optional[str] = Form(
+    protocol_kind: Optional[ProtocolKind] = Form(
         default=None,
         description=(
             "Whether this is a `standard` protocol or a `quick-transfer` protocol."
-            "if ommited, the protocol will be `standard` by default."
+            "if omitted, the protocol will be `standard` by default."
         ),
         alias="protocolKind",
     ),
@@ -223,10 +226,16 @@ async def create_protocol(  # noqa: C901
     file_hasher: FileHasher = Depends(get_file_hasher),
     analyses_manager: AnalysesManager = Depends(get_analyses_manager),
     protocol_auto_deleter: ProtocolAutoDeleter = Depends(get_protocol_auto_deleter),
+    quick_transfer_protocol_auto_deleter: ProtocolAutoDeleter = Depends(
+        get_quick_transfer_protocol_auto_deleter
+    ),
     robot_type: RobotType = Depends(get_robot_type),
     protocol_id: str = Depends(get_unique_id, use_cache=False),
     analysis_id: str = Depends(get_unique_id, use_cache=False),
     created_at: datetime = Depends(get_current_time),
+    maximum_quick_transfer_protocols: int = Depends(
+        get_maximum_quick_transfer_protocols
+    ),
 ) -> PydanticResponse[SimpleBody[Protocol]]:
     """Create a new protocol by uploading its files.
 
@@ -244,18 +253,26 @@ async def create_protocol(  # noqa: C901
         analyses_manager: Protocol analysis managing interface.
         protocol_auto_deleter: An interface to delete old resources to make room for
             the new protocol.
+        quick_transfer_protocol_auto_deleter: An interface to delete old quick
+            transfer resources to make room for the new protocol.
         robot_type: The type of this robot. Protocols meant for other robot types
             are rejected.
         protocol_id: Unique identifier to attach to the protocol resource.
         analysis_id: Unique identifier to attach to the analysis resource.
         created_at: Timestamp to attach to the new resource.
+        maximum_quick_transfer_protocols: Robot setting value limiting stored quick transfers protocols.
     """
-    kind = ProtocolKind.from_string(protocol_kind)
-    if isinstance(protocol_kind, str) and kind is None:
-        raise HTTPException(
-            status_code=400, detail=f"Invalid protocol_kind: {protocol_kind}"
-        )
-    kind = kind or ProtocolKind.STANDARD
+    kind = ProtocolKind.from_string(protocol_kind) or ProtocolKind.STANDARD
+    if kind == ProtocolKind.QUICK_TRANSFER:
+        quick_transfer_protocols = [
+            protocol
+            for protocol in protocol_store.get_all()
+            if protocol.protocol_kind == ProtocolKind.QUICK_TRANSFER.value
+        ]
+        if len(quick_transfer_protocols) >= maximum_quick_transfer_protocols:
+            raise HTTPException(
+                status_code=409, detail="Maximum quick transfer protocols exceeded"
+            )
 
     for file in files:
         # TODO(mm, 2024-02-07): Investigate whether the filename can actually be None.
@@ -351,7 +368,10 @@ async def create_protocol(  # noqa: C901
         protocol_kind=kind.value,
     )
 
-    protocol_auto_deleter.make_room_for_new_protocol()
+    protocol_deleter: ProtocolAutoDeleter = protocol_auto_deleter
+    if kind == ProtocolKind.QUICK_TRANSFER:
+        protocol_deleter = quick_transfer_protocol_auto_deleter
+    protocol_deleter.make_room_for_new_protocol()
     protocol_store.insert(protocol_resource)
 
     new_analysis_summary = await analyses_manager.start_analysis(
@@ -426,16 +446,29 @@ async def _start_new_analysis_if_necessary(
     protocols_router.get,
     path="/protocols",
     summary="Get uploaded protocols",
-    description="Return all stored protocols, in order from first-uploaded to last-uploaded.",
+    description="""
+    Return all stored protocols by default, in order from first-uploaded to last-uploaded.
+    You can provide the kind of protocol with the `protocolKind` query arg
+    """,
     responses={status.HTTP_200_OK: {"model": SimpleMultiBody[Protocol]}},
 )
 async def get_protocols(
+    protocol_kind: Optional[ProtocolKind] = Query(
+        None,
+        description=(
+            "Specify the kind of protocols you want to return."
+            " protocol kind can be `quick-transfer` or `standard` "
+            " If this is omitted or `null`, all protocols will be returned."
+        ),
+        alias="protocolKind",
+    ),
     protocol_store: ProtocolStore = Depends(get_protocol_store),
     analysis_store: AnalysisStore = Depends(get_analysis_store),
 ) -> PydanticResponse[SimpleMultiBody[Protocol]]:
     """Get a list of all currently uploaded protocols.
 
     Args:
+        protocol_kind: Query arg to filter the kind of protocol.
         protocol_store: In-memory database of protocol resources.
         analysis_store: In-memory database of protocol analyses.
     """
@@ -453,6 +486,7 @@ async def get_protocols(
             files=[ProtocolFile(name=f.path.name, role=f.role) for f in r.source.files],
         )
         for r in protocol_resources
+        if (protocol_kind in [None, r.protocol_kind])
     ]
     meta = MultiBodyMeta(cursor=0, totalLength=len(data))
 

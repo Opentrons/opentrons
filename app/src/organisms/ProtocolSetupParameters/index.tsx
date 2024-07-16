@@ -24,14 +24,18 @@ import { ChildNavigation } from '../ChildNavigation'
 import { ResetValuesModal } from './ResetValuesModal'
 import { ChooseEnum } from './ChooseEnum'
 import { ChooseNumber } from './ChooseNumber'
+import { ChooseCsvFile } from './ChooseCsvFile'
 import { useFeatureFlag } from '../../redux/config'
+import { useToaster } from '../ToasterOven'
 
 import type {
   CompletedProtocolAnalysis,
   ChoiceParameter,
+  CsvFileParameter,
   NumberParameter,
   RunTimeParameter,
   ValueRunTimeParameter,
+  CsvFileFileType,
 } from '@opentrons/shared-data'
 import type { LabwareOffsetCreateData } from '@opentrons/api-client'
 
@@ -61,6 +65,10 @@ export function ProtocolSetupParameters({
     showNumericalInputScreen,
     setShowNumericalInputScreen,
   ] = React.useState<NumberParameter | null>(null)
+  const [
+    chooseCsvFileScreen,
+    setChooseCsvFileScreen,
+  ] = React.useState<CsvFileParameter | null>(null)
   const [resetValuesModal, showResetValuesModal] = React.useState<boolean>(
     false
   )
@@ -77,9 +85,10 @@ export function ProtocolSetupParameters({
           ({ ...parameter, value: parameter.default } as ValueRunTimeParameter)
     )
   )
+  const { makeSnackbar } = useToaster()
 
   const updateParameters = (
-    value: boolean | string | number,
+    value: boolean | string | number | CsvFileFileType,
     variableName: string
   ): void => {
     const updatedParameters = runTimeParametersOverrides.map(parameter => {
@@ -108,6 +117,17 @@ export function ProtocolSetupParameters({
         setShowNumericalInputScreen(updatedParameter as NumberParameter)
       }
     }
+    if (
+      chooseCsvFileScreen &&
+      chooseCsvFileScreen.variableName === variableName
+    ) {
+      const updatedParameter = updatedParameters.find(
+        parameter => parameter.variableName === variableName
+      )
+      if (updatedParameter != null && updatedParameter.type === 'csv_file') {
+        setChooseCsvFileScreen(updatedParameter as CsvFileParameter)
+      }
+    }
   }
 
   const runTimeParameterValues = getRunTimeParameterValuesForRun(
@@ -126,18 +146,25 @@ export function ProtocolSetupParameters({
     },
   })
   const handleConfirmValues = (): void => {
-    setStartSetup(true)
-    createProtocolAnalysis({
-      protocolKey: protocolId,
-      runTimeParameterValues: runTimeParameterValues,
-    })
-    createRun({
-      protocolId,
-      labwareOffsets,
-      runTimeParameterValues: getRunTimeParameterValuesForRun(
-        runTimeParametersOverrides
-      ),
-    })
+    if (
+      enableCsvFile &&
+      mostRecentAnalysis?.result === 'parameter-value-required'
+    ) {
+      makeSnackbar(t('protocol_requires_csv') as string)
+    } else {
+      setStartSetup(true)
+      createProtocolAnalysis({
+        protocolKey: protocolId,
+        runTimeParameterValues: runTimeParameterValues,
+      })
+      createRun({
+        protocolId,
+        labwareOffsets,
+        runTimeParameterValues: getRunTimeParameterValuesForRun(
+          runTimeParametersOverrides
+        ),
+      })
+    }
   }
 
   const handleSetParameter = (parameter: RunTimeParameter): void => {
@@ -147,9 +174,11 @@ export function ProtocolSetupParameters({
       updateParameters(!parameter.value, parameter.variableName)
     } else if (parameter.type === 'int' || parameter.type === 'float') {
       setShowNumericalInputScreen(parameter)
+    } else if (parameter.type === 'csv_file') {
+      setChooseCsvFileScreen(parameter)
     } else {
       // bad param
-      console.log('error')
+      console.error('error: bad param. not expected to reach this')
     }
   }
 
@@ -162,6 +191,10 @@ export function ProtocolSetupParameters({
         }}
         onClickButton={handleConfirmValues}
         buttonText={t('confirm_values')}
+        ariaDisabled={
+          enableCsvFile &&
+          mostRecentAnalysis?.result === 'parameter-value-required'
+        }
         buttonIsDisabled={
           enableCsvFile &&
           mostRecentAnalysis?.result === 'parameter-value-required'
@@ -240,6 +273,20 @@ export function ProtocolSetupParameters({
       </Flex>
     </>
   )
+
+  // ToDo (kk:06/18/2024) ff will be removed when we freeze the code
+  if (enableCsvFile && chooseCsvFileScreen != null) {
+    children = (
+      <ChooseCsvFile
+        protocolId={protocolId}
+        handleGoBack={() => {
+          setChooseCsvFileScreen(null)
+        }}
+        parameter={chooseCsvFileScreen}
+        setParameter={updateParameters}
+      />
+    )
+  }
   if (chooseValueScreen != null) {
     children = (
       <ChooseEnum

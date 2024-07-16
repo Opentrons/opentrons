@@ -1,8 +1,9 @@
 from __future__ import annotations
-
 import logging
 from contextlib import ExitStack
 from typing import Any, List, Optional, Sequence, Union, cast, Dict
+from opentrons.protocol_engine.commands.pipetting_common import LiquidNotFoundError
+from opentrons.protocol_engine.errors.error_occurrence import ProtocolCommandFailedError
 from opentrons_shared_data.errors.exceptions import (
     CommandPreconditionViolated,
     CommandParameterLimitViolated,
@@ -26,6 +27,7 @@ from opentrons.protocols.api_support.util import (
     clamp_value,
     requires_version,
     APIVersionError,
+    UnsupportedAPIError,
 )
 from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
 
@@ -62,6 +64,8 @@ _PARTIAL_NOZZLE_CONFIGURATION_AUTOMATIC_TIP_TRACKING_IN = APIVersion(2, 18)
 """The version after which automatic tip tracking supported partially configured nozzle layouts."""
 _DISPOSAL_LOCATION_OFFSET_ADDED_IN = APIVersion(2, 18)
 """The version after which offsets for deck configured trash containers and changes to alternating tip drop behavior were introduced."""
+_PARTIAL_NOZZLE_CONFIGURATION_SINGLE_ROW_PARTIAL_COLUMN_ADDED_IN = APIVersion(2, 20)
+"""The version after which partial nozzle configurations of single, row, and partial column layouts became available."""
 
 
 class InstrumentContext(publisher.CommandPublisher):
@@ -221,7 +225,6 @@ class InstrumentContext(publisher.CommandPublisher):
 
         well: Optional[labware.Well] = None
         move_to_location: types.Location
-
         last_location = self._get_last_location_by_api_version()
         try:
             target = validation.validate_location(
@@ -258,6 +261,14 @@ class InstrumentContext(publisher.CommandPublisher):
         else:
             c_vol = self._core.get_available_volume() if not volume else volume
         flow_rate = self._core.get_aspirate_flow_rate(rate)
+
+        if (
+            self.api_version >= APIVersion(2, 20)
+            and well is not None
+            and self.liquid_presence_detection
+        ):
+            self.require_liquid_presence(well=well)
+            self.prepare_to_aspirate()
 
         with publisher.publish_context(
             broker=self.broker,
@@ -368,7 +379,9 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         if self.api_version < APIVersion(2, 15) and push_out:
             raise APIVersionError(
-                "Unsupported parameter push_out. Change your API version to 2.15 or above to use this parameter."
+                api_element="Parameter push_out",
+                until_version="2.15",
+                current_version=f"{self.api_version}",
             )
         _log.debug(
             "dispense {} from {} at {}".format(
@@ -887,21 +900,24 @@ class InstrumentContext(publisher.CommandPublisher):
         """
 
         if presses is not None and self._api_version >= _PRESSES_INCREMENT_REMOVED_IN:
-            raise APIVersionError(
-                f"presses is only available in API versions lower than {_PRESSES_INCREMENT_REMOVED_IN},"
-                f" but you are using API {self._api_version}."
+            raise UnsupportedAPIError(
+                api_element="presses",
+                since_version=f"{_PRESSES_INCREMENT_REMOVED_IN}",
+                current_version=f"{self._api_version}",
             )
 
         if increment is not None and self._api_version >= _PRESSES_INCREMENT_REMOVED_IN:
-            raise APIVersionError(
-                f"increment is only available in API versions lower than {_PRESSES_INCREMENT_REMOVED_IN},"
-                f" but you are using API {self._api_version}."
+            raise UnsupportedAPIError(
+                api_element="increment",
+                since_version=f"{_PRESSES_INCREMENT_REMOVED_IN}",
+                current_version=f"{self._api_version}",
             )
 
         if prep_after is not None and self._api_version < _PREP_AFTER_ADDED_IN:
             raise APIVersionError(
-                f"prep_after is only available in API {_PREP_AFTER_ADDED_IN} and newer,"
-                f" but you are using API {self._api_version}."
+                api_element="prep_after",
+                until_version=f"{_PREP_AFTER_ADDED_IN}",
+                current_version=f"{self._api_version}",
             )
 
         well: labware.Well
@@ -1493,9 +1509,8 @@ class InstrumentContext(publisher.CommandPublisher):
             # would get a TypeError if they tried to call it like delay(minutes=10).
             # Without changing the ultimate behavior that such a call fails the
             # protocol, we can provide a more descriptive message as a courtesy.
-            raise APIVersionError(
-                "InstrumentContext.delay() is not supported in Python Protocol API v2."
-                " Use ProtocolContext.delay() instead."
+            raise UnsupportedAPIError(
+                message="InstrumentContext.delay() is not supported in Python Protocol API v2. Use ProtocolContext.delay() instead."
             )
         else:
             # Former implementations of this method, when called without any args,
@@ -1615,9 +1630,8 @@ class InstrumentContext(publisher.CommandPublisher):
             :py:attr:`.flow_rate` instead.
         """
         if self._api_version >= ENGINE_CORE_API_VERSION:
-            raise APIVersionError(
-                "InstrumentContext.speed has been removed."
-                " Use InstrumentContext.flow_rate, instead."
+            raise UnsupportedAPIError(
+                message="InstrumentContext.speed has been removed. Use InstrumentContext.flow_rate, instead."
             )
 
         # TODO(mc, 2023-02-13): this assert should be enough for mypy
@@ -1672,7 +1686,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
     @property
     @requires_version(2, 20)
-    def liquid_detection(self) -> bool:
+    def liquid_presence_detection(self) -> bool:
         """
         Gets the global setting for liquid level detection.
 
@@ -1683,9 +1697,9 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         return self._core.get_liquid_presence_detection()
 
-    @liquid_detection.setter
+    @liquid_presence_detection.setter
     @requires_version(2, 20)
-    def liquid_detection(self, enable: bool) -> None:
+    def liquid_presence_detection(self, enable: bool) -> None:
         self._core.set_liquid_presence_detection(enable)
 
     @property
@@ -1963,14 +1977,16 @@ class InstrumentContext(publisher.CommandPublisher):
         self._core.prepare_to_aspirate()
 
     @requires_version(2, 16)
-    def configure_nozzle_layout(
+    def configure_nozzle_layout(  # noqa: C901
         self,
         style: NozzleLayout,
         start: Optional[str] = None,
+        end: Optional[str] = None,
         front_right: Optional[str] = None,
+        back_left: Optional[str] = None,
         tip_racks: Optional[List[labware.Labware]] = None,
     ) -> None:
-        """Configure how many tips the 96-channel pipette will pick up.
+        """Configure how many tips the 8-channel or 96-channel pipette will pick up.
 
         Changing the nozzle layout will affect gantry movement for all subsequent
         pipetting actions that the pipette performs. It also alters the pipette's
@@ -1984,13 +2000,18 @@ class InstrumentContext(publisher.CommandPublisher):
 
         :param style: The shape of the nozzle layout.
 
+            - ``SINGLE`` sets the pipette to use 1 nozzle. This corresponds to a single of well on labware.
             - ``COLUMN`` sets the pipette to use 8 nozzles, aligned from front to back
               with respect to the deck. This corresponds to a column of wells on labware.
+            - ``PARTIAL_COLUMN`` sets the pipette to use 2-7 nozzles, aligned from front to back
+              with respect to the deck.
+            - ``ROW`` sets the pipette to use 12 nozzles, aligned from left to right
+              with respect to the deck. This corresponds to a row of wells on labware.
             - ``ALL`` resets the pipette to use all of its nozzles. Calling
               ``configure_nozzle_layout`` with no arguments also resets the pipette.
 
         :type style: ``NozzleLayout`` or ``None``
-        :param start: The nozzle at the back left of the layout, which the robot uses
+        :param start: The primary nozzle of the layout, which the robot uses
             to determine how it will move to different locations on the deck. The string
             should be of the same format used when identifying wells by name.
             Required unless setting ``style=ALL``.
@@ -2000,6 +2021,16 @@ class InstrumentContext(publisher.CommandPublisher):
                 tips *from the same rack*. Doing so can affect positional accuracy.
 
         :type start: str or ``None``
+        :param end: The nozzle at the end of a linear layout, which is used
+            to determine how many tips will be picked up by a pipette. The string
+            should be of the same format used when identifying wells by name.
+            Required when setting ``style=PARTIAL_COLUMN``.
+
+            .. note::
+                Nozzle layouts numbering between 2-7 nozzles, account for the distance from
+                ``start``. For example, 4 nozzles would require ``start="H1"`` and ``end="E1"``.
+
+        :type end: str or ``None``
         :param tip_racks: Behaves the same as setting the ``tip_racks`` parameter of
             :py:meth:`.load_instrument`. If not specified, the new configuration resets
             :py:obj:`.InstrumentContext.tip_racks` and you must specify the location
@@ -2015,14 +2046,22 @@ class InstrumentContext(publisher.CommandPublisher):
         #       NOTE: Disabled layouts error case can be removed once desired map configurations
         #       have appropriate data regarding tip-type to map current values added to the
         #       pipette definitions.
+
         disabled_layouts = [
-            NozzleLayout.ROW,
-            NozzleLayout.SINGLE,
             NozzleLayout.QUADRANT,
         ]
         if style in disabled_layouts:
             raise ValueError(
                 f"Nozzle layout configuration of style {style.value} is currently unsupported."
+            )
+
+        original_enabled_layouts = [NozzleLayout.COLUMN, NozzleLayout.ALL]
+        if (
+            self._api_version
+            < _PARTIAL_NOZZLE_CONFIGURATION_SINGLE_ROW_PARTIAL_COLUMN_ADDED_IN
+        ) and (style not in original_enabled_layouts):
+            raise ValueError(
+                f"Nozzle layout configuration of style {style.value} is unsupported in API Versions lower than {_PARTIAL_NOZZLE_CONFIGURATION_SINGLE_ROW_PARTIAL_COLUMN_ADDED_IN}."
             )
 
         if style != NozzleLayout.ALL:
@@ -2035,14 +2074,73 @@ class InstrumentContext(publisher.CommandPublisher):
                     f"Starting nozzle specified is not one of {types.ALLOWED_PRIMARY_NOZZLES}"
                 )
         if style == NozzleLayout.QUADRANT:
-            if front_right is None:
+            if front_right is None and back_left is None:
                 raise ValueError(
-                    "Cannot configure a QUADRANT layout without a front right nozzle."
+                    "Cannot configure a QUADRANT layout without a front right or back left nozzle."
                 )
+        elif not (front_right is None and back_left is None):
+            raise ValueError(
+                f"Parameters 'front_right' and 'back_left' cannot be used with {style.value} Nozzle Configuration Layout."
+            )
+
+        front_right_resolved = front_right
+        back_left_resolved = back_left
+        if style == NozzleLayout.PARTIAL_COLUMN:
+            if end is None:
+                raise ValueError(
+                    "Parameter 'end' is required for Partial Column Nozzle Configuration Layout."
+                )
+
+            # Determine if 'end' will be configured as front_right or back_left
+            if start == "H1" or start == "H12":
+                back_left_resolved = end
+            elif start == "A1" or start == "A12":
+                front_right_resolved = end
+
         self._core.configure_nozzle_layout(
             style,
             primary_nozzle=start,
-            front_right_nozzle=front_right,
+            front_right_nozzle=front_right_resolved,
+            back_left_nozzle=back_left_resolved,
         )
-        # TODO (spp, 2023-12-05): verify that tipracks are on adapters for only full 96 channel config
         self._tip_racks = tip_racks or []
+
+    @requires_version(2, 20)
+    def detect_liquid_presence(self, well: labware.Well) -> bool:
+        """Check if there is liquid in a well.
+
+        :returns: A boolean.
+        """
+        loc = well.top()
+        try:
+            self._core.liquid_probe_without_recovery(well._core, loc)
+        except ProtocolCommandFailedError as e:
+            # if we handle the error, we change the protocl state from error to valid
+            if isinstance(e.original_error, LiquidNotFoundError):
+                return False
+            raise e
+        else:
+            return True
+
+    @requires_version(2, 20)
+    def require_liquid_presence(self, well: labware.Well) -> None:
+        """If there is no liquid in a well, raise an error.
+
+        :returns: None.
+        """
+        loc = well.top()
+        self._core.liquid_probe_with_recovery(well._core, loc)
+
+    @requires_version(2, 20)
+    def measure_liquid_height(self, well: labware.Well) -> float:
+        """Check the height of the liquid within a well.
+
+        :returns: The height, in mm, of the liquid from the deck.
+
+        :meta private:
+
+        This is intended for Opentrons internal use only and is not a guaranteed API.
+        """
+        loc = well.top()
+        height = self._core.liquid_probe_without_recovery(well._core, loc)
+        return height
