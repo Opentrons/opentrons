@@ -101,7 +101,7 @@ async def test_liquid_probe_implementation_with_prep(
     subject: LiquidProbeImplementation,
 ) -> None:
     """A Liquid Probe should have an execution implementation with preparing to aspirate."""
-    location = WellLocation(origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0))
+    location = WellLocation(origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=2))
 
     data = LiquidProbeParams(
         pipetteId="abc",
@@ -143,7 +143,7 @@ async def test_liquid_probe_implementation_with_prep(
             pipette_id="abc",
             labware_id="123",
             well_name="A3",
-            well_location=WellLocation(origin=WellOrigin.TOP),
+            well_location=WellLocation(origin=WellOrigin.TOP,offset=WellOffset(x=0, y=0, z=2)),
         ),
     )
 
