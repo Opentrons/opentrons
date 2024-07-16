@@ -464,6 +464,7 @@ if __name__ == "__main__":
     email = args.email[0]
     board_id = args.board_id[0]
     reporter_id = args.reporter_id[0]
+    file_paths = read_robot_logs.get_logs(storage_directory, ip)
     ticket = jira_tool.JiraTicket(url, api_token, email)
     ticket.issues_on_board(board_id)
     users_file_path = ticket.get_jira_users(storage_directory)
@@ -496,7 +497,6 @@ if __name__ == "__main__":
     saved_file_path_calibration, calibration = read_robot_logs.get_calibration_offsets(
         ip, storage_directory
     )
-    file_paths = read_robot_logs.get_logs(storage_directory, ip)
 
     print(f"Making ticket for {summary}.")
     # TODO: make argument or see if I can get rid of with using board_id.

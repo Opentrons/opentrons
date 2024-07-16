@@ -4,6 +4,8 @@ import { css } from 'styled-components'
 
 import {
   ALIGN_FLEX_END,
+  ALIGN_CENTER,
+  Icon,
   Box,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
@@ -14,13 +16,14 @@ import {
   RESPONSIVENESS,
 } from '@opentrons/components'
 
-import { SmallButton } from '../../../atoms/buttons'
+import { SmallButton, TextOnlyButton } from '../../../atoms/buttons'
 
 interface RecoveryFooterButtonProps {
   primaryBtnOnClick: () => void
   /* The "Go back" button */
   secondaryBtnOnClick?: () => void
   primaryBtnTextOverride?: string
+  primaryBtnDisabled?: boolean
   /* If true, render pressed state and a spinner icon for the primary button. */
   isLoadingPrimaryBtnAction?: boolean
   /* To the left of the primary button. */
@@ -52,16 +55,7 @@ function RecoveryGoBackButton({
   const { t } = useTranslation('error_recovery')
   return showGoBackBtn ? (
     <Flex>
-      <SmallButton
-        buttonType="tertiaryLowLight"
-        buttonText={t('go_back')}
-        onClick={secondaryBtnOnClick}
-        marginTop="auto"
-        css={ODD_ONLY_BUTTON}
-      />
-      <SecondaryButton onClick={secondaryBtnOnClick} css={DESKTOP_ONLY_BUTTON}>
-        {t('go_back')}
-      </SecondaryButton>
+      <TextOnlyButton onClick={secondaryBtnOnClick} buttonText={t('go_back')} />
     </Flex>
   ) : (
     <Box />
@@ -93,6 +87,7 @@ function PrimaryButtonGroup(props: RecoveryFooterButtonProps): JSX.Element {
 function RecoveryPrimaryBtn({
   isLoadingPrimaryBtnAction,
   primaryBtnOnClick,
+  primaryBtnDisabled,
   primaryBtnTextOverride,
 }: RecoveryFooterButtonProps): JSX.Element {
   const { t } = useTranslation('error_recovery')
@@ -112,13 +107,25 @@ function RecoveryPrimaryBtn({
         buttonType="primary"
         buttonText={primaryBtnTextOverride ?? t('continue')}
         onClick={primaryBtnOnClick}
+        disabled={primaryBtnDisabled}
       />
       <PrimaryButton
-        css={DESKTOP_ONLY_BUTTON}
+        css={
+          isLoadingPrimaryBtnAction
+            ? css`
+                ${PRESSED_LOADING_STATE} ${DESKTOP_ONLY_BUTTON}
+              `
+            : DESKTOP_ONLY_BUTTON
+        }
         onClick={primaryBtnOnClick}
-        disabled={isLoadingPrimaryBtnAction}
+        disabled={primaryBtnDisabled}
       >
-        {primaryBtnTextOverride ?? t('continue')}
+        <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
+          {isLoadingPrimaryBtnAction && (
+            <Icon name="ot-spinner" size={SPACING.spacing16} spin={true} />
+          )}
+          {primaryBtnTextOverride ?? t('continue')}
+        </Flex>
       </PrimaryButton>
     </>
   )

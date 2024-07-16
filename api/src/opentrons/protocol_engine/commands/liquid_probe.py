@@ -11,7 +11,7 @@ from typing_extensions import Literal
 
 from pydantic import Field
 
-from ..types import CurrentWell, DeckPoint
+from ..types import DeckPoint
 from .pipetting_common import (
     LiquidNotFoundError,
     LiquidNotFoundErrorInternalData,
@@ -97,6 +97,8 @@ class LiquidProbeImplementation(
         Raises:
             TipNotAttachedError: as an undefined error, if there is not tip attached to
                 the pipette.
+            TipNotEmptyError: as an undefined error, if the tip starts with liquid
+                in it.
             MustHomeError: as an undefined error, if the plunger is not in a valid
                 position.
         """
@@ -118,19 +120,12 @@ class LiquidProbeImplementation(
                 message="Current position of pipette is invalid. Please home."
             )
 
-        current_well = CurrentWell(
-            pipette_id=pipette_id,
-            labware_id=labware_id,
-            well_name=well_name,
-        )
-
         # liquid_probe process start position
         position = await self._movement.move_to_well(
             pipette_id=pipette_id,
             labware_id=labware_id,
             well_name=well_name,
             well_location=params.wellLocation,
-            current_well=current_well,
         )
 
         try:

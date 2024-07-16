@@ -36,7 +36,7 @@ from opentrons.protocol_engine.execution import (
     PipettingHandler,
 )
 from opentrons.protocol_engine.resources.model_utils import ModelUtils
-from opentrons.protocol_engine.types import CurrentWell, LoadedPipette
+from opentrons.protocol_engine.types import LoadedPipette
 
 
 EitherImplementationType = Union[
@@ -99,7 +99,6 @@ async def test_liquid_probe_implementation_no_prep(
 ) -> None:
     """A Liquid Probe should have an execution implementation without preparing to aspirate."""
     location = WellLocation(origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1))
-    current_well = CurrentWell(pipette_id="abc", labware_id="123", well_name="A3")
 
     data = LiquidProbeParams(
         pipetteId="abc",
@@ -116,7 +115,6 @@ async def test_liquid_probe_implementation_no_prep(
             labware_id="123",
             well_name="A3",
             well_location=location,
-            current_well=current_well,
         ),
     ).then_return(Point(x=1, y=2, z=3))
 
@@ -147,7 +145,6 @@ async def test_liquid_probe_implementation_with_prep(
 ) -> None:
     """A Liquid Probe should have an execution implementation with preparing to aspirate."""
     location = WellLocation(origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0))
-    current_well = CurrentWell(pipette_id="abc", labware_id="123", well_name="A3")
 
     data = LiquidProbeParams(
         pipetteId="abc",
@@ -165,11 +162,7 @@ async def test_liquid_probe_implementation_with_prep(
     )
     decoy.when(
         await movement.move_to_well(
-            pipette_id="abc",
-            labware_id="123",
-            well_name="A3",
-            well_location=location,
-            current_well=current_well,
+            pipette_id="abc", labware_id="123", well_name="A3", well_location=location
         ),
     ).then_return(Point(x=1, y=2, z=3))
 
@@ -204,9 +197,6 @@ async def test_liquid_not_found_error(
     well_location = WellLocation(
         origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1)
     )
-    current_well = CurrentWell(
-        pipette_id=pipette_id, labware_id=labware_id, well_name=well_name
-    )
 
     position = Point(x=1, y=2, z=3)
 
@@ -230,7 +220,6 @@ async def test_liquid_not_found_error(
             labware_id=labware_id,
             well_name=well_name,
             well_location=well_location,
-            current_well=current_well,
         ),
     ).then_return(position)
 

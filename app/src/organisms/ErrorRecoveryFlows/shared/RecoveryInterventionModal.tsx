@@ -5,7 +5,7 @@ import { css } from 'styled-components'
 import { Flex, RESPONSIVENESS, SPACING } from '@opentrons/components'
 
 import { InterventionModal } from '../../../molecules/InterventionModal'
-import { getModalPortalEl } from '../../../App/portal'
+import { getModalPortalEl, getTopPortalEl } from '../../../App/portal'
 
 import type { ModalType } from '../../../molecules/InterventionModal'
 
@@ -15,12 +15,14 @@ export type RecoveryInterventionModalProps = Omit<
 > & {
   /* If on desktop, specifies the hard-coded dimensions height of the modal. */
   desktopType: 'desktop-small' | 'desktop-large'
+  isOnDevice: boolean
 }
 
 // A wrapper around InterventionModal with Error-Recovery specific props and styling.
 export function RecoveryInterventionModal({
   children,
   desktopType,
+  isOnDevice,
   ...rest
 }: RecoveryInterventionModalProps): JSX.Element {
   const restProps = {
@@ -41,7 +43,7 @@ export function RecoveryInterventionModal({
         {children}
       </Flex>
     </InterventionModal>,
-    getModalPortalEl()
+    isOnDevice ? getTopPortalEl() : getModalPortalEl()
   )
 }
 
@@ -52,10 +54,10 @@ const ODD_STYLE = `
 `
 
 const SMALL_MODAL_STYLE = css`
-  height: 25.25rem;
+  height: 22rem;
   ${ODD_STYLE}
 `
 const LARGE_MODAL_STYLE = css`
-  height: 30rem;
+  height: 26.75rem;
   ${ODD_STYLE}
 `

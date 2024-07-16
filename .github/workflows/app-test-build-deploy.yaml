@@ -207,6 +207,7 @@ jobs:
     needs: [determine-build-type]
     if: needs.determine-build-type.outputs.variants != '[]'
     strategy:
+      fail-fast: false
       matrix:
         os: ['windows-2022', 'ubuntu-22.04', 'macos-latest']
         variant: ${{fromJSON(needs.determine-build-type.outputs.variants)}}

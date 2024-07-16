@@ -12,7 +12,11 @@ import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { mockFailedCommand } from '../__fixtures__'
 import { ErrorRecoveryFlows, useErrorRecoveryFlows } from '..'
-import { useCurrentlyRecoveringFrom, useERUtils } from '../hooks'
+import {
+  useCurrentlyRecoveringFrom,
+  useERUtils,
+  useShowDoorInfo,
+} from '../hooks'
 import { useFeatureFlag } from '../../../redux/config'
 import { useERWizard, ErrorRecoveryWizard } from '../ErrorRecoveryWizard'
 import { useRunPausedSplash, RunPausedSplash } from '../RunPausedSplash'
@@ -122,6 +126,7 @@ describe('ErrorRecovery', () => {
 
   beforeEach(() => {
     props = {
+      runStatus: RUN_STATUS_AWAITING_RECOVERY,
       failedCommand: mockFailedCommand,
       runId: 'MOCK_RUN_ID',
       isFlex: true,
@@ -139,9 +144,22 @@ describe('ErrorRecovery', () => {
     })
     vi.mocked(useRunPausedSplash).mockReturnValue(true)
     vi.mocked(useERUtils).mockReturnValue({ routeUpdateActions: {} } as any)
+    vi.mocked(useShowDoorInfo).mockReturnValue(false)
   })
 
   it('renders the wizard when the wizard is toggled on', () => {
+    render(props)
+    screen.getByText('MOCK WIZARD')
+  })
+
+  it('renders the wizard when isDoorOpen is true', () => {
+    vi.mocked(useShowDoorInfo).mockReturnValue(true)
+    vi.mocked(useERWizard).mockReturnValue({
+      hasLaunchedRecovery: false,
+      toggleERWizard: () => Promise.resolve(),
+      showERWizard: false,
+    })
+
     render(props)
     screen.getByText('MOCK WIZARD')
   })
