@@ -9,6 +9,7 @@ import {
   ErrorRecoveryContent,
   useInitialPipetteHome,
   useERWizard,
+  ErrorRecoveryComponent,
 } from '../ErrorRecoveryWizard'
 import { RECOVERY_MAP } from '../constants'
 import {
@@ -25,14 +26,23 @@ import {
 } from '../RecoveryOptions'
 import { RecoveryInProgress } from '../RecoveryInProgress'
 import { RecoveryError } from '../RecoveryError'
+import { RecoveryDoorOpen } from '../RecoveryDoorOpen'
+import { useErrorDetailsModal, ErrorDetailsModal } from '../shared'
 
 import type { Mock } from 'vitest'
 
 vi.mock('../RecoveryOptions')
 vi.mock('../RecoveryInProgress')
 vi.mock('../RecoveryError')
-vi.mock('../shared')
-
+vi.mock('../RecoveryDoorOpen')
+vi.mock('../shared', async importOriginal => {
+  const actual = await importOriginal<typeof ErrorDetailsModal>()
+  return {
+    ...actual,
+    useErrorDetailsModal: vi.fn(),
+    ErrorDetailsModal: vi.fn(),
+  }
+})
 describe('useERWizard', () => {
   it('has correct initial values', () => {
     const { result } = renderHook(() => useERWizard())
@@ -56,6 +66,65 @@ describe('useERWizard', () => {
 
     expect(result.current.showERWizard).toBe(false)
     expect(result.current.hasLaunchedRecovery).toBe(false)
+  })
+})
+
+const renderRecoveryComponent = (
+  props: React.ComponentProps<typeof ErrorRecoveryComponent>
+) => {
+  return renderWithProviders(<ErrorRecoveryComponent {...props} />, {
+    i18nInstance: i18n,
+  })[0]
+}
+
+describe('ErrorRecoveryComponent', () => {
+  let props: React.ComponentProps<typeof ErrorRecoveryComponent>
+
+  beforeEach(() => {
+    props = mockRecoveryContentProps
+
+    vi.mocked(RecoveryDoorOpen).mockReturnValue(
+      <div>MOCK_RECOVERY_DOOR_OPEN</div>
+    )
+    vi.mocked(ErrorDetailsModal).mockReturnValue(<div>ERROR_DETAILS_MODAL</div>)
+    vi.mocked(useErrorDetailsModal).mockReturnValue({
+      toggleModal: vi.fn(),
+      showModal: false,
+    })
+    vi.mocked(SelectRecoveryOption).mockReturnValue(
+      <div>MOCK_SELECT_RECOVERY_OPTION</div>
+    )
+  })
+
+  it('renders appropriate header copy', () => {
+    renderRecoveryComponent(props)
+
+    screen.getByText('View error details')
+  })
+
+  it('renders the error details modal when there is an error', () => {
+    vi.mocked(useErrorDetailsModal).mockReturnValue({
+      toggleModal: vi.fn(),
+      showModal: true,
+    })
+
+    renderRecoveryComponent(props)
+
+    screen.getByText('ERROR_DETAILS_MODAL')
+  })
+
+  it('renders the recovery door modal when isDoorOpen is true', () => {
+    props = { ...props, isDoorOpen: true }
+
+    renderRecoveryComponent(props)
+
+    screen.getByText('MOCK_RECOVERY_DOOR_OPEN')
+  })
+
+  it('renders recovery content when isDoorOpen is false', () => {
+    renderRecoveryComponent(props)
+
+    screen.getByText('MOCK_SELECT_RECOVERY_OPTION')
   })
 })
 
@@ -399,4 +468,3 @@ describe('useInitialPipetteHome', () => {
     })
   })
 })
-it.todo('add test for ErrorRecoveryComponent.')

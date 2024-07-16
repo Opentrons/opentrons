@@ -12,6 +12,7 @@ import {
   useNotifyRunQuery,
 } from '../../../resources/runs'
 import { useRecoveryOptionCopy } from './useRecoveryOptionCopy'
+import { useRecoveryActionMutation } from './useRecoveryActionMutation'
 import { useRunningStepCounts } from '../../../resources/protocols/hooks'
 
 import type { PipetteData } from '@opentrons/api-client'
@@ -23,6 +24,7 @@ import type { RecoveryTipStatusUtils } from './useRecoveryTipStatus'
 import type { UseFailedLabwareUtilsResult } from './useFailedLabwareUtils'
 import type { UseDeckMapUtilsResult } from './useDeckMapUtils'
 import type { CurrentRecoveryOptionUtils } from './useRecoveryRouting'
+import type { RecoveryActionMutationResult } from './useRecoveryActionMutation'
 import type { StepCounts } from '../../../resources/protocols/hooks'
 
 type ERUtilsProps = ErrorRecoveryFlowsProps & {
@@ -39,6 +41,7 @@ export interface ERUtilsResults {
   failedLabwareUtils: UseFailedLabwareUtilsResult
   deckMapUtils: UseDeckMapUtilsResult
   getRecoveryOptionCopy: ReturnType<typeof useRecoveryOptionCopy>
+  recoveryActionMutationUtils: RecoveryActionMutationResult
   failedPipetteInfo: PipetteData | null
   hasLaunchedRecovery: boolean
   trackExternalMap: (map: Record<string, any>) => void
@@ -119,6 +122,8 @@ export function useERUtils({
 
   const stepCounts = useRunningStepCounts(runId, runCommands)
 
+  const recoveryActionMutationUtils = useRecoveryActionMutation(runId)
+
   // TODO(jh, 06-14-24): Ensure other string build utilities that are internal to ErrorRecoveryFlows are exported under
   // one utility object in useERUtils.
   const getRecoveryOptionCopy = useRecoveryOptionCopy()
@@ -131,6 +136,7 @@ export function useERUtils({
     recoveryMap,
     trackExternalMap,
     currentRecoveryOptionUtils,
+    recoveryActionMutationUtils,
     routeUpdateActions,
     recoveryCommands,
     hasLaunchedRecovery,
