@@ -1,5 +1,3 @@
-import { v4 as uuidv4 } from 'uuid'
-
 // import { GET, request } from '../request'
 
 // import type { ResponsePromise } from '../request'
@@ -25,18 +23,16 @@ export function getCsvFiles(
   config: HostConfig,
   protocolId: string
 ): Promise<{ data: UploadedCsvFilesResponse }> {
-  const fileIdOne = uuidv4()
-  const fileIdTwo = uuidv4()
   const stub = {
     data: {
       files: [
         {
-          id: fileIdOne,
+          id: '1',
           createdAt: '2024-06-07T19:19:56.268029+00:00',
           name: 'rtp_mock_file1.csv',
         },
         {
-          id: fileIdTwo,
+          id: '2',
           createdAt: '2024-06-17T19:19:56.268029+00:00',
           name: 'rtp_mock_file2.csv',
         },

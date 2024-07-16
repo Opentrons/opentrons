@@ -62,6 +62,12 @@ export function ChooseCsvFile({
     handleGoBack()
   }
 
+  React.useEffect(() => {
+    if (csvFilesOnUSB.length === 0) {
+      setCsvFileSelected({})
+    }
+  }, [csvFilesOnUSB])
+
   return (
     <>
       <ChildNavigation
