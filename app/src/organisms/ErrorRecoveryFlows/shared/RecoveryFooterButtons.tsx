@@ -4,6 +4,8 @@ import { css } from 'styled-components'
 
 import {
   ALIGN_FLEX_END,
+  ALIGN_CENTER,
+  Icon,
   Box,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
@@ -99,7 +101,6 @@ function RecoveryPrimaryBtn({
 }: RecoveryFooterButtonProps): JSX.Element {
   const { t } = useTranslation('error_recovery')
 
-  //TOME: You need a loading state on the desktop button!
   return (
     <>
       <SmallButton
@@ -118,11 +119,22 @@ function RecoveryPrimaryBtn({
         disabled={primaryBtnDisabled}
       />
       <PrimaryButton
-        css={DESKTOP_ONLY_BUTTON}
+        css={
+          isLoadingPrimaryBtnAction
+            ? css`
+                ${PRESSED_LOADING_STATE} ${DESKTOP_ONLY_BUTTON}
+              `
+            : DESKTOP_ONLY_BUTTON
+        }
         onClick={primaryBtnOnClick}
         disabled={primaryBtnDisabled}
       >
-        {primaryBtnTextOverride ?? t('continue')}
+        <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
+          {isLoadingPrimaryBtnAction && (
+            <Icon name="ot-spinner" size={SPACING.spacing16} spin={true} />
+          )}
+          {primaryBtnTextOverride ?? t('continue')}
+        </Flex>
       </PrimaryButton>
     </>
   )
