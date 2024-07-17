@@ -1,15 +1,6 @@
 import * as React from 'react'
 
-import {
-  LegacyStyledText,
-  Box,
-  Flex,
-  BORDERS,
-  RESPONSIVENESS,
-  SPACING,
-  ALIGN_CENTER,
-  JUSTIFY_CENTER,
-} from '@opentrons/components'
+import { Box, RESPONSIVENESS } from '@opentrons/components'
 
 import { OneColumn as OneColumnComponent } from './'
 import { StandIn } from './story-utils/StandIn'

@@ -23,6 +23,7 @@ import type { IconName } from '@opentrons/components'
 import { ModalContentOneColSimpleButtons } from './ModalContentOneColSimpleButtons'
 import { TwoColumn } from './TwoColumn'
 import { OneColumn } from './OneColumn'
+import { OneColumnOrTwoColumn } from './OneColumnOrTwoColumn'
 import { ModalContentMixed } from './ModalContentMixed'
 import { DescriptionContent } from './DescriptionContent'
 import { DeckMapContent } from './DeckMapContent'
@@ -31,6 +32,7 @@ export {
   ModalContentOneColSimpleButtons,
   TwoColumn,
   OneColumn,
+  OneColumnOrTwoColumn,
   ModalContentMixed,
   DescriptionContent,
   DeckMapContent,
