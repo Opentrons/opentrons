@@ -10,7 +10,11 @@ from opentrons.protocol_reader import FileHasher, FileReaderWriter, BufferedFile
 
 from robot_server.data_files.data_files_store import DataFilesStore, DataFileInfo
 from robot_server.data_files.models import DataFile, FileIdNotFoundError
-from robot_server.data_files.router import upload_data_file, get_data_file_info_by_id
+from robot_server.data_files.router import (
+    upload_data_file,
+    get_data_file_info_by_id,
+    get_data_file,
+)
 from robot_server.errors.error_responses import ApiError
 
 
@@ -275,3 +279,46 @@ async def test_get_data_file_info_nonexistant(
         )
     assert exc_info.value.status_code == 404
     assert exc_info.value.content["errors"][0]["id"] == "FileIdNotFound"
+
+
+async def test_get_data_file(
+    decoy: Decoy,
+    data_files_store: DataFilesStore,
+    file_reader_writer: FileReaderWriter,
+) -> None:
+    """It should return the existing file."""
+    data_files_directory = Path("/dev/null")
+
+    decoy.when(data_files_store.get("data-file-id")).then_return(
+        DataFileInfo(
+            id="qwerty",
+            name="abc.xyz",
+            file_hash="123",
+            created_at=datetime(year=2024, month=7, day=15),
+        )
+    )
+
+    decoy.when(
+        await file_reader_writer.read(
+            files=[data_files_directory / "data-file-id" / "abc.xyz"]
+        )
+    ).then_return(
+        [
+            BufferedFile(
+                name="123.456",
+                contents=bytes("some_content", encoding="utf-8"),
+                path=None,
+            )
+        ]
+    )
+
+    result = await get_data_file(
+        "data-file-id",
+        data_files_directory=data_files_directory,
+        data_files_store=data_files_store,
+        file_reader_writer=file_reader_writer,
+    )
+
+    assert result.status_code == 200
+    assert result.body == b"some_content"
+    assert result.media_type == "text/plain"

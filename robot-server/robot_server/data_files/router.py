@@ -4,7 +4,7 @@ from pathlib import Path
 from textwrap import dedent
 from typing import Optional, Literal, Union
 
-from fastapi import APIRouter, UploadFile, File, Form, Depends, status
+from fastapi import APIRouter, UploadFile, File, Form, Depends, Response, status
 from opentrons.protocol_reader import FileHasher, FileReaderWriter
 
 from robot_server.service.json_api import (
@@ -153,7 +153,7 @@ async def upload_data_file(
 @PydanticResponse.wrap_route(
     datafiles_router.get,
     path="/dataFiles/{dataFileId}",
-    summary="Get an uploaded data file",
+    summary="Get information about an uploaded data file",
     responses={
         status.HTTP_200_OK: {"model": SimpleBody[DataFile]},
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[FileIdNotFound]},
@@ -183,4 +183,38 @@ async def get_data_file_info_by_id(
             )
         ),
         status_code=status.HTTP_200_OK,
+    )
+
+
+@datafiles_router.get(
+    path="/dataFiles/{dataFileId}/download",
+    summary="Get an uploaded data file",
+    responses={
+        status.HTTP_404_NOT_FOUND: {
+            "model": ErrorBody[Union[FileIdNotFound, FileNotFound]]
+        },
+    },
+)
+async def get_data_file(
+    dataFileId: str,
+    data_files_directory: Path = Depends(get_data_files_directory),
+    data_files_store: DataFilesStore = Depends(get_data_files_store),
+    file_reader_writer: FileReaderWriter = Depends(get_file_reader_writer),
+) -> Response:
+    """Get the requested data file by id."""
+    try:
+        data_file_info = data_files_store.get(dataFileId)
+    except FileIdNotFoundError as e:
+        raise FileIdNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
+
+    try:
+        [buffered_file] = await file_reader_writer.read(
+            files=[data_files_directory / dataFileId / data_file_info.name]
+        )
+    except FileNotFoundError as e:
+        raise FileNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
+
+    return Response(
+        content=buffered_file.contents.decode("utf-8"),
+        media_type="text/plain",
     )
