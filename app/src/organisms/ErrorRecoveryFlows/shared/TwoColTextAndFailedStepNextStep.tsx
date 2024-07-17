@@ -8,7 +8,7 @@ import {
   RESPONSIVENESS,
 } from '@opentrons/components'
 
-import { RecoveryContentWrapper } from './RecoveryContentWrapper'
+import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
 import { TwoColumn } from '../../../molecules/InterventionModal'
 import { RecoveryFooterButtons } from './RecoveryFooterButtons'
 import { FailedStepNextStep } from './FailedStepNextStep'
@@ -41,7 +41,7 @@ export function TwoColTextAndFailedStepNextStep(
   const { goBackPrevStep } = routeUpdateActions
 
   return (
-    <RecoveryContentWrapper>
+    <RecoverySingleColumnContentWrapper>
       <TwoColumn>
         <Flex
           flexDirection={DIRECTION_COLUMN}
@@ -72,6 +72,6 @@ export function TwoColTextAndFailedStepNextStep(
         primaryBtnTextOverride={primaryBtnCopy}
         secondaryBtnOnClick={secondaryBtnOnClickOverride ?? goBackPrevStep}
       />
-    </RecoveryContentWrapper>
+    </RecoverySingleColumnContentWrapper>
   )
 }

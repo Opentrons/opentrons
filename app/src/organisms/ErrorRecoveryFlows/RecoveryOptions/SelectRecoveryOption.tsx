@@ -15,7 +15,10 @@ import {
   ODD_SECTION_TITLE_STYLE,
 } from '../constants'
 import { RadioButton } from '../../../atoms/buttons'
-import { RecoveryFooterButtons, RecoveryContentWrapper } from '../shared'
+import {
+  RecoveryFooterButtons,
+  RecoverySingleColumnContentWrapper,
+} from '../shared'
 
 import type { ErrorKind, RecoveryContentProps, RecoveryRoute } from '../types'
 import type { PipetteWithTip } from '../../DropTipWizardFlows'
@@ -58,7 +61,7 @@ export function SelectRecoveryOptionHome({
   useCurrentTipStatus(determineTipStatus)
 
   return (
-    <RecoveryContentWrapper>
+    <RecoverySingleColumnContentWrapper>
       <LegacyStyledText css={ODD_SECTION_TITLE_STYLE} as="h4SemiBold">
         {t('choose_a_recovery_action')}
       </LegacyStyledText>
@@ -76,7 +79,7 @@ export function SelectRecoveryOptionHome({
           void proceedToRouteAndStep(selectedRoute as RecoveryRoute)
         }}
       />
-    </RecoveryContentWrapper>
+    </RecoverySingleColumnContentWrapper>
   )
 }
 

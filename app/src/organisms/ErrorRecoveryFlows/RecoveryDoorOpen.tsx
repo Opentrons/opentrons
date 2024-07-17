@@ -16,7 +16,10 @@ import {
 } from '@opentrons/components'
 import { RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR } from '@opentrons/api-client'
 
-import { RecoveryContentWrapper, RecoveryFooterButtons } from './shared'
+import {
+  RecoverySingleColumnContentWrapper,
+  RecoveryFooterButtons,
+} from './shared'
 
 import type { RecoveryContentProps } from './types'
 
@@ -31,7 +34,7 @@ export function RecoveryDoorOpen({
   const { t } = useTranslation('error_recovery')
 
   return (
-    <RecoveryContentWrapper>
+    <RecoverySingleColumnContentWrapper>
       <Flex
         padding={SPACING.spacing40}
         gridGap={SPACING.spacing24}
@@ -70,7 +73,7 @@ export function RecoveryDoorOpen({
           isLoadingPrimaryBtnAction={isResumeRecoveryLoading}
         />
       </Flex>
-    </RecoveryContentWrapper>
+    </RecoverySingleColumnContentWrapper>
   )
 }
 
