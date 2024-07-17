@@ -249,7 +249,6 @@ export function ProtocolSetupParameters({
         onClickButton={handleConfirmValues}
         buttonText={t('confirm_values')}
         ariaDisabled={enableCsvFile && hasMissingFileParam}
-        buttonIsDisabled={enableCsvFile && hasMissingFileParam}
         iconName={isLoading || startSetup ? 'ot-spinner' : undefined}
         iconPlacement="startIcon"
         secondaryButtonProps={{
