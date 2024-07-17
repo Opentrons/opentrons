@@ -19,7 +19,10 @@ import {
   sortRuntimeParameters,
 } from '@opentrons/shared-data'
 
-import { getRunTimeParameterValuesForRun } from '../Devices/utils'
+import {
+  getRunTimeParameterFilesForRun,
+  getRunTimeParameterValuesForRun,
+} from '../Devices/utils'
 import { ChildNavigation } from '../ChildNavigation'
 import { ResetValuesModal } from './ResetValuesModal'
 import { ChooseEnum } from './ChooseEnum'
@@ -194,17 +197,22 @@ export function ProtocolSetupParameters({
             return { ...acc, [variableName]: uploadedFileResponse.data.id }
           }, {})
           const runTimeParameterValues = getRunTimeParameterValuesForRun(
+            runTimeParametersOverrides
+          )
+          const runTimeParameterFiles = getRunTimeParameterFilesForRun(
             runTimeParametersOverrides,
             mappedResolvedCsvVariableToFileId
           )
           createProtocolAnalysis({
             protocolKey: protocolId,
             runTimeParameterValues,
+            runTimeParameterFiles,
           })
           createRun({
             protocolId,
             labwareOffsets,
             runTimeParameterValues,
+            runTimeParameterFiles,
           })
         })
       }
