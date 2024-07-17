@@ -29,4 +29,4 @@ class StateSummary(BaseModel):
     startedAt: Optional[datetime]
     completedAt: Optional[datetime]
     liquids: List[Liquid] = Field(default_factory=list)
-    wells: List[LiquidHeightInfo] = Field(default_factor=list)
+    wells: List[LiquidHeightInfo] = Field(default_factory=list)
