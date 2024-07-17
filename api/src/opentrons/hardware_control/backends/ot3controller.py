@@ -643,7 +643,7 @@ class OT3Controller(FlexBackend):
                 origin=origin, target_list=[move_target]
             )
         except ZeroLengthMoveError as zme:
-            log.warning(f"Not moving because move was zero length {str(zme)}")
+            log.debug(f"Not moving because move was zero length {str(zme)}")
             return
         moves = movelist[0]
         log.info(f"move: machine {target} from {origin} requires {moves}")
