@@ -300,15 +300,22 @@ class CurrentWell:
     well_name: str
 
 
-class WellDetails(BaseModel):
+class WellIdentifier(BaseModel):
     """Identifying information needed for well state tracking."""
 
     labware_id: str
     well_name: str
 
     def __hash__(self) -> int:
-        """Needed to make WellDetails a key in WellState dictionaries."""
+        """Needed to make WellIdentifier a key in dictionaries."""
         return hash((self.labware_id, self.well_name))
+
+
+class LiquidHeightInfo(BaseModel):
+    """Payload required to store recent measured liquid heights."""
+
+    height: float
+    last_measured: datetime
 
 
 @dataclass(frozen=True)

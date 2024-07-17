@@ -1,5 +1,6 @@
 """Basic well data state and store."""
 from dataclasses import dataclass
+from datetime import datetime
 from typing import Dict, List, Optional
 from opentrons.protocol_engine.actions.actions import (
     FailCommandAction,
@@ -7,7 +8,7 @@ from opentrons.protocol_engine.actions.actions import (
 )
 from opentrons.protocol_engine.commands.liquid_probe import LiquidProbe
 from opentrons.protocol_engine.commands.pipetting_common import LiquidNotFoundError
-from opentrons.protocol_engine.types import WellDetails
+from opentrons.protocol_engine.types import WellIdentifier, LiquidHeightInfo
 
 from .abstract_store import HasState, HandlesActions
 from ..actions import Action
@@ -18,7 +19,7 @@ from ..commands import Command
 class WellState:
     """State of all wells."""
 
-    current_liquid_heights: Dict[WellDetails, float]
+    measured_liquid_heights: Dict[WellIdentifier, LiquidHeightInfo]
 
 
 class WellStore(HasState[WellState], HandlesActions):
@@ -28,7 +29,7 @@ class WellStore(HasState[WellState], HandlesActions):
 
     def __init__(self) -> None:
         """Initialize a well store and its state."""
-        self._state = WellState(current_liquid_heights={})
+        self._state = WellState(measured_liquid_heights={})
 
     def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""
@@ -39,24 +40,31 @@ class WellStore(HasState[WellState], HandlesActions):
 
     def _handle_succeded_command(self, command: Command) -> None:
         if isinstance(command, LiquidProbe):
-            well = WellDetails(
+            well = WellIdentifier(
                 labware_id=command.params.labwareId, well_name=command.params.wellName
             )
             if command.result is None:
-                self._set_liquid_height(well=well, height=None)
+                self._set_liquid_height(well=well, height=None, time=None)
             else:
-                self._set_liquid_height(well=well, height=command.result.z_position)
+                self._set_liquid_height(
+                    well=well,
+                    height=command.result.z_position,
+                    time=command.createdAt,
+                )
 
     def _handle_failed_command(self, action: FailCommandAction) -> None:
         if isinstance(action.error, LiquidNotFoundError):
-            self._set_liquid_height(None)
+            self._set_liquid_height(0)
 
-    def _set_liquid_height(self, well: WellDetails, height: Optional[float]) -> None:
+    def _set_liquid_height(
+        self, well: WellIdentifier, height: Optional[float], time: Optional[datetime]
+    ) -> None:
         """Set the liquid height of the well."""
-        if height is None:
-            del self._state.current_liquid_heights[well]
+        if height is None or time is None:
+            del self._state.measured_liquid_heights[well]
         else:
-            self._state.current_liquid_heights[well] = height
+            lhi = LiquidHeightInfo(height=height, last_measured=time)
+            self._state.measured_liquid_heights[well] = lhi
 
 
 class WellView(HasState[WellState]):
@@ -72,25 +80,25 @@ class WellView(HasState[WellState]):
         """
         self._state = state
 
-    def get_all(self) -> List[float]:
+    def get_all(self) -> List[LiquidHeightInfo]:
         """Get all well liquid heights."""
-        return list(self._state.current_liquid_heights.values())
+        return list(self._state.measured_liquid_heights.values())
 
-    def get_last_measured_liquid_height(self, well: WellDetails) -> Optional[float]:
+    def get_last_measured_liquid_height(self, well: WellIdentifier) -> Optional[float]:
         """Returns the height of the liquid according to the most recent liquid level probe to this well.
 
         Returns None if no liquid probe has been done.
         """
         try:
-            height = self._state.current_liquid_heights[well]
+            height = self._state.measured_liquid_heights[well].height
             return height
         except KeyError:
             return None
 
-    def has_measured_liquid_height(self, well: WellDetails) -> bool:
+    def has_measured_liquid_height(self, well: WellIdentifier) -> bool:
         """Returns True if the well has been liquid level probed previously."""
         try:
-            height = self._state.current_liquid_heights[well]
+            height = self._state.measured_liquid_heights[well].height
             return height is not None
         except KeyError:
             return False
