@@ -22,11 +22,17 @@ from .models import Health, HealthLinks
 
 _log = logging.getLogger(__name__)
 
-OT2_LOG_PATHS = ["/logs/serial.log", "/logs/api.log", "/logs/server.log"]
+OT2_LOG_PATHS = [
+    "/logs/serial.log",
+    "/logs/api.log",
+    "/logs/server.log",
+    "/logs/update_server.log",
+]
 FLEX_LOG_PATHS = [
     "/logs/serial.log",
     "/logs/api.log",
     "/logs/server.log",
+    "/logs/update_server.log",
     "/logs/touchscreen.log",
 ]
 VERSION_PATH = "/etc/VERSION.json"
