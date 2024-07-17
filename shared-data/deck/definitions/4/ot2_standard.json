@@ -9,7 +9,7 @@
   },
   "robot": {
     "model": "OT-2 Standard",
-    "extents": [446.75, 347.50, 0.0],
+    "extents": [446.75, 347.5, 0.0],
     "mountOffsets": {
       "left": [-34, 0.0, 0.0],
       "right": [0.0, 0.0, 0.0]

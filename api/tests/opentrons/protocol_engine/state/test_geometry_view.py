@@ -174,7 +174,20 @@ def addressable_area_store(
 ) -> AddressableAreaStore:
     """Get an addressable area store that can accept actions."""
     return AddressableAreaStore(
-        deck_configuration=[], config=state_config, deck_definition=deck_definition
+        deck_configuration=[],
+        config=state_config,
+        deck_definition=deck_definition,
+        robot_definition={
+            "displayName": "OT-3",
+            "robotType": "OT-3 Standard",
+            "models": ["OT-3 Standard"],
+            "extents": [477.2, 493.8, 0.0],
+            "mountOffsets": {
+                "left": [-13.5, -60.5, 255.675],
+                "right": [40.5, -60.5, 255.675],
+                "gripper": [84.55, -12.75, 93.85],
+            },
+        },
     )
 
 

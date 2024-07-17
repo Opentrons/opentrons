@@ -193,7 +193,7 @@ def test_deck_conflicts_for_96_ch_a1_column_configuration() -> None:
     ):
         # Moving the 96 channel in column configuration with column 1
         # is incompatible with moving to a plate in B3 in the right most
-        # column. 
+        # column.
         instrument.aspirate(25, well_placed_plate.wells_by_name()["A11"])
 
     # No error because we're moving to column 1 of the plate with

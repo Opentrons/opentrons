@@ -234,7 +234,9 @@ def check_safe_for_pipette_movement(
         )
     )
     if not _is_within_pipette_extents(
-        engine_state=engine_state, pipette_id=pipette_id, pipette_bounding_box_at_loc=pipette_bounds_at_well_location
+        engine_state=engine_state,
+        pipette_id=pipette_id,
+        pipette_bounding_box_at_loc=pipette_bounds_at_well_location,
     ):
         raise PartialTipMovementNotAllowedError(
             f"Requested motion with the {primary_nozzle} nozzle partial configuration"
@@ -419,17 +421,19 @@ def _is_within_pipette_extents(
     pip_back_left_bound, pip_front_right_bound, _, _ = pipette_bounding_box_at_loc
     pipette_bounds_offsets = engine_state.pipettes.get_pipette_bounding_box(pipette_id)
     from_back_right = (
-        robot_extent_per_mount.back_right[mount] + pipette_bounds_offsets.back_right_corner
+        robot_extent_per_mount.back_right[mount]
+        + pipette_bounds_offsets.back_right_corner
     )
     from_front_left = (
-        robot_extent_per_mount.front_left[mount] + pipette_bounds_offsets.front_left_corner
+        robot_extent_per_mount.front_left[mount]
+        + pipette_bounds_offsets.front_left_corner
     )
 
     return (
         from_back_right.x >= pip_back_left_bound.x >= from_front_left.x
-        and from_back_right.y >= pip_back_left_bound.y >= from_front_left.y and
-        from_back_right.x >= pip_front_right_bound.x >= from_front_left.x and
-        from_back_right.y >= pip_front_right_bound.y >= from_front_left.y
+        and from_back_right.y >= pip_back_left_bound.y >= from_front_left.y
+        and from_back_right.x >= pip_front_right_bound.x >= from_front_left.x
+        and from_back_right.y >= pip_front_right_bound.y >= from_front_left.y
     )
 
 

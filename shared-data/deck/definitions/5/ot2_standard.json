@@ -8,8 +8,7 @@
     "tags": ["ot2", "12 slots", "standard"]
   },
   "robot": {
-    "model": "OT-2 Standard",
-    "extents": [446.75, 347.50, 0.0]
+    "model": "OT-2 Standard"
   },
   "locations": {
     "addressableAreas": [
