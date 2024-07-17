@@ -1360,13 +1360,10 @@ def test_detect_liquid_presence(
     decoy.verify(mock_protocol_core.set_last_location(loc, mount=subject.get_mount()))
 
 
-@pytest.mark.parametrize("version", versions_at_or_above(APIVersion(2, 20)))
 def test_liquid_probe_without_recovery(
     decoy: Decoy,
     mock_engine_client: EngineClient,
-    mock_protocol_core: ProtocolCore,
     subject: InstrumentCore,
-    version: APIVersion,
 ) -> None:
     """It should raise an exception on an empty well and return a float on a valid well."""
     well_core = WellCore(
@@ -1389,13 +1386,10 @@ def test_liquid_probe_without_recovery(
         subject.liquid_probe_without_recovery(well_core=well_core, loc=loc)
 
 
-@pytest.mark.parametrize("version", versions_at_or_above(APIVersion(2, 20)))
 def test_liquid_probe_with_recovery(
     decoy: Decoy,
     mock_engine_client: EngineClient,
-    mock_protocol_core: ProtocolCore,
     subject: InstrumentCore,
-    version: APIVersion,
 ) -> None:
     """It should not raise an exception on an empty well."""
     well_core = WellCore(
