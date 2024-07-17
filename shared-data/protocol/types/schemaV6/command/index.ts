@@ -21,7 +21,6 @@ export * from './timing'
 export type CommandStatus = 'queued' | 'running' | 'succeeded' | 'failed'
 export interface CommonCommandRunTimeInfo {
   key?: string
-  id: string
   status: CommandStatus
   error?: RunCommandError | null
   createdAt: string
