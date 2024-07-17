@@ -52,7 +52,10 @@ import { useCreateRunFromProtocol } from '../ChooseRobotToRunProtocolSlideout/us
 import { ApplyHistoricOffsets } from '../ApplyHistoricOffsets'
 import { useOffsetCandidatesForAnalysis } from '../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { FileCard } from '../ChooseRobotSlideout/FileCard'
-import { getRunTimeParameterValuesForRun } from '../Devices/utils'
+import {
+  getRunTimeParameterFilesForRun,
+  getRunTimeParameterValuesForRun,
+} from '../Devices/utils'
 import { getAnalysisStatus } from '../ProtocolsLanding/utils'
 
 import type { DropdownOption } from '@opentrons/components'
@@ -230,14 +233,26 @@ export function ChooseProtocolSlideoutComponent(
           return { ...acc, [variableName]: uploadedFileResponse.data.id }
         }, {})
         const runTimeParameterValues = getRunTimeParameterValuesForRun(
+          runTimeParametersOverrides
+        )
+        const runTimeParameterFiles = getRunTimeParameterFilesForRun(
           runTimeParametersOverrides,
           mappedResolvedCsvVariableToFileId
         )
-        createRunFromProtocolSource({
-          files: srcFileObjects,
-          protocolKey: selectedProtocol.protocolKey,
-          runTimeParameterValues,
-        })
+        if (enableCsvFile) {
+          createRunFromProtocolSource({
+            files: srcFileObjects,
+            protocolKey: selectedProtocol.protocolKey,
+            runTimeParameterValues,
+            runTimeParameterFiles,
+          })
+        } else {
+          createRunFromProtocolSource({
+            files: srcFileObjects,
+            protocolKey: selectedProtocol.protocolKey,
+            runTimeParameterValues,
+          })
+        }
       })
     } else {
       logger.warn('failed to create protocol, no protocol selected')
