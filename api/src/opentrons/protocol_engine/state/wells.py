@@ -1,5 +1,4 @@
 """Basic well data state and store."""
-import pdb
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Dict, List, Optional
@@ -90,7 +89,7 @@ class WellView(HasState[WellState]):
             allHeights.extend(a for a in val.values())
         return allHeights
 
-    def get_wells_in_labware(self, labware_id: str) -> List[LiquidHeightInfo]:
+    def get_all_in_labware(self, labware_id: str) -> List[LiquidHeightInfo]:
         """Get all well liquid heights for a particular labware."""
         return list(self._state.measured_liquid_heights[labware_id].values())
 
