@@ -945,8 +945,8 @@ class InstrumentContext(publisher.CommandPublisher):
                 # in which self.starting_tip consumes tips. It would currently vary
                 # depending on the configuration layout of a pipette at a given
                 # time, which means that some combination of starting tip and partial
-                # configuraiton are incompatible under the current understanding of
-                # starting tip behavior. Replacing starting_tip with an undeprecated
+                # configuration are incompatible under the current understanding of
+                # starting tip behavior. Replacing starting_tip with an un-deprecated
                 # Labware.has_tip may solve this.
                 raise CommandPreconditionViolated(
                     "Automatic tip tracking is not available when using a partial pipette"
