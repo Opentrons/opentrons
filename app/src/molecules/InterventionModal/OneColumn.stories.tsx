@@ -7,7 +7,7 @@ import { StandInContent } from './story-utils/StandIn'
 
 import type { Meta, StoryObj } from '@storybook/react'
 
-const meta: Meta<React.ComponentProps<OneColumnComponent>> = {
+const meta: Meta<React.ComponentProps<typeof OneColumnComponent>> = {
   title: 'App/Molecules/InterventionModal/OneColumn',
   component: OneColumnComponent,
   render: args => (
@@ -28,6 +28,6 @@ const meta: Meta<React.ComponentProps<OneColumnComponent>> = {
 
 export default meta
 
-export type Story = StoryObj<OneColumnComponent>
+export type Story = StoryObj<typeof OneColumnComponent>
 
 export const ExampleOneColumn: Story = { args: {} }
