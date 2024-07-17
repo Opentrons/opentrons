@@ -132,7 +132,7 @@ def test_close_shave_deck_conflicts_for_96_ch_a12_column_configuration() -> None
     p1000_96.configure_nozzle_layout(style=SINGLE, start="A12", tip_racks=[tiprack_8])
 
     hs.close_labware_latch()  # type: ignore[union-attr]
-    # Note 
+    # Note
     p1000_96.distribute(
         15,
         res12["A6"],
