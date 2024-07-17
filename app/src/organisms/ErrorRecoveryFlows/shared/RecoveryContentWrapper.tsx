@@ -104,8 +104,8 @@ export function RecoveryODDOneDesktopTwoColumnContentWrapper({
 const STYLE = css`
   gap: ${SPACING.spacing24};
   width: 100%;
+  height: 100%;
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     gap: none;
-    height: 100%;
   }
 `

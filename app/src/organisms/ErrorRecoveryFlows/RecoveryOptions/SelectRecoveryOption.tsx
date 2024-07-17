@@ -151,7 +151,11 @@ export function DesktopRecoveryOptions({
           ({
             value: option,
             children: (
-              <StyledText role="label" htmlFor={option}>
+              <StyledText
+                desktopStyle="bodyDefaultRegular"
+                role="label"
+                htmlFor={option}
+              >
                 {getRecoveryOptionCopy(option)}
               </StyledText>
             ),

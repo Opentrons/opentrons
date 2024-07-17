@@ -1,6 +1,8 @@
 import * as React from 'react'
+
+import { css } from 'styled-components'
 import type { ChangeEventHandler } from 'react'
-import { RadioGroup } from '@opentrons/components'
+import { RadioGroup, SPACING, Flex } from '@opentrons/components'
 
 // note: this typescript stuff is so that e.currentTarget.value in the ChangeEventHandler
 // is deduced to a union of the values of the options passed to the radiogroup rather than
@@ -28,11 +30,14 @@ export function RecoveryRadioGroup<T extends string>(
 ): JSX.Element {
   return (
     <RadioGroup
+      css={css``}
       {...props}
       options={props.options.map(radioOption => ({
         name: '',
         value: radioOption.value,
-        children: radioOption.children,
+        children: (
+          <Flex marginY={SPACING.spacing4}>{radioOption.children}</Flex>
+        ),
       }))}
     />
   )
