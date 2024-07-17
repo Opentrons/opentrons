@@ -1315,6 +1315,51 @@ def test_configure_for_volume_post_219(
         )
 
 
+@pytest.mark.parametrize(
+    ("returned_from_engine", "expected_return_from_core"),
+    [
+        (None, False),
+        (0, True),
+        (1, True),
+    ],
+)
+def test_detect_liquid_presence(
+    returned_from_engine: Optional[float],
+    expected_return_from_core: bool,
+    decoy: Decoy,
+    mock_protocol_core: ProtocolCore,
+    mock_engine_client: EngineClient,
+    subject: InstrumentCore,
+) -> None:
+    """It should convert a height result from the engine to True/False."""
+    well_core = WellCore(
+        name="my cool well", labware_id="123abc", engine_client=mock_engine_client
+    )
+    decoy.when(
+        mock_engine_client.execute_command_without_recovery(
+            cmd.TryLiquidProbeParams(
+                pipetteId=subject.pipette_id,
+                wellLocation=WellLocation(
+                    origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0)
+                ),
+                wellName=well_core.get_name(),
+                labwareId=well_core.labware_id,
+            )
+        )
+    ).then_return(
+        cmd.TryLiquidProbeResult.construct(
+            z_position=returned_from_engine,
+            position=object(),  # type: ignore[arg-type]
+        )
+    )
+    loc = Location(Point(0, 0, 0), None)
+
+    result = subject.detect_liquid_presence(well_core=well_core, loc=loc)
+    assert result == expected_return_from_core
+
+    decoy.verify(mock_protocol_core.set_last_location(loc, mount=subject.get_mount()))
+
+
 @pytest.mark.parametrize("version", versions_at_or_above(APIVersion(2, 20)))
 def test_liquid_probe_without_recovery(
     decoy: Decoy,
