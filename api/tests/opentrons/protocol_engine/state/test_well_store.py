@@ -1,7 +1,6 @@
 """Well state store tests."""
 import pytest
 from opentrons.protocol_engine.state.wells import WellStore
-from opentrons.protocol_engine.types import WellIdentifier
 from opentrons.protocol_engine.actions.actions import SucceedCommandAction
 
 from .command_fixtures import create_liquid_probe_command
@@ -15,7 +14,8 @@ def subject() -> WellStore:
 
 def test_handles_liquid_probe_success(subject: WellStore) -> None:
     """It should add the well to the state after a successful liquid probe."""
-    well_id = WellIdentifier(labware_id="labware-id", well_name="well-name")
+    labware_id = "labware-id"
+    well_name = "well-name"
 
     liquid_probe = create_liquid_probe_command()
 
@@ -25,4 +25,4 @@ def test_handles_liquid_probe_success(subject: WellStore) -> None:
 
     assert len(subject.state.measured_liquid_heights) == 1
 
-    assert subject.state.measured_liquid_heights[well_id].height == 0.5
+    assert subject.state.measured_liquid_heights[labware_id][well_name].height == 0.5
