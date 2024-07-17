@@ -110,8 +110,8 @@ class GeometryView:
         right_offset = self._addressable_areas.mount_offsets["right"]
 
         front_left_abs = {
-            MountType.LEFT: left_offset,
-            MountType.RIGHT: right_offset,
+            MountType.LEFT: Point(left_offset.x, -1 * left_offset.y, left_offset.z),
+            MountType.RIGHT: Point(right_offset.x, -1 * right_offset.y, right_offset.z),
         }
         back_right_abs = {
             MountType.LEFT: self._addressable_areas.deck_extents + left_offset,
