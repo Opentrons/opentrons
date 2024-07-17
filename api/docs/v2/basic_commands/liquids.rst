@@ -261,9 +261,11 @@ This example aspirates enough air to fill the remaining volume in a pipette::
 Detect Liquids
 ==============
 
-The :py:meth:`.InstrumentContext.detect_liquid_presence` method liquid presence detection to occur and returns the result. It will not raise an error if liquid is not present.
-A return-presence command
+The :py:meth:`.InstrumentContext.detect_liquid_presence` method tells the robot to check for a liquid and return the results. It returns ``True`` if liquid is detected and ``False`` if liquid is not detected. It will not raise an error or stop your protocol if a liquid is not present in a well or reservoir. See also :ref:`lld`.
 
+.. code-block:: python
+
+    pipette.detect_liquid_presence()
 
 .. versionadded:: 2.20
 
