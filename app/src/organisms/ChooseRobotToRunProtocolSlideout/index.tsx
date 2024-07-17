@@ -22,7 +22,10 @@ import { useFeatureFlag } from '../../redux/config'
 import { OPENTRONS_USB } from '../../redux/discovery'
 import { appShellRequestor } from '../../redux/shell/remote'
 import { useTrackCreateProtocolRunEvent } from '../Devices/hooks'
-import { getRunTimeParameterValuesForRun } from '../Devices/utils'
+import {
+  getRunTimeParameterFilesForRun,
+  getRunTimeParameterValuesForRun,
+} from '../Devices/utils'
 import { ApplyHistoricOffsets } from '../ApplyHistoricOffsets'
 import { useOffsetCandidatesForAnalysis } from '../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { ChooseRobotSlideout } from '../ChooseRobotSlideout'
@@ -161,6 +164,9 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
           return { ...acc, [variableName]: uploadedFileResponse.data.id }
         }, {})
         const runTimeParameterValues = getRunTimeParameterValuesForRun(
+          runTimeParametersOverrides
+        )
+        const runTimeParameterFiles = getRunTimeParameterFilesForRun(
           runTimeParametersOverrides,
           mappedResolvedCsvVariableToFileId
         )
@@ -168,6 +174,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
           files: srcFileObjects,
           protocolKey,
           runTimeParameterValues,
+          runTimeParameterFiles,
         })
       })
     } else {

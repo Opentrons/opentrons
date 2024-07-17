@@ -1374,7 +1374,7 @@ def test_liquid_probe_without_recovery(
             cmd.LiquidProbeParams(
                 pipetteId=subject.pipette_id,
                 wellLocation=WellLocation(
-                    origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0)
+                    origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=2)
                 ),
                 wellName=well_core.get_name(),
                 labwareId=well_core.labware_id,
@@ -1402,7 +1402,7 @@ def test_liquid_probe_with_recovery(
             cmd.LiquidProbeParams(
                 pipetteId=subject.pipette_id,
                 wellLocation=WellLocation(
-                    origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0)
+                    origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=2.0)
                 ),
                 wellName=well_core.get_name(),
                 labwareId=well_core.labware_id,

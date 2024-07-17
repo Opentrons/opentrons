@@ -1,5 +1,5 @@
 """Create ticket for robot with error."""
-from typing import List, Tuple, Any, Dict
+from typing import List, Tuple, Any, Dict, Optional
 from abr_testing.data_collection import read_robot_logs, abr_google_drive, get_run_logs
 import requests
 import argparse
@@ -18,7 +18,7 @@ from statistics import mean, StatisticsError
 def compare_current_trh_to_average(
     robot: str,
     start_time: Any,
-    end_time: Any,
+    end_time: Optional[Any],
     protocol_name: str,
     storage_directory: str,
 ) -> str:
@@ -38,27 +38,29 @@ def compare_current_trh_to_average(
     df_all_trh = pd.DataFrame(all_trh_data)
     # Convert timestamps to datetime objects
     df_all_trh["Timestamp"] = pd.to_datetime(
-        df_all_trh["Timestamp"], format="mixed"
+        df_all_trh["Timestamp"], format="mixed", utc=True
     ).dt.tz_localize(None)
     # Ensure start_time is timezone-naive
     start_time = start_time.replace(tzinfo=None)
-    end_time = end_time.replace(tzinfo=None)
     relevant_temp_rhs = df_all_trh[
-        (df_all_trh["Robot"] == robot)
-        & (df_all_trh["Timestamp"] >= start_time)
-        & (df_all_trh["Timestamp"] <= end_time)
+        (df_all_trh["Robot"] == robot) & (df_all_trh["Timestamp"] >= start_time)
     ]
     try:
         avg_temp = round(mean(relevant_temp_rhs["Temp (oC)"]), 2)
         avg_rh = round(mean(relevant_temp_rhs["Relative Humidity (%)"]), 2)
     except StatisticsError:
-        avg_temp = None
-        avg_rh = None
+        # If there is one value assign it as the average.
+        if len(relevant_temp_rhs["Temp (oC)"]) == 1:
+            avg_temp = relevant_temp_rhs["Temp (oC)"][0]
+            avg_rh = relevant_temp_rhs["Relative Humidity (%)"][0]
+        else:
+            avg_temp = None
+            avg_rh = None
     # Get AVG t/rh of runs w/ same robot & protocol newer than 3 wks old with no errors
     weeks_ago_3 = start_time - timedelta(weeks=3)
     df_all_run_data = pd.DataFrame(all_run_data)
     df_all_run_data["Start_Time"] = pd.to_datetime(
-        df_all_run_data["Start_Time"], format="mixed"
+        df_all_run_data["Start_Time"], format="mixed", utc=True
     ).dt.tz_localize(None)
     df_all_run_data["Errors"] = pd.to_numeric(df_all_run_data["Errors"])
     df_all_run_data["Average Temp (oC)"] = pd.to_numeric(
@@ -283,7 +285,9 @@ def get_robot_state(
     components = match_error_to_component("RABR", reported_string, components)
     print(components)
     end_time = datetime.now()
+    print(end_time)
     start_time = end_time - timedelta(hours=2)
+    print(start_time)
     # Get current temp/rh compared to historical data
     temp_rh_string = compare_current_trh_to_average(
         parent, start_time, end_time, "", storage_directory

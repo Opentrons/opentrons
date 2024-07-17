@@ -130,6 +130,7 @@ async def test_liquid_probe_implementation_no_prep(
             pipette_id="abc",
             labware_id="123",
             well_name="A3",
+            well_location=location,
         ),
     ).then_return(15.0)
 
@@ -152,7 +153,7 @@ async def test_liquid_probe_implementation_with_prep(
     result_type: EitherResultType,
 ) -> None:
     """A Liquid Probe should have an execution implementation with preparing to aspirate."""
-    location = WellLocation(origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0))
+    location = WellLocation(origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=2))
 
     data = params_type(
         pipetteId="abc",
@@ -179,6 +180,7 @@ async def test_liquid_probe_implementation_with_prep(
             pipette_id="abc",
             labware_id="123",
             well_name="A3",
+            well_location=location,
         ),
     ).then_return(15.0)
 
@@ -188,6 +190,17 @@ async def test_liquid_probe_implementation_with_prep(
     assert result == SuccessData(
         public=result_type(z_position=15.0, position=DeckPoint(x=1, y=2, z=3)),
         private=None,
+    )
+
+    decoy.verify(
+        await movement.move_to_well(
+            pipette_id="abc",
+            labware_id="123",
+            well_name="A3",
+            well_location=WellLocation(
+                origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=2)
+            ),
+        ),
     )
 
 
@@ -237,6 +250,7 @@ async def test_liquid_not_found_error(
             pipette_id=pipette_id,
             labware_id=labware_id,
             well_name=well_name,
+            well_location=well_location,
         ),
     ).then_raise(PipetteLiquidNotFoundError())
 

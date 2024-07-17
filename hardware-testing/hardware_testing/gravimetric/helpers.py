@@ -168,7 +168,7 @@ def _jog_to_find_liquid_height(
     ctx: ProtocolContext, pipette: InstrumentContext, well: Well
 ) -> float:
     _well_depth = well.depth
-    _liquid_height = _well_depth
+    _liquid_height = _well_depth + 2
     _jog_size = -1.0
     if ctx.is_simulating():
         return _liquid_height - 1
