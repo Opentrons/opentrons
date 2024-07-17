@@ -26,15 +26,9 @@ class Metadata(TypedDict, total=False):
     displayName: str
     tags: List[str]
 
-class mountOffset(TypedDict):
-    left: List[float]
-    right: List[float]
-    gripper: Optional[List[float]]
 
 class Robot(TypedDict):
     model: RobotModel
-    extents: List[float]
-    mountOffsets: mountOffset
 
 
 class BoundingBox(TypedDict):
