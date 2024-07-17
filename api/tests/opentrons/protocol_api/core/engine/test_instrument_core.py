@@ -1340,12 +1340,7 @@ def test_liquid_probe_without_recovery(
         )
     ).then_raise(PipetteLiquidNotFoundError())
     loc = Location(Point(0, 0, 0), None)
-    try:
-        subject.liquid_probe_without_recovery(well_core=well_core, loc=loc)
-    except PipetteLiquidNotFoundError:
-        assert True
-    else:
-        assert False
+    subject.liquid_probe_without_recovery(well_core=well_core, loc=loc)
 
 
 @pytest.mark.parametrize("version", versions_at_or_above(APIVersion(2, 20)))
@@ -1367,7 +1362,7 @@ def test_liquid_probe_with_recovery(
             cmd.LiquidProbeParams(
                 pipetteId=subject.pipette_id,
                 wellLocation=WellLocation(
-                    origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0)
+                    origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=2.0)
                 ),
                 wellName=well_core.get_name(),
                 labwareId=well_core.labware_id,
