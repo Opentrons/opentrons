@@ -874,5 +874,4 @@ class InstrumentCore(AbstractInstrument[WellCore]):
 
         self._protocol_core.set_last_location(location=loc, mount=self.get_mount())
 
-        if result is not None and isinstance(result, LiquidProbeResult):
-            return result.z_position
+        return result.z_position
