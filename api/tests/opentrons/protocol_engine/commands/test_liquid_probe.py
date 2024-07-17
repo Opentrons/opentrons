@@ -130,6 +130,7 @@ async def test_liquid_probe_implementation_no_prep(
             pipette_id="abc",
             labware_id="123",
             well_name="A3",
+            well_location=location,
         ),
     ).then_return(15.0)
 
@@ -179,6 +180,7 @@ async def test_liquid_probe_implementation_with_prep(
             pipette_id="abc",
             labware_id="123",
             well_name="A3",
+            well_location=location,
         ),
     ).then_return(15.0)
 
@@ -248,6 +250,7 @@ async def test_liquid_not_found_error(
             pipette_id=pipette_id,
             labware_id=labware_id,
             well_name=well_name,
+            well_location=well_location,
         ),
     ).then_raise(PipetteLiquidNotFoundError())
 
