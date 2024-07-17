@@ -1340,12 +1340,8 @@ def test_liquid_probe_without_recovery(
         )
     ).then_raise(PipetteLiquidNotFoundError())
     loc = Location(Point(0, 0, 0), None)
-    try:
+    with pytest.raises(PipetteLiquidNotFoundError):
         subject.liquid_probe_without_recovery(well_core=well_core, loc=loc)
-    except PipetteLiquidNotFoundError:
-        assert True
-    else:
-        assert False
 
 
 @pytest.mark.parametrize("version", versions_at_or_above(APIVersion(2, 20)))
