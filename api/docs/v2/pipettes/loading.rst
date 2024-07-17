@@ -221,10 +221,10 @@ Another example is a Flex protocol that uses a waste chute. Say you want to only
 Liquid Presence Verification
 ============================
 
-Liquid Presence Verification (LPV) is a pressure-based feature that gives all Opentrons pipettes the ability to detect the presence or absence of a liquid in a well or reservoir. You can use LPV to identify, avoid, and recover from liquid-related protocol errors or just check for the presence or absence of a fluid---all with or without interrupting a protocol run. You can activate LPV globally for an entire protocol run, or turn it on and off as needed. LPV is disabled by default.
+Liquid Presence Verification (LPV) is a pressure-based feature that allows Opentrons Flex pipettes to detect the presence of liquids in a well, reservoir, or other container. With LPV, you have the ability to identify, avoid, and recover from liquid-related protocol errors. Additionally, you can use it to check for the presence or absence of a fluid, all without interrupting a protocol run. LPV can be globally activated for the entire protocol run or toggled on and off as required. LPV works with Flex pipettes only and is disabled by default.
 
 .. note::
-    If your protocol uses :ref:`partial tip pickup <partial-tip-pickup>`, the pressure sensors for the Flex 8-Channel pipette are on channels 1 and 8. For the 96-Channel Pipette, the pressure sensors are on channels 1 and 96.
+    If your protocol uses :ref:`partial tip pickup <partial-tip-pickup>`, the pressure sensors for the Flex 8-Channel pipette are on channels 1 and 8. For the Flex 96-Channel Pipette, the pressure sensors are on channels 1 and 96.
 
 Enable LPV Globally
 -------------------
