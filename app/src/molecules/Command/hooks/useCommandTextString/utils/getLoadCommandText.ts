@@ -1,44 +1,33 @@
-import { useTranslation } from 'react-i18next'
 import {
   getModuleDisplayName,
   getModuleType,
   getOccludedSlotCountForModule,
   getPipetteNameSpecs,
 } from '@opentrons/shared-data'
+
 import {
   getLabwareName,
   getPipetteNameOnMount,
   getModuleModel,
   getModuleDisplayLocation,
   getLiquidDisplayName,
-} from './utils'
+} from '../../../utils'
 
-import type {
-  RunTimeCommand,
-  RobotType,
-  LoadLabwareRunTimeCommand,
-} from '@opentrons/shared-data'
-import type { CommandTextData } from './types'
+import type { LoadLabwareRunTimeCommand } from '@opentrons/shared-data'
+import type { GetCommandText } from '..'
 
-interface LoadCommandTextProps {
-  command: RunTimeCommand
-  commandTextData: CommandTextData
-  robotType: RobotType
-}
-
-export const LoadCommandText = ({
+export const getLoadCommandText = ({
   command,
   commandTextData,
   robotType,
-}: LoadCommandTextProps): JSX.Element | null => {
-  const { t } = useTranslation('run_details')
-
-  switch (command.commandType) {
+  t,
+}: GetCommandText): string => {
+  switch (command?.commandType) {
     case 'loadPipette': {
-      const pipetteModel = getPipetteNameOnMount(
-        commandTextData,
-        command.params.mount
-      )
+      const pipetteModel =
+        commandTextData != null
+          ? getPipetteNameOnMount(commandTextData, command.params.mount)
+          : null
       return t('load_pipette_protocol_setup', {
         pipette_name:
           pipetteModel != null
@@ -63,10 +52,10 @@ export const LoadCommandText = ({
         command.params.location !== 'offDeck' &&
         'moduleId' in command.params.location
       ) {
-        const moduleModel = getModuleModel(
-          commandTextData,
-          command.params.location.moduleId
-        )
+        const moduleModel =
+          commandTextData != null
+            ? getModuleModel(commandTextData, command.params.location.moduleId)
+            : null
         const moduleName =
           moduleModel != null ? getModuleDisplayName(moduleModel) : ''
 
@@ -79,10 +68,13 @@ export const LoadCommandText = ({
                 )
               : 1,
           labware: command.result?.definition.metadata.displayName,
-          slot_name: getModuleDisplayLocation(
-            commandTextData,
-            command.params.location.moduleId
-          ),
+          slot_name:
+            commandTextData != null
+              ? getModuleDisplayLocation(
+                  commandTextData,
+                  command.params.location.moduleId
+                )
+              : null,
           module_name: moduleName,
         })
       } else if (
@@ -91,7 +83,7 @@ export const LoadCommandText = ({
       ) {
         const labwareId = command.params.location.labwareId
         const labwareName = command.result?.definition.metadata.displayName
-        const matchingAdapter = commandTextData.commands.find(
+        const matchingAdapter = commandTextData?.commands.find(
           (command): command is LoadLabwareRunTimeCommand =>
             command.commandType === 'loadLabware' &&
             command.result?.labwareId === labwareId
@@ -111,24 +103,27 @@ export const LoadCommandText = ({
             slot_name: adapterLoc?.slotName,
           })
         } else if (adapterLoc != null && 'moduleId' in adapterLoc) {
-          const moduleModel = getModuleModel(
-            commandTextData,
-            adapterLoc?.moduleId ?? ''
-          )
+          const moduleModel =
+            commandTextData != null
+              ? getModuleModel(commandTextData, adapterLoc?.moduleId ?? '')
+              : null
           const moduleName =
             moduleModel != null ? getModuleDisplayName(moduleModel) : ''
           return t('load_labware_info_protocol_setup_adapter_module', {
             labware: labwareName,
             adapter_name: adapterName,
             module_name: moduleName,
-            slot_name: getModuleDisplayLocation(
-              commandTextData,
-              adapterLoc?.moduleId ?? ''
-            ),
+            slot_name:
+              commandTextData != null
+                ? getModuleDisplayLocation(
+                    commandTextData,
+                    adapterLoc?.moduleId ?? ''
+                  )
+                : null,
           })
         } else {
           //  shouldn't reach here, adapter shouldn't have location  type labwareId
-          return null
+          return ''
         }
       } else {
         const labware =
@@ -148,8 +143,14 @@ export const LoadCommandText = ({
     case 'loadLiquid': {
       const { liquidId, labwareId } = command.params
       return t('load_liquids_info_protocol_setup', {
-        liquid: getLiquidDisplayName(commandTextData, liquidId),
-        labware: getLabwareName(commandTextData, labwareId),
+        liquid:
+          commandTextData != null
+            ? getLiquidDisplayName(commandTextData, liquidId)
+            : null,
+        labware:
+          commandTextData != null
+            ? getLabwareName(commandTextData, labwareId)
+            : null,
       })
     }
     default: {
@@ -157,7 +158,7 @@ export const LoadCommandText = ({
         'LoadCommandText encountered a command with an unrecognized commandType: ',
         command
       )
-      return null
+      return ''
     }
   }
 }

@@ -1,50 +1,46 @@
-import { useTranslation } from 'react-i18next'
-
 import { getLabwareDefURI } from '@opentrons/shared-data'
 
-import { getLoadedLabware } from './utils/accessors'
+import { getLoadedLabware } from '../../../utils/accessors'
 import {
   getLabwareName,
   getLabwareDisplayLocation,
   getFinalLabwareLocation,
   getWellRange,
   getLabwareDefinitionsFromCommands,
-} from './utils'
-import type {
-  PipetteName,
-  PipettingRunTimeCommand,
-  RobotType,
-} from '@opentrons/shared-data'
-import type { CommandTextData } from './types'
+} from '../../../utils'
+
+import type { PipetteName, RunTimeCommand } from '@opentrons/shared-data'
 import type { TFunction } from 'i18next'
+import type { GetCommandText } from '..'
 
-interface PipettingCommandTextProps {
-  command: PipettingRunTimeCommand
-  commandTextData: CommandTextData
-  robotType: RobotType
-}
-
-export const PipettingCommandText = ({
+export const getPipettingCommandText = ({
   command,
   commandTextData,
   robotType,
-}: PipettingCommandTextProps): JSX.Element | null => {
-  const { t } = useTranslation('protocol_command_text')
-
+  t,
+}: GetCommandText): string => {
   const labwareId =
-    'labwareId' in command.params ? command.params.labwareId : ''
-  const wellName = 'wellName' in command.params ? command.params.wellName : ''
+    command != null && 'labwareId' in command.params
+      ? (command.params.labwareId as string)
+      : ''
+  const wellName =
+    command != null && 'wellName' in command.params
+      ? command.params.wellName
+      : ''
 
-  const allPreviousCommands = commandTextData.commands.slice(
+  const allPreviousCommands = commandTextData?.commands.slice(
     0,
-    commandTextData.commands.findIndex(c => c.id === command.id)
+    commandTextData.commands.findIndex(c => c.id === command?.id)
   )
-  const labwareLocation = getFinalLabwareLocation(
-    labwareId,
-    allPreviousCommands
-  )
+  const labwareLocation =
+    allPreviousCommands != null
+      ? getFinalLabwareLocation(
+          labwareId,
+          allPreviousCommands as RunTimeCommand[]
+        )
+      : null
   const displayLocation =
-    labwareLocation != null
+    labwareLocation != null && commandTextData != null
       ? getLabwareDisplayLocation(
           commandTextData,
           labwareLocation,
@@ -52,12 +48,15 @@ export const PipettingCommandText = ({
           robotType
         )
       : ''
-  switch (command.commandType) {
+  switch (command?.commandType) {
     case 'aspirate': {
       const { volume, flowRate } = command.params
       return t('aspirate', {
         well_name: wellName,
-        labware: getLabwareName(commandTextData, labwareId),
+        labware:
+          commandTextData != null
+            ? getLabwareName(commandTextData, labwareId)
+            : null,
         labware_location: displayLocation,
         volume,
         flow_rate: flowRate,
@@ -68,7 +67,10 @@ export const PipettingCommandText = ({
       return pushOut != null
         ? t('dispense_push_out', {
             well_name: wellName,
-            labware: getLabwareName(commandTextData, labwareId),
+            labware:
+              commandTextData != null
+                ? getLabwareName(commandTextData, labwareId)
+                : null,
             labware_location: displayLocation,
             volume,
             flow_rate: flowRate,
@@ -76,7 +78,10 @@ export const PipettingCommandText = ({
           })
         : t('dispense', {
             well_name: wellName,
-            labware: getLabwareName(commandTextData, labwareId),
+            labware:
+              commandTextData != null
+                ? getLabwareName(commandTextData, labwareId)
+                : null,
             labware_location: displayLocation,
             volume,
             flow_rate: flowRate,
@@ -86,46 +91,67 @@ export const PipettingCommandText = ({
       const { flowRate } = command.params
       return t('blowout', {
         well_name: wellName,
-        labware: getLabwareName(commandTextData, labwareId),
+        labware:
+          commandTextData != null
+            ? getLabwareName(commandTextData, labwareId)
+            : null,
         labware_location: displayLocation,
         flow_rate: flowRate,
       })
     }
     case 'dropTip': {
-      const loadedLabware = getLoadedLabware(commandTextData, labwareId)
-      const labwareDefinitions = getLabwareDefinitionsFromCommands(
-        commandTextData.commands
-      )
-      const labwareDef = labwareDefinitions.find(
+      const loadedLabware =
+        commandTextData != null
+          ? getLoadedLabware(commandTextData, labwareId)
+          : null
+      const labwareDefinitions =
+        commandTextData != null
+          ? getLabwareDefinitionsFromCommands(
+              commandTextData.commands as RunTimeCommand[]
+            )
+          : null
+      const labwareDef = labwareDefinitions?.find(
         lw => getLabwareDefURI(lw) === loadedLabware?.definitionUri
       )
       return Boolean(labwareDef?.parameters.isTiprack)
         ? t('return_tip', {
             well_name: wellName,
-            labware: getLabwareName(commandTextData, labwareId),
+            labware:
+              commandTextData != null
+                ? getLabwareName(commandTextData, labwareId)
+                : null,
             labware_location: displayLocation,
           })
         : t('drop_tip', {
             well_name: wellName,
-            labware: getLabwareName(commandTextData, labwareId),
+            labware:
+              commandTextData != null
+                ? getLabwareName(commandTextData, labwareId)
+                : null,
           })
     }
     case 'pickUpTip': {
       const pipetteId = command.params.pipetteId
       const pipetteName:
         | PipetteName
-        | undefined = commandTextData.pipettes.find(
+        | undefined = commandTextData?.pipettes.find(
         pipette => pipette.id === pipetteId
       )?.pipetteName
 
       return t('pickup_tip', {
-        well_range: getWellRange(
-          pipetteId,
-          allPreviousCommands,
-          wellName,
-          pipetteName
-        ),
-        labware: getLabwareName(commandTextData, labwareId),
+        well_range:
+          allPreviousCommands != null
+            ? getWellRange(
+                pipetteId,
+                allPreviousCommands as RunTimeCommand[],
+                wellName as string,
+                pipetteName
+              )
+            : null,
+        labware:
+          commandTextData != null
+            ? getLabwareName(commandTextData, labwareId)
+            : null,
         labware_location: displayLocation,
       })
     }
@@ -149,7 +175,7 @@ export const PipettingCommandText = ({
         'PipettingCommandText encountered a command with an unrecognized commandType: ',
         command
       )
-      return null
+      return ''
     }
   }
 }
