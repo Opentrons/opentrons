@@ -3,7 +3,7 @@ import * as React from 'react'
 import { Box, RESPONSIVENESS } from '@opentrons/components'
 
 import { OneColumn as OneColumnComponent } from './'
-import { StandIn } from './story-utils/StandIn'
+import { StandInContent } from './story-utils/StandIn'
 
 import type { Meta, StoryObj } from '@storybook/react'
 
@@ -20,7 +20,7 @@ const meta: Meta<React.ComponentProps<OneColumnComponent>> = {
       `}
     >
       <OneColumnComponent>
-        <StandIn>This is a standin for another component</StandIn>
+        <StandInContent>This is a standin for another component</StandInContent>
       </OneColumnComponent>
     </Box>
   ),
