@@ -306,6 +306,12 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         ...
 
     @abstractmethod
+    def detect_liquid_presence(
+        self, well_core: WellCoreType, loc: types.Location
+    ) -> bool:
+        """Do a liquid probe to detect whether there is liquid in the well."""
+
+    @abstractmethod
     def liquid_probe_with_recovery(
         self, well_core: WellCoreType, loc: types.Location
     ) -> None:

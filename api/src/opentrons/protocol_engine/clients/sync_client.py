@@ -83,6 +83,12 @@ class SyncClient:
     ) -> commands.LiquidProbeResult:
         pass
 
+    @overload
+    def execute_command_without_recovery(
+        self, params: commands.TryLiquidProbeParams
+    ) -> commands.TryLiquidProbeResult:
+        pass
+
     def execute_command_without_recovery(
         self, params: commands.CommandParams
     ) -> commands.CommandResult:
