@@ -36,7 +36,7 @@ import type { CutoutId, CutoutFixtureId } from '@opentrons/shared-data'
 import type { SetupScreens } from '../../pages/ProtocolSetup'
 import { useRunStatus } from '../RunTimeControl/hooks'
 import { RUN_STATUS_STOPPED } from '@opentrons/api-client'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 const ATTACHED_MODULE_POLL_MS = 5000
 const DECK_CONFIG_POLL_MS = 5000
@@ -58,13 +58,13 @@ export function ProtocolSetupModulesAndDeck({
   setProvidedFixtureOptions,
 }: ProtocolSetupModulesAndDeckProps): JSX.Element {
   const { i18n, t } = useTranslation('protocol_setup')
-  const history = useHistory()
+  const navigate = useNavigate()
   const runStatus = useRunStatus(runId)
   React.useEffect(() => {
     if (runStatus === RUN_STATUS_STOPPED) {
-      history.push('/protocols')
+      navigate('/protocols')
     }
-  }, [runStatus, history])
+  }, [runStatus, navigate])
   const [
     showSetupInstructionsModal,
     setShowSetupInstructionsModal,

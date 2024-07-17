@@ -2,7 +2,7 @@ import * as React from 'react'
 import isEmpty from 'lodash/isEmpty'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
-import { NavLink, Redirect, useParams } from 'react-router-dom'
+import { NavLink, Navigate, Route, useParams } from 'react-router-dom'
 import styled, { css } from 'styled-components'
 
 import {
@@ -125,11 +125,9 @@ function RoundTab({
 }
 
 export function ProtocolRunDetails(): JSX.Element | null {
-  const {
-    robotName,
-    runId,
-    protocolRunDetailsTab,
-  } = useParams<DesktopRouteParams>()
+  const { robotName, runId, protocolRunDetailsTab } = useParams<
+    keyof DesktopRouteParams
+  >() as DesktopRouteParams
   const dispatch = useDispatch<Dispatch>()
 
   const robot = useRobot(robotName)
@@ -224,7 +222,8 @@ function PageContents(props: PageContentsProps): JSX.Element {
     protocolRunDetailsTab
   ] ?? (
     // default to the setup tab if no tab or nonexistent tab is passed as a param
-    <Redirect to={`/devices/${robotName}/protocol-runs/${runId}/setup`} />
+
+    <Navigate to={`/devices/${robotName}/protocol-runs/${runId}/setup`} />
   )
 
   return (
@@ -277,7 +276,7 @@ const SetupTab = (props: SetupTabProps): JSX.Element | null => {
       />
       {currentRunId !== runId ? (
         // redirect to run preview if not current run
-        <Redirect
+        <Navigate
           to={`/devices/${robotName}/protocol-runs/${runId}/run-preview`}
         />
       ) : null}
@@ -305,7 +304,7 @@ const ParametersTab = (props: ParametersTabProps): JSX.Element | null => {
         tabName={t('parameters')}
       />
       {disabled ? (
-        <Redirect
+        <Navigate
           to={`/devices/${robotName}/protocol-runs/${runId}/run-preview`}
         />
       ) : null}
@@ -346,7 +345,8 @@ const ModuleControlsTab = (
       />
       {disabled ? (
         // redirect to run preview if not current run
-        <Redirect
+
+        <Navigate
           to={`/devices/${robotName}/protocol-runs/${runId}/run-preview`}
         />
       ) : null}

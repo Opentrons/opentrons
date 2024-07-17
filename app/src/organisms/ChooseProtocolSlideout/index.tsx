@@ -1,7 +1,7 @@
 import * as React from 'react'
 import first from 'lodash/first'
 import { Trans, useTranslation } from 'react-i18next'
-import { Link, NavLink, useHistory } from 'react-router-dom'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 
@@ -89,7 +89,7 @@ export function ChooseProtocolSlideoutComponent(
   props: ChooseProtocolSlideoutProps
 ): JSX.Element | null {
   const { t } = useTranslation(['device_details', 'shared'])
-  const history = useHistory()
+  const navigate = useNavigate()
   const logger = useLogger(new URL('', import.meta.url).pathname)
   const [targetProps, tooltipProps] = useTooltip()
   const [targetPropsHover, tooltipPropsHover] = useHoverTooltip()
@@ -190,7 +190,7 @@ export function ChooseProtocolSlideoutComponent(
           name: 'createProtocolRecordResponse',
           properties: { success: true },
         })
-        history.push(`/devices/${name}/protocol-runs/${runData.id}`)
+        navigate(`/devices/${name}/protocol-runs/${runData.id}`)
       },
       onError: (error: Error) => {
         trackCreateProtocolRunEvent({

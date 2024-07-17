@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import {
   ALIGN_CENTER,
@@ -25,7 +25,7 @@ const ESTOP_STATUS_REFETCH_INTERVAL_MS = 10000
 
 export function EmergencyStop(): JSX.Element {
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
-  const history = useHistory()
+  const navigate = useNavigate()
 
   // Note here the touchscreen app is using status since status is linked to EstopPhysicalStatuses
   // left notPresent + right disengaged => disengaged
@@ -102,7 +102,7 @@ export function EmergencyStop(): JSX.Element {
           buttonText={i18n.format(t('shared:continue'), 'capitalize')}
           disabled={!isEstopConnected}
           onClick={() => {
-            history.push('/robot-settings/rename-robot')
+            navigate('/robot-settings/rename-robot')
           }}
         />
       </Flex>

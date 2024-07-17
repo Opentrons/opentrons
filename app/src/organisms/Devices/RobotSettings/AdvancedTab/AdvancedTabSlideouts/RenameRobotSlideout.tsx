@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useForm, Controller } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import {
@@ -57,7 +57,7 @@ export function RenameRobotSlideout({
   )
   const isFlex = useIsFlex(robotName)
   const trackEvent = useTrackEvent()
-  const history = useHistory()
+  const navigate = useNavigate()
   const dispatch = useDispatch<Dispatch>()
   const connectableRobots = useSelector((state: State) =>
     getConnectableRobots(state)
@@ -136,10 +136,10 @@ export function RenameRobotSlideout({
   const { updateRobotName } = useUpdateRobotNameMutation({
     onSuccess: (data: UpdatedRobotName) => {
       // TODO: 6/10/2022 kj for the robot name, we need to use GET: /server/name
-      // data.name != null && history.push(`/devices/${data.name}/robot-settings`)
+      // data.name != null && navigate(`/devices/${data.name}/robot-settings`)
       // TODO 6/9/2022 kj this is a temporary fix to avoid the issue
       // https://github.com/Opentrons/opentrons/issues/10709
-      data.name != null && history.push(`/devices`)
+      data.name != null && navigate(`/devices`)
       dispatch(removeRobot(previousRobotName))
     },
     onError: (error: Error) => {

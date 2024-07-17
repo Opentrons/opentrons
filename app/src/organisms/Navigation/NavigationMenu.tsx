@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import {
   ALIGN_CENTER,
@@ -37,7 +37,7 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
     setShowRestartRobotConfirmationModal,
   ] = React.useState<boolean>(false)
 
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const handleRestart = (): void => {
     setShowRestartRobotConfirmationModal(true)
@@ -97,7 +97,7 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
         <MenuItem
           key="deck-configuration"
           onClick={() => {
-            history.push('/deck-configuration')
+            navigate('/deck-configuration')
           }}
         >
           <Flex alignItems={ALIGN_CENTER}>

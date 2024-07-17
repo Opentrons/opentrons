@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import { Link, useHistory } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 import {
   RUN_STATUS_IDLE,
@@ -139,7 +139,7 @@ export function ProtocolRunHeader({
   makeHandleJumpToStep,
 }: ProtocolRunHeaderProps): JSX.Element | null {
   const { t } = useTranslation(['run_details', 'shared'])
-  const history = useHistory()
+  const navigate = useNavigate()
   const host = useHost()
   const createdAtTimestamp = useRunCreatedAtTimestamp(runId)
   const {
@@ -228,9 +228,9 @@ export function ProtocolRunHeader({
 
   React.useEffect(() => {
     if (protocolData != null && !isRobotViewable) {
-      history.push(`/devices`)
+      navigate(`/devices`)
     }
-  }, [protocolData, isRobotViewable, history])
+  }, [protocolData, isRobotViewable, navigate])
 
   // Side effects dependent on the current run state.
   React.useEffect(() => {
@@ -254,7 +254,7 @@ export function ProtocolRunHeader({
 
   // redirect to new run after successful reset
   const onResetSuccess = (createRunResponse: Run): void => {
-    history.push(
+    navigate(
       `/devices/${robotName}/protocol-runs/${createRunResponse.data.id}/run-preview`
     )
   }
@@ -577,7 +577,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
     isFixtureMismatch,
     isResetRunLoadingRef,
   } = props
-  const history = useHistory()
+  const navigate = useNavigate()
   const { t } = useTranslation(['run_details', 'shared'])
   const attachedModules =
     useModulesQuery({
@@ -597,7 +597,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
   } = useRunControls(runId, (createRunResponse: Run): void =>
     // redirect to new run after successful reset
     {
-      history.push(
+      navigate(
         `/devices/${robotName}/protocol-runs/${createRunResponse.data.id}/run-preview`
       )
     }
@@ -726,7 +726,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
         confirmAttachment()
       } else {
         play()
-        history.push(`/devices/${robotName}/protocol-runs/${runId}/run-preview`)
+        navigate(`/devices/${robotName}/protocol-runs/${runId}/run-preview`)
         trackProtocolRunEvent({
           name:
             runStatus === RUN_STATUS_IDLE
