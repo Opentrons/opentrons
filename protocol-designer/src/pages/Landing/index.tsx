@@ -19,7 +19,7 @@ export function Landing(): JSX.Element {
         marginTop={SPACING.spacing24}
         gridGap={SPACING.spacing16}
       >
-        <NavLink to={'/createNewProtocol'}>{t('create_new')}</NavLink>
+        <NavLink to={'/createNew'}>{t('create_new')}</NavLink>
         {t('import')}
       </Flex>
     </Flex>
