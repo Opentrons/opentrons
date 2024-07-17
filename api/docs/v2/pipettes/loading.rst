@@ -257,13 +257,6 @@ Next, tell the robot to aspirate and dispense some liquid from the reservoir::
     pipette.aspirate(100, reservoir["A1"])  #LLD happens during this step
     pipette.dispense(100, plate["A1"])
 
-Finally, discard the used tip, pick up a new tip, and continue the protocol with LLD enabled::
-
-    pipette.drop_tip()
-    pipette.pick_up_tip(tiprack2)
-
-Remember, LLD will not work with used tips.
-
 Turing LLD Off and On
 ---------------------
 
@@ -286,3 +279,5 @@ To turn LLD on after deactivating it, add ``pipette.liquid_presence_detection=Tr
     pipette.aspirate(100, reservoir["A3"])
 
 LLD will resume until it is disabled again, raises an error, or the protocol completes.
+
+.. versionadded:: 2.20
