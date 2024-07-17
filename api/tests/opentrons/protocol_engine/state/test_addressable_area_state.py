@@ -28,6 +28,17 @@ def test_deck_configuration_setting(
             deck_type=DeckType.OT3_STANDARD,
         ),
         deck_definition=ot3_standard_deck_def,
+        robot_definition={
+            "displayName": "OT-3",
+            "robotType": "OT-3 Standard",
+            "models": ["OT-3 Standard"],
+            "extents": [477.2, 493.8, 0.0],
+            "mountOffsets": {
+                "left": [-13.5, -60.5, 255.675],
+                "right": [40.5, -60.5, 255.675],
+                "gripper": [84.55, -12.75, 93.85],
+            },
+        },
     )
     subject_view = AddressableAreaView(subject.state)
 

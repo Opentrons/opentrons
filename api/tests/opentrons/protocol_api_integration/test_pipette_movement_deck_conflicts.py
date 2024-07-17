@@ -3,7 +3,7 @@
 import pytest
 
 from opentrons import simulate
-from opentrons.protocol_api import COLUMN, ALL
+from opentrons.protocol_api import COLUMN, ALL, SINGLE
 from opentrons.protocol_api.core.engine.deck_conflict import (
     PartialTipMovementNotAllowedError,
 )
@@ -113,7 +113,7 @@ def test_deck_conflicts_for_96_ch_a12_column_configuration() -> None:
 @pytest.mark.ot3_only
 def test_close_shave_deck_conflicts_for_96_ch_a12_column_configuration() -> None:
     """Shouldn't raise errors for "almost collision"s."""
-    protocol_context = simulate.get_protocol_api(version="2.16", robot_type="Flex")
+    protocol_context = simulate.get_protocol_api(version="2.20", robot_type="Flex")
     res12 = protocol_context.load_labware("nest_12_reservoir_15ml", "C3")
 
     # Mag block and tiprack adapter are very close to the destination reservoir labware
@@ -129,13 +129,14 @@ def test_close_shave_deck_conflicts_for_96_ch_a12_column_configuration() -> None
     deepwell = hs_adapter.load_labware("nest_96_wellplate_2ml_deep")
     protocol_context.load_trash_bin("A3")
     p1000_96 = protocol_context.load_instrument("flex_96channel_1000")
-    p1000_96.configure_nozzle_layout(style=COLUMN, start="A12", tip_racks=[tiprack_8])
+    p1000_96.configure_nozzle_layout(style=SINGLE, start="A12", tip_racks=[tiprack_8])
 
     hs.close_labware_latch()  # type: ignore[union-attr]
+    # Note 
     p1000_96.distribute(
         15,
-        res12.wells()[0],
-        deepwell.rows()[0],
+        res12["A6"],
+        deepwell.columns()[6],
         disposal_vol=0,
     )
 

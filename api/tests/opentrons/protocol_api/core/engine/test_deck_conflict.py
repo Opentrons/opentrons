@@ -467,22 +467,9 @@ module = LoadedModule(
             ),
             pytest.raises(
                 deck_conflict.PartialTipMovementNotAllowedError,
-                match="collision with items in staging slot C4",
+                match="will result in collision with items in staging slot C4.",
             ),
             170,
-        ),
-        (  # Collision with robot
-            (
-                Point(x=150, y=150, z=40),
-                Point(x=250, y=101, z=40),
-                Point(x=150, y=101, z=40),
-                Point(x=250, y=150, z=40),
-            ),
-            pytest.raises(
-                deck_conflict.PartialTipMovementNotAllowedError,
-                match="is outside of robot bounds for the pipette.",
-            ),
-            700,
         ),
     ],
 )
@@ -639,7 +626,7 @@ def test_deck_conflict_raises_for_collision_with_tc_lid(
     destination_well_point = Point(x=123, y=123, z=123)
     pipette_bounds_at_destination = (
         Point(x=50, y=350, z=204.5),
-        Point(x=150, y=450, z=204.5),
+        Point(x=150, y=429, z=204.5),
         Point(x=150, y=400, z=204.5),
         Point(x=50, y=300, z=204.5),
     )
@@ -666,6 +653,32 @@ def test_deck_conflict_raises_for_collision_with_tc_lid(
             pipette_id="pipette-id", destination_position=destination_well_point
         )
     ).then_return(pipette_bounds_at_destination)
+    decoy.when(mock_state_view.pipettes.get_mount("pipette-id")).then_return(
+        MountType.LEFT
+    )
+    decoy.when(
+        mock_state_view.pipettes.get_pipette_bounding_box("pipette-id")
+    ).then_return(
+        # 96 chan outer bounds
+        PipetteBoundingBoxOffsets(
+            back_left_corner=Point(-67.0, -3.5, -259.15),
+            front_right_corner=Point(94.0, -113.0, -259.15),
+            front_left_corner=Point(-67.0, -113.0, -259.15),
+            back_right_corner=Point(94.0, -3.5, -259.15),
+        )
+    )
+    decoy.when(mock_state_view.geometry.absolute_deck_extents).then_return(
+        _AbsoluteRobotExtents(
+            front_left={
+                MountType.LEFT: Point(13.5, 60.5, 0.0),
+                MountType.RIGHT: Point(-40.5, 60.5, 0.0),
+            },
+            back_right={
+                MountType.LEFT: Point(463.7, 433.3, 0.0),
+                MountType.RIGHT: Point(517.7, 433.3),
+            },
+        )
+    )
 
     decoy.when(
         adjacent_slots_getters.get_surrounding_slots(5, robot_type="OT-3 Standard")

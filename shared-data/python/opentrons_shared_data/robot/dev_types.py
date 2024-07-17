@@ -1,6 +1,6 @@
 """opentrons_shared_data.robot.dev_types: types for robot def."""
 import enum
-from typing import NewType, List, Dict, Any, Optional
+from typing import NewType, List, Dict, Any
 from typing_extensions import Literal, TypedDict, NotRequired
 
 RobotSchemaVersion1 = Literal[1]
@@ -30,6 +30,8 @@ class RobotTypeEnum(enum.Enum):
 
 
 class mountOffset(TypedDict):
+    """The mount offsets for a given robot type based off the center of the carriage.."""
+
     left: List[float]
     right: List[float]
     gripper: NotRequired[List[float]]
