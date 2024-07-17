@@ -1,7 +1,7 @@
 """Liquid Sense OT3."""
 from opentrons.protocol_api import ProtocolContext, OFF_DECK
 
-metadata = {"protocolName": "liquid-sense-ot3-p50-single-vial"}
+metadata = {"protocolName": "liquid-sense-ot3-p50-single-96well"}
 requirements = {"robotType": "Flex", "apiLevel": "2.17"}
 
 SLOT_SCALE = 1
@@ -9,7 +9,7 @@ SLOT_DIAL = 9
 SLOTS_TIPRACK = {
     50: [3],
 }
-LABWARE_ON_SCALE = "radwag_pipette_calibration_vial"
+LABWARE_ON_SCALE = "corning_96_wellplate_360ul_flat"
 
 
 def run(ctx: ProtocolContext) -> None:
