@@ -14,6 +14,7 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
+  DIRECTION_ROW,
 } from '@opentrons/components'
 
 import type { RouteProps } from './types'
@@ -31,7 +32,7 @@ export function Navbar({ routes }: { routes: RouteProps[] }): JSX.Element {
       alignItems={ALIGN_CENTER}
     >
       <Flex
-        flexDirection="row"
+        flexDirection={DIRECTION_ROW}
         flex={FLEX_NONE}
         alignItems={ALIGN_FLEX_START}
         alignSelf={ALIGN_STRETCH}
