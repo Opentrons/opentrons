@@ -13,7 +13,7 @@ from ..errors.exceptions import (
     InvalidPushOutVolumeError,
     InvalidDispenseVolumeError,
 )
-from opentrons.protocol_engine import WellLocation
+from opentrons.protocol_engine.types import WellLocation
 
 # 1e-9 µL (1 femtoliter!) is a good value because:
 # * It's large relative to rounding errors that occur in practice in protocols. For

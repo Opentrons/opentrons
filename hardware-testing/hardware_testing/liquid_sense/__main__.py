@@ -6,7 +6,7 @@ from pathlib import Path
 import subprocess
 from time import sleep
 import os
-from typing import List, Any, Optional
+from typing import List, Any, Optional, Dict
 import traceback
 import sys
 
@@ -69,7 +69,7 @@ LABWARE_OFFSETS: List[LabwareOffset] = []
 MAX_PROBE_SECONDS = 3.5
 
 
-LIQUID_SENSE_CFG = {
+LIQUID_SENSE_CFG: Dict[int, Dict[int, Any]] = {
     50: {
         1: liquid_sense_ot3_p50_single_vial,
         8: liquid_sense_ot3_p50_multi,

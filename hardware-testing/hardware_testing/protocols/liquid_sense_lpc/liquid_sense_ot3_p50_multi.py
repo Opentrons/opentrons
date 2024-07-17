@@ -6,9 +6,7 @@ requirements = {"robotType": "Flex", "apiLevel": "2.15"}
 
 SLOT_SCALE = 1
 SLOT_DIAL = 9
-SLOTS_TIPRACK = {
-    50: [3]
-}
+SLOTS_TIPRACK = {50: [3]}
 LABWARE_ON_SCALE = "nest_12_reservoir_15ml"
 
 
