@@ -8,11 +8,18 @@ export function uploadCsvFile(
   config: HostConfig,
   data: FileData
 ): ResponsePromise<UploadedCsvFileResponse> {
-  return request<UploadedCsvFileResponse>(
+  let formData
+
+  if (typeof data !== 'string') {
+    formData = new FormData()
+    formData.append('file', data)
+  } else {
+    formData = data
+  }
+  return request<UploadedCsvFileResponse, FormData | string>(
     POST,
     '/dataFiles',
-    null,
-    config,
-    data
+    formData,
+    config
   )
 }
