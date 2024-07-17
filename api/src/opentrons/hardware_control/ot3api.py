@@ -1671,6 +1671,11 @@ class OT3API(
             self._current_position,
         )
         pip_ax = Axis.of_main_tool_actuator(checked_mount)
+        # always use the (higher) aspirate acceleration during upward motion
+        # NOTE: for HW testing, it might help with keeping o-rings static friction lower
+        up_acceleration = self._pipette_handler.plunger_acceleration(
+            instrument, instrument.flow_acceleration
+        )
         # speed depends on if there is a tip, and which direction to move
         if instrument.has_tip:
             # using slower aspirate flow-rate, to avoid pulling droplets up
@@ -1702,26 +1707,29 @@ class OT3API(
             await self._backend.set_active_current(
                 {pip_ax: instrument.config.plunger_homing_configurations.current}
             )
-            if self._current_position[pip_ax] < backlash_pos[pip_ax]:
-                await self._move(
-                    backlash_pos,
-                    speed=(speed_down * rate),
-                    acquire_lock=acquire_lock,
-                )
             await self._move(
-                overshoot_pos,
+                backlash_pos,
                 speed=(speed_down * rate),
                 acquire_lock=acquire_lock,
             )
-            # NOTE: This should ALWAYS be moving UP.
-            #       There should never be a time that this function is called and
-            #       the plunger doesn't physically move UP into it's BOTTOM position.
-            #       This is to make sure we are always engaged at the beginning of aspirate.
-            await self._move(
-                target_pos,
-                speed=(speed_up * rate),
-                acquire_lock=acquire_lock,
-            )
+            async with self.restore_system_constrants():
+                await self.set_system_constraints_for_plunger_acceleration(
+                    checked_mount, up_acceleration
+                )
+                await self._move(
+                    overshoot_pos,
+                    speed=(speed_down * rate),
+                    acquire_lock=acquire_lock,
+                )
+                # NOTE: This should ALWAYS be moving UP.
+                #       There should never be a time that this function is called and
+                #       the plunger doesn't physically move UP into it's BOTTOM position.
+                #       This is to make sure we are always engaged at the beginning of aspirate.
+                await self._move(
+                    target_pos,
+                    speed=(speed_up * rate),
+                    acquire_lock=acquire_lock,
+                )
 
     async def configure_for_volume(
         self, mount: Union[top_types.Mount, OT3Mount], volume: float
