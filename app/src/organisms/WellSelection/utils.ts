@@ -26,6 +26,7 @@ export function clientRectToBoundingRect(rect: ClientRect): BoundingRect {
   }
 }
 
+// TODO(jh, 07-17-24): Consider checking specific well labels instead of elementAtPoint as a more robust alternative.
 export const getCollidingWells = (rectPositions: GenericRect): WellGroup => {
   const isElementVisible = (element: HTMLElement): boolean => {
     const rect = element.getBoundingClientRect()
