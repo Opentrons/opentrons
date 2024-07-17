@@ -803,15 +803,7 @@ class PipetteView(HasState[PipetteState]):
     def get_pipette_bounding_box(self, pipette_id: str) -> PipetteBoundingBoxOffsets:
         """Get the bounding box of the pipette."""
         return self.get_config(pipette_id).pipette_bounding_box_offsets
-<<<<<<< HEAD
 
-    def get_pipette_bounding_box(self, pipette_id: str) -> PipetteBoundingBoxOffsets:
-        """Get the bounding box of the pipette."""
-        return self.get_config(pipette_id).pipette_bounding_box_offsets
-
-=======
-    
->>>>>>> fix bound check to properly account for the length of the pipette
     def get_pipette_bounds_at_specified_move_to_position(
         self,
         pipette_id: str,
