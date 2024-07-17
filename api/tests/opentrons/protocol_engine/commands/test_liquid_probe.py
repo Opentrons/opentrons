@@ -24,6 +24,7 @@ from opentrons.protocol_engine.commands.liquid_probe import (
     LiquidProbeParams,
     LiquidProbeResult,
     LiquidProbeImplementation,
+    TryLiquidProbeParams,
     TryLiquidProbeResult,
     TryLiquidProbeImplementation,
 )
@@ -43,36 +44,41 @@ EitherImplementationType = Union[
     Type[LiquidProbeImplementation], Type[TryLiquidProbeImplementation]
 ]
 EitherImplementation = Union[LiquidProbeImplementation, TryLiquidProbeImplementation]
+EitherParamsType = Union[Type[LiquidProbeParams], Type[TryLiquidProbeParams]]
 EitherResultType = Union[Type[LiquidProbeResult], Type[TryLiquidProbeResult]]
 
 
 @pytest.fixture(
     params=[
-        (LiquidProbeImplementation, LiquidProbeResult),
-        (TryLiquidProbeImplementation, TryLiquidProbeResult),
+        (LiquidProbeImplementation, LiquidProbeParams, LiquidProbeResult),
+        (TryLiquidProbeImplementation, TryLiquidProbeParams, TryLiquidProbeResult),
     ]
 )
-def implementation_and_result_types(
+def types(
     request: pytest.FixtureRequest,
-) -> tuple[EitherImplementationType, EitherResultType]:
-    """Return an implementation class and the result class associated with it."""
+) -> tuple[EitherImplementationType, EitherParamsType, EitherResultType]:
+    """Return a tuple of types associated with a single variant of the command."""
     return request.param  # type: ignore[no-any-return]
 
 
 @pytest.fixture
 def implementation_type(
-    implementation_and_result_types: tuple[EitherImplementationType, object]
+    types: tuple[EitherImplementationType, object, object]
 ) -> EitherImplementationType:
-    """Return an implementation class. This is kept in sync with `result_type`."""
-    return implementation_and_result_types[0]
+    """Return an implementation type. Kept in sync with the params and result types."""
+    return types[0]
 
 
 @pytest.fixture
-def result_type(
-    implementation_and_result_types: tuple[object, EitherResultType]
-) -> EitherResultType:
-    """Return a result class. This is kept in sync with `implementation_type`."""
-    return implementation_and_result_types[1]
+def params_type(types: tuple[object, EitherParamsType, object]) -> EitherParamsType:
+    """Return a params type. Kept in sync with the implementation and result types."""
+    return types[1]
+
+
+@pytest.fixture
+def result_type(types: tuple[object, object, EitherResultType]) -> EitherResultType:
+    """Return a result type. Kept in sync with the implementation and params types."""
+    return types[2]
 
 
 @pytest.fixture
@@ -95,12 +101,13 @@ async def test_liquid_probe_implementation_no_prep(
     movement: MovementHandler,
     pipetting: PipettingHandler,
     subject: EitherImplementation,
+    params_type: EitherParamsType,
     result_type: EitherResultType,
 ) -> None:
     """A Liquid Probe should have an execution implementation without preparing to aspirate."""
     location = WellLocation(origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1))
 
-    data = LiquidProbeParams(
+    data = params_type(
         pipetteId="abc",
         labwareId="123",
         wellName="A3",
@@ -141,12 +148,13 @@ async def test_liquid_probe_implementation_with_prep(
     movement: MovementHandler,
     pipetting: PipettingHandler,
     subject: EitherImplementation,
+    params_type: EitherParamsType,
     result_type: EitherResultType,
 ) -> None:
     """A Liquid Probe should have an execution implementation with preparing to aspirate."""
     location = WellLocation(origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0))
 
-    data = LiquidProbeParams(
+    data = params_type(
         pipetteId="abc",
         labwareId="123",
         wellName="A3",
@@ -188,6 +196,7 @@ async def test_liquid_not_found_error(
     movement: MovementHandler,
     pipetting: PipettingHandler,
     subject: EitherImplementation,
+    params_type: EitherParamsType,
     model_utils: ModelUtils,
 ) -> None:
     """It should return a liquid not found error if the hardware API indicates that."""
@@ -203,7 +212,7 @@ async def test_liquid_not_found_error(
     error_id = "error-id"
     error_timestamp = datetime(year=2020, month=1, day=2)
 
-    data = LiquidProbeParams(
+    data = params_type(
         pipetteId=pipette_id,
         labwareId=labware_id,
         wellName=well_name,
@@ -261,6 +270,7 @@ async def test_liquid_probe_tip_checking(
     decoy: Decoy,
     pipetting: PipettingHandler,
     subject: EitherImplementation,
+    params_type: EitherParamsType,
 ) -> None:
     """It should return a TipNotAttached error if the hardware API indicates that."""
     pipette_id = "pipette-id"
@@ -270,7 +280,7 @@ async def test_liquid_probe_tip_checking(
         origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1)
     )
 
-    data = LiquidProbeParams(
+    data = params_type(
         pipetteId=pipette_id,
         labwareId=labware_id,
         wellName=well_name,
@@ -290,6 +300,7 @@ async def test_liquid_probe_volume_checking(
     decoy: Decoy,
     pipetting: PipettingHandler,
     subject: EitherImplementation,
+    params_type: EitherParamsType,
 ) -> None:
     """It should return a TipNotEmptyError if the hardware API indicates that."""
     pipette_id = "pipette-id"
@@ -299,7 +310,7 @@ async def test_liquid_probe_volume_checking(
         origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1)
     )
 
-    data = LiquidProbeParams(
+    data = params_type(
         pipetteId=pipette_id,
         labwareId=labware_id,
         wellName=well_name,
@@ -316,6 +327,7 @@ async def test_liquid_probe_location_checking(
     decoy: Decoy,
     movement: MovementHandler,
     subject: EitherImplementation,
+    params_type: EitherParamsType,
 ) -> None:
     """It should return a PositionUnkownError if the hardware API indicates that."""
     pipette_id = "pipette-id"
@@ -325,7 +337,7 @@ async def test_liquid_probe_location_checking(
         origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1)
     )
 
-    data = LiquidProbeParams(
+    data = params_type(
         pipetteId=pipette_id,
         labwareId=labware_id,
         wellName=well_name,

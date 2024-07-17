@@ -38,8 +38,21 @@ LiquidProbeCommandType = Literal["liquidProbe"]
 TryLiquidProbeCommandType = Literal["tryLiquidProbe"]
 
 
-class LiquidProbeParams(PipetteIdMixin, WellLocationMixin):
-    """Parameters required to liquid probe a specific well."""
+# Both command variants should have identical parameters.
+# But we need two separate parameter model classes because
+# `command_unions.CREATE_TYPES_BY_PARAMS_TYPE` needs to be a 1:1 mapping.
+class _CommonParams(PipetteIdMixin, WellLocationMixin):
+    pass
+
+
+class LiquidProbeParams(_CommonParams):
+    """Parameters required for a `liquidProbe` command."""
+
+    pass
+
+
+class TryLiquidProbeParams(_CommonParams):
+    """Parameters required for a `tryLiquidProbe` command."""
 
     pass
 
@@ -88,7 +101,7 @@ class LiquidProbeImplementation(
         self._pipetting = pipetting
         self._model_utils = model_utils
 
-    async def execute(self, params: LiquidProbeParams) -> _LiquidProbeExecuteReturn:
+    async def execute(self, params: _CommonParams) -> _LiquidProbeExecuteReturn:
         """Move to and liquid probe the requested well.
 
         Return the z-position of the found liquid.
@@ -160,7 +173,7 @@ class LiquidProbeImplementation(
 
 
 class TryLiquidProbeImplementation(
-    AbstractCommandImpl[LiquidProbeParams, _TryLiquidProbeExecuteReturn]
+    AbstractCommandImpl[TryLiquidProbeParams, _TryLiquidProbeExecuteReturn]
 ):
     """The implementation of a `tryLiquidProbe` command."""
 
@@ -175,7 +188,7 @@ class TryLiquidProbeImplementation(
         self._pipetting = pipetting
         self._model_utils = model_utils
 
-    async def execute(self, params: LiquidProbeParams) -> _TryLiquidProbeExecuteReturn:
+    async def execute(self, params: _CommonParams) -> _TryLiquidProbeExecuteReturn:
         """Execute a `tryLiquidProbe` command.
 
         `tryLiquidProbe` is identical to `liquidProbe`, except that if no liquid is
@@ -230,12 +243,12 @@ class LiquidProbe(
 
 
 class TryLiquidProbe(
-    BaseCommand[LiquidProbeParams, TryLiquidProbeResult, ErrorOccurrence]
+    BaseCommand[TryLiquidProbeParams, TryLiquidProbeResult, ErrorOccurrence]
 ):
     """The model for a full `tryLiquidProbe` command."""
 
     commandType: TryLiquidProbeCommandType = "tryLiquidProbe"
-    params: LiquidProbeParams
+    params: TryLiquidProbeParams
     result: Optional[TryLiquidProbeResult]
 
     _ImplementationCls: Type[
@@ -252,10 +265,10 @@ class LiquidProbeCreate(BaseCommandCreate[LiquidProbeParams]):
     _CommandCls: Type[LiquidProbe] = LiquidProbe
 
 
-class TryLiquidProbeCreate(BaseCommandCreate[LiquidProbeParams]):
+class TryLiquidProbeCreate(BaseCommandCreate[TryLiquidProbeParams]):
     """The request model for a `tryLiquidProbe` command."""
 
     commandType: TryLiquidProbeCommandType = "tryLiquidProbe"
-    params: LiquidProbeParams
+    params: TryLiquidProbeParams
 
     _CommandCls: Type[TryLiquidProbe] = TryLiquidProbe
