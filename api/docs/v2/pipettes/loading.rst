@@ -216,20 +216,20 @@ Another example is a Flex protocol that uses a waste chute. Say you want to only
 .. versionchanged:: 2.16
     Added support for ``TrashBin`` and ``WasteChute`` objects.
 
-.. _lld:
+.. _lpv:
 
-Liquid Level Detection
-======================
+Liquid Presence Verification
+============================
 
-All Opentrons Flex pipettes can sense liquids in a well plate or reservoir. Known as liquid level detection (LLD), this feature uses pressure sensors inside each pipette to detect the presence or absence of liquid in a well, reservoir, or other type of container. You can use LLD to avoid and recover from liquid-related protocol errors or just check for the presence or absence of a fluid with or without interrupting a protocol run. LLD is disabled by default.
+Liquid Presence Verification (LPV) is a pressure-based feature that gives all Opentrons pipettes the ability to detect the presence or absence of a liquid in a well or reservoir. You can use LPV to identify, avoid, and recover from liquid-related protocol errors or just check for the presence or absence of a fluid---all with or without interrupting a protocol run. You can activate LPV globally for an entire protocol run, or turn it on and off as needed. LPV is disabled by default.
 
 .. note::
     If your protocol uses :ref:`partial tip pickup <partial-tip-pickup>`, the pressure sensors for the Flex 8-Channel pipette are on channels 1 and 8. For the 96-Channel Pipette, the pressure sensors are on channels 1 and 96.
 
-Enable LLD Globally
+Enable LPV Globally
 -------------------
 
-The easiest, and recommended, way to use LLD is by adding the optional Boolean argument, ``liquid_presence_detection=True`` to :py:meth:`.ProtocolContext.load_instrument`. When ``True``, the robot will perform LLD on every aspiration. You can also turn LLD off and back on again later in a protocol. This example adds LLD to the 8-Channel Pipette used in the sample protocol at the top of the page.
+The easiest, and recommended, way to use LPV is by adding the optional Boolean argument, ``liquid_presence_detection=True`` to :py:meth:`.ProtocolContext.load_instrument` in your protocol. When ``True``, the robot will perform LPV on every aspiration. You can also turn LPV off and back on again later in a protocol. This example adds LPV to the 8-Channel Pipette used in the sample protocol at the top of the page.
 
 .. code-block:: python
 
@@ -241,43 +241,40 @@ The easiest, and recommended, way to use LLD is by adding the optional Boolean a
     )
 
 .. note::
-    LLD requires fresh, dry pipette tips. Protocols using LLD must discard used tips after aspirating and dispensing and pick up new tips before the next cycle. The API will raise an error if LLD is active and your protocol attempts to reuse a pipette tip.
+    LPV requires fresh, dry pipette tips. Protocols using LPV must discard used tips after an aspirate/dispense cycle and pick up new tips before the next cycle. The API will raise an error if LPV is active and your protocol attempts to reuse a pipette tip.
 
-Now, let's add some commands and start the cycle. First, tell the robot to pick up a new, clean tip::
+Let's take a look at how all this works. First, tell the robot to pick up a new, clean tip::
     
     pipette.pick_up_tip(tiprack2)
-
-..
-    2 tipracks in the page example: tiprack1 & tiprack2
-    the 8-channel uses tiprack2
-    does this need to specify the tip coords each time? e.g. (tiprack2["A1"]), (tiprack2["A2"]) etc
 
 Next, tell the robot to aspirate and dispense some liquid from the reservoir::
 
-    pipette.aspirate(100, reservoir["A1"])  #LLD happens during this step
+    pipette.aspirate(100, reservoir["A1"])
     pipette.dispense(100, plate["A1"])
 
-Turing LLD Off and On
+LPV takes place during aspiration. Flex continues to execute your protocol until it no longer detects liquid. When the robot doesn't detect liquid, it raises an error and stops the protocol until the problem is resolved.
+
+Turing LPV Off and On
 ---------------------
 
-You can turn LLD off and on throughout a protocol. To turn LLD off, add ``pipette.liquid_presence_detection=False`` at the point in a protocol where it needs to be disabled, usually between picking up a new tip and aspirating a liquid. This overrides the global argument, ``liquid_presence_detection=True`` that we set on :py:meth:`~.ProtocolContext.load_instrument`. Let's try this starting after picking up a new tip. 
+You can turn LPV off and on throughout a protocol. To turn LPV off, add ``pipette.liquid_presence_detection=False`` at the point in a protocol where it needs to be disabled, usually between picking up a new tip and aspirating a liquid. This overrides the global argument, ``liquid_presence_detection=True`` that we set on :py:meth:`~.ProtocolContext.load_instrument`. Let's try this starting after picking up a new tip. 
 
 .. code-block:: python
     
     pipette.pick_up_tip(tiprack2)
-    pipette.liquid_presence_detection=False
+    pipette.liquid_presence_detection=False  #LPV off
     pipette.aspirate(100, reservoir["A2"])
 
-Going forward, the pipette will not perform LLD until you turn this feature back on. 
+Going forward, the pipette will not perform LPV until you turn this feature back on. 
 
-To turn LLD on after deactivating it, add ``pipette.liquid_presence_detection=True`` at the point in a protocol where it needs to be enabled, usually between picking up a new tip and aspirating a liquid.
+To reactivate LPV, add ``pipette.liquid_presence_detection=True`` at the point in a protocol where it needs to be enabled, usually between picking up a new tip and aspirating a liquid.
 
 .. code-block:: python
 
     pipette.pick_up_tip(tiprack2)
-    pipette.liquid_presence_detection=True
+    pipette.liquid_presence_detection=True  #LPV on again
     pipette.aspirate(100, reservoir["A3"])
 
-LLD will resume until it is disabled again, raises an error, or the protocol completes.
+LPV will resume until it is disabled again, raises an error, or the protocol completes.
 
 .. versionadded:: 2.20

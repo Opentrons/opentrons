@@ -258,10 +258,12 @@ This example aspirates enough air to fill the remaining volume in a pipette::
 
 .. versionadded:: 2.0
 
+.. _detect-liquid-presence:
+
 Detect Liquids
 ==============
 
-The :py:meth:`.InstrumentContext.detect_liquid_presence` method tells the robot to check for a liquid and return the results. It returns ``True`` if liquid is detected and ``False`` if liquid is not detected. It will not raise an error or stop your protocol if a liquid is not present in a well or reservoir. See also :ref:`lld`.
+The :py:meth:`.InstrumentContext.detect_liquid_presence` method tells the robot to check for a liquid and return the results. It returns ``True`` if liquid is detected and ``False`` if liquid is not detected. It will not raise an error or stop your protocol if a liquid is not present in a well or reservoir. See also :ref:`lpv`.
 
 .. code-block:: python
 
@@ -269,10 +271,12 @@ The :py:meth:`.InstrumentContext.detect_liquid_presence` method tells the robot 
 
 .. versionadded:: 2.20
 
+.. _require-liquid-presence:
+
 Require Liquids
 ===============
 
-The :py:meth:`.InstrumentContext.require_liquid_presence` method forces the robot to check for the presence of a liquid, even when :ref:`lld` is specifically disabled. When using this method, the robot will raise an error that stops a protocol, writes a warning to the run logs, and also lets you recover from the error through your own error handling code.
+The :py:meth:`.InstrumentContext.require_liquid_presence` method forces the robot to check for the presence of a liquid, even when :ref:`lpv` is specifically disabled. When using this method, the robot will raise an error that stops a protocol, writes a warning to the run logs, and also lets you recover from the error through your own error handling code.
 
 .. code-block:: python
 

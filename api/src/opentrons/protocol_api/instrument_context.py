@@ -2055,7 +2055,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
     @requires_version(2, 20)
     def detect_liquid_presence(self, well: labware.Well) -> bool:
-        """Check if there is liquid in a well.
+        """Check if there is liquid in a well. See :ref:`detect-liquid-presence`.
 
         :returns: A boolean.
         """
@@ -2072,7 +2072,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
     @requires_version(2, 20)
     def require_liquid_presence(self, well: labware.Well) -> None:
-        """If there is no liquid in a well, raise an error.
+        """If there is no liquid in a well, raise an error. See :ref:`require-liquid-presence`.
 
         :returns: None.
         """
