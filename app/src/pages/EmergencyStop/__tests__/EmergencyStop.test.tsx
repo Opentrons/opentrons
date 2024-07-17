@@ -19,12 +19,12 @@ const mockDisconnectedEstop = {
     rightEstopPhysicalStatus: 'notPresent',
   },
 } as any
-const mockPush = vi.fn()
+const mockNavigate = vi.fn()
 vi.mock('react-router-dom', async importOriginal => {
   const actual = await importOriginal<typeof ReactRouterDom>()
   return {
     ...actual,
-    useHistory: () => ({ push: mockPush } as any),
+    useNavigate: () => mockNavigate,
   }
 })
 
@@ -85,6 +85,6 @@ describe('EmergencyStop', () => {
     } as any)
     render()
     fireEvent.click(screen.getByRole('button'))
-    expect(mockPush).toHaveBeenCalledWith('/robot-settings/rename-robot')
+    expect(mockNavigate).toHaveBeenCalledWith('/robot-settings/rename-robot')
   })
 })

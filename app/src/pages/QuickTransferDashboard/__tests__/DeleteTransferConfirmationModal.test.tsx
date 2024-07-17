@@ -14,7 +14,7 @@ import { DeleteTransferConfirmationModal } from '../DeleteTransferConfirmationMo
 import type * as ReactRouterDom from 'react-router-dom'
 import type { HostConfig } from '@opentrons/api-client'
 
-const mockPush = vi.fn()
+const mockNavigate = vi.fn()
 
 vi.mock('@opentrons/api-client')
 vi.mock('@opentrons/react-api-client')
@@ -23,7 +23,7 @@ vi.mock('react-router-dom', async importOriginal => {
   const reactRouterDom = await importOriginal<typeof ReactRouterDom>()
   return {
     ...reactRouterDom,
-    useHistory: () => ({ push: mockPush } as any),
+    useNavigate: () => mockNavigate,
   }
 })
 

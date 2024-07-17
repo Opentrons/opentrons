@@ -8,13 +8,13 @@ import { i18n } from '../../../i18n'
 import { NetworkSetupMenu } from '..'
 import type * as ReactRouterDom from 'react-router-dom'
 
-const mockPush = vi.fn()
+const mockNavigate = vi.fn()
 
 vi.mock('react-router-dom', async importOriginal => {
   const actual = await importOriginal<typeof ReactRouterDom>()
   return {
     ...actual,
-    useHistory: () => ({ push: mockPush } as any),
+    useNavigate: () => mockNavigate,
   }
 })
 
@@ -53,10 +53,10 @@ describe('NetworkSetupMenu', () => {
     const ethernetButton = screen.getByText('Ethernet')
     const usbButton = screen.getByText('USB')
     fireEvent.click(wifiButton)
-    expect(mockPush).toHaveBeenCalledWith('/network-setup/wifi')
+    expect(mockNavigate).toHaveBeenCalledWith('/network-setup/wifi')
     fireEvent.click(ethernetButton)
-    expect(mockPush).toHaveBeenCalledWith('/network-setup/ethernet')
+    expect(mockNavigate).toHaveBeenCalledWith('/network-setup/ethernet')
     fireEvent.click(usbButton)
-    expect(mockPush).toHaveBeenCalledWith('/network-setup/usb')
+    expect(mockNavigate).toHaveBeenCalledWith('/network-setup/usb')
   })
 })

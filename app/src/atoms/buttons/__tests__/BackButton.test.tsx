@@ -2,7 +2,7 @@ import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import { MemoryRouter, Route, Switch } from 'react-router-dom'
+import { MemoryRouter, Route, Routes } from 'react-router-dom'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 
@@ -16,14 +16,10 @@ const render = (props?: React.HTMLProps<HTMLButtonElement>) => {
       initialIndex={1}
     >
       <BackButton {...props} />
-      <Switch>
-        <Route exact path="/current-page">
-          this is the current page
-        </Route>
-        <Route exact path="/previous-page">
-          this is the previous page
-        </Route>
-      </Switch>
+      <Routes>
+        <Route path="/current-page">this is the current page</Route>
+        <Route path="/previous-page">this is the previous page</Route>
+      </Routes>
     </MemoryRouter>,
     { i18nInstance: i18n }
   )[0]

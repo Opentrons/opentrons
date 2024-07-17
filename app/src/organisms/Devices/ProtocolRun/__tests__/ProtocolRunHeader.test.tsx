@@ -104,13 +104,13 @@ import type * as OpentronsSharedData from '@opentrons/shared-data'
 import type * as OpentronsComponents from '@opentrons/components'
 import type * as OpentronsApiClient from '@opentrons/api-client'
 
-const mockPush = vi.fn()
+const mockNavigate = vi.fn()
 
 vi.mock('react-router-dom', async importOriginal => {
   const reactRouterDom = await importOriginal<typeof ReactRouterDom>()
   return {
     ...reactRouterDom,
-    useHistory: () => ({ push: mockPush } as any),
+    useNavigate: () => mockNavigate,
   }
 })
 
@@ -945,7 +945,7 @@ describe('ProtocolRunHeader', () => {
     vi.mocked(useIsRobotViewable).mockReturnValue(false)
     render()
     await waitFor(() => {
-      expect(mockPush).toHaveBeenCalledWith('/devices')
+      expect(mockNavigate).toHaveBeenCalledWith('/devices')
     })
   })
 

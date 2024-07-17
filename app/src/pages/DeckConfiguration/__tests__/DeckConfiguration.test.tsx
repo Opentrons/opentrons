@@ -28,7 +28,7 @@ vi.mock('react-router-dom', async importOriginal => {
   const actual = await importOriginal<typeof ReactRouterDom>()
   return {
     ...actual,
-    useHistory: () => ({ goBack: mockGoBack } as any),
+    useNavigate: () => mockGoBack,
   }
 })
 vi.mock('@opentrons/components', async importOriginal => {

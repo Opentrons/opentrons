@@ -14,13 +14,13 @@ import type { Chip } from '@opentrons/components'
 import type { ProtocolResource } from '@opentrons/shared-data'
 import type * as ReactRouterDom from 'react-router-dom'
 
-const mockPush = vi.fn()
+const mockNavigate = vi.fn()
 
 vi.mock('react-router-dom', async importOriginal => {
   const actual = await importOriginal<typeof ReactRouterDom>()
   return {
     ...actual,
-    useHistory: () => ({ push: mockPush } as any),
+    useNavigate: () => mockNavigate,
   }
 })
 vi.mock('@opentrons/components', async importOriginal => {
@@ -119,7 +119,7 @@ describe('Pinned Protocol', () => {
     render(props)
     const name = screen.getByText('yay mock protocol')
     fireEvent.click(name)
-    expect(mockPush).toHaveBeenCalledWith('/protocols/mockProtocol1')
+    expect(mockNavigate).toHaveBeenCalledWith('/protocols/mockProtocol1')
   })
 
   it('should display modal after long click', async () => {

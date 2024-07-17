@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { Route, useParams, Navigate } from 'react-router-dom'
+import { useParams, Navigate } from 'react-router-dom'
 
 import {
   BORDERS,
@@ -102,7 +102,6 @@ export function RobotSettings(): JSX.Element | null {
 
   const robotSettingsContent = robotSettingsContentByTab[robotSettingsTab] ?? (
     // default to the calibration tab if no tab or nonexistent tab is passed as a param
-
     <Navigate to={`/devices/${robotName}/robot-settings/calibration`} />
   )
 

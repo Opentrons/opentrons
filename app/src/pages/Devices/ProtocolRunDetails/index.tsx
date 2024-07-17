@@ -2,7 +2,7 @@ import * as React from 'react'
 import isEmpty from 'lodash/isEmpty'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
-import { NavLink, Navigate, Route, useParams } from 'react-router-dom'
+import { NavLink, Navigate, useParams } from 'react-router-dom'
 import styled, { css } from 'styled-components'
 
 import {

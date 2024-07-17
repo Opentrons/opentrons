@@ -14,13 +14,13 @@ import { NameQuickTransfer } from '../NameQuickTransfer'
 import { Overview } from '../Overview'
 import type * as ReactRouterDom from 'react-router-dom'
 
-const mockPush = vi.fn()
+const mockNavigate = vi.fn()
 
 vi.mock('react-router-dom', async importOriginal => {
   const reactRouterDom = await importOriginal<typeof ReactRouterDom>()
   return {
     ...reactRouterDom,
-    useHistory: () => ({ push: mockPush } as any),
+    useNavigate: () => mockNavigate,
   }
 })
 vi.mock('../Overview')

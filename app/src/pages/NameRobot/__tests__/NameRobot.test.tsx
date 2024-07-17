@@ -26,13 +26,13 @@ vi.mock('../../../redux/config')
 vi.mock('../../../redux/analytics')
 vi.mock('../../../organisms/RobotSettingsDashboard/NetworkSettings/hooks')
 
-const mockPush = vi.fn()
+const mockNavigate = vi.fn()
 
 vi.mock('react-router-dom', async importOriginal => {
   const actual = await importOriginal<typeof ReactRouterDom>()
   return {
     ...actual,
-    useHistory: () => ({ push: mockPush } as any),
+    useNavigate: () => mockNavigate,
   }
 })
 
@@ -142,6 +142,6 @@ describe('NameRobot', () => {
     vi.mocked(useIsUnboxingFlowOngoing).mockReturnValue(false)
     render()
     fireEvent.click(screen.getByTestId('name_back_button'))
-    expect(mockPush).toHaveBeenCalledWith('/robot-settings')
+    expect(mockNavigate).toHaveBeenCalledWith('/robot-settings')
   })
 })

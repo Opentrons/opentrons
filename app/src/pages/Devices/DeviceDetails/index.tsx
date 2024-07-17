@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { Navigate, Route, useParams } from 'react-router-dom'
+import { Navigate, useParams } from 'react-router-dom'
 
 import { ApiHostProvider } from '@opentrons/react-api-client'
 

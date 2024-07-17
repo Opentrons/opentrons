@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useParams, Route, Navigate } from 'react-router-dom'
+import { useParams, Navigate } from 'react-router-dom'
 
 import { useDispatch, useSelector } from 'react-redux'
 import {

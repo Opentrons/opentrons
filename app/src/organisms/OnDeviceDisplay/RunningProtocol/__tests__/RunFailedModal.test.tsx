@@ -9,13 +9,13 @@ import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { RunFailedModal } from '../RunFailedModal'
 
-import type { useHistory } from 'react-router-dom'
+import type { useNavigate } from 'react-router-dom'
 
 vi.mock('@opentrons/react-api-client')
 
 const RUN_ID = 'mock_runID'
 const mockFn = vi.fn()
-const mockPush = vi.fn()
+const mockNavigate = vi.fn()
 const mockErrors = [
   {
     id: 'd0245210-dfb9-4f1c-8ad0-3416b603a7ba',
@@ -74,10 +74,10 @@ const mockErrors = [
 const mockStopRun = vi.fn((_runId, opts) => opts.onSuccess())
 
 vi.mock('react-router-dom', async importOriginal => {
-  const actual = await importOriginal<typeof useHistory>()
+  const actual = await importOriginal<typeof useNavigate>()
   return {
     ...actual,
-    useHistory: () => ({ push: mockPush } as any),
+    useNavigate: () => mockNavigate,
   }
 })
 
@@ -123,6 +123,6 @@ describe('RunFailedModal', () => {
     const button = screen.getByText('Close')
     fireEvent.click(button)
     expect(mockStopRun).toHaveBeenCalled()
-    expect(mockPush).toHaveBeenCalledWith('/dashboard')
+    expect(mockNavigate).toHaveBeenCalledWith('/dashboard')
   })
 })

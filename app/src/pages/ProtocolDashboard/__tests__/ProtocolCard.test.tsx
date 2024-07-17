@@ -21,13 +21,13 @@ import type {
   ProtocolResource,
 } from '@opentrons/shared-data'
 
-const mockPush = vi.fn()
+const mockNavigate = vi.fn()
 
 vi.mock('react-router-dom', async importOriginal => {
   const actual = await importOriginal<typeof ReactRouterDom>()
   return {
     ...actual,
-    useHistory: () => ({ push: mockPush } as any),
+    useNavigate: () => mockNavigate,
   }
 })
 vi.mock('@opentrons/react-api-client')
@@ -107,7 +107,7 @@ describe('ProtocolCard', () => {
     const card = screen.getByTestId('protocol_card')
     expect(card).toHaveStyle(`background-color: ${COLORS.grey35}`)
     fireEvent.click(name)
-    expect(mockPush).toHaveBeenCalledWith('/protocols/mockProtocol1')
+    expect(mockNavigate).toHaveBeenCalledWith('/protocols/mockProtocol1')
   })
 
   it('should display the analysis failed error modal when clicking on the protocol', () => {

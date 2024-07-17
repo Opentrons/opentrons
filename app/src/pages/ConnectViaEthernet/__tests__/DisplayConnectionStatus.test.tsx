@@ -9,12 +9,12 @@ import { DisplayConnectionStatus } from '../../../pages/ConnectViaEthernet/Displ
 import type * as ReactRouterDom from 'react-router-dom'
 
 const mockFunc = vi.fn()
-const mockPush = vi.fn()
+const mockNavigate = vi.fn()
 vi.mock('react-router-dom', async importOriginal => {
   const actual = await importOriginal<typeof ReactRouterDom>()
   return {
     ...actual,
-    useHistory: () => ({ push: mockPush } as any),
+    useNavigate: () => mockNavigate,
   }
 })
 
@@ -70,7 +70,7 @@ describe('DisplayConnectionStatus', () => {
   it('should call a mock push when tapping continue button', () => {
     render(props)
     fireEvent.click(screen.getByText('Continue'))
-    expect(mockPush).toHaveBeenCalledWith(
+    expect(mockNavigate).toHaveBeenCalledWith(
       '/robot-settings/update-robot-during-onboarding'
     )
   })

@@ -10,13 +10,13 @@ import { PinnedTransfer } from '../PinnedTransfer'
 import type { ProtocolResource } from '@opentrons/shared-data'
 import type * as ReactRouterDom from 'react-router-dom'
 
-const mockPush = vi.fn()
+const mockNavigate = vi.fn()
 
 vi.mock('react-router-dom', async importOriginal => {
   const actual = await importOriginal<typeof ReactRouterDom>()
   return {
     ...actual,
-    useHistory: () => ({ push: mockPush } as any),
+    useNavigate: () => mockNavigate,
   }
 })
 
@@ -63,7 +63,7 @@ describe('Pinned Transfer', () => {
     render()
     const name = screen.getByText('yay mock transfer')
     fireEvent.click(name)
-    expect(mockPush).toHaveBeenCalledWith('/quick-transfer/mockTransfer1')
+    expect(mockNavigate).toHaveBeenCalledWith('/quick-transfer/mockTransfer1')
   })
 
   it('should display modal after long click', async () => {

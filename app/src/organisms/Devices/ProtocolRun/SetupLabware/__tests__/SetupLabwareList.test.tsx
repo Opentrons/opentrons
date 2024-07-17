@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { StaticRouter } from 'react-router-dom'
+import { MemoryRouter } from 'react-router-dom'
 import { describe, it, beforeEach, vi, expect } from 'vitest'
 import { screen } from '@testing-library/react'
 
@@ -21,9 +21,9 @@ const protocolWithTC = (multiple_tipacks_with_tc as unknown) as CompletedProtoco
 
 const render = (props: React.ComponentProps<typeof SetupLabwareList>) => {
   return renderWithProviders(
-    <StaticRouter>
+    <MemoryRouter>
       <SetupLabwareList {...props} />
-    </StaticRouter>,
+    </MemoryRouter>,
     {
       i18nInstance: i18n,
     }

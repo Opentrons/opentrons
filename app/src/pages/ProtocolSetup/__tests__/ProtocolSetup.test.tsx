@@ -74,7 +74,7 @@ Object.defineProperty(window, 'IntersectionObserver', {
   value: IntersectionObserver,
 })
 
-let mockHistoryPush = vi.fn()
+let mockNavigate = vi.fn()
 
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const sharedData = await importOriginal<typeof SharedData>()
@@ -88,9 +88,7 @@ vi.mock('react-router-dom', async importOriginal => {
   const reactRouterDom = await importOriginal<typeof ReactRouterDom>()
   return {
     ...reactRouterDom,
-    useHistory: () => ({
-      push: mockHistoryPush,
-    }),
+    useNavigate: () => mockNavigate,
   }
 })
 
@@ -193,7 +191,7 @@ describe('ProtocolSetup', () => {
   let mockLaunchLPC = vi.fn()
   beforeEach(() => {
     mockLaunchLPC = vi.fn()
-    mockHistoryPush = vi.fn()
+    mockNavigate = vi.fn()
     vi.mocked(useLPCDisabledReason).mockReturnValue(null)
     vi.mocked(useAttachedModules).mockReturnValue([])
     vi.mocked(useModuleCalibrationStatus).mockReturnValue({ complete: true })
@@ -430,6 +428,6 @@ describe('ProtocolSetup', () => {
   it('should redirect to the protocols page when a run is stopped', () => {
     vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_STOPPED)
     render(`/runs/${RUN_ID}/setup/`)
-    expect(mockHistoryPush).toHaveBeenCalledWith('/protocols')
+    expect(mockNavigate).toHaveBeenCalledWith('/protocols')
   })
 })

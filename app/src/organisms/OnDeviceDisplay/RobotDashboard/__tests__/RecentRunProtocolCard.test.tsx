@@ -33,16 +33,16 @@ import {
   INIT_STATUS,
 } from '../../../../resources/health/hooks'
 
-import type { useHistory } from 'react-router-dom'
+import type { useNavigate } from 'react-router-dom'
 import type { ProtocolHardware } from '../../../../pages/Protocols/hooks'
 
-const mockPush = vi.fn()
+const mockNavigate = vi.fn()
 
 vi.mock('react-router-dom', async importOriginal => {
-  const actual = await importOriginal<typeof useHistory>()
+  const actual = await importOriginal<typeof useNavigate>()
   return {
     ...actual,
-    useHistory: () => ({ push: mockPush } as any),
+    useNavigate: () => mockNavigate,
   }
 })
 
@@ -292,6 +292,6 @@ describe('RecentRunProtocolCard', () => {
     render(props)
     const button = screen.getByLabelText('RecentRunProtocolCard')
     fireEvent.click(button)
-    expect(mockPush).toBeCalledWith('/protocols/mockProtocolId')
+    expect(mockNavigate).toBeCalledWith('/protocols/mockProtocolId')
   })
 })
