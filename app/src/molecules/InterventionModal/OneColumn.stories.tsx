@@ -12,26 +12,9 @@ import {
 } from '@opentrons/components'
 
 import { OneColumn as OneColumnComponent } from './'
+import { StandIn } from './story-utils/StandIn'
 
 import type { Meta, StoryObj } from '@storybook/react'
-
-function StandInContent(): JSX.Element {
-  return (
-    <Flex
-      border={'4px dashed #A864FFFF'}
-      borderRadius={BORDERS.borderRadius8}
-      margin={SPACING.spacing16}
-      height="104px"
-      backgroundColor="#A864FF19"
-      alignItems={ALIGN_CENTER}
-      justifyContent={JUSTIFY_CENTER}
-    >
-      <LegacyStyledText as="h1">
-        This is a standin for some other component
-      </LegacyStyledText>
-    </Flex>
-  )
-}
 
 const meta: Meta<React.ComponentProps<OneColumnComponent>> = {
   title: 'App/Molecules/InterventionModal/OneColumn',
@@ -46,7 +29,7 @@ const meta: Meta<React.ComponentProps<OneColumnComponent>> = {
       `}
     >
       <OneColumnComponent>
-        <StandInContent />
+        <StandIn>This is a standin for another component</StandIn>
       </OneColumnComponent>
     </Box>
   ),
