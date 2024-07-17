@@ -1,8 +1,8 @@
 export { RecoveryFooterButtons } from './RecoveryFooterButtons'
 export {
-    RecoverySingleColumnContentWrapper,
-    RecoveryTwoColumnContentWrapper,
-    RecoveryODDOneDesktopTwoColumnContentWrapper,
+  RecoverySingleColumnContentWrapper,
+  RecoveryTwoColumnContentWrapper,
+  RecoveryODDOneDesktopTwoColumnContentWrapper,
 } from './RecoveryContentWrapper'
 export { ReplaceTips } from './ReplaceTips'
 export { SelectTips } from './SelectTips'
