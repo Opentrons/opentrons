@@ -157,7 +157,6 @@ export function RunPausedSplash(
             flexDirection={DIRECTION_COLUMN}
             alignItems={ALIGN_FLEX_END}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
-            height="25rem"
           >
             <Flex
               borderRadius={BORDERS.borderRadius8}
