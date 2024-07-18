@@ -104,6 +104,7 @@ def create_csv_test_report_photometric(
                 lines=[
                     CSVLine("robot", [str]),
                     CSVLine("pipette", [str]),
+                    CSVLine("tips_20ul", [str]),
                     CSVLine("tips_50ul", [str]),
                     CSVLine("tips_200ul", [str]),
                     CSVLine("tips_1000ul", [str]),
@@ -206,6 +207,7 @@ def create_csv_test_report(
                 lines=[
                     CSVLine("robot", [str]),
                     CSVLine("pipette", [str]),
+                    CSVLine("tips_20ul", [str]),
                     CSVLine("tips_50ul", [str]),
                     CSVLine("tips_200ul", [str]),
                     CSVLine("tips_1000ul", [str]),
