@@ -13,6 +13,8 @@ import {
   RECOVERY_MAP,
   ERROR_KINDS,
   ODD_SECTION_TITLE_STYLE,
+  ODD_ONLY,
+  DESKTOP_ONLY,
 } from '../constants'
 import { RadioButton } from '../../../atoms/buttons'
 import {
@@ -49,7 +51,6 @@ export function SelectRecoveryOptionHome({
   tipStatusUtils,
   currentRecoveryOptionUtils,
   getRecoveryOptionCopy,
-  isOnDevice,
   ...rest
 }: RecoveryContentProps): JSX.Element | null {
   const { t } = useTranslation('error_recovery')
@@ -80,21 +81,22 @@ export function SelectRecoveryOptionHome({
         >
           {t('choose_a_recovery_action')}
         </StyledText>
-        {isOnDevice ? (
+        <Flex css={ODD_ONLY}>
           <ODDRecoveryOptions
             validRecoveryOptions={validRecoveryOptions}
             setSelectedRoute={setSelectedRoute}
             selectedRoute={selectedRoute}
             getRecoveryOptionCopy={getRecoveryOptionCopy}
           />
-        ) : (
+        </Flex>
+        <Flex css={DESKTOP_ONLY}>
           <DesktopRecoveryOptions
             validRecoveryOptions={validRecoveryOptions}
             setSelectedRoute={setSelectedRoute}
             selectedRoute={selectedRoute}
             getRecoveryOptionCopy={getRecoveryOptionCopy}
           />
-        )}
+        </Flex>
       </Flex>
       <FailedStepNextStep {...rest} />
     </RecoveryODDOneDesktopTwoColumnContentWrapper>

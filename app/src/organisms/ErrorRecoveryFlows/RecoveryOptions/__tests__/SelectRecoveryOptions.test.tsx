@@ -112,13 +112,13 @@ describe('SelectRecoveryOption', () => {
 
     screen.getByText('Choose a recovery action')
 
-    const retryStepOption = screen.getByRole('label', { name: 'Retry step' })
+    const retryStepOption = screen.getAllByRole('label', { name: 'Retry step' })
     clickButtonLabeled('Continue')
     expect(
       screen.queryByRole('button', { name: 'Go back' })
     ).not.toBeInTheDocument()
 
-    fireEvent.click(retryStepOption)
+    fireEvent.click(retryStepOption[0])
     clickButtonLabeled('Continue')
 
     expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
@@ -136,14 +136,14 @@ describe('SelectRecoveryOption', () => {
 
     screen.getByText('Choose a recovery action')
 
-    const retryNewTips = screen.getByRole('label', {
+    const retryNewTips = screen.getAllByRole('label', {
       name: 'Retry with new tips',
     })
     expect(
       screen.queryByRole('button', { name: 'Go back' })
     ).not.toBeInTheDocument()
 
-    fireEvent.click(retryNewTips)
+    fireEvent.click(retryNewTips[0])
     clickButtonLabeled('Continue')
 
     expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(RETRY_NEW_TIPS.ROUTE)
@@ -159,11 +159,11 @@ describe('SelectRecoveryOption', () => {
 
     screen.getByText('Choose a recovery action')
 
-    const fillManuallyAndSkip = screen.getByRole('label', {
+    const fillManuallyAndSkip = screen.getAllByRole('label', {
       name: 'Manually fill well and skip to next step',
     })
 
-    fireEvent.click(fillManuallyAndSkip)
+    fireEvent.click(fillManuallyAndSkip[0])
     clickButtonLabeled('Continue')
 
     expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
@@ -181,11 +181,11 @@ describe('SelectRecoveryOption', () => {
 
     screen.getByText('Choose a recovery action')
 
-    const retrySameTips = screen.getByRole('label', {
+    const retrySameTips = screen.getAllByRole('label', {
       name: 'Retry with same tips',
     })
 
-    fireEvent.click(retrySameTips)
+    fireEvent.click(retrySameTips[0])
     clickButtonLabeled('Continue')
 
     expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
@@ -203,11 +203,11 @@ describe('SelectRecoveryOption', () => {
 
     screen.getByText('Choose a recovery action')
 
-    const skipStepWithSameTips = screen.getByRole('label', {
+    const skipStepWithSameTips = screen.getAllByRole('label', {
       name: 'Skip to next step with same tips',
     })
 
-    fireEvent.click(skipStepWithSameTips)
+    fireEvent.click(skipStepWithSameTips[0])
     clickButtonLabeled('Continue')
 
     expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
