@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
+import {css} from 'styled-components'
 
 import {
   ALIGN_CENTER,
@@ -15,6 +16,7 @@ import {
   POSITION_STICKY,
   SPACING,
   DIRECTION_COLUMN,
+  RESPONSIVENESS
 } from '@opentrons/components'
 
 import { getIsOnDevice } from '../../redux/config'
@@ -166,15 +168,7 @@ export function InterventionModal({
               onClick={iconHeadingOnClick}
             >
               {iconName != null ? (
-                isOnDevice ? (
-                  <Icon name={iconName} size={SPACING.spacing32} />
-                ) : (
-                  <Icon
-                    width={SPACING.spacing16}
-                    height={SPACING.spacing16}
-                    name={iconName}
-                  />
-                )
+              <Icon name={iconName} css={ICON_SIZE} />
               ) : null}
               {iconHeading ?? null}
             </Flex>
@@ -185,3 +179,13 @@ export function InterventionModal({
     </Flex>
   )
 }
+
+
+const ICON_SIZE = css`
+  width: 1rem;
+  height: 1rem;
+  @media (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+    width: 2rem;
+    height: 2rem;
+  }
+`
