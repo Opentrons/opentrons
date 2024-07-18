@@ -446,6 +446,7 @@ export function ChooseProtocolSlideoutComponent(
                   flexDirection={DIRECTION_COLUMN}
                   alignItems={ALIGN_CENTER}
                   gridgap={SPACING.spacing8}
+                  key={runtimeParam.variableName}
                 >
                   <Flex
                     flexDirection={DIRECTION_COLUMN}
