@@ -226,7 +226,7 @@ describe('StyledText', () => {
       children: 'h3Bold',
     }
     render(props)
-    expect(screen.getByText('h3Bold')).toHaveStyle(
+    expect(screen.queryAllByText('h3Bold')[0]).toHaveStyle(
       `fontSize: ${TYPOGRAPHY.fontSize32}`
     )
     expect(screen.getByText('h3Bold')).toHaveStyle(
@@ -243,7 +243,7 @@ describe('StyledText', () => {
       children: 'h4Bold',
     }
     render(props)
-    expect(screen.getByText('h4Bold')).toHaveStyle(
+    expect(screen.queryAllByText('h4Bold')[0]).toHaveStyle(
       `fontSize: ${TYPOGRAPHY.fontSize28}`
     )
     expect(screen.getByText('h4Bold')).toHaveStyle(

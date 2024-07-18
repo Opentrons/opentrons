@@ -83,7 +83,7 @@ export function ErrorRecoveryWizard(
 export function ErrorRecoveryComponent(
   props: RecoveryContentProps
 ): JSX.Element {
-  const { recoveryMap, hasLaunchedRecovery, isDoorOpen, isOnDevice } = props
+  const { recoveryMap, isDoorOpen, isOnDevice } = props
   const { route, step } = recoveryMap
   const { t } = useTranslation('error_recovery')
   const { showModal, toggleModal } = useErrorDetailsModal()
