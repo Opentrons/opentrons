@@ -1,7 +1,7 @@
 import os.path
 
-from bs4 import BeautifulSoup 
-from markdownify import markdownify 
+from bs4 import BeautifulSoup
+from markdownify import markdownify
 
 current_dir = os.path.dirname(__file__)
 html_file_path = os.path.join(current_dir, "build", "docs", "html", "v2", "index.html")
