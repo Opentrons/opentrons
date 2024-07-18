@@ -165,7 +165,7 @@ export function InterventionModal({
               {iconName != null ? (
                 <Icon name={iconName} css={ICON_STYLE} />
               ) : null}
-              {iconHeading ?? null}
+              {iconHeading != null ? iconHeading : null}
             </Flex>
           </Flex>
           {children}
