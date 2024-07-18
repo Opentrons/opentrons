@@ -17,7 +17,7 @@ import { ODD_SECTION_TITLE_STYLE, RECOVERY_MAP } from '../constants'
 import {
   RecoveryFooterButtons,
   RecoverySingleColumnContentWrapper,
-  RecoveryRadioGroup
+  RecoveryRadioGroup,
 } from '../shared'
 import { DropTipWizardFlows } from '../../DropTipWizardFlows'
 import { DT_ROUTES } from '../../DropTipWizardFlows/constants'
@@ -141,7 +141,6 @@ export function BeginRemoval({
         css={DESKTOP_ONLY}
       >
         <RecoveryRadioGroup
-          useBlueChecked
           css={css`
             padding: ${SPACING.spacing4};
           `}

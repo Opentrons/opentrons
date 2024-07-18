@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import {css} from 'styled-components'
+import { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
@@ -16,7 +16,7 @@ import {
   POSITION_STICKY,
   SPACING,
   DIRECTION_COLUMN,
-  RESPONSIVENESS
+  RESPONSIVENESS,
 } from '@opentrons/components'
 
 import { getIsOnDevice } from '../../redux/config'
@@ -143,7 +143,6 @@ export function InterventionModal({
   const isOnDevice = useSelector(getIsOnDevice)
   const modalStyle = isOnDevice ? MODAL_ODD_STYLE : MODAL_DESKTOP_STYLE
   const headerStyle = isOnDevice ? BASE_HEADER_STYLE : DESKTOP_HEADER_STYLE
-  const titleSpacing = isOnDevice ? SPACING.spacing12 : SPACING.spacing4
 
   return (
     <Flex {...WRAPPER_STYLE}>
@@ -162,13 +161,9 @@ export function InterventionModal({
             justifyContent={headerJustifyContent}
           >
             {titleHeading}
-            <Flex
-              alignItems={ALIGN_CENTER}
-              gridGap={titleSpacing}
-              onClick={iconHeadingOnClick}
-            >
+            <Flex alignItems={ALIGN_CENTER} onClick={iconHeadingOnClick}>
               {iconName != null ? (
-              <Icon name={iconName} css={ICON_SIZE} />
+                <Icon name={iconName} css={ICON_STYLE} />
               ) : null}
               {iconHeading ?? null}
             </Flex>
@@ -180,12 +175,13 @@ export function InterventionModal({
   )
 }
 
-
-const ICON_SIZE = css`
+const ICON_STYLE = css`
   width: 1rem;
   height: 1rem;
+  margin: ${SPACING.spacing4};
   @media (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
     width: 2rem;
     height: 2rem;
+    margin: ${SPACING.spacing12};
   }
 `

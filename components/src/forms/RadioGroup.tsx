@@ -76,7 +76,7 @@ export function RadioGroup(props: RadioGroupProps): JSX.Element {
               onChange={props.onChange}
             />
             <div className={cx(props.labelTextClassName, styles.label_text)}>
-            {radio.name}  
+              {radio.name}
             </div>
             {radio.children}
           </label>
