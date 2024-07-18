@@ -119,10 +119,9 @@ export function ChooseCsvFile({
                 csvFilesOnUSB.map(csvFilePath => {
                   const fileName = last(csvFilePath.split('/'))
                   return (
-                    <>
+                    <React.Fragment key={fileName}>
                       {csvFilePath.length !== 0 && fileName !== undefined ? (
                         <RadioButton
-                          key={fileName}
                           data-testid={fileName}
                           buttonLabel={fileName ?? 'default'}
                           buttonValue={csvFilePath}
@@ -135,7 +134,7 @@ export function ChooseCsvFile({
                           isSelected={csvFileSelected?.filePath === csvFilePath}
                         />
                       ) : null}
-                    </>
+                    </React.Fragment>
                   )
                 })
               ) : (
