@@ -13,7 +13,9 @@ from opentrons.protocol_engine.state.config import Config
 from typing import Optional
 
 
-def create_error_recovery_policy_from_rules(rules: list[ErrorRecoveryRule]) -> ErrorRecoveryPolicy:
+def create_error_recovery_policy_from_rules(
+    rules: list[ErrorRecoveryRule],
+) -> ErrorRecoveryPolicy:
     """
     Given a "high-level" error recovery policy (a list of rules, as robot-server exposes
     in its HTTP API), return a "low-level" error recovery policy
