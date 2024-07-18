@@ -23,7 +23,6 @@ export const DEPRECATED_FLAGS = [
   'OT_PD_ALLOW_96_CHANNEL',
   'OT_PD_ENABLE_FLEX_DECK_MODIFICATION',
   'OT_PD_ENABLE_MULTI_TIP',
-  'OT_PD_ENABLE_MOAM',
 ]
 // union of feature flag string constant IDs
 export type FlagTypes =
@@ -32,6 +31,7 @@ export type FlagTypes =
   | 'OT_PD_ALLOW_ALL_TIPRACKS'
   | 'OT_PD_ENABLE_ABSORBANCE_READER'
   | 'OT_PD_ENABLE_REDESIGN'
+  | 'OT_PD_ENABLE_MOAM'
 // flags that are not in this list only show in prerelease mode
 export const userFacingFlags: FlagTypes[] = [
   'OT_PD_DISABLE_MODULE_RESTRICTIONS',
@@ -42,5 +42,6 @@ export const allFlags: FlagTypes[] = [
   'PRERELEASE_MODE',
   'OT_PD_ENABLE_ABSORBANCE_READER',
   'OT_PD_ENABLE_REDESIGN',
+  'OT_PD_ENABLE_MOAM',
 ]
 export type Flags = Partial<Record<FlagTypes, boolean | null | undefined>>
