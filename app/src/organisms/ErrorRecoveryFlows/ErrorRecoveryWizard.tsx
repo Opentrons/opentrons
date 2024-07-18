@@ -83,15 +83,13 @@ export function ErrorRecoveryWizard(
 export function ErrorRecoveryComponent(
   props: RecoveryContentProps
 ): JSX.Element {
-  const { recoveryMap, isDoorOpen, isOnDevice } = props
+  const { recoveryMap, hasLaunchedRecovery, isDoorOpen, isOnDevice } = props
   const { route, step } = recoveryMap
   const { t } = useTranslation('error_recovery')
   const { showModal, toggleModal } = useErrorDetailsModal()
 
   const buildTitleHeading = (): JSX.Element => {
-    const titleText = props.hasLaunchedRecovery
-      ? t('recovery_mode')
-      : t('cancel_run')
+    const titleText = hasLaunchedRecovery ? t('recovery_mode') : t('cancel_run')
     return (
       <StyledText
         oddStyle="level4HeaderBold"

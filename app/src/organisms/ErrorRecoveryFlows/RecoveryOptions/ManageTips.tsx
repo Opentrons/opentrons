@@ -8,12 +8,16 @@ import {
   SPACING,
   Flex,
   StyledText,
-  RESPONSIVENESS,
 } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { RadioButton } from '../../../atoms/buttons'
-import { ODD_SECTION_TITLE_STYLE, RECOVERY_MAP } from '../constants'
+import {
+  ODD_SECTION_TITLE_STYLE,
+  RECOVERY_MAP,
+  ODD_ONLY,
+  DESKTOP_ONLY,
+} from '../constants'
 import {
   RecoveryFooterButtons,
   RecoverySingleColumnContentWrapper,
@@ -91,18 +95,6 @@ export function BeginRemoval({
       }
     }
   }
-
-  const ODD_ONLY = css`
-    @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
-      display: none;
-    }
-  `
-
-  const DESKTOP_ONLY = css`
-    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-      display: none;
-    }
-  `
 
   return (
     <RecoverySingleColumnContentWrapper>
