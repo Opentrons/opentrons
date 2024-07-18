@@ -851,7 +851,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         #   Okay so far.
         #
         # - If the hardware detects no liquid, the `tryLiquidProbe` engine command will
-        #   suceced and return `None`, which we'll convert to a `False` return.
+        #   succeed and return `None`, which we'll convert to a `False` return.
         #   Still okay so far.
         #
         # - If there is any other error within the `tryLiquidProbe` command, things get
