@@ -15,7 +15,7 @@ export function uploadCsvFile(
   } else {
     formData.append('filePath', data)
   }
-  return request<UploadedCsvFileResponse, FormData | string>(
+  return request<UploadedCsvFileResponse, FormData>(
     POST,
     '/dataFiles',
     formData,
