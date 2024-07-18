@@ -13,7 +13,6 @@ import {
   SPACING,
   StyledText,
   TYPOGRAPHY,
-  RESPONSIVENESS,
 } from '@opentrons/components'
 import { ODD_FOCUS_VISIBLE } from './constants'
 import type { IconName, StyleProps } from '@opentrons/components'

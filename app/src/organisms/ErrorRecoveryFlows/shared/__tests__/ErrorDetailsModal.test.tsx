@@ -11,7 +11,6 @@ import { Modal } from '../../../../molecules/Modal'
 import {
   useErrorDetailsModal,
   ErrorDetailsModal,
-  ErrorDetailsModal,
   OverpressureBanner,
 } from '../ErrorDetailsModal'
 
