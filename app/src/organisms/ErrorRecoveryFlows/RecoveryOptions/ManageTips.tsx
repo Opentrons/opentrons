@@ -12,7 +12,10 @@ import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { RadioButton } from '../../../atoms/buttons'
 import { ODD_SECTION_TITLE_STYLE, RECOVERY_MAP } from '../constants'
-import { RecoveryFooterButtons, RecoveryContentWrapper } from '../shared'
+import {
+  RecoveryFooterButtons,
+  RecoverySingleColumnContentWrapper,
+} from '../shared'
 import { DropTipWizardFlows } from '../../DropTipWizardFlows'
 import { DT_ROUTES } from '../../DropTipWizardFlows/constants'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
@@ -87,7 +90,7 @@ export function BeginRemoval({
   }
 
   return (
-    <RecoveryContentWrapper>
+    <RecoverySingleColumnContentWrapper>
       <LegacyStyledText css={ODD_SECTION_TITLE_STYLE} as="h4SemiBold">
         {t('you_may_want_to_remove', { mount })}
       </LegacyStyledText>
@@ -110,7 +113,7 @@ export function BeginRemoval({
         />
       </Flex>
       <RecoveryFooterButtons primaryBtnOnClick={primaryOnClick} />
-    </RecoveryContentWrapper>
+    </RecoverySingleColumnContentWrapper>
   )
 }
 
@@ -158,7 +161,7 @@ function DropTipFlowsContainer(
   const fixitCommandTypeUtils = useDropTipFlowUtils(props)
 
   return (
-    <RecoveryContentWrapper>
+    <RecoverySingleColumnContentWrapper>
       <DropTipWizardFlows
         robotType={isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE}
         closeFlow={onCloseFlow}
@@ -166,7 +169,7 @@ function DropTipFlowsContainer(
         instrumentModelSpecs={specs}
         fixitCommandTypeUtils={fixitCommandTypeUtils}
       />
-    </RecoveryContentWrapper>
+    </RecoverySingleColumnContentWrapper>
   )
 }
 
