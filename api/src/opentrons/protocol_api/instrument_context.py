@@ -2,8 +2,6 @@ from __future__ import annotations
 import logging
 from contextlib import ExitStack
 from typing import Any, List, Optional, Sequence, Union, cast, Dict
-from opentrons.protocol_engine.commands.pipetting_common import LiquidNotFoundError
-from opentrons.protocol_engine.errors.error_occurrence import ProtocolCommandFailedError
 from opentrons_shared_data.errors.exceptions import (
     CommandPreconditionViolated,
     CommandParameterLimitViolated,
@@ -2112,15 +2110,7 @@ class InstrumentContext(publisher.CommandPublisher):
         :returns: A boolean.
         """
         loc = well.top()
-        try:
-            self._core.liquid_probe_without_recovery(well._core, loc)
-        except ProtocolCommandFailedError as e:
-            # if we handle the error, we change the protocl state from error to valid
-            if isinstance(e.original_error, LiquidNotFoundError):
-                return False
-            raise e
-        else:
-            return True
+        return self._core.detect_liquid_presence(well._core, loc)
 
     @requires_version(2, 20)
     def require_liquid_presence(self, well: labware.Well) -> None:
