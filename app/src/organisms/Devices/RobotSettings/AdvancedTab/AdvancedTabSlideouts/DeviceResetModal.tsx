@@ -79,7 +79,7 @@ export function DeviceResetModal({
         }
       }
       dispatchRequest(resetConfig(robotName, resetOptions))
-      navigate(`/devices/`)
+      navigate('/devices/')
     }
   }
 

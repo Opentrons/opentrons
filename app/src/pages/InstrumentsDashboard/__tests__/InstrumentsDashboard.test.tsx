@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Route, MemoryRouter } from 'react-router-dom'
+import { Route, MemoryRouter, Routes } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { vi, describe, it, afterEach, beforeEach, expect } from 'vitest'
@@ -96,12 +96,10 @@ vi.mock('../../../organisms/Navigation')
 const render = () => {
   return renderWithProviders(
     <MemoryRouter initialEntries={['/instruments', '/instruments/:mount']}>
-      <Route path="/instruments">
-        <InstrumentsDashboard />
-      </Route>
-      <Route path="/instruments/:mount">
-        <InstrumentDetail />
-      </Route>
+      <Routes>
+        <Route path="/instruments" element={<InstrumentsDashboard />} />
+        <Route path="/instruments/:mount" element={<InstrumentDetail />} />
+      </Routes>
     </MemoryRouter>,
     { i18nInstance: i18n }
   )

@@ -17,8 +17,8 @@ const render = (props?: React.HTMLProps<HTMLButtonElement>) => {
     >
       <BackButton {...props} />
       <Routes>
-        <Route path="/current-page">this is the current page</Route>
-        <Route path="/previous-page">this is the previous page</Route>
+        <Route path="/current-page" element={<>this is the current page</>} />
+        <Route path="/previous-page" element={<>this is the previous page</>} />
       </Routes>
     </MemoryRouter>,
     { i18nInstance: i18n }
@@ -45,7 +45,7 @@ describe('BackButton', () => {
     expect(screen.queryByText('this is the previous page')).toBeNull()
   })
 
-  it('goes back one page in history on click if no on click handler provided', () => {
+  it('goes back one page in navigate on click if no on click handler provided', () => {
     render()
 
     screen.getByText('this is the current page')

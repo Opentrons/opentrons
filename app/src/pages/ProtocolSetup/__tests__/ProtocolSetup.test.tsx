@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Route, MemoryRouter } from 'react-router-dom'
+import { Route, MemoryRouter, Routes } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { when } from 'vitest-when'
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
@@ -116,9 +116,9 @@ vi.mock('../../../resources/deck_configuration')
 const render = (path = '/') => {
   return renderWithProviders(
     <MemoryRouter initialEntries={[path]} initialIndex={0}>
-      <Route path="/runs/:runId/setup/">
-        <ProtocolSetup />
-      </Route>
+      <Routes>
+        <Route path="/runs/:runId/setup/" element={<ProtocolSetup />} />
+      </Routes>
     </MemoryRouter>,
     {
       i18nInstance: i18n,

@@ -9,7 +9,7 @@ import { useLights } from '../../Devices/hooks'
 import { RestartRobotConfirmationModal } from '../RestartRobotConfirmationModal'
 import { NavigationMenu } from '../NavigationMenu'
 
-import type { useNavigate } from 'react-router-dom'
+import type { NavigateFunction } from 'react-router-dom'
 
 vi.mock('../../../redux/robot-admin')
 vi.mock('../../../redux/robot-controls')
@@ -18,10 +18,10 @@ vi.mock('../RestartRobotConfirmationModal')
 
 const mockNavigate = vi.fn()
 vi.mock('react-router-dom', async importOriginal => {
-  const actual = await importOriginal<typeof useNavigate>()
+  const actual = await importOriginal<typeof NavigateFunction>()
   return {
     ...actual,
-    useHNavigate: () => mockNavigate,
+    useNavigate: () => mockNavigate,
   }
 })
 

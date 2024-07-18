@@ -57,6 +57,13 @@ vi.mock('../../../redux/robot-api')
 vi.mock('../../../organisms/ToasterOven')
 vi.mock('../../../organisms/Devices/hooks')
 vi.mock('../../../resources/devices/hooks/useIsEstopNotDisengaged')
+vi.mock('react-router-dom', async importOriginal => {
+  const actual = await importOriginal<typeof ReactRouterDom>()
+  return {
+    ...actual,
+    useNavigate: () => vi.fn(),
+  }
+})
 
 const mockMagneticModuleHub = {
   id: 'magdeck_id',

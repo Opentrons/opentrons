@@ -35,18 +35,35 @@ const render = (path = '/') => {
   return renderWithProviders(
     <MemoryRouter initialEntries={[path]} initialIndex={0}>
       <Routes>
-        <Route path="/devices/:robotName">
-          <Breadcrumbs />
-          <div>device details path matched</div>
-        </Route>
-        <Route path="/devices/:robotName/protocol-runs/:runId">
-          <Breadcrumbs />
-          <div>protocol run details path matched</div>
-        </Route>
-        <Route path="/protocols/:protocolKey">
-          <Breadcrumbs />
-          <div>protocol details path matched</div>
-        </Route>
+        <Route
+          path="/devices/:robotName"
+          element={
+            <>
+              <Breadcrumbs />
+              <div>device details path matched</div>
+            </>
+          }
+        />
+
+        <Route
+          path="/devices/:robotName/protocol-runs/:runId"
+          element={
+            <>
+              <Breadcrumbs />
+              <div>protocol run details path matched</div>
+            </>
+          }
+        />
+
+        <Route
+          path="/protocols/:protocolKey"
+          element={
+            <>
+              <Breadcrumbs />
+              <div>protocol details path matched</div>
+            </>
+          }
+        />
       </Routes>
     </MemoryRouter>,
     {

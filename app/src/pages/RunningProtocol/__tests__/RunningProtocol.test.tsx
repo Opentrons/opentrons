@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Route, MemoryRouter } from 'react-router-dom'
+import { Route, MemoryRouter, Routes } from 'react-router-dom'
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { when } from 'vitest-when'
 import { screen } from '@testing-library/react'
@@ -82,9 +82,9 @@ const mockResumeRunFromRecovery = vi.fn()
 const render = (path = '/') => {
   return renderWithProviders(
     <MemoryRouter initialEntries={[path]} initialIndex={0}>
-      <Route path="/runs/:runId/run">
-        <RunningProtocol />
-      </Route>
+      <Routes>
+        <Route path="/runs/:runId/run" element={<RunningProtocol />} />
+      </Routes>
     </MemoryRouter>
   )
 }

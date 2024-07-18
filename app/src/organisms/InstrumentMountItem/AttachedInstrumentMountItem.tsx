@@ -53,7 +53,7 @@ export function AttachedInstrumentMountItem(
         attachedGripper: attachedInstrument,
         onComplete: () => {
           navigate(
-            attachedInstrument == null ? `/instruments` : `/instrument/${mount}`
+            attachedInstrument == null ? '/instruments' : `/instrument/${mount}`
           )
         },
         closeFlow: () => {

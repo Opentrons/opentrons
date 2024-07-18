@@ -2,6 +2,7 @@
 import React from 'react'
 import ReactDom from 'react-dom/client'
 import { Provider } from 'react-redux'
+import { BrowserRouter } from 'react-router-dom'
 
 import { ApiClientProvider } from '@opentrons/react-api-client'
 
@@ -17,7 +18,6 @@ import '../src/atoms/SoftwareKeyboard/NumericalKeyboard/index.css'
 
 // component tree
 import { App } from './App'
-import { BrowserRouter } from 'react-router-dom'
 
 const log = createLogger(new URL('', import.meta.url).pathname)
 
