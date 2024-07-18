@@ -117,7 +117,11 @@ export function ODDRecoveryOptions({
   getRecoveryOptionCopy,
 }: RecoveryOptionsProps): JSX.Element {
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      gridGap={SPACING.spacing4}
+      width="100%"
+    >
       {validRecoveryOptions.map((recoveryOption: RecoveryRoute) => {
         const optionName = getRecoveryOptionCopy(recoveryOption)
         return (
