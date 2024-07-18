@@ -65,7 +65,10 @@ GRAVIMETRIC_CFG = {
 
 GRAVIMETRIC_CFG_INCREMENT = {
     50: {
-        1: {50: gravimetric_ot3_p50_single},
+        1: {
+            20: gravimetric_ot3_p50_single,
+            50: gravimetric_ot3_p50_single
+        },
         8: {50: gravimetric_ot3_p50_multi_50ul_tip_increment},
     },
     1000: {
@@ -103,6 +106,7 @@ PIPETTE_MODEL_NAME = {
 PHOTOMETRIC_CFG = {
     50: {
         1: {
+            20: photometric_ot3_p50_single,
             50: photometric_ot3_p50_single,
         },
         8: {
@@ -552,7 +556,7 @@ if __name__ == "__main__":
     parser.add_argument("--simulate", action="store_true")
     parser.add_argument("--pipette", type=int, choices=[50, 1000], required=True)
     parser.add_argument("--channels", type=int, choices=[1, 8, 96], default=1)
-    parser.add_argument("--tip", type=int, choices=[0, 50, 200, 1000], default=0)
+    parser.add_argument("--tip", type=int, choices=[0, 20, 50, 200, 1000], default=0)
     parser.add_argument("--trials", type=int, default=0)
     parser.add_argument("--increment", action="store_true")
     parser.add_argument("--return-tip", action="store_true")

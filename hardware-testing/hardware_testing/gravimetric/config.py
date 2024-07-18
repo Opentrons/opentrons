@@ -88,6 +88,12 @@ LABWARE_BOTTOM_CLEARANCE = 1.5
 LIQUID_PROBE_SETTINGS: Dict[int, Dict[int, Dict[int, Dict[str, int]]]] = {
     50: {
         1: {
+            20: {
+                "max_z_distance": 20,
+                "mount_speed": 11,
+                "plunger_speed": 21,
+                "sensor_threshold_pascals": 150,
+            },
             50: {
                 "max_z_distance": 20,
                 "mount_speed": 11,
@@ -190,6 +196,7 @@ def _get_liquid_probe_settings(
 QC_VOLUMES_G: Dict[int, Dict[int, List[Tuple[int, List[float]]]]] = {
     1: {
         50: [  # P50
+            (20, [1.0, 20.0]),
             (50, [1.0, 50.0]),  # T50
         ],
         1000: [  # P1000
@@ -299,6 +306,11 @@ QC_TEST_MIN_REQUIREMENTS: Dict[
     # channels: [Pipette: [tip: [Volume: (%d, Cv)]]]
     1: {
         50: {  # P50
+            20: {
+                1.0: (5.0, 4.0),
+                10.0: (1.0, 0.5),
+                20.0: (1, 0.4),
+            },
             50: {
                 1.0: (5.0, 4.0),
                 10.0: (1.0, 0.5),
