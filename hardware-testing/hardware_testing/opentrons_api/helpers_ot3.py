@@ -576,6 +576,7 @@ async def update_pick_up_distance(
                 tip_type
             ].distance = distance
     pipette.pick_up_configurations.press_fit = config_model
+    print(f'{pipette.pick_up_configurations.press_fit}')
 
 
 async def move_plunger_absolute_ot3(

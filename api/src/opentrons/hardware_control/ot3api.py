@@ -1932,6 +1932,95 @@ class OT3API(
                 acquire_lock=acquire_lock,
             )
 
+    async def _move_to_plunger_top(
+        self,
+        mount: OT3Mount,
+        volume: float,
+        rate: float,
+        acquire_lock: bool = True,
+        check_current_vol: bool = True,
+    ) -> None:
+        """
+        Move an instrument's plunger to its bottom position, while no liquids
+        are held by said instrument.
+
+        Possible events where this occurs:
+
+        1. After homing the plunger
+        2. After picking up a new tip
+        3. Between a blow-out and an aspiration (eg: re-using tips)
+
+        Three possible physical tip states when this happens:
+
+        1. no tip on pipette
+        2. empty and dry (unused) tip on pipette
+        3. empty and wet (used) tip on pipette
+
+        With wet tips, the primary concern is leftover droplets inside the tip.
+        These droplets ideally only move down and out of the tip, not up into the tip.
+        Therefore, it is preferable to use the "blow-out" speed when moving the
+        plunger down, and the slower "aspirate" speed when moving the plunger up.
+
+        Assume all tips are wet, because we do not differentiate between wet/dry tips.
+
+        When no tip is attached, moving at the max speed is preferable, to save time.
+        """
+        checked_mount = OT3Mount.from_mount(mount)
+        instrument = self._pipette_handler.get_pipette(checked_mount)
+        if check_current_vol and instrument.current_volume > 0:
+            raise RuntimeError("cannot position plunger while holding liquid")
+        pos = self._pipette_handler.plunger_position(instrument, volume, 'aspirate')
+        # target position is plunger BOTTOM
+        target_pos = target_position_from_plunger(
+            OT3Mount.from_mount(mount),
+            pos,
+            self._current_position,
+        )
+        pip_ax = Axis.of_main_tool_actuator(checked_mount)
+        # speed depends on if there is a tip, and which direction to move
+        if instrument.has_tip_length:
+            # using slower aspirate flow-rate, to avoid pulling droplets up
+            speed_up = self._pipette_handler.plunger_speed(
+                instrument, instrument.aspirate_flow_rate, "aspirate"
+            )
+            # use blow-out flow-rate, so we can push droplets out
+            speed_down = self._pipette_handler.plunger_speed(
+                instrument, instrument.blow_out_flow_rate, "dispense"
+            )
+        else:
+            # save time by using max speed
+            max_speeds = self.config.motion_settings.default_max_speed
+            speed_up = max_speeds[self.gantry_load][OT3AxisKind.P]
+            speed_down = speed_up
+        # IMPORTANT: Here is our backlash compensation.
+        #            The plunger is pre-loaded in the "aspirate" direction
+        backlash_pos = target_pos.copy()
+        backlash_pos[pip_ax] += instrument.backlash_distance
+        # NOTE: plunger position (mm) decreases up towards homing switch
+        # NOTE: if already at BOTTOM, we still need to run backlash-compensation movement,
+        #       because we do not know if we arrived at BOTTOM from above or below.
+        async with self._backend.motor_current(
+            run_currents={
+                pip_ax: instrument.config.plunger_homing_configurations.current
+            }
+        ):
+            if self._current_position[pip_ax] < backlash_pos[pip_ax]:
+                await self._move(
+                    backlash_pos,
+                    speed=(speed_down * rate),
+                    acquire_lock=acquire_lock,
+                )
+            # NOTE: This should ALWAYS be moving UP.
+            #       There should never be a time that this function is called and
+            #       the plunger doesn't physically move UP into it's BOTTOM position.
+            #       This is to make sure we are always engaged at the beginning of aspirate.
+            await self._move(
+                target_pos,
+                speed=(speed_up * rate),
+                acquire_lock=acquire_lock,
+            )
+            instrument.add_current_volume(volume)
+
     async def configure_for_volume(
         self, mount: Union[top_types.Mount, OT3Mount], volume: float
     ) -> None:
@@ -2119,6 +2208,26 @@ class OT3API(
         finally:
             await self.home_gear_motors()
 
+    async def _high_throughput_evo_push(self) -> None:
+        """Tip action required for high throughput pipettes to get tip status."""
+        instrument = self._pipette_handler.get_pipette(OT3Mount.LEFT)
+        tip_presence_check_target = instrument.tip_presence_check_dist_mm
+
+        # if position is not known, home gear motors before any potential movement
+        if self._backend.gear_motor_position is None:
+            await self.home_gear_motors()
+
+        tip_motor_pos_float = self._backend.gear_motor_position or 0.0
+
+        # only move tip motors if they are not already below the sensor
+        if tip_motor_pos_float < tip_presence_check_target:
+            await self._backend.tip_action(
+                origin={Axis.Q: tip_motor_pos_float},
+                targets=[({Axis.Q: tip_presence_check_target}, 400)],
+            )
+
+        await self.home_gear_motors()
+
     async def get_tip_presence_status(
         self,
         mount: Union[top_types.Mount, OT3Mount],
@@ -2215,6 +2324,31 @@ class OT3API(
 
         if prep_after:
             await self.prepare_for_aspirate(realmount)
+
+    async def evo_pick_up_tip(
+        self,
+        mount: Union[top_types.Mount, OT3Mount],
+        tip_length: float,
+        presses: Optional[int] = None,
+        increment: Optional[float] = None,
+        volume: Optional[float] = None,
+    ) -> None:
+        """Pick up tip from current location."""
+        realmount = OT3Mount.from_mount(mount)
+        instrument = self._pipette_handler.get_pipette(realmount)
+
+        def add_tip_to_instr() -> None:
+            instrument.add_tip(tip_length=tip_length)
+            instrument.set_current_volume(volume)
+
+        # await self._move_to_plunger_top(realmount, rate=1.0)
+
+        await self.tip_pickup_moves(realmount, presses, increment)
+
+        add_tip_to_instr()
+
+        # if prep_after:
+        #     await self.prepare_for_aspirate(realmount)
 
     def set_current_tiprack_diameter(
         self, mount: Union[top_types.Mount, OT3Mount], tiprack_diameter: float
