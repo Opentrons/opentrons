@@ -166,7 +166,7 @@ export function BeginRemoval({
               ),
             },
           ]}
-        ></RecoveryRadioGroup>
+        />
       </Flex>
       <RecoveryFooterButtons primaryBtnOnClick={primaryOnClick} />
     </RecoverySingleColumnContentWrapper>
