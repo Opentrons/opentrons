@@ -8,7 +8,6 @@ import {
   SPACING,
   Flex,
   StyledText,
-  RadioGroup,
   RESPONSIVENESS,
 } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
@@ -18,6 +17,7 @@ import { ODD_SECTION_TITLE_STYLE, RECOVERY_MAP } from '../constants'
 import {
   RecoveryFooterButtons,
   RecoverySingleColumnContentWrapper,
+  RecoveryRadioGroup
 } from '../shared'
 import { DropTipWizardFlows } from '../../DropTipWizardFlows'
 import { DT_ROUTES } from '../../DropTipWizardFlows/constants'
@@ -140,22 +140,34 @@ export function BeginRemoval({
         gridGap={SPACING.spacing4}
         css={DESKTOP_ONLY}
       >
-        <RadioGroup
+        <RecoveryRadioGroup
           useBlueChecked
           css={css`
             padding: ${SPACING.spacing4};
           `}
           value={selected}
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            const newValue = event.target.value;
-            console.log("newValue " + newValue)
-            setSelected('skip')
+          onChange={e => {
+            setSelected(e.currentTarget.value)
           }}
           options={[
-            { name: '', value: t('begin_removal'), children: <StyledText desktopStyle="bodyDefaultRegular">{t('begin_removal')}</StyledText> },
-            { name: '', value: t('skip'), children: <StyledText desktopStyle="bodyDefaultRegular">{t('skip')}</StyledText> },
+            {
+              value: t('begin_removal'),
+              children: (
+                <StyledText desktopStyle="bodyDefaultRegular">
+                  {t('begin_removal')}
+                </StyledText>
+              ),
+            },
+            {
+              value: t('skip'),
+              children: (
+                <StyledText desktopStyle="bodyDefaultRegular">
+                  {t('skip')}
+                </StyledText>
+              ),
+            },
           ]}
-        ></RadioGroup>
+        ></RecoveryRadioGroup>
       </Flex>
       <RecoveryFooterButtons primaryBtnOnClick={primaryOnClick} />
     </RecoverySingleColumnContentWrapper>
