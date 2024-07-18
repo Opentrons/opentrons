@@ -33,3 +33,7 @@ export const getEnableRedesign: Selector<boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ENABLE_REDESIGN ?? false
 )
+export const getEnableMoam: Selector<boolean> = createSelector(
+  getFeatureFlagData,
+  flags => flags.OT_PD_ENABLE_MOAM ?? false
+)
