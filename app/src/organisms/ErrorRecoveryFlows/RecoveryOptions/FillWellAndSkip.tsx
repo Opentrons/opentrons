@@ -12,7 +12,7 @@ import { RECOVERY_MAP } from '../constants'
 import { CancelRun } from './CancelRun'
 import {
   RecoveryFooterButtons,
-  RecoveryContentWrapper,
+  RecoverySingleColumnContentWrapper,
   LeftColumnLabwareInfo,
   TwoColTextAndFailedStepNextStep,
 } from '../shared'
@@ -49,7 +49,7 @@ export function FillWell(props: RecoveryContentProps): JSX.Element | null {
   const { goBackPrevStep, proceedNextStep } = routeUpdateActions
 
   return (
-    <RecoveryContentWrapper>
+    <RecoverySingleColumnContentWrapper>
       <TwoColumn>
         <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
           <LeftColumnLabwareInfo
@@ -68,7 +68,7 @@ export function FillWell(props: RecoveryContentProps): JSX.Element | null {
         primaryBtnOnClick={proceedNextStep}
         secondaryBtnOnClick={goBackPrevStep}
       />
-    </RecoveryContentWrapper>
+    </RecoverySingleColumnContentWrapper>
   )
 }
 

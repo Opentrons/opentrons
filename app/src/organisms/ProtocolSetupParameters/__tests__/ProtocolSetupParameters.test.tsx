@@ -141,12 +141,11 @@ describe('ProtocolSetupParameters', () => {
     screen.getByText('EtoH Volume')
   })
 
-  // ToDo (kk:06/18/2024) comment-out will be removed in a following PR.
-  // it('renders the other setting when csv param', () => {
-  //   vi.mocked(useFeatureFlag).mockReturnValue(true)
-  //   render(props)
-  //   screen.getByText('CSV File')
-  // })
+  it('renders the other setting when csv param', () => {
+    vi.mocked(useFeatureFlag).mockReturnValue(true)
+    render(props)
+    screen.getByText('CSV File')
+  })
 
   it('renders the back icon and calls useHistory', () => {
     render(props)

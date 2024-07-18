@@ -11,7 +11,10 @@ import {
 
 import { ODD_SECTION_TITLE_STYLE, RECOVERY_MAP } from '../constants'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
-import { RecoveryFooterButtons, RecoveryContentWrapper } from '../shared'
+import {
+  RecoveryFooterButtons,
+  RecoverySingleColumnContentWrapper,
+} from '../shared'
 import { RadioButton } from '../../../atoms/buttons'
 
 import type { RecoveryContentProps } from '../types'
@@ -78,7 +81,7 @@ export function IgnoreErrorStepHome({
   }
 
   return (
-    <RecoveryContentWrapper>
+    <RecoverySingleColumnContentWrapper>
       <LegacyStyledText css={ODD_SECTION_TITLE_STYLE} as="h4SemiBold">
         {t('ignore_similar_errors_later_in_run')}
       </LegacyStyledText>
@@ -93,7 +96,7 @@ export function IgnoreErrorStepHome({
         primaryBtnOnClick={primaryOnClick}
         secondaryBtnOnClick={goBackPrevStep}
       />
-    </RecoveryContentWrapper>
+    </RecoverySingleColumnContentWrapper>
   )
 }
 

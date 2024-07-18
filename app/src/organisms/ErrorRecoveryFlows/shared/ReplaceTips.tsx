@@ -3,7 +3,7 @@ import * as React from 'react'
 import { Flex } from '@opentrons/components'
 
 import { useTranslation } from 'react-i18next'
-import { RecoveryContentWrapper } from './RecoveryContentWrapper'
+import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
 import { TwoColumn, DeckMapContent } from '../../../molecules/InterventionModal'
 import { RecoveryFooterButtons } from './RecoveryFooterButtons'
 import { LeftColumnLabwareInfo } from './LeftColumnLabwareInfo'
@@ -36,7 +36,7 @@ export function ReplaceTips(props: RecoveryContentProps): JSX.Element | null {
   }
 
   return (
-    <RecoveryContentWrapper>
+    <RecoverySingleColumnContentWrapper>
       <TwoColumn>
         <LeftColumnLabwareInfo
           {...props}
@@ -49,6 +49,6 @@ export function ReplaceTips(props: RecoveryContentProps): JSX.Element | null {
         </Flex>
       </TwoColumn>
       <RecoveryFooterButtons primaryBtnOnClick={primaryOnClick} />
-    </RecoveryContentWrapper>
+    </RecoverySingleColumnContentWrapper>
   )
 }
