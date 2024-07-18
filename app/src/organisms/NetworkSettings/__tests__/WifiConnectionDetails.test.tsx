@@ -11,7 +11,7 @@ import * as Fixtures from '../../../redux/networking/__fixtures__'
 import { NetworkDetailsModal } from '../../RobotSettingsDashboard/NetworkSettings/NetworkDetailsModal'
 import { WifiConnectionDetails } from '../WifiConnectionDetails'
 
-import type { useNavigate } from 'react-router-dom'
+import type { NavigateFunction } from 'react-router-dom'
 
 vi.mock('../../../resources/networking/hooks')
 vi.mock('../../../redux/networking')
@@ -20,7 +20,7 @@ vi.mock('../../RobotSettingsDashboard/NetworkSettings/NetworkDetailsModal')
 
 const mockNavigate = vi.fn()
 vi.mock('react-router-dom', async importOriginal => {
-  const actual = await importOriginal<typeof useNavigate>()
+  const actual = await importOriginal<typeof NavigateFunction>()
   return {
     ...actual,
     useNavigate: () => mockNavigate,

@@ -20,7 +20,7 @@ import { mockConnectedRobot } from '../../../../redux/discovery/__fixtures__'
 import { ConfirmCancelRunModal } from '../ConfirmCancelRunModal'
 import { CancelingRunModal } from '../CancelingRunModal'
 
-import type { useNavigate } from 'react-router-dom'
+import type { NavigateFunction } from 'react-router-dom'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../../organisms/Devices/hooks')
@@ -38,7 +38,7 @@ const mockTrackProtocolRunEvent = vi.fn(
 )
 
 vi.mock('react-router-dom', async importOriginal => {
-  const actual = await importOriginal<typeof useNavigate>()
+  const actual = await importOriginal<typeof NavigateFunction>()
   return {
     ...actual,
     useNavigate: () => mockNavigate,

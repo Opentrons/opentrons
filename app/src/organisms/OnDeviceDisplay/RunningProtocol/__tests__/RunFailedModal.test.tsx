@@ -9,7 +9,7 @@ import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { RunFailedModal } from '../RunFailedModal'
 
-import type { useNavigate } from 'react-router-dom'
+import type { NavigateFunction } from 'react-router-dom'
 
 vi.mock('@opentrons/react-api-client')
 
@@ -74,7 +74,7 @@ const mockErrors = [
 const mockStopRun = vi.fn((_runId, opts) => opts.onSuccess())
 
 vi.mock('react-router-dom', async importOriginal => {
-  const actual = await importOriginal<typeof useNavigate>()
+  const actual = await importOriginal<typeof NavigateFunction>()
   return {
     ...actual,
     useNavigate: () => mockNavigate,

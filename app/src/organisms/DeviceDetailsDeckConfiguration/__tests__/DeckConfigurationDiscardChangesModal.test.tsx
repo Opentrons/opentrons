@@ -5,13 +5,13 @@ import { describe, it, beforeEach, vi, expect } from 'vitest'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { DeckConfigurationDiscardChangesModal } from '../DeckConfigurationDiscardChangesModal'
-import type { useNavigate } from 'react-router-dom'
+import type { NavigateFunction } from 'react-router-dom'
 
 const mockFunc = vi.fn()
 const mockNavigate = vi.fn()
 
 vi.mock('react-router-dom', async importOriginal => {
-  const actual = await importOriginal<typeof useNavigate>()
+  const actual = await importOriginal<typeof NavigateFunction>()
   return {
     ...actual,
     useNavigate: () => mockNavigate,

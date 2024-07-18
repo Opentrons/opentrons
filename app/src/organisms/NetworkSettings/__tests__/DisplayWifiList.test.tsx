@@ -8,7 +8,7 @@ import * as Fixtures from '../../../redux/networking/__fixtures__'
 import { DisplaySearchNetwork } from '../DisplaySearchNetwork'
 import { DisplayWifiList } from '../DisplayWifiList'
 
-import type { useNavigate } from 'react-router-dom'
+import type { NavigateFunction } from 'react-router-dom'
 
 const mockNavigate = vi.fn()
 const mockWifiList = [
@@ -24,7 +24,7 @@ vi.mock('../../../redux/networking/selectors')
 vi.mock('../../../redux/discovery/selectors')
 vi.mock('../DisplaySearchNetwork')
 vi.mock('react-router-dom', async importOriginal => {
-  const actual = await importOriginal<typeof useNavigate>()
+  const actual = await importOriginal<typeof NavigateFunction>()
   return {
     ...actual,
     useNavigate: () => mockNavigate,

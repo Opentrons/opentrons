@@ -33,13 +33,13 @@ import {
   INIT_STATUS,
 } from '../../../../resources/health/hooks'
 
-import type { useNavigate } from 'react-router-dom'
+import type { NavigateFunction } from 'react-router-dom'
 import type { ProtocolHardware } from '../../../../pages/Protocols/hooks'
 
 const mockNavigate = vi.fn()
 
 vi.mock('react-router-dom', async importOriginal => {
-  const actual = await importOriginal<typeof useNavigate>()
+  const actual = await importOriginal<typeof NavigateFunction>()
   return {
     ...actual,
     useNavigate: () => mockNavigate,

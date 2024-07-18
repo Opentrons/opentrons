@@ -21,7 +21,7 @@ import { ExitModal } from '../ExitModal'
 import { ConfirmPipette } from '../ConfirmPipette'
 import { ChangePipette } from '..'
 
-import type { useNavigate } from 'react-router-dom'
+import type { NavigateFunction } from 'react-router-dom'
 import type { PipetteNameSpecs } from '@opentrons/shared-data'
 import type { AttachedPipette } from '../../../redux/pipettes/types'
 import type { DispatchApiRequestType } from '../../../redux/robot-api'
@@ -29,7 +29,7 @@ import type { DispatchApiRequestType } from '../../../redux/robot-api'
 const mockNavigate = vi.fn()
 
 vi.mock('react-router-dom', async importOriginal => {
-  const actual = await importOriginal<typeof useNavigate>()
+  const actual = await importOriginal<typeof NavigateFunction>()
   return {
     ...actual,
     useNavigate: () => mockNavigate,
