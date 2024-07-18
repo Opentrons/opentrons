@@ -1003,7 +1003,7 @@
     "format": "96Standard",
     "quirks": [],
     "isTiprack": true,
-    "tipLength": 57.9,
+    "tipLength": 52.0,
     "tipOverlap": 10.5,
     "isMagneticModuleCompatible": false,
     "loadName": "opentrons_flex_96_tiprack_20ul"
