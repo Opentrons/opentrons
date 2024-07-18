@@ -74,6 +74,17 @@ def get_addressable_area_view(
         or {},
         deck_definition=deck_definition or cast(DeckDefinitionV5, {"otId": "fake"}),
         deck_configuration=deck_configuration or [],
+        robot_definition={
+            "displayName": "OT-3",
+            "robotType": "OT-3 Standard",
+            "models": ["OT-3 Standard"],
+            "extents": [477.2, 493.8, 0.0],
+            "mountOffsets": {
+                "left": [-13.5, -60.5, 255.675],
+                "right": [40.5, -60.5, 255.675],
+                "gripper": [84.55, -12.75, 93.85],
+            },
+        },
         robot_type=robot_type,
         use_simulated_deck_config=use_simulated_deck_config,
     )

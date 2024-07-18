@@ -775,6 +775,8 @@ def test_add_pipette_config(
         pipette_bounding_box_offsets=PipetteBoundingBoxOffsets(
             back_left_corner=Point(x=1, y=2, z=3),
             front_right_corner=Point(x=4, y=5, z=6),
+            front_left_corner=Point(x=1, y=5, z=3),
+            back_right_corner=Point(x=4, y=2, z=3),
         ),
         lld_settings={},
     )
