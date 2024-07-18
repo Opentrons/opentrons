@@ -12,7 +12,6 @@ import { InstrumentsDashboard } from '..'
 import { formatTimeWithUtcLabel } from '../../../resources/runs'
 import { InstrumentDetail } from '../../../pages/InstrumentDetail'
 import type * as ReactApiClient from '@opentrons/react-api-client'
-import type * as ReactRouterDom from 'react-router-dom'
 
 const mockGripperData = {
   instrumentModel: 'gripperV1',

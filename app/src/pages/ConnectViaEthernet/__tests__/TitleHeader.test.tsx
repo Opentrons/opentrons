@@ -5,11 +5,11 @@ import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { TitleHeader } from '../../../pages/ConnectViaEthernet/TitleHeader'
 
-import type * as ReactRouterDom from 'react-router-dom'
+import type { NavigateFunction } from 'react-router-dom'
 
 const mockNavigate = vi.fn()
 vi.mock('react-router-dom', async importOriginal => {
-  const actual = await importOriginal<typeof ReactRouterDom>()
+  const actual = await importOriginal<NavigateFunction>()
   return {
     ...actual,
     useNavigate: () => mockNavigate,

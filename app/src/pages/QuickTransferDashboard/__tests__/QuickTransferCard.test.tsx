@@ -11,7 +11,7 @@ import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { QuickTransferCard } from '../QuickTransferCard'
 import { LongPressModal } from '../LongPressModal'
-import type * as ReactRouterDom from 'react-router-dom'
+import type { NavigateFunction } from 'react-router-dom'
 import type { UseQueryResult } from 'react-query'
 import type {
   CompletedProtocolAnalysis,
@@ -21,7 +21,7 @@ import type {
 const mockNavigate = vi.fn()
 
 vi.mock('react-router-dom', async importOriginal => {
-  const actual = await importOriginal<typeof ReactRouterDom>()
+  const actual = await importOriginal<NavigateFunction>()
   return {
     ...actual,
     useNavigate: () => mockNavigate,

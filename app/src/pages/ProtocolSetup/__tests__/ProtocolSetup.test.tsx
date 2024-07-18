@@ -60,7 +60,7 @@ import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configu
 
 import type { UseQueryResult } from 'react-query'
 import type * as SharedData from '@opentrons/shared-data'
-import type * as ReactRouterDom from 'react-router-dom'
+import type { NavigateFunction } from 'react-router-dom'
 // Mock IntersectionObserver
 class IntersectionObserver {
   observe = vi.fn()
@@ -85,7 +85,7 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
 })
 
 vi.mock('react-router-dom', async importOriginal => {
-  const reactRouterDom = await importOriginal<typeof ReactRouterDom>()
+  const reactRouterDom = await importOriginal<NavigateFunction>()
   return {
     ...reactRouterDom,
     useNavigate: () => mockNavigate,

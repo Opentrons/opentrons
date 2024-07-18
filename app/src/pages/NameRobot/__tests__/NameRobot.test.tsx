@@ -19,7 +19,7 @@ import {
 } from '../../../redux/discovery/__fixtures__'
 
 import { NameRobot } from '..'
-import type * as ReactRouterDom from 'react-router-dom'
+import type { NavigateFunction } from 'react-router-dom'
 
 vi.mock('../../../redux/discovery/selectors')
 vi.mock('../../../redux/config')
@@ -29,7 +29,7 @@ vi.mock('../../../organisms/RobotSettingsDashboard/NetworkSettings/hooks')
 const mockNavigate = vi.fn()
 
 vi.mock('react-router-dom', async importOriginal => {
-  const actual = await importOriginal<typeof ReactRouterDom>()
+  const actual = await importOriginal<NavigateFunction>()
   return {
     ...actual,
     useNavigate: () => mockNavigate,

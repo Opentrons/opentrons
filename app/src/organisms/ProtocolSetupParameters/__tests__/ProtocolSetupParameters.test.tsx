@@ -20,7 +20,7 @@ import { useToaster } from '../../ToasterOven'
 import { useFeatureFlag } from '../../../redux/config'
 import { ProtocolSetupParameters } from '..'
 
-import type * as ReactRouterDom from 'react-router-dom'
+import type { NavigateFunction } from 'react-router-dom'
 import type { HostConfig } from '@opentrons/api-client'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
@@ -34,7 +34,7 @@ vi.mock('../../ToasterOven')
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 vi.mock('react-router-dom', async importOriginal => {
-  const reactRouterDom = await importOriginal<typeof ReactRouterDom>()
+  const reactRouterDom = await importOriginal<NavigateFunction>()
   return {
     ...reactRouterDom,
     useNavigate: () => mockNavigate,

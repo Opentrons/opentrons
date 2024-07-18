@@ -20,12 +20,12 @@ import {
 import type { UseQueryResult } from 'react-query'
 import type { DeckConfiguration } from '@opentrons/shared-data'
 import type * as Components from '@opentrons/components'
-import type * as ReactRouterDom from 'react-router-dom'
+import type { NavigateFunction } from 'react-router-dom'
 
 const mockUpdateDeckConfiguration = vi.fn()
 const mockGoBack = vi.fn()
 vi.mock('react-router-dom', async importOriginal => {
-  const actual = await importOriginal<typeof ReactRouterDom>()
+  const actual = await importOriginal<NavigateFunction>()
   return {
     ...actual,
     useNavigate: () => mockGoBack,

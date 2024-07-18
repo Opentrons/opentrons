@@ -228,7 +228,7 @@ export function ProtocolRunHeader({
 
   React.useEffect(() => {
     if (protocolData != null && !isRobotViewable) {
-      navigate(`/devices`)
+      navigate('/devices')
     }
   }, [protocolData, isRobotViewable, navigate])
 

@@ -77,7 +77,7 @@ export function ConfirmCancelRunModal({
         if (protocolId != null) {
           navigate(`/protocols/${protocolId}`)
         } else {
-          navigate(`/protocols`)
+          navigate('/protocols')
         }
       }
     }

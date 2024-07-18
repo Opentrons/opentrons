@@ -37,7 +37,7 @@ import { FirmwareUpdateFailedModal } from '../FirmwareUpdateFailedModal'
 import { ErrorInfo } from '../ErrorInfo'
 import { ModuleCard } from '..'
 
-import type * as ReactRouterDom from 'react-router-dom'
+import type { NavigateFunction } from 'react-router-dom'
 import type {
   HeaterShakerModule,
   MagneticModule,
@@ -59,7 +59,7 @@ vi.mock('../../../organisms/ToasterOven')
 vi.mock('../../../organisms/Devices/hooks')
 vi.mock('../../../resources/devices/hooks/useIsEstopNotDisengaged')
 vi.mock('react-router-dom', async importOriginal => {
-  const actual = await importOriginal<typeof ReactRouterDom>()
+  const actual = await importOriginal<NavigateFunction>()
   return {
     ...actual,
     useNavigate: () => vi.fn(),

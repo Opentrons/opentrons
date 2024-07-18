@@ -19,12 +19,12 @@ import { RobotDashboard } from '..'
 import { useNotifyAllRunsQuery } from '../../../resources/runs'
 
 import type { ProtocolResource } from '@opentrons/shared-data'
-import type * as ReactRouterDom from 'react-router-dom'
+import type { NavigateFunction } from 'react-router-dom'
 
 const mockNavigate = vi.fn()
 
 vi.mock('react-router-dom', async importOriginal => {
-  const actual = await importOriginal<typeof ReactRouterDom>()
+  const actual = await importOriginal<NavigateFunction>()
   return {
     ...actual,
     useNavigate: () => mockNavigate,

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
-
+import { useNavigate } from 'react-router-dom'
 import {
   COLORS,
   DIRECTION_COLUMN,
@@ -14,6 +14,7 @@ import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
 } from '@opentrons/shared-data'
+import { RUN_STATUS_STOPPED } from '@opentrons/api-client'
 
 import { getTopPortalEl } from '../../App/portal'
 import { FloatingActionButton } from '../../atoms/buttons'
@@ -22,6 +23,7 @@ import { ChildNavigation } from '../../organisms/ChildNavigation'
 import { useAttachedModules } from '../../organisms/Devices/hooks'
 import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useRunStatus } from '../RunTimeControl/hooks'
 import {
   getAttachedProtocolModuleMatches,
   getUnmatchedModulesForProtocol,
@@ -34,9 +36,6 @@ import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configurat
 
 import type { CutoutId, CutoutFixtureId } from '@opentrons/shared-data'
 import type { SetupScreens } from '../../pages/ProtocolSetup'
-import { useRunStatus } from '../RunTimeControl/hooks'
-import { RUN_STATUS_STOPPED } from '@opentrons/api-client'
-import { useNavigate } from 'react-router-dom'
 
 const ATTACHED_MODULE_POLL_MS = 5000
 const DECK_CONFIG_POLL_MS = 5000

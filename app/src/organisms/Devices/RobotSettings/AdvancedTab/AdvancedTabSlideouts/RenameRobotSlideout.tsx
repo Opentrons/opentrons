@@ -139,7 +139,7 @@ export function RenameRobotSlideout({
       // data.name != null && navigate(`/devices/${data.name}/robot-settings`)
       // TODO 6/9/2022 kj this is a temporary fix to avoid the issue
       // https://github.com/Opentrons/opentrons/issues/10709
-      data.name != null && navigate(`/devices`)
+      data.name != null && navigate('/devices')
       dispatch(removeRobot(previousRobotName))
     },
     onError: (error: Error) => {
