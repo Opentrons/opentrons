@@ -13,6 +13,7 @@ from opentrons.protocol_engine.types import (
     NumberParameter,
     CSVParameter,
     CsvRunTimeParamFilesType,
+    FileInfo,
 )
 from opentrons.protocols.api_support.types import APIVersion
 
@@ -1694,7 +1695,9 @@ async def test_update_protocol_analyses_with_new_rtp_values(
         default=3.0,
     )
     csv_parameter = CSVParameter(
-        displayName="CSV parameter", variableName="csv_param", fileId="file-id"
+        displayName="CSV parameter",
+        variableName="csv_param",
+        file=FileInfo(id="file-id", name=""),
     )
     decoy.when(protocol_store.has(protocol_id="protocol-id")).then_return(True)
     decoy.when(protocol_store.get(protocol_id="protocol-id")).then_return(

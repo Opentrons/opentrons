@@ -156,7 +156,6 @@ def run_time_parameters() -> List[pe_types.RunTimeParameter]:
             displayName="Display Name 4",
             variableName="variable_name_4",
             description="a csv parameter without file id",
-            fileId=None,
         ),
     ]
 

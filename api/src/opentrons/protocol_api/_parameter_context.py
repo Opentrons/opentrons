@@ -20,6 +20,7 @@ from opentrons.protocol_engine.types import (
     RunTimeParameter,
     PrimitiveRunTimeParamValuesType,
     CsvRunTimeParamFilesType,
+    FileInfo,
 )
 
 from ._parameters import Parameters
@@ -240,8 +241,8 @@ class ParameterContext:
                     f" but '{variable_name}' is not a CSV parameter."
                 )
 
-            parameter.id = file_id
-            # TODO (spp, 2024-07-16): assign the file as parameter.value
+            parameter.file_info = FileInfo(id=file_id, name="")
+            # TODO (spp, 2024-07-16): set the file name and assign the file as parameter.value.
             #  Most likely, we will be creating a temporary file copy of the original
             #  to pass onto the protocol context
 

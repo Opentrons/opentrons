@@ -14,6 +14,7 @@ from opentrons.protocol_engine.types import (
     EnumChoice,
     BooleanParameter,
     CSVParameter,
+    FileInfo,
 )
 
 from sqlalchemy.engine import Engine as SQLEngine
@@ -112,12 +113,12 @@ def mock_number_param(name: str, value: float) -> NumberParameter:
     )
 
 
-def mock_csv_param(name: str, file_id: Optional[str]) -> CSVParameter:
+def mock_csv_param(name: str, file: Optional[FileInfo]) -> CSVParameter:
     """Return a CSVParameter."""
     return CSVParameter(
         variableName=name,
         displayName="csv param",
-        fileId=file_id,
+        file=file,
     )
 
 
@@ -342,7 +343,9 @@ async def test_update_adds_rtp_values_to_completed_store(
         default="blah",
     )
     csv_param = pe_types.CSVParameter(
-        displayName="A CSV param", variableName="coolest_param", fileId="file-id"
+        displayName="A CSV param",
+        variableName="coolest_param",
+        file=FileInfo(id="file-id", name="file-name"),
     )
     expected_completed_analysis_resource = CompletedAnalysisResource(
         id="analysis-id",
@@ -545,7 +548,9 @@ async def test_save_initialization_failed_analysis(
                 mock_number_param("cool_param", 2.0),
                 mock_enum_param("cooler_param", "baz"),
                 mock_bool_param("uncool_param", True),
-                mock_csv_param("coolest_param", "file-id"),
+                mock_csv_param(
+                    "coolest_param", FileInfo(id="file-id", name="file-name")
+                ),
             ],
             True,
         ),
@@ -554,7 +559,9 @@ async def test_save_initialization_failed_analysis(
                 mock_number_param("cool_param", 2),
                 mock_enum_param("cooler_param", "buzzzzz"),
                 mock_bool_param("uncool_param", False),
-                mock_csv_param("coolest_param", "file-id"),
+                mock_csv_param(
+                    "coolest_param", FileInfo(id="file-id", name="file-name")
+                ),
             ],
             False,
         ),
@@ -563,7 +570,9 @@ async def test_save_initialization_failed_analysis(
                 # params in different order, cool param is '2' instead of '2.0'
                 mock_enum_param("cooler_param", "baz"),
                 mock_bool_param("uncool_param", True),
-                mock_csv_param("coolest_param", "file-id"),
+                mock_csv_param(
+                    "coolest_param", FileInfo(id="file-id", name="file-name")
+                ),
                 mock_number_param("cool_param", 2),
             ],
             True,
