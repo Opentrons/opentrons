@@ -1039,13 +1039,23 @@ class EnumParameter(RTPBase):
     )
 
 
+class FileInfo(BaseModel):
+    """A file UUID descriptor."""
+
+    id: str = Field(
+        ...,
+        description="The UUID identifier of the file stored on the robot.",
+    )
+    name: str = Field(..., description="Name of the file, including the extension.")
+
+
 class CSVParameter(RTPBase):
     """A CSV file parameter defined in a protocol."""
 
     type: Literal["csv_file"] = Field(
         default="csv_file", description="String specifying the type of this parameter"
     )
-    fileId: Optional[str] = Field(
+    file: Optional[FileInfo] = Field(
         default=None,
         description="ID of the CSV file stored on the robot; to be used for fetching the CSV file."
         " For local analysis this will most likely be empty.",
