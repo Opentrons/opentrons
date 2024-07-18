@@ -38,7 +38,7 @@ describe('RecoveryFooterButtons', () => {
     const primaryBtns = screen.getAllByRole('button', { name: 'Continue' })
     const secondaryBtns = screen.getAllByRole('button', { name: 'Go back' })
     expect(primaryBtns.length).toBe(2)
-    expect(secondaryBtns.length).toBe(2)
+    expect(secondaryBtns.length).toBe(1)
 
     primaryBtns.forEach(btn => {
       mockPrimaryBtnOnClick.mockReset()
@@ -61,6 +61,22 @@ describe('RecoveryFooterButtons', () => {
       name: 'MOCK_OVERRIDE_TEXT',
     })
     expect(secondaries.length).toBe(2)
+  })
+
+  it('renders the primary button as disabled when primaryBtnDisabled is true', () => {
+    props = {
+      ...props,
+      primaryBtnOnClick: mockPrimaryBtnOnClick,
+      primaryBtnDisabled: true,
+      primaryBtnTextOverride: 'Hi',
+    }
+    render(props)
+
+    const primaryBtns = screen.getAllByRole('button', { name: 'Hi' })
+
+    primaryBtns.forEach(btn => {
+      expect(btn).toBeDisabled()
+    })
   })
 
   it('does not render the secondary button if no on click handler is supplied', () => {

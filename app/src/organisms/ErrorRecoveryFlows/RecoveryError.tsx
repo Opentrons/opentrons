@@ -13,7 +13,7 @@ import {
 } from '@opentrons/components'
 
 import { RECOVERY_MAP } from './constants'
-import { RecoveryContentWrapper } from './shared'
+import { RecoverySingleColumnContentWrapper } from './shared'
 
 import type { RecoveryContentProps } from './types'
 import { SmallButton } from '../../atoms/buttons'
@@ -168,7 +168,7 @@ export function ErrorContent({
   btnOnClick: () => void
 }): JSX.Element | null {
   return (
-    <RecoveryContentWrapper>
+    <RecoverySingleColumnContentWrapper>
       <Flex
         padding={SPACING.spacing40}
         gridGap={SPACING.spacing24}
@@ -196,6 +196,6 @@ export function ErrorContent({
       <Flex justifyContent={JUSTIFY_END}>
         <SmallButton onClick={btnOnClick} buttonText={btnText} />
       </Flex>
-    </RecoveryContentWrapper>
+    </RecoverySingleColumnContentWrapper>
   )
 }

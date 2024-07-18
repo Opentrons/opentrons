@@ -34,6 +34,8 @@ COL_TRIAL_CONVERSION = {
     13: "AO",
 }
 
+BASELINE_TRIAL_LINE_NUMBER = 43
+
 
 def _get_pressure_results(result_file: str) -> Tuple[float, float, float, List[float]]:
     z_velocity: float = 0.0
@@ -137,11 +139,13 @@ def process_csv_directory(  # noqa: C901
             for row in summary_reader:
                 final_report_writer.writerow(row)
                 s += 1
-                if s == 44:
+                if s == BASELINE_TRIAL_LINE_NUMBER:
                     meniscus_travel = float(row[6])
-                if s >= 45 and s < 45 + (trials * len(tips)):
+                if s >= (BASELINE_TRIAL_LINE_NUMBER + 1) and s < (
+                    BASELINE_TRIAL_LINE_NUMBER + 1 + (trials * len(tips))
+                ):
                     # while processing this grab the tip offsets from the summary
-                    tip_offsets[tips[int((s - 45) / trials)]].append(float(row[8]))
+                    tip_offsets[tips[int((s - 44) / trials)]].append(float(row[8]))
             # summary_reader.line_num is the last line in the summary that has text
             pressures_start_line = summary_reader.line_num + 3
             # calculate where the start and end of each block of data we want to graph

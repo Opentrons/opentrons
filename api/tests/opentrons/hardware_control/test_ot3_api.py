@@ -806,9 +806,6 @@ async def test_liquid_probe(
     )
     await ot3_hardware.cache_pipette(mount, instr_data, None)
     pipette = ot3_hardware.hardware_pipettes[mount.to_mount()]
-    plunger_positions = ot3_hardware._pipette_handler.get_pipette(
-        mount
-    ).plunger_positions
 
     assert pipette
     await ot3_hardware.add_tip(mount, 100)
@@ -838,10 +835,10 @@ async def test_liquid_probe(
         )
         fake_max_z_dist = 10.0
         await ot3_hardware.liquid_probe(mount, fake_max_z_dist, fake_settings_aspirate)
-        mock_move_to_plunger_bottom.assert_called_once()
+        mock_move_to_plunger_bottom.call_count == 2
         mock_liquid_probe.assert_called_once_with(
             mount,
-            plunger_positions.bottom - plunger_positions.top,
+            3.0,
             fake_settings_aspirate.mount_speed,
             (fake_settings_aspirate.plunger_speed * -1),
             fake_settings_aspirate.sensor_threshold_pascals,
@@ -913,7 +910,7 @@ async def test_multi_liquid_probe(
         await ot3_hardware.liquid_probe(
             OT3Mount.LEFT, fake_max_z_dist, fake_settings_aspirate
         )
-        assert mock_move_to_plunger_bottom.call_count == 3
+        assert mock_move_to_plunger_bottom.call_count == 4
         mock_liquid_probe.assert_called_with(
             OT3Mount.LEFT,
             plunger_positions.bottom - plunger_positions.top,
@@ -989,8 +986,8 @@ async def test_liquid_not_found(
         await ot3_hardware.liquid_probe(
             OT3Mount.LEFT, fake_max_z_dist, fake_settings_aspirate
         )
-    # assert that it went through 3 passes
-    assert mock_move_to_plunger_bottom.call_count == 3
+    # assert that it went through 3 passes and then prepared to aspirate
+    assert mock_move_to_plunger_bottom.call_count == 4
 
 
 @pytest.mark.parametrize(

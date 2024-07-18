@@ -76,13 +76,13 @@ def create_data_dictionary(
                 start_time = datetime.strptime(
                     file_results.get("startedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
                 )
-                adjusted_start_time = start_time - timedelta(hours=5)
+                adjusted_start_time = start_time - timedelta(hours=4)
                 start_date = str(adjusted_start_time.date())
                 start_time_str = str(adjusted_start_time).split("+")[0]
                 complete_time = datetime.strptime(
                     file_results.get("completedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
                 )
-                adjusted_complete_time = complete_time - timedelta(hours=5)
+                adjusted_complete_time = complete_time - timedelta(hours=4)
                 complete_time_str = str(adjusted_complete_time).split("+")[0]
                 run_time = complete_time - start_time
                 run_time_min = run_time.total_seconds() / 60

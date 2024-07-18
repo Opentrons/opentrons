@@ -39,6 +39,13 @@ def subject(
     return StateStore(
         config=engine_config,
         deck_definition=ot2_standard_deck_def,
+        robot_definition={
+            "displayName": "OT-2",
+            "robotType": "OT-2 Standard",
+            "models": ["OT-2 Standard", "OT-2 Refresh"],
+            "extents": [446.75, 347.5, 0.0],
+            "mountOffsets": {"left": [-34.0, 0.0, 0.0], "right": [0.0, 0.0, 0.0]},
+        },
         deck_fixed_labware=[],
         change_notifier=change_notifier,
         is_door_open=False,

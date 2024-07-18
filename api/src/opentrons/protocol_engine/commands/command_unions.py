@@ -1,6 +1,7 @@
 """Union types of concrete command definitions."""
 
-from typing import Annotated, Iterable, Type, Union, get_type_hints
+from collections.abc import Collection
+from typing import Annotated, Type, Union, get_type_hints
 
 from pydantic import Field
 
@@ -313,6 +314,11 @@ from .liquid_probe import (
     LiquidProbeCreate,
     LiquidProbeResult,
     LiquidProbeCommandType,
+    TryLiquidProbe,
+    TryLiquidProbeParams,
+    TryLiquidProbeCreate,
+    TryLiquidProbeResult,
+    TryLiquidProbeCommandType,
 )
 
 Command = Annotated[
@@ -353,6 +359,7 @@ Command = Annotated[
         VerifyTipPresence,
         GetTipPresence,
         LiquidProbe,
+        TryLiquidProbe,
         heater_shaker.WaitForTemperature,
         heater_shaker.SetTargetTemperature,
         heater_shaker.DeactivateHeater,
@@ -421,6 +428,7 @@ CommandParams = Union[
     VerifyTipPresenceParams,
     GetTipPresenceParams,
     LiquidProbeParams,
+    TryLiquidProbeParams,
     heater_shaker.WaitForTemperatureParams,
     heater_shaker.SetTargetTemperatureParams,
     heater_shaker.DeactivateHeaterParams,
@@ -487,6 +495,7 @@ CommandType = Union[
     VerifyTipPresenceCommandType,
     GetTipPresenceCommandType,
     LiquidProbeCommandType,
+    TryLiquidProbeCommandType,
     heater_shaker.WaitForTemperatureCommandType,
     heater_shaker.SetTargetTemperatureCommandType,
     heater_shaker.DeactivateHeaterCommandType,
@@ -554,6 +563,7 @@ CommandCreate = Annotated[
         VerifyTipPresenceCreate,
         GetTipPresenceCreate,
         LiquidProbeCreate,
+        TryLiquidProbeCreate,
         heater_shaker.WaitForTemperatureCreate,
         heater_shaker.SetTargetTemperatureCreate,
         heater_shaker.DeactivateHeaterCreate,
@@ -622,6 +632,7 @@ CommandResult = Union[
     VerifyTipPresenceResult,
     GetTipPresenceResult,
     LiquidProbeResult,
+    TryLiquidProbeResult,
     heater_shaker.WaitForTemperatureResult,
     heater_shaker.SetTargetTemperatureResult,
     heater_shaker.DeactivateHeaterResult,
@@ -671,12 +682,20 @@ CommandDefinedErrorData = Union[
 
 
 def _map_create_types_by_params_type(
-    create_types: Iterable[Type[CommandCreate]],
+    create_types: Collection[Type[CommandCreate]],
 ) -> dict[Type[CommandParams], Type[CommandCreate]]:
     def get_params_type(create_type: Type[CommandCreate]) -> Type[CommandParams]:
         return get_type_hints(create_type)["params"]  # type: ignore[no-any-return]
 
-    return {get_params_type(create_type): create_type for create_type in create_types}
+    result = {get_params_type(create_type): create_type for create_type in create_types}
+
+    # This isn't an inherent requirement of opentrons.protocol_engine,
+    # but this mapping is only useful to higher-level code if this holds true.
+    assert len(result) == len(
+        create_types
+    ), "Param models should map to create models 1:1."
+
+    return result
 
 
 CREATE_TYPES_BY_PARAMS_TYPE = _map_create_types_by_params_type(

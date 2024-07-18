@@ -298,6 +298,7 @@ export function ProtocolRunHeader({
       {isERActive ? (
         <ErrorRecoveryFlows
           isFlex={true}
+          runStatus={runStatus}
           runId={runId}
           failedCommand={failedCommand}
           protocolAnalysis={robotProtocolAnalysis}
@@ -353,8 +354,7 @@ export function ProtocolRunHeader({
         {analysisErrors != null && analysisErrors.length > 0 && (
           <ProtocolAnalysisErrorBanner errors={analysisErrors} />
         )}
-        {runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR ||
-        runStatus === RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR ? (
+        {runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR ? (
           <Banner type="warning" iconMarginLeft={SPACING.spacing4}>
             {t('close_door_to_resume')}
           </Banner>
@@ -545,11 +545,16 @@ const RUN_AGAIN_STATUSES: RunStatus[] = [
   RUN_STATUS_FAILED,
   RUN_STATUS_SUCCEEDED,
 ]
+const RECOVERY_STATUSES: RunStatus[] = [
+  RUN_STATUS_AWAITING_RECOVERY,
+  RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
+  RUN_STATUS_AWAITING_RECOVERY_PAUSED,
+]
 const DISABLED_STATUSES: RunStatus[] = [
   RUN_STATUS_FINISHING,
   RUN_STATUS_STOP_REQUESTED,
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
-  RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
+  ...RECOVERY_STATUSES,
 ]
 interface ActionButtonProps {
   runId: string
@@ -632,7 +637,6 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
     // For before running a protocol, "close door to begin".
     (isDoorOpen &&
       runStatus !== RUN_STATUS_BLOCKED_BY_OPEN_DOOR &&
-      runStatus !== RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR &&
       runStatus != null &&
       CANCELLABLE_STATUSES.includes(runStatus))
   const robot = useRobot(robotName)
@@ -693,7 +697,10 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
   if (isProtocolAnalyzing) {
     buttonIconName = 'ot-spinner'
     buttonText = t('analyzing_on_robot')
-  } else if (runStatus === RUN_STATUS_RUNNING) {
+  } else if (
+    runStatus === RUN_STATUS_RUNNING ||
+    (runStatus != null && RECOVERY_STATUSES.includes(runStatus))
+  ) {
     buttonIconName = 'pause'
     buttonText = t('pause_run')
     handleButtonClick = (): void => {

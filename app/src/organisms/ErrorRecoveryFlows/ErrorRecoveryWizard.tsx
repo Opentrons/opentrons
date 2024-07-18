@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { StyledText } from '@opentrons/components'
 
 import { RecoveryError } from './RecoveryError'
+import { RecoveryDoorOpen } from './RecoveryDoorOpen'
 import {
   SelectRecoveryOption,
   RetryStep,
@@ -27,11 +28,7 @@ import { RECOVERY_MAP } from './constants'
 
 import type { RobotType } from '@opentrons/shared-data'
 import type { RecoveryContentProps } from './types'
-import type {
-  useRouteUpdateActions,
-  useRecoveryCommands,
-  ERUtilsResults,
-} from './hooks'
+import type { ERUtilsResults } from './hooks'
 import type { ErrorRecoveryFlowsProps } from '.'
 
 interface UseERWizardResult {
@@ -60,6 +57,7 @@ export type ErrorRecoveryWizardProps = ErrorRecoveryFlowsProps &
   ERUtilsResults & {
     robotType: RobotType
     isOnDevice: boolean
+    isDoorOpen: boolean
   }
 
 export function ErrorRecoveryWizard(
@@ -85,7 +83,8 @@ export function ErrorRecoveryWizard(
 export function ErrorRecoveryComponent(
   props: RecoveryContentProps
 ): JSX.Element {
-  const { route, step } = props.recoveryMap
+  const { recoveryMap, hasLaunchedRecovery, isDoorOpen, isOnDevice } = props
+  const { route, step } = recoveryMap
   const { t } = useTranslation('error_recovery')
   const { showModal, toggleModal } = useErrorDetailsModal()
 
@@ -109,9 +108,20 @@ export function ErrorRecoveryComponent(
     </StyledText>
   )
 
+  // TODO(jh, 07-16-24): Revisit making RecoveryDoorOpen a route.
+  const buildInterventionContent = (): JSX.Element => {
+    if (isDoorOpen) {
+      return <RecoveryDoorOpen {...props} />
+    } else {
+      return <ErrorRecoveryContent {...props} />
+    }
+  }
+
   const isLargeDesktopStyle =
+    !isDoorOpen &&
     route === RECOVERY_MAP.DROP_TIP_FLOWS.ROUTE &&
     step !== RECOVERY_MAP.DROP_TIP_FLOWS.STEPS.BEGIN_REMOVAL
+
   return (
     <RecoveryInterventionModal
       iconHeading={buildIconHeading()}
@@ -119,11 +129,12 @@ export function ErrorRecoveryComponent(
       iconHeadingOnClick={toggleModal}
       iconName="information"
       desktopType={isLargeDesktopStyle ? 'desktop-large' : 'desktop-small'}
+      isOnDevice={isOnDevice}
     >
       {showModal ? (
         <ErrorDetailsModal {...props} toggleModal={toggleModal} />
       ) : null}
-      <ErrorRecoveryContent {...props} />
+      {buildInterventionContent()}
     </RecoveryInterventionModal>
   )
 }
@@ -176,6 +187,7 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
   const buildIgnoreErrorSkipStep = (): JSX.Element => {
     return <IgnoreErrorSkipStep {...props} />
   }
+
   switch (props.recoveryMap.route) {
     case RECOVERY_MAP.OPTION_SELECTION.ROUTE:
       return buildSelectRecoveryOption()
@@ -211,9 +223,9 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
   }
 }
 interface UseInitialPipetteHomeParams {
-  hasLaunchedRecovery: boolean
-  recoveryCommands: ReturnType<typeof useRecoveryCommands>
-  routeUpdateActions: ReturnType<typeof useRouteUpdateActions>
+  hasLaunchedRecovery: ErrorRecoveryWizardProps['hasLaunchedRecovery']
+  recoveryCommands: ErrorRecoveryWizardProps['recoveryCommands']
+  routeUpdateActions: ErrorRecoveryWizardProps['routeUpdateActions']
 }
 // Home the Z-axis of all attached pipettes on Error Recovery launch.
 export function useInitialPipetteHome({

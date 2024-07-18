@@ -838,13 +838,12 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         z_axis = self._engine_client.state.pipettes.get_z_axis(self._pipette_id)
         self._engine_client.execute_command(cmd.HomeParams(axes=[z_axis]))
 
-    def liquid_probe_with_recovery(self, well_core: WellCore) -> None:
+    def liquid_probe_with_recovery(self, well_core: WellCore, loc: Location) -> None:
         labware_id = well_core.labware_id
         well_name = well_core.get_name()
         well_location = WellLocation(
-            origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0)
+            origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=2)
         )
-
         self._engine_client.execute_command(
             cmd.LiquidProbeParams(
                 labwareId=labware_id,
@@ -854,13 +853,16 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             )
         )
 
-    def liquid_probe_without_recovery(self, well_core: WellCore) -> float:
+        self._protocol_core.set_last_location(location=loc, mount=self.get_mount())
+
+    def liquid_probe_without_recovery(
+        self, well_core: WellCore, loc: Location
+    ) -> float:
         labware_id = well_core.labware_id
         well_name = well_core.get_name()
         well_location = WellLocation(
-            origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0)
+            origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=2)
         )
-
         result = self._engine_client.execute_command_without_recovery(
             cmd.LiquidProbeParams(
                 labwareId=labware_id,
@@ -869,6 +871,8 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                 pipetteId=self.pipette_id,
             )
         )
+
+        self._protocol_core.set_last_location(location=loc, mount=self.get_mount())
 
         if result is not None and isinstance(result, LiquidProbeResult):
             return result.z_position

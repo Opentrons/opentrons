@@ -50,7 +50,7 @@ export function RadioGroup(props: RadioGroupProps): JSX.Element {
         const useStyleUpdates =
           props.useBlueChecked && radio.value === props.value
         return (
-          <label key={radio.value} className={itemClassName}>
+          <label key={radio.value} id={radio.value} className={itemClassName}>
             <div
               className={cx(styles.checkbox_icon, {
                 [styles.checked]: useStyleUpdates,
