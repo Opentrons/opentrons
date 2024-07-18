@@ -67,6 +67,7 @@ interface LabwareListItemProps extends LabwareSetupItem {
   isFlex: boolean
   commands: RunTimeCommand[]
   nestedLabwareInfo: NestedLabwareInfo | null
+  showLabwareSVG?: boolean
 }
 
 export function LabwareListItem(
@@ -83,6 +84,7 @@ export function LabwareListItem(
     isFlex,
     commands,
     nestedLabwareInfo,
+    showLabwareSVG,
   } = props
   const { t } = useTranslation('protocol_setup')
   const [
@@ -263,11 +265,11 @@ export function LabwareListItem(
       </Flex>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
         <Flex>
-          <StandaloneLabware definition={definition} />
+          {showLabwareSVG && <StandaloneLabware definition={definition} />}
           <Flex
             flexDirection={DIRECTION_COLUMN}
             justifyContent={JUSTIFY_CENTER}
-            marginLeft={SPACING.spacing16}
+            marginLeft={showLabwareSVG ? SPACING.spacing12 : SPACING.spacing8}
             marginRight={SPACING.spacing24}
           >
             <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
@@ -281,15 +283,10 @@ export function LabwareListItem(
         {nestedLabwareInfo != null &&
         nestedLabwareInfo?.sharedSlotId === slotInfo ? (
           <Flex>
-            {nestedLabwareInfo.nestedLabwareDefinition != null ? (
-              <StandaloneLabware
-                definition={nestedLabwareInfo.nestedLabwareDefinition}
-              />
-            ) : null}
             <Flex
               flexDirection={DIRECTION_COLUMN}
               justifyContent={JUSTIFY_CENTER}
-              marginLeft={SPACING.spacing16}
+              marginLeft={SPACING.spacing8}
               marginRight={SPACING.spacing24}
             >
               <LegacyStyledText
