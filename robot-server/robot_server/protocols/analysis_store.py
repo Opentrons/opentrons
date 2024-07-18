@@ -351,7 +351,7 @@ class AnalysisStore:
             CsvParameterResource(
                 analysis_id=completed_analysis.id,
                 parameter_variable_name=param.variableName,
-                file_id=param.fileId,
+                file_id=param.file.id if param.file else None,
             )
             for param in csv_rtp_list
             if isinstance(param, CSVParameter)
@@ -407,7 +407,8 @@ class AnalysisStore:
         ), "Mismatch in parameters found in the current request vs. last saved parameters."  # Indicates internal bug
         for param in new_parameters:
             if isinstance(param, CSVParameter):
-                if csv_rtps_in_last_analysis[param.variableName] != param.fileId:
+                new_file_id = param.file.id if param.file else None
+                if csv_rtps_in_last_analysis[param.variableName] != new_file_id:
                     return False
             elif primitive_rtps_in_last_analysis[param.variableName] != param.value:
                 return False
