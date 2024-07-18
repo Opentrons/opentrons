@@ -282,12 +282,10 @@ export function ProtocolRunSetup({
                     <EmptySetupStep
                       title={t(`${stepKey}_title`)}
                       description={StepDetailMap[stepKey].description}
-                      label={t('step', { index: index + 1 })}
                     />
                   ) : (
                     <SetupStep
                       expanded={stepKey === expandedStepKey}
-                      label={t('step', { index: index + 1 })}
                       title={setupStepTitle}
                       description={StepDetailMap[stepKey].description}
                       toggleExpanded={() => {
