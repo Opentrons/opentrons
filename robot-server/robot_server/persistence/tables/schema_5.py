@@ -96,7 +96,7 @@ analysis_primitive_type_rtp_table = sqlalchemy.Table(
 )
 
 analysis_csv_rtp_table = sqlalchemy.Table(
-    "analysis_csv_parameter",
+    "analysis_csv_rtp_table",
     metadata,
     sqlalchemy.Column(
         "row_id",

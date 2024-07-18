@@ -152,6 +152,12 @@ def run_time_parameters() -> List[pe_types.RunTimeParameter]:
             default="cooler choice",
             value="coolest choice",
         ),
+        pe_types.CSVParameter(
+            displayName="Display Name 4",
+            variableName="variable_name_4",
+            description="a csv parameter without file id",
+            fileId=None,
+        ),
     ]
 
 
