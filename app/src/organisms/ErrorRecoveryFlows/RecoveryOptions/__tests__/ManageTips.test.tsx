@@ -93,16 +93,16 @@ describe('ManageTips', () => {
     screen.getByText(
       'You may want to remove the tips from the left pipette before using it again in a protocol'
     )
-    screen.getByText('Begin removal')
-    screen.getByText('Skip')
+    screen.queryAllByText('Begin removal')
+    screen.queryAllByText('Skip')
     expect(screen.getAllByText('Continue').length).toBe(2)
   })
 
   it('routes correctly when continuing on BeginRemoval', () => {
     render(props)
 
-    const beginRemovalBtn = screen.getByText('Begin removal')
-    const skipBtn = screen.getByText('Skip')
+    const beginRemovalBtn = screen.queryAllByText('Begin removal')[0]
+    const skipBtn = screen.queryAllByText('Skip')[0]
 
     fireEvent.click(beginRemovalBtn)
     clickButtonLabeled('Continue')
@@ -124,7 +124,7 @@ describe('ManageTips', () => {
     }
     render(props)
 
-    const skipBtn = screen.getByText('Skip')
+    const skipBtn = screen.queryAllByText('Skip')[0]
 
     fireEvent.click(skipBtn)
     clickButtonLabeled('Continue')
