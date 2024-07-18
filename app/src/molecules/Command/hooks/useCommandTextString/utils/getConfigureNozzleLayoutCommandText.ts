@@ -1,17 +1,13 @@
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
 
 import type { ConfigureNozzleLayoutRunTimeCommand } from '@opentrons/shared-data/command'
-import type { GetCommandText } from '..'
-
-type GetConfigureNozzleLayoutCommandText = Omit<GetCommandText, 'command'> & {
-  command: ConfigureNozzleLayoutRunTimeCommand
-}
+import type { HandlesCommands } from './types'
 
 export function getConfigureNozzleLayoutCommandText({
   command,
   commandTextData,
   t,
-}: GetConfigureNozzleLayoutCommandText): string {
+}: HandlesCommands<ConfigureNozzleLayoutRunTimeCommand>): string {
   const { configurationParams, pipetteId } = command.params
   const pipetteName = commandTextData?.pipettes.find(
     pip => pip.id === pipetteId

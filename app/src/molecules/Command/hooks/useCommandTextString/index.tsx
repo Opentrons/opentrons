@@ -2,9 +2,9 @@ import { useTranslation } from 'react-i18next'
 import * as utils from './utils'
 
 import type { TFunction } from 'i18next'
-import type { RunTimeCommand } from '@opentrons/shared-data/command'
-import type { RobotType } from '@opentrons/shared-data/lib/js'
+import type { RunTimeCommand, RobotType } from '@opentrons/shared-data'
 import type { CommandTextData } from '../../types'
+import type { GetDirectTranslationCommandText } from './utils/getDirectTranslationCommandText'
 
 export interface UseCommandTextStringParams {
   command: RunTimeCommand | null
@@ -52,7 +52,9 @@ export function useCommandTextString(
     case 'heaterShaker/deactivateShaker':
     case 'heaterShaker/waitForTemperature':
       return {
-        commandText: utils.getDirectTranslationCommandText(fullParams),
+        commandText: utils.getDirectTranslationCommandText(
+          fullParams as GetDirectTranslationCommandText
+        ),
       }
 
     case 'aspirate':

@@ -4,8 +4,9 @@ import type {
   TCSetTargetBlockTemperatureCreateCommand,
   TCSetTargetLidTemperatureCreateCommand,
   HeaterShakerSetTargetTemperatureCreateCommand,
+  RunTimeCommand,
 } from '@opentrons/shared-data'
-import type { GetCommandText } from '..'
+import type { HandlesCommands } from './types'
 
 export type TemperatureCreateCommand =
   | TemperatureModuleSetTargetTemperatureCreateCommand
@@ -24,9 +25,12 @@ const T_KEYS_BY_COMMAND_TYPE: {
   'heaterShaker/setTargetTemperature': 'setting_hs_temp',
 }
 
-type GetTemperatureCommandText = Omit<GetCommandText, 'command'> & {
-  command: TemperatureCreateCommand
-}
+type HandledCommands = Extract<
+  RunTimeCommand,
+  { commandType: keyof typeof T_KEYS_BY_COMMAND_TYPE }
+>
+
+type GetTemperatureCommandText = HandlesCommands<HandledCommands>
 
 export const getTemperatureCommandText = ({
   command,

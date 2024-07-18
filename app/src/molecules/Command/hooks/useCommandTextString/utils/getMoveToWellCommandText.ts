@@ -1,22 +1,19 @@
-import type { MoveToWellRunTimeCommand } from '@opentrons/shared-data/command'
-import type { GetCommandText } from '..'
 import {
   getFinalLabwareLocation,
   getLabwareDisplayLocation,
   getLabwareName,
 } from '../../../utils'
-import type { TFunction } from 'i18next'
 
-type GetMoveToWellCommandText = Omit<GetCommandText, 'command'> & {
-  command: MoveToWellRunTimeCommand
-}
+import type { TFunction } from 'i18next'
+import type { MoveToWellRunTimeCommand } from '@opentrons/shared-data/command'
+import type { HandlesCommands } from './types'
 
 export function getMoveToWellCommandText({
   command,
   t,
   commandTextData,
   robotType,
-}: GetMoveToWellCommandText): string {
+}: HandlesCommands<MoveToWellRunTimeCommand>): string {
   const { wellName, labwareId } = command.params
   const allPreviousCommands = commandTextData?.commands.slice(
     0,

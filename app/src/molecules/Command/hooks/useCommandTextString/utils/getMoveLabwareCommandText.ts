@@ -7,18 +7,14 @@ import {
 } from '../../../utils'
 
 import type { MoveLabwareRunTimeCommand } from '@opentrons/shared-data'
-import type { GetCommandText } from '..'
-
-type GetMoveToWellCommandText = Omit<GetCommandText, 'command'> & {
-  command: MoveLabwareRunTimeCommand
-}
+import type { HandlesCommands } from './types'
 
 export function getMoveLabwareCommandText({
   command,
   t,
   commandTextData,
   robotType,
-}: GetMoveToWellCommandText): string {
+}: HandlesCommands<MoveLabwareRunTimeCommand>): string {
   const { labwareId, newLocation, strategy } = command.params
 
   const allPreviousCommands = commandTextData?.commands.slice(

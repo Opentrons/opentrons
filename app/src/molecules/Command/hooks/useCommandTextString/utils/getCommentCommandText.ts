@@ -1,13 +1,9 @@
 import type { CommentRunTimeCommand } from '@opentrons/shared-data/command'
-import type { GetCommandText } from '..'
-
-type GetCommentCommandText = Omit<GetCommandText, 'command'> & {
-  command: CommentRunTimeCommand
-}
+import type { HandlesCommands } from './types'
 
 export function getCommentCommandText({
   command,
-}: GetCommentCommandText): string {
+}: HandlesCommands<CommentRunTimeCommand>): string {
   const { message } = command.params
 
   return message

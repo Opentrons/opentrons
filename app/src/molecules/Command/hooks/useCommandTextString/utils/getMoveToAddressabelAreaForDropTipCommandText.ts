@@ -1,20 +1,13 @@
 import { getAddressableAreaDisplayName } from '../../../utils'
 
 import type { MoveToAddressableAreaForDropTipRunTimeCommand } from '@opentrons/shared-data/command'
-import type { GetCommandText } from '..'
-
-type GetMoveToAddressableAreaForDropTipCommandText = Omit<
-  GetCommandText,
-  'command'
-> & {
-  command: MoveToAddressableAreaForDropTipRunTimeCommand
-}
+import type { HandlesCommands } from './types'
 
 export function getMoveToAddressableAreaForDropTipCommandText({
   command,
   commandTextData,
   t,
-}: GetMoveToAddressableAreaForDropTipCommandText): string {
+}: HandlesCommands<MoveToAddressableAreaForDropTipRunTimeCommand>): string {
   const addressableAreaDisplayName =
     commandTextData != null
       ? getAddressableAreaDisplayName(commandTextData, command.id, t)

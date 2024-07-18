@@ -1,5 +1,5 @@
 import type { RunTimeCommand } from '@opentrons/shared-data/command'
-import type { GetCommandText } from '..'
+import type { HandlesCommands } from './types'
 
 const SIMPLE_TRANSLATION_KEY_BY_COMMAND_TYPE: {
   [commandType in RunTimeCommand['commandType']]?: string
@@ -24,10 +24,17 @@ const SIMPLE_TRANSLATION_KEY_BY_COMMAND_TYPE: {
   'heaterShaker/waitForTemperature': 'waiting_for_hs_to_reach',
 }
 
+type HandledCommands = Extract<
+  RunTimeCommand,
+  { commandType: keyof typeof SIMPLE_TRANSLATION_KEY_BY_COMMAND_TYPE }
+>
+
+export type GetDirectTranslationCommandText = HandlesCommands<HandledCommands>
+
 export function getDirectTranslationCommandText({
   command,
   t,
-}: GetCommandText): string {
+}: GetDirectTranslationCommandText): string {
   const simpleTKey =
     command != null
       ? SIMPLE_TRANSLATION_KEY_BY_COMMAND_TYPE[command.commandType]

@@ -1,17 +1,13 @@
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
 
 import type { PrepareToAspirateRunTimeCommand } from '@opentrons/shared-data/command'
-import type { GetCommandText } from '..'
-
-type GetPrepareToAspirateCommandText = Omit<GetCommandText, 'command'> & {
-  command: PrepareToAspirateRunTimeCommand
-}
+import type { HandlesCommands } from './types'
 
 export function getPrepareToAspirateCommandText({
   command,
   commandTextData,
   t,
-}: GetPrepareToAspirateCommandText): string {
+}: HandlesCommands<PrepareToAspirateRunTimeCommand>): string {
   const { pipetteId } = command.params
   const pipetteName = commandTextData?.pipettes.find(
     pip => pip.id === pipetteId

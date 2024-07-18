@@ -1,14 +1,10 @@
 import type { DeprecatedDelayRunTimeCommand } from '@opentrons/shared-data/command'
-import type { GetCommandText } from '..'
-
-type GetDelayCommandText = Omit<GetCommandText, 'command'> & {
-  command: DeprecatedDelayRunTimeCommand
-}
+import type { HandlesCommands } from './types'
 
 export function getDelayCommandText({
   command,
   t,
-}: GetDelayCommandText): string {
+}: HandlesCommands<DeprecatedDelayRunTimeCommand>): string {
   const { message = '' } = command.params
 
   if ('waitForResume' in command.params) {

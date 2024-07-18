@@ -1,13 +1,9 @@
 import type { CustomRunTimeCommand } from '@opentrons/shared-data/command'
-import type { GetCommandText } from '..'
-
-type GetCustomCommandText = Omit<GetCommandText, 'command'> & {
-  command: CustomRunTimeCommand
-}
+import type { HandlesCommands } from './types'
 
 export function getCustomCommandText({
   command,
-}: GetCustomCommandText): string {
+}: HandlesCommands<CustomRunTimeCommand>): string {
   const { legacyCommandText } = command.params ?? {}
   const sanitizedCommandText =
     typeof legacyCommandText === 'object'

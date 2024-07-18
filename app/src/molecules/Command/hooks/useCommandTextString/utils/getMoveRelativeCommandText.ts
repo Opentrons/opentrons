@@ -1,14 +1,10 @@
 import type { MoveRelativeRunTimeCommand } from '@opentrons/shared-data/command'
-import type { GetCommandText } from '..'
-
-type GetMoveRelativeRunTimeCommand = Omit<GetCommandText, 'command'> & {
-  command: MoveRelativeRunTimeCommand
-}
+import type { HandlesCommands } from './types'
 
 export function getMoveRelativeCommandText({
   command,
   t,
-}: GetMoveRelativeRunTimeCommand): string {
+}: HandlesCommands<MoveRelativeRunTimeCommand>): string {
   const { axis, distance } = command.params
 
   return t('move_relative', { axis, distance })

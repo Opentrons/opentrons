@@ -1,14 +1,11 @@
 import type { TCRunProfileRunTimeCommand } from '@opentrons/shared-data/command'
-import type { GetCommandText, GetCommandTextResult } from '..'
-
-type GetTCRunProfileCommandText = Omit<GetCommandText, 'command'> & {
-  command: TCRunProfileRunTimeCommand
-}
+import type { GetCommandTextResult } from '..'
+import type { HandlesCommands } from './types'
 
 export function getTCRunProfileCommandText({
   command,
   t,
-}: GetTCRunProfileCommandText): GetCommandTextResult {
+}: HandlesCommands<TCRunProfileRunTimeCommand>): GetCommandTextResult {
   const { profile } = command.params
 
   const stepTexts = profile.map(

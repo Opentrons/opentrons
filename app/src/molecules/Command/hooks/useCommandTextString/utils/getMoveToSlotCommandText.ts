@@ -1,14 +1,10 @@
 import type { MoveToSlotRunTimeCommand } from '@opentrons/shared-data/command'
-import type { GetCommandText } from '..'
-
-type GetMoveToSlotCommandText = Omit<GetCommandText, 'command'> & {
-  command: MoveToSlotRunTimeCommand
-}
+import type { HandlesCommands } from './types'
 
 export function getMoveToSlotCommandText({
   command,
   t,
-}: GetMoveToSlotCommandText): string {
+}: HandlesCommands<MoveToSlotRunTimeCommand>): string {
   const { slotName } = command.params
 
   return t('move_to_slot', { slot_name: slotName })

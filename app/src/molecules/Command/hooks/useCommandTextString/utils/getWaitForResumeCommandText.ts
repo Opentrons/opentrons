@@ -1,14 +1,10 @@
 import type { WaitForResumeRunTimeCommand } from '@opentrons/shared-data/command'
-import type { GetCommandText } from '..'
-
-type GetWaitForResumeCommandText = Omit<GetCommandText, 'command'> & {
-  command: WaitForResumeRunTimeCommand
-}
+import type { HandlesCommands } from './types'
 
 export function getWaitForResumeCommandText({
   command,
   t,
-}: GetWaitForResumeCommandText): string {
+}: HandlesCommands<WaitForResumeRunTimeCommand>): string {
   return command.params?.message != null && command.params.message !== ''
     ? command.params.message
     : t('wait_for_resume')
