@@ -29,7 +29,7 @@ import type { DispatchApiRequestType } from '../../../redux/robot-api'
 const mockNavigate = vi.fn()
 
 vi.mock('react-router-dom', async importOriginal => {
-  const actual = await importOriginal<typeof NavigateFunction>()
+  const actual = await importOriginal<NavigateFunction>()
   return {
     ...actual,
     useNavigate: () => mockNavigate,

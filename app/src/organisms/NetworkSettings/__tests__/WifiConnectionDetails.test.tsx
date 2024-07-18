@@ -20,7 +20,7 @@ vi.mock('../../RobotSettingsDashboard/NetworkSettings/NetworkDetailsModal')
 
 const mockNavigate = vi.fn()
 vi.mock('react-router-dom', async importOriginal => {
-  const actual = await importOriginal<typeof NavigateFunction>()
+  const actual = await importOriginal<NavigateFunction>()
   return {
     ...actual,
     useNavigate: () => mockNavigate,

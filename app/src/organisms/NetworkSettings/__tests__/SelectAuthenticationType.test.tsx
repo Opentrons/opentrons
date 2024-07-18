@@ -22,7 +22,7 @@ vi.mock('../../../redux/discovery/selectors')
 vi.mock('../AlternativeSecurityTypeModal')
 vi.mock('../../RobotSettingsDashboard/NetworkSettings/hooks')
 vi.mock('react-router-dom', async importOriginal => {
-  const actual = await importOriginal<typeof NavigateFunction>()
+  const actual = await importOriginal<NavigateFunction>()
   return {
     ...actual,
     useNavigate: () => mockNavigate,

@@ -37,6 +37,7 @@ import { FirmwareUpdateFailedModal } from '../FirmwareUpdateFailedModal'
 import { ErrorInfo } from '../ErrorInfo'
 import { ModuleCard } from '..'
 
+import type * as ReactRouterDom from 'react-router-dom'
 import type {
   HeaterShakerModule,
   MagneticModule,

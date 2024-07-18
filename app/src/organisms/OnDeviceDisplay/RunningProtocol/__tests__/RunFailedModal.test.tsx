@@ -74,7 +74,7 @@ const mockErrors = [
 const mockStopRun = vi.fn((_runId, opts) => opts.onSuccess())
 
 vi.mock('react-router-dom', async importOriginal => {
-  const actual = await importOriginal<typeof NavigateFunction>()
+  const actual = await importOriginal<NavigateFunction>()
   return {
     ...actual,
     useNavigate: () => mockNavigate,
