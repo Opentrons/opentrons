@@ -2631,6 +2631,12 @@ class OT3API(
         )
         max_speeds = self.config.motion_settings.default_max_speed
         p_prep_speed = max_speeds[self.gantry_load][OT3AxisKind.P]
+        # We need to significatly slow down the 96 channel liquid probe
+        if self.gantry_load == GantryLoad.HIGH_THROUGHPUT
+            max_plunger_speed = self.config.motion_settings.max_speed_discontinuity[
+                GantryLoad.HIGH_THROUGHPUT
+                ][OT3AxisKind.P]
+            probe_settings.plunger_speed = min(max_plunger_speed, probe_settings.plunger_speed)
 
         error: Optional[PipetteLiquidNotFoundError] = None
         pos = await self.gantry_position(checked_mount, refresh=True)
