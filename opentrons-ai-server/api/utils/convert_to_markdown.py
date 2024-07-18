@@ -1,5 +1,5 @@
-from markdownify import markdownify
 from bs4 import BeautifulSoup
+from markdownify import markdownify
 import os.path
 
 current_dir = os.path.dirname(__file__)
@@ -30,20 +30,17 @@ tab_markdown = {}
 for idx, tab_section in enumerate(tab_sections):
     tab_buttons = tab_section.find_all(class_='sphinx-tabs-tab')
     tab_panels = tab_section.find_all(class_='sphinx-tabs-panel')
-    
-    section_markdown = []
-    
+    if len(tab_buttons) != len(tab_panels):
+        print(f"Warning: Tab buttons and panels lengths don't match for tab section {idx}")
+        continue
+    section_markdown = []   
     for button, panel in zip(tab_buttons, tab_panels):
-        section_markdown.append(f'### {button.text.strip()}\n')
-        
+        section_markdown.append(f'### {button.text.strip()}\n')        
         panel_content = markdownify(str(panel), strip=['div'])
         section_markdown.append(panel_content)
-    
     combined_section_markdown = '\n'.join(section_markdown) + '\n\n'
-    
     placeholder = f'tabSection{idx}'
-    tab_markdown[placeholder] = combined_section_markdown
-    
+    tab_markdown[placeholder] = combined_section_markdown  
     placeholder_tag = soup.new_tag('div')
     placeholder_tag.string = placeholder
     tab_section.replace_with(placeholder_tag)
