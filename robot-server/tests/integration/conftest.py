@@ -118,7 +118,6 @@ def _wait_until_ready(base_url: str) -> None:
             time.sleep(0.1)
 
 
-# TODO (spp, 2024-07-18: add data files deletion here)
 def _clean_server_state(base_url: str) -> None:
     async def _clean_server_state_async() -> None:
         async with RobotClient.make(base_url=base_url, version="*") as robot_client:
