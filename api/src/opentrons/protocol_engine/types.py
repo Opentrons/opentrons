@@ -1046,7 +1046,7 @@ class CSVParameter(RTPBase):
         default="csv_file", description="String specifying the type of this parameter"
     )
     fileId: Optional[str] = Field(
-        ...,
+        default=None,
         description="ID of the CSV file stored on the robot; to be used for fetching the CSV file."
         " For local analysis this will most likely be empty.",
     )
