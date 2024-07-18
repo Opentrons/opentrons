@@ -32,7 +32,7 @@ stages:
       json:
         data: !force_original_structure '{file_info}'
 
-  - name: Upload color_codes_2.csv file using file path
+  - name: Upload sample_record.csv file using file path
     request:
       url: '{ot2_server_base_url}/dataFiles'
       method: POST

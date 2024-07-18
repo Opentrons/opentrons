@@ -118,6 +118,7 @@ def _wait_until_ready(base_url: str) -> None:
             time.sleep(0.1)
 
 
+# TODO (spp, 2024-07-18: add data files deletion here)
 def _clean_server_state(base_url: str) -> None:
     async def _clean_server_state_async() -> None:
         async with RobotClient.make(base_url=base_url, version="*") as robot_client:
@@ -141,7 +142,7 @@ async def _delete_all_runs(robot_client: RobotClient) -> None:
 
 
 async def _delete_all_protocols(robot_client: RobotClient) -> None:
-    """Delete all protocols on the robot server"""
+    """Delete all protocols on the robot server."""
     response = await robot_client.get_protocols()
     protocol_ids = [p["id"] for p in response.json()["data"]]
     for protocol_id in protocol_ids:
