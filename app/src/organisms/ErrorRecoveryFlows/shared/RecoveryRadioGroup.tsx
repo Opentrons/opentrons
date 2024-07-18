@@ -1,6 +1,5 @@
 import * as React from 'react'
 
-import { css } from 'styled-components'
 import type { ChangeEventHandler } from 'react'
 import { RadioGroup, SPACING, Flex } from '@opentrons/components'
 
@@ -30,7 +29,6 @@ export function RecoveryRadioGroup<T extends string>(
 ): JSX.Element {
   return (
     <RadioGroup
-      css={css``}
       {...props}
       options={props.options.map(radioOption => ({
         name: '',
