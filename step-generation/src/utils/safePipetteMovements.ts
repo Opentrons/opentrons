@@ -70,62 +70,49 @@ const getIsWithinPipetteExtents = (
   }
 }
 
-//  return pipette bounds at a sepcific position
+// return pipette bounds at a sepcific position
+// note that this calculation is pessimistic to mirror behavior on protocol engine
+// the returned plane is defined by the z-height of the empty nozzles (lowest case scenario)
+// and the x-y bounds defined by the outer-most bounds of the pipette
 const getPipetteBoundsAtSpecifiedMoveToPosition = (
   pipetteEntity: PipetteEntity,
   tipLength: number,
-  destinationPosition: Point
+  wellTargetPoint: Point,
+  primaryNozzle: string = 'A12'
 ): Point[] => {
-  const primaryNozzleOffset =
-    pipetteEntity.spec.nozzleMap != null
-      ? pipetteEntity.spec.nozzleMap.A1
-      : pipetteEntity.spec.nozzleOffset
-  const primaryNozzlePosition = {
-    x: destinationPosition.x,
-    y: destinationPosition.y,
-    z: (destinationPosition.z ?? 0) + tipLength,
-  }
-  const pipetteBoundsOffsets = pipetteEntity.spec.pipetteBoundingBoxOffsets
-  const backLeftBound = {
-    x:
-      primaryNozzlePosition.x -
-      primaryNozzleOffset[0] +
-      pipetteBoundsOffsets.backLeftCorner[0],
-    y:
-      primaryNozzlePosition.y -
-      primaryNozzleOffset[1] +
-      pipetteBoundsOffsets.backLeftCorner[1],
-    z:
-      primaryNozzlePosition.z -
-      primaryNozzleOffset[2] +
-      pipetteBoundsOffsets.backLeftCorner[2],
-  }
-  const frontRightBound = {
-    x:
-      primaryNozzlePosition.x -
-      primaryNozzleOffset[0] +
-      pipetteBoundsOffsets.frontRightCorner[0],
-    y:
-      primaryNozzlePosition.y -
-      primaryNozzleOffset[1] +
-      pipetteBoundsOffsets.frontRightCorner[1],
-    z:
-      primaryNozzlePosition.z -
-      primaryNozzleOffset[2] +
-      pipetteBoundsOffsets.frontRightCorner[2],
-  }
+  const {
+    nozzleMap,
+    nozzleOffset,
+    pipetteBoundingBoxOffsets,
+  } = pipetteEntity.spec
+  const primaryNozzlePoint =
+    nozzleMap == null || primaryNozzle == null
+      ? nozzleOffset
+      : nozzleMap[primaryNozzle]
+  const pipetteBoundingBoxLeftXOffset =
+    pipetteBoundingBoxOffsets.backLeftCorner[0]
+  const pipetteBoundingBoxRightXOffset =
+    pipetteBoundingBoxOffsets.frontRightCorner[0]
+  const pipetteBoundingBoxBackYOffset =
+    pipetteBoundingBoxOffsets.backLeftCorner[1]
+  const pipetteBoundingBoxFrontYOffset =
+    pipetteBoundingBoxOffsets.frontRightCorner[1]
+  const leftX =
+    wellTargetPoint.x - (primaryNozzlePoint[0] - pipetteBoundingBoxLeftXOffset)
+  const rightX =
+    wellTargetPoint.x + (pipetteBoundingBoxRightXOffset - primaryNozzlePoint[0])
+  const backY =
+    wellTargetPoint.y + (pipetteBoundingBoxBackYOffset - primaryNozzlePoint[1])
+  const frontY =
+    wellTargetPoint.y - (primaryNozzlePoint[1] - pipetteBoundingBoxFrontYOffset)
 
-  const backRightBound: Point = {
-    x: frontRightBound.x,
-    y: backLeftBound.y,
-    z: frontRightBound.z,
-  }
-  const frontLeftBound: Point = {
-    x: backLeftBound.x,
-    y: frontRightBound.y,
-    z: backLeftBound.z,
-  }
+  const tipOverlapOnNozzle = 0
+  const zNozzles = (wellTargetPoint.z ?? 0) + tipLength - tipOverlapOnNozzle
 
+  const backLeftBound = { x: leftX, y: backY, z: zNozzles }
+  const frontRightBound = { x: rightX, y: frontY, z: zNozzles }
+  const backRightBound = { x: rightX, y: backY, z: zNozzles }
+  const frontLeftBound = { x: leftX, y: frontY, z: zNozzles }
   return [backLeftBound, frontRightBound, backRightBound, frontLeftBound]
 }
 
@@ -134,30 +121,12 @@ const getHasOverlappingRectangles = (
   rectangle1: Point[],
   rectangle2: Point[]
 ): boolean => {
-  const xCoords = [
-    rectangle1[0].x,
-    rectangle1[1].x,
-    rectangle2[0].x,
-    rectangle2[1].x,
-  ]
-  const xLengthRect1 = Math.abs(rectangle1[1].x - rectangle1[0].x)
-  const xLengthRect2 = Math.abs((rectangle2[1].x = rectangle2[0].x))
-  const overlappingInX =
-    Math.abs(Math.max(...xCoords) - Math.min(...xCoords)) <
-    xLengthRect1 + xLengthRect2
-  const yCoordinates = [
-    rectangle1[0].y,
-    rectangle1[1].y,
-    rectangle2[0].y,
-    rectangle2[1].y,
-  ]
-  const yLengthRect1 = Math.abs(rectangle1[1].y - rectangle1[0].y)
-  const yLengthRect2 = Math.abs(rectangle2[1].y - rectangle2[0].y)
-  const overlappingInY =
-    Math.abs(Math.max(...yCoordinates) - Math.min(...yCoordinates)) <
-    yLengthRect1 + yLengthRect2
+  const oneLeftOfTwo = rectangle1[1].x < rectangle2[0].x
+  const oneRightOfTwo = rectangle1[0].x > rectangle2[1].x
+  const oneUnderTwo = rectangle1[0].y < rectangle2[1].y
+  const oneOverTwo = rectangle1[1].y > rectangle2[0].y
 
-  return overlappingInX && overlappingInY
+  return !(oneLeftOfTwo || oneRightOfTwo || oneUnderTwo || oneOverTwo)
 }
 
 //  check the highest Z-point of all items stacked given a deck slot (including modules,
@@ -244,12 +213,24 @@ const getSlotHasPotentialCollidingObject = (
       ) &&
       pipetteBounds[0].z != null
     ) {
-      const highestZInSlot = getHighestZInSlot(
-        robotState,
-        invariantContext,
-        labwareId
+      const surroundSlotLabwareId = Object.keys(robotState.labware).find(
+        lwId => robotState.labware[lwId].slot === slot.addressableArea?.id
       )
-      return highestZInSlot >= pipetteBounds[0]?.z
+      const highestZInSurroundingSlot =
+        surroundSlotLabwareId != null
+          ? getHighestZInSlot(
+              robotState,
+              invariantContext,
+              surroundSlotLabwareId
+            )
+          : 0
+
+      console.log({
+        highestZInSurroundingSlot,
+        pipetteBounds,
+        slot: slot.addressableArea?.id,
+      })
+      return highestZInSurroundingSlot >= pipetteBounds[0]?.z
     }
   }
   return false
@@ -277,21 +258,21 @@ const getWillCollideWithThermocyclerLid = (
 
 const getWellPosition = (
   labwareEntity: LabwareEntity,
-  wellLocationOffset: Point
+  wellName: string,
+  wellLocationOffset: Point,
+  addressableAreaOffset: CoordinateTuple | null
 ): Point => {
-  const { dimensions: wellDimensions, cornerOffsetFromSlot } = labwareEntity.def
-
+  const { wells } = labwareEntity.def
   //  getting location from the bottom of the well since PD only supports aspirate/dispense from bottom
   //  note: api includes calibration data here which PD does not have knowledge of at the moment
+  const wellDef = wells[wellName]
   return {
-    x:
-      cornerOffsetFromSlot.x + wellLocationOffset.x + wellDimensions.xDimension,
-    y:
-      cornerOffsetFromSlot.y + wellLocationOffset.y + wellDimensions.yDimension,
+    x: wellDef.x + wellLocationOffset.x + (addressableAreaOffset?.[0] ?? 0),
+    y: wellDef.y + wellLocationOffset.y + (addressableAreaOffset?.[1] ?? 0),
     z:
-      cornerOffsetFromSlot.z +
+      wellDef.z +
       (wellLocationOffset.z ?? 0) +
-      wellDimensions.zDimension,
+      (addressableAreaOffset?.[2] ?? 0),
   }
 }
 
@@ -302,7 +283,8 @@ export const getIsSafePipetteMovement = (
   pipetteId: string,
   labwareId: string,
   tipRackDefURI: string,
-  wellLocationOffset: Point
+  wellLocationOffset: Point,
+  wellTargetName?: string
 ): boolean => {
   const deckDefinition = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   const {
@@ -314,9 +296,10 @@ export const getIsSafePipetteMovement = (
   const { labware: labwareState, tipState } = robotState
 
   //  early exit if labwareId is a trashBin or wasteChute
-  if (labwareEntities[labwareId] == null) {
+  if (labwareEntities[labwareId] == null || wellTargetName == null) {
     return true
   }
+
   const tiprackTipLength = Object.values(labwareEntities).find(
     labwareEntity => labwareEntity.labwareDefURI === tipRackDefURI
   )?.def.parameters.tipLength
@@ -327,13 +310,20 @@ export const getIsSafePipetteMovement = (
   const pipetteEntity = pipetteEntities[pipetteId]
   const pipetteHasTip = tipState.pipettes[pipetteId]
   const tipLength = pipetteHasTip ? tiprackTipLength ?? 0 : 0
-  const wellLocationPoint = getWellPosition(
+  const labwareSlot = labwareState[labwareId].slot
+  const addressableAreaOffset = getPositionFromSlotId(
+    labwareSlot,
+    deckDefinition
+  )
+  const wellTargetPoint = getWellPosition(
     labwareEntities[labwareId],
-    wellLocationOffset
+    wellTargetName,
+    wellLocationOffset,
+    addressableAreaOffset
   )
 
   const isWithinPipetteExtents = getIsWithinPipetteExtents(
-    wellLocationPoint,
+    wellTargetPoint,
     //  TODO(jr, 4/22/24): PD only supports A12 as a primary nozzle for now
     //  and only for 96-channel column pick up
     NOZZLE_CONFIGURATION,
@@ -342,11 +332,10 @@ export const getIsSafePipetteMovement = (
   if (!isWithinPipetteExtents) {
     return false
   } else {
-    const labwareSlot = labwareState[labwareId].slot
     const pipetteBoundsAtWellLocation = getPipetteBoundsAtSpecifiedMoveToPosition(
       pipetteEntity,
       tipLength,
-      wellLocationOffset
+      wellTargetPoint
     )
     const surroundingSlots = getFlexSurroundingSlots(
       labwareSlot,
