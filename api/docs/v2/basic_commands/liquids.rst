@@ -263,7 +263,7 @@ This example aspirates enough air to fill the remaining volume in a pipette::
 Detect Liquids
 ==============
 
-The :py:meth:`.InstrumentContext.detect_liquid_presence` method tells the robot to check for a liquid and return the results. It returns ``True`` if liquid is detected and ``False`` if liquid is not detected. It will not raise an error or stop your protocol if a liquid is not present in a well or reservoir. See also :ref:`lpv`.
+Using the :py:meth:`.InstrumentContext.detect_liquid_presence` method tells a Flex pipette to check for the presence of a liquid in a wellplate or reservoir. This method returns ``True`` if the pressure sensors in a pipette detect a liquid and ``False`` if liquid if the sensors do not. Detection takes place during aspiration. As the Flex pipette detects a liquid, it stops, raises itself above the liquid's surface, and then resumes aspiration. This method will not raise an error or stop your protocol if the Flex pipette does not detect a liquid. You can write your own code to respond to the output of this method. See also :ref:`lpv`.
 
 .. code-block:: python
 
@@ -276,7 +276,7 @@ The :py:meth:`.InstrumentContext.detect_liquid_presence` method tells the robot 
 Require Liquids
 ===============
 
-The :py:meth:`.InstrumentContext.require_liquid_presence` method forces the robot to check for the presence of a liquid, even when :ref:`lpv` is specifically disabled. When using this method, the robot will raise an error that stops a protocol, writes a warning to the run logs, and also lets you recover from the error through your own error handling code.
+Using the :py:meth:`.InstrumentContext.require_liquid_presence` method tells a Flex pipette to check for and require a liquid in a well or reservoir. This method returns ``True`` if the pressure sensors in a pipette detect a liquid and ``False`` if liquid if the sensors do not. Detection takes place during aspiration. As the Flex pipette detects a liquid, it stops, raises itself above the liquid's surface, and then resumes aspiration. If the Flex pipette does not detect liquid, the robot raises an error, stops the protocol, writes a warning to the run log, and lets you recover from the error through your own error handling code. See also :ref:`lpv`.
 
 .. code-block:: python
 
