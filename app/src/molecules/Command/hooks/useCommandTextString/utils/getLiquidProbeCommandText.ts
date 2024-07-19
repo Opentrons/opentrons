@@ -1,21 +1,27 @@
-import type {
-  LiquidProbeRunTimeCommand,
-  RunTimeCommand,
-} from '@opentrons/shared-data'
-import type { HandlesCommands } from './types'
 import {
   getFinalLabwareLocation,
   getLabwareDisplayLocation,
   getLabwareName,
 } from '../../../utils'
+
+import type {
+  LiquidProbeRunTimeCommand,
+  RunTimeCommand,
+  TryLiquidProbeRunTimeCommand,
+} from '@opentrons/shared-data'
+import type { HandlesCommands } from './types'
 import type { TFunction } from 'i18next'
+
+type LiquidProbeRunTimeCommands =
+  | LiquidProbeRunTimeCommand
+  | TryLiquidProbeRunTimeCommand
 
 export function getLiquidProbeCommandText({
   command,
   commandTextData,
   t,
   robotType,
-}: HandlesCommands<LiquidProbeRunTimeCommand>): string {
+}: HandlesCommands<LiquidProbeRunTimeCommands>): string {
   const { wellName, labwareId } = command.params
 
   const allPreviousCommands = commandTextData?.commands.slice(
@@ -26,7 +32,7 @@ export function getLiquidProbeCommandText({
   const labwareLocation =
     allPreviousCommands != null
       ? getFinalLabwareLocation(
-          labwareId,
+          labwareId as string,
           allPreviousCommands as RunTimeCommand[]
         )
       : null
@@ -42,7 +48,9 @@ export function getLiquidProbeCommandText({
       : ''
 
   const labware =
-    commandTextData != null ? getLabwareName(commandTextData, labwareId) : null
+    commandTextData != null
+      ? getLabwareName(commandTextData, labwareId as string)
+      : null
 
   return t('detect_liquid_presence', {
     labware,

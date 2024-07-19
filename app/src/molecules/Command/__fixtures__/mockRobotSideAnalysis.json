@@ -6411,6 +6411,26 @@
         },
         "pipetteId": "f6d1c83c-9d1b-4d0d-9de3-e6d649739cfb"
       }
+    },
+    {
+      "id": "84f7af1d-c097-4d4b-9819-ad56479bbbb8",
+      "createdAt": "2023-01-31T21:53:04.965216+00:00",
+      "commandType": "tryLiquidProbe",
+      "key": "1248111104",
+      "status": "succeeded",
+      "params": {
+        "labwareId": "b2a40c9d-31b0-4f27-ad4a-c92ced91204d",
+        "wellName": "A1",
+        "wellLocation": {
+          "origin": "top",
+          "offset": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          }
+        },
+        "pipetteId": "f6d1c83c-9d1b-4d0d-9de3-e6d649739cfb"
+      }
     }
   ],
   "errors": [],

@@ -79,6 +79,7 @@ export function useCommandTextString(
       }
 
     case 'liquidProbe':
+    case 'tryLiquidProbe':
       return {
         commandText: utils.getLiquidProbeCommandText({
           ...fullParams,

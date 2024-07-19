@@ -1421,4 +1421,24 @@ describe('CommandText', () => {
       )
     }
   })
+
+  it('renders correct text for tryLiquidProbe', () => {
+    const command = mockCommandTextData.commands.find(
+      c => c.commandType === 'tryLiquidProbe'
+    )
+    expect(command).not.toBeUndefined()
+    if (command != null) {
+      renderWithProviders(
+        <CommandText
+          commandTextData={mockCommandTextData}
+          robotType={FLEX_ROBOT_TYPE}
+          command={command}
+        />,
+        { i18nInstance: i18n }
+      )
+      screen.getByText(
+        'Detecting liquid presence in well A1 of Opentrons 96 Tip Rack 300 µL in Slot 9'
+      )
+    }
+  })
 })
