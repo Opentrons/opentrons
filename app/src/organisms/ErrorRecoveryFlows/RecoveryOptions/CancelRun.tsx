@@ -155,10 +155,10 @@ const FLEX_WIDTH = css`
 `
 
 const ICON_SIZE = css`
-  width: ${SPACING.spacing40}
-  height: ${SPACING.spacing40}
+  width: ${SPACING.spacing40};
+  height: ${SPACING.spacing40};
   @media (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
-    width: ${SPACING.spacing60}
-    height: ${SPACING.spacing60}
+    width: ${SPACING.spacing60};
+    height: ${SPACING.spacing60};
   }
 `
