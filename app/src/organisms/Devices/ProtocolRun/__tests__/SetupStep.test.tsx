@@ -23,7 +23,6 @@ describe('SetupStep', () => {
           expanded,
           title,
           description,
-          label,
           toggleExpanded,
           children,
           rightElement,

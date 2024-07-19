@@ -77,7 +77,7 @@ export function LocationIcon({
       {iconName != null ? (
         <Icon
           name={iconName}
-          size="1.25rem"
+          size=".75rem"
           color={color ?? COLORS.black90}
           aria-label={iconName}
         />

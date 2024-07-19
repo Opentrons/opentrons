@@ -5,12 +5,14 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  LegacyStyledText,
-  TYPOGRAPHY,
+  StyledText,
+  COLORS,
 } from '@opentrons/components'
-import { getLabwareSetupItemGroups } from '../../../../pages/Protocols/utils'
+import {
+  getLabwareSetupItemGroups,
+  LabwareSetupItem,
+} from '../../../../pages/Protocols/utils'
 import { LabwareListItem } from './LabwareListItem'
-import { OffDeckLabwareList } from './OffDeckLabwareList'
 import { getNestedLabwareInfo } from './getNestedLabwareInfo'
 
 import type { RunTimeCommand } from '@opentrons/shared-data'
@@ -20,8 +22,9 @@ import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTyp
 const HeaderRow = styled.div`
   display: grid;
   grid-template-columns: 1fr 5.2fr 5.3fr;
-  grid-gap: ${SPACING.spacing8};
-  padding: ${SPACING.spacing8};
+  grid-gap: ${SPACING.spacing16};
+  padding-left: ${SPACING.spacing24};
+  padding-top: ${SPACING.spacing20};
 `
 interface SetupLabwareListProps {
   attachedModuleInfo: { [moduleId: string]: ModuleRenderInfoForProtocol }
@@ -35,6 +38,9 @@ export function SetupLabwareList(
   const { attachedModuleInfo, commands, extraAttentionModules, isFlex } = props
   const { t } = useTranslation('protocol_setup')
   const { offDeckItems, onDeckItems } = getLabwareSetupItemGroups(commands)
+  const allItems: LabwareSetupItem[] = []
+  allItems.push.apply(allItems, onDeckItems)
+  allItems.push.apply(allItems, offDeckItems)
 
   return (
     <Flex
@@ -43,18 +49,15 @@ export function SetupLabwareList(
       marginBottom={SPACING.spacing16}
     >
       <HeaderRow>
-        <LegacyStyledText as="label" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+        <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
           {t('location')}
-        </LegacyStyledText>
-        <LegacyStyledText as="label" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+        </StyledText>
+        <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
           {t('labware_name')}
-        </LegacyStyledText>
-        <LegacyStyledText as="label" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-          {t('placement')}
-        </LegacyStyledText>
+        </StyledText>
       </HeaderRow>
-      {onDeckItems.map((labwareItem, index) => {
-        const labwareOnAdapter = onDeckItems.find(
+      {allItems.map((labwareItem, index) => {
+        const labwareOnAdapter = allItems.find(
           item =>
             labwareItem.initialLocation !== 'offDeck' &&
             'labwareId' in labwareItem.initialLocation &&
@@ -72,11 +75,6 @@ export function SetupLabwareList(
           />
         )
       })}
-      <OffDeckLabwareList
-        commands={commands}
-        labwareItems={offDeckItems}
-        isFlex={isFlex}
-      />
     </Flex>
   )
 }
