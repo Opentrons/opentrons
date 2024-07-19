@@ -27,5 +27,6 @@ packaging = "==24.1"
 
 [packages]
 opentrons-shared-data = { editable = true, path = "." }
-jsonschema = "==4.21.1"
 pydantic = "==1.10.12"
+#note(07/19/24): any json schema >=4.18 will cause dependency conflict
+jsonschema = ">=4.17.3"
