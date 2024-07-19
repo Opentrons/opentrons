@@ -22,11 +22,9 @@ exports.default = async configuration => {
     console.log(`Sign code: ${process.code}`)
   } catch (err) {
     console.error(
-      `Exception running sign:`,
-      err,
-      process,
-      process.stdout.toString(),
-      process.stderr.toString()
+      `Exception running sign: ${
+        err.status
+      }! Output: ${err.stdout.toString()} Error: ${err.stdout.toString()}`
     )
     throw err
   }
