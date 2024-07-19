@@ -10,7 +10,6 @@ import {
 } from '@opentrons/shared-data'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '../types'
-import { getInitialRobotStateStandard, makeContext } from '../fixtures'
 
 const mockLabwareId = 'labwareId'
 const mockPipId = 'pip'
@@ -22,8 +21,6 @@ const mockAdapter = 'adapterId'
 const mockWellName = 'A1'
 
 describe('getIsSafePipetteMovement', () => {
-  let robotState: RobotState
-  let invariantContext: InvariantContext
   let mockInvariantProperties: InvariantContext
   let mockRobotState: RobotState
   beforeEach(() => {

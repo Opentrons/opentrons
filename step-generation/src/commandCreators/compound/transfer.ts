@@ -2,7 +2,6 @@ import assert from 'assert'
 import zip from 'lodash/zip'
 import {
   getWellDepth,
-  COLUMN,
   LOW_VOLUME_PIPETTES,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
 } from '@opentrons/shared-data'
@@ -19,7 +18,6 @@ import {
   getTrashOrLabware,
   dispenseLocationHelper,
   moveHelper,
-  getIsSafePipetteMovement,
   getWasteChuteAddressableAreaNamePip,
   getHasWasteChute,
 } from '../../utils'
@@ -112,8 +110,6 @@ export const transfer: CommandCreator<TransferArgs> = (
   // TODO Ian 2018-04-02 following ~10 lines are identical to first lines of consolidate.js...
   const actionName = 'transfer'
   const errors: CommandCreatorError[] = []
-  const is96Channel =
-    invariantContext.pipetteEntities[args.pipette]?.spec.channels === 96
 
   if (
     !prevRobotState.pipettes[args.pipette] ||

@@ -3,7 +3,6 @@ import {
   LOW_VOLUME_PIPETTES,
   COLUMN,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
-  NozzleConfigurationStyle,
 } from '@opentrons/shared-data'
 import {
   repeatArray,
@@ -23,6 +22,7 @@ import {
   touchTip,
 } from '../atomic'
 
+import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
 import type {
   MixArgs,
   CommandCreator,

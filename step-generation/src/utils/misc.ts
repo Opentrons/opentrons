@@ -10,13 +10,8 @@ import {
   ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   NINETY_SIX_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
-  COLUMN,
 } from '@opentrons/shared-data'
-import {
-  getIsSafePipetteMovement,
-  reduceCommandCreators,
-  wasteChuteCommandsUtil,
-} from './index'
+import { reduceCommandCreators, wasteChuteCommandsUtil } from './index'
 import {
   aspirate,
   dispense,
