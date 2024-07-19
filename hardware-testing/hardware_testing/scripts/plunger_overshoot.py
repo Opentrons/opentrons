@@ -1,6 +1,12 @@
 """Plunger overshoot."""
 import argparse
-from asyncio import run, sleep as async_sleep, wait_for, TimeoutError, Event as AsyncEvent
+from asyncio import (
+    run,
+    sleep as async_sleep,
+    wait_for,
+    TimeoutError,
+    Event as AsyncEvent,
+)
 from contextlib import asynccontextmanager
 from random import random
 from threading import Thread, Event
@@ -8,9 +14,16 @@ import time
 from typing import Optional, AsyncIterator
 
 from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
-from opentrons_hardware.firmware_bindings.constants import NodeId, MessageId, MotorUsageValueType
+from opentrons_hardware.firmware_bindings.constants import (
+    NodeId,
+    MessageId,
+    MotorUsageValueType,
+)
 from opentrons_hardware.firmware_bindings.messages import MessageDefinition
-from opentrons_hardware.firmware_bindings.messages.message_definitions import GetMotorUsageRequest, GetMotorUsageResponse
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
+    GetMotorUsageRequest,
+    GetMotorUsageResponse,
+)
 
 from opentrons.hardware_control.ot3api import OT3API
 
@@ -115,14 +128,14 @@ async def _set_move_flags(simulate: bool) -> AsyncIterator[None]:
         MOVING = False
 
 
-async def _run_test_loop(api: OT3API) -> None:
+async def _run_test_loop(api: OT3API, skip_test: bool) -> None:
     global PLUNGER_POS
-    overshoot = 0.0
     bottom = api.hardware_pipettes[MNT.to_mount()].plunger_positions.bottom
     min_pos = bottom - MAX_DIST_MM
     max_pos = bottom + MAX_DIST_MM
-    prev_inp = ""
 
+    overshoot = 0.0
+    prev_inp = ""
     event: Optional[AsyncEvent] = None
 
     def _listener(message: MessageDefinition, arb_id: ArbitrationId) -> None:
@@ -140,8 +153,8 @@ async def _run_test_loop(api: OT3API) -> None:
             MessageId(arb_id.parts.message_id) == MessageId.get_motor_usage_response
         )
 
-    while True:
-        inp_str = input("enter command, or ENTER to repeat: ")
+    async def _process_input_string(inp_str) -> None:
+        nonlocal prev_inp, overshoot, event
         if not inp_str:
             inp_str = prev_inp
         prev_inp = inp_str
@@ -155,7 +168,9 @@ async def _run_test_loop(api: OT3API) -> None:
                 event = AsyncEvent()
                 can_messenger = api._backend._messenger
                 can_messenger.add_listener(_listener, _filter)
-                await can_messenger.send(node_id=NodeId.pipette_left, message=GetMotorUsageRequest())
+                await can_messenger.send(
+                    node_id=NodeId.pipette_left, message=GetMotorUsageRequest()
+                )
                 try:
                     await wait_for(event.wait(), 1.0)
                 except TimeoutError:
@@ -211,8 +226,23 @@ async def _run_test_loop(api: OT3API) -> None:
                 except ValueError as e:
                     print(e)
 
+    if not skip_test:
+        overshoot_increment = 0.0125
+        overshoot_max = 0.1
+        num_increments_to_test = int(overshoot_max / overshoot_increment)
+        num_trials = 2
+        test_str = "p j-3 j3 d30 z d1 "
+        test_str += "o0.0000 j0.2 "
+        for o in [i * overshoot_increment for i in range(num_increments_to_test + 1)]:
+            for _ in range(num_trials):
+                test_str += f"o{round(o, 4)} j-3.2 j3 d10 j0.2 d10 "
+        await _process_input_string(test_str)
+    else:
+        while True:
+            await _process_input_string(input("enter command, or ENTER to repeat: "))
 
-async def _main(simulate: bool):
+
+async def _main(simulate: bool, skip_test: bool):
     global PIP_SN, PLUNGER_POS
 
     # create OT3API
@@ -244,7 +274,7 @@ async def _main(simulate: bool):
         ui.get_user_ready("install dial-indicator and connect to OT3")
     try:
         _start_indicator_thread(simulate, csv)
-        await _run_test_loop(api)
+        await _run_test_loop(api, skip_test)
     finally:
         _stop_indicator_thread()
 
@@ -252,6 +282,7 @@ async def _main(simulate: bool):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate", action="store_true")
+    parser.add_argument("--skip-test", action="store_true")
     args = parser.parse_args()
     RUN_ID = data.create_run_id()
-    run(_main(args.simulate))
+    run(_main(args.simulate, args.skip_test))
