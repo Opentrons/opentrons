@@ -4,12 +4,12 @@ import {
   getAddressableAreaFromSlotId,
   getDeckDefFromRobotType,
   getFlexSurroundingSlots,
-  getModuleDef2,
   getPositionFromSlotId,
 } from '@opentrons/shared-data'
 import type {
   AddressableArea,
   CoordinateTuple,
+  ModuleModel,
   NozzleConfigurationStyle,
 } from '@opentrons/shared-data'
 import type {
@@ -129,53 +129,75 @@ const getHasOverlappingRectangles = (
   return !(oneLeftOfTwo || oneRightOfTwo || oneUnderTwo || oneOverTwo)
 }
 
+const getModuleHeightFromDeckDefinition = (
+  moduleModel: ModuleModel
+): number => {
+  const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
+  const { addressableAreas } = deckDef.locations
+  const moduleAddressableArea = addressableAreas.find(addressableArea =>
+    addressableArea.id.includes(moduleModel)
+  )
+  return moduleAddressableArea?.offsetFromCutoutFixture[2] ?? 0
+}
+
 //  check the highest Z-point of all items stacked given a deck slot (including modules,
 //  adapters, and modules on adapters)
 const getHighestZInSlot = (
   robotState: RobotState,
   invariantContext: InvariantContext,
-  labwareId: string
+  slotId: string
 ): number => {
   const { modules, labware } = robotState
   const { moduleEntities, labwareEntities } = invariantContext
-  if (modules[labwareId] != null) {
-    const moduleDimensions = getModuleDef2(moduleEntities[labwareId].model)
-      .dimensions
-    return (
-      //  labware + module
-      labwareEntities[labwareId].def.dimensions.zDimension +
-      moduleDimensions.bareOverallHeight +
-      (moduleDimensions.lidHeight ?? 0)
+
+  let totalHeight = 0
+  const moduleInSlot = Object.keys(modules).find(
+    moduleId => modules[moduleId].slot === slotId
+  )
+  // module in slot
+  if (moduleInSlot != null) {
+    totalHeight += getModuleHeightFromDeckDefinition(
+      moduleEntities[moduleInSlot].model
     )
-  } else if (labware[labwareId] != null) {
-    const adapterId = labware[labwareId].slot
-    if (labwareEntities[adapterId] != null) {
-      if (modules[adapterId] != null) {
-        const moduleDimensions = getModuleDef2(moduleEntities[adapterId].model)
-          .dimensions
-        return (
-          //  labware + adapter + module
-          labwareEntities[labwareId].def.dimensions.zDimension +
-          labwareEntities[adapterId].def.dimensions.zDimension +
-          moduleDimensions.bareOverallHeight +
-          (moduleDimensions.lidHeight ?? 0)
-        )
-      } else {
-        return (
-          //   labware + adapter
-          labwareEntities[labwareId].def.dimensions.zDimension +
-          labwareEntities[adapterId].def.dimensions.zDimension
-        )
+    const moduleDirectChildId = Object.keys(labware).find(
+      lwId => labware[lwId].slot === moduleInSlot
+    )
+    if (moduleDirectChildId != null) {
+      const moduleChildHeight =
+        labwareEntities[moduleDirectChildId].def.dimensions.zDimension
+      totalHeight += moduleChildHeight
+
+      // check if adapter and has child
+      const moduleGrandchildId = Object.keys(labware).find(
+        lwId => labware[lwId].slot === moduleDirectChildId
+      )
+      if (moduleGrandchildId != null) {
+        const moduleGrandchildHeight =
+          labwareEntities[moduleGrandchildId].def.dimensions.zDimension
+        totalHeight += moduleGrandchildHeight
       }
-    } else {
-      //   labware
-      return labwareEntities[labwareId].def.dimensions.zDimension
     }
-    //   shouldn't hit here!
   } else {
-    console.error('something went wrong, this shoud not be hit')
-    return 0
+    const labwareInSlotId = Object.keys(labware).find(
+      lwId => labware[lwId].slot === slotId
+    )
+    if (labwareInSlotId != null) {
+      const slotDirectChild = labwareEntities[labwareInSlotId]
+      const slotDirectChildHeight = slotDirectChild.def.dimensions.zDimension
+      totalHeight += slotDirectChildHeight
+
+      // check if adapter and has child
+      const slotGrandchildId = Object.keys(labware).find(
+        lwId => labware[lwId].slot === labwareInSlotId
+      )
+      if (slotGrandchildId != null) {
+        const slotGrandchildHeight =
+          labwareEntities[slotGrandchildId].def.dimensions.zDimension
+        totalHeight += slotGrandchildHeight
+      }
+    }
   }
+  return totalHeight
 }
 
 //  check if the slot overlaps with the pipette position
@@ -213,23 +235,14 @@ const getSlotHasPotentialCollidingObject = (
       ) &&
       pipetteBounds[0].z != null
     ) {
-      const surroundSlotLabwareId = Object.keys(robotState.labware).find(
-        lwId => robotState.labware[lwId].slot === slot.addressableArea?.id
-      )
       const highestZInSurroundingSlot =
-        surroundSlotLabwareId != null
+        slot.addressableArea?.id != null
           ? getHighestZInSlot(
               robotState,
               invariantContext,
-              surroundSlotLabwareId
+              slot.addressableArea.id
             )
           : 0
-
-      console.log({
-        highestZInSurroundingSlot,
-        pipetteBounds,
-        slot: slot.addressableArea?.id,
-      })
       return highestZInSurroundingSlot >= pipetteBounds[0]?.z
     }
   }
@@ -260,7 +273,8 @@ const getWellPosition = (
   labwareEntity: LabwareEntity,
   wellName: string,
   wellLocationOffset: Point,
-  addressableAreaOffset: CoordinateTuple | null
+  addressableAreaOffset: CoordinateTuple | null,
+  hasTip: boolean
 ): Point => {
   const { wells } = labwareEntity.def
   //  getting location from the bottom of the well since PD only supports aspirate/dispense from bottom
@@ -269,10 +283,11 @@ const getWellPosition = (
   return {
     x: wellDef.x + wellLocationOffset.x + (addressableAreaOffset?.[0] ?? 0),
     y: wellDef.y + wellLocationOffset.y + (addressableAreaOffset?.[1] ?? 0),
-    z:
-      wellDef.z +
-      (wellLocationOffset.z ?? 0) +
-      (addressableAreaOffset?.[2] ?? 0),
+    z: hasTip
+      ? wellDef.z +
+        (wellLocationOffset.z ?? 0) +
+        (addressableAreaOffset?.[2] ?? 0)
+      : labwareEntity.def.dimensions.zDimension,
   }
 }
 
@@ -300,15 +315,19 @@ export const getIsSafePipetteMovement = (
     return true
   }
 
-  const tiprackTipLength = Object.values(labwareEntities).find(
-    labwareEntity => labwareEntity.labwareDefURI === tipRackDefURI
-  )?.def.parameters.tipLength
-
+  const tiprackEntityId = Object.keys(labwareEntities).find(lwKey =>
+    lwKey.includes(tipRackDefURI)
+  )
+  const tiprackTipLength =
+    tiprackEntityId != null
+      ? labwareEntities[tiprackEntityId].def.parameters.tipLength
+      : 0
   const stagingAreaSlots = Object.values(additionalEquipmentEntities)
     .filter(ae => ae.name === 'stagingArea')
     .map(stagingArea => stagingArea.location as string)
   const pipetteEntity = pipetteEntities[pipetteId]
   const pipetteHasTip = tipState.pipettes[pipetteId]
+  // account for tip length if picking up tip
   const tipLength = pipetteHasTip ? tiprackTipLength ?? 0 : 0
   const labwareSlot = labwareState[labwareId].slot
   const addressableAreaOffset = getPositionFromSlotId(
@@ -319,7 +338,8 @@ export const getIsSafePipetteMovement = (
     labwareEntities[labwareId],
     wellTargetName,
     wellLocationOffset,
-    addressableAreaOffset
+    addressableAreaOffset,
+    pipetteHasTip
   )
 
   const isWithinPipetteExtents = getIsWithinPipetteExtents(

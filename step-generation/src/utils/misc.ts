@@ -10,8 +10,13 @@ import {
   ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   NINETY_SIX_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
+  COLUMN,
 } from '@opentrons/shared-data'
-import { reduceCommandCreators, wasteChuteCommandsUtil } from './index'
+import {
+  getIsSafePipetteMovement,
+  reduceCommandCreators,
+  wasteChuteCommandsUtil,
+} from './index'
 import {
   aspirate,
   dispense,
@@ -26,6 +31,7 @@ import type {
   LabwareDefinition2,
   BlowoutParams,
   PipetteChannels,
+  NozzleConfigurationStyle,
 } from '@opentrons/shared-data'
 import type {
   AdditionalEquipmentEntities,
@@ -482,6 +488,8 @@ interface DispenseLocationHelperArgs {
   yOffset: number
   offsetFromBottomMm?: number
   well?: string
+  nozzles: NozzleConfigurationStyle | null
+  tipRack: string
 }
 export const dispenseLocationHelper: CommandCreator<DispenseLocationHelperArgs> = (
   args,
@@ -497,6 +505,8 @@ export const dispenseLocationHelper: CommandCreator<DispenseLocationHelperArgs> 
     well,
     xOffset,
     yOffset,
+    tipRack,
+    nozzles,
   } = args
 
   const trashOrLabware = getTrashOrLabware(
@@ -521,6 +531,8 @@ export const dispenseLocationHelper: CommandCreator<DispenseLocationHelperArgs> 
         offsetFromBottomMm,
         xOffset,
         yOffset,
+        tipRack,
+        nozzles,
       }),
     ]
   } else if (trashOrLabware === 'wasteChute') {
@@ -615,6 +627,7 @@ interface AirGapArgs {
   blowOutLocation?: string | null
   sourceId?: string
   sourceWell?: string
+  nozzles: NozzleConfigurationStyle | null
 }
 export const airGapHelper: CommandCreator<AirGapArgs> = (
   args,
@@ -632,6 +645,7 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
     sourceId,
     sourceWell,
     volume,
+    nozzles,
   } = args
 
   const trashOrLabware = getTrashOrLabware(
@@ -667,6 +681,7 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
           tipRack,
           xOffset: 0,
           yOffset: 0,
+          nozzles,
         }),
       ]
       //  when aspirating out of multi wells for consolidate
@@ -684,6 +699,7 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
           //  NOTE: airgap aspirates happen at default x/y offset
           xOffset: 0,
           yOffset: 0,
+          nozzles,
         }),
       ]
     }

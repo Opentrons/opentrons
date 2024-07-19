@@ -35,6 +35,7 @@ interface PickUpTipArgs {
   pipette: string
   tiprack: string
   well: string
+  nozzles?: NozzleConfigurationStyle
 }
 
 const _pickUpTip: CommandCreator<PickUpTipArgs> = (
@@ -43,6 +44,27 @@ const _pickUpTip: CommandCreator<PickUpTipArgs> = (
   prevRobotState
 ) => {
   const errors: CommandCreatorError[] = []
+
+  const is96Channel =
+    invariantContext.pipetteEntities[args.pipette]?.spec.channels === 96
+
+  if (
+    is96Channel &&
+    args.nozzles === COLUMN &&
+    !getIsSafePipetteMovement(
+      prevRobotState,
+      invariantContext,
+      args.pipette,
+      args.tiprack,
+      args.tiprack,
+      //  we don't adjust the offset when moving to the tiprack
+      { x: 0, y: 0 },
+      args.well
+    )
+  ) {
+    errors.push(errorCreators.possiblePipetteCollision())
+  }
+
   const tiprackSlot = prevRobotState.labware[args.tiprack].slot
   if (COLUMN_4_SLOTS.includes(tiprackSlot)) {
     errors.push(
@@ -174,23 +196,6 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   ) {
     return { errors: [errorCreators.dropTipLocationDoesNotExist()] }
   }
-  if (
-    channels === 96 &&
-    nozzles === COLUMN &&
-    !getIsSafePipetteMovement(
-      prevRobotState,
-      invariantContext,
-      nextTiprack.tiprackId,
-      pipette,
-      tipRack,
-      //  we don't adjust the offset when moving to the tiprack
-      { x: 0, y: 0 }
-    )
-  ) {
-    return {
-      errors: [errorCreators.possiblePipetteCollision()],
-    }
-  }
 
   if (
     modulePipetteCollision({
@@ -266,6 +271,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
       pipette,
       tiprack: nextTiprack.tiprackId,
       well: nextTiprack.well,
+      nozzles: args.nozzles,
     }),
   ]
   if (isWasteChute) {
@@ -281,6 +287,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
         pipette,
         tiprack: nextTiprack.tiprackId,
         well: nextTiprack.well,
+        nozzles: args.nozzles,
       }),
     ]
   }
@@ -297,6 +304,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
         pipette,
         tiprack: nextTiprack.tiprackId,
         well: nextTiprack.well,
+        nozzles: args.nozzles,
       }),
     ]
   }
