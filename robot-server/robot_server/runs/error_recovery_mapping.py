@@ -1,5 +1,8 @@
 """Functions used for managing error recovery policy."""
-from robot_server.runs.error_recovery_models import ErrorRecoveryRule, valueMatchType
+from typing import Optional
+
+from opentrons.protocol_engine.state.config import Config
+from robot_server.runs.error_recovery_models import ErrorRecoveryRule, ReactionIfMatch
 from opentrons.protocol_engine.commands.command_unions import (
     Command,
     CommandDefinedErrorData,
@@ -9,8 +12,6 @@ from opentrons.protocol_engine.error_recovery_policy import (
     ErrorRecoveryType,
     standard_run_policy,
 )
-from opentrons.protocol_engine.state.config import Config
-from typing import Optional
 
 
 def create_error_recovery_policy_from_rules(
@@ -33,11 +34,11 @@ def create_error_recovery_policy_from_rules(
                 and defined_error_data.public.errorType == rule.errorType
             )
             if command_type_matches and error_type_matches:
-                if rule.ifMatch == valueMatchType.IGNORE_AND_CONTINUE:
+                if rule.ifMatch == ReactionIfMatch.IGNORE_AND_CONTINUE:
                     raise NotImplementedError  # No protocol engine support for this yet. It's in another ticket.
-                elif rule.ifMatch == valueMatchType.FAIL_RUN:
+                elif rule.ifMatch == ReactionIfMatch.FAIL_RUN:
                     return ErrorRecoveryType.FAIL_RUN
-                elif rule.ifMatch == valueMatchType.WAIT_FOR_RECOVERY:
+                elif rule.ifMatch == ReactionIfMatch.WAIT_FOR_RECOVERY:
                     return ErrorRecoveryType.WAIT_FOR_RECOVERY
 
         return standard_run_policy(config, failed_command, defined_error_data)
