@@ -154,6 +154,7 @@ async def _run_test_loop(api: OT3API, skip_test: bool) -> None:
         )
 
     async def _process_input_string(inp_str) -> None:
+        global PLUNGER_POS
         nonlocal prev_inp, overshoot, event
         if not inp_str:
             inp_str = prev_inp
@@ -204,7 +205,7 @@ async def _run_test_loop(api: OT3API, skip_test: bool) -> None:
                     async def _run_move() -> None:
                         global PLUNGER_POS
                         if use_overshoot and overshoot > 0:
-                            print("Overshoot:", round(new_pos + overshoot, 3))
+                            print("Overshoot:", round(new_pos - overshoot, 3))
                             await helpers_ot3.move_plunger_absolute_ot3(
                                 api, MNT, new_pos - overshoot, speed=SPEED
                             )
