@@ -35,9 +35,12 @@ pypi_test_upload_url := https://test.pypi.org/legacy/
 # parameter 2: name of the project
 # parameter 3: an extra version tag string
 # parameter 4: override python_build_utils.py path (default: ../scripts/python_build_utils.py)
+# define python_package_version
 define python_package_version
-$(shell $(python) $(if $(4),$(4),../scripts/python_build_utils.py) $(1) $(2) normalize_version $(if $(3),-e $(3)))
+24.1
 endef
+# $(shell $(python) $(if $(4),$(4),../scripts/python_build_utils.py) $(1) $(2) normalize_version $(if $(3),-e $(3)))
+# endef
 
 # This is the poetry version of python_get_wheelname. Arguments are identical.
 define poetry_python_get_wheelname
