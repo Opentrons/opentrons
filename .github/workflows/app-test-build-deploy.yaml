@@ -222,7 +222,7 @@ jobs:
 
       - name: set summary
         run: |
-          echo Type: ${{steps.determine-build-type.outputs.type}} Variants: ${{steps.determine-build-type.outputs.variants}}' >> $GITHUB_STEP_SUMMARY
+          echo 'Type: ${{steps.determine-build-type.outputs.type}} Variants: ${{steps.determine-build-type.outputs.variants}}' >> $GITHUB_STEP_SUMMARY
 
   build-app:
     needs: [determine-build-type]
