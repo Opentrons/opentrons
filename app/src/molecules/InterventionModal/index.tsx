@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
+import { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
@@ -15,6 +16,7 @@ import {
   POSITION_STICKY,
   SPACING,
   DIRECTION_COLUMN,
+  RESPONSIVENESS,
 } from '@opentrons/components'
 
 import { getIsOnDevice } from '../../redux/config'
@@ -157,12 +159,11 @@ export function InterventionModal({
             {...headerStyle}
             backgroundColor={headerColor}
             justifyContent={headerJustifyContent}
-            onClick={iconHeadingOnClick}
           >
             {titleHeading}
-            <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing12}>
+            <Flex alignItems={ALIGN_CENTER} onClick={iconHeadingOnClick}>
               {iconName != null ? (
-                <Icon name={iconName} size={SPACING.spacing32} />
+                <Icon name={iconName} css={ICON_STYLE} />
               ) : null}
               {iconHeading != null ? iconHeading : null}
             </Flex>
@@ -173,3 +174,14 @@ export function InterventionModal({
     </Flex>
   )
 }
+
+const ICON_STYLE = css`
+  width: ${SPACING.spacing16};
+  height: ${SPACING.spacing16};
+  margin: ${SPACING.spacing4};
+  @media (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+    width: ${SPACING.spacing32};
+    height: ${SPACING.spacing32};
+    margin: ${SPACING.spacing12};
+  }
+`

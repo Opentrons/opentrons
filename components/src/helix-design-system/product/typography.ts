@@ -52,6 +52,7 @@ export const lineHeightHeadingMediumSemiBold = lineHeightHeadingMedium
 export const fontFamilyHeadingMediumSemiBold = fontFamilyHeadingMedium
 export const fontWeightHeadingMediumSemiBold = fontWeightSemiBold
 export const fontStyleHeadingMediumSemiBold = `${fontWeightHeadingMediumSemiBold} ${fontSizeHeadingMediumSemiBold}/${lineHeightHeadingMediumSemiBold} ${fontFamilyHeadingMediumSemiBold}`
+export const fontStyleHeadingMediumBold = `${fontWeightBold} ${fontSizeHeadingMedium}/${lineHeightHeadingMediumSemiBold} ${fontFamilyHeadingMediumSemiBold}`
 
 // Heading-Small
 const fontSizeHeadingSmall = '1.125rem' // 18px
@@ -71,6 +72,7 @@ export const lineHeightHeadingSmallBold = lineHeightHeadingSmall
 export const fontFamilyHeadingSmallBold = fontFamilyHeadingSmall
 export const fontWeightHeadingSmallBold = fontWeightBold
 export const fontStyleHeadingSmallBold = `${fontWeightHeadingSmallBold} ${fontSizeHeadingSmallBold}/${lineHeightHeadingSmallBold} ${fontFamilyHeadingSmallBold}`
+export const fontStyleHeadingSmallSemiBold = `${fontWeightSemiBold} ${fontSizeHeadingSmallBold}/${lineHeightHeadingSmallBold} ${fontFamilyHeadingSmallBold}`
 
 // Body-Large
 const fontSizeBodyLarge = '1rem' // 16px
