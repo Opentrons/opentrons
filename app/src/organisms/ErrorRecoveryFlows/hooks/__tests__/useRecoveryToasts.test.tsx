@@ -3,34 +3,54 @@ import { vi, describe, it, expect, beforeEach } from 'vitest'
 import { I18nextProvider } from 'react-i18next'
 import { i18n } from '../../../../i18n'
 import { renderHook, render, screen } from '@testing-library/react'
+
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+
 import {
   useRecoveryToasts,
-  useToastText,
+  useRecoveryToastText,
   getStepNumber,
+  useRecoveryFullCommandText,
 } from '../useRecoveryToasts'
 import { RECOVERY_MAP } from '../../constants'
 import { useToaster } from '../../../ToasterOven'
+import { useCommandTextString } from '../../../../molecules/Command'
 
 import type { Mock } from 'vitest'
+import type { BuildToast } from '../useRecoveryToasts'
 
 vi.mock('../../../ToasterOven')
+vi.mock('../../../../molecules/Command')
+
+const TEST_COMMAND = 'test command'
+const TC_COMMAND = 'tc command cycle some more text'
 
 let mockMakeToast: Mock
+
+const DEFAULT_PROPS: BuildToast = {
+  isOnDevice: false,
+  currentStepCount: 1,
+  selectedRecoveryOption: RECOVERY_MAP.RETRY_SAME_TIPS.ROUTE,
+  commandTextData: { commands: [] } as any,
+  robotType: FLEX_ROBOT_TYPE,
+}
+
+// Utility function for rendering with I18nextProvider
+const renderWithI18n = (component: React.ReactElement) => {
+  return render(<I18nextProvider i18n={i18n}>{component}</I18nextProvider>)
+}
 
 describe('useRecoveryToasts', () => {
   beforeEach(() => {
     mockMakeToast = vi.fn()
     vi.mocked(useToaster).mockReturnValue({ makeToast: mockMakeToast } as any)
+    vi.mocked(useCommandTextString).mockReturnValue({
+      commandText: TEST_COMMAND,
+    })
   })
 
   it('should return makeSuccessToast function', () => {
-    const { result } = renderHook(() =>
-      useRecoveryToasts({
-        isOnDevice: false,
-        currentStepCount: 1,
-        selectedRecoveryOption: RECOVERY_MAP.RETRY_SAME_TIPS.ROUTE,
-      })
-    )
+    const { result } = renderHook(() => useRecoveryToasts(DEFAULT_PROPS))
 
     expect(result.current.makeSuccessToast).toBeInstanceOf(Function)
   })
@@ -38,67 +58,90 @@ describe('useRecoveryToasts', () => {
   it(`should not make toast for ${RECOVERY_MAP.CANCEL_RUN.ROUTE} option`, () => {
     const { result } = renderHook(() =>
       useRecoveryToasts({
-        isOnDevice: false,
-        currentStepCount: 1,
+        ...DEFAULT_PROPS,
         selectedRecoveryOption: RECOVERY_MAP.CANCEL_RUN.ROUTE,
       })
     )
 
-    const mockMakeToast = vi.fn()
-    vi.mocked(useToaster).mockReturnValue({ makeToast: mockMakeToast } as any)
-
     result.current.makeSuccessToast()
     expect(mockMakeToast).not.toHaveBeenCalled()
   })
+
+  it('should make toast with correct parameters for desktop', () => {
+    vi.mocked(useCommandTextString).mockReturnValue({
+      commandText: TEST_COMMAND,
+    })
+
+    const { result } = renderHook(() =>
+      useRecoveryToasts({
+        ...DEFAULT_PROPS,
+        commandTextData: { commands: [TEST_COMMAND] } as any,
+      })
+    )
+
+    vi.mocked(useCommandTextString).mockReturnValue({
+      commandText: TEST_COMMAND,
+      stepTexts: undefined,
+    })
+
+    result.current.makeSuccessToast()
+    expect(mockMakeToast).toHaveBeenCalledWith(
+      TEST_COMMAND,
+      'success',
+      expect.objectContaining({
+        closeButton: true,
+        disableTimeout: true,
+        displayType: 'desktop',
+        heading: expect.any(String),
+      })
+    )
+  })
+
+  it('should make toast with correct parameters for ODD', () => {
+    const { result } = renderHook(() =>
+      useRecoveryToasts({
+        ...DEFAULT_PROPS,
+        isOnDevice: true,
+      })
+    )
+
+    result.current.makeSuccessToast()
+    expect(mockMakeToast).toHaveBeenCalledWith(
+      expect.any(String),
+      'success',
+      expect.objectContaining({
+        closeButton: true,
+        disableTimeout: true,
+        displayType: 'odd',
+        heading: undefined,
+      })
+    )
+  })
 })
 
-describe('useToastText', () => {
+describe('useRecoveryToastText', () => {
   it(`should return correct text for ${RECOVERY_MAP.RETRY_SAME_TIPS.ROUTE} option`, () => {
     const { result } = renderHook(() =>
-      useToastText({
-        currentStepCount: 2,
+      useRecoveryToastText({
+        stepNumber: 2,
         selectedRecoveryOption: RECOVERY_MAP.RETRY_SAME_TIPS.ROUTE,
       })
     )
 
-    render(
-      <I18nextProvider i18n={i18n}>
-        <div>{result.current}</div>
-      </I18nextProvider>
-    )
-    screen.getByText('Retrying step 2 succeeded')
+    renderWithI18n(<div>{result.current}</div>)
+    screen.getByText('Retrying step 2 succeeded.')
   })
 
   it(`should return correct text for ${RECOVERY_MAP.SKIP_STEP_WITH_SAME_TIPS.ROUTE} option`, () => {
     const { result } = renderHook(() =>
-      useToastText({
-        currentStepCount: 2,
+      useRecoveryToastText({
+        stepNumber: 3,
         selectedRecoveryOption: RECOVERY_MAP.SKIP_STEP_WITH_SAME_TIPS.ROUTE,
       })
     )
 
-    render(
-      <I18nextProvider i18n={i18n}>
-        <div>{result.current}</div>
-      </I18nextProvider>
-    )
-    screen.getByText('Skipping to step 3 succeeded')
-  })
-
-  it('should handle a falsy currentStepCount', () => {
-    const { result } = renderHook(() =>
-      useToastText({
-        currentStepCount: null,
-        selectedRecoveryOption: RECOVERY_MAP.RETRY_SAME_TIPS.ROUTE,
-      })
-    )
-
-    render(
-      <I18nextProvider i18n={i18n}>
-        <div>{result.current}</div>
-      </I18nextProvider>
-    )
-    screen.getByText('Retrying step ? succeeded')
+    renderWithI18n(<div>{result.current}</div>)
+    screen.getByText('Skipping to step 3 succeeded.')
   })
 })
 
@@ -121,5 +164,55 @@ describe('getStepNumber', () => {
     expect(getStepNumber('UNKNOWN_OPTION' as any, 3)).toBe(
       'HANDLE RECOVERY TOAST OPTION EXPLICITLY.'
     )
+  })
+})
+
+describe('useRecoveryFullCommandText', () => {
+  it('should return the correct command text', () => {
+    vi.mocked(useCommandTextString).mockReturnValue({
+      commandText: TEST_COMMAND,
+      stepTexts: undefined,
+    })
+
+    const { result } = renderHook(() =>
+      useRecoveryFullCommandText({
+        robotType: FLEX_ROBOT_TYPE,
+        stepNumber: 1,
+        commandTextData: { commands: [TEST_COMMAND] } as any,
+      })
+    )
+
+    expect(result.current).toBe(TEST_COMMAND)
+  })
+
+  it('should return stepNumber if it is a string', () => {
+    const { result } = renderHook(() =>
+      useRecoveryFullCommandText({
+        robotType: FLEX_ROBOT_TYPE,
+        stepNumber: '?',
+        commandTextData: { commands: [] } as any,
+      })
+    )
+
+    expect(result.current).toBe('?')
+  })
+
+  it('should truncate TC command', () => {
+    vi.mocked(useCommandTextString).mockReturnValue({
+      commandText: TC_COMMAND,
+      stepTexts: ['step'],
+    })
+
+    const { result } = renderHook(() =>
+      useRecoveryFullCommandText({
+        robotType: FLEX_ROBOT_TYPE,
+        stepNumber: 1,
+        commandTextData: {
+          commands: [TC_COMMAND],
+        } as any,
+      })
+    )
+
+    expect(result.current).toBe('tc command cycle')
   })
 })

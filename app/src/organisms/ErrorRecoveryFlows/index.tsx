@@ -117,17 +117,19 @@ export function ErrorRecoveryFlows(
 
   const { hasLaunchedRecovery, toggleERWizard, showERWizard } = useERWizard()
 
+  const isOnDevice = useSelector(getIsOnDevice)
+  const robotType = protocolAnalysis?.robotType ?? OT2_ROBOT_TYPE
+  const showSplash = useRunPausedSplash(isOnDevice, showERWizard)
+
   const isDoorOpen = useShowDoorInfo(runStatus)
 
   const recoveryUtils = useERUtils({
     ...props,
     hasLaunchedRecovery,
     toggleERWizard,
+    isOnDevice,
+    robotType,
   })
-
-  const robotType = protocolAnalysis?.robotType ?? OT2_ROBOT_TYPE
-  const isOnDevice = useSelector(getIsOnDevice)
-  const showSplash = useRunPausedSplash(isOnDevice, showERWizard)
 
   return (
     <>
