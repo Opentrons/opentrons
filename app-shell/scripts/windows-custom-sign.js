@@ -15,18 +15,21 @@ exports.default = async configuration => {
     const signProcess = execSync(signCmd, {
       stdio: 'pipe',
     })
-    const stdout = signProcess.stdout.read()
-    const stderr = signProcess.stderr.read()
-    console.log(`Sign stdout: ${stdout.toString()}`)
-    console.log(`Sign stderr: ${stderr.toString()}`)
+    console.log(`Sign success!`)
+    console.log(
+      `Sign stdout: ${signProcess?.stdout?.toString() ?? '<no output>'}`
+    )
+    console.log(
+      `Sign stderr: ${signProcess?.stderr?.toString() ?? '<no output>'}`
+    )
     console.log(`Sign code: ${signProcess.code}`)
   } catch (err) {
     console.error(`Exception running sign: ${err.status}!
 Process stdout:
- ${err.stdout.toString()}
+ ${err?.stdout?.toString() ?? '<no output>'}
 -------------
 Process stderr:
-${err.stdout.toString()}
+${err?.stdout?.toString() ?? '<no output>'}
 -------------
 `)
     throw err
@@ -37,18 +40,21 @@ ${err.stdout.toString()}
   console.log(verifyCmd)
   try {
     const verifyProcess = execSync(verifyCmd, { stdio: 'pipe' })
-    const stdout = verifyProcess.stdout.read()
-    const stderr = verifyProcess.stderr.read()
-    console.log(`Verify stdout: ${stdout}`)
-    console.log(`Verify stderr: ${stderr}`)
+    console.log(`Verify success!`)
+    console.log(
+      `Verify stdout: ${verifyProcess?.stdout?.toString() ?? '<no output>'}`
+    )
+    console.log(
+      `Verify stderr: ${verifyProcess?.stderr?.toString() ?? '<no output>'}`
+    )
   } catch (err) {
     console.error(`
 Exception running verification: ${err.status}!
 Process stdout:
- ${err.stdout.toString()}
+ ${err?.stdout?.toString() ?? '<no output>'}
 --------------
 Process stderr:
- ${err.stderr.toString()}
+ ${err?.stderr?.toString() ?? '<no output>'}
 --------------
 `)
     throw err
