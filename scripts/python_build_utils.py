@@ -58,7 +58,12 @@ def normalize_version(package, project, extra_tag='', git_dir=None):
     # we try all the possible ways to find it.
     try:
         # new way
-        from setuptools.extern import packaging
+        import setuptools
+        major, minor, patch = [int(x, 10) for x in setuptools.__version__.split('.')]
+        if major < 71:
+            from setuptools.extern import packaging
+        else:
+            import packaging
     except ImportError:
         # old way
         from pkg_resources.extern import packaging
