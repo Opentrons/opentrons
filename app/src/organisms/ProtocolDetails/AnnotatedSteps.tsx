@@ -11,6 +11,8 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
   OVERFLOW_AUTO,
+  Icon,
+  ALIGN_FLEX_START,
 } from '@opentrons/components'
 import { CommandIcon, CommandText } from '../../molecules/Command'
 
@@ -25,6 +27,16 @@ interface AnnotatedStepsProps {
   currentCommandIndex?: number
 }
 
+interface ParentNode {
+  annotationIndex: number
+  subCommands: LeafNode[]
+  isHighlighted: boolean
+}
+interface LeafNode {
+  command: RunTimeCommand
+  isHighlighted: boolean
+}
+
 export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
   const { analysis, currentCommandIndex } = props
   const HIDE_SCROLLBAR = css`
@@ -32,6 +44,61 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
       display: none;
     }
   `
+
+  //  test with doitAllV8
+  const annotations = analysis.commandAnnotations ?? [
+    {
+      annotationType: 'secondOrderCommand',
+      machineReadableName: 'pips and mods',
+      params: {},
+      commandKeys: [
+        'a1b95079-5b17-428d-b40c-a8236a9890c5',
+        '6f1e3ad3-8f03-4583-8031-be6be2fcd903',
+        '4997a543-7788-434f-8eae-1c4aa3a2a805',
+      ],
+    },
+  ]
+
+  const groupedCommands = analysis.commands.reduce<
+    Array<LeafNode | ParentNode>
+  >((acc, c, i) => {
+    const foundAnnotationIndex = annotations.findIndex(
+      a => c.key != null && a.commandKeys.includes(c.key)
+    )
+    const lastAccNode = acc[acc.length - 1]
+    if (
+      acc.length > 0 &&
+      c.key != null &&
+      'annotationIndex' in lastAccNode &&
+      lastAccNode.annotationIndex != null &&
+      annotations[lastAccNode.annotationIndex]?.commandKeys.includes(c.key)
+    ) {
+      return [
+        ...acc.slice(0, -1),
+        {
+          ...lastAccNode,
+          subCommands: [
+            ...lastAccNode.subCommands,
+            { command: c, isHighlighted: i === currentCommandIndex },
+          ],
+          isHighlighted: lastAccNode.isHighlighted || i === currentCommandIndex,
+        },
+      ]
+    } else if (foundAnnotationIndex >= 0) {
+      return [
+        ...acc,
+        {
+          annotationIndex: foundAnnotationIndex,
+          subCommands: [
+            { command: c, isHighlighted: i === currentCommandIndex },
+          ],
+          isHighlighted: i === currentCommandIndex,
+        },
+      ]
+    } else {
+      return [...acc, { command: c, isHighlighted: i === currentCommandIndex }]
+    }
+  }, [])
 
   return (
     <Flex
@@ -46,16 +113,125 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
         marginY={SPACING.spacing16}
         gridGap={SPACING.spacing4}
       >
-        {analysis.commands.map((c, i) => (
-          <IndividualCommand
-            key={i}
-            stepNumber={(i + 1).toString()}
-            command={c}
-            isHighlighted={i === currentCommandIndex}
-            analysis={analysis}
-          />
-        ))}
+        {groupedCommands.map((c, i) =>
+          'annotationIndex' in c ? (
+            <AnnotatedGroup
+              key={i}
+              stepNumber={(i + 1).toString()}
+              analysis={analysis}
+              annotationType={
+                annotations[c.annotationIndex]?.machineReadableName
+              }
+              isHighlighted={c.isHighlighted}
+              subCommands={c.subCommands}
+            />
+          ) : (
+            <IndividualCommand
+              key={i}
+              stepNumber={(i + 1).toString()}
+              command={c.command}
+              isHighlighted={c.isHighlighted}
+              analysis={analysis}
+            />
+          )
+        )}
       </Flex>
+    </Flex>
+  )
+}
+
+interface AnnotatedGroupProps {
+  annotationType: string
+  subCommands: LeafNode[]
+  analysis: ProtocolAnalysisOutput | CompletedProtocolAnalysis
+  stepNumber: string
+  isHighlighted: boolean
+}
+function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
+  const {
+    subCommands,
+    annotationType,
+    analysis,
+    stepNumber,
+    isHighlighted,
+  } = props
+  const [isExpanded, setIsExpanded] = React.useState(false)
+  const backgroundColor = isHighlighted ? COLORS.blue30 : COLORS.grey20
+  return (
+    <Flex onClick={() => setIsExpanded(!isExpanded)} cursor="pointer">
+      {isExpanded ? (
+        <Flex flexDirection={DIRECTION_COLUMN}>
+          <Flex
+            alignItems={ALIGN_CENTER}
+            alignSelf={ALIGN_FLEX_START}
+            gridGap={SPACING.spacing8}
+          >
+            <LegacyStyledText
+              minWidth={SPACING.spacing16}
+              fontSize={TYPOGRAPHY.fontSizeCaption}
+            >
+              {stepNumber}
+            </LegacyStyledText>
+            <Flex
+              alignItems={ALIGN_CENTER}
+              backgroundColor={backgroundColor}
+              color={COLORS.black90}
+              borderRadius={BORDERS.borderRadius4}
+              padding={SPACING.spacing8}
+            >
+              <LegacyStyledText
+                as="h3"
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                marginLeft={SPACING.spacing8}
+              >
+                {annotationType}
+              </LegacyStyledText>
+              <Icon name="chevron-up" size="2rem" />
+            </Flex>
+          </Flex>
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            paddingY={SPACING.spacing16}
+            paddingX={SPACING.spacing32}
+            gridGap={SPACING.spacing4}
+          >
+            {subCommands.map((c, i) => (
+              <IndividualCommand
+                key={c.command.id}
+                command={c.command}
+                analysis={analysis}
+                isHighlighted={c.isHighlighted}
+                stepNumber={`${stepNumber}.${(i + 1).toString()}`}
+              />
+            ))}
+          </Flex>
+        </Flex>
+      ) : (
+        <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
+          <LegacyStyledText
+            minWidth={SPACING.spacing16}
+            fontSize={TYPOGRAPHY.fontSizeCaption}
+          >
+            {stepNumber}
+          </LegacyStyledText>
+          <Flex
+            alignItems={ALIGN_CENTER}
+            backgroundColor={backgroundColor}
+            color={COLORS.black90}
+            borderRadius={BORDERS.borderRadius4}
+            padding={SPACING.spacing8}
+          >
+            <LegacyStyledText
+              as="h3"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              marginLeft={SPACING.spacing8}
+            >
+              {annotationType}
+            </LegacyStyledText>
+            <Icon name="chevron-down" size="2rem" />
+          </Flex>
+        </Flex>
+      )}
     </Flex>
   )
 }

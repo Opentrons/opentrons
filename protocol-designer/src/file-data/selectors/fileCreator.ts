@@ -57,6 +57,7 @@ import type {
 import type { LabwareDefByDefURI } from '../../labware-defs'
 import type { Selector } from '../../types'
 import type { DesignerApplicationData } from '../../load-file/migration/utils/getLoadLiquidCommands'
+import { SecondOrderCommandAnnotation } from '@opentrons/shared-data/commandAnnotation/types'
 
 // TODO: BC: 2018-02-21 uncomment this assert, causes test failures
 // console.assert(!isEmpty(process.env.OT_PD_VERSION), 'Could not find application version!')
@@ -381,9 +382,19 @@ export const createFile: Selector<ProtocolFile> = createSelector(
       commands,
     }
 
+    const annotationExample: SecondOrderCommandAnnotation = {
+      annotationType: 'secondOrderCommand',
+      machineReadableName: 'pips and mods',
+      params: {},
+      commandKeys: [
+        'a1b95079-5b17-428d-b40c-a8236a9890c5',
+        '6f1e3ad3-8f03-4583-8031-be6be2fcd903',
+        '4997a543-7788-434f-8eae-1c4aa3a2a805',
+      ],
+    }
     const commandAnnotionaV1Mixin: CommandAnnotationV1Mixin = {
       commandAnnotationSchemaId: 'opentronsCommandAnnotationSchemaV1',
-      commandAnnotations: [],
+      commandAnnotations: [annotationExample],
     }
 
     const protocolBase: ProtocolBase<DesignerApplicationData> = {

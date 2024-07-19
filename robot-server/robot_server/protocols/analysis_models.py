@@ -5,7 +5,7 @@ from enum import Enum
 from opentrons.protocol_engine.types import RunTimeParameter, RunTimeParamValuesType
 from opentrons_shared_data.robot.dev_types import RobotType
 from pydantic import BaseModel, Field
-from typing import List, Optional, Union, NamedTuple
+from typing import Any, List, Optional, Union, NamedTuple
 from typing_extensions import Literal
 
 from opentrons.protocol_engine import (
@@ -185,7 +185,7 @@ class CompletedAnalysis(BaseModel):
             " but it won't have more than one element."
         ),
     )
-
+    commandAnnotations: List[Any] = Field(default_factory=list)
 
 AnalysisParameterType = Union[float, bool, str, None]
 
