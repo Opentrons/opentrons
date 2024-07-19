@@ -44,6 +44,7 @@ mock = "~=5.1.0"
 types-mock = "==5.1.0"
 types-requests = "==2.27.1"
 requests = "==2.27.1"
+packaging = "==24.1"
 
 [requires]
 python_version = "3.10"

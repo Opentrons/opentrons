@@ -11,7 +11,6 @@ opentrons-shared-data = { editable = true, path = "../shared-data/python" }
 opentrons = { editable = true, path = "." }
 opentrons-hardware = { editable = true, path = "./../hardware", extras=["FLEX"] }
 numpy = "==1.22.3"
-packaging = "==21.3"
 pyusb = "==1.2.1"
 
 [dev-packages]
@@ -44,6 +43,7 @@ decoy = "==2.1.1"
 black = "==22.3.0"
 types-mock = "~=5.1.0"
 types-setuptools = "==57.0.2"
+packaging = "==24.1"
 # specify typing-extensions explicitly to force lockfile inclusion on Python >= 3.8
 typing-extensions = ">=4.0.0,<5"
 pytest-profiling = "~=1.7.0"

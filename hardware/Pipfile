@@ -25,6 +25,7 @@ types-mock = "~=5.1.0"
 hypothesis = "~=6.96.1"
 pytest-asyncio = "~=0.23.0"
 matplotlib = "*"
+packaging = "==24.1"
 opentrons-shared-data = { editable = true, path = "../shared-data/python" }
 
 [requires]
