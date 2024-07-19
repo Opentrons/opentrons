@@ -7,8 +7,8 @@ const { execSync } = require('node:child_process')
 exports.default = async configuration => {
   const signCmd = `smctl sign --keypair-alias="${String(
     process.env.SM_KEYPAIR_ALIAS
-  )}" --input "${String(
-    configuration.path
+  )}" --input "${String(configuration.path)}" --certificate="${String(
+    process.env.WINDOWS_CSC_FILEPATH
   )}" --exit-non-zero-on-fail --failfast --verbose`
   console.log(signCmd)
   try {
