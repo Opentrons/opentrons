@@ -1,0 +1,50 @@
+test_name: Test getting and setting client data.
+
+marks:
+  - usefixtures:
+      - ot3_server_base_url
+
+stages:
+  - name: Check the initial client data
+    request:
+      method: GET
+      url: '{ot3_server_base_url}/clientData'
+    response:
+      status_code: 200
+      json:
+        data: {}
+
+  - name: Set client data
+    request:
+      method: PUT
+      url: '{ot3_server_base_url}/clientData'
+      json:
+        data: &put_data
+          stringField: string value
+          numberField: 123.456
+          boolField: true
+          nullField: null
+          objectField:
+            key: value
+    response:
+      status_code: 200
+      json:
+        data: *put_data
+
+  - name: Check that it rejects non-object data
+    request:
+      method: PUT
+      url: '{ot3_server_base_url}/clientData'
+      json:
+        data: This is a string and not an object.
+    response:
+      status_code: 422
+
+  - name: Retrieve client data
+    request:
+      method: GET
+      url: '{ot3_server_base_url}/clientData'
+    response:
+      status_code: 200
+      json:
+        data: *put_data
