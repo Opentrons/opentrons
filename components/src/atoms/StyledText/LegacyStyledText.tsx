@@ -58,9 +58,7 @@ const styleMap: { [tag: string]: FlattenSimpleInterpolation } = {
       ${TYPOGRAPHY.level3HeaderSemiBold}
     }
   `,
-  h4SemiBold: css`
-    ${TYPOGRAPHY.level4HeaderSemiBold},
-  `,
+  h4SemiBold: TYPOGRAPHY.level4HeaderSemiBold,
   h6SemiBold: TYPOGRAPHY.h6SemiBold,
   pSemiBold: css`
     ${TYPOGRAPHY.pSemiBold}
@@ -76,12 +74,8 @@ const styleMap: { [tag: string]: FlattenSimpleInterpolation } = {
     }
   `,
   h2Bold: TYPOGRAPHY.level2HeaderBold,
-  h3Bold: css`
-    ${TYPOGRAPHY.level3HeaderBold}
-  `,
-  h4Bold: css`
-    ${TYPOGRAPHY.level4HeaderBold}
-  `,
+  h3Bold: TYPOGRAPHY.level3HeaderBold,
+  h4Bold: TYPOGRAPHY.level4HeaderBold,
   pBold: TYPOGRAPHY.bodyTextBold,
   labelBold: TYPOGRAPHY.smallBodyTextBold,
 }
