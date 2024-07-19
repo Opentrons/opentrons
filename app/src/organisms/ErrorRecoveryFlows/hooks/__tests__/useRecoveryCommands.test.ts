@@ -33,13 +33,16 @@ const mockRouteUpdateActions = {
 } as any
 
 describe('useRecoveryCommands', () => {
-  const mockResumeRunFromRecovery = vi.fn()
+  const mockMakeSuccessToast = vi.fn()
+  const mockResumeRunFromRecovery = vi.fn(() =>
+    Promise.resolve(mockMakeSuccessToast())
+  )
   const mockStopRun = vi.fn()
   const mockChainRunCommands = vi.fn().mockResolvedValue([])
 
   beforeEach(() => {
     vi.mocked(useResumeRunFromRecoveryMutation).mockReturnValue({
-      resumeRunFromRecovery: mockResumeRunFromRecovery,
+      mutateAsync: mockResumeRunFromRecovery,
     } as any)
     vi.mocked(useStopRunMutation).mockReturnValue({
       stopRun: mockStopRun,
@@ -56,6 +59,7 @@ describe('useRecoveryCommands', () => {
         failedCommand: mockFailedCommand,
         failedLabwareUtils: mockFailedLabwareUtils,
         routeUpdateActions: mockRouteUpdateActions,
+        recoveryToastUtils: {} as any,
       })
     )
 
@@ -81,6 +85,7 @@ describe('useRecoveryCommands', () => {
         failedCommand: mockFailedCommand,
         failedLabwareUtils: mockFailedLabwareUtils,
         routeUpdateActions: mockRouteUpdateActions,
+        recoveryToastUtils: {} as any,
       })
     )
 
@@ -107,6 +112,7 @@ describe('useRecoveryCommands', () => {
         failedCommand: mockFailedCommand,
         failedLabwareUtils: mockFailedLabwareUtils,
         routeUpdateActions: mockRouteUpdateActions,
+        recoveryToastUtils: {} as any,
       })
     )
 
@@ -120,19 +126,23 @@ describe('useRecoveryCommands', () => {
     )
   })
 
-  it('should call resumeRun with runId', () => {
+  it('should call resumeRun with runId and show success toast on success', async () => {
     const { result } = renderHook(() =>
       useRecoveryCommands({
         runId: mockRunId,
         failedCommand: mockFailedCommand,
         failedLabwareUtils: mockFailedLabwareUtils,
         routeUpdateActions: mockRouteUpdateActions,
+        recoveryToastUtils: { makeSuccessToast: mockMakeSuccessToast } as any,
       })
     )
 
-    result.current.resumeRun()
+    await act(async () => {
+      await result.current.resumeRun()
+    })
 
     expect(mockResumeRunFromRecovery).toHaveBeenCalledWith(mockRunId)
+    expect(mockMakeSuccessToast).toHaveBeenCalled()
   })
 
   it('should call cancelRun with runId', () => {
@@ -142,6 +152,7 @@ describe('useRecoveryCommands', () => {
         failedCommand: mockFailedCommand,
         failedLabwareUtils: mockFailedLabwareUtils,
         routeUpdateActions: mockRouteUpdateActions,
+        recoveryToastUtils: {} as any,
       })
     )
 
@@ -157,6 +168,7 @@ describe('useRecoveryCommands', () => {
         failedCommand: mockFailedCommand,
         failedLabwareUtils: mockFailedLabwareUtils,
         routeUpdateActions: mockRouteUpdateActions,
+        recoveryToastUtils: {} as any,
       })
     )
 
@@ -195,6 +207,7 @@ describe('useRecoveryCommands', () => {
           failedLabware: mockFailedLabware,
         },
         routeUpdateActions: mockRouteUpdateActions,
+        recoveryToastUtils: {} as any,
       })
     )
 
@@ -215,6 +228,7 @@ describe('useRecoveryCommands', () => {
         failedCommand: mockFailedCommand,
         failedLabwareUtils: mockFailedLabwareUtils,
         routeUpdateActions: mockRouteUpdateActions,
+        recoveryToastUtils: {} as any,
       })
     )
 
@@ -235,6 +249,7 @@ describe('useRecoveryCommands', () => {
         failedCommand: mockFailedCommand,
         failedLabwareUtils: mockFailedLabwareUtils,
         routeUpdateActions: mockRouteUpdateActions,
+        recoveryToastUtils: {} as any,
       })
     )
 

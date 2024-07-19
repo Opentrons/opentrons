@@ -15,12 +15,14 @@ import type { WellGroup } from '@opentrons/components'
 import type { FailedCommand } from '../types'
 import type { UseFailedLabwareUtilsResult } from './useFailedLabwareUtils'
 import type { UseRouteUpdateActionsResult } from './useRouteUpdateActions'
+import type { RecoveryToasts } from './useRecoveryToasts'
 
 interface UseRecoveryCommandsParams {
   runId: string
   failedCommand: FailedCommand | null
   failedLabwareUtils: UseFailedLabwareUtilsResult
   routeUpdateActions: UseRouteUpdateActionsResult
+  recoveryToastUtils: RecoveryToasts
 }
 export interface UseRecoveryCommandsResult {
   /* A terminal recovery command that causes ER to exit as the run status becomes "running" */
@@ -44,11 +46,15 @@ export function useRecoveryCommands({
   failedCommand,
   failedLabwareUtils,
   routeUpdateActions,
+  recoveryToastUtils,
 }: UseRecoveryCommandsParams): UseRecoveryCommandsResult {
   const { proceedToRouteAndStep } = routeUpdateActions
   const { chainRunCommands } = useChainRunCommands(runId, failedCommand?.id)
-  const { resumeRunFromRecovery } = useResumeRunFromRecoveryMutation()
+  const {
+    mutateAsync: resumeRunFromRecovery,
+  } = useResumeRunFromRecoveryMutation()
   const { stopRun } = useStopRunMutation()
+  const { makeSuccessToast } = recoveryToastUtils
 
   const chainRunRecoveryCommands = React.useCallback(
     (
@@ -96,8 +102,10 @@ export function useRecoveryCommands({
   }, [chainRunRecoveryCommands, failedCommand, failedLabwareUtils])
 
   const resumeRun = React.useCallback((): void => {
-    resumeRunFromRecovery(runId)
-  }, [runId, resumeRunFromRecovery])
+    void resumeRunFromRecovery(runId).then(() => {
+      makeSuccessToast()
+    })
+  }, [runId, resumeRunFromRecovery, makeSuccessToast])
 
   const cancelRun = React.useCallback((): void => {
     stopRun(runId)
