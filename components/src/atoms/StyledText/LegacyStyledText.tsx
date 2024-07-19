@@ -59,9 +59,7 @@ const styleMap: { [tag: string]: FlattenSimpleInterpolation } = {
     }
   `,
   h4SemiBold: css`
-    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-      ${TYPOGRAPHY.level4HeaderSemiBold},
-    }
+    ${TYPOGRAPHY.level4HeaderSemiBold},
   `,
   h6SemiBold: TYPOGRAPHY.h6SemiBold,
   pSemiBold: css`
@@ -79,14 +77,10 @@ const styleMap: { [tag: string]: FlattenSimpleInterpolation } = {
   `,
   h2Bold: TYPOGRAPHY.level2HeaderBold,
   h3Bold: css`
-    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-      ${TYPOGRAPHY.level3HeaderBold}
-    }
+    ${TYPOGRAPHY.level3HeaderBold}
   `,
   h4Bold: css`
-    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-      ${TYPOGRAPHY.level4HeaderBold}
-    }
+    ${TYPOGRAPHY.level4HeaderBold}
   `,
   pBold: TYPOGRAPHY.bodyTextBold,
   labelBold: TYPOGRAPHY.smallBodyTextBold,
