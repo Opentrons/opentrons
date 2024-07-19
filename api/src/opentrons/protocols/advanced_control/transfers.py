@@ -16,6 +16,7 @@ from typing import (
 from opentrons.protocol_api.labware import Labware, Well
 from opentrons import types
 from opentrons.protocols.api_support.types import APIVersion
+from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
 
 
 if TYPE_CHECKING:
@@ -409,7 +410,11 @@ class TransferPlan:
         # then avoid iterating through its Wells.
         # ii. if using single channel pipettes, flatten a multi-dimensional
         # list of Wells into a 1 dimensional list of Wells
-        if self._instr.channels > 1:
+        if (
+            self._instr.channels > 1
+            and self._instr._core.get_nozzle_map().configuration
+            == NozzleConfigurationType.FULL
+        ):
             sources, dests = self._multichannel_transfer(sources, dests)
         else:
             if isinstance(sources, List) and isinstance(sources[0], List):
