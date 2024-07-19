@@ -10,16 +10,16 @@ exports.default = async configuration => {
   )}" --input "${String(
     configuration.path
   )}" --exit-non-zero-on-fail --failfast --verbose`
-  console.log(cmd)
+  console.log(signCmd)
   try {
-    const process = execSync(cmd, {
+    const signProcess = execSync(signCmd, {
       stdio: 'pipe',
     })
-    const stdout = process.stdout.read()
-    const stderr = process.stderr.read()
+    const stdout = signProcess.stdout.read()
+    const stderr = signProcess.stderr.read()
     console.log(`Sign stdout: ${stdout.toString()}`)
     console.log(`Sign stderr: ${stderr.toString()}`)
-    console.log(`Sign code: ${process.code}`)
+    console.log(`Sign code: ${signProcess.code}`)
   } catch (err) {
     console.error(`Exception running sign: ${err.status}!
 Process stdout:
@@ -37,8 +37,8 @@ ${err.stdout.toString()}
   console.log(verifyCmd)
   try {
     const verifyProcess = execSync(verifyCmd, { stdio: 'pipe' })
-    const stdout = process.stdout.read()
-    const stderr = process.stderr.read()
+    const stdout = verifyProcess.stdout.read()
+    const stderr = verifyProcess.stderr.read()
     console.log(`Verify stdout: ${stdout}`)
     console.log(`Verify stderr: ${stderr}`)
   } catch (err) {
