@@ -266,7 +266,7 @@ export function OnDeviceDisplayAppRoutes(): JSX.Element {
         />
       ))}
       {targetPath != null && (
-        <Route path="/" element={<Navigate to={targetPath} />} />
+        <Route path="*" element={<Navigate to={targetPath} replace />} />
       )}
     </Routes>
   )
