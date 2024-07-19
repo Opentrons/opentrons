@@ -172,6 +172,7 @@ describe('LabwareListItem', () => {
     })
     screen.getByText('Mock Labware Definition')
     screen.getByTestId('slot_info_7')
+    screen.getByTestId('LocationIcon_stacked')
     screen.getByText('Magnetic Module GEN1')
     const button = screen.getByText('Secure labware instructions')
     fireEvent.click(button)
@@ -206,6 +207,7 @@ describe('LabwareListItem', () => {
     })
     screen.getByText('Mock Labware Definition')
     screen.getByTestId('slot_info_7')
+    screen.getByTestId('LocationIcon_stacked')
     screen.getByText('Temperature Module GEN1')
     screen.getByText('nickName')
   })
@@ -314,7 +316,6 @@ describe('LabwareListItem', () => {
     screen.getByText('mock nested display name')
     screen.getByText('nestedLabwareNickName')
     screen.getByText('nickName')
-    screen.getByText('On deck')
   })
 
   it('renders the correct info for a labware on top of a heater shaker', () => {
@@ -375,6 +376,6 @@ describe('LabwareListItem', () => {
       nestedLabwareInfo: null,
     })
     screen.getByText('Mock Labware Definition')
-    screen.getByText('Off deck')
+    screen.getByTestId('slot_info_OFF DECK')
   })
 })

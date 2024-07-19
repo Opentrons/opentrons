@@ -8,16 +8,14 @@ import {
   StyledText,
   COLORS,
 } from '@opentrons/components'
-import {
-  getLabwareSetupItemGroups,
-  LabwareSetupItem,
-} from '../../../../pages/Protocols/utils'
+import { getLabwareSetupItemGroups } from '../../../../pages/Protocols/utils'
 import { LabwareListItem } from './LabwareListItem'
 import { getNestedLabwareInfo } from './getNestedLabwareInfo'
 
 import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { ModuleRenderInfoForProtocol } from '../../hooks'
 import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
+import type { LabwareSetupItem } from '../../../../pages/Protocols/utils'
 
 const HeaderRow = styled.div`
   display: grid;

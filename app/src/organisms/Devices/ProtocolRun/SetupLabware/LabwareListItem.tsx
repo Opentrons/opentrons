@@ -169,7 +169,7 @@ export function LabwareListItem(
     switch (moduleTypeNeedsAttention) {
       case MAGNETIC_MODULE_TYPE:
       case THERMOCYCLER_MODULE_TYPE:
-        if (moduleModel == THERMOCYCLER_MODULE_V2) {
+        if (moduleModel !== THERMOCYCLER_MODULE_V2) {
           secureLabwareInstructions = (
             <Btn
               css={css`
@@ -274,7 +274,12 @@ export function LabwareListItem(
         {slotInfo != null && isFlex ? (
           <LocationIcon slotName={slotInfo} />
         ) : (
-          { slotInfo }
+          <StyledText
+            css={TYPOGRAPHY.pSemiBold}
+            data-testid={`slot_info_${slotInfo}`}
+          >
+            {slotInfo}
+          </StyledText>
         )}
         {nestedLabwareInfo != null || moduleDisplayName != null ? (
           <LocationIcon iconName="stacked" />
