@@ -8,6 +8,7 @@ const {
 } = process.env
 const DEV_MODE = process.env.NODE_ENV !== 'production'
 const USE_PYTHON = process.env.NO_PYTHON !== 'true'
+const WINDOWS_SIGN = process.env.WINDOWS_SIGN === 'true'
 const project = process.env.OPENTRONS_PROJECT ?? 'robot-stack'
 
 // this will generate either
@@ -72,6 +73,11 @@ module.exports = async () => ({
     target: ['nsis'],
     publisherName: 'Opentrons Labworks Inc.',
     icon: project === 'robot-stack' ? 'build/icon.ico' : 'build/three.ico',
+    forceCodeSigning: WINDOWS_SIGN,
+    rfc3161TimeStampServer: 'http://timestamp.digicert.com',
+    sign: 'script/windows-custom-sign.js',
+    signDlls: true,
+    signingHashAlgorithms: ['sha256'],
   },
   nsis: {
     oneClick: false,
