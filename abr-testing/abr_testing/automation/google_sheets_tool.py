@@ -136,7 +136,6 @@ class google_sheet:
 
         for col_offset, col_values in enumerate(data):
             column_index = start_column_index + col_offset
-            # column_letter = index_to_column_letter(column_index)
             for row_offset, value in enumerate(col_values):
                 row_index = start_row + row_offset
                 try:
@@ -163,7 +162,10 @@ class google_sheet:
                 )
 
         body = {"requests": requests}
-        self.spread_sheet.batch_update(body=body)
+        try:
+            self.spread_sheet.batch_update(body=body)
+        except gspread.exceptions.APIError as e:
+            print(f"ERROR MESSAGE: {e}")
 
     def update_cell(
         self, sheet_title: str, row: int, column: int, single_data: Any
