@@ -337,6 +337,7 @@ jobs:
           SM_CLIENT_CERT_FILE: "D:\\Certificate_pkcs12.p12"
           SM_CLIENT_CERT_PASSWORD: ${{secrets.SM_CLIENT_CERT_PASSWORD}}
           SM_API_KEY: ${{secrets.SM_API_KEY}}
+          SM_CODE_SIGNING_CERT_SHA1_HASH: ${{secrets.SM_CODE_SIGNING_CERT_SHA1_HASH}}
           CSC_LINK: ${{ secrets.OT_APP_CSC_MACOS }}
           CSC_KEY_PASSWORD: ${{ secrets.OT_APP_CSC_KEY_MACOS }}
           APPLE_ID: ${{ secrets.OT_APP_APPLE_ID }}
