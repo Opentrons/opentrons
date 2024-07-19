@@ -1,13 +1,15 @@
 import * as React from 'react'
 
 import { Box, BORDERS, SPACING } from '@opentrons/components'
+import type { StyleProps } from '@opentrons/components'
 
-export interface VisibleContainerProps {
+export interface VisibleContainerProps extends StyleProps {
   children: JSX.Element | JSX.Element[]
 }
 
 export function VisibleContainer({
   children,
+  ...styleProps
 }: VisibleContainerProps): JSX.Element {
   return (
     <Box
@@ -18,6 +20,7 @@ export function VisibleContainer({
       maxWidth="100vp"
       maxHeight="100vp"
       padding={SPACING.spacing32}
+      {...styleProps}
     >
       {children}
     </Box>

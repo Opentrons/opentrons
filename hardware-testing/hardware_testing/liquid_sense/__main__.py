@@ -6,7 +6,7 @@ from pathlib import Path
 import subprocess
 from time import sleep
 import os
-from typing import List, Any, Optional
+from typing import List, Any, Optional, Dict
 import traceback
 import sys
 
@@ -39,6 +39,7 @@ from .post_process import process_csv_directory, process_google_sheet
 from hardware_testing.protocols.liquid_sense_lpc import (
     liquid_sense_ot3_p50_single_vial,
     liquid_sense_ot3_p1000_96_well,
+    liquid_sense_ot3_p50_multi,
 )
 
 try:
@@ -68,10 +69,10 @@ LABWARE_OFFSETS: List[LabwareOffset] = []
 MAX_PROBE_SECONDS = 3.5
 
 
-LIQUID_SENSE_CFG = {
+LIQUID_SENSE_CFG: Dict[int, Dict[int, Any]] = {
     50: {
         1: liquid_sense_ot3_p50_single_vial,
-        8: None,
+        8: liquid_sense_ot3_p50_multi,
     },
     1000: {
         1: liquid_sense_ot3_p1000_96_well,

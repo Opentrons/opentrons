@@ -123,9 +123,25 @@ def get_most_recent_run_and_record(
     most_recent_run_id = run_list[-1]["id"]
     results = get_run_logs.get_run_data(most_recent_run_id, ip)
     # Save run information to local directory as .json file
-    read_robot_logs.save_run_log_to_json(ip, results, storage_directory)
+    saved_file_path = read_robot_logs.save_run_log_to_json(
+        ip, results, storage_directory
+    )
+    # Check that last run is completed.
+    with open(saved_file_path) as file:
+        file_results = json.load(file)
+        try:
+            file_results["completedAt"]
+        except ValueError:
+            # no completedAt field, get run before the last run.
+            most_recent_run_id = run_list[-2]["id"]
+            results = get_run_logs.get_run_data(most_recent_run_id, ip)
+            # Save run information to local directory as .json file
+            saved_file_path = read_robot_logs.save_run_log_to_json(
+                ip, results, storage_directory
+            )
     # Record run to google sheets.
     print(most_recent_run_id)
+
     (
         runs_and_robots,
         headers,

@@ -331,6 +331,11 @@ from .liquid_probe import (
     LiquidProbeCreate,
     LiquidProbeResult,
     LiquidProbeCommandType,
+    TryLiquidProbe,
+    TryLiquidProbeParams,
+    TryLiquidProbeCreate,
+    TryLiquidProbeResult,
+    TryLiquidProbeCommandType,
 )
 
 __all__ = [
@@ -580,4 +585,9 @@ __all__ = [
     "LiquidProbeCreate",
     "LiquidProbeResult",
     "LiquidProbeCommandType",
+    "TryLiquidProbe",
+    "TryLiquidProbeParams",
+    "TryLiquidProbeCreate",
+    "TryLiquidProbeResult",
+    "TryLiquidProbeCommandType",
 ]

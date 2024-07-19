@@ -484,6 +484,10 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
         """Retract this instrument to the top of the gantry."""
         self._protocol_interface.get_hardware.retract(self._mount)  # type: ignore [attr-defined]
 
+    def detect_liquid_presence(self, well_core: WellCore, loc: types.Location) -> bool:
+        """This will never be called because it was added in API 2.20."""
+        assert False, "detect_liquid_presence only supported in API 2.20 & later"
+
     def liquid_probe_with_recovery(
         self, well_core: WellCore, loc: types.Location
     ) -> None:

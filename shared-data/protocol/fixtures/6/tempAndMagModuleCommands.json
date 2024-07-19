@@ -1238,7 +1238,7 @@
   "commands": [
     {
       "commandType": "loadPipette",
-      "id": "0abc123",
+      "key": "0abc123",
       "params": {
         "pipetteId": "pipetteId",
         "mount": "left"
@@ -1246,7 +1246,7 @@
     },
     {
       "commandType": "loadModule",
-      "id": "1abc123",
+      "key": "1abc123",
       "params": {
         "moduleId": "magneticModuleId",
         "location": { "slotName": "3" }
@@ -1254,7 +1254,7 @@
     },
     {
       "commandType": "loadModule",
-      "id": "2abc123",
+      "key": "2abc123",
       "params": {
         "moduleId": "temperatureModuleId",
         "location": { "slotName": "1" }
@@ -1262,7 +1262,7 @@
     },
     {
       "commandType": "loadLabware",
-      "id": "3abc123",
+      "key": "3abc123",
       "params": {
         "labwareId": "sourcePlateId",
         "location": {
@@ -1272,7 +1272,7 @@
     },
     {
       "commandType": "loadLabware",
-      "id": "4abc123",
+      "key": "4abc123",
       "params": {
         "labwareId": "destPlateId",
         "location": {
@@ -1282,7 +1282,7 @@
     },
     {
       "commandType": "loadLabware",
-      "id": "5abc123",
+      "key": "5abc123",
       "params": {
         "labwareId": "tipRackId",
         "location": { "slotName": "8" }
@@ -1290,7 +1290,7 @@
     },
     {
       "commandType": "loadLabware",
-      "id": "6abc123",
+      "key": "6abc123",
       "params": {
         "labwareId": "fixedTrash",
         "location": {
@@ -1300,7 +1300,7 @@
     },
     {
       "commandType": "loadLiquid",
-      "id": "7abc123",
+      "key": "7abc123",
       "params": {
         "liquidId": "waterId",
         "labwareId": "sourcePlateId",
@@ -1313,7 +1313,7 @@
 
     {
       "commandType": "pickUpTip",
-      "id": "8abc123",
+      "key": "8abc123",
       "params": {
         "pipetteId": "pipetteId",
         "labwareId": "tipRackId",
@@ -1322,7 +1322,7 @@
     },
     {
       "commandType": "aspirate",
-      "id": "9abc123",
+      "key": "9abc123",
       "params": {
         "pipetteId": "pipetteId",
         "labwareId": "sourcePlateId",
@@ -1337,14 +1337,14 @@
     },
     {
       "commandType": "delay",
-      "id": "10abc123",
+      "key": "10abc123",
       "params": {
         "seconds": 42
       }
     },
     {
       "commandType": "dispense",
-      "id": "11abc123",
+      "key": "11abc123",
       "params": {
         "pipetteId": "pipetteId",
         "labwareId": "destPlateId",
@@ -1359,7 +1359,7 @@
     },
     {
       "commandType": "temperatureModule/setTargetTemperature",
-      "id": "12abc123",
+      "key": "12abc123",
       "params": {
         "moduleId": "temperatureModuleId",
         "celsius": 80
@@ -1367,7 +1367,7 @@
     },
     {
       "commandType": "temperatureModule/waitForTemperature",
-      "id": "13abc123",
+      "key": "13abc123",
       "params": {
         "moduleId": "temperatureModuleId",
         "celsius": 80
@@ -1375,14 +1375,14 @@
     },
     {
       "commandType": "temperatureModule/deactivate",
-      "id": "14abc123",
+      "key": "14abc123",
       "params": {
         "moduleId": "temperatureModuleId"
       }
     },
     {
       "commandType": "magneticModule/engage",
-      "id": "15abc123",
+      "key": "15abc123",
       "params": {
         "moduleId": "magneticModuleId",
         "height": 10
@@ -1390,7 +1390,7 @@
     },
     {
       "commandType": "magneticModule/disengage",
-      "id": "16abc123",
+      "key": "16abc123",
       "params": {
         "moduleId": "magneticModuleId"
       }

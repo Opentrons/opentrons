@@ -21,7 +21,10 @@ import { getShellUpdateDataFiles } from '../../redux/shell'
 import { ChildNavigation } from '../ChildNavigation'
 import { EmptyFile } from './EmptyFile'
 
-import type { CsvFileParameter, CsvFileFileType } from '@opentrons/shared-data'
+import type {
+  CsvFileParameter,
+  CsvFileParameterFileData,
+} from '@opentrons/shared-data'
 import type { CsvFileData } from '@opentrons/api-client'
 
 interface ChooseCsvFileProps {
@@ -29,7 +32,7 @@ interface ChooseCsvFileProps {
   handleGoBack: () => void
   parameter: CsvFileParameter
   setParameter: (
-    value: boolean | string | number | CsvFileFileType,
+    value: boolean | string | number | CsvFileParameterFileData,
     variableName: string
   ) => void
 }
@@ -46,10 +49,11 @@ export function ChooseCsvFile({
 
   const csvFilesOnRobot = useAllCsvFilesQuery(protocolId).data?.data.files ?? []
 
-  const initialFileObject: CsvFileFileType = parameter.file ?? {}
-  const [csvFileSelected, setCsvFileSelected] = React.useState<CsvFileFileType>(
-    initialFileObject
-  )
+  const initialFileObject: CsvFileParameterFileData = parameter.file ?? {}
+  const [
+    csvFileSelected,
+    setCsvFileSelected,
+  ] = React.useState<CsvFileParameterFileData>(initialFileObject)
 
   const handleBackButton = (): void => {
     if (!isEqual(csvFileSelected, initialFileObject)) {
@@ -57,6 +61,12 @@ export function ChooseCsvFile({
     }
     handleGoBack()
   }
+
+  React.useEffect(() => {
+    if (csvFilesOnUSB.length === 0) {
+      setCsvFileSelected({})
+    }
+  }, [csvFilesOnUSB])
 
   return (
     <>
@@ -109,10 +119,9 @@ export function ChooseCsvFile({
                 csvFilesOnUSB.map(csvFilePath => {
                   const fileName = last(csvFilePath.split('/'))
                   return (
-                    <>
+                    <React.Fragment key={fileName}>
                       {csvFilePath.length !== 0 && fileName !== undefined ? (
                         <RadioButton
-                          key={fileName}
                           data-testid={fileName}
                           buttonLabel={fileName ?? 'default'}
                           buttonValue={csvFilePath}
@@ -125,7 +134,7 @@ export function ChooseCsvFile({
                           isSelected={csvFileSelected?.filePath === csvFilePath}
                         />
                       ) : null}
-                    </>
+                    </React.Fragment>
                   )
                 })
               ) : (

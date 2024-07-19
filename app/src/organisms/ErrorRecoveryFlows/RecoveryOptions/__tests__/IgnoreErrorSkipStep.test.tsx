@@ -20,7 +20,9 @@ vi.mock('../shared', async () => {
   const actual = await vi.importActual('../shared')
   return {
     ...actual,
-    RecoveryContentWrapper: vi.fn(({ children }) => <div>{children}</div>),
+    RecoverySingleColumnContentWrapper: vi.fn(({ children }) => (
+      <div>{children}</div>
+    )),
   }
 })
 vi.mock('../SelectRecoveryOption')

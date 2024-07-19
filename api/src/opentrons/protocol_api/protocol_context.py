@@ -246,10 +246,6 @@ class ProtocolContext(CommandPublisher):
             self._unsubscribe_commands()
             self._unsubscribe_commands = None
 
-    def __del__(self) -> None:
-        if getattr(self, "_unsubscribe_commands", None):
-            self._unsubscribe_commands()  # type: ignore
-
     @property
     @requires_version(2, 0)
     def max_speeds(self) -> AxisMaxSpeeds:
