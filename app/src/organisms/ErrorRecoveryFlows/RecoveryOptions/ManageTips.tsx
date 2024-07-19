@@ -151,7 +151,7 @@ export function BeginRemoval({
           `}
           value={selected}
           onChange={e => {
-            setSelected(e.currentTarget.value as RemovalOptions)
+            setSelected(e.currentTarget.value)
           }}
           options={[
             {
