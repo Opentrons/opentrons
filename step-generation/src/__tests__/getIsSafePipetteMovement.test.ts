@@ -1,4 +1,4 @@
-import { expect, describe, it, beforeEach, afterEach, vi } from 'vitest'
+import { expect, describe, it, beforeEach } from 'vitest'
 import { getIsSafePipetteMovement } from '../utils'
 import {
   TEMPERATURE_MODULE_TYPE,
@@ -72,9 +72,6 @@ describe('getIsSafePipetteMovement', () => {
       tipState: { tipracks: {}, pipettes: {} },
       liquidState: { pipettes: {}, labware: {}, additionalEquipment: {} },
     }
-  })
-  afterEach(() => {
-    vi.resetAllMocks()
   })
 
   it('returns true when the labware id is a trash bin', () => {
