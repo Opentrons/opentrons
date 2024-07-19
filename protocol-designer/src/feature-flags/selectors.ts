@@ -37,3 +37,7 @@ export const getEnableMoam: Selector<boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ENABLE_MOAM ?? false
 )
+export const getEnableComment: Selector<boolean> = createSelector(
+  getFeatureFlagData,
+  flags => flags.OT_PD_ENABLE_COMMENT ?? false
+)
