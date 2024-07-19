@@ -8,6 +8,7 @@ import {
   SPACING,
   Flex,
   StyledText,
+  RESPONSIVENESS,
 } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
@@ -96,8 +97,20 @@ export function BeginRemoval({
     }
   }
 
+  const DESKTOP_ONLY_GRID_GAP = css`
+    @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+      gap: 0rem;
+    }
+  `
+
+  const RADIO_GROUP_MARGIN = css`
+    @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+      margin-left: 0.5rem;
+    }
+  `
+
   return (
-    <RecoverySingleColumnContentWrapper>
+    <RecoverySingleColumnContentWrapper css={DESKTOP_ONLY_GRID_GAP}>
       <StyledText
         css={ODD_SECTION_TITLE_STYLE}
         oddStyle="level4HeaderSemiBold"
@@ -107,7 +120,7 @@ export function BeginRemoval({
       </StyledText>
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing4}
+        gridGap={SPACING.spacing2}
         css={ODD_ONLY}
       >
         <RadioButton
@@ -144,7 +157,10 @@ export function BeginRemoval({
             {
               value: t('begin_removal'),
               children: (
-                <StyledText desktopStyle="bodyDefaultRegular">
+                <StyledText
+                  desktopStyle="bodyDefaultRegular"
+                  css={RADIO_GROUP_MARGIN}
+                >
                   {t('begin_removal')}
                 </StyledText>
               ),
@@ -152,7 +168,10 @@ export function BeginRemoval({
             {
               value: t('skip'),
               children: (
-                <StyledText desktopStyle="bodyDefaultRegular">
+                <StyledText
+                  desktopStyle="bodyDefaultRegular"
+                  css={RADIO_GROUP_MARGIN}
+                >
                   {t('skip')}
                 </StyledText>
               ),
