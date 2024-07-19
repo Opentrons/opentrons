@@ -9,7 +9,7 @@ import json
 import os
 import subprocess
 import sys
-import packaging
+from packaging.version import Version
 from collections import namedtuple
 
 
@@ -53,7 +53,7 @@ def get_version(package, project, extra_tag='', git_dir=None):
     return version
 
 def normalize_version(package, project, extra_tag='', git_dir=None):
-    vers_obj = packaging.version.Version(get_version(package, project, extra_tag, git_dir))
+    vers_obj = Version(get_version(package, project, extra_tag, git_dir))
     return str(vers_obj)
 
 def _latest_tag_for_prefix(prefix, git_dir):
