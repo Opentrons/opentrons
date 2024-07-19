@@ -2,7 +2,7 @@
 
 import json
 from dataclasses import dataclass
-from typing import Any, Dict, Sequence, Union, Optional
+from typing import Any, Dict, List, Sequence, Union, Optional
 
 import anyio
 
@@ -45,6 +45,8 @@ class IdentifiedJsonMain:
     metadata: Metadata
     """The protocol metadata extracted from this file."""
 
+    command_annotations: List[Any]
+
 
 @dataclass(frozen=True)
 class IdentifiedPythonMain:
@@ -61,6 +63,8 @@ class IdentifiedPythonMain:
 
     metadata: Metadata
     """The protocol metadata extracted from this file."""
+
+    command_annotations: List[Any]
 
 
 @dataclass(frozen=True)
@@ -203,6 +207,7 @@ def _analyze_json_protocol(
         metadata = json_contents["metadata"]
         schema_version = json_contents["schemaVersion"]
         robot_type = json_contents["robot"]["model"]
+        command_annotations = json_contents.get("commandAnnotations", [])
     except KeyError as e:
         raise FileIdentificationError(
             message=error_message,
@@ -217,6 +222,9 @@ def _analyze_json_protocol(
         raise FileIdentificationError(
             message=error_message, detail={"kind": "json-metadata-not-object"}
         )
+
+    if not isinstance(command_annotations, list):
+        raise FileIdentificationError(error_message)
 
     if not isinstance(schema_version, int):
         raise FileIdentificationError(
@@ -239,6 +247,7 @@ def _analyze_json_protocol(
         schema_version=schema_version,
         robot_type=robot_type,
         metadata=metadata,
+        command_annotations=command_annotations,
     )
 
 
@@ -281,4 +290,6 @@ def _analyze_python_protocol(
         metadata=parsed.metadata or {},
         robot_type=parsed.robot_type,
         api_level=parsed.api_level,
+        command_annotations=[],
     )
+    
