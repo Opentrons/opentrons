@@ -1,22 +1,19 @@
-import { useTranslation } from 'react-i18next'
 import type {
   TemperatureModuleAwaitTemperatureCreateCommand,
   TemperatureModuleSetTargetTemperatureCreateCommand,
   TCSetTargetBlockTemperatureCreateCommand,
   TCSetTargetLidTemperatureCreateCommand,
   HeaterShakerSetTargetTemperatureCreateCommand,
+  RunTimeCommand,
 } from '@opentrons/shared-data'
+import type { HandlesCommands } from './types'
 
-type TemperatureCreateCommand =
+export type TemperatureCreateCommand =
   | TemperatureModuleSetTargetTemperatureCreateCommand
   | TemperatureModuleAwaitTemperatureCreateCommand
   | TCSetTargetBlockTemperatureCreateCommand
   | TCSetTargetLidTemperatureCreateCommand
   | HeaterShakerSetTargetTemperatureCreateCommand
-
-interface TemperatureCommandTextProps {
-  command: TemperatureCreateCommand
-}
 
 const T_KEYS_BY_COMMAND_TYPE: {
   [commandType in TemperatureCreateCommand['commandType']]: string
@@ -28,11 +25,17 @@ const T_KEYS_BY_COMMAND_TYPE: {
   'heaterShaker/setTargetTemperature': 'setting_hs_temp',
 }
 
-export const TemperatureCommandText = ({
-  command,
-}: TemperatureCommandTextProps): JSX.Element | null => {
-  const { t } = useTranslation('protocol_command_text')
+type HandledCommands = Extract<
+  RunTimeCommand,
+  { commandType: keyof typeof T_KEYS_BY_COMMAND_TYPE }
+>
 
+type GetTemperatureCommandText = HandlesCommands<HandledCommands>
+
+export const getTemperatureCommandText = ({
+  command,
+  t,
+}: GetTemperatureCommandText): string => {
   return t(T_KEYS_BY_COMMAND_TYPE[command.commandType], {
     temp:
       command.params?.celsius != null
