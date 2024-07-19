@@ -6,24 +6,48 @@
 Partial Tip Pickup
 ******************
 
-The 96-channel pipette occupies both pipette mounts on Flex, so it's not possible to attach another pipette at the same time. Partial tip pickup lets you perform some of the same actions that you would be able to perform with a second pipette. As of version 2.16 of the API, you can configure the 96-channel pipette to pick up a single column of tips, similar to the behavior of an 8-channel pipette.
+By default, multi-channel pipettes always use all of their nozzles to pick up tips and handle liquids: an 8-channel pipette picks up 8 tips at once, and a 96-channel pipette picks up 96 tips at once. Partial tip pickup lets you configure a multi-channel pipette to use fewer tips. This expands the liquid handling capabilities of your robot without having to physically switch pipettes, and is especially useful for the Flex 96-Channel Pipette, which occupies both pipette mounts.
+
+Before getting started with partial tip pickup, make sure your protocol specifies an API version that supports the configuration you need.
+
+.. list-table::
+    :header-rows: 1
+
+    * - Pipette
+      - Partial Configuration
+      - Minimum API Version
+    * - Flex 96-Channel Pipette
+      - Column
+      - 2.16
+    * - Flex 96-Channel Pipette
+      - Single, partial column, row
+      - 2.20
+    * - Flex 8-Channel Pipettes
+      - Single, partial column
+      - 2.20
+    * - OT-2 Multi-Channel Pipettes
+      - Single, partial column
+      - 2.20
 
 Nozzle Layout
 =============
 
-Use the :py:meth:`.configure_nozzle_layout` method to choose how many tips the 96-channel pipette will pick up. The method's ``style`` parameter accepts special layout constants. You must import these constants at the top of your protocol, or you won't be able to configure the pipette for partial tip pickup.
+Use the :py:meth:`.configure_nozzle_layout` method to choose how many tips a pipette will pick up. The method's ``style`` parameter accepts special layout constants. You must import these constants at the top of your protocol, or you won't be able to configure the pipette for partial tip pickup.
 
 At minimum, import the API from the ``opentrons`` package::
 
     from opentrons import protocol_api
 
-Then when you call ``configure_nozzle_layout`` later in your protocol, you can set ``style=protocol_api.COLUMN``.
+Then when you call ``configure_nozzle_layout`` later in your protocol, you can set a layout like ``style=protocol_api.COLUMN``.
 
 For greater convenience, also import the individual layout constants that you plan to use in your protocol::
 
     from opentrons.protocol_api import COLUMN, ALL
 
 Then when you call ``configure_nozzle_layout`` later in your protocol, you can set ``style=COLUMN``.
+
+Column Layout Example
+---------------------
 
 Here is the start of a protocol that performs both imports, loads a 96-channel pipette, and sets it to pick up a single column of tips.
 
@@ -72,6 +96,21 @@ In this configuration, pipetting actions will use a single column::
 .. warning::
 
     :py:meth:`.InstrumentContext.pick_up_tip` always accepts a ``location`` argument, regardless of nozzle configuration. Do not pass a value that would lead the pipette to line up over more unused tips than specified by the current layout. For example, setting ``COLUMN`` layout and then calling ``pipette.pick_up_tip(tip_rack["A2"])`` on a full tip rack will lead to unexpected pipetting behavior and potential crashes.
+
+Row Layout Example
+------------------
+
+TK
+
+Single Layout Example
+---------------------
+
+TK
+
+Partial Column Layout Example
+-----------------------------
+
+TK
 
 .. _partial-tip-rack-adapters:
 
