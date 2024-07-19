@@ -1401,4 +1401,24 @@ describe('CommandText', () => {
       'Moving NEST 96 Well Plate 100 µL PCR Full Skirt (1) using gripper from Magnetic Module GEN2 in Slot 1 to Magnetic Module GEN2 in Slot 1'
     )
   })
+
+  it('renders correct text for liquidProbe', () => {
+    const command = mockCommandTextData.commands.find(
+      c => c.commandType === 'liquidProbe'
+    )
+    expect(command).not.toBeUndefined()
+    if (command != null) {
+      renderWithProviders(
+        <CommandText
+          commandTextData={mockCommandTextData}
+          robotType={FLEX_ROBOT_TYPE}
+          command={command}
+        />,
+        { i18nInstance: i18n }
+      )
+      screen.getByText(
+        'Detecting liquid presence in well A1 of Opentrons 96 Tip Rack 300 µL in Slot 9'
+      )
+    }
+  })
 })
