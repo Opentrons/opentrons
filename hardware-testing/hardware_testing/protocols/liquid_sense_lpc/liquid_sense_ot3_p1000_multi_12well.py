@@ -1,5 +1,5 @@
 """Liquid Sense OT3 P1000."""
-from opentrons.protocol_api import ProtocolContext
+from opentrons.protocol_api import ProtocolContext, OFF_DECK
 
 metadata = {"protocolName": "liquid-sense-ot3-p50-multi"}
 requirements = {"robotType": "Flex", "apiLevel": "2.15"}
@@ -30,4 +30,3 @@ def run(ctx: ProtocolContext) -> None:
             pipette.dispense(10, dial["A1"].top())
             pipette.drop_tip(trash)
             ctx.move_labware(rack, OFF_DECK)
-

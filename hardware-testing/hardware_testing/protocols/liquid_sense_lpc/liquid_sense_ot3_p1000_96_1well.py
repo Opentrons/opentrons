@@ -15,6 +15,7 @@ SLOTS_TIPRACK = {
 
 LABWARE_ON_SCALE = "nest_1_reservoir_195ml"
 
+
 def run(ctx: ProtocolContext) -> None:
     """Run."""
     trash = ctx.load_trash_bin("A3")
@@ -34,7 +35,7 @@ def run(ctx: ProtocolContext) -> None:
             pipette.pick_up_tip(rack["A1"])
             pipette.aspirate(10, vial["A1"].top())
             pipette.dispense(10, vial["A1"].top())
+            pipette.aspirate(10, dial["A1"].top())
+            pipette.dispense(10, dial["A1"].top())
             pipette.drop_tip(trash)
             ctx.move_labware(rack, OFF_DECK)
-
-
