@@ -75,7 +75,7 @@ module.exports = async () => ({
     icon: project === 'robot-stack' ? 'build/icon.ico' : 'build/three.ico',
     forceCodeSigning: WINDOWS_SIGN,
     rfc3161TimeStampServer: 'http://timestamp.digicert.com',
-    sign: 'script/windows-custom-sign.js',
+    sign: 'scripts/windows-custom-sign.js',
     signDlls: true,
     signingHashAlgorithms: ['sha256'],
   },
