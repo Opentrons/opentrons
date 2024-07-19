@@ -302,6 +302,7 @@ jobs:
 
       - name: 'Configure Windows code signing environment'
         if: startsWith(matrix.os, 'windows') && contains(needs.determine-build-type.outputs.type, 'release')
+        shell: bash
         run:
           echo "${{ secrets.SM_CLIENT_CERT_FILE_B64 }}" | base64 --decode > /d/Certificate_pkcs12.p12
           echo "C:\Program Files (x86)\Windows Kits\10\App Certification Kit" >> $GITHUB_PATH
