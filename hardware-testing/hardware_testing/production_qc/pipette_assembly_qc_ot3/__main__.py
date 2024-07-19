@@ -804,6 +804,7 @@ async def _read_pipette_sensor_repeatedly_and_average(
     # FIXME: this while loop is required b/c the command does not always
     #        return a value, not sure what's the source of this issue
     readings: List[float] = []
+    sequential_failures = 0
     while len(readings) < num_readings:
         try:
             if sensor_type == SensorType.capacitive:
@@ -823,16 +824,19 @@ async def _read_pipette_sensor_repeatedly_and_average(
             else:
                 raise ValueError(f"unexpected sensor type: {sensor_type}")
             
+            sequential_failures = 0
             #print(f"{sensor_type} {sensor_id} sensor response {r}")
             LOG_GING.info(f"{sensor_type} {sensor_id} sensor response {r}")
         except helpers_ot3.SensorResponseBad:
-            sensor_type_dic = {1:"capacitive(电容)",3:"pressure(气压)",6:"temperature(温度)",5:"humidity(湿度)"
-                
-            }
-            printerr = f"07-01:{sensor_type_dic[int(sensor_type)]}传感器故障,传感器类型 {sensor_type_dic[int(sensor_type)]} 传感器ID {sensor_id}读取数据失败)"
-            ui.print_fail(printerr)
-            FINAL_TEST_FAIL_INFOR.append(printerr)
-            return -999999999999.0
+            sequential_failures += 1
+            if sequential_failures == 3:
+                sensor_type_dic = {1:"capacitive(电容)",3:"pressure(气压)",6:"temperature(温度)",5:"humidity(湿度)"
+                    
+                }
+                printerr = f"07-01:{sensor_type_dic[int(sensor_type)]}传感器故障,传感器类型 {sensor_type_dic[int(sensor_type)]} 传感器ID {sensor_id}读取数据失败)"
+                ui.print_fail(printerr)
+                FINAL_TEST_FAIL_INFOR.append(printerr)
+                return -999999999999.0
         readings.append(r)
     readings.sort()
     readings = readings[1:-1]
@@ -1260,7 +1264,7 @@ async def _test_diagnostics_pressure(
         await api.move_to(mount, slot_5_pos._replace(y=slot_5_pos.y+29,z=current_pos.z))
         await api.move_rel(mount, Point(z=movez+10))
         await api.move_rel(mount, Point(z=-10),speed=5)
-    await asyncio.sleep(0.2)
+    await asyncio.sleep(2)
     for sensor_id in sensor_ids:
         pressure = await _read_pressure(sensor_id)
         #print(f"pressure-sealed: {pressure}")
@@ -1295,6 +1299,7 @@ async def _test_diagnostics_pressure(
     #print(f"aspirate {plunger_aspirate_ul} ul")
     LOG_GING.info(f"aspirate {plunger_aspirate_ul} ul")
     await api.aspirate(mount, plunger_aspirate_ul)
+    await asyncio.sleep(2)
     for sensor_id in sensor_ids:
         pressure = await _read_pressure(sensor_id)
         #print(f"pressure-compressed-{sensor_id.name}: {pressure}")
