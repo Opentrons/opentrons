@@ -78,6 +78,15 @@ export function useCommandTextString(
         commandText: utils.getLoadCommandText(fullParams),
       }
 
+    case 'liquidProbe':
+    case 'tryLiquidProbe':
+      return {
+        commandText: utils.getLiquidProbeCommandText({
+          ...fullParams,
+          command,
+        }),
+      }
+
     case 'temperatureModule/setTargetTemperature':
     case 'temperatureModule/waitForTemperature':
     case 'thermocycler/setTargetBlockTemperature':
