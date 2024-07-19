@@ -1,4 +1,4 @@
-import { getPipetteNameSpecs } from '@opentrons/shared-data'
+import { getPipetteSpecsV2 } from '@opentrons/shared-data'
 
 import type { ConfigureForVolumeRunTimeCommand } from '@opentrons/shared-data/command'
 import type { HandlesCommands } from './types'
@@ -16,6 +16,6 @@ export function getConfigureForVolumeCommandText({
   return t('configure_for_volume', {
     volume,
     pipette:
-      pipetteName != null ? getPipetteNameSpecs(pipetteName)?.displayName : '',
+      pipetteName != null ? getPipetteSpecsV2(pipetteName)?.displayName : '',
   })
 }

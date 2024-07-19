@@ -1,4 +1,4 @@
-import { getPipetteNameSpecs } from '@opentrons/shared-data'
+import { getPipetteSpecsV2 } from '@opentrons/shared-data'
 
 import type { PrepareToAspirateRunTimeCommand } from '@opentrons/shared-data/command'
 import type { HandlesCommands } from './types'
@@ -15,6 +15,6 @@ export function getPrepareToAspirateCommandText({
 
   return t('prepare_to_aspirate', {
     pipette:
-      pipetteName != null ? getPipetteNameSpecs(pipetteName)?.displayName : '',
+      pipetteName != null ? getPipetteSpecsV2(pipetteName)?.displayName : '',
   })
 }

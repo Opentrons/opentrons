@@ -2,7 +2,7 @@ import {
   getModuleDisplayName,
   getModuleType,
   getOccludedSlotCountForModule,
-  getPipetteNameSpecs,
+  getPipetteSpecsV2,
 } from '@opentrons/shared-data'
 
 import {
@@ -31,7 +31,7 @@ export const getLoadCommandText = ({
       return t('load_pipette_protocol_setup', {
         pipette_name:
           pipetteModel != null
-            ? getPipetteNameSpecs(pipetteModel)?.displayName ?? ''
+            ? getPipetteSpecsV2(pipetteModel)?.displayName ?? ''
             : '',
         mount_name: command.params.mount === 'left' ? t('left') : t('right'),
       })

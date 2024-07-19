@@ -1,6 +1,6 @@
-import { getPipetteNameSpecs } from '@opentrons/shared-data'
+import { getPipetteSpecsV2 } from '@opentrons/shared-data'
 
-import type { ConfigureNozzleLayoutRunTimeCommand } from '@opentrons/shared-data/command'
+import type { ConfigureNozzleLayoutRunTimeCommand } from '@opentrons/shared-data'
 import type { HandlesCommands } from './types'
 
 export function getConfigureNozzleLayoutCommandText({
@@ -16,6 +16,6 @@ export function getConfigureNozzleLayoutCommandText({
   return t('configure_nozzle_layout', {
     amount: configurationParams.style === 'COLUMN' ? '8' : 'all',
     pipette:
-      pipetteName != null ? getPipetteNameSpecs(pipetteName)?.displayName : '',
+      pipetteName != null ? getPipetteSpecsV2(pipetteName)?.displayName : '',
   })
 }
