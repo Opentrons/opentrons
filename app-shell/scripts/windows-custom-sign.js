@@ -34,7 +34,7 @@ ${err?.stdout?.toString() ?? '<no output>'}
 `)
     throw err
   }
-  const verifyCmd = `smctl sign verify --fingerprint-string="${String(
+  const verifyCmd = `smctl sign verify --fingerprint="${String(
     process.env.SM_CODE_SIGNING_CERT_SHA1_HASH
   )}" --input="${String(configuration.path)}" --verbose`
   console.log(verifyCmd)
