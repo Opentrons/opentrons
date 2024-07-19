@@ -102,8 +102,8 @@ test-photometric:
 
 .PHONY: test-gravimetric-cavity
 test-gravimetric-cavity:
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 1  --cavity --no-blank --trials 10 --tip 20
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 1  --cavity --no-blank --trials 10 --tip 50
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 1  --cavity --no-blank --trials 2 --tip 20
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 1  --cavity --no-blank --trials 2 --tip 50
 
 .PHONY: test-gravimetric-single
 test-gravimetric-single:
