@@ -86,7 +86,7 @@ export function SkipToNextStep(
     proceedToRouteAndStep,
   } = routeUpdateActions
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
-  const { skipFailedCommand, resumeRun } = recoveryCommands
+  const { skipFailedCommand } = recoveryCommands
   const { ROBOT_SKIPPING_STEP, IGNORE_AND_SKIP } = RECOVERY_MAP
   const { t } = useTranslation('error_recovery')
 
@@ -100,11 +100,9 @@ export function SkipToNextStep(
   }
 
   const primaryBtnOnClick = (): Promise<void> => {
-    return setRobotInMotion(true, ROBOT_SKIPPING_STEP.ROUTE)
-      .then(() => skipFailedCommand())
-      .then(() => {
-        resumeRun()
-      })
+    return setRobotInMotion(true, ROBOT_SKIPPING_STEP.ROUTE).then(() => {
+      skipFailedCommand()
+    })
   }
 
   const buildBodyText = (): JSX.Element => {

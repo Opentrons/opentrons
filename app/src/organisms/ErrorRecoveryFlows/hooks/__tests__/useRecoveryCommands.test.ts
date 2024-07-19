@@ -221,25 +221,23 @@ describe('useRecoveryCommands', () => {
     )
   })
 
-  it('should call skipFailedCommand and resolve after a timeout', async () => {
+  it('should call skipFailedCommand and show success toast on success', async () => {
     const { result } = renderHook(() =>
       useRecoveryCommands({
         runId: mockRunId,
         failedCommand: mockFailedCommand,
         failedLabwareUtils: mockFailedLabwareUtils,
         routeUpdateActions: mockRouteUpdateActions,
-        recoveryToastUtils: {} as any,
+        recoveryToastUtils: { makeSuccessToast: mockMakeSuccessToast } as any,
       })
     )
-
-    const consoleSpy = vi.spyOn(console, 'log')
 
     await act(async () => {
       await result.current.skipFailedCommand()
     })
 
-    expect(consoleSpy).toHaveBeenCalledWith('SKIPPING TO NEXT STEP')
-    expect(result.current.skipFailedCommand()).resolves.toBeUndefined()
+    expect(mockResumeRunFromRecovery).toHaveBeenCalledWith(mockRunId)
+    expect(mockMakeSuccessToast).toHaveBeenCalled()
   })
 
   it('should call ignoreErrorKindThisRun and resolve immediately', async () => {
