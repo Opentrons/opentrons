@@ -100,6 +100,11 @@ test-photometric:
 	$(python) -m hardware_testing.gravimetric --photometric --simulate --pipette 1000 --channels 96 --tip 50 --trials 1
 	$(python) -m hardware_testing.gravimetric --photometric --simulate --pipette 1000 --channels 96 --tip 200 --trials 1
 
+.PHONY: test-gravimetric-cavity
+test-gravimetric-cavity:
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 1  --cavity --no-blank --trials 10 --tip 20
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 1  --cavity --no-blank --trials 10 --tip 50
+
 .PHONY: test-gravimetric-single
 test-gravimetric-single:
 	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1
@@ -109,8 +114,6 @@ test-gravimetric-single:
 	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --trials 1 --increment --no-blank --tip 50
 	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --trials 1 --increment --no-blank --tip 200
 	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --trials 1 --increment --no-blank --tip 1000
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 1  --cavity --no-blank
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 1  --cavity --no-blank --trials 10
 
 .PHONY: test-gravimetric-multi
 test-gravimetric-multi:
@@ -130,6 +133,7 @@ test-gravimetric:
 	$(python) -m hardware_testing.gravimetric.daily_setup --simulate --calibrate
 	$(MAKE) test-gravimetric-single
 	$(MAKE) test-gravimetric-multi
+	$(MAKE) test-gravimetric-cavity
 	$(MAKE) test-gravimetric-96
 	$(MAKE) test-photometric
 
