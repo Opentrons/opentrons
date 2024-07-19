@@ -220,6 +220,10 @@ jobs:
             echo 'type=develop' >> $GITHUB_OUTPUT
           fi
 
+      - name: set summary
+        run: |
+          echo Type: ${{steps.determine-build-type.outputs.type}} Variants: ${{steps.determine-build-type.outputs.variants}}' >> $GITHUB_STEP_SUMMARY
+
   build-app:
     needs: [determine-build-type]
     if: needs.determine-build-type.outputs.variants != '[]'
@@ -297,7 +301,7 @@ jobs:
           make setup-js
 
       - name: 'Configure Windows code signing environment'
-        if: contains(matrix.platform, 'windows') && contains(needs.determine-build-type.outputs.type, 'release')
+        if: startsWith(matrix.os, 'windows') && contains(needs.determine-build-type.outputs.type, 'release')
         run:
           echo "${{ secrets.SM_CLIENT_CERT_FILE_B64 }}" | base64 --decode > /d/Certificate_pkcs12.p12
           echo "C:\Program Files (x86)\Windows Kits\10\App Certification Kit" >> $GITHUB_PATH
@@ -305,7 +309,7 @@ jobs:
           echo "C:\Program Files\DigiCert\ DigiCert Keylocker Tools" >> $GITHUB_PATH
 
       - name: 'Setup Windows code signing helpers'
-        if: contains(matrix.platform, 'windows') && contains(needs.determine-build-type.outputs.type, 'release')
+        if: startsWith(matrix.os, 'windows') && contains(needs.determine-build-type.outputs.type, 'release')
         shell: cmd
         env:
           SM_HOST: ${{ secrets.SM_HOST }}
