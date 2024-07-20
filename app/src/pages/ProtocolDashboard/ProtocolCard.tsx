@@ -13,7 +13,6 @@ import {
   Chip,
   COLORS,
   DIRECTION_COLUMN,
-  DIRECTION_ROW,
   Flex,
   Icon,
   LegacyStyledText,
