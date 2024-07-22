@@ -15,8 +15,9 @@ class ReactionIfMatch(Enum):
     IGNORE_AND_CONTINUE = "ignoreAndContinue"
     FAIL_RUN = "failRun"
     WAIT_FOR_RECOVERY = "waitForRecovery"
-    
-#There's a lot of nested classes here. This is the JSON schema this code models.
+
+
+# There's a lot of nested classes here. This is the JSON schema this code models.
 # "ErrorRecoveryRule": {
 #     "matchCriteria": {
 #         "command": {
@@ -29,8 +30,10 @@ class ReactionIfMatch(Enum):
 #     "ifMatch": "baz"
 # }
 
+
 class ErrorMatcher(BaseModel):
     errorType: str = Field(..., description="The error type that this rule applies to.")
+
 
 class CommandMatcher(BaseModel):
     commandType: str = Field(
@@ -40,17 +43,19 @@ class CommandMatcher(BaseModel):
         ..., description="The error details that this rule applies to."
     )
 
+
 class MatchCriteria(BaseModel):
     command: CommandMatcher = Field(
         ..., description="The command and error types that this rule applies to."
     )
+
 
 class ErrorRecoveryRule(BaseModel):
     """Request/Response model for new error recovery rule creation."""
 
     matchCriteria: list[MatchCriteria] = Field(
         default_factory=list,
-        description="The criteria that must be met for this rule to be applied."
+        description="The criteria that must be met for this rule to be applied.",
     )
     ifMatch: list[ReactionIfMatch] = Field(
         default_factory=list,

@@ -28,18 +28,21 @@ def create_error_recovery_policy_from_rules(
         defined_error_data: Optional[CommandDefinedErrorData],
     ) -> ErrorRecoveryType:
         for rule in rules:
-            command_type_matches = failed_command.commandType == rule.commandType
-            error_type_matches = (
-                defined_error_data is not None
-                and defined_error_data.public.errorType == rule.errorType
-            )
-            if command_type_matches and error_type_matches:
-                if rule.ifMatch == ReactionIfMatch.IGNORE_AND_CONTINUE:
-                    raise NotImplementedError  # No protocol engine support for this yet. It's in another ticket.
-                elif rule.ifMatch == ReactionIfMatch.FAIL_RUN:
-                    return ErrorRecoveryType.FAIL_RUN
-                elif rule.ifMatch == ReactionIfMatch.WAIT_FOR_RECOVERY:
-                    return ErrorRecoveryType.WAIT_FOR_RECOVERY
+            for i, criteria in enumerate(rule.matchCriteria):
+                command_type_matches = (
+                    failed_command.commandType == criteria.command.commandType
+                )
+                error_type_matches = (
+                    defined_error_data is not None
+                    and defined_error_data.public.errorType == rule.ifMatch[i].value
+                )
+                if command_type_matches and error_type_matches:
+                    if rule.ifMatch == ReactionIfMatch.IGNORE_AND_CONTINUE:
+                        raise NotImplementedError  # No protocol engine support for this yet. It's in another ticket.
+                    elif rule.ifMatch == ReactionIfMatch.FAIL_RUN:
+                        return ErrorRecoveryType.FAIL_RUN
+                    elif rule.ifMatch == ReactionIfMatch.WAIT_FOR_RECOVERY:
+                        return ErrorRecoveryType.WAIT_FOR_RECOVERY
 
         return standard_run_policy(config, failed_command, defined_error_data)
 
