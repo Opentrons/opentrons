@@ -37,7 +37,7 @@ sqlalchemy2-stubs = "==0.0.2a21"
 python-box = "==6.1.0"
 types-paho-mqtt = "==1.6.0.20240106"
 pyusb = "==1.2.1"
-performance-metrics = {file = "../performance-metrics", editable = true}
+
 
 [packages]
 anyio = "==3.7.1"
@@ -64,3 +64,4 @@ opentrons = { editable = true, path = "../api"}
 opentrons-shared-data = { editable = true, path = "../shared-data/python" }
 server-utils = {editable = true, path = "./../server-utils"}
 robot-server = { editable = true, path = "."}
+performance-metrics = {file = "../performance-metrics", editable = true}
