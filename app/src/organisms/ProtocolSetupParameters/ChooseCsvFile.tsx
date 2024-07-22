@@ -10,8 +10,8 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useAllCsvFilesQuery } from '@opentrons/react-api-client'
@@ -47,26 +47,28 @@ export function ChooseCsvFile({
 
   const csvFilesOnUSB = useSelector(getShellUpdateDataFiles) ?? []
   const csvFilesOnRobot = useAllCsvFilesQuery(protocolId).data?.data.files ?? []
+  const sortedCsvFilesOnUSB = csvFilesOnUSB.sort((a, b) => {
+    const regex = /^(.*\/)?(.+?)(\d*)\.csv$/
+    const aMatch = a.match(regex)
+    const bMatch = b.match(regex)
 
-  // ToDo: (kk 07/22/2024) update the function for sorting csv files on robot
-  const sortCsvFiles = (csvFiles: string[]): string[] => {
-    return csvFiles.sort((a, b) => {
-      const regex = /(\D+)(\d*)/
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const [, aText, aNum] = a.match(regex)!
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const [, bText, bNum] = b.match(regex)!
+    if (!aMatch || !bMatch) {
+      console.error('Invalid filename format:', !aMatch ? a : b)
+      return 0
+    }
 
-      if (aText < bText) return -1
-      if (aText > bText) return 1
+    const [, , aText, aNum] = aMatch
+    const [, , bText, bNum] = bMatch
 
-      const aNumber = aNum != null ? parseInt(aNum, 10) : 0
-      const bNumber = bNum != null ? parseInt(bNum, 10) : 0
+    if (aText !== bText) {
+      return aText.localeCompare(bText)
+    }
 
-      return aNumber - bNumber
-    })
-  }
-  const sortedCsvFilesOnUSB = sortCsvFiles(csvFilesOnUSB)
+    return (
+      (aNum === '' ? 0 : parseInt(aNum, 10)) -
+      (bNum === '' ? 0 : parseInt(bNum, 10))
+    )
+  })
 
   const initialFileObject: CsvFileParameterFileData = parameter.file ?? {}
   const [
@@ -148,7 +150,7 @@ export function ChooseCsvFile({
                           onChange={() => {
                             setCsvFileSelected({
                               filePath: csvFilePath,
-                              fileName: fileName,
+                              fileName,
                             })
                           }}
                           isSelected={csvFileSelected?.filePath === csvFilePath}
