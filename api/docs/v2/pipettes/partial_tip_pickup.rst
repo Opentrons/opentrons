@@ -44,12 +44,12 @@ For greater convenience, also import the individual layout constants that you pl
 
     from opentrons.protocol_api import COLUMN, ALL
 
-Then when you call ``configure_nozzle_layout`` later in your protocol, you can set ``style=COLUMN``.
+Then when you call ``configure_nozzle_layout`` later in your protocol, you can use the shorter ``style=COLUMN``.
 
 Column Layout Example
 ---------------------
 
-Here is the start of a protocol that performs both imports, loads a 96-channel pipette, and sets it to pick up a single column of tips.
+Here is the start of a protocol that imports the ``COLUMN`` and ``ALL`` layout constants, loads a 96-channel pipette, and sets it to pick up a single column of tips.
 
 .. code-block:: python
     :substitutions:
@@ -76,7 +76,7 @@ Here is the start of a protocol that performs both imports, loads a 96-channel p
 
 Let's unpack some of the details of this code.
 
-First, we've given a special name to the tip rack, ``column_rack``. You can name your tip racks whatever you like, but if you're performing full pickup and partial pickup in the same protocol, you'll need to keep them separate. See :ref:`partial-tip-rack-adapters` below.
+First, we've given a special name to the tip rack, ``column_rack``. You can name your tip racks whatever you like, but if you're using a 96-channel pipette for full pickup and partial pickup in the same protocol, you'll need to keep them separate. See :ref:`partial-tip-rack-adapters` below.
 
 Next, we load the 96-channel pipette. Note that :py:meth:`.load_instrument` only has a single argument. The 96-channel pipette occupies both mounts, so ``mount`` is omissible. The ``tip_racks`` argument is always optional. But it would have no effect to declare it here, because every call to ``configure_nozzle_layout()`` resets the pipette's :py:obj:`.InstrumentContext.tip_racks` property.
 
@@ -100,7 +100,42 @@ In this configuration, pipetting actions will use a single column::
 Row Layout Example
 ------------------
 
-TK
+Here is the start of a protocol that imports the ``ROW`` and ``ALL`` layout constants, loads a 96-channel pipette, and sets it to pick up a single row of tips.
+
+.. code-block:: python
+    :substitutions:
+
+    from opentrons import protocol_api
+    from opentrons.protocol_api import ROW, ALL
+
+    requirements = {"robotType": "Flex", "apiLevel": "|apiLevel|"}
+
+    def run(protocol: protocol_api.ProtocolContext):
+        column_rack = protocol.load_labware(
+            load_name="opentrons_flex_96_tiprack_1000ul",
+            location="D3"
+        )
+        trash = protocol.load_trash_bin("A3")
+        pipette = protocol.load_instrument("flex_96channel_1000")
+        pipette.configure_nozzle_layout(
+            style=ROW,
+            start="H1",
+            tip_racks=[column_rack]
+        )
+
+Setting ``start="H1"`` means the pipette will use its frontmost nozzles to pick up tips, starting from the back of the tip rack::
+
+    pipette.pick_up_tip()  # picks up A1-A12 from tip rack
+    pipette.drop_tip()
+    pipette.pick_up_tip()  # picks up B1-B12 from tip rack
+
+You can also set ``start="A1"`` to use the backmost nozzles and pick up from the front of the tip rack. 
+
+.. note::
+
+    Picking up rows from front to back will not work with tip racks placed in row D of the deck, because the robot door prevents the pipette from moving far enough forward. Since the pipette can't pick up the frontmost tips, it can't pick up any other rows of tips either.
+
+.. versionadded:: 2.20
 
 Single Layout Example
 ---------------------
