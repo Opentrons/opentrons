@@ -6,12 +6,12 @@ from datetime import datetime
 from ..errors import ErrorOccurrence
 from ..types import (
     EngineStatus,
+    LiquidHeightSummary,
     LoadedLabware,
     LabwareOffset,
     LoadedModule,
     LoadedPipette,
     Liquid,
-    LiquidHeightInfo,
 )
 
 
@@ -29,4 +29,4 @@ class StateSummary(BaseModel):
     startedAt: Optional[datetime]
     completedAt: Optional[datetime]
     liquids: List[Liquid] = Field(default_factory=list)
-    wells: List[LiquidHeightInfo] = Field(default_factory=list)
+    wells: List[LiquidHeightSummary] = Field(default_factory=list)
