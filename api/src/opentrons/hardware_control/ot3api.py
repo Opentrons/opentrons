@@ -2699,9 +2699,13 @@ class OT3API(
         pos = await self.gantry_position(checked_mount, refresh=True)
         while (probe_start_pos.z - pos.z) < max_z_dist:
             # safe distance so we don't accidentally aspirate liquid if we're already close to liquid
-            safe_plunger_pos = top_types.Point(pos.x, pos.y, pos.z + 2)
+            safe_plunger_pos = top_types.Point(
+                pos.x, pos.y, pos.z + probe_safe_reset_mm
+            )
             # overlap amount we want to use between passes
-            pass_start_pos = top_types.Point(pos.x, pos.y, pos.z + 0.5)
+            pass_start_pos = top_types.Point(
+                pos.x, pos.y, pos.z + probe_pass_z_offset_mm
+            )
             max_z_time = (
                 max_z_dist - (probe_start_pos.z - safe_plunger_pos.z)
             ) / probe_settings.mount_speed
