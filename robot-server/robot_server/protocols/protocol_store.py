@@ -14,6 +14,8 @@ import sqlalchemy
 
 from opentrons.protocols.parse import PythonParseMode
 from opentrons.protocol_reader import ProtocolReader, ProtocolSource
+
+from robot_server.data_files.models import DataFile
 from robot_server.persistence.database import sqlite_rowid
 from robot_server.persistence.tables import (
     analysis_table,
@@ -21,6 +23,7 @@ from robot_server.persistence.tables import (
     run_table,
     analysis_primitive_type_rtp_table,
     analysis_csv_rtp_table,
+    data_files_table,
 )
 
 
@@ -301,6 +304,33 @@ class ProtocolStore:
         ]
 
         return usage_info
+
+    # TODO (spp, 2024-07-22): get files referenced in runs as well
+    async def get_referenced_data_files(self, protocol_id: str) -> List[DataFile]:
+        """Get a list of data files referenced in specified protocol's analyses and runs."""
+        # Get analyses of protocol_id
+        select_referencing_analysis_ids = sqlalchemy.select(analysis_table.c.id).where(
+            analysis_table.c.protocol_id == protocol_id
+        )
+        # Get all entries in csv table that match the analyses
+        csv_file_ids = sqlalchemy.select(analysis_csv_rtp_table.c.file_id).where(
+            analysis_csv_rtp_table.c.analysis_id.in_(select_referencing_analysis_ids)
+        )
+        # Get list of data file IDs from the entries
+        select_data_file_rows_statement = data_files_table.select().where(
+            data_files_table.c.id.in_(csv_file_ids)
+        )
+        with self._sql_engine.begin() as transaction:
+            data_files_rows = transaction.execute(select_data_file_rows_statement).all()
+
+        return [
+            DataFile(
+                id=sql_row.id,
+                name=sql_row.name,
+                createdAt=sql_row.created_at,
+            )
+            for sql_row in data_files_rows
+        ]
 
     def get_referencing_run_ids(self, protocol_id: str) -> List[str]:
         """Return a list of run ids that reference a particular protocol.
