@@ -1676,6 +1676,7 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
 )
 export const ADD_STEPS_TO_GROUP = 'ADD_STEPS_TO_GROUP'
 export const CREATE_GROUP = 'CREATE_GROUP'
+export const REMOVE_GROUP = 'REMOVE_GROUP'
 export type StepGroupsState = Record<string, StepIdType[]>
 const initialStepGroupState = {}
 const stepGroups: Reducer<StepGroupsState, any> = handleActions<
@@ -1688,6 +1689,13 @@ const stepGroups: Reducer<StepGroupsState, any> = handleActions<
         ...state,
         [action.payload.groupName]: [],
       }
+    },
+    REMOVE_GROUP: (state, action) => {
+      const {
+        [action.payload.groupName]: removedGroup,
+        ...remainingGroups
+      } = state
+      return remainingGroups
     },
     ADD_STEPS_TO_GROUP: (state, action) => {
       return {
@@ -1702,21 +1710,18 @@ const stepGroups: Reducer<StepGroupsState, any> = handleActions<
   initialStepGroupState
 )
 export type UnsavedGroupState = StepIdType[]
-export const SELECT_STEP_FOR_GROUP = 'SELECT_STEP_FOR_GROUP'
-export const CLEAR_GROUP = 'CLEAR_GROUP'
+export const SELECT_STEP_FOR_UNSAVED_GROUP = 'SELECT_STEP_FOR_UNSAVED_GROUP'
+export const CLEAR_UNSAVED_GROUP = 'CLEAR_UNSAVED_GROUP'
 const initialUnsavedGroupState: StepIdType[] = []
 const unsavedGroup: Reducer<UnsavedGroupState, any> = handleActions<
   UnsavedGroupState,
   any
 >(
   {
-    SELECT_STEP_FOR_GROUP: (state, action) => {
-      if (action.type === SELECT_STEP_FOR_GROUP) {
-        return [...state, action.payload.stepId]
-      }
-      return state
+    SELECT_STEP_FOR_UNSAVED_GROUP: (state, action) => {
+      return [...state, action.payload.stepId]
     },
-    CLEAR_GROUP: () => {
+    CLEAR_UNSAVED_GROUP: () => {
       return []
     },
   },

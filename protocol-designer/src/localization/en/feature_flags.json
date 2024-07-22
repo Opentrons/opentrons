@@ -27,5 +27,9 @@
   "OT_PD_ENABLE_COMMENT": {
     "title": "Enable comment step",
     "description": "You can add comments anywhere between timeline steps."
+  },
+  "OT_PD_ENABLE_STEP_GROUPING": {
+    "title": "Enable step grouping",
+    "description": "Define groups and add steps to them."
   }
 }

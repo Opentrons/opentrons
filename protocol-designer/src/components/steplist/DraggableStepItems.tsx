@@ -1,11 +1,22 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useDrop, useDrag } from 'react-dnd'
+import {
+  BORDERS,
+  Box,
+  COLORS,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
+  PrimaryButton,
+  SPACING,
+} from '@opentrons/components'
 
 import { DND_TYPES } from '../../constants'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { stepIconsByType } from '../../form-types'
+import { getStepGroups } from '../../step-forms/selectors'
 import { ConnectedStepItem } from '../../containers/ConnectedStepItem'
 import { PDTitledList } from '../lists'
 import { ContextMenu } from './ContextMenu'
@@ -13,6 +24,9 @@ import styles from './StepItem.module.css'
 import type { DragLayerMonitor, DropTargetOptions } from 'react-dnd'
 import type { StepIdType } from '../../form-types'
 import type { ConnectedStepItemProps } from '../../containers/ConnectedStepItem'
+import { removeGroup } from '../../step-forms/actions/groups'
+
+type GroupedStep = { groupName: string; stepIds: string[] } | string
 
 interface DragDropStepItemProps extends ConnectedStepItemProps {
   stepId: StepIdType
@@ -81,6 +95,8 @@ export const DraggableStepItems = (
 ): JSX.Element | null => {
   const { orderedStepIds, reorderSteps } = props
   const { t } = useTranslation('shared')
+  const groups = useSelector(getStepGroups)
+  const dispatch = useDispatch()
 
   const findStepIndex = (stepId: StepIdType): number =>
     orderedStepIds.findIndex(id => stepId === id)
@@ -102,22 +118,84 @@ export const DraggableStepItems = (
     }
   }
 
+  const groupedSteps: GroupedStep[] = []
+  const seenSteps: Set<string> = new Set()
+
+  orderedStepIds.forEach(stepId => {
+    // If stepId is already processed, skip it
+    if (seenSteps.has(stepId)) return
+
+    // Find group for the current stepId
+    const group = Object.entries(groups).find(([groupName, stepIds]) =>
+      stepIds.includes(stepId)
+    )
+
+    if (group) {
+      const [groupName, stepIds] = group
+      // Add the whole group to the result and mark all stepIds as seen
+      groupedSteps.push({ groupName, stepIds })
+      stepIds.forEach(id => seenSteps.add(id))
+    } else {
+      // If not part of a group, add stepId as is
+      groupedSteps.push(stepId)
+    }
+  })
+
   return (
     <>
       <ContextMenu>
         {({ makeStepOnContextMenu }) =>
-          orderedStepIds.map((stepId: StepIdType, index: number) => (
-            <DragDropStepItem
-              key={`${stepId}_${index}`}
-              stepNumber={index + 1}
-              stepId={stepId}
-              //  @ts-expect-error
-              onStepContextMenu={makeStepOnContextMenu(stepId)}
-              moveStep={moveStep}
-              findStepIndex={findStepIndex}
-              orderedStepIds={orderedStepIds}
-            />
-          ))
+          groupedSteps.map((item, index) => {
+            if (typeof item === 'string') {
+              // Render a single step
+              return (
+                <DragDropStepItem
+                  key={item}
+                  stepNumber={index + 1}
+                  stepId={item}
+                  //  @ts-expect-error
+                  onStepContextMenu={makeStepOnContextMenu(item)}
+                  moveStep={moveStep}
+                  findStepIndex={findStepIndex}
+                  orderedStepIds={orderedStepIds}
+                />
+              )
+            } else {
+              // Render a group of steps
+              return (
+                <Box
+                  key={item.groupName}
+                  border={BORDERS.lineBorder}
+                  backgroundColor={COLORS.grey30}
+                >
+                  <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
+                    <LegacyStyledText padding={SPACING.spacing8}>
+                      {item.groupName}
+                    </LegacyStyledText>
+                    <PrimaryButton
+                      onClick={() => {
+                        dispatch(removeGroup({ groupName: item.groupName }))
+                      }}
+                    >
+                      Ungroup
+                    </PrimaryButton>
+                  </Flex>
+                  {item.stepIds.map((stepId, subIndex) => (
+                    <DragDropStepItem
+                      key={`${stepId}_${subIndex}`}
+                      stepNumber={index + 1}
+                      stepId={stepId}
+                      //  @ts-expect-error
+                      onStepContextMenu={makeStepOnContextMenu(stepId)}
+                      moveStep={moveStep}
+                      findStepIndex={findStepIndex}
+                      orderedStepIds={orderedStepIds}
+                    />
+                  ))}
+                </Box>
+              )
+            }
+          })
         }
       </ContextMenu>
       <StepDragPreview />
