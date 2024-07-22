@@ -28,6 +28,7 @@ import {
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
   DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
 } from '../../constants'
+import { getStepGroups } from '../../step-forms/selectors'
 import { getFileMetadata, getRobotType } from './fileFields'
 import { getInitialRobotState, getRobotStateTimeline } from './commands'
 
@@ -57,7 +58,7 @@ import type {
 import type { LabwareDefByDefURI } from '../../labware-defs'
 import type { Selector } from '../../types'
 import type { DesignerApplicationData } from '../../load-file/migration/utils/getLoadLiquidCommands'
-import { SecondOrderCommandAnnotation } from '@opentrons/shared-data/commandAnnotation/types'
+import type { SecondOrderCommandAnnotation } from '@opentrons/shared-data/commandAnnotation/types'
 
 // TODO: BC: 2018-02-21 uncomment this assert, causes test failures
 // console.assert(!isEmpty(process.env.OT_PD_VERSION), 'Could not find application version!')
@@ -112,6 +113,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
   stepFormSelectors.getPipetteEntities,
   uiLabwareSelectors.getLabwareNicknamesById,
   labwareDefSelectors.getLabwareDefsByURI,
+  getStepGroups,
   (
     fileMetadata,
     initialRobotState,
@@ -126,9 +128,11 @@ export const createFile: Selector<ProtocolFile> = createSelector(
     moduleEntities,
     pipetteEntities,
     labwareNicknamesById,
-    labwareDefsByURI
+    labwareDefsByURI,
+    stepGroups
   ) => {
     const { author, description, created } = fileMetadata
+
     const name = fileMetadata.protocolName || 'untitled'
     const lastModified = fileMetadata.lastModified
     // TODO: Ian 2018-07-10 allow user to save steps in JSON file, even if those
@@ -382,19 +386,33 @@ export const createFile: Selector<ProtocolFile> = createSelector(
       commands,
     }
 
-    const annotationExample: SecondOrderCommandAnnotation = {
-      annotationType: 'secondOrderCommand',
-      machineReadableName: 'pips and mods',
-      params: {},
-      commandKeys: [
-        'a1b95079-5b17-428d-b40c-a8236a9890c5',
-        '6f1e3ad3-8f03-4583-8031-be6be2fcd903',
-        '4997a543-7788-434f-8eae-1c4aa3a2a805',
-      ],
-    }
+    const commandAnnotations: SecondOrderCommandAnnotation[] = Object.entries(
+      stepGroups
+    ).map(([name, groupStepIds]) => {
+      // map stepIds from group to orderedStepIds and return indices from orderedStepIds
+      const stepIndices = groupStepIds
+        .map(groupStepId => orderedStepIds.indexOf(groupStepId))
+        .filter(index => index !== -1)
+
+      //  return commands assosciated with the indices
+      const commands = stepIndices.flatMap(
+        index => robotStateTimeline.timeline[index].commands
+      )
+      const commandKeys = commands.map(command => command.key ?? '')
+
+      const annotation: SecondOrderCommandAnnotation = {
+        annotationType: 'secondOrderCommand',
+        machineReadableName: name,
+        params: {},
+        commandKeys,
+      }
+
+      return annotation
+    })
+
     const commandAnnotionaV1Mixin: CommandAnnotationV1Mixin = {
       commandAnnotationSchemaId: 'opentronsCommandAnnotationSchemaV1',
-      commandAnnotations: [annotationExample],
+      commandAnnotations,
     }
 
     const protocolBase: ProtocolBase<DesignerApplicationData> = {

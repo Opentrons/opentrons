@@ -89,3 +89,11 @@ export interface SelectMultipleStepsAction {
     lastSelected: StepIdType
   }
 }
+
+export interface SelectMultipleStepsForGroupAction {
+  type: 'SELECT_MULTIPLE_STEPS_FOR_GROUP'
+  payload: {
+    stepIds: StepIdType[]
+    lastSelected: StepIdType
+  }
+}

@@ -479,6 +479,15 @@ export const getModulesForEditModulesCard: Selector<
     }
   )
 )
+export const getUnsavedGroup: Selector<
+  BaseState,
+  StepIdType[]
+> = createSelector(rootSelector, state => state.unsavedGroup)
+export const getStepGroups: Selector<
+  BaseState,
+  Record<string, StepIdType[]>
+> = createSelector(rootSelector, state => state.stepGroups)
+
 export const getUnsavedForm: Selector<
   BaseState,
   FormData | null | undefined
