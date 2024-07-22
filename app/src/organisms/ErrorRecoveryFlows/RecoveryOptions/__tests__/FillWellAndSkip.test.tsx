@@ -141,14 +141,12 @@ describe('SkipToNextStep', () => {
   let mockGoBackPrevStep: Mock
   let mockProceedToRouteAndStep: Mock
   let mockSkipFailedCommand: Mock
-  let mockResumeRun: Mock
 
   beforeEach(() => {
     mockSetRobotInMotion = vi.fn(() => Promise.resolve())
     mockGoBackPrevStep = vi.fn()
     mockProceedToRouteAndStep = vi.fn()
     mockSkipFailedCommand = vi.fn(() => Promise.resolve())
-    mockResumeRun = vi.fn()
 
     props = {
       ...mockRecoveryContentProps,
@@ -159,7 +157,6 @@ describe('SkipToNextStep', () => {
       } as any,
       recoveryCommands: {
         skipFailedCommand: mockSkipFailedCommand,
-        resumeRun: mockResumeRun,
       } as any,
     }
   })
@@ -197,15 +194,9 @@ describe('SkipToNextStep', () => {
     await waitFor(() => {
       expect(mockSkipFailedCommand).toHaveBeenCalled()
     })
-    await waitFor(() => {
-      expect(mockResumeRun).toHaveBeenCalled()
-    })
 
     expect(mockSetRobotInMotion.mock.invocationCallOrder[0]).toBeLessThan(
       mockSkipFailedCommand.mock.invocationCallOrder[0]
-    )
-    expect(mockSkipFailedCommand.mock.invocationCallOrder[0]).toBeLessThan(
-      mockResumeRun.mock.invocationCallOrder[0]
     )
   })
 })
