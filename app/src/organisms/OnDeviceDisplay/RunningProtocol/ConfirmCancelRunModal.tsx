@@ -46,8 +46,9 @@ export function ConfirmCancelRunModal({
   const { t } = useTranslation(['run_details', 'shared'])
   const { stopRun } = useStopRunMutation()
   const { deleteRun } = useDeleteRunMutation({
-    onSuccess: () => {
-      console.log('deleted run')
+    onError: error => {
+      setIsCanceling(false)
+      console.error('Error deleting quick transfer run', error)
     },
   })
   const {
@@ -69,7 +70,6 @@ export function ConfirmCancelRunModal({
   }
 
   const handleCancelRun = (): void => {
-    console.log('is cancelling')
     setIsCanceling(true)
     stopRun(runId, {
       onError: () => {
@@ -79,24 +79,23 @@ export function ConfirmCancelRunModal({
   }
 
   React.useEffect(() => {
-    console.log(runStatus)
     if (runStatus === RUN_STATUS_STOPPED) {
       trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.CANCEL })
-      dismissCurrentRun(runId)
       if (isQuickTransfer) {
-        console.log('here')
-        console.log(runId)
         deleteRun(runId)
-      }
-      if (!isActiveRun) {
-        if (isQuickTransfer && protocolId != null) {
+        if (protocolId != null) {
           history.push(`/quick-transfer/${protocolId}`)
-        } else if (isQuickTransfer) {
-          history.push(`/quick-transfer`)
-        } else if (protocolId != null) {
-          history.push(`/protocols/${protocolId}`)
         } else {
-          history.push(`/protocols`)
+          history.push('/quick-transfer')
+        }
+      } else {
+        dismissCurrentRun(runId)
+        if (!isActiveRun) {
+          if (protocolId != null) {
+            history.push(`/protocols/${protocolId}`)
+          } else {
+            history.push(`/protocols`)
+          }
         }
       }
     }

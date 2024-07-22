@@ -107,12 +107,10 @@ export function RunSummary(): JSX.Element {
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name ?? 'no name'
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
-  // pass in an on reset success that will delete the previous run after reset is complete
+
   const onCloneRunSuccess = (): void => {
     if (isQuickTransfer) {
-      console.log('clone run success, is quick transfer')
       deleteRun(runId)
-      console.log('deleting run')
     }
   }
 
@@ -161,10 +159,7 @@ export function RunSummary(): JSX.Element {
   }
 
   const returnToQuickTransfer = (): void => {
-    closeCurrentRun()
-    console.log('closed current run')
     deleteRun(runId)
-    console.log('deleting')
     history.push('/quick-transfer')
   }
 
