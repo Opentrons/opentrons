@@ -21,7 +21,7 @@ from .persistence.fastapi_dependencies import (
 from .router import router
 from .service.logging import initialize_logging
 from .service.task_runner import set_up_task_runner
-from .settings import get_settings
+from .settings import RobotServerSettings, get_settings
 from .runs.dependencies import (
     start_light_control_task,
     mark_light_control_startup_finished,
@@ -44,11 +44,7 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """
     async with contextlib.AsyncExitStack() as exit_stack:
         settings = get_settings()
-
-        if settings.persistence_directory == "automatically_make_temporary":
-            persistence_directory: Optional[Path] = None
-        else:
-            persistence_directory = settings.persistence_directory
+        persistence_directory = _get_persistence_directory(settings)
 
         initialize_logging()
 
@@ -119,3 +115,10 @@ app.add_middleware(
 
 # main router
 app.include_router(router=router)
+
+
+def _get_persistence_directory(settings: RobotServerSettings) -> Optional[Path]:
+    if settings.persistence_directory == "automatically_make_temporary":
+        return None
+    else:
+        return settings.persistence_directory
