@@ -6,7 +6,7 @@ import {
   Flex,
   RESPONSIVENESS,
   SPACING,
-  LegacyStyledText,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -65,16 +65,17 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
   // TODO: (ew, 2023-04-21): button is not tabbable, so focus state
   // is not possible on ODD. It's testable in storybook but not in real life.
   const SettingButtonLabel = styled.label`
-    border-radius: ${BORDERS.borderRadius16};
-    cursor: pointer;
-    padding: ${isLarge ? SPACING.spacing24 : SPACING.spacing20};
-    width: 100%;
+      border-radius: ${BORDERS.borderRadius16};
+      cursor: pointer;
+      padding: ${isLarge ? SPACING.spacing24 : SPACING.spacing20};
+      width: 100%;
 
-    ${isSelected ? SELECTED_BUTTON_STYLE : AVAILABLE_BUTTON_STYLE}
-    ${disabled && DISABLED_BUTTON_STYLE}
+      ${isSelected ? SELECTED_BUTTON_STYLE : AVAILABLE_BUTTON_STYLE}
+      ${disabled && DISABLED_BUTTON_STYLE}
 
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-      cursor: default;
+        cursor: default;
+      }
     }
   `
 
@@ -89,19 +90,19 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
         value={buttonValue}
       />
       <SettingButtonLabel role="label" htmlFor={buttonLabel}>
-        <LegacyStyledText
-          fontSize={isLarge ? TYPOGRAPHY.fontSize28 : TYPOGRAPHY.fontSize22}
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          lineHeight={
-            isLarge ? TYPOGRAPHY.lineHeight36 : TYPOGRAPHY.lineHeight28
-          }
+        <StyledText
+          oddStyle={isLarge ? 'level4HeaderRegular' : 'bodyTextRegular'}
+          desktopStyle="bodyDefaultRegular"
         >
           {buttonLabel}
-        </LegacyStyledText>
+        </StyledText>
         {subButtonLabel != null ? (
-          <LegacyStyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightRegular}>
+          <StyledText
+            oddStyle="level4HeaderRegular"
+            fontWeight={TYPOGRAPHY.fontWeightRegular}
+          >
             {subButtonLabel}
-          </LegacyStyledText>
+          </StyledText>
         ) : null}
       </SettingButtonLabel>
     </Flex>

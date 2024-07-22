@@ -12,7 +12,7 @@ import { RECOVERY_MAP } from '../constants'
 import { CancelRun } from './CancelRun'
 import {
   RecoveryFooterButtons,
-  RecoveryContentWrapper,
+  RecoverySingleColumnContentWrapper,
   LeftColumnLabwareInfo,
   TwoColTextAndFailedStepNextStep,
 } from '../shared'
@@ -49,7 +49,7 @@ export function FillWell(props: RecoveryContentProps): JSX.Element | null {
   const { goBackPrevStep, proceedNextStep } = routeUpdateActions
 
   return (
-    <RecoveryContentWrapper>
+    <RecoverySingleColumnContentWrapper>
       <TwoColumn>
         <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
           <LeftColumnLabwareInfo
@@ -68,7 +68,7 @@ export function FillWell(props: RecoveryContentProps): JSX.Element | null {
         primaryBtnOnClick={proceedNextStep}
         secondaryBtnOnClick={goBackPrevStep}
       />
-    </RecoveryContentWrapper>
+    </RecoverySingleColumnContentWrapper>
   )
 }
 
@@ -86,7 +86,7 @@ export function SkipToNextStep(
     proceedToRouteAndStep,
   } = routeUpdateActions
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
-  const { skipFailedCommand, resumeRun } = recoveryCommands
+  const { skipFailedCommand } = recoveryCommands
   const { ROBOT_SKIPPING_STEP, IGNORE_AND_SKIP } = RECOVERY_MAP
   const { t } = useTranslation('error_recovery')
 
@@ -100,11 +100,9 @@ export function SkipToNextStep(
   }
 
   const primaryBtnOnClick = (): Promise<void> => {
-    return setRobotInMotion(true, ROBOT_SKIPPING_STEP.ROUTE)
-      .then(() => skipFailedCommand())
-      .then(() => {
-        resumeRun()
-      })
+    return setRobotInMotion(true, ROBOT_SKIPPING_STEP.ROUTE).then(() => {
+      skipFailedCommand()
+    })
   }
 
   const buildBodyText = (): JSX.Element => {

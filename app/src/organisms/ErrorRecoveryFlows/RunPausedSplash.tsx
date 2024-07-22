@@ -30,7 +30,7 @@ import { LargeButton } from '../../atoms/buttons'
 import { RECOVERY_MAP } from './constants'
 import {
   RecoveryInterventionModal,
-  RecoveryContentWrapper,
+  RecoverySingleColumnContentWrapper,
   StepInfo,
 } from './shared'
 
@@ -151,13 +151,12 @@ export function RunPausedSplash(
         titleHeading={buildTitleHeadingDesktop()}
         isOnDevice={isOnDevice}
       >
-        <RecoveryContentWrapper>
+        <RecoverySingleColumnContentWrapper>
           <Flex
             gridGap={SPACING.spacing24}
             flexDirection={DIRECTION_COLUMN}
             alignItems={ALIGN_FLEX_END}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
-            height="25rem"
           >
             <Flex
               borderRadius={BORDERS.borderRadius8}
@@ -206,7 +205,7 @@ export function RunPausedSplash(
               </StyledText>
             </PrimaryButton>
           </Flex>
-        </RecoveryContentWrapper>
+        </RecoverySingleColumnContentWrapper>
       </RecoveryInterventionModal>
     )
   }

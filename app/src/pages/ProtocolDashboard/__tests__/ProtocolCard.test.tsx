@@ -20,6 +20,7 @@ import type {
   CompletedProtocolAnalysis,
   ProtocolResource,
 } from '@opentrons/shared-data'
+import type { Chip } from '@opentrons/components'
 
 const mockNavigate = vi.fn()
 
@@ -32,6 +33,13 @@ vi.mock('react-router-dom', async importOriginal => {
 })
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../redux/config')
+vi.mock('@opentrons/components', async importOriginal => {
+  const actual = await importOriginal<typeof Chip>()
+  return {
+    ...actual,
+    Chip: vi.fn(() => <div>mock Chip</div>),
+  }
+})
 
 const mockProtocol: ProtocolResource = {
   id: 'mockProtocol1',
@@ -119,10 +127,8 @@ describe('ProtocolCard', () => {
     } as UseQueryResult<CompletedProtocolAnalysis>)
     render(props)
 
-    screen.getByLabelText('failedAnalysis_icon')
-    screen.getByText('Failed analysis')
     fireEvent.click(screen.getByText('yay mock protocol'))
-    screen.getByText('Protocol analysis failed')
+    screen.getByText('mock Chip')
     screen.getByText(
       'Delete the protocol, make changes to address the error, and resend the protocol to this robot from the Opentrons App.'
     )
@@ -164,8 +170,7 @@ describe('ProtocolCard', () => {
       vi.advanceTimersByTime(1005)
     })
     expect(props.longPress).toHaveBeenCalled()
-    screen.getByLabelText('failedAnalysis_icon')
-    screen.getByText('Failed analysis')
+    screen.getByText('mock Chip')
     const card = screen.getByTestId('protocol_card')
     expect(card).toHaveStyle(`background-color: ${COLORS.red35}`)
     fireEvent.click(screen.getByText('yay mock protocol'))
@@ -204,8 +209,7 @@ describe('ProtocolCard', () => {
       data: { result: 'parameter-value-required' } as any,
     } as UseQueryResult<CompletedProtocolAnalysis>)
     render({ ...props, protocol: mockProtocolWithCSV })
-    screen.getByLabelText('requiresCsv_file_icon')
-    screen.getByText('Requires CSV')
+    screen.getByText('mock Chip')
     const card = screen.getByTestId('protocol_card')
     expect(card).toHaveStyle(`background-color: ${COLORS.yellow35}`)
   })

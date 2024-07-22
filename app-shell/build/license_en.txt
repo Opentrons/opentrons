@@ -1,6 +1,6 @@
 Opentrons End-User License Agreement
 
-Last updated: June 27, 2024
+Last updated: July 10, 2024
 
 THIS END-USER LICENSE AGREEMENT (“EULA”) is a legal agreement between you (“User”), either as an individual or on behalf of an entity, and Opentrons Labworks Inc. (“Opentrons”) regarding your use of Opentrons robots, modules, software, and associated documentation (“Opentrons Products”) including, but not limited to, the Opentrons OT-2 robot and associated modules, the Opentrons Flex robot and associated modules, the Opentrons App, the Opentrons API, the Opentrons Protocol Designer and Protocol Library, the Opentrons Labware Library, and the Opentrons Website. By installing or using the Opentrons Products, you agree to be bound by the terms and conditions of this EULA. If you do not agree to the terms of this EULA, you must immediately cease use of the Opentrons Products.
 
@@ -9,7 +9,7 @@ Use of Opentrons Products.
 Permitted Use. User shall use the Opentrons Products strictly in accordance with the terms of the EULA and Related Agreements. User shall use Opentrons Product software only in conjunction with Opentrons Product hardware.
 Restrictions on Use. Unless otherwise specified in a separate agreement entered into between Opentrons and User, User may not, and may not permit others to:
 reverse engineer, decompile or otherwise derive source code from the Opentrons Products;
-disassemble the Opentrons Products, except as instructed by Opentrons employees or Opentrons technical product manuals;
+disassemble or bypass protection on Opentrons Products to exceed authorized access to Opentrons systems, or to analyze or modify components of the Opentrons Products for the purpose of gaining unauthorized access to confidential Opentrons or Opentrons Product information;
 copy, modify, or create derivative works of the Opentrons Products for the purpose of competing with Opentrons;
 remove or alter any proprietary notices or marks on the Opentrons Products;
 use the Opentrons Products in any manner that does not comply with the applicable laws in the jurisdiction(s) in which such use takes place;

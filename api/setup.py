@@ -59,7 +59,7 @@ INSTALL_REQUIRES = [
     f"opentrons-shared-data=={VERSION}",
     "aionotify==0.3.1",
     "anyio>=3.6.1,<4.0.0",
-    "jsonschema>=3.0.1,<4.18.0",
+    "jsonschema>=3.0.1,<5",
     "numpy>=1.20.0,<2",
     "pydantic>=1.10.9,<2.0.0",
     "pyserial>=3.5",

@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 from typing import Optional, TYPE_CHECKING, cast, Union
-from opentrons.protocol_engine.commands.liquid_probe import LiquidProbeResult
 from opentrons.protocols.api_support.types import APIVersion
 
 from opentrons.types import Location, Mount
@@ -838,6 +837,44 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         z_axis = self._engine_client.state.pipettes.get_z_axis(self._pipette_id)
         self._engine_client.execute_command(cmd.HomeParams(axes=[z_axis]))
 
+    def detect_liquid_presence(self, well_core: WellCore, loc: Location) -> bool:
+        labware_id = well_core.labware_id
+        well_name = well_core.get_name()
+        well_location = WellLocation(
+            origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0)
+        )
+
+        # The error handling here is a bit nuanced and also a bit broken:
+        #
+        # - If the hardware detects liquid, the `tryLiquidProbe` engine command will
+        #   succeed and return a height, which we'll convert to a `True` return.
+        #   Okay so far.
+        #
+        # - If the hardware detects no liquid, the `tryLiquidProbe` engine command will
+        #   succeed and return `None`, which we'll convert to a `False` return.
+        #   Still okay so far.
+        #
+        # - If there is any other error within the `tryLiquidProbe` command, things get
+        #   messy. It may kick the run into recovery mode. At that point, all bets are
+        #   off--we lose our guarantee of having a `tryLiquidProbe` command whose
+        #   `result` we can inspect. We don't know how to deal with that here, so we
+        #   currently propagate the exception up, which will quickly kill the protocol,
+        #   after a potential split second of recovery mode. It's unclear what would
+        #   be good user-facing behavior here, but it's unfortunate to kill the protocol
+        #   for an error that the engine thinks should be recoverable.
+        result = self._engine_client.execute_command_without_recovery(
+            cmd.TryLiquidProbeParams(
+                labwareId=labware_id,
+                wellName=well_name,
+                wellLocation=well_location,
+                pipetteId=self.pipette_id,
+            )
+        )
+
+        self._protocol_core.set_last_location(location=loc, mount=self.get_mount())
+
+        return result.z_position is not None
+
     def liquid_probe_with_recovery(self, well_core: WellCore, loc: Location) -> None:
         labware_id = well_core.labware_id
         well_name = well_core.get_name()
@@ -874,5 +911,4 @@ class InstrumentCore(AbstractInstrument[WellCore]):
 
         self._protocol_core.set_last_location(location=loc, mount=self.get_mount())
 
-        if result is not None and isinstance(result, LiquidProbeResult):
-            return result.z_position
+        return result.z_position

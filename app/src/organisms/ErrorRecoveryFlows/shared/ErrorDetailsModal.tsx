@@ -43,20 +43,7 @@ type ErrorDetailsModalProps = ErrorRecoveryFlowsProps &
     robotType: RobotType
   }
 
-export function ErrorDetailsModal(
-  props: ErrorDetailsModalProps
-): JSX.Element | null {
-  if (props.isOnDevice) {
-    return <ErrorDetailsModalODD {...props} />
-  } else {
-    return null
-  }
-}
-
-// For ODD use only.
-export function ErrorDetailsModalODD(
-  props: ErrorDetailsModalProps
-): JSX.Element {
+export function ErrorDetailsModal(props: ErrorDetailsModalProps): JSX.Element {
   const { failedCommand, toggleModal, isOnDevice } = props
   const errorKind = getErrorKind(failedCommand)
   const errorName = useErrorName(errorKind)

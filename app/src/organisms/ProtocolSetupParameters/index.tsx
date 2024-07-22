@@ -89,13 +89,24 @@ export function ProtocolSetupParameters({
           ({ ...parameter, value: parameter.default } as ValueRunTimeParameter)
     )
   )
+
   const hasMissingFileParam =
-    runTimeParametersOverrides?.some(
-      parameter =>
-        parameter.type === 'csv_file' &&
-        ((parameter.file?.id == null && parameter.file?.file == null) ||
-          parameter.file?.filePath == null)
-    ) ?? false
+    runTimeParametersOverrides?.some((parameter): boolean => {
+      if (parameter.type !== 'csv_file') {
+        return false
+      }
+
+      if (parameter.file == null) {
+        return true
+      }
+
+      return (
+        parameter.file.id == null &&
+        parameter.file.file == null &&
+        parameter.file.filePath == null
+      )
+    }) ?? false
+
   const { makeSnackbar } = useToaster()
 
   const updateParameters = (

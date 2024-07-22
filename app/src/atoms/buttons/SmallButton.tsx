@@ -10,7 +10,7 @@ import {
   Icon,
   JUSTIFY_CENTER,
   SPACING,
-  LegacyStyledText,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { ODD_FOCUS_VISIBLE } from './constants'
@@ -180,13 +180,12 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
           </Flex>
         ) : null}
 
-        <LegacyStyledText
-          fontSize="1.375rem"
-          lineHeight={TYPOGRAPHY.lineHeight28}
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+        <StyledText
+          oddStyle="bodyTextSemiBold"
+          desktopStyle="bodyDefaultSemiBold"
         >
           {buttonText}
-        </LegacyStyledText>
+        </StyledText>
         {iconPlacement === 'endIcon' && iconName != null ? (
           <Flex
             aria-label={
