@@ -46,8 +46,27 @@ export function ChooseCsvFile({
   const { t } = useTranslation('protocol_setup')
 
   const csvFilesOnUSB = useSelector(getShellUpdateDataFiles) ?? []
-
   const csvFilesOnRobot = useAllCsvFilesQuery(protocolId).data?.data.files ?? []
+
+  // ToDo: (kk 07/22/2024) update the function for sorting csv files on robot
+  const sortCsvFiles = (csvFiles: string[]): string[] => {
+    return csvFiles.sort((a, b) => {
+      const regex = /(\D+)(\d*)/
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const [, aText, aNum] = a.match(regex)!
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const [, bText, bNum] = b.match(regex)!
+
+      if (aText < bText) return -1
+      if (aText > bText) return 1
+
+      const aNumber = aNum != null ? parseInt(aNum, 10) : 0
+      const bNumber = bNum != null ? parseInt(bNum, 10) : 0
+
+      return aNumber - bNumber
+    })
+  }
+  const sortedCsvFilesOnUSB = sortCsvFiles(csvFilesOnUSB)
 
   const initialFileObject: CsvFileParameterFileData = parameter.file ?? {}
   const [
@@ -57,6 +76,7 @@ export function ChooseCsvFile({
 
   const handleBackButton = (): void => {
     if (!isEqual(csvFileSelected, initialFileObject)) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       setParameter(csvFileSelected, parameter.variableName)
     }
     handleGoBack()
@@ -115,8 +135,8 @@ export function ChooseCsvFile({
               {t('csv_files_on_usb')}
             </LegacyStyledText>
             <Flex css={LIST_CONTAINER_STYLE}>
-              {csvFilesOnUSB.length !== 0 ? (
-                csvFilesOnUSB.map(csvFilePath => {
+              {sortedCsvFilesOnUSB.length !== 0 ? (
+                sortedCsvFilesOnUSB.map(csvFilePath => {
                   const fileName = last(csvFilePath.split('/'))
                   return (
                     <React.Fragment key={fileName}>
