@@ -2,7 +2,6 @@ import assert from 'assert'
 import zip from 'lodash/zip'
 import {
   getWellDepth,
-  COLUMN,
   LOW_VOLUME_PIPETTES,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
 } from '@opentrons/shared-data'
@@ -19,7 +18,6 @@ import {
   getTrashOrLabware,
   dispenseLocationHelper,
   moveHelper,
-  getIsSafePipetteMovement,
   getWasteChuteAddressableAreaNamePip,
   getHasWasteChute,
 } from '../../utils'
@@ -112,8 +110,6 @@ export const transfer: CommandCreator<TransferArgs> = (
   // TODO Ian 2018-04-02 following ~10 lines are identical to first lines of consolidate.js...
   const actionName = 'transfer'
   const errors: CommandCreatorError[] = []
-  const is96Channel =
-    invariantContext.pipetteEntities[args.pipette]?.spec.channels === 96
 
   if (
     !prevRobotState.pipettes[args.pipette] ||
@@ -163,36 +159,6 @@ export const transfer: CommandCreator<TransferArgs> = (
     !invariantContext.additionalEquipmentEntities[args.dropTipLocation]
   ) {
     errors.push(errorCreators.dropTipLocationDoesNotExist())
-  }
-
-  if (
-    is96Channel &&
-    args.nozzles === COLUMN &&
-    !getIsSafePipetteMovement(
-      prevRobotState,
-      invariantContext,
-      args.pipette,
-      args.sourceLabware,
-      args.tipRack,
-      { x: aspirateXOffset, y: aspirateYOffset, z: aspirateOffsetFromBottomMm }
-    )
-  ) {
-    errors.push(errorCreators.possiblePipetteCollision())
-  }
-
-  if (
-    is96Channel &&
-    args.nozzles === COLUMN &&
-    !getIsSafePipetteMovement(
-      prevRobotState,
-      invariantContext,
-      args.pipette,
-      args.destLabware,
-      args.tipRack,
-      { x: dispenseXOffset, y: dispenseYOffset, z: dispenseOffsetFromBottomMm }
-    )
-  ) {
-    errors.push(errorCreators.possiblePipetteCollision())
   }
 
   if (errors.length > 0)
@@ -332,6 +298,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                   aspirateYOffset,
                   dispenseXOffset,
                   dispenseYOffset,
+                  nozzles: args.nozzles,
                 })
               : []
           const mixBeforeAspirateCommands =
@@ -353,6 +320,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                   aspirateYOffset,
                   dispenseXOffset,
                   dispenseYOffset,
+                  nozzles: args.nozzles,
                 })
               : []
           const delayAfterAspirateCommands =
@@ -421,6 +389,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                   aspirateYOffset,
                   dispenseXOffset,
                   dispenseYOffset,
+                  nozzles: args.nozzles,
                 })
               : []
 
@@ -438,6 +407,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                     tipRack,
                     xOffset: 0,
                     yOffset: 0,
+                    nozzles: args.nozzles,
                   }),
                   ...(aspirateDelay != null
                     ? [
@@ -460,6 +430,8 @@ export const transfer: CommandCreator<TransferArgs> = (
                     isAirGap: true,
                     xOffset: 0,
                     yOffset: 0,
+                    tipRack: args.tipRack,
+                    nozzles: args.nozzles,
                   }),
                   ...(dispenseDelay != null
                     ? [
@@ -503,6 +475,7 @@ export const transfer: CommandCreator<TransferArgs> = (
               tipRack,
               xOffset: aspirateXOffset,
               yOffset: aspirateYOffset,
+              nozzles: args.nozzles,
             }),
           ]
           const dispenseCommand = [
@@ -515,6 +488,8 @@ export const transfer: CommandCreator<TransferArgs> = (
               offsetFromBottomMm: dispenseOffsetFromBottomMm,
               xOffset: dispenseXOffset,
               yOffset: dispenseYOffset,
+              tipRack: args.tipRack,
+              nozzles: args.nozzles,
             }),
           ]
 
@@ -564,6 +539,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                     flowRate: aspirateFlowRateUlSec,
                     offsetFromBottomMm: airGapOffsetDestWell,
                     tipRack,
+                    nozzles: args.nozzles,
                   }),
                   ...(aspirateDelay != null
                     ? [

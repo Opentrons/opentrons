@@ -22,6 +22,7 @@ import {
   touchTip,
 } from '../atomic'
 
+import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
 import type {
   MixArgs,
   CommandCreator,
@@ -45,6 +46,7 @@ export function mixUtil(args: {
   dispenseYOffset: number
   aspirateDelaySeconds?: number | null | undefined
   dispenseDelaySeconds?: number | null | undefined
+  nozzles: NozzleConfigurationStyle | null
 }): CurriedCommandCreator[] {
   const {
     pipette,
@@ -63,6 +65,7 @@ export function mixUtil(args: {
     aspirateYOffset,
     dispenseXOffset,
     dispenseYOffset,
+    nozzles,
   } = args
 
   const getDelayCommand = (seconds?: number | null): CurriedCommandCreator[] =>
@@ -90,6 +93,7 @@ export function mixUtil(args: {
         tipRack,
         xOffset: aspirateXOffset,
         yOffset: aspirateYOffset,
+        nozzles: null,
       }),
       ...getDelayCommand(aspirateDelaySeconds),
       curryCommandCreator(dispense, {
@@ -101,6 +105,8 @@ export function mixUtil(args: {
         flowRate: dispenseFlowRateUlSec,
         xOffset: dispenseXOffset,
         yOffset: dispenseYOffset,
+        tipRack,
+        nozzles: nozzles,
       }),
       ...getDelayCommand(dispenseDelaySeconds),
     ],
@@ -143,6 +149,7 @@ export const mix: CommandCreator<MixArgs> = (
     aspirateYOffset,
     dispenseXOffset,
     dispenseYOffset,
+    nozzles,
   } = data
 
   const is96Channel =
@@ -284,6 +291,7 @@ export const mix: CommandCreator<MixArgs> = (
         aspirateYOffset,
         dispenseXOffset,
         dispenseYOffset,
+        nozzles,
       })
       return [
         ...tipCommands,

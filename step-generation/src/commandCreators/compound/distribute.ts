@@ -72,6 +72,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
     aspirateYOffset,
     dispenseXOffset,
     dispenseYOffset,
+    nozzles,
   } = args
 
   // TODO Ian 2018-05-03 next ~20 lines match consolidate.js
@@ -225,6 +226,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
               xOffset: 0,
               yOffset: 0,
               tipRack: args.tipRack,
+              nozzles,
             }),
             ...(aspirateDelay != null
               ? [
@@ -247,6 +249,8 @@ export const distribute: CommandCreator<DistributeArgs> = (
               isAirGap: true,
               xOffset: 0,
               yOffset: 0,
+              nozzles,
+              tipRack: args.tipRack,
             }),
             ...(dispenseDelay != null
               ? [
@@ -307,6 +311,8 @@ export const distribute: CommandCreator<DistributeArgs> = (
               offsetFromBottomMm: dispenseOffsetFromBottomMm,
               xOffset: dispenseXOffset,
               yOffset: dispenseYOffset,
+              nozzles,
+              tipRack: args.tipRack,
             }),
             ...delayAfterDispenseCommands,
             ...touchTipAfterDispenseCommand,
@@ -357,6 +363,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
                 tipRack: args.tipRack,
                 xOffset: 0,
                 yOffset: 0,
+                nozzles,
               }),
               ...(aspirateDelay != null
                 ? [
@@ -463,6 +470,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
               aspirateYOffset,
               dispenseXOffset,
               dispenseYOffset,
+              nozzles,
             })
           : []
 
@@ -491,6 +499,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
           tipRack: args.tipRack,
           xOffset: aspirateXOffset,
           yOffset: aspirateYOffset,
+          nozzles,
         }),
         ...delayAfterAspirateCommands,
         ...touchTipAfterAspirateCommand,

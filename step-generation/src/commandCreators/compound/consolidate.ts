@@ -82,6 +82,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     dispenseYOffset,
     destLabware,
     sourceLabware,
+    nozzles,
   } = args
 
   const actionName = 'consolidate'
@@ -233,6 +234,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
                   tipRack: args.tipRack,
                   xOffset: 0,
                   yOffset: 0,
+                  nozzles,
                 }),
                 ...(aspirateDelay != null
                   ? [
@@ -292,6 +294,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
               tipRack: args.tipRack,
               xOffset: aspirateXOffset,
               yOffset: aspirateYOffset,
+              nozzles,
             }),
             ...delayAfterAspirateCommands,
             ...touchTipAfterAspirateCommand,
@@ -346,6 +349,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
               aspirateYOffset,
               dispenseXOffset,
               dispenseYOffset,
+              nozzles,
             })
           : []
       const preWetTipCommands = args.preWetTip // Pre-wet tip is equivalent to a single mix, with volume equal to the consolidate volume.
@@ -366,6 +370,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
             aspirateYOffset,
             dispenseXOffset,
             dispenseYOffset,
+            nozzles,
           })
         : []
       //  can not mix in a waste chute
@@ -388,6 +393,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
               aspirateYOffset,
               dispenseXOffset,
               dispenseYOffset,
+              nozzles,
             })
           : []
 
@@ -415,6 +421,8 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
           offsetFromBottomMm: dispenseOffsetFromBottomMm,
           xOffset: dispenseXOffset,
           yOffset: dispenseYOffset,
+          nozzles,
+          tipRack: args.tipRack,
         }),
       ]
 
@@ -462,6 +470,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
                 flowRate: aspirateFlowRateUlSec,
                 offsetFromBottomMm: airGapOffsetDestWell,
                 tipRack: args.tipRack,
+                nozzles,
               }),
               ...(aspirateDelay != null
                 ? [
