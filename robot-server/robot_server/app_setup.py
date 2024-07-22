@@ -24,10 +24,7 @@ from .persistence.fastapi_dependencies import (
 )
 from .router import router
 from .service.logging import initialize_logging
-from .service.task_runner import (
-    initialize_task_runner,
-    clean_up_task_runner,
-)
+from .service.task_runner import set_up_task_runner
 from .settings import get_settings
 from .runs.dependencies import (
     start_light_control_task,
@@ -59,8 +56,7 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
         initialize_logging()
 
-        initialize_task_runner(app_state=app.state)
-        exit_stack.push_async_callback(clean_up_task_runner, app.state)
+        await exit_stack.enter_async_context(set_up_task_runner(app.state))
 
         fbl_init(app_state=app.state)
         exit_stack.push_async_callback(fbl_clean_up, app.state)
