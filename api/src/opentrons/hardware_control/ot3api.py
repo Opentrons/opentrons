@@ -26,9 +26,6 @@ from opentrons.hardware_control.modules.module_calibration import (
 )
 
 
-from opentrons_hardware.hardware_control.tool_sensors import (
-    liquid_probe_non_responsive_z_distance,
-)
 from opentrons_shared_data.pipette.dev_types import (
     PipetteName,
 )
@@ -2602,6 +2599,21 @@ class OT3API(
     def remove_gripper_probe(self) -> None:
         self._gripper_handler.remove_probe()
 
+    @staticmethod
+    def liquid_probe_non_responsive_z_distance(z_speed: float) -> float:
+        """Calculate the Z distance travelled where the LLD pass will be unresponsive."""
+        # NOTE: (sigler) Here lye some magic numbers.
+        #       The Z axis probing motion uses the first 20 samples to calculate
+        #       a baseline for all following samples, making the very beginning of
+        #       that Z motion unable to detect liquid. The sensor is configured for
+        #       4ms sample readings, and so we then assume it takes ~80ms to complete.
+        #       If the Z is moving at 5mm/sec, then ~80ms equates to ~0.4
+        baseline_during_z_sample_num = 20  # FIXME: (sigler) shouldn't be defined here?
+        sample_time_sec = 0.004  # FIXME: (sigler) shouldn't be defined here?
+        baseline_duration_sec = baseline_during_z_sample_num * sample_time_sec
+        non_responsive_z_mm = baseline_duration_sec * z_speed
+        return non_responsive_z_mm
+
     async def _liquid_probe_pass(
         self,
         mount: OT3Mount,
@@ -2684,7 +2696,7 @@ class OT3API(
         # height where probe action will begin
         # TODO: (sigler) add this to pipette's liquid def (per tip)
         probe_pass_overlap_mm = 0.1
-        non_responsive_z_mm = liquid_probe_non_responsive_z_distance(
+        non_responsive_z_mm = OT3API.liquid_probe_non_responsive_z_distance(
             probe_settings.mount_speed
         )
         probe_pass_z_offset_mm = non_responsive_z_mm + probe_pass_overlap_mm

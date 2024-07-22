@@ -383,21 +383,6 @@ async def _run_with_binding(
     return result
 
 
-def liquid_probe_non_responsive_z_distance(z_speed: float) -> float:
-    """Calculate the Z distance travelled where the LLD pass will be unresponsive."""
-    # NOTE: (sigler) Here lye some magic numbers.
-    #       The Z axis probing motion uses the first 20 samples to calculate
-    #       a baseline for all following samples, making the very beginning of
-    #       that Z motion unable to detect liquid. The sensor is configured for
-    #       4ms sample readings, and so we then assume it takes ~80ms to complete.
-    #       If the Z is moving at 5mm/sec, then ~80ms equates to ~0.4
-    baseline_during_z_sample_num = 20  # FIXME: (sigler) shouldn't be defined here?
-    sample_time_sec = 0.004  # FIXME: (sigler) shouldn't be defined here?
-    baseline_duration_sec = baseline_during_z_sample_num * sample_time_sec
-    non_responsive_z_mm = baseline_duration_sec * z_speed
-    return non_responsive_z_mm
-
-
 async def liquid_probe(
     messenger: CanMessenger,
     tool: PipetteProbeTarget,
