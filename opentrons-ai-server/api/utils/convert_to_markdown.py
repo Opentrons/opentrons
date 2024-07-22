@@ -1,7 +1,18 @@
 import os.path
+import subprocess
 
 from bs4 import BeautifulSoup
-from markdownify import markdownify
+from markdownify import markdownify # type: ignore
+
+# Define the command to run Sphinx
+command = "pipenv run sphinx-build -b singlehtml api/docs/v2 opentrons-ai-server/api/utils/build/docs/html/v2"
+
+# Run the command
+try:
+    subprocess.run(command, check=True, shell=True)
+except subprocess.CalledProcessError as e:
+    print(f"An error occurred while running Sphinx build: {e}")
+
 
 current_dir = os.path.dirname(__file__)
 html_file_path = os.path.join(current_dir, "build", "docs", "html", "v2", "index.html")
