@@ -1684,18 +1684,6 @@ class InstrumentContext(publisher.CommandPublisher):
     def tip_racks(self, racks: List[labware.Labware]) -> None:
         self._tip_racks = racks
 
-    def _96_tip_config_valid(self) -> bool:
-        n_map = self._core.get_nozzle_map()
-        if self.channels == 96:
-            if (
-                n_map.back_left != n_map.full_instrument_back_left
-                and n_map.front_right != n_map.full_instrument_front_right
-            ):
-                raise TipNotAttachedError(
-                    "Either the front right or the back left nozzle must have a tip attached to do LLD."
-                )
-        return True
-
     @property
     @requires_version(2, 20)
     def liquid_presence_detection(self) -> bool:
@@ -1887,6 +1875,19 @@ class InstrumentContext(publisher.CommandPublisher):
             return self._protocol_core.get_last_location(mount=self._core.get_mount())
         else:
             return self._protocol_core.get_last_location()
+
+    def _96_tip_config_valid(self) -> bool:
+        n_map = self._core.get_nozzle_map()
+        channels = self._core.get_active_channels()
+        if channels == 96:
+            if (
+                n_map.back_left != n_map.full_instrument_back_left
+                and n_map.front_right != n_map.full_instrument_front_right
+            ):
+                raise TipNotAttachedError(
+                    "Either the front right or the back left nozzle must have a tip attached to do LLD."
+                )
+        return True
 
     def __repr__(self) -> str:
         return "<{}: {} in {}>".format(
