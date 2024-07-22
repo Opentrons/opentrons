@@ -60,7 +60,7 @@ Here is the start of a protocol that imports the ``COLUMN`` and ``ALL`` layout c
     requirements = {"robotType": "Flex", "apiLevel": "|apiLevel|"}
 
     def run(protocol: protocol_api.ProtocolContext):
-        column_rack = protocol.load_labware(
+        partial_rack = protocol.load_labware(
             load_name="opentrons_flex_96_tiprack_1000ul",
             location="D3"
         )
@@ -69,14 +69,14 @@ Here is the start of a protocol that imports the ``COLUMN`` and ``ALL`` layout c
         pipette.configure_nozzle_layout(
             style=COLUMN,
             start="A12",
-            tip_racks=[column_rack]
+            tip_racks=[partial_rack]
         )
 
 .. versionadded:: 2.16
 
 Let's unpack some of the details of this code.
 
-First, we've given a special name to the tip rack, ``column_rack``. You can name your tip racks whatever you like, but if you're using a 96-channel pipette for full pickup and partial pickup in the same protocol, you'll need to keep them separate. See :ref:`partial-tip-rack-adapters` below.
+First, we've given a special name to the tip rack, ``partial_rack``. You can name your tip racks whatever you like, but if you're using a 96-channel pipette for full pickup and partial pickup in the same protocol, you'll need to keep them separate. See :ref:`partial-tip-rack-adapters` below.
 
 Next, we load the 96-channel pipette. Note that :py:meth:`.load_instrument` only has a single argument. The 96-channel pipette occupies both mounts, so ``mount`` is omissible. The ``tip_racks`` argument is always optional. But it would have no effect to declare it here, because every call to ``configure_nozzle_layout()`` resets the pipette's :py:obj:`.InstrumentContext.tip_racks` property.
 
@@ -111,7 +111,7 @@ Here is the start of a protocol that imports the ``ROW`` and ``ALL`` layout cons
     requirements = {"robotType": "Flex", "apiLevel": "|apiLevel|"}
 
     def run(protocol: protocol_api.ProtocolContext):
-        column_rack = protocol.load_labware(
+        partial_rack = protocol.load_labware(
             load_name="opentrons_flex_96_tiprack_1000ul",
             location="D3"
         )
@@ -120,8 +120,10 @@ Here is the start of a protocol that imports the ``ROW`` and ``ALL`` layout cons
         pipette.configure_nozzle_layout(
             style=ROW,
             start="H1",
-            tip_racks=[column_rack]
+            tip_racks=[partial_rack]
         )
+
+.. versionadded:: 2.20
 
 Setting ``start="H1"`` means the pipette will use its frontmost nozzles to pick up tips, starting from the back of the tip rack::
 
@@ -133,14 +135,91 @@ You can also set ``start="A1"`` to use the backmost nozzles and pick up from the
 
 .. note::
 
-    Picking up rows from front to back will not work with tip racks placed in row D of the deck, because the robot door prevents the pipette from moving far enough forward. Since the pipette can't pick up the frontmost tips, it can't pick up any other rows of tips either.
+    Consider the placement of your tip rack when choosing the ``start`` value for row pickup. The pipette cannot pick up from back to front (``start="H1"``) on tip racks in row A of the deck, nor can it pick up from front to back (``start="A1"``) on tip racks in row D of the deck. This is because the pipette would have to move too far backward or forward, respectively, to align over those tips.
 
-.. versionadded:: 2.20
+    Use a different ``start`` value, or load the tip rack in row B or C.
 
 Single Layout Example
 ---------------------
 
-TK
+Single-tip pickup is available on both 8-channel and 96-channel pipettes. For 8-channel pipettes, there are two possible configurations, using either the front or back nozzle. For 96-channel pipettes, there are four possible configurations, using any of the corner nozzles. 
+
+The ``start`` parameter sets the "first" and only nozzle used in the configuration. It also affects the order in which the pipette picks up tips. When using automatic tip tracking, single-tip configurations always consume all tips within a single column before proceeding to another column.
+
+.. list-table::
+    :header-rows: 1
+
+    * - Pipette Type
+      - ``start`` Well
+      - Pickup Order
+    * - 8-channel
+      - A1
+      - | Front to back, right to left, i.e.
+        | H1 through A1, H2 through A2, etc.
+    * - 8-channel
+      - H1
+      - | Back to front, right to left, i.e.
+        | A1 through H1, A2 through H2, etc.
+    * - 96-channel
+      - A1
+      - | Front to back, left to right, i.e.
+        | H12 through A12, H11 through A11, etc.
+    * - 96-channel
+      - H1
+      - | Back to front, left to right, i.e.
+        | A12 through H12, A11 through H11, etc.
+    * - 96-channel
+      - A12
+      - | Front to back, right to left, i.e.
+        | H1 through A1, H2 through A2, etc.
+    * - 96-channel
+      - H12
+      - | Back to front, right to left, i.e.
+        | A1 through H1, A2 through H2, etc.
+
+Since they follow the same order as using a single-channel pipette, Opentrons recommends using the following configurations:
+
+- For 8-channel pipettes, ``start="H1"``.
+- For 96-channel pipettes, ``start="H12"``.
+
+Here is the start of a protocol that imports the ``SINGLE`` and ``ALL`` layout constants, loads an 8-channel pipette, and sets it to pick up a single tip.
+
+.. code-block:: python
+    :substitutions:
+
+    from opentrons import protocol_api
+    from opentrons.protocol_api import ROW, ALL
+
+    requirements = {"robotType": "Flex", "apiLevel": "|apiLevel|"}
+
+    def run(protocol: protocol_api.ProtocolContext):
+        partial_rack = protocol.load_labware(
+            load_name="opentrons_flex_96_tiprack_1000ul",
+            location="D3"
+        )
+        trash = protocol.load_trash_bin("A3")
+        pipette = protocol.load_instrument(
+            instrument_name="flex_8channel_1000",
+            mount="left"
+        )
+        pipette.configure_nozzle_layout(
+            style=ROW,
+            start="H12",
+            tip_racks=[partial_rack]
+        )
+
+.. versionadded:: 2.20
+
+Since this configuration uses ``start="H12"``, it will pick up tips in the usual order::
+
+    pipette.pick_up_tip()  # picks up A1 from tip rack
+    pipette.drop_tip()
+    pipette.pick_up_tip()  # picks up B1 from tip rack
+
+.. note::
+
+    You can pick up tips row-wise first, rather than column-wise first, by specifying a location for :py:meth:`.pick_up_tip` each time you use it in ``SINGLE`` configuration. However, as with all partial tip layouts, be careful that you don't place the pipette in a position where it overlaps more tips than intended.
+
 
 Partial Column Layout Example
 -----------------------------
