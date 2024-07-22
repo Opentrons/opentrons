@@ -29,6 +29,8 @@ const initialFlags: Flags = {
   OT_PD_ENABLE_MOAM: process.env.OT_PD_ENABLE_MOAM === '1' || false,
   OT_PD_ENABLE_COMMENT: process.env.OT_PD_ENABLE_COMMENT === '1' || false,
   OT_PD_ENABLE_RETURN_TIP: process.env.OT_PD_ENABLE_RETURN_TIP === '1' || false,
+  OT_PD_ENABLE_STEP_GROUPING:
+    process.env.OT_PD_ENABLE_STEP_GROUPING === '1' || false,
 }
 // @ts-expect-error(sa, 2021-6-10): cannot use string literals as action type
 // TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081

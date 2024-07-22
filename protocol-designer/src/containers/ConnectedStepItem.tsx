@@ -30,9 +30,11 @@ import {
 import {
   getAdditionalEquipmentEntities,
   getInitialDeckSetup,
+  getStepGroups,
   getUnsavedGroup,
 } from '../step-forms/selectors'
-import { selectStepForGroup } from '../step-forms/actions/groups'
+import { selectStepForUnsavedGroup } from '../step-forms/actions/groups'
+import { getEnableStepGrouping } from '../feature-flags/selectors'
 
 import type { ThunkDispatch } from 'redux-thunk'
 import type {
@@ -75,7 +77,9 @@ export const ConnectedStepItem = (
   props: ConnectedStepItemProps
 ): JSX.Element => {
   const { stepId, stepNumber } = props
+  const enableStepGrouping = useSelector(getEnableStepGrouping)
   const unsavedGroup = useSelector(getUnsavedGroup)
+  const groups = useSelector(getStepGroups)
   const step = useSelector(stepFormSelectors.getSavedStepForms)[stepId]
   const argsAndErrors = useSelector(stepFormSelectors.getArgsAndErrorsByStepId)[
     stepId
@@ -143,7 +147,7 @@ export const ConnectedStepItem = (
     dispatch(stepsActions.hoverOnStep(null))
 
   const addStep = (stepId: string): void => {
-    dispatch(selectStepForGroup({ stepId }))
+    dispatch(selectStepForUnsavedGroup({ stepId }))
   }
 
   const handleStepItemSelection = (event: React.MouseEvent): void => {
@@ -237,7 +241,7 @@ export const ConnectedStepItem = (
     hoveredSubstep,
   }
   const name = unsavedGroup.includes(stepId) ? 'ot-checkbox' : 'minus-box'
-  console.log('unsavedGroup', unsavedGroup)
+
   const getModalType = (): DeleteModalType => {
     if (isMultiSelectMode) {
       return CLOSE_BATCH_EDIT_FORM
@@ -247,6 +251,10 @@ export const ConnectedStepItem = (
       return CLOSE_STEP_FORM_WITH_CHANGES
     }
   }
+
+  const isStepInGroup = Object.values(groups).find(groupStepId =>
+    groupStepId.includes(stepId)
+  )
   return (
     <>
       {showConfirmation && (
@@ -257,13 +265,15 @@ export const ConnectedStepItem = (
         />
       )}
       <Box>
-        <Btn
-          onClick={() => {
-            addStep(stepId)
-          }}
-        >
-          <Icon name={name} width="2rem" height="2rem" />
-        </Btn>
+        {enableStepGrouping && !isStepInGroup ? (
+          <Btn
+            onClick={() => {
+              addStep(stepId)
+            }}
+          >
+            <Icon name={name} width="2rem" height="2rem" />
+          </Btn>
+        ) : null}
         <StepItem
           {...stepItemProps}
           onStepContextMenu={props.onStepContextMenu}

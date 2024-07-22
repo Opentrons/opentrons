@@ -34,6 +34,7 @@ export type FlagTypes =
   | 'OT_PD_ENABLE_MOAM'
   | 'OT_PD_ENABLE_COMMENT'
   | 'OT_PD_ENABLE_RETURN_TIP'
+  | 'OT_PD_ENABLE_STEP_GROUPING'
 // flags that are not in this list only show in prerelease mode
 export const userFacingFlags: FlagTypes[] = [
   'OT_PD_DISABLE_MODULE_RESTRICTIONS',
@@ -47,5 +48,6 @@ export const allFlags: FlagTypes[] = [
   'OT_PD_ENABLE_MOAM',
   'OT_PD_ENABLE_COMMENT',
   'OT_PD_ENABLE_RETURN_TIP',
+  'OT_PD_ENABLE_STEP_GROUPING',
 ]
 export type Flags = Partial<Record<FlagTypes, boolean | null | undefined>>

@@ -403,7 +403,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
       const annotation: SecondOrderCommandAnnotation = {
         annotationType: 'secondOrderCommand',
         machineReadableName: name,
-        params: {},
+        params: {}, // what is this used for?
         commandKeys,
       }
 

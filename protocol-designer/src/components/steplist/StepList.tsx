@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   DIRECTION_COLUMN,
+  DIRECTION_ROW,
   Flex,
   Modal,
   PrimaryButton,
@@ -17,6 +18,7 @@ import {
 } from '../../steplist'
 import { actions as stepsActions, getIsMultiSelectMode } from '../../ui/steps'
 import { selectors as stepFormSelectors } from '../../step-forms'
+import { getEnableStepGrouping } from '../../feature-flags/selectors'
 import { StepCreationButton } from '../StepCreationButton'
 import { DraggableStepItems } from './DraggableStepItems'
 import { MultiSelectToolbar } from './MultiSelectToolbar'
@@ -29,7 +31,7 @@ import type { ThunkDispatch } from '../../types'
 import { getUnsavedGroup } from '../../step-forms/selectors'
 import {
   addStepToGroup,
-  clearGroup,
+  clearUnsavedGroup,
   createGroup,
 } from '../../step-forms/actions/groups'
 
@@ -41,20 +43,22 @@ export interface StepListProps {
 }
 
 export const StepList = (): JSX.Element => {
+  const enableStepGrouping = useSelector(getEnableStepGrouping)
   const orderedStepIds = useSelector(stepFormSelectors.getOrderedStepIds)
   const isMultiSelectMode = useSelector(getIsMultiSelectMode)
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const [group, setGroup] = React.useState<boolean>(false)
 
   const [groupName, setGroupName] = React.useState<string>('')
-  const stepIds = useSelector(getUnsavedGroup)
+  const unsavedStepIds = useSelector(getUnsavedGroup)
 
   const handleCreateGroup = (): void => {
-    if (groupName && stepIds.length > 0) {
+    if (groupName && unsavedStepIds.length > 0) {
       dispatch(createGroup({ groupName }))
-      dispatch(addStepToGroup({ groupName, stepIds }))
-      dispatch(clearGroup())
+      dispatch(addStepToGroup({ groupName, stepIds: unsavedStepIds }))
+      dispatch(clearUnsavedGroup())
       setGroupName('')
+      setGroup(false)
     }
   }
 
@@ -89,13 +93,6 @@ export const StepList = (): JSX.Element => {
   return group ? (
     <Modal>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-        <PrimaryButton
-          onClick={() => {
-            setGroup(false)
-          }}
-        >
-          close
-        </PrimaryButton>
         <input
           type="text"
           value={groupName}
@@ -104,20 +101,32 @@ export const StepList = (): JSX.Element => {
           }}
           placeholder="Enter group name"
         />
-        <SecondaryButton onClick={handleCreateGroup}>
-          create group
-        </SecondaryButton>
+        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing16}>
+          <PrimaryButton
+            onClick={() => {
+              setGroup(false)
+            }}
+          >
+            Close
+          </PrimaryButton>
+          <SecondaryButton onClick={handleCreateGroup}>
+            Create group
+          </SecondaryButton>
+        </Flex>
       </Flex>
     </Modal>
   ) : (
     <SidePanel title="Protocol Timeline">
-      <PrimaryButton
-        onClick={() => {
-          setGroup(true)
-        }}
-      >
-        make group
-      </PrimaryButton>
+      {enableStepGrouping ? (
+        <PrimaryButton
+          disabled={unsavedStepIds.length === 0}
+          onClick={() => {
+            setGroup(true)
+          }}
+        >
+          Make group
+        </PrimaryButton>
+      ) : null}
       <MultiSelectToolbar isMultiSelectMode={Boolean(isMultiSelectMode)} />
 
       <StartingDeckStateTerminalItem />

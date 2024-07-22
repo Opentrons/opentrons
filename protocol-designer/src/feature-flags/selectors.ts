@@ -45,3 +45,7 @@ export const getEnableReturnTip: Selector<boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ENABLE_RETURN_TIP ?? false
 )
+export const getEnableStepGrouping: Selector<boolean> = createSelector(
+  getFeatureFlagData,
+  flags => flags.OT_PD_ENABLE_STEP_GROUPING ?? false
+)
