@@ -37,9 +37,11 @@ from .report import build_ls_report, store_config, store_serial_numbers
 from .post_process import process_csv_directory, process_google_sheet
 
 from hardware_testing.protocols.liquid_sense_lpc import (
-    liquid_sense_ot3_p50_single_vial,
-    liquid_sense_ot3_p1000_96_well,
-    liquid_sense_ot3_p50_multi,
+    liquid_sense_ot3_p50_single_96well,
+    liquid_sense_ot3_p1000_96_1well,
+    liquid_sense_ot3_p1000_single_96well,
+    liquid_sense_ot3_p50_multi_12well,
+    liquid_sense_ot3_p1000_multi_12well,
 )
 
 try:
@@ -71,13 +73,13 @@ MAX_PROBE_SECONDS = 3.5
 
 LIQUID_SENSE_CFG: Dict[int, Dict[int, Any]] = {
     50: {
-        1: liquid_sense_ot3_p50_single_vial,
-        8: liquid_sense_ot3_p50_multi,
+        1: liquid_sense_ot3_p50_single_96well,
+        8: liquid_sense_ot3_p50_multi_12well,
     },
     1000: {
-        1: liquid_sense_ot3_p1000_96_well,
-        8: None,
-        96: None,
+        1: liquid_sense_ot3_p1000_single_96well,
+        8: liquid_sense_ot3_p1000_multi_12well,
+        96: liquid_sense_ot3_p1000_96_1well,
     },
 }
 
