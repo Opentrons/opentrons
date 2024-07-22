@@ -2,7 +2,7 @@ import os.path
 import subprocess
 
 from bs4 import BeautifulSoup
-from markdownify import markdownify # type: ignore
+from markdownify import markdownify  # type: ignore
 
 # Define the command to run Sphinx
 command = "pipenv run sphinx-build -b singlehtml api/docs/v2 opentrons-ai-server/api/utils/build/docs/html/v2"
