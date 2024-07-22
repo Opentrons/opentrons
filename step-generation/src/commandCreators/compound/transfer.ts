@@ -432,7 +432,6 @@ export const transfer: CommandCreator<TransferArgs> = (
                     yOffset: 0,
                     tipRack: args.tipRack,
                     nozzles: args.nozzles,
-                    test: 'THIS IS A DISPENSE TEST',
                   }),
                   ...(dispenseDelay != null
                     ? [
@@ -477,7 +476,6 @@ export const transfer: CommandCreator<TransferArgs> = (
               xOffset: aspirateXOffset,
               yOffset: aspirateYOffset,
               nozzles: args.nozzles,
-              test: 'THIS IS AN ASPIRATE TEST',
             }),
           ]
           const dispenseCommand = [

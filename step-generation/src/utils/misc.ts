@@ -481,10 +481,10 @@ interface DispenseLocationHelperArgs {
   flowRate: number
   xOffset: number
   yOffset: number
-  offsetFromBottomMm?: number
-  well?: string
   nozzles: NozzleConfigurationStyle | null
   tipRack: string
+  offsetFromBottomMm?: number
+  well?: string
 }
 export const dispenseLocationHelper: CommandCreator<DispenseLocationHelperArgs> = (
   args,
@@ -619,10 +619,10 @@ interface AirGapArgs {
   tipRack: string
   pipetteId: string
   volume: number
+  nozzles: NozzleConfigurationStyle | null
   blowOutLocation?: string | null
   sourceId?: string
   sourceWell?: string
-  nozzles: NozzleConfigurationStyle | null
 }
 export const airGapHelper: CommandCreator<AirGapArgs> = (
   args,

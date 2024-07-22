@@ -78,7 +78,7 @@ const getPipetteBoundsAtSpecifiedMoveToPosition = (
   pipetteEntity: PipetteEntity,
   tipLength: number,
   wellTargetPoint: Point,
-  primaryNozzle: string = 'A12'
+  primaryNozzle: string = 'A12' // hardcoding A12 becasue only column pick up supported currently
 ): Point[] => {
   const {
     nozzleMap,
@@ -150,7 +150,7 @@ const getHighestZInSlot = (
   const { modules, labware } = robotState
   const { moduleEntities, labwareEntities } = invariantContext
 
-  let totalHeight = 0
+  let totalHeight: number = 0
   const moduleInSlot = Object.keys(modules).find(
     moduleId => modules[moduleId].slot === slotId
   )
@@ -167,7 +167,7 @@ const getHighestZInSlot = (
         labwareEntities[moduleDirectChildId].def.dimensions.zDimension
       totalHeight += moduleChildHeight
 
-      // check if adapter and has child
+      // check if adapter is on module and has child
       const moduleGrandchildId = Object.keys(labware).find(
         lwId => labware[lwId].slot === moduleDirectChildId
       )

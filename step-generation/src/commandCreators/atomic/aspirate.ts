@@ -27,7 +27,6 @@ export interface ExtendedAspirateParams extends AspirateParams {
   yOffset: number
   tipRack: string
   nozzles: NozzleConfigurationStyle | null
-  test?: string
 }
 /** Aspirate with given args. Requires tip. */
 export const aspirate: CommandCreator<ExtendedAspirateParams> = (
