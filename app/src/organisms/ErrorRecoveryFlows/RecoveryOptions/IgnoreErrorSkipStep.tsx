@@ -1,12 +1,14 @@
 import * as React from 'react'
 import head from 'lodash/head'
+import {css} from 'styled-components'
 import { useTranslation } from 'react-i18next'
 
 import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  LegacyStyledText,
+  StyledText, 
+  RESPONSIVENESS
 } from '@opentrons/components'
 
 import { ODD_SECTION_TITLE_STYLE, RECOVERY_MAP, ODD_ONLY, DESKTOP_ONLY } from '../constants'
@@ -82,16 +84,37 @@ export function IgnoreErrorStepHome({
   }
 
   return (
-    <RecoverySingleColumnContentWrapper>
-      <LegacyStyledText css={ODD_SECTION_TITLE_STYLE} as="h4SemiBold">
+    <RecoverySingleColumnContentWrapper css={DESKTOP_ONLY_GRID_GAP}>
+      <StyledText css={ODD_SECTION_TITLE_STYLE} oddStyle="level4HeaderSemiBold" desktopStyle='headingSmallSemiBold'>
         {t('ignore_similar_errors_later_in_run')}
-      </LegacyStyledText>
-      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+      </StyledText>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4} css={ODD_ONLY}>
         <IgnoreOptions
           ignoreOptions={IGNORE_OPTIONS_IN_ORDER}
           setSelectedOption={setSelectedOption}
           selectedOption={selectedOption}
         />
+      </Flex>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4} css={DESKTOP_ONLY}>
+      <RecoveryRadioGroup
+        value={selectedOption}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+          setSelectedOption(e.currentTarget.value as IgnoreOption)
+        }}
+        options={IGNORE_OPTIONS_IN_ORDER.map((option) => {
+          return {
+            value: t(option),
+            children: (
+              <StyledText
+              css={RADIO_GROUP_MARGIN}
+                desktopStyle="bodyDefaultRegular"
+              >
+                {t(option)}
+              </StyledText>
+            ),
+          }
+        })}
+      />
       </Flex>
       <RecoveryFooterButtons
         primaryBtnOnClick={primaryOnClick}
@@ -118,9 +141,8 @@ export function IgnoreOptions({
   return ignoreOptions.map(ignoreOption => {
     const copyText = t(ignoreOption)
 
-    return (
-      <Felx>
-      <RadioButton css={ODD_ONLY}
+    return (     
+      <RadioButton
         key={`ignore_option_${ignoreOption}`}
         buttonLabel={copyText}
         buttonValue={copyText}
@@ -129,37 +151,6 @@ export function IgnoreOptions({
         }}
         isSelected={ignoreOption === selectedOption}
       />
- <RecoveryRadioGroup css={DESKTOP_ONLY}
-      value={selected}
-      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-        setSelected(e.currentTarget.value as RemovalOptions)
-      }}
-      options={[
-        {
-          value: t('begin_removal'),
-          children: (
-            <StyledText
-              desktopStyle="bodyDefaultRegular"
-              css={RADIO_GROUP_MARGIN}
-            >
-              {t('begin_removal')}
-            </StyledText>
-          ),
-        },
-        {
-          value: t('skip'),
-          children: (
-            <StyledText
-              desktopStyle="bodyDefaultRegular"
-              css={RADIO_GROUP_MARGIN}
-            >
-              {t('skip')}
-            </StyledText>
-          ),
-        },
-      ]}
-    />
-    </Felx>
     )
   })
 }
@@ -170,3 +161,15 @@ const IGNORE_OPTIONS_IN_ORDER: IgnoreOption[] = [
   'ignore_only_this_error',
   'ignore_all_errors_of_this_type',
 ]
+
+const RADIO_GROUP_MARGIN = css`
+@media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+  margin-left: 0.5rem;
+}
+`
+
+const DESKTOP_ONLY_GRID_GAP = css`
+@media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+  gap: 0rem;
+}
+`
