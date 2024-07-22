@@ -9,7 +9,9 @@ from opentrons.protocol_reader import FileHasher, FileReaderWriter
 
 from robot_server.service.json_api import (
     SimpleBody,
+    SimpleMultiBody,
     PydanticResponse,
+    MultiBodyMeta,
 )
 from robot_server.errors.error_responses import ErrorDetails, ErrorBody
 from .dependencies import get_data_files_directory, get_data_files_store
@@ -217,4 +219,37 @@ async def get_data_file(
     return Response(
         content=buffered_file.contents.decode("utf-8"),
         media_type="text/plain",
+    )
+
+
+@PydanticResponse.wrap_route(
+    datafiles_router.get,
+    path="/dataFiles",
+    summary="Get a list of all data file info",
+    responses={status.HTTP_200_OK: {"model": SimpleMultiBody[str]}},
+)
+async def get_all_data_files(
+    data_files_store: DataFilesStore = Depends(get_data_files_store),
+) -> PydanticResponse[SimpleMultiBody[DataFile]]:
+    """Get a list of all data files stored on the robot server.
+
+    Args:
+        data_files_store: In-memory database of data file resources.
+    """
+    data_files = data_files_store.sql_get_all_from_engine()
+
+    meta = MultiBodyMeta(cursor=0, totalLength=len(data_files))
+
+    return await PydanticResponse.create(
+        content=SimpleMultiBody.construct(
+            data=[
+                DataFile.construct(
+                    id=data_file_info.id,
+                    name=data_file_info.name,
+                    createdAt=data_file_info.created_at,
+                )
+                for data_file_info in data_files
+            ],
+            meta=meta,
+        ),
     )

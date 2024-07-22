@@ -35,7 +35,7 @@ class DataFilesStore:
 
     def get_file_info_by_hash(self, file_hash: str) -> Optional[DataFileInfo]:
         """Get the ID of data file having the provided hash."""
-        for file in self._sql_get_all_from_engine():
+        for file in self.sql_get_all_from_engine():
             if file.file_hash == file_hash:
                 return file
         return None
@@ -65,7 +65,8 @@ class DataFilesStore:
 
         return _convert_row_data_file_info(data_file_row)
 
-    def _sql_get_all_from_engine(self) -> List[DataFileInfo]:
+    def sql_get_all_from_engine(self) -> List[DataFileInfo]:
+        """Get all data file info from the database."""
         statement = sqlalchemy.select(data_files_table).order_by(sqlite_rowid)
         with self._sql_engine.begin() as transaction:
             all_rows = transaction.execute(statement).all()
