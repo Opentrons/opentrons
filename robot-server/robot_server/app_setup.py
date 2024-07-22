@@ -10,13 +10,9 @@ from opentrons import __version__
 
 from .errors.exception_handlers import exception_handlers
 from .hardware import (
-    fbl_init,
-    fbl_mark_hardware_init_complete,
-    fbl_mark_persistence_init_complete,
+    FrontButtonLightBlinker,
     start_initializing_hardware,
     clean_up_hardware,
-    fbl_start_blinking,
-    fbl_clean_up,
 )
 from .persistence.fastapi_dependencies import (
     start_initializing_persistence,
@@ -58,8 +54,8 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
         await exit_stack.enter_async_context(set_up_task_runner(app.state))
 
-        fbl_init(app_state=app.state)
-        exit_stack.push_async_callback(fbl_clean_up, app.state)
+        blinker = FrontButtonLightBlinker()
+        exit_stack.push_async_callback(blinker.clean_up)
 
         start_initializing_hardware(
             app_state=app.state,
@@ -68,8 +64,11 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
                 (start_light_control_task, True),
                 (mark_light_control_startup_finished, False),
                 # OT-2 light control:
-                (fbl_start_blinking, True),
-                (fbl_mark_hardware_init_complete, False),
+                (lambda _app_state, hw_api: blinker.start_blinking(hw_api), True),
+                (
+                    lambda _app_state, _hw_api: blinker.mark_hardware_init_complete(),
+                    False,
+                ),
             ],
         )
         exit_stack.push_async_callback(clean_up_hardware, app.state)
@@ -81,7 +80,7 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
                 # For OT-2 light control only. The Flex status bar isn't handled here
                 # because it's currently tied to hardware and run status, not to
                 # initialization of the persistence layer.
-                fbl_mark_persistence_init_complete
+                blinker.mark_persistence_init_complete
             ],
         )
         exit_stack.push_async_callback(clean_up_persistence, app.state)
