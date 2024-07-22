@@ -263,9 +263,9 @@ class InstrumentContext(publisher.CommandPublisher):
 
         if (
             self.api_version >= APIVersion(2, 20)
-            and self._96_tip_config_valid()
             and well is not None
             and self.liquid_presence_detection
+            and self._96_tip_config_valid()
         ):
             self.require_liquid_presence(well=well)
             self.prepare_to_aspirate()
