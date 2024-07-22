@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { css } from 'styled-components'
 import {
   ALIGN_CENTER,
@@ -76,12 +76,12 @@ interface CardButtonProps {
 
 export function CardButton(props: CardButtonProps): JSX.Element {
   const { title, iconName, description, destinationPath, disabled } = props
-  const history = useHistory()
+  const navigate = useNavigate()
 
   return (
     <Btn
       onClick={() => {
-        history.push(destinationPath)
+        navigate(destinationPath)
       }}
       width="100%"
       css={CARD_BUTTON_STYLE}

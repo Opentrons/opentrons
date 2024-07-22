@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, beforeEach, vi, expect } from 'vitest'
-import { StaticRouter } from 'react-router-dom'
+import { MemoryRouter } from 'react-router-dom'
 
 import { opentrons96PcrAdapterV1 } from '@opentrons/shared-data'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
@@ -68,9 +68,9 @@ const mockNickName = 'nickName'
 
 const render = (props: React.ComponentProps<typeof LabwareListItem>) => {
   return renderWithProviders(
-    <StaticRouter>
+    <MemoryRouter>
       <LabwareListItem {...props} />
-    </StaticRouter>,
+    </MemoryRouter>,
     {
       i18nInstance: i18n,
     }

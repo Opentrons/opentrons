@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import {
   ALIGN_START,
@@ -126,11 +126,11 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const [showCalModal, setShowCalModal] = React.useState(false)
 
   const [targetProps, tooltipProps] = useHoverTooltip()
-  const history = useHistory()
+  const navigate = useNavigate()
   const runStatus = useCurrentRunStatus({
     onSettled: data => {
       if (data == null) {
-        history.push('/upload')
+        navigate('/upload')
       }
     },
   })

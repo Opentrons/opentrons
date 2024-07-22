@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import {
   BORDERS,
   COLORS,
@@ -35,7 +35,7 @@ interface InstrumentInfoProps {
 export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
   const { t, i18n } = useTranslation('instruments_dashboard')
   const { instrument } = props
-  const history = useHistory()
+  const navigate = useNavigate()
   const [wizardProps, setWizardProps] = React.useState<
     | React.ComponentProps<typeof GripperWizardFlows>
     | React.ComponentProps<typeof PipetteWizardFlows>
@@ -66,7 +66,7 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
               ...sharedGripperWizardProps,
               flowType: GRIPPER_FLOW_TYPES.DETACH,
               onComplete: () => {
-                history.goBack()
+                navigate(-1)
               },
             }
           : {
@@ -74,7 +74,7 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
                 setWizardProps(null)
               },
               onComplete: () => {
-                history.goBack()
+                navigate(-1)
               },
               mount: instrument.mount as PipetteMount,
               selectedPipette: is96Channel

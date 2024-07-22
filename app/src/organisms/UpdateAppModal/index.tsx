@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import styled, { css } from 'styled-components'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -96,7 +96,7 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
   } = updateState
   const releaseNotes = updateInfo?.releaseNotes
   const { t } = useTranslation(['app_settings', 'branded'])
-  const history = useHistory()
+  const navigate = useNavigate()
   const { removeActiveAppUpdateToast } = useRemoveActiveAppUpdateToast()
   const availableAppUpdateVersion = useSelector(getAvailableShellUpdate) ?? ''
 
@@ -104,7 +104,7 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
     setTimeout(() => dispatch(applyShellUpdate()), RESTART_APP_AFTER_TIME)
 
   const handleRemindMeLaterClick = (): void => {
-    history.push('/app-settings/general')
+    navigate('/app-settings/general')
     closeModal(true)
   }
 
