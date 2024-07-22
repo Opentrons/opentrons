@@ -61,10 +61,8 @@ const LabwareRow = styled.div`
   border-width: 1px;
   border-color: ${COLORS.grey30};
   border-radius: ${BORDERS.borderRadius4};
-  padding: ${(SPACING.spacing12,
-  SPACING.spacing16,
-  SPACING.spacing12,
-  SPACING.spacing24)};
+  padding: ${SPACING.spacing12} ${SPACING.spacing16} ${SPACING.spacing12}
+    ${SPACING.spacing24};
 `
 
 interface LabwareListItemProps extends LabwareSetupItem {
