@@ -82,6 +82,7 @@ export function BeginRemoval({
 
   const primaryOnClick = (): void => {
     if (selected === 'begin-removal') {
+      console.log('HITTING PROCEED')
       void proceedNextStep()
     } else {
       if (selectedRecoveryOption === RETRY_NEW_TIPS.ROUTE) {
@@ -155,7 +156,7 @@ export function BeginRemoval({
           }}
           options={[
             {
-              value: t('begin_removal'),
+              value: 'begin-removal',
               children: (
                 <StyledText
                   desktopStyle="bodyDefaultRegular"
@@ -166,7 +167,7 @@ export function BeginRemoval({
               ),
             },
             {
-              value: t('skip'),
+              value: 'skip',
               children: (
                 <StyledText
                   desktopStyle="bodyDefaultRegular"
