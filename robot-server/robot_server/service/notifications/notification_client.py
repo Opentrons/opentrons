@@ -154,7 +154,7 @@ class NotificationClient:
         if rc == 0:
             log.info("Successfully connected to MQTT broker.")
         else:
-            log.info(f"Failed to connect to MQTT broker with reason code: {rc}")
+            log.error(f"Failed to connect to MQTT broker with reason code: {rc}")
 
     def _on_disconnect(
         self,
@@ -174,7 +174,7 @@ class NotificationClient:
         if rc == 0:
             log.info("Successfully disconnected from MQTT broker.")
         else:
-            log.info(f"Failed to disconnect from MQTT broker with reason code: {rc}")
+            log.error(f"Failed to disconnect from MQTT broker with reason code: {rc}")
 
 
 _notification_client_accessor: AppStateAccessor[NotificationClient] = AppStateAccessor[
@@ -192,8 +192,11 @@ def initialize_notification_client(app_state: AppState) -> None:
 
     try:
         notification_client.connect()
-    except Exception as error:
-        log.info(f"Could not successfully connect to notification server: {error}")
+    except Exception:
+        log.warning(
+            "Could not successfully connect to MQTT broker. Is this a dev server?",
+            exc_info=True,
+        )
 
 
 async def clean_up_notification_client(app_state: AppState) -> None:
