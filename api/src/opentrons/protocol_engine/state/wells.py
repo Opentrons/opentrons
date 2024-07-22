@@ -61,9 +61,7 @@ class WellStore(HasState[WellState], HandlesActions):
     ) -> None:
         """Set the liquid height of the well."""
         lhi = LiquidHeightInfo(height=height, last_measured=time)
-        try:
-            self._state.measured_liquid_heights[labware_id]
-        except KeyError:
+        if labware_id not in self._state.measured_liquid_heights:
             self._state.measured_liquid_heights[labware_id] = {}
         self._state.measured_liquid_heights[labware_id][well_name] = lhi
 
@@ -83,25 +81,21 @@ class WellView(HasState[WellState]):
 
     def get_all(self) -> List[LiquidHeightSummary]:
         """Get all well liquid heights."""
-        allHeights = []  # type: List[LiquidHeightSummary]
-        # for key,  in self._state.measured_liquid_heights.items():
-        #     lhs = LiquidHeightSummary(labware_id=)
-        #     allHeights.extend(a for a in val.values())
-        # return allHeights
-        for labware in self._state.measured_liquid_heights.keys():
-            for well, lhi in self._state.measured_liquid_heights[labware].items():
+        all_heights: List[LiquidHeightSummary] = []
+        for labware, wells in self._state.measured_liquid_heights.items():
+            for well, lhi in wells.items():
                 lhs = LiquidHeightSummary(
                     labware_id=labware,
                     well_name=well,
                     height=lhi.height,
                     last_measured=lhi.last_measured,
                 )
-            allHeights.append(lhs)
-        return allHeights
+            all_heights.append(lhs)
+        return all_heights
 
     def get_all_in_labware(self, labware_id: str) -> List[LiquidHeightSummary]:
         """Get all well liquid heights for a particular labware."""
-        allHeights = []  # type: List[LiquidHeightSummary]
+        all_heights: List[LiquidHeightSummary] = []
         for well, lhi in self._state.measured_liquid_heights[labware_id].items():
             lhs = LiquidHeightSummary(
                 labware_id=labware_id,
@@ -109,8 +103,8 @@ class WellView(HasState[WellState]):
                 height=lhi.height,
                 last_measured=lhi.last_measured,
             )
-            allHeights.append(lhs)
-        return allHeights
+            all_heights.append(lhs)
+        return all_heights
 
     def get_last_measured_liquid_height(
         self, labware_id: str, well_name: str
@@ -128,7 +122,8 @@ class WellView(HasState[WellState]):
     def has_measured_liquid_height(self, labware_id: str, well_name: str) -> bool:
         """Returns True if the well has been liquid level probed previously."""
         try:
-            self._state.measured_liquid_heights[labware_id][well_name].height
-            return True
+            return bool(
+                self._state.measured_liquid_heights[labware_id][well_name].height
+            )
         except KeyError:
             return False
