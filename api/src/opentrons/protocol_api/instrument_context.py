@@ -260,9 +260,13 @@ class InstrumentContext(publisher.CommandPublisher):
         else:
             c_vol = self._core.get_available_volume() if not volume else volume
         flow_rate = self._core.get_aspirate_flow_rate(rate)
-            
 
-        if self._should_do_lld(well, False):
+        if (
+            self._96_tip_config_valid()
+            and self.api_version >= APIVersion(2, 20)
+            and well is not None
+            and self.liquid_presence_detection
+        ):
             self.require_liquid_presence(well=well)
             self.prepare_to_aspirate()
 
@@ -1679,27 +1683,19 @@ class InstrumentContext(publisher.CommandPublisher):
     @tip_racks.setter
     def tip_racks(self, racks: List[labware.Labware]) -> None:
         self._tip_racks = racks
-        
-    def _should_do_lld(self, well: Optional[labware.Well], manualCommand: bool) -> bool:
+
+    def _96_tip_config_valid(self) -> bool:
         n_map = self._core.get_nozzle_map()
-        if self.channels() == 96:
-            if (n_map.back_left() != n_map.full_instrument_back_left()
-                and n_map.front_right() != n_map.full_instrument_front_right()):
-                raise TipNotAttachedError("Either the front right or the back left nozzle must have a tip attached to do LLD.")
-            
-        if (
-            manualCommand is False and 
-            self.api_version >= APIVersion(2, 20)
-            and well is not None
-            and self.liquid_presence_detection
-        ) or (
-            manualCommand and 
-            self.api_version >= APIVersion(2, 20)
-            and well is not None
-        ):
-            return True
-        return False
-        
+        if self.channels == 96:
+            if (
+                n_map.back_left != n_map.full_instrument_back_left
+                and n_map.front_right != n_map.full_instrument_front_right
+            ):
+                raise TipNotAttachedError(
+                    "Either the front right or the back left nozzle must have a tip attached to do LLD."
+                )
+        return True
+
     @property
     @requires_version(2, 20)
     def liquid_presence_detection(self) -> bool:
@@ -2128,8 +2124,8 @@ class InstrumentContext(publisher.CommandPublisher):
         :returns: A boolean.
         """
         loc = well.top()
-        if self._should_do_lld(well, True):
-            return self._core.detect_liquid_presence(well._core, loc)
+        self._96_tip_config_valid()
+        return self._core.detect_liquid_presence(well._core, loc)
 
     @requires_version(2, 20)
     def require_liquid_presence(self, well: labware.Well) -> None:
@@ -2138,8 +2134,8 @@ class InstrumentContext(publisher.CommandPublisher):
         :returns: None.
         """
         loc = well.top()
-        if self._should_do_lld(well, True):
-            self._core.liquid_probe_with_recovery(well._core, loc)
+        self._96_tip_config_valid()
+        return self._core.liquid_probe_with_recovery(well._core, loc)
 
     @requires_version(2, 20)
     def measure_liquid_height(self, well: labware.Well) -> float:
@@ -2151,7 +2147,8 @@ class InstrumentContext(publisher.CommandPublisher):
 
         This is intended for Opentrons internal use only and is not a guaranteed API.
         """
+
         loc = well.top()
-        if self._should_do_lld(well, True): 
-            height = self._core.liquid_probe_without_recovery(well._core, loc)
-            return height
+        self._96_tip_config_valid()
+        height = self._core.liquid_probe_without_recovery(well._core, loc)
+        return height
