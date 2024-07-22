@@ -262,8 +262,8 @@ class InstrumentContext(publisher.CommandPublisher):
         flow_rate = self._core.get_aspirate_flow_rate(rate)
 
         if (
-            self._96_tip_config_valid()
-            and self.api_version >= APIVersion(2, 20)
+            self.api_version >= APIVersion(2, 20)
+            and self._96_tip_config_valid()
             and well is not None
             and self.liquid_presence_detection
         ):
