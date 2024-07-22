@@ -48,6 +48,8 @@ from robot_server.service.json_api import (
     PydanticResponse,
     RequestModel,
 )
+from robot_server.data_files.models import DataFile
+
 from .analyses_manager import AnalysesManager, FailedToInitializeAnalyzer
 
 from .protocol_auto_deleter import ProtocolAutoDeleter
@@ -77,7 +79,6 @@ from .dependencies import (
     get_file_hasher,
     get_maximum_quick_transfer_protocols,
 )
-
 
 log = logging.getLogger(__name__)
 
@@ -869,3 +870,43 @@ async def get_protocol_analysis_as_document(
         ) from error
 
     return PlainTextResponse(content=analysis, media_type="application/json")
+
+
+@PydanticResponse.wrap_route(
+    protocols_router.get,
+    path="/protocols/{protocolId}/dataFiles",
+    summary="Get all the data files used with the specified protocol.",
+    description=(
+        "Returns a list of all data files used in analyses and runs associated with"
+        " the specified protocol."
+    ),
+    responses={
+        status.HTTP_200_OK: {"model": SimpleMultiBody[DataFile]},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorBody[ProtocolNotFound]},
+    },
+)
+async def get_protocol_data_files(
+    protocolId: str,
+    protocol_store: ProtocolStore = Depends(get_protocol_store),
+) -> PydanticResponse[SimpleMultiBody[DataFile]]:
+    """Get the list of all data files associated with a protocol.
+
+    The list includes all files used in analysis and runs stored on the robot
+    that are associated with the protocol.
+
+    Arguments:
+        protocolId: ID of the protocol whose files are to be fetched.
+        protocol_store: Database of protocol resources.
+    """
+    if not protocol_store.has(protocolId):
+        raise ProtocolNotFound(detail=f"Protocol {protocolId} not found").as_error(
+            status.HTTP_404_NOT_FOUND
+        )
+
+    data_files = await protocol_store.get_referenced_data_files(protocolId)
+
+    return await PydanticResponse.create(
+        content=SimpleMultiBody.construct(
+            data=data_files, meta=MultiBodyMeta(cursor=0, totalLength=len(data_files))
+        )
+    )

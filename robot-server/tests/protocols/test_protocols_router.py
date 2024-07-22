@@ -30,6 +30,7 @@ from opentrons.protocol_reader import (
     BufferedFile,
 )
 
+from robot_server.data_files.models import DataFile
 from robot_server.errors.error_responses import ApiError
 from robot_server.protocols.analyses_manager import AnalysesManager
 from robot_server.protocols.protocol_analyzer import ProtocolAnalyzer
@@ -74,6 +75,7 @@ from robot_server.protocols.router import (
     get_protocol_analyses,
     get_protocol_analysis_by_id,
     get_protocol_analysis_as_document,
+    get_protocol_data_files,
 )
 
 
@@ -2023,3 +2025,48 @@ async def test_create_protocol_maximum_quick_transfer_protocols_exceeded(
         )
 
         assert exc_info.value.status_code == 409
+
+
+async def test_get_data_files(
+    decoy: Decoy,
+    protocol_store: ProtocolStore,
+) -> None:
+    """It should get all the data files associated with the protocol."""
+    data_files = [
+        DataFile(
+            id="id1",
+            name="csv-file1.csv",
+            createdAt=datetime(year=2024, month=1, day=1),
+        ),
+        DataFile(
+            id="id2",
+            name="csv-file2.csv",
+            createdAt=datetime(year=2024, month=1, day=1),
+        ),
+    ]
+    decoy.when(protocol_store.has(protocol_id="protocol-id")).then_return(True)
+    decoy.when(
+        await protocol_store.get_referenced_data_files("protocol-id")
+    ).then_return(data_files)
+    result = await get_protocol_data_files(
+        protocolId="protocol-id",
+        protocol_store=protocol_store,
+    )
+    assert result.status_code == 200
+    assert result.content.data == data_files
+
+
+async def test_get_non_existent_protocol_data_files(
+    decoy: Decoy,
+    protocol_store: ProtocolStore,
+) -> None:
+    """It should 404 if a protocol does not exist."""
+    decoy.when(protocol_store.has("protocol-id")).then_return(False)
+
+    with pytest.raises(ApiError) as exc_info:
+        await get_protocol_data_files(
+            protocolId="protocol-id",
+            protocol_store=protocol_store,
+        )
+    assert exc_info.value.status_code == 404
+    assert exc_info.value.content["errors"][0]["id"] == "ProtocolNotFound"
