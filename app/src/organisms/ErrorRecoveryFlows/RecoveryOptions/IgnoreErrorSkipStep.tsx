@@ -9,11 +9,12 @@ import {
   LegacyStyledText,
 } from '@opentrons/components'
 
-import { ODD_SECTION_TITLE_STYLE, RECOVERY_MAP } from '../constants'
+import { ODD_SECTION_TITLE_STYLE, RECOVERY_MAP, ODD_ONLY, DESKTOP_ONLY } from '../constants'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 import {
   RecoveryFooterButtons,
   RecoverySingleColumnContentWrapper,
+  RecoveryRadioGroup,
 } from '../shared'
 import { RadioButton } from '../../../atoms/buttons'
 
@@ -118,7 +119,8 @@ export function IgnoreOptions({
     const copyText = t(ignoreOption)
 
     return (
-      <RadioButton
+      <Felx>
+      <RadioButton css={ODD_ONLY}
         key={`ignore_option_${ignoreOption}`}
         buttonLabel={copyText}
         buttonValue={copyText}
@@ -127,6 +129,37 @@ export function IgnoreOptions({
         }}
         isSelected={ignoreOption === selectedOption}
       />
+ <RecoveryRadioGroup css={DESKTOP_ONLY}
+      value={selected}
+      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+        setSelected(e.currentTarget.value as RemovalOptions)
+      }}
+      options={[
+        {
+          value: t('begin_removal'),
+          children: (
+            <StyledText
+              desktopStyle="bodyDefaultRegular"
+              css={RADIO_GROUP_MARGIN}
+            >
+              {t('begin_removal')}
+            </StyledText>
+          ),
+        },
+        {
+          value: t('skip'),
+          children: (
+            <StyledText
+              desktopStyle="bodyDefaultRegular"
+              css={RADIO_GROUP_MARGIN}
+            >
+              {t('skip')}
+            </StyledText>
+          ),
+        },
+      ]}
+    />
+    </Felx>
     )
   })
 }
