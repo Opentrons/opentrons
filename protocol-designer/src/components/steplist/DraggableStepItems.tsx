@@ -168,10 +168,11 @@ export const DraggableStepItems = (
                   border={BORDERS.lineBorder}
                   backgroundColor={COLORS.grey30}
                 >
-                  <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-                    <LegacyStyledText padding={SPACING.spacing8}>
-                      {item.groupName}
-                    </LegacyStyledText>
+                  <Flex
+                    justifyContent={JUSTIFY_SPACE_BETWEEN}
+                    padding={SPACING.spacing8}
+                  >
+                    <LegacyStyledText as='h2SemiBold'>{item.groupName}</LegacyStyledText>
                     <PrimaryButton
                       onClick={() => {
                         dispatch(removeGroup({ groupName: item.groupName }))

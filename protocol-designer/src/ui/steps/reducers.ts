@@ -70,7 +70,7 @@ const collapsedSteps: Reducer<CollapsedStepsState, any> = handleActions(
         (acc: CollapsedStepsState, stepId) => ({ ...acc, [stepId]: true }),
         {}
       ),
-},
+  },
   {}
 )
 export const SINGLE_STEP_SELECTION_TYPE: 'SINGLE_STEP_SELECTION_TYPE' =
