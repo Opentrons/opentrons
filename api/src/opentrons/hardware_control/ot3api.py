@@ -2670,7 +2670,6 @@ class OT3API(
             instrument.plunger_positions.bottom - instrument.plunger_positions.top
         )
 
-        max_speeds = self.config.motion_settings.default_max_speed
         # We need to significatly slow down the 96 channel liquid probe
         if self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
             max_plunger_speed = self.config.motion_settings.max_speed_discontinuity[
