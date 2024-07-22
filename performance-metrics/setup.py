@@ -53,7 +53,10 @@ CLASSIFIERS = [
 KEYWORDS = ["robots", "protocols", "synbio", "pcr", "automation", "lab"]
 DESCRIPTION = "Library for working with performance metrics on the Opentrons robots"
 PACKAGES = find_packages(where="src", exclude=["tests.*", "tests"])
-INSTALL_REQUIRES = []
+INSTALL_REQUIRES = [
+    "psutil==6.0.0; sys_platform=='linux'",
+    "systemd-python==234; sys_platform=='linux'"
+]
 
 
 def read(*parts):
