@@ -1,6 +1,14 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { SidePanel } from '@opentrons/components'
+import {
+  DIRECTION_COLUMN,
+  Flex,
+  Modal,
+  PrimaryButton,
+  SPACING,
+  SecondaryButton,
+  SidePanel,
+} from '@opentrons/components'
 
 import { END_TERMINAL_TITLE } from '../../constants'
 import {
@@ -18,6 +26,12 @@ import { TerminalItem } from './TerminalItem'
 
 import type { StepIdType } from '../../form-types'
 import type { ThunkDispatch } from '../../types'
+import { getUnsavedGroup } from '../../step-forms/selectors'
+import {
+  addStepToGroup,
+  clearGroup,
+  createGroup,
+} from '../../step-forms/actions/groups'
 
 export interface StepListProps {
   isMultiSelectMode?: boolean | null
@@ -30,6 +44,19 @@ export const StepList = (): JSX.Element => {
   const orderedStepIds = useSelector(stepFormSelectors.getOrderedStepIds)
   const isMultiSelectMode = useSelector(getIsMultiSelectMode)
   const dispatch = useDispatch<ThunkDispatch<any>>()
+  const [group, setGroup] = React.useState<boolean>(false)
+
+  const [groupName, setGroupName] = React.useState<string>('')
+  const stepIds = useSelector(getUnsavedGroup)
+
+  const handleCreateGroup = (): void => {
+    if (groupName && stepIds.length > 0) {
+      dispatch(createGroup({ groupName }))
+      dispatch(addStepToGroup({ groupName, stepIds }))
+      dispatch(clearGroup())
+      setGroupName('')
+    }
+  }
 
   const handleKeyDown: (e: KeyboardEvent) => void = e => {
     const key = e.key
@@ -59,8 +86,38 @@ export const StepList = (): JSX.Element => {
     }
   }, [])
 
-  return (
+  return group ? (
+    <Modal>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+        <PrimaryButton
+          onClick={() => {
+            setGroup(false)
+          }}
+        >
+          close
+        </PrimaryButton>
+        <input
+          type="text"
+          value={groupName}
+          onChange={e => {
+            setGroupName(e.target.value)
+          }}
+          placeholder="Enter group name"
+        />
+        <SecondaryButton onClick={handleCreateGroup}>
+          create group
+        </SecondaryButton>
+      </Flex>
+    </Modal>
+  ) : (
     <SidePanel title="Protocol Timeline">
+      <PrimaryButton
+        onClick={() => {
+          setGroup(true)
+        }}
+      >
+        make group
+      </PrimaryButton>
       <MultiSelectToolbar isMultiSelectMode={Boolean(isMultiSelectMode)} />
 
       <StartingDeckStateTerminalItem />

@@ -49,7 +49,7 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
   const annotations = analysis.commandAnnotations ?? [
     {
       annotationType: 'secondOrderCommand',
-      machineReadableName: 'pips and mods',
+      machineReadableName: 'pipettes and module load commands',
       params: {},
       commandKeys: [
         'a1b95079-5b17-428d-b40c-a8236a9890c5',
@@ -158,7 +158,12 @@ function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
   const [isExpanded, setIsExpanded] = React.useState(false)
   const backgroundColor = isHighlighted ? COLORS.blue30 : COLORS.grey20
   return (
-    <Flex onClick={() => setIsExpanded(!isExpanded)} cursor="pointer">
+    <Flex
+      onClick={() => {
+        setIsExpanded(!isExpanded)
+      }}
+      cursor="pointer"
+    >
       {isExpanded ? (
         <Flex flexDirection={DIRECTION_COLUMN}>
           <Flex

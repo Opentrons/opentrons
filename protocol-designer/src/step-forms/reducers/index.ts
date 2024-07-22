@@ -1674,6 +1674,54 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
   },
   initialAdditionalEquipmentState
 )
+export const ADD_STEPS_TO_GROUP = 'ADD_STEPS_TO_GROUP'
+export const CREATE_GROUP = 'CREATE_GROUP'
+export type StepGroupsState = Record<string, StepIdType[]>
+const initialStepGroupState = {}
+const stepGroups: Reducer<StepGroupsState, any> = handleActions<
+  StepGroupsState,
+  any
+>(
+  {
+    CREATE_GROUP: (state, action) => {
+      return {
+        ...state,
+        [action.payload.groupName]: [],
+      }
+    },
+    ADD_STEPS_TO_GROUP: (state, action) => {
+      return {
+        ...state,
+        [action.payload.groupName]: [
+          ...state[action.payload.groupName],
+          ...action.payload.stepIds,
+        ],
+      }
+    },
+  },
+  initialStepGroupState
+)
+export type UnsavedGroupState = StepIdType[]
+export const SELECT_STEP_FOR_GROUP = 'SELECT_STEP_FOR_GROUP'
+export const CLEAR_GROUP = 'CLEAR_GROUP'
+const initialUnsavedGroupState: StepIdType[] = []
+const unsavedGroup: Reducer<UnsavedGroupState, any> = handleActions<
+  UnsavedGroupState,
+  any
+>(
+  {
+    SELECT_STEP_FOR_GROUP: (state, action) => {
+      if (action.type === SELECT_STEP_FOR_GROUP) {
+        return [...state, action.payload.stepId]
+      }
+      return state
+    },
+    CLEAR_GROUP: () => {
+      return []
+    },
+  },
+  initialUnsavedGroupState
+)
 
 export type OrderedStepIdsState = StepIdType[]
 const initialOrderedStepIdsState: string[] = []
@@ -1790,6 +1838,8 @@ export const presavedStepForm = (
   }
 }
 export interface RootState {
+  unsavedGroup: UnsavedGroupState
+  stepGroups: StepGroupsState
   orderedStepIds: OrderedStepIdsState
   labwareDefs: LabwareDefsRootState
   labwareInvariantProperties: NormalizedLabwareById
@@ -1806,6 +1856,8 @@ export interface RootState {
 // TODO: Ian 2018-12-13 remove this 'action: any' type
 export const rootReducer: Reducer<RootState, any> = nestedCombineReducers(
   ({ action, state, prevStateFallback }) => ({
+    unsavedGroup: unsavedGroup(prevStateFallback.unsavedGroup, action),
+    stepGroups: stepGroups(prevStateFallback.stepGroups, action),
     orderedStepIds: orderedStepIds(prevStateFallback.orderedStepIds, action),
     labwareInvariantProperties: labwareInvariantProperties(
       prevStateFallback.labwareInvariantProperties,

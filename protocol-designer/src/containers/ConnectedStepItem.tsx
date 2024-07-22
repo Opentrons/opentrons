@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import uniq from 'lodash/uniq'
 import UAParser from 'ua-parser-js'
-import { useConditionalConfirm } from '@opentrons/components'
+import { Box, Btn, Icon, useConditionalConfirm } from '@opentrons/components'
 
 import { selectors as uiLabwareSelectors } from '../ui/labware'
 import * as timelineWarningSelectors from '../top-selectors/timelineWarnings'
@@ -30,7 +30,9 @@ import {
 import {
   getAdditionalEquipmentEntities,
   getInitialDeckSetup,
+  getUnsavedGroup,
 } from '../step-forms/selectors'
+import { selectStepForGroup } from '../step-forms/actions/groups'
 
 import type { ThunkDispatch } from 'redux-thunk'
 import type {
@@ -73,7 +75,7 @@ export const ConnectedStepItem = (
   props: ConnectedStepItemProps
 ): JSX.Element => {
   const { stepId, stepNumber } = props
-
+  const unsavedGroup = useSelector(getUnsavedGroup)
   const step = useSelector(stepFormSelectors.getSavedStepForms)[stepId]
   const argsAndErrors = useSelector(stepFormSelectors.getArgsAndErrorsByStepId)[
     stepId
@@ -139,6 +141,10 @@ export const ConnectedStepItem = (
     dispatch(stepsActions.hoverOnStep(stepId))
   const unhighlightStep = (): HoverOnStepAction =>
     dispatch(stepsActions.hoverOnStep(null))
+
+  const addStep = (stepId: string): void => {
+    dispatch(selectStepForGroup({ stepId }))
+  }
 
   const handleStepItemSelection = (event: React.MouseEvent): void => {
     const { isShiftKeyPressed, isMetaKeyPressed } = getMouseClickKeyInfo(event)
@@ -230,7 +236,8 @@ export const ConnectedStepItem = (
     highlightSubstep,
     hoveredSubstep,
   }
-
+  const name = unsavedGroup.includes(stepId) ? 'ot-checkbox' : 'minus-box'
+  console.log('unsavedGroup', unsavedGroup)
   const getModalType = (): DeleteModalType => {
     if (isMultiSelectMode) {
       return CLOSE_BATCH_EDIT_FORM
@@ -249,9 +256,21 @@ export const ConnectedStepItem = (
           onCancelClick={cancel}
         />
       )}
-      <StepItem {...stepItemProps} onStepContextMenu={props.onStepContextMenu}>
-        <StepItemContents {...stepItemContentsProps} />
-      </StepItem>
+      <Box>
+        <Btn
+          onClick={() => {
+            addStep(stepId)
+          }}
+        >
+          <Icon name={name} width="2rem" height="2rem" />
+        </Btn>
+        <StepItem
+          {...stepItemProps}
+          onStepContextMenu={props.onStepContextMenu}
+        >
+          <StepItemContents {...stepItemContentsProps} />
+        </StepItem>
+      </Box>
     </>
   )
 }
