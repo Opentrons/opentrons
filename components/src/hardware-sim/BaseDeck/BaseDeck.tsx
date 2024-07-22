@@ -19,11 +19,15 @@ import {
   STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
 } from '@opentrons/shared-data'
 
+import { Flex } from '../../primitives'
+import { Tooltip, TOOLTIP_LEFT, useHoverTooltip } from '../../tooltips'
+import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordinateSpace } from '../RobotCoordinateSpace'
 import { Module } from '../Module'
 import { LabwareRender } from '../Labware'
 import { FlexTrash } from '../Deck/FlexTrash'
 import { DeckFromLayers } from '../Deck/DeckFromLayers'
+import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import { SlotLabels } from '../Deck'
 import { COLORS } from '../../helix-design-system'
 
@@ -36,6 +40,7 @@ import type { Svg } from '../../primitives'
 import type {
   CutoutFixtureId,
   DeckConfiguration,
+  DeckDefinition,
   LabwareDefinition2,
   LabwareLocation,
   ModuleLocation,
@@ -273,49 +278,88 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
             ) : null
           }
         )}
-        {labwareOnDeck.map(
-          ({
-            labwareLocation,
-            definition,
-            labwareChildren,
-            wellFill,
-            missingTips,
-            onLabwareClick,
-          }) => {
-            if (
-              labwareLocation === 'offDeck' ||
-              !('slotName' in labwareLocation) ||
-              // for legacy protocols that list fixed trash as a labware, do not render
-              definition.parameters.loadName ===
-                'opentrons_1_trash_3200ml_fixed'
-            ) {
-              return null
-            }
-
-            const slotPosition = getPositionFromSlotId(
-              labwareLocation.slotName,
-              deckDef
-            )
-
-            return slotPosition != null ? (
-              <g
-                key={labwareLocation.slotName}
-                transform={`translate(${slotPosition[0].toString()},${slotPosition[1].toString()})`}
-                cursor={onLabwareClick != null ? 'pointer' : ''}
-              >
-                <LabwareRender
-                  definition={definition}
-                  onLabwareClick={onLabwareClick}
-                  wellFill={wellFill ?? undefined}
-                  missingTips={missingTips}
-                />
-                {labwareChildren}
-              </g>
-            ) : null
-          }
-        )}
+        {labwareOnDeck.map((labware, i) => (
+          <LabwareItem key={i} {...labware} deckDef={deckDef} />
+        ))}
       </>
       {children}
     </RobotCoordinateSpace>
   )
+}
+
+function LabwareItem({
+  labwareLocation,
+  definition,
+  labwareChildren,
+  wellFill,
+  missingTips,
+  onLabwareClick,
+  deckDef,
+  topLabwareDisplayName,
+}: LabwareOnDeck & {
+  deckDef: DeckDefinition
+  topLabwareDisplayName?: string
+}): JSX.Element | null {
+  const [targetProps, tooltipProps] = useHoverTooltip({
+    placement: TOOLTIP_LEFT,
+  })
+
+  if (
+    labwareLocation === 'offDeck' ||
+    !('slotName' in labwareLocation) ||
+    // for legacy protocols that list fixed trash as a labware, do not render
+    definition.parameters.loadName === 'opentrons_1_trash_3200ml_fixed'
+  ) {
+    return null
+  }
+
+  const slotPosition = getPositionFromSlotId(labwareLocation.slotName, deckDef)
+
+  return slotPosition != null ? (
+    <>
+      <g
+        key={labwareLocation.slotName}
+        transform={`translate(${slotPosition[0].toString()},${slotPosition[1].toString()})`}
+        cursor={onLabwareClick != null ? 'pointer' : ''}
+      >
+        <LabwareRender
+          definition={definition}
+          onLabwareClick={onLabwareClick}
+          wellFill={wellFill ?? undefined}
+          missingTips={missingTips}
+        />
+        {labwareChildren}
+      </g>
+      <RobotCoordsForeignObject
+        height={definition.dimensions.yDimension}
+        width={definition.dimensions.xDimension}
+        x={slotPosition[0]}
+        y={slotPosition[1]}
+      >
+        <Tooltip {...tooltipProps} position="relative">
+          <Flex
+            fontSize={TYPOGRAPHY.fontSizeCaption}
+            justifyContent="end"
+            width="8rem"
+            position="absolute"
+            x="0"
+            y="0"
+          >
+            <Flex backgroundColor={COLORS.black90} padding={SPACING.spacing4}>
+              {topLabwareDisplayName}
+            </Flex>
+          </Flex>
+        </Tooltip>
+      </RobotCoordsForeignObject>
+      <RobotCoordsForeignObject
+        height={definition.dimensions.yDimension}
+        width={definition.dimensions.xDimension}
+        x={slotPosition[0]}
+        y={slotPosition[1]}
+        foreignObjectProps={{
+          ...targetProps,
+        }}
+      ></RobotCoordsForeignObject>
+    </>
+  ) : null
 }
