@@ -271,7 +271,7 @@ export const ConnectedStepItem = (
               addStep(stepId)
             }}
           >
-            <Icon name={name} width="2rem" height="2rem" />
+            <Icon name={name} width="1rem" height="1rem" />
           </Btn>
         ) : null}
         <StepItem
