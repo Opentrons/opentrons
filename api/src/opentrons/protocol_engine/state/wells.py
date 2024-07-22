@@ -8,7 +8,7 @@ from opentrons.protocol_engine.actions.actions import (
 )
 from opentrons.protocol_engine.commands.liquid_probe import LiquidProbeResult
 from opentrons.protocol_engine.commands.pipetting_common import LiquidNotFoundError
-from opentrons.protocol_engine.types import LiquidHeightInfo
+from opentrons.protocol_engine.types import LiquidHeightInfo, LiquidHeightSummary
 
 from .abstract_store import HasState, HandlesActions
 from ..actions import Action
@@ -19,7 +19,6 @@ from ..commands import Command
 class WellState:
     """State of all wells."""
 
-    #                       Dict[Labware: Dict[Wellname: [Height,TimeRecorded]]]
     measured_liquid_heights: Dict[str, Dict[str, LiquidHeightInfo]]
 
 
@@ -82,16 +81,36 @@ class WellView(HasState[WellState]):
         """
         self._state = state
 
-    def get_all(self) -> List[LiquidHeightInfo]:
+    def get_all(self) -> List[LiquidHeightSummary]:
         """Get all well liquid heights."""
-        allHeights = []  # type: List[LiquidHeightInfo]
-        for val in self._state.measured_liquid_heights.values():
-            allHeights.extend(a for a in val.values())
+        allHeights = []  # type: List[LiquidHeightSummary]
+        # for key,  in self._state.measured_liquid_heights.items():
+        #     lhs = LiquidHeightSummary(labware_id=)
+        #     allHeights.extend(a for a in val.values())
+        # return allHeights
+        for labware in self._state.measured_liquid_heights.keys():
+            for well, lhi in self._state.measured_liquid_heights[labware].items():
+                lhs = LiquidHeightSummary(
+                    labware_id=labware,
+                    well_name=well,
+                    height=lhi.height,
+                    last_measured=lhi.last_measured,
+                )
+            allHeights.append(lhs)
         return allHeights
 
-    def get_all_in_labware(self, labware_id: str) -> List[LiquidHeightInfo]:
+    def get_all_in_labware(self, labware_id: str) -> List[LiquidHeightSummary]:
         """Get all well liquid heights for a particular labware."""
-        return list(self._state.measured_liquid_heights[labware_id].values())
+        allHeights = []  # type: List[LiquidHeightSummary]
+        for well, lhi in self._state.measured_liquid_heights[labware_id].items():
+            lhs = LiquidHeightSummary(
+                labware_id=labware_id,
+                well_name=well,
+                height=lhi.height,
+                last_measured=lhi.last_measured,
+            )
+            allHeights.append(lhs)
+        return allHeights
 
     def get_last_measured_liquid_height(
         self, labware_id: str, well_name: str
