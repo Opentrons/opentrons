@@ -188,7 +188,7 @@ Here is the start of a protocol that imports the ``SINGLE`` and ``ALL`` layout c
     :substitutions:
 
     from opentrons import protocol_api
-    from opentrons.protocol_api import ROW, ALL
+    from opentrons.protocol_api import SINGLE, ALL
 
     requirements = {"robotType": "Flex", "apiLevel": "|apiLevel|"}
 
@@ -203,7 +203,7 @@ Here is the start of a protocol that imports the ``SINGLE`` and ``ALL`` layout c
             mount="left"
         )
         pipette.configure_nozzle_layout(
-            style=ROW,
+            style=SINGLE,
             start="H12",
             tip_racks=[partial_rack]
         )
