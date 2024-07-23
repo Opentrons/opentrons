@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import uniq from 'lodash/uniq'
 import UAParser from 'ua-parser-js'
-import { Box, Btn, Icon, useConditionalConfirm } from '@opentrons/components'
+import { Box, useConditionalConfirm } from '@opentrons/components'
 
 import { selectors as uiLabwareSelectors } from '../ui/labware'
 import * as timelineWarningSelectors from '../top-selectors/timelineWarnings'
@@ -30,11 +30,7 @@ import {
 import {
   getAdditionalEquipmentEntities,
   getInitialDeckSetup,
-  getStepGroups,
-  getUnsavedGroup,
 } from '../step-forms/selectors'
-import { selectStepForUnsavedGroup } from '../step-forms/actions/groups'
-import { getEnableStepGrouping } from '../feature-flags/selectors'
 
 import type { ThunkDispatch } from 'redux-thunk'
 import type {
@@ -77,9 +73,6 @@ export const ConnectedStepItem = (
   props: ConnectedStepItemProps
 ): JSX.Element => {
   const { stepId, stepNumber } = props
-  const enableStepGrouping = useSelector(getEnableStepGrouping)
-  const unsavedGroup = useSelector(getUnsavedGroup)
-  const groups = useSelector(getStepGroups)
   const step = useSelector(stepFormSelectors.getSavedStepForms)[stepId]
   const argsAndErrors = useSelector(stepFormSelectors.getArgsAndErrorsByStepId)[
     stepId
@@ -146,10 +139,6 @@ export const ConnectedStepItem = (
   const unhighlightStep = (): HoverOnStepAction =>
     dispatch(stepsActions.hoverOnStep(null))
 
-  const addStep = (stepId: string): void => {
-    dispatch(selectStepForUnsavedGroup({ stepId }))
-  }
-
   const handleStepItemSelection = (event: React.MouseEvent): void => {
     const { isShiftKeyPressed, isMetaKeyPressed } = getMouseClickKeyInfo(event)
     let stepsToSelect: StepIdType[] = []
@@ -207,6 +196,7 @@ export const ConnectedStepItem = (
   )
 
   const stepItemProps: StepItemProps = {
+    stepId,
     description: step.stepDetails,
     rawForm: step,
     stepNumber,
@@ -240,7 +230,6 @@ export const ConnectedStepItem = (
     highlightSubstep,
     hoveredSubstep,
   }
-  const name = unsavedGroup.includes(stepId) ? 'ot-checkbox' : 'minus-box'
 
   const getModalType = (): DeleteModalType => {
     if (isMultiSelectMode) {
@@ -251,10 +240,6 @@ export const ConnectedStepItem = (
       return CLOSE_STEP_FORM_WITH_CHANGES
     }
   }
-
-  const isStepInGroup = Object.values(groups).find(groupStepId =>
-    groupStepId.includes(stepId)
-  )
   return (
     <>
       {showConfirmation && (
@@ -265,15 +250,6 @@ export const ConnectedStepItem = (
         />
       )}
       <Box>
-        {enableStepGrouping && !isStepInGroup ? (
-          <Btn
-            onClick={() => {
-              addStep(stepId)
-            }}
-          >
-            <Icon name={name} width="1rem" height="1rem" />
-          </Btn>
-        ) : null}
         <StepItem
           {...stepItemProps}
           onStepContextMenu={props.onStepContextMenu}

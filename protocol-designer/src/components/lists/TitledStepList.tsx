@@ -1,10 +1,16 @@
 import * as React from 'react'
 import cx from 'classnames'
-import { Icon } from '@opentrons/components'
-import styles from './styles.module.css'
+import { useDispatch, useSelector } from 'react-redux'
+import { Btn, COLORS, Flex, Icon, SPACING } from '@opentrons/components'
+import { getEnableStepGrouping } from '../../feature-flags/selectors'
+import { getStepGroups, getUnsavedGroup } from '../../step-forms/selectors'
+import { selectStepForUnsavedGroup } from '../../step-forms/actions/groups'
 import type { IconName } from '@opentrons/components'
 
-export interface Props {
+import styles from './styles.module.css'
+
+export interface TitleStepListProps {
+  stepId: string
   /** text of title */
   title: string
   /** icon left of the step */
@@ -41,7 +47,7 @@ export interface Props {
   isLastSelected?: boolean
 }
 
-export function TitledStepList(props: Props): JSX.Element {
+export function TitledStepList(props: TitleStepListProps): JSX.Element {
   const {
     iconName,
     'data-test': dataTest,
@@ -52,10 +58,26 @@ export function TitledStepList(props: Props): JSX.Element {
     onContextMenu,
     isMultiSelectMode,
     isLastSelected,
+    onClick,
+    stepId,
   } = props
   const collapsible = onCollapseToggle != null
+  const unsavedGroup = useSelector(getUnsavedGroup)
+  const enableStepGrouping = useSelector(getEnableStepGrouping)
+  const groups = useSelector(getStepGroups)
+  const dispatch = useDispatch()
 
-  const onClick = props.onClick
+  const addStep = (stepId: string): void => {
+    dispatch(selectStepForUnsavedGroup({ stepId }))
+  }
+
+  const isStepInGroup = Object.values(groups).find(groupStepId =>
+    groupStepId.includes(stepId)
+  )
+  const name = unsavedGroup.includes(stepId) ? 'ot-checkbox' : 'minus-box'
+  const groupIconColor = unsavedGroup.includes(stepId)
+    ? '#00c3e6' //  this matches legacy --c-highlight used in PD right now
+    : COLORS.grey60
 
   // clicking on the carat will not call props.onClick,
   // so prevent bubbling up if there is an onCollapseToggle fn
@@ -92,55 +114,73 @@ export function TitledStepList(props: Props): JSX.Element {
     : 'checkbox-blank-outline'
 
   return (
-    <div
-      className={className}
-      data-test={dataTest}
-      {...{ onMouseEnter, onMouseLeave, onContextMenu }}
-    >
-      <div onClick={onClick} className={titleBarClass}>
-        {isMultiSelectMode && (
-          <div
-            className={cx(styles.multiselect_wrapper, {
-              [styles.last_selected]: isLastSelected,
-            })}
-          >
-            <Icon
-              name={multiSelectIconName}
-              className={styles.icon_multiselect}
-            />
-          </div>
-        )}
-        {iconName && (
+    <Flex>
+      {enableStepGrouping && !isStepInGroup ? (
+        <Btn
+          onClick={() => {
+            addStep(stepId)
+          }}
+        >
           <Icon
-            {...iconProps}
-            data-testid={`TitledStepList_icon_${iconName}`}
-            className={iconClass}
-            name={iconName}
+            name={name}
+            height="1.4rem"
+            color={groupIconColor}
+            paddingRight={SPACING.spacing4}
           />
-        )}
-        <h3 className={styles.title}>{props.title}</h3>
-        {collapsible && (
-          <div
-            onClick={handleCollapseToggle}
-            className={styles.title_bar_carat}
-          >
+        </Btn>
+      ) : null}
+
+      <div
+        className={className}
+        data-test={dataTest}
+        {...{ onMouseEnter, onMouseLeave, onContextMenu }}
+      >
+        <div onClick={onClick} className={titleBarClass}>
+          {isMultiSelectMode && (
+            <div
+              className={cx(styles.multiselect_wrapper, {
+                [styles.last_selected]: isLastSelected,
+              })}
+            >
+              <Icon
+                name={multiSelectIconName}
+                className={styles.icon_multiselect}
+              />
+            </div>
+          )}
+          {iconName && (
             <Icon
-              className={styles.title_bar_icon}
-              name={
-                props.selected
-                  ? 'chevron-right'
-                  : props.collapsed
-                  ? 'chevron-down'
-                  : 'chevron-up'
-              }
+              {...iconProps}
+              data-testid={`TitledStepList_icon_${iconName}`}
+              className={iconClass}
+              name={iconName}
             />
-          </div>
+          )}
+          <h3 className={styles.title}>{props.title}</h3>
+
+          {collapsible && (
+            <div
+              onClick={handleCollapseToggle}
+              className={styles.title_bar_carat}
+            >
+              <Icon
+                className={styles.title_bar_icon}
+                name={
+                  props.selected
+                    ? 'chevron-right'
+                    : props.collapsed
+                    ? 'chevron-down'
+                    : 'chevron-up'
+                }
+              />
+            </div>
+          )}
+        </div>
+        {!props.collapsed && props.description}
+        {!props.collapsed && hasValidChildren && (
+          <ol className={styles.list}>{props.children}</ol>
         )}
       </div>
-      {!props.collapsed && props.description}
-      {!props.collapsed && hasValidChildren && (
-        <ol className={styles.list}>{props.children}</ol>
-      )}
-    </div>
+    </Flex>
   )
 }

@@ -8,6 +8,7 @@ import {
   PrimaryButton,
   SPACING,
   SecondaryButton,
+  InputField,
   SidePanel,
 } from '@opentrons/components'
 
@@ -19,6 +20,12 @@ import {
 import { actions as stepsActions, getIsMultiSelectMode } from '../../ui/steps'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { getEnableStepGrouping } from '../../feature-flags/selectors'
+import { getUnsavedGroup } from '../../step-forms/selectors'
+import {
+  addStepToGroup,
+  clearUnsavedGroup,
+  createGroup,
+} from '../../step-forms/actions/groups'
 import { StepCreationButton } from '../StepCreationButton'
 import { DraggableStepItems } from './DraggableStepItems'
 import { MultiSelectToolbar } from './MultiSelectToolbar'
@@ -28,12 +35,6 @@ import { TerminalItem } from './TerminalItem'
 
 import type { StepIdType } from '../../form-types'
 import type { ThunkDispatch } from '../../types'
-import { getUnsavedGroup } from '../../step-forms/selectors'
-import {
-  addStepToGroup,
-  clearUnsavedGroup,
-  createGroup,
-} from '../../step-forms/actions/groups'
 
 export interface StepListProps {
   isMultiSelectMode?: boolean | null
@@ -93,13 +94,12 @@ export const StepList = (): JSX.Element => {
   return group ? (
     <Modal>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-        <input
-          type="text"
+        <InputField
           value={groupName}
+          placeholder="Enter group name"
           onChange={e => {
             setGroupName(e.target.value)
           }}
-          placeholder="Enter group name"
         />
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing16}>
           <PrimaryButton
@@ -109,7 +109,10 @@ export const StepList = (): JSX.Element => {
           >
             Close
           </PrimaryButton>
-          <SecondaryButton onClick={handleCreateGroup}>
+          <SecondaryButton
+            onClick={handleCreateGroup}
+            disabled={groupName === ''}
+          >
             Create group
           </SecondaryButton>
         </Flex>

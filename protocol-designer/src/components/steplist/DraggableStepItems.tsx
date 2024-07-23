@@ -5,11 +5,11 @@ import { useDrop, useDrag } from 'react-dnd'
 import {
   BORDERS,
   Box,
+  Btn,
   COLORS,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
-  PrimaryButton,
   SPACING,
 } from '@opentrons/components'
 
@@ -25,6 +25,7 @@ import type { DragLayerMonitor, DropTargetOptions } from 'react-dnd'
 import type { StepIdType } from '../../form-types'
 import type { ConnectedStepItemProps } from '../../containers/ConnectedStepItem'
 import { removeGroup } from '../../step-forms/actions/groups'
+import { css } from 'styled-components'
 
 type GroupedStep = { groupName: string; stepIds: string[] } | string
 
@@ -172,14 +173,24 @@ export const DraggableStepItems = (
                     justifyContent={JUSTIFY_SPACE_BETWEEN}
                     padding={SPACING.spacing8}
                   >
-                    <LegacyStyledText as='h2SemiBold'>{item.groupName}</LegacyStyledText>
-                    <PrimaryButton
+                    <LegacyStyledText as="h2SemiBold" color={COLORS.grey60}>
+                      {item.groupName}
+                    </LegacyStyledText>
+                    <Btn
+                      //  this matches legacy --c-highlight used in PD right now
+                      css={css`
+                        color: ${COLORS.grey40};
+
+                        &:hover {
+                          color: #00c3e6;
+                        }
+                      `}
                       onClick={() => {
                         dispatch(removeGroup({ groupName: item.groupName }))
                       }}
                     >
                       Ungroup
-                    </PrimaryButton>
+                    </Btn>
                   </Flex>
                   {item.stepIds.map((stepId, subIndex) => (
                     <DragDropStepItem

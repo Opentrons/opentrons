@@ -35,7 +35,7 @@ export const PresavedStepItem = (): JSX.Element | null => {
     rawForm: null,
     stepNumber,
     stepType: presavedStepForm.stepType,
-
+    stepId: PRESAVED_STEP_ID,
     selected,
     hovered,
 
