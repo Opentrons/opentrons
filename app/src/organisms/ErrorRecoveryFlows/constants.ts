@@ -204,10 +204,6 @@ export const INVALID = 'INVALID' as const
  * Styling
  */
 
-export const BODY_TEXT_STYLE = css`
-  ${TYPOGRAPHY.bodyTextRegular};
-`
-
 export const ODD_SECTION_TITLE_STYLE = css`
   margin-bottom: ${SPACING.spacing16};
 `

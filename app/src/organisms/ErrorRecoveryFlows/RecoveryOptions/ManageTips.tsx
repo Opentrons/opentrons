@@ -187,10 +187,10 @@ function DropTipFlowsContainer(
   props: RecoveryContentProps
 ): JSX.Element | null {
   const {
+    robotType,
     tipStatusUtils,
     routeUpdateActions,
     recoveryCommands,
-    isFlex,
     currentRecoveryOptionUtils,
   } = props
   const { DROP_TIP_FLOWS, ROBOT_CANCELING, RETRY_NEW_TIPS } = RECOVERY_MAP
@@ -229,7 +229,7 @@ function DropTipFlowsContainer(
   return (
     <RecoverySingleColumnContentWrapper>
       <DropTipWizardFlows
-        robotType={isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE}
+        robotType={robotType}
         closeFlow={onCloseFlow}
         mount={mount}
         instrumentModelSpecs={specs}

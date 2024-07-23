@@ -1,4 +1,5 @@
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { useRouteUpdateActions } from './useRouteUpdateActions'
 import { useRecoveryCommands } from './useRecoveryCommands'
@@ -56,7 +57,6 @@ export interface ERUtilsResults {
 const SUBSEQUENT_COMMAND_DEPTH = 2
 // Builds various Error Recovery utilities.
 export function useERUtils({
-  isFlex,
   failedCommand,
   runId,
   toggleERWizard,
@@ -96,7 +96,7 @@ export function useERUtils({
 
   const tipStatusUtils = useRecoveryTipStatus({
     runId,
-    isFlex,
+    isFlex: robotType === FLEX_ROBOT_TYPE,
     runRecord,
     attachedInstruments,
   })
