@@ -1719,7 +1719,12 @@ const unsavedGroup: Reducer<UnsavedGroupState, any> = handleActions<
 >(
   {
     SELECT_STEP_FOR_UNSAVED_GROUP: (state, action) => {
-      return [...state, action.payload.stepId]
+      const stepId: string = action.payload.stepId
+      if (state.includes(stepId)) {
+        return state.filter(id => id !== stepId)
+      } else {
+        return [...state, stepId]
+      }
     },
     CLEAR_UNSAVED_GROUP: () => {
       return []
