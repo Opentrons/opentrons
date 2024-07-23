@@ -90,9 +90,7 @@ describe('ManageTips', () => {
   it(`renders BeginRemoval with correct copy when the step is ${DROP_TIP_FLOWS.STEPS.BEGIN_REMOVAL}`, () => {
     render(props)
 
-    screen.getByText(
-      'You may want to remove the tips from the left pipette before using it again in a protocol'
-    )
+    screen.getByText('Remove tips from left pipette before canceling the run?')
     screen.queryAllByText('Begin removal')
     screen.queryAllByText('Skip')
     expect(screen.getAllByText('Continue').length).toBe(2)
@@ -102,7 +100,7 @@ describe('ManageTips', () => {
     render(props)
 
     const beginRemovalBtn = screen.queryAllByText('Begin removal')[0]
-    const skipBtn = screen.queryAllByText('Skip')[0]
+    const skipBtn = screen.queryAllByText('Skip removal')[0]
 
     fireEvent.click(beginRemovalBtn)
     clickButtonLabeled('Continue')
@@ -124,7 +122,7 @@ describe('ManageTips', () => {
     }
     render(props)
 
-    const skipBtn = screen.queryAllByText('Skip')[0]
+    const skipBtn = screen.queryAllByText('Skip removal')[0]
 
     fireEvent.click(skipBtn)
     clickButtonLabeled('Continue')
@@ -263,6 +261,14 @@ describe('useDropTipFlowUtils', () => {
       ERROR_WHILE_RECOVERING.ROUTE,
       ERROR_WHILE_RECOVERING.STEPS.DROP_TIP_GENERAL_ERROR
     )
+  })
+
+  it('should return the correct button overrides', () => {
+    const { result } = renderHook(() => useDropTipFlowUtils(mockProps))
+
+    result.current.buttonOverrides.goBackBeforeBeginning()
+
+    expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(DROP_TIP_FLOWS.ROUTE)
   })
 
   it(`should return correct route overrides when the route is ${DROP_TIP_FLOWS.STEPS.CHOOSE_TIP_DROP}`, () => {
