@@ -17,12 +17,9 @@ from opentrons.protocol_engine.error_recovery_policy import (
 def create_error_recovery_policy_from_rules(
     rules: list[ErrorRecoveryRule],
 ) -> ErrorRecoveryPolicy:
-    """
-    Given a "high-level" error recovery policy (a list of rules, as robot-server exposes
-    in its HTTP API), return a "low-level" error recovery policy
-    """
+    """Given a list of error recovery rules return an error recovery policy."""
 
-    def policy(
+    def _policy(
         config: Config,
         failed_command: Command,
         defined_error_data: Optional[CommandDefinedErrorData],
@@ -37,13 +34,13 @@ def create_error_recovery_policy_from_rules(
                     and defined_error_data.public.errorType == rule.ifMatch[i].value
                 )
                 if command_type_matches and error_type_matches:
-                    if rule.ifMatch == ReactionIfMatch.IGNORE_AND_CONTINUE:
+                    if rule.ifMatch[i] == ReactionIfMatch.IGNORE_AND_CONTINUE:
                         raise NotImplementedError  # No protocol engine support for this yet. It's in another ticket.
-                    elif rule.ifMatch == ReactionIfMatch.FAIL_RUN:
+                    elif rule.ifMatch[i] == ReactionIfMatch.FAIL_RUN:
                         return ErrorRecoveryType.FAIL_RUN
-                    elif rule.ifMatch == ReactionIfMatch.WAIT_FOR_RECOVERY:
+                    elif rule.ifMatch[i] == ReactionIfMatch.WAIT_FOR_RECOVERY:
                         return ErrorRecoveryType.WAIT_FOR_RECOVERY
 
         return standard_run_policy(config, failed_command, defined_error_data)
 
-    return policy
+    return _policy

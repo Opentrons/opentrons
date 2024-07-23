@@ -32,10 +32,14 @@ class ReactionIfMatch(Enum):
 
 
 class ErrorMatcher(BaseModel):
+    """The error type that this rule applies to."""
+
     errorType: str = Field(..., description="The error type that this rule applies to.")
 
 
 class CommandMatcher(BaseModel):
+    """Command/error data used for matching rules."""
+
     commandType: str = Field(
         ..., description="The command type that this rule applies to."
     )
@@ -45,6 +49,8 @@ class CommandMatcher(BaseModel):
 
 
 class MatchCriteria(BaseModel):
+    """The criteria that this rule will attempt to match."""
+
     command: CommandMatcher = Field(
         ..., description="The command and error types that this rule applies to."
     )
