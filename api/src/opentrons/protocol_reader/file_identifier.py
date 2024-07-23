@@ -292,4 +292,3 @@ def _analyze_python_protocol(
         api_level=parsed.api_level,
         command_annotations=[],
     )
-    
