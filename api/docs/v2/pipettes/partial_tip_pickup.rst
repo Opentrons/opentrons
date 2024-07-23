@@ -14,8 +14,8 @@ Before getting started with partial tip pickup, make sure your protocol specifie
     :header-rows: 1
 
     * - Pipette
-      - Partial Configuration
-      - Minimum API Version
+      - Partial configuration
+      - Minimum API version
     * - Flex 96-Channel Pipette
       - Column
       - 2.16
@@ -131,7 +131,7 @@ Setting ``start="H1"`` means the pipette will use its frontmost nozzles to pick 
     pipette.drop_tip()
     pipette.pick_up_tip()  # picks up B1-B12 from tip rack
 
-You can also set ``start="A1"`` to use the backmost nozzles and pick up from the front of the tip rack. 
+You can also set ``start="A1"`` to use the backmost nozzles and pick up from the front of the tip rack.
 
 .. note::
 
@@ -142,42 +142,42 @@ You can also set ``start="A1"`` to use the backmost nozzles and pick up from the
 Single Layout Example
 ---------------------
 
-Single-tip pickup is available on both 8-channel and 96-channel pipettes. For 8-channel pipettes, there are two possible configurations, using either the front or back nozzle. For 96-channel pipettes, there are four possible configurations, using any of the corner nozzles. 
+Single-tip pickup is available on both 8-channel and 96-channel pipettes. For 8-channel pipettes, there are two possible configurations, using either the front or back nozzle. For 96-channel pipettes, there are four possible configurations, using any of the corner nozzles.
 
 The ``start`` parameter sets the "first" and only nozzle used in the configuration. It also affects the order in which the pipette picks up tips. When using automatic tip tracking, single-tip configurations always consume all tips within a single column before proceeding to another column.
 
 .. list-table::
     :header-rows: 1
 
-    * - Pipette Type
-      - ``start`` Well
-      - Pickup Order
+    * - Pipette type
+      - ``start`` well
+      - Pickup order
     * - 8-channel
       - A1
-      - | Front to back, right to left, i.e.
-        | H1 through A1, H2 through A2, etc.
+      - | Front to back, right to left
+        | (H1 through A1, H2 through A2, …)
     * - 8-channel
       - H1
-      - | Back to front, right to left, i.e.
-        | A1 through H1, A2 through H2, etc.
+      - | Back to front, right to left
+        | (A1 through H1, A2 through H2, …)
     * - 96-channel
       - A1
-      - | Front to back, left to right, i.e.
-        | H12 through A12, H11 through A11, etc.
+      - | Front to back, left to right
+        | (H12 through A12, H11 through A11, …)
     * - 96-channel
       - H1
-      - | Back to front, left to right, i.e.
-        | A12 through H12, A11 through H11, etc.
+      - | Back to front, left to right
+        | (A12 through H12, A11 through H11, …)
     * - 96-channel
       - A12
-      - | Front to back, right to left, i.e.
-        | H1 through A1, H2 through A2, etc.
+      - | Front to back, right to left
+        | (H1 through A1, H2 through A2, …)
     * - 96-channel
       - H12
-      - | Back to front, right to left, i.e.
-        | A1 through H1, A2 through H2, etc.
+      - | Back to front, right to left
+        | (A1 through H1, A2 through H2, …)
 
-Since they follow the same order as using a single-channel pipette, Opentrons recommends using the following configurations:
+Since they follow the same pickup order as a single-channel pipette, Opentrons recommends using the following configurations:
 
 - For 8-channel pipettes, ``start="H1"``.
 - For 96-channel pipettes, ``start="H12"``.
@@ -224,7 +224,32 @@ Since this configuration uses ``start="H12"``, it will pick up tips in the usual
 Partial Column Layout Example
 -----------------------------
 
-TK
+Partial column pickup is available on both 8-channel and 96-channel pipettes. Partial columns contain 2 to 7 consecutive tips in a single column. 8-channel pipettes always pick up partial columns with the frontmost nozzles of the pipette (``start="H1"``). 96-channel pipettes can pick up partial columns with the frontmost nozzles in the leftmost column (``start="H1"``) or the rightmost column (``start="H12"``).
+
+.. note::
+
+    Picking up partial columns with the backmost nozzles is currently not supported. Setting ``style=PARTIAL_COLUMN`` and either ``start="A1"`` or ``start="A12"`` will raise an error.
+
+To specify the number of tips to pick up, add the ``end`` parameter when calling :py:meth:`.configure_nozzle_layout`. Use the chart below to determine the end row (G through B) for your desired number of tips. The end column should be the same as your start column (1 or 12).
+
+.. list-table::
+    :stub-columns: 1
+
+    * - Number of tips
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+      - 7
+    * - ``end`` row
+      - G
+      - F
+      - E
+      - D
+      - C
+      - B
+
 
 .. _partial-tip-rack-adapters:
 
@@ -261,7 +286,7 @@ When switching between full and partial pickup, you may want to organize your ti
 
 .. Tip::
 
-    It's also good practice to keep separate lists of tip racks when using multiple partial tip pickup configurations (i.e., using both column 1 and column 12 in the same protocol). This improves positional accuracy when picking up tips. Additionally, use Labware Position Check in the Opentrons App to ensure that the partial configuration is well-aligned to the rack.
+    It's also good practice to keep separate lists of tip racks when using multiple partial tip pickup configurations ((using both column 1 and column 12 in the same protocol). This improves positional accuracy when picking up tips. Additionally, use Labware Position Check in the Opentrons App to ensure that the partial configuration is well-aligned to the rack.
 
 Now, when you configure the nozzle layout, you can reference the appropriate list as the value of ``tip_racks``::
 
