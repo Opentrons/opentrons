@@ -220,6 +220,7 @@ class HardwareTipHandler(TipHandler):
             pipette_serial=self._state_view.pipettes.get_serial_number(pipette_id),
             labware_definition=self._state_view.labware.get_definition(labware_id),
             nominal_fallback=nominal_tip_geometry.length,
+            robot_type=self._state_view.config.robot_type,
         )
 
         await self._hardware_api.tip_pickup_moves(

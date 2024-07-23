@@ -10,9 +10,9 @@ from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocols.labware import get_labware_definition
 
 # TODO (lc 09-26-2022) We should conditionally import ot2 or ot3 calibration
-from opentrons.hardware_control.instruments.ot2 import (
-    instrument_calibration as instr_cal,
-)
+from opentrons.hardware_control.instruments.ot3 import instrument_calibration as instr_cal_ot3
+from opentrons.hardware_control.instruments.ot2 import instrument_calibration as instr_cal_ot2
+from opentrons_shared_data.robot.dev_types import RobotType, RobotTypeEnum
 from opentrons.calibration_storage.types import TipLengthCalNotFound
 
 
@@ -53,6 +53,7 @@ class LabwareDataProvider:
         pipette_serial: str,
         labware_definition: LabwareDefinition,
         nominal_fallback: float,
+        robot_type: RobotType,
     ) -> float:
         """Get the calibrated tip length of a tip rack / pipette pair.
 
@@ -64,6 +65,7 @@ class LabwareDataProvider:
             pipette_serial,
             labware_definition,
             nominal_fallback,
+            robot_type,
         )
 
     @staticmethod
@@ -71,11 +73,20 @@ class LabwareDataProvider:
         pipette_serial: str,
         labware_definition: LabwareDefinition,
         nominal_fallback: float,
+        robot_type: RobotType,
     ) -> float:
         try:
-            return instr_cal.load_tip_length_for_pipette(
-                pipette_serial, labware_definition
-            ).tip_length
+            # load_tip_length_for_pipette method does not exist for ot3
+            # check pipette/labware compatability? (see load_pipette.py)
+            robot_type = RobotTypeEnum.robot_literal_to_enum(robot_type)
+            if robot_type == RobotTypeEnum.FLEX:
+                return instr_cal_ot3.load_tip_length_for_pipette(
+                    pipette_serial, labware_definition
+                ).tip_length
+            elif robot_type == RobotTypeEnum.OT2:
+                return instr_cal_ot2.load_tip_length_for_pipette(
+                    pipette_serial, labware_definition
+                ).tip_length
 
         except TipLengthCalNotFound as e:
             message = (
