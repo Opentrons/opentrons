@@ -6206,7 +6206,7 @@ After the `load_module()` method loads the modules into your protocol, it return
 
 ### Protocols
 
-_class_ opentrons.protocol_api.ProtocolContext(_api_version: APIVersion_, _core: AbstractProtocol\[AbstractInstrument\[AbstractWellCore], AbstractLabware\[AbstractWellCore], AbstractModuleCore]_, _broker: [Optional](https://docs.python.org/3/library/typing.html#typing.Optional '(in Python v3.12)')\[LegacyBroker] \= None_, _core_map: [Optional](https://docs.python.org/3/library/typing.html#typing.Optional '(in Python v3.12)')\[LoadedCoreMap] \= None_, _deck: [Optional](https://docs.python.org/3/library/typing.html#typing.Optional '(in Python v3.12)')\[Deck] \= None_, _bundled_data: [Optional](https://docs.python.org/3/library/typing.html#typing.Optional '(in Python v3.12)')\[[Dict](https://docs.python.org/3/library/typing.html#typing.Dict '(in Python v3.12)')\[[str](https://docs.python.org/3/library/stdtypes.html#str '(in Python v3.12)'), [bytes](https://docs.python.org/3/library/stdtypes.html#bytes '(in Python v3.12)')]] \= None_)
+_class_ opentrons.protocol*api.ProtocolContext(\_api_version: APIVersion*, _core: AbstractProtocol\[AbstractInstrument\[AbstractWellCore], AbstractLabware\[AbstractWellCore], AbstractModuleCore]_, _broker: [Optional](https://docs.python.org/3/library/typing.html#typing.Optional '(in Python v3.12)')\[LegacyBroker] \= None_, _core_map: [Optional](https://docs.python.org/3/library/typing.html#typing.Optional '(in Python v3.12)')\[LoadedCoreMap] \= None_, _deck: [Optional](https://docs.python.org/3/library/typing.html#typing.Optional '(in Python v3.12)')\[Deck] \= None_, _bundled_data: [Optional](https://docs.python.org/3/library/typing.html#typing.Optional '(in Python v3.12)')\[[Dict](https://docs.python.org/3/library/typing.html#typing.Dict '(in Python v3.12)')\[[str](https://docs.python.org/3/library/stdtypes.html#str '(in Python v3.12)'), [bytes](https://docs.python.org/3/library/stdtypes.html#bytes '(in Python v3.12)')]] \= None_)
 A context for the state of a protocol.
 
 The `ProtocolContext` class provides the objects, attributes, and methods that
@@ -6324,7 +6324,7 @@ Changed in version 2\.15: `del` sets the corresponding labware’s location to `
 
 New in version 2\.0\.
 
-define_liquid(_self_, _name: 'str'_, _description: 'Optional\[str]'_, _display_color: 'Optional\[str]'_) → 'Liquid'
+define*liquid(\_self*, _name: 'str'_, _description: 'Optional\[str]'_, _display_color: 'Optional\[str]'_) → 'Liquid'
 Define a liquid within a protocol.
 
 Parameters:
@@ -6373,7 +6373,7 @@ Home the movement system of the robot.
 
 New in version 2\.0\.
 
-is_simulating(_self_) → 'bool'
+is*simulating(\_self*) → 'bool'
 Returns `True` if the protocol is running in simulation.
 
 Returns `False` if the protocol is running on actual hardware.
@@ -6390,7 +6390,7 @@ instantaneously in simulation. But external methods, like those from the
 
 New in version 2\.0\.
 
-load_adapter(_self_, _load_name: 'str'_, _location: 'Union\[DeckLocation, OffDeckType]'_, _namespace: 'Optional\[str]' \= None_, _version: 'Optional\[int]' \= None_) → 'Labware'
+load*adapter(\_self*, _load_name: 'str'_, _location: 'Union\[DeckLocation, OffDeckType]'_, _namespace: 'Optional\[str]' \= None_, _version: 'Optional\[int]' \= None_) → 'Labware'
 Load an adapter onto a location.
 
 For adapters already defined by Opentrons, this is a convenient way
@@ -6423,7 +6423,7 @@ definition, and you want to explicitly choose one or the other.
 
 New in version 2\.15\.
 
-load_adapter_from_definition(_self_, _adapter_def: "'LabwareDefinition'"_, _location: 'Union\[DeckLocation, OffDeckType]'_) → 'Labware'
+load*adapter_from_definition(\_self*, _adapter_def: "'LabwareDefinition'"_, _location: 'Union\[DeckLocation, OffDeckType]'_) → 'Labware'
 Specify the presence of an adapter on the deck.
 
 This function loads the adapter definition specified by `adapter_def`
@@ -6437,7 +6437,7 @@ Parameters:
 
 New in version 2\.15\.
 
-load_instrument(_self_, _instrument_name: 'str'_, _mount: 'Union\[Mount, str, None]' \= None_, _tip_racks: 'Optional\[List\[Labware]]' \= None_, _replace: 'bool' \= False_, _liquid_presence_detection: 'Optional\[bool]' \= None_) → 'InstrumentContext'
+load*instrument(\_self*, _instrument_name: 'str'_, _mount: 'Union\[Mount, str, None]' \= None_, _tip_racks: 'Optional\[List\[Labware]]' \= None_, _replace: 'bool' \= False_, _liquid_presence_detection: 'Optional\[bool]' \= None_) → 'InstrumentContext'
 Load a specific instrument for use in the protocol.
 
 When analyzing the protocol on the robot, instruments loaded with this method
@@ -6468,7 +6468,7 @@ Parameters:
 
 New in version 2\.0\.
 
-load_labware(_self_, _load_name: 'str'_, _location: 'Union\[DeckLocation, OffDeckType]'_, _label: 'Optional\[str]' \= None_, _namespace: 'Optional\[str]' \= None_, _version: 'Optional\[int]' \= None_, _adapter: 'Optional\[str]' \= None_) → 'Labware'
+load*labware(\_self*, _load_name: 'str'_, _location: 'Union\[DeckLocation, OffDeckType]'_, _label: 'Optional\[str]' \= None_, _namespace: 'Optional\[str]' \= None_, _version: 'Optional\[int]' \= None_, _adapter: 'Optional\[str]' \= None_) → 'Labware'
 Load a labware onto a location.
 
 For Opentrons\-verified labware, this is a convenient way
@@ -6514,13 +6514,13 @@ definition, and you want to explicitly choose one or the other.
 
 New in version 2\.0\.
 
-load_labware_by_name(_self_, _load_name: 'str'_, _location: 'DeckLocation'_, _label: 'Optional\[str]' \= None_, _namespace: 'Optional\[str]' \= None_, _version: 'int' \= 1_) → 'Labware'
+load*labware_by_name(\_self*, _load_name: 'str'_, _location: 'DeckLocation'_, _label: 'Optional\[str]' \= None_, _namespace: 'Optional\[str]' \= None_, _version: 'int' \= 1_) → 'Labware'
 
 Deprecated since version 2\.0: Use [`load_labware()`](#opentrons.protocol_api.ProtocolContext.load_labware 'opentrons.protocol_api.ProtocolContext.load_labware') instead.
 
 New in version 2\.0\.
 
-load_labware_from_definition(_self_, _labware_def: "'LabwareDefinition'"_, _location: 'Union\[DeckLocation, OffDeckType]'_, _label: 'Optional\[str]' \= None_) → 'Labware'
+load*labware_from_definition(\_self*, _labware_def: "'LabwareDefinition'"_, _location: 'Union\[DeckLocation, OffDeckType]'_, _label: 'Optional\[str]' \= None_) → 'Labware'
 Specify the presence of a labware on the deck.
 
 This function loads the labware definition specified by `labware_def`
@@ -6537,7 +6537,7 @@ Parameters:
 
 New in version 2\.0\.
 
-load_module(_self_, _module_name: 'str'_, _location: 'Optional\[DeckLocation]' \= None_, _configuration: 'Optional\[str]' \= None_) → 'ModuleTypes'
+load*module(\_self*, _module_name: 'str'_, _location: 'Optional\[DeckLocation]' \= None_, _configuration: 'Optional\[str]' \= None_) → 'ModuleTypes'
 Load a module onto the deck, given its name or model.
 
 This is the function to call to use a module in your protocol, like
@@ -6585,7 +6585,7 @@ Changed in version 2\.15: Added `MagneticBlockContext` return value.
 
 New in version 2\.0\.
 
-load_trash_bin(_self_, _location: 'DeckLocation'_) → 'TrashBin'
+load*trash_bin(\_self*, _location: 'DeckLocation'_) → 'TrashBin'
 Load a trash bin on the deck of a Flex.
 
 See [Trash Bin](index.html#configure-trash-bin) for details.
@@ -6600,7 +6600,7 @@ If you try to load a trash bin in column 2 or 4, the API will raise an error.
 
 New in version 2\.16\.
 
-load_waste_chute(_self_) → 'WasteChute'
+load*waste_chute(\_self*) → 'WasteChute'
 Load the waste chute on the deck of a Flex.
 
 See [Waste Chute](index.html#configure-waste-chute) for details, including the deck configuration
@@ -6685,7 +6685,7 @@ This property is not yet supported in API version 2\.14 or higher.
 
 New in version 2\.0\.
 
-move_labware(_self_, _labware: 'Labware'_, _new_location: 'Union\[DeckLocation, Labware, ModuleTypes, OffDeckType, WasteChute]'_, _use_gripper: 'bool' \= False_, _pick_up_offset: 'Optional\[Mapping\[str, float]]' \= None_, _drop_offset: 'Optional\[Mapping\[str, float]]' \= None_) → 'None'
+move*labware(\_self*, _labware: 'Labware'_, _new_location: 'Union\[DeckLocation, Labware, ModuleTypes, OffDeckType, WasteChute]'_, _use_gripper: 'bool' \= False_, _pick_up_offset: 'Optional\[Mapping\[str, float]]' \= None_, _drop_offset: 'Optional\[Mapping\[str, float]]' \= None_) → 'None'
 Move a loaded labware to a new location.
 
 See [Moving Labware](index.html#moving-labware) for more details.
@@ -6764,7 +6764,7 @@ after a period of time, use [`delay()`](#opentrons.protocol_api.ProtocolContext.
 
 New in version 2\.0\.
 
-set_rail_lights(_self_, _on: 'bool'_) → 'None'
+set*rail_lights(\_self*, _on: 'bool'_) → 'None'
 Controls the robot’s ambient lighting (rail lights).
 
 Parameters:
@@ -6774,7 +6774,7 @@ New in version 2\.5\.
 
 ### Instruments
 
-_class_ opentrons.protocol_api.InstrumentContext(_core: AbstractInstrument\[AbstractWellCore]_, _protocol_core: AbstractProtocol\[AbstractInstrument\[AbstractWellCore], AbstractLabware\[AbstractWellCore], AbstractModuleCore]_, _broker: LegacyBroker_, _api_version: APIVersion_, _tip_racks: [List](https://docs.python.org/3/library/typing.html#typing.List '(in Python v3.12)')\[[Labware](index.html#opentrons.protocol_api.Labware 'opentrons.protocol_api.labware.Labware')]_, _trash: [Optional](https://docs.python.org/3/library/typing.html#typing.Optional '(in Python v3.12)')\[[Union](https://docs.python.org/3/library/typing.html#typing.Union '(in Python v3.12)')\[[Labware](index.html#opentrons.protocol_api.Labware 'opentrons.protocol_api.labware.Labware'), [TrashBin](index.html#opentrons.protocol_api.TrashBin 'opentrons.protocol_api.disposal_locations.TrashBin'), [WasteChute](index.html#opentrons.protocol_api.WasteChute 'opentrons.protocol_api.disposal_locations.WasteChute')]]_, _requested_as: [str](https://docs.python.org/3/library/stdtypes.html#str '(in Python v3.12)')_)
+_class_ opentrons.protocol*api.InstrumentContext(\_core: AbstractInstrument\[AbstractWellCore]*, _protocol_core: AbstractProtocol\[AbstractInstrument\[AbstractWellCore], AbstractLabware\[AbstractWellCore], AbstractModuleCore]_, _broker: LegacyBroker_, _api_version: APIVersion_, _tip_racks: [List](https://docs.python.org/3/library/typing.html#typing.List '(in Python v3.12)')\[[Labware](index.html#opentrons.protocol_api.Labware 'opentrons.protocol_api.labware.Labware')]_, _trash: [Optional](https://docs.python.org/3/library/typing.html#typing.Optional '(in Python v3.12)')\[[Union](https://docs.python.org/3/library/typing.html#typing.Union '(in Python v3.12)')\[[Labware](index.html#opentrons.protocol_api.Labware 'opentrons.protocol_api.labware.Labware'), [TrashBin](index.html#opentrons.protocol_api.TrashBin 'opentrons.protocol_api.disposal_locations.TrashBin'), [WasteChute](index.html#opentrons.protocol_api.WasteChute 'opentrons.protocol_api.disposal_locations.WasteChute')]]_, _requested_as: [str](https://docs.python.org/3/library/stdtypes.html#str '(in Python v3.12)')_)
 A context for a specific pipette or instrument.
 
 The InstrumentContext class provides the objects, attributes, and methods that allow
@@ -6800,7 +6800,7 @@ to set the pipette to use fewer channels.
 
 New in version 2\.16\.
 
-air_gap(_self_, _volume: 'Optional\[float]' \= None_, _height: 'Optional\[float]' \= None_) → 'InstrumentContext'
+air*gap(\_self*, _volume: 'Optional\[float]' \= None_, _height: 'Optional\[float]' \= None_) → 'InstrumentContext'
 Draw air into the pipette’s tip at the current well.
 
 See [Air Gap](index.html#air-gap).
@@ -6883,7 +6883,7 @@ that argument as `volume`. If you want to call `aspirate` with only
 
 New in version 2\.0\.
 
-blow_out(_self_, _location: 'Optional\[Union\[types.Location, labware.Well, TrashBin, WasteChute]]' \= None_) → 'InstrumentContext'
+blow*out(\_self*, _location: 'Optional\[Union\[types.Location, labware.Well, TrashBin, WasteChute]]' \= None_) → 'InstrumentContext'
 Blow an extra amount of air through a pipette’s tip to clear it.
 
 If [`dispense()`](#opentrons.protocol_api.InstrumentContext.dispense 'opentrons.protocol_api.InstrumentContext.dispense') is used to empty a pipette, usually a small amount of
@@ -6917,7 +6917,7 @@ See also [`type`](#opentrons.protocol_api.InstrumentContext.type 'opentrons.prot
 
 New in version 2\.0\.
 
-configure_for_volume(_self_, _volume: 'float'_) → 'None'
+configure*for_volume(\_self*, _volume: 'float'_) → 'None'
 Configure a pipette to handle a specific volume of liquid, measured in µL.
 The pipette enters a volume mode depending on the volume provided. Changing
 pipette modes alters properties of the instance of
@@ -6947,7 +6947,7 @@ Parameters:
 
 New in version 2\.15\.
 
-configure_nozzle_layout(_self_, _style: 'NozzleLayout'_, _start: 'Optional\[str]' \= None_, _end: 'Optional\[str]' \= None_, _front_right: 'Optional\[str]' \= None_, _back_left: 'Optional\[str]' \= None_, _tip_racks: 'Optional\[List\[labware.Labware]]' \= None_) → 'None'
+configure*nozzle_layout(\_self*, _style: 'NozzleLayout'_, _start: 'Optional\[str]' \= None_, _end: 'Optional\[str]' \= None_, _front_right: 'Optional\[str]' \= None_, _back_left: 'Optional\[str]' \= None_, _tip_racks: 'Optional\[List\[labware.Labware]]' \= None_) → 'None'
 Configure how many tips the 8\-channel or 96\-channel pipette will pick up.
 
 Changing the nozzle layout will affect gantry movement for all subsequent
@@ -7034,7 +7034,7 @@ can be changed with the `speed` argument of the
 
 New in version 2\.0\.
 
-detect_liquid_presence(_self_, _well: 'labware.Well'_) → 'bool'
+detect*liquid_presence(\_self*, _well: 'labware.Well'_) → 'bool'
 Check if there is liquid in a well.
 
 Returns:
@@ -7126,7 +7126,7 @@ This instance.
 
 New in version 2\.0\.
 
-drop_tip(_self_, _location: 'Optional\[Union\[types.Location, labware.Well, TrashBin, WasteChute]]' \= None_, _home_after: 'Optional\[bool]' \= None_) → 'InstrumentContext'
+drop*tip(\_self*, _location: 'Optional\[Union\[types.Location, labware.Well, TrashBin, WasteChute]]' \= None_, _home_after: 'Optional\[bool]' \= None_) → 'InstrumentContext'
 Drop the current tip.
 
 See [Dropping a Tip](index.html#pipette-drop-tip) for examples.
@@ -7213,7 +7213,7 @@ This instance.
 
 New in version 2\.0\.
 
-home_plunger(_self_) → 'InstrumentContext'
+home*plunger(\_self*) → 'InstrumentContext'
 Home the plunger associated with this mount.
 
 Returns:
@@ -7311,7 +7311,7 @@ The possible names are `"left"` and `"right"`.
 
 New in version 2\.0\.
 
-move_to(_self_, _location: 'Union\[types.Location, TrashBin, WasteChute]'_, _force_direct: 'bool' \= False_, _minimum_z_height: 'Optional\[float]' \= None_, _speed: 'Optional\[float]' \= None_, _publish: 'bool' \= True_) → 'InstrumentContext'
+move*to(\_self*, _location: 'Union\[types.Location, TrashBin, WasteChute]'_, _force_direct: 'bool' \= False_, _minimum_z_height: 'Optional\[float]' \= None_, _speed: 'Optional\[float]' \= None_, _publish: 'bool' \= True_) → 'InstrumentContext'
 Move the instrument.
 
 See [Move To](index.html#move-to) for examples.
@@ -7346,7 +7346,7 @@ The name string for the pipette (e.g., `"p300_single"`).
 
 New in version 2\.0\.
 
-pick_up_tip(_self_, _location: 'Union\[types.Location, labware.Well, labware.Labware, None]' \= None_, _presses: 'Optional\[int]' \= None_, _increment: 'Optional\[float]' \= None_, _prep_after: 'Optional\[bool]' \= None_) → 'InstrumentContext'
+pick*up_tip(\_self*, _location: 'Union\[types.Location, labware.Well, labware.Labware, None]' \= None_, _presses: 'Optional\[int]' \= None_, _increment: 'Optional\[float]' \= None_, _prep_after: 'Optional\[bool]' \= None_) → 'InstrumentContext'
 Pick up a tip for the pipette to run liquid\-handling commands.
 
 See [Picking Up a Tip](index.html#basic-tip-pickup).
@@ -7439,7 +7439,7 @@ This instance.
 
 New in version 2\.0\.
 
-prepare_to_aspirate(_self_) → 'None'
+prepare*to_aspirate(\_self*) → 'None'
 Prepare a pipette for aspiration.
 
 Before a pipette can aspirate into an empty tip, the plunger must be in its
@@ -7481,7 +7481,7 @@ aspirate in place.
 
 New in version 2\.16\.
 
-require_liquid_presence(_self_, _well: 'labware.Well'_) → 'None'
+require*liquid_presence(\_self*, _well: 'labware.Well'_) → 'None'
 If there is no liquid in a well, raise an error.
 
 Returns:
@@ -7489,7 +7489,7 @@ None.
 
 New in version 2\.20\.
 
-reset_tipracks(_self_) → 'None'
+reset*tipracks(\_self*) → 'None'
 Reload all tips in each tip rack and reset the starting tip.
 
 New in version 2\.0\.
@@ -7504,7 +7504,7 @@ length to get the distance from the top of the well to drop the tip.
 
 New in version 2\.2\.
 
-return_tip(_self_, _home_after: 'Optional\[bool]' \= None_) → 'InstrumentContext'
+return*tip(\_self*, _home_after: 'Optional\[bool]' \= None_) → 'InstrumentContext'
 Drop the currently attached tip in its original location in the tip rack.
 
 Returning a tip does not reset tip tracking, so [`Well.has_tip`](#opentrons.protocol_api.Well.has_tip 'opentrons.protocol_api.Well.has_tip') will
@@ -7557,7 +7557,7 @@ This is the property used to determine which tips to pick up next when calling
 
 New in version 2\.0\.
 
-touch_tip(_self_, _location: 'Optional\[labware.Well]' \= None_, _radius: 'float' \= 1\.0_, _v_offset: 'float' \= \- 1\.0_, _speed: 'float' \= 60\.0_) → 'InstrumentContext'
+touch*tip(\_self*, _location: 'Optional\[labware.Well]' \= None_, _radius: 'float' \= 1\.0_, _v_offset: 'float' \= \- 1\.0_, _speed: 'float' \= 60\.0_) → 'InstrumentContext'
 Touch the pipette tip to the sides of a well, with the intent of removing leftover droplets.
 
 See [Touch Tip](index.html#touch-tip) for more details and examples.
@@ -7735,7 +7735,7 @@ New in version 2\.0\.
 
 ### Labware
 
-_class_ opentrons.protocol_api.Labware(_core: AbstractLabware\[Any]_, _api_version: APIVersion_, _protocol_core: ProtocolCore_, _core_map: LoadedCoreMap_)
+_class_ opentrons.protocol*api.Labware(\_core: AbstractLabware\[Any]*, _api_version: APIVersion_, _protocol_core: ProtocolCore_, _core_map: LoadedCoreMap_)
 This class represents a piece of labware.
 
 Labware available in the API generally fall under two categories.
@@ -7792,13 +7792,13 @@ A list of column lists.
 
 New in version 2\.0\.
 
-columns_by_index(_self_) → 'Dict\[str, List\[Well]]'
+columns*by_index(\_self*) → 'Dict\[str, List\[Well]]'
 
 Deprecated since version 2\.0: Use [`columns_by_name()`](#opentrons.protocol_api.Labware.columns_by_name 'opentrons.protocol_api.Labware.columns_by_name') instead.
 
 New in version 2\.0\.
 
-columns_by_name(_self_) → 'Dict\[str, List\[Well]]'
+columns*by_name(\_self*) → 'Dict\[str, List\[Well]]'
 Accessor function to navigate through a labware by column name.
 
 Use indexing to access individual columns or wells contained in the dictionary.
@@ -7834,7 +7834,7 @@ Returns `True` if the labware definition specifies `isTiprack` as `True`.
 
 New in version 2\.0\.
 
-load_labware(_self_, _name: 'str'_, _label: 'Optional\[str]' \= None_, _namespace: 'Optional\[str]' \= None_, _version: 'Optional\[int]' \= None_) → 'Labware'
+load*labware(\_self*, _name: 'str'_, _label: 'Optional\[str]' \= None_, _namespace: 'Optional\[str]' \= None_, _version: 'Optional\[int]' \= None_) → 'Labware'
 Load a compatible labware onto the labware using its load parameters.
 
 The parameters of this function behave like those of
@@ -7847,7 +7847,7 @@ The initialized and loaded labware object.
 
 New in version 2\.15\.
 
-load_labware_from_definition(_self_, _definition: 'LabwareDefinition'_, _label: 'Optional\[str]' \= None_) → 'Labware'
+load*labware_from_definition(\_self*, _definition: 'LabwareDefinition'_, _label: 'Optional\[str]' \= None_) → 'Labware'
 Load a compatible labware onto the labware using an inline definition.
 
 Parameters:
@@ -7963,13 +7963,13 @@ A list of row lists.
 
 New in version 2\.0\.
 
-rows_by_index(_self_) → 'Dict\[str, List\[Well]]'
+rows*by_index(\_self*) → 'Dict\[str, List\[Well]]'
 
 Deprecated since version 2\.0: Use [`rows_by_name()`](#opentrons.protocol_api.Labware.rows_by_name 'opentrons.protocol_api.Labware.rows_by_name') instead.
 
 New in version 2\.0\.
 
-rows_by_name(_self_) → 'Dict\[str, List\[Well]]'
+rows*by_name(\_self*) → 'Dict\[str, List\[Well]]'
 Accessor function to navigate through a labware by row name.
 
 Use indexing to access individual rows or wells contained in the dictionary.
@@ -7982,12 +7982,12 @@ Dictionary of [`Well`](#opentrons.protocol_api.Well 'opentrons.protocol_api.Well
 
 New in version 2\.0\.
 
-set_calibration(_self_, _delta: 'Point'_) → 'None'
+set*calibration(\_self*, _delta: 'Point'_) → 'None'
 An internal, deprecated method used for updating the labware offset.
 
 Deprecated since version 2\.14\.
 
-set_offset(_self_, _x: 'float'_, _y: 'float'_, _z: 'float'_) → 'None'
+set*offset(\_self*, _x: 'float'_, _y: 'float'_, _z: 'float'_) → 'None'
 Set the labware’s position offset.
 
 The offset is an x, y, z vector in deck coordinates
@@ -8059,13 +8059,13 @@ Ordered list of all wells in a labware.
 
 New in version 2\.0\.
 
-wells_by_index(_self_) → 'Dict\[str, Well]'
+wells*by_index(\_self*) → 'Dict\[str, Well]'
 
 Deprecated since version 2\.0: Use [`wells_by_name()`](#opentrons.protocol_api.Labware.wells_by_name 'opentrons.protocol_api.Labware.wells_by_name') or dict access instead.
 
 New in version 2\.0\.
 
-wells_by_name(_self_) → 'Dict\[str, Well]'
+wells*by_name(\_self*) → 'Dict\[str, Well]'
 Accessor function used to navigate through a labware by well name.
 
 Use indexing to access individual wells contained in the dictionary.
@@ -8112,7 +8112,7 @@ New in version 2\.18\.
 
 ### Wells and Liquids
 
-_class_ opentrons.protocol_api.Well(_parent: [Labware](index.html#opentrons.protocol_api.Labware 'opentrons.protocol_api.Labware')_, _core: WellCore_, _api_version: APIVersion_)
+_class_ opentrons.protocol*api.Well(\_parent: [Labware](index.html#opentrons.protocol_api.Labware 'opentrons.protocol_api.Labware')*, _core: WellCore_, _api_version: APIVersion_)
 The Well class represents a single well in a [`Labware`](#opentrons.protocol_api.Labware 'opentrons.protocol_api.Labware'). It provides parameters and functions for three major uses:
 
 > - Calculating positions relative to the well. See [Position Relative to Labware](index.html#position-relative-labware) for details.
@@ -8163,7 +8163,7 @@ For example, “A1 of Corning 96 Well Plate 360 µL Flat on slot D1”. Run log
 entries use this format for identifying wells. See
 [`ProtocolContext.commands()`](#opentrons.protocol_api.ProtocolContext.commands 'opentrons.protocol_api.ProtocolContext.commands').
 
-from_center_cartesian(_self_, _x: 'float'_, _y: 'float'_, _z: 'float'_) → 'Point'
+from*center_cartesian(\_self*, _x: 'float'_, _y: 'float'_, _z: 'float'_) → 'Point'
 Specifies a [`Point`](#opentrons.types.Point 'opentrons.types.Point') based on fractions of the
 distance from the center of the well to the edge along each axis.
 
@@ -8219,7 +8219,7 @@ Returns `None` if the well is not rectangular.
 
 New in version 2\.9\.
 
-load_liquid(_self_, _liquid: 'Liquid'_, _volume: 'float'_) → 'None'
+load*liquid(\_self*, _liquid: 'Liquid'_, _volume: 'float'_) → 'None'
 Load a liquid into a well.
 
 Parameters:
@@ -8268,7 +8268,7 @@ Returns `None` if the well is not rectangular.
 
 New in version 2\.9\.
 
-_class_ opentrons.protocol_api.Liquid(_\_id: [str](https://docs.python.org/3/library/stdtypes.html#str '(in Python v3.12)')_, _name: [str](https://docs.python.org/3/library/stdtypes.html#str '(in Python v3.12)')_, _description: [Optional](https://docs.python.org/3/library/typing.html#typing.Optional '(in Python v3.12)')\[[str](https://docs.python.org/3/library/stdtypes.html#str '(in Python v3.12)')]_, _display_color: [Optional](https://docs.python.org/3/library/typing.html#typing.Optional '(in Python v3.12)')\[[str](https://docs.python.org/3/library/stdtypes.html#str '(in Python v3.12)')]_)
+_class_ opentrons.protocol*api.Liquid(*\_id: [str](https://docs.python.org/3/library/stdtypes.html#str '(in Python v3.12)')_, \_name: [str](https://docs.python.org/3/library/stdtypes.html#str '(in Python v3.12)')_, _description: [Optional](https://docs.python.org/3/library/typing.html#typing.Optional '(in Python v3.12)')\[[str](https://docs.python.org/3/library/stdtypes.html#str '(in Python v3.12)')]_, _display_color: [Optional](https://docs.python.org/3/library/typing.html#typing.Optional '(in Python v3.12)')\[[str](https://docs.python.org/3/library/stdtypes.html#str '(in Python v3.12)')]_)
 A liquid to load into a well.
 
 name
@@ -8293,7 +8293,7 @@ New in version 2\.14\.
 
 ### Modules
 
-_class_ opentrons.protocol_api.HeaterShakerContext(_core: AbstractModuleCore_, _protocol_core: AbstractProtocol\[AbstractInstrument\[AbstractWellCore], AbstractLabware\[AbstractWellCore], AbstractModuleCore]_, _core_map: LoadedCoreMap_, _api_version: APIVersion_, _broker: LegacyBroker_)
+_class_ opentrons.protocol*api.HeaterShakerContext(\_core: AbstractModuleCore*, _protocol_core: AbstractProtocol\[AbstractInstrument\[AbstractWellCore], AbstractLabware\[AbstractWellCore], AbstractModuleCore]_, _core_map: LoadedCoreMap_, _api_version: APIVersion_, _broker: LegacyBroker_)
 An object representing a connected Heater\-Shaker Module.
 
 It should not be instantiated directly; instead, it should be
@@ -8305,7 +8305,7 @@ _property_ api_version*: APIVersion*
 
 New in version 2\.0\.
 
-close_labware_latch(_self_) → 'None'
+close*labware_latch(\_self*) → 'None'
 Closes the labware latch.
 
 The labware latch needs to be closed using this method before sending a shake command,
@@ -8325,7 +8325,7 @@ Returns `23` in simulation if no target temperature has been set.
 
 New in version 2\.13\.
 
-deactivate_heater(_self_) → 'None'
+deactivate*heater(\_self*) → 'None'
 Stops heating.
 
 The module will passively cool to room temperature.
@@ -8333,7 +8333,7 @@ The Heater\-Shaker does not have active cooling.
 
 New in version 2\.13\.
 
-deactivate_shaker(_self_) → 'None'
+deactivate*shaker(\_self*) → 'None'
 Stops shaking.
 
 Decelerating to 0 rpm typically only takes a few seconds.
@@ -8359,7 +8359,7 @@ One of six possible latch statuses:
 
 New in version 2\.13\.
 
-load_adapter(_self_, _name: 'str'_, _namespace: 'Optional\[str]' \= None_, _version: 'Optional\[int]' \= None_) → 'Labware'
+load*adapter(\_self*, _name: 'str'_, _namespace: 'Optional\[str]' \= None_, _version: 'Optional\[int]' \= None_) → 'Labware'
 Load an adapter onto the module using its load parameters.
 
 The parameters of this function behave like those of
@@ -8372,7 +8372,7 @@ The initialized and loaded adapter object.
 
 New in version 2\.15\.
 
-load_adapter_from_definition(_self_, _definition: 'LabwareDefinition'_) → 'Labware'
+load*adapter_from_definition(\_self*, _definition: 'LabwareDefinition'_) → 'Labware'
 Load an adapter onto the module using an inline definition.
 
 Parameters:
@@ -8383,7 +8383,7 @@ The initialized and loaded labware object.
 
 New in version 2\.15\.
 
-load_labware(_self_, _name: 'str'_, _label: 'Optional\[str]' \= None_, _namespace: 'Optional\[str]' \= None_, _version: 'Optional\[int]' \= None_, _adapter: 'Optional\[str]' \= None_) → 'Labware'
+load*labware(\_self*, _name: 'str'_, _label: 'Optional\[str]' \= None_, _namespace: 'Optional\[str]' \= None_, _version: 'Optional\[int]' \= None_, _adapter: 'Optional\[str]' \= None_) → 'Labware'
 Load a labware onto the module using its load parameters.
 
 The parameters of this function behave like those of
@@ -8396,13 +8396,13 @@ The initialized and loaded labware object.
 
 New in version 2\.1: The _label,_ _namespace,_ and _version_ parameters.
 
-load_labware_by_name(_self_, _name: 'str'_, _label: 'Optional\[str]' \= None_, _namespace: 'Optional\[str]' \= None_, _version: 'Optional\[int]' \= None_) → 'Labware'
+load*labware_by_name(\_self*, _name: 'str'_, _label: 'Optional\[str]' \= None_, _namespace: 'Optional\[str]' \= None_, _version: 'Optional\[int]' \= None_) → 'Labware'
 
 Deprecated since version 2\.0: Use [`load_labware()`](#opentrons.protocol_api.HeaterShakerContext.load_labware 'opentrons.protocol_api.HeaterShakerContext.load_labware') instead.
 
 New in version 2\.1\.
 
-load_labware_from_definition(_self_, _definition: 'LabwareDefinition'_, _label: 'Optional\[str]' \= None_) → 'Labware'
+load*labware_from_definition(\_self*, _definition: 'LabwareDefinition'_, _label: 'Optional\[str]' \= None_) → 'Labware'
 Load a labware onto the module using an inline definition.
 
 Parameters:
@@ -8423,7 +8423,7 @@ Get the module’s model identifier.
 
 New in version 2\.14\.
 
-open_labware_latch(_self_) → 'None'
+open*labware_latch(\_self*) → 'None'
 Open the Heater\-Shaker’s labware latch.
 
 The labware latch needs to be closed before:\* Shaking
@@ -8453,7 +8453,7 @@ Get the module’s unique hardware serial number.
 
 New in version 2\.14\.
 
-set_and_wait_for_shake_speed(_self_, _rpm: 'int'_) → 'None'
+set*and_wait_for_shake_speed(\_self*, _rpm: 'int'_) → 'None'
 Set a shake speed in rpm and block execution of further commands until the module reaches the target.
 
 Reaching a target shake speed typically only takes a few seconds.
@@ -8467,7 +8467,7 @@ Parameters:
 
 New in version 2\.13\.
 
-set_and_wait_for_temperature(_self_, _celsius: 'float'_) → 'None'
+set*and_wait_for_temperature(\_self*, _celsius: 'float'_) → 'None'
 Set a target temperature and wait until the module reaches the target.
 
 No other protocol commands will execute while waiting for the temperature.
@@ -8479,7 +8479,7 @@ and the Heater\-Shaker module has a temperature accuracy of ±0\.5 °C.
 
 New in version 2\.13\.
 
-set_target_temperature(_self_, _celsius: 'float'_) → 'None'
+set*target_temperature(\_self*, _celsius: 'float'_) → 'None'
 Set target temperature and return immediately.
 
 Sets the Heater\-Shaker’s target temperature and returns immediately without
@@ -8538,7 +8538,7 @@ Get the module’s general type identifier.
 
 New in version 2\.14\.
 
-wait_for_temperature(_self_) → 'None'
+wait*for_temperature(\_self*) → 'None'
 Delays protocol execution until the Heater\-Shaker has reached its target
 temperature.
 
@@ -8546,7 +8546,7 @@ Raises an error if no target temperature was previously set.
 
 New in version 2\.13\.
 
-_class_ opentrons.protocol_api.MagneticBlockContext(_core: AbstractModuleCore_, _protocol_core: AbstractProtocol\[AbstractInstrument\[AbstractWellCore], AbstractLabware\[AbstractWellCore], AbstractModuleCore]_, _core_map: LoadedCoreMap_, _api_version: APIVersion_, _broker: LegacyBroker_)
+_class_ opentrons.protocol*api.MagneticBlockContext(\_core: AbstractModuleCore*, _protocol_core: AbstractProtocol\[AbstractInstrument\[AbstractWellCore], AbstractLabware\[AbstractWellCore], AbstractModuleCore]_, _core_map: LoadedCoreMap_, _api_version: APIVersion_, _broker: LegacyBroker_)
 An object representing a Magnetic Block.
 
 It should not be instantiated directly; instead, it should be
@@ -8563,7 +8563,7 @@ The labware (if any) present on this module.
 
 New in version 2\.0\.
 
-load_adapter(_self_, _name: 'str'_, _namespace: 'Optional\[str]' \= None_, _version: 'Optional\[int]' \= None_) → 'Labware'
+load*adapter(\_self*, _name: 'str'_, _namespace: 'Optional\[str]' \= None_, _version: 'Optional\[int]' \= None_) → 'Labware'
 Load an adapter onto the module using its load parameters.
 
 The parameters of this function behave like those of
@@ -8576,7 +8576,7 @@ The initialized and loaded adapter object.
 
 New in version 2\.15\.
 
-load_adapter_from_definition(_self_, _definition: 'LabwareDefinition'_) → 'Labware'
+load*adapter_from_definition(\_self*, _definition: 'LabwareDefinition'_) → 'Labware'
 Load an adapter onto the module using an inline definition.
 
 Parameters:
@@ -8587,7 +8587,7 @@ The initialized and loaded labware object.
 
 New in version 2\.15\.
 
-load_labware(_self_, _name: 'str'_, _label: 'Optional\[str]' \= None_, _namespace: 'Optional\[str]' \= None_, _version: 'Optional\[int]' \= None_, _adapter: 'Optional\[str]' \= None_) → 'Labware'
+load*labware(\_self*, _name: 'str'_, _label: 'Optional\[str]' \= None_, _namespace: 'Optional\[str]' \= None_, _version: 'Optional\[int]' \= None_, _adapter: 'Optional\[str]' \= None_) → 'Labware'
 Load a labware onto the module using its load parameters.
 
 The parameters of this function behave like those of
@@ -8600,13 +8600,13 @@ The initialized and loaded labware object.
 
 New in version 2\.1: The _label,_ _namespace,_ and _version_ parameters.
 
-load_labware_by_name(_self_, _name: 'str'_, _label: 'Optional\[str]' \= None_, _namespace: 'Optional\[str]' \= None_, _version: 'Optional\[int]' \= None_) → 'Labware'
+load*labware_by_name(\_self*, _name: 'str'_, _label: 'Optional\[str]' \= None_, _namespace: 'Optional\[str]' \= None_, _version: 'Optional\[int]' \= None_) → 'Labware'
 
 Deprecated since version 2\.0: Use [`load_labware()`](#opentrons.protocol_api.MagneticBlockContext.load_labware 'opentrons.protocol_api.MagneticBlockContext.load_labware') instead.
 
 New in version 2\.1\.
 
-load_labware_from_definition(_self_, _definition: 'LabwareDefinition'_, _label: 'Optional\[str]' \= None_) → 'Labware'
+load*labware_from_definition(\_self*, _definition: 'LabwareDefinition'_, _label: 'Optional\[str]' \= None_) → 'Labware'
 Load a labware onto the module using an inline definition.
 
 Parameters:
@@ -8640,7 +8640,7 @@ Get the module’s general type identifier.
 
 New in version 2\.14\.
 
-_class_ opentrons.protocol_api.MagneticModuleContext(_core: AbstractModuleCore_, _protocol_core: AbstractProtocol\[AbstractInstrument\[AbstractWellCore], AbstractLabware\[AbstractWellCore], AbstractModuleCore]_, _core_map: LoadedCoreMap_, _api_version: APIVersion_, _broker: LegacyBroker_)
+_class_ opentrons.protocol*api.MagneticModuleContext(\_core: AbstractModuleCore*, _protocol_core: AbstractProtocol\[AbstractInstrument\[AbstractWellCore], AbstractLabware\[AbstractWellCore], AbstractModuleCore]_, _core_map: LoadedCoreMap_, _api_version: APIVersion_, _broker: LegacyBroker_)
 An object representing a connected Magnetic Module.
 
 It should not be instantiated directly; instead, it should be
@@ -8691,7 +8691,7 @@ The labware (if any) present on this module.
 
 New in version 2\.0\.
 
-load_adapter(_self_, _name: 'str'_, _namespace: 'Optional\[str]' \= None_, _version: 'Optional\[int]' \= None_) → 'Labware'
+load*adapter(\_self*, _name: 'str'_, _namespace: 'Optional\[str]' \= None_, _version: 'Optional\[int]' \= None_) → 'Labware'
 Load an adapter onto the module using its load parameters.
 
 The parameters of this function behave like those of
@@ -8704,7 +8704,7 @@ The initialized and loaded adapter object.
 
 New in version 2\.15\.
 
-load_adapter_from_definition(_self_, _definition: 'LabwareDefinition'_) → 'Labware'
+load*adapter_from_definition(\_self*, _definition: 'LabwareDefinition'_) → 'Labware'
 Load an adapter onto the module using an inline definition.
 
 Parameters:
@@ -8715,7 +8715,7 @@ The initialized and loaded labware object.
 
 New in version 2\.15\.
 
-load_labware(_self_, _name: 'str'_, _label: 'Optional\[str]' \= None_, _namespace: 'Optional\[str]' \= None_, _version: 'Optional\[int]' \= None_, _adapter: 'Optional\[str]' \= None_) → 'Labware'
+load*labware(\_self*, _name: 'str'_, _label: 'Optional\[str]' \= None_, _namespace: 'Optional\[str]' \= None_, _version: 'Optional\[int]' \= None_, _adapter: 'Optional\[str]' \= None_) → 'Labware'
 Load a labware onto the module using its load parameters.
 
 The parameters of this function behave like those of
@@ -8728,13 +8728,13 @@ The initialized and loaded labware object.
 
 New in version 2\.1: The _label,_ _namespace,_ and _version_ parameters.
 
-load_labware_by_name(_self_, _name: 'str'_, _label: 'Optional\[str]' \= None_, _namespace: 'Optional\[str]' \= None_, _version: 'Optional\[int]' \= None_) → 'Labware'
+load*labware_by_name(\_self*, _name: 'str'_, _label: 'Optional\[str]' \= None_, _namespace: 'Optional\[str]' \= None_, _version: 'Optional\[int]' \= None_) → 'Labware'
 
 Deprecated since version 2\.0: Use [`load_labware()`](#opentrons.protocol_api.MagneticModuleContext.load_labware 'opentrons.protocol_api.MagneticModuleContext.load_labware') instead.
 
 New in version 2\.1\.
 
-load_labware_from_definition(_self_, _definition: 'LabwareDefinition'_, _label: 'Optional\[str]' \= None_) → 'Labware'
+load*labware_from_definition(\_self*, _definition: 'LabwareDefinition'_, _label: 'Optional\[str]' \= None_) → 'Labware'
 Load a labware onto the module using an inline definition.
 
 Parameters:
@@ -8778,7 +8778,7 @@ Get the module’s general type identifier.
 
 New in version 2\.14\.
 
-_class_ opentrons.protocol_api.TemperatureModuleContext(_core: AbstractModuleCore_, _protocol_core: AbstractProtocol\[AbstractInstrument\[AbstractWellCore], AbstractLabware\[AbstractWellCore], AbstractModuleCore]_, _core_map: LoadedCoreMap_, _api_version: APIVersion_, _broker: LegacyBroker_)
+_class_ opentrons.protocol*api.TemperatureModuleContext(\_core: AbstractModuleCore*, _protocol_core: AbstractProtocol\[AbstractInstrument\[AbstractWellCore], AbstractLabware\[AbstractWellCore], AbstractModuleCore]_, _core_map: LoadedCoreMap_, _api_version: APIVersion_, _broker: LegacyBroker_)
 An object representing a connected Temperature Module.
 
 It should not be instantiated directly; instead, it should be
@@ -8800,7 +8800,7 @@ The labware (if any) present on this module.
 
 New in version 2\.0\.
 
-load_adapter(_self_, _name: 'str'_, _namespace: 'Optional\[str]' \= None_, _version: 'Optional\[int]' \= None_) → 'Labware'
+load*adapter(\_self*, _name: 'str'_, _namespace: 'Optional\[str]' \= None_, _version: 'Optional\[int]' \= None_) → 'Labware'
 Load an adapter onto the module using its load parameters.
 
 The parameters of this function behave like those of
@@ -8813,7 +8813,7 @@ The initialized and loaded adapter object.
 
 New in version 2\.15\.
 
-load_adapter_from_definition(_self_, _definition: 'LabwareDefinition'_) → 'Labware'
+load*adapter_from_definition(\_self*, _definition: 'LabwareDefinition'_) → 'Labware'
 Load an adapter onto the module using an inline definition.
 
 Parameters:
@@ -8824,7 +8824,7 @@ The initialized and loaded labware object.
 
 New in version 2\.15\.
 
-load_labware(_self_, _name: 'str'_, _label: 'Optional\[str]' \= None_, _namespace: 'Optional\[str]' \= None_, _version: 'Optional\[int]' \= None_, _adapter: 'Optional\[str]' \= None_) → 'Labware'
+load*labware(\_self*, _name: 'str'_, _label: 'Optional\[str]' \= None_, _namespace: 'Optional\[str]' \= None_, _version: 'Optional\[int]' \= None_, _adapter: 'Optional\[str]' \= None_) → 'Labware'
 Load a labware onto the module using its load parameters.
 
 The parameters of this function behave like those of
@@ -8837,13 +8837,13 @@ The initialized and loaded labware object.
 
 New in version 2\.1: The _label,_ _namespace,_ and _version_ parameters.
 
-load_labware_by_name(_self_, _name: 'str'_, _label: 'Optional\[str]' \= None_, _namespace: 'Optional\[str]' \= None_, _version: 'Optional\[int]' \= None_) → 'Labware'
+load*labware_by_name(\_self*, _name: 'str'_, _label: 'Optional\[str]' \= None_, _namespace: 'Optional\[str]' \= None_, _version: 'Optional\[int]' \= None_) → 'Labware'
 
 Deprecated since version 2\.0: Use [`load_labware()`](#opentrons.protocol_api.TemperatureModuleContext.load_labware 'opentrons.protocol_api.TemperatureModuleContext.load_labware') instead.
 
 New in version 2\.1\.
 
-load_labware_from_definition(_self_, _definition: 'LabwareDefinition'_, _label: 'Optional\[str]' \= None_) → 'Labware'
+load*labware_from_definition(\_self*, _definition: 'LabwareDefinition'_, _label: 'Optional\[str]' \= None_) → 'Labware'
 Load a labware onto the module using an inline definition.
 
 Parameters:
@@ -8877,7 +8877,7 @@ Get the module’s unique hardware serial number.
 
 New in version 2\.14\.
 
-set_temperature(_self_, _celsius: 'float'_) → 'None'
+set*temperature(\_self*, _celsius: 'float'_) → 'None'
 Set a target temperature and wait until the module reaches the target.
 
 No other protocol commands will execute while waiting for the temperature.
@@ -8917,7 +8917,7 @@ Get the module’s general type identifier.
 
 New in version 2\.14\.
 
-_class_ opentrons.protocol_api.ThermocyclerContext(_core: AbstractModuleCore_, _protocol_core: AbstractProtocol\[AbstractInstrument\[AbstractWellCore], AbstractLabware\[AbstractWellCore], AbstractModuleCore]_, _core_map: LoadedCoreMap_, _api_version: APIVersion_, _broker: LegacyBroker_)
+_class_ opentrons.protocol*api.ThermocyclerContext(\_core: AbstractModuleCore*, _protocol_core: AbstractProtocol\[AbstractInstrument\[AbstractWellCore], AbstractLabware\[AbstractWellCore], AbstractModuleCore]_, _core_map: LoadedCoreMap_, _api_version: APIVersion_, _broker: LegacyBroker_)
 An object representing a connected Thermocycler Module.
 
 It should not be instantiated directly; instead, it should be
@@ -8951,7 +8951,7 @@ One of five possible temperature statuses:
 
 New in version 2\.0\.
 
-close_lid(_self_) → 'str'
+close*lid(\_self*) → 'str'
 Close the lid.
 
 New in version 2\.0\.
@@ -8961,17 +8961,17 @@ Turn off both the well block temperature controller and the lid heater.
 
 New in version 2\.0\.
 
-deactivate_block(_self_) → 'None'
+deactivate*block(\_self*) → 'None'
 Turn off the well block temperature controller.
 
 New in version 2\.0\.
 
-deactivate_lid(_self_) → 'None'
+deactivate*lid(\_self*) → 'None'
 Turn off the lid heater.
 
 New in version 2\.0\.
 
-execute_profile(_self_, _steps: 'List\[ThermocyclerStep]'_, _repetitions: 'int'_, _block_max_volume: 'Optional\[float]' \= None_) → 'None'
+execute*profile(\_self*, _steps: 'List\[ThermocyclerStep]'_, _repetitions: 'int'_, _block_max_volume: 'Optional\[float]' \= None_) → 'None'
 Execute a Thermocycler profile, defined as a cycle of
 `steps`, for a given number of `repetitions`.
 
@@ -9026,7 +9026,7 @@ One of five possible temperature statuses:
 
 New in version 2\.0\.
 
-load_adapter(_self_, _name: 'str'_, _namespace: 'Optional\[str]' \= None_, _version: 'Optional\[int]' \= None_) → 'Labware'
+load*adapter(\_self*, _name: 'str'_, _namespace: 'Optional\[str]' \= None_, _version: 'Optional\[int]' \= None_) → 'Labware'
 Load an adapter onto the module using its load parameters.
 
 The parameters of this function behave like those of
@@ -9039,7 +9039,7 @@ The initialized and loaded adapter object.
 
 New in version 2\.15\.
 
-load_adapter_from_definition(_self_, _definition: 'LabwareDefinition'_) → 'Labware'
+load*adapter_from_definition(\_self*, _definition: 'LabwareDefinition'_) → 'Labware'
 Load an adapter onto the module using an inline definition.
 
 Parameters:
@@ -9050,7 +9050,7 @@ The initialized and loaded labware object.
 
 New in version 2\.15\.
 
-load_labware(_self_, _name: 'str'_, _label: 'Optional\[str]' \= None_, _namespace: 'Optional\[str]' \= None_, _version: 'Optional\[int]' \= None_, _adapter: 'Optional\[str]' \= None_) → 'Labware'
+load*labware(\_self*, _name: 'str'_, _label: 'Optional\[str]' \= None_, _namespace: 'Optional\[str]' \= None_, _version: 'Optional\[int]' \= None_, _adapter: 'Optional\[str]' \= None_) → 'Labware'
 Load a labware onto the module using its load parameters.
 
 The parameters of this function behave like those of
@@ -9063,13 +9063,13 @@ The initialized and loaded labware object.
 
 New in version 2\.1: The _label,_ _namespace,_ and _version_ parameters.
 
-load_labware_by_name(_self_, _name: 'str'_, _label: 'Optional\[str]' \= None_, _namespace: 'Optional\[str]' \= None_, _version: 'Optional\[int]' \= None_) → 'Labware'
+load*labware_by_name(\_self*, _name: 'str'_, _label: 'Optional\[str]' \= None_, _namespace: 'Optional\[str]' \= None_, _version: 'Optional\[int]' \= None_) → 'Labware'
 
 Deprecated since version 2\.0: Use [`load_labware()`](#opentrons.protocol_api.ThermocyclerContext.load_labware 'opentrons.protocol_api.ThermocyclerContext.load_labware') instead.
 
 New in version 2\.1\.
 
-load_labware_from_definition(_self_, _definition: 'LabwareDefinition'_, _label: 'Optional\[str]' \= None_) → 'Labware'
+load*labware_from_definition(\_self*, _definition: 'LabwareDefinition'_, _label: 'Optional\[str]' \= None_) → 'Labware'
 Load a labware onto the module using an inline definition.
 
 Parameters:
@@ -9090,7 +9090,7 @@ Get the module’s model identifier.
 
 New in version 2\.14\.
 
-open_lid(_self_) → 'str'
+open*lid(\_self*) → 'str'
 Open the lid.
 
 New in version 2\.0\.
@@ -9108,7 +9108,7 @@ Get the module’s unique hardware serial number.
 
 New in version 2\.14\.
 
-set_block_temperature(_self_, _temperature: 'float'_, _hold_time_seconds: 'Optional\[float]' \= None_, _hold_time_minutes: 'Optional\[float]' \= None_, _ramp_rate: 'Optional\[float]' \= None_, _block_max_volume: 'Optional\[float]' \= None_) → 'None'
+set*block_temperature(\_self*, _temperature: 'float'_, _hold_time_seconds: 'Optional\[float]' \= None_, _hold_time_minutes: 'Optional\[float]' \= None_, _ramp_rate: 'Optional\[float]' \= None_, _block_max_volume: 'Optional\[float]' \= None_) → 'None'
 Set the target temperature for the well block, in °C.
 
 Parameters:
@@ -9129,7 +9129,7 @@ Parameters:
 
 New in version 2\.0\.
 
-set_lid_temperature(_self_, _temperature: 'float'_) → 'None'
+set*lid_temperature(\_self*, _temperature: 'float'_) → 'None'
 Set the target temperature for the heated lid, in °C.
 
 Parameters:
@@ -9292,7 +9292,7 @@ Don’t do that anymore. If `payload["text"]` happens to contain any
   are presented by the protocol context in
   `ProtocolContext.bundled_data`.
 
-opentrons.execute.get_arguments(_parser: [argparse.ArgumentParser](https://docs.python.org/3/library/argparse.html#argparse.ArgumentParser '(in Python v3.12)')_) → [argparse.ArgumentParser](https://docs.python.org/3/library/argparse.html#argparse.ArgumentParser '(in Python v3.12)')
+opentrons.execute.get*arguments(\_parser: [argparse.ArgumentParser](https://docs.python.org/3/library/argparse.html#argparse.ArgumentParser '(in Python v3.12)')*) → [argparse.ArgumentParser](https://docs.python.org/3/library/argparse.html#argparse.ArgumentParser '(in Python v3.12)')
 Get the argument parser for this module
 
 Useful if you want to use this module as a component of another CLI program
@@ -9304,7 +9304,7 @@ Parameters:
 Returns argparse.ArgumentParser:
 The parser with arguments added.
 
-opentrons.execute.get_protocol_api(_version: Union\[[str](https://docs.python.org/3/library/stdtypes.html#str '(in Python v3.12)'), opentrons.protocols.api_support.types.APIVersion]_, _bundled_labware: Optional\[Dict\[str, ForwardRef('LabwareDefinitionDict')]] \= None_, _bundled_data: Optional\[Dict\[[str](https://docs.python.org/3/library/stdtypes.html#str '(in Python v3.12)'), [bytes](https://docs.python.org/3/library/stdtypes.html#bytes '(in Python v3.12)')]] \= None_, _extra_labware: Optional\[Dict\[str, ForwardRef('LabwareDefinitionDict')]] \= None_) → [opentrons.protocol_api.protocol_context.ProtocolContext](index.html#opentrons.protocol_api.ProtocolContext 'opentrons.protocol_api.protocol_context.ProtocolContext')
+opentrons.execute.get*protocol_api(\_version: Union\[[str](https://docs.python.org/3/library/stdtypes.html#str '(in Python v3.12)'), opentrons.protocols.api_support.types.APIVersion]*, _bundled_labware: Optional\[Dict\[str, ForwardRef('LabwareDefinitionDict')]] \= None_, _bundled_data: Optional\[Dict\[[str](https://docs.python.org/3/library/stdtypes.html#str '(in Python v3.12)'), [bytes](https://docs.python.org/3/library/stdtypes.html#bytes '(in Python v3.12)')]] \= None_, _extra_labware: Optional\[Dict\[str, ForwardRef('LabwareDefinitionDict')]] \= None_) → [opentrons.protocol_api.protocol_context.ProtocolContext](index.html#opentrons.protocol_api.ProtocolContext 'opentrons.protocol_api.protocol_context.ProtocolContext')
 Build and return a `protocol_api.ProtocolContext`
 connected to the robot.
 
@@ -9368,18 +9368,18 @@ Check if bundling is allowed with a special not\-exposed\-to\-the\-app flag.
 Returns `True` if the environment variable
 `OT_API_FF_allowBundleCreation` is `"1"`
 
-opentrons.simulate.bundle_from_sim(_protocol: opentrons.protocols.types.PythonProtocol_, _context: [opentrons.protocol_api.protocol_context.ProtocolContext](index.html#opentrons.protocol_api.ProtocolContext 'opentrons.protocol_api.protocol_context.ProtocolContext')_) → opentrons.protocols.types.BundleContents
+opentrons.simulate.bundle*from_sim(\_protocol: opentrons.protocols.types.PythonProtocol*, _context: [opentrons.protocol_api.protocol_context.ProtocolContext](index.html#opentrons.protocol_api.ProtocolContext 'opentrons.protocol_api.protocol_context.ProtocolContext')_) → opentrons.protocols.types.BundleContents
 From a protocol, and the context that has finished simulating that
 protocol, determine what needs to go in a bundle for the protocol.
 
-opentrons.simulate.format_runlog(_runlog: List\[Mapping\[[str](https://docs.python.org/3/library/stdtypes.html#str '(in Python v3.12)'), Any]]_) → [str](https://docs.python.org/3/library/stdtypes.html#str '(in Python v3.12)')
+opentrons.simulate.format*runlog(\_runlog: List\[Mapping\[[str](https://docs.python.org/3/library/stdtypes.html#str '(in Python v3.12)'), Any]]*) → [str](https://docs.python.org/3/library/stdtypes.html#str '(in Python v3.12)')
 Format a run log (return value of [`simulate`](#opentrons.simulate.simulate 'opentrons.simulate.simulate')) into a
 human\-readable string
 
 Parameters:
 **runlog** – The output of a call to [`simulate`](#opentrons.simulate.simulate 'opentrons.simulate.simulate')
 
-opentrons.simulate.get_arguments(_parser: [argparse.ArgumentParser](https://docs.python.org/3/library/argparse.html#argparse.ArgumentParser '(in Python v3.12)')_) → [argparse.ArgumentParser](https://docs.python.org/3/library/argparse.html#argparse.ArgumentParser '(in Python v3.12)')
+opentrons.simulate.get*arguments(\_parser: [argparse.ArgumentParser](https://docs.python.org/3/library/argparse.html#argparse.ArgumentParser '(in Python v3.12)')*) → [argparse.ArgumentParser](https://docs.python.org/3/library/argparse.html#argparse.ArgumentParser '(in Python v3.12)')
 Get the argument parser for this module
 
 Useful if you want to use this module as a component of another CLI program
@@ -9392,7 +9392,7 @@ created.
 Returns argparse.ArgumentParser:
 The parser with arguments added.
 
-opentrons.simulate.get_protocol_api(_version: Union\[str, opentrons.protocols.api_support.types.APIVersion], bundled_labware: Optional\[Dict\[str, ForwardRef('LabwareDefinitionDict')]] \= None, bundled_data: Optional\[Dict\[str, bytes]] \= None, extra_labware: Optional\[Dict\[str, ForwardRef('LabwareDefinitionDict')]] \= None, hardware_simulator: Optional\[opentrons.hardware_control.thread_manager.ThreadManager\[Union\[opentrons.hardware_control.protocols.HardwareControlInterface\[opentrons.hardware_control.robot_calibration.RobotCalibration, opentrons.types.Mount, opentrons.config.types.RobotConfig], opentrons.hardware_control.protocols.FlexHardwareControlInterface\[opentrons.hardware_control.ot3_calibration.OT3Transforms, Union\[opentrons.types.Mount, opentrons.hardware_control.types.OT3Mount], opentrons.config.types.OT3Config]]]] \= None, \\\*, robot_type: Optional\[Literal\['OT\-2', 'Flex']] \= None, use_virtual_hardware: bool \= True_) → [opentrons.protocol_api.protocol_context.ProtocolContext](index.html#opentrons.protocol_api.ProtocolContext 'opentrons.protocol_api.protocol_context.ProtocolContext')
+opentrons.simulate.get*protocol_api(\_version: Union\[str, opentrons.protocols.api_support.types.APIVersion], bundled_labware: Optional\[Dict\[str, ForwardRef('LabwareDefinitionDict')]] \= None, bundled_data: Optional\[Dict\[str, bytes]] \= None, extra_labware: Optional\[Dict\[str, ForwardRef('LabwareDefinitionDict')]] \= None, hardware_simulator: Optional\[opentrons.hardware_control.thread_manager.ThreadManager\[Union\[opentrons.hardware_control.protocols.HardwareControlInterface\[opentrons.hardware_control.robot_calibration.RobotCalibration, opentrons.types.Mount, opentrons.config.types.RobotConfig], opentrons.hardware_control.protocols.FlexHardwareControlInterface\[opentrons.hardware_control.ot3_calibration.OT3Transforms, Union\[opentrons.types.Mount, opentrons.hardware_control.types.OT3Mount], opentrons.config.types.OT3Config]]]] \= None, \\\*, robot_type: Optional\[Literal\['OT\-2', 'Flex']] \= None, use_virtual_hardware: bool \= True*) → [opentrons.protocol_api.protocol_context.ProtocolContext](index.html#opentrons.protocol_api.ProtocolContext 'opentrons.protocol_api.protocol_context.ProtocolContext')
 Build and return a `protocol_api.ProtocolContext`
 connected to Virtual Smoothie.
 

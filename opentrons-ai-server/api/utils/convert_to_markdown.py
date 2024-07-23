@@ -31,7 +31,7 @@ def clean_html(soup: BeautifulSoup) -> BeautifulSoup:
     return soup
 
 
-def extract_tab_content(soup: BeautifulSoup) -> tuple[BeautifulSoup, dict]:
+def extract_tab_content(soup: BeautifulSoup) -> tuple[BeautifulSoup, dict[str, str]]:
     tab_sections = soup.find_all(class_="sphinx-tabs docutils container")
     tab_markdown = {}
 
@@ -73,7 +73,7 @@ def convert_html_to_markdown(html_file_path: str, markdown_file_path: str) -> No
         file.write(full_markdown)
 
 
-def get_latest_version():
+def get_latest_version() -> str:
     try:
         # Run the git command to get the latest tag
         command = "git tag -l 'docs@2*' --sort=-taggerdate | head -n 1"
@@ -87,10 +87,10 @@ def get_latest_version():
         return version
     except subprocess.CalledProcessError as e:
         print(f"An error occurred while getting the version: {e}")
-        return None
+        return ""
 
 
-def get_markdown_format():
+def get_markdown_format() -> None:
     current_version = get_latest_version()
     command = "pipenv run sphinx-build -b singlehtml ../api/docs/v2 api/utils/build/docs/html/v2"
     current_dir = os.path.dirname(__file__)
