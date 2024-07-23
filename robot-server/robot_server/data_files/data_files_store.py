@@ -66,7 +66,7 @@ class DataFilesStore:
         return _convert_row_data_file_info(data_file_row)
 
     def sql_get_all_from_engine(self) -> List[DataFileInfo]:
-        """Get all data file info from the database."""
+        """Get all data file entries from the database."""
         statement = sqlalchemy.select(data_files_table).order_by(sqlite_rowid)
         with self._sql_engine.begin() as transaction:
             all_rows = transaction.execute(statement).all()

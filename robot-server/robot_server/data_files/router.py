@@ -225,7 +225,7 @@ async def get_data_file(
 @PydanticResponse.wrap_route(
     datafiles_router.get,
     path="/dataFiles",
-    summary="Get a list of all data file info",
+    summary="Get a list of all data files stored on the robot server",
     responses={status.HTTP_200_OK: {"model": SimpleMultiBody[str]}},
 )
 async def get_all_data_files(
