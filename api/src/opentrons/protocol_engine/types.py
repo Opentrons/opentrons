@@ -16,7 +16,7 @@ from pydantic import (
 from typing import Optional, Union, List, Dict, Any, NamedTuple, Tuple, FrozenSet
 from typing_extensions import Literal, TypeGuard
 
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.pipette import PipetteNameType
 from opentrons.types import MountType, DeckSlotName, StagingSlotName
 from opentrons.hardware_control.types import (
     TipStateType as HwTipStateType,
@@ -26,11 +26,11 @@ from opentrons.hardware_control.modules import (
     ModuleType as ModuleType,
 )
 
-from opentrons_shared_data.pipette.dev_types import (  # noqa: F401
+from opentrons_shared_data.pipette import (  # noqa: F401
     # convenience re-export of LabwareUri type
     LabwareUri as LabwareUri,
 )
-from opentrons_shared_data.module.dev_types import ModuleType as SharedDataModuleType
+from opentrons_shared_data.module import ModuleType as SharedDataModuleType
 
 
 # todo(mm, 2024-06-24): This monolithic status field is getting to be a bit much.
@@ -347,7 +347,7 @@ class MotorAxis(str, Enum):
     EXTENSION_JAW = "extensionJaw"
 
 
-# TODO(mc, 2022-01-18): use opentrons_shared_data.module.dev_types.ModuleModel
+# TODO(mc, 2022-01-18): use opentrons_shared_data.module.ModuleModel
 class ModuleModel(str, Enum):
     """All available modules' models."""
 

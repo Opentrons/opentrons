@@ -3,8 +3,8 @@ import pytest
 from typing import ContextManager, Any, NamedTuple, List, Tuple
 from decoy import Decoy
 from contextlib import nullcontext as does_not_raise
-from opentrons_shared_data.labware.dev_types import LabwareUri
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.labware import LabwareUri
+from opentrons_shared_data.robot import RobotType
 
 from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
 from opentrons.motion_planning import deck_conflict as wrapped_deck_conflict

@@ -17,7 +17,7 @@ from typing import (
 )
 
 from opentrons.config import CONFIG, ARCHITECTURE, SystemArchitecture
-from opentrons_shared_data.robot.dev_types import RobotTypeEnum
+from opentrons_shared_data.robot import RobotTypeEnum
 
 if TYPE_CHECKING:
     from pathlib import Path

@@ -6,12 +6,12 @@ from opentrons_shared_data.pipette.pipette_load_name_conversions import (
 )
 from opentrons_shared_data.pipette.types import PipetteGenerationType
 from opentrons_shared_data.robot import user_facing_robot_type
-from opentrons_shared_data.robot.dev_types import RobotTypeEnum
+from opentrons_shared_data.robot import RobotTypeEnum
 from pydantic import BaseModel, Field
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.pipette import PipetteNameType
 from opentrons.types import MountType
 
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData

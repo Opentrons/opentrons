@@ -3,7 +3,7 @@ import enum
 from math import sqrt, isclose
 from typing import TYPE_CHECKING, Any, NamedTuple, Iterator, Union, List
 
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot import RobotType
 
 from .protocols.api_support.labware_like import LabwareLike
 

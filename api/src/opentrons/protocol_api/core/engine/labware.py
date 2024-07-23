@@ -1,7 +1,7 @@
 """ProtocolEngine-based Labware core implementations."""
 from typing import List, Optional, cast
 
-from opentrons_shared_data.labware.dev_types import (
+from opentrons_shared_data.labware import (
     LabwareParameters as LabwareParametersDict,
     LabwareDefinition as LabwareDefinitionDict,
 )

@@ -27,7 +27,7 @@ from typing import (
 )
 from typing_extensions import Literal
 
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot import RobotType
 
 import opentrons
 from opentrons import should_use_ot3
@@ -76,7 +76,7 @@ from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from .util import entrypoint_util
 
 if TYPE_CHECKING:
-    from opentrons_shared_data.labware.dev_types import (
+    from opentrons_shared_data.labware import (
         LabwareDefinition as LabwareDefinitionDict,
     )
 

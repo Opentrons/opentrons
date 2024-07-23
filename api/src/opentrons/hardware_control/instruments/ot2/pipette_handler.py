@@ -21,7 +21,7 @@ from opentrons_shared_data.errors.exceptions import (
     UnexpectedTipRemovalError,
     UnexpectedTipAttachError,
 )
-from opentrons_shared_data.pipette.dev_types import UlPerMmAction
+from opentrons_shared_data.pipette import UlPerMmAction
 from opentrons_shared_data.pipette.types import Quirks
 from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
 

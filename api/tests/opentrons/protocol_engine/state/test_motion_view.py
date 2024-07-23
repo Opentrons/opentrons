@@ -5,7 +5,7 @@ from typing import List
 import pytest
 from decoy import Decoy
 
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.pipette import PipetteNameType
 from opentrons.types import Point, MountType, DeckSlotName
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons import motion_planning
@@ -29,7 +29,7 @@ from opentrons.protocol_engine.state.geometry import GeometryView
 from opentrons.protocol_engine.state.motion import MotionView
 from opentrons.protocol_engine.state.modules import ModuleView
 from opentrons.protocol_engine.state.module_substates import HeaterShakerModuleId
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot import RobotType
 
 
 @pytest.fixture

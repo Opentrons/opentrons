@@ -13,8 +13,8 @@ from typing import (
     cast,
 )
 
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.labware import LabwareDefinition
+from opentrons_shared_data.pipette import PipetteNameType
 
 from opentrons.types import Mount, Location, DeckLocation, DeckSlotName, StagingSlotName
 from opentrons.legacy_broker import LegacyBroker

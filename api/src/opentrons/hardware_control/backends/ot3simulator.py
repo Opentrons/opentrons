@@ -47,7 +47,7 @@ from opentrons.hardware_control.types import (
     HardwareEventUnsubscriber,
 )
 
-from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
+from opentrons_shared_data.pipette import PipetteName, PipetteModel
 from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
     load_data as load_pipette_data,

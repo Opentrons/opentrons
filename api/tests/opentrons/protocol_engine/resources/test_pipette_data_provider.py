@@ -2,7 +2,7 @@
 from typing import Dict
 from sys import maxsize
 import pytest
-from opentrons_shared_data.pipette.dev_types import PipetteNameType, PipetteModel
+from opentrons_shared_data.pipette import PipetteNameType, PipetteModel
 from opentrons_shared_data.pipette import pipette_definition, types as pip_types
 from opentrons_shared_data.pipette.pipette_definition import (
     PipetteBoundingBoxOffsetDefinition,

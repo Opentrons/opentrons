@@ -56,7 +56,7 @@ from robot_server.persistence.fastapi_dependencies import (
     get_persistence_resetter,
 )
 from robot_server.persistence.persistence_directory import PersistenceResetter
-from opentrons_shared_data.robot.dev_types import RobotTypeEnum
+from opentrons_shared_data.robot import RobotTypeEnum
 
 log = logging.getLogger(__name__)
 

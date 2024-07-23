@@ -2,13 +2,13 @@
 from dataclasses import dataclass
 from typing import Iterator, List, Mapping, Optional, Tuple, Union
 
-from opentrons_shared_data.deck.dev_types import SlotDefV3
+from opentrons_shared_data.deck import SlotDefV3
 
 from opentrons.motion_planning import adjacent_slots_getters
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.types import DeckLocation, DeckSlotName, StagingSlotName, Location, Point
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot import RobotType
 
 
 from .core.common import ProtocolCore

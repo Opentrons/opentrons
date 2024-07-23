@@ -5,8 +5,8 @@ from typing import cast
 import pytest
 from decoy import Decoy, matchers
 
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
-from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
+from opentrons_shared_data.pipette import PipetteNameType
+from opentrons_shared_data.labware import LabwareDefinition as LabwareDefDict
 
 from opentrons.types import Mount, DeckSlotName, StagingSlotName
 from opentrons.protocol_api import OFF_DECK

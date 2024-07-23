@@ -6,7 +6,7 @@ from logging import getLogger
 from typing import Dict, List, Optional
 from typing_extensions import Final
 
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot import RobotType
 from opentrons_shared_data.errors import ErrorCodes
 from opentrons.protocol_engine.types import (
     RunTimeParameter,

@@ -52,7 +52,7 @@ from opentrons.hardware_control.errors import InvalidCriticalPoint
 from opentrons.hardware_control import nozzle_manager
 
 
-from opentrons_shared_data.pipette.dev_types import (
+from opentrons_shared_data.pipette import (
     UlPerMmAction,
     PipetteName,
     PipetteModel,

@@ -11,8 +11,8 @@ import pytest
 from decoy import Decoy
 from typing import Dict, Set, Optional, cast
 
-from opentrons_shared_data.robot.dev_types import RobotType
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
+from opentrons_shared_data.robot import RobotType
+from opentrons_shared_data.deck import DeckDefinitionV5
 from opentrons.types import Point, DeckSlotName
 
 from opentrons.protocol_engine.errors import (

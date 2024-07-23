@@ -5,8 +5,8 @@ from typing import Dict, Optional, cast, ContextManager, Any, Union, NamedTuple,
 from contextlib import nullcontext as does_not_raise
 
 from opentrons_shared_data.deck import load as load_deck
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
-from opentrons_shared_data.pipette.dev_types import LabwareUri
+from opentrons_shared_data.deck import DeckDefinitionV5
+from opentrons_shared_data.pipette import LabwareUri
 from opentrons_shared_data.labware import load_definition
 from opentrons_shared_data.labware.labware_definition import (
     Parameters,

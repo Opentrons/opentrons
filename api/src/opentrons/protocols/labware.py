@@ -17,7 +17,7 @@ from opentrons.protocols.api_support.constants import (
     STANDARD_DEFS_PATH,
     USER_DEFS_PATH,
 )
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons_shared_data.labware import LabwareDefinition
 
 
 MODULE_LOG = logging.getLogger(__name__)

@@ -1,7 +1,7 @@
 import logging
 from typing import Dict, Optional
 
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.pipette import PipetteNameType
 from opentrons_shared_data.pipette.pipette_load_name_conversions import (
     convert_to_pipette_name_type,
 )

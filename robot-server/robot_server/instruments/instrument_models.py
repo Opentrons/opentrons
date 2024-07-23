@@ -10,7 +10,7 @@ from pydantic.generics import GenericModel
 
 from opentrons.calibration_storage.types import SourceType
 from opentrons.protocol_engine.types import Vec3f
-from opentrons_shared_data.pipette.dev_types import (
+from opentrons_shared_data.pipette import (
     PipetteName,
     PipetteModel,
     ChannelCount,

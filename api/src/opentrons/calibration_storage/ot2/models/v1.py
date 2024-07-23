@@ -4,7 +4,7 @@ from typing_extensions import Literal
 from pydantic import BaseModel, Field, validator
 from datetime import datetime
 
-from opentrons_shared_data.pipette.dev_types import LabwareUri
+from opentrons_shared_data.pipette import LabwareUri
 
 from opentrons.types import Point
 from opentrons.calibration_storage import types

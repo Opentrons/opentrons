@@ -17,8 +17,8 @@ from typing import (
     cast,
 )
 
-from opentrons_shared_data.robot.dev_types import RobotType
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
+from opentrons_shared_data.robot import RobotType
+from opentrons_shared_data.deck import DeckDefinitionV5
 
 from opentrons_shared_data import load_shared_data
 from opentrons.types import DeckSlotName, MountType

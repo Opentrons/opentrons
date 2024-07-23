@@ -5,7 +5,7 @@ from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.protocols.protocol_store import ProtocolStore
 from sqlalchemy.engine import Engine as SQLEngine
 
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot import RobotType
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine import DeckType

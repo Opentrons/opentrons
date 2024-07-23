@@ -19,7 +19,7 @@ from pathlib import Path
 from opentrons.drivers.rpi_drivers.types import USBPort
 
 if TYPE_CHECKING:
-    from opentrons_shared_data.module.dev_types import (
+    from opentrons_shared_data.module import (
         ThermocyclerModuleType,
         MagneticModuleType,
         TemperatureModuleType,

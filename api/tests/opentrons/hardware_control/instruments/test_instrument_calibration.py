@@ -6,7 +6,7 @@ import pytest
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 from decoy import Decoy
 
-from opentrons_shared_data.labware.dev_types import (
+from opentrons_shared_data.labware import (
     LabwareUri,
     LabwareDefinition as LabwareDefDict,
 )

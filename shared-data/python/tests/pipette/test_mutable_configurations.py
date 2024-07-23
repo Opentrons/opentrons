@@ -11,7 +11,7 @@ from opentrons_shared_data.pipette import (
     pipette_definition,
     pipette_load_name_conversions as pip_conversions,
     load_data,
-    dev_types,
+    PipetteModel,
 )
 
 
@@ -242,15 +242,11 @@ def test_save_invalid_overrides(
     argnames=["pipette_model", "serial_number"],
     argvalues=[
         [
-            pip_conversions.convert_pipette_model(
-                cast(dev_types.PipetteModel, "p1000_96_v3.3")
-            ),
+            pip_conversions.convert_pipette_model(cast(PipetteModel, "p1000_96_v3.3")),
             "P1KHV3320230629",
         ],
         [
-            pip_conversions.convert_pipette_model(
-                cast(dev_types.PipetteModel, "p50_multi_v1.5")
-            ),
+            pip_conversions.convert_pipette_model(cast(PipetteModel, "p50_multi_v1.5")),
             TEST_SERIAL_NUMBER,
         ],
     ],

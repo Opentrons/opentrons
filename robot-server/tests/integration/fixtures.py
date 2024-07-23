@@ -9,7 +9,7 @@ from opentrons.protocol_api import (
     MIN_SUPPORTED_VERSION_FOR_FLEX,
 )
 from opentrons import __version__, config
-from opentrons_shared_data.module.dev_types import ModuleModel
+from opentrons_shared_data.module import ModuleModel
 
 
 def check_health_response(response: Response) -> None:

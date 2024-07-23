@@ -3,8 +3,8 @@ from dataclasses import dataclass
 from functools import cached_property
 from typing import Dict, List, Optional, Set, Union
 
-from opentrons_shared_data.robot.dev_types import RobotType, RobotDefinition
-from opentrons_shared_data.deck.dev_types import (
+from opentrons_shared_data.robot import RobotType, RobotDefinition
+from opentrons_shared_data.deck import (
     DeckDefinitionV5,
     SlotDefV3,
     CutoutFixture,

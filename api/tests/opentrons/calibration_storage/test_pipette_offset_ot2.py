@@ -13,7 +13,7 @@ from opentrons.calibration_storage.ot2 import (
 )
 
 if TYPE_CHECKING:
-    from opentrons_shared_data.deck.dev_types import RobotModel
+    from opentrons_shared_data.deck import RobotModel
 
 
 @pytest.fixture

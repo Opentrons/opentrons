@@ -29,7 +29,7 @@ from opentrons_shared_data.protocol.models import (
     Pipette,
     Robot,
 )
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.pipette import PipetteNameType
 from opentrons.types import DeckSlotName, MountType
 from opentrons.protocol_runner.json_translator import JsonTranslator
 from opentrons.protocol_engine import (

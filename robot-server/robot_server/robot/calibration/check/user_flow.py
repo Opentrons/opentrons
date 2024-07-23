@@ -35,7 +35,7 @@ from opentrons.protocols.api_support.deck_type import (
     guess_from_global_config as guess_deck_type_from_global_config,
 )
 
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons_shared_data.labware import LabwareDefinition
 
 from robot_server.robot.calibration.constants import (
     MOVE_TO_DECK_SAFETY_BUFFER,

@@ -32,7 +32,7 @@ from opentrons.protocol_engine.state.module_substates.heater_shaker_module_subst
     HeaterShakerModuleSubState,
 )
 from opentrons.types import DeckSlotName
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot import RobotType
 
 
 @pytest.fixture

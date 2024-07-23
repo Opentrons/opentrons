@@ -2,8 +2,8 @@
 from typing import List, Set, cast, Dict, Optional
 
 import pytest
-from opentrons_shared_data.robot.dev_types import RobotType
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
+from opentrons_shared_data.robot import RobotType
+from opentrons_shared_data.deck import DeckDefinitionV5
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 
 from opentrons.types import DeckSlotName

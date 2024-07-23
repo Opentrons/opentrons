@@ -51,7 +51,7 @@ from opentrons.protocol_engine import (
 )
 from opentrons.protocol_engine.protocol_engine import code_in_error_tree
 
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot import RobotType
 
 from opentrons_shared_data.errors import ErrorCodes
 from opentrons_shared_data.errors.exceptions import (

@@ -29,7 +29,7 @@ from opentrons.hardware_control import HardwareControlAPI, CriticalPoint, Pipett
 from opentrons.protocols.api_support.deck_type import (
     guess_from_global_config as guess_deck_type_from_global_config,
 )
-from opentrons_shared_data.pipette.dev_types import LabwareUri
+from opentrons_shared_data.pipette import LabwareUri
 from opentrons.protocol_api import labware
 from opentrons.protocol_api.core.legacy.deck import Deck
 from opentrons.types import Mount, Point, Location
@@ -56,7 +56,7 @@ from .state_machine import (
     PipetteOffsetWithTipLengthStateMachine,
 )
 
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons_shared_data.labware import LabwareDefinition
 
 
 MODULE_LOG = logging.getLogger(__name__)

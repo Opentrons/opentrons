@@ -1,7 +1,7 @@
 """Maintenance Run router dependency-injection wire-up."""
 from fastapi import Depends
 
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot import RobotType
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine import DeckType

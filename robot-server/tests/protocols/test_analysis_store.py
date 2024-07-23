@@ -11,7 +11,7 @@ from opentrons.protocol_engine.types import RunTimeParamValuesType
 
 from sqlalchemy.engine import Engine as SQLEngine
 
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.pipette import PipetteNameType
 from opentrons_shared_data.errors import ErrorCodes
 
 from opentrons.types import MountType, DeckSlotName

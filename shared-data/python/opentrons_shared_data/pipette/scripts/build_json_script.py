@@ -23,7 +23,7 @@ from ..pipette_definition import (
     PlungerEjectDropTipConfiguration,
 )
 
-from ..dev_types import PipetteModelSpec
+from .. import PipetteModelSpec
 
 
 PIPETTE_DEFINITION_ROOT = Path("pipette") / "definitions" / "2"

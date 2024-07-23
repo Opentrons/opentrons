@@ -18,7 +18,7 @@ from opentrons.protocol_engine.commands.configure_for_volume import (
     ConfigureForVolumePrivateResult,
     ConfigureForVolumeImplementation,
 )
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.pipette import PipetteNameType
 from ..pipette_fixtures import get_default_nozzle_map
 from opentrons.types import Point
 

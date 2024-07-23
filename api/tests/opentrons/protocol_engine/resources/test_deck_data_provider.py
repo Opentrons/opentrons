@@ -3,7 +3,7 @@ import pytest
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 from decoy import Decoy
 
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
+from opentrons_shared_data.deck import DeckDefinitionV5
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import DeckSlotName
 

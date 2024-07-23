@@ -87,7 +87,7 @@ from opentrons_shared_data.pipette.types import (
 from opentrons_shared_data.pipette import (
     load_data as load_pipette_data,
 )
-from opentrons_shared_data.pipette.dev_types import PipetteModel
+from opentrons_shared_data.pipette import PipetteModel
 from opentrons.hardware_control.modules import (
     Thermocycler,
     TempDeck,

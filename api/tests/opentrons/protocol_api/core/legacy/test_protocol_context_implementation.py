@@ -5,9 +5,9 @@ from typing import Any, Dict, cast
 import pytest
 from decoy import Decoy
 
-from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
-from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
+from opentrons_shared_data.labware import LabwareDefinition as LabwareDefDict
+from opentrons_shared_data.pipette import PipetteNameType
+from opentrons_shared_data.module import ModuleDefinitionV3
 
 from opentrons.types import DeckSlotName, StagingSlotName, Location, Mount, Point
 from opentrons.util.broker import Broker

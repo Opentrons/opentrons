@@ -5,8 +5,8 @@ from dataclasses import dataclass
 from typing import Callable, Dict, List, Optional, Sequence, TypeVar
 from typing_extensions import ParamSpec
 
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
-from opentrons_shared_data.robot.dev_types import RobotDefinition
+from opentrons_shared_data.deck import DeckDefinitionV5
+from opentrons_shared_data.robot import RobotDefinition
 
 from opentrons.protocol_engine.types import ModuleOffsetData
 from opentrons.util.change_notifier import ChangeNotifier

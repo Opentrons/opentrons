@@ -5,7 +5,7 @@ from typing import cast
 import pytest
 from decoy import Decoy
 
-from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
+from opentrons_shared_data.labware import LabwareDefinition as LabwareDefDict
 
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import APIVersionError, UnsupportedAPIError
