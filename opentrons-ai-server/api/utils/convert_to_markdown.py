@@ -4,64 +4,102 @@ import subprocess
 from bs4 import BeautifulSoup
 from markdownify import markdownify  # type: ignore
 
-# Define the command to run Sphinx
-command = "pipenv run sphinx-build -b singlehtml api/docs/v2 opentrons-ai-server/api/utils/build/docs/html/v2"
 
-# Run the command
-try:
-    subprocess.run(command, check=True, shell=True)
-except subprocess.CalledProcessError as e:
-    print(f"An error occurred while running Sphinx build: {e}")
+def run_sphinx_build(command: str) -> None:
+    try:
+        subprocess.run(command, check=True, shell=True)
+    except subprocess.CalledProcessError as e:
+        print(f"An error occurred while running Sphinx build: {e}")
 
 
-current_dir = os.path.dirname(__file__)
-html_file_path = os.path.join(current_dir, "build", "docs", "html", "v2", "index.html")
-markdown_file_path = os.path.join(current_dir, "python_api_219.md")
+def clean_html(soup: BeautifulSoup) -> BeautifulSoup:
+    # Remove specific logos
+    logos = soup.find_all("img", src=lambda x: x and ("opentrons-images/website" in x))
+    for logo in logos:
+        logo.decompose()
 
-with open(html_file_path, "r", encoding="utf-8") as file:
-    html_content = file.read()
+    # Remove all images
+    all_images = soup.find_all("img")
+    for img in all_images:
+        img.decompose()
 
-soup = BeautifulSoup(html_content, "html.parser")
+    # Remove pilcrow symbols
+    pilcrow_symbols = soup.find_all("a", string="¶")
+    for symbol in pilcrow_symbols:
+        symbol.decompose()
 
-logos = soup.find_all("img", src=lambda x: x and ("opentrons-images/website" in x))
-for logo in logos:
-    logo.decompose()
+    return soup
 
-all_images = soup.find_all("img")
-for img in all_images:
-    img.decompose()
 
-pilcrow_symbols = soup.find_all("a", string="¶")
-for symbol in pilcrow_symbols:
-    symbol.decompose()
+def extract_tab_content(soup: BeautifulSoup) -> tuple[BeautifulSoup, dict]:
+    tab_sections = soup.find_all(class_="sphinx-tabs docutils container")
+    tab_markdown = {}
 
-tab_sections = soup.find_all(class_="sphinx-tabs docutils container")
+    for idx, tab_section in enumerate(tab_sections):
+        tab_buttons = tab_section.find_all(class_="sphinx-tabs-tab")
+        tab_panels = tab_section.find_all(class_="sphinx-tabs-panel")
 
-tab_markdown = {}
+        section_markdown = []
+        for button, panel in zip(tab_buttons, tab_panels, strict=False):
+            section_markdown.append(f"### {button.text.strip()}\n")
+            panel_content = markdownify(str(panel), strip=["div"])
+            section_markdown.append(panel_content)
+        combined_section_markdown = "\n".join(section_markdown) + "\n\n"
+        placeholder = f"tabSection{idx}"
+        tab_markdown[placeholder] = combined_section_markdown
+        placeholder_tag = soup.new_tag("div")
+        placeholder_tag.string = placeholder
+        tab_section.replace_with(placeholder_tag)
 
-for idx, tab_section in enumerate(tab_sections):
-    tab_buttons = tab_section.find_all(class_="sphinx-tabs-tab")
-    tab_panels = tab_section.find_all(class_="sphinx-tabs-panel")
+    return soup, tab_markdown
 
-    section_markdown = []
-    for button, panel in zip(tab_buttons, tab_panels, strict=False):
-        section_markdown.append(f"### {button.text.strip()}\n")
-        panel_content = markdownify(str(panel), strip=["div"])
-        section_markdown.append(panel_content)
-    combined_section_markdown = "\n".join(section_markdown) + "\n\n"
-    placeholder = f"tabSection{idx}"
-    tab_markdown[placeholder] = combined_section_markdown
-    placeholder_tag = soup.new_tag("div")
-    placeholder_tag.string = placeholder
-    tab_section.replace_with(placeholder_tag)
 
-modified_html_content = str(soup)
+def convert_html_to_markdown(html_file_path: str, markdown_file_path: str) -> None:
+    with open(html_file_path, "r", encoding="utf-8") as file:
+        html_content = file.read()
 
-full_markdown = markdownify(modified_html_content)
+    soup = BeautifulSoup(html_content, "html.parser")
+    soup = clean_html(soup)
+    soup, tab_markdown = extract_tab_content(soup)
 
-for placeholder, section_md in tab_markdown.items():
-    if placeholder in full_markdown:
-        full_markdown = full_markdown.replace(placeholder, section_md)
+    modified_html_content = str(soup)
+    full_markdown = markdownify(modified_html_content)
 
-with open(markdown_file_path, "w", encoding="utf-8") as file:
-    file.write(full_markdown)
+    for placeholder, section_md in tab_markdown.items():
+        if placeholder in full_markdown:
+            full_markdown = full_markdown.replace(placeholder, section_md)
+
+    with open(markdown_file_path, "w", encoding="utf-8") as file:
+        file.write(full_markdown)
+
+
+def get_latest_version():
+    try:
+        # Run the git command to get the latest tag
+        command = "git tag -l 'docs@2*' --sort=-taggerdate | head -n 1"
+        result = subprocess.run(command, capture_output=True, text=True, shell=True)
+        # Extract the tag from the output and remove '.'
+        tag = "".join(result.stdout.strip().split("."))
+        # tag = tag.split('_')[0]
+
+        # replace '@' prefix with '_'
+        version = tag.replace("@", "_")
+        return version
+    except subprocess.CalledProcessError as e:
+        print(f"An error occurred while getting the version: {e}")
+        return None
+
+
+def get_markdown_format():
+    current_version = get_latest_version()
+    command = "pipenv run sphinx-build -b singlehtml ../api/docs/v2 api/utils/build/docs/html/v2"
+    current_dir = os.path.dirname(__file__)
+    html_file_path = os.path.join(current_dir, "build", "docs", "html", "v2", "index.html")
+    markdown_file_path = os.path.join(current_dir, "..", "data", f"python_api_{current_version}.md")
+
+    run_sphinx_build(command)
+    convert_html_to_markdown(html_file_path, markdown_file_path)
+
+
+if __name__ == "__main__":
+    get_markdown_format()
