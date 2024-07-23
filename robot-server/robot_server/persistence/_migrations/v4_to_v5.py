@@ -70,15 +70,15 @@ def _migrate_db_with_changes(
         dest_transaction,
     )
     copy_rows_unmodified(
-        schema_4.action_table,
-        schema_5.action_table,
+        schema_4.run_table,
+        schema_5.run_table,
         source_transaction,
         dest_transaction,
         order_by_rowid=True,
     )
     copy_rows_unmodified(
-        schema_4.run_table,
-        schema_5.run_table,
+        schema_4.action_table,
+        schema_5.action_table,
         source_transaction,
         dest_transaction,
         order_by_rowid=True,
