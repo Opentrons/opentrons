@@ -13,61 +13,61 @@ from pydantic import BaseModel, Extra, Field
 from typing_extensions import Literal
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
-from opentrons_shared_data.protocol import dev_types
+from opentrons_shared_data import protocol
 
-CommandAspirate: dev_types.AspirateCommandId = "aspirate"
-CommandDispense: dev_types.DispenseCommandId = "dispense"
-CommandAirGap: dev_types.AirGapCommandId = "airGap"
-CommandBlowout: dev_types.BlowoutCommandId = "blowout"
-CommandTouchTip: dev_types.TouchTipCommandId = "touchTip"
-CommandPickUpTip: dev_types.PickUpTipCommandId = "pickUpTip"
-CommandDropTip: dev_types.DropTipCommandId = "dropTip"
-CommandMoveToSlot: dev_types.MoveToSlotCommandId = "moveToSlot"
-CommandMoveToWell: dev_types.MoveToWellCommandId = "moveToWell"
-CommandDelay: dev_types.DelayCommandId = "delay"
-CommandMagneticModuleEngage: dev_types.MagneticModuleEngageCommandId = (
+CommandAspirate: protocol.AspirateCommandId = "aspirate"
+CommandDispense: protocol.DispenseCommandId = "dispense"
+CommandAirGap: protocol.AirGapCommandId = "airGap"
+CommandBlowout: protocol.BlowoutCommandId = "blowout"
+CommandTouchTip: protocol.TouchTipCommandId = "touchTip"
+CommandPickUpTip: protocol.PickUpTipCommandId = "pickUpTip"
+CommandDropTip: protocol.DropTipCommandId = "dropTip"
+CommandMoveToSlot: protocol.MoveToSlotCommandId = "moveToSlot"
+CommandMoveToWell: protocol.MoveToWellCommandId = "moveToWell"
+CommandDelay: protocol.DelayCommandId = "delay"
+CommandMagneticModuleEngage: protocol.MagneticModuleEngageCommandId = (
     "magneticModule/engageMagnet"
 )
-CommandMagneticModuleDisengage: dev_types.MagneticModuleDisengageCommandId = (
+CommandMagneticModuleDisengage: protocol.MagneticModuleDisengageCommandId = (
     "magneticModule/disengageMagnet"
 )
-CommandTemperatureModuleSetTarget: dev_types.TemperatureModuleSetTargetCommandId = (
+CommandTemperatureModuleSetTarget: protocol.TemperatureModuleSetTargetCommandId = (
     "temperatureModule/setTargetTemperature"
 )
-CommandTemperatureModuleAwait: dev_types.TemperatureModuleAwaitCommandId = (
+CommandTemperatureModuleAwait: protocol.TemperatureModuleAwaitCommandId = (
     "temperatureModule/awaitTemperature"
 )
-CommandTemperatureModuleDeactivate: dev_types.TemperatureModuleDeactivateCommandId = (
+CommandTemperatureModuleDeactivate: protocol.TemperatureModuleDeactivateCommandId = (
     "temperatureModule/deactivate"
 )
-CommandThermocyclerSetTargetBlock: dev_types.ThermocyclerSetTargetBlockCommandId = (
+CommandThermocyclerSetTargetBlock: protocol.ThermocyclerSetTargetBlockCommandId = (
     "thermocycler/setTargetBlockTemperature"
 )
-CommandThermocyclerSetTargetLid: dev_types.ThermocyclerSetTargetLidCommandId = (
+CommandThermocyclerSetTargetLid: protocol.ThermocyclerSetTargetLidCommandId = (
     "thermocycler/setTargetLidTemperature"
 )
-CommandThermocyclerAwaitLidTemperature: dev_types.ThermocyclerAwaitLidTemperatureCommandId = (
+CommandThermocyclerAwaitLidTemperature: protocol.ThermocyclerAwaitLidTemperatureCommandId = (
     "thermocycler/awaitLidTemperature"
 )
-CommandThermocyclerAwaitBlockTemperature: dev_types.ThermocyclerAwaitBlockTemperatureCommandId = (
+CommandThermocyclerAwaitBlockTemperature: protocol.ThermocyclerAwaitBlockTemperatureCommandId = (
     "thermocycler/awaitBlockTemperature"
 )
-CommandThermocyclerDeactivateBlock: dev_types.ThermocyclerDeactivateBlockCommandId = (
+CommandThermocyclerDeactivateBlock: protocol.ThermocyclerDeactivateBlockCommandId = (
     "thermocycler/deactivateBlock"
 )
-CommandThermocyclerDeactivateLid: dev_types.ThermocyclerDeactivateLidCommandId = (
+CommandThermocyclerDeactivateLid: protocol.ThermocyclerDeactivateLidCommandId = (
     "thermocycler/deactivateLid"
 )
-CommandThermocyclerOpenLid: dev_types.ThermocyclerOpenLidCommandId = (
+CommandThermocyclerOpenLid: protocol.ThermocyclerOpenLidCommandId = (
     "thermocycler/openLid"
 )
-CommandThermocyclerCloseLid: dev_types.ThermocyclerCloseLidCommandId = (
+CommandThermocyclerCloseLid: protocol.ThermocyclerCloseLidCommandId = (
     "thermocycler/closeLid"
 )
-CommandThermocyclerRunProfile: dev_types.ThermocyclerRunProfileCommandId = (
+CommandThermocyclerRunProfile: protocol.ThermocyclerRunProfileCommandId = (
     "thermocycler/runProfile"
 )
-CommandThermocyclerAwaitProfile: dev_types.ThermocyclerAwaitProfileCommandId = (
+CommandThermocyclerAwaitProfile: protocol.ThermocyclerAwaitProfileCommandId = (
     "thermocycler/awaitProfileComplete"
 )
 

@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field, validator
 from typing_extensions import Literal
 from dataclasses import dataclass
 
-from . import types as pip_types, dev_types
+from . import types as pip_types
 
 # The highest and lowest existing overlap version values.
 TIP_OVERLAP_VERSION_MINIMUM = 0
