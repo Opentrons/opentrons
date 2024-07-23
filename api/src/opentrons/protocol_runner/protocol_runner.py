@@ -44,7 +44,7 @@ from ..protocol_engine.types import (
     DeckConfigurationType,
     RunTimeParameter,
     PrimitiveRunTimeParamValuesType,
-    CsvRunTimeParamFilesType,
+    CSVRunTimeParamFilesType,
 )
 from ..protocols.types import PythonProtocol
 
@@ -186,7 +186,7 @@ class PythonAndLegacyRunner(AbstractRunner):
         protocol_source: ProtocolSource,
         python_parse_mode: PythonParseMode,
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType],
-        run_time_param_files: Optional[CsvRunTimeParamFilesType],
+        run_time_param_files: Optional[CSVRunTimeParamFilesType],
     ) -> None:
         """Load a Python or JSONv5(& older) ProtocolSource into managed ProtocolEngine."""
         labware_definitions = await protocol_reader.extract_labware_definitions(
@@ -254,7 +254,7 @@ class PythonAndLegacyRunner(AbstractRunner):
         deck_configuration: DeckConfigurationType,
         protocol_source: Optional[ProtocolSource] = None,
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
-        run_time_param_files: Optional[CsvRunTimeParamFilesType] = None,
+        run_time_param_files: Optional[CSVRunTimeParamFilesType] = None,
         python_parse_mode: PythonParseMode = PythonParseMode.NORMAL,
     ) -> RunResult:
         # TODO(mc, 2022-01-11): move load to runner creation, remove from `run`

@@ -15,7 +15,7 @@ from opentrons.legacy_broker import LegacyBroker
 from opentrons.protocol_engine import ProtocolEngine
 from opentrons.protocol_engine.types import (
     PrimitiveRunTimeParamValuesType,
-    CsvRunTimeParamFilesType,
+    CSVRunTimeParamFilesType,
 )
 from opentrons.protocol_reader import ProtocolSource, ProtocolFileRole
 from opentrons.util.broker import Broker
@@ -165,7 +165,7 @@ class PythonProtocolExecutor:
         protocol: PythonProtocol,
         parameter_context: ParameterContext,
         run_time_param_overrides: Optional[PrimitiveRunTimeParamValuesType],
-        run_time_param_file_overrides: Optional[CsvRunTimeParamFilesType],
+        run_time_param_file_overrides: Optional[CSVRunTimeParamFilesType],
     ) -> Optional[Parameters]:
         """Extract the parameters defined in the protocol, overridden with values for the run."""
         return exec_add_parameters(

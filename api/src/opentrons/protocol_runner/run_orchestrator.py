@@ -32,7 +32,7 @@ from ..protocol_engine.types import (
     DeckConfigurationType,
     RunTimeParameter,
     PrimitiveRunTimeParamValuesType,
-    CsvRunTimeParamFilesType,
+    CSVRunTimeParamFilesType,
 )
 from ..protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
 
@@ -340,7 +340,7 @@ class RunOrchestrator:
         self,
         protocol_source: ProtocolSource,
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType],
-        run_time_param_files: Optional[CsvRunTimeParamFilesType],
+        run_time_param_files: Optional[CSVRunTimeParamFilesType],
         parse_mode: ParseMode,
     ) -> None:
         """Load a json/python protocol."""

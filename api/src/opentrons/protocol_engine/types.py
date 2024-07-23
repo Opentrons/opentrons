@@ -1068,4 +1068,4 @@ PrimitiveRunTimeParamValuesType = Mapping[
     StrictStr, Union[StrictInt, StrictFloat, StrictBool, StrictStr]
 ]  # update value types as more RTP types are added
 
-CsvRunTimeParamFilesType = Mapping[StrictStr, StrictStr]
+CSVRunTimeParamFilesType = Mapping[StrictStr, StrictStr]
