@@ -363,7 +363,9 @@ class ProtocolStore:
         )
         delete_analysis_csv_rtps_statement = sqlalchemy.delete(
             analysis_csv_rtp_table
-        ).where(analysis_csv_rtp_table.c.analysis_id.in_(analyses_using_protocol))
+        ).where(
+            analysis_csv_rtp_table.c.analysis_id.in_(select_referencing_analysis_ids)
+        )
         delete_analyses_statement = sqlalchemy.delete(analysis_table).where(
             analysis_table.c.protocol_id == protocol_id
         )
