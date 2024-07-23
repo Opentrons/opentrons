@@ -25,12 +25,17 @@ interface ErrorOverrides {
   generalFailure: () => void
 }
 
+interface ButtonOverrides {
+  goBackBeforeBeginning: () => void
+}
+
 export interface FixitCommandTypeUtils {
   runId: string
   failedCommandId: string
   trackCurrentMap: ERUtilsResults['trackExternalMap']
   copyOverrides: CopyOverrides
   errorOverrides: ErrorOverrides
+  buttonOverrides: ButtonOverrides
   routeOverride?: typeof DT_ROUTES[keyof typeof DT_ROUTES]
 }
 
