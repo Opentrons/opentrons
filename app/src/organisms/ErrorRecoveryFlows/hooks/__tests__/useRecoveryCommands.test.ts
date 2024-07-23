@@ -131,7 +131,7 @@ describe('useRecoveryCommands', () => {
     'blowoutInPlace',
     'dropTipInPlace',
     'prepareToAspirate',
-  ] as const).forEach(async inPlaceCommandType => {
+  ] as const).forEach(inPlaceCommandType => {
     it(`Should move to retryLocation if failed command is ${inPlaceCommandType} and error is appropriate when retrying`, async () => {
       const { result } = renderHook(() =>
         useRecoveryCommands({
@@ -167,7 +167,7 @@ describe('useRecoveryCommands', () => {
         },
         {
           commandType: inPlaceCommandType,
-          params: { pipetteId: 'mock-pipette_id' },
+          params: { pipetteId: 'mock-pipette-id' },
         },
       ])
     })
