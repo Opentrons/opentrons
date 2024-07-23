@@ -6116,6 +6116,39 @@
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "e1b16944e3d0ff8ae0a964f7e638c1b3",
+      "notes": [],
+      "params": {
+        "flowRate": 160.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 20.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -9.8
+          },
+          "origin": "top"
+        },
+        "wellName": "A2"
+      },
+      "result": {
+        "position": {
+          "x": 23.28,
+          "y": 181.18,
+          "z": 4.5
+        },
+        "volume": 20.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
     }
   ],
   "config": {
@@ -6129,7 +6162,7 @@
   "errors": [
     {
       "createdAt": "TIMESTAMP",
-      "detail": "PartialTipMovementNotAllowedError [line 25]: Error 2004 MOTION_PLANNING_FAILURE (PartialTipMovementNotAllowedError): Requested motion with the A12 nozzle partial configuration is outside of robot bounds for the pipette.",
+      "detail": "PartialTipMovementNotAllowedError [line 28]: Error 2004 MOTION_PLANNING_FAILURE (PartialTipMovementNotAllowedError): Moving to NEST 96 Well Plate 200 µL Flat in slot A2 with A12 nozzle partial configuration will result in collision with thermocycler lid in deck slot A1.",
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
@@ -6138,7 +6171,7 @@
       "wrappedErrors": [
         {
           "createdAt": "TIMESTAMP",
-          "detail": "Requested motion with the A12 nozzle partial configuration is outside of robot bounds for the pipette.",
+          "detail": "Moving to NEST 96 Well Plate 200 µL Flat in slot A2 with A12 nozzle partial configuration will result in collision with thermocycler lid in deck slot A1.",
           "errorCode": "2004",
           "errorInfo": {},
           "errorType": "PartialTipMovementNotAllowedError",
