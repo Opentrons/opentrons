@@ -2136,7 +2136,7 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         loc = well.top()
         self._96_tip_config_valid()
-        return self._core.liquid_probe_with_recovery(well._core, loc)
+        self._core.liquid_probe_with_recovery(well._core, loc)
 
     @requires_version(2, 20)
     def measure_liquid_height(self, well: labware.Well) -> float:
