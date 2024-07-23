@@ -251,7 +251,7 @@ def store_trial(
         try:
             trial_for_google_sheet: List[List[str]] = [
                 [f"{trial + 1}"],
-                [f"{target_height}"]
+                [f"{target_height}"],
                 [f"{height}"],
                 [f"{plunger_pos}"],
                 [f"{tip_length_offset}"],
