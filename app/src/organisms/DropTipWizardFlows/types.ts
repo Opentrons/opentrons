@@ -27,6 +27,7 @@ interface ErrorOverrides {
 
 interface ButtonOverrides {
   goBackBeforeBeginning: () => void
+  tipDropComplete: (() => void) | null
 }
 
 export interface FixitCommandTypeUtils {

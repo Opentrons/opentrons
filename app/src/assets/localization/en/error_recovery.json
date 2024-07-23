@@ -17,7 +17,7 @@
   "continue_to_drop_tip": "Continue to drop tip",
   "error": "Error",
   "error_on_robot": "Error on {{robot}}",
-  "failed_dispense_step_not_completed": "<block>The failed dispense step will not be completed. The run will continue from the next step.</block><block>Close the robot door before proceeding.</block>",
+  "failed_dispense_step_not_completed": "<block>The failed dispense step will not be completed. The run will continue from the next step with the attached tips.</block><block>Close the robot door before proceeding.</block>",
   "failed_step": "Failed step",
   "first_take_any_necessary_actions": "<block>First, take any necessary actions to prepare the robot to retry the failed step.</block><block>Then, close the robot door before proceeding.</block>",
   "go_back": "Go back",
