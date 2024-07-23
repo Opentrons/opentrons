@@ -42,7 +42,6 @@ async def test_dispense_implementation(
     subject: DispenseImplementation,
 ) -> None:
     """It should move to the target location and then dispense."""
-
     well_location = WellLocation(
         origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1)
     )
