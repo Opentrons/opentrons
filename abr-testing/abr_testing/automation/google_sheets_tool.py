@@ -57,7 +57,7 @@ class google_sheet:
     def create_worksheet(self, title: str) -> Optional[str]:
         """Create a worksheet with tab name. Existing spreadsheet needed."""
         try:
-            new_sheet = self.spread_sheet.add_worksheet(title, rows="2500", cols="40")
+            new_sheet = self.spread_sheet.add_worksheet(title, rows="2500", cols="60")
             return new_sheet.id
         except gspread.exceptions.APIError:
             print("Sheet already exists.")
