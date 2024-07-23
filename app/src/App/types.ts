@@ -22,7 +22,6 @@ export type RobotSettingsTab =
   | 'networking'
   | 'advanced'
   | 'feature-flags'
-  | 'privacy'
 
 export type AppSettingsTab =
   | 'general'
