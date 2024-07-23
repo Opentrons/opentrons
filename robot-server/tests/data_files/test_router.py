@@ -8,12 +8,15 @@ from decoy import Decoy
 from fastapi import UploadFile
 from opentrons.protocol_reader import FileHasher, FileReaderWriter, BufferedFile
 
+from robot_server.service.json_api import MultiBodyMeta
+
 from robot_server.data_files.data_files_store import DataFilesStore, DataFileInfo
 from robot_server.data_files.models import DataFile, FileIdNotFoundError
 from robot_server.data_files.router import (
     upload_data_file,
     get_data_file_info_by_id,
     get_data_file,
+    get_all_data_files,
 )
 from robot_server.errors.error_responses import ApiError
 
@@ -322,3 +325,43 @@ async def test_get_data_file(
     assert result.status_code == 200
     assert result.body == b"some_content"
     assert result.media_type == "text/plain"
+
+
+async def test_get_all_data_file_info(
+    decoy: Decoy,
+    data_files_store: DataFilesStore,
+) -> None:
+    """Get a list of all data file info from the database."""
+    decoy.when(data_files_store.sql_get_all_from_engine()).then_return(
+        [
+            DataFileInfo(
+                id="qwerty",
+                name="abc.xyz",
+                file_hash="123",
+                created_at=datetime(year=2024, month=7, day=15),
+            ),
+            DataFileInfo(
+                id="hfhcjdeowjfie",
+                name="mcd.kfc",
+                file_hash="124",
+                created_at=datetime(year=2024, month=7, day=22),
+            ),
+        ]
+    )
+
+    result = await get_all_data_files(data_files_store=data_files_store)
+
+    assert result.status_code == 200
+    assert result.content.data == [
+        DataFile(
+            id="qwerty",
+            name="abc.xyz",
+            createdAt=datetime(year=2024, month=7, day=15),
+        ),
+        DataFile(
+            id="hfhcjdeowjfie",
+            name="mcd.kfc",
+            createdAt=datetime(year=2024, month=7, day=22),
+        ),
+    ]
+    assert result.content.meta == MultiBodyMeta(cursor=0, totalLength=2)
