@@ -21,6 +21,7 @@ import type {
   ProtocolAnalysisOutput,
   RunTimeCommand,
 } from '@opentrons/shared-data'
+import { CommandAnnotation } from '@opentrons/shared-data/commandAnnotation/types'
 
 interface AnnotatedStepsProps {
   analysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput
@@ -45,8 +46,8 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
     }
   `
 
-  //  test with doitAllV8
-  const annotations = analysis.commandAnnotations ?? [
+  //  TODO(ja, 7/23/24): remove stub
+  const FIXTURE_FOR_DO_IT_ALL_V8: CommandAnnotation[] = [
     {
       annotationType: 'secondOrderCommand',
       machineReadableName: 'pipettes and module load commands',
@@ -58,6 +59,9 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
       ],
     },
   ]
+
+  //  test with doitAllV8
+  const annotations = analysis.commandAnnotations ?? FIXTURE_FOR_DO_IT_ALL_V8
 
   const groupedCommands = analysis.commands.reduce<
     Array<LeafNode | ParentNode>
