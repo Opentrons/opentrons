@@ -201,8 +201,8 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                 </>
               )}
             </Box>
+            <TopLevelRedirects />
           </ErrorBoundary>
-          <TopLevelRedirects />
         </OnDeviceLocalizationProvider>
       </InitialLoadingScreen>
     </ApiHostProvider>
@@ -275,7 +275,9 @@ export function OnDeviceDisplayAppRoutes(): JSX.Element {
 function TopLevelRedirects(): JSX.Element | null {
   const currentRunRoute = useCurrentRunRoute()
   return currentRunRoute != null ? (
-    <Route element={<Navigate to={currentRunRoute} />} />
+    <Routes>
+      <Route path="*" element={<Navigate to={currentRunRoute} />} />
+    </Routes>
   ) : null
 }
 
