@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Route, MemoryRouter } from 'react-router-dom'
+import { Route, MemoryRouter, Routes } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { vi, describe, it, afterEach, beforeEach, expect } from 'vitest'
@@ -93,18 +93,16 @@ vi.mock('../../../organisms/PipetteWizardFlows')
 vi.mock('../../../organisms/PipetteWizardFlows/ChoosePipette')
 vi.mock('../../../organisms/Navigation')
 
-const render = () => {
+const render = (path = '/') => {
   return renderWithProviders(
-    <MemoryRouter initialEntries={['/instruments', '/instruments/:mount']}>
-      <Route path="/instruments">
-        <InstrumentsDashboard />
-      </Route>
-      <Route path="/instruments/:mount">
-        <InstrumentDetail />
-      </Route>
+    <MemoryRouter initialEntries={[path]} initialIndex={0}>
+      <Routes>
+        <Route path="/instruments" element={<InstrumentsDashboard />} />
+        <Route path="/instruments/:mount" element={<InstrumentDetail />} />
+      </Routes>
     </MemoryRouter>,
     { i18nInstance: i18n }
-  )
+  )[0]
 }
 
 describe('InstrumentsDashboard', () => {
@@ -119,7 +117,7 @@ describe('InstrumentsDashboard', () => {
     vi.resetAllMocks()
   })
   it('should render mount info for all attached mounts', () => {
-    render()
+    render('/instruments')
     screen.getByText('left Mount')
     screen.getByText('Flex 1-Channel 1000 μL')
     screen.getByText('right Mount')
@@ -128,7 +126,7 @@ describe('InstrumentsDashboard', () => {
     screen.getByText('Flex Gripper')
   })
   it('should route to left mount detail when instrument attached and clicked', () => {
-    render()
+    render('/instruments')
     fireEvent.click(screen.getByText('left Mount'))
     screen.getByText('serial number')
     screen.getByText(mockLeftPipetteData.serialNumber)
@@ -139,7 +137,7 @@ describe('InstrumentsDashboard', () => {
     )
   })
   it('should route to right mount detail when instrument attached and clicked', () => {
-    render()
+    render('/instruments')
     fireEvent.click(screen.getByText('right Mount'))
     screen.getByText('serial number')
     screen.getByText(mockRightPipetteData.serialNumber)
@@ -150,7 +148,7 @@ describe('InstrumentsDashboard', () => {
     )
   })
   it('should route to extension mount detail when instrument attached and clicked', () => {
-    render()
+    render('/instruments')
     fireEvent.click(screen.getByText('extension Mount'))
     screen.getByText('serial number')
     screen.getByText(mockGripperData.serialNumber)
@@ -159,7 +157,7 @@ describe('InstrumentsDashboard', () => {
     vi.mocked(useInstrumentsQuery).mockReturnValue({
       data: { data: [] },
     } as any)
-    render()
+    render('/instruments')
     fireEvent.click(screen.getByText('left Mount'))
     expect(vi.mocked(ChoosePipette)).toHaveBeenCalled()
   })
@@ -167,7 +165,7 @@ describe('InstrumentsDashboard', () => {
     vi.mocked(useInstrumentsQuery).mockReturnValue({
       data: { data: [] },
     } as any)
-    render()
+    render('/instruments')
     fireEvent.click(screen.getByText('right Mount'))
     expect(vi.mocked(ChoosePipette)).toHaveBeenCalled()
   })
@@ -175,7 +173,7 @@ describe('InstrumentsDashboard', () => {
     vi.mocked(useInstrumentsQuery).mockReturnValue({
       data: { data: [] },
     } as any)
-    render()
+    render('/instruments')
     fireEvent.click(screen.getByText('extension Mount'))
     expect(vi.mocked(GripperWizardFlows)).toHaveBeenCalled()
   })
@@ -185,7 +183,7 @@ describe('InstrumentsDashboard', () => {
         data: [mock96ChannelData, mockGripperData],
       },
     } as any)
-    render()
+    render('/instruments')
     screen.getByText('Left+Right Mounts')
     screen.getByText('extension Mount')
   })

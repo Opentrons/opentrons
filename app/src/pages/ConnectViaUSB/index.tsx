@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -23,7 +23,7 @@ import { MediumButton } from '../../atoms/buttons'
 
 export function ConnectViaUSB(): JSX.Element {
   const { i18n, t } = useTranslation(['device_settings', 'shared', 'branded'])
-  const history = useHistory()
+  const navigate = useNavigate()
   // TODO(bh, 2023-5-31): active connections from /system/connected isn't exactly the right way to monitor for a usb connection -
   // the system-server tracks active connections by authorization token, which is valid for 2 hours
   // another option is to report an active usb connection by monitoring usb port traffic (discovery-client polls health from the desktop app)
@@ -50,7 +50,7 @@ export function ConnectViaUSB(): JSX.Element {
           <Btn
             left="0"
             onClick={() => {
-              history.push('/network-setup')
+              navigate('/network-setup')
             }}
             position={POSITION_ABSOLUTE}
           >
@@ -104,7 +104,7 @@ export function ConnectViaUSB(): JSX.Element {
             <MediumButton
               buttonText={i18n.format(t('shared:continue'), 'capitalize')}
               onClick={() => {
-                history.push('/emergency-stop')
+                navigate('/emergency-stop')
               }}
             />
           </Flex>

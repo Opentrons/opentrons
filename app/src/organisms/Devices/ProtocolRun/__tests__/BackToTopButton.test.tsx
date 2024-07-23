@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { when } from 'vitest-when'
-import { StaticRouter } from 'react-router-dom'
+import { MemoryRouter } from 'react-router-dom'
 import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
@@ -25,14 +25,14 @@ const ROBOT_SERIAL_NUMBER = 'OT123'
 
 const render = () => {
   return renderWithProviders(
-    <StaticRouter>
+    <MemoryRouter>
       <BackToTopButton
         protocolRunHeaderRef={null}
         robotName={ROBOT_NAME}
         runId={RUN_ID}
         sourceLocation="test run button"
       />
-    </StaticRouter>,
+    </MemoryRouter>,
     {
       i18nInstance: i18n,
     }

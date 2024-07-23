@@ -5,17 +5,17 @@ import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { AnalysisFailedModal } from '../AnalysisFailedModal'
-import type * as ReactRouterDom from 'react-router-dom'
+import type { NavigateFunction } from 'react-router-dom'
 
-const mockPush = vi.fn()
+const mockNavigate = vi.fn()
 const PROTOCOL_ID = 'mockId'
 const mockSetShowAnalysisFailedModal = vi.fn()
 
 vi.mock('react-router-dom', async importOriginal => {
-  const reactRouterDom = await importOriginal<typeof ReactRouterDom>()
+  const reactRouterDom = await importOriginal<NavigateFunction>()
   return {
     ...reactRouterDom,
-    useHistory: () => ({ push: mockPush } as any),
+    useNavigate: () => mockNavigate,
   }
 })
 
@@ -58,12 +58,12 @@ describe('AnalysisFailedModal', () => {
   it('should call a mock function when tapping restart setup button', () => {
     render(props)
     fireEvent.click(screen.getByText('Restart setup'))
-    expect(mockPush).toHaveBeenCalledWith(`/protocols/${PROTOCOL_ID}`)
+    expect(mockNavigate).toHaveBeenCalledWith(`/protocols/${PROTOCOL_ID}`)
   })
 
   it('should push to protocols dashboard when tapping restart setup button and protocol ID is null', () => {
     render({ ...props, protocolId: null })
     fireEvent.click(screen.getByText('Restart setup'))
-    expect(mockPush).toHaveBeenCalledWith('/protocols')
+    expect(mockNavigate).toHaveBeenCalledWith('/protocols')
   })
 })

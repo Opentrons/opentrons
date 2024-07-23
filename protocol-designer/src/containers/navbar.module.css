@@ -1,4 +1,4 @@
-@import '../index.module.css';
+@import '@opentrons/components/styles';
 
 .navbar {
   flex: none;

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { Trans, useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
 import { formatDistance } from 'date-fns'
@@ -10,15 +10,15 @@ import {
   ALIGN_CENTER,
   ALIGN_END,
   BORDERS,
+  Chip,
   COLORS,
   DIRECTION_COLUMN,
-  DIRECTION_ROW,
   Flex,
   Icon,
+  LegacyStyledText,
   OVERFLOW_WRAP_ANYWHERE,
   OVERFLOW_WRAP_BREAK_WORD,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
   useLongPress,
 } from '@opentrons/components'
@@ -59,7 +59,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
     setTargetProtocolId,
     setIsRequiredCSV,
   } = props
-  const history = useHistory()
+  const navigate = useNavigate()
   const [showIcon, setShowIcon] = React.useState<boolean>(false)
   const [
     showFailedAnalysisModal,
@@ -120,7 +120,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
     if (isFailedAnalysis) {
       setShowFailedAnalysisModal(true)
     } else if (!longpress.isLongPressed) {
-      history.push(`/protocols/${protocolId}`)
+      navigate(`/protocols/${protocolId}`)
     }
   }
 
@@ -230,36 +230,14 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
         gridGap={SPACING.spacing8}
       >
         {isFailedAnalysis ? (
-          <Flex
-            color={COLORS.red60}
-            flexDirection={DIRECTION_ROW}
-            gridGap={SPACING.spacing8}
-          >
-            <Icon
-              name="ot-alert"
-              size="1.5rem"
-              aria-label="failedAnalysis_icon"
-            />
-            <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-              {i18n.format(t('failed_analysis'), 'capitalize')}
-            </LegacyStyledText>
-          </Flex>
+          <Chip
+            type="error"
+            text={i18n.format(t('failed_analysis'), 'capitalize')}
+            background={false}
+          />
         ) : null}
         {isRequiredCSV ? (
-          <Flex
-            color={COLORS.yellow60}
-            flexDirection={DIRECTION_ROW}
-            gridGap={SPACING.spacing8}
-          >
-            <Icon
-              name="ot-alert"
-              size="1.5rem"
-              aria-label="requiresCsv_file_icon"
-            />
-            <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-              {t('requires_csv')}
-            </LegacyStyledText>
-          </Flex>
+          <Chip type="warning" text={t('requires_csv')} background={false} />
         ) : null}
         <LegacyStyledText
           as="p"

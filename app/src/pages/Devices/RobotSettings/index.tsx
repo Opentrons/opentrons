@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { Redirect, useParams } from 'react-router-dom'
+import { useParams, Navigate } from 'react-router-dom'
 
 import {
   BORDERS,
@@ -40,7 +40,9 @@ import type { DesktopRouteParams, RobotSettingsTab } from '../../../App/types'
 
 export function RobotSettings(): JSX.Element | null {
   const { t } = useTranslation('device_settings')
-  const { robotName, robotSettingsTab } = useParams<DesktopRouteParams>()
+  const { robotName, robotSettingsTab } = useParams<
+    keyof DesktopRouteParams
+  >() as DesktopRouteParams
   const robot = useRobot(robotName)
   const isCalibrationDisabled = robot?.status !== CONNECTABLE
   const isPrivacyDisabled = robot?.status === UNREACHABLE
@@ -87,7 +89,7 @@ export function RobotSettings(): JSX.Element | null {
       (robot?.status === REACHABLE && robot?.serverHealthStatus !== 'ok')) &&
     robotUpdateSession == null
   ) {
-    return <Redirect to={`/devices/${robotName}`} />
+    return <Navigate to={`/devices/${robotName}`} />
   }
   const cannotViewCalibration =
     robotSettingsTab === 'calibration' && isCalibrationDisabled
@@ -95,12 +97,12 @@ export function RobotSettings(): JSX.Element | null {
     robotSettingsTab === 'feature-flags' && !devToolsOn
   const cannotViewPrivacy = robotSettingsTab === 'privacy' && isPrivacyDisabled
   if (cannotViewCalibration || cannotViewFeatureFlags || cannotViewPrivacy) {
-    return <Redirect to={`/devices/${robotName}/robot-settings/networking`} />
+    return <Navigate to={`/devices/${robotName}/robot-settings/networking`} />
   }
 
   const robotSettingsContent = robotSettingsContentByTab[robotSettingsTab] ?? (
     // default to the calibration tab if no tab or nonexistent tab is passed as a param
-    <Redirect to={`/devices/${robotName}/robot-settings/calibration`} />
+    <Navigate to={`/devices/${robotName}/robot-settings/calibration`} />
   )
 
   return (

@@ -1,16 +1,15 @@
 // internal link that preserves query parameters
 import * as React from 'react'
-import { withRouter, Link as BaseLink } from 'react-router-dom'
-import type { RouteComponentProps } from 'react-router-dom'
+import { Link as BaseLink, useLocation } from 'react-router-dom'
 
-export interface LinkProps extends RouteComponentProps {
+export interface LinkProps {
   to: string
   children?: React.ReactNode
   className?: string
 }
 
-export function WrappedLink(props: LinkProps): JSX.Element {
-  const { to, children, className, location } = props
+export function Link({ to, children, className }: LinkProps): JSX.Element {
+  const location = useLocation()
 
   return (
     <BaseLink
@@ -21,10 +20,3 @@ export function WrappedLink(props: LinkProps): JSX.Element {
     </BaseLink>
   )
 }
-
-// @ts-expect-error react router type not portable
-export const Link: (props: {
-  to: string
-  children?: React.ReactNode
-  className?: string
-}) => JSX.Element = withRouter(WrappedLink)

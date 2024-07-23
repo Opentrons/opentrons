@@ -12,15 +12,15 @@ import { i18n } from '../../../i18n'
 import { SummaryAndSettings } from '../SummaryAndSettings'
 import { NameQuickTransfer } from '../NameQuickTransfer'
 import { Overview } from '../Overview'
-import type * as ReactRouterDom from 'react-router-dom'
+import type { NavigateFunction } from 'react-router-dom'
 
-const mockPush = vi.fn()
+const mockNavigate = vi.fn()
 
 vi.mock('react-router-dom', async importOriginal => {
-  const reactRouterDom = await importOriginal<typeof ReactRouterDom>()
+  const reactRouterDom = await importOriginal<NavigateFunction>()
   return {
     ...reactRouterDom,
-    useHistory: () => ({ push: mockPush } as any),
+    useNavigate: () => mockNavigate,
   }
 })
 vi.mock('../Overview')

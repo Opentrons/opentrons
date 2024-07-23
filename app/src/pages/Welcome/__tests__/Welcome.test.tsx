@@ -8,16 +8,16 @@ import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { Welcome } from '..'
 
-import type * as ReactRouterDom from 'react-router-dom'
+import type { NavigateFunction } from 'react-router-dom'
 
 const PNG_FILE_NAME = 'welcome_background.png'
 
-const mockPush = vi.fn()
+const mockNavigate = vi.fn()
 vi.mock('react-router-dom', async importOriginal => {
-  const actual = await importOriginal<typeof ReactRouterDom>()
+  const actual = await importOriginal<NavigateFunction>()
   return {
     ...actual,
-    useHistory: () => ({ push: mockPush } as any),
+    useNavigate: () => mockNavigate,
   }
 })
 
@@ -44,9 +44,9 @@ describe('Welcome', () => {
     expect(image.getAttribute('src')).toContain(PNG_FILE_NAME)
   })
 
-  it('should call mockPush when tapping Get started', () => {
+  it('should call mockNavigate when tapping Get started', () => {
     render()
     fireEvent.click(screen.getByRole('button', { name: 'Get started' }))
-    expect(mockPush).toHaveBeenCalledWith('/network-setup')
+    expect(mockNavigate).toHaveBeenCalledWith('/network-setup')
   })
 })
