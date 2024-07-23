@@ -148,6 +148,7 @@ export function DesktopRecoveryOptions({
 }: RecoveryOptionsProps): JSX.Element {
   return (
     <RecoveryRadioGroup
+      css={RADIO_GAP}
       onChange={e => {
         setSelectedRoute(e.currentTarget.value)
       }}
@@ -221,3 +222,7 @@ export const GENERAL_ERROR_OPTIONS: RecoveryRoute[] = [
   RECOVERY_MAP.RETRY_FAILED_COMMAND.ROUTE,
   RECOVERY_MAP.CANCEL_RUN.ROUTE,
 ]
+
+const RADIO_GAP = `
+  gap: ${SPACING.spacing4};
+`
