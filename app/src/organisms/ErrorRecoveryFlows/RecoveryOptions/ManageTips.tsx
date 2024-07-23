@@ -5,6 +5,7 @@ import { css } from 'styled-components'
 
 import {
   DIRECTION_COLUMN,
+  COLORS,
   SPACING,
   Flex,
   StyledText,
@@ -103,8 +104,9 @@ export function BeginRemoval({
     }
   `
 
-  const RADIO_GROUP_MARGIN = css`
+  const RADIO_GROUP_STYLE = css`
     @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+      color: ${COLORS.black90};
       margin-left: 0.5rem;
     }
   `
@@ -116,7 +118,7 @@ export function BeginRemoval({
         oddStyle="level4HeaderSemiBold"
         desktopStyle="headingSmallSemiBold"
       >
-        {t('you_may_want_to_remove', { mount })}
+        {t('remove_tips_from_pipette', { mount })}
       </StyledText>
       <Flex
         flexDirection={DIRECTION_COLUMN}
@@ -132,8 +134,8 @@ export function BeginRemoval({
           isSelected={selected === 'begin-removal'}
         />
         <RadioButton
-          buttonLabel={t('skip')}
-          buttonValue={t('skip')}
+          buttonLabel={t('skip_removal')}
+          buttonValue={t('skip_removal')}
           onChange={() => {
             setSelected('skip')
           }}
@@ -155,24 +157,24 @@ export function BeginRemoval({
           }}
           options={[
             {
-              value: t('begin_removal'),
+              value: 'begin-removal',
               children: (
                 <StyledText
                   desktopStyle="bodyDefaultRegular"
-                  css={RADIO_GROUP_MARGIN}
+                  css={RADIO_GROUP_STYLE}
                 >
                   {t('begin_removal')}
                 </StyledText>
               ),
             },
             {
-              value: t('skip'),
+              value: 'skip',
               children: (
                 <StyledText
                   desktopStyle="bodyDefaultRegular"
-                  css={RADIO_GROUP_MARGIN}
+                  css={RADIO_GROUP_STYLE}
                 >
-                  {t('skip')}
+                  {t('skip_removal')}
                 </StyledText>
               ),
             },
@@ -299,6 +301,14 @@ export function useDropTipFlowUtils({
     }
   }
 
+  const buildButtonOverrides = (): FixitCommandTypeUtils['buttonOverrides'] => {
+    return {
+      goBackBeforeBeginning: () => {
+        return proceedToRouteAndStep(DROP_TIP_FLOWS.ROUTE)
+      },
+    }
+  }
+
   // If a specific step within the DROP_TIP_FLOWS route is selected, begin the Drop Tip Flows at its related route.
   const buildRouteOverride = (): FixitCommandTypeUtils['routeOverride'] => {
     switch (step) {
@@ -315,6 +325,7 @@ export function useDropTipFlowUtils({
     copyOverrides: buildCopyOverrides(),
     trackCurrentMap: trackExternalMap,
     errorOverrides: buildErrorOverrides(),
+    buttonOverrides: buildButtonOverrides(),
     routeOverride: buildRouteOverride(),
   }
 }

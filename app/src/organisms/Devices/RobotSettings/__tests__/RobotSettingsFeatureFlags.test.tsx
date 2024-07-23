@@ -37,7 +37,6 @@ describe('RobotSettings Advanced tab', () => {
           'deckCalibrationDots',
           'shortFixedTrash',
           'useOldAspirationFunctions',
-          'disableLogAggregation',
           'disableFastProtocolUpload',
         ].map(id => ({
           id,

@@ -58,7 +58,7 @@
   "robot_will_retry_with_tips": "The robot will retry the failed step with new tips.",
   "run_paused": "Run paused",
   "select_tip_pickup_location": "Select tip pick-up location",
-  "skip": "Skip",
+  "skip_removal": "Skip removal",
   "skip_to_next_step": "Skip to next step",
   "skip_to_next_step_new_tips": "Skip to next step with new tips",
   "skip_to_next_step_same_tips": "Skip to next step with same tips",
@@ -73,5 +73,5 @@
   "view_error_details": "View error details",
   "view_recovery_options": "View recovery options",
   "you_can_still_drop_tips": "You can still drop the attached tips before proceeding to tip selection.",
-  "you_may_want_to_remove": "You may want to remove the tips from the {{mount}} pipette before using it again in a protocol"
+  "remove_tips_from_pipette": "Remove tips from {{mount}} pipette before canceling the run?"
 }
