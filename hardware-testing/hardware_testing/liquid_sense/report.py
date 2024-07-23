@@ -240,7 +240,7 @@ def store_trial(
             # Write header
             gs_header: List[List[str]] = [
                 ["Trial"],
-                ["Target Height (mm)"]
+                ["Target Height (mm)"],
                 ["Height"],
                 ["Plunger Position"],
                 ["Tip Length Offset"],
