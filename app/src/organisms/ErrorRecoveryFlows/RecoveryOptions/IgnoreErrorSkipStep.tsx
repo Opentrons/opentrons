@@ -120,7 +120,7 @@ export function IgnoreErrorStepHome({
           }}
           options={IGNORE_OPTIONS_IN_ORDER.map(option => {
             return {
-              value: t(option),
+              value: option,
               children: (
                 <StyledText
                   css={RADIO_GROUP_MARGIN}
