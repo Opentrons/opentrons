@@ -180,7 +180,7 @@ def store_baseline_trial(
     """Report Trial."""
     if google_sheet:
         try:
-            google_sheet.update_cell(sheet_title, 9, 2, height)
+            google_sheet.update_cell(sheet_title, 11, 2, height)
         except google_sheets_tool.google_interaction_error:
             ui.print_error("did not store baseline trial on google sheet.")
     report(
@@ -240,6 +240,7 @@ def store_trial(
             # Write header
             gs_header: List[List[str]] = [
                 ["Trial"],
+                ["Target Height (mm)"]
                 ["Height"],
                 ["Plunger Position"],
                 ["Tip Length Offset"],
@@ -250,6 +251,7 @@ def store_trial(
         try:
             trial_for_google_sheet: List[List[str]] = [
                 [f"{trial + 1}"],
+                [f"{target_height}"]
                 [f"{height}"],
                 [f"{plunger_pos}"],
                 [f"{tip_length_offset}"],
