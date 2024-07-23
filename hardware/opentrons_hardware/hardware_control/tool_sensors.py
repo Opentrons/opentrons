@@ -84,6 +84,7 @@ capacitive_output_file_heading = [
 
 PLUNGER_SOLO_MOVE_TIME = 0.2
 
+
 def _fix_pass_step_for_buffer(
     move_group: MoveGroupStep,
     movers: List[NodeId],
