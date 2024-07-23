@@ -3,7 +3,10 @@ import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
+  ALIGN_FLEX_END,
   ALIGN_CENTER,
+  Icon,
+  Box,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
@@ -13,13 +16,14 @@ import {
   RESPONSIVENESS,
 } from '@opentrons/components'
 
-import { SmallButton } from '../../../atoms/buttons'
+import { SmallButton, TextOnlyButton } from '../../../atoms/buttons'
 
 interface RecoveryFooterButtonProps {
   primaryBtnOnClick: () => void
   /* The "Go back" button */
   secondaryBtnOnClick?: () => void
   primaryBtnTextOverride?: string
+  primaryBtnDisabled?: boolean
   /* If true, render pressed state and a spinner icon for the primary button. */
   isLoadingPrimaryBtnAction?: boolean
   /* To the left of the primary button. */
@@ -35,7 +39,7 @@ export function RecoveryFooterButtons(
       width="100%"
       height="100%"
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      alignItems={ALIGN_CENTER}
+      alignItems={ALIGN_FLEX_END}
       gridGap={SPACING.spacing8}
     >
       <RecoveryGoBackButton {...props} />
@@ -50,19 +54,12 @@ function RecoveryGoBackButton({
   const showGoBackBtn = secondaryBtnOnClick != null
   const { t } = useTranslation('error_recovery')
   return showGoBackBtn ? (
-    <Flex marginTop="auto">
-      <SmallButton
-        buttonType="tertiaryLowLight"
-        buttonText={t('go_back')}
-        onClick={secondaryBtnOnClick}
-        marginTop="auto"
-        css={ODD_ONLY_BUTTON}
-      />
-      <SecondaryButton onClick={secondaryBtnOnClick} css={DESKTOP_ONLY_BUTTON}>
-        {t('go_back')}
-      </SecondaryButton>
+    <Flex>
+      <TextOnlyButton onClick={secondaryBtnOnClick} buttonText={t('go_back')} />
     </Flex>
-  ) : null
+  ) : (
+    <Box />
+  )
 }
 
 function PrimaryButtonGroup(props: RecoveryFooterButtonProps): JSX.Element {
@@ -73,13 +70,13 @@ function PrimaryButtonGroup(props: RecoveryFooterButtonProps): JSX.Element {
 
   if (!renderTertiaryBtn) {
     return (
-      <Flex marginTop="auto">
+      <Flex>
         <RecoveryPrimaryBtn {...props} />
       </Flex>
     )
   } else {
     return (
-      <Flex gridGap={SPACING.spacing8} marginTop="auto">
+      <Flex gridGap={SPACING.spacing8}>
         <RecoveryTertiaryBtn {...props} />
         <RecoveryPrimaryBtn {...props} />
       </Flex>
@@ -90,6 +87,7 @@ function PrimaryButtonGroup(props: RecoveryFooterButtonProps): JSX.Element {
 function RecoveryPrimaryBtn({
   isLoadingPrimaryBtnAction,
   primaryBtnOnClick,
+  primaryBtnDisabled,
   primaryBtnTextOverride,
 }: RecoveryFooterButtonProps): JSX.Element {
   const { t } = useTranslation('error_recovery')
@@ -109,14 +107,25 @@ function RecoveryPrimaryBtn({
         buttonType="primary"
         buttonText={primaryBtnTextOverride ?? t('continue')}
         onClick={primaryBtnOnClick}
-        marginTop="auto"
+        disabled={primaryBtnDisabled}
       />
       <PrimaryButton
-        css={DESKTOP_ONLY_BUTTON}
+        css={
+          isLoadingPrimaryBtnAction
+            ? css`
+                ${PRESSED_LOADING_STATE} ${DESKTOP_ONLY_BUTTON}
+              `
+            : DESKTOP_ONLY_BUTTON
+        }
         onClick={primaryBtnOnClick}
-        disabled={isLoadingPrimaryBtnAction}
+        disabled={primaryBtnDisabled}
       >
-        {primaryBtnTextOverride ?? t('continue')}
+        <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
+          {isLoadingPrimaryBtnAction && (
+            <Icon name="ot-spinner" size={SPACING.spacing16} spin={true} />
+          )}
+          {primaryBtnTextOverride ?? t('continue')}
+        </Flex>
       </PrimaryButton>
     </>
   )

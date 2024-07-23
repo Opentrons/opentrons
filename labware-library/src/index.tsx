@@ -1,7 +1,7 @@
 // labware library entry
 import * as React from 'react'
 import { hydrate, render } from 'react-dom'
-import { BrowserRouter, Route, Switch } from 'react-router-dom'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
 
 import { App } from './components/App'
 import { LabwareCreator } from './labware-creator'
@@ -19,10 +19,10 @@ if (!$root) {
 
 const Root = (): JSX.Element => (
   <BrowserRouter>
-    <Switch>
-      <Route path={`${getPublicPath()}create`} component={LabwareCreator} />
-      <Route component={App} />
-    </Switch>
+    <Routes>
+      <Route path={`${getPublicPath()}create`} element={<LabwareCreator />} />
+      <Route path={`${getPublicPath()}*`} element={<App />} />
+    </Routes>
   </BrowserRouter>
 )
 

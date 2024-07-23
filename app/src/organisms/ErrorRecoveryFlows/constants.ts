@@ -1,6 +1,6 @@
 import { css } from 'styled-components'
 
-import { SPACING, TYPOGRAPHY } from '@opentrons/components'
+import { SPACING, TYPOGRAPHY, RESPONSIVENESS } from '@opentrons/components'
 
 import type { StepOrder } from './types'
 
@@ -210,4 +210,15 @@ export const BODY_TEXT_STYLE = css`
 
 export const ODD_SECTION_TITLE_STYLE = css`
   margin-bottom: ${SPACING.spacing16};
+`
+
+export const ODD_ONLY = css`
+  @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+    display: none;
+  }
+`
+export const DESKTOP_ONLY = css`
+  @media (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+    display: none;
+  }
 `

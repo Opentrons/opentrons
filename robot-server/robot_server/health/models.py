@@ -10,26 +10,44 @@ class HealthLinks(BaseModel):
 
     apiLog: str = Field(
         ...,
-        description="The path to the API logs endpoint",
+        description=(
+            "The path to the API logs endpoint."
+            " Deprecated: Use the `logs` field of the `GET /health` response"
+            " or refer to the OpenAPI specification of the `/logs` endpoint, instead."
+        ),
         examples=["/logs/api.log"],
+        deprecated=True,
     )
     serialLog: str = Field(
         ...,
-        description="The path to the motor control serial communication logs endpoint",
+        description=(
+            "The path to the motor control serial communication logs endpoint."
+            " Deprecated: Use the `logs` field of the `GET /health` response"
+            " or refer to the OpenAPI specification of the `/logs` endpoint, instead."
+        ),
         examples=["/logs/serial.log"],
+        deprecated=True,
     )
     serverLog: str = Field(
         ...,
-        description="The path to the HTTP server logs endpoint",
+        description=(
+            "The path to the HTTP server logs endpoint."
+            " Deprecated: Use the `logs` field of the `GET /health` response"
+            " or refer to the OpenAPI specification of the `/logs` endpoint, instead."
+        ),
         examples=["/logs/server.log"],
+        deprecated=True,
     )
     oddLog: typing.Optional[str] = Field(
         None,
         description=(
             "The path to the on-device display app logs endpoint"
-            " (only present on the Opentrons Flex)"
+            " (only present on the Opentrons Flex)."
+            " Deprecated: Use the `logs` field of the `GET /health` response"
+            " or refer to the OpenAPI specification of the `/logs` endpoint, instead."
         ),
         examples=["/logs/touchscreen.log"],
+        deprecated=True,
     )
     apiSpec: str = Field(
         ...,

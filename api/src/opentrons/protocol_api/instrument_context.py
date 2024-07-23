@@ -2,14 +2,11 @@ from __future__ import annotations
 import logging
 from contextlib import ExitStack
 from typing import Any, List, Optional, Sequence, Union, cast, Dict
-from opentrons.protocol_engine.commands.pipetting_common import LiquidNotFoundError
-from opentrons.protocol_engine.errors.error_occurrence import ProtocolCommandFailedError
 from opentrons_shared_data.errors.exceptions import (
     CommandPreconditionViolated,
     CommandParameterLimitViolated,
     UnexpectedTipRemovalError,
 )
-from opentrons.protocol_engine.errors.exceptions import WellDoesNotExistError
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons import types
@@ -226,7 +223,6 @@ class InstrumentContext(publisher.CommandPublisher):
 
         well: Optional[labware.Well] = None
         move_to_location: types.Location
-
         last_location = self._get_last_location_by_api_version()
         try:
             target = validation.validate_location(
@@ -263,6 +259,14 @@ class InstrumentContext(publisher.CommandPublisher):
         else:
             c_vol = self._core.get_available_volume() if not volume else volume
         flow_rate = self._core.get_aspirate_flow_rate(rate)
+
+        if (
+            self.api_version >= APIVersion(2, 20)
+            and well is not None
+            and self.liquid_presence_detection
+        ):
+            self.require_liquid_presence(well=well)
+            self.prepare_to_aspirate()
 
         with publisher.publish_context(
             broker=self.broker,
@@ -2105,16 +2109,8 @@ class InstrumentContext(publisher.CommandPublisher):
 
         :returns: A boolean.
         """
-        if not isinstance(well, labware.Well):
-            raise WellDoesNotExistError("You must provide a valid well to check.")
-        try:
-            self._core.liquid_probe_without_recovery(well._core)
-        except ProtocolCommandFailedError as e:
-            if isinstance(e.original_error, LiquidNotFoundError):
-                return False
-            raise e
-        else:
-            return True
+        loc = well.top()
+        return self._core.detect_liquid_presence(well._core, loc)
 
     @requires_version(2, 20)
     def require_liquid_presence(self, well: labware.Well) -> None:
@@ -2122,10 +2118,8 @@ class InstrumentContext(publisher.CommandPublisher):
 
         :returns: None.
         """
-        if not isinstance(well, labware.Well):
-            raise WellDoesNotExistError("You must provide a valid well to check.")
-
-        self._core.liquid_probe_with_recovery(well._core)
+        loc = well.top()
+        self._core.liquid_probe_with_recovery(well._core, loc)
 
     @requires_version(2, 20)
     def measure_liquid_height(self, well: labware.Well) -> float:
@@ -2137,8 +2131,6 @@ class InstrumentContext(publisher.CommandPublisher):
 
         This is intended for Opentrons internal use only and is not a guaranteed API.
         """
-        if not isinstance(well, labware.Well):
-            raise WellDoesNotExistError("You must provide a valid well to check.")
-
-        height = self._core.liquid_probe_without_recovery(well._core)
+        loc = well.top()
+        height = self._core.liquid_probe_without_recovery(well._core, loc)
         return height

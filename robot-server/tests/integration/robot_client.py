@@ -332,6 +332,23 @@ class RobotClient:
         response.raise_for_status()
         return response
 
+    async def post_data_files(self, req_body: Dict[str, object]) -> Response:
+        """POST /dataFiles"""
+        response = await self.httpx_client.post(
+            url=f"{self.base_url}/dataFiles",
+            data=req_body,
+        )
+        response.raise_for_status()
+        return response
+
+    async def get_data_files_download(self, data_file_id: str) -> Response:
+        """GET /dataFiles/{data_file_id}/download"""
+        response = await self.httpx_client.get(
+            url=f"{self.base_url}/dataFiles/{data_file_id}/download",
+        )
+        response.raise_for_status()
+        return response
+
 
 async def poll_until_run_completes(
     robot_client: RobotClient, run_id: str, poll_interval: float = _RUN_POLL_INTERVAL

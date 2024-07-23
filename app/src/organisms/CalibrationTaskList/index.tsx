@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import {
   ALIGN_CENTER,
@@ -55,7 +55,7 @@ export function CalibrationTaskList({
     setShowCompletionScreen,
   ] = React.useState<boolean>(false)
   const { t } = useTranslation(['robot_calibration', 'device_settings'])
-  const history = useHistory()
+  const navigate = useNavigate()
   const { activeIndex, taskList, taskListStatus } = useCalibrationTaskList(
     pipOffsetCalLauncher,
     tipLengthCalLauncher,
@@ -111,7 +111,7 @@ export function CalibrationTaskList({
     <LegacyModal
       title={`${robotName} ${t('calibration_dashboard')}`}
       onClose={() => {
-        history.push(`/devices/${robotName}/robot-settings/calibration`)
+        navigate(`/devices/${robotName}/robot-settings/calibration`)
       }}
       fullPage
       backgroundColor={COLORS.grey10}
@@ -145,7 +145,7 @@ export function CalibrationTaskList({
             <PrimaryButton
               marginTop={SPACING.spacing24}
               onClick={() => {
-                history.push(`/devices/${robotName}/robot-settings/calibration`)
+                navigate(`/devices/${robotName}/robot-settings/calibration`)
               }}
             >
               {t('device_settings:done')}

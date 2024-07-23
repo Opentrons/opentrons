@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import {
   BORDERS,
   COLORS,
@@ -27,7 +27,7 @@ export function AnalysisFailedModal({
   setShowAnalysisFailedModal,
 }: AnalysisFailedModalProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
-  const history = useHistory()
+  const navigate = useNavigate()
   const modalHeader: ModalHeaderBaseProps = {
     title: t('protocol_analysis_failed'),
     iconName: 'information',
@@ -36,7 +36,7 @@ export function AnalysisFailedModal({
   }
 
   const handleRestartSetup = (): void => {
-    history.push(protocolId != null ? `/protocols/${protocolId}` : '/protocols')
+    navigate(protocolId != null ? `/protocols/${protocolId}` : '/protocols')
   }
 
   return (

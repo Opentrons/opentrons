@@ -11,7 +11,6 @@ import { Modal } from '../../../../molecules/Modal'
 import {
   useErrorDetailsModal,
   ErrorDetailsModal,
-  ErrorDetailsModalODD,
   OverpressureBanner,
 } from '../ErrorDetailsModal'
 
@@ -58,7 +57,7 @@ describe('ErrorDetailsModal', () => {
     vi.mocked(StepInfo).mockReturnValue(<div>MOCK_STEP_INFO</div>)
   })
 
-  it('renders ErrorDetailsModalODD', () => {
+  it('renders ErrorDetailsModal', () => {
     renderWithProviders(<ErrorDetailsModal {...props} />, {
       i18nInstance: i18n,
     })
@@ -66,14 +65,14 @@ describe('ErrorDetailsModal', () => {
   })
 })
 
-const render = (props: React.ComponentProps<typeof ErrorDetailsModalODD>) => {
-  return renderWithProviders(<ErrorDetailsModalODD {...props} />, {
+const render = (props: React.ComponentProps<typeof ErrorDetailsModal>) => {
+  return renderWithProviders(<ErrorDetailsModal {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
-describe('ErrorDetailsModalODD', () => {
-  let props: React.ComponentProps<typeof ErrorDetailsModalODD>
+describe('ErrorDetailsModal', () => {
+  let props: React.ComponentProps<typeof ErrorDetailsModal>
 
   beforeEach(() => {
     props = {

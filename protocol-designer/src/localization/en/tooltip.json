@@ -15,6 +15,7 @@
   "y_position_value": "A negative value moves towards the front",
 
   "step_description": {
+    "comment": "Add a comment anywhere between steps in your protocol",
     "heaterShaker": "Set heat, shake, or labware latch commands for the Heater-Shaker module",
     "magnet": "Engage or disengage the Magnetic module.",
     "mix": "Mix contents of wells/tubes.",

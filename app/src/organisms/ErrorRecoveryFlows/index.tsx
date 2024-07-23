@@ -18,7 +18,11 @@ import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import { getIsOnDevice } from '../../redux/config'
 import { ErrorRecoveryWizard, useERWizard } from './ErrorRecoveryWizard'
 import { RunPausedSplash, useRunPausedSplash } from './RunPausedSplash'
-import { useCurrentlyRecoveringFrom, useERUtils } from './hooks'
+import {
+  useCurrentlyRecoveringFrom,
+  useERUtils,
+  useShowDoorInfo,
+} from './hooks'
 
 import type { RunStatus } from '@opentrons/api-client'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
@@ -100,6 +104,7 @@ export function useErrorRecoveryFlows(
 
 export interface ErrorRecoveryFlowsProps {
   runId: string
+  runStatus: RunStatus | null
   failedCommand: FailedCommand | null
   isFlex: boolean
   protocolAnalysis: CompletedProtocolAnalysis | null
@@ -108,30 +113,33 @@ export interface ErrorRecoveryFlowsProps {
 export function ErrorRecoveryFlows(
   props: ErrorRecoveryFlowsProps
 ): JSX.Element | null {
+  const { protocolAnalysis, runStatus } = props
+
   const { hasLaunchedRecovery, toggleERWizard, showERWizard } = useERWizard()
+
+  const isOnDevice = useSelector(getIsOnDevice)
+  const robotType = protocolAnalysis?.robotType ?? OT2_ROBOT_TYPE
+  const showSplash = useRunPausedSplash(isOnDevice, showERWizard)
+
+  const isDoorOpen = useShowDoorInfo(runStatus)
 
   const recoveryUtils = useERUtils({
     ...props,
     hasLaunchedRecovery,
     toggleERWizard,
+    isOnDevice,
+    robotType,
   })
 
-  // if (!enableRunNotes) {
-  //   return null
-  // }
-
-  const { protocolAnalysis } = props
-  const robotType = protocolAnalysis?.robotType ?? OT2_ROBOT_TYPE
-  const isOnDevice = useSelector(getIsOnDevice)
-  const showSplash = useRunPausedSplash(showERWizard)
   return (
     <>
-      {showERWizard ? (
+      {showERWizard || isDoorOpen ? (
         <ErrorRecoveryWizard
           {...props}
           {...recoveryUtils}
           robotType={robotType}
           isOnDevice={isOnDevice}
+          isDoorOpen={isDoorOpen}
         />
       ) : null}
       {showSplash ? (

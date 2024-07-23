@@ -1,7 +1,7 @@
 /* eslint-disable no-use-before-define */
 // application types
 import type { Store as ReduxStore, Dispatch as ReduxDispatch } from 'redux'
-import type { RouterState, RouterAction } from 'connected-react-router'
+import type { RouterAction } from 'connected-react-router'
 import type { Observable } from 'rxjs'
 
 import type { RobotApiState, RobotApiAction } from './robot-api/types'
@@ -54,7 +54,6 @@ export interface State {
   readonly sessions: SessionState
   readonly calibration: CalibrationState
   readonly protocolStorage: ProtocolStorageState
-  readonly router: RouterState
 }
 
 export type Action =

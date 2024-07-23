@@ -54,6 +54,7 @@
     "redux": "4.0.5",
     "redux-actions": "2.2.1",
     "react-popper": "1.0.0",
+    "react-router-dom": "6.24.1",
     "redux-thunk": "2.3.0",
     "reselect": "4.0.0",
     "styled-components": "5.3.6",

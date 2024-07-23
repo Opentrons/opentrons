@@ -15,20 +15,22 @@ import type { WellGroup } from '@opentrons/components'
 import type { FailedCommand } from '../types'
 import type { UseFailedLabwareUtilsResult } from './useFailedLabwareUtils'
 import type { UseRouteUpdateActionsResult } from './useRouteUpdateActions'
+import type { RecoveryToasts } from './useRecoveryToasts'
 
 interface UseRecoveryCommandsParams {
   runId: string
   failedCommand: FailedCommand | null
   failedLabwareUtils: UseFailedLabwareUtilsResult
   routeUpdateActions: UseRouteUpdateActionsResult
+  recoveryToastUtils: RecoveryToasts
 }
 export interface UseRecoveryCommandsResult {
   /* A terminal recovery command that causes ER to exit as the run status becomes "running" */
   resumeRun: () => void
   /* A terminal recovery command that causes ER to exit as the run status becomes "stop-requested" */
   cancelRun: () => void
-  /* A non-terminal recovery command, but should generally be chained with a resumeRun. */
-  skipFailedCommand: () => Promise<void>
+  /* A terminal recovery command, that causes ER to exit as the run status becomes "running" */
+  skipFailedCommand: () => void
   /* A non-terminal recovery command. Ignore this errorKind for the rest of this run. */
   ignoreErrorKindThisRun: () => Promise<void>
   /* A non-terminal recovery command */
@@ -44,11 +46,15 @@ export function useRecoveryCommands({
   failedCommand,
   failedLabwareUtils,
   routeUpdateActions,
+  recoveryToastUtils,
 }: UseRecoveryCommandsParams): UseRecoveryCommandsResult {
   const { proceedToRouteAndStep } = routeUpdateActions
   const { chainRunCommands } = useChainRunCommands(runId, failedCommand?.id)
-  const { resumeRunFromRecovery } = useResumeRunFromRecoveryMutation()
+  const {
+    mutateAsync: resumeRunFromRecovery,
+  } = useResumeRunFromRecoveryMutation()
   const { stopRun } = useStopRunMutation()
+  const { makeSuccessToast } = recoveryToastUtils
 
   const chainRunRecoveryCommands = React.useCallback(
     (
@@ -96,23 +102,20 @@ export function useRecoveryCommands({
   }, [chainRunRecoveryCommands, failedCommand, failedLabwareUtils])
 
   const resumeRun = React.useCallback((): void => {
-    resumeRunFromRecovery(runId)
-  }, [runId, resumeRunFromRecovery])
+    void resumeRunFromRecovery(runId).then(() => {
+      makeSuccessToast()
+    })
+  }, [runId, resumeRunFromRecovery, makeSuccessToast])
 
   const cancelRun = React.useCallback((): void => {
     stopRun(runId)
   }, [runId])
 
-  // TODO(jh, 06-18-24): If this command is actually terminal for error recovery, remove the resumeRun currently promise
-  // chained where this is used. Also update docstring in iface.
-  const skipFailedCommand = React.useCallback((): Promise<void> => {
-    console.log('SKIPPING TO NEXT STEP')
-    return new Promise<void>(resolve => {
-      setTimeout(() => {
-        resolve()
-      }, 2000)
+  const skipFailedCommand = React.useCallback((): void => {
+    void resumeRunFromRecovery(runId).then(() => {
+      makeSuccessToast()
     })
-  }, [])
+  }, [runId, resumeRunFromRecovery, makeSuccessToast])
 
   const ignoreErrorKindThisRun = React.useCallback((): Promise<void> => {
     console.log('IGNORING ALL ERRORS OF THIS KIND THIS RUN')
