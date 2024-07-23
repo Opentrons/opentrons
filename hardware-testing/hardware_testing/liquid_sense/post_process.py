@@ -298,17 +298,8 @@ def process_google_sheet(
     adjusted_height = google_sheet.get_single_col_range(
         sheet_name, adjusted_height_range
     )
-    normalized_height = [
-        float(height) - float(target_height) for height in adjusted_height
-    ]
-    normalized_height = []
-    for trial in num_of_trials - 1:
-        i = 0
-        norm_height = adjusted_height[i] - target_height[i]
-        normalized_height.append(norm_height)
-        i = i + 1
-        
-    google_sheet.batch_update_cells([normalized_height], "G", 11, sheet_id)
+    norm_height_range = "G11:G" + str(last_trial_row)
+    normalized_height = google_sheet.get_single_col_range(sheet_name, norm_height_range)
     # Find accuracy, precision, repeatability
     try:
         accuracy = statistics.mean(normalized_height)

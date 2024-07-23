@@ -256,6 +256,7 @@ def store_trial(
                 [f"{plunger_pos}"],
                 [f"{tip_length_offset}"],
                 [f"{height + tip_length_offset}"],
+                [f"{target_height - height}"]
             ]
             google_sheet.batch_update_cells(
                 trial_for_google_sheet, "A", 11 + int(trial), sheet_id
