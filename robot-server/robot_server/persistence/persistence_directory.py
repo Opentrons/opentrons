@@ -12,7 +12,7 @@ from anyio import Path as AsyncPath, to_thread
 
 from ._folder_migrator import MigrationOrchestrator
 from ._migrations import up_to_3, v3_to_v4, v4_to_v5
-
+from . import LATEST_PERSISTENCE_DIRECTORY
 
 _TEMP_PERSISTENCE_DIR_PREFIX: Final = "opentrons-robot-server-"
 _RESET_MARKER_FILE_NAME: Final = "_TO_BE_DELETED_ON_REBOOT"
@@ -21,7 +21,6 @@ This file was placed here by robot-server.
 It tells robot-server to clear this directory on the next boot,
 after which it will delete this file.
 """
-
 
 _log = getLogger(__name__)
 
@@ -51,7 +50,7 @@ async def prepare_active_subdirectory(prepared_root: Path) -> Path:
         migrations=[
             up_to_3.MigrationUpTo3(subdirectory="3"),
             v3_to_v4.Migration3to4(subdirectory="4"),
-            v4_to_v5.Migration4to5(subdirectory="5"),
+            v4_to_v5.Migration4to5(subdirectory=LATEST_PERSISTENCE_DIRECTORY),
         ],
         temp_file_prefix="temp-",
     )

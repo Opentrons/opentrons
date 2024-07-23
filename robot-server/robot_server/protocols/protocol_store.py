@@ -317,17 +317,6 @@ class ProtocolStore:
         with self._sql_engine.begin() as transaction:
             return transaction.execute(select_referencing_run_ids).scalars().all()
 
-    def _get_referencing_analysis_ids(self, protocol_id: str) -> List[str]:
-        """Return a list of analysis IDs that reference a particular protocol."""
-        select_referencing_analysis_ids = (
-            sqlalchemy.select(analysis_table.c.id)
-            .where(analysis_table.c.protocol_id == protocol_id)
-            .order_by(sqlite_rowid)
-        )
-
-        with self._sql_engine.begin() as transaction:
-            return transaction.execute(select_referencing_analysis_ids).scalars().all()
-
     def _sql_insert(self, resource: _DBProtocolResource) -> None:
         statement = sqlalchemy.insert(protocol_table).values(
             _convert_dataclass_to_sql_values(resource=resource)
@@ -359,11 +348,17 @@ class ProtocolStore:
         return [_convert_sql_row_to_dataclass(sql_row=row) for row in all_rows]
 
     def _sql_remove(self, protocol_id: str) -> None:
-        analyses_using_protocol = self._get_referencing_analysis_ids(protocol_id)
+        select_referencing_analysis_ids = (
+            sqlalchemy.select(analysis_table.c.id)
+            .where(analysis_table.c.protocol_id == protocol_id)
+            .order_by(sqlite_rowid)
+        )
         delete_analysis_rtps_statement = sqlalchemy.delete(
             analysis_primitive_type_rtp_table
         ).where(
-            analysis_primitive_type_rtp_table.c.analysis_id.in_(analyses_using_protocol)
+            analysis_primitive_type_rtp_table.c.analysis_id.in_(
+                select_referencing_analysis_ids
+            )
         )
         delete_analyses_statement = sqlalchemy.delete(analysis_table).where(
             analysis_table.c.protocol_id == protocol_id

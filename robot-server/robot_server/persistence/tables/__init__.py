@@ -10,6 +10,7 @@ from .schema_5 import (
     run_command_table,
     action_table,
     data_files_table,
+    PrimitiveParamSQLEnum,
 )
 
 
@@ -22,4 +23,5 @@ __all__ = [
     "run_command_table",
     "action_table",
     "data_files_table",
+    "PrimitiveParamSQLEnum",
 ]

@@ -6,6 +6,7 @@ import sqlalchemy
 from dataclasses import dataclass
 from typing import Dict, Callable, Union
 
+from robot_server.persistence.tables import PrimitiveParamSQLEnum
 from opentrons.protocols.parameters.types import PrimitiveAllowedTypes
 
 
@@ -23,7 +24,7 @@ class PrimitiveParameterResource:
         return {
             "analysis_id": self.analysis_id,
             "parameter_variable_name": self.parameter_variable_name,
-            "parameter_type": self.parameter_type,
+            "parameter_type": PrimitiveParamSQLEnum(self.parameter_type),
             "parameter_value": str(self.parameter_value),
         }
 
@@ -40,7 +41,7 @@ class PrimitiveParameterResource:
         assert isinstance(parameter_variable_name, str)
 
         parameter_type = sql_row.parameter_type
-        assert isinstance(parameter_type, str)
+        assert isinstance(parameter_type, PrimitiveParamSQLEnum)
 
         parameter_val_str = sql_row.parameter_value
         assert isinstance(parameter_val_str, str)
@@ -52,17 +53,21 @@ class PrimitiveParameterResource:
                 return float(value)
             return converted_num
 
+        def _bool_converter(value: str) -> bool:
+            bool_conversion = {"true": True, "false": False}
+            return bool_conversion[value.lower()]
+
         param_types: Dict[str, Callable[[str], Union[str, float, bool]]] = {
             "str": str,
             "int": _int_converter,
             "float": float,
-            "bool": bool,
+            "bool": _bool_converter,
         }
-        parameter_value = param_types[parameter_type](sql_row.parameter_value)
+        parameter_value = param_types[parameter_type.value](sql_row.parameter_value)
 
         return cls(
             analysis_id=analysis_id,
             parameter_variable_name=parameter_variable_name,
-            parameter_type=parameter_type,
+            parameter_type=parameter_type.value,
             parameter_value=parameter_value,
         )

@@ -47,7 +47,6 @@ class Migration4to5(Migration):  # noqa: D101
         # Append the new column to existing protocols in v4 database
         with ExitStack() as exit_stack:
             source_engine = exit_stack.enter_context(sql_engine_ctx(source_db_file))
-            schema_4.metadata.create_all(source_engine)
 
             dest_engine = exit_stack.enter_context(sql_engine_ctx(dest_db_file))
             schema_5.metadata.create_all(dest_engine)

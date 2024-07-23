@@ -372,6 +372,11 @@ class AnalysisStore:
                 last_analysis_summary.id
             )
         )
+        if len(primitive_rtps_in_last_analysis) == 0:
+            # Protocols migrated from v4 will not have any entries in RTP table,
+            # this is fine and we should just trigger a new analysis and have
+            # the new values be stored in the RTP table.
+            return False
         assert set(param.variableName for param in new_parameters) == set(
             primitive_rtps_in_last_analysis.keys()
         ), "Mismatch in parameters found in the current request vs. last saved parameters."  # Indicates internal bug

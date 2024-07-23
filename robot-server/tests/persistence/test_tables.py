@@ -51,10 +51,11 @@ EXPECTED_STATEMENTS_LATEST = [
         row_id INTEGER NOT NULL,
         analysis_id VARCHAR NOT NULL,
         parameter_variable_name VARCHAR NOT NULL,
-        parameter_type VARCHAR NOT NULL,
+        parameter_type VARCHAR(5) NOT NULL,
         parameter_value VARCHAR NOT NULL,
         PRIMARY KEY (row_id),
-        FOREIGN KEY(analysis_id) REFERENCES analysis (id)
+        FOREIGN KEY(analysis_id) REFERENCES analysis (id),
+        CONSTRAINT primitiveparamsqlenum CHECK (parameter_type IN ('int', 'float', 'bool', 'str'))
     )
     """,
     """

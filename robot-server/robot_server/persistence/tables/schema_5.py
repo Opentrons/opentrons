@@ -1,10 +1,20 @@
 """v5 of our SQLite schema."""
-
+import enum
 import sqlalchemy
 
 from robot_server.persistence._utc_datetime import UTCDateTime
 
 metadata = sqlalchemy.MetaData()
+
+
+class PrimitiveParamSQLEnum(enum.Enum):
+    """Enum type to store primitive param type."""
+
+    INT = "int"
+    FLOAT = "float"
+    BOOL = "bool"
+    STR = "str"
+
 
 protocol_table = sqlalchemy.Table(
     "protocol",
@@ -71,7 +81,11 @@ analysis_primitive_type_rtp_table = sqlalchemy.Table(
     ),
     sqlalchemy.Column(
         "parameter_type",
-        sqlalchemy.String,
+        sqlalchemy.Enum(
+            PrimitiveParamSQLEnum,
+            values_callable=lambda obj: [e.value for e in obj],
+            create_constraint=True,
+        ),
         nullable=False,
     ),
     sqlalchemy.Column(
