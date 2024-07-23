@@ -158,7 +158,7 @@ async def _delete_all_sessions(robot_client: RobotClient) -> None:
 
 
 async def _delete_client_data(robot_client: RobotClient) -> None:
-    await robot_client.put_client_data({})
+    await robot_client.delete_all_client_data()
 
 
 async def _reset_deck_configuration(robot_client: RobotClient) -> None:

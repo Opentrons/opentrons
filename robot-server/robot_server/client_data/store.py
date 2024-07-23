@@ -16,15 +16,29 @@ class ClientDataStore:
     """An in-memory store for client-defined JSON objects."""
 
     def __init__(self) -> None:
-        self._current_data: ClientData = {}
+        self._current_data: dict[str, ClientData] = {}
 
-    def put(self, new_data: ClientData) -> None:
-        """Replace the stored data."""
-        self._current_data = new_data
+    def put(self, key: str, new_data: ClientData) -> None:
+        """Store new data at the given key, replacing any data that already exists."""
+        self._current_data[key] = new_data
 
-    def get(self) -> ClientData:
-        """Return the currently-stored data."""
-        return self._current_data
+    def get(self, key: str) -> ClientData:
+        """Return the currently-stored data.
+
+        If the given key has no data, raise `KeyError`.
+        """
+        return self._current_data[key]
+
+    def delete(self, key: str) -> None:
+        """Delete the data at the given key.
+
+        If the given key has no data, raise `KeyError`.
+        """
+        del self._current_data[key]
+
+    def delete_all(self) -> None:
+        """Delete all data from the store."""
+        self._current_data.clear()
 
 
 _app_state_accessor = AppStateAccessor[ClientDataStore]("client_data_store")

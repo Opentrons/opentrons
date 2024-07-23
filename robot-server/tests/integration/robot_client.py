@@ -349,10 +349,8 @@ class RobotClient:
         response.raise_for_status()
         return response
 
-    async def put_client_data(self, new_data: Dict[str, object]) -> Response:
-        response = await self.httpx_client.put(
-            url=f"{self.base_url}/clientData", json={"data": new_data}
-        )
+    async def delete_all_client_data(self) -> Response:
+        response = await self.httpx_client.delete(url=f"{self.base_url}/clientData")
         response.raise_for_status()
         return response
 
