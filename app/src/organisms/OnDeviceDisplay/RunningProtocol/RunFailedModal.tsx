@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { css } from 'styled-components'
 
 import {
@@ -34,7 +34,7 @@ export function RunFailedModal({
   errors,
 }: RunFailedModalProps): JSX.Element | null {
   const { t, i18n } = useTranslation(['run_details', 'shared', 'branded'])
-  const history = useHistory()
+  const navigate = useNavigate()
   const { stopRun } = useStopRunMutation()
   const [isCanceling, setIsCanceling] = React.useState(false)
 
@@ -53,7 +53,7 @@ export function RunFailedModal({
         // ToDo do we need to track this event?
         // If need, runCancel or runFailure something
         // trackProtocolRunEvent({ name: 'runCancel' })
-        history.push('/dashboard')
+        navigate('/dashboard')
       },
       onError: () => {
         setIsCanceling(false)

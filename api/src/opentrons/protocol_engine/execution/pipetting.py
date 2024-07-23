@@ -13,7 +13,7 @@ from ..errors.exceptions import (
     InvalidPushOutVolumeError,
     InvalidDispenseVolumeError,
 )
-
+from opentrons.protocol_engine.types import WellLocation
 
 # 1e-9 µL (1 femtoliter!) is a good value because:
 # * It's large relative to rounding errors that occur in practice in protocols. For
@@ -30,7 +30,7 @@ class PipettingHandler(TypingProtocol):
     """Liquid handling commands."""
 
     def get_is_empty(self, pipette_id: str) -> bool:
-        """Get whether a pipette has a working volume equal to 0."""
+        """Get whether a pipette has an aspirated volume equal to 0."""
 
     def get_is_ready_to_aspirate(self, pipette_id: str) -> bool:
         """Get whether a pipette is ready to aspirate."""
@@ -68,6 +68,7 @@ class PipettingHandler(TypingProtocol):
         pipette_id: str,
         labware_id: str,
         well_name: str,
+        well_location: WellLocation,
     ) -> float:
         """Detect liquid level."""
 
@@ -81,8 +82,8 @@ class HardwarePipettingHandler(PipettingHandler):
         self._hardware_api = hardware_api
 
     def get_is_empty(self, pipette_id: str) -> bool:
-        """Get whether a pipette has a working volume equal to 0."""
-        return self._state_view.pipettes.get_working_volume(pipette_id) == 0
+        """Get whether a pipette has an aspirated volume equal to 0."""
+        return self._state_view.pipettes.get_aspirated_volume(pipette_id) == 0
 
     def get_is_ready_to_aspirate(self, pipette_id: str) -> bool:
         """Get whether a pipette is ready to aspirate."""
@@ -176,6 +177,7 @@ class HardwarePipettingHandler(PipettingHandler):
         pipette_id: str,
         labware_id: str,
         well_name: str,
+        well_location: WellLocation,
     ) -> float:
         """Detect liquid level."""
         hw_pipette = self._state_view.pipettes.get_hardware_pipette(
@@ -188,7 +190,8 @@ class HardwarePipettingHandler(PipettingHandler):
             pipette_id=pipette_id
         )
         z_pos = await self._hardware_api.liquid_probe(
-            mount=hw_pipette.mount, max_z_dist=well_depth - lld_min_height
+            mount=hw_pipette.mount,
+            max_z_dist=well_depth - lld_min_height + well_location.offset.z,
         )
         return float(z_pos)
 
@@ -234,8 +237,8 @@ class VirtualPipettingHandler(PipettingHandler):
         self._state_view = state_view
 
     def get_is_empty(self, pipette_id: str) -> bool:
-        """Get whether a pipette has a working volume equal to 0."""
-        return self._state_view.pipettes.get_working_volume(pipette_id) == 0
+        """Get whether a pipette has an aspirated volume equal to 0."""
+        return self._state_view.pipettes.get_aspirated_volume(pipette_id) == 0
 
     def get_is_ready_to_aspirate(self, pipette_id: str) -> bool:
         """Get whether a pipette is ready to aspirate."""
@@ -290,6 +293,7 @@ class VirtualPipettingHandler(PipettingHandler):
         pipette_id: str,
         labware_id: str,
         well_name: str,
+        well_location: WellLocation,
     ) -> float:
         """Detect liquid level."""
         # TODO (pm, 6-18-24): return a value of worth if needed

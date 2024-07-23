@@ -21,6 +21,7 @@ import {
   selectors as stepFormSelectors,
   getIsModuleOnDeck,
 } from '../step-forms'
+import { getEnableComment } from '../feature-flags/selectors'
 import {
   ConfirmDeleteModal,
   CLOSE_UNSAVED_STEP_FORM,
@@ -105,19 +106,33 @@ export function StepButtonItem(props: StepButtonItemProps): JSX.Element {
 }
 
 export const StepCreationButton = (): JSX.Element => {
+  const enableComment = useSelector(getEnableComment)
+
   const getSupportedSteps = (): Array<
     Exclude<StepType, 'manualIntervention'>
-  > => [
-    'comment',
-    'moveLabware',
-    'moveLiquid',
-    'mix',
-    'pause',
-    'heaterShaker',
-    'magnet',
-    'temperature',
-    'thermocycler',
-  ]
+  > =>
+    enableComment
+      ? [
+          'comment',
+          'moveLabware',
+          'moveLiquid',
+          'mix',
+          'pause',
+          'heaterShaker',
+          'magnet',
+          'temperature',
+          'thermocycler',
+        ]
+      : [
+          'moveLabware',
+          'moveLiquid',
+          'mix',
+          'pause',
+          'heaterShaker',
+          'magnet',
+          'temperature',
+          'thermocycler',
+        ]
 
   const currentFormIsPresaved = useSelector(
     stepFormSelectors.getCurrentFormIsPresaved
@@ -131,7 +146,7 @@ export const StepCreationButton = (): JSX.Element => {
     Exclude<StepType, 'manualIntervention'>,
     boolean
   > = {
-    comment: true,
+    comment: enableComment,
     moveLabware: true,
     moveLiquid: true,
     mix: true,

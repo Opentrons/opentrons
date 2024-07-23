@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
@@ -16,28 +16,37 @@ import {
   SPACING,
   LegacyStyledText,
 } from '@opentrons/components'
-import { useAllProtocolsQuery } from '@opentrons/react-api-client'
+import {
+  useAllProtocolsQuery,
+  useInstrumentsQuery,
+} from '@opentrons/react-api-client'
 
 import { SmallButton, FloatingActionButton } from '../../atoms/buttons'
 import { Navigation } from '../../organisms/Navigation'
 import {
   getPinnedQuickTransferIds,
   getQuickTransfersOnDeviceSortKey,
+  getHasDismissedQuickTransferIntro,
   updateConfigValue,
 } from '../../redux/config'
 import { PinnedTransferCarousel } from './PinnedTransferCarousel'
 import { sortQuickTransfers } from './utils'
 import { QuickTransferCard } from './QuickTransferCard'
 import { NoQuickTransfers } from './NoQuickTransfers'
+import { PipetteNotAttachedErrorModal } from './PipetteNotAttachedErrorModal'
+import { StorageLimitReachedErrorModal } from './StorageLimitReachedErrorModal'
+import { IntroductoryModal } from './IntroductoryModal'
 import { DeleteTransferConfirmationModal } from './DeleteTransferConfirmationModal'
 
 import type { ProtocolResource } from '@opentrons/shared-data'
+import type { PipetteData } from '@opentrons/api-client'
 import type { Dispatch } from '../../redux/types'
 import type { QuickTransfersOnDeviceSortKey } from '../../redux/config/types'
 
 export function QuickTransferDashboard(): JSX.Element {
   const protocols = useAllProtocolsQuery()
-  const history = useHistory()
+  const { data: attachedInstruments } = useInstrumentsQuery()
+  const navigate = useNavigate()
   const { t } = useTranslation(['quick_transfer', 'protocol_info'])
   const dispatch = useDispatch<Dispatch>()
   const [navMenuIsOpened, setNavMenuIsOpened] = React.useState<boolean>(false)
@@ -49,8 +58,21 @@ export function QuickTransferDashboard(): JSX.Element {
     showDeleteConfirmationModal,
     setShowDeleteConfirmationModal,
   ] = React.useState<boolean>(false)
+  const [
+    showPipetteNotAttachedModal,
+    setShowPipetteNotAttaachedModal,
+  ] = React.useState<boolean>(false)
+  const [
+    showStorageLimitReachedModal,
+    setShowStorageLimitReachedModal,
+  ] = React.useState<boolean>(false)
   const [targetTransferId, setTargetTransferId] = React.useState<string>('')
   const sortBy = useSelector(getQuickTransfersOnDeviceSortKey) ?? 'alphabetical'
+  const hasDismissedIntro = useSelector(getHasDismissedQuickTransferIntro)
+
+  const pipetteIsAttached = attachedInstruments?.data.some(
+    (i): i is PipetteData => i.ok && i.instrumentType === 'pipette'
+  )
   const quickTransfersData =
     protocols.data?.data.filter(protocol => {
       return protocol.protocolKind === 'quick-transfer'
@@ -123,12 +145,51 @@ export function QuickTransferDashboard(): JSX.Element {
     }
   }
 
+  const handleCreateNewQuickTransfer = (): void => {
+    if (!pipetteIsAttached) {
+      setShowPipetteNotAttaachedModal(true)
+    } else if (quickTransfersData.length >= 20) {
+      setShowStorageLimitReachedModal(true)
+    } else {
+      navigate('/quick-transfer/new')
+    }
+  }
+
   return (
     <>
+      {!hasDismissedIntro ? (
+        <IntroductoryModal
+          onClose={() =>
+            dispatch(
+              updateConfigValue(
+                'protocols.hasDismissedQuickTransferIntro',
+                true
+              )
+            )
+          }
+        />
+      ) : null}
       {showDeleteConfirmationModal ? (
         <DeleteTransferConfirmationModal
           transferId={targetTransferId}
           setShowDeleteConfirmationModal={setShowDeleteConfirmationModal}
+        />
+      ) : null}
+      {showPipetteNotAttachedModal ? (
+        <PipetteNotAttachedErrorModal
+          onExit={() => {
+            setShowPipetteNotAttaachedModal(false)
+          }}
+          onAttach={() => {
+            navigate('/instruments')
+          }}
+        />
+      ) : null}
+      {showStorageLimitReachedModal ? (
+        <StorageLimitReachedErrorModal
+          onExit={() => {
+            setShowStorageLimitReachedModal(false)
+          }}
         />
       ) : null}
       <Flex
@@ -241,9 +302,7 @@ export function QuickTransferDashboard(): JSX.Element {
       <FloatingActionButton
         buttonText={t('quick_transfer')}
         iconName="plus"
-        onClick={() => {
-          history.push('/quick-transfer/new')
-        }}
+        onClick={handleCreateNewQuickTransfer}
       />
     </>
   )

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { act, screen, waitFor } from '@testing-library/react'
-import { StaticRouter } from 'react-router-dom'
+import { MemoryRouter } from 'react-router-dom'
 import { describe, it, beforeEach, vi, expect, afterEach } from 'vitest'
 
 import { renderWithProviders } from '../../../__testing-utils__'
@@ -40,9 +40,9 @@ const render = (
   props: Partial<React.ComponentProps<typeof ProtocolDetails>> = {}
 ) => {
   return renderWithProviders(
-    <StaticRouter>
+    <MemoryRouter>
       <ProtocolDetails {...{ ...storedProtocolData, ...props }} />
-    </StaticRouter>,
+    </MemoryRouter>,
     {
       i18nInstance: i18n,
     }

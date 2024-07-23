@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 from sqlalchemy.engine import Engine as SQLEngine
 
 from robot_server.data_files.data_files_store import DataFilesStore, DataFileInfo
+from robot_server.data_files.models import FileIdNotFoundError
 
 
 @pytest.fixture
@@ -46,3 +47,25 @@ async def test_insert_file_info_with_existing_id(
     await subject.insert(data_file_info1)
     with pytest.raises(Exception):
         await subject.insert(data_file_info2)
+
+
+async def test_insert_data_file_info_and_get_by_id(
+    subject: DataFilesStore,
+) -> None:
+    """It should get the inserted data file info from the database."""
+    data_file_info = DataFileInfo(
+        id="file-id",
+        name="file-name",
+        file_hash="abc",
+        created_at=datetime(year=2024, month=7, day=15, tzinfo=timezone.utc),
+    )
+    await subject.insert(data_file_info)
+    assert subject.get("file-id") == data_file_info
+
+
+def test_get_by_id_raises(
+    subject: DataFilesStore,
+) -> None:
+    """It should raise if the requested data file id does not exist."""
+    with pytest.raises(FileIdNotFoundError):
+        assert subject.get("file-id")

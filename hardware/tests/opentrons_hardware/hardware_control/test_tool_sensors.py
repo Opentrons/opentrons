@@ -217,6 +217,7 @@ async def test_liquid_probe(
         mount_speed=10,
         plunger_speed=8,
         threshold_pascals=threshold_pascals,
+        plunger_impulse_time=0.2,
         csv_output=False,
         sync_buffer_output=False,
         can_bus_only_output=False,
@@ -348,6 +349,7 @@ async def test_liquid_probe_output_options(
             mount_speed=10,
             plunger_speed=8,
             threshold_pascals=14,
+            plunger_impulse_time=0.2,
             csv_output=csv_output,
             sync_buffer_output=sync_buffer_output,
             can_bus_only_output=can_bus_only_output,
@@ -445,7 +447,7 @@ async def test_capacitive_probe(
     message_send_loopback.add_responder(move_responder)
 
     status = await capacitive_probe(
-        mock_messenger, target_node, motor_node, distance, speed, speed
+        mock_messenger, target_node, motor_node, distance, speed
     )
     assert status.motor_position == 10  # this comes from the current_position_um above
     assert status.encoder_position == 10

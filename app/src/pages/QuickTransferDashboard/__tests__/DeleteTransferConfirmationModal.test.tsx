@@ -11,19 +11,19 @@ import { i18n } from '../../../i18n'
 import { useToaster } from '../../../organisms/ToasterOven'
 import { DeleteTransferConfirmationModal } from '../DeleteTransferConfirmationModal'
 
-import type * as ReactRouterDom from 'react-router-dom'
+import type { NavigateFunction } from 'react-router-dom'
 import type { HostConfig } from '@opentrons/api-client'
 
-const mockPush = vi.fn()
+const mockNavigate = vi.fn()
 
 vi.mock('@opentrons/api-client')
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../organisms/ToasterOven')
 vi.mock('react-router-dom', async importOriginal => {
-  const reactRouterDom = await importOriginal<typeof ReactRouterDom>()
+  const reactRouterDom = await importOriginal<NavigateFunction>()
   return {
     ...reactRouterDom,
-    useHistory: () => ({ push: mockPush } as any),
+    useNavigate: () => mockNavigate,
   }
 })
 

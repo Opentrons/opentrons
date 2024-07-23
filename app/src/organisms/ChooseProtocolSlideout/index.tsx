@@ -1,7 +1,7 @@
 import * as React from 'react'
 import first from 'lodash/first'
 import { Trans, useTranslation } from 'react-i18next'
-import { Link, NavLink, useHistory } from 'react-router-dom'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 
@@ -52,7 +52,10 @@ import { useCreateRunFromProtocol } from '../ChooseRobotToRunProtocolSlideout/us
 import { ApplyHistoricOffsets } from '../ApplyHistoricOffsets'
 import { useOffsetCandidatesForAnalysis } from '../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { FileCard } from '../ChooseRobotSlideout/FileCard'
-import { getRunTimeParameterValuesForRun } from '../Devices/utils'
+import {
+  getRunTimeParameterFilesForRun,
+  getRunTimeParameterValuesForRun,
+} from '../Devices/utils'
 import { getAnalysisStatus } from '../ProtocolsLanding/utils'
 
 import type { DropdownOption } from '@opentrons/components'
@@ -86,7 +89,7 @@ export function ChooseProtocolSlideoutComponent(
   props: ChooseProtocolSlideoutProps
 ): JSX.Element | null {
   const { t } = useTranslation(['device_details', 'shared'])
-  const history = useHistory()
+  const navigate = useNavigate()
   const logger = useLogger(new URL('', import.meta.url).pathname)
   const [targetProps, tooltipProps] = useTooltip()
   const [targetPropsHover, tooltipPropsHover] = useHoverTooltip()
@@ -187,7 +190,7 @@ export function ChooseProtocolSlideoutComponent(
           name: 'createProtocolRecordResponse',
           properties: { success: true },
         })
-        history.push(`/devices/${name}/protocol-runs/${runData.id}`)
+        navigate(`/devices/${name}/protocol-runs/${runData.id}`)
       },
       onError: (error: Error) => {
         trackCreateProtocolRunEvent({
@@ -230,14 +233,26 @@ export function ChooseProtocolSlideoutComponent(
           return { ...acc, [variableName]: uploadedFileResponse.data.id }
         }, {})
         const runTimeParameterValues = getRunTimeParameterValuesForRun(
+          runTimeParametersOverrides
+        )
+        const runTimeParameterFiles = getRunTimeParameterFilesForRun(
           runTimeParametersOverrides,
           mappedResolvedCsvVariableToFileId
         )
-        createRunFromProtocolSource({
-          files: srcFileObjects,
-          protocolKey: selectedProtocol.protocolKey,
-          runTimeParameterValues,
-        })
+        if (enableCsvFile) {
+          createRunFromProtocolSource({
+            files: srcFileObjects,
+            protocolKey: selectedProtocol.protocolKey,
+            runTimeParameterValues,
+            runTimeParameterFiles,
+          })
+        } else {
+          createRunFromProtocolSource({
+            files: srcFileObjects,
+            protocolKey: selectedProtocol.protocolKey,
+            runTimeParameterValues,
+          })
+        }
       })
     } else {
       logger.warn('failed to create protocol, no protocol selected')
@@ -285,7 +300,7 @@ export function ChooseProtocolSlideoutComponent(
                       }
                       return parameter
                     })
-                    setRunTimeParametersOverrides?.(clone)
+                    setRunTimeParametersOverrides?.(clone as RunTimeParameter[])
                   }}
                   title={runtimeParam.displayName}
                   width="100%"
@@ -431,6 +446,7 @@ export function ChooseProtocolSlideoutComponent(
                   flexDirection={DIRECTION_COLUMN}
                   alignItems={ALIGN_CENTER}
                   gridgap={SPACING.spacing8}
+                  key={runtimeParam.variableName}
                 >
                   <Flex
                     flexDirection={DIRECTION_COLUMN}

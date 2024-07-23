@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
-import { StaticRouter } from 'react-router-dom'
+import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { when } from 'vitest-when'
 
@@ -51,9 +51,9 @@ const render = (
   props: React.ComponentProps<typeof ChooseRobotToRunProtocolSlideout>
 ) => {
   return renderWithProviders(
-    <StaticRouter>
+    <MemoryRouter>
       <ChooseRobotToRunProtocolSlideout {...props} />
-    </StaticRouter>,
+    </MemoryRouter>,
     {
       i18nInstance: i18n,
     }

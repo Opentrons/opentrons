@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { RECOVERY_MAP } from '../constants'
-import { RecoveryContentWrapper } from './RecoveryContentWrapper'
+import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
 import { TwoColumn } from '../../../molecules/InterventionModal'
 import { RecoveryFooterButtons } from './RecoveryFooterButtons'
 import { LeftColumnLabwareInfo } from './LeftColumnLabwareInfo'
@@ -12,12 +12,7 @@ import { TipSelection } from './TipSelection'
 import type { RecoveryContentProps } from '../types'
 
 export function SelectTips(props: RecoveryContentProps): JSX.Element | null {
-  const {
-    failedPipetteInfo,
-    isOnDevice,
-    routeUpdateActions,
-    recoveryCommands,
-  } = props
+  const { failedPipetteInfo, routeUpdateActions, recoveryCommands } = props
   const { ROBOT_PICKING_UP_TIPS } = RECOVERY_MAP
   const { pickUpTips } = recoveryCommands
   const {
@@ -38,39 +33,34 @@ export function SelectTips(props: RecoveryContentProps): JSX.Element | null {
     setShowTipSelectModal(!showTipSelectModal)
   }
 
-  if (isOnDevice) {
-    return (
-      <>
-        {showTipSelectModal && (
-          <TipSelectionModal
+  return (
+    <>
+      {showTipSelectModal && (
+        <TipSelectionModal
+          {...props}
+          allowTipSelection={true}
+          toggleModal={toggleModal}
+        />
+      )}
+      <RecoverySingleColumnContentWrapper>
+        <TwoColumn>
+          <LeftColumnLabwareInfo
             {...props}
-            allowTipSelection={true}
-            toggleModal={toggleModal}
+            title={t('select_tip_pickup_location')}
+            type="location"
+            bannerText={t('replace_tips_and_select_location')}
           />
-        )}
-        <RecoveryContentWrapper>
-          <TwoColumn>
-            <LeftColumnLabwareInfo
-              {...props}
-              title={t('select_tip_pickup_location')}
-              moveType="refill"
-              bannerText={t('replace_tips_and_select_location')}
-            />
-            <TipSelection {...props} allowTipSelection={false} />
-          </TwoColumn>
-          <RecoveryFooterButtons
-            isOnDevice={isOnDevice}
-            primaryBtnOnClick={primaryBtnOnClick}
-            secondaryBtnOnClick={goBackPrevStep}
-            primaryBtnTextOverride={t('pick_up_tips')}
-            tertiaryBtnDisabled={failedPipetteInfo?.data.channels === 96}
-            tertiaryBtnOnClick={toggleModal}
-            tertiaryBtnText={t('change_location')}
-          />
-        </RecoveryContentWrapper>
-      </>
-    )
-  } else {
-    return null
-  }
+          <TipSelection {...props} allowTipSelection={false} />
+        </TwoColumn>
+        <RecoveryFooterButtons
+          primaryBtnOnClick={primaryBtnOnClick}
+          secondaryBtnOnClick={goBackPrevStep}
+          primaryBtnTextOverride={t('pick_up_tips')}
+          tertiaryBtnDisabled={failedPipetteInfo?.data.channels === 96}
+          tertiaryBtnOnClick={toggleModal}
+          tertiaryBtnText={t('change_location')}
+        />
+      </RecoverySingleColumnContentWrapper>
+    </>
+  )
 }

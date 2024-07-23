@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useModulesQuery } from '@opentrons/react-api-client'
 import {
   ALIGN_CENTER,
@@ -193,13 +193,13 @@ function NoUnconfiguredModules(props: NoUnconfiguredModulesProps): JSX.Element {
     robotName,
   } = props
   const { t } = useTranslation('protocol_setup')
-  const history = useHistory()
+  const navigate = useNavigate()
   const { closeCurrentRun } = useCloseCurrentRun()
   const handleCancelRun = (): void => {
     closeCurrentRun()
   }
   const handleNavigateToDeviceDetails = (): void => {
-    history.push(`/devices/${robotName}`)
+    navigate(`/devices/${robotName}`)
   }
   const exitButton = isOnDevice ? (
     <SmallButton

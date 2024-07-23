@@ -3,7 +3,7 @@ import last from 'lodash/last'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
 import { useDispatch, useSelector } from 'react-redux'
-import { useHistory, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -72,7 +72,7 @@ const QuickTransferHeader = ({
   isScrolled,
   isTransferFetching,
 }: QuickTransferHeaderProps): JSX.Element => {
-  const history = useHistory()
+  const navigate = useNavigate()
   const { t } = useTranslation('protocol_details')
   const [truncate, setTruncate] = React.useState<boolean>(true)
   const [startSetup, setStartSetup] = React.useState<boolean>(false)
@@ -107,7 +107,7 @@ const QuickTransferHeader = ({
           paddingLeft="0rem"
           paddingRight={SPACING.spacing24}
           onClick={() => {
-            history.push('/quick-transfer')
+            navigate('/quick-transfer')
           }}
           width="3rem"
         >
@@ -271,7 +271,9 @@ const TransferSectionContent = ({
 
 export function QuickTransferDetails(): JSX.Element | null {
   const { t, i18n } = useTranslation(['quick_transfer', 'shared'])
-  const { quickTransferId: transferId } = useParams<OnDeviceRouteParams>()
+  const { quickTransferId: transferId } = useParams<
+    keyof OnDeviceRouteParams
+  >() as OnDeviceRouteParams
   const {
     missingProtocolHardware,
     conflictedSlots,

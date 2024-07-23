@@ -168,7 +168,7 @@ def _jog_to_find_liquid_height(
     ctx: ProtocolContext, pipette: InstrumentContext, well: Well
 ) -> float:
     _well_depth = well.depth
-    _liquid_height = _well_depth
+    _liquid_height = _well_depth + 2
     _jog_size = -1.0
     if ctx.is_simulating():
         return _liquid_height - 1
@@ -445,7 +445,10 @@ def _load_pipette(
     #       so we need to decrease the pick-up current to work with 1 tip.
     if pipette.channels == 8 and not increment and not photometric:
         pipette._core.configure_nozzle_layout(
-            style=NozzleLayout.SINGLE, primary_nozzle="A1", front_right_nozzle="A1"
+            style=NozzleLayout.SINGLE,
+            primary_nozzle="A1",
+            front_right_nozzle="A1",
+            back_left_nozzle="A1",
         )
         # override deck conflict checking cause we specially lay out our tipracks
         DeckConflit.check_safe_for_pipette_movement = (

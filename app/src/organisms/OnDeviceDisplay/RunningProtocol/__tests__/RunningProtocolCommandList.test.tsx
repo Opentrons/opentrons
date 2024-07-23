@@ -63,6 +63,11 @@ describe('RunningProtocolCommandList', () => {
     expect(mockShowModal).toHaveBeenCalled()
   })
 
+  it("it displays the run's current action number", () => {
+    render({ ...props, currentRunCommandIndex: 11 })
+    screen.getByText(12)
+  })
+
   // ToDo (kj:04/10/2023) once we fix the track event stuff, we can implement tests
   it.todo('when tapping play button, track event mock function is called')
 })

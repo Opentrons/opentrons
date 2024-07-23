@@ -1,6 +1,6 @@
 import { css } from 'styled-components'
 
-import { SPACING, TYPOGRAPHY } from '@opentrons/components'
+import { SPACING, TYPOGRAPHY, RESPONSIVENESS } from '@opentrons/components'
 
 import type { StepOrder } from './types'
 
@@ -24,12 +24,6 @@ export const ERROR_KINDS = {
 // TODO(jh, 06-14-24): Consolidate motion routes to a single route with several steps.
 // Valid recovery routes and steps.
 export const RECOVERY_MAP = {
-  BEFORE_BEGINNING: {
-    ROUTE: 'before-beginning',
-    STEPS: {
-      RECOVERY_DESCRIPTION: 'recovery-description',
-    },
-  },
   DROP_TIP_FLOWS: {
     ROUTE: 'drop-tip',
     STEPS: {
@@ -139,7 +133,6 @@ export const RECOVERY_MAP = {
 } as const
 
 const {
-  BEFORE_BEGINNING,
   OPTION_SELECTION,
   RETRY_FAILED_COMMAND,
   ROBOT_CANCELING,
@@ -162,7 +155,6 @@ const {
 
 // The deterministic ordering of steps for a given route.
 export const STEP_ORDER: StepOrder = {
-  [BEFORE_BEGINNING.ROUTE]: [BEFORE_BEGINNING.STEPS.RECOVERY_DESCRIPTION],
   [OPTION_SELECTION.ROUTE]: [OPTION_SELECTION.STEPS.SELECT],
   [RETRY_FAILED_COMMAND.ROUTE]: [RETRY_FAILED_COMMAND.STEPS.CONFIRM_RETRY],
   [RETRY_NEW_TIPS.ROUTE]: [
@@ -218,4 +210,15 @@ export const BODY_TEXT_STYLE = css`
 
 export const ODD_SECTION_TITLE_STYLE = css`
   margin-bottom: ${SPACING.spacing16};
+`
+
+export const ODD_ONLY = css`
+  @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+    display: none;
+  }
+`
+export const DESKTOP_ONLY = css`
+  @media (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+    display: none;
+  }
 `

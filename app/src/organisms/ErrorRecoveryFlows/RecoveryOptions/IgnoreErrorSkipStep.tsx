@@ -11,7 +11,10 @@ import {
 
 import { ODD_SECTION_TITLE_STYLE, RECOVERY_MAP } from '../constants'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
-import { RecoveryFooterButtons, RecoveryContentWrapper } from '../shared'
+import {
+  RecoveryFooterButtons,
+  RecoverySingleColumnContentWrapper,
+} from '../shared'
 import { RadioButton } from '../../../atoms/buttons'
 
 import type { RecoveryContentProps } from '../types'
@@ -35,7 +38,6 @@ export function IgnoreErrorSkipStep(props: RecoveryContentProps): JSX.Element {
 }
 
 export function IgnoreErrorStepHome({
-  isOnDevice,
   recoveryCommands,
   routeUpdateActions,
 }: RecoveryContentProps): JSX.Element | null {
@@ -78,29 +80,24 @@ export function IgnoreErrorStepHome({
     }
   }
 
-  if (isOnDevice) {
-    return (
-      <RecoveryContentWrapper>
-        <LegacyStyledText css={ODD_SECTION_TITLE_STYLE} as="h4SemiBold">
-          {t('ignore_similar_errors_later_in_run')}
-        </LegacyStyledText>
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-          <IgnoreOptions
-            ignoreOptions={IGNORE_OPTIONS_IN_ORDER}
-            setSelectedOption={setSelectedOption}
-            selectedOption={selectedOption}
-          />
-        </Flex>
-        <RecoveryFooterButtons
-          isOnDevice={isOnDevice}
-          primaryBtnOnClick={primaryOnClick}
-          secondaryBtnOnClick={goBackPrevStep}
+  return (
+    <RecoverySingleColumnContentWrapper>
+      <LegacyStyledText css={ODD_SECTION_TITLE_STYLE} as="h4SemiBold">
+        {t('ignore_similar_errors_later_in_run')}
+      </LegacyStyledText>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+        <IgnoreOptions
+          ignoreOptions={IGNORE_OPTIONS_IN_ORDER}
+          setSelectedOption={setSelectedOption}
+          selectedOption={selectedOption}
         />
-      </RecoveryContentWrapper>
-    )
-  } else {
-    return null
-  }
+      </Flex>
+      <RecoveryFooterButtons
+        primaryBtnOnClick={primaryOnClick}
+        secondaryBtnOnClick={goBackPrevStep}
+      />
+    </RecoverySingleColumnContentWrapper>
+  )
 }
 
 interface IgnoreOptionsProps {

@@ -3,7 +3,7 @@ import { css } from 'styled-components'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import {
   Flex,
@@ -62,7 +62,7 @@ export function ProtocolOverflowMenu(
     setShowOverflowMenu,
   } = useMenuHandleClickOutside()
   const dispatch = useDispatch<Dispatch>()
-  const history = useHistory()
+  const navigate = useNavigate()
   const trackEvent = useTrackEvent()
   const {
     confirm: confirmDeleteProtocol,
@@ -114,7 +114,7 @@ export function ProtocolOverflowMenu(
   }
   const handleClickTimeline: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
-    history.push(`/protocols/${protocolKey}/timeline`)
+    navigate(`/protocols/${protocolKey}/timeline`)
     setShowOverflowMenu(prevShowOverflowMenu => !prevShowOverflowMenu)
   }
   return (

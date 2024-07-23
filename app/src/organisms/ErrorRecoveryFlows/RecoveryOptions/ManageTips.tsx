@@ -1,18 +1,29 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import head from 'lodash/head'
+import { css } from 'styled-components'
 
 import {
   DIRECTION_COLUMN,
   SPACING,
   Flex,
-  LegacyStyledText,
+  StyledText,
+  RESPONSIVENESS,
 } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { RadioButton } from '../../../atoms/buttons'
-import { ODD_SECTION_TITLE_STYLE, RECOVERY_MAP } from '../constants'
-import { RecoveryFooterButtons, RecoveryContentWrapper } from '../shared'
+import {
+  ODD_SECTION_TITLE_STYLE,
+  RECOVERY_MAP,
+  ODD_ONLY,
+  DESKTOP_ONLY,
+} from '../constants'
+import {
+  RecoveryFooterButtons,
+  RecoverySingleColumnContentWrapper,
+  RecoveryRadioGroup,
+} from '../shared'
 import { DropTipWizardFlows } from '../../DropTipWizardFlows'
 import { DT_ROUTES } from '../../DropTipWizardFlows/constants'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
@@ -48,7 +59,6 @@ export function ManageTips(props: RecoveryContentProps): JSX.Element {
 type RemovalOptions = 'begin-removal' | 'skip'
 
 export function BeginRemoval({
-  isOnDevice,
   tipStatusUtils,
   routeUpdateActions,
   recoveryCommands,
@@ -87,39 +97,91 @@ export function BeginRemoval({
     }
   }
 
-  if (isOnDevice) {
-    return (
-      <RecoveryContentWrapper>
-        <LegacyStyledText css={ODD_SECTION_TITLE_STYLE} as="h4SemiBold">
-          {t('you_may_want_to_remove', { mount })}
-        </LegacyStyledText>
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-          <RadioButton
-            buttonLabel={t('begin_removal')}
-            buttonValue={t('begin_removal')}
-            onChange={() => {
-              setSelected('begin-removal')
-            }}
-            isSelected={selected === 'begin-removal'}
-          />
-          <RadioButton
-            buttonLabel={t('skip')}
-            buttonValue={t('skip')}
-            onChange={() => {
-              setSelected('skip')
-            }}
-            isSelected={selected === 'skip'}
-          />
-        </Flex>
-        <RecoveryFooterButtons
-          isOnDevice={isOnDevice}
-          primaryBtnOnClick={primaryOnClick}
+  const DESKTOP_ONLY_GRID_GAP = css`
+    @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+      gap: 0rem;
+    }
+  `
+
+  const RADIO_GROUP_MARGIN = css`
+    @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+      margin-left: 0.5rem;
+    }
+  `
+
+  return (
+    <RecoverySingleColumnContentWrapper css={DESKTOP_ONLY_GRID_GAP}>
+      <StyledText
+        css={ODD_SECTION_TITLE_STYLE}
+        oddStyle="level4HeaderSemiBold"
+        desktopStyle="headingSmallSemiBold"
+      >
+        {t('you_may_want_to_remove', { mount })}
+      </StyledText>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing2}
+        css={ODD_ONLY}
+      >
+        <RadioButton
+          buttonLabel={t('begin_removal')}
+          buttonValue={t('begin_removal')}
+          onChange={() => {
+            setSelected('begin-removal')
+          }}
+          isSelected={selected === 'begin-removal'}
         />
-      </RecoveryContentWrapper>
-    )
-  } else {
-    return null
-  }
+        <RadioButton
+          buttonLabel={t('skip')}
+          buttonValue={t('skip')}
+          onChange={() => {
+            setSelected('skip')
+          }}
+          isSelected={selected === 'skip'}
+        />
+      </Flex>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing4}
+        css={DESKTOP_ONLY}
+      >
+        <RecoveryRadioGroup
+          css={css`
+            padding: ${SPACING.spacing4};
+          `}
+          value={selected}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            setSelected(e.currentTarget.value as RemovalOptions)
+          }}
+          options={[
+            {
+              value: t('begin_removal'),
+              children: (
+                <StyledText
+                  desktopStyle="bodyDefaultRegular"
+                  css={RADIO_GROUP_MARGIN}
+                >
+                  {t('begin_removal')}
+                </StyledText>
+              ),
+            },
+            {
+              value: t('skip'),
+              children: (
+                <StyledText
+                  desktopStyle="bodyDefaultRegular"
+                  css={RADIO_GROUP_MARGIN}
+                >
+                  {t('skip')}
+                </StyledText>
+              ),
+            },
+          ]}
+        />
+      </Flex>
+      <RecoveryFooterButtons primaryBtnOnClick={primaryOnClick} />
+    </RecoverySingleColumnContentWrapper>
+  )
 }
 
 function DropTipFlowsContainer(
@@ -131,7 +193,6 @@ function DropTipFlowsContainer(
     recoveryCommands,
     isFlex,
     currentRecoveryOptionUtils,
-    isOnDevice,
   } = props
   const { DROP_TIP_FLOWS, ROBOT_CANCELING, RETRY_NEW_TIPS } = RECOVERY_MAP
   const { proceedToRouteAndStep, setRobotInMotion } = routeUpdateActions
@@ -166,21 +227,17 @@ function DropTipFlowsContainer(
 
   const fixitCommandTypeUtils = useDropTipFlowUtils(props)
 
-  if (isOnDevice) {
-    return (
-      <RecoveryContentWrapper>
-        <DropTipWizardFlows
-          robotType={isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE}
-          closeFlow={onCloseFlow}
-          mount={mount}
-          instrumentModelSpecs={specs}
-          fixitCommandTypeUtils={fixitCommandTypeUtils}
-        />
-      </RecoveryContentWrapper>
-    )
-  } else {
-    return null
-  }
+  return (
+    <RecoverySingleColumnContentWrapper>
+      <DropTipWizardFlows
+        robotType={isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE}
+        closeFlow={onCloseFlow}
+        mount={mount}
+        instrumentModelSpecs={specs}
+        fixitCommandTypeUtils={fixitCommandTypeUtils}
+      />
+    </RecoverySingleColumnContentWrapper>
+  )
 }
 
 // Builds the overrides injected into DT Wiz.

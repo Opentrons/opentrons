@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { NavLink, useHistory } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 
 import {
   Flex,
@@ -103,7 +103,7 @@ interface MenuDropdownProps extends HistoricalProtocolRunOverflowMenuProps {
 }
 function MenuDropdown(props: MenuDropdownProps): JSX.Element {
   const { t } = useTranslation('device_details')
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const {
     runId,
@@ -121,7 +121,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
   )
   const [targetProps, tooltipProps] = useHoverTooltip()
   const onResetSuccess = (createRunResponse: Run): void => {
-    history.push(
+    navigate(
       `/devices/${robotName}/protocol-runs/${createRunResponse.data.id}/run-preview`
     )
   }

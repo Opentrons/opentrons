@@ -6,7 +6,6 @@ export interface RouteProps {
    * drop developed components into slots held by placeholder div components
    */
   Component: React.FC
-  exact?: boolean
   /**
    * a route/page name to render in the nav bar
    */

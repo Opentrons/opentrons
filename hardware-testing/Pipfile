@@ -10,6 +10,7 @@ opentrons-hardware = {editable = true, path = "./../hardware", extras=['FLEX']}
 hardware-testing = { editable = true, path = "." }
 abr-testing = { editable = true, path = "./../abr-testing" }
 pyserial = "==3.5"
+types-pytz = "*"
 
 [dev-packages]
 atomicwrites = "==1.4.1"

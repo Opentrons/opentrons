@@ -87,3 +87,14 @@ export const TitleWithTwoButtonsDisabled: Story = {
     ariaDisabled: true,
   },
 }
+
+export const TitleWithInlineNotification: Story = {
+  args: {
+    header: 'Header',
+    onClickBack: () => {},
+    inlineNotification: {
+      type: 'neutral',
+      heading: 'Inline notification',
+    },
+  },
+}
