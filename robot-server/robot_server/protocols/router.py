@@ -9,7 +9,7 @@ from typing import List, Optional, Union, Tuple
 
 from opentrons.protocol_engine.types import (
     PrimitiveRunTimeParamValuesType,
-    CsvRunTimeParamFilesType,
+    CSVRunTimeParamFilesType,
 )
 from opentrons_shared_data.robot import user_facing_robot_type
 from opentrons.util.performance_helpers import TrackingFunctions
@@ -434,7 +434,7 @@ async def _start_new_analysis_if_necessary(
     analysis_id: str,
     force_analyze: bool,
     rtp_values: PrimitiveRunTimeParamValuesType,
-    rtp_files: CsvRunTimeParamFilesType,
+    rtp_files: CSVRunTimeParamFilesType,
     protocol_resource: ProtocolResource,
     analysis_store: AnalysisStore,
     analyses_manager: AnalysesManager,

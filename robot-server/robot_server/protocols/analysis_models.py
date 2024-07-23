@@ -5,7 +5,7 @@ from enum import Enum
 from opentrons.protocol_engine.types import (
     RunTimeParameter,
     PrimitiveRunTimeParamValuesType,
-    CsvRunTimeParamFilesType,
+    CSVRunTimeParamFilesType,
 )
 from opentrons_shared_data.robot.dev_types import RobotType
 from pydantic import BaseModel, Field
@@ -56,7 +56,7 @@ class AnalysisRequest(BaseModel):
         default={},
         description="Key-value pairs of primitive run-time parameters defined in a protocol.",
     )
-    runTimeParameterFiles: CsvRunTimeParamFilesType = Field(
+    runTimeParameterFiles: CSVRunTimeParamFilesType = Field(
         default={},
         description="Key-fileId pairs of CSV run-time parameters defined in a protocol.",
     )

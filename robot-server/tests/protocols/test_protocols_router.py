@@ -12,7 +12,7 @@ from opentrons.protocol_engine.types import (
     PrimitiveRunTimeParamValuesType,
     NumberParameter,
     CSVParameter,
-    CsvRunTimeParamFilesType,
+    CSVRunTimeParamFilesType,
     FileInfo,
 )
 from opentrons.protocols.api_support.types import APIVersion
@@ -1654,7 +1654,7 @@ async def test_update_protocol_analyses_with_new_rtp_values(
         "dry_run": True,
         "mount": "left",
     }
-    rtp_files: CsvRunTimeParamFilesType = {
+    rtp_files: CSVRunTimeParamFilesType = {
         "csv_param": "file-id",
     }
     protocol_source = ProtocolSource(

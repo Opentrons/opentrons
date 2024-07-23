@@ -299,7 +299,7 @@ class CompletedAnalysisStore:
         with self._sql_engine.begin() as transaction:
             results = transaction.execute(statement).all()
 
-        csv_rtps: Dict[str, Union[str, None]] = {}
+        csv_rtps: Dict[str, Optional[str]] = {}
         for row in results:
             param = CsvParameterResource.from_sql_row(row)
             csv_rtps.update({param.parameter_variable_name: param.file_id})
@@ -348,7 +348,6 @@ class CompletedAnalysisStore:
 
         with self._sql_engine.begin() as transaction:
             transaction.execute(delete_primitive_rtp_statement)
-            transaction.execute(delete_csv_rtp_statement)
             transaction.execute(delete_csv_rtp_statement)
             transaction.execute(delete_statement)
             transaction.execute(insert_statement)

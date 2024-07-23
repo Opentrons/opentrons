@@ -12,7 +12,7 @@ from opentrons.protocols.execution.errors import ExceptionInProtocolError
 from opentrons.protocols.types import PythonProtocol, MalformedPythonProtocolError
 from opentrons.protocol_engine.types import (
     PrimitiveRunTimeParamValuesType,
-    CsvRunTimeParamFilesType,
+    CSVRunTimeParamFilesType,
 )
 
 
@@ -71,7 +71,7 @@ def _raise_pretty_protocol_error(exception: Exception, filename: str) -> None:
 def _parse_and_set_parameters(
     parameter_context: ParameterContext,
     run_time_param_overrides: Optional[PrimitiveRunTimeParamValuesType],
-    run_time_param_file_overrides: Optional[CsvRunTimeParamFilesType],
+    run_time_param_file_overrides: Optional[CSVRunTimeParamFilesType],
     new_globs: Dict[Any, Any],
     filename: str,
 ) -> Parameters:
@@ -111,7 +111,7 @@ def exec_add_parameters(
     protocol: PythonProtocol,
     parameter_context: ParameterContext,
     run_time_param_overrides: Optional[PrimitiveRunTimeParamValuesType],
-    run_time_param_file_overrides: Optional[CsvRunTimeParamFilesType],
+    run_time_param_file_overrides: Optional[CSVRunTimeParamFilesType],
 ) -> Optional[Parameters]:
     """Exec the add_parameters function and get the final run time parameters with overrides."""
     new_globs: Dict[Any, Any] = {}

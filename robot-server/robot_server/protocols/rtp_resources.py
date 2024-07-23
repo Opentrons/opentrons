@@ -4,7 +4,7 @@ from __future__ import annotations
 import sqlalchemy
 
 from dataclasses import dataclass
-from typing import Dict, Callable, Union
+from typing import Dict, Callable, Union, Optional
 
 from robot_server.persistence.tables import PrimitiveParamSQLEnum
 from opentrons.protocols.parameters.types import PrimitiveAllowedTypes
@@ -79,7 +79,7 @@ class CsvParameterResource:
 
     analysis_id: str
     parameter_variable_name: str
-    file_id: Union[str, None]
+    file_id: Optional[str]
 
     def to_sql_values(self) -> Dict[str, object]:
         """Return this data as a dict that can be passed to an SQLAlchemy insert."""

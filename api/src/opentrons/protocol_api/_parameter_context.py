@@ -19,7 +19,7 @@ from opentrons.protocols.parameters.exceptions import (
 from opentrons.protocol_engine.types import (
     RunTimeParameter,
     PrimitiveRunTimeParamValuesType,
-    CsvRunTimeParamFilesType,
+    CSVRunTimeParamFilesType,
     FileInfo,
 )
 
@@ -218,7 +218,7 @@ class ParameterContext:
                 parameter.value = validated_value
 
     def initialize_csv_files(
-        self, run_time_param_file_overrides: CsvRunTimeParamFilesType
+        self, run_time_param_file_overrides: CSVRunTimeParamFilesType
     ) -> None:
         """Initializes the files for CSV parameters.
 
