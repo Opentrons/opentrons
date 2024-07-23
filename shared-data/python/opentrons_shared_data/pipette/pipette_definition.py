@@ -5,6 +5,7 @@ from typing_extensions import Literal
 from dataclasses import dataclass
 
 from . import types as pip_types
+from . import PipetteName
 
 # The highest and lowest existing overlap version values.
 TIP_OVERLAP_VERSION_MINIMUM = 0
@@ -302,7 +303,7 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
         description="The display or full product name of the pipette.",
         alias="displayName",
     )
-    pipette_backcompat_names: List[dev_types.PipetteName] = Field(
+    pipette_backcompat_names: List[PipetteName] = Field(
         ...,
         description="A list of pipette names that are compatible with this pipette.",
         alias="backCompatNames",
