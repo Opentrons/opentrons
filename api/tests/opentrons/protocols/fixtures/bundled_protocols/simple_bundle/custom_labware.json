@@ -15,7 +15,7 @@
   ],
   "schemaVersion": 2,
   "version": 1,
-  "namespace": "custom_beta",
+  "namespace": "custom",
   "metadata": {
     "displayName": "FAKE example labware",
     "displayVolumeUnits": "mL",

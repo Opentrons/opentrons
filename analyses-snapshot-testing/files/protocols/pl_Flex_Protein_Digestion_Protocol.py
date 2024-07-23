@@ -31,7 +31,7 @@ def run(ctx: protocol_api.ProtocolContext):
 
     # labware
     assay_plates = (
-        ctx.load_labware("thermo_96_wellplate_2200ul", location=slot, namespace="custom_beta")
+        ctx.load_labware("thermo_96_wellplate_2200ul", location=slot, namespace="custom")
         for slot in ["C2", "C3", "D2", "D3"][:num_plates]
     )
     assay_reservoir = ctx.load_labware("nest_1_reservoir_290ml", location="C1")

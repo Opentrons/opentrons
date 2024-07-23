@@ -28499,7 +28499,7 @@
         "location": {
           "slotName": "B3"
         },
-        "namespace": "custom_beta",
+        "namespace": "custom",
         "version": 1
       },
       "result": {
@@ -28538,7 +28538,7 @@
             "displayVolumeUnits": "µL",
             "tags": []
           },
-          "namespace": "custom_beta",
+          "namespace": "custom",
           "ordering": [
             [
               "A1"
@@ -28645,7 +28645,7 @@
         "location": {
           "slotName": "C2"
         },
-        "namespace": "custom_beta",
+        "namespace": "custom",
         "version": 1
       },
       "result": {
@@ -28776,7 +28776,7 @@
             "displayVolumeUnits": "µL",
             "tags": []
           },
-          "namespace": "custom_beta",
+          "namespace": "custom",
           "ordering": [
             [
               "A1",
@@ -30523,7 +30523,7 @@
         "location": {
           "slotName": "B3"
         },
-        "namespace": "custom_beta",
+        "namespace": "custom",
         "version": 1
       },
       "result": {
@@ -30562,7 +30562,7 @@
             "displayVolumeUnits": "µL",
             "tags": []
           },
-          "namespace": "custom_beta",
+          "namespace": "custom",
           "ordering": [
             [
               "A1"
@@ -30669,7 +30669,7 @@
         "location": {
           "slotName": "C2"
         },
-        "namespace": "custom_beta",
+        "namespace": "custom",
         "version": 1
       },
       "result": {
@@ -30800,7 +30800,7 @@
             "displayVolumeUnits": "µL",
             "tags": []
           },
-          "namespace": "custom_beta",
+          "namespace": "custom",
           "ordering": [
             [
               "A1",
@@ -32547,7 +32547,7 @@
         "location": {
           "slotName": "B3"
         },
-        "namespace": "custom_beta",
+        "namespace": "custom",
         "version": 1
       },
       "result": {
@@ -32586,7 +32586,7 @@
             "displayVolumeUnits": "µL",
             "tags": []
           },
-          "namespace": "custom_beta",
+          "namespace": "custom",
           "ordering": [
             [
               "A1"
@@ -32693,7 +32693,7 @@
         "location": {
           "slotName": "C2"
         },
-        "namespace": "custom_beta",
+        "namespace": "custom",
         "version": 1
       },
       "result": {
@@ -32824,7 +32824,7 @@
             "displayVolumeUnits": "µL",
             "tags": []
           },
-          "namespace": "custom_beta",
+          "namespace": "custom",
           "ordering": [
             [
               "A1",
@@ -34571,7 +34571,7 @@
         "location": {
           "slotName": "B3"
         },
-        "namespace": "custom_beta",
+        "namespace": "custom",
         "version": 1
       },
       "result": {
@@ -34610,7 +34610,7 @@
             "displayVolumeUnits": "µL",
             "tags": []
           },
-          "namespace": "custom_beta",
+          "namespace": "custom",
           "ordering": [
             [
               "A1"
@@ -34717,7 +34717,7 @@
         "location": {
           "slotName": "C2"
         },
-        "namespace": "custom_beta",
+        "namespace": "custom",
         "version": 1
       },
       "result": {
@@ -34848,7 +34848,7 @@
             "displayVolumeUnits": "µL",
             "tags": []
           },
-          "namespace": "custom_beta",
+          "namespace": "custom",
           "ordering": [
             [
               "A1",
@@ -36595,7 +36595,7 @@
         "location": {
           "slotName": "B3"
         },
-        "namespace": "custom_beta",
+        "namespace": "custom",
         "version": 1
       },
       "result": {
@@ -36634,7 +36634,7 @@
             "displayVolumeUnits": "µL",
             "tags": []
           },
-          "namespace": "custom_beta",
+          "namespace": "custom",
           "ordering": [
             [
               "A1"
@@ -36741,7 +36741,7 @@
         "location": {
           "slotName": "C2"
         },
-        "namespace": "custom_beta",
+        "namespace": "custom",
         "version": 1
       },
       "result": {
@@ -36872,7 +36872,7 @@
             "displayVolumeUnits": "µL",
             "tags": []
           },
-          "namespace": "custom_beta",
+          "namespace": "custom",
           "ordering": [
             [
               "A1",
@@ -38619,7 +38619,7 @@
         "location": {
           "slotName": "B3"
         },
-        "namespace": "custom_beta",
+        "namespace": "custom",
         "version": 1
       },
       "result": {
@@ -38658,7 +38658,7 @@
             "displayVolumeUnits": "µL",
             "tags": []
           },
-          "namespace": "custom_beta",
+          "namespace": "custom",
           "ordering": [
             [
               "A1"
@@ -38765,7 +38765,7 @@
         "location": {
           "slotName": "C2"
         },
-        "namespace": "custom_beta",
+        "namespace": "custom",
         "version": 1
       },
       "result": {
@@ -38896,7 +38896,7 @@
             "displayVolumeUnits": "µL",
             "tags": []
           },
-          "namespace": "custom_beta",
+          "namespace": "custom",
           "ordering": [
             [
               "A1",
@@ -40720,84 +40720,84 @@
       }
     },
     {
-      "definitionUri": "custom_beta/omintray_1well_plate/1",
+      "definitionUri": "custom/omintray_1well_plate/1",
       "displayName": "STACKED AGAR PLATES",
       "id": "UUID",
       "loadName": "omintray_1well_plate",
       "location": "offDeck"
     },
     {
-      "definitionUri": "custom_beta/omni_plate_tilt_adapter/1",
+      "definitionUri": "custom/omni_plate_tilt_adapter/1",
       "displayName": "TILT ADAPTER",
       "id": "UUID",
       "loadName": "omni_plate_tilt_adapter",
       "location": "offDeck"
     },
     {
-      "definitionUri": "custom_beta/omintray_1well_plate/1",
+      "definitionUri": "custom/omintray_1well_plate/1",
       "displayName": "STACKED AGAR PLATES",
       "id": "UUID",
       "loadName": "omintray_1well_plate",
       "location": "offDeck"
     },
     {
-      "definitionUri": "custom_beta/omni_plate_tilt_adapter/1",
+      "definitionUri": "custom/omni_plate_tilt_adapter/1",
       "displayName": "TILT ADAPTER",
       "id": "UUID",
       "loadName": "omni_plate_tilt_adapter",
       "location": "offDeck"
     },
     {
-      "definitionUri": "custom_beta/omintray_1well_plate/1",
+      "definitionUri": "custom/omintray_1well_plate/1",
       "displayName": "STACKED AGAR PLATES",
       "id": "UUID",
       "loadName": "omintray_1well_plate",
       "location": "offDeck"
     },
     {
-      "definitionUri": "custom_beta/omni_plate_tilt_adapter/1",
+      "definitionUri": "custom/omni_plate_tilt_adapter/1",
       "displayName": "TILT ADAPTER",
       "id": "UUID",
       "loadName": "omni_plate_tilt_adapter",
       "location": "offDeck"
     },
     {
-      "definitionUri": "custom_beta/omintray_1well_plate/1",
+      "definitionUri": "custom/omintray_1well_plate/1",
       "displayName": "STACKED AGAR PLATES",
       "id": "UUID",
       "loadName": "omintray_1well_plate",
       "location": "offDeck"
     },
     {
-      "definitionUri": "custom_beta/omni_plate_tilt_adapter/1",
+      "definitionUri": "custom/omni_plate_tilt_adapter/1",
       "displayName": "TILT ADAPTER",
       "id": "UUID",
       "loadName": "omni_plate_tilt_adapter",
       "location": "offDeck"
     },
     {
-      "definitionUri": "custom_beta/omintray_1well_plate/1",
+      "definitionUri": "custom/omintray_1well_plate/1",
       "displayName": "STACKED AGAR PLATES",
       "id": "UUID",
       "loadName": "omintray_1well_plate",
       "location": "offDeck"
     },
     {
-      "definitionUri": "custom_beta/omni_plate_tilt_adapter/1",
+      "definitionUri": "custom/omni_plate_tilt_adapter/1",
       "displayName": "TILT ADAPTER",
       "id": "UUID",
       "loadName": "omni_plate_tilt_adapter",
       "location": "offDeck"
     },
     {
-      "definitionUri": "custom_beta/omintray_1well_plate/1",
+      "definitionUri": "custom/omintray_1well_plate/1",
       "displayName": "STACKED AGAR PLATES",
       "id": "UUID",
       "loadName": "omintray_1well_plate",
       "location": "offDeck"
     },
     {
-      "definitionUri": "custom_beta/omni_plate_tilt_adapter/1",
+      "definitionUri": "custom/omni_plate_tilt_adapter/1",
       "displayName": "TILT ADAPTER",
       "id": "UUID",
       "loadName": "omni_plate_tilt_adapter",

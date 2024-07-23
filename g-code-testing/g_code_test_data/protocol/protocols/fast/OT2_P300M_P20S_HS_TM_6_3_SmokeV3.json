@@ -47,7 +47,7 @@
             "fixedTrash": "12",
             "ec1d5933-5ac9-4714-8d51-838fdc75736b:opentrons/opentrons_96_tiprack_300ul/1": "5",
             "e94f8a6d-6ee1-4a00-988c-729773976cb8:opentrons/opentrons_96_tiprack_20ul/1": "4",
-            "15fe3051-ae0c-4a0d-9ca4-88940f13168c:custom_beta/cpx_4_tuberack_100ul/1": "6",
+            "15fe3051-ae0c-4a0d-9ca4-88940f13168c:custom/cpx_4_tuberack_100ul/1": "6",
             "08671408-b545-41a5-908b-eaf6b5df68c2:opentrons/opentrons_96_aluminumblock_nest_wellplate_100ul/1": "f95f02b9-89a6-4391-978f-a05baffb26bc:temperatureModuleType",
             "1c47c956-7eca-46b5-88d1-942d35e331fa:opentrons/nest_12_reservoir_15ml/1": "9",
             "641d0a17-42aa-4dcb-b504-93777320f8c3:opentrons/opentrons_96_pcr_adapter_nest_wellplate_100ul_pcr_full_skirt/1": "f3bb5fac-39d1-4669-a750-cca9df43cbeb:heaterShakerModuleType",
@@ -147,7 +147,7 @@
           "aspirate_touchTip_checkbox": false,
           "aspirate_touchTip_mmFromBottom": null,
           "dispense_flowRate": null,
-          "dispense_labware": "15fe3051-ae0c-4a0d-9ca4-88940f13168c:custom_beta/cpx_4_tuberack_100ul/1",
+          "dispense_labware": "15fe3051-ae0c-4a0d-9ca4-88940f13168c:custom/cpx_4_tuberack_100ul/1",
           "dispense_wells": ["A2"],
           "dispense_wellOrder_first": "t2b",
           "dispense_wellOrder_second": "l2r",
@@ -195,7 +195,7 @@
           "aspirate_touchTip_checkbox": false,
           "aspirate_touchTip_mmFromBottom": null,
           "dispense_flowRate": null,
-          "dispense_labware": "15fe3051-ae0c-4a0d-9ca4-88940f13168c:custom_beta/cpx_4_tuberack_100ul/1",
+          "dispense_labware": "15fe3051-ae0c-4a0d-9ca4-88940f13168c:custom/cpx_4_tuberack_100ul/1",
           "dispense_wells": ["A2"],
           "dispense_wellOrder_first": "t2b",
           "dispense_wellOrder_second": "l2r",
@@ -228,7 +228,7 @@
           "stepDetails": "",
           "times": "3",
           "changeTip": "once",
-          "labware": "15fe3051-ae0c-4a0d-9ca4-88940f13168c:custom_beta/cpx_4_tuberack_100ul/1",
+          "labware": "15fe3051-ae0c-4a0d-9ca4-88940f13168c:custom/cpx_4_tuberack_100ul/1",
           "mix_wellOrder_first": "t2b",
           "mix_wellOrder_second": "l2r",
           "blowout_checkbox": false,
@@ -375,9 +375,9 @@
       "displayName": "Opentrons 96 Tip Rack 20 µL",
       "definitionId": "opentrons/opentrons_96_tiprack_20ul/1"
     },
-    "15fe3051-ae0c-4a0d-9ca4-88940f13168c:custom_beta/cpx_4_tuberack_100ul/1": {
+    "15fe3051-ae0c-4a0d-9ca4-88940f13168c:custom/cpx_4_tuberack_100ul/1": {
       "displayName": "Custom wells",
-      "definitionId": "custom_beta/cpx_4_tuberack_100ul/1"
+      "definitionId": "custom/cpx_4_tuberack_100ul/1"
     },
     "08671408-b545-41a5-908b-eaf6b5df68c2:opentrons/opentrons_96_aluminumblock_nest_wellplate_100ul/1": {
       "displayName": "Opentrons 96 Well Aluminum Block with NEST Well Plate 100 µL",
@@ -2477,7 +2477,7 @@
       "groups": [{ "wells": ["A1"], "metadata": {} }],
       "cornerOffsetFromSlot": { "x": 0, "y": 0, "z": 0 }
     },
-    "custom_beta/cpx_4_tuberack_100ul/1": {
+    "custom/cpx_4_tuberack_100ul/1": {
       "ordering": [
         ["A1", "B1"],
         ["A2", "B2"]
@@ -2542,7 +2542,7 @@
         "isMagneticModuleCompatible": false,
         "loadName": "cpx_4_tuberack_100ul"
       },
-      "namespace": "custom_beta",
+      "namespace": "custom",
       "version": 1,
       "schemaVersion": 2,
       "cornerOffsetFromSlot": { "x": 0, "y": 0, "z": 0 }
@@ -5848,7 +5848,7 @@
       "key": "0806426f-8b13-4c74-816e-66e1c23e7531",
       "commandType": "loadLabware",
       "params": {
-        "labwareId": "15fe3051-ae0c-4a0d-9ca4-88940f13168c:custom_beta/cpx_4_tuberack_100ul/1",
+        "labwareId": "15fe3051-ae0c-4a0d-9ca4-88940f13168c:custom/cpx_4_tuberack_100ul/1",
         "location": { "slotName": "6" }
       }
     },
@@ -6091,7 +6091,7 @@
       "params": {
         "pipetteId": "ae170543-3b22-4b2b-b58a-218d4c1d9f35",
         "volume": 20,
-        "labwareId": "15fe3051-ae0c-4a0d-9ca4-88940f13168c:custom_beta/cpx_4_tuberack_100ul/1",
+        "labwareId": "15fe3051-ae0c-4a0d-9ca4-88940f13168c:custom/cpx_4_tuberack_100ul/1",
         "wellName": "A2",
         "wellLocation": { "origin": "bottom", "offset": { "z": 0.5 } },
         "flowRate": 3.78
@@ -6133,7 +6133,7 @@
       "params": {
         "pipetteId": "ae170543-3b22-4b2b-b58a-218d4c1d9f35",
         "volume": 20,
-        "labwareId": "15fe3051-ae0c-4a0d-9ca4-88940f13168c:custom_beta/cpx_4_tuberack_100ul/1",
+        "labwareId": "15fe3051-ae0c-4a0d-9ca4-88940f13168c:custom/cpx_4_tuberack_100ul/1",
         "wellName": "A2",
         "wellLocation": { "origin": "bottom", "offset": { "z": 0.5 } },
         "flowRate": 3.78
@@ -6163,7 +6163,7 @@
       "params": {
         "pipetteId": "ae170543-3b22-4b2b-b58a-218d4c1d9f35",
         "volume": 20,
-        "labwareId": "15fe3051-ae0c-4a0d-9ca4-88940f13168c:custom_beta/cpx_4_tuberack_100ul/1",
+        "labwareId": "15fe3051-ae0c-4a0d-9ca4-88940f13168c:custom/cpx_4_tuberack_100ul/1",
         "wellName": "A2",
         "wellLocation": { "origin": "bottom", "offset": { "z": 0.5 } },
         "flowRate": 3.78
@@ -6175,7 +6175,7 @@
       "params": {
         "pipetteId": "ae170543-3b22-4b2b-b58a-218d4c1d9f35",
         "volume": 20,
-        "labwareId": "15fe3051-ae0c-4a0d-9ca4-88940f13168c:custom_beta/cpx_4_tuberack_100ul/1",
+        "labwareId": "15fe3051-ae0c-4a0d-9ca4-88940f13168c:custom/cpx_4_tuberack_100ul/1",
         "wellName": "A2",
         "wellLocation": { "origin": "bottom", "offset": { "z": 0.5 } },
         "flowRate": 3.78
@@ -6187,7 +6187,7 @@
       "params": {
         "pipetteId": "ae170543-3b22-4b2b-b58a-218d4c1d9f35",
         "volume": 20,
-        "labwareId": "15fe3051-ae0c-4a0d-9ca4-88940f13168c:custom_beta/cpx_4_tuberack_100ul/1",
+        "labwareId": "15fe3051-ae0c-4a0d-9ca4-88940f13168c:custom/cpx_4_tuberack_100ul/1",
         "wellName": "A2",
         "wellLocation": { "origin": "bottom", "offset": { "z": 0.5 } },
         "flowRate": 3.78
@@ -6199,7 +6199,7 @@
       "params": {
         "pipetteId": "ae170543-3b22-4b2b-b58a-218d4c1d9f35",
         "volume": 20,
-        "labwareId": "15fe3051-ae0c-4a0d-9ca4-88940f13168c:custom_beta/cpx_4_tuberack_100ul/1",
+        "labwareId": "15fe3051-ae0c-4a0d-9ca4-88940f13168c:custom/cpx_4_tuberack_100ul/1",
         "wellName": "A2",
         "wellLocation": { "origin": "bottom", "offset": { "z": 0.5 } },
         "flowRate": 3.78
@@ -6211,7 +6211,7 @@
       "params": {
         "pipetteId": "ae170543-3b22-4b2b-b58a-218d4c1d9f35",
         "volume": 20,
-        "labwareId": "15fe3051-ae0c-4a0d-9ca4-88940f13168c:custom_beta/cpx_4_tuberack_100ul/1",
+        "labwareId": "15fe3051-ae0c-4a0d-9ca4-88940f13168c:custom/cpx_4_tuberack_100ul/1",
         "wellName": "A2",
         "wellLocation": { "origin": "bottom", "offset": { "z": 0.5 } },
         "flowRate": 3.78
@@ -6223,7 +6223,7 @@
       "params": {
         "pipetteId": "ae170543-3b22-4b2b-b58a-218d4c1d9f35",
         "volume": 20,
-        "labwareId": "15fe3051-ae0c-4a0d-9ca4-88940f13168c:custom_beta/cpx_4_tuberack_100ul/1",
+        "labwareId": "15fe3051-ae0c-4a0d-9ca4-88940f13168c:custom/cpx_4_tuberack_100ul/1",
         "wellName": "A2",
         "wellLocation": { "origin": "bottom", "offset": { "z": 0.5 } },
         "flowRate": 3.78

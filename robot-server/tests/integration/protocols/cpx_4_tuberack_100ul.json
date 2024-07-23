@@ -87,7 +87,7 @@
         "isMagneticModuleCompatible": false,
         "loadName": "cpx_4_tuberack_100ul"
     },
-    "namespace": "custom_beta",
+    "namespace": "custom",
     "version": 1,
     "schemaVersion": 2,
     "cornerOffsetFromSlot": {

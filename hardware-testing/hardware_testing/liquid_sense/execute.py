@@ -115,7 +115,7 @@ def _load_dial_indicator(run_args: RunArgs) -> Labware:
         return loaded_labwares[slot_dial]
 
     dial_labware = run_args.ctx.load_labware(
-        dial_labware_name, location=slot_dial, namespace="custom_beta"
+        dial_labware_name, location=slot_dial, namespace="custom"
     )
     return dial_labware
 
@@ -125,7 +125,7 @@ def _load_test_well(run_args: RunArgs) -> Labware:
     labware_on_scale = run_args.protocol_cfg.LABWARE_ON_SCALE  # type: ignore[union-attr]
     ui.print_info(f'Loading labware on scale: "{labware_on_scale}"')
     if labware_on_scale == "radwag_pipette_calibration_vial":
-        namespace = "custom_beta"
+        namespace = "custom"
     else:
         namespace = "opentrons"
     # If running multiple tests in one run, the labware may already be loaded

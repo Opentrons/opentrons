@@ -5044,7 +5044,7 @@
         "location": {
           "slotName": "C2"
         },
-        "namespace": "custom_beta",
+        "namespace": "custom",
         "version": 1
       },
       "result": {
@@ -5178,7 +5178,7 @@
             "displayVolumeUnits": "µL",
             "tags": []
           },
-          "namespace": "custom_beta",
+          "namespace": "custom",
           "ordering": [
             [
               "A1",
@@ -6697,7 +6697,7 @@
         "location": {
           "slotName": "C3"
         },
-        "namespace": "custom_beta",
+        "namespace": "custom",
         "version": 1
       },
       "result": {
@@ -6831,7 +6831,7 @@
             "displayVolumeUnits": "µL",
             "tags": []
           },
-          "namespace": "custom_beta",
+          "namespace": "custom",
           "ordering": [
             [
               "A1",
@@ -8350,7 +8350,7 @@
         "location": {
           "slotName": "D2"
         },
-        "namespace": "custom_beta",
+        "namespace": "custom",
         "version": 1
       },
       "result": {
@@ -8484,7 +8484,7 @@
             "displayVolumeUnits": "µL",
             "tags": []
           },
-          "namespace": "custom_beta",
+          "namespace": "custom",
           "ordering": [
             [
               "A1",
@@ -10003,7 +10003,7 @@
         "location": {
           "slotName": "D3"
         },
-        "namespace": "custom_beta",
+        "namespace": "custom",
         "version": 1
       },
       "result": {
@@ -10137,7 +10137,7 @@
             "displayVolumeUnits": "µL",
             "tags": []
           },
-          "namespace": "custom_beta",
+          "namespace": "custom",
           "ordering": [
             [
               "A1",
@@ -11752,7 +11752,7 @@
       }
     },
     {
-      "definitionUri": "custom_beta/thermo_96_wellplate_2200ul/1",
+      "definitionUri": "custom/thermo_96_wellplate_2200ul/1",
       "id": "UUID",
       "loadName": "thermo_96_wellplate_2200ul",
       "location": {
@@ -11760,7 +11760,7 @@
       }
     },
     {
-      "definitionUri": "custom_beta/thermo_96_wellplate_2200ul/1",
+      "definitionUri": "custom/thermo_96_wellplate_2200ul/1",
       "id": "UUID",
       "loadName": "thermo_96_wellplate_2200ul",
       "location": {
@@ -11768,7 +11768,7 @@
       }
     },
     {
-      "definitionUri": "custom_beta/thermo_96_wellplate_2200ul/1",
+      "definitionUri": "custom/thermo_96_wellplate_2200ul/1",
       "id": "UUID",
       "loadName": "thermo_96_wellplate_2200ul",
       "location": {
@@ -11776,7 +11776,7 @@
       }
     },
     {
-      "definitionUri": "custom_beta/thermo_96_wellplate_2200ul/1",
+      "definitionUri": "custom/thermo_96_wellplate_2200ul/1",
       "id": "UUID",
       "loadName": "thermo_96_wellplate_2200ul",
       "location": {

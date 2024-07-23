@@ -1647,7 +1647,7 @@
         "location": {
           "slotName": "D1"
         },
-        "namespace": "custom_beta",
+        "namespace": "custom",
         "version": 1
       },
       "result": {
@@ -1781,7 +1781,7 @@
             "displayVolumeUnits": "µL",
             "tags": []
           },
-          "namespace": "custom_beta",
+          "namespace": "custom",
           "ordering": [
             [
               "A1",
@@ -2806,7 +2806,7 @@
         "location": {
           "slotName": "D2"
         },
-        "namespace": "custom_beta",
+        "namespace": "custom",
         "version": 1
       },
       "result": {
@@ -2940,7 +2940,7 @@
             "displayVolumeUnits": "µL",
             "tags": []
           },
-          "namespace": "custom_beta",
+          "namespace": "custom",
           "ordering": [
             [
               "A1",
@@ -3964,7 +3964,7 @@
         "location": {
           "slotName": "D3"
         },
-        "namespace": "custom_beta",
+        "namespace": "custom",
         "version": 1
       },
       "result": {
@@ -4098,7 +4098,7 @@
             "displayVolumeUnits": "µL",
             "tags": []
           },
-          "namespace": "custom_beta",
+          "namespace": "custom",
           "ordering": [
             [
               "A1",
@@ -13286,7 +13286,7 @@
       }
     },
     {
-      "definitionUri": "custom_beta/biorad_96_wellplate_200ul_pcr/1",
+      "definitionUri": "custom/biorad_96_wellplate_200ul_pcr/1",
       "displayName": "Indices_1",
       "id": "UUID",
       "loadName": "biorad_96_wellplate_200ul_pcr",
@@ -13295,14 +13295,14 @@
       }
     },
     {
-      "definitionUri": "custom_beta/biorad_96_wellplate_200ul_pcr/1",
+      "definitionUri": "custom/biorad_96_wellplate_200ul_pcr/1",
       "displayName": "Reaction Plate_1",
       "id": "UUID",
       "loadName": "biorad_96_wellplate_200ul_pcr",
       "location": "offDeck"
     },
     {
-      "definitionUri": "custom_beta/biorad_96_wellplate_200ul_pcr/1",
+      "definitionUri": "custom/biorad_96_wellplate_200ul_pcr/1",
       "id": "UUID",
       "loadName": "biorad_96_wellplate_200ul_pcr",
       "location": {

@@ -400,7 +400,7 @@ class ProtocolContext(CommandPublisher):
             If unspecified, the API will automatically search two namespaces:
 
               - ``"opentrons"``, to load standard Opentrons labware definitions.
-              - ``"custom_beta"``, to load custom labware definitions created with the
+              - ``"custom"``, to load custom labware definitions created with the
                 `Custom Labware Creator <https://labware.opentrons.com/create>`__.
 
             You might need to specify an explicit ``namespace`` if you have a custom
@@ -578,7 +578,7 @@ class ProtocolContext(CommandPublisher):
             If unspecified, the API will automatically search two namespaces:
 
               * ``"opentrons"``, to load standard Opentrons labware definitions.
-              * ``"custom_beta"``, to load custom labware definitions created with the
+              * ``"custom"``, to load custom labware definitions created with the
                 `Custom Labware Creator <https://labware.opentrons.com/create>`_.
 
             You might need to specify an explicit ``namespace`` if you have a custom

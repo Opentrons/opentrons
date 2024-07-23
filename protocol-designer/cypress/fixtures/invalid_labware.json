@@ -48,7 +48,7 @@
     "isMagneticModuleCompatible": false,
     "loadName": "onboarding_1_wellplate_1000ul"
   },
-  "namespace": "custom_beta",
+  "namespace": "custom",
   "version": 1,
   "schemaVersion": 2,
   "cornerOffsetFromSlot": {

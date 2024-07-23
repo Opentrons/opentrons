@@ -36,7 +36,7 @@ def get_labware_definition(
 
     :param str load_name: corresponds to 'loadName' key in definition
     :param str namespace: The namespace the labware definition belongs to.
-        If unspecified, will search 'opentrons' then 'custom_beta'
+        If unspecified, will search 'opentrons' then 'custom'
     :param int version: The version of the labware definition. If unspecified,
         will use version 1.
     :param bundled_defs: A bundle of labware definitions to exclusively use for

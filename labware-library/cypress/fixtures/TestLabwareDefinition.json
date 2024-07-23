@@ -189,7 +189,7 @@
     "isMagneticModuleCompatible": false,
     "loadName": "testpro_15_wellplate_5ul"
   },
-  "namespace": "custom_beta",
+  "namespace": "custom",
   "version": 1,
   "schemaVersion": 2,
   "cornerOffsetFromSlot": {

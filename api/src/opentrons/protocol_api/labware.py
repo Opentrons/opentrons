@@ -1228,7 +1228,7 @@ def load(
     :param str label: An optional label that will override the labware's
                       display name from its definition
     :param str namespace: The namespace the labware definition belongs to.
-        If unspecified, will search 'opentrons' then 'custom_beta'
+        If unspecified, will search 'opentrons' then 'custom'
     :param int version: The version of the labware definition. If unspecified,
         will use version 1.
     :param bundled_defs: If specified, a mapping of labware names to labware

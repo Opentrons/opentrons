@@ -288,7 +288,7 @@
     "isMagneticModuleCompatible": false,
     "loadName": "generic_1_tiprack_20ul"
   },
-  "namespace": "custom_beta",
+  "namespace": "custom",
   "version": 1,
   "schemaVersion": 2,
   "cornerOffsetFromSlot": {

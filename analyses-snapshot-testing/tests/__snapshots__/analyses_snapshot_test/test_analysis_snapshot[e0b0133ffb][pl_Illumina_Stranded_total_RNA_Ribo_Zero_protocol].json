@@ -4282,7 +4282,7 @@
         "location": {
           "addressableAreaName": "A4"
         },
-        "namespace": "custom_beta",
+        "namespace": "custom",
         "version": 1
       },
       "result": {
@@ -4414,7 +4414,7 @@
             "displayVolumeUnits": "µL",
             "tags": []
           },
-          "namespace": "custom_beta",
+          "namespace": "custom",
           "ordering": [
             [
               "A1",
@@ -5433,7 +5433,7 @@
         "location": {
           "addressableAreaName": "B4"
         },
-        "namespace": "custom_beta",
+        "namespace": "custom",
         "version": 1
       },
       "result": {
@@ -5565,7 +5565,7 @@
             "displayVolumeUnits": "µL",
             "tags": []
           },
-          "namespace": "custom_beta",
+          "namespace": "custom",
           "ordering": [
             [
               "A1",
@@ -38611,7 +38611,7 @@
       }
     },
     {
-      "definitionUri": "custom_beta/eppendorf_96_wellplate_150ul/1",
+      "definitionUri": "custom/eppendorf_96_wellplate_150ul/1",
       "displayName": "Index Anchors",
       "id": "UUID",
       "loadName": "eppendorf_96_wellplate_150ul",
@@ -38620,7 +38620,7 @@
       }
     },
     {
-      "definitionUri": "custom_beta/eppendorf_96_wellplate_150ul/1",
+      "definitionUri": "custom/eppendorf_96_wellplate_150ul/1",
       "displayName": "Index Plate",
       "id": "UUID",
       "loadName": "eppendorf_96_wellplate_150ul",

@@ -43,7 +43,7 @@ export function getTiprackOptions(props: TiprackOptionsProps): TiprackOption[] {
           } else {
             return (
               selectedPipetteDefaultTipracks.includes(getLabwareDefURI(def)) ||
-              def.namespace === 'custom_beta'
+              def.namespace === 'custom'
             )
           }
         })

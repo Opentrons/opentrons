@@ -30,14 +30,14 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
         "cpx_4_tuberack_100ul",
         "9",
         "4 tubes",
-        "custom_beta",
+        "custom",
     )
 
     six_tubes: Labware = ctx.load_labware(
         "cpx_6_tuberack_100ul",
         "3",
         "6 tubes",
-        "custom_beta",
+        "custom",
     )
 
     four_tubes_destination_wells: List[Well] = [

@@ -283,7 +283,7 @@
     "isMagneticModuleCompatible": false,
     "loadName": "somerackbrand_24_tuberack_1500ul"
   },
-  "namespace": "custom_beta",
+  "namespace": "custom",
   "version": 1,
   "schemaVersion": 2,
   "cornerOffsetFromSlot": {

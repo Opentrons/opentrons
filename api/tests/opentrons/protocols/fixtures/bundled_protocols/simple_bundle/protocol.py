@@ -4,7 +4,7 @@ metadata = {"author": "MISTER FIXTURE", "apiLevel": "2.0"}
 def run(protocol_context):
     tip_rack = protocol_context.load_labware("opentrons_96_tiprack_10ul", "3")
     plate = protocol_context.load_labware(
-        "custom_labware", "1", namespace="custom_beta"
+        "custom_labware", "1", namespace="custom"
     )
 
     pipette = protocol_context.load_instrument(

@@ -84,7 +84,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
             "cpx_4_tuberack_100ul",
             custom_lw_position,
             "4 tubes",
-            "custom_beta",
+            "custom",
         )
 
     # create plates and pattern list

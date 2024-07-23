@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "version": 1,
-  "namespace": "custom_beta",
+  "namespace": "custom",
   "ordering": [["A1"]],
   "metadata": {
     "displayName": "Mitutoyo Digimatic Indicator",

@@ -134,7 +134,7 @@ describe('CreateFileWizard', () => {
       },
       {
         name: 'Custom',
-        value: 'custom_beta_blah_blah_blah',
+        value: 'custom_blah_blah_blah',
       },
     ])
     render()

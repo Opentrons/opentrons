@@ -19,7 +19,7 @@ const fixtureTipRack10ul = fixtureTiprack10ul as LabwareDefinition2
 
 const fixtureTipRack10ulCustomBeta = {
   ...fixtureTiprack10ul,
-  namespace: 'custom_beta',
+  namespace: 'custom',
 } as LabwareDefinition2
 
 const fixtureTipRack10ulVersion2 = {
@@ -57,7 +57,7 @@ describe('findLabwareDefWithCustom', () => {
   it('handles no-custom-labware', () => {
     expect(
       findLabwareDefWithCustom(
-        'custom_beta',
+        'custom',
         'opentrons_96_tiprack_300ul',
         '1',
         []
@@ -102,7 +102,7 @@ describe('findLabwareDefWithCustom', () => {
         fixtureTipRack10ulVersion2,
       ],
       expect: fixtureTipRack10ulCustomBeta,
-      namespace: 'custom_beta',
+      namespace: 'custom',
       loadName: 'fixture_tiprack_10_ul',
       version: null,
     },

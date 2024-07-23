@@ -166,7 +166,7 @@ def _update_environment_first_last_min_max(test_report: report.CSVReport) -> Non
 def _load_labware(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> Labware:
     ui.print_info(f'Loading labware on scale: "{cfg.labware_on_scale}"')
     if cfg.labware_on_scale == "radwag_pipette_calibration_vial":
-        namespace = "custom_beta"
+        namespace = "custom"
     else:
         namespace = "opentrons"
     # If running multiple tests in one run, the labware may already be loaded

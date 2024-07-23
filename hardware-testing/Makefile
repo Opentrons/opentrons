@@ -197,8 +197,8 @@ push-description-ot3:
 
 .PHONY: push-labware-ot3
 push-labware-ot3:
-	ssh $(ssh_helper_ot3) root@$(host) "mkdir -p /data/labware/v2/custom_definitions/custom_beta"
-	scp $(ssh_helper_ot3) -r hardware_testing/labware/* root@$(host):/data/labware/v2/custom_definitions/custom_beta/
+	ssh $(ssh_helper_ot3) root@$(host) "mkdir -p /data/labware/v2/custom_definitions/custom"
+	scp $(ssh_helper_ot3) -r hardware_testing/labware/* root@$(host):/data/labware/v2/custom_definitions/custom/
 
 .PHONY: restart
 restart:

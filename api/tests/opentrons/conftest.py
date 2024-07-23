@@ -511,7 +511,7 @@ def get_bundle_fixture() -> Callable[[str], Bundle]:
             tiprack_def = get_std_labware("opentrons_96_tiprack_10ul")
             result["bundled_labware"] = {
                 "opentrons/opentrons_1_trash_1100ml_fixed/1": fixed_trash_def,
-                "custom_beta/custom_labware/1": custom_labware,
+                "custom/custom_labware/1": custom_labware,
                 "opentrons/opentrons_96_tiprack_10ul/1": tiprack_def,
             }
             result["bundled_python"] = {}

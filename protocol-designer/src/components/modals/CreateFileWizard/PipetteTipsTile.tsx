@@ -179,12 +179,12 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
 
   const defaultTiprackOptions = tiprackOptions.filter(option =>
     allowAllTipracks
-      ? !option.value.includes('custom_beta')
+      ? !option.value.includes('custom')
       : selectedPipetteDefaultTipracks.includes(option.value)
   )
 
   const customTiprackOptions = tiprackOptions.filter(option =>
-    option.value.includes('custom_beta')
+    option.value.includes('custom')
   )
 
   const selectedValues = pipettesByMount[mount].tiprackDefURI ?? []

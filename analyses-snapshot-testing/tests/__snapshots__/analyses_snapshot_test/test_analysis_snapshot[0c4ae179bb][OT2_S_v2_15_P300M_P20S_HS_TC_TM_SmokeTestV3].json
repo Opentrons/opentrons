@@ -9324,7 +9324,7 @@
         "location": {
           "slotName": "6"
         },
-        "namespace": "custom_beta",
+        "namespace": "custom",
         "version": 1
       },
       "result": {
@@ -9369,7 +9369,7 @@
             "displayVolumeUnits": "µL",
             "tags": []
           },
-          "namespace": "custom_beta",
+          "namespace": "custom",
           "ordering": [
             [
               "A1",
@@ -16892,7 +16892,7 @@
       }
     },
     {
-      "definitionUri": "custom_beta/cpx_4_tuberack_100ul/1",
+      "definitionUri": "custom/cpx_4_tuberack_100ul/1",
       "displayName": "4 custom tubes",
       "id": "UUID",
       "loadName": "cpx_4_tuberack_100ul",
