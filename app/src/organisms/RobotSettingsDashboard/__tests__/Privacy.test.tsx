@@ -5,7 +5,7 @@ import { vi, describe, beforeEach, afterEach, expect, it } from 'vitest'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { toggleAnalyticsOptedIn } from '../../../redux/analytics'
-import { getRobotSettings, updateSetting } from '../../../redux/robot-settings'
+import { getRobotSettings } from '../../../redux/robot-settings'
 
 import { Privacy } from '../Privacy'
 
@@ -38,8 +38,6 @@ describe('Privacy', () => {
     screen.getByText(
       'Opentrons cares about your privacy. We anonymize all data and only use it to improve our products.'
     )
-    screen.getByText('Share robot logs')
-    screen.getByText('Data on actions the robot does, like running protocols.')
     screen.getByText('Share display usage')
     screen.getByText('Data on how you interact with the touchscreen on Flex.')
   })
@@ -48,15 +46,5 @@ describe('Privacy', () => {
     render(props)
     fireEvent.click(screen.getByText('Share display usage'))
     expect(vi.mocked(toggleAnalyticsOptedIn)).toBeCalled()
-  })
-
-  it('should toggle robot logs sharing on click', () => {
-    render(props)
-    fireEvent.click(screen.getByText('Share robot logs'))
-    expect(vi.mocked(updateSetting)).toBeCalledWith(
-      'Otie',
-      'disableLogAggregation',
-      true
-    )
   })
 })

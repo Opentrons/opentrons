@@ -50,21 +50,21 @@ class DriverSettings(BaseSettings):
     """Settings for driver building."""
 
     interface: str = Field(
-        default=DEFAULT_INTERFACE,
+        DEFAULT_INTERFACE,
         description=f"Can either be {OPENTRONS_INTERFACE} for simple socket "
         f"or a python can interface.",
     )
     bit_rate: int = Field(
-        default=DEFAULT_BITRATE,
+        DEFAULT_BITRATE,
         description=f"Bit rate. Not applicable to {OPENTRONS_INTERFACE} interface.",
     )
-    channel: str = Field(default=DEFAULT_CHANNEL, description="The SocketCan channel.")
+    channel: str = Field(DEFAULT_CHANNEL, description="The SocketCan channel.")
 
-    host: str = Field(default=DEFAULT_HOST, description=f"{OPENTRONS_INTERFACE} only.")
-    port: int = Field(default=DEFAULT_PORT, description=f"{OPENTRONS_INTERFACE} only.")
-    fcan_clock: int = Field(default=DEFAULT_FDCAN_CLK, description="pcan only.")
-    sample_rate: float = Field(default=DEFAULT_SAMPLE_RATE, description="pcan only.")
-    jump_width: int = Field(default=DEFAULT_JUMP_WIDTH_SEG, description="pcan only.")
+    host: str = Field(DEFAULT_HOST, description=f"{OPENTRONS_INTERFACE} only.")
+    port: int = Field(DEFAULT_PORT, description=f"{OPENTRONS_INTERFACE} only.")
+    fcan_clock: int = Field(DEFAULT_FDCAN_CLK, description="pcan only.")
+    sample_rate: float = Field(DEFAULT_SAMPLE_RATE, description="pcan only.")
+    jump_width: int = Field(DEFAULT_JUMP_WIDTH_SEG, descript="pcan only.")
 
     class Config:  # noqa: D106
         env_prefix = "OT3_CAN_DRIVER_"

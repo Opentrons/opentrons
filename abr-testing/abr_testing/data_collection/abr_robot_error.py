@@ -131,9 +131,20 @@ def compare_lpc_to_historical_data(
     current_x = round(labware_dict["X"], 2)
     current_y = round(labware_dict["Y"], 2)
     current_z = round(labware_dict["Z"], 2)
-    avg_x = round(mean(x_float), 2)
-    avg_y = round(mean(y_float), 2)
-    avg_z = round(mean(z_float), 2)
+    try:
+        avg_x = round(mean(x_float), 2)
+        avg_y = round(mean(y_float), 2)
+        avg_z = round(mean(z_float), 2)
+    except StatisticsError:
+        # If there is one value assign it as the average.
+        if len(x_float) == 1:
+            avg_x = x_float[0]
+            avg_y = y_float[0]
+            avg_z = z_float[0]
+        else:
+            avg_x = None
+            avg_y = None
+            avg_z = None
 
     # Formats LPC message for ticket.
     lpc_message = (

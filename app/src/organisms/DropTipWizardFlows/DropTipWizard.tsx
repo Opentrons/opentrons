@@ -2,11 +2,13 @@ import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { Trans, useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+import { css } from 'styled-components'
 
 import {
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
+  RESPONSIVENESS,
   Flex,
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
@@ -109,7 +111,8 @@ export function DropTipWizard(props: DropTipWizardProps): JSX.Element {
   )
 }
 
-// TODO(jh, 06-07-24): All content views could use refactoring and DQA. Create shared components from designs. EXEC-520.
+// TODO(jh, 06-07-24): All content views could use refactoring and DQA. Create shared components from designs.
+// Convince design not to use SimpleWizardBody. EXEC-520.
 export function DropTipWizardContainer(
   props: DropTipWizardContainerProps
 ): JSX.Element {
@@ -218,7 +221,12 @@ export const DropTipWizardContent = (
   }
 
   function buildRobotInMotion(): JSX.Element {
-    return <InProgressModal description={t('stand_back_robot_in_motion')} />
+    return (
+      <>
+        {issuedCommandsType === 'fixit' ? <Flex /> : null}
+        <InProgressModal description={t('stand_back_robot_in_motion')} />
+      </>
+    )
   }
 
   function buildShowExitConfirmation(): JSX.Element {
@@ -244,7 +252,7 @@ export const DropTipWizardContent = (
         header={errorDetails?.header ?? t('error_dropping_tips')}
         subHeader={subHeader}
         justifyContentForOddButton={JUSTIFY_FLEX_END}
-        marginTop={`-${SPACING.spacing68}`} // See EXEC-520. This clearly isn't ideal.
+        css={ERROR_MODAL_FIXIT_STYLE}
       >
         {button}
       </SimpleWizardBody>
@@ -397,3 +405,9 @@ function useInitiateExit(): {
 
   return { isExitInitiated, toggleExitInitiated }
 }
+
+const ERROR_MODAL_FIXIT_STYLE = css`
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    margin-top: -${SPACING.spacing68}; // See EXEC-520. This clearly isn't ideal.
+  }
+`

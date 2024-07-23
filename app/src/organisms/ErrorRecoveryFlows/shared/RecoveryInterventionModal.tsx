@@ -38,7 +38,6 @@ export function RecoveryInterventionModal({
             ? SMALL_MODAL_STYLE
             : LARGE_MODAL_STYLE
         }
-        padding={SPACING.spacing32}
       >
         {children}
       </Flex>
@@ -47,17 +46,15 @@ export function RecoveryInterventionModal({
   )
 }
 
-const ODD_STYLE = `
-@media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+const SMALL_MODAL_STYLE = css`
+  height: 22rem;
+  padding: ${SPACING.spacing32};
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    padding: ${SPACING.spacing32};
     height: 100%;
   }
 `
-
-const SMALL_MODAL_STYLE = css`
-  height: 22rem;
-  ${ODD_STYLE}
-`
 const LARGE_MODAL_STYLE = css`
   height: 26.75rem;
-  ${ODD_STYLE}
 `
