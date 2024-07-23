@@ -248,6 +248,8 @@ def store_trial(
                 ["Normalized Height"],
             ]
             google_sheet.batch_update_cells(gs_header, "A", 10, sheet_id)
+            google_sheet.update_cell(sheet_name, 1,6,"Transposed Height (mm)")
+        normalized_height = target_height - height
         try:
             trial_for_google_sheet: List[List[str]] = [
                 [f"{trial + 1}"],
@@ -256,11 +258,12 @@ def store_trial(
                 [f"{plunger_pos}"],
                 [f"{tip_length_offset}"],
                 [f"{height + tip_length_offset}"],
-                [f"{target_height - height}"]
+                [f"{normalized_height}"]
             ]
             google_sheet.batch_update_cells(
                 trial_for_google_sheet, "A", 11 + int(trial), sheet_id
             )
+            google_sheet.update_cell(sheet_name, 1, 6 + int(trial), height)
         except google_sheets_tool.google_interaction_error:
             ui.print_error(f"did not log trial {trial+1} to google sheet.")
 
