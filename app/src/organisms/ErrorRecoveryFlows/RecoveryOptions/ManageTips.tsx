@@ -146,9 +146,6 @@ export function BeginRemoval({
         css={DESKTOP_ONLY}
       >
         <RecoveryRadioGroup
-          // css={css`
-          //   padding: ${SPACING.spacing4};
-          // `}
           value={selected}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
             setSelected(e.currentTarget.value as RemovalOptions)
