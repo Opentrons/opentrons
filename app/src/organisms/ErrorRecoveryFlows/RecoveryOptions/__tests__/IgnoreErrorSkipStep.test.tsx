@@ -105,7 +105,7 @@ describe('IgnoreErrorStepHome', () => {
 
   it('calls ignoreOnce when "ignore_only_this_error" is selected and primary button is clicked', async () => {
     renderIgnoreErrorStepHome(props)
-    fireEvent.click(screen.getByText('Ignore only this error'))
+    fireEvent.click(screen.queryAllByText('Ignore only this error')[0])
     clickButtonLabeled('Continue')
     await waitFor(() => {
       expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
