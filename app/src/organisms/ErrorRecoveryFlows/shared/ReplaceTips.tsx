@@ -25,10 +25,7 @@ export function ReplaceTips(props: RecoveryContentProps): JSX.Element | null {
   const primaryOnClick = (): void => {
     void proceedNextStep()
   }
-  const [slot, _] = getSlotNameAndLwLocFrom(
-    failedLabware?.location ?? null,
-    false
-  )
+  const [slot] = getSlotNameAndLwLocFrom(failedLabware?.location ?? null, false)
   const buildTitle = (): string => {
     if (failedPipetteInfo?.data.channels === 96) {
       return t('replace_with_new_tip_rack', { slot })
