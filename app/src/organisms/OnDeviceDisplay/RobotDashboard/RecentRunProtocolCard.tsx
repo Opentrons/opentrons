@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { formatDistance } from 'date-fns'
 import last from 'lodash/last'
 
@@ -81,7 +81,7 @@ export function ProtocolWithLastRun({
     isLoading: isLookingForHardware,
     conflictedSlots,
   } = useMissingProtocolHardware(protocolData.id)
-  const history = useHistory()
+  const navigate = useNavigate()
   const isOk = 'ok' in runData ? !(runData?.ok === false) : true
   const isReadyToBeReRun = isOk && missingProtocolHardware.length === 0
   const chipText = useRerunnableStatusText(
@@ -93,7 +93,7 @@ export function ProtocolWithLastRun({
   // TODO(BC, 08/29/23): reintroduce this analytics event when we refactor the hook to fetch data lazily (performance concern)
   // const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runData.id)
   const onResetSuccess = (createRunResponse: Run): void => {
-    history.push(`runs/${createRunResponse.data.id}/setup`)
+    navigate(`runs/${createRunResponse.data.id}/setup`)
   }
   const { cloneRun } = useCloneRun(runData.id, onResetSuccess)
   const robotInitStatus = useRobotInitializationStatus()
@@ -147,7 +147,7 @@ export function ProtocolWithLastRun({
   const handleCardClick = (): void => {
     setShowSpinner(true)
     if (hasRunTimeParameters) {
-      history.push(`/protocols/${protocolId}`)
+      navigate(`/protocols/${protocolId}`)
     } else {
       cloneRun()
       trackEvent({

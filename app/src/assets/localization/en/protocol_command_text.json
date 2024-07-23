@@ -16,6 +16,7 @@
   "deactivating_tc_block": "Deactivating Thermocycler block",
   "deactivating_tc_lid": "Deactivating Thermocycler lid",
   "degrees_c": "{{temp}}°C",
+  "detect_liquid_presence": "Detecting liquid presence in well {{well_name}} of {{labware}} in {{labware_location}}",
   "disengaging_magnetic_module": "Disengaging Magnetic Module",
   "dispense": "Dispensing {{volume}} µL into well {{well_name}} of {{labware}} in {{labware_location}} at {{flow_rate}} µL/sec",
   "dispense_in_place": "Dispensing {{volume}} µL in place at {{flow_rate}} µL/sec",

@@ -14,8 +14,10 @@ import {
 import { useRecoveryOptionCopy } from './useRecoveryOptionCopy'
 import { useRecoveryActionMutation } from './useRecoveryActionMutation'
 import { useRunningStepCounts } from '../../../resources/protocols/hooks'
+import { useRecoveryToasts } from './useRecoveryToasts'
 
 import type { PipetteData } from '@opentrons/api-client'
+import type { RobotType } from '@opentrons/shared-data'
 import type { IRecoveryMap } from '../types'
 import type { ErrorRecoveryFlowsProps } from '..'
 import type { UseRouteUpdateActionsResult } from './useRouteUpdateActions'
@@ -30,6 +32,8 @@ import type { StepCounts } from '../../../resources/protocols/hooks'
 type ERUtilsProps = ErrorRecoveryFlowsProps & {
   toggleERWizard: (launchER: boolean) => Promise<void>
   hasLaunchedRecovery: boolean
+  isOnDevice: boolean
+  robotType: RobotType
 }
 
 export interface ERUtilsResults {
@@ -58,6 +62,8 @@ export function useERUtils({
   toggleERWizard,
   hasLaunchedRecovery,
   protocolAnalysis,
+  isOnDevice,
+  robotType,
 }: ERUtilsProps): ERUtilsResults {
   const { data: attachedInstruments } = useInstrumentsQuery()
   const { data: runRecord } = useNotifyRunQuery(runId)
@@ -71,12 +77,22 @@ export function useERUtils({
     pageLength: 999,
   })
 
+  const stepCounts = useRunningStepCounts(runId, runCommands)
+
   const {
     recoveryMap,
     setRM,
     trackExternalMap,
     currentRecoveryOptionUtils,
   } = useRecoveryRouting()
+
+  const recoveryToastUtils = useRecoveryToasts({
+    currentStepCount: stepCounts.currentStepNumber,
+    selectedRecoveryOption: currentRecoveryOptionUtils.selectedRecoveryOption,
+    isOnDevice,
+    commandTextData: protocolAnalysis,
+    robotType,
+  })
 
   const tipStatusUtils = useRecoveryTipStatus({
     runId,
@@ -111,6 +127,7 @@ export function useERUtils({
     failedCommand,
     failedLabwareUtils,
     routeUpdateActions,
+    recoveryToastUtils,
   })
 
   const deckMapUtils = useDeckMapUtils({
@@ -119,8 +136,6 @@ export function useERUtils({
     protocolAnalysis,
     failedLabwareUtils,
   })
-
-  const stepCounts = useRunningStepCounts(runId, runCommands)
 
   const recoveryActionMutationUtils = useRecoveryActionMutation(runId)
 

@@ -124,7 +124,7 @@ def test_close_shave_deck_conflicts_for_96_ch_a12_column_configuration() -> None
         adapter="opentrons_flex_96_tiprack_adapter",
     )
     tiprack_8 = protocol_context.load_labware("opentrons_flex_96_tiprack_200ul", "B2")
-    hs = protocol_context.load_module("heaterShakerModuleV1", "D1")
+    hs = protocol_context.load_module("heaterShakerModuleV1", "C1")
     hs_adapter = hs.load_adapter("opentrons_96_deep_well_adapter")
     deepwell = hs_adapter.load_labware("nest_96_wellplate_2ml_deep")
     protocol_context.load_trash_bin("A3")

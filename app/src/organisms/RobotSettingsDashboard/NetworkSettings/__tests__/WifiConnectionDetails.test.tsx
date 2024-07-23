@@ -17,12 +17,12 @@ vi.mock('../../../../redux/discovery')
 vi.mock('../../../../redux/networking')
 vi.mock('../NetworkDetailsModal')
 
-const mockPush = vi.fn()
+const mockNavigate = vi.fn()
 vi.mock('react-router-dom', async importOriginal => {
   const reactRouterDom = await importOriginal<typeof Dom>()
   return {
     ...reactRouterDom,
-    useHistory: () => ({ push: mockPush } as any),
+    useNavigate: () => mockNavigate,
   }
 })
 

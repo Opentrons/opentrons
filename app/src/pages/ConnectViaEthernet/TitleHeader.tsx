@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import {
   ALIGN_CENTER,
@@ -21,7 +21,7 @@ interface TitleHeaderProps {
 
 // Note (kj:05/12/2023) This might be a component later
 export function TitleHeader({ title }: TitleHeaderProps): JSX.Element {
-  const history = useHistory()
+  const navigate = useNavigate()
   return (
     <Flex
       flexDirection={DIRECTION_ROW}
@@ -32,7 +32,7 @@ export function TitleHeader({ title }: TitleHeaderProps): JSX.Element {
     >
       <Btn
         onClick={() => {
-          history.push('/network-setup')
+          navigate('/network-setup')
         }}
         data-testid={`${title}_header_back_button`}
       >

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { vi, describe, beforeEach, it, expect, afterEach } from 'vitest'
 import { Route } from 'react-router'
-import { MemoryRouter } from 'react-router-dom'
+import { MemoryRouter, Routes } from 'react-router-dom'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 
@@ -22,9 +22,9 @@ vi.mock('../../../organisms/AppSettings/FeatureFlags')
 const render = (path = '/'): ReturnType<typeof renderWithProviders> => {
   return renderWithProviders(
     <MemoryRouter initialEntries={[path]} initialIndex={0}>
-      <Route path="/app-settings/:appSettingsTab">
-        <AppSettings />
-      </Route>
+      <Routes>
+        <Route path="/app-settings/:appSettingsTab" element={<AppSettings />} />
+      </Routes>
     </MemoryRouter>,
     {
       i18nInstance: i18n,

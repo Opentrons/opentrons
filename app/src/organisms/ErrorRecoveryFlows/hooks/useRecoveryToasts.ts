@@ -1,10 +1,14 @@
+import { useTranslation } from 'react-i18next'
+
 import { useToaster } from '../../ToasterOven'
 import { RECOVERY_MAP } from '../constants'
-import type { CurrentRecoveryOptionUtils } from './useRecoveryRouting'
-import { useTranslation } from 'react-i18next'
-import type { StepCounts } from '../../../resources/protocols/hooks'
+import { useCommandTextString } from '../../../molecules/Command'
 
-interface BuildToast {
+import type { StepCounts } from '../../../resources/protocols/hooks'
+import type { CurrentRecoveryOptionUtils } from './useRecoveryRouting'
+import type { UseCommandTextStringParams } from '../../../molecules/Command'
+
+export type BuildToast = Omit<UseCommandTextStringParams, 'command'> & {
   isOnDevice: boolean
   currentStepCount: StepCounts['currentStepNumber']
   selectedRecoveryOption: CurrentRecoveryOptionUtils['selectedRecoveryOption']
@@ -20,17 +24,35 @@ export function useRecoveryToasts({
   currentStepCount,
   isOnDevice,
   selectedRecoveryOption,
+  ...rest
 }: BuildToast): RecoveryToasts {
   const { makeToast } = useToaster()
+  const displayType = isOnDevice ? 'odd' : 'desktop'
 
-  const toastText = useToastText({ currentStepCount, selectedRecoveryOption })
+  const stepNumber = getStepNumber(selectedRecoveryOption, currentStepCount)
+
+  const desktopFullCommandText = useRecoveryFullCommandText({
+    ...rest,
+    stepNumber,
+  })
+  const recoveryToastText = useRecoveryToastText({
+    stepNumber,
+    selectedRecoveryOption,
+  })
+
+  // The "body" of the toast message. On ODD, this is the recovery-specific text. On desktop, this is the full command text.
+  const bodyText =
+    displayType === 'desktop' ? desktopFullCommandText : recoveryToastText
+  // The "heading" of the toast message. Currently, this text is only present on the desktop toasts.
+  const headingText = displayType === 'desktop' ? recoveryToastText : undefined
 
   const makeSuccessToast = (): void => {
     if (selectedRecoveryOption !== RECOVERY_MAP.CANCEL_RUN.ROUTE) {
-      makeToast(toastText, 'success', {
+      makeToast(bodyText, 'success', {
         closeButton: true,
         disableTimeout: true,
-        displayType: isOnDevice ? 'odd' : 'desktop',
+        displayType,
+        heading: headingText,
       })
     }
   }
@@ -39,13 +61,15 @@ export function useRecoveryToasts({
 }
 
 // Return i18n toast text for the corresponding user selected recovery option.
-export function useToastText({
-  currentStepCount,
+// Ex: "Skip to step <###> succeeded."
+export function useRecoveryToastText({
+  stepNumber,
   selectedRecoveryOption,
-}: Omit<BuildToast, 'isOnDevice'>): string {
+}: {
+  stepNumber: ReturnType<typeof getStepNumber>
+  selectedRecoveryOption: CurrentRecoveryOptionUtils['selectedRecoveryOption']
+}): string {
   const { t } = useTranslation('error_recovery')
-
-  const stepNumber = getStepNumber(selectedRecoveryOption, currentStepCount)
 
   const currentStepReturnVal = t('retrying_step_succeeded', {
     step: stepNumber,
@@ -63,6 +87,35 @@ export function useToastText({
   return toastText
 }
 
+type UseRecoveryFullCommandTextParams = Omit<
+  UseCommandTextStringParams,
+  'command'
+> & {
+  stepNumber: ReturnType<typeof getStepNumber>
+}
+
+// Return the full command text of the recovery command that is "retried" or "skipped".
+export function useRecoveryFullCommandText(
+  props: UseRecoveryFullCommandTextParams
+): string {
+  const { commandTextData, stepNumber } = props
+
+  const relevantCmdIdx = typeof stepNumber === 'number' ? stepNumber : -1
+  const relevantCmd = commandTextData?.commands[relevantCmdIdx] ?? null
+
+  const { commandText, stepTexts } = useCommandTextString({
+    ...props,
+    command: relevantCmd,
+  })
+
+  if (typeof stepNumber === 'string') {
+    return stepNumber
+  } else {
+    return truncateIfTCCommand(commandText, stepTexts != null)
+  }
+}
+
+// Return the user-facing step number. If the step number cannot be determined, return '?'.
 export function getStepNumber(
   selectedRecoveryOption: BuildToast['selectedRecoveryOption'],
   currentStepCount: BuildToast['currentStepCount']
@@ -99,5 +152,22 @@ function handleRecoveryOptionAction<T>(
       return currentStepReturnVal
     default:
       return 'HANDLE RECOVERY TOAST OPTION EXPLICITLY.'
+  }
+}
+
+// Special case the TC text, so it make sense in a success toast.
+function truncateIfTCCommand(commandText: string, isTCText: boolean): string {
+  if (isTCText) {
+    const indexOfCycle = commandText.indexOf('cycle')
+
+    if (indexOfCycle === -1) {
+      console.warn(
+        'TC cycle text has changed. Update Error Recovery TC text utility.'
+      )
+    }
+
+    return commandText.slice(0, indexOfCycle + 5) // +5 to include "cycle"
+  } else {
+    return commandText
   }
 }

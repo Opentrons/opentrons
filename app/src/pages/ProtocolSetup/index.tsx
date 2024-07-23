@@ -2,7 +2,7 @@ import * as React from 'react'
 import last from 'lodash/last'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { useHistory, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import first from 'lodash/first'
 import { css } from 'styled-components'
 
@@ -282,7 +282,7 @@ function PrepareToRun({
   runRecord,
 }: PrepareToRunProps): JSX.Element {
   const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
-  const history = useHistory()
+  const navigate = useNavigate()
   const { makeSnackbar } = useToaster()
   const scrollRef = React.useRef<HTMLDivElement>(null)
   const [isScrolled, setIsScrolled] = React.useState<boolean>(false)
@@ -323,7 +323,7 @@ function PrepareToRun({
 
   const runStatus = useRunStatus(runId)
   if (runStatus === RUN_STATUS_STOPPED) {
-    history.push('/protocols')
+    navigate('/protocols')
   }
 
   React.useEffect(() => {
@@ -339,7 +339,7 @@ function PrepareToRun({
 
   const onConfirmCancelClose = (): void => {
     setShowConfirmCancelModal(false)
-    history.goBack()
+    navigate(-1)
   }
 
   const protocolHasModules =
@@ -832,7 +832,9 @@ export type SetupScreens =
   | 'view only parameters'
 
 export function ProtocolSetup(): JSX.Element {
-  const { runId } = useParams<OnDeviceRouteParams>()
+  const { runId } = useParams<
+    keyof OnDeviceRouteParams
+  >() as OnDeviceRouteParams
   const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
   const { analysisErrors } = useProtocolAnalysisErrors(runId)
   const localRobot = useSelector(getLocalRobot)

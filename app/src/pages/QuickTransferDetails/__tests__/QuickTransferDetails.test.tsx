@@ -2,7 +2,7 @@ import * as React from 'react'
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import { when } from 'vitest-when'
-import { Route, MemoryRouter } from 'react-router-dom'
+import { Route, MemoryRouter, Routes } from 'react-router-dom'
 import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '../../../__testing-utils__'
 import {
@@ -74,9 +74,12 @@ const MOCK_DATA = {
 const render = (path = '/quick-transfer/fakeTransferId') => {
   return renderWithProviders(
     <MemoryRouter initialEntries={[path]} initialIndex={0}>
-      <Route path="/quick-transfer/:transferId">
-        <QuickTransferDetails />
-      </Route>
+      <Routes>
+        <Route
+          path="/quick-transfer/:transferId"
+          element={<QuickTransferDetails />}
+        />
+      </Routes>
     </MemoryRouter>,
     {
       i18nInstance: i18n,

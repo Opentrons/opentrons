@@ -11,20 +11,20 @@ import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { QuickTransferCard } from '../QuickTransferCard'
 import { LongPressModal } from '../LongPressModal'
-import type * as ReactRouterDom from 'react-router-dom'
+import type { NavigateFunction } from 'react-router-dom'
 import type { UseQueryResult } from 'react-query'
 import type {
   CompletedProtocolAnalysis,
   ProtocolResource,
 } from '@opentrons/shared-data'
 
-const mockPush = vi.fn()
+const mockNavigate = vi.fn()
 
 vi.mock('react-router-dom', async importOriginal => {
-  const actual = await importOriginal<typeof ReactRouterDom>()
+  const actual = await importOriginal<NavigateFunction>()
   return {
     ...actual,
-    useHistory: () => ({ push: mockPush } as any),
+    useNavigate: () => mockNavigate,
   }
 })
 vi.mock('@opentrons/react-api-client')
@@ -81,7 +81,7 @@ describe('QuickTransferCard', () => {
     render()
     const name = screen.getByText('yay mock transfer')
     fireEvent.click(name)
-    expect(mockPush).toHaveBeenCalledWith('/quick-transfer/mockTransfer1')
+    expect(mockNavigate).toHaveBeenCalledWith('/quick-transfer/mockTransfer1')
   })
 
   it('should display the analysis failed error modal when clicking on the transfer', () => {

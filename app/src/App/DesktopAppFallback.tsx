@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useDispatch } from 'react-redux'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 import { useTrackEvent, ANALYTICS_DESKTOP_APP_ERROR } from '../redux/analytics'
@@ -26,14 +26,14 @@ export function DesktopAppFallback({ error }: FallbackProps): JSX.Element {
   const { t } = useTranslation('app_settings')
   const trackEvent = useTrackEvent()
   const dispatch = useDispatch<Dispatch>()
-  const history = useHistory()
+  const navigate = useNavigate()
   const handleReloadClick = (): void => {
     trackEvent({
       name: ANALYTICS_DESKTOP_APP_ERROR,
       properties: { errorMessage: error.message },
     })
     // route to the root page and initiate an electron browser window reload via app-shell
-    history.push('/')
+    navigate('/', { replace: true })
     dispatch(reloadUi(error.message as string))
   }
 

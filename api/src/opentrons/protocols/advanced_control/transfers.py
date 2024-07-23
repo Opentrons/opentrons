@@ -16,11 +16,15 @@ from typing import (
 from opentrons.protocol_api.labware import Labware, Well
 from opentrons import types
 from opentrons.protocols.api_support.types import APIVersion
+from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
 
 
 if TYPE_CHECKING:
     from opentrons.protocol_api import InstrumentContext
     from opentrons.protocols.execution.dev_types import Dictable
+
+_PARTIAL_TIP_SUPPORT_ADDED = APIVersion(2, 18)
+"""The version after which partial tip support and nozzle maps were made available."""
 
 
 class MixStrategy(enum.Enum):
@@ -409,7 +413,15 @@ class TransferPlan:
         # then avoid iterating through its Wells.
         # ii. if using single channel pipettes, flatten a multi-dimensional
         # list of Wells into a 1 dimensional list of Wells
-        if self._instr.channels > 1:
+        pipette_configuration_type = NozzleConfigurationType.FULL
+        if self._api_version >= _PARTIAL_TIP_SUPPORT_ADDED:
+            pipette_configuration_type = (
+                self._instr._core.get_nozzle_map().configuration
+            )
+        if (
+            self._instr.channels > 1
+            and pipette_configuration_type == NozzleConfigurationType.FULL
+        ):
             sources, dests = self._multichannel_transfer(sources, dests)
         else:
             if isinstance(sources, List) and isinstance(sources[0], List):

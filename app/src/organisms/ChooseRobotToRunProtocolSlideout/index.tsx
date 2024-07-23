@@ -2,7 +2,7 @@ import * as React from 'react'
 import first from 'lodash/first'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import {
   Icon,
@@ -50,7 +50,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
 ): JSX.Element | null {
   const { t } = useTranslation(['protocol_details', 'shared', 'app_settings'])
   const { storedProtocolData, showSlideout, onCloseClick } = props
-  const history = useHistory()
+  const navigate = useNavigate()
   const [shouldApplyOffsets, setShouldApplyOffsets] = React.useState<boolean>(
     true
   )
@@ -112,9 +112,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
             name: 'createProtocolRecordResponse',
             properties: { success: true },
           })
-          history.push(
-            `/devices/${selectedRobot.name}/protocol-runs/${runData.id}`
-          )
+          navigate(`/devices/${selectedRobot.name}/protocol-runs/${runData.id}`)
         }
       },
       onError: (error: Error) => {

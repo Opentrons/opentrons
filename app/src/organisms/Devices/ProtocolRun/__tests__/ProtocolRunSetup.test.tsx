@@ -279,7 +279,6 @@ describe('ProtocolRunSetup', () => {
         .thenReturn({ complete: false })
 
       render()
-      screen.getByText('STEP 2')
       screen.getByText('Deck hardware')
       screen.getByText('Calibration needed')
     })
@@ -304,7 +303,6 @@ describe('ProtocolRunSetup', () => {
         .thenReturn({ complete: false })
 
       render()
-      screen.getByText('STEP 2')
       screen.getByText('Deck hardware')
       screen.getByText('Action needed')
     })
@@ -338,7 +336,6 @@ describe('ProtocolRunSetup', () => {
         .thenReturn({ complete: false })
 
       render()
-      screen.getByText('STEP 2')
       screen.getByText('Deck hardware')
       screen.getByText('Action needed')
     })
@@ -353,16 +350,13 @@ describe('ProtocolRunSetup', () => {
     it('renders correct text contents for multiple modules', () => {
       render()
 
-      screen.getByText('STEP 1')
       screen.getByText('Instruments')
       screen.getByText(
         'Review required pipettes and tip length calibrations for this protocol.'
       )
-      screen.getByText('STEP 2')
       screen.getByText('Deck hardware')
 
       screen.getByText('Install the required modules.')
-      screen.getByText('STEP 3')
       screen.getByText('Labware')
 
       screen.getByText(
@@ -389,16 +383,13 @@ describe('ProtocolRunSetup', () => {
       ])
       render()
 
-      screen.getByText('STEP 1')
       screen.getByText('Instruments')
       screen.getByText(
         'Review required pipettes and tip length calibrations for this protocol.'
       )
-      screen.getByText('STEP 2')
       screen.getByText('Deck hardware')
 
       screen.getByText('Install the required module.')
-      screen.getByText('STEP 3')
       screen.getByText('Labware')
       screen.getByText(
         'Gather the following labware and full tip racks. To run your protocol without Labware Position Check, place and secure labware in their initial locations.'
@@ -425,7 +416,6 @@ describe('ProtocolRunSetup', () => {
       ])
       render()
 
-      screen.getByText('STEP 2')
       screen.getByText('Deck hardware')
       screen.getByText(
         'Install and calibrate the required modules. Install the required fixtures.'

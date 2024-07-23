@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
@@ -46,7 +46,7 @@ import type { QuickTransfersOnDeviceSortKey } from '../../redux/config/types'
 export function QuickTransferDashboard(): JSX.Element {
   const protocols = useAllProtocolsQuery()
   const { data: attachedInstruments } = useInstrumentsQuery()
-  const history = useHistory()
+  const navigate = useNavigate()
   const { t } = useTranslation(['quick_transfer', 'protocol_info'])
   const dispatch = useDispatch<Dispatch>()
   const [navMenuIsOpened, setNavMenuIsOpened] = React.useState<boolean>(false)
@@ -151,7 +151,7 @@ export function QuickTransferDashboard(): JSX.Element {
     } else if (quickTransfersData.length >= 20) {
       setShowStorageLimitReachedModal(true)
     } else {
-      history.push('/quick-transfer/new')
+      navigate('/quick-transfer/new')
     }
   }
 
@@ -181,7 +181,7 @@ export function QuickTransferDashboard(): JSX.Element {
             setShowPipetteNotAttaachedModal(false)
           }}
           onAttach={() => {
-            history.push('/instruments')
+            navigate('/instruments')
           }}
         />
       ) : null}

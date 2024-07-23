@@ -9,10 +9,10 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
+  LegacyStyledText,
   POSITION_STATIC,
   POSITION_STICKY,
   SPACING,
-  LegacyStyledText,
 } from '@opentrons/components'
 import { useAllProtocolsQuery } from '@opentrons/react-api-client'
 
