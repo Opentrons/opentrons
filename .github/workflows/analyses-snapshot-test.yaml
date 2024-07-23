@@ -40,7 +40,7 @@ jobs:
       # If we're running because of workflow_dispatch, use the user input to decide
       # whether to open a PR on failure. Otherwise, there is no user input, so always
       # open a PR on failure.
-      OPEN_PR_ON_FAILURE: ${{ github.event_name == 'workflow_dispatch' && github.events.inputs.OPEN_PR_ON_FAILURE || true }}
+      OPEN_PR_ON_FAILURE: ${{ (github.event_name == 'workflow_dispatch' && github.events.inputs.OPEN_PR_ON_FAILURE) || (github.event_name != 'workflow_dispatch') }}
 
     steps:
       - name: Checkout Repository
