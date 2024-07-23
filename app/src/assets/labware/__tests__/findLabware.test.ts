@@ -56,12 +56,7 @@ describe('findLabwareDefWithCustom', () => {
 
   it('handles no-custom-labware', () => {
     expect(
-      findLabwareDefWithCustom(
-        'custom',
-        'opentrons_96_tiprack_300ul',
-        '1',
-        []
-      )
+      findLabwareDefWithCustom('custom', 'opentrons_96_tiprack_300ul', '1', [])
     ).toBe(null)
   })
 

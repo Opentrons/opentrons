@@ -70,7 +70,7 @@ To build a _regular_ labware, the `options` object should have the following sha
 | `group`           | [Group](#Group)                   | no       | Well group parameters                                                                              |
 | `brand`           | [Brand](#Brand)                   | no       | Labware manufacturer ("generic" if omitted)                                                        |
 | `version`         | [number](#Version)                | no       | Version of the definition, should be incremented if non-metadata info is altered (defaults to `1`) |
-| `namespace`       | [string](#Namespace)              | no       | Defaults to "custom"                                                                          |
+| `namespace`       | [string](#Namespace)              | no       | Defaults to "custom"                                                                               |
 | `loadNamePostfix` | [Array<string>](#LoadNamePostfix) | no       | Array of additional strings to postfix the loadName with                                           |
 
 This example generates [corning_96_wellplate_360ul_flat][]:
@@ -170,7 +170,7 @@ To build an _irregular_ labware, the `options` object should have the following 
 | `group`           | Array<[Group](#Group)>            | no       | Well group parameters per grid                                                                     |
 | `brand`           | [Brand](#Brand)                   | no       | Labware manufacturer information                                                                   |
 | `version`         | [number](#Version)                | no       | Version of the definition, should be incremented if non-metadata info is altered (defaults to `1`) |
-| `namespace`       | [string](#Namespace)              | no       | Defaults to "custom"                                                                          |
+| `namespace`       | [string](#Namespace)              | no       | Defaults to "custom"                                                                               |
 | `loadNamePostfix` | [Array<string>](#LoadNamePostfix) | no       | Array of additional strings to postfix the loadName with                                           |
 
 This example generates [opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical][]
