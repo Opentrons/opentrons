@@ -13,10 +13,7 @@ from opentrons.protocol_engine.types import DeckType
 from robot_server.runs.error_recovery_mapping import (
     create_error_recovery_policy_from_rules,
 )
-from robot_server.runs.error_recovery_models import (
-    ErrorRecoveryRule,
-    MatchCriteria
-)
+from robot_server.runs.error_recovery_models import ErrorRecoveryRule, MatchCriteria
 
 
 @pytest.fixture
