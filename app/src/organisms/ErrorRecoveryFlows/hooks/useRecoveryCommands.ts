@@ -9,7 +9,16 @@ import {
 import { useChainRunCommands } from '../../../resources/runs'
 import { RECOVERY_MAP } from '../constants'
 
-import type { CreateCommand, LoadedLabware } from '@opentrons/shared-data'
+import type {
+  CreateCommand,
+  LoadedLabware,
+  MoveToCoordinatesCreateCommand,
+  AspirateInPlaceRunTimeCommand,
+  BlowoutInPlaceRunTimeCommand,
+  DispenseInPlaceRunTimeCommand,
+  DropTipInPlaceRunTimeCommand,
+  PrepareToAspirateRunTimeCommand,
+} from '@opentrons/shared-data'
 import type { CommandData } from '@opentrons/api-client'
 import type { WellGroup } from '@opentrons/components'
 import type { FailedCommand } from '../types'
@@ -56,6 +65,48 @@ export function useRecoveryCommands({
   const { stopRun } = useStopRunMutation()
   const { makeSuccessToast } = recoveryToastUtils
 
+  const buildRetryPrepMove = (): MoveToCoordinatesCreateCommand | null => {
+    type InPlaceCommand =
+      | AspirateInPlaceRunTimeCommand
+      | BlowoutInPlaceRunTimeCommand
+      | DispenseInPlaceRunTimeCommand
+      | DropTipInPlaceRunTimeCommand
+      | PrepareToAspirateRunTimeCommand
+    const IN_PLACE_COMMAND_TYPES = [
+      'aspirateInPlace',
+      'dispenseInPlace',
+      'blowOutInPlace',
+      'dropTipInPlace',
+      'prepareToAspirate',
+    ] as const
+    const isInPlace = (
+      failedCommand: FailedCommand
+    ): failedCommand is InPlaceCommand =>
+      IN_PLACE_COMMAND_TYPES.includes(
+        (failedCommand as InPlaceCommand).commandType
+      )
+    return failedCommand != null
+      ? isInPlace(failedCommand)
+        ? failedCommand.error?.isDefined &&
+          failedCommand.error?.errorType === 'overpressure' &&
+          // Paranoia: this value comes from the wire and may be unevenly implemented
+          typeof failedCommand.error?.errorInfo?.retryLocation?.at(0) ===
+            'number'
+          ? {
+              commandType: 'moveToCoordinates',
+              params: {
+                pipetteId: failedCommand.params?.pipetteId,
+                coordinates: {
+                  x: failedCommand.error.errorInfo.retryLocation[0],
+                  y: failedCommand.error.errorInfo.retryLocation[1],
+                  z: failedCommand.error.errorInfo.retryLocation[2],
+                },
+              },
+            }
+          : null
+        : null
+      : null
+  }
   const chainRunRecoveryCommands = React.useCallback(
     (
       commands: CreateCommand[],
@@ -72,10 +123,13 @@ export function useRecoveryCommands({
 
   const retryFailedCommand = React.useCallback((): Promise<CommandData[]> => {
     const { commandType, params } = failedCommand as FailedCommand // Null case is handled before command could be issued.
-
-    return chainRunRecoveryCommands([
-      { commandType, params },
-    ] as CreateCommand[]) // the created command is the same command that failed
+    return chainRunRecoveryCommands(
+      [
+        // move back to the location of the command if it is an in-place command
+        buildRetryPrepMove(),
+        { commandType, params }, // retry the command that failed
+      ].filter(c => c != null) as CreateCommand[]
+    ) // the created command is the same command that failed
   }, [chainRunRecoveryCommands, failedCommand])
 
   // Homes the Z-axis of all attached pipettes.
