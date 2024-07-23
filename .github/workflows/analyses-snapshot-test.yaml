@@ -12,7 +12,7 @@ on:
         required: true
         default: 'edge'
       OPEN_PR_ON_FAILURE:
-        description: 'If the test fails, whether to automatically open a PR to update the snapshots.'
+        description: 'If the test fails, open a PR to update the snapshots'
         type: boolean
         required: true
         default: false
