@@ -6,6 +6,7 @@ from markdownify import markdownify  # type: ignore
 
 
 def run_sphinx_build(command: str) -> None:
+    """Run the sphinx command to convert rst files to a single HTML file."""
     try:
         subprocess.run(command, check=True, shell=True)
     except subprocess.CalledProcessError as e:
@@ -13,6 +14,7 @@ def run_sphinx_build(command: str) -> None:
 
 
 def clean_html(soup: BeautifulSoup) -> BeautifulSoup:
+    """Clean up the unused features in the markdown file."""
     # Remove specific logos
     logos = soup.find_all("img", src=lambda x: x and ("opentrons-images/website" in x))
     for logo in logos:
@@ -32,6 +34,7 @@ def clean_html(soup: BeautifulSoup) -> BeautifulSoup:
 
 
 def extract_tab_content(soup: BeautifulSoup) -> tuple[BeautifulSoup, dict[str, str]]:
+    """Find all tabbed content sections and convert each tabbed section to markdown format."""
     tab_sections = soup.find_all(class_="sphinx-tabs docutils container")
     tab_markdown = {}
 
@@ -45,6 +48,7 @@ def extract_tab_content(soup: BeautifulSoup) -> tuple[BeautifulSoup, dict[str, s
             panel_content = markdownify(str(panel), strip=["div"])
             section_markdown.append(panel_content)
         combined_section_markdown = "\n".join(section_markdown) + "\n\n"
+        # Replace the original tab section with a placeholder in the soup
         placeholder = f"tabSection{idx}"
         tab_markdown[placeholder] = combined_section_markdown
         placeholder_tag = soup.new_tag("div")
@@ -55,6 +59,7 @@ def extract_tab_content(soup: BeautifulSoup) -> tuple[BeautifulSoup, dict[str, s
 
 
 def convert_html_to_markdown(html_file_path: str, markdown_file_path: str) -> None:
+    """Converts an HTML file to a Markdown file with specific modifications."""
     with open(html_file_path, "r", encoding="utf-8") as file:
         html_content = file.read()
 
@@ -74,6 +79,7 @@ def convert_html_to_markdown(html_file_path: str, markdown_file_path: str) -> No
 
 
 def get_latest_version() -> str:
+    """Get the lastest docs version number."""
     try:
         # Run the git command to get the latest tag
         command = "git tag -l 'docs@2*' --sort=-taggerdate | head -n 1"
@@ -91,6 +97,7 @@ def get_latest_version() -> str:
 
 
 def get_markdown_format() -> None:
+    """Generates a version-aware Markdown file from HTML documentation."""
     current_version = get_latest_version()
     command = "pipenv run sphinx-build -b singlehtml ../api/docs/v2 api/utils/build/docs/html/v2"
     current_dir = os.path.dirname(__file__)
