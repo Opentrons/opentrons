@@ -10,7 +10,7 @@ from ...errors.error_occurrence import ErrorOccurrence
 from opentrons.protocol_engine.types import (
     LabwareOffsetVector,
     LabwareMovementOffsetData,
-    ModuleLocation,
+    AddressableAreaLocation,
 )
 from opentrons.protocol_engine.resources import labware_validation
 from .types import MoveLidResult
@@ -85,9 +85,18 @@ class CloseLidImpl(
             self._state_view.geometry.ensure_valid_gripper_location(current_location)
         )
 
-        # we need to move the lid onto the module
-        new_location = ModuleLocation(moduleId=mod_substate.module_id)
-        # new_location = self._state_view.modules.get_location(mod_substate.module_id)
+        # we need to move the lid onto the module reader
+        absorbance_model = self._state_view.modules.get_requested_model(params.moduleId)
+        assert absorbance_model is not None
+        new_location = AddressableAreaLocation(
+            addressableAreaName=self._state_view.modules.ensure_and_convert_module_fixture_location(
+                deck_slot=self._state_view.modules.get_location(
+                    params.moduleId
+                ).slotName,
+                deck_type=self._state_view.config.deck_type,
+                model=absorbance_model,
+            )
+        )
         validated_new_location = (
             self._state_view.geometry.ensure_valid_gripper_location(new_location)
         )

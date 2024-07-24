@@ -29,7 +29,7 @@ from opentrons.motion_planning.adjacent_slots_getters import (
 from opentrons.protocol_engine.commands.calibration.calibrate_module import (
     CalibrateModuleResult,
 )
-from opentrons.types import DeckSlotName, MountType, StagingSlotName
+from opentrons.types import DeckSlotName, MountType
 from ..errors import ModuleNotConnectedError
 
 from ..types import (
@@ -48,6 +48,8 @@ from ..types import (
     LabwareMovementOffsetData,
     AddressableAreaLocation,
 )
+
+from ..resources import DeckFixedLabware
 from .addressable_areas import AddressableAreaView
 from .. import errors
 from ..commands import (
@@ -181,6 +183,15 @@ class ModuleState:
     deck_type: DeckType
     """Type of deck that the modules are on."""
 
+    deck_fixed_labware: Sequence[DeckFixedLabware]
+    """Fixed labware from the deck which may be assigned to a module.
+
+    The Opentrons Plate Reader module makes use of an electronic Lid labware which moves
+    between the Reader and Dock positions, and is pre-loaded into the engine as to persist
+    even when not in use. For this reason, we inject it here when an appropriate match
+    is identified.
+    """
+
 
 class ModuleStore(HasState[ModuleState], HandlesActions):
     """Module state container."""
@@ -190,6 +201,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
     def __init__(
         self,
         config: Config,
+        deck_fixed_labware: Sequence[DeckFixedLabware],
         module_calibration_offsets: Optional[Dict[str, ModuleOffsetData]] = None,
     ) -> None:
         """Initialize a ModuleStore and its state."""
@@ -201,6 +213,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             substate_by_module_id={},
             module_offset_by_serial=module_calibration_offsets or {},
             deck_type=config.deck_type,
+            deck_fixed_labware=deck_fixed_labware,
         )
         self._robot_type = config.robot_type
 
@@ -310,7 +323,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             lid_id=lid_id,
         )
 
-    def _add_module_substate(
+    def _add_module_substate(  # noqa: C901
         self,
         module_id: str,
         serial_number: Optional[str],
@@ -369,15 +382,29 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 module_id=MagneticBlockId(module_id)
             )
         elif ModuleModel.is_absorbance_reader(actual_model):
-            self._state.substate_by_module_id[module_id] = AbsorbanceReaderSubState(
-                module_id=AbsorbanceReaderId(module_id),
-                configured=False,
-                measured=False,
-                is_lid_on=False,
-                data=None,
-                configured_wavelength=None,
-                lid_id=None,
-            )
+            slot = self._state.slot_by_module_id[module_id]
+            if slot is not None:
+                reader_addressable_area = f"absorbanceReaderV1{slot.value}"
+                lid_labware_id = None
+                for labware in self._state.deck_fixed_labware:
+                    if labware.location == AddressableAreaLocation(
+                        addressableAreaName=reader_addressable_area
+                    ):
+                        lid_labware_id = labware.labware_id
+                        break
+                self._state.substate_by_module_id[module_id] = AbsorbanceReaderSubState(
+                    module_id=AbsorbanceReaderId(module_id),
+                    configured=False,
+                    measured=False,
+                    is_lid_on=True,
+                    data=None,
+                    configured_wavelength=None,
+                    lid_id=lid_labware_id,
+                )
+            else:
+                raise errors.ModuleNotOnDeckError(
+                    "Opentrons Plate Reader location did not return a valid Deck Slot."
+                )
 
     def _update_additional_slots_occupied_by_thermocycler(
         self,
@@ -1292,14 +1319,9 @@ class ModuleView(HasState[ModuleState]):
     ) -> AddressableAreaLocation:
         """Get the addressable area for the absorbance reader dock."""
         reader_slot = self.get_location(module_id)
-        lid_dock_slot = get_adjacent_staging_slot(reader_slot.slotName)
-        assert lid_dock_slot is not None
-
-        return AddressableAreaLocation(addressableAreaName=lid_dock_slot.id)
-
-    def absorbance_reader_dock_location_name(self, module_id: str) -> StagingSlotName:
-        """Get the addressable area for the absorbance reader dock."""
-        reader_slot = self.get_location(module_id)
-        lid_dock_slot = get_adjacent_staging_slot(reader_slot.slotName)
-        assert lid_dock_slot is not None
-        return lid_dock_slot
+        lid_doc_slot = get_adjacent_staging_slot(reader_slot.slotName)
+        assert lid_doc_slot is not None
+        lid_dock_area = AddressableAreaLocation(
+            addressableAreaName="absorbanceReaderV1LidDock" + lid_doc_slot.value
+        )
+        return lid_dock_area

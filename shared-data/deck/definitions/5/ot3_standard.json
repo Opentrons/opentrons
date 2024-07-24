@@ -199,7 +199,7 @@
       {
         "id": "D4",
         "areaType": "stagingSlot",
-        "offsetFromCutoutFixture": [164.0, 0.0, 0.0],
+        "offsetFromCutoutFixture": [164.0, 0.0, 14.5],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
@@ -831,6 +831,30 @@
         "slot": "A3",
         "labware": "opentrons_1_trash_3200ml_fixed",
         "displayName": "Fixed Trash"
+      },
+      {
+        "id": "absorbanceReaderV1LidA3",
+        "slot": "absorbanceReaderV1A3",
+        "labware": "opentrons_flex_lid_absorbance_plate_reader_module",
+        "displayName": "Plate Reader Lid"
+      },
+      {
+        "id": "absorbanceReaderV1LidB3",
+        "slot": "absorbanceReaderV1B3",
+        "labware": "opentrons_flex_lid_absorbance_plate_reader_module",
+        "displayName": "Plate Reader Lid"
+      },
+      {
+        "id": "absorbanceReaderV1LidC3",
+        "slot": "absorbanceReaderV1C3",
+        "labware": "opentrons_flex_lid_absorbance_plate_reader_module",
+        "displayName": "Plate Reader Lid"
+      },
+      {
+        "id": "absorbanceReaderV1LidD3",
+        "slot": "absorbanceReaderV1D3",
+        "labware": "opentrons_flex_lid_absorbance_plate_reader_module",
+        "displayName": "Plate Reader Lid"
       }
     ]
   },

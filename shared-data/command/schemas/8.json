@@ -65,7 +65,7 @@
       "absorbanceReader/closeLid": "#/definitions/opentrons__protocol_engine__commands__absorbance_reader__close_lid__CloseLidCreate",
       "absorbanceReader/openLid": "#/definitions/opentrons__protocol_engine__commands__absorbance_reader__open_lid__OpenLidCreate",
       "absorbanceReader/initialize": "#/definitions/InitializeCreate",
-      "absorbanceReader/measure": "#/definitions/ReadAbsorbanceCreate",
+      "absorbanceReader/read": "#/definitions/ReadAbsorbanceCreate",
       "calibration/calibrateGripper": "#/definitions/CalibrateGripperCreate",
       "calibration/calibratePipette": "#/definitions/CalibratePipetteCreate",
       "calibration/calibrateModule": "#/definitions/CalibrateModuleCreate",
@@ -4014,8 +4014,8 @@
       "properties": {
         "commandType": {
           "title": "Commandtype",
-          "default": "absorbanceReader/measure",
-          "enum": ["absorbanceReader/measure"],
+          "default": "absorbanceReader/read",
+          "enum": ["absorbanceReader/read"],
           "type": "string"
         },
         "params": {

@@ -33,13 +33,6 @@
     "ot2_short_trash": {},
     "ot3_standard": {}
   },
-  "peripherals": [
-    {
-      "loadName": "opentrons_flex_lid_absorbance_plate_reader_module",
-      "version": 1,
-      "namespace": "opentrons"
-    }
-  ],
   "compatibleWith": [],
   "incompatibleWithDecks": ["ot2_standard"],
   "twoDimensionalRendering": {
