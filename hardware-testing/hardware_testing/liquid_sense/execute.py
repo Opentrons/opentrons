@@ -1,5 +1,6 @@
 """Logic for running a single liquid probe test."""
 import csv
+import time
 from enum import Enum
 from typing import Dict, Any, List, Tuple, Optional
 from .report import store_tip_results, store_trial, store_baseline_trial
@@ -206,17 +207,22 @@ def run(
     assert len(tips) >= run_args.trials
     results: List[float] = []
     adjusted_results: List[float] = []
+    
+    def read_dial() -> float:
+        time.sleep(2)
+        return run_args.dial_indicator.read()
+    
     lpc_offset = 0.0
     if run_args.dial_indicator is not None:
         run_args.pipette.move_to(dial_well.top())
-        lpc_offset = run_args.dial_indicator.read_stable()
+        lpc_offset = read_dial()
         run_args.pipette._retract()
 
     def _get_tip_offset() -> float:
         tip_offset = 0.0
         if run_args.dial_indicator is not None:
             run_args.pipette.move_to(dial_well.top())
-            tip_offset = run_args.dial_indicator.read_stable()
+            tip_offset = read_dial()
             run_args.pipette._retract()
         return tip_offset
 
@@ -273,7 +279,7 @@ def run(
             if run_args.dial_indicator is not None:
                 run_args.pipette._retract()
                 run_args.pipette.move_to(dial_well.top())
-                tip_length_offset = tip_offset - run_args.dial_indicator.read_stable()
+                tip_length_offset = tip_offset - read_dial()
                 run_args.pipette._retract()
                 ui.print_info(f"Tip Offset  {tip_length_offset}")
             run_args.pipette.move_to(test_well.top(z=2))
