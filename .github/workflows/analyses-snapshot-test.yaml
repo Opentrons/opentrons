@@ -49,6 +49,20 @@ jobs:
         with:
           ref: ${{ env.SNAPSHOT_REF }}
 
+      - name: Are my analyses snapshots in sync with the target branch?
+        if: ${{ env.PR_TARGET_BRANCH != 'not a pr' }}
+        run: |
+          git fetch origin ${{ env.PR_TARGET_BRANCH }}
+          git diff --quiet ${{ env.PR_TARGET_BRANCH }} -- analyses-snapshot-testing/tests/__snapshots__/analyses_snapshot_test
+          DIFF_EXIT_CODE=$?
+          if [ $DIFF_EXIT_CODE -eq 0 ]; then
+            echo "Analyses snapshots match ${{ env.PR_TARGET_BRANCH }} snapshots."
+          else
+            echo "Analyses snapshots do NOT match ${{ env.PR_TARGET_BRANCH }} snapshots."
+            echo "Is this becasue you have not pulled and merged ${{ env.PR_TARGET_BRANCH }}?"
+            echo "Or is this because you have already updated your snapshots and are all good 😊?"
+          fi
+
       - name: Docker Build
         working-directory: analyses-snapshot-testing
         run: make build-opentrons-analysis
@@ -69,19 +83,6 @@ jobs:
         working-directory: analyses-snapshot-testing
         run: make snapshot-test
 
-      - name: Are my analyses snapshots in sync with the target branch?
-        if: ${{ env.PR_TARGET_BRANCH != 'not a pr' }}
-        run: |
-          git fetch origin ${{ env.PR_TARGET_BRANCH }}
-          git diff --quiet HEAD ${{ env.PR_TARGET_BRANCH }} -- analyses-snapshot-testing/tests/__snapshots__/analyses_snapshot_test
-          DIFF_EXIT_CODE=$?
-          if [ $DIFF_EXIT_CODE -eq 0 ]; then
-            echo "Analyses snapshots match ${{ env.PR_TARGET_BRANCH }} snapshots."
-          else
-            echo "Analyses snapshots do NOT match ${{ env.PR_TARGET_BRANCH }} snapshots."
-            echo "Is this becasue you have not pulled and merged ${{ env.PR_TARGET_BRANCH }}?"
-            echo "Or is this because you have already updated your snapshots and are all good 😊?"
-          fi
       - name: Upload Report
         if: '!cancelled()'
         uses: actions/upload-artifact@v4
