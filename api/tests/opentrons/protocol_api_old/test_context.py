@@ -5,7 +5,7 @@ import mock
 from typing import Any, Dict
 
 from opentrons_shared_data import load_shared_data
-from opentrons_shared_data.pipette.dev_types import LabwareUri
+from opentrons_shared_data.pipette.types import LabwareUri
 from opentrons_shared_data.errors.exceptions import UnexpectedTipRemovalError
 
 import opentrons.protocol_api as papi

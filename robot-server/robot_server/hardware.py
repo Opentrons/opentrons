@@ -18,7 +18,7 @@ from traceback import format_exception_only, TracebackException
 from contextlib import contextmanager, suppress
 
 from opentrons_shared_data import deck
-from opentrons_shared_data.robot.dev_types import RobotType, RobotTypeEnum
+from opentrons_shared_data.robot.types import RobotType, RobotTypeEnum
 
 from opentrons import initialize as initialize_api, should_use_ot3
 from opentrons.config import (

@@ -3,7 +3,7 @@
 import functools
 from pathlib import Path
 
-from opentrons_shared_data.robot.dev_types import RobotTypeEnum
+from opentrons_shared_data.robot.types import RobotTypeEnum
 import typing
 from opentrons.config import (
     get_performance_metrics_data_dir,

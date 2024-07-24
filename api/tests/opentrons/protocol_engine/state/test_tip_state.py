@@ -20,7 +20,7 @@ from opentrons.protocol_engine.resources.pipette_data_provider import (
     LoadedStaticPipetteData,
 )
 from opentrons.types import Point
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.pipette.types import PipetteNameType
 from ..pipette_fixtures import (
     NINETY_SIX_MAP,
     NINETY_SIX_COLS,

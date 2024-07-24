@@ -8,7 +8,7 @@ from opentrons.protocol_runner import RunOrchestrator
 import opentrons.protocol_runner.create_simulating_orchestrator as simulating_runner
 from opentrons.protocol_engine.types import BooleanParameter
 from opentrons.protocol_reader import ProtocolSource, JsonProtocolConfig
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.types import RobotType
 
 from robot_server.protocols import protocol_analyzer
 from robot_server.protocols.protocol_models import ProtocolKind

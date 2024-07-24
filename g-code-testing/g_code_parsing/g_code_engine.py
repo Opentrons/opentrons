@@ -33,7 +33,7 @@ from g_code_parsing.g_code_program.g_code_program import (
 )
 from g_code_parsing.g_code_watcher import GCodeWatcher
 from g_code_parsing.utils import get_configuration_dir
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.types import RobotType
 
 Protocol = namedtuple("Protocol", ["text", "filename", "filelike"])
 

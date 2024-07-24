@@ -3,7 +3,7 @@ import pytest
 from datetime import datetime
 from typing import Optional, Union
 
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons_shared_data.pipette import pipette_definition
 
 from opentrons.types import DeckSlotName, MountType, Point
