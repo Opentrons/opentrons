@@ -25,6 +25,7 @@ on:
       - '!api/docs/**'
       - 'shared-data/**/*'
       - '!shared-data/js/**'
+      - '.github/workflows/analyses-snapshot-test.yaml'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -40,8 +41,8 @@ jobs:
       # If we're running because of workflow_dispatch, use the user input to decide
       # whether to open a PR on failure. Otherwise, there is no user input, so always
       # open a PR on failure.
-      OPEN_PR_ON_FAILURE: ${{ (github.event_name == 'workflow_dispatch' && github.events.inputs.OPEN_PR_ON_FAILURE) || (github.event_name != 'workflow_dispatch') }}
-
+      OPEN_PR_ON_FAILURE: ${{ (github.event_name == 'workflow_dispatch' && github.events.inputs.OPEN_PR_ON_FAILURE) || ((github.event_name != 'workflow_dispatch') && !(contains(github.event.pull_request.labels.*.name, 'no-analyses-snapshot-pr'))) }}
+      PR_TARGET_BRANCH: ${{ github.event.pull_request.base.ref || 'not a pr'}}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -68,6 +69,19 @@ jobs:
         working-directory: analyses-snapshot-testing
         run: make snapshot-test
 
+      - name: Are my analyses snapshots in sync with the target branch?
+        if: ${{ env.PR_TARGET_BRANCH != 'not a pr' }}
+        run: |
+          git fetch origin ${{ env.PR_TARGET_BRANCH }}
+          git diff --quiet HEAD ${{ env.PR_TARGET_BRANCH }} -- analyses-snapshot-testing/tests/__snapshots__/analyses_snapshot_test
+          DIFF_EXIT_CODE=$?
+          if [ $DIFF_EXIT_CODE -eq 0 ]; then
+            echo "Analyses snapshots match ${{ env.PR_TARGET_BRANCH }} snapshots."
+          else
+            echo "Analyses snapshots do NOT match ${{ env.PR_TARGET_BRANCH }} snapshots."
+            echo "Is this becasue you have not pulled and merged ${{ env.PR_TARGET_BRANCH }}?"
+            echo "Or is this because you have already updated your snapshots and are all good 😊?"
+          fi
       - name: Upload Report
         if: '!cancelled()'
         uses: actions/upload-artifact@v4
