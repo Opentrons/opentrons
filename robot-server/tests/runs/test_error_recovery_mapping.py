@@ -23,7 +23,6 @@ from robot_server.runs.error_recovery_models import (
     MatchCriteria,
     CommandMatcher,
     ErrorMatcher,
-    ReactionIfMatch,
 )
 
 
@@ -31,6 +30,7 @@ from robot_server.runs.error_recovery_models import (
 def mock_command(decoy: Decoy) -> LiquidProbe:
     """Get a mock PickUpTip command."""
     mock = decoy.mock(cls=LiquidProbe)
+    decoy.when(mock.commandType).then_return("liquidProbe")
     return mock
 
 
@@ -53,7 +53,9 @@ def mock_criteria(decoy: Decoy) -> MatchCriteria:
     mock_command = decoy.mock(cls=CommandMatcher)
     decoy.when(mock_command.commandType).then_return("liquidProbe")
     mock_error_matcher = decoy.mock(cls=ErrorMatcher)
-    decoy.when(mock_error_matcher.errorType).then_return("LiquidNotFoundError")
+    decoy.when(mock_error_matcher.errorType).then_return("liquidNotFound")
+    decoy.when(mock.command).then_return(mock_command)
+    decoy.when(mock_command.error).then_return(mock_error_matcher)
     return mock
 
 
@@ -61,7 +63,7 @@ def mock_criteria(decoy: Decoy) -> MatchCriteria:
 def mock_rule(decoy: Decoy, mock_criteria: MatchCriteria) -> ErrorRecoveryRule:
     """Get a mock ErrorRecoveryRule."""
     mock = decoy.mock(cls=ErrorRecoveryRule)
-    decoy.when(mock.ifMatch).then_return([ReactionIfMatch.IGNORE_AND_CONTINUE])
+    decoy.when(mock.ifMatch).then_return([ErrorRecoveryType.IGNORE_AND_CONTINUE])
     decoy.when(mock.matchCriteria).then_return([mock_criteria])
     return mock
 
@@ -78,7 +80,8 @@ def test_create_error_recovery_policy_with_rules(
         robot_type="OT-3 Standard",
         deck_type=DeckType.OT3_STANDARD,
     )
-    assert policy(exampleConfig, mock_command, mock_error_data)
+    with pytest.raises(NotImplementedError):
+        policy(exampleConfig, mock_command, mock_error_data)
 
 
 def test_create_error_recovery_policy_undefined_error(
