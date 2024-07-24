@@ -426,6 +426,42 @@ def test_blow_out_clears_volume(
                 well_name="move-to-well-well-name",
             ),
         ),
+        (
+            FailCommandAction(
+                running_command=cmd.Dispense(
+                    params=cmd.DispenseParams(
+                        pipetteId="pipette-id",
+                        labwareId="dispense-labware-id",
+                        wellName="dispense-well-name",
+                        volume=50,
+                        flowRate=1.23,
+                    ),
+                    id="command-id",
+                    key="command-key",
+                    createdAt=datetime.now(),
+                    status=cmd.CommandStatus.RUNNING,
+                ),
+                error=DefinedErrorData(
+                    public=OverpressureError(
+                        id="error-id",
+                        createdAt=datetime.now(),
+                    ),
+                    private=OverpressureErrorInternalData(
+                        position=DeckPoint(x=0, y=0, z=0)
+                    ),
+                ),
+                command_id="command-id",
+                error_id="error-id",
+                failed_at=datetime.now(),
+                notes=[],
+                type=ErrorRecoveryType.WAIT_FOR_RECOVERY,
+            ),
+            CurrentWell(
+                pipette_id="pipette-id",
+                labware_id="dispense-labware-id",
+                well_name="dispense-well-name",
+            ),
+        ),
     ),
 )
 def test_movement_commands_update_current_well(
@@ -901,6 +937,36 @@ def test_add_pipette_config(
                 destination=DeckPoint(x=11, y=22, z=33),
             ),
             private_result=None,
+        ),
+        FailCommandAction(
+            running_command=cmd.Dispense(
+                params=cmd.DispenseParams(
+                    pipetteId="pipette-id",
+                    labwareId="labware-id",
+                    wellName="well-name",
+                    volume=125,
+                    flowRate=1.23,
+                ),
+                id="command-id",
+                key="command-key",
+                createdAt=datetime.now(),
+                status=cmd.CommandStatus.RUNNING,
+            ),
+            error=DefinedErrorData(
+                public=OverpressureError(
+                    id="error-id",
+                    detail="error-detail",
+                    createdAt=datetime.now(),
+                ),
+                private=OverpressureErrorInternalData(
+                    position=DeckPoint(x=11, y=22, z=33)
+                ),
+            ),
+            command_id="command-id",
+            error_id="error-id",
+            failed_at=datetime.now(),
+            notes=[],
+            type=ErrorRecoveryType.WAIT_FOR_RECOVERY,
         ),
     ),
 )
