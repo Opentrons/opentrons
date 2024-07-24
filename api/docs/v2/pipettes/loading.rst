@@ -216,20 +216,24 @@ Another example is a Flex protocol that uses a waste chute. Say you want to only
 .. versionchanged:: 2.16
     Added support for ``TrashBin`` and ``WasteChute`` objects.
 
-.. _lpv:
+.. _lpd:
 
-Liquid Presence Verification
-============================
+Liquid Presence Detection
+=========================
 
-Liquid Presence Verification (LPV) is a pressure-based feature that allows Opentrons Flex pipettes to detect the presence of liquids in a well, reservoir, or other container. With LPV, you have the ability to identify, avoid, and recover from liquid-related protocol errors. Additionally, you can use it to check for the presence or absence of a fluid, all without interrupting a protocol run. LPV can be globally activated for the entire protocol run or toggled on and off as required. LPV works with Flex pipettes only and is disabled by default.
+Liquid Presence Detection is a pressure-based feature that allows Opentrons Flex pipettes to detect liquids in a well, reservoir, or other container. Liquid Presence Detection gives you the ability to identify, avoid, and recover from liquid-related protocol errors. Additionally, you can use it to check for the presence or absence of a fluid, all without interrupting a protocol run. You can enable liquid detection for an entire protocol run or toggle it on and off as required. Liquid Presence Detection works with Flex pipettes only and is disabled by default.
 
 .. note::
     If your protocol uses :ref:`partial tip pickup <partial-tip-pickup>`, the pressure sensors for the Flex 8-Channel pipette are on channels 1 and 8. For the Flex 96-Channel Pipette, the pressure sensors are on channels 1 and 96.
 
-Enable LPV Globally
--------------------
+.. versionadded:: 2.20
 
-The easiest, and recommended, way to use LPV is by adding the optional Boolean argument, ``liquid_presence_detection=True`` to :py:meth:`.ProtocolContext.load_instrument` in your protocol. When ``True``, the robot will perform LPV on every aspiration. You can also turn LPV off and back on again later in a protocol. This example adds LPV to the 8-Channel Pipette used in the sample protocol at the top of the page.
+.. Ed: Enabling instead of Enable?
+
+Enable Liquid Presence Detection
+--------------------------------
+
+The easiest, and recommended, way to use Liquid Presence Detection is by adding the optional Boolean argument, ``liquid_presence_detection=True`` to :py:meth:`.ProtocolContext.load_instrument` in your protocol. When ``True``, the robot will check for liquid on every aspiration. You can also turn this feature off and back on again later in a protocol. This example adds Liquid Presence Detection to the 8-Channel Pipette used in the sample protocol at the top of the page.
 
 .. code-block:: python
 
@@ -241,7 +245,7 @@ The easiest, and recommended, way to use LPV is by adding the optional Boolean a
     )
 
 .. note::
-    LPV requires fresh, dry pipette tips. Protocols using LPV must discard used tips after an aspirate/dispense cycle and pick up new tips before the next cycle. The API will raise an error if LPV is active and your protocol attempts to reuse a pipette tip.
+    Accurate liquid detection requires fresh, dry pipette tips. Protocols using this feature must discard used tips after an aspirate/dispense cycle and pick up new tips before the next cycle. The API will raise an error if liquid detection is active and your protocol attempts to reuse a pipette tip or if the robot thinks the tip is wet.
 
 Let's take a look at how all this works. First, tell the robot to pick up a new, clean tip::
     
@@ -252,29 +256,33 @@ Next, tell the robot to aspirate and dispense some liquid from the reservoir::
     pipette.aspirate(100, reservoir["A1"])
     pipette.dispense(100, plate["A1"])
 
-LPV takes place during aspiration. Flex continues to execute your protocol until it no longer detects liquid. When the robot doesn't detect liquid, it raises an error and stops the protocol until the problem is resolved.
+Liquid detection takes place immediately prior to aspiration. Flex continues to execute your protocol until it no longer detects liquid. When the robot doesn't detect liquid, it raises an error and stops the protocol until the problem is resolved.
 
-Turing LPV Off and On
----------------------
+.. versionadded:: 2.20
 
-You can turn LPV off and on throughout a protocol. To turn LPV off, add ``pipette.liquid_presence_detection=False`` at the point in a protocol where it needs to be disabled, usually between picking up a new tip and aspirating a liquid. This overrides the global argument, ``liquid_presence_detection=True`` that we set on :py:meth:`~.ProtocolContext.load_instrument`. Let's try this starting after picking up a new tip. 
+Turning Liquid Presence Detection Off and On
+---------------------------------------------
+
+You can turn Liquid Presence Detection off and on throughout a protocol. To turn it off, set ``pipette.liquid_presence_detection=False`` at the point in a protocol where it needs to be disabled, usually between picking up a new tip and aspirating a liquid. This overrides the global argument, ``liquid_presence_detection=True`` that we set on :py:meth:`~.ProtocolContext.load_instrument`. Let's try this starting after picking up a new tip. 
 
 .. code-block:: python
     
     pipette.pick_up_tip(tiprack2)
-    pipette.liquid_presence_detection=False  #LPV off
+    pipette.liquid_presence_detection=False  #Liquid Presence Detection off
     pipette.aspirate(100, reservoir["A2"])
 
-Going forward, the pipette will not perform LPV until you turn this feature back on. 
+Going forward, the pipette will not perform a liquid check until you turn this feature back on. 
 
-To reactivate LPV, add ``pipette.liquid_presence_detection=True`` at the point in a protocol where it needs to be enabled, usually between picking up a new tip and aspirating a liquid.
+To reactivate, add ``pipette.liquid_presence_detection=True`` at the point in a protocol where it needs to be enabled, usually between picking up a new tip and aspirating a liquid.
 
 .. code-block:: python
 
     pipette.pick_up_tip(tiprack2)
-    pipette.liquid_presence_detection=True  #LPV on again
+    pipette.liquid_presence_detection=True  #Liquid detection active again
     pipette.aspirate(100, reservoir["A3"])
 
-LPV will resume until it is disabled again, raises an error, or the protocol completes.
+The robot will continue to check for a liquid until this feature is disabled again, or an empty well is detected (and the robot raises an error), or the protocol completes.
+
+See also :ref:`detect-liquid-presence` and :ref:`require-liquid-presence`.
 
 .. versionadded:: 2.20

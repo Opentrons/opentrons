@@ -906,7 +906,7 @@ class ProtocolContext(CommandPublisher):
                              control <advanced-control>` applications. You cannot
                              replace an instrument in the middle of a protocol being run
                              from the Opentrons App or touchscreen.
-        :param bool liquid_presence_detection: If ``True``, enables liquid presence detection for Flex 1-, 8-, or 96-channel pipettes. See :ref:`lpv`.
+        :param bool liquid_presence_detection: If ``True``, enables liquid presence detection for Flex 1-, 8-, or 96-channel pipettes. See :ref:`lpd`.
 
                     .. versionadded:: 2.20
         """
