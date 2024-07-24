@@ -1,6 +1,6 @@
 import { css } from 'styled-components'
 
-import { SPACING, TYPOGRAPHY, RESPONSIVENESS } from '@opentrons/components'
+import { SPACING, RESPONSIVENESS } from '@opentrons/components'
 
 import type { StepOrder } from './types'
 

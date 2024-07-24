@@ -11,7 +11,6 @@ import {
   StyledText,
   RESPONSIVENESS,
 } from '@opentrons/components'
-import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { RadioButton } from '../../../atoms/buttons'
 import {

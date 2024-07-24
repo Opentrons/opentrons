@@ -20,7 +20,6 @@ import {
   StyledText,
   JUSTIFY_END,
   PrimaryButton,
-  ALIGN_FLEX_END,
   SecondaryButton,
 } from '@opentrons/components'
 

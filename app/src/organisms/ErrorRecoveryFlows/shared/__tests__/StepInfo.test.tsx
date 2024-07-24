@@ -25,7 +25,7 @@ describe('StepInfo', () => {
         ...mockRecoveryContentProps,
         protocolAnalysis: { commands: [mockFailedCommand] } as any,
       },
-      desktopStyle: 'h4',
+      desktopStyle: 'bodyDefaultRegular',
       stepCounts: {
         currentStepNumber: 5,
         totalStepCount: 10,
