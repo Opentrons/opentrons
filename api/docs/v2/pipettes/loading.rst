@@ -221,7 +221,7 @@ Another example is a Flex protocol that uses a waste chute. Say you want to only
 Liquid Presence Detection
 =========================
 
-Liquid Presence Detection is a pressure-based feature that allows Opentrons Flex pipettes to detect liquids in a well, reservoir, or other container. Liquid Presence Detection gives you the ability to identify, avoid, and recover from liquid-related protocol errors. Additionally, you can use it to check for the presence or absence of a fluid, all without interrupting a protocol run. You can enable liquid detection for an entire protocol run or toggle it on and off as required. Liquid Presence Detection works with Flex pipettes only and is disabled by default.
+Liquid Presence Detection is a pressure-based feature that allows Opentrons Flex pipettes to detect the presence or absence of liquids in a well, reservoir, or other container. Liquid Presence Detection gives you the ability to identify, avoid, and recover from liquid-related protocol errors. You can enable this feature for an entire protocol run or toggle it on and off as required. Liquid Presence Detection works with Flex pipettes only and is disabled by default.
 
 .. note::
     If your protocol uses :ref:`partial tip pickup <partial-tip-pickup>`, the pressure sensors for the Flex 8-Channel pipette are on channels 1 and 8. For the Flex 96-Channel Pipette, the pressure sensors are on channels 1 and 96.
@@ -256,7 +256,7 @@ Next, tell the robot to aspirate and dispense some liquid from the reservoir::
     pipette.aspirate(100, reservoir["A1"])
     pipette.dispense(100, plate["A1"])
 
-Liquid detection takes place immediately prior to aspiration. Flex continues to execute your protocol until it no longer detects liquid. When the robot doesn't detect liquid, it raises an error and stops the protocol until the problem is resolved.
+Liquid detection takes place immediately prior to aspiration. Upon detecting a liquid, the pipette stops, raises itself above the liquid's surface, and then aspirates according to your protocol. Checking for the presence or absence of a liquid adds time to your protocol run, so be aware of that before you use it. Flex continues to execute your protocol until it no longer detects liquid. When the robot doesn't detect liquid, it raises an error and stops the protocol until the problem is resolved.
 
 .. versionadded:: 2.20
 
@@ -273,12 +273,12 @@ You can turn Liquid Presence Detection off and on throughout a protocol. To turn
 
 Going forward, the pipette will not perform a liquid check until you turn this feature back on. 
 
-To reactivate, add ``pipette.liquid_presence_detection=True`` at the point in a protocol where it needs to be enabled, usually between picking up a new tip and aspirating a liquid.
+To reactivate, add ``pipette.liquid_presence_detection=True`` at the point later in a protocol where it needs to be enabled, usually between picking up a new tip and aspirating a liquid.
 
 .. code-block:: python
 
     pipette.pick_up_tip(tiprack2)
-    pipette.liquid_presence_detection=True  #Liquid detection active again
+    pipette.liquid_presence_detection=True  #Liquid Presence Detection on again
     pipette.aspirate(100, reservoir["A3"])
 
 The robot will continue to check for a liquid until this feature is disabled again, or an empty well is detected (and the robot raises an error), or the protocol completes.
