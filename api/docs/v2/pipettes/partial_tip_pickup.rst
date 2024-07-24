@@ -330,7 +330,7 @@ When switching between full and partial pickup, you may want to organize your ti
 
 .. Tip::
 
-    It's also good practice to keep separate lists of tip racks when using multiple partial tip pickup configurations ((using both column 1 and column 12 in the same protocol). This improves positional accuracy when picking up tips. Additionally, use Labware Position Check in the Opentrons App to ensure that the partial configuration is well-aligned to the rack.
+    It's also good practice to keep separate lists of tip racks when using multiple partial tip pickup configurations (i.e., using both column 1 and column 12 in the same protocol). This improves positional accuracy when picking up tips. Additionally, use Labware Position Check in the Opentrons App to ensure that the partial configuration is well-aligned to the rack.
 
 Now, when you configure the nozzle layout, you can reference the appropriate list as the value of ``tip_racks``::
 
