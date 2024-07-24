@@ -28,7 +28,6 @@ class ErrorRecoveryType(enum.Enum):
     WAIT_FOR_RECOVERY = enum.auto()
     """Stop and wait for the error to be recovered from manually."""
 
-
     IGNORE_AND_CONTINUE = enum.auto()
     """Continue with the run, as if the command never failed."""
 
