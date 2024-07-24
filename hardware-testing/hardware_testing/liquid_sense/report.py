@@ -218,7 +218,7 @@ def store_trial(
     sheet_id: Optional[str],
 ) -> None:
     """Report Trial."""
-    adjusted_height = height - tip_length_offset
+    adjusted_height = height + tip_length_offset
     report(
         "TRIALS",
         f"trial-{trial + 1}-{tip}ul",

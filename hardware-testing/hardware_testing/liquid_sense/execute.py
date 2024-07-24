@@ -210,7 +210,8 @@ def run(
     
     def read_dial() -> float:
         time.sleep(2)
-        return run_args.dial_indicator.read()
+        dial_value = run_args.dial_indicator.read()
+        return dial_value
     
     lpc_offset = 0.0
     if run_args.dial_indicator is not None:
