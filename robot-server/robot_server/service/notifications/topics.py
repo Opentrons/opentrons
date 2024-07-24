@@ -18,9 +18,9 @@ TopicName = NewType("TopicName", str)
 _TOPIC_BASE = TopicName("robot-server")
 
 
-def _is_valid_topic_name_segment(segment: str) -> bool:
-    """Return whether a string is valid as a segment in an MQTT topic name."""
-    return not re.match("[/#+]", segment)
+def _is_valid_topic_name_level(level: str) -> bool:
+    """Return whether a string is valid as a level (segment) in an MQTT topic name."""
+    return not re.match("[/#+]", level)
 
 
 MAINTENANCE_RUNS_CURRENT_RUN = TopicName(f"{_TOPIC_BASE}/maintenance_runs/current_run")
@@ -35,7 +35,7 @@ RUNS_PRE_SERIALIZED_COMMANDS = TopicName(f"{_TOPIC_BASE}/runs/pre_serialized_com
 def client_data(key: str) -> TopicName:
     """Return the dynamic MQTT topic name for the given clientData key."""
     base = f"{_TOPIC_BASE}/clientData"
-    if _is_valid_topic_name_segment(key):
+    if _is_valid_topic_name_level(key):
         return TopicName(f"{base}/{key}")
     else:
         raise ValueError(
