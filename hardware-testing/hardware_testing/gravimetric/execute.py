@@ -1,4 +1,5 @@
 """Gravimetric."""
+import threading
 from time import sleep
 from typing import Optional, Tuple, List, Dict
 
@@ -53,6 +54,11 @@ from .tips import MULTI_CHANNEL_TEST_ORDER
 import glob
 
 from opentrons.hardware_control.types import StatusBarState
+from hardware_testing.drivers.wtvb01_bt50 import WVTB01_BT50
+from hardware_testing.drivers.sz_air_sensor import AirSensor2
+import csv
+import time
+import threading
 
 _MEASUREMENTS: List[Tuple[str, MeasurementData]] = list()
 
@@ -65,6 +71,8 @@ CAM_CMD_OT3 = (
     "--stream-mmap --stream-to={0} --stream-count=1"
 )
 
+WRITE_MEASURE_DATA = True
+
 
 def _minimum_z_height(cfg: config.GravimetricConfig) -> int:
     if cfg.pipette_channels == 96:
@@ -74,14 +82,14 @@ def _minimum_z_height(cfg: config.GravimetricConfig) -> int:
 
 
 def _generate_callbacks_for_trial(
-    ctx: ProtocolContext,
-    pipette: InstrumentContext,
-    test_report: CSVReport,
-    recorder: GravimetricRecorder,
-    volume: Optional[float],
-    channel: int,
-    trial: int,
-    blank_measurement: bool,
+        ctx: ProtocolContext,
+        pipette: InstrumentContext,
+        test_report: CSVReport,
+        recorder: GravimetricRecorder,
+        volume: Optional[float],
+        channel: int,
+        trial: int,
+        blank_measurement: bool,
 ) -> PipettingCallbacks:
     # it is useful to tag the scale data by what is physically happening,
     # so we can graph the data and color-code the lines based on these tags.
@@ -171,8 +179,8 @@ def _load_labware(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> Labwar
     # If running multiple tests in one run, the labware may already be loaded
     loaded_labwares = ctx.loaded_labwares
     if (
-        cfg.slot_scale in loaded_labwares.keys()
-        and loaded_labwares[cfg.slot_scale].name == cfg.labware_on_scale
+            cfg.slot_scale in loaded_labwares.keys()
+            and loaded_labwares[cfg.slot_scale].name == cfg.labware_on_scale
     ):
         return loaded_labwares[cfg.slot_scale]
 
@@ -193,7 +201,7 @@ def _print_stats(mode: str, average: float, cv: float, d: float) -> None:
 
 
 def _print_final_results(
-    volumes: List[float], channel_count: int, test_report: CSVReport
+        volumes: List[float], channel_count: int, test_report: CSVReport
 ) -> None:
     for vol in volumes:
         ui.print_info(f"  * {vol}ul channel all:")
@@ -216,10 +224,10 @@ def _print_final_results(
 
 
 def _next_tip_for_channel(
-    cfg: config.GravimetricConfig,
-    resources: TestResources,
-    channel: int,
-    max_tips: int,
+        cfg: config.GravimetricConfig,
+        resources: TestResources,
+        channel: int,
+        max_tips: int,
 ) -> Well:
     _tips_used = sum([tc for tc in _tip_counter.values()])
     if _tips_used >= max_tips:
@@ -259,7 +267,7 @@ def _take_photos(trial: GravimetricTrial, stage_str: str) -> None:
 
 
 def _run_trial(
-    trial: GravimetricTrial,
+        trial: GravimetricTrial,
 ) -> Tuple[float, MeasurementData, float, MeasurementData]:
     global _PREV_TRIAL_GRAMS
     pipetting_callbacks = _generate_callbacks_for_trial(
@@ -405,20 +413,20 @@ def _get_channel_divider(cfg: config.GravimetricConfig) -> float:
 
 
 def build_gm_report(
-    test_volumes: List[float],
-    run_id: str,
-    pipette_tag: str,
-    operator_name: str,
-    git_description: str,
-    robot_serial: str,
-    tip_batchs: Dict[str, str],
-    recorder: GravimetricRecorder,
-    pipette_channels: int,
-    increment: bool,
-    name: str,
-    environment_sensor: asair_sensor.AsairSensorBase,
-    trials: int,
-    fw_version: str,
+        test_volumes: List[float],
+        run_id: str,
+        pipette_tag: str,
+        operator_name: str,
+        git_description: str,
+        robot_serial: str,
+        tip_batchs: Dict[str, str],
+        recorder: GravimetricRecorder,
+        pipette_channels: int,
+        increment: bool,
+        name: str,
+        environment_sensor: asair_sensor.AsairSensorBase,
+        trials: int,
+        fw_version: str,
 ) -> report.CSVReport:
     """Build a CSVReport formated for gravimetric tests."""
     ui.print_header("CREATE TEST-REPORT")
@@ -442,12 +450,12 @@ def build_gm_report(
 
 
 def _load_scale(
-    name: str,
-    scale: Scale,
-    run_id: str,
-    pipette_tag: str,
-    start_time: float,
-    simulating: bool,
+        name: str,
+        scale: Scale,
+        run_id: str,
+        pipette_tag: str,
+        start_time: float,
+        simulating: bool,
 ) -> GravimetricRecorder:
     ui.print_header("LOAD SCALE")
     ui.print_info(
@@ -478,12 +486,12 @@ def _load_scale(
 
 
 def _calculate_evaporation(
-    cfg: config.GravimetricConfig,
-    resources: TestResources,
-    recorder: GravimetricRecorder,
-    liquid_tracker: LiquidTracker,
-    test_report: report.CSVReport,
-    labware_on_scale: Labware,
+        cfg: config.GravimetricConfig,
+        resources: TestResources,
+        recorder: GravimetricRecorder,
+        liquid_tracker: LiquidTracker,
+        test_report: report.CSVReport,
+        labware_on_scale: Labware,
 ) -> Tuple[float, float]:
     ui.print_title("MEASURE EVAPORATION")
     blank_trials = build_gravimetric_trials(
@@ -538,7 +546,7 @@ def _calculate_evaporation(
 
 
 def _get_liquid_height(
-    resources: TestResources, cfg: config.GravimetricConfig, well: Well
+        resources: TestResources, cfg: config.GravimetricConfig, well: Well
 ) -> float:
     resources.pipette.move_to(well.top(0), minimum_z_height=_minimum_z_height(cfg))
     if cfg.pipette_channels == 96:
@@ -560,10 +568,61 @@ def _get_liquid_height(
     return _liquid_height
 
 
+def _write_to_csv(filename, row: list):
+    with open(filename, 'a', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(row)
+
+
+def get_pose_sensor(pose_sensor: WVTB01_BT50) -> list:
+    """
+    get pose data
+    """
+    result_list = []
+    data = pose_sensor.read_data()
+
+    vibration_velocity = pose_sensor.get_vibration_velocity(data)  # "====震动速度===="
+    vibration_angular = pose_sensor.get_vibration_angular(data)  # "====震动角度====="
+    temperature = pose_sensor.get_temperature(data)  # "====温度===="
+    vibration_distance = pose_sensor.get_vibration_distance(data)  # "====震动距离====="
+    viration_hz = pose_sensor.get_viration_hz(data)  # "====震动频率=====")
+    result_list.append(temperature)
+    result_list.extend(list(vibration_velocity.values()))
+    result_list.extend(list(vibration_angular.values()))
+    result_list.extend(list(vibration_distance.values()))
+    result_list.extend(list(viration_hz.values()))
+    return result_list
+
+
+def get_airsensor_data(sensor: AirSensor2) -> list:
+    """
+    get air sensor data
+    """
+    sensor = AirSensor2(49846)
+    sensor.connect()
+    res = sensor.get_air_params()
+    if res[0]:
+        return res[1]
+    else:
+        return [None]
+
+
+def th_method():
+    global WRITE_MEASURE_DATA
+    pose_sensor = WVTB01_BT50()
+    pose_sensor.build_device_by_serial()
+    time_str = time.strftime("%Y-%m-%d-%H-%M-%S")
+
+    while WRITE_MEASURE_DATA:
+        pose_list = get_pose_sensor(pose_sensor)
+        _write_to_csv(f'/data/testing_data/sensor_measurement_{time_str}', pose_list)
+
+
 def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noqa: C901
     """Run."""
     global _PREV_TRIAL_GRAMS
     global _MEASUREMENTS
+    global WRITE_MEASURE_DATA
     ui.print_header("LOAD LABWARE")
     labware_on_scale = _load_labware(resources.ctx, cfg)
     liquid_tracker = LiquidTracker(resources.ctx)
@@ -658,6 +717,9 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
             False,
             resources.env_sensor,
         )
+        # threading start
+        th = threading.Thread(target=th_method)
+        th.start()
         for volume in trials.keys():
             actual_asp_list_all = []
             actual_disp_list_all = []
@@ -811,17 +873,17 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
                 print(f"dispense cv {dispense_cv} aspirate_cv {aspirate_cv}")
                 print(f"dispense d {dispense_cv} aspirate_d {aspirate_d}")
                 if (
-                    not cfg.ignore_fail
-                    and acceptable_cv is not None
-                    and acceptable_d is not None
+                        not cfg.ignore_fail
+                        and acceptable_cv is not None
+                        and acceptable_d is not None
                 ):
                     acceptable_cv = abs(acceptable_cv / 100)
                     acceptable_d = abs(acceptable_d / 100)
                     if (
-                        dispense_cv > acceptable_cv
-                        or aspirate_cv > acceptable_cv
-                        or aspirate_d > acceptable_d
-                        or dispense_d > acceptable_d
+                            dispense_cv > acceptable_cv
+                            or aspirate_cv > acceptable_cv
+                            or aspirate_d > acceptable_d
+                            or dispense_d > acceptable_d
                     ):
                         raise RuntimeError(
                             f"Trial with volume {volume} on channel {channel} did not pass spec"
@@ -887,6 +949,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
                 d=dispense_d,
                 flag="isolated" if cfg.isolate_volumes else "",
             )
+        WRITE_MEASURE_DATA = False
     finally:
         _return_tip = False if calibration_tip_in_use else cfg.return_tip
         _finish_test(cfg, resources, _return_tip)
