@@ -49,7 +49,7 @@ jobs:
         with:
           ref: ${{ env.SNAPSHOT_REF }}
 
-      - name: Are my analyses snapshots in sync with the target branch?
+      - name: Are the analyses snapshots in my PR branch in sync with the target branch?
         if: ${{ env.PR_TARGET_BRANCH != 'not a pr' }}
         run: |
           git fetch origin ${{ env.PR_TARGET_BRANCH }}
