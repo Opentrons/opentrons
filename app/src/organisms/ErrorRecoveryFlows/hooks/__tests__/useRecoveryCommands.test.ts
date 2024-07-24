@@ -217,7 +217,7 @@ describe('useRecoveryCommands', () => {
 
     expect(mockChainRunCommands).toHaveBeenCalledWith(
       [buildPickUpTipsCmd],
-      true
+      false
     )
   })
 
