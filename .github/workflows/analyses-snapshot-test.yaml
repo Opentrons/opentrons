@@ -53,7 +53,7 @@ jobs:
         if: ${{ env.PR_TARGET_BRANCH != 'not a pr' }}
         run: |
           git fetch origin ${{ env.PR_TARGET_BRANCH }}
-          git diff --quiet ${{ env.PR_TARGET_BRANCH }} -- analyses-snapshot-testing/tests/__snapshots__/analyses_snapshot_test
+          git diff --quiet HEAD origin/${{ env.PR_TARGET_BRANCH }} -- analyses-snapshot-testing/tests/__snapshots__/analyses_snapshot_test
           DIFF_EXIT_CODE=$?
           if [ $DIFF_EXIT_CODE -eq 0 ]; then
             echo "Analyses snapshots match ${{ env.PR_TARGET_BRANCH }} snapshots."
