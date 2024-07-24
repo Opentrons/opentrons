@@ -128,7 +128,7 @@ describe('useRecoveryCommands', () => {
   ;([
     'aspirateInPlace',
     'dispenseInPlace',
-    'blowoutInPlace',
+    'blowOutInPlace',
     'dropTipInPlace',
     'prepareToAspirate',
   ] as const).forEach(inPlaceCommandType => {
@@ -144,6 +144,8 @@ describe('useRecoveryCommands', () => {
             },
             error: {
               errorType: 'overpressure',
+              errorCode: '3006',
+              isDefined: true,
               errorInfo: {
                 retryLocation: [1, 2, 3],
               },
@@ -157,19 +159,23 @@ describe('useRecoveryCommands', () => {
       await act(async () => {
         await result.current.retryFailedCommand()
       })
-      expect(mockChainRunCommands).toHaveBeenCalledWith([
-        {
-          commandType: 'moveToCoordinates',
-          params: {
-            pipetteId: 'mock-pipette-id',
-            coordinates: { x: 1, y: 2, z: 3 },
+      expect(mockChainRunCommands).toHaveBeenLastCalledWith(
+        [
+          {
+            commandType: 'moveToCoordinates',
+            intent: 'fixit',
+            params: {
+              pipetteId: 'mock-pipette-id',
+              coordinates: { x: 1, y: 2, z: 3 },
+            },
           },
-        },
-        {
-          commandType: inPlaceCommandType,
-          params: { pipetteId: 'mock-pipette-id' },
-        },
-      ])
+          {
+            commandType: inPlaceCommandType,
+            params: { pipetteId: 'mock-pipette-id' },
+          },
+        ],
+        false
+      )
     })
   })
 
