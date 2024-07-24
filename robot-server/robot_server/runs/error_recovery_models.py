@@ -1,6 +1,21 @@
 """Request and response models for dealing with error recovery policies."""
+from enum import Enum
 from pydantic import BaseModel, Field
-from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
+
+
+class ReactionIfMatch(Enum):
+    """The type of the error recovery setting.
+
+    * `"ignoreAndContinue"`: Ignore this error and future errors of the same type.
+    * `"failRun"`: Errors of this type should fail the run.
+    * `"waitForRecovery"`: Instances of this error should initiate a recover operation.
+
+    """
+
+    IGNORE_AND_CONTINUE = "ignoreAndContinue"
+    FAIL_RUN = "failRun"
+    WAIT_FOR_RECOVERY = "waitForRecovery"
+
 
 # There's a lot of nested classes here. This is the JSON schema this code models.
 # "ErrorRecoveryRule": {
@@ -48,7 +63,7 @@ class ErrorRecoveryRule(BaseModel):
         default_factory=list,
         description="The criteria that must be met for this rule to be applied.",
     )
-    ifMatch: list[ErrorRecoveryType] = Field(
+    ifMatch: list[ReactionIfMatch] = Field(
         default_factory=list,
         description="The specific recovery setting that will be in use if the type parameters match.",
     )

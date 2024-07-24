@@ -2,6 +2,11 @@
 import pytest
 from decoy import Decoy
 
+
+from opentrons.protocol_engine.commands.pipetting_common import (
+    LiquidNotFoundError,
+    LiquidNotFoundErrorInternalData,
+)
 from opentrons.protocol_engine.commands.command import (
     DefinedErrorData,
 )
@@ -13,12 +18,12 @@ from opentrons.protocol_engine.types import DeckType
 from robot_server.runs.error_recovery_mapping import (
     create_error_recovery_policy_from_rules,
 )
-
 from robot_server.runs.error_recovery_models import (
     ErrorRecoveryRule,
     MatchCriteria,
     CommandMatcher,
     ErrorMatcher,
+    ReactionIfMatch,
 )
 
 
@@ -33,7 +38,12 @@ def mock_command(decoy: Decoy) -> LiquidProbe:
 @pytest.fixture
 def mock_error_data(decoy: Decoy) -> CommandDefinedErrorData:
     """Get a mock TipPhysicallyMissingError."""
-    mock = decoy.mock(cls=DefinedErrorData)
+    mock = decoy.mock(
+        cls=DefinedErrorData[LiquidNotFoundError, LiquidNotFoundErrorInternalData]
+    )
+    mock_lnfe = decoy.mock(cls=LiquidNotFoundError)
+    decoy.when(mock.public).then_return(mock_lnfe)
+    decoy.when(mock_lnfe.errorType).then_return("liquidNotFound")
     return mock
 
 
@@ -54,7 +64,7 @@ def mock_criteria(decoy: Decoy) -> MatchCriteria:
 def mock_rule(decoy: Decoy, mock_criteria: MatchCriteria) -> ErrorRecoveryRule:
     """Get a mock ErrorRecoveryRule."""
     mock = decoy.mock(cls=ErrorRecoveryRule)
-    decoy.when(mock.ifMatch).then_return([ErrorRecoveryType.IGNORE_AND_CONTINUE])
+    decoy.when(mock.ifMatch).then_return([ReactionIfMatch.IGNORE_AND_CONTINUE])
     decoy.when(mock.matchCriteria).then_return([mock_criteria])
     return mock
 
