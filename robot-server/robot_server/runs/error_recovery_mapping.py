@@ -14,7 +14,7 @@ from opentrons.protocol_engine.error_recovery_policy import (
 
 
 def create_error_recovery_policy_from_rules(
-    rules: list[ErrorRecoveryRule],
+    rules: Optional[list[ErrorRecoveryRule]],
 ) -> ErrorRecoveryPolicy:
     """Given a list of error recovery rules return an error recovery policy."""
 
@@ -23,23 +23,25 @@ def create_error_recovery_policy_from_rules(
         failed_command: Command,
         defined_error_data: Optional[CommandDefinedErrorData],
     ) -> ErrorRecoveryType:
+        if rules is None:
+            return standard_run_policy(config, failed_command, defined_error_data)
         for rule in rules:
-            for i, criteria in enumerate(rule.matchCriteria):
-                command_type_matches = (
-                    failed_command.commandType == criteria.command.commandType
-                )
-                error_type_matches = (
-                    defined_error_data is not None
-                    and defined_error_data.public.errorType
-                    == criteria.command.error.errorType
-                )
-                if command_type_matches and error_type_matches:
-                    if rule.ifMatch[i] == ReactionIfMatch.IGNORE_AND_CONTINUE:
-                        raise NotImplementedError  # No protocol engine support for this yet. It's in EXEC-302.
-                    elif rule.ifMatch[i] == ReactionIfMatch.FAIL_RUN:
-                        return ErrorRecoveryType.FAIL_RUN
-                    elif rule.ifMatch[i] == ReactionIfMatch.WAIT_FOR_RECOVERY:
-                        return ErrorRecoveryType.WAIT_FOR_RECOVERY
+            command_type_matches = (
+                failed_command.commandType == rule.matchCriteria.command.commandType
+            )
+            error_type_matches = (
+                defined_error_data is not None
+                and defined_error_data.public.errorType
+                == rule.matchCriteria.command.error.errorType
+            )
+
+            if command_type_matches and error_type_matches:
+                if rule.ifMatch == ReactionIfMatch.IGNORE_AND_CONTINUE:
+                    raise NotImplementedError  # No protocol engine support for this yet. It's in EXEC-302.
+                elif rule.ifMatch == ReactionIfMatch.FAIL_RUN:
+                    return ErrorRecoveryType.FAIL_RUN
+                elif rule.ifMatch == ReactionIfMatch.WAIT_FOR_RECOVERY:
+                    return ErrorRecoveryType.WAIT_FOR_RECOVERY
 
         return standard_run_policy(config, failed_command, defined_error_data)
 
