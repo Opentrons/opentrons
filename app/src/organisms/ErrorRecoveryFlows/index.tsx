@@ -106,7 +106,6 @@ export interface ErrorRecoveryFlowsProps {
   runId: string
   runStatus: RunStatus | null
   failedCommand: FailedCommand | null
-  isFlex: boolean
   protocolAnalysis: CompletedProtocolAnalysis | null
 }
 

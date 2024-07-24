@@ -129,7 +129,6 @@ describe('ErrorRecovery', () => {
       runStatus: RUN_STATUS_AWAITING_RECOVERY,
       failedCommand: mockFailedCommand,
       runId: 'MOCK_RUN_ID',
-      isFlex: true,
       protocolAnalysis: {} as any,
     }
     vi.mocked(ErrorRecoveryWizard).mockReturnValue(<div>MOCK WIZARD</div>)
