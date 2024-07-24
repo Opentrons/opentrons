@@ -224,12 +224,12 @@ def run(
         nonlocal liquid_height, liquid_height_from_deck, tip_offset
         run_args.pipette.pick_up_tip(tips[0])
         del tips[: run_args.pipette_channels]
+        tip_offset = _get_tip_offset()
         liquid_height = _jog_to_find_liquid_height(
             run_args.ctx, run_args.pipette, test_well
         )
         liquid_height_from_deck = test_well.bottom(liquid_height).point.z
         run_args.pipette._retract()
-        tip_offset = _get_tip_offset()
 
     _get_target_height()
 
@@ -269,14 +269,6 @@ def run(
             ui.print_info(f"Picking up {tip}ul tip")
             run_args.pipette.pick_up_tip(tips[0])
             del tips[: run_args.pipette_channels]
-
-            run_args.pipette.move_to(test_well.top(z=2))
-            if run_args.wet:
-                run_args.pipette.move_to(test_well.bottom(1))
-                run_args.pipette.move_to(test_well.top(z=2))
-            start_pos = hw_api.current_position_ot3(OT3Mount.LEFT)
-            height, result = _run_trial(run_args, tip, test_well, trial, start_pos)
-            end_pos = hw_api.current_position_ot3(OT3Mount.LEFT)
             tip_length_offset = 0.0
             if run_args.dial_indicator is not None:
                 run_args.pipette._retract()
@@ -284,7 +276,13 @@ def run(
                 tip_length_offset = tip_offset - run_args.dial_indicator.read_stable()
                 run_args.pipette._retract()
                 ui.print_info(f"Tip Offset  {tip_length_offset}")
-
+            run_args.pipette.move_to(test_well.top(z=2))
+            if run_args.wet:
+                run_args.pipette.move_to(test_well.bottom(1))
+                run_args.pipette.move_to(test_well.top(z=2))
+            start_pos = hw_api.current_position_ot3(OT3Mount.LEFT)
+            height, result = _run_trial(run_args, tip, test_well, trial, start_pos)
+            end_pos = hw_api.current_position_ot3(OT3Mount.LEFT)
             ui.print_info("Dropping tip")
             if run_args.return_tip:
                 run_args.pipette.return_tip()
