@@ -6,6 +6,14 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
+## Opentrons Robot Software Changes in 7.5.0
+
+Welcome to the v7.5.0 release of the Opentrons robot software!
+
+This release adds support for the latest Flex Gripper hardware.
+
+---
+
 ## Opentrons Robot Software Changes in 7.4.0
 
 Welcome to the v7.4.0 release of the Opentrons robot software!
