@@ -84,7 +84,6 @@ export function useRecoveryCommands({
   }, [chainRunRecoveryCommands])
 
   // Pick up the user-selected tips
-  // TODO(jh, 06-14-24): Do not ignore pickUpTip errors once Pipettes can support tip pick up.
   const pickUpTips = React.useCallback((): Promise<CommandData[]> => {
     const { selectedTipLocations, failedLabware } = failedLabwareUtils
 
@@ -97,7 +96,7 @@ export function useRecoveryCommands({
     if (pickUpTipCmd == null) {
       return Promise.reject(new Error('Invalid use of pickUpTips command'))
     } else {
-      return chainRunRecoveryCommands([pickUpTipCmd], true)
+      return chainRunRecoveryCommands([pickUpTipCmd])
     }
   }, [chainRunRecoveryCommands, failedCommand, failedLabwareUtils])
 
