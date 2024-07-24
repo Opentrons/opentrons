@@ -60,6 +60,8 @@ describe('useRecoveryCommands', () => {
         failedLabwareUtils: mockFailedLabwareUtils,
         routeUpdateActions: mockRouteUpdateActions,
         recoveryToastUtils: {} as any,
+        analytics: { reportRecoveredRunResult: vi.fn() } as any,
+        selectedRecoveryOption: RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE,
       })
     )
 
@@ -86,6 +88,8 @@ describe('useRecoveryCommands', () => {
         failedLabwareUtils: mockFailedLabwareUtils,
         routeUpdateActions: mockRouteUpdateActions,
         recoveryToastUtils: {} as any,
+        analytics: { reportActionSelectedResult: vi.fn() } as any,
+        selectedRecoveryOption: RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE,
       })
     )
 
@@ -113,6 +117,8 @@ describe('useRecoveryCommands', () => {
         failedLabwareUtils: mockFailedLabwareUtils,
         routeUpdateActions: mockRouteUpdateActions,
         recoveryToastUtils: {} as any,
+        analytics: { reportRecoveredRunResult: vi.fn() } as any,
+        selectedRecoveryOption: RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE,
       })
     )
 
@@ -134,7 +140,9 @@ describe('useRecoveryCommands', () => {
         failedLabwareUtils: mockFailedLabwareUtils,
         routeUpdateActions: mockRouteUpdateActions,
         recoveryToastUtils: { makeSuccessToast: mockMakeSuccessToast } as any,
-      })
+        analytics: { reportActionSelectedResult: vi.fn() } as any,
+        selectedRecoveryOption: RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE,
+      } as any)
     )
 
     await act(async () => {
@@ -153,6 +161,8 @@ describe('useRecoveryCommands', () => {
         failedLabwareUtils: mockFailedLabwareUtils,
         routeUpdateActions: mockRouteUpdateActions,
         recoveryToastUtils: {} as any,
+        analytics: { reportActionSelectedResult: vi.fn() } as any,
+        selectedRecoveryOption: RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE,
       })
     )
 
@@ -169,6 +179,8 @@ describe('useRecoveryCommands', () => {
         failedLabwareUtils: mockFailedLabwareUtils,
         routeUpdateActions: mockRouteUpdateActions,
         recoveryToastUtils: {} as any,
+        analytics: { reportActionSelectedResult: vi.fn() } as any,
+        selectedRecoveryOption: RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE,
       })
     )
 
@@ -208,6 +220,8 @@ describe('useRecoveryCommands', () => {
         },
         routeUpdateActions: mockRouteUpdateActions,
         recoveryToastUtils: {} as any,
+        analytics: { reportActionSelectedResult: vi.fn() } as any,
+        selectedRecoveryOption: RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE,
       })
     )
 
@@ -229,6 +243,8 @@ describe('useRecoveryCommands', () => {
         failedLabwareUtils: mockFailedLabwareUtils,
         routeUpdateActions: mockRouteUpdateActions,
         recoveryToastUtils: { makeSuccessToast: mockMakeSuccessToast } as any,
+        analytics: { reportActionSelectedResult: vi.fn() } as any,
+        selectedRecoveryOption: RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE,
       })
     )
 
@@ -248,6 +264,8 @@ describe('useRecoveryCommands', () => {
         failedLabwareUtils: mockFailedLabwareUtils,
         routeUpdateActions: mockRouteUpdateActions,
         recoveryToastUtils: {} as any,
+        analytics: { reportActionSelectedResult: vi.fn() } as any,
+        selectedRecoveryOption: RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE,
       })
     )
 

@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 import { RUN_STATUS_FAILED, RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
 
 import {
