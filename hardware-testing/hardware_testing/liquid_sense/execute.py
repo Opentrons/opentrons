@@ -192,6 +192,7 @@ def run(
     dial_well: Well = dial_indicator["A1"]
     liquid_height: float = 0.0
     liquid_height_from_deck: float = 0.0
+    tip_offset: float = 0.0
     hw_api = get_sync_hw_api(run_args.ctx)
     test_well: Well = test_labware[run_args.test_well]
     _load_tipracks(run_args.ctx, run_args.pipette_channels, run_args.protocol_cfg, tip)
@@ -220,7 +221,7 @@ def run(
         return tip_offset
 
     def _get_target_height() -> None:
-        nonlocal liquid_height, liquid_height_from_deck
+        nonlocal liquid_height, liquid_height_from_deck, tip_offset
         run_args.pipette.pick_up_tip(tips[0])
         del tips[: run_args.pipette_channels]
         liquid_height = _jog_to_find_liquid_height(
@@ -228,9 +229,9 @@ def run(
         )
         liquid_height_from_deck = test_well.bottom(liquid_height).point.z
         run_args.pipette._retract()
+        tip_offset = _get_tip_offset()
 
     _get_target_height()
-    tip_offset = _get_tip_offset()
 
     if run_args.return_tip:
         run_args.pipette.return_tip()
