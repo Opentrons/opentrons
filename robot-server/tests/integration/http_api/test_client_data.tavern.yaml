@@ -84,6 +84,8 @@ marks:
       vals:
         - ['foo/bar', 404]
         - ['foo*', 422]
+        - ['+', 422] # "+" is a wildcard in MQTT, but HTTP-brained code might decode it as a space.
+        - ['foo+bar', 422]
 
 stages:
   - name: Check that PUT rejects bad keys
