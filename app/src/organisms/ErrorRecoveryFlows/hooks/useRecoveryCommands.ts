@@ -94,6 +94,7 @@ export function useRecoveryCommands({
             'number'
           ? {
               commandType: 'moveToCoordinates',
+              intent: 'fixit',
               params: {
                 pipetteId: failedCommand.params?.pipetteId,
                 coordinates: {
