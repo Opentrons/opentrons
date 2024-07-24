@@ -1,14 +1,13 @@
 import * as React from 'react'
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { Route, MemoryRouter } from 'react-router-dom'
+import { Route, MemoryRouter, Routes } from 'react-router-dom'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { RobotSettingsCalibration } from '../../../../organisms/RobotSettingsCalibration'
 import { RobotSettingsNetworking } from '../../../../organisms/Devices/RobotSettings/RobotSettingsNetworking'
 import { RobotSettingsAdvanced } from '../../../../organisms/Devices/RobotSettings/RobotSettingsAdvanced'
-import { RobotSettingsPrivacy } from '../../../../organisms/Devices/RobotSettings/RobotSettingsPrivacy'
 import { useRobot } from '../../../../organisms/Devices/hooks'
 import { RobotSettings } from '..'
 import { when } from 'vitest-when'
@@ -22,7 +21,6 @@ import { getRobotUpdateSession } from '../../../../redux/robot-update'
 vi.mock('../../../../organisms/RobotSettingsCalibration')
 vi.mock('../../../../organisms/Devices/RobotSettings/RobotSettingsNetworking')
 vi.mock('../../../../organisms/Devices/RobotSettings/RobotSettingsAdvanced')
-vi.mock('../../../../organisms/Devices/RobotSettings/RobotSettingsPrivacy')
 vi.mock('../../../../organisms/Devices/hooks')
 vi.mock('../../../../redux/discovery/selectors')
 vi.mock('../../../../redux/robot-update')
@@ -30,12 +28,16 @@ vi.mock('../../../../redux/robot-update')
 const render = (path = '/') => {
   return renderWithProviders(
     <MemoryRouter initialEntries={[path]} initialIndex={0}>
-      <Route path="/devices/:robotName/robot-settings/:robotSettingsTab">
-        <RobotSettings />
-      </Route>
-      <Route path="/devices/:robotName">
-        <div>mock device details</div>
-      </Route>
+      <Routes>
+        <Route
+          path="/devices/:robotName/robot-settings/:robotSettingsTab"
+          element={<RobotSettings />}
+        />
+        <Route
+          path="/devices/:robotName"
+          element={<div>mock device details</div>}
+        />
+      </Routes>
     </MemoryRouter>,
     {
       i18nInstance: i18n,
@@ -56,9 +58,6 @@ describe('RobotSettings', () => {
     )
     vi.mocked(RobotSettingsAdvanced).mockReturnValue(
       <div>Mock RobotSettingsAdvanced</div>
-    )
-    vi.mocked(RobotSettingsPrivacy).mockReturnValue(
-      <div>Mock RobotSettingsPrivacy</div>
     )
   })
   afterEach(() => {
@@ -155,14 +154,5 @@ describe('RobotSettings', () => {
     expect(screen.queryByText('Mock RobotSettingsAdvanced')).toBeFalsy()
     fireEvent.click(AdvancedTab)
     screen.getByText('Mock RobotSettingsAdvanced')
-  })
-
-  it('renders privacy content when the privacy tab is clicked', () => {
-    render('/devices/otie/robot-settings/calibration')
-
-    const PrivacyTab = screen.getByText('Privacy')
-    expect(screen.queryByText('Mock RobotSettingsPrivacy')).toBeFalsy()
-    fireEvent.click(PrivacyTab)
-    screen.getByText('Mock RobotSettingsPrivacy')
   })
 })

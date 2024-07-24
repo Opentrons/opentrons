@@ -6,6 +6,17 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
+## Opentrons Robot Software Changes in 7.4.0
+
+Welcome to the v7.4.0 release of the Opentrons robot software!
+
+This release adds support for the [Opentrons Flex HEPA/UV Module](https://opentrons.com/products/opentrons-flex-hepa-uv-module).
+
+### Bug Fixes
+
+- Fixed certain string runtime parameter values being misinterpreted as an incorrect type.
+---
+
 ## Opentrons Robot Software Changes in 7.3.1
 
 Welcome to the v7.3.1 release of the Opentrons robot software!

@@ -8,8 +8,8 @@ import uniq from 'lodash/uniq'
 import { getAllDefinitions } from './definitions'
 import { getPublicPath } from './public-path'
 
-import type { Location } from 'history'
 import type { FilterParams, LabwareDefinition, LabwareList } from './types'
+import type { Location } from 'react-router-dom'
 
 export const FILTER_OFF = 'all'
 
@@ -30,7 +30,7 @@ export function getAllManufacturers(): string[] {
   return uniq([FILTER_OFF, ...brands, ...wellGroupBrands])
 }
 
-export function useFilters(location: Location): FilterParams {
+export function useFilters(location: Location<any>): FilterParams {
   const [params, setParams] = useState({
     category: FILTER_OFF,
     manufacturer: FILTER_OFF,

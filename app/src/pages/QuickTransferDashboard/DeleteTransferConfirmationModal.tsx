@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useQueryClient } from 'react-query'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
@@ -35,7 +35,7 @@ export function DeleteTransferConfirmationModal({
   setShowDeleteConfirmationModal,
 }: DeleteTransferConfirmationModalProps): JSX.Element {
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
-  const history = useHistory()
+  const navigate = useNavigate()
   const { makeSnackbar } = useToaster()
   const [showIcon, setShowIcon] = React.useState<boolean>(false)
   const modalHeader: ModalHeaderBaseProps = {
@@ -77,11 +77,11 @@ export function DeleteTransferConfirmationModal({
         .then(() => {
           setShowIcon(false)
           setShowDeleteConfirmationModal(false)
-          history.push('/quick-transfer')
+          navigate('/quick-transfer')
           makeSnackbar(t('deleted_transfer') as string)
         })
         .catch((e: Error) => {
-          history.push('/quick-transfer')
+          navigate('/quick-transfer')
           console.error(`error deleting resources: ${e.message}`)
         })
     } else {

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -27,10 +27,10 @@ export function ConfirmRobotName({
   robotName,
 }: ConfirmRobotNameProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const handleClick = (): void => {
-    history.push('/dashboard')
+    navigate('/dashboard')
   }
   return (
     <>

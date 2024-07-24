@@ -1,18 +1,30 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import head from 'lodash/head'
+import { css } from 'styled-components'
 
 import {
   DIRECTION_COLUMN,
+  COLORS,
   SPACING,
   Flex,
-  LegacyStyledText,
+  StyledText,
+  RESPONSIVENESS,
 } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { RadioButton } from '../../../atoms/buttons'
-import { ODD_SECTION_TITLE_STYLE, RECOVERY_MAP } from '../constants'
-import { RecoveryFooterButtons, RecoveryContentWrapper } from '../shared'
+import {
+  ODD_SECTION_TITLE_STYLE,
+  RECOVERY_MAP,
+  ODD_ONLY,
+  DESKTOP_ONLY,
+} from '../constants'
+import {
+  RecoveryFooterButtons,
+  RecoverySingleColumnContentWrapper,
+  RecoveryRadioGroup,
+} from '../shared'
 import { DropTipWizardFlows } from '../../DropTipWizardFlows'
 import { DT_ROUTES } from '../../DropTipWizardFlows/constants'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
@@ -86,12 +98,33 @@ export function BeginRemoval({
     }
   }
 
+  const DESKTOP_ONLY_GRID_GAP = css`
+    @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+      gap: 0rem;
+    }
+  `
+
+  const RADIO_GROUP_STYLE = css`
+    @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+      color: ${COLORS.black90};
+      margin-left: 0.5rem;
+    }
+  `
+
   return (
-    <RecoveryContentWrapper>
-      <LegacyStyledText css={ODD_SECTION_TITLE_STYLE} as="h4SemiBold">
-        {t('you_may_want_to_remove', { mount })}
-      </LegacyStyledText>
-      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+    <RecoverySingleColumnContentWrapper css={DESKTOP_ONLY_GRID_GAP}>
+      <StyledText
+        css={ODD_SECTION_TITLE_STYLE}
+        oddStyle="level4HeaderSemiBold"
+        desktopStyle="headingSmallSemiBold"
+      >
+        {t('remove_tips_from_pipette', { mount })}
+      </StyledText>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing2}
+        css={ODD_ONLY}
+      >
         <RadioButton
           buttonLabel={t('begin_removal')}
           buttonValue={t('begin_removal')}
@@ -101,16 +134,52 @@ export function BeginRemoval({
           isSelected={selected === 'begin-removal'}
         />
         <RadioButton
-          buttonLabel={t('skip')}
-          buttonValue={t('skip')}
+          buttonLabel={t('skip_removal')}
+          buttonValue={t('skip_removal')}
           onChange={() => {
             setSelected('skip')
           }}
           isSelected={selected === 'skip'}
         />
       </Flex>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing4}
+        css={DESKTOP_ONLY}
+      >
+        <RecoveryRadioGroup
+          value={selected}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            setSelected(e.currentTarget.value as RemovalOptions)
+          }}
+          options={[
+            {
+              value: 'begin-removal',
+              children: (
+                <StyledText
+                  desktopStyle="bodyDefaultRegular"
+                  css={RADIO_GROUP_STYLE}
+                >
+                  {t('begin_removal')}
+                </StyledText>
+              ),
+            },
+            {
+              value: 'skip',
+              children: (
+                <StyledText
+                  desktopStyle="bodyDefaultRegular"
+                  css={RADIO_GROUP_STYLE}
+                >
+                  {t('skip_removal')}
+                </StyledText>
+              ),
+            },
+          ]}
+        />
+      </Flex>
       <RecoveryFooterButtons primaryBtnOnClick={primaryOnClick} />
-    </RecoveryContentWrapper>
+    </RecoverySingleColumnContentWrapper>
   )
 }
 
@@ -158,7 +227,7 @@ function DropTipFlowsContainer(
   const fixitCommandTypeUtils = useDropTipFlowUtils(props)
 
   return (
-    <RecoveryContentWrapper>
+    <RecoverySingleColumnContentWrapper>
       <DropTipWizardFlows
         robotType={isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE}
         closeFlow={onCloseFlow}
@@ -166,7 +235,7 @@ function DropTipFlowsContainer(
         instrumentModelSpecs={specs}
         fixitCommandTypeUtils={fixitCommandTypeUtils}
       />
-    </RecoveryContentWrapper>
+    </RecoverySingleColumnContentWrapper>
   )
 }
 
@@ -229,6 +298,14 @@ export function useDropTipFlowUtils({
     }
   }
 
+  const buildButtonOverrides = (): FixitCommandTypeUtils['buttonOverrides'] => {
+    return {
+      goBackBeforeBeginning: () => {
+        return proceedToRouteAndStep(DROP_TIP_FLOWS.ROUTE)
+      },
+    }
+  }
+
   // If a specific step within the DROP_TIP_FLOWS route is selected, begin the Drop Tip Flows at its related route.
   const buildRouteOverride = (): FixitCommandTypeUtils['routeOverride'] => {
     switch (step) {
@@ -245,6 +322,7 @@ export function useDropTipFlowUtils({
     copyOverrides: buildCopyOverrides(),
     trackCurrentMap: trackExternalMap,
     errorOverrides: buildErrorOverrides(),
+    buttonOverrides: buildButtonOverrides(),
     routeOverride: buildRouteOverride(),
   }
 }

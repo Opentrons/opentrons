@@ -12,6 +12,7 @@ LABWARE_ON_SCALE = "nest_12_reservoir_15ml"
 
 def run(ctx: ProtocolContext) -> None:
     """Run."""
+    trash = ctx.load_trash_bin("A3")
     tipracks = [
         ctx.load_labware(f"opentrons_flex_96_tiprack_{size}uL", slot)
         for size, slots in SLOTS_TIPRACK.items()
@@ -26,4 +27,4 @@ def run(ctx: ProtocolContext) -> None:
         pipette.dispense(10, vial["A1"].top())
         pipette.aspirate(1, dial["A1"].top())
         pipette.dispense(1, dial["A1"].top())
-        pipette.drop_tip(home_after=False)
+        pipette.drop_tip(trash)

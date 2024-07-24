@@ -7,6 +7,7 @@ from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import DoorState
 from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
 from opentrons.util.async_helpers import async_context_manager_in_thread
+from opentrons_shared_data.robot import load as load_robot
 
 from .protocol_engine import ProtocolEngine
 from .resources import DeckDataProvider, ModuleDataProvider
@@ -45,11 +46,12 @@ async def create_protocol_engine(
         else []
     )
     module_calibration_offsets = ModuleDataProvider.load_module_calibrations()
-
+    robot_definition = load_robot(config.robot_type)
     state_store = StateStore(
         config=config,
         deck_definition=deck_definition,
         deck_fixed_labware=deck_fixed_labware,
+        robot_definition=robot_definition,
         is_door_open=hardware_api.door_state is DoorState.OPEN,
         module_calibration_offsets=module_calibration_offsets,
         deck_configuration=deck_configuration,

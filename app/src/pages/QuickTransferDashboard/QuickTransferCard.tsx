@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { Trans, useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
 import last from 'lodash/last'
@@ -53,7 +53,7 @@ export function QuickTransferCard(props: {
     setShowDeleteConfirmationModal,
     setTargetTransferId,
   } = props
-  const history = useHistory()
+  const navigate = useNavigate()
   const [showIcon, setShowIcon] = React.useState<boolean>(false)
   const [
     showFailedAnalysisModal,
@@ -108,7 +108,7 @@ export function QuickTransferCard(props: {
     if (isFailedAnalysis) {
       setShowFailedAnalysisModal(true)
     } else if (!longpress.isLongPressed) {
-      history.push(`/quick-transfer/${transferId}`)
+      navigate(`/quick-transfer/${transferId}`)
     }
   }
 

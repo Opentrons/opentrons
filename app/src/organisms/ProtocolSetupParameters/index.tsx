@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import {
   useCreateProtocolAnalysisMutation,
   useCreateRunMutation,
@@ -58,7 +58,7 @@ export function ProtocolSetupParameters({
 }: ProtocolSetupParametersProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   const enableCsvFile = useFeatureFlag('enableCsvFile')
-  const history = useHistory()
+  const navigate = useNavigate()
   const host = useHost()
   const queryClient = useQueryClient()
   const [
@@ -89,13 +89,24 @@ export function ProtocolSetupParameters({
           ({ ...parameter, value: parameter.default } as ValueRunTimeParameter)
     )
   )
+
   const hasMissingFileParam =
-    runTimeParametersOverrides?.some(
-      parameter =>
-        parameter.type === 'csv_file' &&
-        ((parameter.file?.id == null && parameter.file?.file == null) ||
-          parameter.file?.filePath == null)
-    ) ?? false
+    runTimeParametersOverrides?.some((parameter): boolean => {
+      if (parameter.type !== 'csv_file') {
+        return false
+      }
+
+      if (parameter.file == null) {
+        return true
+      }
+
+      return (
+        parameter.file.id == null &&
+        parameter.file.file == null &&
+        parameter.file.filePath == null
+      )
+    }) ?? false
+
   const { makeSnackbar } = useToaster()
 
   const updateParameters = (
@@ -252,7 +263,7 @@ export function ProtocolSetupParameters({
       <ChildNavigation
         header={t('parameters')}
         onClickBack={() => {
-          history.goBack()
+          navigate(-1)
         }}
         onClickButton={handleConfirmValues}
         buttonText={t('confirm_values')}

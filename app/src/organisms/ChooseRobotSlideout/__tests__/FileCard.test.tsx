@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { vi, it, describe, expect } from 'vitest'
 
-import { StaticRouter } from 'react-router-dom'
+import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 
 import { renderWithProviders } from '../../../__testing-utils__'
@@ -16,9 +16,9 @@ vi.mock('../../../resources/useNotifyDataReady')
 vi.mock('../../../redux/config')
 const render = (props: React.ComponentProps<typeof FileCard>) => {
   return renderWithProviders(
-    <StaticRouter>
+    <MemoryRouter>
       <FileCard {...props} />
-    </StaticRouter>,
+    </MemoryRouter>,
     {
       i18nInstance: i18n,
     }

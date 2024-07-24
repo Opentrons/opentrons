@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
@@ -8,11 +9,15 @@ import {
   Flex,
   Icon,
   SPACING,
-  LegacyStyledText,
+  StyledText,
+  RESPONSIVENESS,
 } from '@opentrons/components'
 
 import { RECOVERY_MAP } from '../constants'
-import { RecoveryFooterButtons, RecoveryContentWrapper } from '../shared'
+import {
+  RecoveryFooterButtons,
+  RecoverySingleColumnContentWrapper,
+} from '../shared'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 import type { RecoveryContentProps } from '../types'
@@ -56,33 +61,35 @@ function CancelRunConfirmation({
   })
 
   return (
-    <RecoveryContentWrapper
+    <RecoverySingleColumnContentWrapper
       gridGap={SPACING.spacing24}
       alignItems={ALIGN_CENTER}
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}
         alignItems={ALIGN_CENTER}
-        gridGap={SPACING.spacing24}
+        gridGap={SPACING.spacing16}
+        padding={`${SPACING.spacing32} ${SPACING.spacing16}`}
         height="100%"
-        width="848px"
+        css={FLEX_WIDTH}
       >
         <Icon
           name="ot-alert"
-          size="3.75rem"
+          css={ICON_SIZE}
           marginTop={SPACING.spacing24}
           color={COLORS.red50}
         />
-        <LegacyStyledText as="h3Bold">
+        <StyledText oddStyle="level3HeaderBold" desktopStyle="headingSmallBold">
           {t('are_you_sure_you_want_to_cancel')}
-        </LegacyStyledText>
-        <LegacyStyledText
-          as="h4"
-          color={COLORS.grey60}
+        </StyledText>
+        <StyledText
+          oddStyle="level4HeaderRegular"
+          desktopStyle="bodyDefaultRegular"
+          color={COLORS.black90}
           textAlign={ALIGN_CENTER}
         >
           {t('if_tips_are_attached')}
-        </LegacyStyledText>
+        </StyledText>
       </Flex>
       <RecoveryFooterButtons
         primaryBtnOnClick={handleCancelRunClick}
@@ -90,7 +97,7 @@ function CancelRunConfirmation({
         primaryBtnTextOverride={t('confirm')}
         isLoadingPrimaryBtnAction={showBtnLoadingState}
       />
-    </RecoveryContentWrapper>
+    </RecoverySingleColumnContentWrapper>
   )
 }
 
@@ -140,3 +147,19 @@ export function useOnCancelRun({
 
   return { showBtnLoadingState, handleCancelRunClick }
 }
+
+const FLEX_WIDTH = css`
+  width: 41.625rem;
+  @media (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+    width: 53rem;
+  }
+`
+
+const ICON_SIZE = css`
+  width: ${SPACING.spacing40};
+  height: ${SPACING.spacing40};
+  @media (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+    width: ${SPACING.spacing60};
+    height: ${SPACING.spacing60};
+  }
+`

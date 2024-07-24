@@ -10,6 +10,8 @@ import sqlalchemy.engine
 from robot_server.persistence.database import sqlite_rowid
 from robot_server.persistence.tables import data_files_table
 
+from .models import FileIdNotFoundError
+
 
 @dataclass(frozen=True)
 class DataFileInfo:
@@ -33,7 +35,7 @@ class DataFilesStore:
 
     def get_file_info_by_hash(self, file_hash: str) -> Optional[DataFileInfo]:
         """Get the ID of data file having the provided hash."""
-        for file in self._sql_get_all_from_engine():
+        for file in self.sql_get_all_from_engine():
             if file.file_hash == file_hash:
                 return file
         return None
@@ -50,16 +52,31 @@ class DataFilesStore:
         with self._sql_engine.begin() as transaction:
             transaction.execute(statement)
 
-    def _sql_get_all_from_engine(self) -> List[DataFileInfo]:
+    def get(self, data_file_id: str) -> DataFileInfo:
+        """Get data file info from the database."""
+        statement = sqlalchemy.select(data_files_table).where(
+            data_files_table.c.id == data_file_id
+        )
+        with self._sql_engine.begin() as transaction:
+            try:
+                data_file_row = transaction.execute(statement).one()
+            except sqlalchemy.exc.NoResultFound as e:
+                raise FileIdNotFoundError(data_file_id) from e
+
+        return _convert_row_data_file_info(data_file_row)
+
+    def sql_get_all_from_engine(self) -> List[DataFileInfo]:
+        """Get all data file entries from the database."""
         statement = sqlalchemy.select(data_files_table).order_by(sqlite_rowid)
         with self._sql_engine.begin() as transaction:
             all_rows = transaction.execute(statement).all()
-        return [
-            DataFileInfo(
-                id=sql_row.id,
-                name=sql_row.name,
-                created_at=sql_row.created_at,
-                file_hash=sql_row.file_hash,
-            )
-            for sql_row in all_rows
-        ]
+        return [_convert_row_data_file_info(sql_row) for sql_row in all_rows]
+
+
+def _convert_row_data_file_info(row: sqlalchemy.engine.Row) -> DataFileInfo:
+    return DataFileInfo(
+        id=row.id,
+        name=row.name,
+        created_at=row.created_at,
+        file_hash=row.file_hash,
+    )

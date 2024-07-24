@@ -2,7 +2,7 @@ import * as React from 'react'
 import { css } from 'styled-components'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 
 import {
@@ -53,7 +53,7 @@ export const RobotOverviewOverflowMenu = (
     showOverflowMenu,
     setShowOverflowMenu,
   } = useMenuHandleClickOutside()
-  const history = useHistory()
+  const navigate = useNavigate()
   const isRobotBusy = useIsRobotBusy()
   const runId = useCurrentRunId()
   const [targetProps, tooltipProps] = useHoverTooltip()
@@ -207,7 +207,7 @@ export const RobotOverviewOverflowMenu = (
           <Divider marginY="0" />
           <MenuItem
             onClick={() => {
-              history.push(`/devices/${robot.name}/robot-settings`)
+              navigate(`/devices/${robot.name}/robot-settings`)
             }}
             disabled={
               robot == null ||

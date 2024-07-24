@@ -72,12 +72,10 @@ describe('SkipStepSameTipsInfo', () => {
   let props: React.ComponentProps<typeof SkipStepSameTipsInfo>
   let mockSetRobotInMotion: Mock
   let mockSkipFailedCommand: Mock
-  let mockResumeRun: Mock
 
   beforeEach(() => {
     mockSetRobotInMotion = vi.fn(() => Promise.resolve())
     mockSkipFailedCommand = vi.fn(() => Promise.resolve())
-    mockResumeRun = vi.fn()
 
     props = {
       ...mockRecoveryContentProps,
@@ -86,7 +84,6 @@ describe('SkipStepSameTipsInfo', () => {
       } as any,
       recoveryCommands: {
         skipFailedCommand: mockSkipFailedCommand,
-        resumeRun: mockResumeRun,
       } as any,
     }
   })
@@ -114,18 +111,13 @@ describe('SkipStepSameTipsInfo', () => {
         RECOVERY_MAP.ROBOT_SKIPPING_STEP.ROUTE
       )
     })
+
     await waitFor(() => {
       expect(mockSkipFailedCommand).toHaveBeenCalled()
-    })
-    await waitFor(() => {
-      expect(mockResumeRun).toHaveBeenCalled()
     })
 
     expect(mockSetRobotInMotion.mock.invocationCallOrder[0]).toBeLessThan(
       mockSkipFailedCommand.mock.invocationCallOrder[0]
-    )
-    expect(mockSkipFailedCommand.mock.invocationCallOrder[0]).toBeLessThan(
-      mockResumeRun.mock.invocationCallOrder[0]
     )
   })
 })

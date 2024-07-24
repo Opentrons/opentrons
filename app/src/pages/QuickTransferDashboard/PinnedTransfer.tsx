@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import styled, { css } from 'styled-components'
 
 import {
@@ -71,7 +71,7 @@ export function PinnedTransfer(props: {
     setTargetTransferId,
   } = props
   const cardSize = props.cardSize ?? 'full'
-  const history = useHistory()
+  const navigate = useNavigate()
   const longpress = useLongPress()
   const transferName = transfer.metadata.protocolName ?? transfer.files[0].name
 
@@ -80,7 +80,7 @@ export function PinnedTransfer(props: {
     transferId: string
   ): void => {
     if (!longpress.isLongPressed) {
-      history.push(`/quick-transfer/${transferId}`)
+      navigate(`/quick-transfer/${transferId}`)
     }
   }
   React.useEffect(() => {
