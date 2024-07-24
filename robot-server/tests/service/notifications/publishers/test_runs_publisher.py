@@ -5,7 +5,7 @@ from unittest.mock import AsyncMock, MagicMock, Mock
 
 from opentrons.protocol_engine import CommandPointer, EngineStatus
 
-from robot_server.service.notifications import RunsPublisher, Topics
+from robot_server.service.notifications import RunsPublisher, topics
 from robot_server.service.notifications.notification_client import NotificationClient
 from robot_server.service.notifications.publisher_notifier import PublisherNotifier
 
@@ -70,9 +70,9 @@ async def test_initialize(
     assert runs_publisher._engine_state_slice.recovery_target_command is None
     assert runs_publisher._engine_state_slice.state_summary_status is None
 
-    notification_client.publish_advise_refetch_async.assert_any_await(topic=Topics.RUNS)
+    notification_client.publish_advise_refetch_async.assert_any_await(topic=topics.RUNS)
     notification_client.publish_advise_refetch_async.assert_any_await(
-        topic=f"{Topics.RUNS}/1234"
+        topic=f"{topics.RUNS}/1234"
     )
 
 
@@ -86,18 +86,18 @@ async def test_clean_up_current_run(
 
     await runs_publisher.clean_up_run(run_id="1234")
 
-    notification_client.publish_advise_refetch_async.assert_any_await(topic=Topics.RUNS)
+    notification_client.publish_advise_refetch_async.assert_any_await(topic=topics.RUNS)
     notification_client.publish_advise_refetch_async.assert_any_await(
-        topic=f"{Topics.RUNS}/1234"
+        topic=f"{topics.RUNS}/1234"
     )
     notification_client.publish_advise_unsubscribe_async.assert_any_await(
-        topic=f"{Topics.RUNS}/1234"
+        topic=f"{topics.RUNS}/1234"
     )
     notification_client.publish_advise_unsubscribe_async.assert_any_await(
-        topic=Topics.RUNS_COMMANDS_LINKS
+        topic=topics.RUNS_COMMANDS_LINKS
     )
     notification_client.publish_advise_unsubscribe_async.assert_any_await(
-        topic=f"{Topics.RUNS_PRE_SERIALIZED_COMMANDS}/1234"
+        topic=f"{topics.RUNS_PRE_SERIALIZED_COMMANDS}/1234"
     )
 
 
@@ -132,7 +132,7 @@ async def test_handle_current_command_change(
     await runs_publisher._handle_current_command_change()
 
     notification_client.publish_advise_refetch_async.assert_any_await(
-        topic=Topics.RUNS_COMMANDS_LINKS
+        topic=topics.RUNS_COMMANDS_LINKS
     )
 
 
@@ -167,7 +167,7 @@ async def test_handle_recovery_target_command_change(
     await runs_publisher._handle_recovery_target_command_change()
 
     notification_client.publish_advise_refetch_async.assert_any_await(
-        topic=Topics.RUNS_COMMANDS_LINKS
+        topic=topics.RUNS_COMMANDS_LINKS
     )
 
 
@@ -203,9 +203,9 @@ async def test_handle_engine_status_change(
 
     await runs_publisher._handle_engine_status_change()
 
-    notification_client.publish_advise_refetch_async.assert_any_await(topic=Topics.RUNS)
+    notification_client.publish_advise_refetch_async.assert_any_await(topic=topics.RUNS)
     notification_client.publish_advise_refetch_async.assert_any_await(
-        topic=f"{Topics.RUNS}/1234"
+        topic=f"{topics.RUNS}/1234"
     )
 
 
@@ -231,5 +231,5 @@ async def test_publish_pre_serialized_commannds_notif(
     assert notification_client.publish_advise_refetch_async.call_count == 3
 
     notification_client.publish_advise_refetch_async.assert_any_await(
-        topic=f"{Topics.RUNS_PRE_SERIALIZED_COMMANDS}/1234"
+        topic=f"{topics.RUNS_PRE_SERIALIZED_COMMANDS}/1234"
     )
