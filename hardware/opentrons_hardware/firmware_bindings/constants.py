@@ -241,6 +241,9 @@ class MessageId(int, Enum):
     gear_write_motor_driver_request = 0x506
     gear_read_motor_driver_request = 0x507
 
+    max_sensor_value_request = 0x70
+    max_sensor_value_response = 0x71
+
     read_sensor_request = 0x82
     write_sensor_request = 0x83
     baseline_sensor_request = 0x84

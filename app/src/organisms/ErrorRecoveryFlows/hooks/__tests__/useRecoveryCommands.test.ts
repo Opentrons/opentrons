@@ -125,6 +125,59 @@ describe('useRecoveryCommands', () => {
       false
     )
   })
+  ;([
+    'aspirateInPlace',
+    'dispenseInPlace',
+    'blowOutInPlace',
+    'dropTipInPlace',
+    'prepareToAspirate',
+  ] as const).forEach(inPlaceCommandType => {
+    it(`Should move to retryLocation if failed command is ${inPlaceCommandType} and error is appropriate when retrying`, async () => {
+      const { result } = renderHook(() =>
+        useRecoveryCommands({
+          runId: mockRunId,
+          failedCommand: {
+            ...mockFailedCommand,
+            commandType: inPlaceCommandType,
+            params: {
+              pipetteId: 'mock-pipette-id',
+            },
+            error: {
+              errorType: 'overpressure',
+              errorCode: '3006',
+              isDefined: true,
+              errorInfo: {
+                retryLocation: [1, 2, 3],
+              },
+            },
+          },
+          failedLabwareUtils: mockFailedLabwareUtils,
+          routeUpdateActions: mockRouteUpdateActions,
+          recoveryToastUtils: {} as any,
+        })
+      )
+      await act(async () => {
+        await result.current.retryFailedCommand()
+      })
+      expect(mockChainRunCommands).toHaveBeenLastCalledWith(
+        [
+          {
+            commandType: 'moveToCoordinates',
+            intent: 'fixit',
+            params: {
+              pipetteId: 'mock-pipette-id',
+              coordinates: { x: 1, y: 2, z: 3 },
+            },
+          },
+          {
+            commandType: inPlaceCommandType,
+            params: { pipetteId: 'mock-pipette-id' },
+          },
+        ],
+        false
+      )
+    })
+  })
 
   it('should call resumeRun with runId and show success toast on success', async () => {
     const { result } = renderHook(() =>
@@ -217,7 +270,7 @@ describe('useRecoveryCommands', () => {
 
     expect(mockChainRunCommands).toHaveBeenCalledWith(
       [buildPickUpTipsCmd],
-      true
+      false
     )
   })
 

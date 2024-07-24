@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 import { StyledText } from '@opentrons/components'
 
@@ -101,7 +102,13 @@ export function ErrorRecoveryComponent(
   }
 
   const buildIconHeading = (): JSX.Element => (
-    <StyledText oddStyle="bodyTextSemiBold" desktopStyle="bodyDefaultSemiBold">
+    <StyledText
+      oddStyle="bodyTextSemiBold"
+      desktopStyle="bodyDefaultSemiBold"
+      css={css`
+        cursor: pointer;
+      `}
+    >
       {t('view_error_details')}
     </StyledText>
   )
@@ -119,6 +126,7 @@ export function ErrorRecoveryComponent(
     !isDoorOpen &&
     route === RECOVERY_MAP.DROP_TIP_FLOWS.ROUTE &&
     step !== RECOVERY_MAP.DROP_TIP_FLOWS.STEPS.BEGIN_REMOVAL
+  const desktopType = isLargeDesktopStyle ? 'desktop-large' : 'desktop-small'
 
   return (
     <RecoveryInterventionModal
@@ -126,11 +134,15 @@ export function ErrorRecoveryComponent(
       titleHeading={buildTitleHeading()}
       iconHeadingOnClick={toggleModal}
       iconName="information"
-      desktopType={isLargeDesktopStyle ? 'desktop-large' : 'desktop-small'}
+      desktopType={desktopType}
       isOnDevice={isOnDevice}
     >
       {showModal ? (
-        <ErrorDetailsModal {...props} toggleModal={toggleModal} />
+        <ErrorDetailsModal
+          {...props}
+          toggleModal={toggleModal}
+          desktopType={desktopType}
+        />
       ) : null}
       {buildInterventionContent()}
     </RecoveryInterventionModal>

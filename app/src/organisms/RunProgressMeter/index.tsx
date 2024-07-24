@@ -31,7 +31,7 @@ import {
 } from '@opentrons/api-client'
 
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { getTopPortalEl } from '../../App/portal'
+import { getModalPortalEl } from '../../App/portal'
 import { Tooltip } from '../../atoms/Tooltip'
 import { CommandText } from '../../molecules/Command'
 import { useRunStatus } from '../RunTimeControl/hooks'
@@ -175,7 +175,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
               run={runData}
               analysis={analysis}
             />,
-            getTopPortalEl()
+            getModalPortalEl()
           )
         : null}
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>

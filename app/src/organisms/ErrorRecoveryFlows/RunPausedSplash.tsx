@@ -20,7 +20,6 @@ import {
   StyledText,
   JUSTIFY_END,
   PrimaryButton,
-  ALIGN_FLEX_END,
   SecondaryButton,
 } from '@opentrons/components'
 
@@ -115,7 +114,7 @@ export function RunPausedSplash(
           <Flex width="49rem" justifyContent={JUSTIFY_CENTER}>
             <StepInfo
               {...props}
-              textStyle="level3HeaderBold"
+              oddStyle="level3HeaderBold"
               overflow="hidden"
               overflowWrap={OVERFLOW_WRAP_BREAK_WORD}
               color={COLORS.white}
@@ -155,7 +154,6 @@ export function RunPausedSplash(
           <Flex
             gridGap={SPACING.spacing24}
             flexDirection={DIRECTION_COLUMN}
-            alignItems={ALIGN_FLEX_END}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
           >
             <Flex
@@ -180,7 +178,7 @@ export function RunPausedSplash(
                 <StyledText desktopStyle="headingSmallBold">{title}</StyledText>
                 <StepInfo
                   {...props}
-                  textStyle="bodyDefaultRegular"
+                  desktopStyle="bodyDefaultRegular"
                   overflow="hidden"
                   overflowWrap={OVERFLOW_WRAP_BREAK_WORD}
                   textAlign={TEXT_ALIGN_CENTER}

@@ -523,6 +523,28 @@ class ReadLimitSwitchResponse(BaseMessage):  # noqa: D101
 
 
 @dataclass
+class MaxSensorValueRequest(BaseMessage):  # noqa: D101
+    payload: payloads.ReadFromSensorRequestPayload
+    payload_type: Type[
+        payloads.ReadFromSensorRequestPayload
+    ] = payloads.ReadFromSensorRequestPayload
+    message_id: Literal[
+        MessageId.max_sensor_value_request
+    ] = MessageId.max_sensor_value_request
+
+
+@dataclass
+class MaxSensorValueResponse(BaseMessage):  # noqa: D101
+    payload: payloads.ReadFromSensorRequestPayload
+    payload_type: Type[
+        payloads.ReadFromSensorRequestPayload
+    ] = payloads.ReadFromSensorRequestPayload
+    message_id: Literal[
+        MessageId.max_sensor_value_response
+    ] = MessageId.max_sensor_value_response
+
+
+@dataclass
 class ReadFromSensorRequest(BaseMessage):  # noqa: D101
     payload: payloads.ReadFromSensorRequestPayload
     payload_type: Type[
