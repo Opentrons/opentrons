@@ -16,6 +16,8 @@ import type { FailedCommand } from '../types'
 import type { UseFailedLabwareUtilsResult } from './useFailedLabwareUtils'
 import type { UseRouteUpdateActionsResult } from './useRouteUpdateActions'
 import type { RecoveryToasts } from './useRecoveryToasts'
+import type { UseRecoveryAnalyticsResult } from './useRecoveryAnalytics'
+import type { CurrentRecoveryOptionUtils } from './useRecoveryRouting'
 
 interface UseRecoveryCommandsParams {
   runId: string
@@ -23,6 +25,8 @@ interface UseRecoveryCommandsParams {
   failedLabwareUtils: UseFailedLabwareUtilsResult
   routeUpdateActions: UseRouteUpdateActionsResult
   recoveryToastUtils: RecoveryToasts
+  analytics: UseRecoveryAnalyticsResult
+  selectedRecoveryOption: CurrentRecoveryOptionUtils['selectedRecoveryOption']
 }
 export interface UseRecoveryCommandsResult {
   /* A terminal recovery command that causes ER to exit as the run status becomes "running" */
@@ -40,6 +44,8 @@ export interface UseRecoveryCommandsResult {
   /* A non-terminal recovery command */
   pickUpTips: () => Promise<CommandData[]>
 }
+
+// TODO(jh, 07-24-24): Create tighter abstractions for terminal vs. non-terminal commands.
 // Returns commands with a "fixit" intent. Commands may or may not terminate Error Recovery. See each command docstring for details.
 export function useRecoveryCommands({
   runId,
@@ -47,6 +53,8 @@ export function useRecoveryCommands({
   failedLabwareUtils,
   routeUpdateActions,
   recoveryToastUtils,
+  analytics,
+  selectedRecoveryOption,
 }: UseRecoveryCommandsParams): UseRecoveryCommandsResult {
   const { proceedToRouteAndStep } = routeUpdateActions
   const { chainRunCommands } = useChainRunCommands(runId, failedCommand?.id)
@@ -63,6 +71,7 @@ export function useRecoveryCommands({
     ): Promise<CommandData[]> =>
       chainRunCommands(commands, continuePastFailure).catch(e => {
         console.warn(`Error executing "fixit" command: ${e}`)
+        analytics.reportActionSelectedResult(selectedRecoveryOption, 'failed')
         // the catch never occurs if continuePastCommandFailure is "true"
         void proceedToRouteAndStep(RECOVERY_MAP.ERROR_WHILE_RECOVERING.ROUTE)
         return Promise.reject(new Error(`Could not execute command: ${e}`))
@@ -102,16 +111,19 @@ export function useRecoveryCommands({
 
   const resumeRun = React.useCallback((): void => {
     void resumeRunFromRecovery(runId).then(() => {
+      analytics.reportActionSelectedResult(selectedRecoveryOption, 'succeeded')
       makeSuccessToast()
     })
   }, [runId, resumeRunFromRecovery, makeSuccessToast])
 
   const cancelRun = React.useCallback((): void => {
+    analytics.reportActionSelectedResult(selectedRecoveryOption, 'succeeded')
     stopRun(runId)
   }, [runId])
 
   const skipFailedCommand = React.useCallback((): void => {
     void resumeRunFromRecovery(runId).then(() => {
+      analytics.reportActionSelectedResult(selectedRecoveryOption, 'succeeded')
       makeSuccessToast()
     })
   }, [runId, resumeRunFromRecovery, makeSuccessToast])

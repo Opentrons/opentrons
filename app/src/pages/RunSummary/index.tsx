@@ -149,6 +149,8 @@ export function RunSummary(): JSX.Element {
     navigate('/')
   }
 
+  // TODO(jh, 07-24-24): After EXEC-504, add reportRecoveredRunResult here.
+
   // TODO(jh, 05-30-24): EXEC-487. Refactor reset() so we can redirect to the setup page, showing the shimmer skeleton instead.
   const runAgain = (): void => {
     setShowRunAgainSpinner(true)
