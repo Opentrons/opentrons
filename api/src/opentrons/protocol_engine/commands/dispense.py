@@ -99,6 +99,7 @@ class DispenseImplementation(AbstractCommandImpl[DispenseParams, _ExecuteReturn]
                             error=e,
                         )
                     ],
+                    errorInfo={"retryLocation": (position.x, position.y, position.z)},
                 ),
                 private=OverpressureErrorInternalData(
                     position=DeckPoint.construct(

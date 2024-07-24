@@ -445,6 +445,7 @@ def test_blow_out_clears_volume(
                     public=OverpressureError(
                         id="error-id",
                         createdAt=datetime.now(),
+                        errorInfo={"retryLocation": (0, 0, 0)},
                     ),
                     private=OverpressureErrorInternalData(
                         position=DeckPoint(x=0, y=0, z=0)
@@ -957,6 +958,7 @@ def test_add_pipette_config(
                     id="error-id",
                     detail="error-detail",
                     createdAt=datetime.now(),
+                    errorInfo={"retryLocation": (11, 22, 33)},
                 ),
                 private=OverpressureErrorInternalData(
                     position=DeckPoint(x=11, y=22, z=33)
