@@ -139,10 +139,10 @@ describe('useRecoveryCommands', () => {
         failedCommand: mockFailedCommand,
         failedLabwareUtils: mockFailedLabwareUtils,
         routeUpdateActions: mockRouteUpdateActions,
-        recoveryToastUtils: { makeSuccessToast: mockMakeSuccessToast } as any,
         analytics: { reportActionSelectedResult: vi.fn() } as any,
         selectedRecoveryOption: RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE,
-      } as any)
+        recoveryToastUtils: { makeSuccessToast: mockMakeSuccessToast } as any,
+      })
     )
 
     await act(async () => {
