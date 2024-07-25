@@ -60,8 +60,7 @@ jobs:
         if: github.event_name == 'pull_request'
         run: |
           git fetch origin ${{ env.PR_TARGET_BRANCH }}
-          git diff --quiet HEAD origin/${{ env.PR_TARGET_BRANCH }} -- analyses-snapshot-testing/tests/__snapshots__/analyses_snapshot_test || true
-          DIFF_EXIT_CODE=$?
+          DIFF_OUTPUT=$(git diff HEAD origin/${{ env.PR_TARGET_BRANCH }} -- analyses-snapshot-testing/tests/__snapshots__/analyses_snapshot_test)
           if [ $DIFF_EXIT_CODE -eq 0 ]; then
             echo "Analyses snapshots match ${{ env.PR_TARGET_BRANCH }} snapshots."
           else
