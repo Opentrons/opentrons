@@ -175,6 +175,9 @@ async def create_run(
     rtp_values = (
         request_body.data.runTimeParameterValues if request_body is not None else None
     )
+    rtp_files = (
+        request_body.data.runTimeParameterFiles if request_body is not None else None
+    )
     protocol_resource = None
 
     deck_configuration = await deck_configuration_store.get_deck_configuration()
@@ -205,6 +208,7 @@ async def create_run(
             labware_offsets=offsets,
             deck_configuration=deck_configuration,
             run_time_param_values=rtp_values,
+            run_time_param_files=rtp_files,
             protocol=protocol_resource,
             notify_publishers=notify_publishers,
         )
