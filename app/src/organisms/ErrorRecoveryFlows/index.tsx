@@ -21,6 +21,7 @@ import { RunPausedSplash, useRunPausedSplash } from './RunPausedSplash'
 import {
   useCurrentlyRecoveringFrom,
   useERUtils,
+  useRecoveryAnalytics,
   useShowDoorInfo,
 } from './hooks'
 
@@ -112,13 +113,18 @@ export interface ErrorRecoveryFlowsProps {
 export function ErrorRecoveryFlows(
   props: ErrorRecoveryFlowsProps
 ): JSX.Element | null {
-  const { protocolAnalysis, runStatus } = props
+  const { protocolAnalysis, runStatus, failedCommand } = props
 
   const { hasLaunchedRecovery, toggleERWizard, showERWizard } = useERWizard()
 
   const isOnDevice = useSelector(getIsOnDevice)
   const robotType = protocolAnalysis?.robotType ?? OT2_ROBOT_TYPE
   const showSplash = useRunPausedSplash(isOnDevice, showERWizard)
+  const analytics = useRecoveryAnalytics()
+
+  React.useEffect(() => {
+    analytics.reportErrorEvent(failedCommand)
+  }, [analytics, failedCommand])
 
   const isDoorOpen = useShowDoorInfo(runStatus)
 
@@ -128,6 +134,7 @@ export function ErrorRecoveryFlows(
     toggleERWizard,
     isOnDevice,
     robotType,
+    analytics,
   })
 
   return (
@@ -139,6 +146,7 @@ export function ErrorRecoveryFlows(
           robotType={robotType}
           isOnDevice={isOnDevice}
           isDoorOpen={isDoorOpen}
+          analytics={analytics}
         />
       ) : null}
       {showSplash ? (
@@ -148,6 +156,7 @@ export function ErrorRecoveryFlows(
           robotType={robotType}
           isOnDevice={isOnDevice}
           toggleERWiz={toggleERWizard}
+          analytics={analytics}
         />
       ) : null}
     </>
