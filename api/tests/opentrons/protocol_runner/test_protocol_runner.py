@@ -9,11 +9,11 @@ from pathlib import Path
 from typing import List, cast, Union, Type
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
-from opentrons_shared_data.labware.dev_types import (
+from opentrons_shared_data.labware.types import (
     LabwareDefinition as LabwareDefinitionTypedDict,
 )
 from opentrons_shared_data.protocol.models import ProtocolSchemaV6, ProtocolSchemaV7
-from opentrons_shared_data.protocol.dev_types import (
+from opentrons_shared_data.protocol.types import (
     JsonProtocol as LegacyJsonProtocolDict,
 )
 from opentrons.hardware_control import API as HardwareAPI

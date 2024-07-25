@@ -3,7 +3,7 @@ from typing import Dict
 import pytest
 from decoy import Decoy
 
-from opentrons_shared_data.labware.dev_types import WellDefinition
+from opentrons_shared_data.labware.types import WellDefinition
 
 from opentrons.hardware_control.modules.types import (
     MagneticModuleModel,

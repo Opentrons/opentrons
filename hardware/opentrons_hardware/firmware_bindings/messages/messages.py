@@ -66,6 +66,8 @@ MessageDefinition = Union[
     defs.FirmwareUpdateStartApp,
     defs.ReadLimitSwitchRequest,
     defs.ReadLimitSwitchResponse,
+    defs.MaxSensorValueRequest,
+    defs.MaxSensorValueResponse,
     defs.ReadFromSensorRequest,
     defs.WriteToSensorRequest,
     defs.BaselineSensorRequest,

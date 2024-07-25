@@ -1,6 +1,6 @@
 from typing import cast, Awaitable, Optional, Any, Union
 from opentrons.types import Mount
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons_shared_data.labware.types import LabwareDefinition
 from robot_server.robot.calibration.tip_length.user_flow import TipCalibrationUserFlow
 from robot_server.robot.calibration.models import SessionCreateParams
 from robot_server.robot.calibration.tip_length.models import TipCalibrationSessionStatus

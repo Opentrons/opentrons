@@ -5,7 +5,7 @@ from opentrons.protocols.api_support.types import APIVersion
 from opentrons.types import Point, Location
 
 if typing.TYPE_CHECKING:
-    from opentrons_shared_data.labware.dev_types import LabwareDefinition
+    from opentrons_shared_data.labware.types import LabwareDefinition
 
 
 def test_wells_rebuilt_with_offset(minimal_labware_def: "LabwareDefinition") -> None:

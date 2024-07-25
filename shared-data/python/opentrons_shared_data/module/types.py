@@ -1,5 +1,5 @@
 """
-opentrons_shared_data.module.dev_types: types requiring typing_extensions
+opentrons_shared_data.module.types: types requiring typing_extensions
 for modules
 """
 

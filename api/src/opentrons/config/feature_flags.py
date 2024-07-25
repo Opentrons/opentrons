@@ -1,5 +1,5 @@
 from opentrons.config import advanced_settings as advs
-from opentrons_shared_data.robot.dev_types import RobotTypeEnum
+from opentrons_shared_data.robot.types import RobotTypeEnum
 
 
 def short_fixed_trash() -> bool:

@@ -36,7 +36,7 @@ from .instrument_calibration import (
     load_pipette_offset,
     PipetteOffsetByPipetteMount,
 )
-from opentrons_shared_data.pipette.dev_types import (
+from opentrons_shared_data.pipette.types import (
     UlPerMmAction,
     PipetteName,
     PipetteModel,

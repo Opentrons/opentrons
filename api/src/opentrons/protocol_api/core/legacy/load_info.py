@@ -7,7 +7,7 @@ It's only for internal Opentrons use.
 
 from dataclasses import dataclass
 from typing import Optional, Union
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons_shared_data.labware.types import LabwareDefinition
 
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control.modules.types import ModuleModel

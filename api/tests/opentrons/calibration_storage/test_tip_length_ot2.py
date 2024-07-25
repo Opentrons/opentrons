@@ -17,10 +17,10 @@ from opentrons.calibration_storage.ot2 import (
     clear_tip_length_calibration,
     models,
 )
-from opentrons_shared_data.pipette.dev_types import LabwareUri
+from opentrons_shared_data.pipette.types import LabwareUri
 
 if TYPE_CHECKING:
-    from opentrons_shared_data.labware.dev_types import LabwareDefinition
+    from opentrons_shared_data.labware.types import LabwareDefinition
 
 
 @pytest.fixture

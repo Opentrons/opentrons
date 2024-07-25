@@ -10,7 +10,7 @@ from opentrons.protocol_reader import (
     ProtocolFileRole as ProtocolFileRole,
 )
 
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.types import RobotType
 
 from robot_server.service.json_api import ResourceModel
 from .analysis_models import AnalysisSummary

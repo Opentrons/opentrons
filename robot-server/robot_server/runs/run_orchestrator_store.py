@@ -7,8 +7,8 @@ from opentrons.protocol_engine.errors.exceptions import EStopActivatedError
 from opentrons.protocol_engine.types import PostRunHardwareState, RunTimeParameter
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
-from opentrons_shared_data.robot.dev_types import RobotType
-from opentrons_shared_data.robot.dev_types import RobotTypeEnum
+from opentrons_shared_data.robot.types import RobotType
+from opentrons_shared_data.robot.types import RobotTypeEnum
 
 from opentrons.config import feature_flags
 from opentrons.hardware_control import HardwareControlAPI
@@ -44,7 +44,7 @@ from opentrons.protocol_engine.types import (
     RunTimeParamValuesType,
     EngineStatus,
 )
-from opentrons_shared_data.labware.dev_types import LabwareUri
+from opentrons_shared_data.labware.types import LabwareUri
 
 from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
 

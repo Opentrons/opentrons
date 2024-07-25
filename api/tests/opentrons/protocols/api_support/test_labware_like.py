@@ -9,7 +9,7 @@ from opentrons.protocol_api.core.legacy import module_geometry
 from opentrons.protocol_api.core.legacy.deck import Deck
 from opentrons.types import Location
 
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons_shared_data.labware.types import LabwareDefinition
 
 
 @pytest.fixture(scope="session")
