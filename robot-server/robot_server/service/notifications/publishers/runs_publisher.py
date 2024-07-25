@@ -173,9 +173,13 @@ _runs_publisher_accessor: AppStateAccessor[RunsPublisher] = AppStateAccessor[
 
 
 async def get_runs_publisher(
-    app_state: AppState = Depends(get_app_state),
-    notification_client: NotificationClient = Depends(get_notification_client),
-    publisher_notifier: PublisherNotifier = Depends(get_pe_publisher_notifier),
+    app_state: Annotated[AppState, Depends(get_app_state)],
+    notification_client: Annotated[
+        NotificationClient, Depends(get_notification_client)
+    ],
+    publisher_notifier: Annotated[
+        PublisherNotifier, Depends(get_pe_publisher_notifier)
+    ],
 ) -> RunsPublisher:
     """Get a singleton RunsPublisher to publish runs topics."""
     runs_publisher = _runs_publisher_accessor.get_from(app_state)

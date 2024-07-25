@@ -38,7 +38,7 @@ async def get_pipettes(
         "**Warning:** Actively scanning is only valid on OT-2s. On Flex robots, it's"
         " unnecessary, and the behavior is currently undefined.",
     ),
-    hardware: HardwareControlAPI = Depends(get_hardware),
+    hardware: Annotated[HardwareControlAPI, Depends(get_hardware)],
 ) -> pipettes.PipettesByMount:
     """
     Query robot for model strings on 'left' and 'right' mounts, and return a

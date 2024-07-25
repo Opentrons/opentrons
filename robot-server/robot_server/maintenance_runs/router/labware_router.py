@@ -40,7 +40,7 @@ async def add_labware_offset(
     run_orchestrator_store: MaintenanceRunOrchestratorStore = Depends(
         get_maintenance_run_orchestrator_store
     ),
-    run: MaintenanceRun = Depends(get_run_data_from_url),
+    run: Annotated[MaintenanceRun, Depends(get_run_data_from_url)],
 ) -> PydanticResponse[SimpleBody[LabwareOffset]]:
     """Add a labware offset to a maintenance run.
 
@@ -79,7 +79,7 @@ async def add_labware_definition(
     run_orchestrator_store: MaintenanceRunOrchestratorStore = Depends(
         get_maintenance_run_orchestrator_store
     ),
-    run: MaintenanceRun = Depends(get_run_data_from_url),
+    run: Annotated[MaintenanceRun, Depends(get_run_data_from_url)],
 ) -> PydanticResponse[SimpleBody[LabwareDefinitionSummary]]:
     """Add a labware offset to a run.
 

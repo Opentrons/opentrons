@@ -147,12 +147,12 @@ async def create_run(
     run_data_manager: MaintenanceRunDataManager = Depends(
         get_maintenance_run_data_manager
     ),
-    run_id: str = Depends(get_unique_id),
-    created_at: datetime = Depends(get_current_time),
+    run_id: Annotated[str, Depends(get_unique_id)],
+    created_at: Annotated[datetime, Depends(get_current_time)],
     is_ok_to_create_maintenance_run: bool = Depends(
         get_is_okay_to_create_maintenance_run
     ),
-    check_estop: bool = Depends(require_estop_in_good_state),
+    check_estop: Annotated[bool, Depends(require_estop_in_good_state)],
     deck_configuration_store: DeckConfigurationStore = Depends(
         get_deck_configuration_store
     ),
@@ -241,7 +241,7 @@ async def get_current_run(
     },
 )
 async def get_run(
-    run_data: MaintenanceRun = Depends(get_run_data_from_url),
+    run_data: Annotated[MaintenanceRun, Depends(get_run_data_from_url)],
 ) -> PydanticResponse[SimpleBody[MaintenanceRun]]:
     """Get a maintenance run by its ID.
 

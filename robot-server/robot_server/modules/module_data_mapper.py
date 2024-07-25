@@ -48,7 +48,7 @@ from robot_server.hardware import get_deck_type
 class ModuleDataMapper:
     """Map hardware control modules to module response."""
 
-    def __init__(self, deck_type: DeckType = Depends(get_deck_type)) -> None:
+    def __init__(self, deck_type: Annotated[DeckType, Depends(get_deck_type)]) -> None:
         self.deck_type = deck_type
 
     def map_data(

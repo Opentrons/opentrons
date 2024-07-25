@@ -29,8 +29,10 @@ _deck_configuration_publisher_accessor: AppStateAccessor[
 
 
 async def get_deck_configuration_publisher(
-    app_state: AppState = Depends(get_app_state),
-    notification_client: NotificationClient = Depends(get_notification_client),
+    app_state: Annotated[AppState, Depends(get_app_state)],
+    notification_client: Annotated[
+        NotificationClient, Depends(get_notification_client)
+    ],
 ) -> DeckConfigurationPublisher:
     """Get a singleton DeckConfigurationPublisher to publish deck configuration topics."""
     deck_configuration_publisher = _deck_configuration_publisher_accessor.get_from(

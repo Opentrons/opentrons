@@ -18,7 +18,7 @@ from robot_server.hardware import get_thread_manager, get_ot3_hardware
 
 
 async def require_estop_in_good_state(
-    thread_manager: ThreadManagedHardware = Depends(get_thread_manager),
+    thread_manager: Annotated[ThreadManagedHardware, Depends(get_thread_manager)],
 ) -> bool:
     """Check that the estop is in a good state.
 

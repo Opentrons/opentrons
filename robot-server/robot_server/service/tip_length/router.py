@@ -66,7 +66,7 @@ async def get_all_tip_length_calibrations(
         None,
         description="Filter results by their `uri` field.",
     ),
-    _: API = Depends(get_ot2_hardware),
+    _: Annotated[API, Depends(get_ot2_hardware)],
 ) -> tl_models.MultipleCalibrationsResponse:
     all_calibrations = tip_length.get_all_tip_length_calibrations()
     if not all_calibrations:
@@ -129,7 +129,7 @@ async def delete_specific_tip_length_calibration(
             " You must supply either this or `tiprack_hash`."
         ),
     ),
-    _: API = Depends(get_ot2_hardware),
+    _: Annotated[API, Depends(get_ot2_hardware)],
 ):
     try:
         tip_length.delete_tip_length_calibration(

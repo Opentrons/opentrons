@@ -265,7 +265,7 @@ async def _get_attached_instruments_ot2(
     responses={status.HTTP_200_OK: {"model": SimpleMultiBody[AttachedItem]}},
 )
 async def get_attached_instruments(
-    hardware: HardwareControlAPI = Depends(get_hardware),
+    hardware: Annotated[HardwareControlAPI, Depends(get_hardware)],
 ) -> PydanticResponse[SimpleMultiBody[AttachedItem]]:
     """Get a list of all attached instruments."""
     try:

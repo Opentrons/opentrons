@@ -103,7 +103,7 @@ class AllRunsLinks(BaseModel):
 
 async def get_run_data_from_url(
     runId: str,
-    run_data_manager: RunDataManager = Depends(get_run_data_manager),
+    run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
 ) -> Union[Run, BadRun]:
     """Get the data of a run.
 
@@ -140,15 +140,15 @@ async def get_run_data_from_url(
 )
 async def create_run(
     request_body: Optional[RequestModel[RunCreate]] = None,
-    run_data_manager: RunDataManager = Depends(get_run_data_manager),
-    protocol_store: ProtocolStore = Depends(get_protocol_store),
-    run_id: str = Depends(get_unique_id),
-    created_at: datetime = Depends(get_current_time),
-    run_auto_deleter: RunAutoDeleter = Depends(get_run_auto_deleter),
+    run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
+    protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
+    run_id: Annotated[str, Depends(get_unique_id)],
+    created_at: Annotated[datetime, Depends(get_current_time)],
+    run_auto_deleter: Annotated[RunAutoDeleter, Depends(get_run_auto_deleter)],
     quick_transfer_run_auto_deleter: RunAutoDeleter = Depends(
         get_quick_transfer_run_auto_deleter
     ),
-    check_estop: bool = Depends(require_estop_in_good_state),
+    check_estop: Annotated[bool, Depends(require_estop_in_good_state)],
     deck_configuration_store: DeckConfigurationStore = Depends(
         get_deck_configuration_store
     ),
@@ -242,7 +242,7 @@ async def get_runs(
             " If this is omitted or `null`, all runs will be returned."
         ),
     ),
-    run_data_manager: RunDataManager = Depends(get_run_data_manager),
+    run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
 ) -> PydanticResponse[MultiBody[Union[Run, BadRun], AllRunsLinks]]:
     """Get all runs, in order from least-recently to most-recently created.
 
@@ -276,7 +276,7 @@ async def get_runs(
     },
 )
 async def get_run(
-    run_data: Run = Depends(get_run_data_from_url),
+    run_data: Annotated[Run, Depends(get_run_data_from_url)],
 ) -> PydanticResponse[SimpleBody[Union[Run, BadRun]]]:
     """Get a run by its ID.
 
@@ -301,7 +301,7 @@ async def get_run(
 )
 async def remove_run(
     runId: str,
-    run_data_manager: RunDataManager = Depends(get_run_data_manager),
+    run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
 ) -> PydanticResponse[SimpleEmptyBody]:
     """Delete a run by its ID.
 
@@ -338,7 +338,7 @@ async def remove_run(
 async def update_run(
     runId: str,
     request_body: RequestModel[RunUpdate],
-    run_data_manager: RunDataManager = Depends(get_run_data_manager),
+    run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
 ) -> PydanticResponse[SimpleBody[Union[Run, BadRun]]]:
     """Update a run by its ID.
 

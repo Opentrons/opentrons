@@ -131,8 +131,8 @@ async def create_run_command(
             " the default was 30 seconds, not infinite."
         ),
     ),
-    run_id: str = Depends(get_current_run_from_url),
-    check_estop: bool = Depends(require_estop_in_good_state),
+    run_id: Annotated[str, Depends(get_current_run_from_url)],
+    check_estop: Annotated[bool, Depends(require_estop_in_good_state)],
 ) -> PydanticResponse[SimpleBody[pe_commands.Command]]:
     """Enqueue a protocol command.
 

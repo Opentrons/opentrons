@@ -45,10 +45,12 @@ class RunActionNotAllowed(ErrorDetails):
 
 async def get_run_controller(
     runId: str,
-    task_runner: TaskRunner = Depends(get_task_runner),
-    run_orchestrator_store: RunOrchestratorStore = Depends(get_run_orchestrator_store),
-    run_store: RunStore = Depends(get_run_store),
-    runs_publisher: RunsPublisher = Depends(get_runs_publisher),
+    task_runner: Annotated[TaskRunner, Depends(get_task_runner)],
+    run_orchestrator_store: Annotated[
+        RunOrchestratorStore, Depends(get_run_orchestrator_store)
+    ],
+    run_store: Annotated[RunStore, Depends(get_run_store)],
+    runs_publisher: Annotated[RunsPublisher, Depends(get_runs_publisher)],
 ) -> RunController:
     """Get a RunController for the current run.
 
@@ -92,16 +94,16 @@ async def get_run_controller(
 async def create_run_action(
     runId: str,
     request_body: RequestModel[RunActionCreate],
-    run_controller: RunController = Depends(get_run_controller),
-    action_id: str = Depends(get_unique_id),
-    created_at: datetime = Depends(get_current_time),
+    run_controller: Annotated[RunController, Depends(get_run_controller)],
+    action_id: Annotated[str, Depends(get_unique_id)],
+    created_at: Annotated[datetime, Depends(get_current_time)],
     maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore = Depends(
         get_maintenance_run_orchestrator_store
     ),
     deck_configuration_store: DeckConfigurationStore = Depends(
         get_deck_configuration_store
     ),
-    check_estop: bool = Depends(require_estop_in_good_state),
+    check_estop: Annotated[bool, Depends(require_estop_in_good_state)],
 ) -> PydanticResponse[SimpleBody[RunAction]]:
     """Create a run control action.
 

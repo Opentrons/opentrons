@@ -48,7 +48,7 @@ _pe_publisher_notifier_accessor: AppStateAccessor[PublisherNotifier] = AppStateA
 
 
 def get_pe_publisher_notifier(
-    app_state: AppState = Depends(get_app_state),
+    app_state: Annotated[AppState, Depends(get_app_state)],
 ) -> PublisherNotifier:
     """Intended for use by various publishers only. Intended for protocol engine."""
     publisher_notifier = _pe_publisher_notifier_accessor.get_from(app_state)
@@ -58,7 +58,7 @@ def get_pe_publisher_notifier(
 
 
 def get_pe_notify_publishers(
-    app_state: AppState = Depends(get_app_state),
+    app_state: Annotated[AppState, Depends(get_app_state)],
 ) -> Callable[[], None]:
     """Provides access to the callback used to notify publishers of changes. Intended for protocol engine."""
     publisher_notifier = _pe_publisher_notifier_accessor.get_from(app_state)

@@ -89,9 +89,11 @@ async def clean_up_task_runner(app_state: AppState) -> None:
         await task_runner.cancel_all_and_clean_up()
 
 
-def get_task_runner(app_state: AppState = Depends(get_app_state)) -> TaskRunner:
+def get_task_runner(
+    app_state: Annotated[AppState, Depends(get_app_state)]
+) -> TaskRunner:
     """Intended to be used by endpoint functions as a FastAPI dependency,
-    like `task_runner = fastapi.Depends(get_task_runner)`.
+    like `Annotated[task_runner, fastapi.Depends(get_task_runner)]`.
     """
     task_runner = _task_runner_accessor.get_from(app_state)
     assert task_runner, "Task runner was not initialized"

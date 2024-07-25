@@ -218,21 +218,23 @@ async def create_protocol(  # noqa: C901
         ),
         alias="protocolKind",
     ),
-    protocol_directory: Path = Depends(get_protocol_directory),
-    protocol_store: ProtocolStore = Depends(get_protocol_store),
-    analysis_store: AnalysisStore = Depends(get_analysis_store),
-    file_reader_writer: FileReaderWriter = Depends(get_file_reader_writer),
-    protocol_reader: ProtocolReader = Depends(get_protocol_reader),
-    file_hasher: FileHasher = Depends(get_file_hasher),
-    analyses_manager: AnalysesManager = Depends(get_analyses_manager),
-    protocol_auto_deleter: ProtocolAutoDeleter = Depends(get_protocol_auto_deleter),
+    protocol_directory: Annotated[Path, Depends(get_protocol_directory)],
+    protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
+    analysis_store: Annotated[AnalysisStore, Depends(get_analysis_store)],
+    file_reader_writer: Annotated[FileReaderWriter, Depends(get_file_reader_writer)],
+    protocol_reader: Annotated[ProtocolReader, Depends(get_protocol_reader)],
+    file_hasher: Annotated[FileHasher, Depends(get_file_hasher)],
+    analyses_manager: Annotated[AnalysesManager, Depends(get_analyses_manager)],
+    protocol_auto_deleter: Annotated[
+        ProtocolAutoDeleter, Depends(get_protocol_auto_deleter)
+    ],
     quick_transfer_protocol_auto_deleter: ProtocolAutoDeleter = Depends(
         get_quick_transfer_protocol_auto_deleter
     ),
-    robot_type: RobotType = Depends(get_robot_type),
+    robot_type: Annotated[RobotType, Depends(get_robot_type)],
     protocol_id: str = Depends(get_unique_id, use_cache=False),
     analysis_id: str = Depends(get_unique_id, use_cache=False),
-    created_at: datetime = Depends(get_current_time),
+    created_at: Annotated[datetime, Depends(get_current_time)],
     maximum_quick_transfer_protocols: int = Depends(
         get_maximum_quick_transfer_protocols
     ),
@@ -462,8 +464,8 @@ async def get_protocols(
         ),
         alias="protocolKind",
     ),
-    protocol_store: ProtocolStore = Depends(get_protocol_store),
-    analysis_store: AnalysisStore = Depends(get_analysis_store),
+    protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
+    analysis_store: Annotated[AnalysisStore, Depends(get_analysis_store)],
 ) -> PydanticResponse[SimpleMultiBody[Protocol]]:
     """Get a list of all currently uploaded protocols.
 
@@ -510,7 +512,7 @@ async def get_protocols(
     responses={status.HTTP_200_OK: {"model": SimpleMultiBody[str]}},
 )
 async def get_protocol_ids(
-    protocol_store: ProtocolStore = Depends(get_protocol_store),
+    protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
 ) -> PydanticResponse[SimpleMultiBody[str]]:
     """Get a list of all protocol ids stored on the server.
 
@@ -537,8 +539,8 @@ async def get_protocol_ids(
 )
 async def get_protocol_by_id(
     protocolId: str,
-    protocol_store: ProtocolStore = Depends(get_protocol_store),
-    analysis_store: AnalysisStore = Depends(get_analysis_store),
+    protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
+    analysis_store: Annotated[AnalysisStore, Depends(get_analysis_store)],
 ) -> PydanticResponse[Body[Protocol, ProtocolLinks]]:
     """Get an uploaded protocol by ID.
 
@@ -597,7 +599,7 @@ async def get_protocol_by_id(
 )
 async def delete_protocol_by_id(
     protocolId: str,
-    protocol_store: ProtocolStore = Depends(get_protocol_store),
+    protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
 ) -> PydanticResponse[SimpleEmptyBody]:
     """Delete an uploaded protocol by ID.
 
@@ -640,9 +642,9 @@ async def delete_protocol_by_id(
 async def create_protocol_analysis(
     protocolId: str,
     request_body: Optional[RequestModel[AnalysisRequest]] = None,
-    protocol_store: ProtocolStore = Depends(get_protocol_store),
-    analysis_store: AnalysisStore = Depends(get_analysis_store),
-    analyses_manager: AnalysesManager = Depends(get_analyses_manager),
+    protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
+    analysis_store: Annotated[AnalysisStore, Depends(get_analysis_store)],
+    analyses_manager: Annotated[AnalysesManager, Depends(get_analyses_manager)],
     analysis_id: str = Depends(get_unique_id, use_cache=False),
 ) -> PydanticResponse[SimpleMultiBody[AnalysisSummary]]:
     """Start a new analysis for the given existing protocol.
@@ -701,8 +703,8 @@ async def create_protocol_analysis(
 )
 async def get_protocol_analyses(
     protocolId: str,
-    protocol_store: ProtocolStore = Depends(get_protocol_store),
-    analysis_store: AnalysisStore = Depends(get_analysis_store),
+    protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
+    analysis_store: Annotated[AnalysisStore, Depends(get_analysis_store)],
 ) -> PydanticResponse[SimpleMultiBody[ProtocolAnalysis]]:
     """Get a protocol's full analyses list.
 
@@ -742,8 +744,8 @@ async def get_protocol_analyses(
 async def get_protocol_analysis_by_id(
     protocolId: str,
     analysisId: str,
-    protocol_store: ProtocolStore = Depends(get_protocol_store),
-    analysis_store: AnalysisStore = Depends(get_analysis_store),
+    protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
+    analysis_store: Annotated[AnalysisStore, Depends(get_analysis_store)],
 ) -> PydanticResponse[SimpleBody[ProtocolAnalysis]]:
     """Get a protocol analysis by analysis ID.
 
@@ -797,8 +799,8 @@ async def get_protocol_analysis_by_id(
 async def get_protocol_analysis_as_document(
     protocolId: str,
     analysisId: str,
-    protocol_store: ProtocolStore = Depends(get_protocol_store),
-    analysis_store: AnalysisStore = Depends(get_analysis_store),
+    protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
+    analysis_store: Annotated[AnalysisStore, Depends(get_analysis_store)],
 ) -> PlainTextResponse:
     """Get a protocol analysis by analysis ID.
 

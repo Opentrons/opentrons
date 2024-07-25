@@ -65,6 +65,7 @@ class CommandNotFound(ErrorDetails):
 )
 async def create_command(
     request_body: RequestModelWithStatelessCommandCreate,
+    orchestrator: Annotated[RunOrchestrator, Depends(get_default_orchestrator)],
     waitUntilComplete: bool = Query(
         False,
         description=(
@@ -93,7 +94,6 @@ async def create_command(
             " the default was 30 seconds, not infinite."
         ),
     ),
-    orchestrator: RunOrchestrator = Depends(get_default_orchestrator),
 ) -> PydanticResponse[SimpleBody[StatelessCommand]]:
     """Enqueue and execute a command.
 
@@ -133,7 +133,7 @@ async def create_command(
     },
 )
 async def get_commands_list(
-    orchestrator: RunOrchestrator = Depends(get_default_orchestrator),
+    orchestrator: Annotated[RunOrchestrator, Depends(get_default_orchestrator)],
     cursor: Optional[int] = Query(
         None,
         description=(
@@ -180,7 +180,7 @@ async def get_commands_list(
 )
 async def get_command(
     commandId: str,
-    orchestrator: RunOrchestrator = Depends(get_default_orchestrator),
+    orchestrator: Annotated[RunOrchestrator, Depends(get_default_orchestrator)],
 ) -> PydanticResponse[SimpleBody[StatelessCommand]]:
     """Get a single stateless command.
 

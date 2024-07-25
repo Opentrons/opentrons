@@ -49,7 +49,7 @@ _app_state_accessor = AppStateAccessor[ClientDataStore]("client_data_store")
 
 
 async def get_client_data_store(
-    app_state: AppState = fastapi.Depends(get_app_state),
+    app_state: Annotated[AppState, fastapi.Depends(get_app_state)],
 ) -> ClientDataStore:
     """A FastAPI dependency to return the server's singleton `ClientDataStore`."""
     store = _app_state_accessor.get_from(app_state)

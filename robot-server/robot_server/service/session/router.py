@@ -57,7 +57,7 @@ def get_session(manager: SessionManager, session_id: IdentifierType) -> BaseSess
 )
 async def create_session_handler(
     create_request: SessionCreateRequest,
-    session_manager: SessionManager = Depends(get_session_manager),
+    session_manager: Annotated[SessionManager, Depends(get_session_manager)],
 ) -> SessionResponse:
     session_type = create_request.data.sessionType
     create_params = create_request.data.createParams
@@ -85,7 +85,7 @@ async def create_session_handler(
 )
 async def delete_session_handler(
     sessionId: IdentifierType,
-    session_manager: SessionManager = Depends(get_session_manager),
+    session_manager: Annotated[SessionManager, Depends(get_session_manager)],
 ) -> SessionResponse:
     session_obj = get_session(manager=session_manager, session_id=sessionId)
     await session_manager.remove(session_obj.meta.identifier)
@@ -108,7 +108,7 @@ async def delete_session_handler(
 )
 async def get_session_handler(
     sessionId: IdentifierType,
-    session_manager: SessionManager = Depends(get_session_manager),
+    session_manager: Annotated[SessionManager, Depends(get_session_manager)],
 ) -> SessionResponse:
     session_obj = get_session(manager=session_manager, session_id=sessionId)
 
@@ -132,7 +132,7 @@ async def get_sessions_handler(
     session_type: SessionType = Query(
         None, description="Will limit the results to only this session type"
     ),
-    session_manager: SessionManager = Depends(get_session_manager),
+    session_manager: Annotated[SessionManager, Depends(get_session_manager)],
 ) -> MultiSessionResponse:
     sessions = session_manager.get(session_type=session_type)
     return MultiSessionResponse(
@@ -154,7 +154,7 @@ async def get_sessions_handler(
 async def session_command_execute_handler(
     sessionId: IdentifierType,
     command_request: CommandRequest,
-    session_manager: SessionManager = Depends(get_session_manager),
+    session_manager: Annotated[SessionManager, Depends(get_session_manager)],
 ) -> CommandResponse:
     session_obj = get_session(manager=session_manager, session_id=sessionId)
     if not session_manager.is_active(session_obj.meta.identifier):

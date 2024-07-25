@@ -26,10 +26,10 @@ _run_orchestrator_store_accessor = AppStateAccessor[MaintenanceRunOrchestratorSt
 
 
 async def get_maintenance_run_orchestrator_store(
-    app_state: AppState = Depends(get_app_state),
-    hardware_api: HardwareControlAPI = Depends(get_hardware),
-    deck_type: DeckType = Depends(get_deck_type),
-    robot_type: RobotType = Depends(get_robot_type),
+    app_state: Annotated[AppState, Depends(get_app_state)],
+    hardware_api: Annotated[HardwareControlAPI, Depends(get_hardware)],
+    deck_type: Annotated[DeckType, Depends(get_deck_type)],
+    robot_type: Annotated[RobotType, Depends(get_robot_type)],
 ) -> MaintenanceRunOrchestratorStore:
     """Get a singleton MaintenanceRunOrchestratorStore to keep track of created engines / runners."""
     run_orchestrator_store = _run_orchestrator_store_accessor.get_from(app_state)

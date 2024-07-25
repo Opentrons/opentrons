@@ -80,8 +80,10 @@ class PreSerializedCommandsNotAvailable(ErrorDetails):
 
 async def get_current_run_from_url(
     runId: str,
-    run_orchestrator_store: RunOrchestratorStore = Depends(get_run_orchestrator_store),
-    run_store: RunStore = Depends(get_run_store),
+    run_orchestrator_store: Annotated[
+        RunOrchestratorStore, Depends(get_run_orchestrator_store)
+    ],
+    run_store: Annotated[RunStore, Depends(get_run_store)],
 ) -> str:
     """Get run from url.
 
@@ -186,9 +188,11 @@ async def create_run_command(
             "FIXIT command use only. Reference of the failed command id we are trying to fix."
         ),
     ),
-    run_orchestrator_store: RunOrchestratorStore = Depends(get_run_orchestrator_store),
-    check_estop: bool = Depends(require_estop_in_good_state),
-    run_id: str = Depends(get_current_run_from_url),
+    run_orchestrator_store: Annotated[
+        RunOrchestratorStore, Depends(get_run_orchestrator_store)
+    ],
+    check_estop: Annotated[bool, Depends(require_estop_in_good_state)],
+    run_id: Annotated[str, Depends(get_current_run_from_url)],
 ) -> PydanticResponse[SimpleBody[pe_commands.Command]]:
     """Enqueue a protocol command.
 
@@ -268,7 +272,7 @@ async def get_run_commands(
         _DEFAULT_COMMAND_LIST_LENGTH,
         description="The maximum number of commands in the list to return.",
     ),
-    run_data_manager: RunDataManager = Depends(get_run_data_manager),
+    run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
 ) -> PydanticResponse[MultiBody[RunCommandSummary, CommandCollectionLinks]]:
     """Get a summary of a set of commands in a run.
 
@@ -351,7 +355,7 @@ async def get_run_commands(
 )
 async def get_run_commands_as_pre_serialized_list(
     runId: str,
-    run_data_manager: RunDataManager = Depends(get_run_data_manager),
+    run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
 ) -> PydanticResponse[SimpleMultiBody[str]]:
     """Get all commands of a completed run as a list of pre-serialized (string encoded) commands.
 
@@ -392,7 +396,7 @@ async def get_run_commands_as_pre_serialized_list(
 async def get_run_command(
     runId: str,
     commandId: str,
-    run_data_manager: RunDataManager = Depends(get_run_data_manager),
+    run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
 ) -> PydanticResponse[SimpleBody[pe_commands.Command]]:
     """Get a specific command from a run.
 

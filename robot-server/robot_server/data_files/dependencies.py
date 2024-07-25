@@ -29,8 +29,8 @@ _data_files_store_accessor = AppStateAccessor[DataFilesStore]("data_files_store"
 
 
 async def get_data_files_directory(
-    app_state: AppState = Depends(get_app_state),
-    persistent_directory: Path = Depends(get_active_persistence_directory),
+    app_state: Annotated[AppState, Depends(get_app_state)],
+    persistent_directory: Annotated[Path, Depends(get_active_persistence_directory)],
 ) -> Path:
     """Get the directory to save the protocol files, creating it if needed."""
     async with _data_files_directory_init_lock:
@@ -44,8 +44,8 @@ async def get_data_files_directory(
 
 
 async def get_data_files_store(
-    app_state: AppState = Depends(get_app_state),
-    sql_engine: SQLEngine = Depends(get_sql_engine),
+    app_state: Annotated[AppState, Depends(get_app_state)],
+    sql_engine: Annotated[SQLEngine, Depends(get_sql_engine)],
 ) -> DataFilesStore:
     """Get a singleton DataFilesStore to keep track of uploaded data files."""
     async with _data_files_store_init_lock:
