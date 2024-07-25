@@ -11,7 +11,7 @@ FLAG_WORD = 61
 class WVTB01_BT50:
     def __init__(self):
         self.baud = 115200
-        self.serial: Optional[SerialDriver, None] = None
+        self.serial = None
 
     def build_device_by_serial(self):
         self.serial = SerialDriver()

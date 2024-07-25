@@ -33,7 +33,7 @@ class SerialDriver:
             select = '1'
         else:
             select = input(f"Select {lable} Port Number(输入串口号对应的数字):")
-        self.device = port_list[int(select.strip()) - 1].device
+        self.com = port_list[int(select.strip()) - 1].device
 
     def init_serial(self, baud):
 
@@ -42,21 +42,21 @@ class SerialDriver:
         :param baud:
         :return:
         """
-        self.com = serial.Serial(self.device, baud, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE,
+        self.device = serial.Serial(self.com, baud, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE,
                                  bytesize=serial.EIGHTBITS, timeout=1)
-        if self.com.isOpen():
+        if self.device.isOpen():
             print(f"{self.device} Opened! \n")
         # settings
-        self.com.bytesize = serial.EIGHTBITS  # 数据位 8
-        self.com.parity = serial.PARITY_NONE  # 无校验
-        self.com.stopbits = serial.STOPBITS_ONE  # 停止位 1
+        self.device.bytesize = serial.EIGHTBITS  # 数据位 8
+        self.device.parity = serial.PARITY_NONE  # 无校验
+        self.device.stopbits = serial.STOPBITS_ONE  # 停止位 1
 
     def close(self):
         """
         close com
         :return:
         """
-        self.com.close()
+        self.device.close()
         print(f"{self.device} Closed! \n")
 
     def init(self, baud, select_default=False, lable=""):
@@ -75,13 +75,13 @@ class SerialDriver:
         send cmd
         :return:
         """
-        if self.com is None:
+        if self.device is None:
             return
         if type(send) is not bytes:
             send = (send + "\r\n").encode('utf-8')
-        self.com.flushInput()
-        self.com.flushOutput()
-        self.com.write(send)
+        self.device.flushInput()
+        self.device.flushOutput()
+        self.device.write(send)
         time.sleep(0.1)
         if delay is None:
             pass
@@ -90,7 +90,7 @@ class SerialDriver:
         if only_write is True:
             return
         for i in range(times):
-            data = self.com.read(ReceiveBuffer)
+            data = self.device.read(ReceiveBuffer)
             if type(data) is not bytes:
                 if "OK" not in data.decode('utf-8') or "busy" in data.decode('utf-8'):
                     time.sleep(1)
@@ -105,30 +105,30 @@ class SerialDriver:
         :return:
         """
         try:
-            self.com.flushInput()
-            self.com.flushOutput()
+            self.device.flushInput()
+            self.device.flushOutput()
         except:
             pass
         time.sleep(0.3)
         # length = self.com.inWaiting()
         length = ReceiveBuffer if self.receive_buffer is None else self.receive_buffer
-        data = self.com.read(length)
-        self.com.flushInput()
-        self.com.flushOutput()
+        data = self.device.read(length)
+        self.device.flushInput()
+        self.device.flushOutput()
         return data.decode('utf-8')
 
     def read_buffer2(self, read_length, hex_flag=None):
         """
         get specify length of buffer
         """
-        self.com.flushInput()  # 清除接收缓存数据
+        self.device.flushInput()  # 清除接收缓存数据
         for _i in range(5):
             time.sleep(0.1)
-            length = self.com.in_waiting
+            length = self.device.in_waiting
             if length < read_length:
                 continue
             else:
-                return self.com.read(read_length) if hex_flag is None else self.com.read(read_length).hex()
+                return self.device.read(read_length) if hex_flag is None else self.device.read(read_length).hex()
 
 
 if __name__ == '__main__':

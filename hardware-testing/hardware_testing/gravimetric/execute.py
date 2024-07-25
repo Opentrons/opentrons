@@ -607,14 +607,12 @@ def get_airsensor_data(sensor: AirSensor2) -> list:
         return [None]
 
 
-def th_method():
+def th_method(sensor):
     global WRITE_MEASURE_DATA
-    pose_sensor = WVTB01_BT50()
-    pose_sensor.build_device_by_serial()
     time_str = time.strftime("%Y-%m-%d-%H-%M-%S")
 
     while WRITE_MEASURE_DATA:
-        pose_list = get_pose_sensor(pose_sensor)
+        pose_list = get_pose_sensor(sensor)
         _write_to_csv(f'/data/testing_data/sensor_measurement_{time_str}', pose_list)
 
 
@@ -718,7 +716,10 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
             resources.env_sensor,
         )
         # threading start
-        th = threading.Thread(target=th_method)
+        pose_sensor = WVTB01_BT50()
+        pose_sensor.build_device_by_serial()
+        time.sleep(3)
+        th = threading.Thread(target=th_method, args=(pose_sensor))
         th.start()
         for volume in trials.keys():
             actual_asp_list_all = []
