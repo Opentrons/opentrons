@@ -138,6 +138,7 @@ class AspirateImplementation(AbstractCommandImpl[AspirateParams, _ExecuteReturn]
                             error=e,
                         )
                     ],
+                    errorInfo={"retryLocation": (position.x, position.y, position.z)},
                 ),
                 private=OverpressureErrorInternalData(
                     position=DeckPoint.construct(
