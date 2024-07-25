@@ -66,14 +66,14 @@ class CommandNotFound(ErrorDetails):
 async def create_command(
     request_body: RequestModelWithStatelessCommandCreate,
     orchestrator: Annotated[RunOrchestrator, Depends(get_default_orchestrator)],
-    waitUntilComplete: bool = Query(
+    waitUntilComplete: Annotated[bool, Query(
         False,
         description=(
             "If `false`, return immediately, while the new command is still queued."
             " If `true`, only return once the new command succeeds or fails,"
             " or when the timeout is reached. See the `timeout` query parameter."
         ),
-    ),
+    )],
     timeout: Optional[int] = Query(
         default=None,
         gt=0,
@@ -142,10 +142,10 @@ async def get_commands_list(
             " based on the currently running or most recently executed command."
         ),
     ),
-    pageLength: int = Query(
+    pageLength: Annotated[int, Query(
         _DEFAULT_COMMAND_LIST_LENGTH,
         description="The maximum number of commands in the list to return.",
-    ),
+    )],
 ) -> PydanticResponse[SimpleMultiBody[StatelessCommand]]:
     """Get a list of stateless commands.
 

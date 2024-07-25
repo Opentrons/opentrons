@@ -129,9 +129,10 @@ async def get_session_handler(
     response_model=MultiSessionResponse,
 )
 async def get_sessions_handler(
-    session_type: SessionType = Query(
-        None, description="Will limit the results to only this session type"
-    ),
+    session_type: Annotated[
+        SessionType,
+        Query(None, description="Will limit the results to only this session type"),
+    ],
     session_manager: Annotated[SessionManager, Depends(get_session_manager)],
 ) -> MultiSessionResponse:
     sessions = session_manager.get(session_type=session_type)

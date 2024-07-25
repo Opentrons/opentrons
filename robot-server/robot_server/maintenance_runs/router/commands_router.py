@@ -100,14 +100,14 @@ async def get_current_run_from_url(
 )
 async def create_run_command(
     request_body: RequestModelWithCommandCreate,
-    waitUntilComplete: bool = Query(
+    waitUntilComplete: Annotated[bool, Query(
         default=False,
         description=(
             "If `false`, return immediately, while the new command is still queued."
             " If `true`, only return once the new command succeeds or fails,"
             " or when the timeout is reached. See the `timeout` query parameter."
         ),
-    ),
+    )],
     run_orchestrator_store: MaintenanceRunOrchestratorStore = Depends(
         get_maintenance_run_orchestrator_store
     ),
@@ -194,10 +194,10 @@ async def get_run_commands(
             " based on the currently running or most recently executed command."
         ),
     ),
-    pageLength: int = Query(
+    pageLength: Annotated[int, Query(
         _DEFAULT_COMMAND_LIST_LENGTH,
         description="The maximum number of commands in the list to return.",
-    ),
+    )],
     run_data_manager: MaintenanceRunDataManager = Depends(
         get_maintenance_run_data_manager
     ),

@@ -154,14 +154,14 @@ async def get_current_run_from_url(
 )
 async def create_run_command(
     request_body: RequestModelWithCommandCreate,
-    waitUntilComplete: bool = Query(
+    waitUntilComplete: Annotated[bool, Query(
         default=False,
         description=(
             "If `false`, return immediately, while the new command is still queued."
             " If `true`, only return once the new command succeeds or fails,"
             " or when the timeout is reached. See the `timeout` query parameter."
         ),
-    ),
+    )],
     timeout: Optional[int] = Query(
         default=None,
         gt=0,
@@ -268,10 +268,10 @@ async def get_run_commands(
             " based on the currently running or most recently executed command."
         ),
     ),
-    pageLength: int = Query(
+    pageLength: Annotated[int, Query(
         _DEFAULT_COMMAND_LIST_LENGTH,
         description="The maximum number of commands in the list to return.",
-    ),
+    )],
     run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
 ) -> PydanticResponse[MultiBody[RunCommandSummary, CommandCollectionLinks]]:
     """Get a summary of a set of commands in a run.

@@ -28,7 +28,7 @@ router = APIRouter()
     description="Blink the gantry lights so you can pick it out of a crowd",
 )
 async def post_identify(
-    seconds: int = Query(..., description="Time to blink the lights for"),
+    seconds: Annotated[int, Query(..., description="Time to blink the lights for")],
     hardware: Annotated[HardwareControlAPI, Depends(get_hardware)],
 ) -> V1BasicResponse:
     identify = hardware.identify

@@ -99,13 +99,13 @@ async def get_all_tip_length_calibrations(
     responses={status.HTTP_404_NOT_FOUND: {"model": ErrorBody}},
 )
 async def delete_specific_tip_length_calibration(
-    pipette_id: str = Query(
+    pipette_id: Annotated[str, Query(
         ...,
         description=(
             "The `pipette` field value of the calibration you want to delete."
             " (See `GET /calibration/tip_length`.)"
         ),
-    ),
+    )],
     tiprack_hash: Optional[str] = Query(
         None,
         description=(
