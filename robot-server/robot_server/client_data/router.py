@@ -134,11 +134,13 @@ async def delete_client_data(  # noqa: D103
     description="Delete all client-defined data. See `PUT /clientData` for background.",
 )
 async def delete_all_client_data(  # noqa: D103
-    store: ClientDataStore = fastapi.Depends(get_client_data_store),
+    store: Annotated[ClientDataStore, fastapi.Depends(get_client_data_store)],
+    client_data_publisher: Annotated[
+        ClientDataPublisher, fastapi.Depends(get_client_data_publisher)
+    ],
 ) -> SimpleEmptyBody:
+    keys_that_will_be_deleted = store.get_keys()
     store.delete_all()
-    # FIXME(mm, 2024-07-24): We need to notify MQTT subscribers to
-    # `robot-server/client/{key}` (for all values of `key`).
-    # We can do it like RunsPublisher and drive the notifications from the underlying
-    # store instead of driving notifications from these endpoint functions.
+    for deleted_key in keys_that_will_be_deleted:
+        await client_data_publisher.publish_client_data(deleted_key)
     return SimpleEmptyBody.construct()
