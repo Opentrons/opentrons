@@ -78,8 +78,7 @@ export function ChooseCsvFile({
 
   const handleBackButton = (): void => {
     if (!isEqual(csvFileSelected, initialFileObject)) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      setParameter(csvFileSelected, parameter.variableName)
+      setParameter(csvFileSelected, parameter.variableName as string)
     }
     handleGoBack()
   }
