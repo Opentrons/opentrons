@@ -12,8 +12,10 @@ from opentrons.protocol_engine import (
     CommandPointer,
     Command,
 )
-from opentrons.protocol_engine.types import PrimitiveRunTimeParamValuesType, \
-    CSVRunTimeParamFilesType
+from opentrons.protocol_engine.types import (
+    PrimitiveRunTimeParamValuesType,
+    CSVRuntimeParamPaths,
+)
 
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.service.task_runner import TaskRunner
@@ -154,7 +156,8 @@ class RunDataManager:
         labware_offsets: List[LabwareOffsetCreate],
         deck_configuration: DeckConfigurationType,
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType],
-        run_time_param_files: Optional[CSVRunTimeParamFilesType],
+        # TODO rename this variable
+        run_time_param_files: Optional[CSVRuntimeParamPaths],
         notify_publishers: Callable[[], None],
         protocol: Optional[ProtocolResource],
     ) -> Union[Run, BadRun]:

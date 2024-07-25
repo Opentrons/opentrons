@@ -32,7 +32,7 @@ from ..protocol_engine.types import (
     DeckConfigurationType,
     RunTimeParameter,
     PrimitiveRunTimeParamValuesType,
-    CSVRunTimeParamFilesType,
+    CSVRuntimeParamPaths,
 )
 from ..protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
 
@@ -229,6 +229,7 @@ class RunOrchestrator:
         """Get loaded labware definitions."""
         return self._protocol_engine.state_view.labware.get_loaded_labware_definitions()
 
+    # TODO make sure this returns CSV parameters here
     def get_run_time_parameters(self) -> List[RunTimeParameter]:
         """Get the list of run time parameters defined in the protocol, if any.
 
@@ -340,7 +341,8 @@ class RunOrchestrator:
         self,
         protocol_source: ProtocolSource,
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType],
-        run_time_param_files: Optional[CSVRunTimeParamFilesType],
+        # TODO this one too
+        run_time_param_files: Optional[CSVRuntimeParamPaths],
         parse_mode: ParseMode,
     ) -> None:
         """Load a json/python protocol."""

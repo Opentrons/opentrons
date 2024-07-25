@@ -1,5 +1,5 @@
 """Parameter context for python protocols."""
-
+import tempfile
 from typing import List, Optional, Union, Dict
 
 from opentrons.protocols.api_support.types import APIVersion
@@ -19,7 +19,7 @@ from opentrons.protocols.parameters.exceptions import (
 from opentrons.protocol_engine.types import (
     RunTimeParameter,
     PrimitiveRunTimeParamValuesType,
-    CSVRunTimeParamFilesType,
+    CSVRuntimeParamPaths,
     FileInfo,
 )
 
@@ -218,7 +218,7 @@ class ParameterContext:
                 parameter.value = validated_value
 
     def initialize_csv_files(
-        self, run_time_param_file_overrides: CSVRunTimeParamFilesType
+        self, run_time_param_file_overrides: CSVRuntimeParamPaths
     ) -> None:
         """Initializes the files for CSV parameters.
 
@@ -226,7 +226,7 @@ class ParameterContext:
 
         This is intended for Opentrons internal use only and is not a guaranteed API.
         """
-        for variable_name, file_id in run_time_param_file_overrides.items():
+        for variable_name, file_path in run_time_param_file_overrides.items():
             try:
                 parameter = self._parameters[variable_name]
             except KeyError:
@@ -240,11 +240,20 @@ class ParameterContext:
                     f"File Id was provided for the parameter '{variable_name}',"
                     f" but '{variable_name}' is not a CSV parameter."
                 )
+            file_id = file_path.parent.name
+            with file_path.open() as csv_file:
+                contents = csv_file.read()
+                file_name = csv_file.name
 
-            parameter.file_info = FileInfo(id=file_id, name="")
-            # TODO (spp, 2024-07-16): set the file name and assign the file as parameter.value.
-            #  Most likely, we will be creating a temporary file copy of the original
-            #  to pass onto the protocol context
+            temporary_file = tempfile.NamedTemporaryFile("r+")
+            temporary_file.write(contents)
+            temporary_file.flush()
+
+            parameter_file = open(temporary_file.name, "r")
+            temporary_file.close()
+
+            parameter.file_info = FileInfo(id=file_id, name=file_name)
+            parameter.value = parameter_file
 
     def export_parameters_for_analysis(self) -> List[RunTimeParameter]:
         """Exports all parameters into a protocol engine models for reporting in analysis.

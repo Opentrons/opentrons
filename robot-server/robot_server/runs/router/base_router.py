@@ -4,15 +4,22 @@ Contains routes dealing primarily with `Run` models.
 """
 import logging
 from datetime import datetime
+from pathlib import Path
 from textwrap import dedent
-from typing import Optional, Union, Callable
+from typing import Optional, Union, Callable, Dict
 from typing_extensions import Literal
 
 from fastapi import APIRouter, Depends, status, Query
 from pydantic import BaseModel, Field
 
 from opentrons_shared_data.errors import ErrorCodes
+from opentrons.protocol_engine.types import CSVRunTimeParamFilesType
 
+from robot_server.data_files.dependencies import (
+    get_data_files_directory,
+    get_data_files_store,
+)
+from robot_server.data_files.data_files_store import DataFilesStore
 from robot_server.errors.error_responses import ErrorDetails, ErrorBody
 from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.service.dependencies import get_current_time, get_unique_id
@@ -153,6 +160,8 @@ async def create_run(
     deck_configuration_store: DeckConfigurationStore = Depends(
         get_deck_configuration_store
     ),
+    data_files_directory: Path = Depends(get_data_files_directory),
+    data_files_store: DataFilesStore = Depends(get_data_files_store),
     notify_publishers: Callable[[], None] = Depends(get_pe_notify_publishers),
 ) -> PydanticResponse[SimpleBody[Union[Run, BadRun]]]:
     """Create a new run.
@@ -176,9 +185,17 @@ async def create_run(
     rtp_values = (
         request_body.data.runTimeParameterValues if request_body is not None else None
     )
-    rtp_files = (
+    # TODO maybe don't need this typing thing here
+    rtp_files: Optional[CSVRunTimeParamFilesType] = (
         request_body.data.runTimeParameterFiles if request_body is not None else None
     )
+    rtp_paths: Optional[Dict[str, Path]] = None
+    if rtp_files is not None:
+        rtp_paths = {}
+        for rtp_name, file_id in rtp_files.items():
+            file_name = data_files_store.get(file_id).name
+            rtp_paths[rtp_name] = data_files_directory / file_id / file_name
+
     protocol_resource = None
 
     deck_configuration = await deck_configuration_store.get_deck_configuration()
@@ -209,7 +226,7 @@ async def create_run(
             labware_offsets=offsets,
             deck_configuration=deck_configuration,
             run_time_param_values=rtp_values,
-            run_time_param_files=rtp_files,
+            run_time_param_files=rtp_paths,
             protocol=protocol_resource,
             notify_publishers=notify_publishers,
         )
