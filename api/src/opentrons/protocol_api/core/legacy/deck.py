@@ -8,8 +8,8 @@ from typing_extensions import Protocol, Final
 
 from opentrons_shared_data.deck import load as load_deck
 
-from opentrons_shared_data.deck.dev_types import SlotDefV3
-from opentrons_shared_data.labware.dev_types import LabwareUri
+from opentrons_shared_data.deck.types import SlotDefV3
+from opentrons_shared_data.labware.types import LabwareUri
 
 from opentrons.hardware_control.modules.types import ModuleType
 from opentrons.motion_planning import deck_conflict

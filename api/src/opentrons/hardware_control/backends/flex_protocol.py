@@ -12,7 +12,7 @@ from typing import (
     Set,
     TypeVar,
 )
-from opentrons_shared_data.pipette.dev_types import (
+from opentrons_shared_data.pipette.types import (
     PipetteName,
 )
 from opentrons.config.types import GantryLoad, OutputOptions

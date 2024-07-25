@@ -31,7 +31,7 @@ from .file_operation_helpers import (
     MutableConfigurationEncoder,
     MutableConfigurationDecoder,
 )
-from .dev_types import PipetteModel, PipetteName
+from .types import PipetteModel, PipetteName
 
 
 log = logging.getLogger(__name__)
