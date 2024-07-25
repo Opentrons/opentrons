@@ -15,6 +15,7 @@ from opentrons.protocol_engine.actions.actions import FailCommandAction
 from opentrons.protocol_engine.commands.aspirate import Aspirate
 from opentrons.protocol_engine.commands.dispense import Dispense
 from opentrons.protocol_engine.commands.aspirate_in_place import AspirateInPlace
+from opentrons.protocol_engine.commands.dispense_in_place import DispenseInPlace
 from opentrons.protocol_engine.commands.command import DefinedErrorData
 from opentrons.protocol_engine.commands.pipetting_common import (
     OverpressureError,
@@ -415,7 +416,8 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         elif (
             isinstance(action, FailCommandAction)
             and isinstance(
-                action.running_command, (Aspirate, Dispense, AspirateInPlace)
+                action.running_command,
+                (Aspirate, Dispense, AspirateInPlace, DispenseInPlace),
             )
             and isinstance(action.error, DefinedErrorData)
             and isinstance(action.error.public, OverpressureError)
