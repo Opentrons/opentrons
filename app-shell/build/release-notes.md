@@ -10,15 +10,7 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 Welcome to the v7.5.0 release of the Opentrons App!
 
-There are no changes to the Opentrons App in v7.5.0, but it is required for updating the robot software to improve some features.
-
----
-
-## Opentrons App Changes in 7.4.0
-
-Welcome to the v7.4.0 release of the Opentrons App!
-
-This release adds support for the [Opentrons Flex HEPA/UV Module](https://opentrons.com/products/opentrons-flex-hepa-uv-module).
+There are no changes to the Opentrons App in v7.5.0, but it is required for updating the robot software to support the latest Flex Gripper hardware and the [Opentrons Flex HEPA/UV Module](https://opentrons.com/products/opentrons-flex-hepa-uv-module).
 
 ---
 
