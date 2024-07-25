@@ -3,6 +3,7 @@ import subprocess
 import uuid
 
 from bs4 import BeautifulSoup
+from bs4.element import Tag
 from markdownify import markdownify  # type: ignore
 
 
@@ -47,34 +48,39 @@ def remove_list_items_containing_ot1(soup: BeautifulSoup) -> BeautifulSoup:
     return soup
 
 
-def remove_head_tag(soup: BeautifulSoup) -> BeautifulSoup:
-    """Remove the <head> tag from the HTML."""
-    head_tag = soup.find("head")
-    if head_tag:
-        head_tag.decompose()
-    return soup
+def remove_top_section(soup: BeautifulSoup) -> BeautifulSoup:
+    """Remove everything before a Python API docs header section."""
+    # Remove everything before the <div class="document"> element
+    start_section = soup.find("div", class_="document")
 
-
-def remove_everything_before_section(soup: BeautifulSoup, class_name: str) -> BeautifulSoup:
-    """Remove everything before a specified section."""
-    start_section = soup.find("div", class_=class_name)
+    # Check if the section was found
     if not start_section:
-        print(f"Start section with class '{class_name}' not found in the HTML content.")
+        print("Start section not found in the HTML content.")
         return soup
+
+    # Find the head tag and remove it
+    head_tag = soup.find("head")
+    if isinstance(head_tag, Tag):
+        head_tag.decompose()
+
+    # Remove all previous siblings of the start_section
     for previous in list(start_section.previous_siblings):
         previous.extract()
+
+    # Remove the parent elements if they are no longer needed
     for parent in list(start_section.parents):
         if parent.name == "body":
             break
         if not parent.find_previous_siblings() and not parent.find_next_siblings():
             parent.extract()
+
     return soup
 
 
 def remove_footer_content(soup: BeautifulSoup) -> BeautifulSoup:
     """Remove the footer content from the HTML."""
     footer_section = soup.find("footer")
-    if footer_section:
+    if isinstance(footer_section, Tag):
         footer_section.decompose()
     return soup
 
@@ -85,8 +91,7 @@ def clean_html(soup: BeautifulSoup) -> BeautifulSoup:
     soup = remove_all_images(soup)
     soup = remove_pilcrow_symbols(soup)
     soup = remove_list_items_containing_ot1(soup)
-    soup = remove_head_tag(soup)
-    soup = remove_everything_before_section(soup, "document")
+    soup = remove_top_section(soup)
     soup = remove_footer_content(soup)
     return soup
 
@@ -102,9 +107,15 @@ def extract_and_remove_api_reference(html_file_path: str, output_file_path: str)
 
     # Find the start and end points
     start_span = soup.find("span", id="document-new_protocol_api")
+    if start_span is None:
+        print("Start span not found.")
+        return soup
 
     # Get the section to keep
     api_section = start_span.find_next_sibling("section", id="api-version-2-reference")
+    if api_section is None:
+        print("API section not found.")
+        return soup
 
     # Create a BeautifulSoup object for the extracted section
     extracted_html = str(start_span) + str(api_section)
@@ -115,8 +126,9 @@ def extract_and_remove_api_reference(html_file_path: str, output_file_path: str)
         file.write(reference_markdown)
 
     # Remove it from the main markdown file
-    start_span.decompose()
-    api_section.decompose()
+    if isinstance(start_span, Tag) and isinstance(api_section, Tag):
+        start_span.decompose()
+        api_section.decompose()
 
     return soup
 
