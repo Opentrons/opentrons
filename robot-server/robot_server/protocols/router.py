@@ -228,16 +228,16 @@ async def create_protocol(  # noqa: C901
     protocol_auto_deleter: Annotated[
         ProtocolAutoDeleter, Depends(get_protocol_auto_deleter)
     ],
-    quick_transfer_protocol_auto_deleter: ProtocolAutoDeleter = Depends(
+    quick_transfer_protocol_auto_deleter: Annotated[ProtocolAutoDeleter, Depends(
         get_quick_transfer_protocol_auto_deleter
-    ),
+    )],
     robot_type: Annotated[RobotType, Depends(get_robot_type)],
-    protocol_id: str = Depends(get_unique_id, use_cache=False),
-    analysis_id: str = Depends(get_unique_id, use_cache=False),
+    protocol_id: Annotated[str, Depends(get_unique_id, use_cache=False)],
+    analysis_id: Annotated[str, Depends(get_unique_id, use_cache=False)],
     created_at: Annotated[datetime, Depends(get_current_time)],
-    maximum_quick_transfer_protocols: int = Depends(
+    maximum_quick_transfer_protocols: Annotated[int, Depends(
         get_maximum_quick_transfer_protocols
-    ),
+    )],
 ) -> PydanticResponse[SimpleBody[Protocol]]:
     """Create a new protocol by uploading its files.
 
@@ -645,7 +645,7 @@ async def create_protocol_analysis(
     protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
     analysis_store: Annotated[AnalysisStore, Depends(get_analysis_store)],
     analyses_manager: Annotated[AnalysesManager, Depends(get_analyses_manager)],
-    analysis_id: str = Depends(get_unique_id, use_cache=False),
+    analysis_id: Annotated[str, Depends(get_unique_id, use_cache=False)],
 ) -> PydanticResponse[SimpleMultiBody[AnalysisSummary]]:
     """Start a new analysis for the given existing protocol.
 

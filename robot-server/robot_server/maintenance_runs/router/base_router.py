@@ -104,9 +104,9 @@ class AllRunsLinks(BaseModel):
 
 async def get_run_data_from_url(
     runId: str,
-    run_data_manager: MaintenanceRunDataManager = Depends(
+    run_data_manager: Annotated[MaintenanceRunDataManager, Depends(
         get_maintenance_run_data_manager
-    ),
+    )],
 ) -> MaintenanceRun:
     """Get the data of a maintenance run.
 
@@ -144,18 +144,18 @@ async def get_run_data_from_url(
 )
 async def create_run(
     request_body: Optional[RequestModel[MaintenanceRunCreate]] = None,
-    run_data_manager: MaintenanceRunDataManager = Depends(
+    run_data_manager: Annotated[MaintenanceRunDataManager, Depends(
         get_maintenance_run_data_manager
-    ),
+    )],
     run_id: Annotated[str, Depends(get_unique_id)],
     created_at: Annotated[datetime, Depends(get_current_time)],
-    is_ok_to_create_maintenance_run: bool = Depends(
+    is_ok_to_create_maintenance_run: Annotated[bool, Depends(
         get_is_okay_to_create_maintenance_run
-    ),
+    )],
     check_estop: Annotated[bool, Depends(require_estop_in_good_state)],
-    deck_configuration_store: DeckConfigurationStore = Depends(
+    deck_configuration_store: Annotated[DeckConfigurationStore, Depends(
         get_deck_configuration_store
-    ),
+    )],
     notify_publishers: Callable[[], None] = Depends(get_pe_notify_publishers),
 ) -> PydanticResponse[SimpleBody[MaintenanceRun]]:
     """Create a new maintenance run.
@@ -204,9 +204,9 @@ async def create_run(
     },
 )
 async def get_current_run(
-    run_data_manager: MaintenanceRunDataManager = Depends(
+    run_data_manager: Annotated[MaintenanceRunDataManager, Depends(
         get_maintenance_run_data_manager
-    ),
+    )],
 ) -> PydanticResponse[Body[MaintenanceRun, AllRunsLinks]]:
     """Get the current maintenance run.
 
@@ -266,9 +266,9 @@ async def get_run(
 )
 async def remove_run(
     runId: str,
-    run_data_manager: MaintenanceRunDataManager = Depends(
+    run_data_manager: Annotated[MaintenanceRunDataManager, Depends(
         get_maintenance_run_data_manager
-    ),
+    )],
 ) -> PydanticResponse[SimpleEmptyBody]:
     """Delete a maintenance run by its ID.
 

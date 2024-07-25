@@ -94,7 +94,7 @@ async def upload_data_file(
     data_files_store: Annotated[DataFilesStore, Depends(get_data_files_store)],
     file_reader_writer: Annotated[FileReaderWriter, Depends(get_file_reader_writer)],
     file_hasher: Annotated[FileHasher, Depends(get_file_hasher)],
-    file_id: str = Depends(get_unique_id, use_cache=False),
+    file_id: Annotated[str, Depends(get_unique_id, use_cache=False)],
     created_at: Annotated[datetime, Depends(get_current_time)],
 ) -> PydanticResponse[SimpleBody[DataFile]]:
     """Save the uploaded data file to persistent storage and update database."""

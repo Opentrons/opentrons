@@ -37,9 +37,9 @@ labware_router = APIRouter()
 )
 async def add_labware_offset(
     request_body: RequestModel[LabwareOffsetCreate],
-    run_orchestrator_store: MaintenanceRunOrchestratorStore = Depends(
-        get_maintenance_run_orchestrator_store
-    ),
+    run_orchestrator_store: Annotated[
+        MaintenanceRunOrchestratorStore, Depends(get_maintenance_run_orchestrator_store)
+    ],
     run: Annotated[MaintenanceRun, Depends(get_run_data_from_url)],
 ) -> PydanticResponse[SimpleBody[LabwareOffset]]:
     """Add a labware offset to a maintenance run.
@@ -76,9 +76,9 @@ async def add_labware_offset(
 )
 async def add_labware_definition(
     request_body: RequestModel[LabwareDefinition],
-    run_orchestrator_store: MaintenanceRunOrchestratorStore = Depends(
-        get_maintenance_run_orchestrator_store
-    ),
+    run_orchestrator_store: Annotated[
+        MaintenanceRunOrchestratorStore, Depends(get_maintenance_run_orchestrator_store)
+    ],
     run: Annotated[MaintenanceRun, Depends(get_run_data_from_url)],
 ) -> PydanticResponse[SimpleBody[LabwareDefinitionSummary]]:
     """Add a labware offset to a run.

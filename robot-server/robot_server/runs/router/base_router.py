@@ -145,13 +145,13 @@ async def create_run(
     run_id: Annotated[str, Depends(get_unique_id)],
     created_at: Annotated[datetime, Depends(get_current_time)],
     run_auto_deleter: Annotated[RunAutoDeleter, Depends(get_run_auto_deleter)],
-    quick_transfer_run_auto_deleter: RunAutoDeleter = Depends(
+    quick_transfer_run_auto_deleter: Annotated[RunAutoDeleter, Depends(
         get_quick_transfer_run_auto_deleter
-    ),
+    )],
     check_estop: Annotated[bool, Depends(require_estop_in_good_state)],
-    deck_configuration_store: DeckConfigurationStore = Depends(
+    deck_configuration_store: Annotated[DeckConfigurationStore, Depends(
         get_deck_configuration_store
-    ),
+    )],
     notify_publishers: Callable[[], None] = Depends(get_pe_notify_publishers),
 ) -> PydanticResponse[SimpleBody[Union[Run, BadRun]]]:
     """Create a new run.

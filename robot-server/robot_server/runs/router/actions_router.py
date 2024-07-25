@@ -97,12 +97,12 @@ async def create_run_action(
     run_controller: Annotated[RunController, Depends(get_run_controller)],
     action_id: Annotated[str, Depends(get_unique_id)],
     created_at: Annotated[datetime, Depends(get_current_time)],
-    maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore = Depends(
-        get_maintenance_run_orchestrator_store
-    ),
-    deck_configuration_store: DeckConfigurationStore = Depends(
-        get_deck_configuration_store
-    ),
+    maintenance_run_orchestrator_store: Annotated[
+        MaintenanceRunOrchestratorStore, Depends(get_maintenance_run_orchestrator_store)
+    ],
+    deck_configuration_store: Annotated[
+        DeckConfigurationStore, Depends(get_deck_configuration_store)
+    ],
     check_estop: Annotated[bool, Depends(require_estop_in_good_state)],
 ) -> PydanticResponse[SimpleBody[RunAction]]:
     """Create a run control action.

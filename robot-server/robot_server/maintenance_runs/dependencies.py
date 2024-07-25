@@ -44,12 +44,12 @@ async def get_maintenance_run_orchestrator_store(
 
 
 async def get_maintenance_run_data_manager(
-    run_orchestrator_store: MaintenanceRunOrchestratorStore = Depends(
-        get_maintenance_run_orchestrator_store
-    ),
-    maintenance_runs_publisher: MaintenanceRunsPublisher = Depends(
-        get_maintenance_runs_publisher
-    ),
+    run_orchestrator_store: Annotated[
+        MaintenanceRunOrchestratorStore, Depends(get_maintenance_run_orchestrator_store)
+    ],
+    maintenance_runs_publisher: Annotated[
+        MaintenanceRunsPublisher, Depends(get_maintenance_runs_publisher)
+    ],
 ) -> MaintenanceRunDataManager:
     """Get a maintenance run data manager to keep track of current run data."""
     return MaintenanceRunDataManager(
