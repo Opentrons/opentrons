@@ -1,6 +1,6 @@
 """Router for /maintenance_runs commands endpoints."""
 import textwrap
-from typing import Optional, Union
+from typing import Annotated, Optional, Union
 from typing_extensions import Final, Literal
 
 from fastapi import APIRouter, Depends, Query, status

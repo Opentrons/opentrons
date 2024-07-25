@@ -2,7 +2,7 @@
 from datetime import datetime
 from pathlib import Path
 from textwrap import dedent
-from typing import Optional, Literal, Union
+from typing import Annotated, Optional, Literal, Union
 
 from fastapi import APIRouter, UploadFile, File, Form, Depends, Response, status
 from opentrons.protocol_reader import FileHasher, FileReaderWriter

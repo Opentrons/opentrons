@@ -3,7 +3,7 @@
 As of the v5 software release, these endpoints do not function.
 All labware offsets are set via `/run` endpoints.
 """
-from typing import Optional
+from typing import Annotated, Optional
 from typing_extensions import Literal, NoReturn
 
 from fastapi import APIRouter, Depends, status

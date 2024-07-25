@@ -3,7 +3,7 @@
 
 from asyncio import Lock as AsyncLock
 from pathlib import Path
-from typing_extensions import Final
+from typing import Annotated, Final
 import logging
 
 from anyio import Path as AsyncPath

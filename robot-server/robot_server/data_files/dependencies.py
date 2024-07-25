@@ -1,7 +1,7 @@
 """FastAPI dependencies for data files endpoints."""
 from pathlib import Path
 from asyncio import Lock as AsyncLock
-from typing import Final
+from typing import Annotated, Final
 from anyio import Path as AsyncPath
 
 from fastapi import Depends

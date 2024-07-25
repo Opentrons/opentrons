@@ -1,7 +1,7 @@
 """HTTP routes and handlers for /health endpoints."""
 from dataclasses import dataclass
 from fastapi import APIRouter, Depends, status
-from typing import Dict, cast
+from typing import Annotated, Dict, cast
 import logging
 import json
 

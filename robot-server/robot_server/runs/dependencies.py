@@ -1,4 +1,6 @@
 """Run router dependency-injection wire-up."""
+from typing import Annotated
+
 from fastapi import Depends, status
 from robot_server.protocols.dependencies import get_protocol_store
 from robot_server.protocols.protocol_models import ProtocolKind

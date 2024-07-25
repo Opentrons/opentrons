@@ -1,7 +1,7 @@
 """Provides an interface for alerting notification publishers to events and related lifecycle utilities."""
 import asyncio
 from fastapi import Depends
-from typing import Optional, Callable, List, Awaitable, Union
+from typing import Annotated, Optional, Callable, List, Awaitable, Union
 
 from server_utils.fastapi_utils.app_state import (
     AppState,

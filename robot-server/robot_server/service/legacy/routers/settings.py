@@ -1,7 +1,7 @@
 import aiohttp
 import logging
 from dataclasses import asdict
-from typing import cast, Any, Dict, List, Optional, Union
+from typing import cast, Annotated, Any, Dict, List, Optional, Union
 from starlette import status
 from fastapi import APIRouter, Depends
 

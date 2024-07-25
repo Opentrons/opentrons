@@ -1,6 +1,6 @@
 """Modules routes."""
 from fastapi import APIRouter, Depends, status
-from typing import List, Dict
+from typing import Annotated, List, Dict
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import module_calibration

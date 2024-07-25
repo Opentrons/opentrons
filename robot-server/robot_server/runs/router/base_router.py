@@ -5,8 +5,7 @@ Contains routes dealing primarily with `Run` models.
 import logging
 from datetime import datetime
 from textwrap import dedent
-from typing import Optional, Union, Callable
-from typing_extensions import Literal
+from typing import Annotated, Literal, Optional, Union, Callable
 
 from fastapi import APIRouter, Depends, status, Query
 from pydantic import BaseModel, Field

@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Query, Response
-from typing import Dict
+from typing import Annotated, Dict
 
 from opentrons.system import log_control
 

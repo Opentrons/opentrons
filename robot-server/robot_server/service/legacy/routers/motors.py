@@ -1,3 +1,5 @@
+from typing import Annotated
+
 from starlette import status
 from fastapi import APIRouter, Depends
 from pydantic import ValidationError

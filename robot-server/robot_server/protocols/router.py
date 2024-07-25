@@ -5,12 +5,11 @@ import logging
 from textwrap import dedent
 from datetime import datetime
 from pathlib import Path
-from typing import List, Optional, Union, Tuple
+from typing import Annotated, List, Literal, Optional, Union, Tuple
 
 from opentrons.protocol_engine.types import RunTimeParamValuesType
 from opentrons_shared_data.robot import user_facing_robot_type
 from opentrons.util.performance_helpers import TrackingFunctions
-from typing_extensions import Literal
 
 from fastapi import (
     APIRouter,

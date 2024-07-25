@@ -1,6 +1,6 @@
 from starlette import status
 from fastapi import APIRouter, Depends
-from typing import Optional
+from typing import Annotated, Optional
 
 from opentrons import types as ot_types
 from opentrons.calibration_storage.ot2 import pipette_offset, models

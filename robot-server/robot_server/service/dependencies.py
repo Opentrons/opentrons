@@ -1,3 +1,5 @@
+from typing import Annotated
+
 from datetime import datetime, timezone
 from uuid import uuid4
 from fastapi import Depends

@@ -7,7 +7,7 @@
 from __future__ import annotations
 import asyncio
 from logging import getLogger
-from typing import Any, Awaitable, Callable, Set
+from typing import Annotated, Any, Awaitable, Callable, Set
 from fastapi import Depends
 from server_utils.fastapi_utils.app_state import (
     AppState,

@@ -2,7 +2,7 @@
 
 
 from datetime import datetime
-from typing import Union
+from typing import Annotated, Union
 
 import fastapi
 from starlette.status import HTTP_422_UNPROCESSABLE_ENTITY

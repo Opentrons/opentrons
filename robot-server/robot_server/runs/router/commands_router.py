@@ -1,7 +1,6 @@
 """Router for /runs commands endpoints."""
 import textwrap
-from typing import Optional, Union
-from typing_extensions import Final, Literal
+from typing import Annotated, Final, Literal, Optional, Union
 
 from fastapi import APIRouter, Depends, Query, status
 

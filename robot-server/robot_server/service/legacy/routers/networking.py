@@ -4,7 +4,7 @@ import subprocess
 
 from starlette import status
 from starlette.responses import JSONResponse
-from typing import Optional
+from typing import Annotated, Optional
 from fastapi import APIRouter, HTTPException, File, Path, UploadFile, Query
 
 from opentrons_shared_data.errors import ErrorCodes

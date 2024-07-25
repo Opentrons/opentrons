@@ -1,7 +1,7 @@
 """The router for the /subsystems endpoints."""
 
 from datetime import datetime
-from typing import Optional, TYPE_CHECKING
+from typing import Annotated, Optional, TYPE_CHECKING
 
 from fastapi import APIRouter, status, Depends, Response, Request
 from typing_extensions import Literal

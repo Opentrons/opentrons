@@ -1,6 +1,5 @@
 """Router for top-level /commands endpoints."""
-from typing import List, Optional, cast
-from typing_extensions import Final, Literal
+from typing import Annotated, Final, List, Literal, Optional, cast
 
 from fastapi import APIRouter, Depends, Query, status
 

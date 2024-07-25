@@ -4,7 +4,7 @@
 import asyncio
 import logging
 from pathlib import Path
-from typing import Awaitable, Callable, Iterable, Optional
+from typing import Annotated, Awaitable, Callable, Iterable, Optional
 from typing_extensions import Literal
 
 from sqlalchemy.engine import Engine as SQLEngine

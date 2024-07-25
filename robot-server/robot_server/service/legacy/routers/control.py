@@ -1,3 +1,5 @@
+from typing import Annotated
+
 import asyncio
 
 from fastapi import APIRouter, Query, Depends

@@ -3,8 +3,7 @@ import logging
 
 from fastapi import APIRouter, Depends, status
 from datetime import datetime
-from typing import Union
-from typing_extensions import Literal
+from typing import Annotated, Literal, Union
 
 from robot_server.errors.error_responses import ErrorDetails, ErrorBody
 from robot_server.service.dependencies import get_current_time, get_unique_id

@@ -1,5 +1,5 @@
 """Module identification and response data mapping."""
-from typing import Type, cast, Optional
+from typing import Annotated, Type, cast, Optional
 from fastapi import Depends
 
 from opentrons_shared_data.module import load_definition

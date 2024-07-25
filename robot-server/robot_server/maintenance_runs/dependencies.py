@@ -1,4 +1,6 @@
 """Maintenance Run router dependency-injection wire-up."""
+from typing import Annotated
+
 from fastapi import Depends
 
 from opentrons_shared_data.robot.types import RobotType

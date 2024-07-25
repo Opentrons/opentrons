@@ -5,7 +5,7 @@ Contains routes dealing primarily with `Maintenance Run` models.
 import logging
 from datetime import datetime
 from textwrap import dedent
-from typing import Optional, Callable
+from typing import Annotated, Optional, Callable
 from typing_extensions import Literal
 
 from fastapi import APIRouter, Depends, status

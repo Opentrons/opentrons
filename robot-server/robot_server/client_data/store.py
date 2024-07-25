@@ -1,5 +1,7 @@
 """An in-memory store for arbitrary client-defined JSON objects."""
 
+from typing import Annotated
+
 import fastapi
 
 from server_utils.fastapi_utils.app_state import (

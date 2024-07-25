@@ -1,4 +1,6 @@
 """Dependencies related to /robot/control endpoints."""
+from typing import Annotated
+
 from fastapi import status, Depends
 
 from opentrons.hardware_control import ThreadManagedHardware

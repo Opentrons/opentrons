@@ -1,6 +1,6 @@
 from fastapi import Depends
 from dataclasses import dataclass
-from typing import Callable, Optional
+from typing import Annotated, Callable, Optional
 
 from opentrons.protocol_engine import CommandPointer, StateSummary, EngineStatus
 

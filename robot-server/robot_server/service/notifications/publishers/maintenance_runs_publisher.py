@@ -1,3 +1,5 @@
+from typing import Annotated
+
 from fastapi import Depends
 
 from server_utils.fastapi_utils.app_state import (

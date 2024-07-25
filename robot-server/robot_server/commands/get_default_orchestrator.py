@@ -1,5 +1,5 @@
 """Get the default protocol engine."""
-from typing_extensions import Literal
+from typing import Annotated, Literal
 
 from fastapi import Depends, status
 

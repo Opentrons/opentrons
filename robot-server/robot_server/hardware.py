@@ -6,6 +6,7 @@ from fastapi import Depends, status
 from typing import (
     TYPE_CHECKING,
     cast,
+    Annotated,
     Awaitable,
     Callable,
     Iterator,
