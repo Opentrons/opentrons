@@ -38,13 +38,12 @@ from robot_server.protocols.router import ProtocolNotFound
 from ..run_models import RunNotFoundError
 from ..run_auto_deleter import RunAutoDeleter
 from ..run_models import Run, BadRun, RunCreate, RunUpdate
-from ..run_orchestrator_store import RunConflictError, RunOrchestratorStore
+from ..run_orchestrator_store import RunConflictError
 from ..run_data_manager import RunDataManager, RunNotCurrentError
 from ..dependencies import (
     get_run_data_manager,
     get_run_auto_deleter,
     get_quick_transfer_run_auto_deleter,
-    get_run_orchestrator_store,
 )
 from ..error_recovery_models import ErrorRecoveryRule
 
@@ -385,7 +384,7 @@ async def create_run_policies(
     runId: str,
     request_body: Optional[RequestModel[List[ErrorRecoveryRule]]] = None,
     run_data_manager: RunDataManager = Depends(get_run_data_manager),
-) -> PydanticResponse[SimpleBody[Union[Run, BadRun]]]:
+) -> PydanticResponse[SimpleEmptyBody]:
     """Create run polices.
 
     Arguments:
@@ -395,9 +394,12 @@ async def create_run_policies(
     """
     policies = request_body.data if request_body is not None else None
     if policies:
-        await run_data_manager.create_policies(run_id=runId, policies=policies)
+        try:
+            await run_data_manager.create_policies(run_id=runId, policies=policies)
+        except RunNotCurrentError as e:
+            raise RunStopped(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e
 
     return await PydanticResponse.create(
-        content=SimpleBody.construct(data=None),
-        status_code=status.HTTP_201_CREATED,
+        content=SimpleEmptyBody.construct(),
+        status_code=status.HTTP_200_OK,
     )
