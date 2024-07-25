@@ -580,7 +580,11 @@ async def test_create_policies(
 ) -> None:
     """It should call RunDataManager create run policies."""
     policies = decoy.mock(cls=List[ErrorRecoveryRule])
-    await create_run_policies(runId="rud-id", run_data_manager=mock_run_data_manager, request_body=RequestModel(data=policies))
+    await create_run_policies(
+        runId="rud-id",
+        run_data_manager=mock_run_data_manager,
+        request_body=RequestModel(data=policies),
+    )
     decoy.verify(
         await mock_run_data_manager.create_policies(run_id="rud-id", policies=policies)
     )
@@ -607,7 +611,9 @@ async def test_create_policies_raises_not_active_run(
     ).then_raise(RunNotCurrentError())
     with pytest.raises(ApiError) as exc_info:
         await create_run_policies(
-            runId="rud-id", run_data_manager=mock_run_data_manager, request_body=RequestModel(data=policies)
+            runId="rud-id",
+            run_data_manager=mock_run_data_manager,
+            request_body=RequestModel(data=policies),
         )
 
     assert exc_info.value.status_code == 409

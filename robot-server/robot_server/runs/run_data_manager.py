@@ -17,8 +17,8 @@ from opentrons.protocol_engine.types import RunTimeParamValuesType
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.service.task_runner import TaskRunner
 from robot_server.service.notifications import RunsPublisher
+from . import error_recovery_mapping
 from .error_recovery_models import ErrorRecoveryRule
-from .error_recovery_mapping import create_error_recovery_policy_from_rules
 
 from .run_orchestrator_store import RunOrchestratorStore
 from .run_store import RunResource, RunStore, BadRunResource, BadStateSummary
@@ -443,7 +443,9 @@ class RunDataManager:
             raise RunNotCurrentError(
                 f"Cannot update {run_id} because it is not the current run."
             )
-        policy = create_error_recovery_policy_from_rules(policies)
+        policy = error_recovery_mapping.create_error_recovery_policy_from_rules(
+            policies
+        )
         await self._run_orchestrator_store.create_error_recovery_policy(policy=policy)
 
     def _get_state_summary(self, run_id: str) -> Union[StateSummary, BadStateSummary]:

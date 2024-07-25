@@ -1,12 +1,9 @@
 """Tests for RunDataManager."""
+from datetime import datetime
 from typing import Optional, List
 
 import pytest
-from datetime import datetime
 from decoy import Decoy, matchers
-
-from opentrons.types import DeckSlotName
-from opentrons.protocol_runner import RunResult
 from opentrons.protocol_engine import (
     EngineStatus,
     StateSummary,
@@ -20,32 +17,34 @@ from opentrons.protocol_engine import (
     LoadedModule,
     LabwareOffset,
 )
+from opentrons.protocol_engine import Liquid
+from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
+from opentrons.protocol_runner import RunResult
+from opentrons.types import DeckSlotName
 
+from opentrons_shared_data.errors.exceptions import InvalidStoredData
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from robot_server.protocols.protocol_store import ProtocolResource
+from robot_server.runs import error_recovery_mapping
 from robot_server.runs.error_recovery_models import ErrorRecoveryRule
-from robot_server.runs.run_orchestrator_store import (
-    RunOrchestratorStore,
-    RunConflictError,
-)
 from robot_server.runs.run_data_manager import (
     RunDataManager,
     RunNotCurrentError,
     PreSerializedCommandsNotAvailableError,
 )
 from robot_server.runs.run_models import Run, BadRun, RunNotFoundError, RunDataError
+from robot_server.runs.run_orchestrator_store import (
+    RunOrchestratorStore,
+    RunConflictError,
+)
 from robot_server.runs.run_store import (
     RunStore,
     RunResource,
     CommandNotFoundError,
     BadStateSummary,
 )
-from robot_server.service.task_runner import TaskRunner
 from robot_server.service.notifications import RunsPublisher
-
-from opentrons.protocol_engine import Liquid
-
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
-from opentrons_shared_data.errors.exceptions import InvalidStoredData
+from robot_server.service.task_runner import TaskRunner
 
 
 def mock_notify_publishers() -> None:
@@ -1004,19 +1003,44 @@ async def test_get_current_run_labware_definition(
     ]
 
 
-async def test_create_policies_raises_run_not_current(decoy: Decoy,
-                                                      mock_run_orchestrator_store: RunOrchestratorStore,
-                                                      subject: RunDataManager) -> None:
+async def test_create_policies_raises_run_not_current(
+    decoy: Decoy,
+    mock_run_orchestrator_store: RunOrchestratorStore,
+    subject: RunDataManager,
+) -> None:
     """Should raise run not current."""
-    decoy.when(mock_run_orchestrator_store.current_run_id).then_return("not-current-run-id")
+    decoy.when(mock_run_orchestrator_store.current_run_id).then_return(
+        "not-current-run-id"
+    )
     with pytest.raises(RunNotCurrentError):
-        await subject.create_policies(run_id="run-id", policies=decoy.mock(cls=List[ErrorRecoveryRule]))
+        await subject.create_policies(
+            run_id="run-id", policies=decoy.mock(cls=List[ErrorRecoveryRule])
+        )
 
 
-async def test_create_policies_translates_and_calls_orchestrator(decoy: Decoy,
-                                                      mock_run_orchestrator_store: RunOrchestratorStore,
-                                                      subject: RunDataManager) -> None:
+async def test_create_policies_translates_and_calls_orchestrator(
+    decoy: Decoy,
+    monkeypatch: pytest.MonkeyPatch,
+    mock_run_orchestrator_store: RunOrchestratorStore,
+    subject: RunDataManager,
+) -> None:
     """Should translate rules into policy and call orchestrator."""
+    monkeypatch.setattr(
+        error_recovery_mapping,
+        "create_error_recovery_policy_from_rules",
+        decoy.mock(
+            func=decoy.mock(
+                func=error_recovery_mapping.create_error_recovery_policy_from_rules
+            )
+        ),
+    )
+    input_rules = decoy.mock(cls=List[ErrorRecoveryRule])
+    expected_output = decoy.mock(cls=ErrorRecoveryPolicy)
+    decoy.when(
+        error_recovery_mapping.create_error_recovery_policy_from_rules(input_rules)
+    ).then_return(expected_output)
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return("run-id")
-    await subject.create_policies(run_id="run-id", policies=decoy.mock(cls=List[ErrorRecoveryRule]))
-
+    await subject.create_policies(run_id="run-id", policies=input_rules)
+    decoy.verify(
+        await mock_run_orchestrator_store.create_error_recovery_policy(expected_output)
+    )
