@@ -61,7 +61,7 @@ jobs:
         run: |
           git fetch origin ${{ env.PR_TARGET_BRANCH }}
           DIFF_OUTPUT=$(git diff HEAD origin/${{ env.PR_TARGET_BRANCH }} -- analyses-snapshot-testing/tests/__snapshots__/analyses_snapshot_test)
-          if [ $DIFF_EXIT_CODE -eq 0 ]; then
+          if [ -n "$DIFF_OUTPUT" ]; then
             echo "Analyses snapshots match ${{ env.PR_TARGET_BRANCH }} snapshots."
           else
             echo "Analyses snapshots do NOT match ${{ env.PR_TARGET_BRANCH }} snapshots."
