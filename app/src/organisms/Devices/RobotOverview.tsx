@@ -66,7 +66,7 @@ export function RobotOverview({
   const isRobotViewable = useIsRobotViewable(robot?.name ?? '')
   const { lightsOn, toggleLights } = useLights()
 
-  const userId = useSelector(getConfig)?.support?.userId ?? 'Opentrons-user'
+  const userId = useSelector(getConfig)?.userInfo?.userId ?? 'Opentrons-user'
 
   const addresses = useSelector((state: State) =>
     getRobotAddressesByName(state, robot?.name ?? '')

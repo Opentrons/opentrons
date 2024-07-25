@@ -282,4 +282,20 @@ describe('shell selectors', () => {
       expect(Selectors.getApplyHistoricOffsets(state)).toEqual(true)
     })
   })
+
+  describe('getUserId', () => {
+    it('should return userId if it exists in config', () => {
+      const state: State = {
+        config: {
+          userInfo: { userId: 'test-user-id' },
+        },
+      } as any
+      expect(Selectors.getUserId(state)).toEqual('test-user-id')
+    })
+
+    it('should return an empty string if config is null', () => {
+      const state: State = { config: null } as any
+      expect(Selectors.getUserId(state)).toEqual('')
+    })
+  })
 })
