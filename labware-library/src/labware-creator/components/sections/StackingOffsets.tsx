@@ -85,19 +85,15 @@ export function StackingOffsets(): JSX.Element | null {
         definition.parameters.loadName === 'opentrons_96_well_aluminum_block'
     )
   }
-  if (isFlatBottom && isReservoir) {
-    modifiedAdapterDefinitions = adapterDefinitions.filter(
-      definition =>
-        definition.parameters.loadName === 'opentrons_universal_flat_adapter'
-    )
-  }
   if (isFlatBottom && (isReservoir || isWellPlate)) {
     modifiedAdapterDefinitions = adapterDefinitions.filter(
       definition =>
         definition.parameters.loadName ===
-        'opentrons_aluminum_flat_bottom_plate'
+          'opentrons_aluminum_flat_bottom_plate' ||
+        definition.parameters.loadName === 'opentrons_universal_flat_adapter'
     )
   }
+
   if (
     isFlatBottom &&
     isCircular &&
