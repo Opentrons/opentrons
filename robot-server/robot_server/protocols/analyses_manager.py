@@ -5,7 +5,7 @@ from opentrons.util import helpers as datetime_helper
 
 from opentrons.protocol_engine.types import (
     PrimitiveRunTimeParamValuesType,
-    CSVRunTimeParamFilesType,
+    CSVRuntimeParamPaths,
 )
 from opentrons.protocol_engine.errors import ErrorOccurrence
 
@@ -40,7 +40,8 @@ class AnalysesManager:
         analysis_id: str,
         protocol_resource: ProtocolResource,
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType],
-        run_time_param_files: Optional[CSVRunTimeParamFilesType],
+        # TODO rename this as well i guess
+        run_time_param_files: Optional[CSVRuntimeParamPaths],
     ) -> protocol_analyzer.ProtocolAnalyzer:
         """Initialize the protocol analyzer with protocol resource and run time parameter values & fileIds.
 

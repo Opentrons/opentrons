@@ -20,7 +20,8 @@ from opentrons.protocol_engine import (
 )
 from opentrons.protocol_engine.types import (
     RunTimeParameter,
-    PrimitiveRunTimeParamValuesType, CSVRunTimeParamFilesType,
+    PrimitiveRunTimeParamValuesType,
+    CSVRunTimeParamFilesType,
 )
 from opentrons_shared_data.errors import GeneralError
 from robot_server.service.json_api import ResourceModel

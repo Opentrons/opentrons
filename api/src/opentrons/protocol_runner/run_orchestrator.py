@@ -32,7 +32,7 @@ from ..protocol_engine.types import (
     DeckConfigurationType,
     RunTimeParameter,
     PrimitiveRunTimeParamValuesType,
-    CSVRunTimeParamFilesType,
+    CSVRuntimeParamPaths,
 )
 from ..protocol_reader import JsonProtocolConfig, PythonProtocolConfig, ProtocolSource
 from ..protocols.parse import PythonParseMode
@@ -227,6 +227,7 @@ class RunOrchestrator:
         """Get loaded labware definitions."""
         return self._protocol_engine.state_view.labware.get_loaded_labware_definitions()
 
+    # TODO make sure this returns CSV parameters here
     def get_run_time_parameters(self) -> List[RunTimeParameter]:
         """Parameter definitions defined by protocol, if any. Will always be empty before execution."""
         return (
@@ -325,7 +326,8 @@ class RunOrchestrator:
         self,
         protocol_source: ProtocolSource,
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType],
-        run_time_param_files: Optional[CSVRunTimeParamFilesType],
+        # TODO this one too
+        run_time_param_files: Optional[CSVRuntimeParamPaths],
         parse_mode: ParseMode,
     ) -> None:
         """Load a json/python protocol."""

@@ -5,11 +5,11 @@ import logging
 from textwrap import dedent
 from datetime import datetime
 from pathlib import Path
-from typing import List, Optional, Union, Tuple
+from typing import List, Optional, Union, Tuple, Dict
 
 from opentrons.protocol_engine.types import (
     PrimitiveRunTimeParamValuesType,
-    CSVRunTimeParamFilesType,
+    CSVRuntimeParamPaths,
 )
 from opentrons_shared_data.robot import user_facing_robot_type
 from opentrons.util.performance_helpers import TrackingFunctions
@@ -48,6 +48,11 @@ from robot_server.service.json_api import (
     PydanticResponse,
     RequestModel,
 )
+from robot_server.data_files.dependencies import (
+    get_data_files_directory,
+    get_data_files_store,
+)
+from robot_server.data_files.data_files_store import DataFilesStore
 from robot_server.data_files.models import DataFile
 
 from .analyses_manager import AnalysesManager, FailedToInitializeAnalyzer
@@ -250,6 +255,8 @@ async def create_protocol(  # noqa: C901
     maximum_quick_transfer_protocols: int = Depends(
         get_maximum_quick_transfer_protocols
     ),
+    data_files_directory: Path = Depends(get_data_files_directory),
+    data_files_store: DataFilesStore = Depends(get_data_files_store),
 ) -> PydanticResponse[SimpleBody[Protocol]]:
     """Create a new protocol by uploading its files.
 
@@ -309,6 +316,11 @@ async def create_protocol(  # noqa: C901
         if isinstance(run_time_parameter_files, str)
         else {}
     )
+    rtp_paths: Dict[str, Path] = {}
+    if parsed_rtp_files is not None:
+        for rtp_name, file_id in parsed_rtp_files.items():
+            file_name = data_files_store.get(file_id).name
+            rtp_paths[rtp_name] = data_files_directory / file_id / file_name
     content_hash = await file_hasher.hash(buffered_files)
     cached_protocol_id = protocol_store.get_id_by_hash(content_hash)
 
@@ -325,7 +337,7 @@ async def create_protocol(  # noqa: C901
                     analysis_id=analysis_id,
                     force_analyze=False,
                     rtp_values=parsed_rtp_values,
-                    rtp_files=parsed_rtp_files,
+                    rtp_files=rtp_paths,
                     protocol_resource=protocol_store.get(
                         protocol_id=cached_protocol_id
                     ),
@@ -404,7 +416,7 @@ async def create_protocol(  # noqa: C901
         analysis_id=analysis_id,
         force_analyze=True,
         rtp_values=parsed_rtp_values,
-        rtp_files=parsed_rtp_files,
+        rtp_files=rtp_paths,
         protocol_resource=protocol_resource,
         analysis_store=analysis_store,
         analyses_manager=analyses_manager,
@@ -435,7 +447,7 @@ async def _start_new_analysis_if_necessary(
     analysis_id: str,
     force_analyze: bool,
     rtp_values: PrimitiveRunTimeParamValuesType,
-    rtp_files: CSVRunTimeParamFilesType,
+    rtp_files: CSVRuntimeParamPaths,
     protocol_resource: ProtocolResource,
     analysis_store: AnalysisStore,
     analyses_manager: AnalysesManager,
@@ -690,6 +702,8 @@ async def create_protocol_analysis(
     analysis_store: AnalysisStore = Depends(get_analysis_store),
     analyses_manager: AnalysesManager = Depends(get_analyses_manager),
     analysis_id: str = Depends(get_unique_id, use_cache=False),
+    data_files_directory: Path = Depends(get_data_files_directory),
+    data_files_store: DataFilesStore = Depends(get_data_files_store),
 ) -> PydanticResponse[SimpleMultiBody[AnalysisSummary]]:
     """Start a new analysis for the given existing protocol.
 
@@ -708,6 +722,13 @@ async def create_protocol_analysis(
         raise ProtocolNotFound(detail=f"Protocol {protocolId} not found").as_error(
             status.HTTP_404_NOT_FOUND
         )
+
+    rtp_paths: Dict[str, Path] = {}
+    if request_body and request_body.data.runTimeParameterFiles:
+        for rtp_name, file_id in request_body.data.runTimeParameterFiles.items():
+            file_name = data_files_store.get(file_id).name
+            rtp_paths[rtp_name] = data_files_directory / file_id / file_name
+
     try:
         (
             analysis_summaries,
@@ -717,7 +738,7 @@ async def create_protocol_analysis(
             analysis_id=analysis_id,
             force_analyze=request_body.data.forceReAnalyze if request_body else False,
             rtp_values=request_body.data.runTimeParameterValues if request_body else {},
-            rtp_files=request_body.data.runTimeParameterFiles if request_body else {},
+            rtp_files=rtp_paths,
             protocol_resource=protocol_store.get(protocol_id=protocolId),
             analysis_store=analysis_store,
             analyses_manager=analyses_manager,
