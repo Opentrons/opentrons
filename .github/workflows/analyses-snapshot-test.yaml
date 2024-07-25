@@ -98,13 +98,13 @@ jobs:
 
       - name: Handle Test Failure
         id: handle_failure
-        if: always() && steps.run_test.outcome == 'failure' && (env.OPEN_PR_ON_FAILURE || github.event_name == 'schedule')
+        if: always() && steps.run_test.outcome == 'failure' && (env.OPEN_PR_ON_FAILURE == 'true' || github.event_name == 'schedule')
         working-directory: analyses-snapshot-testing
         run: make snapshot-test-update
 
       - name: Create Snapshot update Request
         id: create_pull_request
-        if: always() && steps.handle_failure.outcome == 'success' && env.OPEN_PR_ON_FAILURE && github.event_name == 'pull_request'
+        if: always() && steps.handle_failure.outcome == 'success' && env.OPEN_PR_ON_FAILURE == 'true' && github.event_name == 'pull_request'
         uses: peter-evans/create-pull-request@v6
         with:
           commit-message: 'fix(analyses-snapshot-testing): heal analyses snapshots'
@@ -118,7 +118,7 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const message = 'A PR has been opened to address analyses snapshot changes. Please review the changes here: https://github.com/${{ github.repository }}/pull/${{ steps.create-pull-request.outputs.pull-request-number }}';
+            const message = 'A PR has been opened to address analyses snapshot changes. Please review the changes here: https://github.com/${{ github.repository }}/pull/${{ steps.create_pull_request.outputs.pull-request-number }}';
             github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
