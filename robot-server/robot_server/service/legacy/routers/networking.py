@@ -66,17 +66,20 @@ async def get_networking_status() -> NetworkingStatus:
     response_model=WifiNetworks,
 )
 async def get_wifi_networks(
-    rescan: Optional[bool] = Query(
-        default=False,
-        description=(
-            "If `true`, forces a rescan for beaconing Wi-Fi networks. "
-            "This is an expensive operation that can take ~10 seconds, "
-            'so only do it based on user needs like clicking a "scan network" '
-            "button, not just to poll. "
-            "If `false`, returns the cached Wi-Fi networks, "
-            "letting the system decide when to do a rescan."
+    rescan: Annotated[
+        Optional[bool],
+        Query(
+            default=False,
+            description=(
+                "If `true`, forces a rescan for beaconing Wi-Fi networks. "
+                "This is an expensive operation that can take ~10 seconds, "
+                'so only do it based on user needs like clicking a "scan network" '
+                "button, not just to poll. "
+                "If `false`, returns the cached Wi-Fi networks, "
+                "letting the system decide when to do a rescan."
+            ),
         ),
-    )
+    ]
 ) -> WifiNetworks:
     networks = await nmcli.available_ssids(rescan)
     return WifiNetworks(list=[WifiNetworkFull(**n) for n in networks])

@@ -111,7 +111,7 @@ async def create_run_command(
     run_orchestrator_store: MaintenanceRunOrchestratorStore = Depends(
         get_maintenance_run_orchestrator_store
     ),
-    timeout: Optional[int] = Query(
+    timeout: Annotated[Optional[int], Query(
         default=None,
         gt=0,
         description=(
@@ -130,7 +130,7 @@ async def create_run_command(
             "Compatibility note: on robot software v6.2.0 and older,"
             " the default was 30 seconds, not infinite."
         ),
-    ),
+    )],
     run_id: Annotated[str, Depends(get_current_run_from_url)],
     check_estop: Annotated[bool, Depends(require_estop_in_good_state)],
 ) -> PydanticResponse[SimpleBody[pe_commands.Command]]:
@@ -186,14 +186,14 @@ async def create_run_command(
 )
 async def get_run_commands(
     runId: str,
-    cursor: Optional[int] = Query(
+    cursor: Annotated[Optional[int], Query(
         None,
         description=(
             "The starting index of the desired first command in the list."
             " If unspecified, a cursor will be selected automatically"
             " based on the currently running or most recently executed command."
         ),
-    ),
+    )],
     pageLength: Annotated[int, Query(
         _DEFAULT_COMMAND_LIST_LENGTH,
         description="The maximum number of commands in the list to return.",

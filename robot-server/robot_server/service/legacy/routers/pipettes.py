@@ -27,17 +27,20 @@ router = APIRouter()
     response_model=pipettes.PipettesByMount,
 )
 async def get_pipettes(
-    refresh: typing.Optional[bool] = Query(
-        False,
-        description="If `false`, query a cached value. If `true`, actively scan for"
-        " attached pipettes."
-        "\n\n"
-        "**Warning:** Actively scanning disables the pipette motors and should only be done"
-        " when no protocol is running and you know it won't cause a problem."
-        "\n\n"
-        "**Warning:** Actively scanning is only valid on OT-2s. On Flex robots, it's"
-        " unnecessary, and the behavior is currently undefined.",
-    ),
+    refresh: typing.Annotated[
+        Optional[bool],
+        Query(
+            False,
+            description="If `false`, query a cached value. If `true`, actively scan for"
+            " attached pipettes."
+            "\n\n"
+            "**Warning:** Actively scanning disables the pipette motors and should only be done"
+            " when no protocol is running and you know it won't cause a problem."
+            "\n\n"
+            "**Warning:** Actively scanning is only valid on OT-2s. On Flex robots, it's"
+            " unnecessary, and the behavior is currently undefined.",
+        ),
+    ],
     hardware: Annotated[HardwareControlAPI, Depends(get_hardware)],
 ) -> pipettes.PipettesByMount:
     """

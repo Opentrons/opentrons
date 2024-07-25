@@ -233,7 +233,7 @@ async def create_run(
     },
 )
 async def get_runs(
-    pageLength: Optional[int] = Query(
+    pageLength: Annotated[Optional[int], Query(
         None,
         description=(
             "The maximum number of runs to return."
@@ -241,7 +241,7 @@ async def get_runs(
             " the most-recently created runs will be returned."
             " If this is omitted or `null`, all runs will be returned."
         ),
-    ),
+    )],
     run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
 ) -> PydanticResponse[MultiBody[Union[Run, BadRun], AllRunsLinks]]:
     """Get all runs, in order from least-recently to most-recently created.

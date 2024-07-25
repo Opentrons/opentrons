@@ -49,23 +49,30 @@ def _format_calibration(
     response_model=tl_models.MultipleCalibrationsResponse,
 )
 async def get_all_tip_length_calibrations(
-    tiprack_hash: Optional[str] = Query(
-        None,
-        description=(
-            "Filter results by their `tiprack` field."
-            " This is deprecated because it was prone to bugs where semantically identical"
-            " definitions had different hashes."
-            " Use `tiprack_uri` instead."
+    tiprack_hash: Annotated[
+        Optional[str],
+        Query(
+            None,
+            description=(
+                "Filter results by their `tiprack` field."
+                " This is deprecated because it was prone to bugs where semantically identical"
+                " definitions had different hashes."
+                " Use `tiprack_uri` instead."
+            ),
+            deprecated=True,
         ),
-        deprecated=True,
-    ),
-    pipette_id: Optional[str] = Query(
-        None, description="Filter results by their `pipette` field."
-    ),
-    tiprack_uri: Optional[str] = Query(
-        None,
-        description="Filter results by their `uri` field.",
-    ),
+    ],
+    pipette_id: Annotated[
+        Optional[str],
+        Query(None, description="Filter results by their `pipette` field."),
+    ],
+    tiprack_uri: Annotated[
+        Optional[str],
+        Query(
+            None,
+            description="Filter results by their `uri` field.",
+        ),
+    ],
     _: Annotated[API, Depends(get_ot2_hardware)],
 ) -> tl_models.MultipleCalibrationsResponse:
     all_calibrations = tip_length.get_all_tip_length_calibrations()
@@ -99,36 +106,45 @@ async def get_all_tip_length_calibrations(
     responses={status.HTTP_404_NOT_FOUND: {"model": ErrorBody}},
 )
 async def delete_specific_tip_length_calibration(
-    pipette_id: Annotated[str, Query(
-        ...,
-        description=(
-            "The `pipette` field value of the calibration you want to delete."
-            " (See `GET /calibration/tip_length`.)"
+    pipette_id: Annotated[
+        str,
+        Query(
+            ...,
+            description=(
+                "The `pipette` field value of the calibration you want to delete."
+                " (See `GET /calibration/tip_length`.)"
+            ),
         ),
-    )],
-    tiprack_hash: Optional[str] = Query(
-        None,
-        description=(
-            "The `tiprack` field value of the calibration you want to delete."
-            " (See `GET /calibration/tip_length`.)"
-            "\n\n"
-            " This is deprecated because it was prone to bugs where semantically identical"
-            " definitions had different hashes."
-            " Use `tiprack_uri` instead."
-            "\n\n"
-            "You must supply either this or `tiprack_uri`."
+    ],
+    tiprack_hash: Annotated[
+        Optional[str],
+        Query(
+            None,
+            description=(
+                "The `tiprack` field value of the calibration you want to delete."
+                " (See `GET /calibration/tip_length`.)"
+                "\n\n"
+                " This is deprecated because it was prone to bugs where semantically identical"
+                " definitions had different hashes."
+                " Use `tiprack_uri` instead."
+                "\n\n"
+                "You must supply either this or `tiprack_uri`."
+            ),
+            deprecated=True,
         ),
-        deprecated=True,
-    ),
-    tiprack_uri: Optional[str] = Query(
-        None,
-        description=(
-            "The `uri` field value of the calibration you want to delete."
-            " (See `GET /calibration/tip_length`.)"
-            "\n\n"
-            " You must supply either this or `tiprack_hash`."
+    ],
+    tiprack_uri: Annotated[
+        Optional[str],
+        Query(
+            None,
+            description=(
+                "The `uri` field value of the calibration you want to delete."
+                " (See `GET /calibration/tip_length`.)"
+                "\n\n"
+                " You must supply either this or `tiprack_hash`."
+            ),
         ),
-    ),
+    ],
     _: Annotated[API, Depends(get_ot2_hardware)],
 ):
     try:

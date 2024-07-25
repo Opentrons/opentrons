@@ -455,7 +455,7 @@ async def _start_new_analysis_if_necessary(
     responses={status.HTTP_200_OK: {"model": SimpleMultiBody[Protocol]}},
 )
 async def get_protocols(
-    protocol_kind: Optional[ProtocolKind] = Query(
+    protocol_kind: Annotated[Optional[ProtocolKind], Query(
         None,
         description=(
             "Specify the kind of protocols you want to return."
@@ -463,7 +463,7 @@ async def get_protocols(
             " If this is omitted or `null`, all protocols will be returned."
         ),
         alias="protocolKind",
-    ),
+    )],
     protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
     analysis_store: Annotated[AnalysisStore, Depends(get_analysis_store)],
 ) -> PydanticResponse[SimpleMultiBody[Protocol]]:
