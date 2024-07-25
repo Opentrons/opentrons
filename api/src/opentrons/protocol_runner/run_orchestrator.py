@@ -6,10 +6,10 @@ from typing import Optional, Union, List, Dict, AsyncGenerator
 
 from anyio import move_on_after
 
-from opentrons_shared_data.labware.dev_types import LabwareUri
+from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.errors import GeneralError
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.types import RobotType
 
 from . import protocol_runner, RunResult, JsonRunner, PythonAndLegacyRunner
 from ..hardware_control import HardwareControlAPI
@@ -158,7 +158,11 @@ class RunOrchestrator:
 
     def play(self, deck_configuration: Optional[DeckConfigurationType] = None) -> None:
         """Start or resume the run."""
-        self._protocol_engine.play(deck_configuration=deck_configuration)
+        # todo(mm, 2024-07-09): The deck configuration is set at the same time here for
+        # historical reasons. It's unsafe to change the deck configuration mid-run
+        # and we're relying on the caller to not do that.
+        self._protocol_engine.set_deck_configuration(deck_configuration)
+        self._protocol_engine.play()
 
     async def run(
         self,
@@ -231,7 +235,7 @@ class RunOrchestrator:
         )
 
     def get_current_command(self) -> Optional[CommandPointer]:
-        """Get the current running command."""
+        """Get the "current" command, if any."""
         return self._protocol_engine.state_view.commands.get_current()
 
     def get_command_slice(

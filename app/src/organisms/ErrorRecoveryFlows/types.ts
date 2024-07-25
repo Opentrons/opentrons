@@ -63,3 +63,5 @@ export type RecoveryContentProps = ErrorRecoveryWizardProps & {
   errorKind: ErrorKind
   isOnDevice: boolean
 }
+
+export type DesktopSizeType = 'desktop-small' | 'desktop-large'

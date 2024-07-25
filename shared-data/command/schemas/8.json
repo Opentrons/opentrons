@@ -41,6 +41,7 @@
       "verifyTipPresence": "#/definitions/VerifyTipPresenceCreate",
       "getTipPresence": "#/definitions/GetTipPresenceCreate",
       "liquidProbe": "#/definitions/LiquidProbeCreate",
+      "tryLiquidProbe": "#/definitions/TryLiquidProbeCreate",
       "heaterShaker/waitForTemperature": "#/definitions/opentrons__protocol_engine__commands__heater_shaker__wait_for_temperature__WaitForTemperatureCreate",
       "heaterShaker/setTargetTemperature": "#/definitions/opentrons__protocol_engine__commands__heater_shaker__set_target_temperature__SetTargetTemperatureCreate",
       "heaterShaker/deactivateHeater": "#/definitions/DeactivateHeaterCreate",
@@ -180,6 +181,9 @@
     },
     {
       "$ref": "#/definitions/LiquidProbeCreate"
+    },
+    {
+      "$ref": "#/definitions/TryLiquidProbeCreate"
     },
     {
       "$ref": "#/definitions/opentrons__protocol_engine__commands__heater_shaker__wait_for_temperature__WaitForTemperatureCreate"
@@ -643,9 +647,15 @@
           "description": "The front right nozzle in your configuration.",
           "pattern": "[A-Z]\\d{1,2}",
           "type": "string"
+        },
+        "backLeftNozzle": {
+          "title": "Backleftnozzle",
+          "description": "The back left nozzle in your configuration.",
+          "pattern": "[A-Z]\\d{1,2}",
+          "type": "string"
         }
       },
-      "required": ["primaryNozzle", "frontRightNozzle"]
+      "required": ["primaryNozzle", "frontRightNozzle", "backLeftNozzle"]
     },
     "ConfigureNozzleLayoutParams": {
       "title": "ConfigureNozzleLayoutParams",
@@ -2775,7 +2785,7 @@
     },
     "LiquidProbeParams": {
       "title": "LiquidProbeParams",
-      "description": "Parameters required to liquid probe a specific well.",
+      "description": "Parameters required for a `liquidProbe` command.",
       "type": "object",
       "properties": {
         "labwareId": {
@@ -2807,7 +2817,7 @@
     },
     "LiquidProbeCreate": {
       "title": "LiquidProbeCreate",
-      "description": "Create LiquidProbe command request model.",
+      "description": "The request model for a `liquidProbe` command.",
       "type": "object",
       "properties": {
         "commandType": {
@@ -2818,6 +2828,68 @@
         },
         "params": {
           "$ref": "#/definitions/LiquidProbeParams"
+        },
+        "intent": {
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CommandIntent"
+            }
+          ]
+        },
+        "key": {
+          "title": "Key",
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "type": "string"
+        }
+      },
+      "required": ["params"]
+    },
+    "TryLiquidProbeParams": {
+      "title": "TryLiquidProbeParams",
+      "description": "Parameters required for a `tryLiquidProbe` command.",
+      "type": "object",
+      "properties": {
+        "labwareId": {
+          "title": "Labwareid",
+          "description": "Identifier of labware to use.",
+          "type": "string"
+        },
+        "wellName": {
+          "title": "Wellname",
+          "description": "Name of well to use in labware.",
+          "type": "string"
+        },
+        "wellLocation": {
+          "title": "Welllocation",
+          "description": "Relative well location at which to perform the operation",
+          "allOf": [
+            {
+              "$ref": "#/definitions/WellLocation"
+            }
+          ]
+        },
+        "pipetteId": {
+          "title": "Pipetteid",
+          "description": "Identifier of pipette to use for liquid handling.",
+          "type": "string"
+        }
+      },
+      "required": ["labwareId", "wellName", "pipetteId"]
+    },
+    "TryLiquidProbeCreate": {
+      "title": "TryLiquidProbeCreate",
+      "description": "The request model for a `tryLiquidProbe` command.",
+      "type": "object",
+      "properties": {
+        "commandType": {
+          "title": "Commandtype",
+          "default": "tryLiquidProbe",
+          "enum": ["tryLiquidProbe"],
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/definitions/TryLiquidProbeParams"
         },
         "intent": {
           "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",

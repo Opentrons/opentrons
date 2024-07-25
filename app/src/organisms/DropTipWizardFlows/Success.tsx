@@ -21,28 +21,40 @@ type SuccessProps = DropTipWizardContainerProps & {
   handleProceed: () => void
 }
 export const Success = (props: SuccessProps): JSX.Element => {
-  const { message, proceedText, handleProceed, isOnDevice } = props
+  const {
+    message,
+    proceedText,
+    handleProceed,
+    isOnDevice,
+    issuedCommandsType,
+  } = props
 
   const { i18n } = useTranslation(['drop_tip_wizard', 'shared'])
 
   return (
-    <SimpleWizardBody
-      iconColor={COLORS.green50}
-      header={i18n.format(message, 'capitalize')}
-      isSuccess
-      paddingX={SPACING.spacing32}
-    >
-      {isOnDevice ? (
-        <Flex justifyContent={JUSTIFY_FLEX_END} width="100%">
-          <SmallButton
-            textTransform={TEXT_TRANSFORM_CAPITALIZE}
-            buttonText={proceedText}
-            onClick={handleProceed}
-          />
-        </Flex>
-      ) : (
-        <PrimaryButton onClick={handleProceed}>{proceedText}</PrimaryButton>
-      )}
-    </SimpleWizardBody>
+    <>
+      {issuedCommandsType === 'fixit' ? <Flex /> : null}
+      <SimpleWizardBody
+        iconColor={COLORS.green50}
+        header={i18n.format(message, 'capitalize')}
+        isSuccess
+        paddingX={SPACING.spacing32}
+        marginTop={
+          issuedCommandsType === 'fixit' && isOnDevice ? SPACING.spacing40 : 0
+        }
+      >
+        {isOnDevice ? (
+          <Flex justifyContent={JUSTIFY_FLEX_END} width="100%">
+            <SmallButton
+              textTransform={TEXT_TRANSFORM_CAPITALIZE}
+              buttonText={proceedText}
+              onClick={handleProceed}
+            />
+          </Flex>
+        ) : (
+          <PrimaryButton onClick={handleProceed}>{proceedText}</PrimaryButton>
+        )}
+      </SimpleWizardBody>
+    </>
   )
 }

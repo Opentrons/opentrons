@@ -31,8 +31,8 @@ from opentrons.hardware_control.types import (
     HardwareEventHandler,
 )
 
-from opentrons_shared_data.robot.dev_types import RobotType, RobotTypeEnum
-from opentrons_shared_data.labware.dev_types import LabwareUri
+from opentrons_shared_data.robot.types import RobotType, RobotTypeEnum
+from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 _log = logging.getLogger(__name__)
@@ -229,7 +229,7 @@ class MaintenanceRunOrchestratorStore:
         return self.run_orchestrator.get_command_slice(cursor=cursor, length=length)
 
     def get_current_command(self) -> Optional[CommandPointer]:
-        """Get the current running command."""
+        """Get the "current" command, if any."""
         return self.run_orchestrator.get_current_command()
 
     def get_command_recovery_target(self) -> Optional[CommandPointer]:

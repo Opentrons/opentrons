@@ -28,10 +28,8 @@ class ErrorRecoveryType(enum.Enum):
     WAIT_FOR_RECOVERY = enum.auto()
     """Stop and wait for the error to be recovered from manually."""
 
-    # TODO(mm, 2023-03-18): Add something like this for
-    # https://opentrons.atlassian.net/browse/EXEC-302.
-    # CONTINUE = enum.auto()
-    # """Continue with the run, as if the command never failed."""
+    IGNORE_AND_CONTINUE = enum.auto()
+    """Continue with the run, as if the command never failed."""
 
 
 class ErrorRecoveryPolicy(Protocol):

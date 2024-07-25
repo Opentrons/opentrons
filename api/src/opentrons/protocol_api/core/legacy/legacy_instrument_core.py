@@ -545,6 +545,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
         style: NozzleLayout,
         primary_nozzle: Optional[str],
         front_right_nozzle: Optional[str],
+        back_left_nozzle: Optional[str],
     ) -> None:
         """This will never be called because it was added in API 2.16."""
         pass
@@ -565,10 +566,18 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
         """Retract this instrument to the top of the gantry."""
         self._protocol_interface.get_hardware.retract(self._mount)  # type: ignore [attr-defined]
 
-    def liquid_probe_with_recovery(self, well_core: WellCore) -> None:
+    def detect_liquid_presence(self, well_core: WellCore, loc: types.Location) -> bool:
+        """This will never be called because it was added in API 2.20."""
+        assert False, "detect_liquid_presence only supported in API 2.20 & later"
+
+    def liquid_probe_with_recovery(
+        self, well_core: WellCore, loc: types.Location
+    ) -> None:
         """This will never be called because it was added in API 2.20."""
         assert False, "liquid_probe_with_recovery only supported in API 2.20 & later"
 
-    def liquid_probe_without_recovery(self, well_core: WellCore) -> float:
+    def liquid_probe_without_recovery(
+        self, well_core: WellCore, loc: types.Location
+    ) -> float:
         """This will never be called because it was added in API 2.20."""
         assert False, "liquid_probe_without_recovery only supported in API 2.20 & later"

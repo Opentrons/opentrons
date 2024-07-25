@@ -1,17 +1,28 @@
 import * as React from 'react'
 import head from 'lodash/head'
+import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 
 import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  LegacyStyledText,
+  StyledText,
+  RESPONSIVENESS,
 } from '@opentrons/components'
 
-import { ODD_SECTION_TITLE_STYLE, RECOVERY_MAP } from '../constants'
+import {
+  ODD_SECTION_TITLE_STYLE,
+  RECOVERY_MAP,
+  ODD_ONLY,
+  DESKTOP_ONLY,
+} from '../constants'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
-import { RecoveryFooterButtons, RecoverySingleColumnContent } from '../shared'
+import {
+  RecoveryFooterButtons,
+  RecoverySingleColumnContentWrapper,
+  RecoveryRadioGroup,
+} from '../shared'
 import { RadioButton } from '../../../atoms/buttons'
 
 import type { RecoveryContentProps } from '../types'
@@ -35,7 +46,6 @@ export function IgnoreErrorSkipStep(props: RecoveryContentProps): JSX.Element {
 }
 
 export function IgnoreErrorStepHome({
-  isOnDevice,
   recoveryCommands,
   routeUpdateActions,
 }: RecoveryContentProps): JSX.Element | null {
@@ -78,29 +88,57 @@ export function IgnoreErrorStepHome({
     }
   }
 
-  if (isOnDevice) {
-    return (
-      <RecoverySingleColumnContent>
-        <LegacyStyledText css={ODD_SECTION_TITLE_STYLE} as="h4SemiBold">
-          {t('ignore_similar_errors_later_in_run')}
-        </LegacyStyledText>
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-          <IgnoreOptions
-            ignoreOptions={IGNORE_OPTIONS_IN_ORDER}
-            setSelectedOption={setSelectedOption}
-            selectedOption={selectedOption}
-          />
-        </Flex>
-        <RecoveryFooterButtons
-          isOnDevice={isOnDevice}
-          primaryBtnOnClick={primaryOnClick}
-          secondaryBtnOnClick={goBackPrevStep}
+  return (
+    <RecoverySingleColumnContentWrapper css={DESKTOP_ONLY_GRID_GAP}>
+      <StyledText
+        css={ODD_SECTION_TITLE_STYLE}
+        oddStyle="level4HeaderSemiBold"
+        desktopStyle="headingSmallSemiBold"
+      >
+        {t('ignore_similar_errors_later_in_run')}
+      </StyledText>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing4}
+        css={ODD_ONLY}
+      >
+        <IgnoreOptions
+          ignoreOptions={IGNORE_OPTIONS_IN_ORDER}
+          setSelectedOption={setSelectedOption}
+          selectedOption={selectedOption}
         />
-      </RecoverySingleColumnContent>
-    )
-  } else {
-    return null
-  }
+      </Flex>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing4}
+        css={DESKTOP_ONLY}
+      >
+        <RecoveryRadioGroup
+          value={selectedOption}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            setSelectedOption(e.currentTarget.value as IgnoreOption)
+          }}
+          options={IGNORE_OPTIONS_IN_ORDER.map(option => {
+            return {
+              value: option,
+              children: (
+                <StyledText
+                  css={RADIO_GROUP_MARGIN}
+                  desktopStyle="bodyDefaultRegular"
+                >
+                  {t(option)}
+                </StyledText>
+              ),
+            }
+          })}
+        />
+      </Flex>
+      <RecoveryFooterButtons
+        primaryBtnOnClick={primaryOnClick}
+        secondaryBtnOnClick={goBackPrevStep}
+      />
+    </RecoverySingleColumnContentWrapper>
+  )
 }
 
 interface IgnoreOptionsProps {
@@ -140,3 +178,15 @@ const IGNORE_OPTIONS_IN_ORDER: IgnoreOption[] = [
   'ignore_only_this_error',
   'ignore_all_errors_of_this_type',
 ]
+
+const RADIO_GROUP_MARGIN = css`
+  @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+    margin-left: 0.5rem;
+  }
+`
+
+const DESKTOP_ONLY_GRID_GAP = css`
+  @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+    gap: 0rem;
+  }
+`

@@ -9,10 +9,12 @@ import {
 } from '../../step-forms/selectors'
 import { getIsMultiSelectMode } from '../../ui/steps'
 import { i18n } from '../../localization'
+import { getEnableComment } from '../../feature-flags/selectors'
 import { StepCreationButton } from '../StepCreationButton'
 
 vi.mock('../../step-forms/selectors')
 vi.mock('../../ui/steps')
+vi.mock('../../feature-flags/selectors')
 
 const render = () => {
   return renderWithProviders(<StepCreationButton />, { i18nInstance: i18n })[0]
@@ -20,6 +22,7 @@ const render = () => {
 
 describe('StepCreationButton', () => {
   beforeEach(() => {
+    vi.mocked(getEnableComment).mockReturnValue(true)
     vi.mocked(getCurrentFormIsPresaved).mockReturnValue(false)
     vi.mocked(getCurrentFormHasUnsavedChanges).mockReturnValue(false)
     vi.mocked(getIsMultiSelectMode).mockReturnValue(false)
@@ -34,6 +37,7 @@ describe('StepCreationButton', () => {
     render()
     const addStep = screen.getByRole('button', { name: '+ Add Step' })
     fireEvent.click(addStep)
+    screen.getByText('comment')
     screen.getByText('move labware')
     screen.getByText('transfer')
     screen.getByText('mix')

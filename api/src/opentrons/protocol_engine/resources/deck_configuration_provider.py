@@ -1,7 +1,7 @@
 """Deck configuration resource provider."""
 from typing import List, Set, Tuple
 
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV5, CutoutFixture
+from opentrons_shared_data.deck.types import DeckDefinitionV5, CutoutFixture
 
 from opentrons.types import DeckSlotName
 

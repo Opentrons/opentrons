@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
-import { Route, MemoryRouter } from 'react-router-dom'
+import { Route, MemoryRouter, Routes } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
@@ -61,9 +61,12 @@ const mockMagneticModule = {
 const render = (path = '/') => {
   return renderWithProviders(
     <MemoryRouter initialEntries={[path]} initialIndex={0}>
-      <Route path="/devices/:robotName/protocol-runs/:runId/:protocolRunDetailsTab?">
-        <ProtocolRunDetails />
-      </Route>
+      <Routes>
+        <Route
+          path="/devices/:robotName/protocol-runs/:runId/:protocolRunDetailsTab?"
+          element={<ProtocolRunDetails />}
+        />
+      </Routes>
     </MemoryRouter>,
     {
       i18nInstance: i18n,

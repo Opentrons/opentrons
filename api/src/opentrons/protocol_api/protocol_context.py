@@ -13,8 +13,8 @@ from typing import (
     cast,
 )
 
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.labware.types import LabwareDefinition
+from opentrons_shared_data.pipette.types import PipetteNameType
 
 from opentrons.types import Mount, Location, DeckLocation, DeckSlotName, StagingSlotName
 from opentrons.legacy_broker import LegacyBroker
@@ -248,10 +248,6 @@ class ProtocolContext(CommandPublisher):
         if self._unsubscribe_commands:
             self._unsubscribe_commands()
             self._unsubscribe_commands = None
-
-    def __del__(self) -> None:
-        if getattr(self, "_unsubscribe_commands", None):
-            self._unsubscribe_commands()  # type: ignore
 
     @property
     @requires_version(2, 0)

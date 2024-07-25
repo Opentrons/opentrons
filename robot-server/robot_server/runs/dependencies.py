@@ -1,8 +1,11 @@
 """Run router dependency-injection wire-up."""
 from fastapi import Depends, status
+from robot_server.protocols.dependencies import get_protocol_store
+from robot_server.protocols.protocol_models import ProtocolKind
+from robot_server.protocols.protocol_store import ProtocolStore
 from sqlalchemy.engine import Engine as SQLEngine
 
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.types import RobotType
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine import DeckType
@@ -159,9 +162,26 @@ async def get_run_data_manager(
 
 async def get_run_auto_deleter(
     run_store: RunStore = Depends(get_run_store),
+    protocol_store: ProtocolStore = Depends(get_protocol_store),
 ) -> RunAutoDeleter:
     """Get an `AutoDeleter` to delete old runs."""
     return RunAutoDeleter(
         run_store=run_store,
+        protocol_store=protocol_store,
         deletion_planner=RunDeletionPlanner(maximum_runs=get_settings().maximum_runs),
+        protocol_kind=ProtocolKind.STANDARD,
+    )
+
+
+async def get_quick_transfer_run_auto_deleter(
+    run_store: RunStore = Depends(get_run_store),
+    protocol_store: ProtocolStore = Depends(get_protocol_store),
+) -> RunAutoDeleter:
+    """Get an `AutoDeleter` to delete old runs for quick transfer prorotocols."""
+    return RunAutoDeleter(
+        run_store=run_store,
+        protocol_store=protocol_store,
+        # We dont store quick transfer runs
+        deletion_planner=RunDeletionPlanner(maximum_runs=1),
+        protocol_kind=ProtocolKind.QUICK_TRANSFER,
     )

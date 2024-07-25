@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import { Redirect, useParams } from 'react-router-dom'
+import { Navigate, useParams } from 'react-router-dom'
 
 import {
   ALIGN_START,
@@ -28,7 +28,9 @@ import type { DesktopRouteParams, AppSettingsTab } from '../../App/types'
 export function AppSettings(): JSX.Element {
   const { t } = useTranslation('app_settings')
   const devToolsOn = useSelector(Config.getDevtoolsEnabled)
-  const { appSettingsTab } = useParams<DesktopRouteParams>()
+  const { appSettingsTab } = useParams<
+    keyof DesktopRouteParams
+  >() as DesktopRouteParams
 
   const appSettingsContentByTab: {
     [K in AppSettingsTab]: JSX.Element
@@ -41,7 +43,7 @@ export function AppSettings(): JSX.Element {
 
   const appSettingsContent = appSettingsContentByTab[appSettingsTab] ?? (
     // default to the general tab if no tab or nonexistent tab is passed as a param
-    <Redirect to="/app-settings/general" />
+    <Navigate to="/app-settings/general" />
   )
 
   return (

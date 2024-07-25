@@ -3,8 +3,8 @@ from __future__ import annotations
 import logging
 from typing import List, Optional, Union, cast
 
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
-from opentrons_shared_data.module.dev_types import ModuleModel, ModuleType
+from opentrons_shared_data.labware.types import LabwareDefinition
+from opentrons_shared_data.module.types import ModuleModel, ModuleType
 
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.hardware_control.modules import ThermocyclerStep

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import {
   COLORS,
   DIRECTION_COLUMN,
@@ -18,7 +18,7 @@ const IMAGE_ALT = 'Welcome screen background image'
 
 export function Welcome(): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared', 'branded'])
-  const history = useHistory()
+  const navigate = useNavigate()
 
   return (
     <Flex
@@ -48,7 +48,7 @@ export function Welcome(): JSX.Element {
           buttonCategory="rounded"
           buttonText={t('shared:get_started')}
           onClick={() => {
-            history.push('/network-setup')
+            navigate('/network-setup')
           }}
         />
       </Flex>

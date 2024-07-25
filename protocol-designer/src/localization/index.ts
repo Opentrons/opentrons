@@ -24,6 +24,10 @@ i18n.use(initReactI18next).init(
       'nav',
       'tooltip',
       'well_selection',
+      'liquids',
+      'protocol_overview',
+      'protocol_steps',
+      'starting_deck_state',
     ],
     defaultNS: 'shared',
     interpolation: {

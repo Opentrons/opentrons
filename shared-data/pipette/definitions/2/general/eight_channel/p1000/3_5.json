@@ -24,8 +24,8 @@
         "SingleA1": {
           "default": {
             "speed": 10.0,
-            "distance": 13.0,
-            "current": 0.2,
+            "distance": 11.0,
+            "current": 0.15,
             "tipOverlaps": {
               "v0": {
                 "default": 10.5,
@@ -37,13 +37,13 @@
                 "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 10.17
               },
               "v1": {
-                "default": 10.5,
-                "opentrons/opentrons_flex_96_tiprack_200ul/1": 9.42,
-                "opentrons/opentrons_flex_96_tiprack_50ul/1": 9.27,
-                "opentrons/opentrons_flex_96_tiprack_1000ul/1": 9.67,
-                "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 9.42,
-                "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 9.27,
-                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 9.67
+                "default": 10.08,
+                "opentrons/opentrons_flex_96_tiprack_200ul/1": 10.1,
+                "opentrons/opentrons_flex_96_tiprack_50ul/1": 10.08,
+                "opentrons/opentrons_flex_96_tiprack_1000ul/1": 10.26,
+                "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 10.1,
+                "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 10.08,
+                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 10.26
               }
             }
           }
@@ -51,8 +51,8 @@
         "SingleH1": {
           "default": {
             "speed": 10.0,
-            "distance": 13.0,
-            "current": 0.2,
+            "distance": 11.0,
+            "current": 0.15,
             "tipOverlaps": {
               "v0": {
                 "default": 10.5,
@@ -64,13 +64,13 @@
                 "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 10.17
               },
               "v1": {
-                "default": 10.5,
-                "opentrons/opentrons_flex_96_tiprack_200ul/1": 9.42,
-                "opentrons/opentrons_flex_96_tiprack_50ul/1": 9.27,
-                "opentrons/opentrons_flex_96_tiprack_1000ul/1": 9.67,
-                "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 9.42,
-                "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 9.27,
-                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 9.67
+                "default": 9.52,
+                "opentrons/opentrons_flex_96_tiprack_200ul/1": 9.71,
+                "opentrons/opentrons_flex_96_tiprack_50ul/1": 9.52,
+                "opentrons/opentrons_flex_96_tiprack_1000ul/1": 10.2,
+                "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 9.71,
+                "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 9.52,
+                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 10.2
               }
             }
           }
@@ -79,7 +79,7 @@
           "default": {
             "speed": 10.0,
             "distance": 13.0,
-            "current": 0.14,
+            "current": 0.2,
             "tipOverlaps": {
               "v0": {
                 "default": 10.5,
@@ -91,13 +91,13 @@
                 "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 10.17
               },
               "v1": {
-                "default": 10.5,
-                "opentrons/opentrons_flex_96_tiprack_200ul/1": 9.42,
-                "opentrons/opentrons_flex_96_tiprack_50ul/1": 9.27,
-                "opentrons/opentrons_flex_96_tiprack_1000ul/1": 9.67,
-                "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 9.42,
-                "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 9.27,
-                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 9.67
+                "default": 9.24,
+                "opentrons/opentrons_flex_96_tiprack_200ul/1": 9.52,
+                "opentrons/opentrons_flex_96_tiprack_50ul/1": 9.24,
+                "opentrons/opentrons_flex_96_tiprack_1000ul/1": 9.73,
+                "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 9.52,
+                "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 9.24,
+                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 9.73
               }
             }
           }
@@ -106,7 +106,7 @@
           "default": {
             "speed": 10.0,
             "distance": 13.0,
-            "current": 0.21,
+            "current": 0.2,
             "tipOverlaps": {
               "v0": {
                 "default": 10.5,
@@ -118,13 +118,13 @@
                 "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 10.17
               },
               "v1": {
-                "default": 10.5,
-                "opentrons/opentrons_flex_96_tiprack_200ul/1": 9.42,
-                "opentrons/opentrons_flex_96_tiprack_50ul/1": 9.27,
-                "opentrons/opentrons_flex_96_tiprack_1000ul/1": 9.67,
-                "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 9.42,
-                "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 9.27,
-                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 9.67
+                "default": 9.2,
+                "opentrons/opentrons_flex_96_tiprack_200ul/1": 9.3,
+                "opentrons/opentrons_flex_96_tiprack_50ul/1": 9.2,
+                "opentrons/opentrons_flex_96_tiprack_1000ul/1": 9.8,
+                "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 9.3,
+                "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 9.2,
+                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 9.8
               }
             }
           }
@@ -133,7 +133,7 @@
           "default": {
             "speed": 10.0,
             "distance": 13.0,
-            "current": 0.28,
+            "current": 0.35,
             "tipOverlaps": {
               "v0": {
                 "default": 10.5,
@@ -145,13 +145,13 @@
                 "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 10.17
               },
               "v1": {
-                "default": 10.5,
-                "opentrons/opentrons_flex_96_tiprack_200ul/1": 9.42,
-                "opentrons/opentrons_flex_96_tiprack_50ul/1": 9.27,
-                "opentrons/opentrons_flex_96_tiprack_1000ul/1": 9.67,
-                "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 9.42,
-                "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 9.27,
-                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 9.67
+                "default": 9.2,
+                "opentrons/opentrons_flex_96_tiprack_200ul/1": 9.3,
+                "opentrons/opentrons_flex_96_tiprack_50ul/1": 9.2,
+                "opentrons/opentrons_flex_96_tiprack_1000ul/1": 9.8,
+                "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 9.3,
+                "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 9.2,
+                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 9.8
               }
             }
           }
@@ -160,7 +160,7 @@
           "default": {
             "speed": 10.0,
             "distance": 13.0,
-            "current": 0.34,
+            "current": 0.4,
             "tipOverlaps": {
               "v0": {
                 "default": 10.5,
@@ -172,13 +172,13 @@
                 "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 10.17
               },
               "v1": {
-                "default": 10.5,
-                "opentrons/opentrons_flex_96_tiprack_200ul/1": 9.42,
-                "opentrons/opentrons_flex_96_tiprack_50ul/1": 9.27,
-                "opentrons/opentrons_flex_96_tiprack_1000ul/1": 9.67,
-                "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 9.42,
-                "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 9.27,
-                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 9.67
+                "default": 9.2,
+                "opentrons/opentrons_flex_96_tiprack_200ul/1": 9.3,
+                "opentrons/opentrons_flex_96_tiprack_50ul/1": 9.2,
+                "opentrons/opentrons_flex_96_tiprack_1000ul/1": 9.8,
+                "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 9.3,
+                "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 9.2,
+                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 9.8
               }
             }
           }
@@ -187,7 +187,7 @@
           "default": {
             "speed": 10.0,
             "distance": 13.0,
-            "current": 0.41,
+            "current": 0.4,
             "tipOverlaps": {
               "v0": {
                 "default": 10.5,
@@ -199,13 +199,13 @@
                 "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 10.17
               },
               "v1": {
-                "default": 10.5,
-                "opentrons/opentrons_flex_96_tiprack_200ul/1": 9.42,
-                "opentrons/opentrons_flex_96_tiprack_50ul/1": 9.27,
-                "opentrons/opentrons_flex_96_tiprack_1000ul/1": 9.67,
-                "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 9.42,
-                "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 9.27,
-                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 9.67
+                "default": 9.2,
+                "opentrons/opentrons_flex_96_tiprack_200ul/1": 9.3,
+                "opentrons/opentrons_flex_96_tiprack_50ul/1": 9.2,
+                "opentrons/opentrons_flex_96_tiprack_1000ul/1": 9.8,
+                "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 9.3,
+                "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 9.2,
+                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 9.8
               }
             }
           }
@@ -214,7 +214,7 @@
           "default": {
             "speed": 10.0,
             "distance": 13.0,
-            "current": 0.48,
+            "current": 0.5,
             "tipOverlaps": {
               "v0": {
                 "default": 10.5,
@@ -226,13 +226,13 @@
                 "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 10.17
               },
               "v1": {
-                "default": 10.5,
-                "opentrons/opentrons_flex_96_tiprack_200ul/1": 9.42,
-                "opentrons/opentrons_flex_96_tiprack_50ul/1": 9.27,
-                "opentrons/opentrons_flex_96_tiprack_1000ul/1": 9.67,
-                "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 9.42,
-                "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 9.27,
-                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 9.67
+                "default": 9.13,
+                "opentrons/opentrons_flex_96_tiprack_200ul/1": 9.23,
+                "opentrons/opentrons_flex_96_tiprack_50ul/1": 9.13,
+                "opentrons/opentrons_flex_96_tiprack_1000ul/1": 9.9,
+                "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 9.23,
+                "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 9.13,
+                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 9.9
               }
             }
           }
@@ -259,6 +259,15 @@
                 "opentrons/opentrons_flex_96_tiprack_1000ul/1": 9.67,
                 "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 9.42,
                 "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 9.27,
+                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 9.67
+              },
+              "v3": {
+                "default": 9.28,
+                "opentrons/opentrons_flex_96_tiprack_200ul/1": 9.37,
+                "opentrons/opentrons_flex_96_tiprack_50ul/1": 9.28,
+                "opentrons/opentrons_flex_96_tiprack_1000ul/1": 9.67,
+                "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 9.37,
+                "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 9.28,
                 "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 9.67
               }
             }

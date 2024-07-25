@@ -9,7 +9,6 @@ export type TipSelectionProps = RecoveryContentProps & {
   allowTipSelection: boolean
 }
 
-// TODO(jh, 06-13-24): EXEC-535.
 export function TipSelection(props: TipSelectionProps): JSX.Element {
   const { failedLabwareUtils, failedPipetteInfo, allowTipSelection } = props
 

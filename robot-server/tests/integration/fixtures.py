@@ -9,7 +9,7 @@ from opentrons.protocol_api import (
     MIN_SUPPORTED_VERSION_FOR_FLEX,
 )
 from opentrons import __version__, config
-from opentrons_shared_data.module.dev_types import ModuleModel
+from opentrons_shared_data.module.types import ModuleModel
 
 
 def check_health_response(response: Response) -> None:
@@ -18,7 +18,12 @@ def check_health_response(response: Response) -> None:
         "api_version": __version__,
         "fw_version": "Virtual Smoothie",
         "board_revision": "2.1",
-        "logs": ["/logs/serial.log", "/logs/api.log", "/logs/server.log"],
+        "logs": [
+            "/logs/serial.log",
+            "/logs/api.log",
+            "/logs/server.log",
+            "/logs/update_server.log",
+        ],
         "system_version": config.OT_SYSTEM_VERSION,
         "robot_model": "OT-2 Standard",
         "minimum_protocol_api_version": list(MIN_SUPPORTED_VERSION),
@@ -47,6 +52,7 @@ def check_ot3_health_response(response: Response) -> None:
             "/logs/serial.log",
             "/logs/api.log",
             "/logs/server.log",
+            "/logs/update_server.log",
             "/logs/touchscreen.log",
         ],
         "system_version": config.OT_SYSTEM_VERSION,

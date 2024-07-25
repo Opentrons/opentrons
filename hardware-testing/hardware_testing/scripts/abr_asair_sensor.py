@@ -8,6 +8,7 @@ import time as t
 from typing import List
 import os
 import argparse
+import pytz
 
 
 class _ABRAsairSensor:
@@ -49,12 +50,14 @@ class _ABRAsairSensor:
                 "There are no google sheets credentials. Make sure credentials in jupyter notebook."
             )
         results_list = []  # type: List
-        start_time = datetime.datetime.now()
+        timezone = pytz.timezone("America/New_York")
+        start_time = datetime.datetime.now(timezone)
+        # start_time = datetime.datetime.now(tz=tzinfo.utcoffset(timezone))
         while True:
             env_data = sensor.get_reading()
-            timestamp = datetime.datetime.now()
+            timestamp = datetime.datetime.now(timezone)
             # Time adjustment for ABR robot timezone
-            new_timestamp = timestamp - datetime.timedelta(hours=5)
+            new_timestamp = timestamp
             date = new_timestamp.date()
             time = new_timestamp.time()
             temp = env_data.temperature
@@ -72,7 +75,7 @@ class _ABRAsairSensor:
 
             results_list.append(row)
             # Check if duration elapsed
-            elapsed_time = datetime.datetime.now() - start_time
+            elapsed_time = datetime.datetime.now(timezone) - start_time
             if elapsed_time.total_seconds() >= duration * 60:
                 break
             # write to google sheet

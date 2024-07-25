@@ -8,8 +8,9 @@ import {
   DIRECTION_COLUMN,
 } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
-import { getPipetteSpecsV2, RIGHT, LEFT } from '@opentrons/shared-data'
+import { RIGHT, LEFT } from '@opentrons/shared-data'
 import { RadioButton } from '../../atoms/buttons'
+import { usePipetteSpecsV2 } from '../../resources/instruments/hooks'
 import { ChildNavigation } from '../ChildNavigation'
 
 import type { PipetteData, Mount } from '@opentrons/api-client'
@@ -35,16 +36,12 @@ export function SelectPipette(props: SelectPipetteProps): JSX.Element {
   const leftPipette = attachedInstruments?.data.find(
     (i): i is PipetteData => i.ok && i.mount === LEFT
   )
-  const leftPipetteSpecs =
-    leftPipette != null ? getPipetteSpecsV2(leftPipette.instrumentModel) : null
+  const leftPipetteSpecs = usePipetteSpecsV2(leftPipette?.instrumentModel)
 
   const rightPipette = attachedInstruments?.data.find(
     (i): i is PipetteData => i.ok && i.mount === RIGHT
   )
-  const rightPipetteSpecs =
-    rightPipette != null
-      ? getPipetteSpecsV2(rightPipette.instrumentModel)
-      : null
+  const rightPipetteSpecs = usePipetteSpecsV2(rightPipette?.instrumentModel)
 
   // automatically select 96 channel if it is attached
   const [selectedPipette, setSelectedPipette] = React.useState<

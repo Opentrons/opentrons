@@ -20,7 +20,6 @@ import {
   StyledText,
   JUSTIFY_END,
   PrimaryButton,
-  ALIGN_FLEX_END,
   SecondaryButton,
 } from '@opentrons/components'
 
@@ -30,7 +29,7 @@ import { LargeButton } from '../../atoms/buttons'
 import { RECOVERY_MAP } from './constants'
 import {
   RecoveryInterventionModal,
-  RecoverySingleColumnContentDesktop,
+  RecoverySingleColumnContentWrapper,
   StepInfo,
 } from './shared'
 
@@ -39,9 +38,13 @@ import type { ErrorRecoveryFlowsProps } from '.'
 import type { ERUtilsResults } from './hooks'
 import { useHost } from '@opentrons/react-api-client'
 
-export function useRunPausedSplash(showERWizard: boolean): boolean {
-  // Don't show the splash when the ER wizard is active.
-  return !showERWizard
+export function useRunPausedSplash(
+  isOnDevice: boolean,
+  showERWizard: boolean
+): boolean {
+  // Don't show the splash when desktop ER wizard is active,
+  // but always show it on the ODD (with or without the wizard rendered above it).
+  return !(!isOnDevice && showERWizard)
 }
 
 type RunPausedSplashProps = ERUtilsResults & {
@@ -54,7 +57,7 @@ type RunPausedSplashProps = ERUtilsResults & {
 export function RunPausedSplash(
   props: RunPausedSplashProps
 ): JSX.Element | null {
-  const { toggleERWiz, routeUpdateActions, failedCommand } = props
+  const { isOnDevice, toggleERWiz, routeUpdateActions, failedCommand } = props
   const { t } = useTranslation('error_recovery')
   const errorKind = getErrorKind(failedCommand)
   const title = useErrorName(errorKind)
@@ -88,7 +91,7 @@ export function RunPausedSplash(
 
   // TODO(jh 06-18-24): Instead of passing stepCount internally, we probably want to
   // pass it in as a prop to ErrorRecoveryFlows to ameliorate blippy "step = ? -> step = 24" behavior.
-  if (props.isOnDevice) {
+  if (isOnDevice) {
     return (
       <Flex
         display={DISPLAY_FLEX}
@@ -111,7 +114,7 @@ export function RunPausedSplash(
           <Flex width="49rem" justifyContent={JUSTIFY_CENTER}>
             <StepInfo
               {...props}
-              textStyle="level3HeaderBold"
+              oddStyle="level3HeaderBold"
               overflow="hidden"
               overflowWrap={OVERFLOW_WRAP_BREAK_WORD}
               color={COLORS.white}
@@ -145,14 +148,13 @@ export function RunPausedSplash(
       <RecoveryInterventionModal
         desktopType="desktop-small"
         titleHeading={buildTitleHeadingDesktop()}
+        isOnDevice={isOnDevice}
       >
-        <RecoverySingleColumnContentDesktop>
+        <RecoverySingleColumnContentWrapper>
           <Flex
             gridGap={SPACING.spacing24}
             flexDirection={DIRECTION_COLUMN}
-            alignItems={ALIGN_FLEX_END}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
-            height="25rem"
           >
             <Flex
               borderRadius={BORDERS.borderRadius8}
@@ -176,7 +178,7 @@ export function RunPausedSplash(
                 <StyledText desktopStyle="headingSmallBold">{title}</StyledText>
                 <StepInfo
                   {...props}
-                  textStyle="bodyDefaultRegular"
+                  desktopStyle="bodyDefaultRegular"
                   overflow="hidden"
                   overflowWrap={OVERFLOW_WRAP_BREAK_WORD}
                   textAlign={TEXT_ALIGN_CENTER}
@@ -201,7 +203,7 @@ export function RunPausedSplash(
               </StyledText>
             </PrimaryButton>
           </Flex>
-        </RecoverySingleColumnContentDesktop>
+        </RecoverySingleColumnContentWrapper>
       </RecoveryInterventionModal>
     )
   }

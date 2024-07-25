@@ -7,17 +7,17 @@ from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 from decoy import Decoy
 
 from opentrons_shared_data.deck import load as load_deck
-from opentrons_shared_data.deck.dev_types import (
+from opentrons_shared_data.deck.types import (
     DeckDefinitionV5,
     SlotDefV3,
 )
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
-from opentrons_shared_data.labware.dev_types import (
+from opentrons_shared_data.pipette.types import PipetteNameType
+from opentrons_shared_data.labware.types import (
     LabwareDefinition as LabwareDefDict,
     LabwareUri,
 )
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.types import RobotType
 
 from opentrons.types import DeckSlotName, StagingSlotName, Mount, MountType, Point
 from opentrons.protocol_api import OFF_DECK
@@ -277,8 +277,8 @@ def test_load_instrument_pre_219(
     assert result.pipette_id == "cool-pipette"
 
 
-@pytest.mark.parametrize("api_version", versions_at_or_above(APIVersion(2, 19)))
-def test_load_instrument_post_219(
+@pytest.mark.parametrize("api_version", versions_at_or_above(APIVersion(2, 20)))
+def test_load_instrument_post_220(
     decoy: Decoy,
     mock_sync_hardware_api: SyncHardwareAPI,
     mock_engine_client: EngineClient,
@@ -290,7 +290,7 @@ def test_load_instrument_post_219(
             cmd.LoadPipetteParams(
                 pipetteName=PipetteNameType.P300_SINGLE,
                 mount=MountType.LEFT,
-                tipOverlapNotAfterVersion="v1",
+                tipOverlapNotAfterVersion="v3",
                 liquidPresenceDetection=False,
             )
         )

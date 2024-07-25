@@ -16,17 +16,23 @@ from robot_server.persistence.fastapi_dependencies import (
 )
 from robot_server.service.legacy.models import V1BasicResponse
 
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.types import RobotType
 
 from .models import Health, HealthLinks
 
 _log = logging.getLogger(__name__)
 
-OT2_LOG_PATHS = ["/logs/serial.log", "/logs/api.log", "/logs/server.log"]
+OT2_LOG_PATHS = [
+    "/logs/serial.log",
+    "/logs/api.log",
+    "/logs/server.log",
+    "/logs/update_server.log",
+]
 FLEX_LOG_PATHS = [
     "/logs/serial.log",
     "/logs/api.log",
     "/logs/server.log",
+    "/logs/update_server.log",
     "/logs/touchscreen.log",
 ]
 VERSION_PATH = "/etc/VERSION.json"

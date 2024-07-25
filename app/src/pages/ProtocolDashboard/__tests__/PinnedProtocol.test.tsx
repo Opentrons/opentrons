@@ -12,15 +12,15 @@ import { PinnedProtocol } from '../PinnedProtocol'
 
 import type { Chip } from '@opentrons/components'
 import type { ProtocolResource } from '@opentrons/shared-data'
-import type * as ReactRouterDom from 'react-router-dom'
+import type { NavigateFunction } from 'react-router-dom'
 
-const mockPush = vi.fn()
+const mockNavigate = vi.fn()
 
 vi.mock('react-router-dom', async importOriginal => {
-  const actual = await importOriginal<typeof ReactRouterDom>()
+  const actual = await importOriginal<NavigateFunction>()
   return {
     ...actual,
-    useHistory: () => ({ push: mockPush } as any),
+    useNavigate: () => mockNavigate,
   }
 })
 vi.mock('@opentrons/components', async importOriginal => {
@@ -37,6 +37,7 @@ const mockProtocol: ProtocolResource = {
   createdAt: '2022-05-03T21:36:12.494778+00:00',
   robotType: 'OT-3 Standard',
   protocolType: 'json',
+  protocolKind: 'standard',
   metadata: {
     protocolName: 'yay mock protocol',
     author: 'engineering',
@@ -118,7 +119,7 @@ describe('Pinned Protocol', () => {
     render(props)
     const name = screen.getByText('yay mock protocol')
     fireEvent.click(name)
-    expect(mockPush).toHaveBeenCalledWith('/protocols/mockProtocol1')
+    expect(mockNavigate).toHaveBeenCalledWith('/protocols/mockProtocol1')
   })
 
   it('should display modal after long click', async () => {

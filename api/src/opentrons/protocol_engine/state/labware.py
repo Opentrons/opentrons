@@ -15,10 +15,10 @@ from typing import (
     Union,
 )
 
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
+from opentrons_shared_data.deck.types import DeckDefinitionV5
 from opentrons_shared_data.gripper.constants import LABWARE_GRIP_FORCE
 from opentrons_shared_data.labware.labware_definition import LabwareRole
-from opentrons_shared_data.pipette.dev_types import LabwareUri
+from opentrons_shared_data.pipette.types import LabwareUri
 
 from opentrons.types import DeckSlotName, StagingSlotName, MountType
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE

@@ -113,6 +113,7 @@ describe('useCloneRun hook', () => {
       protocolId: 'protocolId',
       labwareOffsets: 'someOffset',
       runTimeParameterValues: {},
+      runTimeParameterFiles: {},
     })
   })
   it('should return a function that when called, calls createRun run with runTimeParameterValues overrides', async () => {
@@ -129,7 +130,9 @@ describe('useCloneRun hook', () => {
       runTimeParameterValues: {
         number_param: 2,
         boolean_param: false,
-        file_param: { id: 'fileId_123' },
+      },
+      runTimeParameterFiles: {
+        file_param: 'fileId_123',
       },
     })
   })

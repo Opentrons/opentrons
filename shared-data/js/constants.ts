@@ -48,7 +48,13 @@ export const MAGNETIC_BLOCK_V1: 'magneticBlockV1' = 'magneticBlockV1'
 export const GRIPPER_V1: 'gripperV1' = 'gripperV1'
 export const GRIPPER_V1_1: 'gripperV1.1' = 'gripperV1.1'
 export const GRIPPER_V1_2: 'gripperV1.2' = 'gripperV1.2'
-export const GRIPPER_MODELS = [GRIPPER_V1, GRIPPER_V1_1, GRIPPER_V1_2]
+export const GRIPPER_V1_3: 'gripperV1.3' = 'gripperV1.3'
+export const GRIPPER_MODELS = [
+  GRIPPER_V1,
+  GRIPPER_V1_1,
+  GRIPPER_V1_2,
+  GRIPPER_V1_3,
+]
 
 // robot display name
 export const OT2_DISPLAY_NAME: 'Opentrons OT-2' = 'Opentrons OT-2'

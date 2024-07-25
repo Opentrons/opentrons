@@ -31,6 +31,14 @@ const helixProductStyleMap = {
       }
     `,
   },
+  headingMediumBold: {
+    as: 'h3',
+    style: css`
+      @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+        font: ${HELIX_TYPOGRAPHY.fontStyleHeadingMediumBold};
+      }
+    `,
+  },
   headingMediumSemiBold: {
     as: 'h3',
     style: css`
@@ -48,6 +56,14 @@ const helixProductStyleMap = {
     `,
   },
   headingSmallBold: {
+    as: 'h4',
+    style: css`
+      @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+        font: ${HELIX_TYPOGRAPHY.fontStyleHeadingSmallBold};
+      }
+    `,
+  },
+  headingSmallSemiBold: {
     as: 'h4',
     style: css`
       @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
@@ -111,6 +127,14 @@ const helixProductStyleMap = {
       }
     `,
   },
+  hidden: {
+    as: 'none',
+    style: css`
+      @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+        display: none;
+      }
+    `,
+  },
 } as const
 
 const ODDStyleMap = {
@@ -163,7 +187,6 @@ const ODDStyleMap = {
       }
     `,
   },
-
   level3HeaderBold: {
     as: 'h3',
     style: css`
@@ -246,6 +269,14 @@ const ODDStyleMap = {
     style: css`
       @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
         ${TYPOGRAPHY.smallBodyTextBold}
+      }
+    `,
+  },
+  hidden: {
+    as: 'none',
+    style: css`
+      @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+        display: none;
       }
     `,
   },

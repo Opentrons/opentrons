@@ -2,25 +2,28 @@ import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { css } from 'styled-components'
 
-import { Flex, RESPONSIVENESS } from '@opentrons/components'
+import { Flex, RESPONSIVENESS, SPACING } from '@opentrons/components'
 
 import { InterventionModal } from '../../../molecules/InterventionModal'
-import { getModalPortalEl } from '../../../App/portal'
+import { getModalPortalEl, getTopPortalEl } from '../../../App/portal'
 
 import type { ModalType } from '../../../molecules/InterventionModal'
+import type { DesktopSizeType } from '../types'
 
 export type RecoveryInterventionModalProps = Omit<
   React.ComponentProps<typeof InterventionModal>,
   'type'
 > & {
   /* If on desktop, specifies the hard-coded dimensions height of the modal. */
-  desktopType: 'desktop-small' | 'desktop-large'
+  desktopType: DesktopSizeType
+  isOnDevice: boolean
 }
 
 // A wrapper around InterventionModal with Error-Recovery specific props and styling.
 export function RecoveryInterventionModal({
   children,
   desktopType,
+  isOnDevice,
   ...rest
 }: RecoveryInterventionModalProps): JSX.Element {
   const restProps = {
@@ -40,23 +43,19 @@ export function RecoveryInterventionModal({
         {children}
       </Flex>
     </InterventionModal>,
-    getModalPortalEl()
+    isOnDevice ? getTopPortalEl() : getModalPortalEl()
   )
 }
 
-const ODD_STYLE = `
-@media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+const SMALL_MODAL_STYLE = css`
+  height: 22rem;
+  padding: ${SPACING.spacing32};
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    padding: ${SPACING.spacing32};
     height: 100%;
   }
 `
-
-const SMALL_MODAL_STYLE = css`
-  height: 25.25rem;
-
-  ${ODD_STYLE}
-`
 const LARGE_MODAL_STYLE = css`
-  height: 30rem;
-
-  ${ODD_STYLE}
+  height: 26.75rem;
 `

@@ -33,13 +33,16 @@ const mockRouteUpdateActions = {
 } as any
 
 describe('useRecoveryCommands', () => {
-  const mockResumeRunFromRecovery = vi.fn()
+  const mockMakeSuccessToast = vi.fn()
+  const mockResumeRunFromRecovery = vi.fn(() =>
+    Promise.resolve(mockMakeSuccessToast())
+  )
   const mockStopRun = vi.fn()
   const mockChainRunCommands = vi.fn().mockResolvedValue([])
 
   beforeEach(() => {
     vi.mocked(useResumeRunFromRecoveryMutation).mockReturnValue({
-      resumeRunFromRecovery: mockResumeRunFromRecovery,
+      mutateAsync: mockResumeRunFromRecovery,
     } as any)
     vi.mocked(useStopRunMutation).mockReturnValue({
       stopRun: mockStopRun,
@@ -56,6 +59,7 @@ describe('useRecoveryCommands', () => {
         failedCommand: mockFailedCommand,
         failedLabwareUtils: mockFailedLabwareUtils,
         routeUpdateActions: mockRouteUpdateActions,
+        recoveryToastUtils: {} as any,
       })
     )
 
@@ -81,6 +85,7 @@ describe('useRecoveryCommands', () => {
         failedCommand: mockFailedCommand,
         failedLabwareUtils: mockFailedLabwareUtils,
         routeUpdateActions: mockRouteUpdateActions,
+        recoveryToastUtils: {} as any,
       })
     )
 
@@ -107,6 +112,7 @@ describe('useRecoveryCommands', () => {
         failedCommand: mockFailedCommand,
         failedLabwareUtils: mockFailedLabwareUtils,
         routeUpdateActions: mockRouteUpdateActions,
+        recoveryToastUtils: {} as any,
       })
     )
 
@@ -119,20 +125,77 @@ describe('useRecoveryCommands', () => {
       false
     )
   })
+  ;([
+    'aspirateInPlace',
+    'dispenseInPlace',
+    'blowOutInPlace',
+    'dropTipInPlace',
+    'prepareToAspirate',
+  ] as const).forEach(inPlaceCommandType => {
+    it(`Should move to retryLocation if failed command is ${inPlaceCommandType} and error is appropriate when retrying`, async () => {
+      const { result } = renderHook(() =>
+        useRecoveryCommands({
+          runId: mockRunId,
+          failedCommand: {
+            ...mockFailedCommand,
+            commandType: inPlaceCommandType,
+            params: {
+              pipetteId: 'mock-pipette-id',
+            },
+            error: {
+              errorType: 'overpressure',
+              errorCode: '3006',
+              isDefined: true,
+              errorInfo: {
+                retryLocation: [1, 2, 3],
+              },
+            },
+          },
+          failedLabwareUtils: mockFailedLabwareUtils,
+          routeUpdateActions: mockRouteUpdateActions,
+          recoveryToastUtils: {} as any,
+        })
+      )
+      await act(async () => {
+        await result.current.retryFailedCommand()
+      })
+      expect(mockChainRunCommands).toHaveBeenLastCalledWith(
+        [
+          {
+            commandType: 'moveToCoordinates',
+            intent: 'fixit',
+            params: {
+              pipetteId: 'mock-pipette-id',
+              coordinates: { x: 1, y: 2, z: 3 },
+            },
+          },
+          {
+            commandType: inPlaceCommandType,
+            params: { pipetteId: 'mock-pipette-id' },
+          },
+        ],
+        false
+      )
+    })
+  })
 
-  it('should call resumeRun with runId', () => {
+  it('should call resumeRun with runId and show success toast on success', async () => {
     const { result } = renderHook(() =>
       useRecoveryCommands({
         runId: mockRunId,
         failedCommand: mockFailedCommand,
         failedLabwareUtils: mockFailedLabwareUtils,
         routeUpdateActions: mockRouteUpdateActions,
+        recoveryToastUtils: { makeSuccessToast: mockMakeSuccessToast } as any,
       })
     )
 
-    result.current.resumeRun()
+    await act(async () => {
+      await result.current.resumeRun()
+    })
 
     expect(mockResumeRunFromRecovery).toHaveBeenCalledWith(mockRunId)
+    expect(mockMakeSuccessToast).toHaveBeenCalled()
   })
 
   it('should call cancelRun with runId', () => {
@@ -142,6 +205,7 @@ describe('useRecoveryCommands', () => {
         failedCommand: mockFailedCommand,
         failedLabwareUtils: mockFailedLabwareUtils,
         routeUpdateActions: mockRouteUpdateActions,
+        recoveryToastUtils: {} as any,
       })
     )
 
@@ -157,6 +221,7 @@ describe('useRecoveryCommands', () => {
         failedCommand: mockFailedCommand,
         failedLabwareUtils: mockFailedLabwareUtils,
         routeUpdateActions: mockRouteUpdateActions,
+        recoveryToastUtils: {} as any,
       })
     )
 
@@ -195,6 +260,7 @@ describe('useRecoveryCommands', () => {
           failedLabware: mockFailedLabware,
         },
         routeUpdateActions: mockRouteUpdateActions,
+        recoveryToastUtils: {} as any,
       })
     )
 
@@ -204,28 +270,27 @@ describe('useRecoveryCommands', () => {
 
     expect(mockChainRunCommands).toHaveBeenCalledWith(
       [buildPickUpTipsCmd],
-      true
+      false
     )
   })
 
-  it('should call skipFailedCommand and resolve after a timeout', async () => {
+  it('should call skipFailedCommand and show success toast on success', async () => {
     const { result } = renderHook(() =>
       useRecoveryCommands({
         runId: mockRunId,
         failedCommand: mockFailedCommand,
         failedLabwareUtils: mockFailedLabwareUtils,
         routeUpdateActions: mockRouteUpdateActions,
+        recoveryToastUtils: { makeSuccessToast: mockMakeSuccessToast } as any,
       })
     )
-
-    const consoleSpy = vi.spyOn(console, 'log')
 
     await act(async () => {
       await result.current.skipFailedCommand()
     })
 
-    expect(consoleSpy).toHaveBeenCalledWith('SKIPPING TO NEXT STEP')
-    expect(result.current.skipFailedCommand()).resolves.toBeUndefined()
+    expect(mockResumeRunFromRecovery).toHaveBeenCalledWith(mockRunId)
+    expect(mockMakeSuccessToast).toHaveBeenCalled()
   })
 
   it('should call ignoreErrorKindThisRun and resolve immediately', async () => {
@@ -235,6 +300,7 @@ describe('useRecoveryCommands', () => {
         failedCommand: mockFailedCommand,
         failedLabwareUtils: mockFailedLabwareUtils,
         routeUpdateActions: mockRouteUpdateActions,
+        recoveryToastUtils: {} as any,
       })
     )
 

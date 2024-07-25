@@ -27,7 +27,7 @@ from typing import (
 )
 from typing_extensions import Literal
 
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.types import RobotType
 
 import opentrons
 from opentrons import should_use_ot3
@@ -76,7 +76,7 @@ from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from .util import entrypoint_util
 
 if TYPE_CHECKING:
-    from opentrons_shared_data.labware.dev_types import (
+    from opentrons_shared_data.labware.types import (
         LabwareDefinition as LabwareDefinitionDict,
     )
 
@@ -533,11 +533,10 @@ def simulate(
             extra_data=extra_data,
         )
     except parse.JSONSchemaVersionTooNewError as e:
-        if e.attempted_schema_version == 6:
-            # See Jira RCORE-535.
-            raise NotImplementedError(_JSON_TOO_NEW_MESSAGE) from e
-        else:
-            raise
+        # opentrons.protocols.parse() doesn't support new JSON protocols.
+        # The code to do that should be moved from opentrons.protocol_reader.
+        # See https://opentrons.atlassian.net/browse/PLAT-94.
+        raise NotImplementedError(_JSON_TOO_NEW_MESSAGE) from e
 
     if protocol.api_level < APIVersion(2, 0):
         raise ApiDeprecationError(version=protocol.api_level)

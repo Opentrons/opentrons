@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
@@ -8,11 +9,15 @@ import {
   Flex,
   Icon,
   SPACING,
-  LegacyStyledText,
+  StyledText,
+  RESPONSIVENESS,
 } from '@opentrons/components'
 
 import { RECOVERY_MAP } from '../constants'
-import { RecoveryFooterButtons, RecoverySingleColumnContent } from '../shared'
+import {
+  RecoveryFooterButtons,
+  RecoverySingleColumnContentWrapper,
+} from '../shared'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 import type { RecoveryContentProps } from '../types'
@@ -41,7 +46,6 @@ export function CancelRun(props: RecoveryContentProps): JSX.Element {
 }
 
 function CancelRunConfirmation({
-  isOnDevice,
   routeUpdateActions,
   recoveryCommands,
   tipStatusUtils,
@@ -56,48 +60,45 @@ function CancelRunConfirmation({
     tipStatusUtils,
   })
 
-  if (isOnDevice) {
-    return (
-      <RecoverySingleColumnContent
-        gridGap={SPACING.spacing24}
+  return (
+    <RecoverySingleColumnContentWrapper
+      gridGap={SPACING.spacing24}
+      alignItems={ALIGN_CENTER}
+    >
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
         alignItems={ALIGN_CENTER}
+        gridGap={SPACING.spacing16}
+        padding={`${SPACING.spacing32} ${SPACING.spacing16}`}
+        height="100%"
+        css={FLEX_WIDTH}
       >
-        <Flex
-          flexDirection={DIRECTION_COLUMN}
-          alignItems={ALIGN_CENTER}
-          gridGap={SPACING.spacing24}
-          height="100%"
-          width="848px"
-        >
-          <Icon
-            name="ot-alert"
-            size="3.75rem"
-            marginTop={SPACING.spacing24}
-            color={COLORS.red50}
-          />
-          <LegacyStyledText as="h3Bold">
-            {t('are_you_sure_you_want_to_cancel')}
-          </LegacyStyledText>
-          <LegacyStyledText
-            as="h4"
-            color={COLORS.grey60}
-            textAlign={ALIGN_CENTER}
-          >
-            {t('if_tips_are_attached')}
-          </LegacyStyledText>
-        </Flex>
-        <RecoveryFooterButtons
-          isOnDevice={isOnDevice}
-          primaryBtnOnClick={handleCancelRunClick}
-          secondaryBtnOnClick={goBackPrevStep}
-          primaryBtnTextOverride={t('confirm')}
-          isLoadingPrimaryBtnAction={showBtnLoadingState}
+        <Icon
+          name="ot-alert"
+          css={ICON_SIZE}
+          marginTop={SPACING.spacing24}
+          color={COLORS.red50}
         />
-      </RecoverySingleColumnContent>
-    )
-  } else {
-    return null
-  }
+        <StyledText oddStyle="level3HeaderBold" desktopStyle="headingSmallBold">
+          {t('are_you_sure_you_want_to_cancel')}
+        </StyledText>
+        <StyledText
+          oddStyle="level4HeaderRegular"
+          desktopStyle="bodyDefaultRegular"
+          color={COLORS.black90}
+          textAlign={ALIGN_CENTER}
+        >
+          {t('if_tips_are_attached')}
+        </StyledText>
+      </Flex>
+      <RecoveryFooterButtons
+        primaryBtnOnClick={handleCancelRunClick}
+        secondaryBtnOnClick={goBackPrevStep}
+        primaryBtnTextOverride={t('confirm')}
+        isLoadingPrimaryBtnAction={showBtnLoadingState}
+      />
+    </RecoverySingleColumnContentWrapper>
+  )
 }
 
 interface OnCancelRunProps {
@@ -146,3 +147,19 @@ export function useOnCancelRun({
 
   return { showBtnLoadingState, handleCancelRunClick }
 }
+
+const FLEX_WIDTH = css`
+  width: 41.625rem;
+  @media (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+    width: 53rem;
+  }
+`
+
+const ICON_SIZE = css`
+  width: ${SPACING.spacing40};
+  height: ${SPACING.spacing40};
+  @media (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+    width: ${SPACING.spacing60};
+    height: ${SPACING.spacing60};
+  }
+`

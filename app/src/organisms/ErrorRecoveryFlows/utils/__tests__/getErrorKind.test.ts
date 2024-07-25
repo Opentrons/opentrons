@@ -55,10 +55,10 @@ describe('getErrorKind', () => {
   it(`returns ${ERROR_KINDS.GENERAL_ERROR} for defined errors not handled explicitly`, () => {
     const result = getErrorKind({
       commandType: 'aspirate',
-      error: {
+      error: ({
         isDefined: true,
         errorType: 'someHithertoUnknownDefinedErrorType',
-      } as RunCommandError,
+      } as unknown) as RunCommandError,
     } as RunTimeCommand)
     expect(result).toEqual(ERROR_KINDS.GENERAL_ERROR)
   })

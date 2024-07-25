@@ -9,19 +9,19 @@ import { useLights } from '../../Devices/hooks'
 import { RestartRobotConfirmationModal } from '../RestartRobotConfirmationModal'
 import { NavigationMenu } from '../NavigationMenu'
 
-import type { useHistory } from 'react-router-dom'
+import type { NavigateFunction } from 'react-router-dom'
 
 vi.mock('../../../redux/robot-admin')
 vi.mock('../../../redux/robot-controls')
 vi.mock('../../Devices/hooks')
 vi.mock('../RestartRobotConfirmationModal')
 
-const mockPush = vi.fn()
+const mockNavigate = vi.fn()
 vi.mock('react-router-dom', async importOriginal => {
-  const actual = await importOriginal<typeof useHistory>()
+  const actual = await importOriginal<NavigateFunction>()
   return {
     ...actual,
-    useHistory: () => ({ push: mockPush } as any),
+    useNavigate: () => mockNavigate,
   }
 })
 
@@ -97,6 +97,6 @@ describe('NavigationMenu', () => {
   it('should call a mock function when tapping deck configuration', () => {
     render(props)
     fireEvent.click(screen.getByText('Deck configuration'))
-    expect(mockPush).toHaveBeenCalledWith('/deck-configuration')
+    expect(mockNavigate).toHaveBeenCalledWith('/deck-configuration')
   })
 })

@@ -7,7 +7,7 @@ from decoy import Decoy
 
 from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.deck import load as load_deck
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
+from opentrons_shared_data.deck.types import DeckDefinitionV5
 from opentrons_shared_data.labware import load_definition
 from opentrons_shared_data.pipette import pipette_definition
 from opentrons.protocols.models import LabwareDefinition

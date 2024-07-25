@@ -23,8 +23,8 @@ DEFAULT_PIPETTE_OFFSET = [0.0, 0.0, 0.0]
 DEFAULT_MODULE_OFFSET = [0.0, 0.0, 0.0]
 
 DEFAULT_LIQUID_PROBE_SETTINGS: Final[LiquidProbeSettings] = LiquidProbeSettings(
-    mount_speed=10,
-    plunger_speed=5,
+    mount_speed=5,
+    plunger_speed=20,
     plunger_impulse_time=0.2,
     sensor_threshold_pascals=15,
     output_option=OutputOptions.sync_buffer_to_csv,
@@ -328,7 +328,7 @@ def _build_default_liquid_probe(
         or output_option is OutputOptions.stream_to_csv
     ):
         data_files = _build_log_files_with_default(
-            from_conf.get("data_files", {}), default.data_files
+            from_conf.get("data_files", None), default.data_files
         )
     return LiquidProbeSettings(
         mount_speed=from_conf.get("mount_speed", default.mount_speed),

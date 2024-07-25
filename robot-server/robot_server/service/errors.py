@@ -1,5 +1,6 @@
 # TODO(mc, 2021-05-10): delete this file; these models have been moved to
 # robot_server/errors/error_responses.py and robot_server/errors/global_errors.py
+# Note: (2024-07-18): this file does not actually seem to be safe to delete
 from dataclasses import dataclass, asdict
 from enum import Enum
 from typing import Any, Dict, Optional, Sequence, Tuple

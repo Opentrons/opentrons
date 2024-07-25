@@ -20,7 +20,7 @@ import { mockConnectedRobot } from '../../../../redux/discovery/__fixtures__'
 import { ConfirmCancelRunModal } from '../ConfirmCancelRunModal'
 import { CancelingRunModal } from '../CancelingRunModal'
 
-import type { useHistory } from 'react-router-dom'
+import type { NavigateFunction } from 'react-router-dom'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../../organisms/Devices/hooks')
@@ -29,7 +29,7 @@ vi.mock('../../../../redux/analytics')
 vi.mock('../../../ProtocolUpload/hooks')
 vi.mock('../CancelingRunModal')
 vi.mock('../../../../redux/discovery')
-const mockPush = vi.fn()
+const mockNavigate = vi.fn()
 const mockStopRun = vi.fn()
 const mockDismissCurrentRun = vi.fn()
 const mockTrackEvent = vi.fn()
@@ -38,10 +38,10 @@ const mockTrackProtocolRunEvent = vi.fn(
 )
 
 vi.mock('react-router-dom', async importOriginal => {
-  const actual = await importOriginal<typeof useHistory>()
+  const actual = await importOriginal<NavigateFunction>()
   return {
     ...actual,
-    useHistory: () => ({ push: mockPush } as any),
+    useNavigate: () => mockNavigate,
   }
 })
 
@@ -150,6 +150,6 @@ describe('ConfirmCancelRunModal', () => {
 
     expect(mockDismissCurrentRun).toHaveBeenCalled()
     expect(mockTrackProtocolRunEvent).toHaveBeenCalled()
-    expect(mockPush).toHaveBeenCalledWith('/protocols')
+    expect(mockNavigate).toHaveBeenCalledWith('/protocols')
   })
 })
