@@ -47,7 +47,7 @@ export function ChooseCsvFile({
 
   const csvFilesOnUSB = useSelector(getShellUpdateDataFiles) ?? []
 
-  const csvFilesOnRobot = useAllCsvFilesQuery(protocolId).data?.data.files ?? []
+  const csvFilesOnRobot = useAllCsvFilesQuery(protocolId).data?.data ?? []
 
   const initialFileObject: CsvFileParameterFileData = parameter.file ?? {}
   const [
@@ -57,7 +57,7 @@ export function ChooseCsvFile({
 
   const handleBackButton = (): void => {
     if (!isEqual(csvFileSelected, initialFileObject)) {
-      setParameter(csvFileSelected, parameter.variableName)
+      setParameter(csvFileSelected, parameter.variableName as string)
     }
     handleGoBack()
   }
