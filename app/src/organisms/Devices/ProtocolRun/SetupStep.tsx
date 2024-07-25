@@ -12,7 +12,7 @@ import {
   Icon,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  LegacyStyledText,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -23,8 +23,6 @@ interface SetupStepProps {
   title: React.ReactNode
   /** always shown text that provides a one sentence explanation of the contents */
   description: string
-  /** always shown text that sits above title of step (used for step number) */
-  label: string
   /** callback that should toggle the expanded state (managed by parent) */
   toggleExpanded: () => void
   /** contents to be shown only when expanded */
@@ -58,7 +56,6 @@ export function SetupStep({
   expanded,
   title,
   description,
-  label,
   toggleExpanded,
   children,
   rightElement,
@@ -78,29 +75,21 @@ export function SetupStep({
             gridGap={SPACING.spacing40}
           >
             <Flex flexDirection={DIRECTION_COLUMN}>
-              <LegacyStyledText
-                color={COLORS.grey50}
-                css={TYPOGRAPHY.h6SemiBold}
-                marginBottom={SPACING.spacing2}
-                id={`CollapsibleStep_${label}`}
-              >
-                {label}
-              </LegacyStyledText>
-              <LegacyStyledText
+              <StyledText
                 color={COLORS.black90}
-                css={TYPOGRAPHY.h3SemiBold}
+                desktopStyle="bodyLargeSemiBold"
                 marginBottom={SPACING.spacing4}
                 id={`CollapsibleStep_${String(title)}`}
               >
                 {title}
-              </LegacyStyledText>
-              <LegacyStyledText
-                as="p"
+              </StyledText>
+              <StyledText
+                desktopStyle="bodyDefaultRegular"
                 color={COLORS.black90}
                 id={`CollapsibleStep_${description}`}
               >
                 {description}
-              </LegacyStyledText>
+              </StyledText>
             </Flex>
             <Flex alignItems={ALIGN_CENTER} flexDirection={DIRECTION_ROW}>
               {rightElement}

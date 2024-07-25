@@ -12,7 +12,12 @@ import { TipSelection } from './TipSelection'
 import type { RecoveryContentProps } from '../types'
 
 export function SelectTips(props: RecoveryContentProps): JSX.Element | null {
-  const { failedPipetteInfo, routeUpdateActions, recoveryCommands } = props
+  const {
+    failedPipetteInfo,
+    routeUpdateActions,
+    recoveryCommands,
+    isOnDevice,
+  } = props
   const { ROBOT_PICKING_UP_TIPS } = RECOVERY_MAP
   const { pickUpTips } = recoveryCommands
   const {
@@ -33,6 +38,22 @@ export function SelectTips(props: RecoveryContentProps): JSX.Element | null {
     setShowTipSelectModal(!showTipSelectModal)
   }
 
+  const buildTertiaryBtnProps = (): {
+    tertiaryBtnDisabled?: boolean
+    tertiaryBtnOnClick?: () => void
+    tertiaryBtnText?: string
+  } => {
+    if (isOnDevice) {
+      return {
+        tertiaryBtnDisabled: failedPipetteInfo?.data.channels === 96,
+        tertiaryBtnOnClick: toggleModal,
+        tertiaryBtnText: t('change_location'),
+      }
+    } else {
+      return {}
+    }
+  }
+
   return (
     <>
       {showTipSelectModal && (
@@ -50,15 +71,13 @@ export function SelectTips(props: RecoveryContentProps): JSX.Element | null {
             type="location"
             bannerText={t('replace_tips_and_select_location')}
           />
-          <TipSelection {...props} allowTipSelection={false} />
+          <TipSelection {...props} allowTipSelection={!isOnDevice} />
         </TwoColumn>
         <RecoveryFooterButtons
           primaryBtnOnClick={primaryBtnOnClick}
           secondaryBtnOnClick={goBackPrevStep}
           primaryBtnTextOverride={t('pick_up_tips')}
-          tertiaryBtnDisabled={failedPipetteInfo?.data.channels === 96}
-          tertiaryBtnOnClick={toggleModal}
-          tertiaryBtnText={t('change_location')}
+          {...buildTertiaryBtnProps()}
         />
       </RecoverySingleColumnContentWrapper>
     </>

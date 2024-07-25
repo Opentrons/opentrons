@@ -13,7 +13,7 @@ from opentrons_shared_data.pipette.load_data import (
 from opentrons_shared_data.pipette.pipette_load_name_conversions import (
     convert_pipette_model,
 )
-from opentrons_shared_data.pipette.dev_types import PipetteModel
+from opentrons_shared_data.pipette.types import PipetteModel
 
 
 def iterate_models() -> Iterator[PipetteModel]:

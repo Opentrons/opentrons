@@ -8,13 +8,14 @@ import { InterventionModal } from '../../../molecules/InterventionModal'
 import { getModalPortalEl, getTopPortalEl } from '../../../App/portal'
 
 import type { ModalType } from '../../../molecules/InterventionModal'
+import type { DesktopSizeType } from '../types'
 
 export type RecoveryInterventionModalProps = Omit<
   React.ComponentProps<typeof InterventionModal>,
   'type'
 > & {
   /* If on desktop, specifies the hard-coded dimensions height of the modal. */
-  desktopType: 'desktop-small' | 'desktop-large'
+  desktopType: DesktopSizeType
   isOnDevice: boolean
 }
 
@@ -38,7 +39,6 @@ export function RecoveryInterventionModal({
             ? SMALL_MODAL_STYLE
             : LARGE_MODAL_STYLE
         }
-        padding={SPACING.spacing32}
       >
         {children}
       </Flex>
@@ -47,17 +47,15 @@ export function RecoveryInterventionModal({
   )
 }
 
-const ODD_STYLE = `
-@media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+const SMALL_MODAL_STYLE = css`
+  height: 22rem;
+  padding: ${SPACING.spacing32};
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    padding: ${SPACING.spacing32};
     height: 100%;
   }
 `
-
-const SMALL_MODAL_STYLE = css`
-  height: 22rem;
-  ${ODD_STYLE}
-`
 const LARGE_MODAL_STYLE = css`
   height: 26.75rem;
-  ${ODD_STYLE}
 `

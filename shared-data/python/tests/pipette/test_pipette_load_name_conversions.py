@@ -7,7 +7,7 @@ from opentrons_shared_data.pipette.types import (
     PipetteVersionType,
     PipetteGenerationType,
 )
-from opentrons_shared_data.pipette.dev_types import PipetteModel, PipetteName
+from opentrons_shared_data.pipette.types import PipetteModel, PipetteName
 from opentrons_shared_data.pipette import (
     pipette_definition as pc,
     pipette_load_name_conversions as ps,

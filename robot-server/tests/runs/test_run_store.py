@@ -7,7 +7,7 @@ from decoy import Decoy
 from sqlalchemy.engine import Engine
 from unittest import mock
 
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons_shared_data.errors.codes import ErrorCodes
 
 from robot_server.protocols.protocol_store import ProtocolNotFoundError

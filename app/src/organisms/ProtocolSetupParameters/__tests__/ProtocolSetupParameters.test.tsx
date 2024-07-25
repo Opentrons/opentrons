@@ -20,11 +20,11 @@ import { useToaster } from '../../ToasterOven'
 import { useFeatureFlag } from '../../../redux/config'
 import { ProtocolSetupParameters } from '..'
 
-import type * as ReactRouterDom from 'react-router-dom'
+import type { NavigateFunction } from 'react-router-dom'
 import type { HostConfig } from '@opentrons/api-client'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
-const mockGoBack = vi.fn()
+const mockNavigate = vi.fn()
 
 vi.mock('../ChooseEnum')
 vi.mock('../ChooseNumber')
@@ -34,10 +34,10 @@ vi.mock('../../ToasterOven')
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 vi.mock('react-router-dom', async importOriginal => {
-  const reactRouterDom = await importOriginal<typeof ReactRouterDom>()
+  const reactRouterDom = await importOriginal<NavigateFunction>()
   return {
     ...reactRouterDom,
-    useHistory: () => ({ goBack: mockGoBack } as any),
+    useNavigate: () => mockNavigate,
   }
 })
 vi.mock('../../../redux/config')
@@ -147,10 +147,10 @@ describe('ProtocolSetupParameters', () => {
     screen.getByText('CSV File')
   })
 
-  it('renders the back icon and calls useHistory', () => {
+  it('renders the back icon and calls useNavigate', () => {
     render(props)
     fireEvent.click(screen.getAllByRole('button')[0])
-    expect(mockGoBack).toHaveBeenCalled()
+    expect(mockNavigate).toHaveBeenCalled()
   })
 
   it('renders the confirm values button and clicking on it creates a run', () => {

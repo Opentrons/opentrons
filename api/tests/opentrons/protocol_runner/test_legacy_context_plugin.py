@@ -24,7 +24,7 @@ from opentrons.protocol_runner.legacy_context_plugin import LegacyContextPlugin
 
 from opentrons.types import DeckSlotName
 
-from opentrons_shared_data.labware.dev_types import (
+from opentrons_shared_data.labware.types import (
     LabwareDefinition as LabwareDefinitionDict,
 )
 

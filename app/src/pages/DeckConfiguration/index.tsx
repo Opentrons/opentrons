@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import {
   DeckConfigurator,
@@ -28,7 +28,7 @@ export function DeckConfigurationEditor(): JSX.Element {
     'devices_landing',
     'shared',
   ])
-  const history = useHistory()
+  const navigate = useNavigate()
   const [
     showSetupInstructionsModal,
     setShowSetupInstructionsModal,
@@ -49,7 +49,7 @@ export function DeckConfigurationEditor(): JSX.Element {
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
 
   const handleClickConfirm = (): void => {
-    history.goBack()
+    navigate(-1)
   }
 
   const secondaryButtonProps: React.ComponentProps<typeof SmallButton> = {

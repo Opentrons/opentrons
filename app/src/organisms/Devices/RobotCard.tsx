@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import {
   ALIGN_START,
@@ -54,7 +54,7 @@ interface RobotCardProps {
 export function RobotCard(props: RobotCardProps): JSX.Element | null {
   const { robot } = props
   const { name: robotName, local } = robot
-  const history = useHistory()
+  const navigate = useNavigate()
   const robotModel = useSelector((state: State) =>
     getRobotModelByName(state, robotName)
   )
@@ -71,7 +71,7 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
       padding={SPACING.spacing16}
       position={POSITION_RELATIVE}
       onClick={() => {
-        history.push(`/devices/${robotName}`)
+        navigate(`/devices/${robotName}`)
       }}
     >
       <img

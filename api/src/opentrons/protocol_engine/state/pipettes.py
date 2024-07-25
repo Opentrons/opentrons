@@ -13,6 +13,7 @@ from opentrons.hardware_control.nozzle_manager import (
 )
 from opentrons.protocol_engine.actions.actions import FailCommandAction
 from opentrons.protocol_engine.commands.aspirate import Aspirate
+from opentrons.protocol_engine.commands.dispense import Dispense
 from opentrons.protocol_engine.commands.command import DefinedErrorData
 from opentrons.protocol_engine.commands.pipetting_common import (
     OverpressureError,
@@ -316,7 +317,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             )
         elif (
             isinstance(action, FailCommandAction)
-            and isinstance(action.running_command, Aspirate)
+            and isinstance(action.running_command, (Aspirate, Dispense))
             and isinstance(action.error, DefinedErrorData)
             and isinstance(action.error.public, OverpressureError)
         ):
@@ -412,7 +413,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             )
         elif (
             isinstance(action, FailCommandAction)
-            and isinstance(action.running_command, Aspirate)
+            and isinstance(action.running_command, (Aspirate, Dispense))
             and isinstance(action.error, DefinedErrorData)
             and isinstance(action.error.public, OverpressureError)
         ):

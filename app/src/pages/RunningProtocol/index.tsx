@@ -79,7 +79,9 @@ export type ScreenOption =
   | 'RunningProtocolCommandList'
 
 export function RunningProtocol(): JSX.Element {
-  const { runId } = useParams<OnDeviceRouteParams>()
+  const { runId } = useParams<
+    keyof OnDeviceRouteParams
+  >() as OnDeviceRouteParams
   const [currentOption, setCurrentOption] = React.useState<ScreenOption>(
     'CurrentRunningProtocolCommand'
   )
@@ -162,7 +164,6 @@ export function RunningProtocol(): JSX.Element {
       {isERActive ? (
         <ErrorRecoveryFlows
           runStatus={runStatus}
-          isFlex={true}
           runId={runId}
           failedCommand={failedCommand}
           protocolAnalysis={robotSideAnalysis}

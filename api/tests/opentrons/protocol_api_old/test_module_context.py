@@ -24,7 +24,7 @@ from opentrons.protocols.api_support.deck_type import STANDARD_OT2_DECK
 from opentrons.protocols.api_support.types import APIVersion
 
 from opentrons_shared_data.labware import load_definition as load_labware_definition
-from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
+from opentrons_shared_data.module.types import ModuleDefinitionV3
 
 
 @pytest.fixture

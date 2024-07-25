@@ -37,6 +37,7 @@ import { FirmwareUpdateFailedModal } from '../FirmwareUpdateFailedModal'
 import { ErrorInfo } from '../ErrorInfo'
 import { ModuleCard } from '..'
 
+import type { NavigateFunction } from 'react-router-dom'
 import type {
   HeaterShakerModule,
   MagneticModule,
@@ -57,6 +58,13 @@ vi.mock('../../../redux/robot-api')
 vi.mock('../../../organisms/ToasterOven')
 vi.mock('../../../organisms/Devices/hooks')
 vi.mock('../../../resources/devices/hooks/useIsEstopNotDisengaged')
+vi.mock('react-router-dom', async importOriginal => {
+  const actual = await importOriginal<NavigateFunction>()
+  return {
+    ...actual,
+    useNavigate: () => vi.fn(),
+  }
+})
 
 const mockMagneticModuleHub = {
   id: 'magdeck_id',
