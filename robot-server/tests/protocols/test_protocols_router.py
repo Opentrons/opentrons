@@ -108,7 +108,13 @@ def analyses_manager(decoy: Decoy) -> AnalysesManager:
 
 @pytest.fixture
 def protocol_auto_deleter(decoy: Decoy) -> ProtocolAutoDeleter:
-    """Get a mocked out AutoDeleter."""
+    """Get a mocked out ProtocolAutoDeleter."""
+    return decoy.mock(cls=ProtocolAutoDeleter)
+
+
+@pytest.fixture
+def quick_transfer_protocol_auto_deleter(decoy: Decoy) -> ProtocolAutoDeleter:
+    """Get a mocked out quick-transfer ProtocolAutoDeleter."""
     return decoy.mock(cls=ProtocolAutoDeleter)
 
 
@@ -119,7 +125,9 @@ async def test_get_protocols_no_protocols(
     """It should return an empty collection response with no protocols loaded."""
     decoy.when(protocol_store.get_all()).then_return([])
 
-    result = await get_protocols(protocol_store=protocol_store)
+    result = await get_protocols(
+        protocol_store=protocol_store, analysis_store=decoy.mock(cls=AnalysisStore)
+    )
 
     assert result.content.data == []
     assert result.content.meta == MultiBodyMeta(cursor=0, totalLength=0)
@@ -374,6 +382,7 @@ async def test_get_protocol_not_found(
         await get_protocol_by_id(
             "protocol-id",
             protocol_store=protocol_store,
+            analysis_store=decoy.mock(cls=AnalysisStore),
         )
 
     assert exc_info.value.status_code == 404
@@ -388,6 +397,7 @@ async def test_create_existing_protocol(
     file_hasher: FileHasher,
     analyses_manager: AnalysesManager,
     protocol_auto_deleter: ProtocolAutoDeleter,
+    quick_transfer_protocol_auto_deleter: ProtocolAutoDeleter,
 ) -> None:
     """It should return the existing protocol info from database."""
     protocol_directory = Path("/dev/null")
@@ -460,6 +470,7 @@ async def test_create_existing_protocol(
         file_hasher=file_hasher,
         analyses_manager=analyses_manager,
         protocol_auto_deleter=protocol_auto_deleter,
+        quick_transfer_protocol_auto_deleter=quick_transfer_protocol_auto_deleter,
         robot_type="OT-2 Standard",
         protocol_id="protocol-id",
         analysis_id="analysis-id",
@@ -490,6 +501,7 @@ async def test_create_protocol(
     file_hasher: FileHasher,
     analyses_manager: AnalysesManager,
     protocol_auto_deleter: ProtocolAutoDeleter,
+    quick_transfer_protocol_auto_deleter: ProtocolAutoDeleter,
 ) -> None:
     """It should store an uploaded protocol file."""
     protocol_directory = Path("/dev/null")
@@ -601,6 +613,7 @@ async def test_create_new_protocol_with_run_time_params(
     file_hasher: FileHasher,
     analyses_manager: AnalysesManager,
     protocol_auto_deleter: ProtocolAutoDeleter,
+    quick_transfer_protocol_auto_deleter: ProtocolAutoDeleter,
 ) -> None:
     """It should handle the run time parameter overrides correctly."""
     protocol_directory = Path("/dev/null")
@@ -685,6 +698,7 @@ async def test_create_new_protocol_with_run_time_params(
         file_hasher=file_hasher,
         analyses_manager=analyses_manager,
         protocol_auto_deleter=protocol_auto_deleter,
+        quick_transfer_protocol_auto_deleter=quick_transfer_protocol_auto_deleter,
         robot_type="OT-2 Standard",
         protocol_id="protocol-id",
         analysis_id="analysis-id",
@@ -707,6 +721,7 @@ async def test_create_existing_protocol_with_no_previous_analysis(
     file_hasher: FileHasher,
     analyses_manager: AnalysesManager,
     protocol_auto_deleter: ProtocolAutoDeleter,
+    quick_transfer_protocol_auto_deleter: ProtocolAutoDeleter,
 ) -> None:
     """It should re-trigger analysis of the existing protocol resource."""
     protocol_directory = Path("/dev/null")
@@ -791,6 +806,7 @@ async def test_create_existing_protocol_with_no_previous_analysis(
         file_hasher=file_hasher,
         analyses_manager=analyses_manager,
         protocol_auto_deleter=protocol_auto_deleter,
+        quick_transfer_protocol_auto_deleter=quick_transfer_protocol_auto_deleter,
         robot_type="OT-2 Standard",
         protocol_id="protocol-id",
         analysis_id="analysis-id",
@@ -821,6 +837,7 @@ async def test_create_existing_protocol_with_different_run_time_params(
     file_hasher: FileHasher,
     analyses_manager: AnalysesManager,
     protocol_auto_deleter: ProtocolAutoDeleter,
+    quick_transfer_protocol_auto_deleter: ProtocolAutoDeleter,
 ) -> None:
     """It should re-trigger analysis of the existing protocol resource."""
     protocol_directory = Path("/dev/null")
@@ -914,6 +931,7 @@ async def test_create_existing_protocol_with_different_run_time_params(
         file_hasher=file_hasher,
         analyses_manager=analyses_manager,
         protocol_auto_deleter=protocol_auto_deleter,
+        quick_transfer_protocol_auto_deleter=quick_transfer_protocol_auto_deleter,
         robot_type="OT-2 Standard",
         protocol_id="protocol-id",
         analysis_id="analysis-id",
@@ -944,6 +962,7 @@ async def test_create_existing_protocol_with_same_run_time_params(
     file_hasher: FileHasher,
     analyses_manager: AnalysesManager,
     protocol_auto_deleter: ProtocolAutoDeleter,
+    quick_transfer_protocol_auto_deleter: ProtocolAutoDeleter,
 ) -> None:
     """It should re-trigger analysis of the existing protocol resource."""
     protocol_directory = Path("/dev/null")
@@ -1019,6 +1038,7 @@ async def test_create_existing_protocol_with_same_run_time_params(
         file_hasher=file_hasher,
         analyses_manager=analyses_manager,
         protocol_auto_deleter=protocol_auto_deleter,
+        quick_transfer_protocol_auto_deleter=quick_transfer_protocol_auto_deleter,
         robot_type="OT-2 Standard",
         protocol_id="protocol-id",
         analysis_id="analysis-id",
@@ -1049,6 +1069,7 @@ async def test_create_existing_protocol_with_pending_analysis_raises(
     file_hasher: FileHasher,
     analyses_manager: AnalysesManager,
     protocol_auto_deleter: ProtocolAutoDeleter,
+    quick_transfer_protocol_auto_deleter: ProtocolAutoDeleter,
 ) -> None:
     """It should raise an error if protocol has existing pending analysis."""
     protocol_directory = Path("/dev/null")
@@ -1125,6 +1146,7 @@ async def test_create_existing_protocol_with_pending_analysis_raises(
             file_hasher=file_hasher,
             analyses_manager=analyses_manager,
             protocol_auto_deleter=protocol_auto_deleter,
+            quick_transfer_protocol_auto_deleter=quick_transfer_protocol_auto_deleter,
             robot_type="OT-2 Standard",
             protocol_id="protocol-id",
             analysis_id="analysis-id",
@@ -1167,6 +1189,13 @@ async def test_create_protocol_not_readable(
             file_hasher=file_hasher,
             protocol_id="protocol-id",
             maximum_quick_transfer_protocols=20,
+            analysis_store=decoy.mock(cls=AnalysisStore),
+            analyses_manager=decoy.mock(cls=AnalysesManager),
+            protocol_auto_deleter=decoy.mock(cls=ProtocolAutoDeleter),
+            quick_transfer_protocol_auto_deleter=decoy.mock(cls=ProtocolAutoDeleter),
+            robot_type="OT-2 Standard",
+            analysis_id="analysis-id",
+            created_at=datetime.now(),
         )
 
     assert exc_info.value.status_code == 422
@@ -1220,6 +1249,13 @@ async def test_create_protocol_different_robot_type(
             file_hasher=file_hasher,
             protocol_id="protocol-id",
             maximum_quick_transfer_protocols=20,
+            analysis_store=decoy.mock(cls=AnalysisStore),
+            analyses_manager=decoy.mock(cls=AnalysesManager),
+            protocol_auto_deleter=decoy.mock(cls=ProtocolAutoDeleter),
+            quick_transfer_protocol_auto_deleter=decoy.mock(cls=ProtocolAutoDeleter),
+            robot_type="OT-2 Standard",
+            analysis_id="analysis-id",
+            created_at=datetime.now(),
         )
 
     assert exc_info.value.status_code == 422
@@ -1660,6 +1696,7 @@ async def test_create_protocol_kind_quick_transfer(
     file_hasher: FileHasher,
     analyses_manager: AnalysesManager,
     protocol_auto_deleter: ProtocolAutoDeleter,
+    quick_transfer_protocol_auto_deleter: ProtocolAutoDeleter,
 ) -> None:
     """It should store an uploaded protocol file marked as quick-transfer."""
     protocol_directory = Path("/dev/null")
@@ -1743,7 +1780,8 @@ async def test_create_protocol_kind_quick_transfer(
         protocol_reader=protocol_reader,
         file_hasher=file_hasher,
         analyses_manager=analyses_manager,
-        quick_transfer_protocol_auto_deleter=protocol_auto_deleter,
+        protocol_auto_deleter=protocol_auto_deleter,
+        quick_transfer_protocol_auto_deleter=quick_transfer_protocol_auto_deleter,
         robot_type="OT-3 Standard",
         protocol_kind=ProtocolKind.QUICK_TRANSFER,
         protocol_id="protocol-id",
@@ -1779,6 +1817,7 @@ async def test_create_protocol_maximum_quick_transfer_protocols_exceeded(
     file_reader_writer: FileReaderWriter,
     file_hasher: FileHasher,
     protocol_auto_deleter: ProtocolAutoDeleter,
+    quick_transfer_protocol_auto_deleter: ProtocolAutoDeleter,
 ) -> None:
     """It should throw a 409 error if the quick transfer protocols maximum is exceeded."""
     protocol_directory = Path("/dev/null")
@@ -1818,10 +1857,12 @@ async def test_create_protocol_maximum_quick_transfer_protocols_exceeded(
             protocol_directory=protocol_directory,
             protocol_store=protocol_store,
             analysis_store=analysis_store,
+            analyses_manager=decoy.mock(cls=AnalysesManager),
             file_reader_writer=file_reader_writer,
             protocol_reader=protocol_reader,
             file_hasher=file_hasher,
             protocol_auto_deleter=protocol_auto_deleter,
+            quick_transfer_protocol_auto_deleter=quick_transfer_protocol_auto_deleter,
             robot_type="OT-3 Standard",
             protocol_id="protocol-id",
             analysis_id="analysis-id",
