@@ -284,7 +284,7 @@ async def calibrate_tiprack(api, home_position, mount):
         presses = None,
         increment = None,
         volume = test_volume)
-    await api._high_throughput_evo_push()
+    # await api._high_throughput_evo_push()
     return tiprack_loc
 
 async def _main() -> None:
@@ -316,31 +316,31 @@ async def _main() -> None:
     print(plunger_pos)
     home_position = await hw_api.current_position_ot3(mount)
     start_time = time.perf_counter()
-    m_current = 1.5
-    hw_api.set_flow_rate(mount, 15, 15, 15)
+    # m_current = 1.5
+    hw_api.set_flow_rate(mount, 50, 50, 50)
     # pick_up_speed = float(input("pick up tip speed in mm/s: "))
-    await update_pick_up_current(hw_api, mount, m_current)
+    # await update_pick_up_current(hw_api, mount, m_current)
     # await update_pick_up_speed(hw_api, mount, pick_up_speed)
-    await update_pick_up_distance(hw_api, mount, 3, 2.8)
+    # await update_pick_up_distance(hw_api, mount, 3, 2.8)
 
     if (args.measure_nozzles):
         cp = CriticalPoint.NOZZLE
         home_wo_tip = await hw_api.current_position_ot3(mount, cp)
-        # initial_dial_loc = Point(
-        #                     deck_slot['deck_slot'][args.dial_slot]['X'],
-        #                     deck_slot['deck_slot'][args.dial_slot]['Y'],
-        #                     home_wo_tip[Axis.by_mount(mount)]
-        # )
         initial_dial_loc = Point(
-                            236.65,
-                            44.54,
-                            145.45
+                            deck_slot['deck_slot'][args.dial_slot]['X'],
+                            deck_slot['deck_slot'][args.dial_slot]['Y'],
+                            home_wo_tip[Axis.by_mount(mount)]
         )
+        # initial_dial_loc = Point(
+        #                     236.65,
+        #                     44.54,
+        #                     145.45
+        # )
         print("Move Nozzle to Dial Indicator")
         await move_to_point(hw_api, mount, initial_dial_loc, cp)
         current_position = await hw_api.current_position_ot3(mount, cp)
         nozzle_loc = await jog(hw_api, current_position, cp)
-        number_of_channels = 96
+        number_of_channels = 1
         nozzle_count = 0
         x_offset = 0
         y_offset = 0
@@ -348,35 +348,35 @@ async def _main() -> None:
         measurement_map = {}
         num_of_columns = 12
         num_of_rows = 8 * num_of_columns
-        # for tip in range(1, number_of_channels + 1):
-        #     cp = CriticalPoint.NOZZLE
-        #     nozzle_count += 1
-        #     nozzle_position = Point(nozzle_loc[Axis.X] + x_offset,
-        #                             nozzle_loc[Axis.Y] + y_offset,
-        #                             nozzle_loc[Axis.by_mount(mount)])
-        #     await move_to_point(hw_api, mount, nozzle_position, cp)
-        #     await asyncio.sleep(1)
-        #     nozzle_measurement = gauge.read()
-        #     measurement_map.update({nozzle_count: nozzle_measurement})
-        #     print("nozzle-",nozzle_count, "(mm): " , nozzle_measurement, end="")
-        #     print("\r", end="")
-        #     measurements.append(nozzle_measurement)
-        #     if nozzle_count % num_of_columns == 0:
-        #         d_str = ''
-        #         for m in measurements:
-        #             d_str += str(m) + ','
-        #         d_str = d_str[:-1] + '\n'
-        #         print(f"{d_str}")
-        #         data.append_data_to_file(test_n, test_id, test_f, d_str)
-        #         # Reset Measurements list
-        #         measurements = []
-        #         print("\r\n")
-        #     x_offset -= 9
-        #     if nozzle_count % num_of_columns == 0:
-        #         y_offset += 9
-        #     if nozzle_count % num_of_columns == 0:
-        #         x_offset = 0
-        # print(f'Nozzle Measurements: {measurement_map}')
+        for tip in range(1, number_of_channels + 1):
+            cp = CriticalPoint.NOZZLE
+            nozzle_count += 1
+            nozzle_position = Point(nozzle_loc[Axis.X] + x_offset,
+                                    nozzle_loc[Axis.Y] + y_offset,
+                                    nozzle_loc[Axis.by_mount(mount)])
+            await move_to_point(hw_api, mount, nozzle_position, cp)
+            await asyncio.sleep(1)
+            nozzle_measurement = gauge.read()
+            measurement_map.update({nozzle_count: nozzle_measurement})
+            print("nozzle-",nozzle_count, "(mm): " , nozzle_measurement, end="")
+            print("\r", end="")
+            measurements.append(nozzle_measurement)
+            if nozzle_count % num_of_columns == 0:
+                d_str = ''
+                for m in measurements:
+                    d_str += str(m) + ','
+                d_str = d_str[:-1] + '\n'
+                print(f"{d_str}")
+                data.append_data_to_file(test_n, test_id, test_f, d_str)
+                # Reset Measurements list
+                measurements = []
+                print("\r\n")
+            x_offset -= 9
+            if nozzle_count % num_of_columns == 0:
+                y_offset += 9
+            if nozzle_count % num_of_columns == 0:
+                x_offset = 0
+        print(f'Nozzle Measurements: {measurement_map}')
         # num_of_columns = 12
     # Calibrate to tiprack
     if args.calibrate:
