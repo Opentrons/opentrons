@@ -78,7 +78,7 @@ async def get_modules(
 )
 async def post_serial_command(
     command: SerialCommand,
-    serial: str = Path(..., description="Serial number of the module"),
+    serial: Annotated[str, Path(..., description="Serial number of the module")],
     hardware: Annotated[HardwareControlAPI, Depends(get_hardware)],
     requested_version: Annotated[int, Depends(get_requested_version)],
 ) -> SerialCommandResponse:
@@ -144,7 +144,7 @@ async def post_serial_command(
     },
 )
 async def post_serial_update(
-    serial: str = Path(..., description="Serial number of the module"),
+    serial: Annotated[str, Path(..., description="Serial number of the module")],
     hardware: Annotated[HardwareControlAPI, Depends(get_hardware)],
 ) -> V1BasicResponse:
     """Update module firmware"""

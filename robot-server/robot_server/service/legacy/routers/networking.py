@@ -192,11 +192,14 @@ async def post_wifi_key(key: UploadFile = File(...)):
     },
 )
 async def delete_wifi_key(
-    key_uuid: str = Path(
-        ...,
-        description="The ID of key to delete, as determined by a previous"
-        " call to GET /wifi/keys",
-    )
+    key_uuid: Annotated[
+        str,
+        Path(
+            ...,
+            description="The ID of key to delete, as determined by a previous"
+            " call to GET /wifi/keys",
+        ),
+    ]
 ) -> V1BasicResponse:
     """Delete wifi key handler"""
     deleted_file = wifi.remove_key(key_uuid)

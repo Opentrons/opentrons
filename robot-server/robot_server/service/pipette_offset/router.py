@@ -48,9 +48,9 @@ def _format_calibration(
     response_model=pip_models.MultipleCalibrationsResponse,
 )
 async def get_all_pipette_offset_calibrations(
+    _: Annotated[API, Depends(get_ot2_hardware)],
     pipette_id: Optional[str] = None,
     mount: Optional[pip_models.MountType] = None,
-    _: Annotated[API, Depends(get_ot2_hardware)],
 ) -> pip_models.MultipleCalibrationsResponse:
     all_calibrations = pipette_offset.get_all_pipette_offset_calibrations()
     if not all_calibrations:

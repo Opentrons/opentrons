@@ -241,9 +241,9 @@ async def post_settings_reset_options(
     persistence_resetter: Annotated[
         PersistenceResetter, Depends(get_persistence_resetter)
     ],
-    deck_configuration_store: Optional[DeckConfigurationStore] = Depends(
-        get_deck_configuration_store_failsafe
-    ),
+    deck_configuration_store: Annotated[
+        Optional[DeckConfigurationStore], Depends(get_deck_configuration_store_failsafe)
+    ],
     robot_type: Annotated[RobotTypeEnum, Depends(get_robot_type_enum)],
 ) -> V1BasicResponse:
     reset_options = reset_util.reset_options(robot_type)

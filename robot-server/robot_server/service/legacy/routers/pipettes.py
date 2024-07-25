@@ -28,7 +28,7 @@ router = APIRouter()
 )
 async def get_pipettes(
     refresh: typing.Annotated[
-        Optional[bool],
+        typing.Optional[bool],
         Query(
             False,
             description="If `false`, query a cached value. If `true`, actively scan for"
@@ -41,7 +41,7 @@ async def get_pipettes(
             " unnecessary, and the behavior is currently undefined.",
         ),
     ],
-    hardware: Annotated[HardwareControlAPI, Depends(get_hardware)],
+    hardware: typing.Annotated[HardwareControlAPI, Depends(get_hardware)],
 ) -> pipettes.PipettesByMount:
     """
     Query robot for model strings on 'left' and 'right' mounts, and return a

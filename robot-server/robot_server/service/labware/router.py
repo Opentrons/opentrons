@@ -44,11 +44,11 @@ class LabwareCalibrationEndpointsRemoved(ErrorDetails):
     },
 )
 async def get_all_labware_calibrations(
+    requested_version: Annotated[int, Depends(get_requested_version)],
     loadName: Optional[str] = None,
     namespace: Optional[str] = None,
     version: Optional[int] = None,
     parent: Optional[str] = None,
-    requested_version: Annotated[int, Depends(get_requested_version)],
 ) -> lw_models.MultipleCalibrationsResponse:
     if requested_version <= 3:
         return lw_models.MultipleCalibrationsResponse(data=[], links=None)

@@ -189,35 +189,44 @@ protocols_router = APIRouter()
     },
 )
 async def create_protocol(  # noqa: C901
-    files: List[UploadFile] = File(...),
+    files: Annotated[List[UploadFile], File(...)],
     # use Form because request is multipart/form-data
     # https://fastapi.tiangolo.com/tutorial/request-forms-and-files/
-    key: Optional[str] = Form(
-        default=None,
-        description=(
-            "An arbitrary client-defined string to attach to the new protocol resource."
-            " This should be no longer than ~100 characters or so."
-            " It's intended to store something like a UUID, to help clients that store"
-            " protocols locally keep track of which local files correspond to which"
-            " protocol resources on the robot."
+    key: Annotated[
+        Optional[str],
+        Form(
+            default=None,
+            description=(
+                "An arbitrary client-defined string to attach to the new protocol resource."
+                " This should be no longer than ~100 characters or so."
+                " It's intended to store something like a UUID, to help clients that store"
+                " protocols locally keep track of which local files correspond to which"
+                " protocol resources on the robot."
+            ),
         ),
-    ),
-    run_time_parameter_values: Optional[str] = Form(
-        default=None,
-        description="Key-value pairs of run-time parameters defined in a protocol."
-        " Note that this is expected to be a string holding a JSON object."
-        " Also, if this data is included in the request, the server will"
-        " always trigger an analysis (for now).",
-        alias="runTimeParameterValues",
-    ),
-    protocol_kind: Optional[ProtocolKind] = Form(
-        default=None,
-        description=(
-            "Whether this is a `standard` protocol or a `quick-transfer` protocol."
-            "if omitted, the protocol will be `standard` by default."
+    ],
+    run_time_parameter_values: Annotated[
+        Optional[str],
+        Form(
+            default=None,
+            description="Key-value pairs of run-time parameters defined in a protocol."
+            " Note that this is expected to be a string holding a JSON object."
+            " Also, if this data is included in the request, the server will"
+            " always trigger an analysis (for now).",
+            alias="runTimeParameterValues",
         ),
-        alias="protocolKind",
-    ),
+    ],
+    protocol_kind: Annotated[
+        Optional[ProtocolKind],
+        Form(
+            default=None,
+            description=(
+                "Whether this is a `standard` protocol or a `quick-transfer` protocol."
+                "if omitted, the protocol will be `standard` by default."
+            ),
+            alias="protocolKind",
+        ),
+    ],
     protocol_directory: Annotated[Path, Depends(get_protocol_directory)],
     protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
     analysis_store: Annotated[AnalysisStore, Depends(get_analysis_store)],
@@ -228,16 +237,16 @@ async def create_protocol(  # noqa: C901
     protocol_auto_deleter: Annotated[
         ProtocolAutoDeleter, Depends(get_protocol_auto_deleter)
     ],
-    quick_transfer_protocol_auto_deleter: Annotated[ProtocolAutoDeleter, Depends(
-        get_quick_transfer_protocol_auto_deleter
-    )],
+    quick_transfer_protocol_auto_deleter: Annotated[
+        ProtocolAutoDeleter, Depends(get_quick_transfer_protocol_auto_deleter)
+    ],
     robot_type: Annotated[RobotType, Depends(get_robot_type)],
     protocol_id: Annotated[str, Depends(get_unique_id, use_cache=False)],
     analysis_id: Annotated[str, Depends(get_unique_id, use_cache=False)],
     created_at: Annotated[datetime, Depends(get_current_time)],
-    maximum_quick_transfer_protocols: Annotated[int, Depends(
-        get_maximum_quick_transfer_protocols
-    )],
+    maximum_quick_transfer_protocols: Annotated[
+        int, Depends(get_maximum_quick_transfer_protocols)
+    ],
 ) -> PydanticResponse[SimpleBody[Protocol]]:
     """Create a new protocol by uploading its files.
 
@@ -455,15 +464,18 @@ async def _start_new_analysis_if_necessary(
     responses={status.HTTP_200_OK: {"model": SimpleMultiBody[Protocol]}},
 )
 async def get_protocols(
-    protocol_kind: Annotated[Optional[ProtocolKind], Query(
-        None,
-        description=(
-            "Specify the kind of protocols you want to return."
-            " protocol kind can be `quick-transfer` or `standard` "
-            " If this is omitted or `null`, all protocols will be returned."
+    protocol_kind: Annotated[
+        Optional[ProtocolKind],
+        Query(
+            None,
+            description=(
+                "Specify the kind of protocols you want to return."
+                " protocol kind can be `quick-transfer` or `standard` "
+                " If this is omitted or `null`, all protocols will be returned."
+            ),
+            alias="protocolKind",
         ),
-        alias="protocolKind",
-    )],
+    ],
     protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
     analysis_store: Annotated[AnalysisStore, Depends(get_analysis_store)],
 ) -> PydanticResponse[SimpleMultiBody[Protocol]]:
@@ -641,11 +653,11 @@ async def delete_protocol_by_id(
 )
 async def create_protocol_analysis(
     protocolId: str,
-    request_body: Optional[RequestModel[AnalysisRequest]] = None,
     protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
     analysis_store: Annotated[AnalysisStore, Depends(get_analysis_store)],
     analyses_manager: Annotated[AnalysesManager, Depends(get_analyses_manager)],
     analysis_id: Annotated[str, Depends(get_unique_id, use_cache=False)],
+    request_body: Optional[RequestModel[AnalysisRequest]] = None,
 ) -> PydanticResponse[SimpleMultiBody[AnalysisSummary]]:
     """Start a new analysis for the given existing protocol.
 

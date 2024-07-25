@@ -84,12 +84,17 @@ class UnexpectedFileFormat(ErrorDetails):
     },
 )
 async def upload_data_file(
-    file: Optional[UploadFile] = File(default=None, description="Data file to upload"),
-    file_path: Optional[str] = Form(
-        default=None,
-        description="Absolute path to a file on the robot.",
-        alias="filePath",
-    ),
+    file: Annotated[
+        Optional[UploadFile], File(default=None, description="Data file to upload")
+    ],
+    file_path: Annotated[
+        Optional[str],
+        Form(
+            default=None,
+            description="Absolute path to a file on the robot.",
+            alias="filePath",
+        ),
+    ],
     data_files_directory: Annotated[Path, Depends(get_data_files_directory)],
     data_files_store: Annotated[DataFilesStore, Depends(get_data_files_store)],
     file_reader_writer: Annotated[FileReaderWriter, Depends(get_file_reader_writer)],
