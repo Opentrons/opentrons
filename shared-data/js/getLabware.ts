@@ -43,6 +43,7 @@ export const LABWAREV2_DO_NOT_LIST = [
   'opentrons_ot3_96_tiprack_200ul',
   'opentrons_ot3_96_tiprack_1000ul',
   'opentrons_ot3_96_tiprack_50ul',
+  'opentrons_flex_lid_absorbance_plate_reader_module',
 ]
 // NOTE(sa, 2020-7-14): in PD we do not want to list calibration blocks
 // but we still might want the rest of the labware in LABWAREV2_DO_NOT_LIST
