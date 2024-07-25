@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "c4866d66561f1c6c1281d5d1ae5579719441610fb1d00d898575a22ce6e82b87"
+            "sha256": "3d4f103c2b5d34fbfdc8d2138e8c9c39c7ff99bb2070e83fec5b662c34ae3360"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -560,7 +560,7 @@
         },
         "performance-metrics": {
             "editable": true,
-            "file": "../performance-metrics"
+            "path": "../performance-metrics"
         },
         "psutil": {
             "hashes": [

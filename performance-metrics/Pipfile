@@ -4,7 +4,7 @@ verify_ssl  = true
 name        = "pypi"
 
 [packages]
-performance-metrics = {file = ".", editable = true}
+performance-metrics = {path = ".", editable = true}
 psutil = "==6.0.0"
 systemd-python = "234"
 
