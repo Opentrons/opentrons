@@ -55,7 +55,7 @@ DESCRIPTION = "Library for working with performance metrics on the Opentrons rob
 PACKAGES = find_packages(where="src", exclude=["tests.*", "tests"])
 INSTALL_REQUIRES = [
     "psutil==6.0.0; sys_platform=='linux'",
-    "systemd-python==234; sys_platform=='linux'"
+    "systemd-python==234; sys_platform=='linux'",
 ]
 
 
