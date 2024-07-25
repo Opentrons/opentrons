@@ -28,6 +28,11 @@ on:
       - 'shared-data/**/*'
       - '!shared-data/js/**'
       - '.github/workflows/analyses-snapshot-test.yaml'
+    types:
+      - opened #default
+      - synchronize #default
+      - reopened #default
+      - labeled
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -52,7 +57,7 @@ jobs:
           ref: ${{ env.SNAPSHOT_REF }}
 
       - name: Are the analyses snapshots in my PR branch in sync with the target branch?
-        if: ${{ env.PR_TARGET_BRANCH != 'not a pr' }}
+        if: github.event_name == 'pull_request'
         run: |
           git fetch origin ${{ env.PR_TARGET_BRANCH }}
           git diff --quiet HEAD origin/${{ env.PR_TARGET_BRANCH }} -- analyses-snapshot-testing/tests/__snapshots__/analyses_snapshot_test
