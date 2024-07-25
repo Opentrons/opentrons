@@ -16,7 +16,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   TYPOGRAPHY,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 import type { IconName } from '@opentrons/components'
@@ -76,18 +76,18 @@ export function RobotSettingButton({
           alignItems={ALIGN_FLEX_START}
           justifyContent={JUSTIFY_CENTER}
         >
-          <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          <LegacyStyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {settingName}
-          </StyledText>
+          </LegacyStyledText>
           {settingInfo != null ? (
-            <StyledText
+            <LegacyStyledText
               color={COLORS.grey60}
               as="h4"
               fontWeight={TYPOGRAPHY.fontWeightRegular}
               textAlign={TYPOGRAPHY.textAlignLeft}
             >
               {settingInfo}
-            </StyledText>
+            </LegacyStyledText>
           ) : null}
         </Flex>
       </Flex>

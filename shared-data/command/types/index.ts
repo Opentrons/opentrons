@@ -1,3 +1,4 @@
+import type { ErrorCodes } from '../../errors'
 import type {
   PipettingRunTimeCommand,
   PipettingCreateCommand,
@@ -49,6 +50,7 @@ export interface CommonCommandRunTimeInfo {
   completedAt: string | null
   intent?: CommandIntent
   notes?: CommandNote[] | null
+  failedCommandId?: string // only present if intent === 'fixit'
 }
 export interface CommonCommandCreateInfo {
   intent?: CommandIntent
@@ -77,14 +79,28 @@ export type RunTimeCommand =
   | AnnotationRunTimeCommand // annotating command execution
   | IncidentalRunTimeCommand // command with only incidental effects (status bar animations)
 
+export type RunCommandError =
+  | RunCommandErrorUndefined
+  | RunCommandErrorOverpressure
+
 // TODO(jh, 05-24-24): Update when some of these newer properties become more finalized.
-export interface RunCommandError {
+export interface RunCommandErrorBase {
   createdAt: string
   detail: string
-  errorCode: string
-  errorType: string
   id: string
-  isDefined: boolean
-  errorInfo?: Record<string, unknown>
   wrappedErrors?: RunCommandError[]
+}
+
+export interface RunCommandErrorUndefined extends RunCommandErrorBase {
+  errorCode: ErrorCodes
+  errorType: string
+  isDefined: false
+  errorInfo?: Record<string, unknown>
+}
+
+export interface RunCommandErrorOverpressure extends RunCommandErrorBase {
+  errorCode: '3006'
+  errorType: 'overpressure'
+  isDefined: true
+  errorInfo: { retryLocation: [number, number, number] }
 }

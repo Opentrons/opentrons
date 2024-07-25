@@ -17,7 +17,7 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -250,9 +250,12 @@ function FeatureFlags(): JSX.Element {
               justifyContent={JUSTIFY_CENTER}
               width="46.25rem"
             >
-              <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+              <LegacyStyledText
+                as="h4"
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              >
                 {t(`__dev_internal__${flag}`)}
-              </StyledText>
+              </LegacyStyledText>
             </Flex>
           </Flex>
           <OnOffToggle isOn={Boolean(devInternalFlags?.[flag])} />
@@ -273,9 +276,9 @@ export function OnOffToggle(props: { isOn: boolean }): JSX.Element {
       padding={`${SPACING.spacing12} ${SPACING.spacing4}`}
       borderRadius={BORDERS.borderRadius16}
     >
-      <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightRegular}>
+      <LegacyStyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightRegular}>
         {props.isOn ? t('on') : t('off')}
-      </StyledText>
+      </LegacyStyledText>
     </Flex>
   )
 }

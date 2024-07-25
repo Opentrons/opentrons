@@ -104,6 +104,7 @@
       "step_name": { "label": "Step Name" },
       "step_notes": { "label": "Step Notes" },
       "mix": { "label": "mix" },
+      "comment": { "label": "comment" },
       "pauseAction": {
         "options": {
           "untilResume": "Pause until told to resume",

@@ -34,6 +34,8 @@ interface SmallButtonProps extends StyleProps {
   iconName?: IconName | null
   buttonCategory?: ButtonCategory // if not specified, it will be 'default'
   disabled?: boolean
+  /** aria-disabled for displaying snack bar, used for ODD only at this time. */
+  ariaDisabled?: boolean
 }
 
 export function SmallButton(props: SmallButtonProps): JSX.Element {
@@ -44,6 +46,7 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
     disabled,
     iconPlacement,
     iconName,
+    ariaDisabled = false,
     ...buttonProps
   } = props
 
@@ -64,6 +67,7 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
       disabledBackgroundColor: `${COLORS.grey35}`,
       disabledColor: `${COLORS.grey50}`,
     },
+
     alert: {
       defaultColor: COLORS.white,
       defaultBackgroundColor: COLORS.red50,
@@ -71,6 +75,7 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
       disabledBackgroundColor: `${COLORS.grey35}`,
       disabledColor: `${COLORS.grey50}`,
     },
+
     primary: {
       defaultColor: COLORS.white,
       defaultBackgroundColor: COLORS.blue50,
@@ -78,6 +83,7 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
       disabledBackgroundColor: `${COLORS.grey35}`,
       disabledColor: `${COLORS.grey50}`,
     },
+
     tertiaryHighLight: {
       defaultColor: COLORS.black90,
       defaultBackgroundColor: `${COLORS.blue50}00`,
@@ -85,6 +91,7 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
       disabledBackgroundColor: `${COLORS.blue50}00`,
       disabledColor: `${COLORS.grey50}`,
     },
+
     tertiaryLowLight: {
       defaultColor: `${COLORS.grey60}`,
       defaultBackgroundColor: ` ${COLORS.blue50}00`,
@@ -133,18 +140,25 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
         .disabledBackgroundColor};
       color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType].disabledColor};
     }
+
+    &[aria-disabled='true'] {
+      background-color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType]
+        .disabledBackgroundColor};
+      color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType].disabledColor};
+    }
   `
 
   return (
     <Btn
       css={SMALL_BUTTON_STYLE}
-      disabled={disabled}
+      disabled={ariaDisabled ? false : disabled}
       padding={
         iconPlacement != null
           ? SPACING.spacing16
           : `${SPACING.spacing16} ${SPACING.spacing24}`
       }
       {...buttonProps}
+      aria-disabled={ariaDisabled}
     >
       <Flex
         flexDirection={DIRECTION_ROW}
@@ -167,9 +181,8 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
         ) : null}
 
         <StyledText
-          fontSize="1.375rem"
-          lineHeight={TYPOGRAPHY.lineHeight28}
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          oddStyle="bodyTextSemiBold"
+          desktopStyle="bodyDefaultSemiBold"
         >
           {buttonText}
         </StyledText>

@@ -6,7 +6,6 @@ context('Reservoirs', () => {
   before(() => {
     cy.visit('/create')
     cy.viewport('macbook-15')
-    cy.contains('NO').click({ force: true })
   })
 
   describe('Reservoir', () => {
@@ -17,7 +16,7 @@ context('Reservoirs', () => {
         .trigger('mousedown')
       cy.get('*[class^="_option_label"]').contains('Reservoir').click()
       cy.contains('Reservoir').click({ force: true })
-      cy.contains('start creating labware').click({ force: true })
+      cy.contains('Start creating labware').click({ force: true })
     })
 
     it('should create a resevoir', () => {

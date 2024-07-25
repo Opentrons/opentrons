@@ -1,10 +1,12 @@
 """Nozzle Map data to use in tests."""
 
+from typing import Dict, List
 from collections import OrderedDict
 
 from opentrons.types import Point
 from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.pipette.pipette_definition import ValidNozzleMaps
 
 
 NINETY_SIX_ROWS = OrderedDict(
@@ -325,6 +327,7 @@ EIGHT_CHANNEL_MAP = OrderedDict(
 def get_default_nozzle_map(pipette_type: PipetteNameType) -> NozzleMap:
     """Get default nozzle map for a given pipette type."""
     if "multi" in pipette_type.value:
+        multi_full: Dict[str, List[str]] = {"Full": EIGHT_CHANNEL_COLS["1"]}
         return NozzleMap.build(
             physical_nozzles=EIGHT_CHANNEL_MAP,
             physical_rows=EIGHT_CHANNEL_ROWS,
@@ -332,8 +335,23 @@ def get_default_nozzle_map(pipette_type: PipetteNameType) -> NozzleMap:
             starting_nozzle="A1",
             back_left_nozzle="A1",
             front_right_nozzle="H1",
+            valid_nozzle_maps=ValidNozzleMaps(maps=multi_full),
         )
     elif "96" in pipette_type.value:
+        all_nozzles = sum(
+            [
+                NINETY_SIX_ROWS["A"],
+                NINETY_SIX_ROWS["B"],
+                NINETY_SIX_ROWS["C"],
+                NINETY_SIX_ROWS["D"],
+                NINETY_SIX_ROWS["E"],
+                NINETY_SIX_ROWS["F"],
+                NINETY_SIX_ROWS["G"],
+                NINETY_SIX_ROWS["H"],
+            ],
+            [],
+        )
+        ninety_six_full: Dict[str, List[str]] = {"Full": all_nozzles}
         return NozzleMap.build(
             physical_nozzles=NINETY_SIX_MAP,
             physical_rows=NINETY_SIX_ROWS,
@@ -341,8 +359,10 @@ def get_default_nozzle_map(pipette_type: PipetteNameType) -> NozzleMap:
             starting_nozzle="A1",
             back_left_nozzle="A1",
             front_right_nozzle="H12",
+            valid_nozzle_maps=ValidNozzleMaps(maps=ninety_six_full),
         )
     else:
+        single_full: Dict[str, List[str]] = {"Full": ["A1"]}
         return NozzleMap.build(
             physical_nozzles=OrderedDict({"A1": Point(0, 0, 0)}),
             physical_rows=OrderedDict({"A": ["A1"]}),
@@ -350,4 +370,5 @@ def get_default_nozzle_map(pipette_type: PipetteNameType) -> NozzleMap:
             starting_nozzle="A1",
             back_left_nozzle="A1",
             front_right_nozzle="A1",
+            valid_nozzle_maps=ValidNozzleMaps(maps=single_full),
         )

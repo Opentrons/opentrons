@@ -1,10 +1,10 @@
 import * as React from 'react'
 import capitalize from 'lodash/capitalize'
 import { useSelector, useDispatch } from 'react-redux'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
-import { SPACING, TYPOGRAPHY, StyledText } from '@opentrons/components'
+import { SPACING, TYPOGRAPHY, LegacyStyledText } from '@opentrons/components'
 
 import {
   useDispatchApiRequests,
@@ -57,7 +57,7 @@ interface Props {
 export function ChangePipette(props: Props): JSX.Element | null {
   const { robotName, mount, closeModal } = props
   const { t } = useTranslation(['change_pipette', 'shared'])
-  const history = useHistory()
+  const navigate = useNavigate()
   const dispatch = useDispatch<Dispatch>()
   const finalRequestId = React.useRef<string | null | undefined>(null)
   const [dispatchApiRequests] = useDispatchApiRequests(dispatchedAction => {
@@ -180,13 +180,13 @@ export function ChangePipette(props: Props): JSX.Element | null {
   if (movementStatus === MOVING) {
     contents = (
       <InProgressModal>
-        <StyledText
+        <LegacyStyledText
           css={TYPOGRAPHY.h1Default}
           marginTop={SPACING.spacing24}
           marginBottom={SPACING.spacing8}
         >
           {t('shared:stand_back_robot_is_in_motion')}
-        </StyledText>
+        </LegacyStyledText>
       </InProgressModal>
     )
   } else if (wizardStep === CLEAR_DECK) {
@@ -267,7 +267,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
     const toCalDashboard = (): void => {
       dispatchApiRequests(home(robotName, ROBOT))
       closeModal()
-      history.push(`/devices/${robotName}/robot-settings/calibration/dashboard`)
+      navigate(`/devices/${robotName}/robot-settings/calibration/dashboard`)
     }
 
     exitWizardHeader =

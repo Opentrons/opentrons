@@ -3,6 +3,7 @@ import { css } from 'styled-components'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 
 import {
   Flex,
@@ -14,7 +15,7 @@ import {
   ALIGN_FLEX_END,
   useConditionalConfirm,
 } from '@opentrons/components'
-import { FLEX_DISPLAY_NAME } from '@opentrons/shared-data'
+import { FLEX_DISPLAY_NAME, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '../../App/portal'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
@@ -25,6 +26,7 @@ import {
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
   ANALYTICS_DELETE_PROTOCOL_FROM_APP,
 } from '../../redux/analytics'
+import { useFeatureFlag } from '../../redux/config'
 import {
   analyzeProtocol,
   removeProtocol,
@@ -52,6 +54,7 @@ export function ProtocolOverflowMenu(
   } = props
   const { mostRecentAnalysis, protocolKey } = storedProtocolData
   const { t } = useTranslation(['protocol_list', 'shared'])
+  const enableProtocolTimeline = useFeatureFlag('protocolTimeline')
   const {
     menuOverlay,
     handleOverflowClick,
@@ -59,6 +62,7 @@ export function ProtocolOverflowMenu(
     setShowOverflowMenu,
   } = useMenuHandleClickOutside()
   const dispatch = useDispatch<Dispatch>()
+  const navigate = useNavigate()
   const trackEvent = useTrackEvent()
   const {
     confirm: confirmDeleteProtocol,
@@ -108,6 +112,11 @@ export function ProtocolOverflowMenu(
     dispatch(analyzeProtocol(protocolKey))
     setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)
   }
+  const handleClickTimeline: React.MouseEventHandler<HTMLButtonElement> = e => {
+    e.preventDefault()
+    navigate(`/protocols/${protocolKey}/timeline`)
+    setShowOverflowMenu(prevShowOverflowMenu => !prevShowOverflowMenu)
+  }
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
@@ -149,6 +158,11 @@ export function ProtocolOverflowMenu(
           >
             {t('shared:reanalyze')}
           </MenuItem>
+          {enableProtocolTimeline && robotType === FLEX_ROBOT_TYPE ? (
+            <MenuItem onClick={handleClickTimeline}>
+              {t('go_to_timeline')}
+            </MenuItem>
+          ) : null}
           {robotType !== 'OT-2 Standard' ? (
             <MenuItem
               onClick={handleClickSendToOT3}

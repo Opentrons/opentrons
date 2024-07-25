@@ -5,7 +5,7 @@ import {
   COLORS,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 interface InstrumentContainerProps {
@@ -26,9 +26,9 @@ export const InstrumentContainer = (
       paddingY={SPACING.spacing2}
       width="max-content"
     >
-      <StyledText as="p" id={id}>
+      <LegacyStyledText as="p" id={id}>
         {displayName}
-      </StyledText>
+      </LegacyStyledText>
     </Flex>
   )
 }

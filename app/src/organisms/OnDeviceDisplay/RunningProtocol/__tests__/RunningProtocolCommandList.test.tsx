@@ -7,7 +7,7 @@ import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
-import { mockRobotSideAnalysis } from '../../../CommandText/__fixtures__'
+import { mockRobotSideAnalysis } from '../../../../molecules/Command/__fixtures__'
 import { RunningProtocolCommandList } from '../RunningProtocolCommandList'
 
 const mockPlayRun = vi.fn()
@@ -61,6 +61,11 @@ describe('RunningProtocolCommandList', () => {
     const button = screen.getByLabelText('stop')
     fireEvent.click(button)
     expect(mockShowModal).toHaveBeenCalled()
+  })
+
+  it("it displays the run's current action number", () => {
+    render({ ...props, currentRunCommandIndex: 11 })
+    screen.getByText(12)
   })
 
   // ToDo (kj:04/10/2023) once we fix the track event stuff, we can implement tests

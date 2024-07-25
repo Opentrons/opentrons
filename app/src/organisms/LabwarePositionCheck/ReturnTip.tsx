@@ -3,7 +3,7 @@ import { Trans, useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
   Flex,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -13,10 +13,8 @@ import {
   HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { UnorderedList } from '../../molecules/UnorderedList'
-import {
-  getLabwareDef,
-  getLabwareDefinitionsFromCommands,
-} from './utils/labware'
+import { getLabwareDef } from './utils/labware'
+import { getLabwareDefinitionsFromCommands } from '../../molecules/Command/utils/getLabwareDefinitionsFromCommands'
 import { getDisplayLocation } from './utils/getDisplayLocation'
 import { RobotMotionLoader } from './RobotMotionLoader'
 import { PrepareSpace } from './PrepareSpace'
@@ -32,6 +30,7 @@ import type {
 import type { VectorOffset } from '@opentrons/api-client'
 import type { useChainRunCommands } from '../../resources/runs'
 import type { ReturnTipStep } from './types'
+import type { TFunction } from 'i18next'
 
 interface ReturnTipProps extends ReturnTipStep {
   protocolData: CompletedProtocolAnalysis
@@ -65,7 +64,7 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
   const displayLocation = getDisplayLocation(
     location,
     getLabwareDefinitionsFromCommands(protocolData.commands),
-    t,
+    t as TFunction,
     i18n
   )
   const labwareDisplayName = getLabwareDisplayName(labwareDef)
@@ -79,7 +78,10 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
       tOptions={{ tip_rack: labwareDisplayName, location: displayLocation }}
       components={{
         bold: (
-          <StyledText as="span" fontWeight={TYPOGRAPHY.fontWeightSemiBold} />
+          <LegacyStyledText
+            as="span"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          />
         ),
       }}
     />,
@@ -127,7 +129,7 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
           {
             commandType: 'moveLabware' as const,
             params: {
-              labwareId: labwareId,
+              labwareId,
               newLocation: 'offDeck',
               strategy: 'manualMoveWithoutPause',
             },
@@ -145,7 +147,7 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
           {
             commandType: 'moveLabware' as const,
             params: {
-              labwareId: labwareId,
+              labwareId,
               newLocation: 'offDeck',
               strategy: 'manualMoveWithoutPause',
             },
@@ -175,8 +177,8 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
         {
           commandType: 'moveToWell' as const,
           params: {
-            pipetteId: pipetteId,
-            labwareId: labwareId,
+            pipetteId,
+            labwareId,
             wellName: 'A1',
             wellLocation: {
               origin: 'top' as const,
@@ -187,8 +189,8 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
         {
           commandType: 'dropTip' as const,
           params: {
-            pipetteId: pipetteId,
-            labwareId: labwareId,
+            pipetteId,
+            labwareId,
             wellName: 'A1',
             wellLocation: {
               origin: 'default' as const,

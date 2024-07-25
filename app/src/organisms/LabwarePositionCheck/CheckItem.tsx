@@ -5,7 +5,7 @@ import { Trans, useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
   Flex,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { RobotMotionLoader } from './RobotMotionLoader'
@@ -22,10 +22,8 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { useSelector } from 'react-redux'
-import {
-  getLabwareDef,
-  getLabwareDefinitionsFromCommands,
-} from './utils/labware'
+import { getLabwareDef } from './utils/labware'
+import { getLabwareDefinitionsFromCommands } from '../../molecules/Command/utils/getLabwareDefinitionsFromCommands'
 import { UnorderedList } from '../../molecules/UnorderedList'
 import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
 import { getIsOnDevice } from '../../redux/config'
@@ -46,6 +44,7 @@ import type {
   WorkingOffset,
 } from './types'
 import type { Jog } from '../../molecules/JogControls/types'
+import type { TFunction } from 'i18next'
 
 const PROBE_LENGTH_MM = 44.5
 
@@ -151,7 +150,12 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
   const pipetteZMotorAxis: 'leftZ' | 'rightZ' =
     pipetteMount === 'left' ? 'leftZ' : 'rightZ'
   const isTiprack = getIsTiprack(labwareDef)
-  const displayLocation = getDisplayLocation(location, labwareDefs, t, i18n)
+  const displayLocation = getDisplayLocation(
+    location,
+    labwareDefs,
+    t as TFunction,
+    i18n
+  )
   const labwareDisplayName = getLabwareDisplayName(labwareDef)
 
   let placeItemInstruction: JSX.Element = (
@@ -161,7 +165,10 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
       tOptions={{ labware: labwareDisplayName, location: displayLocation }}
       components={{
         bold: (
-          <StyledText as="span" fontWeight={TYPOGRAPHY.fontWeightSemiBold} />
+          <LegacyStyledText
+            as="span"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          />
         ),
       }}
     />
@@ -175,7 +182,10 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
         tOptions={{ tip_rack: labwareDisplayName, location: displayLocation }}
         components={{
           bold: (
-            <StyledText as="span" fontWeight={TYPOGRAPHY.fontWeightSemiBold} />
+            <LegacyStyledText
+              as="span"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            />
           ),
         }}
       />
@@ -191,13 +201,16 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
           location: getDisplayLocation(
             omit(location, ['definitionUri']), // only want the adapter's location here
             labwareDefs,
-            t,
+            t as TFunction,
             i18n
           ),
         }}
         components={{
           bold: (
-            <StyledText as="span" fontWeight={TYPOGRAPHY.fontWeightSemiBold} />
+            <LegacyStyledText
+              as="span"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            />
           ),
         }}
       />
@@ -309,7 +322,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
           {
             commandType: 'moveLabware' as const,
             params: {
-              labwareId: labwareId,
+              labwareId,
               newLocation: 'offDeck',
               strategy: 'manualMoveWithoutPause',
             },
@@ -327,7 +340,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
           {
             commandType: 'moveLabware' as const,
             params: {
-              labwareId: labwareId,
+              labwareId,
               newLocation: 'offDeck',
               strategy: 'manualMoveWithoutPause',
             },
@@ -450,7 +463,10 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
                   ? t('check_tip_location')
                   : t('check_well_location'),
               }}
-              components={{ block: <StyledText as="p" />, bold: <strong /> }}
+              components={{
+                block: <LegacyStyledText as="p" />,
+                bold: <strong />,
+              }}
             />
           }
           labwareDef={labwareDef}

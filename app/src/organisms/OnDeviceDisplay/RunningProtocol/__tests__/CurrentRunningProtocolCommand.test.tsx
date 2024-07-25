@@ -6,9 +6,14 @@ import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
-import { mockRobotSideAnalysis } from '../../../CommandText/__fixtures__'
+import { mockRobotSideAnalysis } from '../../../../molecules/Command/__fixtures__'
 import { CurrentRunningProtocolCommand } from '../CurrentRunningProtocolCommand'
+import { useRunningStepCounts } from '../../../../resources/protocols/hooks'
+import { useNotifyAllCommandsQuery } from '../../../../resources/runs'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+
+vi.mock('../../../../resources/runs')
+vi.mock('../../../../resources/protocols/hooks')
 
 const mockPlayRun = vi.fn()
 const mockPauseRun = vi.fn()
@@ -49,7 +54,15 @@ describe('CurrentRunningProtocolCommand', () => {
       lastRunCommand: null,
       updateLastAnimatedCommand: mockUpdateLastAnimatedCommand,
       robotType: FLEX_ROBOT_TYPE,
+      runId: 'MOCK_RUN_ID',
     }
+
+    vi.mocked(useNotifyAllCommandsQuery).mockReturnValue({} as any)
+    vi.mocked(useRunningStepCounts).mockReturnValue({
+      totalStepCount: 10,
+      currentStepNumber: 5,
+      hasRunDiverged: false,
+    })
   })
 
   afterEach(() => {
@@ -95,6 +108,23 @@ describe('CurrentRunningProtocolCommand', () => {
     rerender(<CurrentRunningProtocolCommand {...newProps} />)
     expect(mockUpdateLastAnimatedCommand).toHaveBeenLastCalledWith('-113949561')
     expect(mockUpdateLastAnimatedCommand).toHaveBeenCalledTimes(2)
+  })
+
+  it('renders the step count in appropriate format if values are present', () => {
+    render(props)
+
+    screen.getByText('Step 5/10')
+  })
+
+  it('renders the step count in appropriate format if values are not present', () => {
+    vi.mocked(useRunningStepCounts).mockReturnValue({
+      totalStepCount: null,
+      currentStepNumber: null,
+      hasRunDiverged: true,
+    })
+    render(props)
+
+    screen.getByText('Step ?/?')
   })
 
   // ToDo (kj:04/10/2023) once we fix the track event stuff, we can implement tests

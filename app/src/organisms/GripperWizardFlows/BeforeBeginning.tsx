@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
-import { COLORS, StyledText } from '@opentrons/components'
+import { COLORS, LegacyStyledText } from '@opentrons/components'
 import { EXTENSION } from '@opentrons/shared-data'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
@@ -96,7 +96,7 @@ export const BeforeBeginning = (
         proceed()
       })
       .catch(error => {
-        setErrorMessage(error.message)
+        setErrorMessage(error.message as string)
       })
   }
 
@@ -142,7 +142,7 @@ export const BeforeBeginning = (
         <Trans
           t={t}
           i18nKey={bodyI18nKey}
-          components={{ block: <StyledText as="p" /> }}
+          components={{ block: <LegacyStyledText as="p" /> }}
         />
       }
       proceedButtonText={t('move_gantry_to_front')}

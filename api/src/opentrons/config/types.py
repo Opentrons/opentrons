@@ -131,10 +131,9 @@ class ZSenseSettings:
 
 @dataclass
 class LiquidProbeSettings:
-    starting_mount_height: float
-    max_z_distance: float
     mount_speed: float
     plunger_speed: float
+    plunger_impulse_time: float
     sensor_threshold_pascals: float
     output_option: OutputOptions
     aspirate_while_sensing: bool

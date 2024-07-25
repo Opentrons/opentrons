@@ -8,6 +8,7 @@ import {
   MOVABLE_TRASH_ADDRESSABLE_AREAS,
   WASTE_CHUTE_ADDRESSABLE_AREAS,
   FIXED_TRASH_ID,
+  ABSORBANCE_READER_TYPE,
 } from '@opentrons/shared-data'
 import { SPAN7_8_10_11_SLOT } from '../constants'
 import { getStagingAreaAddressableAreas } from '../utils'
@@ -28,6 +29,7 @@ export const SUPPORTED_MODULE_TYPES: ModuleType[] = [
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  ABSORBANCE_READER_TYPE,
 ]
 type SupportedSlotMap = Record<ModuleType, DropdownOption[]>
 export const SUPPORTED_MODULE_SLOTS_OT2: SupportedSlotMap = {
@@ -61,6 +63,7 @@ export const SUPPORTED_MODULE_SLOTS_OT2: SupportedSlotMap = {
       value: '1',
     },
   ],
+  [ABSORBANCE_READER_TYPE]: [],
 }
 export const SUPPORTED_MODULE_SLOTS_FLEX: SupportedSlotMap = {
   [MAGNETIC_MODULE_TYPE]: [
@@ -91,6 +94,12 @@ export const SUPPORTED_MODULE_SLOTS_FLEX: SupportedSlotMap = {
     {
       name: 'Slot D2',
       value: 'D2',
+    },
+  ],
+  [ABSORBANCE_READER_TYPE]: [
+    {
+      name: 'Slot D3',
+      value: 'D3',
     },
   ],
 }
@@ -285,11 +294,29 @@ export function getAllModuleSlotsByType(
 }
 
 const FLEX_MODULE_SLOTS = ['D1', 'D3', 'C1', 'C3', 'B1', 'B3', 'A1', 'A3']
+const MAGNETIC_BLOCK_MODULE_SLOTS = [
+  'D2',
+  'C2',
+  'B2',
+  'A2',
+  'D1',
+  'D3',
+  'C1',
+  'C3',
+  'B1',
+  'B3',
+  'A1',
+  'A3',
+]
 
 export function getNextAvailableModuleSlot(
-  initialDeckSetup: InitialDeckSetup
+  initialDeckSetup: InitialDeckSetup,
+  isMagneticBlock: boolean
 ): DeckSlot | undefined {
-  return FLEX_MODULE_SLOTS.find(slot => {
+  return (isMagneticBlock
+    ? MAGNETIC_BLOCK_MODULE_SLOTS
+    : FLEX_MODULE_SLOTS
+  ).find(slot => {
     const cutoutIds = Object.values(initialDeckSetup.additionalEquipmentOnDeck)
       .filter(ae => ae.name === 'stagingArea')
       .map(ae => ae.location as CutoutId)

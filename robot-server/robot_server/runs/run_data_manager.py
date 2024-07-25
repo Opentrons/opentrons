@@ -18,7 +18,7 @@ from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.service.task_runner import TaskRunner
 from robot_server.service.notifications import RunsPublisher
 
-from .engine_store import EngineStore
+from .run_orchestrator_store import RunOrchestratorStore
 from .run_store import RunResource, RunStore, BadRunResource, BadStateSummary
 from .run_models import Run, BadRun, RunDataError
 
@@ -123,18 +123,18 @@ class RunDataManager:
     (historical runs). Returns `Run` response models to the router.
 
     Args:
-        engine_store: In-memory store of the current run's ProtocolEngine.
+        run_orchestrator_store: In-memory store of the current run's ProtocolEngine.
         run_store: Persistent database of current and historical run data.
     """
 
     def __init__(
         self,
-        engine_store: EngineStore,
+        run_orchestrator_store: RunOrchestratorStore,
         run_store: RunStore,
         task_runner: TaskRunner,
         runs_publisher: RunsPublisher,
     ) -> None:
-        self._engine_store = engine_store
+        self._run_orchestrator_store = run_orchestrator_store
         self._run_store = run_store
         self._task_runner = task_runner
         self._runs_publisher = runs_publisher
@@ -142,7 +142,7 @@ class RunDataManager:
     @property
     def current_run_id(self) -> Optional[str]:
         """The identifier of the current run, if any."""
-        return self._engine_store.current_run_id
+        return self._run_orchestrator_store.current_run_id
 
     async def create(
         self,
@@ -169,19 +169,19 @@ class RunDataManager:
             The run resource.
 
         Raise:
-            EngineConflictError: There is a currently active run that cannot
+            RunConflictError: There is a currently active run that cannot
                 be superceded by this new run.
         """
-        prev_run_id = self._engine_store.current_run_id
+        prev_run_id = self._run_orchestrator_store.current_run_id
         if prev_run_id is not None:
-            prev_run_result = await self._engine_store.clear()
+            prev_run_result = await self._run_orchestrator_store.clear()
             self._run_store.update_run_state(
                 run_id=prev_run_id,
                 summary=prev_run_result.state_summary,
                 commands=prev_run_result.commands,
                 run_time_parameters=prev_run_result.parameters,
             )
-        state_summary = await self._engine_store.create(
+        state_summary = await self._run_orchestrator_store.create(
             run_id=run_id,
             labware_offsets=labware_offsets,
             deck_configuration=deck_configuration,
@@ -226,7 +226,7 @@ class RunDataManager:
         run_resource = self._run_store.get(run_id=run_id)
         state_summary = self._get_state_summary(run_id=run_id)
         parameters = self._get_run_time_parameters(run_id=run_id)
-        current = run_id == self._engine_store.current_run_id
+        current = run_id == self._run_orchestrator_store.current_run_id
 
         return _build_run(run_resource, state_summary, current, parameters)
 
@@ -249,14 +249,12 @@ class RunDataManager:
         """
         # The database doesn't store runs' loaded labware definitions in a way that we
         # can query quickly. Avoid it by only supporting this on in-memory runs.
-        if run_id != self._engine_store.current_run_id:
+        if run_id != self._run_orchestrator_store.current_run_id:
             raise RunNotCurrentError(
                 f"Cannot get load labware definitions of {run_id} because it is not the current run."
             )
 
-        return (
-            self._engine_store.engine.state_view.labware.get_loaded_labware_definitions()
-        )
+        return self._run_orchestrator_store.get_loaded_labware_definitions()
 
     def get_all(self, length: Optional[int]) -> List[Union[Run, BadRun]]:
         """Get current and stored run resources.
@@ -270,7 +268,8 @@ class RunDataManager:
             _build_run(
                 run_resource=run_resource,
                 state_summary=self._get_state_summary(run_resource.run_id),
-                current=run_resource.run_id == self._engine_store.current_run_id,
+                current=run_resource.run_id
+                == self._run_orchestrator_store.current_run_id,
                 run_time_parameters=self._get_run_time_parameters(run_resource.run_id),
             )
             for run_resource in self._run_store.get_all(length)
@@ -283,12 +282,12 @@ class RunDataManager:
             run_id: The identifier of the run to remove.
 
         Raises:
-            EngineConflictError: If deleting the current run, the current run
+            RunConflictError: If deleting the current run, the current run
                 is not idle and cannot be deleted.
             RunNotFoundError: The given run identifier was not found in the database.
         """
-        if run_id == self._engine_store.current_run_id:
-            await self._engine_store.clear()
+        if run_id == self._run_orchestrator_store.current_run_id:
+            await self._run_orchestrator_store.clear()
 
         await self._runs_publisher.clean_up_run(run_id=run_id)
 
@@ -312,9 +311,9 @@ class RunDataManager:
         Raises:
             RunNotFoundError: The run identifier was not found in the database.
             RunNotCurrentError: The run is not the current run.
-            EngineConflictError: The run cannot be updated because it is not idle.
+            RunConflictError: The run cannot be updated because it is not idle.
         """
-        if run_id != self._engine_store.current_run_id:
+        if run_id != self._run_orchestrator_store.current_run_id:
             raise RunNotCurrentError(
                 f"Cannot update {run_id} because it is not the current run."
             )
@@ -322,7 +321,11 @@ class RunDataManager:
         next_current = current if current is False else True
 
         if next_current is False:
-            commands, state_summary, parameters = await self._engine_store.clear()
+            (
+                commands,
+                state_summary,
+                parameters,
+            ) = await self._run_orchestrator_store.clear()
             run_resource: Union[
                 RunResource, BadRunResource
             ] = self._run_store.update_run_state(
@@ -335,9 +338,8 @@ class RunDataManager:
                 run_id
             )
         else:
-            state_summary = self._engine_store.engine.state_view.get_summary()
-            runner = self._engine_store.runner
-            parameters = runner.run_time_parameters if runner else []
+            state_summary = self._run_orchestrator_store.get_state_summary()
+            parameters = self._run_orchestrator_store.get_run_time_parameters()
             run_resource = self._run_store.get(run_id=run_id)
 
         return _build_run(
@@ -363,11 +365,10 @@ class RunDataManager:
         Raises:
             RunNotFoundError: The given run identifier was not found in the database.
         """
-        if run_id == self._engine_store.current_run_id:
-            the_slice = self._engine_store.engine.state_view.commands.get_slice(
+        if run_id == self._run_orchestrator_store.current_run_id:
+            return self._run_orchestrator_store.get_command_slice(
                 cursor=cursor, length=length
             )
-            return the_slice
 
         # Let exception propagate
         return self._run_store.get_commands_slice(
@@ -383,8 +384,8 @@ class RunDataManager:
         Args:
             run_id: ID of the run.
         """
-        if self._engine_store.current_run_id == run_id:
-            return self._engine_store.engine.state_view.commands.get_current()
+        if self._run_orchestrator_store.current_run_id == run_id:
+            return self._run_orchestrator_store.get_current_command()
         else:
             # todo(mm, 2024-05-20):
             # For historical runs to behave consistently with the current run,
@@ -399,8 +400,8 @@ class RunDataManager:
         Args:
             run_id: ID of the run.
         """
-        if self._engine_store.current_run_id == run_id:
-            return self._engine_store.engine.state_view.commands.get_recovery_target()
+        if self._run_orchestrator_store.current_run_id == run_id:
+            return self._run_orchestrator_store.get_command_recovery_target()
         else:
             # Historical runs can't have any ongoing error recovery.
             return None
@@ -416,18 +417,16 @@ class RunDataManager:
             RunNotFoundError: The given run identifier was not found.
             CommandNotFoundError: The given command identifier was not found.
         """
-        if self._engine_store.current_run_id == run_id:
-            return self._engine_store.engine.state_view.commands.get(
-                command_id=command_id
-            )
+        if self._run_orchestrator_store.current_run_id == run_id:
+            return self._run_orchestrator_store.get_command(command_id=command_id)
 
         return self._run_store.get_command(run_id=run_id, command_id=command_id)
 
     def get_all_commands_as_preserialized_list(self, run_id: str) -> List[str]:
         """Get all commands of a run in a serialized json list."""
         if (
-            run_id == self._engine_store.current_run_id
-            and not self._engine_store.engine.state_view.commands.get_is_terminal()
+            run_id == self._run_orchestrator_store.current_run_id
+            and not self._run_orchestrator_store.get_is_run_terminal()
         ):
             raise PreSerializedCommandsNotAvailableError(
                 "Pre-serialized commands are only available after a run has ended."
@@ -435,8 +434,8 @@ class RunDataManager:
         return self._run_store.get_all_commands_as_preserialized_list(run_id)
 
     def _get_state_summary(self, run_id: str) -> Union[StateSummary, BadStateSummary]:
-        if run_id == self._engine_store.current_run_id:
-            return self._engine_store.engine.state_view.get_summary()
+        if run_id == self._run_orchestrator_store.current_run_id:
+            return self._run_orchestrator_store.get_state_summary()
         else:
             return self._run_store.get_state_summary(run_id=run_id)
 
@@ -445,8 +444,7 @@ class RunDataManager:
         return summary if isinstance(summary, StateSummary) else None
 
     def _get_run_time_parameters(self, run_id: str) -> List[RunTimeParameter]:
-        if run_id == self._engine_store.current_run_id:
-            runner = self._engine_store.runner
-            return runner.run_time_parameters if runner else []
+        if run_id == self._run_orchestrator_store.current_run_id:
+            return self._run_orchestrator_store.get_run_time_parameters()
         else:
             return self._run_store.get_run_time_parameters(run_id=run_id)

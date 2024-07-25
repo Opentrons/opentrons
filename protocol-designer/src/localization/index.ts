@@ -24,11 +24,15 @@ i18n.use(initReactI18next).init(
       'nav',
       'tooltip',
       'well_selection',
+      'liquids',
+      'protocol_overview',
+      'protocol_steps',
+      'starting_deck_state',
     ],
     defaultNS: 'shared',
     interpolation: {
       escapeValue: false, // not needed for react as it escapes by default
-      format: function (value, format, lng) {
+      format: function (value: string, format, lng) {
         if (format === 'upperCase') return value.toUpperCase()
         if (format === 'capitalize') return capitalize(value)
         if (format === 'sentenceCase') return startCase(value)

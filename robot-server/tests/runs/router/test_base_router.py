@@ -26,7 +26,7 @@ from robot_server.protocols.protocol_store import (
 from robot_server.runs.run_auto_deleter import RunAutoDeleter
 
 from robot_server.runs.run_models import Run, RunCreate, RunUpdate
-from robot_server.runs.engine_store import EngineConflictError
+from robot_server.runs.run_orchestrator_store import RunConflictError
 from robot_server.runs.run_data_manager import RunDataManager, RunNotCurrentError
 from robot_server.runs.run_models import RunNotFoundError
 from robot_server.runs.router.base_router import (
@@ -130,6 +130,7 @@ async def test_create_protocol_run(
     protocol_resource = ProtocolResource(
         protocol_id=protocol_id,
         protocol_key=None,
+        protocol_kind=None,
         created_at=datetime(year=2022, month=2, day=2),
         source=ProtocolSource(
             directory=Path("/dev/null"),
@@ -241,7 +242,7 @@ async def test_create_run_conflict(
             run_time_param_values=None,
             notify_publishers=mock_notify_publishers,
         )
-    ).then_raise(EngineConflictError("oh no"))
+    ).then_raise(RunConflictError("oh no"))
 
     with pytest.raises(ApiError) as exc_info:
         await create_run(
@@ -432,7 +433,7 @@ async def test_delete_active_run(
 ) -> None:
     """It should 409 if the run is not finished."""
     decoy.when(await mock_run_data_manager.delete("run-id")).then_raise(
-        EngineConflictError("oh no")
+        RunConflictError("oh no")
     )
 
     with pytest.raises(ApiError) as exc_info:
@@ -537,7 +538,7 @@ async def test_update_to_current_conflict(
     """It should 409 if attempting to un-current a run that is not idle."""
     decoy.when(
         await mock_run_data_manager.update(run_id="run-id", current=False)
-    ).then_raise(EngineConflictError("oh no"))
+    ).then_raise(RunConflictError("oh no"))
 
     with pytest.raises(ApiError) as exc_info:
         await update_run(

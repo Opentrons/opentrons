@@ -58,14 +58,21 @@ from opentrons.protocol_engine import (
     Config,
     DeckType,
     EngineStatus,
-    create_protocol_engine,
+    error_recovery_policy,
+)
+from opentrons.protocol_engine.create_protocol_engine import (
     create_protocol_engine_in_thread,
+    create_protocol_engine,
 )
 from opentrons.protocol_engine.types import PostRunHardwareState
 
 from opentrons.protocol_reader import ProtocolSource
 
-from opentrons.protocol_runner import create_protocol_runner
+from opentrons.protocol_runner import (
+    create_protocol_runner,
+    RunOrchestrator,
+    LiveRunner,
+)
 
 from .util import entrypoint_util
 
@@ -281,7 +288,7 @@ def get_arguments(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
     return parser
 
 
-def execute(  # noqa: C901
+def execute(
     protocol_file: Union[BinaryIO, TextIO],
     protocol_name: str,
     propagate_logs: bool = False,
@@ -387,11 +394,10 @@ def execute(  # noqa: C901
             extra_data=extra_data,
         )
     except parse.JSONSchemaVersionTooNewError as e:
-        if e.attempted_schema_version == 6:
-            # See Jira RCORE-535.
-            raise NotImplementedError(_JSON_TOO_NEW_MESSAGE) from e
-        else:
-            raise
+        # opentrons.protocols.parse() doesn't support new JSON protocols.
+        # The code to do that should be moved from opentrons.protocol_reader.
+        # See https://opentrons.atlassian.net/browse/PLAT-94.
+        raise NotImplementedError(_JSON_TOO_NEW_MESSAGE) from e
 
     if protocol.api_level < APIVersion(2, 0):
         raise ApiDeprecationError(version=protocol.api_level)
@@ -534,10 +540,12 @@ def _create_live_context_pe(
     assert api_version >= ENGINE_CORE_API_VERSION
 
     global _LIVE_PROTOCOL_ENGINE_CONTEXTS
+    hardware_api_wrapped = hardware_api.wrapped()
     pe, loop = _LIVE_PROTOCOL_ENGINE_CONTEXTS.enter_context(
         create_protocol_engine_in_thread(
-            hardware_api=hardware_api.wrapped(),
+            hardware_api=hardware_api_wrapped,
             config=_get_protocol_engine_config(),
+            error_recovery_policy=error_recovery_policy.never_recover,
             drop_tips_after_run=False,
             post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
             load_fixed_trash=should_load_fixed_trash_labware_for_python_protocol(
@@ -617,16 +625,33 @@ def _run_file_pe(
     """Run a protocol file with Protocol Engine."""
 
     async def run(protocol_source: ProtocolSource) -> None:
+        hardware_api_wrapped = hardware_api.wrapped()
         protocol_engine = await create_protocol_engine(
-            hardware_api=hardware_api.wrapped(),
+            hardware_api=hardware_api_wrapped,
             config=_get_protocol_engine_config(),
+            error_recovery_policy=error_recovery_policy.never_recover,
             load_fixed_trash=should_load_fixed_trash(protocol_source.config),
         )
 
         protocol_runner = create_protocol_runner(
             protocol_config=protocol_source.config,
             protocol_engine=protocol_engine,
-            hardware_api=hardware_api.wrapped(),
+            hardware_api=hardware_api_wrapped,
+        )
+
+        orchestrator = RunOrchestrator(
+            hardware_api=hardware_api_wrapped,
+            protocol_engine=protocol_engine,
+            json_or_python_protocol_runner=protocol_runner,
+            fixit_runner=LiveRunner(
+                protocol_engine=protocol_engine, hardware_api=hardware_api_wrapped
+            ),
+            setup_runner=LiveRunner(
+                protocol_engine=protocol_engine, hardware_api=hardware_api_wrapped
+            ),
+            protocol_live_runner=LiveRunner(
+                protocol_engine=protocol_engine, hardware_api=hardware_api_wrapped
+            ),
         )
 
         unsubscribe = protocol_runner.broker.subscribe(
@@ -635,7 +660,7 @@ def _run_file_pe(
         try:
             # TODO(mm, 2023-06-30): This will home and drop tips at the end, which is not how
             # things have historically behaved with PAPIv2.13 and older or JSONv5 and older.
-            result = await protocol_runner.run(
+            result = await orchestrator.run(
                 deck_configuration=entrypoint_util.get_deck_configuration(),
                 protocol_source=protocol_source,
             )

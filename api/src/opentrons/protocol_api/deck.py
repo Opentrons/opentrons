@@ -107,8 +107,9 @@ class Deck(Mapping[DeckLocation, Optional[DeckItem]]):
             # * PAPIv2.14 (Protocol Engine): No
             # * PAPIv2.15 (Protocol Engine): Yes
             raise APIVersionError(
-                f"Deleting deck elements is not supported with apiLevel {self._api_version}."
-                f" Try increasing your apiLevel to {APIVersion(2, 15)}."
+                api_element="Deleting deck elements",
+                until_version="2.15",
+                current_version=f"{self._api_version}",
             )
 
         slot_name = _get_slot_name(

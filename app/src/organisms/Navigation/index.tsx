@@ -16,23 +16,42 @@ import {
   truncateString,
   TYPOGRAPHY,
   DIRECTION_COLUMN,
+  DISPLAY_FLEX,
+  ALIGN_FLEX_START,
   POSITION_STICKY,
+  POSITION_ABSOLUTE,
   POSITION_STATIC,
   BORDERS,
   RESPONSIVENESS,
+  OVERFLOW_SCROLL,
 } from '@opentrons/components'
 import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
 
 import { useNetworkConnection } from '../../resources/networking/hooks/useNetworkConnection'
 import { getLocalRobot } from '../../redux/discovery'
+import { useFeatureFlag } from '../../redux/config'
 import { NavigationMenu } from './NavigationMenu'
 import type { ON_DEVICE_DISPLAY_PATHS } from '../../App/OnDeviceDisplayApp'
 
-const NAV_LINKS: Array<typeof ON_DEVICE_DISPLAY_PATHS[number]> = [
+let NAV_LINKS: Array<typeof ON_DEVICE_DISPLAY_PATHS[number]> = [
   '/protocols',
   '/instruments',
   '/robot-settings',
 ]
+
+// TODO(sb:7/10/24): update this wrapper to fade on both sides only when not scrolled completely to that side
+// This will be accomplished in PLAT-399
+const CarouselWrapper = styled.div`
+  display: ${DISPLAY_FLEX};
+  flex-direction: ${DIRECTION_ROW};
+  align-items: ${ALIGN_FLEX_START};
+  width: 42.25rem;
+  overflow-x: ${OVERFLOW_SCROLL};
+  -webkit-mask-image: linear-gradient(90deg, #000 90%, transparent);
+  &::-webkit-scrollbar {
+    display: none;
+  }
+`
 
 const CHAR_LIMIT_WITH_ICON = 12
 const CHAR_LIMIT_NO_ICON = 15
@@ -49,6 +68,15 @@ export function Navigation(props: NavigationProps): JSX.Element {
   const localRobot = useSelector(getLocalRobot)
   const [showNavMenu, setShowNavMenu] = React.useState<boolean>(false)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
+  const enableQuickTransferFF = useFeatureFlag('enableQuickTransfer')
+  if (enableQuickTransferFF) {
+    NAV_LINKS = [
+      '/protocols',
+      '/quick-transfer',
+      '/instruments',
+      '/robot-settings',
+    ]
+  }
 
   // We need to display an icon for what type of network connection (if any)
   // is active next to the robot's name. The designs call for it to change color
@@ -81,9 +109,11 @@ export function Navigation(props: NavigationProps): JSX.Element {
       case '/instruments':
         return t('instruments')
       case '/protocols':
-        return t('all_protocols')
+        return t('protocols')
       case '/robot-settings':
         return t('settings')
+      case '/quick-transfer':
+        return t('quick_transfer')
       default:
         return ''
     }
@@ -130,15 +160,27 @@ export function Navigation(props: NavigationProps): JSX.Element {
               />
             ) : null}
           </Flex>
-          {NAV_LINKS.map(path => (
-            <NavigationLink
-              key={path}
-              to={path}
-              name={getPathDisplayName(path)}
-            />
-          ))}
+          <CarouselWrapper>
+            <Flex
+              flexDirection={DIRECTION_ROW}
+              gridGap={SPACING.spacing32}
+              marginRight={SPACING.spacing32}
+            >
+              {NAV_LINKS.map(path => (
+                <NavigationLink
+                  key={path}
+                  to={path}
+                  name={getPathDisplayName(path)}
+                />
+              ))}
+            </Flex>
+          </CarouselWrapper>
         </Flex>
-        <Flex marginTop={`-${SPACING.spacing12}`}>
+        <Flex
+          marginTop={`-${SPACING.spacing12}`}
+          position={POSITION_ABSOLUTE}
+          right={SPACING.spacing16}
+        >
           <IconButton
             aria-label="overflow menu button"
             onClick={() => {

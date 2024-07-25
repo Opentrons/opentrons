@@ -99,6 +99,10 @@ export function getDefaultsForStepType(
         blowout_flowRate: null,
       }
 
+    case 'comment':
+      return {
+        message: null,
+      }
     case 'moveLabware':
       return {
         labware: null,

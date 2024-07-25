@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import last from 'lodash/last'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import {
   AlertPrimaryButton,
@@ -13,7 +13,7 @@ import {
   Link,
   PrimaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { LegacyModal } from '../../../../../molecules/LegacyModal'
@@ -46,7 +46,7 @@ export function DeviceResetModal({
   resetOptions,
 }: DeviceResetModalProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared', 'branded'])
-  const history = useHistory()
+  const navigate = useNavigate()
   const [dispatchRequest, requestIds] = useDispatchApiRequest()
   const isFlex = useIsFlex(robotName)
   const resetRequestStatus = useSelector((state: State) => {
@@ -79,7 +79,7 @@ export function DeviceResetModal({
         }
       }
       dispatchRequest(resetConfig(robotName, resetOptions))
-      history.push(`/devices/`)
+      navigate('/devices/')
     }
   }
 
@@ -98,9 +98,9 @@ export function DeviceResetModal({
           onClose={closeModal}
         >
           <Flex flexDirection={DIRECTION_COLUMN}>
-            <StyledText as="p" paddingBottom={SPACING.spacing24}>
+            <LegacyStyledText as="p" paddingBottom={SPACING.spacing24}>
               {t('factory_reset_modal_description')}
-            </StyledText>
+            </LegacyStyledText>
             <Flex justifyContent={JUSTIFY_FLEX_END} alignItems={ALIGN_CENTER}>
               <Link
                 role="button"
@@ -127,13 +127,13 @@ export function DeviceResetModal({
           title={t('connection_to_robot_lost')}
           onClose={closeModal}
         >
-          <StyledText
+          <LegacyStyledText
             as="p"
             marginBottom={SPACING.spacing24}
             paddingBottom={SPACING.spacing24}
           >
             {t('branded:connection_lost_description')}
-          </StyledText>
+          </LegacyStyledText>
           <Flex justifyContent={JUSTIFY_FLEX_END}>
             <PrimaryButton
               onClick={closeModal}

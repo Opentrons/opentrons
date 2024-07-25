@@ -23,6 +23,7 @@ import {
   getModuleType,
   THERMOCYCLER_MODULE_V2,
   getAreSlotsHorizontallyAdjacent,
+  ABSORBANCE_READER_TYPE,
 } from '@opentrons/shared-data'
 import {
   closeLabwareSelector,
@@ -103,6 +104,7 @@ const RECOMMENDED_LABWARE_BY_MODULE: { [K in ModuleType]: string[] } = {
     'opentrons_24_aluminumblock_nest_2ml_snapcap',
     'opentrons_24_aluminumblock_nest_0.5ml_screwcap',
     'opentrons_aluminum_flat_bottom_plate',
+    'opentrons_96_deep_well_temp_mod_adapter',
   ],
   [MAGNETIC_MODULE_TYPE]: [
     'nest_96_wellplate_100ul_pcr_full_skirt',
@@ -124,6 +126,7 @@ const RECOMMENDED_LABWARE_BY_MODULE: { [K in ModuleType]: string[] } = {
     'nest_96_wellplate_2ml_deep',
     'opentrons_96_wellplate_200ul_pcr_full_skirt',
   ],
+  [ABSORBANCE_READER_TYPE]: [],
 }
 
 export const getLabwareIsRecommended = (

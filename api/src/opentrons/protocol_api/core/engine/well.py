@@ -4,8 +4,9 @@ from typing import Optional
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 
 from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset
+from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
-from opentrons.protocols.api_support.util import APIVersionError
+from opentrons.protocols.api_support.util import UnsupportedAPIError
 from opentrons.types import Point
 
 from . import point_calculations
@@ -68,8 +69,8 @@ class WellCore(AbstractWellCore):
 
     def set_has_tip(self, value: bool) -> None:
         """Set the well as containing or not containing a tip."""
-        raise APIVersionError(
-            "Manually setting the tip state of a well in a tip rack has been deprecated."
+        raise UnsupportedAPIError(
+            api_element="Manually setting the tip state of a well in a tip rack",
         )
 
     def get_display_name(self) -> str:
@@ -130,10 +131,12 @@ class WellCore(AbstractWellCore):
         volume: float,
     ) -> None:
         """Load liquid into a well."""
-        self._engine_client.load_liquid(
-            labware_id=self._labware_id,
-            liquid_id=liquid._id,
-            volume_by_well={self._name: volume},
+        self._engine_client.execute_command(
+            cmd.LoadLiquidParams(
+                labwareId=self._labware_id,
+                liquidId=liquid._id,
+                volumeByWell={self._name: volume},
+            )
         )
 
     def from_center_cartesian(self, x: float, y: float, z: float) -> Point:

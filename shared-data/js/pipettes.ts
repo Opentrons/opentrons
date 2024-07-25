@@ -191,7 +191,7 @@ or PipetteModel such as 'p300_single_v1.3' and converts it to channels,
 model, and version in order to return the correct pipette schema v2 json files. 
 **/
 export const getPipetteSpecsV2 = (
-  name: PipetteName | PipetteModel
+  name?: PipetteName | PipetteModel
 ): PipetteV2Specs | null => {
   if (name == null) {
     return null

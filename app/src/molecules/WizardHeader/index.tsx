@@ -12,7 +12,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   RESPONSIVENESS,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { StepMeter } from '../../atoms/StepMeter'
@@ -20,7 +20,7 @@ import { StepMeter } from '../../atoms/StepMeter'
 interface WizardHeaderProps {
   title: string
   onExit?: (() => void) | null
-  totalSteps?: number
+  totalSteps?: number | null
   currentStep?: number | null
   exitDisabled?: boolean
 }
@@ -85,19 +85,24 @@ export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
     <Box css={BOX_STYLE}>
       <Flex css={HEADER_CONTAINER_STYLE}>
         <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
-          <StyledText css={HEADER_TEXT_STYLE} marginRight={SPACING.spacing8}>
+          <LegacyStyledText
+            css={HEADER_TEXT_STYLE}
+            marginRight={SPACING.spacing8}
+          >
             {title}
-          </StyledText>
+          </LegacyStyledText>
 
           {currentStep != null && totalSteps != null && currentStep > 0 ? (
-            <StyledText css={STEP_TEXT_STYLE}>
+            <LegacyStyledText css={STEP_TEXT_STYLE}>
               {t('step', { current: currentStep, max: totalSteps })}
-            </StyledText>
+            </LegacyStyledText>
           ) : null}
         </Flex>
         {onExit != null ? (
           <Btn onClick={onExit} aria-label="Exit" disabled={exitDisabled}>
-            <StyledText css={EXIT_BUTTON_STYLE}>{t('exit')}</StyledText>
+            <LegacyStyledText css={EXIT_BUTTON_STYLE}>
+              {t('exit')}
+            </LegacyStyledText>
           </Btn>
         ) : null}
       </Flex>

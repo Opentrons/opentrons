@@ -10,7 +10,7 @@ import {
   COLORS,
   BORDERS,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 import { RenderResult } from './RenderResult'
@@ -48,12 +48,12 @@ export function CalibrationResult({
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       width="100%"
     >
-      <StyledText
+      <LegacyStyledText
         css={TYPOGRAPHY.pSemiBold}
         textTransform={TYPOGRAPHY.textTransformCapitalize}
       >
         {t(switchText(calType))}
-      </StyledText>
+      </LegacyStyledText>
       <RenderResult isBadCal={isBadCal} />
     </Flex>
   )

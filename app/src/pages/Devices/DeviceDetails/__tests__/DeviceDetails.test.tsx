@@ -2,7 +2,7 @@ import * as React from 'react'
 import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { when } from 'vitest-when'
 import { screen } from '@testing-library/react'
-import { MemoryRouter, Route } from 'react-router-dom'
+import { MemoryRouter, Route, Routes } from 'react-router-dom'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
 
@@ -29,10 +29,10 @@ vi.mock('../../../../redux/discovery')
 const render = (path = '/') => {
   return renderWithProviders(
     <MemoryRouter initialEntries={[path]} initialIndex={0}>
-      <Route path="/devices/:robotName">
-        <DeviceDetails />
-      </Route>
-      <Route path="/devices">devices page</Route>
+      <Routes>
+        <Route path="/devices/:robotName" element={<DeviceDetails />} />
+        <Route path="/devices" element={<>devices page</>} />
+      </Routes>
     </MemoryRouter>,
     {
       i18nInstance: i18n,

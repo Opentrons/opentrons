@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import {
   ALIGN_START,
@@ -16,7 +16,7 @@ import {
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
@@ -54,7 +54,7 @@ interface RobotCardProps {
 export function RobotCard(props: RobotCardProps): JSX.Element | null {
   const { robot } = props
   const { name: robotName, local } = robot
-  const history = useHistory()
+  const navigate = useNavigate()
   const robotModel = useSelector((state: State) =>
     getRobotModelByName(state, robotName)
   )
@@ -71,7 +71,7 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
       padding={SPACING.spacing16}
       position={POSITION_RELATIVE}
       onClick={() => {
-        history.push(`/devices/${robotName}`)
+        navigate(`/devices/${robotName}`)
       }}
     >
       <img
@@ -131,13 +131,13 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
 
   return !isModulesQueryLoading && attachedModules.length > 0 ? (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-      <StyledText
+      <LegacyStyledText
         as="h6"
         textTransform={TYPOGRAPHY.textTransformUppercase}
         color={COLORS.grey60}
       >
         {t('modules')}
-      </StyledText>
+      </LegacyStyledText>
       <Flex>
         {attachedModules.map((module, i) => (
           <ModuleIcon
@@ -187,9 +187,9 @@ function AttachedInstruments(props: { robotName: string }): JSX.Element {
       gridGap={SPACING.spacing4}
       minWidth="24rem"
     >
-      <StyledText as="h6" color={COLORS.grey60}>
+      <LegacyStyledText as="h6" color={COLORS.grey60}>
         {t('shared:instruments')}
-      </StyledText>
+      </LegacyStyledText>
 
       {isPipetteQueryLoading || isInstrumentsQueryLoading ? null : (
         <Flex flexWrap={WRAP} gridGap={SPACING.spacing4}>

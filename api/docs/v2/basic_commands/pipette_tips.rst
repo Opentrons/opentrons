@@ -19,20 +19,20 @@ To pick up a tip, call the :py:meth:`~.InstrumentContext.pick_up_tip` method wit
     
     pipette.pick_up_tip()
 
-This simple statement works because the variable ``tiprack_1`` in the sample protocol includes the on-deck location of the tip rack (Flex ``location="D3"``, OT-2 ``location=3``) *and* the ``pipette`` variable includes the argument ``tip_racks=[tiprack_1]``. Given this information, the robot moves to the tip rack and picks up a tip from position A1 in the rack. On subsequent calls to ``pick_up_tip()``, the robot will use the next available tip. For example::
+When added to the protocol template, this simple statement works because the API knows which tip rack is associated with ``pipette``, as indicated by ``tip_racks=[tiprack_1]`` in the :py:meth:`.load_instrument` call. And it knows the on-deck location of the tip rack (slot D3 on Flex, slot 3 on OT-2) from the ``location`` argument of :py:meth:`~.ProtocolContext.load_labware`. Given this information, the robot moves to the tip rack and picks up a tip from position A1 in the rack. On subsequent calls to ``pick_up_tip()``, the robot will use the next available tip. For example::
 
     pipette.pick_up_tip()  # picks up tip from rack location A1
     pipette.drop_tip()     # drops tip in trash bin
     pipette.pick_up_tip()  # picks up tip from rack location B1
     pipette.drop_tip()     # drops tip in trash bin 
 
-If you omit the ``tip_rack`` argument from the ``pipette`` variable, the API will raise an error. You must pass in the tip rack's location to ``pick_up_tip`` like this::
+If you omit the ``tip_rack`` argument from the ``pipette`` variable, the API will raise an error. In that case, you must pass the tip rack's location to ``pick_up_tip`` like this::
     
     pipette.pick_up_tip(tiprack_1["A1"])
     pipette.drop_tip()
     pipette.pick_up_tip(tiprack_1["B1"]) 
 
-If coding the location of each tip seems inefficient or tedious, try using a ``for`` loop to automate a sequential tip pick up process. When using a loop, the API keeps track of tips and manages tip pickup for you. But ``pick_up_tip`` is still a powerful feature. It gives you direct control over tip use when that’s important in your protocol.
+In most cases, it's best to associate tip racks with a pipette and let the API automatically track pickup location for you. This also makes it easy to pick up tips when iterating over a loop, as shown in the next section.
 
 .. versionadded:: 2.0
 
@@ -55,19 +55,19 @@ First, add another tip rack to the sample protocol::
         location="C3"
     )
 
-Next, append the new tip rack to the pipette's ``tip_rack`` property::
+Next, change the pipette's ``tip_rack`` property to include the additional rack::
 
     pipette = protocol.load_instrument(
         instrument_name="flex_1channel_1000",
         mount="left",
         tip_racks=[tiprack_1, tiprack_2],
     )
-    pipette_1.tip_racks.append(tiprack_2)
 
-Finally, sum the tip count in the range::
+Finally, iterate over a larger range::
 
     for i in range(192):
         pipette.pick_up_tip()
+        # liquid handling commands
         pipette.drop_tip()
 
 For a more advanced "real-world" example, review the :ref:`off-deck location protocol <off-deck-location>` on the :ref:`moving-labware` page. This example also uses a ``for`` loop to iterate through a tip rack, but it includes other commands that pause the protocol and let you replace an on-deck tip rack with another rack stored in an off-deck location.
@@ -79,16 +79,25 @@ Dropping a Tip
 
 To drop a tip in the pipette's trash container, call the :py:meth:`~.InstrumentContext.drop_tip` method with no arguments::
     
-    pipette.pick_up_tip()
+    pipette.drop_tip()
 
-You can also specify where to drop the tip by passing in a location. For example, this code drops a tip in the trash bin and returns another tip to to a previously used well in a tip rack::
+You can specify where to drop the tip by passing in a location. For example, this code drops a tip in the trash bin and returns another tip to to a previously used well in a tip rack::
 
     pipette.pick_up_tip()            # picks up tip from rack location A1
-    pipette.drop_tip()               # drops tip in trash bin 
+    pipette.drop_tip()               # drops tip in default trash container
     pipette.pick_up_tip()            # picks up tip from rack location B1
     pipette.drop_tip(tiprack["A1"])  # drops tip in rack location A1
 
 .. versionadded:: 2.0
+
+Another use of the ``location`` parameter is to drop a tip in a specific trash container. For example, calling ``pipette.drop_tip(chute)`` will dispose tips in the waste chute, even if the pipette's default trash container is a trash bin::
+
+    pipette.pick_up_tip()    # picks up tip from rack location A1
+    pipette.drop_tip()       # drops tip in default trash container
+    pipette.pick_up_tip()    # picks up tip from rack location B1
+    pipette.drop_tip(chute)  # drops tip in waste chute
+
+.. versionadded:: 2.16
 
 .. _pipette-return-tip:
 

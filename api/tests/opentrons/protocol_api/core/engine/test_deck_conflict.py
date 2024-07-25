@@ -25,9 +25,12 @@ from opentrons.protocol_engine import (
     ModuleModel,
     StateView,
 )
+from opentrons.protocol_engine.state.geometry import _AbsoluteRobotExtents
+from opentrons.protocol_engine.state.pipettes import PipetteBoundingBoxOffsets
+
 from opentrons.protocol_engine.clients import SyncClient
 from opentrons.protocol_engine.errors import LabwareNotLoadedOnModuleError
-from opentrons.types import DeckSlotName, Point, StagingSlotName
+from opentrons.types import DeckSlotName, Point, StagingSlotName, MountType
 
 from opentrons.protocol_engine.types import (
     DeckType,
@@ -416,7 +419,7 @@ module = LoadedModule(
     [("OT-3 Standard", DeckType.OT3_STANDARD)],
 )
 @pytest.mark.parametrize(
-    ["pipette_bounds", "expected_raise"],
+    ["pipette_bounds", "expected_raise", "y_value"],
     [
         (  # nozzles above highest Z
             (
@@ -426,6 +429,7 @@ module = LoadedModule(
                 Point(x=50, y=50, z=60),
             ),
             does_not_raise(),
+            0,
         ),
         # X, Y, Z collisions
         (
@@ -439,6 +443,7 @@ module = LoadedModule(
                 deck_conflict.PartialTipMovementNotAllowedError,
                 match="collision with items in deck slot D1",
             ),
+            0,
         ),
         (
             (
@@ -451,6 +456,7 @@ module = LoadedModule(
                 deck_conflict.PartialTipMovementNotAllowedError,
                 match="collision with items in deck slot D2",
             ),
+            0,
         ),
         (  # Collision with staging slot
             (
@@ -461,8 +467,9 @@ module = LoadedModule(
             ),
             pytest.raises(
                 deck_conflict.PartialTipMovementNotAllowedError,
-                match="collision with items in staging slot C4",
+                match="will result in collision with items in staging slot C4.",
             ),
+            170,
         ),
     ],
 )
@@ -471,6 +478,7 @@ def test_deck_conflict_raises_for_bad_pipette_move(
     mock_state_view: StateView,
     pipette_bounds: Tuple[Point, Point, Point, Point],
     expected_raise: ContextManager[Any],
+    y_value: float,
 ) -> None:
     """It should raise errors when moving to locations with restrictions for partial pipette movement.
 
@@ -485,7 +493,36 @@ def test_deck_conflict_raises_for_bad_pipette_move(
           in order to preserve readability of the test. That means the test does
           actual slot overlap checks.
     """
-    destination_well_point = Point(x=123, y=123, z=123)
+    destination_well_point = Point(x=123, y=y_value, z=123)
+    decoy.when(
+        mock_state_view.pipettes.get_is_partially_configured("pipette-id")
+    ).then_return(True)
+    decoy.when(mock_state_view.pipettes.get_mount("pipette-id")).then_return(
+        MountType.LEFT
+    )
+    decoy.when(mock_state_view.geometry.absolute_deck_extents).then_return(
+        _AbsoluteRobotExtents(
+            front_left={
+                MountType.LEFT: Point(13.5, -60.5, 0.0),
+                MountType.RIGHT: Point(-40.5, -60.5, 0.0),
+            },
+            back_right={
+                MountType.LEFT: Point(463.7, 433.3, 0.0),
+                MountType.RIGHT: Point(517.7, 433.3),
+            },
+        )
+    )
+    decoy.when(
+        mock_state_view.pipettes.get_pipette_bounding_box("pipette-id")
+    ).then_return(
+        # 96 chan outer bounds
+        PipetteBoundingBoxOffsets(
+            back_left_corner=Point(-36.0, -25.5, -259.15),
+            front_right_corner=Point(63.0, -88.5, -259.15),
+            front_left_corner=Point(-36.0, -88.5, -259.15),
+            back_right_corner=Point(63.0, -25.5, -259.15),
+        )
+    )
     decoy.when(
         mock_state_view.pipettes.get_is_partially_configured("pipette-id")
     ).then_return(True)
@@ -589,7 +626,7 @@ def test_deck_conflict_raises_for_collision_with_tc_lid(
     destination_well_point = Point(x=123, y=123, z=123)
     pipette_bounds_at_destination = (
         Point(x=50, y=350, z=204.5),
-        Point(x=150, y=450, z=204.5),
+        Point(x=150, y=429, z=204.5),
         Point(x=150, y=400, z=204.5),
         Point(x=50, y=300, z=204.5),
     )
@@ -616,6 +653,32 @@ def test_deck_conflict_raises_for_collision_with_tc_lid(
             pipette_id="pipette-id", destination_position=destination_well_point
         )
     ).then_return(pipette_bounds_at_destination)
+    decoy.when(mock_state_view.pipettes.get_mount("pipette-id")).then_return(
+        MountType.LEFT
+    )
+    decoy.when(
+        mock_state_view.pipettes.get_pipette_bounding_box("pipette-id")
+    ).then_return(
+        # 96 chan outer bounds
+        PipetteBoundingBoxOffsets(
+            back_left_corner=Point(-67.0, -3.5, -259.15),
+            front_right_corner=Point(94.0, -113.0, -259.15),
+            front_left_corner=Point(-67.0, -113.0, -259.15),
+            back_right_corner=Point(94.0, -3.5, -259.15),
+        )
+    )
+    decoy.when(mock_state_view.geometry.absolute_deck_extents).then_return(
+        _AbsoluteRobotExtents(
+            front_left={
+                MountType.LEFT: Point(13.5, 60.5, 0.0),
+                MountType.RIGHT: Point(-40.5, 60.5, 0.0),
+            },
+            back_right={
+                MountType.LEFT: Point(463.7, 433.3, 0.0),
+                MountType.RIGHT: Point(517.7, 433.3),
+            },
+        )
+    )
 
     decoy.when(
         adjacent_slots_getters.get_surrounding_slots(5, robot_type="OT-3 Standard")

@@ -2,7 +2,7 @@ import * as React from 'react'
 import { describe, it, beforeEach, expect } from 'vitest'
 import { renderWithProviders } from '../../../testing/utils'
 import { screen } from '@testing-library/react'
-import { SPACING } from '../../../ui-style-constants'
+import { SPACING, TYPOGRAPHY } from '../../../ui-style-constants'
 import { BORDERS, COLORS } from '../../../helix-design-system'
 
 import { LocationIcon } from '..'
@@ -20,19 +20,26 @@ describe('LocationIcon', () => {
     }
   })
 
-  it('should render the proper styles', () => {
+  it('should render the proper styles - web style', () => {
     render(props)
     const locationIcon = screen.getByTestId('LocationIcon_A1')
-    expect(locationIcon).toHaveStyle(`padding: ${SPACING.spacing4} 0.375rem`)
-    expect(locationIcon).toHaveStyle('height: 2rem')
+    expect(locationIcon).toHaveStyle(
+      `padding: ${SPACING.spacing2} ${SPACING.spacing4}`
+    )
+    expect(locationIcon).toHaveStyle('height: max-content')
     expect(locationIcon).toHaveStyle('width: max-content')
-    expect(locationIcon).toHaveStyle(`border: 2px solid ${COLORS.black90}`)
-    expect(locationIcon).toHaveStyle(`border-radius: ${BORDERS.borderRadius12}`)
+    expect(locationIcon).toHaveStyle(`border: 1px solid ${COLORS.black90}`)
+    expect(locationIcon).toHaveStyle(`border-radius: ${BORDERS.borderRadius4}`)
   })
+
+  it.todo('should render the proper styles - odd style')
 
   it('should render slot name', () => {
     render(props)
-    screen.getByText('A1')
+    const text = screen.getByText('A1')
+    expect(text).toHaveStyle(`font-size: ${TYPOGRAPHY.fontSizeCaption}`)
+    expect(text).toHaveStyle('line-height: normal')
+    expect(text).toHaveStyle(`  font-weight: ${TYPOGRAPHY.fontWeightBold}`)
   })
 
   it('should render an icon', () => {

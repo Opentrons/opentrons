@@ -8,6 +8,7 @@ import logging
 
 from anyio import Path as AsyncPath
 from fastapi import Depends
+from robot_server.protocols.protocol_models import ProtocolKind
 from sqlalchemy.engine import Engine as SQLEngine
 
 from opentrons.protocol_reader import ProtocolReader, FileReaderWriter, FileHasher
@@ -17,18 +18,19 @@ from server_utils.fastapi_utils.app_state import (
     AppStateAccessor,
     get_app_state,
 )
+from robot_server.service.task_runner import TaskRunner, get_task_runner
 from robot_server.deletion_planner import ProtocolDeletionPlanner
 from robot_server.persistence.fastapi_dependencies import (
     get_sql_engine,
     get_active_persistence_directory,
 )
 from robot_server.settings import get_settings
+from .analyses_manager import AnalysesManager
 
 from .protocol_auto_deleter import ProtocolAutoDeleter
 from .protocol_store import (
     ProtocolStore,
 )
-from .protocol_analyzer import ProtocolAnalyzer
 from .analysis_store import AnalysisStore
 
 
@@ -41,6 +43,7 @@ _protocol_store_accessor = AppStateAccessor[ProtocolStore]("protocol_store")
 
 _analysis_store_accessor = AppStateAccessor[AnalysisStore]("analysis_store")
 
+_analyses_manager_accessor = AppStateAccessor[AnalysesManager]("analyses_manager")
 _protocol_directory_init_lock = AsyncLock()
 _protocol_directory_accessor = AppStateAccessor[Path]("protocol_directory")
 
@@ -109,13 +112,21 @@ async def get_analysis_store(
     return analysis_store
 
 
-async def get_protocol_analyzer(
+async def get_analyses_manager(
+    app_state: AppState = Depends(get_app_state),
     analysis_store: AnalysisStore = Depends(get_analysis_store),
-) -> ProtocolAnalyzer:
-    """Construct a ProtocolAnalyzer for a single request."""
-    return ProtocolAnalyzer(
-        analysis_store=analysis_store,
-    )
+    task_runner: TaskRunner = Depends(get_task_runner),
+) -> AnalysesManager:
+    """Get a singleton AnalysesManager to keep track of analyzers."""
+    analyses_manager = _analyses_manager_accessor.get_from(app_state)
+
+    if analyses_manager is None:
+        analyses_manager = AnalysesManager(
+            analysis_store=analysis_store, task_runner=task_runner
+        )
+        _analyses_manager_accessor.set_on(app_state, analyses_manager)
+
+    return analyses_manager
 
 
 async def get_protocol_auto_deleter(
@@ -127,4 +138,23 @@ async def get_protocol_auto_deleter(
         deletion_planner=ProtocolDeletionPlanner(
             maximum_unused_protocols=get_settings().maximum_unused_protocols
         ),
+        protocol_kind=ProtocolKind.STANDARD,
     )
+
+
+async def get_quick_transfer_protocol_auto_deleter(
+    protocol_store: ProtocolStore = Depends(get_protocol_store),
+) -> ProtocolAutoDeleter:
+    """Get a `ProtocolAutoDeleter` to delete old quick transfer protocols."""
+    return ProtocolAutoDeleter(
+        protocol_store=protocol_store,
+        deletion_planner=ProtocolDeletionPlanner(
+            maximum_unused_protocols=get_settings().maximum_quick_transfer_protocols
+        ),
+        protocol_kind=ProtocolKind.QUICK_TRANSFER,
+    )
+
+
+def get_maximum_quick_transfer_protocols() -> int:
+    """Get the maximum quick transfer protocol setting."""
+    return get_settings().maximum_quick_transfer_protocols

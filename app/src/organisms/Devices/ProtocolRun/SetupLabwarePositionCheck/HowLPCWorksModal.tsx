@@ -9,7 +9,7 @@ import {
   Link,
   PrimaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getTopPortalEl } from '../../../../App/portal'
@@ -30,9 +30,9 @@ export const HowLPCWorksModal = (props: HowLPCWorksModalProps): JSX.Element => {
       width="31.25rem"
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <StyledText as="p" marginBottom={SPACING.spacing16}>
+        <LegacyStyledText as="p" marginBottom={SPACING.spacing16}>
           {t('what_labware_offset_is')}
-        </StyledText>
+        </LegacyStyledText>
         <Link
           css={TYPOGRAPHY.linkPSemiBold}
           href={OFFSET_DATA_HELP_ARTICLE}
@@ -47,9 +47,9 @@ export const HowLPCWorksModal = (props: HowLPCWorksModalProps): JSX.Element => {
             size="0.5rem"
           />
         </Link>
-        <StyledText as="p" marginBottom={SPACING.spacing16}>
+        <LegacyStyledText as="p" marginBottom={SPACING.spacing16}>
           {t('branded:why_use_lpc')}
-        </StyledText>
+        </LegacyStyledText>
         <PrimaryButton
           onClick={props.onCloseClick}
           textTransform={TYPOGRAPHY.textTransformCapitalize}

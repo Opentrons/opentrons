@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { css } from 'styled-components'
 
 import {
@@ -11,7 +11,7 @@ import {
   Flex,
   OVERFLOW_AUTO,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useStopRunMutation } from '@opentrons/react-api-client'
@@ -34,7 +34,7 @@ export function RunFailedModal({
   errors,
 }: RunFailedModalProps): JSX.Element | null {
   const { t, i18n } = useTranslation(['run_details', 'shared', 'branded'])
-  const history = useHistory()
+  const navigate = useNavigate()
   const { stopRun } = useStopRunMutation()
   const [isCanceling, setIsCanceling] = React.useState(false)
 
@@ -53,7 +53,7 @@ export function RunFailedModal({
         // ToDo do we need to track this event?
         // If need, runCancel or runFailure something
         // trackProtocolRunEvent({ name: 'runCancel' })
-        history.push('/dashboard')
+        navigate('/dashboard')
       },
       onError: () => {
         setIsCanceling(false)
@@ -80,12 +80,12 @@ export function RunFailedModal({
           gridGap={SPACING.spacing16}
           alignItems={ALIGN_FLEX_START}
         >
-          <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightBold}>
+          <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightBold}>
             {t('error_info', {
               errorType: highestPriorityError.errorType,
               errorCode: highestPriorityError.errorCode,
             })}
-          </StyledText>
+          </LegacyStyledText>
           <Flex
             width="100%"
             flexDirection={DIRECTION_COLUMN}
@@ -96,12 +96,12 @@ export function RunFailedModal({
             padding={`${SPACING.spacing16} ${SPACING.spacing20}`}
           >
             <Flex flexDirection={DIRECTION_COLUMN} css={SCROLL_BAR_STYLE}>
-              <StyledText as="p" textAlign={TYPOGRAPHY.textAlignLeft}>
+              <LegacyStyledText as="p" textAlign={TYPOGRAPHY.textAlignLeft}>
                 {highestPriorityError.detail}
-              </StyledText>
+              </LegacyStyledText>
             </Flex>
           </Flex>
-          <StyledText
+          <LegacyStyledText
             as="p"
             textAlign={TYPOGRAPHY.textAlignLeft}
             css={css`
@@ -109,7 +109,7 @@ export function RunFailedModal({
             `}
           >
             {t('branded:contact_information')}
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
         <SmallButton
           width="100%"

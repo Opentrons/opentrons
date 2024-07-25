@@ -1,5 +1,6 @@
 import { getUniqueWellProperties } from '@opentrons/shared-data'
 import type {
+  Coordinates,
   LabwareDefinition2,
   LabwareWellGroup,
 } from '@opentrons/shared-data'
@@ -9,7 +10,8 @@ import type { LabwareFields, BooleanString } from './fields'
 const boolToBoolString = (b: boolean): BooleanString => (b ? 'true' : 'false')
 
 export function labwareDefToFields(
-  def: LabwareDefinition2
+  def: LabwareDefinition2,
+  adapterDefinitions: LabwareDefinition2[]
 ): LabwareFields | null {
   const allUniqueWellGroupProps = getUniqueWellProperties(def)
 
@@ -80,6 +82,31 @@ export function labwareDefToFields(
 
   const firstGroup: LabwareWellGroup | undefined = def.groups[0]
   const firstGroupBrand = firstGroup?.brand
+  const zDimension = def.dimensions.zDimension
+  const compatibleAdapters: Record<string, number> =
+    def.stackingOffsetWithLabware != null
+      ? Object.entries(
+          def.stackingOffsetWithLabware as Record<string, Coordinates>
+        ).reduce<Record<string, number>>((acc, [loadName, offset]) => {
+          const adapterZDimension = Object.values(adapterDefinitions).find(
+            def => def.parameters.loadName === loadName
+          )?.dimensions.zDimension
+          if (adapterZDimension != null) {
+            acc[loadName] = adapterZDimension + zDimension - offset.z
+          }
+
+          return acc
+        }, {})
+      : {}
+  const compatibleModules: Record<string, number> =
+    def.stackingOffsetWithModule != null
+      ? Object.entries(
+          def.stackingOffsetWithModule as Record<string, Coordinates>
+        ).reduce<Record<string, number>>((acc, [moduleModel, offset]) => {
+          acc[moduleModel] = zDimension - offset.z
+          return acc
+        }, {})
+      : {}
 
   return {
     // NOTE: Ian 2019-08-26 these LC-specific fields cannot easily/reliably be inferred
@@ -130,5 +157,7 @@ export function labwareDefToFields(
     // NOTE: intentionally null these fields, do not import them
     loadName: null,
     displayName: null,
+    compatibleAdapters,
+    compatibleModules,
   }
 }

@@ -2,7 +2,7 @@ import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import { StaticRouter } from 'react-router-dom'
+import { MemoryRouter } from 'react-router-dom'
 
 import {
   mockOT3HealthResponse,
@@ -57,9 +57,9 @@ const render = (
   props: React.ComponentProps<typeof SendProtocolToFlexSlideout>
 ) => {
   return renderWithProviders(
-    <StaticRouter>
+    <MemoryRouter>
       <SendProtocolToFlexSlideout {...props} />
-    </StaticRouter>,
+    </MemoryRouter>,
     {
       i18nInstance: i18n,
     }

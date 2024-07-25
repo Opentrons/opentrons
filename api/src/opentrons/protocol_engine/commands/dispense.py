@@ -1,7 +1,9 @@
 """Dispense command request, result, and implementation models."""
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional, Type
+from typing import TYPE_CHECKING, Optional, Type, Union
 from typing_extensions import Literal
+
+from opentrons_shared_data.errors.exceptions import PipetteOverpressureError
 
 from pydantic import Field
 
@@ -13,12 +15,21 @@ from .pipetting_common import (
     WellLocationMixin,
     BaseLiquidHandlingResult,
     DestinationPositionResult,
+    OverpressureError,
+    OverpressureErrorInternalData,
 )
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from .command import (
+    AbstractCommandImpl,
+    BaseCommand,
+    BaseCommandCreate,
+    DefinedErrorData,
+    SuccessData,
+)
 from ..errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
     from ..execution import MovementHandler, PipettingHandler
+    from ..resources import ModelUtils
 
 
 DispenseCommandType = Literal["dispense"]
@@ -41,20 +52,27 @@ class DispenseResult(BaseLiquidHandlingResult, DestinationPositionResult):
     pass
 
 
-class DispenseImplementation(
-    AbstractCommandImpl[DispenseParams, SuccessData[DispenseResult, None]]
-):
+_ExecuteReturn = Union[
+    SuccessData[DispenseResult, None],
+    DefinedErrorData[OverpressureError, OverpressureErrorInternalData],
+]
+
+
+class DispenseImplementation(AbstractCommandImpl[DispenseParams, _ExecuteReturn]):
     """Dispense command implementation."""
 
     def __init__(
-        self, movement: MovementHandler, pipetting: PipettingHandler, **kwargs: object
+        self,
+        movement: MovementHandler,
+        pipetting: PipettingHandler,
+        model_utils: ModelUtils,
+        **kwargs: object,
     ) -> None:
         self._movement = movement
         self._pipetting = pipetting
+        self._model_utils = model_utils
 
-    async def execute(
-        self, params: DispenseParams
-    ) -> SuccessData[DispenseResult, None]:
+    async def execute(self, params: DispenseParams) -> _ExecuteReturn:
         """Move to and dispense to the requested well."""
         position = await self._movement.move_to_well(
             pipette_id=params.pipetteId,
@@ -62,20 +80,41 @@ class DispenseImplementation(
             well_name=params.wellName,
             well_location=params.wellLocation,
         )
-        volume = await self._pipetting.dispense_in_place(
-            pipette_id=params.pipetteId,
-            volume=params.volume,
-            flow_rate=params.flowRate,
-            push_out=params.pushOut,
-        )
-
-        return SuccessData(
-            public=DispenseResult(
-                volume=volume,
-                position=DeckPoint(x=position.x, y=position.y, z=position.z),
-            ),
-            private=None,
-        )
+        try:
+            volume = await self._pipetting.dispense_in_place(
+                pipette_id=params.pipetteId,
+                volume=params.volume,
+                flow_rate=params.flowRate,
+                push_out=params.pushOut,
+            )
+        except PipetteOverpressureError as e:
+            return DefinedErrorData(
+                public=OverpressureError(
+                    id=self._model_utils.generate_id(),
+                    createdAt=self._model_utils.get_timestamp(),
+                    wrappedErrors=[
+                        ErrorOccurrence.from_failed(
+                            id=self._model_utils.generate_id(),
+                            createdAt=self._model_utils.get_timestamp(),
+                            error=e,
+                        )
+                    ],
+                    errorInfo={"retryLocation": (position.x, position.y, position.z)},
+                ),
+                private=OverpressureErrorInternalData(
+                    position=DeckPoint.construct(
+                        x=position.x, y=position.y, z=position.z
+                    )
+                ),
+            )
+        else:
+            return SuccessData(
+                public=DispenseResult(
+                    volume=volume,
+                    position=DeckPoint(x=position.x, y=position.y, z=position.z),
+                ),
+                private=None,
+            )
 
 
 class Dispense(BaseCommand[DispenseParams, DispenseResult, ErrorOccurrence]):

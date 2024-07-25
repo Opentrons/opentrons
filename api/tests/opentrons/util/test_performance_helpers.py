@@ -1,24 +1,20 @@
 """Tests for performance_helpers."""
 
 from pathlib import Path
-from opentrons_shared_data.performance.dev_types import RobotContextState
 from opentrons.util.performance_helpers import (
-    StubbedTracker,
+    _StubbedTracker,
     _get_robot_context_tracker,
 )
 
 
 def test_return_function_unchanged() -> None:
-    """Test that the function is returned unchanged when using StubbedTracker."""
-    tracker = StubbedTracker(Path("/path/to/storage"), True)
+    """Test that the function is returned unchanged when using _StubbedTracker."""
+    tracker = _StubbedTracker(Path("/path/to/storage"), True)
 
     def func_to_track() -> None:
         pass
 
-    assert (
-        tracker.track(RobotContextState.ANALYZING_PROTOCOL)(func_to_track)
-        is func_to_track
-    )
+    assert tracker.track("ANALYZING_PROTOCOL")(func_to_track) is func_to_track
 
 
 def test_singleton_tracker() -> None:

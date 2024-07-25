@@ -16,7 +16,7 @@ import {
   Link,
   SIZE_4,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useModulesQuery } from '@opentrons/react-api-client'
@@ -161,9 +161,9 @@ export function DeviceDetailsDeckConfiguration({
           width="100%"
           borderBottom={BORDERS.lineBorder}
         >
-          <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          <LegacyStyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {`${robotName} ${t('deck_configuration')}`}
-          </StyledText>
+          </LegacyStyledText>
           <Link
             role="button"
             css={TYPOGRAPHY.linkPSemiBold}
@@ -228,10 +228,12 @@ export function DeviceDetailsDeckConfiguration({
                   gridGap={SPACING.spacing8}
                   css={TYPOGRAPHY.labelSemiBold}
                 >
-                  <StyledText flex="1 0 30px">{t('location')}</StyledText>
-                  <StyledText flex="9 1 0">
+                  <LegacyStyledText flex="1 0 30px">
+                    {t('location')}
+                  </LegacyStyledText>
+                  <LegacyStyledText flex="9 1 0">
                     {i18n.format(t('deck_hardware'), 'capitalize')}
-                  </StyledText>
+                  </LegacyStyledText>
                 </Flex>
                 {fixtureDisplayList.length > 0 ? (
                   fixtureDisplayList.map(({ displayLocation, displayName }) => (
@@ -244,8 +246,12 @@ export function DeviceDetailsDeckConfiguration({
                       width="100%"
                       css={TYPOGRAPHY.labelRegular}
                     >
-                      <StyledText flex="1 0 30px">{displayLocation}</StyledText>
-                      <StyledText flex="9 1 0">{displayName}</StyledText>
+                      <LegacyStyledText flex="1 0 30px">
+                        {displayLocation}
+                      </LegacyStyledText>
+                      <LegacyStyledText flex="9 1 0">
+                        {displayName}
+                      </LegacyStyledText>
                     </Flex>
                   ))
                 ) : (
@@ -256,7 +262,7 @@ export function DeviceDetailsDeckConfiguration({
                     width="100%"
                     css={TYPOGRAPHY.labelRegular}
                   >
-                    <StyledText>{t('no_deck_fixtures')}</StyledText>
+                    <LegacyStyledText>{t('no_deck_fixtures')}</LegacyStyledText>
                   </Flex>
                 )}
               </Flex>
@@ -273,9 +279,9 @@ export function DeviceDetailsDeckConfiguration({
             paddingBottom={SPACING.spacing24}
             width="100%"
           >
-            <StyledText as="p" color={COLORS.grey40}>
+            <LegacyStyledText as="p" color={COLORS.grey40}>
               {t('offline_deck_configuration')}
-            </StyledText>
+            </LegacyStyledText>
           </Flex>
         )}
       </Flex>

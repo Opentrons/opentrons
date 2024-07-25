@@ -1,4 +1,10 @@
-"""Addressable area state store tests."""
+"""Addressable area state store tests.
+
+DEPRECATED: Testing AddressableAreaStore independently of AddressableAreaView is no
+longer helpful. Add new tests to test_addressable_area_state.py, where they can be
+tested together.
+"""
+
 import pytest
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
@@ -63,6 +69,17 @@ def simulated_subject(
             deck_type=DeckType.OT3_STANDARD,
         ),
         deck_definition=ot3_standard_deck_def,
+        robot_definition={
+            "displayName": "OT-3",
+            "robotType": "OT-3 Standard",
+            "models": ["OT-3 Standard"],
+            "extents": [477.2, 493.8, 0.0],
+            "mountOffsets": {
+                "left": [-13.5, -60.5, 255.675],
+                "right": [40.5, -60.5, 255.675],
+                "gripper": [84.55, -12.75, 93.85],
+            },
+        },
     )
 
 
@@ -79,6 +96,17 @@ def subject(
             deck_type=DeckType.OT3_STANDARD,
         ),
         deck_definition=ot3_standard_deck_def,
+        robot_definition={
+            "displayName": "OT-3",
+            "robotType": "OT-3 Standard",
+            "models": ["OT-3 Standard"],
+            "extents": [477.2, 493.8, 0.0],
+            "mountOffsets": {
+                "left": [-13.5, -60.5, 255.675],
+                "right": [40.5, -60.5, 255.675],
+                "gripper": [84.55, -12.75, 93.85],
+            },
+        },
     )
 
 
@@ -94,6 +122,17 @@ def test_initial_state_simulated(
         deck_configuration=[],
         robot_type="OT-3 Standard",
         use_simulated_deck_config=True,
+        robot_definition={
+            "displayName": "OT-3",
+            "robotType": "OT-3 Standard",
+            "models": ["OT-3 Standard"],
+            "extents": [477.2, 493.8, 0.0],
+            "mountOffsets": {
+                "left": [-13.5, -60.5, 255.675],
+                "right": [40.5, -60.5, 255.675],
+                "gripper": [84.55, -12.75, 93.85],
+            },
+        },
     )
 
 

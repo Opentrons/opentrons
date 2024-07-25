@@ -1,6 +1,6 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import { useAtom } from 'jotai'
 
 import {
@@ -9,7 +9,7 @@ import {
   Flex,
   OVERFLOW_AUTO,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 import { PromptGuide } from '../../molecules/PromptGuide'
 import { ChatDisplay } from '../../molecules/ChatDisplay'
@@ -43,13 +43,15 @@ export function MainContentContainer(): JSX.Element {
     >
       <Flex
         width="100%"
-        flexGrow="1"
         overflowY={OVERFLOW_AUTO}
         flexDirection={DIRECTION_COLUMN}
+        css={css`
+          flex-grow: 1;
+        `}
       >
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
           {/* Prompt Guide remain as a reference for users. */}
-          <StyledText>{t('opentronsai')}</StyledText>
+          <LegacyStyledText>{t('opentronsai')}</LegacyStyledText>
           <PromptGuide />
         </Flex>
         <ChatDataContainer>

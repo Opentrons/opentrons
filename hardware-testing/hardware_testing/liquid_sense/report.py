@@ -76,7 +76,6 @@ def build_config_section() -> CSVSection:
             CSVLine("liquid", [str]),
             CSVLine("labware_type", [str]),
             CSVLine("speed", [str]),
-            CSVLine("probe_seconds_before_contact", [str]),
         ],
     )
 
@@ -84,13 +83,13 @@ def build_config_section() -> CSVSection:
 def build_trials_section(trials: int, tips: List[int]) -> CSVSection:
     """Build section."""
     lines: List[Union[CSVLine, CSVLineRepeating]] = [
-        CSVLine("trial_number", [str, str, str, str, str, str, str, str, str])
+        CSVLine("trial_number", [str, str, str, str, str, str, str, str, str, str])
     ]
     lines.extend(
         [
             CSVLine(
                 f"trial-baseline-{tip}ul",
-                [float, float, float, float, float, float, float, float],
+                [float, float, float, float, float, float, float, float, str],
             )
             for tip in tips
         ]
@@ -99,7 +98,7 @@ def build_trials_section(trials: int, tips: List[int]) -> CSVSection:
         [
             CSVLine(
                 f"trial-{t + 1}-{tip}ul",
-                [float, float, float, float, float, float, float, float, float],
+                [float, float, float, float, float, float, float, float, float, str],
             )
             for tip in tips
             for t in range(trials)
@@ -151,7 +150,6 @@ def store_config(
     liquid: str,
     labware_type: str,
     speed: str,
-    probe_seconds_before_contact: str,
 ) -> None:
     """Report config."""
     report("CONFIG", "protocol_name", [protocol_name])
@@ -166,7 +164,6 @@ def store_config(
     report("CONFIG", "liquid", [liquid])
     report("CONFIG", "labware_type", [labware_type])
     report("CONFIG", "speed", [speed])
-    report("CONFIG", "probe_seconds_before_contact", [probe_seconds_before_contact])
 
 
 def store_baseline_trial(
@@ -198,6 +195,7 @@ def store_baseline_trial(
             0,
             0,
             measured_error,
+            "Baseline",
         ],
     )
 
@@ -214,6 +212,7 @@ def store_trial(
     plunger_travel: float,
     tip_length_offset: float,
     target_height: float,
+    result: str,
     google_sheet: Optional[google_sheets_tool.google_sheet],
     sheet_name: str,
     sheet_id: Optional[str],
@@ -232,6 +231,7 @@ def store_trial(
             tip_length_offset,
             height + tip_length_offset,
             target_height,
+            result,
         ],
     )
     if google_sheet is not None and sheet_id is not None:
@@ -308,6 +308,7 @@ def build_ls_report(
             "tip_length_offset",
             "adjusted_height",
             "target_height",
+            "result",
         ],
     )
     return report

@@ -5,7 +5,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   OVERFLOW_SCROLL,
 } from '@opentrons/components'
@@ -23,14 +23,14 @@ export function IncompatibleModuleODDModalBody({
 }: IncompatibleModuleODDModalBodyProps): JSX.Element {
   const { t } = useTranslation('incompatible_modules')
   const incompatibleModuleHeader: ModalHeaderBaseProps = {
-    title: capitalize(t('incompatible_modules_attached')),
+    title: capitalize(t('incompatible_modules_attached') as string),
   }
   return (
     <Modal header={incompatibleModuleHeader}>
       <Flex flexDirection={DIRECTION_COLUMN} width="100%">
-        <StyledText as="p" marginBottom={SPACING.spacing32}>
+        <LegacyStyledText as="p" marginBottom={SPACING.spacing32}>
           <Trans t={t} i18nKey="remove_before_running_protocol" />
-        </StyledText>
+        </LegacyStyledText>
         <Flex
           overflowY={OVERFLOW_SCROLL}
           flexDirection={DIRECTION_COLUMN}
@@ -39,13 +39,13 @@ export function IncompatibleModuleODDModalBody({
         >
           {modules.map(module => (
             <ListItem key={module.id} type="noActive">
-              <StyledText
+              <LegacyStyledText
                 as="p"
                 key={module.id}
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               >
                 {getModuleDisplayName(module.moduleModel)}
-              </StyledText>
+              </LegacyStyledText>
             </ListItem>
           ))}
         </Flex>

@@ -1,4 +1,6 @@
 """QueueWorker and dependency factory."""
+from typing import AsyncGenerator, Callable
+
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
 from opentrons.protocol_engine.execution.rail_lights import RailLightsHandler
@@ -22,6 +24,7 @@ def create_queue_worker(
     state_store: StateStore,
     action_dispatcher: ActionDispatcher,
     error_recovery_policy: ErrorRecoveryPolicy,
+    command_generator: Callable[[], AsyncGenerator[str, None]],
 ) -> QueueWorker:
     """Create a ready-to-use QueueWorker instance.
 
@@ -30,6 +33,7 @@ def create_queue_worker(
         state_store: StateStore to pass down to dependencies.
         action_dispatcher: ActionDispatcher to pass down to dependencies.
         error_recovery_policy: ErrorRecoveryPolicy to pass down to dependencies.
+        command_generator: Command generator to get the next command to execute.
     """
     gantry_mover = create_gantry_mover(
         hardware_api=hardware_api,
@@ -93,4 +97,5 @@ def create_queue_worker(
     return QueueWorker(
         state_store=state_store,
         command_executor=command_executor,
+        command_generator=command_generator,
     )

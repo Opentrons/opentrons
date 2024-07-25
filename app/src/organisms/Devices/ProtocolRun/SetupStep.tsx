@@ -23,8 +23,6 @@ interface SetupStepProps {
   title: React.ReactNode
   /** always shown text that provides a one sentence explanation of the contents */
   description: string
-  /** always shown text that sits above title of step (used for step number) */
-  label: string
   /** callback that should toggle the expanded state (managed by parent) */
   toggleExpanded: () => void
   /** contents to be shown only when expanded */
@@ -58,7 +56,6 @@ export function SetupStep({
   expanded,
   title,
   description,
-  label,
   toggleExpanded,
   children,
   rightElement,
@@ -79,23 +76,15 @@ export function SetupStep({
           >
             <Flex flexDirection={DIRECTION_COLUMN}>
               <StyledText
-                color={COLORS.grey50}
-                css={TYPOGRAPHY.h6SemiBold}
-                marginBottom={SPACING.spacing2}
-                id={`CollapsibleStep_${label}`}
-              >
-                {label}
-              </StyledText>
-              <StyledText
                 color={COLORS.black90}
-                css={TYPOGRAPHY.h3SemiBold}
+                desktopStyle="bodyLargeSemiBold"
                 marginBottom={SPACING.spacing4}
                 id={`CollapsibleStep_${String(title)}`}
               >
                 {title}
               </StyledText>
               <StyledText
-                as="p"
+                desktopStyle="bodyDefaultRegular"
                 color={COLORS.black90}
                 id={`CollapsibleStep_${description}`}
               >

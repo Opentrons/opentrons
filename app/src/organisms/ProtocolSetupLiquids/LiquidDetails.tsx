@@ -9,7 +9,7 @@ import {
   Icon,
   LocationIcon,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
@@ -109,13 +109,13 @@ export function LiquidDetails(props: LiquidDetailsProps): JSX.Element {
                   </Flex>
                 </TableDatum>
                 <TableDatum>
-                  <StyledText
+                  <LegacyStyledText
                     lineHeight={TYPOGRAPHY.lineHeight28}
                     fontSize="1.375rem"
                     fontWeight={TYPOGRAPHY.fontWeightRegular}
                   >
                     {labwareName}
-                  </StyledText>
+                  </LegacyStyledText>
                 </TableDatum>
 
                 <TableDatum>

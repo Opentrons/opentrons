@@ -34,6 +34,8 @@ COL_TRIAL_CONVERSION = {
     13: "AO",
 }
 
+BASELINE_TRIAL_LINE_NUMBER = 43
+
 
 def _get_pressure_results(result_file: str) -> Tuple[float, float, float, List[float]]:
     z_velocity: float = 0.0
@@ -137,11 +139,13 @@ def process_csv_directory(  # noqa: C901
             for row in summary_reader:
                 final_report_writer.writerow(row)
                 s += 1
-                if s == 44:
+                if s == BASELINE_TRIAL_LINE_NUMBER:
                     meniscus_travel = float(row[6])
-                if s >= 45 and s < 45 + (trials * len(tips)):
+                if s >= (BASELINE_TRIAL_LINE_NUMBER + 1) and s < (
+                    BASELINE_TRIAL_LINE_NUMBER + 1 + (trials * len(tips))
+                ):
                     # while processing this grab the tip offsets from the summary
-                    tip_offsets[tips[int((s - 45) / trials)]].append(float(row[8]))
+                    tip_offsets[tips[int((s - 44) / trials)]].append(float(row[8]))
             # summary_reader.line_num is the last line in the summary that has text
             pressures_start_line = summary_reader.line_num + 3
             # calculate where the start and end of each block of data we want to graph
@@ -250,7 +254,7 @@ def process_csv_directory(  # noqa: C901
                     transposed_pressure_rows = list(map(list, zip(*pressure_rows)))
                     try:
                         google_sheet.batch_update_cells(
-                            sheet_name, transposed_pressure_rows, "H", 11, sheet_id
+                            transposed_pressure_rows, "H", 11, sheet_id
                         )
                     except google_sheets_tool.google_interaction_error:
                         ui.print_error("Did not write pressure data to google sheet.")
@@ -284,7 +288,7 @@ def process_google_sheet(
         test_info,
     ]
     num_of_trials = run_args.trials  # type: ignore[attr-defined]
-    google_sheet.batch_update_cells(sheet_name, test_parameters, "A", 1, sheet_id)
+    google_sheet.batch_update_cells(test_parameters, "A", 1, sheet_id)
     target_height = google_sheet.get_cell(sheet_name, "B9")
     ui.print_info(target_height)
     last_trial_row = 10 + num_of_trials
@@ -295,7 +299,7 @@ def process_google_sheet(
     normalized_height = [
         float(height) - float(target_height) for height in adjusted_height
     ]
-    google_sheet.batch_update_cells(sheet_name, [normalized_height], "F", 11, sheet_id)
+    google_sheet.batch_update_cells([normalized_height], "F", 11, sheet_id)
     # Find accuracy, precision, repeatability
     try:
         accuracy = statistics.mean(normalized_height)
@@ -307,7 +311,7 @@ def process_google_sheet(
             ["Accuracy (mm)", "Precision (+/- mm)", "Repeatability (%)"],
             [accuracy, precision, 100.0 - 100.0 * repeatability_error],
         ]
-        google_sheet.batch_update_cells(sheet_name, summary, "D", 2, sheet_id)
+        google_sheet.batch_update_cells(summary, "D", 2, sheet_id)
     except google_sheets_tool.google_interaction_error:
         ui.print_error("stats didn't work.")
 

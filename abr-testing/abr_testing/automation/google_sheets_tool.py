@@ -136,13 +136,12 @@ class google_sheet:
 
         for col_offset, col_values in enumerate(data):
             column_index = start_column_index + col_offset
-            # column_letter = index_to_column_letter(column_index)
             for row_offset, value in enumerate(col_values):
                 row_index = start_row + row_offset
                 try:
                     float_value = float(value)
                     user_entered_value = {"numberValue": float_value}
-                except ValueError:
+                except (ValueError, TypeError):
                     user_entered_value = {"stringValue": str(value)}
                 requests.append(
                     {
@@ -163,7 +162,10 @@ class google_sheet:
                 )
 
         body = {"requests": requests}
-        self.spread_sheet.batch_update(body=body)
+        try:
+            self.spread_sheet.batch_update(body=body)
+        except gspread.exceptions.APIError as e:
+            print(f"ERROR MESSAGE: {e}")
 
     def update_cell(
         self, sheet_title: str, row: int, column: int, single_data: Any
@@ -172,13 +174,19 @@ class google_sheet:
         self.spread_sheet.worksheet(sheet_title).update_cell(row, column, single_data)
         return row, column, single_data
 
-    def get_all_data(self) -> List[Dict[str, Any]]:
+    def get_all_data(
+        self, expected_headers: Optional[Set[str]]
+    ) -> List[Dict[str, Any]]:
         """Get all the Data recorded from worksheet."""
-        return self.worksheet.get_all_records()
+        return self.worksheet.get_all_records(expected_headers=expected_headers)
 
     def get_column(self, column_number: int) -> Set[str]:
         """Get all values in column."""
         return self.worksheet.col_values(column_number)
+
+    def get_row(self, row_number: int) -> Set[str]:
+        """Get all values in row."""
+        return self.worksheet.row_values(row_number)
 
     def get_cell(self, sheet_title: str, cell: str) -> Any:
         """Get cell value with location ex: 'A1'."""
