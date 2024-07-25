@@ -29,12 +29,14 @@ import type { UseDeckMapUtilsResult } from './useDeckMapUtils'
 import type { CurrentRecoveryOptionUtils } from './useRecoveryRouting'
 import type { RecoveryActionMutationResult } from './useRecoveryActionMutation'
 import type { StepCounts } from '../../../resources/protocols/hooks'
+import type { UseRecoveryAnalyticsResult } from './useRecoveryAnalytics'
 
 type ERUtilsProps = ErrorRecoveryFlowsProps & {
   toggleERWizard: (launchER: boolean) => Promise<void>
   hasLaunchedRecovery: boolean
   isOnDevice: boolean
   robotType: RobotType
+  analytics: UseRecoveryAnalyticsResult
 }
 
 export interface ERUtilsResults {
@@ -64,6 +66,7 @@ export function useERUtils({
   protocolAnalysis,
   isOnDevice,
   robotType,
+  analytics,
 }: ERUtilsProps): ERUtilsResults {
   const { data: attachedInstruments } = useInstrumentsQuery()
   const { data: runRecord } = useNotifyRunQuery(runId)
@@ -128,6 +131,8 @@ export function useERUtils({
     failedLabwareUtils,
     routeUpdateActions,
     recoveryToastUtils,
+    analytics,
+    selectedRecoveryOption: currentRecoveryOptionUtils.selectedRecoveryOption,
   })
 
   const deckMapUtils = useDeckMapUtils({

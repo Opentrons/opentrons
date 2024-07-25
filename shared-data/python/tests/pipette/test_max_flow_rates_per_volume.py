@@ -8,7 +8,7 @@ from opentrons_shared_data.pipette.pipette_load_name_conversions import (
 from opentrons_shared_data.pipette.load_data import load_definition
 from opentrons_shared_data.pipette.ul_per_mm import piecewise_volume_conversion
 
-from opentrons_shared_data.pipette.dev_types import PipetteModel
+from opentrons_shared_data.pipette.types import PipetteModel
 from opentrons_shared_data.pipette.pipette_definition import (
     ulPerMMDefinition,
 )

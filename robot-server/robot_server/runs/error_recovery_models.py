@@ -59,11 +59,11 @@ class MatchCriteria(BaseModel):
 class ErrorRecoveryRule(BaseModel):
     """Request/Response model for new error recovery rule creation."""
 
-    matchCriteria: list[MatchCriteria] = Field(
-        default_factory=list,
+    matchCriteria: MatchCriteria = Field(
+        ...,
         description="The criteria that must be met for this rule to be applied.",
     )
-    ifMatch: list[ReactionIfMatch] = Field(
-        default_factory=list,
+    ifMatch: ReactionIfMatch = Field(
+        ...,
         description="The specific recovery setting that will be in use if the type parameters match.",
     )

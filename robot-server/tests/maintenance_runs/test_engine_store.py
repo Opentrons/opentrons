@@ -4,7 +4,7 @@ from datetime import datetime
 import pytest
 from decoy import Decoy, matchers
 
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.types import RobotType
 
 from opentrons.protocol_engine.errors.exceptions import EStopActivatedError
 from opentrons.types import DeckSlotName

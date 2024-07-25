@@ -21,7 +21,7 @@ from opentrons_shared_data.protocol import (
     Schema as JSONProtocolSchema,
     load_schema as load_protocol_schema,
 )
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.types import RobotType
 
 from opentrons.ordered_set import OrderedSet
 
@@ -41,8 +41,8 @@ from .types import (
 from .bundle import extract_bundle
 
 if TYPE_CHECKING:
-    from opentrons_shared_data.labware.dev_types import LabwareDefinition
-    from opentrons_shared_data.protocol.dev_types import JsonProtocol as JsonProtocolDef
+    from opentrons_shared_data.labware.types import LabwareDefinition
+    from opentrons_shared_data.protocol.types import JsonProtocol as JsonProtocolDef
 
 MODULE_LOG = logging.getLogger(__name__)
 

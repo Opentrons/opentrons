@@ -5,8 +5,8 @@ from datetime import datetime
 from pathlib import Path
 
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons_shared_data.robot.dev_types import RobotType
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.robot.types import RobotType
+from opentrons_shared_data.pipette.types import PipetteNameType
 
 from opentrons.types import MountType, DeckSlotName
 from opentrons.protocol_engine import (

@@ -1,10 +1,10 @@
 import logging
 from typing import Dict, List, Optional, Set, Union, cast, Tuple
 
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV5, SlotDefV3
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.deck.types import DeckDefinitionV5, SlotDefV3
+from opentrons_shared_data.labware.types import LabwareDefinition
+from opentrons_shared_data.pipette.types import PipetteNameType
+from opentrons_shared_data.robot.types import RobotType
 
 from opentrons.types import DeckSlotName, StagingSlotName, Location, Mount, Point
 from opentrons.util.broker import Broker

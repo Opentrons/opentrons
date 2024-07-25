@@ -178,7 +178,7 @@ from opentrons_hardware.hardware_control.hepa_uv_settings import (
 )
 
 from opentrons_hardware.drivers.gpio import OT3GPIO, RemoteOT3GPIO
-from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons_shared_data.pipette.types import PipetteName
 from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
     load_data as load_pipette_data,
