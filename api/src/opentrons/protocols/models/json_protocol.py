@@ -58,9 +58,7 @@ CommandThermocyclerDeactivateBlock: types.ThermocyclerDeactivateBlockCommandId =
 CommandThermocyclerDeactivateLid: types.ThermocyclerDeactivateLidCommandId = (
     "thermocycler/deactivateLid"
 )
-CommandThermocyclerOpenLid: types.ThermocyclerOpenLidCommandId = (
-    "thermocycler/openLid"
-)
+CommandThermocyclerOpenLid: types.ThermocyclerOpenLidCommandId = "thermocycler/openLid"
 CommandThermocyclerCloseLid: types.ThermocyclerCloseLidCommandId = (
     "thermocycler/closeLid"
 )
