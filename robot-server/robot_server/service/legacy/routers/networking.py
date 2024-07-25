@@ -69,7 +69,6 @@ async def get_wifi_networks(
     rescan: Annotated[
         Optional[bool],
         Query(
-            default=False,
             description=(
                 "If `true`, forces a rescan for beaconing Wi-Fi networks. "
                 "This is an expensive operation that can take ~10 seconds, "
@@ -79,7 +78,7 @@ async def get_wifi_networks(
                 "letting the system decide when to do a rescan."
             ),
         ),
-    ]
+    ] = False
 ) -> WifiNetworks:
     networks = await nmcli.available_ssids(rescan)
     return WifiNetworks(list=[WifiNetworkFull(**n) for n in networks])

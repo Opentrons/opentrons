@@ -189,43 +189,6 @@ protocols_router = APIRouter()
 )
 async def create_protocol(  # noqa: C901
     files: Annotated[List[UploadFile], File(...)],
-    # use Form because request is multipart/form-data
-    # https://fastapi.tiangolo.com/tutorial/request-forms-and-files/
-    key: Annotated[
-        Optional[str],
-        Form(
-            default=None,
-            description=(
-                "An arbitrary client-defined string to attach to the new protocol resource."
-                " This should be no longer than ~100 characters or so."
-                " It's intended to store something like a UUID, to help clients that store"
-                " protocols locally keep track of which local files correspond to which"
-                " protocol resources on the robot."
-            ),
-        ),
-    ],
-    run_time_parameter_values: Annotated[
-        Optional[str],
-        Form(
-            default=None,
-            description="Key-value pairs of run-time parameters defined in a protocol."
-            " Note that this is expected to be a string holding a JSON object."
-            " Also, if this data is included in the request, the server will"
-            " always trigger an analysis (for now).",
-            alias="runTimeParameterValues",
-        ),
-    ],
-    protocol_kind: Annotated[
-        Optional[ProtocolKind],
-        Form(
-            default=None,
-            description=(
-                "Whether this is a `standard` protocol or a `quick-transfer` protocol."
-                "if omitted, the protocol will be `standard` by default."
-            ),
-            alias="protocolKind",
-        ),
-    ],
     protocol_directory: Annotated[Path, Depends(get_protocol_directory)],
     protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
     analysis_store: Annotated[AnalysisStore, Depends(get_analysis_store)],
@@ -246,6 +209,40 @@ async def create_protocol(  # noqa: C901
     maximum_quick_transfer_protocols: Annotated[
         int, Depends(get_maximum_quick_transfer_protocols)
     ],
+    # use Form because request is multipart/form-data
+    # https://fastapi.tiangolo.com/tutorial/request-forms-and-files/
+    key: Annotated[
+        Optional[str],
+        Form(
+            description=(
+                "An arbitrary client-defined string to attach to the new protocol resource."
+                " This should be no longer than ~100 characters or so."
+                " It's intended to store something like a UUID, to help clients that store"
+                " protocols locally keep track of which local files correspond to which"
+                " protocol resources on the robot."
+            ),
+        ),
+    ] = None,
+    run_time_parameter_values: Annotated[
+        Optional[str],
+        Form(
+            description="Key-value pairs of run-time parameters defined in a protocol."
+            " Note that this is expected to be a string holding a JSON object."
+            " Also, if this data is included in the request, the server will"
+            " always trigger an analysis (for now).",
+            alias="runTimeParameterValues",
+        ),
+    ] = None,
+    protocol_kind: Annotated[
+        Optional[ProtocolKind],
+        Form(
+            description=(
+                "Whether this is a `standard` protocol or a `quick-transfer` protocol."
+                "if omitted, the protocol will be `standard` by default."
+            ),
+            alias="protocolKind",
+        ),
+    ] = None,
 ) -> PydanticResponse[SimpleBody[Protocol]]:
     """Create a new protocol by uploading its files.
 
@@ -463,10 +460,11 @@ async def _start_new_analysis_if_necessary(
     responses={status.HTTP_200_OK: {"model": SimpleMultiBody[Protocol]}},
 )
 async def get_protocols(
+    protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
+    analysis_store: Annotated[AnalysisStore, Depends(get_analysis_store)],
     protocol_kind: Annotated[
         Optional[ProtocolKind],
         Query(
-            None,
             description=(
                 "Specify the kind of protocols you want to return."
                 " protocol kind can be `quick-transfer` or `standard` "
@@ -474,9 +472,7 @@ async def get_protocols(
             ),
             alias="protocolKind",
         ),
-    ],
-    protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
-    analysis_store: Annotated[AnalysisStore, Depends(get_analysis_store)],
+    ] = None,
 ) -> PydanticResponse[SimpleMultiBody[Protocol]]:
     """Get a list of all currently uploaded protocols.
 

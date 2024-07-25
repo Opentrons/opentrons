@@ -49,10 +49,10 @@ def _format_calibration(
     response_model=tl_models.MultipleCalibrationsResponse,
 )
 async def get_all_tip_length_calibrations(
+    _: Annotated[API, Depends(get_ot2_hardware)],
     tiprack_hash: Annotated[
         Optional[str],
         Query(
-            None,
             description=(
                 "Filter results by their `tiprack` field."
                 " This is deprecated because it was prone to bugs where semantically identical"
@@ -61,19 +61,17 @@ async def get_all_tip_length_calibrations(
             ),
             deprecated=True,
         ),
-    ],
+    ] = None,
     pipette_id: Annotated[
         Optional[str],
-        Query(None, description="Filter results by their `pipette` field."),
-    ],
+        Query(description="Filter results by their `pipette` field."),
+    ] = None,
     tiprack_uri: Annotated[
         Optional[str],
         Query(
-            None,
             description="Filter results by their `uri` field.",
         ),
-    ],
-    _: Annotated[API, Depends(get_ot2_hardware)],
+    ] = None,
 ) -> tl_models.MultipleCalibrationsResponse:
     all_calibrations = tip_length.get_all_tip_length_calibrations()
     if not all_calibrations:
@@ -106,6 +104,7 @@ async def get_all_tip_length_calibrations(
     responses={status.HTTP_404_NOT_FOUND: {"model": ErrorBody}},
 )
 async def delete_specific_tip_length_calibration(
+    _: Annotated[API, Depends(get_ot2_hardware)],
     pipette_id: Annotated[
         str,
         Query(
@@ -119,7 +118,6 @@ async def delete_specific_tip_length_calibration(
     tiprack_hash: Annotated[
         Optional[str],
         Query(
-            None,
             description=(
                 "The `tiprack` field value of the calibration you want to delete."
                 " (See `GET /calibration/tip_length`.)"
@@ -132,11 +130,10 @@ async def delete_specific_tip_length_calibration(
             ),
             deprecated=True,
         ),
-    ],
+    ] = None,
     tiprack_uri: Annotated[
         Optional[str],
         Query(
-            None,
             description=(
                 "The `uri` field value of the calibration you want to delete."
                 " (See `GET /calibration/tip_length`.)"
@@ -144,8 +141,7 @@ async def delete_specific_tip_length_calibration(
                 " You must supply either this or `tiprack_hash`."
             ),
         ),
-    ],
-    _: Annotated[API, Depends(get_ot2_hardware)],
+    ] = None,
 ):
     try:
         tip_length.delete_tip_length_calibration(

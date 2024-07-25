@@ -68,18 +68,16 @@ async def create_command(
     waitUntilComplete: Annotated[
         bool,
         Query(
-            False,
             description=(
                 "If `false`, return immediately, while the new command is still queued."
                 " If `true`, only return once the new command succeeds or fails,"
                 " or when the timeout is reached. See the `timeout` query parameter."
             ),
         ),
-    ],
+    ] = False,
     timeout: Annotated[
         Optional[int],
         Query(
-            default=None,
             gt=0,
             description=(
                 "If `waitUntilComplete` is `true`,"
@@ -98,7 +96,7 @@ async def create_command(
                 " the default was 30 seconds, not infinite."
             ),
         ),
-    ],
+    ] = None,
 ) -> PydanticResponse[SimpleBody[StatelessCommand]]:
     """Enqueue and execute a command.
 
@@ -142,21 +140,19 @@ async def get_commands_list(
     cursor: Annotated[
         Optional[int],
         Query(
-            None,
             description=(
                 "The starting index of the desired first command in the list."
                 " If unspecified, a cursor will be selected automatically"
                 " based on the currently running or most recently executed command."
             ),
         ),
-    ],
+    ] = None,
     pageLength: Annotated[
         int,
         Query(
-            _DEFAULT_COMMAND_LIST_LENGTH,
             description="The maximum number of commands in the list to return.",
         ),
-    ],
+    ] = _DEFAULT_COMMAND_LIST_LENGTH,
 ) -> PydanticResponse[SimpleMultiBody[StatelessCommand]]:
     """Get a list of stateless commands.
 

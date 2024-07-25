@@ -153,21 +153,24 @@ async def get_current_run_from_url(
 )
 async def create_run_command(
     request_body: RequestModelWithCommandCreate,
+    run_orchestrator_store: Annotated[
+        RunOrchestratorStore, Depends(get_run_orchestrator_store)
+    ],
+    check_estop: Annotated[bool, Depends(require_estop_in_good_state)],
+    run_id: Annotated[str, Depends(get_current_run_from_url)],
     waitUntilComplete: Annotated[
         bool,
         Query(
-            default=False,
             description=(
                 "If `false`, return immediately, while the new command is still queued."
                 " If `true`, only return once the new command succeeds or fails,"
                 " or when the timeout is reached. See the `timeout` query parameter."
             ),
         ),
-    ],
+    ] = False,
     timeout: Annotated[
         Optional[int],
         Query(
-            default=None,
             gt=0,
             description=(
                 "If `waitUntilComplete` is `true`,"
@@ -186,21 +189,15 @@ async def create_run_command(
                 " the default was 30 seconds, not infinite."
             ),
         ),
-    ],
+    ] = None,
     failedCommandId: Annotated[
         Optional[str],
         Query(
-            default=None,
             description=(
                 "FIXIT command use only. Reference of the failed command id we are trying to fix."
             ),
         ),
-    ],
-    run_orchestrator_store: Annotated[
-        RunOrchestratorStore, Depends(get_run_orchestrator_store)
-    ],
-    check_estop: Annotated[bool, Depends(require_estop_in_good_state)],
-    run_id: Annotated[str, Depends(get_current_run_from_url)],
+    ] = None,
 ) -> PydanticResponse[SimpleBody[pe_commands.Command]]:
     """Enqueue a protocol command.
 
@@ -268,25 +265,23 @@ async def create_run_command(
 )
 async def get_run_commands(
     runId: str,
+    run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
     cursor: Annotated[
         Optional[int],
         Query(
-            None,
             description=(
                 "The starting index of the desired first command in the list."
                 " If unspecified, a cursor will be selected automatically"
                 " based on the currently running or most recently executed command."
             ),
         ),
-    ],
+    ] = None,
     pageLength: Annotated[
         int,
         Query(
-            _DEFAULT_COMMAND_LIST_LENGTH,
             description="The maximum number of commands in the list to return.",
         ),
-    ],
-    run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
+    ] = _DEFAULT_COMMAND_LIST_LENGTH,
 ) -> PydanticResponse[MultiBody[RunCommandSummary, CommandCollectionLinks]]:
     """Get a summary of a set of commands in a run.
 

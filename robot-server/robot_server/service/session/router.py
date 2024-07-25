@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, Optional
 import logging
 
 from starlette import status as http_status_codes
@@ -130,11 +130,11 @@ async def get_session_handler(
     response_model=MultiSessionResponse,
 )
 async def get_sessions_handler(
-    session_type: Annotated[
-        SessionType,
-        Query(None, description="Will limit the results to only this session type"),
-    ],
     session_manager: Annotated[SessionManager, Depends(get_session_manager)],
+    session_type: Annotated[
+        Optional[SessionType],
+        Query(description="Will limit the results to only this session type"),
+    ] = None,
 ) -> MultiSessionResponse:
     sessions = session_manager.get(session_type=session_type)
     return MultiSessionResponse(
