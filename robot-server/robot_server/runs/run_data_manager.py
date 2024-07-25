@@ -12,7 +12,8 @@ from opentrons.protocol_engine import (
     CommandPointer,
     Command,
 )
-from opentrons.protocol_engine.types import PrimitiveRunTimeParamValuesType
+from opentrons.protocol_engine.types import PrimitiveRunTimeParamValuesType, \
+    CSVRunTimeParamFilesType
 
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.service.task_runner import TaskRunner
@@ -153,6 +154,7 @@ class RunDataManager:
         labware_offsets: List[LabwareOffsetCreate],
         deck_configuration: DeckConfigurationType,
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType],
+        run_time_param_files: Optional[CSVRunTimeParamFilesType],
         notify_publishers: Callable[[], None],
         protocol: Optional[ProtocolResource],
     ) -> Union[Run, BadRun]:
@@ -189,6 +191,7 @@ class RunDataManager:
             deck_configuration=deck_configuration,
             protocol=protocol,
             run_time_param_values=run_time_param_values,
+            run_time_param_files=run_time_param_files,
             notify_publishers=notify_publishers,
         )
         run_resource = self._run_store.insert(
@@ -207,7 +210,7 @@ class RunDataManager:
             run_resource=run_resource,
             state_summary=state_summary,
             current=True,
-            run_time_parameters=[],
+            run_time_parameters=self._run_orchestrator_store.get_run_time_parameters(),
         )
 
     def get(self, run_id: str) -> Union[Run, BadRun]:

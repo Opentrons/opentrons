@@ -4,7 +4,8 @@ import logging
 from typing import List, Optional, Callable
 
 from opentrons.protocol_engine.errors.exceptions import EStopActivatedError
-from opentrons.protocol_engine.types import PostRunHardwareState, RunTimeParameter
+from opentrons.protocol_engine.types import PostRunHardwareState, RunTimeParameter, \
+    CSVRunTimeParamFilesType
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.robot.types import RobotType
@@ -188,6 +189,7 @@ class RunOrchestratorStore:
         notify_publishers: Callable[[], None],
         protocol: Optional[ProtocolResource],
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
+        run_time_param_files: Optional[CSVRunTimeParamFilesType] = None,
     ) -> StateSummary:
         """Create and store a ProtocolRunner and ProtocolEngine for a given Run.
 
@@ -243,8 +245,7 @@ class RunOrchestratorStore:
             await self.run_orchestrator.load(
                 protocol.source,
                 run_time_param_values=run_time_param_values,
-                # TODO (spp, 2024-07-16): update this once runs accept csv params
-                run_time_param_files={},
+                run_time_param_files=run_time_param_files,
                 parse_mode=ParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
             )
         else:
