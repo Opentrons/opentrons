@@ -64,6 +64,7 @@ export function StackingOffsets(): JSX.Element | null {
   const isFlatBottom = values.wellBottomShape === 'flat'
   const isCircular = values.wellShape === 'circular'
   const isReservoir = values.labwareType === 'reservoir'
+  const isWellPlate = values.labwareType === 'wellPlate'
   const labwareHeight = values.labwareZDimension
   const has12Columns =
     values.gridColumns != null && parseInt(values.gridColumns) === 12
@@ -87,9 +88,14 @@ export function StackingOffsets(): JSX.Element | null {
   if (isFlatBottom && isReservoir) {
     modifiedAdapterDefinitions = adapterDefinitions.filter(
       definition =>
-        definition.parameters.loadName ===
-          'opentrons_aluminum_flat_bottom_plate' ||
         definition.parameters.loadName === 'opentrons_universal_flat_adapter'
+    )
+  }
+  if (isFlatBottom && (isReservoir || isWellPlate)) {
+    modifiedAdapterDefinitions = adapterDefinitions.filter(
+      definition =>
+        definition.parameters.loadName ===
+        'opentrons_aluminum_flat_bottom_plate'
     )
   }
   if (
