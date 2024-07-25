@@ -114,7 +114,7 @@ jobs:
           branch: 'analyses-snapshot-testing/${{ env.ANALYSIS_REF }}-from-${{ env.SNAPSHOT_REF}}'
           base: ${{ env.SNAPSHOT_REF}}
 
-      - name: Comment on PR
+      - name: Comment on feature PR
         if: always() && steps.create_pull_request.outcome == 'success' && github.event_name == 'pull_request'
         uses: actions/github-script@v7
         with:
