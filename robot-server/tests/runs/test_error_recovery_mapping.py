@@ -64,8 +64,8 @@ def mock_criteria(decoy: Decoy) -> MatchCriteria:
 def mock_rule(decoy: Decoy, mock_criteria: MatchCriteria) -> ErrorRecoveryRule:
     """Get a mock ErrorRecoveryRule."""
     mock = decoy.mock(cls=ErrorRecoveryRule)
-    decoy.when(mock.ifMatch).then_return([ReactionIfMatch.IGNORE_AND_CONTINUE])
-    decoy.when(mock.matchCriteria).then_return([mock_criteria])
+    decoy.when(mock.ifMatch).then_return(ReactionIfMatch.IGNORE_AND_CONTINUE)
+    decoy.when(mock.matchCriteria).then_return(mock_criteria)
     return mock
 
 
@@ -89,9 +89,7 @@ def test_create_error_recovery_policy_undefined_error(
     decoy: Decoy, mock_command: LiquidProbe
 ) -> None:
     """Should return a FAIL_RUN policy when error is not defined."""
-    rule1 = ErrorRecoveryRule(matchCriteria=[], ifMatch=[])
-
-    policy = create_error_recovery_policy_from_rules([rule1])
+    policy = create_error_recovery_policy_from_rules(rules=[])
     exampleConfig = Config(
         robot_type="OT-3 Standard",
         deck_type=DeckType.OT3_STANDARD,
@@ -104,9 +102,7 @@ def test_create_error_recovery_policy_defined_error(
     decoy: Decoy, mock_command: LiquidProbe, mock_error_data: CommandDefinedErrorData
 ) -> None:
     """Should return a WAIT_FOR_RECOVERY policy when error is defined."""
-    rule1 = ErrorRecoveryRule(matchCriteria=[], ifMatch=[])
-
-    policy = create_error_recovery_policy_from_rules([rule1])
+    policy = create_error_recovery_policy_from_rules(rules=[])
     exampleConfig = Config(
         robot_type="OT-3 Standard",
         deck_type=DeckType.OT3_STANDARD,
