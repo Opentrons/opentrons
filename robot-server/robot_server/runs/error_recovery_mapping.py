@@ -14,7 +14,7 @@ from opentrons.protocol_engine.error_recovery_policy import (
 
 
 def create_error_recovery_policy_from_rules(
-    rules: Optional[list[ErrorRecoveryRule]],
+    rules: list[ErrorRecoveryRule],
 ) -> ErrorRecoveryPolicy:
     """Given a list of error recovery rules return an error recovery policy."""
 
