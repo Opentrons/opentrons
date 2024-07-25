@@ -464,7 +464,6 @@ class ProtocolCore(
                     displayName="Absorbance Reader Lid",
                 )
             )
-            validation.ensure_definition_is_labware(lid.definition)
 
             self._engine_client.add_absorbance_reader_lid(
                 module_id=module_core.module_id,
