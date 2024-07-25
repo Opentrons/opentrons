@@ -38,12 +38,13 @@ from robot_server.protocols.router import ProtocolNotFound
 from ..run_models import RunNotFoundError
 from ..run_auto_deleter import RunAutoDeleter
 from ..run_models import Run, BadRun, RunCreate, RunUpdate
-from ..run_orchestrator_store import RunConflictError
+from ..run_orchestrator_store import RunConflictError, RunOrchestratorStore
 from ..run_data_manager import RunDataManager, RunNotCurrentError
 from ..dependencies import (
     get_run_data_manager,
     get_run_auto_deleter,
     get_quick_transfer_run_auto_deleter,
+    get_run_orchestrator_store,
 )
 from ..error_recovery_models import ErrorRecoveryRule
 
@@ -375,13 +376,15 @@ async def update_run(
         """
     ),
     status_code=status.HTTP_201_CREATED,
-    responses={status.HTTP_201_CREATED: {"model": SimpleBody[Run]}},
+    responses={
+        status.HTTP_201_CREATED: {"model": SimpleBody[Run]},
+        status.HTTP_409_CONFLICT: {"model": ErrorBody[RunStopped]},
+    },
 )
 async def create_run_policies(
     runId: str,
     request_body: Optional[RequestModel[List[ErrorRecoveryRule]]] = None,
     run_data_manager: RunDataManager = Depends(get_run_data_manager),
-    created_at: datetime = Depends(get_current_time),
 ) -> PydanticResponse[SimpleBody[Union[Run, BadRun]]]:
     """Create run polices.
 
@@ -389,10 +392,12 @@ async def create_run_policies(
         runId: Run ID pulled from URL.
         request_body: Optional request body with run creation data.
         run_data_manager: Current and historical run data management.
-        created_at: Timestamp to attach to created run.
     """
+    policies = request_body.data if request_body is not None else None
+    if policies:
+        await run_data_manager.create_policies(run_id=runId, policies=policies)
 
-    # return await PydanticResponse.create(
-    #     content=SimpleBody.construct(data=run_data),
-    #     status_code=status.HTTP_201_CREATED,
-    # )
+    return await PydanticResponse.create(
+        content=SimpleBody.construct(data=None),
+        status_code=status.HTTP_201_CREATED,
+    )

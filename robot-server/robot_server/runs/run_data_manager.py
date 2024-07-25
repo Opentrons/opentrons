@@ -17,6 +17,8 @@ from opentrons.protocol_engine.types import RunTimeParamValuesType
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.service.task_runner import TaskRunner
 from robot_server.service.notifications import RunsPublisher
+from .error_recovery_models import ErrorRecoveryRule
+from .error_recovery_mapping import create_error_recovery_policy_from_rules
 
 from .run_orchestrator_store import RunOrchestratorStore
 from .run_store import RunResource, RunStore, BadRunResource, BadStateSummary
@@ -432,6 +434,17 @@ class RunDataManager:
                 "Pre-serialized commands are only available after a run has ended."
             )
         return self._run_store.get_all_commands_as_preserialized_list(run_id)
+
+    async def create_policies(
+        self, run_id: str, policies: List[ErrorRecoveryRule]
+    ) -> None:
+        """Create run policy rules for error recovery."""
+        if run_id != self._run_orchestrator_store.current_run_id:
+            raise RunNotCurrentError(
+                f"Cannot update {run_id} because it is not the current run."
+            )
+        policy = create_error_recovery_policy_from_rules(policies)
+        await self._run_orchestrator_store.create_error_recovery_policy(policy=policy)
 
     def _get_state_summary(self, run_id: str) -> Union[StateSummary, BadStateSummary]:
         if run_id == self._run_orchestrator_store.current_run_id:
