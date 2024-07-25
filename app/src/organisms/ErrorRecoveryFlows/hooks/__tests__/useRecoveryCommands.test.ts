@@ -144,6 +144,11 @@ describe('useRecoveryCommands', () => {
           failedLabwareUtils: mockFailedLabwareUtils,
           routeUpdateActions: mockRouteUpdateActions,
           recoveryToastUtils: {} as any,
+          analytics: {
+            reportActionSelectedResult: mockReportActionSelectedResult,
+            reportRecoveredRunResult: mockReportRecoveredRunResult,
+          } as any,
+          selectedRecoveryOption: RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE,
         })
       )
       await act(async () => {
@@ -169,19 +174,16 @@ describe('useRecoveryCommands', () => {
     })
   })
 
-  // TODO(jh, 07-25-24): For some reason, this is passing typechecks locally but failing on CI.
-  // Figure out why.
+  it('should call resumeRun with runId and show success toast on success', async () => {
+    const { result } = renderHook(() => useRecoveryCommands(props))
 
-  // it('should call resumeRun with runId and show success toast on success', async () => {
-  //   const { result } = renderHook(() => useRecoveryCommands(props))
-  //
-  //   await act(async () => {
-  //     await result.current.resumeRun()
-  //   })
-  //
-  //   expect(mockResumeRunFromRecovery).toHaveBeenCalledWith(mockRunId)
-  //   expect(mockMakeSuccessToast).toHaveBeenCalled()
-  // })
+    await act(async () => {
+      await result.current.resumeRun()
+    })
+
+    expect(mockResumeRunFromRecovery).toHaveBeenCalledWith(mockRunId)
+    expect(mockMakeSuccessToast).toHaveBeenCalled()
+  })
 
   it('should call cancelRun with runId', () => {
     const { result } = renderHook(() => useRecoveryCommands(props))
