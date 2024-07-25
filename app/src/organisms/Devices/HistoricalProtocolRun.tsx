@@ -89,7 +89,7 @@ export function HistoricalProtocolRun(
           >
             {protocolName}
           </LegacyStyledText>
-          {enableCsvFile ? (
+          {enableCsvFile && allProtocolDataFiles != null ? (
             <LegacyStyledText
               as="p"
               width="5%"
