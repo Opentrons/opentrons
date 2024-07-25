@@ -62,11 +62,11 @@ jobs:
           git fetch origin ${{ env.PR_TARGET_BRANCH }}
           DIFF_OUTPUT=$(git diff HEAD origin/${{ env.PR_TARGET_BRANCH }} -- analyses-snapshot-testing/tests/__snapshots__/analyses_snapshot_test)
           if [ -n "$DIFF_OUTPUT" ]; then
-            echo "Analyses snapshots match ${{ env.PR_TARGET_BRANCH }} snapshots."
-          else
             echo "Analyses snapshots do NOT match ${{ env.PR_TARGET_BRANCH }} snapshots."
             echo "Is this becasue you have not pulled and merged ${{ env.PR_TARGET_BRANCH }}?"
             echo "Or is this because you have already updated your snapshots and are all good 😊?"
+          else
+            echo "Analyses snapshots match ${{ env.PR_TARGET_BRANCH }} snapshots."
           fi
 
       - name: Docker Build
