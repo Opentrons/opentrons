@@ -45,7 +45,7 @@ class SerialDriver:
         self.device = serial.Serial(self.com, baud, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE,
                                  bytesize=serial.EIGHTBITS, timeout=1)
         if self.device.isOpen():
-            print(f"{self.device} Opened! \n")
+            print(f"{self.com} Opened! \n")
         # settings
         self.device.bytesize = serial.EIGHTBITS  # 数据位 8
         self.device.parity = serial.PARITY_NONE  # 无校验

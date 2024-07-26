@@ -72,6 +72,10 @@ CAM_CMD_OT3 = (
 )
 
 WRITE_MEASURE_DATA = True
+current_volume = "None"
+current_trial = "None"
+current_channel = "None"
+current_action = "None"
 
 
 def _minimum_z_height(cfg: config.GravimetricConfig) -> int:
@@ -116,7 +120,6 @@ def _generate_callbacks_for_trial(
         encoder_bottom = hw_api.encoder_current_position_ot3(hw_mount)[pip_ax]
 
     def _on_retracting() -> None:
-        nonlocal estimate_aspirated, encoder_aspirated
         recorder.set_sample_tag(
             create_measurement_tag("retract", volume, channel, trial)
         )
@@ -125,10 +128,10 @@ def _generate_callbacks_for_trial(
             return
         estimate_aspirated = hw_api.current_position_ot3(hw_mount)[pip_ax]
         encoder_aspirated = hw_api.encoder_current_position_ot3(hw_mount)[pip_ax]
+        print("Encoder_aspirated:", estimate_aspirated, encoder_aspirated)
         report.store_encoder(
             test_report,
             volume,
-            channel,
             trial,
             estimate_bottom,
             encoder_bottom,
@@ -270,6 +273,7 @@ def _run_trial(
         trial: GravimetricTrial,
 ) -> Tuple[float, MeasurementData, float, MeasurementData]:
     global _PREV_TRIAL_GRAMS
+    global current_action
     pipetting_callbacks = _generate_callbacks_for_trial(
         trial.ctx,
         trial.pipette,
@@ -315,7 +319,7 @@ def _run_trial(
         return m_data
 
     ui.print_info("recorded weights:")
-
+    current_action = "Move To"
     # RUN MIX
     if trial.mix:
         mix_with_liquid_class(
@@ -351,6 +355,7 @@ def _run_trial(
     _PREV_TRIAL_GRAMS = m_data_init
 
     # RUN ASPIRATE
+    current_action = "Aspirate"
     aspirate_with_liquid_class(
         trial.ctx,
         trial.pipette,
@@ -371,7 +376,7 @@ def _run_trial(
     m_data_aspirate = _record_measurement_and_store(MeasurementType.ASPIRATE)
     ui.print_info(f"\tgrams after aspirate: {m_data_aspirate.grams_average} g")
     ui.print_info(f"\tcelsius after aspirate: {m_data_aspirate.celsius_pipette} C")
-
+    current_action = "Dispense"
     # RUN DISPENSE
     dispense_with_liquid_class(
         trial.ctx,
@@ -392,6 +397,7 @@ def _run_trial(
     m_data_dispense = _record_measurement_and_store(MeasurementType.DISPENSE)
     ui.print_info(f"\tgrams after dispense: {m_data_dispense.grams_average} g")
     # calculate volumes
+    current_action = "Calculate"
     volume_aspirate = calculate_change_in_volume(m_data_init, m_data_aspirate)
     volume_dispense = calculate_change_in_volume(m_data_aspirate, m_data_dispense)
     return volume_aspirate, m_data_aspirate, volume_dispense, m_data_dispense
@@ -574,26 +580,6 @@ def _write_to_csv(filename, row: list):
         writer.writerow(row)
 
 
-def get_pose_sensor(pose_sensor: WVTB01_BT50) -> list:
-    """
-    get pose data
-    """
-    result_list = []
-    data = pose_sensor.read_data()
-
-    vibration_velocity = pose_sensor.get_vibration_velocity(data)  # "====震动速度===="
-    vibration_angular = pose_sensor.get_vibration_angular(data)  # "====震动角度====="
-    temperature = pose_sensor.get_temperature(data)  # "====温度===="
-    vibration_distance = pose_sensor.get_vibration_distance(data)  # "====震动距离====="
-    viration_hz = pose_sensor.get_viration_hz(data)  # "====震动频率=====")
-    result_list.append(temperature)
-    result_list.extend(list(vibration_velocity.values()))
-    result_list.extend(list(vibration_angular.values()))
-    result_list.extend(list(vibration_distance.values()))
-    result_list.extend(list(viration_hz.values()))
-    return result_list
-
-
 def get_airsensor_data(sensor: AirSensor2) -> list:
     """
     get air sensor data
@@ -607,20 +593,52 @@ def get_airsensor_data(sensor: AirSensor2) -> list:
         return [None]
 
 
-def th_method(sensor):
+def measure_env(pose_sensor):
     global WRITE_MEASURE_DATA
     time_str = time.strftime("%Y-%m-%d-%H-%M-%S")
-
+    ui.print_info("Measurement Threading Start...")
+    global current_action
+    global current_channel
+    global current_trial
+    global current_volume
+    # title
+    title_list = ["Time", "current_action", "current_channel", "current_volume", "current_trial", "Pose_Temperature", "vibration_velocity_X", "vibration_velocity_Y", "vibration_velocity_Z",
+                  "get_vibration_angular_X", "get_vibration_angular_Y", "get_vibration_angular_Z", "get_vibration_distance_X", 
+                  "get_vibration_distance_Y", "get_vibration_distance_Z", "get_viration_hz_X", "get_viration_hz_Y", "get_viration_hz_Z"]
+    _write_to_csv(f'/data/testing_data/sensor_measurement_{time_str}.csv', title_list)
     while WRITE_MEASURE_DATA:
-        pose_list = get_pose_sensor(sensor)
-        _write_to_csv(f'/data/testing_data/sensor_measurement_{time_str}', pose_list)
+        
+        current_time = time.strftime("%Y-%m-%d-%H-%M-%S")
+        result_list = []
+        result_list.append(current_time)
+        result_list.extend([current_action, current_channel, current_volume, current_trial])
+        pose_data = pose_sensor.read_data()
+        vibration_velocity = pose_sensor.get_vibration_velocity(pose_data)  # "====震动速度===="
+        vibration_angular = pose_sensor.get_vibration_angular(pose_data)  # "====震动角度====="
+        temperature = pose_sensor.get_temperature(pose_data)  # "====温度===="
+        vibration_distance = pose_sensor.get_vibration_distance(pose_data)  # "====震动距离====="
+        viration_hz = pose_sensor.get_viration_hz(pose_data)  # "====震动频率=====")
+        result_list.append(temperature)
+        result_list.extend(list(vibration_velocity.values()))
+        result_list.extend(list(vibration_angular.values()))
+        result_list.extend(list(vibration_distance.values()))
+        result_list.extend(list(viration_hz.values()))
 
+        _write_to_csv(f'/data/testing_data/sensor_measurement_{time_str}.csv', result_list)
+        time.sleep(1)
+    ui.print_info("Measurement Threading Stoped...")
 
 def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noqa: C901
     """Run."""
     global _PREV_TRIAL_GRAMS
     global _MEASUREMENTS
     global WRITE_MEASURE_DATA
+
+    global current_volume
+    global current_trial
+    global current_channel
+    global current_action
+
     ui.print_header("LOAD LABWARE")
     labware_on_scale = _load_labware(resources.ctx, cfg)
     liquid_tracker = LiquidTracker(resources.ctx)
@@ -716,12 +734,13 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
             resources.env_sensor,
         )
         # threading start
-        pose_sensor = WVTB01_BT50()
-        pose_sensor.build_device_by_serial()
-        time.sleep(3)
-        th = threading.Thread(target=th_method, args=(pose_sensor))
-        th.start()
+        # pose_sensor = WVTB01_BT50()
+        # pose_sensor.build_device_by_serial()
+        # time.sleep(1)
+        # th_measurement = threading.Thread(target=measure_env, args=(pose_sensor,))
+        # th_measurement.start()
         for volume in trials.keys():
+            current_volume = str(volume)
             actual_asp_list_all = []
             actual_disp_list_all = []
             ui.print_title(f"{volume} uL")
@@ -733,6 +752,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
                 trial: [] for trial in range(cfg.trials)
             }
             for channel in trials[volume].keys():
+                current_channel = str(channel)
                 channel_offset = _get_channel_offset(cfg, channel)
                 actual_asp_list_channel = []
                 actual_disp_list_channel = []
@@ -740,6 +760,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
                 dispense_data_list = []
                 for run_trial in trials[volume][channel]:
                     trial_count += 1
+                    current_trial = str(trial_count)
                     ui.print_header(
                         f"{volume} uL channel {channel + 1} ({run_trial.trial + 1}/{cfg.trials})"
                     )
@@ -750,6 +771,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
                         cfg, resources, channel, total_tips
                     )
                     next_tip_location = next_tip.top().move(channel_offset)
+                    current_action = "Pick UP"
                     if not cfg.same_tip:
                         _pick_up_tip(
                             resources.ctx,
