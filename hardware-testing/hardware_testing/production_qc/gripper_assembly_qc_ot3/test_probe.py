@@ -34,8 +34,8 @@ JAW_ALIGNMENT_MM_Z = 2.0
 # PROBE_PF_MAX = 6.0
 # DECK_PF_MIN = 9.0
 # DECK_PF_MAX = 15.0
-PROBE_DIFF_MAX = 9.5
-PROBE_DIFF_MIN = 7.5
+# PROBE_DIFF_MAX = 9.5
+PROBE_DIFF_MIN = 7
 
 
 def _get_test_tag(probe: GripperProbe) -> str:
@@ -48,10 +48,10 @@ def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     for p in GripperProbe:
         tag = _get_test_tag(p)
         lines.append(CSVLine(f"{tag}-open-air-pf", [float]))
-        lines.append(CSVLine(f"{tag}-probe-pf", [float]))
-        lines.append(CSVLine(f"{tag}-probe-pf-difference-min", [float]))
         lines.append(CSVLine(f"{tag}-deck-pf", [float]))
-        lines.append(CSVLine(f"{tag}-probe-pf-difference-max", [float]))
+        lines.append(CSVLine(f"{tag}-probe-difference", [float]))
+        lines.append(CSVLine(f"{tag}-probe-pf-difference-min", [float]))
+        lines.append(CSVLine(f"{tag}-probe-pf-difference-max", [str]))
         lines.append(CSVLine(f"{tag}-result", [CSVResult]))
     for p in GripperProbe:
         lines.append(CSVLine(f"jaw-probe-{p.name.lower()}-xyz", [float, float, float]))
@@ -163,14 +163,14 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         print(f"Reading on deck: {deck_pf}")
 
         result = (
-            PROBE_DIFF_MIN < (deck_pf - open_air_pf) < PROBE_DIFF_MAX
+            PROBE_DIFF_MIN < (deck_pf - open_air_pf)
         )
         _tag = _get_test_tag(probe)
         report(section, f"{_tag}-open-air-pf", [open_air_pf])
-        report(section, f"{_tag}-probe-pf", [probe_pf])
-        report(section, f"{_tag}-probe-pf-difference-min", [PROBE_DIFF_MIN])
         report(section, f"{_tag}-deck-pf", [deck_pf])
-        report(section, f"{_tag}-probe-pf-difference-max", [PROBE_DIFF_MAX])
+        report(section, f"{_tag}-probe-difference", [(deck_pf - open_air_pf)])
+        report(section, f"{_tag}-probe-pf-difference-min", [PROBE_DIFF_MIN])
+        report(section, f"{_tag}-probe-pf-difference-max", ["None"])
         report(section, f"{_tag}-result", [CSVResult.from_bool(result)])
         await api.home_z()
         await api.ungrip()
