@@ -15,7 +15,7 @@ from opentrons.protocol_api import (
 NUM_TRIALS = 10
 
 TIP_SIZE = 50
-PIPETTE_SIZE = 1000
+PIPETTE_SIZE = 50
 PIPETTE_CHANNELS = 1
 
 LABWARE = "corning_96_wellplate_360ul_flat"
@@ -28,7 +28,7 @@ SLOT_LABWARE = "D1"
 ###########################################
 
 metadata = {"protocolName": "lld-test-empty-wells"}
-requirements = {"robotType": "Flex", "apiLevel": "2.19"}
+requirements = {"robotType": "Flex", "apiLevel": "2.20"}
 
 TEST_WELLS = {
     1: {
