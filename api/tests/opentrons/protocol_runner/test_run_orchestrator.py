@@ -528,5 +528,5 @@ async def test_create_error_recovery_policy(
 ) -> None:
     """Should call PE set_error_recovery_policy."""
     policy = decoy.mock(cls=ErrorRecoveryPolicy)
-    await live_protocol_subject.create_error_recovery_policy(policy)
-    decoy.verify(await mock_protocol_engine.set_error_recovery_policy(policy))
+    live_protocol_subject.set_error_recovery_policy(policy)
+    decoy.verify(mock_protocol_engine.set_error_recovery_policy(policy))

@@ -40,7 +40,7 @@ from robot_server.runs.router.base_router import (
     get_runs,
     remove_run,
     update_run,
-    create_run_policies,
+    set_run_policies,
 )
 
 from robot_server.deck_configuration.store import DeckConfigurationStore
@@ -580,25 +580,12 @@ async def test_create_policies(
 ) -> None:
     """It should call RunDataManager create run policies."""
     policies = decoy.mock(cls=List[ErrorRecoveryRule])
-    await create_run_policies(
+    await set_run_policies(
         runId="rud-id",
-        run_data_manager=mock_run_data_manager,
         request_body=RequestModel(data=policies),
+        run_data_manager=mock_run_data_manager,
     )
-    decoy.verify(
-        await mock_run_data_manager.create_policies(run_id="rud-id", policies=policies)
-    )
-
-
-# async def test_create_policies_raises_no_policies(
-#     decoy: Decoy, mock_run_data_manager: RunDataManager
-# ) -> None:
-#     """It should raise that no policies were accepted."""
-#     policies = decoy.mock(cls=List[ErrorRecoveryRule])
-#     await create_run_policies(runId="rud-id", request_body=RequestModel(data=policies))
-#     decoy.verify(
-#         mock_run_data_manager.create_policies(run_id="rud-id", policies=policies)
-#     )
+    decoy.verify(mock_run_data_manager.set_policies(run_id="rud-id", policies=policies))
 
 
 async def test_create_policies_raises_not_active_run(
@@ -607,13 +594,13 @@ async def test_create_policies_raises_not_active_run(
     """It should raise that the run is not current."""
     policies = decoy.mock(cls=List[ErrorRecoveryRule])
     decoy.when(
-        await mock_run_data_manager.create_policies(run_id="rud-id", policies=policies)
+        mock_run_data_manager.set_policies(run_id="rud-id", policies=policies)
     ).then_raise(RunNotCurrentError())
     with pytest.raises(ApiError) as exc_info:
-        await create_run_policies(
+        await set_run_policies(
             runId="rud-id",
-            run_data_manager=mock_run_data_manager,
             request_body=RequestModel(data=policies),
+            run_data_manager=mock_run_data_manager,
         )
 
     assert exc_info.value.status_code == 409

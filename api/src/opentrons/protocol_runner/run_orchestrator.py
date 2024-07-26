@@ -359,9 +359,9 @@ class RunOrchestrator:
         """Get engine deck type."""
         return self._protocol_engine.state_view.config.deck_type
 
-    async def create_error_recovery_policy(self, policy: ErrorRecoveryPolicy) -> None:
+    def set_error_recovery_policy(self, policy: ErrorRecoveryPolicy) -> None:
         """Create error recovery policy for the run."""
-        await self._protocol_engine.set_error_recovery_policy(policy)
+        self._protocol_engine.set_error_recovery_policy(policy)
 
     async def command_generator(self) -> AsyncGenerator[str, None]:
         """Yield next command to execute."""

@@ -366,12 +366,12 @@ async def update_run(
 
 
 @PydanticResponse.wrap_route(
-    base_router.post,
-    path="/runs/{runId}/policies",
-    summary="Create run policies",
+    base_router.put,
+    path="/runs/{runId}/errorRecoveryPolicies",
+    summary="Set run policies",
     description=dedent(
         """
-        Create run policies for error recovery.
+        Set run policies for error recovery.
         """
     ),
     status_code=status.HTTP_201_CREATED,
@@ -380,22 +380,23 @@ async def update_run(
         status.HTTP_409_CONFLICT: {"model": ErrorBody[RunStopped]},
     },
 )
-async def create_run_policies(
+async def set_run_policies(
     runId: str,
-    request_body: Optional[RequestModel[List[ErrorRecoveryRule]]] = None,
+    request_body: RequestModel[List[ErrorRecoveryRule]],
     run_data_manager: RunDataManager = Depends(get_run_data_manager),
 ) -> PydanticResponse[SimpleEmptyBody]:
     """Create run polices.
 
     Arguments:
         runId: Run ID pulled from URL.
-        request_body: Optional request body with run creation data.
+        request_body:  Request body with run policies data.
         run_data_manager: Current and historical run data management.
     """
-    policies = request_body.data if request_body is not None else None
+    policies = request_body.data
+    print(policies)
     if policies:
         try:
-            await run_data_manager.create_policies(run_id=runId, policies=policies)
+            run_data_manager.set_policies(run_id=runId, policies=policies)
         except RunNotCurrentError as e:
             raise RunStopped(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e
 

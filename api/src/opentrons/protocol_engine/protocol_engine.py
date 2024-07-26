@@ -614,7 +614,7 @@ class ProtocolEngine:
         )
         self._queue_worker.start()
 
-    async def set_error_recovery_policy(self, policy: ErrorRecoveryPolicy) -> None:
+    def set_error_recovery_policy(self, policy: ErrorRecoveryPolicy) -> None:
         """Set error recovery policy for run."""
         raise NotImplementedError("set_error_recovery_policy is not implemented yet")
 

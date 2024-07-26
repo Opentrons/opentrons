@@ -435,9 +435,7 @@ class RunDataManager:
             )
         return self._run_store.get_all_commands_as_preserialized_list(run_id)
 
-    async def create_policies(
-        self, run_id: str, policies: List[ErrorRecoveryRule]
-    ) -> None:
+    def set_policies(self, run_id: str, policies: List[ErrorRecoveryRule]) -> None:
         """Create run policy rules for error recovery."""
         if run_id != self._run_orchestrator_store.current_run_id:
             raise RunNotCurrentError(
@@ -446,7 +444,7 @@ class RunDataManager:
         policy = error_recovery_mapping.create_error_recovery_policy_from_rules(
             policies
         )
-        await self._run_orchestrator_store.create_error_recovery_policy(policy=policy)
+        self._run_orchestrator_store.set_error_recovery_policy(policy=policy)
 
     def _get_state_summary(self, run_id: str) -> Union[StateSummary, BadStateSummary]:
         if run_id == self._run_orchestrator_store.current_run_id:

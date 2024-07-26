@@ -360,9 +360,9 @@ class RunOrchestratorStore:
         """Add a new labware definition to state."""
         return self.run_orchestrator.add_labware_definition(definition)
 
-    async def create_error_recovery_policy(self, policy: ErrorRecoveryPolicy) -> None:
+    def set_error_recovery_policy(self, policy: ErrorRecoveryPolicy) -> None:
         """Create run policy rules for error recovery."""
-        await self.run_orchestrator.create_error_recovery_policy(policy)
+        self.run_orchestrator.set_error_recovery_policy(policy)
 
     async def add_command_and_wait_for_interval(
         self,
