@@ -45,7 +45,8 @@ class JiraTicket:
         return issue_ids
 
     def match_issues(issue_ids, ticket_summary: str):
-        current_error = ticket_summary.split("_")[3]
+        to_link = []
+        error = ticket_summary.split("_")[3]
         robot = ticket_summary.split("_")[0]
         #for every issue see if both match, if yes then grab issue ID and add it to a list
         for i in issue_ids:
@@ -53,6 +54,15 @@ class JiraTicket:
             issue_error = summary.split("_")[3]
             issue_robot = summary.split("_")[0]
             issue_id = issue_ids[i][0]
+            if robot == issue_robot and error == issue_error:
+                to_link.append(issue_id)
+        
+        return to_link
+
+    def link_issues(to_link, ticket_summary: str):
+        print("oh no")
+
+
 
     #function: "match_issues", input would be the list from above, another input is summary of ticket created (ticket_summary: string), 
 
