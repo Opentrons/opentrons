@@ -761,7 +761,7 @@ class OT3API(
 
     @ExecutionManagerProvider.wait_for_running
     async def _update_position_estimation(
-        self, axes: Optional[List[Axis]] = None
+        self, axes: Optional[Sequence[Axis]] = None
     ) -> None:
         """
         Function to update motor estimation for a set of axes
@@ -1140,6 +1140,10 @@ class OT3API(
             y=cur_pos[Axis.Y],
             z=cur_pos[Axis.by_mount(realmount)],
         )
+
+    async def update_axis_position_estimations(self, axes: Sequence[Axis]) -> None:
+        """Update specified axes position estimators from their encoders."""
+        await self._update_position_estimation(axes)
 
     async def move_to(
         self,
