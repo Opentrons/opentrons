@@ -256,7 +256,7 @@ Next, tell the robot to aspirate and dispense some liquid from the reservoir::
     pipette.aspirate(100, reservoir["A1"])
     pipette.dispense(100, plate["A1"])
 
-Liquid detection takes place immediately prior to aspiration. Upon detecting a liquid, the pipette stops, raises itself above the liquid's surface, and then aspirates according to your protocol. Checking for a liquid adds time to your protocol run, so be aware of that before you use it. Flex continues to execute your protocol until it no longer detects liquid. When the robot doesn't detect liquid, it raises an error and stops the protocol until the problem is resolved.
+Liquid detection takes place immediately prior to aspiration. Upon detecting a liquid, the pipette stops, raises itself above the liquid's surface, and then aspirates according to your protocol. Checking for a liquid adds time to your protocol run, so be aware of that before you use it. When the robot doesn't detect liquid during an aspiration, it raises an error and stops the protocol until the problem is resolved.
 
 .. versionadded:: 2.20
 
