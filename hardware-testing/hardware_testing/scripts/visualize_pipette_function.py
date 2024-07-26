@@ -31,7 +31,7 @@ from opentrons.hardware_control.instruments.ot2.instrument_calibration import (
     PipetteOffsetByPipetteMount,
 )
 from opentrons_shared_data.pipette import model_config
-from opentrons_shared_data.pipette.dev_types import PipetteModel
+from opentrons_shared_data.pipette.types import PipetteModel
 
 
 def _user_select_model(model_includes: Optional[str] = None) -> str:

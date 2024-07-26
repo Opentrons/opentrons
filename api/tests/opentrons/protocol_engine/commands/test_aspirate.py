@@ -263,7 +263,10 @@ async def test_overpressure_error(
 
     assert result == DefinedErrorData(
         public=OverpressureError.construct(
-            id=error_id, createdAt=error_timestamp, wrappedErrors=[matchers.Anything()]
+            id=error_id,
+            createdAt=error_timestamp,
+            wrappedErrors=[matchers.Anything()],
+            errorInfo={"retryLocation": (position.x, position.y, position.z)},
         ),
         private=OverpressureErrorInternalData(
             position=DeckPoint(x=position.x, y=position.y, z=position.z)

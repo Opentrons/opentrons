@@ -36,7 +36,7 @@ from .instrument_calibration import (
     load_pipette_offset,
     PipetteOffsetByPipetteMount,
 )
-from opentrons_shared_data.pipette.dev_types import (
+from opentrons_shared_data.pipette.types import (
     UlPerMmAction,
     PipetteName,
     PipetteModel,
@@ -581,6 +581,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
                 "tip_length": self.current_tip_length,
                 "return_tip_height": self.active_tip_settings.default_return_tip_height,
                 "tip_overlap": self.tip_overlap["v0"],
+                "versioned_tip_overlap": self.tip_overlap,
                 "back_compat_names": self._config.pipette_backcompat_names,
                 "supported_tips": self.liquid_class.supported_tips,
             }

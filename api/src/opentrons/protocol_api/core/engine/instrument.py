@@ -30,12 +30,11 @@ from opentrons.protocol_engine.types import (
 from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
-
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
 from opentrons.hardware_control.nozzle_manager import NozzleMap
-from . import deck_conflict
+from . import deck_conflict, overlap_versions
 
 from ..instrument import AbstractInstrument
 from .well import WellCore
@@ -84,6 +83,9 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         self._flow_rates = FlowRates(self)
 
         self.set_default_speed(speed=default_movement_speed)
+        self._liquid_presence_detection = bool(
+            self._engine_client.state.pipettes.get_liquid_presence_detection(pipette_id)
+        )
 
     @property
     def pipette_id(self) -> str:
@@ -747,21 +749,17 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             self._pipette_id
         )
 
+    def get_liquid_presence_detection(self) -> bool:
+        return self._liquid_presence_detection
+
     def is_tip_tracking_available(self) -> bool:
-        primary_nozzle = self._engine_client.state.pipettes.get_primary_nozzle(
-            self._pipette_id
-        )
         if self.get_nozzle_configuration() == NozzleConfigurationType.FULL:
             return True
         else:
             if self.get_channels() == 96:
                 return True
             if self.get_channels() == 8:
-                # TODO: (cb, 03/06/24): Enable automatic tip tracking on the 8 channel pipettes once PAPI support exists
-                return (
-                    self.get_nozzle_configuration() == NozzleConfigurationType.SINGLE
-                    and primary_nozzle == "H1"
-                )
+                return True
         return False
 
     def set_flow_rate(
@@ -780,9 +778,18 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             assert blow_out > 0
             self._blow_out_flow_rate = blow_out
 
+    def set_liquid_presence_detection(self, enable: bool) -> None:
+        self._liquid_presence_detection = enable
+
     def configure_for_volume(self, volume: float) -> None:
         self._engine_client.execute_command(
-            cmd.ConfigureForVolumeParams(pipetteId=self._pipette_id, volume=volume)
+            cmd.ConfigureForVolumeParams(
+                pipetteId=self._pipette_id,
+                volume=volume,
+                tipOverlapNotAfterVersion=overlap_versions.overlap_for_api_version(
+                    self._protocol_core.api_version
+                ),
+            )
         )
 
     def prepare_to_aspirate(self) -> None:
@@ -795,6 +802,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         style: NozzleLayout,
         primary_nozzle: Optional[str],
         front_right_nozzle: Optional[str],
+        back_left_nozzle: Optional[str],
     ) -> None:
         if style == NozzleLayout.COLUMN:
             configuration_model: NozzleLayoutConfigurationType = (
@@ -806,11 +814,11 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             configuration_model = RowNozzleLayoutConfiguration(
                 primaryNozzle=cast(PRIMARY_NOZZLE_LITERAL, primary_nozzle)
             )
-        elif style == NozzleLayout.QUADRANT:
-            assert front_right_nozzle is not None
+        elif style == NozzleLayout.QUADRANT or style == NozzleLayout.PARTIAL_COLUMN:
             configuration_model = QuadrantNozzleLayoutConfiguration(
                 primaryNozzle=cast(PRIMARY_NOZZLE_LITERAL, primary_nozzle),
                 frontRightNozzle=front_right_nozzle,
+                backLeftNozzle=back_left_nozzle,
             )
         elif style == NozzleLayout.SINGLE:
             configuration_model = SingleNozzleLayoutConfiguration(
@@ -828,3 +836,79 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         """Retract this instrument to the top of the gantry."""
         z_axis = self._engine_client.state.pipettes.get_z_axis(self._pipette_id)
         self._engine_client.execute_command(cmd.HomeParams(axes=[z_axis]))
+
+    def detect_liquid_presence(self, well_core: WellCore, loc: Location) -> bool:
+        labware_id = well_core.labware_id
+        well_name = well_core.get_name()
+        well_location = WellLocation(
+            origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0)
+        )
+
+        # The error handling here is a bit nuanced and also a bit broken:
+        #
+        # - If the hardware detects liquid, the `tryLiquidProbe` engine command will
+        #   succeed and return a height, which we'll convert to a `True` return.
+        #   Okay so far.
+        #
+        # - If the hardware detects no liquid, the `tryLiquidProbe` engine command will
+        #   succeed and return `None`, which we'll convert to a `False` return.
+        #   Still okay so far.
+        #
+        # - If there is any other error within the `tryLiquidProbe` command, things get
+        #   messy. It may kick the run into recovery mode. At that point, all bets are
+        #   off--we lose our guarantee of having a `tryLiquidProbe` command whose
+        #   `result` we can inspect. We don't know how to deal with that here, so we
+        #   currently propagate the exception up, which will quickly kill the protocol,
+        #   after a potential split second of recovery mode. It's unclear what would
+        #   be good user-facing behavior here, but it's unfortunate to kill the protocol
+        #   for an error that the engine thinks should be recoverable.
+        result = self._engine_client.execute_command_without_recovery(
+            cmd.TryLiquidProbeParams(
+                labwareId=labware_id,
+                wellName=well_name,
+                wellLocation=well_location,
+                pipetteId=self.pipette_id,
+            )
+        )
+
+        self._protocol_core.set_last_location(location=loc, mount=self.get_mount())
+
+        return result.z_position is not None
+
+    def liquid_probe_with_recovery(self, well_core: WellCore, loc: Location) -> None:
+        labware_id = well_core.labware_id
+        well_name = well_core.get_name()
+        well_location = WellLocation(
+            origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=2)
+        )
+        self._engine_client.execute_command(
+            cmd.LiquidProbeParams(
+                labwareId=labware_id,
+                wellName=well_name,
+                wellLocation=well_location,
+                pipetteId=self.pipette_id,
+            )
+        )
+
+        self._protocol_core.set_last_location(location=loc, mount=self.get_mount())
+
+    def liquid_probe_without_recovery(
+        self, well_core: WellCore, loc: Location
+    ) -> float:
+        labware_id = well_core.labware_id
+        well_name = well_core.get_name()
+        well_location = WellLocation(
+            origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=2)
+        )
+        result = self._engine_client.execute_command_without_recovery(
+            cmd.LiquidProbeParams(
+                labwareId=labware_id,
+                wellName=well_name,
+                wellLocation=well_location,
+                pipetteId=self.pipette_id,
+            )
+        )
+
+        self._protocol_core.set_last_location(location=loc, mount=self.get_mount())
+
+        return result.z_position

@@ -13,7 +13,7 @@ import {
   POSITION_ABSOLUTE,
   RESPONSIVENESS,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
@@ -150,8 +150,8 @@ export function SimpleWizardBody(props: Props): JSX.Element {
           <>
             {isSuccess ? (
               <img
-                width={robotType === FLEX_ROBOT_TYPE ? '250px' : '160px'}
-                height={robotType === FLEX_ROBOT_TYPE ? '208px' : '120px'}
+                width={robotType === FLEX_ROBOT_TYPE ? '170px' : '160px'}
+                height={robotType === FLEX_ROBOT_TYPE ? '141px' : '120px'}
                 src={SuccessIcon}
                 alt="Success Icon"
               />
@@ -163,9 +163,11 @@ export function SimpleWizardBody(props: Props): JSX.Element {
                 aria-label="ot-alert"
               />
             )}
-            <StyledText css={HEADER_STYLE}>{header}</StyledText>
+            <LegacyStyledText css={HEADER_STYLE}>{header}</LegacyStyledText>
             {subHeader != null ? (
-              <StyledText css={SUBHEADER_STYLE}>{subHeader}</StyledText>
+              <LegacyStyledText css={SUBHEADER_STYLE}>
+                {subHeader}
+              </LegacyStyledText>
             ) : (
               <Flex aria-label="flex_spacing" css={FLEX_SPACING_STYLE} />
             )}

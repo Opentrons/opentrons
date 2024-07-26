@@ -11,19 +11,19 @@ import * as Fixtures from '../../../redux/networking/__fixtures__'
 import { NetworkDetailsModal } from '../../RobotSettingsDashboard/NetworkSettings/NetworkDetailsModal'
 import { WifiConnectionDetails } from '../WifiConnectionDetails'
 
-import type { useHistory } from 'react-router-dom'
+import type { NavigateFunction } from 'react-router-dom'
 
 vi.mock('../../../resources/networking/hooks')
 vi.mock('../../../redux/networking')
 vi.mock('../../../redux/discovery/selectors')
 vi.mock('../../RobotSettingsDashboard/NetworkSettings/NetworkDetailsModal')
 
-const mockPush = vi.fn()
+const mockNavigate = vi.fn()
 vi.mock('react-router-dom', async importOriginal => {
-  const actual = await importOriginal<typeof useHistory>()
+  const actual = await importOriginal<NavigateFunction>()
   return {
     ...actual,
-    useHistory: () => ({ push: mockPush } as any),
+    useNavigate: () => mockNavigate,
   }
 })
 
@@ -88,7 +88,7 @@ describe('WifiConnectionDetails', () => {
   it('when clicking Check for updates button, should call mock function', () => {
     render(props)
     fireEvent.click(screen.getByText('Continue'))
-    expect(mockPush).toHaveBeenCalledWith(
+    expect(mockNavigate).toHaveBeenCalledWith(
       '/robot-settings/update-robot-during-onboarding'
     )
   })

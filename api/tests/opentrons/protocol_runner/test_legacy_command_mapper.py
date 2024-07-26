@@ -34,9 +34,9 @@ from opentrons.protocol_runner.legacy_command_mapper import (
     LegacyContextCommandError,
     LegacyCommandMapper,
 )
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
-from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.labware.types import LabwareDefinition
+from opentrons_shared_data.module.types import ModuleDefinitionV3
+from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons.types import DeckSlotName, Mount, MountType
 
 
@@ -336,7 +336,7 @@ def test_map_instrument_load(decoy: Decoy) -> None:
     pipette_config = cast(LoadedStaticPipetteData, {"config": True})
 
     decoy.when(
-        pipette_data_provider.get_pipette_static_config(pipette_dict)
+        pipette_data_provider.get_pipette_static_config(pipette_dict, "v0"),
     ).then_return(pipette_config)
 
     expected_id_and_key = "commands.LOAD_PIPETTE-0"

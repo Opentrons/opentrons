@@ -9,7 +9,7 @@ import {
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TEXT_ALIGN_RIGHT,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -35,13 +35,13 @@ export function CalibrationStatusBanner({
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
-        <StyledText as="p">
+        <LegacyStyledText as="p">
           {taskListStatus === 'bad'
             ? t('recalibration_recommended')
             : t('missing_calibration_data_long')}
-        </StyledText>
+        </LegacyStyledText>
         <RouterLink to={`/devices/${robotName}/robot-settings/calibration`}>
-          <StyledText
+          <LegacyStyledText
             as="p"
             color={COLORS.black90}
             paddingRight={SPACING.spacing16}
@@ -49,7 +49,7 @@ export function CalibrationStatusBanner({
             textDecoration={TYPOGRAPHY.textDecorationUnderline}
           >
             {t('launch_calibration_link_text')}
-          </StyledText>
+          </LegacyStyledText>
         </RouterLink>
       </Flex>
     </Banner>

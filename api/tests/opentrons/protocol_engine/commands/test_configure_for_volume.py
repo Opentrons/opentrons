@@ -1,4 +1,5 @@
 """Test load pipette commands."""
+import pytest
 from decoy import Decoy
 
 from opentrons.protocol_engine.execution import (
@@ -17,22 +18,30 @@ from opentrons.protocol_engine.commands.configure_for_volume import (
     ConfigureForVolumePrivateResult,
     ConfigureForVolumeImplementation,
 )
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.pipette.types import PipetteNameType
 from ..pipette_fixtures import get_default_nozzle_map
 from opentrons.types import Point
 
 
+@pytest.mark.parametrize(
+    "data",
+    [
+        ConfigureForVolumeParams(
+            pipetteId="some id",
+            volume=1,
+        ),
+        ConfigureForVolumeParams(
+            pipetteId="some id",
+            volume=1,
+            tipOverlapNotAfterVersion="v3",
+        ),
+    ],
+)
 async def test_configure_for_volume_implementation(
-    decoy: Decoy,
-    equipment: EquipmentHandler,
+    decoy: Decoy, equipment: EquipmentHandler, data: ConfigureForVolumeParams
 ) -> None:
     """A ConfigureForVolume command should have an execution implementation."""
     subject = ConfigureForVolumeImplementation(equipment=equipment)
-
-    data = ConfigureForVolumeParams(
-        pipetteId="some id",
-        volume=1,
-    )
 
     config = LoadedStaticPipetteData(
         model="some-model",
@@ -50,12 +59,14 @@ async def test_configure_for_volume_implementation(
         nozzle_map=get_default_nozzle_map(PipetteNameType.P300_MULTI),
         back_left_corner_offset=Point(10, 20, 30),
         front_right_corner_offset=Point(40, 50, 60),
+        pipette_lld_settings={},
     )
 
     decoy.when(
         await equipment.configure_for_volume(
             pipette_id="some id",
             volume=1,
+            tip_overlap_version=data.tipOverlapNotAfterVersion,
         )
     ).then_return(
         LoadedConfigureForVolumeData(

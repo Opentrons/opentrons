@@ -13,7 +13,7 @@ import type { Mock } from 'vitest'
 
 vi.mock('../TipSelectionModal')
 vi.mock('../TipSelection')
-vi.mock('../LeftColumnTipInfo')
+vi.mock('../LeftColumnLabwareInfo')
 
 const render = (props: React.ComponentProps<typeof SelectTips>) => {
   return renderWithProviders(<SelectTips {...props} />, {
@@ -59,7 +59,7 @@ describe('SelectTips', () => {
   it('renders the TipSelectionModal when showTipSelectModal is true', () => {
     render(props)
 
-    fireEvent.click(screen.getByText('Change location'))
+    fireEvent.click(screen.getAllByText('Change location')[0])
 
     expect(screen.getByText('MOCK TIP SELECTION MODAL')).toBeInTheDocument()
   })
@@ -84,7 +84,7 @@ describe('SelectTips', () => {
       routeUpdateActions: mockRouteUpdateActions,
     })
 
-    const primaryBtn = screen.getByText('Pick up tips')
+    const primaryBtn = screen.getAllByText('Pick up tips')[0]
     fireEvent.click(primaryBtn)
 
     await waitFor(() => {
@@ -117,7 +117,7 @@ describe('SelectTips', () => {
   it('calls goBackPrevStep when the secondary button is clicked', () => {
     render(props)
 
-    fireEvent.click(screen.getByText('Go back'))
+    fireEvent.click(screen.getAllByText('Go back')[0])
 
     expect(mockGoBackPrevStep).toHaveBeenCalled()
   })
@@ -133,7 +133,9 @@ describe('SelectTips', () => {
     }
     render(props)
 
-    const tertiaryBtn = screen.getByRole('button', { name: 'Change location' })
-    expect(tertiaryBtn).toBeDisabled()
+    const tertiaryBtn = screen.getAllByRole('button', {
+      name: 'Change location',
+    })
+    expect(tertiaryBtn[0]).toBeDisabled()
   })
 })

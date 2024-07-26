@@ -10,7 +10,7 @@ import {
   PrimaryButton,
   SIZE_1,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 import { DETACH } from './constants'
 
@@ -67,11 +67,11 @@ export function CheckPipettesButton(
           spin
           marginRight={SPACING.spacing8}
         />
-        <StyledText>
+        <LegacyStyledText>
           {direction === DETACH
             ? t('confirming_detachment')
             : t('confirming_attachment')}
-        </StyledText>
+        </LegacyStyledText>
       </>
     )
   } else if (children == null && !isPending) {

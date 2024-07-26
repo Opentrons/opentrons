@@ -50,7 +50,7 @@ import type { ProfileFormError } from '../../steplist/formLevel/profileErrors'
 import type { LabwareDefByDefURI } from '../../labware-defs'
 import type { FormWarning } from '../../steplist/formLevel'
 import type { BaseState, DeckSlot } from '../../types'
-import type { FormData, StepIdType } from '../../form-types'
+import type { FormData, ProfileItem, StepIdType } from '../../form-types'
 import type {
   StepArgsAndErrorsById,
   StepFormErrors,
@@ -246,8 +246,8 @@ const _getInitialDeckSetup = (
   }, {})
 
   return {
-    labware: mapValues<{}, LabwareOnDeck>(
-      labwareLocations,
+    labware: mapValues<Record<DeckSlot, string>, LabwareOnDeck>(
+      labwareLocations as Record<DeckSlot, string>,
       (slot: DeckSlot, labwareId: string): LabwareOnDeck => {
         return {
           slot,
@@ -255,8 +255,8 @@ const _getInitialDeckSetup = (
         }
       }
     ),
-    modules: mapValues<{}, ModuleOnDeck>(
-      moduleLocations,
+    modules: mapValues<Record<DeckSlot, string>, ModuleOnDeck>(
+      moduleLocations as Record<DeckSlot, string>,
       (slot: DeckSlot, moduleId: string): ModuleOnDeck => {
         const moduleEntity = moduleEntities[moduleId]
 
@@ -313,7 +313,7 @@ const _getInitialDeckSetup = (
       }
     ),
     pipettes: mapValues<{}, PipetteOnDeck>(
-      pipetteLocations,
+      pipetteLocations as Record<Mount, string>,
       (mount: Mount, pipetteId: string): PipetteOnDeck => {
         return { mount, ...pipetteEntities[pipetteId] }
       }
@@ -554,7 +554,7 @@ export const _hasFieldLevelErrors = (hydratedForm: FormData): boolean => {
       hydratedForm.stepType === 'thermocycler' &&
       fieldName === 'profileItemsById'
     ) {
-      if (getProfileItemsHaveErrors(value)) {
+      if (getProfileItemsHaveErrors(value as Record<string, ProfileItem>)) {
         return true
       }
     } else {
@@ -613,6 +613,7 @@ export const getInvariantContext: Selector<
   featureFlagSelectors.getDisableModuleRestrictions,
   featureFlagSelectors.getAllowAllTipracks,
   featureFlagSelectors.getEnableAbsorbanceReader,
+  featureFlagSelectors.getEnableRedesign,
   (
     labwareEntities,
     moduleEntities,
@@ -620,7 +621,8 @@ export const getInvariantContext: Selector<
     additionalEquipmentEntities,
     disableModuleRestrictions,
     allowAllTipracks,
-    enableAbsorbanceReader
+    enableAbsorbanceReader,
+    enableEnableRedesign
   ) => ({
     labwareEntities,
     moduleEntities,
@@ -630,6 +632,7 @@ export const getInvariantContext: Selector<
       OT_PD_ALLOW_ALL_TIPRACKS: Boolean(allowAllTipracks),
       OT_PD_DISABLE_MODULE_RESTRICTIONS: Boolean(disableModuleRestrictions),
       OT_PD_ENABLE_ABSORBANCE_READER: Boolean(enableAbsorbanceReader),
+      OT_PD_ENABLE_REDESIGN: Boolean(enableEnableRedesign),
     },
   })
 )

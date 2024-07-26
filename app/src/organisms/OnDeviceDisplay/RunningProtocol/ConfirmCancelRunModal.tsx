@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 
 import { RUN_STATUS_STOPPED } from '@opentrons/api-client'
@@ -10,7 +10,7 @@ import {
   DIRECTION_ROW,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 import {
   useStopRunMutation,
@@ -50,7 +50,7 @@ export function ConfirmCancelRunModal({
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name ?? ''
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
-  const history = useHistory()
+  const navigate = useNavigate()
   const [isCanceling, setIsCanceling] = React.useState(false)
 
   const modalHeader: ModalHeaderBaseProps = {
@@ -75,9 +75,9 @@ export function ConfirmCancelRunModal({
       dismissCurrentRun(runId)
       if (!isActiveRun) {
         if (protocolId != null) {
-          history.push(`/protocols/${protocolId}`)
+          navigate(`/protocols/${protocolId}`)
         } else {
-          history.push(`/protocols`)
+          navigate('/protocols')
         }
       }
     }
@@ -100,8 +100,12 @@ export function ConfirmCancelRunModal({
           paddingBottom={SPACING.spacing32}
           paddingTop={`${isActiveRun ? SPACING.spacing32 : '0'}`}
         >
-          <StyledText as="p">{t('cancel_run_alert_info_flex')}</StyledText>
-          <StyledText as="p">{t('cancel_run_module_info')}</StyledText>
+          <LegacyStyledText as="p">
+            {t('cancel_run_alert_info_flex')}
+          </LegacyStyledText>
+          <LegacyStyledText as="p">
+            {t('cancel_run_module_info')}
+          </LegacyStyledText>
         </Flex>
         <Flex
           flexDirection={DIRECTION_ROW}

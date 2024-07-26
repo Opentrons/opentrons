@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Optional, Union
 from opentrons import types
 from opentrons.hardware_control import CriticalPoint
 from opentrons.hardware_control.dev_types import PipetteDict
+from opentrons.protocol_api.core.common import WellCore
 from opentrons.protocols.api_support import instrument as instrument_support
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.api_support.labware_like import LabwareLike
@@ -61,6 +62,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
             blow_out_defaults=pipette_state["default_blow_out_flow_rates"],
             api_level=self._api_version,
         )
+        self._liquid_presence_detection = False
 
     def get_default_speed(self) -> float:
         """Gets the speed at which the robot's gantry moves."""
@@ -133,10 +135,10 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
         """
         if isinstance(location, (TrashBin, WasteChute)):
             raise APIVersionError(
-                "Dispense in Moveable Trash or Waste Chute are not supported in this API Version."
+                api_element="Dispense in Moveable Trash or Waste Chute"
             )
         if push_out:
-            raise APIVersionError("push_out is not supported in this API version.")
+            raise APIVersionError(api_element="push_out")
         if not in_place:
             self.move_to(location=location)
 
@@ -157,7 +159,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
         """
         if isinstance(location, (TrashBin, WasteChute)):
             raise APIVersionError(
-                "Blow Out in Moveable Trash or Waste Chute are not supported in this API Version."
+                api_element="Blow Out in Moveable Trash or Waste Chute"
             )
 
         if not in_place:
@@ -247,9 +249,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
             home_after: Whether to home the pipette after the tip is dropped.
         """
         if alternate_drop_location:
-            raise APIVersionError(
-                "Tip drop randomization is not supported in this API version."
-            )
+            raise APIVersionError(api_element="Tip drop randomization")
         labware_core = well_core.geometry.parent
 
         if location is None:
@@ -300,9 +300,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
         home_after: Optional[bool],
         alternate_tip_drop: bool = False,
     ) -> None:
-        raise APIVersionError(
-            "Dropping tips in a trash bin or waste chute is not supported in this API Version."
-        )
+        raise APIVersionError(api_element="Dropping tips in a trash bin or waste chute")
 
     def home(self) -> None:
         """Home the mount"""
@@ -340,9 +338,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
                 the computed safe travel height.
         """
         if isinstance(location, (TrashBin, WasteChute)):
-            raise APIVersionError(
-                "Move To Trash Bin and Waste Chute are not supported in this API Version."
-            )
+            raise APIVersionError(api_element="Move To Trash Bin and Waste Chute")
         self.flag_unsafe_move(location)
 
         # prevent direct movement bugs in PAPI version >= 2.10
@@ -471,6 +467,9 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
     def get_flow_rate(self) -> FlowRates:
         return self._flow_rates
 
+    def get_liquid_presence_detection(self) -> bool:
+        return self._liquid_presence_detection
+
     def get_aspirate_flow_rate(self, rate: float = 1.0) -> float:
         return self.get_hardware_state()["aspirate_flow_rate"] * rate
 
@@ -496,6 +495,9 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
             dispense=dispense,
             blow_out=blow_out,
         )
+
+    def set_liquid_presence_detection(self, enable: bool) -> None:
+        self._protocol_interface.get_hardware().set_liquid_presence_detection(enable)
 
     def set_pipette_speed(
         self,
@@ -543,6 +545,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
         style: NozzleLayout,
         primary_nozzle: Optional[str],
         front_right_nozzle: Optional[str],
+        back_left_nozzle: Optional[str],
     ) -> None:
         """This will never be called because it was added in API 2.16."""
         pass
@@ -562,3 +565,19 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
     def retract(self) -> None:
         """Retract this instrument to the top of the gantry."""
         self._protocol_interface.get_hardware.retract(self._mount)  # type: ignore [attr-defined]
+
+    def detect_liquid_presence(self, well_core: WellCore, loc: types.Location) -> bool:
+        """This will never be called because it was added in API 2.20."""
+        assert False, "detect_liquid_presence only supported in API 2.20 & later"
+
+    def liquid_probe_with_recovery(
+        self, well_core: WellCore, loc: types.Location
+    ) -> None:
+        """This will never be called because it was added in API 2.20."""
+        assert False, "liquid_probe_with_recovery only supported in API 2.20 & later"
+
+    def liquid_probe_without_recovery(
+        self, well_core: WellCore, loc: types.Location
+    ) -> float:
+        """This will never be called because it was added in API 2.20."""
+        assert False, "liquid_probe_without_recovery only supported in API 2.20 & later"

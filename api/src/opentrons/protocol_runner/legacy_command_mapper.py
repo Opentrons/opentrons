@@ -11,7 +11,7 @@ from opentrons.hardware_control.modules.types import (
     ThermocyclerModuleModel,
     HeaterShakerModuleModel,
 )
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons.types import MountType, DeckSlotName, Location
 from opentrons.legacy_commands import types as legacy_command_types
 from opentrons.protocol_api import InstrumentContext
@@ -719,7 +719,10 @@ class LegacyCommandMapper:
             pipette_id=pipette_id,
             serial_number=serial,
             config=pipette_data_provider.get_pipette_static_config(
-                instrument_load_info.pipette_dict
+                # Compatibility note - this is the version of tip overlap data, it stays at 0
+                # so protocol behavior does not change when you run a legacy JSON protocol
+                instrument_load_info.pipette_dict,
+                "v0",
             ),
         )
         queue_action = pe_actions.QueueCommandAction(

@@ -4,8 +4,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, screen, waitFor, renderHook } from '@testing-library/react'
 import { createStore } from 'redux'
 
-import { COLORS } from '@opentrons/components'
-
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { mockRecoveryContentProps } from '../__fixtures__'
@@ -36,9 +34,25 @@ describe('useRunPausedSplash', () => {
     )
   })
 
-  it('returns true if on the ODD', () => {
-    const { result } = renderHook(() => useRunPausedSplash(), { wrapper })
-    expect(result.current).toEqual(true)
+  const TEST_CASES = [
+    { isOnDevice: true, showERWizard: true, expected: true },
+    { isOnDevice: true, showERWizard: false, expected: true },
+    { isOnDevice: false, showERWizard: true, expected: false },
+    { isOnDevice: false, showERWizard: false, expected: true },
+  ]
+
+  describe('useRunPausedSplash', () => {
+    TEST_CASES.forEach(({ isOnDevice, showERWizard, expected }) => {
+      it(`returns ${expected} when isOnDevice is ${isOnDevice} and showERWizard is ${showERWizard}`, () => {
+        const { result } = renderHook(
+          () => useRunPausedSplash(isOnDevice, showERWizard),
+          {
+            wrapper,
+          }
+        )
+        expect(result.current).toEqual(expected)
+      })
+    })
   })
 })
 
@@ -86,7 +100,8 @@ describe('RunPausedSplash', () => {
       ...props,
       failedCommand: {
         ...props.failedCommand,
-        error: { errorType: 'overpressure' },
+        commandType: 'aspirate',
+        error: { isDefined: true, errorType: 'overpressure' },
       } as any,
     }
     render(props)
@@ -104,16 +119,6 @@ describe('RunPausedSplash', () => {
 
     expect(primaryBtn).toBeInTheDocument()
     expect(secondaryBtn).toBeInTheDocument()
-
-    expect(primaryBtn).toHaveStyle({ 'background-color': 'transparent' })
-    expect(secondaryBtn).toHaveStyle({ 'background-color': COLORS.white })
-
-    expect(screen.getByLabelText('remove icon')).toHaveStyle({
-      color: COLORS.red50,
-    })
-    expect(screen.getByLabelText('recovery icon')).toHaveStyle({
-      color: COLORS.white,
-    })
 
     fireEvent.click(secondaryBtn)
 

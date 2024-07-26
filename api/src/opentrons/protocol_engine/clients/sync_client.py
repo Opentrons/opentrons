@@ -2,7 +2,7 @@
 
 from typing import cast, Any, Optional, overload
 
-from opentrons_shared_data.labware.dev_types import LabwareUri
+from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 from .. import commands
@@ -75,6 +75,18 @@ class SyncClient:
     def execute_command_without_recovery(
         self, params: commands.LoadPipetteParams
     ) -> commands.LoadPipetteResult:
+        pass
+
+    @overload
+    def execute_command_without_recovery(
+        self, params: commands.LiquidProbeParams
+    ) -> commands.LiquidProbeResult:
+        pass
+
+    @overload
+    def execute_command_without_recovery(
+        self, params: commands.TryLiquidProbeParams
+    ) -> commands.TryLiquidProbeResult:
         pass
 
     def execute_command_without_recovery(

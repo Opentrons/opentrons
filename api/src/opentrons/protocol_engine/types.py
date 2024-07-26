@@ -16,7 +16,7 @@ from pydantic import (
 from typing import Optional, Union, List, Dict, Any, NamedTuple, Tuple, FrozenSet
 from typing_extensions import Literal, TypeGuard
 
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons.types import MountType, DeckSlotName, StagingSlotName
 from opentrons.hardware_control.types import (
     TipStateType as HwTipStateType,
@@ -26,33 +26,78 @@ from opentrons.hardware_control.modules import (
     ModuleType as ModuleType,
 )
 
-from opentrons_shared_data.pipette.dev_types import (  # noqa: F401
+from opentrons_shared_data.pipette.types import (  # noqa: F401
     # convenience re-export of LabwareUri type
     LabwareUri as LabwareUri,
 )
-from opentrons_shared_data.module.dev_types import ModuleType as SharedDataModuleType
+from opentrons_shared_data.module.types import ModuleType as SharedDataModuleType
 
 
+# todo(mm, 2024-06-24): This monolithic status field is getting to be a bit much.
+# We should consider splitting this up into multiple fields.
 class EngineStatus(str, Enum):
-    """Current execution status of a ProtocolEngine."""
+    """Current execution status of a ProtocolEngine.
+
+    This is a high-level summary of what the robot is doing and what interactions are
+    appropriate.
+    """
+
+    # Statuses for an ongoing run:
 
     IDLE = "idle"
+    """The protocol has not been started yet.
+
+    The robot may truly be idle, or it may be executing commands with `intent: "setup"`.
+    """
+
     RUNNING = "running"
+    """The engine is actively running the protocol."""
+
     PAUSED = "paused"
+    """A pause has been requested. Activity is paused, or will pause soon.
+
+    (There is currently no way to tell which.)
+    """
+
     BLOCKED_BY_OPEN_DOOR = "blocked-by-open-door"
+    """The robot's door is open. Activity is paused, or will pause soon."""
+
     STOP_REQUESTED = "stop-requested"
-    STOPPED = "stopped"
+    """A stop has been requested. Activity will stop soon."""
+
     FINISHING = "finishing"
-    FAILED = "failed"
-    SUCCEEDED = "succeeded"
+    """The robot is doing post-run cleanup, like homing and dropping tips."""
+
+    # Statuses for error recovery mode:
 
     AWAITING_RECOVERY = "awaiting-recovery"
     """The engine is waiting for external input to recover from a nonfatal error.
 
-    New fixup commands may be enqueued, which will run immediately.
+    New commands with `intent: "fixit"` may be enqueued, which will run immediately.
     The run can't be paused in this state, but it can be canceled, or resumed from the
     next protocol command if recovery is complete.
     """
+
+    AWAITING_RECOVERY_PAUSED = "awaiting-recovery-paused"
+    """The engine is paused while in error recovery mode. Activity is paused, or will pause soon.
+
+    This state is not possible to enter manually. It happens when an open door
+    gets closed during error recovery.
+    """
+
+    AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR = "awaiting-recovery-blocked-by-open-door"
+    """The robot's door is open while in recovery mode. Activity is paused, or will pause soon."""
+
+    # Terminal statuses:
+
+    STOPPED = "stopped"
+    """All activity is over; it was stopped by an explicit external request."""
+
+    FAILED = "failed"
+    """All activity is over; there was a fatal error."""
+
+    SUCCEEDED = "succeeded"
+    """All activity is over; things completed without any fatal error."""
 
 
 class DeckSlotLocation(BaseModel):
@@ -302,7 +347,7 @@ class MotorAxis(str, Enum):
     EXTENSION_JAW = "extensionJaw"
 
 
-# TODO(mc, 2022-01-18): use opentrons_shared_data.module.dev_types.ModuleModel
+# TODO(mc, 2022-01-18): use opentrons_shared_data.module.types.ModuleModel
 class ModuleModel(str, Enum):
     """All available modules' models."""
 
@@ -831,10 +876,15 @@ class QuadrantNozzleLayoutConfiguration(BaseModel):
         ...,
         description="The primary nozzle to use in the layout configuration. This nozzle will update the critical point of the current pipette. For now, this is also the back left corner of your rectangle.",
     )
-    frontRightNozzle: str = Field(
+    frontRightNozzle: Optional[str] = Field(
         ...,
         regex=NOZZLE_NAME_REGEX,
         description="The front right nozzle in your configuration.",
+    )
+    backLeftNozzle: Optional[str] = Field(
+        ...,
+        regex=NOZZLE_NAME_REGEX,
+        description="The back left nozzle in your configuration.",
     )
 
 

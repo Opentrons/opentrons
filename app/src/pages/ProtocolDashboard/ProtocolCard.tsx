@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { Trans, useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
 import { formatDistance } from 'date-fns'
@@ -10,16 +10,15 @@ import {
   ALIGN_CENTER,
   ALIGN_END,
   BORDERS,
+  Chip,
   COLORS,
   DIRECTION_COLUMN,
-  DIRECTION_ROW,
   Flex,
   Icon,
+  LegacyStyledText,
   OVERFLOW_WRAP_ANYWHERE,
   OVERFLOW_WRAP_BREAK_WORD,
-  SIZE_2,
   SPACING,
-  StyledText,
   TYPOGRAPHY,
   useLongPress,
 } from '@opentrons/components'
@@ -34,6 +33,7 @@ import { SmallButton } from '../../atoms/buttons'
 import { Modal } from '../../molecules/Modal'
 import { LongPressModal } from './LongPressModal'
 import { formatTimeWithUtcLabel } from '../../resources/runs'
+import { useFeatureFlag } from '../../redux/config'
 
 import type { UseLongPressResult } from '@opentrons/components'
 import type { ProtocolResource } from '@opentrons/shared-data'
@@ -41,21 +41,25 @@ import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 
 const REFETCH_INTERVAL = 5000
 
-export function ProtocolCard(props: {
+interface ProtocolCardProps {
   protocol: ProtocolResource
   longPress: React.Dispatch<React.SetStateAction<boolean>>
   setShowDeleteConfirmationModal: (showDeleteConfirmationModal: boolean) => void
   setTargetProtocolId: (targetProtocolId: string) => void
   lastRun?: string
-}): JSX.Element {
+  setIsRequiredCSV: (isRequiredCSV: boolean) => void
+}
+
+export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
   const {
     protocol,
     lastRun,
     longPress,
     setShowDeleteConfirmationModal,
     setTargetProtocolId,
+    setIsRequiredCSV,
   } = props
-  const history = useHistory()
+  const navigate = useNavigate()
   const [showIcon, setShowIcon] = React.useState<boolean>(false)
   const [
     showFailedAnalysisModal,
@@ -66,6 +70,8 @@ export function ProtocolCard(props: {
   const longpress = useLongPress()
   const queryClient = useQueryClient()
   const host = useHost()
+  // ToDo (kk:06/12/2024) this will be removed when we freeze the code
+  const enableCsvFile = useFeatureFlag('enableCsvFile')
 
   const { id: protocolId, analysisSummaries } = protocol
   const {
@@ -100,6 +106,11 @@ export function ProtocolCard(props: {
         analysisForProtocolCard.result === 'not-ok')) ??
     false
 
+  // ToDo (kk:06/25/2024) remove ff when we are ready for freezing the code
+  const isRequiredCSV =
+    enableCsvFile &&
+    analysisForProtocolCard?.result === 'parameter-value-required'
+
   const isPendingAnalysis = analysisForProtocolCard == null
 
   const handleProtocolClick = (
@@ -109,7 +120,7 @@ export function ProtocolCard(props: {
     if (isFailedAnalysis) {
       setShowFailedAnalysisModal(true)
     } else if (!longpress.isLongPressed) {
-      history.push(`/protocols/${protocolId}`)
+      navigate(`/protocols/${protocolId}`)
     }
   }
 
@@ -117,8 +128,16 @@ export function ProtocolCard(props: {
     if (longpress.isLongPressed) {
       longPress(true)
       setTargetProtocolId(protocol.id)
+      setIsRequiredCSV(isRequiredCSV)
     }
-  }, [longpress.isLongPressed, longPress, protocol.id, setTargetProtocolId])
+  }, [
+    longpress.isLongPressed,
+    longPress,
+    protocol.id,
+    setTargetProtocolId,
+    isRequiredCSV,
+    setIsRequiredCSV,
+  ])
 
   const failedAnalysisHeader: ModalHeaderBaseProps = {
     title: i18n.format(t('protocol_analysis_failed'), 'capitalize'),
@@ -162,20 +181,27 @@ export function ProtocolCard(props: {
     }
   }
 
+  let pushedBackgroundColor = 'COLORS.grey50'
+  if (isFailedAnalysis) {
+    pushedBackgroundColor = COLORS.red40
+  } else if (isRequiredCSV) {
+    pushedBackgroundColor = COLORS.yellow40
+  }
+
   const PUSHED_STATE_STYLE = css`
     &:active {
-      background-color: ${longpress.isLongPressed
-        ? ''
-        : isFailedAnalysis
-        ? COLORS.red40
-        : COLORS.grey50};
+      background-color: ${longpress.isLongPressed ? '' : pushedBackgroundColor};
     }
   `
 
+  let protocolCardBackgroundColor = COLORS.grey35
+  if (isFailedAnalysis) protocolCardBackgroundColor = COLORS.red35
+  if (isRequiredCSV) protocolCardBackgroundColor = COLORS.yellow35
+
   return (
     <Flex
-      alignItems={isFailedAnalysis ? ALIGN_END : ALIGN_CENTER}
-      backgroundColor={isFailedAnalysis ? COLORS.red35 : COLORS.grey35}
+      alignItems={isFailedAnalysis || isRequiredCSV ? ALIGN_END : ALIGN_CENTER}
+      backgroundColor={protocolCardBackgroundColor}
       borderRadius={BORDERS.borderRadius16}
       marginBottom={SPACING.spacing8}
       gridGap={SPACING.spacing48}
@@ -185,13 +211,14 @@ export function ProtocolCard(props: {
       padding={SPACING.spacing24}
       ref={longpress.ref}
       css={PUSHED_STATE_STYLE}
+      data-testid="protocol_card"
     >
       {isPendingAnalysis ? (
         <Icon
           name="ot-spinner"
           aria-label="Protocol is loading"
           spin
-          size={SIZE_2}
+          size="2rem"
           marginY={'-1.5rem'}
           opacity={0.7}
         />
@@ -203,42 +230,36 @@ export function ProtocolCard(props: {
         gridGap={SPACING.spacing8}
       >
         {isFailedAnalysis ? (
-          <Flex
-            color={COLORS.red60}
-            flexDirection={DIRECTION_ROW}
-            gridGap={SPACING.spacing8}
-          >
-            <Icon
-              name="ot-alert"
-              size="1.5rem"
-              aria-label="failedAnalysis_icon"
-            />
-            <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-              {i18n.format(t('failed_analysis'), 'capitalize')}
-            </StyledText>
-          </Flex>
+          <Chip
+            type="error"
+            text={i18n.format(t('failed_analysis'), 'capitalize')}
+            background={false}
+          />
         ) : null}
-        <StyledText
+        {isRequiredCSV ? (
+          <Chip type="warning" text={t('requires_csv')} background={false} />
+        ) : null}
+        <LegacyStyledText
           as="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           opacity={isPendingAnalysis ? 0.7 : 1}
         >
           {protocolName}
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
       <Flex width="9.25rem">
-        <StyledText as="p" color={COLORS.grey60} whiteSpace="nowrap">
+        <LegacyStyledText as="p" color={COLORS.grey60} whiteSpace="nowrap">
           {lastRun != null
             ? formatDistance(new Date(lastRun), new Date(), {
                 addSuffix: true,
               }).replace('about ', '')
             : t('no_history')}
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
       <Flex width="12.5rem" whiteSpace="nowrap">
-        <StyledText as="p" color={COLORS.grey60}>
+        <LegacyStyledText as="p" color={COLORS.grey60}>
           {formatTimeWithUtcLabel(protocol.createdAt)}
-        </StyledText>
+        </LegacyStyledText>
         {longpress.isLongPressed && !isFailedAnalysis && (
           <LongPressModal
             longpress={longpress}
@@ -271,7 +292,7 @@ export function ProtocolCard(props: {
                   i18nKey={t('error_analyzing', { protocolName })}
                   components={{
                     block: (
-                      <StyledText
+                      <LegacyStyledText
                         as="p"
                         css={css`
                           display: -webkit-box;
@@ -287,9 +308,9 @@ export function ProtocolCard(props: {
                   }}
                 />
 
-                <StyledText as="p">
+                <LegacyStyledText as="p">
                   {t('branded:delete_protocol_from_app')}
-                </StyledText>
+                </LegacyStyledText>
               </Flex>
               <SmallButton
                 onClick={handleDeleteProtocol}

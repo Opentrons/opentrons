@@ -3,13 +3,15 @@ import enum
 from numpy import array, dot, double as npdouble
 from numpy.typing import NDArray
 from typing import Optional, List, Tuple, Union, cast, TypeVar, Dict
+from dataclasses import dataclass
+from functools import cached_property
 
 from opentrons.types import Point, DeckSlotName, StagingSlotName, MountType
 
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
-from opentrons_shared_data.deck.dev_types import CutoutFixture
+from opentrons_shared_data.deck.types import CutoutFixture
 from opentrons_shared_data.pipette import PIPETTE_X_SPAN
-from opentrons_shared_data.pipette.dev_types import ChannelCount
+from opentrons_shared_data.pipette.types import ChannelCount
 
 from .. import errors
 from ..errors import (
@@ -71,6 +73,12 @@ class _GripperMoveType(enum.Enum):
     DROP_LABWARE = enum.auto()
 
 
+@dataclass
+class _AbsoluteRobotExtents:
+    front_left: Dict[MountType, Point]
+    back_right: Dict[MountType, Point]
+
+
 _LabwareLocation = TypeVar("_LabwareLocation", bound=LabwareLocation)
 
 
@@ -94,6 +102,24 @@ class GeometryView:
         self._pipettes = pipette_view
         self._addressable_areas = addressable_area_view
         self._last_drop_tip_location_spot: Dict[str, _TipDropSection] = {}
+
+    @cached_property
+    def absolute_deck_extents(self) -> _AbsoluteRobotExtents:
+        """The absolute deck extents for a given robot deck."""
+        left_offset = self._addressable_areas.mount_offsets["left"]
+        right_offset = self._addressable_areas.mount_offsets["right"]
+
+        front_left_abs = {
+            MountType.LEFT: Point(left_offset.x, -1 * left_offset.y, left_offset.z),
+            MountType.RIGHT: Point(right_offset.x, -1 * right_offset.y, right_offset.z),
+        }
+        back_right_abs = {
+            MountType.LEFT: self._addressable_areas.deck_extents + left_offset,
+            MountType.RIGHT: self._addressable_areas.deck_extents + right_offset,
+        }
+        return _AbsoluteRobotExtents(
+            front_left=front_left_abs, back_right=back_right_abs
+        )
 
     def get_labware_highest_z(self, labware_id: str) -> float:
         """Get the highest Z-point of a labware."""

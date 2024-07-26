@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
-import { StaticRouter } from 'react-router-dom'
+import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { when } from 'vitest-when'
 
@@ -19,7 +19,6 @@ import {
   getUnreachableRobots,
   startDiscovery,
 } from '../../../redux/discovery'
-import { useFeatureFlag } from '../../../redux/config'
 import { getRobotUpdateDisplayInfo } from '../../../redux/robot-update'
 import {
   mockConnectableRobot,
@@ -44,19 +43,17 @@ vi.mock('../../../organisms/RunTimeControl/hooks')
 vi.mock('../../../redux/discovery')
 vi.mock('../../../redux/robot-update')
 vi.mock('../../../redux/networking')
-vi.mock('../../../redux/config')
 vi.mock('../useCreateRunFromProtocol')
 vi.mock('../../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis')
 vi.mock('../../../resources/useNotifyDataReady')
-vi.mock('../../../redux/config')
 
 const render = (
   props: React.ComponentProps<typeof ChooseRobotToRunProtocolSlideout>
 ) => {
   return renderWithProviders(
-    <StaticRouter>
+    <MemoryRouter>
       <ChooseRobotToRunProtocolSlideout {...props} />
-    </StaticRouter>,
+    </MemoryRouter>,
     {
       i18nInstance: i18n,
     }
@@ -75,7 +72,6 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     mockTrackCreateProtocolRunEvent = vi.fn(
       () => new Promise(resolve => resolve({}))
     )
-    vi.mocked(useFeatureFlag).mockReturnValue(true)
     vi.mocked(getRobotUpdateDisplayInfo).mockReturnValue({
       autoUpdateAction: '',
       autoUpdateDisabledReason: null,
@@ -98,20 +94,14 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
       .calledWith(
         expect.any(Object),
         { hostname: expect.any(String) },
-        expect.any(Array),
-        expect.any(Object)
+        expect.any(Array)
       )
       .thenReturn({
         createRunFromProtocolSource: mockCreateRunFromProtocolSource,
         reset: mockResetCreateRun,
       } as any)
     when(vi.mocked(useCreateRunFromProtocol))
-      .calledWith(
-        expect.any(Object),
-        null,
-        expect.any(Array),
-        expect.any(Object)
-      )
+      .calledWith(expect.any(Object), null, expect.any(Array))
       .thenReturn({
         createRunFromProtocolSource: mockCreateRunFromProtocolSource,
         reset: mockResetCreateRun,
@@ -126,6 +116,12 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
       .calledWith(
         storedProtocolDataFixture.mostRecentAnalysis,
         expect.any(String)
+      )
+      .thenReturn([])
+    when(vi.mocked(useOffsetCandidatesForAnalysis))
+      .calledWith(
+        storedProtocolDataWithCsvRunTimeParameter.mostRecentAnalysis,
+        null
       )
       .thenReturn([])
     when(vi.mocked(useOffsetCandidatesForAnalysis))
@@ -190,7 +186,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     expect(vi.mocked(startDiscovery)).toHaveBeenCalled()
     expect(dispatch).toHaveBeenCalledWith({ type: 'mockStartDiscovery' })
   })
-  it('defaults to first available robot and allows an available robot to be selected', () => {
+  it('defaults to first available robot and allows an available robot to be selected', async () => {
     vi.mocked(getConnectableRobots).mockReturnValue([
       { ...mockConnectableRobot, name: 'otherRobot', ip: 'otherIp' },
       mockConnectableRobot,
@@ -212,10 +208,13 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     const confirm = screen.getByRole('button', { name: 'Confirm values' })
     expect(confirm).not.toBeDisabled()
     fireEvent.click(confirm)
-    expect(mockCreateRunFromProtocolSource).toHaveBeenCalledWith({
-      files: [expect.any(File)],
-      protocolKey: storedProtocolDataFixture.protocolKey,
-    })
+    await waitFor(() =>
+      expect(mockCreateRunFromProtocolSource).toHaveBeenCalledWith({
+        files: [expect.any(File)],
+        protocolKey: storedProtocolDataFixture.protocolKey,
+        runTimeParameterValues: expect.any(Object),
+      })
+    )
     expect(mockTrackCreateProtocolRunEvent).toHaveBeenCalled()
   })
   it('if selected robot is on a different version of the software than the app, disable CTA and show link to device details in options', () => {
@@ -240,7 +239,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     fireEvent.click(linkToRobotDetails)
   })
 
-  it('renders error state when there is a run creation error', () => {
+  it('renders error state when there is a run creation error', async () => {
     vi.mocked(useCreateRunFromProtocol).mockReturnValue({
       runCreationError: 'run creation error',
       createRunFromProtocolSource: mockCreateRunFromProtocolSource,
@@ -258,16 +257,19 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     })
     fireEvent.click(proceedButton)
     fireEvent.click(screen.getByRole('button', { name: 'Confirm values' }))
-    expect(mockCreateRunFromProtocolSource).toHaveBeenCalledWith({
-      files: [expect.any(File)],
-      protocolKey: storedProtocolDataFixture.protocolKey,
-    })
+    await waitFor(() =>
+      expect(mockCreateRunFromProtocolSource).toHaveBeenCalledWith({
+        files: [expect.any(File)],
+        protocolKey: storedProtocolDataFixture.protocolKey,
+        runTimeParameterValues: expect.any(Object),
+      })
+    )
     expect(mockTrackCreateProtocolRunEvent).toHaveBeenCalled()
     // TODO( jr, 3.13.24): fix this when page 2 is completed of the multislideout
     // expect(screen.getByText('run creation error')).toBeInTheDocument()
   })
 
-  it('renders error state when run creation error code is 409', () => {
+  it('renders error state when run creation error code is 409', async () => {
     vi.mocked(useCreateRunFromProtocol).mockReturnValue({
       runCreationError: 'Current run is not idle or stopped.',
       createRunFromProtocolSource: mockCreateRunFromProtocolSource,
@@ -288,10 +290,13 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     expect(link.getAttribute('href')).toEqual('/devices/opentrons-robot-name')
     fireEvent.click(proceedButton)
     fireEvent.click(screen.getByRole('button', { name: 'Confirm values' }))
-    expect(mockCreateRunFromProtocolSource).toHaveBeenCalledWith({
-      files: [expect.any(File)],
-      protocolKey: storedProtocolDataFixture.protocolKey,
-    })
+    await waitFor(() =>
+      expect(mockCreateRunFromProtocolSource).toHaveBeenCalledWith({
+        files: [expect.any(File)],
+        protocolKey: storedProtocolDataFixture.protocolKey,
+        runTimeParameterValues: expect.any(Object),
+      })
+    )
     expect(mockTrackCreateProtocolRunEvent).toHaveBeenCalled()
     // TODO( jr, 3.13.24): fix this when page 2 is completed of the multislideout
     // screen.getByText(
@@ -299,7 +304,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     // )
   })
 
-  it('renders apply historic offsets as determinate if candidates available', () => {
+  it('renders apply historic offsets as determinate if candidates available', async () => {
     const mockOffsetCandidate = {
       id: 'third_offset_id',
       labwareDisplayName: 'Third Fake Labware Display Name',
@@ -330,8 +335,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
           location: mockOffsetCandidate.location,
           definitionUri: mockOffsetCandidate.definitionUri,
         },
-      ],
-      {}
+      ]
     )
     expect(screen.getByRole('checkbox')).toBeChecked()
     const proceedButton = screen.getByRole('button', {
@@ -339,9 +343,12 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     })
     fireEvent.click(proceedButton)
     fireEvent.click(screen.getByRole('button', { name: 'Confirm values' }))
-    expect(mockCreateRunFromProtocolSource).toHaveBeenCalledWith({
-      files: [expect.any(File)],
-      protocolKey: storedProtocolDataFixture.protocolKey,
+    await waitFor(() => {
+      expect(mockCreateRunFromProtocolSource).toHaveBeenCalledWith({
+        files: [expect.any(File)],
+        protocolKey: storedProtocolDataFixture.protocolKey,
+        runTimeParameterValues: expect.any(Object),
+      })
     })
   })
 
@@ -389,14 +396,12 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
           location: mockOffsetCandidate.location,
           definitionUri: mockOffsetCandidate.definitionUri,
         },
-      ],
-      {}
+      ]
     )
     expect(vi.mocked(useCreateRunFromProtocol)).toHaveBeenLastCalledWith(
       expect.any(Object),
       { hostname: 'otherIp' },
-      [],
-      {}
+      []
     )
   })
 

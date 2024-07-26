@@ -4,11 +4,11 @@ from typing import Dict, Optional, Type, Union, List, Tuple, TYPE_CHECKING
 
 from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.commands import LoadModuleResult
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV5, SlotDefV3
+from opentrons_shared_data.deck.types import DeckDefinitionV5, SlotDefV3
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
-from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.labware.types import LabwareDefinition as LabwareDefDict
+from opentrons_shared_data.pipette.types import PipetteNameType
+from opentrons_shared_data.robot.types import RobotType
 
 from opentrons.types import (
     DeckSlotName,
@@ -68,8 +68,7 @@ from .module_core import (
     AbsorbanceReaderCore,
 )
 from .exceptions import InvalidModuleLocationError
-from . import load_labware_params
-from . import deck_conflict
+from . import load_labware_params, deck_conflict, overlap_versions
 
 if TYPE_CHECKING:
     from ...labware import Labware
@@ -497,7 +496,10 @@ class ProtocolCore(
             )
 
     def load_instrument(
-        self, instrument_name: PipetteNameType, mount: Mount
+        self,
+        instrument_name: PipetteNameType,
+        mount: Mount,
+        liquid_presence_detection: bool = False,
     ) -> InstrumentCore:
         """Load an instrument into the protocol.
 
@@ -510,7 +512,14 @@ class ProtocolCore(
         """
         engine_mount = MountType[mount.name]
         load_result = self._engine_client.execute_command_without_recovery(
-            cmd.LoadPipetteParams(pipetteName=instrument_name, mount=engine_mount)
+            cmd.LoadPipetteParams(
+                pipetteName=instrument_name,
+                mount=engine_mount,
+                tipOverlapNotAfterVersion=overlap_versions.overlap_for_api_version(
+                    self._api_version
+                ),
+                liquidPresenceDetection=liquid_presence_detection,
+            )
         )
 
         return InstrumentCore(

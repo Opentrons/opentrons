@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import {
   ALIGN_CENTER,
@@ -18,7 +18,7 @@ import {
   POSITION_FIXED,
   POSITION_RELATIVE,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'
@@ -47,7 +47,7 @@ interface FormValues {
 
 export function NameRobot(): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
-  const history = useHistory()
+  const navigate = useNavigate()
   const trackEvent = useTrackEvent()
   const localRobot = useSelector(getLocalRobot)
   const ipAddress = localRobot?.ip
@@ -143,7 +143,7 @@ export function NameRobot(): JSX.Element {
       if (data.name != null) {
         setNewName(data.name)
         if (!isUnboxingFlowOngoing) {
-          history.push('/robot-settings')
+          navigate('/robot-settings')
         } else {
           setIsShowConfirmRobotName(true)
         }
@@ -198,9 +198,9 @@ export function NameRobot(): JSX.Element {
                   data-testid="name_back_button"
                   onClick={() => {
                     if (isUnboxingFlowOngoing) {
-                      history.push('/emergency-stop')
+                      navigate('/emergency-stop')
                     } else {
-                      history.push('/robot-settings')
+                      navigate('/robot-settings')
                     }
                   }}
                 >
@@ -208,11 +208,14 @@ export function NameRobot(): JSX.Element {
                 </Btn>
               </Flex>
               <Flex marginLeft={isUnboxingFlowOngoing ? '0' : '4rem'}>
-                <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
+                <LegacyStyledText
+                  as="h2"
+                  fontWeight={TYPOGRAPHY.fontWeightBold}
+                >
                   {isUnboxingFlowOngoing
                     ? t('name_your_robot')
                     : t('rename_robot')}
-                </StyledText>
+                </LegacyStyledText>
               </Flex>
               <Flex position={POSITION_ABSOLUTE} right="0">
                 {Boolean(isNaming) ? (
@@ -246,14 +249,14 @@ export function NameRobot(): JSX.Element {
               width="100%"
             >
               {isUnboxingFlowOngoing ? (
-                <StyledText
+                <LegacyStyledText
                   as="h4"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
                   color={COLORS.grey60}
                   marginBottom={SPACING.spacing24}
                 >
                   {t('name_your_robot_description')}
-                </StyledText>
+                </LegacyStyledText>
               ) : null}
               <Controller
                 control={control}
@@ -274,21 +277,21 @@ export function NameRobot(): JSX.Element {
                 )}
               />
             </Flex>
-            <StyledText
+            <LegacyStyledText
               as="p"
               color={COLORS.grey60}
               fontWeight={TYPOGRAPHY.fontWeightRegular}
             >
               {t('name_rule_description')}
-            </StyledText>
+            </LegacyStyledText>
             {errors.newRobotName != null ? (
-              <StyledText
+              <LegacyStyledText
                 as="p"
                 fontWeight={TYPOGRAPHY.fontWeightRegular}
                 color={COLORS.red50}
               >
                 {errors.newRobotName.message}
-              </StyledText>
+              </LegacyStyledText>
             ) : null}
           </Flex>
 

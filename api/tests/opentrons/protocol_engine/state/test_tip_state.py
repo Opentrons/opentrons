@@ -20,7 +20,7 @@ from opentrons.protocol_engine.resources.pipette_data_provider import (
     LoadedStaticPipetteData,
 )
 from opentrons.types import Point
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.pipette.types import PipetteNameType
 from ..pipette_fixtures import (
     NINETY_SIX_MAP,
     NINETY_SIX_COLS,
@@ -148,6 +148,7 @@ def test_get_next_tip_returns_none(
             nozzle_map=get_default_nozzle_map(PipetteNameType.P1000_96),
             back_left_corner_offset=Point(0, 0, 0),
             front_right_corner_offset=Point(0, 0, 0),
+            pipette_lld_settings={},
         ),
     )
     subject.handle_action(
@@ -208,6 +209,7 @@ def test_get_next_tip_returns_first_tip(
             nozzle_map=get_default_nozzle_map(pipette_name_type),
             back_left_corner_offset=Point(0, 0, 0),
             front_right_corner_offset=Point(0, 0, 0),
+            pipette_lld_settings={},
         ),
     )
     subject.handle_action(
@@ -262,6 +264,7 @@ def test_get_next_tip_used_starting_tip(
             nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
             back_left_corner_offset=Point(0, 0, 0),
             front_right_corner_offset=Point(0, 0, 0),
+            pipette_lld_settings={},
         ),
     )
     subject.handle_action(
@@ -350,6 +353,7 @@ def test_get_next_tip_skips_picked_up_tip(
             nozzle_map=get_default_nozzle_map(pipette_name_type),
             back_left_corner_offset=Point(0, 0, 0),
             front_right_corner_offset=Point(0, 0, 0),
+            pipette_lld_settings={},
         ),
     )
     subject.handle_action(
@@ -404,6 +408,7 @@ def test_get_next_tip_with_starting_tip(
             nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
             back_left_corner_offset=Point(x=1, y=2, z=3),
             front_right_corner_offset=Point(x=4, y=5, z=6),
+            pipette_lld_settings={},
         ),
     )
     subject.handle_action(
@@ -478,6 +483,7 @@ def test_get_next_tip_with_starting_tip_8_channel(
             nozzle_map=get_default_nozzle_map(PipetteNameType.P300_MULTI_GEN2),
             back_left_corner_offset=Point(0, 0, 0),
             front_right_corner_offset=Point(0, 0, 0),
+            pipette_lld_settings={},
         ),
     )
     subject.handle_action(
@@ -553,6 +559,7 @@ def test_get_next_tip_with_1_channel_followed_by_8_channel(
             nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
             back_left_corner_offset=Point(0, 0, 0),
             front_right_corner_offset=Point(0, 0, 0),
+            pipette_lld_settings={},
         ),
     )
     subject.handle_action(
@@ -584,6 +591,7 @@ def test_get_next_tip_with_1_channel_followed_by_8_channel(
             nozzle_map=get_default_nozzle_map(PipetteNameType.P300_MULTI_GEN2),
             back_left_corner_offset=Point(0, 0, 0),
             front_right_corner_offset=Point(0, 0, 0),
+            pipette_lld_settings={},
         ),
     )
     subject.handle_action(
@@ -659,6 +667,7 @@ def test_get_next_tip_with_starting_tip_out_of_tips(
             nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
             back_left_corner_offset=Point(0, 0, 0),
             front_right_corner_offset=Point(0, 0, 0),
+            pipette_lld_settings={},
         ),
     )
     subject.handle_action(
@@ -734,6 +743,7 @@ def test_get_next_tip_with_column_and_starting_tip(
             nozzle_map=get_default_nozzle_map(PipetteNameType.P300_MULTI_GEN2),
             back_left_corner_offset=Point(0, 0, 0),
             front_right_corner_offset=Point(0, 0, 0),
+            pipette_lld_settings={},
         ),
     )
     subject.handle_action(
@@ -786,6 +796,7 @@ def test_reset_tips(
             nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
             back_left_corner_offset=Point(x=1, y=2, z=3),
             front_right_corner_offset=Point(x=4, y=5, z=6),
+            pipette_lld_settings={},
         ),
     )
 
@@ -838,6 +849,7 @@ def test_handle_pipette_config_action(
             nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
             back_left_corner_offset=Point(x=1, y=2, z=3),
             front_right_corner_offset=Point(x=4, y=5, z=6),
+            pipette_lld_settings={},
         ),
     )
     subject.handle_action(
@@ -921,6 +933,7 @@ def test_drop_tip(
             nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
             back_left_corner_offset=Point(x=1, y=2, z=3),
             front_right_corner_offset=Point(x=4, y=5, z=6),
+            pipette_lld_settings={},
         ),
     )
     subject.handle_action(
@@ -1047,6 +1060,7 @@ def test_active_channels(
             nozzle_map=nozzle_map,
             back_left_corner_offset=Point(x=1, y=2, z=3),
             front_right_corner_offset=Point(x=4, y=5, z=6),
+            pipette_lld_settings={},
         ),
     )
     subject.handle_action(
@@ -1112,6 +1126,7 @@ def test_next_tip_uses_active_channels(
             nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
             back_left_corner_offset=Point(x=1, y=2, z=3),
             front_right_corner_offset=Point(x=4, y=5, z=6),
+            pipette_lld_settings={},
         ),
     )
     subject.handle_action(
@@ -1197,6 +1212,7 @@ def test_next_tip_automatic_tip_tracking_with_partial_configurations(
             nozzle_map=get_default_nozzle_map(PipetteNameType.P1000_96),
             back_left_corner_offset=Point(x=1, y=2, z=3),
             front_right_corner_offset=Point(x=4, y=5, z=6),
+            pipette_lld_settings={},
         ),
     )
     subject.handle_action(
@@ -1355,6 +1371,7 @@ def test_next_tip_automatic_tip_tracking_tiprack_limits(
             nozzle_map=get_default_nozzle_map(PipetteNameType.P1000_96),
             back_left_corner_offset=Point(x=1, y=2, z=3),
             front_right_corner_offset=Point(x=4, y=5, z=6),
+            pipette_lld_settings={},
         ),
     )
     subject.handle_action(

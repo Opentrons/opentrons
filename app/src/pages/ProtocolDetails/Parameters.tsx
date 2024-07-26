@@ -12,7 +12,7 @@ import {
   COLORS,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
@@ -60,7 +60,7 @@ export const Parameters = (props: { protocolId: string }): JSX.Element => {
   const { t, i18n } = useTranslation('protocol_details')
 
   const makeSnack = (): void => {
-    makeSnackbar(t('start_setup_customize_values'))
+    makeSnackbar(t('start_setup_customize_values') as string)
   }
 
   const formatRange = (parameter: RunTimeParameter): string => {
@@ -97,19 +97,19 @@ export const Parameters = (props: { protocolId: string }): JSX.Element => {
       <thead>
         <tr>
           <TableHeader>
-            <StyledText paddingLeft={SPACING.spacing24}>
+            <LegacyStyledText paddingLeft={SPACING.spacing24}>
               {i18n.format(t('name'), 'capitalize')}
-            </StyledText>
+            </LegacyStyledText>
           </TableHeader>
           <TableHeader>
-            <StyledText paddingLeft={SPACING.spacing24}>
+            <LegacyStyledText paddingLeft={SPACING.spacing24}>
               {i18n.format(t('default_value'), 'capitalize')}
-            </StyledText>
+            </LegacyStyledText>
           </TableHeader>
           <TableHeader>
-            <StyledText paddingLeft={SPACING.spacing24}>
+            <LegacyStyledText paddingLeft={SPACING.spacing24}>
               {i18n.format(t('range'), 'capitalize')}
-            </StyledText>
+            </LegacyStyledText>
           </TableHeader>
         </tr>
       </thead>

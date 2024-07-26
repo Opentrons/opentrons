@@ -4,7 +4,7 @@ from typing import Dict, Iterable, Optional, cast
 
 from anyio import to_thread
 
-from opentrons_shared_data.labware.dev_types import (
+from opentrons_shared_data.labware.types import (
     LabwareDefinition as LabwareDefinitionTypedDict,
 )
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition

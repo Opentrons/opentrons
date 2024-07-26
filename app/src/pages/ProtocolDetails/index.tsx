@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
 import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
 import { useDispatch, useSelector } from 'react-redux'
-import { useHistory, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -20,9 +20,10 @@ import {
   OVERFLOW_WRAP_ANYWHERE,
   POSITION_STICKY,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   truncateString,
   TYPOGRAPHY,
+  Tabs,
 } from '@opentrons/components'
 import {
   useCreateRunMutation,
@@ -31,7 +32,7 @@ import {
   useProtocolQuery,
 } from '@opentrons/react-api-client'
 import { MAXIMUM_PINNED_PROTOCOLS } from '../../App/constants'
-import { MediumButton, SmallButton, TabbedButton } from '../../atoms/buttons'
+import { MediumButton, SmallButton } from '../../atoms/buttons'
 import {
   ProtocolDetailsHeaderChipSkeleton,
   ProcotolDetailsHeaderTitleSkeleton,
@@ -44,6 +45,7 @@ import {
   getApplyHistoricOffsets,
   getPinnedProtocolIds,
   updateConfigValue,
+  useFeatureFlag,
 } from '../../redux/config'
 import { useOffsetCandidatesForAnalysis } from '../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import {
@@ -78,7 +80,7 @@ const ProtocolHeader = ({
   isScrolled,
   isProtocolFetching,
 }: ProtocolHeaderProps): JSX.Element => {
-  const history = useHistory()
+  const navigate = useNavigate()
   const { t } = useTranslation(['protocol_info, protocol_details', 'shared'])
   const [truncate, setTruncate] = React.useState<boolean>(true)
   const [startSetup, setStartSetup] = React.useState<boolean>(false)
@@ -113,7 +115,7 @@ const ProtocolHeader = ({
           paddingLeft="0rem"
           paddingRight={SPACING.spacing24}
           onClick={() => {
-            history.push('/protocols')
+            navigate('/protocols')
           }}
           width="3rem"
         >
@@ -135,14 +137,14 @@ const ProtocolHeader = ({
             )}
           </Flex>
           {!isProtocolFetching ? (
-            <StyledText
+            <LegacyStyledText
               as="h2"
               fontWeight={TYPOGRAPHY.fontWeightBold}
               onClick={toggleTruncate}
               overflowWrap={OVERFLOW_WRAP_ANYWHERE}
             >
               {displayedTitle}
-            </StyledText>
+            </LegacyStyledText>
           ) : (
             <ProcotolDetailsHeaderTitleSkeleton />
           )}
@@ -192,23 +194,18 @@ const ProtocolSectionTabs = ({
   currentOption,
   setCurrentOption,
 }: ProtocolSectionTabsProps): JSX.Element => {
-  const options = protocolSectionTabOptions
-
   return (
     <Flex gridGap={SPACING.spacing8}>
-      {options.map(option => {
-        return (
-          <TabbedButton
-            isSelected={option === currentOption}
-            key={option}
-            onClick={() => {
-              setCurrentOption(option)
-            }}
-          >
-            {option}
-          </TabbedButton>
-        )
-      })}
+      <Tabs
+        tabs={protocolSectionTabOptions.map(option => ({
+          text: option,
+          onClick: () => {
+            setCurrentOption(option)
+          },
+          isActive: option === currentOption,
+          disabled: false,
+        }))}
+      />
     </Flex>
   )
 }
@@ -227,20 +224,20 @@ const Summary = ({ author, description, date }: SummaryProps): JSX.Element => {
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         gridGap={SPACING.spacing4}
       >
-        <StyledText
+        <LegacyStyledText
           as="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        >{`${i18n.format(t('author'), 'capitalize')}: `}</StyledText>
-        <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+        >{`${i18n.format(t('author'), 'capitalize')}: `}</LegacyStyledText>
+        <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {author}
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
-      <StyledText
+      <LegacyStyledText
         as="p"
         color={description === null ? COLORS.grey60 : undefined}
       >
         {description ?? i18n.format(t('no_summary'), 'capitalize')}
-      </StyledText>
+      </LegacyStyledText>
       <Flex
         backgroundColor={COLORS.grey35}
         borderRadius={BORDERS.borderRadius8}
@@ -248,9 +245,9 @@ const Summary = ({ author, description, date }: SummaryProps): JSX.Element => {
         width="max-content"
         padding={`${SPACING.spacing8} ${SPACING.spacing12}`}
       >
-        <StyledText as="p">{`${t('protocol_info:date_added')}: ${
+        <LegacyStyledText as="p">{`${t('protocol_info:date_added')}: ${
           date != null ? formatTimeWithUtcLabel(date) : t('shared:no_data')
-        }`}</StyledText>
+        }`}</LegacyStyledText>
       </Flex>
     </Flex>
   )
@@ -311,18 +308,19 @@ export function ProtocolDetails(): JSX.Element | null {
     'protocol_info',
     'shared',
   ])
-  const { protocolId } = useParams<OnDeviceRouteParams>()
+  const enableCsvFile = useFeatureFlag('enableCsvFile')
+  const { protocolId } = useParams<
+    keyof OnDeviceRouteParams
+  >() as OnDeviceRouteParams
   const {
     missingProtocolHardware,
     conflictedSlots,
   } = useMissingProtocolHardware(protocolId)
-  const chipText = useHardwareStatusText(
-    missingProtocolHardware,
-    conflictedSlots
-  )
+  let chipText = useHardwareStatusText(missingProtocolHardware, conflictedSlots)
+
   const runTimeParameters = useRunTimeParameters(protocolId)
   const dispatch = useDispatch<Dispatch>()
-  const history = useHistory()
+  const navigate = useNavigate()
   const host = useHost()
   const { makeSnackbar } = useToaster()
   const [showParameters, setShowParameters] = React.useState<boolean>(false)
@@ -381,17 +379,27 @@ export function ProtocolDetails(): JSX.Element | null {
     },
   })
 
+  const isRequiredCsv =
+    mostRecentAnalysis?.result === 'parameter-value-required'
+  if (enableCsvFile && isRequiredCsv) {
+    if (chipText === 'Ready to run') {
+      chipText = i18n.format(t('requires_csv'), 'capitalize')
+    } else {
+      chipText = `${chipText} & ${t('requires_csv')}`
+    }
+  }
+
   const handlePinClick = (): void => {
     if (!pinned) {
       if (pinnedProtocolIds.length === MAXIMUM_PINNED_PROTOCOLS) {
         setShowMaxPinsAlert(true)
       } else {
         pinnedProtocolIds.push(protocolId)
-        makeSnackbar(t('protocol_info:pinned_protocol'))
+        makeSnackbar(t('protocol_info:pinned_protocol') as string)
       }
     } else {
       pinnedProtocolIds = pinnedProtocolIds.filter(p => p !== protocolId)
-      makeSnackbar(t('protocol_info:unpinned_protocol'))
+      makeSnackbar(t('protocol_info:unpinned_protocol') as string)
     }
     dispatch(
       updateConfigValue('protocols.pinnedProtocolIds', pinnedProtocolIds)
@@ -420,11 +428,11 @@ export function ProtocolDetails(): JSX.Element | null {
         )
         .then(() => deleteProtocol(host, protocolId))
         .then(() => {
-          history.push('/protocols')
+          navigate('/protocols')
         })
         .catch((e: Error) => {
           console.error(`error deleting resources: ${e.message}`)
-          history.push('/protocols')
+          navigate('/protocols')
         })
     } else {
       console.error(
@@ -449,6 +457,7 @@ export function ProtocolDetails(): JSX.Element | null {
       protocolId={protocolId}
       labwareOffsets={labwareOffsets}
       runTimeParameters={runTimeParameters}
+      mostRecentAnalysis={mostRecentAnalysis}
     />
   ) : (
     <>
@@ -463,13 +472,13 @@ export function ProtocolDetails(): JSX.Element | null {
               header={deleteModalHeader}
             >
               <Flex flexDirection={DIRECTION_COLUMN} width="100%">
-                <StyledText
+                <LegacyStyledText
                   as="h4"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
                   marginBottom={SPACING.spacing40}
                 >
                   {t('delete_protocol_perm', { name: displayName })}
-                </StyledText>
+                </LegacyStyledText>
                 <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
                   <SmallButton
                     onClick={() => {

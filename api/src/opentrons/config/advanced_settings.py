@@ -16,8 +16,8 @@ from typing import (
     List,
 )
 
-from opentrons.config import CONFIG, ARCHITECTURE, SystemArchitecture
-from opentrons_shared_data.robot.dev_types import RobotTypeEnum
+from opentrons.config import CONFIG
+from opentrons_shared_data.robot.types import RobotTypeEnum
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -95,18 +95,6 @@ class SettingDefinition:
         """
         if self.restart_required:
             set_restart_required()
-
-
-class DisableLogIntegrationSettingDefinition(SettingDefinition):
-    def __init__(self) -> None:
-        super().__init__(
-            _id="disableLogAggregation",
-            title="Disable Opentrons Log Collection",
-            description="Prevent the robot from sending its logs to Opentrons"
-            " for analysis. Opentrons uses these logs to"
-            " troubleshoot robot issues and spot error trends.",
-            robot_type=[RobotTypeEnum.OT2, RobotTypeEnum.FLEX],
-        )
 
 
 class Setting(NamedTuple):
@@ -211,11 +199,8 @@ settings = [
         title="Enable error recovery experiments",
         description=(
             "Do not enable."
-            " This is an Opentrons internal setting to experiment with"
+            " This is an Opentrons internal setting to enable additional,"
             " in-development error recovery features."
-            " This will interfere with your protocol runs,"
-            " corrupt your robot's storage,"
-            " bring misfortune and pestilence upon you and your livestock, etc."
         ),
         robot_type=[RobotTypeEnum.FLEX],
         internal_only=True,
@@ -238,12 +223,6 @@ settings = [
         internal_only=True,
     ),
 ]
-
-if (
-    ARCHITECTURE == SystemArchitecture.BUILDROOT
-    or ARCHITECTURE == SystemArchitecture.YOCTO
-):
-    settings.append(DisableLogIntegrationSettingDefinition())
 
 
 settings_by_id: Dict[str, SettingDefinition] = {s.id: s for s in settings}
@@ -726,6 +705,16 @@ def _migrate33to34(previous: SettingsMap) -> SettingsMap:
     return newmap
 
 
+def _migrate34to35(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 35 of the feature flags file.
+
+    - Removes disableLogAggregation
+    """
+    removals = ["disableLogAggregation"]
+    newmap = {k: v for k, v in previous.items() if k not in removals}
+    return newmap
+
+
 _MIGRATIONS = [
     _migrate0to1,
     _migrate1to2,
@@ -761,6 +750,7 @@ _MIGRATIONS = [
     _migrate31to32,
     _migrate32to33,
     _migrate33to34,
+    _migrate34to35,
 ]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below

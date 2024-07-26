@@ -90,7 +90,7 @@ export function useProtocolReceiptToast(): void {
             makeToast(
               t('protocol_added', {
                 protocol_name: truncateString(name, 30),
-              }),
+              }) as string,
               'success',
               {
                 closeButton: true,

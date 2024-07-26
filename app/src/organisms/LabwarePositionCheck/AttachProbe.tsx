@@ -3,7 +3,7 @@ import { Trans, useTranslation } from 'react-i18next'
 import {
   RESPONSIVENESS,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
@@ -85,7 +85,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
       ],
       false
     ).catch(error => {
-      setFatalError(error.message)
+      setFatalError(error.message as string)
     })
   }, [])
 
@@ -99,7 +99,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
       {
         commandType: 'verifyTipPresence',
         params: {
-          pipetteId: pipetteId,
+          pipetteId,
           expectedState: 'present',
           followSingularSensor: 'primary',
         },
@@ -170,7 +170,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
         </video>
       }
       bodyText={
-        <StyledText css={BODY_STYLE}>
+        <LegacyStyledText css={BODY_STYLE}>
           <Trans
             t={t}
             i18nKey={'install_probe'}
@@ -179,7 +179,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
               bold: <strong />,
             }}
           />
-        </StyledText>
+        </LegacyStyledText>
       }
       proceedButtonText={i18n.format(t('shared:continue'), 'capitalize')}
       proceed={handleProbeAttached}

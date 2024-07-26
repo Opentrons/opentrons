@@ -17,18 +17,18 @@ import {
   JUSTIFY_FLEX_START,
   JUSTIFY_SPACE_AROUND,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   POSITION_ABSOLUTE,
   PrimaryButton,
   RESPONSIVENESS,
   SPACING,
-  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   EIGHT_CHANNEL,
+  LEFT,
   NINETY_SIX_CHANNEL,
   RIGHT,
-  LEFT,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
 import { i18n } from '../../i18n'
@@ -81,6 +81,7 @@ const UNSELECTED_OPTIONS_STYLE = css`
     }
   }
 `
+
 const SELECTED_OPTIONS_STYLE = css`
   ${UNSELECTED_OPTIONS_STYLE}
   border: 1px solid ${COLORS.blue50};
@@ -136,7 +137,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
   })
   const wizardHeader = (
     <WizardHeader
-      title={startCase(t('attach_pipette', { mount: mount }))}
+      title={startCase(t('attach_pipette', { mount }) as string)}
       currentStep={0}
       totalSteps={3}
       onExit={
@@ -185,7 +186,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
                   value: NINETY_SIX_CHANNEL,
                 }}
                 onSelect={event => {
-                  setSelectedPipette(event.target.value as any)
+                  setSelectedPipette(event.target.value as SelectablePipettes)
                 }}
                 initialSelected={selectedPipette}
               />
@@ -222,7 +223,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
             justifyContent={JUSTIFY_SPACE_BETWEEN}
           >
             <Flex flexDirection={DIRECTION_COLUMN}>
-              <StyledText as="h1">{t('choose_pipette')}</StyledText>
+              <LegacyStyledText as="h1">{t('choose_pipette')}</LegacyStyledText>
               <Flex
                 margin={SPACING.spacing40}
                 justifyContent={JUSTIFY_SPACE_AROUND}
@@ -235,17 +236,17 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
                 >
                   <img
                     src={singleChannelAndEightChannel}
-                    width="138.78px"
-                    height="160px"
+                    width="168px"
+                    height="150.99px"
                     alt={singleMount}
                   />
-                  <StyledText
+                  <LegacyStyledText
                     as="h3"
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     textAlign={TYPOGRAPHY.textAlignCenter}
                   >
                     {singleMount}
-                  </StyledText>
+                  </LegacyStyledText>
                 </PipetteMountOption>
                 <PipetteMountOption
                   isSelected={selectedPipette === NINETY_SIX_CHANNEL}
@@ -255,17 +256,17 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
                 >
                   <img
                     src={ninetySixChannel}
-                    width="138.78px"
-                    height="160px"
+                    width="168px"
+                    height="151.2px"
                     alt={bothMounts}
                   />
-                  <StyledText
+                  <LegacyStyledText
                     as="h3"
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     textAlign={TYPOGRAPHY.textAlignCenter}
                   >
                     {bothMounts}
-                  </StyledText>
+                  </LegacyStyledText>
                 </PipetteMountOption>
               </Flex>
             </Flex>

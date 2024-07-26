@@ -2,8 +2,8 @@
 import pytest
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.deck.types import DeckDefinitionV5
+from opentrons_shared_data.robot.types import RobotType
 from opentrons_shared_data.deck import load as load_deck
 
 from opentrons.calibration_storage.helpers import uri_from_details
@@ -14,8 +14,10 @@ from opentrons.protocol_engine import (
     ProtocolEngine,
     Config as EngineConfig,
     DeckType,
-    create_protocol_engine,
+    error_recovery_policy,
 )
+from opentrons.protocol_engine.create_protocol_engine import create_protocol_engine
+
 from opentrons.protocol_engine.types import DeckSlotLocation, LoadedLabware
 from opentrons.types import DeckSlotName
 
@@ -82,6 +84,7 @@ async def test_create_engine_initializes_state_with_no_fixed_trash(
             robot_type=robot_type,
             deck_type=deck_type,
         ),
+        error_recovery_policy=error_recovery_policy.never_recover,
         load_fixed_trash=False,
     )
     state = engine.state_view
@@ -139,6 +142,7 @@ async def test_create_engine_initializes_state_with_fixed_trash(
             robot_type=robot_type,
             deck_type=deck_type,
         ),
+        error_recovery_policy=error_recovery_policy.never_recover,
         load_fixed_trash=True,
     )
     state = engine.state_view
@@ -173,6 +177,7 @@ async def test_create_engine_initializes_state_with_door_state(
             robot_type="OT-2 Standard",
             deck_type=DeckType.OT2_SHORT_TRASH,
         ),
+        error_recovery_policy=error_recovery_policy.never_recover,
     )
     state = engine.state_view
     assert state.commands.get_is_door_blocking() is True

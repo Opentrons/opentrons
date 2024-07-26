@@ -28,11 +28,11 @@ import {
   POSITION_RELATIVE,
   PrimaryButton,
   ProtocolDeck,
-  RoundTab,
+  Tabs,
   SIZE_1,
   SIZE_5,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -64,6 +64,7 @@ import { useFeatureFlag } from '../../redux/config'
 import { ChooseRobotToRunProtocolSlideout } from '../ChooseRobotToRunProtocolSlideout'
 import { SendProtocolToFlexSlideout } from '../SendProtocolToFlexSlideout'
 import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
+import { ProtocolStatusBanner } from '../ProtocolStatusBanner'
 import {
   getAnalysisStatus,
   getProtocolDisplayName,
@@ -75,6 +76,7 @@ import { ProtocolLabwareDetails } from './ProtocolLabwareDetails'
 import { ProtocolLiquidsDetails } from './ProtocolLiquidsDetails'
 import { RobotConfigurationDetails } from './RobotConfigurationDetails'
 import { ProtocolParameters } from './ProtocolParameters'
+import { AnnotatedSteps } from './AnnotatedSteps'
 
 import type { JsonConfig, PythonConfig } from '@opentrons/shared-data'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
@@ -118,7 +120,7 @@ function MetadataDetails({
   protocolType,
 }: MetadataDetailsProps): JSX.Element {
   if (protocolType === 'json') {
-    return <StyledText as="p">{description}</StyledText>
+    return <LegacyStyledText as="p">{description}</LegacyStyledText>
   } else {
     const filteredMetaData = Object.entries(
       omit(metadata, ['description', 'protocolName', 'author', 'apiLevel'])
@@ -130,18 +132,18 @@ function MetadataDetails({
         flexDirection={DIRECTION_COLUMN}
         data-testid="ProtocolDetails_description"
       >
-        <StyledText as="p">{description}</StyledText>
+        <LegacyStyledText as="p">{description}</LegacyStyledText>
         {filteredMetaData.map((item, index) => {
           return (
             <React.Fragment key={index}>
-              <StyledText
+              <LegacyStyledText
                 as="h6"
                 marginTop={SPACING.spacing8}
                 color={COLORS.grey60}
               >
                 {startCase(item.label)}
-              </StyledText>
-              <StyledText as="p">{item.value}</StyledText>
+              </LegacyStyledText>
+              <LegacyStyledText as="p">{item.value}</LegacyStyledText>
             </React.Fragment>
           )
         })}
@@ -167,7 +169,7 @@ const ReadMoreContent = (props: ReadMoreContentProps): JSX.Element => {
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
       {isReadMore ? (
-        <StyledText as="p">{description.slice(0, 160)}</StyledText>
+        <LegacyStyledText as="p">{description.slice(0, 160)}</LegacyStyledText>
       ) : (
         <MetadataDetails
           description={description}
@@ -203,10 +205,11 @@ export function ProtocolDetails(
   const { protocolKey, srcFileNames, mostRecentAnalysis, modified } = props
   const { t, i18n } = useTranslation(['protocol_details', 'shared'])
   const enableProtocolStats = useFeatureFlag('protocolStats')
+  const enableProtocolTimeline = useFeatureFlag('protocolTimeline')
   const runTimeParameters = mostRecentAnalysis?.runTimeParameters ?? []
   const hasRunTimeParameters = runTimeParameters.length > 0
   const [currentTab, setCurrentTab] = React.useState<
-    'robot_config' | 'labware' | 'liquids' | 'stats' | 'parameters'
+    'robot_config' | 'labware' | 'liquids' | 'stats' | 'parameters' | 'timeline'
   >(hasRunTimeParameters ? 'parameters' : 'robot_config')
   const [
     showChooseRobotToRunProtocolSlideout,
@@ -341,6 +344,10 @@ export function ProtocolDetails(
     stats: enableProtocolStats ? (
       <ProtocolStats analysis={mostRecentAnalysis} />
     ) : null,
+    timeline:
+      enableProtocolTimeline && mostRecentAnalysis != null ? (
+        <AnnotatedSteps analysis={mostRecentAnalysis} />
+      ) : null,
     parameters: <ProtocolParameters runTimeParameters={runTimeParameters} />,
   }
 
@@ -351,6 +358,7 @@ export function ProtocolDetails(
     missing: <Box size="14rem" backgroundColor={COLORS.grey30} />,
     loading: <Box size="14rem" backgroundColor={COLORS.grey30} />,
     error: <Box size="14rem" backgroundColor={COLORS.grey30} />,
+    parameterRequired: <Box size="14rem" backgroundColor={COLORS.grey30} />,
     complete: (
       <Box size="14rem" height="auto">
         {deckMap}
@@ -428,60 +436,62 @@ export function ProtocolDetails(
               width="100%"
             >
               {analysisStatus !== 'loading' &&
-              mostRecentAnalysis != null &&
-              mostRecentAnalysis.errors.length > 0 ? (
+              mostRecentAnalysis?.result === 'parameter-value-required' ? (
+                <ProtocolStatusBanner />
+              ) : null}
+              {mostRecentAnalysis != null && analysisStatus === 'error' ? (
                 <ProtocolAnalysisFailure
                   protocolKey={protocolKey}
                   errors={mostRecentAnalysis.errors.map(e => e.detail)}
                 />
               ) : null}
-              <StyledText
+              <LegacyStyledText
                 css={TYPOGRAPHY.h2SemiBold}
                 marginBottom={SPACING.spacing16}
                 data-testid={`ProtocolDetails_${protocolDisplayName}`}
                 overflowWrap={OVERFLOW_WRAP_ANYWHERE}
               >
                 {protocolDisplayName}
-              </StyledText>
+              </LegacyStyledText>
               <Flex css={GRID_STYLE}>
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_creationMethod"
                 >
-                  <StyledText as="h6" color={COLORS.grey60}>
+                  <LegacyStyledText as="h6" color={COLORS.grey60}>
                     {t('creation_method')}
-                  </StyledText>
-                  <StyledText as="p">
+                  </LegacyStyledText>
+                  <LegacyStyledText as="p">
                     {analysisStatus === 'loading'
                       ? t('shared:loading')
                       : creationMethod}
-                  </StyledText>
+                  </LegacyStyledText>
                 </Flex>
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_lastUpdated"
                 >
-                  <StyledText as="h6" color={COLORS.grey60}>
+                  <LegacyStyledText as="h6" color={COLORS.grey60}>
                     {t('last_updated')}
-                  </StyledText>
-                  <StyledText as="p">
+                  </LegacyStyledText>
+                  <LegacyStyledText as="p">
                     {analysisStatus === 'loading'
                       ? t('shared:loading')
                       : format(new Date(modified), 'M/d/yy HH:mm')}
-                  </StyledText>
+                  </LegacyStyledText>
                 </Flex>
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_lastAnalyzed"
                 >
-                  <StyledText as="h6" color={COLORS.grey60}>
+                  <LegacyStyledText as="h6" color={COLORS.grey60}>
                     {t('last_analyzed')}
-                  </StyledText>
-                  <StyledText as="p">
+                  </LegacyStyledText>
+                  <LegacyStyledText as="p">
                     {analysisStatus === 'loading'
                       ? t('shared:loading')
                       : lastAnalyzed}
-                  </StyledText>
+                  </LegacyStyledText>
                 </Flex>
                 <Flex
                   css={css`
@@ -506,10 +516,10 @@ export function ProtocolDetails(
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_author"
                 >
-                  <StyledText as="h6" color={COLORS.grey60}>
+                  <LegacyStyledText as="h6" color={COLORS.grey60}>
                     {t('org_or_author')}
-                  </StyledText>
-                  <StyledText
+                  </LegacyStyledText>
+                  <LegacyStyledText
                     as="p"
                     marginRight={SPACING.spacing20}
                     overflowWrap={OVERFLOW_WRAP_ANYWHERE}
@@ -517,17 +527,19 @@ export function ProtocolDetails(
                     {analysisStatus === 'loading'
                       ? t('shared:loading')
                       : author}
-                  </StyledText>
+                  </LegacyStyledText>
                 </Flex>
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_description"
                 >
-                  <StyledText as="h6" color={COLORS.grey60}>
+                  <LegacyStyledText as="h6" color={COLORS.grey60}>
                     {t('description')}
-                  </StyledText>
+                  </LegacyStyledText>
                   {analysisStatus === 'loading' ? (
-                    <StyledText as="p">{t('shared:loading')}</StyledText>
+                    <LegacyStyledText as="p">
+                      {t('shared:loading')}
+                    </LegacyStyledText>
                   ) : null}
                   {mostRecentAnalysis != null ? (
                     <ReadMoreContent
@@ -573,9 +585,12 @@ export function ProtocolDetails(
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
                 padding={SPACING.spacing16}
               >
-                <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+                <LegacyStyledText
+                  as="h3"
+                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                >
                   {t('deck_view')}
-                </StyledText>
+                </LegacyStyledText>
                 <Btn
                   alignItems={ALIGN_CENTER}
                   disabled={analysisStatus !== 'complete'}
@@ -613,75 +628,85 @@ export function ProtocolDetails(
             >
               <Flex gridGap={SPACING.spacing4}>
                 {mostRecentAnalysis != null && (
-                  <RoundTab
-                    data-testid="ProtocolDetails_parameters"
-                    isCurrent={currentTab === 'parameters'}
-                    onClick={() => {
-                      setCurrentTab('parameters')
-                    }}
-                  >
-                    <StyledText>
-                      {i18n.format(t('parameters'), 'capitalize')}
-                    </StyledText>
-                  </RoundTab>
+                  <Tabs
+                    tabs={[
+                      {
+                        text: i18n.format(t('parameters'), 'capitalize'),
+                        isActive: currentTab === 'parameters',
+                        disabled: false,
+                        onClick: () => {
+                          setCurrentTab('parameters')
+                        },
+                      },
+                    ]}
+                  />
                 )}
-                <RoundTab
-                  data-testid="ProtocolDetails_robotConfig"
-                  isCurrent={currentTab === 'robot_config'}
-                  onClick={() => {
-                    setCurrentTab('robot_config')
-                  }}
-                >
-                  <StyledText>
-                    {i18n.format(t('hardware'), 'capitalize')}
-                  </StyledText>
-                </RoundTab>
-                <RoundTab
-                  data-testid="ProtocolDetails_labware"
-                  isCurrent={currentTab === 'labware'}
-                  onClick={() => {
-                    setCurrentTab('labware')
-                  }}
-                >
-                  <StyledText>
-                    {i18n.format(t('labware'), 'capitalize')}
-                  </StyledText>
-                </RoundTab>
+                <Tabs
+                  tabs={[
+                    {
+                      text: i18n.format(t('hardware'), 'capitalize'),
+                      isActive: currentTab === 'robot_config',
+                      disabled: false,
+                      onClick: () => {
+                        setCurrentTab('robot_config')
+                      },
+                    },
+                    {
+                      text: i18n.format(t('labware'), 'capitalize'),
+                      isActive: currentTab === 'labware',
+                      disabled: false,
+                      onClick: () => {
+                        setCurrentTab('labware')
+                      },
+                    },
+                  ]}
+                />
                 {mostRecentAnalysis != null && (
-                  <RoundTab
-                    data-testid="ProtocolDetails_liquids"
-                    isCurrent={currentTab === 'liquids'}
-                    onClick={() => {
-                      setCurrentTab('liquids')
-                    }}
-                  >
-                    <StyledText>
-                      {i18n.format(t('liquids'), 'capitalize')}
-                    </StyledText>
-                  </RoundTab>
+                  <Tabs
+                    tabs={[
+                      {
+                        text: i18n.format(t('liquids'), 'capitalize'),
+                        isActive: currentTab === 'liquids',
+                        disabled: false,
+                        onClick: () => {
+                          setCurrentTab('liquids')
+                        },
+                      },
+                    ]}
+                  />
                 )}
                 {enableProtocolStats && mostRecentAnalysis != null && (
-                  <RoundTab
-                    data-testid="ProtocolDetails_stats"
-                    isCurrent={currentTab === 'stats'}
-                    onClick={() => {
-                      setCurrentTab('stats')
-                    }}
-                  >
-                    <StyledText>
-                      {i18n.format(t('stats'), 'capitalize')}
-                    </StyledText>
-                  </RoundTab>
+                  <Tabs
+                    tabs={[
+                      {
+                        text: i18n.format(t('stats'), 'capitalize'),
+                        isActive: currentTab === 'stats',
+                        disabled: false,
+                        onClick: () => {
+                          setCurrentTab('stats')
+                        },
+                      },
+                    ]}
+                  />
+                )}
+                {enableProtocolTimeline && mostRecentAnalysis != null && (
+                  <Tabs
+                    tabs={[
+                      {
+                        text: i18n.format(t('timeline'), 'capitalize'),
+                        isActive: currentTab === 'timeline',
+                        disabled: false,
+                        onClick: () => {
+                          setCurrentTab('timeline')
+                        },
+                      },
+                    ]}
+                  />
                 )}
               </Flex>
               <Box
                 backgroundColor={COLORS.white}
-                // remove left upper corner border radius when first tab is active
-                borderRadius={`${
-                  currentTab === 'robot_config' ? '0' : BORDERS.borderRadius4
-                } ${BORDERS.borderRadius4} ${BORDERS.borderRadius4} ${
-                  BORDERS.borderRadius4
-                }`}
+                borderRadius={BORDERS.borderRadius8}
                 padding={SPACING.spacing16}
               >
                 {contentsByTabName[currentTab]}

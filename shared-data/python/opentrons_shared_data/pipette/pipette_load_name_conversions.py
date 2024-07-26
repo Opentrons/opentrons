@@ -2,7 +2,7 @@ import re
 from functools import lru_cache
 from typing import List, Optional, Union, cast, Literal, Tuple
 from opentrons_shared_data import get_shared_data_root
-from .dev_types import PipetteModel, PipetteName
+from .types import PipetteModel, PipetteName
 
 from .types import (
     PipetteChannelType,

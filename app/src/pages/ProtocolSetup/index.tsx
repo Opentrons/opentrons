@@ -2,7 +2,7 @@ import * as React from 'react'
 import last from 'lodash/last'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { useHistory, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import first from 'lodash/first'
 import { css } from 'styled-components'
 
@@ -20,7 +20,7 @@ import {
   OVERFLOW_WRAP_ANYWHERE,
   POSITION_STICKY,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TEXT_ALIGN_RIGHT,
   truncateString,
   TYPOGRAPHY,
@@ -102,9 +102,15 @@ import type {
 import type { ProtocolModuleInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 
 const FETCH_DURATION_MS = 5000
+
+export type ProtocolSetupStepStatus =
+  | 'ready'
+  | 'not ready'
+  | 'general'
+  | 'inform'
 interface ProtocolSetupStepProps {
   onClickSetupStep: () => void
-  status: 'ready' | 'not ready' | 'general' | 'inform'
+  status: ProtocolSetupStepStatus
   title: string
   // first line of detail text
   detail?: string | null
@@ -208,21 +214,21 @@ export function ProtocolSetupStep({
           flexDirection={DIRECTION_COLUMN}
           textAlign={TYPOGRAPHY.textAlignLeft}
         >
-          <StyledText
+          <LegacyStyledText
             as="h4"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             color={disabled ? COLORS.grey50 : COLORS.black90}
           >
             {title}
-          </StyledText>
+          </LegacyStyledText>
           {description != null ? (
-            <StyledText
+            <LegacyStyledText
               as="h4"
               color={disabled ? COLORS.grey50 : COLORS.grey60}
               maxWidth="35rem"
             >
               {description}
-            </StyledText>
+            </LegacyStyledText>
           ) : null}
         </Flex>
         <Flex
@@ -232,7 +238,7 @@ export function ProtocolSetupStep({
             isToggle ? `${SPACING.spacing12} ${SPACING.spacing10}` : 'undefined'
           }
         >
-          <StyledText
+          <LegacyStyledText
             as={fontSize}
             textAlign={TEXT_ALIGN_RIGHT}
             color={disabled ? COLORS.grey50 : COLORS.black90}
@@ -241,7 +247,7 @@ export function ProtocolSetupStep({
             {detail}
             {subDetail != null && detail != null ? <br /> : null}
             {subDetail}
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
         {disabled || !hasRightIcon ? null : (
           <Icon
@@ -276,7 +282,7 @@ function PrepareToRun({
   runRecord,
 }: PrepareToRunProps): JSX.Element {
   const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
-  const history = useHistory()
+  const navigate = useNavigate()
   const { makeSnackbar } = useToaster()
   const scrollRef = React.useRef<HTMLDivElement>(null)
   const [isScrolled, setIsScrolled] = React.useState<boolean>(false)
@@ -317,7 +323,7 @@ function PrepareToRun({
 
   const runStatus = useRunStatus(runId)
   if (runStatus === RUN_STATUS_STOPPED) {
-    history.push('/protocols')
+    navigate('/protocols')
   }
 
   React.useEffect(() => {
@@ -333,7 +339,7 @@ function PrepareToRun({
 
   const onConfirmCancelClose = (): void => {
     setShowConfirmCancelModal(false)
-    history.goBack()
+    navigate(-1)
   }
 
   const protocolHasModules =
@@ -502,7 +508,7 @@ function PrepareToRun({
     incompleteInstrumentCount === 0 && areModulesReady && areFixturesReady
   const onPlay = (): void => {
     if (isDoorOpen) {
-      makeSnackbar(t('shared:close_robot_door'))
+      makeSnackbar(t('shared:close_robot_door') as string)
     } else {
       if (
         isHeaterShakerInProtocol &&
@@ -515,7 +521,7 @@ function PrepareToRun({
           play()
           trackProtocolRunEvent({
             name: ANALYTICS_PROTOCOL_RUN_ACTION.START,
-            properties: robotAnalyticsData != null ? robotAnalyticsData : {},
+            properties: robotAnalyticsData ?? {},
           })
         } else {
           makeSnackbar(
@@ -677,17 +683,20 @@ function PrepareToRun({
           >
             {!isLoading ? (
               <>
-                <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightBold}>
+                <LegacyStyledText
+                  as="h4"
+                  fontWeight={TYPOGRAPHY.fontWeightBold}
+                >
                   {t('prepare_to_run')}
-                </StyledText>
-                <StyledText
+                </LegacyStyledText>
+                <LegacyStyledText
                   as="h4"
                   color={COLORS.grey50}
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   overflowWrap={OVERFLOW_WRAP_ANYWHERE}
                 >
                   {truncateString(protocolName, 100)}
-                </StyledText>
+                </LegacyStyledText>
               </>
             ) : (
               <ProtocolSetupTitleSkeleton />
@@ -823,7 +832,9 @@ export type SetupScreens =
   | 'view only parameters'
 
 export function ProtocolSetup(): JSX.Element {
-  const { runId } = useParams<OnDeviceRouteParams>()
+  const { runId } = useParams<
+    keyof OnDeviceRouteParams
+  >() as OnDeviceRouteParams
   const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
   const { analysisErrors } = useProtocolAnalysisErrors(runId)
   const localRobot = useSelector(getLocalRobot)

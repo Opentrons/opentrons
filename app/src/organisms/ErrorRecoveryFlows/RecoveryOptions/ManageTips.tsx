@@ -1,32 +1,44 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import head from 'lodash/head'
+import { css } from 'styled-components'
 
 import {
   DIRECTION_COLUMN,
+  COLORS,
   SPACING,
   Flex,
   StyledText,
+  RESPONSIVENESS,
 } from '@opentrons/components'
-import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { RadioButton } from '../../../atoms/buttons'
-import { ODD_SECTION_TITLE_STYLE, RECOVERY_MAP } from '../constants'
-import { RecoveryFooterButtons, RecoverySingleColumnContent } from '../shared'
+import {
+  ODD_SECTION_TITLE_STYLE,
+  RECOVERY_MAP,
+  ODD_ONLY,
+  DESKTOP_ONLY,
+} from '../constants'
+import {
+  RecoveryFooterButtons,
+  RecoverySingleColumnContentWrapper,
+  RecoveryRadioGroup,
+} from '../shared'
 import { DropTipWizardFlows } from '../../DropTipWizardFlows'
 import { DT_ROUTES } from '../../DropTipWizardFlows/constants'
+import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 import type { PipetteWithTip } from '../../DropTipWizardFlows'
-import type { RecoveryContentProps } from '../types'
+import type { RecoveryContentProps, RecoveryRoute, RouteStep } from '../types'
 import type { FixitCommandTypeUtils } from '../../DropTipWizardFlows/types'
 
 // The Drop Tip flow entry point. Includes entry from SelectRecoveryOption and CancelRun.
-export function ManageTips(props: RecoveryContentProps): JSX.Element | null {
+export function ManageTips(props: RecoveryContentProps): JSX.Element {
   const { recoveryMap } = props
 
-  const buildContent = (): JSX.Element | null => {
+  const buildContent = (): JSX.Element => {
     const { DROP_TIP_FLOWS } = RECOVERY_MAP
-    const { step } = recoveryMap
+    const { step, route } = recoveryMap
 
     switch (step) {
       case DROP_TIP_FLOWS.STEPS.BEGIN_REMOVAL:
@@ -36,7 +48,8 @@ export function ManageTips(props: RecoveryContentProps): JSX.Element | null {
       case DROP_TIP_FLOWS.STEPS.CHOOSE_TIP_DROP:
         return <DropTipFlowsContainer {...props} />
       default:
-        return <DropTipFlowsContainer {...props} />
+        console.warn(`${step} in ${route} not explicitly handled. Rerouting.`)
+        return <SelectRecoveryOption {...props} />
     }
   }
 
@@ -46,7 +59,6 @@ export function ManageTips(props: RecoveryContentProps): JSX.Element | null {
 type RemovalOptions = 'begin-removal' | 'skip'
 
 export function BeginRemoval({
-  isOnDevice,
   tipStatusUtils,
   routeUpdateActions,
   recoveryCommands,
@@ -85,47 +97,99 @@ export function BeginRemoval({
     }
   }
 
-  if (isOnDevice) {
-    return (
-      <RecoverySingleColumnContent>
-        <StyledText css={ODD_SECTION_TITLE_STYLE} as="h4SemiBold">
-          {t('you_may_want_to_remove', { mount })}
-        </StyledText>
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-          <RadioButton
-            buttonLabel={t('begin_removal')}
-            buttonValue={t('begin_removal')}
-            onChange={() => {
-              setSelected('begin-removal')
-            }}
-            isSelected={selected === 'begin-removal'}
-          />
-          <RadioButton
-            buttonLabel={t('skip')}
-            buttonValue={t('skip')}
-            onChange={() => {
-              setSelected('skip')
-            }}
-            isSelected={selected === 'skip'}
-          />
-        </Flex>
-        <RecoveryFooterButtons
-          isOnDevice={isOnDevice}
-          primaryBtnOnClick={primaryOnClick}
+  const DESKTOP_ONLY_GRID_GAP = css`
+    @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+      gap: 0rem;
+    }
+  `
+
+  const RADIO_GROUP_STYLE = css`
+    @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+      color: ${COLORS.black90};
+      margin-left: 0.5rem;
+    }
+  `
+
+  return (
+    <RecoverySingleColumnContentWrapper css={DESKTOP_ONLY_GRID_GAP}>
+      <StyledText
+        css={ODD_SECTION_TITLE_STYLE}
+        oddStyle="level4HeaderSemiBold"
+        desktopStyle="headingSmallSemiBold"
+      >
+        {t('remove_tips_from_pipette', { mount })}
+      </StyledText>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing2}
+        css={ODD_ONLY}
+      >
+        <RadioButton
+          buttonLabel={t('begin_removal')}
+          buttonValue={t('begin_removal')}
+          onChange={() => {
+            setSelected('begin-removal')
+          }}
+          isSelected={selected === 'begin-removal'}
         />
-      </RecoverySingleColumnContent>
-    )
-  } else {
-    return null
-  }
+        <RadioButton
+          buttonLabel={t('skip_removal')}
+          buttonValue={t('skip_removal')}
+          onChange={() => {
+            setSelected('skip')
+          }}
+          isSelected={selected === 'skip'}
+        />
+      </Flex>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing4}
+        css={DESKTOP_ONLY}
+      >
+        <RecoveryRadioGroup
+          value={selected}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            setSelected(e.currentTarget.value as RemovalOptions)
+          }}
+          options={[
+            {
+              value: 'begin-removal',
+              children: (
+                <StyledText
+                  desktopStyle="bodyDefaultRegular"
+                  css={RADIO_GROUP_STYLE}
+                >
+                  {t('begin_removal')}
+                </StyledText>
+              ),
+            },
+            {
+              value: 'skip',
+              children: (
+                <StyledText
+                  desktopStyle="bodyDefaultRegular"
+                  css={RADIO_GROUP_STYLE}
+                >
+                  {t('skip_removal')}
+                </StyledText>
+              ),
+            },
+          ]}
+        />
+      </Flex>
+      <RecoveryFooterButtons primaryBtnOnClick={primaryOnClick} />
+    </RecoverySingleColumnContentWrapper>
+  )
 }
 
-function DropTipFlowsContainer(props: RecoveryContentProps): JSX.Element {
+function DropTipFlowsContainer(
+  props: RecoveryContentProps
+): JSX.Element | null {
   const {
+    robotType,
     tipStatusUtils,
     routeUpdateActions,
     recoveryCommands,
-    isFlex,
     currentRecoveryOptionUtils,
   } = props
   const { DROP_TIP_FLOWS, ROBOT_CANCELING, RETRY_NEW_TIPS } = RECOVERY_MAP
@@ -159,16 +223,18 @@ function DropTipFlowsContainer(props: RecoveryContentProps): JSX.Element {
     void proceedToRouteAndStep(DROP_TIP_FLOWS.ROUTE)
   }
 
+  const fixitCommandTypeUtils = useDropTipFlowUtils(props)
+
   return (
-    <RecoverySingleColumnContent>
+    <RecoverySingleColumnContentWrapper>
       <DropTipWizardFlows
-        robotType={isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE}
+        robotType={robotType}
         closeFlow={onCloseFlow}
         mount={mount}
         instrumentModelSpecs={specs}
-        fixitCommandTypeUtils={useDropTipFlowUtils(props)}
+        fixitCommandTypeUtils={fixitCommandTypeUtils}
       />
-    </RecoverySingleColumnContent>
+    </RecoverySingleColumnContentWrapper>
   )
 }
 
@@ -184,6 +250,7 @@ export function useDropTipFlowUtils({
   const { t } = useTranslation('error_recovery')
   const {
     RETRY_NEW_TIPS,
+    SKIP_STEP_WITH_NEW_TIPS,
     ERROR_WHILE_RECOVERING,
     DROP_TIP_FLOWS,
   } = RECOVERY_MAP
@@ -196,9 +263,32 @@ export function useDropTipFlowUtils({
   const buildTipDropCompleteBtn = (): string => {
     switch (selectedRecoveryOption) {
       case RETRY_NEW_TIPS.ROUTE:
+      case SKIP_STEP_WITH_NEW_TIPS.ROUTE:
         return t('proceed_to_tip_selection')
       default:
         return t('proceed_to_cancel')
+    }
+  }
+
+  const buildTipDropCompleteRouting = (): (() => void) | null => {
+    const routeTo = (selectedRoute: RecoveryRoute, step: RouteStep): void => {
+      void proceedToRouteAndStep(selectedRoute, step)
+    }
+
+    switch (selectedRecoveryOption) {
+      case RETRY_NEW_TIPS.ROUTE:
+        return () => {
+          routeTo(selectedRecoveryOption, RETRY_NEW_TIPS.STEPS.REPLACE_TIPS)
+        }
+      case SKIP_STEP_WITH_NEW_TIPS.ROUTE:
+        return () => {
+          routeTo(
+            selectedRecoveryOption,
+            SKIP_STEP_WITH_NEW_TIPS.STEPS.REPLACE_TIPS
+          )
+        }
+      default:
+        return null
     }
   }
 
@@ -231,6 +321,15 @@ export function useDropTipFlowUtils({
     }
   }
 
+  const buildButtonOverrides = (): FixitCommandTypeUtils['buttonOverrides'] => {
+    return {
+      goBackBeforeBeginning: () => {
+        return proceedToRouteAndStep(DROP_TIP_FLOWS.ROUTE)
+      },
+      tipDropComplete: buildTipDropCompleteRouting(),
+    }
+  }
+
   // If a specific step within the DROP_TIP_FLOWS route is selected, begin the Drop Tip Flows at its related route.
   const buildRouteOverride = (): FixitCommandTypeUtils['routeOverride'] => {
     switch (step) {
@@ -247,6 +346,7 @@ export function useDropTipFlowUtils({
     copyOverrides: buildCopyOverrides(),
     trackCurrentMap: trackExternalMap,
     errorOverrides: buildErrorOverrides(),
+    buttonOverrides: buildButtonOverrides(),
     routeOverride: buildRouteOverride(),
   }
 }

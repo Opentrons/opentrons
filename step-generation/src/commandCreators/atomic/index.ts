@@ -4,6 +4,7 @@ import { blowout } from './blowout'
 import { blowOutInPlace } from './blowOutInPlace'
 import { configureForVolume } from './configureForVolume'
 import { configureNozzleLayout } from './configureNozzleLayout'
+import { comment } from './comment'
 import { deactivateTemperature } from './deactivateTemperature'
 import { delay } from './delay'
 import { disengageMagnet } from './disengageMagnet'
@@ -27,6 +28,7 @@ export {
   blowOutInPlace,
   configureForVolume,
   configureNozzleLayout,
+  comment,
   deactivateTemperature,
   delay,
   disengageMagnet,

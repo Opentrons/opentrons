@@ -178,7 +178,7 @@ from opentrons_hardware.hardware_control.hepa_uv_settings import (
 )
 
 from opentrons_hardware.drivers.gpio import OT3GPIO, RemoteOT3GPIO
-from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons_shared_data.pipette.types import PipetteName
 from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
     load_data as load_pipette_data,
@@ -191,10 +191,9 @@ from opentrons_shared_data.errors.exceptions import (
     PipetteOverpressureError,
     FirmwareUpdateRequiredError,
     FailedGripperPickupError,
-    LiquidNotFoundError,
+    PipetteLiquidNotFoundError,
     CommunicationError,
     PythonException,
-    UnsupportedHardwareCommand,
 )
 
 from .subsystem_manager import SubsystemManager
@@ -644,7 +643,7 @@ class OT3Controller(FlexBackend):
                 origin=origin, target_list=[move_target]
             )
         except ZeroLengthMoveError as zme:
-            log.warning(f"Not moving because move was zero length {str(zme)}")
+            log.debug(f"Not moving because move was zero length {str(zme)}")
             return
         moves = movelist[0]
         log.info(f"move: machine {target} from {origin} requires {moves}")
@@ -1354,25 +1353,16 @@ class OT3Controller(FlexBackend):
     async def liquid_probe(
         self,
         mount: OT3Mount,
-        max_z_distance: float,
+        max_p_distance: float,
         mount_speed: float,
         plunger_speed: float,
         threshold_pascals: float,
+        plunger_impulse_time: float,
         output_option: OutputOptions = OutputOptions.can_bus_only,
         data_files: Optional[Dict[InstrumentProbeType, str]] = None,
         probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
+        force_both_sensors: bool = False,
     ) -> float:
-        if output_option == OutputOptions.sync_buffer_to_csv:
-            if (
-                self._subsystem_manager.device_info[
-                    SubSystem.of_mount(mount)
-                ].revision.tertiary
-                != "1"
-            ):
-                raise UnsupportedHardwareCommand(
-                    "Liquid Probe not supported on this pipette firmware"
-                )
-
         head_node = axis_to_node(Axis.by_mount(mount))
         tool = sensor_node_for_pipette(OT3Mount(mount.value))
         csv_output = bool(output_option.value & OutputOptions.stream_to_csv.value)
@@ -1394,15 +1384,17 @@ class OT3Controller(FlexBackend):
             messenger=self._messenger,
             tool=tool,
             head_node=head_node,
-            max_z_distance=max_z_distance,
+            max_p_distance=max_p_distance,
             plunger_speed=plunger_speed,
             mount_speed=mount_speed,
             threshold_pascals=threshold_pascals,
+            plunger_impulse_time=plunger_impulse_time,
             csv_output=csv_output,
             sync_buffer_output=sync_buffer_output,
             can_bus_only_output=can_bus_only_output,
             data_files=data_files_transposed,
             sensor_id=sensor_id_for_instrument(probe),
+            force_both_sensors=force_both_sensors,
         )
         for node, point in positions.items():
             self._position.update({node: point.motor_position})
@@ -1412,7 +1404,7 @@ class OT3Controller(FlexBackend):
             or positions[head_node].move_ack
             == MoveCompleteAck.complete_without_condition
         ):
-            raise LiquidNotFoundError(
+            raise PipetteLiquidNotFoundError(
                 "Liquid not found during probe.",
                 {
                     str(node_to_axis(node)): str(point.motor_position)
@@ -1459,7 +1451,6 @@ class OT3Controller(FlexBackend):
             tool=sensor_node_for_mount(mount),
             mover=axis_to_node(moving),
             distance=distance_mm,
-            plunger_speed=speed_mm_per_s,
             mount_speed=speed_mm_per_s,
             csv_output=csv_output,
             sync_buffer_output=sync_buffer_output,

@@ -9,6 +9,9 @@ from opentrons.protocols.api_support.definitions import (
     MIN_SUPPORTED_VERSION,
     MIN_SUPPORTED_VERSION_FOR_FLEX,
 )
+from opentrons.protocols.parameters.exceptions import (
+    RuntimeParameterRequired as RuntimeParameterRequiredError,
+)
 
 from .protocol_context import ProtocolContext
 from .deck import Deck
@@ -28,6 +31,9 @@ from ._liquid import Liquid
 from ._types import OFF_DECK
 from ._nozzle_layout import (
     COLUMN,
+    PARTIAL_COLUMN,
+    SINGLE,
+    ROW,
     ALL,
 )
 from ._parameters import Parameters
@@ -60,8 +66,12 @@ __all__ = [
     "Liquid",
     "Parameters",
     "COLUMN",
+    "PARTIAL_COLUMN",
+    "SINGLE",
+    "ROW",
     "ALL",
     "OFF_DECK",
+    "RuntimeParameterRequiredError",
     # For internal Opentrons use only:
     "create_protocol_context",
     "ProtocolEngineCoreRequiredError",

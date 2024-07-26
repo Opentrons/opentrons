@@ -40,6 +40,8 @@
       "setStatusBar": "#/definitions/SetStatusBarCreate",
       "verifyTipPresence": "#/definitions/VerifyTipPresenceCreate",
       "getTipPresence": "#/definitions/GetTipPresenceCreate",
+      "liquidProbe": "#/definitions/LiquidProbeCreate",
+      "tryLiquidProbe": "#/definitions/TryLiquidProbeCreate",
       "heaterShaker/waitForTemperature": "#/definitions/opentrons__protocol_engine__commands__heater_shaker__wait_for_temperature__WaitForTemperatureCreate",
       "heaterShaker/setTargetTemperature": "#/definitions/opentrons__protocol_engine__commands__heater_shaker__set_target_temperature__SetTargetTemperatureCreate",
       "heaterShaker/deactivateHeater": "#/definitions/DeactivateHeaterCreate",
@@ -174,6 +176,12 @@
     },
     {
       "$ref": "#/definitions/GetTipPresenceCreate"
+    },
+    {
+      "$ref": "#/definitions/LiquidProbeCreate"
+    },
+    {
+      "$ref": "#/definitions/TryLiquidProbeCreate"
     },
     {
       "$ref": "#/definitions/opentrons__protocol_engine__commands__heater_shaker__wait_for_temperature__WaitForTemperatureCreate"
@@ -497,6 +505,11 @@
           "description": "Amount of liquid in uL. Must be at least 0 and no greater than a pipette-specific maximum volume.",
           "minimum": 0,
           "type": "number"
+        },
+        "tipOverlapNotAfterVersion": {
+          "title": "Tipoverlapnotafterversion",
+          "description": "A version of tip overlap data to not exceed. The highest-versioned tip overlap data that does not exceed this version will be used. Versions are expressed as vN where N is an integer, counting up from v0. If None, the current highest version will be used.",
+          "type": "string"
         }
       },
       "required": ["pipetteId", "volume"]
@@ -626,9 +639,15 @@
           "description": "The front right nozzle in your configuration.",
           "pattern": "[A-Z]\\d{1,2}",
           "type": "string"
+        },
+        "backLeftNozzle": {
+          "title": "Backleftnozzle",
+          "description": "The back left nozzle in your configuration.",
+          "pattern": "[A-Z]\\d{1,2}",
+          "type": "string"
         }
       },
-      "required": ["primaryNozzle", "frontRightNozzle"]
+      "required": ["primaryNozzle", "frontRightNozzle", "backLeftNozzle"]
     },
     "ConfigureNozzleLayoutParams": {
       "title": "ConfigureNozzleLayoutParams",
@@ -1643,6 +1662,16 @@
           "title": "Pipetteid",
           "description": "An optional ID to assign to this pipette. If None, an ID will be generated.",
           "type": "string"
+        },
+        "tipOverlapNotAfterVersion": {
+          "title": "Tipoverlapnotafterversion",
+          "description": "A version of tip overlap data to not exceed. The highest-versioned tip overlap data that does not exceed this version will be used. Versions are expressed as vN where N is an integer, counting up from v0. If None, the current highest version will be used.",
+          "type": "string"
+        },
+        "liquidPresenceDetection": {
+          "title": "Liquidpresencedetection",
+          "description": "Enable liquid presence detection for this pipette. Defaults to False.",
+          "type": "boolean"
         }
       },
       "required": ["pipetteName", "mount"]
@@ -2729,6 +2758,130 @@
         },
         "params": {
           "$ref": "#/definitions/GetTipPresenceParams"
+        },
+        "intent": {
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CommandIntent"
+            }
+          ]
+        },
+        "key": {
+          "title": "Key",
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "type": "string"
+        }
+      },
+      "required": ["params"]
+    },
+    "LiquidProbeParams": {
+      "title": "LiquidProbeParams",
+      "description": "Parameters required for a `liquidProbe` command.",
+      "type": "object",
+      "properties": {
+        "labwareId": {
+          "title": "Labwareid",
+          "description": "Identifier of labware to use.",
+          "type": "string"
+        },
+        "wellName": {
+          "title": "Wellname",
+          "description": "Name of well to use in labware.",
+          "type": "string"
+        },
+        "wellLocation": {
+          "title": "Welllocation",
+          "description": "Relative well location at which to perform the operation",
+          "allOf": [
+            {
+              "$ref": "#/definitions/WellLocation"
+            }
+          ]
+        },
+        "pipetteId": {
+          "title": "Pipetteid",
+          "description": "Identifier of pipette to use for liquid handling.",
+          "type": "string"
+        }
+      },
+      "required": ["labwareId", "wellName", "pipetteId"]
+    },
+    "LiquidProbeCreate": {
+      "title": "LiquidProbeCreate",
+      "description": "The request model for a `liquidProbe` command.",
+      "type": "object",
+      "properties": {
+        "commandType": {
+          "title": "Commandtype",
+          "default": "liquidProbe",
+          "enum": ["liquidProbe"],
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/definitions/LiquidProbeParams"
+        },
+        "intent": {
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CommandIntent"
+            }
+          ]
+        },
+        "key": {
+          "title": "Key",
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "type": "string"
+        }
+      },
+      "required": ["params"]
+    },
+    "TryLiquidProbeParams": {
+      "title": "TryLiquidProbeParams",
+      "description": "Parameters required for a `tryLiquidProbe` command.",
+      "type": "object",
+      "properties": {
+        "labwareId": {
+          "title": "Labwareid",
+          "description": "Identifier of labware to use.",
+          "type": "string"
+        },
+        "wellName": {
+          "title": "Wellname",
+          "description": "Name of well to use in labware.",
+          "type": "string"
+        },
+        "wellLocation": {
+          "title": "Welllocation",
+          "description": "Relative well location at which to perform the operation",
+          "allOf": [
+            {
+              "$ref": "#/definitions/WellLocation"
+            }
+          ]
+        },
+        "pipetteId": {
+          "title": "Pipetteid",
+          "description": "Identifier of pipette to use for liquid handling.",
+          "type": "string"
+        }
+      },
+      "required": ["labwareId", "wellName", "pipetteId"]
+    },
+    "TryLiquidProbeCreate": {
+      "title": "TryLiquidProbeCreate",
+      "description": "The request model for a `tryLiquidProbe` command.",
+      "type": "object",
+      "properties": {
+        "commandType": {
+          "title": "Commandtype",
+          "default": "tryLiquidProbe",
+          "enum": ["tryLiquidProbe"],
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/definitions/TryLiquidProbeParams"
         },
         "intent": {
           "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",

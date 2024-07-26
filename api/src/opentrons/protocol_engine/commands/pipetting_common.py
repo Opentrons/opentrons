@@ -2,7 +2,7 @@
 from dataclasses import dataclass
 from opentrons_shared_data.errors import ErrorCodes
 from pydantic import BaseModel, Field
-from typing import Literal, Optional
+from typing import Literal, Optional, Tuple, TypedDict
 
 from opentrons.protocol_engine.errors.error_occurrence import ErrorOccurrence
 
@@ -123,6 +123,12 @@ class DestinationPositionResult(BaseModel):
     )
 
 
+class ErrorLocationInfo(TypedDict):
+    """Holds a retry location for in-place error recovery."""
+
+    retryLocation: Tuple[float, float, float]
+
+
 class OverpressureError(ErrorOccurrence):
     """Returned when sensors detect an overpressure error while moving liquid.
 
@@ -138,10 +144,34 @@ class OverpressureError(ErrorOccurrence):
     errorCode: str = ErrorCodes.PIPETTE_OVERPRESSURE.value.code
     detail: str = ErrorCodes.PIPETTE_OVERPRESSURE.value.detail
 
+    errorInfo: ErrorLocationInfo
+
 
 @dataclass(frozen=True)
 class OverpressureErrorInternalData:
     """Internal-to-ProtocolEngine data about an OverpressureError."""
+
+    position: DeckPoint
+    """Same meaning as DestinationPositionResult.position."""
+
+
+class LiquidNotFoundError(ErrorOccurrence):
+    """Returned when no liquid is detected during the liquid probe process/move.
+
+    After a failed probing, the pipette returns to the process start position.
+    """
+
+    isDefined: bool = True
+
+    errorType: Literal["liquidNotFound"] = "liquidNotFound"
+
+    errorCode: str = ErrorCodes.PIPETTE_LIQUID_NOT_FOUND.value.code
+    detail: str = ErrorCodes.PIPETTE_LIQUID_NOT_FOUND.value.detail
+
+
+@dataclass(frozen=True)
+class LiquidNotFoundErrorInternalData:
+    """Internal-to-ProtocolEngine data about a LiquidNotFoundError."""
 
     position: DeckPoint
     """Same meaning as DestinationPositionResult.position."""

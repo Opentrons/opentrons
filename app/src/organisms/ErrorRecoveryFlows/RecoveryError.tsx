@@ -6,24 +6,24 @@ import {
   DIRECTION_COLUMN,
   Flex,
   Icon,
-  StyledText,
+  LegacyStyledText,
   SPACING,
   ALIGN_CENTER,
   JUSTIFY_END,
 } from '@opentrons/components'
 
 import { RECOVERY_MAP } from './constants'
-import { RecoverySingleColumnContent } from './shared'
+import { RecoverySingleColumnContentWrapper } from './shared'
 
 import type { RecoveryContentProps } from './types'
 import { SmallButton } from '../../atoms/buttons'
 
-export function RecoveryError(props: RecoveryContentProps): JSX.Element | null {
+export function RecoveryError(props: RecoveryContentProps): JSX.Element {
   const { recoveryMap } = props
   const { step } = recoveryMap
   const { ERROR_WHILE_RECOVERING } = RECOVERY_MAP
 
-  const buildContent = (): JSX.Element | null => {
+  const buildContent = (): JSX.Element => {
     switch (step) {
       case ERROR_WHILE_RECOVERING.STEPS.RECOVERY_ACTION_FAILED:
         return <ErrorRecoveryFlowError {...props} />
@@ -45,7 +45,7 @@ export function ErrorRecoveryFlowError({
   getRecoveryOptionCopy,
   currentRecoveryOptionUtils,
   routeUpdateActions,
-}: RecoveryContentProps): JSX.Element | null {
+}: RecoveryContentProps): JSX.Element {
   const { OPTION_SELECTION } = RECOVERY_MAP
   const { t } = useTranslation('error_recovery')
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
@@ -74,7 +74,7 @@ export function RecoveryDropTipFlowErrors({
   currentRecoveryOptionUtils,
   routeUpdateActions,
   getRecoveryOptionCopy,
-}: RecoveryContentProps): JSX.Element | null {
+}: RecoveryContentProps): JSX.Element {
   const { t } = useTranslation('error_recovery')
   const { step } = recoveryMap
   const {
@@ -167,39 +167,35 @@ export function ErrorContent({
   btnText: string
   btnOnClick: () => void
 }): JSX.Element | null {
-  if (isOnDevice) {
-    return (
-      <RecoverySingleColumnContent>
+  return (
+    <RecoverySingleColumnContentWrapper>
+      <Flex
+        padding={SPACING.spacing40}
+        gridGap={SPACING.spacing24}
+        flexDirection={DIRECTION_COLUMN}
+        alignItems={ALIGN_CENTER}
+        justifyContent={ALIGN_CENTER}
+        flex="1"
+      >
+        <Icon
+          name="alert-circle"
+          size={SPACING.spacing60}
+          color={COLORS.red50}
+          data-testid="recovery_error_alert_icon"
+        />
         <Flex
-          padding={SPACING.spacing40}
-          gridGap={SPACING.spacing24}
+          gridGap={SPACING.spacing4}
           flexDirection={DIRECTION_COLUMN}
           alignItems={ALIGN_CENTER}
-          justifyContent={ALIGN_CENTER}
-          flex="1"
+          textAlign={ALIGN_CENTER}
         >
-          <Icon
-            name="alert-circle"
-            size={SPACING.spacing60}
-            color={COLORS.red50}
-            data-testid="recovery_error_alert_icon"
-          />
-          <Flex
-            gridGap={SPACING.spacing4}
-            flexDirection={DIRECTION_COLUMN}
-            alignItems={ALIGN_CENTER}
-            textAlign={ALIGN_CENTER}
-          >
-            <StyledText as="h3Bold">{title}</StyledText>
-            <StyledText as="h4">{subTitle}</StyledText>
-          </Flex>
+          <LegacyStyledText as="h3Bold">{title}</LegacyStyledText>
+          <LegacyStyledText as="h4">{subTitle}</LegacyStyledText>
         </Flex>
-        <Flex justifyContent={JUSTIFY_END}>
-          <SmallButton onClick={btnOnClick} buttonText={btnText} />
-        </Flex>
-      </RecoverySingleColumnContent>
-    )
-  } else {
-    return null
-  }
+      </Flex>
+      <Flex justifyContent={JUSTIFY_END}>
+        <SmallButton onClick={btnOnClick} buttonText={btnText} />
+      </Flex>
+    </RecoverySingleColumnContentWrapper>
+  )
 }

@@ -32,7 +32,7 @@ from opentrons.protocol_reader import ProtocolReader, ProtocolSource
 from opentrons.protocols.types import JsonProtocol, Protocol, PythonProtocol
 
 if TYPE_CHECKING:
-    from opentrons_shared_data.labware.dev_types import LabwareDefinition
+    from opentrons_shared_data.labware.types import LabwareDefinition
 
 
 log = logging.getLogger(__name__)

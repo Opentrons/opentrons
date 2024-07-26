@@ -1,19 +1,20 @@
 import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
-
+import { useNavigate } from 'react-router-dom'
 import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
 } from '@opentrons/shared-data'
+import { RUN_STATUS_STOPPED } from '@opentrons/api-client'
 
 import { getTopPortalEl } from '../../App/portal'
 import { FloatingActionButton } from '../../atoms/buttons'
@@ -22,6 +23,7 @@ import { ChildNavigation } from '../../organisms/ChildNavigation'
 import { useAttachedModules } from '../../organisms/Devices/hooks'
 import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useRunStatus } from '../RunTimeControl/hooks'
 import {
   getAttachedProtocolModuleMatches,
   getUnmatchedModulesForProtocol,
@@ -34,9 +36,6 @@ import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configurat
 
 import type { CutoutId, CutoutFixtureId } from '@opentrons/shared-data'
 import type { SetupScreens } from '../../pages/ProtocolSetup'
-import { useRunStatus } from '../RunTimeControl/hooks'
-import { RUN_STATUS_STOPPED } from '@opentrons/api-client'
-import { useHistory } from 'react-router-dom'
 
 const ATTACHED_MODULE_POLL_MS = 5000
 const DECK_CONFIG_POLL_MS = 5000
@@ -58,13 +57,13 @@ export function ProtocolSetupModulesAndDeck({
   setProvidedFixtureOptions,
 }: ProtocolSetupModulesAndDeckProps): JSX.Element {
   const { i18n, t } = useTranslation('protocol_setup')
-  const history = useHistory()
+  const navigate = useNavigate()
   const runStatus = useRunStatus(runId)
   React.useEffect(() => {
     if (runStatus === RUN_STATUS_STOPPED) {
-      history.push('/protocols')
+      navigate('/protocols')
     }
-  }, [runStatus, history])
+  }, [runStatus, navigate])
   const [
     showSetupInstructionsModal,
     setShowSetupInstructionsModal,
@@ -164,11 +163,11 @@ export function ProtocolSetupModulesAndDeck({
             lineHeight={TYPOGRAPHY.lineHeight28}
             paddingX={SPACING.spacing24}
           >
-            <StyledText flex="3.5 0 0">
+            <LegacyStyledText flex="3.5 0 0">
               {i18n.format(t('deck_hardware'), 'titleCase')}
-            </StyledText>
-            <StyledText flex="2 0 0">{t('location')}</StyledText>
-            <StyledText flex="4 0 0"> {t('status')}</StyledText>
+            </LegacyStyledText>
+            <LegacyStyledText flex="2 0 0">{t('location')}</LegacyStyledText>
+            <LegacyStyledText flex="4 0 0"> {t('status')}</LegacyStyledText>
           </Flex>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
             {hasModules ? (

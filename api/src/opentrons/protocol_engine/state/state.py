@@ -5,7 +5,8 @@ from dataclasses import dataclass
 from typing import Callable, Dict, List, Optional, Sequence, TypeVar
 from typing_extensions import ParamSpec
 
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
+from opentrons_shared_data.deck.types import DeckDefinitionV5
+from opentrons_shared_data.robot.types import RobotDefinition
 
 from opentrons.protocol_engine.types import ModuleOffsetData
 from opentrons.util.change_notifier import ChangeNotifier
@@ -144,6 +145,7 @@ class StateStore(StateView, ActionHandler):
         config: Config,
         deck_definition: DeckDefinitionV5,
         deck_fixed_labware: Sequence[DeckFixedLabware],
+        robot_definition: RobotDefinition,
         is_door_open: bool,
         change_notifier: Optional[ChangeNotifier] = None,
         module_calibration_offsets: Optional[Dict[str, ModuleOffsetData]] = None,
@@ -162,6 +164,7 @@ class StateStore(StateView, ActionHandler):
             change_notifier: Internal state change notifier.
             module_calibration_offsets: Module offsets to preload.
             deck_configuration: The initial deck configuration the addressable area store will be instantiated with.
+            robot_definition: Static information about the robot type being used.
             notify_publishers: Notifies robot server publishers of internal state change.
         """
         self._command_store = CommandStore(config=config, is_door_open=is_door_open)
@@ -172,6 +175,7 @@ class StateStore(StateView, ActionHandler):
             deck_configuration=deck_configuration,
             config=config,
             deck_definition=deck_definition,
+            robot_definition=robot_definition,
         )
         self._labware_store = LabwareStore(
             deck_fixed_labware=deck_fixed_labware,

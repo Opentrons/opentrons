@@ -16,8 +16,9 @@ import {
   OVERFLOW_WRAP_ANYWHERE,
   POSITION_RELATIVE,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
 
@@ -167,10 +168,12 @@ export function RunningProtocolCommandList({
         height="6.75rem"
       >
         <Flex flexDirection={DIRECTION_COLUMN}>
-          <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightBold}>
+          <LegacyStyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightBold}>
             {currentRunStatus}
-          </StyledText>
-          <StyledText css={TITLE_TEXT_STYLE}>{protocolName}</StyledText>
+          </LegacyStyledText>
+          <LegacyStyledText css={TITLE_TEXT_STYLE}>
+            {protocolName}
+          </LegacyStyledText>
         </Flex>
         <Flex height="100%" gridGap="1.5rem" alignItems={ALIGN_CENTER}>
           <StopButton onStop={onStop} buttonSize="6.26rem" iconSize="2.5rem" />
@@ -219,8 +222,15 @@ export function RunningProtocolCommandList({
                 <Flex
                   key={command.id}
                   alignItems={ALIGN_CENTER}
-                  gridGap={SPACING.spacing8}
+                  gridGap={SPACING.spacing12}
                 >
+                  <StyledText
+                    minWidth={SPACING.spacing16}
+                    oddStyle="bodyTextRegular"
+                    height="1.75rem"
+                  >
+                    {index + 1}
+                  </StyledText>
                   <Flex
                     padding={`${SPACING.spacing12} ${SPACING.spacing24}`}
                     alignItems={ALIGN_CENTER}

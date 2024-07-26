@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
   useConditionalConfirm,
@@ -25,7 +25,7 @@ const QUICK_TRANSFER_WIZARD_STEPS = 8
 const initialQuickTransferState: QuickTransferWizardState = {}
 
 export const QuickTransferFlow = (): JSX.Element => {
-  const history = useHistory()
+  const navigate = useNavigate()
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
   const [state, dispatch] = React.useReducer(
     quickTransferWizardReducer,
@@ -38,7 +38,7 @@ export const QuickTransferFlow = (): JSX.Element => {
     showConfirmation: showConfirmExit,
     cancel: cancelExit,
   } = useConditionalConfirm(() => {
-    history.push('protocols')
+    navigate('/quick-transfer')
   }, true)
 
   const exitButtonProps: React.ComponentProps<typeof SmallButton> = {

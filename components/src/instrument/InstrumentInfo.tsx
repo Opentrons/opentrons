@@ -3,7 +3,7 @@ import * as React from 'react'
 import { LEFT, RIGHT } from '@opentrons/shared-data'
 import { Flex } from '../primitives'
 import { SPACING, TYPOGRAPHY } from '../ui-style-constants'
-import { StyledText } from '../atoms'
+import { LegacyStyledText } from '../atoms'
 import { DIRECTION_COLUMN, JUSTIFY_CENTER } from '../styles'
 import { InstrumentDiagram } from './InstrumentDiagram'
 
@@ -56,35 +56,39 @@ export function InstrumentInfo(props: InstrumentInfoProps): JSX.Element {
         gridGap={SPACING.spacing8}
       >
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-          <StyledText
+          <LegacyStyledText
             as="h3"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             textTransform={TYPOGRAPHY.textTransformCapitalize}
           >
             {showMountLabel && !has96Channel ? `${mount} pipette` : 'pipette'}
-          </StyledText>
-          <StyledText as="p" width="max-content" maxWidth={MAX_WIDTH}>
+          </LegacyStyledText>
+          <LegacyStyledText as="p" width="max-content" maxWidth={MAX_WIDTH}>
             {description}
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
 
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-          <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          <LegacyStyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {'Tip rack'}
-          </StyledText>
+          </LegacyStyledText>
           <ul>
             {tiprackModels != null && tiprackModels.length > 0 ? (
               tiprackModels.map((model, index) => (
                 <li key={`${model}_${index}`}>
-                  <StyledText as="p" width="max-content" maxWidth={MAX_WIDTH}>
+                  <LegacyStyledText
+                    as="p"
+                    width="max-content"
+                    maxWidth={MAX_WIDTH}
+                  >
                     {model}
-                  </StyledText>
+                  </LegacyStyledText>
                 </li>
               ))
             ) : (
-              <StyledText as="p" width="max-content" maxWidth={MAX_WIDTH}>
+              <LegacyStyledText as="p" width="max-content" maxWidth={MAX_WIDTH}>
                 {'None'}
-              </StyledText>
+              </LegacyStyledText>
             )}
           </ul>
         </Flex>

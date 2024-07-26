@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { Redirect, useParams } from 'react-router-dom'
+import { useParams, Navigate } from 'react-router-dom'
 
 import {
   BORDERS,
@@ -10,7 +10,7 @@ import {
   Flex,
   SIZE_6,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
@@ -33,17 +33,17 @@ import { RobotSettingsCalibration } from '../../../organisms/RobotSettingsCalibr
 import { RobotSettingsAdvanced } from '../../../organisms/Devices/RobotSettings/RobotSettingsAdvanced'
 import { RobotSettingsNetworking } from '../../../organisms/Devices/RobotSettings/RobotSettingsNetworking'
 import { RobotSettingsFeatureFlags } from '../../../organisms/Devices/RobotSettings/RobotSettingsFeatureFlags'
-import { RobotSettingsPrivacy } from '../../../organisms/Devices/RobotSettings/RobotSettingsPrivacy'
 import { ReachableBanner } from '../../../organisms/Devices/ReachableBanner'
 
 import type { DesktopRouteParams, RobotSettingsTab } from '../../../App/types'
 
 export function RobotSettings(): JSX.Element | null {
   const { t } = useTranslation('device_settings')
-  const { robotName, robotSettingsTab } = useParams<DesktopRouteParams>()
+  const { robotName, robotSettingsTab } = useParams<
+    keyof DesktopRouteParams
+  >() as DesktopRouteParams
   const robot = useRobot(robotName)
   const isCalibrationDisabled = robot?.status !== CONNECTABLE
-  const isPrivacyDisabled = robot?.status === UNREACHABLE
   const isNetworkingDisabled = robot?.status === UNREACHABLE
   const [showRobotBusyBanner, setShowRobotBusyBanner] = React.useState<boolean>(
     false
@@ -76,7 +76,6 @@ export function RobotSettings(): JSX.Element | null {
       />
     ),
     'feature-flags': <RobotSettingsFeatureFlags robotName={robotName} />,
-    privacy: <RobotSettingsPrivacy robotName={robotName} />,
   }
 
   const devToolsOn = useSelector(getDevtoolsEnabled)
@@ -87,20 +86,19 @@ export function RobotSettings(): JSX.Element | null {
       (robot?.status === REACHABLE && robot?.serverHealthStatus !== 'ok')) &&
     robotUpdateSession == null
   ) {
-    return <Redirect to={`/devices/${robotName}`} />
+    return <Navigate to={`/devices/${robotName}`} />
   }
   const cannotViewCalibration =
     robotSettingsTab === 'calibration' && isCalibrationDisabled
   const cannotViewFeatureFlags =
     robotSettingsTab === 'feature-flags' && !devToolsOn
-  const cannotViewPrivacy = robotSettingsTab === 'privacy' && isPrivacyDisabled
-  if (cannotViewCalibration || cannotViewFeatureFlags || cannotViewPrivacy) {
-    return <Redirect to={`/devices/${robotName}/robot-settings/networking`} />
+  if (cannotViewCalibration || cannotViewFeatureFlags) {
+    return <Navigate to={`/devices/${robotName}/robot-settings/networking`} />
   }
 
   const robotSettingsContent = robotSettingsContentByTab[robotSettingsTab] ?? (
     // default to the calibration tab if no tab or nonexistent tab is passed as a param
-    <Redirect to={`/devices/${robotName}/robot-settings/calibration`} />
+    <Navigate to={`/devices/${robotName}/robot-settings/calibration`} />
   )
 
   return (
@@ -128,9 +126,9 @@ export function RobotSettings(): JSX.Element | null {
           )}
           {showRobotBusyBanner && (
             <Banner type="warning" marginBottom={SPACING.spacing16}>
-              <StyledText as="p">
+              <LegacyStyledText as="p">
                 {t('some_robot_controls_are_not_available')}
-              </StyledText>
+              </LegacyStyledText>
             </Banner>
           )}
           <Flex gridGap={SPACING.spacing16}>
@@ -143,11 +141,6 @@ export function RobotSettings(): JSX.Element | null {
               to={`/devices/${robotName}/robot-settings/networking`}
               tabName={t('networking')}
               disabled={isNetworkingDisabled}
-            />
-            <NavTab
-              to={`/devices/${robotName}/robot-settings/privacy`}
-              tabName={t('privacy')}
-              disabled={isPrivacyDisabled}
             />
             <NavTab
               to={`/devices/${robotName}/robot-settings/advanced`}

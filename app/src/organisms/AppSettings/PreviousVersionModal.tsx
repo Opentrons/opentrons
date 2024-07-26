@@ -6,7 +6,7 @@ import {
   JUSTIFY_FLEX_END,
   PrimaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 import { LegacyModal } from '../../molecules/LegacyModal'
@@ -29,9 +29,9 @@ export function PreviousVersionModal(
   return (
     <LegacyModal onClose={props.closeModal} title={t('how_to_restore')}>
       <Box>
-        <StyledText as="p" paddingBottom={SPACING.spacing8}>
+        <LegacyStyledText as="p" paddingBottom={SPACING.spacing8}>
           {t('branded:restore_description')}
-        </StyledText>
+        </LegacyStyledText>
         <ExternalLink
           href={UNINSTALL_APP_URL}
           id="PreviousVersionModal_uninstallingAppLink"

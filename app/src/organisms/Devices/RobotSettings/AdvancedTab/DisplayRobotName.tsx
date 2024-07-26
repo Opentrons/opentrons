@@ -9,7 +9,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING_AUTO,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -39,24 +39,24 @@ export function DisplayRobotName({
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
       <Box width="70%">
-        <StyledText
+        <LegacyStyledText
           as="h2"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginBottom={SPACING.spacing16}
           id="AdvancedSettings_About"
         >
           {t('about_advanced')}
-        </StyledText>
-        <StyledText
+        </LegacyStyledText>
+        <LegacyStyledText
           as="p"
           css={TYPOGRAPHY.pSemiBold}
           marginBottom={SPACING.spacing4}
         >
           {t('robot_name')}
-        </StyledText>
-        <StyledText as="p" color={COLORS.grey60}>
+        </LegacyStyledText>
+        <LegacyStyledText as="p" color={COLORS.grey60}>
           {robotName}
-        </StyledText>
+        </LegacyStyledText>
       </Box>
       <TertiaryButton
         marginLeft={SPACING_AUTO}

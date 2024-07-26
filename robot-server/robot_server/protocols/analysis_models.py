@@ -3,7 +3,7 @@
 from enum import Enum
 
 from opentrons.protocol_engine.types import RunTimeParameter, RunTimeParamValuesType
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.types import RobotType
 from pydantic import BaseModel, Field
 from typing import List, Optional, Union, NamedTuple
 from typing_extensions import Literal
@@ -34,10 +34,15 @@ class AnalysisResult(str, Enum):
         OK: No problems were found during protocol analysis.
         NOT_OK: Problems were found during protocol analysis. Inspect
             `analysis.errors` for error occurrences.
+        PARAMETER_VALUE_REQUIRED: A value is required to be set for a parameter
+            in order for the protocol to be analyzed/run. The absence of this does not
+            inherently mean there are no parameters, as there may be defaults for all
+            or unset parameters are not referenced or handled via try/except clauses.
     """
 
     OK = "ok"
     NOT_OK = "not-ok"
+    PARAMETER_VALUE_REQUIRED = "parameter-value-required"
 
 
 class AnalysisRequest(BaseModel):

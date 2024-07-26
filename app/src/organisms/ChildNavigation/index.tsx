@@ -12,7 +12,7 @@ import {
   POSITION_FIXED,
   RESPONSIVENESS,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
@@ -38,6 +38,7 @@ interface ChildNavigationProps extends StyleProps {
   iconName?: IconName
   iconPlacement?: IconPlacement
   secondaryButtonProps?: React.ComponentProps<typeof SmallButton>
+  ariaDisabled?: boolean
 }
 
 export function ChildNavigation({
@@ -51,6 +52,7 @@ export function ChildNavigation({
   iconPlacement,
   secondaryButtonProps,
   buttonIsDisabled,
+  ariaDisabled = false,
   ...styleProps
 }: ChildNavigationProps): JSX.Element {
   return (
@@ -76,9 +78,9 @@ export function ChildNavigation({
             <Icon name="back" size="3rem" color={COLORS.black90} />
           </IconButton>
         ) : null}
-        <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
+        <LegacyStyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
           {header}
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
       {onClickButton != null && buttonText != null ? (
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
@@ -98,6 +100,7 @@ export function ChildNavigation({
             iconPlacement={iconPlacement}
             disabled={buttonIsDisabled}
             data-testid="ChildNavigation_Primary_Button"
+            ariaDisabled={ariaDisabled}
           />
         </Flex>
       ) : null}

@@ -102,7 +102,7 @@ export function getConfig<P extends keyof Config>(path: P): Config[P]
 export function getConfig(): Config
 export function getConfig(path?: any): any {
   const result = store().get(path)
-  const over = getOverrides(path)
+  const over = getOverrides(path as string | undefined)
 
   if (over != null) {
     if (typeof result === 'object' && result != null) {

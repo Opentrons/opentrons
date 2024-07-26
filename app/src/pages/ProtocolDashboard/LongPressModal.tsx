@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Flex, Icon, SPACING, StyledText } from '@opentrons/components'
+import { Flex, Icon, SPACING, LegacyStyledText } from '@opentrons/components'
 import { useCreateRunMutation } from '@opentrons/react-api-client'
 
 import { MAXIMUM_PINNED_PROTOCOLS } from '../../App/constants'
@@ -28,7 +28,7 @@ export function LongPressModal({
   setShowDeleteConfirmationModal,
   setTargetProtocolId,
 }: LongPressModalProps): JSX.Element {
-  const history = useHistory()
+  const navigate = useNavigate()
   let pinnedProtocolIds = useSelector(getPinnedProtocolIds) ?? []
   const { i18n, t } = useTranslation(['protocol_info', 'shared'])
   const dispatch = useDispatch<Dispatch>()
@@ -49,7 +49,7 @@ export function LongPressModal({
   const createRunUse = useCreateRunMutation({
     onSuccess: data => {
       const runId: string = data.data.id
-      history.push(`/runs/${runId}/setup`)
+      navigate(`/runs/${runId}/setup`)
     },
   })
   const createRun =
@@ -72,12 +72,12 @@ export function LongPressModal({
       } else {
         pinnedProtocolIds.push(protocolId)
         handlePinnedProtocolIds(pinnedProtocolIds)
-        makeSnackbar(t('pinned_protocol'))
+        makeSnackbar(t('pinned_protocol') as string)
       }
     } else {
       pinnedProtocolIds = pinnedProtocolIds.filter(p => p !== protocolId)
       handlePinnedProtocolIds(pinnedProtocolIds)
-      makeSnackbar(t('unpinned_protocol'))
+      makeSnackbar(t('unpinned_protocol') as string)
     }
   }
 
@@ -109,25 +109,25 @@ export function LongPressModal({
           <MenuItem onClick={handleRunClick} key="play-circle">
             <Flex>
               <Icon name="play-circle" size="1.75rem" />
-              <StyledText marginLeft={SPACING.spacing24}>
+              <LegacyStyledText marginLeft={SPACING.spacing24}>
                 {t('run_protocol')}
-              </StyledText>
+              </LegacyStyledText>
             </Flex>
           </MenuItem>
           <MenuItem onClick={handlePinClick} key="pin">
             <Flex>
               <Icon name="pin" size="2.5rem" />
-              <StyledText marginLeft={SPACING.spacing24}>
+              <LegacyStyledText marginLeft={SPACING.spacing24}>
                 {pinned ? t('unpin_protocol') : t('pin_protocol')}
-              </StyledText>
+              </LegacyStyledText>
             </Flex>
           </MenuItem>
           <MenuItem onClick={handleDeleteClick} key="trash" isAlert={true}>
             <Flex>
               <Icon name="trash" size="2.5rem" />
-              <StyledText marginLeft={SPACING.spacing24}>
+              <LegacyStyledText marginLeft={SPACING.spacing24}>
                 {t('delete_protocol')}
-              </StyledText>
+              </LegacyStyledText>
             </Flex>
           </MenuItem>
         </MenuList>

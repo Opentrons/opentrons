@@ -12,7 +12,9 @@ export type DevInternalFlag =
   | 'protocolStats'
   | 'enableRunNotes'
   | 'enableQuickTransfer'
+  | 'protocolTimeline'
   | 'enableCsvFile'
+  | 'enableLabwareCreator'
 
 export type FeatureFlags = Partial<Record<DevInternalFlag, boolean | undefined>>
 
@@ -21,6 +23,12 @@ export type ProtocolsOnDeviceSortKey =
   | 'reverse'
   | 'recentRun'
   | 'oldRun'
+  | 'recentCreated'
+  | 'oldCreated'
+
+export type QuickTransfersOnDeviceSortKey =
+  | 'alphabetical'
+  | 'reverse'
   | 'recentCreated'
   | 'oldCreated'
 
@@ -244,4 +252,27 @@ export type ConfigV21 = Omit<ConfigV20, 'version'> & {
   version: 21
 }
 
-export type Config = ConfigV21
+export type ConfigV22 = Omit<ConfigV21, 'version' | 'analytics'> & {
+  version: 22
+  analytics: {
+    appId: string
+    optedIn: boolean
+  }
+}
+export type ConfigV23 = Omit<ConfigV22, 'version'> & {
+  version: 23
+  protocols: ConfigV22['protocols'] & {
+    pinnedQuickTransferIds: string[]
+    quickTransfersOnDeviceSortKey: QuickTransfersOnDeviceSortKey | null
+    hasDismissedQuickTransferIntro: boolean
+  }
+}
+
+export type ConfigV24 = Omit<ConfigV23, 'version' | 'support'> & {
+  version: 24
+  userInfo: {
+    userId: string
+  }
+}
+
+export type Config = ConfigV24

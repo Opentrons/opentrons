@@ -46,7 +46,7 @@ class NodeId(int, Enum):
         """Mapping between bootloader_node and nodes.
 
         Note: The ordering of the Node list matters as the first element
-        represents the core appliaction node for that given node. For example
+        represents the core application node for that given node. For example
 
         NodeId.head_bootloader : [NodeId.head, NodeId.head_l, NodeId.head_r]
 
@@ -241,6 +241,9 @@ class MessageId(int, Enum):
     gear_write_motor_driver_request = 0x506
     gear_read_motor_driver_request = 0x507
 
+    max_sensor_value_request = 0x70
+    max_sensor_value_response = 0x71
+
     read_sensor_request = 0x82
     write_sensor_request = 0x83
     baseline_sensor_request = 0x84
@@ -374,6 +377,8 @@ class SensorOutputBinding(int, Enum):
     sync = 0x01
     report = 0x02
     max_threshold_sync = 0x04
+    auto_baseline_report = 0x08
+    multi_sensor_sync = 0x10
 
 
 @unique

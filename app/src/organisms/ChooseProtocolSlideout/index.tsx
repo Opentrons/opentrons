@@ -1,7 +1,7 @@
 import * as React from 'react'
 import first from 'lodash/first'
 import { Trans, useTranslation } from 'react-i18next'
-import { Link, NavLink, useHistory } from 'react-router-dom'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 
@@ -24,12 +24,15 @@ import {
   ProtocolDeck,
   SPACING,
   SecondaryButton,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   useTooltip,
   useHoverTooltip,
 } from '@opentrons/components'
-import { ApiHostProvider } from '@opentrons/react-api-client'
+import {
+  ApiHostProvider,
+  useUploadCsvFileMutation,
+} from '@opentrons/react-api-client'
 import { sortRuntimeParameters } from '@opentrons/shared-data'
 
 import { useLogger } from '../../logger'
@@ -49,7 +52,10 @@ import { useCreateRunFromProtocol } from '../ChooseRobotToRunProtocolSlideout/us
 import { ApplyHistoricOffsets } from '../ApplyHistoricOffsets'
 import { useOffsetCandidatesForAnalysis } from '../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { FileCard } from '../ChooseRobotSlideout/FileCard'
-import { getRunTimeParameterValuesForRun } from '../Devices/utils'
+import {
+  getRunTimeParameterFilesForRun,
+  getRunTimeParameterValuesForRun,
+} from '../Devices/utils'
 import { getAnalysisStatus } from '../ProtocolsLanding/utils'
 
 import type { DropdownOption } from '@opentrons/components'
@@ -83,7 +89,7 @@ export function ChooseProtocolSlideoutComponent(
   props: ChooseProtocolSlideoutProps
 ): JSX.Element | null {
   const { t } = useTranslation(['device_details', 'shared'])
-  const history = useHistory()
+  const navigate = useNavigate()
   const logger = useLogger(new URL('', import.meta.url).pathname)
   const [targetProps, tooltipProps] = useTooltip()
   const [targetPropsHover, tooltipPropsHover] = useHoverTooltip()
@@ -147,6 +153,17 @@ export function ChooseProtocolSlideoutComponent(
     robot.ip
   )
 
+  const { uploadCsvFile } = useUploadCsvFileMutation(
+    {},
+    robot != null
+      ? {
+          hostname: robot.ip,
+          requestor:
+            robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined,
+        }
+      : null
+  )
+
   const srcFileObjects =
     selectedProtocol != null
       ? selectedProtocol.srcFiles.map((srcFileBuffer, index) => {
@@ -173,7 +190,7 @@ export function ChooseProtocolSlideoutComponent(
           name: 'createProtocolRecordResponse',
           properties: { success: true },
         })
-        history.push(`/devices/${name}/protocol-runs/${runData.id}`)
+        navigate(`/devices/${name}/protocol-runs/${runData.id}`)
       },
       onError: (error: Error) => {
         trackCreateProtocolRunEvent({
@@ -189,15 +206,53 @@ export function ChooseProtocolSlideoutComponent(
           location,
           definitionUri,
         }))
-      : [],
-    getRunTimeParameterValuesForRun(runTimeParametersOverrides)
+      : []
   )
   const handleProceed: React.MouseEventHandler<HTMLButtonElement> = () => {
     if (selectedProtocol != null) {
       trackCreateProtocolRunEvent({ name: 'createProtocolRecordRequest' })
-      createRunFromProtocolSource({
-        files: srcFileObjects,
-        protocolKey: selectedProtocol.protocolKey,
+      const dataFilesForProtocolMap = runTimeParametersOverrides.reduce<
+        Record<string, File>
+      >(
+        (acc, parameter) =>
+          parameter.type === 'csv_file' && parameter.file?.file != null
+            ? { ...acc, [parameter.variableName]: parameter.file.file }
+            : acc,
+        {}
+      )
+      Promise.all(
+        Object.entries(dataFilesForProtocolMap).map(([key, file]) => {
+          const fileResponse = uploadCsvFile(file)
+          const varName = Promise.resolve(key)
+          return Promise.all([fileResponse, varName])
+        })
+      ).then(responseTuples => {
+        const mappedResolvedCsvVariableToFileId = responseTuples.reduce<
+          Record<string, string>
+        >((acc, [uploadedFileResponse, variableName]) => {
+          return { ...acc, [variableName]: uploadedFileResponse.data.id }
+        }, {})
+        const runTimeParameterValues = getRunTimeParameterValuesForRun(
+          runTimeParametersOverrides
+        )
+        const runTimeParameterFiles = getRunTimeParameterFilesForRun(
+          runTimeParametersOverrides,
+          mappedResolvedCsvVariableToFileId
+        )
+        if (enableCsvFile) {
+          createRunFromProtocolSource({
+            files: srcFileObjects,
+            protocolKey: selectedProtocol.protocolKey,
+            runTimeParameterValues,
+            runTimeParameterFiles,
+          })
+        } else {
+          createRunFromProtocolSource({
+            files: srcFileObjects,
+            protocolKey: selectedProtocol.protocolKey,
+            runTimeParameterValues,
+          })
+        }
       })
     } else {
       logger.warn('failed to create protocol, no protocol selected')
@@ -245,7 +300,7 @@ export function ChooseProtocolSlideoutComponent(
                       }
                       return parameter
                     })
-                    setRunTimeParametersOverrides?.(clone)
+                    setRunTimeParametersOverrides?.(clone as RunTimeParameter[])
                   }}
                   title={runtimeParam.displayName}
                   width="100%"
@@ -275,7 +330,7 @@ export function ChooseProtocolSlideoutComponent(
                     })
                   : null
               if (error != null) {
-                errors.push(error)
+                errors.push(error as string)
               }
               return (
                 <InputField
@@ -327,13 +382,13 @@ export function ChooseProtocolSlideoutComponent(
                   flexDirection={DIRECTION_COLUMN}
                   key={runtimeParam.variableName}
                 >
-                  <StyledText
+                  <LegacyStyledText
                     as="label"
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     paddingBottom={SPACING.spacing8}
                   >
                     {runtimeParam.displayName}
-                  </StyledText>
+                  </LegacyStyledText>
                   <Flex
                     gridGap={SPACING.spacing8}
                     justifyContent={JUSTIFY_FLEX_START}
@@ -351,7 +406,7 @@ export function ChooseProtocolSlideoutComponent(
                             ) {
                               return {
                                 ...parameter,
-                                value: !parameter.value,
+                                value: !Boolean(parameter.value),
                               }
                             }
                             return parameter
@@ -361,21 +416,21 @@ export function ChooseProtocolSlideoutComponent(
                       }}
                       height="0.813rem"
                       label={
-                        runtimeParam.value
+                        Boolean(runtimeParam.value)
                           ? t('protocol_details:on')
                           : t('protocol_details:off')
                       }
                       paddingTop={SPACING.spacing2} // manual alignment of SVG with value label
                     />
-                    <StyledText as="p">
-                      {runtimeParam.value
+                    <LegacyStyledText as="p">
+                      {Boolean(runtimeParam.value)
                         ? t('protocol_details:on')
                         : t('protocol_details:off')}
-                    </StyledText>
+                    </LegacyStyledText>
                   </Flex>
-                  <StyledText as="label" paddingTop={SPACING.spacing8}>
+                  <LegacyStyledText as="label" paddingTop={SPACING.spacing8}>
                     {runtimeParam.description}
-                  </StyledText>
+                  </LegacyStyledText>
                 </Flex>
               )
             } else if (runtimeParam.type === 'csv_file') {
@@ -384,13 +439,14 @@ export function ChooseProtocolSlideoutComponent(
                   ? null
                   : t('protocol_details:csv_file_type_required')
               if (error != null) {
-                errors.push(error)
+                errors.push(error as string)
               }
               return !enableCsvFile ? null : (
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
                   alignItems={ALIGN_CENTER}
                   gridgap={SPACING.spacing8}
+                  key={runtimeParam.variableName}
                 >
                   <Flex
                     flexDirection={DIRECTION_COLUMN}
@@ -398,15 +454,15 @@ export function ChooseProtocolSlideoutComponent(
                     width="100%"
                     marginBottom={SPACING.spacing16}
                   >
-                    <StyledText
+                    <LegacyStyledText
                       as="h3"
                       fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     >
                       {t('protocol_details:csv_file')}
-                    </StyledText>
-                    <StyledText as="p">
+                    </LegacyStyledText>
+                    <LegacyStyledText as="p">
                       {t('protocol_details:csv_required')}
-                    </StyledText>
+                    </LegacyStyledText>
                   </Flex>
                   {runtimeParam.file == null ? (
                     <UploadInput
@@ -420,7 +476,7 @@ export function ChooseProtocolSlideoutComponent(
                             ) {
                               return {
                                 ...parameter,
-                                file: { file: file },
+                                file: { file },
                               }
                             }
                             return parameter
@@ -429,7 +485,7 @@ export function ChooseProtocolSlideoutComponent(
                         setRunTimeParametersOverrides?.(clone)
                       }}
                       dragAndDropText={
-                        <StyledText as="p">
+                        <LegacyStyledText as="p">
                           <Trans
                             t={t}
                             i18nKey="shared:drag_and_drop"
@@ -443,7 +499,7 @@ export function ChooseProtocolSlideoutComponent(
                               ),
                             }}
                           />
-                        </StyledText>
+                        </LegacyStyledText>
                       }
                     />
                   ) : (
@@ -678,13 +734,15 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
         )
         const missingAnalysisData =
           analysisStatus === 'error' || analysisStatus === 'stale'
+        const requiresCsvRunTimeParameter =
+          analysisStatus === 'parameterRequired'
         return (
           <React.Fragment key={storedProtocol.protocolKey}>
             <Flex flexDirection={DIRECTION_COLUMN}>
               <MiniCard
                 isSelected={isSelected}
                 isError={runCreationError != null}
-                isWarning={missingAnalysisData}
+                isWarning={missingAnalysisData || requiresCsvRunTimeParameter}
                 onClick={() => {
                   handleSelectProtocol(storedProtocol)
                 }}
@@ -694,7 +752,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                   gridTemplateColumns="1fr 3fr"
                   marginRight={SPACING.spacing16}
                 >
-                  {!missingAnalysisData ? (
+                  {!missingAnalysisData && !requiresCsvRunTimeParameter ? (
                     <Box
                       marginY={SPACING.spacingAuto}
                       backgroundColor={isSelected ? COLORS.white : 'inherit'}
@@ -715,7 +773,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                       borderRadius={SPACING.spacing8}
                     />
                   )}
-                  <StyledText
+                  <LegacyStyledText
                     as="p"
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     overflowWrap={OVERFLOW_WRAP_ANYWHERE}
@@ -724,9 +782,11 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                       ?.protocolName ??
                       first(storedProtocol.srcFileNames) ??
                       storedProtocol.protocolKey}
-                  </StyledText>
+                  </LegacyStyledText>
                 </Box>
-                {(runCreationError != null || missingAnalysisData) &&
+                {(runCreationError != null ||
+                  missingAnalysisData ||
+                  requiresCsvRunTimeParameter) &&
                 isSelected ? (
                   <>
                     <Box flex="1 1 auto" />
@@ -744,7 +804,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
               </MiniCard>
             </Flex>
             {runCreationError != null && isSelected ? (
-              <StyledText
+              <LegacyStyledText
                 as="label"
                 color={COLORS.red60}
                 overflowWrap={OVERFLOW_WRAP_ANYWHERE}
@@ -771,15 +831,27 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                 ) : (
                   runCreationError
                 )}
-              </StyledText>
+              </LegacyStyledText>
             ) : null}
-            {missingAnalysisData && isSelected ? (
-              <StyledText
+            {requiresCsvRunTimeParameter && isSelected ? (
+              <LegacyStyledText
                 as="label"
                 color={COLORS.yellow60}
                 overflowWrap="anywhere"
                 display={DISPLAY_BLOCK}
-                marginTop={`-${SPACING.spacing8}`}
+                marginTop={`-${SPACING.spacing4}`}
+                marginBottom={SPACING.spacing8}
+              >
+                {t('csv_required_for_analysis')}
+              </LegacyStyledText>
+            ) : null}
+            {missingAnalysisData && isSelected ? (
+              <LegacyStyledText
+                as="label"
+                color={COLORS.yellow60}
+                overflowWrap="anywhere"
+                display={DISPLAY_BLOCK}
+                marginTop={`-${SPACING.spacing4}`}
                 marginBottom={SPACING.spacing8}
               >
                 {analysisStatus === 'stale'
@@ -802,7 +874,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                     }}
                   />
                 }
-              </StyledText>
+              </LegacyStyledText>
             ) : null}
           </React.Fragment>
         )
@@ -824,15 +896,15 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
       `}
     >
       <Icon size="1.25rem" name="alert-circle" color={COLORS.grey30} />
-      <StyledText
+      <LegacyStyledText
         as="p"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         marginTop={SPACING.spacing8}
         role="heading"
       >
         {t('no_protocols_found')}
-      </StyledText>
-      <StyledText
+      </LegacyStyledText>
+      <LegacyStyledText
         as="p"
         marginTop={SPACING.spacing8}
         textAlign={TYPOGRAPHY.textAlignCenter}
@@ -844,7 +916,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
             navlink: <Link to="/protocols" css={TYPOGRAPHY.linkPSemiBold} />,
           }}
         />
-      </StyledText>
+      </LegacyStyledText>
     </Flex>
   )
 }

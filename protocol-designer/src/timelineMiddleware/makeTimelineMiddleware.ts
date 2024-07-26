@@ -14,7 +14,7 @@ import type { ComputeRobotStateTimelineSuccessAction } from '../file-data/action
 import type { Middleware } from 'redux'
 import type { BaseState } from '../types'
 import type { GenerateRobotStateTimelineArgs } from './generateRobotStateTimeline'
-import type { SubstepsArgsNoTimeline } from './types'
+import type { SubstepsArgsNoTimeline, WorkerResponse } from './types'
 
 const hasChanged = (
   nextValues: { [key in any]?: any },
@@ -87,13 +87,19 @@ export const makeTimelineMiddleware: () => Middleware<BaseState, any> = () => {
     // call the next dispatch method in the middleware chain
     const returnValue = next(action)
     const nextState = getState()
-    const shouldRecomputeTimeline = timelineNeedsRecompute(nextState)
-    const shouldRecomputeSubsteps = substepsNeedsRecompute(nextState)
+    const shouldRecomputeTimeline = timelineNeedsRecompute(
+      nextState as BaseState
+    )
+    const shouldRecomputeSubsteps = substepsNeedsRecompute(
+      nextState as BaseState
+    )
 
     // TODO: how to stop re-assigning this event handler every middleware call? We need
     // the `next` fn, so we can't do it outside the middleware body
     worker.onmessage = e => {
-      prevSuccessAction = computeRobotStateTimelineSuccess(e.data)
+      prevSuccessAction = computeRobotStateTimelineSuccess(
+        e.data as WorkerResponse
+      )
       next(prevSuccessAction)
     }
 

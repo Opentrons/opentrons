@@ -11,8 +11,8 @@ import {
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   SPACING,
-  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -342,7 +342,9 @@ export function AddFixtureModal({
           }}
         >
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
-            <StyledText as="p">{t('add_fixture_description')}</StyledText>
+            <LegacyStyledText as="p">
+              {t('add_fixture_description')}
+            </LegacyStyledText>
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
               {fixtureOptions}
               {nextStageOptions}
@@ -352,7 +354,9 @@ export function AddFixtureModal({
       ) : (
         <LegacyModal {...modalProps}>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-            <StyledText as="p">{t('add_fixture_description')}</StyledText>
+            <LegacyStyledText as="p">
+              {t('add_fixture_description')}
+            </LegacyStyledText>
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
               {fixtureOptions}
               {nextStageOptions}
@@ -368,9 +372,9 @@ export function AddFixtureModal({
               marginTop={'1.44rem'}
               marginBottom={'0.56rem'}
             >
-              <StyledText css={GO_BACK_BUTTON_STYLE}>
+              <LegacyStyledText css={GO_BACK_BUTTON_STYLE}>
                 {t('shared:go_back')}
-              </StyledText>
+              </LegacyStyledText>
             </Btn>
           ) : null}
         </LegacyModal>
@@ -437,10 +441,10 @@ export function FixtureOption(props: FixtureOptionProps): JSX.Element {
       padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
       css={FIXTURE_BUTTON_STYLE_ODD}
     >
-      <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+      <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {props.optionName}
-      </StyledText>
-      <StyledText as="p">{props.buttonText}</StyledText>
+      </LegacyStyledText>
+      <LegacyStyledText as="p">{props.buttonText}</LegacyStyledText>
     </Btn>
   ) : (
     <Flex
@@ -451,7 +455,9 @@ export function FixtureOption(props: FixtureOptionProps): JSX.Element {
       backgroundColor={COLORS.grey20}
       borderRadius={BORDERS.borderRadius4}
     >
-      <StyledText css={TYPOGRAPHY.pSemiBold}>{optionName}</StyledText>
+      <LegacyStyledText css={TYPOGRAPHY.pSemiBold}>
+        {optionName}
+      </LegacyStyledText>
       <TertiaryButton onClick={onClickHandler}>{buttonText}</TertiaryButton>
     </Flex>
   )

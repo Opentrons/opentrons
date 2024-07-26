@@ -14,7 +14,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   Link,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   truncateString,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -348,7 +348,7 @@ export function Toast(props: ToastProps): JSX.Element {
           width={showODDStyle ? 'auto' : '100%'}
         >
           {headingText.length > 0 ? (
-            <StyledText
+            <LegacyStyledText
               color={COLORS.black90}
               fontSize={
                 showODDStyle ? TYPOGRAPHY.fontSize22 : TYPOGRAPHY.fontSizeP
@@ -356,7 +356,7 @@ export function Toast(props: ToastProps): JSX.Element {
               fontWeight={
                 showODDStyle
                   ? TYPOGRAPHY.fontWeightBold
-                  : TYPOGRAPHY.fontWeightRegular
+                  : TYPOGRAPHY.fontWeightSemiBold
               }
               lineHeight={
                 showODDStyle ? TYPOGRAPHY.lineHeight28 : TYPOGRAPHY.lineHeight20
@@ -368,10 +368,10 @@ export function Toast(props: ToastProps): JSX.Element {
               whiteSpace="nowrap"
             >
               {headingText}
-            </StyledText>
+            </LegacyStyledText>
           ) : null}
           <Flex alignItems={ALIGN_CENTER}>
-            <StyledText css={TEXT_STYLE}>{message}</StyledText>
+            <LegacyStyledText css={TEXT_STYLE}>{message}</LegacyStyledText>
             {linkText ? (
               <Link
                 role="button"
@@ -398,7 +398,7 @@ export function Toast(props: ToastProps): JSX.Element {
           }}
           padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
         >
-          <StyledText
+          <LegacyStyledText
             color={COLORS.black90}
             fontSize={
               showODDStyle ? TYPOGRAPHY.fontSize22 : TYPOGRAPHY.fontSizeP
@@ -418,7 +418,7 @@ export function Toast(props: ToastProps): JSX.Element {
             whiteSpace="nowrap"
           >
             {closeText}
-          </StyledText>
+          </LegacyStyledText>
         </Link>
       ) : null}
       {!closeText && closeButton ? (

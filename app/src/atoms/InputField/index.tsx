@@ -11,7 +11,7 @@ import {
   Icon,
   RESPONSIVENESS,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TEXT_ALIGN_RIGHT,
   TYPOGRAPHY,
   useHoverTooltip,
@@ -249,14 +249,14 @@ export const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
         <Flex flexDirection={DIRECTION_COLUMN} width="100%">
           {title != null ? (
             <Flex gridGap={SPACING.spacing8}>
-              <StyledText
+              <LegacyStyledText
                 as="label"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 htmlFor={props.id}
                 css={TITLE_STYLE}
               >
                 {title}
-              </StyledText>
+              </LegacyStyledText>
               {tooltipText != null ? (
                 <>
                   <Flex {...targetProps}>
@@ -299,18 +299,18 @@ export const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
             </Flex>
           </Flex>
           {props.caption != null ? (
-            <StyledText
+            <LegacyStyledText
               as="label"
               css={FORM_BOTTOM_SPACE_STYLE}
               color={COLORS.grey60}
             >
               {props.caption}
-            </StyledText>
+            </LegacyStyledText>
           ) : null}
           {hasError ? (
-            <StyledText as="label" css={ERROR_TEXT_STYLE}>
+            <LegacyStyledText as="label" css={ERROR_TEXT_STYLE}>
               {props.error}
-            </StyledText>
+            </LegacyStyledText>
           ) : null}
         </Flex>
       </Flex>

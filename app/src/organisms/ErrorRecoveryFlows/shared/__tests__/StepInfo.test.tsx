@@ -3,7 +3,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
-import { mockRecoveryContentProps } from '../../__fixtures__'
+import { mockRecoveryContentProps, mockFailedCommand } from '../../__fixtures__'
 import { i18n } from '../../../../i18n'
 import { StepInfo } from '../StepInfo'
 import { CommandText } from '../../../../molecules/Command'
@@ -21,8 +21,11 @@ describe('StepInfo', () => {
 
   beforeEach(() => {
     props = {
-      ...mockRecoveryContentProps,
-      as: 'h4',
+      ...{
+        ...mockRecoveryContentProps,
+        protocolAnalysis: { commands: [mockFailedCommand] } as any,
+      },
+      desktopStyle: 'bodyDefaultRegular',
       stepCounts: {
         currentStepNumber: 5,
         totalStepCount: 10,

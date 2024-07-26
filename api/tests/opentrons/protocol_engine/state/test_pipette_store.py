@@ -3,7 +3,7 @@ import pytest
 from datetime import datetime
 from typing import Optional, Union
 
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons_shared_data.pipette import pipette_definition
 
 from opentrons.types import DeckSlotName, MountType, Point
@@ -82,6 +82,7 @@ def test_sets_initial_state(subject: PipetteStore) -> None:
         static_config_by_id={},
         flow_rates_by_id={},
         nozzle_configuration_by_id={},
+        liquid_presence_detection_by_id={},
     )
 
 
@@ -329,6 +330,7 @@ def test_blow_out_clears_volume(
                     public=OverpressureError(
                         id="error-id",
                         createdAt=datetime.now(),
+                        errorInfo={"retryLocation": (0, 0, 0)},
                     ),
                     private=OverpressureErrorInternalData(
                         position=DeckPoint(x=0, y=0, z=0)
@@ -422,6 +424,43 @@ def test_blow_out_clears_volume(
                 pipette_id="pipette-id",
                 labware_id="move-to-well-labware-id",
                 well_name="move-to-well-well-name",
+            ),
+        ),
+        (
+            FailCommandAction(
+                running_command=cmd.Dispense(
+                    params=cmd.DispenseParams(
+                        pipetteId="pipette-id",
+                        labwareId="dispense-labware-id",
+                        wellName="dispense-well-name",
+                        volume=50,
+                        flowRate=1.23,
+                    ),
+                    id="command-id",
+                    key="command-key",
+                    createdAt=datetime.now(),
+                    status=cmd.CommandStatus.RUNNING,
+                ),
+                error=DefinedErrorData(
+                    public=OverpressureError(
+                        id="error-id",
+                        createdAt=datetime.now(),
+                        errorInfo={"retryLocation": (0, 0, 0)},
+                    ),
+                    private=OverpressureErrorInternalData(
+                        position=DeckPoint(x=0, y=0, z=0)
+                    ),
+                ),
+                command_id="command-id",
+                error_id="error-id",
+                failed_at=datetime.now(),
+                notes=[],
+                type=ErrorRecoveryType.WAIT_FOR_RECOVERY,
+            ),
+            CurrentWell(
+                pipette_id="pipette-id",
+                labware_id="dispense-labware-id",
+                well_name="dispense-well-name",
             ),
         ),
     ),
@@ -748,6 +787,7 @@ def test_add_pipette_config(
             nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE),
             back_left_corner_offset=Point(x=1, y=2, z=3),
             front_right_corner_offset=Point(x=4, y=5, z=6),
+            pipette_lld_settings={},
         ),
     )
     subject.handle_action(
@@ -773,7 +813,10 @@ def test_add_pipette_config(
         pipette_bounding_box_offsets=PipetteBoundingBoxOffsets(
             back_left_corner=Point(x=1, y=2, z=3),
             front_right_corner=Point(x=4, y=5, z=6),
+            front_left_corner=Point(x=1, y=5, z=3),
+            back_right_corner=Point(x=4, y=2, z=3),
         ),
+        lld_settings={},
     )
     assert subject.state.flow_rates_by_id["pipette-id"].default_aspirate == {"a": 1.0}
     assert subject.state.flow_rates_by_id["pipette-id"].default_dispense == {"b": 2.0}
@@ -813,6 +856,7 @@ def test_add_pipette_config(
                     id="error-id",
                     detail="error-detail",
                     createdAt=datetime.now(),
+                    errorInfo={"retryLocation": (11, 22, 33)},
                 ),
                 private=OverpressureErrorInternalData(
                     position=DeckPoint(x=11, y=22, z=33)
@@ -894,6 +938,95 @@ def test_add_pipette_config(
                 destination=DeckPoint(x=11, y=22, z=33),
             ),
             private_result=None,
+        ),
+        FailCommandAction(
+            running_command=cmd.Dispense(
+                params=cmd.DispenseParams(
+                    pipetteId="pipette-id",
+                    labwareId="labware-id",
+                    wellName="well-name",
+                    volume=125,
+                    flowRate=1.23,
+                ),
+                id="command-id",
+                key="command-key",
+                createdAt=datetime.now(),
+                status=cmd.CommandStatus.RUNNING,
+            ),
+            error=DefinedErrorData(
+                public=OverpressureError(
+                    id="error-id",
+                    detail="error-detail",
+                    createdAt=datetime.now(),
+                    errorInfo={"retryLocation": (11, 22, 33)},
+                ),
+                private=OverpressureErrorInternalData(
+                    position=DeckPoint(x=11, y=22, z=33)
+                ),
+            ),
+            command_id="command-id",
+            error_id="error-id",
+            failed_at=datetime.now(),
+            notes=[],
+            type=ErrorRecoveryType.WAIT_FOR_RECOVERY,
+        ),
+        FailCommandAction(
+            running_command=cmd.AspirateInPlace(
+                params=cmd.AspirateInPlaceParams(
+                    pipetteId="pipette-id",
+                    volume=125,
+                    flowRate=1.23,
+                ),
+                id="command-id",
+                key="command-key",
+                createdAt=datetime.now(),
+                status=cmd.CommandStatus.RUNNING,
+            ),
+            error=DefinedErrorData(
+                public=OverpressureError(
+                    id="error-id",
+                    detail="error-detail",
+                    createdAt=datetime.now(),
+                    errorInfo={"retryLocation": (11, 22, 33)},
+                ),
+                private=OverpressureErrorInternalData(
+                    position=DeckPoint(x=11, y=22, z=33)
+                ),
+            ),
+            command_id="command-id",
+            error_id="error-id",
+            failed_at=datetime.now(),
+            notes=[],
+            type=ErrorRecoveryType.WAIT_FOR_RECOVERY,
+        ),
+        FailCommandAction(
+            running_command=cmd.DispenseInPlace(
+                params=cmd.DispenseInPlaceParams(
+                    pipetteId="pipette-id",
+                    volume=125,
+                    flowRate=1.23,
+                ),
+                id="command-id",
+                key="command-key",
+                createdAt=datetime.now(),
+                status=cmd.CommandStatus.RUNNING,
+            ),
+            error=DefinedErrorData(
+                public=OverpressureError(
+                    id="error-id",
+                    detail="error-detail",
+                    createdAt=datetime.now(),
+                    errorInfo={"retryLocation": (11, 22, 33)},
+                ),
+                private=OverpressureErrorInternalData(
+                    position=DeckPoint(x=11, y=22, z=33)
+                ),
+            ),
+            command_id="command-id",
+            error_id="error-id",
+            failed_at=datetime.now(),
+            notes=[],
+            type=ErrorRecoveryType.WAIT_FOR_RECOVERY,
         ),
     ),
 )

@@ -1,0 +1,61 @@
+{
+  "commands": [],
+  "config": {
+    "apiVersion": [
+      2,
+      13
+    ],
+    "protocolType": "python"
+  },
+  "createdAt": "TIMESTAMP",
+  "errors": [
+    {
+      "createdAt": "TIMESTAMP",
+      "detail": "No module named 'superspecialmagic'",
+      "errorCode": "4000",
+      "errorInfo": {},
+      "errorType": "UnexpectedAnalysisError",
+      "id": "UUID",
+      "isDefined": false,
+      "wrappedErrors": [
+        {
+          "createdAt": "TIMESTAMP",
+          "detail": "ModuleNotFoundError: No module named 'superspecialmagic'",
+          "errorCode": "4000",
+          "errorInfo": {
+            "args": "(\"No module named 'superspecialmagic'\",)",
+            "class": "ModuleNotFoundError",
+            "msg": "No module named 'superspecialmagic'",
+            "name": "superspecialmagic",
+            "path": "None",
+            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/cli/analyze.py\", line N, in _do_analyze\n    await orchestrator.load(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_runner/run_orchestrator.py\", line N, in load\n    await self._protocol_runner.load(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_runner/protocol_runner.py\", line N, in load\n    self._protocol_executor.extract_run_parameters(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_runner/python_protocol_wrappers.py\", line N, in extract_run_parameters\n    return exec_add_parameters(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line N, in exec_add_parameters\n    exec(protocol.contents, new_globs)\n\n  File \"OT2_X_v2_13_None_None_PythonSyntaxError.py\", line N, in <module>\n"
+          },
+          "errorType": "PythonException",
+          "id": "UUID",
+          "isDefined": false,
+          "wrappedErrors": []
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "name": "OT2_X_v2_13_None_None_PythonSyntaxError.py",
+      "role": "main"
+    }
+  ],
+  "labware": [],
+  "liquids": [],
+  "metadata": {
+    "apiLevel": "2.13",
+    "author": "Opentrons Engineering <engineering@opentrons.com>",
+    "description": "import superspecialmagic",
+    "protocolName": "bad import",
+    "source": "Software Testing Team"
+  },
+  "modules": [],
+  "pipettes": [],
+  "result": "not-ok",
+  "robotType": "OT-2 Standard",
+  "runTimeParameters": []
+}

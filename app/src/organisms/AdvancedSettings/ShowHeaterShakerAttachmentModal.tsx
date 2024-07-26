@@ -13,7 +13,7 @@ import {
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -38,14 +38,16 @@ export function ShowHeaterShakerAttachmentModal(): JSX.Element {
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
       <Box width="70%">
-        <StyledText
+        <LegacyStyledText
           css={TYPOGRAPHY.h3SemiBold}
           paddingBottom={SPACING.spacing8}
           id="AdvancedSettings_showHeaterShakerAttachmentModal"
         >
           {t('heater_shaker_attach_visible')}
-        </StyledText>
-        <StyledText as="p">{t('heater_shaker_attach_description')}</StyledText>
+        </LegacyStyledText>
+        <LegacyStyledText as="p">
+          {t('heater_shaker_attach_description')}
+        </LegacyStyledText>
       </Box>
       <ToggleButton
         label="show_heater_shaker_modal"

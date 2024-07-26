@@ -5,10 +5,10 @@ from __future__ import annotations
 from abc import abstractmethod, ABC
 from typing import Generic, List, Optional, Union, Tuple, Dict, TYPE_CHECKING
 
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV5, SlotDefV3
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.deck.types import DeckDefinitionV5, SlotDefV3
+from opentrons_shared_data.pipette.types import PipetteNameType
+from opentrons_shared_data.labware.types import LabwareDefinition
+from opentrons_shared_data.robot.types import RobotType
 
 from opentrons.types import DeckSlotName, StagingSlotName, Location, Mount, Point
 from opentrons.hardware_control import SyncHardwareAPI
@@ -124,7 +124,10 @@ class AbstractProtocol(
 
     @abstractmethod
     def load_instrument(
-        self, instrument_name: PipetteNameType, mount: Mount
+        self,
+        instrument_name: PipetteNameType,
+        mount: Mount,
+        liquid_presence_detection: bool = False,
     ) -> InstrumentCoreType:
         ...
 

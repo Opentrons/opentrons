@@ -10,7 +10,7 @@ import {
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -59,7 +59,9 @@ export const NotConfiguredModal = (
       width="27.75rem"
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <StyledText as="p">{t('add_this_deck_hardware')}</StyledText>
+        <LegacyStyledText as="p">
+          {t('add_this_deck_hardware')}
+        </LegacyStyledText>
         <Flex paddingTop={SPACING.spacing16} flexDirection={DIRECTION_COLUMN}>
           <Flex
             padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
@@ -68,9 +70,9 @@ export const NotConfiguredModal = (
             alignItems={ALIGN_CENTER}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
           >
-            <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+            <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
               {getFixtureDisplayName(requiredFixtureId)}
-            </StyledText>
+            </LegacyStyledText>
             <TertiaryButton onClick={handleUpdateDeck}>
               {i18n.format(t('shared:add'), 'capitalize')}
             </TertiaryButton>

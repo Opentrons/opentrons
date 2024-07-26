@@ -6,7 +6,7 @@ import {
   DIRECTION_ROW,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 import { labwareImages } from './labwareImages'
 
@@ -43,9 +43,9 @@ export function ChosenTipRackRender(
         alt={`${String(displayName)} image`}
       />
       <Box>
-        <StyledText as="p" marginLeft={SPACING.spacing16}>
+        <LegacyStyledText as="p" marginLeft={SPACING.spacing16}>
           {displayName}
-        </StyledText>
+        </LegacyStyledText>
       </Box>
     </Flex>
   )

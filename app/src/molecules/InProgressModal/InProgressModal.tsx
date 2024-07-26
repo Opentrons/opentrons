@@ -10,7 +10,7 @@ import {
   JUSTIFY_CENTER,
   RESPONSIVENESS,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getIsOnDevice } from '../../redux/config'
@@ -55,11 +55,12 @@ const MODAL_STYLE = css`
   padding: ${SPACING.spacing32};
   height: 24.625rem;
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    height: 29.5rem;
+    max-height: 29.5rem;
+    height: 100%;
   }
 `
 const SPINNER_STYLE = css`
-  color: ${COLORS.grey50};
+  color: ${COLORS.grey60};
   opacity: 100%;
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     color: ${COLORS.black90};
@@ -89,9 +90,13 @@ export function InProgressModal(props: Props): JSX.Element {
         alignItems={ALIGN_CENTER}
       >
         {description != null && (
-          <StyledText css={DESCRIPTION_STYLE}>{description}</StyledText>
+          <LegacyStyledText css={DESCRIPTION_STYLE}>
+            {description}
+          </LegacyStyledText>
         )}
-        {body != null && <StyledText css={BODY_STYLE}>{body}</StyledText>}
+        {body != null && (
+          <LegacyStyledText css={BODY_STYLE}>{body}</LegacyStyledText>
+        )}
       </Flex>
       {children}
     </Flex>

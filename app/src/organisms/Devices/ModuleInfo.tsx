@@ -11,7 +11,7 @@ import {
   RobotCoordsForeignObject,
   SPACING,
   TYPOGRAPHY,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 import {
   getModuleDisplayName,
@@ -78,22 +78,22 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
               marginRight={SPACING.spacing4}
             />
 
-            <StyledText
+            <LegacyStyledText
               color={COLORS.grey50}
               fontSize={TYPOGRAPHY.fontSizeCaption}
             >
               {!isAttached ? t('module_not_connected') : t('module_connected')}
-            </StyledText>
+            </LegacyStyledText>
           </Flex>
         ) : null}
-        <StyledText
+        <LegacyStyledText
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           color={COLORS.grey50}
           fontSize={TYPOGRAPHY.fontSizeLabel}
         >
           {getModuleDisplayName(moduleModel)}
-        </StyledText>
-        <StyledText
+        </LegacyStyledText>
+        <LegacyStyledText
           color={COLORS.grey50}
           fontSize={TYPOGRAPHY.fontSizeH6}
           fontStyle={
@@ -105,7 +105,7 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
           {runHasStarted
             ? t('connection_info_not_available')
             : connectionStatus}
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
     </RobotCoordsForeignObject>
   )

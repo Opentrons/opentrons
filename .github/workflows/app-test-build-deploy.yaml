@@ -96,8 +96,9 @@ jobs:
   backend-unit-test:
     strategy:
       matrix:
-        os: ['windows-2022', 'ubuntu-22.04', 'macos-11']
+        os: ['windows-2022', 'ubuntu-22.04', 'macos-latest']
     name: 'opentrons app backend unit tests on ${{matrix.os}}'
+    timeout-minutes: 60
     runs-on: ${{ matrix.os }}
     steps:
       - uses: 'actions/checkout@v3'
@@ -184,36 +185,58 @@ jobs:
             echo "both develop builds for edge"
             echo 'variants=["release", "internal-release"]' >> $GITHUB_OUTPUT
             echo 'type=develop' >> $GITHUB_OUTPUT
-          elif [ "${{ format('{0}', endsWith(github.ref, 'app-build-internal')) }}" = "true" ] ; then
-            echo "internal-release builds for app-build-internal suffixes"
+          elif [ "${{ format('{0}', contains(github.ref, 'app-build-internal')) }}" = "true" ] ; then
+
             echo 'variants=["internal-release"]' >> $GITHUB_OUTPUT
-            echo 'type=develop' >> $GITHUB_OUTPUT
-          elif [ "${{ format('{0}', endsWith(github.ref, 'app-build')) }}" = "true" ] ; then
-            echo "release develop builds for app-build suffixes"
+            if [ "${{ format('{0}', contains(github.ref, 'as-release')) }}" = "true" ] ; then
+               echo "internal-release as-release builds for app-build-internal + as-release suffixes"
+               echo 'type=as-release' >> $GITHUB_OUTPUT
+            else
+               echo "internal-release develop builds for app-build-internal suffixes"
+               echo 'type=develop' >> $GITHUB_OUTPUT
+            fi
+          elif [ "${{ format('{0}', contains(github.ref, 'app-build')) }}" = "true" ] ; then
             echo 'variants=["release"]' >> $GITHUB_OUTPUT
-            echo 'type=develop' >> $GITHUB_OUTPUT
-          elif [ "${{ format('{0}', endsWith(github.ref, 'app-build-both')) }}" = "true" ] ; then
-            echo "Both develop builds for app-build-both suffixes"
+            if [ "${{ format('{0}', contains(github.ref, 'as-release')) }}" = "true" ] ; then
+               echo "release as-release builds for app-build + as-release suffixes"
+               echo 'type=as-release' >> $GITHUB_OUTPUT
+            else
+               echo "release develop builds for app-build suffixes"
+               echo 'type=develop' >> $GITHUB_OUTPUT
+            fi
+          elif [ "${{ format('{0}', contains(github.ref, 'app-build-both')) }}" = "true" ] ; then
+
             echo 'variants=["release", "internal-release"]' >> $GITHUB_OUTPUT
-            echo 'type=develop' >> $GITHUB_OUTPUT
+            if [ "${{ format('{0}', contains(github.ref, 'as-release')) }}" = "true" ] ; then
+               echo "Both as-release builds for app-build-both + as-release suffixes"
+               echo 'type=as-release' >> $GITHUB_OUTPUT
+            else
+               echo "Both develop builds for app-build-both + as-release suffixes"
+               echo 'type=develop' >> $GITHUB_OUTPUT
+            fi
           else
             echo "No build for ref ${{github.ref}} and event ${{github.event_type}}"
             echo 'variants=[]' >> $GITHUB_OUTPUT
             echo 'type=develop' >> $GITHUB_OUTPUT
           fi
 
+      - name: set summary
+        run: |
+          echo 'Type: ${{steps.determine-build-type.outputs.type}} Variants: ${{steps.determine-build-type.outputs.variants}}' >> $GITHUB_STEP_SUMMARY
+
   build-app:
     needs: [determine-build-type]
     if: needs.determine-build-type.outputs.variants != '[]'
     strategy:
+      fail-fast: false
       matrix:
-        os: ['windows-2022', 'ubuntu-22.04', 'macos-11']
+        os: ['windows-2022', 'ubuntu-22.04', 'macos-latest']
         variant: ${{fromJSON(needs.determine-build-type.outputs.variants)}}
         target: ['desktop', 'odd']
         exclude:
           - os: 'windows-2022'
             target: 'odd'
-          - os: 'macos-11'
+          - os: 'macos-latest'
             target: 'odd'
 
     runs-on: ${{ matrix.os }}
@@ -276,6 +299,34 @@ jobs:
           npm config set cache ${{ github.workspace }}/.npm-cache
           yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
           make setup-js
+
+      - name: 'Configure Windows code signing environment'
+        if: startsWith(matrix.os, 'windows') && contains(needs.determine-build-type.outputs.type, 'release')
+        shell: bash
+        run: |
+          echo "${{ secrets.SM_CLIENT_CERT_FILE_B64 }}" | base64 --decode > /d/Certificate_pkcs12.p12
+          echo "${{ secrets.WINDOWS_CSC_B64}}" | base64 --decode > /d/opentrons_labworks_inc.crt
+          echo "C:\Program Files (x86)\Windows Kits\10\App Certification Kit" >> $GITHUB_PATH
+          echo "C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.8 Tools" >> $GITHUB_PATH
+          echo "C:\Program Files\DigiCert\DigiCert Keylocker Tools" >> $GITHUB_PATH
+
+      - name: 'Setup Windows code signing helpers'
+        if: startsWith(matrix.os, 'windows') && contains(needs.determine-build-type.outputs.type, 'release')
+        shell: cmd
+        env:
+          SM_HOST: ${{ secrets.SM_HOST }}
+          SM_CLIENT_CERT_FILE: "D:\\Certificate_pkcs12.p12"
+          SM_CLIENT_CERT_PASSWORD: ${{secrets.SM_CLIENT_CERT_PASSWORD}}
+          SM_API_KEY: ${{secrets.SM_API_KEY}}
+        run: |
+          curl -X GET  https://one.digicert.com/signingmanager/api-ui/v1/releases/Keylockertools-windows-x64.msi/download -H "x-api-key:${{secrets.SM_API_KEY}}" -o Keylockertools-windows-x64.msi
+          msiexec /i Keylockertools-windows-x64.msi /quiet /qn
+          smksp_registrar.exe list
+          smctl.exe keypair ls
+          C:\Windows\System32\certutil.exe -csp "DigiCert Signing Manager KSP" -key -user
+          smksp_cert_sync.exe
+          smctl.exe healthcheck --all
+
       # build the desktop app and deploy it
       - name: 'build ${{matrix.variant}} app for ${{ matrix.os }}'
         if: matrix.target == 'desktop'
@@ -283,8 +334,14 @@ jobs:
         env:
           OT_APP_MIXPANEL_ID: ${{ secrets.OT_APP_MIXPANEL_ID }}
           OT_APP_INTERCOM_ID: ${{ secrets.OT_APP_INTERCOM_ID }}
-          WIN_CSC_LINK: ${{ secrets.OT_APP_CSC_WINDOWS }}
-          WIN_CSC_KEY_PASSWORD: ${{ secrets.OT_APP_CSC_KEY_WINDOWS }}
+          WINDOWS_SIGN: ${{ format('{0}', contains(needs.determine-build-type.outputs.type, 'release')) }}
+          SM_HOST: ${{secrets.SM_HOST}}
+          SM_CLIENT_CERT_FILE: "D:\\Certificate_pkcs12.p12"
+          SM_CLIENT_CERT_PASSWORD: ${{secrets.SM_CLIENT_CERT_PASSWORD}}
+          SM_API_KEY: ${{secrets.SM_API_KEY}}
+          SM_CODE_SIGNING_CERT_SHA1_HASH: ${{secrets.SM_CODE_SIGNING_CERT_SHA1_HASH}}
+          SM_KEYPAIR_ALIAS: ${{secrets.SM_KEYPAIR_ALIAS}}
+          WINDOWS_CSC_FILEPATH: "D:\\opentrons_labworks_inc.crt"
           CSC_LINK: ${{ secrets.OT_APP_CSC_MACOS }}
           CSC_KEY_PASSWORD: ${{ secrets.OT_APP_CSC_KEY_MACOS }}
           APPLE_ID: ${{ secrets.OT_APP_APPLE_ID }}

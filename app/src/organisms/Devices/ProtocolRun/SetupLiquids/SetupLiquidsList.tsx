@@ -14,14 +14,14 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  Icon,
   JUSTIFY_CENTER,
   JUSTIFY_FLEX_START,
-  SIZE_1,
+  LiquidIcon,
   SIZE_AUTO,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 import { getModuleDisplayName, MICRO_LITERS } from '@opentrons/shared-data'
 import {
@@ -47,13 +47,6 @@ const HIDE_SCROLLBAR = css`
   ::-webkit-scrollbar {
     display: none;
   }
-`
-
-const LIQUID_BORDER_STYLE = css`
-  border-style: ${BORDERS.styleSolid};
-  border-width: 1px;
-  border-color: ${COLORS.grey30};
-  border-radius: ${BORDERS.borderRadius8};
 `
 
 export const CARD_OUTLINE_BORDER_STYLE = css`
@@ -171,22 +164,22 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
             marginTop={SPACING.spacing16}
             marginBottom={SPACING.spacing8}
           >
-            <StyledText
+            <LegacyStyledText
               as="label"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               marginLeft={SPACING.spacing16}
               width="8.125rem"
             >
               {t('location')}
-            </StyledText>
-            <StyledText
+            </LegacyStyledText>
+            <LegacyStyledText
               as="label"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               marginRight={SPACING.spacing32}
             >
               {t('labware_name')}
-            </StyledText>
-            <StyledText
+            </LegacyStyledText>
+            <LegacyStyledText
               as="label"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               width="4.25rem"
@@ -194,7 +187,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
               marginRight={SPACING.spacing16}
             >
               {t('volume')}
-            </StyledText>
+            </LegacyStyledText>
           </Flex>
           {labwareByLiquidId[liquidId].map((labware, index) => {
             const {
@@ -227,24 +220,24 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
                   gridGap={SPACING.spacing16}
                 >
                   <Flex>
-                    <StyledText
+                    <LegacyStyledText
                       as="p"
                       fontWeight={TYPOGRAPHY.fontWeightRegular}
                       minWidth="8.125rem"
                       alignSelf={ALIGN_CENTER}
                     >
                       {slotName}
-                    </StyledText>
+                    </LegacyStyledText>
                   </Flex>
                   <Flex flexDirection={DIRECTION_COLUMN}>
-                    <StyledText
+                    <LegacyStyledText
                       as="p"
                       fontWeight={TYPOGRAPHY.fontWeightRegular}
                     >
                       {labwareName}
-                    </StyledText>
+                    </LegacyStyledText>
                     {adapterName != null ? (
-                      <StyledText
+                      <LegacyStyledText
                         as="p"
                         fontWeight={TYPOGRAPHY.fontWeightRegular}
                         color={COLORS.grey50}
@@ -257,10 +250,10 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
                           : t('on_adapter', {
                               adapterName: adapterName,
                             })}
-                      </StyledText>
+                      </LegacyStyledText>
                     ) : null}
                   </Flex>
-                  <StyledText
+                  <LegacyStyledText
                     as="p"
                     fontWeight={TYPOGRAPHY.fontWeightRegular}
                     minWidth="4.25rem"
@@ -273,7 +266,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
                       labwareByLiquidId
                     ).toFixed(1)}{' '}
                     {MICRO_LITERS}
-                  </StyledText>
+                  </LegacyStyledText>
                 </Flex>
               </Box>
             )
@@ -303,26 +296,17 @@ export const LiquidsListItemDetails = (
     description,
   } = props
   return (
-    <Flex flexDirection={DIRECTION_ROW}>
-      <Flex
-        css={LIQUID_BORDER_STYLE}
-        padding={SPACING.spacing12}
-        height="max-content"
-        backgroundColor={COLORS.white}
-      >
-        <Icon name="circle" color={displayColor} size={SIZE_1} />
-      </Flex>
+    <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
+      <LiquidIcon color={displayColor} />
       <Flex flexDirection={DIRECTION_COLUMN} justifyContent={JUSTIFY_CENTER}>
         <StyledText
-          as="p"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          desktopStyle="bodyDefaultSemiBold"
           marginX={SPACING.spacing16}
         >
           {displayName}
         </StyledText>
         <StyledText
-          as="p"
-          fontWeight={TYPOGRAPHY.fontWeightRegular}
+          desktopStyle="bodyDefaultRegular"
           color={COLORS.grey60}
           marginX={SPACING.spacing16}
         >
@@ -330,15 +314,14 @@ export const LiquidsListItemDetails = (
         </StyledText>
       </Flex>
       <Flex
-        backgroundColor={COLORS.black90 + '1A'}
-        borderRadius={BORDERS.borderRadius8}
+        backgroundColor={`${COLORS.black90}${COLORS.opacity20HexCode}`}
+        borderRadius={BORDERS.borderRadius4}
         height="max-content"
-        paddingY={SPACING.spacing4}
-        paddingX={SPACING.spacing8}
+        padding={`${SPACING.spacing2} ${SPACING.spacing8}`}
         alignSelf={ALIGN_CENTER}
         marginLeft={SIZE_AUTO}
       >
-        <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightRegular}>
+        <StyledText desktopStyle="bodyDefaultRegular">
           {getTotalVolumePerLiquidId(liquidId, labwareByLiquidId).toFixed(1)}{' '}
           {MICRO_LITERS}
         </StyledText>
