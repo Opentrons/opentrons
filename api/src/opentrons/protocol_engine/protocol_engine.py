@@ -614,6 +614,9 @@ class ProtocolEngine:
         )
         self._queue_worker.start()
 
+    async def set_error_recovery_policy(self, policy: ErrorRecoveryPolicy) -> None:
+        raise NotImplementedError("set_error_recovery_policy is not implemented yet")
+
 
 # TODO(tz, 7-12-23): move this to shared data when we dont relay on ErrorOccurrence
 def code_in_error_tree(
