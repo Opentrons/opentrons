@@ -35,7 +35,7 @@ from robot_server.protocols.protocol_store import (
 )
 from robot_server.protocols.rtp_resources import (
     PrimitiveParameterResource,
-    CsvParameterResource,
+    CSVParameterResource,
 )
 
 
@@ -306,12 +306,12 @@ async def test_store_and_get_csv_rtps_by_analysis_id(
         protocol_id="protocol-id",
     )
     csv_rtp_resources = [
-        CsvParameterResource(
+        CSVParameterResource(
             analysis_id="analysis-id",
             parameter_variable_name="baz",
             file_id="file-id",
         ),
-        CsvParameterResource(
+        CSVParameterResource(
             analysis_id="analysis-id",
             parameter_variable_name="bar",
             file_id=None,
@@ -483,12 +483,12 @@ async def test_make_room_and_add_handles_rtp_tables_correctly(
         ),
     ]
     existing_csv_rtp_resources = [
-        CsvParameterResource(
+        CSVParameterResource(
             analysis_id="analysis-id-0",
             parameter_variable_name="baz",
             file_id="file-id",
         ),
-        CsvParameterResource(
+        CSVParameterResource(
             analysis_id="analysis-id-1",
             parameter_variable_name="bar",
             file_id=None,
@@ -524,7 +524,7 @@ async def test_make_room_and_add_handles_rtp_tables_correctly(
             )
         ],
         csv_rtp_resources=[
-            CsvParameterResource(
+            CSVParameterResource(
                 analysis_id="new-analysis-id",
                 parameter_variable_name="bar",
                 file_id="file-id",

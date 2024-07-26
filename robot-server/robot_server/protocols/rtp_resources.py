@@ -58,7 +58,7 @@ class PrimitiveParameterResource:
 
 
 @dataclass
-class CsvParameterResource:
+class CSVParameterResource:
     """A CSV runtime parameter from a completed analysis, storable in a SQL database."""
 
     analysis_id: str
@@ -77,7 +77,7 @@ class CsvParameterResource:
     def from_sql_row(
         cls,
         sql_row: sqlalchemy.engine.Row,
-    ) -> CsvParameterResource:
+    ) -> CSVParameterResource:
         """Extract CSV resource data from SQLAlchemy row object."""
         analysis_id = sql_row.analysis_id
         assert isinstance(analysis_id, str)

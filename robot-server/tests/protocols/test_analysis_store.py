@@ -56,7 +56,7 @@ from robot_server.protocols.protocol_store import (
 )
 from robot_server.protocols.rtp_resources import (
     PrimitiveParameterResource,
-    CsvParameterResource,
+    CSVParameterResource,
 )
 
 
@@ -402,7 +402,7 @@ async def test_update_adds_rtp_values_to_completed_store(
                 ),
             ],
             csv_rtp_resources=[
-                CsvParameterResource(
+                CSVParameterResource(
                     analysis_id="analysis-id",
                     parameter_variable_name="coolest_param",
                     file_id="file-id",

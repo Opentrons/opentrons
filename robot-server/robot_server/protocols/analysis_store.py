@@ -33,7 +33,7 @@ from .analysis_models import (
 
 from .completed_analysis_store import CompletedAnalysisStore, CompletedAnalysisResource
 from .analysis_memcache import MemoryCache
-from .rtp_resources import PrimitiveParameterResource, CsvParameterResource
+from .rtp_resources import PrimitiveParameterResource, CSVParameterResource
 
 _log = getLogger(__name__)
 
@@ -345,11 +345,11 @@ class AnalysisStore:
     @staticmethod
     def _extract_csv_run_time_params(
         completed_analysis: CompletedAnalysis,
-    ) -> List[CsvParameterResource]:
+    ) -> List[CSVParameterResource]:
         """Extract the Primitive Run Time Parameters from analysis for saving in DB."""
         csv_rtp_list = completed_analysis.runTimeParameters
         return [
-            CsvParameterResource(
+            CSVParameterResource(
                 analysis_id=completed_analysis.id,
                 parameter_variable_name=param.variableName,
                 file_id=param.file.id if param.file else None,

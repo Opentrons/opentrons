@@ -20,7 +20,7 @@ from robot_server.persistence.pydantic import json_to_pydantic, pydantic_to_json
 
 from .analysis_models import CompletedAnalysis
 from .analysis_memcache import MemoryCache
-from .rtp_resources import PrimitiveParameterResource, CsvParameterResource
+from .rtp_resources import PrimitiveParameterResource, CSVParameterResource
 
 _log = getLogger(__name__)
 
@@ -301,7 +301,7 @@ class CompletedAnalysisStore:
 
         csv_rtps: Dict[str, Optional[str]] = {}
         for row in results:
-            param = CsvParameterResource.from_sql_row(row)
+            param = CSVParameterResource.from_sql_row(row)
             csv_rtps.update({param.parameter_variable_name: param.file_id})
         return csv_rtps
 
@@ -309,7 +309,7 @@ class CompletedAnalysisStore:
         self,
         completed_analysis_resource: CompletedAnalysisResource,
         primitive_rtp_resources: List[PrimitiveParameterResource],
-        csv_rtp_resources: List[CsvParameterResource],
+        csv_rtp_resources: List[CSVParameterResource],
     ) -> None:
         """Make room and add a resource to the store.
 
