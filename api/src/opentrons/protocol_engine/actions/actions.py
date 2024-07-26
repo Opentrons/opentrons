@@ -20,7 +20,7 @@ from ..commands import (
     CommandDefinedErrorData,
     CommandPrivateResult,
 )
-from ..error_recovery_policy import ErrorRecoveryType
+from ..error_recovery_policy import ErrorRecoveryPolicy, ErrorRecoveryType
 from ..notes.notes import CommandNote
 from ..types import (
     LabwareOffsetCreate,
@@ -266,6 +266,13 @@ class SetPipetteMovementSpeedAction:
     speed: Optional[float]
 
 
+@dataclass(frozen=True)
+class SetErrorRecoveryPolicyAction:
+    """See `ProtocolEngine.set_error_recovery_policy()`."""
+
+    error_recovery_policy: ErrorRecoveryPolicy
+
+
 Action = Union[
     PlayAction,
     PauseAction,
@@ -286,4 +293,5 @@ Action = Union[
     AddLiquidAction,
     ResetTipsAction,
     SetPipetteMovementSpeedAction,
+    SetErrorRecoveryPolicyAction,
 ]
