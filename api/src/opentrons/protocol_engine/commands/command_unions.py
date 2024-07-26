@@ -22,6 +22,7 @@ from . import temperature_module
 from . import thermocycler
 
 from . import calibration
+from . import unsafe
 
 from .set_rail_lights import (
     SetRailLights,
@@ -387,6 +388,7 @@ Command = Annotated[
         calibration.CalibratePipette,
         calibration.CalibrateModule,
         calibration.MoveToMaintenancePosition,
+        unsafe.UnsafeBlowOutInPlace,
     ],
     Field(discriminator="commandType"),
 ]
@@ -456,6 +458,7 @@ CommandParams = Union[
     calibration.CalibratePipetteParams,
     calibration.CalibrateModuleParams,
     calibration.MoveToMaintenancePositionParams,
+    unsafe.UnsafeBlowOutInPlaceParams,
 ]
 
 CommandType = Union[
@@ -523,6 +526,7 @@ CommandType = Union[
     calibration.CalibratePipetteCommandType,
     calibration.CalibrateModuleCommandType,
     calibration.MoveToMaintenancePositionCommandType,
+    unsafe.UnsafeBlowOutInPlaceCommandType,
 ]
 
 CommandCreate = Annotated[
@@ -591,6 +595,7 @@ CommandCreate = Annotated[
         calibration.CalibratePipetteCreate,
         calibration.CalibrateModuleCreate,
         calibration.MoveToMaintenancePositionCreate,
+        unsafe.UnsafeBlowOutInPlaceCreate,
     ],
     Field(discriminator="commandType"),
 ]
@@ -660,6 +665,7 @@ CommandResult = Union[
     calibration.CalibratePipetteResult,
     calibration.CalibrateModuleResult,
     calibration.MoveToMaintenancePositionResult,
+    unsafe.UnsafeBlowOutInPlaceResult
 ]
 
 # todo(mm, 2024-06-12): Ideally, command return types would have specific

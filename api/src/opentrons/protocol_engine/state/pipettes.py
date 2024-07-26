@@ -53,6 +53,7 @@ from ..commands import (
     RetractAxisResult,
     BlowOutResult,
     BlowOutInPlaceResult,
+    unsafe,
     TouchTipResult,
     thermocycler,
     heater_shaker,
@@ -483,7 +484,8 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             self._state.aspirated_volume_by_id[pipette_id] = next_volume
 
         elif isinstance(action, SucceedCommandAction) and isinstance(
-            action.command.result, (BlowOutResult, BlowOutInPlaceResult)
+            action.command.result,
+            (BlowOutResult, BlowOutInPlaceResult, unsafe.UnsafeBlowOutInPlaceResult),
         ):
             pipette_id = action.command.params.pipetteId
             self._state.aspirated_volume_by_id[pipette_id] = None

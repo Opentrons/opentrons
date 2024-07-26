@@ -603,3 +603,23 @@ def create_reload_labware_command(
         params=params,
         result=result,
     )
+
+
+def create_unsafe_blow_out_in_place_command(
+    pipette_id: str,
+    flow_rate: float,
+) -> cmd.unsafe.UnsafeBlowOutInPlace:
+    """Create a completed UnsafeBlowOutInPlace command."""
+    params = cmd.unsafe.UnsafeBlowOutInPlaceParams(
+        pipetteId=pipette_id, flowRate=flow_rate
+    )
+    result = cmd.unsafe.UnsafeBlowOutInPlaceResult()
+
+    return cmd.unsafe.UnsafeBlowOutInPlace(
+        id="command-id",
+        key="command-key",
+        status=cmd.CommandStatus.SUCCEEDED,
+        createdAt=datetime.now(),
+        params=params,
+        result=result,
+    )
