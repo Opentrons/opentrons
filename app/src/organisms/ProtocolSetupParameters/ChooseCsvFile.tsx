@@ -122,12 +122,12 @@ export function ChooseCsvFile({
                     <React.Fragment key={fileName}>
                       {csvFilePath.length !== 0 && fileName !== undefined ? (
                         <RadioButton
-                          buttonLabel={fileName ?? 'default'}
+                          buttonLabel={fileName}
                           buttonValue={csvFilePath}
                           onChange={() => {
                             setCsvFileSelected({
                               filePath: csvFilePath,
-                              fileName: fileName,
+                              fileName,
                             })
                           }}
                           isSelected={csvFileSelected?.filePath === csvFilePath}
