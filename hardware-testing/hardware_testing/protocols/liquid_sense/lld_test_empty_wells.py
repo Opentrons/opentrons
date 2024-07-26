@@ -44,6 +44,7 @@ TEST_WELLS = {
 }
 
 DIAL_POS_WITHOUT_TIP: Optional[float] = None
+DIAL_PORT_NAME = "/dev/ttyUSB0"
 DIAL_PORT = None
 RUN_ID = ""
 FILE_NAME = ""
@@ -64,18 +65,20 @@ def _setup(ctx: ProtocolContext) -> Tuple[InstrumentContext, Labware, Labware, L
 
     if not ctx.is_simulating() and DIAL_PORT is None:
         from hardware_testing.data import create_file_name, create_run_id
-        from hardware_testing.drivers import list_ports_and_select
         from hardware_testing.drivers.mitutoyo_digimatic_indicator import (
             Mitutoyo_Digimatic_Indicator,
         )
 
-        dial_port_name = list_ports_and_select("Dial Indicator")
-        DIAL_PORT = Mitutoyo_Digimatic_Indicator(port=dial_port_name)
+        DIAL_PORT = Mitutoyo_Digimatic_Indicator(port=DIAL_PORT_NAME)
         DIAL_PORT.connect()
         RUN_ID = create_run_id()
         FILE_NAME = create_file_name(
             metadata["protocolName"], RUN_ID, f"{pip_name}-{rack_name}"
         )
+        _write_line_to_csv(ctx, RUN_ID)
+        _write_line_to_csv(ctx, pip_name)
+        _write_line_to_csv(ctx, rack_name)
+        _write_line_to_csv(ctx, LABWARE)
 
     return pipette, rack, labware, dial
 
@@ -119,6 +122,7 @@ def _store_dial_baseline(
     if DIAL_POS_WITHOUT_TIP is not None:
         return
     DIAL_POS_WITHOUT_TIP = _read_dial_indicator(ctx, pipette, dial)
+    _write_line_to_csv(ctx, f"DIAL-BASELINE,{DIAL_POS_WITHOUT_TIP}")
 
 
 def _get_tip_z_error(
@@ -155,18 +159,20 @@ def _test_for_expected_liquid_state(
     fail_counter = 0
     trial_counter = 0
     _store_dial_baseline(ctx, pipette, dial)
+    csv_header = f'trial,tip-z-error,{",".join([w.well_name for w in wells])}'
+    _write_line_to_csv(ctx, f"{csv_header}")
     while trial_counter < trials:
         for tip in tips:
+            trial_counter += 1
             pipette.pick_up_tip(tip)
             tip_z_error = _get_tip_z_error(ctx, pipette, dial)
             failed_wells = _get_wells_with_expected_liquid_state(
                 pipette, wells, liquid_state
             )
-            trial_data = [tip_z_error] + [w not in failed_wells for w in wells]
+            trial_data = [trial_counter, tip_z_error] + [w not in failed_wells for w in wells]
             _write_line_to_csv(ctx, ",".join([str(d) for d in trial_data]))
             pipette.drop_tip()
             fail_counter += 1 if len(failed_wells) else 0
-            trial_counter += 1
         if trial_counter < trials:
             ctx.pause("replace with NEW tips")
             pipette.reset_tipracks()
