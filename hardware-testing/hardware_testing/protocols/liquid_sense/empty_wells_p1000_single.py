@@ -1,5 +1,5 @@
 """Measure Tip Overlap."""
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 
 from opentrons.protocol_api import (
     ProtocolContext,
@@ -22,6 +22,7 @@ LABWARE = "corning_96_wellplate_360ul_flat"
 
 SLOT_TIPRACK = "D3"
 SLOT_LABWARE = "D1"
+SLOT_DIAL = "B3"
 
 ###########################################
 #  VARIABLES - END
@@ -42,8 +43,15 @@ TEST_WELLS = {
     },
 }
 
+DIAL_POS_WITHOUT_TIP: Optional[float] = None
+DIAL_PORT = None
+RUN_ID = ""
+FILE_NAME = ""
+CSV_HEADER = "some,dumb,header"
 
-def _setup(ctx: ProtocolContext) -> Tuple[InstrumentContext, Labware, Labware]:
+
+def _setup(ctx: ProtocolContext) -> Tuple[InstrumentContext, Labware, Labware, Labware]:
+    global DIAL_PORT, RUN_ID, FILE_NAME
     # TODO: use runtime-variables instead of constants
     ctx.load_trash_bin("A3")
     pip_name = f"flex_{PIPETTE_CHANNELS}channel_{PIPETTE_SIZE}"
@@ -52,8 +60,32 @@ def _setup(ctx: ProtocolContext) -> Tuple[InstrumentContext, Labware, Labware]:
     rack = ctx.load_labware(rack_name, SLOT_TIPRACK)
     pipette = ctx.load_instrument(pip_name, "left")
     labware = ctx.load_labware(LABWARE, SLOT_LABWARE)
+    dial = ctx.load_labware("dial_indicator", SLOT_DIAL)
 
-    return pipette, rack, labware
+    if not ctx.is_simulating() and DIAL_PORT is None:
+        from hardware_testing.data import create_file_name, create_run_id
+        from hardware_testing.drivers import list_ports_and_select
+        from hardware_testing.drivers.mitutoyo_digimatic_indicator import (
+            Mitutoyo_Digimatic_Indicator,
+        )
+
+        dial_port_name = list_ports_and_select("Dial Indicator")
+        DIAL_PORT = Mitutoyo_Digimatic_Indicator(port=dial_port_name)
+        DIAL_PORT.connect()
+        RUN_ID = create_run_id()
+        FILE_NAME = create_file_name(
+            metadata["protocolName"], RUN_ID, f"{pip_name}-{rack_name}"
+        )
+
+    return pipette, rack, labware, dial
+
+
+def _write_line_to_csv(ctx: ProtocolContext, line: str) -> None:
+    if ctx.is_simulating():
+        return
+    from hardware_testing.data import append_data_to_file
+
+    append_data_to_file(metadata["protocolName"], RUN_ID, FILE_NAME, f"{line}\n")
 
 
 def _get_test_wells(labware: Labware, pipette: InstrumentContext) -> List[Well]:
@@ -68,6 +100,35 @@ def _get_test_tips(rack: Labware, pipette: InstrumentContext) -> List[Well]:
     else:
         test_tips = rack.wells()[:NUM_TRIALS]
     return test_tips
+
+
+def _read_dial_indicator(
+    ctx: ProtocolContext, pipette: InstrumentContext, dial: Labware
+) -> float:
+    pipette.move_to(dial["A1"].top())
+    ctx.delay(seconds=2)
+    if ctx.is_simulating():
+        return 0.0
+    return DIAL_PORT.read()
+
+
+def _store_dial_baseline(
+    ctx: ProtocolContext, pipette: InstrumentContext, dial: Labware
+) -> None:
+    global DIAL_POS_WITHOUT_TIP
+    if DIAL_POS_WITHOUT_TIP is not None:
+        return
+    DIAL_POS_WITHOUT_TIP = _read_dial_indicator(ctx, pipette, dial)
+
+
+def _get_tip_z_error(
+    ctx: ProtocolContext, pipette: InstrumentContext, dial: Labware
+) -> float:
+    assert DIAL_POS_WITHOUT_TIP is not None
+    new_val = _read_dial_indicator(ctx, pipette, dial)
+    z_error = new_val - DIAL_POS_WITHOUT_TIP
+    # NOTE: dial-indicators are upside-down, so we need to flip the values
+    return z_error * -1.0
 
 
 def _get_wells_with_expected_liquid_state(
@@ -85,6 +146,7 @@ def _get_wells_with_expected_liquid_state(
 def _test_for_expected_liquid_state(
     ctx: ProtocolContext,
     pipette: InstrumentContext,
+    dial: Labware,
     tips: List[Well],
     wells: List[Well],
     trials: int,
@@ -92,17 +154,19 @@ def _test_for_expected_liquid_state(
 ) -> None:
     fail_counter = 0
     trial_counter = 0
+    _store_dial_baseline(ctx, pipette, dial)
     while trial_counter < trials:
         for tip in tips:
             pipette.pick_up_tip(tip)
+            tip_z_error = _get_tip_z_error(ctx, pipette, dial)
             failed_wells = _get_wells_with_expected_liquid_state(
                 pipette, wells, liquid_state
             )
-            if failed_wells:
-                ctx.pause(f"Failed: {[w.well_name for w in failed_wells]}")
+            trial_data = [tip_z_error] + [w not in failed_wells for w in wells]
+            _write_line_to_csv(ctx, ",".join([str(d) for d in trial_data]))
             pipette.drop_tip()
-            fail_counter += len(failed_wells)
-            trial_counter += len(wells)
+            fail_counter += 1 if len(failed_wells) else 0
+            trial_counter += 1
         if trial_counter < trials:
             ctx.pause("replace with NEW tips")
             pipette.reset_tipracks()
@@ -111,12 +175,13 @@ def _test_for_expected_liquid_state(
 
 def run(ctx: ProtocolContext) -> None:
     """Run."""
-    pipette, rack, labware = _setup(ctx)
+    pipette, rack, labware, dial = _setup(ctx)
     test_wells = _get_test_wells(labware, pipette)
     test_tips = _get_test_tips(rack, pipette)
     _test_for_expected_liquid_state(
         ctx,
         pipette,
+        dial,
         tips=test_tips,
         wells=test_wells,
         trials=NUM_TRIALS,
