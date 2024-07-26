@@ -4,7 +4,8 @@ import os
 from pathlib import Path
 from glob import glob
 from typing import Any, AsyncGenerator, Dict, Tuple, Union
-from .types import UpdateError
+
+from .errors import UpdateError
 from .mod_abc import AbstractModule
 from opentrons.hardware_control.threaded_async_lock import ThreadedAsyncLock
 from contextlib import asynccontextmanager
@@ -33,6 +34,7 @@ async def update_firmware(
         kwargs: Dict[str, Any] = {
             "stdout": asyncio.subprocess.PIPE,
             "stderr": asyncio.subprocess.PIPE,
+            "module": module,
         }
         successful, res = await module.bootloader()(
             flash_port_or_dfu_serial, str(firmware_file), kwargs

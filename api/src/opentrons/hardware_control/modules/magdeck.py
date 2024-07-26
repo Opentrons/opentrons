@@ -54,6 +54,7 @@ class MagDeck(mod_abc.AbstractModule):
         simulating: bool = False,
         sim_model: Optional[str] = None,
         sim_serial_number: Optional[str] = None,
+        disconnected_callback: types.ModuleDisconnectedCallback = None,
     ) -> "MagDeck":
         """Factory function."""
         driver: AbstractMagDeckDriver
@@ -71,6 +72,7 @@ class MagDeck(mod_abc.AbstractModule):
             hw_control_loop=hw_control_loop,
             device_info=await driver.get_device_info(),
             driver=driver,
+            disconnected_callback=disconnected_callback,
         )
         return mod
 
@@ -82,6 +84,7 @@ class MagDeck(mod_abc.AbstractModule):
         hw_control_loop: asyncio.AbstractEventLoop,
         driver: AbstractMagDeckDriver,
         device_info: Mapping[str, str],
+        disconnected_callback: types.ModuleDisconnectedCallback = None,
     ) -> None:
         """Constructor"""
         super().__init__(
@@ -89,6 +92,7 @@ class MagDeck(mod_abc.AbstractModule):
             usb_port=usb_port,
             hw_control_loop=hw_control_loop,
             execution_manager=execution_manager,
+            disconnected_callback=disconnected_callback,
         )
         self._device_info = device_info
         self._driver = driver
@@ -170,6 +174,11 @@ class MagDeck(mod_abc.AbstractModule):
 
         """
         return self._device_info
+
+    @property
+    def serial_number(self) -> Optional[str]:
+        """The usb serial number of this device"""
+        return self._device_info.get("serial")
 
     @property
     def status(self) -> types.MagneticStatus:

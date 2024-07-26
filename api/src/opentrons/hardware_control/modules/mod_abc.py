@@ -2,13 +2,19 @@ import abc
 import asyncio
 import logging
 import re
-from typing import ClassVar, Mapping, Optional, TypeVar, cast
+from typing import ClassVar, Mapping, Optional, TypeVar
 from packaging.version import InvalidVersion, parse, Version
 from opentrons.config import IS_ROBOT, ROBOT_FIRMWARE_DIR
 from opentrons.drivers.rpi_drivers.types import USBPort
 
 from ..execution_manager import ExecutionManager
-from .types import BundledFirmware, UploadFunction, LiveData, ModuleType
+from .types import (
+    BundledFirmware,
+    ModuleDisconnectedCallback,
+    UploadFunction,
+    LiveData,
+    ModuleType,
+)
 
 mod_log = logging.getLogger(__name__)
 
@@ -25,7 +31,7 @@ def parse_fw_version(version: str) -> Version:
             raise InvalidVersion()
     except InvalidVersion:
         device_version = parse("v0.0.0")
-    return cast(Version, device_version)
+    return device_version
 
 
 class AbstractModule(abc.ABC):
@@ -45,6 +51,7 @@ class AbstractModule(abc.ABC):
         simulating: bool = False,
         sim_model: Optional[str] = None,
         sim_serial_number: Optional[str] = None,
+        disconnected_callback: ModuleDisconnectedCallback = None,
     ) -> "AbstractModule":
         """Modules should always be created using this factory.
 
@@ -58,12 +65,14 @@ class AbstractModule(abc.ABC):
         usb_port: USBPort,
         execution_manager: ExecutionManager,
         hw_control_loop: asyncio.AbstractEventLoop,
+        disconnected_callback: ModuleDisconnectedCallback = None,
     ) -> None:
         self._port = port
         self._usb_port = usb_port
         self._loop = hw_control_loop
         self._execution_manager = execution_manager
         self._bundled_fw: Optional[BundledFirmware] = self.get_bundled_fw()
+        self._disconnected_callback = disconnected_callback
 
     @staticmethod
     def sort_key(inst: "AbstractModule") -> int:
@@ -82,13 +91,18 @@ class AbstractModule(abc.ABC):
     def loop(self) -> asyncio.AbstractEventLoop:
         return self._loop
 
+    def disconnected_callback(self) -> None:
+        """Called from within the module object to signify the object is no longer connected"""
+        if self._disconnected_callback is not None:
+            self._disconnected_callback(self.port, self.serial_number)
+
     def get_bundled_fw(self) -> Optional[BundledFirmware]:
         """Get absolute path to bundled version of module fw if available."""
         if not IS_ROBOT:
             return None
         file_prefix = self.firmware_prefix()
 
-        MODULE_FW_RE = re.compile(f"^{file_prefix}@v(.*)[.](hex|bin)$")
+        MODULE_FW_RE = re.compile(f"^{file_prefix}@v(.*)[.](hex|bin|byoup)$")
         for fw_resource in ROBOT_FIRMWARE_DIR.iterdir():  # type: ignore
             matches = MODULE_FW_RE.search(fw_resource.name)
             if matches:
@@ -153,6 +167,11 @@ class AbstractModule(abc.ABC):
     def usb_port(self) -> USBPort:
         """The physical port where the module is connected."""
         return self._usb_port
+
+    @property
+    def serial_number(self) -> Optional[str]:
+        """The usb serial number of this device."""
+        return self.device_info.get("serial")
 
     @abc.abstractmethod
     async def prep_for_update(self) -> str:
