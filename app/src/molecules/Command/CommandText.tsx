@@ -9,7 +9,6 @@ import {
   LegacyStyledText,
   StyledText,
   RESPONSIVENESS,
-  styleProps,
 } from '@opentrons/components'
 
 import { useCommandTextString } from './hooks'
@@ -78,14 +77,14 @@ function CommandStyledText(
       <StyledText
         desktopStyle={props.desktopStyle ?? 'bodyDefaultRegular'}
         oddStyle={props.oddStyle ?? 'bodyTextRegular'}
-        {...styleProps(props)}
+        {...props}
       >
         {props.children}
       </StyledText>
     )
   } else {
     return (
-      <LegacyStyledText as={props.as ?? 'p'} {...styleProps(props)}>
+      <LegacyStyledText as={props.as ?? 'p'} {...props}>
         {props.children}
       </LegacyStyledText>
     )

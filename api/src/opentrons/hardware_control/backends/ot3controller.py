@@ -178,7 +178,7 @@ from opentrons_hardware.hardware_control.hepa_uv_settings import (
 )
 
 from opentrons_hardware.drivers.gpio import OT3GPIO, RemoteOT3GPIO
-from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons_shared_data.pipette.types import PipetteName
 from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
     load_data as load_pipette_data,
@@ -1357,6 +1357,7 @@ class OT3Controller(FlexBackend):
         mount_speed: float,
         plunger_speed: float,
         threshold_pascals: float,
+        plunger_impulse_time: float,
         output_option: OutputOptions = OutputOptions.can_bus_only,
         data_files: Optional[Dict[InstrumentProbeType, str]] = None,
         probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
@@ -1387,6 +1388,7 @@ class OT3Controller(FlexBackend):
             plunger_speed=plunger_speed,
             mount_speed=mount_speed,
             threshold_pascals=threshold_pascals,
+            plunger_impulse_time=plunger_impulse_time,
             csv_output=csv_output,
             sync_buffer_output=sync_buffer_output,
             can_bus_only_output=can_bus_only_output,

@@ -1,7 +1,7 @@
 import logging
 from typing import Optional, Any
 
-from opentrons_shared_data.labware.dev_types import (
+from opentrons_shared_data.labware.types import (
     LabwareDefinition as LabwareDefinitionDict,
 )
 
@@ -16,7 +16,7 @@ from opentrons.hardware_control.instruments.ot2 import (
 )
 from opentrons.protocol_api.labware import Labware
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons_shared_data.protocol.dev_types import (
+from opentrons_shared_data.protocol.types import (
     LiquidHandlingCommand,
     BlowoutLocation,
 )

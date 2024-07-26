@@ -44,27 +44,6 @@ describe('useErrorDetailsModal', () => {
   })
 })
 
-describe('ErrorDetailsModal', () => {
-  let props: React.ComponentProps<typeof ErrorDetailsModal>
-
-  beforeEach(() => {
-    props = {
-      ...mockRecoveryContentProps,
-      toggleModal: vi.fn(),
-      robotType: 'OT-3 Standard',
-    }
-
-    vi.mocked(StepInfo).mockReturnValue(<div>MOCK_STEP_INFO</div>)
-  })
-
-  it('renders ErrorDetailsModal', () => {
-    renderWithProviders(<ErrorDetailsModal {...props} />, {
-      i18nInstance: i18n,
-    })
-    expect(screen.getByText('MOCK_STEP_INFO')).toBeInTheDocument()
-  })
-})
-
 const render = (props: React.ComponentProps<typeof ErrorDetailsModal>) => {
   return renderWithProviders(<ErrorDetailsModal {...props} />, {
     i18nInstance: i18n,
@@ -79,6 +58,7 @@ describe('ErrorDetailsModal', () => {
       ...mockRecoveryContentProps,
       toggleModal: vi.fn(),
       robotType: 'OT-3 Standard',
+      desktopType: 'desktop-small',
     }
 
     vi.mocked(StepInfo).mockReturnValue(<div>MOCK_STEP_INFO</div>)
@@ -87,7 +67,9 @@ describe('ErrorDetailsModal', () => {
     )
   })
 
-  it('renders the modal with the correct content', () => {
+  const IS_ODD = [true, false]
+
+  it('renders the ODD modal with the correct content', () => {
     render(props)
     expect(vi.mocked(Modal)).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -102,21 +84,30 @@ describe('ErrorDetailsModal', () => {
     expect(screen.getByText('MOCK_STEP_INFO')).toBeInTheDocument()
   })
 
-  it('renders the OverpressureBanner when the error kind is an overpressure error', () => {
-    props.failedCommand = {
-      ...props.failedCommand,
-      commandType: 'aspirate',
-      error: { isDefined: true, errorType: 'overpressure' },
-    } as any
-    render(props)
+  it('renders the desktop modal with the correct content', () => {
+    render({ ...props, isOnDevice: false })
 
-    screen.getByText('MOCK_INLINE_NOTIFICATION')
+    screen.getByText('MOCK_STEP_INFO')
+    screen.getByText('Error details')
   })
 
-  it('does not render the OverpressureBanner when the error kind is not an overpressure error', () => {
-    render(props)
+  IS_ODD.forEach(isOnDevice => {
+    it('renders the OverpressureBanner when the error kind is an overpressure error', () => {
+      props.failedCommand = {
+        ...props.failedCommand,
+        commandType: 'aspirate',
+        error: { isDefined: true, errorType: 'overpressure' },
+      } as any
+      render({ ...props, isOnDevice })
 
-    expect(screen.queryByText('MOCK_INLINE_NOTIFICATION')).toBeNull()
+      screen.getByText('MOCK_INLINE_NOTIFICATION')
+    })
+
+    it('does not render the OverpressureBanner when the error kind is not an overpressure error', () => {
+      render({ ...props, isOnDevice })
+
+      expect(screen.queryByText('MOCK_INLINE_NOTIFICATION')).toBeNull()
+    })
   })
 })
 
@@ -128,7 +119,7 @@ describe('OverpressureBanner', () => {
   })
 
   it('renders the InlineNotification', () => {
-    renderWithProviders(<OverpressureBanner isOnDevice={true} />, {
+    renderWithProviders(<OverpressureBanner />, {
       i18nInstance: i18n,
     })
     expect(vi.mocked(InlineNotification)).toHaveBeenCalledWith(

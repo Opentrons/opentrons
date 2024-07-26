@@ -7,7 +7,7 @@ from typing_extensions import Literal
 
 from opentrons.protocols.api_support.types import APIVersion
 
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.types import RobotType
 
 
 class ProtocolType(str, Enum):

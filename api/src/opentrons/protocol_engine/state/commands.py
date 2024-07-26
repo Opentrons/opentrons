@@ -337,7 +337,10 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 other_command_ids_to_fail = list(
                     self._state.command_history.get_queue_ids()
                 )
-            elif action.type == ErrorRecoveryType.WAIT_FOR_RECOVERY:
+            elif (
+                action.type == ErrorRecoveryType.WAIT_FOR_RECOVERY
+                or action.type == ErrorRecoveryType.IGNORE_AND_CONTINUE
+            ):
                 other_command_ids_to_fail = []
             else:
                 assert_never(action.type)

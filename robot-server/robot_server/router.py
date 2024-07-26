@@ -5,6 +5,7 @@ from .constants import V1_TAG
 from .errors.error_responses import LegacyErrorResponse
 from .versioning import check_version_header
 
+from .client_data.router import router as client_data_router
 from .commands.router import commands_router
 from .deck_configuration.router import router as deck_configuration_router
 from .health.router import health_router
@@ -45,6 +46,12 @@ router.include_router(
             "model": LegacyErrorResponse,
         }
     },
+)
+
+router.include_router(
+    router=client_data_router,
+    tags=["Client Data"],
+    dependencies=[Depends(check_version_header)],
 )
 
 router.include_router(

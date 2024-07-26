@@ -1,4 +1,4 @@
-"""Module for tracking robot context and execution duration for different operations."""
+"""Module for tracking robot activity and execution duration for different operations."""
 
 import inspect
 from pathlib import Path
@@ -8,8 +8,8 @@ from time import perf_counter_ns
 import typing
 
 from ._metrics_store import MetricsStore
-from ._data_shapes import RawContextData, MetricsMetadata
-from ._types import SupportsTracking, RobotContextState
+from ._data_shapes import RawActivityData, MetricsMetadata
+from ._types import SupportsTracking, RobotActivityState
 from ._util import get_timing_function
 
 _UnderlyingFunctionParameters = typing.ParamSpec("_UnderlyingFunctionParameters")
@@ -22,20 +22,20 @@ _UnderlyingFunction = typing.Callable[
 _timing_function = get_timing_function()
 
 
-class RobotContextTracker(SupportsTracking):
-    """Tracks and stores robot context and execution duration for different operations."""
+class RobotActivityTracker(SupportsTracking):
+    """Tracks and stores robot activity and execution duration for different operations."""
 
     METADATA_NAME: typing.Final[
-        typing.Literal["robot_context_data"]
-    ] = "robot_context_data"
+        typing.Literal["robot_activity_data"]
+    ] = "robot_activity_data"
 
     def __init__(self, storage_location: Path, should_track: bool) -> None:
-        """Initializes the RobotContextTracker with an empty storage list."""
-        self._store = MetricsStore[RawContextData](
+        """Initializes the RobotActivityTracker with an empty storage list."""
+        self._store = MetricsStore[RawActivityData](
             MetricsMetadata(
                 name=self.METADATA_NAME,
                 storage_dir=storage_location,
-                headers=RawContextData.headers(),
+                headers=RawActivityData.headers(),
             )
         )
         self._should_track = should_track
@@ -45,7 +45,7 @@ class RobotContextTracker(SupportsTracking):
 
     def track(
         self,
-        state: RobotContextState,
+        state: RobotActivityState,
     ) -> typing.Callable[
         [_UnderlyingFunction[_UnderlyingFunctionParameters, _UnderlyingFunctionReturn]],
         _UnderlyingFunction[_UnderlyingFunctionParameters, _UnderlyingFunctionReturn],
@@ -56,7 +56,7 @@ class RobotContextTracker(SupportsTracking):
 
         Args:
             func_to_track: The function to track.
-            state: The state of the robot context during the function execution.
+            state: The state of the robot activity during the function execution.
             *args: The arguments to pass to the function.
             **kwargs: The keyword arguments to pass to the function.
 
@@ -90,7 +90,7 @@ class RobotContextTracker(SupportsTracking):
                         duration_end_time = perf_counter_ns()
 
                         self._store.add(
-                            RawContextData(
+                            RawActivityData(
                                 func_start=function_start_time,
                                 duration=duration_end_time - duration_start_time,
                                 state=state,
@@ -116,7 +116,7 @@ class RobotContextTracker(SupportsTracking):
                         duration_end_time = perf_counter_ns()
 
                         self._store.add(
-                            RawContextData(
+                            RawActivityData(
                                 func_start=function_start_time,
                                 duration=duration_end_time - duration_start_time,
                                 state=state,
@@ -130,7 +130,7 @@ class RobotContextTracker(SupportsTracking):
         return inner_decorator
 
     def store(self) -> None:
-        """Returns the stored context data and clears the storage list."""
+        """Returns the stored activity data and clears the storage list."""
         if not self._should_track:
             return
         self._store.store()

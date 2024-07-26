@@ -16,6 +16,7 @@ import {
   useCurrentlyRecoveringFrom,
   useERUtils,
   useShowDoorInfo,
+  useRecoveryAnalytics,
 } from '../hooks'
 import { useFeatureFlag } from '../../../redux/config'
 import { useERWizard, ErrorRecoveryWizard } from '../ErrorRecoveryWizard'
@@ -129,7 +130,6 @@ describe('ErrorRecovery', () => {
       runStatus: RUN_STATUS_AWAITING_RECOVERY,
       failedCommand: mockFailedCommand,
       runId: 'MOCK_RUN_ID',
-      isFlex: true,
       protocolAnalysis: {} as any,
     }
     vi.mocked(ErrorRecoveryWizard).mockReturnValue(<div>MOCK WIZARD</div>)
@@ -145,6 +145,9 @@ describe('ErrorRecovery', () => {
     vi.mocked(useRunPausedSplash).mockReturnValue(true)
     vi.mocked(useERUtils).mockReturnValue({ routeUpdateActions: {} } as any)
     vi.mocked(useShowDoorInfo).mockReturnValue(false)
+    vi.mocked(useRecoveryAnalytics).mockReturnValue({
+      reportErrorEvent: vi.fn(),
+    } as any)
   })
 
   it('renders the wizard when the wizard is toggled on', () => {

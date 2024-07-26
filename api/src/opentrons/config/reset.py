@@ -5,7 +5,7 @@ from enum import Enum
 from pathlib import Path
 from typing import NamedTuple, Dict, Set
 
-from opentrons_shared_data.robot.dev_types import RobotTypeEnum
+from opentrons_shared_data.robot.types import RobotTypeEnum
 from opentrons.config import IS_ROBOT
 from opentrons.calibration_storage import (
     delete_robot_deck_attitude,

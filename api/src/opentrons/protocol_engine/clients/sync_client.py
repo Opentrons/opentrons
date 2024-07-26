@@ -2,7 +2,7 @@
 
 from typing import cast, Any, Optional, overload
 
-from opentrons_shared_data.labware.dev_types import LabwareUri
+from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 from .. import commands

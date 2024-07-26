@@ -68,7 +68,8 @@ function CancelRunConfirmation({
       <Flex
         flexDirection={DIRECTION_COLUMN}
         alignItems={ALIGN_CENTER}
-        gridGap={SPACING.spacing24}
+        gridGap={SPACING.spacing16}
+        padding={`${SPACING.spacing32} ${SPACING.spacing16}`}
         height="100%"
         css={FLEX_WIDTH}
       >
@@ -84,7 +85,7 @@ function CancelRunConfirmation({
         <StyledText
           oddStyle="level4HeaderRegular"
           desktopStyle="bodyDefaultRegular"
-          color={COLORS.grey60}
+          color={COLORS.black90}
           textAlign={ALIGN_CENTER}
         >
           {t('if_tips_are_attached')}

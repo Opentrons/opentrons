@@ -268,4 +268,11 @@ export type ConfigV23 = Omit<ConfigV22, 'version'> & {
   }
 }
 
-export type Config = ConfigV23
+export type ConfigV24 = Omit<ConfigV23, 'version' | 'support'> & {
+  version: 24
+  userInfo: {
+    userId: string
+  }
+}
+
+export type Config = ConfigV24
