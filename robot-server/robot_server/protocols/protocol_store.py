@@ -348,10 +348,8 @@ class ProtocolStore:
         return [_convert_sql_row_to_dataclass(sql_row=row) for row in all_rows]
 
     def _sql_remove(self, protocol_id: str) -> None:
-        select_referencing_analysis_ids = (
-            sqlalchemy.select(analysis_table.c.id)
-            .where(analysis_table.c.protocol_id == protocol_id)
-            .order_by(sqlite_rowid)
+        select_referencing_analysis_ids = sqlalchemy.select(analysis_table.c.id).where(
+            analysis_table.c.protocol_id == protocol_id
         )
         delete_analysis_rtps_statement = sqlalchemy.delete(
             analysis_primitive_type_rtp_table
