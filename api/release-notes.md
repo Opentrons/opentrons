@@ -10,7 +10,10 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 Welcome to the v7.5.0 release of the Opentrons robot software!
 
-This release adds support for the latest Flex Gripper hardware and the [Opentrons Flex HEPA/UV Module](https://opentrons.com/products/opentrons-flex-hepa-uv-module).
+### Hardware Support
+
+- [Opentrons Flex HEPA/UV Module](https://opentrons.com/products/opentrons-flex-hepa-uv-module)
+- Latest gripper model `GRPV13xxxxx`
 
 ### Bug Fixes
 
