@@ -8,7 +8,7 @@ from opentrons.protocol_engine import ErrorOccurrence
 from opentrons.protocol_engine.types import BooleanParameter
 from opentrons.protocol_reader import ProtocolSource, JsonProtocolConfig
 from opentrons_shared_data.errors import EnumeratedError, ErrorCodes
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.types import RobotType
 
 from robot_server.protocols import protocol_analyzer
 from robot_server.protocols.protocol_models import ProtocolKind

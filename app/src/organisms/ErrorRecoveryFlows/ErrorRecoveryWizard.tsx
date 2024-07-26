@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 import { StyledText } from '@opentrons/components'
 
@@ -28,7 +29,7 @@ import { RECOVERY_MAP } from './constants'
 
 import type { RobotType } from '@opentrons/shared-data'
 import type { RecoveryContentProps } from './types'
-import type { ERUtilsResults } from './hooks'
+import type { ERUtilsResults, UseRecoveryAnalyticsResult } from './hooks'
 import type { ErrorRecoveryFlowsProps } from '.'
 
 interface UseERWizardResult {
@@ -58,6 +59,7 @@ export type ErrorRecoveryWizardProps = ErrorRecoveryFlowsProps &
     robotType: RobotType
     isOnDevice: boolean
     isDoorOpen: boolean
+    analytics: UseRecoveryAnalyticsResult
   }
 
 export function ErrorRecoveryWizard(
@@ -83,10 +85,22 @@ export function ErrorRecoveryWizard(
 export function ErrorRecoveryComponent(
   props: RecoveryContentProps
 ): JSX.Element {
-  const { recoveryMap, hasLaunchedRecovery, isDoorOpen, isOnDevice } = props
+  const {
+    recoveryMap,
+    hasLaunchedRecovery,
+    isDoorOpen,
+    isOnDevice,
+    analytics,
+  } = props
   const { route, step } = recoveryMap
   const { t } = useTranslation('error_recovery')
   const { showModal, toggleModal } = useErrorDetailsModal()
+
+  React.useEffect(() => {
+    if (showModal) {
+      analytics.reportViewErrorDetailsEvent(route, step)
+    }
+  }, [analytics, route, showModal, step])
 
   const buildTitleHeading = (): JSX.Element => {
     const titleText = hasLaunchedRecovery ? t('recovery_mode') : t('cancel_run')
@@ -101,7 +115,13 @@ export function ErrorRecoveryComponent(
   }
 
   const buildIconHeading = (): JSX.Element => (
-    <StyledText oddStyle="bodyTextSemiBold" desktopStyle="bodyDefaultSemiBold">
+    <StyledText
+      oddStyle="bodyTextSemiBold"
+      desktopStyle="bodyDefaultSemiBold"
+      css={css`
+        cursor: pointer;
+      `}
+    >
       {t('view_error_details')}
     </StyledText>
   )
@@ -119,6 +139,7 @@ export function ErrorRecoveryComponent(
     !isDoorOpen &&
     route === RECOVERY_MAP.DROP_TIP_FLOWS.ROUTE &&
     step !== RECOVERY_MAP.DROP_TIP_FLOWS.STEPS.BEGIN_REMOVAL
+  const desktopType = isLargeDesktopStyle ? 'desktop-large' : 'desktop-small'
 
   return (
     <RecoveryInterventionModal
@@ -126,11 +147,15 @@ export function ErrorRecoveryComponent(
       titleHeading={buildTitleHeading()}
       iconHeadingOnClick={toggleModal}
       iconName="information"
-      desktopType={isLargeDesktopStyle ? 'desktop-large' : 'desktop-small'}
+      desktopType={desktopType}
       isOnDevice={isOnDevice}
     >
       {showModal ? (
-        <ErrorDetailsModal {...props} toggleModal={toggleModal} />
+        <ErrorDetailsModal
+          {...props}
+          toggleModal={toggleModal}
+          desktopType={desktopType}
+        />
       ) : null}
       {buildInterventionContent()}
     </RecoveryInterventionModal>

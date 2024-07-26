@@ -4,7 +4,7 @@ from typing import cast
 import pytest
 from decoy import Decoy
 
-from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
+from opentrons_shared_data.labware.types import LabwareDefinition as LabwareDefDict
 
 from opentrons.hardware_control.modules.types import ModuleType, HeaterShakerModuleModel
 from opentrons.legacy_broker import LegacyBroker

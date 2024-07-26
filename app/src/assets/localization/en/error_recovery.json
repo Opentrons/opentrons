@@ -16,8 +16,9 @@
   "continue_run_now": "Continue run now",
   "continue_to_drop_tip": "Continue to drop tip",
   "error": "Error",
+  "error_details": "Error details",
   "error_on_robot": "Error on {{robot}}",
-  "failed_dispense_step_not_completed": "<block>The failed dispense step will not be completed. The run will continue from the next step.</block><block>Close the robot door before proceeding.</block>",
+  "failed_dispense_step_not_completed": "<block>The failed dispense step will not be completed. The run will continue from the next step with the attached tips.</block><block>Close the robot door before proceeding.</block>",
   "failed_step": "Failed step",
   "first_take_any_necessary_actions": "<block>First, take any necessary actions to prepare the robot to retry the failed step.</block><block>Then, close the robot door before proceeding.</block>",
   "go_back": "Go back",
@@ -40,6 +41,7 @@
   "recovery_action_failed": "{{action}} failed",
   "recovery_mode": "Recovery Mode",
   "recovery_mode_explanation": "<block>Recovery Mode provides you with guided and manual controls for handling errors at runtime.</block><br/><block>You can make changes to ensure the step in progress when the error occurred can be completed or choose to cancel the protocol. When changes are made and no subsequent errors are detected, the method completes. Depending on the conditions that caused the error, you will only be provided with appropriate options.</block>",
+  "remove_tips_from_pipette": "Remove tips from {{mount}} pipette before canceling the run?",
   "replace_tips_and_select_location": "It's best to replace tips and select the last location used for tip pickup.",
   "replace_used_tips_in_rack_location": "Replace used tips in rack location {{location}} in slot {{slot}}",
   "replace_with_new_tip_rack": "Replace with new tip rack in slot {{slot}}",
@@ -72,6 +74,5 @@
   "tip_not_detected": "Tip not detected",
   "view_error_details": "View error details",
   "view_recovery_options": "View recovery options",
-  "you_can_still_drop_tips": "You can still drop the attached tips before proceeding to tip selection.",
-  "remove_tips_from_pipette": "Remove tips from {{mount}} pipette before canceling the run?"
+  "you_can_still_drop_tips": "You can still drop the attached tips before proceeding to tip selection."
 }

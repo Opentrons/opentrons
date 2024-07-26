@@ -179,6 +179,8 @@ const ICON_STYLE = css`
   width: ${SPACING.spacing16};
   height: ${SPACING.spacing16};
   margin: ${SPACING.spacing4};
+  cursor: pointer;
+
   @media (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
     width: ${SPACING.spacing32};
     height: ${SPACING.spacing32};

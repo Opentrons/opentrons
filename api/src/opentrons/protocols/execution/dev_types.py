@@ -2,7 +2,7 @@ from typing import Callable, Dict, TYPE_CHECKING
 
 from typing_extensions import Protocol, TypedDict
 
-from opentrons_shared_data.protocol.dev_types import (
+from opentrons_shared_data.protocol.types import (
     BlowoutParams,
     DelayParams,
     PipetteAccessParams,

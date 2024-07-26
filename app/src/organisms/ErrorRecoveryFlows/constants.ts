@@ -1,6 +1,6 @@
 import { css } from 'styled-components'
 
-import { SPACING, TYPOGRAPHY, RESPONSIVENESS } from '@opentrons/components'
+import { SPACING, RESPONSIVENESS } from '@opentrons/components'
 
 import type { StepOrder } from './types'
 
@@ -203,10 +203,6 @@ export const INVALID = 'INVALID' as const
 /**
  * Styling
  */
-
-export const BODY_TEXT_STYLE = css`
-  ${TYPOGRAPHY.bodyTextRegular};
-`
 
 export const ODD_SECTION_TITLE_STYLE = css`
   margin-bottom: ${SPACING.spacing16};

@@ -1,4 +1,5 @@
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { useRouteUpdateActions } from './useRouteUpdateActions'
 import { useRecoveryCommands } from './useRecoveryCommands'
@@ -28,12 +29,14 @@ import type { UseDeckMapUtilsResult } from './useDeckMapUtils'
 import type { CurrentRecoveryOptionUtils } from './useRecoveryRouting'
 import type { RecoveryActionMutationResult } from './useRecoveryActionMutation'
 import type { StepCounts } from '../../../resources/protocols/hooks'
+import type { UseRecoveryAnalyticsResult } from './useRecoveryAnalytics'
 
 type ERUtilsProps = ErrorRecoveryFlowsProps & {
   toggleERWizard: (launchER: boolean) => Promise<void>
   hasLaunchedRecovery: boolean
   isOnDevice: boolean
   robotType: RobotType
+  analytics: UseRecoveryAnalyticsResult
 }
 
 export interface ERUtilsResults {
@@ -56,7 +59,6 @@ export interface ERUtilsResults {
 const SUBSEQUENT_COMMAND_DEPTH = 2
 // Builds various Error Recovery utilities.
 export function useERUtils({
-  isFlex,
   failedCommand,
   runId,
   toggleERWizard,
@@ -64,6 +66,7 @@ export function useERUtils({
   protocolAnalysis,
   isOnDevice,
   robotType,
+  analytics,
 }: ERUtilsProps): ERUtilsResults {
   const { data: attachedInstruments } = useInstrumentsQuery()
   const { data: runRecord } = useNotifyRunQuery(runId)
@@ -96,7 +99,7 @@ export function useERUtils({
 
   const tipStatusUtils = useRecoveryTipStatus({
     runId,
-    isFlex,
+    isFlex: robotType === FLEX_ROBOT_TYPE,
     runRecord,
     attachedInstruments,
   })
@@ -128,6 +131,8 @@ export function useERUtils({
     failedLabwareUtils,
     routeUpdateActions,
     recoveryToastUtils,
+    analytics,
+    selectedRecoveryOption: currentRecoveryOptionUtils.selectedRecoveryOption,
   })
 
   const deckMapUtils = useDeckMapUtils({

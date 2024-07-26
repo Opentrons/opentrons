@@ -318,10 +318,14 @@ export const DropTipWizardContent = (
   }
 
   function buildSuccess(): JSX.Element {
+    const { tipDropComplete } = fixitCommandTypeUtils?.buttonOverrides ?? {}
+
     // Route to the drop tip route if user is at the blowout success screen, otherwise proceed conditionally.
     const handleProceed = (): void => {
       if (currentStep === BLOWOUT_SUCCESS) {
         void proceedToRoute(DT_ROUTES.DROP_TIP)
+      } else if (tipDropComplete != null) {
+        tipDropComplete()
       } else {
         proceedWithConditionalClose()
       }

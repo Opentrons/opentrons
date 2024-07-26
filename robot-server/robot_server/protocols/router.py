@@ -31,7 +31,7 @@ from opentrons.protocol_reader import (
     FileReaderWriter,
     FileHasher,
 )
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.types import RobotType
 
 from robot_server.errors.error_responses import ErrorDetails, ErrorBody
 from robot_server.hardware import get_robot_type

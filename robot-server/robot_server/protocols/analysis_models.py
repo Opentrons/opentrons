@@ -6,7 +6,7 @@ from opentrons.protocol_engine.types import (
     RunTimeParameter,
     PrimitiveRunTimeParamValuesType,
 )
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.types import RobotType
 from pydantic import BaseModel, Field
 from typing import List, Optional, Union, NamedTuple
 from typing_extensions import Literal

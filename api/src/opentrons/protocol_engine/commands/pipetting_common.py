@@ -2,7 +2,7 @@
 from dataclasses import dataclass
 from opentrons_shared_data.errors import ErrorCodes
 from pydantic import BaseModel, Field
-from typing import Literal, Optional
+from typing import Literal, Optional, Tuple, TypedDict
 
 from opentrons.protocol_engine.errors.error_occurrence import ErrorOccurrence
 
@@ -123,6 +123,12 @@ class DestinationPositionResult(BaseModel):
     )
 
 
+class ErrorLocationInfo(TypedDict):
+    """Holds a retry location for in-place error recovery."""
+
+    retryLocation: Tuple[float, float, float]
+
+
 class OverpressureError(ErrorOccurrence):
     """Returned when sensors detect an overpressure error while moving liquid.
 
@@ -137,6 +143,8 @@ class OverpressureError(ErrorOccurrence):
 
     errorCode: str = ErrorCodes.PIPETTE_OVERPRESSURE.value.code
     detail: str = ErrorCodes.PIPETTE_OVERPRESSURE.value.detail
+
+    errorInfo: ErrorLocationInfo
 
 
 @dataclass(frozen=True)

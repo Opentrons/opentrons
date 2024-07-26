@@ -11,7 +11,6 @@ import {
   StyledText,
   RESPONSIVENESS,
 } from '@opentrons/components'
-import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { RadioButton } from '../../../atoms/buttons'
 import {
@@ -30,7 +29,7 @@ import { DT_ROUTES } from '../../DropTipWizardFlows/constants'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 import type { PipetteWithTip } from '../../DropTipWizardFlows'
-import type { RecoveryContentProps } from '../types'
+import type { RecoveryContentProps, RecoveryRoute, RouteStep } from '../types'
 import type { FixitCommandTypeUtils } from '../../DropTipWizardFlows/types'
 
 // The Drop Tip flow entry point. Includes entry from SelectRecoveryOption and CancelRun.
@@ -148,9 +147,6 @@ export function BeginRemoval({
         css={DESKTOP_ONLY}
       >
         <RecoveryRadioGroup
-          css={css`
-            padding: ${SPACING.spacing4};
-          `}
           value={selected}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
             setSelected(e.currentTarget.value as RemovalOptions)
@@ -190,10 +186,10 @@ function DropTipFlowsContainer(
   props: RecoveryContentProps
 ): JSX.Element | null {
   const {
+    robotType,
     tipStatusUtils,
     routeUpdateActions,
     recoveryCommands,
-    isFlex,
     currentRecoveryOptionUtils,
   } = props
   const { DROP_TIP_FLOWS, ROBOT_CANCELING, RETRY_NEW_TIPS } = RECOVERY_MAP
@@ -232,7 +228,7 @@ function DropTipFlowsContainer(
   return (
     <RecoverySingleColumnContentWrapper>
       <DropTipWizardFlows
-        robotType={isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE}
+        robotType={robotType}
         closeFlow={onCloseFlow}
         mount={mount}
         instrumentModelSpecs={specs}
@@ -254,6 +250,7 @@ export function useDropTipFlowUtils({
   const { t } = useTranslation('error_recovery')
   const {
     RETRY_NEW_TIPS,
+    SKIP_STEP_WITH_NEW_TIPS,
     ERROR_WHILE_RECOVERING,
     DROP_TIP_FLOWS,
   } = RECOVERY_MAP
@@ -266,9 +263,32 @@ export function useDropTipFlowUtils({
   const buildTipDropCompleteBtn = (): string => {
     switch (selectedRecoveryOption) {
       case RETRY_NEW_TIPS.ROUTE:
+      case SKIP_STEP_WITH_NEW_TIPS.ROUTE:
         return t('proceed_to_tip_selection')
       default:
         return t('proceed_to_cancel')
+    }
+  }
+
+  const buildTipDropCompleteRouting = (): (() => void) | null => {
+    const routeTo = (selectedRoute: RecoveryRoute, step: RouteStep): void => {
+      void proceedToRouteAndStep(selectedRoute, step)
+    }
+
+    switch (selectedRecoveryOption) {
+      case RETRY_NEW_TIPS.ROUTE:
+        return () => {
+          routeTo(selectedRecoveryOption, RETRY_NEW_TIPS.STEPS.REPLACE_TIPS)
+        }
+      case SKIP_STEP_WITH_NEW_TIPS.ROUTE:
+        return () => {
+          routeTo(
+            selectedRecoveryOption,
+            SKIP_STEP_WITH_NEW_TIPS.STEPS.REPLACE_TIPS
+          )
+        }
+      default:
+        return null
     }
   }
 
@@ -306,6 +326,7 @@ export function useDropTipFlowUtils({
       goBackBeforeBeginning: () => {
         return proceedToRouteAndStep(DROP_TIP_FLOWS.ROUTE)
       },
+      tipDropComplete: buildTipDropCompleteRouting(),
     }
   }
 

@@ -2,7 +2,7 @@
 from typing import cast, List, Union
 from pydantic import parse_obj_as
 
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons_shared_data.protocol.models import (
     ProtocolSchemaV6,
     protocol_schema_v6,
