@@ -101,6 +101,7 @@ export function ChooseCsvFile({
                       onChange={() => {
                         setCsvFileSelected({ id: csv.id, fileName: csv.name })
                       }}
+                      id={`${csv.name}-on-robot`}
                       isSelected={csvFileSelected?.id === csv.id}
                     />
                   </React.Fragment>
@@ -130,6 +131,7 @@ export function ChooseCsvFile({
                               fileName,
                             })
                           }}
+                          id={`${fileName}}-on-usb`}
                           isSelected={csvFileSelected?.filePath === csvFilePath}
                         />
                       ) : null}
