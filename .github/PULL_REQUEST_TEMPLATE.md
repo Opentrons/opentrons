@@ -41,6 +41,8 @@ List changes introduced by this PR considering future developers and the end use
 - Indicate the level of attention this PR needs.
 - Provide context to guide reviewers.
 - Discuss trade-offs, coupling, and side effects.
+- Look for the possibility, even if you think it's small, that your change may affect some other part of the system.
+  - For instance, changing return tip behavior may also change the behavior of labware calibration.
 - How do your unit tests and on hands on testing mitigate this PR's risks and the risk of future regressions?
 - Especially in high risk PRs, explain how you know your testing is enough.
 -->
