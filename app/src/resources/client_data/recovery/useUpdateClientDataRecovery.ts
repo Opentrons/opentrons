@@ -1,4 +1,7 @@
 import { useUpdateClientData } from '@opentrons/react-api-client'
+import { useSelector } from 'react-redux'
+
+import { getUserId } from '../../../redux/config'
 import { KEYS } from '../constants'
 
 import type {
@@ -11,9 +14,8 @@ export type UseUpdateClientDataRecoveryResult = Omit<
   UseUpdateClientDataMutationResult<ClientDataRecovery>,
   'updateClientData'
 > & {
-  /* Update the server with a given user id */
-  updateUserId: (
-    id: ClientDataRecovery['userId'],
+  /* Update the server with the user's id and a recovery intent. */
+  updateWithIntent: (
     intent: ClientDataRecovery['intent']
   ) => ReturnType<
     UseUpdateClientDataMutationResult<ClientDataRecovery>['updateClientData']
@@ -28,18 +30,18 @@ export function useUpdateClientDataRecovery(
     updateClientData,
     ...mutate
   } = useUpdateClientData<ClientDataRecovery>(KEYS.ERROR_RECOVERY, options)
+  const thisUserId = useSelector(getUserId)
 
-  const updateUserId = (
-    id: ClientDataRecovery['userId'],
+  const updateWithIntent = (
     intent: ClientDataRecovery['intent']
   ): ReturnType<
     UseUpdateClientDataMutationResult<ClientDataRecovery>['updateClientData']
   > => {
-    updateClientData({ userId: id, intent })
+    updateClientData({ userId: thisUserId, intent })
   }
 
   return {
     ...mutate,
-    updateUserId,
+    updateWithIntent,
   }
 }
