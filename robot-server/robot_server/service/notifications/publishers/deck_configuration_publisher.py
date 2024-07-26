@@ -6,7 +6,7 @@ from server_utils.fastapi_utils.app_state import (
     get_app_state,
 )
 from ..notification_client import NotificationClient, get_notification_client
-from ..topics import Topics
+from .. import topics
 
 
 class DeckConfigurationPublisher:
@@ -20,7 +20,7 @@ class DeckConfigurationPublisher:
         self,
     ) -> None:
         """Publishes the equivalent of GET /deck_configuration"""
-        await self._client.publish_advise_refetch_async(topic=Topics.DECK_CONFIGURATION)
+        await self._client.publish_advise_refetch_async(topic=topics.DECK_CONFIGURATION)
 
 
 _deck_configuration_publisher_accessor: AppStateAccessor[

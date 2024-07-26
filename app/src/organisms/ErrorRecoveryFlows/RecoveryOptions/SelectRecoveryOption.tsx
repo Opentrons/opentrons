@@ -51,6 +51,7 @@ export function SelectRecoveryOptionHome({
   tipStatusUtils,
   currentRecoveryOptionUtils,
   getRecoveryOptionCopy,
+  analytics,
   ...rest
 }: RecoveryContentProps): JSX.Element | null {
   const { t } = useTranslation('error_recovery')
@@ -68,6 +69,7 @@ export function SelectRecoveryOptionHome({
     <RecoveryODDOneDesktopTwoColumnContentWrapper
       footerDetails={{
         primaryBtnOnClick: () => {
+          analytics.reportActionSelectedEvent(selectedRoute)
           setSelectedRecoveryOption(selectedRoute)
           void proceedToRouteAndStep(selectedRoute as RecoveryRoute)
         },
