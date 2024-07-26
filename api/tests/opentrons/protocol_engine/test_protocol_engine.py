@@ -9,6 +9,7 @@ from decoy import Decoy
 
 from opentrons_shared_data.robot.types import RobotType
 
+from opentrons.protocol_engine.actions.actions import SetErrorRecoveryPolicyAction
 from opentrons.types import DeckSlotName
 from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
 from opentrons.hardware_control.modules import MagDeck, TempDeck
@@ -1188,4 +1189,14 @@ def test_reset_tips(
     decoy.verify(
         action_dispatcher.dispatch(ResetTipsAction(labware_id="cool-labware")),
         times=1,
+    )
+
+
+async def test_set_error_recovery_policy(
+    decoy: Decoy, action_dispatcher: ActionDispatcher, subject: ProtocolEngine
+) -> None:
+    """It should set the error recovery policy by dispatching an action."""
+    await subject.set_error_recovery_policy(sentinel.new_policy)
+    decoy.verify(
+        action_dispatcher.dispatch(SetErrorRecoveryPolicyAction(sentinel.new_policy))
     )

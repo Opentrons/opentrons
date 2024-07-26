@@ -15,7 +15,10 @@ from opentrons_shared_data.errors import ErrorCodes, PythonException
 from opentrons.hardware_control.types import DoorState
 from opentrons.ordered_set import OrderedSet
 from opentrons.protocol_engine import actions, commands, errors
-from opentrons.protocol_engine.actions.actions import PlayAction
+from opentrons.protocol_engine.actions.actions import (
+    PlayAction,
+    SetErrorRecoveryPolicyAction,
+)
 from opentrons.protocol_engine.commands.command import CommandIntent
 from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
 from opentrons.protocol_engine.errors.error_occurrence import ErrorOccurrence
@@ -856,3 +859,18 @@ def test_final_state_after_error_recovery_stop() -> None:
     assert subject_view.get_status() == EngineStatus.STOPPED
     assert subject_view.get_recovery_target() is None
     assert subject_view.get_error() is None
+
+
+def test_set_and_get_error_recovery_policy() -> None:
+    """Test storage of `ErrorRecoveryPolicy`s."""
+    initial_policy = sentinel.initial_policy
+    new_policy = sentinel.new_policy
+    subject = CommandStore(
+        config=_make_config(),
+        error_recovery_policy=initial_policy,
+        is_door_open=False,
+    )
+    subject_view = CommandView(subject.state)
+    assert subject_view.get_error_recovery_policy() is initial_policy
+    subject.handle_action(SetErrorRecoveryPolicyAction(sentinel.new_policy))
+    assert subject_view.get_error_recovery_policy() is new_policy
