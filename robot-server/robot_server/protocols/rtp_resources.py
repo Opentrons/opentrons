@@ -2,9 +2,10 @@
 from __future__ import annotations
 
 import sqlalchemy
+import json
 
 from dataclasses import dataclass
-from typing import Dict, Callable, Union
+from typing import Dict
 
 from robot_server.persistence.tables import PrimitiveParamSQLEnum
 from opentrons.protocols.parameters.types import PrimitiveAllowedTypes
@@ -25,7 +26,7 @@ class PrimitiveParameterResource:
             "analysis_id": self.analysis_id,
             "parameter_variable_name": self.parameter_variable_name,
             "parameter_type": PrimitiveParamSQLEnum(self.parameter_type),
-            "parameter_value": str(self.parameter_value),
+            "parameter_value": json.dumps(self.parameter_value),
         }
 
     @classmethod
@@ -46,24 +47,7 @@ class PrimitiveParameterResource:
         parameter_val_str = sql_row.parameter_value
         assert isinstance(parameter_val_str, str)
 
-        def _int_converter(value: str) -> float:
-            try:
-                converted_num = int(value)
-            except ValueError:
-                return float(value)
-            return converted_num
-
-        def _bool_converter(value: str) -> bool:
-            bool_conversion = {"true": True, "false": False}
-            return bool_conversion[value.lower()]
-
-        param_types: Dict[str, Callable[[str], Union[str, float, bool]]] = {
-            "str": str,
-            "int": _int_converter,
-            "float": float,
-            "bool": _bool_converter,
-        }
-        parameter_value = param_types[parameter_type.value](sql_row.parameter_value)
+        parameter_value = json.loads(sql_row.parameter_value)
 
         return cls(
             analysis_id=analysis_id,
