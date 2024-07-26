@@ -1,6 +1,6 @@
 """Measure Tip Overlap."""
-from typing import List, Tuple, Optional
-
+from typing import List, Tuple, Optional, Any
+from abr_testing.automation import google_sheets_tool
 from opentrons.protocol_api import (
     ProtocolContext,
     Labware,
@@ -82,6 +82,26 @@ def _setup(ctx: ProtocolContext) -> Tuple[InstrumentContext, Labware, Labware, L
 
     return pipette, rack, labware, dial
 
+def _connect_to_google_sheet(ctx:ProtocolContext, header:List[List[str]]) -> Optional[Any]:
+    """Connect to google sheet using credentials file in jupyter notebook."""
+    if ctx.is_simulating():
+        return
+    credentials_path = "/var/lib/jupyter/notebooks/abr.json"
+    try:
+        google_sheet = google_sheets_tool.google_sheet(
+            credentials_path, "Empty Well Testing", tab_number=0
+        )
+        sheet_id = google_sheet.create_worksheet(RUN_ID)  # type: ignore[union-attr]
+        google_sheet.batch_update_cells(header, "A", 1, sheet_id)
+        ctx.comment("Connected to the google sheet.")
+        return google_sheet
+    except:
+        ctx.comment(
+            "There are no google sheets credentials. Make sure credentials in jupyter notebook."
+        )
+        
+def _write_line_to_google_sheet(google_sheet:Any, line: str)-> None:
+    google_sheet.update_row(line)
 
 def _write_line_to_csv(ctx: ProtocolContext, line: str) -> None:
     if ctx.is_simulating():
@@ -123,7 +143,6 @@ def _store_dial_baseline(
         return
     DIAL_POS_WITHOUT_TIP = _read_dial_indicator(ctx, pipette, dial)
     _write_line_to_csv(ctx, f"DIAL-BASELINE,{DIAL_POS_WITHOUT_TIP}")
-
 
 def _get_tip_z_error(
     ctx: ProtocolContext, pipette: InstrumentContext, dial: Labware
