@@ -184,8 +184,8 @@ def get_latest_version() -> str:
         # Extract the tag from the output and remove '.'
         tag = "".join(result.stdout.strip().split("."))
 
-        # replace '@' prefix with '_'
-        version = tag.replace("@", "_")
+        version = tag.split("@")[1]
+        version = version.split("_")[0]
         return version
     except subprocess.CalledProcessError as e:
         print(f"An error occurred while getting the version: {e}")
@@ -195,11 +195,15 @@ def get_latest_version() -> str:
 def get_markdown_format() -> None:
     """Generates a version-aware Markdown file from HTML documentation."""
     current_version = get_latest_version()
-    command = "pipenv run sphinx-build -b singlehtml ../api/docs/v2 api/utils/build/docs/html/v2"
     current_dir = os.path.dirname(__file__)
-    html_file_path = os.path.join(current_dir, "build", "docs", "html", "v2", "index.html")
-    markdown_file_path = os.path.join(current_dir, "..", "data", f"python_api_{current_version}.md")
-    reference_file_path = os.path.join(current_dir, "..", "data", "api_version_reference.md")
+
+    docs_src_path = os.path.join("..", "api", "docs", "v2")
+    build_html_path = os.path.join(current_dir, "build", "docs", "html", "v2")
+    html_file_path = os.path.join(build_html_path, "index.html")
+    markdown_file_path = os.path.join(current_dir, "..", "data", f"python_api_{current_version}_docs.md")
+    reference_file_path = os.path.join(current_dir, "..", "data", f"python_api_{current_version}_reference.md")
+
+    command = f"pipenv run sphinx-build -b singlehtml {docs_src_path} {build_html_path}"
 
     run_sphinx_build(command)
 
