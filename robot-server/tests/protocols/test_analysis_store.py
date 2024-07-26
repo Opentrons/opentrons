@@ -470,6 +470,15 @@ async def test_save_initialization_failed_analysis(
     decoy: Decoy, sql_engine: SQLEngine, protocol_store: ProtocolStore
 ) -> None:
     """It should save the analysis that failed during analyzer initialization."""
+    validated_rtp = NumberParameter(
+        displayName="My parameter",
+        variableName="cool_param",
+        type="int",
+        min=1,
+        max=5,
+        value=2.0,
+        default=3.0,
+    )
     error_occurence = pe_errors.ErrorOccurrence(
         id="error-id",
         createdAt=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
@@ -485,7 +494,7 @@ async def test_save_initialization_failed_analysis(
             status=AnalysisStatus.COMPLETED,
             result=AnalysisResult.NOT_OK,
             robotType="OT-2 Standard",
-            runTimeParameters=[],
+            runTimeParameters=[validated_rtp],
             labware=[],
             pipettes=[],
             modules=[],
@@ -503,6 +512,7 @@ async def test_save_initialization_failed_analysis(
         protocol_id="protocol-id",
         analysis_id="analysis-id",
         robot_type="OT-2 Standard",
+        run_time_parameters=[validated_rtp],
         errors=[error_occurence],
     )
     decoy.verify(

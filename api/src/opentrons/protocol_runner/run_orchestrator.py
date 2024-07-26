@@ -227,7 +227,20 @@ class RunOrchestrator:
         return self._protocol_engine.state_view.labware.get_loaded_labware_definitions()
 
     def get_run_time_parameters(self) -> List[RunTimeParameter]:
-        """Parameter definitions defined by protocol, if any. Will always be empty before execution."""
+        """Get the list of run time parameters defined in the protocol, if any.
+
+        This returns a list of all run time parameters with their validated definitions
+        and client-requested values. Will always be empty before loading the runner.
+
+        If there was an error during RTP definition validation, then this list will
+        contain the parameter definitions that were validated before the error occurred.
+        These parameters' values will be default values.
+
+        If all definitions validated successfully but an error occurred while
+        setting the RTP values with those sent by the client, then only the parameters
+        whose values were successfully set will have the client-requested values while
+        the others will contain the default values.
+        """
         return (
             []
             if self._protocol_runner is None

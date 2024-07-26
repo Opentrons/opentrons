@@ -45,7 +45,7 @@ class ProtocolAnalyzer:
         return self._protocol_resource
 
     def get_verified_run_time_parameters(self) -> List[RunTimeParameter]:
-        """Get the extracted RTPs."""
+        """Get the validated RTPs with values set by the client."""
         assert self._orchestrator is not None
         return self._orchestrator.get_run_time_parameters()
 

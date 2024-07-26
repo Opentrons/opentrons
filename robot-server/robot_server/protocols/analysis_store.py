@@ -223,6 +223,7 @@ class AnalysisStore:
         protocol_id: str,
         analysis_id: str,
         robot_type: RobotType,
+        run_time_parameters: List[RunTimeParameter],
         errors: List[ErrorOccurrence],
     ) -> None:
         """Commit the failed analysis to store."""
@@ -231,7 +232,7 @@ class AnalysisStore:
             result=AnalysisResult.NOT_OK,
             robotType=robot_type,
             status=AnalysisStatus.COMPLETED,
-            runTimeParameters=[],
+            runTimeParameters=run_time_parameters,
             commands=[],
             labware=[],
             modules=[],

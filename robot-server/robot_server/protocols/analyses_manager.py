@@ -40,6 +40,11 @@ class AnalysesManager:
     ) -> protocol_analyzer.ProtocolAnalyzer:
         """Initialize the protocol analyzer with protocol resource and run time parameter values.
 
+        If an error is raised during initialization, then we abandon the analysis process
+        and save the failed analysis, along with the error message, to the database.
+        See `RunOrchestrator.get_run_time_parameters()` for details of which RTPs get
+        saved in the analysis when such a failure occurs.
+
         Returns: the successfully initialized analyzer that is ready to start analyzing.
         Raises: FailedToInitializeAnalyzer if initialization failed due to error in creating
                 the protocol runner or loading the protocol resource or
@@ -59,6 +64,7 @@ class AnalysesManager:
                 protocol_id=protocol_resource.protocol_id,
                 analysis_id=analysis_id,
                 robot_type=protocol_resource.source.robot_type,
+                run_time_parameters=analyzer.get_verified_run_time_parameters(),
                 errors=[
                     ErrorOccurrence.from_failed(
                         id="internal-error",
