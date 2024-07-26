@@ -1,8 +1,12 @@
 import type { CommonCommandRunTimeInfo, CommonCommandCreateInfo } from '.'
 
-export type UnsafeRunTimeCommand = UnsafeBlowoutInPlaceRunTimeCommand
+export type UnsafeRunTimeCommand =
+    | UnsafeBlowoutInPlaceRunTimeCommand
+    | UnsafeDropTipInPlaceRunTimeCommand
 
-export type UnsafeCreateCommand = UnsafeBlowoutInPlaceCreateCommand
+export type UnsafeCreateCommand =
+    | UnsafeBlowoutInPlaceCreateCommand
+    | UnsafeDropTipInPlaceCreateCommand
 
 export interface UnsafeBlowoutInPlaceParams {
     pipetteId: string
@@ -18,4 +22,19 @@ export interface UnsafeBlowoutInPlaceRunTimeCommand
     extends CommonCommandRunTimeInfo,
         UnsafeBlowoutInPlaceCreateCommand {
     result?: {}
+}
+
+export interface UnsafeDropTipInPlaceParams {
+    pipetteId: string
+}
+
+export interface UnsafeDropTipInPlaceCreateCommand
+    extends CommonCommandCreateInfo {
+    commandType: 'unsafe/dropTipInPlace'
+    params: UnsafeDropTipInPlaceParams
+}
+export interface UnsafeDropTipInPlaceRunTimeCommand
+    extends CommonCommandRunTimeInfo,
+        UnsafeDropTipInPlaceCreateCommand {
+    result?: any
 }
