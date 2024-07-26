@@ -120,6 +120,7 @@ def _generate_callbacks_for_trial(
         encoder_bottom = hw_api.encoder_current_position_ot3(hw_mount)[pip_ax]
 
     def _on_retracting() -> None:
+        nonlocal estimate_aspirated, encoder_aspirated
         recorder.set_sample_tag(
             create_measurement_tag("retract", volume, channel, trial)
         )
@@ -132,6 +133,7 @@ def _generate_callbacks_for_trial(
         report.store_encoder(
             test_report,
             volume,
+            channel,
             trial,
             estimate_bottom,
             encoder_bottom,
@@ -734,11 +736,11 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
             resources.env_sensor,
         )
         # threading start
-        # pose_sensor = WVTB01_BT50()
-        # pose_sensor.build_device_by_serial()
-        # time.sleep(1)
-        # th_measurement = threading.Thread(target=measure_env, args=(pose_sensor,))
-        # th_measurement.start()
+        pose_sensor = WVTB01_BT50()
+        pose_sensor.build_device_by_serial()
+        time.sleep(1)
+        th_measurement = threading.Thread(target=measure_env, args=(pose_sensor,))
+        th_measurement.start()
         for volume in trials.keys():
             current_volume = str(volume)
             actual_asp_list_all = []
