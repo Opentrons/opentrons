@@ -3,6 +3,7 @@ import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
 import { TakeoverModal } from './TakeoverModal'
 import { MaintenanceRunStatusProvider } from './MaintenanceRunStatusProvider'
 import { useMaintenanceRunTakeover } from './useMaintenanceRunTakeover'
+import { useTranslation } from 'react-i18next'
 
 interface MaintenanceRunTakeoverProps {
   children: React.ReactNode
@@ -25,6 +26,7 @@ interface MaintenanceRunTakeoverModalProps {
 export function MaintenanceRunTakeoverModal(
   props: MaintenanceRunTakeoverModalProps
 ): JSX.Element {
+  const { i18n, t } = useTranslation(['shared', 'branded'])
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
   const [
     showConfirmTerminateModal,
@@ -58,6 +60,7 @@ export function MaintenanceRunTakeoverModal(
     <>
       {desktopMaintenanceRunInProgress && (
         <TakeoverModal
+          title={i18n.format(t('robot_is_busy'), 'capitalize')}
           confirmTerminate={handleCloseAndTerminate}
           showConfirmTerminateModal={showConfirmTerminateModal}
           setShowConfirmTerminateModal={setShowConfirmTerminateModal}
