@@ -58,6 +58,7 @@ from .command_fixtures import (
     create_move_to_coordinates_command,
     create_move_relative_command,
     create_prepare_to_aspirate_command,
+    create_unsafe_blow_out_in_place_command,
 )
 from ..pipette_fixtures import get_default_nozzle_map
 
@@ -261,6 +262,7 @@ def test_dispense_subtracts_volume(
     [
         create_blow_out_command("pipette-id", 1.23),
         create_blow_out_in_place_command("pipette-id", 1.23),
+        create_unsafe_blow_out_in_place_command("pipette-id", 1.23),
     ],
 )
 def test_blow_out_clears_volume(

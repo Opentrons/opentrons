@@ -68,7 +68,8 @@
       "calibration/calibrateGripper": "#/definitions/CalibrateGripperCreate",
       "calibration/calibratePipette": "#/definitions/CalibratePipetteCreate",
       "calibration/calibrateModule": "#/definitions/CalibrateModuleCreate",
-      "calibration/moveToMaintenancePosition": "#/definitions/MoveToMaintenancePositionCreate"
+      "calibration/moveToMaintenancePosition": "#/definitions/MoveToMaintenancePositionCreate",
+      "unsafe/blowOutInPlace": "#/definitions/UnsafeBlowOutInPlaceCreate"
     }
   },
   "oneOf": [
@@ -263,6 +264,9 @@
     },
     {
       "$ref": "#/definitions/MoveToMaintenancePositionCreate"
+    },
+    {
+      "$ref": "#/definitions/UnsafeBlowOutInPlaceCreate"
     }
   ],
   "definitions": {
@@ -4204,6 +4208,55 @@
         },
         "params": {
           "$ref": "#/definitions/MoveToMaintenancePositionParams"
+        },
+        "intent": {
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CommandIntent"
+            }
+          ]
+        },
+        "key": {
+          "title": "Key",
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "type": "string"
+        }
+      },
+      "required": ["params"]
+    },
+    "UnsafeBlowOutInPlaceParams": {
+      "title": "UnsafeBlowOutInPlaceParams",
+      "description": "Payload required to blow-out in place while position is unknown.",
+      "type": "object",
+      "properties": {
+        "flowRate": {
+          "title": "Flowrate",
+          "description": "Speed in \u00b5L/s configured for the pipette",
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "pipetteId": {
+          "title": "Pipetteid",
+          "description": "Identifier of pipette to use for liquid handling.",
+          "type": "string"
+        }
+      },
+      "required": ["flowRate", "pipetteId"]
+    },
+    "UnsafeBlowOutInPlaceCreate": {
+      "title": "UnsafeBlowOutInPlaceCreate",
+      "description": "UnsafeBlowOutInPlace command request model.",
+      "type": "object",
+      "properties": {
+        "commandType": {
+          "title": "Commandtype",
+          "default": "unsafe/blowOutInPlace",
+          "enum": ["unsafe/blowOutInPlace"],
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/definitions/UnsafeBlowOutInPlaceParams"
         },
         "intent": {
           "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
