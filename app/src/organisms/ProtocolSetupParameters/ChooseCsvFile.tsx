@@ -68,6 +68,8 @@ export function ChooseCsvFile({
     }
   }, [csvFilesOnUSB])
 
+  console.log('csvFilesOnRobot', csvFilesOnRobot)
+
   return (
     <>
       <ChildNavigation
