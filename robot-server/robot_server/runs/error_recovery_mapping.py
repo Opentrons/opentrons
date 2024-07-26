@@ -23,8 +23,6 @@ def create_error_recovery_policy_from_rules(
         failed_command: Command,
         defined_error_data: Optional[CommandDefinedErrorData],
     ) -> ErrorRecoveryType:
-        if rules is None:
-            return standard_run_policy(config, failed_command, defined_error_data)
         for rule in rules:
             command_type_matches = (
                 failed_command.commandType == rule.matchCriteria.command.commandType
