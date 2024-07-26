@@ -36,7 +36,7 @@ class JiraTicket:
             all_issues = board_data["issues"]
         except json.JSONDecodeError as e:
             print("Error decoding json: ", e)
-        #convert issue id's into dict and have one key as the issue key and one be summary, return entire dict
+        #convert issue id's into array and have one key as the issue key and one be summary, return entire array
         issue_ids = []
         for i in all_issues:
             issue_id = i.get("id")
