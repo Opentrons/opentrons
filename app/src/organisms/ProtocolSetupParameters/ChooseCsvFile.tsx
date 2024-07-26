@@ -46,7 +46,7 @@ export function ChooseCsvFile({
   const { t } = useTranslation('protocol_setup')
 
   const csvFilesOnUSB = useSelector(getShellUpdateDataFiles) ?? []
-  const csvFilesOnRobot = (useAllCsvFilesQuery(protocolId).data?.data?.files ??
+  const csvFilesOnRobot = (useAllCsvFilesQuery(protocolId).data?.data ??
     []) as CsvFileData[]
 
   const initialFileObject: CsvFileParameterFileData = parameter.file ?? {}
