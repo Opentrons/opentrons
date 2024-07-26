@@ -28,6 +28,8 @@ on:
       - 'shared-data/**/*'
       - '!shared-data/js/**'
       - '.github/workflows/analyses-snapshot-test.yaml'
+      - 'analyses-snapshot-testing/**'
+
     types:
       - opened #default
       - synchronize #default
