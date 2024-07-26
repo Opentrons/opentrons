@@ -32,7 +32,7 @@ from robot_server.protocols.protocol_store import (
     ProtocolNotFoundError,
     ProtocolUsedByRunError,
 )
-from robot_server.protocols.rtp_resources import CsvParameterResource
+from robot_server.protocols.rtp_resources import CSVParameterResource
 
 from robot_server.runs.run_store import RunStore
 
@@ -597,12 +597,12 @@ async def test_get_referenced_data_files(
         completed_analysis_resource=analysis_resource1,
         primitive_rtp_resources=[],
         csv_rtp_resources=[
-            CsvParameterResource(
+            CSVParameterResource(
                 analysis_id="analysis-id-1",
                 parameter_variable_name="csv-var",
                 file_id="data-file-id",
             ),
-            CsvParameterResource(
+            CSVParameterResource(
                 analysis_id="analysis-id-1",
                 parameter_variable_name="csv-var",
                 file_id="data-file-id-2",
