@@ -34,7 +34,7 @@ export default defineConfig(
         esbuildOptions: {
           target: 'CommonJs',
         },
-        exclude: ['node_modules']
+        exclude: ['node_modules'],
       },
       define: {
         'process.env': process.env,
