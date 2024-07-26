@@ -36,11 +36,34 @@ class JiraTicket:
             all_issues = board_data["issues"]
         except json.JSONDecodeError as e:
             print("Error decoding json: ", e)
+        #convert issue id's into dict and have one key as the issue key and one be summary, return entire dict
         issue_ids = []
         for i in all_issues:
             issue_id = i.get("id")
             issue_ids.append(issue_id)
         return issue_ids
+
+    def match_issues(issue_ids, ticket_summary: str):
+        current_error = ticket_summary.split("_")[3]
+        robot = ticket_summary.split("_")[0]
+        """Grab all issues from board."""
+        response = requests.get(
+            f"{self.url}/rest/agile/1.0/board/{board_id}/issue",
+            headers=self.headers,
+            auth=self.auth,
+        )
+        response.raise_for_status()
+        try:
+            board_data = response.json()
+            all_issues = board_data["issues"]
+        except json.JSONDecodeError as e:
+            print("Error decoding json: ", e)
+        #for every issue see if both match, if yes then grab issue ID and add it to a list
+        for i in all_issues:
+            issue_error = ticket_summary.split("_")[3]
+            issue_robot = ticket_summary.split("_")[0]
+
+    #function: "match_issues", input would be the list from above, another input is summary of ticket created (ticket_summary: string), 
 
     def open_issue(self, issue_key: str) -> str:
         """Open issue on web browser."""
@@ -260,3 +283,5 @@ if __name__ == "__main__":
     board_id = args.board_id[0]
     reporter_id = args.reporter_id[0]
     ticket = JiraTicket(url, api_token, email)
+    ticket.issues_on_board()
+    ticket.match_issues()
