@@ -20,6 +20,7 @@ interface RadioButtonProps extends StyleProps {
   isSelected?: boolean
   radioButtonType?: 'large' | 'small'
   subButtonLabel?: string
+  id?: string
 }
 
 export function RadioButton(props: RadioButtonProps): JSX.Element {
@@ -31,6 +32,7 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
     onChange,
     radioButtonType = 'large',
     subButtonLabel,
+    id = buttonLabel,
   } = props
 
   const isLarge = radioButtonType === 'large'
@@ -84,12 +86,12 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
       <SettingButton
         checked={isSelected}
         disabled={disabled}
-        id={buttonLabel}
+        id={id}
         onChange={onChange}
         type="radio"
         value={buttonValue}
       />
-      <SettingButtonLabel role="label" htmlFor={buttonLabel}>
+      <SettingButtonLabel role="label" htmlFor={id}>
         <StyledText
           oddStyle={isLarge ? 'level4HeaderRegular' : 'bodyTextRegular'}
           desktopStyle="bodyDefaultRegular"
