@@ -232,7 +232,6 @@ class RunArgs:
             protocol_cfg.LABWARE_ON_SCALE,  # type: ignore[union-attr]
             args.z_speed,
         )
-        tool_sensors.PLUNGER_SOLO_MOVE_TIME = args.p_solo_time
         return RunArgs(
             tip_volumes=tip_volumes,
             run_id=run_id,
@@ -280,7 +279,7 @@ if __name__ == "__main__":
     parser.add_argument("--starting-tip", type=str, default="A1")
     parser.add_argument("--test-well", type=str, default="A1")
     parser.add_argument(
-        "--p-solo-time", type=float, default=tool_sensors.PLUNGER_SOLO_MOVE_TIME
+        "--p-solo-time", type=float, default=0
     )
     parser.add_argument("--google-sheet-name", type=str, default="LLD-Shared-Data")
     parser.add_argument(
