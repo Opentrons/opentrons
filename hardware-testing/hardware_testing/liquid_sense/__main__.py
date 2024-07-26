@@ -42,8 +42,6 @@ from hardware_testing.protocols.liquid_sense_lpc import (
     liquid_sense_ot3_p1000_96_1well,
     liquid_sense_ot3_p1000_single_vial,
     liquid_sense_ot3_p1000_multi_vial,
-    liquid_sense_ot3_p50_multi_12well,
-    liquid_sense_ot3_p1000_multi_12well,
 )
 
 try:
