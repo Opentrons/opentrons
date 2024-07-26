@@ -8,6 +8,13 @@ from opentrons.protocol_api import (
     InstrumentContext,
 )
 
+from opentrons_shared_data.pipette.load_data import load_definition
+from opentrons_shared_data.pipette.types import (
+    PipetteChannelType,
+    PipetteModelType,
+    PipetteVersionType,
+)
+
 ###########################################
 #  VARIABLES - START
 ###########################################
@@ -79,6 +86,19 @@ def _setup(ctx: ProtocolContext) -> Tuple[InstrumentContext, Labware, Labware, L
         _write_line_to_csv(ctx, pip_name)
         _write_line_to_csv(ctx, rack_name)
         _write_line_to_csv(ctx, LABWARE)
+        # get the minimum LLD height configured for this pipette
+        pip_model_list = pipette.model.split("_")
+        pip_def = load_definition(
+            model=PipetteModelType(pip_model_list[0]),
+            channels=PipetteChannelType(pipette.channels),
+            version=PipetteVersionType(
+                major=int(pip_model_list[-1][-3]),
+                minor=int(pip_model_list[-1][-1])
+            ),
+        )
+        tipVolume = "t" + str(TIP_SIZE)
+        lld_min_height = pip_def.lld_settings[tipVolume]["minHeight"]
+        _write_line_to_csv(ctx, f"lld-min-height,{lld_min_height}")
 
     return pipette, rack, labware, dial
 
@@ -155,15 +175,14 @@ def _get_tip_z_error(
 
 
 def _get_wells_with_expected_liquid_state(
-    pipette: InstrumentContext, test_wells: List[Well], state: bool
+    pipette: InstrumentContext, test_wells: List[Well], expected_state: bool
 ) -> List[Well]:
-    # NOTE: (sigler) prioritize testing all-tip pickups over partial-tip pickups
-    failed_wells = []
+    successful_wells = []
     for well in test_wells:
         found_liquid = pipette.detect_liquid_presence(well)
-        if found_liquid != state:
-            failed_wells.append(well)
-    return failed_wells
+        if found_liquid == expected_state:
+            successful_wells.append(well)
+    return successful_wells
 
 
 def _test_for_expected_liquid_state(
@@ -178,20 +197,24 @@ def _test_for_expected_liquid_state(
     fail_counter = 0
     trial_counter = 0
     _store_dial_baseline(ctx, pipette, dial)
-    csv_header = f'trial,tip-z-error,{",".join([w.well_name for w in wells])}'
+    csv_header = f'trial,result,tip-z-error,{",".join([w.well_name for w in wells])}'
     _write_line_to_csv(ctx, f"{csv_header}")
     while trial_counter < trials:
         for tip in tips:
             trial_counter += 1
+            # NOTE: (sigler) prioritize testing all-tip pickups over partial-tip pickups
             pipette.pick_up_tip(tip)
             tip_z_error = _get_tip_z_error(ctx, pipette, dial)
-            failed_wells = _get_wells_with_expected_liquid_state(
+            successful_wells = _get_wells_with_expected_liquid_state(
                 pipette, wells, liquid_state
             )
-            trial_data = [trial_counter, tip_z_error] + [w not in failed_wells for w in wells]
+            all_trials_passed = "PASS" if len(successful_wells) == len(wells) else "FAIL"
+            trial_data = [trial_counter, all_trials_passed, tip_z_error]
+            each_well_result_bool = [bool(w in successful_wells) for w in wells]
+            trial_data += ["PASS" if w else "FAIL" for w in each_well_result_bool]
             _write_line_to_csv(ctx, ",".join([str(d) for d in trial_data]))
             pipette.drop_tip()
-            fail_counter += 1 if len(failed_wells) else 0
+            fail_counter += 0 if all_trials_passed else 1
         if trial_counter < trials:
             ctx.pause("replace with NEW tips")
             pipette.reset_tipracks()
