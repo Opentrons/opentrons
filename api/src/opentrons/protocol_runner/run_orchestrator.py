@@ -35,6 +35,7 @@ from ..protocol_engine.types import (
 )
 from ..protocol_reader import JsonProtocolConfig, PythonProtocolConfig, ProtocolSource
 from ..protocols.parse import PythonParseMode
+from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
 
 
 class NoProtocolRunAvailable(RuntimeError):
@@ -356,6 +357,9 @@ class RunOrchestrator:
     def get_deck_type(self) -> DeckType:
         """Get engine deck type."""
         return self._protocol_engine.state_view.config.deck_type
+
+    async def create_error_recovery_policy(self, policy: ErrorRecoveryPolicy):
+        self._protocol_engine.set_error_recovery_policy(policy)
 
     async def command_generator(self) -> AsyncGenerator[str, None]:
         """Yield next command to execute."""
