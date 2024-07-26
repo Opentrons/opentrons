@@ -8,6 +8,13 @@ from opentrons.protocol_api import (
     InstrumentContext,
 )
 
+from opentrons_shared_data.pipette.load_data import load_definition
+from opentrons_shared_data.pipette.types import (
+    PipetteChannelType,
+    PipetteModelType,
+    PipetteVersionType,
+)
+
 ###########################################
 #  VARIABLES - START
 ###########################################
@@ -79,6 +86,19 @@ def _setup(ctx: ProtocolContext) -> Tuple[InstrumentContext, Labware, Labware, L
         _write_line_to_csv(ctx, pip_name)
         _write_line_to_csv(ctx, rack_name)
         _write_line_to_csv(ctx, LABWARE)
+        # get the minimum LLD height configured for this pipette
+        pip_model_list = pipette.model.split("_")
+        pip_def = load_definition(
+            model=PipetteModelType(pip_model_list[0]),
+            channels=PipetteChannelType(pipette.channels),
+            version=PipetteVersionType(
+                major=int(pip_model_list[-1][-3]),
+                minor=int(pip_model_list[-1][-1])
+            ),
+        )
+        tipVolume = "t" + str(TIP_SIZE)
+        lld_min_height = pip_def.lld_settings[tipVolume]["minHeight"]
+        _write_line_to_csv(ctx, f"lld-min-height,{lld_min_height}")
 
     return pipette, rack, labware, dial
 
