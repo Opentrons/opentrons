@@ -389,6 +389,7 @@ Command = Annotated[
         calibration.CalibrateModule,
         calibration.MoveToMaintenancePosition,
         unsafe.UnsafeBlowOutInPlace,
+        unsafe.UnsafeDropTipInPlace,
     ],
     Field(discriminator="commandType"),
 ]
@@ -459,6 +460,7 @@ CommandParams = Union[
     calibration.CalibrateModuleParams,
     calibration.MoveToMaintenancePositionParams,
     unsafe.UnsafeBlowOutInPlaceParams,
+    unsafe.UnsafeDropTipInPlaceParams,
 ]
 
 CommandType = Union[
@@ -527,6 +529,7 @@ CommandType = Union[
     calibration.CalibrateModuleCommandType,
     calibration.MoveToMaintenancePositionCommandType,
     unsafe.UnsafeBlowOutInPlaceCommandType,
+    unsafe.UnsafeDropTipInPlaceCommandType,
 ]
 
 CommandCreate = Annotated[
@@ -596,6 +599,7 @@ CommandCreate = Annotated[
         calibration.CalibrateModuleCreate,
         calibration.MoveToMaintenancePositionCreate,
         unsafe.UnsafeBlowOutInPlaceCreate,
+        unsafe.UnsafeDropTipInPlaceCreate,
     ],
     Field(discriminator="commandType"),
 ]
@@ -665,7 +669,8 @@ CommandResult = Union[
     calibration.CalibratePipetteResult,
     calibration.CalibrateModuleResult,
     calibration.MoveToMaintenancePositionResult,
-    unsafe.UnsafeBlowOutInPlaceResult
+    unsafe.UnsafeBlowOutInPlaceResult,
+    unsafe.UnsafeDropTipInPlaceResult,
 ]
 
 # todo(mm, 2024-06-12): Ideally, command return types would have specific

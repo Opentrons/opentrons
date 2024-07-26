@@ -623,3 +623,21 @@ def create_unsafe_blow_out_in_place_command(
         params=params,
         result=result,
     )
+
+
+def create_unsafe_drop_tip_in_place_command(
+    pipette_id: str,
+) -> cmd.unsafe.UnsafeDropTipInPlace:
+    """Get a completed UnsafeDropTipInPlace command."""
+    params = cmd.unsafe.UnsafeDropTipInPlaceParams(pipetteId=pipette_id)
+
+    result = cmd.unsafe.UnsafeDropTipInPlaceResult()
+
+    return cmd.unsafe.UnsafeDropTipInPlace(
+        id="command-id",
+        key="command-key",
+        status=cmd.CommandStatus.SUCCEEDED,
+        createdAt=datetime.now(),
+        params=params,
+        result=result,
+    )

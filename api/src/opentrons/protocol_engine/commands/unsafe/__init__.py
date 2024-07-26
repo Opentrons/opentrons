@@ -7,6 +7,13 @@ from .unsafe_blow_out_in_place import (
     UnsafeBlowOutInPlace,
     UnsafeBlowOutInPlaceCreate,
 )
+from .unsafe_drop_tip_in_place import (
+    UnsafeDropTipInPlaceCommandType,
+    UnsafeDropTipInPlaceParams,
+    UnsafeDropTipInPlaceResult,
+    UnsafeDropTipInPlace,
+    UnsafeDropTipInPlaceCreate,
+)
 
 __all__ = [
     # Unsafe blow-out-in-place command models
@@ -15,4 +22,10 @@ __all__ = [
     "UnsafeBlowOutInPlaceResult",
     "UnsafeBlowOutInPlace",
     "UnsafeBlowOutInPlaceCreate",
+    # Unsafe drop-tip command models
+    "UnsafeDropTipInPlaceCommandType",
+    "UnsafeDropTipInPlaceParams",
+    "UnsafeDropTipInPlaceResult",
+    "UnsafeDropTipInPlace",
+    "UnsafeDropTipInPlaceCreate",
 ]
