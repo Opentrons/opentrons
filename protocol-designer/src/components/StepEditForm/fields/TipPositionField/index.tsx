@@ -103,7 +103,7 @@ export function TipPositionField(props: TipPositionFieldProps): JSX.Element {
     zValue =
       mmFromBottom ?? getDefaultMmFromBottom({ name: zName, wellDepthMm })
   }
-
+console.log('wellDepthMm from field', wellDepthMm, zField)
   let modal = (
     <ZTipPositionModal
       name={zName}

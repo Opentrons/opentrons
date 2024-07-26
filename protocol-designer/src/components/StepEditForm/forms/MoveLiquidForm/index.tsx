@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import cx from 'classnames'
 import { useSelector } from 'react-redux'
 import { getPipetteEntities } from '../../../../step-forms/selectors'
+import { getEnableReturnTip } from '../../../../feature-flags/selectors'
 import {
   VolumeField,
   PipetteField,
@@ -17,6 +18,7 @@ import styles from '../../StepEditForm.module.css'
 import { SourceDestFields } from './SourceDestFields'
 import { SourceDestHeaders } from './SourceDestHeaders'
 import type { StepFormProps } from '../../types'
+import { PickUpTipField } from '../../fields/PickUpTipField'
 
 // TODO: BC 2019-01-25 instead of passing path from here, put it in connect fields where needed
 // or question if it even needs path
@@ -28,6 +30,7 @@ export const MoveLiquidForm = (props: StepFormProps): JSX.Element => {
   const toggleCollapsed = (): void => {
     _setCollapsed(!collapsed)
   }
+  const enableReturnTip = useSelector(getEnableReturnTip)
 
   const { propsForFields, formData } = props
   const { stepType, path } = formData
@@ -139,11 +142,22 @@ export const MoveLiquidForm = (props: StepFormProps): JSX.Element => {
       </div>
       <div className={styles.section_header}>
         <span className={styles.section_header_text}>
-          {t('form:step_edit_form.section.dropTip')}
+          {enableReturnTip
+            ? t('form:step_edit_form.section.pickUpAndDrop')
+            : t('form:step_edit_form.section.dropTip')}
         </span>
       </div>
       <div className={cx(styles.form_row, styles.section_column)}>
-        <DropTipField {...propsForFields.dropTip_location} />
+        <PickUpTipField
+          {...propsForFields.pickUpTip_location}
+          updateWellsValue={propsForFields.pickUpTip_wellNames.updateValue}
+          selectedWells={propsForFields.pickUpTip_wellNames.value}
+        />
+        <DropTipField
+          {...propsForFields.dropTip_location}
+          updateWellsValue={propsForFields.dropTip_wellNames.updateValue}
+          selectedWells={propsForFields.dropTip_wellNames.value}
+        />
       </div>
     </div>
   )

@@ -45,7 +45,7 @@ export const MixForm = (props: StepFormProps): JSX.Element => {
   const toggleCollapsed = (): void => {
     setCollapsed(prevCollapsed => !prevCollapsed)
   }
-
+  console.log('props for fields', propsForFields)
   return (
     <div className={styles.form_wrapper}>
       <div className={styles.section_header}>
@@ -251,7 +251,11 @@ export const MixForm = (props: StepFormProps): JSX.Element => {
           />
         </div>
         <div className={cx(styles.form_row, styles.section_column)}>
-          <DropTipField {...propsForFields.dropTip_location} />
+          <DropTipField
+            {...propsForFields.dropTip_location}
+            updateWellsValue={propsForFields.dropTip_wellNames.updateValue}
+            selectedWells={propsForFields.dropTip_wellNames.value}
+          />
         </div>
       </div>
     </div>
