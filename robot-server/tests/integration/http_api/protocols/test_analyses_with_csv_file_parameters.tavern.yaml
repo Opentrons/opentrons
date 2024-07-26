@@ -95,5 +95,5 @@ stages:
                   variableName: liq_handling_csv_file
                   description: A CSV file that contains wells to use for pipetting
                   file:
-                  - id: '{csv_file_id}'
+                    id: '{csv_file_id}'
                     name: ''
