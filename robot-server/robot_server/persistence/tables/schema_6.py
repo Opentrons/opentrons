@@ -220,3 +220,28 @@ data_files_table = sqlalchemy.Table(
         nullable=False,
     ),
 )
+
+run_csv_rtp_table = sqlalchemy.Table(
+    "run_csv_rtp_table",
+    metadata,
+    sqlalchemy.Column(
+        "row_id",
+        sqlalchemy.Integer,
+        primary_key=True,
+    ),
+    sqlalchemy.Column(
+        "run_id",
+        sqlalchemy.ForeignKey("run.id"),
+        nullable=False,
+    ),
+    sqlalchemy.Column(
+        "parameter_variable_name",
+        sqlalchemy.String,
+        nullable=False,
+    ),
+    sqlalchemy.Column(
+        "file_id",
+        sqlalchemy.ForeignKey("data_files.id"),
+        nullable=True,
+    ),
+)

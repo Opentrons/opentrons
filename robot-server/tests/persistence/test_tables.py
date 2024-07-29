@@ -122,6 +122,17 @@ EXPECTED_STATEMENTS_LATEST = [
         PRIMARY KEY (id)
     )
     """,
+    """
+    CREATE TABLE run_csv_rtp_table (
+        row_id INTEGER NOT NULL,
+        run_id VARCHAR NOT NULL,
+        parameter_variable_name VARCHAR NOT NULL,
+        file_id VARCHAR,
+        PRIMARY KEY (row_id),
+        FOREIGN KEY(run_id) REFERENCES run (id),
+        FOREIGN KEY(file_id) REFERENCES data_files (id)
+    )
+    """,
 ]
 
 EXPECTED_STATEMENTS_V6 = EXPECTED_STATEMENTS_LATEST
