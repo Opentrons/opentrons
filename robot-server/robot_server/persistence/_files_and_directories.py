@@ -4,4 +4,4 @@ from typing import Final
 DECK_CONFIGURATION_FILE: Final = "deck_configuration.json"
 PROTOCOLS_DIRECTORY: Final = "protocols"
 DB_FILE: Final = "robot_server.db"
-LATEST_VERSION_DIRECTORY: Final = "5.1"
+LATEST_VERSION_DIRECTORY: Final = "6"
