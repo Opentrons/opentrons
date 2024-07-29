@@ -29,9 +29,7 @@ class RunAutoDeleter:  # noqa: D101
         protocols = self._protocol_store.get_all()
         protocol_ids = [p.protocol_id for p in protocols]
         filtered_protocol_ids = [
-            p.protocol_id
-            for p in protocols
-            if p.protocol_kind == self._protocol_kind.value
+            p.protocol_id for p in protocols if p.protocol_kind == self._protocol_kind
         ]
 
         # runs with no protocols first, then oldest to newest.

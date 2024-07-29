@@ -219,8 +219,10 @@ async def create_protocol(  # noqa: C901
         " always trigger an analysis (for now).",
         alias="runTimeParameterValues",
     ),
-    protocol_kind: Optional[ProtocolKind] = Form(
-        default=None,
+    protocol_kind: ProtocolKind = Form(
+        # This default needs to be kept in sync with the function body.
+        # See todo comments.
+        default=ProtocolKind.STANDARD,
         description=(
             "Whether this is a `standard` protocol or a `quick-transfer` protocol."
             "if omitted, the protocol will be `standard` by default."
@@ -277,12 +279,30 @@ async def create_protocol(  # noqa: C901
         created_at: Timestamp to attach to the new resource.
         maximum_quick_transfer_protocols: Robot setting value limiting stored quick transfers protocols.
     """
-    kind = ProtocolKind.from_string(protocol_kind) or ProtocolKind.STANDARD
-    if kind == ProtocolKind.QUICK_TRANSFER:
+    # We have to do these isinstance checks because if `runTimeParameterValues` or
+    # `protocolKind` are not specified in the request, then they get assigned a
+    # Form(default) value instead of just the default value. \(O.o)/
+    # TODO: check if we can make our own "RTP multipart-form field" Pydantic type
+    #  so we can validate the data contents and return a better error response.
+    # TODO: check if this is still necessary after converting FastAPI args to Annotated.
+    parsed_rtp_values = (
+        json.loads(run_time_parameter_values)
+        if isinstance(run_time_parameter_values, str)
+        else {}
+    )
+    parsed_rtp_files = (
+        json.loads(run_time_parameter_files)
+        if isinstance(run_time_parameter_files, str)
+        else {}
+    )
+    if not isinstance(protocol_kind, ProtocolKind):
+        protocol_kind = ProtocolKind.STANDARD
+
+    if protocol_kind == ProtocolKind.QUICK_TRANSFER:
         quick_transfer_protocols = [
             protocol
             for protocol in protocol_store.get_all()
-            if protocol.protocol_kind == ProtocolKind.QUICK_TRANSFER.value
+            if protocol.protocol_kind == ProtocolKind.QUICK_TRANSFER
         ]
         if len(quick_transfer_protocols) >= maximum_quick_transfer_protocols:
             raise HTTPException(
@@ -294,21 +314,6 @@ async def create_protocol(  # noqa: C901
         assert file.filename is not None
     buffered_files = await file_reader_writer.read(files=files)  # type: ignore[arg-type]
 
-    # We have to do this isinstance check because if `runTimeParameterValues` is
-    # not specified in the request, then it gets assigned a Form(None) value
-    # instead of just a None. \(O.o)/
-    # TODO: check if we can make our own "RTP multipart-form field" Pydantic type
-    #  so we can validate the data contents and return a better error response.
-    parsed_rtp_values = (
-        json.loads(run_time_parameter_values)
-        if isinstance(run_time_parameter_values, str)
-        else {}
-    )
-    parsed_rtp_files = (
-        json.loads(run_time_parameter_files)
-        if isinstance(run_time_parameter_files, str)
-        else {}
-    )
     content_hash = await file_hasher.hash(buffered_files)
     cached_protocol_id = protocol_store.get_id_by_hash(content_hash)
 
@@ -340,7 +345,7 @@ async def create_protocol(  # noqa: C901
             data = Protocol.construct(
                 id=cached_protocol_id,
                 createdAt=resource.created_at,
-                protocolKind=ProtocolKind.from_string(resource.protocol_kind),
+                protocolKind=resource.protocol_kind,
                 protocolType=resource.source.config.protocol_type,
                 robotType=resource.source.robot_type,
                 metadata=Metadata.parse_obj(resource.source.metadata),
@@ -390,11 +395,11 @@ async def create_protocol(  # noqa: C901
         created_at=created_at,
         source=source,
         protocol_key=key,
-        protocol_kind=kind.value,
+        protocol_kind=protocol_kind,
     )
 
     protocol_deleter: ProtocolAutoDeleter = protocol_auto_deleter
-    if kind == ProtocolKind.QUICK_TRANSFER:
+    if protocol_kind == ProtocolKind.QUICK_TRANSFER:
         protocol_deleter = quick_transfer_protocol_auto_deleter
     protocol_deleter.make_room_for_new_protocol()
     protocol_store.insert(protocol_resource)
@@ -413,7 +418,7 @@ async def create_protocol(  # noqa: C901
     data = Protocol(
         id=protocol_id,
         createdAt=created_at,
-        protocolKind=kind,
+        protocolKind=protocol_kind,
         protocolType=source.config.protocol_type,
         robotType=source.robot_type,
         metadata=Metadata.parse_obj(source.metadata),
@@ -523,7 +528,7 @@ async def get_protocols(
         Protocol.construct(
             id=r.protocol_id,
             createdAt=r.created_at,
-            protocolKind=ProtocolKind.from_string(r.protocol_kind),
+            protocolKind=r.protocol_kind,
             protocolType=r.source.config.protocol_type,
             robotType=r.source.robot_type,
             metadata=Metadata.parse_obj(r.source.metadata),
@@ -604,7 +609,7 @@ async def get_protocol_by_id(
     data = Protocol.construct(
         id=protocolId,
         createdAt=resource.created_at,
-        protocolKind=ProtocolKind.from_string(resource.protocol_kind),
+        protocolKind=resource.protocol_kind,
         protocolType=resource.source.config.protocol_type,
         robotType=resource.source.robot_type,
         metadata=Metadata.parse_obj(resource.source.metadata),
