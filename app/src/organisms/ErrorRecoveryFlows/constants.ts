@@ -1,6 +1,6 @@
 import { css } from 'styled-components'
 
-import { SPACING, RESPONSIVENESS } from '@opentrons/components'
+import { RESPONSIVENESS, SPACING } from '@opentrons/components'
 
 import type { StepOrder } from './types'
 
@@ -216,5 +216,19 @@ export const ODD_ONLY = css`
 export const DESKTOP_ONLY = css`
   @media (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
     display: none;
+  }
+`
+export const FLEX_WIDTH_ALERT_INFO_STYLE = css`
+  width: 41.625rem;
+  @media (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+    width: 53rem;
+  }
+`
+export const ICON_SIZE_ALERT_INFO_STYLE = css`
+  width: ${SPACING.spacing40};
+  height: ${SPACING.spacing40};
+  @media (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+    width: ${SPACING.spacing60};
+    height: ${SPACING.spacing60};
   }
 `
