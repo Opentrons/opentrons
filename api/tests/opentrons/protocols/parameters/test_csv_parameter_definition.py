@@ -6,7 +6,7 @@ from io import TextIOWrapper
 import pytest
 from decoy import Decoy
 
-from opentrons.protocol_engine.types import CSVParameter, FileId
+from opentrons.protocol_engine.types import CSVParameter, FileInfo
 from opentrons.protocols.parameters import validation as mock_validation
 from opentrons.protocols.parameters.csv_parameter_definition import (
     create_csv_parameter,
@@ -49,7 +49,7 @@ def test_create_csv_parameter(decoy: Decoy) -> None:
     assert result.variable_name == "my_cool_csv"
     assert result._description == "Comma Separated Value"
     assert result.value is None
-    assert result.id is None
+    assert result.file_info is None
 
 
 def test_set_csv_value(
@@ -75,13 +75,13 @@ def test_csv_parameter_as_protocol_engine_type(
         file=None,
     )
 
-    csv_parameter_subject.id = "123abc"
+    csv_parameter_subject.file_info = FileInfo(id="123abc", name="")
     result = csv_parameter_subject.as_protocol_engine_type()
     assert result == CSVParameter(
         displayName="My cool CSV",
         variableName="my_cool_csv",
         description="Comma Separated Value",
-        file=FileId(id="123abc"),
+        file=FileInfo(id="123abc", name=""),
     )
 
 

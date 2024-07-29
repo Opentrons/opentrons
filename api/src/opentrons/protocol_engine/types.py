@@ -13,7 +13,17 @@ from pydantic import (
     StrictStr,
     validator,
 )
-from typing import Optional, Union, List, Dict, Any, NamedTuple, Tuple, FrozenSet
+from typing import (
+    Optional,
+    Union,
+    List,
+    Dict,
+    Any,
+    NamedTuple,
+    Tuple,
+    FrozenSet,
+    Mapping,
+)
 from typing_extensions import Literal, TypeGuard
 
 from opentrons_shared_data.pipette.types import PipetteNameType
@@ -1029,13 +1039,14 @@ class EnumParameter(RTPBase):
     )
 
 
-class FileId(BaseModel):
+class FileInfo(BaseModel):
     """A file UUID descriptor."""
 
     id: str = Field(
         ...,
         description="The UUID identifier of the file stored on the robot.",
     )
+    name: str = Field(..., description="Name of the file, including the extension.")
 
 
 class CSVParameter(RTPBase):
@@ -1044,15 +1055,17 @@ class CSVParameter(RTPBase):
     type: Literal["csv_file"] = Field(
         default="csv_file", description="String specifying the type of this parameter"
     )
-    file: Optional[FileId] = Field(
-        ...,
-        description="The CSV file stored on the robot, to be used as the CSV RTP override value."
-        " For local analysis this will be empty.",
+    file: Optional[FileInfo] = Field(
+        default=None,
+        description="ID of the CSV file stored on the robot; to be used for fetching the CSV file."
+        " For local analysis this will most likely be empty.",
     )
 
 
 RunTimeParameter = Union[NumberParameter, EnumParameter, BooleanParameter, CSVParameter]
 
-PrimitiveRunTimeParamValuesType = Dict[
+PrimitiveRunTimeParamValuesType = Mapping[
     StrictStr, Union[StrictInt, StrictFloat, StrictBool, StrictStr]
 ]  # update value types as more RTP types are added
+
+CSVRunTimeParamFilesType = Mapping[StrictStr, StrictStr]

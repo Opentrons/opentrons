@@ -97,9 +97,13 @@ async def test_initialize_analyzer(
         analysis_id="analysis-id",
         protocol_resource=protocol_resource,
         run_time_param_values={"sample_count": 123},
+        run_time_param_files={"my_file": "file-id"},
     )
     decoy.verify(
-        await analyzer.load_orchestrator(run_time_param_values={"sample_count": 123})
+        await analyzer.load_orchestrator(
+            run_time_param_values={"sample_count": 123},
+            run_time_param_files={"my_file": "file-id"},
+        )
     )
 
 
@@ -139,7 +143,10 @@ async def test_raises_error_and_saves_result_if_initialization_errors(
         )
     ).then_return(analyzer)
     decoy.when(
-        await analyzer.load_orchestrator(run_time_param_values={"sample_count": 123})
+        await analyzer.load_orchestrator(
+            run_time_param_values={"sample_count": 123},
+            run_time_param_files={},
+        )
     ).then_raise(raised_exception)
     decoy.when(analyzer.get_verified_run_time_parameters()).then_return([])
     decoy.when(em.map_unexpected_error(error=raised_exception)).then_return(
@@ -150,6 +157,7 @@ async def test_raises_error_and_saves_result_if_initialization_errors(
             analysis_id="analysis-id",
             protocol_resource=protocol_resource,
             run_time_param_values={"sample_count": 123},
+            run_time_param_files={},
         )
     decoy.verify(
         await analysis_store.save_initialization_failed_analysis(

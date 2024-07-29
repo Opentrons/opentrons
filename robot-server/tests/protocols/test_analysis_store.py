@@ -3,7 +3,7 @@ import json
 
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import List, NamedTuple
+from typing import List, NamedTuple, Optional
 
 import pytest
 from decoy import Decoy
@@ -13,6 +13,8 @@ from opentrons.protocol_engine.types import (
     EnumParameter,
     EnumChoice,
     BooleanParameter,
+    CSVParameter,
+    FileInfo,
 )
 
 from sqlalchemy.engine import Engine as SQLEngine
@@ -52,7 +54,10 @@ from robot_server.protocols.protocol_store import (
     ProtocolStore,
     ProtocolResource,
 )
-from robot_server.protocols.rtp_resources import PrimitiveParameterResource
+from robot_server.protocols.rtp_resources import (
+    PrimitiveParameterResource,
+    CSVParameterResource,
+)
 
 
 @pytest.fixture
@@ -105,6 +110,15 @@ def mock_number_param(name: str, value: float) -> NumberParameter:
         max=10,
         min=0,
         type="float",
+    )
+
+
+def mock_csv_param(name: str, file: Optional[FileInfo]) -> CSVParameter:
+    """Return a CSVParameter."""
+    return CSVParameter(
+        variableName=name,
+        displayName="csv param",
+        file=file,
     )
 
 
@@ -328,6 +342,11 @@ async def test_update_adds_rtp_values_to_completed_store(
         value="baz",
         default="blah",
     )
+    csv_param = pe_types.CSVParameter(
+        displayName="A CSV param",
+        variableName="coolest_param",
+        file=FileInfo(id="file-id", name="file-name"),
+    )
     expected_completed_analysis_resource = CompletedAnalysisResource(
         id="analysis-id",
         protocol_id="protocol-id",
@@ -337,7 +356,7 @@ async def test_update_adds_rtp_values_to_completed_store(
             status=AnalysisStatus.COMPLETED,
             result=AnalysisResult.OK,
             robotType="OT-2 Standard",
-            runTimeParameters=[number_param, string_param],
+            runTimeParameters=[number_param, string_param, csv_param],
             labware=[],
             pipettes=[],
             modules=[],
@@ -357,7 +376,7 @@ async def test_update_adds_rtp_values_to_completed_store(
     await subject.update(
         analysis_id="analysis-id",
         robot_type="OT-2 Standard",
-        run_time_parameters=[number_param, string_param],
+        run_time_parameters=[number_param, string_param, csv_param],
         labware=[],
         pipettes=[],
         modules=[],
@@ -380,6 +399,13 @@ async def test_update_adds_rtp_values_to_completed_store(
                     parameter_variable_name="cooler_param",
                     parameter_type="str",
                     parameter_value="baz",
+                ),
+            ],
+            csv_rtp_resources=[
+                CSVParameterResource(
+                    analysis_id="analysis-id",
+                    parameter_variable_name="coolest_param",
+                    file_id="file-id",
                 ),
             ],
         )
@@ -519,6 +545,7 @@ async def test_save_initialization_failed_analysis(
         await mock_completed_store.make_room_and_add(
             completed_analysis_resource=expected_completed_analysis_resource,
             primitive_rtp_resources=[],
+            csv_rtp_resources=[],
         )
     )
 
@@ -531,24 +558,43 @@ async def test_save_initialization_failed_analysis(
                 mock_number_param("cool_param", 2.0),
                 mock_enum_param("cooler_param", "baz"),
                 mock_bool_param("uncool_param", True),
+                mock_csv_param(
+                    "coolest_param", FileInfo(id="file-id", name="file-name")
+                ),
             ],
             True,
         ),
         (
-            [
+            [  # Params have non-matching values
                 mock_number_param("cool_param", 2),
                 mock_enum_param("cooler_param", "buzzzzz"),
                 mock_bool_param("uncool_param", False),
+                mock_csv_param(
+                    "coolest_param", FileInfo(id="file-id", name="file-name")
+                ),
             ],
             False,
         ),
         (
             [
+                # params in different order, cool param is '2' instead of '2.0'
                 mock_enum_param("cooler_param", "baz"),
                 mock_bool_param("uncool_param", True),
+                mock_csv_param(
+                    "coolest_param", FileInfo(id="file-id", name="file-name")
+                ),
                 mock_number_param("cool_param", 2),
             ],
             True,
+        ),
+        (
+            [  # CSV param file ID is None
+                mock_number_param("cool_param", 2.0),
+                mock_enum_param("cooler_param", "baz"),
+                mock_bool_param("uncool_param", True),
+                mock_csv_param("coolest_param", None),
+            ],
+            False,
         ),
     ],
 )
@@ -573,6 +619,9 @@ async def test_matching_rtp_values_in_analysis(
             "uncool_param": True,
         }
     )
+    decoy.when(
+        mock_completed_store.get_csv_rtps_by_analysis_id("analysis-2")
+    ).then_return({"coolest_param": "file-id"})
     assert (
         await subject.matching_rtp_values_in_analysis(
             last_analysis_summary=AnalysisSummary(

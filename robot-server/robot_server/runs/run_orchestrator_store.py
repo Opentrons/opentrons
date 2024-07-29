@@ -243,6 +243,8 @@ class RunOrchestratorStore:
             await self.run_orchestrator.load(
                 protocol.source,
                 run_time_param_values=run_time_param_values,
+                # TODO (spp, 2024-07-16): update this once runs accept csv params
+                run_time_param_files={},
                 parse_mode=ParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
             )
         else:

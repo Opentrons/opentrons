@@ -12,10 +12,15 @@ from opentrons.protocols.parameters.types import (
     ParameterChoice,
     UserFacingTypes,
 )
-from opentrons.protocols.parameters.exceptions import ParameterDefinitionError
+from opentrons.protocols.parameters.exceptions import (
+    ParameterDefinitionError,
+    ParameterValueError,
+)
 from opentrons.protocol_engine.types import (
     RunTimeParameter,
     PrimitiveRunTimeParamValuesType,
+    CSVRunTimeParamFilesType,
+    FileInfo,
 )
 
 from ._parameters import Parameters
@@ -202,12 +207,44 @@ class ParameterContext:
                     f"Parameter {variable_name} is not defined as a parameter for this protocol."
                 )
             if isinstance(parameter, csv_parameter_definition.CSVParameterDefinition):
-                pass
+                raise ParameterValueError(
+                    f"A primitive param value was provided for the parameter '{variable_name}',"
+                    f" but '{variable_name}' is a CSV parameter that can only accept file IDs."
+                )
             else:
                 validated_value = validation.ensure_value_type(
                     override_value, parameter.parameter_type
                 )
                 parameter.value = validated_value
+
+    def initialize_csv_files(
+        self, run_time_param_file_overrides: CSVRunTimeParamFilesType
+    ) -> None:
+        """Initializes the files for CSV parameters.
+
+        :meta private:
+
+        This is intended for Opentrons internal use only and is not a guaranteed API.
+        """
+        for variable_name, file_id in run_time_param_file_overrides.items():
+            try:
+                parameter = self._parameters[variable_name]
+            except KeyError:
+                raise ParameterDefinitionError(
+                    f"Parameter {variable_name} is not defined as a parameter for this protocol."
+                )
+            if not isinstance(
+                parameter, csv_parameter_definition.CSVParameterDefinition
+            ):
+                raise ParameterValueError(
+                    f"File Id was provided for the parameter '{variable_name}',"
+                    f" but '{variable_name}' is not a CSV parameter."
+                )
+
+            parameter.file_info = FileInfo(id=file_id, name="")
+            # TODO (spp, 2024-07-16): set the file name and assign the file as parameter.value.
+            #  Most likely, we will be creating a temporary file copy of the original
+            #  to pass onto the protocol context
 
     def export_parameters_for_analysis(self) -> List[RunTimeParameter]:
         """Exports all parameters into a protocol engine models for reporting in analysis.

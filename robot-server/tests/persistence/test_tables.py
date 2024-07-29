@@ -59,6 +59,17 @@ EXPECTED_STATEMENTS_LATEST = [
     )
     """,
     """
+    CREATE TABLE analysis_csv_rtp_table (
+        row_id INTEGER NOT NULL,
+        analysis_id VARCHAR NOT NULL,
+        parameter_variable_name VARCHAR NOT NULL,
+        file_id VARCHAR,
+        PRIMARY KEY (row_id),
+        FOREIGN KEY(analysis_id) REFERENCES analysis (id),
+        FOREIGN KEY(file_id) REFERENCES data_files (id)
+    )
+    """,
+    """
     CREATE INDEX ix_analysis_protocol_id ON analysis (protocol_id)
     """,
     """
