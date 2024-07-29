@@ -8,8 +8,8 @@ import {
 } from '../../../../step-forms/selectors'
 import { getAllTiprackOptions } from '../../../../ui/labware/selectors'
 import { getEnableReturnTip } from '../../../../feature-flags/selectors'
-import { StepFormDropdown } from '../StepFormDropdownField'
 import type { DropdownOption } from '@opentrons/components'
+import type { StepFormDropdown } from '../StepFormDropdownField'
 
 import styles from '../../StepEditForm.module.css'
 
@@ -70,7 +70,7 @@ export function DropTipField(
     >
       <DropdownField
         disabled={disabled}
-        options={[...options, ...tiprackOptions]}
+        options={enableReturnTip ? [...options, ...tiprackOptions] : options}
         name={name}
         value={dropdownItem ? String(dropdownItem) : null}
         onBlur={onFieldBlur}

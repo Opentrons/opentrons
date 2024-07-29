@@ -7,7 +7,7 @@ import { getPipetteEntities } from '../../../../step-forms/selectors'
 import { getNozzleType } from '../../utils'
 import { getMainPagePortalEl } from '../../../portals/MainPageModalPortal'
 import { WellSelectionModal } from '../WellSelectionField/WellSelectionModal'
-import { StepFormDropdown } from '../StepFormDropdownField'
+import type { StepFormDropdown } from '../StepFormDropdownField'
 
 import styles from '../../StepEditForm.module.css'
 

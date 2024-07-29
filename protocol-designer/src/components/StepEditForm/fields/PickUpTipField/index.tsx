@@ -1,9 +1,10 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import { DropdownField, DropdownOption, FormGroup } from '@opentrons/components'
+import { DropdownField, FormGroup } from '@opentrons/components'
 import { getAllTiprackOptions } from '../../../../ui/labware/selectors'
-import { StepFormDropdown } from '../StepFormDropdownField'
+import type { DropdownOption } from '@opentrons/components'
+import type { StepFormDropdown } from '../StepFormDropdownField'
 
 import styles from '../../StepEditForm.module.css'
 

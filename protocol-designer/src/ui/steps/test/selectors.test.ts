@@ -612,6 +612,18 @@ describe('_getSavedMultiSelectFieldValues', () => {
           value: 'fixedTrash',
           isIndeterminate: false,
         },
+        dropTip_wellNames: {
+          value: undefined,
+          isIndeterminate: false,
+        },
+        pickUpTip_location: {
+          value: undefined,
+          isIndeterminate: false,
+        },
+        pickUpTip_wellNames: {
+          value: undefined,
+          isIndeterminate: false,
+        },
       })
     })
   })
@@ -842,6 +854,18 @@ describe('_getSavedMultiSelectFieldValues', () => {
           value: 'fixedTrash',
           isIndeterminate: false,
         },
+        dropTip_wellNames: {
+          value: undefined,
+          isIndeterminate: false,
+        },
+        pickUpTip_location: {
+          value: undefined,
+          isIndeterminate: false,
+        },
+        pickUpTip_wellNames: {
+          value: undefined,
+          isIndeterminate: false,
+        },
       })
     })
   })
@@ -902,6 +926,18 @@ describe('_getSavedMultiSelectFieldValues', () => {
         },
         dropTip_location: {
           value: 'fixedTrash',
+          isIndeterminate: false,
+        },
+        dropTip_wellNames: {
+          value: undefined,
+          isIndeterminate: false,
+        },
+        pickUpTip_location: {
+          value: undefined,
+          isIndeterminate: false,
+        },
+        pickUpTip_wellNames: {
+          value: undefined,
           isIndeterminate: false,
         },
       })
@@ -984,6 +1020,15 @@ describe('_getSavedMultiSelectFieldValues', () => {
         },
         dropTip_location: {
           value: 'fixedTrash',
+          isIndeterminate: false,
+        },
+        dropTip_wellNames: {
+          isIndeterminate: false,
+        },
+        pickUpTip_location: {
+          isIndeterminate: false,
+        },
+        pickUpTip_wellNames: {
           isIndeterminate: false,
         },
       })

@@ -7,36 +7,36 @@ import {
   getLabwareEntities,
   getPipetteEntities,
 } from '../../../step-forms/selectors'
+import { getEnableReturnTip } from '../../../feature-flags/selectors'
 import {
   BlowoutLocationField,
+  BlowoutZOffsetField,
   ChangeTipField,
   CheckboxRowField,
+  Configure96ChannelField,
   DelayFields,
+  DropTipField,
   FlowRateField,
   LabwareField,
+  PickUpTipField,
   PipetteField,
   TextField,
   TipPositionField,
+  TiprackField,
+  TipWellSelectionField,
   VolumeField,
   WellOrderField,
   WellSelectionField,
-  BlowoutZOffsetField,
 } from '../fields'
-import { TiprackField } from '../fields/TiprackField'
 import {
   getBlowoutLocationOptionsForForm,
   getLabwareFieldForPositioningField,
 } from '../utils'
-import { Configure96ChannelField } from '../fields/Configure96ChannelField'
-import { DropTipField } from '../fields/DropTipField'
 import { AspDispSection } from './AspDispSection'
 
 import type { StepFormProps } from '../types'
 
 import styles from '../StepEditForm.module.css'
-import { PickUpTipField } from '../fields/PickUpTipField'
-import { TipWellSelectionField } from '../fields/PickUpTipField/TipWellSelectionField'
-import { getEnableReturnTip } from '../../../feature-flags/selectors'
 
 export const MixForm = (props: StepFormProps): JSX.Element => {
   const [collapsed, setCollapsed] = React.useState(true)
@@ -261,30 +261,37 @@ export const MixForm = (props: StepFormProps): JSX.Element => {
             stepType={formData.stepType}
           />
         </div>
-        <div className={cx(styles.form_row, styles.section_column)}>
-          {enableReturnTip ? (
-            <>
-              <PickUpTipField {...propsForFields.pickUpTip_location} />
-              {userSelectedPickUpTipLocation ? (
-                <TipWellSelectionField
-                  {...propsForFields.pickUpTip_wellNames}
-                  nozzles={String(propsForFields.nozzles.value) ?? null}
-                  labwareId={propsForFields.pickUpTip_location.value}
-                  pipetteId={propsForFields.pipette.value}
-                />
-              ) : null}
-            </>
-          ) : null}
-          <DropTipField {...propsForFields.dropTip_location} />
-          {userSelectedDropTipLocation ? (
-            <TipWellSelectionField
-              {...propsForFields.dropTip_wellNames}
-              nozzles={String(propsForFields.nozzles.value) ?? null}
-              labwareId={propsForFields.dropTip_location.value}
-              pipetteId={propsForFields.pipette.value}
-            />
-          ) : null}
-        </div>
+      </div>
+      <div className={styles.section_header}>
+        <span className={styles.section_header_text}>
+          {enableReturnTip
+            ? t('form:step_edit_form.section.pickUpAndDrop')
+            : t('form:step_edit_form.section.dropTip')}
+        </span>
+      </div>
+      <div className={cx(styles.form_row, styles.section_column)}>
+        {enableReturnTip ? (
+          <>
+            <PickUpTipField {...propsForFields.pickUpTip_location} />
+            {userSelectedPickUpTipLocation ? (
+              <TipWellSelectionField
+                {...propsForFields.pickUpTip_wellNames}
+                nozzles={String(propsForFields.nozzles.value) ?? null}
+                labwareId={propsForFields.pickUpTip_location.value}
+                pipetteId={propsForFields.pipette.value}
+              />
+            ) : null}
+          </>
+        ) : null}
+        <DropTipField {...propsForFields.dropTip_location} />
+        {userSelectedDropTipLocation ? (
+          <TipWellSelectionField
+            {...propsForFields.dropTip_wellNames}
+            nozzles={String(propsForFields.nozzles.value) ?? null}
+            labwareId={propsForFields.dropTip_location.value}
+            pipetteId={propsForFields.pipette.value}
+          />
+        ) : null}
       </div>
     </div>
   )

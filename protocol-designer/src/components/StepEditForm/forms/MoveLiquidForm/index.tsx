@@ -13,12 +13,12 @@ import {
   ChangeTipField,
   DisposalVolumeField,
   PathField,
+  TiprackField,
+  DropTipField,
+  PickUpTipField,
+  TipWellSelectionField,
+  Configure96ChannelField,
 } from '../../fields'
-import { TiprackField } from '../../fields/TiprackField'
-import { TipWellSelectionField } from '../../fields/PickUpTipField/TipWellSelectionField'
-import { Configure96ChannelField } from '../../fields/Configure96ChannelField'
-import { DropTipField } from '../../fields/DropTipField'
-import { PickUpTipField } from '../../fields/PickUpTipField'
 import { SourceDestFields } from './SourceDestFields'
 import { SourceDestHeaders } from './SourceDestHeaders'
 import type { StepFormProps } from '../../types'
@@ -157,7 +157,7 @@ export const MoveLiquidForm = (props: StepFormProps): JSX.Element => {
             : t('form:step_edit_form.section.dropTip')}
         </span>
       </div>
-      <div className={cx(styles.form_row, styles.section_column)}>
+      <div className={styles.form_row}>
         {enableReturnTip ? (
           <>
             <PickUpTipField {...propsForFields.pickUpTip_location} />

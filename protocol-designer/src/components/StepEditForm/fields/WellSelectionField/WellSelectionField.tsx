@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { FormGroup, InputField } from '@opentrons/components'
-import { ALL, COLUMN } from '@opentrons/shared-data'
+import { COLUMN } from '@opentrons/shared-data'
 import {
   actions as stepsActions,
   getSelectedStepId,
@@ -15,7 +15,6 @@ import { getNozzleType } from '../../utils'
 import { WellSelectionModal } from './WellSelectionModal'
 import styles from '../../StepEditForm.module.css'
 
-import type { NozzleType } from '../../../../types'
 import type { FieldProps } from '../../types'
 
 export type Props = FieldProps & {

@@ -4,11 +4,11 @@ import without from 'lodash/without'
 import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
   DEST_WELL_BLOWOUT_DESTINATION,
-  PipetteEntity,
 } from '@opentrons/step-generation'
-import { ALL, COLUMN, NozzleConfigurationStyle } from '@opentrons/shared-data'
+import { ALL, COLUMN } from '@opentrons/shared-data'
 import { PROFILE_CYCLE } from '../../form-types'
 import { getDefaultsForStepType } from '../../steplist/formLevel/getDefaultsForStepType'
+import type { PipetteEntity } from '@opentrons/step-generation'
 import type { Options } from '@opentrons/components'
 import type { ProfileFormError } from '../../steplist/formLevel/profileErrors'
 import type { FormWarning } from '../../steplist/formLevel/warnings'
