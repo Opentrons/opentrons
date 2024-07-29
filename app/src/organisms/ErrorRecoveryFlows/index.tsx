@@ -154,6 +154,7 @@ export function ErrorRecoveryFlows(
           intent={intent}
           robotName={robotName}
           isOnDevice={isOnDevice}
+          runStatus={runStatus}
         />
       ) : null}
       {renderWizard ? (

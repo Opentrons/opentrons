@@ -15,6 +15,7 @@ import {
   TEXT_ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
+import { RUN_STATUS_AWAITING_RECOVERY } from '@opentrons/api-client'
 
 import { useUpdateClientDataRecovery } from '../../resources/client_data'
 import { TakeoverModal } from '../TakeoverModal/TakeoverModal'
@@ -24,15 +25,21 @@ import type {
   ClientDataRecovery,
   UseUpdateClientDataRecoveryResult,
 } from '../../resources/client_data'
+import type { ErrorRecoveryFlowsProps } from '.'
 
 // The takeover view, functionally similar to MaintenanceRunTakeover
 export function RecoveryTakeover(props: {
   intent: ClientDataRecovery['intent']
+  runStatus: ErrorRecoveryFlowsProps['runStatus']
   robotName: string
   isOnDevice: boolean
 }): JSX.Element {
   const { t } = useTranslation('error_recovery')
   const { clearClientData } = useUpdateClientDataRecovery()
+
+  // TODO(jh, 07-29-24): This is likely sufficient for most edge cases, but this does not account for
+  // all terminal commands as it should. Revisit this.
+  const isTerminateDisabled = props.runStatus !== RUN_STATUS_AWAITING_RECOVERY
 
   const buildRecoveryTakeoverProps = (
     intent: ClientDataRecovery['intent']
@@ -41,6 +48,7 @@ export function RecoveryTakeover(props: {
       case 'canceling':
         return {
           title: t('robot_is_canceling_run'),
+          isRunStatusAwaitingRecovery: isTerminateDisabled,
           clearClientData,
           ...props,
         }
@@ -48,6 +56,7 @@ export function RecoveryTakeover(props: {
       default:
         return {
           title: t('robot_is_in_recovery_mode'),
+          isRunStatusAwaitingRecovery: isTerminateDisabled,
           clearClientData,
           ...props,
         }
@@ -61,6 +70,8 @@ export function RecoveryTakeover(props: {
 
 interface RecoveryTakeoverProps {
   title: string
+  /* Do not let other users terminate activity if run is not awaiting recovery. Ex, the run is "recovery canceling." */
+  isRunStatusAwaitingRecovery: boolean
   robotName: string
   isOnDevice: boolean
   clearClientData: UseUpdateClientDataRecoveryResult['clearClientData']
@@ -79,6 +90,7 @@ export function RecoveryTakeoverComponent(
 export function RecoveryTakeoverODD({
   title,
   clearClientData,
+  isRunStatusAwaitingRecovery,
 }: RecoveryTakeoverProps): JSX.Element {
   const [showConfirmation, setShowConfirmation] = React.useState(false)
 
@@ -88,7 +100,7 @@ export function RecoveryTakeoverODD({
       confirmTerminate={clearClientData}
       setShowConfirmTerminateModal={setShowConfirmation}
       showConfirmTerminateModal={showConfirmation}
-      terminateInProgress={false}
+      terminateInProgress={isRunStatusAwaitingRecovery}
     />
   )
 }
@@ -97,6 +109,7 @@ export function RecoveryTakeoverDesktop({
   title,
   robotName,
   clearClientData,
+  isRunStatusAwaitingRecovery,
 }: RecoveryTakeoverProps): JSX.Element {
   const { t } = useTranslation('error_recovery')
 
@@ -119,7 +132,10 @@ export function RecoveryTakeoverDesktop({
           </StyledText>
         </Flex>
         <Flex marginLeft="auto">
-          <AlertPrimaryButton onClick={clearClientData}>
+          <AlertPrimaryButton
+            onClick={clearClientData}
+            disabled={isRunStatusAwaitingRecovery}
+          >
             {t('terminate_remote_activity')}
           </AlertPrimaryButton>
         </Flex>
