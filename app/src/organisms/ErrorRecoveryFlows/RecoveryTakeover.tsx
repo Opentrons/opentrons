@@ -15,7 +15,11 @@ import {
   TEXT_ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
-import { RUN_STATUS_AWAITING_RECOVERY } from '@opentrons/api-client'
+import {
+  RUN_STATUS_AWAITING_RECOVERY,
+  RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
+  RUN_STATUS_AWAITING_RECOVERY_PAUSED,
+} from '@opentrons/api-client'
 
 import { useUpdateClientDataRecovery } from '../../resources/client_data'
 import { TakeoverModal } from '../TakeoverModal/TakeoverModal'
@@ -34,12 +38,17 @@ export function RecoveryTakeover(props: {
   robotName: string
   isOnDevice: boolean
 }): JSX.Element {
+  const { runStatus } = props
   const { t } = useTranslation('error_recovery')
   const { clearClientData } = useUpdateClientDataRecovery()
 
   // TODO(jh, 07-29-24): This is likely sufficient for most edge cases, but this does not account for
   // all terminal commands as it should. Revisit this.
-  const isTerminateDisabled = props.runStatus !== RUN_STATUS_AWAITING_RECOVERY
+  const isTerminateDisabled = !(
+    runStatus === RUN_STATUS_AWAITING_RECOVERY ||
+    runStatus === RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR ||
+    runStatus === RUN_STATUS_AWAITING_RECOVERY_PAUSED
+  )
 
   const buildRecoveryTakeoverProps = (
     intent: ClientDataRecovery['intent']

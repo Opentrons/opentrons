@@ -2,7 +2,11 @@ import * as React from 'react'
 import { describe, it, vi, expect, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
 
-import { RUN_STATUS_AWAITING_RECOVERY } from '@opentrons/api-client'
+import {
+  RUN_STATUS_AWAITING_RECOVERY,
+  RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
+  RUN_STATUS_AWAITING_RECOVERY_PAUSED,
+} from '@opentrons/api-client'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
@@ -54,6 +58,17 @@ describe('RecoveryTakeover', () => {
     screen.getByText(
       'The robot’s touchscreen or another computer with the app is currently controlling this robot.'
     )
+  })
+  ;[
+    RUN_STATUS_AWAITING_RECOVERY,
+    RUN_STATUS_AWAITING_RECOVERY_PAUSED,
+    RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
+  ].forEach(runStatus => {
+    it(`renders the terminate button as enabled when run status is ${runStatus}`, () => {
+      render({ ...props, runStatus })
+
+      expect(screen.getByText('Terminate remote activity')).toBeEnabled()
+    })
   })
 
   it('renders RecoveryTakeoverComponent with correct props for recovering intent on ODD', () => {
