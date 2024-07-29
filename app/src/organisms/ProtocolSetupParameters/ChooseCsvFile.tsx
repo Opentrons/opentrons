@@ -10,8 +10,8 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useAllCsvFilesQuery } from '@opentrons/react-api-client'
@@ -46,8 +46,29 @@ export function ChooseCsvFile({
   const { t } = useTranslation('protocol_setup')
 
   const csvFilesOnUSB = useSelector(getShellUpdateDataFiles) ?? []
-
   const csvFilesOnRobot = useAllCsvFilesQuery(protocolId).data?.data.files ?? []
+  const sortedCsvFilesOnUSB = csvFilesOnUSB.sort((a, b) => {
+    const regex = /^(.*\/)?(.+?)(\d*)\.csv$/
+    const aMatch = a.match(regex)
+    const bMatch = b.match(regex)
+
+    if (!aMatch || !bMatch) {
+      console.error('Invalid filename format:', !aMatch ? a : b)
+      return 0
+    }
+
+    const [, , aText, aNum] = aMatch
+    const [, , bText, bNum] = bMatch
+
+    if (aText !== bText) {
+      return aText.localeCompare(bText)
+    }
+
+    return (
+      (aNum === '' ? 0 : parseInt(aNum, 10)) -
+      (bNum === '' ? 0 : parseInt(bNum, 10))
+    )
+  })
 
   const initialFileObject: CsvFileParameterFileData = parameter.file ?? {}
   const [
@@ -57,7 +78,7 @@ export function ChooseCsvFile({
 
   const handleBackButton = (): void => {
     if (!isEqual(csvFileSelected, initialFileObject)) {
-      setParameter(csvFileSelected, parameter.variableName)
+      setParameter(csvFileSelected, parameter.variableName as string)
     }
     handleGoBack()
   }
@@ -115,8 +136,8 @@ export function ChooseCsvFile({
               {t('csv_files_on_usb')}
             </LegacyStyledText>
             <Flex css={LIST_CONTAINER_STYLE}>
-              {csvFilesOnUSB.length !== 0 ? (
-                csvFilesOnUSB.map(csvFilePath => {
+              {sortedCsvFilesOnUSB.length !== 0 ? (
+                sortedCsvFilesOnUSB.map(csvFilePath => {
                   const fileName = last(csvFilePath.split('/'))
                   return (
                     <React.Fragment key={fileName}>
@@ -128,7 +149,7 @@ export function ChooseCsvFile({
                           onChange={() => {
                             setCsvFileSelected({
                               filePath: csvFilePath,
-                              fileName: fileName,
+                              fileName,
                             })
                           }}
                           isSelected={csvFileSelected?.filePath === csvFilePath}
