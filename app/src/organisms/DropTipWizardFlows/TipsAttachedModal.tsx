@@ -46,9 +46,9 @@ const TipsAttachedModal = NiceModal.create(
     const { showDTWiz, toggleDTWiz } = useDropTipWizardFlows()
 
     const tipsAttachedHeader: ModalHeaderBaseProps = {
-      title: t('tips_are_attached'),
+      title: t('remove_any_attached_tips'),
       iconName: 'ot-alert',
-      iconColor: COLORS.yellow50,
+      iconColor: COLORS.red50,
     }
 
     const cleanUpAndClose = (): void => {
@@ -66,7 +66,7 @@ const TipsAttachedModal = NiceModal.create(
             <LegacyStyledText as="p">
               <Trans
                 t={t}
-                i18nKey="remove_the_tips"
+                i18nKey="liquid_may_damage_pipette"
                 values={{
                   mount: displayMountText,
                 }}
