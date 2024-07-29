@@ -1196,7 +1196,7 @@ async def test_set_error_recovery_policy(
     decoy: Decoy, action_dispatcher: ActionDispatcher, subject: ProtocolEngine
 ) -> None:
     """It should set the error recovery policy by dispatching an action."""
-    await subject.set_error_recovery_policy(sentinel.new_policy)
+    subject.set_error_recovery_policy(sentinel.new_policy)
     decoy.verify(
         action_dispatcher.dispatch(SetErrorRecoveryPolicyAction(sentinel.new_policy))
     )
