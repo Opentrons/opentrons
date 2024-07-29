@@ -199,6 +199,9 @@ class CommandState:
     This value can be used to generate future hashes.
     """
 
+    failed_command_errors: Optional[List[ErrorOccurrence]]
+    """List of errors that occurred during run execution."""
+
     stopped_by_estop: bool
     """If this is set to True, the engine was stopped by an estop event."""
 
@@ -230,6 +233,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
             run_started_at=None,
             latest_protocol_command_hash=None,
             stopped_by_estop=False,
+            failed_command_errors=None,
         )
 
     def handle_action(self, action: Action) -> None:
@@ -319,6 +323,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
             notes=action.notes,
         )
         self._state.failed_command = self._state.command_history.get(action.command_id)
+        self._state.failed_command_errors.append(public_error_occurrence)
 
         other_command_ids_to_fail: List[str]
         if prev_entry.command.intent == CommandIntent.SETUP:
