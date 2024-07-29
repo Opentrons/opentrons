@@ -283,7 +283,7 @@ async def create_protocol(  # noqa: C901
         quick_transfer_protocols = [
             protocol
             for protocol in protocol_store.get_all()
-            if protocol.protocol_kind == ProtocolKind.QUICK_TRANSFER.value
+            if protocol.protocol_kind == ProtocolKind.QUICK_TRANSFER
         ]
         if len(quick_transfer_protocols) >= maximum_quick_transfer_protocols:
             raise HTTPException(
