@@ -279,22 +279,6 @@ async def create_protocol(  # noqa: C901
         created_at: Timestamp to attach to the new resource.
         maximum_quick_transfer_protocols: Robot setting value limiting stored quick transfers protocols.
     """
-    if protocol_kind == ProtocolKind.QUICK_TRANSFER:
-        quick_transfer_protocols = [
-            protocol
-            for protocol in protocol_store.get_all()
-            if protocol.protocol_kind == ProtocolKind.QUICK_TRANSFER
-        ]
-        if len(quick_transfer_protocols) >= maximum_quick_transfer_protocols:
-            raise HTTPException(
-                status_code=409, detail="Maximum quick transfer protocols exceeded"
-            )
-
-    for file in files:
-        # TODO(mm, 2024-02-07): Investigate whether the filename can actually be None.
-        assert file.filename is not None
-    buffered_files = await file_reader_writer.read(files=files)  # type: ignore[arg-type]
-
     # We have to do these isinstance checks because if `runTimeParameterValues` or
     # `protocolKind` are not specified in the request, then they get assigned a
     # Form(default) value instead of just the default value. \(O.o)/
@@ -313,6 +297,22 @@ async def create_protocol(  # noqa: C901
     )
     if not isinstance(protocol_kind, ProtocolKind):
         protocol_kind = ProtocolKind.STANDARD
+
+    if protocol_kind == ProtocolKind.QUICK_TRANSFER:
+        quick_transfer_protocols = [
+            protocol
+            for protocol in protocol_store.get_all()
+            if protocol.protocol_kind == ProtocolKind.QUICK_TRANSFER
+        ]
+        if len(quick_transfer_protocols) >= maximum_quick_transfer_protocols:
+            raise HTTPException(
+                status_code=409, detail="Maximum quick transfer protocols exceeded"
+            )
+
+    for file in files:
+        # TODO(mm, 2024-02-07): Investigate whether the filename can actually be None.
+        assert file.filename is not None
+    buffered_files = await file_reader_writer.read(files=files)  # type: ignore[arg-type]
 
     content_hash = await file_hasher.hash(buffered_files)
     cached_protocol_id = protocol_store.get_id_by_hash(content_hash)
