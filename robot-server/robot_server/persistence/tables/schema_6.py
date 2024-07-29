@@ -16,6 +16,13 @@ class PrimitiveParamSQLEnum(enum.Enum):
     STR = "str"
 
 
+class ProtocolKindSQLEnum(enum.Enum):
+    """What kind a stored protocol is."""
+
+    STANDARD = "standard"
+    QUICK_TRANSFER = "quick-transfer"
+
+
 protocol_table = sqlalchemy.Table(
     "protocol",
     metadata,
@@ -30,7 +37,16 @@ protocol_table = sqlalchemy.Table(
         nullable=False,
     ),
     sqlalchemy.Column("protocol_key", sqlalchemy.String, nullable=True),
-    sqlalchemy.Column("protocol_kind", sqlalchemy.String, nullable=True),
+    sqlalchemy.Column(
+        "protocol_kind",
+        sqlalchemy.Enum(
+            ProtocolKindSQLEnum,
+            values_callable=lambda obj: [e.value for e in obj],
+            create_constraint=True,
+        ),
+        index=True,
+        nullable=False,
+    ),
 )
 
 analysis_table = sqlalchemy.Table(

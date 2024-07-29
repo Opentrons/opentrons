@@ -12,6 +12,7 @@ from .schema_6 import (
     action_table,
     data_files_table,
     PrimitiveParamSQLEnum,
+    ProtocolKindSQLEnum,
 )
 
 
@@ -26,4 +27,5 @@ __all__ = [
     "action_table",
     "data_files_table",
     "PrimitiveParamSQLEnum",
+    "ProtocolKindSQLEnum",
 ]
