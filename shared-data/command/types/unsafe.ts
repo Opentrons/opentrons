@@ -4,10 +4,12 @@ import type { MotorAxes } from '../../js/types'
 export type UnsafeRunTimeCommand =
   | UnsafeBlowoutInPlaceRunTimeCommand
   | UnsafeDropTipInPlaceRunTimeCommand
+  | UnsafeUpdatePositionEstimatorsRunTimeCommand
 
 export type UnsafeCreateCommand =
   | UnsafeBlowoutInPlaceCreateCommand
   | UnsafeDropTipInPlaceCreateCommand
+  | UnsafeUpdatePositionEstimatorsCreateCommand
 
 export interface UnsafeBlowoutInPlaceParams {
   pipetteId: string

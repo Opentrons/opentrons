@@ -119,8 +119,12 @@ export function useDropTipCommands({
 
       if (addressableAreaFromConfig != null) {
         const moveToAACommand = buildMoveToAACommand(addressableAreaFromConfig)
-
-        return chainRunCommands([moveToAACommand], true)
+        return chainRunCommands(
+          isFlex
+            ? [UPDATE_ESTIMATORS_EXCEPT_PLUNGERS, moveToAACommand]
+            : [moveToAACommand],
+          true
+        )
           .then((commandData: CommandData[]) => {
             const error = commandData[0].data.error
             if (error != null) {
@@ -264,6 +268,11 @@ const HOME: CreateCommand = {
 
 const HOME_EXCEPT_PLUNGERS: CreateCommand = {
   commandType: 'home' as const,
+  params: { axes: ['leftZ', 'rightZ', 'x', 'y'] },
+}
+
+const UPDATE_ESTIMATORS_EXCEPT_PLUNGERS: CreateCommand = {
+  commandType: 'unsafe/updatePositionEstimators' as const,
   params: { axes: ['leftZ', 'rightZ', 'x', 'y'] },
 }
 
