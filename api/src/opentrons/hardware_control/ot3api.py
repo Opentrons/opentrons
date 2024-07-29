@@ -1144,6 +1144,8 @@ class OT3API(
     async def update_axis_position_estimations(self, axes: Sequence[Axis]) -> None:
         """Update specified axes position estimators from their encoders."""
         await self._update_position_estimation(axes)
+        await self._cache_current_position()
+        await self._cache_encoder_position()
 
     async def move_to(
         self,
