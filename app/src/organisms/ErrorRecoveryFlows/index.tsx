@@ -124,7 +124,7 @@ export function ErrorRecoveryFlows(
 
   React.useEffect(() => {
     analytics.reportErrorEvent(failedCommand)
-  }, [analytics, failedCommand])
+  }, [failedCommand])
 
   const isDoorOpen = useShowDoorInfo(runStatus)
 
