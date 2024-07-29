@@ -30,9 +30,10 @@ import type { CurrentRecoveryOptionUtils } from './useRecoveryRouting'
 import type { RecoveryActionMutationResult } from './useRecoveryActionMutation'
 import type { StepCounts } from '../../../resources/protocols/hooks'
 import type { UseRecoveryAnalyticsResult } from './useRecoveryAnalytics'
+import type { UseRecoveryTakeoverResult } from './useRecoveryTakeover'
 
 type ERUtilsProps = ErrorRecoveryFlowsProps & {
-  toggleERWizAsActiveUser: (launchER: boolean) => Promise<void>
+  toggleERWizAsActiveUser: UseRecoveryTakeoverResult['toggleERWizAsActiveUser']
   hasLaunchedRecovery: boolean
   isOnDevice: boolean
   robotType: RobotType

@@ -22,7 +22,6 @@ import {
   PrimaryButton,
   SecondaryButton,
 } from '@opentrons/components'
-import { useHost } from '@opentrons/react-api-client'
 
 import { useErrorName } from './hooks'
 import { getErrorKind } from './utils'
@@ -36,7 +35,11 @@ import {
 
 import type { RobotType } from '@opentrons/shared-data'
 import type { ErrorRecoveryFlowsProps } from '.'
-import type { ERUtilsResults, UseRecoveryAnalyticsResult } from './hooks'
+import type {
+  ERUtilsResults,
+  UseRecoveryAnalyticsResult,
+  UseRecoveryTakeoverResult,
+} from './hooks'
 
 export function useRunPausedSplash(
   isOnDevice: boolean,
@@ -44,7 +47,11 @@ export function useRunPausedSplash(
 ): boolean {
   // Don't show the splash when desktop ER wizard is active,
   // but always show it on the ODD (with or without the wizard rendered above it).
-  return !(!isOnDevice && showERWizard)
+  if (isOnDevice) {
+    return true
+  } else {
+    return !showERWizard
+  }
 }
 
 type RunPausedSplashProps = ERUtilsResults & {
@@ -53,7 +60,7 @@ type RunPausedSplashProps = ERUtilsResults & {
   protocolAnalysis: ErrorRecoveryFlowsProps['protocolAnalysis']
   robotType: RobotType
   robotName: string
-  toggleERWizAsActiveUser: (launchER: boolean) => Promise<void>
+  toggleERWizAsActiveUser: UseRecoveryTakeoverResult['toggleERWizAsActiveUser']
   analytics: UseRecoveryAnalyticsResult
 }
 export function RunPausedSplash(
@@ -84,14 +91,14 @@ export function RunPausedSplash(
 
   // Do not launch error recovery, but do utilize the wizard's cancel route.
   const onCancelClick = (): Promise<void> => {
-    return toggleERWizAsActiveUser(false).then(() => {
+    return toggleERWizAsActiveUser(true, false).then(() => {
       reportInitialActionEvent('cancel-run')
       void proceedToRouteAndStep(RECOVERY_MAP.CANCEL_RUN.ROUTE)
     })
   }
 
   const onLaunchERClick = (): Promise<void> => {
-    return toggleERWizAsActiveUser(true).then(() => {
+    return toggleERWizAsActiveUser(true, true).then(() => {
       reportInitialActionEvent('launch-recovery')
     })
   }

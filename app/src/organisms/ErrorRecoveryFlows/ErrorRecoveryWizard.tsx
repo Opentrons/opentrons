@@ -32,10 +32,10 @@ import type { RecoveryContentProps } from './types'
 import type { ERUtilsResults, UseRecoveryAnalyticsResult } from './hooks'
 import type { ErrorRecoveryFlowsProps } from '.'
 
-interface UseERWizardResult {
+export interface UseERWizardResult {
   hasLaunchedRecovery: boolean
   showERWizard: boolean
-  toggleERWizard: (hasLaunchedER: boolean) => Promise<void>
+  toggleERWizard: (isActive: boolean, hasLaunchedER?: boolean) => Promise<void>
 }
 
 export function useERWizard(): UseERWizardResult {
@@ -45,9 +45,14 @@ export function useERWizard(): UseERWizardResult {
   // when recovery mode has not been launched.
   const [hasLaunchedRecovery, setHasLaunchedRecovery] = React.useState(false)
 
-  const toggleERWizard = (hasLaunchedER: boolean): Promise<void> => {
-    setHasLaunchedRecovery(hasLaunchedER)
-    setShowERWizard(!showERWizard)
+  const toggleERWizard = (
+    isActive: boolean,
+    hasLaunchedER?: boolean
+  ): Promise<void> => {
+    if (hasLaunchedER !== undefined) {
+      setHasLaunchedRecovery(hasLaunchedER)
+    }
+    setShowERWizard(isActive)
     return Promise.resolve()
   }
 

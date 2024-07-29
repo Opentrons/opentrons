@@ -8,8 +8,23 @@ import {
 } from '../../../resources/client_data'
 
 import type { ClientDataRecovery } from '../../../resources/client_data'
+import type { UseERWizardResult } from '../ErrorRecoveryWizard'
 
 const CLIENT_DATA_INTERVAL_MS = 5000
+
+export interface UseRecoveryTakeoverResult {
+  /* Whether to show the takeover modal. */
+  showTakeover: boolean
+  /* Whether the user is permitted to enter *any* ER flows, including the cancel flow. */
+  isActiveUser: boolean
+  /* Wraps toggleERWiz with the ability to claim immediate active user status and inform the network of the client's active user status. */
+  toggleERWizAsActiveUser: (
+    isActive: boolean,
+    launchER: boolean
+  ) => Promise<void>
+  /* Indicates the active user's recovery intent. */
+  intent: ClientDataRecovery['intent']
+}
 
 /**
  * A client is the active user when actively engaging in Error Recovery (ex, clicking an option from the splash screen).
@@ -23,17 +38,8 @@ const CLIENT_DATA_INTERVAL_MS = 5000
  * A client claims the active user status via a CTA, and then informs other clients of their active user status.
  */
 export function useRecoveryTakeover(
-  toggleERWiz: (launchER: boolean) => Promise<void>
-): {
-  /* Whether to show the takeover modal. */
-  showTakeover: boolean
-  /* Whether the user is permitted to enter *any* ER flows, including the cancel flow. */
-  isActiveUser: boolean
-  /* Wraps toggleERWiz with the ability to claim immediate active user status and inform the network of the client's active user status. */
-  toggleERWizAsActiveUser: (launchER: boolean) => Promise<void>
-  /* Indicates the active user's recovery intent. */
-  intent: ClientDataRecovery['intent']
-} {
+  toggleERWiz: UseERWizardResult['toggleERWizard']
+): UseRecoveryTakeoverResult {
   const [isActiveUser, setIsActiveUser] = React.useState(false)
 
   const thisUserId = useSelector(getUserId)
@@ -44,7 +50,10 @@ export function useRecoveryTakeover(
 
   const showTakeover = !(activeId == null || thisUserId === activeId)
 
-  const toggleERWizAsActiveUser = (launchER: boolean): Promise<void> => {
+  const toggleERWizAsActiveUser = (
+    isActive: boolean,
+    launchER: boolean
+  ): Promise<void> => {
     const newIsActiveUser = !isActiveUser
     setIsActiveUser(newIsActiveUser)
 
@@ -57,10 +66,12 @@ export function useRecoveryTakeover(
     }
     // If the client is in a takeover and then presses "go back" enough to get back to the splash, revoke the client's active status.
     else if (isActiveUser && !newIsActiveUser) {
-      clearClientData()
+      void toggleERWiz(false).then(() => {
+        clearClientData()
+      })
     }
 
-    return toggleERWiz(launchER)
+    return toggleERWiz(isActive, launchER)
   }
 
   // Update the client's active user status implicitly if revoked by a different client.

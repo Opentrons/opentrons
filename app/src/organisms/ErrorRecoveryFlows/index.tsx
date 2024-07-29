@@ -126,7 +126,6 @@ export function ErrorRecoveryFlows(
   const { hasLaunchedRecovery, toggleERWizard, showERWizard } = useERWizard()
   const isOnDevice = useSelector(getIsOnDevice)
   const robotType = protocolAnalysis?.robotType ?? OT2_ROBOT_TYPE
-  const showSplash = useRunPausedSplash(isOnDevice, showERWizard)
   const robotName = useHost()?.robotName ?? 'robot'
 
   const isDoorOpen = useShowDoorInfo(runStatus)
@@ -137,6 +136,7 @@ export function ErrorRecoveryFlows(
     toggleERWizAsActiveUser,
   } = useRecoveryTakeover(toggleERWizard)
   const renderWizard = isActiveUser && (showERWizard || isDoorOpen)
+  const showSplash = useRunPausedSplash(isOnDevice, renderWizard)
 
   const recoveryUtils = useERUtils({
     ...props,
