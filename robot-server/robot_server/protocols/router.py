@@ -220,6 +220,8 @@ async def create_protocol(  # noqa: C901
         alias="runTimeParameterValues",
     ),
     protocol_kind: ProtocolKind = Form(
+        # This default needs to be kept in sync with the function body.
+        # See todo comments.
         default=ProtocolKind.STANDARD,
         description=(
             "Whether this is a `standard` protocol or a `quick-transfer` protocol."
@@ -293,11 +295,12 @@ async def create_protocol(  # noqa: C901
         assert file.filename is not None
     buffered_files = await file_reader_writer.read(files=files)  # type: ignore[arg-type]
 
-    # We have to do this isinstance check because if `runTimeParameterValues` is
-    # not specified in the request, then it gets assigned a Form(None) value
-    # instead of just a None. \(O.o)/
+    # We have to do these isinstance checks because if `runTimeParameterValues` or
+    # `protocolKind` are not specified in the request, then they get assigned a
+    # Form(default) value instead of just the default value. \(O.o)/
     # TODO: check if we can make our own "RTP multipart-form field" Pydantic type
     #  so we can validate the data contents and return a better error response.
+    # TODO: check if this is still necessary after converting FastAPI args to Annotated.
     parsed_rtp_values = (
         json.loads(run_time_parameter_values)
         if isinstance(run_time_parameter_values, str)
@@ -308,6 +311,9 @@ async def create_protocol(  # noqa: C901
         if isinstance(run_time_parameter_files, str)
         else {}
     )
+    if not isinstance(protocol_kind, ProtocolKind):
+        protocol_kind = ProtocolKind.STANDARD
+
     content_hash = await file_hasher.hash(buffered_files)
     cached_protocol_id = protocol_store.get_id_by_hash(content_hash)
 
