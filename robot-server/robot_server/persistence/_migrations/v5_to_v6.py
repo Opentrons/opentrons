@@ -30,6 +30,7 @@ from ._util import copy_rows_unmodified, copy_if_exists, copytree_if_exists
 from .._files_and_directories import (
     DECK_CONFIGURATION_FILE,
     PROTOCOLS_DIRECTORY,
+    DATA_FILES_DIRECTORY,
     DB_FILE,
 )
 
@@ -43,6 +44,9 @@ class Migration5to6(Migration):  # noqa: D101
         )
         copytree_if_exists(
             source_dir / PROTOCOLS_DIRECTORY, dest_dir / PROTOCOLS_DIRECTORY
+        )
+        copytree_if_exists(
+            source_dir / DATA_FILES_DIRECTORY, dest_dir / DATA_FILES_DIRECTORY
         )
 
         source_db_file = source_dir / DB_FILE
