@@ -19,6 +19,10 @@ Welcome to the v7.5.0 release of the Opentrons robot software!
 
 - Fixed certain string runtime parameter values being misinterpreted as an incorrect type.
 
+### Known Issue
+
+- If the HEPA/UV Module is removed from the top of Flex while its lights are on, thus activating its safety shutoff, its buttons may not respond properly once it is reattached. Power cycle the module to restore normal behavior. The module is safe to use even if you do not power cycle it.
+
 ---
 
 ## Opentrons Robot Software Changes in 7.3.1
