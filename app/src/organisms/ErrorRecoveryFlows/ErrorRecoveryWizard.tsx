@@ -131,7 +131,7 @@ export function ErrorRecoveryComponent(
     </StyledText>
   )
 
-  // TODO(jh, 07-16-24): Revisit making RecoveryDoorOpen a route.
+  // TODO(jh, 07-29-24): Make RecoveryDoorOpen render logic equivalent to RecoveryTakeover. Do not nest it in RecoveryWizard.
   const buildInterventionContent = (): JSX.Element => {
     if (isDoorOpen) {
       return <RecoveryDoorOpen {...props} />
