@@ -27,15 +27,15 @@ export interface UseRecoveryTakeoverResult {
 }
 
 /**
- * A client is the active user when actively engaging in Error Recovery (ex, clicking an option from the splash screen).
+ * A client is the active user when actively engaging in Error Recovery. A client claims the active user status via a CTA
+ * (ex, clicking an option from the splash screen), and then informs other clients of their active user status.
+ *
  * An active user may be made inactive through three methods:
  * 1) If a different client revokes the active user status (ex "terminate remote activity").
  * In this instance, the client will not be the active user, but may *not* see a takeover modal if a different user has
  * yet to become the active user.
  * 2) The client yields their active status by returning to the splash page (the client is not actively using error recovery).
  * 3) Completing a recovery flow.
- *
- * A client claims the active user status via a CTA, and then informs other clients of their active user status.
  */
 export function useRecoveryTakeover(
   toggleERWiz: UseERWizardResult['toggleERWizard']
@@ -47,6 +47,22 @@ export function useRecoveryTakeover(
     refetchInterval: CLIENT_DATA_INTERVAL_MS,
   })
   const { updateWithIntent, clearClientData } = useUpdateClientDataRecovery()
+
+  // Update the client's active user status implicitly if revoked by a different client.
+  React.useEffect(() => {
+    if (isActiveUser && activeId !== thisUserId) {
+      setIsActiveUser(false)
+    }
+  }, [activeId]) // Not all dependencies added for intended behavior!
+
+  // If Error Recovery unrenders and this client is the active user, revoke the client's active user status.
+  React.useEffect(() => {
+    return () => {
+      if (isActiveUser) {
+        clearClientData()
+      }
+    }
+  }, [])
 
   const showTakeover = !(activeId == null || thisUserId === activeId)
 
@@ -73,13 +89,6 @@ export function useRecoveryTakeover(
 
     return toggleERWiz(isActive, launchER)
   }
-
-  // Update the client's active user status implicitly if revoked by a different client.
-  React.useEffect(() => {
-    if (isActiveUser && activeId !== thisUserId) {
-      setIsActiveUser(false)
-    }
-  }, [activeId]) // Not all dependencies added for intended behavior!
 
   return {
     showTakeover,
