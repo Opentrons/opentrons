@@ -76,5 +76,6 @@ class ErrorRecoveryPolicies(BaseModel):
 
     policyRules: List[ErrorRecoveryRule] = Field(
         ...,
-        description="The criteria that must be met for this rule to be applied.",
+        description="A list or error recovery rules to apply for a run's recovery management."
+        "The rules are evaluated first-to-last. The first exact match will dectate recovery management.",
     )

@@ -371,7 +371,7 @@ async def update_run(
     summary="Set run policies",
     description=dedent(
         """
-        When in error recovery, add the ability to ignore errors for commands.
+        Update how to handle different kinds of command failures.
         The following rules will persist during the run.
         """
     ),
