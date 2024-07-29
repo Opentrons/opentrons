@@ -65,6 +65,13 @@ def _migrate_db_with_changes(
     source_transaction: sqlalchemy.engine.Connection,
     dest_transaction: sqlalchemy.engine.Connection,
 ) -> None:
+    copy_rows_unmodified(
+        schema_5.data_files_table,
+        schema_6.data_files_table,
+        source_transaction,
+        dest_transaction,
+        order_by_rowid=True,
+    )
     _migrate_protocol_table_with_new_protocol_kind_col(
         source_transaction,
         dest_transaction,
