@@ -371,7 +371,8 @@ async def update_run(
     summary="Set run policies",
     description=dedent(
         """
-        Set run policies for error recovery.
+        When in error recovery, add the ability to ignore errors for commands.
+        The following rules will persist during the run.
         """
     ),
     status_code=status.HTTP_201_CREATED,
