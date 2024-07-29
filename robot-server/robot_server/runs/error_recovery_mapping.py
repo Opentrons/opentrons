@@ -37,7 +37,7 @@ def create_error_recovery_policy_from_rules(
 
             if command_type_matches and error_type_matches:
                 if rule.ifMatch == ReactionIfMatch.IGNORE_AND_CONTINUE:
-                    raise NotImplementedError  # No protocol engine support for this yet. It's in EXEC-302.
+                    return ErrorRecoveryType.IGNORE_AND_CONTINUE
                 elif rule.ifMatch == ReactionIfMatch.FAIL_RUN:
                     return ErrorRecoveryType.FAIL_RUN
                 elif rule.ifMatch == ReactionIfMatch.WAIT_FOR_RECOVERY:

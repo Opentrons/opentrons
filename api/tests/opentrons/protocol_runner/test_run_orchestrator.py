@@ -8,6 +8,7 @@ from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 from decoy import Decoy
 from typing import Union, Generator
 
+from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
 from opentrons.protocol_engine.errors import RunStoppedError
 from opentrons.protocol_engine.state import StateStore
 from opentrons.protocols.api_support.types import APIVersion
@@ -518,3 +519,14 @@ async def test_command_generator(
     async for command in live_protocol_subject.command_generator():
         assert command == f"command-id-{index}"
         index = index + 1
+
+
+async def test_create_error_recovery_policy(
+    decoy: Decoy,
+    mock_protocol_engine: ProtocolEngine,
+    live_protocol_subject: RunOrchestrator,
+) -> None:
+    """Should call PE set_error_recovery_policy."""
+    policy = decoy.mock(cls=ErrorRecoveryPolicy)
+    live_protocol_subject.set_error_recovery_policy(policy)
+    decoy.verify(mock_protocol_engine.set_error_recovery_policy(policy))

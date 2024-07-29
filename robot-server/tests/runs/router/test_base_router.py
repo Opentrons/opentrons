@@ -9,6 +9,7 @@ from opentrons.protocol_engine import LabwareOffsetCreate, types as pe_types
 from opentrons.protocol_reader import ProtocolSource, JsonProtocolConfig
 
 from robot_server.errors.error_responses import ApiError
+from robot_server.runs.error_recovery_models import ErrorRecoveryPolicies
 from robot_server.service.json_api import (
     RequestModel,
     SimpleBody,
@@ -37,6 +38,7 @@ from robot_server.runs.router.base_router import (
     get_runs,
     remove_run,
     update_run,
+    set_run_policies,
 )
 
 from robot_server.deck_configuration.store import DeckConfigurationStore
@@ -569,3 +571,41 @@ async def test_update_to_current_missing(
 
     assert exc_info.value.status_code == 404
     assert exc_info.value.content["errors"][0]["id"] == "RunNotFound"
+
+
+async def test_create_policies(
+    decoy: Decoy, mock_run_data_manager: RunDataManager
+) -> None:
+    """It should call RunDataManager create run policies."""
+    policies = decoy.mock(cls=ErrorRecoveryPolicies)
+    await set_run_policies(
+        runId="rud-id",
+        request_body=RequestModel(data=policies),
+        run_data_manager=mock_run_data_manager,
+    )
+    decoy.verify(
+        mock_run_data_manager.set_policies(
+            run_id="rud-id", policies=policies.policyRules
+        )
+    )
+
+
+async def test_create_policies_raises_not_active_run(
+    decoy: Decoy, mock_run_data_manager: RunDataManager
+) -> None:
+    """It should raise that the run is not current."""
+    policies = decoy.mock(cls=ErrorRecoveryPolicies)
+    decoy.when(
+        mock_run_data_manager.set_policies(
+            run_id="rud-id", policies=policies.policyRules
+        )
+    ).then_raise(RunNotCurrentError())
+    with pytest.raises(ApiError) as exc_info:
+        await set_run_policies(
+            runId="rud-id",
+            request_body=RequestModel(data=policies),
+            run_data_manager=mock_run_data_manager,
+        )
+
+    assert exc_info.value.status_code == 409
+    assert exc_info.value.content["errors"][0]["id"] == "RunStopped"

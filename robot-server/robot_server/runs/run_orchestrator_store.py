@@ -46,6 +46,7 @@ from opentrons.protocol_engine.types import (
 )
 from opentrons_shared_data.labware.types import LabwareUri
 
+from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
 
 _log = logging.getLogger(__name__)
 
@@ -358,6 +359,10 @@ class RunOrchestratorStore:
     def add_labware_definition(self, definition: LabwareDefinition) -> LabwareUri:
         """Add a new labware definition to state."""
         return self.run_orchestrator.add_labware_definition(definition)
+
+    def set_error_recovery_policy(self, policy: ErrorRecoveryPolicy) -> None:
+        """Create run policy rules for error recovery."""
+        self.run_orchestrator.set_error_recovery_policy(policy)
 
     async def add_command_and_wait_for_interval(
         self,
