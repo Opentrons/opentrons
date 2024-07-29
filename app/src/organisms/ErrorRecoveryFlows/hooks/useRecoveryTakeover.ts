@@ -62,7 +62,7 @@ export function useRecoveryTakeover(
         clearClientData()
       }
     }
-  }, [])
+  }, [clearClientData, isActiveUser])
 
   const showTakeover = !(activeId == null || thisUserId === activeId)
 

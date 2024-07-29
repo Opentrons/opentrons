@@ -1,9 +1,11 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+
 import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
+
 import { TakeoverModal } from './TakeoverModal'
 import { MaintenanceRunStatusProvider } from './MaintenanceRunStatusProvider'
 import { useMaintenanceRunTakeover } from './useMaintenanceRunTakeover'
-import { useTranslation } from 'react-i18next'
 
 interface MaintenanceRunTakeoverProps {
   children: React.ReactNode

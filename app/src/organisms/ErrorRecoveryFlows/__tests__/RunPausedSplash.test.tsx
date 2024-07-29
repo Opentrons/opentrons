@@ -78,6 +78,7 @@ describe('RunPausedSplash', () => {
   beforeEach(() => {
     props = {
       ...mockRecoveryContentProps,
+      robotName: 'testRobot',
       toggleERWizAsActiveUser: mockToggleERWiz,
       routeUpdateActions: mockRouteUpdateActions,
     }
@@ -126,7 +127,7 @@ describe('RunPausedSplash', () => {
       expect(mockToggleERWiz).toHaveBeenCalledTimes(1)
     })
     await waitFor(() => {
-      expect(mockToggleERWiz).toHaveBeenCalledWith(false)
+      expect(mockToggleERWiz).toHaveBeenCalledWith(true, false)
     })
     await waitFor(() => {
       expect(mockProceedToRouteAndStep).toHaveBeenCalledTimes(1)
@@ -141,7 +142,7 @@ describe('RunPausedSplash', () => {
       expect(mockToggleERWiz).toHaveBeenCalledTimes(2)
     })
     await waitFor(() => {
-      expect(mockToggleERWiz).toHaveBeenCalledWith(true)
+      expect(mockToggleERWiz).toHaveBeenCalledWith(true, true)
     })
   })
 })

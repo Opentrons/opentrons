@@ -14,6 +14,7 @@ import {
   RUN_STATUS_SUCCEEDED,
 } from '@opentrons/api-client'
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import { useHost } from '@opentrons/react-api-client'
 
 import { getIsOnDevice } from '../../redux/config'
 import { ErrorRecoveryWizard, useERWizard } from './ErrorRecoveryWizard'
@@ -30,7 +31,6 @@ import {
 import type { RunStatus } from '@opentrons/api-client'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { FailedCommand } from './types'
-import { useHost } from '@opentrons/react-api-client'
 
 const VALID_ER_RUN_STATUSES: RunStatus[] = [
   RUN_STATUS_AWAITING_RECOVERY,

@@ -27,7 +27,6 @@ import type { UseRouteUpdateActionsResult } from './useRouteUpdateActions'
 import type { RecoveryToasts } from './useRecoveryToasts'
 import type { UseRecoveryAnalyticsResult } from './useRecoveryAnalytics'
 import type { CurrentRecoveryOptionUtils } from './useRecoveryRouting'
-import { useUpdateClientDataRecovery } from '../../../resources/client_data'
 
 interface UseRecoveryCommandsParams {
   runId: string
