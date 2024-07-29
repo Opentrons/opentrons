@@ -11,12 +11,17 @@ import type { StepFormDropdown } from '../StepFormDropdownField'
 
 import styles from '../../StepEditForm.module.css'
 
+type TipWellSelectionFieldProps = Omit<
+  React.ComponentProps<typeof StepFormDropdown>,
+  'options'
+> & {
+  pipetteId: unknown
+  labwareId: unknown
+  nozzles: string | null
+}
+
 export function TipWellSelectionField(
-  props: Omit<React.ComponentProps<typeof StepFormDropdown>, 'options'> & {
-    pipetteId: unknown
-    labwareId: unknown
-    nozzles: string | null
-  }
+  props: TipWellSelectionFieldProps
 ): JSX.Element {
   const {
     value: selectedWells,
@@ -33,7 +38,7 @@ export function TipWellSelectionField(
   const primaryWellCount =
     Array.isArray(selectedWells) && selectedWells.length > 0
       ? selectedWells.length.toString()
-      : undefined
+      : null
   const [openModal, setOpenModal] = React.useState<boolean>(false)
   const pipette = pipetteId != null ? pipetteEntities[String(pipetteId)] : null
   const nozzleType = getNozzleType(pipette, nozzles)
@@ -68,7 +73,7 @@ export function TipWellSelectionField(
           readOnly
           error={errorToShow}
           name={name}
-          value={primaryWellCount ?? null}
+          value={primaryWellCount}
           onClick={() => {
             setOpenModal(true)
           }}

@@ -34,15 +34,15 @@ export const MoveLiquidForm = (props: StepFormProps): JSX.Element => {
   const { t } = useTranslation(['application', 'form'])
   const [collapsed, _setCollapsed] = React.useState<boolean>(true)
   const enableReturnTip = useSelector(getEnableReturnTip)
-  const labware = useSelector(getLabwareEntities)
+  const labwares = useSelector(getLabwareEntities)
   const pipettes = useSelector(getPipetteEntities)
   const toggleCollapsed = (): void => {
     _setCollapsed(!collapsed)
   }
   const userSelectedPickUpTipLocation =
-    labware[String(propsForFields.pickUpTip_location.value)] != null
+    labwares[String(propsForFields.pickUpTip_location.value)] != null
   const userSelectedDropTipLocation =
-    labware[String(propsForFields.dropTip_location.value)] != null
+    labwares[String(propsForFields.dropTip_location.value)] != null
 
   const is96Channel =
     propsForFields.pipette.value != null &&

@@ -206,7 +206,7 @@ export const getNozzleType = (
   pipette: PipetteEntity | null,
   nozzles: string | null
 ): NozzleType | null => {
-  const is8Channel = pipette != null ? pipette.spec.channels === 8 : false
+  const is8Channel = pipette != null && pipette.spec.channels === 8
   if (is8Channel) {
     return '8-channel'
   } else if (nozzles === COLUMN) {

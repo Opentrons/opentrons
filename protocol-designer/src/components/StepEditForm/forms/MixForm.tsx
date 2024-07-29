@@ -42,7 +42,7 @@ export const MixForm = (props: StepFormProps): JSX.Element => {
   const [collapsed, setCollapsed] = React.useState(true)
   const pipettes = useSelector(getPipetteEntities)
   const enableReturnTip = useSelector(getEnableReturnTip)
-  const labware = useSelector(getLabwareEntities)
+  const labwares = useSelector(getLabwareEntities)
   const { t } = useTranslation(['application', 'form'])
 
   const { propsForFields, formData } = props
@@ -50,9 +50,9 @@ export const MixForm = (props: StepFormProps): JSX.Element => {
     propsForFields.pipette.value != null &&
     pipettes[String(propsForFields.pipette.value)].name === 'p1000_96'
   const userSelectedPickUpTipLocation =
-    labware[String(propsForFields.pickUpTip_location.value)] != null
+    labwares[String(propsForFields.pickUpTip_location.value)] != null
   const userSelectedDropTipLocation =
-    labware[String(propsForFields.dropTip_location.value)] != null
+    labwares[String(propsForFields.dropTip_location.value)] != null
 
   const toggleCollapsed = (): void => {
     setCollapsed(prevCollapsed => !prevCollapsed)
