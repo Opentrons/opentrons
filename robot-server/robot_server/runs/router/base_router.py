@@ -5,7 +5,7 @@ Contains routes dealing primarily with `Run` models.
 import logging
 from datetime import datetime
 from textwrap import dedent
-from typing import Optional, Union, Callable, List
+from typing import Optional, Union, Callable
 from typing_extensions import Literal
 
 from fastapi import APIRouter, Depends, status, Query
@@ -45,7 +45,7 @@ from ..dependencies import (
     get_run_auto_deleter,
     get_quick_transfer_run_auto_deleter,
 )
-from ..error_recovery_models import ErrorRecoveryRule
+from ..error_recovery_models import ErrorRecoveryPolicies
 
 from robot_server.deck_configuration.fastapi_dependencies import (
     get_deck_configuration_store,
@@ -376,13 +376,13 @@ async def update_run(
     ),
     status_code=status.HTTP_201_CREATED,
     responses={
-        status.HTTP_201_CREATED: {"model": SimpleBody[Run]},
+        status.HTTP_200_OK: {"model": SimpleEmptyBody},
         status.HTTP_409_CONFLICT: {"model": ErrorBody[RunStopped]},
     },
 )
 async def set_run_policies(
     runId: str,
-    request_body: RequestModel[List[ErrorRecoveryRule]],
+    request_body: RequestModel[ErrorRecoveryPolicies],
     run_data_manager: RunDataManager = Depends(get_run_data_manager),
 ) -> PydanticResponse[SimpleEmptyBody]:
     """Create run polices.
@@ -392,8 +392,7 @@ async def set_run_policies(
         request_body:  Request body with run policies data.
         run_data_manager: Current and historical run data management.
     """
-    policies = request_body.data
-    print(policies)
+    policies = request_body.data.policyRules
     if policies:
         try:
             run_data_manager.set_policies(run_id=runId, policies=policies)
