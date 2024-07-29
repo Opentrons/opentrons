@@ -125,12 +125,12 @@ class RootFSInterface:
                     if len(chunk) != chunk_size:
                         break
 
-            # check that the uncompressed size is greater than the partition size
-            partition_size = PartitionManager.get_partition_size(part.path)
-            if total_size > partition_size:
-                msg = f"Write failed, update size ({total_size}) is larger than partition size {part.path} ({partition_size})."
-                LOG.error(msg)
-                return False, msg
+            ## check that the uncompressed size is greater than the partition size
+            #partition_size = PartitionManager.get_partition_size(part.path)
+            #if total_size > partition_size:
+            #    msg = f"Write failed, update size ({total_size}) is larger than partition size {part.path} ({partition_size})."
+            #    LOG.error(msg)
+            #    return False, msg
 
             with lzma.open(rootfs_filepath, "rb") as fsrc, open(
                 part.path, "wb"
