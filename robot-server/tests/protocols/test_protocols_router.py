@@ -157,7 +157,7 @@ async def test_get_protocols(
             content_hash="a_b_c",
         ),
         protocol_key="dummy-key-111",
-        protocol_kind=ProtocolKind.STANDARD.value,
+        protocol_kind=ProtocolKind.STANDARD,
     )
     resource_2 = ProtocolResource(
         protocol_id="123",
@@ -172,7 +172,7 @@ async def test_get_protocols(
             content_hash="1_2_3",
         ),
         protocol_key="dummy-key-222",
-        protocol_kind=ProtocolKind.STANDARD.value,
+        protocol_kind=ProtocolKind.STANDARD,
     )
     resource_3 = ProtocolResource(
         protocol_id="333",
@@ -187,7 +187,7 @@ async def test_get_protocols(
             content_hash="3_3_3",
         ),
         protocol_key="dummy-key-333",
-        protocol_kind=ProtocolKind.QUICK_TRANSFER.value,
+        protocol_kind=ProtocolKind.QUICK_TRANSFER,
     )
 
     analysis_1 = AnalysisSummary(id="analysis-id-abc", status=AnalysisStatus.PENDING)
@@ -330,7 +330,7 @@ async def test_get_protocol_by_id(
             content_hash="a_b_c",
         ),
         protocol_key="dummy-key-111",
-        protocol_kind=ProtocolKind.STANDARD.value,
+        protocol_kind=ProtocolKind.STANDARD,
     )
 
     analysis_summary = AnalysisSummary(
@@ -426,7 +426,7 @@ async def test_create_existing_protocol(
         created_at=datetime(year=2020, month=1, day=1),
         source=protocol_source,
         protocol_key="dummy-key-222",
-        protocol_kind=ProtocolKind.STANDARD.value,
+        protocol_kind=ProtocolKind.STANDARD,
     )
 
     completed_analysis = AnalysisSummary(
@@ -537,7 +537,7 @@ async def test_create_protocol(
         created_at=datetime(year=2021, month=1, day=1),
         source=protocol_source,
         protocol_key="dummy-key-111",
-        protocol_kind=ProtocolKind.STANDARD.value,
+        protocol_kind=ProtocolKind.STANDARD,
     )
 
     pending_analysis = AnalysisSummary(
@@ -659,7 +659,7 @@ async def test_create_new_protocol_with_run_time_params(
         created_at=datetime(year=2021, month=1, day=1),
         source=protocol_source,
         protocol_key="dummy-key-111",
-        protocol_kind=ProtocolKind.STANDARD.value,
+        protocol_kind=ProtocolKind.STANDARD,
     )
     run_time_parameter = NumberParameter(
         displayName="My parameter",
@@ -777,7 +777,7 @@ async def test_create_existing_protocol_with_no_previous_analysis(
         created_at=datetime(year=2020, month=1, day=1),
         source=protocol_source,
         protocol_key="dummy-key-222",
-        protocol_kind=ProtocolKind.STANDARD.value,
+        protocol_kind=ProtocolKind.STANDARD,
     )
     run_time_parameter = NumberParameter(
         displayName="My parameter",
@@ -899,7 +899,7 @@ async def test_create_existing_protocol_with_different_run_time_params(
         created_at=datetime(year=2020, month=1, day=1),
         source=protocol_source,
         protocol_key="dummy-key-222",
-        protocol_kind=ProtocolKind.STANDARD.value,
+        protocol_kind=ProtocolKind.STANDARD,
     )
 
     completed_summary = AnalysisSummary(
@@ -1033,7 +1033,7 @@ async def test_create_existing_protocol_with_same_run_time_params(
         created_at=datetime(year=2020, month=1, day=1),
         source=protocol_source,
         protocol_key="dummy-key-222",
-        protocol_kind=ProtocolKind.STANDARD.value,
+        protocol_kind=ProtocolKind.STANDARD,
     )
     run_time_parameter = NumberParameter(
         displayName="My parameter",
@@ -1158,7 +1158,7 @@ async def test_create_existing_protocol_with_pending_analysis_raises(
         created_at=datetime(year=2020, month=1, day=1),
         source=protocol_source,
         protocol_key="dummy-key-222",
-        protocol_kind=ProtocolKind.STANDARD.value,
+        protocol_kind=ProtocolKind.STANDARD,
     )
     run_time_parameter = NumberParameter(
         displayName="My parameter",
@@ -1603,7 +1603,7 @@ async def test_create_protocol_analyses_with_same_rtp_values(
         created_at=datetime(year=2020, month=1, day=1),
         source=protocol_source,
         protocol_key="dummy-key-222",
-        protocol_kind=ProtocolKind.STANDARD.value,
+        protocol_kind=ProtocolKind.STANDARD,
     )
     decoy.when(protocol_store.has(protocol_id="protocol-id")).then_return(True)
     decoy.when(protocol_store.get(protocol_id="protocol-id")).then_return(
@@ -1679,7 +1679,7 @@ async def test_update_protocol_analyses_with_new_rtp_values(
         created_at=datetime(year=2020, month=1, day=1),
         source=protocol_source,
         protocol_key="dummy-key-222",
-        protocol_kind=ProtocolKind.STANDARD.value,
+        protocol_kind=ProtocolKind.STANDARD,
     )
     analysis_summaries = [
         AnalysisSummary(
@@ -1794,7 +1794,7 @@ async def test_update_protocol_analyses_with_forced_reanalysis(
         created_at=datetime(year=2020, month=1, day=1),
         source=protocol_source,
         protocol_key="dummy-key-222",
-        protocol_kind=ProtocolKind.STANDARD.value,
+        protocol_kind=ProtocolKind.STANDARD,
     )
     decoy.when(protocol_store.has(protocol_id="protocol-id")).then_return(True)
     decoy.when(
@@ -1872,7 +1872,7 @@ async def test_create_protocol_kind_quick_transfer(
         created_at=datetime(year=2021, month=1, day=1),
         source=protocol_source,
         protocol_key="dummy-key-111",
-        protocol_kind=ProtocolKind.QUICK_TRANSFER.value,
+        protocol_kind=ProtocolKind.QUICK_TRANSFER,
     )
     run_time_parameter = NumberParameter(
         displayName="My parameter",
@@ -2000,7 +2000,7 @@ async def test_create_protocol_maximum_quick_transfer_protocols_exceeded(
         created_at=datetime(year=2020, month=1, day=1),
         source=protocol_source,
         protocol_key="dummy-key-222",
-        protocol_kind=ProtocolKind.QUICK_TRANSFER.value,
+        protocol_kind=ProtocolKind.QUICK_TRANSFER,
     )
 
     decoy.when(protocol_store.get_all()).then_return([stored_protocol_resource])

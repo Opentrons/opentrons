@@ -13,6 +13,8 @@ Summary of changes from schema 5:
           will still be available as part of the completed analysis blob.
 - Adds a new analysis_csv_rtp_table to store the CSV parameters' file IDs used in analysis
 - Adds a new run_csv_rtp_table to store the CSV parameters' file IDs used in runs
+- Converts protocol.protocol_kind to a constrained string (a SQL "enum"), makes it
+  non-nullable (NULL was semantically equivalent to "standard"), and adds an index.
 """
 
 from pathlib import Path
@@ -63,12 +65,9 @@ def _migrate_db_with_changes(
     source_transaction: sqlalchemy.engine.Connection,
     dest_transaction: sqlalchemy.engine.Connection,
 ) -> None:
-    copy_rows_unmodified(
-        schema_5.protocol_table,
-        schema_6.protocol_table,
+    _migrate_protocol_table_with_new_protocol_kind_col(
         source_transaction,
         dest_transaction,
-        order_by_rowid=True,
     )
     _migrate_analysis_table_excluding_rtp_defaults_and_vals(
         source_transaction,
@@ -95,6 +94,31 @@ def _migrate_db_with_changes(
         dest_transaction,
         order_by_rowid=True,
     )
+
+
+def _migrate_protocol_table_with_new_protocol_kind_col(
+    source_transaction: sqlalchemy.engine.Connection,
+    dest_transaction: sqlalchemy.engine.Connection,
+) -> None:
+    """Add a new 'protocol_kind' column to protocols table."""
+    select_old_protocols = sqlalchemy.select(schema_5.protocol_table).order_by(
+        sqlite_rowid
+    )
+    insert_new_protocol = sqlalchemy.insert(schema_6.protocol_table)
+    for old_row in source_transaction.execute(select_old_protocols).all():
+        new_protocol_kind = (
+            # Account for old_row.protocol_kind being NULL.
+            schema_6.ProtocolKindSQLEnum.QUICK_TRANSFER
+            if old_row.protocol_kind == "quick-transfer"
+            else schema_6.ProtocolKindSQLEnum.STANDARD
+        )
+        dest_transaction.execute(
+            insert_new_protocol,
+            id=old_row.id,
+            created_at=old_row.created_at,
+            protocol_key=old_row.protocol_key,
+            protocol_kind=new_protocol_kind,
+        )
 
 
 def _migrate_analysis_table_excluding_rtp_defaults_and_vals(

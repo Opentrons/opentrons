@@ -83,7 +83,7 @@ async def test_initialize_analyzer(
             content_hash="abc123",
         ),
         protocol_key="dummy-data-111",
-        protocol_kind=ProtocolKind.STANDARD.value,
+        protocol_kind=ProtocolKind.STANDARD,
     )
     analyzer = decoy.mock(cls=protocol_analyzer.ProtocolAnalyzer)
     decoy.when(
@@ -128,7 +128,7 @@ async def test_raises_error_and_saves_result_if_initialization_errors(
             content_hash="abc123",
         ),
         protocol_key="dummy-data-111",
-        protocol_kind=ProtocolKind.STANDARD.value,
+        protocol_kind=ProtocolKind.STANDARD,
     )
     raised_exception = Exception("Oh noooo!")
     enumerated_error = EnumeratedError(
@@ -197,7 +197,7 @@ async def test_start_analysis(
             content_hash="abc123",
         ),
         protocol_key="dummy-data-111",
-        protocol_kind=ProtocolKind.STANDARD.value,
+        protocol_kind=ProtocolKind.STANDARD,
     )
     bool_parameter = BooleanParameter(
         displayName="Foo", variableName="Bar", default=True, value=False

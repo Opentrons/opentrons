@@ -18,6 +18,7 @@ from robot_server.service.json_api import (
     ResourceLink,
 )
 
+from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.protocols.protocol_store import (
     ProtocolNotFoundError,
     ProtocolResource,
@@ -132,7 +133,7 @@ async def test_create_protocol_run(
     protocol_resource = ProtocolResource(
         protocol_id=protocol_id,
         protocol_key=None,
-        protocol_kind=None,
+        protocol_kind=ProtocolKind.STANDARD,
         created_at=datetime(year=2022, month=2, day=2),
         source=ProtocolSource(
             directory=Path("/dev/null"),

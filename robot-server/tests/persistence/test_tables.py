@@ -33,8 +33,9 @@ EXPECTED_STATEMENTS_LATEST = [
         id VARCHAR NOT NULL,
         created_at DATETIME NOT NULL,
         protocol_key VARCHAR,
-        protocol_kind VARCHAR,
-        PRIMARY KEY (id)
+        protocol_kind VARCHAR(14) NOT NULL,
+        PRIMARY KEY (id),
+        CONSTRAINT protocolkindsqlenum CHECK (protocol_kind IN ('standard', 'quick-transfer'))
     )
     """,
     """
@@ -112,6 +113,9 @@ EXPECTED_STATEMENTS_LATEST = [
     """,
     """
     CREATE UNIQUE INDEX ix_run_run_id_index_in_run ON run_command (run_id, index_in_run)
+    """,
+    """
+    CREATE INDEX ix_protocol_protocol_kind ON protocol (protocol_kind)
     """,
     """
     CREATE TABLE data_files (
