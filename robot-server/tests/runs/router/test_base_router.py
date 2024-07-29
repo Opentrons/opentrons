@@ -9,7 +9,7 @@ from opentrons.protocol_engine import LabwareOffsetCreate, types as pe_types
 from opentrons.protocol_reader import ProtocolSource, JsonProtocolConfig
 
 from robot_server.errors.error_responses import ApiError
-from robot_server.runs.error_recovery_models import ErrorRecoveryPolicies
+from robot_server.runs.error_recovery_models import ErrorRecoveryPolicy
 from robot_server.service.json_api import (
     RequestModel,
     SimpleBody,
@@ -577,7 +577,7 @@ async def test_create_policies(
     decoy: Decoy, mock_run_data_manager: RunDataManager
 ) -> None:
     """It should call RunDataManager create run policies."""
-    policies = decoy.mock(cls=ErrorRecoveryPolicies)
+    policies = decoy.mock(cls=ErrorRecoveryPolicy)
     await set_run_policies(
         runId="rud-id",
         request_body=RequestModel(data=policies),
@@ -594,7 +594,7 @@ async def test_create_policies_raises_not_active_run(
     decoy: Decoy, mock_run_data_manager: RunDataManager
 ) -> None:
     """It should raise that the run is not current."""
-    policies = decoy.mock(cls=ErrorRecoveryPolicies)
+    policies = decoy.mock(cls=ErrorRecoveryPolicy)
     decoy.when(
         mock_run_data_manager.set_policies(
             run_id="rud-id", policies=policies.policyRules

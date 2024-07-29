@@ -45,7 +45,7 @@ from ..dependencies import (
     get_run_auto_deleter,
     get_quick_transfer_run_auto_deleter,
 )
-from ..error_recovery_models import ErrorRecoveryPolicies
+from ..error_recovery_models import ErrorRecoveryPolicy
 
 from robot_server.deck_configuration.fastapi_dependencies import (
     get_deck_configuration_store,
@@ -367,7 +367,7 @@ async def update_run(
 
 @PydanticResponse.wrap_route(
     base_router.put,
-    path="/runs/{runId}/errorRecoveryPolicies",
+    path="/runs/{runId}/errorRecoveryPolicy",
     summary="Set run policies",
     description=dedent(
         """
@@ -383,7 +383,7 @@ async def update_run(
 )
 async def set_run_policies(
     runId: str,
-    request_body: RequestModel[ErrorRecoveryPolicies],
+    request_body: RequestModel[ErrorRecoveryPolicy],
     run_data_manager: RunDataManager = Depends(get_run_data_manager),
 ) -> PydanticResponse[SimpleEmptyBody]:
     """Create run polices.
