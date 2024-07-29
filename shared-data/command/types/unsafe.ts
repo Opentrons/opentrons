@@ -1,4 +1,5 @@
 import type { CommonCommandRunTimeInfo, CommonCommandCreateInfo } from '.'
+import type { MotorAxes } from '../../js/types'
 
 export type UnsafeRunTimeCommand =
   | UnsafeBlowoutInPlaceRunTimeCommand
@@ -36,5 +37,20 @@ export interface UnsafeDropTipInPlaceCreateCommand
 export interface UnsafeDropTipInPlaceRunTimeCommand
   extends CommonCommandRunTimeInfo,
     UnsafeDropTipInPlaceCreateCommand {
+  result?: any
+}
+
+export interface UnsafeUpdatePositionEstimatorsParams {
+  axes: MotorAxes
+}
+
+export interface UnsafeUpdatePositionEstimatorsCreateCommand
+  extends CommonCommandCreateInfo {
+  commandType: 'unsafe/updatePositionEstimators'
+  params: UnsafeUpdatePositionEstimatorsParams
+}
+export interface UnsafeUpdatePositionEstimatorsRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    UnsafeUpdatePositionEstimatorsCreateCommand {
   result?: any
 }

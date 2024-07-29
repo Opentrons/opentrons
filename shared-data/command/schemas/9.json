@@ -70,7 +70,8 @@
       "calibration/calibrateModule": "#/definitions/CalibrateModuleCreate",
       "calibration/moveToMaintenancePosition": "#/definitions/MoveToMaintenancePositionCreate",
       "unsafe/blowOutInPlace": "#/definitions/UnsafeBlowOutInPlaceCreate",
-      "unsafe/dropTipInPlace": "#/definitions/UnsafeDropTipInPlaceCreate"
+      "unsafe/dropTipInPlace": "#/definitions/UnsafeDropTipInPlaceCreate",
+      "unsafe/updatePositionEstimators": "#/definitions/UpdatePositionEstimatorsCreate"
     }
   },
   "oneOf": [
@@ -271,6 +272,9 @@
     },
     {
       "$ref": "#/definitions/UnsafeDropTipInPlaceCreate"
+    },
+    {
+      "$ref": "#/definitions/UpdatePositionEstimatorsCreate"
     }
   ],
   "definitions": {
@@ -4309,6 +4313,51 @@
         },
         "params": {
           "$ref": "#/definitions/UnsafeDropTipInPlaceParams"
+        },
+        "intent": {
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CommandIntent"
+            }
+          ]
+        },
+        "key": {
+          "title": "Key",
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "type": "string"
+        }
+      },
+      "required": ["params"]
+    },
+    "UpdatePositionEstimatorsParams": {
+      "title": "UpdatePositionEstimatorsParams",
+      "description": "Payload required for an UpdatePositionEstimators command.",
+      "type": "object",
+      "properties": {
+        "axes": {
+          "description": "The axes for which to update the position estimators.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/MotorAxis"
+          }
+        }
+      },
+      "required": ["axes"]
+    },
+    "UpdatePositionEstimatorsCreate": {
+      "title": "UpdatePositionEstimatorsCreate",
+      "description": "UpdatePositionEstimators command request model.",
+      "type": "object",
+      "properties": {
+        "commandType": {
+          "title": "Commandtype",
+          "default": "unsafe/updatePositionEstimators",
+          "enum": ["unsafe/updatePositionEstimators"],
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/definitions/UpdatePositionEstimatorsParams"
         },
         "intent": {
           "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",

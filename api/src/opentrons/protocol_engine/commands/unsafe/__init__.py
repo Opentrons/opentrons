@@ -15,6 +15,14 @@ from .unsafe_drop_tip_in_place import (
     UnsafeDropTipInPlaceCreate,
 )
 
+from .update_position_estimators import (
+    UpdatePositionEstimatorsCommandType,
+    UpdatePositionEstimatorsParams,
+    UpdatePositionEstimatorsResult,
+    UpdatePositionEstimators,
+    UpdatePositionEstimatorsCreate,
+)
+
 __all__ = [
     # Unsafe blow-out-in-place command models
     "UnsafeBlowOutInPlaceCommandType",
@@ -28,4 +36,10 @@ __all__ = [
     "UnsafeDropTipInPlaceResult",
     "UnsafeDropTipInPlace",
     "UnsafeDropTipInPlaceCreate",
+    # Update position estimate command models
+    "UpdatePositionEstimatorsCommandType",
+    "UpdatePositionEstimatorsParams",
+    "UpdatePositionEstimatorsResult",
+    "UpdatePositionEstimators",
+    "UpdatePositionEstimatorsCreate",
 ]
