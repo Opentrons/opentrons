@@ -18,7 +18,7 @@ from opentrons.protocol_api.core.legacy.module_geometry import (
 )
 from opentrons.protocol_api.core.legacy.deck import Deck
 
-from opentrons_shared_data.module.dev_types import (
+from opentrons_shared_data.module.types import (
     ModuleDefinitionV3,
     ModuleDefinitionV1,
 )

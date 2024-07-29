@@ -33,11 +33,11 @@ try:
 except (OSError, ModuleNotFoundError):
     aionotify = None
 
-from opentrons_shared_data.robot.dev_types import RobotTypeEnum
-from opentrons_shared_data.protocol.dev_types import JsonProtocol
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
-from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
-from opentrons_shared_data.deck.dev_types import (
+from opentrons_shared_data.robot.types import RobotTypeEnum
+from opentrons_shared_data.protocol.types import JsonProtocol
+from opentrons_shared_data.labware.types import LabwareDefinition
+from opentrons_shared_data.module.types import ModuleDefinitionV3
+from opentrons_shared_data.deck.types import (
     RobotModel,
     DeckDefinitionV3,
     DeckDefinitionV5,

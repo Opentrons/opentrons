@@ -7,7 +7,7 @@ from opentrons.config import robot_configs
 from opentrons.hardware_control.modules import MagDeck, Thermocycler, TempDeck
 from opentrons.hardware_control import simulator_setup, API
 from opentrons.types import Mount
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.types import RobotType
 from opentrons.hardware_control.types import OT3Mount
 
 if TYPE_CHECKING:

@@ -29,6 +29,10 @@ class ClientDataStore:
         """
         return self._current_data[key]
 
+    def get_keys(self) -> list[str]:
+        """Return the keys that currently have data stored."""
+        return list(self._current_data.keys())
+
     def delete(self, key: str) -> None:
         """Delete the data at the given key.
 

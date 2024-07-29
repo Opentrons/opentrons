@@ -2,7 +2,7 @@ import pytest
 import typeguard
 
 from opentrons_shared_data.labware import load_definition
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons_shared_data.labware.types import LabwareDefinition
 
 from . import get_ot_defs
 

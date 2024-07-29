@@ -7,7 +7,7 @@ import json
 
 from .. import get_shared_data_root
 
-from .dev_types import RobotDefinition, RobotType
+from .types import RobotDefinition, RobotType
 
 DEFAULT_ROBOT_DEFINITION_VERSION: Final = 1
 

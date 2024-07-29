@@ -22,6 +22,7 @@ import {
   PrimaryButton,
   SecondaryButton,
 } from '@opentrons/components'
+import { useHost } from '@opentrons/react-api-client'
 
 import { useErrorName } from './hooks'
 import { getErrorKind } from './utils'
@@ -35,8 +36,7 @@ import {
 
 import type { RobotType } from '@opentrons/shared-data'
 import type { ErrorRecoveryFlowsProps } from '.'
-import type { ERUtilsResults } from './hooks'
-import { useHost } from '@opentrons/react-api-client'
+import type { ERUtilsResults, UseRecoveryAnalyticsResult } from './hooks'
 
 export function useRunPausedSplash(
   isOnDevice: boolean,
@@ -53,17 +53,25 @@ type RunPausedSplashProps = ERUtilsResults & {
   protocolAnalysis: ErrorRecoveryFlowsProps['protocolAnalysis']
   robotType: RobotType
   toggleERWiz: (launchER: boolean) => Promise<void>
+  analytics: UseRecoveryAnalyticsResult
 }
 export function RunPausedSplash(
   props: RunPausedSplashProps
 ): JSX.Element | null {
-  const { isOnDevice, toggleERWiz, routeUpdateActions, failedCommand } = props
+  const {
+    isOnDevice,
+    toggleERWiz,
+    routeUpdateActions,
+    failedCommand,
+    analytics,
+  } = props
   const { t } = useTranslation('error_recovery')
   const errorKind = getErrorKind(failedCommand)
   const title = useErrorName(errorKind)
   const host = useHost()
 
   const { proceedToRouteAndStep } = routeUpdateActions
+  const { reportInitialActionEvent } = analytics
 
   const buildTitleHeadingDesktop = (): JSX.Element => {
     return (
@@ -75,12 +83,17 @@ export function RunPausedSplash(
 
   // Do not launch error recovery, but do utilize the wizard's cancel route.
   const onCancelClick = (): Promise<void> => {
-    return toggleERWiz(false).then(() =>
-      proceedToRouteAndStep(RECOVERY_MAP.CANCEL_RUN.ROUTE)
-    )
+    return toggleERWiz(false).then(() => {
+      reportInitialActionEvent('cancel-run')
+      void proceedToRouteAndStep(RECOVERY_MAP.CANCEL_RUN.ROUTE)
+    })
   }
 
-  const onLaunchERClick = (): Promise<void> => toggleERWiz(true)
+  const onLaunchERClick = (): Promise<void> => {
+    return toggleERWiz(true).then(() => {
+      reportInitialActionEvent('launch-recovery')
+    })
+  }
 
   // TODO(jh 05-22-24): The hardcoded Z-indexing is non-ideal but must be done to keep the splash page above
   // several components in the RunningProtocol page. Investigate why these components have seemingly arbitrary zIndex values

@@ -14,8 +14,8 @@ from hashlib import sha256
 from . import types as local_types
 
 if TYPE_CHECKING:
-    from opentrons_shared_data.labware.dev_types import LabwareDefinition
-    from opentrons_shared_data.pipette.dev_types import LabwareUri
+    from opentrons_shared_data.labware.types import LabwareDefinition
+    from opentrons_shared_data.pipette.types import LabwareUri
 
 
 def dict_filter_none(data: List[Tuple[str, Any]]) -> Dict[str, Any]:

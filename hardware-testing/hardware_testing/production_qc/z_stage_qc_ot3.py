@@ -23,7 +23,7 @@ from hardware_testing.data.csv_report import (
 
 from opentrons_shared_data.errors.exceptions import MoveConditionNotMetError
 from opentrons.config.advanced_settings import get_adv_setting, set_adv_setting
-from opentrons_shared_data.robot.dev_types import RobotTypeEnum
+from opentrons_shared_data.robot.types import RobotTypeEnum
 
 import logging
 

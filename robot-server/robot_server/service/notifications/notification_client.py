@@ -7,6 +7,8 @@ from fastapi import Depends
 from typing import Any, Dict, Optional
 from enum import Enum
 
+
+from .topics import TopicName
 from ..json_api import NotifyRefetchBody, NotifyUnsubscribeBody
 from server_utils.fastapi_utils.app_state import (
     AppState,
@@ -80,7 +82,7 @@ class NotificationClient:
         self._client.loop_stop()
         await to_thread.run_sync(self._client.disconnect)
 
-    async def publish_advise_refetch_async(self, topic: str) -> None:
+    async def publish_advise_refetch_async(self, topic: TopicName) -> None:
         """Asynchronously publish a refetch message on a specific topic to the MQTT broker.
 
         Args:
@@ -88,7 +90,7 @@ class NotificationClient:
         """
         await to_thread.run_sync(self.publish_advise_refetch, topic)
 
-    async def publish_advise_unsubscribe_async(self, topic: str) -> None:
+    async def publish_advise_unsubscribe_async(self, topic: TopicName) -> None:
         """Asynchronously publish an unsubscribe message on a specific topic to the MQTT broker.
 
         Args:
