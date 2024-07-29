@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
@@ -13,7 +12,6 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
-  RESPONSIVENESS,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '../../App/portal'
@@ -75,7 +73,7 @@ export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
         </Flex>
       </Modal>
     ) : (
-      <Modal css={ODD_ONLY}>
+      <Modal>
         <Flex
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing40}
@@ -122,9 +120,3 @@ export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
     getTopPortalEl()
   )
 }
-
-export const ODD_ONLY = css`
-  @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
-    display: none;
-  }
-`

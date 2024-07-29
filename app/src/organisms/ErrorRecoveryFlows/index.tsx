@@ -150,7 +150,11 @@ export function ErrorRecoveryFlows(
   return (
     <>
       {showTakeover ? (
-        <RecoveryTakeover intent={intent} robotName={robotName} />
+        <RecoveryTakeover
+          intent={intent}
+          robotName={robotName}
+          isOnDevice={isOnDevice}
+        />
       ) : null}
       {renderWizard ? (
         <ErrorRecoveryWizard
