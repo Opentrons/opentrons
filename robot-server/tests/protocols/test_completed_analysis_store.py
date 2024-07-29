@@ -29,6 +29,7 @@ from robot_server.protocols.analysis_models import (
     AnalysisStatus,
     RunTimeParameterAnalysisData,
 )
+from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.protocols.protocol_store import (
     ProtocolStore,
     ProtocolResource,
@@ -95,7 +96,7 @@ def make_dummy_protocol_resource(protocol_id: str) -> ProtocolResource:
             content_hash="abc123",
         ),
         protocol_key=None,
-        protocol_kind="standard",
+        protocol_kind=ProtocolKind.STANDARD,
     )
 
 

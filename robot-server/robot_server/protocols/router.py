@@ -219,8 +219,8 @@ async def create_protocol(  # noqa: C901
         " always trigger an analysis (for now).",
         alias="runTimeParameterValues",
     ),
-    protocol_kind: Optional[ProtocolKind] = Form(
-        default=None,
+    protocol_kind: ProtocolKind = Form(
+        default=ProtocolKind.STANDARD,
         description=(
             "Whether this is a `standard` protocol or a `quick-transfer` protocol."
             "if omitted, the protocol will be `standard` by default."
@@ -277,8 +277,7 @@ async def create_protocol(  # noqa: C901
         created_at: Timestamp to attach to the new resource.
         maximum_quick_transfer_protocols: Robot setting value limiting stored quick transfers protocols.
     """
-    kind = ProtocolKind.from_string(protocol_kind) or ProtocolKind.STANDARD
-    if kind == ProtocolKind.QUICK_TRANSFER:
+    if protocol_kind == ProtocolKind.QUICK_TRANSFER:
         quick_transfer_protocols = [
             protocol
             for protocol in protocol_store.get_all()
@@ -340,7 +339,7 @@ async def create_protocol(  # noqa: C901
             data = Protocol.construct(
                 id=cached_protocol_id,
                 createdAt=resource.created_at,
-                protocolKind=ProtocolKind.from_string(resource.protocol_kind),
+                protocolKind=resource.protocol_kind,
                 protocolType=resource.source.config.protocol_type,
                 robotType=resource.source.robot_type,
                 metadata=Metadata.parse_obj(resource.source.metadata),
@@ -390,11 +389,11 @@ async def create_protocol(  # noqa: C901
         created_at=created_at,
         source=source,
         protocol_key=key,
-        protocol_kind=kind.value,
+        protocol_kind=protocol_kind,
     )
 
     protocol_deleter: ProtocolAutoDeleter = protocol_auto_deleter
-    if kind == ProtocolKind.QUICK_TRANSFER:
+    if protocol_kind == ProtocolKind.QUICK_TRANSFER:
         protocol_deleter = quick_transfer_protocol_auto_deleter
     protocol_deleter.make_room_for_new_protocol()
     protocol_store.insert(protocol_resource)
@@ -413,7 +412,7 @@ async def create_protocol(  # noqa: C901
     data = Protocol(
         id=protocol_id,
         createdAt=created_at,
-        protocolKind=kind,
+        protocolKind=protocol_kind,
         protocolType=source.config.protocol_type,
         robotType=source.robot_type,
         metadata=Metadata.parse_obj(source.metadata),
@@ -523,7 +522,7 @@ async def get_protocols(
         Protocol.construct(
             id=r.protocol_id,
             createdAt=r.created_at,
-            protocolKind=ProtocolKind.from_string(r.protocol_kind),
+            protocolKind=r.protocol_kind,
             protocolType=r.source.config.protocol_type,
             robotType=r.source.robot_type,
             metadata=Metadata.parse_obj(r.source.metadata),
@@ -604,7 +603,7 @@ async def get_protocol_by_id(
     data = Protocol.construct(
         id=protocolId,
         createdAt=resource.created_at,
-        protocolKind=ProtocolKind.from_string(resource.protocol_kind),
+        protocolKind=resource.protocol_kind,
         protocolType=resource.source.config.protocol_type,
         robotType=resource.source.robot_type,
         metadata=Metadata.parse_obj(resource.source.metadata),
