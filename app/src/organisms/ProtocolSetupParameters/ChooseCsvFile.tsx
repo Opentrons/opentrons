@@ -46,7 +46,8 @@ export function ChooseCsvFile({
   const { t } = useTranslation('protocol_setup')
 
   const csvFilesOnUSB = useSelector(getShellUpdateDataFiles) ?? []
-  const csvFilesOnRobot = useAllCsvFilesQuery(protocolId).data?.data ?? []
+  const csvFilesOnRobot = (useAllCsvFilesQuery(protocolId).data?.data ??
+    []) as CsvFileData[]
   const sortedCsvFilesOnUSB = csvFilesOnUSB.sort((a, b) => {
     const regex = /^(.*\/)?(.+?)(\d*)\.csv$/
     const aMatch = a.match(regex)
