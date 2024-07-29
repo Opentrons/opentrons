@@ -1053,6 +1053,6 @@ class CSVParameter(RTPBase):
 
 RunTimeParameter = Union[NumberParameter, EnumParameter, BooleanParameter, CSVParameter]
 
-RunTimeParamValuesType = Dict[
+PrimitiveRunTimeParamValuesType = Dict[
     StrictStr, Union[StrictInt, StrictFloat, StrictBool, StrictStr]
 ]  # update value types as more RTP types are added

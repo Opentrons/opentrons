@@ -43,7 +43,7 @@ from ..protocol_engine.types import (
     PostRunHardwareState,
     DeckConfigurationType,
     RunTimeParameter,
-    RunTimeParamValuesType,
+    PrimitiveRunTimeParamValuesType,
 )
 from ..protocols.types import PythonProtocol
 
@@ -130,7 +130,7 @@ class AbstractRunner(ABC):
         self,
         deck_configuration: DeckConfigurationType,
         protocol_source: Optional[ProtocolSource] = None,
-        run_time_param_values: Optional[RunTimeParamValuesType] = None,
+        run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
     ) -> RunResult:
         """Run a given protocol to completion."""
 
@@ -184,7 +184,7 @@ class PythonAndLegacyRunner(AbstractRunner):
         self,
         protocol_source: ProtocolSource,
         python_parse_mode: PythonParseMode,
-        run_time_param_values: Optional[RunTimeParamValuesType],
+        run_time_param_values: Optional[PrimitiveRunTimeParamValuesType],
     ) -> None:
         """Load a Python or JSONv5(& older) ProtocolSource into managed ProtocolEngine."""
         labware_definitions = await protocol_reader.extract_labware_definitions(
@@ -250,7 +250,7 @@ class PythonAndLegacyRunner(AbstractRunner):
         self,
         deck_configuration: DeckConfigurationType,
         protocol_source: Optional[ProtocolSource] = None,
-        run_time_param_values: Optional[RunTimeParamValuesType] = None,
+        run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
         python_parse_mode: PythonParseMode = PythonParseMode.NORMAL,
     ) -> RunResult:
         # TODO(mc, 2022-01-11): move load to runner creation, remove from `run`
@@ -361,7 +361,7 @@ class JsonRunner(AbstractRunner):
         self,
         deck_configuration: DeckConfigurationType,
         protocol_source: Optional[ProtocolSource] = None,
-        run_time_param_values: Optional[RunTimeParamValuesType] = None,
+        run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
     ) -> RunResult:
         # TODO(mc, 2022-01-11): move load to runner creation, remove from `run`
         # currently `protocol_source` arg is only used by tests
@@ -433,7 +433,7 @@ class LiveRunner(AbstractRunner):
         self,
         deck_configuration: DeckConfigurationType,
         protocol_source: Optional[ProtocolSource] = None,
-        run_time_param_values: Optional[RunTimeParamValuesType] = None,
+        run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
     ) -> RunResult:
         assert protocol_source is None
         await self._hardware_api.home()

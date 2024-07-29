@@ -19,6 +19,7 @@ from robot_server.persistence.tables import (
     analysis_table,
     protocol_table,
     run_table,
+    analysis_primitive_type_rtp_table,
 )
 
 
@@ -347,6 +348,16 @@ class ProtocolStore:
         return [_convert_sql_row_to_dataclass(sql_row=row) for row in all_rows]
 
     def _sql_remove(self, protocol_id: str) -> None:
+        select_referencing_analysis_ids = sqlalchemy.select(analysis_table.c.id).where(
+            analysis_table.c.protocol_id == protocol_id
+        )
+        delete_analysis_rtps_statement = sqlalchemy.delete(
+            analysis_primitive_type_rtp_table
+        ).where(
+            analysis_primitive_type_rtp_table.c.analysis_id.in_(
+                select_referencing_analysis_ids
+            )
+        )
         delete_analyses_statement = sqlalchemy.delete(analysis_table).where(
             analysis_table.c.protocol_id == protocol_id
         )
@@ -355,16 +366,17 @@ class ProtocolStore:
         )
 
         with self._sql_engine.begin() as transaction:
-            # TODO(mm, 2022-04-28): Deleting analyses from the table is enough to
-            # avoid a SQL foreign key conflict. But, if this protocol had any *pending*
-            # analyses, they'll be left behind in the AnalysisStore, orphaned,
-            # since they're stored independently of this SQL table.
+            # TODO(mm, 2022-04-28): Deleting analyses, and any RTP tables that reference
+            #  those analyses, from the table is enough to avoid a SQL foreign key conflict.
+            #  But, if this protocol had any *pending* analyses, they'll be left behind
+            #  in the AnalysisStore, orphaned, since they're stored independently of this SQL table.
             #
-            # To fix this, we'll need to either:
+            #  To fix this, we'll need to either:
             #
-            # * Merge the Store classes or otherwise give them access to each other.
-            # * Switch from SQLAlchemy Core to ORM and use cascade deletes.
+            #  * Merge the Store classes or otherwise give them access to each other.
+            #  * Switch from SQLAlchemy Core to ORM and use cascade deletes.
             try:
+                transaction.execute(delete_analysis_rtps_statement)
                 transaction.execute(delete_analyses_statement)
                 result = transaction.execute(delete_protocol_statement)
             except sqlalchemy.exc.IntegrityError as e:

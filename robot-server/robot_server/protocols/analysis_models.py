@@ -2,7 +2,10 @@
 # TODO(mc, 2021-08-25): add modules to simulation result
 from enum import Enum
 
-from opentrons.protocol_engine.types import RunTimeParameter, RunTimeParamValuesType
+from opentrons.protocol_engine.types import (
+    RunTimeParameter,
+    PrimitiveRunTimeParamValuesType,
+)
 from opentrons_shared_data.robot.types import RobotType
 from pydantic import BaseModel, Field
 from typing import List, Optional, Union, NamedTuple
@@ -48,7 +51,7 @@ class AnalysisResult(str, Enum):
 class AnalysisRequest(BaseModel):
     """Model for analysis request body."""
 
-    runTimeParameterValues: RunTimeParamValuesType = Field(
+    runTimeParameterValues: PrimitiveRunTimeParamValuesType = Field(
         default={},
         description="Key-value pairs of run-time parameters defined in a protocol.",
     )

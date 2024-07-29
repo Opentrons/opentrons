@@ -8,7 +8,10 @@ import pytest
 from sqlalchemy.engine import Engine
 from decoy import Decoy
 
-from robot_server.persistence.tables import analysis_table
+from robot_server.persistence.tables import (
+    analysis_table,
+    analysis_primitive_type_rtp_table,
+)
 from robot_server.protocols.completed_analysis_store import (
     CompletedAnalysisResource,
     CompletedAnalysisStore,
@@ -28,6 +31,7 @@ from robot_server.protocols.protocol_store import (
     ProtocolStore,
     ProtocolResource,
 )
+from robot_server.protocols.rtp_resources import PrimitiveParameterResource
 
 
 @pytest.fixture
@@ -99,7 +103,6 @@ def _completed_analysis_resource(
             errors=[],
             liquids=[],
         ),
-        run_time_parameter_values_and_defaults=rtp_values_and_defaults or {},
     )
 
 
@@ -127,7 +130,7 @@ async def test_get_by_analysis_id_falls_back_to_sql(
     """It should return analyses from sql if they are not cached."""
     resource = _completed_analysis_resource("analysis-id", "protocol-id")
     protocol_store.insert(make_dummy_protocol_resource("protocol-id"))
-    await subject.make_room_and_add(resource)
+    await subject.make_room_and_add(resource, [])
     # the analysis is not cached
     decoy.when(memcache.get("analysis-id")).then_raise(KeyError())
     analysis_from_sql = await subject.get_by_id("analysis-id")
@@ -144,7 +147,7 @@ async def test_get_by_analysis_id_stores_results_in_cache(
     """It should cache successful fetches from sql."""
     resource = _completed_analysis_resource("analysis-id", "protocol-id")
     protocol_store.insert(make_dummy_protocol_resource("protocol-id"))
-    await subject.make_room_and_add(resource)
+    await subject.make_room_and_add(resource, [])
     # the analysis is not cached
     decoy.when(memcache.get("analysis-id")).then_raise(KeyError())
     from_sql = await subject.get_by_id("analysis-id")
@@ -159,7 +162,7 @@ async def test_get_by_analysis_id_as_document(
     """It should return the analysis serialized as a JSON string."""
     resource = _completed_analysis_resource("analysis-id", "protocol-id")
     protocol_store.insert(make_dummy_protocol_resource("protocol-id"))
-    await subject.make_room_and_add(resource)
+    await subject.make_room_and_add(resource, [])
     result = await subject.get_by_id_as_document("analysis-id")
     assert result is not None
     assert json.loads(result) == {
@@ -185,9 +188,9 @@ async def test_get_ids_by_protocol(
     resource_3 = _completed_analysis_resource("analysis-id-3", "protocol-id-2")
     protocol_store.insert(make_dummy_protocol_resource("protocol-id-1"))
     protocol_store.insert(make_dummy_protocol_resource("protocol-id-2"))
-    await subject.make_room_and_add(resource_1)
-    await subject.make_room_and_add(resource_2)
-    await subject.make_room_and_add(resource_3)
+    await subject.make_room_and_add(resource_1, [])
+    await subject.make_room_and_add(resource_2, [])
+    await subject.make_room_and_add(resource_3, [])
     assert subject.get_ids_by_protocol("protocol-id-1") == [
         "analysis-id-1",
         "analysis-id-2",
@@ -209,9 +212,9 @@ async def test_get_by_protocol(
     decoy.when(memcache.insert("analysis-id-1", resource_1)).then_return(None)
     decoy.when(memcache.insert("analysis-id-2", resource_2)).then_return(None)
     decoy.when(memcache.insert("analysis-id-3", resource_3)).then_return(None)
-    await subject.make_room_and_add(resource_1)
-    await subject.make_room_and_add(resource_2)
-    await subject.make_room_and_add(resource_3)
+    await subject.make_room_and_add(resource_1, [])
+    await subject.make_room_and_add(resource_2, [])
+    await subject.make_room_and_add(resource_3, [])
     decoy.when(memcache.get("analysis-id-1")).then_raise(KeyError())
     decoy.when(memcache.get("analysis-id-2")).then_return(resource_2)
     decoy.when(memcache.contains("analysis-id-1")).then_return(False)
@@ -221,48 +224,46 @@ async def test_get_by_protocol(
     assert resources == [resource_1, resource_2]
 
 
-async def test_get_rtp_values_and_defaults_by_analysis_id_prefers_memcache(
+async def test_store_and_get_primitive_rtps_by_analysis(
     subject: CompletedAnalysisStore,
-    memcache: MemoryCache[str, CompletedAnalysisResource],
     protocol_store: ProtocolStore,
     decoy: Decoy,
 ) -> None:
-    """It should return RTP values and defaults dict from memcache."""
-    resource = _completed_analysis_resource(
+    """It should fetch the stored primitive run time parameters of the specified analysis."""
+    analysis_resource = _completed_analysis_resource(
         analysis_id="analysis-id",
         protocol_id="protocol-id",
-        rtp_values_and_defaults={
-            "abc": RunTimeParameterAnalysisData(value=123, default=234)
-        },
     )
+    rtp_resources = [
+        PrimitiveParameterResource(
+            analysis_id="analysis-id",
+            parameter_variable_name="foo",
+            parameter_type="int",
+            parameter_value=10,
+        ),
+        PrimitiveParameterResource(
+            analysis_id="analysis-id",
+            parameter_variable_name="bar",
+            parameter_type="bool",
+            parameter_value=True,
+        ),
+        PrimitiveParameterResource(
+            analysis_id="analysis-id",
+            parameter_variable_name="baz",
+            parameter_type="str",
+            parameter_value="10",
+        ),
+    ]
     protocol_store.insert(make_dummy_protocol_resource("protocol-id"))
-    # When we retrieve a resource via its id we should see it query the cache, and it should
-    # return the identity-same resource
-    decoy.when(memcache.get("analysis-id")).then_return(resource)
-    result = await subject.get_rtp_values_and_defaults_by_analysis_id("analysis-id")
-    assert result == resource.run_time_parameter_values_and_defaults
-
-
-async def test_get_rtp_values_and_defaults_by_analysis_from_db(
-    subject: CompletedAnalysisStore,
-    memcache: MemoryCache[str, CompletedAnalysisResource],
-    protocol_store: ProtocolStore,
-    decoy: Decoy,
-) -> None:
-    """It should fetch the RTP values and defaults dict from database if not present in cache."""
-    resource = _completed_analysis_resource(
-        analysis_id="analysis-id",
-        protocol_id="protocol-id",
-        rtp_values_and_defaults={
-            "xyz": RunTimeParameterAnalysisData(value=123, default=234)
-        },
+    await subject.make_room_and_add(
+        completed_analysis_resource=analysis_resource,
+        primitive_rtp_resources=rtp_resources,
     )
-    protocol_store.insert(make_dummy_protocol_resource("protocol-id"))
-    await subject.make_room_and_add(resource)
-    # Not in memcache
-    decoy.when(memcache.get("analysis-id")).then_raise(KeyError())
-    result = await subject.get_rtp_values_and_defaults_by_analysis_id("analysis-id")
-    assert result == resource.run_time_parameter_values_and_defaults
+    assert subject.get_primitive_rtps_by_analysis_id("analysis-id") == {
+        "foo": 10,
+        "bar": True,
+        "baz": "10",
+    }
 
 
 @pytest.mark.parametrize(
@@ -345,7 +346,8 @@ async def test_add_makes_room_for_new_analysis(
         _completed_analysis_resource(
             analysis_id="new-analysis-id",
             protocol_id="protocol-id",
-        )
+        ),
+        [],
     )
     assert (
         subject.get_ids_by_protocol("protocol-id")
@@ -359,3 +361,81 @@ async def test_add_makes_room_for_new_analysis(
     ]
     for analysis_id in removed_ids:
         decoy.verify(memcache.remove(analysis_id))
+
+
+async def test_make_room_and_add_handles_rtp_tables_correctly(
+    subject: CompletedAnalysisStore,
+    memcache: MemoryCache[str, CompletedAnalysisResource],
+    protocol_store: ProtocolStore,
+    sql_engine: Engine,
+) -> None:
+    """It should delete any RTP table entries that reference the analyses being deleted, and then insert new RTP entries."""
+    existing_analysis_ids = [
+        "analysis-id-0",
+        "analysis-id-1",
+        "analysis-id-2",
+        "analysis-id-3",
+        "analysis-id-4",
+    ]
+
+    protocol_store.insert(make_dummy_protocol_resource("protocol-id"))
+
+    # Set up the database with existing analyses
+    resources = [
+        _completed_analysis_resource(
+            analysis_id=analysis_id,
+            protocol_id="protocol-id",
+        )
+        for analysis_id in existing_analysis_ids
+    ]
+    primitive_rtp_resources = [
+        PrimitiveParameterResource(
+            analysis_id="analysis-id-0",
+            parameter_variable_name="foo",
+            parameter_type="int",
+            parameter_value=10,
+        ),
+        PrimitiveParameterResource(
+            analysis_id="analysis-id-2",
+            parameter_variable_name="bar",
+            parameter_type="bool",
+            parameter_value=True,
+        ),
+    ]
+    for resource in resources:
+        statement = analysis_table.insert().values(await resource.to_sql_values())
+        with sql_engine.begin() as transaction:
+            transaction.execute(statement)
+    for primitive_rtp_resource in primitive_rtp_resources:
+        statement = analysis_primitive_type_rtp_table.insert().values(
+            primitive_rtp_resource.to_sql_values()
+        )
+        with sql_engine.begin() as transaction:
+            transaction.execute(statement)
+
+    assert subject.get_ids_by_protocol("protocol-id") == existing_analysis_ids
+    await subject.make_room_and_add(
+        _completed_analysis_resource(
+            analysis_id="new-analysis-id",
+            protocol_id="protocol-id",
+        ),
+        [
+            PrimitiveParameterResource(
+                analysis_id="new-analysis-id",
+                parameter_variable_name="baz",
+                parameter_type="str",
+                parameter_value="10",
+            )
+        ],
+    )
+    assert subject.get_ids_by_protocol("protocol-id") == [
+        "analysis-id-1",
+        "analysis-id-2",
+        "analysis-id-3",
+        "analysis-id-4",
+        "new-analysis-id",
+    ]
+
+    assert subject.get_primitive_rtps_by_analysis_id("analysis-id-2") == {"bar": True}
+    assert subject.get_primitive_rtps_by_analysis_id("analysis-id-0") == {}
+    assert subject.get_primitive_rtps_by_analysis_id("new-analysis-id") == {"baz": "10"}
