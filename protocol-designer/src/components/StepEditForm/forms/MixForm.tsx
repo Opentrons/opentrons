@@ -3,7 +3,10 @@ import cx from 'classnames'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { FormGroup } from '@opentrons/components'
-import { getPipetteEntities } from '../../../step-forms/selectors'
+import {
+  getLabwareEntities,
+  getPipetteEntities,
+} from '../../../step-forms/selectors'
 import {
   BlowoutLocationField,
   ChangeTipField,
@@ -31,21 +34,29 @@ import { AspDispSection } from './AspDispSection'
 import type { StepFormProps } from '../types'
 
 import styles from '../StepEditForm.module.css'
+import { PickUpTipField } from '../fields/PickUpTipField'
+import { TipWellSelectionField } from '../fields/PickUpTipField/TipWellSelectionField'
+import { getEnableReturnTip } from '../../../feature-flags/selectors'
 
 export const MixForm = (props: StepFormProps): JSX.Element => {
   const [collapsed, setCollapsed] = React.useState(true)
   const pipettes = useSelector(getPipetteEntities)
+  const enableReturnTip = useSelector(getEnableReturnTip)
+  const labware = useSelector(getLabwareEntities)
   const { t } = useTranslation(['application', 'form'])
 
   const { propsForFields, formData } = props
   const is96Channel =
     propsForFields.pipette.value != null &&
     pipettes[String(propsForFields.pipette.value)].name === 'p1000_96'
+  const userSelectedPickUpTipLocation =
+    labware[String(propsForFields.pickUpTip_location.value)] != null
+  const userSelectedDropTipLocation =
+    labware[String(propsForFields.dropTip_location.value)] != null
 
   const toggleCollapsed = (): void => {
     setCollapsed(prevCollapsed => !prevCollapsed)
   }
-  console.log('props for fields', propsForFields)
   return (
     <div className={styles.form_wrapper}>
       <div className={styles.section_header}>
@@ -251,11 +262,28 @@ export const MixForm = (props: StepFormProps): JSX.Element => {
           />
         </div>
         <div className={cx(styles.form_row, styles.section_column)}>
-          <DropTipField
-            {...propsForFields.dropTip_location}
-            updateWellsValue={propsForFields.dropTip_wellNames.updateValue}
-            selectedWells={propsForFields.dropTip_wellNames.value}
-          />
+          {enableReturnTip ? (
+            <>
+              <PickUpTipField {...propsForFields.pickUpTip_location} />
+              {userSelectedPickUpTipLocation ? (
+                <TipWellSelectionField
+                  {...propsForFields.pickUpTip_wellNames}
+                  nozzles={String(propsForFields.nozzles.value) ?? null}
+                  labwareId={propsForFields.pickUpTip_location.value}
+                  pipetteId={propsForFields.pipette.value}
+                />
+              ) : null}
+            </>
+          ) : null}
+          <DropTipField {...propsForFields.dropTip_location} />
+          {userSelectedDropTipLocation ? (
+            <TipWellSelectionField
+              {...propsForFields.dropTip_wellNames}
+              nozzles={String(propsForFields.nozzles.value) ?? null}
+              labwareId={propsForFields.dropTip_location.value}
+              pipetteId={propsForFields.pipette.value}
+            />
+          ) : null}
         </div>
       </div>
     </div>

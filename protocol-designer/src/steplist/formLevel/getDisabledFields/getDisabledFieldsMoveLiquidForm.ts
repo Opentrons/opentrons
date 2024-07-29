@@ -10,10 +10,11 @@ export function getDisabledFieldsMoveLiquidForm(
 ): Set<string> {
   const disabled: Set<string> = new Set()
   const prefixes = ['aspirate', 'dispense']
-console.log(' hydratedForm.dispense_wells.length',  hydratedForm.dispense_wells.length)
+
   if (
     hydratedForm.dispense_wells.length === 0 ||
-    hydratedForm.aspirate_wells.length === 0
+    hydratedForm.aspirate_wells.length === 0 ||
+    hydratedForm.pipette == null
   ) {
     disabled.add('pickUpTip_location')
     disabled.add('dropTip_location')

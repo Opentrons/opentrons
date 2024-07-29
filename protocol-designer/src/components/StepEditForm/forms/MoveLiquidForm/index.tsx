@@ -2,7 +2,10 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import cx from 'classnames'
 import { useSelector } from 'react-redux'
-import { getPipetteEntities } from '../../../../step-forms/selectors'
+import {
+  getLabwareEntities,
+  getPipetteEntities,
+} from '../../../../step-forms/selectors'
 import { getEnableReturnTip } from '../../../../feature-flags/selectors'
 import {
   VolumeField,
@@ -12,28 +15,35 @@ import {
   PathField,
 } from '../../fields'
 import { TiprackField } from '../../fields/TiprackField'
+import { TipWellSelectionField } from '../../fields/PickUpTipField/TipWellSelectionField'
 import { Configure96ChannelField } from '../../fields/Configure96ChannelField'
 import { DropTipField } from '../../fields/DropTipField'
-import styles from '../../StepEditForm.module.css'
+import { PickUpTipField } from '../../fields/PickUpTipField'
 import { SourceDestFields } from './SourceDestFields'
 import { SourceDestHeaders } from './SourceDestHeaders'
 import type { StepFormProps } from '../../types'
-import { PickUpTipField } from '../../fields/PickUpTipField'
+
+import styles from '../../StepEditForm.module.css'
 
 // TODO: BC 2019-01-25 instead of passing path from here, put it in connect fields where needed
 // or question if it even needs path
 
 export const MoveLiquidForm = (props: StepFormProps): JSX.Element => {
-  const [collapsed, _setCollapsed] = React.useState<boolean>(true)
-  const pipettes = useSelector(getPipetteEntities)
+  const { propsForFields, formData } = props
+  const { stepType, path } = formData
   const { t } = useTranslation(['application', 'form'])
+  const [collapsed, _setCollapsed] = React.useState<boolean>(true)
+  const enableReturnTip = useSelector(getEnableReturnTip)
+  const labware = useSelector(getLabwareEntities)
+  const pipettes = useSelector(getPipetteEntities)
   const toggleCollapsed = (): void => {
     _setCollapsed(!collapsed)
   }
-  const enableReturnTip = useSelector(getEnableReturnTip)
+  const userSelectedPickUpTipLocation =
+    labware[String(propsForFields.pickUpTip_location.value)] != null
+  const userSelectedDropTipLocation =
+    labware[String(propsForFields.dropTip_location.value)] != null
 
-  const { propsForFields, formData } = props
-  const { stepType, path } = formData
   const is96Channel =
     propsForFields.pipette.value != null &&
     pipettes[String(propsForFields.pipette.value)].name === 'p1000_96'
@@ -148,16 +158,28 @@ export const MoveLiquidForm = (props: StepFormProps): JSX.Element => {
         </span>
       </div>
       <div className={cx(styles.form_row, styles.section_column)}>
-        <PickUpTipField
-          {...propsForFields.pickUpTip_location}
-          updateWellsValue={propsForFields.pickUpTip_wellNames.updateValue}
-          selectedWells={propsForFields.pickUpTip_wellNames.value}
-        />
-        <DropTipField
-          {...propsForFields.dropTip_location}
-          updateWellsValue={propsForFields.dropTip_wellNames.updateValue}
-          selectedWells={propsForFields.dropTip_wellNames.value}
-        />
+        {enableReturnTip ? (
+          <>
+            <PickUpTipField {...propsForFields.pickUpTip_location} />
+            {userSelectedPickUpTipLocation ? (
+              <TipWellSelectionField
+                {...propsForFields.pickUpTip_wellNames}
+                nozzles={String(propsForFields.nozzles.value) ?? null}
+                labwareId={propsForFields.pickUpTip_location.value}
+                pipetteId={propsForFields.pipette.value}
+              />
+            ) : null}
+          </>
+        ) : null}
+        <DropTipField {...propsForFields.dropTip_location} />
+        {userSelectedDropTipLocation && enableReturnTip ? (
+          <TipWellSelectionField
+            {...propsForFields.dropTip_wellNames}
+            nozzles={String(propsForFields.nozzles.value) ?? null}
+            labwareId={propsForFields.dropTip_location.value}
+            pipetteId={propsForFields.pipette.value}
+          />
+        ) : null}
       </div>
     </div>
   )
