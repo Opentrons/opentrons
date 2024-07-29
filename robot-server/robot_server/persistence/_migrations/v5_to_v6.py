@@ -12,6 +12,7 @@ Summary of changes from schema 5:
           save its RTP data to the new table. RTP data belonging to previous analyses
           will still be available as part of the completed analysis blob.
 - Adds a new analysis_csv_rtp_table to store the CSV parameters' file IDs used in analysis
+- Adds a new run_csv_rtp_table to store the CSV parameters' file IDs used in runs
 """
 
 from pathlib import Path
