@@ -27,6 +27,7 @@ import type { UseRouteUpdateActionsResult } from './useRouteUpdateActions'
 import type { RecoveryToasts } from './useRecoveryToasts'
 import type { UseRecoveryAnalyticsResult } from './useRecoveryAnalytics'
 import type { CurrentRecoveryOptionUtils } from './useRecoveryRouting'
+import { useUpdateClientDataRecovery } from '../../../resources/client_data'
 
 interface UseRecoveryCommandsParams {
   runId: string
@@ -71,6 +72,7 @@ export function useRecoveryCommands({
     mutateAsync: resumeRunFromRecovery,
   } = useResumeRunFromRecoveryMutation()
   const { stopRun } = useStopRunMutation()
+  const { clearClientData } = useUpdateClientDataRecovery()
   const { makeSuccessToast } = recoveryToastUtils
 
   const buildRetryPrepMove = (): MoveToCoordinatesCreateCommand | null => {
@@ -165,22 +167,37 @@ export function useRecoveryCommands({
   }, [chainRunRecoveryCommands, failedCommand, failedLabwareUtils])
 
   const resumeRun = React.useCallback((): void => {
-    void resumeRunFromRecovery(runId).then(() => {
-      analytics.reportActionSelectedResult(selectedRecoveryOption, 'succeeded')
-      makeSuccessToast()
-    })
+    void resumeRunFromRecovery(runId)
+      .then(() => {
+        analytics.reportActionSelectedResult(
+          selectedRecoveryOption,
+          'succeeded'
+        )
+        makeSuccessToast()
+      })
+      .finally(() => {
+        clearClientData()
+      })
   }, [runId, resumeRunFromRecovery, makeSuccessToast])
 
   const cancelRun = React.useCallback((): void => {
     analytics.reportActionSelectedResult(selectedRecoveryOption, 'succeeded')
     stopRun(runId)
+    clearClientData()
   }, [runId])
 
   const skipFailedCommand = React.useCallback((): void => {
-    void resumeRunFromRecovery(runId).then(() => {
-      analytics.reportActionSelectedResult(selectedRecoveryOption, 'succeeded')
-      makeSuccessToast()
-    })
+    void resumeRunFromRecovery(runId)
+      .then(() => {
+        analytics.reportActionSelectedResult(
+          selectedRecoveryOption,
+          'succeeded'
+        )
+        makeSuccessToast()
+      })
+      .finally(() => {
+        clearClientData()
+      })
   }, [runId, resumeRunFromRecovery, makeSuccessToast])
 
   const ignoreErrorKindThisRun = React.useCallback((): Promise<void> => {

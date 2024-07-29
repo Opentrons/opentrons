@@ -6,6 +6,7 @@ export { useRecoveryCommands } from './useRecoveryCommands'
 export { useRouteUpdateActions } from './useRouteUpdateActions'
 export { useERUtils } from './useERUtils'
 export { useRecoveryAnalytics } from './useRecoveryAnalytics'
+export { useRecoveryTakeover } from './useRecoveryTakeover'
 
 export type { UseRouteUpdateActionsResult } from './useRouteUpdateActions'
 export type { UseRecoveryCommandsResult } from './useRecoveryCommands'

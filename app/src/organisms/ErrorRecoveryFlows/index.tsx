@@ -18,16 +18,19 @@ import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import { getIsOnDevice } from '../../redux/config'
 import { ErrorRecoveryWizard, useERWizard } from './ErrorRecoveryWizard'
 import { RunPausedSplash, useRunPausedSplash } from './RunPausedSplash'
+import { RecoveryTakeover } from './RecoveryTakeover'
 import {
   useCurrentlyRecoveringFrom,
   useERUtils,
   useRecoveryAnalytics,
+  useRecoveryTakeover,
   useShowDoorInfo,
 } from './hooks'
 
 import type { RunStatus } from '@opentrons/api-client'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { FailedCommand } from './types'
+import { useHost } from '@opentrons/react-api-client'
 
 const VALID_ER_RUN_STATUSES: RunStatus[] = [
   RUN_STATUS_AWAITING_RECOVERY,
@@ -115,23 +118,30 @@ export function ErrorRecoveryFlows(
 ): JSX.Element | null {
   const { protocolAnalysis, runStatus, failedCommand } = props
 
-  const { hasLaunchedRecovery, toggleERWizard, showERWizard } = useERWizard()
-
-  const isOnDevice = useSelector(getIsOnDevice)
-  const robotType = protocolAnalysis?.robotType ?? OT2_ROBOT_TYPE
-  const showSplash = useRunPausedSplash(isOnDevice, showERWizard)
   const analytics = useRecoveryAnalytics()
-
   React.useEffect(() => {
     analytics.reportErrorEvent(failedCommand)
   }, [analytics, failedCommand])
 
+  const { hasLaunchedRecovery, toggleERWizard, showERWizard } = useERWizard()
+  const isOnDevice = useSelector(getIsOnDevice)
+  const robotType = protocolAnalysis?.robotType ?? OT2_ROBOT_TYPE
+  const showSplash = useRunPausedSplash(isOnDevice, showERWizard)
+  const robotName = useHost()?.robotName ?? 'robot'
+
   const isDoorOpen = useShowDoorInfo(runStatus)
+  const {
+    showTakeover,
+    isActiveUser,
+    intent,
+    toggleERWizAsActiveUser,
+  } = useRecoveryTakeover(toggleERWizard)
+  const renderWizard = isActiveUser && (showERWizard || isDoorOpen)
 
   const recoveryUtils = useERUtils({
     ...props,
     hasLaunchedRecovery,
-    toggleERWizard,
+    toggleERWizAsActiveUser,
     isOnDevice,
     robotType,
     analytics,
@@ -139,7 +149,10 @@ export function ErrorRecoveryFlows(
 
   return (
     <>
-      {showERWizard || isDoorOpen ? (
+      {showTakeover ? (
+        <RecoveryTakeover intent={intent} robotName={robotName} />
+      ) : null}
+      {renderWizard ? (
         <ErrorRecoveryWizard
           {...props}
           {...recoveryUtils}
@@ -154,8 +167,9 @@ export function ErrorRecoveryFlows(
           {...props}
           {...recoveryUtils}
           robotType={robotType}
+          robotName={robotName}
           isOnDevice={isOnDevice}
-          toggleERWiz={toggleERWizard}
+          toggleERWizAsActiveUser={toggleERWizAsActiveUser}
           analytics={analytics}
         />
       ) : null}

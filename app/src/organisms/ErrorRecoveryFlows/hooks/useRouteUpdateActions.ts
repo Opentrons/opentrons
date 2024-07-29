@@ -13,7 +13,7 @@ import type {
 
 export interface GetRouteUpdateActionsParams {
   hasLaunchedRecovery: boolean
-  toggleERWizard: (launchER: boolean) => Promise<void>
+  toggleERWizAsActiveUser: (launchER: boolean) => Promise<void>
   recoveryMap: IRecoveryMap
   setRecoveryMap: (recoveryMap: IRecoveryMap) => void
 }
@@ -175,7 +175,7 @@ interface DetermineRecoveryRoutingParams extends GetRouteUpdateActionsParams {
 // is the fallback route as opposed to SelectRecoveryOption (ex, accessed by pressing "go back" enough times).
 function determineRecoveryRouting({
   hasLaunchedRecovery,
-  toggleERWizard,
+  toggleERWizAsActiveUser,
   setRecoveryMap,
   updatedStep,
   currentRoute,
@@ -189,7 +189,7 @@ function determineRecoveryRouting({
     })
 
     if (!hasLaunchedRecovery) {
-      void toggleERWizard(false)
+      void toggleERWizAsActiveUser(false)
     }
   } else {
     setRecoveryMap({ route: currentRoute, step: updatedStep })

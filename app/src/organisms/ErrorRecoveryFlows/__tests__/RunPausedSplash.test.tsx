@@ -78,7 +78,7 @@ describe('RunPausedSplash', () => {
   beforeEach(() => {
     props = {
       ...mockRecoveryContentProps,
-      toggleERWiz: mockToggleERWiz,
+      toggleERWizAsActiveUser: mockToggleERWiz,
       routeUpdateActions: mockRouteUpdateActions,
     }
 
