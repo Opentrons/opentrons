@@ -33,7 +33,7 @@ from .._files_and_directories import (
 
 class Migration5to6(Migration):  # noqa: D101
     def migrate(self, source_dir: Path, dest_dir: Path) -> None:
-        """Migrate the persistence directory from schema 4 to 5."""
+        """Migrate the persistence directory from schema 5 to 6."""
         # Copy over unmodified directories and files to new version
         copy_if_exists(
             source_dir / DECK_CONFIGURATION_FILE, dest_dir / DECK_CONFIGURATION_FILE
