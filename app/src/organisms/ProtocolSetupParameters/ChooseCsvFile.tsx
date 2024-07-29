@@ -97,7 +97,7 @@ export function ChooseCsvFile({
                   <React.Fragment key={csv.id}>
                     <RadioButton
                       buttonLabel={csv.name}
-                      buttonValue={`${csv.id}`}
+                      buttonValue={csv.id}
                       onChange={() => {
                         setCsvFileSelected({ id: csv.id, fileName: csv.name })
                       }}
