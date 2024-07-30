@@ -498,6 +498,7 @@ def run(protocol_context: protocol_api.ProtocolContext):
 
                 # Currently getting error because something is looking for a trash bin and I
                 # don't have one defined.
+                # https://opentrons.atlassian.net/browse/RQA-2888
                 # pipette.distribute(
                 #     test_case.liquid_transfer_settings.transfer_volume,
                 #     src_labware.wells_by_name()["A1"],
