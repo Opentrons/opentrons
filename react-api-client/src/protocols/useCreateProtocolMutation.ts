@@ -11,13 +11,16 @@ import type {
   ErrorResponse,
   HostConfig,
   Protocol,
-  RunTimeParameterCreateData,
+  RunTimeParameterFilesCreateData,
+  RunTimeParameterValuesCreateData,
 } from '@opentrons/api-client'
 
 export interface CreateProtocolVariables {
   files: File[]
   protocolKey?: string
-  runTimeParameterValues?: RunTimeParameterCreateData
+  protocolKind?: string
+  runTimeParameterValues?: RunTimeParameterValuesCreateData
+  runTimeParameterFiles?: RunTimeParameterFilesCreateData
 }
 export type UseCreateProtocolMutationResult = UseMutationResult<
   Protocol,
@@ -52,12 +55,20 @@ export function useCreateProtocolMutation(
     CreateProtocolVariables
   >(
     [host, 'protocols'],
-    ({ files: protocolFiles, protocolKey, runTimeParameterValues }) =>
+    ({
+      files: protocolFiles,
+      protocolKey,
+      protocolKind = 'standard',
+      runTimeParameterValues,
+      runTimeParameterFiles,
+    }) =>
       createProtocol(
         host as HostConfig,
         protocolFiles,
         protocolKey,
-        runTimeParameterValues
+        protocolKind,
+        runTimeParameterValues,
+        runTimeParameterFiles
       )
         .then(response => {
           const protocolId = response.data.data.id

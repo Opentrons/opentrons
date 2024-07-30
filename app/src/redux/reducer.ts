@@ -1,7 +1,4 @@
-import createHistory from 'history/createHashHistory'
 import { combineReducers } from 'redux'
-import { connectRouter } from 'connected-react-router'
-import type { RouterState } from 'connected-react-router'
 
 // api state
 import { robotApiReducer } from './robot-api/reducer'
@@ -53,14 +50,8 @@ import { protocolStorageReducer } from './protocol-storage/reducer'
 
 import type { Reducer } from 'redux'
 import type { State, Action } from './types'
-import type { History } from 'history'
 
-export const history = createHistory<any>()
-
-export const rootReducer: Reducer<State, Action> = combineReducers<
-  State,
-  Action
->({
+export const rootReducer: Reducer<State, Action> = combineReducers({
   robotApi: robotApiReducer,
   robotAdmin: robotAdminReducer,
   robotControls: robotControlsReducer,
@@ -77,7 +68,4 @@ export const rootReducer: Reducer<State, Action> = combineReducers<
   sessions: sessionReducer,
   calibration: calibrationReducer,
   protocolStorage: protocolStorageReducer,
-  router: connectRouter<State['router']>(
-    history as History<RouterState<unknown>>
-  ) as Reducer<State['router'], Action>,
 })

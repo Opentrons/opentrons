@@ -15,7 +15,7 @@ import logging
 from itertools import dropwhile
 from typing import TYPE_CHECKING, Any, List, Dict, Optional, Union, Tuple, cast
 
-from opentrons_shared_data.labware.dev_types import LabwareDefinition, LabwareParameters
+from opentrons_shared_data.labware.types import LabwareDefinition, LabwareParameters
 
 from opentrons.types import Location, Point
 from opentrons.protocols.api_support.types import APIVersion

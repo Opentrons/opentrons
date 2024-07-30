@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Switch, Route, Redirect } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import { css } from 'styled-components'
 import { ErrorBoundary } from 'react-error-boundary'
 
@@ -34,6 +34,8 @@ import { RobotSettingsDashboard } from '../pages/RobotSettingsDashboard'
 import { ProtocolDashboard } from '../pages/ProtocolDashboard'
 import { ProtocolDetails } from '../pages/ProtocolDetails'
 import { QuickTransferFlow } from '../organisms/QuickTransferFlow'
+import { QuickTransferDashboard } from '../pages/QuickTransferDashboard'
+import { QuickTransferDetails } from '../pages/QuickTransferDetails'
 import { RunningProtocol } from '../pages/RunningProtocol'
 import { RunSummary } from '../pages/RunSummary'
 import { UpdateRobot } from '../pages/UpdateRobot/UpdateRobot'
@@ -76,6 +78,8 @@ export const ON_DEVICE_DISPLAY_PATHS = [
   '/protocols',
   '/protocols/:protocolId',
   '/quick-transfer',
+  '/quick-transfer/new',
+  '/quick-transfer/:quickTransferId',
   '/robot-settings',
   '/robot-settings/rename-robot',
   '/robot-settings/update-robot',
@@ -112,8 +116,12 @@ function getPathComponent(
       return <ProtocolDashboard />
     case '/protocols/:protocolId':
       return <ProtocolDetails />
-    case `/quick-transfer`:
+    case '/quick-transfer':
+      return <QuickTransferDashboard />
+    case '/quick-transfer/new':
       return <QuickTransferFlow />
+    case '/quick-transfer/:quickTransferId':
+      return <QuickTransferDetails />
     case '/robot-settings':
       return <RobotSettingsDashboard />
     case '/robot-settings/rename-robot':
@@ -193,8 +201,8 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                 </>
               )}
             </Box>
+            <TopLevelRedirects />
           </ErrorBoundary>
-          <TopLevelRedirects />
         </OnDeviceLocalizationProvider>
       </InitialLoadingScreen>
     </ApiHostProvider>
@@ -244,23 +252,33 @@ export function OnDeviceDisplayAppRoutes(): JSX.Element {
   `
 
   return (
-    <Switch>
+    <Routes>
       {ON_DEVICE_DISPLAY_PATHS.map(path => (
-        <Route key={path} exact path={path}>
-          <Box css={TOUCH_SCREEN_STYLE} ref={scrollRef}>
-            <ModalPortalRoot />
-            {getPathComponent(path)}
-          </Box>
-        </Route>
+        <Route
+          key={path}
+          path={path}
+          element={
+            <Box css={TOUCH_SCREEN_STYLE} ref={scrollRef}>
+              <ModalPortalRoot />
+              {getPathComponent(path)}
+            </Box>
+          }
+        />
       ))}
-      {targetPath != null && <Redirect exact from="/" to={targetPath} />}
-    </Switch>
+      {targetPath != null && (
+        <Route path="*" element={<Navigate to={targetPath} replace />} />
+      )}
+    </Routes>
   )
 }
 
 function TopLevelRedirects(): JSX.Element | null {
   const currentRunRoute = useCurrentRunRoute()
-  return currentRunRoute != null ? <Redirect to={currentRunRoute} /> : null
+  return currentRunRoute != null ? (
+    <Routes>
+      <Route path="*" element={<Navigate to={currentRunRoute} />} />
+    </Routes>
+  ) : null
 }
 
 function ProtocolReceiptToasts(): null {

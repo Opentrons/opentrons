@@ -2,8 +2,8 @@
 from fastapi import APIRouter, status, Depends
 from typing import TYPE_CHECKING
 
-from opentrons_shared_data.robot.dev_types import RobotType
-from opentrons_shared_data.robot.dev_types import RobotTypeEnum
+from opentrons_shared_data.robot.types import RobotType
+from opentrons_shared_data.robot.types import RobotTypeEnum
 from robot_server.hardware import get_robot_type
 
 from robot_server.errors.error_responses import ErrorBody

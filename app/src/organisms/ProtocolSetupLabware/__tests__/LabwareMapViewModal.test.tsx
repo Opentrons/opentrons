@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { StaticRouter } from 'react-router-dom'
+import { MemoryRouter } from 'react-router-dom'
 import { when } from 'vitest-when'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, vi, beforeEach, afterEach, expect } from 'vitest'
@@ -53,9 +53,9 @@ vi.mock('@opentrons/components', async importOriginal => {
 
 const render = (props: React.ComponentProps<typeof LabwareMapViewModal>) => {
   return renderWithProviders(
-    <StaticRouter>
+    <MemoryRouter>
       <LabwareMapViewModal {...props} />
-    </StaticRouter>,
+    </MemoryRouter>,
     {
       i18nInstance: i18n,
     }

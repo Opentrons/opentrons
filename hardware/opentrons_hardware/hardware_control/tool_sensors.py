@@ -393,6 +393,7 @@ async def liquid_probe(
     plunger_speed: float,
     mount_speed: float,
     threshold_pascals: float,
+    plunger_impulse_time: float,
     csv_output: bool = False,
     sync_buffer_output: bool = False,
     can_bus_only_output: bool = False,
@@ -425,7 +426,7 @@ async def liquid_probe(
         sensor_driver,
         True,
     )
-    p_prep_distance = float(PLUNGER_SOLO_MOVE_TIME * plunger_speed)
+    p_prep_distance = float(plunger_impulse_time * plunger_speed)
     p_pass_distance = float(max_p_distance - p_prep_distance)
     max_z_distance = (p_pass_distance / plunger_speed) * mount_speed
 
@@ -433,7 +434,7 @@ async def liquid_probe(
         distance={tool: float64(p_prep_distance)},
         velocity={tool: float64(plunger_speed)},
         acceleration={},
-        duration=float64(PLUNGER_SOLO_MOVE_TIME),
+        duration=float64(plunger_impulse_time),
         present_nodes=[tool],
     )
     sensor_group = _build_pass_step(
@@ -519,7 +520,6 @@ async def capacitive_probe(
     tool: InstrumentProbeTarget,
     mover: NodeId,
     distance: float,
-    plunger_speed: float,
     mount_speed: float,
     sensor_id: SensorId = SensorId.S0,
     relative_threshold_pf: float = 1.0,
@@ -538,6 +538,8 @@ async def capacitive_probe(
     """
     log_files: Dict[SensorId, str] = {} if not data_files else data_files
     sensor_driver = SensorDriver()
+    pipette_present = tool in [NodeId.pipette_left, NodeId.pipette_right]
+
     capacitive_sensors = await _setup_capacitive_sensors(
         messenger,
         sensor_id,
@@ -546,10 +548,18 @@ async def capacitive_probe(
         sensor_driver,
     )
 
+    probe_distance = {mover: distance}
+    probe_speed = {mover: mount_speed}
+    movers = [mover]
+    if pipette_present:
+        probe_distance[tool] = 0.0
+        probe_speed[tool] = 0.0
+        movers.append(tool)
+
     sensor_group = _build_pass_step(
-        movers=[mover, tool],
-        distance={mover: distance, tool: 0.0},
-        speed={mover: mount_speed, tool: 0.0},
+        movers=movers,
+        distance=probe_distance,
+        speed=probe_speed,
         sensor_type=SensorType.capacitive,
         sensor_id=sensor_id,
         stop_condition=MoveStopCondition.sync_line,
@@ -557,9 +567,9 @@ async def capacitive_probe(
     if sync_buffer_output:
         sensor_group = _fix_pass_step_for_buffer(
             sensor_group,
-            movers=[mover, tool],
-            distance={mover: distance, tool: distance},
-            speed={mover: mount_speed, tool: plunger_speed},
+            movers=movers,
+            distance=probe_distance,
+            speed=probe_speed,
             sensor_type=SensorType.capacitive,
             sensor_id=sensor_id,
             stop_condition=MoveStopCondition.sync_line,

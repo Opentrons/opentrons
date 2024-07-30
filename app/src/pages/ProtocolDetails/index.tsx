@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
 import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
 import { useDispatch, useSelector } from 'react-redux'
-import { useHistory, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -80,7 +80,7 @@ const ProtocolHeader = ({
   isScrolled,
   isProtocolFetching,
 }: ProtocolHeaderProps): JSX.Element => {
-  const history = useHistory()
+  const navigate = useNavigate()
   const { t } = useTranslation(['protocol_info, protocol_details', 'shared'])
   const [truncate, setTruncate] = React.useState<boolean>(true)
   const [startSetup, setStartSetup] = React.useState<boolean>(false)
@@ -115,7 +115,7 @@ const ProtocolHeader = ({
           paddingLeft="0rem"
           paddingRight={SPACING.spacing24}
           onClick={() => {
-            history.push('/protocols')
+            navigate('/protocols')
           }}
           width="3rem"
         >
@@ -309,7 +309,9 @@ export function ProtocolDetails(): JSX.Element | null {
     'shared',
   ])
   const enableCsvFile = useFeatureFlag('enableCsvFile')
-  const { protocolId } = useParams<OnDeviceRouteParams>()
+  const { protocolId } = useParams<
+    keyof OnDeviceRouteParams
+  >() as OnDeviceRouteParams
   const {
     missingProtocolHardware,
     conflictedSlots,
@@ -318,7 +320,7 @@ export function ProtocolDetails(): JSX.Element | null {
 
   const runTimeParameters = useRunTimeParameters(protocolId)
   const dispatch = useDispatch<Dispatch>()
-  const history = useHistory()
+  const navigate = useNavigate()
   const host = useHost()
   const { makeSnackbar } = useToaster()
   const [showParameters, setShowParameters] = React.useState<boolean>(false)
@@ -426,11 +428,11 @@ export function ProtocolDetails(): JSX.Element | null {
         )
         .then(() => deleteProtocol(host, protocolId))
         .then(() => {
-          history.push('/protocols')
+          navigate('/protocols')
         })
         .catch((e: Error) => {
           console.error(`error deleting resources: ${e.message}`)
-          history.push('/protocols')
+          navigate('/protocols')
         })
     } else {
       console.error(

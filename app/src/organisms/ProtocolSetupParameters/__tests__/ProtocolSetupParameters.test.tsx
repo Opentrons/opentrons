@@ -6,6 +6,7 @@ import {
   useCreateProtocolAnalysisMutation,
   useCreateRunMutation,
   useHost,
+  useUploadCsvFileMutation,
 } from '@opentrons/react-api-client'
 import { COLORS } from '@opentrons/components'
 
@@ -19,11 +20,11 @@ import { useToaster } from '../../ToasterOven'
 import { useFeatureFlag } from '../../../redux/config'
 import { ProtocolSetupParameters } from '..'
 
-import type * as ReactRouterDom from 'react-router-dom'
+import type { NavigateFunction } from 'react-router-dom'
 import type { HostConfig } from '@opentrons/api-client'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
-const mockGoBack = vi.fn()
+const mockNavigate = vi.fn()
 
 vi.mock('../ChooseEnum')
 vi.mock('../ChooseNumber')
@@ -33,16 +34,17 @@ vi.mock('../../ToasterOven')
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 vi.mock('react-router-dom', async importOriginal => {
-  const reactRouterDom = await importOriginal<typeof ReactRouterDom>()
+  const reactRouterDom = await importOriginal<NavigateFunction>()
   return {
     ...reactRouterDom,
-    useHistory: () => ({ goBack: mockGoBack } as any),
+    useNavigate: () => mockNavigate,
   }
 })
 vi.mock('../../../redux/config')
 
 const MOCK_HOST_CONFIG: HostConfig = { hostname: 'MOCK_HOST' }
 const mockCreateProtocolAnalysis = vi.fn()
+const mockUploadCsvFile = vi.fn()
 const mockCreateRun = vi.fn()
 const mockMostRecentAnalysis = ({
   commands: [],
@@ -79,6 +81,9 @@ describe('ProtocolSetupParameters', () => {
     when(vi.mocked(useCreateRunMutation))
       .calledWith(expect.anything())
       .thenReturn({ createRun: mockCreateRun } as any)
+    when(vi.mocked(useUploadCsvFileMutation))
+      .calledWith(expect.anything(), expect.anything())
+      .thenReturn({ uploadCsvFile: mockUploadCsvFile } as any)
     when(vi.mocked(useFeatureFlag))
       .calledWith('enableCsvFile')
       .thenReturn(false)
@@ -136,17 +141,16 @@ describe('ProtocolSetupParameters', () => {
     screen.getByText('EtoH Volume')
   })
 
-  // ToDo (kk:06/18/2024) comment-out will be removed in a following PR.
-  // it('renders the other setting when csv param', () => {
-  //   vi.mocked(useFeatureFlag).mockReturnValue(true)
-  //   render(props)
-  //   screen.getByText('CSV File')
-  // })
+  it('renders the other setting when csv param', () => {
+    vi.mocked(useFeatureFlag).mockReturnValue(true)
+    render(props)
+    screen.getByText('CSV File')
+  })
 
-  it('renders the back icon and calls useHistory', () => {
+  it('renders the back icon and calls useNavigate', () => {
     render(props)
     fireEvent.click(screen.getAllByRole('button')[0])
-    expect(mockGoBack).toHaveBeenCalled()
+    expect(mockNavigate).toHaveBeenCalled()
   })
 
   it('renders the confirm values button and clicking on it creates a run', () => {

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { formatDistance } from 'date-fns'
 import styled, { css } from 'styled-components'
 
@@ -83,7 +83,7 @@ export function PinnedProtocol(props: PinnedProtocolProps): JSX.Element {
     isRequiredCSV = false,
   } = props
   const cardSize = size ?? 'full'
-  const history = useHistory()
+  const navigate = useNavigate()
   const longpress = useLongPress()
   const protocolName = protocol.metadata.protocolName ?? protocol.files[0].name
   const { t } = useTranslation('protocol_info')
@@ -96,7 +96,7 @@ export function PinnedProtocol(props: PinnedProtocolProps): JSX.Element {
     protocolId: string
   ): void => {
     if (!longpress.isLongPressed) {
-      history.push(`/protocols/${protocolId}`)
+      navigate(`/protocols/${protocolId}`)
     }
   }
   React.useEffect(() => {

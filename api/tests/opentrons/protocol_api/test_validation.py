@@ -10,8 +10,8 @@ from opentrons_shared_data.labware.labware_definition import (
     LabwareRole,
     Parameters as LabwareDefinitionParameters,
 )
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.pipette.types import PipetteNameType
+from opentrons_shared_data.robot.types import RobotType
 
 from opentrons.types import Mount, DeckSlotName, StagingSlotName, Location, Point
 from opentrons.hardware_control.modules.types import (

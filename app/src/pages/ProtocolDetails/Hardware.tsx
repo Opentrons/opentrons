@@ -30,8 +30,8 @@ import {
 import { useRequiredProtocolHardware } from '../Protocols/hooks'
 import { EmptySection } from './EmptySection'
 
-import type { ProtocolHardware, ProtocolPipette } from '../Protocols/hooks'
 import type { TFunction } from 'i18next'
+import type { ProtocolHardware, ProtocolPipette } from '../Protocols/hooks'
 
 const Table = styled('table')`
   ${TYPOGRAPHY.labelRegular}
@@ -79,8 +79,6 @@ const getHardwareLocation = (
     return 'location unknown'
   }
 }
-
-// convert to anon
 
 const useHardwareName = (protocolHardware: ProtocolHardware): string => {
   const gripperDisplayName = useGripperDisplayName(GRIPPER_V1_2)

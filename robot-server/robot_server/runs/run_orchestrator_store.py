@@ -7,8 +7,8 @@ from opentrons.protocol_engine.errors.exceptions import EStopActivatedError
 from opentrons.protocol_engine.types import PostRunHardwareState, RunTimeParameter
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
-from opentrons_shared_data.robot.dev_types import RobotType
-from opentrons_shared_data.robot.dev_types import RobotTypeEnum
+from opentrons_shared_data.robot.types import RobotType
+from opentrons_shared_data.robot.types import RobotTypeEnum
 
 from opentrons.config import feature_flags
 from opentrons.hardware_control import HardwareControlAPI
@@ -41,11 +41,12 @@ from opentrons.protocol_engine.create_protocol_engine import create_protocol_eng
 from robot_server.protocols.protocol_store import ProtocolResource
 from opentrons.protocol_engine.types import (
     DeckConfigurationType,
-    RunTimeParamValuesType,
+    PrimitiveRunTimeParamValuesType,
     EngineStatus,
 )
-from opentrons_shared_data.labware.dev_types import LabwareUri
+from opentrons_shared_data.labware.types import LabwareUri
 
+from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
 
 _log = logging.getLogger(__name__)
 
@@ -186,7 +187,7 @@ class RunOrchestratorStore:
         deck_configuration: DeckConfigurationType,
         notify_publishers: Callable[[], None],
         protocol: Optional[ProtocolResource],
-        run_time_param_values: Optional[RunTimeParamValuesType] = None,
+        run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
     ) -> StateSummary:
         """Create and store a ProtocolRunner and ProtocolEngine for a given Run.
 
@@ -242,6 +243,8 @@ class RunOrchestratorStore:
             await self.run_orchestrator.load(
                 protocol.source,
                 run_time_param_values=run_time_param_values,
+                # TODO (spp, 2024-07-16): update this once runs accept csv params
+                run_time_param_files={},
                 parse_mode=ParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
             )
         else:
@@ -358,6 +361,10 @@ class RunOrchestratorStore:
     def add_labware_definition(self, definition: LabwareDefinition) -> LabwareUri:
         """Add a new labware definition to state."""
         return self.run_orchestrator.add_labware_definition(definition)
+
+    def set_error_recovery_policy(self, policy: ErrorRecoveryPolicy) -> None:
+        """Create run policy rules for error recovery."""
+        self.run_orchestrator.set_error_recovery_policy(policy)
 
     async def add_command_and_wait_for_interval(
         self,

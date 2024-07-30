@@ -43,7 +43,8 @@ from ..protocol_engine.types import (
     PostRunHardwareState,
     DeckConfigurationType,
     RunTimeParameter,
-    RunTimeParamValuesType,
+    PrimitiveRunTimeParamValuesType,
+    CSVRunTimeParamFilesType,
 )
 from ..protocols.types import PythonProtocol
 
@@ -100,7 +101,11 @@ class AbstractRunner(ABC):
 
     def play(self, deck_configuration: Optional[DeckConfigurationType] = None) -> None:
         """Start or resume the run."""
-        self._protocol_engine.play(deck_configuration=deck_configuration)
+        # todo(mm, 2024-07-09): The deck configuration is set at the same time here for
+        # historical reasons. It's unsafe to change the deck configuration mid-run
+        # and we're relying on the caller to not do that.
+        self._protocol_engine.set_deck_configuration(deck_configuration)
+        self._protocol_engine.play()
 
     def pause(self) -> None:
         """Pause the run."""
@@ -126,7 +131,7 @@ class AbstractRunner(ABC):
         self,
         deck_configuration: DeckConfigurationType,
         protocol_source: Optional[ProtocolSource] = None,
-        run_time_param_values: Optional[RunTimeParamValuesType] = None,
+        run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
     ) -> RunResult:
         """Run a given protocol to completion."""
 
@@ -180,7 +185,8 @@ class PythonAndLegacyRunner(AbstractRunner):
         self,
         protocol_source: ProtocolSource,
         python_parse_mode: PythonParseMode,
-        run_time_param_values: Optional[RunTimeParamValuesType],
+        run_time_param_values: Optional[PrimitiveRunTimeParamValuesType],
+        run_time_param_files: Optional[CSVRunTimeParamFilesType],
     ) -> None:
         """Load a Python or JSONv5(& older) ProtocolSource into managed ProtocolEngine."""
         labware_definitions = await protocol_reader.extract_labware_definitions(
@@ -203,6 +209,7 @@ class PythonAndLegacyRunner(AbstractRunner):
                     protocol=protocol,
                     parameter_context=self._parameter_context,
                     run_time_param_overrides=run_time_param_values,
+                    run_time_param_file_overrides=run_time_param_files,
                 )
             )
         else:
@@ -246,7 +253,8 @@ class PythonAndLegacyRunner(AbstractRunner):
         self,
         deck_configuration: DeckConfigurationType,
         protocol_source: Optional[ProtocolSource] = None,
-        run_time_param_values: Optional[RunTimeParamValuesType] = None,
+        run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
+        run_time_param_files: Optional[CSVRunTimeParamFilesType] = None,
         python_parse_mode: PythonParseMode = PythonParseMode.NORMAL,
     ) -> RunResult:
         # TODO(mc, 2022-01-11): move load to runner creation, remove from `run`
@@ -256,6 +264,7 @@ class PythonAndLegacyRunner(AbstractRunner):
                 protocol_source=protocol_source,
                 python_parse_mode=python_parse_mode,
                 run_time_param_values=run_time_param_values,
+                run_time_param_files=run_time_param_files,
             )
 
         self.play(deck_configuration=deck_configuration)
@@ -357,7 +366,7 @@ class JsonRunner(AbstractRunner):
         self,
         deck_configuration: DeckConfigurationType,
         protocol_source: Optional[ProtocolSource] = None,
-        run_time_param_values: Optional[RunTimeParamValuesType] = None,
+        run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
     ) -> RunResult:
         # TODO(mc, 2022-01-11): move load to runner creation, remove from `run`
         # currently `protocol_source` arg is only used by tests
@@ -429,7 +438,7 @@ class LiveRunner(AbstractRunner):
         self,
         deck_configuration: DeckConfigurationType,
         protocol_source: Optional[ProtocolSource] = None,
-        run_time_param_values: Optional[RunTimeParamValuesType] = None,
+        run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
     ) -> RunResult:
         assert protocol_source is None
         await self._hardware_api.home()

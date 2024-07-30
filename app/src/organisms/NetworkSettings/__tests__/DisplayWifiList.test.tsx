@@ -8,9 +8,9 @@ import * as Fixtures from '../../../redux/networking/__fixtures__'
 import { DisplaySearchNetwork } from '../DisplaySearchNetwork'
 import { DisplayWifiList } from '../DisplayWifiList'
 
-import type { useHistory } from 'react-router-dom'
+import type { NavigateFunction } from 'react-router-dom'
 
-const mockPush = vi.fn()
+const mockNavigate = vi.fn()
 const mockWifiList = [
   { ...Fixtures.mockWifiNetwork, ssid: 'foo', active: true },
   { ...Fixtures.mockWifiNetwork, ssid: 'bar' },
@@ -24,10 +24,10 @@ vi.mock('../../../redux/networking/selectors')
 vi.mock('../../../redux/discovery/selectors')
 vi.mock('../DisplaySearchNetwork')
 vi.mock('react-router-dom', async importOriginal => {
-  const actual = await importOriginal<typeof useHistory>()
+  const actual = await importOriginal<NavigateFunction>()
   return {
     ...actual,
-    useHistory: () => ({ push: mockPush } as any),
+    useNavigate: () => mockNavigate,
   }
 })
 
@@ -76,7 +76,7 @@ describe('DisplayWifiList', () => {
     render(props)
     const button = screen.getByLabelText('back-button')
     fireEvent.click(button)
-    expect(mockPush).toHaveBeenCalledWith('/network-setup')
+    expect(mockNavigate).toHaveBeenCalledWith('/network-setup')
   })
 
   it('should call mock function when tapping tapping a ssid', () => {

@@ -17,29 +17,46 @@ import { RECOVERY_MAP } from '../../constants'
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../../resources/runs')
 
-const mockFailedCommand = {
-  id: 'MOCK_ID',
-  commandType: 'mockCommandType',
-  params: { test: 'mock_param' },
-} as any
-const mockRunId = '123'
-const mockFailedLabwareUtils = {
-  selectedTipLocations: { A1: null },
-  pickUpTipLabware: { id: 'MOCK_LW_ID' },
-} as any
-const mockProceedToRouteAndStep = vi.fn()
-const mockRouteUpdateActions = {
-  proceedToRouteAndStep: mockProceedToRouteAndStep,
-} as any
-
 describe('useRecoveryCommands', () => {
-  const mockResumeRunFromRecovery = vi.fn()
+  const mockFailedCommand = {
+    id: 'MOCK_ID',
+    commandType: 'mockCommandType',
+    params: { test: 'mock_param' },
+  } as any
+  const mockRunId = '123'
+  const mockFailedLabwareUtils = {
+    selectedTipLocations: { A1: null },
+    pickUpTipLabware: { id: 'MOCK_LW_ID' },
+  } as any
+  const mockProceedToRouteAndStep = vi.fn()
+  const mockRouteUpdateActions = {
+    proceedToRouteAndStep: mockProceedToRouteAndStep,
+  } as any
+  const mockMakeSuccessToast = vi.fn()
+  const mockResumeRunFromRecovery = vi.fn(() =>
+    Promise.resolve(mockMakeSuccessToast())
+  )
   const mockStopRun = vi.fn()
   const mockChainRunCommands = vi.fn().mockResolvedValue([])
+  const mockReportActionSelectedResult = vi.fn()
+  const mockReportRecoveredRunResult = vi.fn()
+
+  const props = {
+    runId: mockRunId,
+    failedCommand: mockFailedCommand,
+    failedLabwareUtils: mockFailedLabwareUtils,
+    routeUpdateActions: mockRouteUpdateActions,
+    recoveryToastUtils: { makeSuccessToast: mockMakeSuccessToast } as any,
+    analytics: {
+      reportActionSelectedResult: mockReportActionSelectedResult,
+      reportRecoveredRunResult: mockReportRecoveredRunResult,
+    } as any,
+    selectedRecoveryOption: RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE,
+  }
 
   beforeEach(() => {
     vi.mocked(useResumeRunFromRecoveryMutation).mockReturnValue({
-      resumeRunFromRecovery: mockResumeRunFromRecovery,
+      mutateAsync: mockResumeRunFromRecovery,
     } as any)
     vi.mocked(useStopRunMutation).mockReturnValue({
       stopRun: mockStopRun,
@@ -50,17 +67,10 @@ describe('useRecoveryCommands', () => {
   })
 
   it('should call chainRunRecoveryCommands with continuePastCommandFailure set to false', async () => {
-    const { result } = renderHook(() =>
-      useRecoveryCommands({
-        runId: mockRunId,
-        failedCommand: mockFailedCommand,
-        failedLabwareUtils: mockFailedLabwareUtils,
-        routeUpdateActions: mockRouteUpdateActions,
-      })
-    )
+    const { result } = renderHook(() => useRecoveryCommands(props))
 
     await act(async () => {
-      await result.current.homePipetteZAxes() // can use any result returned command
+      await result.current.homePipetteZAxes()
     })
 
     expect(mockChainRunCommands).toHaveBeenCalledWith(
@@ -75,14 +85,7 @@ describe('useRecoveryCommands', () => {
       chainRunCommands: vi.fn().mockRejectedValue(mockError),
     } as any)
 
-    const { result } = renderHook(() =>
-      useRecoveryCommands({
-        runId: mockRunId,
-        failedCommand: mockFailedCommand,
-        failedLabwareUtils: mockFailedLabwareUtils,
-        routeUpdateActions: mockRouteUpdateActions,
-      })
-    )
+    const { result } = renderHook(() => useRecoveryCommands(props))
 
     await act(async () => {
       await expect(result.current.homePipetteZAxes()).rejects.toThrow(
@@ -101,14 +104,7 @@ describe('useRecoveryCommands', () => {
       params: mockFailedCommand.params,
     }
 
-    const { result } = renderHook(() =>
-      useRecoveryCommands({
-        runId: mockRunId,
-        failedCommand: mockFailedCommand,
-        failedLabwareUtils: mockFailedLabwareUtils,
-        routeUpdateActions: mockRouteUpdateActions,
-      })
-    )
+    const { result } = renderHook(() => useRecoveryCommands(props))
 
     await act(async () => {
       await result.current.retryFailedCommand()
@@ -119,31 +115,78 @@ describe('useRecoveryCommands', () => {
       false
     )
   })
-
-  it('should call resumeRun with runId', () => {
-    const { result } = renderHook(() =>
-      useRecoveryCommands({
-        runId: mockRunId,
-        failedCommand: mockFailedCommand,
-        failedLabwareUtils: mockFailedLabwareUtils,
-        routeUpdateActions: mockRouteUpdateActions,
+  ;([
+    'aspirateInPlace',
+    'dispenseInPlace',
+    'blowOutInPlace',
+    'dropTipInPlace',
+    'prepareToAspirate',
+  ] as const).forEach(inPlaceCommandType => {
+    it(`Should move to retryLocation if failed command is ${inPlaceCommandType} and error is appropriate when retrying`, async () => {
+      const { result } = renderHook(() =>
+        useRecoveryCommands({
+          runId: mockRunId,
+          failedCommand: {
+            ...mockFailedCommand,
+            commandType: inPlaceCommandType,
+            params: {
+              pipetteId: 'mock-pipette-id',
+            },
+            error: {
+              errorType: 'overpressure',
+              errorCode: '3006',
+              isDefined: true,
+              errorInfo: {
+                retryLocation: [1, 2, 3],
+              },
+            },
+          },
+          failedLabwareUtils: mockFailedLabwareUtils,
+          routeUpdateActions: mockRouteUpdateActions,
+          recoveryToastUtils: {} as any,
+          analytics: {
+            reportActionSelectedResult: mockReportActionSelectedResult,
+            reportRecoveredRunResult: mockReportRecoveredRunResult,
+          } as any,
+          selectedRecoveryOption: RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE,
+        })
+      )
+      await act(async () => {
+        await result.current.retryFailedCommand()
       })
-    )
+      expect(mockChainRunCommands).toHaveBeenLastCalledWith(
+        [
+          {
+            commandType: 'moveToCoordinates',
+            intent: 'fixit',
+            params: {
+              pipetteId: 'mock-pipette-id',
+              coordinates: { x: 1, y: 2, z: 3 },
+            },
+          },
+          {
+            commandType: inPlaceCommandType,
+            params: { pipetteId: 'mock-pipette-id' },
+          },
+        ],
+        false
+      )
+    })
+  })
 
-    result.current.resumeRun()
+  it('should call resumeRun with runId and show success toast on success', async () => {
+    const { result } = renderHook(() => useRecoveryCommands(props))
+
+    await act(async () => {
+      await result.current.resumeRun()
+    })
 
     expect(mockResumeRunFromRecovery).toHaveBeenCalledWith(mockRunId)
+    expect(mockMakeSuccessToast).toHaveBeenCalled()
   })
 
   it('should call cancelRun with runId', () => {
-    const { result } = renderHook(() =>
-      useRecoveryCommands({
-        runId: mockRunId,
-        failedCommand: mockFailedCommand,
-        failedLabwareUtils: mockFailedLabwareUtils,
-        routeUpdateActions: mockRouteUpdateActions,
-      })
-    )
+    const { result } = renderHook(() => useRecoveryCommands(props))
 
     result.current.cancelRun()
 
@@ -151,14 +194,7 @@ describe('useRecoveryCommands', () => {
   })
 
   it('should call homePipetteZAxes with the appropriate command', async () => {
-    const { result } = renderHook(() =>
-      useRecoveryCommands({
-        runId: mockRunId,
-        failedCommand: mockFailedCommand,
-        failedLabwareUtils: mockFailedLabwareUtils,
-        routeUpdateActions: mockRouteUpdateActions,
-      })
-    )
+    const { result } = renderHook(() => useRecoveryCommands(props))
 
     await act(async () => {
       await result.current.homePipetteZAxes()
@@ -186,17 +222,16 @@ describe('useRecoveryCommands', () => {
       mockFailedLabware
     )
 
-    const { result } = renderHook(() =>
-      useRecoveryCommands({
-        runId: mockRunId,
-        failedCommand: mockFailedCmdWithPipetteId,
-        failedLabwareUtils: {
-          ...mockFailedLabwareUtils,
-          failedLabware: mockFailedLabware,
-        },
-        routeUpdateActions: mockRouteUpdateActions,
-      })
-    )
+    const testProps = {
+      ...props,
+      failedCommand: mockFailedCmdWithPipetteId,
+      failedLabwareUtils: {
+        ...mockFailedLabwareUtils,
+        failedLabware: mockFailedLabware,
+      },
+    }
+
+    const { result } = renderHook(() => useRecoveryCommands(testProps))
 
     await act(async () => {
       await result.current.pickUpTips()
@@ -204,39 +239,23 @@ describe('useRecoveryCommands', () => {
 
     expect(mockChainRunCommands).toHaveBeenCalledWith(
       [buildPickUpTipsCmd],
-      true
+      false
     )
   })
 
-  it('should call skipFailedCommand and resolve after a timeout', async () => {
-    const { result } = renderHook(() =>
-      useRecoveryCommands({
-        runId: mockRunId,
-        failedCommand: mockFailedCommand,
-        failedLabwareUtils: mockFailedLabwareUtils,
-        routeUpdateActions: mockRouteUpdateActions,
-      })
-    )
-
-    const consoleSpy = vi.spyOn(console, 'log')
+  it('should call skipFailedCommand and show success toast on success', async () => {
+    const { result } = renderHook(() => useRecoveryCommands(props))
 
     await act(async () => {
       await result.current.skipFailedCommand()
     })
 
-    expect(consoleSpy).toHaveBeenCalledWith('SKIPPING TO NEXT STEP')
-    expect(result.current.skipFailedCommand()).resolves.toBeUndefined()
+    expect(mockResumeRunFromRecovery).toHaveBeenCalledWith(mockRunId)
+    expect(mockMakeSuccessToast).toHaveBeenCalled()
   })
 
   it('should call ignoreErrorKindThisRun and resolve immediately', async () => {
-    const { result } = renderHook(() =>
-      useRecoveryCommands({
-        runId: mockRunId,
-        failedCommand: mockFailedCommand,
-        failedLabwareUtils: mockFailedLabwareUtils,
-        routeUpdateActions: mockRouteUpdateActions,
-      })
-    )
+    const { result } = renderHook(() => useRecoveryCommands(props))
 
     const consoleSpy = vi.spyOn(console, 'log')
 

@@ -11,7 +11,7 @@ from opentrons.protocol_engine import (
 from opentrons.protocol_engine.create_protocol_engine import create_protocol_engine
 from opentrons.protocol_reader.protocol_source import ProtocolConfig
 
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.types import RobotType
 
 from .python_protocol_wrappers import SimulatingContextCreator
 from .run_orchestrator import RunOrchestrator

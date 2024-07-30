@@ -309,11 +309,7 @@ def test_command_store_handles_pause_action(pause_source: PauseSource) -> None:
 def test_command_store_handles_play_action(pause_source: PauseSource) -> None:
     """It should set the running flag on play."""
     subject = CommandStore(is_door_open=False, config=_make_config())
-    subject.handle_action(
-        PlayAction(
-            requested_at=datetime(year=2021, month=1, day=1), deck_configuration=[]
-        )
-    )
+    subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
 
     assert subject.state == CommandState(
         command_history=CommandHistory(),
@@ -340,11 +336,7 @@ def test_command_store_handles_finish_action() -> None:
     """It should change to a succeeded state with FinishAction."""
     subject = CommandStore(is_door_open=False, config=_make_config())
 
-    subject.handle_action(
-        PlayAction(
-            requested_at=datetime(year=2021, month=1, day=1), deck_configuration=[]
-        )
-    )
+    subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
     subject.handle_action(FinishAction())
 
     assert subject.state == CommandState(
@@ -372,11 +364,7 @@ def test_command_store_handles_finish_action_with_stopped() -> None:
     """It should change to a stopped state if FinishAction has set_run_status=False."""
     subject = CommandStore(is_door_open=False, config=_make_config())
 
-    subject.handle_action(
-        PlayAction(
-            requested_at=datetime(year=2021, month=1, day=1), deck_configuration=[]
-        )
-    )
+    subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
     subject.handle_action(FinishAction(set_run_status=False))
 
     assert subject.state.run_result == RunResult.STOPPED
@@ -392,11 +380,7 @@ def test_command_store_handles_stop_action(
     """It should mark the engine as non-gracefully stopped on StopAction."""
     subject = CommandStore(is_door_open=False, config=_make_config())
 
-    subject.handle_action(
-        PlayAction(
-            requested_at=datetime(year=2021, month=1, day=1), deck_configuration=[]
-        )
-    )
+    subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
     subject.handle_action(StopAction(from_estop=from_estop))
 
     assert subject.state == CommandState(
@@ -424,11 +408,7 @@ def test_command_store_handles_stop_action_when_awaiting_recovery() -> None:
     """It should mark the engine as non-gracefully stopped on StopAction."""
     subject = CommandStore(is_door_open=False, config=_make_config())
 
-    subject.handle_action(
-        PlayAction(
-            requested_at=datetime(year=2021, month=1, day=1), deck_configuration=[]
-        )
-    )
+    subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
 
     subject.state.queue_status = QueueStatus.AWAITING_RECOVERY
 
@@ -459,11 +439,7 @@ def test_command_store_cannot_restart_after_should_stop() -> None:
     """It should reject a play action after finish."""
     subject = CommandStore(is_door_open=False, config=_make_config())
     subject.handle_action(FinishAction())
-    subject.handle_action(
-        PlayAction(
-            requested_at=datetime(year=2021, month=1, day=1), deck_configuration=[]
-        )
-    )
+    subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
 
     assert subject.state == CommandState(
         command_history=CommandHistory(),
@@ -492,7 +468,7 @@ def test_command_store_save_started_completed_run_timestamp() -> None:
     start_time = datetime(year=2021, month=1, day=1)
     hardware_stopped_time = datetime(year=2022, month=2, day=2)
 
-    subject.handle_action(PlayAction(requested_at=start_time, deck_configuration=[]))
+    subject.handle_action(PlayAction(requested_at=start_time))
     subject.handle_action(
         HardwareStoppedAction(
             completed_at=hardware_stopped_time, finish_error_details=None
@@ -512,9 +488,9 @@ def test_timestamps_are_latched() -> None:
     stop_time_1 = datetime(year=2023, month=3, day=3)
     stop_time_2 = datetime(year=2024, month=4, day=4)
 
-    subject.handle_action(PlayAction(requested_at=play_time_1, deck_configuration=[]))
+    subject.handle_action(PlayAction(requested_at=play_time_1))
     subject.handle_action(PauseAction(source=PauseSource.CLIENT))
-    subject.handle_action(PlayAction(requested_at=play_time_2, deck_configuration=[]))
+    subject.handle_action(PlayAction(requested_at=play_time_2))
     subject.handle_action(
         HardwareStoppedAction(completed_at=stop_time_1, finish_error_details=None)
     )
@@ -685,11 +661,7 @@ def test_command_store_ignores_stop_after_graceful_finish() -> None:
     """It should no-op on stop if already gracefully finished."""
     subject = CommandStore(is_door_open=False, config=_make_config())
 
-    subject.handle_action(
-        PlayAction(
-            requested_at=datetime(year=2021, month=1, day=1), deck_configuration=[]
-        )
-    )
+    subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
     subject.handle_action(FinishAction())
     subject.handle_action(StopAction())
 
@@ -718,11 +690,7 @@ def test_command_store_ignores_finish_after_non_graceful_stop() -> None:
     """It should no-op on finish if already ungracefully stopped."""
     subject = CommandStore(is_door_open=False, config=_make_config())
 
-    subject.handle_action(
-        PlayAction(
-            requested_at=datetime(year=2021, month=1, day=1), deck_configuration=[]
-        )
-    )
+    subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
     subject.handle_action(StopAction())
     subject.handle_action(FinishAction())
 

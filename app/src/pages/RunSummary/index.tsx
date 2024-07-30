@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { useParams, useHistory } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
 
@@ -68,9 +68,11 @@ import type { OnDeviceRouteParams } from '../../App/types'
 import type { PipetteWithTip } from '../../organisms/DropTipWizardFlows'
 
 export function RunSummary(): JSX.Element {
-  const { runId } = useParams<OnDeviceRouteParams>()
+  const { runId } = useParams<
+    keyof OnDeviceRouteParams
+  >() as OnDeviceRouteParams
   const { t } = useTranslation('run_details')
-  const history = useHistory()
+  const navigate = useNavigate()
   const host = useHost()
   const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
   const isRunCurrent = Boolean(runRecord?.data?.current)
@@ -144,8 +146,10 @@ export function RunSummary(): JSX.Element {
 
   const returnToDash = (): void => {
     closeCurrentRun()
-    history.push('/')
+    navigate('/')
   }
+
+  // TODO(jh, 07-24-24): After EXEC-504, add reportRecoveredRunResult here.
 
   // TODO(jh, 05-30-24): EXEC-487. Refactor reset() so we can redirect to the setup page, showing the shimmer skeleton instead.
   const runAgain = (): void => {

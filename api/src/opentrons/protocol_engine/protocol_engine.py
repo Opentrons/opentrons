@@ -49,6 +49,7 @@ from .actions import (
     AddLabwareOffsetAction,
     AddLabwareDefinitionAction,
     AddLiquidAction,
+    SetDeckConfigurationAction,
     AddAddressableAreaAction,
     AddModuleAction,
     HardwareStoppedAction,
@@ -140,13 +141,27 @@ class ProtocolEngine:
         """Add a plugin to the engine to customize behavior."""
         self._plugin_starter.start(plugin)
 
-    def play(self, deck_configuration: Optional[DeckConfigurationType] = None) -> None:
+    def set_deck_configuration(
+        self, deck_configuration: Optional[DeckConfigurationType]
+    ) -> None:
+        """Inform the engine of the robot's current deck configuration.
+
+        If `Config.use_simulated_deck_config` is `True`, this is meaningless and unused.
+        You can call this with `None` if you want to be explicit--it will no-op.
+
+        If `Config.use_simulated_deck_config` is `False`, you should call this with the
+        robot's actual, full, non-`None` deck configuration, before you play the run for
+        the first time. Do not call this in the middle of a run.
+        """
+        self._action_dispatcher.dispatch(SetDeckConfigurationAction(deck_configuration))
+
+    def play(self) -> None:
         """Start or resume executing commands in the queue."""
         requested_at = self._model_utils.get_timestamp()
         # TODO(mc, 2021-08-05): if starting, ensure plungers motors are
         # homed if necessary
         action = self._state_store.commands.validate_action_allowed(
-            PlayAction(requested_at=requested_at, deck_configuration=deck_configuration)
+            PlayAction(requested_at=requested_at)
         )
         self._action_dispatcher.dispatch(action)
 
@@ -598,6 +613,10 @@ class ProtocolEngine:
             command_generator=command_generator,
         )
         self._queue_worker.start()
+
+    def set_error_recovery_policy(self, policy: ErrorRecoveryPolicy) -> None:
+        """Set error recovery policy for run."""
+        raise NotImplementedError("set_error_recovery_policy is not implemented yet")
 
 
 # TODO(tz, 7-12-23): move this to shared data when we dont relay on ErrorOccurrence

@@ -6,7 +6,10 @@ import {
   useCreateProtocolAnalysisMutation,
 } from '@opentrons/react-api-client'
 import { useNotifyRunQuery } from '../../../resources/runs'
-import { getRunTimeParameterValuesForRun } from '../../Devices/utils'
+import {
+  getRunTimeParameterValuesForRun,
+  getRunTimeParameterFilesForRun,
+} from '../../Devices/utils'
 
 import type { Run } from '@opentrons/api-client'
 
@@ -49,10 +52,22 @@ export function useCloneRun(
       const runTimeParameterValues = getRunTimeParameterValuesForRun(
         runTimeParameters
       )
+      const runTimeParameterFiles = getRunTimeParameterFilesForRun(
+        runTimeParameters
+      )
       if (triggerAnalysis && protocolKey != null) {
-        createProtocolAnalysis({ protocolKey, runTimeParameterValues })
+        createProtocolAnalysis({
+          protocolKey,
+          runTimeParameterValues,
+          runTimeParameterFiles,
+        })
       }
-      createRun({ protocolId, labwareOffsets, runTimeParameterValues })
+      createRun({
+        protocolId,
+        labwareOffsets,
+        runTimeParameterValues,
+        runTimeParameterFiles,
+      })
     } else {
       console.info('failed to clone run record, source run record not found')
     }

@@ -5,7 +5,7 @@ from datetime import datetime
 import pytest
 from decoy import Decoy
 
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
+from opentrons_shared_data.deck.types import DeckDefinitionV5
 from opentrons.util.change_notifier import ChangeNotifier
 
 from opentrons.protocol_engine.actions import PlayAction
@@ -39,6 +39,13 @@ def subject(
     return StateStore(
         config=engine_config,
         deck_definition=ot2_standard_deck_def,
+        robot_definition={
+            "displayName": "OT-2",
+            "robotType": "OT-2 Standard",
+            "models": ["OT-2 Standard", "OT-2 Refresh"],
+            "extents": [446.75, 347.5, 0.0],
+            "mountOffsets": {"left": [-34.0, 0.0, 0.0], "right": [0.0, 0.0, 0.0]},
+        },
         deck_fixed_labware=[],
         change_notifier=change_notifier,
         is_door_open=False,
@@ -55,11 +62,7 @@ def test_has_state(subject: StateStore) -> None:
 def test_state_is_immutable(subject: StateStore) -> None:
     """It should treat the state as immutable."""
     result_1 = subject.state
-    subject.handle_action(
-        PlayAction(
-            requested_at=datetime(year=2021, month=1, day=1), deck_configuration=[]
-        )
-    )
+    subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
     result_2 = subject.state
 
     assert result_1 is not result_2
@@ -72,11 +75,7 @@ def test_notify_on_state_change(
 ) -> None:
     """It should notify state changes when actions are handled."""
     decoy.verify(change_notifier.notify(), times=0)
-    subject.handle_action(
-        PlayAction(
-            requested_at=datetime(year=2021, month=1, day=1), deck_configuration=[]
-        )
-    )
+    subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
     decoy.verify(change_notifier.notify(), times=1)
 
 

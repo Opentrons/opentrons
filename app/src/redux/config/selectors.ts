@@ -6,6 +6,7 @@ import type {
   FeatureFlags,
   UpdateChannel,
   ProtocolsOnDeviceSortKey,
+  QuickTransfersOnDeviceSortKey,
   OnDeviceDisplaySettings,
 } from './types'
 import type { SelectOption } from '../../atoms/SelectField/Select'
@@ -102,6 +103,27 @@ export const getPinnedProtocolIds: (
   config => config?.protocols.pinnedProtocolIds
 )
 
+export const getPinnedQuickTransferIds: (
+  state: State
+) => string[] | undefined = createSelector(
+  getConfig,
+  config => config?.protocols.pinnedQuickTransferIds
+)
+
+export const getQuickTransfersOnDeviceSortKey: (
+  state: State
+) => QuickTransfersOnDeviceSortKey | null = createSelector(
+  getConfig,
+  config => config?.protocols.quickTransfersOnDeviceSortKey ?? null
+)
+
+export const getHasDismissedQuickTransferIntro: (
+  state: State
+) => boolean = createSelector(
+  getConfig,
+  config => config?.protocols.hasDismissedQuickTransferIntro ?? false
+)
+
 export const getOnDeviceDisplaySettings: (
   state: State
 ) => OnDeviceDisplaySettings = createSelector(getConfig, config => {
@@ -123,3 +145,8 @@ export const getOnDeviceDisplaySettings: (
     unfinishedUnboxingFlowRoute: '/welcome',
   }
 })
+
+export const getUserId: (state: State) => string = createSelector(
+  getConfig,
+  config => config?.userInfo.userId ?? ''
+)

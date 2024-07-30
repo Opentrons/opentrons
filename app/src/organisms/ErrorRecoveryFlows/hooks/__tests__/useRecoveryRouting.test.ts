@@ -20,8 +20,8 @@ describe('useRecoveryRouting', () => {
     const { result } = renderHook(() => useRecoveryRouting())
 
     const newRecoveryMap = {
-      route: RECOVERY_MAP.BEFORE_BEGINNING.ROUTE,
-      step: RECOVERY_MAP.BEFORE_BEGINNING.STEPS.RECOVERY_DESCRIPTION,
+      route: RECOVERY_MAP.ERROR_WHILE_RECOVERING.ROUTE,
+      step: RECOVERY_MAP.ERROR_WHILE_RECOVERING.STEPS.RECOVERY_ACTION_FAILED,
     } as IRecoveryMap
 
     act(() => {

@@ -12,7 +12,7 @@ import pytest
 from _pytest.fixtures import SubRequest
 
 from opentrons_shared_data import get_shared_data_root, load_shared_data
-from opentrons_shared_data.pipette.dev_types import PipetteModel
+from opentrons_shared_data.pipette.types import PipetteModel
 from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
     load_data as load_pipette_data,

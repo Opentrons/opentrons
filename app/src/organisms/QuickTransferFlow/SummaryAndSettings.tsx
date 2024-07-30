@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useQueryClient } from 'react-query'
 import {
   Flex,
@@ -39,7 +39,7 @@ export function SummaryAndSettings(
   props: SummaryAndSettingsProps
 ): JSX.Element | null {
   const { exitButtonProps, state: wizardFlowState } = props
-  const history = useHistory()
+  const navigate = useNavigate()
   const queryClient = useQueryClient()
   const host = useHost()
   const { t } = useTranslation(['quick_transfer', 'shared'])
@@ -67,7 +67,7 @@ export function SummaryAndSettings(
     quickTransferSummaryReducer,
     initialSummaryState
   )
-  // TODO: adjust this mutation to add the quick transfer query parameter
+
   const { mutateAsync: createProtocolAsync } = useCreateProtocolMutation()
 
   const { createRun } = useCreateRunMutation(
@@ -76,7 +76,7 @@ export function SummaryAndSettings(
         queryClient.invalidateQueries([host, 'runs']).catch((e: Error) => {
           console.error(`error invalidating runs query: ${e.message}`)
         })
-        history.push(`/runs/${data.data.id}/setup`)
+        navigate(`/runs/${data.data.id}/setup`)
       },
     },
     host
@@ -88,14 +88,20 @@ export function SummaryAndSettings(
       deckConfig,
       protocolName
     )
-    createProtocolAsync({ files: [protocolFile] }).then(data => {
-      history.push(`protocols/${data.data.id}`)
+    createProtocolAsync({
+      files: [protocolFile],
+      protocolKind: 'quick-transfer',
+    }).then(() => {
+      navigate('/quick-transfer')
     })
   }
 
   const handleClickRun = (): void => {
     const protocolFile = createQuickTransferFile(state, deckConfig)
-    createProtocolAsync({ files: [protocolFile] }).then(data => {
+    createProtocolAsync({
+      files: [protocolFile],
+      protocolKind: 'quick-transfer',
+    }).then(data => {
       createRun({
         protocolId: data.data.id,
       })

@@ -47,7 +47,7 @@ from opentrons.hardware_control.types import (
     HardwareEventUnsubscriber,
 )
 
-from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
+from opentrons_shared_data.pipette.types import PipetteName, PipetteModel
 from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
     load_data as load_pipette_data,
@@ -345,6 +345,7 @@ class OT3Simulator(FlexBackend):
         mount_speed: float,
         plunger_speed: float,
         threshold_pascals: float,
+        plunger_impulse_time: float,
         output_format: OutputOptions = OutputOptions.can_bus_only,
         data_files: Optional[Dict[InstrumentProbeType, str]] = None,
         probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,

@@ -20,6 +20,7 @@ import type {
   DispenseRunTimeCommand,
   LiquidProbeRunTimeCommand,
 } from '@opentrons/shared-data'
+import { getLoadedLabware } from '../../../molecules/Command/utils/accessors'
 import type { ErrorRecoveryFlowsProps } from '..'
 
 interface UseFailedLabwareUtilsProps {
@@ -37,6 +38,8 @@ export type UseFailedLabwareUtilsResult = UseTipSelectionUtilsResult & {
   failedLabware: LoadedLabware | null
   /* The name of the well(s) or tip location(s), if any. */
   relevantWellName: string | null
+  /* The user-content nickname of the failed labware, if any */
+  failedLabwareNickname: string | null
 }
 
 /** Utils for labware relating to the failedCommand.
@@ -59,7 +62,7 @@ export function useFailedLabwareUtils({
 
   const tipSelectionUtils = useTipSelectionUtils(recentRelevantFailedLabwareCmd)
 
-  const failedLabwareName = React.useMemo(
+  const failedLabwareDetails = React.useMemo(
     () =>
       getFailedCmdRelevantLabware(
         protocolAnalysis,
@@ -81,9 +84,10 @@ export function useFailedLabwareUtils({
 
   return {
     ...tipSelectionUtils,
-    failedLabwareName,
+    failedLabwareName: failedLabwareDetails?.name ?? null,
     failedLabware,
     relevantWellName,
+    failedLabwareNickname: failedLabwareDetails?.nickname ?? null,
   }
 }
 
@@ -238,15 +242,25 @@ export function getFailedCmdRelevantLabware(
   protocolAnalysis: ErrorRecoveryFlowsProps['protocolAnalysis'],
   recentRelevantFailedLabwareCmd: FailedCommandRelevantLabware,
   runRecord?: Run
-): string | null {
+): { name: string; nickname: string | null } | null {
   const lwDefsByURI = getLoadedLabwareDefinitionsByUri(
     protocolAnalysis?.commands ?? []
   )
+  const labwareNickname =
+    protocolAnalysis != null
+      ? getLoadedLabware(
+          protocolAnalysis,
+          recentRelevantFailedLabwareCmd?.params.labwareId || ''
+        )?.displayName ?? null
+      : null
   const failedLWURI = runRecord?.data.labware.find(
     labware => labware.id === recentRelevantFailedLabwareCmd?.params.labwareId
   )?.definitionUri
   if (failedLWURI != null) {
-    return getLabwareDisplayName(lwDefsByURI[failedLWURI])
+    return {
+      name: getLabwareDisplayName(lwDefsByURI[failedLWURI]),
+      nickname: labwareNickname,
+    }
   } else {
     return null
   }

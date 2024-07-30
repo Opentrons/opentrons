@@ -1,39 +1,13 @@
 import * as React from 'react'
 
-import {
-  LegacyStyledText,
-  Box,
-  Flex,
-  BORDERS,
-  RESPONSIVENESS,
-  SPACING,
-  ALIGN_CENTER,
-  JUSTIFY_CENTER,
-} from '@opentrons/components'
+import { Box, RESPONSIVENESS } from '@opentrons/components'
 
 import { OneColumn as OneColumnComponent } from './'
+import { StandInContent } from './story-utils/StandIn'
 
 import type { Meta, StoryObj } from '@storybook/react'
 
-function StandInContent(): JSX.Element {
-  return (
-    <Flex
-      border={'4px dashed #A864FFFF'}
-      borderRadius={BORDERS.borderRadius8}
-      margin={SPACING.spacing16}
-      height="104px"
-      backgroundColor="#A864FF19"
-      alignItems={ALIGN_CENTER}
-      justifyContent={JUSTIFY_CENTER}
-    >
-      <LegacyStyledText as="h1">
-        This is a standin for some other component
-      </LegacyStyledText>
-    </Flex>
-  )
-}
-
-const meta: Meta<React.ComponentProps<OneColumnComponent>> = {
+const meta: Meta<React.ComponentProps<typeof OneColumnComponent>> = {
   title: 'App/Molecules/InterventionModal/OneColumn',
   component: OneColumnComponent,
   render: args => (
@@ -46,7 +20,7 @@ const meta: Meta<React.ComponentProps<OneColumnComponent>> = {
       `}
     >
       <OneColumnComponent>
-        <StandInContent />
+        <StandInContent>This is a standin for another component</StandInContent>
       </OneColumnComponent>
     </Box>
   ),
@@ -54,6 +28,6 @@ const meta: Meta<React.ComponentProps<OneColumnComponent>> = {
 
 export default meta
 
-export type Story = StoryObj<OneColumnComponent>
+export type Story = StoryObj<typeof OneColumnComponent>
 
 export const ExampleOneColumn: Story = { args: {} }

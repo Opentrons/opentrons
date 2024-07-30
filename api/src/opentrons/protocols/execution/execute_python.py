@@ -10,7 +10,10 @@ from opentrons.protocol_api import ProtocolContext, ParameterContext
 from opentrons.protocol_api._parameters import Parameters
 from opentrons.protocols.execution.errors import ExceptionInProtocolError
 from opentrons.protocols.types import PythonProtocol, MalformedPythonProtocolError
-from opentrons.protocol_engine.types import RunTimeParamValuesType
+from opentrons.protocol_engine.types import (
+    PrimitiveRunTimeParamValuesType,
+    CSVRunTimeParamFilesType,
+)
 
 
 from opentrons_shared_data.errors.exceptions import ExecutionCancelledError
@@ -67,7 +70,8 @@ def _raise_pretty_protocol_error(exception: Exception, filename: str) -> None:
 
 def _parse_and_set_parameters(
     parameter_context: ParameterContext,
-    run_time_param_overrides: Optional[RunTimeParamValuesType],
+    run_time_param_overrides: Optional[PrimitiveRunTimeParamValuesType],
+    run_time_param_file_overrides: Optional[CSVRunTimeParamFilesType],
     new_globs: Dict[Any, Any],
     filename: str,
 ) -> Parameters:
@@ -80,6 +84,8 @@ def _parse_and_set_parameters(
         exec("add_parameters(__param_context)", new_globs)
         if run_time_param_overrides is not None:
             parameter_context.set_parameters(run_time_param_overrides)
+        if run_time_param_file_overrides is not None:
+            parameter_context.initialize_csv_files(run_time_param_file_overrides)
     except Exception as e:
         _raise_pretty_protocol_error(exception=e, filename=filename)
     return parameter_context.export_parameters_for_protocol()
@@ -104,7 +110,8 @@ def _get_filename(
 def exec_add_parameters(
     protocol: PythonProtocol,
     parameter_context: ParameterContext,
-    run_time_param_overrides: Optional[RunTimeParamValuesType],
+    run_time_param_overrides: Optional[PrimitiveRunTimeParamValuesType],
+    run_time_param_file_overrides: Optional[CSVRunTimeParamFilesType],
 ) -> Optional[Parameters]:
     """Exec the add_parameters function and get the final run time parameters with overrides."""
     new_globs: Dict[Any, Any] = {}
@@ -115,6 +122,7 @@ def exec_add_parameters(
         _parse_and_set_parameters(
             parameter_context=parameter_context,
             run_time_param_overrides=run_time_param_overrides,
+            run_time_param_file_overrides=run_time_param_file_overrides,
             new_globs=new_globs,
             filename=filename,
         )

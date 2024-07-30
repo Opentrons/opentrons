@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import {
   DIRECTION_COLUMN,
@@ -29,7 +29,7 @@ export function RobotSystemVersionModal({
   setShowModal,
 }: RobotSystemVersionModalProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const modalHeader: ModalHeaderBaseProps = {
     title: t('robot_system_version_available', {
@@ -68,7 +68,7 @@ export function RobotSystemVersionModal({
           <SmallButton
             flex="1"
             onClick={() => {
-              history.push('/robot-settings/update-robot')
+              navigate('/robot-settings/update-robot')
             }}
             buttonText={t('shared:update')}
           />

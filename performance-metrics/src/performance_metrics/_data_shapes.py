@@ -4,34 +4,34 @@ import dataclasses
 import typing
 from pathlib import Path
 
-from ._types import SupportsCSVStorage, StorableData, RobotContextState
+from ._types import SupportsCSVStorage, StorableData, RobotActivityState
 from ._util import get_timing_function
 
 _timing_function = get_timing_function()
 
 
 @dataclasses.dataclass(frozen=True)
-class RawContextData(SupportsCSVStorage):
-    """Represents raw duration data with context state information.
+class RawActivityData(SupportsCSVStorage):
+    """Represents raw duration data with activity state information.
 
     Attributes:
     - function_start_time (int): The start time of the function.
     - duration_measurement_start_time (int): The start time for duration measurement.
     - duration_measurement_end_time (int): The end time for duration measurement.
-    - state (RobotContextStates): The current state of the context.
+    - state (RobotActivityStates): The current state of the activity.
     """
 
-    state: RobotContextState
+    state: RobotActivityState
     func_start: int
     duration: int
 
     @classmethod
     def headers(self) -> typing.Tuple[str, str, str]:
-        """Returns the headers for the raw context data."""
+        """Returns the headers for the raw activity data."""
         return ("state_name", "function_start_time", "duration")
 
     def csv_row(self) -> typing.Tuple[str, int, int]:
-        """Returns the raw context data as a string."""
+        """Returns the raw activity data as a string."""
         return (
             self.state,
             self.func_start,
@@ -40,9 +40,9 @@ class RawContextData(SupportsCSVStorage):
 
     @classmethod
     def from_csv_row(cls, row: typing.Sequence[StorableData]) -> SupportsCSVStorage:
-        """Returns a RawContextData object from a CSV row."""
+        """Returns a RawActivityData object from a CSV row."""
         return cls(
-            state=typing.cast(RobotContextState, row[0]),
+            state=typing.cast(RobotActivityState, row[0]),
             func_start=int(row[1]),
             duration=int(row[2]),
         )

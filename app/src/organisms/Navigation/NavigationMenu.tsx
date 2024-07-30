@@ -1,15 +1,16 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import {
   ALIGN_CENTER,
   COLORS,
   Flex,
   Icon,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -17,6 +18,7 @@ import { MenuList } from '../../atoms/MenuList'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { home, ROBOT } from '../../redux/robot-controls'
 import { useLights } from '../Devices/hooks'
+import { getTopPortalEl } from '../../App/portal'
 import { RestartRobotConfirmationModal } from './RestartRobotConfirmationModal'
 
 import type { Dispatch } from '../../redux/types'
@@ -37,7 +39,7 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
     setShowRestartRobotConfirmationModal,
   ] = React.useState<boolean>(false)
 
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const handleRestart = (): void => {
     setShowRestartRobotConfirmationModal(true)
@@ -48,9 +50,7 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
     setShowNavMenu(false)
   }
 
-  // ToDo (kk:10/02/2023)
-  // Need to update a function for onClick
-  return (
+  return createPortal(
     <>
       {showRestartRobotConfirmationModal ? (
         <RestartRobotConfirmationModal
@@ -97,7 +97,7 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
         <MenuItem
           key="deck-configuration"
           onClick={() => {
-            history.push('/deck-configuration')
+            navigate('/deck-configuration')
           }}
         >
           <Flex alignItems={ALIGN_CENTER}>
@@ -132,6 +132,7 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
           </Flex>
         </MenuItem>
       </MenuList>
-    </>
+    </>,
+    getTopPortalEl()
   )
 }
