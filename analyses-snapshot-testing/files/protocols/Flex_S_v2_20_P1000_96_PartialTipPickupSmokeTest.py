@@ -14,12 +14,14 @@ NUM_ROWS_IN_TIPRACK = 8
 NUM_COLUMNS_IN_TIPRACK = 12
 NUM_TIPS_PER_TIPRACK = NUM_ROWS_IN_TIPRACK * NUM_COLUMNS_IN_TIPRACK
 HACKY_FLEX_1000_UL_TIPRACK_LOAD_NAME = "hacky_1000ul_flex_tiprack"
+LIQUID_TRANSFER_AMOUNT = 1
 
 
 @dataclass
 class LiquidTransferSettings:
     source_labware_deck_slot: str
     destination_labware_deck_slot: str
+    transfer_volume: int = LIQUID_TRANSFER_AMOUNT
 
 
 @dataclass
@@ -242,11 +244,11 @@ NINETY_SIX_CH_TEST_CASES = [
             "pickup each tip in column from bottom to top -> shift to column left -> repeat"
         ),
         pipette_configuration=PipetteConfiguration.single_bottom_right(),
-        pickup_deck_slot="D2",
-        drop_deck_slot="B1",
+        pickup_deck_slot="D3",
+        drop_deck_slot="B3",
         liquid_transfer_settings=LiquidTransferSettings(
-            source_labware_deck_slot="C3",
-            destination_labware_deck_slot="B3",
+            source_labware_deck_slot="D2",
+            destination_labware_deck_slot="B2",
         ),
     ),
     PartialTipPickupTestCase(
@@ -451,11 +453,18 @@ def run(protocol_context: protocol_api.ProtocolContext):
             pipette.pick_up_tip(location=pickup_tip_rack)
 
             drop_location = test_case.pipette_configuration.get_drop_location(drop_tip_rack, i)
-            aspirate_location = test_case.pipette_configuration.get_drop_location(src_labware, i)
-            dispense_location = test_case.pipette_configuration.get_drop_location(dest_labware, i)
 
-            pipette.aspirate(volume=1.0, location=aspirate_location)
-            pipette.dispense(volume=1.0, location=dispense_location)
+            if test_case.pipette_configuration.pickup_mode == SINGLE and i == 0:
+                transfer_src_wells = [src_labware.wells_by_name()["A1"], src_labware.wells_by_name()["C1"]]
+                transfer_dest_wells = [dest_labware.wells_by_name()["A1"], dest_labware.wells_by_name()["C1"]]
+
+                pipette.transfer(
+                    test_case.liquid_transfer_settings.transfer_volume,
+                    transfer_src_wells,
+                    transfer_dest_wells,
+                    new_tip="never",
+                )
+
 
             pipette.drop_tip(drop_location)
 
