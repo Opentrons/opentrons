@@ -1,8 +1,8 @@
-import { useNotifyAllRunsQuery } from '../../../resources/runs'
+import { useNotifyAllRunsQuery } from './useNotifyAllRunsQuery'
 
 import type { AxiosError } from 'axios'
 import type { UseAllRunsQueryOptions } from '@opentrons/react-api-client/src/runs/useAllRunsQuery'
-import type { QueryOptionsWithPolling } from '../../../resources/useNotifyDataReady'
+import type { QueryOptionsWithPolling } from '../useNotifyDataReady'
 
 export function useCurrentRunId(
   options: QueryOptionsWithPolling<UseAllRunsQueryOptions, AxiosError> = {}

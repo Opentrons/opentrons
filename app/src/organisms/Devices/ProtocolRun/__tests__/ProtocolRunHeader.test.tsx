@@ -34,10 +34,7 @@ import {
 
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
-import {
-  useCloseCurrentRun,
-  useCurrentRunId,
-} from '../../../../organisms/ProtocolUpload/hooks'
+import { useCloseCurrentRun } from '../../../../organisms/ProtocolUpload/hooks'
 import { ConfirmCancelModal } from '../../../../organisms/RunDetails/ConfirmCancelModal'
 import {
   useRunTimestamps,
@@ -87,7 +84,7 @@ import { getIsFixtureMismatch } from '../../../../resources/deck_configuration/u
 import { useDeckConfigurationCompatibility } from '../../../../resources/deck_configuration/hooks'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useMostRecentRunId } from '../../../ProtocolUpload/hooks/useMostRecentRunId'
-import { useNotifyRunQuery } from '../../../../resources/runs'
+import { useNotifyRunQuery, useCurrentRunId } from '../../../../resources/runs'
 import {
   useDropTipWizardFlows,
   useTipAttachmentStatus,

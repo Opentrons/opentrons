@@ -19,7 +19,7 @@ import {
 } from '../../../redux/modules/__fixtures__'
 import { useIsRobotBusy, useRunStatuses } from '../../Devices/hooks'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { useCurrentRunId } from '../../ProtocolUpload/hooks'
+import { useCurrentRunId } from '../../../resources/runs'
 import {
   useLatchControls,
   useModuleOverflowMenu,

@@ -9,7 +9,7 @@ import * as DiscoveryClientFixtures from '../../../../../discovery-client/src/fi
 import { useAuthorization } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../i18n'
-import { useCurrentRunId } from '../../ProtocolUpload/hooks'
+import { useCurrentRunId } from '../../../resources/runs'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import { getRobotUpdateDisplayInfo } from '../../../redux/robot-update'
 import { getConfig, useFeatureFlag } from '../../../redux/config'
@@ -61,7 +61,7 @@ vi.mock('../../../redux/robot-controls')
 vi.mock('../../../redux/robot-update/selectors')
 vi.mock('../../../redux/config')
 vi.mock('../../../redux/discovery/selectors')
-vi.mock('../../ProtocolUpload/hooks')
+vi.mock('../../../resources/runs')
 vi.mock('../hooks')
 vi.mock('../RobotStatusHeader')
 vi.mock('../../UpdateRobotBanner')
