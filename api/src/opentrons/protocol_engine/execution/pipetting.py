@@ -191,7 +191,7 @@ class HardwarePipettingHandler(PipettingHandler):
         )
         z_pos = await self._hardware_api.liquid_probe(
             mount=hw_pipette.mount,
-            max_z_dist=well_depth - lld_min_height  # + well_location.offset.z,
+            max_z_dist=well_depth - lld_min_height + well_location.offset.z,
         )
         return float(z_pos)
 
