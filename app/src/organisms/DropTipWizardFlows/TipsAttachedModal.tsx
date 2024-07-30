@@ -66,7 +66,7 @@ const TipsAttachedModal = NiceModal.create(
             <LegacyStyledText as="p">
               <Trans
                 t={t}
-                i18nKey="liquid_may_damage_pipette"
+                i18nKey="liquid_damages_this_pipette"
                 values={{
                   mount: displayMountText,
                 }}
