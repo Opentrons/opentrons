@@ -6,6 +6,10 @@ from dataclasses import dataclass
 
 from . import types as pip_types, dev_types
 
+# The highest and lowest existing overlap version values.
+TIP_OVERLAP_VERSION_MINIMUM = 0
+TIP_OVERLAP_VERSION_MAXIMUM = 1
+
 PLUNGER_CURRENT_MINIMUM = 0.1
 PLUNGER_CURRENT_MAXIMUM = 1.5
 
@@ -436,10 +440,10 @@ class PipetteLiquidPropertiesDefinition(BaseModel):
     supported_tips: Dict[pip_types.PipetteTipType, SupportedTipsDefinition] = Field(
         ..., alias="supportedTips"
     )
-    tip_overlap_dictionary: Dict[str, float] = Field(
+    versioned_tip_overlap_dictionary: Dict[str, Dict[str, float]] = Field(
         ...,
-        description="The default tip overlap associated with this tip type.",
-        alias="defaultTipOverlapDictionary",
+        description="A versioned map of tip overlaps for tips associated with this tip type.",
+        alias="versionedTipOverlapDictionary",
     )
     max_volume: int = Field(
         ...,
