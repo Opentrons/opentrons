@@ -5,7 +5,7 @@ import json
 import os
 
 from pathlib import Path
-from typing import Any, AnyStr, List, Dict, Optional, Union
+from typing import Any, AnyStr, List, Dict, Optional, Union, TYPE_CHECKING
 
 import jsonschema  # type: ignore
 
@@ -18,6 +18,9 @@ from opentrons.protocols.api_support.constants import (
     USER_DEFS_PATH,
 )
 from opentrons_shared_data.labware.types import LabwareDefinition
+
+if TYPE_CHECKING:
+    from _typeshed import GenericPath
 
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -70,7 +73,7 @@ def get_all_labware_definitions() -> List[str]:
     """
     labware_list = ModifiedList()
 
-    def _check_for_subdirectories(path):
+    def _check_for_subdirectories(path: Union[int, GenericPath[AnyStr]]) -> None:
         with os.scandir(path) as top_path:
             for sub_dir in top_path:
                 if sub_dir.is_dir():
@@ -98,6 +101,7 @@ def save_definition(
     :param location: File path
     """
     namespace = labware_def["namespace"]
+    assert "loadName" in labware_def["namespace"]
     load_name = labware_def["parameters"]["loadName"]
     version = labware_def["version"]
 
@@ -150,7 +154,7 @@ def verify_definition(
     jsonschema.validate(to_return, labware_schema_v2)
     # we can type ignore this because if it passes the jsonschema it has
     # the correct structure
-    return to_return  # type: ignore
+    return to_return  # type: ignore[return-value]
 
 
 def _get_labware_definition_from_bundle(
@@ -244,8 +248,7 @@ def _get_standard_labware_definition(
             f'Labware "{load_name}" not found with version {checked_version} '
             f'in namespace "{namespace}".'
         )
-
-    return labware_def
+    return labware_def  # type: ignore[no-any-return]
 
 
 def _get_path_to_labware(

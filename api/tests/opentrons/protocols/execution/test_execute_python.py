@@ -116,7 +116,7 @@ def test_rtp_extraction(protocol: Protocol, protocol_file: str) -> None:
     val = execute_python.exec_add_parameters(
         protocol=proto,
         parameter_context=parameter_context,
-        run_time_param_overrides=run_time_param_overrides, # type: ignore[arg-type]
+        run_time_param_overrides=run_time_param_overrides,
         run_time_param_file_overrides={},
     )
     assert val is not None
