@@ -12,6 +12,7 @@ from opentrons.protocols.api_support.definitions import (
 from opentrons.protocols.parameters.exceptions import (
     RuntimeParameterRequired as RuntimeParameterRequiredError,
 )
+from opentrons.protocols.parameters.types import CSVParameter
 
 from .protocol_context import ProtocolContext
 from .deck import Deck
@@ -72,6 +73,7 @@ __all__ = [
     "ALL",
     "OFF_DECK",
     "RuntimeParameterRequiredError",
+    "CSVParameter",
     # For internal Opentrons use only:
     "create_protocol_context",
     "ProtocolEngineCoreRequiredError",
