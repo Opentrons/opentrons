@@ -190,7 +190,7 @@ async def create_run(
         request_body.data.runTimeParameterFiles if request_body is not None else None
     )
     rtp_paths: Optional[Dict[str, Path]] = None
-    if rtp_files is not None:
+    if rtp_files:
         rtp_paths = {}
         for rtp_name, file_id in rtp_files.items():
             file_name = data_files_store.get(file_id).name

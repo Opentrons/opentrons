@@ -8,6 +8,8 @@ from opentrons.types import DeckSlotName
 from opentrons.protocol_engine import LabwareOffsetCreate, types as pe_types
 from opentrons.protocol_reader import ProtocolSource, JsonProtocolConfig
 
+from robot_server.data_files.data_files_store import DataFilesStore, DataFileInfo
+
 from robot_server.errors.error_responses import ApiError
 from robot_server.runs.error_recovery_models import ErrorRecoveryPolicies
 from robot_server.service.json_api import (
@@ -51,6 +53,11 @@ def mock_notify_publishers() -> None:
 
 
 @pytest.fixture
+def mock_data_files_store(decoy: Decoy) -> DataFilesStore:
+    return decoy.mock(cls=DataFilesStore)
+
+
+@pytest.fixture
 def labware_offset_create() -> LabwareOffsetCreate:
     """Get a labware offset create request value object."""
     return pe_types.LabwareOffsetCreate(
@@ -66,6 +73,7 @@ async def test_create_run(
     mock_run_auto_deleter: RunAutoDeleter,
     labware_offset_create: pe_types.LabwareOffsetCreate,
     mock_deck_configuration_store: DeckConfigurationStore,
+    mock_data_files_store: DataFilesStore,
 ) -> None:
     """It should be able to create a basic run."""
     run_id = "run-id"
@@ -96,6 +104,7 @@ async def test_create_run(
             deck_configuration=[],
             protocol=None,
             run_time_param_values=None,
+            run_time_param_files=None,
             notify_publishers=mock_notify_publishers,
         )
     ).then_return(expected_response)
@@ -105,6 +114,8 @@ async def test_create_run(
             data=RunCreate(labwareOffsets=[labware_offset_create])
         ),
         run_data_manager=mock_run_data_manager,
+        data_files_store=mock_data_files_store,
+        data_files_directory=Path("/dev/null"),
         run_id=run_id,
         created_at=run_created_at,
         run_auto_deleter=mock_run_auto_deleter,
@@ -124,6 +135,7 @@ async def test_create_protocol_run(
     mock_run_data_manager: RunDataManager,
     mock_run_auto_deleter: RunAutoDeleter,
     mock_deck_configuration_store: DeckConfigurationStore,
+    mock_data_files_store: DataFilesStore,
 ) -> None:
     """It should be able to create a protocol run."""
     run_id = "run-id"
@@ -160,6 +172,14 @@ async def test_create_protocol_run(
         status=pe_types.EngineStatus.IDLE,
         liquids=[],
     )
+    decoy.when(mock_data_files_store.get("file-id")).then_return(
+        DataFileInfo(
+            id="123",
+            name="abc.xyz",
+            file_hash="987",
+            created_at=datetime(month=1, day=2, year=2024),
+        )
+    )
     decoy.when(
         await mock_deck_configuration_store.get_deck_configuration()
     ).then_return([])
@@ -175,6 +195,7 @@ async def test_create_protocol_run(
             deck_configuration=[],
             protocol=protocol_resource,
             run_time_param_values={"foo": "bar"},
+            run_time_param_files={"my-csv-param": Path("/dev/null/file-id/abc.xyz")},
             notify_publishers=mock_notify_publishers,
         )
     ).then_return(expected_response)
@@ -182,11 +203,15 @@ async def test_create_protocol_run(
     result = await create_run(
         request_body=RequestModel(
             data=RunCreate(
-                protocolId="protocol-id", runTimeParameterValues={"foo": "bar"}
+                protocolId="protocol-id",
+                runTimeParameterValues={"foo": "bar"},
+                runTimeParameterFiles={"my-csv-param": "file-id"},
             )
         ),
         protocol_store=mock_protocol_store,
         run_data_manager=mock_run_data_manager,
+        data_files_store=mock_data_files_store,
+        data_files_directory=Path("/dev/null"),
         run_id=run_id,
         created_at=run_created_at,
         run_auto_deleter=mock_run_auto_deleter,
@@ -243,6 +268,7 @@ async def test_create_run_conflict(
             deck_configuration=[],
             protocol=None,
             run_time_param_values=None,
+            run_time_param_files=None,
             notify_publishers=mock_notify_publishers,
         )
     ).then_raise(RunConflictError("oh no"))

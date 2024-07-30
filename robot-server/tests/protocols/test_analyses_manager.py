@@ -97,12 +97,12 @@ async def test_initialize_analyzer(
         analysis_id="analysis-id",
         protocol_resource=protocol_resource,
         run_time_param_values={"sample_count": 123},
-        run_time_param_files={"my_file": "file-id"},
+        run_time_param_files={"my_file": Path("file-path")},
     )
     decoy.verify(
         await analyzer.load_orchestrator(
             run_time_param_values={"sample_count": 123},
-            run_time_param_files={"my_file": "file-id"},
+            run_time_param_files={"my_file": Path("file-path")},
         )
     )
 

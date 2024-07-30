@@ -102,7 +102,7 @@ async def test_load_orchestrator(
     ).then_return(run_orchestrator)
     await subject.load_orchestrator(
         run_time_param_values={"rtp_var": 123},
-        run_time_param_files={"csv_param": "file-id"},
+        run_time_param_files={"csv_param": Path("file-path")},
     )
 
     decoy.verify(
@@ -110,7 +110,7 @@ async def test_load_orchestrator(
             protocol_source=protocol_source,
             parse_mode=ParseMode.NORMAL,
             run_time_param_values={"rtp_var": 123},
-            run_time_param_files={"csv_param": "file-id"},
+            run_time_param_files={"csv_param": Path("file-path")},
         ),
         times=1,
     )

@@ -241,9 +241,9 @@ class ParameterContext:
                     f" but '{variable_name}' is not a CSV parameter."
                 )
             file_id = file_path.parent.name
+            file_name = file_path.name
             with file_path.open() as csv_file:
                 contents = csv_file.read()
-                file_name = csv_file.name
 
             temporary_file = tempfile.NamedTemporaryFile("r+")
             temporary_file.write(contents)
