@@ -11,7 +11,6 @@ import {
 import { getTopPortalEl } from '../../../App/portal'
 import { RadioButton } from '../../../atoms/buttons'
 import { ChildNavigation } from '../../ChildNavigation'
-import { getSelectedWellCount } from '../utils'
 
 import type {
   ChangeTipOptions,
