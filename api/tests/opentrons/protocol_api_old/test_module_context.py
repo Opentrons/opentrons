@@ -1,13 +1,8 @@
 from typing import cast, Any, Type
 import mock
-from opentrons.protocol_api.core.legacy.legacy_instrument_core import LegacyInstrumentCore
-from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabwareCore
-from opentrons.protocol_api.core.module import AbstractThermocyclerCore
 import pytest
-import pdb
 
 import opentrons.protocol_api as papi
-from opentrons.protocol_api.protocol_context import ModuleTypes
 
 from opentrons.types import Point, Location
 from opentrons.drivers.types import (
@@ -432,7 +427,7 @@ def test_deprecated_module_load_labware_by_name(
 ) -> None:
     """It should call load labware"""
     mod = ctx_with_tempdeck.load_module("Temperature Module", 1)
-    with mock.patch.object(mod, 'load_labware') as mock_load_labware:
+    with mock.patch.object(mod, "load_labware") as mock_load_labware:
         mod.load_labware_by_name(
             name="a module", namespace="ns", label="a label", version=2
         )
@@ -450,7 +445,7 @@ async def test_magdeck_gen1_labware_props(ctx: papi.ProtocolContext) -> None:
     assert mod.labware is None
     assert isinstance(mod, papi.MagneticModuleContext)
     mod.engage(height=45)
-    assert mod._core._sync_module_hardware.current_height == 45 # type: ignore[attr-defined]
+    assert mod._core._sync_module_hardware.current_height == 45  # type: ignore[attr-defined]
     with pytest.raises(ValueError):
         mod.engage(height=45.1)  # max engage height for gen1 is 45 mm
     mod.load_labware(labware_name)
@@ -458,16 +453,16 @@ async def test_magdeck_gen1_labware_props(ctx: papi.ProtocolContext) -> None:
     if "magneticModuleEngageHeight" not in labware_def["parameters"]:
         assert False
     lw_offset = labware_def["parameters"]["magneticModuleEngageHeight"]
-    assert await mod._core._sync_module_hardware._driver.get_plate_height() == lw_offset # type: ignore[attr-defined]
+    assert await mod._core._sync_module_hardware._driver.get_plate_height() == lw_offset  # type: ignore[attr-defined]
     mod.disengage()
     mod.engage(offset=2)
     assert (
-        await mod._core._sync_module_hardware._driver.get_plate_height() # type: ignore[attr-defined]
+        await mod._core._sync_module_hardware._driver.get_plate_height()  # type: ignore[attr-defined]
         == lw_offset + 2
     )
     mod.disengage()
     mod.engage(height=3)
-    assert await mod._core._sync_module_hardware._driver.get_plate_height() == 3 # type: ignore[attr-defined]
+    assert await mod._core._sync_module_hardware._driver.get_plate_height() == 3  # type: ignore[attr-defined]
     mod.geometry.reset_labware()
     labware_name = "corning_96_wellplate_360ul_flat"
     mod.load_labware(labware_name)
@@ -476,13 +471,13 @@ async def test_magdeck_gen1_labware_props(ctx: papi.ProtocolContext) -> None:
     with pytest.raises(ValueError):
         mod.engage(offset=1)
     mod.engage(height=2)
-    assert await mod._core._sync_module_hardware._driver.get_plate_height() == 2 # type: ignore[attr-defined]
+    assert await mod._core._sync_module_hardware._driver.get_plate_height() == 2  # type: ignore[attr-defined]
     mod.engage(height=0)
-    assert await mod._core._sync_module_hardware._driver.get_plate_height() == 0 # type: ignore[attr-defined]
+    assert await mod._core._sync_module_hardware._driver.get_plate_height() == 0  # type: ignore[attr-defined]
     mod.engage(height_from_base=2)
     assert (
-        await mod._core._sync_module_hardware._driver.get_plate_height() # type: ignore[attr-defined]
-        == 2 + OFFSET_TO_LABWARE_BOTTOM[mod._core._sync_module_hardware.model()] # type: ignore[attr-defined]
+        await mod._core._sync_module_hardware._driver.get_plate_height()  # type: ignore[attr-defined]
+        == 2 + OFFSET_TO_LABWARE_BOTTOM[mod._core._sync_module_hardware.model()]  # type: ignore[attr-defined]
     )
 
 
@@ -491,11 +486,11 @@ def test_magdeck_gen2_labware_props(ctx: papi.ProtocolContext) -> None:
     mod = ctx.load_module("magnetic module gen2", 1)
     assert isinstance(mod, papi.MagneticModuleContext)
     mod.engage(height=25)
-    assert mod._core._sync_module_hardware.current_height == 25 # type: ignore[attr-defined]
+    assert mod._core._sync_module_hardware.current_height == 25  # type: ignore[attr-defined]
     with pytest.raises(ValueError):
         mod.engage(height=25.1)  # max engage height for gen2 is 25 mm
     mod.engage(height=0)
-    assert mod._core._sync_module_hardware.current_height == 0 # type: ignore[attr-defined]
+    assert mod._core._sync_module_hardware.current_height == 0  # type: ignore[attr-defined]
 
 
 def test_module_compatibility() -> None:
