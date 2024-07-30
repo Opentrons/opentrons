@@ -46,7 +46,7 @@ from opentrons.protocol_engine.types import (
 )
 from opentrons_shared_data.labware.types import LabwareUri
 
-from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
+from .error_recovery_mapping import default_error_recovery_policy
 
 _log = logging.getLogger(__name__)
 
@@ -222,7 +222,7 @@ class RunOrchestratorStore:
                     RobotTypeEnum.robot_literal_to_enum(self._robot_type)
                 ),
             ),
-            error_recovery_policy=error_recovery_policy.standard_run_policy,
+            error_recovery_policy=default_error_recovery_policy,
             load_fixed_trash=load_fixed_trash,
             deck_configuration=deck_configuration,
             notify_publishers=notify_publishers,
@@ -362,7 +362,9 @@ class RunOrchestratorStore:
         """Add a new labware definition to state."""
         return self.run_orchestrator.add_labware_definition(definition)
 
-    def set_error_recovery_policy(self, policy: ErrorRecoveryPolicy) -> None:
+    def set_error_recovery_policy(
+        self, policy: error_recovery_policy.ErrorRecoveryPolicy
+    ) -> None:
         """Create run policy rules for error recovery."""
         self.run_orchestrator.set_error_recovery_policy(policy)
 
