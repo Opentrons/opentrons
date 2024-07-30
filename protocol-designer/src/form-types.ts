@@ -267,7 +267,7 @@ export interface HydratedMoveLiquidFormData {
     blowout_z_offset?: number | null
     dispense_airGap_volume?: number | null
     dispense_delay_mmFromBottom?: number | null
-    dispense_delay_second?: number | null
+    dispense_delay_seconds?: number | null
     dispense_flowRate?: number | null
     dispense_mix_times?: number | null
     dispense_mix_volume?: number | null
