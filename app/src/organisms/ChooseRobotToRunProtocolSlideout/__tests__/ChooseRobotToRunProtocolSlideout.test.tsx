@@ -34,8 +34,6 @@ import { useNotifyDataReady } from '../../../resources/useNotifyDataReady'
 import { useCurrentRunId } from '../../../resources/runs'
 
 import type { State } from '../../../redux/types'
-import type { Runs } from '@opentrons/api-client'
-import { UseAllRunsQueryOptions } from '@opentrons/react-api-client/src/runs/useAllRunsQuery'
 
 vi.mock('../../../organisms/Devices/hooks')
 vi.mock('../../../organisms/ProtocolUpload/hooks')
@@ -463,9 +461,9 @@ const provideNullCurrentRunIdFor = (hostname: string): void => {
     })
     .thenDo(options => {
       void (options?.onSuccess != null && once
-        ? options.onSuccess(({
+        ? options.onSuccess({
             links: { current: null },
-          } as unknown) as UseAllRunsQueryOptions)
+          } as any)
         : {})
       once = false
       return null
