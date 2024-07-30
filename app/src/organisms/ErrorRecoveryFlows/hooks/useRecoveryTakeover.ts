@@ -59,10 +59,11 @@ export function useRecoveryTakeover(
   React.useEffect(() => {
     return () => {
       if (isActiveUser) {
+        console.log('HITTING INSIDE BLOCK')
         clearClientData()
       }
     }
-  }, [clearClientData, isActiveUser])
+  }, [isActiveUser])
 
   const showTakeover = !(activeId == null || thisUserId === activeId)
 
