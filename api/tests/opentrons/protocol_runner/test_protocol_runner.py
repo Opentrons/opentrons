@@ -638,7 +638,7 @@ async def test_load_legacy_python(
         legacy_protocol_source,
         python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
         run_time_param_values=None,
-        run_time_param_files=None,
+        run_time_param_paths=None,
     )
 
     run_func_captor = matchers.Captor()
@@ -720,7 +720,7 @@ async def test_load_python_with_pe_papi_core(
         protocol_source,
         python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
         run_time_param_values=None,
-        run_time_param_files=None,
+        run_time_param_paths=None,
     )
 
     decoy.verify(protocol_engine.add_plugin(matchers.IsA(LegacyContextPlugin)), times=0)
@@ -783,7 +783,7 @@ async def test_load_legacy_json(
         legacy_protocol_source,
         python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
         run_time_param_values=None,
-        run_time_param_files=None,
+        run_time_param_paths=None,
     )
 
     run_func_captor = matchers.Captor()

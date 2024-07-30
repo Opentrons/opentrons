@@ -40,8 +40,7 @@ class AnalysesManager:
         analysis_id: str,
         protocol_resource: ProtocolResource,
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType],
-        # TODO rename this as well i guess
-        run_time_param_files: Optional[CSVRuntimeParamPaths],
+        run_time_param_paths: Optional[CSVRuntimeParamPaths],
     ) -> protocol_analyzer.ProtocolAnalyzer:
         """Initialize the protocol analyzer with protocol resource and run time parameter values & fileIds.
 
@@ -62,7 +61,7 @@ class AnalysesManager:
         try:
             await analyzer.load_orchestrator(
                 run_time_param_values=run_time_param_values,
-                run_time_param_files=run_time_param_files,
+                run_time_param_paths=run_time_param_paths,
             )
         except Exception as error:
             internal_error = em.map_unexpected_error(error)

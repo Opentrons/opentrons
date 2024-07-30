@@ -471,7 +471,7 @@ async def _start_new_analysis_if_necessary(
             analysis_id=analysis_id,
             protocol_resource=protocol_resource,
             run_time_param_values=rtp_values,
-            run_time_param_files=rtp_files,
+            run_time_param_paths=rtp_files,
         )
     except FailedToInitializeAnalyzer:
         analyses.append(

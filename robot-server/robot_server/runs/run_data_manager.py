@@ -156,8 +156,7 @@ class RunDataManager:
         labware_offsets: List[LabwareOffsetCreate],
         deck_configuration: DeckConfigurationType,
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType],
-        # TODO rename this variable
-        run_time_param_files: Optional[CSVRuntimeParamPaths],
+        run_time_param_paths: Optional[CSVRuntimeParamPaths],
         notify_publishers: Callable[[], None],
         protocol: Optional[ProtocolResource],
     ) -> Union[Run, BadRun]:
@@ -170,6 +169,7 @@ class RunDataManager:
             deck_configuration: A mapping of fixtures to cutout fixtures the deck will be loaded with.
             notify_publishers: Utilized by the engine to notify publishers of state changes.
             run_time_param_values: Any runtime parameter values to set.
+            run_time_param_paths: Any runtime filepath to set.
             protocol: The protocol to load the runner with, if any.
 
         Returns:
@@ -194,7 +194,7 @@ class RunDataManager:
             deck_configuration=deck_configuration,
             protocol=protocol,
             run_time_param_values=run_time_param_values,
-            run_time_param_files=run_time_param_files,
+            run_time_param_paths=run_time_param_paths,
             notify_publishers=notify_publishers,
         )
         run_resource = self._run_store.insert(

@@ -341,8 +341,7 @@ class RunOrchestrator:
         self,
         protocol_source: ProtocolSource,
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType],
-        # TODO this one too
-        run_time_param_files: Optional[CSVRuntimeParamPaths],
+        run_time_param_paths: Optional[CSVRuntimeParamPaths],
         parse_mode: ParseMode,
     ) -> None:
         """Load a json/python protocol."""
@@ -358,7 +357,7 @@ class RunOrchestrator:
                 # doesn't conform to the new rules.
                 python_parse_mode=python_parse_mode,
                 run_time_param_values=run_time_param_values,
-                run_time_param_files=run_time_param_files,
+                run_time_param_paths=run_time_param_paths,
             )
 
     def get_is_okay_to_clear(self) -> bool:
