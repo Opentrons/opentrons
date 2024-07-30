@@ -455,16 +455,32 @@ def run(protocol_context: protocol_api.ProtocolContext):
             drop_location = test_case.pipette_configuration.get_drop_location(drop_tip_rack, i)
 
             if test_case.pipette_configuration.pickup_mode == SINGLE and i == 0:
-                transfer_src_wells = [src_labware.wells_by_name()["A1"], src_labware.wells_by_name()["C1"]]
-                transfer_dest_wells = [dest_labware.wells_by_name()["A1"], dest_labware.wells_by_name()["C1"]]
+
+                src_well_list = [src_labware.wells_by_name()["A1"], src_labware.wells_by_name()["C1"]]
+                dest_well_list = [dest_labware.wells_by_name()["A1"], dest_labware.wells_by_name()["C1"]]
 
                 pipette.transfer(
                     test_case.liquid_transfer_settings.transfer_volume,
-                    transfer_src_wells,
-                    transfer_dest_wells,
+                    src_well_list,
+                    dest_well_list,
                     new_tip="never",
                 )
 
+                # Currently getting error because something is looking for a trash bin and I
+                # don't have one defined.
+                # pipette.distribute(
+                #     test_case.liquid_transfer_settings.transfer_volume,
+                #     src_labware.wells_by_name()["A1"],
+                #     dest_well_list,
+                #     new_tip="never",
+                # )
+
+                pipette.consolidate(
+                    test_case.liquid_transfer_settings.transfer_volume,
+                    src_well_list,
+                    dest_labware.wells_by_name()["A1"],
+                    new_tip="never",
+                )
 
             pipette.drop_tip(drop_location)
 
