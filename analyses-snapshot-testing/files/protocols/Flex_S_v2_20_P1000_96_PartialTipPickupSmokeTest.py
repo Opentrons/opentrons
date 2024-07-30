@@ -46,12 +46,12 @@ class PipetteConfiguration:
     }
 
     pickup_mode: typing.Literal[SINGLE, ROW, COLUMN, PARTIAL_COLUMN]
-    pickup_start_well: str
-    pickup_end_well: typing.Optional[str]  # for PARTIAL_COLUMN only
+    starting_pipette_nozzle: str
+    ending_pipette_nozzle: typing.Optional[str]  # for PARTIAL_COLUMN only
 
     def _calculate_number_per_pickup_for_partial_column(self) -> int:
         assert self.pickup_mode == PARTIAL_COLUMN
-        for num_pickups_key, self.pickup_end_well in self.number_per_pickup_to_slot_lookup.items():
+        for num_pickups_key, self.ending_pipette_nozzle in self.number_per_pickup_to_slot_lookup.items():
             if well_name == well_name_key:
                 return num_pickups_key
         else:
@@ -114,64 +114,64 @@ class PipetteConfiguration:
     def single_top_left(cls) -> "PipetteConfiguration":
         return cls(
             pickup_mode=SINGLE,
-            pickup_start_well="A1",
-            pickup_end_well=None,
+            starting_pipette_nozzle="A1",
+            ending_pipette_nozzle=None,
         )
 
     @classmethod
     def single_top_right(cls) -> "PipetteConfiguration":
         return cls(
             pickup_mode=SINGLE,
-            pickup_start_well="A12",
-            pickup_end_well=None,
+            starting_pipette_nozzle="A12",
+            ending_pipette_nozzle=None,
         )
 
     @classmethod
     def single_bottom_right(cls) -> "PipetteConfiguration":
         return cls(
             pickup_mode=SINGLE,
-            pickup_start_well="H12",
-            pickup_end_well=None,
+            starting_pipette_nozzle="H12",
+            ending_pipette_nozzle=None,
         )
 
     @classmethod
     def single_bottom_left(cls) -> "PipetteConfiguration":
         return cls(
             pickup_mode=SINGLE,
-            pickup_start_well="H1",
-            pickup_end_well=None,
+            starting_pipette_nozzle="H1",
+            ending_pipette_nozzle=None,
         )
 
     @classmethod
     def row_top(cls) -> "PipetteConfiguration":
         return cls(
             pickup_mode=ROW,
-            pickup_start_well="A1",
-            pickup_end_well=None,
+            starting_pipette_nozzle="A1",
+            ending_pipette_nozzle=None,
         )
 
     @classmethod
     def row_bottom(cls) -> "PipetteConfiguration":
         return cls(
             pickup_mode=ROW,
-            pickup_start_well="H1",
-            pickup_end_well=None,
+            starting_pipette_nozzle="H1",
+            ending_pipette_nozzle=None,
         )
 
     @classmethod
     def column_left(cls) -> "PipetteConfiguration":
         return cls(
             pickup_mode=COLUMN,
-            pickup_start_well="A1",
-            pickup_end_well=None,
+            starting_pipette_nozzle="A1",
+            ending_pipette_nozzle=None,
         )
 
     @classmethod
     def column_right(cls) -> "PipetteConfiguration":
         return cls(
             pickup_mode=COLUMN,
-            pickup_start_well="A12",
-            pickup_end_well=None,
+            starting_pipette_nozzle="A12",
+            ending_pipette_nozzle=None,
         )
 
     @classmethod
@@ -180,8 +180,8 @@ class PipetteConfiguration:
 
         return cls(
             pickup_mode=PARTIAL_COLUMN,
-            pickup_start_well="A1",
-            pickup_end_well=PipetteConfiguration.number_per_pickup_to_slot_lookup[num_per_pickup],
+            starting_pipette_nozzle="A1",
+            ending_pipette_nozzle=PipetteConfiguration.number_per_pickup_to_slot_lookup[num_per_pickup],
         )
 
 
@@ -198,8 +198,10 @@ NINETY_SIX_CH_TEST_CASES = [
     PartialTipPickupTestCase(
         summary=(
             "single tip pickup"
-            "starting with top left tip"
-            "pickup each tip in column from top to bottom -> shift to column right -> repeat"
+            "using top-left nozzle of pipette"
+            "pickup bottom-right tip of tiprack"
+            "repeat the following steps until tips are exhausted or rtp specified number of pickups is reached: "
+            "pickup each tip in column, from bottom to top -> shift to column left"
         ),
         pickup_deck_slot="A1",
         drop_deck_slot="C1",
@@ -212,8 +214,10 @@ NINETY_SIX_CH_TEST_CASES = [
     PartialTipPickupTestCase(
         summary=(
             "single tip pickup"
-            "starting with top right tip"
-            "pickup each tip in column from top to bottom -> shift to column left -> repeat"
+            "using top-right nozzle of pipette"
+            "pickup bottom-left tip of tiprack"
+            "repeat the following steps until tips are exhausted or rtp specified number of pickups is reached: "
+            "pickup each tip in column, from bottom to top -> shift to column right"
         ),
         pipette_configuration=PipetteConfiguration.single_top_right(),
         pickup_deck_slot="A3",
@@ -226,8 +230,10 @@ NINETY_SIX_CH_TEST_CASES = [
     PartialTipPickupTestCase(
         summary=(
             "single tip pickup"
-            "starting with bottom left tip"
-            "pickup each tip in column from bottom to top -> shift to column right -> repeat"
+            "using bottom-left nozzle of pipette"
+            "pickup top-right tip of tiprack"
+            "repeat the following steps until tips are exhausted or rtp specified number of pickups is reached: "
+            "pickup each tip in column, from top to bottom -> shift to column left"
         ),
         pipette_configuration=PipetteConfiguration.single_bottom_left(),
         pickup_deck_slot="D1",
@@ -240,8 +246,10 @@ NINETY_SIX_CH_TEST_CASES = [
     PartialTipPickupTestCase(
         summary=(
             "single tip pickup"
-            "starting with bottom right tip"
-            "pickup each tip in column from bottom to top -> shift to column left -> repeat"
+            "using bottom-right nozzle of pipette"
+            "pickup top-left tip of tiprack"
+            "repeat the following steps until tips are exhausted or rtp specified number of pickups is reached: "
+            "pickup each tip in column, from top to bottom -> shift to column right"
         ),
         pipette_configuration=PipetteConfiguration.single_bottom_right(),
         pickup_deck_slot="D3",
@@ -252,7 +260,13 @@ NINETY_SIX_CH_TEST_CASES = [
         ),
     ),
     PartialTipPickupTestCase(
-        summary=("row tip pickup" "starting with top row" "pickup a row of tips -> shift to row below -> repeat"),
+        summary=(
+            "row tip pickup"
+            "using top row of nozzles"
+            "pickup bottom row of tips"
+            "repeat the following steps until tips are exhausted or rtp specified number of pickups is reached:"
+            "shift to row above -> pickup row of tips"
+        ),
         pipette_configuration=PipetteConfiguration.row_top(),
         pickup_deck_slot="A1",
         drop_deck_slot="A2",
@@ -262,7 +276,13 @@ NINETY_SIX_CH_TEST_CASES = [
         ),
     ),
     PartialTipPickupTestCase(
-        summary=("row tip pickup" "starting with bottom row" "pickup a row tips -> shift to row above -> repeat"),
+        summary=(
+            "row tip pickup"
+            "using bottom row of nozzles" 
+            "pickup top row of tips"
+            "repeat the following steps until tips are exhausted or rtp specified number of pickups is reached:"
+            "shift to row below -> pickup row of tips"
+            ),
         pipette_configuration=PipetteConfiguration.row_bottom(),
         pickup_deck_slot="D1",
         drop_deck_slot="D2",
@@ -272,7 +292,12 @@ NINETY_SIX_CH_TEST_CASES = [
         ),
     ),
     PartialTipPickupTestCase(
-        summary=("column tip pickup" "starting with left column" "pickup a column of tips -> shift to column right -> repeat"),
+        summary=(
+            "column tip pickup"
+            "using left column of nozzles"
+            "pickup right column of tips"
+            "repeat the following steps until tips are exhausted or rtp specified number of pickups is reached:"
+            "pickup a column of tips -> shift to column right"),
         pipette_configuration=PipetteConfiguration.column_left(),
         pickup_deck_slot="A1",
         drop_deck_slot="B1",
@@ -282,7 +307,12 @@ NINETY_SIX_CH_TEST_CASES = [
         ),
     ),
     PartialTipPickupTestCase(
-        summary=("column tip pickup" "starting with right column" "pickup a column of tips -> shift to column left -> repeat"),
+        summary=(
+            "column tip pickup"
+            "using right column of nozzles"
+            "pickup left column of tips"
+            "repeat the following steps until tips are exhausted or rtp specified number of pickups is reached:"
+            "pickup a column of tips -> shift to column left"),
         pipette_configuration=PipetteConfiguration.column_right(),
         pickup_deck_slot="A3",
         drop_deck_slot="B3",
@@ -437,7 +467,7 @@ def run(protocol_context: protocol_api.ProtocolContext):
 
         pipette.configure_nozzle_layout(
             style=test_case.pipette_configuration.pickup_mode,
-            start=test_case.pipette_configuration.pickup_start_well,
+            start=test_case.pipette_configuration.starting_pipette_nozzle,
             tip_racks=[pickup_tip_rack],
         )
 
