@@ -1353,7 +1353,7 @@ async def test_create_protocol_different_robot_type(
             analyses_manager=decoy.mock(cls=AnalysesManager),
             protocol_auto_deleter=decoy.mock(cls=ProtocolAutoDeleter),
             quick_transfer_protocol_auto_deleter=decoy.mock(cls=ProtocolAutoDeleter),
-            robot_type="OT-2 Standard",
+            robot_type="OT-3 Standard",
             analysis_id="analysis-id",
             created_at=datetime.now(),
         )
@@ -1985,7 +1985,7 @@ async def test_create_protocol_kind_quick_transfer(
     )
 
     decoy.verify(
-        protocol_auto_deleter.make_room_for_new_protocol(),
+        quick_transfer_protocol_auto_deleter.make_room_for_new_protocol(),
         protocol_store.insert(protocol_resource),
     )
 
