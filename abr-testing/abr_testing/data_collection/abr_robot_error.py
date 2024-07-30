@@ -533,6 +533,15 @@ if __name__ == "__main__":
         affects_version,
         parent_key,
     )
+
+    #Link Tickets (hopefully)
+    all_issues = ticket.issues_on_board(board_id)
+    print(type(all_issues))
+    print(type(summary))
+    to_link = ticket.match_issues(all_issues, summary)
+    print(to_link)
+    ticket.link_issues(to_link, issue_key)
+
     # OPEN TICKET
     issue_url = ticket.open_issue(issue_key)
     # MOVE FILES TO ERROR FOLDER.

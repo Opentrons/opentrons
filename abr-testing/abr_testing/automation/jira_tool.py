@@ -25,11 +25,14 @@ class JiraTicket:
 
     def issues_on_board(self, board_id: str) -> List[str]:
         """Print Issues on board."""
+        params = {"jql": "project = RABR"}
         response = requests.get(
-            f"{self.url}/rest/agile/1.0/board/{board_id}/issue",
+            f"{self.url}/rest/api/3/search",
             headers=self.headers,
+            params = params,
             auth=self.auth,
         )
+        
         response.raise_for_status()
         try:
             board_data = response.json()
@@ -40,29 +43,51 @@ class JiraTicket:
         issue_ids = []
         for i in all_issues:
             issue_id = i.get("id")
-            issue_summary = i.get("summary")
+            issue_summary = i["fields"].get("summary")
+            #print(f"summary: {issue_summary} {issue_id}")
             issue_ids.append([issue_id, issue_summary])
         return issue_ids
 
-    def match_issues(issue_ids, ticket_summary: str):
+    def match_issues(self, issue_ids: List[List[str]], ticket_summary: str):
         to_link = []
         error = ticket_summary.split("_")[3]
         robot = ticket_summary.split("_")[0]
+        print(error)
+        print(robot)
         #for every issue see if both match, if yes then grab issue ID and add it to a list
-        for i in issue_ids:
-            summary = issue_ids[i][1]            
-            issue_error = summary.split("_")[3]
-            issue_robot = summary.split("_")[0]
-            issue_id = issue_ids[i][0]
+        for issue in issue_ids:
+            summary = issue[1]         
+            try:    
+                issue_error = summary.split("_")[3]
+                issue_robot = summary.split("_")[0]
+            except IndexError:
+                continue
+            issue_id = issue[0]
             if robot == issue_robot and error == issue_error:
                 to_link.append(issue_id)
-        
         return to_link
 
-    def link_issues(to_link, ticket_summary: str):
-        print("oh no")
-
-
+    def link_issues(self, to_link: list, ticket_id: str):
+        for issue in to_link:
+            link_data = {
+                "type": {"name": "Related Issues"},
+                "inwardIssue": {"id": ticket_id},
+                "outwardIssue": {"id": issue},
+                "comment": {"body": "comment if needed"},
+            }
+            try:
+                response = requests.post(
+                    f"{self.url}/rest/api/2/issueLink",
+                    headers=self.headers,
+                    auth=self.auth,
+                    json=link_data,
+                )
+                response.raise_for_status()
+                response_str = str(response.content)
+            except requests.exceptions.HTTPError:
+                print(f"HTTP error occurred. Response content: {response_str}")
+            except json.JSONDecodeError:
+                print(f"JSON decoding error occurred. Response content: {response_str}")
 
     #function: "match_issues", input would be the list from above, another input is summary of ticket created (ticket_summary: string), 
 
