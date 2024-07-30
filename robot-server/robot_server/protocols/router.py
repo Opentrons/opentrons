@@ -5,7 +5,7 @@ import logging
 from textwrap import dedent
 from datetime import datetime
 from pathlib import Path
-from typing import List, Optional, Union, Tuple, Dict
+from typing import List, Optional, Union, Tuple
 
 from opentrons.protocol_engine.types import (
     PrimitiveRunTimeParamValuesType,
@@ -250,6 +250,8 @@ async def create_protocol(  # noqa: C901
     quick_transfer_protocol_auto_deleter: ProtocolAutoDeleter = Depends(
         get_quick_transfer_protocol_auto_deleter
     ),
+    data_files_directory: Path = Depends(get_data_files_directory),
+    data_files_store: DataFilesStore = Depends(get_data_files_store),
     robot_type: RobotType = Depends(get_robot_type),
     protocol_id: str = Depends(get_unique_id, use_cache=False),
     analysis_id: str = Depends(get_unique_id, use_cache=False),
@@ -257,8 +259,6 @@ async def create_protocol(  # noqa: C901
     maximum_quick_transfer_protocols: int = Depends(
         get_maximum_quick_transfer_protocols
     ),
-    data_files_directory: Path = Depends(get_data_files_directory),
-    data_files_store: DataFilesStore = Depends(get_data_files_store),
 ) -> PydanticResponse[SimpleBody[Protocol]]:
     """Create a new protocol by uploading its files.
 
@@ -279,6 +279,8 @@ async def create_protocol(  # noqa: C901
             the new protocol.
         quick_transfer_protocol_auto_deleter: An interface to delete old quick
             transfer resources to make room for the new protocol.
+        data_files_directory: Persistence directory for data files.
+        data_files_store: In-memory database of data file resources.
         robot_type: The type of this robot. Protocols meant for other robot types
             are rejected.
         protocol_id: Unique identifier to attach to the protocol resource.
@@ -321,11 +323,10 @@ async def create_protocol(  # noqa: C901
         assert file.filename is not None
     buffered_files = await file_reader_writer.read(files=files)  # type: ignore[arg-type]
 
-    rtp_paths: Dict[str, Path] = {}
-    if parsed_rtp_files is not None:
-        for rtp_name, file_id in parsed_rtp_files.items():
-            file_name = data_files_store.get(file_id).name
-            rtp_paths[rtp_name] = data_files_directory / file_id / file_name
+    rtp_paths = {
+        name: data_files_directory / file_id / data_files_store.get(file_id).name
+        for name, file_id in parsed_rtp_files.items()
+    }
 
     content_hash = await file_hasher.hash(buffered_files)
     cached_protocol_id = protocol_store.get_id_by_hash(content_hash)
@@ -729,11 +730,12 @@ async def create_protocol_analysis(
             status.HTTP_404_NOT_FOUND
         )
 
-    rtp_paths: Dict[str, Path] = {}
-    if request_body and request_body.data.runTimeParameterFiles:
-        for rtp_name, file_id in request_body.data.runTimeParameterFiles.items():
-            file_name = data_files_store.get(file_id).name
-            rtp_paths[rtp_name] = data_files_directory / file_id / file_name
+    rtp_files = request_body.data.runTimeParameterFiles if request_body else {}
+
+    rtp_paths = {
+        name: data_files_directory / file_id / data_files_store.get(file_id).name
+        for name, file_id in rtp_files.items()
+    }
 
     try:
         (

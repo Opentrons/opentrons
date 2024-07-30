@@ -6,14 +6,14 @@ import logging
 from datetime import datetime
 from pathlib import Path
 from textwrap import dedent
-from typing import Optional, Union, Callable, Dict
+from typing import Optional, Union, Callable
 from typing_extensions import Literal
 
 from fastapi import APIRouter, Depends, status, Query
 from pydantic import BaseModel, Field
 
 from opentrons_shared_data.errors import ErrorCodes
-from opentrons.protocol_engine.types import CSVRunTimeParamFilesType
+from opentrons.protocol_engine.types import CSVRuntimeParamPaths
 
 from robot_server.data_files.dependencies import (
     get_data_files_directory,
@@ -156,12 +156,12 @@ async def create_run(
     quick_transfer_run_auto_deleter: RunAutoDeleter = Depends(
         get_quick_transfer_run_auto_deleter
     ),
+    data_files_directory: Path = Depends(get_data_files_directory),
+    data_files_store: DataFilesStore = Depends(get_data_files_store),
     check_estop: bool = Depends(require_estop_in_good_state),
     deck_configuration_store: DeckConfigurationStore = Depends(
         get_deck_configuration_store
     ),
-    data_files_directory: Path = Depends(get_data_files_directory),
-    data_files_store: DataFilesStore = Depends(get_data_files_store),
     notify_publishers: Callable[[], None] = Depends(get_pe_notify_publishers),
 ) -> PydanticResponse[SimpleBody[Union[Run, BadRun]]]:
     """Create a new run.
@@ -175,6 +175,8 @@ async def create_run(
         run_auto_deleter: An interface to delete old resources to make room for
             the new run.
         quick_transfer_run_auto_deleter: An interface to delete old quick-transfer
+        data_files_directory: Persistence directory for data files.
+        data_files_store: In-memory database of data file resources.
         resources to make room for the new run.
         check_estop: Dependency to verify the estop is in a valid state.
         deck_configuration_store: Dependency to fetch the deck configuration.
@@ -185,16 +187,15 @@ async def create_run(
     rtp_values = (
         request_body.data.runTimeParameterValues if request_body is not None else None
     )
-    # TODO maybe don't need this typing thing here
-    rtp_files: Optional[CSVRunTimeParamFilesType] = (
+    rtp_files = (
         request_body.data.runTimeParameterFiles if request_body is not None else None
     )
-    rtp_paths: Optional[Dict[str, Path]] = None
+    rtp_paths: Optional[CSVRuntimeParamPaths] = None
     if rtp_files:
-        rtp_paths = {}
-        for rtp_name, file_id in rtp_files.items():
-            file_name = data_files_store.get(file_id).name
-            rtp_paths[rtp_name] = data_files_directory / file_id / file_name
+        rtp_paths = {
+            name: data_files_directory / file_id / data_files_store.get(file_id).name
+            for name, file_id in rtp_files.items()
+        }
 
     protocol_resource = None
 

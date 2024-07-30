@@ -54,6 +54,7 @@ def mock_notify_publishers() -> None:
 
 @pytest.fixture
 def mock_data_files_store(decoy: Decoy) -> DataFilesStore:
+    """Get a mock DataFilesStore."""
     return decoy.mock(cls=DataFilesStore)
 
 
