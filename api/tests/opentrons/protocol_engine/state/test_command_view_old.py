@@ -63,6 +63,7 @@ def get_command_view(  # noqa: C901
     finish_error: Optional[errors.ErrorOccurrence] = None,
     commands: Sequence[cmd.Command] = (),
     latest_command_hash: Optional[str] = None,
+    failed_command_errors: Optional[List[ErrorOccurrence]] = None,
 ) -> CommandView:
     """Get a command view test subject."""
     command_history = CommandHistory()
@@ -99,6 +100,7 @@ def get_command_view(  # noqa: C901
         run_started_at=run_started_at,
         latest_protocol_command_hash=latest_command_hash,
         stopped_by_estop=False,
+        failed_command_errors=failed_command_errors or [],
     )
 
     return CommandView(state=state)

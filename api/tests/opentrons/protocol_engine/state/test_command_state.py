@@ -171,6 +171,7 @@ def test_command_failure(error_recovery_type: ErrorRecoveryType) -> None:
     )
 
     assert subject_view.get("command-id") == expected_failed_command
+    assert subject.state.failed_command_errors == [expected_error_occurrence]
 
 
 def test_command_failure_clears_queues() -> None:
@@ -202,12 +203,20 @@ def test_command_failure_clears_queues() -> None:
         started_at=datetime(year=2022, month=2, day=2),
     )
     subject.handle_action(run_1)
+    expected_error = errors.ProtocolEngineError(message="oh no")
+    expected_error_occurance = errors.ErrorOccurrence(
+        id="error-id",
+        errorType="ProtocolEngineError",
+        createdAt=datetime(year=2023, month=3, day=3),
+        detail="oh no",
+        errorCode=ErrorCodes.GENERAL_ERROR.value.code,
+    )
     fail_1 = actions.FailCommandAction(
         command_id="command-id-1",
         running_command=subject_view.get("command-id-1"),
         error_id="error-id",
         failed_at=datetime(year=2023, month=3, day=3),
-        error=errors.ProtocolEngineError(message="oh no"),
+        error=expected_error,
         notes=[],
         type=ErrorRecoveryType.FAIL_RUN,
     )
@@ -220,6 +229,7 @@ def test_command_failure_clears_queues() -> None:
     assert subject_view.get_running_command_id() is None
     assert subject_view.get_queue_ids() == OrderedSet()
     assert subject_view.get_next_to_execute() is None
+    assert subject.state.failed_command_errors == [expected_error_occurance]
 
 
 def test_setup_command_failure_only_clears_setup_command_queue() -> None:
@@ -453,12 +463,20 @@ def test_door_during_error_recovery() -> None:
         started_at=datetime(year=2022, month=2, day=2),
     )
     subject.handle_action(run_1)
+    expected_error = errors.ProtocolEngineError(message="oh no")
+    expected_error_occurance = errors.ErrorOccurrence(
+        id="error-id",
+        errorType="ProtocolEngineError",
+        createdAt=datetime(year=2023, month=3, day=3),
+        detail="oh no",
+        errorCode=ErrorCodes.GENERAL_ERROR.value.code,
+    )
     fail_1 = actions.FailCommandAction(
         command_id="command-id-1",
         running_command=subject_view.get("command-id-1"),
         error_id="error-id",
         failed_at=datetime(year=2023, month=3, day=3),
-        error=errors.ProtocolEngineError(message="oh no"),
+        error=expected_error,
         notes=[],
         type=ErrorRecoveryType.WAIT_FOR_RECOVERY,
     )
@@ -500,6 +518,7 @@ def test_door_during_error_recovery() -> None:
     subject.handle_action(play)
     assert subject_view.get_status() == EngineStatus.AWAITING_RECOVERY
     assert subject_view.get_next_to_execute() == "command-id-2"
+    assert subject.state.failed_command_errors == [expected_error_occurance]
 
 
 @pytest.mark.parametrize(
@@ -564,7 +583,7 @@ def test_error_recovery_type_tracking() -> None:
             command_id="c1",
             running_command=running_command_1,
             error_id="c1-error",
-            failed_at=datetime.now(),
+            failed_at=datetime(year=2023, month=3, day=3),
             error=PythonException(RuntimeError("new sheriff in town")),
             notes=[],
             type=ErrorRecoveryType.WAIT_FOR_RECOVERY,
@@ -579,7 +598,7 @@ def test_error_recovery_type_tracking() -> None:
             command_id="c2",
             running_command=running_command_2,
             error_id="c2-error",
-            failed_at=datetime.now(),
+            failed_at=datetime(year=2023, month=3, day=3),
             error=PythonException(RuntimeError("new sheriff in town")),
             notes=[],
             type=ErrorRecoveryType.FAIL_RUN,
@@ -589,6 +608,19 @@ def test_error_recovery_type_tracking() -> None:
     view = CommandView(subject.state)
     assert view.get_error_recovery_type("c1") == ErrorRecoveryType.WAIT_FOR_RECOVERY
     assert view.get_error_recovery_type("c2") == ErrorRecoveryType.FAIL_RUN
+
+    exception = PythonException(RuntimeError("new sheriff in town"))
+    error_occurrence_1 = ErrorOccurrence.from_failed(
+        id="c1-error", createdAt=datetime(year=2023, month=3, day=3), error=exception
+    )
+    error_occurrence_2 = ErrorOccurrence.from_failed(
+        id="c2-error", createdAt=datetime(year=2023, month=3, day=3), error=exception
+    )
+
+    assert subject.state.failed_command_errors == [
+        error_occurrence_1,
+        error_occurrence_2,
+    ]
 
 
 def test_recovery_target_tracking() -> None:

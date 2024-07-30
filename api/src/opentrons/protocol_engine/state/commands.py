@@ -199,7 +199,7 @@ class CommandState:
     This value can be used to generate future hashes.
     """
 
-    failed_command_errors: Optional[List[ErrorOccurrence]]
+    failed_command_errors: List[ErrorOccurrence]
     """List of errors that occurred during run execution."""
 
     stopped_by_estop: bool
@@ -233,7 +233,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
             run_started_at=None,
             latest_protocol_command_hash=None,
             stopped_by_estop=False,
-            failed_command_errors=None,
+            failed_command_errors=[],
         )
 
     def handle_action(self, action: Action) -> None:
