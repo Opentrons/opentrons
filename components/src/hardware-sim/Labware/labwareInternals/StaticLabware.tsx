@@ -1,6 +1,6 @@
 // Render labware definition to SVG. XY is in robot coordinates.
 import * as React from 'react'
-import styled from 'styled-components'
+import styled, { CSSProperties } from 'styled-components'
 import flatMap from 'lodash/flatMap'
 
 import { LabwareOutline } from './LabwareOutline'
@@ -22,6 +22,7 @@ export interface StaticLabwareProps {
   onMouseEnterWell?: (e: WellMouseEvent) => unknown
   /** Optional callback to be executed when mouse leaves a well element */
   onMouseLeaveWell?: (e: WellMouseEvent) => unknown
+  fill?: CSSProperties['fill']
 }
 
 const TipDecoration = React.memo(function TipDecoration(props: {
@@ -55,13 +56,18 @@ export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
     onLabwareClick,
     onMouseEnterWell,
     onMouseLeaveWell,
+    fill,
   } = props
 
   const { isTiprack } = definition.parameters
   return (
     <g onClick={onLabwareClick}>
       <LabwareDetailGroup>
-        <LabwareOutline definition={definition} highlight={highlight} />
+        <LabwareOutline
+          definition={definition}
+          highlight={highlight}
+          fill={fill}
+        />
       </LabwareDetailGroup>
       <g>
         {flatMap(
@@ -78,6 +84,7 @@ export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
                     {...(isTiprack
                       ? STYLE_BY_WELL_CONTENTS.tipPresent
                       : STYLE_BY_WELL_CONTENTS.defaultWell)}
+                    fill={fill}
                   />
 
                   {isTiprack ? (

@@ -18,6 +18,7 @@ export interface LabwareOutlineProps {
   highlight?: boolean
   /** [legacy] override the border color */
   stroke?: CSSProperties['stroke']
+  fill?: CSSProperties['fill']
 }
 
 const OUTLINE_THICKNESS_MM = 1
@@ -30,13 +31,19 @@ export function LabwareOutline(props: LabwareOutlineProps): JSX.Element {
     isTiprack = false,
     highlight = false,
     stroke,
+    fill,
   } = props
   const {
     parameters = { isTiprack },
     dimensions = { xDimension: width, yDimension: height },
   } = definition ?? {}
 
-  const backgroundFill = parameters.isTiprack ? '#CCCCCC' : COLORS.white
+  let backgroundFill
+  if (fill != null) {
+    backgroundFill = fill
+  } else {
+    backgroundFill = parameters.isTiprack ? '#CCCCCC' : COLORS.white
+  }
   return (
     <>
       {highlight ? (
