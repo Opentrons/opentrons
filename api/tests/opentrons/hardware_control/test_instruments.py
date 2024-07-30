@@ -6,9 +6,9 @@ from decoy import Decoy
 from typing import Iterator
 
 try:
-    import aionotify
+    import aionotify  # type: ignore[import-untyped]
 except (OSError, ModuleNotFoundError):
-    aionotify = None  # type: ignore
+    aionotify = None
 
 
 from opentrons import types

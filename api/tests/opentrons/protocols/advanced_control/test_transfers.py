@@ -1,5 +1,8 @@
 """ Test the Transfer class and its functions """
+from opentrons.hardware_control import ThreadManagedHardware
+from opentrons.protocol_api.protocol_context import ProtocolContext
 import pytest
+from typing import Dict, Any
 
 from opentrons.types import Mount, TransferTipPolicy
 from opentrons.protocols.advanced_control import transfers as tx
@@ -13,7 +16,7 @@ pytestmark = pytest.mark.ot2_only
 
 
 @pytest.fixture
-def _instr_labware(ctx):
+def _instr_labware(ctx: ProtocolContext) -> Dict[str, Any]:
     lw1 = ctx.load_labware("biorad_96_wellplate_200ul_pcr", 1)
     lw2 = ctx.load_labware("corning_96_wellplate_360ul_flat", 2)
     tiprack = ctx.load_labware("opentrons_96_tiprack_300ul", 3)
@@ -32,7 +35,7 @@ def _instr_labware(ctx):
 
 
 # +++++++ Test Helper Functions ++++++++++
-def test_check_if_zero():
+def test_check_if_zero() -> None:
     tclass = tx.TransferPlan
     assert tclass._check_volume_not_zero(APIVersion(2, 6), 0)
     assert tclass._check_volume_not_zero(APIVersion(2, 6), 15)
@@ -41,7 +44,7 @@ def test_check_if_zero():
 
 
 # +++++++ Test transfer types ++++++++++++
-def test_default_transfers(_instr_labware):
+def test_default_transfers(_instr_labware: Dict[str, Any]) -> None:
     # Transfer 100ml from row1 of labware1 to row1 of labware2: first with
     #  new_tip = ONCE, then with new_tip = NEVER
     _instr_labware["ctx"].home()
@@ -142,7 +145,7 @@ def test_default_transfers(_instr_labware):
     assert consd_plan_list == exp3
 
 
-def test_uneven_transfers(_instr_labware):
+def test_uneven_transfers(_instr_labware: Dict[str, Any]) -> None:
     _instr_labware["ctx"].home()
     lw1 = _instr_labware["lw1"]
     lw2 = _instr_labware["lw2"]
@@ -231,7 +234,7 @@ def test_uneven_transfers(_instr_labware):
     assert many_to_one_plan_list == exp3
 
 
-def test_location_wells(_instr_labware):
+def test_location_wells(_instr_labware: Dict[str, Any]) -> None:
     _instr_labware["ctx"].home()
     lw1 = _instr_labware["lw1"]
     lw2 = _instr_labware["lw2"]
@@ -277,7 +280,7 @@ def test_location_wells(_instr_labware):
             idx_dest += 1
 
 
-def test_no_new_tip(_instr_labware):
+def test_no_new_tip(_instr_labware: Dict[str, Any]) -> None:
     _instr_labware["ctx"].home()
     lw1 = _instr_labware["lw1"]
     lw2 = _instr_labware["lw2"]
@@ -332,7 +335,9 @@ def test_no_new_tip(_instr_labware):
         assert step["method"] != "drop_tip"
 
 
-def test_new_tip_always(_instr_labware, monkeypatch):
+def test_new_tip_always(
+    _instr_labware: Dict[str, Any], monkeypatch: pytest.MonkeyPatch
+) -> None:
     _instr_labware["ctx"].home()
     lw1 = _instr_labware["lw1"]
     lw2 = _instr_labware["lw2"]
@@ -383,7 +388,7 @@ def test_new_tip_always(_instr_labware, monkeypatch):
     assert tiprack.next_tip() == tiprack.columns()[0][4]
 
 
-def test_transfer_w_touchtip_blowout(_instr_labware):
+def test_transfer_w_touchtip_blowout(_instr_labware: Dict[str, Any]) -> None:
     _instr_labware["ctx"].home()
     lw1 = _instr_labware["lw1"]
     lw2 = _instr_labware["lw2"]
@@ -483,7 +488,7 @@ def test_transfer_w_touchtip_blowout(_instr_labware):
     assert dist_plan_list == exp2
 
 
-def test_transfer_w_airgap_blowout(_instr_labware):
+def test_transfer_w_airgap_blowout(_instr_labware: Dict[str, Any]) -> None:
     _instr_labware["ctx"].home()
     lw1 = _instr_labware["lw1"]
     lw2 = _instr_labware["lw2"]
@@ -602,7 +607,7 @@ def test_transfer_w_airgap_blowout(_instr_labware):
     assert consd_plan_list == exp3
 
 
-def test_touchtip_mix(_instr_labware):
+def test_touchtip_mix(_instr_labware: Dict[str, Any]) -> None:
     _instr_labware["ctx"].home()
     lw1 = _instr_labware["lw1"]
     lw2 = _instr_labware["lw2"]
@@ -727,7 +732,7 @@ def test_touchtip_mix(_instr_labware):
     assert consd_plan_list == exp3
 
 
-def test_all_options(_instr_labware):
+def test_all_options(_instr_labware: Dict[str, Any]) -> None:
     _instr_labware["ctx"].home()
     lw1 = _instr_labware["lw1"]
     lw2 = _instr_labware["lw2"]
@@ -796,7 +801,9 @@ def test_all_options(_instr_labware):
     assert xfer_plan_list == exp1
 
 
-def test_invalid_air_gap_disposal_sum_distribute(_instr_labware):
+def test_invalid_air_gap_disposal_sum_distribute(
+    _instr_labware: Dict[str, Any]
+) -> None:
     _instr_labware["ctx"].home()
     lw1 = _instr_labware["lw1"]
     lw2 = _instr_labware["lw2"]
@@ -823,7 +830,7 @@ def test_invalid_air_gap_disposal_sum_distribute(_instr_labware):
         list(plan)
 
 
-def test_invalid_air_gap_distribute(_instr_labware):
+def test_invalid_air_gap_distribute(_instr_labware: Dict[str, Any]) -> None:
     _instr_labware["ctx"].home()
     lw1 = _instr_labware["lw1"]
     lw2 = _instr_labware["lw2"]
@@ -847,7 +854,7 @@ def test_invalid_air_gap_distribute(_instr_labware):
         list(plan)
 
 
-def test_invalid_disposal_volume_distribute(_instr_labware):
+def test_invalid_disposal_volume_distribute(_instr_labware: Dict[str, Any]) -> None:
     _instr_labware["ctx"].home()
     lw1 = _instr_labware["lw1"]
     lw2 = _instr_labware["lw2"]
@@ -871,7 +878,7 @@ def test_invalid_disposal_volume_distribute(_instr_labware):
         list(plan)
 
 
-def test_oversized_distribute(_instr_labware):
+def test_oversized_distribute(_instr_labware: Dict[str, Any]) -> None:
     _instr_labware["ctx"].home()
     lw1 = _instr_labware["lw1"]
     lw2 = _instr_labware["lw2"]
@@ -955,7 +962,7 @@ def test_oversized_distribute(_instr_labware):
     assert xfer_plan_list == exp1
 
 
-def test_oversized_consolidate(_instr_labware):
+def test_oversized_consolidate(_instr_labware: Dict[str, Any]) -> None:
     _instr_labware["ctx"].home()
     lw1 = _instr_labware["lw1"]
     lw2 = _instr_labware["lw2"]
@@ -1039,7 +1046,7 @@ def test_oversized_consolidate(_instr_labware):
     assert xfer_plan_list == exp1
 
 
-def test_oversized_transfer(_instr_labware):
+def test_oversized_transfer(_instr_labware: Dict[str, Any]) -> None:
     _instr_labware["ctx"].home()
     lw1 = _instr_labware["lw1"]
     lw2 = _instr_labware["lw2"]
@@ -1123,7 +1130,9 @@ def test_oversized_transfer(_instr_labware):
     assert xfer_plan_list == exp1
 
 
-def test_multichannel_transfer_old_version(hardware, deck_definition_name):
+def test_multichannel_transfer_old_version(
+    hardware: ThreadManagedHardware, deck_definition_name: str
+) -> None:
     # for API version below 2.2, multichannel pipette can only
     # reach row A of 384-well plates
     ctx = papi.create_protocol_context(
@@ -1186,7 +1195,9 @@ def test_multichannel_transfer_old_version(hardware, deck_definition_name):
             xfer_plan_list.append(step)
 
 
-def test_multichannel_transfer_locs(hardware, deck_definition_name):
+def test_multichannel_transfer_locs(
+    hardware: ThreadManagedHardware, deck_definition_name: str
+) -> None:
     ctx = papi.create_protocol_context(
         api_version=APIVersion(2, 2),
         hardware_api=hardware,
@@ -1255,7 +1266,7 @@ def test_multichannel_transfer_locs(hardware, deck_definition_name):
         )
 
 
-def test_zero_volume_results_in_no_transfer(_instr_labware):
+def test_zero_volume_results_in_no_transfer(_instr_labware: Dict[str, Any]) -> None:
     _instr_labware["ctx"].home()
     lw1 = _instr_labware["lw1"]
     lw2 = _instr_labware["lw2"]
@@ -1371,7 +1382,9 @@ def test_zero_volume_results_in_no_transfer(_instr_labware):
         assert step == expected
 
 
-def test_zero_volume_causes_transfer_of_disposal_vol(_instr_labware):
+def test_zero_volume_causes_transfer_of_disposal_vol(
+    _instr_labware: Dict[str, Any]
+) -> None:
     # This test checks the old behavior of distribute and consolidate
     # with zero volumes in which case the volume aspirated/dispensed
     # was the min volume + disposal volume if a zero volume was
@@ -1489,7 +1502,7 @@ def test_zero_volume_causes_transfer_of_disposal_vol(_instr_labware):
         assert step == expected
 
 
-def test_blowout_to_source(_instr_labware):
+def test_blowout_to_source(_instr_labware: Dict[str, Any]) -> None:
     _instr_labware["ctx"].home()
     lw1 = _instr_labware["lw1"]
     lw2 = _instr_labware["lw2"]
@@ -1560,7 +1573,7 @@ def test_blowout_to_source(_instr_labware):
         assert step == expected
 
 
-def test_blowout_to_dest(_instr_labware):
+def test_blowout_to_dest(_instr_labware: Dict[str, Any]) -> None:
     _instr_labware["ctx"].home()
     lw1 = _instr_labware["lw1"]
     lw2 = _instr_labware["lw2"]

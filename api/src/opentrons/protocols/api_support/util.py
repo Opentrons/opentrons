@@ -180,7 +180,7 @@ class FlowRates:
         return self._instr.get_aspirate_flow_rate()
 
     @aspirate.setter
-    def aspirate(self, new_val: float):
+    def aspirate(self, new_val: float) -> None:
         self._instr.set_flow_rate(
             aspirate=_assert_gzero(
                 new_val, "flow rate should be a numerical value in ul/s"
@@ -192,7 +192,7 @@ class FlowRates:
         return self._instr.get_dispense_flow_rate()
 
     @dispense.setter
-    def dispense(self, new_val: float):
+    def dispense(self, new_val: float) -> None:
         self._instr.set_flow_rate(
             dispense=_assert_gzero(
                 new_val, "flow rate should be a numerical value in ul/s"
@@ -204,7 +204,7 @@ class FlowRates:
         return self._instr.get_blow_out_flow_rate()
 
     @blow_out.setter
-    def blow_out(self, new_val: float):
+    def blow_out(self, new_val: float) -> None:
         self._instr.set_flow_rate(
             blow_out=_assert_gzero(
                 new_val, "flow rate should be a numerical value in ul/s"
@@ -247,7 +247,7 @@ class PlungerSpeeds:
         return self._instr.get_hardware_state()["aspirate_speed"]
 
     @aspirate.setter
-    def aspirate(self, new_val: float):
+    def aspirate(self, new_val: float) -> None:
         self._instr.set_pipette_speed(
             aspirate=_assert_gzero(new_val, "speed should be a numerical value in mm/s")
         )
@@ -257,7 +257,7 @@ class PlungerSpeeds:
         return self._instr.get_hardware_state()["dispense_speed"]
 
     @dispense.setter
-    def dispense(self, new_val: float):
+    def dispense(self, new_val: float) -> None:
         self._instr.set_pipette_speed(
             dispense=_assert_gzero(new_val, "speed should be a numerical value in mm/s")
         )
@@ -267,13 +267,13 @@ class PlungerSpeeds:
         return self._instr.get_hardware_state()["blow_out_speed"]
 
     @blow_out.setter
-    def blow_out(self, new_val: float):
+    def blow_out(self, new_val: float) -> None:
         self._instr.set_pipette_speed(
             blow_out=_assert_gzero(new_val, "speed should be a numerical value in mm/s")
         )
 
 
-class AxisMaxSpeeds(UserDict):
+class AxisMaxSpeeds(UserDict[Union[str, Axis], float]):
     """Special mapping allowing internal storage by Mount enums and
     user access by string
     """
@@ -299,7 +299,7 @@ class AxisMaxSpeeds(UserDict):
             raise KeyError(key)
         return checked_key
 
-    def __setitem__(self, key: Any, value: Any):
+    def __setitem__(self, key: Any, value: Any) -> None:
         if value is None:
             del self[key]
             return
@@ -311,7 +311,7 @@ class AxisMaxSpeeds(UserDict):
 
         self.data[checked_key] = checked_val
 
-    def __delitem__(self, key: Union[str, Axis]):
+    def __delitem__(self, key: Union[str, Axis]) -> None:
         checked_key = AxisMaxSpeeds._verify_key(key)
         del self.data[checked_key]
 

@@ -4,8 +4,10 @@ from opentrons.protocol_api.core.legacy.well_geometry import WellGeometry
 
 from unittest import mock
 from copy import deepcopy
+from opentrons_shared_data.labware.types import LabwareDefinition
+from opentrons_shared_data.protocol.types import DelayParams
 import pytest
-from opentrons.types import Location, Point
+from opentrons.types import Location, Point, MountType
 from opentrons.protocols.parse import parse
 from opentrons.protocol_api.core.legacy.deck import Deck
 from opentrons.protocol_api import (
@@ -33,9 +35,11 @@ from opentrons.protocols.execution.execute_json_v3 import (
     load_pipettes_from_json,
 )
 
+from typing import Any, Callable, Tuple
 
-def test_load_pipettes_from_json():
-    def fake_pipette(name, mount):
+
+def test_load_pipettes_from_json() -> None:
+    def fake_pipette(name: str, mount: MountType) -> Tuple[str, MountType]:
         return (name, mount)
 
     ctx = mock.create_autospec(ProtocolContext)
@@ -50,7 +54,7 @@ def test_load_pipettes_from_json():
     assert result == {"aID": ("a", "left"), "bID": ("b", "right")}
 
 
-def test_get_well(minimal_labware_def2):
+def test_get_well(minimal_labware_def2: LabwareDefinition) -> None:
     deck = Location(Point(0, 0, 0), "deck")
     well_name = "A2"
     some_labware = labware.Labware(
@@ -65,7 +69,7 @@ def test_get_well(minimal_labware_def2):
     assert result == some_labware[well_name]
 
 
-def test_set_flow_rate():
+def test_set_flow_rate() -> None:
     pipette = mock.create_autospec(InstrumentContext)
     pipette.flow_rate.aspirate = 1
     pipette.flow_rate.dispense = 2
@@ -78,7 +82,9 @@ def test_set_flow_rate():
     assert pipette.flow_rate.blow_out == 42
 
 
-def test_load_labware_from_json_defs(ctx, get_labware_fixture):
+def test_load_labware_from_json_defs(
+    ctx: ProtocolContext, get_labware_fixture: Callable[[str], Any]
+) -> None:
     custom_trough_def = get_labware_fixture("fixture_12_trough")
     data = {
         "labwareDefinitions": {"someTroughDef": custom_trough_def},
@@ -104,14 +110,16 @@ def test_load_labware_from_json_defs(ctx, get_labware_fixture):
     )
 
 
-def test_get_location_with_offset(min_lw2):
+def test_get_location_with_offset(min_lw2: labware.Labware) -> None:
     loaded_labware = {"someLabwareId": min_lw2}
     params = {"offsetFromBottomMm": 3, "labware": "someLabwareId", "well": "A2"}
     result = _get_location_with_offset(loaded_labware, params)
     assert result == Location(Point(19, 28, 8), min_lw2["A2"])
 
 
-def test_get_location_with_offset_fixed_trash(minimal_labware_def2):
+def test_get_location_with_offset_fixed_trash(
+    minimal_labware_def2: LabwareDefinition,
+) -> None:
     deck = Location(Point(0, 0, 0), "deck")
     trash_labware_def = deepcopy(minimal_labware_def2)
     trash_labware_def["parameters"]["quirks"] = ["fixedTrash"]
@@ -137,14 +145,14 @@ def test_get_location_with_offset_fixed_trash(minimal_labware_def2):
         ({"wait": 123, "message": "m"}, [mock.call.delay(seconds=123, msg="m")]),
     ],
 )
-def test_delay(params, expected):
+def test_delay(params: DelayParams, expected) -> None:
     mock_context = mock.MagicMock()
     _delay(mock_context, params)
 
     assert mock_context.mock_calls == expected
 
 
-def test_blowout():
+def test_blowout() -> None:
     m = mock.MagicMock()
     m.pipette_mock = mock.create_autospec(InstrumentContext)
     m.mock_set_flow_rate = mock.MagicMock()
@@ -168,7 +176,7 @@ def test_blowout():
     ]
 
 
-def test_pick_up_tip():
+def test_pick_up_tip() -> None:
     pipette_mock = mock.create_autospec(InstrumentContext)
     params = {
         "pipette": "somePipetteId",
@@ -184,7 +192,7 @@ def test_pick_up_tip():
     assert pipette_mock.mock_calls == [mock.call.pick_up_tip(well)]
 
 
-def test_drop_tip():
+def test_drop_tip() -> None:
     pipette_mock = mock.create_autospec(InstrumentContext)
 
     params = {
@@ -200,7 +208,7 @@ def test_drop_tip():
     assert pipette_mock.mock_calls == [mock.call.drop_tip(well)]
 
 
-def test_air_gap(minimal_labware_def2):
+def test_air_gap(minimal_labware_def2: LabwareDefinition) -> None:
     m = mock.MagicMock()
     m.pipette_mock = mock.create_autospec(InstrumentContext)
     m.mock_set_flow_rate = mock.MagicMock()
@@ -245,7 +253,7 @@ def test_air_gap(minimal_labware_def2):
     ]
 
 
-def test_aspirate():
+def test_aspirate() -> None:
     m = mock.MagicMock()
     m.pipette_mock = mock.create_autospec(InstrumentContext)
     m.mock_get_location_with_offset = mock.MagicMock(
@@ -278,7 +286,7 @@ def test_aspirate():
     ]
 
 
-def test_dispense():
+def test_dispense() -> None:
     m = mock.MagicMock()
     m.pipette_mock = mock.create_autospec(InstrumentContext)
     m.mock_get_location_with_offset = mock.MagicMock(
@@ -311,7 +319,7 @@ def test_dispense():
     ]
 
 
-def test_touch_tip():
+def test_touch_tip() -> None:
     location = Location(Point(1, 2, 3), "deck")
     well = labware.Well(
         parent=None,
@@ -372,7 +380,7 @@ def test_touch_tip():
     assert pipette_mock.mock_calls == [mock.call.touch_tip(well, v_offset=-70.0)]
 
 
-def test_move_to_slot():
+def test_move_to_slot() -> None:
     slot_position = Location(Point(1, 2, 3), "deck")
     mock_context = mock.Mock()
 
@@ -404,7 +412,7 @@ def test_move_to_slot():
     ]
 
 
-def test_dispatch_json():
+def test_dispatch_json() -> None:
     m = mock.MagicMock()
     mock_dispatcher_map = {
         "delay": m._delay,
@@ -450,7 +458,7 @@ def test_dispatch_json():
         ]
 
 
-def test_dispatch_json_invalid_command():
+def test_dispatch_json_invalid_command() -> None:
     protocol_data = {
         "commands": [
             {"command": "no_such_command", "params": "foo"},
@@ -466,7 +474,7 @@ def test_dispatch_json_invalid_command():
 
 
 @pytest.mark.ot2_only
-def test_papi_execute_json_v3(monkeypatch, ctx, get_json_protocol_fixture):
+def test_papi_execute_json_v3(monkeypatch, ctx, get_json_protocol_fixture) -> None:
     protocol_data = get_json_protocol_fixture("3", "testAllAtomicSingleV3", False)
     protocol = parse(protocol_data, None)
     ctx.home()

@@ -335,6 +335,10 @@ class TransferOptions(NamedTuple):
     dispense: DispenseOpts = DispenseOpts()
 
 
+# These 4 types are the type options for multiple parameters in multiple different functions.
+RepeatedTypes = Union[List[List[Well]], List[Well], Well, types.Location]
+# RepeatedTypes = List[Union[Well, types.Location]]
+
 TransferOptions.transfer.__doc__ = """
     Options pertaining to behavior of the transfer.
 
@@ -386,9 +390,9 @@ class TransferPlan:
 
     def __init__(
         self,
-        volume,
-        sources,
-        dests,
+        volume: Any,
+        sources: RepeatedTypes,
+        dests: RepeatedTypes,
         # todo(mm, 2021-03-10):
         # Refactor to not need an InstrumentContext, so we can more
         # easily test this class's logic on its own.
@@ -532,7 +536,7 @@ class TransferPlan:
     def _extend_source_target_lists(
         sources: List[Union[Well, types.Location]],
         targets: List[Union[Well, types.Location]],
-    ):
+    ) -> Tuple[List[Union[Well, types.Location]], List[Union[Well, types.Location]]]:
         """Extend source or target list to match the length of the other"""
         if len(sources) < len(targets):
             if len(targets) % len(sources) != 0:
@@ -837,9 +841,9 @@ class TransferPlan:
     def _format_dict(
         self,
         method: str,
-        args: List = None,
-        kwargs: Union["Dictable", Dict[str, Any]] = None,
-    ):
+        args: Optional[List[Any]] = None,
+        kwargs: Optional[Union["Dictable", Dict[str, Any]]] = None,
+    ) -> Dict[str, Any]:
         if kwargs:
             if isinstance(kwargs, Dict):
                 params = {key: val for key, val in kwargs.items() if val}
@@ -851,7 +855,9 @@ class TransferPlan:
             args = []
         return {"method": method, "args": args, "kwargs": params}
 
-    def _create_volume_list(self, volume, total_xfers):
+    def _create_volume_list(
+        self, volume: Any, total_xfers: int
+    ) -> List[Union[float, int]]:
         if isinstance(volume, (float, int)):
             return [volume] * total_xfers
         elif isinstance(volume, tuple):
@@ -870,21 +876,23 @@ class TransferPlan:
                 )
             return volume
 
-    def _create_volume_gradient(self, min_v, max_v, total, gradient=None):
+    def _create_volume_gradient(
+        self, min_v: float, max_v: float, total: int, gradient=None
+    ) -> List[float]:
 
         diff_vol = max_v - min_v
 
-        def _map_volume(i):
+        def _map_volume(i: float) -> float:
             nonlocal diff_vol, total
             rel_x = i / (total - 1)
             rel_y = gradient(rel_x) if gradient else rel_x
-            return (rel_y * diff_vol) + min_v
+            return float((rel_y * diff_vol) + min_v)
 
         return [_map_volume(i) for i in range(total)]
 
     def _check_valid_volume_parameters(
         self, disposal_volume: float, air_gap: float, max_volume: float
-    ):
+    ) -> None:
         if air_gap >= max_volume:
             raise ValueError(
                 "The air gap must be less than the maximum volume of the pipette"
@@ -898,7 +906,9 @@ class TransferPlan:
                 "The sum of the air gap and disposal volume must be less than the maximum volume of the pipette"
             )
 
-    def _check_valid_well_list(self, well_list, id, old_well_list):
+    def _check_valid_well_list(
+        self, well_list: List[Any], id: str, old_well_list: List[Any]
+    ) -> None:
         if self._api_version >= APIVersion(2, 2) and len(well_list) < 1:
             raise RuntimeError(
                 f"Invalid {id} for multichannel transfer: {old_well_list}"
@@ -914,7 +924,9 @@ class TransferPlan:
             return True
         return False
 
-    def _multichannel_transfer(self, s, d):
+    def _multichannel_transfer(
+        self, s: Union[List, Well, types.Location], d: Union[List, Well, types.Location]
+    ) -> Tuple[List, List]:
         # TODO: add a check for container being multi-channel compatible?
         # Helper function for multi-channel use-case
         assert (
@@ -958,7 +970,7 @@ class TransferPlan:
         self._check_valid_well_list(new_dst, "target", d)
         return new_src, new_dst
 
-    def _is_valid_row(self, well: Union[Well, types.Location]):
+    def _is_valid_row(self, well: Union[Well, types.Location]) -> bool:
         if isinstance(well, types.Location):
             test_well = well.labware.as_well()
         else:

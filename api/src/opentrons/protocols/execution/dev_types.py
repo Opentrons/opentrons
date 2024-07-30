@@ -45,7 +45,7 @@ if Protocol is not None:
         not a type (https://github.com/python/mypy/issues/3915)
         """
 
-        async def _asdict(self):
+        async def _asdict(self) -> None:
             ...
 
 
