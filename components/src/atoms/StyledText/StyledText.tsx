@@ -111,6 +111,14 @@ const helixProductStyleMap = {
       }
     `,
   },
+  captionBold: {
+    as: 'label',
+    style: css`
+      @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+        font: ${HELIX_TYPOGRAPHY.fontStyleCaptionBold};
+      }
+    `,
+  },
   captionRegular: {
     as: 'label',
     style: css`

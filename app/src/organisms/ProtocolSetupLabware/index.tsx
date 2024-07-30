@@ -9,6 +9,7 @@ import {
   BORDERS,
   Box,
   COLORS,
+  DeckInfoLabel,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
@@ -16,7 +17,6 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_SPACE_EVENLY,
   LabwareRender,
-  LocationIcon,
   MODULE_ICON_NAME_BY_TYPE,
   SPACING,
   LegacyStyledText,
@@ -147,14 +147,16 @@ export function ProtocolSetupLabware({
     typeof selectedLabware.location === 'object' &&
     'slotName' in selectedLabware?.location
   ) {
-    location = <LocationIcon slotName={selectedLabware?.location.slotName} />
+    location = <DeckInfoLabel deckLabel={selectedLabware?.location.slotName} />
   } else if (
     selectedLabware != null &&
     typeof selectedLabware.location === 'object' &&
     'addressableAreaName' in selectedLabware?.location
   ) {
     location = (
-      <LocationIcon slotName={selectedLabware?.location.addressableAreaName} />
+      <DeckInfoLabel
+        deckLabel={selectedLabware?.location.addressableAreaName}
+      />
     )
   } else if (
     selectedLabware != null &&
@@ -170,8 +172,8 @@ export function ProtocolSetupLabware({
     if (matchedModule != null) {
       location = (
         <>
-          <LocationIcon slotName={matchedModule?.slotName} />
-          <LocationIcon
+          <DeckInfoLabel deckLabel={matchedModule?.slotName} />
+          <DeckInfoLabel
             iconName={
               MODULE_ICON_NAME_BY_TYPE[matchedModule?.moduleDef.moduleType]
             }
@@ -192,7 +194,7 @@ export function ProtocolSetupLabware({
     )?.params.location
     if (adapterLocation != null && adapterLocation !== 'offDeck') {
       if ('slotName' in adapterLocation) {
-        location = <LocationIcon slotName={adapterLocation.slotName} />
+        location = <DeckInfoLabel deckLabel={adapterLocation.slotName} />
       } else if ('moduleId' in adapterLocation) {
         const moduleUnderAdapter = attachedProtocolModuleMatches.find(
           module => module.moduleId === adapterLocation.moduleId
@@ -200,8 +202,8 @@ export function ProtocolSetupLabware({
         if (moduleUnderAdapter != null) {
           location = (
             <>
-              <LocationIcon slotName={moduleUnderAdapter.slotName} />
-              <LocationIcon
+              <DeckInfoLabel deckLabel={moduleUnderAdapter.slotName} />
+              <DeckInfoLabel
                 iconName={
                   MODULE_ICON_NAME_BY_TYPE[
                     moduleUnderAdapter.moduleDef.moduleType
@@ -510,16 +512,16 @@ function RowLabware({
     location = t('off_deck')
   } else if ('slotName' in initialLocation) {
     slotName = initialLocation.slotName
-    location = <LocationIcon slotName={initialLocation.slotName} />
+    location = <DeckInfoLabel deckLabel={initialLocation.slotName} />
   } else if ('addressableAreaName' in initialLocation) {
     slotName = initialLocation.addressableAreaName
-    location = <LocationIcon slotName={initialLocation.addressableAreaName} />
+    location = <DeckInfoLabel deckLabel={initialLocation.addressableAreaName} />
   } else if (matchedModuleType != null && matchedModule?.slotName != null) {
     slotName = matchedModule.slotName
     location = (
       <>
-        <LocationIcon slotName={matchedModule?.slotName} />
-        <LocationIcon iconName={MODULE_ICON_NAME_BY_TYPE[matchedModuleType]} />
+        <DeckInfoLabel deckLabel={matchedModule?.slotName} />
+        <DeckInfoLabel iconName={MODULE_ICON_NAME_BY_TYPE[matchedModuleType]} />
       </>
     )
   } else if ('labwareId' in initialLocation) {
@@ -533,7 +535,7 @@ function RowLabware({
     if (adapterLocation != null && adapterLocation !== 'offDeck') {
       if ('slotName' in adapterLocation) {
         slotName = adapterLocation.slotName
-        location = <LocationIcon slotName={adapterLocation.slotName} />
+        location = <DeckInfoLabel deckLabel={adapterLocation.slotName} />
       } else if ('moduleId' in adapterLocation) {
         const moduleUnderAdapter = attachedProtocolModules.find(
           module => module.moduleId === adapterLocation.moduleId
@@ -542,8 +544,8 @@ function RowLabware({
           slotName = moduleUnderAdapter.slotName
           location = (
             <>
-              <LocationIcon slotName={moduleUnderAdapter.slotName} />
-              <LocationIcon
+              <DeckInfoLabel deckLabel={moduleUnderAdapter.slotName} />
+              <DeckInfoLabel
                 iconName={
                   MODULE_ICON_NAME_BY_TYPE[
                     moduleUnderAdapter.moduleDef.moduleType
