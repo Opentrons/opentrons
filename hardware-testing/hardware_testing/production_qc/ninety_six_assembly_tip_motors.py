@@ -91,7 +91,7 @@ async def _run_test_jaw(api: OT3API):
     await api.move_to(OT3Mount.LEFT, slot_5._replace(z=home_pos.z))
     # LOOP THROUGH CURRENTS + SPEEDS
     current = 0.7
-    speed = 8
+    speed = 12
     ui.print_header(f"CURRENT: {current}, SPEED: {speed}")
     led_check, jaws_aligned = await jaw_precheck(api, ax, speed)
 
