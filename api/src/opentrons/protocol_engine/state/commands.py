@@ -624,6 +624,10 @@ class CommandView(HasState[CommandState]):
         else:
             return run_error or finish_error
 
+    def get_all_errors(self) -> List[ErrorOccurrence]:
+        """Get the run's full error list, if there was none, returns an empty list."""
+        return self._state.failed_command_errors
+
     def get_running_command_id(self) -> Optional[str]:
         """Return the ID of the command that's currently running, if there is one."""
         running_command = self._state.command_history.get_running_command()

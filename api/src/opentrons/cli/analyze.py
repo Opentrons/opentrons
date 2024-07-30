@@ -274,6 +274,7 @@ async def _do_analyze(protocol_source: ProtocolSource) -> RunResult:
                 modules=[],
                 labwareOffsets=[],
                 liquids=[],
+                fullErrorList=[error_occ],
             ),
             parameters=[],
         )

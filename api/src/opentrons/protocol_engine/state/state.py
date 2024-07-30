@@ -128,6 +128,7 @@ class StateView(HasState[State]):
             completedAt=self._state.commands.run_completed_at,
             startedAt=self._state.commands.run_started_at,
             liquids=self._liquid.get_all(),
+            fullErrorList=self._commands.get_all_errors(),
         )
 
 

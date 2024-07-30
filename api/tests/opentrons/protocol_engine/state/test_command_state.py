@@ -744,6 +744,7 @@ def test_final_state_after_estop() -> None:
 
     assert subject_view.get_status() == EngineStatus.FAILED
     assert subject_view.get_error() == expected_error_occurrence
+    assert subject_view.get_all_errors() == []
 
 
 def test_final_state_after_stop() -> None:
@@ -808,6 +809,13 @@ def test_final_state_after_error_recovery_stop() -> None:
         notes=[],
         type=ErrorRecoveryType.WAIT_FOR_RECOVERY,
     )
+    expected_error_occurrence_1 = ErrorOccurrence(
+        id="error-id",
+        createdAt=datetime(year=2023, month=3, day=3),
+        errorCode=ErrorCodes.GENERAL_ERROR.value.code,
+        errorType="ProtocolEngineError",
+        detail="oh no",
+    )
     subject.handle_action(fail_1)
     assert subject_view.get_status() == EngineStatus.AWAITING_RECOVERY
 
@@ -831,6 +839,10 @@ def test_final_state_after_error_recovery_stop() -> None:
             finish_error_details=None,
         )
     )
+
     assert subject_view.get_status() == EngineStatus.STOPPED
     assert subject_view.get_recovery_target() is None
     assert subject_view.get_error() is None
+    assert subject_view.get_all_errors() == [
+        expected_error_occurrence_1,
+    ]
