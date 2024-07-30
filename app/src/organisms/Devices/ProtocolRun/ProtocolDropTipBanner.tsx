@@ -23,19 +23,19 @@ export function ProtocolDropTipBanner(props: {
 
   return (
     <Banner
-      type="warning"
+      type="error"
       onCloseClick={onCloseClick}
       marginBottom={SPACING.spacing16}
       paddingRight={SPACING.spacing16}
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
         <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-          {t('tips_may_be_attached')}
+          {t('remove_attached_tips')}
         </LegacyStyledText>
 
         <Flex flexDirection={DIRECTION_ROW}>
           <LegacyStyledText as="p" marginRight={SPACING.spacing4}>
-            {t('remove_the_tips_from_pipette')}
+            {t('liquid_damages_pipette')}
           </LegacyStyledText>
           <Btn
             textAlign={ALIGN_START}
