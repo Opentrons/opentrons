@@ -30,9 +30,10 @@ import type { CurrentRecoveryOptionUtils } from './useRecoveryRouting'
 import type { RecoveryActionMutationResult } from './useRecoveryActionMutation'
 import type { StepCounts } from '../../../resources/protocols/hooks'
 import type { UseRecoveryAnalyticsResult } from './useRecoveryAnalytics'
+import type { UseRecoveryTakeoverResult } from './useRecoveryTakeover'
 
 type ERUtilsProps = ErrorRecoveryFlowsProps & {
-  toggleERWizard: (launchER: boolean) => Promise<void>
+  toggleERWizAsActiveUser: UseRecoveryTakeoverResult['toggleERWizAsActiveUser']
   hasLaunchedRecovery: boolean
   isOnDevice: boolean
   robotType: RobotType
@@ -61,7 +62,7 @@ const SUBSEQUENT_COMMAND_DEPTH = 2
 export function useERUtils({
   failedCommand,
   runId,
-  toggleERWizard,
+  toggleERWizAsActiveUser,
   hasLaunchedRecovery,
   protocolAnalysis,
   isOnDevice,
@@ -107,7 +108,7 @@ export function useERUtils({
   const routeUpdateActions = useRouteUpdateActions({
     hasLaunchedRecovery,
     recoveryMap,
-    toggleERWizard,
+    toggleERWizAsActiveUser,
     setRecoveryMap: setRM,
   })
 

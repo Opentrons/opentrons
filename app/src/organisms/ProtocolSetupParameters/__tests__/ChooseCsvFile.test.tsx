@@ -32,20 +32,18 @@ const mockUsbData = [
 
 const mockDataOnRobot = {
   data: {
-    data: {
-      files: [
-        {
-          id: '1',
-          createdAt: '2024-06-07T19:19:56.268029+00:00',
-          name: 'rtp_mock_file1.csv',
-        },
-        {
-          id: '2',
-          createdAt: '2024-06-17T19:19:56.268029+00:00',
-          name: 'rtp_mock_file2.csv',
-        },
-      ],
-    },
+    data: [
+      {
+        id: '1',
+        createdAt: '2024-06-07T19:19:56.268029+00:00',
+        name: 'rtp_mock_file1.csv',
+      },
+      {
+        id: '2',
+        createdAt: '2024-06-17T19:19:56.268029+00:00',
+        name: 'rtp_mock_file2.csv',
+      },
+    ],
   },
 }
 
@@ -72,6 +70,7 @@ describe('ChooseCsvFile', () => {
       .calledWith(PROTOCOL_ID)
       .thenReturn([] as any)
   })
+
   it('should render text and buttons', () => {
     render(props)
     screen.getByText('Choose CSV file')
