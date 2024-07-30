@@ -117,6 +117,8 @@ async def _main(arguments: argparse.Namespace) -> None:
                 test_data['Location']=record_dict['Location']
                 test_data['Sample Time(sec)']=record_dict['Sample Time']
                 test_data['PASS/FAIL'] = test_result
+                if number == 5:
+                    print(f"{test_data['Time(Date Time)']}s 0.3u(<8160)={test_data['Count1(M3)']} 0.5u(<2816)={test_data['Count2(M3)']} test_result={test_data['PASS/FAIL']}" )
                 csv_cb.write(list(test_data.values()))
             input("TURN OFF FAN,removal Particle instrument ,PRESS ENTER TO CONTINUE.(关闭风扇,把粒子仪器移除地板区域,按回车键继续)")
             
@@ -215,10 +217,15 @@ async def _main(arguments: argparse.Namespace) -> None:
                 test_data2['SLOT']=slot_name[grip_slot2]
                 test_data2['uvdata']=intdatadict
                 csv_cb.write(list(test_data2.values()))
-
+                if intdatadict >= 175:
+                    test_result_val = "PASS"
+                else:
+                    test_result_val = "FAIL"
+                print(f"****** {test_data2['SLOT']} = {test_data2['uvdata']} test_result = {test_result_val}")
                 # LOOP THROUGH FORCES
                 if iii == 4:
                     tetsuv = True
+            
         
         if tetsuv:
             print("home(环境恢复)")
