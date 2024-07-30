@@ -23,7 +23,7 @@ describe('useRouteUpdateActions', () => {
 
     useRouteUpdateActionsParams = {
       hasLaunchedRecovery: true,
-      toggleERWizard: mockToggleERWizard,
+      toggleERWizAsActiveUser: mockToggleERWizard,
       recoveryMap: {
         route: RECOVERY_MAP.RETRY_FAILED_COMMAND.ROUTE,
         step: RECOVERY_MAP.RETRY_FAILED_COMMAND.STEPS.CONFIRM_RETRY,

@@ -220,7 +220,7 @@ export function ChooseProtocolSlideoutComponent(
             : acc,
         {}
       )
-      Promise.all(
+      void Promise.all(
         Object.entries(dataFilesForProtocolMap).map(([key, file]) => {
           const fileResponse = uploadCsvFile(file)
           const varName = Promise.resolve(key)

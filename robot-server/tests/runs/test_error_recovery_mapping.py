@@ -81,8 +81,10 @@ def test_create_error_recovery_policy_with_rules(
         robot_type="OT-3 Standard",
         deck_type=DeckType.OT3_STANDARD,
     )
-    with pytest.raises(NotImplementedError):
+    assert (
         policy(exampleConfig, mock_command, mock_error_data)
+        == ErrorRecoveryType.IGNORE_AND_CONTINUE
+    )
 
 
 def test_create_error_recovery_policy_undefined_error(

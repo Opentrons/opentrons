@@ -53,6 +53,7 @@ async def create_protocol_engine(
         deck_fixed_labware=deck_fixed_labware,
         robot_definition=robot_definition,
         is_door_open=hardware_api.door_state is DoorState.OPEN,
+        error_recovery_policy=error_recovery_policy,
         module_calibration_offsets=module_calibration_offsets,
         deck_configuration=deck_configuration,
         notify_publishers=notify_publishers,
@@ -61,7 +62,6 @@ async def create_protocol_engine(
     return ProtocolEngine(
         state_store=state_store,
         hardware_api=hardware_api,
-        error_recovery_policy=error_recovery_policy,
     )
 
 

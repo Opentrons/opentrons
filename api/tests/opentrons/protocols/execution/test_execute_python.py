@@ -104,6 +104,7 @@ metadata={"apiLevel": "2.0"};
     assert "Exception [line 5]: hi" in str(e.value)
 
 
+# TODO (spp, 2024-7-16): add a test for CSV rtp extraction
 @pytest.mark.ot2_only
 @pytest.mark.parametrize("protocol_file", ["testosaur_with_rtp.py"])
 def test_rtp_extraction(protocol: Protocol, protocol_file: str) -> None:
@@ -115,7 +116,8 @@ def test_rtp_extraction(protocol: Protocol, protocol_file: str) -> None:
     val = execute_python.exec_add_parameters(
         protocol=proto,
         parameter_context=parameter_context,
-        run_time_param_overrides=run_time_param_overrides,  # type: ignore[arg-type]
+        run_time_param_overrides=run_time_param_overrides, # type: ignore[arg-type]
+        run_time_param_file_overrides={},
     )
     assert val is not None
     assert val.get_all() == {"sample_count": 2, "mount": "left"}
