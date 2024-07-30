@@ -2719,9 +2719,9 @@ class OT3API(
                 pos.x, pos.y, pos.z + probe_pass_z_offset_mm
             )
             max_z_time = (
-                max_z_dist - (probe_start_pos.z - safe_plunger_pos.z)
+                max_z_dist - probe_start_pos.z + safe_plunger_pos.z
             ) / probe_settings.mount_speed
-            p_travel_required_for_z = (max_z_time + probe_settings.plunger_impulse_time) * probe_settings.plunger_speed
+            p_travel_required_for_z = max_z_time * probe_settings.plunger_speed
 
             # if total_travel_left < working range of plunger axis, dont keep going past the total travel
             #  min(total_travel_left_to_do, working_range_of_plunger_axis)
