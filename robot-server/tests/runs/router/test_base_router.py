@@ -38,7 +38,7 @@ from robot_server.runs.router.base_router import (
     get_runs,
     remove_run,
     update_run,
-    set_run_policies,
+    put_error_recovery_policy,
 )
 
 from robot_server.deck_configuration.store import DeckConfigurationStore
@@ -578,7 +578,7 @@ async def test_create_policies(
 ) -> None:
     """It should call RunDataManager create run policies."""
     policies = decoy.mock(cls=ErrorRecoveryPolicy)
-    await set_run_policies(
+    await put_error_recovery_policy(
         runId="rud-id",
         request_body=RequestModel(data=policies),
         run_data_manager=mock_run_data_manager,
@@ -601,7 +601,7 @@ async def test_create_policies_raises_not_active_run(
         )
     ).then_raise(RunNotCurrentError())
     with pytest.raises(ApiError) as exc_info:
-        await set_run_policies(
+        await put_error_recovery_policy(
             runId="rud-id",
             request_body=RequestModel(data=policies),
             run_data_manager=mock_run_data_manager,

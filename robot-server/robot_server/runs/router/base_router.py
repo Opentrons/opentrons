@@ -381,7 +381,7 @@ async def update_run(
         status.HTTP_409_CONFLICT: {"model": ErrorBody[RunStopped]},
     },
 )
-async def set_run_policies(
+async def put_error_recovery_policy(
     runId: str,
     request_body: RequestModel[ErrorRecoveryPolicy],
     run_data_manager: RunDataManager = Depends(get_run_data_manager),
