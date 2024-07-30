@@ -23,41 +23,43 @@ class JiraTicket:
             "Content-Type": "application/json",
         }
 
-    def issues_on_board(self, board_id: str) -> List[str]:
+    def issues_on_board(self, board_id: str) -> List[List[Any]]:
         """Print Issues on board."""
         params = {"jql": "project = RABR"}
         response = requests.get(
             f"{self.url}/rest/api/3/search",
             headers=self.headers,
-            params = params,
+            params=params,
             auth=self.auth,
         )
-        
+
         response.raise_for_status()
         try:
             board_data = response.json()
             all_issues = board_data["issues"]
         except json.JSONDecodeError as e:
             print("Error decoding json: ", e)
-        #convert issue id's into array and have one key as the issue key and one be summary, return entire array
+        # convert issue id's into array and have one key as
+        # the issue key and one be summary, return entire array
         issue_ids = []
         for i in all_issues:
             issue_id = i.get("id")
             issue_summary = i["fields"].get("summary")
-            #print(f"summary: {issue_summary} {issue_id}")
+            # print(f"summary: {issue_summary} {issue_id}")
             issue_ids.append([issue_id, issue_summary])
         return issue_ids
 
-    def match_issues(self, issue_ids: List[List[str]], ticket_summary: str):
+    def match_issues(self, issue_ids: List[List[str]], ticket_summary: str) -> List:
+        """Matches related ticket ID's."""
         to_link = []
         error = ticket_summary.split("_")[3]
         robot = ticket_summary.split("_")[0]
         print(error)
         print(robot)
-        #for every issue see if both match, if yes then grab issue ID and add it to a list
+        # for every issue see if both match, if yes then grab issue ID and add it to a list
         for issue in issue_ids:
-            summary = issue[1]         
-            try:    
+            summary = issue[1]
+            try:
                 issue_error = summary.split("_")[3]
                 issue_robot = summary.split("_")[0]
             except IndexError:
@@ -67,29 +69,45 @@ class JiraTicket:
                 to_link.append(issue_id)
         return to_link
 
-    def link_issues(self, to_link: list, ticket_id: str):
+    def link_issues(self, to_link: list, ticket_key: str) -> None:
+        """Links relevant issues in Jira."""
         for issue in to_link:
-            link_data = {
-                "type": {"name": "Related Issues"},
-                "inwardIssue": {"id": ticket_id},
-                "outwardIssue": {"id": issue},
-                "comment": {"body": "comment if needed"},
-            }
-            try:
-                response = requests.post(
-                    f"{self.url}/rest/api/2/issueLink",
-                    headers=self.headers,
-                    auth=self.auth,
-                    json=link_data,
-                )
-                response.raise_for_status()
-                response_str = str(response.content)
-            except requests.exceptions.HTTPError:
-                print(f"HTTP error occurred. Response content: {response_str}")
-            except json.JSONDecodeError:
-                print(f"JSON decoding error occurred. Response content: {response_str}")
+            link_data = json.dumps(
+                {
+                    "comment": {
+                        "body": {
+                            "content": [
+                                {
+                                    "content": [
+                                        {
+                                            "text": "Linked related issue!",
+                                            "type": "text",
+                                        }
+                                    ],
+                                    "type": "paragraph",
+                                }
+                            ],
+                            "type": "doc",
+                            "version": 1,
+                        },
+                    },
+                    "inwardIssue": {"key": ticket_key},
+                    "outwardIssue": {"id": issue},
+                    "type": {"name": "Relates"},
+                }
+            )
+            response = requests.post(
+                f"{self.url}/rest/api/3/issueLink",
+                headers=self.headers,
+                auth=self.auth,
+                data=link_data,
+            )
+            # print(response.raise_for_status())
 
-    #function: "match_issues", input would be the list from above, another input is summary of ticket created (ticket_summary: string), 
+            # except requests.exceptions.HTTPError:
+            #     print("HTTP ERROR OH NO")
+            # except json.JSONDecodeError:
+            #     print("JSON decoding error")
 
     def open_issue(self, issue_key: str) -> str:
         """Open issue on web browser."""
@@ -309,5 +327,3 @@ if __name__ == "__main__":
     board_id = args.board_id[0]
     reporter_id = args.reporter_id[0]
     ticket = JiraTicket(url, api_token, email)
-    ticket.issues_on_board()
-    ticket.match_issues()

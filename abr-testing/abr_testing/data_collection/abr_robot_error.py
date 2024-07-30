@@ -534,7 +534,7 @@ if __name__ == "__main__":
         parent_key,
     )
 
-    #Link Tickets (hopefully)
+    # Link Tickets (hopefully)
     all_issues = ticket.issues_on_board(board_id)
     print(type(all_issues))
     print(type(summary))
