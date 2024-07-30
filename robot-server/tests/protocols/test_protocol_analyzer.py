@@ -183,6 +183,7 @@ async def test_analyze(
                 modules=[],
                 labwareOffsets=[],
                 liquids=[],
+                fullErrorList=[],
             ),
             parameters=[bool_parameter],
         )

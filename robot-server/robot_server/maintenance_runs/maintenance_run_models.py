@@ -47,6 +47,10 @@ class MaintenanceRun(ResourceModel):
             " but it won't have more than one element."
         ),
     )
+    fullErrorList: List[ErrorOccurrence] = Field(
+        ...,
+        description=("A list of errors that occured during the run."),
+    )
     pipettes: List[LoadedPipette] = Field(
         ...,
         description="Pipettes that have been loaded into the run.",

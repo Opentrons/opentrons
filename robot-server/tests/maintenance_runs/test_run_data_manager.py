@@ -132,6 +132,7 @@ async def test_create(
         status=engine_state_summary.status,
         actions=[],
         errors=engine_state_summary.errors,
+        fullErrorList=engine_state_summary.fullErrorList,
         labware=engine_state_summary.labware,
         labwareOffsets=engine_state_summary.labwareOffsets,
         pipettes=engine_state_summary.pipettes,
