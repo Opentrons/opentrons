@@ -42,7 +42,6 @@ export function TipWellSelectionField(
   const [openModal, setOpenModal] = React.useState<boolean>(false)
   const pipette = pipetteId != null ? pipetteEntities[String(pipetteId)] : null
   const nozzleType = getNozzleType(pipette, nozzles)
-  const label = t('step_edit_form.wellSelectionLabel.wells')
 
   return (
     <>
@@ -66,7 +65,7 @@ export function TipWellSelectionField(
 
       <FormGroup
         disabled={disabled}
-        label={label}
+        label={t('step_edit_form.wellSelectionLabel.wells')}
         className={styles.small_field}
       >
         <InputField

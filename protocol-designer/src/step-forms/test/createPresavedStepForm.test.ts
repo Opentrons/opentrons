@@ -145,7 +145,7 @@ describe('createPresavedStepForm', () => {
       // default fields
       dropTip_wellNames: undefined,
       dropTip_location: 'mockTrash',
-      pickUpTip_location: null,
+      pickUpTip_location: undefined,
       pickUpTip_wellNames: undefined,
       aspirate_airGap_checkbox: false,
       aspirate_airGap_volume: '1',
@@ -210,7 +210,7 @@ describe('createPresavedStepForm', () => {
         nozzles: null,
         dropTip_wellNames: undefined,
         dropTip_location: 'mockTrash',
-        pickUpTip_location: null,
+        pickUpTip_location: undefined,
         pickUpTip_wellNames: undefined,
         wells: [],
         aspirate_delay_checkbox: false,
