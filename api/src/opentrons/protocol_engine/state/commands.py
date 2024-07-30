@@ -15,8 +15,12 @@ from opentrons.hardware_control.types import DoorState
 from opentrons.protocol_engine.actions.actions import (
     ResumeFromRecoveryAction,
     RunCommandAction,
+    SetErrorRecoveryPolicyAction,
 )
-from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
+from opentrons.protocol_engine.error_recovery_policy import (
+    ErrorRecoveryPolicy,
+    ErrorRecoveryType,
+)
 from opentrons.protocol_engine.notes.notes import CommandNote
 
 from ..actions import (
@@ -202,6 +206,9 @@ class CommandState:
     stopped_by_estop: bool
     """If this is set to True, the engine was stopped by an estop event."""
 
+    error_recovery_policy: ErrorRecoveryPolicy
+    """See `CommandView.get_error_recovery_policy()`."""
+
 
 class CommandStore(HasState[CommandState], HandlesActions):
     """Command state container for run-level command concerns."""
@@ -213,6 +220,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
         *,
         config: Config,
         is_door_open: bool,
+        error_recovery_policy: ErrorRecoveryPolicy,
     ) -> None:
         """Initialize a CommandStore and its state."""
         self._config = config
@@ -230,223 +238,242 @@ class CommandStore(HasState[CommandState], HandlesActions):
             run_started_at=None,
             latest_protocol_command_hash=None,
             stopped_by_estop=False,
+            error_recovery_policy=error_recovery_policy,
         )
 
-    def handle_action(self, action: Action) -> None:  # noqa: C901
+    def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""
-        if isinstance(action, QueueCommandAction):
-            # TODO(mc, 2021-06-22): mypy has trouble with this automatic
-            # request > command mapping, figure out how to type precisely
-            # (or wait for a future mypy version that can figure it out).
-            queued_command = action.request._CommandCls.construct(
-                id=action.command_id,
-                key=(
-                    action.request.key
-                    if action.request.key is not None
-                    else (action.request_hash or action.command_id)
-                ),
-                createdAt=action.created_at,
-                params=action.request.params,  # type: ignore[arg-type]
-                intent=action.request.intent,
-                status=CommandStatus.QUEUED,
-                failedCommandId=action.failed_command_id,
+        match action:
+            case QueueCommandAction():
+                self._handle_queue_command_action(action)
+            case RunCommandAction():
+                self._handle_run_command_action(action)
+            case SucceedCommandAction():
+                self._handle_succeed_command_action(action)
+            case FailCommandAction():
+                self._handle_fail_command_action(action)
+            case PlayAction():
+                self._handle_play_action(action)
+            case PauseAction():
+                self._handle_pause_action(action)
+            case ResumeFromRecoveryAction():
+                self._handle_resume_from_recovery_action(action)
+            case StopAction():
+                self._handle_stop_action(action)
+            case FinishAction():
+                self._handle_finish_action(action)
+            case HardwareStoppedAction():
+                self._handle_hardware_stopped_action(action)
+            case DoorChangeAction():
+                self._handle_door_change_action(action)
+            case SetErrorRecoveryPolicyAction():
+                self._handle_set_error_recovery_policy_action(action)
+            case _:
+                pass
+
+    def _handle_queue_command_action(self, action: QueueCommandAction) -> None:
+        # TODO(mc, 2021-06-22): mypy has trouble with this automatic
+        # request > command mapping, figure out how to type precisely
+        # (or wait for a future mypy version that can figure it out).
+        queued_command = action.request._CommandCls.construct(
+            id=action.command_id,
+            key=(
+                action.request.key
+                if action.request.key is not None
+                else (action.request_hash or action.command_id)
+            ),
+            createdAt=action.created_at,
+            params=action.request.params,  # type: ignore[arg-type]
+            intent=action.request.intent,
+            status=CommandStatus.QUEUED,
+            failedCommandId=action.failed_command_id,
+        )
+
+        self._state.command_history.append_queued_command(queued_command)
+
+        if action.request_hash is not None:
+            self._state.latest_protocol_command_hash = action.request_hash
+
+    def _handle_run_command_action(self, action: RunCommandAction) -> None:
+        prev_entry = self._state.command_history.get(action.command_id)
+
+        running_command = prev_entry.command.copy(
+            update={
+                "status": CommandStatus.RUNNING,
+                "startedAt": action.started_at,
+            }
+        )
+
+        self._state.command_history.set_command_running(running_command)
+
+    def _handle_succeed_command_action(self, action: SucceedCommandAction) -> None:
+        succeeded_command = action.command
+        self._state.command_history.set_command_succeeded(succeeded_command)
+
+    def _handle_fail_command_action(self, action: FailCommandAction) -> None:
+        prev_entry = self.state.command_history.get(action.command_id)
+
+        if isinstance(action.error, EnumeratedError):
+            public_error_occurrence = ErrorOccurrence.from_failed(
+                id=action.error_id,
+                createdAt=action.failed_at,
+                error=action.error,
             )
+        else:
+            public_error_occurrence = action.error.public
 
-            self._state.command_history.append_queued_command(queued_command)
+        self._update_to_failed(
+            command_id=action.command_id,
+            failed_at=action.failed_at,
+            error_occurrence=public_error_occurrence,
+            error_recovery_type=action.type,
+            notes=action.notes,
+        )
+        self._state.failed_command = self._state.command_history.get(action.command_id)
 
-            if action.request_hash is not None:
-                self._state.latest_protocol_command_hash = action.request_hash
-
-        elif isinstance(action, RunCommandAction):
-            prev_entry = self._state.command_history.get(action.command_id)
-
-            running_command = prev_entry.command.copy(
-                update={
-                    "status": CommandStatus.RUNNING,
-                    "startedAt": action.started_at,
-                }
+        other_command_ids_to_fail: List[str]
+        if prev_entry.command.intent == CommandIntent.SETUP:
+            other_command_ids_to_fail = list(
+                self._state.command_history.get_setup_queue_ids()
             )
-
-            self._state.command_history.set_command_running(running_command)
-
-        elif isinstance(action, SucceedCommandAction):
-            succeeded_command = action.command
-            self._state.command_history.set_command_succeeded(succeeded_command)
-
-        elif isinstance(action, FailCommandAction):
-            if isinstance(action.error, EnumeratedError):
-                public_error_occurrence = ErrorOccurrence.from_failed(
-                    id=action.error_id,
-                    createdAt=action.failed_at,
-                    error=action.error,
-                )
-            else:
-                public_error_occurrence = action.error.public
-
-            prev_entry = self.state.command_history.get(action.command_id)
-            self._update_to_failed(
-                command_id=action.command_id,
-                failed_at=action.failed_at,
-                error_occurrence=public_error_occurrence,
-                error_recovery_type=action.type,
-                notes=action.notes,
+        elif prev_entry.command.intent == CommandIntent.FIXIT:
+            other_command_ids_to_fail = list(
+                self._state.command_history.get_fixit_queue_ids()
             )
-
-            self._state.failed_command = self._state.command_history.get(
-                action.command_id
-            )
-
-            if prev_entry.command.intent == CommandIntent.SETUP:
+        elif (
+            prev_entry.command.intent == CommandIntent.PROTOCOL
+            or prev_entry.command.intent is None
+        ):
+            if action.type == ErrorRecoveryType.FAIL_RUN:
                 other_command_ids_to_fail = list(
-                    # Copy to avoid it mutating as we remove elements below.
-                    self._state.command_history.get_setup_queue_ids()
+                    self._state.command_history.get_queue_ids()
                 )
-                for command_id in other_command_ids_to_fail:
-                    # TODO(mc, 2022-06-06): add new "cancelled" status or similar
-                    self._update_to_failed(
-                        command_id=command_id,
-                        failed_at=action.failed_at,
-                        error_occurrence=None,
-                        error_recovery_type=None,
-                        notes=None,
-                    )
             elif (
-                prev_entry.command.intent == CommandIntent.PROTOCOL
-                or prev_entry.command.intent is None
+                action.type == ErrorRecoveryType.WAIT_FOR_RECOVERY
+                or action.type == ErrorRecoveryType.IGNORE_AND_CONTINUE
             ):
-                if action.type == ErrorRecoveryType.WAIT_FOR_RECOVERY:
-                    self._state.queue_status = QueueStatus.AWAITING_RECOVERY
-                    self._state.recovery_target_command_id = action.command_id
-                elif action.type == ErrorRecoveryType.FAIL_RUN:
-                    other_command_ids_to_fail = list(
-                        # Copy to avoid it mutating as we remove elements below.
-                        self._state.command_history.get_queue_ids()
-                    )
-                    for command_id in other_command_ids_to_fail:
-                        # TODO(mc, 2022-06-06): add new "cancelled" status or similar
-                        self._update_to_failed(
-                            command_id=command_id,
-                            failed_at=action.failed_at,
-                            error_occurrence=None,
-                            error_recovery_type=None,
-                            notes=None,
-                        )
-                else:
-                    assert_never(action.type)
-            elif prev_entry.command.intent == CommandIntent.FIXIT:
-                other_command_ids_to_fail = list(
-                    # Copy to avoid it mutating as we remove elements below.
-                    self._state.command_history.get_fixit_queue_ids()
-                )
-                for command_id in other_command_ids_to_fail:
-                    # TODO(mc, 2022-06-06): add new "cancelled" status or similar
-                    self._update_to_failed(
-                        command_id=command_id,
-                        failed_at=action.failed_at,
-                        error_occurrence=None,
-                        error_recovery_type=None,
-                        notes=None,
-                    )
+                other_command_ids_to_fail = []
             else:
-                assert_never(prev_entry.command.intent)
+                assert_never(action.type)
+        else:
+            assert_never(prev_entry.command.intent)
+        for command_id in other_command_ids_to_fail:
+            # TODO(mc, 2022-06-06): add new "cancelled" status or similar
+            self._update_to_failed(
+                command_id=command_id,
+                failed_at=action.failed_at,
+                error_occurrence=None,
+                error_recovery_type=None,
+                notes=None,
+            )
 
-        elif isinstance(action, PlayAction):
-            if not self._state.run_result:
-                self._state.run_started_at = (
-                    self._state.run_started_at or action.requested_at
-                )
-                match self._state.queue_status:
-                    case QueueStatus.SETUP:
-                        self._state.queue_status = (
-                            QueueStatus.PAUSED
-                            if self._state.is_door_blocking
-                            else QueueStatus.RUNNING
-                        )
-                    case QueueStatus.AWAITING_RECOVERY_PAUSED:
-                        self._state.queue_status = QueueStatus.AWAITING_RECOVERY
-                    case QueueStatus.PAUSED:
-                        self._state.queue_status = QueueStatus.RUNNING
-                    case QueueStatus.RUNNING | QueueStatus.AWAITING_RECOVERY:
-                        # Nothing for the play action to do. No-op.
-                        pass
+        if (
+            prev_entry.command.intent in (CommandIntent.PROTOCOL, None)
+            and action.type == ErrorRecoveryType.WAIT_FOR_RECOVERY
+        ):
+            self._state.queue_status = QueueStatus.AWAITING_RECOVERY
+            self._state.recovery_target_command_id = action.command_id
 
-        elif isinstance(action, PauseAction):
-            self._state.queue_status = QueueStatus.PAUSED
+    def _handle_play_action(self, action: PlayAction) -> None:
+        if not self._state.run_result:
+            self._state.run_started_at = (
+                self._state.run_started_at or action.requested_at
+            )
+            match self._state.queue_status:
+                case QueueStatus.SETUP:
+                    self._state.queue_status = (
+                        QueueStatus.PAUSED
+                        if self._state.is_door_blocking
+                        else QueueStatus.RUNNING
+                    )
+                case QueueStatus.AWAITING_RECOVERY_PAUSED:
+                    self._state.queue_status = QueueStatus.AWAITING_RECOVERY
+                case QueueStatus.PAUSED:
+                    self._state.queue_status = QueueStatus.RUNNING
+                case QueueStatus.RUNNING | QueueStatus.AWAITING_RECOVERY:
+                    # Nothing for the play action to do. No-op.
+                    pass
 
-        elif isinstance(action, ResumeFromRecoveryAction):
-            self._state.queue_status = QueueStatus.RUNNING
+    def _handle_pause_action(self, action: PauseAction) -> None:
+        self._state.queue_status = QueueStatus.PAUSED
+
+    def _handle_resume_from_recovery_action(
+        self, action: ResumeFromRecoveryAction
+    ) -> None:
+        self._state.queue_status = QueueStatus.RUNNING
+        self._state.recovery_target_command_id = None
+
+    def _handle_stop_action(self, action: StopAction) -> None:
+        if not self._state.run_result:
             self._state.recovery_target_command_id = None
 
-        elif isinstance(action, StopAction):
-            if not self._state.run_result:
-                self._state.recovery_target_command_id = None
-
-                self._state.queue_status = QueueStatus.PAUSED
-                if action.from_estop:
-                    self._state.stopped_by_estop = True
-                    self._state.run_result = RunResult.FAILED
-                else:
-                    self._state.run_result = RunResult.STOPPED
-
-        elif isinstance(action, FinishAction):
-            if not self._state.run_result:
-                self._state.queue_status = QueueStatus.PAUSED
-                if action.set_run_status:
-                    self._state.run_result = (
-                        RunResult.SUCCEEDED
-                        if not action.error_details
-                        else RunResult.FAILED
-                    )
-                else:
-                    self._state.run_result = RunResult.STOPPED
-
-                if not self._state.run_error and action.error_details:
-                    self._state.run_error = self._map_run_exception_to_error_occurrence(
-                        action.error_details.error_id,
-                        action.error_details.created_at,
-                        action.error_details.error,
-                    )
-            else:
-                # HACK(sf): There needs to be a better way to set
-                # an estop error than this else clause
-                if self._state.stopped_by_estop and action.error_details:
-                    self._state.run_error = self._map_run_exception_to_error_occurrence(
-                        action.error_details.error_id,
-                        action.error_details.created_at,
-                        action.error_details.error,
-                    )
-
-        elif isinstance(action, HardwareStoppedAction):
             self._state.queue_status = QueueStatus.PAUSED
-            self._state.run_result = self._state.run_result or RunResult.STOPPED
-            self._state.run_completed_at = (
-                self._state.run_completed_at or action.completed_at
-            )
+            if action.from_estop:
+                self._state.stopped_by_estop = True
+                self._state.run_result = RunResult.FAILED
+            else:
+                self._state.run_result = RunResult.STOPPED
 
-            if action.finish_error_details:
-                self._state.finish_error = (
-                    self._map_finish_exception_to_error_occurrence(
-                        action.finish_error_details.error_id,
-                        action.finish_error_details.created_at,
-                        action.finish_error_details.error,
-                    )
+    def _handle_finish_action(self, action: FinishAction) -> None:
+        if not self._state.run_result:
+            self._state.queue_status = QueueStatus.PAUSED
+            if action.set_run_status:
+                self._state.run_result = (
+                    RunResult.SUCCEEDED
+                    if not action.error_details
+                    else RunResult.FAILED
+                )
+            else:
+                self._state.run_result = RunResult.STOPPED
+
+            if not self._state.run_error and action.error_details:
+                self._state.run_error = self._map_run_exception_to_error_occurrence(
+                    action.error_details.error_id,
+                    action.error_details.created_at,
+                    action.error_details.error,
+                )
+        else:
+            # HACK(sf): There needs to be a better way to set
+            # an estop error than this else clause
+            if self._state.stopped_by_estop and action.error_details:
+                self._state.run_error = self._map_run_exception_to_error_occurrence(
+                    action.error_details.error_id,
+                    action.error_details.created_at,
+                    action.error_details.error,
                 )
 
-        elif isinstance(action, DoorChangeAction):
-            if self._config.block_on_door_open:
-                if action.door_state == DoorState.OPEN:
-                    self._state.is_door_blocking = True
-                    match self._state.queue_status:
-                        case QueueStatus.SETUP:
-                            pass
-                        case QueueStatus.RUNNING | QueueStatus.PAUSED:
-                            self._state.queue_status = QueueStatus.PAUSED
-                        case QueueStatus.AWAITING_RECOVERY | QueueStatus.AWAITING_RECOVERY_PAUSED:
-                            self._state.queue_status = (
-                                QueueStatus.AWAITING_RECOVERY_PAUSED
-                            )
-                elif action.door_state == DoorState.CLOSED:
-                    self._state.is_door_blocking = False
+    def _handle_hardware_stopped_action(self, action: HardwareStoppedAction) -> None:
+        self._state.queue_status = QueueStatus.PAUSED
+        self._state.run_result = self._state.run_result or RunResult.STOPPED
+        self._state.run_completed_at = (
+            self._state.run_completed_at or action.completed_at
+        )
+
+        if action.finish_error_details:
+            self._state.finish_error = self._map_finish_exception_to_error_occurrence(
+                action.finish_error_details.error_id,
+                action.finish_error_details.created_at,
+                action.finish_error_details.error,
+            )
+
+    def _handle_door_change_action(self, action: DoorChangeAction) -> None:
+        if self._config.block_on_door_open:
+            if action.door_state == DoorState.OPEN:
+                self._state.is_door_blocking = True
+                match self._state.queue_status:
+                    case QueueStatus.SETUP:
+                        pass
+                    case QueueStatus.RUNNING | QueueStatus.PAUSED:
+                        self._state.queue_status = QueueStatus.PAUSED
+                    case QueueStatus.AWAITING_RECOVERY | QueueStatus.AWAITING_RECOVERY_PAUSED:
+                        self._state.queue_status = QueueStatus.AWAITING_RECOVERY_PAUSED
+            elif action.door_state == DoorState.CLOSED:
+                self._state.is_door_blocking = False
+
+    def _handle_set_error_recovery_policy_action(
+        self, action: SetErrorRecoveryPolicyAction
+    ) -> None:
+        self._state.error_recovery_policy = action.error_recovery_policy
 
     def _update_to_failed(
         self,
@@ -974,3 +1001,12 @@ class CommandView(HasState[CommandState]):
     def get_latest_protocol_command_hash(self) -> Optional[str]:
         """Get the command hash of the last queued command, if any."""
         return self._state.latest_protocol_command_hash
+
+    def get_error_recovery_policy(self) -> ErrorRecoveryPolicy:
+        """Return the run's current error recovery policy (see `ErrorRecoveryPolicy`).
+
+        This error recovery policy is not ever evaluated by
+        `CommandStore`/`CommandView`. It's stored here for convenience, but evaluated by
+        higher-level code.
+        """
+        return self._state.error_recovery_policy

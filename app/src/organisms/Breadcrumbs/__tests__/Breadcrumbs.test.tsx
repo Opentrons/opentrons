@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { MemoryRouter, Route, Switch } from 'react-router-dom'
+import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { when } from 'vitest-when'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
@@ -34,20 +34,37 @@ const PROTOCOL_NAME = 'a protocol for otie'
 const render = (path = '/') => {
   return renderWithProviders(
     <MemoryRouter initialEntries={[path]} initialIndex={0}>
-      <Switch>
-        <Route exact path="/devices/:robotName">
-          <Breadcrumbs />
-          <div>device details path matched</div>
-        </Route>
-        <Route exact path="/devices/:robotName/protocol-runs/:runId">
-          <Breadcrumbs />
-          <div>protocol run details path matched</div>
-        </Route>
-        <Route exact path="/protocols/:protocolKey">
-          <Breadcrumbs />
-          <div>protocol details path matched</div>
-        </Route>
-      </Switch>
+      <Routes>
+        <Route
+          path="/devices/:robotName"
+          element={
+            <>
+              <Breadcrumbs />
+              <div>device details path matched</div>
+            </>
+          }
+        />
+
+        <Route
+          path="/devices/:robotName/protocol-runs/:runId"
+          element={
+            <>
+              <Breadcrumbs />
+              <div>protocol run details path matched</div>
+            </>
+          }
+        />
+
+        <Route
+          path="/protocols/:protocolKey"
+          element={
+            <>
+              <Breadcrumbs />
+              <div>protocol details path matched</div>
+            </>
+          }
+        />
+      </Routes>
     </MemoryRouter>,
     {
       i18nInstance: i18n,

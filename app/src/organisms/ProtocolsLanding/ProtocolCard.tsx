@@ -2,7 +2,7 @@ import * as React from 'react'
 import { format } from 'date-fns'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { ErrorBoundary } from 'react-error-boundary'
 
 import {
@@ -60,7 +60,7 @@ interface ProtocolCardProps {
   storedProtocolData: StoredProtocolData
 }
 export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
-  const history = useHistory()
+  const navigate = useNavigate()
   const {
     handleRunProtocol,
     handleSendProtocolToFlex,
@@ -101,7 +101,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
       padding={SPACING.spacing16}
       position="relative"
       onClick={() => {
-        history.push(`/protocols/${protocolKey}`)
+        navigate(`/protocols/${protocolKey}`)
       }}
     >
       <ErrorBoundary fallback={UnknownAttachmentError}>

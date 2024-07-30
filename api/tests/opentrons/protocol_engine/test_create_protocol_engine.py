@@ -2,8 +2,8 @@
 import pytest
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.deck.types import DeckDefinitionV5
+from opentrons_shared_data.robot.types import RobotType
 from opentrons_shared_data.deck import load as load_deck
 
 from opentrons.calibration_storage.helpers import uri_from_details

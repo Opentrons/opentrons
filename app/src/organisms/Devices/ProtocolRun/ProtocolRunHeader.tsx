@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import { Link, useHistory } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 import {
   RUN_STATUS_IDLE,
@@ -108,6 +108,7 @@ import {
   useErrorRecoveryFlows,
   ErrorRecoveryFlows,
 } from '../../ErrorRecoveryFlows'
+import { useRecoveryAnalytics } from '../../ErrorRecoveryFlows/hooks'
 
 import type { Run, RunError, RunStatus } from '@opentrons/api-client'
 import type { IconName } from '@opentrons/components'
@@ -139,7 +140,7 @@ export function ProtocolRunHeader({
   makeHandleJumpToStep,
 }: ProtocolRunHeaderProps): JSX.Element | null {
   const { t } = useTranslation(['run_details', 'shared'])
-  const history = useHistory()
+  const navigate = useNavigate()
   const host = useHost()
   const createdAtTimestamp = useRunCreatedAtTimestamp(runId)
   const {
@@ -148,6 +149,7 @@ export function ProtocolRunHeader({
     protocolKey,
     isProtocolAnalyzing,
   } = useProtocolDetailsForRun(runId)
+  const { reportRecoveredRunResult } = useRecoveryAnalytics()
 
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
@@ -161,6 +163,7 @@ export function ProtocolRunHeader({
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
   const [showRunFailedModal, setShowRunFailedModal] = React.useState(false)
   const [showDropTipBanner, setShowDropTipBanner] = React.useState(true)
+  const [enteredER, setEnteredER] = React.useState(false)
   const isResetRunLoadingRef = React.useRef(false)
   const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
   const highestPriorityError =
@@ -228,12 +231,13 @@ export function ProtocolRunHeader({
 
   React.useEffect(() => {
     if (protocolData != null && !isRobotViewable) {
-      history.push(`/devices`)
+      navigate('/devices')
     }
-  }, [protocolData, isRobotViewable, history])
+  }, [protocolData, isRobotViewable, navigate])
 
   // Side effects dependent on the current run state.
   React.useEffect(() => {
+    reportRecoveredRunResult(runStatus, enteredER)
     // After a user-initiated stopped run, close the run current run automatically.
     if (runStatus === RUN_STATUS_STOPPED && isRunCurrent && runId != null) {
       trackProtocolRunEvent({
@@ -243,6 +247,9 @@ export function ProtocolRunHeader({
         },
       })
       closeCurrentRun()
+    }
+    if (runStatus === RUN_STATUS_AWAITING_RECOVERY) {
+      setEnteredER(true)
     }
   }, [runStatus, isRunCurrent, runId, closeCurrentRun])
 
@@ -254,7 +261,7 @@ export function ProtocolRunHeader({
 
   // redirect to new run after successful reset
   const onResetSuccess = (createRunResponse: Run): void => {
-    history.push(
+    navigate(
       `/devices/${robotName}/protocol-runs/${createRunResponse.data.id}/run-preview`
     )
   }
@@ -297,7 +304,7 @@ export function ProtocolRunHeader({
     <>
       {isERActive ? (
         <ErrorRecoveryFlows
-          isFlex={true}
+          runStatus={runStatus}
           runId={runId}
           failedCommand={failedCommand}
           protocolAnalysis={robotProtocolAnalysis}
@@ -353,8 +360,7 @@ export function ProtocolRunHeader({
         {analysisErrors != null && analysisErrors.length > 0 && (
           <ProtocolAnalysisErrorBanner errors={analysisErrors} />
         )}
-        {runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR ||
-        runStatus === RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR ? (
+        {runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR ? (
           <Banner type="warning" iconMarginLeft={SPACING.spacing4}>
             {t('close_door_to_resume')}
           </Banner>
@@ -545,11 +551,16 @@ const RUN_AGAIN_STATUSES: RunStatus[] = [
   RUN_STATUS_FAILED,
   RUN_STATUS_SUCCEEDED,
 ]
+const RECOVERY_STATUSES: RunStatus[] = [
+  RUN_STATUS_AWAITING_RECOVERY,
+  RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
+  RUN_STATUS_AWAITING_RECOVERY_PAUSED,
+]
 const DISABLED_STATUSES: RunStatus[] = [
   RUN_STATUS_FINISHING,
   RUN_STATUS_STOP_REQUESTED,
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
-  RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
+  ...RECOVERY_STATUSES,
 ]
 interface ActionButtonProps {
   runId: string
@@ -572,7 +583,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
     isFixtureMismatch,
     isResetRunLoadingRef,
   } = props
-  const history = useHistory()
+  const navigate = useNavigate()
   const { t } = useTranslation(['run_details', 'shared'])
   const attachedModules =
     useModulesQuery({
@@ -592,7 +603,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
   } = useRunControls(runId, (createRunResponse: Run): void =>
     // redirect to new run after successful reset
     {
-      history.push(
+      navigate(
         `/devices/${robotName}/protocol-runs/${createRunResponse.data.id}/run-preview`
       )
     }
@@ -633,7 +644,6 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
     // For before running a protocol, "close door to begin".
     (isDoorOpen &&
       runStatus !== RUN_STATUS_BLOCKED_BY_OPEN_DOOR &&
-      runStatus !== RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR &&
       runStatus != null &&
       CANCELLABLE_STATUSES.includes(runStatus))
   const robot = useRobot(robotName)
@@ -694,7 +704,10 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
   if (isProtocolAnalyzing) {
     buttonIconName = 'ot-spinner'
     buttonText = t('analyzing_on_robot')
-  } else if (runStatus === RUN_STATUS_RUNNING) {
+  } else if (
+    runStatus === RUN_STATUS_RUNNING ||
+    (runStatus != null && RECOVERY_STATUSES.includes(runStatus))
+  ) {
     buttonIconName = 'pause'
     buttonText = t('pause_run')
     handleButtonClick = (): void => {
@@ -719,7 +732,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
         confirmAttachment()
       } else {
         play()
-        history.push(`/devices/${robotName}/protocol-runs/${runId}/run-preview`)
+        navigate(`/devices/${robotName}/protocol-runs/${runId}/run-preview`)
         trackProtocolRunEvent({
           name:
             runStatus === RUN_STATUS_IDLE

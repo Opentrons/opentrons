@@ -569,23 +569,32 @@ def get_calibration_offsets(
 
 def get_logs(storage_directory: str, ip: str) -> List[str]:
     """Get Robot logs."""
-    log_types = ["api.log", "server.log", "serial.log", "touchscreen.log"]
+    log_types: List[Dict[str, Any]] = [
+        {"log type": "api.log", "records": 1000},
+        {"log type": "server.log", "records": 10000},
+        {"log type": "serial.log", "records": 10000},
+        {"log type": "touchscreen.log", "records": 1000},
+    ]
     all_paths = []
     for log_type in log_types:
         try:
+            log_type_name = log_type["log type"]
+            print(log_type_name)
+            log_records = int(log_type["records"])
+            print(log_records)
             response = requests.get(
-                f"http://{ip}:31950/logs/{log_type}",
-                headers={"log_identifier": log_type},
-                params={"records": 5000},
+                f"http://{ip}:31950/logs/{log_type_name}",
+                headers={"log_identifier": log_type_name},
+                params={"records": log_records},
             )
             response.raise_for_status()
             log_data = response.text
-            log_name = ip + "_" + log_type.split(".")[0] + ".log"
+            log_name = ip + "_" + log_type_name.split(".")[0] + ".log"
             file_path = os.path.join(storage_directory, log_name)
             with open(file_path, mode="w", encoding="utf-8") as file:
                 file.write(log_data)
         except RuntimeError:
-            print(f"Request exception. Did not save {log_type}")
+            print(f"Request exception. Did not save {log_type_name}")
             continue
         all_paths.append(file_path)
     # Get weston.log using scp

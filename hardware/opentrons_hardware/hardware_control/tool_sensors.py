@@ -393,6 +393,7 @@ async def liquid_probe(
     plunger_speed: float,
     mount_speed: float,
     threshold_pascals: float,
+    plunger_impulse_time: float,
     csv_output: bool = False,
     sync_buffer_output: bool = False,
     can_bus_only_output: bool = False,
@@ -425,7 +426,7 @@ async def liquid_probe(
         sensor_driver,
         True,
     )
-    p_prep_distance = float(PLUNGER_SOLO_MOVE_TIME * plunger_speed)
+    p_prep_distance = float(plunger_impulse_time * plunger_speed)
     p_pass_distance = float(max_p_distance - p_prep_distance)
     max_z_distance = (p_pass_distance / plunger_speed) * mount_speed
 
@@ -433,7 +434,7 @@ async def liquid_probe(
         distance={tool: float64(p_prep_distance)},
         velocity={tool: float64(plunger_speed)},
         acceleration={},
-        duration=float64(PLUNGER_SOLO_MOVE_TIME),
+        duration=float64(plunger_impulse_time),
         present_nodes=[tool],
     )
     sensor_group = _build_pass_step(

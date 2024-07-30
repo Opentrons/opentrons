@@ -3,6 +3,7 @@ import {
   getLabwareDefURI,
   opentrons96PcrAdapterV1,
 } from '@opentrons/shared-data'
+import { RUN_STATUS_AWAITING_RECOVERY } from '@opentrons/api-client'
 
 import { RECOVERY_MAP } from '../constants'
 import { mockRobotSideAnalysis } from '../../../molecules/Command/__fixtures__'
@@ -56,8 +57,9 @@ export const mockRecoveryContentProps: RecoveryContentProps = {
   errorKind: 'GENERAL_ERROR',
   robotType: FLEX_ROBOT_TYPE,
   runId: 'MOCK_RUN_ID',
-  isFlex: true,
+  isDoorOpen: false,
   isOnDevice: true,
+  runStatus: RUN_STATUS_AWAITING_RECOVERY,
   recoveryMap: {
     route: RECOVERY_MAP.OPTION_SELECTION.ROUTE,
     step: RECOVERY_MAP.OPTION_SELECTION.STEPS.SELECT,
@@ -70,7 +72,7 @@ export const mockRecoveryContentProps: RecoveryContentProps = {
   failedPipetteInfo: {} as any,
   deckMapUtils: { setSelectedLocation: () => {} } as any,
   stepCounts: {} as any,
-  protocolAnalysis: { commands: [mockFailedCommand] } as any,
+  protocolAnalysis: mockRobotSideAnalysis,
   trackExternalMap: () => null,
   hasLaunchedRecovery: true,
   getRecoveryOptionCopy: () => 'MOCK_COPY',
@@ -78,4 +80,13 @@ export const mockRecoveryContentProps: RecoveryContentProps = {
     mockRobotSideAnalysis.commands[mockRobotSideAnalysis.commands.length - 2],
     mockRobotSideAnalysis.commands[mockRobotSideAnalysis.commands.length - 1],
   ],
+  recoveryActionMutationUtils: {} as any,
+  analytics: {
+    reportRecoveredRunResult: () => {},
+    reportErrorEvent: () => {},
+    reportViewErrorDetailsEvent: () => {},
+    reportActionSelectedEvent: () => {},
+    reportInitialActionEvent: () => {},
+    reportActionSelectedResult: () => {},
+  },
 }

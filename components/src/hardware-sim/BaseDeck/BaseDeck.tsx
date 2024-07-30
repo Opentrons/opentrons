@@ -54,6 +54,7 @@ export interface LabwareOnDeck {
   /** generic prop to render self-positioned children for each labware */
   labwareChildren?: React.ReactNode
   onLabwareClick?: () => void
+  highlight?: boolean
 }
 
 export interface ModuleOnDeck {
@@ -65,6 +66,7 @@ export interface ModuleOnDeck {
   /** generic prop to render self-positioned children for each module */
   moduleChildren?: React.ReactNode
   onLabwareClick?: () => void
+  highlightLabware?: boolean
 }
 interface BaseDeckProps {
   deckConfig: DeckConfiguration
@@ -240,6 +242,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
             innerProps,
             moduleChildren,
             onLabwareClick,
+            highlightLabware,
           }) => {
             const slotPosition = getPositionFromSlotId(
               moduleLocation.slotName,
@@ -266,6 +269,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                       inferModuleOrientationFromXCoordinate(slotPosition[0]) ===
                         'left' && moduleModel === HEATERSHAKER_MODULE_V1
                     }
+                    highlight={highlightLabware}
                   />
                 ) : null}
                 {moduleChildren}
@@ -281,6 +285,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
             wellFill,
             missingTips,
             onLabwareClick,
+            highlight,
           }) => {
             if (
               labwareLocation === 'offDeck' ||
@@ -308,6 +313,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                   onLabwareClick={onLabwareClick}
                   wellFill={wellFill ?? undefined}
                   missingTips={missingTips}
+                  highlight={highlight}
                 />
                 {labwareChildren}
               </g>

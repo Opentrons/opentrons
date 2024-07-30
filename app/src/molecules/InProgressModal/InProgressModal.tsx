@@ -55,11 +55,12 @@ const MODAL_STYLE = css`
   padding: ${SPACING.spacing32};
   height: 24.625rem;
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    height: 29.5rem;
+    max-height: 29.5rem;
+    height: 100%;
   }
 `
 const SPINNER_STYLE = css`
-  color: ${COLORS.grey50};
+  color: ${COLORS.grey60};
   opacity: 100%;
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     color: ${COLORS.black90};

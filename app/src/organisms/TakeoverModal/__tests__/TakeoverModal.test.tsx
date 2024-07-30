@@ -20,6 +20,7 @@ describe('TakeoverModal', () => {
       setShowConfirmTerminateModal: vi.fn(),
       confirmTerminate: vi.fn(),
       terminateInProgress: false,
+      title: 'Robot is busy',
     }
   })
 

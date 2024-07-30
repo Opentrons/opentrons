@@ -23,7 +23,6 @@ vi.mock('../EmptyFile')
 const mockHandleGoBack = vi.fn()
 const mockSetParameter = vi.fn()
 const mockParameter: CsvFileParameter = {} as any
-const mockSetFileInfo = vi.fn()
 const PROTOCOL_ID = 'fake_protocol_id'
 const mockUsbData = [
   '/media/mock-usb-drive/mock-file1.csv',
@@ -33,20 +32,18 @@ const mockUsbData = [
 
 const mockDataOnRobot = {
   data: {
-    data: {
-      files: [
-        {
-          id: '1',
-          createdAt: '2024-06-07T19:19:56.268029+00:00',
-          name: 'rtp_mock_file1.csv',
-        },
-        {
-          id: '2',
-          createdAt: '2024-06-17T19:19:56.268029+00:00',
-          name: 'rtp_mock_file2.csv',
-        },
-      ],
-    },
+    data: [
+      {
+        id: '1',
+        createdAt: '2024-06-07T19:19:56.268029+00:00',
+        name: 'rtp_mock_file1.csv',
+      },
+      {
+        id: '2',
+        createdAt: '2024-06-17T19:19:56.268029+00:00',
+        name: 'rtp_mock_file2.csv',
+      },
+    ],
   },
 }
 
@@ -64,8 +61,6 @@ describe('ChooseCsvFile', () => {
       handleGoBack: mockHandleGoBack,
       parameter: mockParameter,
       setParameter: mockSetParameter,
-      csvFileInfo: 'mockFileId',
-      setCsvFileInfo: mockSetFileInfo,
     }
     vi.mocked(getLocalRobot).mockReturnValue(mockConnectedRobot)
     vi.mocked(EmptyFile).mockReturnValue(<div>mock EmptyFile</div>)
@@ -75,12 +70,13 @@ describe('ChooseCsvFile', () => {
       .calledWith(PROTOCOL_ID)
       .thenReturn([] as any)
   })
+
   it('should render text and buttons', () => {
     render(props)
     screen.getByText('Choose CSV file')
     screen.getByText('CSV files on robot')
     screen.getByText('CSV files on USB')
-    screen.getByText('Confirm selection')
+    screen.getByText('Leave USB drive attached until run starts')
   })
 
   it('should render csv file names', () => {
@@ -95,13 +91,71 @@ describe('ChooseCsvFile', () => {
     screen.getByText('mock-file3.csv')
   })
 
-  it('should call a mock function when tapping back button', () => {
+  it('should call a mock function when tapping back button + without selecting a csv file', () => {
     render(props)
+
     fireEvent.click(screen.getAllByRole('button')[0])
+    expect(props.setParameter).not.toHaveBeenCalled()
     expect(mockHandleGoBack).toHaveBeenCalled()
   })
 
-  it.todo('should call a mock function when tapping a csv file')
+  it('should render a selected radio button in Robot side when tapped', () => {
+    when(useAllCsvFilesQuery)
+      .calledWith(PROTOCOL_ID)
+      .thenReturn(mockDataOnRobot as any)
+    render(props)
+
+    const selectedCsvFileOnRobot = screen.getByLabelText('rtp_mock_file2.csv')
+    fireEvent.click(selectedCsvFileOnRobot)
+    expect(selectedCsvFileOnRobot).toBeChecked()
+  })
+
+  it('should render a selected radio button in USB side when tapped', () => {
+    render(props)
+
+    const selectCsvFileOnUsb = screen.getByLabelText('mock-file2.csv')
+    fireEvent.click(selectCsvFileOnUsb)
+    expect(selectCsvFileOnUsb).toBeChecked()
+  })
+
+  it('call mock function (setParameter) with fileId + fileName when the selected file is a csv on Robot + tapping back button', () => {
+    when(useAllCsvFilesQuery)
+      .calledWith(PROTOCOL_ID)
+      .thenReturn(mockDataOnRobot as any)
+    render(props)
+
+    const csvFileOnRobot = screen.getByRole('label', {
+      name: 'rtp_mock_file2.csv',
+    })
+
+    fireEvent.click(csvFileOnRobot)
+    fireEvent.click(screen.getAllByRole('button')[0])
+    expect(props.setParameter).toHaveBeenCalledWith(
+      {
+        id: '2',
+        fileName: 'rtp_mock_file2.csv',
+      },
+      props.parameter.variableName
+    )
+    expect(mockHandleGoBack).toHaveBeenCalled()
+  })
+
+  it('call mock function (setParameter) with filePath + fileName when the selected file is a csv on USB + tapping back button', () => {
+    render(props)
+
+    const csvFileOnUsb = screen.getByRole('label', { name: 'mock-file1.csv' })
+
+    fireEvent.click(csvFileOnUsb)
+    fireEvent.click(screen.getAllByRole('button')[0])
+    expect(props.setParameter).toHaveBeenCalledWith(
+      {
+        filePath: '/media/mock-usb-drive/mock-file1.csv',
+        fileName: 'mock-file1.csv',
+      },
+      props.parameter.variableName
+    )
+    expect(mockHandleGoBack).toHaveBeenCalled()
+  })
 
   it('should render mock empty file component when there is no csv file', () => {
     vi.mocked(getShellUpdateDataFiles).mockReturnValue([])

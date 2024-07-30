@@ -28,10 +28,8 @@ class ErrorRecoveryType(enum.Enum):
     WAIT_FOR_RECOVERY = enum.auto()
     """Stop and wait for the error to be recovered from manually."""
 
-    # TODO(mm, 2023-03-18): Add something like this for
-    # https://opentrons.atlassian.net/browse/EXEC-302.
-    # CONTINUE = enum.auto()
-    # """Continue with the run, as if the command never failed."""
+    IGNORE_AND_CONTINUE = enum.auto()
+    """Continue with the run, as if the command never failed."""
 
 
 class ErrorRecoveryPolicy(Protocol):
@@ -56,28 +54,6 @@ class ErrorRecoveryPolicy(Protocol):
         defined_error_data: Optional[CommandDefinedErrorData],
     ) -> ErrorRecoveryType:
         ...
-
-
-# todo(mm, 2024-07-05): This "static" policy will need to somehow become dynamic for
-# https://opentrons.atlassian.net/browse/EXEC-589.
-def standard_run_policy(
-    config: Config,
-    failed_command: Command,
-    defined_error_data: Optional[CommandDefinedErrorData],
-) -> ErrorRecoveryType:
-    """An error recovery policy suitable for normal protocol runs via robot-server."""
-    # Although error recovery can theoretically work on OT-2s, we haven't tested it,
-    # and it's generally scarier because the OT-2 has much less hardware feedback.
-    robot_is_flex = config.robot_type == "OT-3 Standard"
-    # If the error is defined, we're taking that to mean that we should
-    # WAIT_FOR_RECOVERY. This is not necessarily the right long-term logic--we might
-    # want to FAIL_RUN on certain defined errors and WAIT_FOR_RECOVERY on certain
-    # undefined errors--but this is convenient for now.
-    error_is_defined = defined_error_data is not None
-    if robot_is_flex and error_is_defined:
-        return ErrorRecoveryType.WAIT_FOR_RECOVERY
-    else:
-        return ErrorRecoveryType.FAIL_RUN
 
 
 def never_recover(

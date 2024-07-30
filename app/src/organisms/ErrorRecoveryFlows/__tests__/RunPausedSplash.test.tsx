@@ -34,13 +34,24 @@ describe('useRunPausedSplash', () => {
     )
   })
 
-  const IS_WIZARD_SHOWN = [false, true]
-  IS_WIZARD_SHOWN.forEach(val => {
-    it(`returns ${!val} if showERWizard is ${val}`, () => {
-      const { result } = renderHook(() => useRunPausedSplash(val), {
-        wrapper,
+  const TEST_CASES = [
+    { isOnDevice: true, showERWizard: true, expected: true },
+    { isOnDevice: true, showERWizard: false, expected: true },
+    { isOnDevice: false, showERWizard: true, expected: false },
+    { isOnDevice: false, showERWizard: false, expected: true },
+  ]
+
+  describe('useRunPausedSplash', () => {
+    TEST_CASES.forEach(({ isOnDevice, showERWizard, expected }) => {
+      it(`returns ${expected} when isOnDevice is ${isOnDevice} and showERWizard is ${showERWizard}`, () => {
+        const { result } = renderHook(
+          () => useRunPausedSplash(isOnDevice, showERWizard),
+          {
+            wrapper,
+          }
+        )
+        expect(result.current).toEqual(expected)
       })
-      expect(result.current).toEqual(!val)
     })
   })
 })
@@ -67,7 +78,8 @@ describe('RunPausedSplash', () => {
   beforeEach(() => {
     props = {
       ...mockRecoveryContentProps,
-      toggleERWiz: mockToggleERWiz,
+      robotName: 'testRobot',
+      toggleERWizAsActiveUser: mockToggleERWiz,
       routeUpdateActions: mockRouteUpdateActions,
     }
 
@@ -115,7 +127,7 @@ describe('RunPausedSplash', () => {
       expect(mockToggleERWiz).toHaveBeenCalledTimes(1)
     })
     await waitFor(() => {
-      expect(mockToggleERWiz).toHaveBeenCalledWith(false)
+      expect(mockToggleERWiz).toHaveBeenCalledWith(true, false)
     })
     await waitFor(() => {
       expect(mockProceedToRouteAndStep).toHaveBeenCalledTimes(1)
@@ -130,7 +142,7 @@ describe('RunPausedSplash', () => {
       expect(mockToggleERWiz).toHaveBeenCalledTimes(2)
     })
     await waitFor(() => {
-      expect(mockToggleERWiz).toHaveBeenCalledWith(true)
+      expect(mockToggleERWiz).toHaveBeenCalledWith(true, true)
     })
   })
 })

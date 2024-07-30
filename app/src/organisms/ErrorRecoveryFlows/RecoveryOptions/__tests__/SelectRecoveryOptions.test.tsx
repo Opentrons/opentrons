@@ -8,7 +8,8 @@ import { i18n } from '../../../../i18n'
 import { mockRecoveryContentProps } from '../../__fixtures__'
 import {
   SelectRecoveryOption,
-  RecoveryOptions,
+  ODDRecoveryOptions,
+  DesktopRecoveryOptions,
   getRecoveryOptions,
   GENERAL_ERROR_OPTIONS,
   OVERPRESSURE_WHILE_ASPIRATING_OPTIONS,
@@ -17,21 +18,32 @@ import {
   NO_LIQUID_DETECTED_OPTIONS,
 } from '../SelectRecoveryOption'
 import { RECOVERY_MAP, ERROR_KINDS } from '../../constants'
+import { clickButtonLabeled } from '../../__tests__/util'
 
 import type { Mock } from 'vitest'
 
 const renderSelectRecoveryOption = (
   props: React.ComponentProps<typeof SelectRecoveryOption>
 ) => {
-  return renderWithProviders(<SelectRecoveryOption {...props} />, {
+  return renderWithProviders(
+    <SelectRecoveryOption {...{ ...mockRecoveryContentProps, ...props }} />,
+    {
+      i18nInstance: i18n,
+    }
+  )[0]
+}
+
+const renderODDRecoveryOptions = (
+  props: React.ComponentProps<typeof ODDRecoveryOptions>
+) => {
+  return renderWithProviders(<ODDRecoveryOptions {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
-
-const renderRecoveryOptions = (
-  props: React.ComponentProps<typeof RecoveryOptions>
+const renderDesktopRecoveryOptions = (
+  props: React.ComponentProps<typeof DesktopRecoveryOptions>
 ) => {
-  return renderWithProviders(<RecoveryOptions {...props} />, {
+  return renderWithProviders(<DesktopRecoveryOptions {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
@@ -88,8 +100,7 @@ describe('SelectRecoveryOption', () => {
   it('sets the selected recovery option when clicking continue', () => {
     renderSelectRecoveryOption(props)
 
-    const continueBtn = screen.getByRole('button', { name: 'Continue' })
-    fireEvent.click(continueBtn)
+    clickButtonLabeled('Continue')
 
     expect(mockSetSelectedRecoveryOption).toHaveBeenCalledWith(
       RETRY_FAILED_COMMAND.ROUTE
@@ -101,14 +112,14 @@ describe('SelectRecoveryOption', () => {
 
     screen.getByText('Choose a recovery action')
 
-    const retryStepOption = screen.getByRole('label', { name: 'Retry step' })
-    const continueBtn = screen.getByRole('button', { name: 'Continue' })
+    const retryStepOption = screen.getAllByRole('label', { name: 'Retry step' })
+    clickButtonLabeled('Continue')
     expect(
       screen.queryByRole('button', { name: 'Go back' })
     ).not.toBeInTheDocument()
 
-    fireEvent.click(retryStepOption)
-    fireEvent.click(continueBtn)
+    fireEvent.click(retryStepOption[0])
+    clickButtonLabeled('Continue')
 
     expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
       RETRY_FAILED_COMMAND.ROUTE
@@ -125,16 +136,15 @@ describe('SelectRecoveryOption', () => {
 
     screen.getByText('Choose a recovery action')
 
-    const retryNewTips = screen.getByRole('label', {
+    const retryNewTips = screen.getAllByRole('label', {
       name: 'Retry with new tips',
     })
-    const continueBtn = screen.getByRole('button', { name: 'Continue' })
     expect(
       screen.queryByRole('button', { name: 'Go back' })
     ).not.toBeInTheDocument()
 
-    fireEvent.click(retryNewTips)
-    fireEvent.click(continueBtn)
+    fireEvent.click(retryNewTips[0])
+    clickButtonLabeled('Continue')
 
     expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(RETRY_NEW_TIPS.ROUTE)
   })
@@ -149,13 +159,12 @@ describe('SelectRecoveryOption', () => {
 
     screen.getByText('Choose a recovery action')
 
-    const fillManuallyAndSkip = screen.getByRole('label', {
+    const fillManuallyAndSkip = screen.getAllByRole('label', {
       name: 'Manually fill well and skip to next step',
     })
-    const continueBtn = screen.getByRole('button', { name: 'Continue' })
 
-    fireEvent.click(fillManuallyAndSkip)
-    fireEvent.click(continueBtn)
+    fireEvent.click(fillManuallyAndSkip[0])
+    clickButtonLabeled('Continue')
 
     expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
       RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.ROUTE
@@ -172,13 +181,12 @@ describe('SelectRecoveryOption', () => {
 
     screen.getByText('Choose a recovery action')
 
-    const retrySameTips = screen.getByRole('label', {
+    const retrySameTips = screen.getAllByRole('label', {
       name: 'Retry with same tips',
     })
-    const continueBtn = screen.getByRole('button', { name: 'Continue' })
 
-    fireEvent.click(retrySameTips)
-    fireEvent.click(continueBtn)
+    fireEvent.click(retrySameTips[0])
+    clickButtonLabeled('Continue')
 
     expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
       RECOVERY_MAP.RETRY_SAME_TIPS.ROUTE
@@ -195,130 +203,135 @@ describe('SelectRecoveryOption', () => {
 
     screen.getByText('Choose a recovery action')
 
-    const skipStepWithSameTips = screen.getByRole('label', {
+    const skipStepWithSameTips = screen.getAllByRole('label', {
       name: 'Skip to next step with same tips',
     })
-    const continueBtn = screen.getByRole('button', { name: 'Continue' })
 
-    fireEvent.click(skipStepWithSameTips)
-    fireEvent.click(continueBtn)
+    fireEvent.click(skipStepWithSameTips[0])
+    clickButtonLabeled('Continue')
 
     expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
       RECOVERY_MAP.SKIP_STEP_WITH_SAME_TIPS.ROUTE
     )
   })
 })
+;([
+  ['desktop', renderDesktopRecoveryOptions] as const,
+  ['odd', renderODDRecoveryOptions] as const,
+] as const).forEach(([target, renderer]) => {
+  describe(`RecoveryOptions on ${target}`, () => {
+    let props: React.ComponentProps<typeof DesktopRecoveryOptions>
+    let mockSetSelectedRoute: Mock
+    let mockGetRecoveryOptionCopy: Mock
 
-describe('RecoveryOptions', () => {
-  let props: React.ComponentProps<typeof RecoveryOptions>
-  let mockSetSelectedRoute: Mock
-  let mockGetRecoveryOptionCopy: Mock
+    beforeEach(() => {
+      mockSetSelectedRoute = vi.fn()
+      mockGetRecoveryOptionCopy = vi.fn()
+      const generalRecoveryOptions = getRecoveryOptions(
+        ERROR_KINDS.GENERAL_ERROR
+      )
 
-  beforeEach(() => {
-    mockSetSelectedRoute = vi.fn()
-    mockGetRecoveryOptionCopy = vi.fn()
-    const generalRecoveryOptions = getRecoveryOptions(ERROR_KINDS.GENERAL_ERROR)
+      props = {
+        validRecoveryOptions: generalRecoveryOptions,
+        setSelectedRoute: mockSetSelectedRoute,
+        getRecoveryOptionCopy: mockGetRecoveryOptionCopy,
+      }
 
-    props = {
-      validRecoveryOptions: generalRecoveryOptions,
-      setSelectedRoute: mockSetSelectedRoute,
-      getRecoveryOptionCopy: mockGetRecoveryOptionCopy,
-    }
-
-    when(mockGetRecoveryOptionCopy)
-      .calledWith(RECOVERY_MAP.RETRY_FAILED_COMMAND.ROUTE)
-      .thenReturn('Retry step')
-    when(mockGetRecoveryOptionCopy)
-      .calledWith(RECOVERY_MAP.CANCEL_RUN.ROUTE)
-      .thenReturn('Cancel run')
-    when(mockGetRecoveryOptionCopy)
-      .calledWith(RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE)
-      .thenReturn('Retry with new tips')
-    when(mockGetRecoveryOptionCopy)
-      .calledWith(RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.ROUTE)
-      .thenReturn('Manually fill well and skip to next step')
-    when(mockGetRecoveryOptionCopy)
-      .calledWith(RECOVERY_MAP.RETRY_SAME_TIPS.ROUTE)
-      .thenReturn('Retry with same tips')
-    when(mockGetRecoveryOptionCopy)
-      .calledWith(RECOVERY_MAP.SKIP_STEP_WITH_SAME_TIPS.ROUTE)
-      .thenReturn('Skip to next step with same tips')
-    when(mockGetRecoveryOptionCopy)
-      .calledWith(RECOVERY_MAP.SKIP_STEP_WITH_NEW_TIPS.ROUTE)
-      .thenReturn('Skip to next step with new tips')
-    when(mockGetRecoveryOptionCopy)
-      .calledWith(RECOVERY_MAP.IGNORE_AND_SKIP.ROUTE)
-      .thenReturn('Ignore error and skip to next step')
-  })
-
-  it('renders valid recovery options for a general error errorKind', () => {
-    renderRecoveryOptions(props)
-
-    screen.getByRole('label', { name: 'Retry step' })
-    screen.getByRole('label', { name: 'Cancel run' })
-  })
-
-  it(`renders valid recovery options for a ${ERROR_KINDS.OVERPRESSURE_WHILE_ASPIRATING} errorKind`, () => {
-    props = {
-      ...props,
-      validRecoveryOptions: OVERPRESSURE_WHILE_ASPIRATING_OPTIONS,
-    }
-
-    renderRecoveryOptions(props)
-
-    screen.getByRole('label', { name: 'Retry with new tips' })
-    screen.getByRole('label', { name: 'Cancel run' })
-  })
-
-  it('updates the selectedRoute when a new option is selected', () => {
-    renderRecoveryOptions(props)
-
-    fireEvent.click(screen.getByRole('label', { name: 'Cancel run' }))
-
-    expect(mockSetSelectedRoute).toHaveBeenCalledWith(
-      RECOVERY_MAP.CANCEL_RUN.ROUTE
-    )
-  })
-
-  it(`renders valid recovery options for a ${ERROR_KINDS.NO_LIQUID_DETECTED} errorKind`, () => {
-    props = {
-      ...props,
-      validRecoveryOptions: NO_LIQUID_DETECTED_OPTIONS,
-    }
-
-    renderRecoveryOptions(props)
-
-    screen.getByRole('label', {
-      name: 'Manually fill well and skip to next step',
+      when(mockGetRecoveryOptionCopy)
+        .calledWith(RECOVERY_MAP.RETRY_FAILED_COMMAND.ROUTE)
+        .thenReturn('Retry step')
+      when(mockGetRecoveryOptionCopy)
+        .calledWith(RECOVERY_MAP.CANCEL_RUN.ROUTE)
+        .thenReturn('Cancel run')
+      when(mockGetRecoveryOptionCopy)
+        .calledWith(RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE)
+        .thenReturn('Retry with new tips')
+      when(mockGetRecoveryOptionCopy)
+        .calledWith(RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.ROUTE)
+        .thenReturn('Manually fill well and skip to next step')
+      when(mockGetRecoveryOptionCopy)
+        .calledWith(RECOVERY_MAP.RETRY_SAME_TIPS.ROUTE)
+        .thenReturn('Retry with same tips')
+      when(mockGetRecoveryOptionCopy)
+        .calledWith(RECOVERY_MAP.SKIP_STEP_WITH_SAME_TIPS.ROUTE)
+        .thenReturn('Skip to next step with same tips')
+      when(mockGetRecoveryOptionCopy)
+        .calledWith(RECOVERY_MAP.SKIP_STEP_WITH_NEW_TIPS.ROUTE)
+        .thenReturn('Skip to next step with new tips')
+      when(mockGetRecoveryOptionCopy)
+        .calledWith(RECOVERY_MAP.IGNORE_AND_SKIP.ROUTE)
+        .thenReturn('Ignore error and skip to next step')
     })
-    screen.getByRole('label', { name: 'Ignore error and skip to next step' })
-    screen.getByRole('label', { name: 'Cancel run' })
-  })
 
-  it(`renders valid recovery options for a ${ERROR_KINDS.OVERPRESSURE_PREPARE_TO_ASPIRATE} errorKind`, () => {
-    props = {
-      ...props,
-      validRecoveryOptions: OVERPRESSURE_PREPARE_TO_ASPIRATE,
-    }
+    it('renders valid recovery options for a general error errorKind', () => {
+      renderer(props)
 
-    renderRecoveryOptions(props)
+      screen.getByRole('label', { name: 'Retry step' })
+      screen.getByRole('label', { name: 'Cancel run' })
+    })
 
-    screen.getByRole('label', { name: 'Retry with new tips' })
-    screen.getByRole('label', { name: 'Retry with same tips' })
-    screen.getByRole('label', { name: 'Cancel run' })
-  })
+    it(`renders valid recovery options for a ${ERROR_KINDS.OVERPRESSURE_WHILE_ASPIRATING} errorKind`, () => {
+      props = {
+        ...props,
+        validRecoveryOptions: OVERPRESSURE_WHILE_ASPIRATING_OPTIONS,
+      }
 
-  it(`renders valid recovery options for a ${ERROR_KINDS.OVERPRESSURE_WHILE_DISPENSING} errorKind`, () => {
-    props = {
-      ...props,
-      validRecoveryOptions: OVERPRESSURE_WHILE_DISPENSING_OPTIONS,
-    }
+      renderer(props)
 
-    renderRecoveryOptions(props)
+      screen.getByRole('label', { name: 'Retry with new tips' })
+      screen.getByRole('label', { name: 'Cancel run' })
+    })
 
-    screen.getByRole('label', { name: 'Skip to next step with same tips' })
-    screen.getByRole('label', { name: 'Skip to next step with new tips' })
-    screen.getByRole('label', { name: 'Cancel run' })
+    it('updates the selectedRoute when a new option is selected', () => {
+      renderer(props)
+
+      fireEvent.click(screen.getByRole('label', { name: 'Cancel run' }))
+
+      expect(mockSetSelectedRoute).toHaveBeenCalledWith(
+        RECOVERY_MAP.CANCEL_RUN.ROUTE
+      )
+    })
+
+    it(`renders valid recovery options for a ${ERROR_KINDS.NO_LIQUID_DETECTED} errorKind`, () => {
+      props = {
+        ...props,
+        validRecoveryOptions: NO_LIQUID_DETECTED_OPTIONS,
+      }
+
+      renderer(props)
+
+      screen.getByRole('label', {
+        name: 'Manually fill well and skip to next step',
+      })
+      screen.getByRole('label', { name: 'Ignore error and skip to next step' })
+      screen.getByRole('label', { name: 'Cancel run' })
+    })
+
+    it(`renders valid recovery options for a ${ERROR_KINDS.OVERPRESSURE_PREPARE_TO_ASPIRATE} errorKind`, () => {
+      props = {
+        ...props,
+        validRecoveryOptions: OVERPRESSURE_PREPARE_TO_ASPIRATE,
+      }
+
+      renderer(props)
+
+      screen.getByRole('label', { name: 'Retry with new tips' })
+      screen.getByRole('label', { name: 'Retry with same tips' })
+      screen.getByRole('label', { name: 'Cancel run' })
+    })
+
+    it(`renders valid recovery options for a ${ERROR_KINDS.OVERPRESSURE_WHILE_DISPENSING} errorKind`, () => {
+      props = {
+        ...props,
+        validRecoveryOptions: OVERPRESSURE_WHILE_DISPENSING_OPTIONS,
+      }
+
+      renderer(props)
+
+      screen.getByRole('label', { name: 'Skip to next step with same tips' })
+      screen.getByRole('label', { name: 'Skip to next step with new tips' })
+      screen.getByRole('label', { name: 'Cancel run' })
+    })
   })
 })
 

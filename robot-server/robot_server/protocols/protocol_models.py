@@ -10,7 +10,7 @@ from opentrons.protocol_reader import (
     ProtocolFileRole as ProtocolFileRole,
 )
 
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.types import RobotType
 
 from robot_server.service.json_api import ResourceModel
 from .analysis_models import AnalysisSummary
@@ -21,14 +21,6 @@ class ProtocolKind(str, Enum):
 
     STANDARD = "standard"
     QUICK_TRANSFER = "quick-transfer"
-
-    @staticmethod
-    def from_string(name: Optional[str]) -> Optional["ProtocolKind"]:
-        """Get the ProtocolKind from a string."""
-        for item in ProtocolKind:
-            if name == item.value:
-                return item
-        return None
 
 
 class ProtocolFile(BaseModel):

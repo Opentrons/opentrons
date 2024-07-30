@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Flex, Icon, SPACING, LegacyStyledText } from '@opentrons/components'
 import { useCreateRunMutation } from '@opentrons/react-api-client'
@@ -28,7 +28,7 @@ export function LongPressModal({
   setShowDeleteConfirmationModal,
   setTargetProtocolId,
 }: LongPressModalProps): JSX.Element {
-  const history = useHistory()
+  const navigate = useNavigate()
   let pinnedProtocolIds = useSelector(getPinnedProtocolIds) ?? []
   const { i18n, t } = useTranslation(['protocol_info', 'shared'])
   const dispatch = useDispatch<Dispatch>()
@@ -49,7 +49,7 @@ export function LongPressModal({
   const createRunUse = useCreateRunMutation({
     onSuccess: data => {
       const runId: string = data.data.id
-      history.push(`/runs/${runId}/setup`)
+      navigate(`/runs/${runId}/setup`)
     },
   })
   const createRun =

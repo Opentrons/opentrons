@@ -51,7 +51,7 @@ from opentrons.protocol_engine import (
 )
 from opentrons.protocol_engine.protocol_engine import code_in_error_tree
 
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.types import RobotType
 
 from opentrons_shared_data.errors import ErrorCodes
 from opentrons_shared_data.errors.exceptions import (
@@ -248,6 +248,7 @@ async def _do_analyze(protocol_source: ProtocolSource) -> RunResult:
             protocol_source=protocol_source,
             parse_mode=ParseMode.NORMAL,
             run_time_param_values=None,
+            run_time_param_files=None,
         )
     except Exception as error:
         err_id = "analysis-setup-error"

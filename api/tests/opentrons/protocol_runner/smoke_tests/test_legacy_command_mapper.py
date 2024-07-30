@@ -25,7 +25,7 @@ from opentrons.protocol_runner.create_simulating_orchestrator import (
 )
 from opentrons.protocol_runner.legacy_command_mapper import LegacyCommandParams
 from opentrons.types import MountType, DeckSlotName
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.pipette.types import PipetteNameType
 
 
 async def simulate_and_get_commands(protocol_file: Path) -> List[commands.Command]:

@@ -1,5 +1,5 @@
 """Create ticket for robot with error."""
-from typing import List, Tuple, Any, Dict
+from typing import List, Tuple, Any, Dict, Optional
 from abr_testing.data_collection import read_robot_logs, abr_google_drive, get_run_logs
 import requests
 import argparse
@@ -7,10 +7,99 @@ from abr_testing.automation import jira_tool, google_sheets_tool, google_drive_t
 import shutil
 import os
 import subprocess
+from datetime import datetime, timedelta
 import sys
 import json
 import re
 import pandas as pd
+from statistics import mean, StatisticsError
+
+
+def compare_current_trh_to_average(
+    robot: str,
+    start_time: Any,
+    end_time: Optional[Any],
+    protocol_name: str,
+    storage_directory: str,
+) -> str:
+    """Get average temp/rh for errored run and compare to average."""
+    # Connect to ABR ambient conditions sheet
+    credentials_path = os.path.join(storage_directory, "credentials.json")
+    temprh_data_sheet = google_sheets_tool.google_sheet(
+        credentials_path, "ABR Ambient Conditions", 0
+    )
+    headers = temprh_data_sheet.get_row(1)
+    all_trh_data = temprh_data_sheet.get_all_data(expected_headers=headers)
+    # Connect to ABR-run-data sheet
+    abr_data = google_sheets_tool.google_sheet(credentials_path, "ABR-run-data", 0)
+    headers = abr_data.get_row(1)
+    all_run_data = abr_data.get_all_data(expected_headers=headers)
+    # Find average conditions of errored time period
+    df_all_trh = pd.DataFrame(all_trh_data)
+    # Convert timestamps to datetime objects
+    df_all_trh["Timestamp"] = pd.to_datetime(
+        df_all_trh["Timestamp"], format="mixed", utc=True
+    ).dt.tz_localize(None)
+    # Ensure start_time is timezone-naive
+    start_time = start_time.replace(tzinfo=None)
+    relevant_temp_rhs = df_all_trh[
+        (df_all_trh["Robot"] == robot) & (df_all_trh["Timestamp"] >= start_time)
+    ]
+    try:
+        avg_temp = round(mean(relevant_temp_rhs["Temp (oC)"]), 2)
+        avg_rh = round(mean(relevant_temp_rhs["Relative Humidity (%)"]), 2)
+    except StatisticsError:
+        # If there is one value assign it as the average.
+        if len(relevant_temp_rhs["Temp (oC)"]) == 1:
+            avg_temp = relevant_temp_rhs["Temp (oC)"][0]
+            avg_rh = relevant_temp_rhs["Relative Humidity (%)"][0]
+        else:
+            avg_temp = None
+            avg_rh = None
+    # Get AVG t/rh of runs w/ same robot & protocol newer than 3 wks old with no errors
+    weeks_ago_3 = start_time - timedelta(weeks=3)
+    df_all_run_data = pd.DataFrame(all_run_data)
+    df_all_run_data["Start_Time"] = pd.to_datetime(
+        df_all_run_data["Start_Time"], format="mixed", utc=True
+    ).dt.tz_localize(None)
+    df_all_run_data["Errors"] = pd.to_numeric(df_all_run_data["Errors"])
+    df_all_run_data["Average Temp (oC)"] = pd.to_numeric(
+        df_all_run_data["Average Temp (oC)"]
+    )
+    common_filters = (
+        (df_all_run_data["Robot"] == robot)
+        & (df_all_run_data["Start_Time"] >= weeks_ago_3)
+        & (df_all_run_data["Start_Time"] <= start_time)
+        & (df_all_run_data["Errors"] < 1)
+        & (df_all_run_data["Average Temp (oC)"] > 1)
+    )
+
+    if protocol_name == "":
+        relevant_run_data = df_all_run_data[common_filters]
+    else:
+        relevant_run_data = df_all_run_data[
+            common_filters & (df_all_run_data["Protocol_Name"] == protocol_name)
+        ]
+    # Calculate means of historical data
+    try:
+        historical_avg_temp = round(
+            mean(relevant_run_data["Average Temp (oC)"].astype(float)), 2
+        )
+        historical_avg_rh = round(
+            mean(relevant_run_data["Average RH(%)"].astype(float)), 2
+        )
+    except StatisticsError:
+        historical_avg_temp = None
+        historical_avg_rh = None
+    # Formats TEMP/RH message for ticket.
+    temp_rh_message = (
+        f"{len(relevant_run_data)} runs with temp/rh data for {robot} running {protocol_name}."
+        f" AVG TEMP (deg C): {historical_avg_temp}. AVG RH (%): {historical_avg_rh}."
+        f" AVG TEMP of ERROR: {avg_temp}. AVG RH of ERROR: {avg_rh}."
+    )
+    # Print out comparison string.
+    print(temp_rh_message)
+    return temp_rh_message
 
 
 def compare_lpc_to_historical_data(
@@ -42,9 +131,20 @@ def compare_lpc_to_historical_data(
     current_x = round(labware_dict["X"], 2)
     current_y = round(labware_dict["Y"], 2)
     current_z = round(labware_dict["Z"], 2)
-    avg_x = round(sum(x_float) / len(x_float), 2)
-    avg_y = round(sum(y_float) / len(y_float), 2)
-    avg_z = round(sum(z_float) / len(z_float), 2)
+    try:
+        avg_x = round(mean(x_float), 2)
+        avg_y = round(mean(y_float), 2)
+        avg_z = round(mean(z_float), 2)
+    except StatisticsError:
+        # If there is one value assign it as the average.
+        if len(x_float) == 1:
+            avg_x = x_float[0]
+            avg_y = y_float[0]
+            avg_z = z_float[0]
+        else:
+            avg_x = None
+            avg_y = None
+            avg_z = None
 
     # Formats LPC message for ticket.
     lpc_message = (
@@ -195,6 +295,15 @@ def get_robot_state(
     components = ["Flex-RABR"]
     components = match_error_to_component("RABR", reported_string, components)
     print(components)
+    end_time = datetime.now()
+    print(end_time)
+    start_time = end_time - timedelta(hours=2)
+    print(start_time)
+    # Get current temp/rh compared to historical data
+    temp_rh_string = compare_current_trh_to_average(
+        parent, start_time, end_time, "", storage_directory
+    )
+    description["Robot Temp and RH Comparison"] = temp_rh_string
     whole_description_str = (
         "{"
         + "\n".join("{!r}: {!r},".format(k, v) for k, v in description.items())
@@ -242,6 +351,23 @@ def get_run_error_info_from_robot(
     description["protocol_name"] = results["protocol"]["metadata"].get(
         "protocolName", ""
     )
+    # Get start and end time of run
+    start_time = datetime.strptime(
+        results.get("startedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
+    )
+    adjusted_start_time = start_time - timedelta(hours=4)
+    complete_time = datetime.strptime(
+        results.get("completedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
+    )
+    adjusted_complete_time = complete_time - timedelta(hours=4)
+    # Get average temp and rh of robot and protocol the error occurred on.
+    temp_rh_comparison = compare_current_trh_to_average(
+        parent,
+        adjusted_start_time,
+        adjusted_complete_time,
+        description["protocol_name"],
+        storage_directory,
+    )
     # Get LPC coordinates of labware of failure
     lpc_dict = results["labwareOffsets"]
     labware_dict = results["labware"]
@@ -280,6 +406,7 @@ def get_run_error_info_from_robot(
     if len(lpc_message) < 1:
         lpc_message = "No LPC coordinates found in relation to error."
     description["LPC Comparison"] = lpc_message
+    description["Robot Temp and RH Comparison"] = temp_rh_comparison
     all_modules = abr_google_drive.get_modules(results)
     whole_description = {**description, **all_modules}
     whole_description_str = (
@@ -352,6 +479,7 @@ if __name__ == "__main__":
     email = args.email[0]
     board_id = args.board_id[0]
     reporter_id = args.reporter_id[0]
+    file_paths = read_robot_logs.get_logs(storage_directory, ip)
     ticket = jira_tool.JiraTicket(url, api_token, email)
     ticket.issues_on_board(board_id)
     users_file_path = ticket.get_jira_users(storage_directory)
@@ -384,7 +512,6 @@ if __name__ == "__main__":
     saved_file_path_calibration, calibration = read_robot_logs.get_calibration_offsets(
         ip, storage_directory
     )
-    file_paths = read_robot_logs.get_logs(storage_directory, ip)
 
     print(f"Making ticket for {summary}.")
     # TODO: make argument or see if I can get rid of with using board_id.

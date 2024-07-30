@@ -19,7 +19,7 @@ import type { Instruments } from '@opentrons/api-client'
 vi.mock('@opentrons/react-api-client')
 vi.mock('react-router-dom', () => ({
   useParams: vi.fn(),
-  useHistory: vi.fn(),
+  useNavigate: vi.fn(),
 }))
 vi.mock('../../../resources/instruments/hooks')
 vi.mock('../../../resources/robot-settings/hooks')

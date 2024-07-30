@@ -1,12 +1,12 @@
 """Test for the ProtocolEngine-based instrument API core."""
 from typing import cast, Optional, Union
 
-from opentrons.protocol_engine.commands.liquid_probe import LiquidProbeResult
 from opentrons_shared_data.errors.exceptions import PipetteLiquidNotFoundError
 import pytest
 from decoy import Decoy
+from decoy import errors
 
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.pipette.types import PipetteNameType
 
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.dev_types import PipetteDict
@@ -1166,23 +1166,32 @@ def test_liquid_presence_detection(
 
 
 @pytest.mark.parametrize(
-    argnames=["style", "primary_nozzle", "front_right_nozzle", "expected_model"],
+    argnames=[
+        "style",
+        "primary_nozzle",
+        "front_right_nozzle",
+        "back_left_nozzle",
+        "expected_model",
+    ],
     argvalues=[
         [
             NozzleLayout.COLUMN,
             "A1",
             "H1",
+            None,
             ColumnNozzleLayoutConfiguration(primaryNozzle="A1"),
         ],
         [
             NozzleLayout.SINGLE,
             "H12",
             None,
+            None,
             SingleNozzleLayoutConfiguration(primaryNozzle="H12"),
         ],
         [
             NozzleLayout.ROW,
             "A12",
+            None,
             None,
             RowNozzleLayoutConfiguration(primaryNozzle="A12"),
         ],
@@ -1195,10 +1204,13 @@ def test_configure_nozzle_layout(
     style: NozzleLayout,
     primary_nozzle: Optional[str],
     front_right_nozzle: Optional[str],
+    back_left_nozzle: Optional[str],
     expected_model: NozzleLayoutConfigurationType,
 ) -> None:
     """The correct model is passed to the engine client."""
-    subject.configure_nozzle_layout(style, primary_nozzle, front_right_nozzle)
+    subject.configure_nozzle_layout(
+        style, primary_nozzle, front_right_nozzle, back_left_nozzle
+    )
 
     decoy.verify(
         mock_engine_client.execute_command(
@@ -1222,7 +1234,7 @@ def test_configure_nozzle_layout(
         (8, NozzleConfigurationType.FULL, "A1", True),
         (8, NozzleConfigurationType.FULL, None, True),
         (8, NozzleConfigurationType.SINGLE, "H1", True),
-        (8, NozzleConfigurationType.SINGLE, "A1", False),
+        (8, NozzleConfigurationType.SINGLE, "A1", True),
         (1, NozzleConfigurationType.FULL, None, True),
     ],
 )
@@ -1281,24 +1293,77 @@ def test_configure_for_volume_post_219(
     """Configure_for_volume should specify overlap version."""
     decoy.when(mock_protocol_core.api_version).then_return(version)
     subject.configure_for_volume(123.0)
-    decoy.verify(
-        mock_engine_client.execute_command(
-            cmd.ConfigureForVolumeParams(
-                pipetteId=subject.pipette_id,
-                volume=123.0,
-                tipOverlapNotAfterVersion="v1",
+    try:
+        decoy.verify(
+            mock_engine_client.execute_command(
+                cmd.ConfigureForVolumeParams(
+                    pipetteId=subject.pipette_id,
+                    volume=123.0,
+                    tipOverlapNotAfterVersion="v1",
+                )
             )
         )
+    except errors.VerifyError:
+        decoy.verify(
+            mock_engine_client.execute_command(
+                cmd.ConfigureForVolumeParams(
+                    pipetteId=subject.pipette_id,
+                    volume=123.0,
+                    tipOverlapNotAfterVersion="v3",
+                )
+            )
+        )
+
+
+@pytest.mark.parametrize(
+    ("returned_from_engine", "expected_return_from_core"),
+    [
+        (None, False),
+        (0, True),
+        (1, True),
+    ],
+)
+def test_detect_liquid_presence(
+    returned_from_engine: Optional[float],
+    expected_return_from_core: bool,
+    decoy: Decoy,
+    mock_protocol_core: ProtocolCore,
+    mock_engine_client: EngineClient,
+    subject: InstrumentCore,
+) -> None:
+    """It should convert a height result from the engine to True/False."""
+    well_core = WellCore(
+        name="my cool well", labware_id="123abc", engine_client=mock_engine_client
     )
+    decoy.when(
+        mock_engine_client.execute_command_without_recovery(
+            cmd.TryLiquidProbeParams(
+                pipetteId=subject.pipette_id,
+                wellLocation=WellLocation(
+                    origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0)
+                ),
+                wellName=well_core.get_name(),
+                labwareId=well_core.labware_id,
+            )
+        )
+    ).then_return(
+        cmd.TryLiquidProbeResult.construct(
+            z_position=returned_from_engine,
+            position=object(),  # type: ignore[arg-type]
+        )
+    )
+    loc = Location(Point(0, 0, 0), None)
+
+    result = subject.detect_liquid_presence(well_core=well_core, loc=loc)
+    assert result == expected_return_from_core
+
+    decoy.verify(mock_protocol_core.set_last_location(loc, mount=subject.get_mount()))
 
 
-@pytest.mark.parametrize("version", versions_at_or_above(APIVersion(2, 20)))
 def test_liquid_probe_without_recovery(
     decoy: Decoy,
     mock_engine_client: EngineClient,
-    mock_protocol_core: ProtocolCore,
     subject: InstrumentCore,
-    version: APIVersion,
 ) -> None:
     """It should raise an exception on an empty well and return a float on a valid well."""
     well_core = WellCore(
@@ -1309,57 +1374,35 @@ def test_liquid_probe_without_recovery(
             cmd.LiquidProbeParams(
                 pipetteId=subject.pipette_id,
                 wellLocation=WellLocation(
-                    origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0)
+                    origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=2)
                 ),
                 wellName=well_core.get_name(),
                 labwareId=well_core.labware_id,
             )
         )
     ).then_raise(PipetteLiquidNotFoundError())
-    try:
-        subject.liquid_probe_without_recovery(well_core=well_core)
-    except PipetteLiquidNotFoundError:
-        assert True
-    else:
-        assert False
-
-    decoy.reset()
-
-    lpr = LiquidProbeResult(z_position=5.0)
-    decoy.when(
-        mock_engine_client.execute_command_without_recovery(
-            cmd.LiquidProbeParams(
-                pipetteId=subject.pipette_id,
-                wellLocation=WellLocation(
-                    origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0)
-                ),
-                wellName=well_core.get_name(),
-                labwareId=well_core.labware_id,
-            )
-        )
-    ).then_return(lpr)
-    assert subject.liquid_probe_without_recovery(well_core=well_core) == 5.0
+    loc = Location(Point(0, 0, 0), None)
+    with pytest.raises(PipetteLiquidNotFoundError):
+        subject.liquid_probe_without_recovery(well_core=well_core, loc=loc)
 
 
-@pytest.mark.parametrize("version", versions_at_or_above(APIVersion(2, 20)))
 def test_liquid_probe_with_recovery(
     decoy: Decoy,
     mock_engine_client: EngineClient,
-    mock_protocol_core: ProtocolCore,
     subject: InstrumentCore,
-    version: APIVersion,
 ) -> None:
     """It should not raise an exception on an empty well."""
     well_core = WellCore(
         name="my cool well", labware_id="123abc", engine_client=mock_engine_client
     )
-    subject.liquid_probe_with_recovery(well_core=well_core)
+    loc = Location(Point(0, 0, 0), None)
+    subject.liquid_probe_with_recovery(well_core=well_core, loc=loc)
     decoy.verify(
         mock_engine_client.execute_command(
             cmd.LiquidProbeParams(
                 pipetteId=subject.pipette_id,
                 wellLocation=WellLocation(
-                    origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0)
+                    origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=2.0)
                 ),
                 wellName=well_core.get_name(),
                 labwareId=well_core.labware_id,

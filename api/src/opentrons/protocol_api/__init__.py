@@ -31,6 +31,9 @@ from ._liquid import Liquid
 from ._types import OFF_DECK
 from ._nozzle_layout import (
     COLUMN,
+    PARTIAL_COLUMN,
+    SINGLE,
+    ROW,
     ALL,
 )
 from ._parameters import Parameters
@@ -63,6 +66,9 @@ __all__ = [
     "Liquid",
     "Parameters",
     "COLUMN",
+    "PARTIAL_COLUMN",
+    "SINGLE",
+    "ROW",
     "ALL",
     "OFF_DECK",
     "RuntimeParameterRequiredError",

@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
+import isEqual from 'lodash/isEqual'
 import last from 'lodash/last'
 
 import {
@@ -9,8 +10,8 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useAllCsvFilesQuery } from '@opentrons/react-api-client'
@@ -20,17 +21,20 @@ import { getShellUpdateDataFiles } from '../../redux/shell'
 import { ChildNavigation } from '../ChildNavigation'
 import { EmptyFile } from './EmptyFile'
 
-import type { CsvFileParameter } from '@opentrons/shared-data'
+import type {
+  CsvFileParameter,
+  CsvFileParameterFileData,
+} from '@opentrons/shared-data'
 import type { CsvFileData } from '@opentrons/api-client'
 
 interface ChooseCsvFileProps {
   protocolId: string
   handleGoBack: () => void
-  // ToDo (kk:06/18/2024) null will be removed when implemented required part
-  parameter: CsvFileParameter | null
-  setParameter: (value: boolean | string | number, variableName: string) => void
-  csvFileInfo: string
-  setCsvFileInfo: (fileInfo: string) => void
+  parameter: CsvFileParameter
+  setParameter: (
+    value: boolean | string | number | CsvFileParameterFileData,
+    variableName: string
+  ) => void
 }
 
 export function ChooseCsvFile({
@@ -38,31 +42,63 @@ export function ChooseCsvFile({
   handleGoBack,
   parameter,
   setParameter,
-  csvFileInfo,
-  setCsvFileInfo,
 }: ChooseCsvFileProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
+
   const csvFilesOnUSB = useSelector(getShellUpdateDataFiles) ?? []
+  const csvFilesOnRobot = (useAllCsvFilesQuery(protocolId).data?.data ??
+    []) as CsvFileData[]
+  const sortedCsvFilesOnUSB = csvFilesOnUSB.sort((a, b) => {
+    const regex = /^(.*\/)?(.+?)(\d*)\.csv$/
+    const aMatch = a.match(regex)
+    const bMatch = b.match(regex)
 
-  const csvFilesOnRobot = useAllCsvFilesQuery(protocolId).data?.data.files ?? []
+    if (!aMatch || !bMatch) {
+      console.error('Invalid filename format:', !aMatch ? a : b)
+      return 0
+    }
 
-  // ToDo (06/20/2024) this will removed when working on AUTH-521
-  // const handleOnChange = (newValue: string | number | boolean): void => {
-  //   setParameter(newValue, parameter?.variableName ?? 'csvFileId')
-  // }
+    const [, , aText, aNum] = aMatch
+    const [, , bText, bNum] = bMatch
 
-  const handleConfirmSelection = (): void => {
-    // ToDo (kk:06/18/2024) wire up later
+    if (aText !== bText) {
+      return aText.localeCompare(bText)
+    }
+
+    return (
+      (aNum === '' ? 0 : parseInt(aNum, 10)) -
+      (bNum === '' ? 0 : parseInt(bNum, 10))
+    )
+  })
+
+  const initialFileObject: CsvFileParameterFileData = parameter.file ?? {}
+  const [
+    csvFileSelected,
+    setCsvFileSelected,
+  ] = React.useState<CsvFileParameterFileData>(initialFileObject)
+
+  const handleBackButton = (): void => {
+    if (!isEqual(csvFileSelected, initialFileObject)) {
+      setParameter(csvFileSelected, parameter.variableName as string)
+    }
+    handleGoBack()
   }
+
+  React.useEffect(() => {
+    if (csvFilesOnUSB.length === 0) {
+      setCsvFileSelected({})
+    }
+  }, [csvFilesOnUSB])
 
   return (
     <>
       <ChildNavigation
         header={t('choose_csv_file')}
-        onClickBack={handleGoBack}
-        buttonType="primary"
-        buttonText={t('confirm_selection')}
-        onClickButton={handleConfirmSelection}
+        onClickBack={handleBackButton}
+        inlineNotification={{
+          type: 'neutral',
+          heading: t('usb_drive_notification'),
+        }}
       />
       <Flex
         marginTop="7.75rem"
@@ -80,13 +116,17 @@ export function ChooseCsvFile({
             <Flex css={LIST_CONTAINER_STYLE}>
               {csvFilesOnRobot.length !== 0 ? (
                 csvFilesOnRobot.map((csv: CsvFileData) => (
-                  <RadioButton
-                    key={csv.id}
-                    data-testid={csv.id}
-                    buttonLabel={csv.name}
-                    buttonValue={csv.id}
-                    onChange={() => {}}
-                  />
+                  <React.Fragment key={csv.id}>
+                    <RadioButton
+                      buttonLabel={csv.name}
+                      buttonValue={csv.id}
+                      onChange={() => {
+                        setCsvFileSelected({ id: csv.id, fileName: csv.name })
+                      }}
+                      id={`${csv.id}-on-robot`}
+                      isSelected={csvFileSelected?.id === csv.id}
+                    />
+                  </React.Fragment>
                 ))
               ) : (
                 <EmptyFile />
@@ -98,24 +138,28 @@ export function ChooseCsvFile({
               {t('csv_files_on_usb')}
             </LegacyStyledText>
             <Flex css={LIST_CONTAINER_STYLE}>
-              {csvFilesOnUSB.length !== 0 ? (
-                csvFilesOnUSB.map(csv => (
-                  <>
-                    {csv.length !== 0 && last(csv.split('/')) !== undefined ? (
-                      <RadioButton
-                        key={last(csv.split('/'))}
-                        data-testid={`${last(csv.split('/'))}`}
-                        buttonLabel={last(csv.split('/')) ?? 'default'}
-                        buttonValue={csv}
-                        onChange={() => {
-                          // ToDO this will be implemented AUTH-521
-                          // handleOnChange(option.value)
-                          setCsvFileInfo(csv)
-                        }}
-                      />
-                    ) : null}
-                  </>
-                ))
+              {sortedCsvFilesOnUSB.length !== 0 ? (
+                sortedCsvFilesOnUSB.map(csvFilePath => {
+                  const fileName = last(csvFilePath.split('/'))
+                  return (
+                    <React.Fragment key={fileName}>
+                      {csvFilePath.length !== 0 && fileName !== undefined ? (
+                        <RadioButton
+                          buttonLabel={fileName}
+                          buttonValue={csvFilePath}
+                          onChange={() => {
+                            setCsvFileSelected({
+                              filePath: csvFilePath,
+                              fileName,
+                            })
+                          }}
+                          id={`${csvFilePath.replace('/', '-')}}-on-usb`}
+                          isSelected={csvFileSelected?.filePath === csvFilePath}
+                        />
+                      ) : null}
+                    </React.Fragment>
+                  )
+                })
               ) : (
                 <EmptyFile />
               )}

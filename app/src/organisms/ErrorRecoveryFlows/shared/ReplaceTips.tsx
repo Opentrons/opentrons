@@ -3,60 +3,54 @@ import * as React from 'react'
 import { Flex } from '@opentrons/components'
 
 import { useTranslation } from 'react-i18next'
-import { RecoveryContentWrapper } from './RecoveryContentWrapper'
+import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
 import { TwoColumn, DeckMapContent } from '../../../molecules/InterventionModal'
 import { RecoveryFooterButtons } from './RecoveryFooterButtons'
 import { LeftColumnLabwareInfo } from './LeftColumnLabwareInfo'
+import { getSlotNameAndLwLocFrom } from '../hooks/useDeckMapUtils'
 
 import type { RecoveryContentProps } from '../types'
 
 export function ReplaceTips(props: RecoveryContentProps): JSX.Element | null {
   const {
-    isOnDevice,
     routeUpdateActions,
     failedPipetteInfo,
     failedLabwareUtils,
     deckMapUtils,
   } = props
-  const { relevantWellName } = failedLabwareUtils
+  const { relevantWellName, failedLabware } = failedLabwareUtils
   const { proceedNextStep } = routeUpdateActions
   const { t } = useTranslation('error_recovery')
 
   const primaryOnClick = (): void => {
     void proceedNextStep()
   }
-
+  const [slot] = getSlotNameAndLwLocFrom(failedLabware?.location ?? null, false)
   const buildTitle = (): string => {
     if (failedPipetteInfo?.data.channels === 96) {
-      return t('replace_with_new_tip_rack')
+      return t('replace_with_new_tip_rack', { slot })
     } else {
       return t('replace_used_tips_in_rack_location', {
         location: relevantWellName,
+        slot,
       })
     }
   }
 
-  if (isOnDevice) {
-    return (
-      <RecoveryContentWrapper>
-        <TwoColumn>
-          <LeftColumnLabwareInfo
-            {...props}
-            title={buildTitle()}
-            moveType="refill"
-            bannerText={t('replace_tips_and_select_location')}
-          />
-          <Flex marginTop="1.742rem">
-            <DeckMapContent {...deckMapUtils} />
-          </Flex>
-        </TwoColumn>
-        <RecoveryFooterButtons
-          isOnDevice={isOnDevice}
-          primaryBtnOnClick={primaryOnClick}
+  return (
+    <RecoverySingleColumnContentWrapper>
+      <TwoColumn>
+        <LeftColumnLabwareInfo
+          {...props}
+          title={buildTitle()}
+          type="location"
+          bannerText={t('replace_tips_and_select_location')}
         />
-      </RecoveryContentWrapper>
-    )
-  } else {
-    return null
-  }
+        <Flex marginTop="1.742rem">
+          <DeckMapContent {...deckMapUtils} />
+        </Flex>
+      </TwoColumn>
+      <RecoveryFooterButtons primaryBtnOnClick={primaryOnClick} />
+    </RecoverySingleColumnContentWrapper>
+  )
 }

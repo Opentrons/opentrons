@@ -6,16 +6,22 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  LegacyStyledText,
+  StyledText,
 } from '@opentrons/components'
 
 import {
   RECOVERY_MAP,
   ERROR_KINDS,
   ODD_SECTION_TITLE_STYLE,
+  ODD_ONLY,
+  DESKTOP_ONLY,
 } from '../constants'
 import { RadioButton } from '../../../atoms/buttons'
-import { RecoveryFooterButtons, RecoveryContentWrapper } from '../shared'
+import {
+  RecoveryODDOneDesktopTwoColumnContentWrapper,
+  RecoveryRadioGroup,
+  FailedStepNextStep,
+} from '../shared'
 
 import type { ErrorKind, RecoveryContentProps, RecoveryRoute } from '../types'
 import type { PipetteWithTip } from '../../DropTipWizardFlows'
@@ -40,12 +46,13 @@ export function SelectRecoveryOption(props: RecoveryContentProps): JSX.Element {
 }
 
 export function SelectRecoveryOptionHome({
-  isOnDevice,
   errorKind,
   routeUpdateActions,
   tipStatusUtils,
   currentRecoveryOptionUtils,
   getRecoveryOptionCopy,
+  analytics,
+  ...rest
 }: RecoveryContentProps): JSX.Element | null {
   const { t } = useTranslation('error_recovery')
   const { proceedToRouteAndStep } = routeUpdateActions
@@ -58,32 +65,44 @@ export function SelectRecoveryOptionHome({
 
   useCurrentTipStatus(determineTipStatus)
 
-  if (isOnDevice) {
-    return (
-      <RecoveryContentWrapper>
-        <LegacyStyledText css={ODD_SECTION_TITLE_STYLE} as="h4SemiBold">
+  return (
+    <RecoveryODDOneDesktopTwoColumnContentWrapper
+      footerDetails={{
+        primaryBtnOnClick: () => {
+          analytics.reportActionSelectedEvent(selectedRoute)
+          setSelectedRecoveryOption(selectedRoute)
+          void proceedToRouteAndStep(selectedRoute as RecoveryRoute)
+        },
+      }}
+    >
+      <Flex flexDirection={DIRECTION_COLUMN}>
+        <StyledText
+          oddStyle="level4HeaderSemiBold"
+          desktopStyle="headingSmallBold"
+          css={ODD_SECTION_TITLE_STYLE}
+        >
           {t('choose_a_recovery_action')}
-        </LegacyStyledText>
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-          <RecoveryOptions
+        </StyledText>
+        <Flex css={ODD_ONLY}>
+          <ODDRecoveryOptions
             validRecoveryOptions={validRecoveryOptions}
             setSelectedRoute={setSelectedRoute}
             selectedRoute={selectedRoute}
             getRecoveryOptionCopy={getRecoveryOptionCopy}
           />
         </Flex>
-        <RecoveryFooterButtons
-          isOnDevice={isOnDevice}
-          primaryBtnOnClick={() => {
-            setSelectedRecoveryOption(selectedRoute)
-            void proceedToRouteAndStep(selectedRoute as RecoveryRoute)
-          }}
-        />
-      </RecoveryContentWrapper>
-    )
-  } else {
-    return null
-  }
+        <Flex css={DESKTOP_ONLY}>
+          <DesktopRecoveryOptions
+            validRecoveryOptions={validRecoveryOptions}
+            setSelectedRoute={setSelectedRoute}
+            selectedRoute={selectedRoute}
+            getRecoveryOptionCopy={getRecoveryOptionCopy}
+          />
+        </Flex>
+      </Flex>
+      <FailedStepNextStep {...rest} />
+    </RecoveryODDOneDesktopTwoColumnContentWrapper>
+  )
 }
 
 interface RecoveryOptionsProps {
@@ -93,29 +112,67 @@ interface RecoveryOptionsProps {
   selectedRoute?: RecoveryRoute
 }
 // For ODD use only.
-export function RecoveryOptions({
+export function ODDRecoveryOptions({
   validRecoveryOptions,
   selectedRoute,
   setSelectedRoute,
   getRecoveryOptionCopy,
-}: RecoveryOptionsProps): JSX.Element[] {
-  return validRecoveryOptions.map((recoveryOption: RecoveryRoute) => {
-    const optionName = getRecoveryOptionCopy(recoveryOption)
-
-    return (
-      <RadioButton
-        key={`recovery_option_${optionName}`}
-        buttonLabel={optionName}
-        buttonValue={optionName}
-        onChange={() => {
-          setSelectedRoute(recoveryOption)
-        }}
-        isSelected={recoveryOption === selectedRoute}
-      />
-    )
-  })
+}: RecoveryOptionsProps): JSX.Element {
+  return (
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      gridGap={SPACING.spacing4}
+      width="100%"
+    >
+      {validRecoveryOptions.map((recoveryOption: RecoveryRoute) => {
+        const optionName = getRecoveryOptionCopy(recoveryOption)
+        return (
+          <RadioButton
+            key={`recovery_option_${optionName}`}
+            buttonLabel={optionName}
+            buttonValue={optionName}
+            onChange={() => {
+              setSelectedRoute(recoveryOption)
+            }}
+            isSelected={recoveryOption === selectedRoute}
+          />
+        )
+      })}
+    </Flex>
+  )
 }
 
+export function DesktopRecoveryOptions({
+  validRecoveryOptions,
+  selectedRoute,
+  setSelectedRoute,
+  getRecoveryOptionCopy,
+}: RecoveryOptionsProps): JSX.Element {
+  return (
+    <RecoveryRadioGroup
+      css={RADIO_GAP}
+      onChange={e => {
+        setSelectedRoute(e.currentTarget.value)
+      }}
+      value={selectedRoute}
+      options={validRecoveryOptions.map(
+        (option: RecoveryRoute) =>
+          ({
+            value: option,
+            children: (
+              <StyledText
+                desktopStyle="bodyDefaultRegular"
+                role="label"
+                htmlFor={option}
+              >
+                {getRecoveryOptionCopy(option)}
+              </StyledText>
+            ),
+          } as const)
+      )}
+    />
+  )
+}
 // Pre-fetch tip attachment status. Users are not blocked from proceeding at this step.
 export function useCurrentTipStatus(
   determineTipStatus: () => Promise<PipetteWithTip[]>
@@ -167,3 +224,7 @@ export const GENERAL_ERROR_OPTIONS: RecoveryRoute[] = [
   RECOVERY_MAP.RETRY_FAILED_COMMAND.ROUTE,
   RECOVERY_MAP.CANCEL_RUN.ROUTE,
 ]
+
+const RADIO_GAP = `
+  gap: ${SPACING.spacing4};
+`

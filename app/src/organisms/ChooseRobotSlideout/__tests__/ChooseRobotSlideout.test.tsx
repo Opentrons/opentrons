@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { vi, it, describe, expect, beforeEach } from 'vitest'
 
-import { StaticRouter } from 'react-router-dom'
+import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
@@ -30,9 +30,9 @@ vi.mock('../../../redux/networking')
 vi.mock('../../../resources/useNotifyDataReady')
 const render = (props: React.ComponentProps<typeof ChooseRobotSlideout>) => {
   return renderWithProviders(
-    <StaticRouter>
+    <MemoryRouter>
       <ChooseRobotSlideout {...props} />
-    </StaticRouter>,
+    </MemoryRouter>,
     {
       i18nInstance: i18n,
     }

@@ -24,7 +24,12 @@ def info_num_to_model(num: str) -> GripperModel:
     # PVT will now be 1.2
     model_map = {
         "0": {"0": GripperModel.v1, "1": GripperModel.v1},
-        "1": {"0": GripperModel.v1, "1": GripperModel.v1_1, "2": GripperModel.v1_2},
+        "1": {
+            "0": GripperModel.v1,
+            "1": GripperModel.v1_1,
+            "2": GripperModel.v1_2,
+            "3": GripperModel.v1_3,
+        },
     }
     return model_map[major_model][minor_model]
 

@@ -9,13 +9,13 @@ import { RobotSystemVersionModal } from '../RobotSystemVersionModal'
 import type * as Dom from 'react-router-dom'
 
 const mockFn = vi.fn()
-const mockPush = vi.fn()
+const mockNavigate = vi.fn()
 
 vi.mock('react-router-dom', async importOriginal => {
   const reactRouterDom = await importOriginal<typeof Dom>()
   return {
     ...reactRouterDom,
-    useHistory: () => ({ push: mockPush } as any),
+    useNavigate: () => mockNavigate,
   }
 })
 
@@ -52,7 +52,7 @@ describe('RobotSystemVersionModal', () => {
   it('should close the modal when tapping remind me later', () => {
     render(props)
     fireEvent.click(screen.getByText('Update'))
-    expect(mockPush).toHaveBeenCalledWith('/robot-settings/update-robot')
+    expect(mockNavigate).toHaveBeenCalledWith('/robot-settings/update-robot')
   })
 
   it('should call the mock function when tapping update', () => {

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 
 import { RUN_STATUS_STOPPED } from '@opentrons/api-client'
@@ -65,7 +65,7 @@ export function ConfirmCancelRunModal({
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name ?? ''
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
-  const history = useHistory()
+  const navigate = useNavigate()
   const [isCanceling, setIsCanceling] = React.useState(false)
 
   const modalHeader: ModalHeaderBaseProps = {
@@ -90,13 +90,13 @@ export function ConfirmCancelRunModal({
       dismissCurrentRun(runId)
       if (!isActiveRun) {
         if (isQuickTransfer && protocolId != null) {
-          history.push(`/quick-transfer/${protocolId}`)
+          navigate(`/quick-transfer/${protocolId}`)
         } else if (isQuickTransfer) {
-          history.push('/quick-transfer')
+          navigate('/quick-transfer')
         } else if (protocolId != null) {
-          history.push(`/protocols/${protocolId}`)
+          navigate(`/protocols/${protocolId}`)
         } else {
-          history.push(`/protocols`)
+          navigate('/protocols')
         }
       }
     }
