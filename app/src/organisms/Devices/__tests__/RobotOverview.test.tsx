@@ -151,7 +151,7 @@ describe('RobotOverview', () => {
       .calledWith(MOCK_STATE, mockConnectableRobot.name)
       .thenReturn([])
     vi.mocked(getConfig).mockReturnValue({
-      support: { userId: 'opentrons-robot-user' },
+      userInfo: { userId: 'opentrons-robot-user' },
     } as Config)
     when(useAuthorization)
       .calledWith({

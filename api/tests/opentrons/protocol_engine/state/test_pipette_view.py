@@ -4,7 +4,7 @@ from collections import OrderedDict
 import pytest
 from typing import cast, Dict, List, Optional, Tuple, NamedTuple
 
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons_shared_data.pipette import pipette_definition
 from opentrons_shared_data.pipette.pipette_definition import ValidNozzleMaps
 

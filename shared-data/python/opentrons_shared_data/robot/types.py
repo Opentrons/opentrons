@@ -1,4 +1,4 @@
-"""opentrons_shared_data.robot.dev_types: types for robot def."""
+"""opentrons_shared_data.robot.types: types for robot def."""
 import enum
 from typing import NewType, List, Dict, Any
 from typing_extensions import Literal, TypedDict, NotRequired

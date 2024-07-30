@@ -7,7 +7,7 @@ from decoy import Decoy
 from sqlalchemy.engine import Engine
 from unittest import mock
 
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons_shared_data.errors.codes import ErrorCodes
 
 from robot_server.protocols.protocol_store import ProtocolNotFoundError
@@ -151,6 +151,11 @@ def run_time_parameters() -> List[pe_types.RunTimeParameter]:
             ],
             default="cooler choice",
             value="coolest choice",
+        ),
+        pe_types.CSVParameter(
+            displayName="Display Name 4",
+            variableName="variable_name_4",
+            description="a csv parameter without file id",
         ),
     ]
 

@@ -21,7 +21,7 @@ from opentrons import types as top_types
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.hardware_control.types import Axis
 from opentrons.hardware_control.util import ot2_axis_to_string
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.types import RobotType
 from opentrons_shared_data.errors.exceptions import (
     APIRemoved,
     IncorrectAPIVersion,

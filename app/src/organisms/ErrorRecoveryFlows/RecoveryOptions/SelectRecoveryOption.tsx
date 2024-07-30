@@ -51,6 +51,7 @@ export function SelectRecoveryOptionHome({
   tipStatusUtils,
   currentRecoveryOptionUtils,
   getRecoveryOptionCopy,
+  analytics,
   ...rest
 }: RecoveryContentProps): JSX.Element | null {
   const { t } = useTranslation('error_recovery')
@@ -68,6 +69,7 @@ export function SelectRecoveryOptionHome({
     <RecoveryODDOneDesktopTwoColumnContentWrapper
       footerDetails={{
         primaryBtnOnClick: () => {
+          analytics.reportActionSelectedEvent(selectedRoute)
           setSelectedRecoveryOption(selectedRoute)
           void proceedToRouteAndStep(selectedRoute as RecoveryRoute)
         },
@@ -148,6 +150,7 @@ export function DesktopRecoveryOptions({
 }: RecoveryOptionsProps): JSX.Element {
   return (
     <RecoveryRadioGroup
+      css={RADIO_GAP}
       onChange={e => {
         setSelectedRoute(e.currentTarget.value)
       }}
@@ -221,3 +224,7 @@ export const GENERAL_ERROR_OPTIONS: RecoveryRoute[] = [
   RECOVERY_MAP.RETRY_FAILED_COMMAND.ROUTE,
   RECOVERY_MAP.CANCEL_RUN.ROUTE,
 ]
+
+const RADIO_GAP = `
+  gap: ${SPACING.spacing4};
+`

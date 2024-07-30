@@ -23,7 +23,7 @@ import {
 } from '@opentrons/components'
 // import { NeedHelpLink } from '../CalibrationPanels'
 import { JogControls } from '../../molecules/JogControls'
-import { SmallButton } from '../../atoms/buttons'
+import { SmallButton, TextOnlyButton } from '../../atoms/buttons'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 
@@ -46,67 +46,76 @@ type ConfirmPositionProps = DropTipWizardContainerProps & {
 }
 
 const ConfirmPosition = (props: ConfirmPositionProps): JSX.Element | null => {
-  const { handlePipetteAction, handleGoBack, isOnDevice, currentStep } = props
+  const {
+    handlePipetteAction,
+    handleGoBack,
+    isOnDevice,
+    currentStep,
+    issuedCommandsType,
+  } = props
   const { i18n, t } = useTranslation(['drop_tip_wizard', 'shared'])
   const flowTitle = t('drop_tips')
 
   if (isOnDevice) {
     return (
-      <>
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
-          <Flex
-            gridGap={SPACING.spacing24}
-            justifyContent={JUSTIFY_CENTER}
-            alignItems={ALIGN_CENTER}
-            textAlign={TEXT_ALIGN_CENTER}
-            flexDirection={DIRECTION_COLUMN}
-            width="100%"
-            height="20.25rem"
-            padding={SPACING.spacing40}
-          >
-            <Flex gridGap={SPACING.spacing24}>
-              <Icon
-                name="ot-alert"
-                size="3.75rem"
-                color={COLORS.yellow50}
-                aria-label="ot-alert"
-              />
-            </Flex>
-            <LegacyStyledText
-              fontSize={TYPOGRAPHY.fontSize32}
-              fontWeight={TYPOGRAPHY.fontWeightBold}
-            >
-              {currentStep === POSITION_AND_BLOWOUT
-                ? t('confirm_blowout_location', { flow: flowTitle })
-                : t('confirm_drop_tip_location', { flow: flowTitle })}
-            </LegacyStyledText>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={issuedCommandsType === 'setup' ? SPACING.spacing32 : null}
+        padding={issuedCommandsType === 'fixit' ? SPACING.spacing32 : null}
+      >
+        <Flex
+          gridGap={SPACING.spacing24}
+          justifyContent={JUSTIFY_CENTER}
+          alignItems={ALIGN_CENTER}
+          textAlign={TEXT_ALIGN_CENTER}
+          flexDirection={DIRECTION_COLUMN}
+          width="100%"
+          height="20.25rem"
+          padding={SPACING.spacing40}
+        >
+          <Flex gridGap={SPACING.spacing24}>
+            <Icon
+              name="ot-alert"
+              size="3.75rem"
+              color={COLORS.yellow50}
+              aria-label="ot-alert"
+            />
           </Flex>
-          <Flex width="100%" justifyContent={JUSTIFY_SPACE_BETWEEN}>
-            <Flex width="100%">
-              <SmallButton
-                buttonType="tertiaryLowLight"
-                buttonText={t('shared:go_back')}
-                onClick={handleGoBack}
-              />
-            </Flex>
-            <Flex width="100%" justifyContent={JUSTIFY_END}>
-              <SmallButton
-                buttonText={
-                  currentStep === POSITION_AND_BLOWOUT
-                    ? i18n.format(t('blowout_liquid'), 'capitalize')
-                    : i18n.format(t('drop_tips'), 'capitalize')
-                }
-                onClick={handlePipetteAction}
-              />
-            </Flex>
+          <LegacyStyledText
+            fontSize={TYPOGRAPHY.fontSize32}
+            fontWeight={TYPOGRAPHY.fontWeightBold}
+          >
+            {currentStep === POSITION_AND_BLOWOUT
+              ? t('confirm_blowout_location', { flow: flowTitle })
+              : t('confirm_drop_tip_location', { flow: flowTitle })}
+          </LegacyStyledText>
+        </Flex>
+        <Flex width="100%" justifyContent={JUSTIFY_SPACE_BETWEEN}>
+          <Flex width="100%">
+            <SmallButton
+              buttonType="tertiaryLowLight"
+              buttonText={t('shared:go_back')}
+              onClick={handleGoBack}
+            />
+          </Flex>
+          <Flex width="100%" justifyContent={JUSTIFY_END}>
+            <SmallButton
+              buttonText={
+                currentStep === POSITION_AND_BLOWOUT
+                  ? i18n.format(t('blowout_liquid'), 'capitalize')
+                  : i18n.format(t('drop_tips'), 'capitalize')
+              }
+              onClick={handlePipetteAction}
+            />
           </Flex>
         </Flex>
-      </>
+      </Flex>
     )
   } else {
     return (
       <SimpleWizardBody
         iconColor={COLORS.yellow50}
+        marginTop={SPACING.spacing32}
         header={
           currentStep === POSITION_AND_BLOWOUT
             ? t('confirm_blowout_location', { flow: flowTitle })
@@ -117,18 +126,28 @@ const ConfirmPosition = (props: ConfirmPositionProps): JSX.Element | null => {
         <Flex
           width="100%"
           marginTop={SPACING.spacing32}
-          justifyContent={JUSTIFY_FLEX_END}
-          alignItems={ALIGN_CENTER}
           paddingLeft={SPACING.spacing32}
         >
           {/* <NeedHelpLink href={NEED_HELP_URL} /> */}
-          <Flex gridGap={SPACING.spacing8}>
-            <SecondaryButton
-              onClick={handleGoBack}
-              marginRight={SPACING.spacing4}
-            >
-              {t('shared:go_back')}
-            </SecondaryButton>
+          <Flex
+            gridGap={SPACING.spacing8}
+            justifyContent={
+              issuedCommandsType === 'setup'
+                ? JUSTIFY_FLEX_END
+                : JUSTIFY_SPACE_BETWEEN
+            }
+            width="100%"
+          >
+            {issuedCommandsType === 'setup' ? (
+              <SecondaryButton onClick={handleGoBack}>
+                {t('shared:go_back')}
+              </SecondaryButton>
+            ) : (
+              <TextOnlyButton
+                onClick={handleGoBack}
+                buttonText={t('shared:go_back')}
+              />
+            )}
             <PrimaryButton onClick={handlePipetteAction}>
               {currentStep === POSITION_AND_BLOWOUT
                 ? i18n.format(t('blowout_liquid'), 'capitalize')
@@ -158,6 +177,7 @@ export const JogToPosition = (
     body,
     currentStep,
     isOnDevice,
+    issuedCommandsType,
   } = props
   const { i18n, t } = useTranslation(['drop_tip_wizard', 'shared'])
   const [
@@ -204,6 +224,7 @@ export const JogToPosition = (
         flexDirection={DIRECTION_COLUMN}
         height="100%"
         gridGap={SPACING.spacing32}
+        padding={issuedCommandsType === 'fixit' ? SPACING.spacing32 : null}
       >
         <JogControls jog={handleJog} isOnDevice={true} />
         <Flex width="100%" justifyContent={JUSTIFY_SPACE_BETWEEN}>
@@ -231,7 +252,8 @@ export const JogToPosition = (
         flexDirection={DIRECTION_COLUMN}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         padding={SPACING.spacing32}
-        minHeight="29.5rem"
+        gridGap={issuedCommandsType === 'fixit' ? SPACING.spacing24 : null}
+        height="100%"
       >
         <Flex gridGap={SPACING.spacing24}>
           <Flex
@@ -246,34 +268,44 @@ export const JogToPosition = (
             <LegacyStyledText as="p">{body}</LegacyStyledText>
           </Flex>
           {/* no animations */}
-          <Flex
-            flex="1"
-            alignItems={ALIGN_CENTER}
-            gridGap={SPACING.spacing20}
-          ></Flex>
+          {issuedCommandsType === 'setup' ? (
+            <Flex
+              flex="1"
+              alignItems={ALIGN_CENTER}
+              gridGap={SPACING.spacing20}
+            />
+          ) : null}
         </Flex>
-        <>
-          <JogControls jog={handleJog} />
-          <Flex
-            width="100%"
-            marginTop={SPACING.spacing32}
-            justifyContent={JUSTIFY_FLEX_END}
+        <JogControls jog={handleJog} />
+        <Flex
+          width="100%"
+          marginTop={issuedCommandsType === 'setup' ? SPACING.spacing32 : null}
+          gridGap={SPACING.spacing8}
+          justifyContent={
+            issuedCommandsType === 'setup'
+              ? JUSTIFY_FLEX_END
+              : JUSTIFY_SPACE_BETWEEN
+          }
+        >
+          {/* <NeedHelpLink href={NEED_HELP_URL} /> */}
+          {issuedCommandsType === 'setup' ? (
+            <SecondaryButton onClick={onGoBack}>
+              {t('shared:go_back')}
+            </SecondaryButton>
+          ) : (
+            <TextOnlyButton
+              onClick={onGoBack}
+              buttonText={t('shared:go_back')}
+            />
+          )}
+          <PrimaryButton
+            onClick={() => {
+              setShowPositionConfirmation(true)
+            }}
           >
-            {/* <NeedHelpLink href={NEED_HELP_URL} /> */}
-            <Flex gridGap={SPACING.spacing8}>
-              <SecondaryButton onClick={onGoBack}>
-                {t('shared:go_back')}
-              </SecondaryButton>
-              <PrimaryButton
-                onClick={() => {
-                  setShowPositionConfirmation(true)
-                }}
-              >
-                {t('shared:confirm_position')}
-              </PrimaryButton>
-            </Flex>
-          </Flex>
-        </>
+            {t('shared:confirm_position')}
+          </PrimaryButton>
+        </Flex>
       </Flex>
     )
   }

@@ -145,3 +145,8 @@ export const getOnDeviceDisplaySettings: (
     unfinishedUnboxingFlowRoute: '/welcome',
   }
 })
+
+export const getUserId: (state: State) => string = createSelector(
+  getConfig,
+  config => config?.userInfo.userId ?? ''
+)

@@ -6,7 +6,6 @@ import {
   ALIGN_CENTER,
   ALIGN_FLEX_END,
   Btn,
-  COLORS,
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
@@ -20,7 +19,7 @@ import {
 } from '@opentrons/components'
 import { getDeckDefFromRobotType } from '@opentrons/shared-data'
 
-import { SmallButton } from '../../atoms/buttons'
+import { SmallButton, TextOnlyButton } from '../../atoms/buttons'
 import { TwoColumn, DeckMapContent } from '../../molecules/InterventionModal'
 
 import type {
@@ -59,6 +58,7 @@ export const ChooseLocation = (
     body,
     robotType,
     moveToAddressableArea,
+    issuedCommandsType,
   } = props
   const { i18n, t } = useTranslation(['drop_tip_wizard', 'shared'])
   const [
@@ -79,7 +79,10 @@ export const ChooseLocation = (
     }
   }
   return (
-    <Flex css={CONTAINER_STYLE}>
+    <Flex
+      css={CONTAINER_STYLE}
+      height={issuedCommandsType === 'fixit' ? '100%' : '24.625rem'}
+    >
       <TwoColumn>
         <Flex flexDirection={DIRECTION_COLUMN} flex="1" gap={SPACING.spacing16}>
           <Title>{title}</Title>
@@ -102,9 +105,10 @@ export const ChooseLocation = (
             handleGoBack()
           }}
         >
-          <LegacyStyledText css={GO_BACK_BUTTON_STYLE}>
-            {t('shared:go_back')}
-          </LegacyStyledText>
+          <TextOnlyButton
+            onClick={handleGoBack}
+            buttonText={t('shared:go_back')}
+          />
         </Btn>
         <PrimaryButton
           onClick={handleConfirmPosition}
@@ -130,24 +134,6 @@ export const ChooseLocation = (
   )
 }
 
-const GO_BACK_BUTTON_STYLE = css`
-  ${TYPOGRAPHY.pSemiBold};
-  color: ${COLORS.grey50};
-
-  &:hover {
-    opacity: 70%;
-  }
-
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
-    font-size: ${TYPOGRAPHY.fontSize22};
-    padding-left: 0;
-    &:hover {
-      opacity: 100%;
-    }
-  }
-`
-
 const ALIGN_BUTTONS = css`
   align-items: ${ALIGN_FLEX_END};
 
@@ -160,7 +146,6 @@ const CONTAINER_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
   justify-content: ${JUSTIFY_SPACE_BETWEEN};
   padding: ${SPACING.spacing32};
-  height: 24.625rem;
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     justify-content: ${JUSTIFY_FLEX_START};
     gap: ${SPACING.spacing32};

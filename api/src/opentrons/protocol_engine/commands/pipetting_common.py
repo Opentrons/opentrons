@@ -2,7 +2,7 @@
 from dataclasses import dataclass
 from opentrons_shared_data.errors import ErrorCodes
 from pydantic import BaseModel, Field
-from typing import Literal, Optional
+from typing import Literal, Optional, Tuple, TypedDict
 
 from opentrons.protocol_engine.errors.error_occurrence import ErrorOccurrence
 
@@ -123,12 +123,20 @@ class DestinationPositionResult(BaseModel):
     )
 
 
+class ErrorLocationInfo(TypedDict):
+    """Holds a retry location for in-place error recovery."""
+
+    retryLocation: Tuple[float, float, float]
+
+
 class OverpressureError(ErrorOccurrence):
     """Returned when sensors detect an overpressure error while moving liquid.
 
-    The pipette plunger motion is stopped at the point of the error. The next thing to
-    move the plunger must be a `home` or `blowout` command; commands like `aspirate`
-    will return an error.
+    The pipette plunger motion is stopped at the point of the error.
+
+    The next thing to move the plunger must account for the robot not having a valid
+    estimate of its position. It should be a `home`, `unsafe/updatePositionEstimators`,
+    `unsafe/dropTipInPlace`, or `unsafe/blowOutInPlace`.
     """
 
     isDefined: bool = True
@@ -137,6 +145,8 @@ class OverpressureError(ErrorOccurrence):
 
     errorCode: str = ErrorCodes.PIPETTE_OVERPRESSURE.value.code
     detail: str = ErrorCodes.PIPETTE_OVERPRESSURE.value.detail
+
+    errorInfo: ErrorLocationInfo
 
 
 @dataclass(frozen=True)

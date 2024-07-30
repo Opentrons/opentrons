@@ -86,7 +86,7 @@ describe('useRecoveryToasts', () => {
 
     result.current.makeSuccessToast()
     expect(mockMakeToast).toHaveBeenCalledWith(
-      TEST_COMMAND,
+      'Retrying step 1 succeeded.',
       'success',
       expect.objectContaining({
         closeButton: true,
@@ -114,6 +114,32 @@ describe('useRecoveryToasts', () => {
         disableTimeout: true,
         displayType: 'odd',
         heading: undefined,
+      })
+    )
+  })
+
+  it('should use recoveryToastText when desktopFullCommandText is null', () => {
+    vi.mocked(useCommandTextString).mockReturnValue({
+      commandText: '',
+      stepTexts: undefined,
+    })
+
+    const { result } = renderHook(() =>
+      useRecoveryToasts({
+        ...DEFAULT_PROPS,
+        commandTextData: { commands: [] } as any,
+      })
+    )
+
+    result.current.makeSuccessToast()
+    expect(mockMakeToast).toHaveBeenCalledWith(
+      expect.any(String),
+      'success',
+      expect.objectContaining({
+        closeButton: true,
+        disableTimeout: true,
+        displayType: 'desktop',
+        heading: expect.any(String),
       })
     )
   })
@@ -177,12 +203,29 @@ describe('useRecoveryFullCommandText', () => {
     const { result } = renderHook(() =>
       useRecoveryFullCommandText({
         robotType: FLEX_ROBOT_TYPE,
-        stepNumber: 1,
+        stepNumber: 0,
         commandTextData: { commands: [TEST_COMMAND] } as any,
       })
     )
 
     expect(result.current).toBe(TEST_COMMAND)
+  })
+
+  it('should return null when relevantCmd is null', () => {
+    vi.mocked(useCommandTextString).mockReturnValue({
+      commandText: '',
+      stepTexts: undefined,
+    })
+
+    const { result } = renderHook(() =>
+      useRecoveryFullCommandText({
+        robotType: FLEX_ROBOT_TYPE,
+        stepNumber: 1,
+        commandTextData: { commands: [] } as any,
+      })
+    )
+
+    expect(result.current).toBeNull()
   })
 
   it('should return stepNumber if it is a string', () => {
@@ -206,7 +249,7 @@ describe('useRecoveryFullCommandText', () => {
     const { result } = renderHook(() =>
       useRecoveryFullCommandText({
         robotType: FLEX_ROBOT_TYPE,
-        stepNumber: 1,
+        stepNumber: 0,
         commandTextData: {
           commands: [TC_COMMAND],
         } as any,

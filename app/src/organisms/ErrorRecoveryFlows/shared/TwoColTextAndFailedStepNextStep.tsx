@@ -46,9 +46,9 @@ export function TwoColTextAndFailedStepNextStep(
         <Flex
           flexDirection={DIRECTION_COLUMN}
           css={css`
-            gap=${SPACING.spacing16};
+            gap: ${SPACING.spacing16};
             @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-            gap=${SPACING.spacing8}
+              gap: ${SPACING.spacing8};
             }
           `}
         >

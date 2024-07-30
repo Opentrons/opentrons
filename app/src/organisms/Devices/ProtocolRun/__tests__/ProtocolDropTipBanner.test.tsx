@@ -24,8 +24,10 @@ describe('Module Update Banner', () => {
 
   it('displays appropriate banner text', () => {
     render(props)
-    screen.getByText('Tips may be attached.')
-    screen.queryByText('You may want to remove tips')
+    screen.getByText('Remove any attached tips')
+    screen.queryByText(
+      /Homing the .* pipette with liquid in the tips may damage it\. You must remove all tips before using the pipette again\./
+    )
     screen.getByText('Remove tips')
   })
 

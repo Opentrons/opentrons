@@ -5,6 +5,10 @@
 const { execSync } = require('node:child_process')
 
 exports.default = async configuration => {
+  const { WINDOWS_SIGN } = process.env
+  if (WINDOWS_SIGN !== 'true') {
+    return
+  }
   const signCmd = `smctl sign --keypair-alias="${String(
     process.env.SM_KEYPAIR_ALIAS
   )}" --input "${String(configuration.path)}" --certificate="${String(

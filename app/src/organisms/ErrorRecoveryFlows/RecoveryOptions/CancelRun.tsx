@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
@@ -10,10 +9,13 @@ import {
   Icon,
   SPACING,
   StyledText,
-  RESPONSIVENESS,
 } from '@opentrons/components'
 
-import { RECOVERY_MAP } from '../constants'
+import {
+  FLEX_WIDTH_ALERT_INFO_STYLE,
+  ICON_SIZE_ALERT_INFO_STYLE,
+  RECOVERY_MAP,
+} from '../constants'
 import {
   RecoveryFooterButtons,
   RecoverySingleColumnContentWrapper,
@@ -68,13 +70,14 @@ function CancelRunConfirmation({
       <Flex
         flexDirection={DIRECTION_COLUMN}
         alignItems={ALIGN_CENTER}
-        gridGap={SPACING.spacing24}
+        gridGap={SPACING.spacing16}
+        padding={`${SPACING.spacing32} ${SPACING.spacing16}`}
         height="100%"
-        css={FLEX_WIDTH}
+        css={FLEX_WIDTH_ALERT_INFO_STYLE}
       >
         <Icon
           name="ot-alert"
-          css={ICON_SIZE}
+          css={ICON_SIZE_ALERT_INFO_STYLE}
           marginTop={SPACING.spacing24}
           color={COLORS.red50}
         />
@@ -84,7 +87,7 @@ function CancelRunConfirmation({
         <StyledText
           oddStyle="level4HeaderRegular"
           desktopStyle="bodyDefaultRegular"
-          color={COLORS.grey60}
+          color={COLORS.black90}
           textAlign={ALIGN_CENTER}
         >
           {t('if_tips_are_attached')}
@@ -146,19 +149,3 @@ export function useOnCancelRun({
 
   return { showBtnLoadingState, handleCancelRunClick }
 }
-
-const FLEX_WIDTH = css`
-  width: 41.625rem;
-  @media (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
-    width: 53rem;
-  }
-`
-
-const ICON_SIZE = css`
-  width: ${SPACING.spacing40};
-  height: ${SPACING.spacing40};
-  @media (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
-    width: ${SPACING.spacing60};
-    height: ${SPACING.spacing60};
-  }
-`

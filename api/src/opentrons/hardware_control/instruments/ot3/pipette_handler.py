@@ -12,7 +12,7 @@ from typing import (
 )
 from typing_extensions import Final
 import numpy
-from opentrons_shared_data.pipette.dev_types import UlPerMmAction
+from opentrons_shared_data.pipette.types import UlPerMmAction
 
 from opentrons_shared_data.errors.exceptions import (
     CommandPreconditionViolated,

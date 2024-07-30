@@ -2,6 +2,7 @@ from __future__ import annotations
 import logging
 from contextlib import ExitStack
 from typing import Any, List, Optional, Sequence, Union, cast, Dict
+from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
 from opentrons_shared_data.errors.exceptions import (
     CommandPreconditionViolated,
     CommandParameterLimitViolated,
@@ -264,6 +265,7 @@ class InstrumentContext(publisher.CommandPublisher):
             self.api_version >= APIVersion(2, 20)
             and well is not None
             and self.liquid_presence_detection
+            and self._96_tip_config_valid()
         ):
             self.require_liquid_presence(well=well)
             self.prepare_to_aspirate()
@@ -1874,6 +1876,19 @@ class InstrumentContext(publisher.CommandPublisher):
         else:
             return self._protocol_core.get_last_location()
 
+    def _96_tip_config_valid(self) -> bool:
+        n_map = self._core.get_nozzle_map()
+        channels = self._core.get_active_channels()
+        if channels == 96:
+            if (
+                n_map.back_left != n_map.full_instrument_back_left
+                and n_map.front_right != n_map.full_instrument_front_right
+            ):
+                raise TipNotAttachedError(
+                    "Either the front right or the back left nozzle must have a tip attached to do LLD."
+                )
+        return True
+
     def __repr__(self) -> str:
         return "<{}: {} in {}>".format(
             self.__class__.__name__,
@@ -2110,6 +2125,7 @@ class InstrumentContext(publisher.CommandPublisher):
         :returns: A boolean.
         """
         loc = well.top()
+        self._96_tip_config_valid()
         return self._core.detect_liquid_presence(well._core, loc)
 
     @requires_version(2, 20)
@@ -2119,6 +2135,7 @@ class InstrumentContext(publisher.CommandPublisher):
         :returns: None.
         """
         loc = well.top()
+        self._96_tip_config_valid()
         self._core.liquid_probe_with_recovery(well._core, loc)
 
     @requires_version(2, 20)
@@ -2131,6 +2148,8 @@ class InstrumentContext(publisher.CommandPublisher):
 
         This is intended for Opentrons internal use only and is not a guaranteed API.
         """
+
         loc = well.top()
+        self._96_tip_config_valid()
         height = self._core.liquid_probe_without_recovery(well._core, loc)
         return height

@@ -6,7 +6,7 @@ from server_utils.fastapi_utils.app_state import (
     get_app_state,
 )
 from ..notification_client import NotificationClient, get_notification_client
-from ..topics import Topics
+from .. import topics
 
 
 class MaintenanceRunsPublisher:
@@ -21,7 +21,7 @@ class MaintenanceRunsPublisher:
     ) -> None:
         """Publishes the equivalent of GET /maintenance_run/current_run"""
         await self._client.publish_advise_refetch_async(
-            topic=Topics.MAINTENANCE_RUNS_CURRENT_RUN
+            topic=topics.MAINTENANCE_RUNS_CURRENT_RUN
         )
 
 

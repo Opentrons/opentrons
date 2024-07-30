@@ -16,7 +16,7 @@ from robot_server.persistence.fastapi_dependencies import (
 )
 from robot_server.service.legacy.models import V1BasicResponse
 
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.types import RobotType
 
 from .models import Health, HealthLinks
 
