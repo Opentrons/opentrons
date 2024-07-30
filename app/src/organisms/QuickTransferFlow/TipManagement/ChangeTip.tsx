@@ -11,6 +11,7 @@ import {
 import { getTopPortalEl } from '../../../App/portal'
 import { RadioButton } from '../../../atoms/buttons'
 import { ChildNavigation } from '../../ChildNavigation'
+import { getSelectedWellCount } from '../utils'
 
 import type {
   ChangeTipOptions,
@@ -35,9 +36,13 @@ export function ChangeTip(props: ChangeTipProps): JSX.Element {
   ) {
     allowedChangeTipOptions.push('always')
   }
-  if (state.path === 'single' && state.transferType === 'distribute') {
+  if (
+    state.path === 'single' &&
+    state.transferType === 'distribute' &&
+    state.destinationWells.length <= 96
+  ) {
     allowedChangeTipOptions.push('perDest')
-  } else if (state.path === 'single') {
+  } else if (state.path === 'single' && state.sourceWells.length <= 96) {
     allowedChangeTipOptions.push('perSource')
   }
 

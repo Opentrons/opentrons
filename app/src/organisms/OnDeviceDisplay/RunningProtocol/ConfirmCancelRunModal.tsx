@@ -54,7 +54,13 @@ export function ConfirmCancelRunModal({
   const {
     dismissCurrentRun,
     isLoading: isDismissing,
-  } = useDismissCurrentRunMutation()
+  } = useDismissCurrentRunMutation({
+    onSuccess: () => {
+      if (isQuickTransfer) {
+        deleteRun(runId)
+      }
+    },
+  })
   const runStatus = useRunStatus(runId)
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name ?? ''
@@ -81,21 +87,16 @@ export function ConfirmCancelRunModal({
   React.useEffect(() => {
     if (runStatus === RUN_STATUS_STOPPED) {
       trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.CANCEL })
-      if (isQuickTransfer) {
-        deleteRun(runId)
-        if (protocolId != null) {
+      dismissCurrentRun(runId)
+      if (!isActiveRun) {
+        if (isQuickTransfer && protocolId != null) {
           history.push(`/quick-transfer/${protocolId}`)
-        } else {
+        } else if (isQuickTransfer) {
           history.push('/quick-transfer')
-        }
-      } else {
-        dismissCurrentRun(runId)
-        if (!isActiveRun) {
-          if (protocolId != null) {
-            history.push(`/protocols/${protocolId}`)
-          } else {
-            history.push(`/protocols`)
-          }
+        } else if (protocolId != null) {
+          history.push(`/protocols/${protocolId}`)
+        } else {
+          history.push(`/protocols`)
         }
       }
     }
