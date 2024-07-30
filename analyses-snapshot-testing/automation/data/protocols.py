@@ -635,6 +635,12 @@ class Protocols:
         robot="Flex",
     )
 
+    Flex_S_v2_19_P1000_96_GRIP_HS_MB_TC_TM_Smoke: Protocol = Protocol(
+        file_stem="Flex_S_v2_19_P1000_96_GRIP_HS_MB_TC_TM_Smoke",
+        file_extension="py",
+        robot="Flex",
+    )
+
     OT2_X_v2_18_None_None_duplicateRTPVariableName: Protocol = Protocol(
         file_stem="OT2_X_v2_18_None_None_duplicateRTPVariableName",
         file_extension="py",
@@ -661,6 +667,12 @@ class Protocols:
 
     OT2_S_v2_18_NO_PIPETTES_GoldenRTP_OT2: Protocol = Protocol(
         file_stem="OT2_S_v2_18_NO_PIPETTES_GoldenRTP_OT2",
+        file_extension="py",
+        robot="OT2",
+    )
+
+    OT2_S_v2_19_P300M_P20S_HS_TC_TM_SmokeTestV3: Protocol = Protocol(
+        file_stem="OT2_S_v2_19_P300M_P20S_HS_TC_TM_SmokeTestV3",
         file_extension="py",
         robot="OT2",
     )

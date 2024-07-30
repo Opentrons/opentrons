@@ -44,6 +44,11 @@ def add_parameters(parameters: ParameterContext):
         default="flex_1channel_50",
         description="What pipette to use during the protocol.",
     )
+    parameters.add_csv_file(
+        display_name="Liquid handling CSV file",
+        variable_name="liq_handling_csv_file",
+        description="A CSV file that contains wells to use for pipetting",
+    )
 
 
 def run(protocol: ProtocolContext) -> None:

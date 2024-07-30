@@ -7,7 +7,11 @@ from opentrons_shared_data.robot.types import RobotType
 import opentrons.protocol_runner.create_simulating_orchestrator as simulating_runner
 from opentrons.protocol_engine.errors import ErrorOccurrence
 from opentrons.util.performance_helpers import TrackingFunctions
-from opentrons.protocol_engine.types import RunTimeParamValuesType, RunTimeParameter
+from opentrons.protocol_engine.types import (
+    PrimitiveRunTimeParamValuesType,
+    RunTimeParameter,
+    CSVRunTimeParamFilesType,
+)
 import opentrons.util.helpers as datetime_helper
 from opentrons.protocol_runner import (
     RunOrchestrator,
@@ -34,37 +38,51 @@ class ProtocolAnalyzer:
         """Initialize the analyzer and its dependencies."""
         self._analysis_store = analysis_store
         self._protocol_resource = protocol_resource
+        self._orchestrator: Optional[RunOrchestrator] = None
 
-    async def load_runner(
+    @property
+    def protocol_resource(self) -> ProtocolResource:
+        """Return the protocol resource."""
+        return self._protocol_resource
+
+    def get_verified_run_time_parameters(self) -> List[RunTimeParameter]:
+        """Get the validated RTPs with values set by the client."""
+        assert self._orchestrator is not None
+        return self._orchestrator.get_run_time_parameters()
+
+    async def load_orchestrator(
         self,
-        run_time_param_values: Optional[RunTimeParamValuesType],
-    ) -> RunOrchestrator:
+        run_time_param_values: Optional[PrimitiveRunTimeParamValuesType],
+        run_time_param_files: Optional[CSVRunTimeParamFilesType],
+    ) -> None:
         """Load runner with the protocol and run time parameter values.
 
         Returns: The RunOrchestrator instance.
         """
-        orchestrator = await simulating_runner.create_simulating_orchestrator(
+        self._orchestrator = await simulating_runner.create_simulating_orchestrator(
             robot_type=self._protocol_resource.source.robot_type,
             protocol_config=self._protocol_resource.source.config,
         )
-        await orchestrator.load(
+        await self._orchestrator.load(
             protocol_source=self._protocol_resource.source,
             parse_mode=ParseMode.NORMAL,
             run_time_param_values=run_time_param_values,
+            run_time_param_files=run_time_param_files,
         )
-        return orchestrator
 
     @TrackingFunctions.track_analysis
     async def analyze(
         self,
-        orchestrator: RunOrchestrator,
         analysis_id: str,
-        run_time_parameters: Optional[List[RunTimeParameter]] = None,
     ) -> None:
-        """Analyze a given protocol, storing the analysis when complete."""
+        """Analyze a given protocol, storing the analysis when complete.
+
+        This method should only be called once the run orchestrator is loaded.
+        """
         assert self._protocol_resource is not None
+        assert self._orchestrator is not None
         try:
-            result = await orchestrator.run(
+            result = await self._orchestrator.run(
                 deck_configuration=[],
             )
         except BaseException as error:
@@ -72,7 +90,7 @@ class ProtocolAnalyzer:
                 analysis_id=analysis_id,
                 protocol_robot_type=self._protocol_resource.source.robot_type,
                 error=error,
-                run_time_parameters=run_time_parameters or [],
+                run_time_parameters=self._orchestrator.get_run_time_parameters(),
             )
             return
 

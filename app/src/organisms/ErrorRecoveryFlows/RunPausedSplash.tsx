@@ -22,7 +22,6 @@ import {
   PrimaryButton,
   SecondaryButton,
 } from '@opentrons/components'
-import { useHost } from '@opentrons/react-api-client'
 
 import { useErrorName } from './hooks'
 import { getErrorKind } from './utils'
@@ -36,7 +35,11 @@ import {
 
 import type { RobotType } from '@opentrons/shared-data'
 import type { ErrorRecoveryFlowsProps } from '.'
-import type { ERUtilsResults, UseRecoveryAnalyticsResult } from './hooks'
+import type {
+  ERUtilsResults,
+  UseRecoveryAnalyticsResult,
+  UseRecoveryTakeoverResult,
+} from './hooks'
 
 export function useRunPausedSplash(
   isOnDevice: boolean,
@@ -44,7 +47,11 @@ export function useRunPausedSplash(
 ): boolean {
   // Don't show the splash when desktop ER wizard is active,
   // but always show it on the ODD (with or without the wizard rendered above it).
-  return !(!isOnDevice && showERWizard)
+  if (isOnDevice) {
+    return true
+  } else {
+    return !showERWizard
+  }
 }
 
 type RunPausedSplashProps = ERUtilsResults & {
@@ -52,7 +59,8 @@ type RunPausedSplashProps = ERUtilsResults & {
   failedCommand: ErrorRecoveryFlowsProps['failedCommand']
   protocolAnalysis: ErrorRecoveryFlowsProps['protocolAnalysis']
   robotType: RobotType
-  toggleERWiz: (launchER: boolean) => Promise<void>
+  robotName: string
+  toggleERWizAsActiveUser: UseRecoveryTakeoverResult['toggleERWizAsActiveUser']
   analytics: UseRecoveryAnalyticsResult
 }
 export function RunPausedSplash(
@@ -60,15 +68,15 @@ export function RunPausedSplash(
 ): JSX.Element | null {
   const {
     isOnDevice,
-    toggleERWiz,
+    toggleERWizAsActiveUser,
     routeUpdateActions,
     failedCommand,
     analytics,
+    robotName,
   } = props
   const { t } = useTranslation('error_recovery')
   const errorKind = getErrorKind(failedCommand)
   const title = useErrorName(errorKind)
-  const host = useHost()
 
   const { proceedToRouteAndStep } = routeUpdateActions
   const { reportInitialActionEvent } = analytics
@@ -76,21 +84,21 @@ export function RunPausedSplash(
   const buildTitleHeadingDesktop = (): JSX.Element => {
     return (
       <StyledText desktopStyle="bodyLargeSemiBold">
-        {t('error_on_robot', { robot: host?.robotName ?? '' })}
+        {t('error_on_robot', { robot: robotName })}
       </StyledText>
     )
   }
 
   // Do not launch error recovery, but do utilize the wizard's cancel route.
   const onCancelClick = (): Promise<void> => {
-    return toggleERWiz(false).then(() => {
+    return toggleERWizAsActiveUser(true, false).then(() => {
       reportInitialActionEvent('cancel-run')
       void proceedToRouteAndStep(RECOVERY_MAP.CANCEL_RUN.ROUTE)
     })
   }
 
   const onLaunchERClick = (): Promise<void> => {
-    return toggleERWiz(true).then(() => {
+    return toggleERWizAsActiveUser(true, true).then(() => {
       reportInitialActionEvent('launch-recovery')
     })
   }

@@ -143,7 +143,7 @@ async def _delete_all_runs(robot_client: RobotClient) -> None:
 
 
 async def _delete_all_protocols(robot_client: RobotClient) -> None:
-    """Delete all protocols on the robot server"""
+    """Delete all protocols on the robot server."""
     response = await robot_client.get_protocols()
     protocol_ids = [p["id"] for p in response.json()["data"]]
     for protocol_id in protocol_ids:
