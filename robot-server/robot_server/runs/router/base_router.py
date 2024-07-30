@@ -385,7 +385,7 @@ async def update_run(
 async def set_run_policies(
     runId: str,
     request_body: RequestModel[ErrorRecoveryPolicies],
-    run_data_manager: RunDataManager = Depends(get_run_data_manager),
+    run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
 ) -> PydanticResponse[SimpleEmptyBody]:
     """Create run polices.
 
