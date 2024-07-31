@@ -56,7 +56,7 @@ export function ConfirmCancelRunModal({
     isLoading: isDismissing,
   } = useDismissCurrentRunMutation({
     onSuccess: () => {
-      if (isQuickTransfer) {
+      if (isQuickTransfer && !isActiveRun) {
         deleteRun(runId)
       }
     },

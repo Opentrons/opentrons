@@ -162,7 +162,15 @@ export function RunSummary(): JSX.Element {
   // TODO(jh, 07-24-24): After EXEC-504, add reportRecoveredRunResult here.
 
   const returnToQuickTransfer = (): void => {
-    deleteRun(runId)
+    if (!isRunCurrent) {
+      deleteRun(runId)
+    } else {
+      closeCurrentRun({
+        onSuccess: () => {
+          deleteRun(runId)
+        },
+      })
+    }
     navigate('/quick-transfer')
   }
 
