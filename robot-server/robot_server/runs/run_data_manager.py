@@ -57,7 +57,6 @@ def _build_run(
         )
 
     errors: List[EnumeratedError] = []
-    # TODO(tz, 7-30-24): should these error be in the full errors list as well?
     if isinstance(state_summary, BadStateSummary):
         state = StateSummary.construct(
             status=EngineStatus.STOPPED,
