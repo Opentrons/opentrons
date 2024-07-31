@@ -6,15 +6,23 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-## Opentrons Robot Software Changes in 7.4.0
+## Opentrons Robot Software Changes in 7.5.0
 
-Welcome to the v7.4.0 release of the Opentrons robot software!
+Welcome to the v7.5.0 release of the Opentrons robot software!
 
-This release adds support for the [Opentrons Flex HEPA/UV Module](https://opentrons.com/products/opentrons-flex-hepa-uv-module).
+### Hardware Support
+
+- [Opentrons Flex HEPA/UV Module](https://opentrons.com/products/opentrons-flex-hepa-uv-module)
+- Latest Flex Gripper model (serial numbers beginning `GRPV13`)
 
 ### Bug Fixes
 
 - Fixed certain string runtime parameter values being misinterpreted as an incorrect type.
+
+### Known Issue
+
+- The HEPA/UV Module's buttons may not respond properly after its safety shutoff is activated. This happens when the module is removed from the top of Flex while its lights are on. Power cycle the module to restore normal behavior. The module is safe to use even if you do not power cycle it.
+
 ---
 
 ## Opentrons Robot Software Changes in 7.3.1

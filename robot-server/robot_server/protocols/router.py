@@ -7,7 +7,10 @@ from datetime import datetime
 from pathlib import Path
 from typing import List, Optional, Union, Tuple
 
-from opentrons.protocol_engine.types import PrimitiveRunTimeParamValuesType
+from opentrons.protocol_engine.types import (
+    PrimitiveRunTimeParamValuesType,
+    CSVRunTimeParamFilesType,
+)
 from opentrons_shared_data.robot import user_facing_robot_type
 from opentrons.util.performance_helpers import TrackingFunctions
 from typing_extensions import Literal
@@ -45,6 +48,8 @@ from robot_server.service.json_api import (
     PydanticResponse,
     RequestModel,
 )
+from robot_server.data_files.models import DataFile
+
 from .analyses_manager import AnalysesManager, FailedToInitializeAnalyzer
 
 from .protocol_auto_deleter import ProtocolAutoDeleter
@@ -74,7 +79,6 @@ from .dependencies import (
     get_file_hasher,
     get_maximum_quick_transfer_protocols,
 )
-
 
 log = logging.getLogger(__name__)
 
@@ -215,13 +219,20 @@ async def create_protocol(  # noqa: C901
         " always trigger an analysis (for now).",
         alias="runTimeParameterValues",
     ),
-    protocol_kind: Optional[ProtocolKind] = Form(
-        default=None,
+    protocol_kind: ProtocolKind = Form(
+        # This default needs to be kept in sync with the function body.
+        # See todo comments.
+        default=ProtocolKind.STANDARD,
         description=(
             "Whether this is a `standard` protocol or a `quick-transfer` protocol."
             "if omitted, the protocol will be `standard` by default."
         ),
         alias="protocolKind",
+    ),
+    run_time_parameter_files: Optional[str] = Form(
+        default=None,
+        description="Param-file pairs of CSV run-time parameters defined in the protocol.",
+        alias="runTimeParameterFiles",
     ),
     protocol_directory: Path = Depends(get_protocol_directory),
     protocol_store: ProtocolStore = Depends(get_protocol_store),
@@ -247,7 +258,8 @@ async def create_protocol(  # noqa: C901
     Arguments:
         files: List of uploaded files, from form-data.
         key: Optional key for cli-side tracking
-        run_time_parameter_values: Key value pairs of run-time parameters defined in a protocol.
+        run_time_parameter_values: Key value pairs of primitive run-time parameters defined in a protocol.
+        run_time_parameter_files: Stringified dictionary of CSV parameters and their file IDs
         protocol_kind: Optional key representing the kind of protocol.
         protocol_directory: Location to store uploaded files.
         protocol_store: In-memory database of protocol resources.
@@ -267,12 +279,30 @@ async def create_protocol(  # noqa: C901
         created_at: Timestamp to attach to the new resource.
         maximum_quick_transfer_protocols: Robot setting value limiting stored quick transfers protocols.
     """
-    kind = ProtocolKind.from_string(protocol_kind) or ProtocolKind.STANDARD
-    if kind == ProtocolKind.QUICK_TRANSFER:
+    # We have to do these isinstance checks because if `runTimeParameterValues` or
+    # `protocolKind` are not specified in the request, then they get assigned a
+    # Form(default) value instead of just the default value. \(O.o)/
+    # TODO: check if we can make our own "RTP multipart-form field" Pydantic type
+    #  so we can validate the data contents and return a better error response.
+    # TODO: check if this is still necessary after converting FastAPI args to Annotated.
+    parsed_rtp_values = (
+        json.loads(run_time_parameter_values)
+        if isinstance(run_time_parameter_values, str)
+        else {}
+    )
+    parsed_rtp_files = (
+        json.loads(run_time_parameter_files)
+        if isinstance(run_time_parameter_files, str)
+        else {}
+    )
+    if not isinstance(protocol_kind, ProtocolKind):
+        protocol_kind = ProtocolKind.STANDARD
+
+    if protocol_kind == ProtocolKind.QUICK_TRANSFER:
         quick_transfer_protocols = [
             protocol
             for protocol in protocol_store.get_all()
-            if protocol.protocol_kind == ProtocolKind.QUICK_TRANSFER.value
+            if protocol.protocol_kind == ProtocolKind.QUICK_TRANSFER
         ]
         if len(quick_transfer_protocols) >= maximum_quick_transfer_protocols:
             raise HTTPException(
@@ -283,15 +313,7 @@ async def create_protocol(  # noqa: C901
         # TODO(mm, 2024-02-07): Investigate whether the filename can actually be None.
         assert file.filename is not None
     buffered_files = await file_reader_writer.read(files=files)  # type: ignore[arg-type]
-    if isinstance(run_time_parameter_values, str):
-        # We have to do this isinstance check because if `runTimeParameterValues` is
-        # not specified in the request, then it gets assigned a Form(None) value
-        # instead of just a None. \(O.o)/
-        # TODO: check if we can make our own "RTP multipart-form field" Pydantic type
-        #  so we can validate the data contents and return a better error response.
-        parsed_rtp = json.loads(run_time_parameter_values)
-    else:
-        parsed_rtp = {}
+
     content_hash = await file_hasher.hash(buffered_files)
     cached_protocol_id = protocol_store.get_id_by_hash(content_hash)
 
@@ -307,11 +329,11 @@ async def create_protocol(  # noqa: C901
                     protocol_id=cached_protocol_id,
                     analysis_id=analysis_id,
                     force_analyze=False,
-                    rtp_values=parsed_rtp,
+                    rtp_values=parsed_rtp_values,
+                    rtp_files=parsed_rtp_files,
                     protocol_resource=protocol_store.get(
                         protocol_id=cached_protocol_id
                     ),
-                    protocol_store=protocol_store,
                     analysis_store=analysis_store,
                     analyses_manager=analyses_manager,
                 )
@@ -323,7 +345,7 @@ async def create_protocol(  # noqa: C901
             data = Protocol.construct(
                 id=cached_protocol_id,
                 createdAt=resource.created_at,
-                protocolKind=ProtocolKind.from_string(resource.protocol_kind),
+                protocolKind=resource.protocol_kind,
                 protocolType=resource.source.config.protocol_type,
                 robotType=resource.source.robot_type,
                 metadata=Metadata.parse_obj(resource.source.metadata),
@@ -373,11 +395,11 @@ async def create_protocol(  # noqa: C901
         created_at=created_at,
         source=source,
         protocol_key=key,
-        protocol_kind=kind.value,
+        protocol_kind=protocol_kind,
     )
 
     protocol_deleter: ProtocolAutoDeleter = protocol_auto_deleter
-    if kind == ProtocolKind.QUICK_TRANSFER:
+    if protocol_kind == ProtocolKind.QUICK_TRANSFER:
         protocol_deleter = quick_transfer_protocol_auto_deleter
     protocol_deleter.make_room_for_new_protocol()
     protocol_store.insert(protocol_resource)
@@ -386,9 +408,9 @@ async def create_protocol(  # noqa: C901
         protocol_id=protocol_id,
         analysis_id=analysis_id,
         force_analyze=True,
-        rtp_values=parsed_rtp,
+        rtp_values=parsed_rtp_values,
+        rtp_files=parsed_rtp_files,
         protocol_resource=protocol_resource,
-        protocol_store=protocol_store,
         analysis_store=analysis_store,
         analyses_manager=analyses_manager,
     )
@@ -396,7 +418,7 @@ async def create_protocol(  # noqa: C901
     data = Protocol(
         id=protocol_id,
         createdAt=created_at,
-        protocolKind=kind,
+        protocolKind=protocol_kind,
         protocolType=source.config.protocol_type,
         robotType=source.robot_type,
         metadata=Metadata.parse_obj(source.metadata),
@@ -418,8 +440,8 @@ async def _start_new_analysis_if_necessary(
     analysis_id: str,
     force_analyze: bool,
     rtp_values: PrimitiveRunTimeParamValuesType,
+    rtp_files: CSVRunTimeParamFilesType,
     protocol_resource: ProtocolResource,
-    protocol_store: ProtocolStore,
     analysis_store: AnalysisStore,
     analyses_manager: AnalysesManager,
 ) -> Tuple[List[AnalysisSummary], bool]:
@@ -436,6 +458,7 @@ async def _start_new_analysis_if_necessary(
             analysis_id=analysis_id,
             protocol_resource=protocol_resource,
             run_time_param_values=rtp_values,
+            run_time_param_files=rtp_files,
         )
     except FailedToInitializeAnalyzer:
         analyses.append(
@@ -505,7 +528,7 @@ async def get_protocols(
         Protocol.construct(
             id=r.protocol_id,
             createdAt=r.created_at,
-            protocolKind=ProtocolKind.from_string(r.protocol_kind),
+            protocolKind=r.protocol_kind,
             protocolType=r.source.config.protocol_type,
             robotType=r.source.robot_type,
             metadata=Metadata.parse_obj(r.source.metadata),
@@ -586,7 +609,7 @@ async def get_protocol_by_id(
     data = Protocol.construct(
         id=protocolId,
         createdAt=resource.created_at,
-        protocolKind=ProtocolKind.from_string(resource.protocol_kind),
+        protocolKind=resource.protocol_kind,
         protocolType=resource.source.config.protocol_type,
         robotType=resource.source.robot_type,
         metadata=Metadata.parse_obj(resource.source.metadata),
@@ -676,7 +699,7 @@ async def create_protocol_analysis(
     """Start a new analysis for the given existing protocol.
 
     Starts a new analysis for the protocol along with the provided run-time parameter
-    values (if any), and appends it to the existing analyses.
+    values (if any) and file IDs (if any), and appends it to the existing analyses.
 
     If the last analysis in the existing analyses used the same RTP values, then a new
     analysis is not created.
@@ -699,8 +722,8 @@ async def create_protocol_analysis(
             analysis_id=analysis_id,
             force_analyze=request_body.data.forceReAnalyze if request_body else False,
             rtp_values=request_body.data.runTimeParameterValues if request_body else {},
+            rtp_files=request_body.data.runTimeParameterFiles if request_body else {},
             protocol_resource=protocol_store.get(protocol_id=protocolId),
-            protocol_store=protocol_store,
             analysis_store=analysis_store,
             analyses_manager=analyses_manager,
         )
@@ -852,3 +875,43 @@ async def get_protocol_analysis_as_document(
         ) from error
 
     return PlainTextResponse(content=analysis, media_type="application/json")
+
+
+@PydanticResponse.wrap_route(
+    protocols_router.get,
+    path="/protocols/{protocolId}/dataFiles",
+    summary="Get all the data files used with the specified protocol.",
+    description=(
+        "Returns a list of all data files used in analyses and runs associated with"
+        " the specified protocol."
+    ),
+    responses={
+        status.HTTP_200_OK: {"model": SimpleMultiBody[DataFile]},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorBody[ProtocolNotFound]},
+    },
+)
+async def get_protocol_data_files(
+    protocolId: str,
+    protocol_store: ProtocolStore = Depends(get_protocol_store),
+) -> PydanticResponse[SimpleMultiBody[DataFile]]:
+    """Get the list of all data files associated with a protocol.
+
+    The list includes all files used in analysis and runs stored on the robot
+    that are associated with the protocol.
+
+    Arguments:
+        protocolId: ID of the protocol whose files are to be fetched.
+        protocol_store: Database of protocol resources.
+    """
+    if not protocol_store.has(protocolId):
+        raise ProtocolNotFound(detail=f"Protocol {protocolId} not found").as_error(
+            status.HTTP_404_NOT_FOUND
+        )
+
+    data_files = await protocol_store.get_referenced_data_files(protocolId)
+
+    return await PydanticResponse.create(
+        content=SimpleMultiBody.construct(
+            data=data_files, meta=MultiBodyMeta(cursor=0, totalLength=len(data_files))
+        )
+    )

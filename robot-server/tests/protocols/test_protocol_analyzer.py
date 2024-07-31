@@ -87,7 +87,7 @@ async def test_load_orchestrator(
         created_at=datetime(year=2021, month=1, day=1),
         source=protocol_source,
         protocol_key="dummy-data-111",
-        protocol_kind=ProtocolKind.STANDARD.value,
+        protocol_kind=ProtocolKind.STANDARD,
     )
     subject = ProtocolAnalyzer(
         analysis_store=analysis_store, protocol_resource=protocol_resource
@@ -100,13 +100,17 @@ async def test_load_orchestrator(
             protocol_config=PythonProtocolConfig(api_version=APIVersion(100, 200)),
         )
     ).then_return(run_orchestrator)
-    await subject.load_orchestrator(run_time_param_values={"rtp_var": 123})
+    await subject.load_orchestrator(
+        run_time_param_values={"rtp_var": 123},
+        run_time_param_files={"csv_param": "file-id"},
+    )
 
     decoy.verify(
         await run_orchestrator.load(
             protocol_source=protocol_source,
             parse_mode=ParseMode.NORMAL,
             run_time_param_values={"rtp_var": 123},
+            run_time_param_files={"csv_param": "file-id"},
         ),
         times=1,
     )
@@ -132,7 +136,7 @@ async def test_analyze(
             content_hash="abc123",
         ),
         protocol_key="dummy-data-111",
-        protocol_kind=ProtocolKind.STANDARD.value,
+        protocol_kind=ProtocolKind.STANDARD,
     )
 
     analysis_command = pe_commands.WaitForResume(
@@ -171,7 +175,9 @@ async def test_analyze(
     subject = ProtocolAnalyzer(
         analysis_store=analysis_store, protocol_resource=protocol_resource
     )
-    await subject.load_orchestrator(run_time_param_values={"rtp_var": 123})
+    await subject.load_orchestrator(
+        run_time_param_values={"rtp_var": 123}, run_time_param_files={}
+    )
     decoy.when(await orchestrator.run(deck_configuration=[],)).then_return(
         protocol_runner.RunResult(
             commands=[analysis_command],
@@ -227,7 +233,7 @@ async def test_analyze_updates_pending_on_error(
             content_hash="abc123",
         ),
         protocol_key="dummy-data-111",
-        protocol_kind=ProtocolKind.STANDARD.value,
+        protocol_kind=ProtocolKind.STANDARD,
     )
 
     raised_exception = Exception("You got me!!")
@@ -268,7 +274,9 @@ async def test_analyze_updates_pending_on_error(
     decoy.when(datetime_helper.utc_now()).then_return(
         datetime(year=2023, month=3, day=3)
     )
-    await subject.load_orchestrator(run_time_param_values={"rtp_var": 123})
+    await subject.load_orchestrator(
+        run_time_param_values={"rtp_var": 123}, run_time_param_files={}
+    )
     await subject.analyze(
         analysis_id="analysis-id",
     )

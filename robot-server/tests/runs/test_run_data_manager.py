@@ -24,6 +24,8 @@ from opentrons.types import DeckSlotName
 
 from opentrons_shared_data.errors.exceptions import InvalidStoredData
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+
+from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.runs import error_recovery_mapping
 from robot_server.runs.error_recovery_models import ErrorRecoveryRule
@@ -219,7 +221,7 @@ async def test_create_with_options(
         created_at=datetime(year=2022, month=2, day=2),
         source=None,  # type: ignore[arg-type]
         protocol_key=None,
-        protocol_kind="standard",
+        protocol_kind=ProtocolKind.STANDARD,
     )
 
     labware_offset = pe_types.LabwareOffsetCreate(

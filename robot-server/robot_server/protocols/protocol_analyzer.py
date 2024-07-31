@@ -10,6 +10,7 @@ from opentrons.util.performance_helpers import TrackingFunctions
 from opentrons.protocol_engine.types import (
     PrimitiveRunTimeParamValuesType,
     RunTimeParameter,
+    CSVRunTimeParamFilesType,
 )
 import opentrons.util.helpers as datetime_helper
 from opentrons.protocol_runner import (
@@ -52,6 +53,7 @@ class ProtocolAnalyzer:
     async def load_orchestrator(
         self,
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType],
+        run_time_param_files: Optional[CSVRunTimeParamFilesType],
     ) -> None:
         """Load runner with the protocol and run time parameter values.
 
@@ -65,6 +67,7 @@ class ProtocolAnalyzer:
             protocol_source=self._protocol_resource.source,
             parse_mode=ParseMode.NORMAL,
             run_time_param_values=run_time_param_values,
+            run_time_param_files=run_time_param_files,
         )
 
     @TrackingFunctions.track_analysis

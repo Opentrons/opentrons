@@ -8,7 +8,7 @@ Add new tests to test_command_state.py, where they can be tested together.
 import pytest
 from contextlib import nullcontext as does_not_raise
 from datetime import datetime
-from typing import Dict, List, NamedTuple, Optional, Sequence, Type, Union
+from typing import Any, Dict, List, NamedTuple, Optional, Sequence, Type, Union
 
 from opentrons.protocol_engine import EngineStatus, commands as cmd, errors
 from opentrons.protocol_engine.actions import (
@@ -44,6 +44,15 @@ from .command_fixtures import (
     create_failed_command,
     create_succeeded_command,
 )
+
+
+def _placeholder_error_recovery_policy(*args: object, **kwargs: object) -> Any:
+    """A placeholder `ErrorRecoveryPolicy` for tests that don't care about it.
+
+    That should be all the tests in this file, since error recovery was added
+    after this file was deprecated.
+    """
+    raise NotImplementedError()
 
 
 def get_command_view(  # noqa: C901
@@ -101,6 +110,7 @@ def get_command_view(  # noqa: C901
         latest_protocol_command_hash=latest_command_hash,
         stopped_by_estop=False,
         failed_command_errors=failed_command_errors or [],
+        error_recovery_policy=_placeholder_error_recovery_policy,
     )
 
     return CommandView(state=state)

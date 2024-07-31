@@ -83,6 +83,7 @@ export function LabwareMapViewModal(
               handleLabwareClick(topLabwareDefinition, topLabwareId)
             }
           : undefined,
+      highlightLabware: true,
       moduleChildren: null,
     }
   })
@@ -105,6 +106,7 @@ export function LabwareMapViewModal(
           handleLabwareClick(topLabwareDefinition, topLabwareId)
         },
         labwareChildren: null,
+        highlight: true,
       }
     }
   )

@@ -5,6 +5,7 @@ implementation detail.
 """
 
 from datetime import datetime
+from typing import Any
 from unittest.mock import sentinel
 
 import pytest
@@ -14,7 +15,10 @@ from opentrons_shared_data.errors import ErrorCodes, PythonException
 from opentrons.hardware_control.types import DoorState
 from opentrons.ordered_set import OrderedSet
 from opentrons.protocol_engine import actions, commands, errors
-from opentrons.protocol_engine.actions.actions import PlayAction
+from opentrons.protocol_engine.actions.actions import (
+    PlayAction,
+    SetErrorRecoveryPolicyAction,
+)
 from opentrons.protocol_engine.commands.command import CommandIntent
 from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
 from opentrons.protocol_engine.errors.error_occurrence import ErrorOccurrence
@@ -39,9 +43,18 @@ def _make_config() -> Config:
     )
 
 
+def _placeholder_error_recovery_policy(*args: object, **kwargs: object) -> Any:
+    """A placeholder `ErrorRecoveryPolicy` for tests that don't care about it."""
+    raise NotImplementedError()
+
+
 def test_queue_command_action() -> None:
     """It should translate a command request into a queued command and add it."""
-    subject = CommandStore(is_door_open=False, config=_make_config())
+    subject = CommandStore(
+        is_door_open=False,
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
+    )
     subject_view = CommandView(subject.state)
 
     id = "command-id"
@@ -70,7 +83,11 @@ def test_queue_command_action() -> None:
 
 def test_latest_protocol_command_hash() -> None:
     """It should return the latest protocol command's hash."""
-    subject = CommandStore(is_door_open=False, config=_make_config())
+    subject = CommandStore(
+        is_door_open=False,
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
+    )
     subject_view = CommandView(subject.state)
 
     # The initial hash should be None.
@@ -106,7 +123,11 @@ def test_latest_protocol_command_hash() -> None:
 @pytest.mark.parametrize("error_recovery_type", ErrorRecoveryType)
 def test_command_failure(error_recovery_type: ErrorRecoveryType) -> None:
     """It should store an error and mark the command if it fails."""
-    subject = CommandStore(is_door_open=False, config=_make_config())
+    subject = CommandStore(
+        is_door_open=False,
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
+    )
     subject_view = CommandView(subject.state)
 
     command_id = "command-id"
@@ -176,7 +197,11 @@ def test_command_failure(error_recovery_type: ErrorRecoveryType) -> None:
 
 def test_command_failure_clears_queues() -> None:
     """It should clear the command queue on command failure."""
-    subject = CommandStore(config=_make_config(), is_door_open=False)
+    subject = CommandStore(
+        config=_make_config(),
+        is_door_open=False,
+        error_recovery_policy=_placeholder_error_recovery_policy,
+    )
     subject_view = CommandView(subject.state)
 
     queue_1 = actions.QueueCommandAction(
@@ -238,7 +263,11 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
     This test queues up a non-setup command followed by two setup commands,
     then runs and fails the first setup command.
     """
-    subject = CommandStore(is_door_open=False, config=_make_config())
+    subject = CommandStore(
+        is_door_open=False,
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
+    )
     subject_view = CommandView(subject.state)
 
     queue_1 = actions.QueueCommandAction(
@@ -308,7 +337,11 @@ def test_nonfatal_command_failure() -> None:
 
     The queue status should be "awaiting-recovery."
     """
-    subject = CommandStore(is_door_open=False, config=_make_config())
+    subject = CommandStore(
+        is_door_open=False,
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
+    )
     subject_view = CommandView(subject.state)
 
     queue_1 = actions.QueueCommandAction(
@@ -358,6 +391,7 @@ def test_door_during_setup_phase() -> None:
     """Test behavior when the door is opened during the setup phase."""
     subject = CommandStore(
         is_door_open=False,
+        error_recovery_policy=_placeholder_error_recovery_policy,
         config=Config(
             block_on_door_open=True,
             # Choice of robot and deck type are arbitrary.
@@ -390,6 +424,7 @@ def test_door_during_protocol_phase() -> None:
     """Test behavior when the door is opened during the main protocol phase."""
     subject = CommandStore(
         is_door_open=False,
+        error_recovery_policy=_placeholder_error_recovery_policy,
         config=Config(
             block_on_door_open=True,
             # Choice of robot and deck type are arbitrary.
@@ -439,6 +474,7 @@ def test_door_during_error_recovery() -> None:
     """Test behavior when the door is opened during error recovery."""
     subject = CommandStore(
         is_door_open=False,
+        error_recovery_policy=_placeholder_error_recovery_policy,
         config=Config(
             block_on_door_open=True,
             # Choice of robot and deck type are arbitrary.
@@ -534,6 +570,7 @@ def test_door_initially_open(
     """Test open-door blocking behavior given different initial door states."""
     subject = CommandStore(
         is_door_open=door_initially_open,
+        error_recovery_policy=_placeholder_error_recovery_policy,
         config=Config(
             block_on_door_open=True,
             # Choice of robot and deck type are arbitrary.
@@ -552,7 +589,11 @@ def test_door_initially_open(
 
 def test_error_recovery_type_tracking() -> None:
     """It should keep track of each failed command's error recovery type."""
-    subject = CommandStore(config=_make_config(), is_door_open=False)
+    subject = CommandStore(
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
+        is_door_open=False,
+    )
 
     subject.handle_action(
         actions.QueueCommandAction(
@@ -625,7 +666,11 @@ def test_error_recovery_type_tracking() -> None:
 
 def test_recovery_target_tracking() -> None:
     """It should keep track of the command currently undergoing error recovery."""
-    subject = CommandStore(config=_make_config(), is_door_open=False)
+    subject = CommandStore(
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
+        is_door_open=False,
+    )
     subject_view = CommandView(subject.state)
 
     queue_1 = actions.QueueCommandAction(
@@ -719,7 +764,11 @@ def test_recovery_target_tracking() -> None:
 
 def test_final_state_after_estop() -> None:
     """Test the final state of the run after it's E-stopped."""
-    subject = CommandStore(config=_make_config(), is_door_open=False)
+    subject = CommandStore(
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
+        is_door_open=False,
+    )
     subject_view = CommandView(subject.state)
 
     error_details = actions.FinishErrorDetails(
@@ -749,7 +798,11 @@ def test_final_state_after_estop() -> None:
 
 def test_final_state_after_stop() -> None:
     """Test the final state of the run after it's stopped."""
-    subject = CommandStore(config=_make_config(), is_door_open=False)
+    subject = CommandStore(
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
+        is_door_open=False,
+    )
     subject_view = CommandView(subject.state)
 
     subject.handle_action(actions.StopAction())
@@ -782,7 +835,11 @@ def test_final_state_after_error_recovery_stop() -> None:
 
     We still want to count this as "stopped," not "failed."
     """
-    subject = CommandStore(config=_make_config(), is_door_open=False)
+    subject = CommandStore(
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
+        is_door_open=False,
+    )
     subject_view = CommandView(subject.state)
 
     # Fail a command to put the subject in recovery mode.
@@ -846,3 +903,18 @@ def test_final_state_after_error_recovery_stop() -> None:
     assert subject_view.get_all_errors() == [
         expected_error_occurrence_1,
     ]
+
+
+def test_set_and_get_error_recovery_policy() -> None:
+    """Test storage of `ErrorRecoveryPolicy`s."""
+    initial_policy = sentinel.initial_policy
+    new_policy = sentinel.new_policy
+    subject = CommandStore(
+        config=_make_config(),
+        error_recovery_policy=initial_policy,
+        is_door_open=False,
+    )
+    subject_view = CommandView(subject.state)
+    assert subject_view.get_error_recovery_policy() is initial_policy
+    subject.handle_action(SetErrorRecoveryPolicyAction(sentinel.new_policy))
+    assert subject_view.get_error_recovery_policy() is new_policy

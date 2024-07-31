@@ -83,8 +83,10 @@ describe('TipsAttachedModal', () => {
     const btn = screen.getByTestId('testButton')
     fireEvent.click(btn)
 
-    screen.getByText('Tips are attached')
-    screen.queryByText(`${LEFT} Pipette`)
+    screen.getByText('Remove any attached tips')
+    screen.queryByText(
+      /Homing the .* pipette with liquid in the tips may damage it\. You must remove all tips before using the pipette again\./
+    )
   })
   it('clicking the skip button properly closes the modal', () => {
     render(MOCK_PIPETTES_WITH_TIP)

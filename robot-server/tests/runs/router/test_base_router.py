@@ -9,7 +9,7 @@ from opentrons.protocol_engine import LabwareOffsetCreate, types as pe_types
 from opentrons.protocol_reader import ProtocolSource, JsonProtocolConfig
 
 from robot_server.errors.error_responses import ApiError
-from robot_server.runs.error_recovery_models import ErrorRecoveryPolicies
+from robot_server.runs.error_recovery_models import ErrorRecoveryPolicy
 from robot_server.service.json_api import (
     RequestModel,
     SimpleBody,
@@ -18,6 +18,7 @@ from robot_server.service.json_api import (
     ResourceLink,
 )
 
+from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.protocols.protocol_store import (
     ProtocolNotFoundError,
     ProtocolResource,
@@ -38,7 +39,7 @@ from robot_server.runs.router.base_router import (
     get_runs,
     remove_run,
     update_run,
-    set_run_policies,
+    put_error_recovery_policy,
 )
 
 from robot_server.deck_configuration.store import DeckConfigurationStore
@@ -133,7 +134,7 @@ async def test_create_protocol_run(
     protocol_resource = ProtocolResource(
         protocol_id=protocol_id,
         protocol_key=None,
-        protocol_kind=None,
+        protocol_kind=ProtocolKind.STANDARD,
         created_at=datetime(year=2022, month=2, day=2),
         source=ProtocolSource(
             directory=Path("/dev/null"),
@@ -585,8 +586,8 @@ async def test_create_policies(
     decoy: Decoy, mock_run_data_manager: RunDataManager
 ) -> None:
     """It should call RunDataManager create run policies."""
-    policies = decoy.mock(cls=ErrorRecoveryPolicies)
-    await set_run_policies(
+    policies = decoy.mock(cls=ErrorRecoveryPolicy)
+    await put_error_recovery_policy(
         runId="rud-id",
         request_body=RequestModel(data=policies),
         run_data_manager=mock_run_data_manager,
@@ -602,14 +603,14 @@ async def test_create_policies_raises_not_active_run(
     decoy: Decoy, mock_run_data_manager: RunDataManager
 ) -> None:
     """It should raise that the run is not current."""
-    policies = decoy.mock(cls=ErrorRecoveryPolicies)
+    policies = decoy.mock(cls=ErrorRecoveryPolicy)
     decoy.when(
         mock_run_data_manager.set_policies(
             run_id="rud-id", policies=policies.policyRules
         )
     ).then_raise(RunNotCurrentError())
     with pytest.raises(ApiError) as exc_info:
-        await set_run_policies(
+        await put_error_recovery_policy(
             runId="rud-id",
             request_body=RequestModel(data=policies),
             run_data_manager=mock_run_data_manager,

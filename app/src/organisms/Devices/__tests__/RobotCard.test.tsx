@@ -31,6 +31,10 @@ import { UpdateRobotBanner } from '../../UpdateRobotBanner'
 import { RobotOverflowMenu } from '../RobotOverflowMenu'
 import { RobotStatusHeader } from '../RobotStatusHeader'
 import { RobotCard } from '../RobotCard'
+import {
+  ErrorRecoveryBanner,
+  useErrorRecoveryBanner,
+} from '../../ErrorRecoveryBanner'
 
 import type { State } from '../../../redux/types'
 
@@ -41,6 +45,7 @@ vi.mock('../../UpdateRobotBanner')
 vi.mock('../../../redux/config')
 vi.mock('../RobotOverflowMenu')
 vi.mock('../RobotStatusHeader')
+vi.mock('../../ErrorRecoveryBanner')
 
 const OT2_PNG_FILE_NAME = '/app/src/assets/images/OT2-R_HERO.png'
 const FLEX_PNG_FILE_NAME = '/app/src/assets/images/FLEX.png'
@@ -127,6 +132,13 @@ describe('RobotCard', () => {
     when(getRobotModelByName)
       .calledWith(MOCK_STATE, mockConnectableRobot.name)
       .thenReturn('OT-2')
+    vi.mocked(ErrorRecoveryBanner).mockReturnValue(
+      <div>MOCK_RECOVERY_BANNER</div>
+    )
+    vi.mocked(useErrorRecoveryBanner).mockReturnValue({
+      showRecoveryBanner: false,
+      recoveryIntent: 'recovering',
+    })
   })
 
   it('renders an OT-2 image when robot model is OT-2', () => {
@@ -160,5 +172,16 @@ describe('RobotCard', () => {
   it('renders a RobotStatusHeader component', () => {
     render(props)
     screen.getByText('Mock RobotStatusHeader')
+  })
+
+  it('renders the error recovery banner when another user is performing error recovery', () => {
+    vi.mocked(useErrorRecoveryBanner).mockReturnValue({
+      showRecoveryBanner: true,
+      recoveryIntent: 'recovering',
+    })
+
+    render(props)
+
+    screen.getByText('MOCK_RECOVERY_BANNER')
   })
 })

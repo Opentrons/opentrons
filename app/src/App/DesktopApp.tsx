@@ -144,7 +144,7 @@ export const DesktopApp = (): JSX.Element => {
                         />
                       )
                     })}
-                    <Route path="/" element={<Navigate to="/protocols" />} />
+                    <Route path="*" element={<Navigate to="/protocols" />} />
                   </Routes>
                   <RobotControlTakeover />
                 </Alerts>

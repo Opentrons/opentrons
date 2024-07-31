@@ -15,8 +15,12 @@ from opentrons.hardware_control.types import DoorState
 from opentrons.protocol_engine.actions.actions import (
     ResumeFromRecoveryAction,
     RunCommandAction,
+    SetErrorRecoveryPolicyAction,
 )
-from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
+from opentrons.protocol_engine.error_recovery_policy import (
+    ErrorRecoveryPolicy,
+    ErrorRecoveryType,
+)
 from opentrons.protocol_engine.notes.notes import CommandNote
 
 from ..actions import (
@@ -205,6 +209,9 @@ class CommandState:
     stopped_by_estop: bool
     """If this is set to True, the engine was stopped by an estop event."""
 
+    error_recovery_policy: ErrorRecoveryPolicy
+    """See `CommandView.get_error_recovery_policy()`."""
+
 
 class CommandStore(HasState[CommandState], HandlesActions):
     """Command state container for run-level command concerns."""
@@ -216,6 +223,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
         *,
         config: Config,
         is_door_open: bool,
+        error_recovery_policy: ErrorRecoveryPolicy,
     ) -> None:
         """Initialize a CommandStore and its state."""
         self._config = config
@@ -234,6 +242,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
             latest_protocol_command_hash=None,
             stopped_by_estop=False,
             failed_command_errors=[],
+            error_recovery_policy=error_recovery_policy,
         )
 
     def handle_action(self, action: Action) -> None:
@@ -261,6 +270,8 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 self._handle_hardware_stopped_action(action)
             case DoorChangeAction():
                 self._handle_door_change_action(action)
+            case SetErrorRecoveryPolicyAction():
+                self._handle_set_error_recovery_policy_action(action)
             case _:
                 pass
 
@@ -463,6 +474,11 @@ class CommandStore(HasState[CommandState], HandlesActions):
                         self._state.queue_status = QueueStatus.AWAITING_RECOVERY_PAUSED
             elif action.door_state == DoorState.CLOSED:
                 self._state.is_door_blocking = False
+
+    def _handle_set_error_recovery_policy_action(
+        self, action: SetErrorRecoveryPolicyAction
+    ) -> None:
+        self._state.error_recovery_policy = action.error_recovery_policy
 
     def _update_to_failed(
         self,
@@ -994,3 +1010,12 @@ class CommandView(HasState[CommandState]):
     def get_latest_protocol_command_hash(self) -> Optional[str]:
         """Get the command hash of the last queued command, if any."""
         return self._state.latest_protocol_command_hash
+
+    def get_error_recovery_policy(self) -> ErrorRecoveryPolicy:
+        """Return the run's current error recovery policy (see `ErrorRecoveryPolicy`).
+
+        This error recovery policy is not ever evaluated by
+        `CommandStore`/`CommandView`. It's stored here for convenience, but evaluated by
+        higher-level code.
+        """
+        return self._state.error_recovery_policy

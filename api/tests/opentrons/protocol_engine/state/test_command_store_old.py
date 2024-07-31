@@ -5,8 +5,10 @@ Add new tests to test_command_state.py, where they can be tested together.
 """
 
 
+from decoy import matchers
 import pytest
 from datetime import datetime
+from typing import Any
 
 from opentrons_shared_data.errors import ErrorCodes
 
@@ -50,6 +52,15 @@ def _make_config(block_on_door_open: bool = False) -> Config:
     )
 
 
+def _placeholder_error_recovery_policy(*args: object, **kwargs: object) -> Any:
+    """A placeholder `ErrorRecoveryPolicy` for tests that don't care about it.
+
+    That should be all the tests in this file, since error recovery was added
+    after this file was deprecated.
+    """
+    raise NotImplementedError()
+
+
 def test_command_queue_and_unqueue() -> None:
     """It should queue on QueueCommandAction and dequeue on RunCommandAction."""
     queue_1 = QueueCommandAction(
@@ -77,7 +88,11 @@ def test_command_queue_and_unqueue() -> None:
         command=create_succeeded_command(command_id="command-id-2"),
     )
 
-    subject = CommandStore(is_door_open=False, config=_make_config())
+    subject = CommandStore(
+        is_door_open=False,
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
+    )
 
     subject.handle_action(queue_1)
     assert subject.state.command_history.get_queue_ids() == OrderedSet(["command-id-1"])
@@ -126,7 +141,11 @@ def test_setup_command_queue_and_unqueue() -> None:
         command=create_succeeded_command(command_id="command-id-2"),
     )
 
-    subject = CommandStore(is_door_open=False, config=_make_config())
+    subject = CommandStore(
+        is_door_open=False,
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
+    )
 
     subject.handle_action(queue_1)
     assert subject.state.command_history.get_setup_queue_ids() == OrderedSet(
@@ -170,7 +189,11 @@ def test_setup_queue_action_updates_command_intent() -> None:
         intent=commands.CommandIntent.SETUP,
     )
 
-    subject = CommandStore(is_door_open=False, config=_make_config())
+    subject = CommandStore(
+        is_door_open=False,
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
+    )
 
     subject.handle_action(queue_cmd)
     assert subject.state.command_history.get("command-id-1") == CommandEntry(
@@ -195,7 +218,11 @@ def test_running_command_id() -> None:
         command=create_succeeded_command(command_id="command-id-1"),
     )
 
-    subject = CommandStore(is_door_open=False, config=_make_config())
+    subject = CommandStore(
+        is_door_open=False,
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
+    )
 
     subject.handle_action(queue)
     assert subject.state.command_history.get_running_command() is None
@@ -222,7 +249,11 @@ def test_command_store_keeps_commands_in_queue_order() -> None:
         params=commands.CommentParams(message="hello world"),
     )
 
-    subject = CommandStore(is_door_open=False, config=_make_config())
+    subject = CommandStore(
+        is_door_open=False,
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
+    )
 
     subject.handle_action(
         QueueCommandAction(
@@ -285,7 +316,11 @@ def test_command_store_keeps_commands_in_queue_order() -> None:
 @pytest.mark.parametrize("pause_source", PauseSource)
 def test_command_store_handles_pause_action(pause_source: PauseSource) -> None:
     """It should clear the running flag on pause."""
-    subject = CommandStore(is_door_open=False, config=_make_config())
+    subject = CommandStore(
+        is_door_open=False,
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
+    )
     subject.handle_action(PauseAction(source=pause_source))
 
     assert subject.state == CommandState(
@@ -303,13 +338,18 @@ def test_command_store_handles_pause_action(pause_source: PauseSource) -> None:
         latest_protocol_command_hash=None,
         stopped_by_estop=False,
         failed_command_errors=[],
+        error_recovery_policy=matchers.Anything(),
     )
 
 
 @pytest.mark.parametrize("pause_source", PauseSource)
 def test_command_store_handles_play_action(pause_source: PauseSource) -> None:
     """It should set the running flag on play."""
-    subject = CommandStore(is_door_open=False, config=_make_config())
+    subject = CommandStore(
+        is_door_open=False,
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
+    )
     subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
 
     assert subject.state == CommandState(
@@ -327,6 +367,7 @@ def test_command_store_handles_play_action(pause_source: PauseSource) -> None:
         latest_protocol_command_hash=None,
         stopped_by_estop=False,
         failed_command_errors=[],
+        error_recovery_policy=matchers.Anything(),
     )
     assert subject.state.command_history.get_running_command() is None
     assert subject.state.command_history.get_all_ids() == []
@@ -336,7 +377,11 @@ def test_command_store_handles_play_action(pause_source: PauseSource) -> None:
 
 def test_command_store_handles_finish_action() -> None:
     """It should change to a succeeded state with FinishAction."""
-    subject = CommandStore(is_door_open=False, config=_make_config())
+    subject = CommandStore(
+        is_door_open=False,
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
+    )
 
     subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
     subject.handle_action(FinishAction())
@@ -356,6 +401,7 @@ def test_command_store_handles_finish_action() -> None:
         latest_protocol_command_hash=None,
         stopped_by_estop=False,
         failed_command_errors=[],
+        error_recovery_policy=matchers.Anything(),
     )
     assert subject.state.command_history.get_running_command() is None
     assert subject.state.command_history.get_all_ids() == []
@@ -365,7 +411,11 @@ def test_command_store_handles_finish_action() -> None:
 
 def test_command_store_handles_finish_action_with_stopped() -> None:
     """It should change to a stopped state if FinishAction has set_run_status=False."""
-    subject = CommandStore(is_door_open=False, config=_make_config())
+    subject = CommandStore(
+        is_door_open=False,
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
+    )
 
     subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
     subject.handle_action(FinishAction(set_run_status=False))
@@ -381,7 +431,11 @@ def test_command_store_handles_stop_action(
     from_estop: bool, expected_run_result: RunResult
 ) -> None:
     """It should mark the engine as non-gracefully stopped on StopAction."""
-    subject = CommandStore(is_door_open=False, config=_make_config())
+    subject = CommandStore(
+        is_door_open=False,
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
+    )
 
     subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
     subject.handle_action(StopAction(from_estop=from_estop))
@@ -401,6 +455,7 @@ def test_command_store_handles_stop_action(
         latest_protocol_command_hash=None,
         stopped_by_estop=from_estop,
         failed_command_errors=[],
+        error_recovery_policy=matchers.Anything(),
     )
     assert subject.state.command_history.get_running_command() is None
     assert subject.state.command_history.get_all_ids() == []
@@ -410,7 +465,11 @@ def test_command_store_handles_stop_action(
 
 def test_command_store_handles_stop_action_when_awaiting_recovery() -> None:
     """It should mark the engine as non-gracefully stopped on StopAction."""
-    subject = CommandStore(is_door_open=False, config=_make_config())
+    subject = CommandStore(
+        is_door_open=False,
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
+    )
 
     subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
 
@@ -433,6 +492,7 @@ def test_command_store_handles_stop_action_when_awaiting_recovery() -> None:
         latest_protocol_command_hash=None,
         stopped_by_estop=False,
         failed_command_errors=[],
+        error_recovery_policy=matchers.Anything(),
     )
     assert subject.state.command_history.get_running_command() is None
     assert subject.state.command_history.get_all_ids() == []
@@ -442,7 +502,11 @@ def test_command_store_handles_stop_action_when_awaiting_recovery() -> None:
 
 def test_command_store_cannot_restart_after_should_stop() -> None:
     """It should reject a play action after finish."""
-    subject = CommandStore(is_door_open=False, config=_make_config())
+    subject = CommandStore(
+        is_door_open=False,
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
+    )
     subject.handle_action(FinishAction())
     subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
 
@@ -461,6 +525,7 @@ def test_command_store_cannot_restart_after_should_stop() -> None:
         latest_protocol_command_hash=None,
         stopped_by_estop=False,
         failed_command_errors=[],
+        error_recovery_policy=matchers.Anything(),
     )
     assert subject.state.command_history.get_running_command() is None
     assert subject.state.command_history.get_all_ids() == []
@@ -470,7 +535,11 @@ def test_command_store_cannot_restart_after_should_stop() -> None:
 
 def test_command_store_save_started_completed_run_timestamp() -> None:
     """It should save started and completed timestamps."""
-    subject = CommandStore(config=_make_config(), is_door_open=False)
+    subject = CommandStore(
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
+        is_door_open=False,
+    )
     start_time = datetime(year=2021, month=1, day=1)
     hardware_stopped_time = datetime(year=2022, month=2, day=2)
 
@@ -487,7 +556,11 @@ def test_command_store_save_started_completed_run_timestamp() -> None:
 
 def test_timestamps_are_latched() -> None:
     """It should not change startedAt or completedAt once set."""
-    subject = CommandStore(config=_make_config(), is_door_open=False)
+    subject = CommandStore(
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
+        is_door_open=False,
+    )
 
     play_time_1 = datetime(year=2021, month=1, day=1)
     play_time_2 = datetime(year=2022, month=2, day=2)
@@ -518,7 +591,11 @@ def test_command_store_wraps_unknown_errors() -> None:
     The wrapping EnumeratedError should be an UnexpectedProtocolError for errors that happened
     in the main part of the protocol run, or a PythonException for errors that happened elsewhere.
     """
-    subject = CommandStore(is_door_open=False, config=_make_config())
+    subject = CommandStore(
+        is_door_open=False,
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
+    )
 
     subject.handle_action(
         FinishAction(
@@ -594,6 +671,7 @@ def test_command_store_wraps_unknown_errors() -> None:
         latest_protocol_command_hash=None,
         stopped_by_estop=False,
         failed_command_errors=[],
+        error_recovery_policy=matchers.Anything(),
     )
     assert subject.state.command_history.get_running_command() is None
     assert subject.state.command_history.get_all_ids() == []
@@ -608,7 +686,11 @@ def test_command_store_preserves_enumerated_errors() -> None:
         def __init__(self, message: str) -> None:
             super().__init__(ErrorCodes.PIPETTE_NOT_PRESENT, message)
 
-    subject = CommandStore(is_door_open=False, config=_make_config())
+    subject = CommandStore(
+        is_door_open=False,
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
+    )
 
     subject.handle_action(
         FinishAction(
@@ -658,6 +740,7 @@ def test_command_store_preserves_enumerated_errors() -> None:
         latest_protocol_command_hash=None,
         stopped_by_estop=False,
         failed_command_errors=[],
+        error_recovery_policy=matchers.Anything(),
     )
     assert subject.state.command_history.get_running_command() is None
     assert subject.state.command_history.get_all_ids() == []
@@ -667,7 +750,11 @@ def test_command_store_preserves_enumerated_errors() -> None:
 
 def test_command_store_ignores_stop_after_graceful_finish() -> None:
     """It should no-op on stop if already gracefully finished."""
-    subject = CommandStore(is_door_open=False, config=_make_config())
+    subject = CommandStore(
+        is_door_open=False,
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
+    )
 
     subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
     subject.handle_action(FinishAction())
@@ -688,6 +775,7 @@ def test_command_store_ignores_stop_after_graceful_finish() -> None:
         latest_protocol_command_hash=None,
         stopped_by_estop=False,
         failed_command_errors=[],
+        error_recovery_policy=matchers.Anything(),
     )
     assert subject.state.command_history.get_running_command() is None
     assert subject.state.command_history.get_all_ids() == []
@@ -697,7 +785,11 @@ def test_command_store_ignores_stop_after_graceful_finish() -> None:
 
 def test_command_store_ignores_finish_after_non_graceful_stop() -> None:
     """It should no-op on finish if already ungracefully stopped."""
-    subject = CommandStore(is_door_open=False, config=_make_config())
+    subject = CommandStore(
+        is_door_open=False,
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
+    )
 
     subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
     subject.handle_action(StopAction())
@@ -718,6 +810,7 @@ def test_command_store_ignores_finish_after_non_graceful_stop() -> None:
         latest_protocol_command_hash=None,
         stopped_by_estop=False,
         failed_command_errors=[],
+        error_recovery_policy=matchers.Anything(),
     )
     assert subject.state.command_history.get_running_command() is None
     assert subject.state.command_history.get_all_ids() == []
@@ -727,7 +820,11 @@ def test_command_store_ignores_finish_after_non_graceful_stop() -> None:
 
 def test_handles_hardware_stopped() -> None:
     """It should mark the hardware as stopped on HardwareStoppedAction."""
-    subject = CommandStore(is_door_open=False, config=_make_config())
+    subject = CommandStore(
+        is_door_open=False,
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
+    )
     completed_at = datetime(year=2021, day=1, month=1)
     subject.handle_action(
         HardwareStoppedAction(completed_at=completed_at, finish_error_details=None)
@@ -748,6 +845,7 @@ def test_handles_hardware_stopped() -> None:
         latest_protocol_command_hash=None,
         stopped_by_estop=False,
         failed_command_errors=[],
+        error_recovery_policy=matchers.Anything(),
     )
     assert subject.state.command_history.get_running_command() is None
     assert subject.state.command_history.get_all_ids() == []

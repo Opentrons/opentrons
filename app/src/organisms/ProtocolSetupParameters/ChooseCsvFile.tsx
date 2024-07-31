@@ -46,7 +46,8 @@ export function ChooseCsvFile({
   const { t } = useTranslation('protocol_setup')
 
   const csvFilesOnUSB = useSelector(getShellUpdateDataFiles) ?? []
-  const csvFilesOnRobot = useAllCsvFilesQuery(protocolId).data?.data.files ?? []
+  const csvFilesOnRobot = (useAllCsvFilesQuery(protocolId).data?.data ??
+    []) as CsvFileData[]
   const sortedCsvFilesOnUSB = csvFilesOnUSB.sort((a, b) => {
     const regex = /^(.*\/)?(.+?)(\d*)\.csv$/
     const aMatch = a.match(regex)
@@ -115,16 +116,17 @@ export function ChooseCsvFile({
             <Flex css={LIST_CONTAINER_STYLE}>
               {csvFilesOnRobot.length !== 0 ? (
                 csvFilesOnRobot.map((csv: CsvFileData) => (
-                  <RadioButton
-                    key={csv.id}
-                    data-testid={csv.id}
-                    buttonLabel={csv.name}
-                    buttonValue={`${csv.id}`}
-                    onChange={() => {
-                      setCsvFileSelected({ id: csv.id, fileName: csv.name })
-                    }}
-                    isSelected={csvFileSelected?.id === csv.id}
-                  />
+                  <React.Fragment key={csv.id}>
+                    <RadioButton
+                      buttonLabel={csv.name}
+                      buttonValue={csv.id}
+                      onChange={() => {
+                        setCsvFileSelected({ id: csv.id, fileName: csv.name })
+                      }}
+                      id={`${csv.id}-on-robot`}
+                      isSelected={csvFileSelected?.id === csv.id}
+                    />
+                  </React.Fragment>
                 ))
               ) : (
                 <EmptyFile />
@@ -143,8 +145,7 @@ export function ChooseCsvFile({
                     <React.Fragment key={fileName}>
                       {csvFilePath.length !== 0 && fileName !== undefined ? (
                         <RadioButton
-                          data-testid={fileName}
-                          buttonLabel={fileName ?? 'default'}
+                          buttonLabel={fileName}
                           buttonValue={csvFilePath}
                           onChange={() => {
                             setCsvFileSelected({
@@ -152,6 +153,7 @@ export function ChooseCsvFile({
                               fileName,
                             })
                           }}
+                          id={`${csvFilePath.replace('/', '-')}}-on-usb`}
                           isSelected={csvFileSelected?.filePath === csvFilePath}
                         />
                       ) : null}

@@ -67,10 +67,7 @@ import {
 } from '../../../redux/analytics'
 import { getIsHeaterShakerAttached } from '../../../redux/config'
 import { Tooltip } from '../../../atoms/Tooltip'
-import {
-  useCloseCurrentRun,
-  useCurrentRunId,
-} from '../../../organisms/ProtocolUpload/hooks'
+import { useCloseCurrentRun } from '../../../organisms/ProtocolUpload/hooks'
 import { ConfirmCancelModal } from '../../../organisms/RunDetails/ConfirmCancelModal'
 import { HeaterShakerIsRunningModal } from '../HeaterShakerIsRunningModal'
 import {
@@ -103,12 +100,16 @@ import { getIsFixtureMismatch } from '../../../resources/deck_configuration/util
 import { useDeckConfigurationCompatibility } from '../../../resources/deck_configuration/hooks'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useMostRecentRunId } from '../../ProtocolUpload/hooks/useMostRecentRunId'
-import { useNotifyRunQuery } from '../../../resources/runs'
+import { useNotifyRunQuery, useCurrentRunId } from '../../../resources/runs'
 import {
   useErrorRecoveryFlows,
   ErrorRecoveryFlows,
 } from '../../ErrorRecoveryFlows'
 import { useRecoveryAnalytics } from '../../ErrorRecoveryFlows/hooks'
+import {
+  useProtocolDropTipModal,
+  ProtocolDropTipModal,
+} from './ProtocolDropTipModal'
 
 import type { Run, RunError, RunStatus } from '@opentrons/api-client'
 import type { IconName } from '@opentrons/components'
@@ -212,6 +213,15 @@ export function ProtocolRunHeader({
     attachedInstruments,
     host,
     isFlex,
+  })
+  const {
+    showDTModal,
+    onDTModalSkip,
+    onDTModalRemoval,
+  } = useProtocolDropTipModal({
+    areTipsAttached,
+    toggleDTWiz,
+    isMostRecentRunCurrent: mostRecentRunId === runId,
   })
 
   React.useEffect(() => {
@@ -403,6 +413,13 @@ export function ProtocolRunHeader({
             }}
           />
         ) : null}
+        {showDTModal ? (
+          <ProtocolDropTipModal
+            onSkip={onDTModalSkip}
+            onBeginRemoval={onDTModalRemoval}
+            mount={pipettesWithTip[0]?.mount}
+          />
+        ) : null}
         <Box display="grid" gridTemplateColumns="4fr 3fr 3fr 4fr">
           <LabeledValue label={t('run')} value={createdAtTimestamp} />
           <LabeledValue
@@ -478,7 +495,7 @@ export function ProtocolRunHeader({
         {showDTWiz && mostRecentRunId === runId ? (
           <DropTipWizardFlows
             robotType={isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE}
-            mount={pipettesWithTip[0].mount}
+            mount={pipettesWithTip[0]?.mount}
             instrumentModelSpecs={pipettesWithTip[0].specs}
             closeFlow={() => setTipStatusResolved().then(toggleDTWiz)}
           />

@@ -41,6 +41,10 @@ import {
   useRobot,
 } from './hooks'
 import { CalibrationStatusBanner } from './CalibrationStatusBanner'
+import {
+  ErrorRecoveryBanner,
+  useErrorRecoveryBanner,
+} from '../ErrorRecoveryBanner'
 
 import type { State } from '../../redux/types'
 
@@ -56,6 +60,8 @@ export function RobotOverview({
     'shared',
     'robot_calibration',
   ])
+
+  const { showRecoveryBanner, recoveryIntent } = useErrorRecoveryBanner()
 
   const isRobotBusy = useIsRobotBusy({ poll: true })
 
@@ -113,6 +119,12 @@ export function RobotOverview({
               <ReachableBanner robot={robot} />
             </Box>
             <UpdateRobotBanner robot={robot} marginBottom={SPACING.spacing8} />
+            {showRecoveryBanner ? (
+              <ErrorRecoveryBanner
+                recoveryIntent={recoveryIntent}
+                marginBottom={SPACING.spacing8}
+              />
+            ) : null}
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
               <RobotStatusHeader
                 name={robot.name}
