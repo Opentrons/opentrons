@@ -14,7 +14,7 @@ NUM_ROWS_IN_TIPRACK = 8
 NUM_COLUMNS_IN_TIPRACK = 12
 NUM_TIPS_PER_TIPRACK = NUM_ROWS_IN_TIPRACK * NUM_COLUMNS_IN_TIPRACK
 HACKY_FLEX_1000_UL_TIPRACK_LOAD_NAME = "hacky_1000ul_flex_tiprack"
-LIQUID_TRANSFER_AMOUNT = 1
+LIQUID_TRANSFER_AMOUNT = 5.0
 
 
 @dataclass
@@ -278,11 +278,11 @@ NINETY_SIX_CH_TEST_CASES = [
     PartialTipPickupTestCase(
         summary=(
             "row tip pickup"
-            "using bottom row of nozzles" 
+            "using bottom row of nozzles"
             "pickup top row of tips"
             "repeat the following steps until tips are exhausted or rtp specified number of pickups is reached:"
             "shift to row below -> pickup row of tips"
-            ),
+        ),
         pipette_configuration=PipetteConfiguration.row_bottom(),
         pickup_deck_slot="D1",
         drop_deck_slot="D2",
@@ -297,7 +297,8 @@ NINETY_SIX_CH_TEST_CASES = [
             "using left column of nozzles"
             "pickup right column of tips"
             "repeat the following steps until tips are exhausted or rtp specified number of pickups is reached:"
-            "pickup a column of tips -> shift to column right"),
+            "pickup a column of tips -> shift to column right"
+        ),
         pipette_configuration=PipetteConfiguration.column_left(),
         pickup_deck_slot="A1",
         drop_deck_slot="B1",
@@ -312,7 +313,8 @@ NINETY_SIX_CH_TEST_CASES = [
             "using right column of nozzles"
             "pickup left column of tips"
             "repeat the following steps until tips are exhausted or rtp specified number of pickups is reached:"
-            "pickup a column of tips -> shift to column left"),
+            "pickup a column of tips -> shift to column left"
+        ),
         pipette_configuration=PipetteConfiguration.column_right(),
         pickup_deck_slot="A3",
         drop_deck_slot="B3",
@@ -484,34 +486,37 @@ def run(protocol_context: protocol_api.ProtocolContext):
 
             drop_location = test_case.pipette_configuration.get_drop_location(drop_tip_rack, i)
 
-            if test_case.pipette_configuration.pickup_mode == SINGLE and i == 0:
+            if i == 0:
+                if test_case.pipette_configuration.pickup_mode == SINGLE:
 
-                src_well_list = [src_labware.wells_by_name()["A1"], src_labware.wells_by_name()["C1"]]
-                dest_well_list = [dest_labware.wells_by_name()["A1"], dest_labware.wells_by_name()["C1"]]
+                    single_src_well = src_labware.wells_by_name()["A1"]
+                    single_dest_well = dest_labware.wells_by_name()["A1"]
 
-                pipette.transfer(
-                    test_case.liquid_transfer_settings.transfer_volume,
-                    src_well_list,
-                    dest_well_list,
-                    new_tip="never",
-                )
+                    src_well_list = [src_labware.wells_by_name()[well_name] for well_name in ["A1", "C1"]]
 
-                # Currently getting error because something is looking for a trash bin and I
-                # don't have one defined.
-                # https://opentrons.atlassian.net/browse/RQA-2888
-                # pipette.distribute(
-                #     test_case.liquid_transfer_settings.transfer_volume,
-                #     src_labware.wells_by_name()["A1"],
-                #     dest_well_list,
-                #     new_tip="never",
-                # )
+                    dest_well_list = [dest_labware.wells_by_name()[well_name] for well_name in ["A1", "C1"]]
 
-                pipette.consolidate(
-                    test_case.liquid_transfer_settings.transfer_volume,
-                    src_well_list,
-                    dest_labware.wells_by_name()["A1"],
-                    new_tip="never",
-                )
+                    pipette.transfer(
+                        test_case.liquid_transfer_settings.transfer_volume,
+                        src_well_list,
+                        dest_well_list,
+                        new_tip="never",
+                    )
+
+                    pipette.distribute(
+                        test_case.liquid_transfer_settings.transfer_volume,
+                        single_src_well,
+                        dest_well_list,
+                        new_tip="never",
+                        disposal_volume=0,
+                    )
+
+                    pipette.consolidate(
+                        test_case.liquid_transfer_settings.transfer_volume,
+                        src_well_list,
+                        single_dest_well,
+                        new_tip="never",
+                    )
 
             pipette.drop_tip(drop_location)
 
