@@ -1,7 +1,9 @@
 import json
 import os
+from pathlib import Path
+from logging import getLogger
 
-from typing import Dict, Any, Union, Optional, List
+from typing import Dict, Any, Union, Optional, List, Iterator
 from typing_extensions import Literal
 from functools import lru_cache
 
@@ -26,6 +28,7 @@ from .types import (
 
 LoadedConfiguration = Dict[str, Union[str, Dict[str, Any]]]
 
+LOG = getLogger(__name__)
 
 def _get_configuration_dictionary(
     config_type: Literal["general", "geometry", "liquid"],
@@ -95,6 +98,11 @@ def _physical(
 ) -> LoadedConfiguration:
     return _get_configuration_dictionary("general", channels, model, version)
 
+def _dirs_in(path: Path) -> Iterator[Path]:
+    for child in path.iterdir():
+        if child.is_dir():
+            yield child
+
 
 @lru_cache(maxsize=None)
 def load_serial_lookup_table() -> Dict[str, str]:
@@ -112,14 +120,18 @@ def load_serial_lookup_table() -> Dict[str, str]:
         "eight_channel": "multi",
     }
     _model_shorthand = {"p1000": "p1k", "p300": "p3h"}
-    for channel_dir in os.listdir(config_path):
-        for model_dir in os.listdir(config_path / channel_dir):
-            for version_file in os.listdir(config_path / channel_dir / model_dir):
-                version_list = version_file.split(".json")[0].split("_")
-                built_model = f"{model_dir}_{_channel_model_str[channel_dir]}_v{version_list[0]}.{version_list[1]}"
-
-                model_shorthand = _model_shorthand.get(model_dir, model_dir)
-
+    for channel_dir in _dirs_in(config_path):
+        for model_dir in _dirs_in(channel_dir):
+            for version_file in model_dir.iterdir():
+                if version_file.suffix != '.json':
+                    continue
+                try:
+                    version_list = version_file.stem.split("_")
+                    built_model = f"{model_dir.stem}_{_channel_model_str[channel_dir.stem]}_v{version_list[0]}.{version_list[1]}"
+                except IndexError:
+                    LOG.warning(f'Pipette def with bad name {version_file} ignored')
+                    continue
+                model_shorthand = _model_shorthand.get(model_dir.stem, model_dir.stem)
                 if (
                     model_dir == "p300"
                     and int(version_list[0]) == 1
@@ -127,8 +139,8 @@ def load_serial_lookup_table() -> Dict[str, str]:
                 ):
                     # Well apparently, we decided to switch the shorthand of the p300 depending
                     # on whether it's a "V1" model or not...so...here is the lovely workaround.
-                    model_shorthand = model_dir
-                serial_shorthand = f"{model_shorthand.upper()}{_channel_shorthand[channel_dir]}V{version_list[0]}{version_list[1]}"
+                    model_shorthand = model_dir.stem
+                serial_shorthand = f"{model_shorthand.upper()}{_channel_shorthand[channel_dir.stem]}V{version_list[0]}{version_list[1]}"
                 _lookup_table[serial_shorthand] = built_model
     return _lookup_table
 
