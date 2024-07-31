@@ -32,7 +32,11 @@ export function useCommandTextString(
 
   const fullParams = { ...params, t }
 
-  switch (command?.commandType) {
+  if (command == null) {
+    return { commandText: '' }
+  }
+
+  switch (command.commandType) {
     case 'touchTip':
     case 'home':
     case 'savePosition':
