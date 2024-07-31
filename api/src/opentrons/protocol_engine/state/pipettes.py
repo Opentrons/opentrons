@@ -53,6 +53,7 @@ from ..commands import (
     RetractAxisResult,
     BlowOutResult,
     BlowOutInPlaceResult,
+    unsafe,
     TouchTipResult,
     thermocycler,
     heater_shaker,
@@ -278,7 +279,10 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                     default_dispense=tip_configuration.default_dispense_flowrate.values_by_api_level,
                 )
 
-        elif isinstance(command.result, (DropTipResult, DropTipInPlaceResult)):
+        elif isinstance(
+            command.result,
+            (DropTipResult, DropTipInPlaceResult, unsafe.UnsafeDropTipInPlaceResult),
+        ):
             pipette_id = command.params.pipetteId
             self._state.aspirated_volume_by_id[pipette_id] = None
             self._state.attached_tip_by_id[pipette_id] = None
@@ -483,7 +487,8 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             self._state.aspirated_volume_by_id[pipette_id] = next_volume
 
         elif isinstance(action, SucceedCommandAction) and isinstance(
-            action.command.result, (BlowOutResult, BlowOutInPlaceResult)
+            action.command.result,
+            (BlowOutResult, BlowOutInPlaceResult, unsafe.UnsafeBlowOutInPlaceResult),
         ):
             pipette_id = action.command.params.pipetteId
             self._state.aspirated_volume_by_id[pipette_id] = None
