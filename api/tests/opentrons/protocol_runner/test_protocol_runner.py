@@ -409,6 +409,7 @@ async def test_run_json_runner_stop_requested_stops_enqueuing(
                 createdAt=datetime(year=2021, month=1, day=1),
                 error=pe_errors.ProtocolEngineError(),
             ),
+            status=pe_commands.CommandStatus.FAILED,
         )
     )
 
