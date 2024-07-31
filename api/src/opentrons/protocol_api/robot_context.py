@@ -43,11 +43,12 @@ class RobotContext(publisher.CommandPublisher):
 
     def move_to(
         self,
-        abs_axis_map: Dict[hw_types.Axis, hw_types.AxisMapValue],
+        mount: Union[Mount, str],
+        abs_position: hw_types.Point,
         velocity: float,
         critical_point: Optional[hw_types.CriticalPoint],
     ) -> None:
-        raise NotImplementedError("`move_to` not yet implemented.")
+        raise NotImplementedError()
 
     def move_axes_to(
         self,
@@ -55,39 +56,35 @@ class RobotContext(publisher.CommandPublisher):
         velocity: float,
         critical_point: Optional[hw_types.CriticalPoint],
     ) -> None:
-        raise NotImplementedError("`move_axes_to` not yet implemented.")
+        raise NotImplementedError()
 
     def move_axes_relative(
         self, rel_axis_map: Dict[hw_types.Axis, hw_types.AxisMapValue], velocity: float
     ) -> None:
-        raise NotImplementedError("`move_axes_relative` not yet implemented.")
+        raise NotImplementedError()
 
     def grasp_gripper(self, force: float) -> None:
-        raise NotImplementedError("`grasp_gripper` not yet implemented.")
+        raise NotImplementedError()
 
     def release_gripper(self) -> None:
-        raise NotImplementedError("`release_gripper` not yet implemented.")
+        raise NotImplementedError()
 
     def axis_coordinates_for(
         self, mount: Union[Mount, str], location: Union[DeckLocation, OffDeckType]
     ) -> None:
-        raise NotImplementedError("`convert_axes_map` not yet implemented.")
+        raise NotImplementedError()
 
     def plunger_coordinates_for_volume(
         self, mount: Union[Mount, str], volume: float
     ) -> None:
-        raise NotImplementedError(
-            "`plunger_coordinates_for_volume` not yet implemented."
-        )
+        raise NotImplementedError()
 
     def plunger_coordinates_for_named_position(
         self, mount: Union[Mount, str], position_name: str
     ) -> None:
-        raise NotImplementedError(
-            "`plunger_coordinates_for_named_position` not yet implemented."
-        )
+        raise NotImplementedError()
 
     def build_axis_map(
         self, axis_map: Dict[hw_types.Axis, hw_types.AxisMapValue]
     ) -> None:
-        raise NotImplementedError("`build_axis_map` not yet implemented.")
+        raise NotImplementedError()

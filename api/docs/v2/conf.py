@@ -446,5 +446,6 @@ nitpick_ignore_regex = [
     ("py:class", r".*opentrons_shared_data.*"),
     ("py:class", r".*protocol_api._parameters.Parameters.*"),
     ("py:class", r".*AbsorbanceReaderContext"),  # shh it's a secret (for now)
+	("py:class", r".*RobotContext"),  # shh it's a secret (for now)
     ("py:class", r'.*AbstractLabware|APIVersion|LabwareLike|LoadedCoreMap|ModuleTypes|NoneType|OffDeckType|ProtocolCore|WellCore'),  # laundry list of not fully qualified things
 ]
