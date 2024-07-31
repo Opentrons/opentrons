@@ -153,11 +153,16 @@ class PythonProtocolExecutor:
     async def execute(
         protocol: Protocol,
         context: ProtocolContext,
+        parameter_context: Optional[ParameterContext],
         run_time_parameters_with_overrides: Optional[Parameters],
     ) -> None:
         """Execute a PAPIv2 protocol with a given ProtocolContext in a child thread."""
         await to_thread.run_sync(
-            run_protocol, protocol, context, run_time_parameters_with_overrides
+            run_protocol,
+            protocol,
+            context,
+            parameter_context,
+            run_time_parameters_with_overrides,
         )
 
     @staticmethod

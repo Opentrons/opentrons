@@ -255,6 +255,20 @@ class ParameterContext:
             parameter.file_info = FileInfo(id=file_id, name=file_name)
             parameter.value = parameter_file
 
+    def close_csv_files(self) -> None:
+        """Close all file handlers for CSV parameters.
+
+        :meta private:
+
+        This is intended for Opentrons internal use only and is not a guaranteed API.
+        """
+        for parameter in self._parameters.values():
+            if (
+                isinstance(parameter, csv_parameter_definition.CSVParameterDefinition)
+                and parameter.value is not None
+            ):
+                parameter.value.close()
+
     def export_parameters_for_analysis(self) -> List[RunTimeParameter]:
         """Exports all parameters into a protocol engine models for reporting in analysis.
 

@@ -1,7 +1,7 @@
 import logging
 from typing import Optional
 
-from opentrons.protocol_api import ProtocolContext
+from opentrons.protocol_api import ProtocolContext, ParameterContext
 from opentrons.protocol_api._parameters import Parameters
 from opentrons.protocols.execution.execute_python import exec_run
 from opentrons.protocols.execution.json_dispatchers import (
@@ -21,25 +21,35 @@ MODULE_LOG = logging.getLogger(__name__)
 def run_protocol(
     protocol: Protocol,
     context: ProtocolContext,
+    parameter_context: Optional[ParameterContext] = None,
     run_time_parameters_with_overrides: Optional[Parameters] = None,
 ) -> None:
     """Run a protocol.
 
     :param protocol: The :py:class:`.protocols.types.Protocol` to execute
     :param context: The protocol context to use.
+    :param parameter_context: The parameter context to use if running with runtime parameters.
     :param run_time_parameters_with_overrides: Run time parameters defined in the protocol,
         updated with the run's RTP override values. When we are running either simulate
         or execute, this will be None (until RTP is supported in cli commands)
     """
     if isinstance(protocol, PythonProtocol):
-        if protocol.api_level >= APIVersion(2, 0):
-            exec_run(
-                proto=protocol,
-                context=context,
-                run_time_parameters_with_overrides=run_time_parameters_with_overrides,
-            )
-        else:
-            raise RuntimeError(f"Unsupported python API version: {protocol.api_level}")
+        try:
+            if protocol.api_level >= APIVersion(2, 0):
+                exec_run(
+                    proto=protocol,
+                    context=context,
+                    run_time_parameters_with_overrides=run_time_parameters_with_overrides,
+                )
+            else:
+                raise RuntimeError(
+                    f"Unsupported python API version: {protocol.api_level}"
+                )
+        except Exception:
+            raise
+        finally:
+            if parameter_context is not None:
+                parameter_context.close_csv_files()
     else:
         if protocol.contents["schemaVersion"] == 3:
             ins = execute_json_v3.load_pipettes_from_json(context, protocol.contents)
