@@ -407,6 +407,14 @@ def add_parameters(parameters: protocol_api.Parameters):
         default="nest_96_wellplate_100ul_pcr_full_skirt",
     )
     parameters.add_int(
+        variable_name="pipetting_speed",
+        display_name="Pipetting Speed",
+        description="How fast should the pipette move around the deck.",
+        default=300,
+        minimum=50,
+        maximum=350,
+    )
+    parameters.add_int(
         variable_name="actual_num_of_single_pickups",
         display_name="Number of Single Mode Pickups",
         description="How many pickups should be done in single mode.",
@@ -433,6 +441,7 @@ def run(protocol_context: protocol_api.ProtocolContext):
     TIP_RACK_NAME = protocol_context.params.tip_rack_name
     TRANSFER_LABWARE_NAME = protocol_context.params.liquid_transfer_labware_name
     ACTUAL_NUM_OF_SINGLE_PICKUPS = protocol_context.params.actual_num_of_single_pickups
+    PIPETTING_SPEED = protocol_context.params.pipetting_speed
 
     if "50" in PIPETTE_NAME and "50" not in TIP_RACK_NAME:
         raise ValueError("50μL pipette requires 50μL tip rack")
@@ -443,38 +452,53 @@ def run(protocol_context: protocol_api.ProtocolContext):
         PICKUP_CASES = NINETY_SIX_CH_TEST_CASES
 
     pipette = protocol_context.load_instrument(PIPETTE_NAME, mount="left")
+    pipette.default_speed = PIPETTING_SPEED
 
     for test_case in PICKUP_CASES:
-        pickup_tip_rack = protocol_context.load_labware(load_name=TIP_RACK_NAME, location=protocol_api.OFF_DECK)
+        pickup_tip_rack = protocol_context.load_labware(
+            load_name=TIP_RACK_NAME,
+            label="Tip Rack - Full",
+            location=protocol_api.OFF_DECK
+        )
 
-        drop_tip_rack = protocol_context.load_labware(load_name=HACKY_FLEX_1000_UL_TIPRACK_LOAD_NAME, location=protocol_api.OFF_DECK)
+        drop_tip_rack = protocol_context.load_labware(
+            load_name=HACKY_FLEX_1000_UL_TIPRACK_LOAD_NAME,
+            label="Tip Rack - Empty",
+            location=protocol_api.OFF_DECK,
+        )
 
         src_labware = protocol_context.load_labware(
             load_name=TRANSFER_LABWARE_NAME,
             label="Liquid Transfer - Source Labware",
-            location=test_case.liquid_transfer_settings.source_labware_deck_slot,
+            location=protocol_api.OFF_DECK,
         )
 
         dest_labware = protocol_context.load_labware(
             load_name=TRANSFER_LABWARE_NAME,
             label="Liquid Transfer - Destination Labware",
-            location=test_case.liquid_transfer_settings.destination_labware_deck_slot,
+            location=protocol_api.OFF_DECK,
         )
-
         protocol_context.move_labware(labware=pickup_tip_rack, new_location=test_case.pickup_deck_slot)
 
         protocol_context.pause("Make sure to load an empty tip rack for the next step")
 
         protocol_context.move_labware(labware=drop_tip_rack, new_location=test_case.drop_deck_slot)
 
+        protocol_context.move_labware(
+            labware=src_labware,
+            new_location=test_case.liquid_transfer_settings.source_labware_deck_slot,
+        )
+
+        protocol_context.move_labware(
+            labware=dest_labware,
+            new_location=test_case.liquid_transfer_settings.destination_labware_deck_slot,
+        )
+
         pipette.configure_nozzle_layout(
             style=test_case.pipette_configuration.pickup_mode,
             start=test_case.pipette_configuration.starting_pipette_nozzle,
             tip_racks=[pickup_tip_rack],
         )
-
-        # Trying not to murder a pipette
-        pipette.default_speed = 50
 
         if test_case.pipette_configuration.pickup_mode == SINGLE:
             num_pickups = ACTUAL_NUM_OF_SINGLE_PICKUPS
