@@ -390,11 +390,11 @@ def add_parameters(parameters: protocol_api.Parameters):
         variable_name="tip_rack_name",
         display_name="Tip Rack Name",
         choices=[
-            {"display_name": "50μL", "value": "opentrons_96_tiprack_50ul"},
-            {"display_name": "200μL", "value": "opentrons_96_tiprack_200ul"},
-            {"display_name": "1000μL", "value": "opentrons_96_tiprack_1000ul"},
+            {"display_name": "50μL", "value": "opentrons_flex_96_tiprack_50ul"},
+            {"display_name": "200μL", "value": "opentrons_flex_96_tiprack_200ul"},
+            {"display_name": "1000μL", "value": "opentrons_flex_96_tiprack_1000ul"},
         ],
-        default="opentrons_96_tiprack_1000ul",
+        default="opentrons_flex_96_tiprack_1000ul",
     )
     parameters.add_str(
         variable_name="liquid_transfer_labware_name",
@@ -445,7 +445,7 @@ def run(protocol_context: protocol_api.ProtocolContext):
     pipette = protocol_context.load_instrument(PIPETTE_NAME, mount="left")
 
     for test_case in PICKUP_CASES:
-        pickup_tip_rack = protocol_context.load_labware(load_name="opentrons_96_tiprack_1000ul", location=protocol_api.OFF_DECK)
+        pickup_tip_rack = protocol_context.load_labware(load_name=TIP_RACK_NAME, location=protocol_api.OFF_DECK)
 
         drop_tip_rack = protocol_context.load_labware(load_name=HACKY_FLEX_1000_UL_TIPRACK_LOAD_NAME, location=protocol_api.OFF_DECK)
 
