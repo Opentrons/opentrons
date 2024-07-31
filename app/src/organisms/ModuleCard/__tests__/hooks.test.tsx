@@ -31,7 +31,7 @@ import type { State } from '../../../redux/types'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
-vi.mock('../../ProtocolUpload/hooks')
+vi.mock('../../../resources/runs')
 vi.mock('../../Devices/hooks')
 
 const mockCloseLatchHeaterShaker = {
