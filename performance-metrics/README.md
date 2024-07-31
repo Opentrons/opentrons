@@ -58,22 +58,23 @@ Developers are able to track when the robot is in a block of code they choose to
 `api/src/opentrons/util/performance_helpers.py` you will see a class called `TrackingFunctions`. This class
 defines static methods which are decorators that can be used wrap arbitrary functions.
 
-As of 2024-07-31, the following tracking functions are available: 
+As of 2024-07-31, the following tracking functions are available:
+
 - `track_analysis`
 - `track_getting_cached_protocol_analysis`
 
-Looking at `TrackingFunctions.track_analysis` we see that the underlying call to _track_a_function specifies a string `"ANALYZING_PROTOCOL"`. Whenever a function that is wrapped with `TrackingFunctions.track_analysis` executes, the tracking function will label the underlying function as `"ANALYZING_PROTOCOL"`.
+Looking at `TrackingFunctions.track_analysis` we see that the underlying call to \_track_a_function specifies a string `"ANALYZING_PROTOCOL"`. Whenever a function that is wrapped with `TrackingFunctions.track_analysis` executes, the tracking function will label the underlying function as `"ANALYZING_PROTOCOL"`.
 
 To see where tracking function is used look at `robot_server/robot-server/protocols/protocol_analyzer.py`. You will see that the `ProtocolAnalyzer.analyze` function is wrapped with `TrackingFunctions.track_analysis`. Whenever `ProtocolAnalyzer.analyze` is called, the tracking function will start a timer. When the `ProtocolAnalyzer.analyze` function completes, the tracking function will stop the timer. It will then store the function start time and duration to the csv file, /data/performance_metrics_data/robot_activity_data
 
 #### Adding new tracking decorator
 
-To add a new tracking decorator, go to `performance-metrics/src/performance_metrics/_types.py`, and look at RobotActivityState literal and add a new state. 
+To add a new tracking decorator, go to `performance-metrics/src/performance_metrics/_types.py`, and look at RobotActivityState literal and add a new state.
 Go to `api/src/opentrons/util/performance_helpers.py` and add a static method to the `TrackingFunctions` class that uses the new state.
 
 You can now wrap your functions with your new tracking decorator.
 
 ### System resource tracking
 
-performance-metrics also exposes a tracking application called `SystemResourceTracker`. The application is implemented as a systemd service on the robot and records system resource usage by process. See the `oe-core` repo for more details. 
+performance-metrics also exposes a tracking application called `SystemResourceTracker`. The application is implemented as a systemd service on the robot and records system resource usage by process. See the `oe-core` repo for more details.
 You can configure the system resource tracker by modifying the environment variables set for the service. The service file lives at `/lib/systemd/system/system-resource-tracker.service`. You can change the defined environment variables or remove them and define them in the robot's environment variables. See `performance-metrics/src/performance_metrics/system_resource_tracker/_config.py` to see what environment variables are available.
