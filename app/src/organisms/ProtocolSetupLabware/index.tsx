@@ -615,7 +615,7 @@ function RowLabware({
                     <LegacyStyledText as="p" color={COLORS.grey60}>
                       {t('protocol_setup:labware_latch_instructions')}
                     </LegacyStyledText>
-                  ) : null}{' '}
+                  ) : null}
                 </Flex>
               </Flex>
             </>
