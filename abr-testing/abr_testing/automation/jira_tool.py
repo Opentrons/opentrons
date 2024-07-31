@@ -76,12 +76,25 @@ class JiraTicket:
                     "type": {"name": "Relates"},
                 }
             )
-            response = requests.post(
-                f"{self.url}/rest/api/3/issueLink",
-                headers=self.headers,
-                auth=self.auth,
-                data=link_data,
-            )
+            try:
+                response = requests.post(
+                    f"{self.url}/rest/api/3/issueLink",
+                    headers=self.headers,
+                    auth=self.auth,
+                    data=link_data,
+                )
+                response.raise_for_status()
+            except requests.exceptions.HTTPError:
+                print(
+                    f"HTTP error occurred. Ticket ID {issue} was not linked. \
+                        Check user permissions and authentication credentials"
+                )
+            except requests.exceptions.ConnectionError:
+                print(f"Connection error occurred. Ticket ID {issue} was not linked.")
+            except json.JSONDecodeError:
+                print(
+                    f"JSON decoding error occurred. Ticket ID {issue} was not linked."
+                )
 
     def open_issue(self, issue_key: str) -> str:
         """Open issue on web browser."""
