@@ -43,6 +43,7 @@ stages:
           current: True
           actions: []
           errors: []
+          fullErrorList: []
           pipettes: []
           modules: []
           labware: []
