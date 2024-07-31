@@ -110,7 +110,7 @@ class Run(ResourceModel):
             " but it won't have more than one element."
         ),
     )
-    fullErrorList: List[ErrorOccurrence] = Field(
+    allCommandErrors: List[ErrorOccurrence] = Field(
         ...,
         description=("A list of errors that occured during the run."),
     )
@@ -187,7 +187,7 @@ class BadRun(ResourceModel):
             " but it won't have more than one element."
         ),
     )
-    fullErrorList: List[ErrorOccurrence] = Field(
+    allCommandErrors: List[ErrorOccurrence] = Field(
         ...,
         description=("A list of errors that occured during the run."),
     )

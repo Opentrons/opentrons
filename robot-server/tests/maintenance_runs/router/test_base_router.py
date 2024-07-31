@@ -75,7 +75,7 @@ async def test_create_run(
         labwareOffsets=[],
         status=pe_types.EngineStatus.IDLE,
         liquids=[],
-        fullErrorList=[],
+        allCommandErrors=[],
     )
 
     decoy.when(
@@ -147,7 +147,7 @@ async def test_get_run_data_from_url(
         labware=[],
         labwareOffsets=[],
         liquids=[],
-        fullErrorList=[],
+        allCommandErrors=[],
     )
 
     decoy.when(mock_maintenance_run_data_manager.get("run-id")).then_return(
@@ -197,7 +197,7 @@ async def test_get_run() -> None:
         labware=[],
         labwareOffsets=[],
         liquids=[],
-        fullErrorList=[],
+        allCommandErrors=[],
     )
 
     result = await get_run(run_data=run_data)
@@ -223,7 +223,7 @@ async def test_get_current_run(
         labware=[],
         labwareOffsets=[],
         liquids=[],
-        fullErrorList=[],
+        allCommandErrors=[],
     )
     decoy.when(mock_maintenance_run_data_manager.current_run_id).then_return(
         "current-run-id"

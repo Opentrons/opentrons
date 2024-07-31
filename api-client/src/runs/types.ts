@@ -47,6 +47,7 @@ export interface LegacyGoodRunData {
   status: RunStatus
   actions: RunAction[]
   errors: RunError[]
+  allCommandErrors: RunError[]
   pipettes: LoadedPipette[]
   labware: LoadedLabware[]
   liquids: Liquid[]

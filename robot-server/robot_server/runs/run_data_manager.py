@@ -44,7 +44,7 @@ def _build_run(
             actions=run_resource.actions,
             status=state_summary.status,
             errors=state_summary.errors,
-            fullErrorList=state_summary.fullErrorList,
+            allCommandErrors=state_summary.allCommandErrors,
             labware=state_summary.labware,
             labwareOffsets=state_summary.labwareOffsets,
             pipettes=state_summary.pipettes,
@@ -66,7 +66,7 @@ def _build_run(
             pipettes=[],
             modules=[],
             liquids=[],
-            fullErrorList=[],
+            allCommandErrors=[],
         )
         errors.append(state_summary.dataError)
     else:
@@ -109,7 +109,7 @@ def _build_run(
         startedAt=state.startedAt,
         liquids=state.liquids,
         runTimeParameters=run_time_parameters,
-        fullErrorList=state.fullErrorList,
+        allCommandErrors=state.allCommandErrors,
     )
 
 

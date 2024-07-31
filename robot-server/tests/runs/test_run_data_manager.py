@@ -86,7 +86,7 @@ def engine_state_summary() -> StateSummary:
     return StateSummary(
         status=EngineStatus.IDLE,
         errors=[ErrorOccurrence.construct(id="some-error-id")],  # type: ignore[call-arg]
-        fullErrorList=[ErrorOccurrence.construct(id="some-error-id")],  # type: ignore[call-arg]
+        allCommandErrors=[ErrorOccurrence.construct(id="some-error-id")],  # type: ignore[call-arg]
         labware=[LoadedLabware.construct(id="some-labware-id")],  # type: ignore[call-arg]
         labwareOffsets=[LabwareOffset.construct(id="some-labware-offset-id")],  # type: ignore[call-arg]
         pipettes=[LoadedPipette.construct(id="some-pipette-id")],  # type: ignore[call-arg]
@@ -196,7 +196,7 @@ async def test_create(
         actions=run_resource.actions,
         status=engine_state_summary.status,
         errors=engine_state_summary.errors,
-        fullErrorList=engine_state_summary.fullErrorList,
+        allCommandErrors=engine_state_summary.allCommandErrors,
         labware=engine_state_summary.labware,
         labwareOffsets=engine_state_summary.labwareOffsets,
         pipettes=engine_state_summary.pipettes,
@@ -268,7 +268,7 @@ async def test_create_with_options(
         actions=run_resource.actions,
         status=engine_state_summary.status,
         errors=engine_state_summary.errors,
-        fullErrorList=engine_state_summary.fullErrorList,
+        allCommandErrors=engine_state_summary.allCommandErrors,
         labware=engine_state_summary.labware,
         labwareOffsets=engine_state_summary.labwareOffsets,
         pipettes=engine_state_summary.pipettes,
@@ -350,7 +350,7 @@ async def test_get_current_run(
         actions=run_resource.actions,
         status=engine_state_summary.status,
         errors=engine_state_summary.errors,
-        fullErrorList=engine_state_summary.fullErrorList,
+        allCommandErrors=engine_state_summary.allCommandErrors,
         labware=engine_state_summary.labware,
         labwareOffsets=engine_state_summary.labwareOffsets,
         pipettes=engine_state_summary.pipettes,
@@ -392,7 +392,7 @@ async def test_get_historical_run(
         actions=run_resource.actions,
         status=engine_state_summary.status,
         errors=engine_state_summary.errors,
-        fullErrorList=engine_state_summary.fullErrorList,
+        allCommandErrors=engine_state_summary.allCommandErrors,
         labware=engine_state_summary.labware,
         labwareOffsets=engine_state_summary.labwareOffsets,
         pipettes=engine_state_summary.pipettes,
@@ -435,7 +435,7 @@ async def test_get_historical_run_no_data(
         actions=run_resource.actions,
         status=EngineStatus.STOPPED,
         errors=[],
-        fullErrorList=[],
+        allCommandErrors=[],
         labware=[],
         labwareOffsets=[],
         pipettes=[],
@@ -455,7 +455,7 @@ async def test_get_all_runs(
     current_run_data = StateSummary(
         status=EngineStatus.IDLE,
         errors=[ErrorOccurrence.construct(id="current-error-id")],  # type: ignore[call-arg]
-        fullErrorList=[ErrorOccurrence.construct(id="current-error-id")],  # type: ignore[call-arg]
+        allCommandErrors=[ErrorOccurrence.construct(id="current-error-id")],  # type: ignore[call-arg]
         labware=[LoadedLabware.construct(id="current-labware-id")],  # type: ignore[call-arg]
         labwareOffsets=[LabwareOffset.construct(id="current-labware-offset-id")],  # type: ignore[call-arg]
         pipettes=[LoadedPipette.construct(id="current-pipette-id")],  # type: ignore[call-arg]
@@ -474,7 +474,7 @@ async def test_get_all_runs(
     historical_run_data = StateSummary(
         status=EngineStatus.STOPPED,
         errors=[ErrorOccurrence.construct(id="old-error-id")],  # type: ignore[call-arg]
-        fullErrorList=[ErrorOccurrence.construct(id="old-error-id")],  # type: ignore[call-arg]
+        allCommandErrors=[ErrorOccurrence.construct(id="old-error-id")],  # type: ignore[call-arg]
         labware=[LoadedLabware.construct(id="old-labware-id")],  # type: ignore[call-arg]
         labwareOffsets=[LabwareOffset.construct(id="old-labware-offset-id")],  # type: ignore[call-arg]
         pipettes=[LoadedPipette.construct(id="old-pipette-id")],  # type: ignore[call-arg]
@@ -534,7 +534,7 @@ async def test_get_all_runs(
             actions=historical_run_resource.actions,
             status=historical_run_data.status,
             errors=historical_run_data.errors,
-            fullErrorList=historical_run_data.fullErrorList,
+            allCommandErrors=historical_run_data.allCommandErrors,
             labware=historical_run_data.labware,
             labwareOffsets=historical_run_data.labwareOffsets,
             pipettes=historical_run_data.pipettes,
@@ -550,7 +550,7 @@ async def test_get_all_runs(
             actions=current_run_resource.actions,
             status=current_run_data.status,
             errors=current_run_data.errors,
-            fullErrorList=current_run_data.fullErrorList,
+            allCommandErrors=current_run_data.allCommandErrors,
             labware=current_run_data.labware,
             labwareOffsets=current_run_data.labwareOffsets,
             pipettes=current_run_data.pipettes,
@@ -640,7 +640,7 @@ async def test_update_current(
         actions=run_resource.actions,
         status=engine_state_summary.status,
         errors=engine_state_summary.errors,
-        fullErrorList=engine_state_summary.fullErrorList,
+        allCommandErrors=engine_state_summary.allCommandErrors,
         labware=engine_state_summary.labware,
         labwareOffsets=engine_state_summary.labwareOffsets,
         pipettes=engine_state_summary.pipettes,
@@ -696,7 +696,7 @@ async def test_update_current_noop(
         actions=run_resource.actions,
         status=engine_state_summary.status,
         errors=engine_state_summary.errors,
-        fullErrorList=engine_state_summary.fullErrorList,
+        allCommandErrors=engine_state_summary.allCommandErrors,
         labware=engine_state_summary.labware,
         labwareOffsets=engine_state_summary.labwareOffsets,
         pipettes=engine_state_summary.pipettes,

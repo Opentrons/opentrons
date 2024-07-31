@@ -34,7 +34,7 @@ stages:
           current: True
           actions: []
           errors: []
-          fullErrorList: []
+          allCommandErrors: []
           pipettes: []
           modules: []
           labware:
@@ -242,6 +242,7 @@ stages:
           runTimeParameters: []
           completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
           errors: []
+          allCommandErrors: []
           pipettes: []
           modules: []
           protocolId: '{protocol_id}'

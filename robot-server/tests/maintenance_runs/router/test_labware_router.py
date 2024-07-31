@@ -38,7 +38,7 @@ def run() -> MaintenanceRun:
         modules=[],
         labwareOffsets=[],
         liquids=[],
-        fullErrorList=[],
+        allCommandErrors=[],
     )
 
 
