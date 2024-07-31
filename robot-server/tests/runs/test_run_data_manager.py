@@ -86,6 +86,7 @@ def engine_state_summary() -> StateSummary:
     return StateSummary(
         status=EngineStatus.IDLE,
         errors=[ErrorOccurrence.construct(id="some-error-id")],  # type: ignore[call-arg]
+        fullErrorList=[ErrorOccurrence.construct(id="some-error-id")],  # type: ignore[call-arg]
         labware=[LoadedLabware.construct(id="some-labware-id")],  # type: ignore[call-arg]
         labwareOffsets=[LabwareOffset.construct(id="some-labware-offset-id")],  # type: ignore[call-arg]
         pipettes=[LoadedPipette.construct(id="some-pipette-id")],  # type: ignore[call-arg]
@@ -454,6 +455,7 @@ async def test_get_all_runs(
     current_run_data = StateSummary(
         status=EngineStatus.IDLE,
         errors=[ErrorOccurrence.construct(id="current-error-id")],  # type: ignore[call-arg]
+        fullErrorList=[ErrorOccurrence.construct(id="current-error-id")],  # type: ignore[call-arg]
         labware=[LoadedLabware.construct(id="current-labware-id")],  # type: ignore[call-arg]
         labwareOffsets=[LabwareOffset.construct(id="current-labware-offset-id")],  # type: ignore[call-arg]
         pipettes=[LoadedPipette.construct(id="current-pipette-id")],  # type: ignore[call-arg]
@@ -472,6 +474,7 @@ async def test_get_all_runs(
     historical_run_data = StateSummary(
         status=EngineStatus.STOPPED,
         errors=[ErrorOccurrence.construct(id="old-error-id")],  # type: ignore[call-arg]
+        fullErrorList=[ErrorOccurrence.construct(id="old-error-id")],  # type: ignore[call-arg]
         labware=[LoadedLabware.construct(id="old-labware-id")],  # type: ignore[call-arg]
         labwareOffsets=[LabwareOffset.construct(id="old-labware-offset-id")],  # type: ignore[call-arg]
         pipettes=[LoadedPipette.construct(id="old-pipette-id")],  # type: ignore[call-arg]
