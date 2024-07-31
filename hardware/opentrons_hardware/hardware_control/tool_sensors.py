@@ -185,10 +185,6 @@ async def run_sync_buffer_to_csv(
     """Runs the sensor pass move group and creates a csv file with the results."""
     sensor_metadata = [0, 0, mount_speed, plunger_speed, threshold]
     positions = await move_group.run(can_messenger=messenger)
-    if raise_z is not None:
-        #  if probing is finished, move the head node back up before requesting the data buffer
-        if positions[head_node].move_ack == MoveCompleteAck.stopped_by_condition:
-            await raise_z.run(can_messenger=messenger)
     # wait a little to see the dropoff curve
     await asyncio.sleep(0.15)
     for sensor_id in log_files.keys():
@@ -203,6 +199,10 @@ async def run_sync_buffer_to_csv(
             ),
             expected_nodes=[tool],
         )
+    if raise_z is not None and False:
+        #  if probing is finished, move the head node back up before requesting the data buffer
+        if positions[head_node].move_ack == MoveCompleteAck.stopped_by_condition:
+            await raise_z.run(can_messenger=messenger)
     for sensor_id in log_files.keys():
         sensor_capturer = LogListener(
             mount=head_node,
