@@ -11,11 +11,9 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  Icon,
   InfoScreen,
   JUSTIFY_FLEX_START,
   LegacyStyledText,
-  Link,
   LocationIcon,
   OVERFLOW_HIDDEN,
   SPACING,
@@ -27,11 +25,8 @@ import {
   getLoadedLabwareDefinitionsByUri,
   getModuleDisplayName,
 } from '@opentrons/shared-data'
-import {
-  useAllCsvFilesQuery,
-  useCsvFileRawQuery,
-} from '@opentrons/react-api-client'
-import { downloadFile } from './utils'
+import { useAllCsvFilesQuery } from '@opentrons/react-api-client'
+import { DownloadCsvFileLink } from './DownloadCsvFileLink'
 import { useFeatureFlag } from '../../redux/config'
 import { Banner } from '../../atoms/Banner'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
@@ -101,7 +96,7 @@ export function HistoricalProtocolRunDrawer(
   ) : null
 
   const protocolFilesData =
-    allProtocolDataFiles.length === 0 ? (
+    allProtocolDataFiles.length === 1 ? (
       <InfoScreen contentType="noFiles" t={t} backgroundColor={COLORS.grey35} />
     ) : (
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
@@ -173,7 +168,7 @@ export function HistoricalProtocolRunDrawer(
                   </LegacyStyledText>
                 </Box>
                 <Box width="34%">
-                  <DownloadLink fileId={fileId} fileName={fileName} />
+                  <DownloadCsvFileLink fileId={fileId} fileName={fileName} />
                 </Box>
               </Flex>
             )
@@ -298,36 +293,5 @@ export function HistoricalProtocolRunDrawer(
       {enableCsvFile ? protocolFilesData : null}
       {labwareOffsets}
     </Flex>
-  )
-}
-
-interface DownloadLinkProps {
-  fileId: string
-  fileName: string
-}
-function DownloadLink(props: DownloadLinkProps): JSX.Element {
-  const { fileId, fileName } = props
-  const { t } = useTranslation('run_details')
-  const { data: csvFileRaw } = useCsvFileRawQuery(fileId)
-
-  return (
-    <Link
-      role="button"
-      css={
-        csvFileRaw == null
-          ? TYPOGRAPHY.darkLinkLabelSemiBoldDisabled
-          : TYPOGRAPHY.linkPSemiBold
-      }
-      onClick={() => {
-        if (csvFileRaw != null) {
-          downloadFile(csvFileRaw, fileName)
-        }
-      }}
-    >
-      <Flex alignItems={ALIGN_CENTER}>
-        <LegacyStyledText as="p">{t('download')}</LegacyStyledText>
-        <Icon name="download" size="1rem" marginLeft="0.4375rem" />
-      </Flex>
-    </Link>
   )
 }
