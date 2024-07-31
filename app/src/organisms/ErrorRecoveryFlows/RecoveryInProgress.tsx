@@ -1,9 +1,19 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { RECOVERY_MAP } from './constants'
-import { Flex, ALIGN_CENTER, JUSTIFY_CENTER } from '@opentrons/components'
+import {
+  Flex,
+  Icon,
+  StyledText,
+  ALIGN_CENTER,
+  JUSTIFY_CENTER,
+  RESPONSIVENESS,
+  DIRECTION_COLUMN,
+  SPACING,
+  COLORS,
+} from '@opentrons/components'
 
 import type { RobotMovingRoute, RecoveryContentProps } from './types'
 
@@ -43,12 +53,37 @@ export function RecoveryInProgress({
   const description = buildDescription()
 
   return (
-    <Flex
-      alignItems={ALIGN_CENTER}
-      justifyContent={JUSTIFY_CENTER}
-      width="100%"
-    >
-      <InProgressModal description={description} />
+    <Flex css={CONTAINER_STYLE}>
+      <Icon name="ot-spinner" aria-label="spinner" css={ICON_STYLE} spin />
+      {description != null && (
+        <StyledText desktopStyle="headingSmallBold" oddStyle="level3HeaderBold">
+          {description}
+        </StyledText>
+      )}
     </Flex>
   )
 }
+
+const CONTAINER_STYLE = css`
+  align-items: ${ALIGN_CENTER};
+  justify-content: ${JUSTIFY_CENTER};
+  flex-direction: ${DIRECTION_COLUMN};
+  grid-gap: ${SPACING.spacing16};
+  width: 100%;
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    grid-gap: ${SPACING.spacing24};
+  }
+`
+
+const ICON_STYLE = css`
+  height: 5rem;
+  width: 5rem;
+  color: ${COLORS.grey60};
+  opacity: 100%;
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    height: 6.25rem;
+    width: 6.25rem;
+  }
+`
