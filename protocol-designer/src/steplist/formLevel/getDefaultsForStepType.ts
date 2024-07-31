@@ -28,6 +28,7 @@ export function getDefaultsForStepType(
         dispense_delay_seconds: `${DEFAULT_DELAY_SECONDS}`,
         dispense_flowRate: null,
         dropTip_location: null,
+        dropTip_wellNames: undefined,
         labware: null,
         mix_mmFromBottom: DEFAULT_MM_FROM_BOTTOM_DISPENSE,
         mix_touchTip_checkbox: false,
