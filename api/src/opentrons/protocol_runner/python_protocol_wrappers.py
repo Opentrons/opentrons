@@ -170,7 +170,6 @@ class PythonProtocolExecutor:
         protocol: PythonProtocol,
         parameter_context: ParameterContext,
         run_time_param_overrides: Optional[PrimitiveRunTimeParamValuesType],
-        # TODO maybe this one too
         run_time_param_file_overrides: Optional[CSVRuntimeParamPaths],
     ) -> Optional[Parameters]:
         """Extract the parameters defined in the protocol, overridden with values for the run."""

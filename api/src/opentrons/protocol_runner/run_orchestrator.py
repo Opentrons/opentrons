@@ -229,7 +229,6 @@ class RunOrchestrator:
         """Get loaded labware definitions."""
         return self._protocol_engine.state_view.labware.get_loaded_labware_definitions()
 
-    # TODO make sure this returns CSV parameters here
     def get_run_time_parameters(self) -> List[RunTimeParameter]:
         """Get the list of run time parameters defined in the protocol, if any.
 
