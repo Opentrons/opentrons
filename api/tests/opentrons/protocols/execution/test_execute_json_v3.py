@@ -1,11 +1,20 @@
-from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabwareCore
-from opentrons.protocol_api.core.legacy.legacy_well_core import LegacyWellCore
-from opentrons.protocol_api.core.legacy.well_geometry import WellGeometry
-
 from unittest import mock
 from copy import deepcopy
+from typing import Any, Callable, Dict, List, Tuple
+import typing
+from opentrons.protocol_api.core.well import AbstractWellCore
 from opentrons_shared_data.labware.types import LabwareDefinition
-from opentrons_shared_data.protocol.types import DelayParams
+from opentrons_shared_data.protocol.types import (
+    BlowoutParams,
+    DelayParams,
+    FlowRateParams,
+    JsonProtocolV3,
+    MoveToSlotParams,
+    PipetteAccessParams,
+    PipetteAccessWithOffsetParams,
+    StandardLiquidHandlingParams,
+    TouchTipParams,
+)
 import pytest
 from opentrons.types import Location, Point, MountType
 from opentrons.protocols.parse import parse
@@ -34,8 +43,10 @@ from opentrons.protocols.execution.execute_json_v3 import (
     _get_location_with_offset,
     load_pipettes_from_json,
 )
-
-from typing import Any, Callable, Tuple
+from opentrons.protocol_api.core.core_map import LoadedCoreMap
+from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabwareCore
+from opentrons.protocol_api.core.legacy.legacy_well_core import LegacyWellCore
+from opentrons.protocol_api.core.legacy.well_geometry import WellGeometry
 
 
 def test_load_pipettes_from_json() -> None:
@@ -44,27 +55,34 @@ def test_load_pipettes_from_json() -> None:
 
     ctx = mock.create_autospec(ProtocolContext)
     ctx.load_instrument = fake_pipette
-    protocol = {
+    protocol: "JsonProtocolV3" = {
         "pipettes": {
-            "aID": {"mount": "left", "name": "a"},
-            "bID": {"mount": "right", "name": "b"},
+            "aID": {"mount": "left", "name": "p10_single"},
+            "bID": {"mount": "right", "name": "p50_single"},
         }
     }
     result = load_pipettes_from_json(ctx, protocol)
-    assert result == {"aID": ("a", "left"), "bID": ("b", "right")}
+    assert result == {"aID": ("p10_single", "left"), "bID": ("p50_single", "right")}  # type: ignore[comparison-overlap]
 
 
 def test_get_well(minimal_labware_def2: LabwareDefinition) -> None:
     deck = Location(Point(0, 0, 0), "deck")
+    mock_core = mock.create_autospec(AbstractWellCore)
+    mock_map = mock.create_autospec(LoadedCoreMap)
+    mock_pipette = mock.create_autospec(InstrumentContext)
     well_name = "A2"
     some_labware = labware.Labware(
         core=LegacyLabwareCore(minimal_labware_def2, deck),
         api_version=MAX_SUPPORTED_VERSION,
-        protocol_core=None,
-        core_map=None,
+        protocol_core=mock_core,
+        core_map=mock_map,
     )
     loaded_labware = {"someLabwareId": some_labware}
-    params = {"labware": "someLabwareId", "well": well_name}
+    params: PipetteAccessParams = {
+        "labware": "someLabwareId",
+        "well": well_name,
+        "pipette": mock_pipette,
+    }
     result = _get_well(loaded_labware, params)
     assert result == some_labware[well_name]
 
@@ -74,7 +92,7 @@ def test_set_flow_rate() -> None:
     pipette.flow_rate.aspirate = 1
     pipette.flow_rate.dispense = 2
     pipette.flow_rate.blow_out = 3
-    params = {"flowRate": 42}
+    params: FlowRateParams = {"flowRate": 42}
 
     _set_flow_rate(pipette, params)
     assert pipette.flow_rate.aspirate == 42
@@ -86,7 +104,7 @@ def test_load_labware_from_json_defs(
     ctx: ProtocolContext, get_labware_fixture: Callable[[str], Any]
 ) -> None:
     custom_trough_def = get_labware_fixture("fixture_12_trough")
-    data = {
+    data: "JsonProtocolV3" = {
         "labwareDefinitions": {"someTroughDef": custom_trough_def},
         "labware": {
             "sourcePlateId": {
@@ -94,7 +112,7 @@ def test_load_labware_from_json_defs(
                 "definitionId": "someTroughDef",
                 "displayName": "Source (Buffer)",
             },
-            "destPlateId": {"slot": "11", "definitionId": "someTroughDef"},
+            "destPlateId": {"slot": "11", "definitionId": "someTroughDef"},  # type: ignore[typeddict-item]
         },
     }
     loaded_labware = load_labware_from_json_defs(ctx, data)
@@ -112,7 +130,13 @@ def test_load_labware_from_json_defs(
 
 def test_get_location_with_offset(min_lw2: labware.Labware) -> None:
     loaded_labware = {"someLabwareId": min_lw2}
-    params = {"offsetFromBottomMm": 3, "labware": "someLabwareId", "well": "A2"}
+    mock_pipette = mock.create_autospec(InstrumentContext)
+    params: PipetteAccessWithOffsetParams = {
+        "offsetFromBottomMm": 3,
+        "labware": "someLabwareId",
+        "well": "A2",
+        "pipette": mock_pipette,
+    }
     result = _get_location_with_offset(loaded_labware, params)
     assert result == Location(Point(19, 28, 8), min_lw2["A2"])
 
@@ -121,17 +145,25 @@ def test_get_location_with_offset_fixed_trash(
     minimal_labware_def2: LabwareDefinition,
 ) -> None:
     deck = Location(Point(0, 0, 0), "deck")
+    mock_core = mock.create_autospec(AbstractWellCore)
+    mock_map = mock.create_autospec(LoadedCoreMap)
+    mock_pipette = mock.create_autospec(InstrumentContext)
     trash_labware_def = deepcopy(minimal_labware_def2)
     trash_labware_def["parameters"]["quirks"] = ["fixedTrash"]
     trash_labware = labware.Labware(
         core=LegacyLabwareCore(trash_labware_def, deck),
         api_version=MAX_SUPPORTED_VERSION,
-        protocol_core=None,
-        core_map=None,
+        protocol_core=mock_core,
+        core_map=mock_map,
     )
 
     loaded_labware = {"someLabwareId": trash_labware}
-    params = {"offsetFromBottomMm": 3, "labware": "someLabwareId", "well": "A1"}
+    params: PipetteAccessWithOffsetParams = {
+        "offsetFromBottomMm": 3,
+        "labware": "someLabwareId",
+        "well": "A1",
+        "pipette": mock_pipette,
+    }
 
     result = _get_location_with_offset(loaded_labware, params)
 
@@ -145,7 +177,7 @@ def test_get_location_with_offset_fixed_trash(
         ({"wait": 123, "message": "m"}, [mock.call.delay(seconds=123, msg="m")]),
     ],
 )
-def test_delay(params: DelayParams, expected) -> None:
+def test_delay(params: DelayParams, expected: List[Any]) -> None:
     mock_context = mock.MagicMock()
     _delay(mock_context, params)
 
@@ -156,15 +188,17 @@ def test_blowout() -> None:
     m = mock.MagicMock()
     m.pipette_mock = mock.create_autospec(InstrumentContext)
     m.mock_set_flow_rate = mock.MagicMock()
+    mock_labware = mock.create_autospec(labware.Labware)
 
-    params = {
+    params: BlowoutParams = {
         "pipette": "somePipetteId",
         "labware": "someLabwareId",
         "well": "someWell",
+        "flowRate": 0,
+        "offsetFromBottomMm": 0,
     }
     instruments = {"somePipetteId": m.pipette_mock}
-    well = "theWell"
-    loaded_labware = {"someLabwareId": {"someWell": well}}
+    loaded_labware: Dict[str, labware.Labware] = {"someLabwareId": mock_labware}
 
     flow_rate_patch = "opentrons.protocols.execution.execute_json_v3._set_flow_rate"
     with mock.patch(flow_rate_patch, new=m.mock_set_flow_rate):
@@ -172,64 +206,69 @@ def test_blowout() -> None:
 
     assert m.mock_calls == [
         mock.call.mock_set_flow_rate(m.pipette_mock, params),
-        mock.call.pipette_mock.blow_out(well),
+        mock.call.pipette_mock.blow_out(mock_labware.__getitem__()),
     ]
 
 
 def test_pick_up_tip() -> None:
     pipette_mock = mock.create_autospec(InstrumentContext)
-    params = {
+    mock_labware = mock.create_autospec(labware.Labware)
+    params: PipetteAccessParams = {
         "pipette": "somePipetteId",
         "labware": "someLabwareId",
         "well": "someWell",
     }
     instruments = {"somePipetteId": pipette_mock}
-    well = "theWell"
-    loaded_labware = {"someLabwareId": {"someWell": well}}
+    loaded_labware: Dict[str, labware.Labware] = {"someLabwareId": mock_labware}
 
     _pick_up_tip(instruments, loaded_labware, params)
 
-    assert pipette_mock.mock_calls == [mock.call.pick_up_tip(well)]
+    assert pipette_mock.mock_calls == [
+        mock.call.pick_up_tip(mock_labware.__getitem__())
+    ]
 
 
 def test_drop_tip() -> None:
     pipette_mock = mock.create_autospec(InstrumentContext)
+    mock_labware = mock.create_autospec(labware.Labware)
 
-    params = {
+    params: PipetteAccessParams = {
         "pipette": "somePipetteId",
         "labware": "someLabwareId",
         "well": "someWell",
     }
     instruments = {"somePipetteId": pipette_mock}
-    well = "theWell"
-    loaded_labware = {"someLabwareId": {"someWell": well}}
+    loaded_labware = {"someLabwareId": mock_labware}
     _drop_tip(instruments, loaded_labware, params)
 
-    assert pipette_mock.mock_calls == [mock.call.drop_tip(well)]
+    assert pipette_mock.mock_calls == [mock.call.drop_tip(mock_labware.__getitem__())]
 
 
 def test_air_gap(minimal_labware_def2: LabwareDefinition) -> None:
     m = mock.MagicMock()
     m.pipette_mock = mock.create_autospec(InstrumentContext)
     m.mock_set_flow_rate = mock.MagicMock()
+    mock_core = mock.create_autospec(LegacyLabwareCore)
+    mock_map = mock.create_autospec(LoadedCoreMap)
 
     deck = Location(Point(0, 0, 0), "deck")
     well_name = "A2"
     some_labware = labware.Labware(
         core=LegacyLabwareCore(minimal_labware_def2, deck),
         api_version=MAX_SUPPORTED_VERSION,
-        protocol_core=None,
-        core_map=None,
+        protocol_core=mock_core,
+        core_map=mock_map,
     )
     loaded_labware = {"someLabwareId": some_labware}
-    params = {"labware": "someLabwareId", "well": well_name}
+    # params = {"labware": "someLabwareId", "well": well_name}
 
-    params = {
+    params: StandardLiquidHandlingParams = {
         "pipette": "somePipetteId",
         "volume": 42,
         "labware": "someLabwareId",
         "well": well_name,
         "offsetFromBottomMm": 12,
+        "flowRate": 0,
     }
 
     instruments = {"somePipetteId": m.pipette_mock}
@@ -261,11 +300,13 @@ def test_aspirate() -> None:
     )
     m.mock_set_flow_rate = mock.MagicMock()
 
-    params = {
+    params: StandardLiquidHandlingParams = {
         "pipette": "somePipetteId",
         "volume": 42,
         "labware": "someLabwareId",
         "well": "someWell",
+        "flowRate": 0,
+        "offsetFromBottomMm": 0,
     }
     instruments = {"somePipetteId": m.pipette_mock}
 
@@ -294,11 +335,13 @@ def test_dispense() -> None:
     )
     m.mock_set_flow_rate = mock.MagicMock()
 
-    params = {
+    params: StandardLiquidHandlingParams = {
         "pipette": "somePipetteId",
         "volume": 42,
         "labware": "someLabwareId",
         "well": "someWell",
+        "flowRate": 0,
+        "offsetFromBottomMm": 0,
     }
     instruments = {"somePipetteId": m.pipette_mock}
 
@@ -321,8 +364,10 @@ def test_dispense() -> None:
 
 def test_touch_tip() -> None:
     location = Location(Point(1, 2, 3), "deck")
+    mock_parent = mock.create_autospec(labware.Labware)
+    mock_core = mock.create_autospec(LegacyLabwareCore)
     well = labware.Well(
-        parent=None,
+        parent=mock_parent,
         core=LegacyWellCore(
             well_geometry=WellGeometry(
                 {
@@ -335,7 +380,7 @@ def test_touch_tip() -> None:
                     "z": 3,
                 },
                 parent_point=Point(10, 20, 30),
-                parent_object=1,
+                parent_object=mock_core,
             ),
             display_name="some well",
             has_tip=False,
@@ -351,10 +396,11 @@ def test_touch_tip() -> None:
     mock_get_well = mock.MagicMock(return_value=well, name="mock_get_well")
     mock_set_flow_rate = mock.MagicMock(name="mock_set_flow_rate")
 
-    params = {
+    params: TouchTipParams = {
         "pipette": "somePipetteId",
         "labware": "someLabwareId",
         "well": "someWell",
+        "offsetFromBottomMm": 0,
     }
     instruments = {"somePipetteId": pipette_mock}
 
@@ -393,7 +439,7 @@ def test_move_to_slot() -> None:
 
     instruments = {"somePipetteId": pipette_mock}
 
-    params = {
+    params: MoveToSlotParams = {
         "pipette": "somePipetteId",
         "slot": "4",
         "offset": {"x": 10, "y": 11, "z": 12},
@@ -444,7 +490,7 @@ def test_dispatch_json() -> None:
         context = mock.sentinel.context
         instruments = mock.sentinel.instruments
         loaded_labware = mock.sentinel.loaded_labware
-        dispatch_json(context, protocol_data, instruments, loaded_labware)
+        dispatch_json(context, protocol_data, instruments, loaded_labware)  # type: ignore[arg-type]
 
         assert m.mock_calls == [
             mock.call._delay(context, "delay_params"),
@@ -458,6 +504,7 @@ def test_dispatch_json() -> None:
         ]
 
 
+@typing.no_type_check
 def test_dispatch_json_invalid_command() -> None:
     protocol_data = {
         "commands": [
@@ -474,7 +521,11 @@ def test_dispatch_json_invalid_command() -> None:
 
 
 @pytest.mark.ot2_only
-def test_papi_execute_json_v3(monkeypatch, ctx, get_json_protocol_fixture) -> None:
+def test_papi_execute_json_v3(
+    monkeypatch: pytest.MonkeyPatch,
+    ctx: ProtocolContext,
+    get_json_protocol_fixture: Callable[[str, str, bool], str],
+) -> None:
     protocol_data = get_json_protocol_fixture("3", "testAllAtomicSingleV3", False)
     protocol = parse(protocol_data, None)
     ctx.home()
