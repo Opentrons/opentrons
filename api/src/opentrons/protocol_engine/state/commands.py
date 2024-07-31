@@ -204,7 +204,7 @@ class CommandState:
     """
 
     failed_command_errors: List[ErrorOccurrence]
-    """List of errors that occurred during run execution."""
+    """List of command errors that occurred during run execution."""
 
     stopped_by_estop: bool
     """If this is set to True, the engine was stopped by an estop event."""
