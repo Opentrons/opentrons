@@ -467,7 +467,10 @@ function RowLabware({
   commands,
 }: RowLabwareProps): JSX.Element | null {
   const { definition, initialLocation, nickName } = labware
-  const { t, i18n } = useTranslation('protocol_command_text')
+  const { t, i18n } = useTranslation([
+    'protocol_command_text',
+    'protocol_setup',
+  ])
 
   const matchedModule =
     initialLocation !== 'offDeck' &&
@@ -588,18 +591,32 @@ function RowLabware({
                 marginY={SPACING.spacing16}
                 width={matchingHeaterShaker != null ? '33rem' : '46rem'}
               />
-              <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing12}>
+              <Flex
+                flexDirection={DIRECTION_ROW}
+                gridGap={SPACING.spacing12}
+                alignItems={ALIGN_CENTER}
+              >
                 <LocationIcon
                   iconName={
                     MODULE_ICON_NAME_BY_TYPE[matchedModule.moduleDef.moduleType]
                   }
                 />
-                <LegacyStyledText
-                  as="p"
-                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                <Flex
+                  flexDirection={DIRECTION_COLUMN}
+                  gridGap={SPACING.spacing4}
                 >
-                  {getModuleDisplayName(matchedModule.moduleDef.model)}
-                </LegacyStyledText>
+                  <LegacyStyledText
+                    as="p"
+                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                  >
+                    {getModuleDisplayName(matchedModule.moduleDef.model)}
+                  </LegacyStyledText>
+                  {matchingHeaterShaker != null ? (
+                    <LegacyStyledText as="p" color={COLORS.grey60}>
+                      {t('protocol_setup:labware_latch_instructions')}
+                    </LegacyStyledText>
+                  ) : null}{' '}
+                </Flex>
               </Flex>
             </>
           ) : null}
