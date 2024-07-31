@@ -9,9 +9,11 @@ import {
   LegacyStyledText,
 } from '@opentrons/components'
 import { css } from 'styled-components'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+import {
+  SimpleWizardBody,
+  SimpleWizardInProgressBody,
+} from '../../molecules/SimpleWizardBody'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import {
   MOVE_PIN_FROM_FRONT_JAW_TO_REAR_JAW,
   MOVE_PIN_TO_FRONT_JAW,
@@ -245,7 +247,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
   } = infoByMovement[movement]
   if (isRobotMoving)
     return (
-      <InProgressModal
+      <SimpleWizardInProgressBody
         description={
           errorMessage == null && !isExiting
             ? inProgressText
