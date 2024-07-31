@@ -72,3 +72,8 @@ To add a new tracking decorator, go to `performance-metrics/src/performance_metr
 Go to `api/src/opentrons/util/performance_helpers.py` and add a static method to the `TrackingFunctions` class that uses the new state.
 
 You can now wrap your functions with your new tracking decorator.
+
+### System resource tracking
+
+performance-metrics also exposes a tracking application called `SystemResourceTracker`. The application is implemented as a systemd service on the robot and records system resource usage by process. See the `oe-core` repo for more details. 
+You can configure the system resource tracker by modifying the environment variables set for the service. The service file lives at `/lib/systemd/system/system-resource-tracker.service`. You can change the defined environment variables or remove them and define them in the robot's environment variables. See `performance-metrics/src/performance_metrics/system_resource_tracker/_config.py` to see what environment variables are available.
