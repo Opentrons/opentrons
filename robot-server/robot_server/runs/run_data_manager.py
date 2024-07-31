@@ -11,7 +11,6 @@ from opentrons.protocol_engine import (
     CommandSlice,
     CommandPointer,
     Command,
-    ErrorOccurrence,
 )
 from opentrons.protocol_engine.types import PrimitiveRunTimeParamValuesType
 
