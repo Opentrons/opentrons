@@ -2739,11 +2739,17 @@ class OT3API(
             try:
                 # move to where we want to start a pass and run a pass
                 await self.move_to(checked_mount, pass_start_pos)
+                if instrument.config.channels > 1:
+                    default_probe = InstrumentProbeType.BOTH
+                else:
+                    default_probe = InstrumentProbeType.PRIMARY
+
                 height = await self._liquid_probe_pass(
                     checked_mount,
                     probe_settings,
-                    probe if probe else InstrumentProbeType.PRIMARY,
+                    probe if probe else default_probe,
                     p_pass_travel + p_impulse_mm,
+                    force_both_sensors
                 )
                 # if we made it here without an error we found the liquid
                 error = None
