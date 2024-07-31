@@ -16,6 +16,12 @@ from pathlib import Path
 from time import time,sleep
 import os
 from opentrons.hardware_control.ot3api import OT3API
+from opentrons.hardware_control.types import (
+    SubSystem,
+    HepaFanState,
+    HepaUVState,
+    DoorState,
+)
 PRESSURE_DATA_CACHE = []
 FINAL_TEST_RESULTS = []
 GRIP_HEIGHT_MM = 48
@@ -66,7 +72,12 @@ async def _main(arguments: argparse.Namespace) -> None:
             input("PLACE CLOSE OTflex DOOR,PRESS ENTER TO CONTINUE.(关闭OT3门,按回车键继续)")
 
 
-            input("TURN ON FAN,PRESS ENTER TO CONTINUE.(打开风扇后,按回车键开始测试粒子浓度)")
+            
+            await api.set_hepa_fan_state(turn_on=True)
+            hepa_fan_state: Optional[HepaFanState] = await api.get_hepa_fan_state()
+            if not hepa_fan_state:
+                input("TURN ON FAN,PRESS ENTER TO CONTINUE.(请手动打开风扇后,按回车键开始测试粒子浓度)")
+
             instrument.initialize_connection()
             instrument.clear_data()
             instrument.set_number_of_samples(6)
@@ -201,7 +212,11 @@ async def _main(arguments: argparse.Namespace) -> None:
                     await api.home([Axis.X, Axis.Y, Axis.Z_L,Axis.Z_G,Axis.G])
 
                 #获取数据UV get uv data
-                aa = input("Test Slot {} Press open UV to continue...(开始测试位置{} 打开UV灯后,回车继续)".format(grip_slot2,grip_slot2))
+                print("Test Slot {} ...(开始测试位置{} )".format(grip_slot2,grip_slot2))
+                await api.set_hepa_uv_state(turn_on=True)
+                hepa_uv_state: Optional[HepaUVState] = await api.get_hepa_uv_state()
+                if not hepa_uv_state:
+                    aa = input("Test Slot {} Press open UV to continue...(开始测试位置{} 打开UV灯后,回车继续)".format(grip_slot2,grip_slot2))
 
                 for i in range(11):
                     await asyncio.sleep(1)
@@ -210,7 +225,13 @@ async def _main(arguments: argparse.Namespace) -> None:
                 # intdatadict = uvinstrument.parse_modbus_data(alldata)
                 intdatadict = uvinstrument.get_stable_uv()
                 print(intdatadict)
-                aa = input("Press close UV to continue...(关闭UV灯后,回车继续)")
+
+
+                #aa = input("Press close UV to continue...(关闭UV灯后,回车继续)")
+                await api.set_hepa_uv_state(turn_on=False)
+                hepa_uv_state: Optional[HepaUVState] = await api.get_hepa_uv_state()
+                if hepa_uv_state:
+                    aa = input("Test Slot {} Press close UV to continue...(测试位置{}后请手动关闭UV灯后,回车继续)".format(grip_slot2,grip_slot2))
 
                 
 
