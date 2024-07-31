@@ -1,6 +1,6 @@
 from typing import NamedTuple, Union, Dict, Optional
 
-from opentrons.types import Mount, DeckLocation
+from opentrons.types import Mount, DeckLocation, Point
 from opentrons.legacy_commands import publisher
 from opentrons.hardware_control import SyncHardwareAPI, types as hw_types
 
@@ -19,13 +19,13 @@ class HardwareManager(NamedTuple):
 
 class RobotContext(publisher.CommandPublisher):
     """
-    A context for exposing finer robot control movement.
+    A context for the movement system of the robot.
 
     The RobotContext class provides the objects, attributes, and methods that allow
     you to control robot motor axes individually.
 
-    They can command the robot to perform an action, like moving to an absolute position,
-    controlling the gripper claw or pipette motors.
+    Its methods can command the robot to perform an action, like moving to an absolute position,
+    controlling the gripper jaw, or moving individual pipette motors.
 
     Objects in this class should not be instantiated directly. Instead, instances are
     returned by :py:meth:`ProtocolContext.robot`.
@@ -44,9 +44,8 @@ class RobotContext(publisher.CommandPublisher):
     def move_to(
         self,
         mount: Union[Mount, str],
-        abs_position: hw_types.Point,
+        destination: Point,
         velocity: float,
-        critical_point: Optional[hw_types.CriticalPoint],
     ) -> None:
         raise NotImplementedError()
 
@@ -63,10 +62,10 @@ class RobotContext(publisher.CommandPublisher):
     ) -> None:
         raise NotImplementedError()
 
-    def grasp_gripper(self, force: float) -> None:
+    def close_gripper_jaw(self, force: float) -> None:
         raise NotImplementedError()
 
-    def release_gripper(self) -> None:
+    def open_gripper_jaw(self) -> None:
         raise NotImplementedError()
 
     def axis_coordinates_for(
