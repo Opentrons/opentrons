@@ -34,10 +34,9 @@ class RawActivityData(CSVStorageBase):
     """Represents raw duration data with activity state information.
 
     Attributes:
-    - function_start_time (int): The start time of the function.
-    - duration_measurement_start_time (int): The start time for duration measurement.
-    - duration_measurement_end_time (int): The end time for duration measurement.
     - state (RobotActivityStates): The current state of the activity.
+    - func_start (int): The start time of the function.
+    - duration (int): The start time for duration measurement.
     """
 
     state: RobotActivityState
