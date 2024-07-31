@@ -27,7 +27,11 @@ import {
   getLoadedLabwareDefinitionsByUri,
   getModuleDisplayName,
 } from '@opentrons/shared-data'
-import { useAllCsvFilesQuery } from '@opentrons/react-api-client'
+import {
+  useAllCsvFilesQuery,
+  useCsvFileRawQuery,
+} from '@opentrons/react-api-client'
+import { downloadFile } from './utils'
 import { useFeatureFlag } from '../../redux/config'
 import { Banner } from '../../atoms/Banner'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
@@ -137,7 +141,7 @@ export function HistoricalProtocolRunDrawer(
         </Flex>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
           {allProtocolDataFiles.map((fileData, index) => {
-            const { createdAt, name } = fileData
+            const { createdAt, name: fileName, id: fileId } = fileData
             return (
               <Flex
                 key={`csv_file_${index}`}
@@ -160,7 +164,7 @@ export function HistoricalProtocolRunDrawer(
                       text-overflow: ellipsis;
                     `}
                   >
-                    {name}
+                    {fileName}
                   </LegacyStyledText>
                 </Flex>
                 <Box width="33%">
@@ -169,22 +173,7 @@ export function HistoricalProtocolRunDrawer(
                   </LegacyStyledText>
                 </Box>
                 <Box width="34%">
-                  <Link
-                    role="button"
-                    css={TYPOGRAPHY.linkPSemiBold}
-                    onClick={() => {}} // TODO (nd: 06/18/2024) get file and download
-                  >
-                    <Flex alignItems={ALIGN_CENTER}>
-                      <LegacyStyledText as="p">
-                        {t('download')}
-                      </LegacyStyledText>
-                      <Icon
-                        name="download"
-                        size="1rem"
-                        marginLeft="0.4375rem"
-                      />
-                    </Flex>
-                  </Link>
+                  <DownloadLink fileId={fileId} fileName={fileName} />
                 </Box>
               </Flex>
             )
@@ -309,5 +298,36 @@ export function HistoricalProtocolRunDrawer(
       {enableCsvFile ? protocolFilesData : null}
       {labwareOffsets}
     </Flex>
+  )
+}
+
+interface DownloadLinkProps {
+  fileId: string
+  fileName: string
+}
+function DownloadLink(props: DownloadLinkProps): JSX.Element {
+  const { fileId, fileName } = props
+  const { t } = useTranslation('run_details')
+  const { data: csvFileRaw } = useCsvFileRawQuery(fileId)
+
+  return (
+    <Link
+      role="button"
+      css={
+        csvFileRaw == null
+          ? TYPOGRAPHY.darkLinkLabelSemiBoldDisabled
+          : TYPOGRAPHY.linkPSemiBold
+      }
+      onClick={() => {
+        if (csvFileRaw != null) {
+          downloadFile(csvFileRaw, fileName)
+        }
+      }}
+    >
+      <Flex alignItems={ALIGN_CENTER}>
+        <LegacyStyledText as="p">{t('download')}</LegacyStyledText>
+        <Icon name="download" size="1rem" marginLeft="0.4375rem" />
+      </Flex>
+    </Link>
   )
 }

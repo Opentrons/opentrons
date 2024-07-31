@@ -18,7 +18,7 @@ export interface UploadedCsvFileResponse {
 }
 
 export interface UploadedCsvFilesResponse {
-  data: {
-    files: CsvFileData[]
-  }
+  data: CsvFileData[]
 }
+
+export type DownloadedCsvFileResponse = string
