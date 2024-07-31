@@ -57,7 +57,7 @@ export function useFailedLabwareUtils({
 }: UseFailedLabwareUtilsProps): UseFailedLabwareUtilsResult {
   const recentRelevantFailedLabwareCmd = React.useMemo(
     () => getRelevantFailedLabwareCmdFrom({ failedCommand, runCommands }),
-    [failedCommand?.key, runCommands]
+    [failedCommand?.error?.errorType, runCommands]
   )
 
   const tipSelectionUtils = useTipSelectionUtils(recentRelevantFailedLabwareCmd)
