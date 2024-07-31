@@ -213,6 +213,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
         files: [expect.any(File)],
         protocolKey: storedProtocolDataFixture.protocolKey,
         runTimeParameterValues: expect.any(Object),
+        runTimeParameterFiles: expect.any(Object),
       })
     )
     expect(mockTrackCreateProtocolRunEvent).toHaveBeenCalled()
@@ -262,6 +263,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
         files: [expect.any(File)],
         protocolKey: storedProtocolDataFixture.protocolKey,
         runTimeParameterValues: expect.any(Object),
+        runTimeParameterFiles: expect.any(Object),
       })
     )
     expect(mockTrackCreateProtocolRunEvent).toHaveBeenCalled()
@@ -295,6 +297,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
         files: [expect.any(File)],
         protocolKey: storedProtocolDataFixture.protocolKey,
         runTimeParameterValues: expect.any(Object),
+        runTimeParameterFiles: expect.any(Object),
       })
     )
     expect(mockTrackCreateProtocolRunEvent).toHaveBeenCalled()
@@ -348,6 +351,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
         files: [expect.any(File)],
         protocolKey: storedProtocolDataFixture.protocolKey,
         runTimeParameterValues: expect.any(Object),
+        runTimeParameterFiles: expect.any(Object),
       })
     })
   })

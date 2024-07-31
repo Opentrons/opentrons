@@ -17,7 +17,6 @@ import { ChooseNumber } from '../ChooseNumber'
 import { ChooseCsvFile } from '../ChooseCsvFile'
 import { mockRunTimeParameterData } from '../../../pages/ProtocolDetails/fixtures'
 import { useToaster } from '../../ToasterOven'
-import { useFeatureFlag } from '../../../redux/config'
 import { ProtocolSetupParameters } from '..'
 
 import type { NavigateFunction } from 'react-router-dom'
@@ -73,7 +72,6 @@ describe('ProtocolSetupParameters', () => {
     vi.mocked(ChooseEnum).mockReturnValue(<div>mock ChooseEnum</div>)
     vi.mocked(ChooseNumber).mockReturnValue(<div>mock ChooseNumber</div>)
     vi.mocked(ChooseCsvFile).mockReturnValue(<div>mock ChooseCsvFile</div>)
-    vi.mocked(useFeatureFlag).mockReturnValue(false)
     vi.mocked(useHost).mockReturnValue(MOCK_HOST_CONFIG)
     when(vi.mocked(useCreateProtocolAnalysisMutation))
       .calledWith(expect.anything(), expect.anything())
@@ -84,9 +82,6 @@ describe('ProtocolSetupParameters', () => {
     when(vi.mocked(useUploadCsvFileMutation))
       .calledWith(expect.anything(), expect.anything())
       .thenReturn({ uploadCsvFile: mockUploadCsvFile } as any)
-    when(vi.mocked(useFeatureFlag))
-      .calledWith('enableCsvFile')
-      .thenReturn(false)
     vi.mocked(useToaster).mockReturnValue({
       makeSnackbar: mockMakeSnackbar,
       makeToast: vi.fn(),
@@ -116,7 +111,6 @@ describe('ProtocolSetupParameters', () => {
   })
 
   it('renders the ChooseCsvFile component when a str param is selected', () => {
-    vi.mocked(useFeatureFlag).mockReturnValue(true)
     render(props)
     fireEvent.click(screen.getByText('CSV File'))
     screen.getByText('mock ChooseCsvFile')
@@ -142,7 +136,6 @@ describe('ProtocolSetupParameters', () => {
   })
 
   it('renders the other setting when csv param', () => {
-    vi.mocked(useFeatureFlag).mockReturnValue(true)
     render(props)
     screen.getByText('CSV File')
   })
@@ -180,7 +173,6 @@ describe('ProtocolSetupParameters', () => {
   })
 
   it('render csv file when a protocol requires a csv file and confirm values button has the disabled style', () => {
-    when(vi.mocked(useFeatureFlag)).calledWith('enableCsvFile').thenReturn(true)
     const mockMostRecentAnalysisForCsv = ({
       commands: [],
       labware: [],
@@ -199,7 +191,6 @@ describe('ProtocolSetupParameters', () => {
   })
 
   it('when tapping aria-disabled button, snack bar will show up', () => {
-    when(vi.mocked(useFeatureFlag)).calledWith('enableCsvFile').thenReturn(true)
     const mockMostRecentAnalysisForCsv = ({
       commands: [],
       labware: [],
