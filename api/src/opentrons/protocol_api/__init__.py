@@ -52,7 +52,7 @@ __all__ = [
     "ProtocolContext",
     "Deck",
     "ModuleContext",
-	"RobotContext",
+    "RobotContext",
     "InstrumentContext",
     "TemperatureModuleContext",
     "MagneticModuleContext",
