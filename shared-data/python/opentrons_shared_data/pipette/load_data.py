@@ -1,5 +1,4 @@
 import json
-import os
 from pathlib import Path
 from logging import getLogger
 
@@ -29,6 +28,7 @@ from .types import (
 LoadedConfiguration = Dict[str, Union[str, Dict[str, Any]]]
 
 LOG = getLogger(__name__)
+
 
 def _get_configuration_dictionary(
     config_type: Literal["general", "geometry", "liquid"],
@@ -98,6 +98,7 @@ def _physical(
 ) -> LoadedConfiguration:
     return _get_configuration_dictionary("general", channels, model, version)
 
+
 def _dirs_in(path: Path) -> Iterator[Path]:
     for child in path.iterdir():
         if child.is_dir():
@@ -123,17 +124,17 @@ def load_serial_lookup_table() -> Dict[str, str]:
     for channel_dir in _dirs_in(config_path):
         for model_dir in _dirs_in(channel_dir):
             for version_file in model_dir.iterdir():
-                if version_file.suffix != '.json':
+                if version_file.suffix != ".json":
                     continue
                 try:
                     version_list = version_file.stem.split("_")
                     built_model = f"{model_dir.stem}_{_channel_model_str[channel_dir.stem]}_v{version_list[0]}.{version_list[1]}"
                 except IndexError:
-                    LOG.warning(f'Pipette def with bad name {version_file} ignored')
+                    LOG.warning(f"Pipette def with bad name {version_file} ignored")
                     continue
                 model_shorthand = _model_shorthand.get(model_dir.stem, model_dir.stem)
                 if (
-                    model_dir == "p300"
+                    model_dir.stem == "p300"
                     and int(version_list[0]) == 1
                     and int(version_list[1]) == 0
                 ):
