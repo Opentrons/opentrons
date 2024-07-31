@@ -19,6 +19,7 @@ from opentrons_shared_data.protocol.types import (
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.protocol_api import ProtocolContext
+from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
 from opentrons.protocol_engine.types import PostRunHardwareState
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.parse import PythonParseMode
@@ -412,6 +413,11 @@ async def test_run_json_runner_stop_requested_stops_enqueuing(
             status=pe_commands.CommandStatus.FAILED,
         )
     )
+    decoy.when(
+        protocol_engine.state_view.commands.get_error_recovery_type(
+            "protocol-command-id"
+        )
+    ).then_return(ErrorRecoveryType.FAIL_RUN)
 
     await json_runner_subject.load(json_protocol_source)
 
