@@ -30,6 +30,10 @@ import type {
   UseUpdateClientDataRecoveryResult,
 } from '../../resources/client_data'
 import type { ErrorRecoveryFlowsProps } from '.'
+import {
+  BANNER_TEXT_CONTAINER_STYLE,
+  BANNER_TEXT_CONTENT_STYLE,
+} from './constants'
 
 // The takeover view, functionally similar to MaintenanceRunTakeover
 export function RecoveryTakeover(props: {
@@ -128,8 +132,8 @@ export function RecoveryTakeoverDesktop({
       desktopType={'desktop-small'}
       isOnDevice={false}
     >
-      <Flex css={CONTAINER_STYLE}>
-        <Flex css={CONTENT_STYLE}>
+      <Flex css={BANNER_TEXT_CONTAINER_STYLE}>
+        <Flex css={BANNER_TEXT_CONTENT_STYLE}>
           <Icon
             name="alert-circle"
             color={COLORS.red50}
@@ -152,20 +156,3 @@ export function RecoveryTakeoverDesktop({
     </RecoveryInterventionModal>
   )
 }
-
-const CONTAINER_STYLE = css`
-  flex-direction: ${DIRECTION_COLUMN};
-  justify-content: ${JUSTIFY_SPACE_BETWEEN};
-  align-items: ${ALIGN_CENTER};
-  padding-top: ${SPACING.spacing12};
-`
-
-const CONTENT_STYLE = css`
-  flex-direction: ${DIRECTION_COLUMN};
-  justify-content: ${JUSTIFY_CENTER};
-  align-items: ${ALIGN_CENTER};
-
-  text-align: ${TEXT_ALIGN_CENTER};
-  padding: ${SPACING.spacing40} ${SPACING.spacing40};
-  grid-gap: ${SPACING.spacing16};
-`
