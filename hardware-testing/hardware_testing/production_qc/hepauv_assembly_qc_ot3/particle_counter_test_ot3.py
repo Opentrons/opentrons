@@ -51,7 +51,8 @@ async def _main(arguments: argparse.Namespace) -> None:
         csv_cb.write(["test_time:", datetime.utcnow().strftime("%Y/%m/%d-%H:%M:%S")])
         csv_cb.write(["INSTRUMENT SN:", INTSN])
         csv_cb.write(["HEPA SN:" , HEPASN])
-
+        if not arguments.skip_uv:
+            input("PLACE THE UV METER ON THE SLOT B2.(将紫外线计放置在底板B2上.)")
         if not arguments.skip_fan:
             await api.home()
             # slotc2 = (229.71,196.32,291.17)
@@ -75,8 +76,10 @@ async def _main(arguments: argparse.Namespace) -> None:
             
             await api.set_hepa_fan_state(turn_on=True)
             hepa_fan_state: Optional[HepaFanState] = await api.get_hepa_fan_state()
-            if not hepa_fan_state:
-                input("TURN ON FAN,PRESS ENTER TO CONTINUE.(请手动打开风扇后,按回车键开始测试粒子浓度)")
+            print("1",hepa_fan_state)
+            if hepa_fan_state:
+                if not hepa_fan_state.fan_on:
+                    input("TURN ON FAN,PRESS ENTER TO CONTINUE.(请手动打开风扇后,按回车键开始测试粒子浓度)")
 
             instrument.initialize_connection()
             instrument.clear_data()
@@ -131,15 +134,20 @@ async def _main(arguments: argparse.Namespace) -> None:
                 if number == 5:
                     print(f"{test_data['Time(Date Time)']}s 0.3u(<8160)={test_data['Count1(M3)']} 0.5u(<2816)={test_data['Count2(M3)']} test_result={test_data['PASS/FAIL']}" )
                 csv_cb.write(list(test_data.values()))
-            input("TURN OFF FAN,removal Particle instrument ,PRESS ENTER TO CONTINUE.(关闭风扇,把粒子仪器移除地板区域,按回车键继续)")
+            await api.set_hepa_fan_state(turn_on=False)
+            await asyncio.sleep(3)
+            hepa_fan_state: Optional[HepaFanState] = await api.get_hepa_fan_state()
+            print("2",hepa_fan_state)
+            if hepa_fan_state:
+                if hepa_fan_state.fan_on:
+                    input("TURN OFF FAN,PRESS ENTER TO CONTINUE.(请手动关闭风扇后,按回车键继续)")    
+            input("removal Particle instrument ,PRESS ENTER TO CONTINUE.(把粒子仪器移除到底板区域外,按回车键继续)")
             
         
         if not arguments.skip_uv:
             await api.home()
-            input("PLACE THE UV METER ON THE SLOT B2,CLOSE OTflex DOOR,START TEST(将紫外线计放置在底板B2上,关闭OT3门,开始测试)")
+            
             #UV
-            
-            
             test_data2={
                         'SLOT': None,
                         'uvdata': None,
@@ -215,8 +223,9 @@ async def _main(arguments: argparse.Namespace) -> None:
                 print("Test Slot {} ...(开始测试位置{} )".format(grip_slot2,grip_slot2))
                 await api.set_hepa_uv_state(turn_on=True)
                 hepa_uv_state: Optional[HepaUVState] = await api.get_hepa_uv_state()
-                if not hepa_uv_state:
-                    aa = input("Test Slot {} Press open UV to continue...(开始测试位置{} 打开UV灯后,回车继续)".format(grip_slot2,grip_slot2))
+                if hepa_uv_state:
+                    if not hepa_uv_state.light_on:
+                        input("Test Slot {} Press open UV to continue...(开始测试位置{} 打开UV灯后,回车继续)".format(grip_slot2,grip_slot2))
 
                 for i in range(11):
                     await asyncio.sleep(1)
@@ -231,7 +240,8 @@ async def _main(arguments: argparse.Namespace) -> None:
                 await api.set_hepa_uv_state(turn_on=False)
                 hepa_uv_state: Optional[HepaUVState] = await api.get_hepa_uv_state()
                 if hepa_uv_state:
-                    aa = input("Test Slot {} Press close UV to continue...(测试位置{}后请手动关闭UV灯后,回车继续)".format(grip_slot2,grip_slot2))
+                    if hepa_uv_state.light_on:
+                        input("Test Slot {} Press close UV to continue...(测试位置{}后请手动关闭UV灯后,回车继续)".format(grip_slot2,grip_slot2))
 
                 
 
@@ -250,6 +260,10 @@ async def _main(arguments: argparse.Namespace) -> None:
         
         if tetsuv:
             print("home(环境恢复)")
+            await api.set_hepa_uv_state(turn_on=False)
+            await api.set_hepa_fan_state(turn_on=False)
+
+            
             hover_pos = slot_loc["D4"]
             hover_over_slot_3 = Point(x=hover_pos[0],y=hover_pos[1],z=hover_pos[2]-1)
             await helpers_ot3.move_to_arched_ot3(api, mount, hover_over_slot_3)
@@ -267,6 +281,14 @@ async def _main(arguments: argparse.Namespace) -> None:
         await api.retract(mount)
         await api.home()
         print(f"CSV: {csv_props.name}")
+        # Confirm that they are off
+        hepa_uv_state: Optional[HepaUVState] = await api.get_hepa_uv_state()
+        if hepa_uv_state:
+            assert not hepa_uv_state.light_on, "Hepa UV did not turn OFF!"
+
+        hepa_fan_state: Optional[HepaFanState] = await api.get_hepa_fan_state()
+        if hepa_fan_state:
+            assert not hepa_fan_state.fan_on, "Hepa Fan did not turn OFF!"
 
 async def UV_test(simulating: bool):
     api = await helpers_ot3.build_async_ot3_hardware_api(
