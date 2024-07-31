@@ -336,7 +336,7 @@ async def _pick_up_tip(
     except Exception as err:
         #print(f"Error picking up tip: {err}")
         LOG_GING.critical(f"Error picking up tip: {err}")
-        prinval = f"07-02:光电传感器故障,取针管状态不正确"
+        prinval = f"07-02光电传感器故障: 取针管状态不正确"
         LOG_GING.error(prinval)
         FINAL_TEST_FAIL_INFOR.append(prinval)
         ui.print_fail(prinval)
@@ -824,7 +824,6 @@ async def _read_pipette_sensor_repeatedly_and_average(
             else:
                 raise ValueError(f"unexpected sensor type: {sensor_type}")
             
-            sequential_failures = 0
             #print(f"{sensor_type} {sensor_id} sensor response {r}")
             LOG_GING.info(f"{sensor_type} {sensor_id} sensor response {r}")
         except helpers_ot3.SensorResponseBad:
@@ -833,10 +832,14 @@ async def _read_pipette_sensor_repeatedly_and_average(
                 sensor_type_dic = {1:"capacitive(电容)",3:"pressure(气压)",6:"temperature(温度)",5:"humidity(湿度)"
                     
                 }
-                printerr = f"07-01:{sensor_type_dic[int(sensor_type)]}传感器故障,传感器类型 {sensor_type_dic[int(sensor_type)]} 传感器ID {sensor_id}读取数据失败)"
+                printerr = f"07-01 {sensor_type_dic[int(sensor_type)]} 故障: 传感器{sensor_type_dic[int(sensor_type)]} 通道ID {sensor_id} 读取数据失败)"
                 ui.print_fail(printerr)
                 FINAL_TEST_FAIL_INFOR.append(printerr)
                 return -999999999999.0
+            
+            r = 0.0
+            continue
+                
         readings.append(r)
     readings.sort()
     readings = readings[1:-1]
@@ -885,13 +888,16 @@ async def _test_diagnostics_environment(
     )
     #print(f"celsius: {celsius} C")
     LOG_GING.info(f"celsius: {celsius} C")
-    if celsius < TEMP_THRESH[0] or celsius > TEMP_THRESH[1]:
-        #print(f"FAIL: celsius {celsius} is out of range")
-        LOG_GING.error(f"FAIL: celsius {celsius} is out of range")
-        printtxt=f"01-01-TEMP:移液器内温度,温度值 {humidity} 超出阈值 {TEMP_THRESH}"
-        LOG_GING.error(printtxt)
-        ui.print_fail(printtxt)
-        FINAL_TEST_FAIL_INFOR.append(printtxt)
+    if celsius != -999999999999.0:
+        if celsius < TEMP_THRESH[0] or celsius > TEMP_THRESH[1]:
+            #print(f"FAIL: celsius {celsius} is out of range")
+            LOG_GING.error(f"FAIL: celsius {celsius} is out of range")
+            printtxt=f"01-01-TEMP:移液器内温度,温度值 {humidity} 超出阈值 {TEMP_THRESH}"
+            LOG_GING.error(printtxt)
+            ui.print_fail(printtxt)
+            FINAL_TEST_FAIL_INFOR.append(printtxt)
+            celsius_pass = False
+    else:
         celsius_pass = False
     write_cb(["celsius", room_celsius, celsius, _bool_to_pass_fail(celsius_pass)])
 
@@ -901,14 +907,17 @@ async def _test_diagnostics_environment(
     )
     #print(f"humidity: {humidity} C")
     LOG_GING.info(f"humidity: {humidity} C")
-    if humidity < HUMIDITY_THRESH[0] or humidity > HUMIDITY_THRESH[1]:
-        print(f"FAIL: humidity {humidity} is out of range")
-        LOG_GING.error(f"FAIL: humidity {humidity} is out of range")
-        printtxt = f"01-02-HUMIDITY:移液器内湿度,湿度值 {humidity} 超出阈值 {HUMIDITY_THRESH}"
-        LOG_GING.error(printtxt)
-        ui.print_fail(printtxt)
-        FINAL_TEST_FAIL_INFOR.append(printtxt)
+    if humidity != -999999999999.0:
+        if humidity < HUMIDITY_THRESH[0] or humidity > HUMIDITY_THRESH[1]:
+            print(f"FAIL: humidity {humidity} is out of range")
+            LOG_GING.error(f"FAIL: humidity {humidity} is out of range")
+            printtxt = f"01-02-HUMIDITY:移液器内湿度,湿度值 {humidity} 超出阈值 {HUMIDITY_THRESH}"
+            LOG_GING.error(printtxt)
+            ui.print_fail(printtxt)
+            FINAL_TEST_FAIL_INFOR.append(printtxt)
 
+            humidity_pass = False
+    else:
         humidity_pass = False
     write_cb(["humidity", room_humidity, humidity, _bool_to_pass_fail(humidity_pass)])
 
@@ -991,22 +1000,25 @@ async def _test_diagnostics_capacitive(  # noqa: C901
         capacitance = await _read_cap(sensor_id)
         #print(f"open-air {sensor_id.name} capacitance: {capacitance}")
         LOG_GING.info(f"open-air {sensor_id.name} capacitance: {capacitance}")
-        if (
-            capacitance < CAP_THRESH_OPEN_AIR[pip.channels][0]
-            or capacitance > CAP_THRESH_OPEN_AIR[pip.channels][1]
-        ):
-            results.append(False)
-            # print(
-            #     f"FAIL: open-air {sensor_id.name} capacitance ({capacitance}) is not correct"
-            # )
-            LOG_GING.error(f"FAIL: open-air {sensor_id.name} capacitance ({capacitance}) is not correct")
-            printtxt = f"01-05-open-air-capacitance:电容传感器,通道{sensor_id.name}在空气中的电容值{capacitance}超出范围{CAP_THRESH_OPEN_AIR}"
-            LOG_GING.error(printtxt)
-            ui.print_fail(printtxt)
-            FINAL_TEST_FAIL_INFOR.append(printtxt)
-            
+        if capacitance != -999999999999.0:
+            if (
+                capacitance < CAP_THRESH_OPEN_AIR[pip.channels][0]
+                or capacitance > CAP_THRESH_OPEN_AIR[pip.channels][1]
+            ):
+                results.append(False)
+                # print(
+                #     f"FAIL: open-air {sensor_id.name} capacitance ({capacitance}) is not correct"
+                # )
+                LOG_GING.error(f"FAIL: open-air {sensor_id.name} capacitance ({capacitance}) is not correct")
+                printtxt = f"01-05-open-air-capacitance:电容传感器,通道{sensor_id.name}在空气中的电容值{capacitance}超出范围{CAP_THRESH_OPEN_AIR}"
+                LOG_GING.error(printtxt)
+                ui.print_fail(printtxt)
+                FINAL_TEST_FAIL_INFOR.append(printtxt)
+                
+            else:
+                results.append(True)
         else:
-            results.append(True)
+            results.append(False)
         write_cb(
             [
                 f"capacitive-open-air-{sensor_id.name}",
@@ -1033,19 +1045,22 @@ async def _test_diagnostics_capacitive(  # noqa: C901
         capacitance = await _read_cap(sensor_id)
         #print(f"probe {sensor_id.name} capacitance: {capacitance}")
         LOG_GING.info(f"probe {sensor_id.name} capacitance: {capacitance}")
-        if (
-            capacitance < CAP_THRESH_PROBE[pip.channels][0]
-            or capacitance > CAP_THRESH_PROBE[pip.channels][1]
-        ):
-            #print(f"FAIL: probe capacitance ({capacitance}) is not correct")
-            LOG_GING.info(f"FAIL: probe capacitance ({capacitance}) is not correct")
-            results.append(False)
-            printtxt = f"01-06-probe-capacitance:电容传感器,通道{sensor_id.name}装上probe的电容值{capacitance}超出范围{CAP_THRESH_PROBE}"
-            LOG_GING.error(printtxt)
-            ui.print_fail(printtxt)
-            FINAL_TEST_FAIL_INFOR.append(printtxt)
+        if capacitance != -999999999999.0:
+            if (
+                capacitance < CAP_THRESH_PROBE[pip.channels][0]
+                or capacitance > CAP_THRESH_PROBE[pip.channels][1]
+            ):
+                #print(f"FAIL: probe capacitance ({capacitance}) is not correct")
+                LOG_GING.info(f"FAIL: probe capacitance ({capacitance}) is not correct")
+                results.append(False)
+                printtxt = f"01-06-probe-capacitance:电容传感器,通道{sensor_id.name}装上probe的电容值{capacitance}超出范围{CAP_THRESH_PROBE}"
+                LOG_GING.error(printtxt)
+                ui.print_fail(printtxt)
+                FINAL_TEST_FAIL_INFOR.append(printtxt)
+            else:
+                results.append(True)
         else:
-            results.append(True)
+            results.append(False)
         write_cb(
             [
                 f"capacitive-probe-{sensor_id.name}",
@@ -1214,25 +1229,26 @@ async def _test_diagnostics_pressure(
         pressure = await _read_pressure(sensor_id)
         #print(f"pressure-open-air-{sensor_id.name}: {pressure}")
         LOG_GING.info(f"pressure-open-air-{sensor_id.name}: {pressure}")
-        if (
-            pressure < PRESSURE_THRESH_OPEN_AIR[pip_channels][CHTYPE_PIPPETE][0]
-            or pressure > PRESSURE_THRESH_OPEN_AIR[pip_channels][CHTYPE_PIPPETE][1]
-        ):  
-            # print(
-            #         f"FAIL: open-air {sensor_id.name} pressure ({pressure}) is not correct"
-            #     )
-            LOG_GING.error(
-                    f"FAIL: open-air {sensor_id.name} pressure ({pressure}) is not correct"
-                )
-            results.append(False)
-            printtxt = f"01-08-open-air-pressure:气压传感器,通道{sensor_id.name}在空气中的气压差值{pressure}超出范围值{PRESSURE_THRESH_OPEN_AIR[pip_channels][CHTYPE_PIPPETE]}"
-            LOG_GING.error(printtxt)
-            ui.print_fail(printtxt)
-            FINAL_TEST_FAIL_INFOR.append(printtxt)
-
-            
+        if pressure != -999999999999.0:
+            if (
+                pressure < PRESSURE_THRESH_OPEN_AIR[pip_channels][CHTYPE_PIPPETE][0]
+                or pressure > PRESSURE_THRESH_OPEN_AIR[pip_channels][CHTYPE_PIPPETE][1]
+            ):  
+                # print(
+                #         f"FAIL: open-air {sensor_id.name} pressure ({pressure}) is not correct"
+                #     )
+                LOG_GING.error(
+                        f"FAIL: open-air {sensor_id.name} pressure ({pressure}) is not correct"
+                    )
+                results.append(False)
+                printtxt = f"01-08-open-air-pressure:气压传感器,通道{sensor_id.name}在空气中的气压差值{pressure}超出范围值{PRESSURE_THRESH_OPEN_AIR[pip_channels][CHTYPE_PIPPETE]}"
+                LOG_GING.error(printtxt)
+                ui.print_fail(printtxt)
+                FINAL_TEST_FAIL_INFOR.append(printtxt)
+            else:
+                results.append(True)
         else:
-            results.append(True)
+            results.append(False)
         write_cb(
             [
                 f"pressure-open-air-{sensor_id.name}",
@@ -1269,20 +1285,24 @@ async def _test_diagnostics_pressure(
         pressure = await _read_pressure(sensor_id)
         #print(f"pressure-sealed: {pressure}")
         LOG_GING.info(f"pressure-sealed: {pressure}")
-        if (
-            pressure < PRESSURE_THRESH_SEALED[pip_channels][CHTYPE_PIPPETE][0]
-            or pressure > PRESSURE_THRESH_SEALED[pip_channels][CHTYPE_PIPPETE][1]
-        ):
-            #print(f"FAIL: sealed {sensor_id.name} pressure ({pressure}) is not correct")
-            LOG_GING.info(f"FAIL: sealed {sensor_id.name} pressure ({pressure}) is not correct")
-            results.append(False)
-            printtxt = f"01-09-sealed-pressure:气压传感器,通道{sensor_id.name}堵住针管时的气压差值{pressure}超出范围值{PRESSURE_THRESH_SEALED[pip_channels][CHTYPE_PIPPETE]}"
-            LOG_GING.error(printtxt)
-            ui.print_fail(printtxt)
-            FINAL_TEST_FAIL_INFOR.append(printtxt)
-            
+        if pressure != -999999999999.0:
+            if (
+                pressure < PRESSURE_THRESH_SEALED[pip_channels][CHTYPE_PIPPETE][0]
+                or pressure > PRESSURE_THRESH_SEALED[pip_channels][CHTYPE_PIPPETE][1]
+            ):
+                #print(f"FAIL: sealed {sensor_id.name} pressure ({pressure}) is not correct")
+                LOG_GING.info(f"FAIL: sealed {sensor_id.name} pressure ({pressure}) is not correct")
+                results.append(False)
+                printtxt = f"01-09-sealed-pressure:气压传感器,通道{sensor_id.name}堵住针管时的气压差值{pressure}超出范围值{PRESSURE_THRESH_SEALED[pip_channels][CHTYPE_PIPPETE]}"
+                LOG_GING.error(printtxt)
+                ui.print_fail(printtxt)
+                FINAL_TEST_FAIL_INFOR.append(printtxt)
+                
+            else:
+                results.append(True)
         else:
-            results.append(True)
+            results.append(False)
+
         write_cb(
             [
                 f"pressure-sealed-{sensor_id.name}",
@@ -1304,21 +1324,24 @@ async def _test_diagnostics_pressure(
         pressure = await _read_pressure(sensor_id)
         #print(f"pressure-compressed-{sensor_id.name}: {pressure}")
         LOG_GING.info(f"pressure-compressed-{sensor_id.name}: {pressure}")
-        if (
-            pressure < PRESSURE_THRESH_COMPRESS[pip_channels][CHTYPE_PIPPETE][0]
-            or pressure > PRESSURE_THRESH_COMPRESS[pip_channels][CHTYPE_PIPPETE][1]
-        ):
-            results.append(False)
-            # print(
-            #     f"FAIL: compressed {sensor_id.name} pressure ({pressure}) is not correct"
-            # )
-            LOG_GING.error(f"FAIL: compressed {sensor_id.name} pressure ({pressure}) is not correct")
-            printtxt = f"01-10-compressed-pressure:气压传感器,通道{sensor_id.name}吸液{plunger_aspirate_ul}ul时的气压差{pressure}超出范围值{PRESSURE_THRESH_COMPRESS[pip_channels][CHTYPE_PIPPETE]}"
-            LOG_GING.error(printtxt)
-            ui.print_fail(printtxt)
-            FINAL_TEST_FAIL_INFOR.append(printtxt)
+        if pressure != -999999999999.0:
+            if (
+                pressure < PRESSURE_THRESH_COMPRESS[pip_channels][CHTYPE_PIPPETE][0]
+                or pressure > PRESSURE_THRESH_COMPRESS[pip_channels][CHTYPE_PIPPETE][1]
+            ):
+                results.append(False)
+                # print(
+                #     f"FAIL: compressed {sensor_id.name} pressure ({pressure}) is not correct"
+                # )
+                LOG_GING.error(f"FAIL: compressed {sensor_id.name} pressure ({pressure}) is not correct")
+                printtxt = f"01-10-compressed-pressure:气压传感器,通道{sensor_id.name}吸液{plunger_aspirate_ul}ul时的气压差{pressure}超出范围值{PRESSURE_THRESH_COMPRESS[pip_channels][CHTYPE_PIPPETE]}"
+                LOG_GING.error(printtxt)
+                ui.print_fail(printtxt)
+                FINAL_TEST_FAIL_INFOR.append(printtxt)
+            else:
+                results.append(True)
         else:
-            results.append(True)
+            results.append(False)
         write_cb(
             [
                 f"pressure-compressed-{sensor_id.name}",
@@ -1637,7 +1660,7 @@ async def _test_liquid_probe(
             except Exception as eee:
                 #print(f"Error {eee}")
                 LOG_GING.critical(f'senser err {eee}')
-                probeval = f"07-03:{probe}传感器故障,读取{probe}传感器值失败"
+                probeval = f"07-03{probe}传感器故障: 读取{probe}传感器值失败"
                 ui.print_fail(probeval)
                 FINAL_TEST_FAIL_INFOR.append(probeval)
                 end_z = 0
@@ -1830,7 +1853,7 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
         global PIP_CURRENT
         global PIP_CHANNELS_CURRENT #pip_channels_stecurrent
         global PIP_VOL_CURRENT #pip_vol_setcurrent
-
+        LOG_GING = ''
 
         FINAL_TEST_FAIL_INFOR = []
         # connect to the pressure fixture (or simulate one)
@@ -1842,18 +1865,24 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
         ENVIRONMENT_SENSOR = asair_sensor.BuildAsairSensor(False)
         
         # create API instance, and get Pipette serial number
-        api = await helpers_ot3.build_async_ot3_hardware_api(
-            is_simulating=test_config.simulate,
-            # pipette_left="p1000_single_v3.4",
-            pipette_right="p1000_multi_v3.4",
-        )
-
+        try:
+            api = await helpers_ot3.build_async_ot3_hardware_api(
+                is_simulating=test_config.simulate,
+                # pipette_left="p1000_single_v3.4",
+                pipette_right="p1000_multi_v3.4",
+            )
+        except Exception as errv:
+            print("07-04识别不到移液器:无法识别该移液器类型.",errv)
         
         
 
         global pipptype
         pipptype = api.get_all_attached_instr()
-        print(f"pipette type: {pipptype[OT3Mount.LEFT]['name']}")
+        try:
+            print(f"pipette type: {pipptype[OT3Mount.LEFT]['name']}")
+        except Exception as errr:
+            print("07-05移液器无条码:移液器没烧录条码")
+
 
         # home and move to attach position
         await api.home([Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R])
@@ -2192,8 +2221,11 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
         LOG_GING.info("done")
         #print("done")
     except Exception as err:
+        
         printsig = f"08-01-assembly-system-error:系统错误,日志:{err}"
         ui.print_fail(printsig)
+        if LOG_GING == '':
+            LOG_GING = _save_logging_print("Pipette-test-system-err")
         LOG_GING.error(printsig)
         LOG_GING.critical(err)
 
