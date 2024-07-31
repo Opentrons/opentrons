@@ -23,9 +23,9 @@ class JiraTicket:
             "Content-Type": "application/json",
         }
 
-    def issues_on_board(self, board_id: str) -> List[List[Any]]:
+    def issues_on_board(self, project_key: str) -> List[List[Any]]:
         """Print Issues on board."""
-        params = {"jql": "project = RABR"}
+        params = {"jql": f"project = {project_key}"}
         response = requests.get(
             f"{self.url}/rest/api/3/search",
             headers=self.headers,
@@ -82,7 +82,6 @@ class JiraTicket:
                 auth=self.auth,
                 data=link_data,
             )
-            print(response)
 
     def open_issue(self, issue_key: str) -> str:
         """Open issue on web browser."""
