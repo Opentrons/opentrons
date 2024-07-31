@@ -2725,8 +2725,6 @@ class OT3API(
 
             # if total_travel_left < working range of plunger axis, dont keep going past the total travel
             #  min(total_travel_left_to_do, working_range_of_plunger_axis)
-            # but also what if you have total_travel_left_to_do < working_range_of_plunger_axis but also
-            # you're already at the bottom
             p_pass_travel = min(p_travel_required_for_z, p_working_mm)
             # Prep the plunger
             await self.move_to(checked_mount, safe_plunger_pos)
