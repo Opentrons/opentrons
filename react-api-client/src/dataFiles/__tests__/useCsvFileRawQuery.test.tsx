@@ -9,7 +9,6 @@ import { useCsvFileRawQuery } from '..'
 import type {
   HostConfig,
   Response,
-  Protocol,
   DownloadedCsvFileResponse,
 } from '@opentrons/api-client'
 
