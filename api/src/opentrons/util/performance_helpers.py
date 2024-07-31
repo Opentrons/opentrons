@@ -103,7 +103,7 @@ def _track_a_function(
     state_name: "RobotActivityState",
     func: _UnderlyingFunction[_UnderlyingFunctionParameters, _UnderlyingFunctionReturn],
 ) -> typing.Callable[_UnderlyingFunctionParameters, _UnderlyingFunctionReturn]:
-    """Track a function.
+    """Wrap a passed function with RobotActivityTracker.track.
 
     This function is a decorator that will track the given state for the
     decorated function.
