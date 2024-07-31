@@ -57,7 +57,7 @@ class Controller:
     """
 
     @classmethod
-    async def build(cls, config: RobotConfig) -> Controller:
+    async def build(cls, config: Optional[RobotConfig]) -> Controller:
         """Build a Controller instance.
 
         Use this factory method rather than the initializer to handle proper
@@ -65,12 +65,13 @@ class Controller:
 
         :param config: A loaded robot config.
         """
+
         gpio = build_gpio_chardev("gpiochip0")
         gpio.config_by_board_rev()
         await gpio.setup()
         return cls(config, gpio)
 
-    def __init__(self, config: RobotConfig, gpio: GPIODriverLike):
+    def __init__(self, config: Optional[RobotConfig], gpio: GPIODriverLike):
         """Build a Controller instance.
 
         Always prefer using :py:meth:`.build` to create an instance of this class. For
