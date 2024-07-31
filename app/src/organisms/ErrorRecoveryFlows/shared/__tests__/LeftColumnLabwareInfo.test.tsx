@@ -52,7 +52,7 @@ describe('LeftColumnLabwareInfo', () => {
       expect.objectContaining({
         type: 'location',
         labwareName: 'MOCK_LW_NAME',
-        currentLocationProps: { slotName: 'A1' },
+        currentLocationProps: { deckLabel: 'A1' },
       }),
       {}
     )
@@ -82,7 +82,7 @@ describe('LeftColumnLabwareInfo', () => {
 
     expect(vi.mocked(InterventionInfo)).toHaveBeenCalledWith(
       expect.objectContaining({
-        currentLocationProps: { slotName: '' },
+        currentLocationProps: { deckLabel: '' },
       }),
       {}
     )
