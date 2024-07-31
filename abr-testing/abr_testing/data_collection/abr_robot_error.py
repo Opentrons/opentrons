@@ -519,6 +519,9 @@ if __name__ == "__main__":
     print(robot)
     parent_key = project_key + "-" + robot.split("ABR")[1]
 
+    # Grab all previous issues
+    all_issues = ticket.issues_on_board(board_id)
+
     # TODO: read board to see if ticket for run id already exists.
     # CREATE TICKET
     issue_key, raw_issue_url = ticket.create_ticket(
@@ -534,12 +537,8 @@ if __name__ == "__main__":
         parent_key,
     )
 
-    # Link Tickets (hopefully)
-    all_issues = ticket.issues_on_board(board_id)
-    print(type(all_issues))
-    print(type(summary))
+    # Link Tickets
     to_link = ticket.match_issues(all_issues, summary)
-    print(to_link)
     ticket.link_issues(to_link, issue_key)
 
     # OPEN TICKET

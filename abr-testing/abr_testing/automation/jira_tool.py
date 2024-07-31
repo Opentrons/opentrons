@@ -45,7 +45,6 @@ class JiraTicket:
         for i in all_issues:
             issue_id = i.get("id")
             issue_summary = i["fields"].get("summary")
-            # print(f"summary: {issue_summary} {issue_id}")
             issue_ids.append([issue_id, issue_summary])
         return issue_ids
 
@@ -54,8 +53,6 @@ class JiraTicket:
         to_link = []
         error = ticket_summary.split("_")[3]
         robot = ticket_summary.split("_")[0]
-        print(error)
-        print(robot)
         # for every issue see if both match, if yes then grab issue ID and add it to a list
         for issue in issue_ids:
             summary = issue[1]
@@ -74,23 +71,6 @@ class JiraTicket:
         for issue in to_link:
             link_data = json.dumps(
                 {
-                    "comment": {
-                        "body": {
-                            "content": [
-                                {
-                                    "content": [
-                                        {
-                                            "text": "Linked related issue!",
-                                            "type": "text",
-                                        }
-                                    ],
-                                    "type": "paragraph",
-                                }
-                            ],
-                            "type": "doc",
-                            "version": 1,
-                        },
-                    },
                     "inwardIssue": {"key": ticket_key},
                     "outwardIssue": {"id": issue},
                     "type": {"name": "Relates"},
@@ -102,12 +82,7 @@ class JiraTicket:
                 auth=self.auth,
                 data=link_data,
             )
-            # print(response.raise_for_status())
-
-            # except requests.exceptions.HTTPError:
-            #     print("HTTP ERROR OH NO")
-            # except json.JSONDecodeError:
-            #     print("JSON decoding error")
+            print(response)
 
     def open_issue(self, issue_key: str) -> str:
         """Open issue on web browser."""
