@@ -96,6 +96,7 @@ async def test_create_run(
             deck_configuration=[],
             protocol=None,
             run_time_param_values=None,
+            run_time_param_files=None,
             notify_publishers=mock_notify_publishers,
         )
     ).then_return(expected_response)
@@ -175,6 +176,7 @@ async def test_create_protocol_run(
             deck_configuration=[],
             protocol=protocol_resource,
             run_time_param_values={"foo": "bar"},
+            run_time_param_files={"my_file": "file-id"},
             notify_publishers=mock_notify_publishers,
         )
     ).then_return(expected_response)
@@ -182,7 +184,9 @@ async def test_create_protocol_run(
     result = await create_run(
         request_body=RequestModel(
             data=RunCreate(
-                protocolId="protocol-id", runTimeParameterValues={"foo": "bar"}
+                protocolId="protocol-id",
+                runTimeParameterValues={"foo": "bar"},
+                runTimeParameterFiles={"my_file": "file-id"},
             )
         ),
         protocol_store=mock_protocol_store,
@@ -243,6 +247,7 @@ async def test_create_run_conflict(
             deck_configuration=[],
             protocol=None,
             run_time_param_values=None,
+            run_time_param_files=None,
             notify_publishers=mock_notify_publishers,
         )
     ).then_raise(RunConflictError("oh no"))

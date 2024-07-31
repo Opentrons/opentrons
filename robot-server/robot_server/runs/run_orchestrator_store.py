@@ -4,7 +4,11 @@ import logging
 from typing import List, Optional, Callable
 
 from opentrons.protocol_engine.errors.exceptions import EStopActivatedError
-from opentrons.protocol_engine.types import CSVRunTimeParamFilesType, PostRunHardwareState, RunTimeParameter
+from opentrons.protocol_engine.types import (
+    CSVRunTimeParamFilesType,
+    PostRunHardwareState,
+    RunTimeParameter,
+)
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.robot.types import RobotType
@@ -199,6 +203,7 @@ class RunOrchestratorStore:
             notify_publishers: Utilized by the engine to notify publishers of state changes.
             protocol: The protocol to load the runner with, if any.
             run_time_param_values: Any runtime parameter values to set.
+            run_time_param_files: Any runtime parameter files to set.
 
         Returns:
             The initial equipment and status summary of the engine.

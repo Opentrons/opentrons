@@ -246,7 +246,7 @@ class RunCreate(BaseModel):
         description="Key-value pairs of run-time parameters defined in a protocol.",
     )
     runTimeParameterFiles: Optional[CSVRunTimeParamFilesType] = Field(
-        default={},
+        None,
         description="Key-fileId pairs of CSV run-time parameters defined in a protocol.",
     )
 

@@ -12,7 +12,10 @@ from opentrons.protocol_engine import (
     CommandPointer,
     Command,
 )
-from opentrons.protocol_engine.types import CSVRunTimeParamFilesType, PrimitiveRunTimeParamValuesType
+from opentrons.protocol_engine.types import (
+    CSVRunTimeParamFilesType,
+    PrimitiveRunTimeParamValuesType,
+)
 
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.service.task_runner import TaskRunner
@@ -166,6 +169,7 @@ class RunDataManager:
             deck_configuration: A mapping of fixtures to cutout fixtures the deck will be loaded with.
             notify_publishers: Utilized by the engine to notify publishers of state changes.
             run_time_param_values: Any runtime parameter values to set.
+            run_time_param_files: Any runtime parameter values to set.
             protocol: The protocol to load the runner with, if any.
 
         Returns:
