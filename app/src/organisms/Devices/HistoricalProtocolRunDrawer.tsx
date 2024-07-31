@@ -49,7 +49,7 @@ export function HistoricalProtocolRunDrawer(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   )
   const { data } = useAllCsvFilesQuery(run.protocolId ?? '')
-  const allProtocolDataFiles = data != null ? data.data.files : []
+  const allProtocolDataFiles = data != null ? data.data : []
   const uniqueLabwareOffsets = allLabwareOffsets?.filter(
     (offset, index, array) => {
       return (
