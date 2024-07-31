@@ -1,19 +1,13 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
 
 import {
-  DIRECTION_COLUMN,
   Flex,
   SPACING,
   COLORS,
   Icon,
   StyledText,
   AlertPrimaryButton,
-  ALIGN_CENTER,
-  JUSTIFY_CENTER,
-  TEXT_ALIGN_CENTER,
-  JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
 import {
   RUN_STATUS_AWAITING_RECOVERY,

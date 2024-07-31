@@ -9,7 +9,6 @@ import {
   ALIGN_CENTER,
   SPACING,
   COLORS,
-  BORDERS,
   DIRECTION_COLUMN,
   POSITION_ABSOLUTE,
   TYPOGRAPHY,
@@ -18,7 +17,6 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   TEXT_ALIGN_CENTER,
   StyledText,
-  JUSTIFY_END,
   PrimaryButton,
   SecondaryButton,
 } from '@opentrons/components'
@@ -31,11 +29,7 @@ import {
   BANNER_TEXT_CONTENT_STYLE,
   RECOVERY_MAP,
 } from './constants'
-import {
-  RecoveryInterventionModal,
-  RecoverySingleColumnContentWrapper,
-  StepInfo,
-} from './shared'
+import { RecoveryInterventionModal, StepInfo } from './shared'
 
 import type { RobotType } from '@opentrons/shared-data'
 import type { ErrorRecoveryFlowsProps } from '.'
