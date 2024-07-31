@@ -7,10 +7,7 @@ import { when } from 'vitest-when'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { useTrackCreateProtocolRunEvent } from '../../../organisms/Devices/hooks'
-import {
-  useCloseCurrentRun,
-  useCurrentRunId,
-} from '../../../organisms/ProtocolUpload/hooks'
+import { useCloseCurrentRun } from '../../../organisms/ProtocolUpload/hooks'
 import { useCurrentRunStatus } from '../../../organisms/RunTimeControl/hooks'
 import {
   getConnectableRobots,
@@ -34,6 +31,7 @@ import { useCreateRunFromProtocol } from '../useCreateRunFromProtocol'
 import { useOffsetCandidatesForAnalysis } from '../../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { ChooseRobotToRunProtocolSlideout } from '../'
 import { useNotifyDataReady } from '../../../resources/useNotifyDataReady'
+import { useCurrentRunId } from '../../../resources/runs'
 
 import type { State } from '../../../redux/types'
 
@@ -46,6 +44,7 @@ vi.mock('../../../redux/networking')
 vi.mock('../useCreateRunFromProtocol')
 vi.mock('../../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis')
 vi.mock('../../../resources/useNotifyDataReady')
+vi.mock('../../../resources/runs')
 
 const render = (
   props: React.ComponentProps<typeof ChooseRobotToRunProtocolSlideout>
@@ -88,7 +87,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
       isClosingCurrentRun: false,
       closeCurrentRun: mockCloseCurrentRun,
     })
-    vi.mocked(useCurrentRunId).mockReturnValue(null)
+    provideNullCurrentRunIdFor(mockConnectableRobot.ip)
     vi.mocked(useCurrentRunStatus).mockReturnValue(null)
     when(vi.mocked(useCreateRunFromProtocol))
       .calledWith(
@@ -191,6 +190,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
       { ...mockConnectableRobot, name: 'otherRobot', ip: 'otherIp' },
       mockConnectableRobot,
     ])
+    provideNullCurrentRunIdFor('otherIp')
     render({
       storedProtocolData: storedProtocolDataFixture,
       onCloseClick: vi.fn(),
@@ -372,6 +372,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
       mockConnectableRobot,
       { ...mockConnectableRobot, name: 'otherRobot', ip: 'otherIp' },
     ])
+    provideNullCurrentRunIdFor('otherIp')
     render({
       storedProtocolData: storedProtocolDataFixture,
       onCloseClick: vi.fn(),
@@ -387,7 +388,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     fireEvent.click(proceedButton)
     fireEvent.click(screen.getByRole('button', { name: 'Confirm values' }))
     expect(vi.mocked(useCreateRunFromProtocol)).nthCalledWith(
-      2,
+      3,
       expect.any(Object),
       { hostname: '127.0.0.1' },
       [
@@ -450,3 +451,21 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     )
   })
 })
+
+const provideNullCurrentRunIdFor = (hostname: string): void => {
+  let once = true
+  when(vi.mocked(useCurrentRunId))
+    .calledWith(expect.any(Object), {
+      hostname,
+      requestor: undefined,
+    })
+    .thenDo(options => {
+      void (options?.onSuccess != null && once
+        ? options.onSuccess({
+            links: { current: null },
+          } as any)
+        : {})
+      once = false
+      return null
+    })
+}
