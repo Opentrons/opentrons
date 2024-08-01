@@ -10,6 +10,7 @@ import {
   Icon,
   JUSTIFY_FLEX_END,
   Link,
+  LegacyModal,
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
@@ -21,7 +22,6 @@ import {
 import { useStopRunMutation } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '../../App/portal'
-import { LegacyModal } from '../../molecules/LegacyModal'
 import { useTrackProtocolRunEvent, useIsFlex } from '../Devices/hooks'
 import { useRunStatus } from '../RunTimeControl/hooks'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '../../redux/analytics'

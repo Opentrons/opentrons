@@ -14,10 +14,10 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
+  LegacyModal,
 } from '@opentrons/components'
 
 import { StatusLabel } from '../../atoms/StatusLabel'
-import { LegacyModal } from '../../molecules/LegacyModal'
 import { TaskList } from '../TaskList'
 
 import {

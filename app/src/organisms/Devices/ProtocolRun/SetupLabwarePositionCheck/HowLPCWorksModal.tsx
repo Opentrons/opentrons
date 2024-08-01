@@ -11,9 +11,9 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
+  LegacyModal,
 } from '@opentrons/components'
 import { getTopPortalEl } from '../../../../App/portal'
-import { LegacyModal } from '../../../../molecules/LegacyModal'
 
 const OFFSET_DATA_HELP_ARTICLE =
   'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'

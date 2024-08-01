@@ -2,8 +2,7 @@ import * as React from 'react'
 import '@testing-library/jest-dom/vitest'
 import { screen } from '@testing-library/react'
 import { describe, it, expect, beforeEach } from 'vitest'
-import { renderWithProviders } from '../../../__testing-utils__'
-
+import { renderWithProviders } from '../../../testing/utils'
 import { LegacyModalShell } from '../LegacyModalShell'
 
 const render = (props: React.ComponentProps<typeof LegacyModalShell>) => {

@@ -15,10 +15,10 @@ import {
   PrimaryButton,
   SPACING,
   LegacyStyledText,
+  LegacyModal,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { LegacyModal } from '../../../../molecules/LegacyModal'
 import { useRobot } from '../../../../organisms/Devices/hooks'
 import { CONNECTABLE } from '../../../../redux/discovery'
 import {

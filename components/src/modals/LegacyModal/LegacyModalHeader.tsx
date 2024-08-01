@@ -1,24 +1,21 @@
 import * as React from 'react'
 import { css } from 'styled-components'
+
+import { Icon } from '../../icons'
+import { Box, Btn, Flex } from '../../primitives'
+import { LegacyStyledText } from '../../atoms'
 import {
   ALIGN_CENTER,
-  Btn,
-  COLORS,
-  Flex,
-  Icon,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING,
-  LegacyStyledText,
-  TYPOGRAPHY,
-} from '@opentrons/components'
-
-import { Divider } from '../../atoms/structure'
-import type { IconProps } from '@opentrons/components'
+} from '../../styles'
+import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { COLORS } from '../../helix-design-system'
+import type { IconProps } from '../../icons'
 
 export interface LegacyModalHeaderProps {
-  onClose?: React.MouseEventHandler
   title: React.ReactNode
+  onClose?: React.MouseEventHandler
   backgroundColor?: string
   color?: string
   icon?: IconProps
@@ -84,7 +81,12 @@ export const LegacyModalHeader = (
               </Btn>
             )}
       </Flex>
-      <Divider width="100%" marginY="0" />
+      <Box
+        borderBottom={`1px solid ${COLORS.grey30}`}
+        marginY="0"
+        width="100%"
+        data-testid="divider"
+      />
     </>
   )
 }

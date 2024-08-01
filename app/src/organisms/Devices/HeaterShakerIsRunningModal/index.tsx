@@ -13,9 +13,9 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
+  LegacyModal,
 } from '@opentrons/components'
 import { useAttachedModules } from '../hooks'
-import { LegacyModal } from '../../../molecules/LegacyModal'
 import { HeaterShakerModuleCard } from '../HeaterShakerWizard/HeaterShakerModuleCard'
 import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
 

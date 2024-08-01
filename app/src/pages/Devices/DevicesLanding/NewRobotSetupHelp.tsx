@@ -10,10 +10,10 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
+  LegacyModal,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '../../../App/portal'
-import { LegacyModal } from '../../../molecules/LegacyModal'
 import { ExternalLink } from '../../../atoms/Link/ExternalLink'
 
 const NEW_FLEX_SETUP_SUPPORT_ARTICLE_HREF =

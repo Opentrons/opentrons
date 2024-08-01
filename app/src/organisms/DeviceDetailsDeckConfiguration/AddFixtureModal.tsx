@@ -13,6 +13,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
   SPACING,
+  LegacyModal,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -50,7 +51,6 @@ import {
 import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
 import { TertiaryButton } from '../../atoms/buttons'
 import { Modal } from '../../molecules/Modal'
-import { LegacyModal } from '../../molecules/LegacyModal'
 import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration/'
 
 import type {
@@ -59,7 +59,7 @@ import type {
   CutoutFixtureId,
 } from '@opentrons/shared-data'
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
-import type { LegacyModalProps } from '../../molecules/LegacyModal'
+import type { LegacyModalProps } from '@opentrons/components'
 
 interface AddFixtureModalProps {
   cutoutId: CutoutId

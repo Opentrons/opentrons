@@ -8,6 +8,8 @@ import {
   StyledText,
   SPACING,
   COLORS,
+  LegacyModalShell,
+  LegacyModalHeader,
   BORDERS,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
@@ -19,10 +21,6 @@ import { ERROR_KINDS } from '../constants'
 import { InlineNotification } from '../../../atoms/InlineNotification'
 import { StepInfo } from './StepInfo'
 import { getErrorKind } from '../utils'
-import {
-  LegacyModalShell,
-  LegacyModalHeader,
-} from '../../../molecules/LegacyModal'
 
 import type { RobotType } from '@opentrons/shared-data'
 import type { IconProps } from '@opentrons/components'

@@ -15,13 +15,11 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
+  LegacyModalHeader,
+  LegacyModalShell,
 } from '@opentrons/components'
 import { getTopPortalEl } from '../../App/portal'
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
-import {
-  LegacyModalHeader,
-  LegacyModalShell,
-} from '../../molecules/LegacyModal'
 import { PythonLabwareOffsetSnippet } from '../../molecules/PythonLabwareOffsetSnippet'
 import { LabwareOffsetTabs } from '../LabwareOffsetTabs'
 import { getLabwareDefinitionsFromCommands } from '../../molecules/Command/utils/getLabwareDefinitionsFromCommands'

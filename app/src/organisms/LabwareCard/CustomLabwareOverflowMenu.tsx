@@ -19,6 +19,7 @@ import {
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
+  LegacyModal,
   LegacyStyledText,
   TYPOGRAPHY,
   useConditionalConfirm,
@@ -28,7 +29,6 @@ import {
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { Divider } from '../../atoms/structure'
-import { LegacyModal } from '../../molecules/LegacyModal'
 import { getTopPortalEl } from '../../App/portal'
 import {
   deleteCustomLabwareFile,

@@ -10,12 +10,12 @@ import {
   JUSTIFY_FLEX_END,
   Link,
   PrimaryButton,
+  LegacyModal,
   SPACING,
   LegacyStyledText,
   TEXT_ALIGN_CENTER,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { LegacyModal } from '../../molecules/LegacyModal'
 import { updateConfigValue } from '../../redux/config'
 import type { Dispatch } from '../../redux/types'
 import type { UpdateConfigValueAction } from '../../redux/config/types'

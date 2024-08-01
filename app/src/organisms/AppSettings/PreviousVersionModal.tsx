@@ -7,9 +7,9 @@ import {
   PrimaryButton,
   SPACING,
   LegacyStyledText,
+  LegacyModal,
 } from '@opentrons/components'
 
-import { LegacyModal } from '../../molecules/LegacyModal'
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
 
 export const UNINSTALL_APP_URL =

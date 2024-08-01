@@ -12,6 +12,7 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
+  LegacyModal,
   JUSTIFY_FLEX_END,
   PrimaryButton,
   SPACING,
@@ -20,7 +21,6 @@ import {
 } from '@opentrons/components'
 import { Banner } from '../../atoms/Banner'
 import { getTopPortalEl } from '../../App/portal'
-import { LegacyModal } from '../../molecules/LegacyModal'
 
 import type { AttachedModule } from '../../redux/modules/types'
 

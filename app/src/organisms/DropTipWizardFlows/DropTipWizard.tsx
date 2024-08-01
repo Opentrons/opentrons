@@ -15,10 +15,10 @@ import {
   POSITION_ABSOLUTE,
   SPACING,
   LegacyStyledText,
+  LegacyModalShell,
   useConditionalConfirm,
 } from '@opentrons/components'
 
-import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { getTopPortalEl } from '../../App/portal'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { getIsOnDevice } from '../../redux/config'

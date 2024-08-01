@@ -11,7 +11,7 @@ import { LegacyModal } from './index'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'App/Molecules/LegacyModal',
+  title: 'Components/modals/LegacyModal',
   component: LegacyModal,
 } as Meta
 

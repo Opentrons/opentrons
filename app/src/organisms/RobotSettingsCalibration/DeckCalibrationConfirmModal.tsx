@@ -8,11 +8,11 @@ import {
   JUSTIFY_FLEX_END,
   Link,
   PrimaryButton,
+  LegacyModal,
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { LegacyModal } from '../../molecules/LegacyModal'
 
 interface DeckCalibrationConfirmModalProps {
   confirm: () => unknown

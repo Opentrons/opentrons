@@ -13,6 +13,7 @@ import {
   Icon,
   JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
+  LegacyModalShell,
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
@@ -26,7 +27,6 @@ import { NeedHelpLink } from '../../CalibrationPanels'
 import { useSelector } from 'react-redux'
 import { TwoUpTileLayout } from '../TwoUpTileLayout'
 import { getTopPortalEl } from '../../../App/portal'
-import { LegacyModalShell } from '../../../molecules/LegacyModal'
 import { SmallButton } from '../../../atoms/buttons'
 import { CALIBRATION_PROBE } from '../../PipetteWizardFlows/constants'
 import { TerseOffsetTable } from '../ResultsSummary'

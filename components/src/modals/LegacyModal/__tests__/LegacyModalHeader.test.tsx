@@ -2,7 +2,6 @@ import * as React from 'react'
 import { screen, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { renderWithProviders } from '../../../__testing-utils__'
 
 import {
   ALIGN_CENTER,
@@ -10,7 +9,7 @@ import {
   JUSTIFY_CENTER,
   SPACING,
 } from '@opentrons/components'
-
+import { renderWithProviders } from '../../../testing/utils'
 import { LegacyModalHeader } from '../LegacyModalHeader'
 
 const mockClose = vi.fn()

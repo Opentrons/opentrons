@@ -16,6 +16,7 @@ import {
   SecondaryButton,
   SPACING,
   LegacyStyledText,
+  LegacyModal,
 } from '@opentrons/components'
 
 import {
@@ -27,7 +28,6 @@ import {
 
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
 import { ReleaseNotes } from '../../molecules/ReleaseNotes'
-import { LegacyModal } from '../../molecules/LegacyModal'
 import { Banner } from '../../atoms/Banner'
 import { ProgressBar } from '../../atoms/ProgressBar'
 import { useRemoveActiveAppUpdateToast } from '../Alerts'

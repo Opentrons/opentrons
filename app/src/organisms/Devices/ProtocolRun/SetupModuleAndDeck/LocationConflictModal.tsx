@@ -17,6 +17,7 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
+  LegacyModal,
 } from '@opentrons/components'
 import {
   getCutoutDisplayName,
@@ -29,7 +30,6 @@ import {
 } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '../../../../App/portal'
-import { LegacyModal } from '../../../../molecules/LegacyModal'
 import { Modal } from '../../../../molecules/Modal'
 import { SmallButton } from '../../../../atoms/buttons/SmallButton'
 import { useNotifyDeckConfigurationQuery } from '../../../../resources/deck_configuration'

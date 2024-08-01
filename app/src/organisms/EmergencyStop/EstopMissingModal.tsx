@@ -10,15 +10,15 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
+  LegacyModal,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '../../App/portal'
-import { LegacyModal } from '../../molecules/LegacyModal'
 import { Modal } from '../../molecules/Modal'
 import { getIsOnDevice } from '../../redux/config'
 
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
-import type { LegacyModalProps } from '../../molecules/LegacyModal'
+import type { LegacyModalProps } from '@opentrons/components'
 
 // Note (07/13/2023) After the launch, we will unify the modal components into one component.
 // Then TouchScreenModal and DesktopModal will be TouchScreenContent and DesktopContent that only render each content.

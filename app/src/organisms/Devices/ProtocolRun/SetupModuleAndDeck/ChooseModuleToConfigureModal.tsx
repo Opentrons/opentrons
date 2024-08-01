@@ -16,6 +16,7 @@ import {
   LegacyStyledText,
   TEXT_ALIGN_CENTER,
   TYPOGRAPHY,
+  LegacyModal,
 } from '@opentrons/components'
 import {
   getFixtureDisplayName,
@@ -24,7 +25,6 @@ import {
   getModuleDisplayName,
 } from '@opentrons/shared-data'
 import { getTopPortalEl } from '../../../../App/portal'
-import { LegacyModal } from '../../../../molecules/LegacyModal'
 import { Modal } from '../../../../molecules/Modal'
 import { FixtureOption } from '../../../DeviceDetailsDeckConfiguration/AddFixtureModal'
 import { useNotifyDeckConfigurationQuery } from '../../../../resources/deck_configuration'

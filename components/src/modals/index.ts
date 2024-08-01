@@ -1,11 +1,12 @@
 // modal components
 
-export * from './Modal'
 export * from './AlertModal'
+export * from './BaseModal'
 export * from './ContinueModal'
-export * from './SpinnerModal'
+export * from './LegacyModal'
+export * from './Modal'
 export * from './ModalPage'
 export * from './ModalShell'
-export * from './SpinnerModalPage'
-export * from './BaseModal'
 export * from './Overlay'
+export * from './SpinnerModal'
+export * from './SpinnerModalPage'

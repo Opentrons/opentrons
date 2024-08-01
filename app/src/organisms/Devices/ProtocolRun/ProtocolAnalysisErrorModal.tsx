@@ -9,11 +9,11 @@ import {
   PrimaryButton,
   SPACING,
   LegacyStyledText,
+  LegacyModal,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '../../../App/portal'
-import { LegacyModal } from '../../../molecules/LegacyModal'
 
 import type { AnalysisError } from '@opentrons/shared-data'
 

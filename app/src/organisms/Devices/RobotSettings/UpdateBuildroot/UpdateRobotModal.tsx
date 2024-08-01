@@ -13,6 +13,7 @@ import {
   Flex,
   NewPrimaryBtn,
   NewSecondaryBtn,
+  LegacyModal,
   BORDERS,
 } from '@opentrons/components'
 
@@ -29,7 +30,6 @@ import { ExternalLink } from '../../../../atoms/Link/ExternalLink'
 import { ReleaseNotes } from '../../../../molecules/ReleaseNotes'
 import { useIsRobotBusy } from '../../hooks'
 import { Tooltip } from '../../../../atoms/Tooltip'
-import { LegacyModal } from '../../../../molecules/LegacyModal'
 import { Banner } from '../../../../atoms/Banner'
 import { useDispatchStartRobotUpdate } from '../../../../redux/robot-update/hooks'
 

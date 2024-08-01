@@ -16,11 +16,11 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
+  LegacyModal,
 } from '@opentrons/components'
 import { Modal } from '../../../../molecules/Modal'
 import { getIsOnDevice } from '../../../../redux/config'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { LegacyModal } from '../../../../molecules/LegacyModal'
 import { getLocationInfoNames } from '../utils/getLocationInfoNames'
 import { getSlotLabwareDefinition } from '../utils/getSlotLabwareDefinition'
 import { LiquidDetailCard } from './LiquidDetailCard'

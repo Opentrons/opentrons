@@ -11,12 +11,10 @@ import {
   StyledText,
   PrimaryButton,
   JUSTIFY_END,
-} from '@opentrons/components'
-
-import {
   LegacyModalHeader,
   LegacyModalShell,
-} from '../../../molecules/LegacyModal'
+} from '@opentrons/components'
+
 import { TextOnlyButton } from '../../../atoms/buttons'
 
 import type { PipetteData } from '@opentrons/api-client'

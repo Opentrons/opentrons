@@ -14,12 +14,12 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
+  LegacyModalShell,
 } from '@opentrons/components'
 import { useDispatch } from 'react-redux'
 
 import styles from './styles.module.css'
 import { labwareImages } from '../../organisms/CalibrationPanels/labwareImages'
-import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { getTopPortalEl } from '../../App/portal'
 import { setUseTrashSurfaceForTipCal } from '../../redux/calibration'

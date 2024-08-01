@@ -16,15 +16,15 @@ import {
   OVERFLOW_WRAP_ANYWHERE,
   PrimaryButton,
   SPACING,
+  LegacyModal,
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { LegacyModal } from '../../../molecules/LegacyModal'
 import { useDownloadRunLog } from '../hooks'
 
 import type { RunError } from '@opentrons/api-client'
-import type { LegacyModalProps } from '../../../molecules/LegacyModal'
+import type { LegacyModalProps } from '@opentrons/components'
 
 /**
  * This modal is for Desktop app

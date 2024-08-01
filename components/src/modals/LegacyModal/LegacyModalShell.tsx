@@ -2,18 +2,18 @@ import * as React from 'react'
 import styled from 'styled-components'
 import {
   ALIGN_CENTER,
-  BORDERS,
-  COLORS,
   JUSTIFY_CENTER,
   OVERFLOW_AUTO,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   POSITION_STICKY,
-  RESPONSIVENESS,
-  SPACING,
-  styleProps,
-} from '@opentrons/components'
-import type { StyleProps } from '@opentrons/components'
+} from '../../styles'
+import { BORDERS, COLORS } from '../../helix-design-system'
+import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
+import { styleProps } from '../../primitives'
+
+import type { StyleProps } from '../../primitives'
+
 export interface LegacyModalShellProps extends StyleProps {
   /** Modal content */
   children: React.ReactNode

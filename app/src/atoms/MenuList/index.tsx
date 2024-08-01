@@ -7,8 +7,8 @@ import {
   SPACING,
   BORDERS,
   JUSTIFY_CENTER,
+  LegacyModalShell,
 } from '@opentrons/components'
-import { LegacyModalShell } from '../../molecules/LegacyModal'
 
 interface MenuListProps {
   children: React.ReactNode

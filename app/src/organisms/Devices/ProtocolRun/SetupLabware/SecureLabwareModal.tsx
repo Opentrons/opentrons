@@ -12,9 +12,9 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
+  LegacyModal,
 } from '@opentrons/components'
 import { getTopPortalEl } from '../../../../App/portal'
-import { LegacyModal } from '../../../../molecules/LegacyModal'
 import secureMagModBracketImage from '../../../../assets/images/secure_mag_mod_bracket.png'
 import secureTCLatchImage from '../../../../assets/images/secure_tc_latch.png'
 import { getModuleName } from '../utils/getModuleName'

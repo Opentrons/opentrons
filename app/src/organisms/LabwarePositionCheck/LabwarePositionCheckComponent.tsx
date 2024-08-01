@@ -4,7 +4,7 @@ import isEqual from 'lodash/isEqual'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
-import { useConditionalConfirm } from '@opentrons/components'
+import { useConditionalConfirm, LegacyModalShell } from '@opentrons/components'
 import {
   useCreateLabwareOffsetMutation,
   useCreateMaintenanceCommandMutation,
@@ -16,7 +16,6 @@ import { getTopPortalEl } from '../../App/portal'
 import { IntroScreen } from './IntroScreen'
 import { ExitConfirmation } from './ExitConfirmation'
 import { CheckItem } from './CheckItem'
-import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { getIsOnDevice } from '../../redux/config'
 import { AttachProbe } from './AttachProbe'

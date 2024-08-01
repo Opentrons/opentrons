@@ -18,12 +18,12 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
   useConditionalConfirm,
+  LegacyModal,
 } from '@opentrons/components'
 
 import { TertiaryButton } from '../../atoms/buttons'
 import { ERROR_TOAST, SUCCESS_TOAST } from '../../atoms/Toast'
 import { useToaster } from '../../organisms/ToasterOven'
-import { LegacyModal } from '../../molecules/LegacyModal'
 import { getTopPortalEl } from '../../App/portal'
 import {
   clearDiscoveryCache,

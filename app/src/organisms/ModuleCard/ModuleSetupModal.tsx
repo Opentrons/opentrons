@@ -9,12 +9,12 @@ import {
   Flex,
   Icon,
   Link,
+  LegacyModal,
   PrimaryButton,
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { LegacyModal } from '../../molecules/LegacyModal'
 import { getTopPortalEl } from '../../App/portal'
 
 const MODULE_SETUP_URL = 'https://support.opentrons.com/s/modules'

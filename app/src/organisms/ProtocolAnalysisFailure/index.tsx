@@ -8,6 +8,7 @@ import {
   Btn,
   Flex,
   JUSTIFY_FLEX_END,
+  LegacyModal,
   JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
   SPACING,
@@ -19,7 +20,6 @@ import {
 import { analyzeProtocol } from '../../redux/protocol-storage'
 import { Banner } from '../../atoms/Banner'
 import { getTopPortalEl } from '../../App/portal'
-import { LegacyModal } from '../../molecules/LegacyModal'
 
 import type { Dispatch } from '../../redux/types'
 interface ProtocolAnalysisFailureProps {

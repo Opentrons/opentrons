@@ -15,9 +15,9 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
+  LegacyModal,
 } from '@opentrons/components'
 
-import { LegacyModal } from '../molecules/LegacyModal'
 import { reloadUi } from '../redux/shell'
 
 import type { Dispatch } from '../redux/types'

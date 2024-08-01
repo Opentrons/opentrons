@@ -34,6 +34,6 @@
     "rootDir": "src",
     "outDir": "lib"
   },
-  "include": ["typings", "src"],
+  "include": ["typings", "src", "../components/src/modals/LegacyModal"],
   "exclude": ["**/*.stories.tsx"]
 }

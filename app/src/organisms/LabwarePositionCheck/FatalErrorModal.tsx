@@ -15,12 +15,12 @@ import {
   RESPONSIVENESS,
   SPACING,
   LegacyStyledText,
+  LegacyModalShell,
   TEXT_ALIGN_CENTER,
   TEXT_TRANSFORM_CAPITALIZE,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getTopPortalEl } from '../../App/portal'
-import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { i18n } from '../../i18n'
 

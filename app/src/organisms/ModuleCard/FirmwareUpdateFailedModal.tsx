@@ -11,9 +11,9 @@ import {
   PrimaryButton,
   SPACING,
   LegacyStyledText,
+  LegacyModal,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { LegacyModal } from '../../molecules/LegacyModal'
 
 import type { AttachedModule } from '../../redux/modules/types'
 

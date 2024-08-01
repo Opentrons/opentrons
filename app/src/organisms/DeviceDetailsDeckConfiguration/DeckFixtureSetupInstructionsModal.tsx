@@ -8,14 +8,14 @@ import {
   Flex,
   PrimaryButton,
   SPACING,
+  LegacyModal,
   LegacyStyledText,
 } from '@opentrons/components'
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
 import { Modal } from '../../molecules/Modal'
-import { LegacyModal } from '../../molecules/LegacyModal'
 
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
-import type { LegacyModalProps } from '../../molecules/LegacyModal'
+import type { LegacyModalProps } from '@opentrons/components'
 
 import imgSrc from '../../assets/images/on-device-display/deck_fixture_setup_qrcode.png'
 

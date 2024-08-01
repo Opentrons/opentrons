@@ -4,7 +4,12 @@ import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
-import { SPACING, TYPOGRAPHY, LegacyStyledText } from '@opentrons/components'
+import {
+  SPACING,
+  TYPOGRAPHY,
+  LegacyStyledText,
+  LegacyModalShell,
+} from '@opentrons/components'
 
 import {
   useDispatchApiRequests,
@@ -24,7 +29,6 @@ import {
   HOME,
 } from '../../redux/robot-controls'
 
-import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { useAttachedPipettes } from '../Devices/hooks'

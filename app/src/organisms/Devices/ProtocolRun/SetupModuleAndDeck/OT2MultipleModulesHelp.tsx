@@ -11,12 +11,12 @@ import {
   Link,
   PrimaryButton,
   SPACING,
+  LegacyModal,
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getTopPortalEl } from '../../../../App/portal'
 import { Banner } from '../../../../atoms/Banner'
-import { LegacyModal } from '../../../../molecules/LegacyModal'
 import multipleModuleHelp from '../../../../assets/images/Moam_modal_image.png'
 
 const HOW_TO_MULTIPLE_MODULES_HREF =

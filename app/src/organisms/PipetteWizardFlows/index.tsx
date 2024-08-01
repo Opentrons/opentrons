@@ -4,7 +4,11 @@ import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
-import { useConditionalConfirm, COLORS } from '@opentrons/components'
+import {
+  useConditionalConfirm,
+  COLORS,
+  LegacyModalShell,
+} from '@opentrons/components'
 import { LEFT, NINETY_SIX_CHANNEL, RIGHT } from '@opentrons/shared-data'
 import {
   useHost,
@@ -17,7 +21,6 @@ import {
   useChainMaintenanceCommands,
 } from '../../resources/runs'
 import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs'
-import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { getTopPortalEl } from '../../App/portal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { FirmwareUpdateModal } from '../FirmwareUpdateModal'

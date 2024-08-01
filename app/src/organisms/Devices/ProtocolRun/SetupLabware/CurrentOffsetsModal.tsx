@@ -14,15 +14,13 @@ import {
   DIRECTION_COLUMN,
   SPACING,
   TYPOGRAPHY,
+  LegacyModalHeader,
+  LegacyModalShell,
   COLORS,
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
 
 import { getIsLabwareOffsetCodeSnippetsOn } from '../../../../redux/config'
-import {
-  LegacyModalHeader,
-  LegacyModalShell,
-} from '../../../../molecules/LegacyModal'
 import { LabwareOffsetTabs } from '../../../LabwareOffsetTabs'
 import { OffsetVector } from '../../../../molecules/OffsetVector'
 import { PythonLabwareOffsetSnippet } from '../../../../molecules/PythonLabwareOffsetSnippet'

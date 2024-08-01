@@ -9,13 +9,13 @@ import {
   POSITION_ABSOLUTE,
   COLORS,
   BORDERS,
+  LegacyModalShell,
 } from '@opentrons/components'
 import {
   useCreateMaintenanceCommandMutation,
   useDeleteMaintenanceRunMutation,
 } from '@opentrons/react-api-client'
 import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs'
-import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { getTopPortalEl } from '../../App/portal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'

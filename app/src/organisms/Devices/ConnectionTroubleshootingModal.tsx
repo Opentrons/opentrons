@@ -9,11 +9,10 @@ import {
   Link,
   PrimaryButton,
   SPACING,
+  LegacyModal,
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import { LegacyModal } from '../../molecules/LegacyModal'
 
 const NEW_ROBOT_SETUP_SUPPORT_ARTICLE_HREF =
   'https://support.opentrons.com/s/article/Troubleshooting-connection-problems'

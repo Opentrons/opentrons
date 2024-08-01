@@ -23,6 +23,7 @@ import {
   RESPONSIVENESS,
   SPACING,
   TYPOGRAPHY,
+  LegacyModalShell,
 } from '@opentrons/components'
 import {
   EIGHT_CHANNEL,
@@ -35,7 +36,6 @@ import { i18n } from '../../i18n'
 import { getIsOnDevice } from '../../redux/config'
 import { getTopPortalEl } from '../../App/portal'
 import { SmallButton } from '../../atoms/buttons'
-import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { ModalContentOneColSimpleButtons } from '../../molecules/InterventionModal'
 import singleChannelAndEightChannel from '../../assets/images/change-pip/1_and_8_channel.png'

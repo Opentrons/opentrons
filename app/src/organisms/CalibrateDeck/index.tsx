@@ -6,7 +6,7 @@ import { useQueryClient } from 'react-query'
 
 import { useHost } from '@opentrons/react-api-client'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
-import { useConditionalConfirm } from '@opentrons/components'
+import { useConditionalConfirm, LegacyModalShell } from '@opentrons/components'
 
 import * as Sessions from '../../redux/sessions'
 import {
@@ -20,7 +20,6 @@ import {
   LoadingState,
   CompleteConfirmation,
 } from '../../organisms/CalibrationPanels'
-import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { getTopPortalEl } from '../../App/portal'
 

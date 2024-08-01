@@ -1,8 +1,11 @@
 import * as React from 'react'
-import { SPACING, COLORS, Box } from '@opentrons/components'
+import { Box } from '../../primitives'
+import { SPACING } from '../../ui-style-constants'
+import { COLORS } from '../../helix-design-system'
 import { LegacyModalHeader } from './LegacyModalHeader'
 import { LegacyModalShell } from './LegacyModalShell'
-import type { IconProps, StyleProps } from '@opentrons/components'
+import type { IconProps } from '../../icons'
+import type { StyleProps } from '../../primitives'
 
 type ModalType = 'info' | 'warning' | 'error'
 export * from './LegacyModalShell'
@@ -20,7 +23,7 @@ export interface LegacyModalProps extends StyleProps {
 }
 
 /**
- * For Desktop app use only.
+ * For Desktop app and web application use only.
  */
 export const LegacyModal = (props: LegacyModalProps): JSX.Element => {
   const {

@@ -13,10 +13,10 @@ import {
   Link,
   PrimaryButton,
   SPACING,
+  LegacyModal,
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { LegacyModal } from '../../../../../molecules/LegacyModal'
 import {
   useDispatchApiRequest,
   getRequestById,

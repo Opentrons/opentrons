@@ -12,11 +12,11 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
+  LegacyModal,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '../../../App/portal'
 import { Banner } from '../../../atoms/Banner'
-import { LegacyModal } from '../../../molecules/LegacyModal'
 
 import type { AnalysisError } from '@opentrons/shared-data'
 

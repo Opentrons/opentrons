@@ -31,6 +31,7 @@ import {
   Tabs,
   SIZE_1,
   SIZE_5,
+  LegacyModal,
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
@@ -51,7 +52,6 @@ import {
 
 import { getTopPortalEl } from '../../App/portal'
 import { Divider } from '../../atoms/structure'
-import { LegacyModal } from '../../molecules/LegacyModal'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,

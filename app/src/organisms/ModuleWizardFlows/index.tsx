@@ -3,7 +3,11 @@ import { createPortal } from 'react-dom'
 import { useSelector } from 'react-redux'
 import { Trans, useTranslation } from 'react-i18next'
 import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
-import { COLORS, LegacyStyledText } from '@opentrons/components'
+import {
+  COLORS,
+  LegacyStyledText,
+  LegacyModalShell,
+} from '@opentrons/components'
 import {
   getModuleType,
   getModuleDisplayName,
@@ -14,7 +18,6 @@ import {
   getDeckDefFromRobotType,
   FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
-import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { getTopPortalEl } from '../../App/portal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { useAttachedPipettesFromInstrumentsQuery } from '../../organisms/Devices/hooks'

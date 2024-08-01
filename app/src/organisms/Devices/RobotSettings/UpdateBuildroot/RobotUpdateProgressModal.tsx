@@ -13,11 +13,11 @@ import {
   JUSTIFY_FLEX_END,
   NewPrimaryBtn,
   SPACING,
+  LegacyModal,
   LegacyStyledText,
 } from '@opentrons/components'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
-import { LegacyModal } from '../../../../molecules/LegacyModal'
 import { ProgressBar } from '../../../../atoms/ProgressBar'
 import { FOOTER_BUTTON_STYLE } from './UpdateRobotModal'
 import {
