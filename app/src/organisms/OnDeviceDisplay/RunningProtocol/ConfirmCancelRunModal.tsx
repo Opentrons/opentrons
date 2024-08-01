@@ -14,6 +14,7 @@ import {
 } from '@opentrons/components'
 import {
   useStopRunMutation,
+  useDeleteRunMutation,
   useDismissCurrentRunMutation,
 } from '@opentrons/react-api-client'
 
@@ -31,6 +32,7 @@ interface ConfirmCancelRunModalProps {
   runId: string
   setShowConfirmCancelRunModal: (showConfirmCancelRunModal: boolean) => void
   isActiveRun: boolean
+  isQuickTransfer: boolean
   protocolId?: string | null
 }
 
@@ -38,14 +40,27 @@ export function ConfirmCancelRunModal({
   runId,
   setShowConfirmCancelRunModal,
   isActiveRun,
+  isQuickTransfer,
   protocolId,
 }: ConfirmCancelRunModalProps): JSX.Element {
   const { t } = useTranslation(['run_details', 'shared'])
   const { stopRun } = useStopRunMutation()
+  const { deleteRun } = useDeleteRunMutation({
+    onError: error => {
+      setIsCanceling(false)
+      console.error('Error deleting quick transfer run', error)
+    },
+  })
   const {
     dismissCurrentRun,
     isLoading: isDismissing,
-  } = useDismissCurrentRunMutation()
+  } = useDismissCurrentRunMutation({
+    onSuccess: () => {
+      if (isQuickTransfer && !isActiveRun) {
+        deleteRun(runId)
+      }
+    },
+  })
   const runStatus = useRunStatus(runId)
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name ?? ''
@@ -74,7 +89,11 @@ export function ConfirmCancelRunModal({
       trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.CANCEL })
       dismissCurrentRun(runId)
       if (!isActiveRun) {
-        if (protocolId != null) {
+        if (isQuickTransfer && protocolId != null) {
+          navigate(`/quick-transfer/${protocolId}`)
+        } else if (isQuickTransfer) {
+          navigate('/quick-transfer')
+        } else if (protocolId != null) {
           navigate(`/protocols/${protocolId}`)
         } else {
           navigate('/protocols')

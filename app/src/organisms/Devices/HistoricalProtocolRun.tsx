@@ -44,7 +44,7 @@ export function HistoricalProtocolRun(
   const [drawerOpen, setDrawerOpen] = React.useState(false)
   const { data: protocolFileData } = useAllCsvFilesQuery(run.protocolId ?? '')
   const allProtocolDataFiles =
-    protocolFileData != null ? protocolFileData.data.files : []
+    protocolFileData != null ? protocolFileData.data : []
   const runStatus = run.status
   const runDisplayName = formatTimestamp(run.createdAt)
   let duration = EMPTY_TIMESTAMP

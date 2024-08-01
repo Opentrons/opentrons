@@ -15,7 +15,7 @@ import pytest
 from fastapi import routing
 from starlette.testclient import TestClient
 
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons_shared_data.labware.types import LabwareDefinition
 
 from opentrons import config
 from opentrons.hardware_control import API, HardwareControlAPI, ThreadedAsyncLock

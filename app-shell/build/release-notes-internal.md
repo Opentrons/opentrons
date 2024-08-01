@@ -1,15 +1,31 @@
 For more details about this release, please see the full [technical changelog][].
 [technical change log]: https://github.com/Opentrons/opentrons/releases
 
+## Internal Release 2.0.0-alpha.3
+
+This internal release, pulled from the `edge` branch, contains features being developed for 8.0.0. It's for internal testing only.
+
+- [Opentrons changes since the latest stable release](https://github.com/Opentrons/opentrons/compare/v7.3.1...ot3@2.0.0-alpha.3)
+- [Opentrons changes since the last internal release](https://github.com/Opentrons/opentrons/compare/ot3@2.0.0-alpha.2...ot3@2.0.0-alpha.3)
+- [Flex changes](https://github.com/Opentrons/oe-core/compare/internal@2.0.0-alpha.2...internal@2.0.0-alpha.3)
+- [Flex firmware changes](https://github.com/Opentrons/ot3-firmware/compare/internal@v9...internal@v10)
+- [OT2 changes](https://github.com/Opentrons/buildroot/compare/v1.17.7...internal@2.0.0-alpha.0)
+
+## Internal Release 2.0.0-alpha.2
+
+This internal release, pulled from the `edge` branch, contains features being developed for 8.0.0. It's for internal testing only.
+
+<https://github.com/Opentrons/opentrons/compare/ot3@2.0.0-alpha.1...ot3@2.0.0-alpha.2>
+
 ## Internal Release 2.0.0-alpha.1
 
-This internal release, pulled from the `edge` branch, contains features being developed for 8.0.0. It's for internal testing only. Usage may require a robot factory reset to restore robot stability.
+This internal release, pulled from the `edge` branch, contains features being developed for 8.0.0. It's for internal testing only.
 
 <https://github.com/Opentrons/opentrons/compare/ot3@2.0.0-alpha.0...ot3@2.0.0-alpha.1>
 
 ## Internal Release 2.0.0-alpha.0
 
-This internal release, pulled from the `edge` branch, contains features being developed for 8.0.0. It's for internal testing only. Usage may require a robot factory reset to restore robot stability.
+This internal release, pulled from the `edge` branch, contains features being developed for 8.0.0. It's for internal testing only.
 
 <https://github.com/Opentrons/opentrons/compare/ot3@1.5.0...ot3@2.0.0-alpha.0>
 

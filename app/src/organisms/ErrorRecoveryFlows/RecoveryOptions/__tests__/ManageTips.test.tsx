@@ -90,25 +90,27 @@ describe('ManageTips', () => {
   it(`renders BeginRemoval with correct copy when the step is ${DROP_TIP_FLOWS.STEPS.BEGIN_REMOVAL}`, () => {
     render(props)
 
-    screen.getByText('Remove tips from left pipette before canceling the run?')
+    screen.getByText('Remove any attached tips')
+    screen.queryByText(
+      /Homing the .* pipette with liquid in the tips may damage it\. You must remove all tips before using the pipette again\./
+    )
     screen.queryAllByText('Begin removal')
     screen.queryAllByText('Skip')
-    expect(screen.getAllByText('Continue').length).toBe(2)
   })
 
   it('routes correctly when continuing on BeginRemoval', () => {
     render(props)
 
     const beginRemovalBtn = screen.queryAllByText('Begin removal')[0]
-    const skipBtn = screen.queryAllByText('Skip removal')[0]
+    const skipBtn = screen.queryAllByText('Skip')[0]
 
     fireEvent.click(beginRemovalBtn)
-    clickButtonLabeled('Continue')
+    clickButtonLabeled('Begin removal')
 
     expect(mockProceedNextStep).toHaveBeenCalled()
 
     fireEvent.click(skipBtn)
-    clickButtonLabeled('Continue')
+    clickButtonLabeled('Skip')
 
     expect(mockSetRobotInMotion).toHaveBeenCalled()
   })
@@ -122,10 +124,10 @@ describe('ManageTips', () => {
     }
     render(props)
 
-    const skipBtn = screen.queryAllByText('Skip removal')[0]
+    const skipBtn = screen.queryAllByText('Skip')[0]
 
     fireEvent.click(skipBtn)
-    clickButtonLabeled('Continue')
+    clickButtonLabeled('Skip')
 
     expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
       RETRY_NEW_TIPS.ROUTE,
@@ -264,11 +266,34 @@ describe('useDropTipFlowUtils', () => {
   })
 
   it('should return the correct button overrides', () => {
-    const { result } = renderHook(() => useDropTipFlowUtils(mockProps))
+    const { result } = renderHook(() =>
+      useDropTipFlowUtils({
+        ...mockProps,
+        recoveryMap: {
+          route: RETRY_NEW_TIPS.ROUTE,
+          step: RETRY_NEW_TIPS.STEPS.DROP_TIPS,
+        },
+        currentRecoveryOptionUtils: {
+          selectedRecoveryOption: RETRY_NEW_TIPS.ROUTE,
+        } as any,
+      })
+    )
+    const { tipDropComplete } = result.current.buttonOverrides
 
     result.current.buttonOverrides.goBackBeforeBeginning()
 
     expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(DROP_TIP_FLOWS.ROUTE)
+
+    expect(tipDropComplete).toBeDefined()
+
+    if (tipDropComplete != null) {
+      tipDropComplete()
+    }
+
+    expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
+      RETRY_NEW_TIPS.ROUTE,
+      RETRY_NEW_TIPS.STEPS.REPLACE_TIPS
+    )
   })
 
   it(`should return correct route overrides when the route is ${DROP_TIP_FLOWS.STEPS.CHOOSE_TIP_DROP}`, () => {

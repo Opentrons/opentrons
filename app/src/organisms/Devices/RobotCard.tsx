@@ -41,6 +41,10 @@ import { useIsFlex } from './hooks'
 import { ReachableBanner } from './ReachableBanner'
 import { RobotOverflowMenu } from './RobotOverflowMenu'
 import { RobotStatusHeader } from './RobotStatusHeader'
+import {
+  ErrorRecoveryBanner,
+  useErrorRecoveryBanner,
+} from '../ErrorRecoveryBanner'
 
 import type { GripperData } from '@opentrons/api-client'
 import type { GripperModel } from '@opentrons/shared-data'
@@ -58,6 +62,8 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
   const robotModel = useSelector((state: State) =>
     getRobotModelByName(state, robotName)
   )
+
+  const { showRecoveryBanner, recoveryIntent } = useErrorRecoveryBanner()
 
   return robot != null ? (
     <Flex
@@ -87,6 +93,12 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
       >
         <UpdateRobotBanner robot={robot} marginRight={SPACING.spacing24} />
         <ReachableBanner robot={robot} />
+        {showRecoveryBanner ? (
+          <ErrorRecoveryBanner
+            recoveryIntent={recoveryIntent}
+            marginRight={SPACING.spacing24}
+          />
+        ) : null}
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
           <RobotStatusHeader
             local={local}

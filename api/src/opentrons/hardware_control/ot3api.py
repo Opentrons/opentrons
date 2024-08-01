@@ -26,13 +26,13 @@ from opentrons.hardware_control.modules.module_calibration import (
 )
 
 
-from opentrons_shared_data.pipette.dev_types import (
+from opentrons_shared_data.pipette.types import (
     PipetteName,
 )
 from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
 )
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.types import RobotType
 
 from opentrons import types as top_types
 from opentrons.config import robot_configs
@@ -761,7 +761,7 @@ class OT3API(
 
     @ExecutionManagerProvider.wait_for_running
     async def _update_position_estimation(
-        self, axes: Optional[List[Axis]] = None
+        self, axes: Optional[Sequence[Axis]] = None
     ) -> None:
         """
         Function to update motor estimation for a set of axes
@@ -1140,6 +1140,12 @@ class OT3API(
             y=cur_pos[Axis.Y],
             z=cur_pos[Axis.by_mount(realmount)],
         )
+
+    async def update_axis_position_estimations(self, axes: Sequence[Axis]) -> None:
+        """Update specified axes position estimators from their encoders."""
+        await self._update_position_estimation(axes)
+        await self._cache_current_position()
+        await self._cache_encoder_position()
 
     async def move_to(
         self,

@@ -3,7 +3,7 @@
 from pathlib import Path
 from opentrons.util.performance_helpers import (
     _StubbedTracker,
-    _get_robot_context_tracker,
+    _get_robot_activity_tracker,
 )
 
 
@@ -19,6 +19,6 @@ def test_return_function_unchanged() -> None:
 
 def test_singleton_tracker() -> None:
     """Test that the tracker is a singleton."""
-    tracker = _get_robot_context_tracker()
-    tracker2 = _get_robot_context_tracker()
+    tracker = _get_robot_activity_tracker()
+    tracker2 = _get_robot_activity_tracker()
     assert tracker is tracker2

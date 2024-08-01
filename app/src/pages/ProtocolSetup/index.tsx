@@ -813,6 +813,9 @@ function PrepareToRun({
       {showConfirmCancelModal ? (
         <ConfirmCancelRunModal
           runId={runId}
+          isQuickTransfer={
+            protocolRecord?.data.protocolKind === 'quick-transfer'
+          }
           setShowConfirmCancelRunModal={setShowConfirmCancelModal}
           isActiveRun={false}
           protocolId={protocolId}

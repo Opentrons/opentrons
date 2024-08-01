@@ -1,5 +1,5 @@
 """
-opentrons_shared_data.deck.dev_types: types for deck defs
+opentrons_shared_data.deck.types: types for deck defs
 
 This should only be imported if typing.TYPE_CHECKING is True
 """
@@ -7,7 +7,7 @@ This should only be imported if typing.TYPE_CHECKING is True
 from typing import Any, Dict, List, NewType, Union
 from typing_extensions import Literal, TypedDict
 
-from ..module.dev_types import ModuleType
+from ..module.types import ModuleType
 
 
 DeckSchemaVersion5 = Literal[5]

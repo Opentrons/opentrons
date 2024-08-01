@@ -27,6 +27,7 @@ import {
   getDeckDefFromRobotType,
   getLabwareDefURI,
   getLabwareDisplayName,
+  getModuleDisplayName,
   HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { parseInitialLoadedLabwareByAdapter } from '@opentrons/api-client'
@@ -170,16 +171,7 @@ export function ProtocolSetupLabware({
         module.moduleId === selectedLabware.location.moduleId
     )
     if (matchedModule != null) {
-      location = (
-        <>
-          <DeckInfoLabel deckLabel={matchedModule?.slotName} />
-          <DeckInfoLabel
-            iconName={
-              MODULE_ICON_NAME_BY_TYPE[matchedModule?.moduleDef.moduleType]
-            }
-          />
-        </>
-      )
+      location = <DeckInfoLabel deckLabel={matchedModule?.slotName} />
     }
   } else if (
     selectedLabware != null &&
@@ -200,18 +192,7 @@ export function ProtocolSetupLabware({
           module => module.moduleId === adapterLocation.moduleId
         )
         if (moduleUnderAdapter != null) {
-          location = (
-            <>
-              <DeckInfoLabel deckLabel={moduleUnderAdapter.slotName} />
-              <DeckInfoLabel
-                iconName={
-                  MODULE_ICON_NAME_BY_TYPE[
-                    moduleUnderAdapter.moduleDef.moduleType
-                  ]
-                }
-              />
-            </>
-          )
+          location = <DeckInfoLabel deckLabel={moduleUnderAdapter.slotName} />
         }
       }
     }
@@ -488,7 +469,10 @@ function RowLabware({
   commands,
 }: RowLabwareProps): JSX.Element | null {
   const { definition, initialLocation, nickName } = labware
-  const { t } = useTranslation('protocol_command_text')
+  const { t, i18n } = useTranslation([
+    'protocol_command_text',
+    'protocol_setup',
+  ])
 
   const matchedModule =
     initialLocation !== 'offDeck' &&
@@ -509,7 +493,9 @@ function RowLabware({
   let slotName: string = ''
   let location: JSX.Element | string | null = null
   if (initialLocation === 'offDeck') {
-    location = t('off_deck')
+    location = (
+      <DeckInfoLabel deckLabel={i18n.format(t('off_deck'), 'upperCase')} />
+    )
   } else if ('slotName' in initialLocation) {
     slotName = initialLocation.slotName
     location = <DeckInfoLabel deckLabel={initialLocation.slotName} />
@@ -521,7 +507,6 @@ function RowLabware({
     location = (
       <>
         <DeckInfoLabel deckLabel={matchedModule?.slotName} />
-        <DeckInfoLabel iconName={MODULE_ICON_NAME_BY_TYPE[matchedModuleType]} />
       </>
     )
   } else if ('labwareId' in initialLocation) {
@@ -542,18 +527,7 @@ function RowLabware({
         )
         if (moduleUnderAdapter != null) {
           slotName = moduleUnderAdapter.slotName
-          location = (
-            <>
-              <DeckInfoLabel deckLabel={moduleUnderAdapter.slotName} />
-              <DeckInfoLabel
-                iconName={
-                  MODULE_ICON_NAME_BY_TYPE[
-                    moduleUnderAdapter.moduleDef.moduleType
-                  ]
-                }
-              />
-            </>
-          )
+          location = <DeckInfoLabel deckLabel={moduleUnderAdapter.slotName} />
         }
       }
     }
@@ -568,6 +542,9 @@ function RowLabware({
     >
       <Flex gridGap={SPACING.spacing4} width="7.6875rem">
         {location}
+        {nestedLabwareInfo != null || matchedModule != null ? (
+          <DeckInfoLabel iconName="stacked" />
+        ) : null}
       </Flex>
       <Flex
         alignSelf={ALIGN_FLEX_START}
@@ -588,26 +565,62 @@ function RowLabware({
               {nickName}
             </LegacyStyledText>
           </Flex>
-          {nestedLabwareInfo != null ? (
-            <Box
-              borderBottom={`1px solid ${COLORS.grey60}`}
-              marginY={SPACING.spacing16}
-              width="33rem"
-            />
-          ) : null}
           {nestedLabwareInfo != null &&
           nestedLabwareInfo?.sharedSlotId === slotName ? (
-            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-              <LegacyStyledText
-                as="p"
-                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            <>
+              <Box
+                borderBottom={`1px solid ${COLORS.grey60}`}
+                marginY={SPACING.spacing16}
+                width={matchingHeaterShaker != null ? '33rem' : '46rem'}
+              />
+              <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+                <LegacyStyledText
+                  as="p"
+                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                >
+                  {nestedLabwareInfo.nestedLabwareDisplayName}
+                </LegacyStyledText>
+                <LegacyStyledText as="p" color={COLORS.grey60}>
+                  {nestedLabwareInfo.nestedLabwareNickName}
+                </LegacyStyledText>
+              </Flex>
+            </>
+          ) : null}
+          {matchedModule != null ? (
+            <>
+              <Box
+                borderBottom={`1px solid ${COLORS.grey60}`}
+                marginY={SPACING.spacing16}
+                width={matchingHeaterShaker != null ? '33rem' : '46rem'}
+              />
+              <Flex
+                flexDirection={DIRECTION_ROW}
+                gridGap={SPACING.spacing12}
+                alignItems={ALIGN_CENTER}
               >
-                {nestedLabwareInfo.nestedLabwareDisplayName}
-              </LegacyStyledText>
-              <LegacyStyledText as="p" color={COLORS.grey60}>
-                {nestedLabwareInfo.nestedLabwareNickName}
-              </LegacyStyledText>
-            </Flex>
+                <DeckInfoLabel
+                  iconName={
+                    MODULE_ICON_NAME_BY_TYPE[matchedModule.moduleDef.moduleType]
+                  }
+                />
+                <Flex
+                  flexDirection={DIRECTION_COLUMN}
+                  gridGap={SPACING.spacing4}
+                >
+                  <LegacyStyledText
+                    as="p"
+                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                  >
+                    {getModuleDisplayName(matchedModule.moduleDef.model)}
+                  </LegacyStyledText>
+                  {matchingHeaterShaker != null ? (
+                    <LegacyStyledText as="p" color={COLORS.grey60}>
+                      {t('protocol_setup:labware_latch_instructions')}
+                    </LegacyStyledText>
+                  ) : null}
+                </Flex>
+              </Flex>
+            </>
           ) : null}
         </Flex>
         {matchingHeaterShaker != null ? (

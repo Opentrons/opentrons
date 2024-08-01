@@ -5,7 +5,7 @@ from decoy import Decoy
 
 from opentrons.protocol_engine.errors import LocationIsOccupiedError
 from opentrons.protocol_engine.state import StateView
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.types import RobotType
 from opentrons.types import DeckSlotName
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
@@ -29,7 +29,7 @@ from opentrons.hardware_control.modules.types import (
     ThermocyclerModuleModel,
     HeaterShakerModuleModel,
 )
-from opentrons_shared_data.deck.dev_types import (
+from opentrons_shared_data.deck.types import (
     DeckDefinitionV5,
     SlotDefV3,
 )

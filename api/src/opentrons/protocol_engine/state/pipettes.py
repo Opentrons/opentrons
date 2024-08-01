@@ -13,6 +13,9 @@ from opentrons.hardware_control.nozzle_manager import (
 )
 from opentrons.protocol_engine.actions.actions import FailCommandAction
 from opentrons.protocol_engine.commands.aspirate import Aspirate
+from opentrons.protocol_engine.commands.dispense import Dispense
+from opentrons.protocol_engine.commands.aspirate_in_place import AspirateInPlace
+from opentrons.protocol_engine.commands.dispense_in_place import DispenseInPlace
 from opentrons.protocol_engine.commands.command import DefinedErrorData
 from opentrons.protocol_engine.commands.pipetting_common import (
     OverpressureError,
@@ -50,6 +53,7 @@ from ..commands import (
     RetractAxisResult,
     BlowOutResult,
     BlowOutInPlaceResult,
+    unsafe,
     TouchTipResult,
     thermocycler,
     heater_shaker,
@@ -275,7 +279,10 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                     default_dispense=tip_configuration.default_dispense_flowrate.values_by_api_level,
                 )
 
-        elif isinstance(command.result, (DropTipResult, DropTipInPlaceResult)):
+        elif isinstance(
+            command.result,
+            (DropTipResult, DropTipInPlaceResult, unsafe.UnsafeDropTipInPlaceResult),
+        ):
             pipette_id = command.params.pipetteId
             self._state.aspirated_volume_by_id[pipette_id] = None
             self._state.attached_tip_by_id[pipette_id] = None
@@ -316,7 +323,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             )
         elif (
             isinstance(action, FailCommandAction)
-            and isinstance(action.running_command, Aspirate)
+            and isinstance(action.running_command, (Aspirate, Dispense))
             and isinstance(action.error, DefinedErrorData)
             and isinstance(action.error.public, OverpressureError)
         ):
@@ -412,7 +419,10 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             )
         elif (
             isinstance(action, FailCommandAction)
-            and isinstance(action.running_command, Aspirate)
+            and isinstance(
+                action.running_command,
+                (Aspirate, Dispense, AspirateInPlace, DispenseInPlace),
+            )
             and isinstance(action.error, DefinedErrorData)
             and isinstance(action.error.public, OverpressureError)
         ):
@@ -477,7 +487,8 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             self._state.aspirated_volume_by_id[pipette_id] = next_volume
 
         elif isinstance(action, SucceedCommandAction) and isinstance(
-            action.command.result, (BlowOutResult, BlowOutInPlaceResult)
+            action.command.result,
+            (BlowOutResult, BlowOutInPlaceResult, unsafe.UnsafeBlowOutInPlaceResult),
         ):
             pipette_id = action.command.params.pipetteId
             self._state.aspirated_volume_by_id[pipette_id] = None
