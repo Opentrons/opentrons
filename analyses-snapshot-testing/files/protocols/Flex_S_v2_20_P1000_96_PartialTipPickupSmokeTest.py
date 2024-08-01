@@ -1,4 +1,4 @@
-import typing
+from typing import Literal, Union, ClassVar, Dict, List, Optional
 from dataclasses import dataclass
 from opentrons import protocol_api
 from opentrons.protocol_api import OFF_DECK, SINGLE, ROW, COLUMN, PARTIAL_COLUMN
@@ -7,8 +7,8 @@ from opentrons.types import Location
 # Need to add transfer, consolidate, and distribute
 # Tip pickup around thermocycler
 
-PipetteNames = typing.Literal["flex_8channel_50", "flex_8channel_1000", "flex_96channel_1000"]
-TipRackNames = typing.Literal["opentrons_flex_96_tiprack_1000ul", "opentrons_flex_96_tiprack_200ul", "opentrons_flex_96_tiprack_50ul"]
+PipetteNames = Literal["flex_8channel_50", "flex_8channel_1000", "flex_96channel_1000"]
+TipRackNames = Literal["opentrons_flex_96_tiprack_1000ul", "opentrons_flex_96_tiprack_200ul", "opentrons_flex_96_tiprack_50ul"]
 
 NUM_ROWS_IN_TIPRACK = 8
 NUM_COLUMNS_IN_TIPRACK = 12
@@ -21,12 +21,12 @@ LIQUID_TRANSFER_AMOUNT = 5.0
 class LiquidTransferSettings:
     source_labware_deck_slot: str
     destination_labware_deck_slot: str
-    transfer_volume: int = LIQUID_TRANSFER_AMOUNT
+    transfer_volume: float = LIQUID_TRANSFER_AMOUNT
 
 
 @dataclass
 class PipetteConfiguration:
-    num_to_row_lookup: typing.ClassVar[typing.Dict[int, str]] = {
+    num_to_row_lookup: ClassVar[Dict[int, str]] = {
         1: "A",
         2: "B",
         3: "C",
@@ -36,7 +36,7 @@ class PipetteConfiguration:
         7: "G",
         8: "H",
     }
-    number_per_pickup_to_slot_lookup: typing.ClassVar[typing.Dict[int, str]] = {
+    number_per_pickup_to_slot_lookup: ClassVar[Dict[int, str]] = {
         2: "G1",
         3: "F1",
         4: "E1",
@@ -45,13 +45,14 @@ class PipetteConfiguration:
         7: "B1",
     }
 
-    pickup_mode: typing.Literal[SINGLE, ROW, COLUMN, PARTIAL_COLUMN]
+    pickup_mode: Union[Literal["SINGLE"], Literal["ROW"], Literal["COLUMN"], Literal["PARTIAL_COLUMN"]]
     starting_pipette_nozzle: str
-    ending_pipette_nozzle: typing.Optional[str]  # for PARTIAL_COLUMN only
+    ending_pipette_nozzle: Optional[str]  # for PARTIAL_COLUMN only
 
     def _calculate_number_per_pickup_for_partial_column(self) -> int:
         assert self.pickup_mode == PARTIAL_COLUMN
-        for num_pickups_key, self.ending_pipette_nozzle in self.number_per_pickup_to_slot_lookup.items():
+        well_name = self.ending_pipette_nozzle
+        for num_pickups_key, well_name_key in self.number_per_pickup_to_slot_lookup.items():
             if well_name == well_name_key:
                 return num_pickups_key
         else:
@@ -67,7 +68,7 @@ class PipetteConfiguration:
 
         return NUM_COLUMNS_IN_TIPRACK * self._calculate_number_pickups_per_column_for_partial_column()
 
-    def _calculate_drop_location_list_for_partial_column(self) -> typing.List[str]:
+    def _calculate_drop_location_list_for_partial_column(self) -> List[str]:
         assert self.pickup_mode == PARTIAL_COLUMN
         # we should have the same number of drops as number of pickups
         num_drops = self._calculate_number_pickups_per_column_for_partial_column()
@@ -80,6 +81,8 @@ class PipetteConfiguration:
 
                 drop_row = PipetteConfiguration.num_to_row_lookup[(NUM_ROWS_IN_TIPRACK + 1) - (drop_number * num_per_pickup)]
                 drop_location_list.append(f"{drop_row}{col_number}")
+
+        return drop_location_list
 
     @property
     def max_number_of_pickups(self) -> int:
@@ -447,7 +450,8 @@ def run(protocol_context: protocol_api.ProtocolContext):
         raise ValueError("50μL pipette requires 50μL tip rack")
 
     if "8_channel" in PIPETTE_NAME:
-        PICKUP_CASES = EIGHT_CH_TEST_CASES
+        raise NotImplementedError("8 channel test cases not yet defined")
+        # PICKUP_CASES = EIGHT_CH_TEST_CASES
     else:
         PICKUP_CASES = NINETY_SIX_CH_TEST_CASES
 
@@ -455,11 +459,7 @@ def run(protocol_context: protocol_api.ProtocolContext):
     pipette.default_speed = PIPETTING_SPEED
 
     for test_case in PICKUP_CASES:
-        pickup_tip_rack = protocol_context.load_labware(
-            load_name=TIP_RACK_NAME,
-            label="Tip Rack - Full",
-            location=protocol_api.OFF_DECK
-        )
+        pickup_tip_rack = protocol_context.load_labware(load_name=TIP_RACK_NAME, label="Tip Rack - Full", location=protocol_api.OFF_DECK)
 
         drop_tip_rack = protocol_context.load_labware(
             load_name=HACKY_FLEX_1000_UL_TIPRACK_LOAD_NAME,
