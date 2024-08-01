@@ -18,6 +18,8 @@ from robot_server.persistence.fastapi_dependencies import (
 )
 
 from .data_files_store import DataFilesStore
+from .file_auto_deleter import DataFileAutoDeleter
+
 
 _DATA_FILES_SUBDIRECTORY: Final = "data_files"
 
@@ -54,3 +56,10 @@ async def get_data_files_store(
             data_files_store = DataFilesStore(sql_engine)
             _data_files_store_accessor.set_on(app_state, data_files_store)
         return data_files_store
+
+
+def get_data_file_auto_deleter(
+    data_files_store: DataFilesStore = Depends(get_data_files_store),
+) -> DataFileAutoDeleter:
+    """Get a `DataFileAutoDeleter` to delete old data files."""
+    return DataFileAutoDeleter(data_files_store)
