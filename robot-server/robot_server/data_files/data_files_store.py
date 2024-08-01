@@ -7,6 +7,7 @@ from typing import Optional, List, Set
 
 import sqlalchemy.engine
 
+from robot_server.deletion_planner import FileUsageInfo
 from robot_server.persistence.database import sqlite_rowid
 from robot_server.persistence.tables import (
     data_files_table,
@@ -25,14 +26,6 @@ class DataFileInfo:
     name: str
     file_hash: str
     created_at: datetime
-
-
-@dataclass(frozen=True)
-class FileUsageInfo:
-    """Information about whether a particular data file is being used by any runs or analyses."""
-
-    file_id: str
-    used_by_run_or_analysis: bool
 
 
 class DataFilesStore:
@@ -120,6 +113,9 @@ class DataFilesStore:
             for file_id in all_file_ids
         ]
         return usage_info
+
+    def remove(self, file_id: str) -> None:
+        """Remove the specified files from database and persistence directory."""
 
 
 def _convert_row_data_file_info(row: sqlalchemy.engine.Row) -> DataFileInfo:

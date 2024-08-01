@@ -18,6 +18,7 @@ from robot_server.data_files.router import (
     get_data_file,
     get_all_data_files,
 )
+from robot_server.data_files.file_auto_deleter import DataFileAutoDeleter
 from robot_server.errors.error_responses import ApiError
 
 
@@ -39,10 +40,17 @@ def file_reader_writer(decoy: Decoy) -> FileReaderWriter:
     return decoy.mock(cls=FileReaderWriter)
 
 
+@pytest.fixture
+def file_auto_deleter(decoy: Decoy) -> DataFileAutoDeleter:
+    """Get a mocked out DataFileAutoDeleter."""
+    return decoy.mock(cls=DataFileAutoDeleter)
+
+
 async def test_upload_new_data_file(
     decoy: Decoy,
     data_files_store: DataFilesStore,
     file_reader_writer: FileReaderWriter,
+    file_auto_deleter: DataFileAutoDeleter,
     file_hasher: FileHasher,
 ) -> None:
     """It should store an uploaded data file to persistent storage & update the database."""
@@ -65,6 +73,7 @@ async def test_upload_new_data_file(
         data_files_directory=data_files_directory,
         data_files_store=data_files_store,
         file_reader_writer=file_reader_writer,
+        data_file_auto_deleter=file_auto_deleter,
         file_hasher=file_hasher,
         file_id="data-file-id",
         created_at=datetime(year=2024, month=6, day=18),
@@ -77,6 +86,7 @@ async def test_upload_new_data_file(
     )
     assert result.status_code == 201
     decoy.verify(
+        await file_auto_deleter.make_room_for_new_file(),
         await file_reader_writer.write(
             directory=data_files_directory / "data-file-id", files=[buffered_file]
         ),
