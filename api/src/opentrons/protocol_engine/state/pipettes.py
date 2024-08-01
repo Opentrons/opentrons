@@ -14,6 +14,7 @@ from opentrons.hardware_control.nozzle_manager import (
 from opentrons.protocol_engine.actions.actions import FailCommandAction
 from opentrons.protocol_engine.commands.command import DefinedErrorData
 from opentrons.protocol_engine.commands.pipetting_common import (
+    LiquidNotFoundError,
     OverpressureError,
     OverpressureErrorInternalData,
 )
@@ -290,6 +291,8 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 commands.DispenseResult,
                 commands.BlowOutResult,
                 commands.TouchTipResult,
+                commands.LiquidProbeResult,
+                commands.TryLiquidProbeResult,
             ),
         ):
             self._state.current_location = CurrentWell(
@@ -297,13 +300,20 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 labware_id=action.command.params.labwareId,
                 well_name=action.command.params.wellName,
             )
-        elif (
-            isinstance(action, FailCommandAction)
-            and isinstance(
-                action.running_command, (commands.Aspirate, commands.Dispense)
+        elif isinstance(action, FailCommandAction) and (
+            isinstance(action.error, DefinedErrorData)
+            and (
+                (
+                    isinstance(
+                        action.running_command, (commands.Aspirate, commands.Dispense)
+                    )
+                    and isinstance(action.error.public, OverpressureError)
+                )
+                or (
+                    isinstance(action.running_command, commands.LiquidProbe)
+                    and isinstance(action.error.public, LiquidNotFoundError)
+                )
             )
-            and isinstance(action.error, DefinedErrorData)
-            and isinstance(action.error.public, OverpressureError)
         ):
             self._state.current_location = CurrentWell(
                 pipette_id=action.running_command.params.pipetteId,
