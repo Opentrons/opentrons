@@ -192,7 +192,7 @@ export const mockRunData: RunData = {
   status: 'running',
   actions: [],
   errors: [],
-  allCommandErrors: [],
+  hasEverEnteredErrorRecovery: false,
   pipettes: [],
   labware: [mockLabwareOnModule, mockLabwareOnSlot, mockLabwareOffDeck],
   modules: [mockModule],

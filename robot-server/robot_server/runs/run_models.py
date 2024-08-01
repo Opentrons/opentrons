@@ -110,9 +110,9 @@ class Run(ResourceModel):
             " but it won't have more than one element."
         ),
     )
-    allCommandErrors: List[ErrorOccurrence] = Field(
+    hasEverEnteredErrorRecovery: bool = Field(
         ...,
-        description=("A list of errors that occured during the run."),
+        description=("Whether the run has entered error recovery."),
     )
     pipettes: List[LoadedPipette] = Field(
         ...,
@@ -187,9 +187,9 @@ class BadRun(ResourceModel):
             " but it won't have more than one element."
         ),
     )
-    allCommandErrors: List[ErrorOccurrence] = Field(
+    hasEverEnteredErrorRecovery: bool = Field(
         ...,
-        description=("A list of errors that occured during the run."),
+        description=("Whether the run has entered error recovery."),
     )
     pipettes: List[LoadedPipette] = Field(
         ...,

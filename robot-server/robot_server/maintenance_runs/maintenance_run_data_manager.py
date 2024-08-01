@@ -32,7 +32,7 @@ def _build_run(
         pipettes=[],
         modules=[],
         liquids=[],
-        allCommandErrors=[],
+        hasEverEnteredErrorRecovery=False,
     )
     return MaintenanceRun.construct(
         id=run_id,
@@ -48,7 +48,7 @@ def _build_run(
         completedAt=state_summary.completedAt,
         startedAt=state_summary.startedAt,
         liquids=state_summary.liquids,
-        allCommandErrors=state_summary.allCommandErrors,
+        hasEverEnteredErrorRecovery=state_summary.hasEverEnteredErrorRecovery,
     )
 
 

@@ -40,7 +40,7 @@ def run() -> Run:
         labwareOffsets=[],
         protocolId=None,
         liquids=[],
-        allCommandErrors=[],
+        hasEverEnteredErrorRecovery=False,
     )
 
 

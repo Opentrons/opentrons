@@ -43,7 +43,7 @@ stages:
           current: True
           actions: []
           errors: []
-          allCommandErrors: []
+          hasEverEnteredErrorRecovery: False
           pipettes: []
           modules: []
           labware: []

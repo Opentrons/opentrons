@@ -65,7 +65,7 @@ def engine_state_summary() -> StateSummary:
         pipettes=[],
         modules=[],
         liquids=[],
-        allCommandErrors=[],
+        hasEverEnteredErrorRecovery=False,
     )
 
 
