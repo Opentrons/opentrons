@@ -129,7 +129,7 @@ class StateView(HasState[State]):
             completedAt=self._state.commands.run_completed_at,
             startedAt=self._state.commands.run_started_at,
             liquids=self._liquid.get_all(),
-            hasEverEnteredErrorRecovery=self._commands.get_has_entered_recovey_mode(),
+            hasEverEnteredErrorRecovery=self._commands.get_has_entered_recovery_mode(),
         )
 
 
