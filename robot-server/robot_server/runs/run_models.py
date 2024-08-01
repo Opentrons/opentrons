@@ -111,6 +111,10 @@ class Run(ResourceModel):
             " but it won't have more than one element."
         ),
     )
+    hasEverEnteredErrorRecovery: bool = Field(
+        ...,
+        description=("Whether the run has entered error recovery."),
+    )
     pipettes: List[LoadedPipette] = Field(
         ...,
         description="Pipettes that have been loaded into the run.",
@@ -183,6 +187,10 @@ class BadRun(ResourceModel):
             " For historical reasons, this is an array,"
             " but it won't have more than one element."
         ),
+    )
+    hasEverEnteredErrorRecovery: bool = Field(
+        ...,
+        description=("Whether the run has entered error recovery."),
     )
     pipettes: List[LoadedPipette] = Field(
         ...,

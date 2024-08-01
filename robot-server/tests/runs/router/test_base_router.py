@@ -93,6 +93,7 @@ async def test_create_run(
         labwareOffsets=[],
         status=pe_types.EngineStatus.IDLE,
         liquids=[],
+        hasEverEnteredErrorRecovery=False,
     )
     decoy.when(
         await mock_deck_configuration_store.get_deck_configuration()
@@ -172,6 +173,7 @@ async def test_create_protocol_run(
         labwareOffsets=[],
         status=pe_types.EngineStatus.IDLE,
         liquids=[],
+        hasEverEnteredErrorRecovery=False,
     )
     decoy.when(mock_data_files_store.get("file-id")).then_return(
         DataFileInfo(
@@ -307,6 +309,7 @@ async def test_get_run_data_from_url(
         labware=[],
         labwareOffsets=[],
         liquids=[],
+        hasEverEnteredErrorRecovery=False,
     )
 
     decoy.when(mock_run_data_manager.get("run-id")).then_return(expected_response)
@@ -353,6 +356,7 @@ async def test_get_run() -> None:
         labware=[],
         labwareOffsets=[],
         liquids=[],
+        hasEverEnteredErrorRecovery=False,
     )
 
     result = await get_run(run_data=run_data)
@@ -398,6 +402,7 @@ async def test_get_runs_not_empty(
         labware=[],
         labwareOffsets=[],
         liquids=[],
+        hasEverEnteredErrorRecovery=False,
     )
 
     response_2 = Run(
@@ -413,6 +418,7 @@ async def test_get_runs_not_empty(
         labware=[],
         labwareOffsets=[],
         liquids=[],
+        hasEverEnteredErrorRecovery=False,
     )
 
     decoy.when(mock_run_data_manager.get_all(20)).then_return([response_1, response_2])
@@ -491,6 +497,7 @@ async def test_update_run_to_not_current(
         labware=[],
         labwareOffsets=[],
         liquids=[],
+        hasEverEnteredErrorRecovery=False,
     )
 
     decoy.when(await mock_run_data_manager.update("run-id", current=False)).then_return(
@@ -525,6 +532,7 @@ async def test_update_current_none_noop(
         labware=[],
         labwareOffsets=[],
         liquids=[],
+        hasEverEnteredErrorRecovery=False,
     )
 
     decoy.when(await mock_run_data_manager.update("run-id", current=None)).then_return(
