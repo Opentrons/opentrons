@@ -150,7 +150,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         z_ax = Axis.by_mount(mount)
         found_pos = await api.capacitive_probe(mount, z_ax, probe_pos.z, pass_settings)
         print(f"Found deck height: {found_pos}")
-
+        found_pos = found_pos[0]
         # check against max overrun
         valid_height = found_pos >= z_limit
         deck_pf = 0.0
@@ -160,7 +160,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
             await api.move_to(mount, probe_pos._replace(z=found_pos))
             if not api.is_simulator:
                 deck_pf = await _read_from_sensor(api, s_driver, cap_sensor, 10)
-        print(f"Reading on deck: {deck_pf}")
+            print(f"Reading on deck: {deck_pf}")
 
         result = (
             PROBE_DIFF_MIN < (deck_pf - open_air_pf)
