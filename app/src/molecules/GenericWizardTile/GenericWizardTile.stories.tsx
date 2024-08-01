@@ -7,9 +7,9 @@ import {
   PrimaryButton,
   SPACING,
   LegacyStyledText,
+  LegacyModalShell,
 } from '@opentrons/components'
 import { Skeleton } from '../../atoms/Skeleton'
-import { LegacyModalShell } from '../LegacyModal'
 import { WizardHeader } from '../WizardHeader'
 import { configReducer } from '../../redux/config/reducer'
 import { GenericWizardTile } from './index'

@@ -3,14 +3,11 @@ import { screen, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-import {
-  ALIGN_CENTER,
-  COLORS,
-  JUSTIFY_CENTER,
-  SPACING,
-} from '@opentrons/components'
 import { renderWithProviders } from '../../../testing/utils'
 import { LegacyModalHeader } from '../LegacyModalHeader'
+import { COLORS } from '../../../helix-design-system'
+import { SPACING } from '../../../ui-style-constants'
+import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../../styles'
 
 const mockClose = vi.fn()
 

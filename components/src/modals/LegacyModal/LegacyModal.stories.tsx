@@ -1,14 +1,11 @@
 import * as React from 'react'
-import {
-  COLORS,
-  PrimaryBtn,
-  SPACING,
-  LegacyStyledText,
-  TYPOGRAPHY,
-} from '@opentrons/components'
 import { LegacyModal } from './index'
 
 import type { Story, Meta } from '@storybook/react'
+import { LegacyStyledText } from '../../atoms'
+import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { PrimaryBtn } from '../../primitives'
+import { COLORS } from '../../helix-design-system'
 
 export default {
   title: 'Components/modals/LegacyModal',
