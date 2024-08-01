@@ -44,6 +44,7 @@ from opentrons.protocols.api_support.util import (
     RobotTypeError,
     UnsupportedAPIError,
 )
+from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
 
 from ._types import OffDeckType
 from .core.common import ModuleCore, LabwareCore, ProtocolCore
@@ -699,6 +700,13 @@ class ProtocolContext(CommandPublisher):
             raise ValueError(
                 f"Expected labware of type 'Labware' but got {type(labware)}."
             )
+
+        # Ensure that when moving to an absorbance reader than the lid is open
+        if isinstance(new_location, AbsorbanceReaderContext):
+            if new_location.is_lid_on():
+                raise CommandPreconditionViolated(
+                    f"Cannot move {labware.name} onto the Absorbance Reader Module when Lid is Closed."
+                )
 
         location: Union[
             ModuleCore,

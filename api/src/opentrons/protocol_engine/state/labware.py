@@ -322,6 +322,22 @@ class LabwareView(HasState[LabwareState]):
 
         return None
 
+    def get_by_addressable_area(
+        self,
+        addressable_area: str,
+    ) -> Optional[LoadedLabware]:
+        """Get the labware located in a given addressable area, if any."""
+        loaded_labware = list(self._state.labware_by_id.values())
+
+        for labware in loaded_labware:
+            if (
+                isinstance(labware.location, AddressableAreaLocation)
+                and labware.location.addressableAreaName == addressable_area
+            ):
+                return labware
+
+        return None
+
     def get_definition(self, labware_id: str) -> LabwareDefinition:
         """Get labware definition by the labware's unique identifier."""
         return self.get_definition_by_uri(

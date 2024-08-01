@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field
 
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ...errors.error_occurrence import ErrorOccurrence
+from ...errors import CannotPerformModuleAction
 from opentrons.protocol_engine.types import (
     LabwareOffsetVector,
     LabwareMovementOffsetData,
@@ -14,6 +15,8 @@ from opentrons.protocol_engine.types import (
 )
 from opentrons.protocol_engine.resources import labware_validation
 from .types import MoveLidResult
+
+from opentrons.drivers.types import AbsorbanceReaderLidStatus
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.state import StateView
@@ -119,6 +122,21 @@ class CloseLidImpl(
             labware_definition_uri=loaded_lid.definitionUri,
             labware_location=new_location,
         )
+
+        if not self._state_view.config.use_virtual_modules:
+            abs_reader = self._equipment.get_module_hardware_api(mod_substate.module_id)
+
+            if abs_reader is not None:
+                result = abs_reader.lid_status
+                if result is not AbsorbanceReaderLidStatus.ON:
+                    raise CannotPerformModuleAction(
+                        "The Opentrons Plate Reader lid mechanicaly position did not match expected Closed state."
+                    )
+            else:
+                raise CannotPerformModuleAction(
+                    "Could not reach the Hardware API for Opentrons Plate Reader Module."
+                )
+
         return SuccessData(
             public=CloseLidResult(
                 lidId=loaded_lid.id, newLocation=new_location, offsetId=new_offset_id
