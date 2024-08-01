@@ -11,11 +11,9 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  Icon,
   InfoScreen,
   JUSTIFY_FLEX_START,
   LegacyStyledText,
-  Link,
   LocationIcon,
   OVERFLOW_HIDDEN,
   SPACING,
@@ -28,6 +26,8 @@ import {
   getModuleDisplayName,
 } from '@opentrons/shared-data'
 import { useAllCsvFilesQuery } from '@opentrons/react-api-client'
+import { DownloadCsvFileLink } from './DownloadCsvFileLink'
+import { useFeatureFlag } from '../../redux/config'
 import { Banner } from '../../atoms/Banner'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useDeckCalibrationData } from './hooks'
@@ -95,7 +95,7 @@ export function HistoricalProtocolRunDrawer(
   ) : null
 
   const protocolFilesData =
-    allProtocolDataFiles.length === 0 ? (
+    allProtocolDataFiles.length === 1 ? (
       <InfoScreen contentType="noFiles" t={t} backgroundColor={COLORS.grey35} />
     ) : (
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
@@ -135,7 +135,7 @@ export function HistoricalProtocolRunDrawer(
         </Flex>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
           {allProtocolDataFiles.map((fileData, index) => {
-            const { createdAt, name } = fileData
+            const { createdAt, name: fileName, id: fileId } = fileData
             return (
               <Flex
                 key={`csv_file_${index}`}
@@ -158,7 +158,7 @@ export function HistoricalProtocolRunDrawer(
                       text-overflow: ellipsis;
                     `}
                   >
-                    {name}
+                    {fileName}
                   </LegacyStyledText>
                 </Flex>
                 <Box width="33%">
@@ -167,22 +167,7 @@ export function HistoricalProtocolRunDrawer(
                   </LegacyStyledText>
                 </Box>
                 <Box width="34%">
-                  <Link
-                    role="button"
-                    css={TYPOGRAPHY.linkPSemiBold}
-                    onClick={() => {}} // TODO (nd: 06/18/2024) get file and download
-                  >
-                    <Flex alignItems={ALIGN_CENTER}>
-                      <LegacyStyledText as="p">
-                        {t('download')}
-                      </LegacyStyledText>
-                      <Icon
-                        name="download"
-                        size="1rem"
-                        marginLeft="0.4375rem"
-                      />
-                    </Flex>
-                  </Link>
+                  <DownloadCsvFileLink fileId={fileId} fileName={fileName} />
                 </Box>
               </Flex>
             )
