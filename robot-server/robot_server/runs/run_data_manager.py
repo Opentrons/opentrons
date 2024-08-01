@@ -13,6 +13,7 @@ from opentrons.protocol_engine import (
     Command,
 )
 from opentrons.protocol_engine.types import PrimitiveRunTimeParamValuesType
+from opentrons.protocol_engine.errors import ErrorOccurrence
 
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.service.task_runner import TaskRunner
@@ -376,6 +377,26 @@ class RunDataManager:
         return self._run_store.get_commands_slice(
             run_id=run_id, cursor=cursor, length=length
         )
+
+    def get_command_error_slice(
+        self, run_id: str, cursor: Optional[int], length: int
+    ) -> List[ErrorOccurrence]:
+        """Get a slice of run commands.
+
+        Args:
+            run_id: ID of the run.
+            cursor: Requested index of first command in the returned slice.
+            length: Length of slice to return.
+
+        Raises:
+            RunNotCurrentError: The given run identifier is not the current run.
+        """
+        if run_id == self._run_orchestrator_store.current_run_id:
+            return self._run_orchestrator_store.get_command_error_slice(
+                cursor=cursor, length=length
+            )
+
+        raise RunNotCurrentError()
 
     def get_current_command(self, run_id: str) -> Optional[CommandPointer]:
         """Get the "current" command, if any.
