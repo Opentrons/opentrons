@@ -5,8 +5,10 @@ import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
   DEST_WELL_BLOWOUT_DESTINATION,
 } from '@opentrons/step-generation'
+import { ALL, COLUMN } from '@opentrons/shared-data'
 import { PROFILE_CYCLE } from '../../form-types'
 import { getDefaultsForStepType } from '../../steplist/formLevel/getDefaultsForStepType'
+import type { PipetteEntity } from '@opentrons/step-generation'
 import type { Options } from '@opentrons/components'
 import type { ProfileFormError } from '../../steplist/formLevel/profileErrors'
 import type { FormWarning } from '../../steplist/formLevel/warnings'
@@ -18,6 +20,7 @@ import type {
   StepType,
   PathOption,
 } from '../../form-types'
+import type { NozzleType } from '../../types'
 
 export function getBlowoutLocationOptionsForForm(args: {
   stepType: StepType
@@ -197,4 +200,20 @@ export function getLabwareFieldForPositioningField(
     mix_touchTip_mmFromBottom: 'labware',
   }
   return fieldMap[name]
+}
+
+export const getNozzleType = (
+  pipette: PipetteEntity | null,
+  nozzles: string | null
+): NozzleType | null => {
+  const is8Channel = pipette != null && pipette.spec.channels === 8
+  if (is8Channel) {
+    return '8-channel'
+  } else if (nozzles === COLUMN) {
+    return COLUMN
+  } else if (nozzles === ALL) {
+    return ALL
+  } else {
+    return null
+  }
 }

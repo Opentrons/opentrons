@@ -3,29 +3,35 @@ import cx from 'classnames'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { FormGroup } from '@opentrons/components'
-import { getPipetteEntities } from '../../../step-forms/selectors'
+import {
+  getLabwareEntities,
+  getPipetteEntities,
+} from '../../../step-forms/selectors'
+import { getEnableReturnTip } from '../../../feature-flags/selectors'
 import {
   BlowoutLocationField,
+  BlowoutZOffsetField,
   ChangeTipField,
   CheckboxRowField,
+  Configure96ChannelField,
   DelayFields,
+  DropTipField,
   FlowRateField,
   LabwareField,
+  PickUpTipField,
   PipetteField,
   TextField,
   TipPositionField,
+  TiprackField,
+  TipWellSelectionField,
   VolumeField,
   WellOrderField,
   WellSelectionField,
-  BlowoutZOffsetField,
 } from '../fields'
-import { TiprackField } from '../fields/TiprackField'
 import {
   getBlowoutLocationOptionsForForm,
   getLabwareFieldForPositioningField,
 } from '../utils'
-import { Configure96ChannelField } from '../fields/Configure96ChannelField'
-import { DropTipField } from '../fields/DropTipField'
 import { AspDispSection } from './AspDispSection'
 
 import type { StepFormProps } from '../types'
@@ -35,17 +41,22 @@ import styles from '../StepEditForm.module.css'
 export const MixForm = (props: StepFormProps): JSX.Element => {
   const [collapsed, setCollapsed] = React.useState(true)
   const pipettes = useSelector(getPipetteEntities)
+  const enableReturnTip = useSelector(getEnableReturnTip)
+  const labwares = useSelector(getLabwareEntities)
   const { t } = useTranslation(['application', 'form'])
 
   const { propsForFields, formData } = props
   const is96Channel =
     propsForFields.pipette.value != null &&
     pipettes[String(propsForFields.pipette.value)].name === 'p1000_96'
+  const userSelectedPickUpTipLocation =
+    labwares[String(propsForFields.pickUpTip_location.value)] != null
+  const userSelectedDropTipLocation =
+    labwares[String(propsForFields.dropTip_location.value)] != null
 
   const toggleCollapsed = (): void => {
     setCollapsed(prevCollapsed => !prevCollapsed)
   }
-
   return (
     <div className={styles.form_wrapper}>
       <div className={styles.section_header}>
@@ -250,9 +261,37 @@ export const MixForm = (props: StepFormProps): JSX.Element => {
             stepType={formData.stepType}
           />
         </div>
-        <div className={cx(styles.form_row, styles.section_column)}>
-          <DropTipField {...propsForFields.dropTip_location} />
-        </div>
+      </div>
+      <div className={styles.section_header}>
+        <span className={styles.section_header_text}>
+          {enableReturnTip
+            ? t('form:step_edit_form.section.pickUpAndDrop')
+            : t('form:step_edit_form.section.dropTip')}
+        </span>
+      </div>
+      <div className={cx(styles.form_row, styles.section_column)}>
+        {enableReturnTip ? (
+          <>
+            <PickUpTipField {...propsForFields.pickUpTip_location} />
+            {userSelectedPickUpTipLocation ? (
+              <TipWellSelectionField
+                {...propsForFields.pickUpTip_wellNames}
+                nozzles={String(propsForFields.nozzles.value) ?? null}
+                labwareId={propsForFields.pickUpTip_location.value}
+                pipetteId={propsForFields.pipette.value}
+              />
+            ) : null}
+          </>
+        ) : null}
+        <DropTipField {...propsForFields.dropTip_location} />
+        {userSelectedDropTipLocation ? (
+          <TipWellSelectionField
+            {...propsForFields.dropTip_wellNames}
+            nozzles={String(propsForFields.nozzles.value) ?? null}
+            labwareId={propsForFields.dropTip_location.value}
+            pipetteId={propsForFields.pipette.value}
+          />
+        ) : null}
       </div>
     </div>
   )

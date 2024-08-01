@@ -9,6 +9,7 @@ import { i18n } from '../../../i18n'
 import { useTrackCreateProtocolRunEvent } from '../../../organisms/Devices/hooks'
 import { useCloseCurrentRun } from '../../../organisms/ProtocolUpload/hooks'
 import { useCurrentRunStatus } from '../../../organisms/RunTimeControl/hooks'
+import { useFeatureFlag } from '../../../redux/config'
 import {
   getConnectableRobots,
   getReachableRobots,
@@ -38,6 +39,7 @@ import type { State } from '../../../redux/types'
 vi.mock('../../../organisms/Devices/hooks')
 vi.mock('../../../organisms/ProtocolUpload/hooks')
 vi.mock('../../../organisms/RunTimeControl/hooks')
+vi.mock('../../../redux/config')
 vi.mock('../../../redux/discovery')
 vi.mock('../../../redux/robot-update')
 vi.mock('../../../redux/networking')
@@ -190,6 +192,8 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
       { ...mockConnectableRobot, name: 'otherRobot', ip: 'otherIp' },
       mockConnectableRobot,
     ])
+    vi.mocked(useFeatureFlag).mockReturnValue(true)
+
     provideNullCurrentRunIdFor('otherIp')
     render({
       storedProtocolData: storedProtocolDataFixture,

@@ -7,6 +7,7 @@ import { simpleAnalysisFileFixture } from '@opentrons/api-client'
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
+import { useFeatureFlag } from '../../../redux/config'
 import { getStoredProtocols } from '../../../redux/protocol-storage'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import {
@@ -18,6 +19,7 @@ import { useCreateRunFromProtocol } from '../../ChooseRobotToRunProtocolSlideout
 import { ChooseProtocolSlideout } from '../'
 import { useNotifyDataReady } from '../../../resources/useNotifyDataReady'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
+import { when } from 'vitest-when'
 
 vi.mock('../../ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol')
 vi.mock('../../../redux/protocol-storage')
@@ -67,6 +69,7 @@ describe('ChooseProtocolSlideout', () => {
       trackCreateProtocolRunEvent: mockTrackCreateProtocolRunEvent,
     })
     vi.mocked(useNotifyDataReady).mockReturnValue({} as any)
+    when(vi.mocked(useFeatureFlag)).calledWith('enableCsvFile').thenReturn(true)
   })
 
   it('renders slideout if showSlideout true', () => {
