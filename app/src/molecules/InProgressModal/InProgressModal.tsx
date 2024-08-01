@@ -61,11 +61,6 @@ const MODAL_STYLE = css`
 `
 const SPINNER_STYLE = css`
   color: ${COLORS.grey60};
-  opacity: 100%;
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    color: ${COLORS.black90};
-    opacity: 70%;
-  }
 `
 
 export function InProgressModal(props: Props): JSX.Element {
