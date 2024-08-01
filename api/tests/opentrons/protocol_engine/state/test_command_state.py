@@ -760,7 +760,7 @@ def test_recovery_target_tracking() -> None:
     # c3 failed, but not recoverably.
     assert subject_view.get_recovery_target() is None
     assert not subject_view.get_recovery_in_progress_for_command("c3")
-    assert subject_view.get_has_entered_recovey_mode() is True
+    assert subject_view.get_has_entered_recovery_mode() is True
 
 
 def test_final_state_after_estop() -> None:

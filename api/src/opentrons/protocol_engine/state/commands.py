@@ -382,6 +382,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
         ):
             self._state.queue_status = QueueStatus.AWAITING_RECOVERY
             self._state.recovery_target_command_id = action.command_id
+            self._state.has_entered_error_recovery = True
 
     def _handle_play_action(self, action: PlayAction) -> None:
         if not self._state.run_result:
@@ -410,7 +411,6 @@ class CommandStore(HasState[CommandState], HandlesActions):
         self, action: ResumeFromRecoveryAction
     ) -> None:
         self._state.queue_status = QueueStatus.RUNNING
-        self._state.has_entered_error_recovery = True
         self._state.recovery_target_command_id = None
 
     def _handle_stop_action(self, action: StopAction) -> None:
