@@ -645,7 +645,7 @@ class Protocols:
         file_stem="Flex_S_v2_20_P1000_96_PartialTipPickupSmokeTest",
         file_extension="py",
         robot="Flex",
-        custom_labware=["hacky_1000ul_flex_tiprack"]
+        custom_labware=["hacky_1000ul_flex_tiprack"],
     )
 
     OT2_X_v2_18_None_None_duplicateRTPVariableName: Protocol = Protocol(
