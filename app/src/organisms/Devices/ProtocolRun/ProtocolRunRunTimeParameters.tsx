@@ -210,7 +210,7 @@ const StyledTableRowComponent = (
           <LegacyStyledText as="p">
             {parameter.type === 'csv_file'
               ? // TODO (nd, 07/17/2024): retrieve filename from parameter once backend is wired up
-                parameter.file?.file?.name ?? ''
+                parameter.file?.name ?? ''
               : formatRunTimeParameterValue(parameter, t)}
           </LegacyStyledText>
           {parameter.type === 'csv_file' ||
