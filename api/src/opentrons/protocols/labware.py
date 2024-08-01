@@ -248,7 +248,7 @@ def _get_standard_labware_definition(
             f'Labware "{load_name}" not found with version {checked_version} '
             f'in namespace "{namespace}".'
         )
-    return labware_def
+    return labware_def  # type: ignore[no-any-return]
 
 
 def _get_path_to_labware(

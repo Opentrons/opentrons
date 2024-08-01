@@ -1,7 +1,7 @@
 import functools
 import logging
 from dataclasses import dataclass
-from typing import Any, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union, Type
 
 from opentrons import types
 from opentrons.hardware_control.types import CriticalPoint
@@ -27,8 +27,9 @@ class LabwareHeightError(Exception):
     pass
 
 
-def max_many(*args: Union[List[Any], Tuple[Any]]) -> Any:
-    return functools.reduce(max, args[1:], args[0])
+def max_many(*args: List[float]) -> float:
+    all_values = [value for sublist in args for value in sublist]
+    return functools.reduce(max, all_values)
 
 
 BAD_PAIRS = {
@@ -76,7 +77,7 @@ class MoveConstraints:
     minimum_z_height: float = 0.0
 
     @classmethod
-    def build(cls, **kwargs: Any):
+    def build(cls: Type['MoveConstraints'], **kwargs: Any) -> 'MoveConstraints':
         return cls(**{k: v for k, v in kwargs.items() if v is not None})
 
 
@@ -196,9 +197,8 @@ def _build_safe_height(
                 )
         from_safety = 0.0  # (ignore since it’s in a max())
 
-    return max_many(
-        to_point.z, from_point.z, to_safety, from_safety, constraints.minimum_z_height
-    )
+    max_many_params = [to_point.z, from_point.z, to_safety, from_safety, constraints.minimum_z_height]
+    return max_many(max_many_params)
 
 
 def plan_moves(

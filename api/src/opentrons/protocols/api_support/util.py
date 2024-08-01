@@ -11,6 +11,8 @@ from typing import (
     Callable,
     Dict,
     List,
+    Iterator,
+    KeysView,
     Optional,
     TypeVar,
     Union,
@@ -283,7 +285,7 @@ class AxisMaxSpeeds(UserDict[Union[str, Axis], float]):
         super().__init__()
         self._robot_type = robot_type
 
-    def __getitem__(self, key: Union[str, Axis]):
+    def __getitem__(self, key: Union[str, Axis]) -> float:
         checked_key = AxisMaxSpeeds._verify_key(key)
         return self.data[checked_key]
 
@@ -315,29 +317,29 @@ class AxisMaxSpeeds(UserDict[Union[str, Axis], float]):
         checked_key = AxisMaxSpeeds._verify_key(key)
         del self.data[checked_key]
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[str]:
         """keys() and dict iteration return string keys"""
         string_keys = (
-            k.name if self._robot_type == "OT-3 Standard" else ot2_axis_to_string(k)
+            k if isinstance(k, str) else k.name if self._robot_type == "OT-3 Standard" else ot2_axis_to_string(k)
             for k in self.data.keys()
         )
         return string_keys
 
-    def keys(self):
+    def keys(self) -> Iterator[str | Axis]:  # type: ignore[override]
         string_keys = (
-            k.name if self._robot_type == "OT-3 Standard" else ot2_axis_to_string(k)
+            k if isinstance(k, str) else k.name if self._robot_type == "OT-3 Standard" else ot2_axis_to_string(k)
             for k in self.data.keys()
         )
         return string_keys
 
-    def items(self):
+    def items(self) -> Iterator[Dict[str | Axis, float]]:  # type: ignore[override]
         return (
-            (
-                k.name
-                if self._robot_type == "OT-3 Standard"
-                else ot2_axis_to_string(k),
-                v,
-            )
+            {
+                k if isinstance(k, str) else 
+                k.name if self._robot_type == "OT-3 Standard"
+                else ot2_axis_to_string(k):
+                v
+            }
             for k, v in self.data.items()
         )
 
@@ -397,8 +399,11 @@ def requires_version(major: int, minor: int) -> Callable[[FuncT], FuncT]:
     return _set_version
 
 
-class ModifiedList(list):
-    def __contains__(self, item):
+class ModifiedList(list[str]):
+    def __contains__(self, item: object) -> bool:
+        #This weird thing where item is passed in as an object
+        #then asserts that it's a string is a workaround for MyPy errors.
+        assert isinstance(item, str)
         for name in self:
             if name == item.replace("-", "_").lower():
                 return True

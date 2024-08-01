@@ -1,4 +1,3 @@
-import pdb
 import asyncio
 from _pytest.fixtures import SubRequest
 import mock
@@ -358,7 +357,7 @@ async def test_cache_instruments_sim(
     # Unless we specifically told the simulator to not strictly enforce
     # correspondence between expectations and preconfiguration
     sim = await sim_builder(
-        attached_instruments=dummy_instruments,
+        attached_instruments=dummy_instruments[0],
         loop=asyncio.get_running_loop(),
         strict_attached_instruments=False,
     )
@@ -702,7 +701,6 @@ async def test_pick_up_tip_pos_ot2(
 
 def assert_move_called(mock_move: mock.Mock, speed: float, lock: Any = None) -> None:
     if lock is not None:
-        pdb.set_trace()
         mock_move.assert_called_with(
             mock.ANY,
             speed=speed,
