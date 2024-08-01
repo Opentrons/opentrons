@@ -9,7 +9,6 @@ from opentrons.protocol_engine.commands.command_unions import (
 from opentrons.protocol_engine.error_recovery_policy import (
     ErrorRecoveryPolicy,
     ErrorRecoveryType,
-    standard_run_policy,
 )
 
 
@@ -23,8 +22,6 @@ def create_error_recovery_policy_from_rules(
         failed_command: Command,
         defined_error_data: Optional[CommandDefinedErrorData],
     ) -> ErrorRecoveryType:
-        if rules is None:
-            return standard_run_policy(config, failed_command, defined_error_data)
         for rule in rules:
             command_type_matches = (
                 failed_command.commandType == rule.matchCriteria.command.commandType
@@ -43,6 +40,30 @@ def create_error_recovery_policy_from_rules(
                 elif rule.ifMatch == ReactionIfMatch.WAIT_FOR_RECOVERY:
                     return ErrorRecoveryType.WAIT_FOR_RECOVERY
 
-        return standard_run_policy(config, failed_command, defined_error_data)
+        return default_error_recovery_policy(config, failed_command, defined_error_data)
 
     return _policy
+
+
+def default_error_recovery_policy(
+    config: Config,
+    failed_command: Command,
+    defined_error_data: Optional[CommandDefinedErrorData],
+) -> ErrorRecoveryType:
+    """The `ErrorRecoveryPolicy` to use when none has been set on a run.
+
+    This is only appropriate for normal protocol runs, not maintenance runs,
+    since it assumes
+    """
+    # Although error recovery can theoretically work on OT-2s, we haven't tested it,
+    # and it's generally scarier because the OT-2 has much less hardware feedback.
+    robot_is_flex = config.robot_type == "OT-3 Standard"
+    # If the error is defined, we're taking that to mean that we should
+    # WAIT_FOR_RECOVERY. This is not necessarily the right long-term logic--we might
+    # want to FAIL_RUN on certain defined errors and WAIT_FOR_RECOVERY on certain
+    # undefined errors--but this is convenient for now.
+    error_is_defined = defined_error_data is not None
+    if robot_is_flex and error_is_defined:
+        return ErrorRecoveryType.WAIT_FOR_RECOVERY
+    else:
+        return ErrorRecoveryType.FAIL_RUN

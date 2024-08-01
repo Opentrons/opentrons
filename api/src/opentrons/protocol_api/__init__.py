@@ -16,6 +16,7 @@ from opentrons.protocols.parameters.types import CSVParameter
 
 from .protocol_context import ProtocolContext
 from .deck import Deck
+from .robot_context import RobotContext
 from .instrument_context import InstrumentContext
 from .labware import Labware, Well
 from .module_contexts import (
@@ -52,6 +53,7 @@ __all__ = [
     "ProtocolContext",
     "Deck",
     "ModuleContext",
+    "RobotContext",
     "InstrumentContext",
     "TemperatureModuleContext",
     "MagneticModuleContext",

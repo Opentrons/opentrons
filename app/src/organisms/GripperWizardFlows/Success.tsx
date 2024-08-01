@@ -10,8 +10,10 @@ import {
   Flex,
 } from '@opentrons/components'
 import { getIsOnDevice } from '../../redux/config'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
+import {
+  SimpleWizardBody,
+  SimpleWizardInProgressBody,
+} from '../../molecules/SimpleWizardBody'
 import { SmallButton } from '../../atoms/buttons'
 import {
   SUCCESSFULLY_ATTACHED,
@@ -70,7 +72,7 @@ export const Success = (
 
   if (isRobotMoving)
     return (
-      <InProgressModal
+      <SimpleWizardInProgressBody
         description={t('shared:stand_back_robot_is_in_motion')}
       />
     )

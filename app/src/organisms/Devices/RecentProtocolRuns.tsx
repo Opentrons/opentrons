@@ -16,10 +16,9 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { HistoricalProtocolRun } from './HistoricalProtocolRun'
 import { useIsRobotViewable, useRunStatuses } from './hooks'
-import { useNotifyAllRunsQuery } from '../../resources/runs'
+import { useNotifyAllRunsQuery, useCurrentRunId } from '../../resources/runs'
 import { useFeatureFlag } from '../../redux/config'
 
 interface RecentProtocolRunsProps {

@@ -87,6 +87,7 @@
   "protocol_title": "Protocol - {{protocol_name}}",
   "resume_run": "Resume run",
   "return_to_dashboard": "Return to dashboard",
+  "return_to_quick_transfer": "Return to quick transfer",
   "right": "Right",
   "robot_has_previous_offsets": "This robot has stored Labware Offset data from previous protocol runs. Do you want to apply that data to this protocol run? You can still adjust any offsets with Labware Position Check.",
   "robot_was_recalibrated": "This robot was recalibrated after this Labware Offset data was stored.",

@@ -1,6 +1,6 @@
 import { useAllSessionsQuery } from '@opentrons/react-api-client'
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
-import { useCurrentRunId } from '../../ProtocolUpload/hooks'
+import { useCurrentRunId } from '../../../resources/runs'
 import { useRunStatus } from '../../RunTimeControl/hooks'
 
 export function useRunStartedOrLegacySessionInProgress(): boolean {
