@@ -27,7 +27,6 @@ import {
 } from '@opentrons/shared-data'
 import { useAllCsvFilesQuery } from '@opentrons/react-api-client'
 import { DownloadCsvFileLink } from './DownloadCsvFileLink'
-import { useFeatureFlag } from '../../redux/config'
 import { Banner } from '../../atoms/Banner'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useDeckCalibrationData } from './hooks'
