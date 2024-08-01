@@ -1,7 +1,6 @@
 import logging
-from typing import Any, Optional, List
+from typing import Any, Dict, Optional, List, cast
 from typing_extensions import Final
-
 import math
 import functools
 
@@ -129,28 +128,40 @@ class DurationEstimator:
         #  - Make this into a map
         #  - Remove "noqa: C901"
         if message_name == types.PICK_UP_TIP:
+            payload = cast(types.PickUpTipCommandPayload, payload)
             duration = self.on_pick_up_tip(payload=payload)
         elif message_name == types.DROP_TIP:
+            payload = cast(types.DropTipCommandPayload, payload)
             duration = self.on_drop_tip(payload=payload)
         elif message_name == types.ASPIRATE:
+            payload = cast(types.AspirateDispenseCommandPayload, payload)
             duration = self.on_aspirate(payload=payload)
         elif message_name == types.DISPENSE:
+            payload = cast(types.AspirateDispenseCommandPayload, payload)
             duration = self.on_dispense(payload=payload)
         elif message_name == types.BLOW_OUT:
+            payload = cast(types.BlowOutCommandPayload, payload)
             duration = self.on_blow_out(payload=payload)
         elif message_name == types.TOUCH_TIP:
+            payload = cast(types.TouchTipCommandPayload, payload)
             duration = self.on_touch_tip()
         elif message_name == types.DELAY:
+            payload = cast(types.DelayCommandPayload, payload)
             duration = self.on_delay(payload=payload)
         elif message_name == types.TEMPDECK_SET_TEMP:
+            payload = cast(types.TempdeckSetTempCommandPayload, payload)
             duration = self.on_tempdeck_set_temp(payload=payload)
         elif message_name == types.TEMPDECK_DEACTIVATE:
+            payload = cast(types.TempdeckDeactivateCommandPayload, payload)
             duration = self.on_tempdeck_deactivate()
         elif message_name == types.TEMPDECK_AWAIT_TEMP:
+            payload = cast(types.TempdeckAwaitTempCommandPayload, payload)
             duration = self.on_tempdeck_await_temp()
         elif message_name == types.THERMOCYCLER_SET_BLOCK_TEMP:
+            payload = cast(types.ThermocyclerSetBlockTempCommandPayload, payload)
             duration = self.on_thermocycler_block_temp(payload=payload)
         elif message_name == types.THERMOCYCLER_EXECUTE_PROFILE:
+            payload = cast(types.ThermocyclerExecuteProfileCommandPayload, payload)
             duration = self.on_execute_profile(payload=payload)
         elif message_name == types.THERMOCYCLER_SET_LID_TEMP:
             duration = self.on_thermocycler_set_lid_temp()
@@ -178,8 +189,8 @@ class DurationEstimator:
 
     def on_pick_up_tip(self, payload: types.PickUpTipCommandPayload) -> float:
         """Handle a pick up tip event"""
-        instrument = payload["instrument"]
 
+        instrument = payload["instrument"]
         location = payload["location"]
         prev_slot = self._last_deckslot
         curr_slot = self.get_slot(location)
@@ -199,7 +210,7 @@ class DurationEstimator:
         )
         return duration
 
-    def on_drop_tip(self, payload: types.CommandPayload) -> float:
+    def on_drop_tip(self, payload: types.DropTipCommandPayload) -> float:
 
         instrument = payload["instrument"]
         # We are going to once again use our "deck movement" set up. This should
