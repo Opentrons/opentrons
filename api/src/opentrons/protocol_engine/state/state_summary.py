@@ -21,8 +21,7 @@ class StateSummary(BaseModel):
     # errors is a list for historical reasons. (This model needs to stay compatible with
     # robot-server's database.) It shouldn't have more than 1 element.
     errors: List[ErrorOccurrence]
-    # TODO(tz, 7-31-24): try removing allCommandErrors from this class.
-    allCommandErrors: List[ErrorOccurrence] = Field(default_factory=list)
+    hasEverEnteredErrorRecovery: bool
     labware: List[LoadedLabware]
     pipettes: List[LoadedPipette]
     modules: List[LoadedModule]

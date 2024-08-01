@@ -206,6 +206,9 @@ class CommandState:
     failed_command_errors: List[ErrorOccurrence]
     """List of command errors that occurred during run execution."""
 
+    has_entered_error_recovery: bool
+    """Whether the run has entered error recovery."""
+
     stopped_by_estop: bool
     """If this is set to True, the engine was stopped by an estop event."""
 
@@ -243,6 +246,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
             stopped_by_estop=False,
             failed_command_errors=[],
             error_recovery_policy=error_recovery_policy,
+            has_entered_error_recovery=False,
         )
 
     def handle_action(self, action: Action) -> None:
@@ -406,6 +410,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
         self, action: ResumeFromRecoveryAction
     ) -> None:
         self._state.queue_status = QueueStatus.RUNNING
+        self._state.has_entered_error_recovery = True
         self._state.recovery_target_command_id = None
 
     def _handle_stop_action(self, action: StopAction) -> None:
@@ -643,6 +648,10 @@ class CommandView(HasState[CommandState]):
     def get_all_errors(self) -> List[ErrorOccurrence]:
         """Get the run's full error list, if there was none, returns an empty list."""
         return self._state.failed_command_errors
+
+    def get_has_entered_recovey_mode(self) -> bool:
+        """Get whether the run has entered recovery mode."""
+        return self._state.has_entered_error_recovery
 
     def get_running_command_id(self) -> Optional[str]:
         """Return the ID of the command that's currently running, if there is one."""
