@@ -28,7 +28,7 @@ from ..command_models import (
     CommandLink,
     CommandLinkMeta,
 )
-from ..run_models import RunCommandSummary, RunCommandError
+from ..run_models import RunCommandSummary
 from ..run_data_manager import (
     RunDataManager,
     PreSerializedCommandsNotAvailableError,
@@ -433,7 +433,9 @@ async def get_run_command(
         "information available for a given command."
     ),
     responses={
-        status.HTTP_200_OK: {"model": SimpleBody[RunCommandError]},
+        status.HTTP_200_OK: {
+            "model": SimpleBody[ResponseList[pe_errors.ErrorOccurrence]]
+        },
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunStopped]},
     },
 )

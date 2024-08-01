@@ -13,7 +13,7 @@ from opentrons.protocol_engine import (
 )
 
 from robot_server.errors.error_responses import ApiError
-from robot_server.service.json_api import MultiBodyMeta
+from robot_server.service.json_api import MultiBodyMeta, ResponseList
 
 from robot_server.runs.command_models import (
     RequestModelWithCommandCreate,
@@ -30,6 +30,7 @@ from robot_server.runs.router.commands_router import (
     get_run_command,
     get_run_commands,
     get_current_run_from_url,
+    get_run_commands_error,
 )
 
 
@@ -439,6 +440,49 @@ async def test_get_run_commands_not_found(
 
     assert exc_info.value.status_code == 404
     assert exc_info.value.content["errors"][0]["id"] == "RunNotFound"
+
+
+async def test_get_run_commands_errors(
+    decoy: Decoy, mock_run_data_manager: RunDataManager
+) -> None:
+    """It should return a list of all commands errors in a run."""
+
+    error = (
+        pe_errors.ErrorOccurrence(
+            id="error-id",
+            errorType="PrettyBadError",
+            createdAt=datetime(year=2024, month=4, day=4),
+            detail="Things are not looking good.",
+        ),
+    )
+
+    decoy.when(
+        mock_run_data_manager.get_command_error_slice(
+            run_id="run-id",
+            cursor=None,
+            length=42,
+        )
+    ).then_return([error])
+
+    result = await get_run_commands_error(
+        runId="run-id",
+        run_data_manager=mock_run_data_manager,
+        cursor=None,
+        pageLength=42,
+    )
+
+    assert result.content.data == ResponseList.construct(
+        __root__=[
+            pe_errors.ErrorOccurrence(
+                id="error-id",
+                errorType="PrettyBadError",
+                createdAt=datetime(year=2024, month=4, day=4),
+                detail="Things are not looking good.",
+            )
+        ]
+    )
+    # assert result.content.meta == MultiBodyMeta(cursor=1, totalLength=3)
+    assert result.status_code == 200
 
 
 async def test_get_run_command_by_id(
