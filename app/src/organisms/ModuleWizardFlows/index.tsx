@@ -16,7 +16,6 @@ import {
 } from '@opentrons/shared-data'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { getTopPortalEl } from '../../App/portal'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { useAttachedPipettesFromInstrumentsQuery } from '../../organisms/Devices/hooks'
 import {
@@ -24,7 +23,10 @@ import {
   useCreateTargetedMaintenanceRunMutation,
 } from '../../resources/runs'
 import { getIsOnDevice } from '../../redux/config'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+import {
+  SimpleWizardBody,
+  SimpleWizardInProgressBody,
+} from '../../molecules/SimpleWizardBody'
 import { getModuleCalibrationSteps } from './getModuleCalibrationSteps'
 import { FLEX_SLOT_NAMES_BY_MOD_TYPE, SECTIONS } from './constants'
 import { BeforeBeginning } from './BeforeBeginning'
@@ -263,7 +265,7 @@ export const ModuleWizardFlows = (
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
   if (isPrepCommandLoading) {
     modalContent = (
-      <InProgressModal
+      <SimpleWizardInProgressBody
         description={t('prepping_module', {
           module: getModuleDisplayName(attachedModule.moduleModel),
         })}
@@ -296,7 +298,9 @@ export const ModuleWizardFlows = (
       />
     )
   } else if (isExiting) {
-    modalContent = <InProgressModal description={t('stand_back_exiting')} />
+    modalContent = (
+      <SimpleWizardInProgressBody description={t('stand_back_exiting')} />
+    )
   } else if (currentStep.section === SECTIONS.BEFORE_BEGINNING) {
     modalContent = <BeforeBeginning {...currentStep} {...calibrateBaseProps} />
   } else if (currentStep.section === SECTIONS.SELECT_LOCATION) {

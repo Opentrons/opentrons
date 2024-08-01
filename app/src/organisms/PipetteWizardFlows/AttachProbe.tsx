@@ -12,8 +12,10 @@ import {
 import { LEFT, WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
 import { Banner } from '../../atoms/Banner'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
+import {
+  SimpleWizardBody,
+  SimpleWizardInProgressBody,
+} from '../../molecules/SimpleWizardBody'
 import pipetteProbe1 from '../../assets/videos/pipette-wizard-flows/Pipette_Probing_1.webm'
 import pipetteProbe8 from '../../assets/videos/pipette-wizard-flows/Pipette_Probing_8.webm'
 import probing96 from '../../assets/videos/pipette-wizard-flows/Pipette_Probing_96.webm'
@@ -156,7 +158,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
 
   if (isRobotMoving)
     return (
-      <InProgressModal
+      <SimpleWizardInProgressBody
         alternativeSpinner={isExiting ? null : pipetteProbeVid}
         description={
           isExiting
@@ -173,7 +175,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
             </LegacyStyledText>
           </Flex>
         )}
-      </InProgressModal>
+      </SimpleWizardInProgressBody>
     )
   else if (showUnableToDetect)
     return (
