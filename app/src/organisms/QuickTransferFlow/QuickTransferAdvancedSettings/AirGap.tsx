@@ -109,13 +109,13 @@ export function AirGap(props: AirGapProps): JSX.Element {
       // after each aspirate action, so we need to halve the available capacity for single path
       // to get the amount available, assuming a min of 2 aspirates per dispense
       maxAvailableCapacity =
-        (Math.min(maxPipetteVolume, tipVolume) - state.volume) / 2
+        (Math.min(maxPipetteVolume, tipVolume) - 2 * state.volume) / 2
     } else {
       // aspirate air gap for multi dispense occurs once per asprirate and
       // available volume is max capacity - volume*3 assuming a min of 2 dispenses
       // per aspirate plus 1x the volume for disposal
       maxAvailableCapacity =
-        Math.min(maxPipetteVolume, tipVolume) - state.volume / 3
+        Math.min(maxPipetteVolume, tipVolume) - state.volume * 3
     }
   }
 

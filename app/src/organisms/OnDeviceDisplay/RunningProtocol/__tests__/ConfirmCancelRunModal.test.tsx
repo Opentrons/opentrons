@@ -7,6 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { RUN_STATUS_IDLE, RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import {
   useStopRunMutation,
+  useDeleteRunMutation,
   useDismissCurrentRunMutation,
 } from '@opentrons/react-api-client'
 
@@ -31,6 +32,7 @@ vi.mock('../CancelingRunModal')
 vi.mock('../../../../redux/discovery')
 const mockNavigate = vi.fn()
 const mockStopRun = vi.fn()
+const mockDeleteRun = vi.fn()
 const mockDismissCurrentRun = vi.fn()
 const mockTrackEvent = vi.fn()
 const mockTrackProtocolRunEvent = vi.fn(
@@ -69,10 +71,14 @@ describe('ConfirmCancelRunModal', () => {
       isActiveRun: true,
       runId: RUN_ID,
       setShowConfirmCancelRunModal: mockFn,
+      isQuickTransfer: false,
     }
 
     vi.mocked(useStopRunMutation).mockReturnValue({
       stopRun: mockStopRun,
+    } as any)
+    vi.mocked(useDeleteRunMutation).mockReturnValue({
+      deleteRun: mockDeleteRun,
     } as any)
     vi.mocked(useDismissCurrentRunMutation).mockReturnValue({
       dismissCurrentRun: mockDismissCurrentRun,
@@ -151,5 +157,17 @@ describe('ConfirmCancelRunModal', () => {
     expect(mockDismissCurrentRun).toHaveBeenCalled()
     expect(mockTrackProtocolRunEvent).toHaveBeenCalled()
     expect(mockNavigate).toHaveBeenCalledWith('/protocols')
+  })
+  it('when quick transfer run is stopped, the run is dismissed and you return to quick transfer', () => {
+    props = {
+      ...props,
+      isActiveRun: false,
+      isQuickTransfer: true,
+    }
+    when(useRunStatus).calledWith(RUN_ID).thenReturn(RUN_STATUS_STOPPED)
+    render(props)
+
+    expect(mockDismissCurrentRun).toHaveBeenCalled()
+    expect(mockNavigate).toHaveBeenCalledWith('/quick-transfer')
   })
 })

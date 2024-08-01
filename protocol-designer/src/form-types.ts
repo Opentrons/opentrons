@@ -56,6 +56,7 @@ export type StepFieldName = string
 // | 'disposalVolume_checkbox',
 // | 'disposalVolume_volume',
 // | 'dropTip_location'
+// | 'dropTip_location'
 // | 'labware'
 // | 'labwareLocationUpdate'
 // | 'message'
@@ -71,6 +72,8 @@ export type StepFieldName = string
 // | 'pauseMessage'
 // | 'pauseMinute'
 // | 'pauseSecond'
+// | 'pickUpTip_location'
+// | 'pickUpTip_wellNames'
 // | 'pipette'
 // | 'preWetTip'
 // | 'stepDetails'
@@ -276,6 +279,9 @@ export interface HydratedMoveLiquidFormData {
     dispense_x_position?: number | null
     dispense_y_position?: number | null
     disposalVolume_volume?: number | null
+    dropTip_wellNames?: string[] | null
+    pickUpTip_location?: string | null
+    pickUpTip_wellNames?: string[] | null
     preWetTip?: boolean | null
   }
   description?: string | null
@@ -328,10 +334,13 @@ export interface HydratedMixFormDataLegacy {
   blowout_z_offset?: number | null
   dispense_delay_seconds?: number | null
   dispense_flowRate?: number | null
+  dropTip_wellNames?: string[] | null
   mix_mmFromBottom?: number | null
   mix_touchTip_mmFromBottom?: number | null
   mix_x_position?: number | null
   mix_y_position?: number | null
+  pickUpTip_location?: string | null
+  pickUpTip_wellNames?: string[] | null
   stepDetails?: string | null
   times?: number | null
 }
