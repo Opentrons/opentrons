@@ -18,7 +18,6 @@ import { useCreateRunFromProtocol } from '../../ChooseRobotToRunProtocolSlideout
 import { ChooseProtocolSlideout } from '../'
 import { useNotifyDataReady } from '../../../resources/useNotifyDataReady'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
-import { when } from 'vitest-when'
 
 vi.mock('../../ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol')
 vi.mock('../../../redux/protocol-storage')
