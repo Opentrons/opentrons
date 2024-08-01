@@ -47,8 +47,8 @@ def test_max_speeds_userdict() -> None:
     assert defaults["a"] == 20
     assert defaults[Axis.A] == 20
 
-    assert sorted(list(defaults.keys())) == sorted(["X", "A"])  # type: ignore[no-untyped-call]
-    assert "X" in defaults.keys()  # type: ignore[no-untyped-call]
+    assert sorted(list(defaults.keys())) == sorted(["X", "A"])  # type: ignore[type-var]
+    assert "X" in defaults.keys()
 
     del defaults["A"]
     assert "A" not in defaults

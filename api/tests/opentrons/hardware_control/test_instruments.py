@@ -37,10 +37,6 @@ LEFT_PIPETTE_PREFIX = "p10_single"
 LEFT_PIPETTE_MODEL = "{}_v1".format(LEFT_PIPETTE_PREFIX)
 LEFT_PIPETTE_ID = "testy"
 
-# mypy: error
-# return-value - Incompatible return value type (got "dict[Mount, dict[str, str]]", expected "dict[Mount, dict[str, str | None] | None]")
-# mypy: error
-# arg-type - Argument "attached_instruments" to "build_hardware_simulator" of "API" has incompatible type "dict[Mount, dict[str, str | None] | None]"; expected "dict[Mount, dict[str, str | None]] | None"
 DummyInstrumentConfig: TypeAlias = Optional[Dict[Mount, Dict[str, Optional[str]]]]
 OT3DummyInstrumentConfig: TypeAlias = Dict[
     Union[Mount, OT3Mount], Optional[Dict[str, Optional[str]]]
@@ -676,7 +672,7 @@ async def test_pick_up_tip(
 
 
 async def test_pick_up_tip_pos_ot2(
-    is_robot, dummy_instruments: Tuple[DummyInstrumentConfig, int]
+    is_robot: bool, dummy_instruments: Tuple[DummyInstrumentConfig, int]
 ) -> None:
     hw_api = await API.build_hardware_simulator(
         attached_instruments=dummy_instruments[0], loop=asyncio.get_running_loop()
@@ -772,7 +768,7 @@ async def test_aspirate_flow_rate(
     with mock.patch.object(hw_api, "_move") as mock_move:
         await hw_api.prepare_for_aspirate(types.Mount.LEFT)
         await hw_api.aspirate(types.Mount.LEFT, 1)
-        assert_move_called(mock_move, pytest.approx(10))
+        assert_move_called(mock_move, pytest.approx(10))  # type: ignore[arg-type]
 
     with mock.patch.object(hw_api, "_move") as mock_move:
         await hw_api.prepare_for_aspirate(types.Mount.LEFT)
