@@ -7,8 +7,6 @@ from robot_server.deletion_planner import DataFileDeletionPlanner
 
 _log = getLogger(__name__)
 
-_MAX_DATA_FILES_TO_STORE: Final = 50
-
 
 class DataFileAutoDeleter:
     """Auto deleter for data files."""

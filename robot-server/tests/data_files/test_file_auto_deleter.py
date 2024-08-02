@@ -1,5 +1,7 @@
 """Tests for DataFileAutoDeleter."""
+import logging
 
+import pytest
 from decoy import Decoy
 
 from robot_server.data_files.data_files_store import DataFilesStore
@@ -9,6 +11,7 @@ from robot_server.deletion_planner import DataFileDeletionPlanner, FileUsageInfo
 
 async def test_make_room_for_new_file(
     decoy: Decoy,
+    caplog: pytest.LogCaptureFixture,
 ) -> None:
     """It should get a deletion plan and enact it on the data files store."""
     mock_data_files_store = decoy.mock(cls=DataFilesStore)
@@ -28,9 +31,10 @@ async def test_make_room_for_new_file(
         data_files_store=mock_data_files_store,
         deletion_planner=mock_deletion_planner,
     )
+    with caplog.at_level(logging.INFO):
+        await subject.make_room_for_new_file()
 
-    await subject.make_room_for_new_file()
-    decoy.verify(
-        mock_data_files_store.remove("id-to-be-deleted-1"),
-        mock_data_files_store.remove("id-to-be-deleted-2"),
-    )
+    decoy.verify(mock_data_files_store.remove("id-to-be-deleted-1"))
+    decoy.verify(mock_data_files_store.remove("id-to-be-deleted-2"))
+    assert "id-to-be-deleted-1" in caplog.text
+    assert "id-to-be-deleted-2" in caplog.text

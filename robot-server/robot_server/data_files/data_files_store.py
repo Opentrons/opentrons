@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime
+from pathlib import Path
 from typing import Optional, List, Set
 
 import sqlalchemy.engine
@@ -15,7 +16,7 @@ from robot_server.persistence.tables import (
     run_csv_rtp_table,
 )
 
-from .models import FileIdNotFoundError
+from .models import FileIdNotFoundError, FileInUseError
 
 
 @dataclass(frozen=True)
@@ -34,9 +35,11 @@ class DataFilesStore:
     def __init__(
         self,
         sql_engine: sqlalchemy.engine.Engine,
+        data_files_directory: Path,
     ) -> None:
         """Create a new DataFilesStore."""
         self._sql_engine = sql_engine
+        self._data_files_directory = data_files_directory
 
     def get_file_info_by_hash(self, file_hash: str) -> Optional[DataFileInfo]:
         """Get the ID of data file having the provided hash."""
@@ -115,7 +118,56 @@ class DataFilesStore:
         return usage_info
 
     def remove(self, file_id: str) -> None:
-        """Remove the specified files from database and persistence directory."""
+        """Remove the specified files from database and persistence directory.
+
+        This should only be called when the specified file has no references
+        in the database.
+
+        Raises:
+            FileIdNotFoundError: the given file ID was not found in the store.
+            FileInUseError: the given file is referenced by an analysis or run
+                            and cannot be deleted.
+        """
+        select_ids_used_in_analyses = sqlalchemy.select(
+            analysis_csv_rtp_table.c.analysis_id
+        ).where(analysis_csv_rtp_table.c.file_id == file_id)
+        select_ids_used_in_runs = sqlalchemy.select(run_csv_rtp_table.c.run_id).where(
+            run_csv_rtp_table.c.file_id == file_id
+        )
+        delete_statement = sqlalchemy.delete(data_files_table).where(
+            data_files_table.c.id == file_id
+        )
+        with self._sql_engine.begin() as transaction:
+            files_used_in_analyses: Set[str] = set(
+                transaction.execute(select_ids_used_in_analyses).scalars().all()
+            )
+            files_used_in_runs: Set[str] = set(
+                transaction.execute(select_ids_used_in_runs).scalars().all()
+            )
+            if len(files_used_in_analyses) + len(files_used_in_runs) > 0:
+                analysis_usage_text = (
+                    f" analyses: {files_used_in_analyses}"
+                    if len(files_used_in_analyses) > 0
+                    else None
+                )
+                runs_usage_text = (
+                    f" runs: {files_used_in_runs}"
+                    if len(files_used_in_runs) > 0
+                    else None
+                )
+                conjunction = " and " if analysis_usage_text and runs_usage_text else ""
+                raise FileInUseError(
+                    data_file_id=file_id,
+                    message=f"Cannot remove file {file_id} as it is being used in"
+                    f" existing{analysis_usage_text or ''}{conjunction}{runs_usage_text or ''}.",
+                )
+            transaction.execute(delete_statement)
+
+        file_dir = self._data_files_directory.joinpath(file_id)
+        if file_dir:
+            for file in file_dir.glob("*"):
+                file.unlink()
+            file_dir.rmdir()
 
 
 def _convert_row_data_file_info(row: sqlalchemy.engine.Row) -> DataFileInfo:
