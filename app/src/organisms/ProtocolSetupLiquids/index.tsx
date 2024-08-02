@@ -9,8 +9,10 @@ import {
   Icon,
   JUSTIFY_FLEX_END,
   SPACING,
-  LegacyStyledText,
+  StyledText,
   TYPOGRAPHY,
+  DIRECTION_ROW,
+  JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
 import {
   parseLiquidsInLoadOrder,
@@ -53,6 +55,18 @@ export function ProtocolSetupLiquids({
         gridGap={SPACING.spacing8}
         marginTop="2.375rem"
       >
+        <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} marginRight="5.5rem">
+          <Flex paddingLeft={SPACING.spacing16} width="10.5625rem">
+            <StyledText oddStyle="smallBodyTextSemiBold" color={COLORS.grey60}>
+              {t('liquid_name')}
+            </StyledText>
+          </Flex>
+          <Flex>
+            <StyledText oddStyle="smallBodyTextSemiBold" color={COLORS.grey60}>
+              {t('total_liquid_volume')}
+            </StyledText>
+          </Flex>
+        </Flex>
         {liquidsInLoadOrder?.map(liquid => (
           <React.Fragment key={liquid.id}>
             <LiquidsList
@@ -114,9 +128,9 @@ export function LiquidsList(props: LiquidsListProps): JSX.Element {
           flexDirection={DIRECTION_COLUMN}
           alignItems={TYPOGRAPHY.textAlignCenter}
         >
-          <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          <StyledText oddStyle="bodyTextSemiBold">
             {liquid.displayName}
-          </LegacyStyledText>
+          </StyledText>
         </Flex>
         <Flex justifyContent={JUSTIFY_FLEX_END} flex="1">
           <Flex
