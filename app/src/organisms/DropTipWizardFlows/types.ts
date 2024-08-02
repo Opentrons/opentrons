@@ -1,4 +1,4 @@
-import { DT_ROUTES } from './constants'
+import type { DT_ROUTES } from './constants'
 import type { DropTipErrorComponents } from './hooks'
 import type { DropTipWizardProps } from './DropTipWizard'
 
