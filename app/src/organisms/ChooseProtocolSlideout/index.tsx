@@ -36,7 +36,6 @@ import {
 import { sortRuntimeParameters } from '@opentrons/shared-data'
 
 import { useLogger } from '../../logger'
-import { useFeatureFlag } from '../../redux/config'
 import { OPENTRONS_USB } from '../../redux/discovery'
 import { getStoredProtocols } from '../../redux/protocol-storage'
 import { appShellRequestor } from '../../redux/shell/remote'
@@ -117,7 +116,6 @@ export function ChooseProtocolSlideoutComponent(
     ) ?? false
   )
   const [isInputFocused, setIsInputFocused] = React.useState<boolean>(false)
-  const enableCsvFile = useFeatureFlag('enableCsvFile')
 
   React.useEffect(() => {
     setRunTimeParametersOverrides(
@@ -239,20 +237,12 @@ export function ChooseProtocolSlideoutComponent(
           runTimeParametersOverrides,
           mappedResolvedCsvVariableToFileId
         )
-        if (enableCsvFile) {
-          createRunFromProtocolSource({
-            files: srcFileObjects,
-            protocolKey: selectedProtocol.protocolKey,
-            runTimeParameterValues,
-            runTimeParameterFiles,
-          })
-        } else {
-          createRunFromProtocolSource({
-            files: srcFileObjects,
-            protocolKey: selectedProtocol.protocolKey,
-            runTimeParameterValues,
-          })
-        }
+        createRunFromProtocolSource({
+          files: srcFileObjects,
+          protocolKey: selectedProtocol.protocolKey,
+          runTimeParameterValues,
+          runTimeParameterFiles,
+        })
       })
     } else {
       logger.warn('failed to create protocol, no protocol selected')
@@ -441,7 +431,7 @@ export function ChooseProtocolSlideoutComponent(
               if (error != null) {
                 errors.push(error as string)
               }
-              return !enableCsvFile ? null : (
+              return (
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
                   alignItems={ALIGN_CENTER}

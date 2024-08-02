@@ -27,7 +27,6 @@ import {
 } from '@opentrons/shared-data'
 import { useAllCsvFilesQuery } from '@opentrons/react-api-client'
 import { DownloadCsvFileLink } from './DownloadCsvFileLink'
-import { useFeatureFlag } from '../../redux/config'
 import { Banner } from '../../atoms/Banner'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useDeckCalibrationData } from './hooks'
@@ -68,7 +67,6 @@ export function HistoricalProtocolRunDrawer(
       ? deckCalibrationData.lastModified
       : null
   const protocolDetails = useMostRecentCompletedAnalysis(run.id)
-  const enableCsvFile = useFeatureFlag('enableCsvFile')
 
   const isOutOfDate =
     typeof lastModifiedDeckCal === 'string' &&
@@ -290,7 +288,7 @@ export function HistoricalProtocolRunDrawer(
       width="100%"
       padding={SPACING.spacing16}
     >
-      {enableCsvFile ? protocolFilesData : null}
+      {protocolFilesData}
       {labwareOffsets}
     </Flex>
   )

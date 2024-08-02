@@ -45,7 +45,6 @@ import {
   getApplyHistoricOffsets,
   getPinnedProtocolIds,
   updateConfigValue,
-  useFeatureFlag,
 } from '../../redux/config'
 import { useOffsetCandidatesForAnalysis } from '../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import {
@@ -308,7 +307,6 @@ export function ProtocolDetails(): JSX.Element | null {
     'protocol_info',
     'shared',
   ])
-  const enableCsvFile = useFeatureFlag('enableCsvFile')
   const { protocolId } = useParams<
     keyof OnDeviceRouteParams
   >() as OnDeviceRouteParams
@@ -381,7 +379,7 @@ export function ProtocolDetails(): JSX.Element | null {
 
   const isRequiredCsv =
     mostRecentAnalysis?.result === 'parameter-value-required'
-  if (enableCsvFile && isRequiredCsv) {
+  if (isRequiredCsv) {
     if (chipText === 'Ready to run') {
       chipText = i18n.format(t('requires_csv'), 'capitalize')
     } else {
