@@ -55,7 +55,7 @@ export function ProtocolSetupLiquids({
         gridGap={SPACING.spacing8}
         marginTop="2.375rem"
       >
-        <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} marginRight="5.5rem">
+        <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} marginRight="13rem">
           <Flex paddingLeft={SPACING.spacing16} width="10.5625rem">
             <StyledText oddStyle="smallBodyTextSemiBold" color={COLORS.grey60}>
               {t('liquid_name')}
@@ -134,12 +134,12 @@ export function LiquidsList(props: LiquidsListProps): JSX.Element {
         </Flex>
         <Flex justifyContent={JUSTIFY_FLEX_END} flex="1">
           <Flex
-            backgroundColor={COLORS.grey35}
-            borderRadius={BORDERS.borderRadius4}
+            backgroundColor={`${COLORS.black90}${COLORS.opacity20HexCode}`}
+            borderRadius={BORDERS.borderRadius8}
             height="2.75rem"
             padding={`${SPACING.spacing8} ${SPACING.spacing12}`}
             alignItems={TYPOGRAPHY.textAlignCenter}
-            marginRight={SPACING.spacing8}
+            marginRight="8rem"
           >
             {getTotalVolumePerLiquidId(liquid.id, labwareByLiquidId)}{' '}
             {MICRO_LITERS}

@@ -78,6 +78,21 @@ export function getTotalVolumePerLiquidId(
   return parseFloat(totalVolume.toFixed(1))
 }
 
+export function getVolumePerWell(
+  liquidId: string,
+  labwareByLiquidId: LabwareByLiquidId
+): number | null {
+  const labwareInfo = labwareByLiquidId[liquidId]
+  const volumes = labwareInfo.flatMap(labware =>
+    Object.values(labware.volumeByWell)
+  )
+  if (new Set(volumes).size === 1) {
+    return volumes[0]
+  } else {
+    return null
+  }
+}
+
 export function getTotalVolumePerLiquidLabwarePair(
   liquidId: string,
   labwareId: string,
