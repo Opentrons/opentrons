@@ -10,7 +10,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   LocationIcon,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -211,12 +211,12 @@ function FixtureTableItem({
         marginBottom={lastItem ? SPACING.spacing68 : 'none'}
       >
         <Flex flex="3.5 0 0" alignItems={ALIGN_CENTER}>
-          <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {cutoutFixtureId != null &&
             (isCurrentFixtureCompatible || isRequiredSingleSlotMissing)
               ? getFixtureDisplayName(cutoutFixtureId)
               : getFixtureDisplayName(compatibleCutoutFixtureIds?.[0])}
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
         <Flex flex="2 0 0" alignItems={ALIGN_CENTER}>
           <LocationIcon slotName={getCutoutDisplayName(cutoutId)} />

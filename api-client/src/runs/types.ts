@@ -13,7 +13,6 @@ export * from './commands/types'
 
 export const RUN_STATUS_IDLE = 'idle' as const
 export const RUN_STATUS_RUNNING = 'running' as const
-export const RUN_STATUS_PAUSE_REQUESTED = 'pause-requested' as const
 export const RUN_STATUS_PAUSED = 'paused'
 export const RUN_STATUS_STOP_REQUESTED = 'stop-requested' as const
 export const RUN_STATUS_STOPPED = 'stopped' as const
@@ -22,11 +21,12 @@ export const RUN_STATUS_FINISHING = 'finishing' as const
 export const RUN_STATUS_SUCCEEDED = 'succeeded' as const
 export const RUN_STATUS_BLOCKED_BY_OPEN_DOOR = 'blocked-by-open-door' as const
 export const RUN_STATUS_AWAITING_RECOVERY = 'awaiting-recovery' as const
+export const RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR = 'awaiting-recovery-blocked-by-open-door' as const
+export const RUN_STATUS_AWAITING_RECOVERY_PAUSED = 'awaiting-recovery-paused' as const
 
 export type RunStatus =
   | typeof RUN_STATUS_IDLE
   | typeof RUN_STATUS_RUNNING
-  | typeof RUN_STATUS_PAUSE_REQUESTED
   | typeof RUN_STATUS_PAUSED
   | typeof RUN_STATUS_STOP_REQUESTED
   | typeof RUN_STATUS_STOPPED
@@ -35,6 +35,8 @@ export type RunStatus =
   | typeof RUN_STATUS_SUCCEEDED
   | typeof RUN_STATUS_BLOCKED_BY_OPEN_DOOR
   | typeof RUN_STATUS_AWAITING_RECOVERY
+  | typeof RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR
+  | typeof RUN_STATUS_AWAITING_RECOVERY_PAUSED
 
 export interface LegacyGoodRunData {
   id: string
@@ -45,6 +47,7 @@ export interface LegacyGoodRunData {
   status: RunStatus
   actions: RunAction[]
   errors: RunError[]
+  hasEverEnteredErrorRecovery: boolean
   pipettes: LoadedPipette[]
   labware: LoadedLabware[]
   liquids: Liquid[]
@@ -130,9 +133,12 @@ export interface LabwareOffsetCreateData {
   vector: VectorOffset
 }
 
-export interface RunTimeParameterCreateData {
-  [key: string]: string | boolean | number
-}
+type RunTimeParameterValuesType = string | number | boolean | { id: string }
+export type RunTimeParameterValuesCreateData = Record<
+  string,
+  RunTimeParameterValuesType
+>
+export type RunTimeParameterFilesCreateData = Record<string, string>
 
 export interface CommandData {
   data: RunTimeCommand
@@ -141,3 +147,29 @@ export interface CommandData {
 // Although run errors are semantically different from command errors,
 // the server currently happens to use the exact same model for both.
 export type RunError = RunCommandError
+
+/**
+ * Error Policy
+ */
+
+export type IfMatchType = 'ignoreAndContinue' | 'failRun' | 'waitForRecovery'
+
+export interface ErrorRecoveryPolicy {
+  policyRules: Array<{
+    matchCriteria: {
+      command: {
+        commandType: RunTimeCommand['commandType']
+        error: {
+          errorType: RunCommandError['errorType']
+        }
+      }
+    }
+    ifMatch: IfMatchType
+  }>
+}
+
+export interface UpdateErrorRecoveryPolicyRequest {
+  data: ErrorRecoveryPolicy
+}
+
+export type UpdateErrorRecoveryPolicyResponse = Record<string, never>

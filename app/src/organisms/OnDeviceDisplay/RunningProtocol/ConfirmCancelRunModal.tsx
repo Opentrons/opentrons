@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 
 import { RUN_STATUS_STOPPED } from '@opentrons/api-client'
@@ -10,10 +10,11 @@ import {
   DIRECTION_ROW,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 import {
   useStopRunMutation,
+  useDeleteRunMutation,
   useDismissCurrentRunMutation,
 } from '@opentrons/react-api-client'
 
@@ -31,6 +32,7 @@ interface ConfirmCancelRunModalProps {
   runId: string
   setShowConfirmCancelRunModal: (showConfirmCancelRunModal: boolean) => void
   isActiveRun: boolean
+  isQuickTransfer: boolean
   protocolId?: string | null
 }
 
@@ -38,19 +40,32 @@ export function ConfirmCancelRunModal({
   runId,
   setShowConfirmCancelRunModal,
   isActiveRun,
+  isQuickTransfer,
   protocolId,
 }: ConfirmCancelRunModalProps): JSX.Element {
   const { t } = useTranslation(['run_details', 'shared'])
   const { stopRun } = useStopRunMutation()
+  const { deleteRun } = useDeleteRunMutation({
+    onError: error => {
+      setIsCanceling(false)
+      console.error('Error deleting quick transfer run', error)
+    },
+  })
   const {
     dismissCurrentRun,
     isLoading: isDismissing,
-  } = useDismissCurrentRunMutation()
+  } = useDismissCurrentRunMutation({
+    onSuccess: () => {
+      if (isQuickTransfer && !isActiveRun) {
+        deleteRun(runId)
+      }
+    },
+  })
   const runStatus = useRunStatus(runId)
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name ?? ''
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
-  const history = useHistory()
+  const navigate = useNavigate()
   const [isCanceling, setIsCanceling] = React.useState(false)
 
   const modalHeader: ModalHeaderBaseProps = {
@@ -74,10 +89,14 @@ export function ConfirmCancelRunModal({
       trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.CANCEL })
       dismissCurrentRun(runId)
       if (!isActiveRun) {
-        if (protocolId != null) {
-          history.push(`/protocols/${protocolId}`)
+        if (isQuickTransfer && protocolId != null) {
+          navigate(`/quick-transfer/${protocolId}`)
+        } else if (isQuickTransfer) {
+          navigate('/quick-transfer')
+        } else if (protocolId != null) {
+          navigate(`/protocols/${protocolId}`)
         } else {
-          history.push(`/protocols`)
+          navigate('/protocols')
         }
       }
     }
@@ -100,8 +119,12 @@ export function ConfirmCancelRunModal({
           paddingBottom={SPACING.spacing32}
           paddingTop={`${isActiveRun ? SPACING.spacing32 : '0'}`}
         >
-          <StyledText as="p">{t('cancel_run_alert_info_flex')}</StyledText>
-          <StyledText as="p">{t('cancel_run_module_info')}</StyledText>
+          <LegacyStyledText as="p">
+            {t('cancel_run_alert_info_flex')}
+          </LegacyStyledText>
+          <LegacyStyledText as="p">
+            {t('cancel_run_module_info')}
+          </LegacyStyledText>
         </Flex>
         <Flex
           flexDirection={DIRECTION_ROW}

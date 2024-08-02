@@ -9,7 +9,7 @@ import {
   PrimaryButton,
   RESPONSIVENESS,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
@@ -19,8 +19,10 @@ import { useTranslation } from 'react-i18next'
 import { getIsOnDevice } from '../../redux/config'
 import { SmallButton } from '../../atoms/buttons'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+import {
+  SimpleWizardBody,
+  SimpleWizardInProgressBody,
+} from '../../molecules/SimpleWizardBody'
 import mountGripper from '../../assets/videos/gripper-wizards/MOUNT_GRIPPER.webm'
 
 import type { GripperWizardStepProps } from './types'
@@ -83,7 +85,7 @@ export const MountGripper = (
 
   if (isRobotMoving)
     return (
-      <InProgressModal
+      <SimpleWizardInProgressBody
         description={t('shared:stand_back_robot_is_in_motion')}
       />
     )
@@ -104,9 +106,9 @@ export const MountGripper = (
             setShowUnableToDetect(false)
           }}
         >
-          <StyledText css={GO_BACK_BUTTON_STYLE}>
+          <LegacyStyledText css={GO_BACK_BUTTON_STYLE}>
             {t('shared:go_back')}
-          </StyledText>
+          </LegacyStyledText>
         </Btn>
         {isOnDevice ? (
           <SmallButton
@@ -139,7 +141,9 @@ export const MountGripper = (
         </video>
       }
       bodyText={
-        <StyledText as="p">{t('attached_gripper_and_screw_in')}</StyledText>
+        <LegacyStyledText as="p">
+          {t('attached_gripper_and_screw_in')}
+        </LegacyStyledText>
       }
       proceedButtonText={t('continue')}
       proceedIsDisabled={isPending}

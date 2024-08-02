@@ -213,15 +213,6 @@ Random, persistent ID to use for anonymous analytics tracking if opted in.
 
 Whether or not the user has opted into anonymous analytics tracking.
 
-##### analytics.seenOptIn
-
-- CLI argument: `--analytics.seenOptIn`
-- Environment variable: `OT_APP_ANALYTICS__SEEN_OPT_IN`
-- JSON path: `analytics.seenOptIn`
-- Default: `false`
-
-Whether or not the user has seen the initial analytics description pop-up.
-
 ##### support.userId
 
 - CLI argument: `--support.userId`

@@ -9,6 +9,7 @@ from opentrons.protocol_engine import LabwareOffsetCreate, types as pe_types
 from opentrons.protocol_reader import ProtocolSource, JsonProtocolConfig
 
 from robot_server.errors.error_responses import ApiError
+from robot_server.runs.error_recovery_models import ErrorRecoveryPolicy
 from robot_server.service.json_api import (
     RequestModel,
     SimpleBody,
@@ -17,6 +18,7 @@ from robot_server.service.json_api import (
     ResourceLink,
 )
 
+from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.protocols.protocol_store import (
     ProtocolNotFoundError,
     ProtocolResource,
@@ -26,7 +28,7 @@ from robot_server.protocols.protocol_store import (
 from robot_server.runs.run_auto_deleter import RunAutoDeleter
 
 from robot_server.runs.run_models import Run, RunCreate, RunUpdate
-from robot_server.runs.engine_store import EngineConflictError
+from robot_server.runs.run_orchestrator_store import RunConflictError
 from robot_server.runs.run_data_manager import RunDataManager, RunNotCurrentError
 from robot_server.runs.run_models import RunNotFoundError
 from robot_server.runs.router.base_router import (
@@ -37,6 +39,7 @@ from robot_server.runs.router.base_router import (
     get_runs,
     remove_run,
     update_run,
+    put_error_recovery_policy,
 )
 
 from robot_server.deck_configuration.store import DeckConfigurationStore
@@ -81,6 +84,7 @@ async def test_create_run(
         labwareOffsets=[],
         status=pe_types.EngineStatus.IDLE,
         liquids=[],
+        hasEverEnteredErrorRecovery=False,
     )
     decoy.when(
         await mock_deck_configuration_store.get_deck_configuration()
@@ -130,6 +134,7 @@ async def test_create_protocol_run(
     protocol_resource = ProtocolResource(
         protocol_id=protocol_id,
         protocol_key=None,
+        protocol_kind=ProtocolKind.STANDARD,
         created_at=datetime(year=2022, month=2, day=2),
         source=ProtocolSource(
             directory=Path("/dev/null"),
@@ -155,6 +160,7 @@ async def test_create_protocol_run(
         labwareOffsets=[],
         status=pe_types.EngineStatus.IDLE,
         liquids=[],
+        hasEverEnteredErrorRecovery=False,
     )
     decoy.when(
         await mock_deck_configuration_store.get_deck_configuration()
@@ -241,7 +247,7 @@ async def test_create_run_conflict(
             run_time_param_values=None,
             notify_publishers=mock_notify_publishers,
         )
-    ).then_raise(EngineConflictError("oh no"))
+    ).then_raise(RunConflictError("oh no"))
 
     with pytest.raises(ApiError) as exc_info:
         await create_run(
@@ -276,6 +282,7 @@ async def test_get_run_data_from_url(
         labware=[],
         labwareOffsets=[],
         liquids=[],
+        hasEverEnteredErrorRecovery=False,
     )
 
     decoy.when(mock_run_data_manager.get("run-id")).then_return(expected_response)
@@ -322,6 +329,7 @@ async def test_get_run() -> None:
         labware=[],
         labwareOffsets=[],
         liquids=[],
+        hasEverEnteredErrorRecovery=False,
     )
 
     result = await get_run(run_data=run_data)
@@ -367,6 +375,7 @@ async def test_get_runs_not_empty(
         labware=[],
         labwareOffsets=[],
         liquids=[],
+        hasEverEnteredErrorRecovery=False,
     )
 
     response_2 = Run(
@@ -382,6 +391,7 @@ async def test_get_runs_not_empty(
         labware=[],
         labwareOffsets=[],
         liquids=[],
+        hasEverEnteredErrorRecovery=False,
     )
 
     decoy.when(mock_run_data_manager.get_all(20)).then_return([response_1, response_2])
@@ -432,7 +442,7 @@ async def test_delete_active_run(
 ) -> None:
     """It should 409 if the run is not finished."""
     decoy.when(await mock_run_data_manager.delete("run-id")).then_raise(
-        EngineConflictError("oh no")
+        RunConflictError("oh no")
     )
 
     with pytest.raises(ApiError) as exc_info:
@@ -460,6 +470,7 @@ async def test_update_run_to_not_current(
         labware=[],
         labwareOffsets=[],
         liquids=[],
+        hasEverEnteredErrorRecovery=False,
     )
 
     decoy.when(await mock_run_data_manager.update("run-id", current=False)).then_return(
@@ -494,6 +505,7 @@ async def test_update_current_none_noop(
         labware=[],
         labwareOffsets=[],
         liquids=[],
+        hasEverEnteredErrorRecovery=False,
     )
 
     decoy.when(await mock_run_data_manager.update("run-id", current=None)).then_return(
@@ -537,7 +549,7 @@ async def test_update_to_current_conflict(
     """It should 409 if attempting to un-current a run that is not idle."""
     decoy.when(
         await mock_run_data_manager.update(run_id="run-id", current=False)
-    ).then_raise(EngineConflictError("oh no"))
+    ).then_raise(RunConflictError("oh no"))
 
     with pytest.raises(ApiError) as exc_info:
         await update_run(
@@ -568,3 +580,41 @@ async def test_update_to_current_missing(
 
     assert exc_info.value.status_code == 404
     assert exc_info.value.content["errors"][0]["id"] == "RunNotFound"
+
+
+async def test_create_policies(
+    decoy: Decoy, mock_run_data_manager: RunDataManager
+) -> None:
+    """It should call RunDataManager create run policies."""
+    policies = decoy.mock(cls=ErrorRecoveryPolicy)
+    await put_error_recovery_policy(
+        runId="rud-id",
+        request_body=RequestModel(data=policies),
+        run_data_manager=mock_run_data_manager,
+    )
+    decoy.verify(
+        mock_run_data_manager.set_policies(
+            run_id="rud-id", policies=policies.policyRules
+        )
+    )
+
+
+async def test_create_policies_raises_not_active_run(
+    decoy: Decoy, mock_run_data_manager: RunDataManager
+) -> None:
+    """It should raise that the run is not current."""
+    policies = decoy.mock(cls=ErrorRecoveryPolicy)
+    decoy.when(
+        mock_run_data_manager.set_policies(
+            run_id="rud-id", policies=policies.policyRules
+        )
+    ).then_raise(RunNotCurrentError())
+    with pytest.raises(ApiError) as exc_info:
+        await put_error_recovery_policy(
+            runId="rud-id",
+            request_body=RequestModel(data=policies),
+            run_data_manager=mock_run_data_manager,
+        )
+
+    assert exc_info.value.status_code == 409
+    assert exc_info.value.content["errors"][0]["id"] == "RunStopped"

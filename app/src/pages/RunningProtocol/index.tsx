@@ -79,7 +79,9 @@ export type ScreenOption =
   | 'RunningProtocolCommandList'
 
 export function RunningProtocol(): JSX.Element {
-  const { runId } = useParams<OnDeviceRouteParams>()
+  const { runId } = useParams<
+    keyof OnDeviceRouteParams
+  >() as OnDeviceRouteParams
   const [currentOption, setCurrentOption] = React.useState<ScreenOption>(
     'CurrentRunningProtocolCommand'
   )
@@ -92,7 +94,7 @@ export function RunningProtocol(): JSX.Element {
     setInterventionModalCommandKey,
   ] = React.useState<string | null>(null)
   const lastAnimatedCommand = React.useRef<string | null>(null)
-  const swipe = useSwipe()
+  const { ref, style, swipeType, setSwipeType } = useSwipe()
   const robotSideAnalysis = useMostRecentCompletedAnalysis(runId)
   const lastRunCommand = useLastRunCommand(runId, {
     refetchInterval: LIVE_RUN_COMMANDS_POLL_MS,
@@ -114,6 +116,7 @@ export function RunningProtocol(): JSX.Element {
   const protocolName =
     protocolRecord?.data.metadata.protocolName ??
     protocolRecord?.data.files[0].name
+  const isQuickTransfer = protocolRecord?.data.protocolKind === 'quick-transfer'
   const { playRun, pauseRun } = useRunActionMutations(runId)
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot != null ? localRobot.name : 'no name'
@@ -125,20 +128,20 @@ export function RunningProtocol(): JSX.Element {
   React.useEffect(() => {
     if (
       currentOption === 'CurrentRunningProtocolCommand' &&
-      swipe.swipeType === 'swipe-left'
+      swipeType === 'swipe-left'
     ) {
       setCurrentOption('RunningProtocolCommandList')
-      swipe.setSwipeType('')
+      setSwipeType('')
     }
 
     if (
       currentOption === 'RunningProtocolCommandList' &&
-      swipe.swipeType === 'swipe-right'
+      swipeType === 'swipe-right'
     ) {
       setCurrentOption('CurrentRunningProtocolCommand')
-      swipe.setSwipeType('')
+      setSwipeType('')
     }
-  }, [currentOption, swipe, swipe.setSwipeType])
+  }, [currentOption, swipeType, setSwipeType])
 
   React.useEffect(() => {
     if (
@@ -160,16 +163,26 @@ export function RunningProtocol(): JSX.Element {
   return (
     <>
       {isERActive ? (
-        <ErrorRecoveryFlows runId={runId} failedCommand={failedCommand} />
+        <ErrorRecoveryFlows
+          runStatus={runStatus}
+          runId={runId}
+          failedCommand={failedCommand}
+          protocolAnalysis={robotSideAnalysis}
+        />
       ) : null}
       {runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR ? (
         <OpenDoorAlertModal />
       ) : null}
       {runStatus === RUN_STATUS_STOP_REQUESTED ? <CancelingRunModal /> : null}
+      {/* note: this zindex is here to establish a zindex context for the bullets
+          so they're relatively-above this flex but not anything else like error
+          recovery
+        */}
       <Flex
         flexDirection={DIRECTION_COLUMN}
         position={POSITION_RELATIVE}
         overflow={OVERFLOW_HIDDEN}
+        zIndex="0"
       >
         {robotSideAnalysis != null ? (
           <StepMeter
@@ -184,6 +197,7 @@ export function RunningProtocol(): JSX.Element {
         {showConfirmCancelRunModal ? (
           <ConfirmCancelRunModal
             runId={runId}
+            isQuickTransfer={isQuickTransfer}
             setShowConfirmCancelRunModal={setShowConfirmCancelRunModal}
             isActiveRun={true}
           />
@@ -202,13 +216,15 @@ export function RunningProtocol(): JSX.Element {
           />
         ) : null}
         <Flex
-          ref={swipe.ref}
+          ref={ref}
+          style={style}
           padding={`1.75rem ${SPACING.spacing40} ${SPACING.spacing40}`}
           flexDirection={DIRECTION_COLUMN}
         >
           {robotSideAnalysis != null ? (
             currentOption === 'CurrentRunningProtocolCommand' ? (
               <CurrentRunningProtocolCommand
+                runId={runId}
                 playRun={playRun}
                 pauseRun={pauseRun}
                 setShowConfirmCancelRunModal={setShowConfirmCancelRunModal}

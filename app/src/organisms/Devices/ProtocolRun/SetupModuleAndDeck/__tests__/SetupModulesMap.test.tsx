@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import { when } from 'vitest-when'
-import { StaticRouter } from 'react-router-dom'
+import { MemoryRouter } from 'react-router-dom'
 import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
 import { screen } from '@testing-library/react'
 
@@ -50,9 +50,9 @@ vi.mock('../../../hooks')
 
 const render = (props: React.ComponentProps<typeof SetupModulesMap>) => {
   return renderWithProviders(
-    <StaticRouter>
+    <MemoryRouter>
       <SetupModulesMap {...props} />
-    </StaticRouter>,
+    </MemoryRouter>,
     {
       i18nInstance: i18n,
     }

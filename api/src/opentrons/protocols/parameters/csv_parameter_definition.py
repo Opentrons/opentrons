@@ -1,11 +1,15 @@
 """CSV Parameter definition and associated classes/functions."""
 from typing import Optional, TextIO
 
-from opentrons.protocol_engine.types import RunTimeParameter, CSVParameter, FileId
+from opentrons.protocol_engine.types import (
+    RunTimeParameter,
+    CSVParameter as ProtocolEngineCSVParameter,
+    FileInfo,
+)
 
 from . import validation
 from .parameter_definition import AbstractParameterDefinition
-from .types import ParameterDefinitionError
+from .types import CSVParameter
 
 
 class CSVParameterDefinition(AbstractParameterDefinition[Optional[TextIO]]):
@@ -25,7 +29,7 @@ class CSVParameterDefinition(AbstractParameterDefinition[Optional[TextIO]]):
         self._variable_name = validation.ensure_variable_name(variable_name)
         self._description = validation.ensure_description(description)
         self._value: Optional[TextIO] = None
-        self._id: Optional[str] = None
+        self._file_info: Optional[FileInfo] = None
 
     @property
     def variable_name(self) -> str:
@@ -39,27 +43,26 @@ class CSVParameterDefinition(AbstractParameterDefinition[Optional[TextIO]]):
 
     @value.setter
     def value(self, new_file: TextIO) -> None:
-        if not new_file.name.endswith(".csv"):
-            raise ParameterDefinitionError(
-                f"CSV parameter {self._variable_name} was given non csv file {new_file.name}"
-            )
         self._value = new_file
 
     @property
-    def id(self) -> Optional[str]:
-        return self._id
+    def file_info(self) -> Optional[FileInfo]:
+        return self._file_info
 
-    @id.setter
-    def id(self, uuid: str) -> None:
-        self._id = uuid
+    @file_info.setter
+    def file_info(self, file_info: FileInfo) -> None:
+        self._file_info = file_info
+
+    def as_csv_parameter_interface(self) -> CSVParameter:
+        return CSVParameter(csv_file=self._value)
 
     def as_protocol_engine_type(self) -> RunTimeParameter:
         """Returns CSV parameter as a Protocol Engine type to send to client."""
-        return CSVParameter(
+        return ProtocolEngineCSVParameter(
             displayName=self._display_name,
             variableName=self._variable_name,
             description=self._description,
-            file=FileId(id=self._id) if self._id is not None else None,
+            file=self._file_info,
         )
 
 

@@ -7,9 +7,9 @@ from unittest.mock import sentinel
 import pytest
 from decoy import Decoy
 
-from opentrons_shared_data.robot.dev_types import RobotType
-from opentrons.protocol_engine.actions.actions import ResumeFromRecoveryAction
+from opentrons_shared_data.robot.types import RobotType
 
+from opentrons.protocol_engine.actions.actions import SetErrorRecoveryPolicyAction
 from opentrons.types import DeckSlotName
 from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
 from opentrons.hardware_control.modules import MagDeck, TempDeck
@@ -53,6 +53,7 @@ from opentrons.protocol_engine.actions import (
     PlayAction,
     PauseAction,
     PauseSource,
+    ResumeFromRecoveryAction,
     StopAction,
     FinishAction,
     FinishErrorDetails,
@@ -545,23 +546,15 @@ def test_play(
     )
     decoy.when(
         state_store.commands.validate_action_allowed(
-            PlayAction(
-                requested_at=datetime(year=2021, month=1, day=1), deck_configuration=[]
-            )
+            PlayAction(requested_at=datetime(year=2021, month=1, day=1))
         ),
-    ).then_return(
-        PlayAction(
-            requested_at=datetime(year=2022, month=2, day=2), deck_configuration=[]
-        )
-    )
+    ).then_return(PlayAction(requested_at=datetime(year=2022, month=2, day=2)))
 
-    subject.play(deck_configuration=[])
+    subject.play()
 
     decoy.verify(
         action_dispatcher.dispatch(
-            PlayAction(
-                requested_at=datetime(year=2022, month=2, day=2), deck_configuration=[]
-            )
+            PlayAction(requested_at=datetime(year=2022, month=2, day=2))
         ),
         hardware_api.resume(HardwarePauseType.PAUSE),
     )
@@ -581,25 +574,17 @@ def test_play_blocked_by_door(
     )
     decoy.when(
         state_store.commands.validate_action_allowed(
-            PlayAction(
-                requested_at=datetime(year=2021, month=1, day=1), deck_configuration=[]
-            )
+            PlayAction(requested_at=datetime(year=2021, month=1, day=1))
         ),
-    ).then_return(
-        PlayAction(
-            requested_at=datetime(year=2022, month=2, day=2), deck_configuration=[]
-        )
-    )
+    ).then_return(PlayAction(requested_at=datetime(year=2022, month=2, day=2)))
     decoy.when(state_store.commands.get_is_door_blocking()).then_return(True)
 
-    subject.play(deck_configuration=[])
+    subject.play()
 
     decoy.verify(hardware_api.resume(HardwarePauseType.PAUSE), times=0)
     decoy.verify(
         action_dispatcher.dispatch(
-            PlayAction(
-                requested_at=datetime(year=2022, month=2, day=2), deck_configuration=[]
-            )
+            PlayAction(requested_at=datetime(year=2022, month=2, day=2))
         ),
         hardware_api.pause(HardwarePauseType.PAUSE),
     )
@@ -863,7 +848,7 @@ async def test_finish_stops_hardware_if_queue_worker_join_fails(
 
     decoy.verify(
         action_dispatcher.dispatch(FinishAction()),
-        # await queue_worker.join() should be called, and should raise, here.
+        # await _get_queue_worker.join() should be called, and should raise, here.
         # We can't verify that step in the sequence here because of a Decoy limitation.
         await hardware_stopper.do_halt(disengage_before_stopping=True),
         door_watcher.stop(),
@@ -1204,4 +1189,14 @@ def test_reset_tips(
     decoy.verify(
         action_dispatcher.dispatch(ResetTipsAction(labware_id="cool-labware")),
         times=1,
+    )
+
+
+async def test_set_error_recovery_policy(
+    decoy: Decoy, action_dispatcher: ActionDispatcher, subject: ProtocolEngine
+) -> None:
+    """It should set the error recovery policy by dispatching an action."""
+    subject.set_error_recovery_policy(sentinel.new_policy)
+    decoy.verify(
+        action_dispatcher.dispatch(SetErrorRecoveryPolicyAction(sentinel.new_policy))
     )

@@ -10,8 +10,10 @@ import {
   JUSTIFY_FLEX_END,
 } from '@opentrons/components'
 import { SmallButton } from '../../atoms/buttons'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+import {
+  SimpleWizardBody,
+  SimpleWizardInProgressBody,
+} from '../../molecules/SimpleWizardBody'
 import { FLOWS } from './constants'
 import type { PipetteWizardFlow } from './types'
 
@@ -38,7 +40,8 @@ export function ExitModal(props: ExitModalProps): JSX.Element {
       break
     }
   }
-  if (isRobotMoving) return <InProgressModal description={t('stand_back')} />
+  if (Boolean(isRobotMoving))
+    return <SimpleWizardInProgressBody description={t('stand_back')} />
 
   return (
     <SimpleWizardBody
@@ -53,7 +56,7 @@ export function ExitModal(props: ExitModalProps): JSX.Element {
           <SmallButton
             marginRight={SPACING.spacing8}
             onClick={proceed}
-            buttonText={capitalize(t('shared:exit'))}
+            buttonText={capitalize(t('shared:exit') as string)}
             buttonType="alert"
           />
 

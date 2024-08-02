@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { css } from 'styled-components'
 
 import {
@@ -14,7 +14,7 @@ import {
   Flex,
   Icon,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
@@ -73,7 +73,7 @@ export function DisplayWifiList({
   isHeader = false,
 }: DisplayWifiListProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const history = useHistory()
+  const navigate = useNavigate()
 
   return (
     <>
@@ -81,7 +81,7 @@ export function DisplayWifiList({
         <RobotSetupHeader
           header={t('select_a_network')}
           onClickBack={() => {
-            history.push('/network-setup')
+            navigate('/network-setup')
           }}
         />
       ) : null}
@@ -102,7 +102,7 @@ export function DisplayWifiList({
                 }}
               >
                 <Icon name="wifi" size="2.5rem" />
-                <StyledText as="h4">{nw.ssid}</StyledText>
+                <LegacyStyledText as="h4">{nw.ssid}</LegacyStyledText>
               </Btn>
             ))
           : null}
@@ -120,7 +120,7 @@ export function DisplayWifiList({
           gridGap={SPACING.spacing4}
         >
           <Icon name="plus" size="2.5rem" color={COLORS.black90} />
-          <StyledText as="h4">{t('join_other_network')}</StyledText>
+          <LegacyStyledText as="h4">{t('join_other_network')}</LegacyStyledText>
         </Btn>
         {list != null && list.length > 0 ? null : <DisplaySearchNetwork />}
       </Flex>

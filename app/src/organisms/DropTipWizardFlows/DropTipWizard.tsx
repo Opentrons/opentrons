@@ -2,15 +2,19 @@ import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { Trans, useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+import { css } from 'styled-components'
 
 import {
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
+  RESPONSIVENESS,
   Flex,
   JUSTIFY_FLEX_END,
+  JUSTIFY_SPACE_BETWEEN,
   POSITION_ABSOLUTE,
-  StyledText,
+  SPACING,
+  LegacyStyledText,
   useConditionalConfirm,
 } from '@opentrons/components'
 
@@ -50,7 +54,6 @@ export type DropTipWizardProps = DropTipWizardFlowsProps &
 export function DropTipWizard(props: DropTipWizardProps): JSX.Element {
   const {
     issuedCommandsType,
-    fixitCommandTypeUtils,
     activeMaintenanceRunId,
     proceed,
     goBack,
@@ -86,11 +89,7 @@ export function DropTipWizard(props: DropTipWizardProps): JSX.Element {
   // Either proceed to drop tip if blowout or execute the close flow routine, accounting for the commands type.
   const proceedWithConditionalClose = (): Promise<void> => {
     if (isFinalWizardStep) {
-      if (fixitCommandTypeUtils != null) {
-        return fixitCommandTypeUtils.onCloseFlow()
-      } else {
-        return dropTipCommands.handleCleanUpAndClose()
-      }
+      return dropTipCommands.handleCleanUpAndClose()
     } else {
       return proceed()
     }
@@ -112,6 +111,8 @@ export function DropTipWizard(props: DropTipWizardProps): JSX.Element {
   )
 }
 
+// TODO(jh, 06-07-24): All content views could use refactoring and DQA. Create shared components from designs.
+// Convince design not to use SimpleWizardBody. EXEC-520.
 export function DropTipWizardContainer(
   props: DropTipWizardContainerProps
 ): JSX.Element {
@@ -137,6 +138,20 @@ export function DropTipWizardFixitType(
 export function DropTipWizardSetupType(
   props: DropTipWizardContainerProps
 ): JSX.Element {
+  const {
+    activeMaintenanceRunId,
+    isCommandInProgress,
+    isExiting,
+    showConfirmExit,
+    errorDetails,
+  } = props
+
+  // TODO(jh: 06-10-24): This is not ideal. See EXEC-520.
+  const inMotion =
+    isCommandInProgress || isExiting || activeMaintenanceRunId == null
+  const simpleWizardPaddingOverrides =
+    inMotion || showConfirmExit || errorDetails
+
   return createPortal(
     props.isOnDevice ? (
       <Flex
@@ -152,7 +167,15 @@ export function DropTipWizardSetupType(
         backgroundColor={COLORS.white}
       >
         <DropTipWizardHeader {...props} />
-        <DropTipWizardContent {...props} />
+        <Flex
+          padding={simpleWizardPaddingOverrides ? 0 : SPACING.spacing32}
+          flexDirection={DIRECTION_COLUMN}
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          height="100%"
+          flex="1"
+        >
+          <DropTipWizardContent {...props} />
+        </Flex>
       </Flex>
     ) : (
       <LegacyModalShell
@@ -177,6 +200,7 @@ export const DropTipWizardContent = (
     errorDetails,
     isCommandInProgress,
     fixitCommandTypeUtils,
+    issuedCommandsType,
     isExiting,
     proceed,
     proceedToRoute,
@@ -197,12 +221,18 @@ export const DropTipWizardContent = (
   }
 
   function buildRobotInMotion(): JSX.Element {
-    return <InProgressModal description={t('stand_back_robot_in_motion')} />
+    return (
+      <>
+        {issuedCommandsType === 'fixit' ? <Flex /> : null}
+        <InProgressModal description={t('stand_back_robot_in_motion')} />
+      </>
+    )
   }
 
   function buildShowExitConfirmation(): JSX.Element {
     return (
       <ExitConfirmation
+        {...props}
         handleGoBack={cancelExit}
         handleExit={() => {
           toggleExitInitiated()
@@ -222,6 +252,7 @@ export const DropTipWizardContent = (
         header={errorDetails?.header ?? t('error_dropping_tips')}
         subHeader={subHeader}
         justifyContentForOddButton={JUSTIFY_FLEX_END}
+        css={ERROR_MODAL_FIXIT_STYLE}
       >
         {button}
       </SimpleWizardBody>
@@ -260,7 +291,7 @@ export const DropTipWizardContent = (
           <Trans
             t={t}
             i18nKey={bodyTextKey}
-            components={{ block: <StyledText as="p" /> }}
+            components={{ block: <LegacyStyledText as="p" /> }}
           />
         }
         moveToAddressableArea={moveToAddressableArea}
@@ -287,20 +318,22 @@ export const DropTipWizardContent = (
   }
 
   function buildSuccess(): JSX.Element {
+    const { tipDropComplete } = fixitCommandTypeUtils?.buttonOverrides ?? {}
+
     // Route to the drop tip route if user is at the blowout success screen, otherwise proceed conditionally.
     const handleProceed = (): void => {
       if (currentStep === BLOWOUT_SUCCESS) {
         void proceedToRoute(DT_ROUTES.DROP_TIP)
+      } else if (tipDropComplete != null) {
+        tipDropComplete()
       } else {
         proceedWithConditionalClose()
       }
     }
 
     const buildProceedText = (): string => {
-      if (fixitCommandTypeUtils != null) {
-        const btnText = fixitCommandTypeUtils.copyOverrides.tipDropCompleteBtn
-
-        return t(`drop_tip_wizard::${btnText}`)
+      if (fixitCommandTypeUtils != null && currentStep === DROP_TIP_SUCCESS) {
+        return fixitCommandTypeUtils.copyOverrides.tipDropCompleteBtnCopy
       } else {
         return currentStep === BLOWOUT_SUCCESS
           ? i18n.format(t('shared:continue'), 'capitalize')
@@ -323,7 +356,13 @@ export const DropTipWizardContent = (
   }
 
   function buildModalContent(): JSX.Element {
-    if (activeMaintenanceRunId == null) {
+    // Don't render the spinner screen for 1 render cycle on fixit commands.
+    if (currentStep === BEFORE_BEGINNING && issuedCommandsType === 'fixit') {
+      return buildBeforeBeginning()
+    } else if (
+      activeMaintenanceRunId == null &&
+      issuedCommandsType === 'setup'
+    ) {
       return buildGettingReady()
     } else if (isCommandInProgress || isExiting) {
       return buildRobotInMotion()
@@ -370,3 +409,9 @@ function useInitiateExit(): {
 
   return { isExitInitiated, toggleExitInitiated }
 }
+
+const ERROR_MODAL_FIXIT_STYLE = css`
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    margin-top: -${SPACING.spacing68}; // See EXEC-520. This clearly isn't ideal.
+  }
+`

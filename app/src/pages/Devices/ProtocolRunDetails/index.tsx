@@ -2,7 +2,7 @@ import * as React from 'react'
 import isEmpty from 'lodash/isEmpty'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
-import { NavLink, Redirect, useParams } from 'react-router-dom'
+import { NavLink, Navigate, useParams } from 'react-router-dom'
 import styled, { css } from 'styled-components'
 
 import {
@@ -15,7 +15,7 @@ import {
   POSITION_RELATIVE,
   SIZE_6,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
@@ -33,7 +33,7 @@ import { RunPreview } from '../../../organisms/RunPreview'
 import { ProtocolRunSetup } from '../../../organisms/Devices/ProtocolRun/ProtocolRunSetup'
 import { ProtocolRunModuleControls } from '../../../organisms/Devices/ProtocolRun/ProtocolRunModuleControls'
 import { ProtocolRunRuntimeParameters } from '../../../organisms/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
-import { useCurrentRunId } from '../../../organisms/ProtocolUpload/hooks'
+import { useCurrentRunId } from '../../../resources/runs'
 import { OPENTRONS_USB } from '../../../redux/discovery'
 import { fetchProtocols } from '../../../redux/protocol-storage'
 import { appShellRequestor } from '../../../redux/shell/remote'
@@ -110,9 +110,9 @@ function RoundTab({
   const [targetProps, tooltipProps] = useHoverTooltip()
   return disabled ? (
     <>
-      <StyledText css={disabledRoundTabStyling} {...targetProps}>
+      <LegacyStyledText css={disabledRoundTabStyling} {...targetProps}>
         {tabName}
-      </StyledText>
+      </LegacyStyledText>
       {tabDisabledReason != null ? (
         <Tooltip tooltipProps={tooltipProps}>{tabDisabledReason}</Tooltip>
       ) : null}
@@ -125,11 +125,9 @@ function RoundTab({
 }
 
 export function ProtocolRunDetails(): JSX.Element | null {
-  const {
-    robotName,
-    runId,
-    protocolRunDetailsTab,
-  } = useParams<DesktopRouteParams>()
+  const { robotName, runId, protocolRunDetailsTab } = useParams<
+    keyof DesktopRouteParams
+  >() as DesktopRouteParams
   const dispatch = useDispatch<Dispatch>()
 
   const robot = useRobot(robotName)
@@ -224,7 +222,8 @@ function PageContents(props: PageContentsProps): JSX.Element {
     protocolRunDetailsTab
   ] ?? (
     // default to the setup tab if no tab or nonexistent tab is passed as a param
-    <Redirect to={`/devices/${robotName}/protocol-runs/${runId}/setup`} />
+
+    <Navigate to={`/devices/${robotName}/protocol-runs/${runId}/setup`} />
   )
 
   return (
@@ -277,7 +276,7 @@ const SetupTab = (props: SetupTabProps): JSX.Element | null => {
       />
       {currentRunId !== runId ? (
         // redirect to run preview if not current run
-        <Redirect
+        <Navigate
           to={`/devices/${robotName}/protocol-runs/${runId}/run-preview`}
         />
       ) : null}
@@ -305,7 +304,7 @@ const ParametersTab = (props: ParametersTabProps): JSX.Element | null => {
         tabName={t('parameters')}
       />
       {disabled ? (
-        <Redirect
+        <Navigate
           to={`/devices/${robotName}/protocol-runs/${runId}/run-preview`}
         />
       ) : null}
@@ -346,7 +345,8 @@ const ModuleControlsTab = (
       />
       {disabled ? (
         // redirect to run preview if not current run
-        <Redirect
+
+        <Navigate
           to={`/devices/${robotName}/protocol-runs/${runId}/run-preview`}
         />
       ) : null}

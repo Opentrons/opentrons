@@ -10,7 +10,7 @@ import {
   PrimaryButton,
   SecondaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TOOLTIP_LEFT,
   TYPOGRAPHY,
   useHoverTooltip,
@@ -107,9 +107,9 @@ export function SetupLabwarePositionCheck(
           justifyContent={JUSTIFY_CENTER}
           borderRadius={BORDERS.borderRadius8}
         >
-          <StyledText as="p">
+          <LegacyStyledText as="p">
             {i18n.format(t('no_labware_offset_data'), 'capitalize')}
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
       )}
       <Flex justifyContent={JUSTIFY_CENTER} gridGap={SPACING.spacing8}>

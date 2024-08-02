@@ -20,6 +20,7 @@ describe('SmallButton', () => {
       buttonText: 'small button',
     }
   })
+
   it('renders the primary button and it works as expected', () => {
     render(props)
     fireEvent.click(screen.getByText('small button'))
@@ -41,6 +42,7 @@ describe('SmallButton', () => {
       `background-color: ${COLORS.red50}`
     )
   })
+
   it('renders the secondary button', () => {
     props = {
       ...props,
@@ -51,6 +53,7 @@ describe('SmallButton', () => {
       `background-color: ${COLORS.blue35}`
     )
   })
+
   it('renders the tertiary high light button', () => {
     props = {
       ...props,
@@ -59,6 +62,7 @@ describe('SmallButton', () => {
     render(props)
     expect(screen.getByRole('button')).toHaveStyle(`color: ${COLORS.black90}`)
   })
+
   it('renders the tertiary low light', () => {
     props = {
       ...props,
@@ -67,6 +71,7 @@ describe('SmallButton', () => {
     render(props)
     expect(screen.getByRole('button')).toHaveStyle(`color: ${COLORS.grey60}`)
   })
+
   it('renders the button as disabled', () => {
     props = {
       ...props,
@@ -75,6 +80,7 @@ describe('SmallButton', () => {
     render(props)
     expect(screen.getByRole('button')).toBeDisabled()
   })
+
   it('renders the rounded button category', () => {
     props = {
       ...props,
@@ -85,6 +91,7 @@ describe('SmallButton', () => {
       `border-radius: ${BORDERS.borderRadius40}`
     )
   })
+
   it('renders an icon with start placement', () => {
     props = {
       ...props,
@@ -102,5 +109,32 @@ describe('SmallButton', () => {
     }
     render(props)
     screen.getByLabelText('alert')
+  })
+
+  it('should render disabled style when ariaDisabled is true', () => {
+    props = {
+      ...props,
+      ariaDisabled: true,
+    }
+    render(props)
+    expect(screen.getByRole('button')).toHaveStyle(
+      `background-color: ${COLORS.grey35}`
+    )
+    expect(screen.getByRole('button')).toHaveStyle(`color: ${COLORS.grey50}`)
+  })
+
+  it('should not render disabled style when ariaDisabled is false and disabled is false', () => {
+    props = {
+      ...props,
+      disabled: false,
+      ariaDisabled: false,
+    }
+    render(props)
+    expect(screen.getByRole('button')).not.toHaveStyle(
+      `background-color: ${COLORS.grey35}`
+    )
+    expect(screen.getByRole('button')).not.toHaveStyle(
+      `color: ${COLORS.grey50}`
+    )
   })
 })

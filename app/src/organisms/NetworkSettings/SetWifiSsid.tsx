@@ -8,7 +8,7 @@ import {
   POSITION_FIXED,
   SPACING,
   TYPOGRAPHY,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 import { InputField } from '../../atoms/InputField'
@@ -38,13 +38,13 @@ export function SetWifiSsid({
         gridGap={SPACING.spacing8}
         marginTop={isUnboxingFlowOngoing ? undefined : '7.75rem'}
       >
-        <StyledText
+        <LegacyStyledText
           as="p"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
           color={errorMessage != null ? COLORS.red50 : COLORS.black90}
         >
           {t('enter_network_name')}
-        </StyledText>
+        </LegacyStyledText>
         <InputField
           aria-label="wifi_ssid"
           value={inputSsid}

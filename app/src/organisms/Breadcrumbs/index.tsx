@@ -71,8 +71,9 @@ const CrumbLinkInactive = styled(Flex)`
 function BreadcrumbsComponent(): JSX.Element | null {
   const { t } = useTranslation('top_navigation')
   const isOnDevice = useSelector(getIsOnDevice)
-  const { protocolKey, robotName, runId } = useParams<DesktopRouteParams>()
-
+  const { protocolKey, robotName, runId } = useParams<
+    keyof DesktopRouteParams
+  >() as DesktopRouteParams
   const runCreatedAtTimestamp = useRunCreatedAtTimestamp(runId)
 
   const storedProtocol = useSelector((state: State) =>
@@ -148,7 +149,9 @@ function BreadcrumbsComponent(): JSX.Element | null {
 }
 
 export function Breadcrumbs(): JSX.Element | null {
-  const { robotName } = useParams<DesktopRouteParams>()
+  const { robotName } = useParams<
+    keyof DesktopRouteParams
+  >() as DesktopRouteParams
   const robot = useRobot(robotName)
 
   return (

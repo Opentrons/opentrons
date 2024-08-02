@@ -8,6 +8,7 @@ describe('getInitialSummaryState', () => {
   const props = {
     state: {
       pipette: {
+        channels: 1,
         liquids: {
           default: {
             supportedTips: {
@@ -82,7 +83,7 @@ describe('getInitialSummaryState', () => {
       transferType: 'consolidate',
       aspirateFlowRate: 50,
       dispenseFlowRate: 75,
-      path: 'multiDispense',
+      path: 'multiAspirate',
       tipPositionAspirate: 1,
       preWetTip: false,
       tipPositionDispense: 1,
@@ -132,7 +133,7 @@ describe('getInitialSummaryState', () => {
       transferType: 'distribute',
       aspirateFlowRate: 50,
       dispenseFlowRate: 75,
-      path: 'multiAspirate',
+      path: 'multiDispense',
       tipPositionAspirate: 1,
       preWetTip: false,
       tipPositionDispense: 1,
@@ -141,6 +142,8 @@ describe('getInitialSummaryState', () => {
         cutoutId: 'cutoutA3',
         cutoutFixtureId: 'trashBinAdapter',
       },
+      disposalVolume: props.state.volume,
+      blowOut: { cutoutId: 'cutoutA3', cutoutFixtureId: 'trashBinAdapter' },
     })
   })
   it('generates the summary state with correct default value for 1 to n transfer with too high of volume for multiDispense', () => {

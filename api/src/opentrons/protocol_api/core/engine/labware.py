@@ -1,13 +1,14 @@
 """ProtocolEngine-based Labware core implementations."""
 from typing import List, Optional, cast
 
-from opentrons_shared_data.labware.dev_types import (
+from opentrons_shared_data.labware.types import (
     LabwareParameters as LabwareParametersDict,
     LabwareDefinition as LabwareDefinitionDict,
 )
 
 from opentrons_shared_data.labware.labware_definition import LabwareRole
 
+from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.errors import LabwareNotOnDeckError, ModuleNotOnDeckError
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocol_engine.types import (
@@ -117,8 +118,10 @@ class LabwareCore(AbstractLabware[WellCore]):
             vector=LabwareOffsetVector(x=delta.x, y=delta.y, z=delta.z),
         )
         self._engine_client.add_labware_offset(request)
-        self._engine_client.reload_labware(
-            labware_id=self._labware_id,
+        self._engine_client.execute_command(
+            cmd.ReloadLabwareParams(
+                labwareId=self._labware_id,
+            )
         )
 
     def get_calibrated_offset(self) -> Point:

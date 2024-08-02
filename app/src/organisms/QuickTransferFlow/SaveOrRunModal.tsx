@@ -3,23 +3,27 @@ import { useTranslation } from 'react-i18next'
 import {
   SPACING,
   COLORS,
-  StyledText,
+  LegacyStyledText,
   Flex,
   DIRECTION_COLUMN,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { Modal } from '../../molecules/Modal'
 import { SmallButton } from '../../atoms/buttons'
+import { NameQuickTransfer } from './NameQuickTransfer'
 
 interface SaveOrRunModalProps {
-  onSave: () => void
+  onSave: (protocolName: string) => void
   onRun: () => void
 }
 
 export const SaveOrRunModal = (props: SaveOrRunModalProps): JSX.Element => {
   const { t } = useTranslation('quick_transfer')
+  const [showNameTransfer, setShowNameTransfer] = React.useState(false)
 
-  return (
+  return showNameTransfer ? (
+    <NameQuickTransfer onSave={props.onSave} />
+  ) : (
     <Modal
       header={{
         title: t('run_quick_transfer_now'),
@@ -32,17 +36,19 @@ export const SaveOrRunModal = (props: SaveOrRunModalProps): JSX.Element => {
         gridGap={SPACING.spacing10}
         width="100%"
       >
-        <StyledText
+        <LegacyStyledText
           css={TYPOGRAPHY.bodyTextRegular}
           paddingBottom={SPACING.spacing24}
         >
           {t('save_to_run_later')}
-        </StyledText>
+        </LegacyStyledText>
         <Flex gridGap={SPACING.spacing8}>
           <SmallButton
             width="50%"
             buttonText={t('save_for_later')}
-            onClick={props.onSave}
+            onClick={() => {
+              setShowNameTransfer(true)
+            }}
             buttonType="secondary"
           />
           <SmallButton

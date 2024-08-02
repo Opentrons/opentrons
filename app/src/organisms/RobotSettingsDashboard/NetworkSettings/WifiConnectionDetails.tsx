@@ -14,7 +14,7 @@ import {
   Icon,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -76,13 +76,13 @@ export function WifiConnectionDetails({
             gridGap={SPACING.spacing8}
             padding={`0 ${SPACING.spacing40} ${SPACING.spacing40}`}
           >
-            <StyledText
+            <LegacyStyledText
               as="p"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               color={COLORS.grey60}
             >
               {t('connected_network')}
-            </StyledText>
+            </LegacyStyledText>
             <Btn
               display={DISPLAY_FLEX}
               width="100%"
@@ -111,9 +111,12 @@ export function WifiConnectionDetails({
                       flexDirection={DIRECTION_COLUMN}
                       gridGap={SPACING.spacing2}
                     >
-                      <StyledText as="h4" textAlign={TYPOGRAPHY.textAlignLeft}>
+                      <LegacyStyledText
+                        as="h4"
+                        textAlign={TYPOGRAPHY.textAlignLeft}
+                      >
                         {activeSsid}
-                      </StyledText>
+                      </LegacyStyledText>
                     </Flex>
                   </Flex>
                 </Flex>
@@ -128,16 +131,19 @@ export function WifiConnectionDetails({
                     aria-label={`${activeSsid}_info_icon`}
                     color={COLORS.black90}
                   />
-                  <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+                  <LegacyStyledText
+                    as="p"
+                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                  >
                     {t('view_details')}
-                  </StyledText>
+                  </LegacyStyledText>
                 </Flex>
               </Flex>
             </Btn>
           </Flex>
         ) : null}
         {activeSsid != null ? (
-          <StyledText
+          <LegacyStyledText
             as="p"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             color={COLORS.grey60}
@@ -145,7 +151,7 @@ export function WifiConnectionDetails({
             marginBottom={SPACING.spacing8}
           >
             {t('other_networks')}
-          </StyledText>
+          </LegacyStyledText>
         ) : null}
         <DisplayWifiList
           list={list}

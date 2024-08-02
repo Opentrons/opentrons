@@ -7,7 +7,7 @@ from decoy import Decoy
 
 from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.deck import load as load_deck
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
+from opentrons_shared_data.deck.types import DeckDefinitionV5
 from opentrons_shared_data.labware import load_definition
 from opentrons_shared_data.pipette import pipette_definition
 from opentrons.protocols.models import LabwareDefinition
@@ -209,6 +209,13 @@ def heater_shaker_v1_def() -> ModuleDefinition:
 def mag_block_v1_def() -> ModuleDefinition:
     """Get the definition of a V1 Mag Block."""
     definition = load_shared_data("module/definitions/3/magneticBlockV1.json")
+    return ModuleDefinition.parse_raw(definition)
+
+
+@pytest.fixture(scope="session")
+def abs_reader_v1_def() -> ModuleDefinition:
+    """Get the definition of a V1 absorbance plate reader."""
+    definition = load_shared_data("module/definitions/3/absorbanceReaderV1.json")
     return ModuleDefinition.parse_raw(definition)
 
 

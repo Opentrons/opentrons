@@ -9,7 +9,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
 } from '../../styles'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
-import { StyledText } from '../StyledText'
+import { LegacyStyledText } from '../StyledText'
 
 export interface CheckboxProps {
   /** checkbox is checked if value is true */
@@ -61,9 +61,9 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
         }
       `}
     >
-      <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+      <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {labelText}
-      </StyledText>
+      </LegacyStyledText>
       <Check isChecked={isChecked} />
     </Flex>
   )

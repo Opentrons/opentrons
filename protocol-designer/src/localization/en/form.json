@@ -30,7 +30,8 @@
     "section": {
       "sterility": "sterility",
       "sterility&motion": "sterility & motion",
-      "dropTip": "drop tip"
+      "dropTip": "drop tip",
+      "pickUpAndDrop": "pick up & drop tip"
     },
     "labwareLabel": {
       "aspirate": "source",
@@ -60,7 +61,9 @@
       "airGap": { "label": "air gap" },
       "blowout": { "label": "blowout" },
       "location": {
-        "label": "location"
+        "label": "location",
+        "pickUp": "pick up tip",
+        "dropTip": "drop tip"
       },
       "change_tip": {
         "label": "change tip",
@@ -104,6 +107,7 @@
       "step_name": { "label": "Step Name" },
       "step_notes": { "label": "Step Notes" },
       "mix": { "label": "mix" },
+      "comment": { "label": "comment" },
       "pauseAction": {
         "options": {
           "untilResume": "Pause until told to resume",

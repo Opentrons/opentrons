@@ -44,15 +44,17 @@ import type {
 } from '@opentrons/shared-data'
 import type { TrashCutoutId } from '../Deck/FlexTrash'
 import type { StagingAreaLocation } from './StagingAreaFixture'
-import type { WellFill } from '../Labware'
+import type { WellFill, WellGroup } from '../Labware'
 
 export interface LabwareOnDeck {
   labwareLocation: LabwareLocation
   definition: LabwareDefinition2
   wellFill?: WellFill
+  missingTips?: WellGroup
   /** generic prop to render self-positioned children for each labware */
   labwareChildren?: React.ReactNode
   onLabwareClick?: () => void
+  highlight?: boolean
 }
 
 export interface ModuleOnDeck {
@@ -64,6 +66,7 @@ export interface ModuleOnDeck {
   /** generic prop to render self-positioned children for each module */
   moduleChildren?: React.ReactNode
   onLabwareClick?: () => void
+  highlightLabware?: boolean
 }
 interface BaseDeckProps {
   deckConfig: DeckConfiguration
@@ -239,6 +242,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
             innerProps,
             moduleChildren,
             onLabwareClick,
+            highlightLabware,
           }) => {
             const slotPosition = getPositionFromSlotId(
               moduleLocation.slotName,
@@ -265,6 +269,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                       inferModuleOrientationFromXCoordinate(slotPosition[0]) ===
                         'left' && moduleModel === HEATERSHAKER_MODULE_V1
                     }
+                    highlight={highlightLabware}
                   />
                 ) : null}
                 {moduleChildren}
@@ -278,7 +283,9 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
             definition,
             labwareChildren,
             wellFill,
+            missingTips,
             onLabwareClick,
+            highlight,
           }) => {
             if (
               labwareLocation === 'offDeck' ||
@@ -305,6 +312,8 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                   definition={definition}
                   onLabwareClick={onLabwareClick}
                   wellFill={wellFill ?? undefined}
+                  missingTips={missingTips}
+                  highlight={highlight}
                 />
                 {labwareChildren}
               </g>

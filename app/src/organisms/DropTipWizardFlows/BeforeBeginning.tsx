@@ -18,27 +18,24 @@ import {
   PrimaryButton,
   RESPONSIVENESS,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { SmallButton, MediumButton } from '../../atoms/buttons'
+import { SmallButton, MediumButton, TextOnlyButton } from '../../atoms/buttons'
 import { DT_ROUTES } from './constants'
 
 import blowoutVideo from '../../assets/videos/droptip-wizard/Blowout-Liquid.webm'
 import droptipVideo from '../../assets/videos/droptip-wizard/Drop-tip.webm'
 
-import type { UseDropTipRoutingResult } from './hooks'
+import type { DropTipWizardContainerProps } from './types'
 
-interface BeforeBeginningProps {
-  isOnDevice: boolean
-  proceedToRoute: UseDropTipRoutingResult['proceedToRoute']
-}
-
-export const BeforeBeginning = (
-  props: BeforeBeginningProps
-): JSX.Element | null => {
-  const { proceedToRoute, isOnDevice } = props
+export const BeforeBeginning = ({
+  proceedToRoute,
+  isOnDevice,
+  issuedCommandsType,
+  fixitCommandTypeUtils,
+}: DropTipWizardContainerProps): JSX.Element | null => {
   const { i18n, t } = useTranslation(['drop_tip_wizard', 'shared'])
   const [flowType, setFlowType] = React.useState<
     'blowout' | 'drop_tips' | null
@@ -52,47 +49,50 @@ export const BeforeBeginning = (
     }
   }
 
+  const buildTopText = (): string => {
+    if (issuedCommandsType === 'fixit') {
+      return fixitCommandTypeUtils?.copyOverrides
+        .beforeBeginningTopText as string
+    } else {
+      return t('before_you_begin_do_you_want_to_blowout')
+    }
+  }
+
   if (isOnDevice) {
     return (
       <Flex
-        padding={SPACING.spacing32}
         flexDirection={DIRECTION_COLUMN}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
         height="100%"
+        padding={issuedCommandsType === 'fixit' ? SPACING.spacing32 : null}
       >
-        <Flex flexDirection={DIRECTION_COLUMN}>
-          <Flex css={ODD_TITLE_STYLE}>
-            {t('before_you_begin_do_you_want_to_blowout')}
-          </Flex>
-          <Flex paddingBottom={SPACING.spacing8}>
-            <MediumButton
-              buttonType={flowType === 'blowout' ? 'primary' : 'secondary'}
-              flex="1"
-              onClick={() => {
-                setFlowType('blowout')
-              }}
-              buttonText={i18n.format(t('yes_blow_out_liquid'), 'capitalize')}
-              justifyContent={JUSTIFY_FLEX_START}
-              paddingLeft={SPACING.spacing24}
-            />
-          </Flex>
-          <Flex>
-            <MediumButton
-              buttonType={flowType === 'drop_tips' ? 'primary' : 'secondary'}
-              flex="1"
-              onClick={() => {
-                setFlowType('drop_tips')
-              }}
-              buttonText={i18n.format(
-                t('no_proceed_to_drop_tip'),
-                'capitalize'
-              )}
-              justifyContent={JUSTIFY_FLEX_START}
-              paddingLeft={SPACING.spacing24}
-            />
-          </Flex>
+        <Flex css={ODD_TITLE_STYLE}>{buildTopText()}</Flex>
+        <Flex paddingBottom={SPACING.spacing8}>
+          <MediumButton
+            buttonType={flowType === 'blowout' ? 'primary' : 'secondary'}
+            flex="1"
+            onClick={() => {
+              setFlowType('blowout')
+            }}
+            buttonText={i18n.format(t('yes_blow_out_liquid'), 'capitalize')}
+            justifyContent={JUSTIFY_FLEX_START}
+            paddingLeft={SPACING.spacing24}
+            height="5.25rem"
+          />
         </Flex>
-        <Flex justifyContent={JUSTIFY_FLEX_END}>
+        <Flex>
+          <MediumButton
+            buttonType={flowType === 'drop_tips' ? 'primary' : 'secondary'}
+            flex="1"
+            onClick={() => {
+              setFlowType('drop_tips')
+            }}
+            buttonText={i18n.format(t('no_proceed_to_drop_tip'), 'capitalize')}
+            justifyContent={JUSTIFY_FLEX_START}
+            paddingLeft={SPACING.spacing24}
+            height="5.25rem"
+          />
+        </Flex>
+        <Flex justifyContent={JUSTIFY_FLEX_END} marginTop="auto">
           <SmallButton
             buttonText={i18n.format(t('shared:continue'), 'capitalize')}
             onClick={handleProceed}
@@ -104,7 +104,7 @@ export const BeforeBeginning = (
   } else {
     return (
       <Flex css={TILE_CONTAINER_STYLE}>
-        <Title>{t('before_you_begin_do_you_want_to_blowout')}</Title>
+        <Title>{buildTopText()}</Title>
         <Flex
           justifyContent={JUSTIFY_SPACE_AROUND}
           alignItems={ALIGN_CENTER}
@@ -132,7 +132,9 @@ export const BeforeBeginning = (
             >
               <source src={blowoutVideo} />
             </video>
-            <StyledText as="h3">{t('yes_blow_out_liquid')}</StyledText>
+            <LegacyStyledText as="h3">
+              {t('yes_blow_out_liquid')}
+            </LegacyStyledText>
           </Flex>
           <Flex
             onClick={() => {
@@ -155,11 +157,28 @@ export const BeforeBeginning = (
             >
               <source src={droptipVideo} />
             </video>
-            <StyledText as="h3">{t('no_proceed_to_drop_tip')}</StyledText>
+            <LegacyStyledText as="h3">
+              {t('no_proceed_to_drop_tip')}
+            </LegacyStyledText>
           </Flex>
         </Flex>
-        <Flex flexDirection={DIRECTION_ROW} justifyContent={JUSTIFY_FLEX_END}>
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          justifyContent={
+            issuedCommandsType === 'fixit'
+              ? JUSTIFY_SPACE_BETWEEN
+              : JUSTIFY_FLEX_END
+          }
+        >
           {/* <NeedHelpLink href={NEED_HELP_URL} /> */}
+          {fixitCommandTypeUtils != null ? (
+            <TextOnlyButton
+              onClick={
+                fixitCommandTypeUtils.buttonOverrides.goBackBeforeBeginning
+              }
+              buttonText={t('shared:go_back')}
+            />
+          ) : null}
           <PrimaryButton disabled={flowType == null} onClick={handleProceed}>
             {i18n.format(t('shared:continue'), 'capitalize')}
           </PrimaryButton>
@@ -237,6 +256,7 @@ const TILE_CONTAINER_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
   justify-content: ${JUSTIFY_SPACE_BETWEEN};
   padding: ${SPACING.spacing32};
+  height: 100%;
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     height: 29.5rem;
   }

@@ -13,7 +13,7 @@ import {
   Link,
   PrimaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { usePipettesQuery } from '@opentrons/react-api-client'
@@ -191,18 +191,18 @@ export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing8}
         >
-          <StyledText
+          <LegacyStyledText
             css={TYPOGRAPHY.h1Default}
             marginBottom={SPACING.spacing16}
           >
             {t('choose_a_tip_rack')}
-          </StyledText>
-          <StyledText
+          </LegacyStyledText>
+          <LegacyStyledText
             textTransform={TYPOGRAPHY.textTransformCapitalize}
             css={TYPOGRAPHY.labelSemiBold}
           >
             {t('select_tip_rack')}
-          </StyledText>
+          </LegacyStyledText>
           <Box marginBottom={SPACING.spacing12}>
             <Select
               isSearchable={false}
@@ -226,22 +226,22 @@ export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
                   }}
                 />
               ),
-              block: <StyledText as="p" />,
+              block: <LegacyStyledText as="p" />,
             }}
           />
         </Flex>
         <Flex flex="1" flexDirection={DIRECTION_COLUMN}>
           <Banner type="warning">
-            <StyledText as="p" marginRight={SPACING.spacing16}>
+            <LegacyStyledText as="p" marginRight={SPACING.spacing16}>
               {t('branded:opentrons_tip_racks_recommended')}
-            </StyledText>
+            </LegacyStyledText>
           </Banner>
           <Divider marginY={SPACING.spacing8} width="100%" />
           <ChosenTipRackRender selectedValue={selectedValue as SelectOption} />
           <Divider marginY={SPACING.spacing8} width="100%" />
-          <StyledText as="label" color={COLORS.grey50}>
+          <LegacyStyledText as="label" color={COLORS.grey50}>
             {t('branded:calibration_on_opentrons_tips_is_important')}
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
       </Flex>
       <Flex

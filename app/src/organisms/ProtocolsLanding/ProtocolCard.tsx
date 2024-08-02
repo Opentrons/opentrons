@@ -2,7 +2,7 @@ import * as React from 'react'
 import { format } from 'date-fns'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { ErrorBoundary } from 'react-error-boundary'
 
 import {
@@ -27,7 +27,7 @@ import {
   SIZE_2,
   SIZE_3,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
@@ -41,6 +41,7 @@ import { getIsProtocolAnalysisInProgress } from '../../redux/protocol-storage'
 import { InstrumentContainer } from '../../atoms/InstrumentContainer'
 import { ProtocolOverflowMenu } from './ProtocolOverflowMenu'
 import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
+import { ProtocolStatusBanner } from '../ProtocolStatusBanner'
 import { getProtocolUsesGripper } from '../ProtocolSetupInstruments/utils'
 import { ProtocolAnalysisStale } from '../ProtocolAnalysisFailure/ProtocolAnalysisStale'
 import {
@@ -59,7 +60,7 @@ interface ProtocolCardProps {
   storedProtocolData: StoredProtocolData
 }
 export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
-  const history = useHistory()
+  const navigate = useNavigate()
   const {
     handleRunProtocol,
     handleSendProtocolToFlex,
@@ -100,7 +101,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
       padding={SPACING.spacing16}
       position="relative"
       onClick={() => {
-        history.push(`/protocols/${protocolKey}`)
+        navigate(`/protocols/${protocolKey}`)
       }}
     >
       <ErrorBoundary fallback={UnknownAttachmentError}>
@@ -193,6 +194,13 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                 borderRadius={SPACING.spacing8}
               />
             ),
+            parameterRequired: (
+              <Box
+                size="6rem"
+                backgroundColor={COLORS.grey30}
+                borderRadius={SPACING.spacing8}
+              />
+            ),
             stale: (
               <Box
                 size="6rem"
@@ -216,6 +224,9 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
       >
         {/* error and protocol name section */}
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+          {analysisStatus === 'parameterRequired' ? (
+            <ProtocolStatusBanner />
+          ) : null}
           {analysisStatus === 'error' ? (
             <ProtocolAnalysisFailure
               protocolKey={protocolKey}
@@ -225,20 +236,20 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
           {analysisStatus === 'stale' ? (
             <ProtocolAnalysisStale protocolKey={protocolKey} />
           ) : null}
-          <StyledText
+          <LegacyStyledText
             as="h3"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             data-testid={`ProtocolCard_${protocolDisplayName}`}
             overflowWrap={OVERFLOW_WRAP_ANYWHERE}
           >
             {protocolDisplayName}
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
         {/* data section */}
         {analysisStatus === 'loading' ? (
-          <StyledText as="p" flex="1" color={COLORS.grey60}>
+          <LegacyStyledText as="p" flex="1" color={COLORS.grey60}>
             {t('loading_data')}
-          </StyledText>
+          </LegacyStyledText>
         ) : (
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
             <Flex gridGap={SPACING.spacing16}>
@@ -249,12 +260,12 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                 flexDirection={DIRECTION_COLUMN}
                 gridGap={SPACING.spacing4}
               >
-                <StyledText as="h6" color={COLORS.grey60}>
+                <LegacyStyledText as="h6" color={COLORS.grey60}>
                   {t('robot')}
-                </StyledText>
-                <StyledText as="p">
+                </LegacyStyledText>
+                <LegacyStyledText as="p">
                   {getRobotTypeDisplayName(robotType)}
-                </StyledText>
+                </LegacyStyledText>
               </Flex>
               <Flex
                 flex="1"
@@ -263,15 +274,26 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                 data-testid={`ProtocolCard_instruments_${protocolDisplayName}`}
                 minWidth="10.625rem"
               >
-                <StyledText as="h6" color={COLORS.grey60}>
+                <LegacyStyledText as="h6" color={COLORS.grey60}>
                   {t('shared:instruments')}
-                </StyledText>
+                </LegacyStyledText>
                 {
                   {
-                    missing: <StyledText as="p">{t('no_data')}</StyledText>,
-                    loading: <StyledText as="p">{t('no_data')}</StyledText>,
-                    error: <StyledText as="p">{t('no_data')}</StyledText>,
-                    stale: <StyledText as="p">{t('no_data')}</StyledText>,
+                    missing: (
+                      <LegacyStyledText as="p">{t('no_data')}</LegacyStyledText>
+                    ),
+                    loading: (
+                      <LegacyStyledText as="p">{t('no_data')}</LegacyStyledText>
+                    ),
+                    error: (
+                      <LegacyStyledText as="p">{t('no_data')}</LegacyStyledText>
+                    ),
+                    parameterRequired: (
+                      <LegacyStyledText as="p">{t('no_data')}</LegacyStyledText>
+                    ),
+                    stale: (
+                      <LegacyStyledText as="p">{t('no_data')}</LegacyStyledText>
+                    ),
                     complete: (
                       <Flex flexWrap={WRAP} gridGap={SPACING.spacing4}>
                         {/* TODO(bh, 2022-10-14): insert 96-channel pipette if found */}
@@ -309,9 +331,9 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
               >
                 {requiredModuleTypes.length > 0 ? (
                   <>
-                    <StyledText as="h6" color={COLORS.grey60}>
+                    <LegacyStyledText as="h6" color={COLORS.grey60}>
                       {t('modules')}
-                    </StyledText>
+                    </LegacyStyledText>
                     <Flex>
                       {requiredModuleTypes.map((moduleType, index) => (
                         <ModuleIcon
@@ -331,12 +353,12 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
               justifyContent={JUSTIFY_FLEX_END}
               data-testid={`ProtocolCard_date_${protocolDisplayName}`}
             >
-              <StyledText as="label" color={COLORS.grey60}>
+              <LegacyStyledText as="label" color={COLORS.grey60}>
                 {`${t('updated')} ${format(
                   new Date(modified),
                   'M/d/yy HH:mm'
                 )}`}
-              </StyledText>
+              </LegacyStyledText>
             </Flex>
           </Flex>
         )}

@@ -76,7 +76,7 @@ export function MultipleModulesRow(
         />
         {t(
           `module_display_names.${
-            occupiedSlots.length > 1 ? 'multipleTemperatureModuleTypes' : type
+            occupiedSlots.length > 1 ? `multiple${type}s` : type
           }`
         )}
       </h4>

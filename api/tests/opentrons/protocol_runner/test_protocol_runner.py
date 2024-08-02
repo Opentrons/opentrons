@@ -1,4 +1,5 @@
 """Tests for the PythonAndLegacyRunner, JsonRunner & LiveRunner classes."""
+from unittest.mock import sentinel
 from datetime import datetime
 
 import pytest
@@ -8,16 +9,17 @@ from pathlib import Path
 from typing import List, cast, Union, Type
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
-from opentrons_shared_data.labware.dev_types import (
+from opentrons_shared_data.labware.types import (
     LabwareDefinition as LabwareDefinitionTypedDict,
 )
 from opentrons_shared_data.protocol.models import ProtocolSchemaV6, ProtocolSchemaV7
-from opentrons_shared_data.protocol.dev_types import (
+from opentrons_shared_data.protocol.types import (
     JsonProtocol as LegacyJsonProtocolDict,
 )
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.protocol_api import ProtocolContext
+from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
 from opentrons.protocol_engine.types import PostRunHardwareState
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.parse import PythonParseMode
@@ -27,6 +29,7 @@ from opentrons.util.broker import Broker
 from opentrons import protocol_reader
 from opentrons.protocol_engine import (
     ProtocolEngine,
+    CommandStatus,
     Liquid,
     commands as pe_commands,
     errors as pe_errors,
@@ -217,9 +220,12 @@ def test_play_starts_run(
     subject: AnyRunner,
 ) -> None:
     """It should start a protocol run with play."""
-    subject.play(deck_configuration=[])
-
-    decoy.verify(protocol_engine.play(deck_configuration=[]), times=1)
+    subject.play(sentinel.deck_configuration)
+    decoy.verify(
+        protocol_engine.set_deck_configuration(sentinel.deck_configuration),
+        protocol_engine.play(),
+        times=1,
+    )
 
 
 @pytest.mark.parametrize(
@@ -325,17 +331,20 @@ async def test_run_json_runner(
     )
 
     assert json_runner_subject.was_started() is False
-    await json_runner_subject.run(deck_configuration=[])
+    await json_runner_subject.run(deck_configuration=sentinel.deck_configuration)
     assert json_runner_subject.was_started() is True
 
     decoy.verify(
-        protocol_engine.play(deck_configuration=[]),
+        protocol_engine.set_deck_configuration(sentinel.deck_configuration),
+        protocol_engine.play(),
         task_queue.start(),
         await task_queue.join(),
     )
 
 
-async def test_run_json_runner_stop_requested_stops_enquqing(
+# todo(mm, 2024-07-08): This test has grown long over time and it's unclear now what
+# it's actually testing. Can we simplify or split it up?
+async def test_run_json_runner_stop_requested_stops_enqueuing(
     decoy: Decoy,
     hardware_api: HardwareAPI,
     protocol_engine: ProtocolEngine,
@@ -381,27 +390,34 @@ async def test_run_json_runner_stop_requested_stops_enquqing(
     decoy.when(json_translator.translate_commands(json_protocol)).then_return(commands)
     decoy.when(json_translator.translate_liquids(json_protocol)).then_return(liquids)
     decoy.when(
-        await protocol_engine.add_and_execute_command(
+        await protocol_engine.add_and_execute_command_wait_for_recovery(
             pe_commands.HomeCreate(params=pe_commands.HomeParams()),
         )
     ).then_return(
         pe_commands.Home.construct(status=pe_commands.CommandStatus.SUCCEEDED)  # type: ignore[call-arg]
     )
     decoy.when(
-        await protocol_engine.add_and_execute_command(
+        await protocol_engine.add_and_execute_command_wait_for_recovery(
             pe_commands.WaitForDurationCreate(
                 params=pe_commands.WaitForDurationParams(seconds=10)
             ),
         )
     ).then_return(
         pe_commands.WaitForDuration.construct(  # type: ignore[call-arg]
+            id="protocol-command-id",
             error=pe_errors.ErrorOccurrence.from_failed(
                 id="some-id",
                 createdAt=datetime(year=2021, month=1, day=1),
                 error=pe_errors.ProtocolEngineError(),
-            )
+            ),
+            status=pe_commands.CommandStatus.FAILED,
         )
     )
+    decoy.when(
+        protocol_engine.state_view.commands.get_error_recovery_type(
+            "protocol-command-id"
+        )
+    ).then_return(ErrorRecoveryType.FAIL_RUN)
 
     await json_runner_subject.load(json_protocol_source)
 
@@ -497,19 +513,67 @@ async def test_load_json_runner(
 
     # Verify that the run func calls the right things:
     run_func = run_func_captor.value
+    decoy.when(
+        await protocol_engine.add_and_execute_command_wait_for_recovery(
+            request=pe_commands.WaitForResumeCreate(
+                params=pe_commands.WaitForResumeParams(message="hello")
+            ),
+        )
+    ).then_return(
+        pe_commands.WaitForResume.construct(  # type: ignore[call-arg]
+            id="command-id-1",
+            status=CommandStatus.SUCCEEDED,
+            error=None,
+        )
+    )
+    decoy.when(
+        await protocol_engine.add_and_execute_command_wait_for_recovery(
+            request=pe_commands.WaitForResumeCreate(
+                params=pe_commands.WaitForResumeParams(message="goodbye")
+            ),
+        )
+    ).then_return(
+        pe_commands.WaitForResume.construct(  # type: ignore[call-arg]
+            id="command-id-2",
+            status=CommandStatus.SUCCEEDED,
+            error=None,
+        )
+    )
+    decoy.when(
+        await protocol_engine.add_and_execute_command_wait_for_recovery(
+            request=pe_commands.LoadLiquidCreate(
+                params=pe_commands.LoadLiquidParams(
+                    liquidId="water-id", labwareId="labware-id", volumeByWell={"A1": 30}
+                )
+            ),
+        )
+    ).then_return(
+        pe_commands.WaitForResume.construct(  # type: ignore[call-arg]
+            id="command-id-3",
+            status=CommandStatus.SUCCEEDED,
+            error=None,
+        )
+    )
     await run_func()
     decoy.verify(
-        await protocol_engine.add_and_execute_command(
+        # todo(mm, 2024-07-08): This triggers decoy.RedundantVerifyWarning.
+        # Above, we're rehearsing each add_and_execute_command() call because the
+        # subject needs the return values. But the subject doesn't return anything
+        # based on on those return values, so here, we need to "redundantly" verify
+        # each call to make sure the subject actually did some work.
+        # It doesn't seem like Decoy wants subjects to be like this, so it's unclear
+        # how to fix this.
+        await protocol_engine.add_and_execute_command_wait_for_recovery(
             request=pe_commands.WaitForResumeCreate(
                 params=pe_commands.WaitForResumeParams(message="hello")
             ),
         ),
-        await protocol_engine.add_and_execute_command(
+        await protocol_engine.add_and_execute_command_wait_for_recovery(
             request=pe_commands.WaitForResumeCreate(
                 params=pe_commands.WaitForResumeParams(message="goodbye")
             ),
         ),
-        await protocol_engine.add_and_execute_command(
+        await protocol_engine.add_and_execute_command_wait_for_recovery(
             request=pe_commands.LoadLiquidCreate(
                 params=pe_commands.LoadLiquidParams(
                     liquidId="water-id", labwareId="labware-id", volumeByWell={"A1": 30}
@@ -581,6 +645,7 @@ async def test_load_legacy_python(
         legacy_protocol_source,
         python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
         run_time_param_values=None,
+        run_time_param_files=None,
     )
 
     run_func_captor = matchers.Captor()
@@ -662,6 +727,7 @@ async def test_load_python_with_pe_papi_core(
         protocol_source,
         python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
         run_time_param_values=None,
+        run_time_param_files=None,
     )
 
     decoy.verify(protocol_engine.add_plugin(matchers.IsA(LegacyContextPlugin)), times=0)
@@ -724,6 +790,7 @@ async def test_load_legacy_json(
         legacy_protocol_source,
         python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
         run_time_param_values=None,
+        run_time_param_files=None,
     )
 
     run_func_captor = matchers.Captor()
@@ -762,11 +829,12 @@ async def test_run_python_runner(
     )
 
     assert python_runner_subject.was_started() is False
-    await python_runner_subject.run(deck_configuration=[])
+    await python_runner_subject.run(deck_configuration=sentinel.deck_configuration)
     assert python_runner_subject.was_started() is True
 
     decoy.verify(
-        protocol_engine.play(deck_configuration=[]),
+        protocol_engine.set_deck_configuration(sentinel.deck_configuration),
+        protocol_engine.play(),
         task_queue.start(),
         await task_queue.join(),
     )
@@ -785,12 +853,13 @@ async def test_run_live_runner(
     )
 
     assert live_runner_subject.was_started() is False
-    await live_runner_subject.run(deck_configuration=[])
+    await live_runner_subject.run(deck_configuration=sentinel.deck_configuration)
     assert live_runner_subject.was_started() is True
 
     decoy.verify(
         await hardware_api.home(),
-        protocol_engine.play(deck_configuration=[]),
+        protocol_engine.set_deck_configuration(sentinel.deck_configuration),
+        protocol_engine.play(),
         task_queue.start(),
         await task_queue.join(),
     )

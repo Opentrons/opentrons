@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import {
   COLORS,
@@ -8,7 +8,7 @@ import {
   Flex,
   JUSTIFY_CENTER,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -27,7 +27,7 @@ export function AlternativeSecurityTypeModal({
   setShowAlternativeSecurityTypeModal,
 }: AlternativeSecurityTypeModalProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'branded'])
-  const history = useHistory()
+  const navigate = useNavigate()
   const modalHeader: ModalHeaderBaseProps = {
     title: t('alternative_security_types'),
     hasExitIcon: true,
@@ -37,7 +37,7 @@ export function AlternativeSecurityTypeModal({
   }
   const handleClick = (): void => {
     setShowAlternativeSecurityTypeModal(false)
-    history.push('/network-setup/usb')
+    navigate('/network-setup/usb')
   }
 
   return (
@@ -53,13 +53,13 @@ export function AlternativeSecurityTypeModal({
         width="100%"
       >
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-          <StyledText
+          <LegacyStyledText
             as="p"
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             color={COLORS.grey60}
           >
             {t('branded:alternative_security_types_description')}
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
         <SmallButton
           buttonText={t('connect_via', { type: t('usb') })}

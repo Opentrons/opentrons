@@ -5,7 +5,7 @@ from requests.auth import HTTPBasicAuth
 import json
 import webbrowser
 import argparse
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Tuple
 import os
 
 
@@ -23,24 +23,78 @@ class JiraTicket:
             "Content-Type": "application/json",
         }
 
-    def issues_on_board(self, board_id: str) -> List[str]:
+    def issues_on_board(self, project_key: str) -> List[List[Any]]:
         """Print Issues on board."""
+        params = {"jql": f"project = {project_key}"}
         response = requests.get(
-            f"{self.url}/rest/agile/1.0/board/{board_id}/issue",
+            f"{self.url}/rest/api/3/search",
             headers=self.headers,
+            params=params,
             auth=self.auth,
         )
+
         response.raise_for_status()
         try:
             board_data = response.json()
             all_issues = board_data["issues"]
         except json.JSONDecodeError as e:
             print("Error decoding json: ", e)
+        # convert issue id's into array and have one key as
+        # the issue key and one be summary, return entire array
         issue_ids = []
         for i in all_issues:
             issue_id = i.get("id")
-            issue_ids.append(issue_id)
+            issue_summary = i["fields"].get("summary")
+            issue_ids.append([issue_id, issue_summary])
         return issue_ids
+
+    def match_issues(self, issue_ids: List[List[str]], ticket_summary: str) -> List:
+        """Matches related ticket ID's."""
+        to_link = []
+        error = ticket_summary.split("_")[3]
+        robot = ticket_summary.split("_")[0]
+        # for every issue see if both match, if yes then grab issue ID and add it to a list
+        for issue in issue_ids:
+            summary = issue[1]
+            try:
+                issue_error = summary.split("_")[3]
+                issue_robot = summary.split("_")[0]
+            except IndexError:
+                continue
+            issue_id = issue[0]
+            if robot == issue_robot and error == issue_error:
+                to_link.append(issue_id)
+        return to_link
+
+    def link_issues(self, to_link: list, ticket_key: str) -> None:
+        """Links relevant issues in Jira."""
+        for issue in to_link:
+            link_data = json.dumps(
+                {
+                    "inwardIssue": {"key": ticket_key},
+                    "outwardIssue": {"id": issue},
+                    "type": {"name": "Relates"},
+                }
+            )
+            try:
+                response = requests.post(
+                    f"{self.url}/rest/api/3/issueLink",
+                    headers=self.headers,
+                    auth=self.auth,
+                    data=link_data,
+                )
+                response.raise_for_status()
+            except requests.exceptions.HTTPError:
+                print(
+                    f"HTTP error occurred. Ticket ID {issue} was not linked. \
+                        Check user permissions and authentication credentials"
+                )
+            except requests.exceptions.ConnectionError:
+                print(f"Connection error occurred. Ticket ID {issue} was not linked.")
+            except json.JSONDecodeError:
+                print(
+                    f"JSON decoding error occurred. Ticket ID {issue} was not linked."
+                )
 
     def open_issue(self, issue_key: str) -> str:
         """Open issue on web browser."""
@@ -61,8 +115,9 @@ class JiraTicket:
         components: list,
         affects_versions: str,
         robot: str,
-    ) -> str:
+    ) -> Tuple[str, str]:
         """Create ticket."""
+        # Check if software version is a field on JIRA, if not replaces with existing version
         data = {
             "fields": {
                 "project": {"id": "10273", "key": project_key},
@@ -73,7 +128,6 @@ class JiraTicket:
                 "parent": {"key": robot},
                 "priority": {"name": priority},
                 "components": [{"name": component} for component in components],
-                "versions": [{"name": affects_versions}],
                 "description": {
                     "content": [
                         {
@@ -87,6 +141,12 @@ class JiraTicket:
                 # Include other required fields as needed
             }
         }
+        available_versions = self.get_project_versions(project_key)
+        if affects_versions in available_versions:
+            data["fields"]["versions"] = [{"name": affects_versions}]
+            print(f"Software version {affects_versions} added.")
+        else:
+            print("Software version of robot not in jira releases.")
         try:
             response = requests.post(
                 f"{self.url}/rest/api/3/issue",
@@ -98,15 +158,15 @@ class JiraTicket:
             response_str = str(response.content)
             issue_url = response.json().get("self")
             issue_key = response.json().get("key")
-            print(f"issue key {issue_key}")
-            print(f"issue url{issue_url}")
+            print(f"issue key: {issue_key}")
+            print(f"issue url: {issue_url}")
             if issue_key is None:
                 print("Error: Could not create issue. No key returned.")
         except requests.exceptions.HTTPError:
             print(f"HTTP error occurred. Response content: {response_str}")
         except json.JSONDecodeError:
             print(f"JSON decoding error occurred. Response content: {response_str}")
-        return issue_key
+        return issue_key, issue_url
 
     def post_attachment_to_ticket(self, issue_id: str, attachment_path: str) -> None:
         """Adds attachments to ticket."""
@@ -138,6 +198,17 @@ class JiraTicket:
         )
         response.raise_for_status()
         return response.json()
+
+    def get_project_versions(self, project_key: str) -> List[str]:
+        """Get all project software versions."""
+        url = f"{self.url}/rest/api/3/project/{project_key}/versions"
+        headers = {"Accept": "application/json"}
+        version_list = []
+        response = requests.request("GET", url, headers=headers, auth=self.auth)
+        versions = response.json()
+        for version in versions:
+            version_list.append(version["name"])
+        return version_list
 
     def extract_users_from_issues(self, issues: dict) -> Dict[str, Any]:
         """Extract users from issues."""
@@ -177,6 +248,29 @@ class JiraTicket:
         except json.JSONDecodeError:
             print("JSON decoding error occurred.")
         return file_path
+
+    def get_project_components(self, project_id: str) -> List[Dict[str, str]]:
+        """Get list of components on JIRA board."""
+        component_url = f"{self.url}/rest/api/3/project/{project_id}/components"
+        response = requests.get(component_url, headers=self.headers, auth=self.auth)
+        components_list = response.json()
+        return components_list
+
+    def comment(self, content_list: List[Dict[str, Any]], issue_url: str) -> None:
+        """Leave comment on JIRA Ticket."""
+        comment_url = issue_url + "/comment"
+        payload = json.dumps(
+            {
+                "body": {
+                    "type": "doc",
+                    "version": 1,
+                    "content": content_list,
+                }
+            }
+        )
+        requests.request(
+            "POST", comment_url, data=payload, headers=self.headers, auth=self.auth
+        )
 
 
 if __name__ == "__main__":

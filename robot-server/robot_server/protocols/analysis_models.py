@@ -2,8 +2,12 @@
 # TODO(mc, 2021-08-25): add modules to simulation result
 from enum import Enum
 
-from opentrons.protocol_engine.types import RunTimeParameter, RunTimeParamValuesType
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons.protocol_engine.types import (
+    RunTimeParameter,
+    PrimitiveRunTimeParamValuesType,
+    CSVRunTimeParamFilesType,
+)
+from opentrons_shared_data.robot.types import RobotType
 from pydantic import BaseModel, Field
 from typing import List, Optional, Union, NamedTuple
 from typing_extensions import Literal
@@ -34,18 +38,27 @@ class AnalysisResult(str, Enum):
         OK: No problems were found during protocol analysis.
         NOT_OK: Problems were found during protocol analysis. Inspect
             `analysis.errors` for error occurrences.
+        PARAMETER_VALUE_REQUIRED: A value is required to be set for a parameter
+            in order for the protocol to be analyzed/run. The absence of this does not
+            inherently mean there are no parameters, as there may be defaults for all
+            or unset parameters are not referenced or handled via try/except clauses.
     """
 
     OK = "ok"
     NOT_OK = "not-ok"
+    PARAMETER_VALUE_REQUIRED = "parameter-value-required"
 
 
 class AnalysisRequest(BaseModel):
     """Model for analysis request body."""
 
-    runTimeParameterValues: RunTimeParamValuesType = Field(
+    runTimeParameterValues: PrimitiveRunTimeParamValuesType = Field(
         default={},
-        description="Key-value pairs of run-time parameters defined in a protocol.",
+        description="Key-value pairs of primitive run-time parameters defined in a protocol.",
+    )
+    runTimeParameterFiles: CSVRunTimeParamFilesType = Field(
+        default={},
+        description="Key-fileId pairs of CSV run-time parameters defined in a protocol.",
     )
     forceReAnalyze: bool = Field(
         False, description="Whether to force start a new analysis."

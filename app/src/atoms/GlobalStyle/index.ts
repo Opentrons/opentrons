@@ -1,5 +1,5 @@
 import { createGlobalStyle } from 'styled-components'
-import { COLORS } from '@opentrons/components'
+import { COLORS, PRODUCT } from '@opentrons/components'
 import 'typeface-open-sans'
 import '@fontsource/dejavu-sans'
 import '@fontsource/public-sans'
@@ -15,7 +15,7 @@ export const GlobalStyle = createGlobalStyle<{}>`
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: 'Public Sans', 'DejaVu Sans', sans-serif;
+    font-family: ${PRODUCT.TYPOGRAPHY.fontFamily}, 'DejaVu Sans', sans-serif;
   }
 
   html,

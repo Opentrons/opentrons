@@ -10,6 +10,7 @@ from opentrons_shared_data.labware.labware_definition import (
     Parameters as LabwareParameters,
 )
 from opentrons_shared_data.pipette import pipette_definition
+from opentrons_shared_data.pipette.pipette_definition import ValidNozzleMaps
 
 from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.protocol_engine import actions, commands
@@ -19,7 +20,7 @@ from opentrons.protocol_engine.resources.pipette_data_provider import (
     LoadedStaticPipetteData,
 )
 from opentrons.types import Point
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.pipette.types import PipetteNameType
 from ..pipette_fixtures import (
     NINETY_SIX_MAP,
     NINETY_SIX_COLS,
@@ -108,6 +109,17 @@ def drop_tip_in_place_command() -> commands.DropTipInPlace:
     )
 
 
+@pytest.fixture
+def unsafe_drop_tip_in_place_command() -> commands.unsafe.UnsafeDropTipInPlace:
+    """Get an unsafe drop-tip-in-place command."""
+    return commands.unsafe.UnsafeDropTipInPlace.construct(  # type: ignore[call-arg]
+        params=commands.unsafe.UnsafeDropTipInPlaceParams.construct(
+            pipetteId="pipette-id"
+        ),
+        result=commands.unsafe.UnsafeDropTipInPlaceResult.construct(),
+    )
+
+
 @pytest.mark.parametrize(
     "labware_definition",
     [
@@ -147,6 +159,7 @@ def test_get_next_tip_returns_none(
             nozzle_map=get_default_nozzle_map(PipetteNameType.P1000_96),
             back_left_corner_offset=Point(0, 0, 0),
             front_right_corner_offset=Point(0, 0, 0),
+            pipette_lld_settings={},
         ),
     )
     subject.handle_action(
@@ -207,6 +220,7 @@ def test_get_next_tip_returns_first_tip(
             nozzle_map=get_default_nozzle_map(pipette_name_type),
             back_left_corner_offset=Point(0, 0, 0),
             front_right_corner_offset=Point(0, 0, 0),
+            pipette_lld_settings={},
         ),
     )
     subject.handle_action(
@@ -261,6 +275,7 @@ def test_get_next_tip_used_starting_tip(
             nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
             back_left_corner_offset=Point(0, 0, 0),
             front_right_corner_offset=Point(0, 0, 0),
+            pipette_lld_settings={},
         ),
     )
     subject.handle_action(
@@ -349,6 +364,7 @@ def test_get_next_tip_skips_picked_up_tip(
             nozzle_map=get_default_nozzle_map(pipette_name_type),
             back_left_corner_offset=Point(0, 0, 0),
             front_right_corner_offset=Point(0, 0, 0),
+            pipette_lld_settings={},
         ),
     )
     subject.handle_action(
@@ -403,6 +419,7 @@ def test_get_next_tip_with_starting_tip(
             nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
             back_left_corner_offset=Point(x=1, y=2, z=3),
             front_right_corner_offset=Point(x=4, y=5, z=6),
+            pipette_lld_settings={},
         ),
     )
     subject.handle_action(
@@ -477,6 +494,7 @@ def test_get_next_tip_with_starting_tip_8_channel(
             nozzle_map=get_default_nozzle_map(PipetteNameType.P300_MULTI_GEN2),
             back_left_corner_offset=Point(0, 0, 0),
             front_right_corner_offset=Point(0, 0, 0),
+            pipette_lld_settings={},
         ),
     )
     subject.handle_action(
@@ -552,6 +570,7 @@ def test_get_next_tip_with_1_channel_followed_by_8_channel(
             nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
             back_left_corner_offset=Point(0, 0, 0),
             front_right_corner_offset=Point(0, 0, 0),
+            pipette_lld_settings={},
         ),
     )
     subject.handle_action(
@@ -583,6 +602,7 @@ def test_get_next_tip_with_1_channel_followed_by_8_channel(
             nozzle_map=get_default_nozzle_map(PipetteNameType.P300_MULTI_GEN2),
             back_left_corner_offset=Point(0, 0, 0),
             front_right_corner_offset=Point(0, 0, 0),
+            pipette_lld_settings={},
         ),
     )
     subject.handle_action(
@@ -658,6 +678,7 @@ def test_get_next_tip_with_starting_tip_out_of_tips(
             nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
             back_left_corner_offset=Point(0, 0, 0),
             front_right_corner_offset=Point(0, 0, 0),
+            pipette_lld_settings={},
         ),
     )
     subject.handle_action(
@@ -733,6 +754,7 @@ def test_get_next_tip_with_column_and_starting_tip(
             nozzle_map=get_default_nozzle_map(PipetteNameType.P300_MULTI_GEN2),
             back_left_corner_offset=Point(0, 0, 0),
             front_right_corner_offset=Point(0, 0, 0),
+            pipette_lld_settings={},
         ),
     )
     subject.handle_action(
@@ -785,6 +807,7 @@ def test_reset_tips(
             nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
             back_left_corner_offset=Point(x=1, y=2, z=3),
             front_right_corner_offset=Point(x=4, y=5, z=6),
+            pipette_lld_settings={},
         ),
     )
 
@@ -837,6 +860,7 @@ def test_handle_pipette_config_action(
             nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
             back_left_corner_offset=Point(x=1, y=2, z=3),
             front_right_corner_offset=Point(x=4, y=5, z=6),
+            pipette_lld_settings={},
         ),
     )
     subject.handle_action(
@@ -890,6 +914,7 @@ def test_drop_tip(
     pick_up_tip_command: commands.PickUpTip,
     drop_tip_command: commands.DropTip,
     drop_tip_in_place_command: commands.DropTipInPlace,
+    unsafe_drop_tip_in_place_command: commands.unsafe.UnsafeDropTipInPlace,
     supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
 ) -> None:
     """It should be clear tip length when a tip is dropped."""
@@ -920,6 +945,7 @@ def test_drop_tip(
             nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
             back_left_corner_offset=Point(x=1, y=2, z=3),
             front_right_corner_offset=Point(x=4, y=5, z=6),
+            pipette_lld_settings={},
         ),
     )
     subject.handle_action(
@@ -954,6 +980,20 @@ def test_drop_tip(
     result = TipView(subject.state).get_tip_length("pipette-id")
     assert result == 0
 
+    subject.handle_action(
+        actions.SucceedCommandAction(private_result=None, command=pick_up_tip_command)
+    )
+    result = TipView(subject.state).get_tip_length("pipette-id")
+    assert result == 1.23
+
+    subject.handle_action(
+        actions.SucceedCommandAction(
+            private_result=None, command=unsafe_drop_tip_in_place_command
+        )
+    )
+    result = TipView(subject.state).get_tip_length("pipette-id")
+    assert result == 0
+
 
 @pytest.mark.parametrize(
     argnames=["nozzle_map", "expected_channels"],
@@ -966,6 +1006,7 @@ def test_drop_tip(
                 starting_nozzle="A1",
                 back_left_nozzle="A1",
                 front_right_nozzle="A1",
+                valid_nozzle_maps=ValidNozzleMaps(maps={"A1": ["A1"]}),
             ),
             1,
         ),
@@ -977,6 +1018,23 @@ def test_drop_tip(
                 starting_nozzle="A1",
                 back_left_nozzle="A1",
                 front_right_nozzle="H12",
+                valid_nozzle_maps=ValidNozzleMaps(
+                    maps={
+                        "Full": sum(
+                            [
+                                NINETY_SIX_ROWS["A"],
+                                NINETY_SIX_ROWS["B"],
+                                NINETY_SIX_ROWS["C"],
+                                NINETY_SIX_ROWS["D"],
+                                NINETY_SIX_ROWS["E"],
+                                NINETY_SIX_ROWS["F"],
+                                NINETY_SIX_ROWS["G"],
+                                NINETY_SIX_ROWS["H"],
+                            ],
+                            [],
+                        )
+                    }
+                ),
             ),
             96,
         ),
@@ -988,6 +1046,9 @@ def test_drop_tip(
                 starting_nozzle="A1",
                 back_left_nozzle="A1",
                 front_right_nozzle="E1",
+                valid_nozzle_maps=ValidNozzleMaps(
+                    maps={"A1_E1": ["A1", "B1", "C1", "D1", "E1"]}
+                ),
             ),
             5,
         ),
@@ -1025,6 +1086,7 @@ def test_active_channels(
             nozzle_map=nozzle_map,
             back_left_corner_offset=Point(x=1, y=2, z=3),
             front_right_corner_offset=Point(x=4, y=5, z=6),
+            pipette_lld_settings={},
         ),
     )
     subject.handle_action(
@@ -1090,6 +1152,7 @@ def test_next_tip_uses_active_channels(
             nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
             back_left_corner_offset=Point(x=1, y=2, z=3),
             front_right_corner_offset=Point(x=4, y=5, z=6),
+            pipette_lld_settings={},
         ),
     )
     subject.handle_action(
@@ -1111,6 +1174,11 @@ def test_next_tip_uses_active_channels(
             starting_nozzle="A12",
             back_left_nozzle="A12",
             front_right_nozzle="H12",
+            valid_nozzle_maps=ValidNozzleMaps(
+                maps={
+                    "A12_H12": ["A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"]
+                }
+            ),
         ),
     )
     subject.handle_action(
@@ -1170,6 +1238,7 @@ def test_next_tip_automatic_tip_tracking_with_partial_configurations(
             nozzle_map=get_default_nozzle_map(PipetteNameType.P1000_96),
             back_left_corner_offset=Point(x=1, y=2, z=3),
             front_right_corner_offset=Point(x=4, y=5, z=6),
+            pipette_lld_settings={},
         ),
     )
     subject.handle_action(
@@ -1217,6 +1286,54 @@ def test_next_tip_automatic_tip_tracking_with_partial_configurations(
                 starting_nozzle=start,
                 back_left_nozzle=back_l,
                 front_right_nozzle=front_r,
+                valid_nozzle_maps=ValidNozzleMaps(
+                    maps={
+                        "A1": ["A1"],
+                        "H1": ["H1"],
+                        "A12": ["A12"],
+                        "H12": ["H12"],
+                        "A1_H3": [
+                            "A1",
+                            "A2",
+                            "A3",
+                            "B1",
+                            "B2",
+                            "B3",
+                            "C1",
+                            "C2",
+                            "C3",
+                            "D1",
+                            "D2",
+                            "D3",
+                            "E1",
+                            "E2",
+                            "E3",
+                            "F1",
+                            "F2",
+                            "F3",
+                            "G1",
+                            "G2",
+                            "G3",
+                            "H1",
+                            "H2",
+                            "H3",
+                        ],
+                        "A1_F2": [
+                            "A1",
+                            "A2",
+                            "B1",
+                            "B2",
+                            "C1",
+                            "C2",
+                            "D1",
+                            "D2",
+                            "E1",
+                            "E2",
+                            "F1",
+                            "F2",
+                        ],
+                    }
+                ),
             ),
         )
         subject.handle_action(
@@ -1280,6 +1397,7 @@ def test_next_tip_automatic_tip_tracking_tiprack_limits(
             nozzle_map=get_default_nozzle_map(PipetteNameType.P1000_96),
             back_left_corner_offset=Point(x=1, y=2, z=3),
             front_right_corner_offset=Point(x=4, y=5, z=6),
+            pipette_lld_settings={},
         ),
     )
     subject.handle_action(
@@ -1328,6 +1446,27 @@ def test_next_tip_automatic_tip_tracking_tiprack_limits(
                 starting_nozzle=start,
                 back_left_nozzle=back_l,
                 front_right_nozzle=front_r,
+                valid_nozzle_maps=ValidNozzleMaps(
+                    maps={
+                        "A1": ["A1"],
+                        "H1": ["H1"],
+                        "A12": ["A12"],
+                        "H12": ["H12"],
+                        "Full": sum(
+                            [
+                                NINETY_SIX_ROWS["A"],
+                                NINETY_SIX_ROWS["B"],
+                                NINETY_SIX_ROWS["C"],
+                                NINETY_SIX_ROWS["D"],
+                                NINETY_SIX_ROWS["E"],
+                                NINETY_SIX_ROWS["F"],
+                                NINETY_SIX_ROWS["G"],
+                                NINETY_SIX_ROWS["H"],
+                            ],
+                            [],
+                        ),
+                    }
+                ),
             ),
         )
         subject.handle_action(

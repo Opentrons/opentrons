@@ -11,6 +11,7 @@ import { useNotifyRunQuery } from '../../../../resources/runs'
 import { useFeatureFlag } from '../../../../redux/config'
 import { mockSucceededRun } from '../../../RunTimeControl/__fixtures__'
 import { ProtocolRunRuntimeParameters } from '../ProtocolRunRunTimeParameters'
+
 import type { UseQueryResult } from 'react-query'
 import type { Run } from '@opentrons/api-client'
 import type {
@@ -86,6 +87,16 @@ const mockRunTimeParameterData: RunTimeParameter[] = [
   },
 ]
 
+const mockCsvRtp = {
+  displayName: 'CSV File',
+  variableName: 'csv_file_var',
+  description: '',
+  type: 'csv_file',
+  file: {
+    file: { name: 'mock.csv' } as File,
+  },
+}
+
 const render = (
   props: React.ComponentProps<typeof ProtocolRunRuntimeParameters>
 ) => {
@@ -110,7 +121,9 @@ describe('ProtocolRunRuntimeParameters', () => {
     vi.mocked(useNotifyRunQuery).mockReturnValue(({
       data: { data: mockSucceededRun },
     } as unknown) as UseQueryResult<Run>)
-    vi.mocked(useFeatureFlag).mockReturnValue(false)
+    when(vi.mocked(useFeatureFlag))
+      .calledWith('enableCsvFile')
+      .thenReturn(false)
   })
 
   afterEach(() => {
@@ -175,7 +188,11 @@ describe('ProtocolRunRuntimeParameters', () => {
   })
 
   it('should render csv row if a protocol requires a csv', () => {
-    vi.mocked(useFeatureFlag).mockReturnValue(true)
+    when(vi.mocked(useFeatureFlag)).calledWith('enableCsvFile').thenReturn(true)
+    vi.mocked(useMostRecentCompletedAnalysis).mockReturnValue({
+      runTimeParameters: [...mockRunTimeParameterData, mockCsvRtp],
+    } as CompletedProtocolAnalysis)
+
     render(props)
     screen.getByText('CSV File')
     screen.getByText('mock.csv')

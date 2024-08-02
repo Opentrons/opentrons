@@ -8,7 +8,7 @@ import {
   DIRECTION_ROW,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -23,20 +23,20 @@ export function ProtocolDropTipBanner(props: {
 
   return (
     <Banner
-      type="warning"
+      type="error"
       onCloseClick={onCloseClick}
       marginBottom={SPACING.spacing16}
       paddingRight={SPACING.spacing16}
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-          {t('tips_may_be_attached')}
-        </StyledText>
+        <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          {t('remove_attached_tips')}
+        </LegacyStyledText>
 
         <Flex flexDirection={DIRECTION_ROW}>
-          <StyledText as="p" marginRight={SPACING.spacing4}>
-            {t('remove_the_tips_from_pipette')}
-          </StyledText>
+          <LegacyStyledText as="p" marginRight={SPACING.spacing4}>
+            {t('liquid_damages_pipette')}
+          </LegacyStyledText>
           <Btn
             textAlign={ALIGN_START}
             onClick={() => {
@@ -44,12 +44,12 @@ export function ProtocolDropTipBanner(props: {
             }}
             aria-label="remove-tips"
           >
-            <StyledText
+            <LegacyStyledText
               as="p"
               textDecoration={TYPOGRAPHY.textDecorationUnderline}
             >
               {t('remove_tips')}
-            </StyledText>
+            </LegacyStyledText>
           </Btn>
         </Flex>
       </Flex>

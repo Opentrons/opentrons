@@ -16,13 +16,13 @@ import {
   JUSTIFY_CENTER,
   SIZE_3,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { Banner } from '../../atoms/Banner'
 import { PipetteRecalibrationWarning } from './PipetteCard/PipetteRecalibrationWarning'
-import { useCurrentRunId } from '../ProtocolUpload/hooks'
+import { useCurrentRunId } from '../../resources/runs'
 import { ModuleCard } from '../ModuleCard'
 import { useIsFlex, useIsRobotViewable, useRunStatuses } from './hooks'
 import { getShowPipetteCalibrationWarning } from './utils'
@@ -124,14 +124,14 @@ export function InstrumentsAndModules({
       flexDirection={DIRECTION_COLUMN}
       width="100%"
     >
-      <StyledText
+      <LegacyStyledText
         as="h3"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         marginBottom={SPACING.spacing16}
         id="InstrumentsAndModules_title"
       >
         {t('instruments_and_modules')}
-      </StyledText>
+      </LegacyStyledText>
       <Flex
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
@@ -283,13 +283,13 @@ export function InstrumentsAndModules({
             padding={SPACING.spacing12}
           >
             {/* TODO(bh, 2022-10-20): insert "offline" image when provided by illustrator */}
-            <StyledText
+            <LegacyStyledText
               as="p"
               color={COLORS.grey40}
               id="InstrumentsAndModules_offline"
             >
               {t('offline_instruments_and_modules')}
-            </StyledText>
+            </LegacyStyledText>
           </Flex>
         )}
       </Flex>

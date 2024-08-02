@@ -1,6 +1,7 @@
 import type { DT_ROUTES } from './constants'
 import type { DropTipErrorComponents } from './hooks'
 import type { DropTipWizardProps } from './DropTipWizard'
+import type { ERUtilsResults } from '../ErrorRecoveryFlows/hooks'
 
 export type DropTipFlowsRoute = typeof DT_ROUTES[keyof typeof DT_ROUTES]
 export type DropTipFlowsStep = DropTipFlowsRoute[number]
@@ -14,14 +15,29 @@ export interface ErrorDetails {
 export type IssuedCommandsType = 'setup' | 'fixit'
 
 interface CopyOverrides {
-  tipDropCompleteBtn: 'proceed_to_cancel' | 'proceed_to_tip_selection'
+  tipDropCompleteBtnCopy: string
+  beforeBeginningTopText: string
+}
+
+interface ErrorOverrides {
+  blowoutFailed: () => void
+  tipDropFailed: () => void
+  generalFailure: () => void
+}
+
+interface ButtonOverrides {
+  goBackBeforeBeginning: () => void
+  tipDropComplete: (() => void) | null
 }
 
 export interface FixitCommandTypeUtils {
   runId: string
   failedCommandId: string
-  onCloseFlow: () => Promise<void>
+  trackCurrentMap: ERUtilsResults['trackExternalMap']
   copyOverrides: CopyOverrides
+  errorOverrides: ErrorOverrides
+  buttonOverrides: ButtonOverrides
+  routeOverride?: typeof DT_ROUTES[keyof typeof DT_ROUTES]
 }
 
 export type DropTipWizardContainerProps = DropTipWizardProps & {

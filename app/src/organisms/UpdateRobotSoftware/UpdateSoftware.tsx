@@ -10,7 +10,7 @@ import {
   Icon,
   JUSTIFY_CENTER,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -60,16 +60,16 @@ export function UpdateSoftware({
         gridGap={SPACING.spacing4}
         alignItems={ALIGN_CENTER}
       >
-        <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
+        <LegacyStyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
           {t('update_found')}
-        </StyledText>
-        <StyledText
+        </LegacyStyledText>
+        <LegacyStyledText
           as="h3"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
           color={COLORS.grey60}
         >
           {renderText()}
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
     </Flex>
   )

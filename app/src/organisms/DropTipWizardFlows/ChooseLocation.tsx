@@ -1,42 +1,52 @@
 import * as React from 'react'
-import { css } from 'styled-components'
+import styled, { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_END,
   Btn,
-  COLORS,
   DIRECTION_COLUMN,
-  DIRECTION_ROW,
   Flex,
-  JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
+  JUSTIFY_FLEX_START,
   PrimaryButton,
   RESPONSIVENESS,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
-  useDeckLocationSelect,
+  DISPLAY_INLINE_BLOCK,
 } from '@opentrons/components'
 import { getDeckDefFromRobotType } from '@opentrons/shared-data'
 
-import { SmallButton } from '../../atoms/buttons'
-import { TwoUpTileLayout } from '../LabwarePositionCheck/TwoUpTileLayout'
+import { SmallButton, TextOnlyButton } from '../../atoms/buttons'
+import { TwoColumn, DeckMapContent } from '../../molecules/InterventionModal'
 
-import type { AddressableAreaName, RobotType } from '@opentrons/shared-data'
+import type {
+  AddressableAreaName,
+  ModuleLocation,
+} from '@opentrons/shared-data'
+import type { DropTipWizardContainerProps } from './types'
 
 // TODO: get help link article URL
 
-interface ChooseLocationProps {
+type ChooseLocationProps = DropTipWizardContainerProps & {
   handleProceed: () => void
   handleGoBack: () => void
   title: string
   body: string | JSX.Element
-  robotType: RobotType
   moveToAddressableArea: (addressableArea: AddressableAreaName) => Promise<void>
-  isOnDevice: boolean
 }
+const Title = styled.h1`
+  ${TYPOGRAPHY.h1Default};
+  margin-bottom: ${SPACING.spacing8};
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    ${TYPOGRAPHY.level4HeaderSemiBold};
+    margin-bottom: 0;
+    height: ${SPACING.spacing40};
+    display: ${DISPLAY_INLINE_BLOCK};
+  }
+`
 
 export const ChooseLocation = (
   props: ChooseLocationProps
@@ -48,17 +58,18 @@ export const ChooseLocation = (
     body,
     robotType,
     moveToAddressableArea,
-    isOnDevice,
+    issuedCommandsType,
   } = props
   const { i18n, t } = useTranslation(['drop_tip_wizard', 'shared'])
+  const [
+    selectedLocation,
+    setSelectedLocation,
+  ] = React.useState<ModuleLocation>()
   const deckDef = getDeckDefFromRobotType(robotType)
-  const { DeckLocationSelect, selectedLocation } = useDeckLocationSelect(
-    robotType
-  )
 
   const handleConfirmPosition = (): void => {
     const deckSlot = deckDef.locations.addressableAreas.find(
-      l => l.id === selectedLocation.slotName
+      l => l.id === selectedLocation?.slotName
     )?.id
 
     if (deckSlot != null) {
@@ -67,124 +78,78 @@ export const ChooseLocation = (
       })
     }
   }
-
-  if (isOnDevice) {
-    return (
+  return (
+    <Flex
+      css={CONTAINER_STYLE}
+      height={issuedCommandsType === 'fixit' ? '100%' : '24.625rem'}
+    >
+      <TwoColumn>
+        <Flex flexDirection={DIRECTION_COLUMN} flex="1" gap={SPACING.spacing16}>
+          <Title>{title}</Title>
+          <LegacyStyledText as="p">{body}</LegacyStyledText>
+        </Flex>
+        <DeckMapContent
+          kind={'deck-config'}
+          setSelectedLocation={setSelectedLocation}
+          robotType={robotType}
+        />
+      </TwoColumn>
       <Flex
-        padding={SPACING.spacing32}
-        flexDirection={DIRECTION_COLUMN}
+        width="100%"
         justifyContent={JUSTIFY_SPACE_BETWEEN}
-        flex="1"
+        css={ALIGN_BUTTONS}
+        gridGap={SPACING.spacing8}
       >
-        <Flex
-          flexDirection={DIRECTION_ROW}
-          gridGap={SPACING.spacing24}
-          flex="1"
+        <Btn
+          onClick={() => {
+            handleGoBack()
+          }}
         >
-          <Flex
-            flexDirection={DIRECTION_COLUMN}
-            gridGap={SPACING.spacing8}
-            width="100%"
-            flex="1"
-          >
-            <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-              {title}
-            </StyledText>
-            <StyledText as="p">{body}</StyledText>
-          </Flex>
-          <Flex
-            flex="1"
-            justifyContent={JUSTIFY_CENTER}
-            paddingLeft={SPACING.spacing24}
-          >
-            {DeckLocationSelect}
-          </Flex>
-        </Flex>
-        <Flex
-          width="100%"
-          justifyContent={JUSTIFY_SPACE_BETWEEN}
-          css={ALIGN_BUTTONS}
-          gridGap={SPACING.spacing8}
-        >
-          <Btn
-            onClick={() => {
-              handleGoBack()
-            }}
-          >
-            <StyledText css={GO_BACK_BUTTON_STYLE}>
-              {t('shared:go_back')}
-            </StyledText>
-          </Btn>
-          <SmallButton
-            buttonText={i18n.format(t('move_to_slot'), 'capitalize')}
-            onClick={handleConfirmPosition}
+          <TextOnlyButton
+            onClick={handleGoBack}
+            buttonText={t('shared:go_back')}
           />
-        </Flex>
-      </Flex>
-    )
-  } else {
-    return (
-      <Flex css={TILE_CONTAINER_STYLE}>
-        <TwoUpTileLayout
-          title={title}
-          body={body}
-          rightElement={DeckLocationSelect}
-          footer={
-            <Flex
-              width="100%"
-              justifyContent={JUSTIFY_SPACE_BETWEEN}
-              gridGap={SPACING.spacing8}
-            >
-              <Btn
-                onClick={() => {
-                  handleGoBack()
-                }}
-              >
-                <StyledText css={GO_BACK_BUTTON_STYLE}>
-                  {t('shared:go_back')}
-                </StyledText>
-              </Btn>
-              <PrimaryButton onClick={handleConfirmPosition}>
-                {i18n.format(t('move_to_slot'), 'capitalize')}
-              </PrimaryButton>
-            </Flex>
-          }
+        </Btn>
+        <PrimaryButton
+          onClick={handleConfirmPosition}
+          css={css`
+            @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+              display: none;
+            }
+          `}
+        >
+          {i18n.format(t('move_to_slot'), 'capitalize')}
+        </PrimaryButton>
+        <SmallButton
+          buttonText={i18n.format(t('move_to_slot'), 'capitalize')}
+          onClick={handleConfirmPosition}
+          css={css`
+            @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+              display: none;
+            }
+          `}
         />
       </Flex>
-    )
-  }
+    </Flex>
+  )
 }
-
-const TILE_CONTAINER_STYLE = css`
-  flex-direction: ${DIRECTION_COLUMN};
-  justify-content: ${JUSTIFY_SPACE_BETWEEN};
-  height: 24.625rem;
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    height: 29.5rem;
-  }
-`
-const GO_BACK_BUTTON_STYLE = css`
-  ${TYPOGRAPHY.pSemiBold};
-  color: ${COLORS.grey50};
-
-  &:hover {
-    opacity: 70%;
-  }
-
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
-    font-size: ${TYPOGRAPHY.fontSize22};
-    padding-left: 0rem;
-    &:hover {
-      opacity: 100%;
-    }
-  }
-`
 
 const ALIGN_BUTTONS = css`
   align-items: ${ALIGN_FLEX_END};
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     align-items: ${ALIGN_CENTER};
+  }
+`
+
+const CONTAINER_STYLE = css`
+  flex-direction: ${DIRECTION_COLUMN};
+  justify-content: ${JUSTIFY_SPACE_BETWEEN};
+  padding: ${SPACING.spacing32};
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    justify-content: ${JUSTIFY_FLEX_START};
+    gap: ${SPACING.spacing32};
+    padding: none;
+    height: 29.5rem;
   }
 `

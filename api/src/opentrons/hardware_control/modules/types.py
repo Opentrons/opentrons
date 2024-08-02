@@ -19,7 +19,7 @@ from pathlib import Path
 from opentrons.drivers.rpi_drivers.types import USBPort
 
 if TYPE_CHECKING:
-    from opentrons_shared_data.module.dev_types import (
+    from opentrons_shared_data.module.types import (
         ThermocyclerModuleType,
         MagneticModuleType,
         TemperatureModuleType,
@@ -80,6 +80,8 @@ class ModuleType(str, Enum):
             return "heaterShakerModuleV1"
         if module_type == ModuleType.MAGNETIC_BLOCK:
             return "magneticBlockV1"
+        if module_type == ModuleType.ABSORBANCE_READER:
+            return "absorbanceReaderV1"
         else:
             raise ValueError(
                 f"Module Type {module_type} does not have a related fixture ID."
@@ -209,4 +211,11 @@ class HeaterShakerStatus(str, Enum):
 class AbsorbanceReaderStatus(str, Enum):
     IDLE = "idle"
     MEASURING = "measuring"
+    ERROR = "error"
+
+
+class LidStatus(str, Enum):
+    ON = "on"
+    OFF = "off"
+    UNKNOWN = "unknown"
     ERROR = "error"

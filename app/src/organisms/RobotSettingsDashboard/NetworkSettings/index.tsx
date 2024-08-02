@@ -13,7 +13,7 @@ import {
   Flex,
   Icon,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -127,23 +127,23 @@ function NetworkSettingButton({
           <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing24}>
             <Icon name={iconName} size="3rem" />
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing2}>
-              <StyledText
+              <LegacyStyledText
                 fontSize={TYPOGRAPHY.fontSize28}
                 lineHeight={TYPOGRAPHY.lineHeight36}
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 textAlign={TYPOGRAPHY.textAlignLeft}
               >
                 {buttonTitle}
-              </StyledText>
+              </LegacyStyledText>
               {networkName != null ? (
-                <StyledText
+                <LegacyStyledText
                   fontSize={TYPOGRAPHY.fontSize28}
                   lineHeight={TYPOGRAPHY.lineHeight36}
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
                   color={COLORS.grey60}
                 >
                   {networkName}
-                </StyledText>
+                </LegacyStyledText>
               ) : null}
             </Flex>
           </Flex>

@@ -9,7 +9,7 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -57,13 +57,13 @@ export const LegacyModalHeader = (
       >
         <Flex>
           {icon != null && <Icon {...icon} data-testid="Modal_header_icon" />}
-          <StyledText
+          <LegacyStyledText
             as="h3"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             color={color}
           >
             {title}
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
         {closeButton != null
           ? closeButton

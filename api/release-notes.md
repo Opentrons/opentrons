@@ -6,6 +6,35 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
+## Opentrons Robot Software Changes in 7.5.0
+
+Welcome to the v7.5.0 release of the Opentrons robot software!
+
+### Hardware Support
+
+- [Opentrons Flex HEPA/UV Module](https://opentrons.com/products/opentrons-flex-hepa-uv-module)
+- Latest Flex Gripper model (serial numbers beginning `GRPV13`)
+
+### Bug Fixes
+
+- Fixed certain string runtime parameter values being misinterpreted as an incorrect type.
+
+### Known Issue
+
+- The HEPA/UV Module's buttons may not respond properly after its safety shutoff is activated. This happens when the module is removed from the top of Flex while its lights are on. Power cycle the module to restore normal behavior. The module is safe to use even if you do not power cycle it.
+
+---
+
+## Opentrons Robot Software Changes in 7.3.1
+
+Welcome to the v7.3.1 release of the Opentrons robot software!
+
+### Improved Features
+
+- Updated values for how much a tip overlaps with the pipette nozzle when the pipette picks up tips, in order to make protocols more reliable. These new values only apply to JSON protocols and Python protocols specifying API version 2.19.
+
+---
+
 ## Opentrons Robot Software Changes in 7.3.0
 
 Welcome to the v7.3.0 release of the Opentrons robot software!

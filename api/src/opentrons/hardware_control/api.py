@@ -27,8 +27,8 @@ from opentrons_shared_data.errors.exceptions import (
 from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
 )
-from opentrons_shared_data.pipette.dev_types import PipetteName
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.pipette.types import PipetteName
+from opentrons_shared_data.robot.types import RobotType
 from opentrons import types as top_types
 from opentrons.config import robot_configs
 from opentrons.config.types import RobotConfig, OT3Config
@@ -65,7 +65,7 @@ from .robot_calibration import (
     RobotCalibration,
 )
 from .protocols import HardwareControlInterface
-from .instruments.ot2.pipette_handler import PipetteHandlerProvider, PickUpTipSpec
+from .instruments.ot2.pipette_handler import PipetteHandlerProvider
 from .instruments.ot2.instrument_calibration import load_pipette_offset
 from .motion_utilities import (
     target_position_from_absolute,
@@ -1155,8 +1155,21 @@ class API(
     async def tip_pickup_moves(
         self,
         mount: top_types.Mount,
-        spec: PickUpTipSpec,
+        presses: Optional[int] = None,
+        increment: Optional[float] = None,
     ) -> None:
+        spec, _ = self.plan_check_pick_up_tip(
+            mount=mount, presses=presses, increment=increment
+        )
+        self._backend.set_active_current(spec.plunger_currents)
+        target_absolute = target_position_from_plunger(
+            mount, spec.plunger_prep_pos, self._current_position
+        )
+        await self._move(
+            target_absolute,
+            home_flagged_axes=False,
+        )
+
         for press in spec.presses:
             with self._backend.save_current():
                 self._backend.set_active_current(press.current)
@@ -1176,6 +1189,11 @@ class API(
 
         await self.retract(mount, spec.retract_target)
 
+    def cache_tip(self, mount: top_types.Mount, tip_length: float) -> None:
+        instrument = self.get_pipette(mount)
+        instrument.add_tip(tip_length=tip_length)
+        instrument.set_current_volume(0)
+
     async def pick_up_tip(
         self,
         mount: top_types.Mount,
@@ -1189,7 +1207,7 @@ class API(
         """
 
         spec, _add_tip_to_instrs = self.plan_check_pick_up_tip(
-            mount, tip_length, presses, increment
+            mount=mount, presses=presses, increment=increment, tip_length=tip_length
         )
         self._backend.set_active_current(spec.plunger_currents)
         target_absolute = target_position_from_plunger(
@@ -1200,7 +1218,24 @@ class API(
             home_flagged_axes=False,
         )
 
-        await self.tip_pickup_moves(mount, spec)
+        for press in spec.presses:
+            with self._backend.save_current():
+                self._backend.set_active_current(press.current)
+                target_down = target_position_from_relative(
+                    mount, press.relative_down, self._current_position
+                )
+                await self._move(target_down, speed=press.speed)
+            target_up = target_position_from_relative(
+                mount, press.relative_up, self._current_position
+            )
+            await self._move(target_up)
+        # neighboring tips tend to get stuck in the space between
+        # the volume chamber and the drop-tip sleeve on p1000.
+        # This extra shake ensures those tips are removed
+        for rel_point, speed in spec.shake_off_list:
+            await self.move_rel(mount, rel_point, speed=speed)
+
+        await self.retract(mount, spec.retract_target)
         _add_tip_to_instrs()
 
         if prep_after:

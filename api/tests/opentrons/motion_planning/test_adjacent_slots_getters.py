@@ -2,7 +2,7 @@
 import pytest
 from typing import List, Optional
 
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.types import RobotType
 
 from opentrons.types import DeckSlotName, StagingSlotName
 from opentrons.motion_planning.adjacent_slots_getters import (

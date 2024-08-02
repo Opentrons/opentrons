@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { useParams, useHistory } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
 
@@ -36,6 +36,7 @@ import {
   useHost,
   useProtocolQuery,
   useInstrumentsQuery,
+  useDeleteRunMutation,
 } from '@opentrons/react-api-client'
 
 import { LargeButton } from '../../atoms/buttons'
@@ -68,14 +69,17 @@ import type { OnDeviceRouteParams } from '../../App/types'
 import type { PipetteWithTip } from '../../organisms/DropTipWizardFlows'
 
 export function RunSummary(): JSX.Element {
-  const { runId } = useParams<OnDeviceRouteParams>()
+  const { runId } = useParams<
+    keyof OnDeviceRouteParams
+  >() as OnDeviceRouteParams
   const { t } = useTranslation('run_details')
-  const history = useHistory()
+  const navigate = useNavigate()
   const host = useHost()
   const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
   const isRunCurrent = Boolean(runRecord?.data?.current)
   const mostRecentRunId = useMostRecentRunId()
   const { data: attachedInstruments } = useInstrumentsQuery()
+  const { deleteRun } = useDeleteRunMutation()
   const runStatus = runRecord?.data.status ?? null
   const didRunSucceed = runStatus === RUN_STATUS_SUCCEEDED
   const protocolId = runRecord?.data.protocolId ?? null
@@ -85,6 +89,8 @@ export function RunSummary(): JSX.Element {
   const protocolName =
     protocolRecord?.data.metadata.protocolName ??
     protocolRecord?.data.files[0].name
+  const isQuickTransfer = protocolRecord?.data.protocolKind === 'quick-transfer'
+
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
   const createdAtTimestamp = useRunCreatedAtTimestamp(runId)
   const startedAtTimestamp =
@@ -103,7 +109,14 @@ export function RunSummary(): JSX.Element {
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name ?? 'no name'
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
-  const { reset, isResetRunLoading } = useRunControls(runId)
+
+  const onCloneRunSuccess = (): void => {
+    if (isQuickTransfer) {
+      deleteRun(runId)
+    }
+  }
+
+  const { reset, isResetRunLoading } = useRunControls(runId, onCloneRunSuccess)
   const trackEvent = useTrackEvent()
   const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
@@ -144,7 +157,21 @@ export function RunSummary(): JSX.Element {
 
   const returnToDash = (): void => {
     closeCurrentRun()
-    history.push('/')
+    navigate('/')
+  }
+  // TODO(jh, 07-24-24): After EXEC-504, add reportRecoveredRunResult here.
+
+  const returnToQuickTransfer = (): void => {
+    if (!isRunCurrent) {
+      deleteRun(runId)
+    } else {
+      closeCurrentRun({
+        onSuccess: () => {
+          deleteRun(runId)
+        },
+      })
+    }
+    navigate('/quick-transfer')
   }
 
   // TODO(jh, 05-30-24): EXEC-487. Refactor reset() so we can redirect to the setup page, showing the shimmer skeleton instead.
@@ -175,6 +202,8 @@ export function RunSummary(): JSX.Element {
         host,
         pipettesWithTip,
       })
+    } else if (isQuickTransfer) {
+      returnToQuickTransfer()
     } else {
       returnToDash()
     }
@@ -321,7 +350,11 @@ export function RunSummary(): JSX.Element {
               onClick={() => {
                 handleReturnToDash(pipettesWithTip)
               }}
-              buttonText={t('return_to_dashboard')}
+              buttonText={
+                isQuickTransfer
+                  ? t('return_to_quick_transfer')
+                  : t('return_to_dashboard')
+              }
               height="17rem"
             />
             <LargeButton

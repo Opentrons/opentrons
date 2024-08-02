@@ -10,7 +10,7 @@ import {
   Icon,
   RESPONSIVENESS,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { Modal } from '../../molecules/Modal'
@@ -48,13 +48,13 @@ export function UpdateInProgressModal(
         alignItems={ALIGN_CENTER}
         gridGap={SPACING.spacing40}
       >
-        <StyledText
+        <LegacyStyledText
           as="h4"
           marginBottom={SPACING.spacing4}
           fontWeight={TYPOGRAPHY.fontWeightBold}
         >
           {t('updating_firmware', { subsystem: t(subsystem) })}
-        </StyledText>
+        </LegacyStyledText>
         <Icon
           name="ot-spinner"
           aria-label="spinner"

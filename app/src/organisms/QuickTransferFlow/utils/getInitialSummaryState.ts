@@ -46,20 +46,26 @@ export function getInitialSummaryState(
   const volumeLimits = getVolumeRange(state)
 
   let path: PathOption = 'single'
+  // for multiDispense the volume capacity must be at least 3x the volume per well
+  // to account for the 1x volume per well disposal volume default
   if (
-    state.transferType === 'consolidate' &&
-    volumeLimits.max >= state.volume * 2
+    state.transferType === 'distribute' &&
+    volumeLimits.max >= state.volume * 3
   ) {
     path = 'multiDispense'
+    // for multiAspirate the volume capacity must be at least 2x the volume per well
   } else if (
-    state.transferType === 'distribute' &&
+    state.transferType === 'consolidate' &&
     volumeLimits.max >= state.volume * 2
   ) {
     path = 'multiAspirate'
   }
 
   let changeTip: ChangeTipOptions = 'always'
-  if (state.sourceWells.length > 96 || state.destinationWells.length > 96) {
+  if (
+    state.sourceWells.length * state.pipette.channels > 96 ||
+    state.destinationWells.length * state.pipette.channels > 96
+  ) {
     changeTip = 'once'
   }
 
@@ -83,6 +89,8 @@ export function getInitialSummaryState(
     aspirateFlowRate: flowRatesForSupportedTip.defaultAspirateFlowRate.default,
     dispenseFlowRate: flowRatesForSupportedTip.defaultDispenseFlowRate.default,
     path,
+    disposalVolume: path === 'multiDispense' ? state.volume : undefined,
+    blowOut: path === 'multiDispense' ? trashConfigCutout : undefined,
     tipPositionAspirate: 1,
     preWetTip: false,
     tipPositionDispense: 1,

@@ -65,6 +65,9 @@ stages:
                   default: flex_1channel_50
                   value: flex_1channel_50
                   description: What pipette to use during the protocol.
+                - displayName: Liquid handling CSV file
+                  variableName: liq_handling_csv_file
+                  description: A CSV file that contains wells to use for pipetting
 
   - name: Check that the analysis summary is present in /protocols/:id; retry until it says it's completed
     max_retries: 5
@@ -84,6 +87,7 @@ stages:
           files: !anything
           createdAt: !anything
           robotType: !anything
+          protocolKind: !anything
           metadata: !anything
         links: !anything
 
@@ -166,6 +170,9 @@ stages:
                   default: flex_1channel_50
                   value: flex_1channel_50
                   description: What pipette to use during the protocol.
+                - displayName: Liquid handling CSV file
+                  variableName: liq_handling_csv_file
+                  description: A CSV file that contains wells to use for pipetting
 
 
   - name: Check that the new analysis uses run time parameter values from client; retry until analysis is completed
@@ -243,3 +250,6 @@ stages:
                 default: flex_1channel_50
                 value: flex_1channel_50
                 description: What pipette to use during the protocol.
+              - displayName: Liquid handling CSV file
+                variableName: liq_handling_csv_file
+                description: A CSV file that contains wells to use for pipetting

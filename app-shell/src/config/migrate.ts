@@ -25,13 +25,16 @@ import type {
   ConfigV19,
   ConfigV20,
   ConfigV21,
+  ConfigV22,
+  ConfigV23,
+  ConfigV24,
 } from '@opentrons/app/src/redux/config/types'
 // format
 // base config v0 defaults
 // any default values for later config versions are specified in the migration
 // functions for those version below
 
-const CONFIG_VERSION_LATEST = 21
+const CONFIG_VERSION_LATEST = 23
 
 export const DEFAULTS_V0: ConfigV0 = {
   version: 0,
@@ -390,6 +393,43 @@ const toVersion21 = (prevConfig: ConfigV20): ConfigV21 => {
   }
 }
 
+const toVersion22 = (prevConfig: ConfigV21): ConfigV22 => {
+  const nextConfig = {
+    ...prevConfig,
+    version: 22 as const,
+    analytics: {
+      appId: prevConfig.analytics.appId,
+      optedIn: true,
+    },
+  }
+  return nextConfig
+}
+
+const toVersion23 = (prevConfig: ConfigV22): ConfigV23 => {
+  const nextConfig = {
+    ...prevConfig,
+    version: 23 as const,
+    protocols: {
+      ...prevConfig.protocols,
+      pinnedQuickTransferIds: [],
+      quickTransfersOnDeviceSortKey: null,
+      hasDismissedQuickTransferIntro: false,
+    },
+  }
+  return nextConfig
+}
+
+const toVersion24 = (prevConfig: ConfigV23): ConfigV24 => {
+  const { support, ...rest } = prevConfig
+  return {
+    ...rest,
+    version: 24 as const,
+    userInfo: {
+      userId: uuid(),
+    },
+  }
+}
+
 const MIGRATIONS: [
   (prevConfig: ConfigV0) => ConfigV1,
   (prevConfig: ConfigV1) => ConfigV2,
@@ -411,7 +451,10 @@ const MIGRATIONS: [
   (prevConfig: ConfigV17) => ConfigV18,
   (prevConfig: ConfigV18) => ConfigV19,
   (prevConfig: ConfigV19) => ConfigV20,
-  (prevConfig: ConfigV20) => ConfigV21
+  (prevConfig: ConfigV20) => ConfigV21,
+  (prevConfig: ConfigV21) => ConfigV22,
+  (prevConfig: ConfigV22) => ConfigV23,
+  (prevConfig: ConfigV23) => ConfigV24
 ] = [
   toVersion1,
   toVersion2,
@@ -434,6 +477,9 @@ const MIGRATIONS: [
   toVersion19,
   toVersion20,
   toVersion21,
+  toVersion22,
+  toVersion23,
+  toVersion24,
 ]
 
 export const DEFAULTS: Config = migrate(DEFAULTS_V0)
@@ -462,6 +508,9 @@ export function migrate(
     | ConfigV19
     | ConfigV20
     | ConfigV21
+    | ConfigV22
+    | ConfigV23
+    | ConfigV24
 ): Config {
   const prevVersion = prevConfig.version
   let result = prevConfig

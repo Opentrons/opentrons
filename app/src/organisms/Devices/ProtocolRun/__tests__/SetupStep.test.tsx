@@ -13,7 +13,6 @@ describe('SetupStep', () => {
     expanded = true,
     title = 'stub title',
     description = 'stub description',
-    label = 'stub label',
     toggleExpanded = toggleExpandedMock,
     children = <button>stub children</button>,
     rightElement = <div>right element</div>,
@@ -24,7 +23,6 @@ describe('SetupStep', () => {
           expanded,
           title,
           description,
-          label,
           toggleExpanded,
           children,
           rightElement,
@@ -54,7 +52,6 @@ describe('SetupStep', () => {
   })
   it('renders text nodes with prop contents', () => {
     render({ expanded: false })
-    screen.getByText('stub label')
     screen.getByText('stub title')
     screen.queryAllByText('stub description')
     screen.queryAllByText('right element')

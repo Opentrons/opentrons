@@ -5,7 +5,7 @@ from typing import cast, Dict
 import pytest
 from decoy import Decoy
 
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV5, SlotDefV3
+from opentrons_shared_data.deck.types import DeckDefinitionV5, SlotDefV3
 
 from opentrons.motion_planning import adjacent_slots_getters as mock_adjacent_slots
 from opentrons.protocols.api_support.types import APIVersion

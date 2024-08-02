@@ -43,6 +43,7 @@ stages:
           current: True
           actions: []
           errors: []
+          hasEverEnteredErrorRecovery: False
           pipettes: []
           modules: []
           labware: []
@@ -134,6 +135,9 @@ stages:
               default: flex_1channel_50
               value: flex_8channel_50
               description: What pipette to use during the protocol.
+            - displayName: Liquid handling CSV file
+              variableName: liq_handling_csv_file
+              description: A CSV file that contains wells to use for pipetting
           protocolId: '{protocol_id}'
 
   - name: Mark the run as not-current
@@ -200,4 +204,7 @@ stages:
               default: flex_1channel_50
               value: flex_8channel_50
               description: What pipette to use during the protocol.
+            - displayName: Liquid handling CSV file
+              variableName: liq_handling_csv_file
+              description: A CSV file that contains wells to use for pipetting
           protocolId: '{protocol_id}'

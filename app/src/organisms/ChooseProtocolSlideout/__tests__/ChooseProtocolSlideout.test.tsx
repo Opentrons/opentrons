@@ -1,12 +1,13 @@
 import * as React from 'react'
 import { vi, it, describe, expect, beforeEach } from 'vitest'
-import { StaticRouter } from 'react-router-dom'
-import { fireEvent, screen } from '@testing-library/react'
+import { MemoryRouter } from 'react-router-dom'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 
 import { simpleAnalysisFileFixture } from '@opentrons/api-client'
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
+import { useFeatureFlag } from '../../../redux/config'
 import { getStoredProtocols } from '../../../redux/protocol-storage'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import {
@@ -18,6 +19,7 @@ import { useCreateRunFromProtocol } from '../../ChooseRobotToRunProtocolSlideout
 import { ChooseProtocolSlideout } from '../'
 import { useNotifyDataReady } from '../../../resources/useNotifyDataReady'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
+import { when } from 'vitest-when'
 
 vi.mock('../../ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol')
 vi.mock('../../../redux/protocol-storage')
@@ -27,9 +29,9 @@ vi.mock('../../../resources/useNotifyDataReady')
 
 const render = (props: React.ComponentProps<typeof ChooseProtocolSlideout>) => {
   return renderWithProviders(
-    <StaticRouter>
+    <MemoryRouter>
       <ChooseProtocolSlideout {...props} />
-    </StaticRouter>,
+    </MemoryRouter>,
     {
       i18nInstance: i18n,
     }
@@ -67,6 +69,7 @@ describe('ChooseProtocolSlideout', () => {
       trackCreateProtocolRunEvent: mockTrackCreateProtocolRunEvent,
     })
     vi.mocked(useNotifyDataReady).mockReturnValue({} as any)
+    when(vi.mocked(useFeatureFlag)).calledWith('enableCsvFile').thenReturn(true)
   })
 
   it('renders slideout if showSlideout true', () => {
@@ -106,7 +109,7 @@ describe('ChooseProtocolSlideout', () => {
     ).toBeInTheDocument()
   })
 
-  it('calls createRunFromProtocolSource if CTA clicked', () => {
+  it('calls createRunFromProtocolSource if CTA clicked', async () => {
     const protocolDataWithoutRunTimeParameter = {
       ...storedProtocolDataWithoutRunTimeParameters,
     }
@@ -122,10 +125,14 @@ describe('ChooseProtocolSlideout', () => {
       name: 'Proceed to setup',
     })
     fireEvent.click(proceedButton)
-    expect(mockCreateRunFromProtocol).toHaveBeenCalledWith({
-      files: [expect.any(File)],
-      protocolKey: storedProtocolDataFixture.protocolKey,
-    })
+    await waitFor(() =>
+      expect(mockCreateRunFromProtocol).toHaveBeenCalledWith({
+        files: [expect.any(File)],
+        protocolKey: storedProtocolDataFixture.protocolKey,
+        runTimeParameterValues: expect.any(Object),
+        runTimeParameterFiles: expect.any(Object),
+      })
+    )
     expect(mockTrackCreateProtocolRunEvent).toHaveBeenCalled()
   })
 

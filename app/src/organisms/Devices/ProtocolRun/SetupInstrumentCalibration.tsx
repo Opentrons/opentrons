@@ -6,7 +6,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import * as PipetteConstants from '../../../redux/pipettes/constants'
@@ -62,13 +62,13 @@ export function SetupInstrumentCalibration({
       {getShowPipetteCalibrationWarning(instrumentsQueryData) && (
         <PipetteRecalibrationWarning />
       )}
-      <StyledText
+      <LegacyStyledText
         color={COLORS.black90}
         css={TYPOGRAPHY.pSemiBold}
         id="PipetteCalibration_requiredPipettesTitle"
       >
         {i18n.format(t('required_instrument_calibrations'), 'titleCase')}
-      </StyledText>
+      </LegacyStyledText>
       {PipetteConstants.PIPETTE_MOUNTS.map((mount, index) => {
         const pipetteInfo = runPipetteInfoByMount[mount]
         if (pipetteInfo != null && !isFlex) {

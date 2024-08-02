@@ -8,7 +8,7 @@ import { useDropTipRouting, useDropTipWithType } from './hooks'
 import { DropTipWizard } from './DropTipWizard'
 
 import type { PipetteModelSpecs, RobotType } from '@opentrons/shared-data'
-import type { PipetteData } from '@opentrons/api-client'
+import type { Mount, PipetteData } from '@opentrons/api-client'
 import type { FixitCommandTypeUtils, IssuedCommandsType } from './types'
 import type { GetPipettesWithTipAttached } from './getPipettesWithTipAttached'
 
@@ -42,16 +42,17 @@ export interface DropTipWizardFlowsProps {
 export function DropTipWizardFlows(
   props: DropTipWizardFlowsProps
 ): JSX.Element {
-  const issuedCommandsType: IssuedCommandsType = props.fixitCommandTypeUtils
-    ? 'fixit'
-    : 'setup'
+  const { fixitCommandTypeUtils } = props
+
+  const issuedCommandsType: IssuedCommandsType =
+    fixitCommandTypeUtils != null ? 'fixit' : 'setup'
 
   const dropTipWithTypeUtils = useDropTipWithType({
     ...props,
     issuedCommandsType,
   })
 
-  const dropTipRoutingUtils = useDropTipRouting()
+  const dropTipRoutingUtils = useDropTipRouting(fixitCommandTypeUtils)
 
   return (
     <DropTipWizard
@@ -64,24 +65,28 @@ export function DropTipWizardFlows(
 }
 
 export interface PipetteWithTip {
-  mount: 'left' | 'right'
+  mount: Mount
   specs: PipetteModelSpecs
 }
 
-interface TipAttachmentStatusResult {
+export interface TipAttachmentStatusResult {
   /** Updates the pipettes with tip cache. Determine whether tips are likely attached on one or more pipettes.
    *
    * NOTE: Use responsibly! This function can potentially (but not likely) iterate over the entire length of a protocol run.
    * */
-  determineTipStatus: () => Promise<void>
+  determineTipStatus: () => Promise<PipetteWithTip[]>
   /** Whether tips are likely attached on *any* pipette. Typically called after determineTipStatus() */
   areTipsAttached: boolean
   /** Resets the cached pipettes with tip statuses to null.  */
   resetTipStatus: () => void
   /** Removes the first element from the tip attached cache if present.
-   * @param {Function} onEmptyCache After skipping the pipette, if the attached tip cache is empty, invoke this callback.
+   * @param {Function} onEmptyCache After removing the pipette from the cache, if the attached tip cache is empty, invoke this callback.
+   * @param {Function} onTipsDetected After removing the pipette from the cache, if the attached tip cache is not empty, invoke this callback.
    * */
-  setTipStatusResolved: (onEmptyCache?: () => void) => Promise<PipetteWithTip[]>
+  setTipStatusResolved: (
+    onEmptyCache?: () => void,
+    onTipsDetected?: () => void
+  ) => Promise<PipetteWithTip[]>
   /** Relevant pipette information for those pipettes with tips attached. */
   pipettesWithTip: PipetteWithTip[]
 }
@@ -97,7 +102,9 @@ export function useTipAttachmentStatus(
   const areTipsAttached =
     pipettesWithTip.length != null && head(pipettesWithTip)?.specs != null
 
-  const determineTipStatus = React.useCallback((): Promise<void> => {
+  const determineTipStatus = React.useCallback((): Promise<
+    PipetteWithTip[]
+  > => {
     return getPipettesWithTipAttached(params).then(pipettesWithTip => {
       const pipettesWithTipsData = pipettesWithTip.map(pipette => {
         const specs = getPipetteModelSpecs(pipette.instrumentModel)
@@ -111,6 +118,8 @@ export function useTipAttachmentStatus(
       ) as PipetteWithTip[]
 
       setPipettesWithTip(pipettesWithTipAndSpecs)
+
+      return Promise.resolve(pipettesWithTipAndSpecs)
     })
   }, [params])
 
@@ -119,13 +128,16 @@ export function useTipAttachmentStatus(
   }
 
   const setTipStatusResolved = (
-    onEmptyCache?: () => void
+    onEmptyCache?: () => void,
+    onTipsDetected?: () => void
   ): Promise<PipetteWithTip[]> => {
     return new Promise<PipetteWithTip[]>(resolve => {
       setPipettesWithTip(prevPipettesWithTip => {
         const newState = [...prevPipettesWithTip.slice(1)]
         if (newState.length === 0) {
           onEmptyCache?.()
+        } else {
+          onTipsDetected?.()
         }
 
         resolve(newState)

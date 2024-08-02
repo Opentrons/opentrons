@@ -31,7 +31,7 @@ from ..maintenance_run_models import (
     MaintenanceRunCreate,
     MaintenanceRunNotFoundError,
 )
-from ..maintenance_engine_store import EngineConflictError
+from ..maintenance_run_orchestrator_store import RunConflictError
 from ..maintenance_run_data_manager import MaintenanceRunDataManager
 from ..dependencies import get_maintenance_run_data_manager
 
@@ -279,7 +279,7 @@ async def remove_run(
     try:
         await run_data_manager.delete(runId)
 
-    except EngineConflictError as e:
+    except RunConflictError as e:
         raise RunNotIdle().as_error(status.HTTP_409_CONFLICT) from e
     except MaintenanceRunNotFoundError as e:
         raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e

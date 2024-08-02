@@ -140,9 +140,11 @@ def command_note_tracker_provider(decoy: Decoy) -> CommandNoteTrackerProvider:
 
 
 @pytest.fixture
-def error_recovery_policy(decoy: Decoy) -> ErrorRecoveryPolicy:
+def error_recovery_policy(state_store: StateStore, decoy: Decoy) -> ErrorRecoveryPolicy:
     """Get a mock error recovery policy."""
-    return decoy.mock(cls=ErrorRecoveryPolicy)
+    mock = decoy.mock(cls=ErrorRecoveryPolicy)
+    decoy.when(state_store.commands.get_error_recovery_policy()).then_return(mock)
+    return mock
 
 
 def get_next_tracker(
@@ -182,7 +184,6 @@ def subject(
     status_bar: StatusBarHandler,
     model_utils: ModelUtils,
     command_note_tracker_provider: CommandNoteTrackerProvider,
-    error_recovery_policy: ErrorRecoveryPolicy,
 ) -> CommandExecutor:
     """Get a CommandExecutor test subject with its dependencies mocked out."""
     return CommandExecutor(
@@ -200,7 +201,6 @@ def subject(
         rail_lights=rail_lights,
         status_bar=status_bar,
         command_note_tracker_provider=command_note_tracker_provider,
-        error_recovery_policy=error_recovery_policy,
     )
 
 
@@ -498,9 +498,9 @@ async def test_execute_undefined_error(
         datetime(year=2023, month=3, day=3),
     )
 
-    decoy.when(error_recovery_policy(matchers.Anything(), None)).then_return(
-        ErrorRecoveryType.WAIT_FOR_RECOVERY
-    )
+    decoy.when(
+        error_recovery_policy(matchers.Anything(), matchers.Anything(), None)
+    ).then_return(ErrorRecoveryType.WAIT_FOR_RECOVERY)
 
     decoy.when(command_note_tracker.get_notes()).then_return(command_notes)
 
@@ -636,6 +636,7 @@ async def test_execute_defined_error(
 
     decoy.when(
         error_recovery_policy(
+            matchers.Anything(),
             matchers.Anything(),
             returned_error,  # type: ignore[arg-type]
         )

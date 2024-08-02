@@ -9,7 +9,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
@@ -46,9 +46,9 @@ const TipsAttachedModal = NiceModal.create(
     const { showDTWiz, toggleDTWiz } = useDropTipWizardFlows()
 
     const tipsAttachedHeader: ModalHeaderBaseProps = {
-      title: t('tips_are_attached'),
+      title: t('remove_any_attached_tips'),
       iconName: 'ot-alert',
-      iconColor: COLORS.yellow50,
+      iconColor: COLORS.red50,
     }
 
     const cleanUpAndClose = (): void => {
@@ -63,10 +63,10 @@ const TipsAttachedModal = NiceModal.create(
       <ApiHostProvider {...host} hostname={host?.hostname ?? null}>
         <Modal header={tipsAttachedHeader}>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
-            <StyledText as="p">
+            <LegacyStyledText as="p">
               <Trans
                 t={t}
-                i18nKey="remove_the_tips"
+                i18nKey="liquid_damages_this_pipette"
                 values={{
                   mount: displayMountText,
                 }}
@@ -74,7 +74,7 @@ const TipsAttachedModal = NiceModal.create(
                   mount: <strong />,
                 }}
               />
-            </StyledText>
+            </LegacyStyledText>
             <Flex gridGap={SPACING.spacing8}>
               <SmallButton
                 flex="1"

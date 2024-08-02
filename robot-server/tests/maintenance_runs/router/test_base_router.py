@@ -19,7 +19,9 @@ from robot_server.maintenance_runs.maintenance_run_models import (
     MaintenanceRunCreate,
     MaintenanceRunNotFoundError,
 )
-from robot_server.maintenance_runs.maintenance_engine_store import EngineConflictError
+from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
+    RunConflictError,
+)
 from robot_server.maintenance_runs.maintenance_run_data_manager import (
     MaintenanceRunDataManager,
 )
@@ -73,6 +75,7 @@ async def test_create_run(
         labwareOffsets=[],
         status=pe_types.EngineStatus.IDLE,
         liquids=[],
+        hasEverEnteredErrorRecovery=False,
     )
 
     decoy.when(
@@ -144,6 +147,7 @@ async def test_get_run_data_from_url(
         labware=[],
         labwareOffsets=[],
         liquids=[],
+        hasEverEnteredErrorRecovery=False,
     )
 
     decoy.when(mock_maintenance_run_data_manager.get("run-id")).then_return(
@@ -193,6 +197,7 @@ async def test_get_run() -> None:
         labware=[],
         labwareOffsets=[],
         liquids=[],
+        hasEverEnteredErrorRecovery=False,
     )
 
     result = await get_run(run_data=run_data)
@@ -218,6 +223,7 @@ async def test_get_current_run(
         labware=[],
         labwareOffsets=[],
         liquids=[],
+        hasEverEnteredErrorRecovery=False,
     )
     decoy.when(mock_maintenance_run_data_manager.current_run_id).then_return(
         "current-run-id"
@@ -288,7 +294,7 @@ async def test_delete_active_run(
 ) -> None:
     """It should 409 if the run is not finished."""
     decoy.when(await mock_maintenance_run_data_manager.delete("run-id")).then_raise(
-        EngineConflictError("oh no")
+        RunConflictError("oh no")
     )
 
     with pytest.raises(ApiError) as exc_info:

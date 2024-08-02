@@ -1,30 +1,56 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 
 import {
   RUN_STATUS_AWAITING_RECOVERY,
+  RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
+  RUN_STATUS_AWAITING_RECOVERY_PAUSED,
+  RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
+  RUN_STATUS_FAILED,
+  RUN_STATUS_IDLE,
+  RUN_STATUS_PAUSED,
+  RUN_STATUS_RUNNING,
   RUN_STATUS_STOP_REQUESTED,
+  RUN_STATUS_SUCCEEDED,
 } from '@opentrons/api-client'
+import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import { useHost } from '@opentrons/react-api-client'
 
-import { useFeatureFlag } from '../../redux/config'
+import { getIsOnDevice } from '../../redux/config'
 import { ErrorRecoveryWizard, useERWizard } from './ErrorRecoveryWizard'
-import { useRunPausedSplash, RunPausedSplash } from './RunPausedSplash'
+import { RunPausedSplash, useRunPausedSplash } from './RunPausedSplash'
+import { RecoveryTakeover } from './RecoveryTakeover'
 import {
   useCurrentlyRecoveringFrom,
-  useRouteUpdateActions,
-  useRecoveryCommands,
-} from './utils'
-import { RECOVERY_MAP } from './constants'
+  useERUtils,
+  useRecoveryAnalytics,
+  useRecoveryTakeover,
+  useShowDoorInfo,
+} from './hooks'
 
 import type { RunStatus } from '@opentrons/api-client'
-import type { FailedCommand, IRecoveryMap } from './types'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import type { FailedCommand } from './types'
 
 const VALID_ER_RUN_STATUSES: RunStatus[] = [
   RUN_STATUS_AWAITING_RECOVERY,
+  RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
+  RUN_STATUS_AWAITING_RECOVERY_PAUSED,
   RUN_STATUS_STOP_REQUESTED,
+]
+
+const INVALID_ER_RUN_STATUSES: RunStatus[] = [
+  RUN_STATUS_RUNNING,
+  RUN_STATUS_PAUSED,
+  RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
+  RUN_STATUS_FAILED,
+  RUN_STATUS_SUCCEEDED,
+  RUN_STATUS_IDLE,
 ]
 
 interface UseErrorRecoveryResult {
   isERActive: boolean
+  /* There is no FailedCommand if the run statis is not AWAITING_RECOVERY. */
   failedCommand: FailedCommand | null
 }
 
@@ -39,8 +65,23 @@ export function useErrorRecoveryFlows(
   )
   const failedCommand = useCurrentlyRecoveringFrom(runId, runStatus)
 
-  if (!hasSeenAwaitingRecovery && runStatus === RUN_STATUS_AWAITING_RECOVERY) {
+  if (
+    !hasSeenAwaitingRecovery &&
+    ([
+      RUN_STATUS_AWAITING_RECOVERY,
+      RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
+      RUN_STATUS_AWAITING_RECOVERY_PAUSED,
+    ] as Array<RunStatus | null>).includes(runStatus)
+  ) {
     setHasSeenAwaitingRecovery(true)
+  }
+  // Reset recovery mode after the client has exited recovery, otherwise "cancel run" will trigger ER after the first recovery.
+  else if (
+    hasSeenAwaitingRecovery &&
+    runStatus != null &&
+    INVALID_ER_RUN_STATUSES.includes(runStatus)
+  ) {
+    setHasSeenAwaitingRecovery(false)
   }
 
   const isValidRunStatus =
@@ -48,12 +89,13 @@ export function useErrorRecoveryFlows(
     VALID_ER_RUN_STATUSES.includes(runStatus) &&
     hasSeenAwaitingRecovery
 
-  if (!isERActive && isValidRunStatus) {
+  if (!isERActive && isValidRunStatus && failedCommand != null) {
     setIsERActive(true)
   }
   // Because multiple ER flows may occur per run, disable ER when the status is not "awaiting-recovery" or a
   // terminating run status in which we want to persist ER flows. Specific recovery commands cause run status to change.
   // See a specific command's docstring for details.
+  // ER handles a null failedCommand outside the splash screen, so we shouldn't set it false here.
   else if (isERActive && !isValidRunStatus) {
     setIsERActive(false)
   }
@@ -64,61 +106,76 @@ export function useErrorRecoveryFlows(
   }
 }
 
-interface ErrorRecoveryFlowsProps {
+export interface ErrorRecoveryFlowsProps {
   runId: string
+  runStatus: RunStatus | null
   failedCommand: FailedCommand | null
+  protocolAnalysis: CompletedProtocolAnalysis | null
 }
 
-export function ErrorRecoveryFlows({
-  runId,
-  failedCommand,
-}: ErrorRecoveryFlowsProps): JSX.Element | null {
-  const enableRunNotes = useFeatureFlag('enableRunNotes')
+export function ErrorRecoveryFlows(
+  props: ErrorRecoveryFlowsProps
+): JSX.Element | null {
+  const { protocolAnalysis, runStatus, failedCommand } = props
+
+  const analytics = useRecoveryAnalytics()
+  React.useEffect(() => {
+    analytics.reportErrorEvent(failedCommand)
+  }, [failedCommand?.error?.detail])
+
   const { hasLaunchedRecovery, toggleERWizard, showERWizard } = useERWizard()
-  const showSplash = useRunPausedSplash()
+  const isOnDevice = useSelector(getIsOnDevice)
+  const robotType = protocolAnalysis?.robotType ?? OT2_ROBOT_TYPE
+  const robotName = useHost()?.robotName ?? 'robot'
 
-  /**
-   * ER Wizard routing.
-   * Recovery Route: A logically-related collection of recovery steps or a single step if unrelated to any existing recovery route.
-   * Recovery Step: Analogous to a "step" in other wizard flows.
-   */
-  const [recoveryMap, setRecoveryMap] = React.useState<IRecoveryMap>({
-    route: RECOVERY_MAP.OPTION_SELECTION.ROUTE,
-    step: RECOVERY_MAP.OPTION_SELECTION.STEPS.SELECT,
-  })
+  const isDoorOpen = useShowDoorInfo(runStatus)
+  const {
+    showTakeover,
+    isActiveUser,
+    intent,
+    toggleERWizAsActiveUser,
+  } = useRecoveryTakeover(toggleERWizard)
+  const renderWizard = isActiveUser && (showERWizard || isDoorOpen)
+  const showSplash = useRunPausedSplash(isOnDevice, renderWizard)
 
-  const routeUpdateActions = useRouteUpdateActions({
+  const recoveryUtils = useERUtils({
+    ...props,
     hasLaunchedRecovery,
-    recoveryMap,
-    toggleERWizard,
-    setRecoveryMap,
+    toggleERWizAsActiveUser,
+    isOnDevice,
+    robotType,
+    analytics,
   })
-
-  const recoveryCommands = useRecoveryCommands({
-    runId,
-    failedCommand,
-  })
-
-  if (!enableRunNotes) {
-    return null
-  }
 
   return (
     <>
-      {showERWizard ? (
+      {showTakeover ? (
+        <RecoveryTakeover
+          intent={intent}
+          robotName={robotName}
+          isOnDevice={isOnDevice}
+          runStatus={runStatus}
+        />
+      ) : null}
+      {renderWizard ? (
         <ErrorRecoveryWizard
-          failedCommand={failedCommand}
-          recoveryMap={recoveryMap}
-          routeUpdateActions={routeUpdateActions}
-          recoveryCommands={recoveryCommands}
-          hasLaunchedRecovery={hasLaunchedRecovery}
+          {...props}
+          {...recoveryUtils}
+          robotType={robotType}
+          isOnDevice={isOnDevice}
+          isDoorOpen={isDoorOpen}
+          analytics={analytics}
         />
       ) : null}
       {showSplash ? (
         <RunPausedSplash
-          failedCommand={failedCommand}
-          toggleERWiz={toggleERWizard}
-          routeUpdateActions={routeUpdateActions}
+          {...props}
+          {...recoveryUtils}
+          robotType={robotType}
+          robotName={robotName}
+          isOnDevice={isOnDevice}
+          toggleERWizAsActiveUser={toggleERWizAsActiveUser}
+          analytics={analytics}
         />
       ) : null}
     </>

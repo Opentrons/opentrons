@@ -46,6 +46,7 @@ clean:
 .PHONY: dist
 dist: export NODE_ENV := production
 dist:
+	echo "Building app JS bundle (browser layer)"
 	vite build
 
 # development
@@ -72,6 +73,11 @@ dev-odd:
 dev-server: export OPENTRONS_PROJECT := $(OPENTRONS_PROJECT)
 dev-server:
 	vite serve
+
+.PHONY: dev-dist
+dev-dist: export NODE_ENV := development
+dev-dist:
+	$(MAKE) -C $(shell_dir) dev-dist OPENTRONS_PROJECT=$(OPENTRONS_PROJECT)
 
 .PHONY: dev-shell
 dev-shell:

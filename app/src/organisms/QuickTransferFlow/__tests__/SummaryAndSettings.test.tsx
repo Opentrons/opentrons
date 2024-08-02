@@ -10,19 +10,21 @@ import { createQuickTransferFile } from '../utils'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { SummaryAndSettings } from '../SummaryAndSettings'
+import { NameQuickTransfer } from '../NameQuickTransfer'
 import { Overview } from '../Overview'
-import type * as ReactRouterDom from 'react-router-dom'
+import type { NavigateFunction } from 'react-router-dom'
 
-const mockPush = vi.fn()
+const mockNavigate = vi.fn()
 
 vi.mock('react-router-dom', async importOriginal => {
-  const reactRouterDom = await importOriginal<typeof ReactRouterDom>()
+  const reactRouterDom = await importOriginal<NavigateFunction>()
   return {
     ...reactRouterDom,
-    useHistory: () => ({ push: mockPush } as any),
+    useNavigate: () => mockNavigate,
   }
 })
 vi.mock('../Overview')
+vi.mock('../NameQuickTransfer')
 vi.mock('../utils', async () => {
   const actual = await vi.importActual('../utils')
   return {
@@ -74,7 +76,7 @@ describe('SummaryAndSettings', () => {
       mutateAsync: createProtocol,
     } as any)
     vi.mocked(useCreateRunMutation).mockReturnValue({
-      createRun: createRun,
+      createRun,
     } as any)
     vi.mocked(createQuickTransferFile).mockReturnValue('' as any)
     createProtocol.mockResolvedValue({
@@ -113,14 +115,13 @@ describe('SummaryAndSettings', () => {
     screen.getByText('Do you want to run your quick transfer now?')
     screen.getByText('Save your quick transfer to run it in the future.')
   })
-  it('calls the proper functions when pressing save', () => {
+  it('renders name quick transfer screen when pressing save', () => {
     render(props)
     const continueBtn = screen.getByTestId('ChildNavigation_Primary_Button')
     fireEvent.click(continueBtn)
     const saveBtn = screen.getByText('Save for later')
     fireEvent.click(saveBtn)
-    expect(vi.mocked(createQuickTransferFile)).toHaveBeenCalled()
-    expect(vi.mocked(createProtocol)).toHaveBeenCalled()
+    expect(vi.mocked(NameQuickTransfer)).toHaveBeenCalled()
   })
   it('calls the proper functions when pressing run', () => {
     render(props)

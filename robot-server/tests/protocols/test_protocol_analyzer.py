@@ -5,9 +5,8 @@ from datetime import datetime
 from pathlib import Path
 
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.parse import PythonParseMode
-from opentrons_shared_data.robot.dev_types import RobotType
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.robot.types import RobotType
+from opentrons_shared_data.pipette.types import PipetteNameType
 
 from opentrons.types import MountType, DeckSlotName
 from opentrons.protocol_engine import (
@@ -18,14 +17,18 @@ from opentrons.protocol_engine import (
     types as pe_types,
 )
 import opentrons.protocol_runner as protocol_runner
+import opentrons.protocol_runner.create_simulating_orchestrator as simulating_runner
 from opentrons.protocol_reader import (
     ProtocolSource,
     JsonProtocolConfig,
     PythonProtocolConfig,
 )
+from opentrons.protocol_runner.run_orchestrator import ParseMode
+
 import opentrons.util.helpers as datetime_helper
 
 from robot_server.protocols.analysis_store import AnalysisStore
+from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.protocols.protocol_analyzer import ProtocolAnalyzer
 import robot_server.errors.error_mappers as em
@@ -50,12 +53,12 @@ def patch_mock_get_utc_datetime(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -
 
 
 @pytest.fixture(autouse=True)
-def patch_mock_create_simulating_runner(
+def patch_mock_create_simulating_orchestrator(
     decoy: Decoy, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Replace protocol_runner.check() with a mock."""
-    mock = decoy.mock(func=protocol_runner.create_simulating_runner)
-    monkeypatch.setattr(protocol_runner, "create_simulating_runner", mock)
+    mock = decoy.mock(func=simulating_runner.create_simulating_orchestrator)
+    monkeypatch.setattr(simulating_runner, "create_simulating_orchestrator", mock)
 
 
 @pytest.fixture
@@ -64,11 +67,11 @@ def analysis_store(decoy: Decoy) -> AnalysisStore:
     return decoy.mock(cls=AnalysisStore)
 
 
-async def test_load_runner(
+async def test_load_orchestrator(
     decoy: Decoy,
     analysis_store: AnalysisStore,
 ) -> None:
-    """It should load the appropriate runner."""
+    """It should load the appropriate run orchestrator."""
     robot_type: RobotType = "OT-3 Standard"
     protocol_source = ProtocolSource(
         directory=Path("/dev/null"),
@@ -84,26 +87,30 @@ async def test_load_runner(
         created_at=datetime(year=2021, month=1, day=1),
         source=protocol_source,
         protocol_key="dummy-data-111",
+        protocol_kind=ProtocolKind.STANDARD,
     )
-
     subject = ProtocolAnalyzer(
         analysis_store=analysis_store, protocol_resource=protocol_resource
     )
 
-    python_runner = decoy.mock(cls=protocol_runner.PythonAndLegacyRunner)
+    run_orchestrator = decoy.mock(cls=protocol_runner.RunOrchestrator)
     decoy.when(
-        await protocol_runner.create_simulating_runner(
+        await simulating_runner.create_simulating_orchestrator(
             robot_type=robot_type,
             protocol_config=PythonProtocolConfig(api_version=APIVersion(100, 200)),
         )
-    ).then_return(python_runner)
-    runner = await subject.load_runner(run_time_param_values={"rtp_var": 123})
-    assert runner == python_runner
+    ).then_return(run_orchestrator)
+    await subject.load_orchestrator(
+        run_time_param_values={"rtp_var": 123},
+        run_time_param_files={"csv_param": "file-id"},
+    )
+
     decoy.verify(
-        await python_runner.load(
+        await run_orchestrator.load(
             protocol_source=protocol_source,
-            python_parse_mode=PythonParseMode.NORMAL,
+            parse_mode=ParseMode.NORMAL,
             run_time_param_values={"rtp_var": 123},
+            run_time_param_files={"csv_param": "file-id"},
         ),
         times=1,
     )
@@ -113,7 +120,7 @@ async def test_analyze(
     decoy: Decoy,
     analysis_store: AnalysisStore,
 ) -> None:
-    """It should be able to start a protocol analysis and return the analysis summary."""
+    """It should be able to start a protocol analysis and update the analysis store when completed."""
     robot_type: RobotType = "OT-3 Standard"
 
     protocol_resource = ProtocolResource(
@@ -129,6 +136,7 @@ async def test_analyze(
             content_hash="abc123",
         ),
         protocol_key="dummy-data-111",
+        protocol_kind=ProtocolKind.STANDARD,
     )
 
     analysis_command = pe_commands.WaitForResume(
@@ -157,12 +165,20 @@ async def test_analyze(
         displayName="Foo", variableName="Bar", default=True, value=False
     )
 
-    json_runner = decoy.mock(cls=protocol_runner.JsonRunner)
+    orchestrator = decoy.mock(cls=protocol_runner.RunOrchestrator)
+    decoy.when(
+        await simulating_runner.create_simulating_orchestrator(
+            robot_type=robot_type,
+            protocol_config=JsonProtocolConfig(schema_version=123),
+        )
+    ).then_return(orchestrator)
     subject = ProtocolAnalyzer(
         analysis_store=analysis_store, protocol_resource=protocol_resource
     )
-
-    decoy.when(await json_runner.run(deck_configuration=[],)).then_return(
+    await subject.load_orchestrator(
+        run_time_param_values={"rtp_var": 123}, run_time_param_files={}
+    )
+    decoy.when(await orchestrator.run(deck_configuration=[],)).then_return(
         protocol_runner.RunResult(
             commands=[analysis_command],
             state_summary=StateSummary(
@@ -173,6 +189,7 @@ async def test_analyze(
                 modules=[],
                 labwareOffsets=[],
                 liquids=[],
+                hasEverEnteredErrorRecovery=False,
             ),
             parameters=[bool_parameter],
         )
@@ -180,8 +197,6 @@ async def test_analyze(
 
     await subject.analyze(
         analysis_id="analysis-id",
-        runner=json_runner,
-        run_time_parameters=[bool_parameter],
     )
     decoy.verify(
         await analysis_store.update(
@@ -218,6 +233,7 @@ async def test_analyze_updates_pending_on_error(
             content_hash="abc123",
         ),
         protocol_key="dummy-data-111",
+        protocol_kind=ProtocolKind.STANDARD,
     )
 
     raised_exception = Exception("You got me!!")
@@ -234,17 +250,23 @@ async def test_analyze_updates_pending_on_error(
         message="You got me!!",
     )
 
-    json_runner = decoy.mock(cls=protocol_runner.JsonRunner)
+    orchestrator = decoy.mock(cls=protocol_runner.RunOrchestrator)
+    decoy.when(
+        await simulating_runner.create_simulating_orchestrator(
+            robot_type=robot_type,
+            protocol_config=JsonProtocolConfig(schema_version=123),
+        )
+    ).then_return(orchestrator)
+
     subject = ProtocolAnalyzer(
         analysis_store=analysis_store, protocol_resource=protocol_resource
     )
-
     decoy.when(
-        await json_runner.run(
+        await orchestrator.run(
             deck_configuration=[],
         )
     ).then_raise(raised_exception)
-
+    decoy.when(orchestrator.get_run_time_parameters()).then_return([])
     decoy.when(em.map_unexpected_error(error=raised_exception)).then_return(
         enumerated_error
     )
@@ -252,9 +274,10 @@ async def test_analyze_updates_pending_on_error(
     decoy.when(datetime_helper.utc_now()).then_return(
         datetime(year=2023, month=3, day=3)
     )
-
+    await subject.load_orchestrator(
+        run_time_param_values={"rtp_var": 123}, run_time_param_files={}
+    )
     await subject.analyze(
-        runner=json_runner,
         analysis_id="analysis-id",
     )
 

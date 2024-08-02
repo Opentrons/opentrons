@@ -5,13 +5,15 @@ import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
 import { MANAGED_PIPETTE_ID, POSITION_AND_BLOWOUT } from '../../constants'
 import { getAddressableAreaFromConfig } from '../../getAddressableAreaFromConfig'
 import { useNotifyDeckConfigurationQuery } from '../../../../resources/deck_configuration'
-
 import type {
   CreateCommand,
   AddressableAreaName,
   PipetteModelSpecs,
+  DropTipInPlaceCreateCommand,
+  UnsafeDropTipInPlaceCreateCommand,
 } from '@opentrons/shared-data'
-import type { CommandData } from '@opentrons/api-client'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+import type { CommandData, PipetteData } from '@opentrons/api-client'
 import type {
   Axis,
   Sign,
@@ -23,6 +25,7 @@ import type { UseDTWithTypeParams } from '..'
 import type { RunCommandByCommandTypeParams } from './useDropTipCreateCommands'
 
 const JOG_COMMAND_TIMEOUT_MS = 10000
+const MAXIMUM_BLOWOUT_FLOW_RATE_UL_PER_S = 50
 
 type UseDropTipSetupCommandsParams = UseDTWithTypeParams & {
   activeMaintenanceRunId: string | null
@@ -33,6 +36,7 @@ type UseDropTipSetupCommandsParams = UseDTWithTypeParams & {
   runCommand: (params: RunCommandByCommandTypeParams) => Promise<CommandData>
   setErrorDetails: (errorDetails: SetRobotErrorDetailsParams) => void
   toggleIsExiting: () => void
+  fixitCommandTypeUtils?: FixitCommandTypeUtils
 }
 
 export interface UseDropTipCommandsResult {
@@ -50,7 +54,6 @@ export interface UseDropTipCommandsResult {
 // Returns setup commands used in Drop Tip Wizard.
 export function useDropTipCommands({
   issuedCommandsType,
-  fixitCommandTypeUtils,
   toggleIsExiting,
   activeMaintenanceRunId,
   runCommand,
@@ -59,7 +62,9 @@ export function useDropTipCommands({
   setErrorDetails,
   instrumentModelSpecs,
   robotType,
+  fixitCommandTypeUtils,
 }: UseDropTipSetupCommandsParams): UseDropTipCommandsResult {
+  const isFlex = robotType === FLEX_ROBOT_TYPE
   const [hasSeenClose, setHasSeenClose] = React.useState(false)
 
   const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation({
@@ -75,8 +80,8 @@ export function useDropTipCommands({
   const handleCleanUpAndClose = (homeOnExit: boolean = true): Promise<void> => {
     return new Promise(() => {
       if (issuedCommandsType === 'fixit') {
-        const { onCloseFlow } = fixitCommandTypeUtils as FixitCommandTypeUtils
-        onCloseFlow()
+        closeFlow()
+        return Promise.resolve()
       } else {
         if (!hasSeenClose) {
           setHasSeenClose(true)
@@ -113,8 +118,12 @@ export function useDropTipCommands({
 
       if (addressableAreaFromConfig != null) {
         const moveToAACommand = buildMoveToAACommand(addressableAreaFromConfig)
-
-        return chainRunCommands([moveToAACommand], true)
+        return chainRunCommands(
+          isFlex
+            ? [UPDATE_ESTIMATORS_EXCEPT_PLUNGERS, moveToAACommand]
+            : [moveToAACommand],
+          true
+        )
           .then((commandData: CommandData[]) => {
             const error = commandData[0].data.error
             if (error != null) {
@@ -126,6 +135,13 @@ export function useDropTipCommands({
           })
           .then(resolve)
           .catch(error => {
+            if (
+              fixitCommandTypeUtils != null &&
+              issuedCommandsType === 'fixit'
+            ) {
+              fixitCommandTypeUtils.errorOverrides.generalFailure()
+            }
+
             reject(
               new Error(`Error issuing move to addressable area: ${error}`)
             )
@@ -152,6 +168,10 @@ export function useDropTipCommands({
           resolve()
         })
         .catch((error: Error) => {
+          if (fixitCommandTypeUtils != null && issuedCommandsType === 'fixit') {
+            fixitCommandTypeUtils.errorOverrides.generalFailure()
+          }
+
           setErrorDetails({
             message: `Error issuing jog command: ${error.message}`,
           })
@@ -165,15 +185,26 @@ export function useDropTipCommands({
     proceed: () => void
   ): Promise<void> => {
     return new Promise((resolve, reject) => {
-      const blowoutCommand = buildBlowoutInPlaceCommand(instrumentModelSpecs)
-
       chainRunCommands(
-        [currentStep === POSITION_AND_BLOWOUT ? blowoutCommand : DROP_TIP],
+        currentStep === POSITION_AND_BLOWOUT
+          ? buildBlowoutCommands(instrumentModelSpecs, isFlex)
+          : buildDropTipInPlaceCommand(isFlex),
         true
       )
         .then((commandData: CommandData[]) => {
           const error = commandData[0].data.error
           if (error != null) {
+            if (
+              fixitCommandTypeUtils != null &&
+              issuedCommandsType === 'fixit'
+            ) {
+              if (currentStep === POSITION_AND_BLOWOUT) {
+                fixitCommandTypeUtils.errorOverrides.blowoutFailed()
+              } else {
+                fixitCommandTypeUtils.errorOverrides.tipDropFailed()
+              }
+            }
+
             setErrorDetails({
               runCommandError: error,
               message: `Error moving to position: ${error.detail}`,
@@ -184,6 +215,14 @@ export function useDropTipCommands({
           }
         })
         .catch((error: Error) => {
+          if (fixitCommandTypeUtils != null && issuedCommandsType === 'fixit') {
+            if (currentStep === POSITION_AND_BLOWOUT) {
+              fixitCommandTypeUtils.errorOverrides.blowoutFailed()
+            } else {
+              fixitCommandTypeUtils.errorOverrides.tipDropFailed()
+            }
+          }
+
           setErrorDetails({
             message: `Error issuing ${
               currentStep === POSITION_AND_BLOWOUT ? 'blowout' : 'drop tip'
@@ -229,22 +268,60 @@ const HOME_EXCEPT_PLUNGERS: CreateCommand = {
   params: { axes: ['leftZ', 'rightZ', 'x', 'y'] },
 }
 
-const DROP_TIP: CreateCommand = {
-  commandType: 'dropTipInPlace',
-  params: { pipetteId: MANAGED_PIPETTE_ID },
+const UPDATE_ESTIMATORS_EXCEPT_PLUNGERS: CreateCommand = {
+  commandType: 'unsafe/updatePositionEstimators' as const,
+  params: { axes: ['leftZ', 'rightZ', 'x', 'y'] },
 }
 
-const buildBlowoutInPlaceCommand = (
-  specs: PipetteModelSpecs
-): CreateCommand => {
-  return {
-    commandType: 'blowOutInPlace',
-    params: {
-      pipetteId: MANAGED_PIPETTE_ID,
-      flowRate: specs.defaultBlowOutFlowRate.value,
-    },
-  }
-}
+const buildDropTipInPlaceCommand = (
+  isFlex: boolean
+): Array<DropTipInPlaceCreateCommand | UnsafeDropTipInPlaceCreateCommand> =>
+  isFlex
+    ? [
+        {
+          commandType: 'unsafe/dropTipInPlace',
+          params: { pipetteId: MANAGED_PIPETTE_ID },
+        },
+      ]
+    : [
+        {
+          commandType: 'dropTipInPlace',
+          params: { pipetteId: MANAGED_PIPETTE_ID },
+        },
+      ]
+
+const buildBlowoutCommands = (
+  specs: PipetteModelSpecs,
+  isFlex: boolean
+): CreateCommand[] =>
+  isFlex
+    ? [
+        {
+          commandType: 'unsafe/blowOutInPlace',
+          params: {
+            pipetteId: MANAGED_PIPETTE_ID,
+            flowRate: Math.min(
+              specs.defaultBlowOutFlowRate.value,
+              MAXIMUM_BLOWOUT_FLOW_RATE_UL_PER_S
+            ),
+          },
+        },
+        {
+          commandType: 'prepareToAspirate',
+          params: {
+            pipetteId: MANAGED_PIPETTE_ID,
+          },
+        },
+      ]
+    : [
+        {
+          commandType: 'blowOutInPlace',
+          params: {
+            pipetteId: MANAGED_PIPETTE_ID,
+            flowRate: specs.defaultBlowOutFlowRate.value,
+          },
+        },
+      ]
 
 const buildMoveToAACommand = (
   addressableAreaFromConfig: AddressableAreaName
@@ -256,6 +333,20 @@ const buildMoveToAACommand = (
       stayAtHighestPossibleZ: true,
       addressableAreaName: addressableAreaFromConfig,
       offset: { x: 0, y: 0, z: 0 },
+    },
+  }
+}
+
+export const buildLoadPipetteCommand = (
+  mount: PipetteData['mount'],
+  pipetteName: PipetteModelSpecs['name']
+): CreateCommand => {
+  return {
+    commandType: 'loadPipette',
+    params: {
+      pipetteId: MANAGED_PIPETTE_ID,
+      mount,
+      pipetteName,
     },
   }
 }

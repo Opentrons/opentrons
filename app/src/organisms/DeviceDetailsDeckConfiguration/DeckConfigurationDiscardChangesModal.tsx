@@ -1,13 +1,13 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 import { SmallButton } from '../../atoms/buttons'
@@ -23,20 +23,22 @@ export function DeckConfigurationDiscardChangesModal({
   setShowConfirmationModal,
 }: DeckConfigurationDiscardChangesModalProps): JSX.Element {
   const { t } = useTranslation('device_details')
-  const history = useHistory()
+  const navigate = useNavigate()
   const modalHeader: ModalHeaderBaseProps = {
     title: t('changes_will_be_lost'),
   }
 
   const handleDiscard = (): void => {
     setShowConfirmationModal(false)
-    history.goBack()
+    navigate(-1)
   }
 
   return (
     <Modal header={modalHeader}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
-        <StyledText as="p">{t('changes_will_be_lost_description')}</StyledText>
+        <LegacyStyledText as="p">
+          {t('changes_will_be_lost_description')}
+        </LegacyStyledText>
         <Flex
           width="100%"
           flexDirection={DIRECTION_ROW}

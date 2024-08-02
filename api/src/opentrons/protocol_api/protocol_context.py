@@ -5,7 +5,6 @@ from typing import (
     Callable,
     Dict,
     List,
-    NamedTuple,
     Optional,
     Type,
     Union,
@@ -13,12 +12,11 @@ from typing import (
     cast,
 )
 
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.labware.types import LabwareDefinition
+from opentrons_shared_data.pipette.types import PipetteNameType
 
 from opentrons.types import Mount, Location, DeckLocation, DeckSlotName, StagingSlotName
 from opentrons.legacy_broker import LegacyBroker
-from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules.types import MagneticBlockModel
 from opentrons.legacy_commands import protocol_commands as cmds, types as cmd_types
 from opentrons.legacy_commands.helpers import stringify_labware_movement_command
@@ -38,6 +36,8 @@ from opentrons.protocols.api_support.util import (
     AxisMaxSpeeds,
     requires_version,
     APIVersionError,
+    RobotTypeError,
+    UnsupportedAPIError,
 )
 
 from ._types import OffDeckType
@@ -50,7 +50,9 @@ from .core.module import (
     AbstractThermocyclerCore,
     AbstractHeaterShakerCore,
     AbstractMagneticBlockCore,
+    AbstractAbsorbanceReaderCore,
 )
+from .robot_context import RobotContext, HardwareManager
 from .core.engine import ENGINE_CORE_API_VERSION
 from .core.legacy.legacy_protocol_core import LegacyProtocolCore
 
@@ -66,6 +68,7 @@ from .module_contexts import (
     ThermocyclerContext,
     HeaterShakerContext,
     MagneticBlockContext,
+    AbsorbanceReaderContext,
     ModuleContext,
 )
 from ._parameters import Parameters
@@ -80,16 +83,8 @@ ModuleTypes = Union[
     ThermocyclerContext,
     HeaterShakerContext,
     MagneticBlockContext,
+    AbsorbanceReaderContext,
 ]
-
-
-class HardwareManager(NamedTuple):
-    """Back. compat. wrapper for a removed class called `HardwareManager`.
-
-    This interface will not be present in PAPIv3.
-    """
-
-    hardware: SyncHardwareAPI
 
 
 class ProtocolContext(CommandPublisher):
@@ -174,6 +169,7 @@ class ProtocolContext(CommandPublisher):
         self._commands: List[str] = []
         self._params: Parameters = Parameters()
         self._unsubscribe_commands: Optional[Callable[[], None]] = None
+        self._robot = RobotContext(self._core)
         self.clear_commands()
 
     @property
@@ -199,14 +195,20 @@ class ProtocolContext(CommandPublisher):
         return self._api_version
 
     @property
+    @requires_version(2, 20)
+    def robot(self) -> RobotContext:
+        return self._robot
+
+    @property
     def _hw_manager(self) -> HardwareManager:
         # TODO (lc 01-05-2021) remove this once we have a more
         # user facing hardware control http api.
+        # HardwareManager(hardware=self._core.get_hardware())
         logger.warning(
             "This function will be deprecated in later versions."
             "Please use with caution."
         )
-        return HardwareManager(hardware=self._core.get_hardware())
+        return self._robot.hardware
 
     @property
     @requires_version(2, 0)
@@ -241,10 +243,6 @@ class ProtocolContext(CommandPublisher):
             self._unsubscribe_commands()
             self._unsubscribe_commands = None
 
-    def __del__(self) -> None:
-        if getattr(self, "_unsubscribe_commands", None):
-            self._unsubscribe_commands()  # type: ignore
-
     @property
     @requires_version(2, 0)
     def max_speeds(self) -> AxisMaxSpeeds:
@@ -267,10 +265,11 @@ class ProtocolContext(CommandPublisher):
         if self._api_version >= ENGINE_CORE_API_VERSION:
             # TODO(mc, 2023-02-23): per-axis max speeds not yet supported on the engine
             # See https://opentrons.atlassian.net/browse/RCORE-373
-            raise APIVersionError(
-                "ProtocolContext.max_speeds is not supported at apiLevel 2.14 or higher."
-                " Use a lower apiLevel or set speeds using InstrumentContext.default_speed"
-                " or the per-method 'speed' argument."
+            raise UnsupportedAPIError(
+                api_element="ProtocolContext.max_speeds",
+                since_version=f"{ENGINE_CORE_API_VERSION}",
+                current_version=f"{self._api_version}",
+                message=" Set speeds using InstrumentContext.default_speed or the per-method 'speed' argument.",
             )
 
         return self._core.get_max_speeds()
@@ -417,7 +416,9 @@ class ProtocolContext(CommandPublisher):
         """
         if isinstance(location, OffDeckType) and self._api_version < APIVersion(2, 15):
             raise APIVersionError(
-                "Loading a labware off-deck requires apiLevel 2.15 or higher."
+                api_element="Loading a labware off-deck",
+                until_version="2.15",
+                current_version=f"{self._api_version}",
             )
 
         load_name = validation.ensure_lowercase_name(load_name)
@@ -425,7 +426,9 @@ class ProtocolContext(CommandPublisher):
         if adapter is not None:
             if self._api_version < APIVersion(2, 15):
                 raise APIVersionError(
-                    "Loading a labware on an adapter requires apiLevel 2.15 or higher."
+                    api_element="Loading a labware on an adapter",
+                    until_version="2.15",
+                    current_version=f"{self._api_version}",
                 )
             loaded_adapter = self.load_adapter(
                 load_name=adapter,
@@ -794,12 +797,15 @@ class ProtocolContext(CommandPublisher):
         if configuration:
             if self._api_version < APIVersion(2, 4):
                 raise APIVersionError(
-                    f"You have specified API {self._api_version}, but you are"
-                    "using Thermocycler parameters only available in 2.4"
+                    api_element="Thermocycler parameters",
+                    until_version="2.4",
+                    current_version=f"{self._api_version}",
                 )
             if self._api_version >= ENGINE_CORE_API_VERSION:
-                raise APIVersionError(
-                    "The configuration parameter of load_module has been removed."
+                raise UnsupportedAPIError(
+                    api_element="The configuration parameter of load_module",
+                    since_version=f"{ENGINE_CORE_API_VERSION}",
+                    current_version=f"{self._api_version}",
                 )
 
         requested_model = validation.ensure_module_model(module_name)
@@ -807,7 +813,9 @@ class ProtocolContext(CommandPublisher):
             requested_model, MagneticBlockModel
         ) and self._api_version < APIVersion(2, 15):
             raise APIVersionError(
-                f"Module of type {module_name} is only available in versions 2.15 and above."
+                api_element=f"Module of type {module_name}",
+                until_version="2.15",
+                current_version=f"{self._api_version}",
             )
 
         deck_slot = (
@@ -867,6 +875,7 @@ class ProtocolContext(CommandPublisher):
         mount: Union[Mount, str, None] = None,
         tip_racks: Optional[List[Labware]] = None,
         replace: bool = False,
+        liquid_presence_detection: Optional[bool] = None,
     ) -> InstrumentContext:
         """Load a specific instrument for use in the protocol.
 
@@ -894,6 +903,7 @@ class ProtocolContext(CommandPublisher):
                              control <advanced-control>` applications. You cannot
                              replace an instrument in the middle of a protocol being run
                              from the Opentrons App or touchscreen.
+        :param bool liquid_presence_detection: If ``True``, enable liquid presence detection for instrument. Only available on Flex robots in API Version 2.20 and above.
         """
         instrument_name = validation.ensure_lowercase_name(instrument_name)
         checked_instrument_name = validation.ensure_pipette_name(instrument_name)
@@ -925,9 +935,26 @@ class ProtocolContext(CommandPublisher):
             f"Loading {checked_instrument_name} on {checked_mount.name.lower()} mount"
         )
 
+        if (
+            self._api_version < APIVersion(2, 20)
+            and liquid_presence_detection is not None
+        ):
+            raise APIVersionError(
+                api_element="Liquid Presence Detection",
+                until_version="2.20",
+                current_version=f"{self._api_version}",
+            )
+        if (
+            self._core.robot_type != "OT-3 Standard"
+            and liquid_presence_detection is not None
+        ):
+            raise RobotTypeError(
+                "Liquid presence detection only available on Flex robot."
+            )
         instrument_core = self._core.load_instrument(
             instrument_name=checked_instrument_name,
             mount=checked_mount,
+            liquid_presence_detection=liquid_presence_detection or False,
         )
 
         for tip_rack in tip_racks:
@@ -940,7 +967,7 @@ class ProtocolContext(CommandPublisher):
         trash: Optional[Union[Labware, TrashBin]]
         try:
             trash = self.fixed_trash
-        except (NoTrashDefinedError, APIVersionError):
+        except (NoTrashDefinedError, UnsupportedAPIError):
             trash = None
 
         instrument = InstrumentContext(
@@ -1005,9 +1032,11 @@ class ProtocolContext(CommandPublisher):
            after a period of time, use :py:meth:`delay`.
         """
         if self._api_version >= ENGINE_CORE_API_VERSION:
-            raise APIVersionError(
-                "A Python Protocol cannot safely resume itself after a pause."
-                " To wait automatically for a period of time, use ProtocolContext.delay()."
+            raise UnsupportedAPIError(
+                api_element="A Python Protocol safely resuming itself after a pause",
+                since_version=f"{ENGINE_CORE_API_VERSION}",
+                current_version=f"{self._api_version}",
+                message=" To wait automatically for a period of time, use ProtocolContext.delay().",
             )
 
         # TODO(mc, 2023-02-13): this assert should be enough for mypy
@@ -1124,8 +1153,11 @@ class ProtocolContext(CommandPublisher):
         """
         if self._api_version >= APIVersion(2, 16):
             if self._core.robot_type == "OT-3 Standard":
-                raise APIVersionError(
-                    "Fixed Trash is not supported on Flex protocols in API Version 2.16 and above."
+                raise UnsupportedAPIError(
+                    api_element="Fixed Trash",
+                    since_version="2.16",
+                    current_version=f"{self._api_version}",
+                    message=" Fixed trash is no longer supported on Flex protocols.",
                 )
             disposal_locations = self._core.get_disposal_locations()
             if len(disposal_locations) == 0:
@@ -1213,6 +1245,8 @@ def _create_module_context(
         module_cls = HeaterShakerContext
     elif isinstance(module_core, AbstractMagneticBlockCore):
         module_cls = MagneticBlockContext
+    elif isinstance(module_core, AbstractAbsorbanceReaderCore):
+        module_cls = AbsorbanceReaderContext
     else:
         assert False, "Unsupported module type"
 

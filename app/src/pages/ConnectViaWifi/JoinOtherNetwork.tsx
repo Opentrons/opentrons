@@ -27,7 +27,7 @@ export function JoinOtherNetwork({
       setSelectedSsid(inputSsid)
       setCurrentOption('SelectAuthType')
     } else {
-      setErrorMessage(t('join_other_network_error_message'))
+      setErrorMessage(t('join_other_network_error_message') as string)
     }
   }
 

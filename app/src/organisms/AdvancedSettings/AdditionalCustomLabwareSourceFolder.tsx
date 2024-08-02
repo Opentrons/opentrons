@@ -12,7 +12,7 @@ import {
   Link,
   SPACING_AUTO,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -42,24 +42,24 @@ export function AdditionalCustomLabwareSourceFolder(): JSX.Element {
       gridGap={SPACING.spacing40}
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <StyledText
+        <LegacyStyledText
           css={TYPOGRAPHY.h3SemiBold}
           paddingBottom={SPACING.spacing8}
           id="AdvancedSettings_customLabware"
         >
           {t('additional_labware_folder_title')}
-        </StyledText>
-        <StyledText as="p" paddingBottom={SPACING.spacing8}>
+        </LegacyStyledText>
+        <LegacyStyledText as="p" paddingBottom={SPACING.spacing8}>
           {t('additional_folder_description')}
-        </StyledText>
-        <StyledText
+        </LegacyStyledText>
+        <LegacyStyledText
           as="h6"
           textTransform={TYPOGRAPHY.textTransformUppercase}
           color={COLORS.grey50}
           paddingBottom={SPACING.spacing4}
         >
           {t('additional_folder_location')}
-        </StyledText>
+        </LegacyStyledText>
         {labwarePath !== '' ? (
           <Link
             role="button"
@@ -76,7 +76,7 @@ export function AdditionalCustomLabwareSourceFolder(): JSX.Element {
             />
           </Link>
         ) : (
-          <StyledText as="p">{t('no_folder')}</StyledText>
+          <LegacyStyledText as="p">{t('no_folder')}</LegacyStyledText>
         )}
       </Flex>
       {

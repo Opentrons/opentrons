@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
-import { Link, useHistory } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { useProtocolQuery } from '@opentrons/react-api-client'
@@ -16,7 +16,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   OVERFLOW_WRAP_ANYWHERE,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   truncateString,
   TYPOGRAPHY,
   useHoverTooltip,
@@ -26,7 +26,6 @@ import {
 import { QuaternaryButton } from '../../atoms/buttons'
 import { Tooltip } from '../../atoms/Tooltip'
 import { useIsFlex } from '../../organisms/Devices/hooks'
-import { useCurrentRunId } from '../../organisms/ProtocolUpload/hooks'
 import { useCurrentRunStatus } from '../../organisms/RunTimeControl/hooks'
 import {
   getRobotAddressesByName,
@@ -34,7 +33,7 @@ import {
   OPENTRONS_USB,
 } from '../../redux/discovery'
 import { getNetworkInterfaces, fetchStatus } from '../../redux/networking'
-import { useNotifyRunQuery } from '../../resources/runs'
+import { useNotifyRunQuery, useCurrentRunId } from '../../resources/runs'
 
 import type { IconName, StyleProps } from '@opentrons/components'
 import type { DiscoveredRobot } from '../../redux/discovery/types'
@@ -58,7 +57,7 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
     'device_settings',
     'run_details',
   ])
-  const history = useHistory()
+  const navigate = useNavigate()
   const [targetProps, tooltipProps] = useHoverTooltip()
   const dispatch = useDispatch<Dispatch>()
 
@@ -84,7 +83,7 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
           e.stopPropagation()
         }}
       >
-        <StyledText
+        <LegacyStyledText
           as="label"
           paddingRight={SPACING.spacing8}
           overflowWrap={OVERFLOW_WRAP_ANYWHERE}
@@ -93,7 +92,7 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
             t(`run_details:status_${currentRunStatus}`),
             'lowerCase'
           )}`}
-        </StyledText>
+        </LegacyStyledText>
         <Link
           to={`/devices/${name}/protocol-runs/${currentRunId}/${
             currentRunStatus === RUN_STATUS_IDLE ? 'setup' : 'run-preview'
@@ -160,7 +159,7 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
   return (
     <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} {...styleProps}>
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <StyledText
+        <LegacyStyledText
           as="h6"
           color={COLORS.grey60}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
@@ -169,25 +168,25 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
           id={`RobotStatusHeader_${String(name)}_robotModel`}
         >
           {robotModel}
-        </StyledText>
+        </LegacyStyledText>
         <Flex alignItems={ALIGN_CENTER}>
           <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
             <RobotNameContainer isGoToRun={isGoToRun}>
-              <StyledText
+              <LegacyStyledText
                 as="h3"
                 id={`RobotStatusHeader_${String(name)}_robotName`}
                 overflow="hidden"
                 textOverflow="ellipsis"
               >
                 {name}
-              </StyledText>
+              </LegacyStyledText>
             </RobotNameContainer>
             {iconName != null ? (
               <Btn
                 {...targetProps}
                 marginRight={SPACING.spacing8}
                 onClick={() => {
-                  history.push(`/devices/${name}/robot-settings/networking`)
+                  navigate(`/devices/${name}/robot-settings/networking`)
                 }}
               >
                 <Icon

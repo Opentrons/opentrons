@@ -18,7 +18,10 @@ from opentrons.protocol_engine import (
     Liquid,
     CommandNote,
 )
-from opentrons.protocol_engine.types import RunTimeParameter, RunTimeParamValuesType
+from opentrons.protocol_engine.types import (
+    RunTimeParameter,
+    PrimitiveRunTimeParamValuesType,
+)
 from opentrons_shared_data.errors import GeneralError
 from robot_server.service.json_api import ResourceModel
 from robot_server.errors.error_responses import ErrorDetails
@@ -73,6 +76,12 @@ class RunCommandSummary(ResourceModel):
         None,
         description="Notes pertaining to this command.",
     )
+    failedCommandId: Optional[str] = Field(
+        None,
+        description=(
+            "FIXIT command use only. Reference of the failed command id we are trying to fix."
+        ),
+    )
 
 
 class Run(ResourceModel):
@@ -100,6 +109,10 @@ class Run(ResourceModel):
             " For historical reasons, this is an array,"
             " but it won't have more than one element."
         ),
+    )
+    hasEverEnteredErrorRecovery: bool = Field(
+        ...,
+        description=("Whether the run has entered error recovery."),
     )
     pipettes: List[LoadedPipette] = Field(
         ...,
@@ -174,6 +187,10 @@ class BadRun(ResourceModel):
             " but it won't have more than one element."
         ),
     )
+    hasEverEnteredErrorRecovery: bool = Field(
+        ...,
+        description=("Whether the run has entered error recovery."),
+    )
     pipettes: List[LoadedPipette] = Field(
         ...,
         description="Pipettes that have been loaded into the run.",
@@ -231,7 +248,7 @@ class RunCreate(BaseModel):
         default_factory=list,
         description="Labware offsets to apply as labware are loaded.",
     )
-    runTimeParameterValues: Optional[RunTimeParamValuesType] = Field(
+    runTimeParameterValues: Optional[PrimitiveRunTimeParamValuesType] = Field(
         None,
         description="Key-value pairs of run-time parameters defined in a protocol.",
     )
