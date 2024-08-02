@@ -200,7 +200,7 @@ export function useDropTipFlowUtils({
   tipStatusUtils,
   failedCommand,
   currentRecoveryOptionUtils,
-  trackExternalMap,
+  subMapUtils,
   routeUpdateActions,
   recoveryMap,
 }: RecoveryContentProps): FixitCommandTypeUtils {
@@ -215,6 +215,7 @@ export function useDropTipFlowUtils({
   const { step } = recoveryMap
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const { proceedToRouteAndStep } = routeUpdateActions
+  const { updateSubMap, subMap } = subMapUtils
   const failedCommandId = failedCommand?.id ?? '' // We should have a failed command here unless the run is not in AWAITING_RECOVERY.
 
   const buildTipDropCompleteBtn = (): string => {
@@ -288,12 +289,18 @@ export function useDropTipFlowUtils({
   }
 
   // If a specific step within the DROP_TIP_FLOWS route is selected, begin the Drop Tip Flows at its related route.
+  //
+  // NOTE: The substep is cleared by drop tip wizard after the completion of the wizard flow.
   const buildRouteOverride = (): FixitCommandTypeUtils['routeOverride'] => {
+    if (subMap?.route != null) {
+      return { route: subMap.route, step: subMap.step }
+    }
+
     switch (step) {
       case DROP_TIP_FLOWS.STEPS.CHOOSE_TIP_DROP:
-        return DT_ROUTES.DROP_TIP
+        return { route: DT_ROUTES.DROP_TIP, step: subMap?.step ?? null }
       case DROP_TIP_FLOWS.STEPS.CHOOSE_BLOWOUT:
-        return DT_ROUTES.BLOWOUT
+        return { route: DT_ROUTES.BLOWOUT, step: subMap?.step ?? null }
     }
   }
 
@@ -301,9 +308,9 @@ export function useDropTipFlowUtils({
     runId,
     failedCommandId,
     copyOverrides: buildCopyOverrides(),
-    trackCurrentMap: trackExternalMap,
     errorOverrides: buildErrorOverrides(),
     buttonOverrides: buildButtonOverrides(),
     routeOverride: buildRouteOverride(),
+    reportMap: updateSubMap,
   }
 }
