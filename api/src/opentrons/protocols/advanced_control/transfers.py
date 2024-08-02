@@ -539,6 +539,7 @@ class TransferPlan:
             - self._strategy.disposal_volume
             - self._strategy.air_gap,
         )
+        # pdb.set_trace()
         for step_vol, (src, dest) in plan_iter:
             if self._strategy.new_tip == types.TransferTipPolicy.ALWAYS:
                 yield self._format_dict("pick_up_tip", kwargs=self._tip_opts)
@@ -553,10 +554,6 @@ class TransferPlan:
                 # TODO: ensure last transfer is > min_vol
                 vol = min(max_vol, step_vol - xferred_vol)
 
-                if isinstance(src, Well):
-                    src = src.bottom(1)
-                if isinstance(dest, Well):
-                    dest = dest.bottom(1)
                 yield from self._aspirate_actions(vol, src)
                 yield from self._dispense_actions(vol=vol, dest=dest, src=src)
                 xferred_vol += vol
@@ -763,7 +760,7 @@ class TransferPlan:
             yield self._format_dict("pick_up_tip", kwargs=self._tip_opts)
         done = False
         while not done:
-            asp_grouped: List[Tuple[float, Well | types.Location]] = []
+            asp_grouped: List[Tuple[float, Union[Well, types.Location]]] = []
             try:
                 while (
                     sum([a[0] for a in asp_grouped])
@@ -797,8 +794,6 @@ class TransferPlan:
     def _aspirate_actions(
         self, vol: float, loc: Union[Well, types.Location]
     ) -> Generator[TransferStep, None, None]:
-        if isinstance(loc, Well):
-            loc = loc.bottom(1)
         yield from self._before_aspirate(loc)
         yield self._format_dict("aspirate", [vol, loc, self._options.aspirate.rate])
         yield from self._after_aspirate()
@@ -810,17 +805,13 @@ class TransferPlan:
         src: Optional[Union[Well, types.Location]] = None,
         is_disp_next: bool = False,
     ) -> Generator[TransferStep, None, None]:
-        if isinstance(dest, Well):
-            dest = dest.bottom(1)
-        if isinstance(src, Well):
-            src = src.bottom(1)
         if self._strategy.air_gap:
             vol += self._strategy.air_gap
         yield self._format_dict("dispense", [vol, dest, self._options.dispense.rate])
         yield from self._after_dispense(dest=dest, src=src, is_disp_next=is_disp_next)
 
     def _before_aspirate(
-        self, loc: types.Location
+        self, loc: Union[Well, types.Location]
     ) -> Generator[TransferStep, None, None]:
         if (
             self._strategy.mix_strategy == MixStrategy.BEFORE
@@ -854,8 +845,8 @@ class TransferPlan:
 
     def _after_dispense(
         self,
-        dest: types.Location,
-        src: Optional[types.Location],
+        dest: Union[Well, types.Location],
+        src: Optional[Union[types.Location, Well]],
         is_disp_next: bool = False,
     ) -> Generator[TransferStep, None, None]:
         # This sequence of actions is subject to change

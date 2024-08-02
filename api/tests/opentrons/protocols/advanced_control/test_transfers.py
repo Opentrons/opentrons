@@ -1,6 +1,4 @@
 """ Test the Transfer class and its functions """
-from opentrons.protocol_api.instrument_context import InstrumentContext
-from opentrons.protocol_api.labware import Labware
 import pytest
 from typing import TypedDict
 
@@ -9,6 +7,8 @@ from opentrons.protocols.advanced_control import transfers as tx
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.hardware_control import ThreadManagedHardware
 from opentrons.protocol_api.protocol_context import ProtocolContext
+from opentrons.protocol_api.instrument_context import InstrumentContext
+from opentrons.protocol_api.labware import Labware
 
 import opentrons.protocol_api as papi
 
@@ -405,9 +405,9 @@ def test_new_tip_always(
 
 def test_transfer_w_touchtip_blowout(_instr_labware: InstrLabware) -> None:
     _instr_labware["ctx"].home()
-    assert isinstance(_instr_labware["instr"], Labware)
     lw1 = _instr_labware["lw1"]
     lw2 = _instr_labware["lw2"]
+    assert hasattr(_instr_labware["instr"].trash_container, "wells")
 
     # ========== Transfer ==========
     options = tx.TransferOptions()
