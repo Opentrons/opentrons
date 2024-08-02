@@ -19,6 +19,7 @@ from opentrons.protocol_engine import (
     CommandNote,
 )
 from opentrons.protocol_engine.types import (
+    CSVRunTimeParamFilesType,
     RunTimeParameter,
     PrimitiveRunTimeParamValuesType,
 )
@@ -251,6 +252,10 @@ class RunCreate(BaseModel):
     runTimeParameterValues: Optional[PrimitiveRunTimeParamValuesType] = Field(
         None,
         description="Key-value pairs of run-time parameters defined in a protocol.",
+    )
+    runTimeParameterFiles: Optional[CSVRunTimeParamFilesType] = Field(
+        None,
+        description="Key-fileId pairs of CSV run-time parameters defined in a protocol.",
     )
 
 

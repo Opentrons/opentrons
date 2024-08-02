@@ -19,6 +19,7 @@ from opentrons.protocol_engine import (
 )
 from opentrons.protocol_engine import Liquid
 from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
+from opentrons.protocol_engine.types import BooleanParameter, CSVParameter
 from opentrons.protocol_runner import RunResult
 from opentrons.types import DeckSlotName
 
@@ -167,9 +168,13 @@ async def test_create(
             protocol=None,
             deck_configuration=[],
             run_time_param_values=None,
+            run_time_param_files=None,
             notify_publishers=mock_notify_publishers,
         )
     ).then_return(engine_state_summary)
+
+    decoy.when(mock_run_orchestrator_store.get_run_time_parameters()).then_return([])
+
     decoy.when(
         mock_run_store.insert(
             run_id=run_id,
@@ -185,6 +190,7 @@ async def test_create(
         protocol=None,
         deck_configuration=[],
         run_time_param_values=None,
+        run_time_param_files=None,
         notify_publishers=mock_notify_publishers,
     )
 
@@ -238,6 +244,7 @@ async def test_create_with_options(
             protocol=protocol,
             deck_configuration=[],
             run_time_param_values={"foo": "bar"},
+            run_time_param_files={"my_file": "file-id"},
             notify_publishers=mock_notify_publishers,
         )
     ).then_return(engine_state_summary)
@@ -250,6 +257,16 @@ async def test_create_with_options(
         )
     ).then_return(run_resource)
 
+    bool_parameter = BooleanParameter(
+        displayName="foo", variableName="bar", default=True, value=False
+    )
+
+    file_parameter = CSVParameter(displayName="my_file", variableName="file-id")
+
+    decoy.when(mock_run_orchestrator_store.get_run_time_parameters()).then_return(
+        [bool_parameter, file_parameter]
+    )
+
     result = await subject.create(
         run_id=run_id,
         created_at=created_at,
@@ -257,6 +274,7 @@ async def test_create_with_options(
         protocol=protocol,
         deck_configuration=[],
         run_time_param_values={"foo": "bar"},
+        run_time_param_files={"my_file": "file-id"},
         notify_publishers=mock_notify_publishers,
     )
 
@@ -274,6 +292,7 @@ async def test_create_with_options(
         pipettes=engine_state_summary.pipettes,
         modules=engine_state_summary.modules,
         liquids=engine_state_summary.liquids,
+        runTimeParameters=[bool_parameter, file_parameter],
     )
 
 
@@ -294,6 +313,7 @@ async def test_create_engine_error(
             protocol=None,
             deck_configuration=[],
             run_time_param_values=None,
+            run_time_param_files=None,
             notify_publishers=mock_notify_publishers,
         )
     ).then_raise(RunConflictError("oh no"))
@@ -306,6 +326,7 @@ async def test_create_engine_error(
             protocol=None,
             deck_configuration=[],
             run_time_param_values=None,
+            run_time_param_files=None,
             notify_publishers=mock_notify_publishers,
         )
 
@@ -753,6 +774,7 @@ async def test_create_archives_existing(
             protocol=None,
             deck_configuration=[],
             run_time_param_values=None,
+            run_time_param_files=None,
             notify_publishers=mock_notify_publishers,
         )
     ).then_return(engine_state_summary)
@@ -772,6 +794,7 @@ async def test_create_archives_existing(
         protocol=None,
         deck_configuration=[],
         run_time_param_values=None,
+        run_time_param_files=None,
         notify_publishers=mock_notify_publishers,
     )
 
