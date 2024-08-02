@@ -275,13 +275,13 @@ class RunOrchestrator:
         cursor: Optional[int],
         length: int,
     ) -> CommandErrorSlice:
-        """Get a slice of run commands.
+        """Get a slice of run commands errors.
 
         Args:
-            cursor: Requested index of first command in the returned slice.
+            cursor: Requested index of first error in the returned slice.
             length: Length of slice to return.
         """
-        return self._protocol_engine.state_view.commands.get_slice(
+        return self._protocol_engine.state_view.commands.get_errors_slice(
             cursor=cursor, length=length
         )
 

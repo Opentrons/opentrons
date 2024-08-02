@@ -25,6 +25,7 @@ from opentrons.protocol_engine.state.commands import (
     CommandState,
     CommandView,
     CommandSlice,
+    CommandErrorSlice,
     CommandPointer,
     RunResult,
     QueueStatus,
@@ -1024,5 +1025,62 @@ def test_get_slice_default_cursor_queued() -> None:
     assert result == CommandSlice(
         commands=[command_3, command_4],
         cursor=2,
+        total_length=5,
+    )
+
+
+def test_get_errors_slice_empty() -> None:
+    """It should return a slice from the tail if no current command."""
+    subject = get_command_view(failed_command_errors=[])
+    result = subject.get_errors_slice(cursor=None, length=2)
+
+    assert result == CommandErrorSlice(commands_errors=[], cursor=0, total_length=0)
+
+
+def test_get_errors_slice() -> None:
+    """It should return a slice of all command errors."""
+    error_1 = ErrorOccurrence.construct(id="error-id-1")  # type: ignore[call-arg]
+    error_2 = ErrorOccurrence.construct(id="error-id-2")  # type: ignore[call-arg]
+    error_3 = ErrorOccurrence.construct(id="error-id-3")  # type: ignore[call-arg]
+    error_4 = ErrorOccurrence.construct(id="error-id-4")  # type: ignore[call-arg]
+
+    subject = get_command_view(
+        failed_command_errors=[error_1, error_2, error_3, error_4]
+    )
+
+    result = subject.get_errors_slice(cursor=1, length=3)
+
+    assert result == CommandErrorSlice(
+        commands_errors=[error_2, error_3, error_4],
+        cursor=1,
+        total_length=4,
+    )
+
+    result = subject.get_errors_slice(cursor=-3, length=10)
+
+    assert result == CommandErrorSlice(
+        commands_errors=[error_1, error_2, error_3, error_4],
+        cursor=0,
+        total_length=4,
+    )
+
+
+def test_get_slice_default_cursor_last_error() -> None:
+    """It should select a cursor automatically to the last error inserted."""
+    error_1 = ErrorOccurrence.construct(id="error-id-1")  # type: ignore[call-arg]
+    error_2 = ErrorOccurrence.construct(id="error-id-2")  # type: ignore[call-arg]
+    error_3 = ErrorOccurrence.construct(id="error-id-3")  # type: ignore[call-arg]
+    error_4 = ErrorOccurrence.construct(id="error-id-4")  # type: ignore[call-arg]
+    error_5 = ErrorOccurrence.construct(id="error-id-5")  # type: ignore[call-arg]
+
+    subject = get_command_view(
+        failed_command_errors=[error_1, error_2, error_3, error_4, error_5]
+    )
+
+    result = subject.get_errors_slice(cursor=None, length=2)
+
+    assert result == CommandErrorSlice(
+        commands_errors=[error_5],
+        cursor=4,
         total_length=5,
     )
