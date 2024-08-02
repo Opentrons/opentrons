@@ -11,7 +11,6 @@ import {
   SPACING,
   StyledText,
   TYPOGRAPHY,
-  DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
 import {
