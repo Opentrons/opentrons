@@ -221,12 +221,12 @@ async def _main(arguments: argparse.Namespace) -> None:
 
                 #获取数据UV get uv data
                 print("Test Slot {} ...(开始测试位置{} )".format(grip_slot2,grip_slot2))
-                await api.set_hepa_uv_state(turn_on=True)
+                await api.set_hepa_uv_state(turn_on=True,uv_duration_s=3600)
                 hepa_uv_state: Optional[HepaUVState] = await api.get_hepa_uv_state()
                 if hepa_uv_state:
                     if not hepa_uv_state.light_on:
                         input("Test Slot {} Press open UV to continue...(开始测试位置{} 打开UV灯后,回车继续)".format(grip_slot2,grip_slot2))
-
+                await asyncio.sleep(3.5)
                 for i in range(11):
                     await asyncio.sleep(1)
                     print(i+1,"S")
