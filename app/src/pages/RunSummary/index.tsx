@@ -150,10 +150,13 @@ export function RunSummary(): JSX.Element {
     isFlex: true,
   })
 
-  // Determine tip status on initial render only.
+  // Determine tip status on initial render only. Error Recovery always handles tip status, so don't show it twice.
+  const enteredER = runRecord?.data.hasEverEnteredErrorRecovery ?? false
   React.useEffect(() => {
-    determineTipStatus()
-  }, [])
+    if (isRunCurrent && enteredER === false) {
+      void determineTipStatus()
+    }
+  }, [isRunCurrent, enteredER])
 
   const returnToDash = (): void => {
     closeCurrentRun()
@@ -185,6 +188,7 @@ export function RunSummary(): JSX.Element {
     trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.AGAIN })
   }
 
+  //TOME: I'm willing to bet this is at least part of the problem!
   // If no pipettes have tips attached, execute the routing callback.
   const setTipStatusResolvedAndRoute = (
     routeCb: (pipettesWithTip: PipetteWithTip[]) => void
@@ -210,7 +214,7 @@ export function RunSummary(): JSX.Element {
   }
 
   const handleRunAgain = (pipettesWithTip: PipetteWithTip[]): void => {
-    if (isRunCurrent && pipettesWithTip.length > 0) {
+    if (mostRecentRunId === runId && pipettesWithTip.length > 0) {
       void handleTipsAttachedModal({
         setTipStatusResolved: setTipStatusResolvedAndRoute(handleRunAgain),
         host,
