@@ -481,7 +481,9 @@ async def get_run_commands_error(
         __root__=command_error_slice.commands_errors
     )
     return await PydanticResponse.create(
-        content=SimpleMultiBody.construct(data=commands_errors_result, meta=meta),
+        content=SimpleMultiBody.construct(
+            data=commands_errors_result, meta=meta  # type: ignore[arg-type]
+        ),
         status_code=status.HTTP_200_OK,
     )
 

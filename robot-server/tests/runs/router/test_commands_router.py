@@ -14,7 +14,7 @@ from opentrons.protocol_engine import (
 )
 
 from robot_server.errors.error_responses import ApiError
-from robot_server.service.json_api import MultiBodyMeta, SimpleMultiBody
+from robot_server.service.json_api import MultiBodyMeta, SimpleMultiBody, ResponseList
 
 from robot_server.runs.command_models import (
     RequestModelWithCommandCreate,
@@ -24,7 +24,7 @@ from robot_server.runs.command_models import (
 )
 from robot_server.runs.run_store import CommandNotFoundError, RunStore
 from robot_server.runs.run_orchestrator_store import RunOrchestratorStore
-from robot_server.runs.run_data_manager import RunDataManager
+from robot_server.runs.run_data_manager import RunDataManager, RunNotCurrentError
 from robot_server.runs.run_models import RunCommandSummary, RunNotFoundError
 from robot_server.runs.router.commands_router import (
     create_run_command,
@@ -448,6 +448,29 @@ async def test_get_run_commands_errors(
 ) -> None:
     """It should return a list of all commands errors in a run."""
 
+    decoy.when(
+        mock_run_data_manager.get_command_error_slice(
+            run_id="run-id",
+            cursor=None,
+            length=42,
+        )
+    ).then_raise(RunNotCurrentError("oh no!"))
+
+    with pytest.raises(ApiError):
+        result = await get_run_commands_error(
+            runId="run-id",
+            run_data_manager=mock_run_data_manager,
+            cursor=None,
+            pageLength=42,
+        )
+        assert result.status_code == 409
+
+
+async def test_get_run_commands_errors_raises_no_run(
+    decoy: Decoy, mock_run_data_manager: RunDataManager
+) -> None:
+    """It should return a list of all commands errors in a run."""
+
     error = (
         pe_errors.ErrorOccurrence(
             id="error-id",
@@ -458,7 +481,7 @@ async def test_get_run_commands_errors(
     )
 
     command_error_slice = CommandErrorSlice(
-        cursor=1, total_length=3, commands_errors=[error]
+        cursor=1, total_length=3, commands_errors=list(error)
     )
 
     decoy.when(
@@ -476,14 +499,16 @@ async def test_get_run_commands_errors(
         pageLength=42,
     )
 
-    assert result.content.data == [
-        pe_errors.ErrorOccurrence(
-            id="error-id",
-            errorType="PrettyBadError",
-            createdAt=datetime(year=2024, month=4, day=4),
-            detail="Things are not looking good.",
-        )
-    ]
+    assert result.content.data == ResponseList(
+        __root__=[
+            pe_errors.ErrorOccurrence(
+                id="error-id",
+                errorType="PrettyBadError",
+                createdAt=datetime(year=2024, month=4, day=4),
+                detail="Things are not looking good.",
+            )
+        ]
+    )
     assert result.content.meta == MultiBodyMeta(cursor=1, totalLength=3)
     assert result.status_code == 200
 

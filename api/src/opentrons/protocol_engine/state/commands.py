@@ -116,6 +116,7 @@ class CommandSlice:
     cursor: int
     total_length: int
 
+
 @dataclass(frozen=True)
 class CommandErrorSlice:
     """A subset of all commands errors in state."""
@@ -623,6 +624,39 @@ class CommandView(HasState[CommandState]):
 
         return CommandSlice(
             commands=commands,
+            cursor=actual_cursor,
+            total_length=total_length,
+        )
+
+    def get_errors_slice(
+        self,
+        cursor: Optional[int],
+        length: int,
+    ) -> CommandErrorSlice:
+        """Get a subset of commands error around a given cursor.
+
+        If the cursor is omitted, a cursor will be selected automatically
+        based most recent error.
+        """
+        all_errors = self.get_all_errors()
+        total_length = len(all_errors)
+
+        if cursor is None:
+            if len(all_errors) > 0:
+                # Get the most recent error,
+                # which we can find just at the end of the list.
+                cursor = total_length - 1
+            else:
+                cursor = total_length - length
+
+        # start is inclusive, stop is exclusive
+        actual_cursor = max(0, min(cursor, total_length - 1))
+        stop = min(total_length, actual_cursor + length)
+
+        sliced_errors = all_errors[actual_cursor:stop]
+
+        return CommandErrorSlice(
+            commands_errors=sliced_errors,
             cursor=actual_cursor,
             total_length=total_length,
         )

@@ -21,6 +21,7 @@ from ..protocol_engine import (
     StateSummary,
     CommandPointer,
     CommandSlice,
+    CommandErrorSlice,
     DeckType,
 )
 from ..protocol_engine.errors import RunStoppedError
@@ -259,6 +260,21 @@ class RunOrchestrator:
         cursor: Optional[int],
         length: int,
     ) -> CommandSlice:
+        """Get a slice of run commands.
+
+        Args:
+            cursor: Requested index of first command in the returned slice.
+            length: Length of slice to return.
+        """
+        return self._protocol_engine.state_view.commands.get_slice(
+            cursor=cursor, length=length
+        )
+
+    def get_command_error_slice(
+        self,
+        cursor: Optional[int],
+        length: int,
+    ) -> CommandErrorSlice:
         """Get a slice of run commands.
 
         Args:

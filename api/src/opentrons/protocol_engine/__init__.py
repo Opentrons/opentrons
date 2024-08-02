@@ -18,7 +18,15 @@ from .commands import (
     CommandType,
     CommandIntent,
 )
-from .state import State, StateView, StateSummary, CommandSlice, CommandPointer, Config, CommandErrorSlice
+from .state import (
+    State,
+    StateView,
+    StateSummary,
+    CommandSlice,
+    CommandPointer,
+    Config,
+    CommandErrorSlice,
+)
 from .plugins import AbstractPlugin
 
 from .types import (

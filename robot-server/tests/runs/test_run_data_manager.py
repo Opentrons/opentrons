@@ -856,7 +856,7 @@ def test_get_commands_errors_slice__not_current_run_raises(
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return("run-not-id")
 
     with pytest.raises(RunNotCurrentError):
-        result = subject.get_commands_slice("run-id", 1, 2)
+        result = subject.get_command_error_slice("run-id", 1, 2)
 
 
 def test_get_commands_errors_slice_current_run(
