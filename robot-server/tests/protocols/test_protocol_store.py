@@ -1,4 +1,5 @@
 """Tests for the ProtocolStore interface."""
+from opentrons.protocol_engine.types import CSVParameter, FileInfo
 import pytest
 from decoy import Decoy
 from datetime import datetime, timezone
@@ -528,6 +529,7 @@ async def test_get_referenced_data_files(
     subject: ProtocolStore,
     data_files_store: DataFilesStore,
     completed_analysis_store: CompletedAnalysisStore,
+    run_store: RunStore,
 ) -> None:
     """It should fetch a list of data files referenced in protocol's analyses and runs."""
     protocol_resource_1 = ProtocolResource(
@@ -577,6 +579,7 @@ async def test_get_referenced_data_files(
             liquids=[],
         ),
     )
+
     subject.insert(protocol_resource_1)
     await data_files_store.insert(
         DataFileInfo(
@@ -594,6 +597,32 @@ async def test_get_referenced_data_files(
             created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
         )
     )
+    await data_files_store.insert(
+        DataFileInfo(
+            id="data-file-id-3",
+            name="file-name",
+            file_hash="abc123",
+            created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        )
+    )
+
+    run_store.insert(
+        run_id="run-id-1",
+        protocol_id="protocol-id",
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+    )
+
+    run_store.insert_csv_rtp(
+        run_id="run-id-1",
+        run_time_parameters=[
+            CSVParameter(
+                variableName="csvFile",
+                displayName="csv param",
+                file=FileInfo(id="data-file-id-3", name="file-name"),
+            )
+        ],
+    )
+
     await completed_analysis_store.make_room_and_add(
         completed_analysis_resource=analysis_resource1,
         primitive_rtp_resources=[],
@@ -616,15 +645,24 @@ async def test_get_referenced_data_files(
         csv_rtp_resources=[],
     )
     result = await subject.get_referenced_data_files("protocol-id")
-    assert result == [
-        DataFile(
-            id="data-file-id",
-            name="file-name",
-            createdAt=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
-        ),
-        DataFile(
-            id="data-file-id-2",
-            name="file-name",
-            createdAt=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
-        ),
-    ]
+
+    for data_file in result:
+        assert data_file in [
+            DataFile(
+                id="data-file-id",
+                name="file-name",
+                createdAt=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+            ),
+            DataFile(
+                id="data-file-id-2",
+                name="file-name",
+                createdAt=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+            ),
+            DataFile(
+                id="data-file-id-3",
+                name="file-name",
+                createdAt=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+            ),
+        ]
+
+    assert len(result) == 3
