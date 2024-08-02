@@ -10,6 +10,7 @@ import {
   ALIGN_CENTER,
   BORDERS,
   Box,
+  DeckInfoLabel,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -251,15 +252,11 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
                   justifyContent={JUSTIFY_FLEX_START}
                   gridGap={SPACING.spacing16}
                 >
-                  <Flex>
+                  <Flex minWidth="8.125rem" alignSelf={ALIGN_CENTER}>
                     {isFlex ? (
-                      <></>
+                      <DeckInfoLabel deckLabel={slotName} />
                     ) : (
-                      <StyledText
-                        desktopStyle="bodyDefaultRegular"
-                        minWidth="8.125rem"
-                        alignSelf={ALIGN_CENTER}
-                      >
+                      <StyledText desktopStyle="bodyDefaultRegular">
                         {slotName}
                       </StyledText>
                     )}
