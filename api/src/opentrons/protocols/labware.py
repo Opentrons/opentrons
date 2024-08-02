@@ -77,7 +77,10 @@ def get_all_labware_definitions() -> List[str]:
         with os.scandir(path) as top_path:
             for sub_dir in top_path:
                 if sub_dir.is_dir():
-                    labware_list.append(sub_dir.name)
+                    if isinstance(sub_dir.name, bytes):
+                        labware_list.append(sub_dir.name.decode("utf-8"))
+                    else:
+                        labware_list.append(sub_dir.name)
 
     # check for standard labware
     _check_for_subdirectories(get_shared_data_root() / STANDARD_DEFS_PATH)
