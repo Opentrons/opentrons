@@ -223,7 +223,11 @@ export function MoveLabwareInterventionContent({
                     )
                   )}
                   {labwareRenderInfo
-                    .filter(l => l.labwareId !== command.params.labwareId)
+                    .filter(
+                      l =>
+                        l.labwareId !== command.params.labwareId &&
+                        !l.labwareDef.allowedRoles?.includes('adapter')
+                    )
                     .map(({ x, y, labwareDef, labwareId }) => (
                       <g key={labwareId} transform={`translate(${x},${y})`}>
                         {labwareDef != null &&
