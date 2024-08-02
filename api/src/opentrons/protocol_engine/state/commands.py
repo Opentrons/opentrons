@@ -116,6 +116,14 @@ class CommandSlice:
     cursor: int
     total_length: int
 
+@dataclass(frozen=True)
+class CommandErrorSlice:
+    """A subset of all commands errors in state."""
+
+    commands_errors: List[ErrorOccurrence]
+    cursor: int
+    total_length: int
+
 
 @dataclass(frozen=True)
 class CommandPointer:

@@ -29,6 +29,7 @@ from opentrons.protocol_engine import (
     LabwareOffsetCreate,
     StateSummary,
     CommandSlice,
+    CommandErrorSlice,
     CommandPointer,
     Command,
     CommandCreate,
@@ -339,7 +340,7 @@ class RunOrchestratorStore:
         self,
         cursor: Optional[int],
         length: int,
-    ) -> List[ErrorOccurrence]:
+    ) -> CommandErrorSlice:
         """Get a slice of run commands error.
 
         Args:

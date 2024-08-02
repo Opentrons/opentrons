@@ -454,7 +454,7 @@ async def get_run_commands_error(
         description="The maximum number of command errors in the list to return.",
     ),
     run_data_manager: RunDataManager = Depends(get_run_data_manager),
-) -> PydanticResponse[SimpleBody[ResponseList[pe_errors.ErrorOccurrence]]]:
+) -> PydanticResponse[SimpleMultiBody[ResponseList[pe_errors.ErrorOccurrence]]]:
     """Get a summary of a set of command errors in a run.
 
     Arguments:
@@ -472,9 +472,16 @@ async def get_run_commands_error(
     except RunNotCurrentError as e:
         raise RunStopped(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e
 
-    commands_errors_result = ResponseList.construct(__root__=command_error_slice)
+    meta = MultiBodyMeta(
+        cursor=command_error_slice.cursor,
+        totalLength=command_error_slice.total_length,
+    )
+
+    commands_errors_result = ResponseList.construct(
+        __root__=command_error_slice.commands_errors
+    )
     return await PydanticResponse.create(
-        content=SimpleBody.construct(data=commands_errors_result),
+        content=SimpleMultiBody.construct(data=commands_errors_result, meta=meta),
         status_code=status.HTTP_200_OK,
     )
 

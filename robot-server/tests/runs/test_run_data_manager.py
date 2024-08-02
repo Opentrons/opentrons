@@ -10,6 +10,7 @@ from opentrons.protocol_engine import (
     commands,
     types as pe_types,
     CommandSlice,
+    CommandErrorSlice,
     CommandPointer,
     ErrorOccurrence,
     LoadedLabware,
@@ -869,14 +870,18 @@ def test_get_commands_errors_slice_current_run(
         ErrorOccurrence.construct(id="error-id")  # type: ignore[call-arg]
     ]
 
+    command_error_slice = CommandErrorSlice(
+        cursor=1, total_length=3, commands_errors=expected_commands_errors_result
+    )
+
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return("run-id")
     decoy.when(mock_run_orchestrator_store.get_command_error_slice(1, 2)).then_return(
-        expected_commands_errors_result
+        command_error_slice
     )
 
     result = subject.get_command_error_slice("run-id", 1, 2)
 
-    assert expected_commands_errors_result == result
+    assert command_error_slice == result
 
 
 def test_get_commands_slice_from_db_run_not_found(

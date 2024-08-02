@@ -6,6 +6,7 @@ from decoy import Decoy, matchers
 
 from opentrons.protocol_engine import (
     CommandSlice,
+    CommandErrorSlice,
     CommandPointer,
     CommandNote,
     commands as pe_commands,
@@ -13,7 +14,7 @@ from opentrons.protocol_engine import (
 )
 
 from robot_server.errors.error_responses import ApiError
-from robot_server.service.json_api import MultiBodyMeta, ResponseList
+from robot_server.service.json_api import MultiBodyMeta, SimpleMultiBody
 
 from robot_server.runs.command_models import (
     RequestModelWithCommandCreate,
@@ -456,13 +457,17 @@ async def test_get_run_commands_errors(
         ),
     )
 
+    command_error_slice = CommandErrorSlice(
+        cursor=1, total_length=3, commands_errors=[error]
+    )
+
     decoy.when(
         mock_run_data_manager.get_command_error_slice(
             run_id="run-id",
             cursor=None,
             length=42,
         )
-    ).then_return([error])
+    ).then_return(command_error_slice)
 
     result = await get_run_commands_error(
         runId="run-id",
@@ -471,17 +476,15 @@ async def test_get_run_commands_errors(
         pageLength=42,
     )
 
-    assert result.content.data == ResponseList.construct(
-        __root__=[
-            pe_errors.ErrorOccurrence(
-                id="error-id",
-                errorType="PrettyBadError",
-                createdAt=datetime(year=2024, month=4, day=4),
-                detail="Things are not looking good.",
-            )
-        ]
-    )
-    # assert result.content.meta == MultiBodyMeta(cursor=1, totalLength=3)
+    assert result.content.data == [
+        pe_errors.ErrorOccurrence(
+            id="error-id",
+            errorType="PrettyBadError",
+            createdAt=datetime(year=2024, month=4, day=4),
+            detail="Things are not looking good.",
+        )
+    ]
+    assert result.content.meta == MultiBodyMeta(cursor=1, totalLength=3)
     assert result.status_code == 200
 
 
