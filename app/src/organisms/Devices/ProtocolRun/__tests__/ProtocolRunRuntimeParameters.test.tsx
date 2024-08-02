@@ -93,7 +93,8 @@ const mockCsvRtp = {
   description: '',
   type: 'csv_file',
   file: {
-    file: { name: 'mock.csv' } as File,
+    id: 'mock_csv_id',
+    name: 'mock.csv',
   },
 }
 
