@@ -9,6 +9,7 @@ import {
   BORDERS,
   Box,
   COLORS,
+  DeckInfoLabel,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
@@ -16,7 +17,6 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_SPACE_EVENLY,
   LabwareRender,
-  LocationIcon,
   MODULE_ICON_NAME_BY_TYPE,
   SPACING,
   LegacyStyledText,
@@ -148,14 +148,16 @@ export function ProtocolSetupLabware({
     typeof selectedLabware.location === 'object' &&
     'slotName' in selectedLabware?.location
   ) {
-    location = <LocationIcon slotName={selectedLabware?.location.slotName} />
+    location = <DeckInfoLabel deckLabel={selectedLabware?.location.slotName} />
   } else if (
     selectedLabware != null &&
     typeof selectedLabware.location === 'object' &&
     'addressableAreaName' in selectedLabware?.location
   ) {
     location = (
-      <LocationIcon slotName={selectedLabware?.location.addressableAreaName} />
+      <DeckInfoLabel
+        deckLabel={selectedLabware?.location.addressableAreaName}
+      />
     )
   } else if (
     selectedLabware != null &&
@@ -169,7 +171,7 @@ export function ProtocolSetupLabware({
         module.moduleId === selectedLabware.location.moduleId
     )
     if (matchedModule != null) {
-      location = <LocationIcon slotName={matchedModule?.slotName} />
+      location = <DeckInfoLabel deckLabel={matchedModule?.slotName} />
     }
   } else if (
     selectedLabware != null &&
@@ -184,13 +186,13 @@ export function ProtocolSetupLabware({
     )?.params.location
     if (adapterLocation != null && adapterLocation !== 'offDeck') {
       if ('slotName' in adapterLocation) {
-        location = <LocationIcon slotName={adapterLocation.slotName} />
+        location = <DeckInfoLabel deckLabel={adapterLocation.slotName} />
       } else if ('moduleId' in adapterLocation) {
         const moduleUnderAdapter = attachedProtocolModuleMatches.find(
           module => module.moduleId === adapterLocation.moduleId
         )
         if (moduleUnderAdapter != null) {
-          location = <LocationIcon slotName={moduleUnderAdapter.slotName} />
+          location = <DeckInfoLabel deckLabel={moduleUnderAdapter.slotName} />
         }
       }
     }
@@ -492,19 +494,19 @@ function RowLabware({
   let location: JSX.Element | string | null = null
   if (initialLocation === 'offDeck') {
     location = (
-      <LocationIcon slotName={i18n.format(t('off_deck'), 'upperCase')} />
+      <DeckInfoLabel deckLabel={i18n.format(t('off_deck'), 'upperCase')} />
     )
   } else if ('slotName' in initialLocation) {
     slotName = initialLocation.slotName
-    location = <LocationIcon slotName={initialLocation.slotName} />
+    location = <DeckInfoLabel deckLabel={initialLocation.slotName} />
   } else if ('addressableAreaName' in initialLocation) {
     slotName = initialLocation.addressableAreaName
-    location = <LocationIcon slotName={initialLocation.addressableAreaName} />
+    location = <DeckInfoLabel deckLabel={initialLocation.addressableAreaName} />
   } else if (matchedModuleType != null && matchedModule?.slotName != null) {
     slotName = matchedModule.slotName
     location = (
       <>
-        <LocationIcon slotName={matchedModule?.slotName} />
+        <DeckInfoLabel deckLabel={matchedModule?.slotName} />
       </>
     )
   } else if ('labwareId' in initialLocation) {
@@ -518,14 +520,14 @@ function RowLabware({
     if (adapterLocation != null && adapterLocation !== 'offDeck') {
       if ('slotName' in adapterLocation) {
         slotName = adapterLocation.slotName
-        location = <LocationIcon slotName={adapterLocation.slotName} />
+        location = <DeckInfoLabel deckLabel={adapterLocation.slotName} />
       } else if ('moduleId' in adapterLocation) {
         const moduleUnderAdapter = attachedProtocolModules.find(
           module => module.moduleId === adapterLocation.moduleId
         )
         if (moduleUnderAdapter != null) {
           slotName = moduleUnderAdapter.slotName
-          location = <LocationIcon slotName={moduleUnderAdapter.slotName} />
+          location = <DeckInfoLabel deckLabel={moduleUnderAdapter.slotName} />
         }
       }
     }
@@ -541,7 +543,7 @@ function RowLabware({
       <Flex gridGap={SPACING.spacing4} width="7.6875rem">
         {location}
         {nestedLabwareInfo != null || matchedModule != null ? (
-          <LocationIcon iconName="stacked" />
+          <DeckInfoLabel iconName="stacked" />
         ) : null}
       </Flex>
       <Flex
@@ -596,7 +598,7 @@ function RowLabware({
                 gridGap={SPACING.spacing12}
                 alignItems={ALIGN_CENTER}
               >
-                <LocationIcon
+                <DeckInfoLabel
                   iconName={
                     MODULE_ICON_NAME_BY_TYPE[matchedModule.moduleDef.moduleType]
                   }

@@ -69,6 +69,7 @@ describe('ManageTips', () => {
       currentRecoveryOptionUtils: {
         selectedRecoveryOption: null,
       } as any,
+      subMapUtils: { subMap: null, updateSubMap: vi.fn() },
     }
 
     vi.mocked(DropTipWizardFlows).mockReturnValue(
@@ -176,13 +177,16 @@ describe('useDropTipFlowUtils', () => {
   const mockRunId = 'MOCK_RUN_ID'
   const mockTipStatusUtils = { runId: mockRunId }
   const mockProceedToRouteAndStep = vi.fn()
+  const mockUpdateSubMap = vi.fn()
   const { ERROR_WHILE_RECOVERING, DROP_TIP_FLOWS } = RECOVERY_MAP
 
   const mockProps = {
     tipStatusUtils: mockTipStatusUtils,
     failedCommand: null,
-    previousRoute: null,
-    trackExternalMap: vi.fn(),
+    subMapUtils: {
+      updateSubMap: mockUpdateSubMap,
+      subMap: null,
+    },
     currentRecoveryOptionUtils: {
       selectedRecoveryOption: null,
     } as any,
@@ -225,19 +229,13 @@ describe('useDropTipFlowUtils', () => {
     screen.getByText('Proceed to cancel')
   })
 
-  it('should call trackExternalMap with the current map', () => {
-    const mockTrackExternalMap = vi.fn()
-    const { result } = renderHook(() =>
-      useDropTipFlowUtils({
-        ...mockProps,
-        trackExternalMap: mockTrackExternalMap,
-      })
-    )
+  it('should call updateSubMap with the current map', () => {
+    const { result } = renderHook(() => useDropTipFlowUtils(mockProps))
 
-    const currentMap = { route: 'route', step: 'step' }
-    result.current.trackCurrentMap(currentMap)
+    const currentMap = { route: 'route', step: 'step' } as any
+    result.current.reportMap(currentMap)
 
-    expect(mockTrackExternalMap).toHaveBeenCalledWith(currentMap)
+    expect(mockUpdateSubMap).toHaveBeenCalledWith(currentMap)
   })
 
   it('should return the correct error overrides', () => {
@@ -296,19 +294,43 @@ describe('useDropTipFlowUtils', () => {
     )
   })
 
-  it(`should return correct route overrides when the route is ${DROP_TIP_FLOWS.STEPS.CHOOSE_TIP_DROP}`, () => {
+  it(`should return correct route override when the step is ${DROP_TIP_FLOWS.STEPS.CHOOSE_TIP_DROP}`, () => {
     const { result } = renderHook(() => useDropTipFlowUtils(mockProps))
 
-    expect(result.current.routeOverride).toEqual(DT_ROUTES.DROP_TIP)
+    expect(result.current.routeOverride).toEqual({
+      route: DT_ROUTES.DROP_TIP,
+      step: null,
+    })
   })
 
-  it(`should return correct route overrides when the route is ${DROP_TIP_FLOWS.STEPS.CHOOSE_BLOWOUT}`, () => {
+  it(`should return correct route override when the step is ${DROP_TIP_FLOWS.STEPS.CHOOSE_BLOWOUT}`, () => {
     const mockPropsBlowout = {
       ...mockProps,
       recoveryMap: { step: DROP_TIP_FLOWS.STEPS.CHOOSE_BLOWOUT },
     }
     const { result } = renderHook(() => useDropTipFlowUtils(mockPropsBlowout))
 
-    expect(result.current.routeOverride).toEqual(DT_ROUTES.BLOWOUT)
+    expect(result.current.routeOverride).toEqual({
+      route: DT_ROUTES.BLOWOUT,
+      step: null,
+    })
+  })
+
+  it('should use subMap.step in routeOverride if available', () => {
+    const mockPropsWithSubMap = {
+      ...mockProps,
+      subMapUtils: {
+        ...mockProps.subMapUtils,
+        subMap: { route: DT_ROUTES.DROP_TIP, step: 'SOME_STEP' },
+      },
+    }
+    const { result } = renderHook(() =>
+      useDropTipFlowUtils(mockPropsWithSubMap)
+    )
+
+    expect(result.current.routeOverride).toEqual({
+      route: DT_ROUTES.DROP_TIP,
+      step: 'SOME_STEP',
+    })
   })
 })

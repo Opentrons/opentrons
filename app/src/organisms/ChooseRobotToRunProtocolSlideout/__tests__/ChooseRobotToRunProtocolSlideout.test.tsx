@@ -9,7 +9,6 @@ import { i18n } from '../../../i18n'
 import { useTrackCreateProtocolRunEvent } from '../../../organisms/Devices/hooks'
 import { useCloseCurrentRun } from '../../../organisms/ProtocolUpload/hooks'
 import { useCurrentRunStatus } from '../../../organisms/RunTimeControl/hooks'
-import { useFeatureFlag } from '../../../redux/config'
 import {
   getConnectableRobots,
   getReachableRobots,
@@ -192,7 +191,6 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
       { ...mockConnectableRobot, name: 'otherRobot', ip: 'otherIp' },
       mockConnectableRobot,
     ])
-    vi.mocked(useFeatureFlag).mockReturnValue(true)
 
     provideNullCurrentRunIdFor('otherIp')
     render({
@@ -267,6 +265,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
         files: [expect.any(File)],
         protocolKey: storedProtocolDataFixture.protocolKey,
         runTimeParameterValues: expect.any(Object),
+        runTimeParameterFiles: expect.any(Object),
       })
     )
     expect(mockTrackCreateProtocolRunEvent).toHaveBeenCalled()
@@ -300,6 +299,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
         files: [expect.any(File)],
         protocolKey: storedProtocolDataFixture.protocolKey,
         runTimeParameterValues: expect.any(Object),
+        runTimeParameterFiles: expect.any(Object),
       })
     )
     expect(mockTrackCreateProtocolRunEvent).toHaveBeenCalled()
@@ -353,6 +353,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
         files: [expect.any(File)],
         protocolKey: storedProtocolDataFixture.protocolKey,
         runTimeParameterValues: expect.any(Object),
+        runTimeParameterFiles: expect.any(Object),
       })
     })
   })

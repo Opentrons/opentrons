@@ -54,7 +54,10 @@ from opentrons_hardware.hardware_control.motion import (
     MoveGroupStep,
 )
 from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
-from opentrons_hardware.hardware_control.types import MotorPositionStatus
+from opentrons_hardware.hardware_control.types import (
+    MotorPositionStatus,
+    MoveCompleteAck,
+)
 
 LOG = getLogger(__name__)
 PipetteProbeTarget = Literal[NodeId.pipette_left, NodeId.pipette_right]
@@ -179,6 +182,7 @@ async def run_sync_buffer_to_csv(
     tool: InstrumentProbeTarget,
     sensor_type: SensorType,
     output_file_heading: list[str],
+    raise_z: Optional[MoveGroupRunner] = None,
 ) -> Dict[NodeId, MotorPositionStatus]:
     """Runs the sensor pass move group and creates a csv file with the results."""
     sensor_metadata = [0, 0, mount_speed, plunger_speed, threshold]
@@ -197,6 +201,10 @@ async def run_sync_buffer_to_csv(
             ),
             expected_nodes=[tool],
         )
+    if raise_z is not None and False:
+        #  if probing is finished, move the head node back up before requesting the data buffer
+        if positions[head_node].move_ack == MoveCompleteAck.stopped_by_condition:
+            await raise_z.run(can_messenger=messenger)
     for sensor_id in log_files.keys():
         sensor_capturer = LogListener(
             mount=head_node,
@@ -472,14 +480,24 @@ async def liquid_probe(
             pressure_output_file_heading,
         )
     elif sync_buffer_output:
+        raise_z = create_step(
+            distance={head_node: float64(max_z_distance)},
+            velocity={head_node: float64(-1 * mount_speed)},
+            acceleration={},
+            duration=float64(max_z_distance / mount_speed),
+            present_nodes=[head_node],
+        )
+        raise_z_runner = MoveGroupRunner(move_groups=[[raise_z]])
+
         return await run_sync_buffer_to_csv(
-            messenger,
-            mount_speed,
-            plunger_speed,
-            threshold_pascals,
-            head_node,
-            sensor_runner,
-            log_files,
+            messenger=messenger,
+            mount_speed=mount_speed,
+            plunger_speed=plunger_speed,
+            threshold=threshold_pascals,
+            head_node=head_node,
+            move_group=sensor_runner,
+            raise_z=raise_z_runner,
+            log_files=log_files,
             tool=tool,
             sensor_type=SensorType.pressure,
             output_file_heading=pressure_output_file_heading,
