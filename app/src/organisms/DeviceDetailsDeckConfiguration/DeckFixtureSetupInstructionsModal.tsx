@@ -8,14 +8,14 @@ import {
   Flex,
   PrimaryButton,
   SPACING,
-  LegacyModal,
+  Modal,
   LegacyStyledText,
 } from '@opentrons/components'
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
 import { OddModal } from '../../molecules/OddModal'
 
 import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
-import type { LegacyModalProps } from '@opentrons/components'
+import type { ModalProps } from '@opentrons/components'
 
 import imgSrc from '../../assets/images/on-device-display/deck_fixture_setup_qrcode.png'
 
@@ -43,7 +43,7 @@ export function DeckFixtureSetupInstructionsModal({
     },
   }
 
-  const modalProps: LegacyModalProps = {
+  const modalProps: ModalProps = {
     title: t('deck_fixture_setup_instructions'),
     onClose: () => {
       setShowSetupInstructionsModal(false)
@@ -78,7 +78,7 @@ export function DeckFixtureSetupInstructionsModal({
           </Flex>
         </OddModal>
       ) : (
-        <LegacyModal {...modalProps}>
+        <Modal {...modalProps}>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
             <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing24}>
               <Flex
@@ -111,7 +111,7 @@ export function DeckFixtureSetupInstructionsModal({
               {i18n.format(t('shared:close'), 'capitalize')}
             </PrimaryButton>
           </Flex>
-        </LegacyModal>
+        </Modal>
       )}
     </>
   )

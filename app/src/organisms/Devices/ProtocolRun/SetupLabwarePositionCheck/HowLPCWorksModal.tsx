@@ -11,7 +11,7 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
-  LegacyModal,
+  Modal,
 } from '@opentrons/components'
 import { getTopPortalEl } from '../../../../App/portal'
 
@@ -24,7 +24,7 @@ interface HowLPCWorksModalProps {
 export const HowLPCWorksModal = (props: HowLPCWorksModalProps): JSX.Element => {
   const { t } = useTranslation(['protocol_setup', 'shared', 'branded'])
   return createPortal(
-    <LegacyModal
+    <Modal
       title={t('how_offset_data_works')}
       onClose={props.onCloseClick}
       width="31.25rem"
@@ -59,7 +59,7 @@ export const HowLPCWorksModal = (props: HowLPCWorksModalProps): JSX.Element => {
           {t('shared:close')}
         </PrimaryButton>
       </Flex>
-    </LegacyModal>,
+    </Modal>,
     getTopPortalEl()
   )
 }

@@ -7,7 +7,7 @@ import {
   PrimaryButton,
   SPACING,
   LegacyStyledText,
-  LegacyModalShell,
+  ModalShell,
 } from '@opentrons/components'
 import { Skeleton } from '../../atoms/Skeleton'
 import { WizardHeader } from '../WizardHeader'
@@ -37,10 +37,10 @@ const Template: Story<
   React.ComponentProps<typeof GenericWizardTile>
 > = args => (
   <Provider store={store}>
-    <LegacyModalShell>
+    <ModalShell>
       <WizardHeader currentStep={3} totalSteps={4} title="Example Title" />
       <GenericWizardTile {...args} />
-    </LegacyModalShell>
+    </ModalShell>
   </Provider>
 )
 const body = (

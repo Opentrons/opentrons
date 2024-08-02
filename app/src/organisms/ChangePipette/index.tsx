@@ -8,7 +8,7 @@ import {
   SPACING,
   TYPOGRAPHY,
   LegacyStyledText,
-  LegacyModalShell,
+  ModalShell,
 } from '@opentrons/components'
 
 import {
@@ -326,7 +326,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
     )
   }
   return (
-    <LegacyModalShell width="42.375rem">
+    <ModalShell width="42.375rem">
       <WizardHeader
         totalSteps={eightChannel ? EIGHT_CHANNEL_STEPS : SINGLE_CHANNEL_STEPS}
         currentStep={currentStepCount}
@@ -334,6 +334,6 @@ export function ChangePipette(props: Props): JSX.Element | null {
         onExit={exitWizardHeader}
       />
       {contents}
-    </LegacyModalShell>
+    </ModalShell>
   )
 }

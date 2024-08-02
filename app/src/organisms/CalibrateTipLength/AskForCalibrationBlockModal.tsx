@@ -14,7 +14,7 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
-  LegacyModalShell,
+  ModalShell,
 } from '@opentrons/components'
 import { useDispatch } from 'react-redux'
 
@@ -54,7 +54,7 @@ export function AskForCalibrationBlockModal(props: Props): JSX.Element {
   }
 
   return createPortal(
-    <LegacyModalShell
+    <ModalShell
       width="47rem"
       header={
         <WizardHeader
@@ -127,7 +127,7 @@ export function AskForCalibrationBlockModal(props: Props): JSX.Element {
           </Flex>
         </Flex>
       </Flex>
-    </LegacyModalShell>,
+    </ModalShell>,
     getTopPortalEl()
   )
 }

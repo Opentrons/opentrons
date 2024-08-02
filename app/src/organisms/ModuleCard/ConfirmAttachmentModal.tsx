@@ -10,7 +10,7 @@ import {
   JUSTIFY_FLEX_END,
   Link,
   PrimaryButton,
-  LegacyModal,
+  Modal,
   SPACING,
   LegacyStyledText,
   TEXT_ALIGN_CENTER,
@@ -50,7 +50,7 @@ export const ConfirmAttachmentModal = (
   }
 
   return (
-    <LegacyModal
+    <Modal
       title={t('confirm_heater_shaker_modal_attachment')}
       onClose={onCloseClick}
     >
@@ -129,6 +129,6 @@ export const ConfirmAttachmentModal = (
           </PrimaryButton>
         </Flex>
       </Flex>
-    </LegacyModal>
+    </Modal>
   )
 }

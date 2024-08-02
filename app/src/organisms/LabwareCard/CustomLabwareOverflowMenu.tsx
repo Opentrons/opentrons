@@ -19,7 +19,7 @@ import {
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
-  LegacyModal,
+  Modal,
   LegacyStyledText,
   TYPOGRAPHY,
   useConditionalConfirm,
@@ -139,7 +139,7 @@ export function CustomLabwareOverflowMenu(
       )}
       {showDeleteConfirmation &&
         createPortal(
-          <LegacyModal
+          <Modal
             type="warning"
             title={t('delete_this_labware')}
             onClose={handleCancelModal}
@@ -169,7 +169,7 @@ export function CustomLabwareOverflowMenu(
                 </AlertPrimaryButton>
               </Flex>
             </Flex>
-          </LegacyModal>,
+          </Modal>,
           getTopPortalEl()
         )}
     </Flex>

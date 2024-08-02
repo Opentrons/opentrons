@@ -16,7 +16,7 @@ import {
   SecondaryButton,
   SPACING,
   LegacyStyledText,
-  LegacyModal,
+  Modal,
 } from '@opentrons/components'
 
 import {
@@ -148,7 +148,7 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
   return (
     <>
       {error != null ? (
-        <LegacyModal
+        <Modal
           title={UPDATE_ERROR}
           onClose={() => {
             closeModal(true)
@@ -156,10 +156,10 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
           css={LEGACY_MODAL_STYLE}
         >
           <PlaceholderError errorMessage={error.message} />
-        </LegacyModal>
+        </Modal>
       ) : null}
       {(downloading || downloaded) && error == null ? (
-        <LegacyModal
+        <Modal
           title={t('branded:opentrons_app_update')}
           css={LEGACY_MODAL_STYLE}
         >
@@ -176,10 +176,10 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
               outerStyles={UPDATE_PROGRESS_BAR_STYLE}
             />
           </Flex>
-        </LegacyModal>
+        </Modal>
       ) : null}
       {!downloading && !downloaded && error == null ? (
-        <LegacyModal
+        <Modal
           title={t('branded:opentrons_app_update_available')}
           onClose={() => {
             closeModal(true)
@@ -195,7 +195,7 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
             </UpdateAppBanner>
             <ReleaseNotes source={releaseNotes} />
           </Flex>
-        </LegacyModal>
+        </Modal>
       ) : null}
     </>
   )

@@ -14,8 +14,8 @@ import {
   DIRECTION_COLUMN,
   SPACING,
   TYPOGRAPHY,
-  LegacyModalHeader,
-  LegacyModalShell,
+  ModalHeader,
+  ModalShell,
   COLORS,
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
@@ -131,13 +131,10 @@ export function CurrentOffsetsModal(
     />
   )
   return (
-    <LegacyModalShell
+    <ModalShell
       maxWidth="40rem"
       header={
-        <LegacyModalHeader
-          title={t('applied_offset_data')}
-          onClose={onCloseClick}
-        />
+        <ModalHeader title={t('applied_offset_data')} onClose={onCloseClick} />
       }
     >
       <Flex
@@ -155,6 +152,6 @@ export function CurrentOffsetsModal(
           TableComponent
         )}
       </Flex>
-    </LegacyModalShell>
+    </ModalShell>
   )
 }

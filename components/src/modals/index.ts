@@ -2,7 +2,7 @@
 
 export * from './AlertModal'
 export * from './ContinueModal'
-export * from './LegacyModal'
+export * from './Modal'
 export * from './ShameModal'
 export * from './ShameModalShell'
 export * from './Overlay'

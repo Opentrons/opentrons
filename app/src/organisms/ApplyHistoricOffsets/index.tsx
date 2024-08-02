@@ -15,8 +15,8 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
-  LegacyModalHeader,
-  LegacyModalShell,
+  ModalHeader,
+  ModalShell,
 } from '@opentrons/components'
 import { getTopPortalEl } from '../../App/portal'
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
@@ -110,10 +110,10 @@ export function ApplyHistoricOffsets(
       </Link>
       {showOffsetDataModal
         ? createPortal(
-            <LegacyModalShell
+            <ModalShell
               maxWidth="40rem"
               header={
-                <LegacyModalHeader
+                <ModalHeader
                   title={t(
                     noOffsetData
                       ? 'what_is_labware_offset_data'
@@ -181,7 +181,7 @@ export function ApplyHistoricOffsets(
                   )
                 ) : null}
               </Flex>
-            </LegacyModalShell>,
+            </ModalShell>,
             getTopPortalEl()
           )
         : null}

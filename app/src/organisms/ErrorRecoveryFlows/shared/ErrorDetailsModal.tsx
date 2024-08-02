@@ -8,8 +8,8 @@ import {
   StyledText,
   SPACING,
   COLORS,
-  LegacyModalShell,
-  LegacyModalHeader,
+  ModalShell,
+  ModalHeader,
   BORDERS,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
@@ -124,7 +124,7 @@ export function ErrorDetailsModalDesktop(
 
   const buildHeader = (): JSX.Element => {
     return (
-      <LegacyModalHeader
+      <ModalHeader
         onClose={toggleModal}
         title={t('error_details')}
         icon={buildIcon()}
@@ -135,7 +135,7 @@ export function ErrorDetailsModalDesktop(
   }
 
   return (
-    <LegacyModalShell
+    <ModalShell
       header={buildHeader()}
       css={
         desktopType === 'desktop-small'
@@ -156,7 +156,7 @@ export function ErrorDetailsModalDesktop(
           <StepInfo {...props} desktopStyle="bodyDefaultRegular" />
         </Flex>
       </Flex>
-    </LegacyModalShell>
+    </ModalShell>
   )
 }
 

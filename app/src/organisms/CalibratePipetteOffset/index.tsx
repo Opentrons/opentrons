@@ -6,7 +6,7 @@ import { useQueryClient } from 'react-query'
 
 import { useHost } from '@opentrons/react-api-client'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
-import { useConditionalConfirm, LegacyModalShell } from '@opentrons/components'
+import { useConditionalConfirm, ModalShell } from '@opentrons/components'
 
 import * as Sessions from '../../redux/sessions'
 import {
@@ -120,7 +120,7 @@ export function CalibratePipetteOffset(
       ? PANEL_BY_STEP[currentStep]
       : null
   return createPortal(
-    <LegacyModalShell
+    <ModalShell
       width="47rem"
       header={
         <WizardHeader
@@ -161,7 +161,7 @@ export function CalibratePipetteOffset(
           defaultTipracks={instrument?.defaultTipracks}
         />
       )}
-    </LegacyModalShell>,
+    </ModalShell>,
     getTopPortalEl()
   )
 }

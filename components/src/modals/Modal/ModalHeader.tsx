@@ -13,7 +13,7 @@ import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { COLORS } from '../../helix-design-system'
 import type { IconProps } from '../../icons'
 
-export interface LegacyModalHeaderProps {
+export interface ModalHeaderProps {
   title: React.ReactNode
   onClose?: React.MouseEventHandler
   backgroundColor?: string
@@ -38,9 +38,7 @@ const closeIconStyles = css`
   }
 `
 
-export const LegacyModalHeader = (
-  props: LegacyModalHeaderProps
-): JSX.Element => {
+export const ModalHeader = (props: ModalHeaderProps): JSX.Element => {
   const { icon, onClose, title, backgroundColor, color, closeButton } = props
   return (
     <>

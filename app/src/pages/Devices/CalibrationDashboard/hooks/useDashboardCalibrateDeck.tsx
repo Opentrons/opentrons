@@ -2,7 +2,7 @@ import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { LegacyModalShell } from '@opentrons/components'
+import { ModalShell } from '@opentrons/components'
 
 import { getTopPortalEl } from '../../../../App/portal'
 import { WizardHeader } from '../../../../molecules/WizardHeader'
@@ -106,12 +106,12 @@ export function useDashboardCalibrateDeck(
 
   let Wizard: JSX.Element | null = createPortal(
     startingSession ? (
-      <LegacyModalShell
+      <ModalShell
         width="47rem"
         header={<WizardHeader title={t('deck_calibration')} />}
       >
         <LoadingState />
-      </LegacyModalShell>
+      </ModalShell>
     ) : (
       <CalibrateDeck
         session={deckCalSession}

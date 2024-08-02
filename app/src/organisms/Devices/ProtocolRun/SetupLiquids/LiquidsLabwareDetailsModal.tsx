@@ -16,7 +16,7 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
-  LegacyModal,
+  Modal,
 } from '@opentrons/components'
 import { OddModal } from '../../../../molecules/OddModal'
 import { getIsOnDevice } from '../../../../redux/config'
@@ -160,7 +160,7 @@ export const LiquidsLabwareDetailsModal = (
       </Flex>
     </OddModal>
   ) : (
-    <LegacyModal
+    <Modal
       onClose={closeModal}
       closeOnOutsideClick
       title={labwareName}
@@ -236,6 +236,6 @@ export const LiquidsLabwareDetailsModal = (
           </Flex>
         </Flex>
       </Box>
-    </LegacyModal>
+    </Modal>
   )
 }

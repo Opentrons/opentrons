@@ -17,7 +17,7 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
-  LegacyModal,
+  Modal,
 } from '@opentrons/components'
 import {
   getCutoutDisplayName,
@@ -275,7 +275,7 @@ export const LocationConflictModal = (
         </Flex>
       </OddModal>
     ) : (
-      <LegacyModal
+      <Modal
         title={
           <Flex
             flexDirection={DIRECTION_ROW}
@@ -371,7 +371,7 @@ export const LocationConflictModal = (
             </PrimaryButton>
           </Flex>
         </Flex>
-      </LegacyModal>
+      </Modal>
     ),
     getTopPortalEl()
   )

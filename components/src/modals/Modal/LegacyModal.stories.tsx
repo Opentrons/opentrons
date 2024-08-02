@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { LegacyModal } from './index'
+import { Modal } from './index'
 
 import type { Story, Meta } from '@storybook/react'
 import { LegacyStyledText } from '../../atoms'
@@ -8,12 +8,12 @@ import { PrimaryBtn } from '../../primitives'
 import { COLORS } from '../../helix-design-system'
 
 export default {
-  title: 'Components/modals/LegacyModal',
-  component: LegacyModal,
+  title: 'Components/modals/Modal',
+  component: Modal,
 } as Meta
 
-const Template: Story<React.ComponentProps<typeof LegacyModal>> = args => (
-  <LegacyModal {...args} />
+const Template: Story<React.ComponentProps<typeof Modal>> = args => (
+  <Modal {...args} />
 )
 
 const Children = (

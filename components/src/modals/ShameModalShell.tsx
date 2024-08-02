@@ -14,7 +14,7 @@ import {
 } from '../styles'
 
 import type { StyleProps } from '../primitives'
-export interface ModalShellProps extends StyleProps {
+export interface ShameModalShellProps extends StyleProps {
   /** Modal content */
   children: React.ReactNode
   /** Optional close on outside click **/
@@ -38,7 +38,7 @@ export interface ModalShellProps extends StyleProps {
  * - An optional sticky footer
  * - An optional onOutsideClick function
  */
-export function ShameModalShell(props: ModalShellProps): JSX.Element {
+export function ShameModalShell(props: ShameModalShellProps): JSX.Element {
   const {
     onOutsideClick,
     zIndex = 10,

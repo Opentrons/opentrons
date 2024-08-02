@@ -13,7 +13,7 @@ import {
   Icon,
   JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
-  LegacyModalShell,
+  ModalShell,
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
@@ -181,7 +181,7 @@ function ViewOffsets(props: ViewOffsetsProps): JSX.Element {
       </Btn>
       {showOffsetsTable
         ? createPortal(
-            <LegacyModalShell
+            <ModalShell
               width="60rem"
               height="33.5rem"
               padding={SPACING.spacing32}
@@ -213,7 +213,7 @@ function ViewOffsets(props: ViewOffsetsProps): JSX.Element {
                   labwareDefinitions={labwareDefinitions}
                 />
               </Box>
-            </LegacyModalShell>,
+            </ModalShell>,
             getTopPortalEl()
           )
         : null}

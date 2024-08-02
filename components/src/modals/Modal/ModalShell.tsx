@@ -14,7 +14,7 @@ import { styleProps } from '../../primitives'
 
 import type { StyleProps } from '../../primitives'
 
-export interface LegacyModalShellProps extends StyleProps {
+export interface ModalShellProps extends StyleProps {
   /** Modal content */
   children: React.ReactNode
   /** Optional close on outside click **/
@@ -37,7 +37,7 @@ export interface LegacyModalShellProps extends StyleProps {
  * - An optional sticky footer
  * - An optional onOutsideClick function
  */
-export function LegacyModalShell(props: LegacyModalShellProps): JSX.Element {
+export function ModalShell(props: ModalShellProps): JSX.Element {
   const {
     onOutsideClick,
     zIndex = 10,

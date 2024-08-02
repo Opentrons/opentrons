@@ -11,8 +11,8 @@ import {
   StyledText,
   PrimaryButton,
   JUSTIFY_END,
-  LegacyModalHeader,
-  LegacyModalShell,
+  ModalHeader,
+  ModalShell,
 } from '@opentrons/components'
 
 import { TextOnlyButton } from '../../../atoms/buttons'
@@ -85,7 +85,7 @@ export function ProtocolDropTipModal({
 
   const buildHeader = (): JSX.Element => {
     return (
-      <LegacyModalHeader
+      <ModalHeader
         title={t('remove_attached_tips')}
         icon={buildIcon()}
         color={COLORS.black90}
@@ -95,7 +95,7 @@ export function ProtocolDropTipModal({
   }
 
   return (
-    <LegacyModalShell header={buildHeader()} css={MODAL_STYLE}>
+    <ModalShell header={buildHeader()} css={MODAL_STYLE}>
       <Flex
         padding={SPACING.spacing24}
         gridGap={SPACING.spacing24}
@@ -121,7 +121,7 @@ export function ProtocolDropTipModal({
           </PrimaryButton>
         </Flex>
       </Flex>
-    </LegacyModalShell>
+    </ModalShell>
   )
 }
 

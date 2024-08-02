@@ -5,7 +5,7 @@ import { RemoveScroll } from 'react-remove-scroll'
 import { Overlay } from './Overlay'
 import styles from './modals.module.css'
 
-export interface ModalProps {
+export interface ShameModalProps {
   /** handler to close the modal (attached to `Overlay` onClick) */
   onCloseClick?: React.MouseEventHandler
   /** Optional styled heading **/
@@ -28,7 +28,7 @@ export interface ModalProps {
  * Base modal component that fills its nearest `display:relative` ancestor
  * with a dark overlay and displays `children` as its contents in a white box
  */
-export function ShameModal(props: ModalProps): JSX.Element {
+export function ShameModal(props: ShameModalProps): JSX.Element {
   const {
     contentsClassName,
     alertOverlay,

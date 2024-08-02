@@ -11,7 +11,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   LegacyStyledText,
-  LegacyModal,
+  Modal,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -50,7 +50,7 @@ export const NotConfiguredModal = (
   }
   const cutoutDisplayName = getCutoutDisplayName(cutoutId)
   return createPortal(
-    <LegacyModal
+    <Modal
       title={t('add_fixture', {
         fixtureName: getFixtureDisplayName(requiredFixtureId),
         locationName: cutoutDisplayName,
@@ -79,7 +79,7 @@ export const NotConfiguredModal = (
           </Flex>
         </Flex>
       </Flex>
-    </LegacyModal>,
+    </Modal>,
     getTopPortalEl()
   )
 }

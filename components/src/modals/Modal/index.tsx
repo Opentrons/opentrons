@@ -2,16 +2,16 @@ import * as React from 'react'
 import { Box } from '../../primitives'
 import { SPACING } from '../../ui-style-constants'
 import { COLORS } from '../../helix-design-system'
-import { LegacyModalHeader } from './LegacyModalHeader'
-import { LegacyModalShell } from './LegacyModalShell'
+import { ModalHeader } from './ModalHeader'
+import { ModalShell } from './ModalShell'
 import type { IconProps } from '../../icons'
 import type { StyleProps } from '../../primitives'
 
 type ModalType = 'info' | 'warning' | 'error'
-export * from './LegacyModalShell'
-export * from './LegacyModalHeader'
+export * from './ModalShell'
+export * from './ModalHeader'
 
-export interface LegacyModalProps extends StyleProps {
+export interface ModalProps extends StyleProps {
   type?: ModalType
   onClose?: React.MouseEventHandler
   closeOnOutsideClick?: boolean
@@ -25,7 +25,7 @@ export interface LegacyModalProps extends StyleProps {
 /**
  * For Desktop app and web application use only.
  */
-export const LegacyModal = (props: LegacyModalProps): JSX.Element => {
+export const Modal = (props: ModalProps): JSX.Element => {
   const {
     type = 'info',
     onClose,
@@ -58,7 +58,7 @@ export const LegacyModal = (props: LegacyModalProps): JSX.Element => {
   }
 
   const modalHeader = (
-    <LegacyModalHeader
+    <ModalHeader
       onClose={onClose}
       title={title}
       icon={['error', 'warning'].includes(type) ? modalIcon : undefined}
@@ -68,7 +68,7 @@ export const LegacyModal = (props: LegacyModalProps): JSX.Element => {
   )
 
   return (
-    <LegacyModalShell
+    <ModalShell
       width={styleProps.width ?? '31.25rem'}
       header={modalHeader}
       onOutsideClick={closeOnOutsideClick ?? false ? onClose : undefined}
@@ -78,6 +78,6 @@ export const LegacyModal = (props: LegacyModalProps): JSX.Element => {
       footer={footer}
     >
       <Box padding={childrenPadding}>{children}</Box>
-    </LegacyModalShell>
+    </ModalShell>
   )
 }

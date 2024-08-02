@@ -11,7 +11,7 @@ import {
   PrimaryButton,
   SPACING,
   LegacyStyledText,
-  LegacyModal,
+  Modal,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -43,7 +43,7 @@ export const FirmwareUpdateFailedModal = (
   )
 
   return (
-    <LegacyModal title={title} onClose={onCloseClick}>
+    <Modal title={title} onClose={onCloseClick}>
       <Flex
         flexDirection={DIRECTION_COLUMN}
         data-testid={`FirmwareUpdateFailedModal_body_text_${module.serialNumber}`}
@@ -68,6 +68,6 @@ export const FirmwareUpdateFailedModal = (
           {t('shared:close')}
         </PrimaryButton>
       </Flex>
-    </LegacyModal>
+    </Modal>
   )
 }

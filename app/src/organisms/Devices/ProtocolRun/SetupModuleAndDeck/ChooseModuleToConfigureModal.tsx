@@ -16,7 +16,7 @@ import {
   LegacyStyledText,
   TEXT_ALIGN_CENTER,
   TYPOGRAPHY,
-  LegacyModal,
+  Modal,
 } from '@opentrons/components'
 import {
   getFixtureDisplayName,
@@ -150,7 +150,7 @@ export const ChooseModuleToConfigureModal = (
         {contents}
       </OddModal>
     ) : (
-      <LegacyModal
+      <Modal
         title={
           <Flex
             flexDirection={DIRECTION_ROW}
@@ -171,7 +171,7 @@ export const ChooseModuleToConfigureModal = (
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
           {contents}
         </Flex>
-      </LegacyModal>
+      </Modal>
     ),
     getTopPortalEl()
   )

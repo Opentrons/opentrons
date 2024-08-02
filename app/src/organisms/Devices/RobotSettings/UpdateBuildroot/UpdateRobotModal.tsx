@@ -13,7 +13,7 @@ import {
   Flex,
   NewPrimaryBtn,
   NewSecondaryBtn,
-  LegacyModal,
+  Modal,
   BORDERS,
 } from '@opentrons/components'
 
@@ -148,7 +148,7 @@ export function UpdateRobotModal({
   )
 
   return (
-    <LegacyModal
+    <Modal
       title={heading}
       onClose={closeModal}
       closeOnOutsideClick={true}
@@ -161,6 +161,6 @@ export function UpdateRobotModal({
         </UpdateAppBanner>
         <ReleaseNotes source={releaseNotes} />
       </Flex>
-    </LegacyModal>
+    </Modal>
   )
 }

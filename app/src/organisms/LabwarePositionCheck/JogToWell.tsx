@@ -18,7 +18,7 @@ import {
   SecondaryButton,
   SPACING,
   LegacyStyledText,
-  LegacyModalShell,
+  ModalShell,
   TYPOGRAPHY,
   WELL_LABEL_OPTIONS,
 } from '@opentrons/components'
@@ -193,7 +193,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
           </Flex>
           {showFullJogControls
             ? createPortal(
-                <LegacyModalShell
+                <ModalShell
                   width="60rem"
                   height="33.5rem"
                   padding={SPACING.spacing32}
@@ -229,7 +229,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
                     }
                     isOnDevice={true}
                   />
-                </LegacyModalShell>,
+                </ModalShell>,
                 getTopPortalEl()
               )
             : null}

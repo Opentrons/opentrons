@@ -3,11 +3,7 @@ import { createPortal } from 'react-dom'
 import { useSelector } from 'react-redux'
 import { Trans, useTranslation } from 'react-i18next'
 import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
-import {
-  COLORS,
-  LegacyStyledText,
-  LegacyModalShell,
-} from '@opentrons/components'
+import { COLORS, LegacyStyledText, ModalShell } from '@opentrons/components'
 import {
   getModuleType,
   getModuleDisplayName,
@@ -364,14 +360,14 @@ export const ModuleWizardFlows = (
 
   return createPortal(
     isOnDevice ? (
-      <LegacyModalShell>
+      <ModalShell>
         {wizardHeader}
         {modalContent}
-      </LegacyModalShell>
+      </ModalShell>
     ) : (
-      <LegacyModalShell width="47rem" height="auto" header={wizardHeader}>
+      <ModalShell width="47rem" height="auto" header={wizardHeader}>
         {modalContent}
-      </LegacyModalShell>
+      </ModalShell>
     ),
     getTopPortalEl()
   )

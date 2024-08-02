@@ -13,7 +13,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
   SPACING,
-  LegacyModal,
+  Modal,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -59,7 +59,7 @@ import type {
   CutoutFixtureId,
 } from '@opentrons/shared-data'
 import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
-import type { LegacyModalProps } from '@opentrons/components'
+import type { ModalProps } from '@opentrons/components'
 
 interface AddFixtureModalProps {
   cutoutId: CutoutId
@@ -112,7 +112,7 @@ export function AddFixtureModal({
     onClick: closeModal,
   }
 
-  const modalProps: LegacyModalProps = {
+  const modalProps: ModalProps = {
     title: t('add_to_slot', {
       slotName: getCutoutDisplayName(cutoutId),
     }),
@@ -352,7 +352,7 @@ export function AddFixtureModal({
           </Flex>
         </OddModal>
       ) : (
-        <LegacyModal {...modalProps}>
+        <Modal {...modalProps}>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
             <LegacyStyledText as="p">
               {t('add_fixture_description')}
@@ -377,7 +377,7 @@ export function AddFixtureModal({
               </LegacyStyledText>
             </Btn>
           ) : null}
-        </LegacyModal>
+        </Modal>
       )}
     </>
   )

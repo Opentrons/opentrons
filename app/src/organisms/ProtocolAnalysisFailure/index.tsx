@@ -8,7 +8,7 @@ import {
   Btn,
   Flex,
   JUSTIFY_FLEX_END,
-  LegacyModal,
+  Modal,
   JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
   SPACING,
@@ -90,7 +90,7 @@ export function ProtocolAnalysisFailure(
       </Flex>
       {showErrorDetails
         ? createPortal(
-            <LegacyModal
+            <Modal
               type="error"
               title={t('protocol_analysis_failure')}
               onClose={handleClickHideDetails}
@@ -109,7 +109,7 @@ export function ProtocolAnalysisFailure(
                   {t('shared:close')}
                 </PrimaryButton>
               </Flex>
-            </LegacyModal>,
+            </Modal>,
             getTopPortalEl()
           )
         : null}

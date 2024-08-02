@@ -15,7 +15,7 @@ import {
   POSITION_ABSOLUTE,
   SPACING,
   LegacyStyledText,
-  LegacyModalShell,
+  ModalShell,
   useConditionalConfirm,
 } from '@opentrons/components'
 
@@ -178,13 +178,13 @@ export function DropTipWizardSetupType(
         </Flex>
       </Flex>
     ) : (
-      <LegacyModalShell
+      <ModalShell
         width="47rem"
         header={<DropTipWizardHeader {...props} />}
         overflow="hidden"
       >
         <DropTipWizardContent {...props} />
-      </LegacyModalShell>
+      </ModalShell>
     ),
     getTopPortalEl()
   )

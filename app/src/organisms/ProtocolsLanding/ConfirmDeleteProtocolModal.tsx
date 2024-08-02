@@ -9,7 +9,7 @@ import {
   JUSTIFY_FLEX_END,
   Link,
   SPACING,
-  LegacyModal,
+  Modal,
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -24,7 +24,7 @@ export function ConfirmDeleteProtocolModal(
 ): JSX.Element {
   const { t } = useTranslation(['protocol_list', 'shared'])
   return (
-    <LegacyModal
+    <Modal
       type="warning"
       onClose={props.cancelDeleteProtocol}
       title={t('delete_this_protocol')}
@@ -51,6 +51,6 @@ export function ConfirmDeleteProtocolModal(
           </AlertPrimaryButton>
         </Flex>
       </Flex>
-    </LegacyModal>
+    </Modal>
   )
 }

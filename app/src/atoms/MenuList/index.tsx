@@ -7,7 +7,7 @@ import {
   SPACING,
   BORDERS,
   JUSTIFY_CENTER,
-  LegacyModalShell,
+  ModalShell,
 } from '@opentrons/components'
 
 interface MenuListProps {
@@ -19,7 +19,7 @@ interface MenuListProps {
 export const MenuList = (props: MenuListProps): JSX.Element | null => {
   const { children, isOnDevice = false, onClick = null } = props
   return isOnDevice && onClick != null ? (
-    <LegacyModalShell
+    <ModalShell
       borderRadius={BORDERS.borderRadius16}
       width="max-content"
       onOutsideClick={onClick}
@@ -31,7 +31,7 @@ export const MenuList = (props: MenuListProps): JSX.Element | null => {
       >
         {children}
       </Flex>
-    </LegacyModalShell>
+    </ModalShell>
   ) : (
     <Flex
       borderRadius="4px 4px 0px 0px"

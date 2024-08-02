@@ -9,7 +9,7 @@ import {
   Link,
   PrimaryButton,
   SPACING,
-  LegacyModal,
+  Modal,
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -25,10 +25,7 @@ export function ConnectionTroubleshootingModal(props: Props): JSX.Element {
   const { t } = useTranslation(['devices_landing', 'shared'])
 
   return (
-    <LegacyModal
-      title={t('why_is_this_robot_unavailable')}
-      onClose={props.onClose}
-    >
+    <Modal title={t('why_is_this_robot_unavailable')} onClose={props.onClose}>
       <Flex flexDirection={DIRECTION_COLUMN}>
         <LegacyStyledText as="p">
           {t('connection_troubleshooting_intro')}
@@ -72,7 +69,7 @@ export function ConnectionTroubleshootingModal(props: Props): JSX.Element {
           {t('shared:close')}
         </PrimaryButton>
       </Flex>
-    </LegacyModal>
+    </Modal>
   )
 }
 

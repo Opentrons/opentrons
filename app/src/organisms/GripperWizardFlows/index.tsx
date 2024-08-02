@@ -9,7 +9,7 @@ import {
   POSITION_ABSOLUTE,
   COLORS,
   BORDERS,
-  LegacyModalShell,
+  ModalShell,
 } from '@opentrons/components'
 import {
   useCreateMaintenanceCommandMutation,
@@ -392,9 +392,9 @@ export const GripperWizard = (
         {modalContent}
       </Flex>
     ) : (
-      <LegacyModalShell width="48rem" header={wizardHeader}>
+      <ModalShell width="48rem" header={wizardHeader}>
         {modalContent}
-      </LegacyModalShell>
+      </ModalShell>
     ),
     getTopPortalEl()
   )

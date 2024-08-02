@@ -2,7 +2,7 @@ import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { LegacyModalShell } from '@opentrons/components'
+import { ModalShell } from '@opentrons/components'
 
 import { getTopPortalEl } from '../../../../App/portal'
 import { WizardHeader } from '../../../../molecules/WizardHeader'
@@ -163,12 +163,12 @@ export function useDashboardCalibratePipOffset(
 
   let Wizard: JSX.Element | null = createPortal(
     startingSession ? (
-      <LegacyModalShell
+      <ModalShell
         width="47rem"
         header={<WizardHeader title={t('pipette_offset_calibration')} />}
       >
         <LoadingState />
-      </LegacyModalShell>
+      </ModalShell>
     ) : (
       <CalibratePipetteOffset
         session={pipOffsetCalSession}

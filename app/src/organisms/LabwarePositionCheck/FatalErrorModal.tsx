@@ -15,7 +15,7 @@ import {
   RESPONSIVENESS,
   SPACING,
   LegacyStyledText,
-  LegacyModalShell,
+  ModalShell,
   TEXT_ALIGN_CENTER,
   TEXT_TRANSFORM_CAPITALIZE,
   TYPOGRAPHY,
@@ -35,7 +35,7 @@ export function FatalErrorModal(props: FatalErrorModalProps): JSX.Element {
   const { errorMessage, shouldUseMetalProbe, onClose } = props
   const { t } = useTranslation(['labware_position_check', 'shared', 'branded'])
   return createPortal(
-    <LegacyModalShell
+    <ModalShell
       width="47rem"
       header={
         <WizardHeader
@@ -83,7 +83,7 @@ export function FatalErrorModal(props: FatalErrorModalProps): JSX.Element {
           {t('shared:exit')}
         </PrimaryButton>
       </Flex>
-    </LegacyModalShell>,
+    </ModalShell>,
     getTopPortalEl()
   )
 }

@@ -10,7 +10,7 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
-  LegacyModal,
+  Modal,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '../../App/portal'
@@ -18,7 +18,7 @@ import { OddModal } from '../../molecules/OddModal'
 import { getIsOnDevice } from '../../redux/config'
 
 import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
-import type { LegacyModalProps } from '@opentrons/components'
+import type { ModalProps } from '@opentrons/components'
 
 // Note (07/13/2023) After the launch, we will unify the modal components into one component.
 // Then TouchScreenModal and DesktopModal will be TouchScreenContent and DesktopContent that only render each content.
@@ -106,7 +106,7 @@ function DesktopModal({
     closeModal()
   }
 
-  const modalProps: LegacyModalProps = {
+  const modalProps: ModalProps = {
     type: 'error',
     title: t('estop_missing'),
     onClose: handleCloseModal,
@@ -116,7 +116,7 @@ function DesktopModal({
   }
 
   return (
-    <LegacyModal {...modalProps}>
+    <Modal {...modalProps}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
         <LegacyStyledText as="h1">
           {t('connect_the_estop_to_continue')}
@@ -125,6 +125,6 @@ function DesktopModal({
           {t('estop_missing_description', { robotName: robotName })}
         </LegacyStyledText>
       </Flex>
-    </LegacyModal>
+    </Modal>
   )
 }

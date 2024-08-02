@@ -15,7 +15,7 @@ import {
   PrimaryButton,
   SPACING,
   LegacyStyledText,
-  LegacyModal,
+  Modal,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -120,7 +120,7 @@ export const DisconnectModal = ({
   }, [isDisconnected])
 
   return (
-    <LegacyModal
+    <Modal
       type="warning"
       title={
         isDisconnected
@@ -182,6 +182,6 @@ export const DisconnectModal = ({
           )}
         </Flex>
       </Flex>
-    </LegacyModal>
+    </Modal>
   )
 }

@@ -13,7 +13,7 @@ import {
   JUSTIFY_FLEX_END,
   NewPrimaryBtn,
   SPACING,
-  LegacyModal,
+  Modal,
   LegacyStyledText,
 } from '@opentrons/components'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
@@ -113,7 +113,7 @@ export function RobotUpdateProgressModal({
   )
 
   return (
-    <LegacyModal
+    <Modal
       title={`${t('updating')} ${robotName}`}
       width="40rem"
       textAlign="center"
@@ -167,7 +167,7 @@ export function RobotUpdateProgressModal({
           </LegacyStyledText>
         </Flex>
       )}
-    </LegacyModal>
+    </Modal>
   )
 }
 

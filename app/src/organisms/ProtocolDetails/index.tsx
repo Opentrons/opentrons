@@ -31,7 +31,7 @@ import {
   Tabs,
   SIZE_1,
   SIZE_5,
-  LegacyModal,
+  Modal,
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
@@ -389,14 +389,14 @@ export function ProtocolDetails(
     <>
       {showDeckViewModal
         ? createPortal(
-            <LegacyModal
+            <Modal
               title={t('deck_view')}
               onClose={() => {
                 setShowDeckViewModal(false)
               }}
             >
               {deckMap}
-            </LegacyModal>,
+            </Modal>,
             getTopPortalEl()
           )
         : null}

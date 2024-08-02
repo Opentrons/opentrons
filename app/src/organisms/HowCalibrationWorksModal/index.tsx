@@ -13,7 +13,7 @@ import {
   SPACING,
   TEXT_TRANSFORM_CAPITALIZE,
   TYPOGRAPHY,
-  LegacyModal,
+  Modal,
   LegacyStyledText,
 } from '@opentrons/components'
 
@@ -33,7 +33,7 @@ export function HowCalibrationWorksModal({
 }: HowCalibrationWorksModalProps): JSX.Element {
   const { t } = useTranslation(['protocol_setup', 'shared'])
   return createPortal(
-    <LegacyModal
+    <Modal
       title={t('robot_cal_help_title')}
       onClose={onCloseClick}
       maxHeight="28.125rem"
@@ -109,7 +109,7 @@ export function HowCalibrationWorksModal({
           {t('shared:close')}
         </PrimaryButton>
       </Flex>
-    </LegacyModal>,
+    </Modal>,
     getTopPortalEl()
   )
 }

@@ -11,7 +11,7 @@ import {
   Link,
   PrimaryButton,
   SPACING,
-  LegacyModal,
+  Modal,
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -63,7 +63,7 @@ export function OT2MultipleModulesHelp(): JSX.Element {
       </Box>
       {showMultipleModulesModal
         ? createPortal(
-            <LegacyModal
+            <Modal
               title={t('multiple_modules_modal')}
               onClose={onCloseClick}
               width="44.75rem"
@@ -116,7 +116,7 @@ export function OT2MultipleModulesHelp(): JSX.Element {
                   {t('shared:close')}
                 </PrimaryButton>
               </Flex>
-            </LegacyModal>,
+            </Modal>,
             getTopPortalEl()
           )
         : null}

@@ -15,7 +15,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
   SPACING,
-  LegacyModal,
+  Modal,
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -33,7 +33,7 @@ import type {
   OddModalHeaderBaseProps,
   ModalSize,
 } from '../../molecules/OddModal/types'
-import type { LegacyModalProps } from '@opentrons/components'
+import type { ModalProps } from '@opentrons/components'
 
 // Note (07/13/2023) After the launch, we will unify the modal components into one component.
 // Then TouchScreenModal and DesktopModal will be TouchScreenContent and DesktopContent that only render each content.
@@ -143,7 +143,7 @@ function DesktopModal({
     closeModal()
   }
 
-  const modalProps: LegacyModalProps = {
+  const modalProps: ModalProps = {
     type: 'error',
     title: t('estop_pressed'),
     onClose: handleCloseModal,
@@ -166,7 +166,7 @@ function DesktopModal({
   }
 
   return (
-    <LegacyModal {...modalProps}>
+    <Modal {...modalProps}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
         <Banner type={isEngaged ? 'error' : 'success'}>
           {isEngaged ? t('estop_engaged') : t('estop_disengaged')}
@@ -190,6 +190,6 @@ function DesktopModal({
           </PrimaryButton>
         </Flex>
       </Flex>
-    </LegacyModal>
+    </Modal>
   )
 }

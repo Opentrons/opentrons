@@ -18,7 +18,7 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
   useConditionalConfirm,
-  LegacyModal,
+  Modal,
 } from '@opentrons/components'
 
 import { TertiaryButton } from '../../atoms/buttons'
@@ -68,7 +68,7 @@ export function ClearUnavailableRobots(): JSX.Element {
     <>
       {showConfirmDeleteUnavailRobots
         ? createPortal(
-            <LegacyModal
+            <Modal
               type="warning"
               title={t('clear_unavailable_robots')}
               onClose={cancelExit}
@@ -101,7 +101,7 @@ export function ClearUnavailableRobots(): JSX.Element {
                   </AlertPrimaryButton>
                 </Flex>
               </Flex>
-            </LegacyModal>,
+            </Modal>,
             getTopPortalEl()
           )
         : null}

@@ -12,7 +12,7 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
-  LegacyModal,
+  Modal,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '../../../App/portal'
@@ -67,7 +67,7 @@ export function ProtocolAnalysisErrorBanner(
       </Flex>
       {showErrorDetails
         ? createPortal(
-            <LegacyModal
+            <Modal
               type="error"
               title={t('protocol_analysis_failure')}
               onClose={handleToggleDetails}
@@ -88,7 +88,7 @@ export function ProtocolAnalysisErrorBanner(
                   {t('shared:close')}
                 </PrimaryButton>
               </Flex>
-            </LegacyModal>,
+            </Modal>,
             getTopPortalEl()
           )
         : null}

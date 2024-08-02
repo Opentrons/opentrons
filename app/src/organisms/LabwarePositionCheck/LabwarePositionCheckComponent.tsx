@@ -4,7 +4,7 @@ import isEqual from 'lodash/isEqual'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
-import { useConditionalConfirm, LegacyModalShell } from '@opentrons/components'
+import { useConditionalConfirm, ModalShell } from '@opentrons/components'
 import {
   useCreateLabwareOffsetMutation,
   useCreateMaintenanceCommandMutation,
@@ -430,14 +430,14 @@ export const LabwarePositionCheckComponent = (
   )
   return createPortal(
     isOnDevice ? (
-      <LegacyModalShell fullPage>
+      <ModalShell fullPage>
         {wizardHeader}
         {modalContent}
-      </LegacyModalShell>
+      </ModalShell>
     ) : (
-      <LegacyModalShell width="47rem" header={wizardHeader}>
+      <ModalShell width="47rem" header={wizardHeader}>
         {modalContent}
-      </LegacyModalShell>
+      </ModalShell>
     ),
     getTopPortalEl()
   )

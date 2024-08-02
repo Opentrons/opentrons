@@ -10,7 +10,7 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
-  LegacyModal,
+  Modal,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '../../../App/portal'
@@ -40,7 +40,7 @@ export function NewRobotSetupHelp(): JSX.Element {
       </Link>
       {showNewRobotHelpModal
         ? createPortal(
-            <LegacyModal
+            <Modal
               title={t('how_to_setup_a_robot')}
               onClose={() => {
                 setShowNewRobotHelpModal(false)
@@ -66,7 +66,7 @@ export function NewRobotSetupHelp(): JSX.Element {
                   {t('shared:close')}
                 </PrimaryButton>
               </Flex>
-            </LegacyModal>,
+            </Modal>,
             getTopPortalEl()
           )
         : null}

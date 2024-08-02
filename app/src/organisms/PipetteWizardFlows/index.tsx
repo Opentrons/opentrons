@@ -7,7 +7,7 @@ import NiceModal, { useModal } from '@ebay/nice-modal-react'
 import {
   useConditionalConfirm,
   COLORS,
-  LegacyModalShell,
+  ModalShell,
 } from '@opentrons/components'
 import { LEFT, NINETY_SIX_CHANNEL, RIGHT } from '@opentrons/shared-data'
 import {
@@ -421,12 +421,12 @@ export const PipetteWizardFlows = (
 
   return createPortal(
     isOnDevice ? (
-      <LegacyModalShell>
+      <ModalShell>
         {wizardHeader}
         {modalContent}
-      </LegacyModalShell>
+      </ModalShell>
     ) : (
-      <LegacyModalShell
+      <ModalShell
         width="47rem"
         height={
           //  changing modal height for now on BeforeBeginning 96 channel attach flow
@@ -440,7 +440,7 @@ export const PipetteWizardFlows = (
         header={wizardHeader}
       >
         {modalContent}
-      </LegacyModalShell>
+      </ModalShell>
     ),
     getTopPortalEl()
   )

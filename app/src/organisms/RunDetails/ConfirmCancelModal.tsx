@@ -10,7 +10,7 @@ import {
   Icon,
   JUSTIFY_FLEX_END,
   Link,
-  LegacyModal,
+  Modal,
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
@@ -70,7 +70,7 @@ export function ConfirmCancelModal(
   }, [runStatus, onClose])
 
   return createPortal(
-    <LegacyModal
+    <Modal
       type="warning"
       onClose={isCanceling ? undefined : onClose}
       title={t('cancel_run_modal_heading')}
@@ -107,7 +107,7 @@ export function ConfirmCancelModal(
           </AlertPrimaryButton>
         </Flex>
       </Flex>
-    </LegacyModal>,
+    </Modal>,
     getTopPortalEl()
   )
 }

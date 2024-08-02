@@ -23,7 +23,7 @@ import {
   RESPONSIVENESS,
   SPACING,
   TYPOGRAPHY,
-  LegacyModalShell,
+  ModalShell,
 } from '@opentrons/components'
 import {
   EIGHT_CHANNEL,
@@ -151,7 +151,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
   )
   return createPortal(
     isOnDevice ? (
-      <LegacyModalShell height="100%" header={wizardHeader}>
+      <ModalShell height="100%" header={wizardHeader}>
         <Flex
           flexDirection={DIRECTION_COLUMN}
           width="100%"
@@ -200,13 +200,9 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
             </Flex>
           )}
         </Flex>
-      </LegacyModalShell>
+      </ModalShell>
     ) : (
-      <LegacyModalShell
-        width="47rem"
-        height="min-content"
-        header={wizardHeader}
-      >
+      <ModalShell width="47rem" height="min-content" header={wizardHeader}>
         {showExitConfirmation ? (
           <ExitModal
             goBack={() => {
@@ -275,7 +271,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
             </PrimaryButton>
           </Flex>
         )}
-      </LegacyModalShell>
+      </ModalShell>
     ),
     getTopPortalEl()
   )

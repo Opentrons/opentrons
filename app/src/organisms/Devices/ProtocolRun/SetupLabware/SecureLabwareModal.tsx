@@ -12,7 +12,7 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
-  LegacyModal,
+  Modal,
 } from '@opentrons/components'
 import { getTopPortalEl } from '../../../../App/portal'
 import secureMagModBracketImage from '../../../../assets/images/secure_mag_mod_bracket.png'
@@ -32,7 +32,7 @@ export const SecureLabwareModal = (
   const { t } = useTranslation(['protocol_setup', 'shared', 'branded'])
   const moduleName = getModuleName(props.type)
   return createPortal(
-    <LegacyModal
+    <Modal
       title={t(`secure_labware_modal`, {
         name: moduleName,
       })}
@@ -94,7 +94,7 @@ export const SecureLabwareModal = (
           {t('shared:close')}
         </PrimaryButton>
       </Flex>
-    </LegacyModal>,
+    </Modal>,
     getTopPortalEl()
   )
 }

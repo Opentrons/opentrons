@@ -5,14 +5,14 @@ import { screen } from '@testing-library/react'
 import { describe, it, expect, beforeEach } from 'vitest'
 import { renderWithProviders } from '../../../testing/utils'
 import { COLORS } from '../../../helix-design-system'
-import { LegacyModal } from '..'
+import { Modal } from '..'
 
-const render = (props: React.ComponentProps<typeof LegacyModal>) => {
-  return renderWithProviders(<LegacyModal {...props} />)
+const render = (props: React.ComponentProps<typeof Modal>) => {
+  return renderWithProviders(<Modal {...props} />)
 }
 
-describe('LegacyModal', () => {
-  let props: React.ComponentProps<typeof LegacyModal>
+describe('Modal', () => {
+  let props: React.ComponentProps<typeof Modal>
 
   beforeEach(() => {
     props = {

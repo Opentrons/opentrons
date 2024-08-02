@@ -4,19 +4,19 @@ import '@testing-library/jest-dom/vitest'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 import { renderWithProviders } from '../../../testing/utils'
-import { LegacyModalHeader } from '../LegacyModalHeader'
+import { ModalHeader } from '../ModalHeader'
 import { COLORS } from '../../../helix-design-system'
 import { SPACING } from '../../../ui-style-constants'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../../styles'
 
 const mockClose = vi.fn()
 
-const render = (props: React.ComponentProps<typeof LegacyModalHeader>) => {
-  return renderWithProviders(<LegacyModalHeader {...props} />)
+const render = (props: React.ComponentProps<typeof ModalHeader>) => {
+  return renderWithProviders(<ModalHeader {...props} />)
 }
 
-describe('LegacyModalHeader', () => {
-  let props: React.ComponentProps<typeof LegacyModalHeader>
+describe('ModalHeader', () => {
+  let props: React.ComponentProps<typeof ModalHeader>
 
   beforeEach(() => {
     props = {
