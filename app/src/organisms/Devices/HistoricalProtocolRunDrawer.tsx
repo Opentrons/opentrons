@@ -9,12 +9,12 @@ import {
   BORDERS,
   Box,
   COLORS,
+  DeckInfoLabel,
   DIRECTION_COLUMN,
   Flex,
   InfoScreen,
   JUSTIFY_FLEX_START,
   LegacyStyledText,
-  LocationIcon,
   OVERFLOW_HIDDEN,
   SPACING,
   TYPOGRAPHY,
@@ -254,7 +254,7 @@ export function HistoricalProtocolRunDrawer(
                   gridGap={SPACING.spacing4}
                   alignItems={ALIGN_CENTER}
                 >
-                  <LocationIcon slotName={offset.location.slotName} />
+                  <DeckInfoLabel deckLabel={offset.location.slotName} />
                   <LegacyStyledText as="p">
                     {offset.location.moduleModel != null
                       ? getModuleDisplayName(offset.location.moduleModel)
