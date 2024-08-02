@@ -21,6 +21,7 @@ from opentrons.protocol_engine import (
     Liquid,
 )
 from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
+from opentrons.protocol_engine.types import BooleanParameter, CSVParameter
 from opentrons.protocol_runner import RunResult
 from opentrons.types import DeckSlotName
 
@@ -173,6 +174,9 @@ async def test_create(
             notify_publishers=mock_notify_publishers,
         )
     ).then_return(engine_state_summary)
+
+    decoy.when(mock_run_orchestrator_store.get_run_time_parameters()).then_return([])
+
     decoy.when(
         mock_run_store.insert(
             run_id=run_id,
@@ -257,7 +261,15 @@ async def test_create_with_options(
         )
     ).then_return(run_resource)
 
-    decoy.when(mock_run_orchestrator_store.get_run_time_parameters()).then_return([])
+    bool_parameter = BooleanParameter(
+        displayName="foo", variableName="bar", default=True, value=False
+    )
+
+    file_parameter = CSVParameter(displayName="my_file", variableName="file-id")
+
+    decoy.when(mock_run_orchestrator_store.get_run_time_parameters()).then_return(
+        [bool_parameter, file_parameter]
+    )
 
     result = await subject.create(
         run_id=run_id,
@@ -284,7 +296,7 @@ async def test_create_with_options(
         pipettes=engine_state_summary.pipettes,
         modules=engine_state_summary.modules,
         liquids=engine_state_summary.liquids,
-        runTimeParameters=[],
+        runTimeParameters=[bool_parameter, file_parameter],
     )
 
 

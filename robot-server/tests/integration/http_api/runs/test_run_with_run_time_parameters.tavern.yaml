@@ -53,6 +53,7 @@ stages:
       save:
         json:
           run_id: data.id
+          run_time_parameters_data: data.runTimeParameters
       json:
         data:
           id: !anystr
@@ -160,52 +161,7 @@ stages:
           createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
           status: succeeded
           current: True
-          runTimeParameters:
-            - displayName: Sample count
-              variableName: sample_count
-              type: int
-              default: 6.0
-              min: 1.0
-              max: 12.0
-              value: 4.0
-              description: How many samples to process.
-            - displayName: Pipette volume
-              variableName: volume
-              type: float
-              default: 20.1
-              choices:
-                - displayName: Low Volume
-                  value: 10.23
-                - displayName: Medium Volume
-                  value: 20.1
-                - displayName: High Volume
-                  value: 50.5
-              value: 10.23
-              description: How many microliters to pipette of each sample.
-            - displayName: Dry Run
-              variableName: dry_run
-              type: bool
-              default: false
-              value: true
-              description: Skip aspirate and dispense steps.
-            - displayName: Pipette Name
-              variableName: pipette
-              type: str
-              choices:
-                - displayName: Single channel 50µL
-                  value: flex_1channel_50
-                - displayName: Eight Channel 50µL
-                  value: flex_8channel_50
-              default: flex_1channel_50
-              value: flex_8channel_50
-              description: What pipette to use during the protocol.
-            - displayName: Liquid handling CSV file
-              variableName: liq_handling_csv_file
-              description: A CSV file that contains wells to use for pipetting
-              type: csv_file
-              file:
-                id: '{data_file_id}'
-                name: sample_plates.csv
+          runTimeParameters: !force_original_structure '{run_time_parameters_data}'
           protocolId: '{protocol_id}'
 
   - name: Mark the run as not-current
@@ -233,50 +189,5 @@ stages:
           createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
           status: succeeded
           current: False
-          runTimeParameters:
-            - displayName: Sample count
-              variableName: sample_count
-              type: int
-              default: 6.0
-              min: 1.0
-              max: 12.0
-              value: 4.0
-              description: How many samples to process.
-            - displayName: Pipette volume
-              variableName: volume
-              type: float
-              default: 20.1
-              choices:
-                - displayName: Low Volume
-                  value: 10.23
-                - displayName: Medium Volume
-                  value: 20.1
-                - displayName: High Volume
-                  value: 50.5
-              value: 10.23
-              description: How many microliters to pipette of each sample.
-            - displayName: Dry Run
-              variableName: dry_run
-              type: bool
-              default: false
-              value: true
-              description: Skip aspirate and dispense steps.
-            - displayName: Pipette Name
-              variableName: pipette
-              type: str
-              choices:
-                - displayName: Single channel 50µL
-                  value: flex_1channel_50
-                - displayName: Eight Channel 50µL
-                  value: flex_8channel_50
-              default: flex_1channel_50
-              value: flex_8channel_50
-              description: What pipette to use during the protocol.
-            - displayName: Liquid handling CSV file
-              variableName: liq_handling_csv_file
-              description: A CSV file that contains wells to use for pipetting
-              type: csv_file
-              file:
-                id: '{data_file_id}'
-                name: sample_plates.csv
+          runTimeParameters: !force_original_structure '{run_time_parameters_data}'
           protocolId: '{protocol_id}'

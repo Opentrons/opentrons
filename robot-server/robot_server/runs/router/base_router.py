@@ -190,6 +190,7 @@ async def create_run(
     rtp_files = (
         request_body.data.runTimeParameterFiles if request_body is not None else None
     )
+
     rtp_paths: Optional[CSVRuntimeParamPaths] = None
     # TODO(jbl 2024-08-02) raise the proper error if file ids don't exist
     if rtp_files:
