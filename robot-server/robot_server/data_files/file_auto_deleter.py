@@ -1,6 +1,5 @@
 """Auto-delete old data files to make room for new ones."""
 from logging import getLogger
-from typing import Final
 
 from robot_server.data_files.data_files_store import DataFilesStore
 from robot_server.deletion_planner import DataFileDeletionPlanner
