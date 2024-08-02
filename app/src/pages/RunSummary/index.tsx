@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
+import { useQueryClient } from 'react-query'
 
 import {
   ALIGN_CENTER,
@@ -155,8 +156,12 @@ export function RunSummary(): JSX.Element {
     determineTipStatus()
   }, [])
 
+  // TODO(jh, 08-02-24): Revisit useCurrentRunRoute and top level redirects.
+  const queryClient = useQueryClient()
   const returnToDash = (): void => {
     closeCurrentRun()
+    // Eagerly clear the query cache to prevent top level redirecting back to this page.
+    queryClient.setQueryData([host, 'runs', runId, 'details'], () => undefined)
     navigate('/')
   }
   // TODO(jh, 07-24-24): After EXEC-504, add reportRecoveredRunResult here.

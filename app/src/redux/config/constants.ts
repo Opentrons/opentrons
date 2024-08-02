@@ -6,7 +6,6 @@ export const DEV_INTERNAL_FLAGS: DevInternalFlag[] = [
   'enableRunNotes',
   'enableQuickTransfer',
   'protocolTimeline',
-  'enableCsvFile',
   'enableLabwareCreator',
 ]
 
