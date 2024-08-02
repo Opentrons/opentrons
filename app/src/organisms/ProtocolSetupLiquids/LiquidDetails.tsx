@@ -69,7 +69,7 @@ export function LiquidDetails(props: LiquidDetailsProps): JSX.Element {
   const [labwareIdModal, setLabwareIdModal] = React.useState<string | null>(
     null
   )
-  const volumePerWell = getVolumePerWell(liquid.id, labwareByLiquidId)
+
   return (
     <Flex marginTop={SPACING.spacing24}>
       {labwareIdModal != null && (
@@ -128,9 +128,17 @@ export function LiquidDetails(props: LiquidDetailsProps): JSX.Element {
                       alignItems={TYPOGRAPHY.textAlignCenter}
                       marginRight={SPACING.spacingAuto}
                     >
-                      {volumePerWell == null
+                      {getVolumePerWell(
+                        liquid.id,
+                        labware.labwareId,
+                        labwareByLiquidId
+                      ) == null
                         ? t('variable_well_amount')
-                        : `${volumePerWell} ${MICRO_LITERS}`}
+                        : `${getVolumePerWell(
+                            liquid.id,
+                            labware.labwareId,
+                            labwareByLiquidId
+                          )} ${MICRO_LITERS}`}
                     </Flex>
                     <Icon name="chevron-right" size="3rem" />
                   </Flex>

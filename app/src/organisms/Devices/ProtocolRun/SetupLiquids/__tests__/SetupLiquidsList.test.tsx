@@ -98,6 +98,11 @@ describe('SetupLiquidsList', () => {
     vi.mocked(useNotifyRunQuery).mockReturnValue({} as any)
   })
 
+  it('renders the table headers', () => {
+    render(props)
+    screen.getByText('Liquid information')
+    screen.getByText('Total volume')
+  })
   it('renders the total volume of the liquid, sample display name, and description', () => {
     render(props)
     screen.getAllByText(nestedTextMatcher('400.0 µL'))

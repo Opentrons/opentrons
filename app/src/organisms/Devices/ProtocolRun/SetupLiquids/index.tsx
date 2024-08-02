@@ -46,7 +46,7 @@ export function SetupLiquids({
     >
       {toggleGroup}
       {selectedValue === t('list_view') ? (
-        <SetupLiquidsList runId={runId} />
+        <SetupLiquidsList runId={runId} robotName={robotName} />
       ) : (
         <SetupLiquidsMap runId={runId} protocolAnalysis={protocolAnalysis} />
       )}
