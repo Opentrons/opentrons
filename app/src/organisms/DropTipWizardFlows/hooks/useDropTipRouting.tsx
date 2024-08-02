@@ -126,7 +126,7 @@ interface DropTipRouteNavigationResult {
 
 // Returns functions that calculate the next and previous steps of a route given a step.
 function getDropTipRouteNavigation(
-  route: DropTipFlowsStep[]
+  route: readonly DropTipFlowsStep[]
 ): DropTipRouteNavigationResult {
   const getNextStep = (step: DropTipFlowsStep): StepNavigationResult => {
     const isStepFinalStep = step === last(route)
@@ -198,10 +198,8 @@ export function getInitialRouteAndStep(
   fixitUtils?: FixitCommandTypeUtils
 ): [DropTipFlowsRoute, DropTipFlowsStep] {
   const routeOverride = fixitUtils?.routeOverride
-  const initialRoute =
-    routeOverride != null ? routeOverride.route : DT_ROUTES.BEFORE_BEGINNING
-  const initialStep =
-    routeOverride != null ? routeOverride.step : head(BEFORE_BEGINNING_STEPS)
+  const initialRoute = routeOverride?.route ?? DT_ROUTES.BEFORE_BEGINNING
+  const initialStep = routeOverride?.route ?? BEFORE_BEGINNING_STEPS[0]
 
   return [initialRoute, initialStep as DropTipFlowsStep]
 }
