@@ -109,10 +109,6 @@ export function RunSummary(): JSX.Element {
   )
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name ?? 'no name'
-  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(
-    runId,
-    robotName as string
-  )
 
   const onCloneRunSuccess = (): void => {
     if (isQuickTransfer) {
@@ -120,6 +116,10 @@ export function RunSummary(): JSX.Element {
     }
   }
 
+  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(
+    runId,
+    robotName as string
+  )
   const robotAnalyticsData = useRobotAnalyticsData(robotName as string)
   const { reportRecoveredRunResult } = useRecoveryAnalytics()
 
