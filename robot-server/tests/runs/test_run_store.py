@@ -1,5 +1,6 @@
 """Tests for robot_server.runs.run_store."""
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import List, Optional, Type
 
 import pytest
@@ -206,14 +207,16 @@ def invalid_state_summary() -> StateSummary:
 
 
 @pytest.fixture
-def data_files_store(sql_engine: Engine) -> DataFilesStore:
+def data_files_store(sql_engine: Engine, tmp_path: Path) -> DataFilesStore:
     """Return a `DataFilesStore` linked to the same database as the subject under test.
 
     `DataFilesStore` is tested elsewhere.
     We only need it here to prepare the database for the analysis store tests.
     The CSV parameters table always needs a data file to link to.
     """
-    return DataFilesStore(sql_engine=sql_engine)
+    data_files_dir = tmp_path / "data_files"
+    data_files_dir.mkdir()
+    return DataFilesStore(sql_engine=sql_engine, data_files_directory=data_files_dir)
 
 
 async def test_update_run_state(

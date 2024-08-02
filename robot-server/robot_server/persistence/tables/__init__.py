@@ -12,7 +12,6 @@ from .schema_6 import (
     action_table,
     run_csv_rtp_table,
     data_files_table,
-    run_csv_rtp_table,
     PrimitiveParamSQLEnum,
     ProtocolKindSQLEnum,
 )
@@ -29,7 +28,6 @@ __all__ = [
     "action_table",
     "run_csv_rtp_table",
     "data_files_table",
-    "run_csv_rtp_table",
     "PrimitiveParamSQLEnum",
     "ProtocolKindSQLEnum",
 ]
