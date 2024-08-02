@@ -38,7 +38,6 @@ from opentrons.protocol_engine import (
     error_recovery_policy,
 )
 from opentrons.protocol_engine.create_protocol_engine import create_protocol_engine
-from opentrons.protocol_engine.errors import ErrorOccurrence
 
 from robot_server.protocols.protocol_store import ProtocolResource
 from opentrons.protocol_engine.types import (

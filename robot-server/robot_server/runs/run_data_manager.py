@@ -14,7 +14,6 @@ from opentrons.protocol_engine import (
     Command,
 )
 from opentrons.protocol_engine.types import PrimitiveRunTimeParamValuesType
-from opentrons.protocol_engine.errors import ErrorOccurrence
 
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.service.task_runner import TaskRunner

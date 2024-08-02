@@ -14,7 +14,7 @@ from opentrons.protocol_engine import (
 )
 
 from robot_server.errors.error_responses import ApiError
-from robot_server.service.json_api import MultiBodyMeta, SimpleMultiBody, ResponseList
+from robot_server.service.json_api import MultiBodyMeta, ResponseList
 
 from robot_server.runs.command_models import (
     RequestModelWithCommandCreate,
@@ -447,7 +447,6 @@ async def test_get_run_commands_errors(
     decoy: Decoy, mock_run_data_manager: RunDataManager
 ) -> None:
     """It should return a list of all commands errors in a run."""
-
     decoy.when(
         mock_run_data_manager.get_command_error_slice(
             run_id="run-id",
@@ -470,7 +469,6 @@ async def test_get_run_commands_errors_raises_no_run(
     decoy: Decoy, mock_run_data_manager: RunDataManager
 ) -> None:
     """It should return a list of all commands errors in a run."""
-
     error = (
         pe_errors.ErrorOccurrence(
             id="error-id",
