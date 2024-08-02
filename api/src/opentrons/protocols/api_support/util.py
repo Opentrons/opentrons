@@ -12,7 +12,6 @@ from typing import (
     Dict,
     List,
     Iterator,
-    KeysView,
     Optional,
     TypeVar,
     Union,
@@ -320,14 +319,22 @@ class AxisMaxSpeeds(UserDict[Union[str, Axis], float]):
     def __iter__(self) -> Iterator[str]:
         """keys() and dict iteration return string keys"""
         string_keys = (
-            k if isinstance(k, str) else k.name if self._robot_type == "OT-3 Standard" else ot2_axis_to_string(k)
+            k
+            if isinstance(k, str)
+            else k.name
+            if self._robot_type == "OT-3 Standard"
+            else ot2_axis_to_string(k)
             for k in self.data.keys()
         )
         return string_keys
 
     def keys(self) -> Iterator[str | Axis]:  # type: ignore[override]
         string_keys = (
-            k if isinstance(k, str) else k.name if self._robot_type == "OT-3 Standard" else ot2_axis_to_string(k)
+            k
+            if isinstance(k, str)
+            else k.name
+            if self._robot_type == "OT-3 Standard"
+            else ot2_axis_to_string(k)
             for k in self.data.keys()
         )
         return string_keys
@@ -335,10 +342,11 @@ class AxisMaxSpeeds(UserDict[Union[str, Axis], float]):
     def items(self) -> Iterator[Dict[str | Axis, float]]:  # type: ignore[override]
         return (
             {
-                k if isinstance(k, str) else 
-                k.name if self._robot_type == "OT-3 Standard"
-                else ot2_axis_to_string(k):
-                v
+                k
+                if isinstance(k, str)
+                else k.name
+                if self._robot_type == "OT-3 Standard"
+                else ot2_axis_to_string(k): v
             }
             for k, v in self.data.items()
         )
@@ -401,8 +409,8 @@ def requires_version(major: int, minor: int) -> Callable[[FuncT], FuncT]:
 
 class ModifiedList(list[str]):
     def __contains__(self, item: object) -> bool:
-        #This weird thing where item is passed in as an object
-        #then asserts that it's a string is a workaround for MyPy errors.
+        # This weird thing where item is passed in as an object
+        # then asserts that it's a string is a workaround for MyPy errors.
         assert isinstance(item, str)
         for name in self:
             if name == item.replace("-", "_").lower():

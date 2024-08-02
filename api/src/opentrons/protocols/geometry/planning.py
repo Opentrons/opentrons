@@ -1,7 +1,7 @@
 import functools
 import logging
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Tuple, Union, Type
+from typing import Any, List, Optional, Tuple, Type
 
 from opentrons import types
 from opentrons.hardware_control.types import CriticalPoint
@@ -77,7 +77,7 @@ class MoveConstraints:
     minimum_z_height: float = 0.0
 
     @classmethod
-    def build(cls: Type['MoveConstraints'], **kwargs: Any) -> 'MoveConstraints':
+    def build(cls: Type["MoveConstraints"], **kwargs: Any) -> "MoveConstraints":
         return cls(**{k: v for k, v in kwargs.items() if v is not None})
 
 
@@ -197,7 +197,13 @@ def _build_safe_height(
                 )
         from_safety = 0.0  # (ignore since it’s in a max())
 
-    max_many_params = [to_point.z, from_point.z, to_safety, from_safety, constraints.minimum_z_height]
+    max_many_params = [
+        to_point.z,
+        from_point.z,
+        to_safety,
+        from_safety,
+        constraints.minimum_z_height,
+    ]
     return max_many(max_many_params)
 
 

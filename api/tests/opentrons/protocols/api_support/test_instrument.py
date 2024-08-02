@@ -147,7 +147,10 @@ def test_validate_takes_liquid_adapter(ctx: ProtocolContext) -> None:
     ],
 )
 def test_validate_tiprack(
-    ctx: ProtocolContext, caplog: pytest.LogCaptureFixture, pipette_name: str, log_value: Optional[str]
+    ctx: ProtocolContext,
+    caplog: pytest.LogCaptureFixture,
+    pipette_name: str,
+    log_value: Optional[str],
 ) -> None:
     tip_rack = ctx.load_labware("opentrons_flex_96_tiprack_200ul", 2)
 

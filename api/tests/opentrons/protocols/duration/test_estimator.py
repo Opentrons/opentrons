@@ -1,10 +1,6 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import math
-from opentrons.protocol_api.core.common import WellCore
-from opentrons.protocol_api.labware import Labware, Well
-from opentrons.protocols.api_support.labware_like import LabwareLike
-from opentrons.protocols.api_support.types import APIVersion
 import pytest
 
 from opentrons.legacy_commands import types
@@ -23,16 +19,12 @@ from opentrons.protocol_api.core.legacy.deck import Deck
 from opentrons.types import Location, Point
 
 messageDataBefore: types.CommandMessageFields = {
-    "$": "before", 
-    "id": "b", 
-    "error": None
+    "$": "before",
+    "id": "b",
+    "error": None,
 }
 
-messageDataAfter: types.CommandMessageFields = {
-    "$": "after", 
-    "id": "a", 
-    "error": None
-}
+messageDataAfter: types.CommandMessageFields = {"$": "after", "id": "a", "error": None}
 
 
 @pytest.fixture
@@ -46,10 +38,12 @@ def mock_instrument() -> MagicMock:
     """A mock instrument context."""
     return MagicMock(spec=InstrumentContext)
 
+
 @pytest.fixture
 def mock_location() -> MagicMock:
     """A mock well."""
     return MagicMock(spec=Location)
+
 
 def test_ignore_before(subject: DurationEstimator) -> None:
     """It should ignore before commands."""
@@ -62,13 +56,17 @@ def test_ignore_before(subject: DurationEstimator) -> None:
     assert subject.get_total_duration() == 0
 
 
-def test_pick_up_tip(subject: DurationEstimator, mock_instrument: MagicMock, mock_location: MagicMock) -> None:
+def test_pick_up_tip(
+    subject: DurationEstimator, mock_instrument: MagicMock, mock_location: MagicMock
+) -> None:
     """It should time a pick up tip."""
     mock_instrument.default_speed = 1
     subject._last_deckslot = "1"
     mock_location.labware.first_parent.return_value = "1"
     message = types.PickUpTipMessage(
-        payload=types.PickUpTipCommandPayload(location=mock_location, instrument=mock_instrument, text=""),
+        payload=types.PickUpTipCommandPayload(
+            location=mock_location, instrument=mock_instrument, text=""
+        ),
         name=types.PICK_UP_TIP,
         **messageDataAfter
     )
@@ -76,14 +74,18 @@ def test_pick_up_tip(subject: DurationEstimator, mock_instrument: MagicMock, moc
     assert subject.get_total_duration() == 4.5
 
 
-def test_drop_tip(subject: DurationEstimator, mock_instrument: MagicMock, mock_location: MagicMock) -> None:
+def test_drop_tip(
+    subject: DurationEstimator, mock_instrument: MagicMock, mock_location: MagicMock
+) -> None:
     """It should time a drop tip."""
     mock_instrument.default_speed = 1
     # Movement in same slot
     subject._last_deckslot = "1"
     mock_location.labware.first_parent.return_value = "1"
     message = types.DropTipMessage(
-        payload=types.DropTipCommandPayload(location=mock_location, instrument=mock_instrument, text=""),
+        payload=types.DropTipCommandPayload(
+            location=mock_location, instrument=mock_instrument, text=""
+        ),
         name=types.DROP_TIP,
         **messageDataAfter
     )
@@ -94,9 +96,11 @@ def test_drop_tip(subject: DurationEstimator, mock_instrument: MagicMock, mock_l
 def test_blow_out(subject: DurationEstimator, mock_instrument: MagicMock) -> None:
     """It should time a blowout."""
     message = types.BlowOutMessage(
-        payload=types.BlowOutCommandPayload(location=None, instrument=mock_instrument, text=""),
+        payload=types.BlowOutCommandPayload(
+            location=None, instrument=mock_instrument, text=""
+        ),
         name=types.BLOW_OUT,
-        **messageDataAfter    
+        **messageDataAfter
     )
     subject.on_message(message)
     assert subject.get_total_duration() == 0.5
@@ -222,7 +226,7 @@ def test_thermocycler_lid_close(subject: DurationEstimator) -> None:
     """It should compute the duration of a lid close."""
     message = types.ThermocyclerCloseMessage(
         payload=types.ThermocyclerCloseCommandPayload(text=""),
-        name = types.THERMOCYCLER_CLOSE,
+        name=types.THERMOCYCLER_CLOSE,
         **messageDataAfter
     )
     subject.on_message(message)
@@ -233,7 +237,7 @@ def test_thermocycler_lid_open(subject: DurationEstimator) -> None:
     """It should compute the duration of a lid open."""
     message = types.ThermocyclerOpenMessage(
         payload=types.ThermocyclerOpenCommandPayload(text=""),
-        name = types.THERMOCYCLER_OPEN,
+        name=types.THERMOCYCLER_OPEN,
         **messageDataAfter
     )
     subject.on_message(message)
@@ -244,7 +248,7 @@ def test_thermocycler_deactivate_lid(subject: DurationEstimator) -> None:
     """It should compute the duration of a lid open."""
     message = types.ThermocyclerDeactivateLidMessage(
         payload=types.ThermocyclerDeactivateLidCommandPayload(text=""),
-        name= types.THERMOCYCLER_DEACTIVATE_LID,
+        name=types.THERMOCYCLER_DEACTIVATE_LID,
         **messageDataAfter
     )
     subject.on_message(message)

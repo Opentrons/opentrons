@@ -1,11 +1,5 @@
 """ Test the functions and classes in the protocol context """
-# TODO: The below imports are only used in test_tip_length_for_caldata, which needs to be fixed.
-import json
-from opentrons_shared_data.pipette.types import LabwareUri
 from decoy import Decoy
-from opentrons.protocols.api_support import instrument as instrument_support
-from opentrons.calibration_storage import types as cs_types
-from opentrons.util.helpers import utc_now
 
 from typing import Any, Callable, Dict, List, Optional, Tuple
 import pytest
@@ -22,6 +16,10 @@ import opentrons.protocols.api_support as papi_support
 from opentrons.protocols.api_support.labware_like import LabwareLike
 import opentrons.protocols.geometry as papi_geometry
 from opentrons.protocols.api_support.deck_type import STANDARD_OT2_DECK
+from opentrons.protocols.api_support import instrument as instrument_support
+from opentrons.calibration_storage import types as cs_types
+from opentrons.util.helpers import utc_now
+from opentrons_shared_data.pipette.types import LabwareUri
 
 from opentrons.protocol_api.module_contexts import (
     ThermocyclerContext,
@@ -1066,7 +1064,9 @@ def test_order_of_module_load() -> None:
     assert id(async_temp2) == id(hw_temp2)
 
 
-def test_tip_length_for_caldata(ctx: papi.ProtocolContext, decoy: Decoy, monkeypatch: MonkeyPatch) -> None:
+def test_tip_length_for_caldata(
+    ctx: papi.ProtocolContext, decoy: Decoy, monkeypatch: MonkeyPatch
+) -> None:
     # TODO (lc 10-27-2022) We need to investigate why the pipette id is
     # being reported as none for this test (and probably all the others)
     from opentrons.hardware_control.instruments.ot2 import (

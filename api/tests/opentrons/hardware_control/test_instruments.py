@@ -12,7 +12,6 @@ from typing import (
     Dict,
     Callable,
     Coroutine,
-    Literal,
     Iterator,
     Tuple,
     Optional,

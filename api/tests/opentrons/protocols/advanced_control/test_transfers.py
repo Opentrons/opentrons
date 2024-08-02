@@ -2,7 +2,7 @@
 from opentrons.protocol_api.instrument_context import InstrumentContext
 from opentrons.protocol_api.labware import Labware
 import pytest
-from typing import Any, Dict, TypedDict, Union
+from typing import TypedDict
 
 from opentrons.types import Mount, TransferTipPolicy
 from opentrons.protocols.advanced_control import transfers as tx
@@ -15,6 +15,7 @@ import opentrons.protocol_api as papi
 # TODO (lc 12-8-2022) We need to re-write these transfer tests so that
 # they are agnostic to the underlying hardware.
 pytestmark = pytest.mark.ot2_only
+
 
 class InstrLabware(TypedDict):
     ctx: ProtocolContext
@@ -816,9 +817,7 @@ def test_all_options(_instr_labware: InstrLabware) -> None:
     assert xfer_plan_list == exp1
 
 
-def test_invalid_air_gap_disposal_sum_distribute(
-    _instr_labware: InstrLabware
-) -> None:
+def test_invalid_air_gap_disposal_sum_distribute(_instr_labware: InstrLabware) -> None:
     _instr_labware["ctx"].home()
     lw1 = _instr_labware["lw1"]
     lw2 = _instr_labware["lw2"]
@@ -1398,7 +1397,7 @@ def test_zero_volume_results_in_no_transfer(_instr_labware: InstrLabware) -> Non
 
 
 def test_zero_volume_causes_transfer_of_disposal_vol(
-    _instr_labware: InstrLabware
+    _instr_labware: InstrLabware,
 ) -> None:
     # This test checks the old behavior of distribute and consolidate
     # with zero volumes in which case the volume aspirated/dispensed
