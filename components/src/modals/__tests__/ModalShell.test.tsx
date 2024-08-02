@@ -2,7 +2,7 @@ import * as React from 'react'
 import '@testing-library/jest-dom/vitest'
 import { screen } from '@testing-library/react'
 import { describe, it, expect, beforeEach } from 'vitest'
-import { renderWithProviders } from '../../../testing/utils'
+import { renderWithProviders } from '../../testing/utils'
 import { ModalShell } from '../ModalShell'
 
 const render = (props: React.ComponentProps<typeof ModalShell>) => {

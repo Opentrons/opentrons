@@ -7,12 +7,12 @@ import {
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   POSITION_STICKY,
-} from '../../styles'
-import { BORDERS, COLORS } from '../../helix-design-system'
-import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
-import { styleProps } from '../../primitives'
+} from '../styles'
+import { BORDERS, COLORS } from '../helix-design-system'
+import { RESPONSIVENESS, SPACING } from '../ui-style-constants'
+import { styleProps } from '../primitives'
 
-import type { StyleProps } from '../../primitives'
+import type { StyleProps } from '../primitives'
 
 export interface ModalShellProps extends StyleProps {
   /** Modal content */

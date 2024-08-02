@@ -6,7 +6,7 @@ import {
   FormGroup,
   BUTTON_TYPE_SUBMIT,
   OutlineButton,
-  ShameModalShell,
+  ModalShell,
   Flex,
   SPACING,
   DIRECTION_ROW,
@@ -198,7 +198,7 @@ export const TrashModal = (props: TrashModalProps): JSX.Element => {
 
   return (
     <form onSubmit={handleSubmit(onSaveClick)}>
-      <ShameModalShell width="48rem">
+      <ModalShell width="48rem">
         <Box marginTop={SPACING.spacing32} paddingX={SPACING.spacing32}>
           <Text as="h2">
             {t(`additional_equipment_display_names.${trashName}`)}
@@ -209,7 +209,7 @@ export const TrashModal = (props: TrashModalProps): JSX.Element => {
           trashName={trashName}
           control={control}
         />
-      </ShameModalShell>
+      </ModalShell>
     </form>
   )
 }

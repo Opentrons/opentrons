@@ -10,7 +10,7 @@ import {
   OutlineButton,
   Tooltip,
   useHoverTooltip,
-  ShameModalShell,
+  ModalShell,
   Flex,
   SPACING,
   DIRECTION_ROW,
@@ -328,7 +328,7 @@ const EditModulesModalComponent = (
   }
 
   return (
-    <ShameModalShell width="48rem" paddingTop={SPACING.spacing32}>
+    <ModalShell width="48rem" paddingTop={SPACING.spacing32}>
       <Box paddingX={SPACING.spacing32}>
         <Text as="h2">{t(`modules:module_long_names.${moduleType}`)}</Text>
       </Box>
@@ -452,6 +452,6 @@ const EditModulesModalComponent = (
           {t('button:save')}
         </OutlineButton>
       </Flex>
-    </ShameModalShell>
+    </ModalShell>
   )
 }

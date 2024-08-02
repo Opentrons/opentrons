@@ -1,13 +1,21 @@
 import * as React from 'react'
-import { Box } from '../../primitives'
-import { SPACING } from '../../ui-style-constants'
-import { COLORS } from '../../helix-design-system'
+import { Box } from '../primitives'
+import { SPACING } from '../ui-style-constants'
+import { COLORS } from '../helix-design-system'
 import { ModalHeader } from './ModalHeader'
 import { ModalShell } from './ModalShell'
-import type { IconProps } from '../../icons'
-import type { StyleProps } from '../../primitives'
+import type { IconProps } from '../icons'
+import type { StyleProps } from '../primitives'
 
 type ModalType = 'info' | 'warning' | 'error'
+// modal components
+
+export * from './AlertModal'
+export * from './ContinueModal'
+export * from './LegacyModal'
+export * from './Overlay'
+export * from './SpinnerModal'
+export * from './SpinnerModalPage'
 export * from './ModalShell'
 export * from './ModalHeader'
 

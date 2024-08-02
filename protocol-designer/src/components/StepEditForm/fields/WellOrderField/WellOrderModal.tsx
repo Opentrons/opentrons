@@ -4,7 +4,7 @@ import cx from 'classnames'
 import { useTranslation } from 'react-i18next'
 import { getMainPagePortalEl } from '../../../portals/MainPageModalPortal'
 import {
-  ShameModal,
+  LegacyModal,
   OutlineButton,
   DeprecatedPrimaryButton,
   FormGroup,
@@ -186,7 +186,7 @@ export const WellOrderModal = (
   if (!isOpen) return null
 
   return createPortal(
-    <ShameModal
+    <LegacyModal
       className={modalStyles.modal}
       contentsClassName={cx(modalStyles.modal_contents)}
       onCloseClick={handleCancel}
@@ -238,7 +238,7 @@ export const WellOrderModal = (
           <DoneButton onClick={handleDone} />
         </div>
       </div>
-    </ShameModal>,
+    </LegacyModal>,
     getMainPagePortalEl()
   )
 }

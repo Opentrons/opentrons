@@ -1,17 +1,17 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 
-import { Icon } from '../../icons'
-import { Box, Btn, Flex } from '../../primitives'
-import { LegacyStyledText } from '../../atoms'
+import { Icon } from '../icons'
+import { Box, Btn, Flex } from '../primitives'
+import { LegacyStyledText } from '../atoms'
 import {
   ALIGN_CENTER,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-} from '../../styles'
-import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
-import { COLORS } from '../../helix-design-system'
-import type { IconProps } from '../../icons'
+} from '../styles'
+import { SPACING, TYPOGRAPHY } from '../ui-style-constants'
+import { COLORS } from '../helix-design-system'
+import type { IconProps } from '../icons'
 
 export interface ModalHeaderProps {
   title: React.ReactNode

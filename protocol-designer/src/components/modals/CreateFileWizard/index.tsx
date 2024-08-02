@@ -8,7 +8,7 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import omit from 'lodash/omit'
 import uniq from 'lodash/uniq'
 import * as Yup from 'yup'
-import { ShameModalShell } from '@opentrons/components'
+import { ModalShell } from '@opentrons/components'
 import {
   OT2_ROBOT_TYPE,
   TEMPERATURE_MODULE_TYPE,
@@ -324,7 +324,7 @@ export function CreateFileWizard(): JSX.Element | null {
   }
 
   return showWizard ? (
-    <ShameModalShell width="48rem" header={wizardHeader}>
+    <ModalShell width="48rem" header={wizardHeader}>
       <CreateFileForm
         currentWizardStep={currentWizardStep}
         createProtocolFile={createProtocolFile}
@@ -332,7 +332,7 @@ export function CreateFileWizard(): JSX.Element | null {
         goBack={goBack}
         setWizardSteps={setWizardSteps}
       />
-    </ShameModalShell>
+    </ModalShell>
   ) : null
 }
 

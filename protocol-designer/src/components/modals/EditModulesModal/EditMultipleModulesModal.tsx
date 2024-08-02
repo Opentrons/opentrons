@@ -5,7 +5,7 @@ import { Controller, useForm, useWatch } from 'react-hook-form'
 import {
   BUTTON_TYPE_SUBMIT,
   OutlineButton,
-  ShameModalShell,
+  ModalShell,
   Flex,
   SPACING,
   DIRECTION_ROW,
@@ -307,7 +307,7 @@ export function EditMultipleModulesModal(
 
   return (
     <form onSubmit={handleSubmit(onSaveClick)}>
-      <ShameModalShell width="48rem">
+      <ModalShell width="48rem">
         <Box marginTop={SPACING.spacing32} paddingX={SPACING.spacing32}>
           <Text as="h2">
             {t(`module_display_names.multiple${moduleType}s`)}
@@ -320,7 +320,7 @@ export function EditMultipleModulesModal(
           moduleLocations={moduleLocations}
           moduleType={moduleType}
         />
-      </ShameModalShell>
+      </ModalShell>
     </form>
   )
 }

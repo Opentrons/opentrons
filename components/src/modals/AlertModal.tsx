@@ -3,7 +3,7 @@ import cx from 'classnames'
 
 import { OutlineButton } from '../buttons'
 import { Icon } from '../icons'
-import { ShameModal } from './ShameModal'
+import { LegacyModal } from './LegacyModal'
 import styles from './modals.module.css'
 
 import type { ButtonProps } from '../buttons'
@@ -53,7 +53,7 @@ export function AlertModal(props: AlertModalProps): JSX.Element {
   )
 
   return (
-    <ShameModal
+    <LegacyModal
       className={className}
       contentsClassName={wrapperStyle}
       onCloseClick={onCloseClick}
@@ -84,6 +84,6 @@ export function AlertModal(props: AlertModalProps): JSX.Element {
           ))}
         </div>
       )}
-    </ShameModal>
+    </LegacyModal>
   )
 }
