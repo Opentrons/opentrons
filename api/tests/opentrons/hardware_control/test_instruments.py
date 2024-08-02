@@ -25,7 +25,7 @@ except (OSError, ModuleNotFoundError):
     aionotify = None
 
 
-from opentrons import types
+from opentrons import _find_smoothie_file, types
 from opentrons.hardware_control import API
 from opentrons.hardware_control.types import Axis, OT3Mount, HardwareFeatureFlags
 from opentrons.types import Mount
@@ -232,6 +232,7 @@ async def test_cache_instruments_hc(
     hw_api_cntrlr = await API.build_hardware_controller(
         loop=asyncio.get_running_loop(),
         feature_flags=HardwareFeatureFlags.build_from_ff(),
+        firmware=_find_smoothie_file()
     )
 
     async def mock_driver_model(mount: str) -> Optional[str]:
