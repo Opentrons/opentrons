@@ -2122,6 +2122,8 @@ class InstrumentContext(publisher.CommandPublisher):
     def detect_liquid_presence(self, well: labware.Well) -> bool:
         """Checks if there is liquid in a well. Will not raise an error if it does not detect liquid. Flex pipettes only. See :ref:`lpd` and :ref:`detect-liquid-presence`.
 
+        When simulating a protocol, the check always succeeds (returns ``True``).
+
         :returns: A boolean.
         """
         loc = well.top()
@@ -2131,6 +2133,8 @@ class InstrumentContext(publisher.CommandPublisher):
     @requires_version(2, 20)
     def require_liquid_presence(self, well: labware.Well) -> None:
         """Checks for liquid in a well. Raises an error if no liquid is detected. Flex pipettes only. See :ref:`lpd` and :ref:`require-liquid-presence`.
+
+        When simulating a protocol, the check always succeeds (does not raise an error).
 
         :returns: None.
         """
