@@ -164,7 +164,6 @@ export function ProtocolRunHeader({
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
   const [showRunFailedModal, setShowRunFailedModal] = React.useState(false)
   const [showDropTipBanner, setShowDropTipBanner] = React.useState(true)
-  const [enteredER, setEnteredER] = React.useState(false)
   const isResetRunLoadingRef = React.useRef(false)
   const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
   const highestPriorityError =
@@ -224,6 +223,8 @@ export function ProtocolRunHeader({
     isMostRecentRunCurrent: mostRecentRunId === runId,
   })
 
+  const enteredER = runRecord?.data.hasEverEnteredErrorRecovery
+
   React.useEffect(() => {
     if (isFlex) {
       if (runStatus === RUN_STATUS_IDLE) {
@@ -232,7 +233,8 @@ export function ProtocolRunHeader({
       } else if (
         runStatus != null &&
         // @ts-expect-error runStatus expected to possibly not be terminal
-        RUN_STATUSES_TERMINAL.includes(runStatus)
+        RUN_STATUSES_TERMINAL.includes(runStatus) &&
+        enteredER === false
       ) {
         void determineTipStatus()
       }
@@ -245,9 +247,14 @@ export function ProtocolRunHeader({
     }
   }, [protocolData, isRobotViewable, navigate])
 
+  React.useEffect(() => {
+    if (isRunCurrent && typeof enteredER === 'boolean') {
+      reportRecoveredRunResult(runStatus, enteredER)
+    }
+  }, [isRunCurrent, enteredER])
+
   // Side effects dependent on the current run state.
   React.useEffect(() => {
-    reportRecoveredRunResult(runStatus, enteredER)
     // After a user-initiated stopped run, close the run current run automatically.
     if (runStatus === RUN_STATUS_STOPPED && isRunCurrent && runId != null) {
       trackProtocolRunEvent({
@@ -257,9 +264,6 @@ export function ProtocolRunHeader({
         },
       })
       closeCurrentRun()
-    }
-    if (runStatus === RUN_STATUS_AWAITING_RECOVERY) {
-      setEnteredER(true)
     }
   }, [runStatus, isRunCurrent, runId, closeCurrentRun])
 
