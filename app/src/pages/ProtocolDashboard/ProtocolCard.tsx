@@ -30,14 +30,14 @@ import {
 import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
 
 import { SmallButton } from '../../atoms/buttons'
-import { Modal } from '../../molecules/Modal'
+import { OddModal } from '../../molecules/OddModal'
 import { LongPressModal } from './LongPressModal'
 import { formatTimeWithUtcLabel } from '../../resources/runs'
 import { useFeatureFlag } from '../../redux/config'
 
 import type { UseLongPressResult } from '@opentrons/components'
 import type { ProtocolResource } from '@opentrons/shared-data'
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
+import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
 
 const REFETCH_INTERVAL = 5000
 
@@ -139,7 +139,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
     setIsRequiredCSV,
   ])
 
-  const failedAnalysisHeader: ModalHeaderBaseProps = {
+  const failedAnalysisHeader: OddModalHeaderBaseProps = {
     title: i18n.format(t('protocol_analysis_failed'), 'capitalize'),
     hasExitIcon: true,
     onClick: () => {
@@ -270,7 +270,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
         )}
         {(showFailedAnalysisModal ||
           (isFailedAnalysis && longpress.isLongPressed)) && (
-          <Modal
+          <OddModal
             header={failedAnalysisHeader}
             onOutsideClick={() => {
               setShowFailedAnalysisModal(false)
@@ -321,7 +321,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
                 disabled={showIcon}
               />
             </Flex>
-          </Modal>
+          </OddModal>
         )}
       </Flex>
     </Flex>

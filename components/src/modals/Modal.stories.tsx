@@ -1,7 +1,6 @@
 import * as React from 'react'
 import {
   AlertModal,
-  BaseModal,
   ContinueModal,
   Overlay,
   SpinnerModal,
@@ -33,46 +32,6 @@ export default {
     ),
   ],
 } as Meta
-
-const BaseTemplate: Story<React.ComponentProps<typeof BaseModal>> = args => (
-  <BaseModal {...args} />
-)
-export const Base = BaseTemplate.bind({})
-Base.args = {
-  header: (
-    <Text
-      as="h2"
-      display={DISPLAY_FLEX}
-      alignItems={ALIGN_CENTER}
-      fontSize={FONT_SIZE_HEADER}
-      fontWeight={FONT_WEIGHT_REGULAR}
-    >
-      <Icon name="alert" width="1em" marginRight={SPACING_2} />
-      Attention
-    </Text>
-  ),
-  children: (
-    <>
-      <Text marginBottom={SPACING_2}>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-        tempor incididunt ut labore et dolore magna aliqua.
-      </Text>
-      <Text marginBottom={SPACING_2}>
-        Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi
-        ut aliquip ex ea commodo consequat.
-      </Text>
-      <Text>
-        Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
-        dolore eu fugiat nulla pariatur
-      </Text>
-    </>
-  ),
-  footer: (
-    <Flex justifyContent={JUSTIFY_FLEX_END}>
-      <SecondaryBtn>OK</SecondaryBtn>
-    </Flex>
-  ),
-}
 
 const AlertTemplate: Story<React.ComponentProps<typeof AlertModal>> = args => (
   <AlertModal {...args} />

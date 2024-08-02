@@ -1,10 +1,10 @@
 import * as React from 'react'
 import { COLORS, Flex, BORDERS, SPACING, VIEWPORT } from '@opentrons/components'
-import { Modal } from './Modal'
+import { OddModal } from './OddModal'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'ODD/Molecules/Modal/Modal',
+  title: 'ODD/Molecules/OddModal/OddModal',
   argTypes: {
     modalSize: {
       options: ['small', 'medium', 'large'],
@@ -15,8 +15,8 @@ export default {
   parameters: VIEWPORT.touchScreenViewport,
 } as Meta
 
-const Template: Story<React.ComponentProps<typeof Modal>> = args => (
-  <Modal {...args} />
+const Template: Story<React.ComponentProps<typeof OddModal>> = args => (
+  <OddModal {...args} />
 )
 export const Default = Template.bind({})
 Default.args = {

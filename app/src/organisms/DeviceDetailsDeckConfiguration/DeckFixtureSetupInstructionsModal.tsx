@@ -12,9 +12,9 @@ import {
   LegacyStyledText,
 } from '@opentrons/components'
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
-import { Modal } from '../../molecules/Modal'
+import { OddModal } from '../../molecules/OddModal'
 
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
+import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
 import type { LegacyModalProps } from '@opentrons/components'
 
 import imgSrc from '../../assets/images/on-device-display/deck_fixture_setup_qrcode.png'
@@ -33,7 +33,7 @@ export function DeckFixtureSetupInstructionsModal({
   isOnDevice = false,
 }: DeckFixtureSetupInstructionsModalProps): JSX.Element {
   const { i18n, t } = useTranslation(['device_details', 'shared', 'branded'])
-  const modalHeader: ModalHeaderBaseProps = {
+  const modalHeader: OddModalHeaderBaseProps = {
     title: t('deck_fixture_setup_instructions'),
     iconName: 'information',
     iconColor: COLORS.black90,
@@ -56,7 +56,7 @@ export function DeckFixtureSetupInstructionsModal({
   return (
     <>
       {isOnDevice ? (
-        <Modal
+        <OddModal
           header={modalHeader}
           onOutsideClick={() => {
             setShowSetupInstructionsModal(false)
@@ -76,7 +76,7 @@ export function DeckFixtureSetupInstructionsModal({
               <img src={imgSrc} alt={IMG_ALT} width="178px" height="178px" />
             </Flex>
           </Flex>
-        </Modal>
+        </OddModal>
       ) : (
         <LegacyModal {...modalProps}>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>

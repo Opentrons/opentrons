@@ -5,7 +5,7 @@ import { Controller, useForm, useWatch } from 'react-hook-form'
 import {
   BUTTON_TYPE_SUBMIT,
   OutlineButton,
-  ModalShell,
+  ShameModalShell,
   Flex,
   SPACING,
   DIRECTION_ROW,
@@ -221,7 +221,7 @@ export const StagingAreasModal = (
 
   return (
     <form onSubmit={handleSubmit(onSaveClick)}>
-      <ModalShell width="48rem">
+      <ShameModalShell width="48rem">
         <Box marginTop={SPACING.spacing32} paddingX={SPACING.spacing32}>
           <Text as="h2">
             {t(`additional_equipment_display_names.stagingAreas`)}
@@ -233,7 +233,7 @@ export const StagingAreasModal = (
           control={control}
           stagingAreaLocations={stagingAreaLocations}
         />
-      </ModalShell>
+      </ShameModalShell>
     </form>
   )
 }

@@ -4,23 +4,23 @@ import '@testing-library/jest-dom/vitest'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 import { renderWithProviders } from '../../../__testing-utils__'
-import { ModalHeader } from '../ModalHeader'
-import { Modal } from '../Modal'
+import { OddModalHeader } from '../OddModalHeader'
+import { OddModal } from '../OddModal'
 
-vi.mock('../ModalHeader')
+vi.mock('../OddModalHeader')
 
-const render = (props: React.ComponentProps<typeof Modal>) => {
-  return renderWithProviders(<Modal {...props} />)[0]
+const render = (props: React.ComponentProps<typeof OddModal>) => {
+  return renderWithProviders(<OddModal {...props} />)[0]
 }
 
 describe('Modal', () => {
-  let props: React.ComponentProps<typeof Modal>
+  let props: React.ComponentProps<typeof OddModal>
   beforeEach(() => {
     props = {
       onOutsideClick: vi.fn(),
       children: <div>children</div>,
     }
-    vi.mocked(ModalHeader).mockReturnValue(<div>mock Modal Header</div>)
+    vi.mocked(OddModalHeader).mockReturnValue(<div>mock Modal Header</div>)
   })
   it('should render the modal with no header', () => {
     render(props)

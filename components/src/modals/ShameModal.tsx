@@ -24,10 +24,11 @@ export interface ModalProps {
 }
 
 /**
+ * @deprecated use Modal instead
  * Base modal component that fills its nearest `display:relative` ancestor
  * with a dark overlay and displays `children` as its contents in a white box
  */
-export function Modal(props: ModalProps): JSX.Element {
+export function ShameModal(props: ModalProps): JSX.Element {
   const {
     contentsClassName,
     alertOverlay,

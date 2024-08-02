@@ -15,7 +15,7 @@ import {
 } from '@opentrons/components'
 
 import { useErrorName } from '../hooks'
-import { Modal } from '../../../molecules/Modal'
+import { OddModal } from '../../../molecules/OddModal'
 import { getModalPortalEl, getTopPortalEl } from '../../../App/portal'
 import { ERROR_KINDS } from '../constants'
 import { InlineNotification } from '../../../atoms/InlineNotification'
@@ -24,7 +24,7 @@ import { getErrorKind } from '../utils'
 
 import type { RobotType } from '@opentrons/shared-data'
 import type { IconProps } from '@opentrons/components'
-import type { ModalHeaderBaseProps } from '../../../molecules/Modal/types'
+import type { OddModalHeaderBaseProps } from '../../../molecules/OddModal/types'
 import type { ERUtilsResults } from '../hooks'
 import type { ErrorRecoveryFlowsProps } from '..'
 import type { DesktopSizeType } from '../types'
@@ -66,7 +66,7 @@ export function ErrorDetailsModal(props: ErrorDetailsModalProps): JSX.Element {
     }
   }
 
-  const modalHeader: ModalHeaderBaseProps = {
+  const modalHeader: OddModalHeaderBaseProps = {
     title: errorName,
     hasExitIcon: true,
   }
@@ -102,7 +102,7 @@ export function ErrorDetailsModal(props: ErrorDetailsModalProps): JSX.Element {
 
 type ErrorDetailsModalType = ErrorDetailsModalProps & {
   children: React.ReactNode
-  modalHeader: ModalHeaderBaseProps
+  modalHeader: OddModalHeaderBaseProps
   toggleModal: () => void
   desktopType: DesktopSizeType
 }
@@ -166,7 +166,7 @@ export function ErrorDetailsModalODD(
   const { children, modalHeader, toggleModal } = props
 
   return (
-    <Modal
+    <OddModal
       header={modalHeader}
       onOutsideClick={toggleModal}
       zIndex={15}
@@ -183,7 +183,7 @@ export function ErrorDetailsModalODD(
           <StepInfo {...props} desktopStyle="bodyDefaultRegular" />
         </Flex>
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }
 

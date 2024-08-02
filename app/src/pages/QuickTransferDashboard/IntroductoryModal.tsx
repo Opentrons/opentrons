@@ -8,7 +8,7 @@ import {
   ALIGN_CENTER,
   TEXT_ALIGN_CENTER,
 } from '@opentrons/components'
-import { Modal } from '../../molecules/Modal'
+import { OddModal } from '../../molecules/OddModal'
 import { SmallButton } from '../../atoms/buttons'
 
 import imgSrc from '../../assets/images/on-device-display/odd-abstract-6.png'
@@ -23,7 +23,7 @@ export const IntroductoryModal = (
   const { t } = useTranslation(['quick_transfer', 'shared'])
 
   return (
-    <Modal modalSize="small">
+    <OddModal modalSize="small">
       <Flex
         flexDirection={DIRECTION_COLUMN}
         alignItems={ALIGN_CENTER}
@@ -51,6 +51,6 @@ export const IntroductoryModal = (
           />
         </Flex>
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }

@@ -50,7 +50,7 @@ import {
 
 import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
 import { TertiaryButton } from '../../atoms/buttons'
-import { Modal } from '../../molecules/Modal'
+import { OddModal } from '../../molecules/OddModal'
 import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration/'
 
 import type {
@@ -58,7 +58,7 @@ import type {
   CutoutId,
   CutoutFixtureId,
 } from '@opentrons/shared-data'
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
+import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
 import type { LegacyModalProps } from '@opentrons/components'
 
 interface AddFixtureModalProps {
@@ -104,7 +104,7 @@ export function AddFixtureModal({
     initialStage
   )
 
-  const modalHeader: ModalHeaderBaseProps = {
+  const modalHeader: OddModalHeaderBaseProps = {
     title: t('add_to_slot', {
       slotName: getCutoutDisplayName(cutoutId),
     }),
@@ -335,7 +335,7 @@ export function AddFixtureModal({
   return (
     <>
       {isOnDevice ? (
-        <Modal
+        <OddModal
           header={modalHeader}
           onOutsideClick={() => {
             if (providedFixtureOptions == null) closeModal()
@@ -350,7 +350,7 @@ export function AddFixtureModal({
               {nextStageOptions}
             </Flex>
           </Flex>
-        </Modal>
+        </OddModal>
       ) : (
         <LegacyModal {...modalProps}>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>

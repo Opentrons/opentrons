@@ -30,7 +30,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '../../../../App/portal'
-import { Modal } from '../../../../molecules/Modal'
+import { OddModal } from '../../../../molecules/OddModal'
 import { SmallButton } from '../../../../atoms/buttons/SmallButton'
 import { useNotifyDeckConfigurationQuery } from '../../../../resources/deck_configuration'
 
@@ -175,7 +175,7 @@ export const LocationConflictModal = (
 
   return createPortal(
     isOnDevice ? (
-      <Modal
+      <OddModal
         onOutsideClick={onCloseClick}
         header={{
           title: t('deck_conflict'),
@@ -273,7 +273,7 @@ export const LocationConflictModal = (
             />
           </Flex>
         </Flex>
-      </Modal>
+      </OddModal>
     ) : (
       <LegacyModal
         title={

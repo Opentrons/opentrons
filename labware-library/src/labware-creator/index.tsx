@@ -14,7 +14,7 @@ import {
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  ModalShell,
+  ShameModalShell,
   PrimaryButton,
 } from '@opentrons/components'
 import {
@@ -507,7 +507,7 @@ export const LabwareCreator = (props: LabwareCreatorProps): JSX.Element => {
           )
 
           return isOnRunApp && goBack != null ? (
-            <ModalShell width="48rem" header={wizardHeader}>
+            <ShameModalShell width="48rem" header={wizardHeader}>
               <Box padding="2rem">
                 <CreateForm
                   values={values}
@@ -523,7 +523,7 @@ export const LabwareCreator = (props: LabwareCreatorProps): JSX.Element => {
                   labwareTypeChildFields={labwareTypeChildFields}
                 />
               </Box>
-            </ModalShell>
+            </ShameModalShell>
           ) : (
             <div className={styles.labware_creator}>
               <h2>Custom Labware Creator</h2>

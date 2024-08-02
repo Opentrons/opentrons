@@ -26,13 +26,13 @@ import { getTopPortalEl } from '../../App/portal'
 import { Banner } from '../../atoms/Banner'
 import { ListItem } from '../../atoms/ListItem'
 import { SmallButton } from '../../atoms/buttons'
-import { Modal } from '../../molecules/Modal'
+import { OddModal } from '../../molecules/OddModal'
 import { getIsOnDevice } from '../../redux/config'
 
 import type {
-  ModalHeaderBaseProps,
+  OddModalHeaderBaseProps,
   ModalSize,
-} from '../../molecules/Modal/types'
+} from '../../molecules/OddModal/types'
 import type { LegacyModalProps } from '@opentrons/components'
 
 // Note (07/13/2023) After the launch, we will unify the modal components into one component.
@@ -76,7 +76,7 @@ function TouchscreenModal({
   const { t } = useTranslation(['device_settings', 'branded'])
   const [isResuming, setIsResuming] = React.useState<boolean>(false)
   const { acknowledgeEstopDisengage } = useAcknowledgeEstopDisengageMutation()
-  const modalHeader: ModalHeaderBaseProps = {
+  const modalHeader: OddModalHeaderBaseProps = {
     title: t('estop_pressed'),
     iconName: 'ot-alert',
     iconColor: COLORS.red50,
@@ -91,7 +91,7 @@ function TouchscreenModal({
     closeModal()
   }
   return (
-    <Modal {...modalProps}>
+    <OddModal {...modalProps}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing40}>
         <LegacyStyledText as="p" fontWeight>
           {t('branded:estop_pressed_description')}
@@ -123,7 +123,7 @@ function TouchscreenModal({
           onClick={handleClick}
         />
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }
 

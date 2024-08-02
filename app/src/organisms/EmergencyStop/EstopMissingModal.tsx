@@ -14,10 +14,10 @@ import {
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '../../App/portal'
-import { Modal } from '../../molecules/Modal'
+import { OddModal } from '../../molecules/OddModal'
 import { getIsOnDevice } from '../../redux/config'
 
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
+import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
 import type { LegacyModalProps } from '@opentrons/components'
 
 // Note (07/13/2023) After the launch, we will unify the modal components into one component.
@@ -66,7 +66,7 @@ function TouchscreenModal({
   robotName,
 }: EstopMissingTouchscreenModalProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const modalHeader: ModalHeaderBaseProps = {
+  const modalHeader: OddModalHeaderBaseProps = {
     title: t('estop_missing'),
     iconName: 'ot-alert',
     iconColor: COLORS.red50,
@@ -76,7 +76,7 @@ function TouchscreenModal({
   }
 
   return (
-    <Modal {...modalProps}>
+    <OddModal {...modalProps}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
         <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightBold}>
           {t('connect_the_estop_to_continue')}
@@ -85,7 +85,7 @@ function TouchscreenModal({
           {t('estop_missing_description', { robotName: robotName })}
         </LegacyStyledText>
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }
 

@@ -1,10 +1,10 @@
 import * as React from 'react'
 import { COLORS, VIEWPORT } from '@opentrons/components'
-import { ModalHeader } from './ModalHeader'
+import { OddModalHeader } from './OddModalHeader'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'ODD/Molecules/Modal/ModalHeader',
+  title: 'ODD/Molecules/OddModal/OddModalHeader',
   argTypes: {
     iconName: {
       options: ['information', 'ot-check', 'ot-alert', undefined],
@@ -26,8 +26,8 @@ export default {
   parameters: VIEWPORT.touchScreenViewport,
 } as Meta
 
-const Template: Story<React.ComponentProps<typeof ModalHeader>> = args => (
-  <ModalHeader {...args} />
+const Template: Story<React.ComponentProps<typeof OddModalHeader>> = args => (
+  <OddModalHeader {...args} />
 )
 export const Default = Template.bind({})
 Default.args = {

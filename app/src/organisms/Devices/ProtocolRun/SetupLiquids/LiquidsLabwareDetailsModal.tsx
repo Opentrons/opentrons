@@ -18,7 +18,7 @@ import {
   TYPOGRAPHY,
   LegacyModal,
 } from '@opentrons/components'
-import { Modal } from '../../../../molecules/Modal'
+import { OddModal } from '../../../../molecules/OddModal'
 import { getIsOnDevice } from '../../../../redux/config'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getLocationInfoNames } from '../utils/getLocationInfoNames'
@@ -127,7 +127,7 @@ export const LiquidsLabwareDetailsModal = (
   })
 
   return isOnDevice ? (
-    <Modal
+    <OddModal
       modalSize="large"
       onOutsideClick={closeModal}
       header={{
@@ -158,7 +158,7 @@ export const LiquidsLabwareDetailsModal = (
           </svg>
         </Flex>
       </Flex>
-    </Modal>
+    </OddModal>
   ) : (
     <LegacyModal
       onClose={closeModal}

@@ -28,6 +28,7 @@ export interface ModalShellProps extends StyleProps {
 }
 
 /**
+ * @deprecated use ModalShell instead
  * A ModalShell is a layout component for building more specific modals.
  *
  * It includes:
@@ -37,7 +38,7 @@ export interface ModalShellProps extends StyleProps {
  * - An optional sticky footer
  * - An optional onOutsideClick function
  */
-export function ModalShell(props: ModalShellProps): JSX.Element {
+export function ShameModalShell(props: ModalShellProps): JSX.Element {
   const {
     onOutsideClick,
     zIndex = 10,

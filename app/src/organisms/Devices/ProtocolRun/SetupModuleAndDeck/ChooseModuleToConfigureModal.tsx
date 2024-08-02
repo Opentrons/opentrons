@@ -25,7 +25,7 @@ import {
   getModuleDisplayName,
 } from '@opentrons/shared-data'
 import { getTopPortalEl } from '../../../../App/portal'
-import { Modal } from '../../../../molecules/Modal'
+import { OddModal } from '../../../../molecules/OddModal'
 import { FixtureOption } from '../../../DeviceDetailsDeckConfiguration/AddFixtureModal'
 import { useNotifyDeckConfigurationQuery } from '../../../../resources/deck_configuration'
 import { SmallButton } from '../../../../atoms/buttons'
@@ -139,7 +139,7 @@ export const ChooseModuleToConfigureModal = (
 
   return createPortal(
     isOnDevice ? (
-      <Modal
+      <OddModal
         onOutsideClick={onCloseClick}
         header={{
           title: t('add_to_slot', { slotName: displaySlotName }),
@@ -148,7 +148,7 @@ export const ChooseModuleToConfigureModal = (
         }}
       >
         {contents}
-      </Modal>
+      </OddModal>
     ) : (
       <LegacyModal
         title={

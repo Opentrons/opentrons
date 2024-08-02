@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux'
 import omit from 'lodash/omit'
 
 import {
-  Modal,
+  ShameModal,
   OutlineButton,
   LabeledValue,
   WELL_LABEL_OPTIONS,
@@ -74,7 +74,7 @@ const WellSelectionModalComponent = (
   const liquidDisplayColors = useSelector(selectors.getLiquidDisplayColors)
 
   return (
-    <Modal
+    <ShameModal
       className={modalStyles.modal}
       contentsClassName={cx(
         modalStyles.modal_contents,
@@ -115,7 +115,7 @@ const WellSelectionModalComponent = (
       ) : null}
 
       <WellSelectionInstructions />
-    </Modal>
+    </ShameModal>
   )
 }
 

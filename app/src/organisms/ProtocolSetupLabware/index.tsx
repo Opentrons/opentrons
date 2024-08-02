@@ -39,7 +39,7 @@ import {
 import { FloatingActionButton } from '../../atoms/buttons'
 import { ODDBackButton } from '../../molecules/ODDBackButton'
 import { getTopPortalEl } from '../../App/portal'
-import { Modal } from '../../molecules/Modal'
+import { OddModal } from '../../molecules/OddModal'
 
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getLabwareSetupItemGroups } from '../../pages/Protocols/utils'
@@ -213,7 +213,7 @@ export function ProtocolSetupLabware({
             />
           ) : null}
           {showLabwareDetailsModal && selectedLabware != null ? (
-            <Modal
+            <OddModal
               onOutsideClick={() => {
                 setShowLabwareDetailsModal(false)
                 setSelectedLabware(null)
@@ -251,7 +251,7 @@ export function ProtocolSetupLabware({
                   </LegacyStyledText>
                 </Flex>
               </Flex>
-            </Modal>
+            </OddModal>
           ) : null}
         </>,
         getTopPortalEl()

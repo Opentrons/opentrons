@@ -11,9 +11,9 @@ import {
 } from '@opentrons/components'
 
 import { SmallButton } from '../../atoms/buttons'
-import { Modal } from '../../molecules/Modal'
+import { OddModal } from '../../molecules/OddModal'
 
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
+import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
 
 interface DeckConfigurationDiscardChangesModalProps {
   setShowConfirmationModal: (showConfirmationModal: boolean) => void
@@ -24,7 +24,7 @@ export function DeckConfigurationDiscardChangesModal({
 }: DeckConfigurationDiscardChangesModalProps): JSX.Element {
   const { t } = useTranslation('device_details')
   const navigate = useNavigate()
-  const modalHeader: ModalHeaderBaseProps = {
+  const modalHeader: OddModalHeaderBaseProps = {
     title: t('changes_will_be_lost'),
   }
 
@@ -34,7 +34,7 @@ export function DeckConfigurationDiscardChangesModal({
   }
 
   return (
-    <Modal header={modalHeader}>
+    <OddModal header={modalHeader}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
         <LegacyStyledText as="p">
           {t('changes_will_be_lost_description')}
@@ -59,6 +59,6 @@ export function DeckConfigurationDiscardChangesModal({
           />
         </Flex>
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }
