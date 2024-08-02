@@ -9,7 +9,7 @@ from typing import List, Optional, Union, Tuple
 
 from opentrons.protocol_engine.types import (
     PrimitiveRunTimeParamValuesType,
-    CSVRunTimeParamFilesType,
+    CSVRuntimeParamPaths,
 )
 from opentrons_shared_data.robot import user_facing_robot_type
 from opentrons.util.performance_helpers import TrackingFunctions
@@ -48,6 +48,11 @@ from robot_server.service.json_api import (
     PydanticResponse,
     RequestModel,
 )
+from robot_server.data_files.dependencies import (
+    get_data_files_directory,
+    get_data_files_store,
+)
+from robot_server.data_files.data_files_store import DataFilesStore
 from robot_server.data_files.models import DataFile
 
 from .analyses_manager import AnalysesManager, FailedToInitializeAnalyzer
@@ -245,6 +250,8 @@ async def create_protocol(  # noqa: C901
     quick_transfer_protocol_auto_deleter: ProtocolAutoDeleter = Depends(
         get_quick_transfer_protocol_auto_deleter
     ),
+    data_files_directory: Path = Depends(get_data_files_directory),
+    data_files_store: DataFilesStore = Depends(get_data_files_store),
     robot_type: RobotType = Depends(get_robot_type),
     protocol_id: str = Depends(get_unique_id, use_cache=False),
     analysis_id: str = Depends(get_unique_id, use_cache=False),
@@ -272,6 +279,8 @@ async def create_protocol(  # noqa: C901
             the new protocol.
         quick_transfer_protocol_auto_deleter: An interface to delete old quick
             transfer resources to make room for the new protocol.
+        data_files_directory: Persistence directory for data files.
+        data_files_store: Database of data file resources.
         robot_type: The type of this robot. Protocols meant for other robot types
             are rejected.
         protocol_id: Unique identifier to attach to the protocol resource.
@@ -314,6 +323,11 @@ async def create_protocol(  # noqa: C901
         assert file.filename is not None
     buffered_files = await file_reader_writer.read(files=files)  # type: ignore[arg-type]
 
+    rtp_paths = {
+        name: data_files_directory / file_id / data_files_store.get(file_id).name
+        for name, file_id in parsed_rtp_files.items()
+    }
+
     content_hash = await file_hasher.hash(buffered_files)
     cached_protocol_id = protocol_store.get_id_by_hash(content_hash)
 
@@ -330,7 +344,7 @@ async def create_protocol(  # noqa: C901
                     analysis_id=analysis_id,
                     force_analyze=False,
                     rtp_values=parsed_rtp_values,
-                    rtp_files=parsed_rtp_files,
+                    rtp_files=rtp_paths,
                     protocol_resource=protocol_store.get(
                         protocol_id=cached_protocol_id
                     ),
@@ -409,7 +423,7 @@ async def create_protocol(  # noqa: C901
         analysis_id=analysis_id,
         force_analyze=True,
         rtp_values=parsed_rtp_values,
-        rtp_files=parsed_rtp_files,
+        rtp_files=rtp_paths,
         protocol_resource=protocol_resource,
         analysis_store=analysis_store,
         analyses_manager=analyses_manager,
@@ -440,7 +454,7 @@ async def _start_new_analysis_if_necessary(
     analysis_id: str,
     force_analyze: bool,
     rtp_values: PrimitiveRunTimeParamValuesType,
-    rtp_files: CSVRunTimeParamFilesType,
+    rtp_files: CSVRuntimeParamPaths,
     protocol_resource: ProtocolResource,
     analysis_store: AnalysisStore,
     analyses_manager: AnalysesManager,
@@ -458,7 +472,7 @@ async def _start_new_analysis_if_necessary(
             analysis_id=analysis_id,
             protocol_resource=protocol_resource,
             run_time_param_values=rtp_values,
-            run_time_param_files=rtp_files,
+            run_time_param_paths=rtp_files,
         )
     except FailedToInitializeAnalyzer:
         analyses.append(
@@ -695,6 +709,8 @@ async def create_protocol_analysis(
     analysis_store: AnalysisStore = Depends(get_analysis_store),
     analyses_manager: AnalysesManager = Depends(get_analyses_manager),
     analysis_id: str = Depends(get_unique_id, use_cache=False),
+    data_files_directory: Path = Depends(get_data_files_directory),
+    data_files_store: DataFilesStore = Depends(get_data_files_store),
 ) -> PydanticResponse[SimpleMultiBody[AnalysisSummary]]:
     """Start a new analysis for the given existing protocol.
 
@@ -713,6 +729,14 @@ async def create_protocol_analysis(
         raise ProtocolNotFound(detail=f"Protocol {protocolId} not found").as_error(
             status.HTTP_404_NOT_FOUND
         )
+
+    rtp_files = request_body.data.runTimeParameterFiles if request_body else {}
+
+    rtp_paths = {
+        name: data_files_directory / file_id / data_files_store.get(file_id).name
+        for name, file_id in rtp_files.items()
+    }
+
     try:
         (
             analysis_summaries,
@@ -722,7 +746,7 @@ async def create_protocol_analysis(
             analysis_id=analysis_id,
             force_analyze=request_body.data.forceReAnalyze if request_body else False,
             rtp_values=request_body.data.runTimeParameterValues if request_body else {},
-            rtp_files=request_body.data.runTimeParameterFiles if request_body else {},
+            rtp_files=rtp_paths,
             protocol_resource=protocol_store.get(protocol_id=protocolId),
             analysis_store=analysis_store,
             analyses_manager=analyses_manager,

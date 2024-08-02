@@ -19,9 +19,9 @@ from opentrons.protocol_engine import (
     CommandNote,
 )
 from opentrons.protocol_engine.types import (
-    CSVRunTimeParamFilesType,
     RunTimeParameter,
     PrimitiveRunTimeParamValuesType,
+    CSVRunTimeParamFilesType,
 )
 from opentrons_shared_data.errors import GeneralError
 from robot_server.service.json_api import ResourceModel
@@ -255,7 +255,7 @@ class RunCreate(BaseModel):
     )
     runTimeParameterFiles: Optional[CSVRunTimeParamFilesType] = Field(
         None,
-        description="Key-fileId pairs of CSV run-time parameters defined in a protocol.",
+        description="Key-fileId pairs of CSV run-time parameters defined in a run.",
     )
 
 

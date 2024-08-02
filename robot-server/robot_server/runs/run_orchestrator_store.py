@@ -5,9 +5,9 @@ from typing import List, Optional, Callable
 
 from opentrons.protocol_engine.errors.exceptions import EStopActivatedError
 from opentrons.protocol_engine.types import (
-    CSVRunTimeParamFilesType,
     PostRunHardwareState,
     RunTimeParameter,
+    CSVRuntimeParamPaths,
 )
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
@@ -192,7 +192,8 @@ class RunOrchestratorStore:
         notify_publishers: Callable[[], None],
         protocol: Optional[ProtocolResource],
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
-        run_time_param_files: Optional[CSVRunTimeParamFilesType] = None,
+        # TODO(jbl 2024-08-02) combine this with run_time_param_values now that theres no ambiguity with Paths
+        run_time_param_paths: Optional[CSVRuntimeParamPaths] = None,
     ) -> StateSummary:
         """Create and store a ProtocolRunner and ProtocolEngine for a given Run.
 
@@ -203,7 +204,7 @@ class RunOrchestratorStore:
             notify_publishers: Utilized by the engine to notify publishers of state changes.
             protocol: The protocol to load the runner with, if any.
             run_time_param_values: Any runtime parameter values to set.
-            run_time_param_files: Any runtime parameter files to set.
+            run_time_param_paths: Any runtime filepath to set.
 
         Returns:
             The initial equipment and status summary of the engine.
@@ -249,7 +250,7 @@ class RunOrchestratorStore:
             await self.run_orchestrator.load(
                 protocol.source,
                 run_time_param_values=run_time_param_values,
-                run_time_param_files=run_time_param_files,
+                run_time_param_paths=run_time_param_paths,
                 parse_mode=ParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
             )
         else:
