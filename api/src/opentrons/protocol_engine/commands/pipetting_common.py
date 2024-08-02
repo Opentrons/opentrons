@@ -114,6 +114,14 @@ class BaseLiquidHandlingResult(BaseModel):
 class DestinationPositionResult(BaseModel):
     """Mixin for command results that move a pipette."""
 
+    # todo(mm, 2024-08-02): Consider deprecating or redefining this.
+    #
+    # This is here because opentrons.protocol_engine needed it for internal bookkeeping
+    # and, at the time, we didn't have a way to do that without adding this to the
+    # public command results. Its usefulness to callers outside
+    # opentrons.protocol_engine is questionable because they would need to know which
+    # critical point is in play, and I think that can change depending on obscure
+    # things like labware quirks.
     position: DeckPoint = Field(
         DeckPoint(x=0, y=0, z=0),
         description=(
