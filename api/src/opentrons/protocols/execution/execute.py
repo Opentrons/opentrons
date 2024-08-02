@@ -48,6 +48,7 @@ def run_protocol(
         except Exception:
             raise
         finally:
+            # TODO(jbl 2024-08-02) this should be more tightly bound to the opening of the csv files
             if parameter_context is not None:
                 parameter_context.close_csv_files()
     else:

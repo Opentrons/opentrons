@@ -176,7 +176,7 @@ async def create_run(
             the new run.
         quick_transfer_run_auto_deleter: An interface to delete old quick-transfer
         data_files_directory: Persistence directory for data files.
-        data_files_store: In-memory database of data file resources.
+        data_files_store: Database of data file resources.
         resources to make room for the new run.
         check_estop: Dependency to verify the estop is in a valid state.
         deck_configuration_store: Dependency to fetch the deck configuration.
@@ -191,6 +191,7 @@ async def create_run(
         request_body.data.runTimeParameterFiles if request_body is not None else None
     )
     rtp_paths: Optional[CSVRuntimeParamPaths] = None
+    # TODO(jbl 2024-08-02) raise the proper error if file ids don't exist
     if rtp_files:
         rtp_paths = {
             name: data_files_directory / file_id / data_files_store.get(file_id).name

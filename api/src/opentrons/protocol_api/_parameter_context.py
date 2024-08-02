@@ -240,15 +240,22 @@ class ParameterContext:
                     f"File Id was provided for the parameter '{variable_name}',"
                     f" but '{variable_name}' is not a CSV parameter."
                 )
+            # TODO(jbl 2024-08-02) This file opening should be moved elsewhere to provide more flexibility with files
+            #    that may be opened as non-text or non-UTF-8
+            # The parent folder in the path will be the file ID, so we can use that to resolve that here
             file_id = file_path.parent.name
             file_name = file_path.name
+
+            # Read the contents of the actual file
             with file_path.open() as csv_file:
                 contents = csv_file.read()
 
+            # Open a temporary file with write permissions and write contents to that
             temporary_file = tempfile.NamedTemporaryFile("r+")
             temporary_file.write(contents)
             temporary_file.flush()
 
+            # Open a new file handler for the temporary file with read-only permissions and close the other
             parameter_file = open(temporary_file.name, "r")
             temporary_file.close()
 

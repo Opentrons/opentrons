@@ -192,6 +192,7 @@ class RunOrchestratorStore:
         notify_publishers: Callable[[], None],
         protocol: Optional[ProtocolResource],
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
+        # TODO(jbl 2024-08-02) combine this with run_time_param_values now that theres no ambiguity with Paths
         run_time_param_paths: Optional[CSVRuntimeParamPaths] = None,
     ) -> StateSummary:
         """Create and store a ProtocolRunner and ProtocolEngine for a given Run.

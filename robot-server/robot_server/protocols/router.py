@@ -280,7 +280,7 @@ async def create_protocol(  # noqa: C901
         quick_transfer_protocol_auto_deleter: An interface to delete old quick
             transfer resources to make room for the new protocol.
         data_files_directory: Persistence directory for data files.
-        data_files_store: In-memory database of data file resources.
+        data_files_store: Database of data file resources.
         robot_type: The type of this robot. Protocols meant for other robot types
             are rejected.
         protocol_id: Unique identifier to attach to the protocol resource.
