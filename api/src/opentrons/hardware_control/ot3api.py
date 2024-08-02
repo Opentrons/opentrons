@@ -5,7 +5,6 @@ from functools import partial, lru_cache, wraps
 from dataclasses import replace
 import logging
 from collections import OrderedDict
-from math import isclose
 from typing import (
     AsyncIterator,
     cast,
