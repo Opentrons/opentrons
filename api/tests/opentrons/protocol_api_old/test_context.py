@@ -1,11 +1,11 @@
 """ Test the functions and classes in the protocol context """
 # TODO: The below imports are only used in test_tip_length_for_caldata, which needs to be fixed.
-# import json
-# from opentrons_shared_data.pipette.types import LabwareUri
-# from decoy import Decoy
-# from opentrons.protocols.api_support import instrument as instrument_support
-# from opentrons.calibration_storage import types as cs_types
-# from opentrons.util.helpers import utc_now
+import json
+from opentrons_shared_data.pipette.types import LabwareUri
+from decoy import Decoy
+from opentrons.protocols.api_support import instrument as instrument_support
+from opentrons.calibration_storage import types as cs_types
+from opentrons.util.helpers import utc_now
 
 from typing import Any, Callable, Dict, List, Optional, Tuple
 import pytest
@@ -1066,51 +1066,51 @@ def test_order_of_module_load() -> None:
     assert id(async_temp2) == id(hw_temp2)
 
 
-# def test_tip_length_for_caldata(ctx: papi.ProtocolContext, decoy: Decoy, monkeypatch: MonkeyPatch) -> None:
-#     # TODO (lc 10-27-2022) We need to investigate why the pipette id is
-#     # being reported as none for this test (and probably all the others)
-#     from opentrons.hardware_control.instruments.ot2 import (
-#         instrument_calibration as instr_cal,
-#     )
-#     from opentrons.calibration_storage import types as CSTypes
+def test_tip_length_for_caldata(ctx: papi.ProtocolContext, decoy: Decoy, monkeypatch: MonkeyPatch) -> None:
+    # TODO (lc 10-27-2022) We need to investigate why the pipette id is
+    # being reported as none for this test (and probably all the others)
+    from opentrons.hardware_control.instruments.ot2 import (
+        instrument_calibration as instr_cal,
+    )
+    from opentrons.calibration_storage import types as CSTypes
 
-#     instr = ctx.load_instrument("p20_single_gen2", "left")
-#     tip_rack = ctx.load_labware("geb_96_tiprack_10ul", "1")
+    instr = ctx.load_instrument("p20_single_gen2", "left")
+    tip_rack = ctx.load_labware("geb_96_tiprack_10ul", "1")
 
-#     mock_load_tip_length = decoy.mock(func=instr_cal.load_tip_length_for_pipette)
-#     monkeypatch.setattr(instr_cal, "load_tip_length_for_pipette", mock_load_tip_length)
+    mock_load_tip_length = decoy.mock(func=instr_cal.load_tip_length_for_pipette)
+    monkeypatch.setattr(instr_cal, "load_tip_length_for_pipette", mock_load_tip_length)
 
-#     decoy.when(mock_load_tip_length(None, tip_rack._core.get_definition())).then_return(
-#         instr_cal.TipLengthCalibration(
-#             tip_length=2,
-#             last_modified=utc_now(),
-#             source=cs_types.SourceType.user,
-#             status=CSTypes.CalibrationStatus(markedBad=False),
-#             uri=LabwareUri("opentrons/geb_96_tiprack_10ul/1"),
-#             tiprack="somehash",
-#             pipette=None,  # type: ignore[arg-type]
-#         )
-#     )
+    decoy.when(mock_load_tip_length(None, tip_rack._core.get_definition())).then_return(  # type: ignore[arg-type]
+        instr_cal.TipLengthCalibration(
+            tip_length=2,
+            last_modified=utc_now(),
+            source=cs_types.SourceType.user,
+            status=CSTypes.CalibrationStatus(markedBad=False),
+            uri=LabwareUri("opentrons/geb_96_tiprack_10ul/1"),
+            tiprack="somehash",
+            pipette=None,  # type: ignore[arg-type]
+        )
+    )
 
-#     assert (
-#         instrument_support.tip_length_for(
-#             pipette=instr.hw_pipette,
-#             tip_rack_definition=tip_rack._core.get_definition(),
-#         )
-#         == 2
-#     )
+    assert (
+        instrument_support.tip_length_for(
+            pipette=instr.hw_pipette,
+            tip_rack_definition=tip_rack._core.get_definition(),
+        )
+        == 2
+    )
 
-#     decoy.when(mock_load_tip_length(None, tip_rack._core.get_definition())).then_raise(
-#         cs_types.TipLengthCalNotFound("oh no")
-#     )
+    decoy.when(mock_load_tip_length(None, tip_rack._core.get_definition())).then_raise(  # type: ignore[arg-type]
+        cs_types.TipLengthCalNotFound("oh no")
+    )
 
-#     assert instrument_support.tip_length_for(
-#         pipette=instr.hw_pipette,
-#         tip_rack_definition=tip_rack._core.get_definition(),
-#     ) == (
-#         tip_rack._core.get_definition()["parameters"]["tipLength"]
-#         - instr.hw_pipette["tip_overlap"]["opentrons/geb_96_tiprack_10ul/1"]
-#     )
+    assert instrument_support.tip_length_for(
+        pipette=instr.hw_pipette,
+        tip_rack_definition=tip_rack._core.get_definition(),
+    ) == (
+        tip_rack._core.get_definition()["parameters"]["tipLength"]
+        - instr.hw_pipette["tip_overlap"]["opentrons/geb_96_tiprack_10ul/1"]
+    )
 
 
 def test_bundled_labware(

@@ -11,7 +11,6 @@ from opentrons.hardware_control import ThreadManagedHardware
 from opentrons.protocol_api.protocol_context import ProtocolContext
 
 import opentrons.protocol_api as papi
-import pdb
 
 # TODO (lc 12-8-2022) We need to re-write these transfer tests so that
 # they are agnostic to the underlying hardware.

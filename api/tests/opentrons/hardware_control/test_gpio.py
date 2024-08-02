@@ -1,6 +1,5 @@
 from unittest.mock import MagicMock
 import pytest
-import pdb
 
 from opentrons import hardware_control as hc
 from opentrons.drivers import rpi_drivers
@@ -11,7 +10,6 @@ from opentrons.hardware_control.types import BoardRevision
 async def test_gpio_setup() -> None:
     # Test without DTOVERLAY path
     # Board revision should be defaulted to 2.1
-    pdb.set_trace()
     backend = await hc.Controller.build(config=None)
     assert str(backend.board_revision) == "2.1"
 
