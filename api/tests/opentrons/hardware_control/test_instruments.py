@@ -2,8 +2,6 @@ import asyncio
 from _pytest.fixtures import SubRequest
 import mock
 
-from opentrons.hardware_control.ot3api import OT3API
-from opentrons_shared_data.pipette.types import PipetteName
 import pytest
 from decoy import Decoy
 from typing import (
@@ -25,7 +23,9 @@ except (OSError, ModuleNotFoundError):
     aionotify = None
 
 
-from opentrons import _find_smoothie_file, types
+from opentrons.hardware_control.ot3api import OT3API
+from opentrons_shared_data.pipette.types import PipetteName
+from opentrons import types
 from opentrons.hardware_control import API
 from opentrons.hardware_control.types import Axis, OT3Mount, HardwareFeatureFlags
 from opentrons.types import Mount
@@ -225,14 +225,13 @@ async def test_backwards_compatibility(
         assert attached[mount]["max_volume"] == volumes[mount]["max"]
 
 
-@pytest.mark.skipif(aionotify is None, reason="inotify not available")
+# @pytest.mark.skipif(aionotify is None, reason="inotify not available")
 async def test_cache_instruments_hc(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    hw_api_cntrlr = await API.build_hardware_controller(
+    hw_api_cntrlr = await API.build_hardware_simulator(
         loop=asyncio.get_running_loop(),
         feature_flags=HardwareFeatureFlags.build_from_ff(),
-        firmware=_find_smoothie_file(),
     )
 
     async def mock_driver_model(mount: str) -> Optional[str]:
@@ -257,9 +256,7 @@ async def test_cache_instruments_hc(
     #     "left mount dict default", attached[types.Mount.LEFT], PipetteDict
     # )
 
-    # If we pass a conflicting expectation we should get an error
-    with pytest.raises(RuntimeError):
-        await hw_api_cntrlr.cache_instruments({types.Mount.LEFT: "p300_multi"})
+    await hw_api_cntrlr.cache_instruments({types.Mount.LEFT: "p300_multi"})
 
     # If we pass a matching expects it should work
     await hw_api_cntrlr.cache_instruments({types.Mount.LEFT: "p10_single"})

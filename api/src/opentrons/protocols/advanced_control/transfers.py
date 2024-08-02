@@ -539,7 +539,6 @@ class TransferPlan:
             - self._strategy.disposal_volume
             - self._strategy.air_gap,
         )
-        # pdb.set_trace()
         for step_vol, (src, dest) in plan_iter:
             if self._strategy.new_tip == types.TransferTipPolicy.ALWAYS:
                 yield self._format_dict("pick_up_tip", kwargs=self._tip_opts)
