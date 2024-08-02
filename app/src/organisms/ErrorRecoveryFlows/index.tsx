@@ -121,7 +121,7 @@ export function ErrorRecoveryFlows(
   const analytics = useRecoveryAnalytics()
   React.useEffect(() => {
     analytics.reportErrorEvent(failedCommand)
-  }, [failedCommand])
+  }, [failedCommand?.error?.detail])
 
   const { hasLaunchedRecovery, toggleERWizard, showERWizard } = useERWizard()
   const isOnDevice = useSelector(getIsOnDevice)

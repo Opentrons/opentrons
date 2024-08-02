@@ -69,9 +69,11 @@ def run_store(sql_engine: SQLEngine, mock_runs_publisher: RunsPublisher) -> RunS
 
 
 @pytest.fixture
-def data_files_store(sql_engine: SQLEngine) -> DataFilesStore:
+def data_files_store(sql_engine: SQLEngine, tmp_path: Path) -> DataFilesStore:
     """Get a mocked out DataFilesStore."""
-    return DataFilesStore(sql_engine=sql_engine)
+    data_files_dir = tmp_path / "data_files"
+    data_files_dir.mkdir()
+    return DataFilesStore(sql_engine=sql_engine, data_files_directory=data_files_dir)
 
 
 @pytest.fixture

@@ -119,6 +119,7 @@ def state_summary() -> StateSummary:
         labwareOffsets=[],
         status=EngineStatus.IDLE,
         liquids=liquids,
+        hasEverEnteredErrorRecovery=False,
     )
 
 
@@ -192,6 +193,7 @@ def invalid_state_summary() -> StateSummary:
 
     return StateSummary(
         errors=[analysis_error],
+        hasEverEnteredErrorRecovery=False,
         labware=[analysis_labware],
         pipettes=[analysis_pipette],
         # TODO(mc, 2022-02-14): evaluate usage of modules in the analysis resp.

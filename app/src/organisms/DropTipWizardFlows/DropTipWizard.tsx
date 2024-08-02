@@ -324,10 +324,15 @@ export const DropTipWizardContent = (
     const handleProceed = (): void => {
       if (currentStep === BLOWOUT_SUCCESS) {
         void proceedToRoute(DT_ROUTES.DROP_TIP)
-      } else if (tipDropComplete != null) {
-        tipDropComplete()
       } else {
-        proceedWithConditionalClose()
+        // Clear the error recovery submap upon completion of drop tip wizard.
+        fixitCommandTypeUtils?.reportMap(null)
+
+        if (tipDropComplete != null) {
+          tipDropComplete()
+        } else {
+          proceedWithConditionalClose()
+        }
       }
     }
 

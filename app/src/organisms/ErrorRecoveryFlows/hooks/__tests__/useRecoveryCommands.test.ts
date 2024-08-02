@@ -4,6 +4,7 @@ import { renderHook, act } from '@testing-library/react'
 import {
   useResumeRunFromRecoveryMutation,
   useStopRunMutation,
+  useUpdateErrorRecoveryPolicy,
 } from '@opentrons/react-api-client'
 
 import { useChainRunCommands } from '../../../../resources/runs'
@@ -11,6 +12,7 @@ import {
   useRecoveryCommands,
   HOME_PIPETTE_Z_AXES,
   buildPickUpTips,
+  buildIgnorePolicyRules,
 } from '../useRecoveryCommands'
 import { RECOVERY_MAP } from '../../constants'
 
@@ -40,6 +42,7 @@ describe('useRecoveryCommands', () => {
   const mockChainRunCommands = vi.fn().mockResolvedValue([])
   const mockReportActionSelectedResult = vi.fn()
   const mockReportRecoveredRunResult = vi.fn()
+  const mockUpdateErrorRecoveryPolicy = vi.fn()
 
   const props = {
     runId: mockRunId,
@@ -63,6 +66,9 @@ describe('useRecoveryCommands', () => {
     } as any)
     vi.mocked(useChainRunCommands).mockReturnValue({
       chainRunCommands: mockChainRunCommands,
+    } as any)
+    vi.mocked(useUpdateErrorRecoveryPolicy).mockReturnValue({
+      updateErrorRecoveryPolicy: mockUpdateErrorRecoveryPolicy,
     } as any)
   })
 
@@ -254,18 +260,46 @@ describe('useRecoveryCommands', () => {
     expect(mockMakeSuccessToast).toHaveBeenCalled()
   })
 
-  it('should call ignoreErrorKindThisRun and resolve immediately', async () => {
-    const { result } = renderHook(() => useRecoveryCommands(props))
+  it('should call updateErrorRecoveryPolicy with correct policy rules when failedCommand has an error', async () => {
+    const mockFailedCommandWithError = {
+      ...mockFailedCommand,
+      commandType: 'aspirateInPlace',
+      error: {
+        errorType: 'mockErrorType',
+      },
+    }
 
-    const consoleSpy = vi.spyOn(console, 'log')
+    const testProps = {
+      ...props,
+      failedCommand: mockFailedCommandWithError,
+    }
+
+    const { result } = renderHook(() => useRecoveryCommands(testProps))
 
     await act(async () => {
       await result.current.ignoreErrorKindThisRun()
     })
 
-    expect(consoleSpy).toHaveBeenCalledWith(
-      'IGNORING ALL ERRORS OF THIS KIND THIS RUN'
+    const expectedPolicyRules = buildIgnorePolicyRules(
+      'aspirateInPlace',
+      'mockErrorType'
     )
-    expect(result.current.ignoreErrorKindThisRun()).resolves.toBeUndefined()
+
+    expect(mockUpdateErrorRecoveryPolicy).toHaveBeenCalledWith(
+      expectedPolicyRules
+    )
+  })
+
+  it('should reject with an error when failedCommand or error is null', async () => {
+    const testProps = {
+      ...props,
+      failedCommand: null,
+    }
+
+    const { result } = renderHook(() => useRecoveryCommands(testProps))
+
+    await expect(result.current.ignoreErrorKindThisRun()).rejects.toThrow(
+      'Could not execute command. No failed command.'
+    )
   })
 })
