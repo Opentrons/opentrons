@@ -51,7 +51,7 @@ export function FileCard(props: FileCardProps): JSX.Element {
             white-space: nowrap;
           `}
         >
-          {truncateString(fileRunTimeParameter?.file?.file?.name ?? '', 35, 18)}
+          {truncateString(fileRunTimeParameter?.file?.name ?? '', 35, 18)}
         </LegacyStyledText>
         <Flex alignItems={ALIGN_CENTER}>
           <Btn
