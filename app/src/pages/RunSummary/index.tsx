@@ -64,6 +64,7 @@ import { formatTimeWithUtcLabel, useNotifyRunQuery } from '../../resources/runs'
 import { handleTipsAttachedModal } from '../../organisms/DropTipWizardFlows/TipsAttachedModal'
 import { useMostRecentRunId } from '../../organisms/ProtocolUpload/hooks/useMostRecentRunId'
 import { useTipAttachmentStatus } from '../../organisms/DropTipWizardFlows'
+import { useRecoveryAnalytics } from '../../organisms/ErrorRecoveryFlows/hooks'
 
 import type { OnDeviceRouteParams } from '../../App/types'
 import type { PipetteWithTip } from '../../organisms/DropTipWizardFlows'
@@ -108,7 +109,10 @@ export function RunSummary(): JSX.Element {
   )
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name ?? 'no name'
-  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
+  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(
+    runId,
+    robotName as string
+  )
 
   const onCloneRunSuccess = (): void => {
     if (isQuickTransfer) {
@@ -116,10 +120,19 @@ export function RunSummary(): JSX.Element {
     }
   }
 
+  const robotAnalyticsData = useRobotAnalyticsData(robotName as string)
+  const { reportRecoveredRunResult } = useRecoveryAnalytics()
+
+  const enteredER = runRecord?.data.hasEverEnteredErrorRecovery
+  React.useEffect(() => {
+    if (isRunCurrent && typeof enteredER === 'boolean') {
+      reportRecoveredRunResult(runStatus, enteredER)
+    }
+  }, [isRunCurrent, enteredER])
+
   const { reset, isResetRunLoading } = useRunControls(runId, onCloneRunSuccess)
   const trackEvent = useTrackEvent()
   const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
-  const robotAnalyticsData = useRobotAnalyticsData(robotName)
   const [showRunFailedModal, setShowRunFailedModal] = React.useState<boolean>(
     false
   )
@@ -151,7 +164,6 @@ export function RunSummary(): JSX.Element {
   })
 
   // Determine tip status on initial render only. Error Recovery always handles tip status, so don't show it twice.
-  const enteredER = runRecord?.data.hasEverEnteredErrorRecovery ?? false
   React.useEffect(() => {
     if (isRunCurrent && enteredER === false) {
       void determineTipStatus()
@@ -162,7 +174,6 @@ export function RunSummary(): JSX.Element {
     closeCurrentRun()
     navigate('/')
   }
-  // TODO(jh, 07-24-24): After EXEC-504, add reportRecoveredRunResult here.
 
   const returnToQuickTransfer = (): void => {
     if (!isRunCurrent) {
@@ -188,7 +199,6 @@ export function RunSummary(): JSX.Element {
     trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.AGAIN })
   }
 
-  //TOME: I'm willing to bet this is at least part of the problem!
   // If no pipettes have tips attached, execute the routing callback.
   const setTipStatusResolvedAndRoute = (
     routeCb: (pipettesWithTip: PipetteWithTip[]) => void
