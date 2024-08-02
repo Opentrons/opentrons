@@ -4,6 +4,7 @@ from typing import TypeVar, Union, TypedDict, TextIO, Optional, List, Any
 from .exceptions import RuntimeParameterRequired, ParameterValueError
 
 
+# TODO(jbl 2024-08-02) This is a public facing class and as such should be moved to the protocol_api folder
 class CSVParameter:
     def __init__(self, csv_file: Optional[TextIO]) -> None:
         self._file = csv_file
