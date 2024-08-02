@@ -14,7 +14,7 @@ from opentrons.drivers.types import (
 )
 
 from opentrons.hardware_control.execution_manager import ExecutionManager
-from opentrons.hardware_control.poller import Reader
+from opentrons.hardware_control.poller import Reader, Poller
 from opentrons.hardware_control.modules import mod_abc
 from opentrons.hardware_control.modules.types import (
     ModuleType,
@@ -22,6 +22,48 @@ from opentrons.hardware_control.modules.types import (
     LiveData,
     UploadFunction,
 )
+
+
+ABS_POLL_INTERVAL_SECS = 1.0
+SIM_ABS_POLL_INTERVAL_SECS = ABS_POLL_INTERVAL_SECS / 20.0
+
+
+class AbsorbanceReaderReader(Reader):
+    """Reads data from an attached Absorbance Reader Module."""
+
+    device_state: AbsorbanceReaderDeviceState
+    lid_status: AbsorbanceReaderLidStatus
+    plate_presence: AbsorbanceReaderPlatePresence
+    supported_wavelengths: List[int]
+
+    def __init__(self, driver: AbstractAbsorbanceReaderDriver) -> None:
+        self.device_state = AbsorbanceReaderDeviceState.UNKNOWN
+        self.lid_status = AbsorbanceReaderLidStatus.UNKNOWN
+        self.plate_presence = AbsorbanceReaderPlatePresence.UNKNOWN
+        self.supported_wavelengths = []
+        self._driver = driver
+
+    async def read(self) -> None:
+        await self.get_device_status()
+        await self.get_supported_wavelengths()
+        await self.get_lid_status()
+        await self.get_plate_presence()
+
+    async def get_device_status(self) -> None:
+        """Get the Absorbance Reader's current status."""
+        self.device_state = await self._driver.get_status()
+
+    async def get_supported_wavelengths(self) -> None:
+        """Get the Absorbance Reader's supported wavelengths."""
+        self.supported_wavelengths = await self._driver.get_available_wavelengths()
+
+    async def get_lid_status(self) -> None:
+        """Get the Absorbance Reader's lid status."""
+        self.lid_status = await self._driver.get_lid_status()
+
+    async def get_plate_presence(self) -> None:
+        """Get the Absorbance Reader's plate presence."""
+        self.plate_presence = await self._driver.get_plate_presence()
 
 
 async def upload_func_placeholder(
@@ -53,14 +95,20 @@ class AbsorbanceReader(mod_abc.AbstractModule):
             driver = await AbsorbanceReaderDriver.create(
                 port, usb_port, hw_control_loop
             )
+            poll_interval_seconds = poll_interval_seconds or ABS_POLL_INTERVAL_SECS
         else:
             driver = SimulatingDriver(serial_number=sim_serial_number)
+            poll_interval_seconds = poll_interval_seconds or SIM_ABS_POLL_INTERVAL_SECS
+        reader = AbsorbanceReaderReader(driver=driver)
+        poller = Poller(reader=reader, interval=poll_interval_seconds)
         module = cls(
             port=port,
             usb_port=usb_port,
+            driver=driver,
+            reader=reader,
+            poller=poller,
             device_info=await driver.get_device_info(),
             execution_manager=execution_manager,
-            driver=driver,
             hw_control_loop=hw_control_loop,
         )
         await module.setup()
@@ -70,13 +118,17 @@ class AbsorbanceReader(mod_abc.AbstractModule):
         self,
         port: str,
         usb_port: USBPort,
-        driver: AbstractAbsorbanceReaderDriver,
-        device_info: Mapping[str, str],
         execution_manager: ExecutionManager,
+        driver: AbstractAbsorbanceReaderDriver,
+        reader: AbsorbanceReaderReader,
+        poller: Poller,
+        device_info: Mapping[str, str],
         hw_control_loop: asyncio.AbstractEventLoop,
     ) -> None:
         super().__init__(port, usb_port, execution_manager, hw_control_loop)
         self._driver = driver
+        self._reader = reader
+        self._poller = poller
         self._device_info = device_info
 
     async def deactivate(self, must_be_running: bool = True) -> None:
@@ -93,11 +145,11 @@ class AbsorbanceReader(mod_abc.AbstractModule):
 
     @property
     def lid_status(self) -> AbsorbanceReaderLidStatus:
-        return AbsorbanceReaderLidStatus.UNKNOWN
+        return self._reader.lid_status
 
     @property
     def plate_presence(self) -> AbsorbanceReaderPlatePresence:
-        return AbsorbanceReaderPlatePresence.UNKNOWN
+        return self._reader.plate_presence
 
     @property
     def device_info(self) -> Mapping[str, str]:
@@ -171,6 +223,7 @@ class AbsorbanceReader(mod_abc.AbstractModule):
         Clean up, i.e. stop pollers, disconnect serial, etc in preparation for
         object destruction.
         """
+        await self._poller.stop()
         await self._driver.disconnect()
 
     async def set_sample_wavelength(self, wavelength: int) -> None:
@@ -191,36 +244,7 @@ class AbsorbanceReader(mod_abc.AbstractModule):
         """Get the Absorbance Reader's current active wavelength."""
         pass
 
-
-class AbsorbanceReaderReader(Reader):
-    device_state: AbsorbanceReaderDeviceState
-    lid_status: AbsorbanceReaderLidStatus
-    plate_presence: AbsorbanceReaderPlatePresence
-    supported_wavelengths: List[int]
-
-    def __init__(self, driver: AbsorbanceReaderDriver) -> None:
-        self.device_state = AbsorbanceReaderDeviceState.UNKNOWN
-        self.lid_status = AbsorbanceReaderLidStatus.UNKNOWN
-        self.plate_presence = AbsorbanceReaderPlatePresence.UNKNOWN
-        self.supported_wavelengths = []
-        self._driver = driver
-
-    async def read(self) -> None:
-        await self.get_device_status()
-        await self.get_supported_wavelengths()
-
-    async def get_device_status(self) -> None:
-        """Get the Absorbance Reader's current status."""
-        self.device_state = await self._driver.get_status()
-
-    async def get_supported_wavelengths(self) -> None:
-        """Get the Absorbance Reader's supported wavelengths."""
-        self.supported_wavelengths = await self._driver.get_available_wavelengths()
-
-    async def get_lid_status(self) -> None:
-        """Get the Absorbance Reader's lid status."""
-        self.lid_status = await self._driver.get_lid_status()
-
-    async def get_plate_presence(self) -> None:
-        """Get the Absorbance Reader's plate presence."""
-        self.plate_presence = await self._driver.get_plate_presence()
+    async def get_current_lid_status(self) -> AbsorbanceReaderLidStatus:
+        """Get the Absorbance Reader's current lid status."""
+        await self._reader.get_lid_status()
+        return self._reader.lid_status

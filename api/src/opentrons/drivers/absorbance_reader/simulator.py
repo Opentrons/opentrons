@@ -4,6 +4,7 @@ from opentrons.util.async_helpers import ensure_yield
 from opentrons.drivers.types import (
     AbsorbanceReaderLidStatus,
     AbsorbanceReaderDeviceState,
+    AbsorbanceReaderPlatePresence,
 )
 
 from .abstract import AbstractAbsorbanceReaderDriver
@@ -56,3 +57,7 @@ class SimulatingDriver(AbstractAbsorbanceReaderDriver):
     @ensure_yield
     async def get_status(self) -> AbsorbanceReaderDeviceState:
         return AbsorbanceReaderDeviceState.OK
+
+    @ensure_yield
+    async def get_plate_presence(self) -> AbsorbanceReaderPlatePresence:
+        return AbsorbanceReaderPlatePresence.ABSENT

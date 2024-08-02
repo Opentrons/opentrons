@@ -3,6 +3,7 @@ from typing import Dict, List
 from opentrons.drivers.types import (
     AbsorbanceReaderLidStatus,
     AbsorbanceReaderDeviceState,
+    AbsorbanceReaderPlatePresence,
 )
 
 
@@ -45,4 +46,8 @@ class AbstractAbsorbanceReaderDriver(ABC):
     @abstractmethod
     async def get_device_info(self) -> Dict[str, str]:
         """Get device info"""
+        ...
+
+    @abstractmethod
+    async def get_plate_presence(self) -> AbsorbanceReaderPlatePresence:
         ...

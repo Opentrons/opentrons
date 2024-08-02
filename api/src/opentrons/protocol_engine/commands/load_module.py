@@ -166,7 +166,7 @@ class LoadModuleImplementation(
             )
 
             if abs_reader is not None:
-                result = abs_reader.lid_status
+                result = await abs_reader.get_current_lid_status()
                 if (
                     isinstance(result, AbsorbanceReaderLidStatus)
                     and result is not AbsorbanceReaderLidStatus.ON

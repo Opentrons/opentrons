@@ -127,7 +127,7 @@ class CloseLidImpl(
             abs_reader = self._equipment.get_module_hardware_api(mod_substate.module_id)
 
             if abs_reader is not None:
-                result = abs_reader.lid_status
+                result = await abs_reader.get_current_lid_status()
                 if result is not AbsorbanceReaderLidStatus.ON:
                     raise CannotPerformModuleAction(
                         "The Opentrons Plate Reader lid mechanicaly position did not match expected Closed state."
