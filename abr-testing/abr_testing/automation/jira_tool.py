@@ -170,9 +170,10 @@ class JiraTicket:
 
     def post_attachment_to_ticket(self, issue_id: str, attachment_path: str) -> None:
         """Adds attachments to ticket."""
-        # TODO: Ensure that file is actually uploaded.
-        file = {"file": open(attachment_path, "rb")}
-        JSON_headers = {"Accept": "application/json"}
+        file = {
+            "file": (attachment_path, open(attachment_path, "rb"), "application-type")
+        }
+        JSON_headers = {"Accept": "application/json", "X-Atlassian-Token": "no-check"}
         try:
             response = requests.post(
                 f"{self.url}/rest/api/3/issue/{issue_id}/attachments",
@@ -180,7 +181,7 @@ class JiraTicket:
                 auth=self.auth,
                 files=file,
             )
-            print(response)
+            print(f"File: {attachment_path} posted to ticket {issue_id}")
         except json.JSONDecodeError:
             error_message = str(response.content)
             print(f"JSON decoding error occurred. Response content: {error_message}.")
