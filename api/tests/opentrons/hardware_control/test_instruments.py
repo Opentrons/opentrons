@@ -232,7 +232,7 @@ async def test_cache_instruments_hc(
     hw_api_cntrlr = await API.build_hardware_controller(
         loop=asyncio.get_running_loop(),
         feature_flags=HardwareFeatureFlags.build_from_ff(),
-        firmware=_find_smoothie_file()
+        firmware=_find_smoothie_file(),
     )
 
     async def mock_driver_model(mount: str) -> Optional[str]:
