@@ -2714,7 +2714,10 @@ class OT3API(
 
         error: Optional[PipetteLiquidNotFoundError] = None
         pos = await self.gantry_position(checked_mount, refresh=True)
-        while (probe_start_pos.z - pos.z) < max_z_dist:
+        #  probe_start_pos.z + z_distance of pass - pos.z should be < max_z_dist
+        # due to rounding errors this can get caught in an infinite loop when the distance is almost equal
+        # so we check to see if they're within 0.01 which is 1/5th the minimum movement distance from move_utils.py
+        while (probe_start_pos.z - pos.z) < (max_z_dist + 0.01):
             # safe distance so we don't accidentally aspirate liquid if we're already close to liquid
             safe_plunger_pos = top_types.Point(
                 pos.x, pos.y, pos.z + probe_safe_reset_mm
@@ -2724,7 +2727,7 @@ class OT3API(
                 pos.x, pos.y, pos.z + probe_pass_z_offset_mm
             )
             max_z_time = (
-                max_z_dist - (probe_start_pos.z - safe_plunger_pos.z)
+                max_z_dist - probe_start_pos.z + pass_start_pos.z
             ) / probe_settings.mount_speed
             p_travel_required_for_z = max_z_time * probe_settings.plunger_speed
             p_pass_travel = min(p_travel_required_for_z, p_working_mm)
