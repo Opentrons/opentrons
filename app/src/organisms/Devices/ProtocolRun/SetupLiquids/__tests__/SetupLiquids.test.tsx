@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { describe, it, beforeEach, vi, MockedFunction } from 'vitest'
+import { describe, it, beforeEach, vi } from 'vitest'
 import { screen, fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '../../../../../__testing-utils__'
