@@ -178,8 +178,6 @@ class AsyncByonoy:
         handle = self._verify_device_handle()
         if not os.path.exists(firmware_file_path):
             return False, f"Firmware file not found: {firmware_file_path}"
-        # TODO: verify if this needs to run in this context or executor thread
-        # err = self._interface.byonoy_update_device(handle, firmware_file_path)
         err = await self._loop.run_in_executor(
             executor=self._executor,
             func=partial(
@@ -287,7 +285,7 @@ class AsyncByonoy:
         self._initialize_measurement(conf)
 
     async def initialize(self, wavelength: int) -> None:
-        """???"""
+        """Initialize the device so we can start reading samples from it."""
         await self._loop.run_in_executor(
             executor=self._executor, func=partial(self._initialize, wavelength)
         )

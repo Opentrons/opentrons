@@ -35,9 +35,6 @@ class AbsorbanceReaderDriver(AbstractAbsorbanceReaderDriver):
     async def connect(self) -> None:
         """Connect to absorbance reader"""
         await self._connection.open()
-        # The Absorbance reader needs to initialize after opening a connection
-        # This takes about 10 seconds, so lets wait 15 to be safe.
-        # await asyncio.sleep(15)
 
     async def disconnect(self) -> None:
         """Disconnect from absorbance reader"""

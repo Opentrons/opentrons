@@ -113,8 +113,6 @@ class Poller:
             self._reader.on_error(e)
             for waiter in previous_waiters:
                 Poller._set_waiter_complete(waiter, e)
-            # NOTE: For debugging
-            await self.stop()
         else:
             for waiter in previous_waiters:
                 Poller._set_waiter_complete(waiter)

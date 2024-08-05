@@ -150,13 +150,13 @@ class SubsystemManager:
         return [target_to_subsystem(t) for t in self._updates_required.keys()]
 
     async def start(self) -> None:
-        # await self._probe_network_and_cache_fw_updates(
-        #    self._expected_core_targets, True
-        # )
-        # self._tool_detection_task = asyncio.create_task(
-        #    self._tool_detection_task_main()
-        # )
-        # await self.refresh()
+        await self._probe_network_and_cache_fw_updates(
+            self._expected_core_targets, True
+        )
+        self._tool_detection_task = asyncio.create_task(
+            self._tool_detection_task_main()
+        )
+        await self.refresh()
         log.info(f"Subsystem manager started with devices {self.device_info}")
 
     async def refresh(self) -> None:
