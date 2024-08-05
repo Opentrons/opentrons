@@ -28,7 +28,7 @@ SPEEDS_TO_TEST = [DEFAULT_SPEED]
 MIN_PASS_CURRENT = 0.4
 CURRENTS_SPEEDS: Dict[float, List[float]] = {
     # round(MIN_PASS_CURRENT - 0.2, 1): SPEEDS_TO_TEST,
-    round(MIN_PASS_CURRENT - 1 , 1): SPEEDS_TO_TEST,
+    round(MIN_PASS_CURRENT - 0.1 , 1): SPEEDS_TO_TEST,
     MIN_PASS_CURRENT: SPEEDS_TO_TEST,
     DEFAULT_CURRENT: SPEEDS_TO_TEST,
 }
@@ -50,7 +50,7 @@ def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
             for dir in ["down", "up"]:
                 for step in ["start", "end"]:
                     tag = _get_test_tag(current, speed, dir, step)
-                    if current <= MIN_PASS_CURRENT:
+                    if current < MIN_PASS_CURRENT:
                         lines.append(CSVLine(tag, [float, float]))
                     else:
                         lines.append(CSVLine(tag, [float, float, CSVResult]))
