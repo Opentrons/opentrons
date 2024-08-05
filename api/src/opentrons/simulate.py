@@ -998,7 +998,6 @@ def main() -> int:
     parser = get_arguments(parser)
 
     args = parser.parse_args()
-    # Try to migrate api v1 containers if needed
 
     # TODO(mm, 2022-12-01): Configure the DurationEstimator with the correct deck type.
     duration_estimator = DurationEstimator() if args.estimate_duration else None  # type: ignore[no-untyped-call]
