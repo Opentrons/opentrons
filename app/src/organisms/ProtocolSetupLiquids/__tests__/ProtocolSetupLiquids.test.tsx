@@ -50,6 +50,8 @@ describe('ProtocolSetupLiquids', () => {
 
   it('renders the total volume of the liquid, sample display name, clicking on arrow renders the modal', () => {
     render(props)
+    screen.getByText('Liquid name')
+    screen.getByText('Total volume')
     screen.getByText('mock liquid 1')
     screen.getByText('mock liquid 2')
     screen.getAllByText('50 µL')
