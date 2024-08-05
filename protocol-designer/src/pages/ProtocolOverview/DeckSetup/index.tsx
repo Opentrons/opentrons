@@ -1,7 +1,8 @@
 import * as React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
 import compact from 'lodash/compact'
 import values from 'lodash/values'
+import { useDispatch, useSelector } from 'react-redux'
+
 import {
   COLORS,
   DeckFromLayers,
@@ -9,12 +10,17 @@ import {
   Module,
   RobotCoordinateSpaceWithRef,
   SingleSlotFixture,
+  SlotLabels,
   StagingAreaFixture,
   useOnClickOutside,
   WasteChuteFixture,
   WasteChuteStagingAreaFixture,
 } from '@opentrons/components'
-import { MODULES_WITH_COLLISION_ISSUES } from '@opentrons/step-generation'
+import {
+  AdditionalEquipmentEntity,
+  MODULES_WITH_COLLISION_ISSUES,
+  ModuleTemporalProperties,
+} from '@opentrons/step-generation'
 import {
   FLEX_ROBOT_TYPE,
   getAddressableAreaFromSlotId,
@@ -27,75 +33,48 @@ import {
   inferModuleOrientationFromXCoordinate,
   isAddressableAreaStandardSlot,
   OT2_ROBOT_TYPE,
+  SPAN7_8_10_11_SLOT,
   STAGING_AREA_CUTOUTS,
   THERMOCYCLER_MODULE_TYPE,
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import { SPAN7_8_10_11_SLOT } from '../../constants'
-import { selectors as labwareDefSelectors } from '../../labware-defs'
-
-import { selectors as featureFlagSelectors } from '../../feature-flags'
-import { getStagingAreaAddressableAreas } from '../../utils'
-import { getSlotIdsBlockedBySpanning, getSlotIsEmpty } from '../../step-forms'
-import * as labwareIngredActions from '../../labware-ingred/actions'
-import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
-import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
-import { getSelectedTerminalItemId } from '../../ui/steps'
-import { getRobotType } from '../../file-data/selectors'
-import { BrowseLabwareModal } from '../labware'
-import { SlotWarning } from './SlotWarning'
-import { LabwareOnDeck } from './LabwareOnDeck'
-import {
-  AdapterControls,
-  SlotControls,
-  LabwareControls,
-} from './LabwareOverlays'
-import { FlexModuleTag } from './FlexModuleTag'
-import { Ot2ModuleTag } from './Ot2ModuleTag'
-import { SlotLabels } from './SlotLabels'
-import { getHasGen1MultiChannelPipette, getSwapBlocked } from './utils'
-
-import type {
-  AdditionalEquipmentEntity,
-  ModuleTemporalProperties,
-} from '@opentrons/step-generation'
 import type { StagingAreaLocation, TrashCutoutId } from '@opentrons/components'
 import type {
   AddressableAreaName,
   CutoutFixture,
   CutoutId,
   DeckDefinition,
+  Dimensions,
   RobotType,
 } from '@opentrons/shared-data'
-import type { TerminalItemId } from '../../steplist'
-import type {
+import { getSelectedTerminalItemId } from '../../../ui/steps'
+import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
+import { getDisableModuleRestrictions } from '../../../feature-flags/selectors'
+import { getRobotType } from '../../../file-data/selectors'
+import {
+  getHasGen1MultiChannelPipette,
+  getSlotIdsBlockedBySpanning,
+  getSlotIsEmpty,
   InitialDeckSetup,
   LabwareOnDeck as LabwareOnDeckType,
   ModuleOnDeck,
-} from '../../step-forms'
+} from '../../../step-forms'
+import * as labwareIngredActions from '../../../labware-ingred/actions'
+import { TerminalItemId } from '../../../steplist'
+import { LabwareOnDeck } from '../../../components/DeckSetup/LabwareOnDeck'
+import { ControlSelect } from './ControlSelect'
+import { getSwapBlocked } from '../../../components/DeckSetup/utils'
+import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
+import { SlotWarning } from '../../../components/DeckSetup/SlotWarning'
+import { getStagingAreaAddressableAreas } from '../../../utils'
+import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
+import { ZoomedInSlot } from './ZoomedInSlot'
 
-import styles from './DeckSetup.module.css'
-
-export const DECK_LAYER_BLOCKLIST = [
-  'calibrationMarkings',
-  'fixedBase',
-  'doorStops',
-  'metalFrame',
-  'removalHandle',
-  'removableDeckOutline',
-  'screwHoles',
-]
-
-const OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
-  'calibrationMarkings',
-  'fixedBase',
-  'doorStops',
-  'metalFrame',
-  'removalHandle',
-  'removableDeckOutline',
-  'screwHoles',
-]
+interface DeckSetupProps {
+  onCancel: () => void
+  onSave: () => void
+}
 
 interface ContentsProps {
   activeDeckSetup: InitialDeckSetup
@@ -105,6 +84,7 @@ interface ContentsProps {
   robotType: RobotType
   stagingAreaCutoutIds: CutoutId[]
   trashSlot: string | null
+  addEquipment: (slotId: string) => void
 }
 
 const lightFill = COLORS.grey35
@@ -117,6 +97,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
     deckDef,
     robotType,
     trashSlot,
+    addEquipment,
     stagingAreaCutoutIds,
   } = props
   // NOTE: handling module<>labware compat when moving labware to empty module
@@ -133,9 +114,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
     LabwareOnDeckType | null | undefined
   >(null)
 
-  const customLabwareDefs = useSelector(
-    labwareDefSelectors.getCustomLabwareDefsByURI
-  )
+  const customLabwareDefs = useSelector(getCustomLabwareDefsByURI)
   const swapBlocked = getSwapBlocked({
     hoveredLabware,
     draggedLabware,
@@ -240,6 +219,11 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
         const isAdapter = labwareLoadedOnModule?.def.allowedRoles?.includes(
           'adapter'
         )
+        const dimensions = {
+          xDimension: labwareLoadedOnModule?.def.dimensions.xDimension ?? 0,
+          yDimension: labwareLoadedOnModule?.def.dimensions.yDimension ?? 0,
+          zDimension: labwareLoadedOnModule?.def.dimensions.zDimension ?? 0,
+        }
         return (
           <Module
             key={moduleOnDeck.slot}
@@ -258,59 +242,27 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
                   y={0}
                   labwareOnDeck={labwareLoadedOnModule}
                 />
-                {isAdapter ? (
-                  <AdapterControls
-                    allLabware={allLabware}
-                    onDeck={false}
-                    labwareId={labwareLoadedOnModule.id}
-                    key={moduleOnDeck.slot}
-                    slotPosition={[0, 0, 0]} // Module Component already handles nested positioning
-                    slotBoundingBox={labwareInterfaceBoundingBox}
-                    selectedTerminalItemId={props.selectedTerminalItemId}
-                    handleDragHover={handleHoverEmptySlot}
-                  />
-                ) : (
-                  <LabwareControls
-                    slotPosition={[0, 0, 0]} // Module Component already handles nested positioning
-                    setHoveredLabware={setHoveredLabware}
-                    setDraggedLabware={setDraggedLabware}
-                    swapBlocked={
-                      swapBlocked &&
-                      (labwareLoadedOnModule.id === hoveredLabware?.id ||
-                        labwareLoadedOnModule.id === draggedLabware?.id)
-                    }
-                    labwareOnDeck={labwareLoadedOnModule}
-                    selectedTerminalItemId={props.selectedTerminalItemId}
-                  />
-                )}
+                <ControlSelect
+                  addEquipment={addEquipment}
+                  slotBoundingBox={dimensions}
+                  slotPosition={[0, 0, 0]}
+                  slotId={labwareLoadedOnModule.slot}
+                  selectedTerminalItemId={props.selectedTerminalItemId}
+                />
               </>
             ) : null}
 
             {labwareLoadedOnModule == null &&
             !shouldHideChildren &&
             !isAdapter ? (
-              <SlotControls
-                key={moduleOnDeck.slot}
-                slotPosition={[0, 0, 0]} // Module Component already handles nested positioning
+              <ControlSelect
+                addEquipment={addEquipment}
                 slotBoundingBox={labwareInterfaceBoundingBox}
-                selectedTerminalItemId={props.selectedTerminalItemId}
-                moduleType={moduleOnDeck.type}
-                handleDragHover={handleHoverEmptySlot}
+                slotPosition={[0, 0, 0]}
                 slotId={moduleOnDeck.id}
+                selectedTerminalItemId={props.selectedTerminalItemId}
               />
             ) : null}
-            {robotType === FLEX_ROBOT_TYPE ? (
-              <FlexModuleTag
-                dimensions={moduleDef.dimensions}
-                displayName={getModuleDisplayName(moduleOnDeck.model)}
-              />
-            ) : (
-              <Ot2ModuleTag
-                orientation={moduleOrientation}
-                dimensions={moduleDef.dimensions}
-                model={moduleOnDeck.model}
-              />
-            )}
           </Module>
         )
       })}
@@ -351,17 +303,12 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
         })
         .map(addressableArea => {
           return (
-            <SlotControls
-              key={addressableArea.id}
-              slotPosition={getPositionFromSlotId(addressableArea.id, deckDef)}
+            <ControlSelect
+              addEquipment={addEquipment}
               slotBoundingBox={addressableArea.boundingBox}
+              slotPosition={getPositionFromSlotId(addressableArea.id, deckDef)}
               slotId={addressableArea.id}
               selectedTerminalItemId={props.selectedTerminalItemId}
-              // Module slots' ids reference their parent module
-              moduleType={
-                activeDeckSetup.modules[addressableArea.id]?.type ?? null
-              }
-              handleDragHover={handleHoverEmptySlot}
             />
           )
         })}
@@ -384,7 +331,6 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
           console.warn(`no slot ${labware.slot} for labware ${labware.id}!`)
           return null
         }
-        const labwareIsAdapter = labware.def.allowedRoles?.includes('adapter')
         return (
           <React.Fragment key={labware.id}>
             <LabwareOnDeck
@@ -393,31 +339,13 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
               labwareOnDeck={labware}
             />
             <g>
-              {labwareIsAdapter ? (
-                <AdapterControls
-                  allLabware={allLabware}
-                  onDeck={true}
-                  labwareId={labware.id}
-                  key={labware.slot}
-                  slotPosition={slotPosition}
-                  slotBoundingBox={slotBoundingBox}
-                  selectedTerminalItemId={props.selectedTerminalItemId}
-                  handleDragHover={handleHoverEmptySlot}
-                />
-              ) : (
-                <LabwareControls
-                  slotPosition={slotPosition}
-                  setHoveredLabware={setHoveredLabware}
-                  setDraggedLabware={setDraggedLabware}
-                  swapBlocked={
-                    swapBlocked &&
-                    (labware.id === hoveredLabware?.id ||
-                      labware.id === draggedLabware?.id)
-                  }
-                  labwareOnDeck={labware}
-                  selectedTerminalItemId={props.selectedTerminalItemId}
-                />
-              )}
+              <ControlSelect
+                addEquipment={addEquipment}
+                slotBoundingBox={slotBoundingBox}
+                slotPosition={slotPosition}
+                slotId={labware.slot}
+                selectedTerminalItemId={props.selectedTerminalItemId}
+              />
             </g>
           </React.Fragment>
         )
@@ -451,6 +379,11 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
           console.warn(`no slot ${labware.slot} for labware ${labware.id}!`)
           return null
         }
+        const slotBoundingBox: Dimensions = {
+          xDimension: labware.def.dimensions.xDimension,
+          yDimension: labware.def.dimensions.yDimension,
+          zDimension: labware.def.dimensions.zDimension,
+        }
         return (
           <React.Fragment key={labware.id}>
             <LabwareOnDeck
@@ -459,16 +392,11 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
               labwareOnDeck={labware}
             />
             <g>
-              <LabwareControls
+              <ControlSelect
+                addEquipment={addEquipment}
+                slotBoundingBox={slotBoundingBox}
                 slotPosition={slotPosition}
-                setHoveredLabware={setHoveredLabware}
-                setDraggedLabware={setDraggedLabware}
-                swapBlocked={
-                  swapBlocked &&
-                  (labware.id === hoveredLabware?.id ||
-                    labware.id === draggedLabware?.id)
-                }
-                labwareOnDeck={labware}
+                slotId={labware.slot}
                 selectedTerminalItemId={props.selectedTerminalItemId}
               />
             </g>
@@ -479,20 +407,31 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
   )
 }
 
-export const LegacyDeckSetup = (): JSX.Element => {
+export const DeckSetup = (props: DeckSetupProps): JSX.Element => {
   const drilledDown =
     useSelector(labwareIngredSelectors.getDrillDownLabwareId) != null
   const selectedTerminalItemId = useSelector(getSelectedTerminalItemId)
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
-  const _disableCollisionWarnings = useSelector(
-    featureFlagSelectors.getDisableModuleRestrictions
-  )
+  const _disableCollisionWarnings = useSelector(getDisableModuleRestrictions)
   const trash = Object.values(activeDeckSetup.additionalEquipmentOnDeck).find(
     ae => ae.name === 'trashBin'
   )
+  const robotType = 'OT-3 Standard'
+
+  const deckDef = React.useMemo(() => getDeckDefFromRobotType(robotType), [])
+  const [openSlot, setOpenSlot] = React.useState<CutoutId>(null)
+
+  const addEquipment = (slotId: string): void => {
+    console.log('hit here with slot id', slotId)
+    const cutoutId = getCutoutIdForAddressableArea(
+      slotId,
+      deckDef.cutoutFixtures
+    )
+    console.log('cutoutId', cutoutId)
+    setOpenSlot(cutoutId)
+  }
 
   const trashSlot = trash?.location
-  const robotType = useSelector(getRobotType)
   const dispatch = useDispatch()
 
   const _hasGen1MultichannelPipette = React.useMemo(
@@ -502,7 +441,6 @@ export const LegacyDeckSetup = (): JSX.Element => {
   const showGen1MultichannelCollisionWarnings =
     !_disableCollisionWarnings && _hasGen1MultichannelPipette
 
-  const deckDef = React.useMemo(() => getDeckDefFromRobotType(robotType), [])
   const wrapperRef: React.RefObject<HTMLDivElement> = useOnClickOutside({
     onClickOutside: () => {
       if (drilledDown) dispatch(labwareIngredActions.drillUpFromLabware())
@@ -545,119 +483,118 @@ export const LegacyDeckSetup = (): JSX.Element => {
   const filteredAddressableAreas = deckDef.locations.addressableAreas.filter(
     aa => isAddressableAreaStandardSlot(aa.id, deckDef)
   )
-  return (
-    <div className={styles.deck_row}>
-      {drilledDown && <BrowseLabwareModal />}
-
-      <div ref={wrapperRef} className={styles.deck_wrapper}>
-        <RobotCoordinateSpaceWithRef
-          height="100%"
-          deckDef={deckDef}
-          viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${
-            hasWasteChute
-              ? deckDef.cornerOffsetFromOrigin[1] - 30
-              : deckDef.cornerOffsetFromOrigin[1]
-          } ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`}
-        >
-          {() => (
+  return openSlot != null ? (
+    <ZoomedInSlot
+      robotType={robotType}
+      cutoutId={openSlot}
+      goBack={() => {
+        setOpenSlot(null)
+      }}
+    />
+  ) : (
+    <RobotCoordinateSpaceWithRef
+      height="100%"
+      deckDef={deckDef}
+      viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${
+        hasWasteChute
+          ? deckDef.cornerOffsetFromOrigin[1] - 30
+          : deckDef.cornerOffsetFromOrigin[1]
+      } ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`}
+    >
+      {() => (
+        <>
+          {robotType === OT2_ROBOT_TYPE ? (
+            <div>wire this up!!!!</div>
+          ) : (
             <>
-              {robotType === OT2_ROBOT_TYPE ? (
-                <DeckFromLayers
-                  robotType={robotType}
-                  layerBlocklist={OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST}
+              {filteredAddressableAreas.map(addressableArea => {
+                const cutoutId = getCutoutIdForAddressableArea(
+                  addressableArea.id,
+                  deckDef.cutoutFixtures
+                )
+                return cutoutId != null ? (
+                  <SingleSlotFixture
+                    key={addressableArea.id}
+                    cutoutId={cutoutId}
+                    deckDefinition={deckDef}
+                    showExpansion={cutoutId === 'cutoutA1'}
+                    fixtureBaseColor={lightFill}
+                  />
+                ) : null
+              })}
+              {stagingAreaFixtures.map(fixture => (
+                <StagingAreaFixture
+                  key={fixture.id}
+                  cutoutId={fixture.location as StagingAreaLocation}
+                  deckDefinition={deckDef}
+                  slotClipColor={darkFill}
+                  fixtureBaseColor={lightFill}
                 />
-              ) : (
-                <>
-                  {filteredAddressableAreas.map(addressableArea => {
-                    const cutoutId = getCutoutIdForAddressableArea(
-                      addressableArea.id,
-                      deckDef.cutoutFixtures
-                    )
-                    return cutoutId != null ? (
-                      <SingleSlotFixture
-                        key={addressableArea.id}
-                        cutoutId={cutoutId}
-                        deckDefinition={deckDef}
-                        slotClipColor={darkFill}
-                        showExpansion={cutoutId === 'cutoutA1'}
-                        fixtureBaseColor={lightFill}
-                      />
+              ))}
+              {trash != null
+                ? trashBinFixtures.map(({ cutoutId }) =>
+                    cutoutId != null ? (
+                      <React.Fragment key={cutoutId}>
+                        <SingleSlotFixture
+                          cutoutId={cutoutId}
+                          deckDefinition={deckDef}
+                          slotClipColor={COLORS.transparent}
+                          fixtureBaseColor={lightFill}
+                        />
+                        <FlexTrash
+                          robotType={robotType}
+                          trashIconColor={lightFill}
+                          trashCutoutId={cutoutId as TrashCutoutId}
+                          backgroundColor={COLORS.grey50}
+                        />
+                      </React.Fragment>
                     ) : null
-                  })}
-                  {stagingAreaFixtures.map(fixture => (
-                    <StagingAreaFixture
-                      key={fixture.id}
-                      cutoutId={fixture.location as StagingAreaLocation}
-                      deckDefinition={deckDef}
-                      slotClipColor={darkFill}
-                      fixtureBaseColor={lightFill}
-                    />
-                  ))}
-                  {trash != null
-                    ? trashBinFixtures.map(({ cutoutId }) =>
-                        cutoutId != null ? (
-                          <React.Fragment key={cutoutId}>
-                            <SingleSlotFixture
-                              cutoutId={cutoutId}
-                              deckDefinition={deckDef}
-                              slotClipColor={COLORS.transparent}
-                              fixtureBaseColor={lightFill}
-                            />
-                            <FlexTrash
-                              robotType={robotType}
-                              trashIconColor={lightFill}
-                              trashCutoutId={cutoutId as TrashCutoutId}
-                              backgroundColor={COLORS.grey50}
-                            />
-                          </React.Fragment>
-                        ) : null
-                      )
-                    : null}
-                  {wasteChuteFixtures.map(fixture => (
-                    <WasteChuteFixture
-                      key={fixture.id}
-                      cutoutId={fixture.location as typeof WASTE_CHUTE_CUTOUT}
-                      deckDefinition={deckDef}
-                      fixtureBaseColor={lightFill}
-                    />
-                  ))}
-                  {wasteChuteStagingAreaFixtures.map(fixture => (
-                    <WasteChuteStagingAreaFixture
-                      key={fixture.id}
-                      cutoutId={fixture.location as typeof WASTE_CHUTE_CUTOUT}
-                      deckDefinition={deckDef}
-                      slotClipColor={darkFill}
-                      fixtureBaseColor={lightFill}
-                    />
-                  ))}
-                </>
-              )}
-              <DeckSetupContents
-                trashSlot={trashSlot ?? null}
-                robotType={robotType}
-                activeDeckSetup={activeDeckSetup}
-                selectedTerminalItemId={selectedTerminalItemId}
-                stagingAreaCutoutIds={stagingAreaFixtures.map(
-                  //  TODO(jr, 11/13/23): fix this type since AdditionalEquipment['location'] is type string
-                  //  instead of CutoutId
-                  areas => areas.location as CutoutId
-                )}
-                {...{
-                  deckDef,
-
-                  showGen1MultichannelCollisionWarnings,
-                }}
-              />
-              <SlotLabels
-                robotType={robotType}
-                hasStagingAreas={stagingAreaFixtures.length > 0}
-                hasWasteChute={hasWasteChute}
-              />
+                  )
+                : null}
+              {wasteChuteFixtures.map(fixture => (
+                <WasteChuteFixture
+                  key={fixture.id}
+                  cutoutId={fixture.location as typeof WASTE_CHUTE_CUTOUT}
+                  deckDefinition={deckDef}
+                  fixtureBaseColor={lightFill}
+                />
+              ))}
+              {wasteChuteStagingAreaFixtures.map(fixture => (
+                <WasteChuteStagingAreaFixture
+                  key={fixture.id}
+                  cutoutId={fixture.location as typeof WASTE_CHUTE_CUTOUT}
+                  deckDefinition={deckDef}
+                  slotClipColor={darkFill}
+                  fixtureBaseColor={lightFill}
+                />
+              ))}
             </>
           )}
-        </RobotCoordinateSpaceWithRef>
-      </div>
-    </div>
+          <DeckSetupContents
+            addEquipment={addEquipment}
+            trashSlot={trashSlot ?? null}
+            robotType={robotType}
+            activeDeckSetup={activeDeckSetup}
+            selectedTerminalItemId={selectedTerminalItemId}
+            stagingAreaCutoutIds={stagingAreaFixtures.map(
+              //  TODO(jr, 11/13/23): fix this type since AdditionalEquipment['location'] is type string
+              //  instead of CutoutId
+              areas => areas.location as CutoutId
+            )}
+            {...{
+              deckDef,
+
+              showGen1MultichannelCollisionWarnings,
+            }}
+          />
+          <SlotLabels
+            robotType={robotType}
+            hasStagingAreas={stagingAreaFixtures.length > 0}
+            hasWasteChute={hasWasteChute}
+          />
+        </>
+      )}
+    </RobotCoordinateSpaceWithRef>
   )
 }
 
