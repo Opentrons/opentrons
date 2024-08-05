@@ -660,10 +660,18 @@ async def test_get_run_commands_errors(
     decoy.when(
         mock_run_data_manager.get_command_error_slice(
             run_id="run-id",
-            cursor=None,
+            cursor=0,
             length=42,
         )
     ).then_raise(RunNotCurrentError("oh no!"))
+
+    error = pe_errors.ErrorOccurrence(
+        id="error-id",
+        errorType="PrettyBadError",
+        createdAt=datetime(year=2024, month=4, day=4),
+        detail="Things are not looking good.",
+    )
+    decoy.when(mock_run_data_manager.get_command_errors("run-id")).then_return([error])
 
     with pytest.raises(ApiError):
         result = await get_run_commands_error(
@@ -679,23 +687,22 @@ async def test_get_run_commands_errors_raises_no_run(
     decoy: Decoy, mock_run_data_manager: RunDataManager
 ) -> None:
     """It should return a list of all commands errors in a run."""
-    error = (
-        pe_errors.ErrorOccurrence(
-            id="error-id",
-            errorType="PrettyBadError",
-            createdAt=datetime(year=2024, month=4, day=4),
-            detail="Things are not looking good.",
-        ),
+    error = pe_errors.ErrorOccurrence(
+        id="error-id",
+        errorType="PrettyBadError",
+        createdAt=datetime(year=2024, month=4, day=4),
+        detail="Things are not looking good.",
     )
+    decoy.when(mock_run_data_manager.get_command_errors("run-id")).then_return([error])
 
     command_error_slice = CommandErrorSlice(
-        cursor=1, total_length=3, commands_errors=list(error)
+        cursor=1, total_length=3, commands_errors=[error]
     )
 
     decoy.when(
         mock_run_data_manager.get_command_error_slice(
             run_id="run-id",
-            cursor=None,
+            cursor=0,
             length=42,
         )
     ).then_return(command_error_slice)
@@ -716,4 +723,46 @@ async def test_get_run_commands_errors_raises_no_run(
         )
     ]
     assert result.content.meta == MultiBodyMeta(cursor=1, totalLength=3)
+    assert result.status_code == 200
+
+
+@pytest.mark.parametrize(
+    "error_list, expected_cursor_result",
+    [([], 0), ([pe_errors.ErrorOccurrence.construct(id="error-id")], 1)],
+)
+async def test_get_run_commands_errors_defualt_cursor(
+    decoy: Decoy,
+    mock_run_data_manager: RunDataManager,
+    error_list: list[pe_errors.ErrorOccurrence],
+    expected_cursor_result: int,
+) -> None:
+    """It should return a list of all commands errors in a run."""
+    print(error_list)
+    decoy.when(mock_run_data_manager.get_command_errors("run-id")).then_return(
+        error_list
+    )
+
+    command_error_slice = CommandErrorSlice(
+        cursor=expected_cursor_result, total_length=3, commands_errors=error_list
+    )
+
+    decoy.when(
+        mock_run_data_manager.get_command_error_slice(
+            run_id="run-id",
+            cursor=0,
+            length=42,
+        )
+    ).then_return(command_error_slice)
+
+    result = await get_run_commands_error(
+        runId="run-id",
+        run_data_manager=mock_run_data_manager,
+        cursor=None,
+        pageLength=42,
+    )
+
+    assert list(result.content.data) == error_list
+    assert result.content.meta == MultiBodyMeta(
+        cursor=expected_cursor_result, totalLength=3
+    )
     assert result.status_code == 200

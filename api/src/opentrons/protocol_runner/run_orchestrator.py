@@ -273,7 +273,7 @@ class RunOrchestrator:
 
     def get_command_error_slice(
         self,
-        cursor: Optional[int],
+        cursor: int,
         length: int,
     ) -> CommandErrorSlice:
         """Get a slice of run commands errors.
@@ -284,17 +284,6 @@ class RunOrchestrator:
                 based on the last error occurence.
             length: Length of slice to return.
         """
-        all_errors = self.get_all_command_errors()
-        total_length = len(all_errors)
-
-        if cursor is None:
-            if len(all_errors) > 0:
-                # Get the most recent error,
-                # which we can find just at the end of the list.
-                cursor = total_length - 1
-            else:
-                cursor = 0
-
         return self._protocol_engine.state_view.commands.get_errors_slice(
             cursor=cursor, length=length
         )
@@ -311,7 +300,7 @@ class RunOrchestrator:
         """Get all run commands."""
         return self._protocol_engine.state_view.commands.get_all()
 
-    def get_all_command_errors(self) -> List[ErrorOccurrence]:
+    def get_command_errors(self) -> List[ErrorOccurrence]:
         """Get all run command errors."""
         return self._protocol_engine.state_view.commands.get_all_errors()
 

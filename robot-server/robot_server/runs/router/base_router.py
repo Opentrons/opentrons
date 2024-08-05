@@ -451,7 +451,7 @@ async def put_error_recovery_policy(
         "information available for a given command."
     ),
     responses={
-        status.HTTP_200_OK: {"model": SimpleMultiBody[list[pe_errors.ErrorOccurrence]]},
+        status.HTTP_200_OK: {"model": SimpleMultiBody[pe_errors.ErrorOccurrence]},
         status.HTTP_409_CONFLICT: {"model": ErrorBody[RunStopped]},
     },
 )
@@ -470,7 +470,7 @@ async def get_run_commands_error(
         description="The maximum number of command errors in the list to return.",
     ),
     run_data_manager: RunDataManager = Depends(get_run_data_manager),
-) -> PydanticResponse[SimpleMultiBody[list[pe_errors.ErrorOccurrence]]]:
+) -> PydanticResponse[SimpleMultiBody[pe_errors.ErrorOccurrence]]:
     """Get a summary of a set of command errors in a run.
 
     Arguments:
@@ -480,6 +480,17 @@ async def get_run_commands_error(
         run_data_manager: Run data retrieval interface.
     """
     try:
+        all_errors = run_data_manager.get_command_errors(run_id=runId)
+        total_length = len(all_errors)
+
+        if cursor is None:
+            if len(all_errors) > 0:
+                # Get the most recent error,
+                # which we can find just at the end of the list.
+                cursor = total_length - 1
+            else:
+                cursor = 0
+
         command_error_slice = run_data_manager.get_command_error_slice(
             run_id=runId,
             cursor=cursor,
@@ -495,7 +506,7 @@ async def get_run_commands_error(
 
     return await PydanticResponse.create(
         content=SimpleMultiBody.construct(
-            data=command_error_slice.commands_errors,  # type:ignore[arg-type]
+            data=command_error_slice.commands_errors,
             meta=meta,
         ),
         status_code=status.HTTP_200_OK,

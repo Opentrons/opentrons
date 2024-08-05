@@ -944,7 +944,7 @@ def test_get_slice_default_cursor_no_current() -> None:
 
     subject = get_command_view(commands=[command_1, command_2, command_3, command_4])
 
-    result = subject.get_slice(cursor=0, length=3)
+    result = subject.get_slice(cursor=None, length=3)
 
     assert result == CommandSlice(
         commands=[command_2, command_3, command_4],
@@ -975,7 +975,7 @@ def test_get_slice_default_cursor_failed_command() -> None:
         failed_command=CommandEntry(index=2, command=command_3),
     )
 
-    result = subject.get_slice(cursor=0, length=3)
+    result = subject.get_slice(cursor=None, length=3)
 
     assert result == CommandSlice(
         commands=[command_3, command_4],
@@ -995,29 +995,6 @@ def test_get_slice_default_cursor_running() -> None:
     subject = get_command_view(
         commands=[command_1, command_2, command_3, command_4, command_5],
         running_command_id="command-id-3",
-    )
-
-    result = subject.get_slice(cursor=None, length=2)
-
-    assert result == CommandSlice(
-        commands=[command_3, command_4],
-        cursor=2,
-        total_length=5,
-    )
-
-
-def test_get_slice_default_cursor_queued() -> None:
-    """It should select a cursor automatically."""
-    command_1 = create_succeeded_command(command_id="command-id-1")
-    command_2 = create_succeeded_command(command_id="command-id-2")
-    command_3 = create_succeeded_command(command_id="command-id-3")
-    command_4 = create_queued_command(command_id="command-id-4")
-    command_5 = create_queued_command(command_id="command-id-5")
-
-    subject = get_command_view(
-        commands=[command_1, command_2, command_3, command_4, command_5],
-        running_command_id=None,
-        queued_command_ids=[command_4.id, command_5.id],
     )
 
     result = subject.get_slice(cursor=None, length=2)
@@ -1062,25 +1039,4 @@ def test_get_errors_slice() -> None:
         commands_errors=[error_1, error_2, error_3, error_4],
         cursor=0,
         total_length=4,
-    )
-
-
-def test_get_slice_default_cursor_last_error() -> None:
-    """It should select a cursor automatically to the last error inserted."""
-    error_1 = ErrorOccurrence.construct(id="error-id-1")  # type: ignore[call-arg]
-    error_2 = ErrorOccurrence.construct(id="error-id-2")  # type: ignore[call-arg]
-    error_3 = ErrorOccurrence.construct(id="error-id-3")  # type: ignore[call-arg]
-    error_4 = ErrorOccurrence.construct(id="error-id-4")  # type: ignore[call-arg]
-    error_5 = ErrorOccurrence.construct(id="error-id-5")  # type: ignore[call-arg]
-
-    subject = get_command_view(
-        failed_command_errors=[error_1, error_2, error_3, error_4, error_5]
-    )
-
-    result = subject.get_errors_slice(cursor=0, length=2)
-
-    assert result == CommandErrorSlice(
-        commands_errors=[error_5],
-        cursor=4,
-        total_length=5,
     )
