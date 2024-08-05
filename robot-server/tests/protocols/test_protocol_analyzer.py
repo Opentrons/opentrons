@@ -102,7 +102,7 @@ async def test_load_orchestrator(
     ).then_return(run_orchestrator)
     await subject.load_orchestrator(
         run_time_param_values={"rtp_var": 123},
-        run_time_param_files={"csv_param": "file-id"},
+        run_time_param_paths={"csv_param": Path("file-path")},
     )
 
     decoy.verify(
@@ -110,7 +110,7 @@ async def test_load_orchestrator(
             protocol_source=protocol_source,
             parse_mode=ParseMode.NORMAL,
             run_time_param_values={"rtp_var": 123},
-            run_time_param_files={"csv_param": "file-id"},
+            run_time_param_paths={"csv_param": Path("file-path")},
         ),
         times=1,
     )
@@ -176,7 +176,7 @@ async def test_analyze(
         analysis_store=analysis_store, protocol_resource=protocol_resource
     )
     await subject.load_orchestrator(
-        run_time_param_values={"rtp_var": 123}, run_time_param_files={}
+        run_time_param_values={"rtp_var": 123}, run_time_param_paths={}
     )
     decoy.when(await orchestrator.run(deck_configuration=[],)).then_return(
         protocol_runner.RunResult(
@@ -275,7 +275,7 @@ async def test_analyze_updates_pending_on_error(
         datetime(year=2023, month=3, day=3)
     )
     await subject.load_orchestrator(
-        run_time_param_values={"rtp_var": 123}, run_time_param_files={}
+        run_time_param_values={"rtp_var": 123}, run_time_param_paths={}
     )
     await subject.analyze(
         analysis_id="analysis-id",

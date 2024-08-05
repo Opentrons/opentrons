@@ -299,7 +299,9 @@ export const ModuleWizardFlows = (
     )
   } else if (isExiting) {
     modalContent = (
-      <SimpleWizardInProgressBody description={t('stand_back_exiting')} />
+      <SimpleWizardInProgressBody
+        description={t('stand_back_robot_in_motion')}
+      />
     )
   } else if (currentStep.section === SECTIONS.BEFORE_BEGINNING) {
     modalContent = <BeforeBeginning {...currentStep} {...calibrateBaseProps} />

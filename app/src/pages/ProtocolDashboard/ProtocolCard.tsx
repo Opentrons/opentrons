@@ -33,7 +33,6 @@ import { SmallButton } from '../../atoms/buttons'
 import { Modal } from '../../molecules/Modal'
 import { LongPressModal } from './LongPressModal'
 import { formatTimeWithUtcLabel } from '../../resources/runs'
-import { useFeatureFlag } from '../../redux/config'
 
 import type { UseLongPressResult } from '@opentrons/components'
 import type { ProtocolResource } from '@opentrons/shared-data'
@@ -70,8 +69,6 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
   const longpress = useLongPress()
   const queryClient = useQueryClient()
   const host = useHost()
-  // ToDo (kk:06/12/2024) this will be removed when we freeze the code
-  const enableCsvFile = useFeatureFlag('enableCsvFile')
 
   const { id: protocolId, analysisSummaries } = protocol
   const {
@@ -108,7 +105,6 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
 
   // ToDo (kk:06/25/2024) remove ff when we are ready for freezing the code
   const isRequiredCSV =
-    enableCsvFile &&
     analysisForProtocolCard?.result === 'parameter-value-required'
 
   const isPendingAnalysis = analysisForProtocolCard == null

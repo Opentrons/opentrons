@@ -34,7 +34,7 @@ from ..protocol_engine.types import (
     DeckConfigurationType,
     RunTimeParameter,
     PrimitiveRunTimeParamValuesType,
-    CSVRunTimeParamFilesType,
+    CSVRuntimeParamPaths,
 )
 from ..protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
 
@@ -374,7 +374,7 @@ class RunOrchestrator:
         self,
         protocol_source: ProtocolSource,
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType],
-        run_time_param_files: Optional[CSVRunTimeParamFilesType],
+        run_time_param_paths: Optional[CSVRuntimeParamPaths],
         parse_mode: ParseMode,
     ) -> None:
         """Load a json/python protocol."""
@@ -390,7 +390,7 @@ class RunOrchestrator:
                 # doesn't conform to the new rules.
                 python_parse_mode=python_parse_mode,
                 run_time_param_values=run_time_param_values,
-                run_time_param_files=run_time_param_files,
+                run_time_param_paths=run_time_param_paths,
             )
 
     def get_is_okay_to_clear(self) -> bool:

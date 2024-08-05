@@ -5,8 +5,8 @@ import {
   ALIGN_CENTER,
   BORDERS,
   COLORS,
+  DeckInfoLabel,
   Flex,
-  LocationIcon,
   ModuleIcon,
   SPACING,
   LegacyStyledText,
@@ -114,10 +114,12 @@ function HardwareItem({
     </LegacyStyledText>
   )
   if (hardware.hardwareType === 'module') {
-    location = <LocationIcon slotName={hardware.slot} />
+    location = <DeckInfoLabel deckLabel={hardware.slot} />
   } else if (hardware.hardwareType === 'fixture') {
     location = (
-      <LocationIcon slotName={getCutoutDisplayName(hardware.location.cutout)} />
+      <DeckInfoLabel
+        deckLabel={getCutoutDisplayName(hardware.location.cutout)}
+      />
     )
   }
   const isMagneticBlockFixture =

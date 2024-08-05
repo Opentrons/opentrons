@@ -2,48 +2,37 @@ import * as React from 'react'
 import { customViewports } from '../../../../.storybook/preview'
 import { Flex } from '../../primitives'
 import { SPACING } from '../../ui-style-constants'
-import { ICON_DATA_BY_NAME } from '../../icons'
-import { LocationIcon } from '.'
+import { DeckInfoLabel } from '.'
 
 import type { Meta, StoryObj } from '@storybook/react'
 
-const slots = [
-  'A1',
-  'A2',
-  'A3',
-  'A4',
-  'B1',
-  'B2',
-  'B3',
-  'B4',
-  'C1',
-  'C2',
-  'C3',
-  'C4',
-  'D1',
-  'D2',
-  'D3',
-  'D4',
-]
-
-const meta: Meta<typeof LocationIcon> = {
-  title: 'Library/Molecules/LocationIcon',
+const meta: Meta<typeof DeckInfoLabel> = {
+  title: 'Library/Molecules/DeckInfoLabel',
   argTypes: {
     iconName: {
       control: {
         type: 'select',
       },
-      options: Object.keys(ICON_DATA_BY_NAME),
+      options: [
+        'ot-magnet-v2',
+        'ot-heater-shaker',
+        'ot-temperature-v2',
+        'ot-magnet-v2',
+        'ot-thermocycler',
+        'ot-absorbance',
+        'stacked',
+      ],
     },
-    slotName: {
+    deckLabel: {
       control: {
-        type: 'select',
+        type: 'text',
       },
-      options: slots,
+      defaultValue: 'A1',
     },
   },
-  component: LocationIcon,
+  component: DeckInfoLabel,
   parameters: {
+    controls: { include: ['highlight', 'iconName', 'deckLabel'] },
     viewport: {
       viewports: customViewports,
       defaultViewport: 'onDeviceDisplay',
@@ -58,17 +47,20 @@ const meta: Meta<typeof LocationIcon> = {
   ],
 }
 export default meta
-type Story = StoryObj<typeof LocationIcon>
+type Story = StoryObj<typeof DeckInfoLabel>
 
 export const DisplaySlot: Story = {
   args: {
-    slotName: 'A1',
+    deckLabel: 'A1',
     iconName: undefined,
+    highlight: false,
   },
 }
 
 export const DisplayIcon: Story = {
   args: {
+    deckLabel: undefined,
     iconName: 'ot-temperature-v2',
+    highlight: false,
   },
 }

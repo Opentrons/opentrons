@@ -6,8 +6,8 @@ import {
   ALIGN_CENTER,
   BORDERS,
   Btn,
-  LocationIcon,
   COLORS,
+  DeckInfoLabel,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   DISPLAY_FLEX,
@@ -270,7 +270,7 @@ export function LabwareListItem(
     <LabwareRow>
       <Flex alignItems={ALIGN_CENTER} width="80px" gridGap={SPACING.spacing2}>
         {slotInfo != null && isFlex ? (
-          <LocationIcon slotName={slotInfo} />
+          <DeckInfoLabel deckLabel={slotInfo} />
         ) : (
           <StyledText
             css={TYPOGRAPHY.pSemiBold}
@@ -280,7 +280,7 @@ export function LabwareListItem(
           </StyledText>
         )}
         {nestedLabwareInfo != null || moduleDisplayName != null ? (
-          <LocationIcon iconName="stacked" />
+          <DeckInfoLabel iconName="stacked" />
         ) : null}
       </Flex>
       <Flex
@@ -340,7 +340,7 @@ export function LabwareListItem(
             >
               <Flex gridGap={SPACING.spacing12} alignItems={ALIGN_CENTER}>
                 {moduleType != null ? (
-                  <LocationIcon
+                  <DeckInfoLabel
                     iconName={MODULE_ICON_NAME_BY_TYPE[moduleType]}
                   />
                 ) : null}

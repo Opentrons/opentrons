@@ -1,6 +1,5 @@
 import * as React from 'react'
 import capitalize from 'lodash/capitalize'
-import head from 'lodash/head'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 import { Trans, useTranslation } from 'react-i18next'
 
@@ -23,7 +22,7 @@ import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 import type { PipetteWithTip } from '.'
 
 interface TipsAttachedModalProps {
-  pipettesWithTip: PipetteWithTip[]
+  aPipetteWithTip: PipetteWithTip
   host: HostConfig | null
   setTipStatusResolved: (onEmpty?: () => void) => Promise<void>
 }
@@ -38,11 +37,11 @@ export const handleTipsAttachedModal = (
 
 const TipsAttachedModal = NiceModal.create(
   (props: TipsAttachedModalProps): JSX.Element => {
-    const { pipettesWithTip, host, setTipStatusResolved } = props
+    const { aPipetteWithTip, host, setTipStatusResolved } = props
     const { t } = useTranslation(['drop_tip_wizard'])
     const modal = useModal()
 
-    const { mount, specs } = head(pipettesWithTip) as PipetteWithTip
+    const { mount, specs } = aPipetteWithTip
     const { showDTWiz, toggleDTWiz } = useDropTipWizardFlows()
 
     const tipsAttachedHeader: ModalHeaderBaseProps = {
@@ -57,7 +56,9 @@ const TipsAttachedModal = NiceModal.create(
     }
 
     const is96Channel = specs.channels === 96
-    const displayMountText = is96Channel ? '96-Channel' : capitalize(mount)
+    const displayMountText = is96Channel
+      ? '96-Channel'
+      : capitalize(mount as string)
 
     return (
       <ApiHostProvider {...host} hostname={host?.hostname ?? null}>
