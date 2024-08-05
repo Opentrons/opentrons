@@ -5,7 +5,12 @@ from decoy import Decoy
 from pathlib import Path
 
 from opentrons.types import DeckSlotName
-from opentrons.protocol_engine import LabwareOffsetCreate, types as pe_types
+from opentrons.protocol_engine import (
+    LabwareOffsetCreate,
+    types as pe_types,
+    errors as pe_errors,
+    CommandErrorSlice,
+)
 from opentrons.protocol_reader import ProtocolSource, JsonProtocolConfig
 
 from robot_server.errors.error_responses import ApiError
@@ -40,6 +45,7 @@ from robot_server.runs.router.base_router import (
     remove_run,
     update_run,
     put_error_recovery_policy,
+    get_run_commands_error,
 )
 
 from robot_server.deck_configuration.store import DeckConfigurationStore
@@ -618,3 +624,69 @@ async def test_create_policies_raises_not_active_run(
 
     assert exc_info.value.status_code == 409
     assert exc_info.value.content["errors"][0]["id"] == "RunStopped"
+
+
+async def test_get_run_commands_errors(
+    decoy: Decoy, mock_run_data_manager: RunDataManager
+) -> None:
+    """It should return a list of all commands errors in a run."""
+    decoy.when(
+        mock_run_data_manager.get_command_error_slice(
+            run_id="run-id",
+            cursor=None,
+            length=42,
+        )
+    ).then_raise(RunNotCurrentError("oh no!"))
+
+    with pytest.raises(ApiError):
+        result = await get_run_commands_error(
+            runId="run-id",
+            run_data_manager=mock_run_data_manager,
+            cursor=None,
+            pageLength=42,
+        )
+        assert result.status_code == 409
+
+
+async def test_get_run_commands_errors_raises_no_run(
+    decoy: Decoy, mock_run_data_manager: RunDataManager
+) -> None:
+    """It should return a list of all commands errors in a run."""
+    error = (
+        pe_errors.ErrorOccurrence(
+            id="error-id",
+            errorType="PrettyBadError",
+            createdAt=datetime(year=2024, month=4, day=4),
+            detail="Things are not looking good.",
+        ),
+    )
+
+    command_error_slice = CommandErrorSlice(
+        cursor=1, total_length=3, commands_errors=list(error)
+    )
+
+    decoy.when(
+        mock_run_data_manager.get_command_error_slice(
+            run_id="run-id",
+            cursor=None,
+            length=42,
+        )
+    ).then_return(command_error_slice)
+
+    result = await get_run_commands_error(
+        runId="run-id",
+        run_data_manager=mock_run_data_manager,
+        cursor=None,
+        pageLength=42,
+    )
+
+    assert result.content.data == [
+        pe_errors.ErrorOccurrence(
+            id="error-id",
+            errorType="PrettyBadError",
+            createdAt=datetime(year=2024, month=4, day=4),
+            detail="Things are not looking good.",
+        )
+    ]
+    assert result.content.meta == MultiBodyMeta(cursor=1, totalLength=3)
+    assert result.status_code == 200

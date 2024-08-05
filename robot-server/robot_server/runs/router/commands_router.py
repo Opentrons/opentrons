@@ -18,7 +18,6 @@ from robot_server.service.json_api import (
     MultiBodyMeta,
     PydanticResponse,
     SimpleMultiBody,
-    ResponseList,
 )
 from robot_server.robot.control.dependencies import require_estop_in_good_state
 
@@ -32,7 +31,6 @@ from ..run_models import RunCommandSummary
 from ..run_data_manager import (
     RunDataManager,
     PreSerializedCommandsNotAvailableError,
-    RunNotCurrentError,
 )
 from ..run_orchestrator_store import RunOrchestratorStore
 from ..run_store import CommandNotFoundError, RunStore
@@ -415,75 +413,6 @@ async def get_run_command(
 
     return await PydanticResponse.create(
         content=SimpleBody.construct(data=command),
-        status_code=status.HTTP_200_OK,
-    )
-
-
-@PydanticResponse.wrap_route(
-    commands_router.get,
-    path="/runs/{runId}/commands/errors",
-    summary="Get a list of all command errors in the run",
-    description=(
-        "Get a list of all command errors in the run. "
-        "\n\n"
-        "The errors are returned in order from oldest to newest."
-        "\n\n"
-        "This endpoint returns the command error. Use "
-        "`GET /runs/{runId}/commands/{commandId}` to get all "
-        "information available for a given command."
-    ),
-    responses={
-        status.HTTP_200_OK: {
-            "model": SimpleBody[ResponseList[pe_errors.ErrorOccurrence]]
-        },
-        status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunStopped]},
-    },
-)
-async def get_run_commands_error(
-    runId: str,
-    cursor: Optional[int] = Query(
-        None,
-        description=(
-            "The starting index of the desired first command error in the list."
-            " If unspecified, a cursor will be selected automatically"
-            " based on the currently running or most recently executed command."
-        ),
-    ),
-    pageLength: int = Query(
-        _DEFAULT_COMMAND_LIST_LENGTH,
-        description="The maximum number of command errors in the list to return.",
-    ),
-    run_data_manager: RunDataManager = Depends(get_run_data_manager),
-) -> PydanticResponse[SimpleMultiBody[ResponseList[pe_errors.ErrorOccurrence]]]:
-    """Get a summary of a set of command errors in a run.
-
-    Arguments:
-        runId: Requested run ID, from the URL
-        cursor: Cursor index for the collection response.
-        pageLength: Maximum number of items to return.
-        run_data_manager: Run data retrieval interface.
-    """
-    try:
-        command_error_slice = run_data_manager.get_command_error_slice(
-            run_id=runId,
-            cursor=cursor,
-            length=pageLength,
-        )
-    except RunNotCurrentError as e:
-        raise RunStopped(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e
-
-    meta = MultiBodyMeta(
-        cursor=command_error_slice.cursor,
-        totalLength=command_error_slice.total_length,
-    )
-
-    commands_errors_result = ResponseList.construct(
-        __root__=command_error_slice.commands_errors
-    )
-    return await PydanticResponse.create(
-        content=SimpleMultiBody.construct(
-            data=commands_errors_result, meta=meta  # type: ignore[arg-type]
-        ),
         status_code=status.HTTP_200_OK,
     )
 
