@@ -477,36 +477,36 @@ def simulate(
     :param protocol_file: The protocol file to simulate.
     :param file_name: The name of the file
     :param custom_labware_paths: A list of directories to search for custom labware.
-                                 Loads valid labware from these paths and makes them available
-                                 to the protocol context. If this is ``None`` (the default), and
-                                 this function is called on a robot, it will look in the ``labware``
-                                 subdirectory of the Jupyter data directory.
+        Loads valid labware from these paths and makes them available
+        to the protocol context. If this is ``None`` (the default), and
+        this function is called on a robot, it will look in the ``labware``
+        subdirectory of the Jupyter data directory.
     :param custom_data_paths: A list of directories or files to load custom
-                              data files from. Ignored if the apiv2 feature
-                              flag if not set. Entries may be either files or
-                              directories. Specified files and the
-                              non-recursive contents of specified directories
-                              are presented by the protocol context in
-                              ``protocol_api.ProtocolContext.bundled_data``.
+        data files from. Ignored if the apiv2 feature
+        flag if not set. Entries may be either files or
+        directories. Specified files and the
+        non-recursive contents of specified directories
+        are presented by the protocol context in
+        ``protocol_api.ProtocolContext.bundled_data``.
     :param hardware_simulator_file_path: A path to a JSON file defining a
-                                         hardware simulator.
+        hardware simulator.
     :param duration_estimator: For internal use only.
-                               Optional duration estimator object.
+        Optional duration estimator object.
     :param propagate_logs: Whether this function should allow logs from the
-                           Opentrons stack to propagate up to the root handler.
-                           This can be useful if you're integrating this
-                           function in a larger application, but most logs that
-                           occur during protocol simulation are best associated
-                           with the actions in the protocol that cause them.
-                           Default: ``False``
+        Opentrons stack to propagate up to the root handler.
+        This can be useful if you're integrating this
+        function in a larger application, but most logs that
+        occur during protocol simulation are best associated
+        with the actions in the protocol that cause them.
+        Default: ``False``
     :param log_level: The level of logs to capture in the run log:
-                      ``"debug"``, ``"info"``, ``"warning"``, or ``"error"``.
-                      Defaults to ``"warning"``.
+        ``"debug"``, ``"info"``, ``"warning"``, or ``"error"``.
+        Defaults to ``"warning"``.
     :returns: A tuple of a run log for user output, and possibly the required
-              data to write to a bundle to bundle this protocol. The bundle is
-              only emitted if bundling is allowed
-              and this is an unbundled Protocol API
-              v2 python protocol. In other cases it is None.
+        data to write to a bundle to bundle this protocol. The bundle is
+        only emitted if bundling is allowed
+        and this is an unbundled Protocol API
+        v2 python protocol. In other cases it is None.
     """
     stack_logger = logging.getLogger("opentrons")
     stack_logger.propagate = propagate_logs
@@ -639,8 +639,7 @@ def get_arguments(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
     Useful if you want to use this module as a component of another CLI program
     and want to add its arguments.
 
-    :param parser: A parser to add arguments to. If not specified, one will be
-                   created.
+    :param parser: A parser to add arguments to. If not specified, one will be created.
     :returns argparse.ArgumentParser: The parser with arguments added.
     """
     parser.add_argument(
