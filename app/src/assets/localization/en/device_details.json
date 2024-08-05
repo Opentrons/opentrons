@@ -29,6 +29,7 @@
   "confirm": "Confirm",
   "continue_editing": "Continue editing",
   "controls": "Controls",
+  "csv_required_for_analysis": "CSV required for analysis. Add it during run setup.",
   "current_speed": "Current: {{speed}} rpm",
   "current_temp": "Current: {{temp}} °C",
   "current_version": "Current Version",

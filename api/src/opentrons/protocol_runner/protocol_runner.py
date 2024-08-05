@@ -401,6 +401,7 @@ class LiveRunner(AbstractRunner):
 
         self._hardware_api.should_taskify_movement_execution(taskify=False)
 
+    # TODO(tz, 6-10-2024): explore moving this method into the constructor.
     def prepare(self) -> None:
         """Set the task queue to wait until all commands are executed."""
         self._task_queue.set_run_func(func=self._protocol_engine.wait_until_complete)

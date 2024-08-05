@@ -160,7 +160,12 @@ export function RunningProtocol(): JSX.Element {
   return (
     <>
       {isERActive ? (
-        <ErrorRecoveryFlows runId={runId} failedCommand={failedCommand} />
+        <ErrorRecoveryFlows
+          isFlex={true}
+          runId={runId}
+          failedCommand={failedCommand}
+          protocolAnalysis={robotSideAnalysis}
+        />
       ) : null}
       {runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR ? (
         <OpenDoorAlertModal />
@@ -209,6 +214,7 @@ export function RunningProtocol(): JSX.Element {
           {robotSideAnalysis != null ? (
             currentOption === 'CurrentRunningProtocolCommand' ? (
               <CurrentRunningProtocolCommand
+                runId={runId}
                 playRun={playRun}
                 pauseRun={pauseRun}
                 setShowConfirmCancelRunModal={setShowConfirmCancelRunModal}

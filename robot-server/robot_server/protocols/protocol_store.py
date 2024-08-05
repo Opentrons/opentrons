@@ -1,4 +1,5 @@
 """Store and retrieve information about uploaded protocols."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -35,6 +36,7 @@ class ProtocolResource:
     created_at: datetime
     source: ProtocolSource
     protocol_key: Optional[str]
+    protocol_kind: Optional[str]
 
 
 @dataclass(frozen=True)
@@ -166,6 +168,7 @@ class ProtocolStore:
                 protocol_id=resource.protocol_id,
                 created_at=resource.created_at,
                 protocol_key=resource.protocol_key,
+                protocol_kind=resource.protocol_kind,
             )
         )
         self._sources_by_id[resource.protocol_id] = resource.source
@@ -183,6 +186,7 @@ class ProtocolStore:
             protocol_id=sql_resource.protocol_id,
             created_at=sql_resource.created_at,
             protocol_key=sql_resource.protocol_key,
+            protocol_kind=sql_resource.protocol_kind,
             source=self._sources_by_id[sql_resource.protocol_id],
         )
 
@@ -198,6 +202,7 @@ class ProtocolStore:
                 protocol_id=r.protocol_id,
                 created_at=r.created_at,
                 protocol_key=r.protocol_key,
+                protocol_kind=r.protocol_kind,
                 source=self._sources_by_id[r.protocol_id],
             )
             for r in all_sql_resources
@@ -471,6 +476,7 @@ class _DBProtocolResource:
     protocol_id: str
     created_at: datetime
     protocol_key: Optional[str]
+    protocol_kind: Optional[str]
 
 
 def _convert_sql_row_to_dataclass(
@@ -479,16 +485,21 @@ def _convert_sql_row_to_dataclass(
     protocol_id = sql_row.id
     protocol_key = sql_row.protocol_key
     created_at = sql_row.created_at
+    protocol_kind = sql_row.protocol_kind
 
     assert isinstance(protocol_id, str), f"Protocol ID {protocol_id} not a string"
     assert protocol_key is None or isinstance(
         protocol_key, str
     ), f"Protocol Key {protocol_key} not a string or None"
+    assert protocol_kind is None or isinstance(
+        protocol_kind, str
+    ), f"Protocol Kind {protocol_kind} not a string or None"
 
     return _DBProtocolResource(
         protocol_id=protocol_id,
         created_at=created_at,
         protocol_key=protocol_key,
+        protocol_kind=protocol_kind,
     )
 
 
@@ -499,4 +510,5 @@ def _convert_dataclass_to_sql_values(
         "id": resource.protocol_id,
         "created_at": resource.created_at,
         "protocol_key": resource.protocol_key,
+        "protocol_kind": resource.protocol_kind,
     }

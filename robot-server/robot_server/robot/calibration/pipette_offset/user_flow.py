@@ -328,7 +328,7 @@ class PipetteOffsetCalibrationUserFlow:
     def _get_tip_length(self) -> float:
         stored_tip_length_cal = self._get_stored_tip_length_cal()
         if stored_tip_length_cal is None or self._should_perform_tip_length:
-            tip_overlap = self._hw_pipette.tip_overlap.get(self._tip_rack.uri, 0)
+            tip_overlap = self._hw_pipette.tip_overlap["v0"].get(self._tip_rack.uri, 0)
             tip_length = self._tip_rack.tip_length
             return tip_length - tip_overlap
         else:

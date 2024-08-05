@@ -101,9 +101,7 @@ module.exports = {
         '@typescript-eslint/no-floating-promises': 'warn',
         '@typescript-eslint/no-unnecessary-type-assertion': 'warn',
         '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'warn',
-        '@typescript-eslint/no-unsafe-argument': 'warn',
         '@typescript-eslint/consistent-indexed-object-style': 'warn',
-        '@typescript-eslint/no-confusing-void-expression': 'warn',
         '@typescript-eslint/ban-types': 'warn',
         '@typescript-eslint/non-nullable-type-assertion-style': 'warn',
         '@typescript-eslint/await-thenable': 'warn',
@@ -127,11 +125,13 @@ module.exports = {
         '**/__fixtures__/**.@(js|ts|tsx)',
         '**/fixtures/**.@(js|ts|tsx)',
         'scripts/*.@(js|ts|tsx)',
+        '**/**test.@(js|ts|tsx)',
       ],
       rules: {
         '@typescript-eslint/consistent-type-assertions': 'off',
         '@typescript-eslint/no-var-requires': 'off',
         '@typescript-eslint/explicit-function-return-type': 'off',
+        '@typescript-eslint/no-unsafe-argument': 'off',
         '@typescript-eslint/no-confusing-void-expression': 'warn',
         'node/handle-callback-err': 'off',
       },
@@ -139,10 +139,6 @@ module.exports = {
     {
       files: ['**/__tests__/**test.tsx'],
       extends: ['plugin:testing-library/react'],
-      rules: {
-        'testing-library/no-manual-cleanup': 'off',
-        'testing-library/prefer-screen-queries': 'warn',
-      },
     },
     {
       files: ['**/*.stories.tsx'],

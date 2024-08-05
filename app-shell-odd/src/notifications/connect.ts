@@ -34,17 +34,23 @@ export function connectAsync(brokerURL: string): Promise<mqtt.Client> {
     } = {
       connect: () => {
         removePromiseListeners()
-        return resolve(client)
+        resolve(client)
       },
       // A connection error event will close the connection without a retry.
       error: (error: Error | string) => {
         removePromiseListeners()
         const clientEndPromise = new Promise((resolve, reject) =>
-          client.end(true, {}, () => resolve(error))
+          client.end(true, {}, () => {
+            resolve(error)
+          })
         )
-        return clientEndPromise.then(() => reject(error))
+        return clientEndPromise.then(() => {
+          reject(error)
+        })
       },
-      end: () => promiseListeners.error(`Couldn't connect to ${brokerURL}`),
+      end: () => {
+        promiseListeners.error(`Couldn't connect to ${brokerURL}`)
+      },
     }
 
     function removePromiseListeners(): void {
@@ -116,6 +122,8 @@ export function establishListeners(): void {
 export function closeConnectionForcefully(): Promise<void> {
   const { client } = connectionStore
   return new Promise<void>((resolve, reject) =>
-    client?.end(true, {}, () => resolve())
+    client?.end(true, {}, () => {
+      resolve()
+    })
   )
 }

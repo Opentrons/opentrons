@@ -95,11 +95,15 @@ export function getShowPipetteCalibrationWarning(
 export function getRunTimeParameterValuesForRun(
   runTimeParameters: RunTimeParameter[]
 ): RunTimeParameterCreateData {
-  return runTimeParameters.reduce(
-    (acc, param) =>
-      param.value !== param.default
+  return runTimeParameters.reduce((acc, param) => {
+    if (param.type === 'csv_file') {
+      // TODO (nd: 06/13/2024) transform file parameter to RunTimeParamterCreateData
+      // return { ...acc, [param.variableName]: { id: param.file?.id } }
+      return acc
+    } else {
+      return param.value !== param.default
         ? { ...acc, [param.variableName]: param.value }
-        : acc,
-    {}
-  )
+        : acc
+    }
+  }, {})
 }

@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { fireEvent, screen, cleanup } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../localization'
 import { getInitialDeckSetup } from '../../../../step-forms/selectors'
@@ -69,9 +69,6 @@ describe('EditMultipleModulesModal', () => {
     })
     vi.mocked(getLabwareOnSlot).mockReturnValue(null)
     vi.mocked(getSlotIsEmpty).mockReturnValue(true)
-  })
-  afterEach(() => {
-    cleanup()
   })
   it('renders modal and buttons with no error', () => {
     vi.mocked(getLabwareIsCompatible).mockReturnValue(true)

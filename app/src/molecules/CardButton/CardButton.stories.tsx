@@ -1,38 +1,44 @@
 import * as React from 'react'
-import { MemoryRouter } from 'react-router-dom'
-import { Flex, SPACING, VIEWPORT } from '@opentrons/components'
-import { GlobalStyle } from '../../atoms/GlobalStyle'
-import { CardButton } from '.'
+import {
+  Flex,
+  ICON_DATA_BY_NAME,
+  SPACING,
+  VIEWPORT,
+} from '@opentrons/components'
+import { CardButton as CardButtonComponent } from './index'
 
-import type { Story, Meta } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react'
 
-export default {
+const meta: Meta<typeof CardButtonComponent> = {
   title: 'ODD/Molecules/CardButton',
-  component: CardButton,
+  component: CardButtonComponent,
   parameters: VIEWPORT.touchScreenViewport,
+  argTypes: {
+    iconName: {
+      control: {
+        type: 'select',
+      },
+      options: Object.keys(ICON_DATA_BY_NAME),
+    },
+  },
   decorators: [
     Story => (
-      <>
-        <GlobalStyle isOnDevice />
+      <Flex marginTop={SPACING.spacing16} width="15.375rem" height="17rem">
         <Story />
-      </>
+      </Flex>
     ),
   ],
-} as Meta
+}
+export default meta
 
-const Template: Story<React.ComponentProps<typeof CardButton>> = args => (
-  <MemoryRouter>
-    <Flex marginTop={SPACING.spacing16} width="15.375rem" height="17rem">
-      <CardButton {...args} />
-    </Flex>
-  </MemoryRouter>
-)
+type Story = StoryObj<typeof CardButtonComponent>
 
-export const Primary = Template.bind({})
-Primary.args = {
-  title: 'Header',
-  iconName: 'wifi',
-  description: 'Subtext.',
-  destinationPath: '/app-molecules-cardbutton--primary',
-  disabled: false,
+export const CardButton: Story = {
+  args: {
+    title: 'Header',
+    iconName: 'wifi',
+    description: 'Subtext.',
+    destinationPath: '/app-molecules-cardbutton--primary',
+    disabled: false,
+  },
 }

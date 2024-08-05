@@ -45,12 +45,12 @@ export function ChooseNumber({
   }, [])
 
   if (parameter.type !== 'int' && parameter.type !== 'float') {
-    console.log(`Incorrect parameter type: ${parameter.type}`)
+    console.log(`Incorrect parameter type: ${parameter.type as string}`)
     return null
   }
   const handleClickGoBack = (newValue: number | null): void => {
     if (error != null || newValue === null) {
-      makeSnackbar(t('value_out_of_range_generic'))
+      makeSnackbar(t('value_out_of_range_generic') as string)
     } else {
       setParameter(newValue, parameter.variableName)
       handleGoBack()
@@ -94,11 +94,11 @@ export function ChooseNumber({
         }}
         buttonType="tertiaryLowLight"
         buttonText={t('restore_default')}
-        onClickButton={() =>
+        onClickButton={() => {
           resetValueDisabled
-            ? makeSnackbar(t('no_custom_values'))
+            ? makeSnackbar(t('no_custom_values') as string)
             : setParamValue(String(parameter.default))
-        }
+        }}
       />
       <Flex
         alignSelf={ALIGN_CENTER}
@@ -132,7 +132,9 @@ export function ChooseNumber({
                 : `${parameter.min.toFixed(1)}-${parameter.max.toFixed(1)}`
             }
             error={error}
-            onBlur={e => e.target.focus()}
+            onBlur={e => {
+              e.target.focus()
+            }}
             onChange={e => {
               const updatedValue =
                 parameter.type === 'int'

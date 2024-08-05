@@ -38,11 +38,12 @@ export function ResetValuesModal({
 
   // ToDo (kk:03/18/2024) reset values function will be implemented
   const handleResetValues = (): void => {
-    setRunTimeParametersOverrides(
-      runTimeParametersOverrides.map(param => {
-        return { ...param, value: param.default }
-      })
+    const clone = runTimeParametersOverrides.map(parameter =>
+      parameter.type === 'csv_file'
+        ? { ...parameter, file: null }
+        : { ...parameter, value: parameter.default }
     )
+    setRunTimeParametersOverrides(clone as RunTimeParameter[])
     handleGoBack()
   }
 

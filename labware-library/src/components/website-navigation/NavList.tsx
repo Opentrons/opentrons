@@ -21,10 +21,13 @@ export class NavList extends React.Component<Props, State> {
     this.state = { menu: null }
   }
 
-  clear: () => void = () => this.setState({ menu: null })
+  clear: () => void = () => {
+    this.setState({ menu: null })
+  }
 
-  toggle: (name: MenuName) => void = name =>
+  toggle: (name: MenuName) => void = name => {
     this.setState({ menu: this.state.menu !== name ? name : null })
+  }
 
   render(): JSX.Element {
     const { menu } = this.state
@@ -38,7 +41,9 @@ export class NavList extends React.Component<Props, State> {
                 [styles.active]: !menu || menu === 'About',
               })}
               role="button"
-              onClick={() => this.toggle('About')}
+              onClick={() => {
+                this.toggle('About')
+              }}
             >
               <NavMenu {...aboutLinkProps} active={menu === 'About'} />
             </li>
@@ -48,7 +53,9 @@ export class NavList extends React.Component<Props, State> {
                 [styles.active]: !menu || menu === 'Products',
               })}
               role="button"
-              onClick={() => this.toggle('Products')}
+              onClick={() => {
+                this.toggle('Products')
+              }}
             >
               <ProductMenu active={menu === 'Products'} />
             </li>
@@ -58,7 +65,9 @@ export class NavList extends React.Component<Props, State> {
                 [styles.active]: !menu || menu === 'Applications',
               })}
               role="button"
-              onClick={() => this.toggle('Applications')}
+              onClick={() => {
+                this.toggle('Applications')
+              }}
             >
               <NavMenu
                 {...applicationLinkProps}
@@ -71,7 +80,9 @@ export class NavList extends React.Component<Props, State> {
                 [styles.active]: !menu || menu === 'Protocols',
               })}
               role="button"
-              onClick={() => this.toggle('Protocols')}
+              onClick={() => {
+                this.toggle('Protocols')
+              }}
             >
               <ProtocolMenu active={menu === 'Protocols'} />
             </li>
@@ -80,7 +91,9 @@ export class NavList extends React.Component<Props, State> {
                 [styles.active]: !menu || menu === 'Support',
               })}
               role="button"
-              onClick={() => this.toggle('Support')}
+              onClick={() => {
+                this.toggle('Support')
+              }}
             >
               <SupportMenu active={menu === 'Support'} />
             </li>

@@ -38,7 +38,7 @@ import {
 import { SmallButton } from '../../atoms/buttons'
 import { LabwareOffsetTabs } from '../LabwareOffsetTabs'
 import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
-import { getLabwareDefinitionsFromCommands } from './utils/labware'
+import { getLabwareDefinitionsFromCommands } from '../../molecules/Command/utils/getLabwareDefinitionsFromCommands'
 import { getDisplayLocation } from './utils/getDisplayLocation'
 
 import type {
@@ -50,6 +50,7 @@ import type {
   LabwareOffsetCreateData,
 } from '@opentrons/api-client'
 import type { ResultsSummaryStep, WorkingOffset } from './types'
+import type { TFunction } from 'i18next'
 
 const LPC_HELP_LINK_URL =
   'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
@@ -185,7 +186,9 @@ export const ResultsSummary = (
       {isOnDevice ? (
         <SmallButton
           alignSelf={ALIGN_FLEX_END}
-          onClick={() => handleApplyOffsets(offsetsToApply)}
+          onClick={() => {
+            handleApplyOffsets(offsetsToApply)
+          }}
           buttonText={i18n.format(t('apply_offsets'), 'capitalize')}
           iconName={isSubmittingAndClosing ? 'ot-spinner' : null}
           iconPlacement={isSubmittingAndClosing ? 'startIcon' : null}
@@ -200,7 +203,9 @@ export const ResultsSummary = (
         >
           <NeedHelpLink href={LPC_HELP_LINK_URL} />
           <PrimaryButton
-            onClick={() => handleApplyOffsets(offsetsToApply)}
+            onClick={() => {
+              handleApplyOffsets(offsetsToApply)
+            }}
             disabled={isSubmittingAndClosing}
           >
             <Flex>
@@ -294,7 +299,12 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
                   as="p"
                   textTransform={TYPOGRAPHY.textTransformCapitalize}
                 >
-                  {getDisplayLocation(location, labwareDefinitions, t, i18n)}
+                  {getDisplayLocation(
+                    location,
+                    labwareDefinitions,
+                    t as TFunction,
+                    i18n
+                  )}
                 </StyledText>
               </TableDatum>
               <TableDatum>

@@ -166,7 +166,9 @@ export function CalibrationHealthCheck({
             <AskForCalibrationBlockModal
               onResponse={handleHealthCheck}
               titleBarTitle={t('robot_calibration:health_check_title')}
-              closePrompt={() => setShowCalBlockModal(false)}
+              closePrompt={() => {
+                setShowCalBlockModal(false)
+              }}
             />,
             getTopPortalEl()
           )

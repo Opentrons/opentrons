@@ -76,7 +76,9 @@ export function Labware(): JSX.Element {
 
   const [sortBy, setSortBy] = React.useState<LabwareSort>('alphabetical')
   const [showSortByMenu, setShowSortByMenu] = React.useState<boolean>(false)
-  const toggleSetShowSortByMenu = (): void => setShowSortByMenu(!showSortByMenu)
+  const toggleSetShowSortByMenu = (): void => {
+    setShowSortByMenu(!showSortByMenu)
+  }
   const trackEvent = useTrackEvent()
   const [filterBy, setFilterBy] = React.useState<LabwareFilter>('all')
   const { makeToast } = useToaster()
@@ -93,7 +95,9 @@ export function Labware(): JSX.Element {
   ] = React.useState<null | LabwareDefAndDate>(null)
 
   const sortOverflowWrapperRef = useOnClickOutside<HTMLDivElement>({
-    onClickOutside: () => setShowSortByMenu(false),
+    onClickOutside: () => {
+      setShowSortByMenu(false)
+    },
   })
   React.useEffect(() => {
     if (labwareFailureMessage != null) {
@@ -104,10 +108,14 @@ export function Labware(): JSX.Element {
       })
     } else if (newLabwareName != null) {
       setShowAddLabwareSlideout(false)
-      makeToast(t('imported', { filename: newLabwareName }), SUCCESS_TOAST, {
-        closeButton: true,
-        onClose: clearLabwareName,
-      })
+      makeToast(
+        t('imported', { filename: newLabwareName }) as string,
+        SUCCESS_TOAST,
+        {
+          closeButton: true,
+          onClose: clearLabwareName,
+        }
+      )
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [labwareFailureMessage, newLabwareName])
@@ -127,7 +135,11 @@ export function Labware(): JSX.Element {
           >
             {t('labware')}
           </StyledText>
-          <SecondaryButton onClick={() => setShowAddLabwareSlideout(true)}>
+          <SecondaryButton
+            onClick={() => {
+              setShowAddLabwareSlideout(true)
+            }}
+          >
             {t('import')}
           </SecondaryButton>
         </Flex>
@@ -234,12 +246,12 @@ export function Labware(): JSX.Element {
 
           <Link
             external
-            onClick={() =>
+            onClick={() => {
               trackEvent({
                 name: ANALYTICS_OPEN_LABWARE_CREATOR_FROM_BOTTOM_OF_LABWARE_LIBRARY_LIST,
                 properties: {},
               })
-            }
+            }}
             href={LABWARE_CREATOR_HREF}
             css={TYPOGRAPHY.darkLinkLabelSemiBold}
           >
@@ -255,13 +267,17 @@ export function Labware(): JSX.Element {
       {showAddLabwareSlideout && (
         <AddCustomLabwareSlideout
           isExpanded={showAddLabwareSlideout}
-          onCloseClick={() => setShowAddLabwareSlideout(false)}
+          onCloseClick={() => {
+            setShowAddLabwareSlideout(false)
+          }}
         />
       )}
       {currentLabwareDef != null && (
         <LabwareDetails
           labware={currentLabwareDef}
-          onClose={() => setCurrentLabwareDef(null)}
+          onClose={() => {
+            setCurrentLabwareDef(null)
+          }}
         />
       )}
     </>

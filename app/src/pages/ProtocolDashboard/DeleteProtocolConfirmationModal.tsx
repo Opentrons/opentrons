@@ -67,14 +67,14 @@ export function DeleteProtocolConfirmationModal({
         .then(() =>
           queryClient
             .invalidateQueries([host, 'protocols'])
-            .catch((e: Error) =>
+            .catch((e: Error) => {
               console.error(`error invalidating runs query: ${e.message}`)
-            )
+            })
         )
         .then(() => {
           setShowIcon(false)
           setShowDeleteConfirmationModal(false)
-          makeSnackbar(t('protocol_deleted'))
+          makeSnackbar(t('protocol_deleted') as string)
         })
         .catch((e: Error) => {
           console.error(`error deleting resources: ${e.message}`)

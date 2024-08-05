@@ -213,6 +213,13 @@ def mag_block_v1_def() -> ModuleDefinition:
 
 
 @pytest.fixture(scope="session")
+def abs_reader_v1_def() -> ModuleDefinition:
+    """Get the definition of a V1 absorbance plate reader."""
+    definition = load_shared_data("module/definitions/3/absorbanceReaderV1.json")
+    return ModuleDefinition.parse_raw(definition)
+
+
+@pytest.fixture(scope="session")
 def supported_tip_fixture() -> pipette_definition.SupportedTipsDefinition:
     """Get a mock supported tip definition."""
     return pipette_definition.SupportedTipsDefinition(

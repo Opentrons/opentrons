@@ -3,18 +3,32 @@
   "displayName": "P10 Single-Channel GEN1",
   "model": "p10",
   "displayCategory": "GEN1",
+  "validNozzleMaps": {
+    "maps": {
+      "SingleA1": ["A1"]
+    }
+  },
   "pickUpTipConfigurations": {
     "pressFit": {
-      "speedByTipCount": {
-        "1": 30.0
-      },
       "presses": 3,
       "increment": 1.0,
-      "distanceByTipCount": {
-        "1": 10.0
-      },
-      "currentByTipCount": {
-        "1": 0.1
+      "configurationsByNozzleMap": {
+        "SingleA1": {
+          "default": {
+            "speed": 30.0,
+            "distance": 10.0,
+            "current": 0.1,
+            "tipOverlaps": {
+              "v0": {
+                "default": 3.29,
+                "opentrons/opentrons_96_tiprack_10ul/1": 3.29,
+                "opentrons/opentrons_96_filtertiprack_10ul/1": 3.29,
+                "opentrons/geb_96_tiprack_10ul/1": 6.2,
+                "opentrons/eppendorf_96_tiprack_10ul_eptips/1": 1.0
+              }
+            }
+          }
+        }
       }
     }
   },

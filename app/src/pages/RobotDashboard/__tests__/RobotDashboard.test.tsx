@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
+import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { useAllProtocolsQuery } from '@opentrons/react-api-client'
@@ -107,9 +108,9 @@ describe('RobotDashboard', () => {
     vi.mocked(useNotifyAllRunsQuery).mockReturnValue({
       data: { data: [mockRunData] },
     } as any)
-    const [{ getByText }] = render()
+    render()
     expect(vi.mocked(Navigation)).toHaveBeenCalled()
-    getByText('Run again')
+    screen.getByText('Run again')
     expect(vi.mocked(RecentRunProtocolCarousel)).toHaveBeenCalled()
   })
 

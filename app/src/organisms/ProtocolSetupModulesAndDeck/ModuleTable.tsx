@@ -139,7 +139,7 @@ function ModuleTableItem({
   const handleCalibrate = (): void => {
     if (module.attachedModuleMatch != null) {
       if (getModuleTooHot(module.attachedModuleMatch)) {
-        makeSnackbar(t('module_wizard_flows:module_too_hot'))
+        makeSnackbar(t('module_wizard_flows:module_too_hot') as string)
       } else {
         chainLiveCommands(
           getModulePrepCommands(module.attachedModuleMatch),
@@ -150,7 +150,7 @@ function ModuleTableItem({
         setShowModuleWizard(true)
       }
     } else {
-      makeSnackbar(t('attach_module'))
+      makeSnackbar(t('attach_module') as string)
     }
   }
 

@@ -64,6 +64,7 @@ import { useFeatureFlag } from '../../redux/config'
 import { ChooseRobotToRunProtocolSlideout } from '../ChooseRobotToRunProtocolSlideout'
 import { SendProtocolToFlexSlideout } from '../SendProtocolToFlexSlideout'
 import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
+import { ProtocolStatusBanner } from '../ProtocolStatusBanner'
 import {
   getAnalysisStatus,
   getProtocolDisplayName,
@@ -180,7 +181,9 @@ const ReadMoreContent = (props: ReadMoreContentProps): JSX.Element => {
           role="button"
           css={TYPOGRAPHY.linkPSemiBold}
           marginTop={SPACING.spacing8}
-          onClick={() => setIsReadMore(!isReadMore)}
+          onClick={() => {
+            setIsReadMore(!isReadMore)
+          }}
         >
           {isReadMore
             ? i18n.format(t('read_more'), 'capitalize')
@@ -381,7 +384,9 @@ export function ProtocolDetails(
         ? createPortal(
             <LegacyModal
               title={t('deck_view')}
-              onClose={() => setShowDeckViewModal(false)}
+              onClose={() => {
+                setShowDeckViewModal(false)
+              }}
             >
               {deckMap}
             </LegacyModal>,
@@ -395,13 +400,17 @@ export function ProtocolDetails(
       >
         <ErrorBoundary fallback={UnknownAttachmentError}>
           <ChooseRobotToRunProtocolSlideout
-            onCloseClick={() => setShowChooseRobotToRunProtocolSlideout(false)}
+            onCloseClick={() => {
+              setShowChooseRobotToRunProtocolSlideout(false)
+            }}
             showSlideout={showChooseRobotToRunProtocolSlideout}
             storedProtocolData={props}
           />
           <SendProtocolToFlexSlideout
             isExpanded={showSendProtocolToFlexSlideout}
-            onCloseClick={() => setShowSendProtocolToFlexSlideout(false)}
+            onCloseClick={() => {
+              setShowSendProtocolToFlexSlideout(false)
+            }}
             storedProtocolData={props}
           />
 
@@ -419,6 +428,10 @@ export function ProtocolDetails(
               padding={`${SPACING.spacing16} 0 ${SPACING.spacing16} ${SPACING.spacing16}`}
               width="100%"
             >
+              {analysisStatus !== 'loading' &&
+              mostRecentAnalysis?.result === 'file-required' ? (
+                <ProtocolStatusBanner />
+              ) : null}
               {analysisStatus !== 'loading' &&
               mostRecentAnalysis != null &&
               mostRecentAnalysis.errors.length > 0 ? (
@@ -482,7 +495,9 @@ export function ProtocolDetails(
                   `}
                 >
                   <PrimaryButton
-                    onClick={() => handleRunProtocolButtonClick()}
+                    onClick={() => {
+                      handleRunProtocolButtonClick()
+                    }}
                     data-testid="ProtocolDetails_runProtocol"
                     disabled={analysisStatus === 'loading'}
                   >
@@ -534,12 +549,12 @@ export function ProtocolDetails(
               right={SPACING.spacing2}
             >
               <ProtocolOverflowMenu
-                handleRunProtocol={() =>
+                handleRunProtocol={() => {
                   setShowChooseRobotToRunProtocolSlideout(true)
-                }
-                handleSendProtocolToFlex={() =>
+                }}
+                handleSendProtocolToFlex={() => {
                   setShowSendProtocolToFlexSlideout(true)
-                }
+                }}
                 storedProtocolData={props}
                 data-testid="ProtocolDetails_overFlowMenu"
               />
@@ -574,7 +589,9 @@ export function ProtocolDetails(
                   height={SPACING.spacing24}
                   width={SPACING.spacing24}
                   css={ZOOM_ICON_STYLE}
-                  onClick={() => setShowDeckViewModal(true)}
+                  onClick={() => {
+                    setShowDeckViewModal(true)
+                  }}
                 >
                   <Icon
                     name="union"

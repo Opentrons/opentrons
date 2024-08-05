@@ -302,7 +302,7 @@ export function Toast(props: ToastProps): JSX.Element {
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       alignItems={ALIGN_CENTER}
       borderRadius={
-        showODDStyle ? BORDERS.borderRadius12 : BORDERS.borderRadius4
+        showODDStyle ? BORDERS.borderRadius8 : BORDERS.borderRadius4
       }
       borderColor={toastStyleByType[type].color}
       borderWidth={showODDStyle ? BORDERS.borderRadius4 : '1px'}
@@ -391,7 +391,13 @@ export function Toast(props: ToastProps): JSX.Element {
         </Flex>
       </Flex>
       {closeText ? (
-        <Link role="button" onClick={() => onCloseHandler()}>
+        <Link
+          role="button"
+          onClick={() => {
+            onCloseHandler()
+          }}
+          padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
+        >
           <StyledText
             color={COLORS.black90}
             fontSize={
@@ -416,7 +422,11 @@ export function Toast(props: ToastProps): JSX.Element {
         </Link>
       ) : null}
       {!closeText && closeButton ? (
-        <Btn onClick={() => onCloseHandler()}>
+        <Btn
+          onClick={() => {
+            onCloseHandler()
+          }}
+        >
           <Icon
             width={SPACING.spacing24}
             height={SPACING.spacing24}

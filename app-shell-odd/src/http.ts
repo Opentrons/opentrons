@@ -78,7 +78,9 @@ export function fetchToFile(
         // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
         if (error) {
           // if we error out, delete the temp dir to clean up
-          return remove(destination).then(() => reject(error))
+          return remove(destination).then(() => {
+            reject(error)
+          })
         }
         resolve(destination)
       })

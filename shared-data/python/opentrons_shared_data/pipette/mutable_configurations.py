@@ -52,18 +52,17 @@ def _edit_non_quirk(
             thiskey = LiquidClasses[thiskey]
         if len(keypath) > 1:
             restkeys = keypath[1:]
-            if thiskey == "##EACHTIP##":
+            if thiskey == "##EACHNOZZLEMAP##":
+                for key in existing.keys():
+                    _do_edit_non_quirk(new_value, existing[key], restkeys)
+            elif thiskey == "##EACHTIPTYPE##":
                 for key in existing.keys():
                     _do_edit_non_quirk(new_value, existing[key], restkeys)
             else:
                 _do_edit_non_quirk(new_value, existing[thiskey], restkeys)
         else:
             # This was the last key
-            if thiskey == "##EACHTIP##":
-                for key in existing.keys():
-                    existing[key] = new_value.value
-            else:
-                existing[thiskey] = new_value.value
+            existing[thiskey] = new_value.value
 
     new_names = _MAP_KEY_TO_V2[mutable_config_key]
     _do_edit_non_quirk(new_mutable_value, base_dict, new_names)
@@ -155,10 +154,12 @@ def _list_all_mutable_configs(
     return default_configurations
 
 
-def _get_default_value_for(config: Dict[str, Any], keypath: List[str]) -> Any:
+def _get_default_value_for(  # noqa: C901
+    config: Dict[str, Any], keypath: List[str]
+) -> Any:
     def _do_get_default_value_for(
-        remaining_config: Dict[Any, Any], keypath: List[str]
-    ) -> Any:
+        remaining_config: Dict[Any, Any], keypath: List[Any]
+    ) -> None:
         first: Any = keypath[0]
         if first in [lc.name for lc in LiquidClasses]:
             first = LiquidClasses[first]
@@ -168,6 +169,13 @@ def _get_default_value_for(config: Dict[str, Any], keypath: List[str]) -> Any:
                 tip_list = list(remaining_config.keys())
                 tip_list.sort(key=lambda o: o.value if isinstance(o, Enum) else o)
                 return _do_get_default_value_for(remaining_config[tip_list[-1]], rest)
+            elif first == "##EACHNOZZLEMAP##":
+                map_list = list(remaining_config.keys())
+                return _do_get_default_value_for(remaining_config[map_list[-1]], rest)
+            elif first == "##EACHTIPTYPE##":
+                for key in remaining_config.keys():
+                    if key == "default":
+                        return _do_get_default_value_for(remaining_config[key], rest)
             else:
                 return _do_get_default_value_for(remaining_config[first], rest)
         else:
@@ -175,12 +183,7 @@ def _get_default_value_for(config: Dict[str, Any], keypath: List[str]) -> Any:
                 tip_list = list(remaining_config.keys())
                 tip_list.sort(key=lambda o: o.value if isinstance(o, Enum) else o)
                 return remaining_config[tip_list[-1]]
-            elif first == "currentByTipCount":
-                # return the value for the most tips at a time
-                cbt = remaining_config[first]
-                return cbt[next(reversed(sorted(cbt.keys())))]
-            else:
-                return remaining_config[first]
+            return remaining_config[first]
 
     return _do_get_default_value_for(config, keypath)
 

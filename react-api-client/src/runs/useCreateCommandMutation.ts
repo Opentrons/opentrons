@@ -39,11 +39,9 @@ export function useCreateCommandMutation(): UseCreateCommandMutationResult {
       return createCommand(host as HostConfig, runId, command, {
         ...rest,
       }).then(response => {
-        queryClient
-          .invalidateQueries([host, 'runs'])
-          .catch((e: Error) =>
-            console.error(`error invalidating runs query: ${e.message}`)
-          )
+        queryClient.invalidateQueries([host, 'runs']).catch((e: Error) => {
+          console.error(`error invalidating runs query: ${e.message}`)
+        })
         return response.data
       })
     }

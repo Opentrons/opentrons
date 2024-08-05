@@ -19,7 +19,7 @@ import { ProtocolRunSetup } from '../../../../organisms/Devices/ProtocolRun/Prot
 import { RunPreviewComponent } from '../../../../organisms/RunPreview'
 import { ProtocolRunRuntimeParameters } from '../../../../organisms/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
 import { useCurrentRunId } from '../../../../organisms/ProtocolUpload/hooks'
-import { mockRobotSideAnalysis } from '../../../../organisms/CommandText/__fixtures__'
+import { mockRobotSideAnalysis } from '../../../../molecules/Command/__fixtures__'
 import { useFeatureFlag } from '../../../../redux/config'
 import { ProtocolRunDetails } from '..'
 

@@ -26,7 +26,7 @@ export function initializeMixpanel(
   config: AnalyticsConfig,
   isOnDevice: boolean | null
 ): void {
-  if (MIXPANEL_ID) {
+  if (MIXPANEL_ID != null) {
     initMixpanelInstanceOnce(config)
     setMixpanelTracking(config, isOnDevice)
     trackEvent({ name: 'appOpen', properties: {} }, config)
@@ -42,10 +42,10 @@ export function trackEvent(
   const { optedIn } = config
 
   log.debug('Trackable event', { event, optedIn })
-  if (MIXPANEL_ID && optedIn) {
-    if (event.superProperties) mixpanel.register(event.superProperties)
-    // @ts-expect-error TODO protect for no name on event and add test case
-    if (event.name) mixpanel.track(event.name, event.properties)
+  if (MIXPANEL_ID != null && optedIn) {
+    if (event.superProperties != null) mixpanel.register(event.superProperties)
+    if ('name' in event && event.name != null)
+      mixpanel.track(event.name, event.properties)
   }
 }
 
@@ -53,7 +53,7 @@ export function setMixpanelTracking(
   config: AnalyticsConfig,
   isOnDevice: boolean | null
 ): void {
-  if (MIXPANEL_ID) {
+  if (MIXPANEL_ID != null) {
     initMixpanelInstanceOnce(config)
     if (config.optedIn) {
       log.debug('User has opted into analytics; tracking with Mixpanel')
@@ -62,7 +62,7 @@ export function setMixpanelTracking(
       mixpanel.register({
         appVersion: CURRENT_VERSION,
         appId: config.appId,
-        appMode: isOnDevice ? 'ODD' : 'Desktop',
+        appMode: Boolean(isOnDevice) ? 'ODD' : 'Desktop',
       })
     } else {
       log.debug('User has opted out of analytics; stopping tracking')
@@ -78,10 +78,10 @@ function initializeMixpanelInstanceOnce(
   let hasBeenInitialized = false
 
   return function (config: AnalyticsConfig): undefined {
-    if (!hasBeenInitialized && MIXPANEL_ID) {
+    if (!hasBeenInitialized && MIXPANEL_ID != null) {
       hasBeenInitialized = true
       log.debug('Initializing Mixpanel', { config })
-      return mixpanel.init(MIXPANEL_ID, MIXPANEL_OPTS)
+      mixpanel.init(MIXPANEL_ID, MIXPANEL_OPTS)
     }
   }
 }
