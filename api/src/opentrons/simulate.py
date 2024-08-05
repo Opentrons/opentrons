@@ -242,28 +242,31 @@ def get_protocol_api(
         >>> instr.home()
 
     :param version: The API version to use. This must be lower than
-                    ``opentrons.protocol_api.MAX_SUPPORTED_VERSION``.
-                    It may be specified either as a string (``'2.0'``) or
-                    as a ``protocols.types.APIVersion``
-                    (``APIVersion(2, 0)``).
+        ``opentrons.protocol_api.MAX_SUPPORTED_VERSION``.
+        It may be specified either as a string (``'2.0'``) or
+        as a ``protocols.types.APIVersion``
+        (``APIVersion(2, 0)``).
     :param bundled_labware: If specified, a mapping from labware names to
-                            labware definitions for labware to consider in the
-                            protocol. Note that if you specify this, _only_
-                            labware in this argument will be allowed in the
-                            protocol. This is preparation for a beta feature
-                            and is best not used.
+        labware definitions for labware to consider in the
+        protocol. Note that if you specify this, _only_
+        labware in this argument will be allowed in the
+        protocol. This is preparation for a beta feature
+        and is best not used.
     :param bundled_data: If specified, a mapping from filenames to contents
-                         for data to be available in the protocol from
-                         :py:obj:`opentrons.protocol_api.ProtocolContext.bundled_data`.
+        for data to be available in the protocol from
+        :py:obj:`opentrons.protocol_api.ProtocolContext.bundled_data`.
     :param extra_labware: A mapping from labware load names to custom labware definitions.
-                          If this is ``None`` (the default), and this function is called on a robot,
-                          it will look for labware in the ``labware`` subdirectory of the Jupyter
-                          data directory.
-    :param hardware_simulator: If specified, a hardware simulator instance.
+        If this is ``None`` (the default), and this function is called on a robot,
+        it will look for labware in the ``labware`` subdirectory of the Jupyter
+        data directory.
+    :param hardware_simulator: This is only for internal use by Opentrons. If specified,
+        it's a hardware simulator instance to reuse instead of creating a fresh one.
     :param robot_type: The type of robot to simulate: either ``"Flex"`` or ``"OT-2"``.
-                       If you're running this function on a robot, the default is the type of that
-                       robot. Otherwise, the default is ``"OT-2"``, for backwards compatibility.
-    :param use_virtual_hardware: If true, use the protocol engines virtual hardware, if false use the lower level hardware simulator.
+        If you're running this function on a robot, the default is the type of that
+        robot. Otherwise, the default is ``"OT-2"``, for backwards compatibility.
+    :param use_virtual_hardware: This is only for internal use by Opentrons.
+        If ``True``, use the Protocol Engine's virtual hardware. If ``False``, use the
+        lower level hardware simulator.
     :return: The protocol context.
     """
     if isinstance(version, str):
@@ -321,7 +324,7 @@ def get_protocol_api(
             hardware_api=checked_hardware,
             bundled_data=bundled_data,
             extra_labware=extra_labware,
-            use_virtual_hardware=use_virtual_hardware,
+            use_pe_virtual_hardware=use_virtual_hardware,
         )
 
     # Intentional difference from execute.get_protocol_api():
@@ -794,7 +797,7 @@ def _create_live_context_pe(
     deck_type: str,
     extra_labware: Dict[str, "LabwareDefinitionDict"],
     bundled_data: Optional[Dict[str, bytes]],
-    use_virtual_hardware: bool = True,
+    use_pe_virtual_hardware: bool = True,
 ) -> ProtocolContext:
     """Return a live ProtocolContext that controls the robot through ProtocolEngine."""
     assert api_version >= ENGINE_CORE_API_VERSION
@@ -804,7 +807,7 @@ def _create_live_context_pe(
         create_protocol_engine_in_thread(
             hardware_api=hardware_api_wrapped,
             config=_get_protocol_engine_config(
-                robot_type, virtual=use_virtual_hardware
+                robot_type, use_pe_virtual_hardware=use_pe_virtual_hardware
             ),
             error_recovery_policy=error_recovery_policy.never_recover,
             drop_tips_after_run=False,
@@ -910,7 +913,9 @@ def _run_file_pe(
         hardware_api_wrapped = hardware_api.wrapped()
         protocol_engine = await create_protocol_engine(
             hardware_api=hardware_api_wrapped,
-            config=_get_protocol_engine_config(robot_type, virtual=True),
+            config=_get_protocol_engine_config(
+                robot_type, use_pe_virtual_hardware=True
+            ),
             error_recovery_policy=error_recovery_policy.never_recover,
             load_fixed_trash=should_load_fixed_trash(protocol_source.config),
         )
@@ -961,15 +966,17 @@ def _run_file_pe(
         return asyncio.run(run(protocol_source))
 
 
-def _get_protocol_engine_config(robot_type: RobotType, virtual: bool) -> Config:
+def _get_protocol_engine_config(
+    robot_type: RobotType, use_pe_virtual_hardware: bool
+) -> Config:
     """Return a Protocol Engine config to execute protocols on this device."""
     return Config(
         robot_type=robot_type,
         deck_type=DeckType(deck_type_for_simulation(robot_type)),
         ignore_pause=True,
-        use_virtual_pipettes=virtual,
-        use_virtual_modules=virtual,
-        use_virtual_gripper=virtual,
+        use_virtual_pipettes=use_pe_virtual_hardware,
+        use_virtual_modules=use_pe_virtual_hardware,
+        use_virtual_gripper=use_pe_virtual_hardware,
         use_simulated_deck_config=True,
     )
 
