@@ -8,8 +8,8 @@ import type { IconProps } from '../icons'
 import type { StyleProps } from '../primitives'
 
 type ModalType = 'info' | 'warning' | 'error'
-// modal components
 
+// modal components
 export * from './AlertModal'
 export * from './ContinueModal'
 export * from './LegacyModal'
@@ -31,7 +31,7 @@ export interface ModalProps extends StyleProps {
 }
 
 /**
- * For Desktop app and web application use only.
+ * For Desktop app and Helix (which includes Protocol Designer) use only.
  */
 export const Modal = (props: ModalProps): JSX.Element => {
   const {

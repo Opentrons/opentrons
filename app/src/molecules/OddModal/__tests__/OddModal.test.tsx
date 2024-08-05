@@ -13,7 +13,7 @@ const render = (props: React.ComponentProps<typeof OddModal>) => {
   return renderWithProviders(<OddModal {...props} />)[0]
 }
 
-describe('Modal', () => {
+describe('OddModal', () => {
   let props: React.ComponentProps<typeof OddModal>
   beforeEach(() => {
     props = {
