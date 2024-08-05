@@ -1,15 +1,15 @@
 import * as React from 'react'
-import { Modal } from './index'
 
-import { LegacyStyledText } from '../../atoms'
-import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
-import { PrimaryBtn } from '../../primitives'
-import { COLORS } from '../../helix-design-system'
+import { LegacyStyledText } from '../atoms'
+import { SPACING, TYPOGRAPHY } from '../ui-style-constants'
+import { PrimaryBtn } from '../primitives'
+import { COLORS } from '../helix-design-system'
+import { Modal } from './index'
 
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'Components/modals/Modal',
+  title: 'Library/Molecules/modals/Modal',
   component: Modal,
 } as Meta
 
@@ -18,13 +18,13 @@ const Template: Story<React.ComponentProps<typeof Modal>> = args => (
 )
 
 const Children = (
-  <React.Fragment>
+  <>
     <LegacyStyledText
       fontWeight={TYPOGRAPHY.fontWeightSemiBold}
       fontSize={TYPOGRAPHY.fontSizeP}
       paddingTop={SPACING.spacing4}
     >
-      {'LegacyModal body goes here'}
+      {'Modal body goes here'}
     </LegacyStyledText>
 
     <PrimaryBtn
@@ -39,7 +39,7 @@ const Children = (
         {'btn text'}
       </LegacyStyledText>
     </PrimaryBtn>
-  </React.Fragment>
+  </>
 )
 
 export const Primary = Template.bind({})
