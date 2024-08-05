@@ -71,11 +71,12 @@ export function useCreateRunFromProtocol(
     reset: resetProtocolMutation,
   } = useCreateProtocolMutation(
     {
-      onSuccess: (data, { runTimeParameterValues }) => {
+      onSuccess: (data, { runTimeParameterValues, runTimeParameterFiles }) => {
         createRun({
           protocolId: data.data.id,
           labwareOffsets,
           runTimeParameterValues,
+          runTimeParameterFiles,
         })
       },
     },

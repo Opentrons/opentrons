@@ -391,13 +391,15 @@ class JsonRunner(AbstractRunner):
                 )
             )
             if executed_command.error is not None:
-                error_was_recovered_from = (
+                error_recovery_type = (
                     self._protocol_engine.state_view.commands.get_error_recovery_type(
                         executed_command.id
                     )
-                    == ErrorRecoveryType.WAIT_FOR_RECOVERY
                 )
-                if not error_was_recovered_from:
+                error_should_fail_run = (
+                    error_recovery_type == ErrorRecoveryType.FAIL_RUN
+                )
+                if error_should_fail_run:
                     raise ProtocolCommandFailedError(
                         original_error=executed_command.error,
                         message=f"{executed_command.error.errorType}: {executed_command.error.detail}",

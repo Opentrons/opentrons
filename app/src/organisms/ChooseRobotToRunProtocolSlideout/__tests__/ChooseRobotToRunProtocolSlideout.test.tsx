@@ -38,6 +38,7 @@ import type { State } from '../../../redux/types'
 vi.mock('../../../organisms/Devices/hooks')
 vi.mock('../../../organisms/ProtocolUpload/hooks')
 vi.mock('../../../organisms/RunTimeControl/hooks')
+vi.mock('../../../redux/config')
 vi.mock('../../../redux/discovery')
 vi.mock('../../../redux/robot-update')
 vi.mock('../../../redux/networking')
@@ -190,6 +191,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
       { ...mockConnectableRobot, name: 'otherRobot', ip: 'otherIp' },
       mockConnectableRobot,
     ])
+
     provideNullCurrentRunIdFor('otherIp')
     render({
       storedProtocolData: storedProtocolDataFixture,
@@ -213,6 +215,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
         files: [expect.any(File)],
         protocolKey: storedProtocolDataFixture.protocolKey,
         runTimeParameterValues: expect.any(Object),
+        runTimeParameterFiles: expect.any(Object),
       })
     )
     expect(mockTrackCreateProtocolRunEvent).toHaveBeenCalled()
@@ -262,6 +265,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
         files: [expect.any(File)],
         protocolKey: storedProtocolDataFixture.protocolKey,
         runTimeParameterValues: expect.any(Object),
+        runTimeParameterFiles: expect.any(Object),
       })
     )
     expect(mockTrackCreateProtocolRunEvent).toHaveBeenCalled()
@@ -295,6 +299,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
         files: [expect.any(File)],
         protocolKey: storedProtocolDataFixture.protocolKey,
         runTimeParameterValues: expect.any(Object),
+        runTimeParameterFiles: expect.any(Object),
       })
     )
     expect(mockTrackCreateProtocolRunEvent).toHaveBeenCalled()
@@ -348,6 +353,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
         files: [expect.any(File)],
         protocolKey: storedProtocolDataFixture.protocolKey,
         runTimeParameterValues: expect.any(Object),
+        runTimeParameterFiles: expect.any(Object),
       })
     })
   })

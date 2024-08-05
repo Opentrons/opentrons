@@ -8,6 +8,8 @@ from typing import List, NamedTuple, Set
 from robot_server.deletion_planner import (
     ProtocolDeletionPlanner,
     RunDeletionPlanner,
+    DataFileDeletionPlanner,
+    FileUsageInfo,
 )
 
 
@@ -128,4 +130,58 @@ def test_plan_for_new_run(
     """It should return a plan that leaves at least one slot open for a new run."""
     subject = RunDeletionPlanner(maximum_runs=maximum_runs)
     result = subject.plan_for_new_run(existing_runs=existing_runs)
+    assert result == expected_deletion_plan
+
+
+class _FileDeletionTestSpec(NamedTuple):
+    """Input and expected output for a single file deletion."""
+
+    maximum_files: int
+    existing_files: List[FileUsageInfo]
+    expected_deletion_plan: Set[str]
+
+
+_file_deletion_test_specs = [
+    _FileDeletionTestSpec(
+        maximum_files=3,
+        existing_files=[
+            FileUsageInfo(file_id="f-1-unused", used_by_run_or_analysis=False),
+            FileUsageInfo(file_id="f-2-used", used_by_run_or_analysis=True),
+            FileUsageInfo(file_id="f-3-unused", used_by_run_or_analysis=False),
+            FileUsageInfo(file_id="f-4-used", used_by_run_or_analysis=True),
+            FileUsageInfo(file_id="f-5-unused", used_by_run_or_analysis=False),
+        ],
+        expected_deletion_plan={"f-1-unused", "f-3-unused", "f-5-unused"},
+    ),
+    _FileDeletionTestSpec(
+        maximum_files=3,
+        existing_files=[
+            FileUsageInfo(file_id="f-1-used", used_by_run_or_analysis=True),
+            FileUsageInfo(file_id="f-2-used", used_by_run_or_analysis=True),
+            FileUsageInfo(file_id="f-3-used", used_by_run_or_analysis=True),
+            FileUsageInfo(file_id="f-4-used", used_by_run_or_analysis=True),
+        ],
+        expected_deletion_plan=set(),
+    ),
+    _FileDeletionTestSpec(
+        maximum_files=3,
+        existing_files=[
+            FileUsageInfo(file_id="f-1-used", used_by_run_or_analysis=True),
+            FileUsageInfo(file_id="f-2-unused", used_by_run_or_analysis=False),
+            FileUsageInfo(file_id="f-3-used", used_by_run_or_analysis=True),
+        ],
+        expected_deletion_plan={"f-2-unused"},
+    ),
+]
+
+
+@pytest.mark.parametrize(_FileDeletionTestSpec._fields, _file_deletion_test_specs)
+def test_plan_for_new_data_file(
+    maximum_files: int,
+    existing_files: List[FileUsageInfo],
+    expected_deletion_plan: Set[str],
+) -> None:
+    """It should return a plan that leaves at least one slot open for a new data file."""
+    subject = DataFileDeletionPlanner(maximum_files=maximum_files)
+    result = subject.plan_for_new_file(existing_files=existing_files)
     assert result == expected_deletion_plan
