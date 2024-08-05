@@ -1,7 +1,6 @@
 """Tests for the CSV Parameter Definitions."""
 import inspect
-import tempfile
-from io import TextIOWrapper
+from pathlib import Path
 
 import pytest
 from decoy import Decoy
@@ -55,12 +54,9 @@ def test_create_csv_parameter(decoy: Decoy) -> None:
 def test_set_csv_value(
     decoy: Decoy, csv_parameter_subject: CSVParameterDefinition
 ) -> None:
-    """It should set the CSV parameter value to a file."""
-    mock_file = decoy.mock(cls=TextIOWrapper)
-    decoy.when(mock_file.name).then_return("mock.csv")
-
-    csv_parameter_subject.value = mock_file
-    assert csv_parameter_subject.value is mock_file
+    """It should set the CSV parameter value to a path."""
+    csv_parameter_subject.value = Path("123")
+    assert csv_parameter_subject.value == Path("123")
 
 
 def test_csv_parameter_as_protocol_engine_type(
@@ -93,7 +89,6 @@ def test_csv_parameter_as_csv_parameter_interface(
     with pytest.raises(RuntimeParameterRequired):
         result.file
 
-    mock_file = tempfile.NamedTemporaryFile(mode="r", suffix=".csv")
-    csv_parameter_subject.value = mock_file  # type: ignore[assignment]
+    csv_parameter_subject.value = Path("abc")
     result = csv_parameter_subject.as_csv_parameter_interface()
-    assert result.file is mock_file  # type: ignore[comparison-overlap]
+    assert result._path == Path("abc")

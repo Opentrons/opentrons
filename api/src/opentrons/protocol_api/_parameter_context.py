@@ -1,5 +1,4 @@
 """Parameter context for python protocols."""
-import tempfile
 from typing import List, Optional, Union, Dict
 
 from opentrons.protocols.api_support.types import APIVersion
@@ -240,41 +239,13 @@ class ParameterContext:
                     f"File Id was provided for the parameter '{variable_name}',"
                     f" but '{variable_name}' is not a CSV parameter."
                 )
-            # TODO(jbl 2024-08-02) This file opening should be moved elsewhere to provide more flexibility with files
-            #    that may be opened as non-text or non-UTF-8
+
             # The parent folder in the path will be the file ID, so we can use that to resolve that here
             file_id = file_path.parent.name
             file_name = file_path.name
 
-            # Read the contents of the actual file
-            with file_path.open() as csv_file:
-                contents = csv_file.read()
-
-            # Open a temporary file with write permissions and write contents to that
-            temporary_file = tempfile.NamedTemporaryFile("r+")
-            temporary_file.write(contents)
-            temporary_file.flush()
-
-            # Open a new file handler for the temporary file with read-only permissions and close the other
-            parameter_file = open(temporary_file.name, "r")
-            temporary_file.close()
-
             parameter.file_info = FileInfo(id=file_id, name=file_name)
-            parameter.value = parameter_file
-
-    def close_csv_files(self) -> None:
-        """Close all file handlers for CSV parameters.
-
-        :meta private:
-
-        This is intended for Opentrons internal use only and is not a guaranteed API.
-        """
-        for parameter in self._parameters.values():
-            if (
-                isinstance(parameter, csv_parameter_definition.CSVParameterDefinition)
-                and parameter.value is not None
-            ):
-                parameter.value.close()
+            parameter.value = file_path
 
     def export_parameters_for_analysis(self) -> List[RunTimeParameter]:
         """Exports all parameters into a protocol engine models for reporting in analysis.
