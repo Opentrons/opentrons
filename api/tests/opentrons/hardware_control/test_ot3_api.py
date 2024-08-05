@@ -927,8 +927,6 @@ async def test_liquid_probe_plunger_moves(
             Point(x=0, y=0, z=46.45),
             Point(x=0, y=0, z=28.6),
             Point(x=0, y=0, z=25),
-            Point(x=0, y=0, z=76),
-            Point(x=0, y=0, z=72),
         ]
         probe_start_pos = await ot3_hardware.gantry_position(mount)
         safe_plunger_pos = Point(
