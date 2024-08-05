@@ -20,16 +20,19 @@ import { SmallButton, TextOnlyButton } from '../../../atoms/buttons'
 
 interface RecoveryFooterButtonProps {
   primaryBtnOnClick: () => void
-  /* The "Go back" button */
-  secondaryBtnOnClick?: () => void
   primaryBtnTextOverride?: string
   primaryBtnDisabled?: boolean
   /* If true, render pressed state and a spinner icon for the primary button. */
   isLoadingPrimaryBtnAction?: boolean
+  /* Typically the "Go back" button */
+  secondaryBtnOnClick?: () => void
+  secondaryBtnTextOverride?: string
   /* To the left of the primary button. */
   tertiaryBtnOnClick?: () => void
   tertiaryBtnText?: string
   tertiaryBtnDisabled?: boolean
+  /* Use the style of the secondary button in the position typically used by the tertiary button. */
+  secondaryAsTertiary?: boolean
 }
 export function RecoveryFooterButtons(
   props: RecoveryFooterButtonProps
@@ -42,20 +45,24 @@ export function RecoveryFooterButtons(
       alignItems={ALIGN_FLEX_END}
       gridGap={SPACING.spacing8}
     >
-      <RecoveryGoBackButton {...props} />
+      {!props.secondaryAsTertiary && <RecoveryGoBackButton {...props} />}
       <PrimaryButtonGroup {...props} />
     </Flex>
   )
 }
 
 function RecoveryGoBackButton({
+  secondaryBtnTextOverride,
   secondaryBtnOnClick,
 }: RecoveryFooterButtonProps): JSX.Element | null {
   const showGoBackBtn = secondaryBtnOnClick != null
   const { t } = useTranslation('error_recovery')
   return showGoBackBtn ? (
     <Flex>
-      <TextOnlyButton onClick={secondaryBtnOnClick} buttonText={t('go_back')} />
+      <TextOnlyButton
+        onClick={secondaryBtnOnClick}
+        buttonText={secondaryBtnTextOverride ?? t('go_back')}
+      />
     </Flex>
   ) : (
     <Box />
@@ -63,10 +70,17 @@ function RecoveryGoBackButton({
 }
 
 function PrimaryButtonGroup(props: RecoveryFooterButtonProps): JSX.Element {
-  const { tertiaryBtnOnClick, tertiaryBtnText } = props
+  const {
+    tertiaryBtnOnClick,
+    tertiaryBtnText,
+    secondaryAsTertiary,
+    secondaryBtnOnClick,
+  } = props
 
   const renderTertiaryBtn =
-    tertiaryBtnOnClick != null || tertiaryBtnText != null
+    tertiaryBtnOnClick != null ||
+    tertiaryBtnText != null ||
+    (secondaryBtnOnClick != null && secondaryAsTertiary)
 
   if (!renderTertiaryBtn) {
     return (
@@ -76,8 +90,15 @@ function PrimaryButtonGroup(props: RecoveryFooterButtonProps): JSX.Element {
     )
   } else {
     return (
-      <Flex gridGap={SPACING.spacing8}>
-        <RecoveryTertiaryBtn {...props} />
+      <Flex
+        gridGap={secondaryAsTertiary ? SPACING.spacing32 : SPACING.spacing8}
+        marginLeft={secondaryAsTertiary ? 'auto' : undefined}
+      >
+        {secondaryAsTertiary ? (
+          <RecoveryGoBackButton {...props} />
+        ) : (
+          <RecoveryTertiaryBtn {...props} />
+        )}
         <RecoveryPrimaryBtn {...props} />
       </Flex>
     )

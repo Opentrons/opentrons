@@ -4,6 +4,7 @@ import head from 'lodash/head'
 import {
   useResumeRunFromRecoveryMutation,
   useStopRunMutation,
+  useUpdateErrorRecoveryPolicy,
 } from '@opentrons/react-api-client'
 
 import { useChainRunCommands } from '../../../resources/runs'
@@ -19,7 +20,10 @@ import type {
   DropTipInPlaceRunTimeCommand,
   PrepareToAspirateRunTimeCommand,
 } from '@opentrons/shared-data'
-import type { CommandData } from '@opentrons/api-client'
+import type {
+  CommandData,
+  RecoveryPolicyRulesParams,
+} from '@opentrons/api-client'
 import type { WellGroup } from '@opentrons/components'
 import type { FailedCommand } from '../types'
 import type { UseFailedLabwareUtilsResult } from './useFailedLabwareUtils'
@@ -71,6 +75,7 @@ export function useRecoveryCommands({
     mutateAsync: resumeRunFromRecovery,
   } = useResumeRunFromRecoveryMutation()
   const { stopRun } = useStopRunMutation()
+  const { updateErrorRecoveryPolicy } = useUpdateErrorRecoveryPolicy(runId)
   const { makeSuccessToast } = recoveryToastUtils
 
   const buildRetryPrepMove = (): MoveToCoordinatesCreateCommand | null => {
@@ -184,9 +189,20 @@ export function useRecoveryCommands({
   }, [runId, resumeRunFromRecovery, makeSuccessToast])
 
   const ignoreErrorKindThisRun = React.useCallback((): Promise<void> => {
-    console.log('IGNORING ALL ERRORS OF THIS KIND THIS RUN')
-    return Promise.resolve()
-  }, [])
+    if (failedCommand?.error != null) {
+      const ignorePolicyRules = buildIgnorePolicyRules(
+        failedCommand.commandType,
+        failedCommand.error.errorType
+      )
+
+      updateErrorRecoveryPolicy(ignorePolicyRules)
+      return Promise.resolve()
+    } else {
+      return Promise.reject(
+        new Error('Could not execute command. No failed command.')
+      )
+    }
+  }, [failedCommand?.error?.errorType, failedCommand?.commandType])
 
   return {
     resumeRun,
@@ -229,4 +245,17 @@ export const buildPickUpTips = (
       },
     }
   }
+}
+
+export const buildIgnorePolicyRules = (
+  commandType: FailedCommand['commandType'],
+  errorType: string
+): RecoveryPolicyRulesParams => {
+  return [
+    {
+      commandType,
+      errorType,
+      ifMatch: 'ignoreAndContinue',
+    },
+  ]
 }

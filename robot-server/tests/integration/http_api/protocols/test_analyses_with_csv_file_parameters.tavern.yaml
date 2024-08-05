@@ -98,7 +98,7 @@ stages:
                   description: A CSV file that contains wells to use for pipetting
                   file:
                     id: '{csv_file_id}'
-                    name: ''
+                    name: 'sample_record.csv'
 
   - name: Wait until analysis is completed
     max_retries: 5

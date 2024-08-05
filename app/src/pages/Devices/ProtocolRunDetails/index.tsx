@@ -2,7 +2,7 @@ import * as React from 'react'
 import isEmpty from 'lodash/isEmpty'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
-import { NavLink, Navigate, useParams } from 'react-router-dom'
+import { NavLink, Navigate, useParams, useNavigate } from 'react-router-dom'
 import styled, { css } from 'styled-components'
 
 import {
@@ -11,11 +11,10 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  LegacyStyledText,
   OVERFLOW_SCROLL,
   POSITION_RELATIVE,
-  SIZE_6,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
@@ -33,7 +32,7 @@ import { RunPreview } from '../../../organisms/RunPreview'
 import { ProtocolRunSetup } from '../../../organisms/Devices/ProtocolRun/ProtocolRunSetup'
 import { ProtocolRunModuleControls } from '../../../organisms/Devices/ProtocolRun/ProtocolRunModuleControls'
 import { ProtocolRunRuntimeParameters } from '../../../organisms/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
-import { useCurrentRunId } from '../../../organisms/ProtocolUpload/hooks'
+import { useCurrentRunId } from '../../../resources/runs'
 import { OPENTRONS_USB } from '../../../redux/discovery'
 import { fetchProtocols } from '../../../redux/protocol-storage'
 import { appShellRequestor } from '../../../redux/shell/remote'
@@ -144,7 +143,7 @@ export function ProtocolRunDetails(): JSX.Element | null {
       robotName={robot.name}
     >
       <Box
-        minWidth={SIZE_6}
+        minWidth="32rem"
         height="100%"
         overflow={OVERFLOW_SCROLL}
         padding={SPACING.spacing16}
@@ -235,9 +234,21 @@ function PageContents(props: PageContentsProps): JSX.Element {
         makeHandleJumpToStep={makeHandleJumpToStep}
       />
       <Flex gridGap={SPACING.spacing8} marginBottom={SPACING.spacing12}>
-        <SetupTab robotName={robotName} runId={runId} />
-        <ParametersTab robotName={robotName} runId={runId} />
-        <ModuleControlsTab robotName={robotName} runId={runId} />
+        <SetupTab
+          robotName={robotName}
+          runId={runId}
+          protocolRunDetailsTab={protocolRunDetailsTab}
+        />
+        <ParametersTab
+          robotName={robotName}
+          runId={runId}
+          protocolRunDetailsTab={protocolRunDetailsTab}
+        />
+        <ModuleControlsTab
+          robotName={robotName}
+          runId={runId}
+          protocolRunDetailsTab={protocolRunDetailsTab}
+        />
         <RunPreviewTab robotName={robotName} runId={runId} />
       </Flex>
       <Box
@@ -254,79 +265,82 @@ function PageContents(props: PageContentsProps): JSX.Element {
 interface SetupTabProps {
   robotName: string
   runId: string
+  protocolRunDetailsTab?: ProtocolRunDetailsTab
 }
 
 const SetupTab = (props: SetupTabProps): JSX.Element | null => {
-  const { robotName, runId } = props
+  const { robotName, runId, protocolRunDetailsTab } = props
   const { t } = useTranslation('run_details')
   const currentRunId = useCurrentRunId()
+  const navigate = useNavigate()
 
   const disabled = currentRunId !== runId
   const tabDisabledReason = `${t('setup')} ${t(
     'not_available_for_a_completed_run'
   )}`
 
+  React.useEffect(() => {
+    if (disabled && protocolRunDetailsTab === 'setup')
+      navigate(`/devices/${robotName}/protocol-runs/${runId}/run-preview`)
+  }, [disabled, navigate, robotName, runId])
+
   return (
-    <>
-      <RoundTab
-        disabled={disabled}
-        tabDisabledReason={tabDisabledReason}
-        to={`/devices/${robotName}/protocol-runs/${runId}/setup`}
-        tabName={t('setup')}
-      />
-      {currentRunId !== runId ? (
-        // redirect to run preview if not current run
-        <Navigate
-          to={`/devices/${robotName}/protocol-runs/${runId}/run-preview`}
-        />
-      ) : null}
-    </>
+    <RoundTab
+      disabled={disabled}
+      tabDisabledReason={tabDisabledReason}
+      to={`/devices/${robotName}/protocol-runs/${runId}/setup`}
+      tabName={t('setup')}
+    />
   )
 }
 
 interface ParametersTabProps {
   robotName: string
   runId: string
+  protocolRunDetailsTab: ProtocolRunDetailsTab
 }
 
 const ParametersTab = (props: ParametersTabProps): JSX.Element | null => {
-  const { robotName, runId } = props
+  const { robotName, runId, protocolRunDetailsTab } = props
   const { t } = useTranslation('run_details')
-  const disabled = false
-  const tabDisabledReason = ''
+  const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
+  const navigate = useNavigate()
+  const disabled = mostRecentAnalysis == null
+
+  React.useEffect(() => {
+    if (disabled && protocolRunDetailsTab === 'runtime-parameters') {
+      navigate(`/devices/${robotName}/protocol-runs/${runId}/run-preview`, {
+        replace: true,
+      })
+    }
+  }, [disabled, navigate, robotName, runId])
 
   return (
-    <>
-      <RoundTab
-        disabled={disabled}
-        tabDisabledReason={tabDisabledReason}
-        to={`/devices/${robotName}/protocol-runs/${runId}/runtime-parameters`}
-        tabName={t('parameters')}
-      />
-      {disabled ? (
-        <Navigate
-          to={`/devices/${robotName}/protocol-runs/${runId}/run-preview`}
-        />
-      ) : null}
-    </>
+    <RoundTab
+      disabled={disabled}
+      to={`/devices/${robotName}/protocol-runs/${runId}/runtime-parameters`}
+      tabName={t('parameters')}
+    />
   )
 }
 
 interface ModuleControlsTabProps {
   robotName: string
   runId: string
+  protocolRunDetailsTab: ProtocolRunDetailsTab
 }
 
 const ModuleControlsTab = (
   props: ModuleControlsTabProps
 ): JSX.Element | null => {
-  const { robotName, runId } = props
+  const { robotName, runId, protocolRunDetailsTab } = props
   const { t } = useTranslation('run_details')
   const currentRunId = useCurrentRunId()
   const moduleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById(
     runId
   )
   const { isRunStill } = useRunStatuses()
+  const navigate = useNavigate()
 
   const disabled = currentRunId !== runId || !isRunStill
   const tabDisabledReason = `${t('module_controls')} ${t(
@@ -335,22 +349,18 @@ const ModuleControlsTab = (
       : 'not_available_for_a_run_in_progress'
   )}`
 
-  return isEmpty(moduleRenderInfoForProtocolById) ? null : (
-    <>
-      <RoundTab
-        disabled={disabled}
-        tabDisabledReason={tabDisabledReason}
-        to={`/devices/${robotName}/protocol-runs/${runId}/module-controls`}
-        tabName={t('module_controls')}
-      />
-      {disabled ? (
-        // redirect to run preview if not current run
+  React.useEffect(() => {
+    if (disabled && protocolRunDetailsTab === 'module-controls')
+      navigate(`/devices/${robotName}/protocol-runs/${runId}/run-preview`)
+  }, [disabled, navigate, robotName, runId])
 
-        <Navigate
-          to={`/devices/${robotName}/protocol-runs/${runId}/run-preview`}
-        />
-      ) : null}
-    </>
+  return isEmpty(moduleRenderInfoForProtocolById) ? null : (
+    <RoundTab
+      disabled={disabled}
+      tabDisabledReason={tabDisabledReason}
+      to={`/devices/${robotName}/protocol-runs/${runId}/module-controls`}
+      tabName={t('module_controls')}
+    />
   )
 }
 

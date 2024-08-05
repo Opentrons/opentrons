@@ -22,7 +22,7 @@ import {
 
 import { Banner } from '../../atoms/Banner'
 import { PipetteRecalibrationWarning } from './PipetteCard/PipetteRecalibrationWarning'
-import { useCurrentRunId } from '../ProtocolUpload/hooks'
+import { useCurrentRunId } from '../../resources/runs'
 import { ModuleCard } from '../ModuleCard'
 import { useIsFlex, useIsRobotViewable, useRunStatuses } from './hooks'
 import { getShowPipetteCalibrationWarning } from './utils'

@@ -4,6 +4,7 @@ Contains routes dealing primarily with `Run` models.
 """
 import logging
 from datetime import datetime
+from pathlib import Path
 from textwrap import dedent
 from typing import Optional, Union, Callable
 from typing_extensions import Literal
@@ -12,7 +13,13 @@ from fastapi import APIRouter, Depends, status, Query
 from pydantic import BaseModel, Field
 
 from opentrons_shared_data.errors import ErrorCodes
+from opentrons.protocol_engine.types import CSVRuntimeParamPaths
 
+from robot_server.data_files.dependencies import (
+    get_data_files_directory,
+    get_data_files_store,
+)
+from robot_server.data_files.data_files_store import DataFilesStore
 from robot_server.errors.error_responses import ErrorDetails, ErrorBody
 from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.service.dependencies import get_current_time, get_unique_id
@@ -45,7 +52,7 @@ from ..dependencies import (
     get_run_auto_deleter,
     get_quick_transfer_run_auto_deleter,
 )
-from ..error_recovery_models import ErrorRecoveryPolicies
+from ..error_recovery_models import ErrorRecoveryPolicy
 
 from robot_server.deck_configuration.fastapi_dependencies import (
     get_deck_configuration_store,
@@ -149,6 +156,8 @@ async def create_run(
     quick_transfer_run_auto_deleter: RunAutoDeleter = Depends(
         get_quick_transfer_run_auto_deleter
     ),
+    data_files_directory: Path = Depends(get_data_files_directory),
+    data_files_store: DataFilesStore = Depends(get_data_files_store),
     check_estop: bool = Depends(require_estop_in_good_state),
     deck_configuration_store: DeckConfigurationStore = Depends(
         get_deck_configuration_store
@@ -166,6 +175,8 @@ async def create_run(
         run_auto_deleter: An interface to delete old resources to make room for
             the new run.
         quick_transfer_run_auto_deleter: An interface to delete old quick-transfer
+        data_files_directory: Persistence directory for data files.
+        data_files_store: Database of data file resources.
         resources to make room for the new run.
         check_estop: Dependency to verify the estop is in a valid state.
         deck_configuration_store: Dependency to fetch the deck configuration.
@@ -176,6 +187,18 @@ async def create_run(
     rtp_values = (
         request_body.data.runTimeParameterValues if request_body is not None else None
     )
+    rtp_files = (
+        request_body.data.runTimeParameterFiles if request_body is not None else None
+    )
+
+    rtp_paths: Optional[CSVRuntimeParamPaths] = None
+    # TODO(jbl 2024-08-02) raise the proper error if file ids don't exist
+    if rtp_files:
+        rtp_paths = {
+            name: data_files_directory / file_id / data_files_store.get(file_id).name
+            for name, file_id in rtp_files.items()
+        }
+
     protocol_resource = None
 
     deck_configuration = await deck_configuration_store.get_deck_configuration()
@@ -206,6 +229,7 @@ async def create_run(
             labware_offsets=offsets,
             deck_configuration=deck_configuration,
             run_time_param_values=rtp_values,
+            run_time_param_paths=rtp_paths,
             protocol=protocol_resource,
             notify_publishers=notify_publishers,
         )
@@ -367,7 +391,7 @@ async def update_run(
 
 @PydanticResponse.wrap_route(
     base_router.put,
-    path="/runs/{runId}/errorRecoveryPolicies",
+    path="/runs/{runId}/errorRecoveryPolicy",
     summary="Set run policies",
     description=dedent(
         """
@@ -381,9 +405,9 @@ async def update_run(
         status.HTTP_409_CONFLICT: {"model": ErrorBody[RunStopped]},
     },
 )
-async def set_run_policies(
+async def put_error_recovery_policy(
     runId: str,
-    request_body: RequestModel[ErrorRecoveryPolicies],
+    request_body: RequestModel[ErrorRecoveryPolicy],
     run_data_manager: RunDataManager = Depends(get_run_data_manager),
 ) -> PydanticResponse[SimpleEmptyBody]:
     """Create run polices.

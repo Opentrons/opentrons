@@ -25,3 +25,13 @@ class FileIdNotFoundError(GeneralError):
             message=f"Data file {data_file_id} was not found.",
             detail={"dataFileId": data_file_id},
         )
+
+
+class FileInUseError(GeneralError):
+    """Error raised when a file being removed is in use."""
+
+    def __init__(self, data_file_id: str, message: str) -> None:
+        super().__init__(
+            message=message,
+            detail={"dataFileId": data_file_id},
+        )

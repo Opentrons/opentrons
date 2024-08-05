@@ -12,7 +12,10 @@ from opentrons.protocol_engine import (
     CommandPointer,
     Command,
 )
-from opentrons.protocol_engine.types import PrimitiveRunTimeParamValuesType
+from opentrons.protocol_engine.types import (
+    PrimitiveRunTimeParamValuesType,
+    CSVRuntimeParamPaths,
+)
 
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.service.task_runner import TaskRunner
@@ -44,6 +47,7 @@ def _build_run(
             actions=run_resource.actions,
             status=state_summary.status,
             errors=state_summary.errors,
+            hasEverEnteredErrorRecovery=state_summary.hasEverEnteredErrorRecovery,
             labware=state_summary.labware,
             labwareOffsets=state_summary.labwareOffsets,
             pipettes=state_summary.pipettes,
@@ -65,6 +69,7 @@ def _build_run(
             pipettes=[],
             modules=[],
             liquids=[],
+            hasEverEnteredErrorRecovery=False,
         )
         errors.append(state_summary.dataError)
     else:
@@ -107,6 +112,7 @@ def _build_run(
         startedAt=state.startedAt,
         liquids=state.liquids,
         runTimeParameters=run_time_parameters,
+        hasEverEnteredErrorRecovery=state.hasEverEnteredErrorRecovery,
     )
 
 
@@ -153,6 +159,7 @@ class RunDataManager:
         labware_offsets: List[LabwareOffsetCreate],
         deck_configuration: DeckConfigurationType,
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType],
+        run_time_param_paths: Optional[CSVRuntimeParamPaths],
         notify_publishers: Callable[[], None],
         protocol: Optional[ProtocolResource],
     ) -> Union[Run, BadRun]:
@@ -165,6 +172,7 @@ class RunDataManager:
             deck_configuration: A mapping of fixtures to cutout fixtures the deck will be loaded with.
             notify_publishers: Utilized by the engine to notify publishers of state changes.
             run_time_param_values: Any runtime parameter values to set.
+            run_time_param_paths: Any runtime filepath to set.
             protocol: The protocol to load the runner with, if any.
 
         Returns:
@@ -189,6 +197,7 @@ class RunDataManager:
             deck_configuration=deck_configuration,
             protocol=protocol,
             run_time_param_values=run_time_param_values,
+            run_time_param_paths=run_time_param_paths,
             notify_publishers=notify_publishers,
         )
         run_resource = self._run_store.insert(
@@ -207,7 +216,7 @@ class RunDataManager:
             run_resource=run_resource,
             state_summary=state_summary,
             current=True,
-            run_time_parameters=[],
+            run_time_parameters=self._run_orchestrator_store.get_run_time_parameters(),
         )
 
     def get(self, run_id: str) -> Union[Run, BadRun]:

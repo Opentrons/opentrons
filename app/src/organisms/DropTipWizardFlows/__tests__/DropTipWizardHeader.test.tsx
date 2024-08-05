@@ -39,7 +39,7 @@ describe('useSeenBlowoutSuccess', () => {
   it('should not render step counter when currentRoute is BEFORE_BEGINNING', () => {
     const { result } = renderHook(() =>
       useSeenBlowoutSuccess({
-        currentStep: 'SOME_STEP',
+        currentStep: 'SOME_STEP' as any,
         currentRoute: DT_ROUTES.BEFORE_BEGINNING,
         currentStepIdx: 0,
       })

@@ -14,7 +14,6 @@ import {
   RUN_STATUS_SUCCEEDED,
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
   instrumentsResponseLeftPipetteFixture,
-  instrumentsResponseRightPipetteFixture,
 } from '@opentrons/api-client'
 import {
   useHost,
@@ -34,10 +33,7 @@ import {
 
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
-import {
-  useCloseCurrentRun,
-  useCurrentRunId,
-} from '../../../../organisms/ProtocolUpload/hooks'
+import { useCloseCurrentRun } from '../../../../organisms/ProtocolUpload/hooks'
 import { ConfirmCancelModal } from '../../../../organisms/RunDetails/ConfirmCancelModal'
 import {
   useRunTimestamps,
@@ -87,15 +83,20 @@ import { getIsFixtureMismatch } from '../../../../resources/deck_configuration/u
 import { useDeckConfigurationCompatibility } from '../../../../resources/deck_configuration/hooks'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useMostRecentRunId } from '../../../ProtocolUpload/hooks/useMostRecentRunId'
-import { useNotifyRunQuery } from '../../../../resources/runs'
+import { useNotifyRunQuery, useCurrentRunId } from '../../../../resources/runs'
 import {
   useDropTipWizardFlows,
   useTipAttachmentStatus,
+  DropTipWizardFlows,
 } from '../../../DropTipWizardFlows'
 import {
   useErrorRecoveryFlows,
   ErrorRecoveryFlows,
 } from '../../../ErrorRecoveryFlows'
+import {
+  ProtocolDropTipModal,
+  useProtocolDropTipModal,
+} from '../ProtocolDropTipModal'
 
 import type { UseQueryResult } from 'react-query'
 import type { NavigateFunction } from 'react-router-dom'
@@ -151,6 +152,7 @@ vi.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 vi.mock('../../../ProtocolUpload/hooks/useMostRecentRunId')
 vi.mock('../../../../resources/runs')
 vi.mock('../../../ErrorRecoveryFlows')
+vi.mock('../ProtocolDropTipModal')
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '95e67900-bc9f-4fbf-92c6-cc4d7226a51b'
@@ -338,10 +340,7 @@ describe('ProtocolRunHeader', () => {
     vi.mocked(useInstrumentsQuery).mockReturnValue({ data: {} } as any)
     vi.mocked(useHost).mockReturnValue({} as any)
     vi.mocked(useTipAttachmentStatus).mockReturnValue({
-      pipettesWithTip: [
-        instrumentsResponseLeftPipetteFixture,
-        instrumentsResponseRightPipetteFixture,
-      ],
+      aPipetteWithTip: instrumentsResponseLeftPipetteFixture,
       areTipsAttached: true,
       determineTipStatus: mockDetermineTipStatus,
       resetTipStatus: vi.fn(),
@@ -373,6 +372,17 @@ describe('ProtocolRunHeader', () => {
     } as any)
     vi.mocked(ErrorRecoveryFlows).mockReturnValue(
       <div>MOCK_ERROR_RECOVERY</div>
+    )
+    vi.mocked(useProtocolDropTipModal).mockReturnValue({
+      onDTModalRemoval: vi.fn(),
+      onDTModalSkip: vi.fn(),
+      showDTModal: false,
+    } as any)
+    vi.mocked(ProtocolDropTipModal).mockReturnValue(
+      <div>MOCK_DROP_TIP_MODAL</div>
+    )
+    vi.mocked(DropTipWizardFlows).mockReturnValue(
+      <div>MOCK_DROP_TIP_WIZARD_FLOWS</div>
     )
   })
 
@@ -1018,8 +1028,23 @@ describe('ProtocolRunHeader', () => {
 
     render()
     await waitFor(() => {
-      screen.getByText('Tips may be attached.')
+      screen.getByText('Remove any attached tips')
+      screen.getByText(
+        'Homing the pipette with liquid in the tips may damage it. You must remove all tips before using the pipette again.'
+      )
     })
+  })
+
+  it('renders the drop tip modal initially when the run ends if tips are attached', () => {
+    vi.mocked(useProtocolDropTipModal).mockReturnValue({
+      onDTModalRemoval: vi.fn(),
+      onDTModalSkip: vi.fn(),
+      showDTModal: true,
+    })
+
+    render()
+
+    screen.getByText('MOCK_DROP_TIP_MODAL')
   })
 
   it('does not render the drop tip banner when the run is not over', async () => {
@@ -1050,5 +1075,15 @@ describe('ProtocolRunHeader', () => {
 
     render()
     screen.getByText('MOCK_ERROR_RECOVERY')
+  })
+
+  it('renders DropTipWizardFlows when conditions are met', () => {
+    vi.mocked(useDropTipWizardFlows).mockReturnValue({
+      showDTWiz: true,
+      toggleDTWiz: vi.fn(),
+    })
+
+    render()
+    screen.getByText('MOCK_DROP_TIP_WIZARD_FLOWS')
   })
 })
