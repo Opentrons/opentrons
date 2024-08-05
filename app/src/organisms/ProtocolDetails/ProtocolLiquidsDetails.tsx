@@ -70,7 +70,7 @@ export const ProtocolLiquidsDetails = (
                       color={COLORS.grey60}
                       marginX={SPACING.spacing16}
                     >
-                      {liquid.description != null ? liquid.description : null}
+                      {liquid.description}
                     </StyledText>
                   </Flex>
                 </Flex>

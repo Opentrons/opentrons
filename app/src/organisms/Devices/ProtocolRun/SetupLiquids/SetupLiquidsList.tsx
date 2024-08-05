@@ -17,11 +17,11 @@ import {
   Flex,
   JUSTIFY_CENTER,
   JUSTIFY_FLEX_START,
+  JUSTIFY_SPACE_BETWEEN,
   LiquidIcon,
   SIZE_AUTO,
   SPACING,
   StyledText,
-  JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
 import { getModuleDisplayName, MICRO_LITERS } from '@opentrons/shared-data'
 import {

@@ -88,7 +88,7 @@ export function getVolumePerWell(
     .filter(labware => labware.labwareId === labwareId)
     .flatMap(labware => Object.values(labware.volumeByWell))
   if (new Set(volumes).size === 1) {
-    return volumes[0]
+    return parseFloat(volumes[0].toFixed(1))
   } else {
     return null
   }
