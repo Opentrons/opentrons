@@ -6,13 +6,7 @@ import { COLORS } from '../../helix-design-system'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { HighlightedWellLabels } from './labwareInternals/types'
 import type { LabwareAdapterLoadName } from './LabwareAdapter'
-
-export const WELL_LABEL_OPTIONS = {
-  SHOW_LABEL_INSIDE: 'SHOW_LABEL_INSIDE',
-  SHOW_LABEL_OUTSIDE: 'SHOW_LABEL_OUTSIDE',
-} as const
-
-export type WellLabelOption = keyof typeof WELL_LABEL_OPTIONS
+import type { WellLabelOption } from '../..'
 
 const HIGHLIGHT_COLOR = COLORS.blue30
 const STROKE_WIDTH = 1
@@ -20,7 +14,7 @@ const SKEW_ANGLE_DEGREES = 30
 const SKEW_ANGLE_RADIANS = (SKEW_ANGLE_DEGREES * Math.PI) / 180
 const COSINE_SKEW_ANGLE = Math.cos(SKEW_ANGLE_RADIANS)
 
-export interface LabwareRenderProps {
+export interface LabwareStackRenderProps {
   /** Labware definitions in stack to render */
   definitionTop: LabwareDefinition2
   /** option to highlight well labels with specified color */
@@ -36,7 +30,9 @@ export interface LabwareRenderProps {
   wellLabelOption?: WellLabelOption
 }
 
-export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
+export const LabwareStackRender = (
+  props: LabwareStackRenderProps
+): JSX.Element => {
   const {
     gRef,
     definitionTop,
