@@ -180,6 +180,7 @@ export function RunPausedSplash(
               gridGap={SPACING.spacing8}
               flexDirection={DIRECTION_COLUMN}
               alignItems={ALIGN_CENTER}
+              width="100%"
             >
               <StyledText desktopStyle="headingSmallBold">{title}</StyledText>
               <StepInfo
