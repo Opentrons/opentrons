@@ -281,6 +281,7 @@
   "total_liquid_volume": "Total volume",
   "update_deck_config": "Update deck configuration",
   "update_deck": "Update deck",
+  "update_offsets": "Update offsets",
   "updated": "Updated",
   "usb_connected_no_port_info": "USB Port Connected",
   "usb_drive_notification": "Leave USB drive attached until run starts",
