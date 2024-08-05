@@ -9,9 +9,15 @@ export function useErrorName(errorKind: ErrorKind): string {
   const { t } = useTranslation('error_recovery')
 
   switch (errorKind) {
+    case ERROR_KINDS.NO_LIQUID_DETECTED:
+      return t('no_liquid_detected')
+    case ERROR_KINDS.OVERPRESSURE_PREPARE_TO_ASPIRATE:
+      return t('pipette_overpressure')
     case ERROR_KINDS.OVERPRESSURE_WHILE_ASPIRATING:
       return t('pipette_overpressure')
+    case ERROR_KINDS.OVERPRESSURE_WHILE_DISPENSING:
+      return t('pipette_overpressure')
     default:
-      return t('general_error')
+      return t('error')
   }
 }
