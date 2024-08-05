@@ -327,6 +327,12 @@ def get_protocol_api(
     # Intentional difference from execute.get_protocol_api():
     # For the caller's convenience, we home the virtual hardware so they don't get MustHomeErrors.
     # Since this hardware is virtual, there's no harm in commanding this "movement" implicitly.
+    #
+    # Calling `checked_hardware_sync.home()` is a hack. It ought to be redundant with
+    # `context.home()`. We need it here to work around a Protocol Engine simulation bug
+    # where both the `HardwareControlAPI` level and the `ProtocolEngine` level need to
+    # be homed for certain commands to work. https://opentrons.atlassian.net/browse/EXEC-646
+    checked_hardware.sync.home()
     context.home()
 
     return context
@@ -935,6 +941,13 @@ def _run_file_pe(
                 protocol_engine=protocol_engine, hardware_api=hardware_api_wrapped
             ),
         )
+
+        # TODO(mm, 2024-08-06): This home is theoretically redundant with Protocol
+        # Engine `home` commands within the `RunOrchestrator`. However, we need this to
+        # work around Protocol Engine bugs where both the `HardwareControlAPI` level
+        # and the `ProtocolEngine` level need to be homed for certain commands to work.
+        # https://opentrons.atlassian.net/browse/EXEC-646
+        await hardware_api_wrapped.home()
 
         scraper = _CommandScraper(stack_logger, log_level, protocol_runner.broker)
         with scraper.scrape():
