@@ -69,17 +69,18 @@ export const LabwareStackRender = (
       </g>
     ) : (
       // isometric view of labware
-      <svg>
+      <>
         <g
-          transform={`translate(55, 28) rotate(SKEW_ANGLE_DEGREES) skewX(-${SKEW_ANGLE_DEGREES}) scale(${COSINE_SKEW_ANGLE}, ${COSINE_SKEW_ANGLE})`}
+          transform={`rotate(${SKEW_ANGLE_DEGREES}) skewX(-${SKEW_ANGLE_DEGREES}) scale(${COSINE_SKEW_ANGLE}, ${COSINE_SKEW_ANGLE})`}
           ref={gRef}
         >
-          <StaticLabware definition={definitionTop} fill={fillColorBottom} />
-          {wellLabelOption != null ? (
+          <StaticLabware definition={definitionTop} fill={fillColorTop} />
+          {wellLabelOption != null &&
+          definitionTop.metadata.displayCategory !== 'adapter' ? (
             <WellLabels
               definition={definitionTop}
               wellLabelOption={wellLabelOption}
-              wellLabelColor={fillColorBottom}
+              wellLabelColor={fillColorTop}
               highlightedWellLabels={props.highlightedWellLabels}
             />
           ) : null}
@@ -87,7 +88,7 @@ export const LabwareStackRender = (
         <rect
           width={definitionTop.dimensions.yDimension - STROKE_WIDTH}
           height={definitionTop.dimensions.zDimension - STROKE_WIDTH}
-          transform={`translate(55, 28) rotate(180) skewY(-${SKEW_ANGLE_DEGREES}) scale(${COSINE_SKEW_ANGLE}, ${COSINE_SKEW_ANGLE})`}
+          transform={`rotate(180) skewY(-${SKEW_ANGLE_DEGREES}) scale(${COSINE_SKEW_ANGLE}, ${COSINE_SKEW_ANGLE})`}
           strokeWidth={STROKE_WIDTH}
           stroke={COLORS.black90}
           fill={fillColorTop}
@@ -95,30 +96,30 @@ export const LabwareStackRender = (
         <rect
           width={definitionTop.dimensions.xDimension - STROKE_WIDTH}
           height={definitionTop.dimensions.zDimension - STROKE_WIDTH}
-          transform={`translate(55, 28) skewY(${SKEW_ANGLE_DEGREES}) scale(${
-            COSINE_SKEW_ANGLE * 0.5
-          }, -${COSINE_SKEW_ANGLE}) `}
+          transform={`skewY(${SKEW_ANGLE_DEGREES}) scale(${
+            COSINE_SKEW_ANGLE ** 2
+          } , -${COSINE_SKEW_ANGLE}) `}
           strokeWidth={STROKE_WIDTH}
           stroke={COLORS.black90}
           fill={fillColorTop}
         />
-      </svg>
+      </>
     )
   }
 
   return (
-    <svg>
+    <>
       {/* bottom labware/adapter */}
       <g
-        transform={`translate(55, ${
-          28 - definitionTop.dimensions.zDimension * 0.5 - 10
+        transform={`translate(0, ${
+          0 - definitionTop.dimensions.zDimension * 0.5 - 10
         }) rotate(${SKEW_ANGLE_DEGREES}) skewX(-${SKEW_ANGLE_DEGREES}) scale(${COSINE_SKEW_ANGLE}, ${COSINE_SKEW_ANGLE})`}
         ref={gRef}
         fill={fillColorBottom}
       >
-        <StaticLabware definition={definitionTop} fill={fillColorBottom} />
+        <StaticLabware definition={definitionBottom} fill={fillColorBottom} />
         {wellLabelOption != null &&
-        definitionTop.metadata.displayCategory !== 'adapter' ? (
+        definitionBottom.metadata.displayCategory !== 'adapter' ? (
           <WellLabels
             definition={definitionTop}
             wellLabelOption={wellLabelOption}
@@ -128,22 +129,22 @@ export const LabwareStackRender = (
         ) : null}
       </g>
       <rect
-        width={definitionTop.dimensions.yDimension - STROKE_WIDTH}
-        height={definitionTop.dimensions.zDimension - STROKE_WIDTH}
-        transform={`translate(55, ${
-          28 - definitionTop.dimensions.zDimension * 0.5 - 10
+        width={definitionBottom.dimensions.yDimension - STROKE_WIDTH}
+        height={definitionBottom.dimensions.zDimension - STROKE_WIDTH}
+        transform={`translate(0, ${
+          0 - definitionTop.dimensions.zDimension * 0.5 - 10
         }) rotate(180) skewY(-${SKEW_ANGLE_DEGREES}) scale(${COSINE_SKEW_ANGLE}, ${COSINE_SKEW_ANGLE})`}
         strokeWidth={STROKE_WIDTH}
         stroke={COLORS.black90}
         fill={fillColorBottom}
       />
       <rect
-        width={definitionTop.dimensions.xDimension - STROKE_WIDTH}
-        height={definitionTop.dimensions.zDimension - STROKE_WIDTH}
-        transform={`translate(55, ${
-          28 - definitionTop.dimensions.zDimension * 0.5 - 10
+        width={definitionBottom.dimensions.xDimension - STROKE_WIDTH}
+        height={definitionBottom.dimensions.zDimension - STROKE_WIDTH}
+        transform={`translate(0, ${
+          0 - definitionTop.dimensions.zDimension * 0.5 - 10
         }) skewY(${SKEW_ANGLE_DEGREES}) scale(${
-          COSINE_SKEW_ANGLE * 0.5
+          COSINE_SKEW_ANGLE ** 2
         }, -${COSINE_SKEW_ANGLE}) `}
         strokeWidth={STROKE_WIDTH}
         stroke={COLORS.black90}
@@ -151,7 +152,9 @@ export const LabwareStackRender = (
       />
       {/* top labware/adapter */}
       <g
-        transform={`translate(55, 28) rotate(${SKEW_ANGLE_DEGREES}) skewX(-${SKEW_ANGLE_DEGREES}) scale(${COSINE_SKEW_ANGLE}, ${COSINE_SKEW_ANGLE})`}
+        transform={`translate(0, ${
+          definitionTop.dimensions.zDimension * 0.5 + 10
+        }) rotate(${SKEW_ANGLE_DEGREES}) skewX(-${SKEW_ANGLE_DEGREES}) scale(${COSINE_SKEW_ANGLE}, ${COSINE_SKEW_ANGLE})`}
         ref={gRef}
       >
         <StaticLabware definition={definitionTop} fill={fillColorTop} />
@@ -168,7 +171,9 @@ export const LabwareStackRender = (
       <rect
         width={definitionTop.dimensions.yDimension - STROKE_WIDTH}
         height={definitionTop.dimensions.zDimension - STROKE_WIDTH}
-        transform={`translate(55, 28) rotate(180) skewY(-${SKEW_ANGLE_DEGREES}) scale(${COSINE_SKEW_ANGLE}, ${COSINE_SKEW_ANGLE})`}
+        transform={`translate(0, ${
+          definitionTop.dimensions.zDimension * 0.5 + 10
+        }) rotate(180) skewY(-${SKEW_ANGLE_DEGREES}) scale(${COSINE_SKEW_ANGLE}, ${COSINE_SKEW_ANGLE})`}
         strokeWidth={STROKE_WIDTH}
         stroke={COLORS.black90}
         fill={fillColorTop}
@@ -176,13 +181,15 @@ export const LabwareStackRender = (
       <rect
         width={definitionTop.dimensions.xDimension - STROKE_WIDTH}
         height={definitionTop.dimensions.zDimension - STROKE_WIDTH}
-        transform={`translate(55, 28) skewY(${SKEW_ANGLE_DEGREES}) scale(${
-          COSINE_SKEW_ANGLE * 0.5
-        }, -${COSINE_SKEW_ANGLE}) `}
+        transform={`translate(0, ${
+          definitionTop.dimensions.zDimension * 0.5 + 10
+        }) skewY(${SKEW_ANGLE_DEGREES}) scale(${
+          COSINE_SKEW_ANGLE ** 2
+        } , -${COSINE_SKEW_ANGLE}) `}
         strokeWidth={STROKE_WIDTH}
         stroke={COLORS.black90}
         fill={fillColorTop}
       />
-    </svg>
+    </>
   )
 }

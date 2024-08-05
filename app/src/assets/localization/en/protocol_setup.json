@@ -257,6 +257,7 @@
   "setup_is_view_only": "Setup is view-only once run has started",
   "slot_location": "Slot {{slotName}}",
   "slot_number": "Slot Number",
+  "stacked_slot": "Stacked slot",
   "status": "Status",
   "step": "STEP {{index}}",
   "there_are_no_unconfigured_modules": "No {{module}} is connected. Attach one and place it in {{slot}}.",

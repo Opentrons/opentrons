@@ -27,6 +27,7 @@ import type {
   CompletedProtocolAnalysis,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
+import { LabwareStackModal } from './LabwareStackModal'
 
 interface SetupLabwareMapProps {
   runId: string
@@ -39,6 +40,11 @@ export function SetupLabwareMap({
 }: SetupLabwareMapProps): JSX.Element | null {
   // early return null if no protocol analysis
   if (protocolAnalysis == null) return null
+
+  const [
+    labwareStackDetailsLabwareId,
+    setLabwareStackDetailsLabwareId,
+  ] = React.useState<string | null>(null)
 
   const commands = protocolAnalysis.commands
 
@@ -76,7 +82,16 @@ export function SetupLabwareMap({
 
       nestedLabwareDef: topLabwareDefinition,
       moduleChildren: (
-        <>
+        // open modal
+        <g
+          onClick={() => {
+            if (topLabwareDefinition != null) {
+              setLabwareStackDetailsLabwareId(topLabwareId)
+            }
+            console.log('TESTING')
+          }}
+          cursor="pointer"
+        >
           {topLabwareDefinition != null && topLabwareId != null ? (
             <LabwareInfoOverlay
               definition={topLabwareDefinition}
@@ -85,7 +100,7 @@ export function SetupLabwareMap({
               runId={runId}
             />
           ) : null}
-        </>
+        </g>
       ),
     }
   })
@@ -143,6 +158,15 @@ export function SetupLabwareMap({
           commands={commands}
         />
       </Flex>
+      {labwareStackDetailsLabwareId != null && (
+        <LabwareStackModal
+          labwareIdTop={labwareStackDetailsLabwareId}
+          runId={runId}
+          closeModal={() => {
+            setLabwareStackDetailsLabwareId(null)
+          }}
+        />
+      )}
     </Flex>
   )
 }
