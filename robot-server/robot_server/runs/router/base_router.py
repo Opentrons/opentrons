@@ -462,7 +462,7 @@ async def get_run_commands_error(
         description=(
             "The starting index of the desired first command error in the list."
             " If unspecified, a cursor will be selected automatically"
-            " based on the currently running or most recently executed command."
+            " based on the last error added."
         ),
     ),
     pageLength: int = Query(
