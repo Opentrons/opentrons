@@ -205,7 +205,7 @@ export function ProtocolRunHeader({
     determineTipStatus,
     resetTipStatus,
     setTipStatusResolved,
-    pipettesWithTip,
+    aPipetteWithTip,
   } = useTipAttachmentStatus({
     runId,
     runRecord,
@@ -421,7 +421,7 @@ export function ProtocolRunHeader({
           <ProtocolDropTipModal
             onSkip={onDTModalSkip}
             onBeginRemoval={onDTModalRemoval}
-            mount={pipettesWithTip[0]?.mount}
+            mount={aPipetteWithTip?.mount}
           />
         ) : null}
         <Box display="grid" gridTemplateColumns="4fr 3fr 3fr 4fr">
@@ -496,11 +496,11 @@ export function ProtocolRunHeader({
             robotName={robotName}
           />
         ) : null}
-        {showDTWiz && mostRecentRunId === runId ? (
+        {showDTWiz && aPipetteWithTip != null ? (
           <DropTipWizardFlows
             robotType={isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE}
-            mount={pipettesWithTip[0]?.mount}
-            instrumentModelSpecs={pipettesWithTip[0].specs}
+            mount={aPipetteWithTip.mount}
+            instrumentModelSpecs={aPipetteWithTip.specs}
             closeFlow={() => setTipStatusResolved().then(toggleDTWiz)}
           />
         ) : null}

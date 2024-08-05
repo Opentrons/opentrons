@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
-import head from 'lodash/head'
 
 import {
   DIRECTION_COLUMN,
@@ -60,7 +59,7 @@ export function BeginRemoval({
   currentRecoveryOptionUtils,
 }: RecoveryContentProps): JSX.Element | null {
   const { t } = useTranslation('error_recovery')
-  const { pipettesWithTip } = tipStatusUtils
+  const { aPipetteWithTip } = tipStatusUtils
   const {
     proceedNextStep,
     setRobotInMotion,
@@ -69,7 +68,7 @@ export function BeginRemoval({
   const { cancelRun } = recoveryCommands
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const { ROBOT_CANCELING, RETRY_NEW_TIPS } = RECOVERY_MAP
-  const mount = head(pipettesWithTip)?.mount
+  const mount = aPipetteWithTip?.mount
 
   const primaryOnClick = (): void => {
     void proceedNextStep()
@@ -155,9 +154,7 @@ function DropTipFlowsContainer(
   const { setTipStatusResolved } = tipStatusUtils
   const { cancelRun } = recoveryCommands
 
-  const { mount, specs } = head(
-    tipStatusUtils.pipettesWithTip
-  ) as PipetteWithTip // Safe as we have to have tips to get to this point in the flow.
+  const { mount, specs } = tipStatusUtils.aPipetteWithTip as PipetteWithTip // Safe as we have to have tips to get to this point in the flow.
 
   const onCloseFlow = (): void => {
     if (selectedRecoveryOption === RETRY_NEW_TIPS.ROUTE) {

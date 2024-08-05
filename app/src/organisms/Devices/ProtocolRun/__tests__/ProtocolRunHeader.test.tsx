@@ -14,7 +14,6 @@ import {
   RUN_STATUS_SUCCEEDED,
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
   instrumentsResponseLeftPipetteFixture,
-  instrumentsResponseRightPipetteFixture,
 } from '@opentrons/api-client'
 import {
   useHost,
@@ -88,6 +87,7 @@ import { useNotifyRunQuery, useCurrentRunId } from '../../../../resources/runs'
 import {
   useDropTipWizardFlows,
   useTipAttachmentStatus,
+  DropTipWizardFlows,
 } from '../../../DropTipWizardFlows'
 import {
   useErrorRecoveryFlows,
@@ -340,10 +340,7 @@ describe('ProtocolRunHeader', () => {
     vi.mocked(useInstrumentsQuery).mockReturnValue({ data: {} } as any)
     vi.mocked(useHost).mockReturnValue({} as any)
     vi.mocked(useTipAttachmentStatus).mockReturnValue({
-      pipettesWithTip: [
-        instrumentsResponseLeftPipetteFixture,
-        instrumentsResponseRightPipetteFixture,
-      ],
+      aPipetteWithTip: instrumentsResponseLeftPipetteFixture,
       areTipsAttached: true,
       determineTipStatus: mockDetermineTipStatus,
       resetTipStatus: vi.fn(),
@@ -383,6 +380,9 @@ describe('ProtocolRunHeader', () => {
     } as any)
     vi.mocked(ProtocolDropTipModal).mockReturnValue(
       <div>MOCK_DROP_TIP_MODAL</div>
+    )
+    vi.mocked(DropTipWizardFlows).mockReturnValue(
+      <div>MOCK_DROP_TIP_WIZARD_FLOWS</div>
     )
   })
 
@@ -1075,5 +1075,15 @@ describe('ProtocolRunHeader', () => {
 
     render()
     screen.getByText('MOCK_ERROR_RECOVERY')
+  })
+
+  it('renders DropTipWizardFlows when conditions are met', () => {
+    vi.mocked(useDropTipWizardFlows).mockReturnValue({
+      showDTWiz: true,
+      toggleDTWiz: vi.fn(),
+    })
+
+    render()
+    screen.getByText('MOCK_DROP_TIP_WIZARD_FLOWS')
   })
 })
