@@ -876,6 +876,10 @@ async def test_liquid_probe_plunger_moves(
     mock_gantry_position: AsyncMock,
 ) -> None:
     """Verify the plunger moves in liquid_probe."""
+    # This test verifies that both:
+    #   - the plunger movements in each liquid probe pass are what we expect
+    #   - liquid probe successfully chooses the correct distance to move
+    #       when approaching its max z distance
     instr_data = AttachedPipette(
         config=load_pipette_data.load_definition(
             PipetteModelType("p1000"), PipetteChannelType(1), PipetteVersionType(3, 4)
@@ -967,7 +971,7 @@ async def test_liquid_probe_plunger_moves(
         (OT3Mount.RIGHT, NodeId.head_r, NodeId.pipette_right),
     ],
 )
-async def test_liquid_probe_moves(
+async def test_liquid_probe_mount_moves(
     mock_move_to: AsyncMock,
     ot3_hardware: ThreadManager[OT3API],
     hardware_backend: OT3Simulator,
@@ -979,7 +983,7 @@ async def test_liquid_probe_moves(
     mock_move_to_plunger_bottom: AsyncMock,
     mock_gantry_position: AsyncMock,
 ) -> None:
-    """Verify move targets for one liquid pass probe."""
+    """Verify move targets for one singular liquid pass probe."""
     instr_data = AttachedPipette(
         config=load_pipette_data.load_definition(
             PipetteModelType("p1000"), PipetteChannelType(1), PipetteVersionType(3, 4)
