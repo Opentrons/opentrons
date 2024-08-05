@@ -26,6 +26,7 @@ from robot_server.service.json_api import (
     RequestModel,
     SimpleBody,
     SimpleEmptyBody,
+    SimpleMultiBody,
     MultiBody,
     MultiBodyMeta,
     ResourceLink,
@@ -426,7 +427,7 @@ async def put_error_recovery_policy(
         "information available for a given command."
     ),
     responses={
-        status.HTTP_200_OK: {"model": MultiBody[list[pe_errors.ErrorOccurrence]]},
+        status.HTTP_200_OK: {"model": SimpleMultiBody[list[pe_errors.ErrorOccurrence]]},
         status.HTTP_409_CONFLICT: {"model": ErrorBody[RunStopped]},
     },
 )
@@ -445,7 +446,7 @@ async def get_run_commands_error(
         description="The maximum number of command errors in the list to return.",
     ),
     run_data_manager: RunDataManager = Depends(get_run_data_manager),
-) -> PydanticResponse[MultiBody[list[pe_errors.ErrorOccurrence]]]:
+) -> PydanticResponse[SimpleMultiBody[list[pe_errors.ErrorOccurrence]]]:
     """Get a summary of a set of command errors in a run.
 
     Arguments:
@@ -469,8 +470,9 @@ async def get_run_commands_error(
     )
 
     return await PydanticResponse.create(
-        content=MultiBody.construct(
-            data=command_error_slice.commands_errors, meta=meta
+        content=SimpleMultiBody.construct(
+            data=command_error_slice.commands_errors,  # type:ignore[arg-type]
+            meta=meta,
         ),
         status_code=status.HTTP_200_OK,
     )

@@ -904,7 +904,7 @@ def test_get_current() -> None:
 def test_get_slice_empty() -> None:
     """It should return a slice from the tail if no current command."""
     subject = get_command_view(commands=[])
-    result = subject.get_slice(cursor=None, length=2)
+    result = subject.get_slice(cursor=0, length=2)
 
     assert result == CommandSlice(commands=[], cursor=0, total_length=0)
 
@@ -944,7 +944,7 @@ def test_get_slice_default_cursor_no_current() -> None:
 
     subject = get_command_view(commands=[command_1, command_2, command_3, command_4])
 
-    result = subject.get_slice(cursor=None, length=3)
+    result = subject.get_slice(cursor=0, length=3)
 
     assert result == CommandSlice(
         commands=[command_2, command_3, command_4],
@@ -975,7 +975,7 @@ def test_get_slice_default_cursor_failed_command() -> None:
         failed_command=CommandEntry(index=2, command=command_3),
     )
 
-    result = subject.get_slice(cursor=None, length=3)
+    result = subject.get_slice(cursor=0, length=3)
 
     assert result == CommandSlice(
         commands=[command_3, command_4],
@@ -1032,7 +1032,7 @@ def test_get_slice_default_cursor_queued() -> None:
 def test_get_errors_slice_empty() -> None:
     """It should return a slice from the tail if no current command."""
     subject = get_command_view(failed_command_errors=[])
-    result = subject.get_errors_slice(cursor=None, length=2)
+    result = subject.get_errors_slice(cursor=0, length=2)
 
     assert result == CommandErrorSlice(commands_errors=[], cursor=0, total_length=0)
 
@@ -1077,7 +1077,7 @@ def test_get_slice_default_cursor_last_error() -> None:
         failed_command_errors=[error_1, error_2, error_3, error_4, error_5]
     )
 
-    result = subject.get_errors_slice(cursor=None, length=2)
+    result = subject.get_errors_slice(cursor=0, length=2)
 
     assert result == CommandErrorSlice(
         commands_errors=[error_5],

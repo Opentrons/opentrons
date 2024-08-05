@@ -680,7 +680,7 @@ async def test_get_run_commands_errors_raises_no_run(
         pageLength=42,
     )
 
-    assert result.content.data == [
+    assert list(result.content.data) == [
         pe_errors.ErrorOccurrence(
             id="error-id",
             errorType="PrettyBadError",

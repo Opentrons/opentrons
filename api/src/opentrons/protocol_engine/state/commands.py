@@ -630,26 +630,13 @@ class CommandView(HasState[CommandState]):
 
     def get_errors_slice(
         self,
-        cursor: Optional[int],
+        cursor: int,
         length: int,
     ) -> CommandErrorSlice:
-        """Get a subset of commands error around a given cursor.
-
-        If the cursor is omitted, a cursor will be selected automatically
-        based most recent error.
-        """
+        """Get a subset of commands error around a given cursor."""
+        # start is inclusive, stop is exclusive
         all_errors = self.get_all_errors()
         total_length = len(all_errors)
-
-        if cursor is None:
-            if len(all_errors) > 0:
-                # Get the most recent error,
-                # which we can find just at the end of the list.
-                cursor = total_length - 1
-            else:
-                cursor = total_length - length
-
-        # start is inclusive, stop is exclusive
         actual_cursor = max(0, min(cursor, total_length - 1))
         stop = min(total_length, actual_cursor + length)
 

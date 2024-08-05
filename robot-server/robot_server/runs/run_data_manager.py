@@ -399,6 +399,7 @@ class RunDataManager:
                 cursor=cursor, length=length
             )
 
+        # TODO(tz, 8-5-2024): Change this to return to error list from the DB when we implement https://opentrons.atlassian.net/browse/EXEC-655.
         raise RunNotCurrentError()
 
     def get_current_command(self, run_id: str) -> Optional[CommandPointer]:
