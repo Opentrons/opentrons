@@ -155,7 +155,7 @@ export function RunSummary(): JSX.Element {
   const {
     determineTipStatus,
     setTipStatusResolved,
-    pipettesWithTip,
+    aPipetteWithTip,
   } = useTipAttachmentStatus({
     runId,
     runRecord,
@@ -206,7 +206,7 @@ export function RunSummary(): JSX.Element {
 
   // If no pipettes have tips attached, execute the routing callback.
   const setTipStatusResolvedAndRoute = (
-    routeCb: (pipettesWithTip: PipetteWithTip[]) => void
+    routeCb: (aPipetteWithTip: PipetteWithTip) => void
   ): (() => Promise<void>) => {
     return () =>
       setTipStatusResolved().then(newPipettesWithTip => {
@@ -214,12 +214,12 @@ export function RunSummary(): JSX.Element {
       })
   }
 
-  const handleReturnToDash = (pipettesWithTip: PipetteWithTip[]): void => {
-    if (mostRecentRunId === runId && pipettesWithTip.length > 0) {
+  const handleReturnToDash = (aPipetteWithTip: PipetteWithTip | null): void => {
+    if (mostRecentRunId === runId && aPipetteWithTip != null) {
       void handleTipsAttachedModal({
         setTipStatusResolved: setTipStatusResolvedAndRoute(handleReturnToDash),
         host,
-        pipettesWithTip,
+        aPipetteWithTip,
       })
     } else if (isQuickTransfer) {
       returnToQuickTransfer()
@@ -228,12 +228,12 @@ export function RunSummary(): JSX.Element {
     }
   }
 
-  const handleRunAgain = (pipettesWithTip: PipetteWithTip[]): void => {
-    if (mostRecentRunId === runId && pipettesWithTip.length > 0) {
+  const handleRunAgain = (aPipetteWithTip: PipetteWithTip | null): void => {
+    if (mostRecentRunId === runId && aPipetteWithTip != null) {
       void handleTipsAttachedModal({
         setTipStatusResolved: setTipStatusResolvedAndRoute(handleRunAgain),
         host,
-        pipettesWithTip,
+        aPipetteWithTip,
       })
     } else {
       if (!isResetRunLoading) {
@@ -367,7 +367,7 @@ export function RunSummary(): JSX.Element {
               iconName="arrow-left"
               buttonType="secondary"
               onClick={() => {
-                handleReturnToDash(pipettesWithTip)
+                handleReturnToDash(aPipetteWithTip)
               }}
               buttonText={
                 isQuickTransfer
@@ -380,7 +380,7 @@ export function RunSummary(): JSX.Element {
               flex="1"
               iconName="play-round-corners"
               onClick={() => {
-                handleRunAgain(pipettesWithTip)
+                handleRunAgain(aPipetteWithTip)
               }}
               buttonText={
                 showRunAgainSpinner ? RUN_AGAIN_SPINNER_TEXT : t('run_again')
