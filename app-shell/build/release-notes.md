@@ -6,6 +6,32 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
+## Opentrons App Changes in 8.0.0
+
+Welcome to the v8.0.0 release of the Opentrons App!
+
+### New Features
+
+- Recover from errors during a protocol run on Flex. If certain types of errors occur, you will have the option to manually correct the error and resume your protocol. Follow detailed recovery instructions on the touchscreen or in the app.
+- Perform quick transfers on Flex. Set up a new quick transfer directly on the touchscreen, specifying a tip rack and up to two labware for pipetting — no protocol file or coding required! You can save and reuse up to 20 quick transfers on a particular Flex robot.
+- Use CSV files as runtime parameters. When setting up a protocol in the app, choose any file on your computer. Or on Flex, select from files already stored on the robot or on an attached USB drive. See the Python API documentation for more information on adding CSV capability to your protocols.
+
+### Improved Features
+
+- Run protocols using the latest version of the Python API (2.20), which adds more partial tip pickup configurations (Flex and OT-2 GEN2 pipettes) and the ability to detect whether a well contains liquid (Flex pipettes only).
+- Tap or click on any labware on the deck map to see adapters and modules that are stacked below it.
+- Lists of liquids now separately show the total volume and per-well volume (when it is the same in each well containing that liquid).
+
+### Bug Fixes
+
+TK
+
+### Known Issues
+
+TK
+
+---
+
 ## Opentrons App Changes in 7.5.0
 
 Welcome to the v7.5.0 release of the Opentrons App!
