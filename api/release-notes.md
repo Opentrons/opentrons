@@ -14,7 +14,7 @@ Welcome to the v8.0.0 release of the Opentrons robot software!
 
 ### New Features
 
-- Adds support for storing and running quick transfers.
+- Create, store, and run quick transfers.
 - Define and use CSV runtime parameters in Python protocols.
 - Detect the presence or absence of liquid in a well (Flex pipettes only), and continue or pause the protocol based on the result.
 
