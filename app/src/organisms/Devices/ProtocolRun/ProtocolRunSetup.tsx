@@ -16,6 +16,7 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
+  FLEX_MAX_CONTENT,
 } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
@@ -47,8 +48,6 @@ import { SetupStep } from './SetupStep'
 import { SetupLiquids } from './SetupLiquids'
 import { EmptySetupStep } from './EmptySetupStep'
 import { HowLPCWorksModal } from './SetupLabwarePositionCheck/HowLPCWorksModal'
-
-import type { ProtocolCalibrationStatus } from '../hooks'
 
 const ROBOT_CALIBRATION_STEP_KEY = 'robot_calibration_step' as const
 const MODULE_SETUP_KEY = 'module_setup_step' as const
@@ -176,6 +175,7 @@ export function ProtocolRunSetup({
   const [liquidSetupComplete, setLiquidSetupComplete] = React.useState<boolean>(
     false
   )
+  const [lpcComplete, setLpcComplete] = React.useState<boolean>(false)
 
   const StepDetailMap: Record<
     StepKey,
@@ -245,15 +245,17 @@ export function ProtocolRunSetup({
       stepInternals: (
         <SetupLabwarePositionCheck
           {...{ runId, robotName }}
-          expandLabwareStep={() => {
-            setExpandedStepKey(LABWARE_SETUP_KEY)
+          setOffsetsConfirmed={confirmed => {
+            confirmed && setExpandedStepKey(LABWARE_SETUP_KEY)
+            setLpcComplete(confirmed)
           }}
+          offsetsConfirmed={lpcComplete}
         />
       ),
       description: t('labware_position_check_step_description'),
       rightElProps: {
         stepKey: LPC_KEY,
-        complete: false,
+        complete: lpcComplete,
         completeText: t('offsets_ready'),
         incompleteText: null,
         incompleteElement: <LearnAboutLPC />,
@@ -262,16 +264,20 @@ export function ProtocolRunSetup({
     [LABWARE_SETUP_KEY]: {
       stepInternals: (
         <SetupLabware
-          protocolRunHeaderRef={protocolRunHeaderRef}
           robotName={robotName}
           runId={runId}
-          nextStep={
-            targetStepKeyInOrder.findIndex(v => v === LABWARE_SETUP_KEY) ===
-            targetStepKeyInOrder.length - 1
-              ? null
-              : LIQUID_SETUP_KEY
-          }
-          expandStep={setExpandedStepKey}
+          labwareConfirmed={labwareSetupComplete}
+          setLabwareConfirmed={(confirmed: boolean) => {
+            setLabwareSetupComplete(confirmed)
+            if (confirmed) {
+              const nextStep =
+                targetStepKeyInOrder.findIndex(v => v === LABWARE_SETUP_KEY) ===
+                targetStepKeyInOrder.length - 1
+                  ? null
+                  : LIQUID_SETUP_KEY
+              setExpandedStepKey(nextStep)
+            }
+          }}
         />
       ),
       description: t(`${LABWARE_SETUP_KEY}_description`),
@@ -286,10 +292,16 @@ export function ProtocolRunSetup({
     [LIQUID_SETUP_KEY]: {
       stepInternals: (
         <SetupLiquids
-          protocolRunHeaderRef={protocolRunHeaderRef}
           robotName={robotName}
           runId={runId}
           protocolAnalysis={protocolAnalysis}
+          isLiquidSetupConfirmed={liquidSetupComplete}
+          setLiquidSetupConfirmed={(confirmed: boolean) => {
+            setLiquidSetupComplete(confirmed)
+            if (confirmed) {
+              setExpandedStepKey(null)
+            }
+          }}
         />
       ),
       description: hasLiquids
@@ -298,7 +310,7 @@ export function ProtocolRunSetup({
       rightElProps: {
         stepKey: LIQUID_SETUP_KEY,
         complete: liquidSetupComplete,
-        completeText: t('location_and_volumes_ready'),
+        completeText: t('liquids_ready'),
         incompleteText: null,
         incompleteElement: null,
       },
@@ -403,10 +415,13 @@ const stepRequiresHW = (
   props.stepKey === MODULE_SETUP_KEY
 
 function StepRightElement(props: StepRightElementProps): JSX.Element | null {
-  const { t } = useTranslation('protocol_setup')
   if (props.complete) {
     return (
-      <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
+      <Flex
+        flexDirection={DIRECTION_ROW}
+        alignItems={ALIGN_CENTER}
+        width={FLEX_MAX_CONTENT}
+      >
         <Icon
           size="1rem"
           color={COLORS.green50}

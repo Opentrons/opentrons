@@ -32,7 +32,8 @@ import { useNotifyRunQuery } from '../../../../resources/runs'
 import type { LabwareOffset } from '@opentrons/api-client'
 
 interface SetupLabwarePositionCheckProps {
-  expandLabwareStep: () => void
+  offsetsConfirmed: boolean
+  setOffsetsConfirmed: (confirmed: boolean) => void
   robotName: string
   runId: string
 }
@@ -40,7 +41,7 @@ interface SetupLabwarePositionCheckProps {
 export function SetupLabwarePositionCheck(
   props: SetupLabwarePositionCheckProps
 ): JSX.Element {
-  const { robotName, runId, expandLabwareStep } = props
+  const { robotName, runId, setOffsetsConfirmed, offsetsConfirmed } = props
   const { t, i18n } = useTranslation('protocol_setup')
 
   const robotType = useRobotType(robotName)
@@ -114,6 +115,17 @@ export function SetupLabwarePositionCheck(
       )}
       <Flex justifyContent={JUSTIFY_CENTER} gridGap={SPACING.spacing8}>
         <SecondaryButton
+          onClick={() => {
+            setOffsetsConfirmed(true)
+          }}
+          id="LPC_setOffsetsConfirmed"
+          padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
+          disabled={offsetsConfirmed}
+        >
+          {t('confirm_offsets')}
+        </SecondaryButton>
+
+        <PrimaryButton
           textTransform={TYPOGRAPHY.textTransformCapitalize}
           title={t('run_labware_position_check')}
           onClick={() => {
@@ -125,17 +137,10 @@ export function SetupLabwarePositionCheck(
           disabled={lpcDisabledReason !== null}
         >
           {t('run_labware_position_check')}
-        </SecondaryButton>
+        </PrimaryButton>
         {lpcDisabledReason !== null ? (
           <Tooltip tooltipProps={tooltipProps}>{lpcDisabledReason}</Tooltip>
         ) : null}
-        <PrimaryButton
-          onClick={expandLabwareStep}
-          id="ModuleSetup_proceedToLabwareSetup"
-          padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
-        >
-          {t('proceed_to_labware_setup_step')}
-        </PrimaryButton>
       </Flex>
       {LPCWizard}
     </Flex>
