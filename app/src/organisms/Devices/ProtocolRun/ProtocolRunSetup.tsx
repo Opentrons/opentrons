@@ -284,7 +284,7 @@ export function ProtocolRunSetup({
       rightElProps: {
         stepKey: LABWARE_SETUP_KEY,
         complete: labwareSetupComplete,
-        completeText: t('placement_ready'),
+        completeText: t('placements_ready'),
         incompleteText: null,
         incompleteElement: null,
       },

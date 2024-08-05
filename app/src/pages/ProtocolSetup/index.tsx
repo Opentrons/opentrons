@@ -118,6 +118,8 @@ interface ProtocolSetupStepProps {
   subDetail?: string | null
   // disallow click handler, disabled styling
   disabled?: boolean
+  // disallow click handler, don't show CTA icons, allow styling
+  interactionDisabled?: boolean
   // display the reason the setup step is disabled
   disabledReason?: string | null
   //  optional description
@@ -137,12 +139,14 @@ export function ProtocolSetupStep({
   detail,
   subDetail,
   disabled = false,
+  interactionDisabled = false,
   disabledReason,
   description,
   hasRightIcon = true,
   hasLeftIcon = true,
   fontSize = 'p',
 }: ProtocolSetupStepProps): JSX.Element {
+  const isInteractionDisabled = interactionDisabled || disabled
   const backgroundColorByStepStatus = {
     ready: COLORS.green35,
     'not ready': COLORS.yellow35,
@@ -185,7 +189,9 @@ export function ProtocolSetupStep({
   return (
     <Btn
       onClick={() => {
-        !disabled ? onClickSetupStep() : makeDisabledReasonSnackbar()
+        !isInteractionDisabled
+          ? onClickSetupStep()
+          : makeDisabledReasonSnackbar()
       }}
       width="100%"
     >
@@ -202,7 +208,6 @@ export function ProtocolSetupStep({
         {status !== 'general' &&
         !disabled &&
         status !== 'inform' &&
-        !disabled &&
         hasLeftIcon ? (
           <Icon
             color={status === 'ready' ? COLORS.green50 : COLORS.yellow50}
@@ -241,7 +246,7 @@ export function ProtocolSetupStep({
           <LegacyStyledText
             as={fontSize}
             textAlign={TEXT_ALIGN_RIGHT}
-            color={disabled ? COLORS.grey50 : COLORS.black90}
+            color={interactionDisabled ? COLORS.grey50 : COLORS.black90}
             maxWidth="20rem"
           >
             {detail}
@@ -249,7 +254,7 @@ export function ProtocolSetupStep({
             {subDetail}
           </LegacyStyledText>
         </Flex>
-        {disabled || !hasRightIcon ? null : (
+        {interactionDisabled || !hasRightIcon ? null : (
           <Icon
             marginLeft={SPACING.spacing8}
             name="more"
@@ -271,6 +276,8 @@ interface PrepareToRunProps {
   play: () => void
   robotName: string
   runRecord: Run | null
+  labwareConfirmed: boolean
+  liquidsConfirmed: boolean
 }
 
 function PrepareToRun({
@@ -280,6 +287,8 @@ function PrepareToRun({
   play,
   robotName,
   runRecord,
+  labwareConfirmed,
+  liquidsConfirmed,
 }: PrepareToRunProps): JSX.Element {
   const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
   const navigate = useNavigate()
@@ -776,8 +785,8 @@ function PrepareToRun({
               title={t('parameters')}
               detail={parametersDetail}
               subDetail={null}
-              status="general"
-              disabled={!hasRunTimeParameters}
+              status="ready"
+              interactionDisabled={!hasRunTimeParameters}
             />
             <ProtocolSetupStep
               onClickSetupStep={() => {
@@ -786,7 +795,7 @@ function PrepareToRun({
               title={t('labware')}
               detail={labwareDetail}
               subDetail={labwareSubDetail}
-              status="general"
+              status={labwareConfirmed ? 'ready' : 'general'}
               disabled={labwareDetail == null}
             />
             <ProtocolSetupStep
@@ -794,7 +803,7 @@ function PrepareToRun({
                 setSetupScreen('liquids')
               }}
               title={t('liquids')}
-              status="general"
+              status={liquidsConfirmed ? 'ready' : 'general'}
               detail={
                 liquidsInProtocol.length > 0
                   ? t('initial_liquids_num', {
@@ -872,6 +881,8 @@ export function ProtocolSetup(): JSX.Element {
   const [providedFixtureOptions, setProvidedFixtureOptions] = React.useState<
     CutoutFixtureId[]
   >([])
+  const [labwareConfirmed, setLabwareConfirmed] = React.useState<boolean>(false)
+  const [liquidsConfirmed, setLiquidsConfirmed] = React.useState<boolean>(false)
 
   // orchestrate setup subpages/components
   const [setupScreen, setSetupScreen] = React.useState<SetupScreens>(
@@ -886,6 +897,8 @@ export function ProtocolSetup(): JSX.Element {
         play={play}
         robotName={localRobot?.name != null ? localRobot.name : 'no name'}
         runRecord={runRecord ?? null}
+        labwareConfirmed={labwareConfirmed}
+        liquidsConfirmed={liquidsConfirmed}
       />
     ),
     instruments: (
@@ -900,10 +913,20 @@ export function ProtocolSetup(): JSX.Element {
       />
     ),
     labware: (
-      <ProtocolSetupLabware runId={runId} setSetupScreen={setSetupScreen} />
+      <ProtocolSetupLabware
+        runId={runId}
+        setSetupScreen={setSetupScreen}
+        isConfirmed={labwareConfirmed}
+        setIsConfirmed={setLabwareConfirmed}
+      />
     ),
     liquids: (
-      <ProtocolSetupLiquids runId={runId} setSetupScreen={setSetupScreen} />
+      <ProtocolSetupLiquids
+        runId={runId}
+        setSetupScreen={setSetupScreen}
+        isConfirmed={liquidsConfirmed}
+        setIsConfirmed={setLiquidsConfirmed}
+      />
     ),
     'deck configuration': (
       <ProtocolSetupDeckConfiguration

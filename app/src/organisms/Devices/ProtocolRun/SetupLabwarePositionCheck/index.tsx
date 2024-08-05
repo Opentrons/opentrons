@@ -76,7 +76,13 @@ export function SetupLabwarePositionCheck(
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const protocolData = robotProtocolAnalysis ?? storedProtocolAnalysis
-  const [targetProps, tooltipProps] = useHoverTooltip({
+  const [runLPCTargetProps, runLPCTooltipProps] = useHoverTooltip({
+    placement: TOOLTIP_LEFT,
+  })
+  const [
+    confirmOffsetsTargetProps,
+    confirmOffsetsTooltipProps,
+  ] = useHoverTooltip({
     placement: TOOLTIP_LEFT,
   })
 
@@ -120,11 +126,16 @@ export function SetupLabwarePositionCheck(
           }}
           id="LPC_setOffsetsConfirmed"
           padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
-          disabled={offsetsConfirmed}
+          {...confirmOffsetsTargetProps}
+          disabled={offsetsConfirmed || lpcDisabledReason !== null}
         >
           {t('confirm_offsets')}
         </SecondaryButton>
-
+        {lpcDisabledReason !== null ? (
+          <Tooltip tooltipProps={confirmOffsetsTooltipProps}>
+            {lpcDisabledReason}
+          </Tooltip>
+        ) : null}
         <PrimaryButton
           textTransform={TYPOGRAPHY.textTransformCapitalize}
           title={t('run_labware_position_check')}
@@ -133,13 +144,15 @@ export function SetupLabwarePositionCheck(
             setIsShowingLPCSuccessToast(false)
           }}
           id="LabwareSetup_checkLabwarePositionsButton"
-          {...targetProps}
+          {...runLPCTargetProps}
           disabled={lpcDisabledReason !== null}
         >
           {t('run_labware_position_check')}
         </PrimaryButton>
         {lpcDisabledReason !== null ? (
-          <Tooltip tooltipProps={tooltipProps}>{lpcDisabledReason}</Tooltip>
+          <Tooltip tooltipProps={runLPCTooltipProps}>
+            {lpcDisabledReason}
+          </Tooltip>
         ) : null}
       </Flex>
       {LPCWizard}

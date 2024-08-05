@@ -25,16 +25,26 @@ vi.mock('../LiquidDetails')
 vi.mock('../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 vi.mock('@opentrons/api-client')
 
-const render = (props: React.ComponentProps<typeof ProtocolSetupLiquids>) => {
-  return renderWithProviders(<ProtocolSetupLiquids {...props} />, {
-    i18nInstance: i18n,
-  })
-}
-
 describe('ProtocolSetupLiquids', () => {
+  let isConfirmed = false
+  const setIsConfirmed = vi.fn((confirmed: boolean) => {
+    isConfirmed = confirmed
+  })
+
+  const render = (props: React.ComponentProps<typeof ProtocolSetupLiquids>) => {
+    return renderWithProviders(<ProtocolSetupLiquids {...props} />, {
+      i18nInstance: i18n,
+    })
+  }
+
   let props: React.ComponentProps<typeof ProtocolSetupLiquids>
   beforeEach(() => {
-    props = { runId: RUN_ID_1, setSetupScreen: vi.fn() }
+    props = {
+      runId: RUN_ID_1,
+      setSetupScreen: vi.fn(),
+      isConfirmed,
+      setIsConfirmed,
+    }
     vi.mocked(parseLiquidsInLoadOrder).mockReturnValue(
       MOCK_LIQUIDS_IN_LOAD_ORDER
     )

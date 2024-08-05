@@ -52,11 +52,17 @@ const mockRefetch = vi.fn()
 const mockCreateLiveCommand = vi.fn()
 
 const render = () => {
+  let confirmed = false
+  const setIsConfirmed = vi.fn((ready: boolean) => {
+    confirmed = ready
+  })
   return renderWithProviders(
     <MemoryRouter>
       <ProtocolSetupLabware
         runId={RUN_ID}
         setSetupScreen={mockSetSetupScreen}
+        isConfirmed={confirmed}
+        setIsConfirmed={setIsConfirmed}
       />
     </MemoryRouter>,
     {

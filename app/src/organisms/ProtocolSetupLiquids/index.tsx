@@ -5,6 +5,7 @@ import {
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
+  DIRECTION_ROW,
   Flex,
   Icon,
   JUSTIFY_FLEX_END,
@@ -12,6 +13,7 @@ import {
   StyledText,
   TYPOGRAPHY,
   JUSTIFY_SPACE_BETWEEN,
+  Chip,
 } from '@opentrons/components'
 import {
   parseLiquidsInLoadOrder,
@@ -19,6 +21,8 @@ import {
 } from '@opentrons/api-client'
 import { MICRO_LITERS } from '@opentrons/shared-data'
 import { ODDBackButton } from '../../molecules/ODDBackButton'
+import { SmallButton } from '../../atoms/buttons'
+
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getTotalVolumePerLiquidId } from '../Devices/ProtocolRun/SetupLiquids/utils'
 import { LiquidDetails } from './LiquidDetails'
@@ -29,11 +33,15 @@ import type { SetupScreens } from '../../pages/ProtocolSetup'
 export interface ProtocolSetupLiquidsProps {
   runId: string
   setSetupScreen: React.Dispatch<React.SetStateAction<SetupScreens>>
+  isConfirmed: boolean
+  setIsConfirmed: (confirmed: boolean) => void
 }
 
 export function ProtocolSetupLiquids({
   runId,
   setSetupScreen,
+  isConfirmed,
+  setIsConfirmed,
 }: ProtocolSetupLiquidsProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   const protocolData = useMostRecentCompletedAnalysis(runId)
@@ -43,12 +51,34 @@ export function ProtocolSetupLiquids({
   )
   return (
     <>
-      <ODDBackButton
-        label={t('liquids')}
-        onClick={() => {
-          setSetupScreen('prepare to run')
-        }}
-      />
+      <Flex
+        flexDirection={DIRECTION_ROW}
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+      >
+        <ODDBackButton
+          label={t('liquids')}
+          onClick={() => {
+            setSetupScreen('prepare to run')
+          }}
+        />
+        {isConfirmed ? (
+          <Chip
+            background
+            iconName="ot-check"
+            text={t('liquids_confirmed')}
+            type="success"
+            chipSize="small"
+          />
+        ) : (
+          <SmallButton
+            buttonText={t('confirm_liquids')}
+            onClick={() => {
+              setIsConfirmed(true)
+              setSetupScreen('prepare to run')
+            }}
+          />
+        )}
+      </Flex>
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing8}
