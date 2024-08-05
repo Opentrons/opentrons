@@ -146,6 +146,15 @@ export function ProtocolRunSetup({
     return true
   })
 
+  const [
+    labwareSetupComplete,
+    setLabwareSetupComplete,
+  ] = React.useState<boolean>(false)
+  const [liquidSetupComplete, setLiquidSetupComplete] = React.useState<boolean>(
+    false
+  )
+  const [lpcComplete, setLpcComplete] = React.useState<boolean>(false)
+
   if (robot == null) return null
 
   const liquids = protocolAnalysis?.liquids ?? []
@@ -167,15 +176,6 @@ export function ProtocolRunSetup({
   const ot2DeckHardwareDescription = hasModules
     ? t('install_modules', { count: modules.length })
     : t('no_deck_hardware_specified')
-
-  const [
-    labwareSetupComplete,
-    setLabwareSetupComplete,
-  ] = React.useState<boolean>(false)
-  const [liquidSetupComplete, setLiquidSetupComplete] = React.useState<boolean>(
-    false
-  )
-  const [lpcComplete, setLpcComplete] = React.useState<boolean>(false)
 
   const StepDetailMap: Record<
     StepKey,
@@ -292,7 +292,6 @@ export function ProtocolRunSetup({
     [LIQUID_SETUP_KEY]: {
       stepInternals: (
         <SetupLiquids
-          robotName={robotName}
           runId={runId}
           protocolAnalysis={protocolAnalysis}
           isLiquidSetupConfirmed={liquidSetupComplete}

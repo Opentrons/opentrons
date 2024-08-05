@@ -249,13 +249,12 @@ function PageContents(props: PageContentsProps): JSX.Element {
     },
   }
 
-  const { content, backToTop } = protocolRunDetailsContentByTab[
-    protocolRunDetailsTab
-  ] ?? (
+  const tabDetails = protocolRunDetailsContentByTab[protocolRunDetailsTab] ?? (
     // default to the setup tab if no tab or nonexistent tab is passed as a param
 
     <Navigate to={`/devices/${robotName}/protocol-runs/${runId}/setup`} />
   )
+  const { content, backToTop } = tabDetails
 
   return (
     <>
