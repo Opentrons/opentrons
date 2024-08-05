@@ -26,8 +26,6 @@ import { getModuleDisplayName } from '@opentrons/shared-data'
 
 interface LabwareStackModalProps {
   labwareIdTop: string
-  labwareIdBottom?: string
-  moduleId?: string
   runId: string
   closeModal: () => void
 }
