@@ -100,6 +100,12 @@ export interface Runs {
   links: RunsLinks
 }
 
+export interface RunCommandErrors {
+  data: RunCommandError[]
+  cursor?: number
+  pageLength?: number
+}
+
 export const RUN_ACTION_TYPE_PLAY: 'play' = 'play'
 export const RUN_ACTION_TYPE_PAUSE: 'pause' = 'pause'
 export const RUN_ACTION_TYPE_STOP: 'stop' = 'stop'
