@@ -13,8 +13,6 @@ def test_create_aionotify_event() -> None:
         List[enum.Enum], [FakeEnum.CREATE, FakeEnum.DELETE, FakeEnum.MODIFY]
     )
 
-    # enum_list = [FakeEnum.CREATE, FakeEnum.DELETE, FakeEnum.MODIFY]
-
     new_event = types.AionotifyEvent.build("fake event", enum_list)
 
     assert hasattr(new_event.flags, "CREATE")
