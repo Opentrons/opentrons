@@ -5,7 +5,7 @@ import json
 import os
 
 from pathlib import Path
-from typing import Any, AnyStr, List, Dict, Optional, Union, TYPE_CHECKING
+from typing import Any, AnyStr, List, Dict, Optional, Union
 
 import jsonschema  # type: ignore
 
