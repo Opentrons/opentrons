@@ -70,29 +70,27 @@ export function useInterventionModal({
   /* Props that must be truthy for the modal to render. Prevents multiple null checks while guaranteeing prop type safety. */
   modalProps: Omit<InterventionModalProps, 'onResume'> | null
 } {
-  return React.useMemo(() => {
-    const isValidIntervention =
-      lastRunCommand != null &&
-      robotName != null &&
-      isInterventionCommand(lastRunCommand) &&
-      runData != null &&
-      runStatus != null &&
-      !TERMINAL_RUN_STATUSES.includes(runStatus)
+  const isValidIntervention =
+    lastRunCommand != null &&
+    robotName != null &&
+    isInterventionCommand(lastRunCommand) &&
+    runData != null &&
+    runStatus != null &&
+    !TERMINAL_RUN_STATUSES.includes(runStatus)
 
-    if (!isValidIntervention) {
-      return { showModal: false, modalProps: null }
-    } else {
-      return {
-        showModal: true,
-        modalProps: {
-          command: lastRunCommand,
-          run: runData,
-          robotName,
-          analysis,
-        },
-      }
+  if (!isValidIntervention) {
+    return { showModal: false, modalProps: null }
+  } else {
+    return {
+      showModal: true,
+      modalProps: {
+        command: lastRunCommand,
+        run: runData,
+        robotName,
+        analysis,
+      },
     }
-  }, [runData?.id, lastRunCommand?.key, runStatus])
+  }
 }
 
 export interface InterventionModalProps {
