@@ -2709,12 +2709,14 @@ class OT3API(
         # TODO: (sigler) add this to pipette's liquid def (per tip)
         z_offset_for_plunger_prep = max(2.0, z_offset_per_pass)
 
-        async def prep_plunger_for_probe_move(aspirate_while_sensing: bool) -> None:
+        async def prep_plunger_for_probe_move(
+            position: top_types.Point, aspirate_while_sensing: bool
+        ) -> None:
             # safe distance so we don't accidentally aspirate liquid if we're already close to liquid
             mount_pos_for_plunger_prep = top_types.Point(
-                current_position.x,
-                current_position.y,
-                current_position.z + z_offset_for_plunger_prep,
+                position.x,
+                position.y,
+                position.z + z_offset_for_plunger_prep,
             )
             # Prep the plunger
             await self.move_to(checked_mount, mount_pos_for_plunger_prep)
@@ -2730,7 +2732,10 @@ class OT3API(
         # due to rounding errors this can get caught in an infinite loop when the distance is almost equal
         # so we check to see if they're within 0.01 which is 1/5th the minimum movement distance from move_utils.py
         while (starting_position.z - current_position.z) < (max_z_dist + 0.01):
-            await prep_plunger_for_probe_move(probe_settings.aspirate_while_sensing)
+            await prep_plunger_for_probe_move(
+                position=current_position,
+                aspirate_while_sensing=probe_settings.aspirate_while_sensing,
+            )
 
             # overlap amount we want to use between passes
             pass_start_pos = top_types.Point(
