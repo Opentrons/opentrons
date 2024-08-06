@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { when } from 'vitest-when'
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 import { describe, it, vi, beforeEach, afterEach, expect } from 'vitest'
 
 import { BaseDeck, EXTENDED_DECK_CONFIG_FIXTURE } from '@opentrons/components'
@@ -16,7 +16,7 @@ import { i18n } from '../../../i18n'
 import { getLabwareRenderInfo } from '../../Devices/ProtocolRun/utils/getLabwareRenderInfo'
 import { getStandardDeckViewLayerBlockList } from '../../Devices/ProtocolRun/utils/getStandardDeckViewLayerBlockList'
 import { mockProtocolModuleInfo } from '../__fixtures__'
-import { LabwareMapViewModal } from '../LabwareMapViewModal'
+import { LabwareMapViewContent } from '../LabwareMapViewContent'
 
 import type {
   getSimplestDeckConfigForProtocol,
@@ -51,10 +51,10 @@ vi.mock('@opentrons/components', async importOriginal => {
   }
 })
 
-const render = (props: React.ComponentProps<typeof LabwareMapViewModal>) => {
+const render = (props: React.ComponentProps<typeof LabwareMapViewContent>) => {
   return renderWithProviders(
     <MemoryRouter>
-      <LabwareMapViewModal {...props} />
+      <LabwareMapViewContent {...props} />
     </MemoryRouter>,
     {
       i18nInstance: i18n,
@@ -62,7 +62,7 @@ const render = (props: React.ComponentProps<typeof LabwareMapViewModal>) => {
   )[0]
 }
 
-describe('LabwareMapViewModal', () => {
+describe('LabwareMapViewContent', () => {
   beforeEach(() => {
     vi.mocked(getLabwareRenderInfo).mockReturnValue({})
     // vi.mocked(getSimplestDeckConfigForProtocol).mockReturnValue([])
@@ -72,7 +72,7 @@ describe('LabwareMapViewModal', () => {
     vi.resetAllMocks()
   })
 
-  it('should render nothing on the deck and calls exit button', () => {
+  it('should render nothing on the deck', () => {
     vi.mocked(BaseDeck).mockReturnValue(<div>mock base deck</div>)
 
     const props = {
@@ -88,10 +88,7 @@ describe('LabwareMapViewModal', () => {
     }
 
     render(props)
-    screen.getByText('Map View')
     screen.getByText('mock base deck')
-    fireEvent.click(screen.getByLabelText('closeIcon'))
-    expect(props.onCloseClick).toHaveBeenCalled()
   })
 
   it('should render a deck with modules and labware', () => {
@@ -136,7 +133,6 @@ describe('LabwareMapViewModal', () => {
     })
     render({
       handleLabwareClick: vi.fn(),
-      onCloseClick: vi.fn(),
       deckDef: (deckDefFixture as unknown) as DeckDefinition,
       mostRecentAnalysis: ({} as unknown) as CompletedProtocolAnalysis,
       initialLoadedLabwareByAdapter: {},

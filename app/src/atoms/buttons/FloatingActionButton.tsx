@@ -21,7 +21,7 @@ import type { IconName, StyleProps } from '@opentrons/components'
 interface FloatingActionButtonProps extends StyleProps {
   buttonText?: React.ReactNode
   disabled?: boolean
-  iconName?: IconName
+  iconName?: IconName | null
   onClick: React.MouseEventHandler
 }
 
@@ -78,12 +78,14 @@ export function FloatingActionButton(
         flexDirection={DIRECTION_ROW}
         gridGap={SPACING.spacing8}
       >
-        <Icon
-          color={contentColor}
-          height="3rem"
-          name={iconName}
-          width="3.75rem"
-        />
+        {iconName != null ? (
+          <Icon
+            color={contentColor}
+            height="3rem"
+            name={iconName}
+            width="3.75rem"
+          />
+        ) : null}
         <LegacyStyledText>{buttonText}</LegacyStyledText>
       </Flex>
     </Btn>

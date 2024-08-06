@@ -39,12 +39,12 @@ export function SetupLabwareMap({
   protocolAnalysis,
 }: SetupLabwareMapProps): JSX.Element | null {
   // early return null if no protocol analysis
-  if (protocolAnalysis == null) return null
-
   const [
     labwareStackDetailsLabwareId,
     setLabwareStackDetailsLabwareId,
   ] = React.useState<string | null>(null)
+
+  if (protocolAnalysis == null) return null
 
   const commands = protocolAnalysis.commands
 

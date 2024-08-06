@@ -110,11 +110,14 @@ describe('ProtocolSetupLabware', () => {
     expect(mockSetSetupScreen).toHaveBeenCalledWith('prepare to run')
   })
 
-  it('should launch and close the deck map', () => {
+  it('should toggle between list and deck map content', () => {
     render()
     fireEvent.click(screen.getByRole('button', { name: 'Map View' }))
-    fireEvent.click(screen.getByLabelText('closeIcon'))
+    screen.getByTestId('DeckInfoLabel_A')
+    fireEvent.click(screen.getByRole('button', { name: 'List View' }))
     screen.getByText('Labware')
+    screen.getByText('Labware name')
+    screen.getByText('Location')
   })
 
   it('sends a latch-close command when the labware latch is open and the button is clicked', () => {

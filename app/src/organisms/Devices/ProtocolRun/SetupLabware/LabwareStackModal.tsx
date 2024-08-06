@@ -9,6 +9,7 @@ import {
   DeckInfoLabel,
   DIRECTION_COLUMN,
   Flex,
+  JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   LabwareStackRender,
   SPACING,
@@ -23,6 +24,13 @@ import { getSlotLabwareDefinition } from '../utils/getSlotLabwareDefinition'
 import { Divider } from '../../../../atoms/structure'
 import { getModuleImage } from '../SetupModuleAndDeck/utils'
 import { getModuleDisplayName } from '@opentrons/shared-data'
+import tiprackAdapter from '../../../../assets/images/labware/opentrons_flex_96_tiprack_adapter.png'
+
+const HIDE_SCROLLBAR = css`
+  ::-webkit-scrollbar {
+    display: none;
+  }
+`
 
 interface LabwareStackModalProps {
   labwareIdTop: string
@@ -49,58 +57,95 @@ export const LabwareStackModal = (
     labwareName,
     labwareNickname,
   } = getLocationInfoNames(labwareIdTop, commands)
-  // working up to here
 
-  const topDefinition = getSlotLabwareDefinition(
-    labwareIdTop,
-    protocolData.commands
-  )
-  const isAdapterOnly =
-    adapterId == null && topDefinition.metadata.displayCategory === 'adapter'
+  const topDefinition = getSlotLabwareDefinition(labwareIdTop, commands)
+  const adapterDef = getSlotLabwareDefinition(adapterId ?? '', commands)
   const moduleDisplayName =
     moduleModel != null ? getModuleDisplayName(moduleModel) : null ?? ''
+  const tiprackAdapterImg = (
+    <img width="156px" height="130px" src={tiprackAdapter} />
+  )
   const moduleImg =
     moduleModel != null ? (
-      <img width="156px" height="140px" src={getModuleImage(moduleModel)} />
+      <img width="156px" height="130px" src={getModuleImage(moduleModel)} />
     ) : null
-  const HIDE_SCROLLBAR = css`
-    ::-webkit-scrollbar {
-      display: none;
-    }
-  `
 
-  const adapterDef = getSlotLabwareDefinition(adapterId ?? '', commands)
   return isOnDevice ? (
     <Modal
-      modalSize="large"
       onOutsideClick={closeModal}
       header={{
-        title: labwareName,
+        title: (
+          <Flex gridGap={SPACING.spacing4}>
+            <DeckInfoLabel deckLabel={slotName} />
+            <DeckInfoLabel iconName="stacked" />
+          </Flex>
+        ),
         hasExitIcon: true,
         onClick: closeModal,
       }}
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        height="23.70375rem"
         css={HIDE_SCROLLBAR}
-        minWidth="10.313rem"
         overflowY="scroll"
         gridGap={SPACING.spacing16}
+        width="41.675rem"
       >
-        {}
-      </Flex>
-      <Flex width="38.75rem">
-        <Flex marginLeft={SPACING.spacing32}>
-          <svg
-            viewBox="0.5 2.2 127 78"
-            height="100%"
-            width="100%"
-            transform="scale(1, -1)"
+        <>
+          <Flex
+            alignItems={ALIGN_CENTER}
+            height="6.875rem"
+            gridGap={SPACING.spacing32}
           >
-            {}
-          </svg>
-        </Flex>
+            <LabwareStackLabel
+              isOnDevice
+              text={labwareName}
+              subText={labwareNickname}
+            />
+            <LabwareStackRender
+              definitionTop={topDefinition}
+              definitionBottom={adapterDef}
+              highlightBottom={false}
+              highlightTop={true}
+            />
+          </Flex>
+          <Divider marginY={SPACING.spacing16} />
+        </>
+        {adapterDef != null ? (
+          <>
+            <Flex
+              alignItems={ALIGN_CENTER}
+              height="6.875rem"
+              gridGap={SPACING.spacing32}
+            >
+              <LabwareStackLabel text={adapterName ?? ''} isOnDevice />
+              {adapterDef.parameters.loadName ===
+              'opentrons_flex_96_tiprack_adapter' ? (
+                tiprackAdapterImg
+              ) : (
+                <LabwareStackRender
+                  definitionTop={topDefinition}
+                  definitionBottom={adapterDef}
+                  highlightBottom={true}
+                  highlightTop={false}
+                />
+              )}
+            </Flex>
+            {moduleModel != null ? (
+              <Divider marginY={SPACING.spacing16} />
+            ) : null}
+          </>
+        ) : null}
+        {moduleModel != null ? (
+          <Flex
+            alignItems={ALIGN_CENTER}
+            height="6.875rem"
+            gridGap={SPACING.spacing32}
+          >
+            <LabwareStackLabel text={moduleDisplayName} isOnDevice />
+            {moduleImg}
+          </Flex>
+        ) : null}
       </Flex>
     </Modal>
   ) : (
@@ -115,34 +160,22 @@ export const LabwareStackModal = (
         </Flex>
       }
       childrenPadding={0}
-      width="31.25rem"
     >
-      <Box
-        padding={SPACING.spacing24}
-        backgroundColor={COLORS.white}
-        height="28.125rem"
-      >
+      <Box padding={SPACING.spacing24} backgroundColor={COLORS.white}>
         <Flex flexDirection={DIRECTION_COLUMN}>
           <>
             <Flex
               alignItems={ALIGN_CENTER}
-              justifyContent={JUSTIFY_SPACE_BETWEEN}
               height="6.875rem"
+              gridGap={SPACING.spacing32}
             >
               <LabwareStackLabel text={labwareName} subText={labwareNickname} />
-              <svg
-                viewBox="-150 -120 300 300"
-                transform={
-                  isAdapterOnly ? 'scale(1.25, -1.25)' : 'scale(1.25, -0.75)'
-                }
-              >
-                <LabwareStackRender
-                  definitionTop={topDefinition}
-                  definitionBottom={adapterDef}
-                  highlightBottom={false}
-                  highlightTop={true}
-                />
-              </svg>
+              <LabwareStackRender
+                definitionTop={topDefinition}
+                definitionBottom={adapterDef}
+                highlightBottom={false}
+                highlightTop={true}
+              />
             </Flex>
             <Divider marginY={SPACING.spacing16} />
           </>
@@ -150,25 +183,18 @@ export const LabwareStackModal = (
             <>
               <Flex
                 alignItems={ALIGN_CENTER}
-                justifyContent={JUSTIFY_SPACE_BETWEEN}
                 height="6.875rem"
+                gridGap={SPACING.spacing32}
               >
                 <LabwareStackLabel text={adapterName ?? ''} />
-                <svg
-                  viewBox="-150 -120 300 300"
-                  transform={'scale(1.25, -0.75)'}
-                >
-                  <LabwareStackRender
-                    definitionTop={topDefinition}
-                    definitionBottom={adapterDef}
-                    highlightBottom={true}
-                    highlightTop={false}
-                  />
-                </svg>
+                <LabwareStackRender
+                  definitionTop={topDefinition}
+                  definitionBottom={adapterDef}
+                  highlightBottom={true}
+                  highlightTop={false}
+                />
               </Flex>
-              {moduleModel != null ? (
-                <Divider marginY={SPACING.spacing16} />
-              ) : null}
+              <Divider marginY={SPACING.spacing16} />
             </>
           ) : null}
           {moduleModel != null ? (
@@ -190,15 +216,31 @@ export const LabwareStackModal = (
 interface LabwareStackLabelProps {
   text: string
   subText?: string
+  isOnDevice?: boolean
 }
 function LabwareStackLabel(props: LabwareStackLabelProps): JSX.Element {
-  const { text, subText } = props
-  return (
+  const { text, subText, isOnDevice = false } = props
+  return isOnDevice ? (
     <Flex
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing4}
-      minWidth="14.75rem"
-      maxWidth="14.75rem"
+      width="28rem"
+      flex="0 0 auto"
+      justifyContent={JUSTIFY_CENTER}
+    >
+      <StyledText oddStyle="bodyTextBold">{text}</StyledText>
+      {subText != null ? (
+        <StyledText oddStyle="bodyTextRegular" color={COLORS.grey60}>
+          {subText}
+        </StyledText>
+      ) : null}
+    </Flex>
+  ) : (
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      gridGap={SPACING.spacing4}
+      width="14.75rem"
+      flex="0 0 auto"
     >
       <StyledText desktopStyle="bodyLargeSemiBold">{text}</StyledText>
       {subText != null ? (
