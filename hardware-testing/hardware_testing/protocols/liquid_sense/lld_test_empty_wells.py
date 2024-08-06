@@ -59,7 +59,17 @@ FILE_NAME = ""
 CSV_HEADER = "some,dumb,header"
 
 
-def _setup(ctx: ProtocolContext) -> Tuple[InstrumentContext, Labware, Labware, Labware, Optional[Any], Optional[str], Optional[int]]:
+def _setup(
+    ctx: ProtocolContext,
+) -> Tuple[
+    InstrumentContext,
+    Labware,
+    Labware,
+    Labware,
+    Optional[Any],
+    Optional[str],
+    Optional[int],
+]:
     global DIAL_PORT, RUN_ID, FILE_NAME
     # TODO: use runtime-variables instead of constants
     ctx.load_trash_bin("A3")
@@ -70,7 +80,7 @@ def _setup(ctx: ProtocolContext) -> Tuple[InstrumentContext, Labware, Labware, L
     pipette = ctx.load_instrument(pip_name, "left")
     labware = ctx.load_labware(LABWARE, SLOT_LABWARE)
     dial = ctx.load_labware("dial_indicator", SLOT_DIAL)
-    
+
     google_sheet = None
     sheet_id = ""
     row = 0
@@ -96,16 +106,18 @@ def _setup(ctx: ProtocolContext) -> Tuple[InstrumentContext, Labware, Labware, L
             model=PipetteModelType(pip_model_list[0]),
             channels=PipetteChannelType(pipette.channels),
             version=PipetteVersionType(
-                major=int(pip_model_list[-1][-3]),
-                minor=int(pip_model_list[-1][-1])
+                major=int(pip_model_list[-1][-3]), minor=int(pip_model_list[-1][-1])
             ),
         )
         # Writes details about test run to google sheet.
         tipVolume = "t" + str(TIP_SIZE)
         lld_min_height = pip_def.lld_settings[tipVolume]["minHeight"]
-        
-        _write_line_to_csv(ctx, f"lld-min-height,{lld_min_height}") 
-        header = [["Run ID", "Pipette Name", "Tip Type", "Labware", "lld-min-height"], [RUN_ID, pip_name, rack_name, LABWARE, lld_min_height]]
+
+        _write_line_to_csv(ctx, f"lld-min-height,{lld_min_height}")
+        header = [
+            ["Run ID", "Pipette Name", "Tip Type", "Labware", "lld-min-height"],
+            [RUN_ID, pip_name, rack_name, LABWARE, lld_min_height],
+        ]
         try:
             google_sheet, sheet_id, row = _set_up_google_sheet(ctx, header)
         except google_sheets_tool.google_interaction_error:
@@ -115,7 +127,10 @@ def _setup(ctx: ProtocolContext) -> Tuple[InstrumentContext, Labware, Labware, L
             row = None
     return pipette, rack, labware, dial, google_sheet, sheet_id, row
 
-def _set_up_google_sheet(ctx:ProtocolContext, header:List[List[str]]) -> Optional[Tuple[Any, str]]:
+
+def _set_up_google_sheet(
+    ctx: ProtocolContext, header: List[List[str]]
+) -> Optional[Tuple[Any, str]]:
     """Connect to google sheet using credentials file in jupyter notebook."""
     if ctx.is_simulating():
         return
@@ -134,12 +149,20 @@ def _set_up_google_sheet(ctx:ProtocolContext, header:List[List[str]]) -> Optiona
         ctx.comment(
             "There are no google sheets credentials. Make sure credentials in jupyter notebook."
         )
-        
-def _write_line_to_google_sheet(ctx: ProtocolContext, google_sheet:Any, line: List[List[Any]], sheet_id: str, row: int)-> None:
+
+
+def _write_line_to_google_sheet(
+    ctx: ProtocolContext,
+    google_sheet: Any,
+    line: List[List[Any]],
+    sheet_id: str,
+    row: int,
+) -> None:
     try:
-        google_sheet.batch_update_cells(line, 'A', row, sheet_id)
+        google_sheet.batch_update_cells(line, "A", row, sheet_id)
     except:
         ctx.comment("Google sheet not updated.")
+
 
 def _write_line_to_csv(ctx: ProtocolContext, line: str) -> None:
     if ctx.is_simulating():
@@ -164,7 +187,10 @@ def _get_test_tips(rack: Labware, pipette: InstrumentContext) -> List[Well]:
 
 
 def _read_dial_indicator(
-    ctx: ProtocolContext, pipette: InstrumentContext, dial: Labware, front_channel: bool = False
+    ctx: ProtocolContext,
+    pipette: InstrumentContext,
+    dial: Labware,
+    front_channel: bool = False,
 ) -> float:
     target = dial["A1"].top()
     if front_channel:
@@ -179,7 +205,13 @@ def _read_dial_indicator(
 
 
 def _store_dial_baseline(
-    ctx: ProtocolContext, pipette: InstrumentContext, dial: Labware, google_sheet: Any, sheet_id: str, row: int, front_channel: bool = False,
+    ctx: ProtocolContext,
+    pipette: InstrumentContext,
+    dial: Labware,
+    google_sheet: Any,
+    sheet_id: str,
+    row: int,
+    front_channel: bool = False,
 ) -> None:
     global DIAL_POS_WITHOUT_TIP
     idx = 0 if not front_channel else 1
@@ -188,10 +220,16 @@ def _store_dial_baseline(
     DIAL_POS_WITHOUT_TIP[idx] = _read_dial_indicator(ctx, pipette, dial, front_channel)
     tag = f"DIAL-BASELINE-{idx}"
     _write_line_to_csv(ctx, f"{tag},{DIAL_POS_WITHOUT_TIP[idx]}")
-    _write_line_to_google_sheet(ctx, google_sheet, [[tag], [DIAL_POS_WITHOUT_TIP[idx]]], sheet_id, row + 1)
+    _write_line_to_google_sheet(
+        ctx, google_sheet, [[tag], [DIAL_POS_WITHOUT_TIP[idx]]], sheet_id, row + 1
+    )
+
 
 def _get_tip_z_error(
-    ctx: ProtocolContext, pipette: InstrumentContext, dial: Labware, front_channel: bool = False
+    ctx: ProtocolContext,
+    pipette: InstrumentContext,
+    dial: Labware,
+    front_channel: bool = False,
 ) -> float:
     idx = 0 if not front_channel else 1
     assert DIAL_POS_WITHOUT_TIP[idx] is not None
@@ -202,7 +240,10 @@ def _get_tip_z_error(
 
 
 def _get_wells_with_expected_liquid_state(
-    ctx: ProtocolContext, pipette: InstrumentContext, test_wells: List[Well], expected_state: bool
+    ctx: ProtocolContext,
+    pipette: InstrumentContext,
+    test_wells: List[Well],
+    expected_state: bool,
 ) -> List[Well]:
     successful_wells = []
     for well in test_wells:
@@ -221,15 +262,17 @@ def _test_for_expected_liquid_state(
     wells: List[Well],
     trials: int,
     liquid_state: bool,
-    google_sheet: Any, 
+    google_sheet: Any,
     sheet_id: str,
-    row: int
+    row: int,
 ) -> None:
     fail_counter = 0
     trial_counter = 0
     _store_dial_baseline(ctx, pipette, dial, google_sheet, sheet_id, row)
     if pipette.channels > 1:
-        _store_dial_baseline(ctx, pipette, dial, google_sheet, sheet_id, row, front_channel=True)
+        _store_dial_baseline(
+            ctx, pipette, dial, google_sheet, sheet_id, row, front_channel=True
+        )
     csv_header = f'trial,result,tip-z-error,{",".join([w.well_name for w in wells])}'
     _write_line_to_csv(ctx, f"{csv_header}")
     # Write header to google sheet.
@@ -243,18 +286,32 @@ def _test_for_expected_liquid_state(
             tip_z_errors: List[float] = []
             tip_z_errors.append(_get_tip_z_error(ctx, pipette, dial))
             if pipette.channels > 1:
-                tip_z_errors.append(_get_tip_z_error(ctx, pipette, dial, front_channel=True))
-            successful_wells = _get_wells_with_expected_liquid_state(ctx,
-                pipette, wells, liquid_state
+                tip_z_errors.append(
+                    _get_tip_z_error(ctx, pipette, dial, front_channel=True)
+                )
+            successful_wells = _get_wells_with_expected_liquid_state(
+                ctx, pipette, wells, liquid_state
             )
-            all_trials_passed = "PASS" if len(successful_wells) == len(wells) else "FAIL"
+            all_trials_passed = (
+                "PASS" if len(successful_wells) == len(wells) else "FAIL"
+            )
             trial_data = [trial_counter, all_trials_passed] + tip_z_errors
             each_well_result_bool = [bool(w in successful_wells) for w in wells]
             trial_data += ["PASS" if w else "FAIL" for w in each_well_result_bool]
             _write_line_to_csv(ctx, ",".join([str(d) for d in trial_data]))
             # Write Pass/Fail data to google_sheet
-            trial_data_for_google_sheet = [[trial_counter], [all_trials_passed], tip_z_errors] + [["PASS"] if w else ["FAIL"] for w in each_well_result_bool]
-            _write_line_to_google_sheet(ctx, google_sheet, trial_data_for_google_sheet, sheet_id, row + trial_counter + 2)
+            trial_data_for_google_sheet = [
+                [trial_counter],
+                [all_trials_passed],
+                tip_z_errors,
+            ] + [["PASS"] if w else ["FAIL"] for w in each_well_result_bool]
+            _write_line_to_google_sheet(
+                ctx,
+                google_sheet,
+                trial_data_for_google_sheet,
+                sheet_id,
+                row + trial_counter + 2,
+            )
             pipette.drop_tip()
             fail_counter += 0 if all_trials_passed else 1
         if trial_counter < trials:
@@ -277,6 +334,6 @@ def run(ctx: ProtocolContext) -> None:
         trials=NUM_TRIALS,
         liquid_state=False,
         google_sheet=google_sheet,
-        sheet_id = sheet_id,
-        row = row
+        sheet_id=sheet_id,
+        row=row,
     )

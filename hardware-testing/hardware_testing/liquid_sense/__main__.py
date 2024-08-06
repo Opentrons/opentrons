@@ -123,6 +123,7 @@ class RunArgs:
     no_multi_pass: int
     test_well: str
     wet: bool
+    dial_front_channel: bool
 
     @classmethod
     def _get_protocol_context(cls, args: argparse.Namespace) -> ProtocolContext:
@@ -256,6 +257,7 @@ class RunArgs:
             no_multi_pass=args.no_multi_pass,
             test_well=args.test_well,
             wet=args.wet,
+            dial_front_channel=args.dial_front_channel,
         )
 
 
@@ -273,7 +275,7 @@ if __name__ == "__main__":
     parser.add_argument("--trials-before-jog", type=int, default=7)
     parser.add_argument("--z-speed", type=float, default=5)
     parser.add_argument("--aspirate", action="store_true")
-    parser.add_argument("--plunger-speed", type=float, default=20)
+    parser.add_argument("--plunger-speed", type=float, default=15)
     parser.add_argument("--no-multi-pass", action="store_true")
     parser.add_argument("--wet", action="store_true")
     parser.add_argument("--starting-tip", type=str, default="A1")
@@ -285,6 +287,7 @@ if __name__ == "__main__":
     )
     parser.add_argument("--liquid", type=str, default="unknown")
     parser.add_argument("--skip-labware-offsets", action="store_true")
+    parser.add_argument("--dial-front-channel", action="store_true")
 
     args = parser.parse_args()
 
