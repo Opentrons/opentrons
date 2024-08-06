@@ -23,7 +23,7 @@ from opentrons_shared_data.pipette.types import (
 NUM_TRIALS = 10
 
 TIP_SIZE = 50
-PIPETTE_SIZE = 50
+PIPETTE_SIZE = 1000
 PIPETTE_CHANNELS = 1
 
 LABWARE = "corning_96_wellplate_360ul_flat"
@@ -75,8 +75,10 @@ def _setup(
     ctx.load_trash_bin("A3")
     pip_name = f"flex_{PIPETTE_CHANNELS}channel_{PIPETTE_SIZE}"
     rack_name = f"opentrons_flex_96_tiprack_{TIP_SIZE}uL"
-
-    rack = ctx.load_labware(rack_name, SLOT_TIPRACK)
+    if PIPETTE_CHANNELS < 96:
+        rack = ctx.load_labware(rack_name, SLOT_TIPRACK)
+    else:
+        rack = ctx.load_labware(rack_name, SLOT_TIPRACK, adapter = "opentrons_flex_96_tiprack_adapter")
     pipette = ctx.load_instrument(pip_name, "left")
     labware = ctx.load_labware(LABWARE, SLOT_LABWARE)
     dial = ctx.load_labware("dial_indicator", SLOT_DIAL)
@@ -197,11 +199,15 @@ def _read_dial_indicator(
         target = target.move(Point(y=9 * 7))
         if pipette.channels == 96:
             target = target.move(Point(x=9 * -11))
+    pipette.move_to(target.move(Point(z=10)))
     pipette.move_to(target)
     ctx.delay(seconds=2)
     if ctx.is_simulating():
         return 0.0
-    return DIAL_PORT.read()
+    dial_port = DIAL_PORT.read()
+    pipette.move_to(target.move(Point(z=10)))
+    return dial_port
+
 
 
 def _store_dial_baseline(
@@ -271,12 +277,16 @@ def _test_for_expected_liquid_state(
     _store_dial_baseline(ctx, pipette, dial, google_sheet, sheet_id, row)
     if pipette.channels > 1:
         _store_dial_baseline(
-            ctx, pipette, dial, google_sheet, sheet_id, row, front_channel=True
+            ctx, pipette, dial, google_sheet, sheet_id, row+1, front_channel=True
         )
     csv_header = f'trial,result,tip-z-error,{",".join([w.well_name for w in wells])}'
     _write_line_to_csv(ctx, f"{csv_header}")
     # Write header to google sheet.
-    gs_list = [["Trial"], ["Result"], ["Tip-Z-Error"]] + [[w.well_name] for w in wells]
+    if pipette.channels == 1:
+        gs_list = [["Trial"], ["Result"], ["Tip-Z-Error"]] + [[w.well_name] for w in wells]
+    else:
+        gs_list = [["Trial"], ["Result"], ["Tip-Z-Error 1 "], ["Tip-Z-Error 2"]] + [[w.well_name] for w in wells]
+        
     _write_line_to_google_sheet(ctx, google_sheet, gs_list, sheet_id, row + 2)
     while trial_counter < trials:
         for tip in tips:
@@ -303,7 +313,7 @@ def _test_for_expected_liquid_state(
             trial_data_for_google_sheet = [
                 [trial_counter],
                 [all_trials_passed],
-                tip_z_errors,
+                [tip_z_errors],
             ] + [["PASS"] if w else ["FAIL"] for w in each_well_result_bool]
             _write_line_to_google_sheet(
                 ctx,
