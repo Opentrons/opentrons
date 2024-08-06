@@ -256,7 +256,6 @@ function PageContents(props: PageContentsProps): JSX.Element {
       backToTop: null,
     },
   }
-  console.log(`run details tab is ${protocolRunDetailsTab}`)
   const tabDetails = protocolRunDetailsContentByTab[protocolRunDetailsTab] ?? {
     // default to the setup tab if no tab or nonexistent tab is passed as a param
     content: (
