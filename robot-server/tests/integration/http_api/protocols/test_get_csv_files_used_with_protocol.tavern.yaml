@@ -5,6 +5,12 @@ marks:
       - ot2_server_base_url
 
 stages:
+  # The order of these data file uploads is important for this test,
+  # since the list of data files returned for the specified protocol is in upload order.
+  # The order in which the files are uploaded in this test is the same as the order in which
+  # these files are uploaded in the overall integration tests suite.
+  # Until we add data file cleanup after each test, maintaining this order within the suite
+  # will be important.
   - name: Upload data file 1
     request:
       url: '{ot2_server_base_url}/dataFiles'
@@ -31,6 +37,21 @@ stages:
         json:
           data_file_2_id: data.id
           data_file_2_name: data.name
+      status_code:
+        - 201
+        - 200
+
+  - name: Upload data file 3
+    request:
+      url: '{ot2_server_base_url}/dataFiles'
+      method: POST
+      files:
+        file: 'tests/integration/data_files/test.csv'
+    response:
+      save:
+        json:
+          data_file_3_id: data.id
+          data_file_3_name: data.name
       status_code:
         - 201
         - 200
@@ -88,7 +109,59 @@ stages:
           metadata: !anything
         links: !anything
 
-  - name: Create a run from the protocol and CSV file
+  - name: Start a new analysis with a different CSV file
+    request:
+      url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses'
+      method: POST
+      json:
+        data:
+          forceReAnalyze: true
+          runTimeParameterFiles:
+            liq_handling_csv_file: '{data_file_3_id}'
+    response:
+      strict:
+        - json:off
+      status_code: 201
+      json:
+        data:
+          - id: '{analysis_id}'
+            status: completed
+          - id: !anystr
+            status: pending
+            runTimeParameters:
+              - displayName: Liquid handling CSV file
+                variableName: liq_handling_csv_file
+                description: A CSV file that contains wells to use for pipetting
+                type: csv_file
+                file:
+                  id: '{data_file_3_id}'
+                  name: 'test.csv'
+
+  - name: Wait until analysis is completed
+    max_retries: 5
+    delay_after: 1
+    request:
+      url: '{ot2_server_base_url}/protocols/{protocol_id}'
+    response:
+      status_code: 200
+      json:
+        data:
+          analyses: []
+          analysisSummaries:
+            - id: '{analysis_id}'
+              status: completed
+            - id: !anystr
+              status: completed
+          id: !anything
+          protocolType: !anything
+          files: !anything
+          createdAt: !anything
+          robotType: !anything
+          protocolKind: !anything
+          metadata: !anything
+        links: !anything
+
+  - name: Create a run from the protocol and a CSV file
     request:
       url: '{ot2_server_base_url}/runs'
       method: POST
@@ -152,16 +225,6 @@ stages:
                 id: '{data_file_2_id}'
                 name: 'sample_plates.csv'
 
-  - name: Mark the run as not-current
-    request:
-      url: '{ot2_server_base_url}/runs/{run_id2}'
-      method: PATCH
-      json:
-        data:
-          current: False
-    response:
-      status_code: 200
-
   - name: Fetch data files used with the protocol so far
     request:
       url: '{ot2_server_base_url}/protocols/{protocol_id}/dataFiles'
@@ -170,11 +233,14 @@ stages:
       json:
         meta:
           cursor: 0
-          totalLength: 2
+          totalLength: 3
         data:
           - id: '{data_file_1_id}'
             name: "sample_record.csv"
             createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
           - id: '{data_file_2_id}'
             name: "sample_plates.csv"
+            createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+          - id: '{data_file_3_id}'
+            name: "test.csv"
             createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
