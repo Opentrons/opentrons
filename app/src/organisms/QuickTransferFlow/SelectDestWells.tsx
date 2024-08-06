@@ -10,12 +10,17 @@ import {
   LegacyStyledText,
   JUSTIFY_CENTER,
 } from '@opentrons/components'
+import { getAllDefinitions } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '../../App/portal'
 import { Modal } from '../../molecules/Modal'
 import { ChildNavigation } from '../../organisms/ChildNavigation'
 import { useToaster } from '../../organisms/ToasterOven'
 import { WellSelection } from '../../organisms/WellSelection'
+import {
+  CIRCULAR_WELL_96_PLATE_DEFINITION_URI,
+  RECTANGULAR_WELL_96_PLATE_DEFINITION_URI,
+} from './SelectSourceWells'
 
 import type { SmallButton } from '../../atoms/buttons'
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
@@ -107,9 +112,17 @@ export function SelectDestWells(props: SelectDestWellsProps): JSX.Element {
       setSelectedWells({})
     },
   }
-  const labwareDefinition =
+  let labwareDefinition =
     state.destination === 'source' ? state.source : state.destination
-
+  if (labwareDefinition?.parameters.format === '96Standard') {
+    const allDefinitions = getAllDefinitions()
+    if (Object.values(labwareDefinition.wells)[0].shape === 'circular') {
+      labwareDefinition = allDefinitions[CIRCULAR_WELL_96_PLATE_DEFINITION_URI]
+    } else {
+      labwareDefinition =
+        allDefinitions[RECTANGULAR_WELL_96_PLATE_DEFINITION_URI]
+    }
+  }
   return (
     <>
       {createPortal(
