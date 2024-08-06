@@ -4,7 +4,7 @@ import { LegacyStyledText } from '../atoms'
 import { SPACING, TYPOGRAPHY } from '../ui-style-constants'
 import { PrimaryBtn } from '../primitives'
 import { COLORS } from '../helix-design-system'
-import { Modal } from './index'
+import { Modal } from './Modal'
 
 import type { Story, Meta } from '@storybook/react'
 
