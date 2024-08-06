@@ -2,9 +2,11 @@ import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { LEFT } from '@opentrons/shared-data'
 import { COLORS, SPACING, LegacyStyledText } from '@opentrons/components'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+import {
+  SimpleWizardBody,
+  SimpleWizardInProgressBody,
+} from '../../molecules/SimpleWizardBody'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { getPipetteAnimations96 } from './utils'
 import { BODY_STYLE, FLOWS, SECTIONS } from './constants'
 import type { PipetteWizardStepProps } from './types'
@@ -47,7 +49,8 @@ export const MountingPlate = (
       })
   }
 
-  if (isRobotMoving) return <InProgressModal description={t('stand_back')} />
+  if (isRobotMoving)
+    return <SimpleWizardInProgressBody description={t('stand_back')} />
   return errorMessage != null ? (
     <SimpleWizardBody
       iconColor={COLORS.red50}

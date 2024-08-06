@@ -21,6 +21,7 @@ class StateSummary(BaseModel):
     # errors is a list for historical reasons. (This model needs to stay compatible with
     # robot-server's database.) It shouldn't have more than 1 element.
     errors: List[ErrorOccurrence]
+    hasEverEnteredErrorRecovery: bool = Field(default=False)
     labware: List[LoadedLabware]
     pipettes: List[LoadedPipette]
     modules: List[LoadedModule]

@@ -8,7 +8,7 @@ Add new tests to test_command_state.py, where they can be tested together.
 import pytest
 from contextlib import nullcontext as does_not_raise
 from datetime import datetime
-from typing import Dict, List, NamedTuple, Optional, Sequence, Type, Union
+from typing import Any, Dict, List, NamedTuple, Optional, Sequence, Type, Union
 
 from opentrons.protocol_engine import EngineStatus, commands as cmd, errors
 from opentrons.protocol_engine.actions import (
@@ -46,6 +46,15 @@ from .command_fixtures import (
 )
 
 
+def _placeholder_error_recovery_policy(*args: object, **kwargs: object) -> Any:
+    """A placeholder `ErrorRecoveryPolicy` for tests that don't care about it.
+
+    That should be all the tests in this file, since error recovery was added
+    after this file was deprecated.
+    """
+    raise NotImplementedError()
+
+
 def get_command_view(  # noqa: C901
     queue_status: QueueStatus = QueueStatus.SETUP,
     run_completed_at: Optional[datetime] = None,
@@ -63,6 +72,8 @@ def get_command_view(  # noqa: C901
     finish_error: Optional[errors.ErrorOccurrence] = None,
     commands: Sequence[cmd.Command] = (),
     latest_command_hash: Optional[str] = None,
+    failed_command_errors: Optional[List[ErrorOccurrence]] = None,
+    has_entered_error_recovery: bool = False,
 ) -> CommandView:
     """Get a command view test subject."""
     command_history = CommandHistory()
@@ -99,6 +110,9 @@ def get_command_view(  # noqa: C901
         run_started_at=run_started_at,
         latest_protocol_command_hash=latest_command_hash,
         stopped_by_estop=False,
+        failed_command_errors=failed_command_errors or [],
+        has_entered_error_recovery=has_entered_error_recovery,
+        error_recovery_policy=_placeholder_error_recovery_policy,
     )
 
     return CommandView(state=state)

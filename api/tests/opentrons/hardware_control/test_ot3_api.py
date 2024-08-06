@@ -87,7 +87,7 @@ from opentrons_shared_data.pipette.types import (
 from opentrons_shared_data.pipette import (
     load_data as load_pipette_data,
 )
-from opentrons_shared_data.pipette.dev_types import PipetteModel
+from opentrons_shared_data.pipette.types import PipetteModel
 from opentrons.hardware_control.modules import (
     Thermocycler,
     TempDeck,
@@ -838,7 +838,7 @@ async def test_liquid_probe(
         mock_move_to_plunger_bottom.call_count == 2
         mock_liquid_probe.assert_called_once_with(
             mount,
-            52,
+            46,
             fake_settings_aspirate.mount_speed,
             (fake_settings_aspirate.plunger_speed * -1),
             fake_settings_aspirate.sensor_threshold_pascals,
@@ -990,7 +990,7 @@ async def test_liquid_not_found(
             OT3Mount.LEFT, fake_max_z_dist, fake_settings_aspirate
         )
     # assert that it went through 4 passes and then prepared to aspirate
-    assert mock_move_to_plunger_bottom.call_count == 5
+    assert mock_move_to_plunger_bottom.call_count == 4
 
 
 @pytest.mark.parametrize(

@@ -6,10 +6,10 @@ from typing import Optional, Union, List, Dict, AsyncGenerator
 
 from anyio import move_on_after
 
-from opentrons_shared_data.labware.dev_types import LabwareUri
+from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.errors import GeneralError
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.types import RobotType
 
 from . import protocol_runner, RunResult, JsonRunner, PythonAndLegacyRunner
 from ..hardware_control import HardwareControlAPI
@@ -31,8 +31,11 @@ from ..protocol_engine.types import (
     LabwareOffset,
     DeckConfigurationType,
     RunTimeParameter,
-    RunTimeParamValuesType,
+    PrimitiveRunTimeParamValuesType,
+    CSVRunTimeParamFilesType,
 )
+from ..protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
+
 from ..protocol_reader import JsonProtocolConfig, PythonProtocolConfig, ProtocolSource
 from ..protocols.parse import PythonParseMode
 
@@ -168,7 +171,7 @@ class RunOrchestrator:
         self,
         deck_configuration: DeckConfigurationType,
         protocol_source: Optional[ProtocolSource] = None,
-        run_time_param_values: Optional[RunTimeParamValuesType] = None,
+        run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
     ) -> RunResult:
         """Start the run."""
         if self._protocol_runner:
@@ -227,7 +230,20 @@ class RunOrchestrator:
         return self._protocol_engine.state_view.labware.get_loaded_labware_definitions()
 
     def get_run_time_parameters(self) -> List[RunTimeParameter]:
-        """Parameter definitions defined by protocol, if any. Will always be empty before execution."""
+        """Get the list of run time parameters defined in the protocol, if any.
+
+        This returns a list of all run time parameters with their validated definitions
+        and client-requested values. Will always be empty before loading the runner.
+
+        If there was an error during RTP definition validation, then this list will
+        contain the parameter definitions that were validated before the error occurred.
+        These parameters' values will be default values.
+
+        If all definitions validated successfully but an error occurred while
+        setting the RTP values with those sent by the client, then only the parameters
+        whose values were successfully set will have the client-requested values while
+        the others will contain the default values.
+        """
         return (
             []
             if self._protocol_runner is None
@@ -323,7 +339,8 @@ class RunOrchestrator:
     async def load(
         self,
         protocol_source: ProtocolSource,
-        run_time_param_values: Optional[RunTimeParamValuesType],
+        run_time_param_values: Optional[PrimitiveRunTimeParamValuesType],
+        run_time_param_files: Optional[CSVRunTimeParamFilesType],
         parse_mode: ParseMode,
     ) -> None:
         """Load a json/python protocol."""
@@ -339,6 +356,7 @@ class RunOrchestrator:
                 # doesn't conform to the new rules.
                 python_parse_mode=python_parse_mode,
                 run_time_param_values=run_time_param_values,
+                run_time_param_files=run_time_param_files,
             )
 
     def get_is_okay_to_clear(self) -> bool:
@@ -356,6 +374,10 @@ class RunOrchestrator:
     def get_deck_type(self) -> DeckType:
         """Get engine deck type."""
         return self._protocol_engine.state_view.config.deck_type
+
+    def set_error_recovery_policy(self, policy: ErrorRecoveryPolicy) -> None:
+        """Create error recovery policy for the run."""
+        self._protocol_engine.set_error_recovery_policy(policy)
 
     async def command_generator(self) -> AsyncGenerator[str, None]:
         """Yield next command to execute."""

@@ -7,7 +7,7 @@ from decoy import Decoy
 from sqlalchemy.engine import Engine
 from unittest import mock
 
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons_shared_data.errors.codes import ErrorCodes
 
 from robot_server.protocols.protocol_store import ProtocolNotFoundError
@@ -117,6 +117,7 @@ def state_summary() -> StateSummary:
         labwareOffsets=[],
         status=EngineStatus.IDLE,
         liquids=liquids,
+        hasEverEnteredErrorRecovery=False,
     )
 
 
@@ -152,6 +153,11 @@ def run_time_parameters() -> List[pe_types.RunTimeParameter]:
             default="cooler choice",
             value="coolest choice",
         ),
+        pe_types.CSVParameter(
+            displayName="Display Name 4",
+            variableName="variable_name_4",
+            description="a csv parameter without file id",
+        ),
     ]
 
 
@@ -184,6 +190,7 @@ def invalid_state_summary() -> StateSummary:
 
     return StateSummary(
         errors=[analysis_error],
+        hasEverEnteredErrorRecovery=False,
         labware=[analysis_labware],
         pipettes=[analysis_pipette],
         # TODO(mc, 2022-02-14): evaluate usage of modules in the analysis resp.

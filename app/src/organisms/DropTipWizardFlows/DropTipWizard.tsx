@@ -15,10 +15,10 @@ import {
   POSITION_ABSOLUTE,
   SPACING,
   LegacyStyledText,
+  ModalShell,
   useConditionalConfirm,
 } from '@opentrons/components'
 
-import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { getTopPortalEl } from '../../App/portal'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { getIsOnDevice } from '../../redux/config'
@@ -178,13 +178,13 @@ export function DropTipWizardSetupType(
         </Flex>
       </Flex>
     ) : (
-      <LegacyModalShell
+      <ModalShell
         width="47rem"
         header={<DropTipWizardHeader {...props} />}
         overflow="hidden"
       >
         <DropTipWizardContent {...props} />
-      </LegacyModalShell>
+      </ModalShell>
     ),
     getTopPortalEl()
   )
@@ -318,12 +318,21 @@ export const DropTipWizardContent = (
   }
 
   function buildSuccess(): JSX.Element {
+    const { tipDropComplete } = fixitCommandTypeUtils?.buttonOverrides ?? {}
+
     // Route to the drop tip route if user is at the blowout success screen, otherwise proceed conditionally.
     const handleProceed = (): void => {
       if (currentStep === BLOWOUT_SUCCESS) {
         void proceedToRoute(DT_ROUTES.DROP_TIP)
       } else {
-        proceedWithConditionalClose()
+        // Clear the error recovery submap upon completion of drop tip wizard.
+        fixitCommandTypeUtils?.reportMap(null)
+
+        if (tipDropComplete != null) {
+          tipDropComplete()
+        } else {
+          proceedWithConditionalClose()
+        }
       }
     }
 

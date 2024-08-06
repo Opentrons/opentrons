@@ -4,7 +4,7 @@ import isEqual from 'lodash/isEqual'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
-import { useConditionalConfirm } from '@opentrons/components'
+import { useConditionalConfirm, ModalShell } from '@opentrons/components'
 import {
   useCreateLabwareOffsetMutation,
   useCreateMaintenanceCommandMutation,
@@ -16,7 +16,6 @@ import { getTopPortalEl } from '../../App/portal'
 import { IntroScreen } from './IntroScreen'
 import { ExitConfirmation } from './ExitConfirmation'
 import { CheckItem } from './CheckItem'
-import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { getIsOnDevice } from '../../redux/config'
 import { AttachProbe } from './AttachProbe'
@@ -431,14 +430,14 @@ export const LabwarePositionCheckComponent = (
   )
   return createPortal(
     isOnDevice ? (
-      <LegacyModalShell fullPage>
+      <ModalShell fullPage>
         {wizardHeader}
         {modalContent}
-      </LegacyModalShell>
+      </ModalShell>
     ) : (
-      <LegacyModalShell width="47rem" header={wizardHeader}>
+      <ModalShell width="47rem" header={wizardHeader}>
         {modalContent}
-      </LegacyModalShell>
+      </ModalShell>
     ),
     getTopPortalEl()
   )

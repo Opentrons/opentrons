@@ -15,6 +15,7 @@ export { useAllCommandsAsPreSerializedList } from './useAllCommandsAsPreSerializ
 export { useCommandQuery } from './useCommandQuery'
 export * from './useCreateLabwareOffsetMutation'
 export * from './useCreateLabwareDefinitionMutation'
+export * from './useUpdateErrorRecoveryPolicy'
 
 export type { UsePlayRunMutationResult } from './usePlayRunMutation'
 export type { UsePauseRunMutationResult } from './usePauseRunMutation'

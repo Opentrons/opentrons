@@ -8,7 +8,7 @@ import {
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 
-import { Modal } from '../../molecules/Modal'
+import { OddModal } from '../../molecules/OddModal'
 import { getStandardDeckViewLayerBlockList } from '../Devices/ProtocolRun/utils/getStandardDeckViewLayerBlockList'
 import { getLabwareRenderInfo } from '../Devices/ProtocolRun/utils/getLabwareRenderInfo'
 
@@ -18,7 +18,7 @@ import type {
   LabwareDefinition2,
 } from '@opentrons/shared-data'
 import type { LoadedLabwareByAdapter } from '@opentrons/api-client'
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
+import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
 import type { AttachedProtocolModuleMatch } from '../ProtocolSetupModulesAndDeck/utils'
 
 interface LabwareMapViewModalProps {
@@ -51,7 +51,7 @@ export function LabwareMapViewModal(
       ? getLabwareRenderInfo(mostRecentAnalysis, deckDef)
       : {}
 
-  const modalHeader: ModalHeaderBaseProps = {
+  const modalHeader: OddModalHeaderBaseProps = {
     title: t('map_view'),
     hasExitIcon: true,
   }
@@ -83,6 +83,7 @@ export function LabwareMapViewModal(
               handleLabwareClick(topLabwareDefinition, topLabwareId)
             }
           : undefined,
+      highlightLabware: true,
       moduleChildren: null,
     }
   })
@@ -105,12 +106,17 @@ export function LabwareMapViewModal(
           handleLabwareClick(topLabwareDefinition, topLabwareId)
         },
         labwareChildren: null,
+        highlight: true,
       }
     }
   )
 
   return (
-    <Modal header={modalHeader} modalSize="large" onOutsideClick={onCloseClick}>
+    <OddModal
+      header={modalHeader}
+      modalSize="large"
+      onOutsideClick={onCloseClick}
+    >
       <BaseDeck
         deckConfig={deckConfig}
         deckLayerBlocklist={getStandardDeckViewLayerBlockList(FLEX_ROBOT_TYPE)}
@@ -118,6 +124,6 @@ export function LabwareMapViewModal(
         labwareOnDeck={labwareLocations}
         modulesOnDeck={modulesOnDeck}
       />
-    </Modal>
+    </OddModal>
   )
 }

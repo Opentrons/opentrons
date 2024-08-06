@@ -20,7 +20,7 @@ from opentrons.protocol_engine.resources.pipette_data_provider import (
     LoadedStaticPipetteData,
 )
 from opentrons.types import Point
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.pipette.types import PipetteNameType
 from ..pipette_fixtures import (
     NINETY_SIX_MAP,
     NINETY_SIX_COLS,
@@ -106,6 +106,17 @@ def drop_tip_in_place_command() -> commands.DropTipInPlace:
             pipetteId="pipette-id",
         ),
         result=commands.DropTipInPlaceResult.construct(),
+    )
+
+
+@pytest.fixture
+def unsafe_drop_tip_in_place_command() -> commands.unsafe.UnsafeDropTipInPlace:
+    """Get an unsafe drop-tip-in-place command."""
+    return commands.unsafe.UnsafeDropTipInPlace.construct(  # type: ignore[call-arg]
+        params=commands.unsafe.UnsafeDropTipInPlaceParams.construct(
+            pipetteId="pipette-id"
+        ),
+        result=commands.unsafe.UnsafeDropTipInPlaceResult.construct(),
     )
 
 
@@ -903,6 +914,7 @@ def test_drop_tip(
     pick_up_tip_command: commands.PickUpTip,
     drop_tip_command: commands.DropTip,
     drop_tip_in_place_command: commands.DropTipInPlace,
+    unsafe_drop_tip_in_place_command: commands.unsafe.UnsafeDropTipInPlace,
     supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
 ) -> None:
     """It should be clear tip length when a tip is dropped."""
@@ -963,6 +975,20 @@ def test_drop_tip(
     subject.handle_action(
         actions.SucceedCommandAction(
             private_result=None, command=drop_tip_in_place_command
+        )
+    )
+    result = TipView(subject.state).get_tip_length("pipette-id")
+    assert result == 0
+
+    subject.handle_action(
+        actions.SucceedCommandAction(private_result=None, command=pick_up_tip_command)
+    )
+    result = TipView(subject.state).get_tip_length("pipette-id")
+    assert result == 1.23
+
+    subject.handle_action(
+        actions.SucceedCommandAction(
+            private_result=None, command=unsafe_drop_tip_in_place_command
         )
     )
     result = TipView(subject.state).get_tip_length("pipette-id")

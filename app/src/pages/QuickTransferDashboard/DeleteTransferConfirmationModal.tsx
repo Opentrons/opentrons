@@ -20,10 +20,10 @@ import {
 import { useHost, useProtocolQuery } from '@opentrons/react-api-client'
 
 import { SmallButton } from '../../atoms/buttons'
-import { Modal } from '../../molecules/Modal'
+import { OddModal } from '../../molecules/OddModal'
 import { useToaster } from '../../organisms/ToasterOven'
 
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
+import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
 
 interface DeleteTransferConfirmationModalProps {
   transferId: string
@@ -38,7 +38,7 @@ export function DeleteTransferConfirmationModal({
   const navigate = useNavigate()
   const { makeSnackbar } = useToaster()
   const [showIcon, setShowIcon] = React.useState<boolean>(false)
-  const modalHeader: ModalHeaderBaseProps = {
+  const modalHeader: OddModalHeaderBaseProps = {
     title: t('delete_this_transfer'),
     iconName: 'ot-alert',
     iconColor: COLORS.yellow50,
@@ -91,7 +91,7 @@ export function DeleteTransferConfirmationModal({
     }
   }
   return (
-    <Modal header={modalHeader}>
+    <OddModal header={modalHeader}>
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing32}
@@ -121,7 +121,7 @@ export function DeleteTransferConfirmationModal({
           />
         </Flex>
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }
 

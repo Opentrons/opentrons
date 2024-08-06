@@ -38,7 +38,7 @@ import {
   ProtocolDetailsSectionContentSkeleton,
 } from '../../organisms/OnDeviceDisplay/ProtocolDetails'
 import { useHardwareStatusText } from '../../organisms/OnDeviceDisplay/RobotDashboard/hooks'
-import { SmallModalChildren } from '../../molecules/Modal'
+import { SmallModalChildren } from '../../molecules/OddModal'
 import { useToaster } from '../../organisms/ToasterOven'
 import {
   getApplyHistoricOffsets,

@@ -8,13 +8,14 @@ import { InterventionModal } from '../../../molecules/InterventionModal'
 import { getModalPortalEl, getTopPortalEl } from '../../../App/portal'
 
 import type { ModalType } from '../../../molecules/InterventionModal'
+import type { DesktopSizeType } from '../types'
 
 export type RecoveryInterventionModalProps = Omit<
   React.ComponentProps<typeof InterventionModal>,
   'type'
 > & {
   /* If on desktop, specifies the hard-coded dimensions height of the modal. */
-  desktopType: 'desktop-small' | 'desktop-large'
+  desktopType: DesktopSizeType
   isOnDevice: boolean
 }
 

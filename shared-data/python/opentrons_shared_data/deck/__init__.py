@@ -8,7 +8,7 @@ import json
 from .. import get_shared_data_root, load_shared_data
 
 if TYPE_CHECKING:
-    from .dev_types import (
+    from .types import (
         DeckSchema,
         DeckDefinition,
         DeckDefinitionV3,

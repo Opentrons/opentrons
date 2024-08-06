@@ -3,7 +3,7 @@ import pytest
 from datetime import datetime
 from decoy import Decoy
 
-from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
+from opentrons_shared_data.labware.types import LabwareDefinition as LabwareDefDict
 
 from opentrons.types import DeckSlotName
 from opentrons.protocol_engine import EngineStatus, types as pe_types
@@ -40,6 +40,7 @@ def run() -> Run:
         labwareOffsets=[],
         protocolId=None,
         liquids=[],
+        hasEverEnteredErrorRecovery=False,
     )
 
 

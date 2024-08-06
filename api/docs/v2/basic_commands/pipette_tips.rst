@@ -79,7 +79,7 @@ Dropping a Tip
 
 To drop a tip in the pipette's trash container, call the :py:meth:`~.InstrumentContext.drop_tip` method with no arguments::
     
-    pipette.pick_up_tip()
+    pipette.drop_tip()
 
 You can specify where to drop the tip by passing in a location. For example, this code drops a tip in the trash bin and returns another tip to to a previously used well in a tip rack::
 

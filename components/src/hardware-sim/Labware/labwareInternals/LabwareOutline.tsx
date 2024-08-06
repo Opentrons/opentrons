@@ -46,6 +46,7 @@ export function LabwareOutline(props: LabwareOutlineProps): JSX.Element {
               <feGaussianBlur stdDeviation="6" />
             </filter>
           </defs>
+          {/* TODO(bh, 2024-07-22): adjust gaussian blur for stacks */}
           <LabwareBorder
             borderThickness={1.5 * OUTLINE_THICKNESS_MM}
             xDimension={dimensions.xDimension}
@@ -56,7 +57,7 @@ export function LabwareOutline(props: LabwareOutlineProps): JSX.Element {
             ry="8"
           />
           <LabwareBorder
-            borderThickness={1.5 * OUTLINE_THICKNESS_MM}
+            borderThickness={2.2 * OUTLINE_THICKNESS_MM}
             xDimension={dimensions.xDimension}
             yDimension={dimensions.yDimension}
             stroke={COLORS.blue50}

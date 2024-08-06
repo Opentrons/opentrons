@@ -40,9 +40,11 @@ export function useRecoveryToasts({
     selectedRecoveryOption,
   })
 
-  // The "body" of the toast message. On ODD, this is the recovery-specific text. On desktop, this is the full command text.
+  // The "body" of the toast message.  On desktop, this is the full command text, if present. Otherwise, this is the recovery-specific text.
   const bodyText =
-    displayType === 'desktop' ? desktopFullCommandText : recoveryToastText
+    displayType === 'desktop' && desktopFullCommandText != null
+      ? desktopFullCommandText
+      : recoveryToastText
   // The "heading" of the toast message. Currently, this text is only present on the desktop toasts.
   const headingText = displayType === 'desktop' ? recoveryToastText : undefined
 
@@ -97,7 +99,7 @@ type UseRecoveryFullCommandTextParams = Omit<
 // Return the full command text of the recovery command that is "retried" or "skipped".
 export function useRecoveryFullCommandText(
   props: UseRecoveryFullCommandTextParams
-): string {
+): string | null {
   const { commandTextData, stepNumber } = props
 
   const relevantCmdIdx = typeof stepNumber === 'number' ? stepNumber : -1
@@ -110,12 +112,16 @@ export function useRecoveryFullCommandText(
 
   if (typeof stepNumber === 'string') {
     return stepNumber
+  }
+  // Occurs when the relevantCmd doesn't exist, ex, we "skip" the last command of a run.
+  else if (relevantCmd === null) {
+    return null
   } else {
     return truncateIfTCCommand(commandText, stepTexts != null)
   }
 }
 
-// Return the user-facing step number. If the step number cannot be determined, return '?'.
+// Return the user-facing step number, 0 indexed. If the step number cannot be determined, return '?'.
 export function getStepNumber(
   selectedRecoveryOption: BuildToast['selectedRecoveryOption'],
   currentStepCount: BuildToast['currentStepCount']

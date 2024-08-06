@@ -27,13 +27,13 @@ from opentrons.hardware_control.modules.module_calibration import (
 )
 
 
-from opentrons_shared_data.pipette.dev_types import (
+from opentrons_shared_data.pipette.types import (
     PipetteName,
 )
 from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
 )
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.types import RobotType
 
 from opentrons import types as top_types
 from opentrons.config import robot_configs
@@ -762,7 +762,7 @@ class OT3API(
 
     @ExecutionManagerProvider.wait_for_running
     async def _update_position_estimation(
-        self, axes: Optional[List[Axis]] = None
+        self, axes: Optional[Sequence[Axis]] = None
     ) -> None:
         """
         Function to update motor estimation for a set of axes
@@ -1141,6 +1141,12 @@ class OT3API(
             y=cur_pos[Axis.Y],
             z=cur_pos[Axis.by_mount(realmount)],
         )
+
+    async def update_axis_position_estimations(self, axes: Sequence[Axis]) -> None:
+        """Update specified axes position estimators from their encoders."""
+        await self._update_position_estimation(axes)
+        await self._cache_current_position()
+        await self._cache_encoder_position()
 
     async def move_to(
         self,
@@ -2712,9 +2718,7 @@ class OT3API(
         #  probe_start_pos.z + z_distance of pass - pos.z should be < max_z_dist
         # due to rounding errors this can get caught in an infinite loop when the distance is almost equal
         # so we check to see if they're within 0.01 which is 1/5th the minimum movement distance from move_utils.py
-        while (probe_start_pos.z - pos.z) < max_z_dist and not isclose(
-            (probe_start_pos.z - pos.z), max_z_dist, rel_tol=0.01
-        ):
+        while (probe_start_pos.z - pos.z) < (max_z_dist + 0.01):
             # safe distance so we don't accidentally aspirate liquid if we're already close to liquid
             safe_plunger_pos = top_types.Point(
                 pos.x, pos.y, pos.z + probe_safe_reset_mm

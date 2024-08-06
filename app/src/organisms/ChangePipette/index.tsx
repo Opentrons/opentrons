@@ -4,7 +4,12 @@ import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
-import { SPACING, TYPOGRAPHY, LegacyStyledText } from '@opentrons/components'
+import {
+  SPACING,
+  TYPOGRAPHY,
+  LegacyStyledText,
+  ModalShell,
+} from '@opentrons/components'
 
 import {
   useDispatchApiRequests,
@@ -24,7 +29,6 @@ import {
   HOME,
 } from '../../redux/robot-controls'
 
-import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { useAttachedPipettes } from '../Devices/hooks'
@@ -322,7 +326,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
     )
   }
   return (
-    <LegacyModalShell width="42.375rem">
+    <ModalShell width="42.375rem">
       <WizardHeader
         totalSteps={eightChannel ? EIGHT_CHANNEL_STEPS : SINGLE_CHANNEL_STEPS}
         currentStep={currentStepCount}
@@ -330,6 +334,6 @@ export function ChangePipette(props: Props): JSX.Element | null {
         onExit={exitWizardHeader}
       />
       {contents}
-    </LegacyModalShell>
+    </ModalShell>
   )
 }

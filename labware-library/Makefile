@@ -30,7 +30,6 @@ dist:
 # development assets server
 .PHONY: dev
 dev: export NODE_ENV := development
-dev: export NODE_OPTIONS := --openssl-legacy-provider
 dev:
 	vite serve --host=::
 

@@ -34,7 +34,6 @@ const NON_FEATURE_FLAG_SETTINGS = [
   'deckCalibrationDots',
   'shortFixedTrash',
   'useOldAspirationFunctions',
-  'disableLogAggregation',
   'disableFastProtocolUpload',
   'disableStatusBar',
 ]

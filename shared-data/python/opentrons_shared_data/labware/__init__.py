@@ -7,7 +7,7 @@ from typing import Any, Dict, NewType, TYPE_CHECKING
 from .. import load_shared_data
 
 if TYPE_CHECKING:
-    from .dev_types import LabwareDefinition
+    from .types import LabwareDefinition
 
 Schema = NewType("Schema", Dict[str, Any])
 

@@ -5,7 +5,7 @@ from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.protocols.protocol_store import ProtocolStore
 from sqlalchemy.engine import Engine as SQLEngine
 
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.types import RobotType
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine import DeckType
@@ -181,7 +181,8 @@ async def get_quick_transfer_run_auto_deleter(
     return RunAutoDeleter(
         run_store=run_store,
         protocol_store=protocol_store,
-        # We dont store quick transfer runs
-        deletion_planner=RunDeletionPlanner(maximum_runs=1),
+        # NOTE: We dont store quick transfer runs, however we need an additional
+        # run slot so we can clone an active run.
+        deletion_planner=RunDeletionPlanner(maximum_runs=2),
         protocol_kind=ProtocolKind.QUICK_TRANSFER,
     )

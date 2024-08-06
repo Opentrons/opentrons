@@ -5,7 +5,7 @@
     "composite": true,
     "rootDir": ".",
     "outDir": "lib",
-    "moduleResolution": "node",
+    "moduleResolution": "node"
   },
   "module": "ESNext",
   "include": [
@@ -15,8 +15,9 @@
     "labware",
     "deck",
     "command",
+    "errors",
     "liquid/types",
     "commandAnnotation/types",
-    "vite.config.ts",
+    "vite.config.ts"
   ]
 }

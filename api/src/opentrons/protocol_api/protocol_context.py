@@ -5,7 +5,6 @@ from typing import (
     Callable,
     Dict,
     List,
-    NamedTuple,
     Optional,
     Type,
     Union,
@@ -13,12 +12,11 @@ from typing import (
     cast,
 )
 
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.labware.types import LabwareDefinition
+from opentrons_shared_data.pipette.types import PipetteNameType
 
 from opentrons.types import Mount, Location, DeckLocation, DeckSlotName, StagingSlotName
 from opentrons.legacy_broker import LegacyBroker
-from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules.types import MagneticBlockModel
 from opentrons.legacy_commands import protocol_commands as cmds, types as cmd_types
 from opentrons.legacy_commands.helpers import stringify_labware_movement_command
@@ -54,6 +52,7 @@ from .core.module import (
     AbstractMagneticBlockCore,
     AbstractAbsorbanceReaderCore,
 )
+from .robot_context import RobotContext, HardwareManager
 from .core.engine import ENGINE_CORE_API_VERSION
 from .core.legacy.legacy_protocol_core import LegacyProtocolCore
 
@@ -86,15 +85,6 @@ ModuleTypes = Union[
     MagneticBlockContext,
     AbsorbanceReaderContext,
 ]
-
-
-class HardwareManager(NamedTuple):
-    """Back. compat. wrapper for a removed class called `HardwareManager`.
-
-    This interface will not be present in PAPIv3.
-    """
-
-    hardware: SyncHardwareAPI
 
 
 class ProtocolContext(CommandPublisher):
@@ -179,6 +169,7 @@ class ProtocolContext(CommandPublisher):
         self._commands: List[str] = []
         self._params: Parameters = Parameters()
         self._unsubscribe_commands: Optional[Callable[[], None]] = None
+        self._robot = RobotContext(self._core)
         self.clear_commands()
 
     @property
@@ -204,14 +195,20 @@ class ProtocolContext(CommandPublisher):
         return self._api_version
 
     @property
+    @requires_version(2, 20)
+    def robot(self) -> RobotContext:
+        return self._robot
+
+    @property
     def _hw_manager(self) -> HardwareManager:
         # TODO (lc 01-05-2021) remove this once we have a more
         # user facing hardware control http api.
+        # HardwareManager(hardware=self._core.get_hardware())
         logger.warning(
             "This function will be deprecated in later versions."
             "Please use with caution."
         )
-        return HardwareManager(hardware=self._core.get_hardware())
+        return self._robot.hardware
 
     @property
     @requires_version(2, 0)

@@ -2,7 +2,7 @@
 import pytest
 from unittest.mock import AsyncMock
 
-from robot_server.service.notifications import DeckConfigurationPublisher, Topics
+from robot_server.service.notifications import DeckConfigurationPublisher, topics
 
 
 @pytest.fixture
@@ -27,5 +27,5 @@ async def test_publish_current_maintenance_run(
     """It should publish a notify flag for deck configuration updates."""
     await deck_configuration_publisher.publish_deck_configuration()
     notification_client.publish_advise_refetch_async.assert_awaited_once_with(
-        topic=Topics.DECK_CONFIGURATION
+        topic=topics.DECK_CONFIGURATION
     )

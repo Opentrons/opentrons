@@ -3,8 +3,10 @@ import { Trans, useTranslation } from 'react-i18next'
 import { COLORS, LegacyStyledText } from '@opentrons/components'
 import { EXTENSION } from '@opentrons/shared-data'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
+import {
+  SimpleWizardBody,
+  SimpleWizardInProgressBody,
+} from '../../molecules/SimpleWizardBody'
 import { WizardRequiredEquipmentList } from '../../molecules/WizardRequiredEquipmentList'
 import {
   GRIPPER_FLOW_TYPES,
@@ -119,7 +121,7 @@ export const BeforeBeginning = (
 
   if (isRobotMoving)
     return (
-      <InProgressModal
+      <SimpleWizardInProgressBody
         description={t('shared:stand_back_robot_is_in_motion')}
       />
     )

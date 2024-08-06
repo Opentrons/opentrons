@@ -12,13 +12,13 @@ import {
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '../../App/portal'
-import { Modal } from '../../molecules/Modal'
+import { OddModal } from '../../molecules/OddModal'
 import { ChildNavigation } from '../../organisms/ChildNavigation'
 import { useToaster } from '../../organisms/ToasterOven'
 import { WellSelection } from '../../organisms/WellSelection'
 
 import type { SmallButton } from '../../atoms/buttons'
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
+import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
 import type {
   QuickTransferWizardState,
   QuickTransferWizardAction,
@@ -200,7 +200,7 @@ function NumberWellsSelectedErrorModal({
   selectionUnits: string
 }): JSX.Element {
   const { t } = useTranslation('quick_transfer')
-  const modalHeader: ModalHeaderBaseProps = {
+  const modalHeader: OddModalHeaderBaseProps = {
     title: t('well_selection'),
     iconName: 'information',
     iconColor: COLORS.black90,
@@ -211,7 +211,7 @@ function NumberWellsSelectedErrorModal({
   }
 
   return (
-    <Modal
+    <OddModal
       header={modalHeader}
       onOutsideClick={() => {
         setShowNumberWellsSelectedErrorModal(false)
@@ -224,6 +224,6 @@ function NumberWellsSelectedErrorModal({
           selectionUnits,
         })}
       </LegacyStyledText>
-    </Modal>
+    </OddModal>
   )
 }

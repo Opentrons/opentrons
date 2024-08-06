@@ -85,6 +85,8 @@ capacitive_output_file_heading = [
 # FIXME we should organize all of these functions to use the sensor drivers.
 # FIXME we should restrict some of these functions by instrument type.
 
+PLUNGER_SOLO_MOVE_TIME = 0.2
+
 
 def _fix_pass_step_for_buffer(
     move_group: MoveGroupStep,
