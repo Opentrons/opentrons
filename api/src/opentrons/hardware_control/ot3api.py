@@ -2689,6 +2689,7 @@ class OT3API(
         )
 
         # We need to significatly slow down the 96 channel liquid probe
+        # TODO: (sigler) add LLD plunger-speed to pipette definitions
         if self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
             max_plunger_speed = self.config.motion_settings.max_speed_discontinuity[
                 GantryLoad.HIGH_THROUGHPUT
@@ -2700,7 +2701,7 @@ class OT3API(
         p_working_mm = p_total_mm - (instrument.backlash_distance + p_impulse_mm)
 
         # height where probe action will begin
-        # TODO: (sigler) add this to pipette's liquid def (per tip)
+        # TODO: (sigler) add pass-overlap distance to pipette's liquid def (per tip)
         probe_pass_overlap_mm = 0.1
         non_responsive_z_mm = OT3API.liquid_probe_non_responsive_z_distance(
             probe_settings.mount_speed
@@ -2709,7 +2710,7 @@ class OT3API(
 
         # height that is considered safe to reset the plunger without disturbing liquid
         # this usually needs to at least 1-2mm from liquid, to avoid splashes from air
-        # TODO: (sigler) add this to pipette's liquid def (per tip)
+        # TODO: (sigler) add safe-reset distance to pipette's liquid def (per tip)
         probe_safe_reset_mm = max(2.0, probe_pass_z_offset_mm)
 
         error: Optional[PipetteLiquidNotFoundError] = None
