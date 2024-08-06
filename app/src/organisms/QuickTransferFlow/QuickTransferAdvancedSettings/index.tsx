@@ -160,7 +160,10 @@ export function QuickTransferAdvancedSettings(
         state.transferType === 'transfer' ||
         state.transferType === 'distribute',
       onClick: () => {
-        if (state.transferType === 'transfer') {
+        if (
+          state.transferType === 'transfer' ||
+          state.transferType === 'distribute'
+        ) {
           setSelectedSetting('aspirate_mix')
         } else {
           makeSnackbar(t('advanced_setting_disabled') as string)
@@ -240,7 +243,10 @@ export function QuickTransferAdvancedSettings(
         state.transferType === 'transfer' ||
         state.transferType === 'consolidate',
       onClick: () => {
-        if (state.transferType === 'transfer') {
+        if (
+          state.transferType === 'transfer' ||
+          state.transferType === 'consolidate'
+        ) {
           setSelectedSetting('dispense_mix')
         } else {
           makeSnackbar(t('advanced_setting_disabled') as string)
