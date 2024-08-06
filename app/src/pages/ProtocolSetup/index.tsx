@@ -196,6 +196,7 @@ export function ProtocolSetupStep({
           : makeDisabledReasonSnackbar()
       }}
       width="100%"
+      data-testid={`SetupButton_${title}`}
     >
       <Flex
         alignItems={ALIGN_CENTER}
@@ -519,25 +520,25 @@ function PrepareToRun({
     if (isDoorOpen) {
       makeSnackbar(t('shared:close_robot_door') as string)
     } else {
-      if (isReadyToRun && runStatus === RUN_STATUS_IDLE) {
-        if (!(labwareConfirmed && offsetsConfirmed && liquidsConfirmed)) {
-          confirmStepsComplete()
-        }
-        if (isHeaterShakerInProtocol) {
+      if (isReadyToRun) {
+        if (runStatus === RUN_STATUS_IDLE && isHeaterShakerInProtocol) {
           confirmAttachment()
-        }
-      } else {
-        if (isReadyToRun) {
+        } else if (
+          runStatus === RUN_STATUS_IDLE &&
+          !(labwareConfirmed && offsetsConfirmed && liquidsConfirmed)
+        ) {
+          confirmStepsComplete()
+        } else {
           play()
           trackProtocolRunEvent({
             name: ANALYTICS_PROTOCOL_RUN_ACTION.START,
             properties: robotAnalyticsData ?? {},
           })
-        } else {
-          makeSnackbar(
-            i18n.format(t('complete_setup_before_proceeding'), 'capitalize')
-          )
         }
+      } else {
+        makeSnackbar(
+          i18n.format(t('complete_setup_before_proceeding'), 'capitalize')
+        )
       }
     }
   }
@@ -787,7 +788,7 @@ function PrepareToRun({
               onClickSetupStep={() => {
                 setSetupScreen('labware')
               }}
-              title={t('labware')}
+              title={i18n.format(t('labware'), 'capitalize')}
               detail={labwareDetail}
               subDetail={labwareSubDetail}
               status={labwareConfirmed ? 'ready' : 'general'}
@@ -948,7 +949,6 @@ export function ProtocolSetup(): JSX.Element {
     !labwareConfirmed ? t('labware_placement') : null,
     !liquidsConfirmed ? t('liquids') : null,
   ].filter(s => s != null)
-  console.log(missingSteps)
   const {
     confirm: confirmMissingSteps,
     showConfirmation: showMissingStepsConfirmation,
