@@ -1,10 +1,12 @@
 """Data files models."""
 from datetime import datetime
+from typing import Literal
 
 from pydantic import Field
 
 from opentrons_shared_data.errors import GeneralError
 
+from robot_server.errors.error_responses import ErrorDetails
 from robot_server.service.json_api import ResourceModel
 
 
@@ -35,3 +37,10 @@ class FileInUseError(GeneralError):
             message=message,
             detail={"dataFileId": data_file_id},
         )
+
+
+class FileIdNotFound(ErrorDetails):
+    """An error returned when specified file id was not found on the robot."""
+
+    id: Literal["FileIdNotFound"] = "FileIdNotFound"
+    title: str = "Specified file id not found on the robot"
