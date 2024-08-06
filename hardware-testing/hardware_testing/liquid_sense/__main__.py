@@ -278,9 +278,7 @@ if __name__ == "__main__":
     parser.add_argument("--wet", action="store_true")
     parser.add_argument("--starting-tip", type=str, default="A1")
     parser.add_argument("--test-well", type=str, default="A1")
-    parser.add_argument(
-        "--p-solo-time", type=float, default=0
-    )
+    parser.add_argument("--p-solo-time", type=float, default=0)
     parser.add_argument("--google-sheet-name", type=str, default="LLD-Shared-Data")
     parser.add_argument(
         "--gd-parent-folder", type=str, default="1b2V85fDPA0tNqjEhyHOGCWRZYgn8KsGf"

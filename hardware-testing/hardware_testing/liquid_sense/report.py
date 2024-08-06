@@ -249,7 +249,7 @@ def store_trial(
                 ["Submerged Depth (mm)"],
             ]
             google_sheet.batch_update_cells(gs_header, "A", 10, sheet_id)
-            google_sheet.update_cell(sheet_name, 1,6,"Transposed Height (mm)")
+            google_sheet.update_cell(sheet_name, 1, 6, "Transposed Height (mm)")
         submerged_depth = adjusted_height - target_height
         try:
             trial_for_google_sheet: List[List[str]] = [
@@ -259,7 +259,7 @@ def store_trial(
                 [f"{plunger_pos}"],
                 [f"{tip_length_offset}"],
                 [f"{adjusted_height}"],
-                [f"{submerged_depth}"]
+                [f"{submerged_depth}"],
             ]
             google_sheet.batch_update_cells(
                 trial_for_google_sheet, "A", 11 + int(trial), sheet_id

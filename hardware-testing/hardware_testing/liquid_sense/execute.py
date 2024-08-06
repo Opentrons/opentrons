@@ -207,12 +207,12 @@ def run(
     assert len(tips) >= run_args.trials
     results: List[float] = []
     adjusted_results: List[float] = []
-    
+
     def read_dial() -> float:
         time.sleep(2)
         dial_value = run_args.dial_indicator.read()
         return dial_value
-    
+
     lpc_offset = 0.0
     if run_args.dial_indicator is not None:
         run_args.pipette.move_to(dial_well.top())
@@ -258,7 +258,6 @@ def run(
         tip_offset - lpc_offset,
         google_sheet,
         run_args.run_id,
-        
     )
 
     trials_before_jog = run_args.trials_before_jog
@@ -321,7 +320,6 @@ def run(
                 google_sheet,
                 run_args.run_id,
                 sheet_id,
-                
             )
             ui.print_info(
                 f"\n\n Z axis start pos {start_pos[Axis.Z_L]} end pos {end_pos[Axis.Z_L]}"

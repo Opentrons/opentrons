@@ -7,6 +7,7 @@ from opentrons.protocol_api import (
     Well,
     InstrumentContext,
 )
+from opentrons.types import Point
 
 from opentrons_shared_data.pipette.load_data import load_definition
 from opentrons_shared_data.pipette.types import (
@@ -50,7 +51,7 @@ TEST_WELLS = {
     },
 }
 
-DIAL_POS_WITHOUT_TIP: Optional[float] = None
+DIAL_POS_WITHOUT_TIP: List[Optional[float]] = [None, None]
 DIAL_PORT_NAME = "/dev/ttyUSB0"
 DIAL_PORT = None
 RUN_ID = ""
@@ -163,9 +164,14 @@ def _get_test_tips(rack: Labware, pipette: InstrumentContext) -> List[Well]:
 
 
 def _read_dial_indicator(
-    ctx: ProtocolContext, pipette: InstrumentContext, dial: Labware
+    ctx: ProtocolContext, pipette: InstrumentContext, dial: Labware, front_channel: bool = False
 ) -> float:
-    pipette.move_to(dial["A1"].top())
+    target = dial["A1"].top()
+    if front_channel:
+        target = target.move(Point(y=9 * 7))
+        if pipette.channels == 96:
+            target = target.move(Point(x=9 * -11))
+    pipette.move_to(target)
     ctx.delay(seconds=2)
     if ctx.is_simulating():
         return 0.0
@@ -173,21 +179,24 @@ def _read_dial_indicator(
 
 
 def _store_dial_baseline(
-    ctx: ProtocolContext, pipette: InstrumentContext, dial: Labware, google_sheet: Any, sheet_id:str, row
+    ctx: ProtocolContext, pipette: InstrumentContext, dial: Labware, google_sheet: Any, sheet_id: str, row: int, front_channel: bool = False,
 ) -> None:
     global DIAL_POS_WITHOUT_TIP
-    if DIAL_POS_WITHOUT_TIP is not None:
+    idx = 0 if not front_channel else 1
+    if DIAL_POS_WITHOUT_TIP[idx] is not None:
         return
-    DIAL_POS_WITHOUT_TIP = _read_dial_indicator(ctx, pipette, dial)
-    _write_line_to_csv(ctx, f"DIAL-BASELINE,{DIAL_POS_WITHOUT_TIP}")
-    _write_line_to_google_sheet(ctx, google_sheet, [["DIAL-BASELINE"], [DIAL_POS_WITHOUT_TIP]],sheet_id, row + 1)
+    DIAL_POS_WITHOUT_TIP[idx] = _read_dial_indicator(ctx, pipette, dial, front_channel)
+    tag = f"DIAL-BASELINE-{idx}
+    _write_line_to_csv(ctx, f"{tag},{DIAL_POS_WITHOUT_TIP[idx]}")
+    _write_line_to_google_sheet(ctx, google_sheet, [[tag], [DIAL_POS_WITHOUT_TIP[idx]]], sheet_id, row + 1)
 
 def _get_tip_z_error(
-    ctx: ProtocolContext, pipette: InstrumentContext, dial: Labware
+    ctx: ProtocolContext, pipette: InstrumentContext, dial: Labware, front_channel: bool = False
 ) -> float:
-    assert DIAL_POS_WITHOUT_TIP is not None
-    new_val = _read_dial_indicator(ctx, pipette, dial)
-    z_error = new_val - DIAL_POS_WITHOUT_TIP
+    idx = 0 if not front_channel else 1
+    assert DIAL_POS_WITHOUT_TIP[idx] is not None
+    new_val = _read_dial_indicator(ctx, pipette, dial, front_channel)
+    z_error = new_val - DIAL_POS_WITHOUT_TIP[idx]
     # NOTE: dial-indicators are upside-down, so we need to flip the values
     return z_error * -1.0
 
@@ -219,6 +228,8 @@ def _test_for_expected_liquid_state(
     fail_counter = 0
     trial_counter = 0
     _store_dial_baseline(ctx, pipette, dial, google_sheet, sheet_id, row)
+    if pipette.channels > 1:
+        _store_dial_baseline(ctx, pipette, dial, google_sheet, sheet_id, row, front_channel=True)
     csv_header = f'trial,result,tip-z-error,{",".join([w.well_name for w in wells])}'
     _write_line_to_csv(ctx, f"{csv_header}")
     # Write header to google sheet.
@@ -229,17 +240,20 @@ def _test_for_expected_liquid_state(
             trial_counter += 1
             # NOTE: (sigler) prioritize testing all-tip pickups over partial-tip pickups
             pipette.pick_up_tip(tip)
-            tip_z_error = _get_tip_z_error(ctx, pipette, dial)
+            tip_z_errors: List[float] = []
+            tip_z_errors.append(_get_tip_z_error(ctx, pipette, dial))
+            if pipette.channels > 1:
+                tip_z_errors.append(_get_tip_z_error(ctx, pipette, dial, front_channel=True))
             successful_wells = _get_wells_with_expected_liquid_state(ctx,
                 pipette, wells, liquid_state
             )
             all_trials_passed = "PASS" if len(successful_wells) == len(wells) else "FAIL"
-            trial_data = [trial_counter, all_trials_passed, tip_z_error]
+            trial_data = [trial_counter, all_trials_passed] + tip_z_errors
             each_well_result_bool = [bool(w in successful_wells) for w in wells]
             trial_data += ["PASS" if w else "FAIL" for w in each_well_result_bool]
             _write_line_to_csv(ctx, ",".join([str(d) for d in trial_data]))
             # Write Pass/Fail data to google_sheet
-            trial_data_for_google_sheet = [[trial_counter], [all_trials_passed], [tip_z_error]] + [["PASS"] if w else ["FAIL"] for w in each_well_result_bool]
+            trial_data_for_google_sheet = [[trial_counter], [all_trials_passed], tip_z_errors] + [["PASS"] if w else ["FAIL"] for w in each_well_result_bool]
             _write_line_to_google_sheet(ctx, google_sheet, trial_data_for_google_sheet, sheet_id, row + trial_counter + 2)
             pipette.drop_tip()
             fail_counter += 0 if all_trials_passed else 1
