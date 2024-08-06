@@ -314,7 +314,7 @@ def execute(
     :param protocol_file: The protocol file to execute
     :param protocol_name: The name of the protocol file. This is required
         internally, but it may not be a thing we can get
-        from the protocol_file argument.
+        from the ``protocol_file`` argument.
     :param propagate_logs: Whether this function should allow logs from the
         Opentrons stack to propagate up to the root handler.
         This can be useful if you're integrating this
