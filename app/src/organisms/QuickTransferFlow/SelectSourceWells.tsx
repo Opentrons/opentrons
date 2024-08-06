@@ -62,13 +62,10 @@ export function SelectSourceWells(props: SelectSourceWellsProps): JSX.Element {
     if (Object.values(state.source.wells)[0].shape === 'circular') {
       displayLabwareDefinition =
         allDefinitions[CIRCULAR_WELL_96_PLATE_DEFINITION_URI]
-      console.log('circle')
     } else {
       displayLabwareDefinition =
         allDefinitions[RECTANGULAR_WELL_96_PLATE_DEFINITION_URI]
-      console.log('rect')
     }
-    console.log(displayLabwareDefinition)
   }
 
   return (

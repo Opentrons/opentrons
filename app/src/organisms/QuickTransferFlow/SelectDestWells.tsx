@@ -156,7 +156,7 @@ export function SelectDestWells(props: SelectDestWellsProps): JSX.Element {
         left="0"
         width="100%"
       >
-        {state.destination != null && state.source != null ? (
+        {labwareDefinition != null ? (
           <Flex
             width={
               labwareDefinition?.parameters.format === '384Standard'
@@ -165,11 +165,7 @@ export function SelectDestWells(props: SelectDestWellsProps): JSX.Element {
             }
           >
             <WellSelection
-              definition={
-                state.destination === 'source'
-                  ? state.source
-                  : state.destination
-              }
+              definition={labwareDefinition}
               deselectWells={(wells: string[]) => {
                 setSelectedWells(prevWells =>
                   without(Object.keys(prevWells), ...wells).reduce(
