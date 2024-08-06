@@ -1114,10 +1114,10 @@ class OT3Controller(FlexBackend):
         )
         try:
             yield
-        finally:
-            await self.set_hold_current(
-                {Axis.Z_L: high_throughput_settings[Axis.Z_L].hold_current}
-            )
+        # finally:
+        #     await self.set_hold_current(
+        #         {Axis.Z_L: high_throughput_settings[Axis.Z_L].hold_current}
+        #     )
 
     @staticmethod
     def _build_event_watcher() -> aionotify.Watcher:
