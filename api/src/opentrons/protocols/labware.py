@@ -19,9 +19,6 @@ from opentrons.protocols.api_support.constants import (
 )
 from opentrons_shared_data.labware.types import LabwareDefinition
 
-if TYPE_CHECKING:
-    from _typeshed import GenericPath
-
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -73,7 +70,7 @@ def get_all_labware_definitions() -> List[str]:
     """
     labware_list = ModifiedList()
 
-    def _check_for_subdirectories(path: Union[int, GenericPath[AnyStr]]) -> None:
+    def _check_for_subdirectories(path: Union[str, Path, os.DirEntry[str]]) -> None:
         with os.scandir(path) as top_path:
             for sub_dir in top_path:
                 if sub_dir.is_dir():
