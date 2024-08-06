@@ -97,7 +97,9 @@ import {
   ProtocolDropTipModal,
   useProtocolDropTipModal,
 } from '../ProtocolDropTipModal'
+import { ConfirmMissingStepsModal } from '../ConfirmMissingStepsModal'
 
+import type { MissingSteps } from '../ProtocolRunSetup'
 import type { UseQueryResult } from 'react-query'
 import type { NavigateFunction } from 'react-router-dom'
 import type { Mock } from 'vitest'
@@ -153,6 +155,7 @@ vi.mock('../../../ProtocolUpload/hooks/useMostRecentRunId')
 vi.mock('../../../../resources/runs')
 vi.mock('../../../ErrorRecoveryFlows')
 vi.mock('../ProtocolDropTipModal')
+vi.mock('../ConfirmMissingStepsModal')
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '95e67900-bc9f-4fbf-92c6-cc4d7226a51b'
@@ -215,6 +218,7 @@ const mockDoorStatus = {
     doorRequiredClosedForProtocol: true,
   },
 }
+let mockMissingSteps: MissingSteps = []
 
 const render = () => {
   return renderWithProviders(
@@ -224,6 +228,7 @@ const render = () => {
         robotName={ROBOT_NAME}
         runId={RUN_ID}
         makeHandleJumpToStep={vi.fn(() => vi.fn())}
+        missingSetupSteps={mockMissingSteps}
       />
     </BrowserRouter>,
     { i18nInstance: i18n }
@@ -240,7 +245,7 @@ describe('ProtocolRunHeader', () => {
     mockTrackProtocolRunEvent = vi.fn(() => new Promise(resolve => resolve({})))
     mockCloseCurrentRun = vi.fn()
     mockDetermineTipStatus = vi.fn()
-
+    mockMissingSteps = []
     vi.mocked(useTrackEvent).mockReturnValue(mockTrackEvent)
     vi.mocked(ConfirmCancelModal).mockReturnValue(
       <div>Mock ConfirmCancelModal</div>
@@ -266,6 +271,9 @@ describe('ProtocolRunHeader', () => {
     vi.mocked(useIsRobotViewable).mockReturnValue(true)
     vi.mocked(ConfirmAttachmentModal).mockReturnValue(
       <div>mock confirm attachment modal</div>
+    )
+    vi.mocked(ConfirmMissingStepsModal).mockReturnValue(
+      <div>mock missing steps modal</div>
     )
     when(vi.mocked(useProtocolAnalysisErrors)).calledWith(RUN_ID).thenReturn({
       analysisErrors: null,
