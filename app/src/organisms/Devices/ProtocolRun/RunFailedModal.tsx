@@ -25,7 +25,6 @@ import { useDownloadRunLog } from '../hooks'
 
 import type { RunError, RunCommandErrors } from '@opentrons/api-client'
 import type { LegacyModalProps } from '../../../molecules/LegacyModal'
-import { RunCommandError } from '@opentrons/shared-data'
 
 /**
  * This modal is for Desktop app
@@ -126,17 +125,14 @@ export function RunFailedModal({
             {commandErrorList?.pageLength} errors
           </LegacyStyledText>
           <Flex css={ERROR_MESSAGE_STYLE}>
-            {commandErrorList?.data.map((error: RunCommandError, index) => {
+            {commandErrorList?.data.map((error: RunError, index) => {
               return (
                 <LegacyStyledText
                   as="p"
                   textAlign={TYPOGRAPHY.textAlignLeft}
                   key={index}
                 >
-                  {t('error_info', {
-                    errorCode: error.errorCode,
-                    errorType: error.detail
-                  })}
+                  {error.errorCode}: {error.detail}
                 </LegacyStyledText>
               )
             })}
