@@ -2013,15 +2013,15 @@ class InstrumentContext(publisher.CommandPublisher):
 
         :param style: The shape of the nozzle layout.
 
-            - ``SINGLE`` sets the pipette to use 1 nozzle. This corresponds to a single of well on labware.
+            - ``ALL`` resets the pipette to use all of its nozzles. Calling
+              ``configure_nozzle_layout`` with no arguments also resets the pipette.
             - ``COLUMN`` sets the pipette to use 8 nozzles, aligned from front to back
               with respect to the deck. This corresponds to a column of wells on labware.
-            - ``PARTIAL_COLUMN`` sets the pipette to use 2-7 nozzles, aligned from front to back
+            - ``PARTIAL_COLUMN`` sets the pipette to use 2--7 nozzles, aligned from front to back
               with respect to the deck.
             - ``ROW`` sets the pipette to use 12 nozzles, aligned from left to right
               with respect to the deck. This corresponds to a row of wells on labware.
-            - ``ALL`` resets the pipette to use all of its nozzles. Calling
-              ``configure_nozzle_layout`` with no arguments also resets the pipette.
+            - ``SINGLE`` sets the pipette to use 1 nozzle. This corresponds to a single of well on labware.
 
         :type style: ``NozzleLayout`` or ``None``
         :param start: The primary nozzle of the layout, which the robot uses
@@ -2039,16 +2039,15 @@ class InstrumentContext(publisher.CommandPublisher):
             should be of the same format used when identifying wells by name.
             Required when setting ``style=PARTIAL_COLUMN``.
 
-            .. note::
-                Nozzle layouts numbering between 2-7 nozzles, account for the distance from
-                ``start``. For example, 4 nozzles would require ``start="H1"`` and ``end="E1"``.
-
         :type end: str or ``None``
         :param tip_racks: Behaves the same as setting the ``tip_racks`` parameter of
             :py:meth:`.load_instrument`. If not specified, the new configuration resets
             :py:obj:`.InstrumentContext.tip_racks` and you must specify the location
             every time you call :py:meth:`~.InstrumentContext.pick_up_tip`.
         :type tip_racks: List[:py:class:`.Labware`]
+
+        .. versionchanged:: 2.20
+            Added partial column, row, and single layouts.
         """
         #       TODO: add the following back into the docstring when QUADRANT is supported
         #
