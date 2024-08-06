@@ -2,6 +2,7 @@
 from typing import List, Optional, Union, Dict
 
 from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.util import requires_version
 from opentrons.protocols.parameters import (
     parameter_definition,
     csv_parameter_definition,
@@ -168,6 +169,7 @@ class ParameterContext:
         )
         self._parameters[parameter.variable_name] = parameter
 
+    @requires_version(2, 20)
     def add_csv_file(
         self,
         display_name: str,
