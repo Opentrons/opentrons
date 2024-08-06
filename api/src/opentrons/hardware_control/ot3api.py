@@ -2673,6 +2673,8 @@ class OT3API(
         self._pipette_handler.ready_for_tip_action(
             instrument, HardwareAction.LIQUID_PROBE, checked_mount
         )
+        if not probe_settings:
+            probe_settings = self.config.liquid_sense
 
         # We need to significantly slow down the 96 channel liquid probe
         if self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
@@ -2684,8 +2686,6 @@ class OT3API(
             )
 
         starting_position = await self.gantry_position(checked_mount, refresh=True)
-        if not probe_settings:
-            probe_settings = self.config.liquid_sense
 
         sensor_baseline_plunger_move_mm = (
             probe_settings.plunger_impulse_time * probe_settings.plunger_speed
@@ -2709,7 +2709,7 @@ class OT3API(
         # TODO: (sigler) add this to pipette's liquid def (per tip)
         z_offset_for_plunger_prep = max(2.0, z_offset_per_pass)
 
-        async def prep_plunger_for_probe_move() -> None:
+        async def prep_plunger_for_probe_move(aspirate_while_sensing: bool) -> None:
             # safe distance so we don't accidentally aspirate liquid if we're already close to liquid
             mount_pos_for_plunger_prep = top_types.Point(
                 current_position.x,
@@ -2718,7 +2718,7 @@ class OT3API(
             )
             # Prep the plunger
             await self.move_to(checked_mount, mount_pos_for_plunger_prep)
-            if probe_settings.aspirate_while_sensing:
+            if aspirate_while_sensing:
                 # TODO(cm, 7/8/24): remove p_prep_speed from the rate at some point
                 await self._move_to_plunger_bottom(checked_mount, rate=1)
             else:
@@ -2730,7 +2730,7 @@ class OT3API(
         # due to rounding errors this can get caught in an infinite loop when the distance is almost equal
         # so we check to see if they're within 0.01 which is 1/5th the minimum movement distance from move_utils.py
         while (starting_position.z - current_position.z) < (max_z_dist + 0.01):
-            await prep_plunger_for_probe_move()
+            await prep_plunger_for_probe_move(probe_settings.aspirate_while_sensing)
 
             # overlap amount we want to use between passes
             pass_start_pos = top_types.Point(
