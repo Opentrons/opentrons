@@ -23,6 +23,7 @@ interface SetupLiquidsProps {
   protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput | null
   isLiquidSetupConfirmed: boolean
   setLiquidSetupConfirmed: (confirmed: boolean) => void
+  robotName: string
 }
 
 export function SetupLiquids({
@@ -30,6 +31,7 @@ export function SetupLiquids({
   protocolAnalysis,
   isLiquidSetupConfirmed,
   setLiquidSetupConfirmed,
+  robotName,
 }: SetupLiquidsProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   const [selectedValue, toggleGroup] = useToggleGroup(

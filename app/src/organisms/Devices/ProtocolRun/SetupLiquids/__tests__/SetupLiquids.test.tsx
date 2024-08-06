@@ -28,6 +28,7 @@ describe('SetupLiquids', () => {
         protocolAnalysis={null}
         isLiquidSetupConfirmed={isConfirmed}
         setLiquidSetupConfirmed={confirmFn}
+        robotName="robotName"
       />,
       {
         i18nInstance: i18n,

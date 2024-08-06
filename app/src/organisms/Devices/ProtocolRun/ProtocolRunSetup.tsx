@@ -317,6 +317,7 @@ export function ProtocolRunSetup({
     [LIQUID_SETUP_KEY]: {
       stepInternals: (
         <SetupLiquids
+          robotName={robotName}
           runId={runId}
           protocolAnalysis={protocolAnalysis}
           isLiquidSetupConfirmed={liquidSetupComplete}
