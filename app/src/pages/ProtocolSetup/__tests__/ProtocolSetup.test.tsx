@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Route, MemoryRouter, Routes } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { when } from 'vitest-when'
-import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
+import { vi, it, describe, expect, beforeEach } from 'vitest'
 
 import { RUN_STATUS_IDLE, RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import {
