@@ -4,7 +4,6 @@ import '@testing-library/jest-dom/vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '../../../testing/utils'
 import { BORDERS, COLORS } from '../../../helix-design-system'
-import { SPACING } from '../../../ui-style-constants'
 
 import { ListItem } from '..'
 
