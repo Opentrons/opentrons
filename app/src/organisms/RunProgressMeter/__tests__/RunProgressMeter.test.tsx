@@ -9,6 +9,7 @@ import {
   RUN_STATUS_IDLE,
   RUN_STATUS_RUNNING,
   RUN_STATUS_SUCCEEDED,
+  RUN_STATUS_STOPPED,
 } from '@opentrons/api-client'
 
 import { i18n } from '../../../i18n'
@@ -34,6 +35,7 @@ import {
 import { RunProgressMeter } from '..'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { useLastRunCommand } from '../../Devices/hooks/useLastRunCommand'
+import { useRunningStepCounts } from '../../../resources/protocols/hooks'
 
 import type { RunCommandSummary } from '@opentrons/api-client'
 import type * as ApiClient from '@opentrons/react-api-client'
@@ -52,6 +54,7 @@ vi.mock('../../Devices/hooks')
 vi.mock('../../../atoms/ProgressBar')
 vi.mock('../../InterventionModal')
 vi.mock('../../Devices/hooks/useLastRunCommand')
+vi.mock('../../../resources/protocols/hooks')
 
 const render = (props: React.ComponentProps<typeof RunProgressMeter>) => {
   return renderWithProviders(<RunProgressMeter {...props} />, {
@@ -88,6 +91,11 @@ describe('RunProgressMeter', () => {
       .thenReturn({ key: NON_DETERMINISTIC_COMMAND_KEY } as RunCommandSummary)
 
     vi.mocked(useNotifyRunQuery).mockReturnValue({ data: null } as any)
+    vi.mocked(useRunningStepCounts).mockReturnValue({
+      totalStepCount: null,
+      currentStepNumber: null,
+      hasRunDiverged: true,
+    })
 
     props = {
       runId: NON_DETERMINISTIC_RUN_ID,
@@ -100,7 +108,7 @@ describe('RunProgressMeter', () => {
   it('should show only the total count of commands in run and not show the meter when protocol is non-deterministic', () => {
     vi.mocked(useCommandQuery).mockReturnValue({ data: null } as any)
     render(props)
-    expect(screen.getByText('Current Step ?/?')).toBeTruthy()
+    expect(screen.getByText('Current Step ?/?:')).toBeTruthy()
     expect(screen.queryByText('MOCK PROGRESS BAR')).toBeFalsy()
   })
   it('should give the correct info when run status is idle', () => {
@@ -141,7 +149,19 @@ describe('RunProgressMeter', () => {
   it('should render the correct run status when run status is completed', () => {
     vi.mocked(useCommandQuery).mockReturnValue({ data: null } as any)
     vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_SUCCEEDED)
+    vi.mocked(useRunningStepCounts).mockReturnValue({
+      totalStepCount: 10,
+      currentStepNumber: 10,
+      hasRunDiverged: false,
+    })
     render(props)
-    screen.getByText('Final Step ?/?')
+    screen.getByText('Final Step 10/10:')
+  })
+
+  it('should render the correct step info when the run is cancelled before running', () => {
+    vi.mocked(useCommandQuery).mockReturnValue({ data: null } as any)
+    vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_STOPPED)
+    render(props)
+    screen.getByText('Final Step: N/A')
   })
 })

@@ -9,8 +9,10 @@ from opentrons.protocol_engine import (
     LabwareOffsetCreate,
     StateSummary,
     CommandSlice,
+    CommandErrorSlice,
     CommandPointer,
     Command,
+    ErrorOccurrence,
 )
 from opentrons.protocol_engine.types import (
     PrimitiveRunTimeParamValuesType,
@@ -386,6 +388,27 @@ class RunDataManager:
             run_id=run_id, cursor=cursor, length=length
         )
 
+    def get_command_error_slice(
+        self, run_id: str, cursor: int, length: int
+    ) -> CommandErrorSlice:
+        """Get a slice of run commands.
+
+        Args:
+            run_id: ID of the run.
+            cursor: Requested index of first command in the returned slice.
+            length: Length of slice to return.
+
+        Raises:
+            RunNotCurrentError: The given run identifier is not the current run.
+        """
+        if run_id == self._run_orchestrator_store.current_run_id:
+            return self._run_orchestrator_store.get_command_error_slice(
+                cursor=cursor, length=length
+            )
+
+        # TODO(tz, 8-5-2024): Change this to return to error list from the DB when we implement https://opentrons.atlassian.net/browse/EXEC-655.
+        raise RunNotCurrentError()
+
     def get_current_command(self, run_id: str) -> Optional[CommandPointer]:
         """Get the "current" command, if any.
 
@@ -432,6 +455,14 @@ class RunDataManager:
             return self._run_orchestrator_store.get_command(command_id=command_id)
 
         return self._run_store.get_command(run_id=run_id, command_id=command_id)
+
+    def get_command_errors(self, run_id: str) -> list[ErrorOccurrence]:
+        """Get all command errors."""
+        if run_id == self._run_orchestrator_store.current_run_id:
+            return self._run_orchestrator_store.get_command_errors()
+
+        # TODO(tz, 8-5-2024): Change this to return to error list from the DB when we implement https://opentrons.atlassian.net/browse/EXEC-655.
+        raise RunNotCurrentError()
 
     def get_all_commands_as_preserialized_list(self, run_id: str) -> List[str]:
         """Get all commands of a run in a serialized json list."""

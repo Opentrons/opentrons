@@ -21,7 +21,9 @@ from ..protocol_engine import (
     StateSummary,
     CommandPointer,
     CommandSlice,
+    CommandErrorSlice,
     DeckType,
+    ErrorOccurrence,
 )
 from ..protocol_engine.errors import RunStoppedError
 from ..protocol_engine.types import (
@@ -269,6 +271,23 @@ class RunOrchestrator:
             cursor=cursor, length=length
         )
 
+    def get_command_error_slice(
+        self,
+        cursor: int,
+        length: int,
+    ) -> CommandErrorSlice:
+        """Get a slice of run commands errors.
+
+        Args:
+            cursor: Requested index of first error in the returned slice.
+                If the cursor is omitted, a cursor will be selected automatically
+                based on the last error occurence.
+            length: Length of slice to return.
+        """
+        return self._protocol_engine.state_view.commands.get_errors_slice(
+            cursor=cursor, length=length
+        )
+
     def get_command_recovery_target(self) -> Optional[CommandPointer]:
         """Get the current error recovery target."""
         return self._protocol_engine.state_view.commands.get_recovery_target()
@@ -280,6 +299,10 @@ class RunOrchestrator:
     def get_all_commands(self) -> List[Command]:
         """Get all run commands."""
         return self._protocol_engine.state_view.commands.get_all()
+
+    def get_command_errors(self) -> List[ErrorOccurrence]:
+        """Get all run command errors."""
+        return self._protocol_engine.state_view.commands.get_all_errors()
 
     def get_run_status(self) -> EngineStatus:
         """Get the current execution status of the engine."""

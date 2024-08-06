@@ -110,10 +110,12 @@ describe('ProtocolSetupLabware', () => {
     expect(mockSetSetupScreen).toHaveBeenCalledWith('prepare to run')
   })
 
-  it('should launch and close the deck map', () => {
+  it('should toggle between map view and list view', () => {
     render()
+    expect(screen.queryByText('List View')).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: 'Map View' }))
-    fireEvent.click(screen.getByLabelText('closeIcon'))
+    expect(screen.queryByText('Map View')).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: 'List View' }))
     screen.getByText('Labware')
   })
 

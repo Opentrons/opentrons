@@ -33,6 +33,7 @@ from opentrons.protocol_engine import (
     LabwareOffsetCreate,
     StateSummary,
     CommandSlice,
+    CommandErrorSlice,
     CommandPointer,
     Command,
     CommandCreate,
@@ -41,6 +42,7 @@ from opentrons.protocol_engine import (
     error_recovery_policy,
 )
 from opentrons.protocol_engine.create_protocol_engine import create_protocol_engine
+from opentrons.protocol_engine import ErrorOccurrence
 
 from robot_server.protocols.protocol_store import ProtocolResource
 from opentrons.protocol_engine.types import (
@@ -339,6 +341,25 @@ class RunOrchestratorStore:
             length: Length of slice to return.
         """
         return self.run_orchestrator.get_command_slice(cursor=cursor, length=length)
+
+    def get_command_error_slice(
+        self,
+        cursor: int,
+        length: int,
+    ) -> CommandErrorSlice:
+        """Get a slice of run commands error.
+
+        Args:
+            cursor: Requested index of first command error in the returned slice.
+            length: Length of slice to return.
+        """
+        return self.run_orchestrator.get_command_error_slice(
+            cursor=cursor, length=length
+        )
+
+    def get_command_errors(self) -> list[ErrorOccurrence]:
+        """Get all command errors."""
+        return self.run_orchestrator.get_command_errors()
 
     def get_command_recovery_target(self) -> Optional[CommandPointer]:
         """Get the current error recovery target."""
