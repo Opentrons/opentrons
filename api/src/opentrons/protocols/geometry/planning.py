@@ -27,9 +27,8 @@ class LabwareHeightError(Exception):
     pass
 
 
-def max_many(*args: List[float]) -> float:
-    all_values = [value for sublist in args for value in sublist]
-    return functools.reduce(max, all_values)
+def max_many(*args: float) -> float:
+    return functools.reduce(max, args[1:], args[0])
 
 
 BAD_PAIRS = {
@@ -197,14 +196,9 @@ def _build_safe_height(
                 )
         from_safety = 0.0  # (ignore since it’s in a max())
 
-    max_many_params = [
-        to_point.z,
-        from_point.z,
-        to_safety,
-        from_safety,
-        constraints.minimum_z_height,
-    ]
-    return max_many(max_many_params)
+    return max_many(
+        to_point.z, from_point.z, to_safety, from_safety, constraints.minimum_z_height
+    )
 
 
 def plan_moves(
