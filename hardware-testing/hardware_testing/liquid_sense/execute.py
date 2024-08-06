@@ -208,6 +208,19 @@ def run(
     results: List[float] = []
     adjusted_results: List[float] = []
 
+    dial_target = dial_well.top()
+    if run_args.dial_front_channel:
+        print("yes dial front channel")
+        y_offset = 0 if run_args.pipette_channels == 1 else 9 * 7
+        x_offset = 0 if run_args.pipette_channels != 96 else 9 * -11
+        dial_target = dial_target.move(
+            top_types.Point(y=y_offset, x=x_offset)
+        )
+        print(x_offset, y_offset)
+        print(x_offset, y_offset)
+    else:
+        print("NO dial front channel")
+
     def read_dial() -> float:
         time.sleep(2)
         dial_value = run_args.dial_indicator.read()
@@ -215,14 +228,14 @@ def run(
 
     lpc_offset = 0.0
     if run_args.dial_indicator is not None:
-        run_args.pipette.move_to(dial_well.top())
+        run_args.pipette.move_to(dial_target)
         lpc_offset = read_dial()
         run_args.pipette._retract()
 
     def _get_tip_offset() -> float:
         tip_offset = 0.0
         if run_args.dial_indicator is not None:
-            run_args.pipette.move_to(dial_well.top())
+            run_args.pipette.move_to(dial_target)
             tip_offset = read_dial()
             run_args.pipette._retract()
         return tip_offset
@@ -278,13 +291,6 @@ def run(
             tip_length_offset = 0.0
             if run_args.dial_indicator is not None:
                 run_args.pipette._retract()
-                dial_target = dial_well.top()
-                if run_args.dial_front_channel:
-                    y_offset = 0 if run_args.pipette_channels == 1 else 9 * 7
-                    x_offset = 0 if run_args.pipette_channels != 96 else 9 * -11
-                    dial_target = dial_target.move(
-                        top_types.Point(y=y_offset, x=x_offset)
-                    )
                 run_args.pipette.move_to(dial_target)
                 tip_length_offset = tip_offset - read_dial()
                 run_args.pipette._retract()
