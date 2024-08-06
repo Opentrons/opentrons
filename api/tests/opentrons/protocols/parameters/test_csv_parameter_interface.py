@@ -5,7 +5,7 @@ from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 
 import tempfile
 from pathlib import Path
-from typing import TextIO
+from typing import TextIO, Generator
 
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
@@ -28,48 +28,53 @@ def api_version() -> APIVersion:
 
 
 @pytest.fixture
-def csv_file_basic() -> TextIO:
-    temp_file = tempfile.TemporaryFile("r+")
-    contents = '"x","y","z"\n"a",1,2\n"b",3,4\n"c",5,6'
-    temp_file.write(contents)
-    temp_file.seek(0)
-    return temp_file
+def csv_file_basic() -> Generator[TextIO, None, None]:
+    """A basic CSV file with quotes around strings."""
+    with tempfile.TemporaryFile("r+") as temp_file:
+        contents = '"x","y","z"\n"a",1,2\n"b",3,4\n"c",5,6'
+        temp_file.write(contents)
+        temp_file.seek(0)
+        yield temp_file
 
 
 @pytest.fixture
-def csv_file_no_quotes() -> TextIO:
-    temp_file = tempfile.TemporaryFile("r+")
-    contents = "x,y,z\na,1,2\nb,3,4\nc,5,6"
-    temp_file.write(contents)
-    temp_file.seek(0)
-    return temp_file
+def csv_file_no_quotes() -> Generator[TextIO, None, None]:
+    """A basic CSV file with no quotes around strings."""
+    with tempfile.TemporaryFile("r+") as temp_file:
+        contents = "x,y,z\na,1,2\nb,3,4\nc,5,6"
+        temp_file.write(contents)
+        temp_file.seek(0)
+        yield temp_file
 
 
 @pytest.fixture
-def csv_file_preceding_spaces() -> TextIO:
-    temp_file = tempfile.TemporaryFile("r+")
-    contents = '"x", "y", "z"\n"a", 1, 2\n"b", 3, 4\n"c", 5, 6'
-    temp_file.write(contents)
-    temp_file.seek(0)
-    return temp_file
+def csv_file_preceding_spaces() -> Generator[TextIO, None, None]:
+    """A basic CSV file with quotes around strings and spaces preceding non-initial columns."""
+    with tempfile.TemporaryFile("r+") as temp_file:
+        contents = '"x", "y", "z"\n"a", 1, 2\n"b", 3, 4\n"c", 5, 6'
+        temp_file.write(contents)
+        temp_file.seek(0)
+        yield temp_file
 
 
 @pytest.fixture
-def csv_file_mixed_quotes() -> TextIO:
-    temp_file = tempfile.TemporaryFile("r+")
-    contents = 'head,er\n"a,b,c",def\n"""ghi""","jkl"'
-    temp_file.write(contents)
-    temp_file.seek(0)
-    return temp_file
+def csv_file_mixed_quotes() -> Generator[TextIO, None, None]:
+    """A basic CSV file with both string quotes and escaped quotes."""
+    with tempfile.TemporaryFile("r+") as temp_file:
+        contents = 'head,er\n"a,b,c",def\n"""ghi""","jkl"'
+        temp_file.write(contents)
+        temp_file.seek(0)
+        yield temp_file
 
 
 @pytest.fixture
-def csv_file_different_delimiter() -> TextIO:
-    temp_file = tempfile.TemporaryFile("r+")
-    contents = "x:y:z\na,:1,:2\nb,:3,:4\nc,:5,:6"
-    temp_file.write(contents)
-    temp_file.seek(0)
-    return temp_file
+def csv_file_different_delimiter() -> Generator[TextIO, None, None]:
+    """A basic CSV file with a non-comma delimiter."""
+    with tempfile.TemporaryFile("r+") as temp_file:
+        contents = "x:y:z\na,:1,:2\nb,:3,:4\nc,:5,:6"
+        temp_file.write(contents)
+        temp_file.seek(0)
+        yield temp_file
 
 
 @pytest.fixture
