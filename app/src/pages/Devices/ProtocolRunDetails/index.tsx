@@ -31,7 +31,10 @@ import {
 } from '../../../organisms/Devices/hooks'
 import { ProtocolRunHeader } from '../../../organisms/Devices/ProtocolRun/ProtocolRunHeader'
 import { RunPreview } from '../../../organisms/RunPreview'
-import { ProtocolRunSetup } from '../../../organisms/Devices/ProtocolRun/ProtocolRunSetup'
+import {
+  ProtocolRunSetup,
+  initialMissingSteps,
+} from '../../../organisms/Devices/ProtocolRun/ProtocolRunSetup'
 import { BackToTopButton } from '../../../organisms/Devices/ProtocolRun/BackToTopButton'
 import { ProtocolRunModuleControls } from '../../../organisms/Devices/ProtocolRun/ProtocolRunModuleControls'
 import { ProtocolRunRuntimeParameters } from '../../../organisms/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
@@ -137,7 +140,6 @@ export function ProtocolRunDetails(): JSX.Element | null {
   React.useEffect(() => {
     dispatch(fetchProtocols())
   }, [dispatch])
-
   return robot != null ? (
     <ApiHostProvider
       key={robot.name}
@@ -188,6 +190,10 @@ function PageContents(props: PageContentsProps): JSX.Element {
     }
   }, [jumpedIndex])
 
+  const [missingSteps, setMissingSteps] = React.useState<
+    ReturnType<typeof initialMissingSteps>
+  >(initialMissingSteps())
+
   const makeHandleScrollToStep = (i: number) => () => {
     listRef.current?.scrollToIndex(i, true, -1 * JUMP_OFFSET_FROM_TOP_PX)
   }
@@ -207,6 +213,8 @@ function PageContents(props: PageContentsProps): JSX.Element {
           protocolRunHeaderRef={protocolRunHeaderRef}
           robotName={robotName}
           runId={runId}
+          setMissingSteps={setMissingSteps}
+          missingSteps={missingSteps}
         />
       ),
       backToTop: (
@@ -248,12 +256,16 @@ function PageContents(props: PageContentsProps): JSX.Element {
       backToTop: null,
     },
   }
-
-  const tabDetails = protocolRunDetailsContentByTab[protocolRunDetailsTab] ?? (
-    // default to the setup tab if no tab or nonexistent tab is passed as a param
-
-    <Navigate to={`/devices/${robotName}/protocol-runs/${runId}/setup`} />
-  )
+  console.log(`run details tab is ${protocolRunDetailsTab}`)
+  const tabDetails = protocolRunDetailsContentByTab[
+    protocolRunDetailsTab
+  ] ?? // default to the setup tab if no tab or nonexistent tab is passed as a param
+  {
+    content: (
+      <Navigate to={`/devices/${robotName}/protocol-runs/${runId}/setup`} />
+    ),
+    backToTop: null,
+  }
   const { content, backToTop } = tabDetails
 
   return (
@@ -263,6 +275,7 @@ function PageContents(props: PageContentsProps): JSX.Element {
         robotName={robotName}
         runId={runId}
         makeHandleJumpToStep={makeHandleJumpToStep}
+        missingSetupSteps={missingSteps}
       />
       <Flex gridGap={SPACING.spacing8} marginBottom={SPACING.spacing12}>
         <SetupTab

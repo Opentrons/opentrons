@@ -40,6 +40,7 @@ import { SetupLiquids } from '../SetupLiquids'
 import { SetupModuleAndDeck } from '../SetupModuleAndDeck'
 import { EmptySetupStep } from '../EmptySetupStep'
 import { ProtocolRunSetup } from '../ProtocolRunSetup'
+import type { MissingSteps } from '../ProtocolRunSetup'
 import { useNotifyRunQuery } from '../../../../resources/runs'
 
 import type * as SharedData from '@opentrons/shared-data'
@@ -68,12 +69,18 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
 const MOCK_PROTOCOL_LIQUID_KEY = { liquids: [] }
+let mockMissingSteps: MissingSteps = []
+const mockSetMissingSteps = vi.fn((missingSteps: MissingSteps) => {
+  mockMissingSteps = missingSteps
+})
 const render = () => {
   return renderWithProviders(
     <ProtocolRunSetup
       protocolRunHeaderRef={null}
       robotName={ROBOT_NAME}
       runId={RUN_ID}
+      missingSteps={mockMissingSteps}
+      setMissingSteps={mockSetMissingSteps}
     />,
     {
       i18nInstance: i18n,
@@ -83,6 +90,7 @@ const render = () => {
 
 describe('ProtocolRunSetup', () => {
   beforeEach(() => {
+    mockMissingSteps = []
     when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(false)
     when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(RUN_ID)

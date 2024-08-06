@@ -62,16 +62,33 @@ export type StepKey =
   | typeof LABWARE_SETUP_KEY
   | typeof LIQUID_SETUP_KEY
 
+export type MissingStep =
+  | 'applied_labware_offsets'
+  | 'labware_placement'
+  | 'liquids'
+
+export type MissingSteps = MissingStep[]
+
+export const initialMissingSteps = (): MissingSteps => [
+  'applied_labware_offsets',
+  'labware_placement',
+  'liquids',
+]
+
 interface ProtocolRunSetupProps {
   protocolRunHeaderRef: React.RefObject<HTMLDivElement> | null
   robotName: string
   runId: string
+  setMissingSteps: (missingSteps: MissingSteps) => void
+  missingSteps: MissingSteps
 }
 
 export function ProtocolRunSetup({
   protocolRunHeaderRef,
   robotName,
   runId,
+  setMissingSteps,
+  missingSteps,
 }: ProtocolRunSetupProps): JSX.Element | null {
   const { t, i18n } = useTranslation('protocol_setup')
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
@@ -246,8 +263,13 @@ export function ProtocolRunSetup({
         <SetupLabwarePositionCheck
           {...{ runId, robotName }}
           setOffsetsConfirmed={confirmed => {
-            confirmed && setExpandedStepKey(LABWARE_SETUP_KEY)
             setLpcComplete(confirmed)
+            if (confirmed) {
+              setExpandedStepKey(LABWARE_SETUP_KEY)
+              setMissingSteps(
+                missingSteps.filter(step => step !== 'applied_labware_offsets')
+              )
+            }
           }}
           offsetsConfirmed={lpcComplete}
         />
@@ -270,6 +292,9 @@ export function ProtocolRunSetup({
           setLabwareConfirmed={(confirmed: boolean) => {
             setLabwareSetupComplete(confirmed)
             if (confirmed) {
+              setMissingSteps(
+                missingSteps.filter(step => step !== 'labware_placement')
+              )
               const nextStep =
                 targetStepKeyInOrder.findIndex(v => v === LABWARE_SETUP_KEY) ===
                 targetStepKeyInOrder.length - 1
@@ -298,6 +323,7 @@ export function ProtocolRunSetup({
           setLiquidSetupConfirmed={(confirmed: boolean) => {
             setLiquidSetupComplete(confirmed)
             if (confirmed) {
+              setMissingSteps(missingSteps.filter(step => step != 'liquids'))
               setExpandedStepKey(null)
             }
           }}
