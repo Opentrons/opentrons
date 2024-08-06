@@ -88,7 +88,6 @@ Finally, we configure the nozzle layout, with three arguments.
 
 In this configuration, pipetting actions will use a single column::
 
-    # configured in COLUMN mode
     pipette.pick_up_tip()  # picks up A1-H1 from tip rack
     pipette.drop_tip()
     pipette.pick_up_tip()  # picks up A2-H2 from tip rack
@@ -144,7 +143,7 @@ Single Layout
 
 Single-tip pickup is available on both 8-channel and 96-channel pipettes. For 8-channel pipettes, there are two possible configurations, using either the front or back nozzle. For 96-channel pipettes, there are four possible configurations, using any of the corner nozzles.
 
-The ``start`` parameter sets the "first" and only nozzle used in the configuration. It also affects the order in which the pipette picks up tips. When using automatic tip tracking, single-tip configurations always consume all tips within a single column before proceeding to another column.
+The ``start`` parameter sets the first and only nozzle used in the configuration. It also affects the order in which the pipette picks up tips. When using automatic tip tracking, single-tip configurations always consume all tips within a single column before proceeding to another column.
 
 .. list-table::
     :header-rows: 1
@@ -250,12 +249,15 @@ To specify the number of tips to pick up, add the ``end`` parameter when calling
       - C
       - B
 
-Here is the start of a protocol that imports the ``PARTIAL_COLUMN`` and ``ALL`` layout constants, loads an 8-channel pipette, and sets it to pick up four tips::
+Here is the start of a protocol that imports the ``PARTIAL_COLUMN`` and ``ALL`` layout constants, loads an 8-channel pipette, and sets it to pick up four tips:
+
+.. code-block:: python
+    :substitutions:
 
     from opentrons import protocol_api
     from opentrons.protocol_api import PARTIAL_COLUMN, ALL
 
-    requirements = {"robotType": "Flex", "apiLevel": "2.20"}
+    requirements = {"robotType": "Flex", "apiLevel": "|apiLevel|"}
 
     def run(protocol: protocol_api.ProtocolContext):
         partial_rack = protocol.load_labware(
@@ -300,11 +302,11 @@ When handling liquids in partial column configuration, remember that *the frontm
 Tip Rack Adapters
 =================
 
-You can use both partial and full tip pickup in the same protocol. This requires having some tip racks directly on the deck, and some tip racks in the tip rack adapter.
+You can use both partial and full tip pickup in the same protocol. When using both with a 96-channel pipette, you must load some tip racks directly on the deck, and some tip racks in a tip rack adapter.
 
-Do not use a tip rack adapter when performing partial tip pickup. Instead, place the tip rack on the deck. During partial tip pickup, the 96-channel pipette lowers onto the tip rack in a horizontally offset position. If the tip rack were in its adapter, the pipette would collide with the adapter's posts, which protrude above the top of the tip rack. If you configure the pipette for partial pickup and then call ``pick_up_tip()`` on a tip rack that's loaded onto an adapter, the API will raise an error.
+Do not use a tip rack adapter when performing partial tip pickup with a 96-channel pipette. Instead, place the tip rack on the deck. During partial tip pickup, the 96-channel pipette lowers onto the tip rack in an offset position. If the tip rack were in its adapter, the pipette could collide with the adapter's posts, which protrude above the top of the tip rack. If you configure the 96-channel pipette for partial pickup and then call ``pick_up_tip()`` on a tip rack that's loaded onto an adapter, the API will raise an error.
 
-On the other hand, you must use the tip rack adapter for full tip pickup. If the 96-channel pipette is in a full layout, either by default or by configuring ``style=ALL``, and you then call ``pick_up_tip()`` on a tip rack that's not in an adapter, the API will raise an error.
+On the other hand, you must use the tip rack adapter for full rack pickup. If the 96-channel pipette is in a full layout, either by default or by configuring ``style=ALL``, and you then call ``pick_up_tip()`` on a tip rack that's not in an adapter, the API will raise an error.
 
 When switching between full and partial pickup, you may want to organize your tip racks into lists, depending on whether they're loaded on adapters or not.
 
@@ -353,9 +355,9 @@ This keeps tip tracking consistent across each type of pickup. And it reduces th
 Tip Pickup and Conflicts
 ========================
 
-During partial tip pickup, 96-channel pipette moves into spaces above adjacent slots. To avoid crashes, the API prevents you from performing partial tip pickup when there is tall labware in these spaces. The current nozzle layout determines which labware can safely occupy adjacent slots.
+During partial tip pickup, pipettes move into spaces above adjacent slots. To avoid crashes, the API prevents you from performing partial tip pickup when there is tall labware in these spaces. The current nozzle layout determines which labware can safely occupy adjacent slots.
 
-The API will raise errors for potential labware crashes when using a column nozzle configuration. Nevertheless, it's a good idea to do the following when working with partial tip pickup:
+The API will raise errors for potential labware crashes when using a partial nozzle configuration. Nevertheless, it's a good idea to do the following when working with partial tip pickup:
 
     - Plan your deck layout carefully. Make a diagram and visualize everywhere the pipette will travel.
     - Simulate your protocol and compare the run preview to your expectations of where the pipette will travel.
@@ -367,6 +369,10 @@ For column pickup, Opentrons recommends using the nozzles in column 12 of the pi
         style=COLUMN,
         start="A12",
     )
+
+.. note::
+
+    When using a column 1 layout, the pipette can't reach the rightmost portion of labware in slots A3–D3. Any well that is within 29 mm of the right edge of the slot may be inaccessible. Use a column 12 layout if you need to pipette in that area.
 
 When using column 12, the pipette overhangs space to the left of wherever it is picking up tips or pipetting. For this reason, it's a good idea to organize tip racks front to back on the deck. If you place them side by side, the rack to the right will be inaccessible. For example, let's load three tip racks in the front left corner of the deck::
 
@@ -383,15 +389,6 @@ You would get a similar error trying to aspirate from or dispense into a well pl
 
 .. tip::
 
-    When using column 12 for partial tip pickup and pipetting, generally organize your deck with the shortest labware on the left side of the deck, and the tallest labware on the right side.
+    When using column 12 nozzles for partial tip pickup and pipetting, generally organize your deck with the shortest labware on the left side of the deck, and the tallest labware on the right side.
 
-If your application can't accommodate a deck layout that works well with column 12, you can configure the 96-channel pipette to pick up tips with column 1::
-
-    pipette.configure_nozzle_layout(
-        style=COLUMN,
-        start="A1",
-    )
-
-.. note::
-
-    When using a column 1 layout, the pipette can't reach the rightmost portion of labware in slots A3–D3. Any well that is within 29 mm of the right edge of the slot may be inaccessible. Use a column 12 layout if you need to pipette in that area.
+    Similarly, when using the frontmost row of nozzles for partial tip pickup and pipetting, organize your deck with the shortest labware towards the back of the deck, and the tallest labware towards the front of the deck.
