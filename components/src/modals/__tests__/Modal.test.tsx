@@ -5,7 +5,7 @@ import { screen } from '@testing-library/react'
 import { describe, it, expect, beforeEach } from 'vitest'
 import { renderWithProviders } from '../../testing/utils'
 import { COLORS } from '../../helix-design-system'
-import { Modal } from '../index'
+import { Modal } from '../Modal'
 
 const render = (props: React.ComponentProps<typeof Modal>) => {
   return renderWithProviders(<Modal {...props} />)

@@ -14,8 +14,8 @@ import {
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
 import { OddModal } from '../../molecules/OddModal'
 
-import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
 import type { ModalProps } from '@opentrons/components'
+import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
 
 import imgSrc from '../../assets/images/on-device-display/deck_fixture_setup_qrcode.png'
 

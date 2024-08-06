@@ -58,8 +58,8 @@ import type {
   CutoutId,
   CutoutFixtureId,
 } from '@opentrons/shared-data'
-import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
 import type { ModalProps } from '@opentrons/components'
+import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
 
 interface AddFixtureModalProps {
   cutoutId: CutoutId

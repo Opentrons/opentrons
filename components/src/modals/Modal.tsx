@@ -9,16 +9,6 @@ import type { StyleProps } from '../primitives'
 
 type ModalType = 'info' | 'warning' | 'error'
 
-// modal components
-export * from './AlertModal'
-export * from './ContinueModal'
-export * from './LegacyModal'
-export * from './Overlay'
-export * from './SpinnerModal'
-export * from './SpinnerModalPage'
-export * from './ModalShell'
-export * from './ModalHeader'
-
 export interface ModalProps extends StyleProps {
   type?: ModalType
   onClose?: React.MouseEventHandler
