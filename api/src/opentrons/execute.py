@@ -148,7 +148,7 @@ def get_protocol_api(
         (``APIVersion(2, 0)``).
     :param bundled_labware: If specified, a mapping from labware names to
         labware definitions for labware to consider in the
-        protocol. Note that if you specify this, _only_
+        protocol. Note that if you specify this, *only*
         labware in this argument will be allowed in the
         protocol. This is preparation for a beta feature
         and is best not used.
