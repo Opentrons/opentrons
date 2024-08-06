@@ -23,6 +23,7 @@ export const SlotDetailsContainer = (
       x={robotType === FLEX_ROBOT_TYPE ? '-180' : '-110'}
       y="-10"
     >
+      {/* TODO(ja, 8/6/24): wire up slot information */}
       <LegacyStyledText as="p">Slot information</LegacyStyledText>
     </RobotCoordsForeignObject>
   )

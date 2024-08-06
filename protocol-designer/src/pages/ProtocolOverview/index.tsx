@@ -1,6 +1,6 @@
-import { Btn } from '@opentrons/components'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { Flex, PrimaryButton, SPACING } from '@opentrons/components'
 import { DeckSetup } from './DeckSetup'
 
 export function ProtocolOverview(): JSX.Element {
@@ -17,15 +17,15 @@ export function ProtocolOverview(): JSX.Element {
       }}
     />
   ) : (
-    <div>
+    <Flex gridGap={SPACING.spacing16}>
       {t('protocol_overview')}
-      <Btn
+      <PrimaryButton
         onClick={() => {
           setDeckSetup(true)
         }}
       >
         go to deck setup
-      </Btn>
-    </div>
+      </PrimaryButton>
+    </Flex>
   )
 }

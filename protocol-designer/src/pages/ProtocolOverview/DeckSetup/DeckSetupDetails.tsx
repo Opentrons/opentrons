@@ -3,10 +3,7 @@ import compact from 'lodash/compact'
 import values from 'lodash/values'
 
 import { Module } from '@opentrons/components'
-import {
-  MODULES_WITH_COLLISION_ISSUES,
-  ModuleTemporalProperties,
-} from '@opentrons/step-generation'
+import { MODULES_WITH_COLLISION_ISSUES } from '@opentrons/step-generation'
 import {
   getAddressableAreaFromSlotId,
   getLabwareHasQuirk,
@@ -21,35 +18,36 @@ import {
 import {
   getSlotIdsBlockedBySpanning,
   getSlotIsEmpty,
-  InitialDeckSetup,
-  LabwareOnDeck as LabwareOnDeckType,
-  ModuleOnDeck,
 } from '../../../step-forms'
-import { TerminalItemId } from '../../../steplist'
 import { LabwareOnDeck } from '../../../components/DeckSetup/LabwareOnDeck'
 import { SlotWarning } from '../../../components/DeckSetup/SlotWarning'
 import { getStagingAreaAddressableAreas } from '../../../utils'
 import { ControlSelect } from './ControlSelect'
 
+import type { ModuleTemporalProperties } from '@opentrons/step-generation'
 import type {
   AddressableAreaName,
   CutoutId,
   DeckDefinition,
   Dimensions,
-  RobotType,
 } from '@opentrons/shared-data'
+import type {
+  InitialDeckSetup,
+  LabwareOnDeck as LabwareOnDeckType,
+  ModuleOnDeck,
+} from '../../../step-forms'
+import type { TerminalItemId } from '../../../steplist'
 
 interface DeckSetupDetailsProps {
   activeDeckSetup: InitialDeckSetup
-  selectedTerminalItemId?: TerminalItemId | null
   showGen1MultichannelCollisionWarnings: boolean
   deckDef: DeckDefinition
-  robotType: RobotType
   stagingAreaCutoutIds: CutoutId[]
   trashSlot: string | null
   addEquipment: (slotId: string) => void
   hover: string | null
   setHover: React.Dispatch<React.SetStateAction<string | null>>
+  selectedTerminalItemId?: TerminalItemId | null
 }
 
 export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
@@ -57,7 +55,6 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
     activeDeckSetup,
     showGen1MultichannelCollisionWarnings,
     deckDef,
-    robotType,
     trashSlot,
     addEquipment,
     stagingAreaCutoutIds,
@@ -206,7 +203,7 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
         )
       })}
 
-      {/* on-deck warnings */}
+      {/* on-deck warnings for OT-2 and GEN1 8-channels only */}
       {multichannelWarningSlotIds.map(slotId => {
         const slotPosition = getPositionFromSlotId(slotId, deckDef)
         const slotBoundingBox = getAddressableAreaFromSlotId(slotId, deckDef)

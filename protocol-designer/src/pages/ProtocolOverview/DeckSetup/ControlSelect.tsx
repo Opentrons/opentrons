@@ -56,11 +56,17 @@ export const ControlSelect = (
       width={slotBoundingBox.xDimension}
       height={slotBoundingBox.yDimension}
       innerDivProps={{
-        //  TODO(jr, 8/6/24): refactor to not require className?
+        //  TODO(ja, 8/6/24): refactor to not require className? and update styling to match designs
         className: cx(styles.slot_overlay, styles.appear_on_mouseover),
-        onMouseEnter: () => setHover(slotId),
-        onMouseLeave: () => setHover(null),
-        onClick: () => addEquipment(slotId),
+        onMouseEnter: () => {
+          setHover(slotId)
+        },
+        onMouseLeave: () => {
+          setHover(null)
+        },
+        onClick: () => {
+          addEquipment(slotId)
+        },
       }}
     >
       <Flex
