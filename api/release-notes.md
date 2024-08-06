@@ -14,13 +14,15 @@ Welcome to the v8.0.0 release of the Opentrons robot software!
 
 ### New Features
 
-- Create, store, and run quick transfers.
+- Create, store, and run quick transfers on Flex.
 - Define and use CSV runtime parameters in Python protocols.
 - Detect the presence or absence of liquid in a well (Flex pipettes only), and continue or pause the protocol based on the result.
+- Automatically pause Flex protocol runs when detecting overpressure, allowing for error recovery and run resumption.
 
 ### Improved Features
 
-- Configure more partial tip pickup configurations. All multi-channel pipettes now support single and partial column pickup, and the Flex 96-channel pipette now supports row pickup.
+- Provides more partial tip pickup configurations. All multi-channel pipettes now support single and partial column pickup, and the Flex 96-channel pipette now supports row pickup.
+- Improves homing behavior when a Flex protocol completes or is canceled with liquid-filled tips attached to the pipette.
 
 ---
 
