@@ -7,6 +7,8 @@ import tempfile
 from pathlib import Path
 from typing import TextIO
 
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.parameters import (
     parameter_file_reader as mock_param_file_reader,
 )
@@ -17,6 +19,12 @@ from opentrons.protocols.parameters.csv_parameter_interface import CSVParameter
 def _patch_parameter_file_reader(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
     for name, func in inspect.getmembers(mock_param_file_reader, inspect.isfunction):
         monkeypatch.setattr(mock_param_file_reader, name, decoy.mock(func=func))
+
+
+@pytest.fixture
+def api_version() -> APIVersion:
+    """The API version under test."""
+    return MAX_SUPPORTED_VERSION
 
 
 @pytest.fixture
@@ -64,9 +72,16 @@ def csv_file_different_delimiter() -> TextIO:
     return temp_file
 
 
-def test_csv_parameter(decoy: Decoy, csv_file_basic: TextIO) -> None:
+@pytest.fixture
+def subject(api_version: APIVersion) -> CSVParameter:
+    """Return a CSVParameter interface subject."""
+    return CSVParameter(csv_path=Path("abc"), api_version=api_version)
+
+
+def test_csv_parameter(
+    decoy: Decoy, csv_file_basic: TextIO, subject: CSVParameter
+) -> None:
     """It should load the CSV parameter and provide access to the file, contents, and rows."""
-    subject = CSVParameter(Path("abc"))
     decoy.when(mock_param_file_reader.open_file_path(Path("abc"))).then_return(
         csv_file_basic
     )
@@ -82,9 +97,10 @@ def test_csv_parameter(decoy: Decoy, csv_file_basic: TextIO) -> None:
         lazy_fixture("csv_file_preceding_spaces"),
     ],
 )
-def test_csv_parameter_rows(decoy: Decoy, csv_file: TextIO) -> None:
+def test_csv_parameter_rows(
+    decoy: Decoy, csv_file: TextIO, subject: CSVParameter
+) -> None:
     """It should load the rows as all strings even with no quotes or leading spaces."""
-    subject = CSVParameter(Path("abc"))
     decoy.when(mock_param_file_reader.open_file_path(Path("abc"))).then_return(csv_file)
     assert len(subject.parse_as_csv()) == 4
     assert subject.parse_as_csv()[0] == ["x", "y", "z"]
@@ -92,10 +108,9 @@ def test_csv_parameter_rows(decoy: Decoy, csv_file: TextIO) -> None:
 
 
 def test_csv_parameter_mixed_quotes(
-    decoy: Decoy, csv_file_mixed_quotes: TextIO
+    decoy: Decoy, csv_file_mixed_quotes: TextIO, subject: CSVParameter
 ) -> None:
     """It should load the rows with no quotes, quotes and escaped quotes with double quotes."""
-    subject = CSVParameter(Path("abc"))
     decoy.when(mock_param_file_reader.open_file_path(Path("abc"))).then_return(
         csv_file_mixed_quotes
     )
@@ -106,10 +121,9 @@ def test_csv_parameter_mixed_quotes(
 
 
 def test_csv_parameter_additional_kwargs(
-    decoy: Decoy, csv_file_different_delimiter: TextIO
+    decoy: Decoy, csv_file_different_delimiter: TextIO, subject: CSVParameter
 ) -> None:
     """It should load the rows with a different delimiter."""
-    subject = CSVParameter(Path("abc"))
     decoy.when(mock_param_file_reader.open_file_path(Path("abc"))).then_return(
         csv_file_different_delimiter
     )
@@ -120,10 +134,9 @@ def test_csv_parameter_additional_kwargs(
 
 
 def test_csv_parameter_dont_detect_dialect(
-    decoy: Decoy, csv_file_preceding_spaces: TextIO
+    decoy: Decoy, csv_file_preceding_spaces: TextIO, subject: CSVParameter
 ) -> None:
     """It should load the rows without trying to detect the dialect."""
-    subject = CSVParameter(Path("abc"))
     decoy.when(mock_param_file_reader.open_file_path(Path("abc"))).then_return(
         csv_file_preceding_spaces
     )

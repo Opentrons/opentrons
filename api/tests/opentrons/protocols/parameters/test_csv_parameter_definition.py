@@ -6,6 +6,8 @@ import pytest
 from decoy import Decoy
 
 from opentrons.protocol_engine.types import CSVParameter, FileInfo
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.parameters import validation as mock_validation
 from opentrons.protocols.parameters.csv_parameter_definition import (
     create_csv_parameter,
@@ -18,6 +20,12 @@ from opentrons.protocols.parameters.exceptions import RuntimeParameterRequired
 def _patch_parameter_validation(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
     for name, func in inspect.getmembers(mock_validation, inspect.isfunction):
         monkeypatch.setattr(mock_validation, name, decoy.mock(func=func))
+
+
+@pytest.fixture
+def api_version() -> APIVersion:
+    """The API version under test."""
+    return MAX_SUPPORTED_VERSION
 
 
 @pytest.fixture
@@ -82,13 +90,14 @@ def test_csv_parameter_as_protocol_engine_type(
 
 
 def test_csv_parameter_as_csv_parameter_interface(
+    api_version: APIVersion,
     csv_parameter_subject: CSVParameterDefinition,
 ) -> None:
     """It should return the CSV parameter interface for use in a protocol run context."""
-    result = csv_parameter_subject.as_csv_parameter_interface()
+    result = csv_parameter_subject.as_csv_parameter_interface(api_version)
     with pytest.raises(RuntimeParameterRequired):
         result.file
 
     csv_parameter_subject.value = Path("abc")
-    result = csv_parameter_subject.as_csv_parameter_interface()
+    result = csv_parameter_subject.as_csv_parameter_interface(api_version)
     assert result._path == Path("abc")

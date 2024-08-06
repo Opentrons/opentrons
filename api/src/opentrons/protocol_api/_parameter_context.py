@@ -270,7 +270,7 @@ class ParameterContext:
         for parameter in self._parameters.values():
             value: UserFacingTypes
             if isinstance(parameter, csv_parameter_definition.CSVParameterDefinition):
-                value = parameter.as_csv_parameter_interface()
+                value = parameter.as_csv_parameter_interface(self._api_version)
             else:
                 value = parameter.value
             parameters_for_protocol[parameter.variable_name] = value

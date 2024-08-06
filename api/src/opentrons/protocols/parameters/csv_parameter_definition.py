@@ -7,6 +7,7 @@ from opentrons.protocol_engine.types import (
     CSVParameter as ProtocolEngineCSVParameter,
     FileInfo,
 )
+from opentrons.protocols.api_support.types import APIVersion
 
 from . import validation
 from .parameter_definition import AbstractParameterDefinition
@@ -54,8 +55,8 @@ class CSVParameterDefinition(AbstractParameterDefinition[Optional[Path]]):
     def file_info(self, file_info: FileInfo) -> None:
         self._file_info = file_info
 
-    def as_csv_parameter_interface(self) -> CSVParameter:
-        return CSVParameter(csv_path=self._value)
+    def as_csv_parameter_interface(self, api_version: APIVersion) -> CSVParameter:
+        return CSVParameter(csv_path=self._value, api_version=api_version)
 
     def as_protocol_engine_type(self) -> RunTimeParameter:
         """Returns CSV parameter as a Protocol Engine type to send to client."""

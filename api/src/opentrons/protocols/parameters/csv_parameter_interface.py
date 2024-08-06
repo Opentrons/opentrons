@@ -2,16 +2,19 @@ import csv
 from pathlib import Path
 from typing import Optional, TextIO, Any, List
 
+from opentrons.protocols.api_support.types import APIVersion
+
 from . import parameter_file_reader
 from .exceptions import ParameterValueError
 
 
 # TODO(jbl 2024-08-02) This is a public facing class and as such should be moved to the protocol_api folder
 class CSVParameter:
-    def __init__(self, csv_path: Optional[Path]) -> None:
+    def __init__(self, csv_path: Optional[Path], api_version: APIVersion) -> None:
         self._path = csv_path
         self._file: Optional[TextIO] = None
         self._contents: Optional[str] = None
+        self._api_version = api_version
 
     @property
     def file(self) -> TextIO:
