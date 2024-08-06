@@ -15,10 +15,10 @@ import {
   POSITION_ABSOLUTE,
   SPACING,
   LegacyStyledText,
+  ModalShell,
   useConditionalConfirm,
 } from '@opentrons/components'
 
-import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { getTopPortalEl } from '../../App/portal'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { getIsOnDevice } from '../../redux/config'
@@ -178,13 +178,13 @@ export function DropTipWizardSetupType(
         </Flex>
       </Flex>
     ) : (
-      <LegacyModalShell
+      <ModalShell
         width="47rem"
         header={<DropTipWizardHeader {...props} />}
         overflow="hidden"
       >
         <DropTipWizardContent {...props} />
-      </LegacyModalShell>
+      </ModalShell>
     ),
     getTopPortalEl()
   )

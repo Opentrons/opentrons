@@ -7,12 +7,12 @@ import {
   getSimplestDeckConfigForProtocol,
 } from '@opentrons/shared-data'
 
-import { Modal } from '../../molecules/Modal'
+import { OddModal } from '../../molecules/OddModal'
 import { ModuleInfo } from '../Devices/ModuleInfo'
 import { getStandardDeckViewLayerBlockList } from '../Devices/ProtocolRun/utils/getStandardDeckViewLayerBlockList'
 
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
+import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
 import type { AttachedProtocolModuleMatch } from './utils'
 
 // Note (kk:10/26/2023) once we are ready for removing ff, we will be able to update props
@@ -31,7 +31,7 @@ export function ModulesAndDeckMapViewModal({
 }: ModulesAndDeckMapViewModalProps): JSX.Element | null {
   const { t } = useTranslation('protocol_setup')
 
-  const modalHeader: ModalHeaderBaseProps = {
+  const modalHeader: OddModalHeaderBaseProps = {
     title: t('map_view'),
     hasExitIcon: true,
   }
@@ -54,7 +54,7 @@ export function ModulesAndDeckMapViewModal({
   }))
 
   return (
-    <Modal
+    <OddModal
       header={modalHeader}
       modalSize="large"
       onOutsideClick={() => {
@@ -68,6 +68,6 @@ export function ModulesAndDeckMapViewModal({
         labwareOnDeck={[]}
         modulesOnDeck={modulesOnDeck}
       />
-    </Modal>
+    </OddModal>
   )
 }

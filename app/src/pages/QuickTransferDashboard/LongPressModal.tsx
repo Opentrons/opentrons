@@ -8,7 +8,7 @@ import { useCreateRunMutation } from '@opentrons/react-api-client'
 import { MAXIMUM_PINNED_PROTOCOLS } from '../../App/constants'
 import { MenuList } from '../../atoms/MenuList'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
-import { SmallModalChildren } from '../../molecules/Modal'
+import { SmallModalChildren } from '../../molecules/OddModal'
 import { useToaster } from '../../organisms/ToasterOven'
 import {
   getPinnedQuickTransferIds,

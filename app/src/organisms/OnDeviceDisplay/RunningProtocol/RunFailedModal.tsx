@@ -17,10 +17,10 @@ import {
 import { useStopRunMutation } from '@opentrons/react-api-client'
 
 import { SmallButton } from '../../../atoms/buttons'
-import { Modal } from '../../../molecules/Modal'
+import { OddModal } from '../../../molecules/OddModal'
 
-import type { ModalHeaderBaseProps } from '../../../molecules/Modal/types'
 import type { RunError } from '@opentrons/api-client'
+import type { OddModalHeaderBaseProps } from '../../../molecules/OddModal/types'
 
 interface RunFailedModalProps {
   runId: string
@@ -39,7 +39,7 @@ export function RunFailedModal({
   const [isCanceling, setIsCanceling] = React.useState(false)
 
   if (errors == null || errors.length === 0) return null
-  const modalHeader: ModalHeaderBaseProps = {
+  const modalHeader: OddModalHeaderBaseProps = {
     title: t('run_failed_modal_title'),
   }
 
@@ -61,7 +61,7 @@ export function RunFailedModal({
     })
   }
   return (
-    <Modal
+    <OddModal
       header={modalHeader}
       onOutsideClick={() => {
         setShowRunFailedModal(false)
@@ -119,7 +119,7 @@ export function RunFailedModal({
           disabled={isCanceling}
         />
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }
 

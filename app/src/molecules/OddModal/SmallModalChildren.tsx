@@ -9,7 +9,7 @@ import {
 } from '@opentrons/components'
 
 import { SmallButton } from '../../atoms/buttons'
-import { Modal } from '.'
+import { OddModal } from './index'
 
 interface SmallModalChildrenProps {
   handleCloseMaxPinsAlert: () => void
@@ -23,7 +23,7 @@ export function SmallModalChildren(
   const { handleCloseMaxPinsAlert, header, subText, buttonText } = props
 
   return (
-    <Modal onOutsideClick={handleCloseMaxPinsAlert} modalSize="small">
+    <OddModal onOutsideClick={handleCloseMaxPinsAlert} modalSize="small">
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing8}
@@ -57,6 +57,6 @@ export function SmallModalChildren(
           />
         </Flex>
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }

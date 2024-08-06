@@ -11,9 +11,9 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import type { ModalHeaderBaseProps } from '../Modal/types'
+import type { OddModalHeaderBaseProps } from './types'
 
-export function ModalHeader(props: ModalHeaderBaseProps): JSX.Element {
+export function OddModalHeader(props: OddModalHeaderBaseProps): JSX.Element {
   const {
     title,
     hasExitIcon,

@@ -21,7 +21,7 @@ import {
 } from '@opentrons/components'
 
 import { SmallButton } from '../../atoms/buttons'
-import { Modal } from '../../molecules/Modal'
+import { OddModal } from '../../molecules/OddModal'
 import { InterventionModal as InterventionModalMolecule } from '../../molecules/InterventionModal'
 import { getIsOnDevice } from '../../redux/config'
 import { PauseInterventionContent } from './PauseInterventionContent'
@@ -117,7 +117,7 @@ export function InterventionModal({
   // TODO(bh, 2023-7-18): this is a one-off modal implementation for desktop
   // reimplement when design system shares a modal component between desktop/ODD
   return isOnDevice ? (
-    <Modal
+    <OddModal
       border={`${BORDERS.borderRadius8} ${BORDERS.styleSolid} ${COLORS.blue50}`}
       modalSize="large"
       header={{
@@ -141,7 +141,7 @@ export function InterventionModal({
           buttonType="secondary"
         />
       </Flex>
-    </Modal>
+    </OddModal>
   ) : (
     <InterventionModalMolecule
       iconHeading={<LegacyStyledText as="h1">{headerTitle}</LegacyStyledText>}

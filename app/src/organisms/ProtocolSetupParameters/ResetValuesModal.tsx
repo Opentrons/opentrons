@@ -12,10 +12,10 @@ import {
 } from '@opentrons/components'
 
 import { SmallButton } from '../../atoms/buttons'
-import { Modal } from '../../molecules/Modal'
+import { OddModal } from '../../molecules/OddModal'
 
 import type { RunTimeParameter } from '@opentrons/shared-data'
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
+import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
 
 interface ResetValuesModalProps {
   runTimeParametersOverrides: RunTimeParameter[]
@@ -30,7 +30,7 @@ export function ResetValuesModal({
 }: ResetValuesModalProps): JSX.Element {
   const { t } = useTranslation(['protocol_setup', 'shared'])
 
-  const modalHeader: ModalHeaderBaseProps = {
+  const modalHeader: OddModalHeaderBaseProps = {
     title: t('reset_parameter_values'),
     iconName: 'ot-alert',
     iconColor: COLORS.yellow50,
@@ -52,7 +52,7 @@ export function ResetValuesModal({
   }
 
   return (
-    <Modal {...modalProps}>
+    <OddModal {...modalProps}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
         <LegacyStyledText as="p">
           {t('reset_parameter_values_body')}
@@ -75,6 +75,6 @@ export function ResetValuesModal({
           />
         </Flex>
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }

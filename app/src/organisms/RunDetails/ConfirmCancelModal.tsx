@@ -10,6 +10,7 @@ import {
   Icon,
   JUSTIFY_FLEX_END,
   Link,
+  Modal,
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
@@ -21,7 +22,6 @@ import {
 import { useStopRunMutation } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '../../App/portal'
-import { LegacyModal } from '../../molecules/LegacyModal'
 import { useTrackProtocolRunEvent, useIsFlex } from '../Devices/hooks'
 import { useRunStatus } from '../RunTimeControl/hooks'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '../../redux/analytics'
@@ -70,7 +70,7 @@ export function ConfirmCancelModal(
   }, [runStatus, onClose])
 
   return createPortal(
-    <LegacyModal
+    <Modal
       type="warning"
       onClose={isCanceling ? undefined : onClose}
       title={t('cancel_run_modal_heading')}
@@ -107,7 +107,7 @@ export function ConfirmCancelModal(
           </AlertPrimaryButton>
         </Flex>
       </Flex>
-    </LegacyModal>,
+    </Modal>,
     getTopPortalEl()
   )
 }
