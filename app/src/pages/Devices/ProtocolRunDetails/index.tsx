@@ -257,10 +257,7 @@ function PageContents(props: PageContentsProps): JSX.Element {
     },
   }
   console.log(`run details tab is ${protocolRunDetailsTab}`)
-  const tabDetails = protocolRunDetailsContentByTab[
-    protocolRunDetailsTab
-  ] ?? // default to the setup tab if no tab or nonexistent tab is passed as a param
-  {
+  const tabDetails = protocolRunDetailsContentByTab[protocolRunDetailsTab] ?? { // default to the setup tab if no tab or nonexistent tab is passed as a param
     content: (
       <Navigate to={`/devices/${robotName}/protocol-runs/${runId}/setup`} />
     ),
