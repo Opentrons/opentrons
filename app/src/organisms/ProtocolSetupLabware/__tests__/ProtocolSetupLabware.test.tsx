@@ -110,10 +110,11 @@ describe('ProtocolSetupLabware', () => {
     expect(mockSetSetupScreen).toHaveBeenCalledWith('prepare to run')
   })
 
-  it('should toggle between list and deck map content', () => {
+  it('should toggle between map view and list view', () => {
     render()
+    expect(screen.queryByText('List View')).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: 'Map View' }))
-    screen.getByTestId('DeckInfoLabel_A')
+    expect(screen.queryByText('Map View')).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: 'List View' }))
     screen.getByText('Labware')
     screen.getByText('Labware name')

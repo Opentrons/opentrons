@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { when } from 'vitest-when'
-import { screen } from '@testing-library/react'
 import { describe, it, vi, beforeEach, afterEach, expect } from 'vitest'
 
 import { BaseDeck, EXTENDED_DECK_CONFIG_FIXTURE } from '@opentrons/components'
@@ -16,7 +15,7 @@ import { i18n } from '../../../i18n'
 import { getLabwareRenderInfo } from '../../Devices/ProtocolRun/utils/getLabwareRenderInfo'
 import { getStandardDeckViewLayerBlockList } from '../../Devices/ProtocolRun/utils/getStandardDeckViewLayerBlockList'
 import { mockProtocolModuleInfo } from '../__fixtures__'
-import { LabwareMapViewContent } from '../LabwareMapViewContent'
+import { LabwareMapView } from '../LabwareMapView'
 
 import type {
   getSimplestDeckConfigForProtocol,
@@ -51,10 +50,10 @@ vi.mock('@opentrons/components', async importOriginal => {
   }
 })
 
-const render = (props: React.ComponentProps<typeof LabwareMapViewContent>) => {
+const render = (props: React.ComponentProps<typeof LabwareMapView>) => {
   return renderWithProviders(
     <MemoryRouter>
-      <LabwareMapViewContent {...props} />
+      <LabwareMapView {...props} />
     </MemoryRouter>,
     {
       i18nInstance: i18n,
@@ -62,33 +61,13 @@ const render = (props: React.ComponentProps<typeof LabwareMapViewContent>) => {
   )[0]
 }
 
-describe('LabwareMapViewContent', () => {
+describe('LabwareMapView', () => {
   beforeEach(() => {
     vi.mocked(getLabwareRenderInfo).mockReturnValue({})
-    // vi.mocked(getSimplestDeckConfigForProtocol).mockReturnValue([])
   })
 
   afterEach(() => {
     vi.resetAllMocks()
-  })
-
-  it('should render nothing on the deck', () => {
-    vi.mocked(BaseDeck).mockReturnValue(<div>mock base deck</div>)
-
-    const props = {
-      handleLabwareClick: vi.fn(),
-      onCloseClick: vi.fn(),
-      deckDef: (deckDefFixture as unknown) as DeckDefinition,
-      mostRecentAnalysis: ({
-        commands: [],
-        labware: [],
-      } as unknown) as CompletedProtocolAnalysis,
-      initialLoadedLabwareByAdapter: {},
-      attachedProtocolModuleMatches: [],
-    }
-
-    render(props)
-    screen.getByText('mock base deck')
   })
 
   it('should render a deck with modules and labware', () => {

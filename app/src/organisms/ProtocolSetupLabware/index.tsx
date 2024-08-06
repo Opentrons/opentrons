@@ -1,6 +1,8 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
+
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
@@ -36,16 +38,17 @@ import {
 
 import { FloatingActionButton } from '../../atoms/buttons'
 import { ODDBackButton } from '../../molecules/ODDBackButton'
+import { getTopPortalEl } from '../../App/portal'
 import { Modal } from '../../molecules/Modal'
 
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getLabwareSetupItemGroups } from '../../pages/Protocols/utils'
+import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
 import { getProtocolModulesInfo } from '../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { getAttachedProtocolModuleMatches } from '../ProtocolSetupModulesAndDeck/utils'
 import { getNestedLabwareInfo } from '../Devices/ProtocolRun/SetupLabware/getNestedLabwareInfo'
+import { LabwareMapView } from './LabwareMapView'
 import { LabwareStackModal } from '../Devices/ProtocolRun/SetupLabware/LabwareStackModal'
-import { LabwareMapViewContent } from './LabwareMapViewContent'
-import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
 
 import type { UseQueryResult } from 'react-query'
 import type {
@@ -81,7 +84,7 @@ export function ProtocolSetupLabware({
   setSetupScreen,
 }: ProtocolSetupLabwareProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
-  const [showDeckMap, setShowDeckMap] = React.useState<boolean>(false)
+  const [showMapView, setShowMapView] = React.useState<boolean>(false)
   const [
     showLabwareDetailsModal,
     setShowLabwareDetailsModal,
@@ -218,9 +221,58 @@ export function ProtocolSetupLabware({
       }
     }
   }
+  console.log({ topLabwareId })
   const selectedLabwareLocation = selectedLabware?.location
   return (
     <>
+      {createPortal(
+        <>
+          {showLabwareDetailsModal &&
+          topLabwareId == null &&
+          selectedLabware != null ? (
+            <Modal
+              onOutsideClick={() => {
+                setShowLabwareDetailsModal(false)
+                setSelectedLabware(null)
+              }}
+            >
+              <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
+                <Flex
+                  flexDirection={DIRECTION_COLUMN}
+                  alignItems={ALIGN_FLEX_START}
+                  gridGap={SPACING.spacing12}
+                >
+                  <Flex gridGap={SPACING.spacing4}>{location}</Flex>
+                  <LegacyStyledText
+                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                    fontSize={TYPOGRAPHY.fontSize22}
+                  >
+                    {getLabwareDisplayName(selectedLabware)}
+                  </LegacyStyledText>
+                  <LegacyStyledText as="p" color={COLORS.grey60}>
+                    {selectedLabware.nickName}
+                    {selectedLabwareLocation != null &&
+                    selectedLabwareLocation !== 'offDeck' &&
+                    'labwareId' in selectedLabwareLocation
+                      ? t('on_adapter', {
+                          adapterName: mostRecentAnalysis?.labware.find(
+                            l => l.id === selectedLabwareLocation.labwareId
+                          )?.displayName,
+                        })
+                      : null}
+                  </LegacyStyledText>
+                </Flex>
+                <LabwareThumbnail
+                  viewBox={`${selectedLabware.cornerOffsetFromSlot.x} ${selectedLabware.cornerOffsetFromSlot.y} ${selectedLabware.dimensions.xDimension} ${selectedLabware.dimensions.yDimension}`}
+                >
+                  <LabwareRender definition={selectedLabware} />
+                </LabwareThumbnail>
+              </Flex>
+            </Modal>
+          ) : null}
+        </>,
+        getTopPortalEl()
+      )}
       <ODDBackButton
         label={t('labware')}
         onClick={() => {
@@ -232,17 +284,14 @@ export function ProtocolSetupLabware({
         gridGap={SPACING.spacing8}
         marginTop={SPACING.spacing32}
       >
-        {showDeckMap ? (
-          <Flex height="27.3125rem">
-            <LabwareMapViewContent
-              data-testid={`LabwareMapViewContent_${runId}`}
-              mostRecentAnalysis={mostRecentAnalysis}
-              deckDef={deckDef}
-              attachedProtocolModuleMatches={attachedProtocolModuleMatches}
-              handleLabwareClick={handleLabwareClick}
-              initialLoadedLabwareByAdapter={initialLoadedLabwareByAdapter}
-            />
-          </Flex>
+        {showMapView ? (
+          <LabwareMapView
+            mostRecentAnalysis={mostRecentAnalysis}
+            deckDef={deckDef}
+            attachedProtocolModuleMatches={attachedProtocolModuleMatches}
+            handleLabwareClick={handleLabwareClick}
+            initialLoadedLabwareByAdapter={initialLoadedLabwareByAdapter}
+          />
         ) : (
           <>
             <Flex
@@ -287,63 +336,17 @@ export function ProtocolSetupLabware({
             labwareIdTop={topLabwareId}
             runId={runId}
             closeModal={() => {
-              setShowDeckMap(true)
               setSelectedLabware(null)
               setShowLabwareDetailsModal(false)
             }}
           />
         ) : null}
-        {showLabwareDetailsModal &&
-        topLabwareId == null &&
-        selectedLabware != null ? (
-          <Modal
-            onOutsideClick={() => {
-              setShowLabwareDetailsModal(false)
-              setSelectedLabware(null)
-            }}
-          >
-            <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
-              <Flex
-                flexDirection={DIRECTION_COLUMN}
-                alignItems={ALIGN_FLEX_START}
-                gridGap={SPACING.spacing12}
-              >
-                <Flex gridGap={SPACING.spacing4}>{location}</Flex>
-                <LegacyStyledText
-                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                  fontSize={TYPOGRAPHY.fontSize22}
-                >
-                  {getLabwareDisplayName(selectedLabware)}
-                </LegacyStyledText>
-                <LegacyStyledText as="p" color={COLORS.grey60}>
-                  {selectedLabware.nickName}
-                  {selectedLabwareLocation != null &&
-                  selectedLabwareLocation !== 'offDeck' &&
-                  'labwareId' in selectedLabwareLocation
-                    ? t('on_adapter', {
-                        adapterName: mostRecentAnalysis?.labware.find(
-                          l => l.id === selectedLabwareLocation.labwareId
-                        )?.displayName,
-                      })
-                    : null}
-                </LegacyStyledText>
-              </Flex>
-              <Flex width="16.875rem">
-                <LabwareThumbnail
-                  viewBox={`${selectedLabware.cornerOffsetFromSlot.x} ${selectedLabware.cornerOffsetFromSlot.y} ${selectedLabware.dimensions.xDimension} ${selectedLabware.dimensions.yDimension}`}
-                >
-                  <LabwareRender definition={selectedLabware} />
-                </LabwareThumbnail>
-              </Flex>
-            </Flex>
-          </Modal>
-        ) : null}
       </Flex>
       <FloatingActionButton
-        buttonText={showDeckMap ? t('list_view') : t('map_view')}
+        buttonText={showMapView ? t('list_view') : t('map_view')}
         iconName={null}
         onClick={() => {
-          setShowDeckMap(!showDeckMap)
+          setShowMapView(mapView => !mapView)
         }}
       />
     </>

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import map from 'lodash/map'
-import { BaseDeck } from '@opentrons/components'
+import { BaseDeck, Flex } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
   getSimplestDeckConfigForProtocol,
@@ -18,7 +18,7 @@ import type {
 import type { LoadedLabwareByAdapter } from '@opentrons/api-client'
 import type { AttachedProtocolModuleMatch } from '../ProtocolSetupModulesAndDeck/utils'
 
-interface LabwareMapViewContentProps {
+interface LabwareMapViewProps {
   attachedProtocolModuleMatches: AttachedProtocolModuleMatch[]
   handleLabwareClick: (
     labwareDef: LabwareDefinition2,
@@ -29,9 +29,7 @@ interface LabwareMapViewContentProps {
   mostRecentAnalysis: CompletedProtocolAnalysis | null
 }
 
-export function LabwareMapViewContent(
-  props: LabwareMapViewContentProps
-): JSX.Element {
+export function LabwareMapView(props: LabwareMapViewProps): JSX.Element {
   const {
     handleLabwareClick,
     attachedProtocolModuleMatches,
@@ -101,12 +99,14 @@ export function LabwareMapViewContent(
   )
 
   return (
-    <BaseDeck
-      deckConfig={deckConfig}
-      deckLayerBlocklist={getStandardDeckViewLayerBlockList(FLEX_ROBOT_TYPE)}
-      robotType={FLEX_ROBOT_TYPE}
-      labwareOnDeck={labwareLocations}
-      modulesOnDeck={modulesOnDeck}
-    />
+    <Flex height="27.75rem">
+      <BaseDeck
+        deckConfig={deckConfig}
+        deckLayerBlocklist={getStandardDeckViewLayerBlockList(FLEX_ROBOT_TYPE)}
+        robotType={FLEX_ROBOT_TYPE}
+        labwareOnDeck={labwareLocations}
+        modulesOnDeck={modulesOnDeck}
+      />
+    </Flex>
   )
 }

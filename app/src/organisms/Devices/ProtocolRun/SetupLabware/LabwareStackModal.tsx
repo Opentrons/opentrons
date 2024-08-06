@@ -80,7 +80,6 @@ export const LabwareStackModal = (
             <DeckInfoLabel iconName="stacked" />
           </Flex>
         ),
-        hasExitIcon: true,
         onClick: closeModal,
       }}
     >

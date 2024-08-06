@@ -121,7 +121,7 @@ export function ODDRecoveryOptions({
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing4}
+      gridGap={SPACING.spacing8}
       width="100%"
     >
       {validRecoveryOptions.map((recoveryOption: RecoveryRoute) => {
@@ -135,6 +135,7 @@ export function ODDRecoveryOptions({
               setSelectedRoute(recoveryOption)
             }}
             isSelected={recoveryOption === selectedRoute}
+            radioButtonType="large"
           />
         )
       })}
