@@ -5,7 +5,6 @@ from functools import partial, lru_cache, wraps
 from dataclasses import replace
 import logging
 from collections import OrderedDict
-from math import isclose
 from typing import (
     AsyncIterator,
     cast,
@@ -2731,9 +2730,6 @@ class OT3API(
                 max_z_dist - probe_start_pos.z + pass_start_pos.z
             ) / probe_settings.mount_speed
             p_travel_required_for_z = max_z_time * probe_settings.plunger_speed
-
-            # if total_travel_left < working range of plunger axis, dont keep going past the total travel
-            #  min(total_travel_left_to_do, working_range_of_plunger_axis)
             p_pass_travel = min(p_travel_required_for_z, p_working_mm)
             # Prep the plunger
             await self.move_to(checked_mount, safe_plunger_pos)
@@ -2758,9 +2754,9 @@ class OT3API(
             except PipetteLiquidNotFoundError as lnfe:
                 error = lnfe
             pos = await self.gantry_position(checked_mount, refresh=True)
-        # await self.move_to(checked_mount, probe_start_pos + top_types.Point(z=2))
-        # await self.prepare_for_aspirate(checked_mount)
-        # await self.move_to(checked_mount, probe_start_pos)
+        await self.move_to(checked_mount, probe_start_pos + top_types.Point(z=2))
+        await self.prepare_for_aspirate(checked_mount)
+        await self.move_to(checked_mount, probe_start_pos)
         if error is not None:
             # if we never found liquid raise an error
             raise error
