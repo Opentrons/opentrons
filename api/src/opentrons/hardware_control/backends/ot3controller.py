@@ -1114,7 +1114,8 @@ class OT3Controller(FlexBackend):
         )
         try:
             yield
-        # finally:
+        finally:
+            pass
         #     await self.set_hold_current(
         #         {Axis.Z_L: high_throughput_settings[Axis.Z_L].hold_current}
         #     )
