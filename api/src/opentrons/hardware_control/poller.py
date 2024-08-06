@@ -36,10 +36,6 @@ class Poller:
         self._poll_waiters: List["asyncio.Future[None]"] = []
         self._poll_forever_task: Optional["asyncio.Task[None]"] = None
 
-    @property
-    def is_running(self) -> bool:
-        return self._poll_forever_task is not None
-
     async def start(self) -> None:
         assert self._poll_forever_task is None, "Poller already started"
         self._poll_forever_task = asyncio.create_task(self._poll_forever())
@@ -56,7 +52,6 @@ class Poller:
             await asyncio.gather(task, return_exceptions=True)
         for waiter in self._poll_waiters:
             waiter.cancel(msg="Module was removed")
-        self._poll_forever_task = None
 
     async def wait_next_poll(self) -> None:
         """Wait for the next poll to complete.

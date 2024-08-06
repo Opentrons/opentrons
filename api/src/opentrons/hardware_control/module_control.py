@@ -127,8 +127,8 @@ class AttachedModulesControl:
         for mod in mods_at_ports:
             for attached_mod in self.available_modules:
                 if (
-                    attached_mod.port == mod.port
-                    and attached_mod.serial_number == mod.serial
+                    attached_mod.serial_number == mod.serial
+                    or attached_mod.port == mod.port
                 ):
                     removed_modules.append(attached_mod)
 

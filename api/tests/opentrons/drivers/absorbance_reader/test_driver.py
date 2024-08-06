@@ -60,7 +60,7 @@ async def test_driver_connect_disconnect(
 
     mock_interface.byonoy_open_device.assert_called_once()
     assert await driver.is_connected()
-    assert driver._connection.verify_device_handle()
+    assert driver._connection._verify_device_handle()
     assert driver._connection._device_handle == 1
 
     mock_interface.byonoy_free_device.return_value = MockErrorCode.BYONOY_ERROR_NO_ERROR

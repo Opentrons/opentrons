@@ -295,6 +295,7 @@ class AbsorbanceReader(mod_abc.AbstractModule):
         log.debug(f"Updating {self.name}: {self.port} with {firmware_file_path}")
         self._updating = True
         success, res = await self._driver.update_firmware(firmware_file_path)
+        self._device_info = await self._driver.get_device_info()
         await self._poller.start()
         self._updating = False
         return success, res
