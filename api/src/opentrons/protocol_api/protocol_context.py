@@ -87,6 +87,16 @@ ModuleTypes = Union[
 ]
 
 
+class _Unset:
+    """A sentinel value for when no value has been supplied for an argument,
+    when `None` is already taken for some other meaning.
+
+    User code should never use this explicitly.
+    """
+
+    pass
+
+
 class ProtocolContext(CommandPublisher):
     """A context for the state of a protocol.
 
@@ -1197,17 +1207,54 @@ class ProtocolContext(CommandPublisher):
 
     @requires_version(2, 14)
     def define_liquid(
-        self, name: str, description: Optional[str], display_color: Optional[str]
+        self,
+        name: str,
+        description: Union[str, None, _Unset] = _Unset(),
+        display_color: Union[str, None, _Unset] = _Unset(),
     ) -> Liquid:
+        # This first line of the docstring overrides the method signature in our public
+        # docs, which would otherwise have the `_Unset()`s expanded to a bunch of junk.
         """
+        define_liquid(self, name: str, description: Optional[str] = None, display_color: Optional[str] = None)
+
         Define a liquid within a protocol.
 
         :param str name: A human-readable name for the liquid.
-        :param str description: An optional description of the liquid.
-        :param str display_color: An optional hex color code, with hash included, to represent the specified liquid. Standard three-value, four-value, six-value, and eight-value syntax are all acceptable.
+        :param Optional[str] description: An optional description of the liquid.
+        :param Optional[str] display_color: An optional hex color code, with hash included,
+            to represent the specified liquid. For example, ``"#48B1FA"``.
+            Standard three-value, four-value, six-value, and eight-value syntax are all
+            acceptable.
 
         :return: A :py:class:`~opentrons.protocol_api.Liquid` object representing the specified liquid.
+
+        .. versionchanged:: 2.20
+            You can now omit the ``description`` and ``display_color`` arguments.
+            Formerly, when you didn't want to provide values, you had to supply
+            ``description=None`` and ``display_color=None`` explicitly.
         """
+        desc_and_display_color_omittable_since = APIVersion(2, 20)
+        if isinstance(description, _Unset):
+            if self._api_version < desc_and_display_color_omittable_since:
+                raise APIVersionError(
+                    api_element="Calling `define_liquid()` without a `description`",
+                    current_version=str(self._api_version),
+                    until_version=str(desc_and_display_color_omittable_since),
+                    message="Use a newer API version or explicitly supply `description=None`.",
+                )
+            else:
+                description = None
+        if isinstance(display_color, _Unset):
+            if self._api_version < desc_and_display_color_omittable_since:
+                raise APIVersionError(
+                    api_element="Calling `define_liquid()` without a `display_color`",
+                    current_version=str(self._api_version),
+                    until_version=str(desc_and_display_color_omittable_since),
+                    message="Use a newer API version or explicitly supply `display_color=None`.",
+                )
+            else:
+                display_color = None
+
         return self._core.define_liquid(
             name=name,
             description=description,
