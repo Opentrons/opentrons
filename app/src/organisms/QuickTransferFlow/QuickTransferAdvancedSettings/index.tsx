@@ -74,7 +74,7 @@ export function QuickTransferAdvancedSettings(
   } else if (state.path === 'multiAspirate') {
     pipettePathValue = t('pipette_path_multi_aspirate')
   } else if (state.path === 'multiDispense') {
-    pipettePathValue = t('pipette_path_multi_dispense', {
+    pipettePathValue = t('pipette_path_multi_dispense_volume_blowout', {
       volume: state.disposalVolume,
       blowOutLocation: getBlowoutValueCopy(),
     })
@@ -299,7 +299,10 @@ export function QuickTransferAdvancedSettings(
     {
       option: 'dispense_blow_out',
       copy: t('blow_out'),
-      value: i18n.format(getBlowoutValueCopy(), 'capitalize'),
+      value:
+        state.transferType === 'distribute'
+          ? t('disabled')
+          : i18n.format(getBlowoutValueCopy(), 'capitalize'),
       enabled: state.transferType !== 'distribute',
       onClick: () => {
         if (state.transferType === 'distribute') {
