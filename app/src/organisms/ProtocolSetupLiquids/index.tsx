@@ -43,7 +43,7 @@ export function ProtocolSetupLiquids({
   isConfirmed,
   setIsConfirmed,
 }: ProtocolSetupLiquidsProps): JSX.Element {
-  const { t } = useTranslation('protocol_setup')
+  const { t, i18n } = useTranslation('protocol_setup')
   const protocolData = useMostRecentCompletedAnalysis(runId)
   const liquidsInLoadOrder = parseLiquidsInLoadOrder(
     protocolData?.liquids ?? [],
@@ -56,7 +56,7 @@ export function ProtocolSetupLiquids({
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
         <ODDBackButton
-          label={t('liquids')}
+          label={i18n.format(t('liquids'), 'capitalize')}
           onClick={() => {
             setSetupScreen('prepare to run')
           }}

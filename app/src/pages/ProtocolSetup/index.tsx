@@ -86,6 +86,7 @@ import {
 } from '../../redux/analytics'
 import { getIsHeaterShakerAttached } from '../../redux/config'
 import { ConfirmAttachedModal } from './ConfirmAttachedModal'
+import { ConfirmSetupStepsCompleteModal } from './ConfirmSetupStepsCompleteModal'
 import { getLatestCurrentOffsets } from '../../organisms/Devices/ProtocolRun/SetupLabwarePositionCheck/utils'
 import { CloseButton, PlayButton } from './Buttons'
 import { useDeckConfigurationCompatibility } from '../../resources/deck_configuration/hooks'
@@ -274,6 +275,7 @@ interface PrepareToRunProps {
   runId: string
   setSetupScreen: React.Dispatch<React.SetStateAction<SetupScreens>>
   confirmAttachment: () => void
+  confirmStepsComplete: () => void
   play: () => void
   robotName: string
   runRecord: Run | null
@@ -292,6 +294,7 @@ function PrepareToRun({
   labwareConfirmed,
   liquidsConfirmed,
   offsetsConfirmed,
+  confirmStepsComplete,
 }: PrepareToRunProps): JSX.Element {
   const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
   const navigate = useNavigate()
@@ -516,12 +519,13 @@ function PrepareToRun({
     if (isDoorOpen) {
       makeSnackbar(t('shared:close_robot_door') as string)
     } else {
-      if (
-        isHeaterShakerInProtocol &&
-        isReadyToRun &&
-        runStatus === RUN_STATUS_IDLE
-      ) {
-        confirmAttachment()
+      if (isReadyToRun && runStatus === RUN_STATUS_IDLE) {
+        if (!(labwareConfirmed && offsetsConfirmed && liquidsConfirmed)) {
+          confirmStepsComplete()
+        }
+        if (isHeaterShakerInProtocol) {
+          confirmAttachment()
+        }
       } else {
         if (isReadyToRun) {
           play()
@@ -793,7 +797,7 @@ function PrepareToRun({
               onClickSetupStep={() => {
                 setSetupScreen('liquids')
               }}
-              title={t('liquids')}
+              title={i18n.format(t('liquids'), 'capitalize')}
               status={liquidsConfirmed ? 'ready' : 'general'}
               detail={
                 liquidsInProtocol.length > 0
@@ -840,6 +844,7 @@ export function ProtocolSetup(): JSX.Element {
   >() as OnDeviceRouteParams
   const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
   const { analysisErrors } = useProtocolAnalysisErrors(runId)
+  const { t } = useTranslation(['protocol_setup'])
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const robotSerialNumber =
@@ -925,8 +930,8 @@ export function ProtocolSetup(): JSX.Element {
   )
   const {
     confirm: confirmAttachment,
-    showConfirmation: showConfirmationModal,
-    cancel: cancelExit,
+    showConfirmation: showHSConfirmationModal,
+    cancel: cancelExitHSConfirmation,
   } = useConditionalConfirm(
     handleProceedToRunClick,
     !configBypassHeaterShakerAttachmentConfirmation
@@ -938,6 +943,20 @@ export function ProtocolSetup(): JSX.Element {
   const [labwareConfirmed, setLabwareConfirmed] = React.useState<boolean>(false)
   const [liquidsConfirmed, setLiquidsConfirmed] = React.useState<boolean>(false)
   const [offsetsConfirmed, setOffsetsConfirmed] = React.useState<boolean>(false)
+  const missingSteps = [
+    !offsetsConfirmed ? t('applied_labware_offsets') : null,
+    !labwareConfirmed ? t('labware_placement') : null,
+    !liquidsConfirmed ? t('liquids') : null,
+  ].filter(s => s != null)
+  console.log(missingSteps)
+  const {
+    confirm: confirmMissingSteps,
+    showConfirmation: showMissingStepsConfirmation,
+    cancel: cancelExitMissingStepsConfirmation,
+  } = useConditionalConfirm(
+    handleProceedToRunClick,
+    !(labwareConfirmed && liquidsConfirmed && offsetsConfirmed)
+  )
 
   // orchestrate setup subpages/components
   const [setupScreen, setSetupScreen] = React.useState<SetupScreens>(
@@ -949,6 +968,7 @@ export function ProtocolSetup(): JSX.Element {
         runId={runId}
         setSetupScreen={setSetupScreen}
         confirmAttachment={confirmAttachment}
+        confirmStepsComplete={confirmMissingSteps}
         play={play}
         robotName={robotName}
         runRecord={runRecord ?? null}
@@ -1019,9 +1039,16 @@ export function ProtocolSetup(): JSX.Element {
           errors={analysisErrors.map(error => error.detail)}
         />
       ) : null}
-      {showConfirmationModal ? (
+      {showMissingStepsConfirmation ? (
+        <ConfirmSetupStepsCompleteModal
+          onCloseClick={cancelExitMissingStepsConfirmation}
+          missingSteps={missingSteps}
+          onConfirmClick={handleProceedToRunClick}
+        />
+      ) : null}
+      {showHSConfirmationModal ? (
         <ConfirmAttachedModal
-          onCloseClick={cancelExit}
+          onCloseClick={cancelExitHSConfirmation}
           isProceedToRunModal={true}
           onConfirmClick={handleProceedToRunClick}
         />
