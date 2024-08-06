@@ -27,10 +27,8 @@ describe('ListItem', () => {
     screen.getByText('mock listitem content')
     const listItem = screen.getByTestId('ListItem_error')
     expect(listItem).toHaveStyle(`backgroundColor: ${COLORS.red35}`)
-    expect(listItem).toHaveStyle(
-      `padding: ${SPACING.spacing16} ${SPACING.spacing24}`
-    )
-    expect(listItem).toHaveStyle(`borderRadius: ${BORDERS.borderRadius12}`)
+    expect(listItem).toHaveStyle(`padding: 0`)
+    expect(listItem).toHaveStyle(`borderRadius: ${BORDERS.borderRadius4}`)
   })
   it('should render correct style - noActive', () => {
     props.type = 'noActive'
@@ -38,10 +36,8 @@ describe('ListItem', () => {
     screen.getByText('mock listitem content')
     const listItem = screen.getByTestId('ListItem_noActive')
     expect(listItem).toHaveStyle(`backgroundColor: ${COLORS.grey35}`)
-    expect(listItem).toHaveStyle(
-      `padding: ${SPACING.spacing16} ${SPACING.spacing24}`
-    )
-    expect(listItem).toHaveStyle(`borderRadius: ${BORDERS.borderRadius12}`)
+    expect(listItem).toHaveStyle(`padding: 0`)
+    expect(listItem).toHaveStyle(`borderRadius: ${BORDERS.borderRadius4}`)
   })
   it('should render correct style - success', () => {
     props.type = 'success'
@@ -49,10 +45,8 @@ describe('ListItem', () => {
     screen.getByText('mock listitem content')
     const listItem = screen.getByTestId('ListItem_success')
     expect(listItem).toHaveStyle(`backgroundColor: ${COLORS.green35}`)
-    expect(listItem).toHaveStyle(
-      `padding: ${SPACING.spacing16} ${SPACING.spacing24}`
-    )
-    expect(listItem).toHaveStyle(`borderRadius: ${BORDERS.borderRadius12}`)
+    expect(listItem).toHaveStyle(`padding: 0`)
+    expect(listItem).toHaveStyle(`borderRadius: ${BORDERS.borderRadius4}`)
   })
   it('should render correct style - warning', () => {
     props.type = 'warning'
@@ -60,10 +54,8 @@ describe('ListItem', () => {
     screen.getByText('mock listitem content')
     const listItem = screen.getByTestId('ListItem_warning')
     expect(listItem).toHaveStyle(`backgroundColor: ${COLORS.yellow35}`)
-    expect(listItem).toHaveStyle(
-      `padding: ${SPACING.spacing16} ${SPACING.spacing24}`
-    )
-    expect(listItem).toHaveStyle(`borderRadius: ${BORDERS.borderRadius12}`)
+    expect(listItem).toHaveStyle(`padding: 0`)
+    expect(listItem).toHaveStyle(`borderRadius: ${BORDERS.borderRadius4}`)
   })
   it('should call on click when pressed', () => {
     render(props)
