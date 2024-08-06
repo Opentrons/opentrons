@@ -5,10 +5,10 @@ import {
   BORDERS,
   COLORS,
   Chip,
+  DeckInfoLabel,
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LocationIcon,
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
@@ -219,7 +219,7 @@ function FixtureTableItem({
           </LegacyStyledText>
         </Flex>
         <Flex flex="2 0 0" alignItems={ALIGN_CENTER}>
-          <LocationIcon slotName={getCutoutDisplayName(cutoutId)} />
+          <DeckInfoLabel deckLabel={getCutoutDisplayName(cutoutId)} />
         </Flex>
         <Flex
           flex="4 0 0"

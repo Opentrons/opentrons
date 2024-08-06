@@ -65,6 +65,7 @@ import { formatTimeWithUtcLabel, useNotifyRunQuery } from '../../resources/runs'
 import { handleTipsAttachedModal } from '../../organisms/DropTipWizardFlows/TipsAttachedModal'
 import { useMostRecentRunId } from '../../organisms/ProtocolUpload/hooks/useMostRecentRunId'
 import { useTipAttachmentStatus } from '../../organisms/DropTipWizardFlows'
+import { useRecoveryAnalytics } from '../../organisms/ErrorRecoveryFlows/hooks'
 
 import type { OnDeviceRouteParams } from '../../App/types'
 import type { PipetteWithTip } from '../../organisms/DropTipWizardFlows'
@@ -109,7 +110,6 @@ export function RunSummary(): JSX.Element {
   )
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name ?? 'no name'
-  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
 
   const onCloneRunSuccess = (): void => {
     if (isQuickTransfer) {
@@ -117,10 +117,23 @@ export function RunSummary(): JSX.Element {
     }
   }
 
+  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(
+    runId,
+    robotName as string
+  )
+  const robotAnalyticsData = useRobotAnalyticsData(robotName as string)
+  const { reportRecoveredRunResult } = useRecoveryAnalytics()
+
+  const enteredER = runRecord?.data.hasEverEnteredErrorRecovery
+  React.useEffect(() => {
+    if (isRunCurrent && typeof enteredER === 'boolean') {
+      reportRecoveredRunResult(runStatus, enteredER)
+    }
+  }, [isRunCurrent, enteredER])
+
   const { reset, isResetRunLoading } = useRunControls(runId, onCloneRunSuccess)
   const trackEvent = useTrackEvent()
   const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
-  const robotAnalyticsData = useRobotAnalyticsData(robotName)
   const [showRunFailedModal, setShowRunFailedModal] = React.useState<boolean>(
     false
   )
@@ -151,10 +164,12 @@ export function RunSummary(): JSX.Element {
     isFlex: true,
   })
 
-  // Determine tip status on initial render only.
+  // Determine tip status on initial render only. Error Recovery always handles tip status, so don't show it twice.
   React.useEffect(() => {
-    determineTipStatus()
-  }, [])
+    if (isRunCurrent && enteredER === false) {
+      void determineTipStatus()
+    }
+  }, [isRunCurrent, enteredER])
 
   // TODO(jh, 08-02-24): Revisit useCurrentRunRoute and top level redirects.
   const queryClient = useQueryClient()
@@ -164,7 +179,6 @@ export function RunSummary(): JSX.Element {
     queryClient.setQueryData([host, 'runs', runId, 'details'], () => undefined)
     navigate('/')
   }
-  // TODO(jh, 07-24-24): After EXEC-504, add reportRecoveredRunResult here.
 
   const returnToQuickTransfer = (): void => {
     if (!isRunCurrent) {
@@ -215,7 +229,7 @@ export function RunSummary(): JSX.Element {
   }
 
   const handleRunAgain = (pipettesWithTip: PipetteWithTip[]): void => {
-    if (isRunCurrent && pipettesWithTip.length > 0) {
+    if (mostRecentRunId === runId && pipettesWithTip.length > 0) {
       void handleTipsAttachedModal({
         setTipStatusResolved: setTipStatusResolvedAndRoute(handleRunAgain),
         host,

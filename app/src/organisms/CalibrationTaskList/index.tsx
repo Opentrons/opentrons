@@ -14,10 +14,10 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
+  Modal,
 } from '@opentrons/components'
 
 import { StatusLabel } from '../../atoms/StatusLabel'
-import { LegacyModal } from '../../molecules/LegacyModal'
 import { TaskList } from '../TaskList'
 
 import {
@@ -108,7 +108,7 @@ export function CalibrationTaskList({
   }
 
   return (
-    <LegacyModal
+    <Modal
       title={`${robotName} ${t('calibration_dashboard')}`}
       onClose={() => {
         navigate(`/devices/${robotName}/robot-settings/calibration`)
@@ -183,6 +183,6 @@ export function CalibrationTaskList({
           />
         </>
       )}
-    </LegacyModal>
+    </Modal>
   )
 }

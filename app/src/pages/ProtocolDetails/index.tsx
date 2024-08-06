@@ -39,7 +39,7 @@ import {
   ProtocolDetailsSectionContentSkeleton,
 } from '../../organisms/OnDeviceDisplay/ProtocolDetails'
 import { useHardwareStatusText } from '../../organisms/OnDeviceDisplay/RobotDashboard/hooks'
-import { Modal, SmallModalChildren } from '../../molecules/Modal'
+import { OddModal, SmallModalChildren } from '../../molecules/OddModal'
 import { useToaster } from '../../organisms/ToasterOven'
 import {
   getApplyHistoricOffsets,
@@ -60,7 +60,7 @@ import { Liquids } from './Liquids'
 import { formatTimeWithUtcLabel } from '../../resources/runs'
 
 import type { Protocol } from '@opentrons/api-client'
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
+import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
 import type { Dispatch } from '../../redux/types'
 import type { OnDeviceRouteParams } from '../../App/types'
 
@@ -445,7 +445,7 @@ export function ProtocolDetails(): JSX.Element | null {
         protocolRecord?.data.files[0].name
       : null
 
-  const deleteModalHeader: ModalHeaderBaseProps = {
+  const deleteModalHeader: OddModalHeaderBaseProps = {
     title: 'Delete this protocol?',
     iconName: 'ot-alert',
     iconColor: COLORS.yellow50,
@@ -462,7 +462,7 @@ export function ProtocolDetails(): JSX.Element | null {
       {showConfirmDeleteProtocol ? (
         <Flex alignItems={ALIGN_CENTER}>
           {!isProtocolFetching ? (
-            <Modal
+            <OddModal
               modalSize="medium"
               onOutsideClick={() => {
                 setShowConfirmationDeleteProtocol(false)
@@ -493,7 +493,7 @@ export function ProtocolDetails(): JSX.Element | null {
                   />
                 </Flex>
               </Flex>
-            </Modal>
+            </OddModal>
           ) : null}
         </Flex>
       ) : null}

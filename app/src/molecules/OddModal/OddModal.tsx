@@ -9,25 +9,25 @@ import {
   JUSTIFY_CENTER,
 } from '@opentrons/components'
 import { BackgroundOverlay } from '../BackgroundOverlay'
-import { ModalHeader } from './ModalHeader'
+import { OddModalHeader } from './OddModalHeader'
 
 import type { StyleProps } from '@opentrons/components'
-import type { ModalHeaderBaseProps, ModalSize } from '../Modal/types'
+import type { OddModalHeaderBaseProps, ModalSize } from './types'
 
-interface ModalProps extends StyleProps {
+interface OddModalProps extends StyleProps {
   /** clicking anywhere outside of the modal closes it  */
   onOutsideClick?: React.MouseEventHandler
   /** modal content */
   children: React.ReactNode
   /** for small, medium, or large modal sizes, medium by default */
   modalSize?: ModalSize
-  /** see ModalHeader component for more details */
-  header?: ModalHeaderBaseProps
+  /** see OddModalHeader component for more details */
+  header?: OddModalHeaderBaseProps
 }
 /**
  * For ODD use only.
  */
-export function Modal(props: ModalProps): JSX.Element {
+export function OddModal(props: OddModalProps): JSX.Element {
   const {
     modalSize = 'medium',
     onOutsideClick,
@@ -71,7 +71,7 @@ export function Modal(props: ModalProps): JSX.Element {
         }}
       >
         {header != null ? (
-          <ModalHeader {...header} onClick={onOutsideClick} />
+          <OddModalHeader {...header} onClick={onOutsideClick} />
         ) : null}
         <Flex
           backgroundColor={COLORS.white}

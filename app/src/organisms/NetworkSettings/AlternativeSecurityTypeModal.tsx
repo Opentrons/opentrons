@@ -13,9 +13,9 @@ import {
 } from '@opentrons/components'
 
 import { SmallButton } from '../../atoms/buttons'
-import { Modal } from '../../molecules/Modal'
+import { OddModal } from '../../molecules/OddModal'
 
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
+import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
 
 interface AlternativeSecurityTypeModalProps {
   setShowAlternativeSecurityTypeModal: (
@@ -28,7 +28,7 @@ export function AlternativeSecurityTypeModal({
 }: AlternativeSecurityTypeModalProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'branded'])
   const navigate = useNavigate()
-  const modalHeader: ModalHeaderBaseProps = {
+  const modalHeader: OddModalHeaderBaseProps = {
     title: t('alternative_security_types'),
     hasExitIcon: true,
   }
@@ -41,7 +41,7 @@ export function AlternativeSecurityTypeModal({
   }
 
   return (
-    <Modal
+    <OddModal
       modalSize="small"
       header={modalHeader}
       onOutsideClick={handleCloseModal}
@@ -66,6 +66,6 @@ export function AlternativeSecurityTypeModal({
           onClick={handleClick}
         />
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }

@@ -2,16 +2,15 @@ import * as React from 'react'
 import '@testing-library/jest-dom/vitest'
 import { screen } from '@testing-library/react'
 import { describe, it, expect, beforeEach } from 'vitest'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '../../testing/utils'
+import { ModalShell } from '../ModalShell'
 
-import { LegacyModalShell } from '../LegacyModalShell'
-
-const render = (props: React.ComponentProps<typeof LegacyModalShell>) => {
-  return renderWithProviders(<LegacyModalShell {...props} />)
+const render = (props: React.ComponentProps<typeof ModalShell>) => {
+  return renderWithProviders(<ModalShell {...props} />)
 }
 
-describe('LegacyModalShell', () => {
-  let props: React.ComponentProps<typeof LegacyModalShell>
+describe('ModalShell', () => {
+  let props: React.ComponentProps<typeof ModalShell>
 
   beforeEach(() => {
     props = {

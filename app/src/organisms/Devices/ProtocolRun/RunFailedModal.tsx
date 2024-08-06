@@ -16,15 +16,15 @@ import {
   OVERFLOW_WRAP_ANYWHERE,
   PrimaryButton,
   SPACING,
+  Modal,
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { LegacyModal } from '../../../molecules/LegacyModal'
 import { useDownloadRunLog } from '../hooks'
 
 import type { RunError } from '@opentrons/api-client'
-import type { LegacyModalProps } from '../../../molecules/LegacyModal'
+import type { ModalProps } from '@opentrons/components'
 
 /**
  * This modal is for Desktop app
@@ -52,7 +52,7 @@ export function RunFailedModal({
   highestPriorityError,
 }: RunFailedModalProps): JSX.Element | null {
   const { i18n, t } = useTranslation(['run_details', 'shared', 'branded'])
-  const modalProps: LegacyModalProps = {
+  const modalProps: ModalProps = {
     type: 'error',
     title: t('run_failed_modal_title'),
     onClose: () => {
@@ -77,7 +77,7 @@ export function RunFailedModal({
   }
 
   return (
-    <LegacyModal {...modalProps}>
+    <Modal {...modalProps}>
       <Flex flexDirection={DIRECTION_COLUMN}>
         <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {t('error_info', {
@@ -110,7 +110,7 @@ export function RunFailedModal({
           </PrimaryButton>
         </Flex>
       </Flex>
-    </LegacyModal>
+    </Modal>
   )
 }
 

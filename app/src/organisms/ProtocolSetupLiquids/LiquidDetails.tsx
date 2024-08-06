@@ -4,10 +4,10 @@ import { useTranslation } from 'react-i18next'
 import {
   BORDERS,
   COLORS,
+  DeckInfoLabel,
   DIRECTION_ROW,
   Flex,
   Icon,
-  LocationIcon,
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
@@ -105,7 +105,7 @@ export function LiquidDetails(props: LiquidDetailsProps): JSX.Element {
               >
                 <TableDatum>
                   <Flex>
-                    <LocationIcon slotName={slotName} />
+                    <DeckInfoLabel deckLabel={slotName} />
                   </Flex>
                 </TableDatum>
                 <TableDatum>

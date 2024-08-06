@@ -7,12 +7,12 @@ import {
   BORDERS,
   Box,
   COLORS,
+  DeckInfoLabel,
   DIRECTION_COLUMN,
   DISPLAY_NONE,
   Flex,
   Icon,
   LabwareRender,
-  LocationIcon,
   Module,
   MoveLabwareOnDeck,
   RESPONSIVENESS,
@@ -256,11 +256,11 @@ function LabwareDisplayLocation(
   let displayLocation: React.ReactNode = ''
   if (location === 'offDeck') {
     // TODO(BC, 08/28/23): remove this string cast after update i18next to >23 (see https://www.i18next.com/overview/typescript#argument-of-type-defaulttfuncreturn-is-not-assignable-to-parameter-of-type-xyz)
-    displayLocation = <LocationIcon slotName={String(t('offdeck'))} />
+    displayLocation = <DeckInfoLabel deckLabel={String(t('offdeck'))} />
   } else if ('slotName' in location) {
-    displayLocation = <LocationIcon slotName={location.slotName} />
+    displayLocation = <DeckInfoLabel deckLabel={location.slotName} />
   } else if ('addressableAreaName' in location) {
-    displayLocation = <LocationIcon slotName={location.addressableAreaName} />
+    displayLocation = <DeckInfoLabel deckLabel={location.addressableAreaName} />
   } else if ('moduleId' in location) {
     const moduleModel = getModuleModelFromRunData(
       protocolData,

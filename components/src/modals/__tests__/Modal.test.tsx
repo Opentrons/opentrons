@@ -3,16 +3,16 @@ import * as React from 'react'
 import '@testing-library/jest-dom/vitest'
 import { screen } from '@testing-library/react'
 import { describe, it, expect, beforeEach } from 'vitest'
-import { COLORS } from '@opentrons/components'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { LegacyModal } from '..'
+import { renderWithProviders } from '../../testing/utils'
+import { COLORS } from '../../helix-design-system'
+import { Modal } from '../Modal'
 
-const render = (props: React.ComponentProps<typeof LegacyModal>) => {
-  return renderWithProviders(<LegacyModal {...props} />)
+const render = (props: React.ComponentProps<typeof Modal>) => {
+  return renderWithProviders(<Modal {...props} />)
 }
 
-describe('LegacyModal', () => {
-  let props: React.ComponentProps<typeof LegacyModal>
+describe('Modal', () => {
+  let props: React.ComponentProps<typeof Modal>
 
   beforeEach(() => {
     props = {
