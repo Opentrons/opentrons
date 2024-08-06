@@ -22,6 +22,7 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
+  Chip,
 } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
@@ -37,7 +38,7 @@ import {
   useModulesQuery,
 } from '@opentrons/react-api-client'
 
-import { FloatingActionButton } from '../../atoms/buttons'
+import { FloatingActionButton, SmallButton } from '../../atoms/buttons'
 import { ODDBackButton } from '../../molecules/ODDBackButton'
 import { getTopPortalEl } from '../../App/portal'
 import { Modal } from '../../molecules/Modal'
@@ -77,11 +78,15 @@ const LabwareThumbnail = styled.svg`
 export interface ProtocolSetupLabwareProps {
   runId: string
   setSetupScreen: React.Dispatch<React.SetStateAction<SetupScreens>>
+  isConfirmed: boolean
+  setIsConfirmed: (confirmed: boolean) => void
 }
 
 export function ProtocolSetupLabware({
   runId,
   setSetupScreen,
+  isConfirmed,
+  setIsConfirmed,
 }: ProtocolSetupLabwareProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   const [showMapView, setShowMapView] = React.useState<boolean>(false)
@@ -247,12 +252,34 @@ export function ProtocolSetupLabware({
         </>,
         getTopPortalEl()
       )}
-      <ODDBackButton
-        label={t('labware')}
-        onClick={() => {
-          setSetupScreen('prepare to run')
-        }}
-      />
+      <Flex
+        flexDirection={DIRECTION_ROW}
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+      >
+        <ODDBackButton
+          label={t('labware')}
+          onClick={() => {
+            setSetupScreen('prepare to run')
+          }}
+        />
+        {isConfirmed ? (
+          <Chip
+            background
+            iconName="ot-check"
+            text={t('placements_ready')}
+            type="success"
+            chipSize="small"
+          />
+        ) : (
+          <SmallButton
+            buttonText={t('confirm_placements')}
+            onClick={() => {
+              setIsConfirmed(true)
+              setSetupScreen('prepare to run')
+            }}
+          />
+        )}
+      </Flex>
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing8}

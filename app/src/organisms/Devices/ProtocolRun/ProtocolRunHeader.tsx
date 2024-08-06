@@ -77,6 +77,7 @@ import {
 } from '../../../organisms/RunTimeControl/hooks'
 import { useIsHeaterShakerInProtocol } from '../../ModuleCard/hooks'
 import { ConfirmAttachmentModal } from '../../ModuleCard/ConfirmAttachmentModal'
+import { ConfirmMissingStepsModal } from './ConfirmMissingStepsModal'
 import {
   useProtocolDetailsForRun,
   useProtocolAnalysisErrors,
@@ -132,6 +133,7 @@ interface ProtocolRunHeaderProps {
   robotName: string
   runId: string
   makeHandleJumpToStep: (index: number) => () => void
+  missingSetupSteps: string[]
 }
 
 export function ProtocolRunHeader({
@@ -139,6 +141,7 @@ export function ProtocolRunHeader({
   robotName,
   runId,
   makeHandleJumpToStep,
+  missingSetupSteps,
 }: ProtocolRunHeaderProps): JSX.Element | null {
   const { t } = useTranslation(['run_details', 'shared'])
   const navigate = useNavigate()
@@ -447,6 +450,7 @@ export function ProtocolRunHeader({
               isDoorOpen={isDoorOpen}
               isFixtureMismatch={isFixtureMismatch}
               isResetRunLoadingRef={isResetRunLoadingRef}
+              missingSetupSteps={missingSetupSteps}
             />
           </Flex>
         </Box>
@@ -591,6 +595,7 @@ interface ActionButtonProps {
   isDoorOpen: boolean
   isFixtureMismatch: boolean
   isResetRunLoadingRef: React.MutableRefObject<boolean>
+  missingSetupSteps: string[]
 }
 
 // TODO(jh, 04-22-2024): Refactor switch cases into separate factories to increase readability and testability.
@@ -603,6 +608,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
     isDoorOpen,
     isFixtureMismatch,
     isResetRunLoadingRef,
+    missingSetupSteps,
   } = props
   const navigate = useNavigate()
   const { t } = useTranslation(['run_details', 'shared'])
@@ -682,11 +688,19 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
   )
   const {
     confirm: confirmAttachment,
-    showConfirmation: showConfirmationModal,
-    cancel: cancelExit,
+    showConfirmation: showHSConfirmationModal,
+    cancel: cancelExitHSConfirmation,
   } = useConditionalConfirm(
     handleProceedToRunClick,
     !configBypassHeaterShakerAttachmentConfirmation
+  )
+  const {
+    confirm: confirmMissingSteps,
+    showConfirmation: showMissingStepsConfirmationModal,
+    cancel: cancelExitMissingStepsConfirmation,
+  } = useConditionalConfirm(
+    handleProceedToRunClick,
+    missingSetupSteps.length !== 0
   )
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
 
@@ -745,6 +759,11 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
     handleButtonClick = () => {
       if (isHeaterShakerShaking && isHeaterShakerInProtocol) {
         setShowIsShakingModal(true)
+      } else if (
+        missingSetupSteps.length !== 0 &&
+        (runStatus === RUN_STATUS_IDLE || runStatus === RUN_STATUS_STOPPED)
+      ) {
+        confirmMissingSteps()
       } else if (
         isHeaterShakerInProtocol &&
         !isHeaterShakerShaking &&
@@ -825,13 +844,21 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
             startRun={play}
           />
         )}
-      {showConfirmationModal && (
+      {showHSConfirmationModal && (
         <ConfirmAttachmentModal
-          onCloseClick={cancelExit}
+          onCloseClick={cancelExitHSConfirmation}
           isProceedToRunModal={true}
           onConfirmClick={handleProceedToRunClick}
         />
       )}
+      {showMissingStepsConfirmationModal && (
+        <ConfirmMissingStepsModal
+          onCloseClick={cancelExitMissingStepsConfirmation}
+          onConfirmClick={handleProceedToRunClick}
+          missingSteps={missingSetupSteps}
+        />
+      )}
+      {}
     </>
   )
 }
