@@ -9,5 +9,10 @@ export function getRunCommandErrors(
   runId: string,
   params: GetCommandsParams
 ): ResponsePromise<RunCommandErrors> {
-  return request<RunCommandErrors>(GET, `/runs/${runId}/commandErrors`, null, config)
+  return request<RunCommandErrors>(
+    GET,
+    `/runs/${runId}/commandErrors`,
+    null,
+    config
+  )
 }
