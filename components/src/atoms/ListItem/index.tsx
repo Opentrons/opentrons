@@ -1,8 +1,9 @@
 import * as React from 'react'
-
-import { BORDERS, COLORS, Flex, SPACING } from '@opentrons/components'
-
-import type { StyleProps } from '@opentrons/components'
+import { css } from 'styled-components'
+import { Flex } from '../../primitives'
+import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
+import { BORDERS, COLORS } from '../../helix-design-system'
+import type { StyleProps } from '../../primitives'
 
 export type ListItemType = 'error' | 'noActive' | 'success' | 'warning'
 
@@ -32,6 +33,9 @@ const LISTITEM_PROPS_BY_TYPE: Record<
   },
 }
 
+/*
+  ListItem is used in ODD and helix
+**/
 export function ListItem(props: ListItemProps): JSX.Element {
   const { type, children, onClick, ...styleProps } = props
   const listItemProps = LISTITEM_PROPS_BY_TYPE[type]
@@ -41,10 +45,16 @@ export function ListItem(props: ListItemProps): JSX.Element {
       data-testid={`ListItem_${type}`}
       width="100%"
       height="max-content"
-      padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
       backgroundColor={listItemProps.backgroundColor}
-      borderRadius={BORDERS.borderRadius12}
       onClick={onClick}
+      css={css`
+        padding: 0;
+        border-radius: ${BORDERS.borderRadius4};
+        @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+          padding: ${SPACING.spacing16} ${SPACING.spacing24};
+          border-radius: ${BORDERS.borderRadius12};
+        }
+      `}
       {...styleProps}
     >
       {children}

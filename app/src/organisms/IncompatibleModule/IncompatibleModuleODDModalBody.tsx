@@ -4,14 +4,14 @@ import capitalize from 'lodash/capitalize'
 import {
   DIRECTION_COLUMN,
   Flex,
-  SPACING,
   LegacyStyledText,
-  TYPOGRAPHY,
+  ListItem,
   OVERFLOW_SCROLL,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 import { OddModal } from '../../molecules/OddModal'
-import { ListItem } from '../../atoms/ListItem'
 import type { AttachedModule } from '@opentrons/api-client'
 import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
 export interface IncompatibleModuleODDModalBodyProps {

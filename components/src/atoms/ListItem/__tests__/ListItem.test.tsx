@@ -2,8 +2,9 @@ import * as React from 'react'
 import { vi, describe, it, expect, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { BORDERS, COLORS, SPACING } from '@opentrons/components'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '../../../testing/utils'
+import { BORDERS, COLORS } from '../../../helix-design-system'
+import { SPACING } from '../../../ui-style-constants'
 
 import { ListItem } from '..'
 
