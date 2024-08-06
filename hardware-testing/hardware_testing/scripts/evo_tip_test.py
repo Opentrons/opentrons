@@ -20,6 +20,15 @@ from hardware_testing.opentrons_api.types import (
     Point,
     CriticalPoint,
 )
+
+from opentrons_hardware.firmware_bindings.constants import NodeId, SensorType
+from opentrons_hardware.drivers.can_bus import build
+from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
+from opentrons_hardware.scripts.sensor_utils import (
+    handle_pressure_sensor,
+    SensorRun,
+)
+
 from hardware_testing.opentrons_api.helpers_ot3 import (
     build_async_ot3_hardware_api,
     home_ot3,
@@ -33,6 +42,8 @@ from hardware_testing import data
 from hardware_testing.drivers import mitutoyo_digimatic_indicator
 
 test_volume = 300
+log = logging.getLogger(__name__)
+
 
 async def update_pick_up_distance(api,
     mount: OT3Mount, prep_distance: float = 5,  distance: float = 3.0
