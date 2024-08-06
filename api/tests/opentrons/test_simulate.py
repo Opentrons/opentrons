@@ -308,7 +308,7 @@ def test_liquid_probe_get_protocol_api() -> None:
         "opentrons_96_wellplate_200ul_pcr_full_skirt", "A2"
     )
     pipette.pick_up_tip(tip_rack["A1"])
-    pipette.require_liquid_presence(well_plate["A1"])
+    pipette.require_liquid_presence(well_plate["A1"])  # Should not raise MustHomeError.
 
 
 def test_liquid_probe_simulate_file() -> None:
@@ -330,7 +330,9 @@ def test_liquid_probe_simulate_file() -> None:
         """
     )
     protocol_contents_stream = io.StringIO(protocol_contents)
-    simulate.simulate(protocol_file=protocol_contents_stream)  # Should not raise.
+    simulate.simulate(
+        protocol_file=protocol_contents_stream
+    )  # Should not raise MustHomeError.
 
 
 class TestGetProtocolAPILabware:
