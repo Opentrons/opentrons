@@ -324,7 +324,7 @@ export function ProtocolRunSetup({
           setLiquidSetupConfirmed={(confirmed: boolean) => {
             setLiquidSetupComplete(confirmed)
             if (confirmed) {
-              setMissingSteps(missingSteps.filter(step => step != 'liquids'))
+              setMissingSteps(missingSteps.filter(step => step !== 'liquids'))
               setExpandedStepKey(null)
             }
           }}
