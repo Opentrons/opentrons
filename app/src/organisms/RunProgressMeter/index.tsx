@@ -30,17 +30,15 @@ import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostR
 import { getModalPortalEl } from '../../App/portal'
 import { Tooltip } from '../../atoms/Tooltip'
 import { useRunStatus } from '../RunTimeControl/hooks'
-import { InterventionModal } from '../InterventionModal'
+import { InterventionModal, useInterventionModal } from '../InterventionModal'
 import { ProgressBar } from '../../atoms/ProgressBar'
 import { useDownloadRunLog, useRobotType } from '../Devices/hooks'
 import { InterventionTicks } from './InterventionTicks'
-import { isInterventionCommand } from '../InterventionModal/utils'
 import {
   useNotifyRunQuery,
   useNotifyAllCommandsQuery,
 } from '../../resources/runs'
 import { useRunningStepCounts } from '../../resources/protocols/hooks'
-import { TERMINAL_RUN_STATUSES } from './constants'
 import { useRunProgressCopy } from './hooks'
 
 interface RunProgressMeterProps {
@@ -51,10 +49,6 @@ interface RunProgressMeterProps {
 }
 export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
   const { runId, robotName, makeHandleJumpToStep, resumeRunHandler } = props
-  const [
-    interventionModalCommandKey,
-    setInterventionModalCommandKey,
-  ] = React.useState<string | null>(null)
   const { t } = useTranslation('run_details')
   const robotType = useRobotType(robotName)
   const runStatus = useRunStatus(runId)
@@ -91,29 +85,23 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
 
   const { downloadRunLog } = useDownloadRunLog(robotName, runId)
 
-  React.useEffect(() => {
-    if (
-      lastRunCommand != null &&
-      interventionModalCommandKey != null &&
-      lastRunCommand.key !== interventionModalCommandKey
-    ) {
-      // set intervention modal command key to null if different from current command key
-      setInterventionModalCommandKey(null)
-    } else if (
-      lastRunCommand?.key != null &&
-      isInterventionCommand(lastRunCommand) &&
-      interventionModalCommandKey === null
-    ) {
-      setInterventionModalCommandKey(lastRunCommand.key)
-    }
-  }, [lastRunCommand, interventionModalCommandKey])
-
   const onDownloadClick: React.MouseEventHandler<HTMLAnchorElement> = e => {
     if (downloadIsDisabled) return false
     e.preventDefault()
     e.stopPropagation()
     downloadRunLog()
   }
+
+  const {
+    showModal: showIntervention,
+    modalProps: interventionProps,
+  } = useInterventionModal({
+    robotName,
+    runStatus,
+    runData,
+    analysis,
+    lastRunCommand,
+  })
 
   const {
     progressPercentage,
@@ -132,20 +120,11 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
 
   return (
     <>
-      {interventionModalCommandKey != null &&
-      lastRunCommand != null &&
-      isInterventionCommand(lastRunCommand) &&
-      analysisCommands != null &&
-      runStatus != null &&
-      runData != null &&
-      !TERMINAL_RUN_STATUSES.includes(runStatus)
+      {showIntervention && interventionProps != null
         ? createPortal(
             <InterventionModal
-              robotName={robotName}
-              command={lastRunCommand}
+              {...interventionProps}
               onResume={resumeRunHandler}
-              run={runData}
-              analysis={analysis}
             />,
             getModalPortalEl()
           )
