@@ -22,14 +22,6 @@ Welcome to the v8.0.0 release of the Opentrons robot software!
 
 - Configure more partial tip pickup configurations. All multi-channel pipettes now support single and partial column pickup, and the Flex 96-channel pipette now supports row pickup.
 
-### Bug Fixes
-
-TK
-
-### Known Issues
-
-TK
-
 ---
 
 ## Opentrons Robot Software Changes in 7.5.0

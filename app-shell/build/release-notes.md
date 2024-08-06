@@ -24,14 +24,6 @@ Welcome to the v8.0.0 release of the Opentrons App!
 - Tap or click on any labware on the deck map to see adapters and modules that are stacked below it.
 - Lists of liquids now separately show the total volume and per-well volume (when it is the same in each well containing that liquid).
 
-### Bug Fixes
-
-TK
-
-### Known Issues
-
-TK
-
 ---
 
 ## Opentrons App Changes in 7.5.0
