@@ -10,7 +10,7 @@ import {
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
-import { ModulesAndDeckMapViewModal } from '../ModulesAndDeckMapViewModal'
+import { ModulesAndDeckMapView } from '../ModulesAndDeckMapView'
 
 vi.mock('@opentrons/components/src/hardware-sim/BaseDeck')
 vi.mock('@opentrons/api-client')
@@ -22,7 +22,6 @@ vi.mock('../../Devices/ModuleInfo')
 vi.mock('../../Devices/ProtocolRun/utils/getLabwareRenderInfo')
 
 const mockRunId = 'mockRunId'
-const mockSetShowDeckMapModal = vi.fn()
 const PROTOCOL_ANALYSIS = {
   id: 'fake analysis',
   status: 'completed',
@@ -101,20 +100,17 @@ vi.mock('@opentrons/components', async importOriginal => {
   }
 })
 
-const render = (
-  props: React.ComponentProps<typeof ModulesAndDeckMapViewModal>
-) => {
-  return renderWithProviders(<ModulesAndDeckMapViewModal {...props} />, {
+const render = (props: React.ComponentProps<typeof ModulesAndDeckMapView>) => {
+  return renderWithProviders(<ModulesAndDeckMapView {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
-describe('ModulesAndDeckMapViewModal', () => {
-  let props: React.ComponentProps<typeof ModulesAndDeckMapViewModal>
+describe('ModulesAndDeckMapView', () => {
+  let props: React.ComponentProps<typeof ModulesAndDeckMapView>
 
   beforeEach(() => {
     props = {
-      setShowDeckMapModal: mockSetShowDeckMapModal,
       attachedProtocolModuleMatches: mockAttachedProtocolModuleMatches,
       runId: mockRunId,
       protocolAnalysis: PROTOCOL_ANALYSIS,
@@ -131,7 +127,6 @@ describe('ModulesAndDeckMapViewModal', () => {
 
   it('should render BaseDeck map view', () => {
     render(props)
-    screen.getByText('Map View')
     screen.getByText('mock BaseDeck')
   })
 })

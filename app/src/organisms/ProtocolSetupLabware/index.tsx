@@ -2,6 +2,7 @@ import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
+
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
@@ -43,11 +44,11 @@ import { Modal } from '../../molecules/Modal'
 
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getLabwareSetupItemGroups } from '../../pages/Protocols/utils'
+import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
 import { getProtocolModulesInfo } from '../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { getAttachedProtocolModuleMatches } from '../ProtocolSetupModulesAndDeck/utils'
 import { getNestedLabwareInfo } from '../Devices/ProtocolRun/SetupLabware/getNestedLabwareInfo'
-import { LabwareMapViewModal } from './LabwareMapViewModal'
-import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
+import { LabwareMapView } from './LabwareMapView'
 
 import type { UseQueryResult } from 'react-query'
 import type {
@@ -83,7 +84,7 @@ export function ProtocolSetupLabware({
   setSetupScreen,
 }: ProtocolSetupLabwareProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
-  const [showDeckMapModal, setShowDeckMapModal] = React.useState<boolean>(false)
+  const [showMapView, setShowMapView] = React.useState<boolean>(false)
   const [
     showLabwareDetailsModal,
     setShowLabwareDetailsModal,
@@ -202,18 +203,6 @@ export function ProtocolSetupLabware({
     <>
       {createPortal(
         <>
-          {showDeckMapModal ? (
-            <LabwareMapViewModal
-              mostRecentAnalysis={mostRecentAnalysis}
-              deckDef={deckDef}
-              attachedProtocolModuleMatches={attachedProtocolModuleMatches}
-              handleLabwareClick={handleLabwareClick}
-              onCloseClick={() => {
-                setShowDeckMapModal(false)
-              }}
-              initialLoadedLabwareByAdapter={initialLoadedLabwareByAdapter}
-            />
-          ) : null}
           {showLabwareDetailsModal && selectedLabware != null ? (
             <Modal
               onOutsideClick={() => {
@@ -269,45 +258,58 @@ export function ProtocolSetupLabware({
         gridGap={SPACING.spacing8}
         marginTop={SPACING.spacing32}
       >
-        <Flex
-          gridGap={SPACING.spacing8}
-          color={COLORS.grey60}
-          fontSize={TYPOGRAPHY.fontSize22}
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          lineHeight={TYPOGRAPHY.lineHeight28}
-        >
-          <Flex paddingLeft={SPACING.spacing16} width="10.5625rem">
-            <LegacyStyledText>{t('location')}</LegacyStyledText>
-          </Flex>
-          <Flex>
-            <LegacyStyledText>{t('labware_name')}</LegacyStyledText>
-          </Flex>
-        </Flex>
-        {[...onDeckItems, ...offDeckItems].map((labware, i) => {
-          const labwareOnAdapter = onDeckItems.find(
-            item =>
-              labware.initialLocation !== 'offDeck' &&
-              'labwareId' in labware.initialLocation &&
-              item.labwareId === labware.initialLocation.labwareId
-          )
-          return mostRecentAnalysis != null && labwareOnAdapter == null ? (
-            <RowLabware
-              key={i}
-              labware={labware}
-              attachedProtocolModules={attachedProtocolModuleMatches}
-              refetchModules={moduleQuery.refetch}
-              commands={mostRecentAnalysis?.commands}
-              nestedLabwareInfo={getNestedLabwareInfo(
-                labware,
-                mostRecentAnalysis.commands
-              )}
-            />
-          ) : null
-        })}
+        {showMapView ? (
+          <LabwareMapView
+            mostRecentAnalysis={mostRecentAnalysis}
+            deckDef={deckDef}
+            attachedProtocolModuleMatches={attachedProtocolModuleMatches}
+            handleLabwareClick={handleLabwareClick}
+            initialLoadedLabwareByAdapter={initialLoadedLabwareByAdapter}
+          />
+        ) : (
+          <>
+            <Flex
+              gridGap={SPACING.spacing8}
+              color={COLORS.grey60}
+              fontSize={TYPOGRAPHY.fontSize22}
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              lineHeight={TYPOGRAPHY.lineHeight28}
+            >
+              <Flex paddingLeft={SPACING.spacing16} width="10.5625rem">
+                <LegacyStyledText>{t('location')}</LegacyStyledText>
+              </Flex>
+              <Flex>
+                <LegacyStyledText>{t('labware_name')}</LegacyStyledText>
+              </Flex>
+            </Flex>
+            {[...onDeckItems, ...offDeckItems].map((labware, i) => {
+              const labwareOnAdapter = onDeckItems.find(
+                item =>
+                  labware.initialLocation !== 'offDeck' &&
+                  'labwareId' in labware.initialLocation &&
+                  item.labwareId === labware.initialLocation.labwareId
+              )
+              return mostRecentAnalysis != null && labwareOnAdapter == null ? (
+                <RowLabware
+                  key={i}
+                  labware={labware}
+                  attachedProtocolModules={attachedProtocolModuleMatches}
+                  refetchModules={moduleQuery.refetch}
+                  commands={mostRecentAnalysis?.commands}
+                  nestedLabwareInfo={getNestedLabwareInfo(
+                    labware,
+                    mostRecentAnalysis.commands
+                  )}
+                />
+              ) : null
+            })}
+          </>
+        )}
       </Flex>
       <FloatingActionButton
+        buttonText={showMapView ? t('list_view') : t('map_view')}
         onClick={() => {
-          setShowDeckMapModal(true)
+          setShowMapView(mapView => !mapView)
         }}
       />
     </>

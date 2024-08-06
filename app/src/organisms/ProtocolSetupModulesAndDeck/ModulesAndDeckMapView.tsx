@@ -1,41 +1,28 @@
 import React from 'react'
-import { useTranslation } from 'react-i18next'
 
-import { BaseDeck } from '@opentrons/components'
+import { BaseDeck, Flex } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
   getSimplestDeckConfigForProtocol,
 } from '@opentrons/shared-data'
 
-import { Modal } from '../../molecules/Modal'
 import { ModuleInfo } from '../Devices/ModuleInfo'
 import { getStandardDeckViewLayerBlockList } from '../Devices/ProtocolRun/utils/getStandardDeckViewLayerBlockList'
 
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 import type { AttachedProtocolModuleMatch } from './utils'
 
-// Note (kk:10/26/2023) once we are ready for removing ff, we will be able to update props
-interface ModulesAndDeckMapViewModalProps {
-  setShowDeckMapModal: (showDeckMapModal: boolean) => void
+interface ModulesAndDeckMapViewProps {
   attachedProtocolModuleMatches: AttachedProtocolModuleMatch[]
   runId: string
   protocolAnalysis: CompletedProtocolAnalysis | null
 }
 
-export function ModulesAndDeckMapViewModal({
-  setShowDeckMapModal,
+export function ModulesAndDeckMapView({
   attachedProtocolModuleMatches,
   runId,
   protocolAnalysis,
-}: ModulesAndDeckMapViewModalProps): JSX.Element | null {
-  const { t } = useTranslation('protocol_setup')
-
-  const modalHeader: ModalHeaderBaseProps = {
-    title: t('map_view'),
-    hasExitIcon: true,
-  }
-
+}: ModulesAndDeckMapViewProps): JSX.Element | null {
   if (protocolAnalysis == null) return null
 
   const deckConfig = getSimplestDeckConfigForProtocol(protocolAnalysis)
@@ -54,13 +41,7 @@ export function ModulesAndDeckMapViewModal({
   }))
 
   return (
-    <Modal
-      header={modalHeader}
-      modalSize="large"
-      onOutsideClick={() => {
-        setShowDeckMapModal(false)
-      }}
-    >
+    <Flex height="27.75rem">
       <BaseDeck
         deckConfig={deckConfig}
         deckLayerBlocklist={getStandardDeckViewLayerBlockList(FLEX_ROBOT_TYPE)}
@@ -68,6 +49,6 @@ export function ModulesAndDeckMapViewModal({
         labwareOnDeck={[]}
         modulesOnDeck={modulesOnDeck}
       />
-    </Modal>
+    </Flex>
   )
 }
