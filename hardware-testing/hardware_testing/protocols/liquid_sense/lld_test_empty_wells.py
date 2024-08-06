@@ -186,7 +186,7 @@ def _store_dial_baseline(
     if DIAL_POS_WITHOUT_TIP[idx] is not None:
         return
     DIAL_POS_WITHOUT_TIP[idx] = _read_dial_indicator(ctx, pipette, dial, front_channel)
-    tag = f"DIAL-BASELINE-{idx}
+    tag = f"DIAL-BASELINE-{idx}"
     _write_line_to_csv(ctx, f"{tag},{DIAL_POS_WITHOUT_TIP[idx]}")
     _write_line_to_google_sheet(ctx, google_sheet, [[tag], [DIAL_POS_WITHOUT_TIP[idx]]], sheet_id, row + 1)
 
