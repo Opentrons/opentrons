@@ -268,7 +268,6 @@ export function ProtocolRunHeader({
 
   // Side effects dependent on the current run state.
   React.useEffect(() => {
-    // After a user-initiated stopped run, close the run current run automatically.
     if (runStatus === RUN_STATUS_STOPPED && isRunCurrent && runId != null) {
       trackProtocolRunEvent({
         name: ANALYTICS_PROTOCOL_RUN_ACTION.FINISH,
@@ -276,9 +275,8 @@ export function ProtocolRunHeader({
           ...robotAnalyticsData,
         },
       })
-      closeCurrentRun()
     }
-  }, [runStatus, isRunCurrent, runId, closeCurrentRun])
+  }, [runStatus, isRunCurrent, runId])
 
   const startedAtTimestamp =
     startedAt != null ? formatTimestamp(startedAt) : EMPTY_TIMESTAMP
@@ -903,10 +901,11 @@ function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
       <Banner type="error" iconMarginLeft={SPACING.spacing4}>
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
           <LegacyStyledText>
-            {t('error_info', {
-              errorType: highestPriorityError?.errorType,
-              errorCode: highestPriorityError?.errorCode,
-            })}
+          {highestPriorityError != null ? t('error_info', {
+                errorType: highestPriorityError?.errorType,
+                errorCode: highestPriorityError?.errorCode,
+              })
+            : 'Run completed with errors.'}
           </LegacyStyledText>
 
           <LinkButton
