@@ -21,8 +21,8 @@ from opentrons import types
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
 
-# This definition is duplicated in instrument_context.py. It is difficult to find a place to put it without circular imports.
-AdvancedLiquidHandling: TypeAlias = Union[
+
+AdvancedLiquidHandling = Union[
     Well,
     types.Location,
     Sequence[Union[Well, types.Location]],
