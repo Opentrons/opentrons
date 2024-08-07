@@ -19,8 +19,7 @@ import type { IconName } from '@opentrons/components'
 interface FloatingActionButtonProps extends React.ComponentProps<typeof Btn> {
   buttonText: string
   disabled?: boolean
-  iconName?: IconName | null
-  onClick: React.MouseEventHandler
+  iconName?: IconName
 }
 
 export function FloatingActionButton(

@@ -226,7 +226,6 @@ export function ProtocolSetupLabware({
       }
     }
   }
-  console.log({ topLabwareId })
   const selectedLabwareLocation = selectedLabware?.location
   return (
     <>
@@ -371,7 +370,6 @@ export function ProtocolSetupLabware({
       </Flex>
       <FloatingActionButton
         buttonText={showMapView ? t('list_view') : t('map_view')}
-        iconName={null}
         onClick={() => {
           setShowMapView(mapView => !mapView)
         }}

@@ -88,7 +88,6 @@ export function SetupLabwareMap({
             if (topLabwareDefinition != null) {
               setLabwareStackDetailsLabwareId(topLabwareId)
             }
-            console.log('TESTING')
           }}
           cursor="pointer"
         >
