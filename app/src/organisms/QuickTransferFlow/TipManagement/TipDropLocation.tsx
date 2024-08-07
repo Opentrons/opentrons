@@ -6,6 +6,7 @@ import {
   SPACING,
   DIRECTION_COLUMN,
   POSITION_FIXED,
+  RadioButton,
   COLORS,
 } from '@opentrons/components'
 import {
@@ -14,7 +15,6 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
 } from '@opentrons/shared-data'
 import { getTopPortalEl } from '../../../App/portal'
-import { RadioButton } from '../../../atoms/buttons'
 import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
 import { ChildNavigation } from '../../ChildNavigation'
 

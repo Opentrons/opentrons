@@ -2,10 +2,10 @@ import * as React from 'react'
 import '@testing-library/jest-dom/vitest'
 import { screen, queryByAttribute } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { COLORS, SPACING } from '@opentrons/components'
-import { renderWithProviders } from '../../../__testing-utils__'
-
-import { RadioButton } from '..'
+import { renderWithProviders } from '../../../testing/utils'
+import { COLORS } from '../../../helix-design-system'
+import { SPACING } from '../../../ui-style-constants'
+import { RadioButton } from '../RadioButton'
 
 const render = (props: React.ComponentProps<typeof RadioButton>) => {
   return renderWithProviders(<RadioButton {...props} />)[0]
@@ -29,7 +29,7 @@ describe('RadioButton', () => {
     render(props)
     const label = screen.getByRole('label')
     expect(label).toHaveStyle(`background-color: ${COLORS.blue35}`)
-    expect(label).toHaveStyle(`padding: ${SPACING.spacing24}`)
+    expect(label).toHaveStyle(`padding: 14px ${SPACING.spacing16}`)
   })
 
   it('renders the large selected button', () => {
@@ -41,18 +41,19 @@ describe('RadioButton', () => {
     render(props)
     const label = screen.getByRole('label')
     expect(label).toHaveStyle(`background-color: ${COLORS.blue50}`)
-    expect(label).toHaveStyle(`padding: ${SPACING.spacing24}`)
+    expect(label).toHaveStyle(`padding: 14px ${SPACING.spacing16}`)
   })
 
-  it('renders the small button', () => {
+  it('renders the small button with an icon', () => {
     props = {
       ...props,
       radioButtonType: 'small',
+      iconName: 'alert-circle',
     }
     render(props)
     const label = screen.getByRole('label')
     expect(label).toHaveStyle(`background-color: ${COLORS.blue35}`)
-    expect(label).toHaveStyle(`padding: ${SPACING.spacing20}`)
+    expect(label).toHaveStyle(`padding: 14px ${SPACING.spacing16}`)
   })
 
   it('renders the small selected button', () => {
@@ -64,7 +65,7 @@ describe('RadioButton', () => {
     render(props)
     const label = screen.getByRole('label')
     expect(label).toHaveStyle(`background-color: ${COLORS.blue50}`)
-    expect(label).toHaveStyle(`padding: ${SPACING.spacing20}`)
+    expect(label).toHaveStyle(`padding: 14px ${SPACING.spacing16}`)
   })
 
   it('renders id instead of buttonLabel when id is set', () => {

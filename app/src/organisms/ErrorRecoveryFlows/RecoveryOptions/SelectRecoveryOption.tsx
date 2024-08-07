@@ -7,6 +7,7 @@ import {
   Flex,
   SPACING,
   StyledText,
+  RadioButton,
 } from '@opentrons/components'
 
 import {
@@ -16,7 +17,6 @@ import {
   ODD_ONLY,
   DESKTOP_ONLY,
 } from '../constants'
-import { RadioButton } from '../../../atoms/buttons'
 import {
   RecoveryODDOneDesktopTwoColumnContentWrapper,
   RecoveryRadioGroup,
