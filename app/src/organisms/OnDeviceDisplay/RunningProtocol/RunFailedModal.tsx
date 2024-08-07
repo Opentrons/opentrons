@@ -51,7 +51,7 @@ export function RunFailedModal({
     title: t('run_failed_modal_title'),
   }
 
-  const highestPriorityError = getHighestPriorityError(errors)
+  const highestPriorityError = getHighestPriorityError(errors ?? [])
 
   const handleClose = (): void => {
     setIsCanceling(true)
