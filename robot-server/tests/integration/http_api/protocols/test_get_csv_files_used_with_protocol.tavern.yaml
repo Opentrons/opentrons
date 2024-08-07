@@ -11,12 +11,16 @@ stages:
   # these files are uploaded in the overall integration tests suite.
   # Until we add data file cleanup after each test, maintaining this order within the suite
   # will be important.
+
+  # sample_record -> test
+  # sample_plates -> sample_record
+  # test -> sample_plates
   - name: Upload data file 1
     request:
       url: '{ot2_server_base_url}/dataFiles'
       method: POST
       files:
-        file: 'tests/integration/data_files/sample_record.csv'
+        file: 'tests/integration/data_files/test.csv'
     response:
       save:
         json:
@@ -31,7 +35,7 @@ stages:
       url: '{ot2_server_base_url}/dataFiles'
       method: POST
       files:
-        file: 'tests/integration/data_files/sample_plates.csv'
+        file: 'tests/integration/data_files/sample_record.csv'
     response:
       save:
         json:
@@ -46,7 +50,7 @@ stages:
       url: '{ot2_server_base_url}/dataFiles'
       method: POST
       files:
-        file: 'tests/integration/data_files/test.csv'
+        file: 'tests/integration/data_files/sample_plates.csv'
     response:
       save:
         json:
@@ -85,7 +89,7 @@ stages:
                   type: csv_file
                   file:
                     id: '{data_file_1_id}'
-                    name: 'sample_record.csv'
+                    name: 'test.csv'
 
   - name: Wait until analysis is completed
     max_retries: 5
@@ -135,7 +139,7 @@ stages:
                 type: csv_file
                 file:
                   id: '{data_file_3_id}'
-                  name: 'test.csv'
+                  name: 'sample_plates.csv'
 
   - name: Wait until analysis is completed
     max_retries: 5
@@ -191,7 +195,7 @@ stages:
               type: csv_file
               file:
                 id: '{data_file_1_id}'
-                name: 'sample_record.csv'
+                name: 'test.csv'
 
   - name: Create another run from the protocol and a different CSV file
     request:
@@ -223,7 +227,7 @@ stages:
               type: csv_file
               file:
                 id: '{data_file_2_id}'
-                name: 'sample_plates.csv'
+                name: 'sample_record.csv'
 
   - name: Fetch data files used with the protocol so far
     request:
@@ -236,11 +240,11 @@ stages:
           totalLength: 3
         data:
           - id: '{data_file_1_id}'
-            name: "sample_record.csv"
+            name: "test.csv"
             createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
           - id: '{data_file_2_id}'
-            name: "sample_plates.csv"
+            name: "sample_record.csv"
             createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
           - id: '{data_file_3_id}'
-            name: "test.csv"
+            name: "sample_plates.csv"
             createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"

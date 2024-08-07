@@ -321,23 +321,22 @@ class ProtocolStore:
             run_table.c.protocol_id == protocol_id
         )
         # Get all entries in analysis_csv_table that match the analysis IDs above
-        analysis_csv_file_ids = sqlalchemy.select(
+        select_analysis_csv_file_ids = sqlalchemy.select(
             analysis_csv_rtp_table.c.file_id
         ).where(
             analysis_csv_rtp_table.c.analysis_id.in_(select_referencing_analysis_ids)
         )
         # Get all entries in run_csv_table that match the run IDs above
-        run_csv_file_ids = sqlalchemy.select(run_csv_rtp_table.c.file_id).where(
+        select_run_csv_file_ids = sqlalchemy.select(run_csv_rtp_table.c.file_id).where(
             run_csv_rtp_table.c.run_id.in_(select_referencing_run_ids)
         )
 
         with self._sql_engine.begin() as transaction:
-            ids_in_analyses = transaction.execute(analysis_csv_file_ids).scalars().all()
-            ids_in_runs = transaction.execute(run_csv_file_ids).scalars().all()
             data_files_rows = transaction.execute(
                 data_files_table.select()
                 .where(
-                    data_files_table.c.id.in_(list(set(ids_in_analyses + ids_in_runs)))
+                    data_files_table.c.id.in_(select_analysis_csv_file_ids)
+                    | data_files_table.c.id.in_(select_run_csv_file_ids)
                 )
                 .order_by(sqlite_rowid)
             ).all()
