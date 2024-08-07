@@ -43,21 +43,24 @@ export function ListItem(props: ListItemProps): JSX.Element {
   return (
     <Flex
       data-testid={`ListItem_${type}`}
-      width="100%"
-      height="max-content"
-      backgroundColor={listItemProps.backgroundColor}
       onClick={onClick}
-      css={css`
-        padding: 0;
-        border-radius: ${BORDERS.borderRadius4};
-        @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-          padding: ${SPACING.spacing16} ${SPACING.spacing24};
-          border-radius: ${BORDERS.borderRadius12};
-        }
-      `}
+      css={LIST_ITEM_STYLE}
       {...styleProps}
     >
       {children}
     </Flex>
   )
 }
+
+const LIST_ITEM_STYLE = css`
+  background-color: ${listItemProps.backgroundColor};
+  width: 100%;
+  height: max-content;
+  padding: 0;
+  border-radius: ${BORDERS.borderRadius4};
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    padding: ${SPACING.spacing16} ${SPACING.spacing24};
+    border-radius: ${BORDERS.borderRadius12};
+  }
+`
