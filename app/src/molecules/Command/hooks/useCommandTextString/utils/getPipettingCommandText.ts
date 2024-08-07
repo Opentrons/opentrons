@@ -139,16 +139,6 @@ export const getPipettingCommandText = ({
         pipette => pipette.id === pipetteId
       )?.pipetteName
 
-      console.log('=>(getPipettingCommandText.ts:157) labwareId', labwareId)
-      console.log(
-        '=>(getPipettingCommandText.ts:161) commandTextData',
-        commandTextData
-      )
-      console.log(
-        '=>(getPipettingCommandText.ts:163) displayLocation',
-        displayLocation
-      )
-
       return t('pickup_tip', {
         well_range:
           allPreviousCommands != null

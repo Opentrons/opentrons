@@ -41,7 +41,6 @@ interface NonSkeletonCommandProps extends FundamentalProps {
 export type CommandProps = SkeletonCommandProps | NonSkeletonCommandProps
 
 export function Command(props: CommandProps): JSX.Element {
-  console.log('=>(Command.tsx:44) props', props)
   // This uses the dynamic function variant to work with storybook
   const isOnDevice = RESPONSIVENESS.isTouchscreenDynamic()
   return props.state === 'loading' ? (
