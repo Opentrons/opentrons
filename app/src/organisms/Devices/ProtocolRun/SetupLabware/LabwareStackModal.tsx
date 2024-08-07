@@ -159,6 +159,7 @@ export const LabwareStackModal = (
         </Flex>
       }
       childrenPadding={0}
+      marginLeft="0"
     >
       <Box padding={SPACING.spacing24} backgroundColor={COLORS.white}>
         <Flex flexDirection={DIRECTION_COLUMN}>
