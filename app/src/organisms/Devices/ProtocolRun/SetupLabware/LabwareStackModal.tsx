@@ -14,6 +14,7 @@ import {
   LabwareStackRender,
   SPACING,
   StyledText,
+  TEXT_ALIGN_RIGHT,
 } from '@opentrons/components'
 import { Modal } from '../../../../molecules/Modal'
 import { getIsOnDevice } from '../../../../redux/config'
@@ -23,7 +24,7 @@ import { getLocationInfoNames } from '../utils/getLocationInfoNames'
 import { getSlotLabwareDefinition } from '../utils/getSlotLabwareDefinition'
 import { Divider } from '../../../../atoms/structure'
 import { getModuleImage } from '../SetupModuleAndDeck/utils'
-import { getModuleDisplayName } from '@opentrons/shared-data'
+import { getModuleDisplayName, RIGHT } from '@opentrons/shared-data'
 import tiprackAdapter from '../../../../assets/images/labware/opentrons_flex_96_tiprack_adapter.png'
 
 const HIDE_SCROLLBAR = css`
@@ -166,7 +167,7 @@ export const LabwareStackModal = (
             <Flex
               alignItems={ALIGN_CENTER}
               height="6.875rem"
-              gridGap={SPACING.spacing32}
+              justifyContent={JUSTIFY_SPACE_BETWEEN}
             >
               <LabwareStackLabel text={labwareName} subText={labwareNickname} />
               <LabwareStackRender
@@ -183,7 +184,7 @@ export const LabwareStackModal = (
               <Flex
                 alignItems={ALIGN_CENTER}
                 height="6.875rem"
-                gridGap={SPACING.spacing32}
+                justifyContent={JUSTIFY_SPACE_BETWEEN}
               >
                 <LabwareStackLabel text={adapterName ?? ''} />
                 <LabwareStackRender
