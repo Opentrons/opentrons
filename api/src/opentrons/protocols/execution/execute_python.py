@@ -45,10 +45,14 @@ def _add_parameters_func_ok(add_parameters_func: Any) -> None:
         raise SyntaxError("Function 'add_parameters' must take exactly one argument.")
 
 
-def _find_protocol_error(tb: TracebackType, proto_name: str) -> traceback.FrameSummary:
+def _find_protocol_error(
+    tb: TracebackType | None, proto_name: str
+) -> traceback.FrameSummary:
     """Return the FrameInfo for the lowest frame in the traceback from the
     protocol.
     """
+    if tb is None:
+        raise KeyError
     tb_info = traceback.extract_tb(tb)
     for frame in reversed(tb_info):
         if frame.filename == proto_name:
@@ -59,8 +63,6 @@ def _find_protocol_error(tb: TracebackType, proto_name: str) -> traceback.FrameS
 
 def _raise_pretty_protocol_error(exception: Exception, filename: str) -> None:
     _, _, tb = sys.exc_info()
-    if tb is None:
-        raise Exception
     try:
         frame = _find_protocol_error(tb, filename)
     except KeyError:
