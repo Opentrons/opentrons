@@ -25,6 +25,7 @@ import { useDownloadRunLog } from '../hooks'
 
 import type { RunError, RunCommandErrors } from '@opentrons/api-client'
 import type { LegacyModalProps } from '../../../molecules/LegacyModal'
+import type { RunCommandError } from '@opentrons/shared-data'
 
 /**
  * This modal is for Desktop app
@@ -43,7 +44,7 @@ interface RunFailedModalProps {
   runId: string
   setShowRunFailedModal: (showRunFailedModal: boolean) => void
   highestPriorityError?: RunError | null
-  commandErrorList?: RunCommandErrors | null
+  commandErrorList: RunCommandErrors | null
 }
 
 export function RunFailedModal({
@@ -77,89 +78,79 @@ export function RunFailedModal({
     e.stopPropagation()
     downloadRunLog()
   }
-  if (
-    highestPriorityError != null &&
-    (commandErrorList == null || commandErrorList?.data?.length === 0)
-  ) {
+
+  interface ErrorContentProps {
+    errors: RunCommandError[]
+    isSingleError: boolean
+  }
+  const ErrorContent = ({
+    errors,
+    isSingleError,
+  }: ErrorContentProps): JSX.Element => {
     return (
-      <LegacyModal {...modalProps}>
-        <Flex flexDirection={DIRECTION_COLUMN}>
-          <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-            {t('error_info', {
-              errorType: highestPriorityError.errorType,
-              errorCode: highestPriorityError.errorCode,
-            })}
-          </LegacyStyledText>
-          <Flex css={ERROR_MESSAGE_STYLE}>
-            <LegacyStyledText as="p" textAlign={TYPOGRAPHY.textAlignLeft}>
-              {highestPriorityError.detail}
+      <>
+        <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          {isSingleError
+            ? t('error_info', {
+                errorType: errors[0].errorType,
+                errorCode: errors[0].errorCode,
+              })
+            : `${errors.length} errors`}
+        </LegacyStyledText>
+        <Flex css={ERROR_MESSAGE_STYLE}>
+          {' '}
+          {errors.map((error, index) => (
+            <LegacyStyledText
+              as="p"
+              textAlign={TYPOGRAPHY.textAlignLeft}
+              key={index}
+            >
+              {' '}
+              {isSingleError
+                ? error.detail
+                : `${error.errorCode}: ${error.detail}`}
             </LegacyStyledText>
-          </Flex>
-          <LegacyStyledText as="p">
-            {t('branded:run_failed_modal_description_desktop')}
-          </LegacyStyledText>
-          <Flex
-            marginTop={SPACING.spacing32}
-            flexDirection={DIRECTION_ROW}
-            justifyContent={JUSTIFY_SPACE_BETWEEN}
-            alignItems={ALIGN_CENTER}
-          >
-            <Link css={TYPOGRAPHY.linkPSemiBold} onClick={handleDownloadClick}>
-              <Flex gridGap={SPACING.spacing2} alignItems={ALIGN_CENTER}>
-                <Icon name="download" size="1rem" />
-                {i18n.format(t('download_run_log'), 'titleCase')}
-              </Flex>
-            </Link>
-            <PrimaryButton onClick={handleClick}>
-              {i18n.format(t('shared:close'), 'capitalize')}
-            </PrimaryButton>
-          </Flex>
+          ))}
         </Flex>
-      </LegacyModal>
-    )
-  } else {
-    return (
-      <LegacyModal {...modalProps}>
-        <Flex flexDirection={DIRECTION_COLUMN}>
-          <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-            {commandErrorList?.meta.totalLength} errors
-          </LegacyStyledText>
-          <Flex css={ERROR_MESSAGE_STYLE}>
-            {commandErrorList?.data.map((error: RunError, index) => {
-              return (
-                <LegacyStyledText
-                  as="p"
-                  textAlign={TYPOGRAPHY.textAlignLeft}
-                  key={index}
-                >
-                  {error.errorCode}: {error.detail}
-                </LegacyStyledText>
-              )
-            })}
-          </Flex>
-          <LegacyStyledText as="p">
-            {t('branded:run_failed_modal_description_desktop')}
-          </LegacyStyledText>
-          <Flex
-            marginTop={SPACING.spacing32}
-            flexDirection={DIRECTION_ROW}
-            justifyContent={JUSTIFY_SPACE_BETWEEN}
-            alignItems={ALIGN_CENTER}
-          >
-            <Link css={TYPOGRAPHY.linkPSemiBold} onClick={handleDownloadClick}>
-              <Flex gridGap={SPACING.spacing2} alignItems={ALIGN_CENTER}>
-                <Icon name="download" size="1rem" />
-                {i18n.format(t('download_run_log'), 'titleCase')}
-              </Flex>
-            </Link>
-            <PrimaryButton onClick={handleClick}>
-              {i18n.format(t('shared:close'), 'capitalize')}
-            </PrimaryButton>
-          </Flex>
-        </Flex>
-      </LegacyModal>
+      </>
     )
   }
+
+  return (
+    <LegacyModal {...modalProps}>
+      <Flex flexDirection={DIRECTION_COLUMN}>
+        <ErrorContent
+          errors={
+            highestPriorityError
+              ? [highestPriorityError]
+              : commandErrorList?.data && commandErrorList?.data.length > 0
+              ? commandErrorList?.data
+              : []
+          }
+          isSingleError={!!highestPriorityError}
+        />
+        <LegacyStyledText as="p">
+          {t('branded:run_failed_modal_description_desktop')}
+        </LegacyStyledText>
+        <Flex
+          marginTop={SPACING.spacing32}
+          flexDirection={DIRECTION_ROW}
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          alignItems={ALIGN_CENTER}
+        >
+          <Link css={TYPOGRAPHY.linkPSemiBold} onClick={handleDownloadClick}>
+            <Flex gridGap={SPACING.spacing2} alignItems={ALIGN_CENTER}>
+              <Icon name="download" size="1rem" />
+              {i18n.format(t('download_run_log'), 'titleCase')}
+            </Flex>
+          </Link>
+          <PrimaryButton onClick={handleClick}>
+            {i18n.format(t('shared:close'), 'capitalize')}
+          </PrimaryButton>
+        </Flex>
+      </Flex>
+    </LegacyModal>
+  )
 }
 
 const ERROR_MESSAGE_STYLE = css`
