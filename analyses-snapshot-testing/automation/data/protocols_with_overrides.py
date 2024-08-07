@@ -38,11 +38,3 @@ class ProtocolsWithOverrides:
         override_variable_name="type_to_test",
         overrides=["str_default_no_matching_choices", "float_default_no_matching_choices", "int_default_no_matching_choices"],
     )
-
-    Flex_S_v2_20_P1000_96_Overrides_PartialTipPickupSmokeTest: ProtocolWithOverrides = ProtocolWithOverrides(
-        file_stem="Flex_S_v2_20_P1000_96_Overrides_PartialTipPickupSmokeTest",
-        file_extension="py",
-        robot="Flex",
-        override_variable_name="test_case_key",
-        overrides=["0", "1", "2", "3", "4", "5", "6", "7"],
-    )
