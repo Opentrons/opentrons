@@ -61,13 +61,13 @@ export const useBlowOutLocationOptions = (
   }> = []
   if (transferType !== 'distribute') {
     blowOutLocationItems.push({
-      location: 'source_well',
+      location: 'dest_well',
       description: t('blow_out_source_well'),
     })
   }
   if (transferType !== 'consolidate') {
     blowOutLocationItems.push({
-      location: 'dest_well',
+      location: 'source_well',
       description: t('blow_out_destination_well'),
     })
   }
