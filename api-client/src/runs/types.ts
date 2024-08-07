@@ -9,6 +9,7 @@ import type {
   RunTimeParameter,
 } from '@opentrons/shared-data'
 import type { ResourceLink, ErrorDetails } from '../types'
+import type { GetCommandsParams } from './commands/types'
 export * from './commands/types'
 
 export const RUN_STATUS_IDLE = 'idle' as const
@@ -102,8 +103,7 @@ export interface Runs {
 
 export interface RunCommandErrors {
   data: RunCommandError[]
-  cursor?: number
-  pageLength?: number
+  meta: GetCommandsParams & { totalLength: number }
 }
 
 export const RUN_ACTION_TYPE_PLAY: 'play' = 'play'

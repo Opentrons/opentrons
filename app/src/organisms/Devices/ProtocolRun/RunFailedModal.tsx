@@ -122,7 +122,7 @@ export function RunFailedModal({
       <LegacyModal {...modalProps}>
         <Flex flexDirection={DIRECTION_COLUMN}>
           <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-            {commandErrorList?.pageLength} errors
+            {commandErrorList?.meta.totalLength} errors
           </LegacyStyledText>
           <Flex css={ERROR_MESSAGE_STYLE}>
             {commandErrorList?.data.map((error: RunError, index) => {

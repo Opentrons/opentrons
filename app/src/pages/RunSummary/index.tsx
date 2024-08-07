@@ -147,12 +147,12 @@ export function RunSummary(): JSX.Element {
     null
 
   const { data: commandErrorList } = useAllRunCommandErrorsQuery(runId, null, {
-      enabled:
-        runStatus != null &&
-        // @ts-expect-error runStatus expected to possibly not be terminal
-        RUN_STATUSES_TERMINAL.includes(runStatus) &&
-        isRunCurrent,
-    })
+    enabled:
+      runStatus != null &&
+      // @ts-expect-error runStatus expected to possibly not be terminal
+      RUN_STATUSES_TERMINAL.includes(runStatus) &&
+      isRunCurrent,
+  })
 
   let headerText = t('run_complete_splash')
   if (runStatus === RUN_STATUS_FAILED) {

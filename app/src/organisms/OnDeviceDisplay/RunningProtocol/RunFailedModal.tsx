@@ -22,6 +22,8 @@ import { Modal } from '../../../molecules/Modal'
 import type { ModalHeaderBaseProps } from '../../../molecules/Modal/types'
 import type { RunCommandErrors, RunError } from '@opentrons/api-client'
 
+import type { RunCommandError } from '@opentrons/shared-data'
+
 interface RunFailedModalProps {
   runId: string
   setShowRunFailedModal: (showRunFailedModal: boolean) => void
@@ -33,14 +35,18 @@ export function RunFailedModal({
   runId,
   setShowRunFailedModal,
   errors,
-  commandErrorList
+  commandErrorList,
 }: RunFailedModalProps): JSX.Element | null {
   const { t, i18n } = useTranslation(['run_details', 'shared', 'branded'])
   const navigate = useNavigate()
   const { stopRun } = useStopRunMutation()
   const [isCanceling, setIsCanceling] = React.useState(false)
 
-  if ((errors == null || errors.length === 0) && (commandErrorList == null || commandErrorList.data.length === 0)) return null
+  if (
+    (errors == null || errors.length === 0) &&
+    (commandErrorList == null || commandErrorList.data.length === 0)
+  )
+    return null
   const modalHeader: ModalHeaderBaseProps = {
     title: t('run_failed_modal_title'),
   }
@@ -66,131 +72,135 @@ export function RunFailedModal({
     highestPriorityError != null &&
     (commandErrorList == null || commandErrorList?.data?.length === 0)
   ) {
-  return (
-    <Modal
-      header={modalHeader}
-      onOutsideClick={() => {
-        setShowRunFailedModal(false)
-      }}
-    >
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing40}
-        width="100%"
-        css={css`
-          word-break: break-all;
-        `}
+    return (
+      <Modal
+        header={modalHeader}
+        onOutsideClick={() => {
+          setShowRunFailedModal(false)
+        }}
       >
         <Flex
           flexDirection={DIRECTION_COLUMN}
-          gridGap={SPACING.spacing16}
-          alignItems={ALIGN_FLEX_START}
-        >
-          <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightBold}>
-            {t('error_info', {
-              errorType: highestPriorityError.errorType,
-              errorCode: highestPriorityError.errorCode,
-            })}
-          </LegacyStyledText>
-          <Flex
-            width="100%"
-            flexDirection={DIRECTION_COLUMN}
-            gridGap={SPACING.spacing8}
-            maxHeight="11rem"
-            backgroundColor={COLORS.grey35}
-            borderRadius={BORDERS.borderRadius8}
-            padding={`${SPACING.spacing16} ${SPACING.spacing20}`}
-          >
-            <Flex flexDirection={DIRECTION_COLUMN} css={SCROLL_BAR_STYLE}>
-              <LegacyStyledText as="p" textAlign={TYPOGRAPHY.textAlignLeft}>
-                {highestPriorityError.detail}
-              </LegacyStyledText>
-            </Flex>
-          </Flex>
-          <LegacyStyledText
-            as="p"
-            textAlign={TYPOGRAPHY.textAlignLeft}
-            css={css`
-              word-break: break-word;
-            `}
-          >
-            {t('branded:contact_information')}
-          </LegacyStyledText>
-        </Flex>
-        <SmallButton
+          gridGap={SPACING.spacing40}
           width="100%"
-          buttonType="alert"
-          buttonText={i18n.format(t('shared:close'), 'capitalize')}
-          onClick={handleClose}
-          disabled={isCanceling}
-        />
-      </Flex>
-    </Modal>
-  )
-}
-else{
-  return (
-    <Modal
-    header={modalHeader}
-    onOutsideClick={() => {
-      setShowRunFailedModal(false)
-    }}
-  >
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing40}
-      width="100%"
-      css={css`
-        word-break: break-all;
-      `}
-    >
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing16}
-        alignItems={ALIGN_FLEX_START}
-      >
-        <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightBold}>
-          {commandErrorList?.pageLength} errors
-        </LegacyStyledText>
-        <Flex
-          width="100%"
-          flexDirection={DIRECTION_COLUMN}
-          gridGap={SPACING.spacing8}
-          maxHeight="11rem"
-          backgroundColor={COLORS.grey35}
-          borderRadius={BORDERS.borderRadius8}
-          padding={`${SPACING.spacing16} ${SPACING.spacing20}`}
-        >
-          <Flex flexDirection={DIRECTION_COLUMN} css={SCROLL_BAR_STYLE}>
-          {commandErrorList?.data.map((error: RunError, index) => {
-              return (
-            <LegacyStyledText as="p" textAlign={TYPOGRAPHY.textAlignLeft} key={index}>
-                {error.errorCode}: {error.detail}
-            </LegacyStyledText>
-              )})}
-          </Flex>
-        </Flex>
-        <LegacyStyledText
-          as="p"
-          textAlign={TYPOGRAPHY.textAlignLeft}
           css={css`
-            word-break: break-word;
+            word-break: break-all;
           `}
         >
-          {t('branded:contact_information')}
-        </LegacyStyledText>
-      </Flex>
-      <SmallButton
-        width="100%"
-        buttonType="alert"
-        buttonText={i18n.format(t('shared:close'), 'capitalize')}
-        onClick={handleClose}
-        disabled={isCanceling}
-      />
-    </Flex>
-  </Modal>
-  )
-}
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            gridGap={SPACING.spacing16}
+            alignItems={ALIGN_FLEX_START}
+          >
+            <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightBold}>
+              {t('error_info', {
+                errorType: highestPriorityError.errorType,
+                errorCode: highestPriorityError.errorCode,
+              })}
+            </LegacyStyledText>
+            <Flex
+              width="100%"
+              flexDirection={DIRECTION_COLUMN}
+              gridGap={SPACING.spacing8}
+              maxHeight="11rem"
+              backgroundColor={COLORS.grey35}
+              borderRadius={BORDERS.borderRadius8}
+              padding={`${SPACING.spacing16} ${SPACING.spacing20}`}
+            >
+              <Flex flexDirection={DIRECTION_COLUMN} css={SCROLL_BAR_STYLE}>
+                <LegacyStyledText as="p" textAlign={TYPOGRAPHY.textAlignLeft}>
+                  {highestPriorityError.detail}
+                </LegacyStyledText>
+              </Flex>
+            </Flex>
+            <LegacyStyledText
+              as="p"
+              textAlign={TYPOGRAPHY.textAlignLeft}
+              css={css`
+                word-break: break-word;
+              `}
+            >
+              {t('branded:contact_information')}
+            </LegacyStyledText>
+          </Flex>
+          <SmallButton
+            width="100%"
+            buttonType="alert"
+            buttonText={i18n.format(t('shared:close'), 'capitalize')}
+            onClick={handleClose}
+            disabled={isCanceling}
+          />
+        </Flex>
+      </Modal>
+    )
+  } else {
+    return (
+      <Modal
+        header={modalHeader}
+        onOutsideClick={() => {
+          setShowRunFailedModal(false)
+        }}
+      >
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          gridGap={SPACING.spacing40}
+          width="100%"
+          css={css`
+            word-break: break-all;
+          `}
+        >
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            gridGap={SPACING.spacing16}
+            alignItems={ALIGN_FLEX_START}
+          >
+            <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightBold}>
+              {commandErrorList?.meta.totalLength} errors
+            </LegacyStyledText>
+            <Flex
+              width="100%"
+              flexDirection={DIRECTION_COLUMN}
+              gridGap={SPACING.spacing8}
+              maxHeight="11rem"
+              backgroundColor={COLORS.grey35}
+              borderRadius={BORDERS.borderRadius8}
+              padding={`${SPACING.spacing16} ${SPACING.spacing20}`}
+            >
+              <Flex flexDirection={DIRECTION_COLUMN} css={SCROLL_BAR_STYLE}>
+                {commandErrorList?.data.map((error: RunCommandError, index) => {
+                  return (
+                    <LegacyStyledText
+                      as="p"
+                      textAlign={TYPOGRAPHY.textAlignLeft}
+                      key={index}
+                    >
+                      {error.errorCode}: {error.detail}
+                    </LegacyStyledText>
+                  )
+                })}
+              </Flex>
+            </Flex>
+            <LegacyStyledText
+              as="p"
+              textAlign={TYPOGRAPHY.textAlignLeft}
+              css={css`
+                word-break: break-word;
+              `}
+            >
+              {t('branded:contact_information')}
+            </LegacyStyledText>
+          </Flex>
+          <SmallButton
+            width="100%"
+            buttonType="alert"
+            buttonText={i18n.format(t('shared:close'), 'capitalize')}
+            onClick={handleClose}
+            disabled={isCanceling}
+          />
+        </Flex>
+      </Modal>
+    )
+  }
 }
 
 const SCROLL_BAR_STYLE = css`
