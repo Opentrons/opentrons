@@ -155,13 +155,9 @@ export const LabwareStackModal = (
     <LegacyModal
       onClose={closeModal}
       closeOnOutsideClick
-      title={
-        <Flex gridGap={SPACING.spacing8}>
-          <DeckInfoLabel deckLabel={slotName} />
-          <DeckInfoLabel iconName="stacked" />
-          <StyledText>{t('stacked_slot')}</StyledText>
-        </Flex>
-      }
+      title={t('stacked_slot')}
+      titleElement1={<DeckInfoLabel deckLabel={slotName} />}
+      titleElement2={<DeckInfoLabel iconName="stacked" />}
       childrenPadding={0}
       marginLeft="0"
     >
