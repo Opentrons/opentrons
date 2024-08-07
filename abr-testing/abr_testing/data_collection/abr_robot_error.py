@@ -535,15 +535,12 @@ if __name__ == "__main__":
         affects_version,
         parent_key,
     )
-
     # Link Tickets
     to_link = ticket.match_issues(all_issues, summary)
     ticket.link_issues(to_link, issue_key)
-
     # OPEN TICKET
     issue_url = ticket.open_issue(issue_key)
     # MOVE FILES TO ERROR FOLDER.
-
     error_files = [saved_file_path_calibration, run_log_file_path] + file_paths
     error_folder_path = os.path.join(storage_directory, issue_key)
     os.makedirs(error_folder_path, exist_ok=True)
@@ -555,8 +552,11 @@ if __name__ == "__main__":
             shutil.move(source_file, destination_file)
         except shutil.Error:
             continue
-    # OPEN FOLDER DIRECTORY
-    subprocess.Popen(["explorer", error_folder_path])
+    # POST FILES TO TICKET
+    list_of_files = os.listdir(error_folder_path)
+    for file in list_of_files:
+        file_to_attach = os.path.join(error_folder_path, file)
+        ticket.post_attachment_to_ticket(issue_key, file_to_attach)
     # ADD ERROR COMMENTS TO TICKET
     read_each_log(error_folder_path, raw_issue_url)
     # WRITE ERRORED RUN TO GOOGLE SHEET
@@ -601,3 +601,5 @@ if __name__ == "__main__":
         google_sheet_lpc.batch_update_cells(runs_and_lpc, "A", start_row_lpc, "0")
     else:
         print("Ticket created.")
+    # Open folder directory incase uploads to ticket were incomplete
+    subprocess.Popen(["explorer", error_folder_path])
