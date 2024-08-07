@@ -183,7 +183,7 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
             <InputField
               type="number"
               value={position}
-              title={t('delay_position_mm')}
+              title={t('touch_tip_position_mm')}
               error={positionError}
               readOnly
             />
