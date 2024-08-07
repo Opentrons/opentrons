@@ -98,7 +98,6 @@ def save_definition(
     :param location: File path
     """
     namespace = labware_def["namespace"]
-    assert "loadName" in labware_def["namespace"]
     load_name = labware_def["parameters"]["loadName"]
     version = labware_def["version"]
 
