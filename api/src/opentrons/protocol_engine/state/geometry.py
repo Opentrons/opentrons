@@ -1062,35 +1062,55 @@ class GeometryView:
             dropOffset=LabwareOffsetVector(x=0, y=0, z=0),
         )
 
-    def _labware_gripper_offsets(
-        self, labware_id: str
-    ) -> Optional[LabwareMovementOffsetData]:
-        """Provide the most appropriate gripper offset data for the specified labware.
+    def _get_labware_position_offset(
+        self, labware_id: str, labware_location: LabwareLocation
+    ) -> LabwareOffsetVector:
+        """Gets the offset vector of a labware on the given location.
 
-        We check the types of gripper offsets available for the labware ("default" or slot-based)
-        and return the most appropriate one for the overall location of the labware.
-        Currently, only module adapters (specifically, the H/S universal flat adapter)
-        have non-default offsets that are specific to location of the module on deck,
-        so, this code only checks for the presence of those known offsets.
+        NOTE: Not to be confused with LPC offset.
+        - For labware on Deck Slot: returns an offset of (0, 0, 0)
+        - For labware on a Module: returns the nominal offset for the labware's position
+          when placed on the specified module (using slot-transformed labwareOffset
+          from the module's definition with any stacking overlap).
+          Does not include module calibration offset or LPC offset.
+        - For labware on another labware: returns the nominal offset for the labware
+          as placed on the specified labware, taking into account any offsets for labware
+          on modules as well as stacking overlaps.
+          Does not include module calibration offset or LPC offset.
         """
-        parent_location = self._labware.get_parent_location(labware_id)
-        assert isinstance(
-            parent_location, (DeckSlotLocation, ModuleLocation)
-        ), "No gripper offsets for off-deck labware"
-
-        if isinstance(parent_location, DeckSlotLocation):
-            slot_name = parent_location.slotName
+        if isinstance(labware_location, (AddressableAreaLocation, DeckSlotLocation)):
+            return LabwareOffsetVector(x=0, y=0, z=0)
+        elif isinstance(labware_location, ModuleLocation):
+            module_id = labware_location.moduleId
+            module_offset = self._modules.get_nominal_module_offset(module_id=module_id)
+            module_model = self._modules.get_connected_model(module_id)
+            stacking_overlap = self._labware.get_module_overlap_offsets(
+                labware_id, module_model
+            )
+            return LabwareOffsetVector(
+                x=module_offset.x - stacking_overlap.x,
+                y=module_offset.y - stacking_overlap.y,
+                z=module_offset.z - stacking_overlap.z,
+            )
+        elif isinstance(labware_location, OnLabwareLocation):
+            on_labware = self._labware.get(labware_location.labwareId)
+            on_labware_dimensions = self._labware.get_dimensions(on_labware.id)
+            stacking_overlap = self._labware.get_labware_overlap_offsets(
+                labware_id=labware_id, below_labware_name=on_labware.loadName
+            )
+            labware_offset = LabwareOffsetVector(
+                x=stacking_overlap.x,
+                y=stacking_overlap.y,
+                z=on_labware_dimensions.z - stacking_overlap.z,
+            )
+            return labware_offset + self._get_labware_position_offset(
+                on_labware.id, on_labware.location
+            )
         else:
-            module_loc = self._modules.get_location(parent_location.moduleId)
-            slot_name = module_loc.slotName
-
-        slot_based_offset = self._labware.get_labware_gripper_offsets(
-            labware_id=labware_id, slot_name=slot_name.to_ot3_equivalent()
-        )
-
-        return slot_based_offset or self._labware.get_labware_gripper_offsets(
-            labware_id=labware_id, slot_name=None
-        )
+            raise errors.LabwareNotOnDeckError(
+                f"Cannot access labware {labware_id} since it is not on the deck. "
+                f"Either it has been loaded off-deck or its been moved off-deck."
+            )
 
     def get_offset_location(self, labware_id: str) -> Optional[LabwareOffsetLocation]:
         """Provide the LabwareOffsetLocation specifying the current position of the labware.
