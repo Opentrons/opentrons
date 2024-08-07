@@ -16,6 +16,8 @@ from typing import (
     TypeVar,
     Union,
     cast,
+    KeysView,
+    ItemsView,
 )
 
 from opentrons import types as top_types
@@ -289,7 +291,7 @@ class AxisMaxSpeeds(UserDict[Union[str, Axis], float]):
         return self.data[checked_key]
 
     @staticmethod
-    def _verify_key(key: Any) -> Axis:
+    def _verify_key(key: object) -> Axis:
         if isinstance(key, Axis):
             checked_key: Optional[Axis] = key
         elif isinstance(key, str):
@@ -300,17 +302,25 @@ class AxisMaxSpeeds(UserDict[Union[str, Axis], float]):
             raise KeyError(key)
         return checked_key
 
-    def __setitem__(self, key: Any, value: Any) -> None:
-        if value is None:
-            del self[key]
-            return
+    def __setitem__(self, key: object, value: object) -> None:
 
         checked_key = AxisMaxSpeeds._verify_key(key)
+        if value is None:
+            del self[checked_key]
+            return
+
         checked_val = _assert_gzero(
             value, "max speeds should be numerical values in mm/s"
         )
 
         self.data[checked_key] = checked_val
+
+    def _axis_to_string(self, axis: Union[str, Axis]) -> str:
+        if isinstance(axis, str):
+            return axis
+        if self._robot_type == "OT-3 Standard":
+            return axis.name
+        return ot2_axis_to_string(axis)
 
     def __delitem__(self, key: Union[str, Axis]) -> None:
         checked_key = AxisMaxSpeeds._verify_key(key)
@@ -318,38 +328,14 @@ class AxisMaxSpeeds(UserDict[Union[str, Axis], float]):
 
     def __iter__(self) -> Iterator[str]:
         """keys() and dict iteration return string keys"""
-        string_keys = (
-            k
-            if isinstance(k, str)
-            else k.name
-            if self._robot_type == "OT-3 Standard"
-            else ot2_axis_to_string(k)
-            for k in self.data.keys()
-        )
+        string_keys = (self._axis_to_string(k) for k in self.data.keys())
         return string_keys
 
-    def keys(self) -> Iterator[str | Axis]:  # type: ignore[override]
-        string_keys = (
-            k
-            if isinstance(k, str)
-            else k.name
-            if self._robot_type == "OT-3 Standard"
-            else ot2_axis_to_string(k)
-            for k in self.data.keys()
-        )
-        return string_keys
+    def keys(self) -> KeysView[str]:
+        return ({self._axis_to_string(k): v for k, v in self.data.items()}).keys()
 
-    def items(self) -> Iterator[Dict[str | Axis, float]]:  # type: ignore[override]
-        return (
-            {
-                k
-                if isinstance(k, str)
-                else k.name
-                if self._robot_type == "OT-3 Standard"
-                else ot2_axis_to_string(k): v
-            }
-            for k, v in self.data.items()
-        )
+    def items(self) -> ItemsView[str, float]:
+        return ({self._axis_to_string(k): v for k, v in self.data.items()}).items()
 
 
 def clamp_value(
