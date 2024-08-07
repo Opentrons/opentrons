@@ -4,8 +4,8 @@ import type { MockInstance } from 'vitest'
 import * as persist from '../persist'
 
 describe('persist', () => {
-  let getItemSpy: MockInstance<unknown[], unknown>
-  let setItemSpy: MockInstance<unknown[], unknown>
+  let getItemSpy: MockInstance
+  let setItemSpy: MockInstance
 
   beforeEach(() => {
     const LocalStorageProto = Object.getPrototypeOf(global.localStorage)

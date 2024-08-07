@@ -23,7 +23,7 @@ describe('release manifest utilities', () => {
     const manifestUrl = 'http://example.com/releases.json'
 
     vi.mocked(Http.fetchJson).mockImplementation(
-      (url: unknown): Promise<unknown> => {
+      (url: unknown): Promise<any> => {
         if (url === manifestUrl) return Promise.resolve(result)
         return Promise.resolve()
       }

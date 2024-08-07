@@ -175,7 +175,7 @@ describe('protocol storage directory utilities', () => {
   describe('addProtocolFile', () => {
     it('writes a protocol file to a new directory', () => {
       let count = 0
-      vi.mocked(uuid).mockImplementation(() => {
+      vi.mocked(uuid).mockImplementation((): any => {
         const nextId = `${count}abc123`
         count = count + 1
         return nextId

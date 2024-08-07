@@ -68,7 +68,7 @@ describe('DownloadUpdateModal', () => {
       progressPercent: 50,
     })
     vi.mocked(getRobotSessionIsManualFile).mockReturnValue(false)
-    vi.mocked(useDispatchStartRobotUpdate).mockReturnValue(vi.fn)
+    vi.mocked(useDispatchStartRobotUpdate).mockReturnValue(vi.fn())
     vi.mocked(getRobotUpdateDownloadError).mockReturnValue(null)
   })
 
