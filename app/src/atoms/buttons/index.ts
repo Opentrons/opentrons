@@ -1,6 +1,5 @@
 export { BackButton } from './BackButton'
 export { FloatingActionButton } from './FloatingActionButton'
-export { LargeButton } from './LargeButton'
 export { MediumButton } from './MediumButton'
 export { QuaternaryButton } from './QuaternaryButton'
 export { SmallButton } from './SmallButton'

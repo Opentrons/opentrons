@@ -1,19 +1,20 @@
 import * as React from 'react'
 import { css } from 'styled-components'
+import { Btn, Flex } from '../../primitives'
+
+import { BORDERS, COLORS } from '../../helix-design-system'
+import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { LegacyStyledText } from '../../atoms/StyledText'
 import {
-  BORDERS,
-  Btn,
-  COLORS,
+  ALIGN_CENTER,
   DIRECTION_COLUMN,
+  DIRECTION_ROW,
   DISPLAY_FLEX,
-  Icon,
-  Flex,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING,
-  LegacyStyledText,
-  TYPOGRAPHY,
-} from '@opentrons/components'
-import type { IconName, StyleProps } from '@opentrons/components'
+} from '../..'
+import { Icon } from '../../icons'
+import type { StyleProps } from '../../primitives'
+import type { IconName } from '../../icons'
 
 type LargeButtonTypes =
   | 'primary'
@@ -126,79 +127,93 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     LARGE_BUTTON_PROPS_BY_TYPE[style].activeIconColor
       ? `color: ${LARGE_BUTTON_PROPS_BY_TYPE[style].activeIconColor}`
       : ''
+
   const LARGE_BUTTON_STYLE = css`
-    text-align: ${TYPOGRAPHY.textAlignLeft};
     color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor};
     background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
       .defaultBackgroundColor};
     cursor: default;
-    border-radius: ${BORDERS.borderRadius16};
-    box-shadow: none;
-    padding: ${SPACING.spacing24};
-    line-height: ${TYPOGRAPHY.lineHeight20};
-    gap: ${SPACING.spacing60};
-    border: ${BORDERS.borderRadius4} solid
-      ${buttonType === 'alertStroke' && !disabled
-        ? LARGE_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor
-        : 'none'};
-
-    ${TYPOGRAPHY.pSemiBold}
-
-    #btn-icon: {
-      color: ${disabled
-        ? LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledIconColor
-        : LARGE_BUTTON_PROPS_BY_TYPE[buttonType].iconColor};
-    }
+    padding: ${SPACING.spacing16} ${SPACING.spacing24};
+    text-align: ${TYPOGRAPHY.textAlignCenter};
+    border-radius: ${BORDERS.borderRadius40};
+    flex-direction: ${DIRECTION_ROW};
+    align-items: ${ALIGN_CENTER};
 
     &:active {
       background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
         .activeBackgroundColor};
       ${activeColorFor(buttonType)};
-      border: ${BORDERS.borderRadius4} solid
-        ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].activeBackgroundColor};
     }
     &:active #btn-icon {
       ${activeIconStyle(buttonType)};
     }
 
-    &:focus-visible {
-      background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
-        .focusVisibleBackgroundColor};
-      ${activeColorFor(buttonType)};
-      padding: calc(${SPACING.spacing24} + ${SPACING.spacing2});
-      border: ${SPACING.spacing2} solid ${COLORS.transparent};
-      outline: 3px solid
-        ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].focusVisibleOutlineColor};
-      background-clip: padding-box;
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      flex-direction: ${DIRECTION_COLUMN};
+      text-align: ${TYPOGRAPHY.textAlignLeft};
+      border-radius: ${BORDERS.borderRadius16};
       box-shadow: none;
-    }
+      padding: ${SPACING.spacing24};
+      line-height: ${TYPOGRAPHY.lineHeight20};
+      gap: ${SPACING.spacing60};
+      border: ${BORDERS.borderRadius4} solid
+        ${buttonType === 'alertStroke' && !disabled
+          ? LARGE_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor
+          : 'none'};
 
-    &:disabled {
-      color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledColor};
-      background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
-        .disabledBackgroundColor};
+      ${TYPOGRAPHY.pSemiBold}
+
+      #btn-icon: {
+        color: ${disabled
+          ? LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledIconColor
+          : LARGE_BUTTON_PROPS_BY_TYPE[buttonType].iconColor};
+      }
+      &:active {
+        border: ${BORDERS.borderRadius4} solid
+          ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].activeBackgroundColor};
+      }
+
+      &:focus-visible {
+        background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
+          .focusVisibleBackgroundColor};
+        ${activeColorFor(buttonType)};
+        padding: calc(${SPACING.spacing24} + ${SPACING.spacing2});
+        border: ${SPACING.spacing2} solid ${COLORS.transparent};
+        outline: 3px solid
+          ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].focusVisibleOutlineColor};
+        background-clip: padding-box;
+        box-shadow: none;
+      }
+
+      &:disabled {
+        color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledColor};
+        background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
+          .disabledBackgroundColor};
+      }
     }
   `
   return (
     <Btn
       display={DISPLAY_FLEX}
       css={LARGE_BUTTON_STYLE}
-      flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       disabled={disabled}
       {...buttonProps}
     >
-      <Flex flexDirection={DIRECTION_COLUMN}>
-        <LegacyStyledText css={TYPOGRAPHY.level3HeaderSemiBold}>
-          {buttonText}
-        </LegacyStyledText>
-      </Flex>
+      <LegacyStyledText css={TYPOGRAPHY.level3HeaderSemiBold}>
+        {buttonText}
+      </LegacyStyledText>
       {iconName ? (
         <Icon
           name={iconName}
           aria-label={`${iconName} icon`}
-          size="5rem"
-          id={`btn-icon`}
+          css={css`
+            size: 20px;
+            @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+              size: 5rem;
+            }
+          `}
+          id="btn-icon"
         />
       ) : null}
     </Btn>
