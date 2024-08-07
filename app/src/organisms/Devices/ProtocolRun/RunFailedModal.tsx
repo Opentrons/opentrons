@@ -44,7 +44,7 @@ interface RunFailedModalProps {
   runId: string
   setShowRunFailedModal: (showRunFailedModal: boolean) => void
   highestPriorityError?: RunError | null
-  commandErrorList: RunCommandErrors | null
+  commandErrorList?: RunCommandErrors | null
 }
 
 export function RunFailedModal({

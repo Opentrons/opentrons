@@ -28,7 +28,7 @@ interface RunFailedModalProps {
   runId: string
   setShowRunFailedModal: (showRunFailedModal: boolean) => void
   errors?: RunError[]
-  commandErrorList: RunCommandErrors
+  commandErrorList?: RunCommandErrors
 }
 
 export function RunFailedModal({
