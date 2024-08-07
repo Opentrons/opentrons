@@ -23,8 +23,16 @@ import { getLocationInfoNames } from '../utils/getLocationInfoNames'
 import { getSlotLabwareDefinition } from '../utils/getSlotLabwareDefinition'
 import { Divider } from '../../../../atoms/structure'
 import { getModuleImage } from '../SetupModuleAndDeck/utils'
-import { getModuleDisplayName } from '@opentrons/shared-data'
+import {
+  FLEX_ROBOT_TYPE,
+  getModuleDisplayName,
+  getModuleType,
+  TC_MODULE_LOCATION_OT2,
+  TC_MODULE_LOCATION_OT3,
+} from '@opentrons/shared-data'
 import tiprackAdapter from '../../../../assets/images/labware/opentrons_flex_96_tiprack_adapter.png'
+
+import type { RobotType } from '@opentrons/shared-data'
 
 const HIDE_SCROLLBAR = css`
   ::-webkit-scrollbar {
@@ -36,12 +44,13 @@ interface LabwareStackModalProps {
   labwareIdTop: string
   runId: string
   closeModal: () => void
+  robotType?: RobotType
 }
 
 export const LabwareStackModal = (
   props: LabwareStackModalProps
 ): JSX.Element | null => {
-  const { labwareIdTop, runId, closeModal } = props
+  const { labwareIdTop, runId, closeModal, robotType = FLEX_ROBOT_TYPE } = props
   const { t } = useTranslation('protocol_setup')
   const isOnDevice = useSelector(getIsOnDevice)
   const protocolData = useMostRecentCompletedAnalysis(runId)
@@ -60,6 +69,14 @@ export const LabwareStackModal = (
 
   const topDefinition = getSlotLabwareDefinition(labwareIdTop, commands)
   const adapterDef = getSlotLabwareDefinition(adapterId ?? '', commands)
+  const isModuleThermocycler =
+    moduleModel == null
+      ? false
+      : getModuleType(moduleModel) === 'thermocyclerModuleType'
+  const thermocyclerLocation =
+    robotType === FLEX_ROBOT_TYPE
+      ? TC_MODULE_LOCATION_OT3
+      : TC_MODULE_LOCATION_OT2
   const moduleDisplayName =
     moduleModel != null ? getModuleDisplayName(moduleModel) : null ?? ''
   const tiprackAdapterImg = (
@@ -80,7 +97,9 @@ export const LabwareStackModal = (
       header={{
         title: (
           <Flex gridGap={SPACING.spacing4}>
-            <DeckInfoLabel deckLabel={slotName} />
+            <DeckInfoLabel
+              deckLabel={isModuleThermocycler ? thermocyclerLocation : slotName}
+            />
             <DeckInfoLabel iconName="stacked" />
           </Flex>
         ),
@@ -156,7 +175,11 @@ export const LabwareStackModal = (
       onClose={closeModal}
       closeOnOutsideClick
       title={t('stacked_slot')}
-      titleElement1={<DeckInfoLabel deckLabel={slotName} />}
+      titleElement1={
+        <DeckInfoLabel
+          deckLabel={isModuleThermocycler ? thermocyclerLocation : slotName}
+        />
+      }
       titleElement2={<DeckInfoLabel iconName="stacked" />}
       childrenPadding={0}
       marginLeft="0"

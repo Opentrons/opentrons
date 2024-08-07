@@ -164,6 +164,7 @@ export function SetupLabwareMap({
           closeModal={() => {
             setLabwareStackDetailsLabwareId(null)
           }}
+          robotType={robotType}
         />
       )}
     </Flex>
