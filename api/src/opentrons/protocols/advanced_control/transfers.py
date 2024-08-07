@@ -553,7 +553,6 @@ class TransferPlan:
                 # TODO: account for unequal length sources, dests
                 # TODO: ensure last transfer is > min_vol
                 vol = min(max_vol, step_vol - xferred_vol)
-
                 yield from self._aspirate_actions(vol, src)
                 yield from self._dispense_actions(vol=vol, dest=dest, src=src)
                 xferred_vol += vol
@@ -875,7 +874,6 @@ class TransferPlan:
                 self._strategy.blow_out_strategy == BlowOutStrategy.TRASH
                 or self._strategy.disposal_volume
             ):
-                # Flake8 marked this function as "too complex", so these two "yield from" calls move some complexity to another function.
                 yield from self._after_dispense_trash()
         else:
             yield from self._after_dispense_helper()
