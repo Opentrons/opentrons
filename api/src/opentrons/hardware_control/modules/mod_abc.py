@@ -31,7 +31,7 @@ def parse_fw_version(version: str) -> Version:
             raise InvalidVersion()
     except InvalidVersion:
         device_version = parse("v0.0.0")
-    return cast(Version, device_version)
+    return cast(Version, device_version)  # type: ignore [redundant-cast]
 
 
 class AbstractModule(abc.ABC):
@@ -73,6 +73,7 @@ class AbstractModule(abc.ABC):
         self._execution_manager = execution_manager
         self._bundled_fw: Optional[BundledFirmware] = self.get_bundled_fw()
         self._disconnected_callback = disconnected_callback
+        self._updating = False
 
     @staticmethod
     def sort_key(inst: "AbstractModule") -> int:
@@ -90,6 +91,11 @@ class AbstractModule(abc.ABC):
     @property
     def loop(self) -> asyncio.AbstractEventLoop:
         return self._loop
+
+    @property
+    def updating(self) -> bool:
+        """The device is updating is True."""
+        return self._updating
 
     def disconnected_callback(self) -> None:
         """Called from within the module object to signify the object is no longer connected"""

@@ -194,14 +194,8 @@ class AbsorbanceReader(mod_abc.AbstractModule):
         self._device_info = device_info
         self._reader = reader
         self._poller = poller
-        self._updating = False
         self._error: Optional[str] = None
         self._reader.register_error_handler(self._enter_error_state)
-
-    @property
-    def updating(self) -> bool:
-        """The device is updating is True."""
-        return self._updating
 
     @property
     def status(self) -> AbsorbanceReaderStatus:
@@ -284,8 +278,6 @@ class AbsorbanceReader(mod_abc.AbstractModule):
 
     def firmware_prefix(self) -> str:
         """The prefix used for looking up firmware"""
-        if isinstance(self._driver, SimulatingDriver):
-            return self._driver.model()
         return "absorbance-96"
 
     async def update_device(self, firmware_file_path: str) -> Tuple[bool, str]:

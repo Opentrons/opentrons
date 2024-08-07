@@ -22,6 +22,7 @@ from opentrons.hardware_control.modules.errors import AbsorbanceReaderDisconnect
 
 SN_PARSER = re.compile(r'ATTRS{serial}=="(?P<serial>.+?)"')
 VERSION_PARSER = re.compile(r"Absorbance (?P<version>V\d+\.\d+\.\d+)")
+SERIAL_PARSER = re.compile(r"SN: (?P<serial>BYO[A-Z]{3}[0-9]{5})")
 
 
 class AsyncByonoy:
@@ -111,7 +112,7 @@ class AsyncByonoy:
         self._device_handle: Optional[int] = None
         self._current_config: Optional[AbsProtocol.MeasurementConfig] = None
 
-    async def open(self) -> int:
+    async def open(self) -> bool:
         """
         Open the connection.
 
@@ -153,13 +154,14 @@ class AsyncByonoy:
             func=partial(self._interface.byonoy_get_device_information, handle),
         )
         self._raise_if_error(err.name, f"Error getting device information: {err}")
-
-        match = VERSION_PARSER.match(device_info.version)
-        version = match["version"].lower() if match else "v0.0.0"
+        serial_match = SERIAL_PARSER.match(device_info.sn)
+        version_match = VERSION_PARSER.match(device_info.version)
+        serial = serial_match["serial"] if serial_match else "BYOMAA00000"
+        version = version_match["version"].lower() if version_match else "v0.0.0"
         info = {
-            "serial": self._device.sn,
-            "model": "ABS96",
+            "serial": serial,
             "version": version,
+            "model": "ABS96",
         }
         return info
 
@@ -170,7 +172,7 @@ class AsyncByonoy:
             executor=self._executor,
             func=partial(self._interface.byonoy_get_device_status, handle),
         )
-        self._raise_if_error(err.name, "Error getting device status: ")
+        self._raise_if_error(err.name, f"Error getting device status: {err}")
         return self.convert_device_state(status.name)
 
     async def update_firmware(self, firmware_file_path: str) -> Tuple[bool, str]:
@@ -257,14 +259,14 @@ class AsyncByonoy:
         err, wavelengths = self._interface.byonoy_abs96_get_available_wavelengths(
             handle
         )
-        self._raise_if_error(err.name, "Error getting available wavelengths: ")
+        self._raise_if_error(err.name, f"Error getting available wavelengths: {err}")
         self._supported_wavelengths = wavelengths
         return wavelengths
 
     def _initialize_measurement(self, conf: AbsProtocol.MeasurementConfig) -> None:
         handle = self._verify_device_handle()
         err = self._interface.byonoy_abs96_initialize_single_measurement(handle, conf)
-        self._raise_if_error(err.name, "Error initializing measurement: ")
+        self._raise_if_error(err.name, f"Error initializing measurement: {err}")
         self._current_config = conf
 
     def _set_sample_wavelength(self, wavelength: int) -> AbsProtocol.MeasurementConfig:
