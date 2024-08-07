@@ -23,6 +23,7 @@ Welcome to the v8.0.0 release of the Opentrons App!
 - Run protocols using the latest version of the Python API (2.20), which adds more partial tip pickup configurations (Flex and OT-2 GEN2 pipettes) and the ability to detect whether a well contains liquid (Flex pipettes only).
 - Tap or click on any labware on the deck map to see adapters and modules that are stacked below it.
 - Lists of liquids now separately show the total volume and per-well volume (when it is the same in each well containing that liquid).
+- Improved instructions for what to do when a Flex protocol completes or is canceled with liquid-filled tips attached to the pipette.
 
 ---
 
