@@ -273,8 +273,8 @@ interface CsvFileDataRowProps {
 function CsvFileDataRow(props: CsvFileDataRowProps): JSX.Element | null {
   const { fileId } = props
 
-  const { data: fileData, isSuccess } = useCsvFileQuery(fileId)
-  if (!isSuccess) {
+  const { data: fileData } = useCsvFileQuery(fileId)
+  if (fileData == null) {
     return null
   }
   const { name, createdAt } = fileData.data
