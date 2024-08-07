@@ -21,11 +21,9 @@ const render = () => {
   )[0]
 }
 
-const mockLoadProtocolFile = vi.fn()
-
 describe('Landing', () => {
   beforeEach(() => {
-    vi.mocked(loadProtocolFile).mockReturnValue(mockLoadProtocolFile)
+    vi.mocked(loadProtocolFile).mockReturnValue(vi.fn())
   })
   it('renders the landing page image and text', () => {
     render()

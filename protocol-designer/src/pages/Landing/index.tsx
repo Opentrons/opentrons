@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
@@ -21,11 +21,13 @@ import type { ThunkDispatch } from '../../types'
 export function Landing(): JSX.Element {
   const { t } = useTranslation('shared')
   const dispatch: ThunkDispatch<any> = useDispatch()
+  const navigate = useNavigate()
   const loadFile = (
     fileChangeEvent: React.ChangeEvent<HTMLInputElement>
   ): void => {
     if (window.confirm(t('confirm_import') as string)) {
       dispatch(loadFileActions.loadProtocolFile(fileChangeEvent))
+      navigate('/overview')
     }
   }
 
