@@ -395,9 +395,8 @@ def requires_version(major: int, minor: int) -> Callable[[FuncT], FuncT]:
 
 class ModifiedList(list[str]):
     def __contains__(self, item: object) -> bool:
-        # This weird thing where item is passed in as an object
-        # then asserts that it's a string is a workaround for MyPy errors.
-        assert isinstance(item, str)
+        if not isinstance(item, str):
+            return False
         for name in self:
             if name == item.replace("-", "_").lower():
                 return True
