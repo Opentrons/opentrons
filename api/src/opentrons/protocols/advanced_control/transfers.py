@@ -436,8 +436,8 @@ class TransferPlan:
         # ii. if using single channel pipettes, flatten a multi-dimensional
         # list of Wells into a 1 dimensional list of Wells
         pipette_configuration_type = NozzleConfigurationType.FULL
-        sources: List[Union[Well, types.Location]]
-        dests: List[Union[Well, types.Location]]
+        normalized_sources: List[Union[Well, types.Location]]
+        normalized_dests: List[Union[Well, types.Location]]
         if self._api_version >= _PARTIAL_TIP_SUPPORT_ADDED:
             pipette_configuration_type = (
                 self._instr._core.get_nozzle_map().configuration
@@ -446,30 +446,36 @@ class TransferPlan:
             self._instr.channels > 1
             and pipette_configuration_type == NozzleConfigurationType.FULL
         ):
-            sources, dests = self._multichannel_transfer(srcs, dsts)
+            normalized_sources, normalized_dests = self._multichannel_transfer(
+                srcs, dsts
+            )
         else:
             if isinstance(srcs, List):
                 if isinstance(srcs[0], List):
                     # Source is a List[List[Well]]
-                    sources = [well for well_list in srcs for well in well_list]
+                    normalized_sources = [
+                        well for well_list in srcs for well in well_list
+                    ]
                 else:
-                    sources = srcs
+                    normalized_sources = srcs
             elif isinstance(srcs, Well) or isinstance(srcs, types.Location):
-                sources = [srcs]
+                normalized_sources = [srcs]
             if isinstance(dsts, List):
                 if isinstance(dsts[0], List):
                     # Dest is a List[List[Well]]
-                    dests = [well for well_list in dsts for well in well_list]
+                    normalized_dests = [
+                        well for well_list in dsts for well in well_list
+                    ]
                 else:
-                    dests = dsts
+                    normalized_dests = dsts
             elif isinstance(dsts, Well) or isinstance(dsts, types.Location):
-                dests = [dsts]
+                normalized_dests = [dsts]
 
-        total_xfers = max(len(sources), len(dests))
+        total_xfers = max(len(normalized_sources), len(normalized_dests))
 
         self._volumes = self._create_volume_list(volume, total_xfers)
-        self._sources = sources
-        self._dests = dests
+        self._sources = normalized_sources
+        self._dests = normalized_dests
         self._options = options or TransferOptions()
         self._strategy = self._options.transfer
         self._tip_opts = self._options.pick_up_tip
