@@ -40,6 +40,19 @@ export function ListItem(props: ListItemProps): JSX.Element {
   const { type, children, onClick, ...styleProps } = props
   const listItemProps = LISTITEM_PROPS_BY_TYPE[type]
 
+  const LIST_ITEM_STYLE = css`
+    background-color: ${listItemProps.backgroundColor};
+    width: 100%;
+    height: max-content;
+    padding: 0;
+    border-radius: ${BORDERS.borderRadius4};
+
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      padding: ${SPACING.spacing16} ${SPACING.spacing24};
+      border-radius: ${BORDERS.borderRadius12};
+    }
+  `
+
   return (
     <Flex
       data-testid={`ListItem_${type}`}
@@ -51,16 +64,3 @@ export function ListItem(props: ListItemProps): JSX.Element {
     </Flex>
   )
 }
-
-const LIST_ITEM_STYLE = css`
-  background-color: ${listItemProps.backgroundColor};
-  width: 100%;
-  height: max-content;
-  padding: 0;
-  border-radius: ${BORDERS.borderRadius4};
-
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    padding: ${SPACING.spacing16} ${SPACING.spacing24};
-    border-radius: ${BORDERS.borderRadius12};
-  }
-`
