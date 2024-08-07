@@ -958,7 +958,7 @@ async def test_liquid_probe_plunger_moves(
             mount_travel_distance = mount_speed * mount_travel_time
             max_z_distance -= mount_travel_distance
 
-            move_mount_z_time = (max_z_distance + probe_safe_reset_mm) / mount_speed
+            move_mount_z_time = (max_z_distance + probe_pass_z_offset_mm) / mount_speed
             p_travel_required_for_z = move_mount_z_time * config.plunger_speed
 
 
