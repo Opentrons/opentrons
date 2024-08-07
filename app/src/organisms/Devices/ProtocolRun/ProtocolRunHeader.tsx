@@ -158,6 +158,7 @@ export function ProtocolRunHeader({
     displayName,
     protocolKey,
     isProtocolAnalyzing,
+    isQuickTransfer,
   } = useProtocolDetailsForRun(runId)
   const storedProtocol = useSelector((state: State) =>
     getStoredProtocol(state, protocolKey)
@@ -302,7 +303,13 @@ export function ProtocolRunHeader({
       // Close the run if no tips are attached after running tip check at least once.
       // This marks the robot as "not busy" as soon as a run is cancelled if drop tip CTAs are unnecessary.
       if (initialPipettesWithTipsCount === 0 && !enteredER) {
-        closeCurrentRun()
+        closeCurrentRun({
+          onSuccess: () => {
+            if (isQuickTransfer) {
+              navigate(`/devices/${robotName}`)
+            }
+          },
+        })
       }
     }
   }, [runStatus, isRunCurrent, runId, enteredER])
@@ -351,7 +358,13 @@ export function ProtocolRunHeader({
       name: ANALYTICS_PROTOCOL_RUN_ACTION.FINISH,
       properties: robotAnalyticsData ?? undefined,
     })
-    closeCurrentRun()
+    closeCurrentRun({
+      onSuccess: () => {
+        if (isQuickTransfer) {
+          navigate(`/devices/${robotName}`)
+        }
+      },
+    })
   }
 
   return (
@@ -449,6 +462,22 @@ export function ProtocolRunHeader({
             }}
             isResetRunLoading={isResetRunLoadingRef.current}
             isRunCurrent={isRunCurrent}
+          />
+        ) : null}
+        {mostRecentRunId === runId && showDropTipBanner && areTipsAttached ? (
+          <ProtocolDropTipBanner
+            onLaunchWizardClick={toggleDTWiz}
+            onCloseClick={() => {
+              resetTipStatus()
+              setShowDropTipBanner(false)
+              closeCurrentRun({
+                onSuccess: () => {
+                  if (isQuickTransfer) {
+                    navigate(`/devices/${robotName}`)
+                  }
+                },
+              })
+            }}
           />
         ) : null}
         {showDTModal ? (
