@@ -141,7 +141,7 @@ export function HistoricalProtocolRunDrawer(
         </Flex>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
           {runDataFileIds.map((fileId, index) => {
-            return <CsvFileDataRow fileId={fileId} index={index} />
+            return <CsvFileDataRow key={`csv_file_${index}`} fileId={fileId} />
           })}
         </Flex>
       </Flex>
@@ -268,11 +268,10 @@ export function HistoricalProtocolRunDrawer(
 
 interface CsvFileDataRowProps {
   fileId: string
-  index: number
 }
 
 function CsvFileDataRow(props: CsvFileDataRowProps): JSX.Element | null {
-  const { fileId, index } = props
+  const { fileId } = props
 
   const { data: fileData, isSuccess } = useCsvFileQuery(fileId)
   if (!isSuccess) {
@@ -281,7 +280,6 @@ function CsvFileDataRow(props: CsvFileDataRowProps): JSX.Element | null {
   const { name, createdAt } = fileData.data
   return (
     <Flex
-      key={`csv_file_${index}`}
       justifyContent={JUSTIFY_FLEX_START}
       alignItems={ALIGN_CENTER}
       padding={SPACING.spacing12}

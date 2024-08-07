@@ -17,9 +17,7 @@ export interface CsvFileDataResponse {
   data: CsvFileData
 }
 
-export interface UploadedCsvFileResponse {
-  data: CsvFileData
-}
+export type UploadedCsvFileResponse = CsvFileDataResponse
 
 export interface UploadedCsvFilesResponse {
   data: CsvFileData[]
