@@ -123,6 +123,8 @@ describe('ProtocolSetupLabware', () => {
     expect(screen.queryByText('Map View')).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: 'List View' }))
     screen.getByText('Labware')
+    screen.getByText('Labware name')
+    screen.getByText('Location')
   })
 
   it('sends a latch-close command when the labware latch is open and the button is clicked', () => {
