@@ -49,6 +49,7 @@ interface OpenSlot {
   slot: DeckSlot
 }
 
+const WASTE_CHUTE_SPACE = 30
 const OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
   'calibrationMarkings',
   'fixedBase',
@@ -68,13 +69,13 @@ export const DeckSetup = (props: DeckSetupProps): JSX.Element => {
   const selectedTerminalItemId = useSelector(getSelectedTerminalItemId)
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
   const _disableCollisionWarnings = useSelector(getDisableModuleRestrictions)
-  const trash = Object.values(activeDeckSetup.additionalEquipmentOnDeck).find(
-    ae => ae.name === 'trashBin'
-  )
   const robotType = useSelector(getRobotType)
   const deckDef = React.useMemo(() => getDeckDefFromRobotType(robotType), [])
   const [hover, setHover] = React.useState<DeckSlot | null>(null)
   const [zoomIn, setZoomInOnSlot] = React.useState<OpenSlot | null>(null)
+  const trash = Object.values(activeDeckSetup.additionalEquipmentOnDeck).find(
+    ae => ae.name === 'trashBin'
+  )
 
   const addEquipment = (slotId: string): void => {
     const cutoutId =
@@ -149,7 +150,7 @@ export const DeckSetup = (props: DeckSetupProps): JSX.Element => {
             deckDef={deckDef}
             viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${
               hasWasteChute
-                ? deckDef.cornerOffsetFromOrigin[1] - 30
+                ? deckDef.cornerOffsetFromOrigin[1] - WASTE_CHUTE_SPACE
                 : deckDef.cornerOffsetFromOrigin[1]
             } ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`}
           >
