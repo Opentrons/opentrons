@@ -94,9 +94,6 @@ def start_initializing_hardware(
     """Initialize the hardware API singleton, attaching it to global state.
 
     Returns immediately while the hardware API initializes in the background.
-
-    Any defined callbacks will be called after the hardware API is initialized, but
-    before the post-init tasks are executed.
     """
     initialize_task = _init_task_accessor.get_from(app_state)
 
