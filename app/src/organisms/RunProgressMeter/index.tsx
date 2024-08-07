@@ -120,7 +120,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
 
   return (
     <>
-      {showIntervention && interventionProps != null
+      {showIntervention
         ? createPortal(
             <InterventionModal
               {...interventionProps}

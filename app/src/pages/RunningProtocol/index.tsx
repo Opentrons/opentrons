@@ -192,7 +192,7 @@ export function RunningProtocol(): JSX.Element {
             isActiveRun={true}
           />
         ) : null}
-        {showIntervention && interventionProps != null ? (
+        {showIntervention ? (
           <InterventionModal {...interventionProps} onResume={playRun} />
         ) : null}
         <Flex

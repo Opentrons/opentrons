@@ -58,6 +58,10 @@ export interface UseInterventionModalProps {
   analysis: CompletedProtocolAnalysis | null
 }
 
+export type UseInterventionModalResult =
+  | { showModal: false; modalProps: null }
+  | { showModal: true; modalProps: Omit<InterventionModalProps, 'onResume'> }
+
 // If showModal is true, modalProps are guaranteed not to be null.
 export function useInterventionModal({
   runData,
@@ -65,11 +69,7 @@ export function useInterventionModal({
   runStatus,
   robotName,
   analysis,
-}: UseInterventionModalProps): {
-  showModal: boolean
-  /* Props that must be truthy for the modal to render. Prevents multiple null checks while guaranteeing prop type safety. */
-  modalProps: Omit<InterventionModalProps, 'onResume'> | null
-} {
+}: UseInterventionModalProps): UseInterventionModalResult {
   const isValidIntervention =
     lastRunCommand != null &&
     robotName != null &&
