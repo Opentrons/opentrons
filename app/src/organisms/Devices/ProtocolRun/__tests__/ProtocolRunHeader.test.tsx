@@ -23,6 +23,7 @@ import {
   useEstopQuery,
   useDoorQuery,
   useInstrumentsQuery,
+  useRunCommandErrors,
 } from '@opentrons/react-api-client'
 import {
   getPipetteModelSpecs,
@@ -179,6 +180,14 @@ const PROTOCOL_DETAILS = {
   isProtocolAnalyzing: false,
   robotType: 'OT-2 Standard' as const,
 }
+
+const RUN_COMMAND_ERRORS = {
+  data: [{errorCode: '4000', errorType: "test", isDefined: false, createdAt: '9-9-9', detail:'blah blah', id:'123'}],
+  meta: {
+    cursor: 0,
+    pageLength: 1
+  }
+} as OpentronsApiClient.RunCommandErrors
 
 const mockMovingHeaterShaker = {
   id: 'heatershaker_id',
@@ -356,6 +365,9 @@ describe('ProtocolRunHeader', () => {
         ...noModulesProtocol,
         ...MOCK_ROTOCOL_LIQUID_KEY,
       } as any)
+    when(vi.mocked(useRunCommandErrors))
+      .calledWith(RUN_ID)
+      .thenReturn(RUN_COMMAND_ERRORS)
     vi.mocked(useDeckConfigurationCompatibility).mockReturnValue([])
     vi.mocked(getIsFixtureMismatch).mockReturnValue(false)
     vi.mocked(useMostRecentRunId).mockReturnValue(RUN_ID)
