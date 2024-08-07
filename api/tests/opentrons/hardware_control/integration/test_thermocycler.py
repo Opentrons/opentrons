@@ -1,6 +1,6 @@
 import asyncio
 import sys
-from typing import AsyncGenerator
+from typing import AsyncGenerator, List
 
 import anyio
 import pytest
@@ -8,7 +8,7 @@ import pytest
 from opentrons.hardware_control import ExecutionManager
 from opentrons.hardware_control.emulation.settings import Settings
 from opentrons.hardware_control.modules import Thermocycler
-from opentrons.hardware_control.modules.types import TemperatureStatus
+from opentrons.hardware_control.modules.types import TemperatureStatus, ThermocyclerStep
 
 from .build_module import build_module
 
@@ -95,7 +95,7 @@ async def test_cycle_temperatures(thermocycler: Thermocycler) -> None:
     assert thermocycler.total_cycle_count is None
     assert thermocycler.total_step_count is None
 
-    steps = [
+    steps: list[ThermocyclerStep] = [
         {
             "temperature": 70.0,
         },
@@ -164,7 +164,7 @@ async def test_cycle_cannot_be_interrupted_by_pause(
     # This list must be long enough that we can reliably target a pause somewhere
     # in the middle of it, but not so long that makes the test take a disruptively
     # long time.
-    steps = [
+    steps: list[ThermocyclerStep] = [
         {"temperature": temp_1, "hold_time_seconds": poll_interval_seconds * 2},
         {"temperature": temp_2, "hold_time_seconds": poll_interval_seconds * 2},
         {"temperature": temp_1, "hold_time_seconds": poll_interval_seconds * 2},
@@ -227,7 +227,7 @@ async def test_cycle_can_be_blocked_by_preexisting_pause(
     # as an approximation of asserting that it blocks forever.
     with pytest.raises(TimeoutError):
         with anyio.fail_after(0.5):
-            steps = [{"temperature": temp_2}]
+            steps: List[ThermocyclerStep] = [{"temperature": temp_2}]
             await thermocycler.cycle_temperatures(steps=steps, repetitions=1)
 
     # Assert that the cycle didn't have any effect.
@@ -240,7 +240,7 @@ async def test_cycle_can_be_cancelled(
     execution_manager: ExecutionManager,
 ) -> None:
     """A cycle should be cancellable (even though it isn't pausable)."""
-    steps = [
+    steps: List[ThermocyclerStep] = [
         {"temperature": 20.0, "hold_time_minutes": 99999},
     ]
 
