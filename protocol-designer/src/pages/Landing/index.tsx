@@ -8,6 +8,7 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  PRODUCT,
   PrimaryButton,
   SPACING,
   StyledText,
@@ -46,30 +47,28 @@ export function Landing(): JSX.Element {
         aria-label="welcome image"
       />
       <StyledText
-        desktopStyle="headingLargeBold"
+        as="h2"
         marginTop={SPACING.spacing16}
         marginBottom={SPACING.spacing16}
       >
         {t('welcome')}
       </StyledText>
       <StyledText
-        desktopStyle="headingSmallRegular"
+        as="h4"
         color={COLORS.grey60}
         maxWidth="34.25rem"
         textAlign={TYPOGRAPHY.textAlignCenter}
+        fontWeight={PRODUCT.TYPOGRAPHY.fontWeightRegular}
+        lineHeight={PRODUCT.TYPOGRAPHY.lineHeightHeadingSmallRegular}
       >
         {t('no-code-solution')}
       </StyledText>
       {/* TODO(ja, 8/7/24): replace this with LargeButton https://opentrons.atlassian.net/browse/AUTH-622 */}
       <PrimaryButton margin={SPACING.spacing32}>
-        <StyledNavLink to={'/createNew'}>
-          <StyledText desktopStyle="bodyLargeRegular">
-            {t('create_new')}
-          </StyledText>
-        </StyledNavLink>
+        <StyledNavLink to={'/createNew'}>{t('create_new')}</StyledNavLink>
       </PrimaryButton>
       <StyledLabel>
-        <StyledText desktopStyle="bodyLargeRegular" color={COLORS.grey60}>
+        <StyledText as="p" color={COLORS.grey60}>
           {t('import_existing')}
         </StyledText>
         <input type="file" onChange={loadFile}></input>
