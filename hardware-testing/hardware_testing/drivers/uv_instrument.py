@@ -94,11 +94,11 @@ class uv_Driver:
                 time.sleep(0.1)
                 # 读取响应数据
                 response_frame = self.particle_counter.read_all()
-                print("Modbus响应帧:", response_frame.hex())
+                #print("Modbus响应帧:", response_frame.hex())
                 modbus_data_hex = response_frame.hex()
 
             except Exception as e:
-                print(f"发生错误: {e}")
+                print(f"获取UV测试仪器值发生错误: {e}")
                 
             # 解析 Modbus 数据
             device_address = modbus_data_hex[0:2]
