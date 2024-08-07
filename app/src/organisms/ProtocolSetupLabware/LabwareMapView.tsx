@@ -72,6 +72,7 @@ export function LabwareMapView(props: LabwareMapViewProps): JSX.Element {
           : undefined,
       highlightLabware: true,
       moduleChildren: null,
+      stacked: topLabwareDefinition != null && topLabwareId != null,
     }
   })
 
