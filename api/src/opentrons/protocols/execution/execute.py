@@ -54,6 +54,8 @@ def run_protocol(
                     if isinstance(parameter, CSVParameter):
                         try:
                             parameter.file.close()
+                        # This will be raised if the csv file wasn't set, which means it was never opened,
+                        # so we can safely skip this.
                         except RuntimeParameterRequired:
                             pass
     else:
