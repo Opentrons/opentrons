@@ -32,12 +32,14 @@ import {
   RUN_STATUS_FAILED,
   RUN_STATUS_STOPPED,
   RUN_STATUS_SUCCEEDED,
+  RUN_STATUSES_TERMINAL,
 } from '@opentrons/api-client'
 import {
   useHost,
   useProtocolQuery,
   useInstrumentsQuery,
   useDeleteRunMutation,
+  useRunCommandErrors,
 } from '@opentrons/react-api-client'
 
 import { LargeButton } from '../../atoms/buttons'
@@ -144,6 +146,14 @@ export function RunSummary(): JSX.Element {
     localRobot?.health?.robot_serial ??
     localRobot?.serverHealth?.serialNumber ??
     null
+
+  const { data: commandErrorList } = useRunCommandErrors(runId, null, {
+    enabled:
+      runStatus != null &&
+      // @ts-expect-error runStatus expected to possibly not be terminal
+      RUN_STATUSES_TERMINAL.includes(runStatus) &&
+      isRunCurrent,
+  })
 
   let headerText = t('run_complete_splash')
   if (runStatus === RUN_STATUS_FAILED) {
@@ -321,6 +331,7 @@ export function RunSummary(): JSX.Element {
               runId={runId}
               setShowRunFailedModal={setShowRunFailedModal}
               errors={runRecord?.data.errors}
+              commandErrorList={commandErrorList}
             />
           ) : null}
           <Flex
