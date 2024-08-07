@@ -12,11 +12,11 @@ import {
   Flex,
   LegacyStyledText,
   SPACING,
+  RadioButton,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useAllCsvFilesQuery } from '@opentrons/react-api-client'
 
-import { RadioButton } from '../../atoms/buttons'
 import { getShellUpdateDataFiles } from '../../redux/shell'
 import { ChildNavigation } from '../ChildNavigation'
 import { EmptyFile } from './EmptyFile'
