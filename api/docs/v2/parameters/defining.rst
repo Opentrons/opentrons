@@ -71,7 +71,9 @@ Within this function definition, call methods on ``parameters`` to define parame
 Types of Parameters
 ===================
 
-The API supports four types of parameters: Boolean (:py:class:`bool`), integer (:py:class:`int`), floating point number (:py:class:`float`), and string (:py:class:`str`). It is not possible to mix types within a single parameter.
+The API supports four types of parameters that correspond to Python built-in types: Boolean (:py:class:`bool`), integer (:py:class:`int`), floating point number (:py:class:`float`), and string (:py:class:`str`). It is not possible to mix types within a single parameter.
+
+In addition, starting in version 2.20, the API supports CSV files as parameters. All data contained in CSV parameters, including numeric data, is initially interpreted as strings. See :ref:`using-rtp-types` for more information on manipulating CSV values.
 
 Boolean Parameters
 ------------------
@@ -179,3 +181,22 @@ A common use for string display names is to provide an easy-to-read version of a
 During run setup, the technician can choose from a menu of the provided choices.
 
 .. versionadded:: 2.18
+
+CSV Parameters
+--------------
+
+CSV parameters accept any valid comma-separated file. You don't need to specify the format of the data. Due to this flexibility, they do not have default values.
+
+Briefly describe the purpose of your CSV parameter when defining it.
+
+.. code-block::
+
+    parameters.add_csv_file(
+        variable_name="cherrypicking_wells",
+        display_name="Cherrypicking wells",
+        description="Table of labware, wells, and volumes to transfer."
+    )
+
+Separately provide standard operating procedures or template files to the scientists and technicians who will create the tabular data your protocol relies on.
+
+.. versionadded:: 2.20

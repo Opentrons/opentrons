@@ -28,6 +28,8 @@ Then ``params`` will gain three attributes: ``params.dry_run``, ``params.sample_
 
 You can also save parameter values to variables with names of your choosing.
 
+.. _using-rtp-types:
+
 Parameter Types
 ===============
 
