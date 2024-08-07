@@ -3,14 +3,18 @@
   "amount": "Amount:",
   "cancel": "Cancel",
   "confirm_reorder": "Are you sure you want to reorder these steps, it may cause errors?",
+  "create_new_protocol": "Create new protocol",
   "create_new": "Create new",
-  "create_opentrons_protocol": "Create Opentrons protocol",
+  "confirm_import": "Are you sure you want to upload this protocol?",
   "done": "Done",
   "edit": "edit",
   "exit": "exit",
   "go_back": "go back",
+  "import_existing": "Import existing protocol",
   "import": "Import",
   "next": "next",
+  "no-code-solution": "A no-code solution to create protocols that x, y and z meaning for your lab and workflow.",
   "remove": "remove",
-  "step": "Step {{current}} / {{max}}"
+  "step": "Step {{current}} / {{max}}",
+  "welcome": "Welcome to Protocol Designer"
 }
