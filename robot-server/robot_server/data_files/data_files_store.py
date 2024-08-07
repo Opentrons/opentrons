@@ -145,26 +145,17 @@ class DataFilesStore:
                 transaction.execute(select_ids_used_in_runs).scalars().all()
             )
             if len(files_used_in_analyses) + len(files_used_in_runs) > 0:
-                analysis_usage_text = (
-                    f" analyses: {files_used_in_analyses}"
-                    if len(files_used_in_analyses) > 0
-                    else None
-                )
-                runs_usage_text = (
-                    f" runs: {files_used_in_runs}"
-                    if len(files_used_in_runs) > 0
-                    else None
-                )
-                conjunction = " and " if analysis_usage_text and runs_usage_text else ""
+
                 raise FileInUseError(
                     data_file_id=file_id,
-                    message=f"Cannot remove file {file_id} as it is being used in"
-                    f" existing{analysis_usage_text or ''}{conjunction}{runs_usage_text or ''}.",
+                    ids_used_in_runs=files_used_in_runs,
+                    ids_used_in_analyses=files_used_in_analyses,
                 )
-            transaction.execute(delete_statement)
-
+            result = transaction.execute(delete_statement)
+        if result.rowcount < 1:
+            raise FileIdNotFoundError(file_id)
         file_dir = self._data_files_directory.joinpath(file_id)
-        if file_dir:
+        if file_dir.exists():
             for file in file_dir.glob("*"):
                 file.unlink()
             file_dir.rmdir()
