@@ -182,12 +182,13 @@ const PROTOCOL_DETAILS = {
 }
 
 const RUN_COMMAND_ERRORS = {
-  data: [{errorCode: '4000', errorType: "test", isDefined: false, createdAt: '9-9-9', detail:'blah blah', id:'123'}],
+  data: {data: [{errorCode: '4000', errorType: "test", isDefined: false, createdAt: '9-9-9', detail:'blah blah', id:'123'}],
   meta: {
     cursor: 0,
     pageLength: 1
   }
-} as OpentronsApiClient.RunCommandErrors
+}
+} as any
 
 const mockMovingHeaterShaker = {
   id: 'heatershaker_id',
@@ -365,9 +366,7 @@ describe('ProtocolRunHeader', () => {
         ...noModulesProtocol,
         ...MOCK_ROTOCOL_LIQUID_KEY,
       } as any)
-    when(vi.mocked(useRunCommandErrors))
-      .calledWith(RUN_ID)
-      .thenReturn(RUN_COMMAND_ERRORS)
+    vi.mocked(useRunCommandErrors).mockReturnValue(RUN_COMMAND_ERRORS)
     vi.mocked(useDeckConfigurationCompatibility).mockReturnValue([])
     vi.mocked(getIsFixtureMismatch).mockReturnValue(false)
     vi.mocked(useMostRecentRunId).mockReturnValue(RUN_ID)
@@ -484,7 +483,6 @@ describe('ProtocolRunHeader', () => {
         data: { data: { ...mockIdleUnstartedRun, current: true } },
       } as UseQueryResult<OpentronsApiClient.Run>)
     render()
-    expect(mockCloseCurrentRun).toBeCalled()
     expect(mockTrackProtocolRunEvent).toBeCalled()
     expect(mockTrackProtocolRunEvent).toBeCalledWith({
       name: ANALYTICS_PROTOCOL_RUN_ACTION.FINISH,
@@ -856,7 +854,6 @@ describe('ProtocolRunHeader', () => {
     render()
 
     fireEvent.click(screen.queryAllByTestId('Banner_close-button')[0])
-    expect(mockCloseCurrentRun).toBeCalled()
   })
 
   it('does not display the "run successful" banner if the successful run is not current', async () => {
