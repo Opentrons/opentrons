@@ -2731,7 +2731,7 @@ class OT3API(
         #  starting_position.z + z_distance of pass - pos.z should be < max_z_dist
         # due to rounding errors this can get caught in an infinite loop when the distance is almost equal
         # so we check to see if they're within 0.01 which is 1/5th the minimum movement distance from move_utils.py
-        while (starting_position.z - current_position.z) < (max_z_dist + 0.01):
+        while (starting_position.z - current_position.z) < (max_z_dist - 0.01):
             await prep_plunger_for_probe_move(
                 position=current_position,
                 aspirate_while_sensing=probe_settings.aspirate_while_sensing,
