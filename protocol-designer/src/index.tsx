@@ -24,7 +24,6 @@ const root = ReactDOM.createRoot(container)
 
 const RootComponent = (): JSX.Element => {
   const enableRedesign = useSelector(getEnableRedesign)
-  console.log('enableRedesign', enableRedesign)
 
   return (
     <>
