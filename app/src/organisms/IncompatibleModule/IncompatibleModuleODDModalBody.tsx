@@ -10,10 +10,10 @@ import {
   OVERFLOW_SCROLL,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
-import type { AttachedModule } from '@opentrons/api-client'
-import { Modal } from '../../molecules/Modal'
+import { OddModal } from '../../molecules/OddModal'
 import { ListItem } from '../../atoms/ListItem'
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
+import type { AttachedModule } from '@opentrons/api-client'
+import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
 export interface IncompatibleModuleODDModalBodyProps {
   modules: AttachedModule[]
 }
@@ -22,11 +22,11 @@ export function IncompatibleModuleODDModalBody({
   modules,
 }: IncompatibleModuleODDModalBodyProps): JSX.Element {
   const { t } = useTranslation('incompatible_modules')
-  const incompatibleModuleHeader: ModalHeaderBaseProps = {
+  const incompatibleModuleHeader: OddModalHeaderBaseProps = {
     title: capitalize(t('incompatible_modules_attached') as string),
   }
   return (
-    <Modal header={incompatibleModuleHeader}>
+    <OddModal header={incompatibleModuleHeader}>
       <Flex flexDirection={DIRECTION_COLUMN} width="100%">
         <LegacyStyledText as="p" marginBottom={SPACING.spacing32}>
           <Trans t={t} i18nKey="remove_before_running_protocol" />
@@ -50,6 +50,6 @@ export function IncompatibleModuleODDModalBody({
           ))}
         </Flex>
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }

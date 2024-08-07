@@ -8,11 +8,11 @@ import {
 } from '@opentrons/api-client'
 import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 
-import { useCurrentRunId } from '../../../ProtocolUpload/hooks'
+import { useCurrentRunId } from '../../../../resources/runs'
 import { useRunStatus } from '../../../RunTimeControl/hooks'
 import { useRunStatuses } from '..'
 
-vi.mock('../../../ProtocolUpload/hooks')
+vi.mock('../../../../resources/runs')
 vi.mock('../../../RunTimeControl/hooks')
 
 describe(' useRunStatuses ', () => {

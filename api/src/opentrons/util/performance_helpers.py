@@ -1,9 +1,9 @@
-"""Performance helpers for tracking robot context."""
+"""Performance helpers for tracking robot activity."""
 
 import functools
 from pathlib import Path
 
-from opentrons_shared_data.robot.dev_types import RobotTypeEnum
+from opentrons_shared_data.robot.types import RobotTypeEnum
 import typing
 from opentrons.config import (
     get_performance_metrics_data_dir,
@@ -12,7 +12,7 @@ from opentrons.config import (
 )
 
 if typing.TYPE_CHECKING:
-    from performance_metrics import RobotContextState, SupportsTracking
+    from performance_metrics import RobotActivityState, SupportsTracking
 
 
 _UnderlyingFunctionParameters = typing.ParamSpec("_UnderlyingFunctionParameters")
@@ -36,7 +36,7 @@ class _StubbedTracker:
 
     def track(
         self,
-        state: "RobotContextState",
+        state: "RobotActivityState",
     ) -> typing.Callable[
         [_UnderlyingFunction[_UnderlyingFunctionParameters, _UnderlyingFunctionReturn]],
         _UnderlyingFunction[_UnderlyingFunctionParameters, _UnderlyingFunctionReturn],
@@ -72,38 +72,38 @@ def _handle_package_import() -> typing.Type["SupportsTracking"]:
     If the package is not available, return a stubbed tracker.
     """
     try:
-        from performance_metrics import RobotContextTracker
+        from performance_metrics import RobotActivityTracker
 
-        return RobotContextTracker
+        return RobotActivityTracker
     except ImportError:
         return _StubbedTracker
 
 
 _package_to_use = _handle_package_import()
-_robot_context_tracker: typing.Optional["SupportsTracking"] = None
+_robot_activity_tracker: typing.Optional["SupportsTracking"] = None
 
 # TODO: derek maggio (06-03-2024): investigate if _should_track should be
-# reevaluated each time _get_robot_context_tracker is called. I think this
+# reevaluated each time _get_robot_activity_tracker is called. I think this
 # might get stuck in a state where after the first call, _should_track is
 # always considered the initial value. It might miss changes to the feature
 # flag. The easiest way to test this is on a robot when that is working.
 
 
-def _get_robot_context_tracker() -> "SupportsTracking":
-    """Singleton for the robot context tracker."""
-    global _robot_context_tracker
-    if _robot_context_tracker is None:
-        _robot_context_tracker = _package_to_use(
+def _get_robot_activity_tracker() -> "SupportsTracking":
+    """Singleton for the robot activity tracker."""
+    global _robot_activity_tracker
+    if _robot_activity_tracker is None:
+        _robot_activity_tracker = _package_to_use(
             get_performance_metrics_data_dir(), _should_track
         )
-    return _robot_context_tracker
+    return _robot_activity_tracker
 
 
 def _track_a_function(
-    state_name: "RobotContextState",
+    state_name: "RobotActivityState",
     func: _UnderlyingFunction[_UnderlyingFunctionParameters, _UnderlyingFunctionReturn],
 ) -> typing.Callable[_UnderlyingFunctionParameters, _UnderlyingFunctionReturn]:
-    """Track a function.
+    """Wrap a passed function with RobotActivityTracker.track.
 
     This function is a decorator that will track the given state for the
     decorated function.
@@ -115,7 +115,7 @@ def _track_a_function(
     Returns:
         The decorated function.
     """
-    tracker: SupportsTracking = _get_robot_context_tracker()
+    tracker: SupportsTracking = _get_robot_activity_tracker()
     wrapped = tracker.track(state=state_name)(func)
 
     @functools.wraps(func)

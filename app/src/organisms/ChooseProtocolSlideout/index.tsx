@@ -1,7 +1,7 @@
 import * as React from 'react'
 import first from 'lodash/first'
 import { Trans, useTranslation } from 'react-i18next'
-import { Link, NavLink, useHistory } from 'react-router-dom'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 
@@ -36,7 +36,6 @@ import {
 import { sortRuntimeParameters } from '@opentrons/shared-data'
 
 import { useLogger } from '../../logger'
-import { useFeatureFlag } from '../../redux/config'
 import { OPENTRONS_USB } from '../../redux/discovery'
 import { getStoredProtocols } from '../../redux/protocol-storage'
 import { appShellRequestor } from '../../redux/shell/remote'
@@ -52,7 +51,10 @@ import { useCreateRunFromProtocol } from '../ChooseRobotToRunProtocolSlideout/us
 import { ApplyHistoricOffsets } from '../ApplyHistoricOffsets'
 import { useOffsetCandidatesForAnalysis } from '../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { FileCard } from '../ChooseRobotSlideout/FileCard'
-import { getRunTimeParameterValuesForRun } from '../Devices/utils'
+import {
+  getRunTimeParameterFilesForRun,
+  getRunTimeParameterValuesForRun,
+} from '../Devices/utils'
 import { getAnalysisStatus } from '../ProtocolsLanding/utils'
 
 import type { DropdownOption } from '@opentrons/components'
@@ -86,7 +88,7 @@ export function ChooseProtocolSlideoutComponent(
   props: ChooseProtocolSlideoutProps
 ): JSX.Element | null {
   const { t } = useTranslation(['device_details', 'shared'])
-  const history = useHistory()
+  const navigate = useNavigate()
   const logger = useLogger(new URL('', import.meta.url).pathname)
   const [targetProps, tooltipProps] = useTooltip()
   const [targetPropsHover, tooltipPropsHover] = useHoverTooltip()
@@ -114,7 +116,6 @@ export function ChooseProtocolSlideoutComponent(
     ) ?? false
   )
   const [isInputFocused, setIsInputFocused] = React.useState<boolean>(false)
-  const enableCsvFile = useFeatureFlag('enableCsvFile')
 
   React.useEffect(() => {
     setRunTimeParametersOverrides(
@@ -187,7 +188,7 @@ export function ChooseProtocolSlideoutComponent(
           name: 'createProtocolRecordResponse',
           properties: { success: true },
         })
-        history.push(`/devices/${name}/protocol-runs/${runData.id}`)
+        navigate(`/devices/${name}/protocol-runs/${runData.id}`)
       },
       onError: (error: Error) => {
         trackCreateProtocolRunEvent({
@@ -217,7 +218,7 @@ export function ChooseProtocolSlideoutComponent(
             : acc,
         {}
       )
-      Promise.all(
+      void Promise.all(
         Object.entries(dataFilesForProtocolMap).map(([key, file]) => {
           const fileResponse = uploadCsvFile(file)
           const varName = Promise.resolve(key)
@@ -230,6 +231,9 @@ export function ChooseProtocolSlideoutComponent(
           return { ...acc, [variableName]: uploadedFileResponse.data.id }
         }, {})
         const runTimeParameterValues = getRunTimeParameterValuesForRun(
+          runTimeParametersOverrides
+        )
+        const runTimeParameterFiles = getRunTimeParameterFilesForRun(
           runTimeParametersOverrides,
           mappedResolvedCsvVariableToFileId
         )
@@ -237,6 +241,7 @@ export function ChooseProtocolSlideoutComponent(
           files: srcFileObjects,
           protocolKey: selectedProtocol.protocolKey,
           runTimeParameterValues,
+          runTimeParameterFiles,
         })
       })
     } else {
@@ -426,11 +431,12 @@ export function ChooseProtocolSlideoutComponent(
               if (error != null) {
                 errors.push(error as string)
               }
-              return !enableCsvFile ? null : (
+              return (
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
                   alignItems={ALIGN_CENTER}
                   gridgap={SPACING.spacing8}
+                  key={runtimeParam.variableName}
                 >
                   <Flex
                     flexDirection={DIRECTION_COLUMN}

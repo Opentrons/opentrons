@@ -6,7 +6,7 @@ import pytest
 from decoy import Decoy
 from decoy import errors
 
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.pipette.types import PipetteNameType
 
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.dev_types import PipetteDict
@@ -1315,13 +1315,55 @@ def test_configure_for_volume_post_219(
         )
 
 
-@pytest.mark.parametrize("version", versions_at_or_above(APIVersion(2, 20)))
+@pytest.mark.parametrize(
+    ("returned_from_engine", "expected_return_from_core"),
+    [
+        (None, False),
+        (0, True),
+        (1, True),
+    ],
+)
+def test_detect_liquid_presence(
+    returned_from_engine: Optional[float],
+    expected_return_from_core: bool,
+    decoy: Decoy,
+    mock_protocol_core: ProtocolCore,
+    mock_engine_client: EngineClient,
+    subject: InstrumentCore,
+) -> None:
+    """It should convert a height result from the engine to True/False."""
+    well_core = WellCore(
+        name="my cool well", labware_id="123abc", engine_client=mock_engine_client
+    )
+    decoy.when(
+        mock_engine_client.execute_command_without_recovery(
+            cmd.TryLiquidProbeParams(
+                pipetteId=subject.pipette_id,
+                wellLocation=WellLocation(
+                    origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0)
+                ),
+                wellName=well_core.get_name(),
+                labwareId=well_core.labware_id,
+            )
+        )
+    ).then_return(
+        cmd.TryLiquidProbeResult.construct(
+            z_position=returned_from_engine,
+            position=object(),  # type: ignore[arg-type]
+        )
+    )
+    loc = Location(Point(0, 0, 0), None)
+
+    result = subject.detect_liquid_presence(well_core=well_core, loc=loc)
+    assert result == expected_return_from_core
+
+    decoy.verify(mock_protocol_core.set_last_location(loc, mount=subject.get_mount()))
+
+
 def test_liquid_probe_without_recovery(
     decoy: Decoy,
     mock_engine_client: EngineClient,
-    mock_protocol_core: ProtocolCore,
     subject: InstrumentCore,
-    version: APIVersion,
 ) -> None:
     """It should raise an exception on an empty well and return a float on a valid well."""
     well_core = WellCore(
@@ -1332,7 +1374,7 @@ def test_liquid_probe_without_recovery(
             cmd.LiquidProbeParams(
                 pipetteId=subject.pipette_id,
                 wellLocation=WellLocation(
-                    origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0)
+                    origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=2)
                 ),
                 wellName=well_core.get_name(),
                 labwareId=well_core.labware_id,
@@ -1340,21 +1382,14 @@ def test_liquid_probe_without_recovery(
         )
     ).then_raise(PipetteLiquidNotFoundError())
     loc = Location(Point(0, 0, 0), None)
-    try:
+    with pytest.raises(PipetteLiquidNotFoundError):
         subject.liquid_probe_without_recovery(well_core=well_core, loc=loc)
-    except PipetteLiquidNotFoundError:
-        assert True
-    else:
-        assert False
 
 
-@pytest.mark.parametrize("version", versions_at_or_above(APIVersion(2, 20)))
 def test_liquid_probe_with_recovery(
     decoy: Decoy,
     mock_engine_client: EngineClient,
-    mock_protocol_core: ProtocolCore,
     subject: InstrumentCore,
-    version: APIVersion,
 ) -> None:
     """It should not raise an exception on an empty well."""
     well_core = WellCore(
@@ -1367,7 +1402,7 @@ def test_liquid_probe_with_recovery(
             cmd.LiquidProbeParams(
                 pipetteId=subject.pipette_id,
                 wellLocation=WellLocation(
-                    origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0)
+                    origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=2.0)
                 ),
                 wellName=well_core.get_name(),
                 labwareId=well_core.labware_id,

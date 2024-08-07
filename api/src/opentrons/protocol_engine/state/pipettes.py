@@ -13,6 +13,9 @@ from opentrons.hardware_control.nozzle_manager import (
 )
 from opentrons.protocol_engine.actions.actions import FailCommandAction
 from opentrons.protocol_engine.commands.aspirate import Aspirate
+from opentrons.protocol_engine.commands.dispense import Dispense
+from opentrons.protocol_engine.commands.aspirate_in_place import AspirateInPlace
+from opentrons.protocol_engine.commands.dispense_in_place import DispenseInPlace
 from opentrons.protocol_engine.commands.command import DefinedErrorData
 from opentrons.protocol_engine.commands.pipetting_common import (
     OverpressureError,
@@ -50,6 +53,7 @@ from ..commands import (
     RetractAxisResult,
     BlowOutResult,
     BlowOutInPlaceResult,
+    unsafe,
     TouchTipResult,
     thermocycler,
     heater_shaker,
@@ -97,6 +101,8 @@ class PipetteBoundingBoxOffsets:
 
     back_left_corner: Point
     front_right_corner: Point
+    back_right_corner: Point
+    front_left_corner: Point
 
 
 @dataclass(frozen=True)
@@ -194,6 +200,16 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 pipette_bounding_box_offsets=PipetteBoundingBoxOffsets(
                     back_left_corner=config.back_left_corner_offset,
                     front_right_corner=config.front_right_corner_offset,
+                    back_right_corner=Point(
+                        config.front_right_corner_offset.x,
+                        config.back_left_corner_offset.y,
+                        config.back_left_corner_offset.z,
+                    ),
+                    front_left_corner=Point(
+                        config.back_left_corner_offset.x,
+                        config.front_right_corner_offset.y,
+                        config.back_left_corner_offset.z,
+                    ),
                 ),
                 bounding_nozzle_offsets=BoundingNozzlesOffsets(
                     back_left_offset=config.nozzle_map.back_left_nozzle_offset,
@@ -263,7 +279,10 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                     default_dispense=tip_configuration.default_dispense_flowrate.values_by_api_level,
                 )
 
-        elif isinstance(command.result, (DropTipResult, DropTipInPlaceResult)):
+        elif isinstance(
+            command.result,
+            (DropTipResult, DropTipInPlaceResult, unsafe.UnsafeDropTipInPlaceResult),
+        ):
             pipette_id = command.params.pipetteId
             self._state.aspirated_volume_by_id[pipette_id] = None
             self._state.attached_tip_by_id[pipette_id] = None
@@ -304,7 +323,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             )
         elif (
             isinstance(action, FailCommandAction)
-            and isinstance(action.running_command, Aspirate)
+            and isinstance(action.running_command, (Aspirate, Dispense))
             and isinstance(action.error, DefinedErrorData)
             and isinstance(action.error.public, OverpressureError)
         ):
@@ -400,7 +419,10 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             )
         elif (
             isinstance(action, FailCommandAction)
-            and isinstance(action.running_command, Aspirate)
+            and isinstance(
+                action.running_command,
+                (Aspirate, Dispense, AspirateInPlace, DispenseInPlace),
+            )
             and isinstance(action.error, DefinedErrorData)
             and isinstance(action.error.public, OverpressureError)
         ):
@@ -465,7 +487,8 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             self._state.aspirated_volume_by_id[pipette_id] = next_volume
 
         elif isinstance(action, SucceedCommandAction) and isinstance(
-            action.command.result, (BlowOutResult, BlowOutInPlaceResult)
+            action.command.result,
+            (BlowOutResult, BlowOutInPlaceResult, unsafe.UnsafeBlowOutInPlaceResult),
         ):
             pipette_id = action.command.params.pipetteId
             self._state.aspirated_volume_by_id[pipette_id] = None
@@ -788,6 +811,10 @@ class PipetteView(HasState[PipetteState]):
         """Get the nozzle offsets of the pipette's bounding nozzles."""
         return self.get_config(pipette_id).bounding_nozzle_offsets
 
+    def get_pipette_bounding_box(self, pipette_id: str) -> PipetteBoundingBoxOffsets:
+        """Get the bounding box of the pipette."""
+        return self.get_config(pipette_id).pipette_bounding_box_offsets
+
     def get_pipette_bounds_at_specified_move_to_position(
         self,
         pipette_id: str,
@@ -796,6 +823,7 @@ class PipetteView(HasState[PipetteState]):
         """Get the pipette's bounding offsets when primary nozzle is at the given position."""
         primary_nozzle_offset = self.get_primary_nozzle_offset(pipette_id)
         tip = self.get_attached_tip(pipette_id)
+        # TODO update this for pipette robot stackup
         # Primary nozzle position at destination, in deck coordinates
         primary_nozzle_position = destination_position + Point(
             x=0, y=0, z=tip.length if tip else 0

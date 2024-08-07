@@ -3,7 +3,7 @@ import pytest
 import typeguard
 
 from opentrons_shared_data import load_shared_data
-from opentrons_shared_data.protocol.dev_types import (
+from opentrons_shared_data.protocol.types import (
     JsonProtocolV3,
     JsonProtocolV4,
     JsonProtocolV5,

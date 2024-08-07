@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import {
   ALIGN_CENTER,
@@ -37,7 +37,7 @@ export function WifiConnectionDetails({
   authType,
 }: WifiConnectionDetailsProps): JSX.Element {
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
-  const history = useHistory()
+  const navigate = useNavigate()
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const dispatch = useDispatch<Dispatch>()
@@ -95,7 +95,7 @@ export function WifiConnectionDetails({
               flex="1"
               buttonText={i18n.format(t('continue'), 'capitalize')}
               onClick={() => {
-                history.push('/robot-settings/update-robot-during-onboarding')
+                navigate('/robot-settings/update-robot-during-onboarding')
               }}
             />
           </Flex>

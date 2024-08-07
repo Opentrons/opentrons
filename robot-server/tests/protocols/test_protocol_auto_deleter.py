@@ -46,7 +46,7 @@ def test_make_room_for_new_protocol(
             created_at=datetime(year=2020, month=1, day=1),
             source=mock_protocol_source,
             protocol_key=f"{p.protocol_id}{idx}",
-            protocol_kind=ProtocolKind.STANDARD.value,
+            protocol_kind=ProtocolKind.STANDARD,
         )
         for idx, p in enumerate(usage_info)
     ]
@@ -96,9 +96,9 @@ def test_make_room_for_new_quick_transfer_protocol(
             created_at=datetime(year=2020, month=1, day=1),
             source=mock_protocol_source,
             protocol_key=f"{p.protocol_id}{idx}",
-            protocol_kind=ProtocolKind.STANDARD.value
+            protocol_kind=ProtocolKind.STANDARD
             if idx not in [3, 4]
-            else ProtocolKind.QUICK_TRANSFER.value,
+            else ProtocolKind.QUICK_TRANSFER,
         )
         for idx, p in enumerate(usage_info_all)
     ]

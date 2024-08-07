@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useQueryClient } from 'react-query'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
@@ -20,10 +20,10 @@ import {
 import { useHost, useProtocolQuery } from '@opentrons/react-api-client'
 
 import { SmallButton } from '../../atoms/buttons'
-import { Modal } from '../../molecules/Modal'
+import { OddModal } from '../../molecules/OddModal'
 import { useToaster } from '../../organisms/ToasterOven'
 
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
+import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
 
 interface DeleteTransferConfirmationModalProps {
   transferId: string
@@ -35,10 +35,10 @@ export function DeleteTransferConfirmationModal({
   setShowDeleteConfirmationModal,
 }: DeleteTransferConfirmationModalProps): JSX.Element {
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
-  const history = useHistory()
+  const navigate = useNavigate()
   const { makeSnackbar } = useToaster()
   const [showIcon, setShowIcon] = React.useState<boolean>(false)
-  const modalHeader: ModalHeaderBaseProps = {
+  const modalHeader: OddModalHeaderBaseProps = {
     title: t('delete_this_transfer'),
     iconName: 'ot-alert',
     iconColor: COLORS.yellow50,
@@ -77,11 +77,11 @@ export function DeleteTransferConfirmationModal({
         .then(() => {
           setShowIcon(false)
           setShowDeleteConfirmationModal(false)
-          history.push('/quick-transfer')
+          navigate('/quick-transfer')
           makeSnackbar(t('deleted_transfer') as string)
         })
         .catch((e: Error) => {
-          history.push('/quick-transfer')
+          navigate('/quick-transfer')
           console.error(`error deleting resources: ${e.message}`)
         })
     } else {
@@ -91,7 +91,7 @@ export function DeleteTransferConfirmationModal({
     }
   }
   return (
-    <Modal header={modalHeader}>
+    <OddModal header={modalHeader}>
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing32}
@@ -121,7 +121,7 @@ export function DeleteTransferConfirmationModal({
           />
         </Flex>
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }
 

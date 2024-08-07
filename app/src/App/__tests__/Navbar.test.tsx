@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { describe, it } from 'vitest'
 import { screen, render } from '@testing-library/react'
-import { StaticRouter } from 'react-router-dom'
+import { MemoryRouter } from 'react-router-dom'
 
 import { Navbar } from '../Navbar'
 
@@ -16,9 +16,9 @@ const ROUTE_PROPS: RouteProps[] = [
 describe('Navbar', () => {
   it('should render a NavbarLink for every nav location', () => {
     render(
-      <StaticRouter>
+      <MemoryRouter>
         <Navbar routes={ROUTE_PROPS} />
-      </StaticRouter>
+      </MemoryRouter>
     )
     screen.getByRole('link', { name: 'foo' })
     screen.getByRole('link', { name: 'bar' })
@@ -26,9 +26,9 @@ describe('Navbar', () => {
   })
   it('should render logo, settings, and help', () => {
     render(
-      <StaticRouter>
+      <MemoryRouter>
         <Navbar routes={ROUTE_PROPS} />
-      </StaticRouter>
+      </MemoryRouter>
     )
     screen.getByRole('img', { name: 'opentrons logo' })
     screen.getByTestId('Navbar_settingsLink')

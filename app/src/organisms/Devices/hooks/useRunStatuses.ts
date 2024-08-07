@@ -6,7 +6,7 @@ import {
   RUN_STATUS_PAUSED,
   RUN_STATUS_RUNNING,
 } from '@opentrons/api-client'
-import { useCurrentRunId } from '../../ProtocolUpload/hooks'
+import { useCurrentRunId } from '../../../resources/runs'
 import { useRunStatus } from '../../RunTimeControl/hooks'
 
 import type { RunStatus } from '@opentrons/api-client'

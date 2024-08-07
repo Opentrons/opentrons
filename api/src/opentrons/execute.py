@@ -24,7 +24,7 @@ from typing import (
 )
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.types import RobotType
 
 from opentrons import protocol_api, __version__, should_use_ot3
 
@@ -77,7 +77,7 @@ from opentrons.protocol_runner import (
 from .util import entrypoint_util
 
 if TYPE_CHECKING:
-    from opentrons_shared_data.labware.dev_types import (
+    from opentrons_shared_data.labware.types import (
         LabwareDefinition as LabwareDefinitionDict,
     )
 

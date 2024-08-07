@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import {
   ALIGN_CENTER,
@@ -47,7 +47,7 @@ interface FormValues {
 
 export function NameRobot(): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
-  const history = useHistory()
+  const navigate = useNavigate()
   const trackEvent = useTrackEvent()
   const localRobot = useSelector(getLocalRobot)
   const ipAddress = localRobot?.ip
@@ -143,7 +143,7 @@ export function NameRobot(): JSX.Element {
       if (data.name != null) {
         setNewName(data.name)
         if (!isUnboxingFlowOngoing) {
-          history.push('/robot-settings')
+          navigate('/robot-settings')
         } else {
           setIsShowConfirmRobotName(true)
         }
@@ -198,9 +198,9 @@ export function NameRobot(): JSX.Element {
                   data-testid="name_back_button"
                   onClick={() => {
                     if (isUnboxingFlowOngoing) {
-                      history.push('/emergency-stop')
+                      navigate('/emergency-stop')
                     } else {
-                      history.push('/robot-settings')
+                      navigate('/robot-settings')
                     }
                   }}
                 >

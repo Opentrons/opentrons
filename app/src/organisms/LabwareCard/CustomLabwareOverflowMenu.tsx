@@ -19,6 +19,7 @@ import {
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
+  Modal,
   LegacyStyledText,
   TYPOGRAPHY,
   useConditionalConfirm,
@@ -28,7 +29,6 @@ import {
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { Divider } from '../../atoms/structure'
-import { LegacyModal } from '../../molecules/LegacyModal'
 import { getTopPortalEl } from '../../App/portal'
 import {
   deleteCustomLabwareFile,
@@ -139,7 +139,7 @@ export function CustomLabwareOverflowMenu(
       )}
       {showDeleteConfirmation &&
         createPortal(
-          <LegacyModal
+          <Modal
             type="warning"
             title={t('delete_this_labware')}
             onClose={handleCancelModal}
@@ -169,7 +169,7 @@ export function CustomLabwareOverflowMenu(
                 </AlertPrimaryButton>
               </Flex>
             </Flex>
-          </LegacyModal>,
+          </Modal>,
           getTopPortalEl()
         )}
     </Flex>

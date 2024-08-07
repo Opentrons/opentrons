@@ -13,6 +13,7 @@ const CANCEL = 'Cancel'
 const CONTINUE = 'Continue'
 
 /**
+ * * @deprecated use Modal instead
  * AlertModal variant to prompt user to "Cancel" or "Continue" a given action
  */
 export function ContinueModal(props: ContinueModalProps): JSX.Element {

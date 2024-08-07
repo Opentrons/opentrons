@@ -2,7 +2,7 @@ import * as React from 'react'
 import first from 'lodash/first'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import {
   Icon,
@@ -18,11 +18,13 @@ import { useUploadCsvFileMutation } from '@opentrons/react-api-client'
 
 import { Tooltip } from '../../atoms/Tooltip'
 import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
-import { useFeatureFlag } from '../../redux/config'
 import { OPENTRONS_USB } from '../../redux/discovery'
 import { appShellRequestor } from '../../redux/shell/remote'
 import { useTrackCreateProtocolRunEvent } from '../Devices/hooks'
-import { getRunTimeParameterValuesForRun } from '../Devices/utils'
+import {
+  getRunTimeParameterFilesForRun,
+  getRunTimeParameterValuesForRun,
+} from '../Devices/utils'
 import { ApplyHistoricOffsets } from '../ApplyHistoricOffsets'
 import { useOffsetCandidatesForAnalysis } from '../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { ChooseRobotSlideout } from '../ChooseRobotSlideout'
@@ -47,7 +49,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
 ): JSX.Element | null {
   const { t } = useTranslation(['protocol_details', 'shared', 'app_settings'])
   const { storedProtocolData, showSlideout, onCloseClick } = props
-  const history = useHistory()
+  const navigate = useNavigate()
   const [shouldApplyOffsets, setShouldApplyOffsets] = React.useState<boolean>(
     true
   )
@@ -93,8 +95,6 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
       : null
   )
 
-  const enableCsvFile = useFeatureFlag('enableCsvFile')
-
   const {
     createRunFromProtocolSource,
     runCreationError,
@@ -109,9 +109,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
             name: 'createProtocolRecordResponse',
             properties: { success: true },
           })
-          history.push(
-            `/devices/${selectedRobot.name}/protocol-runs/${runData.id}`
-          )
+          navigate(`/devices/${selectedRobot.name}/protocol-runs/${runData.id}`)
         }
       },
       onError: (error: Error) => {
@@ -138,48 +136,41 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
   )
   const handleProceed: React.MouseEventHandler<HTMLButtonElement> = () => {
     trackCreateProtocolRunEvent({ name: 'createProtocolRecordRequest' })
-    if (enableCsvFile) {
-      const dataFilesForProtocolMap = runTimeParametersOverrides.reduce<
-        Record<string, File>
-      >(
-        (acc, parameter) =>
-          parameter.type === 'csv_file' && parameter.file?.file != null
-            ? { ...acc, [parameter.variableName]: parameter.file.file }
-            : acc,
-        {}
-      )
-      Promise.all(
-        Object.entries(dataFilesForProtocolMap).map(([key, file]) => {
-          const fileResponse = uploadCsvFile(file)
-          const varName = Promise.resolve(key)
-          return Promise.all([fileResponse, varName])
-        })
-      ).then(responseTuples => {
-        const mappedResolvedCsvVariableToFileId = responseTuples.reduce<
-          Record<string, string>
-        >((acc, [uploadedFileResponse, variableName]) => {
-          return { ...acc, [variableName]: uploadedFileResponse.data.id }
-        }, {})
-        const runTimeParameterValues = getRunTimeParameterValuesForRun(
-          runTimeParametersOverrides,
-          mappedResolvedCsvVariableToFileId
-        )
-        createRunFromProtocolSource({
-          files: srcFileObjects,
-          protocolKey,
-          runTimeParameterValues,
-        })
+    const dataFilesForProtocolMap = runTimeParametersOverrides.reduce<
+      Record<string, File>
+    >(
+      (acc, parameter) =>
+        parameter.type === 'csv_file' && parameter.file?.file != null
+          ? { ...acc, [parameter.variableName]: parameter.file.file }
+          : acc,
+      {}
+    )
+    Promise.all(
+      Object.entries(dataFilesForProtocolMap).map(([key, file]) => {
+        const fileResponse = uploadCsvFile(file)
+        const varName = Promise.resolve(key)
+        return Promise.all([fileResponse, varName])
       })
-    } else {
+    ).then(responseTuples => {
+      const mappedResolvedCsvVariableToFileId = responseTuples.reduce<
+        Record<string, string>
+      >((acc, [uploadedFileResponse, variableName]) => {
+        return { ...acc, [variableName]: uploadedFileResponse.data.id }
+      }, {})
       const runTimeParameterValues = getRunTimeParameterValuesForRun(
         runTimeParametersOverrides
+      )
+      const runTimeParameterFiles = getRunTimeParameterFilesForRun(
+        runTimeParametersOverrides,
+        mappedResolvedCsvVariableToFileId
       )
       createRunFromProtocolSource({
         files: srcFileObjects,
         protocolKey,
         runTimeParameterValues,
+        runTimeParameterFiles,
       })
-    }
+    })
   }
 
   const { autoUpdateAction } = useSelector((state: State) =>

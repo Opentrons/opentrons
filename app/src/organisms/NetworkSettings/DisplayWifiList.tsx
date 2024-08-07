@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { css } from 'styled-components'
 
 import {
@@ -73,7 +73,7 @@ export function DisplayWifiList({
   isHeader = false,
 }: DisplayWifiListProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const history = useHistory()
+  const navigate = useNavigate()
 
   return (
     <>
@@ -81,7 +81,7 @@ export function DisplayWifiList({
         <RobotSetupHeader
           header={t('select_a_network')}
           onClickBack={() => {
-            history.push('/network-setup')
+            navigate('/network-setup')
           }}
         />
       ) : null}

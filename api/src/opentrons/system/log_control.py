@@ -15,7 +15,11 @@ LOG = logging.getLogger(__name__)
 MAX_RECORDS = 100000
 DEFAULT_RECORDS = 50000
 
-UNIT_SELECTORS = ["opentrons-robot-server", "opentrons-robot-app"]
+UNIT_SELECTORS = [
+    "opentrons-robot-server",
+    "opentrons-update-server",
+    "opentrons-robot-app",
+]
 SERIAL_SPECIAL = "ALL_SERIAL"
 SERIAL_SELECTORS = [
     "opentrons-api-serial",

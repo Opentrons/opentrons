@@ -19,6 +19,7 @@ from . import magnetic_module
 from . import temperature_module
 from . import thermocycler
 from . import calibration
+from . import unsafe
 
 from .hash_command_params import hash_protocol_command_params
 from .generate_command_schema import generate_command_schema
@@ -331,6 +332,11 @@ from .liquid_probe import (
     LiquidProbeCreate,
     LiquidProbeResult,
     LiquidProbeCommandType,
+    TryLiquidProbe,
+    TryLiquidProbeParams,
+    TryLiquidProbeCreate,
+    TryLiquidProbeResult,
+    TryLiquidProbeCommandType,
 )
 
 __all__ = [
@@ -543,6 +549,8 @@ __all__ = [
     "thermocycler",
     # calibration command bundle
     "calibration",
+    # unsafe command bundle
+    "unsafe",
     # configure pipette volume command bundle
     "ConfigureForVolume",
     "ConfigureForVolumeCreate",
@@ -580,4 +588,9 @@ __all__ = [
     "LiquidProbeCreate",
     "LiquidProbeResult",
     "LiquidProbeCommandType",
+    "TryLiquidProbe",
+    "TryLiquidProbeParams",
+    "TryLiquidProbeCreate",
+    "TryLiquidProbeResult",
+    "TryLiquidProbeCommandType",
 ]

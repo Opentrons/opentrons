@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { Trans, useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
 import { formatDistance } from 'date-fns'
@@ -10,15 +10,15 @@ import {
   ALIGN_CENTER,
   ALIGN_END,
   BORDERS,
+  Chip,
   COLORS,
   DIRECTION_COLUMN,
-  DIRECTION_ROW,
   Flex,
   Icon,
+  LegacyStyledText,
   OVERFLOW_WRAP_ANYWHERE,
   OVERFLOW_WRAP_BREAK_WORD,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
   useLongPress,
 } from '@opentrons/components'
@@ -30,14 +30,13 @@ import {
 import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
 
 import { SmallButton } from '../../atoms/buttons'
-import { Modal } from '../../molecules/Modal'
+import { OddModal } from '../../molecules/OddModal'
 import { LongPressModal } from './LongPressModal'
 import { formatTimeWithUtcLabel } from '../../resources/runs'
-import { useFeatureFlag } from '../../redux/config'
 
 import type { UseLongPressResult } from '@opentrons/components'
 import type { ProtocolResource } from '@opentrons/shared-data'
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
+import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
 
 const REFETCH_INTERVAL = 5000
 
@@ -59,7 +58,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
     setTargetProtocolId,
     setIsRequiredCSV,
   } = props
-  const history = useHistory()
+  const navigate = useNavigate()
   const [showIcon, setShowIcon] = React.useState<boolean>(false)
   const [
     showFailedAnalysisModal,
@@ -70,8 +69,6 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
   const longpress = useLongPress()
   const queryClient = useQueryClient()
   const host = useHost()
-  // ToDo (kk:06/12/2024) this will be removed when we freeze the code
-  const enableCsvFile = useFeatureFlag('enableCsvFile')
 
   const { id: protocolId, analysisSummaries } = protocol
   const {
@@ -108,7 +105,6 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
 
   // ToDo (kk:06/25/2024) remove ff when we are ready for freezing the code
   const isRequiredCSV =
-    enableCsvFile &&
     analysisForProtocolCard?.result === 'parameter-value-required'
 
   const isPendingAnalysis = analysisForProtocolCard == null
@@ -120,7 +116,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
     if (isFailedAnalysis) {
       setShowFailedAnalysisModal(true)
     } else if (!longpress.isLongPressed) {
-      history.push(`/protocols/${protocolId}`)
+      navigate(`/protocols/${protocolId}`)
     }
   }
 
@@ -139,7 +135,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
     setIsRequiredCSV,
   ])
 
-  const failedAnalysisHeader: ModalHeaderBaseProps = {
+  const failedAnalysisHeader: OddModalHeaderBaseProps = {
     title: i18n.format(t('protocol_analysis_failed'), 'capitalize'),
     hasExitIcon: true,
     onClick: () => {
@@ -230,36 +226,14 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
         gridGap={SPACING.spacing8}
       >
         {isFailedAnalysis ? (
-          <Flex
-            color={COLORS.red60}
-            flexDirection={DIRECTION_ROW}
-            gridGap={SPACING.spacing8}
-          >
-            <Icon
-              name="ot-alert"
-              size="1.5rem"
-              aria-label="failedAnalysis_icon"
-            />
-            <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-              {i18n.format(t('failed_analysis'), 'capitalize')}
-            </LegacyStyledText>
-          </Flex>
+          <Chip
+            type="error"
+            text={i18n.format(t('failed_analysis'), 'capitalize')}
+            background={false}
+          />
         ) : null}
         {isRequiredCSV ? (
-          <Flex
-            color={COLORS.yellow60}
-            flexDirection={DIRECTION_ROW}
-            gridGap={SPACING.spacing8}
-          >
-            <Icon
-              name="ot-alert"
-              size="1.5rem"
-              aria-label="requiresCsv_file_icon"
-            />
-            <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-              {t('requires_csv')}
-            </LegacyStyledText>
-          </Flex>
+          <Chip type="warning" text={t('requires_csv')} background={false} />
         ) : null}
         <LegacyStyledText
           as="p"
@@ -292,7 +266,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
         )}
         {(showFailedAnalysisModal ||
           (isFailedAnalysis && longpress.isLongPressed)) && (
-          <Modal
+          <OddModal
             header={failedAnalysisHeader}
             onOutsideClick={() => {
               setShowFailedAnalysisModal(false)
@@ -343,7 +317,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
                 disabled={showIcon}
               />
             </Flex>
-          </Modal>
+          </OddModal>
         )}
       </Flex>
     </Flex>

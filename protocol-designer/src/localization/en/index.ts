@@ -12,6 +12,10 @@ import nav from './nav.json'
 import shared from './shared.json'
 import tooltip from './tooltip.json'
 import well_selection from './well_selection.json'
+import liquids from './liquids.json'
+import protocol_overview from './protocol_overview.json'
+import protocol_steps from './protocol_steps.json'
+import starting_deck_state from './starting_deck_state.json'
 
 export const en = {
   alert,
@@ -28,4 +32,8 @@ export const en = {
   shared,
   tooltip,
   well_selection,
+  liquids,
+  protocol_overview,
+  protocol_steps,
+  starting_deck_state,
 }

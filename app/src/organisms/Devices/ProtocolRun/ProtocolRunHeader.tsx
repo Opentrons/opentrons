@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import { Link, useHistory } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 import {
   RUN_STATUS_IDLE,
@@ -67,10 +67,7 @@ import {
 } from '../../../redux/analytics'
 import { getIsHeaterShakerAttached } from '../../../redux/config'
 import { Tooltip } from '../../../atoms/Tooltip'
-import {
-  useCloseCurrentRun,
-  useCurrentRunId,
-} from '../../../organisms/ProtocolUpload/hooks'
+import { useCloseCurrentRun } from '../../../organisms/ProtocolUpload/hooks'
 import { ConfirmCancelModal } from '../../../organisms/RunDetails/ConfirmCancelModal'
 import { HeaterShakerIsRunningModal } from '../HeaterShakerIsRunningModal'
 import {
@@ -103,11 +100,16 @@ import { getIsFixtureMismatch } from '../../../resources/deck_configuration/util
 import { useDeckConfigurationCompatibility } from '../../../resources/deck_configuration/hooks'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useMostRecentRunId } from '../../ProtocolUpload/hooks/useMostRecentRunId'
-import { useNotifyRunQuery } from '../../../resources/runs'
+import { useNotifyRunQuery, useCurrentRunId } from '../../../resources/runs'
 import {
   useErrorRecoveryFlows,
   ErrorRecoveryFlows,
 } from '../../ErrorRecoveryFlows'
+import { useRecoveryAnalytics } from '../../ErrorRecoveryFlows/hooks'
+import {
+  useProtocolDropTipModal,
+  ProtocolDropTipModal,
+} from './ProtocolDropTipModal'
 
 import type { Run, RunError, RunStatus } from '@opentrons/api-client'
 import type { IconName } from '@opentrons/components'
@@ -139,7 +141,7 @@ export function ProtocolRunHeader({
   makeHandleJumpToStep,
 }: ProtocolRunHeaderProps): JSX.Element | null {
   const { t } = useTranslation(['run_details', 'shared'])
-  const history = useHistory()
+  const navigate = useNavigate()
   const host = useHost()
   const createdAtTimestamp = useRunCreatedAtTimestamp(runId)
   const {
@@ -148,6 +150,7 @@ export function ProtocolRunHeader({
     protocolKey,
     isProtocolAnalyzing,
   } = useProtocolDetailsForRun(runId)
+  const { reportRecoveredRunResult } = useRecoveryAnalytics()
 
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
@@ -210,6 +213,17 @@ export function ProtocolRunHeader({
     host,
     isFlex,
   })
+  const {
+    showDTModal,
+    onDTModalSkip,
+    onDTModalRemoval,
+  } = useProtocolDropTipModal({
+    areTipsAttached,
+    toggleDTWiz,
+    isMostRecentRunCurrent: mostRecentRunId === runId,
+  })
+
+  const enteredER = runRecord?.data.hasEverEnteredErrorRecovery
 
   React.useEffect(() => {
     if (isFlex) {
@@ -219,7 +233,8 @@ export function ProtocolRunHeader({
       } else if (
         runStatus != null &&
         // @ts-expect-error runStatus expected to possibly not be terminal
-        RUN_STATUSES_TERMINAL.includes(runStatus)
+        RUN_STATUSES_TERMINAL.includes(runStatus) &&
+        enteredER === false
       ) {
         void determineTipStatus()
       }
@@ -228,9 +243,15 @@ export function ProtocolRunHeader({
 
   React.useEffect(() => {
     if (protocolData != null && !isRobotViewable) {
-      history.push(`/devices`)
+      navigate('/devices')
     }
-  }, [protocolData, isRobotViewable, history])
+  }, [protocolData, isRobotViewable, navigate])
+
+  React.useEffect(() => {
+    if (isRunCurrent && typeof enteredER === 'boolean') {
+      reportRecoveredRunResult(runStatus, enteredER)
+    }
+  }, [isRunCurrent, enteredER])
 
   // Side effects dependent on the current run state.
   React.useEffect(() => {
@@ -254,7 +275,7 @@ export function ProtocolRunHeader({
 
   // redirect to new run after successful reset
   const onResetSuccess = (createRunResponse: Run): void => {
-    history.push(
+    navigate(
       `/devices/${robotName}/protocol-runs/${createRunResponse.data.id}/run-preview`
     )
   }
@@ -297,7 +318,6 @@ export function ProtocolRunHeader({
     <>
       {isERActive ? (
         <ErrorRecoveryFlows
-          isFlex={true}
           runStatus={runStatus}
           runId={runId}
           failedCommand={failedCommand}
@@ -397,6 +417,13 @@ export function ProtocolRunHeader({
             }}
           />
         ) : null}
+        {showDTModal ? (
+          <ProtocolDropTipModal
+            onSkip={onDTModalSkip}
+            onBeginRemoval={onDTModalRemoval}
+            mount={pipettesWithTip[0]?.mount}
+          />
+        ) : null}
         <Box display="grid" gridTemplateColumns="4fr 3fr 3fr 4fr">
           <LabeledValue label={t('run')} value={createdAtTimestamp} />
           <LabeledValue
@@ -472,7 +499,7 @@ export function ProtocolRunHeader({
         {showDTWiz && mostRecentRunId === runId ? (
           <DropTipWizardFlows
             robotType={isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE}
-            mount={pipettesWithTip[0].mount}
+            mount={pipettesWithTip[0]?.mount}
             instrumentModelSpecs={pipettesWithTip[0].specs}
             closeFlow={() => setTipStatusResolved().then(toggleDTWiz)}
           />
@@ -577,7 +604,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
     isFixtureMismatch,
     isResetRunLoadingRef,
   } = props
-  const history = useHistory()
+  const navigate = useNavigate()
   const { t } = useTranslation(['run_details', 'shared'])
   const attachedModules =
     useModulesQuery({
@@ -597,7 +624,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
   } = useRunControls(runId, (createRunResponse: Run): void =>
     // redirect to new run after successful reset
     {
-      history.push(
+      navigate(
         `/devices/${robotName}/protocol-runs/${createRunResponse.data.id}/run-preview`
       )
     }
@@ -726,7 +753,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
         confirmAttachment()
       } else {
         play()
-        history.push(`/devices/${robotName}/protocol-runs/${runId}/run-preview`)
+        navigate(`/devices/${robotName}/protocol-runs/${runId}/run-preview`)
         trackProtocolRunEvent({
           name:
             runStatus === RUN_STATUS_IDLE

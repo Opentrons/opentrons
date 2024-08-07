@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import {
   DIRECTION_COLUMN,
@@ -11,9 +11,9 @@ import {
 } from '@opentrons/components'
 
 import { SmallButton } from '../../atoms/buttons'
-import { Modal } from '../../molecules/Modal'
+import { OddModal } from '../../molecules/OddModal'
 
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
+import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
 
 interface DeckConfigurationDiscardChangesModalProps {
   setShowConfirmationModal: (showConfirmationModal: boolean) => void
@@ -23,18 +23,18 @@ export function DeckConfigurationDiscardChangesModal({
   setShowConfirmationModal,
 }: DeckConfigurationDiscardChangesModalProps): JSX.Element {
   const { t } = useTranslation('device_details')
-  const history = useHistory()
-  const modalHeader: ModalHeaderBaseProps = {
+  const navigate = useNavigate()
+  const modalHeader: OddModalHeaderBaseProps = {
     title: t('changes_will_be_lost'),
   }
 
   const handleDiscard = (): void => {
     setShowConfirmationModal(false)
-    history.goBack()
+    navigate(-1)
   }
 
   return (
-    <Modal header={modalHeader}>
+    <OddModal header={modalHeader}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
         <LegacyStyledText as="p">
           {t('changes_will_be_lost_description')}
@@ -59,6 +59,6 @@ export function DeckConfigurationDiscardChangesModal({
           />
         </Flex>
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }

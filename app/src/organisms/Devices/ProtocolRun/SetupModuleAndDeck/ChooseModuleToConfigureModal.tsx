@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useModulesQuery } from '@opentrons/react-api-client'
 import {
   ALIGN_CENTER,
@@ -16,6 +16,7 @@ import {
   LegacyStyledText,
   TEXT_ALIGN_CENTER,
   TYPOGRAPHY,
+  Modal,
 } from '@opentrons/components'
 import {
   getFixtureDisplayName,
@@ -24,8 +25,7 @@ import {
   getModuleDisplayName,
 } from '@opentrons/shared-data'
 import { getTopPortalEl } from '../../../../App/portal'
-import { LegacyModal } from '../../../../molecules/LegacyModal'
-import { Modal } from '../../../../molecules/Modal'
+import { OddModal } from '../../../../molecules/OddModal'
 import { FixtureOption } from '../../../DeviceDetailsDeckConfiguration/AddFixtureModal'
 import { useNotifyDeckConfigurationQuery } from '../../../../resources/deck_configuration'
 import { SmallButton } from '../../../../atoms/buttons'
@@ -139,7 +139,7 @@ export const ChooseModuleToConfigureModal = (
 
   return createPortal(
     isOnDevice ? (
-      <Modal
+      <OddModal
         onOutsideClick={onCloseClick}
         header={{
           title: t('add_to_slot', { slotName: displaySlotName }),
@@ -148,9 +148,9 @@ export const ChooseModuleToConfigureModal = (
         }}
       >
         {contents}
-      </Modal>
+      </OddModal>
     ) : (
-      <LegacyModal
+      <Modal
         title={
           <Flex
             flexDirection={DIRECTION_ROW}
@@ -171,7 +171,7 @@ export const ChooseModuleToConfigureModal = (
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
           {contents}
         </Flex>
-      </LegacyModal>
+      </Modal>
     ),
     getTopPortalEl()
   )
@@ -193,13 +193,13 @@ function NoUnconfiguredModules(props: NoUnconfiguredModulesProps): JSX.Element {
     robotName,
   } = props
   const { t } = useTranslation('protocol_setup')
-  const history = useHistory()
+  const navigate = useNavigate()
   const { closeCurrentRun } = useCloseCurrentRun()
   const handleCancelRun = (): void => {
     closeCurrentRun()
   }
   const handleNavigateToDeviceDetails = (): void => {
-    history.push(`/devices/${robotName}`)
+    navigate(`/devices/${robotName}`)
   }
   const exitButton = isOnDevice ? (
     <SmallButton

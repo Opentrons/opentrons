@@ -1,4 +1,5 @@
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { useRouteUpdateActions } from './useRouteUpdateActions'
 import { useRecoveryCommands } from './useRecoveryCommands'
@@ -14,8 +15,10 @@ import {
 import { useRecoveryOptionCopy } from './useRecoveryOptionCopy'
 import { useRecoveryActionMutation } from './useRecoveryActionMutation'
 import { useRunningStepCounts } from '../../../resources/protocols/hooks'
+import { useRecoveryToasts } from './useRecoveryToasts'
 
 import type { PipetteData } from '@opentrons/api-client'
+import type { RobotType } from '@opentrons/shared-data'
 import type { IRecoveryMap } from '../types'
 import type { ErrorRecoveryFlowsProps } from '..'
 import type { UseRouteUpdateActionsResult } from './useRouteUpdateActions'
@@ -23,13 +26,21 @@ import type { UseRecoveryCommandsResult } from './useRecoveryCommands'
 import type { RecoveryTipStatusUtils } from './useRecoveryTipStatus'
 import type { UseFailedLabwareUtilsResult } from './useFailedLabwareUtils'
 import type { UseDeckMapUtilsResult } from './useDeckMapUtils'
-import type { CurrentRecoveryOptionUtils } from './useRecoveryRouting'
+import type {
+  CurrentRecoveryOptionUtils,
+  SubMapUtils,
+} from './useRecoveryRouting'
 import type { RecoveryActionMutationResult } from './useRecoveryActionMutation'
 import type { StepCounts } from '../../../resources/protocols/hooks'
+import type { UseRecoveryAnalyticsResult } from './useRecoveryAnalytics'
+import type { UseRecoveryTakeoverResult } from './useRecoveryTakeover'
 
 type ERUtilsProps = ErrorRecoveryFlowsProps & {
-  toggleERWizard: (launchER: boolean) => Promise<void>
+  toggleERWizAsActiveUser: UseRecoveryTakeoverResult['toggleERWizAsActiveUser']
   hasLaunchedRecovery: boolean
+  isOnDevice: boolean
+  robotType: RobotType
+  analytics: UseRecoveryAnalyticsResult
 }
 
 export interface ERUtilsResults {
@@ -44,20 +55,22 @@ export interface ERUtilsResults {
   recoveryActionMutationUtils: RecoveryActionMutationResult
   failedPipetteInfo: PipetteData | null
   hasLaunchedRecovery: boolean
-  trackExternalMap: (map: Record<string, any>) => void
   stepCounts: StepCounts
   commandsAfterFailedCommand: ReturnType<typeof getNextSteps>
+  subMapUtils: SubMapUtils
 }
 
 const SUBSEQUENT_COMMAND_DEPTH = 2
 // Builds various Error Recovery utilities.
 export function useERUtils({
-  isFlex,
   failedCommand,
   runId,
-  toggleERWizard,
+  toggleERWizAsActiveUser,
   hasLaunchedRecovery,
   protocolAnalysis,
+  isOnDevice,
+  robotType,
+  analytics,
 }: ERUtilsProps): ERUtilsResults {
   const { data: attachedInstruments } = useInstrumentsQuery()
   const { data: runRecord } = useNotifyRunQuery(runId)
@@ -71,16 +84,26 @@ export function useERUtils({
     pageLength: 999,
   })
 
+  const stepCounts = useRunningStepCounts(runId, runCommands)
+
   const {
     recoveryMap,
     setRM,
-    trackExternalMap,
     currentRecoveryOptionUtils,
+    ...subMapUtils
   } = useRecoveryRouting()
+
+  const recoveryToastUtils = useRecoveryToasts({
+    currentStepCount: stepCounts.currentStepNumber,
+    selectedRecoveryOption: currentRecoveryOptionUtils.selectedRecoveryOption,
+    isOnDevice,
+    commandTextData: protocolAnalysis,
+    robotType,
+  })
 
   const tipStatusUtils = useRecoveryTipStatus({
     runId,
-    isFlex,
+    isFlex: robotType === FLEX_ROBOT_TYPE,
     runRecord,
     attachedInstruments,
   })
@@ -88,7 +111,7 @@ export function useERUtils({
   const routeUpdateActions = useRouteUpdateActions({
     hasLaunchedRecovery,
     recoveryMap,
-    toggleERWizard,
+    toggleERWizAsActiveUser,
     setRecoveryMap: setRM,
   })
 
@@ -111,6 +134,9 @@ export function useERUtils({
     failedCommand,
     failedLabwareUtils,
     routeUpdateActions,
+    recoveryToastUtils,
+    analytics,
+    selectedRecoveryOption: currentRecoveryOptionUtils.selectedRecoveryOption,
   })
 
   const deckMapUtils = useDeckMapUtils({
@@ -119,8 +145,6 @@ export function useERUtils({
     protocolAnalysis,
     failedLabwareUtils,
   })
-
-  const stepCounts = useRunningStepCounts(runId, runCommands)
 
   const recoveryActionMutationUtils = useRecoveryActionMutation(runId)
 
@@ -134,7 +158,7 @@ export function useERUtils({
   )
   return {
     recoveryMap,
-    trackExternalMap,
+    subMapUtils,
     currentRecoveryOptionUtils,
     recoveryActionMutationUtils,
     routeUpdateActions,

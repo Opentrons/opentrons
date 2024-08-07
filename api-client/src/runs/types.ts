@@ -47,6 +47,7 @@ export interface LegacyGoodRunData {
   status: RunStatus
   actions: RunAction[]
   errors: RunError[]
+  hasEverEnteredErrorRecovery: boolean
   pipettes: LoadedPipette[]
   labware: LoadedLabware[]
   liquids: Liquid[]
@@ -132,11 +133,12 @@ export interface LabwareOffsetCreateData {
   vector: VectorOffset
 }
 
-type RunTimeParameterValueType = string | number | boolean | { id: string }
-export type RunTimeParameterCreateData = Record<
+type RunTimeParameterValuesType = string | number | boolean | { id: string }
+export type RunTimeParameterValuesCreateData = Record<
   string,
-  RunTimeParameterValueType
+  RunTimeParameterValuesType
 >
+export type RunTimeParameterFilesCreateData = Record<string, string>
 
 export interface CommandData {
   data: RunTimeCommand
@@ -145,3 +147,29 @@ export interface CommandData {
 // Although run errors are semantically different from command errors,
 // the server currently happens to use the exact same model for both.
 export type RunError = RunCommandError
+
+/**
+ * Error Policy
+ */
+
+export type IfMatchType = 'ignoreAndContinue' | 'failRun' | 'waitForRecovery'
+
+export interface ErrorRecoveryPolicy {
+  policyRules: Array<{
+    matchCriteria: {
+      command: {
+        commandType: RunTimeCommand['commandType']
+        error: {
+          errorType: RunCommandError['errorType']
+        }
+      }
+    }
+    ifMatch: IfMatchType
+  }>
+}
+
+export interface UpdateErrorRecoveryPolicyRequest {
+  data: ErrorRecoveryPolicy
+}
+
+export type UpdateErrorRecoveryPolicyResponse = Record<string, never>

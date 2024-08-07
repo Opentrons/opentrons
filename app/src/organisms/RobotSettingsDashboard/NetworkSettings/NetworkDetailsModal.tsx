@@ -14,9 +14,9 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { Modal } from '../../../molecules/Modal'
+import { OddModal } from '../../../molecules/OddModal'
 
-import type { ModalHeaderBaseProps } from '../../../molecules/Modal/types'
+import type { OddModalHeaderBaseProps } from '../../../molecules/OddModal/types'
 
 interface NetworkDetailsModalProps {
   setShowNetworkDetailModal: (showNetworkDetailModal: boolean) => void
@@ -37,7 +37,7 @@ export function NetworkDetailsModal({
 }: NetworkDetailsModalProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
   const networkName = ssid != null ? ssid : t('shared:no_data')
-  const modalHeader: ModalHeaderBaseProps = {
+  const modalHeader: OddModalHeaderBaseProps = {
     title: securityType != null ? networkName : t('ethernet'),
     hasExitIcon: true,
     iconName: securityType != null ? 'wifi' : 'ethernet',
@@ -45,7 +45,7 @@ export function NetworkDetailsModal({
   }
 
   return (
-    <Modal
+    <OddModal
       modalSize="medium"
       header={modalHeader}
       onOutsideClick={() => {
@@ -64,7 +64,7 @@ export function NetworkDetailsModal({
         <ListItem itemName={t('subnet_mask')} itemValue={subnetMask} />
         <ListItem itemName={t('mac_address')} itemValue={macAddress} />
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }
 

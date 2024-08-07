@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
 import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
 import { useDispatch, useSelector } from 'react-redux'
-import { useHistory, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -39,13 +39,12 @@ import {
   ProtocolDetailsSectionContentSkeleton,
 } from '../../organisms/OnDeviceDisplay/ProtocolDetails'
 import { useHardwareStatusText } from '../../organisms/OnDeviceDisplay/RobotDashboard/hooks'
-import { Modal, SmallModalChildren } from '../../molecules/Modal'
+import { OddModal, SmallModalChildren } from '../../molecules/OddModal'
 import { useToaster } from '../../organisms/ToasterOven'
 import {
   getApplyHistoricOffsets,
   getPinnedProtocolIds,
   updateConfigValue,
-  useFeatureFlag,
 } from '../../redux/config'
 import { useOffsetCandidatesForAnalysis } from '../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import {
@@ -61,7 +60,7 @@ import { Liquids } from './Liquids'
 import { formatTimeWithUtcLabel } from '../../resources/runs'
 
 import type { Protocol } from '@opentrons/api-client'
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
+import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
 import type { Dispatch } from '../../redux/types'
 import type { OnDeviceRouteParams } from '../../App/types'
 
@@ -80,7 +79,7 @@ const ProtocolHeader = ({
   isScrolled,
   isProtocolFetching,
 }: ProtocolHeaderProps): JSX.Element => {
-  const history = useHistory()
+  const navigate = useNavigate()
   const { t } = useTranslation(['protocol_info, protocol_details', 'shared'])
   const [truncate, setTruncate] = React.useState<boolean>(true)
   const [startSetup, setStartSetup] = React.useState<boolean>(false)
@@ -115,7 +114,7 @@ const ProtocolHeader = ({
           paddingLeft="0rem"
           paddingRight={SPACING.spacing24}
           onClick={() => {
-            history.push('/protocols')
+            navigate('/protocols')
           }}
           width="3rem"
         >
@@ -308,8 +307,9 @@ export function ProtocolDetails(): JSX.Element | null {
     'protocol_info',
     'shared',
   ])
-  const enableCsvFile = useFeatureFlag('enableCsvFile')
-  const { protocolId } = useParams<OnDeviceRouteParams>()
+  const { protocolId } = useParams<
+    keyof OnDeviceRouteParams
+  >() as OnDeviceRouteParams
   const {
     missingProtocolHardware,
     conflictedSlots,
@@ -318,7 +318,7 @@ export function ProtocolDetails(): JSX.Element | null {
 
   const runTimeParameters = useRunTimeParameters(protocolId)
   const dispatch = useDispatch<Dispatch>()
-  const history = useHistory()
+  const navigate = useNavigate()
   const host = useHost()
   const { makeSnackbar } = useToaster()
   const [showParameters, setShowParameters] = React.useState<boolean>(false)
@@ -379,7 +379,7 @@ export function ProtocolDetails(): JSX.Element | null {
 
   const isRequiredCsv =
     mostRecentAnalysis?.result === 'parameter-value-required'
-  if (enableCsvFile && isRequiredCsv) {
+  if (isRequiredCsv) {
     if (chipText === 'Ready to run') {
       chipText = i18n.format(t('requires_csv'), 'capitalize')
     } else {
@@ -426,11 +426,11 @@ export function ProtocolDetails(): JSX.Element | null {
         )
         .then(() => deleteProtocol(host, protocolId))
         .then(() => {
-          history.push('/protocols')
+          navigate('/protocols')
         })
         .catch((e: Error) => {
           console.error(`error deleting resources: ${e.message}`)
-          history.push('/protocols')
+          navigate('/protocols')
         })
     } else {
       console.error(
@@ -445,7 +445,7 @@ export function ProtocolDetails(): JSX.Element | null {
         protocolRecord?.data.files[0].name
       : null
 
-  const deleteModalHeader: ModalHeaderBaseProps = {
+  const deleteModalHeader: OddModalHeaderBaseProps = {
     title: 'Delete this protocol?',
     iconName: 'ot-alert',
     iconColor: COLORS.yellow50,
@@ -462,7 +462,7 @@ export function ProtocolDetails(): JSX.Element | null {
       {showConfirmDeleteProtocol ? (
         <Flex alignItems={ALIGN_CENTER}>
           {!isProtocolFetching ? (
-            <Modal
+            <OddModal
               modalSize="medium"
               onOutsideClick={() => {
                 setShowConfirmationDeleteProtocol(false)
@@ -493,7 +493,7 @@ export function ProtocolDetails(): JSX.Element | null {
                   />
                 </Flex>
               </Flex>
-            </Modal>
+            </OddModal>
           ) : null}
         </Flex>
       ) : null}

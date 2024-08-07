@@ -1,10 +1,15 @@
 import * as React from 'react'
 import capitalize from 'lodash/capitalize'
 import { useSelector, useDispatch } from 'react-redux'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
-import { SPACING, TYPOGRAPHY, LegacyStyledText } from '@opentrons/components'
+import {
+  SPACING,
+  TYPOGRAPHY,
+  LegacyStyledText,
+  ModalShell,
+} from '@opentrons/components'
 
 import {
   useDispatchApiRequests,
@@ -24,7 +29,6 @@ import {
   HOME,
 } from '../../redux/robot-controls'
 
-import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { useAttachedPipettes } from '../Devices/hooks'
@@ -57,7 +61,7 @@ interface Props {
 export function ChangePipette(props: Props): JSX.Element | null {
   const { robotName, mount, closeModal } = props
   const { t } = useTranslation(['change_pipette', 'shared'])
-  const history = useHistory()
+  const navigate = useNavigate()
   const dispatch = useDispatch<Dispatch>()
   const finalRequestId = React.useRef<string | null | undefined>(null)
   const [dispatchApiRequests] = useDispatchApiRequests(dispatchedAction => {
@@ -267,7 +271,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
     const toCalDashboard = (): void => {
       dispatchApiRequests(home(robotName, ROBOT))
       closeModal()
-      history.push(`/devices/${robotName}/robot-settings/calibration/dashboard`)
+      navigate(`/devices/${robotName}/robot-settings/calibration/dashboard`)
     }
 
     exitWizardHeader =
@@ -322,7 +326,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
     )
   }
   return (
-    <LegacyModalShell width="42.375rem">
+    <ModalShell width="42.375rem">
       <WizardHeader
         totalSteps={eightChannel ? EIGHT_CHANNEL_STEPS : SINGLE_CHANNEL_STEPS}
         currentStep={currentStepCount}
@@ -330,6 +334,6 @@ export function ChangePipette(props: Props): JSX.Element | null {
         onExit={exitWizardHeader}
       />
       {contents}
-    </LegacyModalShell>
+    </ModalShell>
   )
 }

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { StaticRouter } from 'react-router-dom'
+import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
 import { when } from 'vitest-when'
@@ -36,7 +36,7 @@ const RUN_ID = '1'
 
 const render = () => {
   return renderWithProviders(
-    <StaticRouter>
+    <MemoryRouter>
       <SetupLabware
         robotName={ROBOT_NAME}
         runId={RUN_ID}
@@ -44,7 +44,7 @@ const render = () => {
         expandStep={vi.fn()}
         nextStep={'liquid_setup_step'}
       />
-    </StaticRouter>,
+    </MemoryRouter>,
     {
       i18nInstance: i18n,
     }

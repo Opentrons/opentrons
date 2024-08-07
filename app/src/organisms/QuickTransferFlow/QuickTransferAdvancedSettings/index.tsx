@@ -156,7 +156,9 @@ export function QuickTransferAdvancedSettings(
               reps: state.mixOnAspirate?.repititions,
             })
           : '',
-      enabled: state.transferType === 'transfer',
+      enabled:
+        state.transferType === 'transfer' ||
+        state.transferType === 'distribute',
       onClick: () => {
         if (state.transferType === 'transfer') {
           setSelectedSetting('aspirate_mix')
@@ -234,7 +236,9 @@ export function QuickTransferAdvancedSettings(
               reps: state.mixOnDispense?.repititions,
             })
           : '',
-      enabled: state.transferType === 'transfer',
+      enabled:
+        state.transferType === 'transfer' ||
+        state.transferType === 'consolidate',
       onClick: () => {
         if (state.transferType === 'transfer') {
           setSelectedSetting('dispense_mix')

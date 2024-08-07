@@ -11,6 +11,7 @@ import type {
   ConfigV21,
   ConfigV22,
   ConfigV23,
+  ConfigV24,
 } from '@opentrons/app/src/redux/config/types'
 
 const PKG_VERSION: string = _PKG_VERSION_
@@ -157,5 +158,16 @@ export const MOCK_CONFIG_V23: ConfigV23 = {
     pinnedQuickTransferIds: [],
     quickTransfersOnDeviceSortKey: null,
     hasDismissedQuickTransferIntro: false,
+  },
+}
+
+export const MOCK_CONFIG_V24: ConfigV24 = {
+  ...(() => {
+    const { support, ...rest } = MOCK_CONFIG_V23
+    return rest
+  })(),
+  version: 24,
+  userInfo: {
+    userId: 'MOCK_UUIDv4',
   },
 }

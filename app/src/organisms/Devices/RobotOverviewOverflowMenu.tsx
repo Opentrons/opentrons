@@ -2,7 +2,7 @@ import * as React from 'react'
 import { css } from 'styled-components'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 
 import {
@@ -25,7 +25,6 @@ import { Tooltip } from '../../atoms/Tooltip'
 import { ChooseProtocolSlideout } from '../../organisms/ChooseProtocolSlideout'
 import { DisconnectModal } from '../../organisms/Devices/RobotSettings/ConnectNetwork/DisconnectModal'
 import { handleUpdateBuildroot } from '../../organisms/Devices/RobotSettings/UpdateBuildroot'
-import { useCurrentRunId } from '../../organisms/ProtocolUpload/hooks'
 import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
 import { UNREACHABLE, CONNECTABLE, REACHABLE } from '../../redux/discovery'
 import { checkShellUpdate } from '../../redux/shell'
@@ -34,7 +33,7 @@ import { home, ROBOT } from '../../redux/robot-controls'
 import { useIsRobotBusy } from './hooks'
 import { useCanDisconnect } from '../../resources/networking/hooks'
 import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
-
+import { useCurrentRunId } from '../../resources/runs'
 import type { DiscoveredRobot } from '../../redux/discovery/types'
 import type { Dispatch, State } from '../../redux/types'
 
@@ -53,7 +52,7 @@ export const RobotOverviewOverflowMenu = (
     showOverflowMenu,
     setShowOverflowMenu,
   } = useMenuHandleClickOutside()
-  const history = useHistory()
+  const navigate = useNavigate()
   const isRobotBusy = useIsRobotBusy()
   const runId = useCurrentRunId()
   const [targetProps, tooltipProps] = useHoverTooltip()
@@ -207,7 +206,7 @@ export const RobotOverviewOverflowMenu = (
           <Divider marginY="0" />
           <MenuItem
             onClick={() => {
-              history.push(`/devices/${robot.name}/robot-settings`)
+              navigate(`/devices/${robot.name}/robot-settings`)
             }}
             disabled={
               robot == null ||

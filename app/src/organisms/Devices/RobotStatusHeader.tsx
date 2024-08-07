@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
-import { Link, useHistory } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { useProtocolQuery } from '@opentrons/react-api-client'
@@ -26,7 +26,6 @@ import {
 import { QuaternaryButton } from '../../atoms/buttons'
 import { Tooltip } from '../../atoms/Tooltip'
 import { useIsFlex } from '../../organisms/Devices/hooks'
-import { useCurrentRunId } from '../../organisms/ProtocolUpload/hooks'
 import { useCurrentRunStatus } from '../../organisms/RunTimeControl/hooks'
 import {
   getRobotAddressesByName,
@@ -34,7 +33,7 @@ import {
   OPENTRONS_USB,
 } from '../../redux/discovery'
 import { getNetworkInterfaces, fetchStatus } from '../../redux/networking'
-import { useNotifyRunQuery } from '../../resources/runs'
+import { useNotifyRunQuery, useCurrentRunId } from '../../resources/runs'
 
 import type { IconName, StyleProps } from '@opentrons/components'
 import type { DiscoveredRobot } from '../../redux/discovery/types'
@@ -58,7 +57,7 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
     'device_settings',
     'run_details',
   ])
-  const history = useHistory()
+  const navigate = useNavigate()
   const [targetProps, tooltipProps] = useHoverTooltip()
   const dispatch = useDispatch<Dispatch>()
 
@@ -187,7 +186,7 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
                 {...targetProps}
                 marginRight={SPACING.spacing8}
                 onClick={() => {
-                  history.push(`/devices/${name}/robot-settings/networking`)
+                  navigate(`/devices/${name}/robot-settings/networking`)
                 }}
               >
                 <Icon

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Route, MemoryRouter } from 'react-router-dom'
+import { Route, MemoryRouter, Routes } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { when } from 'vitest-when'
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
@@ -60,7 +60,7 @@ import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configu
 
 import type { UseQueryResult } from 'react-query'
 import type * as SharedData from '@opentrons/shared-data'
-import type * as ReactRouterDom from 'react-router-dom'
+import type { NavigateFunction } from 'react-router-dom'
 // Mock IntersectionObserver
 class IntersectionObserver {
   observe = vi.fn()
@@ -74,7 +74,7 @@ Object.defineProperty(window, 'IntersectionObserver', {
   value: IntersectionObserver,
 })
 
-let mockHistoryPush = vi.fn()
+let mockNavigate = vi.fn()
 
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const sharedData = await importOriginal<typeof SharedData>()
@@ -85,12 +85,10 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
 })
 
 vi.mock('react-router-dom', async importOriginal => {
-  const reactRouterDom = await importOriginal<typeof ReactRouterDom>()
+  const reactRouterDom = await importOriginal<NavigateFunction>()
   return {
     ...reactRouterDom,
-    useHistory: () => ({
-      push: mockHistoryPush,
-    }),
+    useNavigate: () => mockNavigate,
   }
 })
 
@@ -118,9 +116,9 @@ vi.mock('../../../resources/deck_configuration')
 const render = (path = '/') => {
   return renderWithProviders(
     <MemoryRouter initialEntries={[path]} initialIndex={0}>
-      <Route path="/runs/:runId/setup/">
-        <ProtocolSetup />
-      </Route>
+      <Routes>
+        <Route path="/runs/:runId/setup/" element={<ProtocolSetup />} />
+      </Routes>
     </MemoryRouter>,
     {
       i18nInstance: i18n,
@@ -193,7 +191,7 @@ describe('ProtocolSetup', () => {
   let mockLaunchLPC = vi.fn()
   beforeEach(() => {
     mockLaunchLPC = vi.fn()
-    mockHistoryPush = vi.fn()
+    mockNavigate = vi.fn()
     vi.mocked(useLPCDisabledReason).mockReturnValue(null)
     vi.mocked(useAttachedModules).mockReturnValue([])
     vi.mocked(useModuleCalibrationStatus).mockReturnValue({ complete: true })
@@ -430,6 +428,6 @@ describe('ProtocolSetup', () => {
   it('should redirect to the protocols page when a run is stopped', () => {
     vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_STOPPED)
     render(`/runs/${RUN_ID}/setup/`)
-    expect(mockHistoryPush).toHaveBeenCalledWith('/protocols')
+    expect(mockNavigate).toHaveBeenCalledWith('/protocols')
   })
 })

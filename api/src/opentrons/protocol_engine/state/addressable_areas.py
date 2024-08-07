@@ -1,9 +1,10 @@
 """Basic addressable area data state and store."""
 from dataclasses import dataclass
+from functools import cached_property
 from typing import Dict, List, Optional, Set, Union
 
-from opentrons_shared_data.robot.dev_types import RobotType
-from opentrons_shared_data.deck.dev_types import (
+from opentrons_shared_data.robot.types import RobotType, RobotDefinition
+from opentrons_shared_data.deck.types import (
     DeckDefinitionV5,
     SlotDefV3,
     CutoutFixture,
@@ -76,6 +77,9 @@ class AddressableAreaState:
 
     use_simulated_deck_config: bool
     """See `Config.use_simulated_deck_config`."""
+
+    """Information about the current robot model."""
+    robot_definition: RobotDefinition
 
 
 _OT2_ORDERED_SLOTS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]
@@ -164,6 +168,7 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
         deck_configuration: DeckConfigurationType,
         config: Config,
         deck_definition: DeckDefinitionV5,
+        robot_definition: RobotDefinition,
     ) -> None:
         """Initialize an addressable area store and its state."""
         if config.use_simulated_deck_config:
@@ -183,6 +188,7 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
             deck_definition=deck_definition,
             robot_type=config.robot_type,
             use_simulated_deck_config=config.use_simulated_deck_config,
+            robot_definition=robot_definition,
         )
 
     def handle_action(self, action: Action) -> None:
@@ -329,6 +335,22 @@ class AddressableAreaView(HasState[AddressableAreaState]):
             state: Addressable area state dataclass used for all calculations.
         """
         self._state = state
+
+    @cached_property
+    def deck_extents(self) -> Point:
+        """The maximum space on the deck."""
+        extents = self._state.robot_definition["extents"]
+        return Point(x=extents[0], y=extents[1], z=extents[2])
+
+    @cached_property
+    def mount_offsets(self) -> Dict[str, Point]:
+        """The left and right mount offsets of the robot."""
+        left_offset = self.state.robot_definition["mountOffsets"]["left"]
+        right_offset = self.state.robot_definition["mountOffsets"]["right"]
+        return {
+            "left": Point(x=left_offset[0], y=left_offset[1], z=left_offset[2]),
+            "right": Point(x=right_offset[0], y=right_offset[1], z=right_offset[2]),
+        }
 
     def get_addressable_area(self, addressable_area_name: str) -> AddressableArea:
         """Get addressable area."""

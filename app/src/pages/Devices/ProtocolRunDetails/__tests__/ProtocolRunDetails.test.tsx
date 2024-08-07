@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
-import { Route, MemoryRouter } from 'react-router-dom'
+import { Route, MemoryRouter, Routes } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
@@ -18,7 +18,7 @@ import { ProtocolRunModuleControls } from '../../../../organisms/Devices/Protoco
 import { ProtocolRunSetup } from '../../../../organisms/Devices/ProtocolRun/ProtocolRunSetup'
 import { RunPreviewComponent } from '../../../../organisms/RunPreview'
 import { ProtocolRunRuntimeParameters } from '../../../../organisms/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
-import { useCurrentRunId } from '../../../../organisms/ProtocolUpload/hooks'
+import { useCurrentRunId } from '../../../../resources/runs'
 import { mockRobotSideAnalysis } from '../../../../molecules/Command/__fixtures__'
 import { useFeatureFlag } from '../../../../redux/config'
 import { ProtocolRunDetails } from '..'
@@ -33,7 +33,7 @@ vi.mock('../../../../organisms/Devices/ProtocolRun/ProtocolRunHeader')
 vi.mock('../../../../organisms/Devices/ProtocolRun/ProtocolRunSetup')
 vi.mock('../../../../organisms/RunPreview')
 vi.mock('../../../../organisms/Devices/ProtocolRun/ProtocolRunModuleControls')
-vi.mock('../../../../organisms/ProtocolUpload/hooks')
+vi.mock('../../../../resources/runs')
 vi.mock(
   '../../../../organisms/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
 )
@@ -61,9 +61,12 @@ const mockMagneticModule = {
 const render = (path = '/') => {
   return renderWithProviders(
     <MemoryRouter initialEntries={[path]} initialIndex={0}>
-      <Route path="/devices/:robotName/protocol-runs/:runId/:protocolRunDetailsTab?">
-        <ProtocolRunDetails />
-      </Route>
+      <Routes>
+        <Route
+          path="/devices/:robotName/protocol-runs/:runId/:protocolRunDetailsTab?"
+          element={<ProtocolRunDetails />}
+        />
+      </Routes>
     </MemoryRouter>,
     {
       i18nInstance: i18n,

@@ -209,7 +209,7 @@ const StyledTableRowComponent = (
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing16}>
           <LegacyStyledText as="p">
             {parameter.type === 'csv_file'
-              ? parameter.file?.file?.name ?? ''
+              ? parameter.file?.name ?? ''
               : formatRunTimeParameterValue(parameter, t)}
           </LegacyStyledText>
           {parameter.type === 'csv_file' ||

@@ -164,15 +164,11 @@ export function CenteredCommand(
         <CommandText
           {...props}
           propagateTextLimit={props.forceTwoLineClip}
-          css={`
-            ${props.forceTwoLineClip === true
+          css={
+            props.forceTwoLineClip === true
               ? TEXT_CLIP_STYLE
-              : ODD_ONLY_TEXT_CLIP_STYLE}
-            @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
-              max-height: 240px;
-              overflow: auto;
-            } ;
-          `}
+              : ODD_ONLY_TEXT_CLIP_STYLE
+          }
           modernStyledTextDefaults
         />
       </Flex>
@@ -224,15 +220,11 @@ export function LeftAlignedCommand(
         <CommandText
           {...omit(props, ['isOnDevice'])}
           propagateTextLimit={props.forceTwoLineClip}
-          css={`
-            ${props.forceTwoLineClip === true
+          css={
+            props.forceTwoLineClip === true
               ? TEXT_CLIP_STYLE
-              : ODD_ONLY_TEXT_CLIP_STYLE}
-            @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
-              max-height: 240px;
-              overflow: auto;
-            } ;
-          `}
+              : ODD_ONLY_TEXT_CLIP_STYLE
+          }
           modernStyledTextDefaults
         />
       </Flex>
@@ -242,14 +234,17 @@ export function LeftAlignedCommand(
 
 const TEXT_CLIP_STYLE = `
    display: -webkit-box;
-                       -webkit-box-orient: vertical;
-              overflow: hidden;
-              text-overflow: ellipsis;
-              word-wrap: break-word;
-              -webkit-line-clamp: 2;
-}
+   -webkit-box-orient: vertical;
+   overflow: hidden;
+   text-overflow: ellipsis;
+   word-wrap: break-word;
+   -webkit-line-clamp: 2;
 `
 const ODD_ONLY_TEXT_CLIP_STYLE = `
+   @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+      max-height: 240px;
+      overflow: auto;
+   }
    @media (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
      ${TEXT_CLIP_STYLE}
 }

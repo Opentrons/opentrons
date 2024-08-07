@@ -31,6 +31,14 @@ const helixProductStyleMap = {
       }
     `,
   },
+  headingMediumBold: {
+    as: 'h3',
+    style: css`
+      @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+        font: ${HELIX_TYPOGRAPHY.fontStyleHeadingMediumBold};
+      }
+    `,
+  },
   headingMediumSemiBold: {
     as: 'h3',
     style: css`
@@ -48,6 +56,14 @@ const helixProductStyleMap = {
     `,
   },
   headingSmallBold: {
+    as: 'h4',
+    style: css`
+      @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+        font: ${HELIX_TYPOGRAPHY.fontStyleHeadingSmallBold};
+      }
+    `,
+  },
+  headingSmallSemiBold: {
     as: 'h4',
     style: css`
       @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
@@ -92,6 +108,14 @@ const helixProductStyleMap = {
     style: css`
       @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
         font: ${HELIX_TYPOGRAPHY.fontStyleCaptionSemiBold};
+      }
+    `,
+  },
+  captionBold: {
+    as: 'label',
+    style: css`
+      @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+        font: ${HELIX_TYPOGRAPHY.fontStyleCaptionBold};
       }
     `,
   },
@@ -171,7 +195,6 @@ const ODDStyleMap = {
       }
     `,
   },
-
   level3HeaderBold: {
     as: 'h3',
     style: css`
@@ -285,12 +308,13 @@ function styleForODDName(name?: ODDStyles): FlattenSimpleInterpolation {
   return name ? ODDStyleMap[name].style : css``
 }
 
-// this is some artifact of the way styled-text forwards arguments.
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-const DesktopStyledText: (props: Props) => JSX.Element = styled(Text)<Props>`
-  ${props => styleForDesktopName(props.desktopStyle)}
+const DesktopStyledText: (props: Props) => JSX.Element = styled(
+  Text
+).withConfig({
+  shouldForwardProp: p => p !== 'oddStyle' && p !== 'desktopStyle',
+})`
+  ${(props: Props) => styleForDesktopName(props.desktopStyle)}
 `
-/* eslint-enable @typescript-eslint/no-unsafe-argument */
 
 export const StyledText: (props: Props) => JSX.Element = styled(
   DesktopStyledText

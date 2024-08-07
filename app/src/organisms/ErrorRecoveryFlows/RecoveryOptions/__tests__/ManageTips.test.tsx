@@ -69,6 +69,7 @@ describe('ManageTips', () => {
       currentRecoveryOptionUtils: {
         selectedRecoveryOption: null,
       } as any,
+      subMapUtils: { subMap: null, updateSubMap: vi.fn() },
     }
 
     vi.mocked(DropTipWizardFlows).mockReturnValue(
@@ -90,27 +91,27 @@ describe('ManageTips', () => {
   it(`renders BeginRemoval with correct copy when the step is ${DROP_TIP_FLOWS.STEPS.BEGIN_REMOVAL}`, () => {
     render(props)
 
-    screen.getByText(
-      'You may want to remove the tips from the left pipette before using it again in a protocol'
+    screen.getByText('Remove any attached tips')
+    screen.queryByText(
+      /Homing the .* pipette with liquid in the tips may damage it\. You must remove all tips before using the pipette again\./
     )
-    screen.getByText('Begin removal')
-    screen.getByText('Skip')
-    expect(screen.getAllByText('Continue').length).toBe(2)
+    screen.queryAllByText('Begin removal')
+    screen.queryAllByText('Skip')
   })
 
   it('routes correctly when continuing on BeginRemoval', () => {
     render(props)
 
-    const beginRemovalBtn = screen.getByText('Begin removal')
-    const skipBtn = screen.getByText('Skip')
+    const beginRemovalBtn = screen.queryAllByText('Begin removal')[0]
+    const skipBtn = screen.queryAllByText('Skip')[0]
 
     fireEvent.click(beginRemovalBtn)
-    clickButtonLabeled('Continue')
+    clickButtonLabeled('Begin removal')
 
     expect(mockProceedNextStep).toHaveBeenCalled()
 
     fireEvent.click(skipBtn)
-    clickButtonLabeled('Continue')
+    clickButtonLabeled('Skip')
 
     expect(mockSetRobotInMotion).toHaveBeenCalled()
   })
@@ -124,10 +125,10 @@ describe('ManageTips', () => {
     }
     render(props)
 
-    const skipBtn = screen.getByText('Skip')
+    const skipBtn = screen.queryAllByText('Skip')[0]
 
     fireEvent.click(skipBtn)
-    clickButtonLabeled('Continue')
+    clickButtonLabeled('Skip')
 
     expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
       RETRY_NEW_TIPS.ROUTE,
@@ -176,13 +177,16 @@ describe('useDropTipFlowUtils', () => {
   const mockRunId = 'MOCK_RUN_ID'
   const mockTipStatusUtils = { runId: mockRunId }
   const mockProceedToRouteAndStep = vi.fn()
+  const mockUpdateSubMap = vi.fn()
   const { ERROR_WHILE_RECOVERING, DROP_TIP_FLOWS } = RECOVERY_MAP
 
   const mockProps = {
     tipStatusUtils: mockTipStatusUtils,
     failedCommand: null,
-    previousRoute: null,
-    trackExternalMap: vi.fn(),
+    subMapUtils: {
+      updateSubMap: mockUpdateSubMap,
+      subMap: null,
+    },
     currentRecoveryOptionUtils: {
       selectedRecoveryOption: null,
     } as any,
@@ -225,19 +229,13 @@ describe('useDropTipFlowUtils', () => {
     screen.getByText('Proceed to cancel')
   })
 
-  it('should call trackExternalMap with the current map', () => {
-    const mockTrackExternalMap = vi.fn()
-    const { result } = renderHook(() =>
-      useDropTipFlowUtils({
-        ...mockProps,
-        trackExternalMap: mockTrackExternalMap,
-      })
-    )
+  it('should call updateSubMap with the current map', () => {
+    const { result } = renderHook(() => useDropTipFlowUtils(mockProps))
 
-    const currentMap = { route: 'route', step: 'step' }
-    result.current.trackCurrentMap(currentMap)
+    const currentMap = { route: 'route', step: 'step' } as any
+    result.current.reportMap(currentMap)
 
-    expect(mockTrackExternalMap).toHaveBeenCalledWith(currentMap)
+    expect(mockUpdateSubMap).toHaveBeenCalledWith(currentMap)
   })
 
   it('should return the correct error overrides', () => {
@@ -265,19 +263,74 @@ describe('useDropTipFlowUtils', () => {
     )
   })
 
-  it(`should return correct route overrides when the route is ${DROP_TIP_FLOWS.STEPS.CHOOSE_TIP_DROP}`, () => {
-    const { result } = renderHook(() => useDropTipFlowUtils(mockProps))
+  it('should return the correct button overrides', () => {
+    const { result } = renderHook(() =>
+      useDropTipFlowUtils({
+        ...mockProps,
+        recoveryMap: {
+          route: RETRY_NEW_TIPS.ROUTE,
+          step: RETRY_NEW_TIPS.STEPS.DROP_TIPS,
+        },
+        currentRecoveryOptionUtils: {
+          selectedRecoveryOption: RETRY_NEW_TIPS.ROUTE,
+        } as any,
+      })
+    )
+    const { tipDropComplete } = result.current.buttonOverrides
 
-    expect(result.current.routeOverride).toEqual(DT_ROUTES.DROP_TIP)
+    result.current.buttonOverrides.goBackBeforeBeginning()
+
+    expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(DROP_TIP_FLOWS.ROUTE)
+
+    expect(tipDropComplete).toBeDefined()
+
+    if (tipDropComplete != null) {
+      tipDropComplete()
+    }
+
+    expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
+      RETRY_NEW_TIPS.ROUTE,
+      RETRY_NEW_TIPS.STEPS.REPLACE_TIPS
+    )
   })
 
-  it(`should return correct route overrides when the route is ${DROP_TIP_FLOWS.STEPS.CHOOSE_BLOWOUT}`, () => {
+  it(`should return correct route override when the step is ${DROP_TIP_FLOWS.STEPS.CHOOSE_TIP_DROP}`, () => {
+    const { result } = renderHook(() => useDropTipFlowUtils(mockProps))
+
+    expect(result.current.routeOverride).toEqual({
+      route: DT_ROUTES.DROP_TIP,
+      step: null,
+    })
+  })
+
+  it(`should return correct route override when the step is ${DROP_TIP_FLOWS.STEPS.CHOOSE_BLOWOUT}`, () => {
     const mockPropsBlowout = {
       ...mockProps,
       recoveryMap: { step: DROP_TIP_FLOWS.STEPS.CHOOSE_BLOWOUT },
     }
     const { result } = renderHook(() => useDropTipFlowUtils(mockPropsBlowout))
 
-    expect(result.current.routeOverride).toEqual(DT_ROUTES.BLOWOUT)
+    expect(result.current.routeOverride).toEqual({
+      route: DT_ROUTES.BLOWOUT,
+      step: null,
+    })
+  })
+
+  it('should use subMap.step in routeOverride if available', () => {
+    const mockPropsWithSubMap = {
+      ...mockProps,
+      subMapUtils: {
+        ...mockProps.subMapUtils,
+        subMap: { route: DT_ROUTES.DROP_TIP, step: 'SOME_STEP' },
+      },
+    }
+    const { result } = renderHook(() =>
+      useDropTipFlowUtils(mockPropsWithSubMap)
+    )
+
+    expect(result.current.routeOverride).toEqual({
+      route: DT_ROUTES.DROP_TIP,
+      step: 'SOME_STEP',
+    })
   })
 })

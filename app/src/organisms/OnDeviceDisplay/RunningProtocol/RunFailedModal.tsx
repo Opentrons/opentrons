@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { css } from 'styled-components'
 
 import {
@@ -17,10 +17,10 @@ import {
 import { useStopRunMutation } from '@opentrons/react-api-client'
 
 import { SmallButton } from '../../../atoms/buttons'
-import { Modal } from '../../../molecules/Modal'
+import { OddModal } from '../../../molecules/OddModal'
 
-import type { ModalHeaderBaseProps } from '../../../molecules/Modal/types'
 import type { RunError } from '@opentrons/api-client'
+import type { OddModalHeaderBaseProps } from '../../../molecules/OddModal/types'
 
 interface RunFailedModalProps {
   runId: string
@@ -34,12 +34,12 @@ export function RunFailedModal({
   errors,
 }: RunFailedModalProps): JSX.Element | null {
   const { t, i18n } = useTranslation(['run_details', 'shared', 'branded'])
-  const history = useHistory()
+  const navigate = useNavigate()
   const { stopRun } = useStopRunMutation()
   const [isCanceling, setIsCanceling] = React.useState(false)
 
   if (errors == null || errors.length === 0) return null
-  const modalHeader: ModalHeaderBaseProps = {
+  const modalHeader: OddModalHeaderBaseProps = {
     title: t('run_failed_modal_title'),
   }
 
@@ -53,7 +53,7 @@ export function RunFailedModal({
         // ToDo do we need to track this event?
         // If need, runCancel or runFailure something
         // trackProtocolRunEvent({ name: 'runCancel' })
-        history.push('/dashboard')
+        navigate('/dashboard')
       },
       onError: () => {
         setIsCanceling(false)
@@ -61,7 +61,7 @@ export function RunFailedModal({
     })
   }
   return (
-    <Modal
+    <OddModal
       header={modalHeader}
       onOutsideClick={() => {
         setShowRunFailedModal(false)
@@ -119,7 +119,7 @@ export function RunFailedModal({
           disabled={isCanceling}
         />
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }
 

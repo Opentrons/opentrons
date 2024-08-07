@@ -2,7 +2,7 @@ import * as React from 'react'
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { when } from 'vitest-when'
-import { Route, MemoryRouter } from 'react-router-dom'
+import { Route, MemoryRouter, Routes } from 'react-router-dom'
 import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
@@ -20,7 +20,6 @@ import {
   useRunTimeParameters,
 } from '../../Protocols/hooks'
 import { ProtocolSetupParameters } from '../../../organisms/ProtocolSetupParameters'
-import { useFeatureFlag } from '../../../redux/config'
 import { formatTimeWithUtcLabel } from '../../../resources/runs'
 import { ProtocolDetails } from '..'
 import { Deck } from '../Deck'
@@ -81,9 +80,9 @@ const MOCK_DATA = {
 const render = (path = '/protocols/fakeProtocolId') => {
   return renderWithProviders(
     <MemoryRouter initialEntries={[path]} initialIndex={0}>
-      <Route path="/protocols/:protocolId">
-        <ProtocolDetails />
-      </Route>
+      <Routes>
+        <Route path="/protocols/:protocolId" element={<ProtocolDetails />} />
+      </Routes>
     </MemoryRouter>,
     {
       i18nInstance: i18n,
@@ -94,9 +93,6 @@ const render = (path = '/protocols/fakeProtocolId') => {
 describe('ODDProtocolDetails', () => {
   beforeEach(() => {
     when(useRunTimeParameters).calledWith('fakeProtocolId').thenReturn([])
-    when(vi.mocked(useFeatureFlag))
-      .calledWith('enableCsvFile')
-      .thenReturn(false)
     vi.mocked(useCreateRunMutation).mockReturnValue({
       createRun: mockCreateRun,
     } as any)
@@ -248,7 +244,6 @@ describe('ODDProtocolDetails', () => {
   })
 
   it('render requires csv text when a csv file is required', () => {
-    when(vi.mocked(useFeatureFlag)).calledWith('enableCsvFile').thenReturn(true)
     vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
       data: {
         id: 'mockAnalysisId',

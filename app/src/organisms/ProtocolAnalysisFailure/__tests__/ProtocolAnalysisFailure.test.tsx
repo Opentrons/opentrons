@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { StaticRouter } from 'react-router-dom'
+import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
 
@@ -13,7 +13,7 @@ const render = (
   props: Partial<React.ComponentProps<typeof ProtocolAnalysisFailure>> = {}
 ) => {
   return renderWithProviders(
-    <StaticRouter>
+    <MemoryRouter>
       <ProtocolAnalysisFailure
         {...{
           protocolKey: 'fakeProtocolKey',
@@ -21,7 +21,7 @@ const render = (
           ...props,
         }}
       />
-    </StaticRouter>,
+    </MemoryRouter>,
     {
       i18nInstance: i18n,
     }

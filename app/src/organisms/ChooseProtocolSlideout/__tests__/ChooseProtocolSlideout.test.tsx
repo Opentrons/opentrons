@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { vi, it, describe, expect, beforeEach } from 'vitest'
-import { StaticRouter } from 'react-router-dom'
+import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 
 import { simpleAnalysisFileFixture } from '@opentrons/api-client'
@@ -27,9 +27,9 @@ vi.mock('../../../resources/useNotifyDataReady')
 
 const render = (props: React.ComponentProps<typeof ChooseProtocolSlideout>) => {
   return renderWithProviders(
-    <StaticRouter>
+    <MemoryRouter>
       <ChooseProtocolSlideout {...props} />
-    </StaticRouter>,
+    </MemoryRouter>,
     {
       i18nInstance: i18n,
     }
@@ -127,6 +127,7 @@ describe('ChooseProtocolSlideout', () => {
         files: [expect.any(File)],
         protocolKey: storedProtocolDataFixture.protocolKey,
         runTimeParameterValues: expect.any(Object),
+        runTimeParameterFiles: expect.any(Object),
       })
     )
     expect(mockTrackCreateProtocolRunEvent).toHaveBeenCalled()

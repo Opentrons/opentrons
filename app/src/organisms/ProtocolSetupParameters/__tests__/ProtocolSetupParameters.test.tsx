@@ -17,14 +17,13 @@ import { ChooseNumber } from '../ChooseNumber'
 import { ChooseCsvFile } from '../ChooseCsvFile'
 import { mockRunTimeParameterData } from '../../../pages/ProtocolDetails/fixtures'
 import { useToaster } from '../../ToasterOven'
-import { useFeatureFlag } from '../../../redux/config'
 import { ProtocolSetupParameters } from '..'
 
-import type * as ReactRouterDom from 'react-router-dom'
+import type { NavigateFunction } from 'react-router-dom'
 import type { HostConfig } from '@opentrons/api-client'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
-const mockGoBack = vi.fn()
+const mockNavigate = vi.fn()
 
 vi.mock('../ChooseEnum')
 vi.mock('../ChooseNumber')
@@ -34,10 +33,10 @@ vi.mock('../../ToasterOven')
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 vi.mock('react-router-dom', async importOriginal => {
-  const reactRouterDom = await importOriginal<typeof ReactRouterDom>()
+  const reactRouterDom = await importOriginal<NavigateFunction>()
   return {
     ...reactRouterDom,
-    useHistory: () => ({ goBack: mockGoBack } as any),
+    useNavigate: () => mockNavigate,
   }
 })
 vi.mock('../../../redux/config')
@@ -73,7 +72,6 @@ describe('ProtocolSetupParameters', () => {
     vi.mocked(ChooseEnum).mockReturnValue(<div>mock ChooseEnum</div>)
     vi.mocked(ChooseNumber).mockReturnValue(<div>mock ChooseNumber</div>)
     vi.mocked(ChooseCsvFile).mockReturnValue(<div>mock ChooseCsvFile</div>)
-    vi.mocked(useFeatureFlag).mockReturnValue(false)
     vi.mocked(useHost).mockReturnValue(MOCK_HOST_CONFIG)
     when(vi.mocked(useCreateProtocolAnalysisMutation))
       .calledWith(expect.anything(), expect.anything())
@@ -84,9 +82,6 @@ describe('ProtocolSetupParameters', () => {
     when(vi.mocked(useUploadCsvFileMutation))
       .calledWith(expect.anything(), expect.anything())
       .thenReturn({ uploadCsvFile: mockUploadCsvFile } as any)
-    when(vi.mocked(useFeatureFlag))
-      .calledWith('enableCsvFile')
-      .thenReturn(false)
     vi.mocked(useToaster).mockReturnValue({
       makeSnackbar: mockMakeSnackbar,
       makeToast: vi.fn(),
@@ -116,7 +111,6 @@ describe('ProtocolSetupParameters', () => {
   })
 
   it('renders the ChooseCsvFile component when a str param is selected', () => {
-    vi.mocked(useFeatureFlag).mockReturnValue(true)
     render(props)
     fireEvent.click(screen.getByText('CSV File'))
     screen.getByText('mock ChooseCsvFile')
@@ -141,31 +135,30 @@ describe('ProtocolSetupParameters', () => {
     screen.getByText('EtoH Volume')
   })
 
-  // ToDo (kk:06/18/2024) comment-out will be removed in a following PR.
-  // it('renders the other setting when csv param', () => {
-  //   vi.mocked(useFeatureFlag).mockReturnValue(true)
-  //   render(props)
-  //   screen.getByText('CSV File')
-  // })
+  it('renders the other setting when csv param', () => {
+    render(props)
+    screen.getByText('CSV File')
+  })
 
-  it('renders the back icon and calls useHistory', () => {
+  it('renders the back icon and calls useNavigate', () => {
     render(props)
     fireEvent.click(screen.getAllByRole('button')[0])
-    expect(mockGoBack).toHaveBeenCalled()
+    expect(mockNavigate).toHaveBeenCalled()
   })
 
-  it('renders the confirm values button and clicking on it creates a run', () => {
-    render(props)
-    fireEvent.click(screen.getByRole('button', { name: 'Confirm values' }))
-    expect(mockCreateRun).toHaveBeenCalled()
-  })
+  // TODO(nd: 08/1/2024) We intentionally set file field for `csv_file` type parameter to null on mount
+  // it('renders the confirm values button and clicking on it creates a run', () => {
+  //   render(props)
+  //   fireEvent.click(screen.getByRole('button', { name: 'Confirm values' }))
+  //   expect(mockCreateRun).toHaveBeenCalled()
+  // })
 
-  it('should restore default values button is disabled when tapping confirm values button', async () => {
-    render(props)
-    const resetButton = screen.getByTestId('ChildNavigation_Secondary_Button')
-    fireEvent.click(screen.getByText('Confirm values'))
-    expect(resetButton).toBeDisabled()
-  })
+  // it('should restore default values button is disabled when tapping confirm values button', async () => {
+  //   render(props)
+  //   const resetButton = screen.getByTestId('ChildNavigation_Secondary_Button')
+  //   fireEvent.click(screen.getByText('Confirm values'))
+  //   expect(resetButton).toBeDisabled()
+  // })
 
   it('renders the reset values modal', () => {
     render(props)
@@ -181,7 +174,6 @@ describe('ProtocolSetupParameters', () => {
   })
 
   it('render csv file when a protocol requires a csv file and confirm values button has the disabled style', () => {
-    when(vi.mocked(useFeatureFlag)).calledWith('enableCsvFile').thenReturn(true)
     const mockMostRecentAnalysisForCsv = ({
       commands: [],
       labware: [],
@@ -200,7 +192,6 @@ describe('ProtocolSetupParameters', () => {
   })
 
   it('when tapping aria-disabled button, snack bar will show up', () => {
-    when(vi.mocked(useFeatureFlag)).calledWith('enableCsvFile').thenReturn(true)
     const mockMostRecentAnalysisForCsv = ({
       commands: [],
       labware: [],

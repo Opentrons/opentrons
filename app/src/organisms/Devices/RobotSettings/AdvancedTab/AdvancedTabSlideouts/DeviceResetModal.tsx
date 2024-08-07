@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import last from 'lodash/last'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import {
   AlertPrimaryButton,
@@ -13,10 +13,10 @@ import {
   Link,
   PrimaryButton,
   SPACING,
+  Modal,
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { LegacyModal } from '../../../../../molecules/LegacyModal'
 import {
   useDispatchApiRequest,
   getRequestById,
@@ -46,7 +46,7 @@ export function DeviceResetModal({
   resetOptions,
 }: DeviceResetModalProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared', 'branded'])
-  const history = useHistory()
+  const navigate = useNavigate()
   const [dispatchRequest, requestIds] = useDispatchApiRequest()
   const isFlex = useIsFlex(robotName)
   const resetRequestStatus = useSelector((state: State) => {
@@ -79,7 +79,7 @@ export function DeviceResetModal({
         }
       }
       dispatchRequest(resetConfig(robotName, resetOptions))
-      history.push(`/devices/`)
+      navigate('/devices/')
     }
   }
 
@@ -92,7 +92,7 @@ export function DeviceResetModal({
   return (
     <>
       {isRobotReachable ? (
-        <LegacyModal
+        <Modal
           type="warning"
           title={t('reset_to_factory_settings')}
           onClose={closeModal}
@@ -120,9 +120,9 @@ export function DeviceResetModal({
               </AlertPrimaryButton>
             </Flex>
           </Flex>
-        </LegacyModal>
+        </Modal>
       ) : (
-        <LegacyModal
+        <Modal
           type="warning"
           title={t('connection_to_robot_lost')}
           onClose={closeModal}
@@ -142,7 +142,7 @@ export function DeviceResetModal({
               {t('shared:close')}
             </PrimaryButton>
           </Flex>
-        </LegacyModal>
+        </Modal>
       )}
     </>
   )

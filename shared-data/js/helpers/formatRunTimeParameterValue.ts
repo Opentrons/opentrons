@@ -17,7 +17,7 @@ export const formatRunTimeParameterValue = (
   const { type } = runTimeParameter
   const value =
     runTimeParameter.type === 'csv_file'
-      ? runTimeParameter.file?.file?.name ?? ''
+      ? runTimeParameter.file?.name ?? ''
       : runTimeParameter.value
   const suffix =
     'suffix' in runTimeParameter && runTimeParameter.suffix != null

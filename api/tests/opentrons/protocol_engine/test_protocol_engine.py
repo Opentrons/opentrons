@@ -7,8 +7,9 @@ from unittest.mock import sentinel
 import pytest
 from decoy import Decoy
 
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.types import RobotType
 
+from opentrons.protocol_engine.actions.actions import SetErrorRecoveryPolicyAction
 from opentrons.types import DeckSlotName
 from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
 from opentrons.hardware_control.modules import MagDeck, TempDeck
@@ -32,7 +33,6 @@ from opentrons.protocol_engine.types import (
     PostRunHardwareState,
     AddressableAreaLocation,
 )
-from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
 from opentrons.protocol_engine.execution import (
     QueueWorker,
     HardwareStopper,
@@ -117,12 +117,6 @@ def module_data_provider(decoy: Decoy) -> ModuleDataProvider:
     return decoy.mock(cls=ModuleDataProvider)
 
 
-@pytest.fixture
-def error_recovery_policy(decoy: Decoy) -> ErrorRecoveryPolicy:
-    """Get a mock ErrorRecoveryPolicy."""
-    return decoy.mock(cls=ErrorRecoveryPolicy)
-
-
 @pytest.fixture(autouse=True)
 def _mock_slot_standardization_module(
     decoy: Decoy, monkeypatch: pytest.MonkeyPatch
@@ -146,7 +140,6 @@ def _mock_hash_command_params_module(
 def subject(
     hardware_api: HardwareControlAPI,
     state_store: StateStore,
-    error_recovery_policy: ErrorRecoveryPolicy,
     action_dispatcher: ActionDispatcher,
     plugin_starter: PluginStarter,
     queue_worker: QueueWorker,
@@ -159,7 +152,6 @@ def subject(
     return ProtocolEngine(
         hardware_api=hardware_api,
         state_store=state_store,
-        error_recovery_policy=error_recovery_policy,
         action_dispatcher=action_dispatcher,
         plugin_starter=plugin_starter,
         queue_worker=queue_worker,
@@ -1197,4 +1189,14 @@ def test_reset_tips(
     decoy.verify(
         action_dispatcher.dispatch(ResetTipsAction(labware_id="cool-labware")),
         times=1,
+    )
+
+
+async def test_set_error_recovery_policy(
+    decoy: Decoy, action_dispatcher: ActionDispatcher, subject: ProtocolEngine
+) -> None:
+    """It should set the error recovery policy by dispatching an action."""
+    subject.set_error_recovery_policy(sentinel.new_policy)
+    decoy.verify(
+        action_dispatcher.dispatch(SetErrorRecoveryPolicyAction(sentinel.new_policy))
     )

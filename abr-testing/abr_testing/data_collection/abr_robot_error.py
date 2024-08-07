@@ -1,5 +1,5 @@
 """Create ticket for robot with error."""
-from typing import List, Tuple, Any, Dict
+from typing import List, Tuple, Any, Dict, Optional
 from abr_testing.data_collection import read_robot_logs, abr_google_drive, get_run_logs
 import requests
 import argparse
@@ -18,7 +18,7 @@ from statistics import mean, StatisticsError
 def compare_current_trh_to_average(
     robot: str,
     start_time: Any,
-    end_time: Any,
+    end_time: Optional[Any],
     protocol_name: str,
     storage_directory: str,
 ) -> str:
@@ -38,27 +38,29 @@ def compare_current_trh_to_average(
     df_all_trh = pd.DataFrame(all_trh_data)
     # Convert timestamps to datetime objects
     df_all_trh["Timestamp"] = pd.to_datetime(
-        df_all_trh["Timestamp"], format="mixed"
+        df_all_trh["Timestamp"], format="mixed", utc=True
     ).dt.tz_localize(None)
     # Ensure start_time is timezone-naive
     start_time = start_time.replace(tzinfo=None)
-    end_time = end_time.replace(tzinfo=None)
     relevant_temp_rhs = df_all_trh[
-        (df_all_trh["Robot"] == robot)
-        & (df_all_trh["Timestamp"] >= start_time)
-        & (df_all_trh["Timestamp"] <= end_time)
+        (df_all_trh["Robot"] == robot) & (df_all_trh["Timestamp"] >= start_time)
     ]
     try:
         avg_temp = round(mean(relevant_temp_rhs["Temp (oC)"]), 2)
         avg_rh = round(mean(relevant_temp_rhs["Relative Humidity (%)"]), 2)
     except StatisticsError:
-        avg_temp = None
-        avg_rh = None
+        # If there is one value assign it as the average.
+        if len(relevant_temp_rhs["Temp (oC)"]) == 1:
+            avg_temp = relevant_temp_rhs["Temp (oC)"][0]
+            avg_rh = relevant_temp_rhs["Relative Humidity (%)"][0]
+        else:
+            avg_temp = None
+            avg_rh = None
     # Get AVG t/rh of runs w/ same robot & protocol newer than 3 wks old with no errors
     weeks_ago_3 = start_time - timedelta(weeks=3)
     df_all_run_data = pd.DataFrame(all_run_data)
     df_all_run_data["Start_Time"] = pd.to_datetime(
-        df_all_run_data["Start_Time"], format="mixed"
+        df_all_run_data["Start_Time"], format="mixed", utc=True
     ).dt.tz_localize(None)
     df_all_run_data["Errors"] = pd.to_numeric(df_all_run_data["Errors"])
     df_all_run_data["Average Temp (oC)"] = pd.to_numeric(
@@ -129,9 +131,20 @@ def compare_lpc_to_historical_data(
     current_x = round(labware_dict["X"], 2)
     current_y = round(labware_dict["Y"], 2)
     current_z = round(labware_dict["Z"], 2)
-    avg_x = round(mean(x_float), 2)
-    avg_y = round(mean(y_float), 2)
-    avg_z = round(mean(z_float), 2)
+    try:
+        avg_x = round(mean(x_float), 2)
+        avg_y = round(mean(y_float), 2)
+        avg_z = round(mean(z_float), 2)
+    except StatisticsError:
+        # If there is one value assign it as the average.
+        if len(x_float) == 1:
+            avg_x = x_float[0]
+            avg_y = y_float[0]
+            avg_z = z_float[0]
+        else:
+            avg_x = None
+            avg_y = None
+            avg_z = None
 
     # Formats LPC message for ticket.
     lpc_message = (
@@ -283,7 +296,9 @@ def get_robot_state(
     components = match_error_to_component("RABR", reported_string, components)
     print(components)
     end_time = datetime.now()
+    print(end_time)
     start_time = end_time - timedelta(hours=2)
+    print(start_time)
     # Get current temp/rh compared to historical data
     temp_rh_string = compare_current_trh_to_average(
         parent, start_time, end_time, "", storage_directory
@@ -466,7 +481,6 @@ if __name__ == "__main__":
     reporter_id = args.reporter_id[0]
     file_paths = read_robot_logs.get_logs(storage_directory, ip)
     ticket = jira_tool.JiraTicket(url, api_token, email)
-    ticket.issues_on_board(board_id)
     users_file_path = ticket.get_jira_users(storage_directory)
     assignee_id = get_user_id(users_file_path, assignee)
     run_log_file_path = ""
@@ -504,6 +518,9 @@ if __name__ == "__main__":
     print(robot)
     parent_key = project_key + "-" + robot.split("ABR")[1]
 
+    # Grab all previous issues
+    all_issues = ticket.issues_on_board(project_key)
+
     # TODO: read board to see if ticket for run id already exists.
     # CREATE TICKET
     issue_key, raw_issue_url = ticket.create_ticket(
@@ -518,6 +535,11 @@ if __name__ == "__main__":
         affects_version,
         parent_key,
     )
+
+    # Link Tickets
+    to_link = ticket.match_issues(all_issues, summary)
+    ticket.link_issues(to_link, issue_key)
+
     # OPEN TICKET
     issue_url = ticket.open_issue(issue_key)
     # MOVE FILES TO ERROR FOLDER.

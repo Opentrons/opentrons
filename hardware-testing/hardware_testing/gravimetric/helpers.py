@@ -26,7 +26,7 @@ from opentrons.hardware_control.instruments.ot3.pipette import Pipette
 from opentrons import execute, simulate
 from opentrons.types import Point, Location, Mount
 from opentrons.config.types import OT3Config, RobotConfig
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons_shared_data.labware.types import LabwareDefinition
 
 from hardware_testing.opentrons_api import helpers_ot3
 from opentrons.protocol_api import ProtocolContext, InstrumentContext
@@ -168,7 +168,7 @@ def _jog_to_find_liquid_height(
     ctx: ProtocolContext, pipette: InstrumentContext, well: Well
 ) -> float:
     _well_depth = well.depth
-    _liquid_height = _well_depth
+    _liquid_height = _well_depth + 2
     _jog_size = -1.0
     if ctx.is_simulating():
         return _liquid_height - 1

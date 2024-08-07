@@ -6,6 +6,14 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
+## Opentrons App Changes in 7.5.0
+
+Welcome to the v7.5.0 release of the Opentrons App!
+
+There are no changes to the Opentrons App in v7.5.0, but it is required for updating the robot software to support the [Opentrons Flex HEPA/UV Module](https://opentrons.com/products/opentrons-flex-hepa-uv-module) and the latest Flex Gripper model (serial numbers beginning `GRPV13`).
+
+---
+
 ## Opentrons App Changes in 7.3.1
 
 Welcome to the v7.3.1 release of the Opentrons App!

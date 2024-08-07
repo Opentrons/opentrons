@@ -18,6 +18,7 @@ export type PipettingRunTimeCommand =
   | TouchTipRunTimeCommand
   | VerifyTipPresenceRunTimeCommand
   | LiquidProbeRunTimeCommand
+  | TryLiquidProbeRunTimeCommand
 
 export type PipettingCreateCommand =
   | AspirateCreateCommand
@@ -36,6 +37,7 @@ export type PipettingCreateCommand =
   | TouchTipCreateCommand
   | VerifyTipPresenceCreateCommand
   | LiquidProbeCreateCommand
+  | TryLiquidProbeCreateCommand
 
 export interface ConfigureForVolumeCreateCommand
   extends CommonCommandCreateInfo {
@@ -203,6 +205,16 @@ export interface LiquidProbeCreateCommand extends CommonCommandCreateInfo {
 export interface LiquidProbeRunTimeCommand
   extends CommonCommandRunTimeInfo,
     LiquidProbeCreateCommand {
+  result?: Record<string, unknown>
+}
+
+export interface TryLiquidProbeCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'tryLiquidProbe'
+  params: WellLocationParam & PipetteAccessParams
+}
+export interface TryLiquidProbeRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    TryLiquidProbeCreateCommand {
   result?: Record<string, unknown>
 }
 

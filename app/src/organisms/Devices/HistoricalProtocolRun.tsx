@@ -14,7 +14,6 @@ import {
   LegacyStyledText,
 } from '@opentrons/components'
 import { useAllCsvFilesQuery } from '@opentrons/react-api-client'
-import { useFeatureFlag } from '../../redux/config'
 import { formatInterval } from '../RunTimeControl/utils'
 import { formatTimestamp } from './utils'
 import { EMPTY_TIMESTAMP } from './constants'
@@ -44,7 +43,7 @@ export function HistoricalProtocolRun(
   const [drawerOpen, setDrawerOpen] = React.useState(false)
   const { data: protocolFileData } = useAllCsvFilesQuery(run.protocolId ?? '')
   const allProtocolDataFiles =
-    protocolFileData != null ? protocolFileData.data.files : []
+    protocolFileData != null ? protocolFileData.data : []
   const runStatus = run.status
   const runDisplayName = formatTimestamp(run.createdAt)
   let duration = EMPTY_TIMESTAMP
@@ -55,7 +54,6 @@ export function HistoricalProtocolRun(
       duration = formatInterval(run.startedAt, new Date().toString())
     }
   }
-  const enableCsvFile = useFeatureFlag('enableCsvFile')
 
   return (
     <>
@@ -89,15 +87,13 @@ export function HistoricalProtocolRun(
           >
             {protocolName}
           </LegacyStyledText>
-          {enableCsvFile ? (
-            <LegacyStyledText
-              as="p"
-              width="5%"
-              data-testid={`RecentProtocolRuns_Files_${protocolKey}`}
-            >
-              {allProtocolDataFiles.length}
-            </LegacyStyledText>
-          ) : null}
+          <LegacyStyledText
+            as="p"
+            width="5%"
+            data-testid={`RecentProtocolRuns_Files_${protocolKey}`}
+          >
+            {allProtocolDataFiles.length}
+          </LegacyStyledText>
           <LegacyStyledText
             as="p"
             width="14%"
