@@ -9,6 +9,7 @@ from typing import (
     Callable,
     Generator,
     Iterator,
+    Iterable,
     Sequence,
     Tuple,
     TypedDict,
@@ -533,7 +534,7 @@ class TransferPlan:
             max_volume=self._instr.max_volume,
         )
         plan_iter = self._expand_for_volume_constraints(
-            iter(self._volumes),
+            self._volumes,
             zip(sources, dests),
             self._instr.max_volume
             - self._strategy.disposal_volume
@@ -632,8 +633,8 @@ class TransferPlan:
         # First method keeps distribute consistent with current behavior while
         # the other maintains consistency in default behaviors of all functions
         plan_iter = self._expand_for_volume_constraints(
-            iter(self._volumes),
-            iter(self._dests),
+            self._volumes,
+            self._dests,
             # todo(mm, 2021-03-09): Is it right for this to be
             # _instr_.max_volume? Does/should this take the tip maximum volume
             # into account?
@@ -684,7 +685,7 @@ class TransferPlan:
 
     @staticmethod
     def _expand_for_volume_constraints(
-        volumes: Iterator[float], targets: Iterator[Target], max_volume: float
+        volumes: Iterable[float], targets: Iterable[Target], max_volume: float
     ) -> Generator[Tuple[float, "Target"], None, None]:
         """Split a sequence of proposed transfers if necessary to keep each
         transfer under the given max volume.
@@ -750,8 +751,8 @@ class TransferPlan:
             # todo(mm, 2021-03-09): Is it right to use _instr.max_volume here?
             # Why don't we account for tip max volume, disposal volume, or air
             # gap?
-            iter(self._volumes),
-            iter(self._sources),
+            self._volumes,
+            self._sources,
             self._instr.max_volume,
         )
         current_xfer = next(plan_iter)
