@@ -26,6 +26,7 @@ interface HardwareIconProps extends StyleProps {
 // type union requires one of deckLabel or iconName, but not both
 export type DeckInfoLabelProps = (DeckLabelProps | HardwareIconProps) & {
   highlight?: boolean
+  svgSize?: string | number
 }
 
 export const DeckInfoLabel = styled(DeckInfoLabelComponent)`
@@ -42,8 +43,8 @@ export const DeckInfoLabel = styled(DeckInfoLabelComponent)`
     props.height ?? SPACING.spacing20}; // prevents the icon from being squished
 
   > svg {
-    height: 0.875rem;
-    width: 0.875rem;
+    height: ${props => props.svgSize ?? '0.875rem'};
+    width: ${props => props.svgSize ?? '0.875rem'};
   }
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
@@ -53,8 +54,8 @@ export const DeckInfoLabel = styled(DeckInfoLabelComponent)`
       ${props =>
         props.deckLabel != null ? SPACING.spacing8 : SPACING.spacing6};
     > svg {
-      height: 1.25rem;
-      width: 1.25rem;
+      height: ${props => props.svgSize ?? '1.25rem'};
+      width: ${props => props.svgSize ?? '1.25rem'};
     }
   }
 `
