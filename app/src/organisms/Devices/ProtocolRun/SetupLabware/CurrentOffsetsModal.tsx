@@ -14,15 +14,13 @@ import {
   DIRECTION_COLUMN,
   SPACING,
   TYPOGRAPHY,
+  ModalHeader,
+  ModalShell,
   COLORS,
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
 
 import { getIsLabwareOffsetCodeSnippetsOn } from '../../../../redux/config'
-import {
-  LegacyModalHeader,
-  LegacyModalShell,
-} from '../../../../molecules/LegacyModal'
 import { LabwareOffsetTabs } from '../../../LabwareOffsetTabs'
 import { OffsetVector } from '../../../../molecules/OffsetVector'
 import { PythonLabwareOffsetSnippet } from '../../../../molecules/PythonLabwareOffsetSnippet'
@@ -133,13 +131,10 @@ export function CurrentOffsetsModal(
     />
   )
   return (
-    <LegacyModalShell
+    <ModalShell
       maxWidth="40rem"
       header={
-        <LegacyModalHeader
-          title={t('applied_offset_data')}
-          onClose={onCloseClick}
-        />
+        <ModalHeader title={t('applied_offset_data')} onClose={onCloseClick} />
       }
     >
       <Flex
@@ -157,6 +152,6 @@ export function CurrentOffsetsModal(
           TableComponent
         )}
       </Flex>
-    </LegacyModalShell>
+    </ModalShell>
   )
 }

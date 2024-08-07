@@ -289,3 +289,32 @@ export const getTiprackOptions: Selector<DropdownOption[]> = createSelector(
     return options
   }
 )
+
+export const getAllTiprackOptions: Selector<DropdownOption[]> = createSelector(
+  stepFormSelectors.getLabwareEntities,
+  getLabwareNicknamesById,
+  (labwareEntities, nicknamesById) => {
+    const options = reduce(
+      labwareEntities,
+      (
+        acc: DropdownOption[],
+        labwareEntity: LabwareEntity,
+        labwareId: string
+      ): DropdownOption[] => {
+        if (!getIsTiprack(labwareEntity.def)) {
+          return acc
+        } else {
+          return [
+            ...acc,
+            {
+              name: nicknamesById[labwareId],
+              value: labwareEntity.id,
+            },
+          ]
+        }
+      },
+      []
+    )
+    return options
+  }
+)

@@ -3,13 +3,12 @@
 import csv
 import typing
 import logging
-from ._data_shapes import MetricsMetadata
-from ._types import SupportsCSVStorage
+from ._data_shapes import MetricsMetadata, CSVStorageBase
 from ._logging_config import LOGGER_NAME
 
 logger = logging.getLogger(LOGGER_NAME)
 
-T = typing.TypeVar("T", bound=SupportsCSVStorage)
+T = typing.TypeVar("T", bound=CSVStorageBase)
 
 
 class MetricsStore(typing.Generic[T]):

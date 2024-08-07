@@ -1,6 +1,16 @@
 For more details about this release, please see the full [technical changelog][].
 [technical change log]: https://github.com/Opentrons/opentrons/releases
 
+## Internal Release 2.0.0-alpha.4
+
+This internal release, pulled from the `edge` branch, contains features being developed for 8.0.0. It's for internal testing only. There are no changes to `buildroot`, `ot3-firmware`, or `oe-core` since the last internal release.
+
+- [Opentrons changes since the latest stable release](https://github.com/Opentrons/opentrons/compare/v7.5.0...ot3@2.0.0-alpha.4)
+- [Opentrons changes since the last internal release](https://github.com/Opentrons/opentrons/compare/ot3@2.0.0-alpha.3...ot3@2.0.0-alpha.4)
+- [Flex changes since last stable release](https://github.com/Opentrons/oe-core/compare/v0.6.4...internal@2.0.0-alpha.3)
+- [Flex firmware changes since last stable release](https://github.com/Opentrons/ot3-firmware/compare/v52...internal@v10)
+- [OT2 changes since last stable release](https://github.com/Opentrons/buildroot/compare/v1.17.7...internal@2.0.0-alpha.0)
+
 ## Internal Release 2.0.0-alpha.3
 
 This internal release, pulled from the `edge` branch, contains features being developed for 8.0.0. It's for internal testing only.

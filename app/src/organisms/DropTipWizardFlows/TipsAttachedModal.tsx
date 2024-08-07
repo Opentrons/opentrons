@@ -15,11 +15,11 @@ import { ApiHostProvider } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { SmallButton } from '../../atoms/buttons'
-import { Modal } from '../../molecules/Modal'
+import { OddModal } from '../../molecules/OddModal'
 import { DropTipWizardFlows, useDropTipWizardFlows } from '.'
 
 import type { HostConfig } from '@opentrons/api-client'
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
+import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
 import type { PipetteWithTip } from '.'
 
 interface TipsAttachedModalProps {
@@ -45,7 +45,7 @@ const TipsAttachedModal = NiceModal.create(
     const { mount, specs } = head(pipettesWithTip) as PipetteWithTip
     const { showDTWiz, toggleDTWiz } = useDropTipWizardFlows()
 
-    const tipsAttachedHeader: ModalHeaderBaseProps = {
+    const tipsAttachedHeader: OddModalHeaderBaseProps = {
       title: t('remove_any_attached_tips'),
       iconName: 'ot-alert',
       iconColor: COLORS.red50,
@@ -61,7 +61,7 @@ const TipsAttachedModal = NiceModal.create(
 
     return (
       <ApiHostProvider {...host} hostname={host?.hostname ?? null}>
-        <Modal header={tipsAttachedHeader}>
+        <OddModal header={tipsAttachedHeader}>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
             <LegacyStyledText as="p">
               <Trans
@@ -89,7 +89,7 @@ const TipsAttachedModal = NiceModal.create(
               />
             </Flex>
           </Flex>
-        </Modal>
+        </OddModal>
         {showDTWiz ? (
           <DropTipWizardFlows
             instrumentModelSpecs={specs}

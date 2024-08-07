@@ -481,7 +481,6 @@ if __name__ == "__main__":
     reporter_id = args.reporter_id[0]
     file_paths = read_robot_logs.get_logs(storage_directory, ip)
     ticket = jira_tool.JiraTicket(url, api_token, email)
-    ticket.issues_on_board(board_id)
     users_file_path = ticket.get_jira_users(storage_directory)
     assignee_id = get_user_id(users_file_path, assignee)
     run_log_file_path = ""
@@ -519,6 +518,9 @@ if __name__ == "__main__":
     print(robot)
     parent_key = project_key + "-" + robot.split("ABR")[1]
 
+    # Grab all previous issues
+    all_issues = ticket.issues_on_board(project_key)
+
     # TODO: read board to see if ticket for run id already exists.
     # CREATE TICKET
     issue_key, raw_issue_url = ticket.create_ticket(
@@ -533,10 +535,12 @@ if __name__ == "__main__":
         affects_version,
         parent_key,
     )
+    # Link Tickets
+    to_link = ticket.match_issues(all_issues, summary)
+    ticket.link_issues(to_link, issue_key)
     # OPEN TICKET
     issue_url = ticket.open_issue(issue_key)
     # MOVE FILES TO ERROR FOLDER.
-
     error_files = [saved_file_path_calibration, run_log_file_path] + file_paths
     error_folder_path = os.path.join(storage_directory, issue_key)
     os.makedirs(error_folder_path, exist_ok=True)
@@ -548,8 +552,11 @@ if __name__ == "__main__":
             shutil.move(source_file, destination_file)
         except shutil.Error:
             continue
-    # OPEN FOLDER DIRECTORY
-    subprocess.Popen(["explorer", error_folder_path])
+    # POST FILES TO TICKET
+    list_of_files = os.listdir(error_folder_path)
+    for file in list_of_files:
+        file_to_attach = os.path.join(error_folder_path, file)
+        ticket.post_attachment_to_ticket(issue_key, file_to_attach)
     # ADD ERROR COMMENTS TO TICKET
     read_each_log(error_folder_path, raw_issue_url)
     # WRITE ERRORED RUN TO GOOGLE SHEET
@@ -594,3 +601,5 @@ if __name__ == "__main__":
         google_sheet_lpc.batch_update_cells(runs_and_lpc, "A", start_row_lpc, "0")
     else:
         print("Ticket created.")
+    # Open folder directory incase uploads to ticket were incomplete
+    subprocess.Popen(["explorer", error_folder_path])

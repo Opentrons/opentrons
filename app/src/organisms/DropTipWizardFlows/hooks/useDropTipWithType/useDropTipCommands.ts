@@ -9,8 +9,6 @@ import type {
   CreateCommand,
   AddressableAreaName,
   PipetteModelSpecs,
-  BlowoutInPlaceCreateCommand,
-  UnsafeBlowoutInPlaceCreateCommand,
   DropTipInPlaceCreateCommand,
   UnsafeDropTipInPlaceCreateCommand,
 } from '@opentrons/shared-data'
@@ -27,6 +25,7 @@ import type { UseDTWithTypeParams } from '..'
 import type { RunCommandByCommandTypeParams } from './useDropTipCreateCommands'
 
 const JOG_COMMAND_TIMEOUT_MS = 10000
+const MAXIMUM_BLOWOUT_FLOW_RATE_UL_PER_S = 50
 
 type UseDropTipSetupCommandsParams = UseDTWithTypeParams & {
   activeMaintenanceRunId: string | null
@@ -187,11 +186,9 @@ export function useDropTipCommands({
   ): Promise<void> => {
     return new Promise((resolve, reject) => {
       chainRunCommands(
-        [
-          currentStep === POSITION_AND_BLOWOUT
-            ? buildBlowoutInPlaceCommand(instrumentModelSpecs, isFlex)
-            : buildDropTipInPlaceCommand(isFlex),
-        ],
+        currentStep === POSITION_AND_BLOWOUT
+          ? buildBlowoutCommands(instrumentModelSpecs, isFlex)
+          : buildDropTipInPlaceCommand(isFlex),
         true
       )
         .then((commandData: CommandData[]) => {
@@ -278,36 +275,53 @@ const UPDATE_ESTIMATORS_EXCEPT_PLUNGERS: CreateCommand = {
 
 const buildDropTipInPlaceCommand = (
   isFlex: boolean
-): DropTipInPlaceCreateCommand | UnsafeDropTipInPlaceCreateCommand =>
+): Array<DropTipInPlaceCreateCommand | UnsafeDropTipInPlaceCreateCommand> =>
   isFlex
-    ? {
-        commandType: 'unsafe/dropTipInPlace',
-        params: { pipetteId: MANAGED_PIPETTE_ID },
-      }
-    : {
-        commandType: 'dropTipInPlace',
-        params: { pipetteId: MANAGED_PIPETTE_ID },
-      }
+    ? [
+        {
+          commandType: 'unsafe/dropTipInPlace',
+          params: { pipetteId: MANAGED_PIPETTE_ID },
+        },
+      ]
+    : [
+        {
+          commandType: 'dropTipInPlace',
+          params: { pipetteId: MANAGED_PIPETTE_ID },
+        },
+      ]
 
-const buildBlowoutInPlaceCommand = (
+const buildBlowoutCommands = (
   specs: PipetteModelSpecs,
   isFlex: boolean
-): BlowoutInPlaceCreateCommand | UnsafeBlowoutInPlaceCreateCommand =>
+): CreateCommand[] =>
   isFlex
-    ? {
-        commandType: 'unsafe/blowOutInPlace',
-        params: {
-          pipetteId: MANAGED_PIPETTE_ID,
-          flowRate: specs.defaultBlowOutFlowRate.value,
+    ? [
+        {
+          commandType: 'unsafe/blowOutInPlace',
+          params: {
+            pipetteId: MANAGED_PIPETTE_ID,
+            flowRate: Math.min(
+              specs.defaultBlowOutFlowRate.value,
+              MAXIMUM_BLOWOUT_FLOW_RATE_UL_PER_S
+            ),
+          },
         },
-      }
-    : {
-        commandType: 'blowOutInPlace',
-        params: {
-          pipetteId: MANAGED_PIPETTE_ID,
-          flowRate: specs.defaultBlowOutFlowRate.value,
+        {
+          commandType: 'prepareToAspirate',
+          params: {
+            pipetteId: MANAGED_PIPETTE_ID,
+          },
         },
-      }
+      ]
+    : [
+        {
+          commandType: 'blowOutInPlace',
+          params: {
+            pipetteId: MANAGED_PIPETTE_ID,
+            flowRate: specs.defaultBlowOutFlowRate.value,
+          },
+        },
+      ]
 
 const buildMoveToAACommand = (
   addressableAreaFromConfig: AddressableAreaName

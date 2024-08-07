@@ -203,6 +203,12 @@ class CommandState:
     This value can be used to generate future hashes.
     """
 
+    failed_command_errors: List[ErrorOccurrence]
+    """List of command errors that occurred during run execution."""
+
+    has_entered_error_recovery: bool
+    """Whether the run has entered error recovery."""
+
     stopped_by_estop: bool
     """If this is set to True, the engine was stopped by an estop event."""
 
@@ -238,7 +244,9 @@ class CommandStore(HasState[CommandState], HandlesActions):
             run_started_at=None,
             latest_protocol_command_hash=None,
             stopped_by_estop=False,
+            failed_command_errors=[],
             error_recovery_policy=error_recovery_policy,
+            has_entered_error_recovery=False,
         )
 
     def handle_action(self, action: Action) -> None:
@@ -330,6 +338,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
             notes=action.notes,
         )
         self._state.failed_command = self._state.command_history.get(action.command_id)
+        self._state.failed_command_errors.append(public_error_occurrence)
 
         other_command_ids_to_fail: List[str]
         if prev_entry.command.intent == CommandIntent.SETUP:
@@ -373,6 +382,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
         ):
             self._state.queue_status = QueueStatus.AWAITING_RECOVERY
             self._state.recovery_target_command_id = action.command_id
+            self._state.has_entered_error_recovery = True
 
     def _handle_play_action(self, action: PlayAction) -> None:
         if not self._state.run_result:
@@ -634,6 +644,14 @@ class CommandView(HasState[CommandState]):
             return combined_error
         else:
             return run_error or finish_error
+
+    def get_all_errors(self) -> List[ErrorOccurrence]:
+        """Get the run's full error list, if there was none, returns an empty list."""
+        return self._state.failed_command_errors
+
+    def get_has_entered_recovery_mode(self) -> bool:
+        """Get whether the run has entered recovery mode."""
+        return self._state.has_entered_error_recovery
 
     def get_running_command_id(self) -> Optional[str]:
         """Return the ID of the command that's currently running, if there is one."""

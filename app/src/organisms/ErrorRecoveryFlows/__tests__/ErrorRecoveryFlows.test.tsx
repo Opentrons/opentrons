@@ -218,7 +218,7 @@ describe('ErrorRecoveryFlows', () => {
 
     const newProps = {
       ...props,
-      failedCommand: { ...mockFailedCommand, id: 'NEW_ID' },
+      failedCommand: null,
     }
     rerender(<ErrorRecoveryFlows {...newProps} />)
     expect(mockReportErrorEvent).toHaveBeenCalledWith(newProps.failedCommand)
