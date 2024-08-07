@@ -38,7 +38,7 @@ import {
   useProtocolQuery,
   useInstrumentsQuery,
   useDeleteRunMutation,
-  useAllRunCommandErrorsQuery,
+  useRunCommandErrors,
 } from '@opentrons/react-api-client'
 
 import { LargeButton } from '../../atoms/buttons'
@@ -146,7 +146,7 @@ export function RunSummary(): JSX.Element {
     localRobot?.serverHealth?.serialNumber ??
     null
 
-  const { data: commandErrorList } = useAllRunCommandErrorsQuery(runId, null, {
+  const { data: commandErrorList } = useRunCommandErrors(runId, null, {
     enabled:
       runStatus != null &&
       // @ts-expect-error runStatus expected to possibly not be terminal

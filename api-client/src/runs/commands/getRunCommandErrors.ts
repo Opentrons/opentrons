@@ -1,8 +1,8 @@
-import { GET, request } from '../request'
+import { GET, request } from '../../request'
 
-import type { ResponsePromise } from '../request'
-import type { HostConfig } from '../types'
-import type { GetCommandsParams, RunCommandErrors } from './types'
+import type { ResponsePromise } from '../../request'
+import type { HostConfig } from '../../types'
+import type { GetCommandsParams, RunCommandErrors } from '../types'
 
 export function getRunCommandErrors(
   config: HostConfig,
@@ -13,6 +13,7 @@ export function getRunCommandErrors(
     GET,
     `/runs/${runId}/commandErrors`,
     null,
-    config
+    config,
+    params
   )
 }

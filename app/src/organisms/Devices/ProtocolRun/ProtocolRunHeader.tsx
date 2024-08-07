@@ -23,7 +23,7 @@ import {
   useDoorQuery,
   useHost,
   useInstrumentsQuery,
-  useAllRunCommandErrorsQuery,
+  useRunCommandErrors,
 } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import {
@@ -169,7 +169,7 @@ export function ProtocolRunHeader({
   const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
   const [showRunFailedModal, setShowRunFailedModal] = React.useState(false)
-  const { data: commandErrorList } = useAllRunCommandErrorsQuery(runId, null, {
+  const { data: commandErrorList } = useRunCommandErrors(runId, null, {
     enabled:
       runStatus != null &&
       // @ts-expect-error runStatus expected to possibly not be terminal

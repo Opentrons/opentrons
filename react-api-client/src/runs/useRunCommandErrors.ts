@@ -14,7 +14,7 @@ export const DEFAULT_PARAMS: GetCommandsParams = {
   pageLength: DEFAULT_PAGE_LENGTH,
 }
 
-export function useAllRunCommandErrorsQuery<TError = Error>(
+export function useRunCommandErrors<TError = Error>(
   runId: string | null,
   params?: GetCommandsParams | null,
   options: UseQueryOptions<RunCommandErrors, TError> = {}
