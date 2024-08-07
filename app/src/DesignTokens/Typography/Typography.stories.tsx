@@ -26,6 +26,7 @@ const fontStyles = {
     ['BodyLarge', 'Regular'],
     ['BodyDefault', 'SemiBold'],
     ['BodyDefault', 'Regular'],
+    ['Caption', 'Bold'],
     ['Caption', 'SemiBold'],
     ['Caption', 'Regular'],
     ['Code', 'Regular'],
