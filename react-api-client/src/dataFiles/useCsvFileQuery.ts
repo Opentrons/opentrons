@@ -16,7 +16,7 @@ export function useCsvFileQuery(
   }
 
   const query = useQuery<CsvFileDataResponse>(
-    [host, `/dataFiles/${fileId}`],
+    [host, 'dataFiles', fileId],
     () =>
       getCsvFile(host as HostConfig, fileId).then(response => response.data),
     allOptions
