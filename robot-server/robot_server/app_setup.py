@@ -28,8 +28,8 @@ from .runs.dependencies import (
 )
 
 from .service.notifications import (
-    initialize_notifications,
-    clean_up_notification_client,
+    set_up_notification_client,
+    initialize_pe_publisher_notifier,
 )
 
 
@@ -81,8 +81,8 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         )
         exit_stack.push_async_callback(clean_up_persistence, app.state)
 
-        initialize_notifications(app.state)
-        exit_stack.callback(clean_up_notification_client, app.state)
+        exit_stack.enter_context(set_up_notification_client(app.state))
+        initialize_pe_publisher_notifier(app.state)
 
         yield  # Start handling HTTP requests.
 
