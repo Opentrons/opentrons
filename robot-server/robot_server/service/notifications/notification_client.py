@@ -214,7 +214,10 @@ async def clean_up_notification_client(app_state: AppState) -> None:
 
 def get_notification_client(
     app_state: Annotated[AppState, Depends(get_app_state)],
-) -> Optional[NotificationClient]:
+) -> NotificationClient:
     """Intended to be used by endpoint functions as a FastAPI dependency."""
     notification_client = _notification_client_accessor.get_from(app_state)
+    assert (
+        notification_client is not None
+    ), "Forgot to initialize notification client as part of server startup?"
     return notification_client
