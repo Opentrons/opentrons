@@ -838,7 +838,7 @@ async def test_liquid_probe(
         mock_move_to_plunger_bottom.call_count == 2
         mock_liquid_probe.assert_called_once_with(
             mount,
-            52,
+            46,
             fake_settings_aspirate.mount_speed,
             (fake_settings_aspirate.plunger_speed * -1),
             fake_settings_aspirate.sensor_threshold_pascals,
@@ -990,7 +990,7 @@ async def test_liquid_not_found(
             OT3Mount.LEFT, fake_max_z_dist, fake_settings_aspirate
         )
     # assert that it went through 4 passes and then prepared to aspirate
-    assert mock_move_to_plunger_bottom.call_count == 5
+    assert mock_move_to_plunger_bottom.call_count == 4
 
 
 @pytest.mark.parametrize(
