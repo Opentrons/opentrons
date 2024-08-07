@@ -25,7 +25,7 @@ import {
   getLoadedLabwareDefinitionsByUri,
   getModuleDisplayName,
 } from '@opentrons/shared-data'
-import { useAllCsvFilesQuery } from '@opentrons/react-api-client'
+import { useCsvFileQuery } from '@opentrons/react-api-client'
 import { DownloadCsvFileLink } from './DownloadCsvFileLink'
 import { Banner } from '../../atoms/Banner'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
@@ -46,8 +46,15 @@ export function HistoricalProtocolRunDrawer(
   const allLabwareOffsets = run.labwareOffsets?.sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   )
-  const { data } = useAllCsvFilesQuery(run.protocolId ?? '')
-  const allProtocolDataFiles = data != null ? data.data : []
+  const runDataFileIds = run.runTimeParameters.reduce<string[]>(
+    (acc, parameter) => {
+      if (parameter.type === 'csv_file') {
+        return parameter.file?.id != null ? [...acc, parameter.file?.id] : acc
+      }
+      return acc
+    },
+    []
+  )
   const uniqueLabwareOffsets = allLabwareOffsets?.filter(
     (offset, index, array) => {
       return (
@@ -94,7 +101,7 @@ export function HistoricalProtocolRunDrawer(
   ) : null
 
   const protocolFilesData =
-    allProtocolDataFiles.length === 1 ? (
+    runDataFileIds.length === 0 ? (
       <InfoScreen contentType="noFiles" t={t} backgroundColor={COLORS.grey35} />
     ) : (
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
@@ -133,43 +140,8 @@ export function HistoricalProtocolRunDrawer(
           </Box>
         </Flex>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-          {allProtocolDataFiles.map((fileData, index) => {
-            const { createdAt, name: fileName, id: fileId } = fileData
-            return (
-              <Flex
-                key={`csv_file_${index}`}
-                justifyContent={JUSTIFY_FLEX_START}
-                alignItems={ALIGN_CENTER}
-                padding={SPACING.spacing12}
-                backgroundColor={COLORS.white}
-                borderRadius={BORDERS.borderRadius4}
-                gridGap={SPACING.spacing24}
-              >
-                <Flex
-                  width="33%"
-                  gridGap={SPACING.spacing4}
-                  alignItems={ALIGN_CENTER}
-                >
-                  <LegacyStyledText
-                    as="p"
-                    css={css`
-                      overflow: ${OVERFLOW_HIDDEN};
-                      text-overflow: ellipsis;
-                    `}
-                  >
-                    {fileName}
-                  </LegacyStyledText>
-                </Flex>
-                <Box width="33%">
-                  <LegacyStyledText as="p">
-                    {format(new Date(createdAt), 'M/d/yy HH:mm:ss')}
-                  </LegacyStyledText>
-                </Box>
-                <Box width="34%">
-                  <DownloadCsvFileLink fileId={fileId} fileName={fileName} />
-                </Box>
-              </Flex>
-            )
+          {runDataFileIds.map((fileId, index) => {
+            return <CsvFileDataRow fileId={fileId} index={index} />
           })}
         </Flex>
       </Flex>
@@ -290,6 +262,52 @@ export function HistoricalProtocolRunDrawer(
     >
       {protocolFilesData}
       {labwareOffsets}
+    </Flex>
+  )
+}
+
+interface CsvFileDataRowProps {
+  fileId: string
+  index: number
+}
+
+function CsvFileDataRow(props: CsvFileDataRowProps): JSX.Element | null {
+  const { fileId, index } = props
+
+  const { data: fileData, isSuccess } = useCsvFileQuery(fileId)
+  if (!isSuccess) {
+    return null
+  }
+  const { name, createdAt } = fileData.data
+  return (
+    <Flex
+      key={`csv_file_${index}`}
+      justifyContent={JUSTIFY_FLEX_START}
+      alignItems={ALIGN_CENTER}
+      padding={SPACING.spacing12}
+      backgroundColor={COLORS.white}
+      borderRadius={BORDERS.borderRadius4}
+      gridGap={SPACING.spacing24}
+    >
+      <Flex width="33%" gridGap={SPACING.spacing4} alignItems={ALIGN_CENTER}>
+        <LegacyStyledText
+          as="p"
+          css={css`
+            overflow: ${OVERFLOW_HIDDEN};
+            text-overflow: ellipsis;
+          `}
+        >
+          {name}
+        </LegacyStyledText>
+      </Flex>
+      <Box width="33%">
+        <LegacyStyledText as="p">
+          {format(new Date(createdAt), 'M/d/yy HH:mm:ss')}
+        </LegacyStyledText>
+      </Box>
+      <Box width="34%">
+        <DownloadCsvFileLink fileId={fileId} fileName={name} />
+      </Box>
     </Flex>
   )
 }
