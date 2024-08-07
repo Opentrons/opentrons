@@ -182,12 +182,22 @@ const PROTOCOL_DETAILS = {
 }
 
 const RUN_COMMAND_ERRORS = {
-  data: {data: [{errorCode: '4000', errorType: "test", isDefined: false, createdAt: '9-9-9', detail:'blah blah', id:'123'}],
-  meta: {
-    cursor: 0,
-    pageLength: 1
-  }
-}
+  data: {
+    data: [
+      {
+        errorCode: '4000',
+        errorType: 'test',
+        isDefined: false,
+        createdAt: '9-9-9',
+        detail: 'blah blah',
+        id: '123',
+      },
+    ],
+    meta: {
+      cursor: 0,
+      pageLength: 1,
+    },
+  },
 } as any
 
 const mockMovingHeaterShaker = {

@@ -655,7 +655,8 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
   const [showIsShakingModal, setShowIsShakingModal] = React.useState(false)
   const isSetupComplete =
     isCalibrationComplete &&
-    isModuleCalibrationComplete && missingModuleIds.length === 0
+    isModuleCalibrationComplete &&
+    missingModuleIds.length === 0
   const isRobotOnWrongVersionOfSoftware = ['upgrade', 'downgrade'].includes(
     useSelector((state: State) => {
       return getRobotUpdateDisplayInfo(state, robotName)
@@ -901,11 +902,12 @@ function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
       <Banner type="error" iconMarginLeft={SPACING.spacing4}>
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
           <LegacyStyledText>
-          {highestPriorityError != null ? t('error_info', {
-                errorType: highestPriorityError?.errorType,
-                errorCode: highestPriorityError?.errorCode,
-              })
-            : 'Run completed with errors.'}
+            {highestPriorityError != null
+              ? t('error_info', {
+                  errorType: highestPriorityError?.errorType,
+                  errorCode: highestPriorityError?.errorCode,
+                })
+              : 'Run completed with errors.'}
           </LegacyStyledText>
 
           <LinkButton
