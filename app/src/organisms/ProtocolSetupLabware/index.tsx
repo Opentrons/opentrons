@@ -98,6 +98,7 @@ export function ProtocolSetupLabware({
     | (LabwareDefinition2 & {
         location: LabwareLocation
         nickName: string | null
+        id: string
       })
     | null
   >(null)
@@ -143,13 +144,21 @@ export function ProtocolSetupLabware({
         ...labwareDef,
         location: foundLabware.location,
         nickName: nickName ?? null,
+        id: labwareId,
       })
       setShowLabwareDetailsModal(true)
     }
   }
+  const selectedLabwareIsTopOfStack = mostRecentAnalysis?.commands.some(
+    command =>
+      command.commandType === 'loadLabware' &&
+      command.result?.labwareId === selectedLabware?.id &&
+      typeof command.params.location === 'object' &&
+      ('moduleId' in command.params.location ||
+        'labwareId' in command.params.location)
+  )
 
   let location: JSX.Element | string | null = null
-  let topLabwareId: string | null = null
   if (
     selectedLabware != null &&
     typeof selectedLabware.location === 'object' &&
@@ -178,17 +187,6 @@ export function ProtocolSetupLabware({
         module.moduleId === selectedLabware.location.moduleId
     )
     if (matchedModule != null) {
-      topLabwareId =
-        mostRecentAnalysis?.commands.find(
-          (command): command is LoadLabwareRunTimeCommand => {
-            return (
-              command.commandType === 'loadLabware' &&
-              typeof command.params.location === 'object' &&
-              'moduleId' in command.params.location &&
-              command.params.location.moduleId === matchedModule.moduleId
-            )
-          }
-        )?.result?.labwareId ?? null
       location = <DeckInfoLabel deckLabel={matchedModule?.slotName} />
     }
   } else if (
@@ -203,17 +201,6 @@ export function ProtocolSetupLabware({
         command.result?.labwareId === adapterId
     )?.params.location
     if (adapterLocation != null && adapterLocation !== 'offDeck') {
-      topLabwareId =
-        mostRecentAnalysis?.commands.find(
-          (command): command is LoadLabwareRunTimeCommand => {
-            return (
-              command.commandType === 'loadLabware' &&
-              typeof command.params.location === 'object' &&
-              'labwareId' in command.params.location &&
-              command.params.location.labwareId === adapterId
-            )
-          }
-        )?.result?.labwareId ?? null
       if ('slotName' in adapterLocation) {
         location = <DeckInfoLabel deckLabel={adapterLocation.slotName} />
       } else if ('moduleId' in adapterLocation) {
@@ -232,7 +219,7 @@ export function ProtocolSetupLabware({
       {createPortal(
         <>
           {showLabwareDetailsModal &&
-          topLabwareId == null &&
+          !selectedLabwareIsTopOfStack &&
           selectedLabware != null ? (
             <Modal
               onOutsideClick={() => {
@@ -357,9 +344,11 @@ export function ProtocolSetupLabware({
             })}
           </>
         )}
-        {showLabwareDetailsModal && topLabwareId != null ? (
+        {showLabwareDetailsModal &&
+        selectedLabware != null &&
+        selectedLabwareIsTopOfStack ? (
           <LabwareStackModal
-            labwareIdTop={topLabwareId}
+            labwareIdTop={selectedLabware?.id}
             runId={runId}
             closeModal={() => {
               setSelectedLabware(null)
