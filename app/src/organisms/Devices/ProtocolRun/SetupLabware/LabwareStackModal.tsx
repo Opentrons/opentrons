@@ -67,7 +67,11 @@ export const LabwareStackModal = (
   )
   const moduleImg =
     moduleModel != null ? (
-      <img width="156px" height="130px" src={getModuleImage(moduleModel)} />
+      <img
+        width="156px"
+        height="130px"
+        src={getModuleImage(moduleModel, true)}
+      />
     ) : null
 
   return isOnDevice ? (
