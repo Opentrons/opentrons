@@ -31,6 +31,5 @@ export const RadioButton: Story = {
     buttonValue: 1,
     disabled: false,
     isSelected: false,
-    iconName: 'ot-alert',
   },
 }
