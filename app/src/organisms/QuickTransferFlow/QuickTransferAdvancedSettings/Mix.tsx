@@ -85,6 +85,7 @@ export function Mix(props: MixProps): JSX.Element {
           type: mixAction,
           mixSettings: undefined,
         })
+        onBack()
       } else {
         setCurrentStep(2)
       }

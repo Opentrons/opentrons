@@ -108,7 +108,9 @@ export function SetupLiquidsMap(
               setHoverLabwareId('')
             }}
             onClick={() => {
-              if (labwareHasLiquid) setLiquidDetailsLabwareId(topLabwareId)
+              if (labwareHasLiquid) {
+                setLiquidDetailsLabwareId(topLabwareId)
+              }
             }}
             cursor={labwareHasLiquid ? 'pointer' : ''}
           >
@@ -169,8 +171,9 @@ export function SetupLiquidsMap(
                     setHoverLabwareId('')
                   }}
                   onClick={() => {
-                    if (labwareHasLiquid)
+                    if (labwareHasLiquid) {
                       setLiquidDetailsLabwareId(topLabwareId)
+                    }
                   }}
                   cursor={labwareHasLiquid ? 'pointer' : ''}
                 >

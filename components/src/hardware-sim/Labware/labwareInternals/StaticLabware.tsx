@@ -24,6 +24,7 @@ export interface StaticLabwareProps {
   /** Optional callback to be executed when mouse leaves a well element */
   onMouseLeaveWell?: (e: WellMouseEvent) => unknown
   fill?: CSSProperties['fill']
+  showRadius?: boolean
 }
 
 const TipDecoration = React.memo(function TipDecoration(props: {
@@ -58,6 +59,7 @@ export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
     onMouseEnterWell,
     onMouseLeaveWell,
     fill,
+    showRadius = true,
   } = props
 
   const { isTiprack } = definition.parameters
@@ -68,6 +70,7 @@ export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
           definition={definition}
           highlight={highlight}
           fill={fill}
+          showRadius={showRadius}
         />
       </LabwareDetailGroup>
       <g>

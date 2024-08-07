@@ -1153,7 +1153,7 @@ def test_home(
     decoy.verify(mock_core.home(), times=1)
 
 
-def test_add_liquid(
+def test_define_liquid(
     decoy: Decoy, mock_core: ProtocolCore, subject: ProtocolContext
 ) -> None:
     """It should add a liquid to the state."""
@@ -1175,6 +1175,43 @@ def test_add_liquid(
     )
 
     assert result == expected_result
+
+
+@pytest.mark.parametrize(
+    ("api_version", "expect_success"),
+    [
+        (APIVersion(2, 19), False),
+        (APIVersion(2, 20), True),
+    ],
+)
+def test_define_liquid_arg_defaulting(
+    expect_success: bool,
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    subject: ProtocolContext,
+) -> None:
+    """Test API version dependent behavior for missing description and display_color."""
+    success_result = Liquid(
+        _id="water-id", name="water", description=None, display_color=None
+    )
+    decoy.when(
+        mock_core.define_liquid(name="water", description=None, display_color=None)
+    ).then_return(success_result)
+
+    if expect_success:
+        assert (
+            subject.define_liquid(
+                name="water"
+                # description and display_color omitted.
+            )
+            == success_result
+        )
+    else:
+        with pytest.raises(APIVersionError):
+            subject.define_liquid(
+                name="water"
+                # description and display_color omitted.
+            )
 
 
 def test_bundled_data(

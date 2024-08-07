@@ -214,6 +214,7 @@ async def test_create(
         modules=engine_state_summary.modules,
         liquids=engine_state_summary.liquids,
     )
+    decoy.verify(mock_run_store.insert_csv_rtp(run_id=run_id, run_time_parameters=[]))
 
 
 async def test_create_with_options(
@@ -298,6 +299,11 @@ async def test_create_with_options(
         modules=engine_state_summary.modules,
         liquids=engine_state_summary.liquids,
         runTimeParameters=[bool_parameter, file_parameter],
+    )
+    decoy.verify(
+        mock_run_store.insert_csv_rtp(
+            run_id=run_id, run_time_parameters=[bool_parameter, file_parameter]
+        )
     )
 
 

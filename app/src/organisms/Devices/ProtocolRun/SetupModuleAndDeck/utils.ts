@@ -15,6 +15,10 @@ import magneticModule from '../../../../assets/images/magnetic_module_gen_2_tran
 import temperatureModule from '../../../../assets/images/temp_deck_gen_2_transparent.png'
 import thermoModuleGen1 from '../../../../assets/images/thermocycler_closed.png'
 import heaterShakerModule from '../../../../assets/images/heater_shaker_module_transparent.png'
+import magneticModuleHighRes from '../../../../assets/images/modules/magneticModuleV2@3x.png'
+import temperatureModuleHighRes from '../../../../assets/images/modules/temperatureModuleV2@3x.png'
+import thermoModuleGen1HighRes from '../../../../assets/images/modules/thermocyclerModuleV1@3x.png'
+import heaterShakerModuleHighRes from '../../../../assets/images/modules/heaterShakerModuleV1@3x.png'
 import thermoModuleGen2 from '../../../../assets/images/thermocycler_gen_2_closed.png'
 import magneticBlockGen1 from '../../../../assets/images/magnetic_block_gen_1.png'
 import stagingAreaMagneticBlockGen1 from '../../../../assets/images/staging_area_magnetic_block_gen_1.png'
@@ -25,18 +29,21 @@ import wasteChuteStagingArea from '../../../../assets/images/waste_chute_with_st
 
 import type { CutoutFixtureId, ModuleModel } from '@opentrons/shared-data'
 
-export function getModuleImage(model: ModuleModel): string {
+export function getModuleImage(
+  model: ModuleModel,
+  highRes: boolean = false
+): string {
   switch (model) {
     case 'magneticModuleV1':
     case 'magneticModuleV2':
-      return magneticModule
+      return highRes ? magneticModuleHighRes : magneticModule
     case 'temperatureModuleV1':
     case 'temperatureModuleV2':
-      return temperatureModule
+      return highRes ? temperatureModuleHighRes : temperatureModule
     case 'heaterShakerModuleV1':
-      return heaterShakerModule
+      return highRes ? heaterShakerModuleHighRes : heaterShakerModule
     case 'thermocyclerModuleV1':
-      return thermoModuleGen1
+      return highRes ? thermoModuleGen1HighRes : thermoModuleGen1
     case 'thermocyclerModuleV2':
       return thermoModuleGen2
     case 'magneticBlockV1':
