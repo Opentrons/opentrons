@@ -151,9 +151,7 @@ async def test_driver_initialize_and_read(
 
     conf = connected_driver._connection._current_config
     assert conf and conf.sample_wavelength == 450
-    mock_interface.abs96_initialize_single_measurement.assert_called_once_with(
-        1, conf
-    )
+    mock_interface.abs96_initialize_single_measurement.assert_called_once_with(1, conf)
 
     # setup up mock interface
     MEASURE_RESULT = [0.1] * 96
