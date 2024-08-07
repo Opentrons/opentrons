@@ -32,7 +32,7 @@ import {
   RUN_STATUS_FAILED,
   RUN_STATUS_STOPPED,
   RUN_STATUS_SUCCEEDED,
-  RUN_STATUSES_TERMINAL
+  RUN_STATUSES_TERMINAL,
 } from '@opentrons/api-client'
 import {
   useHost,
