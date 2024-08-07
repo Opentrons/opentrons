@@ -48,6 +48,7 @@ export const getPipettingCommandText = ({
           robotType
         )
       : ''
+
   switch (command?.commandType) {
     case 'aspirate': {
       const { volume, flowRate } = command.params
@@ -137,6 +138,16 @@ export const getPipettingCommandText = ({
         | undefined = commandTextData?.pipettes.find(
         pipette => pipette.id === pipetteId
       )?.pipetteName
+
+      console.log('=>(getPipettingCommandText.ts:157) labwareId', labwareId)
+      console.log(
+        '=>(getPipettingCommandText.ts:161) commandTextData',
+        commandTextData
+      )
+      console.log(
+        '=>(getPipettingCommandText.ts:163) displayLocation',
+        displayLocation
+      )
 
       return t('pickup_tip', {
         well_range:

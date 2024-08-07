@@ -166,7 +166,7 @@ export function RunningProtocol(): JSX.Element {
         <ErrorRecoveryFlows
           runStatus={runStatus}
           runId={runId}
-          failedCommand={failedCommand}
+          failedCommandByRunRecord={failedCommand}
           protocolAnalysis={robotSideAnalysis}
         />
       ) : null}
