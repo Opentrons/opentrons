@@ -2,10 +2,10 @@ import * as React from 'react'
 import '@testing-library/jest-dom/vitest'
 import { screen, queryByAttribute } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { COLORS, SPACING } from '@opentrons/components'
-import { renderWithProviders } from '../../../__testing-utils__'
-
-import { RadioButton } from '..'
+import { renderWithProviders } from '../../../testing/utils'
+import { COLORS } from '../../../helix-design-system'
+import { SPACING } from '../../../ui-style-constants'
+import { RadioButton } from '../RadioButton'
 
 const render = (props: React.ComponentProps<typeof RadioButton>) => {
   return renderWithProviders(<RadioButton {...props} />)[0]

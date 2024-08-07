@@ -1,16 +1,19 @@
 import * as React from 'react'
 import styled, { css } from 'styled-components'
+import { Flex } from '../../primitives'
 import {
+  ALIGN_CENTER,
   BORDERS,
   COLORS,
-  Flex,
+  DIRECTION_ROW,
+  Icon,
   RESPONSIVENESS,
   SPACING,
   StyledText,
   TYPOGRAPHY,
-} from '@opentrons/components'
-
-import type { StyleProps } from '@opentrons/components'
+} from '../..'
+import type { IconName } from '../..'
+import type { StyleProps } from '../../primitives'
 
 interface RadioButtonProps extends StyleProps {
   buttonLabel: string
@@ -21,8 +24,10 @@ interface RadioButtonProps extends StyleProps {
   radioButtonType?: 'large' | 'small'
   subButtonLabel?: string
   id?: string
+  iconName?: IconName
 }
 
+//  used for ODD and helix
 export function RadioButton(props: RadioButtonProps): JSX.Element {
   const {
     buttonLabel,
@@ -33,6 +38,7 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
     radioButtonType = 'large',
     subButtonLabel,
     id = buttonLabel,
+    iconName,
   } = props
 
   const isLarge = radioButtonType === 'large'
@@ -92,12 +98,21 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
         value={buttonValue}
       />
       <SettingButtonLabel role="label" htmlFor={id}>
-        <StyledText
-          oddStyle={isLarge ? 'level4HeaderRegular' : 'bodyTextRegular'}
-          desktopStyle="bodyDefaultRegular"
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          gridGap={SPACING.spacing2}
+          alignItems={ALIGN_CENTER}
         >
-          {buttonLabel}
-        </StyledText>
+          {iconName != null ? (
+            <Icon name={iconName} width="1rem" height="1rem" />
+          ) : null}
+          <StyledText
+            oddStyle={isLarge ? 'level4HeaderRegular' : 'bodyTextRegular'}
+            desktopStyle="bodyDefaultRegular"
+          >
+            {buttonLabel}
+          </StyledText>
+        </Flex>
         {subButtonLabel != null ? (
           <StyledText
             oddStyle="level4HeaderRegular"

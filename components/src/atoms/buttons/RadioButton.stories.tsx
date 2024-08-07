@@ -1,11 +1,11 @@
 import { action } from '@storybook/addon-actions'
-import { VIEWPORT } from '@opentrons/components'
 
-import { RadioButton as RadioButtonComponent } from './index'
+import { VIEWPORT } from '../../ui-style-constants'
+import { RadioButton as RadioButtonComponent } from './RadioButton'
 import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<typeof RadioButtonComponent> = {
-  title: 'ODD/Atoms/Buttons/RadioButton',
+  title: 'Library/Atoms/Buttons/RadioButton',
   component: RadioButtonComponent,
   argTypes: {
     radioButtonType: {
@@ -31,5 +31,6 @@ export const RadioButton: Story = {
     buttonValue: 1,
     disabled: false,
     isSelected: false,
+    iconName: 'ot-alert',
   },
 }

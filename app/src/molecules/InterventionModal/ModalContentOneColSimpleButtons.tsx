@@ -4,10 +4,10 @@ import {
   DIRECTION_COLUMN,
   SPACING,
   LegacyStyledText,
+  RadioButton,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { OneColumn } from './OneColumn'
-import { RadioButton } from '../../atoms/buttons/RadioButton'
 
 export interface ButtonProps {
   label: string
