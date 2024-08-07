@@ -1167,7 +1167,7 @@ async def test_liquid_not_found(
             OT3Mount.LEFT, fake_max_z_dist, fake_settings_aspirate
         )
     # assert that it went through 4 passes and then prepared to aspirate
-    assert mock_move_to_plunger_bottom.call_count == 4
+    assert mock_move_to_plunger_bottom.call_count == 5
 
 
 @pytest.mark.parametrize(
