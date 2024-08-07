@@ -7,10 +7,10 @@ import {
   DIRECTION_COLUMN,
   POSITION_FIXED,
   COLORS,
+  LargeButton,
   ALIGN_CENTER,
 } from '@opentrons/components'
 import { getTopPortalEl } from '../../../App/portal'
-import { LargeButton } from '../../../atoms/buttons'
 import { ChildNavigation } from '../../ChildNavigation'
 import { InputField } from '../../../atoms/InputField'
 import { ACTIONS } from '../constants'

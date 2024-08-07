@@ -1,12 +1,14 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import { Btn, Flex } from '../../primitives'
+import { Box, Btn } from '../../primitives'
 
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { LegacyStyledText } from '../../atoms/StyledText'
+import { fontSizeBodyLargeSemiBold } from '../../helix-design-system/product/typography'
 import {
   ALIGN_CENTER,
+  ALIGN_FLEX_START,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   DISPLAY_FLEX,
@@ -149,8 +151,8 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     }
 
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      align-items: ${ALIGN_FLEX_START};
       flex-direction: ${DIRECTION_COLUMN};
-      text-align: ${TYPOGRAPHY.textAlignLeft};
       border-radius: ${BORDERS.borderRadius16};
       box-shadow: none;
       padding: ${SPACING.spacing24};
@@ -200,21 +202,30 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
       disabled={disabled}
       {...buttonProps}
     >
-      <LegacyStyledText css={TYPOGRAPHY.level3HeaderSemiBold}>
+      <LegacyStyledText
+        css={css`
+          font-size: ${fontSizeBodyLargeSemiBold};
+          padding-right: ${SPACING.spacing8};
+          @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+            ${TYPOGRAPHY.level3HeaderSemiBold}
+          }
+        `}
+      >
         {buttonText}
       </LegacyStyledText>
       {iconName ? (
-        <Icon
-          name={iconName}
-          aria-label={`${iconName} icon`}
+        <Box
           css={css`
-            size: 20px;
+            width: 1.5rem;
+            height: 1.5rem;
             @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-              size: 5rem;
+              width: 5rem;
+              height: 5rem;
             }
           `}
-          id="btn-icon"
-        />
+        >
+          <Icon name={iconName} aria-label={`${iconName} icon`} id="btn-icon" />
+        </Box>
       ) : null}
     </Btn>
   )
