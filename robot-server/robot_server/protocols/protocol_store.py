@@ -24,6 +24,7 @@ from robot_server.persistence.tables import (
     analysis_primitive_type_rtp_table,
     analysis_csv_rtp_table,
     data_files_table,
+    run_csv_rtp_table,
     ProtocolKindSQLEnum,
 )
 from robot_server.protocols.protocol_models import ProtocolKind
@@ -307,23 +308,38 @@ class ProtocolStore:
 
         return usage_info
 
-    # TODO (spp, 2024-07-22): get files referenced in runs as well
     async def get_referenced_data_files(self, protocol_id: str) -> List[DataFile]:
-        """Get a list of data files referenced in specified protocol's analyses and runs."""
-        # Get analyses of protocol_id
+        """Return a list of data files referenced in specified protocol's analyses and runs.
+
+        List returned is in the order in which the data files were uploaded to the server.
+        """
+        # Get analyses and runs of protocol_id
         select_referencing_analysis_ids = sqlalchemy.select(analysis_table.c.id).where(
             analysis_table.c.protocol_id == protocol_id
         )
-        # Get all entries in csv table that match the analyses
-        csv_file_ids = sqlalchemy.select(analysis_csv_rtp_table.c.file_id).where(
+        select_referencing_run_ids = sqlalchemy.select(run_table.c.id).where(
+            run_table.c.protocol_id == protocol_id
+        )
+        # Get all entries in analysis_csv_table that match the analysis IDs above
+        select_analysis_csv_file_ids = sqlalchemy.select(
+            analysis_csv_rtp_table.c.file_id
+        ).where(
             analysis_csv_rtp_table.c.analysis_id.in_(select_referencing_analysis_ids)
         )
-        # Get list of data file IDs from the entries
-        select_data_file_rows_statement = data_files_table.select().where(
-            data_files_table.c.id.in_(csv_file_ids)
+        # Get all entries in run_csv_table that match the run IDs above
+        select_run_csv_file_ids = sqlalchemy.select(run_csv_rtp_table.c.file_id).where(
+            run_csv_rtp_table.c.run_id.in_(select_referencing_run_ids)
         )
+
         with self._sql_engine.begin() as transaction:
-            data_files_rows = transaction.execute(select_data_file_rows_statement).all()
+            data_files_rows = transaction.execute(
+                data_files_table.select()
+                .where(
+                    data_files_table.c.id.in_(select_analysis_csv_file_ids)
+                    | data_files_table.c.id.in_(select_run_csv_file_ids)
+                )
+                .order_by(sqlite_rowid)
+            ).all()
 
         return [
             DataFile(

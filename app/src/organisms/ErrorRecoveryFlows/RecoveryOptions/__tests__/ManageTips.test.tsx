@@ -58,7 +58,7 @@ describe('ManageTips', () => {
         step: DROP_TIP_FLOWS.STEPS.BEGIN_REMOVAL,
       },
       tipStatusUtils: {
-        pipettesWithTip: [{ mount: 'left', specs: MOCK_ACTUAL_PIPETTE }],
+        aPipetteWithTip: { mount: 'left', specs: MOCK_ACTUAL_PIPETTE },
       } as any,
       routeUpdateActions: {
         proceedNextStep: mockProceedNextStep,

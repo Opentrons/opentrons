@@ -324,7 +324,7 @@ def test_file_required_error(
     python_protocol_source = textwrap.dedent(
         # Raises an exception during runner load.
         """\
-            requirements = {"robotType": "OT-2", "apiLevel": "2.18"}
+            requirements = {"robotType": "OT-2", "apiLevel": "2.20"}
 
             def add_parameters(parameters):
                 parameters.add_csv_file(
@@ -350,7 +350,7 @@ def test_file_required_error(
     assert result.json_output["liquids"] == []
     assert result.json_output["modules"] == []
     assert result.json_output["config"] == {
-        "apiVersion": [2, 18],
+        "apiVersion": [2, 20],
         "protocolType": "python",
     }
     assert result.json_output["files"] == [{"name": "protocol.py", "role": "main"}]

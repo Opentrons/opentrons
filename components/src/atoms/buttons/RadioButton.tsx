@@ -112,7 +112,7 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
             />
           ) : null}
           <StyledText
-            oddStyle={isLarge ? 'level4HeaderRegular' : 'bodyTextRegular'}
+            oddStyle={isLarge ? 'level4HeaderSemiBold' : 'bodyTextRegular'}
             desktopStyle="bodyDefaultRegular"
           >
             {buttonLabel}

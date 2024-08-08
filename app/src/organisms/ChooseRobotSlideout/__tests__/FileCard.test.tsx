@@ -30,7 +30,7 @@ const mockSetRunTimeParametersOverrides = vi.fn()
 
 const mockCsvRunTimeParameterSuccess: CsvFileParameter = {
   displayName: 'My sample file',
-  file: { id: 'my_file_id', name: 'my_file.csv' },
+  file: { id: 'my_file_id', file: { name: 'my_file.csv' } as File },
   variableName: 'my_sample_csv',
   description: 'This is a mock CSV runtime parameter',
   type: 'csv_file',

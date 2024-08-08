@@ -265,3 +265,9 @@ async def test_remove_raises_in_file_in_use(
     expected_error_message = "Cannot remove file file-id as it is being used in existing analyses: {'analysis-id'}."
     with pytest.raises(FileInUseError, match=expected_error_message):
         subject.remove(file_id="file-id")
+
+
+def test_remove_raise_for_nonexistent_id(subject: DataFilesStore) -> None:
+    """It should raise FileIdNotFound error."""
+    with pytest.raises(FileIdNotFoundError, match="Data file file-id was not found."):
+        subject.remove(file_id="file-id")

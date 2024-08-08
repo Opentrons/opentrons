@@ -13,10 +13,11 @@ import {
   DISPLAY_NONE,
   Flex,
   InfoScreen,
+  LegacyStyledText,
+  OVERFLOW_SCROLL,
   POSITION_FIXED,
   PrimaryButton,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -122,7 +123,7 @@ export const RunPreviewComponent = (
       flexDirection={DIRECTION_COLUMN}
       height="28rem"
       width="100%"
-      overflowY="scroll"
+      overflowY={OVERFLOW_SCROLL}
       gridGap={SPACING.spacing8}
       padding={SPACING.spacing16}
     >

@@ -16,7 +16,7 @@ import {
 import { MICRO_LITERS } from '@opentrons/shared-data'
 import { LiquidsLabwareDetailsModal } from '../Devices/ProtocolRun/SetupLiquids/LiquidsLabwareDetailsModal'
 import { getLocationInfoNames } from '../Devices/ProtocolRun/utils/getLocationInfoNames'
-import { getTotalVolumePerLiquidId } from '../Devices/ProtocolRun/SetupLiquids/utils'
+import { getVolumePerWell } from '../Devices/ProtocolRun/SetupLiquids/utils'
 import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { LabwareByLiquidId, ParsedLiquid } from '@opentrons/api-client'
 
@@ -69,6 +69,7 @@ export function LiquidDetails(props: LiquidDetailsProps): JSX.Element {
   const [labwareIdModal, setLabwareIdModal] = React.useState<string | null>(
     null
   )
+
   return (
     <Flex marginTop={SPACING.spacing24}>
       {labwareIdModal != null && (
@@ -86,7 +87,7 @@ export function LiquidDetails(props: LiquidDetailsProps): JSX.Element {
           <tr>
             <TableHeader>{t('location')}</TableHeader>
             <TableHeader>{t('labware_name')}</TableHeader>
-            <TableHeader>{t('volume')}</TableHeader>
+            <TableHeader>{t('individiual_well_volume')}</TableHeader>
           </tr>
         </thead>
         <tbody>
@@ -123,12 +124,21 @@ export function LiquidDetails(props: LiquidDetailsProps): JSX.Element {
                     <Flex
                       height="2.75rem"
                       padding={`${SPACING.spacing8} ${SPACING.spacing12}`}
-                      width="max-content"
+                      width="15rem"
                       alignItems={TYPOGRAPHY.textAlignCenter}
                       marginRight={SPACING.spacingAuto}
                     >
-                      {getTotalVolumePerLiquidId(liquid.id, labwareByLiquidId)}{' '}
-                      {MICRO_LITERS}
+                      {getVolumePerWell(
+                        liquid.id,
+                        labware.labwareId,
+                        labwareByLiquidId
+                      ) == null
+                        ? t('variable_well_amount')
+                        : `${getVolumePerWell(
+                            liquid.id,
+                            labware.labwareId,
+                            labwareByLiquidId
+                          )} ${MICRO_LITERS}`}
                     </Flex>
                     <Icon name="chevron-right" size="3rem" />
                   </Flex>
