@@ -57,7 +57,10 @@ export function RunFailedModal({
   const { i18n, t } = useTranslation(['run_details', 'shared', 'branded'])
   const modalProps: LegacyModalProps = {
     type: 'error',
-    title: t('run_failed_modal_title'),
+    title:
+      commandErrorList == null || commandErrorList?.data.length === 0
+        ? t('run_failed_modal_title')
+        : t('error_details'),
     onClose: () => {
       setShowRunFailedModal(false)
     },
@@ -95,7 +98,7 @@ export function RunFailedModal({
                 errorType: errors[0].errorType,
                 errorCode: errors[0].errorCode,
               })
-            : `${errors.length} errors`}
+            : `${errors.length} error${errors.length > 1 ? 's' : ''}`}
         </LegacyStyledText>
         <Flex css={ERROR_MESSAGE_STYLE}>
           {' '}

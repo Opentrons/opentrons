@@ -48,7 +48,10 @@ export function RunFailedModal({
   )
     return null
   const modalHeader: ModalHeaderBaseProps = {
-    title: t('run_failed_modal_title'),
+    title:
+      commandErrorList == null || commandErrorList?.data.length === 0
+        ? t('run_failed_modal_title')
+        : t('error_details'),
   }
 
   const highestPriorityError = getHighestPriorityError(errors ?? [])
@@ -85,7 +88,7 @@ export function RunFailedModal({
                 errorType: errors[0].errorType,
                 errorCode: errors[0].errorCode,
               })
-            : `${errors.length} errors`}
+            : `${errors.length} error${errors.length > 1 ? 's' : ''}`}
         </LegacyStyledText>
         <Flex
           width="100%"

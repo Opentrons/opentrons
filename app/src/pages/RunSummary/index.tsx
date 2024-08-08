@@ -399,7 +399,8 @@ export function RunSummary(): JSX.Element {
               height="17rem"
               css={showRunAgainSpinner ? RUN_AGAIN_CLICKED_STYLE : undefined}
             />
-            {!didRunSucceed ? (
+            {(commandErrorList != null && commandErrorList?.data.length > 0) ||
+            !didRunSucceed ? (
               <LargeButton
                 flex="1"
                 iconName="info"
@@ -408,8 +409,10 @@ export function RunSummary(): JSX.Element {
                 buttonText={t('view_error_details')}
                 height="17rem"
                 disabled={
-                  runRecord?.data.errors == null ||
-                  runRecord?.data.errors.length === 0
+                  (runRecord?.data.errors == null ||
+                    runRecord?.data.errors.length === 0) &&
+                  (commandErrorList == null ||
+                    commandErrorList?.data.length === 0)
                 }
               />
             ) : null}
