@@ -3,10 +3,6 @@ import inspect
 from decoy import Decoy
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 
-import tempfile
-from pathlib import Path
-from typing import TextIO, Generator
-
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.parameters import (
@@ -28,70 +24,44 @@ def api_version() -> APIVersion:
 
 
 @pytest.fixture
-def csv_file_basic() -> Generator[TextIO, None, None]:
+def csv_file_basic() -> bytes:
     """A basic CSV file with quotes around strings."""
-    with tempfile.TemporaryFile("r+") as temp_file:
-        contents = '"x","y","z"\n"a",1,2\n"b",3,4\n"c",5,6'
-        temp_file.write(contents)
-        temp_file.seek(0)
-        yield temp_file
+    return b'"x","y","z"\n"a",1,2\n"b",3,4\n"c",5,6'
 
 
 @pytest.fixture
-def csv_file_no_quotes() -> Generator[TextIO, None, None]:
+def csv_file_no_quotes() -> bytes:
     """A basic CSV file with no quotes around strings."""
-    with tempfile.TemporaryFile("r+") as temp_file:
-        contents = "x,y,z\na,1,2\nb,3,4\nc,5,6"
-        temp_file.write(contents)
-        temp_file.seek(0)
-        yield temp_file
+    return b"x,y,z\na,1,2\nb,3,4\nc,5,6"
 
 
 @pytest.fixture
-def csv_file_preceding_spaces() -> Generator[TextIO, None, None]:
+def csv_file_preceding_spaces() -> bytes:
     """A basic CSV file with quotes around strings and spaces preceding non-initial columns."""
-    with tempfile.TemporaryFile("r+") as temp_file:
-        contents = '"x", "y", "z"\n"a", 1, 2\n"b", 3, 4\n"c", 5, 6'
-        temp_file.write(contents)
-        temp_file.seek(0)
-        yield temp_file
+    return b'"x", "y", "z"\n"a", 1, 2\n"b", 3, 4\n"c", 5, 6'
 
 
 @pytest.fixture
-def csv_file_mixed_quotes() -> Generator[TextIO, None, None]:
+def csv_file_mixed_quotes() -> bytes:
     """A basic CSV file with both string quotes and escaped quotes."""
-    with tempfile.TemporaryFile("r+") as temp_file:
-        contents = 'head,er\n"a,b,c",def\n"""ghi""","jkl"'
-        temp_file.write(contents)
-        temp_file.seek(0)
-        yield temp_file
+    return b'head,er\n"a,b,c",def\n"""ghi""","jkl"'
 
 
 @pytest.fixture
-def csv_file_different_delimiter() -> Generator[TextIO, None, None]:
+def csv_file_different_delimiter() -> bytes:
     """A basic CSV file with a non-comma delimiter."""
-    with tempfile.TemporaryFile("r+") as temp_file:
-        contents = "x:y:z\na,:1,:2\nb,:3,:4\nc,:5,:6"
-        temp_file.write(contents)
-        temp_file.seek(0)
-        yield temp_file
-
-
-@pytest.fixture
-def subject(api_version: APIVersion) -> CSVParameter:
-    """Return a CSVParameter interface subject."""
-    return CSVParameter(csv_path=Path("abc"), api_version=api_version)
+    return b"x:y:z\na,:1,:2\nb,:3,:4\nc,:5,:6"
 
 
 def test_csv_parameter(
-    decoy: Decoy, csv_file_basic: TextIO, subject: CSVParameter
+    decoy: Decoy, api_version: APIVersion, csv_file_basic: bytes
 ) -> None:
     """It should load the CSV parameter and provide access to the file, contents, and rows."""
-    decoy.when(mock_param_file_reader.open_file_path(Path("abc"))).then_return(
-        csv_file_basic
-    )
-    assert subject.file is csv_file_basic
+    subject = CSVParameter(csv_file_basic, api_version)
+
+    assert subject.file.read() == '"x","y","z"\n"a",1,2\n"b",3,4\n"c",5,6'
     assert subject.contents == '"x","y","z"\n"a",1,2\n"b",3,4\n"c",5,6'
+    assert subject.parse_as_csv()[0] == ["x", "y", "z"]
 
 
 @pytest.mark.parametrize(
@@ -103,22 +73,26 @@ def test_csv_parameter(
     ],
 )
 def test_csv_parameter_rows(
-    decoy: Decoy, csv_file: TextIO, subject: CSVParameter
+    decoy: Decoy,
+    api_version: APIVersion,
+    csv_file: bytes,
 ) -> None:
     """It should load the rows as all strings even with no quotes or leading spaces."""
-    decoy.when(mock_param_file_reader.open_file_path(Path("abc"))).then_return(csv_file)
+    subject = CSVParameter(csv_file, api_version)
+
     assert len(subject.parse_as_csv()) == 4
     assert subject.parse_as_csv()[0] == ["x", "y", "z"]
     assert subject.parse_as_csv()[1] == ["a", "1", "2"]
 
 
 def test_csv_parameter_mixed_quotes(
-    decoy: Decoy, csv_file_mixed_quotes: TextIO, subject: CSVParameter
+    decoy: Decoy,
+    api_version: APIVersion,
+    csv_file_mixed_quotes: bytes,
 ) -> None:
     """It should load the rows with no quotes, quotes and escaped quotes with double quotes."""
-    decoy.when(mock_param_file_reader.open_file_path(Path("abc"))).then_return(
-        csv_file_mixed_quotes
-    )
+    subject = CSVParameter(csv_file_mixed_quotes, api_version)
+
     assert len(subject.parse_as_csv()) == 3
     assert subject.parse_as_csv()[0] == ["head", "er"]
     assert subject.parse_as_csv()[1] == ["a,b,c", "def"]
@@ -126,25 +100,27 @@ def test_csv_parameter_mixed_quotes(
 
 
 def test_csv_parameter_additional_kwargs(
-    decoy: Decoy, csv_file_different_delimiter: TextIO, subject: CSVParameter
+    decoy: Decoy,
+    api_version: APIVersion,
+    csv_file_different_delimiter: bytes,
 ) -> None:
     """It should load the rows with a different delimiter."""
-    decoy.when(mock_param_file_reader.open_file_path(Path("abc"))).then_return(
-        csv_file_different_delimiter
-    )
+    subject = CSVParameter(csv_file_different_delimiter, api_version)
     rows = subject.parse_as_csv(delimiter=":")
+
     assert len(rows) == 4
     assert rows[0] == ["x", "y", "z"]
     assert rows[1] == ["a,", "1,", "2"]
 
 
 def test_csv_parameter_dont_detect_dialect(
-    decoy: Decoy, csv_file_preceding_spaces: TextIO, subject: CSVParameter
+    decoy: Decoy,
+    api_version: APIVersion,
+    csv_file_preceding_spaces: bytes,
 ) -> None:
     """It should load the rows without trying to detect the dialect."""
-    decoy.when(mock_param_file_reader.open_file_path(Path("abc"))).then_return(
-        csv_file_preceding_spaces
-    )
+    subject = CSVParameter(csv_file_preceding_spaces, api_version)
     rows = subject.parse_as_csv(detect_dialect=False)
+
     assert rows[0] == ["x", ' "y"', ' "z"']
     assert rows[1] == ["a", " 1", " 2"]

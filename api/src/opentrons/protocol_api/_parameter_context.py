@@ -246,8 +246,11 @@ class ParameterContext:
             file_id = file_path.parent.name
             file_name = file_path.name
 
+            with file_path.open("rb") as fh:
+                contents = fh.read()
+
             parameter.file_info = FileInfo(id=file_id, name=file_name)
-            parameter.value = file_path
+            parameter.value = contents
 
     def export_parameters_for_analysis(self) -> List[RunTimeParameter]:
         """Exports all parameters into a protocol engine models for reporting in analysis.

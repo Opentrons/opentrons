@@ -1,5 +1,4 @@
 """CSV Parameter definition and associated classes/functions."""
-from pathlib import Path
 from typing import Optional
 
 from opentrons.protocol_engine.types import (
@@ -14,7 +13,7 @@ from .parameter_definition import AbstractParameterDefinition
 from .csv_parameter_interface import CSVParameter
 
 
-class CSVParameterDefinition(AbstractParameterDefinition[Optional[Path]]):
+class CSVParameterDefinition(AbstractParameterDefinition[Optional[bytes]]):
     """The definition for a user defined CSV file parameter."""
 
     def __init__(
@@ -30,7 +29,7 @@ class CSVParameterDefinition(AbstractParameterDefinition[Optional[Path]]):
         self._display_name = validation.ensure_display_name(display_name)
         self._variable_name = validation.ensure_variable_name(variable_name)
         self._description = validation.ensure_description(description)
-        self._value: Optional[Path] = None
+        self._value: Optional[bytes] = None
         self._file_info: Optional[FileInfo] = None
 
     @property
@@ -39,13 +38,13 @@ class CSVParameterDefinition(AbstractParameterDefinition[Optional[Path]]):
         return self._variable_name
 
     @property
-    def value(self) -> Optional[Path]:
+    def value(self) -> Optional[bytes]:
         """The current set file for the CSV parameter. Defaults to None on definition creation."""
         return self._value
 
     @value.setter
-    def value(self, new_path: Path) -> None:
-        self._value = new_path
+    def value(self, contents: bytes) -> None:
+        self._value = contents
 
     @property
     def file_info(self) -> Optional[FileInfo]:
@@ -56,7 +55,7 @@ class CSVParameterDefinition(AbstractParameterDefinition[Optional[Path]]):
         self._file_info = file_info
 
     def as_csv_parameter_interface(self, api_version: APIVersion) -> CSVParameter:
-        return CSVParameter(csv_path=self._value, api_version=api_version)
+        return CSVParameter(contents=self._value, api_version=api_version)
 
     def as_protocol_engine_type(self) -> RunTimeParameter:
         """Returns CSV parameter as a Protocol Engine type to send to client."""
