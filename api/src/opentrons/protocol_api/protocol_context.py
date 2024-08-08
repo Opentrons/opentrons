@@ -17,7 +17,6 @@ from opentrons_shared_data.pipette.types import PipetteNameType
 
 from opentrons.types import Mount, Location, DeckLocation, DeckSlotName, StagingSlotName
 from opentrons.legacy_broker import LegacyBroker
-from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules.types import (
     MagneticBlockModel,
     AbsorbanceReaderModel,
