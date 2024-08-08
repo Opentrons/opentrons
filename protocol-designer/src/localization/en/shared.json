@@ -2,6 +2,7 @@
   "add": "add",
   "amount": "Amount:",
   "cancel": "Cancel",
+  "confirm": "Confirm",
   "confirm_reorder": "Are you sure you want to reorder these steps, it may cause errors?",
   "create_new_protocol": "Create new protocol",
   "create_a_protocol": "Create a protocol",
