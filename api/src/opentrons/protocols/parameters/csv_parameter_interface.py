@@ -29,6 +29,11 @@ class CSVParameter:
         return self._file
 
     @property
+    def file_opened(self) -> bool:
+        """Return if a file handler has been opened for the CSV parameter."""
+        return self._file is not None
+
+    @property
     def contents(self) -> str:
         """Returns the full contents of the CSV file as a single string."""
         if self._contents is None:
