@@ -263,7 +263,13 @@ This example aspirates enough air to fill the remaining volume in a pipette::
 Detect Liquids
 ==============
 
-The :py:meth:`.InstrumentContext.detect_liquid_presence` method tells a Flex pipette to check for the presence of a liquid in a wellplate or reservoir. This method returns ``True`` if the pressure sensors in a pipette detect a liquid and ``False`` if the sensors do not. It will not raise an error or stop your protocol when the robot detects and empty well. Detection takes place during aspiration, but you don't need to aspirate to use ``detect_liquid_presence``. It's a standalone method that can be called when you just want to detect liquids only. See also :ref:`lpd`. 
+The :py:meth:`.InstrumentContext.detect_liquid_presence` method tells a Flex pipette to check for the presence of a liquid in a well plate or reservoir. This method returns ``True`` if the pressure sensors in the pipette detect a liquid and ``False`` if the sensors do not. It will not raise an error or stop your protocol when the robot detects an empty well. 
+
+You should generally detect liquid immediately after picking up a tip and before aspirating, but you don't need to aspirate to use ``detect_liquid_presence()``. It's a standalone method that can be called when you only want to detect liquid. 
+
+.. note::
+    Accurate liquid detection requires fresh, dry pipette tips.
+
 
 .. code-block:: python
 

@@ -224,7 +224,7 @@ Liquid Presence Detection
 Liquid Presence Detection is a pressure-based feature that allows Opentrons Flex pipettes to detect the presence or absence of liquids in a well, reservoir, or other container. Liquid Presence Detection gives you the ability to identify, avoid, and recover from liquid-related protocol errors. You can enable this feature for an entire protocol run or toggle it on and off as required. Liquid Presence Detection works with Flex pipettes only and is disabled by default.
 
 .. note::
-    If your protocol uses :ref:`partial tip pickup <partial-tip-pickup>`, the pressure sensors for the Flex 8-Channel pipette are on channels 1 and 8. For the Flex 96-Channel Pipette, the pressure sensors are on channels 1 and 96.
+    If your protocol uses :ref:`partial tip pickup <partial-tip-pickup>`, the pressure sensors for the Flex 8-Channel pipette are on channels A1 and H1. For the Flex 96-Channel Pipette, the pressure sensors are on channels A1 and H12.
 
 .. versionadded:: 2.20
 
@@ -267,19 +267,19 @@ You can turn Liquid Presence Detection off and on throughout a protocol. To turn
 
 .. code-block:: python
     
-    pipette.pick_up_tip(tiprack2)
-    pipette.liquid_presence_detection=False  #Liquid Presence Detection off
-    pipette.aspirate(100, reservoir["A2"])
+    pipette.pick_up_tip()
+    pipette.liquid_presence_detection=False  # liquid presence detection off
+    pipette.aspirate(100, reservoir["A2"])  # aspirates immediately
 
 Going forward, the pipette will not perform a liquid check until you turn this feature back on. 
 
-To reactivate, add ``pipette.liquid_presence_detection=True`` at the point later in a protocol where it needs to be enabled, usually between picking up a new tip and aspirating a liquid.
+To reactivate, set ``liquid_presence_detection=True`` at the point later in the protocol where it needs to be enabled, usually between picking up a new tip and aspirating a liquid.
 
 .. code-block:: python
 
-    pipette.pick_up_tip(tiprack2)
-    pipette.liquid_presence_detection=True  #Liquid Presence Detection on again
-    pipette.aspirate(100, reservoir["A3"])
+    pipette.pick_up_tip()
+    pipette.liquid_presence_detection=True  # liquid presence detection on again
+    pipette.aspirate(100, reservoir["A3"])  # detects liquid before aspirating
 
 The robot will continue to check for a liquid until this feature is disabled again, or an empty well is detected (and the robot raises an error), or the protocol completes.
 

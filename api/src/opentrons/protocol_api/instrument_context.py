@@ -2120,7 +2120,9 @@ class InstrumentContext(publisher.CommandPublisher):
 
     @requires_version(2, 20)
     def detect_liquid_presence(self, well: labware.Well) -> bool:
-        """Checks if there is liquid in a well. Will not raise an error if it does not detect liquid. Flex pipettes only. See :ref:`lpd` and :ref:`detect-liquid-presence`.
+        """Check if there is liquid in a well. 
+        
+        Returns ``True`` if liquid is present and ``False`` if liquid is not present. Will not raise an error if it does not detect liquid. Flex pipettes only. See :ref:`detect-liquid-presence`.
 
         When simulating a protocol, the check always succeeds (returns ``True``).
 
@@ -2132,7 +2134,11 @@ class InstrumentContext(publisher.CommandPublisher):
 
     @requires_version(2, 20)
     def require_liquid_presence(self, well: labware.Well) -> None:
-        """Checks for liquid in a well. Raises an error if no liquid is detected. Flex pipettes only. See :ref:`lpd` and :ref:`require-liquid-presence`.
+        """Check for liquid in a well and raise an error if none is detected. 
+        
+        When this method raises an error, Flex will offer the opportunity to enter recovery mode. In recovery mode, you can manually add liquid to resolve the error. 
+        
+        Works with Flex pipettes only. See :ref:`lpd` and :ref:`require-liquid-presence`.
 
         When simulating a protocol, the check always succeeds (does not raise an error).
 
