@@ -126,6 +126,14 @@ Note that sometimes API names is very long eg.,
 
 
 5)  If the pipette is multi-channel eg., P20 Multi-Channel Gen2, please use `columns` method.
+
+6) <<< Load trash for Flex >>>
+For Flex protocols, NOT OT-2 protocols using API version 2.16 or later,
+load a trash bin in slot A3:
+```python
+trash = protocol.load_trash_bin("A3")
+```
+Note that you load trash before commands.
 \n\n
 """
 

@@ -1,5 +1,9 @@
 import { useAuth0 } from '@auth0/auth0-react'
-import { PROD_AUTH0_AUDIENCE, STAGING_AUTH0_AUDIENCE } from '../constants'
+import {
+  PROD_AUTH0_AUDIENCE,
+  STAGING_AUTH0_AUDIENCE,
+  LOCAL_AUTH0_AUDIENCE,
+} from '../constants'
 
 interface UseGetAccessTokenResult {
   getAccessToken: () => Promise<string>
@@ -7,10 +11,25 @@ interface UseGetAccessTokenResult {
 
 export const useGetAccessToken = (): UseGetAccessTokenResult => {
   const { getAccessTokenSilently } = useAuth0()
-  const auth0Audience =
-    process.env.NODE_ENV === 'production'
-      ? PROD_AUTH0_AUDIENCE
-      : STAGING_AUTH0_AUDIENCE
+
+  const getAuth0Audience = (): string => {
+    switch (process.env.NODE_ENV) {
+      case 'production':
+        return PROD_AUTH0_AUDIENCE
+      case 'staging':
+        return STAGING_AUTH0_AUDIENCE
+      case 'development':
+        return LOCAL_AUTH0_AUDIENCE
+      default:
+        console.error(
+          'Error: NODE_ENV variable is not valid:',
+          process.env.NODE_ENV
+        )
+        return STAGING_AUTH0_AUDIENCE
+    }
+  }
+
+  const auth0Audience = getAuth0Audience()
 
   const getAccessToken = async (): Promise<string> => {
     try {
