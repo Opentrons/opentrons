@@ -749,6 +749,11 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
     disableReason = t('close_door')
   }
 
+  const shouldShowHSConfirm =
+    isHeaterShakerInProtocol &&
+    !isHeaterShakerShaking &&
+    (runStatus === RUN_STATUS_IDLE || runStatus === RUN_STATUS_STOPPED)
+
   if (isProtocolAnalyzing) {
     buttonIconName = 'ot-spinner'
     buttonText = t('analyzing_on_robot')
@@ -777,11 +782,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
         (runStatus === RUN_STATUS_IDLE || runStatus === RUN_STATUS_STOPPED)
       ) {
         confirmMissingSteps()
-      } else if (
-        isHeaterShakerInProtocol &&
-        !isHeaterShakerShaking &&
-        (runStatus === RUN_STATUS_IDLE || runStatus === RUN_STATUS_STOPPED)
-      ) {
+      } else if (shouldShowHSConfirm) {
         confirmAttachment()
       } else {
         play()
@@ -867,7 +868,11 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
       {showMissingStepsConfirmationModal && (
         <ConfirmMissingStepsModal
           onCloseClick={cancelExitMissingStepsConfirmation}
-          onConfirmClick={handleProceedToRunClick}
+          onConfirmClick={() => {
+            shouldShowHSConfirm
+              ? confirmAttachment()
+              : handleProceedToRunClick()
+          }}
           missingSteps={missingSetupSteps}
         />
       )}
