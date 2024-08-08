@@ -21,7 +21,6 @@ export function useCloseCurrentRun(): {
   const closeCurrentRun = (
     options?: UseDismissCurrentRunMutationOptions
   ): void => {
-    console.log('=>(useCloseCurrentRun.ts:24) currentRunId', currentRunId)
     if (currentRunId != null) {
       dismissCurrentRun(currentRunId, {
         ...options,

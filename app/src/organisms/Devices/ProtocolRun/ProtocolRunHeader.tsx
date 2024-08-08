@@ -123,6 +123,7 @@ import type { State } from '../../../redux/types'
 import type { HeaterShakerModule } from '../../../redux/modules/types'
 
 const EQUIPMENT_POLL_MS = 5000
+const CURRENT_RUN_POLL_MS = 5000
 const CANCELLABLE_STATUSES = [
   RUN_STATUS_RUNNING,
   RUN_STATUS_PAUSED,
@@ -167,7 +168,8 @@ export function ProtocolRunHeader({
   const { analysisErrors } = useProtocolAnalysisErrors(runId)
   const { data: attachedInstruments } = useInstrumentsQuery()
   const isRunCurrent = Boolean(
-    useNotifyRunQuery(runId, { refetchInterval: 5000 })?.data?.data?.current
+    useNotifyRunQuery(runId, { refetchInterval: CURRENT_RUN_POLL_MS })?.data
+      ?.data?.current
   )
   const mostRecentRunId = useMostRecentRunId()
   const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()

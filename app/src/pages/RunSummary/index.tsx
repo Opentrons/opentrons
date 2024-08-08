@@ -72,6 +72,8 @@ import { useRecoveryAnalytics } from '../../organisms/ErrorRecoveryFlows/hooks'
 import type { OnDeviceRouteParams } from '../../App/types'
 import type { PipetteWithTip } from '../../organisms/DropTipWizardFlows'
 
+const CURRENT_RUN_POLL_MS = 5000
+
 export function RunSummary(): JSX.Element {
   const { runId } = useParams<
     keyof OnDeviceRouteParams
@@ -81,7 +83,8 @@ export function RunSummary(): JSX.Element {
   const host = useHost()
   const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
   const isRunCurrent = Boolean(
-    useNotifyRunQuery(runId, { refetchInterval: 5000 })?.data?.data?.current
+    useNotifyRunQuery(runId, { refetchInterval: CURRENT_RUN_POLL_MS })?.data
+      ?.data?.current
   )
   const { data: attachedInstruments } = useInstrumentsQuery()
   const { deleteRun } = useDeleteRunMutation()
@@ -185,7 +188,6 @@ export function RunSummary(): JSX.Element {
   // TODO(jh, 08-02-24): Revisit useCurrentRunRoute and top level redirects.
   const queryClient = useQueryClient()
   const returnToDash = (): void => {
-    closeCurrentRun()
     // Eagerly clear the query cache to prevent top level redirecting back to this page.
     queryClient.setQueryData([host, 'runs', runId, 'details'], () => undefined)
     navigate('/')
@@ -242,6 +244,7 @@ export function RunSummary(): JSX.Element {
     } else if (isQuickTransfer) {
       returnToQuickTransfer()
     } else {
+      closeCurrentRun()
       returnToDash()
     }
   }
@@ -256,7 +259,6 @@ export function RunSummary(): JSX.Element {
         mount: aPipetteWithTip.mount,
         robotType: FLEX_ROBOT_TYPE,
         onClose: () => {
-          closeCurrentRun()
           runAgain()
         },
       })

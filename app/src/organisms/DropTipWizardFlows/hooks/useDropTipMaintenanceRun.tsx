@@ -44,7 +44,6 @@ export function useDropTipMaintenanceRun({
 
   const { data: maintenanceRunData } = useNotifyCurrentMaintenanceRun({
     refetchInterval: RUN_REFETCH_INTERVAL_MS,
-    forceHttpPolling: true,
   })
 
   const activeMaintenanceRunId = maintenanceRunData?.data.id
@@ -152,9 +151,10 @@ function useMonitorMaintenanceRunForDeletion({
     monitorMaintenanceRunForDeletion,
     setMonitorMaintenanceRunForDeletion,
   ] = React.useState<boolean>(false)
+  const [closedOnce, setClosedOnce] = React.useState<boolean>(false)
 
   React.useEffect(() => {
-    if (isMaintenanceRunType) {
+    if (isMaintenanceRunType && !closedOnce) {
       if (
         createdMaintenanceRunId !== null &&
         activeMaintenanceRunId === createdMaintenanceRunId
@@ -166,12 +166,8 @@ function useMonitorMaintenanceRunForDeletion({
         monitorMaintenanceRunForDeletion
       ) {
         closeFlow()
+        setClosedOnce(true)
       }
     }
-  }, [
-    isMaintenanceRunType,
-    createdMaintenanceRunId,
-    activeMaintenanceRunId,
-    closeFlow,
-  ])
+  }, [isMaintenanceRunType, createdMaintenanceRunId, activeMaintenanceRunId])
 }
