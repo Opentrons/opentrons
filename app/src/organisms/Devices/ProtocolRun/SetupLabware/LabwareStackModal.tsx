@@ -210,14 +210,21 @@ export const LabwareStackModal = (
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
               >
                 <LabwareStackLabel text={adapterName ?? ''} />
-                <LabwareStackRender
-                  definitionTop={topDefinition}
-                  definitionBottom={adapterDef}
-                  highlightBottom={true}
-                  highlightTop={false}
-                />
+                {adapterDef.parameters.loadName ===
+                'opentrons_flex_96_tiprack_adapter' ? (
+                  tiprackAdapterImg
+                ) : (
+                  <LabwareStackRender
+                    definitionTop={topDefinition}
+                    definitionBottom={adapterDef}
+                    highlightBottom={true}
+                    highlightTop={false}
+                  />
+                )}
               </Flex>
-              <Divider marginY={SPACING.spacing16} />
+              {moduleModel != null ? (
+                <Divider marginY={SPACING.spacing16} />
+              ) : null}
             </>
           ) : null}
           {moduleModel != null ? (

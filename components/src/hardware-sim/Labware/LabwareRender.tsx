@@ -88,6 +88,8 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
         >
           <LabwareAdapter
             labwareLoadName={labwareLoadName as LabwareAdapterLoadName}
+            definition={definition}
+            highlight={props.highlight}
           />
         </g>
       </g>

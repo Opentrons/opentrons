@@ -25,6 +25,7 @@ import { OffDeckLabwareList } from './OffDeckLabwareList'
 
 import type {
   CompletedProtocolAnalysis,
+  LoadLabwareRunTimeCommand,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
 import { LabwareStackModal } from './LabwareStackModal'
@@ -137,20 +138,51 @@ export function SetupLabwareMap({
       const topLabwareId = labwareInAdapter?.result?.labwareId ?? labwareId
       const topLabwareDisplayName =
         labwareInAdapter?.params.displayName ?? displayName
+      const isLabwareInStack =
+        topLabwareDefinition != null &&
+        topLabwareId != null &&
+        labwareInAdapter != null
 
+      const loadLabwareCommand = commands.find(
+        command =>
+          command.commandType === 'loadLabware' &&
+          command.result?.labwareId === labwareId
+      ) as LoadLabwareRunTimeCommand
+      const labwareLocation = loadLabwareCommand?.params.location
       return {
-        labwareLocation: { slotName },
+        labwareLocation,
         definition: topLabwareDefinition,
         topLabwareId,
         topLabwareDisplayName,
+        // TODO (nd: 08/08/2024) fix passing of onLabwareClick to actually perform click handling.
+        // Here, I set to an empty function to produce pointer cursor style.
+        onLabwareClick: isLabwareInStack ? () => {} : undefined,
+        highlight: isLabwareInStack && hoverLabwareId === topLabwareId,
         labwareChildren: (
-          <LabwareInfoOverlay
-            definition={topLabwareDefinition}
-            labwareId={topLabwareId}
-            displayName={topLabwareDisplayName}
-            runId={runId}
-          />
+          <g
+            onClick={() => {
+              if (isLabwareInStack) {
+                setLabwareStackDetailsLabwareId(topLabwareId)
+              }
+            }}
+            onMouseEnter={() => {
+              if (topLabwareDefinition != null && topLabwareId != null) {
+                setHoverLabwareId(() => topLabwareId)
+              }
+            }}
+            onMouseLeave={() => {
+              setHoverLabwareId(null)
+            }}
+          >
+            <LabwareInfoOverlay
+              definition={topLabwareDefinition}
+              labwareId={topLabwareId}
+              displayName={topLabwareDisplayName}
+              runId={runId}
+            />
+          </g>
         ),
+        stacked: isLabwareInStack,
       }
     }
   )
