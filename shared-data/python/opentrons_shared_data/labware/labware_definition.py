@@ -105,6 +105,33 @@ class DisplayCategory(str, Enum):
     other = "other"
 
 
+class CircleArea(BaseModel):
+    radius: float
+
+
+class RectangleArea(BaseModel):
+    length: float
+    width: float
+
+
+class Hemisphere(BaseModel):
+    radius: float
+    depth: float
+
+
+CrossSectionShape = Union[CircleArea, RectangleArea]
+
+
+class CrossSection(BaseModel):
+    shape: CrossSectionShape
+    height: float
+
+
+class InnerLabwareGeometry(BaseModel):
+    cross_sections: List[CrossSection]
+    hemisphere: Optional[Hemisphere]
+
+
 class LabwareRole(str, Enum):
     labware = "labware"
     fixture = "fixture"
