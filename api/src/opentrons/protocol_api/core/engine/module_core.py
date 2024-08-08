@@ -24,7 +24,6 @@ from opentrons.protocol_engine.errors.exceptions import (
     LabwareNotLoadedOnModuleError,
     NoMagnetEngageHeightError,
 )
-from opentrons.protocol_engine.types import LabwareOffsetVector
 
 from opentrons.protocols.api_support.types import APIVersion
 
@@ -553,8 +552,6 @@ class AbsorbanceReaderCore(ModuleCore, AbstractAbsorbanceReaderCore):
         self._engine_client.execute_command(
             cmd.absorbance_reader.CloseLidParams(
                 moduleId=self.module_id,
-                pickUpOffset=LabwareOffsetVector(x=14, y=0, z=0),
-                dropOffset=LabwareOffsetVector(x=14, y=0, z=0),
             )
         )
 
@@ -563,7 +560,5 @@ class AbsorbanceReaderCore(ModuleCore, AbstractAbsorbanceReaderCore):
         self._engine_client.execute_command(
             cmd.absorbance_reader.OpenLidParams(
                 moduleId=self.module_id,
-                pickUpOffset=LabwareOffsetVector(x=14, y=0, z=0),
-                dropOffset=LabwareOffsetVector(x=14, y=0, z=0),
             )
         )

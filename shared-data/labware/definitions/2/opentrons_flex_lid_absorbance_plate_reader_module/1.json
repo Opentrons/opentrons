@@ -39,5 +39,19 @@
     "x": 0,
     "y": 0,
     "z": 0
+  },
+  "gripperOffsets": {
+    "default": {
+      "pickUpOffset": {
+        "x": 14,
+        "y": 0,
+        "z": 0
+      },
+      "dropOffset": {
+        "x": 14,
+        "y": 0,
+        "z": 0
+      }
+    }
   }
 }
