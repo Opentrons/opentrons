@@ -345,6 +345,7 @@ export function ProtocolRunHeader({
           setShowRunFailedModal={setShowRunFailedModal}
           highestPriorityError={highestPriorityError}
           commandErrorList={commandErrorList}
+          runStatus={runStatus}
         />
       ) : null}
       <Flex
@@ -660,9 +661,8 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
   )
   const [showIsShakingModal, setShowIsShakingModal] = React.useState(false)
   const isSetupComplete =
-    isCalibrationComplete &&
-    isModuleCalibrationComplete &&
-    missingModuleIds.length === 0
+    // isCalibrationComplete &&
+    isModuleCalibrationComplete && missingModuleIds.length === 0
   const isRobotOnWrongVersionOfSoftware = ['upgrade', 'downgrade'].includes(
     useSelector((state: State) => {
       return getRobotUpdateDisplayInfo(state, robotName)
@@ -899,7 +899,8 @@ function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
     isRunCurrent,
   } = props
   const { t } = useTranslation('run_details')
-
+  const completedWithErrors =
+    commandErrorList?.data != null && commandErrorList.data.length > 0
   const handleRunSuccessClick = (): void => {
     handleClearClick()
   }
@@ -926,7 +927,10 @@ function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
 
   const buildErrorBanner = (): JSX.Element => {
     return (
-      <Banner type="error" iconMarginLeft={SPACING.spacing4}>
+      <Banner
+        type={runStatus === RUN_STATUS_SUCCEEDED ? 'warning' : 'error'}
+        iconMarginLeft={SPACING.spacing4}
+      >
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
           <LegacyStyledText>
             {highestPriorityError != null
@@ -934,7 +938,9 @@ function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
                   errorType: highestPriorityError?.errorType,
                   errorCode: highestPriorityError?.errorCode,
                 })
-              : 'Run completed with errors.'}
+              : `Run completed with ${
+                  runStatus === RUN_STATUS_SUCCEEDED ? 'warnings' : 'errors'
+                }.`}
           </LegacyStyledText>
 
           <LinkButton
@@ -951,14 +957,13 @@ function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
   if (
     runStatus === RUN_STATUS_SUCCEEDED &&
     isRunCurrent &&
-    !isResetRunLoading
+    !isResetRunLoading &&
+    !completedWithErrors
   ) {
     return buildSuccessBanner()
   } else if (
     highestPriorityError != null ||
-    (commandErrorList?.data != null &&
-      commandErrorList.data.length > 0 &&
-      !isResetRunLoading)
+    (completedWithErrors && !isResetRunLoading)
   ) {
     return buildErrorBanner()
   } else {

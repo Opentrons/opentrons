@@ -42,6 +42,7 @@
   "end_step_time": "End",
   "error_info": "Error {{errorCode}}: {{errorType}}",
   "error_type": "Error: {{errorType}}",
+  "error_details": "Error details",
   "failed_step": "Failed step",
   "final_step": "Final Step",
   "ignore_stored_data": "Ignore stored data",
@@ -144,5 +145,6 @@
   "view_analysis_error_details": "View <errorLink>error details</errorLink>",
   "view_current_step": "View current step",
   "view_error": "View error",
-  "view_error_details": "View error details"
+  "view_error_details": "View error details",
+  "warning_details": "Warning details"
 }

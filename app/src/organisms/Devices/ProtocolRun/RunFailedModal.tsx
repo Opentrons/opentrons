@@ -23,7 +23,12 @@ import {
 import { LegacyModal } from '../../../molecules/LegacyModal'
 import { useDownloadRunLog } from '../hooks'
 
-import type { RunError, RunCommandErrors } from '@opentrons/api-client'
+import type {
+  RunError,
+  RunCommandErrors,
+  RunStatus,
+} from '@opentrons/api-client'
+import { RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
 import type { LegacyModalProps } from '../../../molecules/LegacyModal'
 import type { RunCommandError } from '@opentrons/shared-data'
 
@@ -45,6 +50,7 @@ interface RunFailedModalProps {
   setShowRunFailedModal: (showRunFailedModal: boolean) => void
   highestPriorityError?: RunError | null
   commandErrorList?: RunCommandErrors | null
+  runStatus: RunStatus
 }
 
 export function RunFailedModal({
@@ -53,13 +59,16 @@ export function RunFailedModal({
   setShowRunFailedModal,
   highestPriorityError,
   commandErrorList,
+  runStatus,
 }: RunFailedModalProps): JSX.Element | null {
   const { i18n, t } = useTranslation(['run_details', 'shared', 'branded'])
   const modalProps: LegacyModalProps = {
-    type: 'error',
+    type: runStatus === RUN_STATUS_SUCCEEDED ? 'warning' : 'error',
     title:
       commandErrorList == null || commandErrorList?.data.length === 0
         ? t('run_failed_modal_title')
+        : runStatus === RUN_STATUS_SUCCEEDED
+        ? t('warning_details')
         : t('error_details'),
     onClose: () => {
       setShowRunFailedModal(false)
