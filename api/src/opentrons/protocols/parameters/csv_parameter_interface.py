@@ -48,23 +48,20 @@ class CSVParameter:
         rows: List[List[str]] = []
         if detect_dialect:
             try:
-                self.file.seek(0)
-                dialect = csv.Sniffer().sniff(self.file.read(1024))
-                self.file.seek(0)
-                reader = csv.reader(self.file, dialect, **kwargs)
+                dialect = csv.Sniffer().sniff(self.contents[:1024])
+                reader = csv.reader(self.contents.split("\n"), dialect, **kwargs)
             except (UnicodeDecodeError, csv.Error):
                 raise ParameterValueError(
-                    "Cannot parse dialect or contents from provided CSV file."
+                    "Cannot parse dialect or contents from provided CSV contents."
                 )
         else:
             try:
-                reader = csv.reader(self.file, **kwargs)
+                reader = csv.reader(self.contents.split("\n"), **kwargs)
             except (UnicodeDecodeError, csv.Error):
-                raise ParameterValueError("Cannot parse provided CSV file.")
+                raise ParameterValueError("Cannot parse provided CSV contents.")
         try:
             for row in reader:
                 rows.append(row)
         except (UnicodeDecodeError, csv.Error):
-            raise ParameterValueError("Cannot parse provided CSV file.")
-        self.file.seek(0)
+            raise ParameterValueError("Cannot parse provided CSV contents.")
         return rows
