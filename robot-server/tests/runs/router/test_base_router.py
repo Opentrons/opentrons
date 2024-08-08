@@ -5,10 +5,18 @@ from decoy import Decoy
 from pathlib import Path
 
 from opentrons.types import DeckSlotName
-from opentrons.protocol_engine import LabwareOffsetCreate, types as pe_types
+from opentrons.protocol_engine import (
+    LabwareOffsetCreate,
+    types as pe_types,
+    errors as pe_errors,
+    CommandErrorSlice,
+)
 from opentrons.protocol_reader import ProtocolSource, JsonProtocolConfig
 
+from robot_server.data_files.data_files_store import DataFilesStore, DataFileInfo
+
 from robot_server.errors.error_responses import ApiError
+from robot_server.runs.error_recovery_models import ErrorRecoveryPolicy
 from robot_server.service.json_api import (
     RequestModel,
     SimpleBody,
@@ -17,6 +25,7 @@ from robot_server.service.json_api import (
     ResourceLink,
 )
 
+from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.protocols.protocol_store import (
     ProtocolNotFoundError,
     ProtocolResource,
@@ -37,6 +46,8 @@ from robot_server.runs.router.base_router import (
     get_runs,
     remove_run,
     update_run,
+    put_error_recovery_policy,
+    get_run_commands_error,
 )
 
 from robot_server.deck_configuration.store import DeckConfigurationStore
@@ -45,6 +56,12 @@ from robot_server.deck_configuration.store import DeckConfigurationStore
 def mock_notify_publishers() -> None:
     """A mock notify_publishers."""
     return None
+
+
+@pytest.fixture
+def mock_data_files_store(decoy: Decoy) -> DataFilesStore:
+    """Get a mock DataFilesStore."""
+    return decoy.mock(cls=DataFilesStore)
 
 
 @pytest.fixture
@@ -63,6 +80,7 @@ async def test_create_run(
     mock_run_auto_deleter: RunAutoDeleter,
     labware_offset_create: pe_types.LabwareOffsetCreate,
     mock_deck_configuration_store: DeckConfigurationStore,
+    mock_data_files_store: DataFilesStore,
 ) -> None:
     """It should be able to create a basic run."""
     run_id = "run-id"
@@ -81,6 +99,7 @@ async def test_create_run(
         labwareOffsets=[],
         status=pe_types.EngineStatus.IDLE,
         liquids=[],
+        hasEverEnteredErrorRecovery=False,
     )
     decoy.when(
         await mock_deck_configuration_store.get_deck_configuration()
@@ -93,6 +112,7 @@ async def test_create_run(
             deck_configuration=[],
             protocol=None,
             run_time_param_values=None,
+            run_time_param_paths=None,
             notify_publishers=mock_notify_publishers,
         )
     ).then_return(expected_response)
@@ -102,6 +122,8 @@ async def test_create_run(
             data=RunCreate(labwareOffsets=[labware_offset_create])
         ),
         run_data_manager=mock_run_data_manager,
+        data_files_store=mock_data_files_store,
+        data_files_directory=Path("/dev/null"),
         run_id=run_id,
         created_at=run_created_at,
         run_auto_deleter=mock_run_auto_deleter,
@@ -121,6 +143,7 @@ async def test_create_protocol_run(
     mock_run_data_manager: RunDataManager,
     mock_run_auto_deleter: RunAutoDeleter,
     mock_deck_configuration_store: DeckConfigurationStore,
+    mock_data_files_store: DataFilesStore,
 ) -> None:
     """It should be able to create a protocol run."""
     run_id = "run-id"
@@ -130,7 +153,7 @@ async def test_create_protocol_run(
     protocol_resource = ProtocolResource(
         protocol_id=protocol_id,
         protocol_key=None,
-        protocol_kind=None,
+        protocol_kind=ProtocolKind.STANDARD,
         created_at=datetime(year=2022, month=2, day=2),
         source=ProtocolSource(
             directory=Path("/dev/null"),
@@ -156,6 +179,15 @@ async def test_create_protocol_run(
         labwareOffsets=[],
         status=pe_types.EngineStatus.IDLE,
         liquids=[],
+        hasEverEnteredErrorRecovery=False,
+    )
+    decoy.when(mock_data_files_store.get("file-id")).then_return(
+        DataFileInfo(
+            id="123",
+            name="abc.xyz",
+            file_hash="987",
+            created_at=datetime(month=1, day=2, year=2024),
+        )
     )
     decoy.when(
         await mock_deck_configuration_store.get_deck_configuration()
@@ -172,6 +204,7 @@ async def test_create_protocol_run(
             deck_configuration=[],
             protocol=protocol_resource,
             run_time_param_values={"foo": "bar"},
+            run_time_param_paths={"my-csv-param": Path("/dev/null/file-id/abc.xyz")},
             notify_publishers=mock_notify_publishers,
         )
     ).then_return(expected_response)
@@ -179,11 +212,15 @@ async def test_create_protocol_run(
     result = await create_run(
         request_body=RequestModel(
             data=RunCreate(
-                protocolId="protocol-id", runTimeParameterValues={"foo": "bar"}
+                protocolId="protocol-id",
+                runTimeParameterValues={"foo": "bar"},
+                runTimeParameterFiles={"my-csv-param": "file-id"},
             )
         ),
         protocol_store=mock_protocol_store,
         run_data_manager=mock_run_data_manager,
+        data_files_store=mock_data_files_store,
+        data_files_directory=Path("/dev/null"),
         run_id=run_id,
         created_at=run_created_at,
         run_auto_deleter=mock_run_auto_deleter,
@@ -240,6 +277,7 @@ async def test_create_run_conflict(
             deck_configuration=[],
             protocol=None,
             run_time_param_values=None,
+            run_time_param_paths=None,
             notify_publishers=mock_notify_publishers,
         )
     ).then_raise(RunConflictError("oh no"))
@@ -277,6 +315,7 @@ async def test_get_run_data_from_url(
         labware=[],
         labwareOffsets=[],
         liquids=[],
+        hasEverEnteredErrorRecovery=False,
     )
 
     decoy.when(mock_run_data_manager.get("run-id")).then_return(expected_response)
@@ -323,6 +362,7 @@ async def test_get_run() -> None:
         labware=[],
         labwareOffsets=[],
         liquids=[],
+        hasEverEnteredErrorRecovery=False,
     )
 
     result = await get_run(run_data=run_data)
@@ -368,6 +408,7 @@ async def test_get_runs_not_empty(
         labware=[],
         labwareOffsets=[],
         liquids=[],
+        hasEverEnteredErrorRecovery=False,
     )
 
     response_2 = Run(
@@ -383,6 +424,7 @@ async def test_get_runs_not_empty(
         labware=[],
         labwareOffsets=[],
         liquids=[],
+        hasEverEnteredErrorRecovery=False,
     )
 
     decoy.when(mock_run_data_manager.get_all(20)).then_return([response_1, response_2])
@@ -461,6 +503,7 @@ async def test_update_run_to_not_current(
         labware=[],
         labwareOffsets=[],
         liquids=[],
+        hasEverEnteredErrorRecovery=False,
     )
 
     decoy.when(await mock_run_data_manager.update("run-id", current=False)).then_return(
@@ -495,6 +538,7 @@ async def test_update_current_none_noop(
         labware=[],
         labwareOffsets=[],
         liquids=[],
+        hasEverEnteredErrorRecovery=False,
     )
 
     decoy.when(await mock_run_data_manager.update("run-id", current=None)).then_return(
@@ -569,3 +613,156 @@ async def test_update_to_current_missing(
 
     assert exc_info.value.status_code == 404
     assert exc_info.value.content["errors"][0]["id"] == "RunNotFound"
+
+
+async def test_create_policies(
+    decoy: Decoy, mock_run_data_manager: RunDataManager
+) -> None:
+    """It should call RunDataManager create run policies."""
+    policies = decoy.mock(cls=ErrorRecoveryPolicy)
+    await put_error_recovery_policy(
+        runId="rud-id",
+        request_body=RequestModel(data=policies),
+        run_data_manager=mock_run_data_manager,
+    )
+    decoy.verify(
+        mock_run_data_manager.set_policies(
+            run_id="rud-id", policies=policies.policyRules
+        )
+    )
+
+
+async def test_create_policies_raises_not_active_run(
+    decoy: Decoy, mock_run_data_manager: RunDataManager
+) -> None:
+    """It should raise that the run is not current."""
+    policies = decoy.mock(cls=ErrorRecoveryPolicy)
+    decoy.when(
+        mock_run_data_manager.set_policies(
+            run_id="rud-id", policies=policies.policyRules
+        )
+    ).then_raise(RunNotCurrentError())
+    with pytest.raises(ApiError) as exc_info:
+        await put_error_recovery_policy(
+            runId="rud-id",
+            request_body=RequestModel(data=policies),
+            run_data_manager=mock_run_data_manager,
+        )
+
+    assert exc_info.value.status_code == 409
+    assert exc_info.value.content["errors"][0]["id"] == "RunStopped"
+
+
+async def test_get_run_commands_errors(
+    decoy: Decoy, mock_run_data_manager: RunDataManager
+) -> None:
+    """It should return a list of all commands errors in a run."""
+    decoy.when(
+        mock_run_data_manager.get_command_error_slice(
+            run_id="run-id",
+            cursor=0,
+            length=42,
+        )
+    ).then_raise(RunNotCurrentError("oh no!"))
+
+    error = pe_errors.ErrorOccurrence(
+        id="error-id",
+        errorType="PrettyBadError",
+        createdAt=datetime(year=2024, month=4, day=4),
+        detail="Things are not looking good.",
+    )
+    decoy.when(mock_run_data_manager.get_command_errors("run-id")).then_return([error])
+
+    with pytest.raises(ApiError):
+        result = await get_run_commands_error(
+            runId="run-id",
+            run_data_manager=mock_run_data_manager,
+            cursor=None,
+            pageLength=42,
+        )
+        assert result.status_code == 409
+
+
+async def test_get_run_commands_errors_raises_no_run(
+    decoy: Decoy, mock_run_data_manager: RunDataManager
+) -> None:
+    """It should return a list of all commands errors in a run."""
+    error = pe_errors.ErrorOccurrence(
+        id="error-id",
+        errorType="PrettyBadError",
+        createdAt=datetime(year=2024, month=4, day=4),
+        detail="Things are not looking good.",
+    )
+    decoy.when(mock_run_data_manager.get_command_errors("run-id")).then_return([error])
+
+    command_error_slice = CommandErrorSlice(
+        cursor=1, total_length=3, commands_errors=[error]
+    )
+
+    decoy.when(
+        mock_run_data_manager.get_command_error_slice(
+            run_id="run-id",
+            cursor=0,
+            length=42,
+        )
+    ).then_return(command_error_slice)
+
+    result = await get_run_commands_error(
+        runId="run-id",
+        run_data_manager=mock_run_data_manager,
+        cursor=None,
+        pageLength=42,
+    )
+
+    assert list(result.content.data) == [
+        pe_errors.ErrorOccurrence(
+            id="error-id",
+            errorType="PrettyBadError",
+            createdAt=datetime(year=2024, month=4, day=4),
+            detail="Things are not looking good.",
+        )
+    ]
+    assert result.content.meta == MultiBodyMeta(cursor=1, totalLength=3)
+    assert result.status_code == 200
+
+
+@pytest.mark.parametrize(
+    "error_list, expected_cursor_result",
+    [([], 0), ([pe_errors.ErrorOccurrence.construct(id="error-id")], 1)],
+)
+async def test_get_run_commands_errors_defualt_cursor(
+    decoy: Decoy,
+    mock_run_data_manager: RunDataManager,
+    error_list: list[pe_errors.ErrorOccurrence],
+    expected_cursor_result: int,
+) -> None:
+    """It should return a list of all commands errors in a run."""
+    print(error_list)
+    decoy.when(mock_run_data_manager.get_command_errors("run-id")).then_return(
+        error_list
+    )
+
+    command_error_slice = CommandErrorSlice(
+        cursor=expected_cursor_result, total_length=3, commands_errors=error_list
+    )
+
+    decoy.when(
+        mock_run_data_manager.get_command_error_slice(
+            run_id="run-id",
+            cursor=0,
+            length=42,
+        )
+    ).then_return(command_error_slice)
+
+    result = await get_run_commands_error(
+        runId="run-id",
+        run_data_manager=mock_run_data_manager,
+        cursor=None,
+        pageLength=42,
+    )
+
+    assert list(result.content.data) == error_list
+    assert result.content.meta == MultiBodyMeta(
+        cursor=expected_cursor_result, totalLength=3
+    )
+    assert result.status_code == 200

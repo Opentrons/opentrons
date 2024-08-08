@@ -9,9 +9,9 @@ import {
 } from '@opentrons/components'
 
 import { SmallButton } from '../../atoms/buttons'
-import { Modal } from '../../molecules/Modal'
+import { OddModal } from '../../molecules/OddModal'
 
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
+import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
 
 interface ConfirmAttachedModalProps {
   onCloseClick: () => void
@@ -25,7 +25,7 @@ export function ConfirmAttachedModal({
   onConfirmClick,
 }: ConfirmAttachedModalProps): JSX.Element {
   const { i18n, t } = useTranslation(['protocol_setup', 'shared'])
-  const modalHeader: ModalHeaderBaseProps = {
+  const modalHeader: OddModalHeaderBaseProps = {
     title: t('confirm_heater_shaker_module_modal_title'),
     hasExitIcon: true,
   }
@@ -36,7 +36,7 @@ export function ConfirmAttachedModal({
   }
 
   return (
-    <Modal header={modalHeader} onOutsideClick={onCloseClick}>
+    <OddModal header={modalHeader} onOutsideClick={onCloseClick}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
         <LegacyStyledText as="p">
           {t('confirm_heater_shaker_module_modal_description')}
@@ -58,6 +58,6 @@ export function ConfirmAttachedModal({
           />
         </Flex>
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }

@@ -18,12 +18,10 @@ import {
   ANALYTICS_EXPAND_LIQUID_SETUP_ROW,
   ANALYTICS_OPEN_LIQUID_LABWARE_DETAIL_MODAL,
 } from '../../../../../redux/analytics'
+import { useIsFlex } from '../../../hooks'
 import { getLocationInfoNames } from '../../utils/getLocationInfoNames'
 import { SetupLiquidsList } from '../SetupLiquidsList'
-import {
-  getTotalVolumePerLiquidId,
-  getTotalVolumePerLiquidLabwarePair,
-} from '../utils'
+import { getTotalVolumePerLiquidId, getVolumePerWell } from '../utils'
 import { LiquidsLabwareDetailsModal } from '../LiquidsLabwareDetailsModal'
 import { useNotifyRunQuery } from '../../../../../resources/runs'
 
@@ -58,6 +56,7 @@ const MOCK_LABWARE_INFO_BY_LIQUID_ID = {
 
 vi.mock('../utils')
 vi.mock('../../utils/getLocationInfoNames')
+vi.mock('../../../hooks')
 vi.mock('../LiquidsLabwareDetailsModal')
 vi.mock('@opentrons/api-client')
 vi.mock('../../../../../redux/analytics')
@@ -73,9 +72,10 @@ let mockTrackEvent: Mock
 describe('SetupLiquidsList', () => {
   let props: React.ComponentProps<typeof SetupLiquidsList>
   beforeEach(() => {
-    props = { runId: '123' }
+    props = { runId: '123', robotName: 'test_flex' }
     vi.mocked(getTotalVolumePerLiquidId).mockReturnValue(400)
-    vi.mocked(getTotalVolumePerLiquidLabwarePair).mockReturnValue(200)
+    vi.mocked(useIsFlex).mockReturnValue(false)
+    vi.mocked(getVolumePerWell).mockReturnValue(200)
     vi.mocked(getLocationInfoNames).mockReturnValue({
       labwareName: 'mock labware name',
       slotName: '4',
@@ -98,6 +98,11 @@ describe('SetupLiquidsList', () => {
     vi.mocked(useNotifyRunQuery).mockReturnValue({} as any)
   })
 
+  it('renders the table headers', () => {
+    render(props)
+    screen.getByText('Liquid information')
+    screen.getByText('Total volume')
+  })
   it('renders the total volume of the liquid, sample display name, and description', () => {
     render(props)
     screen.getAllByText(nestedTextMatcher('400.0 µL'))
@@ -117,8 +122,8 @@ describe('SetupLiquidsList', () => {
     })
     screen.getByText('Location')
     screen.getByText('Labware name')
-    screen.getByText('Volume')
-    screen.getAllByText(nestedTextMatcher('200.0 µL'))
+    screen.getByText('Individual well volume')
+    screen.getByText('200 µL')
     screen.getByText('4')
     screen.getByText('mock labware name')
   })

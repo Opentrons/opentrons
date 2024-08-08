@@ -10,8 +10,10 @@ import {
   JUSTIFY_FLEX_END,
 } from '@opentrons/components'
 import { getIsOnDevice } from '../../redux/config'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
+import {
+  SimpleWizardBody,
+  SimpleWizardInProgressBody,
+} from '../../molecules/SimpleWizardBody'
 import { SmallButton } from '../../atoms/buttons'
 import { GRIPPER_FLOW_TYPES } from './constants'
 import type { GripperWizardFlowType } from './types'
@@ -37,7 +39,7 @@ export function ExitConfirmation(props: ExitConfirmationProps): JSX.Element {
 
   if (isRobotMoving)
     return (
-      <InProgressModal
+      <SimpleWizardInProgressBody
         description={t('shared:stand_back_robot_is_in_motion')}
       />
     )

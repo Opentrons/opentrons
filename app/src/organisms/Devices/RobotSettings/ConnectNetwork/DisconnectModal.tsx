@@ -15,10 +15,10 @@ import {
   PrimaryButton,
   SPACING,
   LegacyStyledText,
+  Modal,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { LegacyModal } from '../../../../molecules/LegacyModal'
 import { useRobot } from '../../../../organisms/Devices/hooks'
 import { CONNECTABLE } from '../../../../redux/discovery'
 import {
@@ -120,7 +120,7 @@ export const DisconnectModal = ({
   }, [isDisconnected])
 
   return (
-    <LegacyModal
+    <Modal
       type="warning"
       title={
         isDisconnected
@@ -182,6 +182,6 @@ export const DisconnectModal = ({
           )}
         </Flex>
       </Flex>
-    </LegacyModal>
+    </Modal>
   )
 }

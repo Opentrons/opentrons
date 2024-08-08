@@ -18,7 +18,7 @@ import {
 import { useCanDisconnect } from '../../../resources/networking/hooks'
 import { DisconnectModal } from '../../../organisms/Devices/RobotSettings/ConnectNetwork/DisconnectModal'
 import { ChooseProtocolSlideout } from '../../ChooseProtocolSlideout'
-import { useCurrentRunId } from '../../ProtocolUpload/hooks'
+import { useCurrentRunId } from '../../../resources/runs'
 import { useIsRobotBusy } from '../hooks'
 import { handleUpdateBuildroot } from '../RobotSettings/UpdateBuildroot'
 import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
@@ -35,7 +35,7 @@ vi.mock(
   '../../../organisms/Devices/RobotSettings/ConnectNetwork/DisconnectModal'
 )
 vi.mock('../../ChooseProtocolSlideout')
-vi.mock('../../ProtocolUpload/hooks')
+vi.mock('../../../resources/runs')
 vi.mock('../RobotSettings/UpdateBuildroot')
 vi.mock('../../../resources/devices/hooks/useIsEstopNotDisengaged')
 

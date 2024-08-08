@@ -1,9 +1,18 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { RECOVERY_MAP } from './constants'
-import { Flex, ALIGN_CENTER, JUSTIFY_CENTER } from '@opentrons/components'
+import {
+  Flex,
+  ALIGN_CENTER,
+  JUSTIFY_CENTER,
+  RESPONSIVENESS,
+  DIRECTION_COLUMN,
+  SPACING,
+} from '@opentrons/components'
+
+import { InProgressModal } from '../../molecules/InProgressModal'
 
 import type { RobotMovingRoute, RecoveryContentProps } from './types'
 
@@ -43,12 +52,20 @@ export function RecoveryInProgress({
   const description = buildDescription()
 
   return (
-    <Flex
-      alignItems={ALIGN_CENTER}
-      justifyContent={JUSTIFY_CENTER}
-      width="100%"
-    >
+    <Flex css={CONTAINER_STYLE}>
       <InProgressModal description={description} />
     </Flex>
   )
 }
+
+const CONTAINER_STYLE = css`
+  align-items: ${ALIGN_CENTER};
+  justify-content: ${JUSTIFY_CENTER};
+  flex-direction: ${DIRECTION_COLUMN};
+  grid-gap: ${SPACING.spacing16};
+  width: 100%;
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    grid-gap: ${SPACING.spacing24};
+  }
+`

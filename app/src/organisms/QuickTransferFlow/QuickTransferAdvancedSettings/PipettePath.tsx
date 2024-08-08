@@ -7,11 +7,11 @@ import {
   DIRECTION_COLUMN,
   POSITION_FIXED,
   COLORS,
+  LargeButton,
   ALIGN_CENTER,
 } from '@opentrons/components'
 import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
 import { getTopPortalEl } from '../../../App/portal'
-import { LargeButton } from '../../../atoms/buttons'
 import { ChildNavigation } from '../../ChildNavigation'
 import { useBlowOutLocationOptions } from './BlowOut'
 import { getVolumeRange } from '../utils'

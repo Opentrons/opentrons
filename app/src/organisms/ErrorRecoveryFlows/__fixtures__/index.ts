@@ -73,7 +73,7 @@ export const mockRecoveryContentProps: RecoveryContentProps = {
   deckMapUtils: { setSelectedLocation: () => {} } as any,
   stepCounts: {} as any,
   protocolAnalysis: mockRobotSideAnalysis,
-  trackExternalMap: () => null,
+  subMapUtils: { subMap: null, updateSubMap: () => null } as any,
   hasLaunchedRecovery: true,
   getRecoveryOptionCopy: () => 'MOCK_COPY',
   commandsAfterFailedCommand: [
@@ -81,4 +81,12 @@ export const mockRecoveryContentProps: RecoveryContentProps = {
     mockRobotSideAnalysis.commands[mockRobotSideAnalysis.commands.length - 1],
   ],
   recoveryActionMutationUtils: {} as any,
+  analytics: {
+    reportRecoveredRunResult: () => {},
+    reportErrorEvent: () => {},
+    reportViewErrorDetailsEvent: () => {},
+    reportActionSelectedEvent: () => {},
+    reportInitialActionEvent: () => {},
+    reportActionSelectedResult: () => {},
+  },
 }

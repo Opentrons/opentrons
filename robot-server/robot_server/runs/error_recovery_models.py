@@ -1,5 +1,7 @@
 """Request and response models for dealing with error recovery policies."""
 from enum import Enum
+from typing import List
+
 from pydantic import BaseModel, Field
 
 
@@ -57,7 +59,7 @@ class MatchCriteria(BaseModel):
 
 
 class ErrorRecoveryRule(BaseModel):
-    """Request/Response model for new error recovery rule creation."""
+    """Model for new error recovery rule."""
 
     matchCriteria: MatchCriteria = Field(
         ...,
@@ -66,4 +68,14 @@ class ErrorRecoveryRule(BaseModel):
     ifMatch: ReactionIfMatch = Field(
         ...,
         description="The specific recovery setting that will be in use if the type parameters match.",
+    )
+
+
+class ErrorRecoveryPolicy(BaseModel):
+    """Request/Response model for new error recovery policy rules creation."""
+
+    policyRules: List[ErrorRecoveryRule] = Field(
+        ...,
+        description="A list or error recovery rules to apply for a run's recovery management."
+        "The rules are evaluated first-to-last. The first exact match will dectate recovery management.",
     )

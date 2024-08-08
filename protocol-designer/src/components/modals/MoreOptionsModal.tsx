@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import {
   FormGroup,
   InputField,
-  Modal,
+  LegacyModal,
   OutlineButton,
 } from '@opentrons/components'
 import { actions as steplistActions } from '../../steplist'
@@ -44,7 +44,7 @@ export function MoreOptionsModal(props: Props): JSX.Element {
   }
 
   return (
-    <Modal
+    <LegacyModal
       heading={t('step_notes.title')}
       className={modalStyles.modal}
       contentsClassName={styles.modal_contents}
@@ -77,6 +77,6 @@ export function MoreOptionsModal(props: Props): JSX.Element {
           <OutlineButton onClick={handleSave}>{t('button:save')}</OutlineButton>
         </div>
       </div>
-    </Modal>
+    </LegacyModal>
   )
 }

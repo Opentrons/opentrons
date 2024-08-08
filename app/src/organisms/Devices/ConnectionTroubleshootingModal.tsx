@@ -9,11 +9,10 @@ import {
   Link,
   PrimaryButton,
   SPACING,
+  Modal,
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import { LegacyModal } from '../../molecules/LegacyModal'
 
 const NEW_ROBOT_SETUP_SUPPORT_ARTICLE_HREF =
   'https://support.opentrons.com/s/article/Troubleshooting-connection-problems'
@@ -26,10 +25,7 @@ export function ConnectionTroubleshootingModal(props: Props): JSX.Element {
   const { t } = useTranslation(['devices_landing', 'shared'])
 
   return (
-    <LegacyModal
-      title={t('why_is_this_robot_unavailable')}
-      onClose={props.onClose}
-    >
+    <Modal title={t('why_is_this_robot_unavailable')} onClose={props.onClose}>
       <Flex flexDirection={DIRECTION_COLUMN}>
         <LegacyStyledText as="p">
           {t('connection_troubleshooting_intro')}
@@ -73,7 +69,7 @@ export function ConnectionTroubleshootingModal(props: Props): JSX.Element {
           {t('shared:close')}
         </PrimaryButton>
       </Flex>
-    </LegacyModal>
+    </Modal>
   )
 }
 

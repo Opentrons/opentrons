@@ -6,9 +6,9 @@ import {
   Flex,
   SPACING,
   LegacyStyledText,
+  RadioButton,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { RadioButton } from '../../atoms/buttons'
 import { useToaster } from '../ToasterOven'
 import { ChildNavigation } from '../ChildNavigation'
 import type { ChoiceParameter } from '@opentrons/shared-data'

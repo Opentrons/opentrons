@@ -15,7 +15,10 @@ export interface SpinnerModalProps {
   alertOverlay?: boolean
 }
 
+// TODO(ja, 8/2/24): this modal and SpinnerModalPage are only used in utils
+// that are no longer in use, investigate deleting them
 /**
+ * @deprecated use Modal instead
  * Spinner Modal with no background and optional message
  */
 export function SpinnerModal(props: SpinnerModalProps): JSX.Element {

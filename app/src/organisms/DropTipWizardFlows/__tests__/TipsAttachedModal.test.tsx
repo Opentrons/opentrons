@@ -33,24 +33,24 @@ const ninetySixSpecs = {
   channels: 96,
 } as PipetteModelSpecs
 
-const MOCK_PIPETTES_WITH_TIP: PipetteWithTip[] = [
-  { mount: LEFT, specs: MOCK_ACTUAL_PIPETTE },
-]
-const MOCK_96_WITH_TIP: PipetteWithTip[] = [
-  { mount: LEFT, specs: ninetySixSpecs },
-]
+const MOCK_A_PIPETTE_WITH_TIP: PipetteWithTip = {
+  mount: LEFT,
+  specs: MOCK_ACTUAL_PIPETTE,
+}
+
+const MOCK_96_WITH_TIP: PipetteWithTip = { mount: LEFT, specs: ninetySixSpecs }
 
 const mockSetTipStatusResolved = vi.fn()
 const MOCK_HOST: HostConfig = { hostname: 'MOCK_HOST' }
 
-const render = (pipettesWithTips: PipetteWithTip[]) => {
+const render = (aPipetteWithTip: PipetteWithTip) => {
   return renderWithProviders(
     <NiceModal.Provider>
       <button
         onClick={() =>
           handleTipsAttachedModal({
             host: MOCK_HOST,
-            pipettesWithTip: pipettesWithTips,
+            aPipetteWithTip,
             setTipStatusResolved: mockSetTipStatusResolved,
           })
         }
@@ -79,15 +79,17 @@ describe('TipsAttachedModal', () => {
   })
 
   it('renders appropriate warning given the pipette mount', () => {
-    render(MOCK_PIPETTES_WITH_TIP)
+    render(MOCK_A_PIPETTE_WITH_TIP)
     const btn = screen.getByTestId('testButton')
     fireEvent.click(btn)
 
-    screen.getByText('Tips are attached')
-    screen.queryByText(`${LEFT} Pipette`)
+    screen.getByText('Remove any attached tips')
+    screen.queryByText(
+      /Homing the .* pipette with liquid in the tips may damage it\. You must remove all tips before using the pipette again\./
+    )
   })
   it('clicking the skip button properly closes the modal', () => {
-    render(MOCK_PIPETTES_WITH_TIP)
+    render(MOCK_A_PIPETTE_WITH_TIP)
     const btn = screen.getByTestId('testButton')
     fireEvent.click(btn)
 
@@ -96,7 +98,7 @@ describe('TipsAttachedModal', () => {
     expect(mockSetTipStatusResolved).toHaveBeenCalled()
   })
   it('clicking the launch wizard button properly launches the wizard', () => {
-    render(MOCK_PIPETTES_WITH_TIP)
+    render(MOCK_A_PIPETTE_WITH_TIP)
     const btn = screen.getByTestId('testButton')
     fireEvent.click(btn)
 

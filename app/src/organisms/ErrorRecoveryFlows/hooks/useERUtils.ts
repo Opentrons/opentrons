@@ -26,15 +26,21 @@ import type { UseRecoveryCommandsResult } from './useRecoveryCommands'
 import type { RecoveryTipStatusUtils } from './useRecoveryTipStatus'
 import type { UseFailedLabwareUtilsResult } from './useFailedLabwareUtils'
 import type { UseDeckMapUtilsResult } from './useDeckMapUtils'
-import type { CurrentRecoveryOptionUtils } from './useRecoveryRouting'
+import type {
+  CurrentRecoveryOptionUtils,
+  SubMapUtils,
+} from './useRecoveryRouting'
 import type { RecoveryActionMutationResult } from './useRecoveryActionMutation'
 import type { StepCounts } from '../../../resources/protocols/hooks'
+import type { UseRecoveryAnalyticsResult } from './useRecoveryAnalytics'
+import type { UseRecoveryTakeoverResult } from './useRecoveryTakeover'
 
 type ERUtilsProps = ErrorRecoveryFlowsProps & {
-  toggleERWizard: (launchER: boolean) => Promise<void>
+  toggleERWizAsActiveUser: UseRecoveryTakeoverResult['toggleERWizAsActiveUser']
   hasLaunchedRecovery: boolean
   isOnDevice: boolean
   robotType: RobotType
+  analytics: UseRecoveryAnalyticsResult
 }
 
 export interface ERUtilsResults {
@@ -49,9 +55,9 @@ export interface ERUtilsResults {
   recoveryActionMutationUtils: RecoveryActionMutationResult
   failedPipetteInfo: PipetteData | null
   hasLaunchedRecovery: boolean
-  trackExternalMap: (map: Record<string, any>) => void
   stepCounts: StepCounts
   commandsAfterFailedCommand: ReturnType<typeof getNextSteps>
+  subMapUtils: SubMapUtils
 }
 
 const SUBSEQUENT_COMMAND_DEPTH = 2
@@ -59,11 +65,12 @@ const SUBSEQUENT_COMMAND_DEPTH = 2
 export function useERUtils({
   failedCommand,
   runId,
-  toggleERWizard,
+  toggleERWizAsActiveUser,
   hasLaunchedRecovery,
   protocolAnalysis,
   isOnDevice,
   robotType,
+  analytics,
 }: ERUtilsProps): ERUtilsResults {
   const { data: attachedInstruments } = useInstrumentsQuery()
   const { data: runRecord } = useNotifyRunQuery(runId)
@@ -82,8 +89,8 @@ export function useERUtils({
   const {
     recoveryMap,
     setRM,
-    trackExternalMap,
     currentRecoveryOptionUtils,
+    ...subMapUtils
   } = useRecoveryRouting()
 
   const recoveryToastUtils = useRecoveryToasts({
@@ -104,7 +111,7 @@ export function useERUtils({
   const routeUpdateActions = useRouteUpdateActions({
     hasLaunchedRecovery,
     recoveryMap,
-    toggleERWizard,
+    toggleERWizAsActiveUser,
     setRecoveryMap: setRM,
   })
 
@@ -128,6 +135,8 @@ export function useERUtils({
     failedLabwareUtils,
     routeUpdateActions,
     recoveryToastUtils,
+    analytics,
+    selectedRecoveryOption: currentRecoveryOptionUtils.selectedRecoveryOption,
   })
 
   const deckMapUtils = useDeckMapUtils({
@@ -149,7 +158,7 @@ export function useERUtils({
   )
   return {
     recoveryMap,
-    trackExternalMap,
+    subMapUtils,
     currentRecoveryOptionUtils,
     recoveryActionMutationUtils,
     routeUpdateActions,

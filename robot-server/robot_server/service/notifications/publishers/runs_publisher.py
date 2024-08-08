@@ -11,7 +11,7 @@ from server_utils.fastapi_utils.app_state import (
 )
 from ..notification_client import NotificationClient, get_notification_client
 from ..publisher_notifier import PublisherNotifier, get_pe_publisher_notifier
-from ..topics import Topics
+from .. import topics
 
 
 @dataclass
@@ -89,36 +89,40 @@ class RunsPublisher:
         (regardless of query parameters).
         """
         await self._client.publish_advise_refetch_async(
-            topic=Topics.RUNS_COMMANDS_LINKS
+            topic=topics.RUNS_COMMANDS_LINKS
         )
 
     async def _publish_runs_advise_refetch_async(self, run_id: str) -> None:
         """Publish a refetch flag for relevant runs topics."""
-        await self._client.publish_advise_refetch_async(topic=Topics.RUNS)
+        await self._client.publish_advise_refetch_async(topic=topics.RUNS)
 
         if self._run_hooks is not None:
             await self._client.publish_advise_refetch_async(
-                topic=f"{Topics.RUNS}/{run_id}"
+                topic=topics.TopicName(f"{topics.RUNS}/{run_id}")
             )
 
     async def _publish_runs_advise_unsubscribe_async(self, run_id: str) -> None:
         """Publish an unsubscribe flag for relevant runs topics."""
         if self._run_hooks is not None:
             await self._client.publish_advise_unsubscribe_async(
-                topic=f"{Topics.RUNS}/{run_id}"
+                topic=topics.TopicName(f"{topics.RUNS}/{run_id}")
             )
             await self._client.publish_advise_unsubscribe_async(
-                topic=Topics.RUNS_COMMANDS_LINKS
+                topic=topics.RUNS_COMMANDS_LINKS
             )
             await self._client.publish_advise_unsubscribe_async(
-                topic=f"{Topics.RUNS_PRE_SERIALIZED_COMMANDS}/{run_id}"
+                topic=topics.TopicName(
+                    f"{topics.RUNS_PRE_SERIALIZED_COMMANDS}/{run_id}"
+                )
             )
 
     async def publish_pre_serialized_commands_notification(self, run_id: str) -> None:
         """Publishes notification for GET /runs/:runId/commandsAsPreSerializedList."""
         if self._run_hooks is not None:
             await self._client.publish_advise_refetch_async(
-                topic=f"{Topics.RUNS_PRE_SERIALIZED_COMMANDS}/{run_id}"
+                topic=topics.TopicName(
+                    f"{topics.RUNS_PRE_SERIALIZED_COMMANDS}/{run_id}"
+                )
             )
 
     async def _handle_current_command_change(self) -> None:
