@@ -43,6 +43,9 @@ export function SetupLabwareMap({
     labwareStackDetailsLabwareId,
     setLabwareStackDetailsLabwareId,
   ] = React.useState<string | null>(null)
+  const [hoverLabwareId, setHoverLabwareId] = React.useState<string | null>(
+    null
+  )
 
   if (protocolAnalysis == null) return null
 
@@ -81,13 +84,26 @@ export function SetupLabwareMap({
           : {},
 
       nestedLabwareDef: topLabwareDefinition,
+      highlightLabware:
+        topLabwareDefinition != null &&
+        topLabwareId != null &&
+        hoverLabwareId === topLabwareId,
+      stacked: topLabwareDefinition != null && topLabwareId != null,
       moduleChildren: (
         // open modal
         <g
           onClick={() => {
-            if (topLabwareDefinition != null) {
+            if (topLabwareDefinition != null && topLabwareId != null) {
               setLabwareStackDetailsLabwareId(topLabwareId)
             }
+          }}
+          onMouseEnter={() => {
+            if (topLabwareDefinition != null && topLabwareId != null) {
+              setHoverLabwareId(topLabwareId)
+            }
+          }}
+          onMouseLeave={() => {
+            setHoverLabwareId(null)
           }}
           cursor="pointer"
         >
@@ -164,6 +180,7 @@ export function SetupLabwareMap({
           closeModal={() => {
             setLabwareStackDetailsLabwareId(null)
           }}
+          robotType={robotType}
         />
       )}
     </Flex>

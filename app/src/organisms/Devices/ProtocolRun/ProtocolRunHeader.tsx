@@ -23,6 +23,7 @@ import {
   useDoorQuery,
   useHost,
   useInstrumentsQuery,
+  useRunCommandErrors,
 } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import {
@@ -112,7 +113,12 @@ import {
   ProtocolDropTipModal,
 } from './ProtocolDropTipModal'
 
-import type { Run, RunError, RunStatus } from '@opentrons/api-client'
+import type {
+  Run,
+  RunCommandErrors,
+  RunError,
+  RunStatus,
+} from '@opentrons/api-client'
 import type { IconName } from '@opentrons/components'
 import type { State } from '../../../redux/types'
 import type { HeaterShakerModule } from '../../../redux/modules/types'
@@ -166,6 +172,13 @@ export function ProtocolRunHeader({
   const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
   const [showRunFailedModal, setShowRunFailedModal] = React.useState(false)
+  const { data: commandErrorList } = useRunCommandErrors(runId, null, {
+    enabled:
+      runStatus != null &&
+      // @ts-expect-error runStatus expected to possibly not be terminal
+      RUN_STATUSES_TERMINAL.includes(runStatus) &&
+      isRunCurrent,
+  })
   const [showDropTipBanner, setShowDropTipBanner] = React.useState(true)
   const isResetRunLoadingRef = React.useRef(false)
   const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
@@ -258,7 +271,6 @@ export function ProtocolRunHeader({
 
   // Side effects dependent on the current run state.
   React.useEffect(() => {
-    // After a user-initiated stopped run, close the run current run automatically.
     if (runStatus === RUN_STATUS_STOPPED && isRunCurrent && runId != null) {
       trackProtocolRunEvent({
         name: ANALYTICS_PROTOCOL_RUN_ACTION.FINISH,
@@ -266,9 +278,8 @@ export function ProtocolRunHeader({
           ...robotAnalyticsData,
         },
       })
-      closeCurrentRun()
     }
-  }, [runStatus, isRunCurrent, runId, closeCurrentRun])
+  }, [runStatus, isRunCurrent, runId])
 
   const startedAtTimestamp =
     startedAt != null ? formatTimestamp(startedAt) : EMPTY_TIMESTAMP
@@ -333,6 +344,7 @@ export function ProtocolRunHeader({
           runId={runId}
           setShowRunFailedModal={setShowRunFailedModal}
           highestPriorityError={highestPriorityError}
+          commandErrorList={commandErrorList}
         />
       ) : null}
       <Flex
@@ -404,6 +416,7 @@ export function ProtocolRunHeader({
               handleClearClick,
               isClosingCurrentRun,
               setShowRunFailedModal,
+              commandErrorList,
               highestPriorityError,
             }}
             isResetRunLoading={isResetRunLoadingRef.current}
@@ -869,6 +882,7 @@ interface TerminalRunProps {
   handleClearClick: () => void
   isClosingCurrentRun: boolean
   setShowRunFailedModal: (showRunFailedModal: boolean) => void
+  commandErrorList?: RunCommandErrors
   isResetRunLoading: boolean
   isRunCurrent: boolean
   highestPriorityError?: RunError | null
@@ -879,6 +893,7 @@ function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
     handleClearClick,
     isClosingCurrentRun,
     setShowRunFailedModal,
+    commandErrorList,
     highestPriorityError,
     isResetRunLoading,
     isRunCurrent,
@@ -914,10 +929,12 @@ function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
       <Banner type="error" iconMarginLeft={SPACING.spacing4}>
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
           <LegacyStyledText>
-            {t('error_info', {
-              errorType: highestPriorityError?.errorType,
-              errorCode: highestPriorityError?.errorCode,
-            })}
+            {highestPriorityError != null
+              ? t('error_info', {
+                  errorType: highestPriorityError?.errorType,
+                  errorCode: highestPriorityError?.errorCode,
+                })
+              : 'Run completed with errors.'}
           </LegacyStyledText>
 
           <LinkButton
@@ -937,7 +954,12 @@ function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
     !isResetRunLoading
   ) {
     return buildSuccessBanner()
-  } else if (runStatus === RUN_STATUS_FAILED && !isResetRunLoading) {
+  } else if (
+    highestPriorityError != null ||
+    (commandErrorList?.data != null &&
+      commandErrorList.data.length > 0 &&
+      !isResetRunLoading)
+  ) {
     return buildErrorBanner()
   } else {
     return null

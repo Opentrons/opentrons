@@ -1,7 +1,7 @@
 import logging
 from typing import Optional
 
-from opentrons.protocol_api import ProtocolContext, ParameterContext
+from opentrons.protocol_api import ProtocolContext
 from opentrons.protocol_api._parameters import Parameters
 from opentrons.protocols.execution.execute_python import exec_run
 from opentrons.protocols.execution.json_dispatchers import (
@@ -15,20 +15,21 @@ from opentrons.protocols.execution import execute_json_v4, execute_json_v3
 from opentrons.protocols.types import PythonProtocol, Protocol
 from opentrons.protocols.api_support.types import APIVersion
 
+from opentrons.protocols.parameters.csv_parameter_interface import CSVParameter
+from opentrons.protocols.parameters.exceptions import RuntimeParameterRequired
+
 MODULE_LOG = logging.getLogger(__name__)
 
 
 def run_protocol(
     protocol: Protocol,
     context: ProtocolContext,
-    parameter_context: Optional[ParameterContext] = None,
     run_time_parameters_with_overrides: Optional[Parameters] = None,
 ) -> None:
     """Run a protocol.
 
     :param protocol: The :py:class:`.protocols.types.Protocol` to execute
     :param context: The protocol context to use.
-    :param parameter_context: The parameter context to use if running with runtime parameters.
     :param run_time_parameters_with_overrides: Run time parameters defined in the protocol,
         updated with the run's RTP override values. When we are running either simulate
         or execute, this will be None (until RTP is supported in cli commands)
@@ -48,9 +49,15 @@ def run_protocol(
         except Exception:
             raise
         finally:
-            # TODO(jbl 2024-08-02) this should be more tightly bound to the opening of the csv files
-            if parameter_context is not None:
-                parameter_context.close_csv_files()
+            if protocol.api_level >= APIVersion(2, 18):
+                for parameter in context.params.get_all().values():
+                    if isinstance(parameter, CSVParameter):
+                        try:
+                            parameter.file.close()
+                        # This will be raised if the csv file wasn't set, which means it was never opened,
+                        # so we can safely skip this.
+                        except RuntimeParameterRequired:
+                            pass
     else:
         if protocol.contents["schemaVersion"] == 3:
             ins = execute_json_v3.load_pipettes_from_json(context, protocol.contents)

@@ -217,7 +217,7 @@ class RunStore:
         with self._sql_engine.begin() as transaction:
             csv_rtps = transaction.execute(select_all_csv_rtp).all()
 
-        return [_covert_row_to_csv_rtp(row) for row in csv_rtps]
+        return [_convert_row_to_csv_rtp(row) for row in csv_rtps]
 
     def insert_csv_rtp(
         self, run_id: str, run_time_parameters: List[RunTimeParameter]
@@ -543,9 +543,13 @@ class RunStore:
         delete_commands = sqlalchemy.delete(run_command_table).where(
             run_command_table.c.run_id == run_id
         )
+        delete_csv_rtps = sqlalchemy.delete(run_csv_rtp_table).where(
+            run_csv_rtp_table.c.run_id == run_id
+        )
         with self._sql_engine.begin() as transaction:
             transaction.execute(delete_actions)
             transaction.execute(delete_commands)
+            transaction.execute(delete_csv_rtps)
             result = transaction.execute(delete_run)
 
         if result.rowcount < 1:
@@ -574,7 +578,7 @@ class RunStore:
 _run_columns = [run_table.c.id, run_table.c.protocol_id, run_table.c.created_at]
 
 
-def _covert_row_to_csv_rtp(
+def _convert_row_to_csv_rtp(
     row: sqlalchemy.engine.Row,
 ) -> CSVParameterRunResource:
     run_id = row.run_id

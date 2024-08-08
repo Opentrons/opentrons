@@ -12,7 +12,7 @@ from opentrons.protocols.api_support.definitions import (
 from opentrons.protocols.parameters.exceptions import (
     RuntimeParameterRequired as RuntimeParameterRequiredError,
 )
-from opentrons.protocols.parameters.types import CSVParameter
+from opentrons.protocols.parameters.csv_parameter_interface import CSVParameter
 
 from .protocol_context import ProtocolContext
 from .deck import Deck

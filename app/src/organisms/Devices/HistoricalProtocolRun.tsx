@@ -13,7 +13,6 @@ import {
   SPACING,
   LegacyStyledText,
 } from '@opentrons/components'
-import { useAllCsvFilesQuery } from '@opentrons/react-api-client'
 import { formatInterval } from '../RunTimeControl/utils'
 import { formatTimestamp } from './utils'
 import { EMPTY_TIMESTAMP } from './constants'
@@ -41,9 +40,9 @@ export function HistoricalProtocolRun(
   const { t } = useTranslation('run_details')
   const { run, protocolName, robotIsBusy, robotName, protocolKey } = props
   const [drawerOpen, setDrawerOpen] = React.useState(false)
-  const { data: protocolFileData } = useAllCsvFilesQuery(run.protocolId ?? '')
-  const allProtocolDataFiles =
-    protocolFileData != null ? protocolFileData.data : []
+  const countRunDataFiles = run.runTimeParameters.filter(
+    parameter => parameter.type === 'csv_file'
+  ).length
   const runStatus = run.status
   const runDisplayName = formatTimestamp(run.createdAt)
   let duration = EMPTY_TIMESTAMP
@@ -92,7 +91,7 @@ export function HistoricalProtocolRun(
             width="5%"
             data-testid={`RecentProtocolRuns_Files_${protocolKey}`}
           >
-            {allProtocolDataFiles.length}
+            {countRunDataFiles}
           </LegacyStyledText>
           <LegacyStyledText
             as="p"
