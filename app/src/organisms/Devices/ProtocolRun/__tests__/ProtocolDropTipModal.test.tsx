@@ -16,7 +16,7 @@ describe('useProtocolDropTipModal', () => {
     props = {
       areTipsAttached: true,
       toggleDTWiz: vi.fn(),
-      isMostRecentRunCurrent: true,
+      isRunCurrent: true,
     }
   })
 
@@ -44,7 +44,7 @@ describe('useProtocolDropTipModal', () => {
   })
 
   it('should not show modal when isMostRecentRunCurrent is false', () => {
-    props.isMostRecentRunCurrent = false
+    props.isRunCurrent = false
     const { result } = renderHook(() => useProtocolDropTipModal(props))
 
     expect(result.current.showDTModal).toBe(false)

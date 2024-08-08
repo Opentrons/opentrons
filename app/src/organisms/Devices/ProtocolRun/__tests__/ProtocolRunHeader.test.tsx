@@ -1037,31 +1037,6 @@ describe('ProtocolRunHeader', () => {
     ).not.toBeInTheDocument()
   })
 
-  it('renders the drop tip banner when the run is over and a pipette has a tip attached and is a flex', async () => {
-    when(vi.mocked(useNotifyRunQuery))
-      .calledWith(RUN_ID)
-      .thenReturn({
-        data: {
-          data: {
-            ...mockIdleUnstartedRun,
-            current: true,
-            status: RUN_STATUS_SUCCEEDED,
-          },
-        },
-      } as UseQueryResult<OpentronsApiClient.Run>)
-    when(vi.mocked(useRunStatus))
-      .calledWith(RUN_ID)
-      .thenReturn(RUN_STATUS_SUCCEEDED)
-
-    render()
-    await waitFor(() => {
-      screen.getByText('Remove any attached tips')
-      screen.getByText(
-        'Homing the pipette with liquid in the tips may damage it. You must remove all tips before using the pipette again.'
-      )
-    })
-  })
-
   it('renders the drop tip modal initially when the run ends if tips are attached', () => {
     vi.mocked(useProtocolDropTipModal).mockReturnValue({
       onDTModalRemoval: vi.fn(),
@@ -1074,7 +1049,7 @@ describe('ProtocolRunHeader', () => {
     screen.getByText('MOCK_DROP_TIP_MODAL')
   })
 
-  it('does not render the drop tip banner when the run is not over', async () => {
+  it('does not render the drop tip modal when the run is not over', async () => {
     when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID)
       .thenReturn({
