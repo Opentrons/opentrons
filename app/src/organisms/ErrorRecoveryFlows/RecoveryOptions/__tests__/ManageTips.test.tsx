@@ -210,7 +210,11 @@ describe('useDropTipFlowUtils', () => {
     const { result } = renderHook(() =>
       useDropTipFlowUtils({
         ...mockProps,
-        failedCommand: { id: 'MOCK_COMMAND_ID' },
+        failedCommand: {
+          byRunRecord: {
+            id: 'MOCK_COMMAND_ID',
+          },
+        },
       } as any)
     )
 

@@ -334,7 +334,7 @@ export function ProtocolRunHeader({
         <ErrorRecoveryFlows
           runStatus={runStatus}
           runId={runId}
-          failedCommand={failedCommand}
+          failedCommandByRunRecord={failedCommand}
           protocolAnalysis={robotProtocolAnalysis}
         />
       ) : null}
