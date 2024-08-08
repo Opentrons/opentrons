@@ -131,7 +131,7 @@ export function BeginRemoval({
         primaryBtnOnClick={primaryOnClick}
         primaryBtnTextOverride={t('begin_removal')}
         secondaryBtnOnClick={secondaryOnClick}
-        secondaryBtnTextOverride={t('skip')}
+        secondaryBtnTextOverride={t('skip_and_home_pipette')}
         secondaryAsTertiary={true}
       />
     </RecoverySingleColumnContentWrapper>
