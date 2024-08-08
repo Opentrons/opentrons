@@ -238,7 +238,8 @@ def run(
     def _get_target_height() -> None:
         nonlocal liquid_height, liquid_height_from_deck, tip_offset
         run_args.pipette.pick_up_tip(tips[0])
-        del tips[: run_args.pipette_channels]
+        if run_args.pipette_channels < 96:
+            del tips[: run_args.pipette_channels]
         tip_offset = _get_tip_offset()
         liquid_height = _jog_to_find_liquid_height(
             run_args.ctx, run_args.pipette, test_well
