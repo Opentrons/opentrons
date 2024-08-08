@@ -16,15 +16,21 @@ import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { SmallButton } from '../../atoms/buttons'
 import { Modal } from '../../molecules/Modal'
 import { DropTipWizardFlows, useDropTipWizardFlows } from '.'
+import { useHomePipettes } from './hooks'
 
 import type { HostConfig } from '@opentrons/api-client'
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 import type { PipetteWithTip } from '.'
+import type { UseHomePipettesProps } from './hooks'
 
-interface TipsAttachedModalProps {
+type TipsAttachedModalProps = Pick<
+  UseHomePipettesProps,
+  'robotType' | 'instrumentModelSpecs' | 'mount'
+> & {
   aPipetteWithTip: PipetteWithTip
   host: HostConfig | null
   setTipStatusResolved: (onEmpty?: () => void) => Promise<void>
+  onClose: () => void
 }
 
 export const handleTipsAttachedModal = (
@@ -37,12 +43,23 @@ export const handleTipsAttachedModal = (
 
 const TipsAttachedModal = NiceModal.create(
   (props: TipsAttachedModalProps): JSX.Element => {
-    const { aPipetteWithTip, host, setTipStatusResolved } = props
+    const {
+      aPipetteWithTip,
+      host,
+      setTipStatusResolved,
+      ...homePipetteProps
+    } = props
     const { t } = useTranslation(['drop_tip_wizard'])
     const modal = useModal()
 
     const { mount, specs } = aPipetteWithTip
     const { showDTWiz, toggleDTWiz } = useDropTipWizardFlows()
+    const { homePipettes, isHomingPipettes } = useHomePipettes({
+      ...homePipetteProps,
+      onComplete: () => {
+        cleanUpAndClose()
+      },
+    })
 
     const tipsAttachedHeader: ModalHeaderBaseProps = {
       title: t('remove_any_attached_tips'),
@@ -50,9 +67,13 @@ const TipsAttachedModal = NiceModal.create(
       iconColor: COLORS.red50,
     }
 
+    const onHomePipettes = (): void => {
+      homePipettes()
+    }
+
     const cleanUpAndClose = (): void => {
       modal.remove()
-      setTipStatusResolved()
+      props.onClose()
     }
 
     const is96Channel = specs.channels === 96
@@ -80,13 +101,15 @@ const TipsAttachedModal = NiceModal.create(
               <SmallButton
                 flex="1"
                 buttonType="secondary"
-                buttonText={t('skip')}
-                onClick={cleanUpAndClose}
+                buttonText={t('skip_and_home_pipette')}
+                onClick={onHomePipettes}
+                disabled={isHomingPipettes}
               />
               <SmallButton
                 flex="1"
                 buttonText={t('begin_removal')}
                 onClick={toggleDTWiz}
+                disabled={isHomingPipettes}
               />
             </Flex>
           </Flex>
@@ -97,7 +120,6 @@ const TipsAttachedModal = NiceModal.create(
             mount={mount}
             robotType={FLEX_ROBOT_TYPE}
             closeFlow={() => {
-              toggleDTWiz()
               cleanUpAndClose()
             }}
           />
