@@ -59,7 +59,7 @@ export function SetupLiquids({
           }}
           disabled={isLiquidSetupConfirmed}
         >
-          {t('confirm_placements')}
+          {t('confirm_locations_and_volumes')}
         </PrimaryButton>
       </Flex>
     </Flex>
