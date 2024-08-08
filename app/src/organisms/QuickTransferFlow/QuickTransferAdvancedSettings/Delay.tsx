@@ -8,9 +8,9 @@ import {
   POSITION_FIXED,
   COLORS,
   ALIGN_CENTER,
+  LargeButton,
 } from '@opentrons/components'
 import { getTopPortalEl } from '../../../App/portal'
-import { LargeButton } from '../../../atoms/buttons'
 import { ChildNavigation } from '../../ChildNavigation'
 import { InputField } from '../../../atoms/InputField'
 import { ACTIONS } from '../constants'

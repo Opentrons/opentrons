@@ -21,11 +21,11 @@ import {
   JUSTIFY_END,
   PrimaryButton,
   SecondaryButton,
+  LargeButton,
 } from '@opentrons/components'
 
 import { useErrorName } from './hooks'
 import { getErrorKind } from './utils'
-import { LargeButton } from '../../atoms/buttons'
 import { RECOVERY_MAP } from './constants'
 import {
   RecoveryInterventionModal,

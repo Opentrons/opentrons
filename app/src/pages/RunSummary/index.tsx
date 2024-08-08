@@ -26,6 +26,7 @@ import {
   POSITION_RELATIVE,
   SPACING,
   TYPOGRAPHY,
+  LargeButton,
   WRAP,
 } from '@opentrons/components'
 import {
@@ -40,7 +41,6 @@ import {
   useDeleteRunMutation,
 } from '@opentrons/react-api-client'
 
-import { LargeButton } from '../../atoms/buttons'
 import {
   useRunTimestamps,
   useRunControls,

@@ -1,11 +1,15 @@
 import * as React from 'react'
-import { Box, COLORS, SPACING, ICON_DATA_BY_NAME } from '@opentrons/components'
-import { LargeButton } from './'
+
+import { ICON_DATA_BY_NAME } from '../../icons'
+import { SPACING } from '../../ui-style-constants'
+import { Box } from '../../primitives'
+import { COLORS } from '../../helix-design-system'
+import { LargeButton } from './LargeButton'
 
 import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<typeof LargeButton> = {
-  title: 'ODD/Atoms/Buttons/LargeButton',
+  title: 'Library/Atoms/Buttons/LargeButton',
   component: LargeButton,
   argTypes: {
     onClick: { action: 'clicked' },
