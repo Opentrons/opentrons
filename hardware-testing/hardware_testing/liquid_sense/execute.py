@@ -281,8 +281,12 @@ def run(
                     run_args.pipette._retract()
 
             ui.print_info(f"Picking up {tip}ul tip")
+            if run_args.pipette_channels == 96:
+                run_args.pipette._retract()
+                input("install new tips, press ENTER when ready: ")
             run_args.pipette.pick_up_tip(tips[0])
-            del tips[: run_args.pipette_channels]
+            if run_args.pipette_channels < 96:
+                del tips[: run_args.pipette_channels]
             tip_length_offset = 0.0
             if run_args.dial_indicator is not None:
                 run_args.pipette._retract()
