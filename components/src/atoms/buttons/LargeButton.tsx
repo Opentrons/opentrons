@@ -24,7 +24,7 @@ type LargeButtonTypes =
   | 'alertStroke'
   | 'alertAlt'
 interface LargeButtonProps extends StyleProps {
-  onClick: () => void
+  onClick?: () => void
   buttonType?: LargeButtonTypes
   buttonText: React.ReactNode
   iconName?: IconName
@@ -203,7 +203,7 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
       <LegacyStyledText
         css={css`
           font-size: ${fontSizeBodyLargeSemiBold};
-          padding-right: ${SPACING.spacing8};
+          padding-right: ${iconName != null ? SPACING.spacing8 : '0'};
           @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
             ${TYPOGRAPHY.level3HeaderSemiBold}
           }
