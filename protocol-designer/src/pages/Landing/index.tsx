@@ -45,11 +45,7 @@ export function Landing(): JSX.Element {
         width="548px"
         aria-label="welcome image"
       />
-      <StyledText
-        desktopStyle="headingLargeBold"
-        marginTop={SPACING.spacing16}
-        marginBottom={SPACING.spacing16}
-      >
+      <StyledText desktopStyle="headingLargeBold" marginY={SPACING.spacing16}>
         {t('welcome')}
       </StyledText>
       <StyledText
@@ -61,7 +57,7 @@ export function Landing(): JSX.Element {
         {t('no-code-solution')}
       </StyledText>
       <LargeButton
-        margin={SPACING.spacing32}
+        marginY={SPACING.spacing32}
         buttonText={
           <StyledNavLink to={'/createNew'}>
             <StyledText desktopStyle="bodyLargeRegular">

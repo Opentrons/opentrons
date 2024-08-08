@@ -34,5 +34,6 @@ describe('Landing', () => {
     )
     screen.getByRole('button', { name: 'Create a protocol' })
     screen.getByText('Import existing protocol')
+    screen.getByRole('img', { name: 'welcome image' })
   })
 })
