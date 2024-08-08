@@ -8,8 +8,7 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  PRODUCT,
-  PrimaryButton,
+  LargeButton,
   SPACING,
   StyledText,
   TYPOGRAPHY,
@@ -61,14 +60,17 @@ export function Landing(): JSX.Element {
       >
         {t('no-code-solution')}
       </StyledText>
-      {/* TODO(ja, 8/7/24): replace this with LargeButton https://opentrons.atlassian.net/browse/AUTH-622 */}
-      <PrimaryButton margin={SPACING.spacing32}>
-        <StyledNavLink to={'/createNew'}>
-          <StyledText desktopStyle="bodyLargeRegular">
-            {t('create_new')}
-          </StyledText>
-        </StyledNavLink>
-      </PrimaryButton>
+      <LargeButton
+        margin={SPACING.spacing32}
+        buttonText={
+          <StyledNavLink to={'/createNew'}>
+            <StyledText desktopStyle="bodyLargeRegular">
+              {t('create_a_protocol')}
+            </StyledText>
+          </StyledNavLink>
+        }
+      />
+
       <StyledLabel>
         <StyledText desktopStyle="bodyLargeRegular" color={COLORS.grey60}>
           {t('import_existing')}

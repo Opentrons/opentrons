@@ -32,7 +32,7 @@ describe('Landing', () => {
     screen.getByText(
       'A no-code solution to create protocols that x, y and z meaning for your lab and workflow.'
     )
-    screen.getByRole('button', { name: 'Create new' })
+    screen.getByRole('button', { name: 'Create a protocol' })
     screen.getByText('Import existing protocol')
   })
 })
