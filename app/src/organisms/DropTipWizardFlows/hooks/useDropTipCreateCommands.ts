@@ -4,13 +4,12 @@ import {
   useChainMaintenanceCommands,
   useChainRunCommands,
   useCreateRunCommandMutation,
-} from '../../../../resources/runs'
+} from '../../../resources/runs'
 
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { CommandData } from '@opentrons/api-client'
-import type { SetRobotErrorDetailsParams } from '../errors'
-import type { UseDTWithTypeParams } from '.'
-import type { FixitCommandTypeUtils } from '../../types'
+import type { UseDTWithTypeParams, SetRobotErrorDetailsParams } from '.'
+import type { FixitCommandTypeUtils } from '../types'
 
 export interface RunCommandByCommandTypeParams {
   command: CreateCommand

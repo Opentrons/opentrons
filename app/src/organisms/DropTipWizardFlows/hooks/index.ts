@@ -1,4 +1,6 @@
 export * from './errors'
+export * from './useDropTipWithType'
+export * from './useHomePipettes'
 export { useDropTipRouting } from './useDropTipRouting'
 export { useDropTipWithType } from './useDropTipWithType'
 
