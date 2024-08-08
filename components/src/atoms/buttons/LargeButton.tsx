@@ -137,8 +137,7 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     cursor: default;
     padding: ${SPACING.spacing16} ${SPACING.spacing24};
     text-align: ${TYPOGRAPHY.textAlignCenter};
-    border-radius: ${BORDERS.borderRadius40};
-    flex-direction: ${DIRECTION_ROW};
+    border-radius: ${BORDERS.borderRadiusFull};
     align-items: ${ALIGN_CENTER};
 
     &:active {
