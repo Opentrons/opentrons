@@ -1,20 +1,11 @@
 import pytest
-import inspect
+import platform
 from decoy import Decoy
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
-from opentrons.protocols.parameters import (
-    parameter_file_reader as mock_param_file_reader,
-)
 from opentrons.protocols.parameters.csv_parameter_interface import CSVParameter
-
-
-@pytest.fixture(autouse=True)
-def _patch_parameter_file_reader(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
-    for name, func in inspect.getmembers(mock_param_file_reader, inspect.isfunction):
-        monkeypatch.setattr(mock_param_file_reader, name, decoy.mock(func=func))
 
 
 @pytest.fixture
@@ -59,7 +50,17 @@ def test_csv_parameter(
     """It should load the CSV parameter and provide access to the file, contents, and rows."""
     subject = CSVParameter(csv_file_basic, api_version)
 
-    assert subject.file.read() == '"x","y","z"\n"a",1,2\n"b",3,4\n"c",5,6'
+    # On Windows, you can't open a NamedTemporaryFile a second time, which breaks the code under test.
+    # Because of the way CSV analysis works this code will only ever be run on the actual OT-2/Flex hardware,
+    # so we skip testing and instead assert that we get a PermissionError on Windows (to ensure this
+    # test gets fixed in case we ever refactor the file opening.)
+    if platform.system() != "Windows":
+        assert subject.file.readable()
+        assert not subject.file.writable()
+        assert subject.file.read() == '"x","y","z"\n"a",1,2\n"b",3,4\n"c",5,6'
+    else:
+        with pytest.raises(PermissionError):
+            subject.file
     assert subject.contents == '"x","y","z"\n"a",1,2\n"b",3,4\n"c",5,6'
     assert subject.parse_as_csv()[0] == ["x", "y", "z"]
 
