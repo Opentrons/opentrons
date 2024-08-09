@@ -1,3 +1,5 @@
+import type { UpdateFileInfo } from 'electron-updater'
+import type { ReleaseNoteInfo } from 'builder-util-runtime'
 // TODO(mc, 2018-08-08): figure out type exports from app
 import type {
   Action,
