@@ -12,11 +12,11 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
+  Modal,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '../../../App/portal'
 import { Banner } from '../../../atoms/Banner'
-import { LegacyModal } from '../../../molecules/LegacyModal'
 
 import type { AnalysisError } from '@opentrons/shared-data'
 
@@ -67,7 +67,7 @@ export function ProtocolAnalysisErrorBanner(
       </Flex>
       {showErrorDetails
         ? createPortal(
-            <LegacyModal
+            <Modal
               type="error"
               title={t('protocol_analysis_failure')}
               onClose={handleToggleDetails}
@@ -88,7 +88,7 @@ export function ProtocolAnalysisErrorBanner(
                   {t('shared:close')}
                 </PrimaryButton>
               </Flex>
-            </LegacyModal>,
+            </Modal>,
             getTopPortalEl()
           )
         : null}

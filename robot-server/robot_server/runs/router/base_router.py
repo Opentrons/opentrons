@@ -4,14 +4,25 @@ Contains routes dealing primarily with `Run` models.
 """
 import logging
 from datetime import datetime
+from pathlib import Path
 from textwrap import dedent
-from typing import Annotated, Literal, Optional, Union, Callable
+from typing import Annotated, Callable, Final, Literal, Optional, Union
 
 from fastapi import APIRouter, Depends, status, Query
 from pydantic import BaseModel, Field
 
 from opentrons_shared_data.errors import ErrorCodes
+from opentrons.protocol_engine.types import CSVRuntimeParamPaths
+from opentrons.protocol_engine import (
+    errors as pe_errors,
+)
 
+from robot_server.data_files.models import FileIdNotFound, FileIdNotFoundError
+from robot_server.data_files.dependencies import (
+    get_data_files_directory,
+    get_data_files_store,
+)
+from robot_server.data_files.data_files_store import DataFilesStore
 from robot_server.errors.error_responses import ErrorDetails, ErrorBody
 from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.service.dependencies import get_current_time, get_unique_id
@@ -21,6 +32,7 @@ from robot_server.service.json_api import (
     RequestModel,
     SimpleBody,
     SimpleEmptyBody,
+    SimpleMultiBody,
     MultiBody,
     MultiBodyMeta,
     ResourceLink,
@@ -54,6 +66,8 @@ from robot_server.service.notifications import get_pe_notify_publishers
 
 log = logging.getLogger(__name__)
 base_router = APIRouter()
+
+_DEFAULT_COMMAND_ERROR_LIST_LENGTH: Final = 20
 
 
 class RunNotFound(ErrorDetails):
@@ -134,6 +148,7 @@ async def get_run_data_from_url(
     status_code=status.HTTP_201_CREATED,
     responses={
         status.HTTP_201_CREATED: {"model": SimpleBody[Run]},
+        status.HTTP_400_BAD_REQUEST: {"model": ErrorBody[FileIdNotFound]},
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[ProtocolNotFound]},
         status.HTTP_409_CONFLICT: {"model": ErrorBody[RunAlreadyActive]},
     },
@@ -144,6 +159,8 @@ async def create_run(
     run_id: Annotated[str, Depends(get_unique_id)],
     created_at: Annotated[datetime, Depends(get_current_time)],
     run_auto_deleter: Annotated[RunAutoDeleter, Depends(get_run_auto_deleter)],
+    data_files_directory: Annotated[Path, Depends(get_data_files_directory)],
+    data_files_store: Annotated[DataFilesStore, Depends(get_data_files_store)],
     quick_transfer_run_auto_deleter: Annotated[
         RunAutoDeleter, Depends(get_quick_transfer_run_auto_deleter)
     ],
@@ -165,6 +182,8 @@ async def create_run(
         run_auto_deleter: An interface to delete old resources to make room for
             the new run.
         quick_transfer_run_auto_deleter: An interface to delete old quick-transfer
+        data_files_directory: Persistence directory for data files.
+        data_files_store: Database of data file resources.
         resources to make room for the new run.
         check_estop: Dependency to verify the estop is in a valid state.
         deck_configuration_store: Dependency to fetch the deck configuration.
@@ -175,6 +194,22 @@ async def create_run(
     rtp_values = (
         request_body.data.runTimeParameterValues if request_body is not None else None
     )
+    rtp_files = (
+        request_body.data.runTimeParameterFiles if request_body is not None else None
+    )
+
+    rtp_paths: Optional[CSVRuntimeParamPaths] = None
+    try:
+        if rtp_files:
+            rtp_paths = {
+                name: data_files_directory
+                / file_id
+                / data_files_store.get(file_id).name
+                for name, file_id in rtp_files.items()
+            }
+    except FileIdNotFoundError as e:
+        raise FileIdNotFound(detail=str(e)).as_error(status.HTTP_400_BAD_REQUEST)
+
     protocol_resource = None
 
     deck_configuration = await deck_configuration_store.get_deck_configuration()
@@ -205,6 +240,7 @@ async def create_run(
             labware_offsets=offsets,
             deck_configuration=deck_configuration,
             run_time_param_values=rtp_values,
+            run_time_param_paths=rtp_paths,
             protocol=protocol_resource,
             notify_publishers=notify_publishers,
         )
@@ -403,5 +439,81 @@ async def put_error_recovery_policy(
 
     return await PydanticResponse.create(
         content=SimpleEmptyBody.construct(),
+        status_code=status.HTTP_200_OK,
+    )
+
+
+@PydanticResponse.wrap_route(
+    base_router.get,
+    path="/runs/{runId}/commandErrors",
+    summary="Get a list of all command errors in the run",
+    description=(
+        "Get a list of all command errors in the run. "
+        "\n\n"
+        "The errors are returned in order from oldest to newest."
+        "\n\n"
+        "This endpoint returns the command error. Use "
+        "`GET /runs/{runId}/commands/{commandId}` to get all "
+        "information available for a given command."
+    ),
+    responses={
+        status.HTTP_200_OK: {"model": SimpleMultiBody[pe_errors.ErrorOccurrence]},
+        status.HTTP_409_CONFLICT: {"model": ErrorBody[RunStopped]},
+    },
+)
+async def get_run_commands_error(
+    runId: str,
+    cursor: Optional[int] = Query(
+        None,
+        description=(
+            "The starting index of the desired first command error in the list."
+            " If unspecified, a cursor will be selected automatically"
+            " based on the last error added."
+        ),
+    ),
+    pageLength: int = Query(
+        _DEFAULT_COMMAND_ERROR_LIST_LENGTH,
+        description="The maximum number of command errors in the list to return.",
+    ),
+    run_data_manager: RunDataManager = Depends(get_run_data_manager),
+) -> PydanticResponse[SimpleMultiBody[pe_errors.ErrorOccurrence]]:
+    """Get a summary of a set of command errors in a run.
+
+    Arguments:
+        runId: Requested run ID, from the URL
+        cursor: Cursor index for the collection response.
+        pageLength: Maximum number of items to return.
+        run_data_manager: Run data retrieval interface.
+    """
+    try:
+        all_errors = run_data_manager.get_command_errors(run_id=runId)
+        total_length = len(all_errors)
+
+        if cursor is None:
+            if len(all_errors) > 0:
+                # Get the most recent error,
+                # which we can find just at the end of the list.
+                cursor = total_length - 1
+            else:
+                cursor = 0
+
+        command_error_slice = run_data_manager.get_command_error_slice(
+            run_id=runId,
+            cursor=cursor,
+            length=pageLength,
+        )
+    except RunNotCurrentError as e:
+        raise RunStopped(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e
+
+    meta = MultiBodyMeta(
+        cursor=command_error_slice.cursor,
+        totalLength=command_error_slice.total_length,
+    )
+
+    return await PydanticResponse.create(
+        content=SimpleMultiBody.construct(
+            data=command_error_slice.commands_errors,
+            meta=meta,
+        ),
         status_code=status.HTTP_200_OK,
     )

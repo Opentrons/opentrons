@@ -4,21 +4,25 @@ from typing import Optional, List
 
 import pytest
 from decoy import Decoy, matchers
+from pathlib import Path
+
 from opentrons.protocol_engine import (
     EngineStatus,
     StateSummary,
     commands,
     types as pe_types,
     CommandSlice,
+    CommandErrorSlice,
     CommandPointer,
     ErrorOccurrence,
     LoadedLabware,
     LoadedPipette,
     LoadedModule,
     LabwareOffset,
+    Liquid,
 )
-from opentrons.protocol_engine import Liquid
 from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
+from opentrons.protocol_engine.types import BooleanParameter, CSVParameter
 from opentrons.protocol_runner import RunResult
 from opentrons.types import DeckSlotName
 
@@ -86,6 +90,7 @@ def engine_state_summary() -> StateSummary:
     return StateSummary(
         status=EngineStatus.IDLE,
         errors=[ErrorOccurrence.construct(id="some-error-id")],  # type: ignore[call-arg]
+        hasEverEnteredErrorRecovery=False,
         labware=[LoadedLabware.construct(id="some-labware-id")],  # type: ignore[call-arg]
         labwareOffsets=[LabwareOffset.construct(id="some-labware-offset-id")],  # type: ignore[call-arg]
         pipettes=[LoadedPipette.construct(id="some-pipette-id")],  # type: ignore[call-arg]
@@ -166,9 +171,13 @@ async def test_create(
             protocol=None,
             deck_configuration=[],
             run_time_param_values=None,
+            run_time_param_paths=None,
             notify_publishers=mock_notify_publishers,
         )
     ).then_return(engine_state_summary)
+
+    decoy.when(mock_run_orchestrator_store.get_run_time_parameters()).then_return([])
+
     decoy.when(
         mock_run_store.insert(
             run_id=run_id,
@@ -177,6 +186,8 @@ async def test_create(
         )
     ).then_return(run_resource)
 
+    decoy.when(mock_run_orchestrator_store.get_run_time_parameters()).then_return([])
+
     result = await subject.create(
         run_id=run_id,
         created_at=created_at,
@@ -184,6 +195,7 @@ async def test_create(
         protocol=None,
         deck_configuration=[],
         run_time_param_values=None,
+        run_time_param_paths=None,
         notify_publishers=mock_notify_publishers,
     )
 
@@ -195,12 +207,14 @@ async def test_create(
         actions=run_resource.actions,
         status=engine_state_summary.status,
         errors=engine_state_summary.errors,
+        hasEverEnteredErrorRecovery=engine_state_summary.hasEverEnteredErrorRecovery,
         labware=engine_state_summary.labware,
         labwareOffsets=engine_state_summary.labwareOffsets,
         pipettes=engine_state_summary.pipettes,
         modules=engine_state_summary.modules,
         liquids=engine_state_summary.liquids,
     )
+    decoy.verify(mock_run_store.insert_csv_rtp(run_id=run_id, run_time_parameters=[]))
 
 
 async def test_create_with_options(
@@ -236,6 +250,7 @@ async def test_create_with_options(
             protocol=protocol,
             deck_configuration=[],
             run_time_param_values={"foo": "bar"},
+            run_time_param_paths={"xyzzy": Path("zork")},
             notify_publishers=mock_notify_publishers,
         )
     ).then_return(engine_state_summary)
@@ -248,6 +263,16 @@ async def test_create_with_options(
         )
     ).then_return(run_resource)
 
+    bool_parameter = BooleanParameter(
+        displayName="foo", variableName="bar", default=True, value=False
+    )
+
+    file_parameter = CSVParameter(displayName="my_file", variableName="file-id")
+
+    decoy.when(mock_run_orchestrator_store.get_run_time_parameters()).then_return(
+        [bool_parameter, file_parameter]
+    )
+
     result = await subject.create(
         run_id=run_id,
         created_at=created_at,
@@ -255,6 +280,7 @@ async def test_create_with_options(
         protocol=protocol,
         deck_configuration=[],
         run_time_param_values={"foo": "bar"},
+        run_time_param_paths={"xyzzy": Path("zork")},
         notify_publishers=mock_notify_publishers,
     )
 
@@ -266,11 +292,18 @@ async def test_create_with_options(
         actions=run_resource.actions,
         status=engine_state_summary.status,
         errors=engine_state_summary.errors,
+        hasEverEnteredErrorRecovery=engine_state_summary.hasEverEnteredErrorRecovery,
         labware=engine_state_summary.labware,
         labwareOffsets=engine_state_summary.labwareOffsets,
         pipettes=engine_state_summary.pipettes,
         modules=engine_state_summary.modules,
         liquids=engine_state_summary.liquids,
+        runTimeParameters=[bool_parameter, file_parameter],
+    )
+    decoy.verify(
+        mock_run_store.insert_csv_rtp(
+            run_id=run_id, run_time_parameters=[bool_parameter, file_parameter]
+        )
     )
 
 
@@ -291,6 +324,7 @@ async def test_create_engine_error(
             protocol=None,
             deck_configuration=[],
             run_time_param_values=None,
+            run_time_param_paths=None,
             notify_publishers=mock_notify_publishers,
         )
     ).then_raise(RunConflictError("oh no"))
@@ -303,6 +337,7 @@ async def test_create_engine_error(
             protocol=None,
             deck_configuration=[],
             run_time_param_values=None,
+            run_time_param_paths=None,
             notify_publishers=mock_notify_publishers,
         )
 
@@ -347,6 +382,7 @@ async def test_get_current_run(
         actions=run_resource.actions,
         status=engine_state_summary.status,
         errors=engine_state_summary.errors,
+        hasEverEnteredErrorRecovery=engine_state_summary.hasEverEnteredErrorRecovery,
         labware=engine_state_summary.labware,
         labwareOffsets=engine_state_summary.labwareOffsets,
         pipettes=engine_state_summary.pipettes,
@@ -388,6 +424,7 @@ async def test_get_historical_run(
         actions=run_resource.actions,
         status=engine_state_summary.status,
         errors=engine_state_summary.errors,
+        hasEverEnteredErrorRecovery=engine_state_summary.hasEverEnteredErrorRecovery,
         labware=engine_state_summary.labware,
         labwareOffsets=engine_state_summary.labwareOffsets,
         pipettes=engine_state_summary.pipettes,
@@ -430,6 +467,7 @@ async def test_get_historical_run_no_data(
         actions=run_resource.actions,
         status=EngineStatus.STOPPED,
         errors=[],
+        hasEverEnteredErrorRecovery=False,
         labware=[],
         labwareOffsets=[],
         pipettes=[],
@@ -449,6 +487,7 @@ async def test_get_all_runs(
     current_run_data = StateSummary(
         status=EngineStatus.IDLE,
         errors=[ErrorOccurrence.construct(id="current-error-id")],  # type: ignore[call-arg]
+        hasEverEnteredErrorRecovery=False,
         labware=[LoadedLabware.construct(id="current-labware-id")],  # type: ignore[call-arg]
         labwareOffsets=[LabwareOffset.construct(id="current-labware-offset-id")],  # type: ignore[call-arg]
         pipettes=[LoadedPipette.construct(id="current-pipette-id")],  # type: ignore[call-arg]
@@ -467,6 +506,7 @@ async def test_get_all_runs(
     historical_run_data = StateSummary(
         status=EngineStatus.STOPPED,
         errors=[ErrorOccurrence.construct(id="old-error-id")],  # type: ignore[call-arg]
+        hasEverEnteredErrorRecovery=False,
         labware=[LoadedLabware.construct(id="old-labware-id")],  # type: ignore[call-arg]
         labwareOffsets=[LabwareOffset.construct(id="old-labware-offset-id")],  # type: ignore[call-arg]
         pipettes=[LoadedPipette.construct(id="old-pipette-id")],  # type: ignore[call-arg]
@@ -526,6 +566,7 @@ async def test_get_all_runs(
             actions=historical_run_resource.actions,
             status=historical_run_data.status,
             errors=historical_run_data.errors,
+            hasEverEnteredErrorRecovery=historical_run_data.hasEverEnteredErrorRecovery,
             labware=historical_run_data.labware,
             labwareOffsets=historical_run_data.labwareOffsets,
             pipettes=historical_run_data.pipettes,
@@ -541,6 +582,7 @@ async def test_get_all_runs(
             actions=current_run_resource.actions,
             status=current_run_data.status,
             errors=current_run_data.errors,
+            hasEverEnteredErrorRecovery=current_run_data.hasEverEnteredErrorRecovery,
             labware=current_run_data.labware,
             labwareOffsets=current_run_data.labwareOffsets,
             pipettes=current_run_data.pipettes,
@@ -630,6 +672,7 @@ async def test_update_current(
         actions=run_resource.actions,
         status=engine_state_summary.status,
         errors=engine_state_summary.errors,
+        hasEverEnteredErrorRecovery=engine_state_summary.hasEverEnteredErrorRecovery,
         labware=engine_state_summary.labware,
         labwareOffsets=engine_state_summary.labwareOffsets,
         pipettes=engine_state_summary.pipettes,
@@ -685,6 +728,7 @@ async def test_update_current_noop(
         actions=run_resource.actions,
         status=engine_state_summary.status,
         errors=engine_state_summary.errors,
+        hasEverEnteredErrorRecovery=engine_state_summary.hasEverEnteredErrorRecovery,
         labware=engine_state_summary.labware,
         labwareOffsets=engine_state_summary.labwareOffsets,
         pipettes=engine_state_summary.pipettes,
@@ -741,6 +785,7 @@ async def test_create_archives_existing(
             protocol=None,
             deck_configuration=[],
             run_time_param_values=None,
+            run_time_param_paths=None,
             notify_publishers=mock_notify_publishers,
         )
     ).then_return(engine_state_summary)
@@ -760,6 +805,7 @@ async def test_create_archives_existing(
         protocol=None,
         deck_configuration=[],
         run_time_param_values=None,
+        run_time_param_paths=None,
         notify_publishers=mock_notify_publishers,
     )
 
@@ -832,6 +878,43 @@ def test_get_commands_slice_current_run(
     result = subject.get_commands_slice("run-id", 1, 2)
 
     assert expected_command_slice == result
+
+
+def test_get_commands_errors_slice__not_current_run_raises(
+    decoy: Decoy,
+    subject: RunDataManager,
+    mock_run_orchestrator_store: RunOrchestratorStore,
+) -> None:
+    """Should get a sliced command error list from engine store."""
+    decoy.when(mock_run_orchestrator_store.current_run_id).then_return("run-not-id")
+
+    with pytest.raises(RunNotCurrentError):
+        subject.get_command_error_slice("run-id", 1, 2)
+
+
+def test_get_commands_errors_slice_current_run(
+    decoy: Decoy,
+    subject: RunDataManager,
+    mock_run_orchestrator_store: RunOrchestratorStore,
+    run_command: commands.Command,
+) -> None:
+    """Should get a sliced command error list from engine store."""
+    expected_commands_errors_result = [
+        ErrorOccurrence.construct(id="error-id")  # type: ignore[call-arg]
+    ]
+
+    command_error_slice = CommandErrorSlice(
+        cursor=1, total_length=3, commands_errors=expected_commands_errors_result
+    )
+
+    decoy.when(mock_run_orchestrator_store.current_run_id).then_return("run-id")
+    decoy.when(mock_run_orchestrator_store.get_command_error_slice(1, 2)).then_return(
+        command_error_slice
+    )
+
+    result = subject.get_command_error_slice("run-id", 1, 2)
+
+    assert command_error_slice == result
 
 
 def test_get_commands_slice_from_db_run_not_found(

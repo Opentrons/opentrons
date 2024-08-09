@@ -13,6 +13,7 @@ import {
   Icon,
   JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
+  ModalShell,
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
@@ -26,7 +27,6 @@ import { NeedHelpLink } from '../../CalibrationPanels'
 import { useSelector } from 'react-redux'
 import { TwoUpTileLayout } from '../TwoUpTileLayout'
 import { getTopPortalEl } from '../../../App/portal'
-import { LegacyModalShell } from '../../../molecules/LegacyModal'
 import { SmallButton } from '../../../atoms/buttons'
 import { CALIBRATION_PROBE } from '../../PipetteWizardFlows/constants'
 import { TerseOffsetTable } from '../ResultsSummary'
@@ -181,7 +181,7 @@ function ViewOffsets(props: ViewOffsetsProps): JSX.Element {
       </Btn>
       {showOffsetsTable
         ? createPortal(
-            <LegacyModalShell
+            <ModalShell
               width="60rem"
               height="33.5rem"
               padding={SPACING.spacing32}
@@ -213,7 +213,7 @@ function ViewOffsets(props: ViewOffsetsProps): JSX.Element {
                   labwareDefinitions={labwareDefinitions}
                 />
               </Box>
-            </LegacyModalShell>,
+            </ModalShell>,
             getTopPortalEl()
           )
         : null}

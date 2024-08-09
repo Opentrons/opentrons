@@ -479,7 +479,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
   )
 }
 
-export const DeckSetup = (): JSX.Element => {
+export const LegacyDeckSetup = (): JSX.Element => {
   const drilledDown =
     useSelector(labwareIngredSelectors.getDrillDownLabwareId) != null
   const selectedTerminalItemId = useSelector(getSelectedTerminalItemId)

@@ -187,7 +187,8 @@ async def get_quick_transfer_run_auto_deleter(
     return RunAutoDeleter(
         run_store=run_store,
         protocol_store=protocol_store,
-        # We dont store quick transfer runs
-        deletion_planner=RunDeletionPlanner(maximum_runs=1),
+        # NOTE: We dont store quick transfer runs, however we need an additional
+        # run slot so we can clone an active run.
+        deletion_planner=RunDeletionPlanner(maximum_runs=2),
         protocol_kind=ProtocolKind.QUICK_TRANSFER,
     )

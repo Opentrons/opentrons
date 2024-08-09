@@ -39,12 +39,7 @@ from ._nozzle_layout import NozzleLayout
 from . import labware, validation
 
 
-AdvancedLiquidHandling = Union[
-    labware.Well,
-    types.Location,
-    Sequence[Union[labware.Well, types.Location]],
-    Sequence[Sequence[labware.Well]],
-]
+AdvancedLiquidHandling = transfers.AdvancedLiquidHandling
 
 _DEFAULT_ASPIRATE_CLEARANCE = 1.0
 _DEFAULT_DISPENSE_CLEARANCE = 1.0

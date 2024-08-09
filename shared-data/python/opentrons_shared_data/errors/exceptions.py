@@ -964,7 +964,7 @@ class IncorrectAPIVersion(GeneralError):
                 f"{api_element} is not yet available in the API version in use."
             )
         if message:
-            checked_message = checked_message + message
+            checked_message = checked_message + " " + message
         checked_message = (
             checked_message
             or "This feature is not yet available in the API version in use."

@@ -12,7 +12,7 @@ from opentrons.protocol_engine.types import (
     PrimitiveRunTimeParamValuesType,
     NumberParameter,
     CSVParameter,
-    CSVRunTimeParamFilesType,
+    CSVRuntimeParamPaths,
     FileInfo,
 )
 from opentrons.protocols.api_support.types import APIVersion
@@ -30,6 +30,7 @@ from opentrons.protocol_reader import (
     BufferedFile,
 )
 
+from robot_server.data_files.data_files_store import DataFilesStore, DataFileInfo
 from robot_server.data_files.models import DataFile
 from robot_server.errors.error_responses import ApiError
 from robot_server.protocols.analyses_manager import AnalysesManager
@@ -113,6 +114,12 @@ def protocol_reader(decoy: Decoy) -> ProtocolReader:
 def analyses_manager(decoy: Decoy) -> AnalysesManager:
     """Get a mocked out AnalysesManager."""
     return decoy.mock(cls=AnalysesManager)
+
+
+@pytest.fixture
+def data_files_store(decoy: Decoy) -> DataFilesStore:
+    """Get a mocked out DataFilesStore."""
+    return decoy.mock(cls=DataFilesStore)
 
 
 @pytest.fixture
@@ -466,7 +473,7 @@ async def test_create_existing_protocol(
             analysis_id="analysis-id",
             protocol_resource=stored_protocol_resource,
             run_time_param_values={},
-            run_time_param_files={},
+            run_time_param_paths={},
         )
     ).then_return(analyzer)
     decoy.when(analyzer.get_verified_run_time_parameters()).then_return([])
@@ -584,7 +591,7 @@ async def test_create_protocol(
             analysis_id="analysis-id",
             protocol_resource=protocol_resource,
             run_time_param_values={},
-            run_time_param_files={},
+            run_time_param_paths={},
         )
     ).then_return(analyzer)
     decoy.when(analyzer.get_verified_run_time_parameters()).then_return([])
@@ -637,6 +644,7 @@ async def test_create_new_protocol_with_run_time_params(
     decoy: Decoy,
     protocol_store: ProtocolStore,
     analysis_store: AnalysisStore,
+    data_files_store: DataFilesStore,
     protocol_reader: ProtocolReader,
     file_reader_writer: FileReaderWriter,
     file_hasher: FileHasher,
@@ -697,6 +705,15 @@ async def test_create_new_protocol_with_run_time_params(
         )
     ).then_return([buffered_file])
 
+    decoy.when(data_files_store.get("file-id")).then_return(
+        DataFileInfo(
+            id="123",
+            name="file.abc",
+            file_hash="xyz",
+            created_at=datetime(year=2022, month=2, day=2),
+        )
+    )
+
     decoy.when(await file_hasher.hash(files=[buffered_file])).then_return("abc123")
 
     decoy.when(
@@ -715,7 +732,7 @@ async def test_create_new_protocol_with_run_time_params(
             analysis_id="analysis-id",
             protocol_resource=protocol_resource,
             run_time_param_values={"vol": 123, "dry_run": True, "mount": "left"},
-            run_time_param_files={"my_csv_file": "file-id"},
+            run_time_param_paths={"my_csv_file": Path("/dev/null/file-id/file.abc")},
         )
     ).then_return(analyzer)
     decoy.when(
@@ -734,6 +751,8 @@ async def test_create_new_protocol_with_run_time_params(
         protocol_directory=protocol_directory,
         protocol_store=protocol_store,
         analysis_store=analysis_store,
+        data_files_store=data_files_store,
+        data_files_directory=Path("/dev/null"),
         file_reader_writer=file_reader_writer,
         protocol_reader=protocol_reader,
         file_hasher=file_hasher,
@@ -832,7 +851,7 @@ async def test_create_existing_protocol_with_no_previous_analysis(
             analysis_id="analysis-id",
             protocol_resource=stored_protocol_resource,
             run_time_param_values={"vol": 123, "dry_run": True, "mount": "left"},
-            run_time_param_files={},
+            run_time_param_paths={},
         )
     ).then_return(analyzer)
 
@@ -881,6 +900,7 @@ async def test_create_existing_protocol_with_different_run_time_params(
     decoy: Decoy,
     protocol_store: ProtocolStore,
     analysis_store: AnalysisStore,
+    data_files_store: DataFilesStore,
     protocol_reader: ProtocolReader,
     file_reader_writer: FileReaderWriter,
     file_hasher: FileHasher,
@@ -946,6 +966,14 @@ async def test_create_existing_protocol_with_different_run_time_params(
             files=[protocol_file]  # type: ignore[list-item]
         )
     ).then_return([buffered_file])
+    decoy.when(data_files_store.get("csv-file-id")).then_return(
+        DataFileInfo(
+            id="123",
+            name="file.abc",
+            file_hash="xyz",
+            created_at=datetime(year=2022, month=2, day=2),
+        )
+    )
     decoy.when(await file_hasher.hash(files=[buffered_file])).then_return("a_b_c")
     decoy.when(protocol_store.get_all()).then_return([])
     decoy.when(protocol_store.get_id_by_hash("a_b_c")).then_return("the-og-proto-id")
@@ -961,7 +989,9 @@ async def test_create_existing_protocol_with_different_run_time_params(
             analysis_id="analysis-id",
             protocol_resource=stored_protocol_resource,
             run_time_param_values={"vol": 123, "dry_run": True, "mount": "left"},
-            run_time_param_files={"my_csv_file": "csv-file-id"},
+            run_time_param_paths={
+                "my_csv_file": Path("/dev/null/csv-file-id/file.abc")
+            },
         )
     ).then_return(analyzer)
     decoy.when(analyzer.get_verified_run_time_parameters()).then_return(
@@ -987,6 +1017,8 @@ async def test_create_existing_protocol_with_different_run_time_params(
         protocol_directory=protocol_directory,
         protocol_store=protocol_store,
         analysis_store=analysis_store,
+        data_files_store=data_files_store,
+        data_files_directory=Path("/dev/null"),
         file_reader_writer=file_reader_writer,
         protocol_reader=protocol_reader,
         file_hasher=file_hasher,
@@ -1094,7 +1126,7 @@ async def test_create_existing_protocol_with_same_run_time_params(
             analysis_id="analysis-id",
             protocol_resource=stored_protocol_resource,
             run_time_param_values={"vol": 123, "dry_run": True, "mount": "left"},
-            run_time_param_files={},
+            run_time_param_paths={},
         )
     ).then_return(analyzer)
     decoy.when(analyzer.get_verified_run_time_parameters()).then_return(
@@ -1221,7 +1253,7 @@ async def test_create_existing_protocol_with_pending_analysis_raises(
             analysis_id="analysis-id",
             protocol_resource=stored_protocol_resource,
             run_time_param_values={"vol": 123, "dry_run": True, "mount": "left"},
-            run_time_param_files={},
+            run_time_param_paths={},
         )
     ).then_return(analyzer)
     decoy.when(analyzer.get_verified_run_time_parameters()).then_return(
@@ -1654,7 +1686,7 @@ async def test_create_protocol_analyses_with_same_rtp_values(
             analysis_id="analysis-id-2",
             protocol_resource=stored_protocol_resource,
             run_time_param_values=rtp_values,
-            run_time_param_files={},
+            run_time_param_paths={},
         )
     ).then_return(analyzer)
     decoy.when(analyzer.get_verified_run_time_parameters()).then_return(
@@ -1684,6 +1716,7 @@ async def test_update_protocol_analyses_with_new_rtp_values(
     decoy: Decoy,
     protocol_store: ProtocolStore,
     analysis_store: AnalysisStore,
+    data_files_store: DataFilesStore,
     analyses_manager: AnalysesManager,
 ) -> None:
     """It should start a new analysis for the new rtp values."""
@@ -1692,8 +1725,8 @@ async def test_update_protocol_analyses_with_new_rtp_values(
         "dry_run": True,
         "mount": "left",
     }
-    rtp_files: CSVRunTimeParamFilesType = {
-        "csv_param": "file-id",
+    rtp_files: CSVRuntimeParamPaths = {
+        "csv_param": Path("/dev/null/file-id/foo.csv"),
     }
     protocol_source = ProtocolSource(
         directory=Path("/dev/null"),
@@ -1737,6 +1770,14 @@ async def test_update_protocol_analyses_with_new_rtp_values(
         variableName="csv_param",
         file=FileInfo(id="file-id", name=""),
     )
+    decoy.when(data_files_store.get("file-id")).then_return(
+        DataFileInfo(
+            id="123",
+            name="foo.csv",
+            file_hash="xyz",
+            created_at=datetime(year=2022, month=2, day=2),
+        )
+    )
     decoy.when(protocol_store.has(protocol_id="protocol-id")).then_return(True)
     decoy.when(protocol_store.get(protocol_id="protocol-id")).then_return(
         stored_protocol_resource
@@ -1750,7 +1791,7 @@ async def test_update_protocol_analyses_with_new_rtp_values(
             analysis_id="analysis-id-2",
             protocol_resource=stored_protocol_resource,
             run_time_param_values=rtp_values,
-            run_time_param_files=rtp_files,
+            run_time_param_paths=rtp_files,
         )
     ).then_return(analyzer)
     decoy.when(analyzer.get_verified_run_time_parameters()).then_return(
@@ -1778,12 +1819,15 @@ async def test_update_protocol_analyses_with_new_rtp_values(
         protocolId="protocol-id",
         request_body=RequestModel(
             data=AnalysisRequest(
-                runTimeParameterValues=rtp_values, runTimeParameterFiles=rtp_files
+                runTimeParameterValues=rtp_values,
+                runTimeParameterFiles={"csv_param": "file-id"},
             )
         ),
         protocol_store=protocol_store,
         analysis_store=analysis_store,
         analyses_manager=analyses_manager,
+        data_files_store=data_files_store,
+        data_files_directory=Path("/dev/null"),
         analysis_id="analysis-id-2",
     )
     assert result.content.data == [
@@ -1845,7 +1889,7 @@ async def test_update_protocol_analyses_with_forced_reanalysis(
             analysis_id="analysis-id-2",
             protocol_resource=stored_protocol_resource,
             run_time_param_values={},
-            run_time_param_files={},
+            run_time_param_paths={},
         )
     ).then_return(analyzer)
     decoy.when(
@@ -1952,7 +1996,7 @@ async def test_create_protocol_kind_quick_transfer(
             analysis_id="analysis-id",
             protocol_resource=protocol_resource,
             run_time_param_values={},
-            run_time_param_files={},
+            run_time_param_paths={},
         )
     ).then_return(analyzer)
     decoy.when(

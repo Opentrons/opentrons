@@ -164,7 +164,7 @@ def test_parse_rpm_response_failure(input_str: str) -> None:
 )
 def test_parse_labware_latch_status_response_success(
     input_str: str, expected_result: HeaterShakerLabwareLatchStatus
-):
+) -> None:
     assert utils.parse_labware_latch_status_response(input_str) == expected_result
 
 
@@ -179,7 +179,7 @@ def test_parse_labware_latch_status_response_success(
         [":"],
     ],
 )
-def test_parse_labware_latch_status_response_failure(input_str):
+def test_parse_labware_latch_status_response_failure(input_str: str) -> None:
     with pytest.raises(utils.ParseError):
         utils.parse_labware_latch_status_response(input_str)
 

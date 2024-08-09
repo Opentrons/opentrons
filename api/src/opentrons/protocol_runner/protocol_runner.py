@@ -44,7 +44,7 @@ from ..protocol_engine.types import (
     DeckConfigurationType,
     RunTimeParameter,
     PrimitiveRunTimeParamValuesType,
-    CSVRunTimeParamFilesType,
+    CSVRuntimeParamPaths,
 )
 from ..protocols.types import PythonProtocol
 
@@ -186,7 +186,7 @@ class PythonAndLegacyRunner(AbstractRunner):
         protocol_source: ProtocolSource,
         python_parse_mode: PythonParseMode,
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType],
-        run_time_param_files: Optional[CSVRunTimeParamFilesType],
+        run_time_param_paths: Optional[CSVRuntimeParamPaths],
     ) -> None:
         """Load a Python or JSONv5(& older) ProtocolSource into managed ProtocolEngine."""
         labware_definitions = await protocol_reader.extract_labware_definitions(
@@ -209,7 +209,7 @@ class PythonAndLegacyRunner(AbstractRunner):
                     protocol=protocol,
                     parameter_context=self._parameter_context,
                     run_time_param_overrides=run_time_param_values,
-                    run_time_param_file_overrides=run_time_param_files,
+                    run_time_param_file_overrides=run_time_param_paths,
                 )
             )
         else:
@@ -254,7 +254,7 @@ class PythonAndLegacyRunner(AbstractRunner):
         deck_configuration: DeckConfigurationType,
         protocol_source: Optional[ProtocolSource] = None,
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
-        run_time_param_files: Optional[CSVRunTimeParamFilesType] = None,
+        run_time_param_paths: Optional[CSVRuntimeParamPaths] = None,
         python_parse_mode: PythonParseMode = PythonParseMode.NORMAL,
     ) -> RunResult:
         # TODO(mc, 2022-01-11): move load to runner creation, remove from `run`
@@ -264,7 +264,7 @@ class PythonAndLegacyRunner(AbstractRunner):
                 protocol_source=protocol_source,
                 python_parse_mode=python_parse_mode,
                 run_time_param_values=run_time_param_values,
-                run_time_param_files=run_time_param_files,
+                run_time_param_paths=run_time_param_paths,
             )
 
         self.play(deck_configuration=deck_configuration)
@@ -391,13 +391,15 @@ class JsonRunner(AbstractRunner):
                 )
             )
             if executed_command.error is not None:
-                error_was_recovered_from = (
+                error_recovery_type = (
                     self._protocol_engine.state_view.commands.get_error_recovery_type(
                         executed_command.id
                     )
-                    == ErrorRecoveryType.WAIT_FOR_RECOVERY
                 )
-                if not error_was_recovered_from:
+                error_should_fail_run = (
+                    error_recovery_type == ErrorRecoveryType.FAIL_RUN
+                )
+                if error_should_fail_run:
                     raise ProtocolCommandFailedError(
                         original_error=executed_command.error,
                         message=f"{executed_command.error.errorType}: {executed_command.error.detail}",

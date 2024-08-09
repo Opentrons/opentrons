@@ -32,7 +32,6 @@ import {
   OT2_ROBOT_TYPE,
   sortRuntimeParameters,
 } from '@opentrons/shared-data'
-import { useFeatureFlag } from '../../redux/config'
 import {
   getConnectableRobots,
   getReachableRobots,
@@ -153,7 +152,6 @@ export function ChooseRobotSlideout(
     resetRunTimeParameters,
     setHasMissingFileParam,
   } = props
-  const enableCsvFile = useFeatureFlag('enableCsvFile')
 
   const dispatch = useDispatch<Dispatch>()
   const isScanning = useSelector((state: State) => getScanning(state))
@@ -530,8 +528,9 @@ export function ChooseRobotSlideout(
               if (error != null) {
                 errors.push(error as string)
               }
-              return !enableCsvFile ? null : (
+              return (
                 <Flex
+                  key={runtimeParam.variableName}
                   flexDirection={DIRECTION_COLUMN}
                   alignItems={ALIGN_CENTER}
                   gridgap={SPACING.spacing8}

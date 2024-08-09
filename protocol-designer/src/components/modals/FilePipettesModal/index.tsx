@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import * as Yup from 'yup'
 
-import { Modal, OutlineButton } from '@opentrons/components'
+import { LegacyModal, OutlineButton } from '@opentrons/components'
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
@@ -482,7 +482,7 @@ export const FilePipettesModal = (props: Props): JSX.Element => {
     crashablePipetteSelected && hasCrashableMagnetModuleSelected
 
   return (
-    <Modal
+    <LegacyModal
       contentsClassName={cx(
         styles.new_file_modal_contents,
         modalStyles.scrollable_modal_wrapper
@@ -544,6 +544,6 @@ export const FilePipettesModal = (props: Props): JSX.Element => {
           ) : null}
         </div>
       </div>
-    </Modal>
+    </LegacyModal>
   )
 }

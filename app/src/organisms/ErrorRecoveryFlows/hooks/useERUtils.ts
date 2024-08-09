@@ -26,7 +26,10 @@ import type { UseRecoveryCommandsResult } from './useRecoveryCommands'
 import type { RecoveryTipStatusUtils } from './useRecoveryTipStatus'
 import type { UseFailedLabwareUtilsResult } from './useFailedLabwareUtils'
 import type { UseDeckMapUtilsResult } from './useDeckMapUtils'
-import type { CurrentRecoveryOptionUtils } from './useRecoveryRouting'
+import type {
+  CurrentRecoveryOptionUtils,
+  SubMapUtils,
+} from './useRecoveryRouting'
 import type { RecoveryActionMutationResult } from './useRecoveryActionMutation'
 import type { StepCounts } from '../../../resources/protocols/hooks'
 import type { UseRecoveryAnalyticsResult } from './useRecoveryAnalytics'
@@ -52,9 +55,9 @@ export interface ERUtilsResults {
   recoveryActionMutationUtils: RecoveryActionMutationResult
   failedPipetteInfo: PipetteData | null
   hasLaunchedRecovery: boolean
-  trackExternalMap: (map: Record<string, any>) => void
   stepCounts: StepCounts
   commandsAfterFailedCommand: ReturnType<typeof getNextSteps>
+  subMapUtils: SubMapUtils
 }
 
 const SUBSEQUENT_COMMAND_DEPTH = 2
@@ -86,8 +89,8 @@ export function useERUtils({
   const {
     recoveryMap,
     setRM,
-    trackExternalMap,
     currentRecoveryOptionUtils,
+    ...subMapUtils
   } = useRecoveryRouting()
 
   const recoveryToastUtils = useRecoveryToasts({
@@ -155,7 +158,7 @@ export function useERUtils({
   )
   return {
     recoveryMap,
-    trackExternalMap,
+    subMapUtils,
     currentRecoveryOptionUtils,
     recoveryActionMutationUtils,
     routeUpdateActions,

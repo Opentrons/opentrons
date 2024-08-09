@@ -11,9 +11,9 @@ import {
 } from '@opentrons/components'
 
 import { SmallButton } from '../../atoms/buttons'
-import { Modal } from '../../molecules/Modal'
+import { OddModal } from '../../molecules/OddModal'
 
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
+import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
 
 interface AnalysisFailedModalProps {
   errors: string[]
@@ -28,7 +28,7 @@ export function AnalysisFailedModal({
 }: AnalysisFailedModalProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   const navigate = useNavigate()
-  const modalHeader: ModalHeaderBaseProps = {
+  const modalHeader: OddModalHeaderBaseProps = {
     title: t('protocol_analysis_failed'),
     iconName: 'information',
     iconColor: COLORS.black90,
@@ -40,7 +40,7 @@ export function AnalysisFailedModal({
   }
 
   return (
-    <Modal
+    <OddModal
       header={modalHeader}
       onOutsideClick={() => {
         setShowAnalysisFailedModal(false)
@@ -78,6 +78,6 @@ export function AnalysisFailedModal({
           buttonType="alert"
         />
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }

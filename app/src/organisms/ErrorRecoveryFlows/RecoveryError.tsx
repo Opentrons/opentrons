@@ -6,7 +6,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   Icon,
-  LegacyStyledText,
+  StyledText,
   SPACING,
   ALIGN_CENTER,
   JUSTIFY_END,
@@ -61,7 +61,7 @@ export function ErrorRecoveryFlowError({
     <ErrorContent
       isOnDevice={isOnDevice}
       title={t('recovery_action_failed', { action: userRecoveryOptionCopy })}
-      subTitle={t('return_to_the_menu')}
+      subTitle={t('next_try_another_action')}
       btnText={t('back_to_menu')}
       btnOnClick={onPrimaryClick}
     />
@@ -103,13 +103,13 @@ export function RecoveryDropTipFlowErrors({
   const buildSubTitle = (): string => {
     switch (step) {
       case ERROR_WHILE_RECOVERING.STEPS.DROP_TIP_GENERAL_ERROR:
-        return t('return_to_the_menu')
+        return t('next_try_another_action')
       case ERROR_WHILE_RECOVERING.STEPS.DROP_TIP_TIP_DROP_FAILED:
-        return t('return_to_the_menu')
+        return t('next_try_another_action')
       case ERROR_WHILE_RECOVERING.STEPS.DROP_TIP_BLOWOUT_FAILED:
         return t('you_can_still_drop_tips')
       default:
-        return t('return_to_the_menu')
+        return t('next_try_another_action')
     }
   }
 
@@ -189,8 +189,18 @@ export function ErrorContent({
           alignItems={ALIGN_CENTER}
           textAlign={ALIGN_CENTER}
         >
-          <LegacyStyledText as="h3Bold">{title}</LegacyStyledText>
-          <LegacyStyledText as="h4">{subTitle}</LegacyStyledText>
+          <StyledText
+            oddStyle="level3HeaderBold"
+            desktopStyle="headingSmallBold"
+          >
+            {title}
+          </StyledText>
+          <StyledText
+            oddStyle="level4HeaderRegular"
+            desktopStyle="bodyDefaultRegular"
+          >
+            {subTitle}
+          </StyledText>
         </Flex>
       </Flex>
       <Flex justifyContent={JUSTIFY_END}>

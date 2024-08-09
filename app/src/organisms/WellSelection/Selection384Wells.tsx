@@ -8,13 +8,13 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING,
   LegacyStyledText,
+  RadioButton,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { IconButton } from '../../atoms/buttons/IconButton'
-import { RadioButton } from '../../atoms/buttons/RadioButton'
 
 import type { WellGroup } from '@opentrons/components'
 import type {
@@ -98,8 +98,7 @@ export function Selection384Wells({
 
     if (selectBy === 'columns') {
       if (channels === 8) {
-        // for 8-channel, select first and second member of column (all rows) unless only one starting well option is selected
-        if (startingWellState.A1 === startingWellState.B1) {
+        if (startingWellState.A1 && startingWellState.B1) {
           selectWells({
             [columns[nextIndex][0]]: null,
             [columns[nextIndex][1]]: null,
@@ -152,19 +151,27 @@ export function Selection384Wells({
         ) : (
           <StartingWell
             channels={channels}
-            columns={columns}
             deselectWells={deselectWells}
             selectWells={selectWells}
             startingWellState={startingWellState}
             setStartingWellState={setStartingWellState}
+            wells={wells}
           />
         )}
         <ButtonControls
           channels={channels}
           handleMinus={handleMinus}
           handlePlus={handlePlus}
-          lastSelectedIndex={lastSelectedIndex}
-          selectBy={selectBy}
+          minusDisabled={lastSelectedIndex == null}
+          plusDisabled={
+            // disable 8-channel plus if no starting well selected
+            (channels === 8 &&
+              !startingWellState.A1 &&
+              !startingWellState.B1) ||
+            (selectBy === 'columns'
+              ? lastSelectedIndex === COLUMN_COUNT_384 - 1
+              : lastSelectedIndex === WELL_COUNT_384 - 1)
+          }
         />
       </Flex>
     </Flex>
@@ -225,20 +232,20 @@ type StartingWellOption = 'A1' | 'B1' | 'A2' | 'B2'
 
 function StartingWell({
   channels,
-  columns,
   deselectWells,
   selectWells,
   startingWellState,
   setStartingWellState,
+  wells,
 }: {
   channels: PipetteChannels
-  columns: string[][]
   deselectWells: (wells: string[]) => void
   selectWells: (wellGroup: WellGroup) => void
   startingWellState: Record<StartingWellOption, boolean>
   setStartingWellState: React.Dispatch<
     React.SetStateAction<Record<StartingWellOption, boolean>>
   >
+  wells: string[]
 }): JSX.Element {
   const { t, i18n } = useTranslation('quick_transfer')
 
@@ -247,6 +254,9 @@ function StartingWell({
 
   // on mount, select A1 well group for 96-channel
   React.useEffect(() => {
+    // deselect all wells on mount; clears well selection when navigating back within quick transfer flow
+    // otherwise, selected wells and lastSelectedIndex pointer will be out of sync
+    deselectWells(wells)
     if (channels === 96) {
       selectWells({ A1: null })
     }
@@ -288,8 +298,8 @@ interface ButtonControlsProps {
   channels: PipetteChannels
   handleMinus: () => void
   handlePlus: () => void
-  lastSelectedIndex: number | null
-  selectBy: 'columns' | 'wells'
+  minusDisabled: boolean
+  plusDisabled: boolean
 }
 
 function ButtonControls(props: ButtonControlsProps): JSX.Element {
@@ -297,8 +307,8 @@ function ButtonControls(props: ButtonControlsProps): JSX.Element {
     channels,
     handleMinus,
     handlePlus,
-    lastSelectedIndex,
-    selectBy,
+    minusDisabled,
+    plusDisabled,
   } = props
   const { t, i18n } = useTranslation('quick_transfer')
 
@@ -313,18 +323,14 @@ function ButtonControls(props: ButtonControlsProps): JSX.Element {
         </LegacyStyledText>
         <Flex gridGap={SPACING.spacing16}>
           <IconButton
-            disabled={lastSelectedIndex == null}
+            disabled={minusDisabled}
             onClick={handleMinus}
             iconName="minus"
             hasBackground
             flex="1"
           />
           <IconButton
-            disabled={
-              selectBy === 'columns'
-                ? lastSelectedIndex === COLUMN_COUNT_384 - 1
-                : lastSelectedIndex === WELL_COUNT_384 - 1
-            }
+            disabled={plusDisabled}
             onClick={handlePlus}
             iconName="plus"
             hasBackground

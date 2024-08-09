@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import { useSelector } from 'react-redux'
 import {
   ALIGN_CENTER,
   COLORS,
@@ -13,7 +12,6 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { getIsOnDevice } from '../../redux/config'
 
 interface Props {
   //  optional override of the spinner
@@ -61,33 +59,35 @@ const MODAL_STYLE = css`
 `
 const SPINNER_STYLE = css`
   color: ${COLORS.grey60};
-  opacity: 100%;
+  width: 5.125rem;
+  height: 5.125rem;
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    color: ${COLORS.black90};
-    opacity: 70%;
+    width: 6.25rem;
+    height: 6.25rem;
+  }
+`
+
+const DESCRIPTION_CONTAINER_STYLE = css`
+  padding-x: 6.5625rem;
+  gap: ${SPACING.spacing8};
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    padding-x: ${SPACING.spacing40};
+    gap: ${SPACING.spacing4};
   }
 `
 
 export function InProgressModal(props: Props): JSX.Element {
   const { alternativeSpinner, children, description, body } = props
-  const isOnDevice = useSelector(getIsOnDevice)
 
   return (
     <Flex css={MODAL_STYLE}>
       {alternativeSpinner ?? (
-        <Icon
-          name="ot-spinner"
-          aria-label="spinner"
-          size={isOnDevice ? '6.25rem' : '5.125rem'}
-          css={SPINNER_STYLE}
-          spin
-        />
+        <Icon name="ot-spinner" aria-label="spinner" css={SPINNER_STYLE} spin />
       )}
       <Flex
-        paddingX={isOnDevice ? SPACING.spacing40 : '6.5625rem'}
-        gridGap={isOnDevice ? SPACING.spacing4 : SPACING.spacing8}
         flexDirection={DIRECTION_COLUMN}
         alignItems={ALIGN_CENTER}
+        css={DESCRIPTION_CONTAINER_STYLE}
       >
         {description != null && (
           <LegacyStyledText css={DESCRIPTION_STYLE}>
