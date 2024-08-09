@@ -2077,6 +2077,8 @@ class InstrumentContext(publisher.CommandPublisher):
                 f"Nozzle layout configuration of style {style.value} is unsupported in API Versions lower than {_PARTIAL_NOZZLE_CONFIGURATION_SINGLE_ROW_PARTIAL_COLUMN_ADDED_IN}."
             )
 
+        front_right_resolved = front_right
+        back_left_resolved = back_left
         if style != NozzleLayout.ALL:
             if start is None:
                 raise ValueError(
@@ -2086,29 +2088,48 @@ class InstrumentContext(publisher.CommandPublisher):
                 raise ValueError(
                     f"Starting nozzle specified is not one of {types.ALLOWED_PRIMARY_NOZZLES}"
                 )
-        if style == NozzleLayout.QUADRANT:
-            if front_right is None and back_left is None:
-                raise ValueError(
-                    "Cannot configure a QUADRANT layout without a front right or back left nozzle."
-                )
-        elif not (front_right is None and back_left is None):
-            raise ValueError(
-                f"Parameters 'front_right' and 'back_left' cannot be used with {style.value} Nozzle Configuration Layout."
-            )
+            if style == NozzleLayout.ROW:
+                if self.channels != 96:
+                    raise ValueError(
+                        "Row configuraiton is only supported on 96-Channel Pipettes."
+                    )
+            if style == NozzleLayout.PARTIAL_COLUMN:
+                if self.channels == 1 or self.channels == 96:
+                    raise ValueError(
+                        "Partial Column configuraiton is only supported on 8-Channel Pipettes."
+                    )
 
-        front_right_resolved = front_right
-        back_left_resolved = back_left
-        if style == NozzleLayout.PARTIAL_COLUMN:
-            if end is None:
-                raise ValueError(
-                    "Parameter 'end' is required for Partial Column Nozzle Configuration Layout."
-                )
+                if end is None:
+                    raise ValueError(
+                        "Parameter 'end' is required for Partial Column Nozzle Configuration Layout."
+                    )
+                if start[0] in end:
+                    raise ValueError(
+                        "When configuring in Partial Column the 'start' and 'end' parameters cannot be in the same row."
+                    )
+                # Determine if 'end' will be configured as front_right or back_left
+                if start == "H1" or start == "H12":
+                    if "A" in end:
+                        raise ValueError(
+                            f"When configuring in Partial Column with 'start'={start} the 'end' parameter cannot be in row A."
+                        )
+                    back_left_resolved = end
+                elif start == "A1" or start == "A12":
+                    if "H" in end:
+                        raise ValueError(
+                            f"When configuring in Partial Column with 'start'={start} the 'end' parameter cannot be in row H."
+                        )
+                    front_right_resolved = end
 
-            # Determine if 'end' will be configured as front_right or back_left
-            if start == "H1" or start == "H12":
-                back_left_resolved = end
-            elif start == "A1" or start == "A12":
-                front_right_resolved = end
+            if style == NozzleLayout.QUADRANT:
+                if front_right is None and back_left is None:
+                    raise ValueError(
+                        "Cannot configure a QUADRANT layout without a front right or back left nozzle."
+                    )
+            elif not (front_right is None and back_left is None):
+                raise ValueError(
+                    f"Parameters 'front_right' and 'back_left' cannot be used with {style.value} Nozzle Configuration Layout."
+                )
 
         self._core.configure_nozzle_layout(
             style,
