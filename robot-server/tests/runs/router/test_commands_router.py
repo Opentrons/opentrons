@@ -149,12 +149,14 @@ async def test_create_command_with_failed_command_raises(
     command_create = pe_commands.HomeCreate(params=pe_commands.HomeParams())
 
     decoy.when(
-        mock_run_orchestrator_store.add_command_and_wait_for_interval(
+        await mock_run_orchestrator_store.add_command_and_wait_for_interval(
             pe_commands.HomeCreate(
                 params=pe_commands.HomeParams(),
                 intent=pe_commands.CommandIntent.SETUP,
             ),
             failed_command_id="123",
+            wait_until_complete=False,
+            timeout=None,
         )
     ).then_raise(pe_errors.CommandNotAllowedError())
 
@@ -162,8 +164,6 @@ async def test_create_command_with_failed_command_raises(
         await create_run_command(
             run_id="run-id",
             request_body=RequestModelWithCommandCreate(data=command_create),
-            waitUntilComplete=False,
-            timeout=42,
             run_orchestrator_store=mock_run_orchestrator_store,
             failedCommandId="123",
             check_estop=True,
@@ -227,8 +227,11 @@ async def test_add_conflicting_setup_command(
     )
 
     decoy.when(
-        mock_run_orchestrator_store.add_command_and_wait_for_interval(
-            request=command_request, failed_command_id=None
+        await mock_run_orchestrator_store.add_command_and_wait_for_interval(
+            request=command_request,
+            failed_command_id=None,
+            wait_until_complete=False,
+            timeout=None,
         )
     ).then_raise(pe_errors.SetupCommandNotAllowedError("oh no"))
 
@@ -236,7 +239,6 @@ async def test_add_conflicting_setup_command(
         await create_run_command(
             run_id="run-id",
             request_body=RequestModelWithCommandCreate(data=command_request),
-            waitUntilComplete=False,
             run_orchestrator_store=mock_run_orchestrator_store,
             failedCommandId=None,
             check_estop=True,
@@ -260,8 +262,11 @@ async def test_add_command_to_stopped_engine(
     )
 
     decoy.when(
-        mock_run_orchestrator_store.add_command_and_wait_for_interval(
-            request=command_request, failed_command_id=None
+        await mock_run_orchestrator_store.add_command_and_wait_for_interval(
+            request=command_request,
+            failed_command_id=None,
+            wait_until_complete=False,
+            timeout=None,
         )
     ).then_raise(pe_errors.RunStoppedError("oh no"))
 
@@ -269,7 +274,6 @@ async def test_add_command_to_stopped_engine(
         await create_run_command(
             run_id="run-id",
             request_body=RequestModelWithCommandCreate(data=command_request),
-            waitUntilComplete=False,
             run_orchestrator_store=mock_run_orchestrator_store,
             failedCommandId=None,
             check_estop=True,
