@@ -97,9 +97,13 @@ export function RunFailedModal({
                 errorType: errors[0].errorType,
                 errorCode: errors[0].errorCode,
               })
-            : `${errors.length} ${
-                runStatus === RUN_STATUS_SUCCEEDED ? t('warning') : t('error')
-              }${errors.length > 1 ? 's' : ''}`}
+            : runStatus === RUN_STATUS_SUCCEEDED
+            ? t(errors.length > 1 ? 'no_of_warnings' : 'no_of_warning', {
+                count: errors.length,
+              })
+            : t(errors.length > 1 ? 'no_of_errors' : 'no_of_error', {
+                count: errors.length,
+              })}
         </LegacyStyledText>
         <Flex
           width="100%"
