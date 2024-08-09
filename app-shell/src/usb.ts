@@ -18,7 +18,7 @@ import {
 } from './constants'
 
 import type { IpcMainInvokeEvent } from 'electron'
-import type { AxiosRequestConfig, isAxiosError } from 'axios'
+import { AxiosRequestConfig, isAxiosError } from 'axios'
 import type { IPCSafeFormData } from '@opentrons/app/src/redux/shell/types'
 import type { UsbDevice } from '@opentrons/app/src/redux/system-info/types'
 import type { PortInfo } from '@opentrons/usb-bridge/node-client'
