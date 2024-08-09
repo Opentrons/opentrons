@@ -279,6 +279,7 @@ async def test_create_protocol_run_bad_protocol_id(
             run_auto_deleter=mock_run_auto_deleter,
             quick_transfer_run_auto_deleter=mock_run_auto_deleter,
             check_estop=True,
+            notify_publishers=mock_notify_publishers,
         )
 
     assert exc_info.value.status_code == 404

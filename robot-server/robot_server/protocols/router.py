@@ -927,7 +927,7 @@ async def get_protocol_analysis_as_document(
 )
 async def get_protocol_data_files(
     protocolId: str,
-    protocol_store: ProtocolStore = Depends(get_protocol_store),
+    protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
 ) -> PydanticResponse[SimpleMultiBody[DataFile]]:
     """Get the list of all data files associated with a protocol.
 

@@ -168,7 +168,7 @@ async def create_run(  # noqa: C901
     deck_configuration_store: Annotated[
         DeckConfigurationStore, Depends(get_deck_configuration_store)
     ],
-    notify_publishers: Callable[[], None] = Depends(get_pe_notify_publishers),
+    notify_publishers: Annotated[Callable[[], None], Depends(get_pe_notify_publishers)],
     request_body: Optional[RequestModel[RunCreate]] = None,
 ) -> PydanticResponse[SimpleBody[Union[Run, BadRun]]]:
     """Create a new run.
@@ -462,20 +462,24 @@ async def put_error_recovery_policy(
     },
 )
 async def get_run_commands_error(
+    run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
     runId: str,
-    cursor: Optional[int] = Query(
-        None,
-        description=(
-            "The starting index of the desired first command error in the list."
-            " If unspecified, a cursor will be selected automatically"
-            " based on the last error added."
+    pageLength: Annotated[
+        int,
+        Query(
+            description="The maximum number of command errors in the list to return.",
         ),
-    ),
-    pageLength: int = Query(
-        _DEFAULT_COMMAND_ERROR_LIST_LENGTH,
-        description="The maximum number of command errors in the list to return.",
-    ),
-    run_data_manager: RunDataManager = Depends(get_run_data_manager),
+    ] = _DEFAULT_COMMAND_ERROR_LIST_LENGTH,
+    cursor: Annotated[
+        Optional[int],
+        Query(
+            description=(
+                "The starting index of the desired first command error in the list."
+                " If unspecified, a cursor will be selected automatically"
+                " based on the last error added."
+            ),
+        ),
+    ] = None,
 ) -> PydanticResponse[SimpleMultiBody[pe_errors.ErrorOccurrence]]:
     """Get a summary of a set of command errors in a run.
 
