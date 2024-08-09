@@ -18,7 +18,7 @@ import {
 } from './constants'
 
 import type { IpcMainInvokeEvent } from 'electron'
-import type { AxiosRequestConfig } from 'axios'
+import type { AxiosRequestConfig, isAxiosError } from 'axios'
 import type { IPCSafeFormData } from '@opentrons/app/src/redux/shell/types'
 import type { UsbDevice } from '@opentrons/app/src/redux/system-info/types'
 import type { PortInfo } from '@opentrons/usb-bridge/node-client'
@@ -114,12 +114,14 @@ async function usbListener(
 
   const usbHttpAgent = getSerialPortHttpAgent()
   try {
+    usbLog.silly(`${config.method} ${config.url} timeout=${config.timeout}`)
     const response = await axios.request({
       httpAgent: usbHttpAgent,
       ...config,
       data,
       headers: { ...config.headers, ...formHeaders },
     })
+    usbLog.silly(`${config.method} ${config.url} resolved ok`)
     return {
       error: false,
       data: response.data,
@@ -127,9 +129,12 @@ async function usbListener(
       statusText: response.statusText,
     }
   } catch (e) {
-    if (e instanceof Error) {
-      console.log(`axios request error ${e?.message ?? 'unknown'}`)
-    }
+    usbLog.info(
+      `${config.method} ${config.url} failed: ${
+        isAxiosError(e) ? e.toJSON() : JSON.stringify(e)
+      }`
+    )
+    throw e
   }
 }
 
