@@ -42,8 +42,7 @@ async def _main(
         try:
             distance = float(
                 input(
-                    f"How far would you like the z axis to travel? 
-                    The range is between 1 and {str(limit)}: "
+                    f"How far would you like the z axis to travel? The range is between 1 and {str(limit)}: "
                 )
             )
             if 0 < int(distance) <= limit:
