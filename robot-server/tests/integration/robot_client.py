@@ -341,6 +341,20 @@ class RobotClient:
         response.raise_for_status()
         return response
 
+    async def get_data_files(self) -> Response:
+        """GET /dataFiles."""
+        response = await self.httpx_client.get(url=f"{self.base_url}/dataFiles")
+        response.raise_for_status()
+        return response
+
+    async def delete_data_file(self, file_id: str) -> Response:
+        """DELETE /dataFiles/{file_id}."""
+        response = await self.httpx_client.delete(
+            f"{self.base_url}/dataFiles/{file_id}"
+        )
+        response.raise_for_status()
+        return response
+
     async def get_data_files_download(self, data_file_id: str) -> Response:
         """GET /dataFiles/{data_file_id}/download"""
         response = await self.httpx_client.get(
