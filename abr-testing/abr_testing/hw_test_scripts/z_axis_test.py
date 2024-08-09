@@ -30,7 +30,7 @@ async def _main(
     domain_url = "https://opentrons.atlassian.net"
 
     # make directory for tests. check if directory exists, make if doesn't.
-    BASE_DIRECTORY = "/userfs/data/testing_data/gripper_and_z_test/"
+    BASE_DIRECTORY = "/userfs/data/testing_data/z_axis_test/"
     if not os.path.exists(BASE_DIRECTORY):
         os.makedirs(BASE_DIRECTORY)
 
