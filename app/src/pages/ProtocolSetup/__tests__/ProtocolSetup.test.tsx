@@ -478,8 +478,58 @@ describe('ProtocolSetup', () => {
 
   it('should render a confirmation modal when heater-shaker is in a protocol and it is not shaking', () => {
     vi.mocked(useIsHeaterShakerInProtocol).mockReturnValue(true)
+    vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
+      data: { ...mockRobotSideAnalysis, liquids: mockLiquids },
+    } as any)
+    when(vi.mocked(getProtocolModulesInfo))
+      .calledWith(
+        { ...mockRobotSideAnalysis, liquids: mockLiquids },
+        flexDeckDefV5 as any
+      )
+      .thenReturn(mockProtocolModuleInfo)
+    when(vi.mocked(getUnmatchedModulesForProtocol))
+      .calledWith([], mockProtocolModuleInfo)
+      .thenReturn({ missingModuleIds: [], remainingAttachedModules: [] })
+    vi.mocked(getIncompleteInstrumentCount).mockReturnValue(0)
+    MockProtocolSetupLiquids.mockImplementation(
+      vi.fn(({ setIsConfirmed, setSetupScreen }) => {
+        setIsConfirmed(true)
+        setSetupScreen('prepare to run')
+        return <div>Mock ProtocolSetupLiquids</div>
+      })
+    )
+    MockProtocolSetupLabware.mockImplementation(
+      vi.fn(({ setIsConfirmed, setSetupScreen }) => {
+        setIsConfirmed(true)
+        setSetupScreen('prepare to run')
+        return <div>Mock ProtocolSetupLabware</div>
+      })
+    )
+    MockProtocolSetupOffsets.mockImplementation(
+      vi.fn(({ setIsConfirmed, setSetupScreen }) => {
+        setIsConfirmed(true)
+        setSetupScreen('prepare to run')
+        return <div>Mock ProtocolSetupOffsets</div>
+      })
+    )
+    render(`/runs/${RUN_ID}/setup/`)
+    fireEvent.click(screen.getByText('Labware Position Check'))
+    fireEvent.click(screen.getByText('Labware'))
+    fireEvent.click(screen.getByText('Liquids'))
+    fireEvent.click(screen.getByRole('button', { name: 'play' }))
+    expect(vi.mocked(ConfirmAttachedModal)).toHaveBeenCalled()
+  })
+  it('should go from skip steps to heater-shaker modal', () => {
+    vi.mocked(useIsHeaterShakerInProtocol).mockReturnValue(true)
+    MockConfirmSetupStepsCompleteModal.mockImplementation(
+      ({ onConfirmClick }) => {
+        onConfirmClick()
+        return <div>Mock ConfirmSetupStepsCompleteModal</div>
+      }
+    )
     render(`/runs/${RUN_ID}/setup/`)
     fireEvent.click(screen.getByRole('button', { name: 'play' }))
+    expect(MockConfirmSetupStepsCompleteModal).toHaveBeenCalled()
     expect(vi.mocked(ConfirmAttachedModal)).toHaveBeenCalled()
   })
   it('should render a loading skeleton while awaiting a response from the server', () => {
