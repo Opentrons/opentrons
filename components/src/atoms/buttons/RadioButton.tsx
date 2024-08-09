@@ -88,7 +88,14 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
   `
 
   return (
-    <Flex width="100%">
+    <Flex
+      css={css`
+        width: auto;
+        @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+          width: 100%;
+        }
+      `}
+    >
       <SettingButton
         checked={isSelected}
         disabled={disabled}
