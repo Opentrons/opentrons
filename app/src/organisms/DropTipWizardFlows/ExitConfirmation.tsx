@@ -32,7 +32,7 @@ export function ExitConfirmation(props: ExitConfirmationProps): JSX.Element {
   return (
     <SimpleWizardBody
       iconColor={COLORS.red50}
-      header={t('exit_before_completing')}
+      header={t('remove_any_attached_tips')}
       isSuccess={false}
       subHeader={
         <StyledText
@@ -41,7 +41,7 @@ export function ExitConfirmation(props: ExitConfirmationProps): JSX.Element {
         >
           <Trans
             t={t}
-            i18nKey="pipette_will_home"
+            i18nKey="liquid_damages_this_pipette"
             values={{
               mount,
             }}
