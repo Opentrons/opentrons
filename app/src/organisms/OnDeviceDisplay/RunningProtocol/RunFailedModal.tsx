@@ -20,7 +20,12 @@ import { SmallButton } from '../../../atoms/buttons'
 import { Modal } from '../../../molecules/Modal'
 
 import type { ModalHeaderBaseProps } from '../../../molecules/Modal/types'
-import type { RunCommandErrors, RunError } from '@opentrons/api-client'
+import type {
+  RunCommandErrors,
+  RunError,
+  RunStatus,
+} from '@opentrons/api-client'
+import { RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
 
 import type { RunCommandError } from '@opentrons/shared-data'
 
@@ -29,6 +34,7 @@ interface RunFailedModalProps {
   setShowRunFailedModal: (showRunFailedModal: boolean) => void
   errors?: RunError[]
   commandErrorList?: RunCommandErrors
+  runStatus: RunStatus
 }
 
 export function RunFailedModal({
@@ -36,6 +42,7 @@ export function RunFailedModal({
   setShowRunFailedModal,
   errors,
   commandErrorList,
+  runStatus,
 }: RunFailedModalProps): JSX.Element | null {
   const { t, i18n } = useTranslation(['run_details', 'shared', 'branded'])
   const navigate = useNavigate()
@@ -51,6 +58,8 @@ export function RunFailedModal({
     title:
       commandErrorList == null || commandErrorList?.data.length === 0
         ? t('run_failed_modal_title')
+        : runStatus === RUN_STATUS_SUCCEEDED
+        ? t('warning_details')
         : t('error_details'),
   }
 
