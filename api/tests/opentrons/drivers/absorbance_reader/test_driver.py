@@ -60,7 +60,7 @@ async def test_driver_connect_disconnect(
 
     mock_interface.byonoy_open_device.assert_called_once()
     assert await driver.is_connected()
-    assert driver._connection.verify_device_handle()
+    assert driver._connection._verify_device_handle()
     assert driver._connection._device_handle == 1
 
     mock_interface.byonoy_free_device.return_value = MockErrorCode.BYONOY_ERROR_NO_ERROR
@@ -76,9 +76,9 @@ async def test_driver_get_device_info(
 ) -> None:
 
     DEVICE_INFO = MagicMock(AbsorbanceHidInterface.DeviceInfo)
-    DEVICE_INFO.ref_no = "456"
-    DEVICE_INFO.sn = "123"
-    DEVICE_INFO.version = "1.0"
+    DEVICE_INFO.ref_no = ""
+    DEVICE_INFO.sn = "SN: BYOMAA00013 REF: DE MAA 001"
+    DEVICE_INFO.version = "Absorbance V1.0.2 2024-04-18"
 
     mock_interface.byonoy_get_device_information.return_value = (
         MockErrorCode.BYONOY_ERROR_NO_ERROR,
@@ -88,7 +88,7 @@ async def test_driver_get_device_info(
     info = await connected_driver.get_device_info()
 
     mock_interface.byonoy_get_device_information.assert_called_once()
-    assert info == {"serial_number": "123", "reference_number": "456", "version": "1.0"}
+    assert info == {"serial": "BYOMAA00013", "model": "ABS96", "version": "v1.0.2"}
 
 
 @pytest.mark.parametrize(

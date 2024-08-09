@@ -43,10 +43,10 @@ SlotStateNames = Literal[
 ]
 
 DeviceStateNames = Literal[
-    "BYONOY_DEVICE_STATE_UNKNOWN",
-    "BYONOY_DEVICE_STATE_OK",
-    "BYONOY_DEVICE_STATE_BROKEN_FW",
-    "BYONOY_DEVICE_STATE_ERROR",
+    "UNKNOWN",
+    "OK",
+    "BROKEN_FW",
+    "ERROR",
 ]
 
 
@@ -93,14 +93,25 @@ class AbsorbanceHidInterface(Protocol):
     def byonoy_free_device(self, device_handle: int) -> Tuple[ErrorCode, bool]:
         ...
 
+    def byonoy_device_open(self, device_handle: int) -> bool:
+        ...
+
     def byonoy_get_device_information(
         self, device_handle: int
     ) -> Tuple[ErrorCode, DeviceInfo]:
         ...
 
+    def byonoy_update_device(
+        self, device_handle: int, firmware_file_path: str
+    ) -> ErrorCode:
+        ...
+
     def byonoy_get_device_status(
         self, device_handle: int
     ) -> Tuple[ErrorCode, DeviceState]:
+        ...
+
+    def byonoy_get_device_uptime(self, device_handle: int) -> Tuple[ErrorCode, int]:
         ...
 
     def byonoy_get_device_slot_status(
