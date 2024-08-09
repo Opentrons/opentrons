@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Dict, List
+from typing import Dict, List, Tuple
 from opentrons.drivers.types import (
     AbsorbanceReaderLidStatus,
     AbsorbanceReaderDeviceState,
@@ -49,5 +49,16 @@ class AbstractAbsorbanceReaderDriver(ABC):
         ...
 
     @abstractmethod
+    async def get_uptime(self) -> int:
+        """Get device uptime"""
+        ...
+
+    @abstractmethod
     async def get_plate_presence(self) -> AbsorbanceReaderPlatePresence:
+        """Check if there is a plate in the reader."""
+        ...
+
+    @abstractmethod
+    async def update_firmware(self, firmware_file_path: str) -> Tuple[bool, str]:
+        """Updates the firmware on the device."""
         ...

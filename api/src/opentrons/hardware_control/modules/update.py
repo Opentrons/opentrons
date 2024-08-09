@@ -4,7 +4,8 @@ import os
 from pathlib import Path
 from glob import glob
 from typing import Any, AsyncGenerator, Dict, Tuple, Union
-from .types import UpdateError
+
+from .errors import UpdateError
 from .mod_abc import AbstractModule
 from opentrons.hardware_control.threaded_async_lock import ThreadedAsyncLock
 from contextlib import asynccontextmanager
@@ -33,6 +34,7 @@ async def update_firmware(
         kwargs: Dict[str, Any] = {
             "stdout": asyncio.subprocess.PIPE,
             "stderr": asyncio.subprocess.PIPE,
+            "module": module,
         }
         successful, res = await module.bootloader()(
             flash_port_or_dfu_serial, str(firmware_file), kwargs
@@ -139,7 +141,8 @@ async def upload_via_avrdude(
         "-b{}".format(BAUDRATE),
         "-D",
         "-Uflash:w:{}:i".format(firmware_file_path),
-        **kwargs,
+        stdout=kwargs["stdout"],
+        stderr=kwargs["stderr"],
     )
     await proc.wait()
 
@@ -191,8 +194,9 @@ async def upload_via_bossa(
         "--offset=0x2000",
         f"{firmware_file_path}",
     ]
-
-    proc = await asyncio.create_subprocess_exec(*bossa_args, **kwargs)
+    proc = await asyncio.create_subprocess_exec(
+        *bossa_args, stdout=kwargs["stdout"], stderr=kwargs["stderr"]
+    )
     stdout, stderr = await proc.communicate()
     res = stdout.decode()
     if "Verify successful" in res:
@@ -231,7 +235,9 @@ async def upload_via_dfu(
         f"-D{firmware_file_path}",
         "-R",
     ]
-    proc = await asyncio.create_subprocess_exec(*dfu_args, **kwargs)
+    proc = await asyncio.create_subprocess_exec(
+        *dfu_args, stdout=kwargs["stdout"], stderr=kwargs["stderr"]
+    )
     stdout, stderr = await proc.communicate()
     res = stdout.decode()
 
