@@ -201,14 +201,12 @@ def _sense_liquid_height(
     cfg: config.VolumetricConfig,
 ) -> float:
     hwapi = get_sync_hw_api(ctx)
-    # in the next two lines the magic numbers are:
-    # 2, the good start height above the well incase they're very full
-    # 0.5 height above well.bottom to be safe from collisions
+    # the "2" is a good start height above the well incase they're very full
     pipette.move_to(well.top(2))
     probed_z = hwapi.liquid_probe(OT3Mount.LEFT, well.depth + 2 - 0.5)
     if ctx.is_simulating():
         probed_z = well.top().point.z - 1
-    liq_height = probed_z - well.bottom().point.z
+    liq_height = well.depth - (well.top().point.z - probed_z)
     if abs(liq_height - well.depth) < 0.01:
         raise RuntimeError("unable to probe liquid, reach max travel distance")
     return liq_height

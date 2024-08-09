@@ -558,6 +558,7 @@ def _get_liquid_height(
     resources: TestResources, cfg: config.GravimetricConfig, well: Well
 ) -> float:
     resources.pipette.move_to(well.top(0), minimum_z_height=_minimum_z_height(cfg))
+    ui.print_info("Probing liquid height")
     if cfg.pipette_channels == 96:
         if not resources.ctx.is_simulating() and not cfg.same_tip:
             ui.alert_user_ready(
@@ -641,7 +642,10 @@ def run(  # noqa: C901
         ui.print_title("FIND LIQUID HEIGHT")
         well = labware_on_scale["A1"]
         ui.print_info("moving to scale")
-        _liquid_height = _multi_sense(resources, cfg, total_tips, well)
+        tip = _next_tip_for_channel(cfg, resources, 0, total_tips)
+        tip_location = tip.top()
+        _pick_up_tip(resources.ctx, resources.pipette, cfg, location=tip_location)
+        _liquid_height = _get_liquid_height(resources, cfg, well)
         height_below_top = well.depth - _liquid_height
         ui.print_info(f"liquid is {height_below_top} mm below top of vial")
         liquid_tracker.set_start_volume_from_liquid_height(
@@ -727,6 +731,11 @@ def run(  # noqa: C901
                             cfg,
                             location=next_tip_location,
                         )
+                        if not cfg.jog:
+                            _liquid_height = _get_liquid_height(resources, cfg, well)
+                            liquid_tracker.set_start_volume_from_liquid_height(
+                                well, _liquid_height, name="Water"
+                            )
                         resources.pipette._retract()  # retract to top of gantry
                     (
                         actual_aspirate,
@@ -784,13 +793,9 @@ def run(  # noqa: C901
                         and trial_count < cfg.trials
                         and (trial_count) % (cfg.trials / number_of_racks) == 0
                     ):
-                        if not cfg.jog:
-                            _liquid_height = _multi_sense(
-                                resources, cfg, total_tips, well
-                            )
-                            liquid_tracker.set_start_volume_from_liquid_height(
-                                well, _liquid_height, name="Water"
-                            )
+                        tip = _next_tip_for_channel(cfg, resources, 0, total_tips)
+                        tip_location = tip.top()
+                        _pick_up_tip(resources.ctx, resources.pipette, cfg, location=tip_location)
                         resources.pipette._retract()  # retract to top of gantry
                         (
                             average_aspirate_evaporation_ul,
