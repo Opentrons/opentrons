@@ -123,8 +123,24 @@ def data_files_store(decoy: Decoy) -> DataFilesStore:
 
 
 @pytest.fixture
+def data_files_directory(decoy: Decoy) -> Path:
+    """Get a mocked out data files directory.
+
+    We could use Path("/dev/null") for this but I worry something will accidentally
+    try to use it as an actual path and then we'll get confusing errors on Windows.
+    """
+    return decoy.mock(cls=Path)
+
+
+@pytest.fixture
 def protocol_auto_deleter(decoy: Decoy) -> ProtocolAutoDeleter:
-    """Get a mocked out AutoDeleter."""
+    """Get a mocked out ProtocolAutoDeleter."""
+    return decoy.mock(cls=ProtocolAutoDeleter)
+
+
+@pytest.fixture
+def quick_transfer_protocol_auto_deleter(decoy: Decoy) -> ProtocolAutoDeleter:
+    """Get a mocked out quick-transfer ProtocolAutoDeleter."""
     return decoy.mock(cls=ProtocolAutoDeleter)
 
 
@@ -135,7 +151,9 @@ async def test_get_protocols_no_protocols(
     """It should return an empty collection response with no protocols loaded."""
     decoy.when(protocol_store.get_all()).then_return([])
 
-    result = await get_protocols(protocol_store=protocol_store)
+    result = await get_protocols(
+        protocol_store=protocol_store, analysis_store=decoy.mock(cls=AnalysisStore)
+    )
 
     assert result.content.data == []
     assert result.content.meta == MultiBodyMeta(cursor=0, totalLength=0)
@@ -390,6 +408,7 @@ async def test_get_protocol_not_found(
         await get_protocol_by_id(
             "protocol-id",
             protocol_store=protocol_store,
+            analysis_store=decoy.mock(cls=AnalysisStore),
         )
 
     assert exc_info.value.status_code == 404
@@ -399,11 +418,14 @@ async def test_create_existing_protocol(
     decoy: Decoy,
     protocol_store: ProtocolStore,
     analysis_store: AnalysisStore,
+    data_files_store: DataFilesStore,
+    data_files_directory: Path,
     protocol_reader: ProtocolReader,
     file_reader_writer: FileReaderWriter,
     file_hasher: FileHasher,
     analyses_manager: AnalysesManager,
     protocol_auto_deleter: ProtocolAutoDeleter,
+    quick_transfer_protocol_auto_deleter: ProtocolAutoDeleter,
 ) -> None:
     """It should return the existing protocol info from database."""
     protocol_directory = Path("/dev/null")
@@ -480,11 +502,14 @@ async def test_create_existing_protocol(
         protocol_directory=protocol_directory,
         protocol_store=protocol_store,
         analysis_store=analysis_store,
+        data_files_store=data_files_store,
+        data_files_directory=data_files_directory,
         file_reader_writer=file_reader_writer,
         protocol_reader=protocol_reader,
         file_hasher=file_hasher,
         analyses_manager=analyses_manager,
         protocol_auto_deleter=protocol_auto_deleter,
+        quick_transfer_protocol_auto_deleter=quick_transfer_protocol_auto_deleter,
         robot_type="OT-2 Standard",
         protocol_id="protocol-id",
         analysis_id="analysis-id",
@@ -510,11 +535,14 @@ async def test_create_protocol(
     decoy: Decoy,
     protocol_store: ProtocolStore,
     analysis_store: AnalysisStore,
+    data_files_store: DataFilesStore,
+    data_files_directory: Path,
     protocol_reader: ProtocolReader,
     file_reader_writer: FileReaderWriter,
     file_hasher: FileHasher,
     analyses_manager: AnalysesManager,
     protocol_auto_deleter: ProtocolAutoDeleter,
+    quick_transfer_protocol_auto_deleter: ProtocolAutoDeleter,
 ) -> None:
     """It should store an uploaded protocol file."""
     protocol_directory = Path("/dev/null")
@@ -596,12 +624,14 @@ async def test_create_protocol(
         protocol_directory=protocol_directory,
         protocol_store=protocol_store,
         analysis_store=analysis_store,
+        data_files_store=data_files_store,
+        data_files_directory=data_files_directory,
         file_reader_writer=file_reader_writer,
         protocol_reader=protocol_reader,
         file_hasher=file_hasher,
         analyses_manager=analyses_manager,
         protocol_auto_deleter=protocol_auto_deleter,
-        quick_transfer_protocol_auto_deleter=protocol_auto_deleter,
+        quick_transfer_protocol_auto_deleter=quick_transfer_protocol_auto_deleter,
         robot_type="OT-2 Standard",
         protocol_id="protocol-id",
         analysis_id="analysis-id",
@@ -638,6 +668,7 @@ async def test_create_new_protocol_with_run_time_params(
     file_hasher: FileHasher,
     analyses_manager: AnalysesManager,
     protocol_auto_deleter: ProtocolAutoDeleter,
+    quick_transfer_protocol_auto_deleter: ProtocolAutoDeleter,
 ) -> None:
     """It should handle the run time parameter overrides correctly."""
     protocol_directory = Path("/dev/null")
@@ -745,6 +776,7 @@ async def test_create_new_protocol_with_run_time_params(
         file_hasher=file_hasher,
         analyses_manager=analyses_manager,
         protocol_auto_deleter=protocol_auto_deleter,
+        quick_transfer_protocol_auto_deleter=quick_transfer_protocol_auto_deleter,
         robot_type="OT-2 Standard",
         protocol_id="protocol-id",
         analysis_id="analysis-id",
@@ -762,11 +794,14 @@ async def test_create_existing_protocol_with_no_previous_analysis(
     decoy: Decoy,
     protocol_store: ProtocolStore,
     analysis_store: AnalysisStore,
+    data_files_store: DataFilesStore,
+    data_files_directory: Path,
     protocol_reader: ProtocolReader,
     file_reader_writer: FileReaderWriter,
     file_hasher: FileHasher,
     analyses_manager: AnalysesManager,
     protocol_auto_deleter: ProtocolAutoDeleter,
+    quick_transfer_protocol_auto_deleter: ProtocolAutoDeleter,
 ) -> None:
     """It should re-trigger analysis of the existing protocol resource."""
     protocol_directory = Path("/dev/null")
@@ -854,11 +889,14 @@ async def test_create_existing_protocol_with_no_previous_analysis(
         protocol_directory=protocol_directory,
         protocol_store=protocol_store,
         analysis_store=analysis_store,
+        data_files_store=data_files_store,
+        data_files_directory=data_files_directory,
         file_reader_writer=file_reader_writer,
         protocol_reader=protocol_reader,
         file_hasher=file_hasher,
         analyses_manager=analyses_manager,
         protocol_auto_deleter=protocol_auto_deleter,
+        quick_transfer_protocol_auto_deleter=quick_transfer_protocol_auto_deleter,
         robot_type="OT-2 Standard",
         protocol_id="protocol-id",
         analysis_id="analysis-id",
@@ -890,6 +928,7 @@ async def test_create_existing_protocol_with_different_run_time_params(
     file_hasher: FileHasher,
     analyses_manager: AnalysesManager,
     protocol_auto_deleter: ProtocolAutoDeleter,
+    quick_transfer_protocol_auto_deleter: ProtocolAutoDeleter,
 ) -> None:
     """It should re-trigger analysis of the existing protocol resource."""
     protocol_directory = Path("/dev/null")
@@ -1007,6 +1046,7 @@ async def test_create_existing_protocol_with_different_run_time_params(
         file_hasher=file_hasher,
         analyses_manager=analyses_manager,
         protocol_auto_deleter=protocol_auto_deleter,
+        quick_transfer_protocol_auto_deleter=quick_transfer_protocol_auto_deleter,
         robot_type="OT-2 Standard",
         protocol_id="protocol-id",
         analysis_id="analysis-id",
@@ -1032,11 +1072,14 @@ async def test_create_existing_protocol_with_same_run_time_params(
     decoy: Decoy,
     protocol_store: ProtocolStore,
     analysis_store: AnalysisStore,
+    data_files_store: DataFilesStore,
+    data_files_directory: Path,
     protocol_reader: ProtocolReader,
     file_reader_writer: FileReaderWriter,
     file_hasher: FileHasher,
     analyses_manager: AnalysesManager,
     protocol_auto_deleter: ProtocolAutoDeleter,
+    quick_transfer_protocol_auto_deleter: ProtocolAutoDeleter,
 ) -> None:
     """It should re-trigger analysis of the existing protocol resource."""
     protocol_directory = Path("/dev/null")
@@ -1126,11 +1169,14 @@ async def test_create_existing_protocol_with_same_run_time_params(
         protocol_directory=protocol_directory,
         protocol_store=protocol_store,
         analysis_store=analysis_store,
+        data_files_store=data_files_store,
+        data_files_directory=data_files_directory,
         file_reader_writer=file_reader_writer,
         protocol_reader=protocol_reader,
         file_hasher=file_hasher,
         analyses_manager=analyses_manager,
         protocol_auto_deleter=protocol_auto_deleter,
+        quick_transfer_protocol_auto_deleter=quick_transfer_protocol_auto_deleter,
         robot_type="OT-2 Standard",
         protocol_id="protocol-id",
         analysis_id="analysis-id",
@@ -1156,11 +1202,14 @@ async def test_create_existing_protocol_with_pending_analysis_raises(
     decoy: Decoy,
     protocol_store: ProtocolStore,
     analysis_store: AnalysisStore,
+    data_files_store: DataFilesStore,
+    data_files_directory: Path,
     protocol_reader: ProtocolReader,
     file_reader_writer: FileReaderWriter,
     file_hasher: FileHasher,
     analyses_manager: AnalysesManager,
     protocol_auto_deleter: ProtocolAutoDeleter,
+    quick_transfer_protocol_auto_deleter: ProtocolAutoDeleter,
 ) -> None:
     """It should raise an error if protocol has existing pending analysis."""
     protocol_directory = Path("/dev/null")
@@ -1252,11 +1301,14 @@ async def test_create_existing_protocol_with_pending_analysis_raises(
             protocol_directory=protocol_directory,
             protocol_store=protocol_store,
             analysis_store=analysis_store,
+            data_files_store=data_files_store,
+            data_files_directory=data_files_directory,
             file_reader_writer=file_reader_writer,
             protocol_reader=protocol_reader,
             file_hasher=file_hasher,
             analyses_manager=analyses_manager,
             protocol_auto_deleter=protocol_auto_deleter,
+            quick_transfer_protocol_auto_deleter=quick_transfer_protocol_auto_deleter,
             robot_type="OT-2 Standard",
             protocol_id="protocol-id",
             analysis_id="analysis-id",
@@ -1299,6 +1351,15 @@ async def test_create_protocol_not_readable(
             file_hasher=file_hasher,
             protocol_id="protocol-id",
             maximum_quick_transfer_protocols=20,
+            analysis_store=decoy.mock(cls=AnalysisStore),
+            analyses_manager=decoy.mock(cls=AnalysesManager),
+            protocol_auto_deleter=decoy.mock(cls=ProtocolAutoDeleter),
+            quick_transfer_protocol_auto_deleter=decoy.mock(cls=ProtocolAutoDeleter),
+            data_files_store=decoy.mock(cls=DataFilesStore),
+            data_files_directory=Path("/dev/null"),
+            robot_type="OT-2 Standard",
+            analysis_id="analysis-id",
+            created_at=datetime.now(),
         )
 
     assert exc_info.value.status_code == 422
@@ -1352,6 +1413,15 @@ async def test_create_protocol_different_robot_type(
             file_hasher=file_hasher,
             protocol_id="protocol-id",
             maximum_quick_transfer_protocols=20,
+            analysis_store=decoy.mock(cls=AnalysisStore),
+            analyses_manager=decoy.mock(cls=AnalysesManager),
+            protocol_auto_deleter=decoy.mock(cls=ProtocolAutoDeleter),
+            quick_transfer_protocol_auto_deleter=decoy.mock(cls=ProtocolAutoDeleter),
+            data_files_store=decoy.mock(cls=DataFilesStore),
+            data_files_directory=Path("/dev/null"),
+            robot_type="OT-3 Standard",
+            analysis_id="analysis-id",
+            created_at=datetime.now(),
         )
 
     assert exc_info.value.status_code == 422
@@ -1592,6 +1662,8 @@ async def test_create_protocol_analyses_with_same_rtp_values(
     decoy: Decoy,
     protocol_store: ProtocolStore,
     analysis_store: AnalysisStore,
+    data_files_store: DataFilesStore,
+    data_files_directory: Path,
     analyses_manager: AnalysesManager,
 ) -> None:
     """It should not start a new analysis for the new rtp values."""
@@ -1669,6 +1741,8 @@ async def test_create_protocol_analyses_with_same_rtp_values(
         ),
         protocol_store=protocol_store,
         analysis_store=analysis_store,
+        data_files_store=data_files_store,
+        data_files_directory=data_files_directory,
         analyses_manager=analyses_manager,
         analysis_id="analysis-id-2",
     )
@@ -1809,6 +1883,8 @@ async def test_update_protocol_analyses_with_forced_reanalysis(
     decoy: Decoy,
     protocol_store: ProtocolStore,
     analysis_store: AnalysisStore,
+    data_files_store: DataFilesStore,
+    data_files_directory: Path,
     analyses_manager: AnalysesManager,
 ) -> None:
     """It should start a new analysis for the protocol, regardless of rtp values."""
@@ -1868,6 +1944,8 @@ async def test_update_protocol_analyses_with_forced_reanalysis(
         request_body=RequestModel(data=AnalysisRequest(forceReAnalyze=True)),
         protocol_store=protocol_store,
         analysis_store=analysis_store,
+        data_files_store=data_files_store,
+        data_files_directory=data_files_directory,
         analyses_manager=analyses_manager,
         analysis_id="analysis-id-2",
     )
@@ -1882,11 +1960,14 @@ async def test_create_protocol_kind_quick_transfer(
     decoy: Decoy,
     protocol_store: ProtocolStore,
     analysis_store: AnalysisStore,
+    data_files_store: DataFilesStore,
+    data_files_directory: Path,
     protocol_reader: ProtocolReader,
     file_reader_writer: FileReaderWriter,
     file_hasher: FileHasher,
     analyses_manager: AnalysesManager,
     protocol_auto_deleter: ProtocolAutoDeleter,
+    quick_transfer_protocol_auto_deleter: ProtocolAutoDeleter,
 ) -> None:
     """It should store an uploaded protocol file marked as quick-transfer."""
     protocol_directory = Path("/dev/null")
@@ -1977,11 +2058,14 @@ async def test_create_protocol_kind_quick_transfer(
         protocol_directory=protocol_directory,
         protocol_store=protocol_store,
         analysis_store=analysis_store,
+        data_files_store=data_files_store,
+        data_files_directory=data_files_directory,
         file_reader_writer=file_reader_writer,
         protocol_reader=protocol_reader,
         file_hasher=file_hasher,
         analyses_manager=analyses_manager,
-        quick_transfer_protocol_auto_deleter=protocol_auto_deleter,
+        protocol_auto_deleter=protocol_auto_deleter,
+        quick_transfer_protocol_auto_deleter=quick_transfer_protocol_auto_deleter,
         robot_type="OT-3 Standard",
         protocol_kind=ProtocolKind.QUICK_TRANSFER,
         protocol_id="protocol-id",
@@ -1991,7 +2075,7 @@ async def test_create_protocol_kind_quick_transfer(
     )
 
     decoy.verify(
-        protocol_auto_deleter.make_room_for_new_protocol(),
+        quick_transfer_protocol_auto_deleter.make_room_for_new_protocol(),
         protocol_store.insert(protocol_resource),
     )
 
@@ -2013,10 +2097,13 @@ async def test_create_protocol_maximum_quick_transfer_protocols_exceeded(
     decoy: Decoy,
     protocol_store: ProtocolStore,
     analysis_store: AnalysisStore,
+    data_files_store: DataFilesStore,
+    data_files_directory: Path,
     protocol_reader: ProtocolReader,
     file_reader_writer: FileReaderWriter,
     file_hasher: FileHasher,
     protocol_auto_deleter: ProtocolAutoDeleter,
+    quick_transfer_protocol_auto_deleter: ProtocolAutoDeleter,
 ) -> None:
     """It should throw a 409 error if the quick transfer protocols maximum is exceeded."""
     protocol_directory = Path("/dev/null")
@@ -2056,10 +2143,14 @@ async def test_create_protocol_maximum_quick_transfer_protocols_exceeded(
             protocol_directory=protocol_directory,
             protocol_store=protocol_store,
             analysis_store=analysis_store,
+            data_files_store=data_files_store,
+            data_files_directory=data_files_directory,
+            analyses_manager=decoy.mock(cls=AnalysesManager),
             file_reader_writer=file_reader_writer,
             protocol_reader=protocol_reader,
             file_hasher=file_hasher,
             protocol_auto_deleter=protocol_auto_deleter,
+            quick_transfer_protocol_auto_deleter=quick_transfer_protocol_auto_deleter,
             robot_type="OT-3 Standard",
             protocol_id="protocol-id",
             analysis_id="analysis-id",

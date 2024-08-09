@@ -4,7 +4,7 @@
 import asyncio
 import logging
 from pathlib import Path
-from typing import Awaitable, Callable, Iterable, Optional
+from typing import Annotated, Awaitable, Callable, Iterable, Optional
 from typing_extensions import Literal
 
 from sqlalchemy.engine import Engine as SQLEngine
@@ -173,7 +173,7 @@ async def clean_up_persistence(app_state: AppState) -> None:
 
 
 async def get_sql_engine(
-    app_state: AppState = Depends(get_app_state),
+    app_state: Annotated[AppState, Depends(get_app_state)],
 ) -> SQLEngine:
     """Return the server's singleton SQLAlchemy Engine for accessing the database.
 
@@ -207,7 +207,7 @@ async def get_sql_engine(
 
 
 async def get_active_persistence_directory(
-    app_state: AppState = Depends(get_app_state),
+    app_state: Annotated[AppState, Depends(get_app_state)],
 ) -> Path:
     """Return the path to the server's persistence directory.
 
@@ -250,7 +250,7 @@ async def get_active_persistence_directory(
 
 
 async def get_active_persistence_directory_failsafe(
-    app_state: AppState = Depends(get_app_state),
+    app_state: Annotated[AppState, Depends(get_app_state)],
 ) -> Optional[Path]:
     """Return the path to the server's persistence directory.
 
@@ -272,7 +272,7 @@ async def get_active_persistence_directory_failsafe(
 
 
 async def _get_persistence_directory_root(
-    app_state: AppState = Depends(get_app_state),
+    app_state: Annotated[AppState, Depends(get_app_state)],
 ) -> Path:
     """Return the root persistence directory.
 
@@ -287,7 +287,7 @@ async def _get_persistence_directory_root(
 
 async def get_persistence_resetter(
     # We want to reset everything, not only the *active* persistence directory.
-    directory_to_reset: Path = Depends(_get_persistence_directory_root),
+    directory_to_reset: Annotated[Path, Depends(_get_persistence_directory_root)],
 ) -> PersistenceResetter:
     """Get a `PersistenceResetter` to reset the robot-server's stored data."""
     return PersistenceResetter(directory_to_reset)

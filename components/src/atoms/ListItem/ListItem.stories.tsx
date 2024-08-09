@@ -1,16 +1,16 @@
 import * as React from 'react'
-import {
-  DIRECTION_COLUMN,
-  Flex,
-  SPACING,
-  LegacyStyledText,
-  VIEWPORT,
-} from '@opentrons/components'
+
+import { SPACING, VIEWPORT } from '../../ui-style-constants'
+import { DIRECTION_COLUMN } from '../../styles'
+import { Flex } from '../../primitives'
+import { LegacyStyledText } from '../StyledText'
+import { ListItemDescriptor } from './ListItemChildren/ListItemDescriptor'
 import { ListItem as ListItemComponent } from '.'
+
 import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<typeof ListItemComponent> = {
-  title: 'ODD/Atoms/ListItem',
+  title: 'Library/Atoms/ListItem',
   component: ListItemComponent,
   argTypes: {
     type: {
@@ -42,6 +42,32 @@ export const ListItem: Story = {
           Slot Component: Replace me using the component panel.
         </LegacyStyledText>
       </Flex>
+    ),
+  },
+}
+
+export const ListItemDescriptorDefault: Story = {
+  args: {
+    type: 'noActive',
+    children: (
+      <ListItemDescriptor
+        type="default"
+        content={<div>mock content</div>}
+        description={<div>mock description</div>}
+      />
+    ),
+  },
+}
+
+export const ListItemDescriptorMini: Story = {
+  args: {
+    type: 'noActive',
+    children: (
+      <ListItemDescriptor
+        type="mini"
+        content={<div>mock content</div>}
+        description={<div>mock description</div>}
+      />
     ),
   },
 }

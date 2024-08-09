@@ -85,7 +85,10 @@ async def test_get_default_orchestrator(
 
 
 async def test_raises_conflict(
-    decoy: Decoy, run_orchestrator_store: RunOrchestratorStore
+    decoy: Decoy,
+    run_orchestrator_store: RunOrchestratorStore,
+    hardware_api: HardwareControlAPI,
+    module_identifier: ModuleIdentifier,
 ) -> None:
     """It should raise a 409 conflict if the default engine is not availble."""
     decoy.when(await run_orchestrator_store.get_default_orchestrator()).then_raise(
@@ -93,7 +96,11 @@ async def test_raises_conflict(
     )
 
     with pytest.raises(ApiError) as exc_info:
-        await get_default_orchestrator(run_orchestrator_store=run_orchestrator_store)
+        await get_default_orchestrator(
+            run_orchestrator_store=run_orchestrator_store,
+            hardware_api=hardware_api,
+            module_identifier=module_identifier,
+        )
 
     assert exc_info.value.status_code == 409
     assert exc_info.value.content["errors"][0]["id"] == "RunActive"

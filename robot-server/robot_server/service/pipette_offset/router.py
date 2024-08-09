@@ -1,6 +1,6 @@
 from starlette import status
 from fastapi import APIRouter, Depends
-from typing import Optional
+from typing import Annotated, Optional
 
 from opentrons import types as ot_types
 from opentrons.calibration_storage.ot2 import pipette_offset, models
@@ -48,11 +48,10 @@ def _format_calibration(
     response_model=pip_models.MultipleCalibrationsResponse,
 )
 async def get_all_pipette_offset_calibrations(
+    _: Annotated[API, Depends(get_ot2_hardware)],
     pipette_id: Optional[str] = None,
     mount: Optional[pip_models.MountType] = None,
-    _: API = Depends(get_ot2_hardware),
 ) -> pip_models.MultipleCalibrationsResponse:
-
     all_calibrations = pipette_offset.get_all_pipette_offset_calibrations()
     if not all_calibrations:
         return pip_models.MultipleCalibrationsResponse(
@@ -80,7 +79,9 @@ async def get_all_pipette_offset_calibrations(
     responses={status.HTTP_404_NOT_FOUND: {"model": ErrorBody}},
 )
 async def delete_specific_pipette_offset_calibration(
-    pipette_id: str, mount: pip_models.MountType, _: API = Depends(get_ot2_hardware)
+    pipette_id: str,
+    mount: pip_models.MountType,
+    _: Annotated[API, Depends(get_ot2_hardware)],
 ):
     try:
         pipette_offset.delete_pipette_offset_file(

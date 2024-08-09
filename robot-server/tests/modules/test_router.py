@@ -67,6 +67,8 @@ async def test_get_modules_empty(
     result = await get_attached_modules(
         requested_version=_HTTP_API_VERSION,
         hardware=hardware_api,
+        module_identifier=decoy.mock(cls=ModuleIdentifier),
+        module_data_mapper=decoy.mock(cls=ModuleDataMapper),
     )
 
     assert result.content.data == []

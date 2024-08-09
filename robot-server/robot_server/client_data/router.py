@@ -89,7 +89,7 @@ async def put_client_data(  # noqa: D103
 )
 async def get_client_data(  # noqa: D103
     key: Key,
-    store: ClientDataStore = fastapi.Depends(get_client_data_store),
+    store: Annotated[ClientDataStore, fastapi.Depends(get_client_data_store)],
 ) -> SimpleBody[ClientData]:
     try:
         return SimpleBody.construct(data=store.get(key))

@@ -1,16 +1,16 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  Flex,
-  LegacyStyledText,
-  SPACING,
-  TYPOGRAPHY,
-  DIRECTION_COLUMN,
-  JUSTIFY_SPACE_BETWEEN,
   COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
+  ListItem,
+  SPACING,
   TEXT_ALIGN_RIGHT,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { ListItem } from '../../atoms/ListItem'
 import { CONSOLIDATE, DISTRIBUTE } from './constants'
 
 import type { QuickTransferSummaryState } from './types'

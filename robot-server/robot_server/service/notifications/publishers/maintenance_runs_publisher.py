@@ -1,3 +1,5 @@
+from typing import Annotated
+
 from fastapi import Depends
 
 from server_utils.fastapi_utils.app_state import (
@@ -31,8 +33,10 @@ _maintenance_runs_publisher_accessor: AppStateAccessor[
 
 
 async def get_maintenance_runs_publisher(
-    app_state: AppState = Depends(get_app_state),
-    notification_client: NotificationClient = Depends(get_notification_client),
+    app_state: Annotated[AppState, Depends(get_app_state)],
+    notification_client: Annotated[
+        NotificationClient, Depends(get_notification_client)
+    ],
 ) -> MaintenanceRunsPublisher:
     """Get a singleton MaintenanceRunsPublisher to publish maintenance run topics."""
     maintenance_runs_publisher = _maintenance_runs_publisher_accessor.get_from(

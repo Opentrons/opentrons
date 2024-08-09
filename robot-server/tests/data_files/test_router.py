@@ -106,6 +106,7 @@ async def test_upload_existing_data_file(
     data_files_store: DataFilesStore,
     file_reader_writer: FileReaderWriter,
     file_hasher: FileHasher,
+    file_auto_deleter: DataFileAutoDeleter,
 ) -> None:
     """It should return the existing file info."""
     data_files_directory = Path("/dev/null")
@@ -135,6 +136,7 @@ async def test_upload_existing_data_file(
         data_files_store=data_files_store,
         file_reader_writer=file_reader_writer,
         file_hasher=file_hasher,
+        data_file_auto_deleter=file_auto_deleter,
         file_id="data-file-id",
         created_at=datetime(year=2024, month=6, day=18),
     )
@@ -201,6 +203,7 @@ async def test_upload_non_existent_file_path(
     data_files_store: DataFilesStore,
     file_reader_writer: FileReaderWriter,
     file_hasher: FileHasher,
+    file_auto_deleter: DataFileAutoDeleter,
 ) -> None:
     """It should store the data file from path to persistent storage & update the database."""
     data_files_directory = Path("/dev/null")
@@ -216,6 +219,7 @@ async def test_upload_non_existent_file_path(
             data_files_store=data_files_store,
             file_reader_writer=file_reader_writer,
             file_hasher=file_hasher,
+            data_file_auto_deleter=file_auto_deleter,
             file_id="data-file-id",
             created_at=datetime(year=2024, month=6, day=18),
         )
@@ -228,6 +232,7 @@ async def test_upload_non_csv_file(
     data_files_store: DataFilesStore,
     file_reader_writer: FileReaderWriter,
     file_hasher: FileHasher,
+    file_auto_deleter: DataFileAutoDeleter,
 ) -> None:
     """It should store the data file from path to persistent storage & update the database."""
     data_files_directory = Path("/dev/null")
@@ -245,6 +250,7 @@ async def test_upload_non_csv_file(
             data_files_store=data_files_store,
             file_reader_writer=file_reader_writer,
             file_hasher=file_hasher,
+            data_file_auto_deleter=file_auto_deleter,
             file_id="data-file-id",
             created_at=datetime(year=2024, month=6, day=18),
         )

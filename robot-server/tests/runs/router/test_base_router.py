@@ -65,6 +65,16 @@ def mock_data_files_store(decoy: Decoy) -> DataFilesStore:
 
 
 @pytest.fixture
+def mock_data_files_directory(decoy: Decoy) -> Path:
+    """Get a mocked out data files directory.
+
+    We could use Path("/dev/null") for this but I worry something will accidentally
+    try to use it as an actual path and then we'll get confusing errors on Windows.
+    """
+    return decoy.mock(cls=Path)
+
+
+@pytest.fixture
 def labware_offset_create() -> LabwareOffsetCreate:
     """Get a labware offset create request value object."""
     return pe_types.LabwareOffsetCreate(
@@ -80,6 +90,7 @@ async def test_create_run(
     mock_run_auto_deleter: RunAutoDeleter,
     labware_offset_create: pe_types.LabwareOffsetCreate,
     mock_deck_configuration_store: DeckConfigurationStore,
+    mock_protocol_store: ProtocolStore,
     mock_data_files_store: DataFilesStore,
 ) -> None:
     """It should be able to create a basic run."""
@@ -127,8 +138,11 @@ async def test_create_run(
         run_id=run_id,
         created_at=run_created_at,
         run_auto_deleter=mock_run_auto_deleter,
+        quick_transfer_run_auto_deleter=mock_run_auto_deleter,
         deck_configuration_store=mock_deck_configuration_store,
         notify_publishers=mock_notify_publishers,
+        protocol_store=mock_protocol_store,
+        check_estop=True,
     )
 
     assert result.content.data == expected_response
@@ -224,8 +238,10 @@ async def test_create_protocol_run(
         run_id=run_id,
         created_at=run_created_at,
         run_auto_deleter=mock_run_auto_deleter,
+        quick_transfer_run_auto_deleter=mock_run_auto_deleter,
         deck_configuration_store=mock_deck_configuration_store,
         notify_publishers=mock_notify_publishers,
+        check_estop=True,
     )
 
     assert result.content.data == expected_response
@@ -238,6 +254,10 @@ async def test_create_protocol_run_bad_protocol_id(
     decoy: Decoy,
     mock_protocol_store: ProtocolStore,
     mock_deck_configuration_store: DeckConfigurationStore,
+    mock_run_data_manager: RunDataManager,
+    mock_run_auto_deleter: RunAutoDeleter,
+    mock_data_files_store: DataFilesStore,
+    mock_data_files_directory: Path,
 ) -> None:
     """It should 404 if a protocol for a run does not exist."""
     error = ProtocolNotFoundError("protocol-id")
@@ -251,6 +271,15 @@ async def test_create_protocol_run_bad_protocol_id(
             request_body=RequestModel(data=RunCreate(protocolId="protocol-id")),
             protocol_store=mock_protocol_store,
             deck_configuration_store=mock_deck_configuration_store,
+            run_data_manager=mock_run_data_manager,
+            data_files_store=mock_data_files_store,
+            data_files_directory=mock_data_files_directory,
+            run_id="run-id",
+            created_at=datetime.now(),
+            run_auto_deleter=mock_run_auto_deleter,
+            quick_transfer_run_auto_deleter=mock_run_auto_deleter,
+            check_estop=True,
+            notify_publishers=mock_notify_publishers,
         )
 
     assert exc_info.value.status_code == 404
@@ -262,6 +291,9 @@ async def test_create_run_conflict(
     mock_run_data_manager: RunDataManager,
     mock_run_auto_deleter: RunAutoDeleter,
     mock_deck_configuration_store: DeckConfigurationStore,
+    mock_protocol_store: ProtocolStore,
+    mock_data_files_store: DataFilesStore,
+    mock_data_files_directory: Path,
 ) -> None:
     """It should respond with a conflict error if multiple engines are created."""
     created_at = datetime(year=2021, month=1, day=1)
@@ -287,10 +319,15 @@ async def test_create_run_conflict(
             run_id="run-id",
             created_at=created_at,
             request_body=None,
+            protocol_store=mock_protocol_store,
             run_data_manager=mock_run_data_manager,
             run_auto_deleter=mock_run_auto_deleter,
+            quick_transfer_run_auto_deleter=mock_run_auto_deleter,
             deck_configuration_store=mock_deck_configuration_store,
+            data_files_store=mock_data_files_store,
+            data_files_directory=mock_data_files_directory,
             notify_publishers=mock_notify_publishers,
+            check_estop=True,
         )
 
     assert exc_info.value.status_code == 409
