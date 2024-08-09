@@ -521,13 +521,13 @@ function PrepareToRun({
       makeSnackbar(t('shared:close_robot_door') as string)
     } else {
       if (isReadyToRun) {
-        if (runStatus === RUN_STATUS_IDLE && isHeaterShakerInProtocol) {
-          confirmAttachment()
-        } else if (
+        if (
           runStatus === RUN_STATUS_IDLE &&
           !(labwareConfirmed && offsetsConfirmed && liquidsConfirmed)
         ) {
           confirmStepsComplete()
+        } else if (runStatus === RUN_STATUS_IDLE && isHeaterShakerInProtocol) {
+          confirmAttachment()
         } else {
           play()
           trackProtocolRunEvent({
@@ -957,6 +957,8 @@ export function ProtocolSetup(): JSX.Element {
     handleProceedToRunClick,
     !(labwareConfirmed && liquidsConfirmed && offsetsConfirmed)
   )
+  const runStatus = useRunStatus(runId)
+  const isHeaterShakerInProtocol = useIsHeaterShakerInProtocol()
 
   // orchestrate setup subpages/components
   const [setupScreen, setSetupScreen] = React.useState<SetupScreens>(
@@ -1027,7 +1029,6 @@ export function ProtocolSetup(): JSX.Element {
       <ViewOnlyParameters runId={runId} setSetupScreen={setSetupScreen} />
     ),
   }
-
   return (
     <>
       {showAnalysisFailedModal &&
@@ -1043,7 +1044,11 @@ export function ProtocolSetup(): JSX.Element {
         <ConfirmSetupStepsCompleteModal
           onCloseClick={cancelExitMissingStepsConfirmation}
           missingSteps={missingSteps}
-          onConfirmClick={handleProceedToRunClick}
+          onConfirmClick={() => {
+            runStatus === RUN_STATUS_IDLE && isHeaterShakerInProtocol
+              ? confirmAttachment()
+              : handleProceedToRunClick()
+          }}
         />
       ) : null}
       {showHSConfirmationModal ? (
