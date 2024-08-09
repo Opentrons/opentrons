@@ -130,9 +130,9 @@ async function usbListener(
     }
   } catch (e) {
     usbLog.info(
-      `${config.method} ${config.url} failed: ${
-        axios.isAxiosError(e) ? e.toJSON() : JSON.stringify(e)
-      }`
+      `${config.method} ${config.url} failed: ${JSON.stringify(
+        axios.isAxiosError(e) ? e.toJSON() : e
+      )}`
     )
     throw e
   }
