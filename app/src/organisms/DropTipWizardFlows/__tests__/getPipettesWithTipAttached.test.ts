@@ -46,7 +46,7 @@ const mockCommands = {
     createMockCommand(LOAD_PIPETTE, 'load-left', LEFT_PIPETTE_ID),
     createMockCommand(LOAD_PIPETTE, 'load-right', RIGHT_PIPETTE_ID),
     createMockCommand(PICK_UP_TIP, 'pickup-left', LEFT_PIPETTE_ID),
-    createMockCommand(DROP_TIP, 'drop-left', LEFT_PIPETTE_ID, 'failed'),
+    createMockCommand(DROP_TIP, 'drop-left', LEFT_PIPETTE_ID, 'succeeded'),
   ],
   meta: { cursor: 0, totalLength: 4 },
 }
@@ -89,6 +89,20 @@ describe('getPipettesWithTipAttached', () => {
   })
 
   it('returns an empty array when no tips are attached according to protocol', async () => {
+    const mockCommandsWithoutAttachedTips = {
+      ...mockCommands,
+      data: [
+        createMockCommand(LOAD_PIPETTE, 'load-left', LEFT_PIPETTE_ID),
+        createMockCommand(LOAD_PIPETTE, 'load-right', RIGHT_PIPETTE_ID),
+        createMockCommand(PICK_UP_TIP, 'pickup-left', LEFT_PIPETTE_ID),
+        createMockCommand(DROP_TIP, 'drop-left', LEFT_PIPETTE_ID, 'succeeded'),
+      ],
+    }
+
+    vi.mocked(getCommands).mockResolvedValue({
+      data: mockCommandsWithoutAttachedTips,
+    } as any)
+
     const result = await getPipettesWithTipAttached(DEFAULT_PARAMS)
     expect(result).toEqual([])
   })

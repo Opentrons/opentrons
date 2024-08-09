@@ -102,7 +102,8 @@ function checkPipettesForAttachedTips(
       isTipExchangeCommand &&
       pipetteUsedInCommandWithUnknownTipStatus != null
     ) {
-      const tipPossiblyAttached = commandType === 'pickUpTip'
+      const tipPossiblyAttached =
+        commands[i].status !== 'succeeded' || commandType === 'pickUpTip'
 
       if (tipPossiblyAttached) {
         mountsWithTipAttached.push(
