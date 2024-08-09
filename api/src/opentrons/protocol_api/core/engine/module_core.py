@@ -553,8 +553,6 @@ class AbsorbanceReaderCore(ModuleCore, AbstractAbsorbanceReaderCore):
         self._engine_client.execute_command(
             cmd.absorbance_reader.CloseLidParams(
                 moduleId=self.module_id,
-                pickUpOffset=LabwareOffsetVector(x=14, y=0, z=0),
-                dropOffset=LabwareOffsetVector(x=14, y=0, z=0),
             )
         )
 
@@ -563,14 +561,5 @@ class AbsorbanceReaderCore(ModuleCore, AbstractAbsorbanceReaderCore):
         self._engine_client.execute_command(
             cmd.absorbance_reader.OpenLidParams(
                 moduleId=self.module_id,
-                pickUpOffset=LabwareOffsetVector(x=14, y=0, z=0),
-                dropOffset=LabwareOffsetVector(x=14, y=0, z=0),
             )
         )
-
-    def is_lid_on(self) -> bool:
-        """Returns True if the Absorbance Reader's lid is currently on the Reader slot."""
-        abs_state = self._engine_client.state.modules.get_absorbance_reader_substate(
-            self.module_id
-        )
-        return abs_state.is_lid_on

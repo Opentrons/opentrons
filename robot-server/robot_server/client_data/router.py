@@ -13,6 +13,10 @@ from robot_server.client_data.store import (
 from robot_server.errors.error_responses import ErrorBody, ErrorDetails
 from robot_server.service.json_api.request import RequestModel
 from robot_server.service.json_api.response import SimpleBody, SimpleEmptyBody
+from robot_server.service.notifications.publishers.client_data_publisher import (
+    ClientDataPublisher,
+    get_client_data_publisher,
+)
 
 router = fastapi.APIRouter()
 
@@ -62,9 +66,13 @@ class ClientDataKeyDoesNotExist(ErrorDetails):
 async def put_client_data(  # noqa: D103
     key: Key,
     request_body: RequestModel[ClientData],
-    store: ClientDataStore = fastapi.Depends(get_client_data_store),
+    store: Annotated[ClientDataStore, fastapi.Depends(get_client_data_store)],
+    client_data_publisher: Annotated[
+        ClientDataPublisher, fastapi.Depends(get_client_data_publisher)
+    ],
 ) -> SimpleBody[ClientData]:
     store.put(key, request_body.data)
+    await client_data_publisher.publish_client_data(key)
     return SimpleBody.construct(data=store.get(key))
 
 
@@ -81,7 +89,7 @@ async def put_client_data(  # noqa: D103
 )
 async def get_client_data(  # noqa: D103
     key: Key,
-    store: ClientDataStore = fastapi.Depends(get_client_data_store),
+    store: Annotated[ClientDataStore, fastapi.Depends(get_client_data_store)],
 ) -> SimpleBody[ClientData]:
     try:
         return SimpleBody.construct(data=store.get(key))
@@ -104,7 +112,10 @@ async def get_client_data(  # noqa: D103
 )
 async def delete_client_data(  # noqa: D103
     key: Key,
-    store: ClientDataStore = fastapi.Depends(get_client_data_store),
+    store: Annotated[ClientDataStore, fastapi.Depends(get_client_data_store)],
+    client_data_publisher: Annotated[
+        ClientDataPublisher, fastapi.Depends(get_client_data_publisher)
+    ],
 ) -> SimpleEmptyBody:
     try:
         store.delete(key)
@@ -113,6 +124,7 @@ async def delete_client_data(  # noqa: D103
             fastapi.status.HTTP_404_NOT_FOUND
         ) from e
     else:
+        await client_data_publisher.publish_client_data(key)
         return SimpleEmptyBody.construct()
 
 
@@ -122,7 +134,13 @@ async def delete_client_data(  # noqa: D103
     description="Delete all client-defined data. See `PUT /clientData` for background.",
 )
 async def delete_all_client_data(  # noqa: D103
-    store: ClientDataStore = fastapi.Depends(get_client_data_store),
+    store: Annotated[ClientDataStore, fastapi.Depends(get_client_data_store)],
+    client_data_publisher: Annotated[
+        ClientDataPublisher, fastapi.Depends(get_client_data_publisher)
+    ],
 ) -> SimpleEmptyBody:
+    keys_that_will_be_deleted = store.get_keys()
     store.delete_all()
+    for deleted_key in keys_that_will_be_deleted:
+        await client_data_publisher.publish_client_data(deleted_key)
     return SimpleEmptyBody.construct()

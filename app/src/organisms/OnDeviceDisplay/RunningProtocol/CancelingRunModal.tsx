@@ -13,13 +13,13 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { Modal } from '../../../molecules/Modal'
+import { OddModal } from '../../../molecules/OddModal'
 
 export function CancelingRunModal(): JSX.Element {
   const { t, i18n } = useTranslation('run_details')
 
   return (
-    <Modal>
+    <OddModal>
       <Flex
         flexDirection={DIRECTION_COLUMN}
         justifyContent={JUSTIFY_CENTER}
@@ -41,6 +41,6 @@ export function CancelingRunModal(): JSX.Element {
           {i18n.format(t('canceling_run_dot'), 'capitalize')}
         </LegacyStyledText>
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }

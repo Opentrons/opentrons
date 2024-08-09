@@ -19,8 +19,10 @@ import { css } from 'styled-components'
 import { getIsOnDevice } from '../../redux/config'
 import { SmallButton } from '../../atoms/buttons'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+import {
+  SimpleWizardBody,
+  SimpleWizardInProgressBody,
+} from '../../molecules/SimpleWizardBody'
 import unmountGripper from '../../assets/videos/gripper-wizards/UNMOUNT_GRIPPER.webm'
 
 import type { GripperWizardStepProps } from './types'
@@ -93,7 +95,7 @@ export const UnmountGripper = (
 
   if (isRobotMoving)
     return (
-      <InProgressModal
+      <SimpleWizardInProgressBody
         description={t('shared:stand_back_robot_is_in_motion')}
       />
     )

@@ -37,6 +37,21 @@ const MOCK_ACTUAL_PIPETTE = {
   },
 } as PipetteModelSpecs
 
+const mockPipetteWithTip: PipetteWithTip = {
+  mount: 'left',
+  specs: MOCK_ACTUAL_PIPETTE,
+}
+
+const mockSecondPipetteWithTip: PipetteWithTip = {
+  mount: 'right',
+  specs: MOCK_ACTUAL_PIPETTE,
+}
+
+const mockPipettesWithTip: PipetteWithTip[] = [
+  mockPipetteWithTip,
+  mockSecondPipetteWithTip,
+]
+
 describe('useTipAttachmentStatus', () => {
   let mockGetPipettesWithTipAttached: Mock
 
@@ -44,6 +59,7 @@ describe('useTipAttachmentStatus', () => {
     mockGetPipettesWithTipAttached = vi.mocked(getPipettesWithTipAttached)
     vi.mocked(getPipetteModelSpecs).mockReturnValue(MOCK_ACTUAL_PIPETTE)
     vi.mocked(DropTipWizard).mockReturnValue(<div>MOCK DROP TIP WIZ</div>)
+    mockGetPipettesWithTipAttached.mockResolvedValue(mockPipettesWithTip)
   })
 
   afterEach(() => {
@@ -54,16 +70,10 @@ describe('useTipAttachmentStatus', () => {
     const { result } = renderHook(() => useTipAttachmentStatus({} as any))
 
     expect(result.current.areTipsAttached).toBe(false)
-    expect(result.current.pipettesWithTip).toEqual([])
+    expect(result.current.aPipetteWithTip).toEqual(null)
   })
 
   it('should determine tip status and update state accordingly', async () => {
-    const mockPipettesWithTip: PipetteWithTip[] = [
-      { mount: 'left', specs: MOCK_ACTUAL_PIPETTE },
-      { mount: 'right', specs: MOCK_ACTUAL_PIPETTE },
-    ]
-    mockGetPipettesWithTipAttached.mockResolvedValueOnce(mockPipettesWithTip)
-
     const { result } = renderHook(() => useTipAttachmentStatus({} as any))
 
     await act(async () => {
@@ -71,15 +81,10 @@ describe('useTipAttachmentStatus', () => {
     })
 
     expect(result.current.areTipsAttached).toBe(true)
-    expect(result.current.pipettesWithTip).toEqual(mockPipettesWithTip)
+    expect(result.current.aPipetteWithTip).toEqual(mockPipetteWithTip)
   })
 
   it('should reset tip status', async () => {
-    const mockPipettesWithTip: PipetteWithTip[] = [
-      { mount: 'left', specs: MOCK_ACTUAL_PIPETTE },
-    ]
-    mockGetPipettesWithTipAttached.mockResolvedValueOnce(mockPipettesWithTip)
-
     const { result } = renderHook(() => useTipAttachmentStatus({} as any))
 
     await act(async () => {
@@ -88,16 +93,10 @@ describe('useTipAttachmentStatus', () => {
     })
 
     expect(result.current.areTipsAttached).toBe(false)
-    expect(result.current.pipettesWithTip).toEqual([])
+    expect(result.current.aPipetteWithTip).toEqual(null)
   })
 
   it('should set tip status resolved and update state', async () => {
-    const mockPipettesWithTip: PipetteWithTip[] = [
-      { mount: 'left', specs: MOCK_ACTUAL_PIPETTE },
-      { mount: 'right', specs: MOCK_ACTUAL_PIPETTE },
-    ]
-    mockGetPipettesWithTipAttached.mockResolvedValueOnce(mockPipettesWithTip)
-
     const { result } = renderHook(() => useTipAttachmentStatus({} as any))
 
     await act(async () => {
@@ -105,14 +104,11 @@ describe('useTipAttachmentStatus', () => {
       result.current.setTipStatusResolved()
     })
 
-    expect(result.current.pipettesWithTip).toEqual([mockPipettesWithTip[1]])
+    expect(result.current.aPipetteWithTip).toEqual(mockSecondPipetteWithTip)
   })
 
   it('should call onEmptyCache callback when cache becomes empty', async () => {
-    const mockPipettesWithTip: PipetteWithTip[] = [
-      { mount: 'left', specs: MOCK_ACTUAL_PIPETTE },
-    ]
-    mockGetPipettesWithTipAttached.mockResolvedValueOnce(mockPipettesWithTip)
+    mockGetPipettesWithTipAttached.mockResolvedValueOnce([mockPipetteWithTip])
 
     const onEmptyCacheMock = vi.fn()
     const { result } = renderHook(() => useTipAttachmentStatus({} as any))

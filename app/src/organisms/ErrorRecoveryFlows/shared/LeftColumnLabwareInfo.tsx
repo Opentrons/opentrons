@@ -44,7 +44,7 @@ export function LeftColumnLabwareInfo({
         type,
         labwareName: failedLabwareName ?? '',
         labwareNickname: failedLabwareNickname ?? '',
-        currentLocationProps: { slotName: buildLabwareLocationSlotName() },
+        currentLocationProps: { deckLabel: buildLabwareLocationSlotName() },
       }}
       notificationProps={
         bannerText ? { type: 'alert', heading: bannerText } : undefined

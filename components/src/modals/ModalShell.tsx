@@ -1,19 +1,19 @@
 import * as React from 'react'
 import styled from 'styled-components'
-import { SPACING } from '../ui-style-constants'
-import { BORDERS, COLORS } from '../helix-design-system'
-import { styleProps } from '../primitives'
 import {
-  POSITION_FIXED,
-  POSITION_ABSOLUTE,
-  POSITION_RELATIVE,
-  POSITION_STICKY,
   ALIGN_CENTER,
   JUSTIFY_CENTER,
   OVERFLOW_AUTO,
+  POSITION_ABSOLUTE,
+  POSITION_RELATIVE,
+  POSITION_STICKY,
 } from '../styles'
+import { BORDERS, COLORS } from '../helix-design-system'
+import { RESPONSIVENESS, SPACING } from '../ui-style-constants'
+import { styleProps } from '../primitives'
 
 import type { StyleProps } from '../primitives'
+
 export interface ModalShellProps extends StyleProps {
   /** Modal content */
   children: React.ReactNode
@@ -51,15 +51,16 @@ export function ModalShell(props: ModalShellProps): JSX.Element {
   return (
     <Overlay
       aria-label="BackgroundOverlay_ModalShell"
-      onClick={e => {
+      onClick={(e: React.MouseEvent) => {
         e.stopPropagation()
         if (onOutsideClick != null) onOutsideClick(e)
       }}
     >
       <ContentArea zIndex={zIndex}>
         <ModalArea
+          aria-label="ModalShell_ModalArea"
           isFullPage={fullPage}
-          onClick={e => {
+          onClick={(e: React.MouseEvent) => {
             e.stopPropagation()
           }}
           {...styleProps}
@@ -74,16 +75,15 @@ export function ModalShell(props: ModalShellProps): JSX.Element {
 }
 
 const Overlay = styled.div`
-  position: ${POSITION_FIXED};
+  position: ${POSITION_ABSOLUTE};
   left: 0;
   right: 0;
   top: 0;
   bottom: 0;
   z-index: 1;
-  background-color: ${COLORS.black90}${COLORS.opacity60HexCode};
+  background-color: ${COLORS.black90}${COLORS.opacity40HexCode};
   cursor: default;
 `
-
 const ContentArea = styled.div<{ zIndex: string | number }>`
   display: flex;
   position: ${POSITION_ABSOLUTE};
@@ -110,6 +110,9 @@ const ModalArea = styled.div<
   box-shadow: ${BORDERS.smallDropShadow};
   height: ${({ isFullPage }) => (isFullPage ? '100%' : 'auto')};
   background-color: ${COLORS.white};
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    border-radius: ${BORDERS.borderRadius16};
+  }
   ${styleProps};
 `
 

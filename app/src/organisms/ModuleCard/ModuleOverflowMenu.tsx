@@ -12,7 +12,7 @@ import {
 import { MenuList } from '../../atoms/MenuList'
 import { Tooltip } from '../../atoms/Tooltip'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
-import { useCurrentRunId } from '../ProtocolUpload/hooks'
+import { useCurrentRunId } from '../../resources/runs'
 import {
   useIsFlex,
   useRunStatuses,

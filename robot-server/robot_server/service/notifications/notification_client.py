@@ -4,9 +4,11 @@ import logging
 import paho.mqtt.client as mqtt
 from anyio import to_thread
 from fastapi import Depends
-from typing import Any, Dict, Optional
+from typing import Annotated, Any, Dict, Optional
 from enum import Enum
 
+
+from .topics import TopicName
 from ..json_api import NotifyRefetchBody, NotifyUnsubscribeBody
 from server_utils.fastapi_utils.app_state import (
     AppState,
@@ -80,7 +82,7 @@ class NotificationClient:
         self._client.loop_stop()
         await to_thread.run_sync(self._client.disconnect)
 
-    async def publish_advise_refetch_async(self, topic: str) -> None:
+    async def publish_advise_refetch_async(self, topic: TopicName) -> None:
         """Asynchronously publish a refetch message on a specific topic to the MQTT broker.
 
         Args:
@@ -88,7 +90,7 @@ class NotificationClient:
         """
         await to_thread.run_sync(self.publish_advise_refetch, topic)
 
-    async def publish_advise_unsubscribe_async(self, topic: str) -> None:
+    async def publish_advise_unsubscribe_async(self, topic: TopicName) -> None:
         """Asynchronously publish an unsubscribe message on a specific topic to the MQTT broker.
 
         Args:
@@ -208,7 +210,7 @@ async def clean_up_notification_client(app_state: AppState) -> None:
 
 
 def get_notification_client(
-    app_state: AppState = Depends(get_app_state),
+    app_state: Annotated[AppState, Depends(get_app_state)],
 ) -> Optional[NotificationClient]:
     """Intended to be used by endpoint functions as a FastAPI dependency."""
     notification_client = _notification_client_accessor.get_from(app_state)

@@ -16,12 +16,8 @@ import {
 } from '@opentrons/api-client'
 import { useRunActionMutations } from '@opentrons/react-api-client'
 
-import {
-  useCloneRun,
-  useCurrentRunId,
-  useRunCommands,
-} from '../ProtocolUpload/hooks'
-import { useNotifyRunQuery } from '../../resources/runs'
+import { useCloneRun, useRunCommands } from '../ProtocolUpload/hooks'
+import { useNotifyRunQuery, useCurrentRunId } from '../../resources/runs'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 
 import type { UseQueryOptions } from 'react-query'

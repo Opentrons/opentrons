@@ -63,7 +63,7 @@ const fontFamilyHeadingSmall = fontFamily
 export const fontSizeHeadingSmallRegular = fontSizeHeadingSmall
 export const lineHeightHeadingSmallRegular = lineHeightHeadingSmall
 export const fontFamilyHeadingSmallRegular = fontFamilyHeadingSmall
-export const fontWeightHeadingSmallRegular = '600'
+export const fontWeightHeadingSmallRegular = '400'
 export const fontStyleHeadingSmallRegular = `${fontWeightHeadingSmallRegular} ${fontSizeHeadingSmallRegular}/${lineHeightHeadingSmallRegular} ${fontFamilyHeadingSmallRegular}`
 
 // Heading-Small-Bold
@@ -116,6 +116,13 @@ export const fontStyleBodyDefaultRegular = `${fontWeightBodyDefaultRegular} ${fo
 const fontSizeCaption = '0.8125rem' // 13px
 const lineHeightCaption = '1rem' // 16px
 const fontFamilyCaption = fontFamily
+
+// Caption-Bold
+export const fontSizeCaptionBold = fontSizeCaption
+export const lineHeightCaptionBold = lineHeightCaption
+export const fontFamilyCaptionBold = fontFamilyCaption
+export const fontWeightCaptionBold = fontWeightBold
+export const fontStyleCaptionBold = `${fontWeightCaptionBold} ${fontSizeCaptionBold}/${lineHeightCaptionBold} ${fontFamilyCaptionBold}`
 
 // Caption-Medium
 export const fontSizeCaptionSemiBold = fontSizeCaption

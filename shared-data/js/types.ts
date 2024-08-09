@@ -680,6 +680,7 @@ export interface CsvFileParameterFileData {
   file?: File | null
   filePath?: string
   fileName?: string
+  name?: string
 }
 
 export interface CsvFileParameter extends BaseRunTimeParameter {

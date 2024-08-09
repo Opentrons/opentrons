@@ -13,9 +13,11 @@ import {
   Icon,
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
+  ListItem,
+  Modal,
   PrimaryButton,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -23,17 +25,15 @@ import { useAcknowledgeEstopDisengageMutation } from '@opentrons/react-api-clien
 
 import { getTopPortalEl } from '../../App/portal'
 import { Banner } from '../../atoms/Banner'
-import { ListItem } from '../../atoms/ListItem'
 import { SmallButton } from '../../atoms/buttons'
-import { LegacyModal } from '../../molecules/LegacyModal'
-import { Modal } from '../../molecules/Modal'
+import { OddModal } from '../../molecules/OddModal'
 import { getIsOnDevice } from '../../redux/config'
 
 import type {
-  ModalHeaderBaseProps,
+  OddModalHeaderBaseProps,
   ModalSize,
-} from '../../molecules/Modal/types'
-import type { LegacyModalProps } from '../../molecules/LegacyModal'
+} from '../../molecules/OddModal/types'
+import type { ModalProps } from '@opentrons/components'
 
 // Note (07/13/2023) After the launch, we will unify the modal components into one component.
 // Then TouchScreenModal and DesktopModal will be TouchScreenContent and DesktopContent that only render each content.
@@ -76,7 +76,7 @@ function TouchscreenModal({
   const { t } = useTranslation(['device_settings', 'branded'])
   const [isResuming, setIsResuming] = React.useState<boolean>(false)
   const { acknowledgeEstopDisengage } = useAcknowledgeEstopDisengageMutation()
-  const modalHeader: ModalHeaderBaseProps = {
+  const modalHeader: OddModalHeaderBaseProps = {
     title: t('estop_pressed'),
     iconName: 'ot-alert',
     iconColor: COLORS.red50,
@@ -91,7 +91,7 @@ function TouchscreenModal({
     closeModal()
   }
   return (
-    <Modal {...modalProps}>
+    <OddModal {...modalProps}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing40}>
         <LegacyStyledText as="p" fontWeight>
           {t('branded:estop_pressed_description')}
@@ -123,7 +123,7 @@ function TouchscreenModal({
           onClick={handleClick}
         />
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }
 
@@ -143,7 +143,7 @@ function DesktopModal({
     closeModal()
   }
 
-  const modalProps: LegacyModalProps = {
+  const modalProps: ModalProps = {
     type: 'error',
     title: t('estop_pressed'),
     onClose: handleCloseModal,
@@ -166,7 +166,7 @@ function DesktopModal({
   }
 
   return (
-    <LegacyModal {...modalProps}>
+    <Modal {...modalProps}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
         <Banner type={isEngaged ? 'error' : 'success'}>
           {isEngaged ? t('estop_engaged') : t('estop_disengaged')}
@@ -190,6 +190,6 @@ function DesktopModal({
           </PrimaryButton>
         </Flex>
       </Flex>
-    </LegacyModal>
+    </Modal>
   )
 }

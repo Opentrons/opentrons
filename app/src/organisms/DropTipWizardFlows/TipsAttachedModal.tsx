@@ -1,6 +1,5 @@
 import * as React from 'react'
 import capitalize from 'lodash/capitalize'
-import head from 'lodash/head'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 import { Trans, useTranslation } from 'react-i18next'
 
@@ -15,15 +14,15 @@ import { ApiHostProvider } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { SmallButton } from '../../atoms/buttons'
-import { Modal } from '../../molecules/Modal'
+import { OddModal } from '../../molecules/OddModal'
 import { DropTipWizardFlows, useDropTipWizardFlows } from '.'
 
 import type { HostConfig } from '@opentrons/api-client'
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
+import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
 import type { PipetteWithTip } from '.'
 
 interface TipsAttachedModalProps {
-  pipettesWithTip: PipetteWithTip[]
+  aPipetteWithTip: PipetteWithTip
   host: HostConfig | null
   setTipStatusResolved: (onEmpty?: () => void) => Promise<void>
 }
@@ -38,17 +37,17 @@ export const handleTipsAttachedModal = (
 
 const TipsAttachedModal = NiceModal.create(
   (props: TipsAttachedModalProps): JSX.Element => {
-    const { pipettesWithTip, host, setTipStatusResolved } = props
+    const { aPipetteWithTip, host, setTipStatusResolved } = props
     const { t } = useTranslation(['drop_tip_wizard'])
     const modal = useModal()
 
-    const { mount, specs } = head(pipettesWithTip) as PipetteWithTip
+    const { mount, specs } = aPipetteWithTip
     const { showDTWiz, toggleDTWiz } = useDropTipWizardFlows()
 
-    const tipsAttachedHeader: ModalHeaderBaseProps = {
-      title: t('tips_are_attached'),
+    const tipsAttachedHeader: OddModalHeaderBaseProps = {
+      title: t('remove_any_attached_tips'),
       iconName: 'ot-alert',
-      iconColor: COLORS.yellow50,
+      iconColor: COLORS.red50,
     }
 
     const cleanUpAndClose = (): void => {
@@ -57,16 +56,18 @@ const TipsAttachedModal = NiceModal.create(
     }
 
     const is96Channel = specs.channels === 96
-    const displayMountText = is96Channel ? '96-Channel' : capitalize(mount)
+    const displayMountText = is96Channel
+      ? '96-Channel'
+      : capitalize(mount as string)
 
     return (
       <ApiHostProvider {...host} hostname={host?.hostname ?? null}>
-        <Modal header={tipsAttachedHeader}>
+        <OddModal header={tipsAttachedHeader}>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
             <LegacyStyledText as="p">
               <Trans
                 t={t}
-                i18nKey="remove_the_tips"
+                i18nKey="liquid_damages_this_pipette"
                 values={{
                   mount: displayMountText,
                 }}
@@ -89,7 +90,7 @@ const TipsAttachedModal = NiceModal.create(
               />
             </Flex>
           </Flex>
-        </Modal>
+        </OddModal>
         {showDTWiz ? (
           <DropTipWizardFlows
             instrumentModelSpecs={specs}

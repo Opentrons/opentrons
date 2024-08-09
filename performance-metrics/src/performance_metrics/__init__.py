@@ -1,11 +1,11 @@
 """Opentrons performance metrics library."""
 
-from ._robot_context_tracker import RobotContextTracker
-from ._types import RobotContextState, SupportsTracking
+from ._robot_activity_tracker import RobotActivityTracker
+from ._types import RobotActivityState, SupportsTracking
 
 
 __all__ = [
-    "RobotContextTracker",
-    "RobotContextState",
+    "RobotActivityTracker",
+    "RobotActivityState",
     "SupportsTracking",
 ]

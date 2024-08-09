@@ -15,5 +15,5 @@ class APIVersion(NamedTuple):
 
         return cls(major=intparts[0], minor=intparts[1])
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.major}.{self.minor}"

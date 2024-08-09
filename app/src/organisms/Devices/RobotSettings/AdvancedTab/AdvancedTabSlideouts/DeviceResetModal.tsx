@@ -13,10 +13,10 @@ import {
   Link,
   PrimaryButton,
   SPACING,
+  Modal,
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { LegacyModal } from '../../../../../molecules/LegacyModal'
 import {
   useDispatchApiRequest,
   getRequestById,
@@ -92,7 +92,7 @@ export function DeviceResetModal({
   return (
     <>
       {isRobotReachable ? (
-        <LegacyModal
+        <Modal
           type="warning"
           title={t('reset_to_factory_settings')}
           onClose={closeModal}
@@ -120,9 +120,9 @@ export function DeviceResetModal({
               </AlertPrimaryButton>
             </Flex>
           </Flex>
-        </LegacyModal>
+        </Modal>
       ) : (
-        <LegacyModal
+        <Modal
           type="warning"
           title={t('connection_to_robot_lost')}
           onClose={closeModal}
@@ -142,7 +142,7 @@ export function DeviceResetModal({
               {t('shared:close')}
             </PrimaryButton>
           </Flex>
-        </LegacyModal>
+        </Modal>
       )}
     </>
   )

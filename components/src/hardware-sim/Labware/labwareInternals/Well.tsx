@@ -26,12 +26,14 @@ export function WellComponent(props: WellProps): JSX.Element {
     wellName,
     stroke = COLORS.black90,
     strokeWidth = 1,
-    fill = COLORS.white,
+    fill,
     onMouseEnterWell,
     onMouseLeaveWell,
     isInteractive = onMouseEnterWell != null || onMouseLeaveWell != null,
   } = props
   const { x, y } = well
+
+  const wellFill = fill ?? COLORS.white
 
   const pointerEvents: React.CSSProperties['pointerEvents'] = isInteractive
     ? 'auto'
@@ -46,7 +48,7 @@ export function WellComponent(props: WellProps): JSX.Element {
       onMouseLeaveWell != null
         ? (event: React.MouseEvent) => onMouseLeaveWell({ wellName, event })
         : undefined,
-    style: { pointerEvents, stroke, strokeWidth, fill },
+    style: { pointerEvents, stroke, strokeWidth, fill: wellFill },
   }
 
   if (well.shape === 'circular') {

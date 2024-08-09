@@ -13,6 +13,7 @@ import {
   Flex,
   NewPrimaryBtn,
   NewSecondaryBtn,
+  Modal,
   BORDERS,
 } from '@opentrons/components'
 
@@ -29,7 +30,6 @@ import { ExternalLink } from '../../../../atoms/Link/ExternalLink'
 import { ReleaseNotes } from '../../../../molecules/ReleaseNotes'
 import { useIsRobotBusy } from '../../hooks'
 import { Tooltip } from '../../../../atoms/Tooltip'
-import { LegacyModal } from '../../../../molecules/LegacyModal'
 import { Banner } from '../../../../atoms/Banner'
 import { useDispatchStartRobotUpdate } from '../../../../redux/robot-update/hooks'
 
@@ -148,7 +148,7 @@ export function UpdateRobotModal({
   )
 
   return (
-    <LegacyModal
+    <Modal
       title={heading}
       onClose={closeModal}
       closeOnOutsideClick={true}
@@ -161,6 +161,6 @@ export function UpdateRobotModal({
         </UpdateAppBanner>
         <ReleaseNotes source={releaseNotes} />
       </Flex>
-    </LegacyModal>
+    </Modal>
   )
 }

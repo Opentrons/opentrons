@@ -83,7 +83,7 @@ async def test_command_sender_sanitized_response(
         ],
     ],
 )
-def test_remove_serial_echo(cmd: str, resp: str, expected: str):
+def test_remove_serial_echo(cmd: str, resp: str, expected: str) -> None:
     """It should remove unwanted characters only."""
     res = SmoothieConnection._remove_unwanted_characters(cmd, resp)
     assert res == expected

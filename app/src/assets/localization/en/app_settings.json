@@ -3,8 +3,6 @@
   "__dev_internal__protocolStats": "Protocol Stats",
   "__dev_internal__protocolTimeline": "Protocol Timeline",
   "__dev_internal__enableRunNotes": "Display Notes During a Protocol Run",
-  "__dev_internal__enableQuickTransfer": "Enable Quick Transfer",
-  "__dev_internal__enableCsvFile": "Enable CSV File",
   "__dev_internal__enableLabwareCreator": "Enable App Labware Creator",
   "add_folder_button": "Add labware source folder",
   "add_ip_button": "Add",

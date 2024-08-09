@@ -29,13 +29,13 @@ import { RECOVERY_MAP } from './constants'
 
 import type { RobotType } from '@opentrons/shared-data'
 import type { RecoveryContentProps } from './types'
-import type { ERUtilsResults } from './hooks'
+import type { ERUtilsResults, UseRecoveryAnalyticsResult } from './hooks'
 import type { ErrorRecoveryFlowsProps } from '.'
 
-interface UseERWizardResult {
+export interface UseERWizardResult {
   hasLaunchedRecovery: boolean
   showERWizard: boolean
-  toggleERWizard: (hasLaunchedER: boolean) => Promise<void>
+  toggleERWizard: (isActive: boolean, hasLaunchedER?: boolean) => Promise<void>
 }
 
 export function useERWizard(): UseERWizardResult {
@@ -45,9 +45,14 @@ export function useERWizard(): UseERWizardResult {
   // when recovery mode has not been launched.
   const [hasLaunchedRecovery, setHasLaunchedRecovery] = React.useState(false)
 
-  const toggleERWizard = (hasLaunchedER: boolean): Promise<void> => {
-    setHasLaunchedRecovery(hasLaunchedER)
-    setShowERWizard(!showERWizard)
+  const toggleERWizard = (
+    isActive: boolean,
+    hasLaunchedER?: boolean
+  ): Promise<void> => {
+    if (hasLaunchedER !== undefined) {
+      setHasLaunchedRecovery(hasLaunchedER)
+    }
+    setShowERWizard(isActive)
     return Promise.resolve()
   }
 
@@ -59,6 +64,7 @@ export type ErrorRecoveryWizardProps = ErrorRecoveryFlowsProps &
     robotType: RobotType
     isOnDevice: boolean
     isDoorOpen: boolean
+    analytics: UseRecoveryAnalyticsResult
   }
 
 export function ErrorRecoveryWizard(
@@ -84,10 +90,22 @@ export function ErrorRecoveryWizard(
 export function ErrorRecoveryComponent(
   props: RecoveryContentProps
 ): JSX.Element {
-  const { recoveryMap, hasLaunchedRecovery, isDoorOpen, isOnDevice } = props
+  const {
+    recoveryMap,
+    hasLaunchedRecovery,
+    isDoorOpen,
+    isOnDevice,
+    analytics,
+  } = props
   const { route, step } = recoveryMap
   const { t } = useTranslation('error_recovery')
   const { showModal, toggleModal } = useErrorDetailsModal()
+
+  React.useEffect(() => {
+    if (showModal) {
+      analytics.reportViewErrorDetailsEvent(route, step)
+    }
+  }, [analytics, route, showModal, step])
 
   const buildTitleHeading = (): JSX.Element => {
     const titleText = hasLaunchedRecovery ? t('recovery_mode') : t('cancel_run')
@@ -113,7 +131,7 @@ export function ErrorRecoveryComponent(
     </StyledText>
   )
 
-  // TODO(jh, 07-16-24): Revisit making RecoveryDoorOpen a route.
+  // TODO(jh, 07-29-24): Make RecoveryDoorOpen render logic equivalent to RecoveryTakeover. Do not nest it in RecoveryWizard.
   const buildInterventionContent = (): JSX.Element => {
     if (isDoorOpen) {
       return <RecoveryDoorOpen {...props} />

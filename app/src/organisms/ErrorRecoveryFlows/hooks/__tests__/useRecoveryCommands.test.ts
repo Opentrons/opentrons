@@ -4,6 +4,7 @@ import { renderHook, act } from '@testing-library/react'
 import {
   useResumeRunFromRecoveryMutation,
   useStopRunMutation,
+  useUpdateErrorRecoveryPolicy,
 } from '@opentrons/react-api-client'
 
 import { useChainRunCommands } from '../../../../resources/runs'
@@ -11,34 +12,50 @@ import {
   useRecoveryCommands,
   HOME_PIPETTE_Z_AXES,
   buildPickUpTips,
+  buildIgnorePolicyRules,
 } from '../useRecoveryCommands'
 import { RECOVERY_MAP } from '../../constants'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../../resources/runs')
 
-const mockFailedCommand = {
-  id: 'MOCK_ID',
-  commandType: 'mockCommandType',
-  params: { test: 'mock_param' },
-} as any
-const mockRunId = '123'
-const mockFailedLabwareUtils = {
-  selectedTipLocations: { A1: null },
-  pickUpTipLabware: { id: 'MOCK_LW_ID' },
-} as any
-const mockProceedToRouteAndStep = vi.fn()
-const mockRouteUpdateActions = {
-  proceedToRouteAndStep: mockProceedToRouteAndStep,
-} as any
-
 describe('useRecoveryCommands', () => {
+  const mockFailedCommand = {
+    id: 'MOCK_ID',
+    commandType: 'mockCommandType',
+    params: { test: 'mock_param' },
+  } as any
+  const mockRunId = '123'
+  const mockFailedLabwareUtils = {
+    selectedTipLocations: { A1: null },
+    pickUpTipLabware: { id: 'MOCK_LW_ID' },
+  } as any
+  const mockProceedToRouteAndStep = vi.fn()
+  const mockRouteUpdateActions = {
+    proceedToRouteAndStep: mockProceedToRouteAndStep,
+  } as any
   const mockMakeSuccessToast = vi.fn()
   const mockResumeRunFromRecovery = vi.fn(() =>
     Promise.resolve(mockMakeSuccessToast())
   )
   const mockStopRun = vi.fn()
   const mockChainRunCommands = vi.fn().mockResolvedValue([])
+  const mockReportActionSelectedResult = vi.fn()
+  const mockReportRecoveredRunResult = vi.fn()
+  const mockUpdateErrorRecoveryPolicy = vi.fn()
+
+  const props = {
+    runId: mockRunId,
+    failedCommand: mockFailedCommand,
+    failedLabwareUtils: mockFailedLabwareUtils,
+    routeUpdateActions: mockRouteUpdateActions,
+    recoveryToastUtils: { makeSuccessToast: mockMakeSuccessToast } as any,
+    analytics: {
+      reportActionSelectedResult: mockReportActionSelectedResult,
+      reportRecoveredRunResult: mockReportRecoveredRunResult,
+    } as any,
+    selectedRecoveryOption: RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE,
+  }
 
   beforeEach(() => {
     vi.mocked(useResumeRunFromRecoveryMutation).mockReturnValue({
@@ -50,21 +67,16 @@ describe('useRecoveryCommands', () => {
     vi.mocked(useChainRunCommands).mockReturnValue({
       chainRunCommands: mockChainRunCommands,
     } as any)
+    vi.mocked(useUpdateErrorRecoveryPolicy).mockReturnValue({
+      updateErrorRecoveryPolicy: mockUpdateErrorRecoveryPolicy,
+    } as any)
   })
 
   it('should call chainRunRecoveryCommands with continuePastCommandFailure set to false', async () => {
-    const { result } = renderHook(() =>
-      useRecoveryCommands({
-        runId: mockRunId,
-        failedCommand: mockFailedCommand,
-        failedLabwareUtils: mockFailedLabwareUtils,
-        routeUpdateActions: mockRouteUpdateActions,
-        recoveryToastUtils: {} as any,
-      })
-    )
+    const { result } = renderHook(() => useRecoveryCommands(props))
 
     await act(async () => {
-      await result.current.homePipetteZAxes() // can use any result returned command
+      await result.current.homePipetteZAxes()
     })
 
     expect(mockChainRunCommands).toHaveBeenCalledWith(
@@ -79,15 +91,7 @@ describe('useRecoveryCommands', () => {
       chainRunCommands: vi.fn().mockRejectedValue(mockError),
     } as any)
 
-    const { result } = renderHook(() =>
-      useRecoveryCommands({
-        runId: mockRunId,
-        failedCommand: mockFailedCommand,
-        failedLabwareUtils: mockFailedLabwareUtils,
-        routeUpdateActions: mockRouteUpdateActions,
-        recoveryToastUtils: {} as any,
-      })
-    )
+    const { result } = renderHook(() => useRecoveryCommands(props))
 
     await act(async () => {
       await expect(result.current.homePipetteZAxes()).rejects.toThrow(
@@ -106,15 +110,7 @@ describe('useRecoveryCommands', () => {
       params: mockFailedCommand.params,
     }
 
-    const { result } = renderHook(() =>
-      useRecoveryCommands({
-        runId: mockRunId,
-        failedCommand: mockFailedCommand,
-        failedLabwareUtils: mockFailedLabwareUtils,
-        routeUpdateActions: mockRouteUpdateActions,
-        recoveryToastUtils: {} as any,
-      })
-    )
+    const { result } = renderHook(() => useRecoveryCommands(props))
 
     await act(async () => {
       await result.current.retryFailedCommand()
@@ -154,6 +150,11 @@ describe('useRecoveryCommands', () => {
           failedLabwareUtils: mockFailedLabwareUtils,
           routeUpdateActions: mockRouteUpdateActions,
           recoveryToastUtils: {} as any,
+          analytics: {
+            reportActionSelectedResult: mockReportActionSelectedResult,
+            reportRecoveredRunResult: mockReportRecoveredRunResult,
+          } as any,
+          selectedRecoveryOption: RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE,
         })
       )
       await act(async () => {
@@ -180,15 +181,7 @@ describe('useRecoveryCommands', () => {
   })
 
   it('should call resumeRun with runId and show success toast on success', async () => {
-    const { result } = renderHook(() =>
-      useRecoveryCommands({
-        runId: mockRunId,
-        failedCommand: mockFailedCommand,
-        failedLabwareUtils: mockFailedLabwareUtils,
-        routeUpdateActions: mockRouteUpdateActions,
-        recoveryToastUtils: { makeSuccessToast: mockMakeSuccessToast } as any,
-      })
-    )
+    const { result } = renderHook(() => useRecoveryCommands(props))
 
     await act(async () => {
       await result.current.resumeRun()
@@ -199,15 +192,7 @@ describe('useRecoveryCommands', () => {
   })
 
   it('should call cancelRun with runId', () => {
-    const { result } = renderHook(() =>
-      useRecoveryCommands({
-        runId: mockRunId,
-        failedCommand: mockFailedCommand,
-        failedLabwareUtils: mockFailedLabwareUtils,
-        routeUpdateActions: mockRouteUpdateActions,
-        recoveryToastUtils: {} as any,
-      })
-    )
+    const { result } = renderHook(() => useRecoveryCommands(props))
 
     result.current.cancelRun()
 
@@ -215,15 +200,7 @@ describe('useRecoveryCommands', () => {
   })
 
   it('should call homePipetteZAxes with the appropriate command', async () => {
-    const { result } = renderHook(() =>
-      useRecoveryCommands({
-        runId: mockRunId,
-        failedCommand: mockFailedCommand,
-        failedLabwareUtils: mockFailedLabwareUtils,
-        routeUpdateActions: mockRouteUpdateActions,
-        recoveryToastUtils: {} as any,
-      })
-    )
+    const { result } = renderHook(() => useRecoveryCommands(props))
 
     await act(async () => {
       await result.current.homePipetteZAxes()
@@ -251,18 +228,16 @@ describe('useRecoveryCommands', () => {
       mockFailedLabware
     )
 
-    const { result } = renderHook(() =>
-      useRecoveryCommands({
-        runId: mockRunId,
-        failedCommand: mockFailedCmdWithPipetteId,
-        failedLabwareUtils: {
-          ...mockFailedLabwareUtils,
-          failedLabware: mockFailedLabware,
-        },
-        routeUpdateActions: mockRouteUpdateActions,
-        recoveryToastUtils: {} as any,
-      })
-    )
+    const testProps = {
+      ...props,
+      failedCommand: mockFailedCmdWithPipetteId,
+      failedLabwareUtils: {
+        ...mockFailedLabwareUtils,
+        failedLabware: mockFailedLabware,
+      },
+    }
+
+    const { result } = renderHook(() => useRecoveryCommands(testProps))
 
     await act(async () => {
       await result.current.pickUpTips()
@@ -275,15 +250,7 @@ describe('useRecoveryCommands', () => {
   })
 
   it('should call skipFailedCommand and show success toast on success', async () => {
-    const { result } = renderHook(() =>
-      useRecoveryCommands({
-        runId: mockRunId,
-        failedCommand: mockFailedCommand,
-        failedLabwareUtils: mockFailedLabwareUtils,
-        routeUpdateActions: mockRouteUpdateActions,
-        recoveryToastUtils: { makeSuccessToast: mockMakeSuccessToast } as any,
-      })
-    )
+    const { result } = renderHook(() => useRecoveryCommands(props))
 
     await act(async () => {
       await result.current.skipFailedCommand()
@@ -293,26 +260,46 @@ describe('useRecoveryCommands', () => {
     expect(mockMakeSuccessToast).toHaveBeenCalled()
   })
 
-  it('should call ignoreErrorKindThisRun and resolve immediately', async () => {
-    const { result } = renderHook(() =>
-      useRecoveryCommands({
-        runId: mockRunId,
-        failedCommand: mockFailedCommand,
-        failedLabwareUtils: mockFailedLabwareUtils,
-        routeUpdateActions: mockRouteUpdateActions,
-        recoveryToastUtils: {} as any,
-      })
-    )
+  it('should call updateErrorRecoveryPolicy with correct policy rules when failedCommand has an error', async () => {
+    const mockFailedCommandWithError = {
+      ...mockFailedCommand,
+      commandType: 'aspirateInPlace',
+      error: {
+        errorType: 'mockErrorType',
+      },
+    }
 
-    const consoleSpy = vi.spyOn(console, 'log')
+    const testProps = {
+      ...props,
+      failedCommand: mockFailedCommandWithError,
+    }
+
+    const { result } = renderHook(() => useRecoveryCommands(testProps))
 
     await act(async () => {
       await result.current.ignoreErrorKindThisRun()
     })
 
-    expect(consoleSpy).toHaveBeenCalledWith(
-      'IGNORING ALL ERRORS OF THIS KIND THIS RUN'
+    const expectedPolicyRules = buildIgnorePolicyRules(
+      'aspirateInPlace',
+      'mockErrorType'
     )
-    expect(result.current.ignoreErrorKindThisRun()).resolves.toBeUndefined()
+
+    expect(mockUpdateErrorRecoveryPolicy).toHaveBeenCalledWith(
+      expectedPolicyRules
+    )
+  })
+
+  it('should reject with an error when failedCommand or error is null', async () => {
+    const testProps = {
+      ...props,
+      failedCommand: null,
+    }
+
+    const { result } = renderHook(() => useRecoveryCommands(testProps))
+
+    await expect(result.current.ignoreErrorKindThisRun()).rejects.toThrow(
+      'Could not execute command. No failed command.'
+    )
   })
 })
