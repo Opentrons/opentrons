@@ -17,11 +17,11 @@ import {
   ALIGN_FLEX_END,
   BORDERS,
   COLORS,
+  DeckInfoLabel,
   DIRECTION_COLUMN,
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  LocationIcon,
   MODULE_ICON_NAME_BY_TYPE,
   OVERFLOW_AUTO,
   PrimaryButton,
@@ -373,9 +373,9 @@ export const TerseOffsetTable = (props: OffsetTableProps): JSX.Element => {
           return (
             <TerseTableRow key={index}>
               <TerseTableDatum>
-                <LocationIcon slotName={location.slotName} />
+                <DeckInfoLabel deckLabel={location.slotName} />
                 {location.moduleModel != null ? (
-                  <LocationIcon
+                  <DeckInfoLabel
                     iconName={
                       MODULE_ICON_NAME_BY_TYPE[
                         getModuleType(location.moduleModel)

@@ -6,10 +6,10 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
   DIRECTION_COLUMN,
+  RadioButton,
 } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { RIGHT, LEFT } from '@opentrons/shared-data'
-import { RadioButton } from '../../atoms/buttons'
 import { usePipetteSpecsV2 } from '../../resources/instruments/hooks'
 import { ChildNavigation } from '../ChildNavigation'
 

@@ -55,14 +55,14 @@ describe('InterventionModal', () => {
     expect(inputElForButtonFromButtonText('third button').checked).toBeFalsy()
 
     fireEvent.click(inputElForButtonFromButtonText('first button'))
-    expect(inputElForButtonFromButtonText('first button').checked).toBeTruthy()
+    expect(screen.getByLabelText('first button')).toBeChecked()
     expect(inputElForButtonFromButtonText('second button').checked).toBeFalsy()
     expect(inputElForButtonFromButtonText('third button').checked).toBeFalsy()
 
     fireEvent.click(inputElForButtonFromButtonText('third button'))
     expect(inputElForButtonFromButtonText('first button').checked).toBeFalsy()
     expect(inputElForButtonFromButtonText('second button').checked).toBeFalsy()
-    expect(inputElForButtonFromButtonText('third button').checked).toBeTruthy()
+    expect(screen.getByLabelText('third button')).toBeChecked()
   })
 
   it('can start with a button selected', () => {
@@ -76,7 +76,7 @@ describe('InterventionModal', () => {
       />
     )
     expect(inputElForButtonFromButtonText('first button').checked).toBeFalsy()
-    expect(inputElForButtonFromButtonText('second button').checked).toBeTruthy()
+    expect(screen.getByLabelText('second button')).toBeChecked()
     expect(inputElForButtonFromButtonText('third button').checked).toBeFalsy()
   })
 

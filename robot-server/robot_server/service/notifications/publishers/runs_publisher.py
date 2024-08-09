@@ -1,6 +1,6 @@
 from fastapi import Depends
 from dataclasses import dataclass
-from typing import Callable, Optional
+from typing import Annotated, Callable, Optional
 
 from opentrons.protocol_engine import CommandPointer, StateSummary, EngineStatus
 
@@ -11,7 +11,7 @@ from server_utils.fastapi_utils.app_state import (
 )
 from ..notification_client import NotificationClient, get_notification_client
 from ..publisher_notifier import PublisherNotifier, get_pe_publisher_notifier
-from ..topics import Topics
+from .. import topics
 
 
 @dataclass
@@ -89,36 +89,40 @@ class RunsPublisher:
         (regardless of query parameters).
         """
         await self._client.publish_advise_refetch_async(
-            topic=Topics.RUNS_COMMANDS_LINKS
+            topic=topics.RUNS_COMMANDS_LINKS
         )
 
     async def _publish_runs_advise_refetch_async(self, run_id: str) -> None:
         """Publish a refetch flag for relevant runs topics."""
-        await self._client.publish_advise_refetch_async(topic=Topics.RUNS)
+        await self._client.publish_advise_refetch_async(topic=topics.RUNS)
 
         if self._run_hooks is not None:
             await self._client.publish_advise_refetch_async(
-                topic=f"{Topics.RUNS}/{run_id}"
+                topic=topics.TopicName(f"{topics.RUNS}/{run_id}")
             )
 
     async def _publish_runs_advise_unsubscribe_async(self, run_id: str) -> None:
         """Publish an unsubscribe flag for relevant runs topics."""
         if self._run_hooks is not None:
             await self._client.publish_advise_unsubscribe_async(
-                topic=f"{Topics.RUNS}/{run_id}"
+                topic=topics.TopicName(f"{topics.RUNS}/{run_id}")
             )
             await self._client.publish_advise_unsubscribe_async(
-                topic=Topics.RUNS_COMMANDS_LINKS
+                topic=topics.RUNS_COMMANDS_LINKS
             )
             await self._client.publish_advise_unsubscribe_async(
-                topic=f"{Topics.RUNS_PRE_SERIALIZED_COMMANDS}/{run_id}"
+                topic=topics.TopicName(
+                    f"{topics.RUNS_PRE_SERIALIZED_COMMANDS}/{run_id}"
+                )
             )
 
     async def publish_pre_serialized_commands_notification(self, run_id: str) -> None:
         """Publishes notification for GET /runs/:runId/commandsAsPreSerializedList."""
         if self._run_hooks is not None:
             await self._client.publish_advise_refetch_async(
-                topic=f"{Topics.RUNS_PRE_SERIALIZED_COMMANDS}/{run_id}"
+                topic=topics.TopicName(
+                    f"{topics.RUNS_PRE_SERIALIZED_COMMANDS}/{run_id}"
+                )
             )
 
     async def _handle_current_command_change(self) -> None:
@@ -169,9 +173,13 @@ _runs_publisher_accessor: AppStateAccessor[RunsPublisher] = AppStateAccessor[
 
 
 async def get_runs_publisher(
-    app_state: AppState = Depends(get_app_state),
-    notification_client: NotificationClient = Depends(get_notification_client),
-    publisher_notifier: PublisherNotifier = Depends(get_pe_publisher_notifier),
+    app_state: Annotated[AppState, Depends(get_app_state)],
+    notification_client: Annotated[
+        NotificationClient, Depends(get_notification_client)
+    ],
+    publisher_notifier: Annotated[
+        PublisherNotifier, Depends(get_pe_publisher_notifier)
+    ],
 ) -> RunsPublisher:
     """Get a singleton RunsPublisher to publish runs topics."""
     runs_publisher = _runs_publisher_accessor.get_from(app_state)

@@ -2,13 +2,14 @@ import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
+
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
-  ALIGN_STRETCH,
   BORDERS,
   Box,
   COLORS,
+  DeckInfoLabel,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
@@ -16,17 +17,18 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_SPACE_EVENLY,
   LabwareRender,
-  LocationIcon,
   MODULE_ICON_NAME_BY_TYPE,
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
+  Chip,
 } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
   getLabwareDefURI,
   getLabwareDisplayName,
+  getModuleDisplayName,
   HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { parseInitialLoadedLabwareByAdapter } from '@opentrons/api-client'
@@ -35,18 +37,19 @@ import {
   useModulesQuery,
 } from '@opentrons/react-api-client'
 
-import { FloatingActionButton } from '../../atoms/buttons'
+import { FloatingActionButton, SmallButton } from '../../atoms/buttons'
 import { ODDBackButton } from '../../molecules/ODDBackButton'
 import { getTopPortalEl } from '../../App/portal'
-import { Modal } from '../../molecules/Modal'
+import { OddModal } from '../../molecules/OddModal'
 
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getLabwareSetupItemGroups } from '../../pages/Protocols/utils'
+import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
 import { getProtocolModulesInfo } from '../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { getAttachedProtocolModuleMatches } from '../ProtocolSetupModulesAndDeck/utils'
 import { getNestedLabwareInfo } from '../Devices/ProtocolRun/SetupLabware/getNestedLabwareInfo'
-import { LabwareMapViewModal } from './LabwareMapViewModal'
-import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
+import { LabwareMapView } from './LabwareMapView'
+import { LabwareStackModal } from '../Devices/ProtocolRun/SetupLabware/LabwareStackModal'
 
 import type { UseQueryResult } from 'react-query'
 import type {
@@ -75,14 +78,18 @@ const LabwareThumbnail = styled.svg`
 export interface ProtocolSetupLabwareProps {
   runId: string
   setSetupScreen: React.Dispatch<React.SetStateAction<SetupScreens>>
+  isConfirmed: boolean
+  setIsConfirmed: (confirmed: boolean) => void
 }
 
 export function ProtocolSetupLabware({
   runId,
   setSetupScreen,
+  isConfirmed,
+  setIsConfirmed,
 }: ProtocolSetupLabwareProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
-  const [showDeckMapModal, setShowDeckMapModal] = React.useState<boolean>(false)
+  const [showMapView, setShowMapView] = React.useState<boolean>(false)
   const [
     showLabwareDetailsModal,
     setShowLabwareDetailsModal,
@@ -91,6 +98,7 @@ export function ProtocolSetupLabware({
     | (LabwareDefinition2 & {
         location: LabwareLocation
         nickName: string | null
+        id: string
       })
     | null
   >(null)
@@ -136,10 +144,19 @@ export function ProtocolSetupLabware({
         ...labwareDef,
         location: foundLabware.location,
         nickName: nickName ?? null,
+        id: labwareId,
       })
       setShowLabwareDetailsModal(true)
     }
   }
+  const selectedLabwareIsTopOfStack = mostRecentAnalysis?.commands.some(
+    command =>
+      command.commandType === 'loadLabware' &&
+      command.result?.labwareId === selectedLabware?.id &&
+      typeof command.params.location === 'object' &&
+      ('moduleId' in command.params.location ||
+        'labwareId' in command.params.location)
+  )
 
   let location: JSX.Element | string | null = null
   if (
@@ -147,14 +164,16 @@ export function ProtocolSetupLabware({
     typeof selectedLabware.location === 'object' &&
     'slotName' in selectedLabware?.location
   ) {
-    location = <LocationIcon slotName={selectedLabware?.location.slotName} />
+    location = <DeckInfoLabel deckLabel={selectedLabware?.location.slotName} />
   } else if (
     selectedLabware != null &&
     typeof selectedLabware.location === 'object' &&
     'addressableAreaName' in selectedLabware?.location
   ) {
     location = (
-      <LocationIcon slotName={selectedLabware?.location.addressableAreaName} />
+      <DeckInfoLabel
+        deckLabel={selectedLabware?.location.addressableAreaName}
+      />
     )
   } else if (
     selectedLabware != null &&
@@ -168,16 +187,7 @@ export function ProtocolSetupLabware({
         module.moduleId === selectedLabware.location.moduleId
     )
     if (matchedModule != null) {
-      location = (
-        <>
-          <LocationIcon slotName={matchedModule?.slotName} />
-          <LocationIcon
-            iconName={
-              MODULE_ICON_NAME_BY_TYPE[matchedModule?.moduleDef.moduleType]
-            }
-          />
-        </>
-      )
+      location = <DeckInfoLabel deckLabel={matchedModule?.slotName} />
     }
   } else if (
     selectedLabware != null &&
@@ -192,24 +202,13 @@ export function ProtocolSetupLabware({
     )?.params.location
     if (adapterLocation != null && adapterLocation !== 'offDeck') {
       if ('slotName' in adapterLocation) {
-        location = <LocationIcon slotName={adapterLocation.slotName} />
+        location = <DeckInfoLabel deckLabel={adapterLocation.slotName} />
       } else if ('moduleId' in adapterLocation) {
         const moduleUnderAdapter = attachedProtocolModuleMatches.find(
           module => module.moduleId === adapterLocation.moduleId
         )
         if (moduleUnderAdapter != null) {
-          location = (
-            <>
-              <LocationIcon slotName={moduleUnderAdapter.slotName} />
-              <LocationIcon
-                iconName={
-                  MODULE_ICON_NAME_BY_TYPE[
-                    moduleUnderAdapter.moduleDef.moduleType
-                  ]
-                }
-              />
-            </>
-          )
+          location = <DeckInfoLabel deckLabel={moduleUnderAdapter.slotName} />
         }
       }
     }
@@ -219,31 +218,16 @@ export function ProtocolSetupLabware({
     <>
       {createPortal(
         <>
-          {showDeckMapModal ? (
-            <LabwareMapViewModal
-              mostRecentAnalysis={mostRecentAnalysis}
-              deckDef={deckDef}
-              attachedProtocolModuleMatches={attachedProtocolModuleMatches}
-              handleLabwareClick={handleLabwareClick}
-              onCloseClick={() => {
-                setShowDeckMapModal(false)
-              }}
-              initialLoadedLabwareByAdapter={initialLoadedLabwareByAdapter}
-            />
-          ) : null}
-          {showLabwareDetailsModal && selectedLabware != null ? (
-            <Modal
+          {showLabwareDetailsModal &&
+          !selectedLabwareIsTopOfStack &&
+          selectedLabware != null ? (
+            <OddModal
               onOutsideClick={() => {
                 setShowLabwareDetailsModal(false)
                 setSelectedLabware(null)
               }}
             >
-              <Flex alignItems={ALIGN_STRETCH} gridGap={SPACING.spacing48}>
-                <LabwareThumbnail
-                  viewBox={`${selectedLabware.cornerOffsetFromSlot.x} ${selectedLabware.cornerOffsetFromSlot.y} ${selectedLabware.dimensions.xDimension} ${selectedLabware.dimensions.yDimension}`}
-                >
-                  <LabwareRender definition={selectedLabware} />
-                </LabwareThumbnail>
+              <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
                   alignItems={ALIGN_FLEX_START}
@@ -269,62 +253,114 @@ export function ProtocolSetupLabware({
                       : null}
                   </LegacyStyledText>
                 </Flex>
+                <LabwareThumbnail
+                  viewBox={`${selectedLabware.cornerOffsetFromSlot.x} ${selectedLabware.cornerOffsetFromSlot.y} ${selectedLabware.dimensions.xDimension} ${selectedLabware.dimensions.yDimension}`}
+                >
+                  <LabwareRender definition={selectedLabware} />
+                </LabwareThumbnail>
               </Flex>
-            </Modal>
+            </OddModal>
           ) : null}
         </>,
         getTopPortalEl()
       )}
-      <ODDBackButton
-        label={t('labware')}
-        onClick={() => {
-          setSetupScreen('prepare to run')
-        }}
-      />
+      <Flex
+        flexDirection={DIRECTION_ROW}
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+      >
+        <ODDBackButton
+          label={t('labware')}
+          onClick={() => {
+            setSetupScreen('prepare to run')
+          }}
+        />
+        {isConfirmed ? (
+          <Chip
+            background
+            iconName="ot-check"
+            text={t('placements_ready')}
+            type="success"
+            chipSize="small"
+          />
+        ) : (
+          <SmallButton
+            buttonText={t('confirm_placements')}
+            onClick={() => {
+              setIsConfirmed(true)
+              setSetupScreen('prepare to run')
+            }}
+          />
+        )}
+      </Flex>
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing8}
         marginTop={SPACING.spacing32}
       >
-        <Flex
-          gridGap={SPACING.spacing8}
-          color={COLORS.grey60}
-          fontSize={TYPOGRAPHY.fontSize22}
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          lineHeight={TYPOGRAPHY.lineHeight28}
-        >
-          <Flex paddingLeft={SPACING.spacing16} width="10.5625rem">
-            <LegacyStyledText>{t('location')}</LegacyStyledText>
-          </Flex>
-          <Flex>
-            <LegacyStyledText>{t('labware_name')}</LegacyStyledText>
-          </Flex>
-        </Flex>
-        {[...onDeckItems, ...offDeckItems].map((labware, i) => {
-          const labwareOnAdapter = onDeckItems.find(
-            item =>
-              labware.initialLocation !== 'offDeck' &&
-              'labwareId' in labware.initialLocation &&
-              item.labwareId === labware.initialLocation.labwareId
-          )
-          return mostRecentAnalysis != null && labwareOnAdapter == null ? (
-            <RowLabware
-              key={i}
-              labware={labware}
-              attachedProtocolModules={attachedProtocolModuleMatches}
-              refetchModules={moduleQuery.refetch}
-              commands={mostRecentAnalysis?.commands}
-              nestedLabwareInfo={getNestedLabwareInfo(
-                labware,
-                mostRecentAnalysis.commands
-              )}
-            />
-          ) : null
-        })}
+        {showMapView ? (
+          <LabwareMapView
+            mostRecentAnalysis={mostRecentAnalysis}
+            deckDef={deckDef}
+            attachedProtocolModuleMatches={attachedProtocolModuleMatches}
+            handleLabwareClick={handleLabwareClick}
+            initialLoadedLabwareByAdapter={initialLoadedLabwareByAdapter}
+          />
+        ) : (
+          <>
+            <Flex
+              gridGap={SPACING.spacing8}
+              color={COLORS.grey60}
+              fontSize={TYPOGRAPHY.fontSize22}
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              lineHeight={TYPOGRAPHY.lineHeight28}
+            >
+              <Flex paddingLeft={SPACING.spacing16} width="10.5625rem">
+                <LegacyStyledText>{t('location')}</LegacyStyledText>
+              </Flex>
+              <Flex>
+                <LegacyStyledText>{t('labware_name')}</LegacyStyledText>
+              </Flex>
+            </Flex>
+            {[...onDeckItems, ...offDeckItems].map((labware, i) => {
+              const labwareOnAdapter = onDeckItems.find(
+                item =>
+                  labware.initialLocation !== 'offDeck' &&
+                  'labwareId' in labware.initialLocation &&
+                  item.labwareId === labware.initialLocation.labwareId
+              )
+              return mostRecentAnalysis != null && labwareOnAdapter == null ? (
+                <RowLabware
+                  key={i}
+                  labware={labware}
+                  attachedProtocolModules={attachedProtocolModuleMatches}
+                  refetchModules={moduleQuery.refetch}
+                  commands={mostRecentAnalysis?.commands}
+                  nestedLabwareInfo={getNestedLabwareInfo(
+                    labware,
+                    mostRecentAnalysis.commands
+                  )}
+                />
+              ) : null
+            })}
+          </>
+        )}
+        {showLabwareDetailsModal &&
+        selectedLabware != null &&
+        selectedLabwareIsTopOfStack ? (
+          <LabwareStackModal
+            labwareIdTop={selectedLabware?.id}
+            runId={runId}
+            closeModal={() => {
+              setSelectedLabware(null)
+              setShowLabwareDetailsModal(false)
+            }}
+          />
+        ) : null}
       </Flex>
       <FloatingActionButton
+        buttonText={showMapView ? t('list_view') : t('map_view')}
         onClick={() => {
-          setShowDeckMapModal(true)
+          setShowMapView(mapView => !mapView)
         }}
       />
     </>
@@ -486,7 +522,10 @@ function RowLabware({
   commands,
 }: RowLabwareProps): JSX.Element | null {
   const { definition, initialLocation, nickName } = labware
-  const { t } = useTranslation('protocol_command_text')
+  const { t, i18n } = useTranslation([
+    'protocol_command_text',
+    'protocol_setup',
+  ])
 
   const matchedModule =
     initialLocation !== 'offDeck' &&
@@ -507,19 +546,20 @@ function RowLabware({
   let slotName: string = ''
   let location: JSX.Element | string | null = null
   if (initialLocation === 'offDeck') {
-    location = t('off_deck')
+    location = (
+      <DeckInfoLabel deckLabel={i18n.format(t('off_deck'), 'upperCase')} />
+    )
   } else if ('slotName' in initialLocation) {
     slotName = initialLocation.slotName
-    location = <LocationIcon slotName={initialLocation.slotName} />
+    location = <DeckInfoLabel deckLabel={initialLocation.slotName} />
   } else if ('addressableAreaName' in initialLocation) {
     slotName = initialLocation.addressableAreaName
-    location = <LocationIcon slotName={initialLocation.addressableAreaName} />
+    location = <DeckInfoLabel deckLabel={initialLocation.addressableAreaName} />
   } else if (matchedModuleType != null && matchedModule?.slotName != null) {
     slotName = matchedModule.slotName
     location = (
       <>
-        <LocationIcon slotName={matchedModule?.slotName} />
-        <LocationIcon iconName={MODULE_ICON_NAME_BY_TYPE[matchedModuleType]} />
+        <DeckInfoLabel deckLabel={matchedModule?.slotName} />
       </>
     )
   } else if ('labwareId' in initialLocation) {
@@ -533,25 +573,14 @@ function RowLabware({
     if (adapterLocation != null && adapterLocation !== 'offDeck') {
       if ('slotName' in adapterLocation) {
         slotName = adapterLocation.slotName
-        location = <LocationIcon slotName={adapterLocation.slotName} />
+        location = <DeckInfoLabel deckLabel={adapterLocation.slotName} />
       } else if ('moduleId' in adapterLocation) {
         const moduleUnderAdapter = attachedProtocolModules.find(
           module => module.moduleId === adapterLocation.moduleId
         )
         if (moduleUnderAdapter != null) {
           slotName = moduleUnderAdapter.slotName
-          location = (
-            <>
-              <LocationIcon slotName={moduleUnderAdapter.slotName} />
-              <LocationIcon
-                iconName={
-                  MODULE_ICON_NAME_BY_TYPE[
-                    moduleUnderAdapter.moduleDef.moduleType
-                  ]
-                }
-              />
-            </>
-          )
+          location = <DeckInfoLabel deckLabel={moduleUnderAdapter.slotName} />
         }
       }
     }
@@ -566,6 +595,9 @@ function RowLabware({
     >
       <Flex gridGap={SPACING.spacing4} width="7.6875rem">
         {location}
+        {nestedLabwareInfo != null || matchedModule != null ? (
+          <DeckInfoLabel iconName="stacked" />
+        ) : null}
       </Flex>
       <Flex
         alignSelf={ALIGN_FLEX_START}
@@ -586,26 +618,62 @@ function RowLabware({
               {nickName}
             </LegacyStyledText>
           </Flex>
-          {nestedLabwareInfo != null ? (
-            <Box
-              borderBottom={`1px solid ${COLORS.grey60}`}
-              marginY={SPACING.spacing16}
-              width="33rem"
-            />
-          ) : null}
           {nestedLabwareInfo != null &&
           nestedLabwareInfo?.sharedSlotId === slotName ? (
-            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-              <LegacyStyledText
-                as="p"
-                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            <>
+              <Box
+                borderBottom={`1px solid ${COLORS.grey60}`}
+                marginY={SPACING.spacing16}
+                width={matchingHeaterShaker != null ? '33rem' : '46rem'}
+              />
+              <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+                <LegacyStyledText
+                  as="p"
+                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                >
+                  {nestedLabwareInfo.nestedLabwareDisplayName}
+                </LegacyStyledText>
+                <LegacyStyledText as="p" color={COLORS.grey60}>
+                  {nestedLabwareInfo.nestedLabwareNickName}
+                </LegacyStyledText>
+              </Flex>
+            </>
+          ) : null}
+          {matchedModule != null ? (
+            <>
+              <Box
+                borderBottom={`1px solid ${COLORS.grey60}`}
+                marginY={SPACING.spacing16}
+                width={matchingHeaterShaker != null ? '33rem' : '46rem'}
+              />
+              <Flex
+                flexDirection={DIRECTION_ROW}
+                gridGap={SPACING.spacing12}
+                alignItems={ALIGN_CENTER}
               >
-                {nestedLabwareInfo.nestedLabwareDisplayName}
-              </LegacyStyledText>
-              <LegacyStyledText as="p" color={COLORS.grey60}>
-                {nestedLabwareInfo.nestedLabwareNickName}
-              </LegacyStyledText>
-            </Flex>
+                <DeckInfoLabel
+                  iconName={
+                    MODULE_ICON_NAME_BY_TYPE[matchedModule.moduleDef.moduleType]
+                  }
+                />
+                <Flex
+                  flexDirection={DIRECTION_COLUMN}
+                  gridGap={SPACING.spacing4}
+                >
+                  <LegacyStyledText
+                    as="p"
+                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                  >
+                    {getModuleDisplayName(matchedModule.moduleDef.model)}
+                  </LegacyStyledText>
+                  {matchingHeaterShaker != null ? (
+                    <LegacyStyledText as="p" color={COLORS.grey60}>
+                      {t('protocol_setup:labware_latch_instructions')}
+                    </LegacyStyledText>
+                  ) : null}
+                </Flex>
+              </Flex>
+            </>
           ) : null}
         </Flex>
         {matchingHeaterShaker != null ? (

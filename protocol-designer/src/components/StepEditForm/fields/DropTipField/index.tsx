@@ -2,13 +2,19 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { DropdownField, FormGroup } from '@opentrons/components'
-import { getAdditionalEquipmentEntities } from '../../../../step-forms/selectors'
-import styles from '../../StepEditForm.module.css'
+import {
+  getAdditionalEquipmentEntities,
+  getLabwareEntities,
+} from '../../../../step-forms/selectors'
+import { getAllTiprackOptions } from '../../../../ui/labware/selectors'
+import { getEnableReturnTip } from '../../../../feature-flags/selectors'
 import type { DropdownOption } from '@opentrons/components'
 import type { StepFormDropdown } from '../StepFormDropdownField'
 
+import styles from '../../StepEditForm.module.css'
+
 export function DropTipField(
-  props: Omit<React.ComponentProps<typeof StepFormDropdown>, 'options'>
+  props: Omit<React.ComponentProps<typeof StepFormDropdown>, 'options'> & {}
 ): JSX.Element {
   const {
     value: dropdownItem,
@@ -16,9 +22,14 @@ export function DropTipField(
     onFieldBlur,
     onFieldFocus,
     updateValue,
+    disabled,
   } = props
   const { t } = useTranslation('form')
   const additionalEquipment = useSelector(getAdditionalEquipmentEntities)
+  const labwareEntities = useSelector(getLabwareEntities)
+  const tiprackOptions = useSelector(getAllTiprackOptions)
+  const enableReturnTip = useSelector(getEnableReturnTip)
+
   const wasteChute = Object.values(additionalEquipment).find(
     aE => aE.name === 'wasteChute'
   )
@@ -39,17 +50,27 @@ export function DropTipField(
   if (trashBin != null) options.push(trashOption)
 
   React.useEffect(() => {
-    if (additionalEquipment[String(dropdownItem)] == null) {
+    if (
+      additionalEquipment[String(dropdownItem)] == null &&
+      labwareEntities[String(dropdownItem)] == null
+    ) {
       updateValue(null)
     }
   }, [dropdownItem])
+
   return (
     <FormGroup
-      label={t('step_edit_form.field.location.label')}
+      label={
+        enableReturnTip
+          ? t('step_edit_form.field.location.dropTip')
+          : t('step_edit_form.field.location.label')
+      }
       className={styles.large_field}
+      disabled={disabled}
     >
       <DropdownField
-        options={options}
+        disabled={disabled}
+        options={enableReturnTip ? [...options, ...tiprackOptions] : options}
         name={name}
         value={dropdownItem ? String(dropdownItem) : null}
         onBlur={onFieldBlur}

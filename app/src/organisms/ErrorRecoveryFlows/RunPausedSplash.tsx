@@ -9,7 +9,6 @@ import {
   ALIGN_CENTER,
   SPACING,
   COLORS,
-  BORDERS,
   DIRECTION_COLUMN,
   POSITION_ABSOLUTE,
   TYPOGRAPHY,
@@ -18,25 +17,28 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   TEXT_ALIGN_CENTER,
   StyledText,
-  JUSTIFY_END,
   PrimaryButton,
   SecondaryButton,
+  LargeButton,
 } from '@opentrons/components'
 
 import { useErrorName } from './hooks'
 import { getErrorKind } from './utils'
-import { LargeButton } from '../../atoms/buttons'
-import { RECOVERY_MAP } from './constants'
+
 import {
-  RecoveryInterventionModal,
-  RecoverySingleColumnContentWrapper,
-  StepInfo,
-} from './shared'
+  BANNER_TEXT_CONTAINER_STYLE,
+  BANNER_TEXT_CONTENT_STYLE,
+  RECOVERY_MAP,
+} from './constants'
+import { RecoveryInterventionModal, StepInfo } from './shared'
 
 import type { RobotType } from '@opentrons/shared-data'
 import type { ErrorRecoveryFlowsProps } from '.'
-import type { ERUtilsResults } from './hooks'
-import { useHost } from '@opentrons/react-api-client'
+import type {
+  ERUtilsResults,
+  UseRecoveryAnalyticsResult,
+  UseRecoveryTakeoverResult,
+} from './hooks'
 
 export function useRunPausedSplash(
   isOnDevice: boolean,
@@ -44,7 +46,11 @@ export function useRunPausedSplash(
 ): boolean {
   // Don't show the splash when desktop ER wizard is active,
   // but always show it on the ODD (with or without the wizard rendered above it).
-  return !(!isOnDevice && showERWizard)
+  if (isOnDevice) {
+    return true
+  } else {
+    return !showERWizard
+  }
 }
 
 type RunPausedSplashProps = ERUtilsResults & {
@@ -52,35 +58,49 @@ type RunPausedSplashProps = ERUtilsResults & {
   failedCommand: ErrorRecoveryFlowsProps['failedCommand']
   protocolAnalysis: ErrorRecoveryFlowsProps['protocolAnalysis']
   robotType: RobotType
-  toggleERWiz: (launchER: boolean) => Promise<void>
+  robotName: string
+  toggleERWizAsActiveUser: UseRecoveryTakeoverResult['toggleERWizAsActiveUser']
+  analytics: UseRecoveryAnalyticsResult
 }
 export function RunPausedSplash(
   props: RunPausedSplashProps
 ): JSX.Element | null {
-  const { isOnDevice, toggleERWiz, routeUpdateActions, failedCommand } = props
+  const {
+    isOnDevice,
+    toggleERWizAsActiveUser,
+    routeUpdateActions,
+    failedCommand,
+    analytics,
+    robotName,
+  } = props
   const { t } = useTranslation('error_recovery')
   const errorKind = getErrorKind(failedCommand)
   const title = useErrorName(errorKind)
-  const host = useHost()
 
   const { proceedToRouteAndStep } = routeUpdateActions
+  const { reportInitialActionEvent } = analytics
 
   const buildTitleHeadingDesktop = (): JSX.Element => {
     return (
       <StyledText desktopStyle="bodyLargeSemiBold">
-        {t('error_on_robot', { robot: host?.robotName ?? '' })}
+        {t('error_on_robot', { robot: robotName })}
       </StyledText>
     )
   }
 
   // Do not launch error recovery, but do utilize the wizard's cancel route.
   const onCancelClick = (): Promise<void> => {
-    return toggleERWiz(false).then(() =>
-      proceedToRouteAndStep(RECOVERY_MAP.CANCEL_RUN.ROUTE)
-    )
+    return toggleERWizAsActiveUser(true, false).then(() => {
+      reportInitialActionEvent('cancel-run')
+      void proceedToRouteAndStep(RECOVERY_MAP.CANCEL_RUN.ROUTE)
+    })
   }
 
-  const onLaunchERClick = (): Promise<void> => toggleERWiz(true)
+  const onLaunchERClick = (): Promise<void> => {
+    return toggleERWizAsActiveUser(true, true).then(() => {
+      reportInitialActionEvent('launch-recovery')
+    })
+  }
 
   // TODO(jh 05-22-24): The hardcoded Z-indexing is non-ideal but must be done to keep the splash page above
   // several components in the RunningProtocol page. Investigate why these components have seemingly arbitrary zIndex values
@@ -148,49 +168,32 @@ export function RunPausedSplash(
       <RecoveryInterventionModal
         desktopType="desktop-small"
         titleHeading={buildTitleHeadingDesktop()}
-        isOnDevice={isOnDevice}
+        isOnDevice={false}
       >
-        <RecoverySingleColumnContentWrapper>
-          <Flex
-            gridGap={SPACING.spacing24}
-            flexDirection={DIRECTION_COLUMN}
-            justifyContent={JUSTIFY_SPACE_BETWEEN}
-          >
+        <Flex css={BANNER_TEXT_CONTAINER_STYLE}>
+          <Flex css={BANNER_TEXT_CONTENT_STYLE}>
+            <Icon
+              name="ot-alert"
+              size={SPACING.spacing40}
+              color={COLORS.red50}
+            />
             <Flex
-              borderRadius={BORDERS.borderRadius8}
-              padding={`${SPACING.spacing40} ${SPACING.spacing16}`}
-              gridGap={SPACING.spacing16}
-              height="100%"
+              gridGap={SPACING.spacing8}
               flexDirection={DIRECTION_COLUMN}
-              justifyContent={JUSTIFY_CENTER}
               alignItems={ALIGN_CENTER}
+              width="100%"
             >
-              <Icon
-                name="ot-alert"
-                size={SPACING.spacing40}
-                color={COLORS.red50}
+              <StyledText desktopStyle="headingSmallBold">{title}</StyledText>
+              <StepInfo
+                {...props}
+                desktopStyle="bodyDefaultRegular"
+                overflow="hidden"
+                overflowWrap={OVERFLOW_WRAP_BREAK_WORD}
+                textAlign={TEXT_ALIGN_CENTER}
               />
-              <Flex
-                gridGap={SPACING.spacing8}
-                flexDirection={DIRECTION_COLUMN}
-                alignItems={ALIGN_CENTER}
-              >
-                <StyledText desktopStyle="headingSmallBold">{title}</StyledText>
-                <StepInfo
-                  {...props}
-                  desktopStyle="bodyDefaultRegular"
-                  overflow="hidden"
-                  overflowWrap={OVERFLOW_WRAP_BREAK_WORD}
-                  textAlign={TEXT_ALIGN_CENTER}
-                />
-              </Flex>
             </Flex>
           </Flex>
-          <Flex
-            gridGap={SPACING.spacing8}
-            justifyContent={JUSTIFY_END}
-            alignItems={ALIGN_CENTER}
-          >
+          <Flex gridGap={SPACING.spacing8} marginLeft="auto">
             <SecondaryButton isDangerous onClick={onCancelClick}>
               {t('cancel_run')}
             </SecondaryButton>
@@ -203,7 +206,7 @@ export function RunPausedSplash(
               </StyledText>
             </PrimaryButton>
           </Flex>
-        </RecoverySingleColumnContentWrapper>
+        </Flex>
       </RecoveryInterventionModal>
     )
   }

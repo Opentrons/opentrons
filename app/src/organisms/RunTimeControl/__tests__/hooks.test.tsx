@@ -4,11 +4,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { useRunActionMutations } from '@opentrons/react-api-client'
 
-import {
-  useCloneRun,
-  useCurrentRunId,
-  useRunCommands,
-} from '../../ProtocolUpload/hooks'
+import { useCloneRun, useRunCommands } from '../../ProtocolUpload/hooks'
 import {
   useRunControls,
   useRunStatus,
@@ -16,7 +12,7 @@ import {
   useRunTimestamps,
   useRunErrors,
 } from '../hooks'
-import { useNotifyRunQuery } from '../../../resources/runs'
+import { useNotifyRunQuery, useCurrentRunId } from '../../../resources/runs'
 
 import {
   RUN_ID_2,

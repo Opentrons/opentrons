@@ -26,7 +26,7 @@ router = APIRouter()
 
 # NOTE(mc, 2022-03-22): replaced by robot_server.modules.router.get_attached_modules
 async def get_modules(
-    hardware: HardwareControlAPI = Depends(get_hardware),
+    hardware: typing.Annotated[HardwareControlAPI, Depends(get_hardware)],
 ) -> Modules:
     attached_modules = hardware.attached_modules
     module_data = [
@@ -78,9 +78,9 @@ async def get_modules(
 )
 async def post_serial_command(
     command: SerialCommand,
-    serial: str = Path(..., description="Serial number of the module"),
-    hardware: HardwareControlAPI = Depends(get_hardware),
-    requested_version: int = Depends(get_requested_version),
+    serial: typing.Annotated[str, Path(..., description="Serial number of the module")],
+    hardware: typing.Annotated[HardwareControlAPI, Depends(get_hardware)],
+    requested_version: typing.Annotated[int, Depends(get_requested_version)],
 ) -> SerialCommandResponse:
     """Send a command on device identified by serial"""
     if requested_version >= 3:
@@ -144,8 +144,8 @@ async def post_serial_command(
     },
 )
 async def post_serial_update(
-    serial: str = Path(..., description="Serial number of the module"),
-    hardware: HardwareControlAPI = Depends(get_hardware),
+    serial: typing.Annotated[str, Path(..., description="Serial number of the module")],
+    hardware: typing.Annotated[HardwareControlAPI, Depends(get_hardware)],
 ) -> V1BasicResponse:
     """Update module firmware"""
     attached_modules = hardware.attached_modules

@@ -1,28 +1,29 @@
 import asyncio
 
+from opentrons.hardware_control.modules.tempdeck import TempDeck
 import pytest
 
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.hardware_control import modules, ExecutionManager
+from typing import AsyncGenerator
 
 
 @pytest.fixture
-def usb_port():
+def usb_port() -> USBPort:
     return USBPort(
         name="",
-        hub=None,
         port_number=0,
         device_path="/dev/ot_module_sim_tempdeck0",
     )
 
 
 @pytest.fixture
-async def subject(usb_port: USBPort) -> modules.AbstractModule:
+async def subject(usb_port: USBPort) -> AsyncGenerator[modules.AbstractModule, None]:
     """Test subject"""
     temp = await modules.build(
         port="/dev/ot_module_sim_tempdeck0",
         usb_port=usb_port,
-        type=modules.ModuleType.TEMPERATURE,
+        type=modules.ModuleType["TEMPERATURE"],
         simulating=True,
         hw_control_loop=asyncio.get_running_loop(),
         execution_manager=ExecutionManager(),
@@ -31,11 +32,12 @@ async def subject(usb_port: USBPort) -> modules.AbstractModule:
     await temp.cleanup()
 
 
-async def test_sim_initialization(subject: modules.AbstractModule):
+async def test_sim_initialization(subject: modules.AbstractModule) -> None:
     assert isinstance(subject, modules.AbstractModule)
 
 
-async def test_sim_state(subject: modules.AbstractModule):
+async def test_sim_state(subject: modules.AbstractModule) -> None:
+    assert isinstance(subject, TempDeck)
     assert subject.temperature == 0
     assert subject.target is None
     assert subject.status == "idle"
@@ -49,7 +51,8 @@ async def test_sim_state(subject: modules.AbstractModule):
     assert status["version"] == "dummyVersionTD"
 
 
-async def test_sim_update(subject: modules.AbstractModule):
+async def test_sim_update(subject: modules.AbstractModule) -> None:
+    assert isinstance(subject, TempDeck)
     await subject.start_set_temperature(10)
     await subject.await_temperature(None)
     assert subject.temperature == 10
@@ -61,7 +64,8 @@ async def test_sim_update(subject: modules.AbstractModule):
     assert subject.status == "idle"
 
 
-async def test_revision_model_parsing(subject: modules.AbstractModule):
+async def test_revision_model_parsing(subject: modules.AbstractModule) -> None:
+    assert isinstance(subject, TempDeck)
     subject._device_info["model"] = "temp_deck_v20"
     assert subject.model() == "temperatureModuleV2"
     subject._device_info["model"] = "temp_deck_v4.0"

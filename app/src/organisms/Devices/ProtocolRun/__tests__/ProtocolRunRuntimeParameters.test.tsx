@@ -8,7 +8,6 @@ import { i18n } from '../../../../i18n'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useRunStatus } from '../../../RunTimeControl/hooks'
 import { useNotifyRunQuery } from '../../../../resources/runs'
-import { useFeatureFlag } from '../../../../redux/config'
 import { mockSucceededRun } from '../../../RunTimeControl/__fixtures__'
 import { ProtocolRunRuntimeParameters } from '../ProtocolRunRunTimeParameters'
 
@@ -93,7 +92,8 @@ const mockCsvRtp = {
   description: '',
   type: 'csv_file',
   file: {
-    file: { name: 'mock.csv' } as File,
+    id: 'mock_csv_id',
+    name: 'mock.csv',
   },
 }
 
@@ -121,9 +121,6 @@ describe('ProtocolRunRuntimeParameters', () => {
     vi.mocked(useNotifyRunQuery).mockReturnValue(({
       data: { data: mockSucceededRun },
     } as unknown) as UseQueryResult<Run>)
-    when(vi.mocked(useFeatureFlag))
-      .calledWith('enableCsvFile')
-      .thenReturn(false)
   })
 
   afterEach(() => {
@@ -188,7 +185,6 @@ describe('ProtocolRunRuntimeParameters', () => {
   })
 
   it('should render csv row if a protocol requires a csv', () => {
-    when(vi.mocked(useFeatureFlag)).calledWith('enableCsvFile').thenReturn(true)
     vi.mocked(useMostRecentCompletedAnalysis).mockReturnValue({
       runTimeParameters: [...mockRunTimeParameterData, mockCsvRtp],
     } as CompletedProtocolAnalysis)

@@ -18,7 +18,7 @@ import { ProtocolRunModuleControls } from '../../../../organisms/Devices/Protoco
 import { ProtocolRunSetup } from '../../../../organisms/Devices/ProtocolRun/ProtocolRunSetup'
 import { RunPreviewComponent } from '../../../../organisms/RunPreview'
 import { ProtocolRunRuntimeParameters } from '../../../../organisms/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
-import { useCurrentRunId } from '../../../../organisms/ProtocolUpload/hooks'
+import { useCurrentRunId } from '../../../../resources/runs'
 import { mockRobotSideAnalysis } from '../../../../molecules/Command/__fixtures__'
 import { useFeatureFlag } from '../../../../redux/config'
 import { ProtocolRunDetails } from '..'
@@ -33,7 +33,7 @@ vi.mock('../../../../organisms/Devices/ProtocolRun/ProtocolRunHeader')
 vi.mock('../../../../organisms/Devices/ProtocolRun/ProtocolRunSetup')
 vi.mock('../../../../organisms/RunPreview')
 vi.mock('../../../../organisms/Devices/ProtocolRun/ProtocolRunModuleControls')
-vi.mock('../../../../organisms/ProtocolUpload/hooks')
+vi.mock('../../../../resources/runs')
 vi.mock(
   '../../../../organisms/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
 )

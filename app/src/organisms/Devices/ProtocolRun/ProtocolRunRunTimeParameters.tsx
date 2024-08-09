@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
+
 import {
   RUN_ACTION_TYPE_PLAY,
   RUN_STATUS_STOPPED,
@@ -21,8 +22,9 @@ import {
   Flex,
   Icon,
   InfoScreen,
-  SPACING,
   LegacyStyledText,
+  OVERFLOW_AUTO,
+  SPACING,
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
@@ -132,7 +134,12 @@ export function ProtocolRunRuntimeParameters({
       ) : (
         <>
           <Divider width="100%" />
-          <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing16}>
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            padding={SPACING.spacing16}
+            height="28rem"
+            overflowY={OVERFLOW_AUTO}
+          >
             <StyledTable>
               <StyledTableHeaderContainer>
                 <StyledTableHeader>{t('name')}</StyledTableHeader>
@@ -209,8 +216,7 @@ const StyledTableRowComponent = (
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing16}>
           <LegacyStyledText as="p">
             {parameter.type === 'csv_file'
-              ? // TODO (nd, 07/17/2024): retrieve filename from parameter once backend is wired up
-                parameter.file?.file?.name ?? ''
+              ? parameter.file?.name ?? ''
               : formatRunTimeParameterValue(parameter, t)}
           </LegacyStyledText>
           {parameter.type === 'csv_file' ||

@@ -19,6 +19,7 @@
   "homepage": "https://github.com/Opentrons/opentrons",
   "license": "Apache-2.0",
   "dependencies": {
+    "@fontsource/public-sans": "5.0.3",
     "@hot-loader/react-dom": "17.0.1",
     "@vitejs/plugin-react": "^4.2.1",
     "@vituum/vite-plugin-postcss": "1.1.0",

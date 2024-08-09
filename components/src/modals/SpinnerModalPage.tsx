@@ -15,6 +15,7 @@ export interface SpinnerModalPageProps
 }
 
 /**
+ * @deprecated use Modal instead
  * Spinner Modal variant with TitleBar
  */
 export function SpinnerModalPage(props: SpinnerModalPageProps): JSX.Element {

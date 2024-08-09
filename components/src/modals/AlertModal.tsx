@@ -3,7 +3,7 @@ import cx from 'classnames'
 
 import { OutlineButton } from '../buttons'
 import { Icon } from '../icons'
-import { Modal } from './Modal'
+import { LegacyModal } from './LegacyModal'
 import styles from './modals.module.css'
 
 import type { ButtonProps } from '../buttons'
@@ -31,6 +31,7 @@ export interface AlertModalProps {
 }
 
 /**
+ * @deprecated use Modal instead
  * Generic alert modal with a heading and a set of buttons at the bottom
  */
 export function AlertModal(props: AlertModalProps): JSX.Element {
@@ -52,7 +53,7 @@ export function AlertModal(props: AlertModalProps): JSX.Element {
   )
 
   return (
-    <Modal
+    <LegacyModal
       className={className}
       contentsClassName={wrapperStyle}
       onCloseClick={onCloseClick}
@@ -83,6 +84,6 @@ export function AlertModal(props: AlertModalProps): JSX.Element {
           ))}
         </div>
       )}
-    </Modal>
+    </LegacyModal>
   )
 }

@@ -1,7 +1,11 @@
 <!--
-Thanks for taking the time to open a pull request! Please make sure you've read the "Opening Pull Requests" section of our Contributing Guide:
+Thanks for taking the time to open a Pull Request (PR)! Please make sure you've read the "Opening Pull Requests" section of our Contributing Guide:
 
 https://github.com/Opentrons/opentrons/blob/edge/CONTRIBUTING.md#opening-pull-requests
+
+GitHub provides robust markdown to format your PR. Links, diagrams, pictures, and videos along with text formatting make it possible to create a rich and informative PR. For more information on GitHub markdown, see:
+
+https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax
 
 To ensure your code is reviewed quickly and thoroughly, please fill out the sections below to the best of your ability!
 -->
@@ -9,54 +13,36 @@ To ensure your code is reviewed quickly and thoroughly, please fill out the sect
 # Overview
 
 <!--
-Use this section to describe your pull-request at a high level. If the PR addresses any open issues, please tag the issues here.
+Describe your PR at a high level. State acceptance criteria and how this PR fits into other work. Link issues, PRs, and other relevant resources.
 -->
 
-# Test Plan
+## Test Plan and Hands on Testing
 
 <!--
-Use this section to describe the steps that you took to test your Pull Request.
-If you did not perform any testing provide justification why.
-
-OT-3 Developers: You should default to testing on actual physical hardware.
-Once again, if you did not perform testing against hardware, justify why.
-
-Note: It can be helpful to write a test plan before doing development
-
-Example Test Plan (HTTP API Change)
-
-- Verified that new optional argument `dance-party` causes the robot to flash its lights, move the pipettes,
-then home.
-- Verified that when you omit the `dance-party` option the robot homes normally
-- Added protocol that uses `dance-party` argument to G-Code Testing Suite
-- Ran protocol that did not use `dance-party` argument and everything was successful
-- Added unit tests to validate that changes to pydantic model are correct
-
+Describe your testing of the PR. Emphasize testing not reflected in the code. Attach protocols, logs, screenshots and any other assets that support your testing.
 -->
 
-# Changelog
+## Changelog
 
 <!--
-List out the changes to the code in this PR. Please try your best to categorize your changes and describe what has changed and why.
-
-Example changelog:
-- Fixed app crash when trying to calibrate an illegal pipette
-- Added state to API to track pipette usage
-- Updated API docs to mention only two pipettes are supported
-
-IMPORTANT: MAKE SURE ANY BREAKING CHANGES ARE PROPERLY COMMUNICATED
+List changes introduced by this PR considering future developers and the end user. Give careful thought and clear documentation to breaking changes.
 -->
 
-# Review requests
+## Review requests
 
 <!--
-Describe any requests for your reviewers here.
+- What do you need from reviewers to feel confident this PR is ready to merge?
+- Ask questions.
 -->
 
-# Risk assessment
+## Risk assessment
 
 <!--
-Carefully go over your pull request and look at the other parts of the codebase it may affect. Look for the possibility, even if you think it's small, that your change may affect some other part of the system - for instance, changing return tip behavior in protocol may also change the behavior of labware calibration.
-
-Identify the other parts of the system your codebase may affect, so that in addition to your own review and testing, other people who may not have the system internalized as much as you can focus their attention and testing there.
+- Indicate the level of attention this PR needs.
+- Provide context to guide reviewers.
+- Discuss trade-offs, coupling, and side effects.
+- Look for the possibility, even if you think it's small, that your change may affect some other part of the system.
+  - For instance, changing return tip behavior may also change the behavior of labware calibration.
+- How do your unit tests and on hands on testing mitigate this PR's risks and the risk of future regressions?
+- Especially in high risk PRs, explain how you know your testing is enough.
 -->

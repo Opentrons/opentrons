@@ -20,7 +20,7 @@ from ..commands import (
     CommandDefinedErrorData,
     CommandPrivateResult,
 )
-from ..error_recovery_policy import ErrorRecoveryType
+from ..error_recovery_policy import ErrorRecoveryPolicy, ErrorRecoveryType
 from ..notes.notes import CommandNote
 from ..types import (
     LabwareOffsetCreate,
@@ -277,6 +277,13 @@ class AddAbsorbanceReaderLidAction:
     lid_id: str
 
 
+@dataclass(frozen=True)
+class SetErrorRecoveryPolicyAction:
+    """See `ProtocolEngine.set_error_recovery_policy()`."""
+
+    error_recovery_policy: ErrorRecoveryPolicy
+
+
 Action = Union[
     PlayAction,
     PauseAction,
@@ -298,4 +305,5 @@ Action = Union[
     ResetTipsAction,
     SetPipetteMovementSpeedAction,
     AddAbsorbanceReaderLidAction,
+    SetErrorRecoveryPolicyAction,
 ]

@@ -1,5 +1,7 @@
 """An in-memory store for arbitrary client-defined JSON objects."""
 
+from typing import Annotated
+
 import fastapi
 
 from server_utils.fastapi_utils.app_state import (
@@ -29,6 +31,10 @@ class ClientDataStore:
         """
         return self._current_data[key]
 
+    def get_keys(self) -> list[str]:
+        """Return the keys that currently have data stored."""
+        return list(self._current_data.keys())
+
     def delete(self, key: str) -> None:
         """Delete the data at the given key.
 
@@ -45,7 +51,7 @@ _app_state_accessor = AppStateAccessor[ClientDataStore]("client_data_store")
 
 
 async def get_client_data_store(
-    app_state: AppState = fastapi.Depends(get_app_state),
+    app_state: Annotated[AppState, fastapi.Depends(get_app_state)],
 ) -> ClientDataStore:
     """A FastAPI dependency to return the server's singleton `ClientDataStore`."""
     store = _app_state_accessor.get_from(app_state)

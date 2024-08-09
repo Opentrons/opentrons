@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Mapping, Optional
+from typing import Dict, Optional
 
 from opentrons.hardware_control.modules.types import (
     ModuleDisconnectedCallback,
@@ -29,7 +29,7 @@ SIM_TEMP_POLL_INTERVAL_SECS = TEMP_POLL_INTERVAL_SECS / 20.0
 class TempDeck(mod_abc.AbstractModule):
     """Hardware control interface for an attached Temperature Module."""
 
-    MODULE_TYPE = types.ModuleType.TEMPERATURE
+    MODULE_TYPE = types.ModuleType["TEMPERATURE"]
     FIRST_GEN2_REVISION = 20
 
     @classmethod
@@ -100,7 +100,7 @@ class TempDeck(mod_abc.AbstractModule):
         driver: AbstractTempDeckDriver,
         reader: TempDeckReader,
         poller: Poller,
-        device_info: Mapping[str, str],
+        device_info: Dict[str, str],
         hw_control_loop: asyncio.AbstractEventLoop,
         disconnected_callback: ModuleDisconnectedCallback = None,
     ) -> None:
@@ -190,7 +190,7 @@ class TempDeck(mod_abc.AbstractModule):
         await self._reader.read()
 
     @property
-    def device_info(self) -> Mapping[str, str]:
+    def device_info(self) -> Dict[str, str]:
         return self._device_info
 
     @property

@@ -12,9 +12,11 @@ from opentrons.protocols.api_support.definitions import (
 from opentrons.protocols.parameters.exceptions import (
     RuntimeParameterRequired as RuntimeParameterRequiredError,
 )
+from opentrons.protocols.parameters.csv_parameter_interface import CSVParameter
 
 from .protocol_context import ProtocolContext
 from .deck import Deck
+from .robot_context import RobotContext
 from .instrument_context import InstrumentContext
 from .labware import Labware, Well
 from .module_contexts import (
@@ -51,6 +53,7 @@ __all__ = [
     "ProtocolContext",
     "Deck",
     "ModuleContext",
+    "RobotContext",
     "InstrumentContext",
     "TemperatureModuleContext",
     "MagneticModuleContext",
@@ -72,6 +75,7 @@ __all__ = [
     "ALL",
     "OFF_DECK",
     "RuntimeParameterRequiredError",
+    "CSVParameter",
     # For internal Opentrons use only:
     "create_protocol_context",
     "ProtocolEngineCoreRequiredError",

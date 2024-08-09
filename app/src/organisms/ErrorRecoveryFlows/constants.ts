@@ -1,6 +1,14 @@
 import { css } from 'styled-components'
 
-import { SPACING, RESPONSIVENESS } from '@opentrons/components'
+import {
+  RESPONSIVENESS,
+  SPACING,
+  DIRECTION_COLUMN,
+  ALIGN_CENTER,
+  JUSTIFY_CENTER,
+  JUSTIFY_SPACE_BETWEEN,
+  TEXT_ALIGN_CENTER,
+} from '@opentrons/components'
 
 import type { StepOrder } from './types'
 
@@ -217,4 +225,37 @@ export const DESKTOP_ONLY = css`
   @media (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
     display: none;
   }
+`
+export const FLEX_WIDTH_ALERT_INFO_STYLE = css`
+  width: 41.625rem;
+  @media (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+    width: 53rem;
+  }
+`
+export const ICON_SIZE_ALERT_INFO_STYLE = css`
+  width: ${SPACING.spacing40};
+  height: ${SPACING.spacing40};
+  @media (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+    width: ${SPACING.spacing60};
+    height: ${SPACING.spacing60};
+  }
+`
+
+export const BANNER_TEXT_CONTAINER_STYLE = css`
+  flex-direction: ${DIRECTION_COLUMN};
+  justify-content: ${JUSTIFY_SPACE_BETWEEN};
+  align-items: ${ALIGN_CENTER};
+  padding-top: ${SPACING.spacing12};
+  width: 100%;
+`
+
+export const BANNER_TEXT_CONTENT_STYLE = css`
+  flex-direction: ${DIRECTION_COLUMN};
+  justify-content: ${JUSTIFY_CENTER};
+  align-items: ${ALIGN_CENTER};
+
+  text-align: ${TEXT_ALIGN_CENTER};
+  padding: ${SPACING.spacing40} ${SPACING.spacing40};
+  grid-gap: ${SPACING.spacing16};
+  width: 100%;
 `

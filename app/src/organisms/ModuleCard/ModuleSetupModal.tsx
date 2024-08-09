@@ -9,12 +9,12 @@ import {
   Flex,
   Icon,
   Link,
+  Modal,
   PrimaryButton,
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { LegacyModal } from '../../molecules/LegacyModal'
 import { getTopPortalEl } from '../../App/portal'
 
 const MODULE_SETUP_URL = 'https://support.opentrons.com/s/modules'
@@ -29,7 +29,7 @@ export const ModuleSetupModal = (props: ModuleSetupModalProps): JSX.Element => {
   const { t, i18n } = useTranslation(['protocol_setup', 'shared', 'branded'])
 
   return createPortal(
-    <LegacyModal
+    <Modal
       title={t('modal_instructions_title', { moduleName: moduleDisplayName })}
       onClose={props.close}
       width="668px"
@@ -68,7 +68,7 @@ export const ModuleSetupModal = (props: ModuleSetupModalProps): JSX.Element => {
           {i18n.format(t('shared:close'), 'capitalize')}
         </PrimaryButton>
       </Flex>
-    </LegacyModal>,
+    </Modal>,
     getTopPortalEl()
   )
 }

@@ -7,10 +7,6 @@ from pydantic import BaseModel, Field
 
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ...errors.error_occurrence import ErrorOccurrence
-from opentrons.protocol_engine.types import (
-    LabwareOffsetVector,
-    LabwareMovementOffsetData,
-)
 from .types import MoveLidResult
 from opentrons.protocol_engine.resources import labware_validation
 
@@ -29,16 +25,6 @@ class OpenLidParams(BaseModel):
     """Input parameters to open the lid on an absorbance reading."""
 
     moduleId: str = Field(..., description="Unique ID of the absorbance reader.")
-    pickUpOffset: Optional[LabwareOffsetVector] = Field(
-        None,
-        description="Offset to use when picking up labware. "
-        "Experimental param, subject to change",
-    )
-    dropOffset: Optional[LabwareOffsetVector] = Field(
-        None,
-        description="Offset to use when dropping off labware. "
-        "Experimental param, subject to change",
-    )
 
 
 class OpenLidResult(MoveLidResult):
@@ -87,17 +73,21 @@ class OpenLidImpl(AbstractCommandImpl[OpenLidParams, SuccessData[OpenLidResult, 
         validated_new_location = (
             self._state_view.geometry.ensure_valid_gripper_location(new_location)
         )
-        # TODO (AA): we probably don't need this, but let's keep it until we're sure
-        user_offset_data = LabwareMovementOffsetData(
-            pickUpOffset=params.pickUpOffset or LabwareOffsetVector(x=0, y=0, z=0),
-            dropOffset=params.dropOffset or LabwareOffsetVector(x=0, y=0, z=0),
+
+        lid_gripper_offsets = self._state_view.labware.get_labware_gripper_offsets(
+            loaded_lid.id, None
         )
+        if lid_gripper_offsets is None:
+            raise ValueError(
+                "Gripper Offset values for Absorbance Reader Lid labware must not be None."
+            )
+
         # Skips gripper moves when using virtual gripper
         await self._labware_movement.move_labware_with_gripper(
             labware_id=loaded_lid.id,
             current_location=validated_current_location,
             new_location=validated_new_location,
-            user_offset_data=user_offset_data,
+            user_offset_data=lid_gripper_offsets,
             post_drop_slide_offset=None,
         )
         new_offset_id = self._equipment.find_applicable_labware_offset_id(

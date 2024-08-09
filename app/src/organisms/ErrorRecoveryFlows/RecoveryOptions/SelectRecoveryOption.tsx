@@ -7,6 +7,7 @@ import {
   Flex,
   SPACING,
   StyledText,
+  RadioButton,
 } from '@opentrons/components'
 
 import {
@@ -16,7 +17,6 @@ import {
   ODD_ONLY,
   DESKTOP_ONLY,
 } from '../constants'
-import { RadioButton } from '../../../atoms/buttons'
 import {
   RecoveryODDOneDesktopTwoColumnContentWrapper,
   RecoveryRadioGroup,
@@ -51,6 +51,7 @@ export function SelectRecoveryOptionHome({
   tipStatusUtils,
   currentRecoveryOptionUtils,
   getRecoveryOptionCopy,
+  analytics,
   ...rest
 }: RecoveryContentProps): JSX.Element | null {
   const { t } = useTranslation('error_recovery')
@@ -68,6 +69,7 @@ export function SelectRecoveryOptionHome({
     <RecoveryODDOneDesktopTwoColumnContentWrapper
       footerDetails={{
         primaryBtnOnClick: () => {
+          analytics.reportActionSelectedEvent(selectedRoute)
           setSelectedRecoveryOption(selectedRoute)
           void proceedToRouteAndStep(selectedRoute as RecoveryRoute)
         },
@@ -119,7 +121,7 @@ export function ODDRecoveryOptions({
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing4}
+      gridGap={SPACING.spacing8}
       width="100%"
     >
       {validRecoveryOptions.map((recoveryOption: RecoveryRoute) => {
@@ -133,6 +135,7 @@ export function ODDRecoveryOptions({
               setSelectedRoute(recoveryOption)
             }}
             isSelected={recoveryOption === selectedRoute}
+            radioButtonType="large"
           />
         )
       })}

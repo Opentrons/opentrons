@@ -1,6 +1,6 @@
 import asyncio
 import logging
-from typing import Mapping, Optional
+from typing import Dict, Optional
 from opentrons.drivers.mag_deck import (
     SimulatingDriver,
     MagDeckDriver,
@@ -83,7 +83,7 @@ class MagDeck(mod_abc.AbstractModule):
         execution_manager: ExecutionManager,
         hw_control_loop: asyncio.AbstractEventLoop,
         driver: AbstractMagDeckDriver,
-        device_info: Mapping[str, str],
+        device_info: Dict[str, str],
         disconnected_callback: types.ModuleDisconnectedCallback = None,
     ) -> None:
         """Constructor"""
@@ -166,7 +166,7 @@ class MagDeck(mod_abc.AbstractModule):
         return self._current_height
 
     @property
-    def device_info(self) -> Mapping[str, str]:
+    def device_info(self) -> Dict[str, str]:
         """
 
         Returns: a dict

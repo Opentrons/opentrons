@@ -3900,24 +3900,6 @@
           "title": "Moduleid",
           "description": "Unique ID of the absorbance reader.",
           "type": "string"
-        },
-        "pickUpOffset": {
-          "title": "Pickupoffset",
-          "description": "Offset to use when picking up labware. Experimental param, subject to change",
-          "allOf": [
-            {
-              "$ref": "#/definitions/LabwareOffsetVector"
-            }
-          ]
-        },
-        "dropOffset": {
-          "title": "Dropoffset",
-          "description": "Offset to use when dropping off labware. Experimental param, subject to change",
-          "allOf": [
-            {
-              "$ref": "#/definitions/LabwareOffsetVector"
-            }
-          ]
         }
       },
       "required": ["moduleId"]
@@ -3961,24 +3943,6 @@
           "title": "Moduleid",
           "description": "Unique ID of the absorbance reader.",
           "type": "string"
-        },
-        "pickUpOffset": {
-          "title": "Pickupoffset",
-          "description": "Offset to use when picking up labware. Experimental param, subject to change",
-          "allOf": [
-            {
-              "$ref": "#/definitions/LabwareOffsetVector"
-            }
-          ]
-        },
-        "dropOffset": {
-          "title": "Dropoffset",
-          "description": "Offset to use when dropping off labware. Experimental param, subject to change",
-          "allOf": [
-            {
-              "$ref": "#/definitions/LabwareOffsetVector"
-            }
-          ]
         }
       },
       "required": ["moduleId"]

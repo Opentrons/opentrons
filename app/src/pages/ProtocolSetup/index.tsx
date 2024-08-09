@@ -60,6 +60,7 @@ import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/util
 import { ProtocolSetupLabware } from '../../organisms/ProtocolSetupLabware'
 import { ProtocolSetupModulesAndDeck } from '../../organisms/ProtocolSetupModulesAndDeck'
 import { ProtocolSetupLiquids } from '../../organisms/ProtocolSetupLiquids'
+import { ProtocolSetupOffsets } from '../../organisms/ProtocolSetupOffsets'
 import { ProtocolSetupInstruments } from '../../organisms/ProtocolSetupInstruments'
 import { ProtocolSetupDeckConfiguration } from '../../organisms/ProtocolSetupDeckConfiguration'
 import { useLaunchLPC } from '../../organisms/LabwarePositionCheck/useLaunchLPC'
@@ -85,6 +86,7 @@ import {
 } from '../../redux/analytics'
 import { getIsHeaterShakerAttached } from '../../redux/config'
 import { ConfirmAttachedModal } from './ConfirmAttachedModal'
+import { ConfirmSetupStepsCompleteModal } from './ConfirmSetupStepsCompleteModal'
 import { getLatestCurrentOffsets } from '../../organisms/Devices/ProtocolRun/SetupLabwarePositionCheck/utils'
 import { CloseButton, PlayButton } from './Buttons'
 import { useDeckConfigurationCompatibility } from '../../resources/deck_configuration/hooks'
@@ -118,6 +120,8 @@ interface ProtocolSetupStepProps {
   subDetail?: string | null
   // disallow click handler, disabled styling
   disabled?: boolean
+  // disallow click handler, don't show CTA icons, allow styling
+  interactionDisabled?: boolean
   // display the reason the setup step is disabled
   disabledReason?: string | null
   //  optional description
@@ -137,12 +141,14 @@ export function ProtocolSetupStep({
   detail,
   subDetail,
   disabled = false,
+  interactionDisabled = false,
   disabledReason,
   description,
   hasRightIcon = true,
   hasLeftIcon = true,
   fontSize = 'p',
 }: ProtocolSetupStepProps): JSX.Element {
+  const isInteractionDisabled = interactionDisabled || disabled
   const backgroundColorByStepStatus = {
     ready: COLORS.green35,
     'not ready': COLORS.yellow35,
@@ -185,9 +191,12 @@ export function ProtocolSetupStep({
   return (
     <Btn
       onClick={() => {
-        !disabled ? onClickSetupStep() : makeDisabledReasonSnackbar()
+        !isInteractionDisabled
+          ? onClickSetupStep()
+          : makeDisabledReasonSnackbar()
       }}
       width="100%"
+      data-testid={`SetupButton_${title}`}
     >
       <Flex
         alignItems={ALIGN_CENTER}
@@ -202,7 +211,6 @@ export function ProtocolSetupStep({
         {status !== 'general' &&
         !disabled &&
         status !== 'inform' &&
-        !disabled &&
         hasLeftIcon ? (
           <Icon
             color={status === 'ready' ? COLORS.green50 : COLORS.yellow50}
@@ -241,7 +249,7 @@ export function ProtocolSetupStep({
           <LegacyStyledText
             as={fontSize}
             textAlign={TEXT_ALIGN_RIGHT}
-            color={disabled ? COLORS.grey50 : COLORS.black90}
+            color={interactionDisabled ? COLORS.grey50 : COLORS.black90}
             maxWidth="20rem"
           >
             {detail}
@@ -249,7 +257,7 @@ export function ProtocolSetupStep({
             {subDetail}
           </LegacyStyledText>
         </Flex>
-        {disabled || !hasRightIcon ? null : (
+        {interactionDisabled || !hasRightIcon ? null : (
           <Icon
             marginLeft={SPACING.spacing8}
             name="more"
@@ -268,9 +276,13 @@ interface PrepareToRunProps {
   runId: string
   setSetupScreen: React.Dispatch<React.SetStateAction<SetupScreens>>
   confirmAttachment: () => void
+  confirmStepsComplete: () => void
   play: () => void
   robotName: string
   runRecord: Run | null
+  labwareConfirmed: boolean
+  liquidsConfirmed: boolean
+  offsetsConfirmed: boolean
 }
 
 function PrepareToRun({
@@ -280,6 +292,10 @@ function PrepareToRun({
   play,
   robotName,
   runRecord,
+  labwareConfirmed,
+  liquidsConfirmed,
+  offsetsConfirmed,
+  confirmStepsComplete,
 }: PrepareToRunProps): JSX.Element {
   const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
   const navigate = useNavigate()
@@ -335,7 +351,6 @@ function PrepareToRun({
   }, [mostRecentAnalysis?.status])
 
   const robotType = useRobotType(robotName)
-  const { launchLPC, LPCWizard } = useLaunchLPC(runId, robotType, protocolName)
 
   const onConfirmCancelClose = (): void => {
     setShowConfirmCancelModal(false)
@@ -381,12 +396,7 @@ function PrepareToRun({
       : null
 
   const isMissingModules = missingModuleIds.length > 0
-  const lpcDisabledReason = useLPCDisabledReason({
-    runId,
-    hasMissingModulesForOdd: isMissingModules,
-    hasMissingCalForOdd:
-      incompleteInstrumentCount != null && incompleteInstrumentCount > 0,
-  })
+
   const moduleCalibrationStatus = useModuleCalibrationStatus(robotName, runId)
 
   const runTimeParameters = mostRecentAnalysis?.runTimeParameters ?? []
@@ -510,24 +520,25 @@ function PrepareToRun({
     if (isDoorOpen) {
       makeSnackbar(t('shared:close_robot_door') as string)
     } else {
-      if (
-        isHeaterShakerInProtocol &&
-        isReadyToRun &&
-        runStatus === RUN_STATUS_IDLE
-      ) {
-        confirmAttachment()
-      } else {
-        if (isReadyToRun) {
+      if (isReadyToRun) {
+        if (runStatus === RUN_STATUS_IDLE && isHeaterShakerInProtocol) {
+          confirmAttachment()
+        } else if (
+          runStatus === RUN_STATUS_IDLE &&
+          !(labwareConfirmed && offsetsConfirmed && liquidsConfirmed)
+        ) {
+          confirmStepsComplete()
+        } else {
           play()
           trackProtocolRunEvent({
             name: ANALYTICS_PROTOCOL_RUN_ACTION.START,
             properties: robotAnalyticsData ?? {},
           })
-        } else {
-          makeSnackbar(
-            i18n.format(t('complete_setup_before_proceeding'), 'capitalize')
-          )
         }
+      } else {
+        makeSnackbar(
+          i18n.format(t('complete_setup_before_proceeding'), 'capitalize')
+        )
       }
     }
   }
@@ -752,22 +763,16 @@ function PrepareToRun({
             />
             <ProtocolSetupStep
               onClickSetupStep={() => {
-                launchLPC()
+                setSetupScreen('offsets')
               }}
               title={t('labware_position_check')}
-              detail={t(
-                lpcDisabledReason != null
-                  ? 'currently_unavailable'
-                  : 'recommended'
-              )}
+              detail={t('recommended')}
               subDetail={
                 latestCurrentOffsets.length > 0
                   ? t('offsets_applied', { count: latestCurrentOffsets.length })
                   : null
               }
-              status="general"
-              disabled={lpcDisabledReason != null}
-              disabledReason={lpcDisabledReason}
+              status={offsetsConfirmed ? 'ready' : 'general'}
             />
             <ProtocolSetupStep
               onClickSetupStep={() => {
@@ -776,25 +781,25 @@ function PrepareToRun({
               title={t('parameters')}
               detail={parametersDetail}
               subDetail={null}
-              status="general"
-              disabled={!hasRunTimeParameters}
+              status="ready"
+              interactionDisabled={!hasRunTimeParameters}
             />
             <ProtocolSetupStep
               onClickSetupStep={() => {
                 setSetupScreen('labware')
               }}
-              title={t('labware')}
+              title={i18n.format(t('labware'), 'capitalize')}
               detail={labwareDetail}
               subDetail={labwareSubDetail}
-              status="general"
+              status={labwareConfirmed ? 'ready' : 'general'}
               disabled={labwareDetail == null}
             />
             <ProtocolSetupStep
               onClickSetupStep={() => {
                 setSetupScreen('liquids')
               }}
-              title={t('liquids')}
-              status="general"
+              title={i18n.format(t('liquids'), 'capitalize')}
+              status={liquidsConfirmed ? 'ready' : 'general'}
               detail={
                 liquidsInProtocol.length > 0
                   ? t('initial_liquids_num', {
@@ -809,10 +814,12 @@ function PrepareToRun({
           <ProtocolSetupStepSkeleton />
         )}
       </Flex>
-      {LPCWizard}
       {showConfirmCancelModal ? (
         <ConfirmCancelRunModal
           runId={runId}
+          isQuickTransfer={
+            protocolRecord?.data.protocolKind === 'quick-transfer'
+          }
           setShowConfirmCancelRunModal={setShowConfirmCancelModal}
           isActiveRun={false}
           protocolId={protocolId}
@@ -826,6 +833,7 @@ export type SetupScreens =
   | 'prepare to run'
   | 'instruments'
   | 'modules'
+  | 'offsets'
   | 'labware'
   | 'liquids'
   | 'deck configuration'
@@ -837,7 +845,9 @@ export function ProtocolSetup(): JSX.Element {
   >() as OnDeviceRouteParams
   const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
   const { analysisErrors } = useProtocolAnalysisErrors(runId)
+  const { t } = useTranslation(['protocol_setup'])
   const localRobot = useSelector(getLocalRobot)
+  const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const robotSerialNumber =
     localRobot?.status != null ? getRobotSerialNumber(localRobot) : null
   const trackEvent = useTrackEvent()
@@ -846,7 +856,69 @@ export function ProtocolSetup(): JSX.Element {
     showAnalysisFailedModal,
     setShowAnalysisFailedModal,
   ] = React.useState<boolean>(true)
+  const robotType = useRobotType(robotName)
+  const attachedModules =
+    useAttachedModules({
+      refetchInterval: FETCH_DURATION_MS,
+    }) ?? []
+  const protocolId = runRecord?.data?.protocolId ?? null
+  const { data: protocolRecord } = useProtocolQuery(protocolId, {
+    staleTime: Infinity,
+  })
+  const mostRecentAnalysisSummary = last(protocolRecord?.data.analysisSummaries)
+  const [
+    isPollingForCompletedAnalysis,
+    setIsPollingForCompletedAnalysis,
+  ] = React.useState<boolean>(mostRecentAnalysisSummary?.status !== 'completed')
 
+  const {
+    data: mostRecentAnalysis = null,
+  } = useProtocolAnalysisAsDocumentQuery(
+    protocolId,
+    last(protocolRecord?.data.analysisSummaries)?.id ?? null,
+    {
+      enabled: protocolRecord != null && isPollingForCompletedAnalysis,
+      refetchInterval: ANALYSIS_POLL_MS,
+    }
+  )
+
+  React.useEffect(() => {
+    if (mostRecentAnalysis?.status === 'completed') {
+      setIsPollingForCompletedAnalysis(false)
+    } else {
+      setIsPollingForCompletedAnalysis(true)
+    }
+  }, [mostRecentAnalysis?.status])
+  const deckDef = getDeckDefFromRobotType(robotType)
+
+  const protocolModulesInfo =
+    mostRecentAnalysis != null
+      ? getProtocolModulesInfo(mostRecentAnalysis, deckDef)
+      : []
+
+  const { missingModuleIds } = getUnmatchedModulesForProtocol(
+    attachedModules,
+    protocolModulesInfo
+  )
+  const isMissingModules = missingModuleIds.length > 0
+  const { data: attachedInstruments } = useInstrumentsQuery()
+
+  const incompleteInstrumentCount: number | null =
+    mostRecentAnalysis != null && attachedInstruments != null
+      ? getIncompleteInstrumentCount(mostRecentAnalysis, attachedInstruments)
+      : null
+  const lpcDisabledReason = useLPCDisabledReason({
+    runId,
+    hasMissingModulesForOdd: isMissingModules,
+    hasMissingCalForOdd:
+      incompleteInstrumentCount != null && incompleteInstrumentCount > 0,
+  })
+  const protocolName =
+    protocolRecord?.data.metadata.protocolName ??
+    protocolRecord?.data.files[0].name ??
+    ''
+
+  const { launchLPC, LPCWizard } = useLaunchLPC(runId, robotType, protocolName)
   const handleProceedToRunClick = (): void => {
     trackEvent({
       name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
@@ -859,8 +931,8 @@ export function ProtocolSetup(): JSX.Element {
   )
   const {
     confirm: confirmAttachment,
-    showConfirmation: showConfirmationModal,
-    cancel: cancelExit,
+    showConfirmation: showHSConfirmationModal,
+    cancel: cancelExitHSConfirmation,
   } = useConditionalConfirm(
     handleProceedToRunClick,
     !configBypassHeaterShakerAttachmentConfirmation
@@ -869,6 +941,22 @@ export function ProtocolSetup(): JSX.Element {
   const [providedFixtureOptions, setProvidedFixtureOptions] = React.useState<
     CutoutFixtureId[]
   >([])
+  const [labwareConfirmed, setLabwareConfirmed] = React.useState<boolean>(false)
+  const [liquidsConfirmed, setLiquidsConfirmed] = React.useState<boolean>(false)
+  const [offsetsConfirmed, setOffsetsConfirmed] = React.useState<boolean>(false)
+  const missingSteps = [
+    !offsetsConfirmed ? t('applied_labware_offsets') : null,
+    !labwareConfirmed ? t('labware_placement') : null,
+    !liquidsConfirmed ? t('liquids') : null,
+  ].filter(s => s != null)
+  const {
+    confirm: confirmMissingSteps,
+    showConfirmation: showMissingStepsConfirmation,
+    cancel: cancelExitMissingStepsConfirmation,
+  } = useConditionalConfirm(
+    handleProceedToRunClick,
+    !(labwareConfirmed && liquidsConfirmed && offsetsConfirmed)
+  )
 
   // orchestrate setup subpages/components
   const [setupScreen, setSetupScreen] = React.useState<SetupScreens>(
@@ -880,9 +968,13 @@ export function ProtocolSetup(): JSX.Element {
         runId={runId}
         setSetupScreen={setSetupScreen}
         confirmAttachment={confirmAttachment}
+        confirmStepsComplete={confirmMissingSteps}
         play={play}
-        robotName={localRobot?.name != null ? localRobot.name : 'no name'}
+        robotName={robotName}
         runRecord={runRecord ?? null}
+        labwareConfirmed={labwareConfirmed}
+        liquidsConfirmed={liquidsConfirmed}
+        offsetsConfirmed={offsetsConfirmed}
       />
     ),
     instruments: (
@@ -896,11 +988,32 @@ export function ProtocolSetup(): JSX.Element {
         setProvidedFixtureOptions={setProvidedFixtureOptions}
       />
     ),
+    offsets: (
+      <ProtocolSetupOffsets
+        runId={runId}
+        setSetupScreen={setSetupScreen}
+        lpcDisabledReason={lpcDisabledReason}
+        launchLPC={launchLPC}
+        LPCWizard={LPCWizard}
+        isConfirmed={offsetsConfirmed}
+        setIsConfirmed={setOffsetsConfirmed}
+      />
+    ),
     labware: (
-      <ProtocolSetupLabware runId={runId} setSetupScreen={setSetupScreen} />
+      <ProtocolSetupLabware
+        runId={runId}
+        setSetupScreen={setSetupScreen}
+        isConfirmed={labwareConfirmed}
+        setIsConfirmed={setLabwareConfirmed}
+      />
     ),
     liquids: (
-      <ProtocolSetupLiquids runId={runId} setSetupScreen={setSetupScreen} />
+      <ProtocolSetupLiquids
+        runId={runId}
+        setSetupScreen={setSetupScreen}
+        isConfirmed={liquidsConfirmed}
+        setIsConfirmed={setLiquidsConfirmed}
+      />
     ),
     'deck configuration': (
       <ProtocolSetupDeckConfiguration
@@ -926,9 +1039,16 @@ export function ProtocolSetup(): JSX.Element {
           errors={analysisErrors.map(error => error.detail)}
         />
       ) : null}
-      {showConfirmationModal ? (
+      {showMissingStepsConfirmation ? (
+        <ConfirmSetupStepsCompleteModal
+          onCloseClick={cancelExitMissingStepsConfirmation}
+          missingSteps={missingSteps}
+          onConfirmClick={handleProceedToRunClick}
+        />
+      ) : null}
+      {showHSConfirmationModal ? (
         <ConfirmAttachedModal
-          onCloseClick={cancelExit}
+          onCloseClick={cancelExitHSConfirmation}
           isProceedToRunModal={true}
           onConfirmClick={handleProceedToRunClick}
         />

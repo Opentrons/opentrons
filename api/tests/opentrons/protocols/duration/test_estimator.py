@@ -18,6 +18,14 @@ from opentrons.protocols.duration.estimator import (
 from opentrons.protocol_api.core.legacy.deck import Deck
 from opentrons.types import Location, Point
 
+messageDataBefore: types.CommandMessageFields = {
+    "$": "before",
+    "id": "b",
+    "error": None,
+}
+
+messageDataAfter: types.CommandMessageFields = {"$": "after", "id": "a", "error": None}
+
 
 @pytest.fixture
 def subject() -> DurationEstimator:
@@ -31,70 +39,91 @@ def mock_instrument() -> MagicMock:
     return MagicMock(spec=InstrumentContext)
 
 
-def test_ignore_before(subject: DurationEstimator):
+@pytest.fixture
+def mock_location() -> MagicMock:
+    """A mock well."""
+    return MagicMock(spec=Location)
+
+
+def test_ignore_before(subject: DurationEstimator) -> None:
     """It should ignore before commands."""
     message = types.DelayMessage(
-        payload=types.DelayCommandPayload(minutes=1, seconds=1)
+        payload=types.DelayCommandPayload(minutes=1, seconds=1, text=""),
+        name=types.DELAY,
+        **messageDataBefore
     )
-    message["$"] = "before"
-    message["name"] = types.DELAY
     subject.on_message(message)
     assert subject.get_total_duration() == 0
 
 
-def test_pick_up_tip(subject: DurationEstimator, mock_instrument: MagicMock):
+def test_pick_up_tip(
+    subject: DurationEstimator, mock_instrument: MagicMock, mock_location: MagicMock
+) -> None:
     """It should time a pick up tip."""
     mock_instrument.default_speed = 1
-    # Movement in same slot
     subject._last_deckslot = "1"
-    message = types.PickUpTipCommand(
-        payload=types.PickUpTipCommandPayload(location="1", instrument=mock_instrument)
+    mock_location.labware.first_parent.return_value = "1"
+    message = types.PickUpTipMessage(
+        payload=types.PickUpTipCommandPayload(
+            location=mock_location, instrument=mock_instrument, text=""
+        ),
+        name=types.PICK_UP_TIP,
+        **messageDataAfter
     )
-    message["$"] = "after"
-    message["name"] = types.PICK_UP_TIP
     subject.on_message(message)
     assert subject.get_total_duration() == 4.5
 
 
-def test_drop_tip(subject: DurationEstimator, mock_instrument: MagicMock):
+def test_drop_tip(
+    subject: DurationEstimator, mock_instrument: MagicMock, mock_location: MagicMock
+) -> None:
     """It should time a drop tip."""
     mock_instrument.default_speed = 1
     # Movement in same slot
     subject._last_deckslot = "1"
-    message = types.DropTipCommand(
-        payload=types.DropTipCommandPayload(location="1", instrument=mock_instrument)
+    mock_location.labware.first_parent.return_value = "1"
+    message = types.DropTipMessage(
+        payload=types.DropTipCommandPayload(
+            location=mock_location, instrument=mock_instrument, text=""
+        ),
+        name=types.DROP_TIP,
+        **messageDataAfter
     )
-    message["$"] = "after"
-    message["name"] = types.DROP_TIP
     subject.on_message(message)
     assert subject.get_total_duration() == 10.5
 
 
-def test_blow_out(subject: DurationEstimator):
+def test_blow_out(subject: DurationEstimator, mock_instrument: MagicMock) -> None:
     """It should time a blowout."""
-    message = types.BlowOutMessage(payload=types.BlowOutCommandPayload(location=None))
-    message["$"] = "after"
-    message["name"] = types.BLOW_OUT
+    message = types.BlowOutMessage(
+        payload=types.BlowOutCommandPayload(
+            location=None, instrument=mock_instrument, text=""
+        ),
+        name=types.BLOW_OUT,
+        **messageDataAfter
+    )
     subject.on_message(message)
     assert subject.get_total_duration() == 0.5
 
 
-def test_touch_tip(subject: DurationEstimator):
+def test_touch_tip(subject: DurationEstimator, mock_instrument: MagicMock) -> None:
     """It should time a touch tip."""
-    message = types.TouchTipMessage(payload=types.TouchTipCommandPayload())
-    message["$"] = "after"
-    message["name"] = types.TOUCH_TIP
+    message = types.TouchTipMessage(
+        payload=types.TouchTipCommandPayload(instrument=mock_instrument, text=""),
+        name=types.TOUCH_TIP,
+        **messageDataAfter
+    )
     subject.on_message(message)
     assert subject.get_total_duration() == 0.5
 
 
-def test_delay(subject: DurationEstimator):
+def test_delay(subject: DurationEstimator) -> None:
     """It should time a delay."""
     message = types.DelayMessage(
-        payload=types.DelayCommandPayload(minutes=1, seconds=1)
+        payload=types.DelayCommandPayload(minutes=1, seconds=1, text=""),
+        name=types.DELAY,
+        **messageDataAfter
     )
-    message["$"] = "after"
-    message["name"] = types.DELAY
     subject.on_message(message)
     assert subject.get_total_duration() == 61
 
@@ -103,7 +132,7 @@ def test_delay(subject: DurationEstimator):
 def mock_deck() -> MagicMock:
     """A mock deck fixture"""
 
-    def position_for(slot):
+    def position_for(slot: str) -> Location:
         # zero based
         s = int(slot) - 1
         row = int(s / 3)
@@ -141,7 +170,7 @@ def test_calc_deck_movement_time(
     previous_slot: str,
     speed: float,
     expected_duration: float,
-):
+) -> None:
     """It should calculate deck movement correctly."""
     assert (
         subject.calc_deck_movement_time(mock_deck, current_slot, previous_slot, speed)
@@ -177,51 +206,51 @@ def test_calc_deck_movement_time(
 )
 def test_temperature_module(
     subject: DurationEstimator, current: float, target: float, expected_duration: float
-):
+) -> None:
     """It should compute the duration of a temperature change correctly."""
     assert subject.temperature_module(current, target) == expected_duration
 
 
-def test_thermocycler_set_lid_temp(subject: DurationEstimator):
+def test_thermocycler_set_lid_temp(subject: DurationEstimator) -> None:
     """It should compute the duration of a set lid temp."""
-    message = types.ThermocyclerSetLidTempCommand(
-        payload=types.ThermocyclerSetLidTempCommandPayload()
+    message = types.ThermocyclerSetLidTempMessage(
+        payload=types.ThermocyclerSetLidTempCommandPayload(text=""),
+        name=types.THERMOCYCLER_SET_LID_TEMP,
+        **messageDataAfter
     )
-    message["$"] = "after"
-    message["name"] = types.THERMOCYCLER_SET_LID_TEMP
     subject.on_message(message)
     assert subject.get_total_duration() == 60
 
 
-def test_thermocycler_lid_close(subject: DurationEstimator):
+def test_thermocycler_lid_close(subject: DurationEstimator) -> None:
     """It should compute the duration of a lid close."""
     message = types.ThermocyclerCloseMessage(
-        payload=types.ThermocyclerCloseCommandPayload()
+        payload=types.ThermocyclerCloseCommandPayload(text=""),
+        name=types.THERMOCYCLER_CLOSE,
+        **messageDataAfter
     )
-    message["$"] = "after"
-    message["name"] = types.THERMOCYCLER_CLOSE
     subject.on_message(message)
     assert subject.get_total_duration() == 24
 
 
-def test_thermocycler_lid_open(subject: DurationEstimator):
+def test_thermocycler_lid_open(subject: DurationEstimator) -> None:
     """It should compute the duration of a lid open."""
-    message = types.ThermocyclerCloseMessage(
-        payload=types.ThermocyclerCloseCommandPayload()
+    message = types.ThermocyclerOpenMessage(
+        payload=types.ThermocyclerOpenCommandPayload(text=""),
+        name=types.THERMOCYCLER_OPEN,
+        **messageDataAfter
     )
-    message["$"] = "after"
-    message["name"] = types.THERMOCYCLER_CLOSE
     subject.on_message(message)
     assert subject.get_total_duration() == 24
 
 
-def test_thermocycler_deactivate_lid(subject: DurationEstimator):
+def test_thermocycler_deactivate_lid(subject: DurationEstimator) -> None:
     """It should compute the duration of a lid open."""
-    message = types.ThermocyclerDeactivateMessage(
-        payload=types.ThermocyclerDeactivateLidCommandPayload()
+    message = types.ThermocyclerDeactivateLidMessage(
+        payload=types.ThermocyclerDeactivateLidCommandPayload(text=""),
+        name=types.THERMOCYCLER_DEACTIVATE_LID,
+        **messageDataAfter
     )
-    message["$"] = "after"
-    message["name"] = types.THERMOCYCLER_DEACTIVATE_LID
     subject.on_message(message)
     assert subject.get_total_duration() == 23
 
@@ -245,6 +274,6 @@ def test_thermocycler_deactivate_lid(subject: DurationEstimator):
 )
 def test_thermocycler_handler(
     subject: DurationEstimator, current: float, target: float, expected_duration: float
-):
+) -> None:
     """It should compute the duration of a temperature change correctly."""
     assert subject.thermocycler_handler(current, target) == expected_duration
