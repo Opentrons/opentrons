@@ -1,22 +1,21 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  PrimaryButton,
   StyledText,
   RadioButton,
 } from '@opentrons/components'
+import { WizardBody } from './WizardBody'
 
 import type { WizardTileProps } from './types'
-import { WizardBody } from './WizardBody'
-import { getPipetteSpecsV2, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
-  const { goBack, proceed, watch, setValue } = props
+  const { goBack, proceed, watch } = props
   const { t } = useTranslation(['create_new_protocol', 'shared'])
-  const pipettesByMount = watch('pipettesByMount')
+  //   const pipettesByMount = watch('pipettesByMount')
   const fields = watch('fields')
   const [pipetteType, setPipetteType] = React.useState<string | null>(null)
 

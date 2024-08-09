@@ -43,7 +43,6 @@ import { SelectGripper } from './SelectGripper'
 import { SelectModules } from './SelectModules'
 import { SelectFixtures } from './SelectFixtures'
 import { AddMetadata } from './AddMetadata'
-import { getTrashSlot } from './utils'
 
 import type { ThunkDispatch } from 'redux-thunk'
 import type { NormalizedPipette } from '@opentrons/step-generation'
@@ -266,7 +265,8 @@ export function CreateNewProtocolWizard(): JSX.Element | null {
           createDeckFixture(
             'trashBin',
             values.fields.robotType === FLEX_ROBOT_TYPE
-              ? getTrashSlot(values)
+              ? //  TODO(ja, 8/9/24): add logic for which trash location for flex to default to
+                'cutoutA3'
               : 'cutout12'
           )
         )

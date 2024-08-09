@@ -9,8 +9,8 @@ export function SelectRobot(props: WizardTileProps): JSX.Element {
   const { setValue, proceed, watch } = props
   const { t } = useTranslation(['create_new_protocol', 'shared'])
   const fields = watch('fields')
-  const robotType = fields.robotType
-
+  console.log(fields)
+  const robotType = fields?.robotType
   return (
     <WizardBody
       stepNumber={1}

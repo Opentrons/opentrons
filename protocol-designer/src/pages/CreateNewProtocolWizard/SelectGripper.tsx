@@ -4,7 +4,7 @@ import without from 'lodash/without'
 import { Flex, SPACING, StyledText, RadioButton } from '@opentrons/components'
 import { WizardBody } from './WizardBody'
 
-import type { AdditionalEquipment, WizardTileProps } from './types'
+import type { WizardTileProps } from './types'
 
 export function SelectGripper(props: WizardTileProps): JSX.Element | null {
   const { goBack, setValue, proceed, watch } = props
