@@ -124,6 +124,11 @@ def data_files_store(decoy: Decoy) -> DataFilesStore:
 
 @pytest.fixture
 def data_files_directory(decoy: Decoy) -> Path:
+    """Get a mocked out data files directory.
+
+    We could use Path("/dev/null") for this but I worry something will accidentally
+    try to use it as an actual path and then we'll get confusing errors on Windows.
+    """
     return decoy.mock(cls=Path)
 
 
