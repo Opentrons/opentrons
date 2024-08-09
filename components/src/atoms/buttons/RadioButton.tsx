@@ -1,16 +1,19 @@
 import * as React from 'react'
 import styled, { css } from 'styled-components'
+import { Flex } from '../../primitives'
 import {
+  ALIGN_CENTER,
   BORDERS,
   COLORS,
-  Flex,
+  DIRECTION_ROW,
+  Icon,
   RESPONSIVENESS,
   SPACING,
   StyledText,
   TYPOGRAPHY,
-} from '@opentrons/components'
-
-import type { StyleProps } from '@opentrons/components'
+} from '../..'
+import type { IconName } from '../..'
+import type { StyleProps } from '../../primitives'
 
 interface RadioButtonProps extends StyleProps {
   buttonLabel: string
@@ -21,8 +24,10 @@ interface RadioButtonProps extends StyleProps {
   radioButtonType?: 'large' | 'small'
   subButtonLabel?: string
   id?: string
+  iconName?: IconName
 }
 
+//  used for ODD and helix
 export function RadioButton(props: RadioButtonProps): JSX.Element {
   const {
     buttonLabel,
@@ -33,6 +38,7 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
     radioButtonType = 'large',
     subButtonLabel,
     id = buttonLabel,
+    iconName,
   } = props
 
   const isLarge = radioButtonType === 'large'
@@ -64,12 +70,10 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
     cursor: not-allowed;
   `
 
-  // TODO: (ew, 2023-04-21): button is not tabbable, so focus state
-  // is not possible on ODD. It's testable in storybook but not in real life.
   const SettingButtonLabel = styled.label`
-      border-radius: ${BORDERS.borderRadius16};
+      border-radius: ${BORDERS.borderRadius40};
       cursor: pointer;
-      padding: ${isLarge ? SPACING.spacing24 : SPACING.spacing20};
+      padding: 14px ${SPACING.spacing16};
       width: 100%;
 
       ${isSelected ? SELECTED_BUTTON_STYLE : AVAILABLE_BUTTON_STYLE}
@@ -77,6 +81,8 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
 
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
         cursor: default;
+        padding: ${isLarge ? SPACING.spacing24 : SPACING.spacing20};
+        border-radius: ${BORDERS.borderRadius16};
       }
     }
   `
@@ -92,12 +98,26 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
         value={buttonValue}
       />
       <SettingButtonLabel role="label" htmlFor={id}>
-        <StyledText
-          oddStyle={isLarge ? 'level4HeaderRegular' : 'bodyTextRegular'}
-          desktopStyle="bodyDefaultRegular"
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          gridGap={SPACING.spacing2}
+          alignItems={ALIGN_CENTER}
         >
-          {buttonLabel}
-        </StyledText>
+          {iconName != null ? (
+            <Icon
+              name={iconName}
+              width="1rem"
+              height="1rem"
+              data-testid={`icon_${iconName}`}
+            />
+          ) : null}
+          <StyledText
+            oddStyle={isLarge ? 'level4HeaderSemiBold' : 'bodyTextRegular'}
+            desktopStyle="bodyDefaultRegular"
+          >
+            {buttonLabel}
+          </StyledText>
+        </Flex>
         {subButtonLabel != null ? (
           <StyledText
             oddStyle="level4HeaderRegular"

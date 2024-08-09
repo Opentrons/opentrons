@@ -9,7 +9,6 @@ import {
   ALIGN_CENTER,
   SPACING,
   COLORS,
-  BORDERS,
   DIRECTION_COLUMN,
   POSITION_ABSOLUTE,
   TYPOGRAPHY,
@@ -18,20 +17,20 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   TEXT_ALIGN_CENTER,
   StyledText,
-  JUSTIFY_END,
   PrimaryButton,
   SecondaryButton,
+  LargeButton,
 } from '@opentrons/components'
 
 import { useErrorName } from './hooks'
 import { getErrorKind } from './utils'
-import { LargeButton } from '../../atoms/buttons'
-import { RECOVERY_MAP } from './constants'
+
 import {
-  RecoveryInterventionModal,
-  RecoverySingleColumnContentWrapper,
-  StepInfo,
-} from './shared'
+  BANNER_TEXT_CONTAINER_STYLE,
+  BANNER_TEXT_CONTENT_STYLE,
+  RECOVERY_MAP,
+} from './constants'
+import { RecoveryInterventionModal, StepInfo } from './shared'
 
 import type { RobotType } from '@opentrons/shared-data'
 import type { ErrorRecoveryFlowsProps } from '.'
@@ -169,49 +168,32 @@ export function RunPausedSplash(
       <RecoveryInterventionModal
         desktopType="desktop-small"
         titleHeading={buildTitleHeadingDesktop()}
-        isOnDevice={isOnDevice}
+        isOnDevice={false}
       >
-        <RecoverySingleColumnContentWrapper>
-          <Flex
-            gridGap={SPACING.spacing24}
-            flexDirection={DIRECTION_COLUMN}
-            justifyContent={JUSTIFY_SPACE_BETWEEN}
-          >
+        <Flex css={BANNER_TEXT_CONTAINER_STYLE}>
+          <Flex css={BANNER_TEXT_CONTENT_STYLE}>
+            <Icon
+              name="ot-alert"
+              size={SPACING.spacing40}
+              color={COLORS.red50}
+            />
             <Flex
-              borderRadius={BORDERS.borderRadius8}
-              padding={`${SPACING.spacing40} ${SPACING.spacing16}`}
-              gridGap={SPACING.spacing16}
-              height="100%"
+              gridGap={SPACING.spacing8}
               flexDirection={DIRECTION_COLUMN}
-              justifyContent={JUSTIFY_CENTER}
               alignItems={ALIGN_CENTER}
+              width="100%"
             >
-              <Icon
-                name="ot-alert"
-                size={SPACING.spacing40}
-                color={COLORS.red50}
+              <StyledText desktopStyle="headingSmallBold">{title}</StyledText>
+              <StepInfo
+                {...props}
+                desktopStyle="bodyDefaultRegular"
+                overflow="hidden"
+                overflowWrap={OVERFLOW_WRAP_BREAK_WORD}
+                textAlign={TEXT_ALIGN_CENTER}
               />
-              <Flex
-                gridGap={SPACING.spacing8}
-                flexDirection={DIRECTION_COLUMN}
-                alignItems={ALIGN_CENTER}
-              >
-                <StyledText desktopStyle="headingSmallBold">{title}</StyledText>
-                <StepInfo
-                  {...props}
-                  desktopStyle="bodyDefaultRegular"
-                  overflow="hidden"
-                  overflowWrap={OVERFLOW_WRAP_BREAK_WORD}
-                  textAlign={TEXT_ALIGN_CENTER}
-                />
-              </Flex>
             </Flex>
           </Flex>
-          <Flex
-            gridGap={SPACING.spacing8}
-            justifyContent={JUSTIFY_END}
-            alignItems={ALIGN_CENTER}
-          >
+          <Flex gridGap={SPACING.spacing8} marginLeft="auto">
             <SecondaryButton isDangerous onClick={onCancelClick}>
               {t('cancel_run')}
             </SecondaryButton>
@@ -224,7 +206,7 @@ export function RunPausedSplash(
               </StyledText>
             </PrimaryButton>
           </Flex>
-        </RecoverySingleColumnContentWrapper>
+        </Flex>
       </RecoveryInterventionModal>
     )
   }

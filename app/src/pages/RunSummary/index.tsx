@@ -26,21 +26,23 @@ import {
   POSITION_RELATIVE,
   SPACING,
   TYPOGRAPHY,
+  LargeButton,
   WRAP,
 } from '@opentrons/components'
 import {
   RUN_STATUS_FAILED,
   RUN_STATUS_STOPPED,
   RUN_STATUS_SUCCEEDED,
+  RUN_STATUSES_TERMINAL,
 } from '@opentrons/api-client'
 import {
   useHost,
   useProtocolQuery,
   useInstrumentsQuery,
   useDeleteRunMutation,
+  useRunCommandErrors,
 } from '@opentrons/react-api-client'
 
-import { LargeButton } from '../../atoms/buttons'
 import {
   useRunTimestamps,
   useRunControls,
@@ -145,6 +147,14 @@ export function RunSummary(): JSX.Element {
     localRobot?.serverHealth?.serialNumber ??
     null
 
+  const { data: commandErrorList } = useRunCommandErrors(runId, null, {
+    enabled:
+      runStatus != null &&
+      // @ts-expect-error runStatus expected to possibly not be terminal
+      RUN_STATUSES_TERMINAL.includes(runStatus) &&
+      isRunCurrent,
+  })
+
   let headerText = t('run_complete_splash')
   if (runStatus === RUN_STATUS_FAILED) {
     headerText = t('run_failed_splash')
@@ -155,7 +165,7 @@ export function RunSummary(): JSX.Element {
   const {
     determineTipStatus,
     setTipStatusResolved,
-    pipettesWithTip,
+    aPipetteWithTip,
   } = useTipAttachmentStatus({
     runId,
     runRecord,
@@ -206,7 +216,7 @@ export function RunSummary(): JSX.Element {
 
   // If no pipettes have tips attached, execute the routing callback.
   const setTipStatusResolvedAndRoute = (
-    routeCb: (pipettesWithTip: PipetteWithTip[]) => void
+    routeCb: (aPipetteWithTip: PipetteWithTip) => void
   ): (() => Promise<void>) => {
     return () =>
       setTipStatusResolved().then(newPipettesWithTip => {
@@ -214,12 +224,12 @@ export function RunSummary(): JSX.Element {
       })
   }
 
-  const handleReturnToDash = (pipettesWithTip: PipetteWithTip[]): void => {
-    if (mostRecentRunId === runId && pipettesWithTip.length > 0) {
+  const handleReturnToDash = (aPipetteWithTip: PipetteWithTip | null): void => {
+    if (mostRecentRunId === runId && aPipetteWithTip != null) {
       void handleTipsAttachedModal({
         setTipStatusResolved: setTipStatusResolvedAndRoute(handleReturnToDash),
         host,
-        pipettesWithTip,
+        aPipetteWithTip,
       })
     } else if (isQuickTransfer) {
       returnToQuickTransfer()
@@ -228,12 +238,12 @@ export function RunSummary(): JSX.Element {
     }
   }
 
-  const handleRunAgain = (pipettesWithTip: PipetteWithTip[]): void => {
-    if (mostRecentRunId === runId && pipettesWithTip.length > 0) {
+  const handleRunAgain = (aPipetteWithTip: PipetteWithTip | null): void => {
+    if (mostRecentRunId === runId && aPipetteWithTip != null) {
       void handleTipsAttachedModal({
         setTipStatusResolved: setTipStatusResolvedAndRoute(handleRunAgain),
         host,
-        pipettesWithTip,
+        aPipetteWithTip,
       })
     } else {
       if (!isResetRunLoading) {
@@ -321,6 +331,7 @@ export function RunSummary(): JSX.Element {
               runId={runId}
               setShowRunFailedModal={setShowRunFailedModal}
               errors={runRecord?.data.errors}
+              commandErrorList={commandErrorList}
             />
           ) : null}
           <Flex
@@ -367,7 +378,7 @@ export function RunSummary(): JSX.Element {
               iconName="arrow-left"
               buttonType="secondary"
               onClick={() => {
-                handleReturnToDash(pipettesWithTip)
+                handleReturnToDash(aPipetteWithTip)
               }}
               buttonText={
                 isQuickTransfer
@@ -380,7 +391,7 @@ export function RunSummary(): JSX.Element {
               flex="1"
               iconName="play-round-corners"
               onClick={() => {
-                handleRunAgain(pipettesWithTip)
+                handleRunAgain(aPipetteWithTip)
               }}
               buttonText={
                 showRunAgainSpinner ? RUN_AGAIN_SPINNER_TEXT : t('run_again')

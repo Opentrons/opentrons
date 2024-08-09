@@ -65,7 +65,7 @@ class TipTracker:
         start_well: AbstractWellCore,
         num_channels: int = 1,
         fail_if_full: bool = False,
-    ):
+    ) -> None:
         """
         Removes tips from the tip tracker.
 
@@ -142,7 +142,7 @@ class TipTracker:
         except IndexError:
             return None
 
-    def return_tips(self, start_well: AbstractWellCore, num_channels: int = 1):
+    def return_tips(self, start_well: AbstractWellCore, num_channels: int = 1) -> None:
         """
         Re-adds tips to the tip tracker
 

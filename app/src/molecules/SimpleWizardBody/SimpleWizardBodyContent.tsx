@@ -141,8 +141,8 @@ export function SimpleWizardBodyContent(props: Props): JSX.Element {
           <>
             {isSuccess ? (
               <img
-                width={robotType === FLEX_ROBOT_TYPE ? '170px' : '160px'}
-                height={robotType === FLEX_ROBOT_TYPE ? '141px' : '120px'}
+                width={robotType === FLEX_ROBOT_TYPE ? '250px' : '160px'}
+                height={robotType === FLEX_ROBOT_TYPE ? '208px' : '120px'}
                 src={SuccessIcon}
                 alt="Success Icon"
               />

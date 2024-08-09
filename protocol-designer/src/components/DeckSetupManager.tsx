@@ -4,7 +4,7 @@ import {
   getBatchEditSelectedStepTypes,
   getHoveredItem,
 } from '../ui/steps/selectors'
-import { DeckSetup } from './DeckSetup'
+import { LegacyDeckSetup } from './DeckSetup'
 import { NullDeckState } from './DeckSetup/NullDeckState'
 import { OffDeckLabwareButton } from './OffDeckLabwareButton'
 
@@ -17,7 +17,7 @@ export const DeckSetupManager = (): JSX.Element => {
     return (
       <>
         <OffDeckLabwareButton />
-        <DeckSetup />
+        <LegacyDeckSetup />
       </>
     )
   } else {

@@ -14,7 +14,6 @@ import {
   RUN_STATUS_SUCCEEDED,
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
   instrumentsResponseLeftPipetteFixture,
-  instrumentsResponseRightPipetteFixture,
 } from '@opentrons/api-client'
 import {
   useHost,
@@ -24,6 +23,7 @@ import {
   useEstopQuery,
   useDoorQuery,
   useInstrumentsQuery,
+  useRunCommandErrors,
 } from '@opentrons/react-api-client'
 import {
   getPipetteModelSpecs,
@@ -88,6 +88,7 @@ import { useNotifyRunQuery, useCurrentRunId } from '../../../../resources/runs'
 import {
   useDropTipWizardFlows,
   useTipAttachmentStatus,
+  DropTipWizardFlows,
 } from '../../../DropTipWizardFlows'
 import {
   useErrorRecoveryFlows,
@@ -97,7 +98,9 @@ import {
   ProtocolDropTipModal,
   useProtocolDropTipModal,
 } from '../ProtocolDropTipModal'
+import { ConfirmMissingStepsModal } from '../ConfirmMissingStepsModal'
 
+import type { MissingSteps } from '../ProtocolRunSetup'
 import type { UseQueryResult } from 'react-query'
 import type { NavigateFunction } from 'react-router-dom'
 import type { Mock } from 'vitest'
@@ -153,6 +156,7 @@ vi.mock('../../../ProtocolUpload/hooks/useMostRecentRunId')
 vi.mock('../../../../resources/runs')
 vi.mock('../../../ErrorRecoveryFlows')
 vi.mock('../ProtocolDropTipModal')
+vi.mock('../ConfirmMissingStepsModal')
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '95e67900-bc9f-4fbf-92c6-cc4d7226a51b'
@@ -179,6 +183,25 @@ const PROTOCOL_DETAILS = {
   isProtocolAnalyzing: false,
   robotType: 'OT-2 Standard' as const,
 }
+
+const RUN_COMMAND_ERRORS = {
+  data: {
+    data: [
+      {
+        errorCode: '4000',
+        errorType: 'test',
+        isDefined: false,
+        createdAt: '9-9-9',
+        detail: 'blah blah',
+        id: '123',
+      },
+    ],
+    meta: {
+      cursor: 0,
+      pageLength: 1,
+    },
+  },
+} as any
 
 const mockMovingHeaterShaker = {
   id: 'heatershaker_id',
@@ -215,6 +238,7 @@ const mockDoorStatus = {
     doorRequiredClosedForProtocol: true,
   },
 }
+let mockMissingSteps: MissingSteps = []
 
 const render = () => {
   return renderWithProviders(
@@ -224,6 +248,7 @@ const render = () => {
         robotName={ROBOT_NAME}
         runId={RUN_ID}
         makeHandleJumpToStep={vi.fn(() => vi.fn())}
+        missingSetupSteps={mockMissingSteps}
       />
     </BrowserRouter>,
     { i18nInstance: i18n }
@@ -240,7 +265,7 @@ describe('ProtocolRunHeader', () => {
     mockTrackProtocolRunEvent = vi.fn(() => new Promise(resolve => resolve({})))
     mockCloseCurrentRun = vi.fn()
     mockDetermineTipStatus = vi.fn()
-
+    mockMissingSteps = []
     vi.mocked(useTrackEvent).mockReturnValue(mockTrackEvent)
     vi.mocked(ConfirmCancelModal).mockReturnValue(
       <div>Mock ConfirmCancelModal</div>
@@ -266,6 +291,9 @@ describe('ProtocolRunHeader', () => {
     vi.mocked(useIsRobotViewable).mockReturnValue(true)
     vi.mocked(ConfirmAttachmentModal).mockReturnValue(
       <div>mock confirm attachment modal</div>
+    )
+    vi.mocked(ConfirmMissingStepsModal).mockReturnValue(
+      <div>mock missing steps modal</div>
     )
     when(vi.mocked(useProtocolAnalysisErrors)).calledWith(RUN_ID).thenReturn({
       analysisErrors: null,
@@ -340,10 +368,7 @@ describe('ProtocolRunHeader', () => {
     vi.mocked(useInstrumentsQuery).mockReturnValue({ data: {} } as any)
     vi.mocked(useHost).mockReturnValue({} as any)
     vi.mocked(useTipAttachmentStatus).mockReturnValue({
-      pipettesWithTip: [
-        instrumentsResponseLeftPipetteFixture,
-        instrumentsResponseRightPipetteFixture,
-      ],
+      aPipetteWithTip: instrumentsResponseLeftPipetteFixture,
       areTipsAttached: true,
       determineTipStatus: mockDetermineTipStatus,
       resetTipStatus: vi.fn(),
@@ -359,6 +384,7 @@ describe('ProtocolRunHeader', () => {
         ...noModulesProtocol,
         ...MOCK_ROTOCOL_LIQUID_KEY,
       } as any)
+    vi.mocked(useRunCommandErrors).mockReturnValue(RUN_COMMAND_ERRORS)
     vi.mocked(useDeckConfigurationCompatibility).mockReturnValue([])
     vi.mocked(getIsFixtureMismatch).mockReturnValue(false)
     vi.mocked(useMostRecentRunId).mockReturnValue(RUN_ID)
@@ -383,6 +409,9 @@ describe('ProtocolRunHeader', () => {
     } as any)
     vi.mocked(ProtocolDropTipModal).mockReturnValue(
       <div>MOCK_DROP_TIP_MODAL</div>
+    )
+    vi.mocked(DropTipWizardFlows).mockReturnValue(
+      <div>MOCK_DROP_TIP_WIZARD_FLOWS</div>
     )
   })
 
@@ -472,7 +501,6 @@ describe('ProtocolRunHeader', () => {
         data: { data: { ...mockIdleUnstartedRun, current: true } },
       } as UseQueryResult<OpentronsApiClient.Run>)
     render()
-    expect(mockCloseCurrentRun).toBeCalled()
     expect(mockTrackProtocolRunEvent).toBeCalled()
     expect(mockTrackProtocolRunEvent).toBeCalledWith({
       name: ANALYTICS_PROTOCOL_RUN_ACTION.FINISH,
@@ -844,7 +872,6 @@ describe('ProtocolRunHeader', () => {
     render()
 
     fireEvent.click(screen.queryAllByTestId('Banner_close-button')[0])
-    expect(mockCloseCurrentRun).toBeCalled()
   })
 
   it('does not display the "run successful" banner if the successful run is not current', async () => {
@@ -1075,5 +1102,15 @@ describe('ProtocolRunHeader', () => {
 
     render()
     screen.getByText('MOCK_ERROR_RECOVERY')
+  })
+
+  it('renders DropTipWizardFlows when conditions are met', () => {
+    vi.mocked(useDropTipWizardFlows).mockReturnValue({
+      showDTWiz: true,
+      toggleDTWiz: vi.fn(),
+    })
+
+    render()
+    screen.getByText('MOCK_DROP_TIP_WIZARD_FLOWS')
   })
 })

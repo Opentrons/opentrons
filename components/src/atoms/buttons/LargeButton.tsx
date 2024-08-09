@@ -1,19 +1,21 @@
 import * as React from 'react'
 import { css } from 'styled-components'
+import { Box, Btn } from '../../primitives'
+
+import { BORDERS, COLORS } from '../../helix-design-system'
+import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { LegacyStyledText } from '../../atoms/StyledText'
+import { fontSizeBodyLargeSemiBold } from '../../helix-design-system/product/typography'
 import {
-  BORDERS,
-  Btn,
-  COLORS,
+  ALIGN_CENTER,
+  ALIGN_FLEX_START,
   DIRECTION_COLUMN,
   DISPLAY_FLEX,
-  Icon,
-  Flex,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING,
-  LegacyStyledText,
-  TYPOGRAPHY,
-} from '@opentrons/components'
-import type { IconName, StyleProps } from '@opentrons/components'
+} from '../..'
+import { Icon } from '../../icons'
+import type { StyleProps } from '../../primitives'
+import type { IconName } from '../../icons'
 
 type LargeButtonTypes =
   | 'primary'
@@ -22,7 +24,7 @@ type LargeButtonTypes =
   | 'alertStroke'
   | 'alertAlt'
 interface LargeButtonProps extends StyleProps {
-  onClick: () => void
+  onClick?: () => void
   buttonType?: LargeButtonTypes
   buttonText: React.ReactNode
   iconName?: IconName
@@ -126,80 +128,102 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     LARGE_BUTTON_PROPS_BY_TYPE[style].activeIconColor
       ? `color: ${LARGE_BUTTON_PROPS_BY_TYPE[style].activeIconColor}`
       : ''
+
   const LARGE_BUTTON_STYLE = css`
-    text-align: ${TYPOGRAPHY.textAlignLeft};
     color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor};
     background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
       .defaultBackgroundColor};
     cursor: default;
-    border-radius: ${BORDERS.borderRadius16};
-    box-shadow: none;
-    padding: ${SPACING.spacing24};
-    line-height: ${TYPOGRAPHY.lineHeight20};
-    gap: ${SPACING.spacing60};
-    border: ${BORDERS.borderRadius4} solid
-      ${buttonType === 'alertStroke' && !disabled
-        ? LARGE_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor
-        : 'none'};
-
-    ${TYPOGRAPHY.pSemiBold}
-
-    #btn-icon: {
-      color: ${disabled
-        ? LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledIconColor
-        : LARGE_BUTTON_PROPS_BY_TYPE[buttonType].iconColor};
-    }
+    padding: ${SPACING.spacing16} ${SPACING.spacing24};
+    text-align: ${TYPOGRAPHY.textAlignCenter};
+    border-radius: ${BORDERS.borderRadiusFull};
+    align-items: ${ALIGN_CENTER};
 
     &:active {
       background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
         .activeBackgroundColor};
       ${activeColorFor(buttonType)};
-      border: ${BORDERS.borderRadius4} solid
-        ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].activeBackgroundColor};
     }
     &:active #btn-icon {
       ${activeIconStyle(buttonType)};
     }
 
-    &:focus-visible {
-      background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
-        .focusVisibleBackgroundColor};
-      ${activeColorFor(buttonType)};
-      padding: calc(${SPACING.spacing24} + ${SPACING.spacing2});
-      border: ${SPACING.spacing2} solid ${COLORS.transparent};
-      outline: 3px solid
-        ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].focusVisibleOutlineColor};
-      background-clip: padding-box;
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      align-items: ${ALIGN_FLEX_START};
+      flex-direction: ${DIRECTION_COLUMN};
+      border-radius: ${BORDERS.borderRadius16};
       box-shadow: none;
-    }
+      padding: ${SPACING.spacing24};
+      line-height: ${TYPOGRAPHY.lineHeight20};
+      gap: ${SPACING.spacing60};
+      border: ${BORDERS.borderRadius4} solid
+        ${buttonType === 'alertStroke' && !disabled
+          ? LARGE_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor
+          : 'none'};
 
-    &:disabled {
-      color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledColor};
-      background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
-        .disabledBackgroundColor};
+      ${TYPOGRAPHY.pSemiBold}
+
+      #btn-icon: {
+        color: ${disabled
+          ? LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledIconColor
+          : LARGE_BUTTON_PROPS_BY_TYPE[buttonType].iconColor};
+      }
+      &:active {
+        border: ${BORDERS.borderRadius4} solid
+          ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].activeBackgroundColor};
+      }
+
+      &:focus-visible {
+        background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
+          .focusVisibleBackgroundColor};
+        ${activeColorFor(buttonType)};
+        padding: calc(${SPACING.spacing24} + ${SPACING.spacing2});
+        border: ${SPACING.spacing2} solid ${COLORS.transparent};
+        outline: 3px solid
+          ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].focusVisibleOutlineColor};
+        background-clip: padding-box;
+        box-shadow: none;
+      }
+
+      &:disabled {
+        color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledColor};
+        background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
+          .disabledBackgroundColor};
+      }
     }
   `
   return (
     <Btn
       display={DISPLAY_FLEX}
       css={LARGE_BUTTON_STYLE}
-      flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       disabled={disabled}
       {...buttonProps}
     >
-      <Flex flexDirection={DIRECTION_COLUMN}>
-        <LegacyStyledText css={TYPOGRAPHY.level3HeaderSemiBold}>
-          {buttonText}
-        </LegacyStyledText>
-      </Flex>
+      <LegacyStyledText
+        css={css`
+          font-size: ${fontSizeBodyLargeSemiBold};
+          padding-right: ${iconName != null ? SPACING.spacing8 : '0'};
+          @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+            ${TYPOGRAPHY.level3HeaderSemiBold}
+          }
+        `}
+      >
+        {buttonText}
+      </LegacyStyledText>
       {iconName ? (
-        <Icon
-          name={iconName}
-          aria-label={`${iconName} icon`}
-          size="5rem"
-          id={`btn-icon`}
-        />
+        <Box
+          css={css`
+            width: 1.5rem;
+            height: 1.5rem;
+            @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+              width: 5rem;
+              height: 5rem;
+            }
+          `}
+        >
+          <Icon name={iconName} aria-label={`${iconName} icon`} id="btn-icon" />
+        </Box>
       ) : null}
     </Btn>
   )

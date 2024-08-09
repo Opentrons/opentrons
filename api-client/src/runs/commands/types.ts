@@ -1,8 +1,13 @@
-import type { RunTimeCommand } from '@opentrons/shared-data'
+import type { RunTimeCommand, RunCommandError } from '@opentrons/shared-data'
 
 export interface GetCommandsParams {
   cursor: number | null // the index of the command at the center of the window
   pageLength: number // the number of items to include
+}
+
+export interface RunCommandErrors {
+  data: RunCommandError[]
+  meta: GetCommandsParams & { totalLength: number }
 }
 
 // NOTE: this incantation allows us to omit a key from each item in a union distributively

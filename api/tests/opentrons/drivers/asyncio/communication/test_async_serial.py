@@ -52,7 +52,7 @@ async def test_write_timeout_override(
     mock_write_timeout_prop: PropertyMock,
     default: Optional[int],
     override: Optional[int],
-):
+) -> None:
     """It should override the timeout and return to default after the call."""
     mock_write_timeout_prop.return_value = default
     async with subject.timeout_override("write_timeout", override):
@@ -78,7 +78,7 @@ async def test_timeout_override(
     mock_timeout_prop: PropertyMock,
     default: Optional[int],
     override: Optional[int],
-):
+) -> None:
     """It should override the timeout and return to default after the call."""
     mock_timeout_prop.return_value = default
     async with subject.timeout_override("timeout", override):
@@ -101,7 +101,7 @@ async def test_write_timeout_dont_override(
     mock_write_timeout_prop: PropertyMock,
     default: Optional[int],
     override: Optional[int],
-):
+) -> None:
     """It should not override the timeout if not necessary."""
     mock_write_timeout_prop.return_value = default
     async with subject.timeout_override("write_timeout", override):
@@ -123,7 +123,7 @@ async def test_read_timeout_dont_override(
     mock_timeout_prop: PropertyMock,
     default: Optional[int],
     override: Optional[int],
-):
+) -> None:
     """It should not override the timeout if not necessary."""
     mock_timeout_prop.return_value = default
     async with subject.timeout_override("timeout", override):
@@ -132,7 +132,7 @@ async def test_read_timeout_dont_override(
     mock_timeout_prop.assert_called_once()
 
 
-def test_reset_input_buffer(mock_serial: MagicMock, subject: AsyncSerial):
+def test_reset_input_buffer(mock_serial: MagicMock, subject: AsyncSerial) -> None:
     """It should call the underlying serial port's Reset function"""
     subject.reset_input_buffer()
     mock_serial.reset_input_buffer.assert_called_once()
