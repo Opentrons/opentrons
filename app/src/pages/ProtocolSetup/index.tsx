@@ -513,6 +513,8 @@ function PrepareToRun({
     areModulesReady && areFixturesReady && !isLocationConflict
       ? 'ready'
       : 'not ready'
+  // Liquids information
+  const liquidsInProtocol = mostRecentAnalysis?.liquids ?? []
 
   const isReadyToRun =
     incompleteInstrumentCount === 0 && areModulesReady && areFixturesReady
@@ -525,7 +527,11 @@ function PrepareToRun({
           confirmAttachment()
         } else if (
           runStatus === RUN_STATUS_IDLE &&
-          !(labwareConfirmed && offsetsConfirmed && liquidsConfirmed)
+          !(
+            labwareConfirmed &&
+            offsetsConfirmed &&
+            (liquidsConfirmed || liquidsInProtocol.length === 0)
+          )
         ) {
           confirmStepsComplete()
         } else {
@@ -654,9 +660,6 @@ function PrepareToRun({
     runRecord?.data?.labwareOffsets ?? []
   )
 
-  // Liquids information
-  const liquidsInProtocol = mostRecentAnalysis?.liquids ?? []
-
   const { data: doorStatus } = useDoorQuery({
     refetchInterval: FETCH_DURATION_MS,
   })
@@ -757,7 +760,7 @@ function PrepareToRun({
               detail={modulesDetail}
               subDetail={modulesSubDetail}
               status={modulesStatus}
-              disabled={
+              interactionDisabled={
                 protocolModulesInfo.length === 0 && !protocolHasFixtures
               }
             />
@@ -799,7 +802,11 @@ function PrepareToRun({
                 setSetupScreen('liquids')
               }}
               title={i18n.format(t('liquids'), 'capitalize')}
-              status={liquidsConfirmed ? 'ready' : 'general'}
+              status={
+                liquidsConfirmed || liquidsInProtocol.length === 0
+                  ? 'ready'
+                  : 'general'
+              }
               detail={
                 liquidsInProtocol.length > 0
                   ? t('initial_liquids_num', {
@@ -807,7 +814,7 @@ function PrepareToRun({
                     })
                   : t('liquids_not_in_setup')
               }
-              disabled={liquidsInProtocol.length === 0}
+              interactionDisabled={liquidsInProtocol.length === 0}
             />
           </>
         ) : (

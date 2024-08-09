@@ -74,6 +74,7 @@
   "deck_conflict_info": "<block>Update the deck configuration by removing the <strong>{{currentFixture}}</strong> in location <strong>{{cutout}}</strong>. Either remove the fixture from the deck configuration or update the protocol.</block>",
   "deck_conflict": "Deck location conflict",
   "deck_hardware": "Deck hardware",
+  "deck_hardware_ready": "Deck hardware ready",
   "deck_map": "Deck Map",
   "default_values": "Default values",
   "example": "Example",
