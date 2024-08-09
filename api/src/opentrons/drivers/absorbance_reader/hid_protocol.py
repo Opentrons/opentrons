@@ -36,10 +36,10 @@ ErrorCodeNames = Literal[
 ]
 
 SlotStateNames = Literal[
-    "BYONOY_SLOT_UNKNOWN",
-    "BYONOY_SLOT_EMPTY",
-    "BYONOY_SLOT_OCCUPIED",
-    "BYONOY_SLOT_UNDETERMINED",
+    "UNKNOWN",
+    "EMPTY",
+    "OCCUPIED",
+    "UNDETERMINED",
 ]
 
 DeviceStateNames = Literal[

@@ -58,6 +58,7 @@ from .actions import (
     HardwareStoppedAction,
     ResetTipsAction,
     SetPipetteMovementSpeedAction,
+    AddAbsorbanceReaderLidAction,
 )
 
 
@@ -559,6 +560,12 @@ class ProtocolEngine:
         area = AddressableAreaLocation(addressableAreaName=addressable_area_name)
         self._action_dispatcher.dispatch(
             AddAddressableAreaAction(addressable_area=area)
+        )
+
+    def add_absorbance_reader_lid(self, module_id: str, lid_id: str) -> None:
+        """Add an absorbance reader lid to the module state."""
+        self._action_dispatcher.dispatch(
+            AddAbsorbanceReaderLidAction(module_id=module_id, lid_id=lid_id)
         )
 
     def reset_tips(self, labware_id: str) -> None:

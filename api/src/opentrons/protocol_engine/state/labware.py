@@ -29,6 +29,7 @@ from .. import errors
 from ..resources import DeckFixedLabware, labware_validation, fixture_validation
 from ..commands import (
     Command,
+    absorbance_reader,
     LoadLabwareResult,
     MoveLabwareResult,
     ReloadLabwareResult,
@@ -223,6 +224,14 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
                 # If a labware has been moved into a waste chute it's been chuted away and is now technically off deck
                 new_location = OFF_DECK_LOCATION
             self._state.labware_by_id[labware_id].location = new_location
+
+        elif isinstance(command.result, absorbance_reader.MoveLidResult):
+            lid_id = command.result.lidId
+            new_location = command.result.newLocation
+            new_offset_id = command.result.offsetId
+
+            self._state.labware_by_id[lid_id].offsetId = new_offset_id
+            self._state.labware_by_id[lid_id].location = new_location
 
     def _add_labware_offset(self, labware_offset: LabwareOffset) -> None:
         """Add a new labware offset to state.
@@ -703,6 +712,12 @@ class LabwareView(HasState[LabwareState]):
     def is_fixed_trash(self, labware_id: str) -> bool:
         """Check if labware is fixed trash."""
         return self.get_has_quirk(labware_id, "fixedTrash")
+
+    def is_absorbance_reader_lid(self, labware_id: str) -> bool:
+        """Check if labware is an absorbance reader lid."""
+        return labware_validation.is_absorbance_reader_lid(
+            self.get(labware_id).loadName
+        )
 
     def raise_if_labware_inaccessible_by_pipette(self, labware_id: str) -> None:
         """Raise an error if the specified location cannot be reached via a pipette."""

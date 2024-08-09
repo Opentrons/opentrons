@@ -5,7 +5,7 @@
   "labwareOffset": {
     "x": 0.0,
     "y": 0.0,
-    "z": 16.0
+    "z": 0.65
   },
   "dimensions": {
     "bareOverallHeight": 18.5,
@@ -26,20 +26,6 @@
     "y": 64.93,
     "z": 97.8
   },
-  "gripperOffsets": {
-    "default": {
-      "pickUpOffset": {
-        "x": 0,
-        "y": 0,
-        "z": 4.6
-      },
-      "dropOffset": {
-        "x": 0,
-        "y": 0,
-        "z": 5.6
-      }
-    }
-  },
   "displayName": "Absorbance Plate Reader Module GEN1",
   "quirks": [],
   "slotTransforms": {
@@ -55,7 +41,7 @@
     "value": "",
     "attributes": {
       "version": "1.1",
-      "id": "magneticblock",
+      "id": "absorbanceReader",
       "xmlns": "http://www.w3.org/2000/svg",
       "xmlns:xlink": "http://www.w3.org/1999/xlink",
       "width": "134",

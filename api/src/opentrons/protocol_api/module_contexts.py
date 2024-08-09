@@ -976,23 +976,33 @@ class AbsorbanceReaderContext(ModuleContext):
     It should not be instantiated directly; instead, it should be
     created through :py:meth:`.ProtocolContext.load_module`.
 
-    .. versionadded:: 2.18
+    .. versionadded:: 2.21
     """
 
     _core: AbsorbanceReaderCore
 
     @property
-    @requires_version(2, 18)
+    @requires_version(2, 21)
     def serial_number(self) -> str:
         """Get the module's unique hardware serial number."""
         return self._core.get_serial_number()
 
-    @requires_version(2, 18)
+    @requires_version(2, 21)
+    def close_lid(self) -> None:
+        """Close the lid of the Absorbance Reader."""
+        self._core.close_lid()
+
+    @requires_version(2, 21)
+    def open_lid(self) -> None:
+        """Close the lid of the Absorbance Reader."""
+        self._core.open_lid()
+
+    @requires_version(2, 21)
     def initialize(self, wavelength: int) -> None:
         """Initialize the Absorbance Reader by taking zero reading."""
         self._core.initialize(wavelength)
 
-    @requires_version(2, 18)
-    def initiate_read(self) -> None:
+    @requires_version(2, 21)
+    def read(self) -> None:
         """Initiate read on the Absorbance Reader."""
-        self._core.initiate_read()
+        self._core.read()

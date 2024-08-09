@@ -76,16 +76,16 @@ def test_initialize(
     assert subject._initialized_value == 123
 
 
-def test_initiate_read(
+def test_read(
     decoy: Decoy, mock_engine_client: EngineClient, subject: AbsorbanceReaderCore
 ) -> None:
     """It should call absorbance reader to read with the engine client."""
     subject._initialized_value = 123
-    subject.initiate_read()
+    subject.read()
 
     decoy.verify(
         mock_engine_client.execute_command(
-            cmd.absorbance_reader.MeasureAbsorbanceParams(
+            cmd.absorbance_reader.ReadAbsorbanceParams(
                 moduleId="1234",
                 sampleWavelength=123,
             ),

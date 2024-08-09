@@ -11,6 +11,7 @@ from .hid_protocol import (
     AbsorbanceHidInterface as AbsProtocol,
     ErrorCodeNames,
     DeviceStateNames,
+    SlotStateNames,
 )
 from opentrons.drivers.types import (
     AbsorbanceReaderLidStatus,
@@ -276,7 +277,10 @@ class AsyncByonoy:
         )
 
     async def get_plate_presence(self) -> AbsorbanceReaderPlatePresence:
-        return AbsorbanceReaderPlatePresence.UNKNOWN
+        presence = await self._loop.run_in_executor(
+            executor=self._executor, func=self._get_slot_status
+        )
+        return self.convert_plate_presence(presence.name)
 
     async def get_device_status(self) -> AbsorbanceReaderDeviceState:
         status = await self._loop.run_in_executor(
@@ -296,3 +300,15 @@ class AsyncByonoy:
             "BYONOY_DEVICE_STATE_ERROR": AbsorbanceReaderDeviceState.ERROR,
         }
         return state_map[device_state]
+
+    @staticmethod
+    def convert_plate_presence(
+        slot_state: SlotStateNames,
+    ) -> AbsorbanceReaderPlatePresence:
+        state_map: Dict[SlotStateNames, AbsorbanceReaderPlatePresence] = {
+            "UNKNOWN": AbsorbanceReaderPlatePresence.UNKNOWN,
+            "EMPTY": AbsorbanceReaderPlatePresence.ABSENT,
+            "OCCUPIED": AbsorbanceReaderPlatePresence.PRESENT,
+            "UNDETERMINED": AbsorbanceReaderPlatePresence.UNKNOWN,
+        }
+        return state_map[slot_state]

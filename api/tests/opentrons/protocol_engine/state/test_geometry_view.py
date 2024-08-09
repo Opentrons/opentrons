@@ -147,7 +147,9 @@ def labware_view(labware_store: LabwareStore) -> LabwareView:
 @pytest.fixture
 def module_store(state_config: Config) -> ModuleStore:
     """Get a module store that can accept actions."""
-    return ModuleStore(config=state_config, module_calibration_offsets={})
+    return ModuleStore(
+        config=state_config, deck_fixed_labware=[], module_calibration_offsets={}
+    )
 
 
 @pytest.fixture
