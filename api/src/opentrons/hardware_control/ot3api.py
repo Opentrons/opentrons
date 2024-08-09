@@ -2629,7 +2629,7 @@ class OT3API(
         force_both_sensors: bool = False,
     ) -> float:
         plunger_direction = -1 if probe_settings.aspirate_while_sensing else 1
-        await self._backend.liquid_probe(
+        end_z = await self._backend.liquid_probe(
             mount,
             p_travel,
             probe_settings.mount_speed,
@@ -2641,8 +2641,17 @@ class OT3API(
             probe=probe,
             force_both_sensors=force_both_sensors,
         )
-        end_pos = await self.gantry_position(mount, refresh=True)
-        return end_pos.z
+        machine_pos = await self._backend.update_position()
+        machine_pos[Axis.by_mount(mount)] = end_z
+        deck_end_z = self._deck_from_machine(machine_pos)[Axis.by_mount(mount)]
+        offset = offset_for_mount(
+            mount,
+            top_types.Point(*self._config.left_mount_offset),
+            top_types.Point(*self._config.right_mount_offset),
+            top_types.Point(*self._config.gripper_mount_offset),
+        )
+        cp = self.critical_point_for(mount, None)
+        return deck_end_z + offset[2] + cp.z
 
     async def liquid_probe(
         self,
