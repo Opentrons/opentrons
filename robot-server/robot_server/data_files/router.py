@@ -2,7 +2,7 @@
 from datetime import datetime
 from pathlib import Path
 from textwrap import dedent
-from typing import Optional, Literal, Union
+from typing import Annotated, Optional, Literal, Union
 
 from fastapi import APIRouter, UploadFile, File, Form, Depends, Response, status
 from opentrons.protocol_reader import FileHasher, FileReaderWriter
@@ -82,19 +82,25 @@ class UnexpectedFileFormat(ErrorDetails):
     },
 )
 async def upload_data_file(
-    file: Optional[UploadFile] = File(default=None, description="Data file to upload"),
-    file_path: Optional[str] = Form(
-        default=None,
-        description="Absolute path to a file on the robot.",
-        alias="filePath",
-    ),
-    data_files_directory: Path = Depends(get_data_files_directory),
-    data_files_store: DataFilesStore = Depends(get_data_files_store),
-    data_file_auto_deleter: DataFileAutoDeleter = Depends(get_data_file_auto_deleter),
-    file_reader_writer: FileReaderWriter = Depends(get_file_reader_writer),
-    file_hasher: FileHasher = Depends(get_file_hasher),
-    file_id: str = Depends(get_unique_id, use_cache=False),
-    created_at: datetime = Depends(get_current_time),
+    data_files_directory: Annotated[Path, Depends(get_data_files_directory)],
+    data_files_store: Annotated[DataFilesStore, Depends(get_data_files_store)],
+    data_file_auto_deleter: Annotated[
+        DataFileAutoDeleter, Depends(get_data_file_auto_deleter)
+    ],
+    file_reader_writer: Annotated[FileReaderWriter, Depends(get_file_reader_writer)],
+    file_hasher: Annotated[FileHasher, Depends(get_file_hasher)],
+    file_id: Annotated[str, Depends(get_unique_id, use_cache=False)],
+    created_at: Annotated[datetime, Depends(get_current_time)],
+    file: Annotated[
+        Optional[UploadFile], File(description="Data file to upload")
+    ] = None,
+    file_path: Annotated[
+        Optional[str],
+        Form(
+            description="Absolute path to a file on the robot.",
+            alias="filePath",
+        ),
+    ] = None,
 ) -> PydanticResponse[SimpleBody[DataFile]]:
     """Save the uploaded data file to persistent storage and update database."""
     if all([file, file_path]):
@@ -162,7 +168,7 @@ async def upload_data_file(
 )
 async def get_data_file_info_by_id(
     dataFileId: str,
-    data_files_store: DataFilesStore = Depends(get_data_files_store),
+    data_files_store: Annotated[DataFilesStore, Depends(get_data_files_store)],
 ) -> PydanticResponse[SimpleBody[DataFile]]:
     """Get data file info by ID.
 
@@ -198,9 +204,9 @@ async def get_data_file_info_by_id(
 )
 async def get_data_file(
     dataFileId: str,
-    data_files_directory: Path = Depends(get_data_files_directory),
-    data_files_store: DataFilesStore = Depends(get_data_files_store),
-    file_reader_writer: FileReaderWriter = Depends(get_file_reader_writer),
+    data_files_directory: Annotated[Path, Depends(get_data_files_directory)],
+    data_files_store: Annotated[DataFilesStore, Depends(get_data_files_store)],
+    file_reader_writer: Annotated[FileReaderWriter, Depends(get_file_reader_writer)],
 ) -> Response:
     """Get the requested data file by id."""
     try:
@@ -228,7 +234,7 @@ async def get_data_file(
     responses={status.HTTP_200_OK: {"model": SimpleMultiBody[str]}},
 )
 async def get_all_data_files(
-    data_files_store: DataFilesStore = Depends(get_data_files_store),
+    data_files_store: Annotated[DataFilesStore, Depends(get_data_files_store)],
 ) -> PydanticResponse[SimpleMultiBody[DataFile]]:
     """Get a list of all data files stored on the robot server.
 

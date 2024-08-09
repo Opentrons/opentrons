@@ -1,3 +1,5 @@
+from typing import Annotated
+
 from starlette import status
 from fastapi import APIRouter, Depends
 from pydantic import ValidationError
@@ -26,7 +28,7 @@ router = APIRouter()
     },
 )
 async def get_engaged_motors(
-    hardware: HardwareControlAPI = Depends(get_hardware),
+    hardware: Annotated[HardwareControlAPI, Depends(get_hardware)],
 ) -> model.EngagedMotors:
     # TODO (spp, 2023-07-06): Implement fetching Flex's engaged motors
     #  https://opentrons.atlassian.net/browse/RET-1371
@@ -51,7 +53,7 @@ async def get_engaged_motors(
     response_model=V1BasicResponse,
 )
 async def post_disengage_motors(
-    axes: model.Axes, hardware: HardwareControlAPI = Depends(get_hardware)
+    axes: model.Axes, hardware: Annotated[HardwareControlAPI, Depends(get_hardware)]
 ) -> V1BasicResponse:
     input_axes = [Axis[ax.upper()] for ax in axes.axes]
     try:
