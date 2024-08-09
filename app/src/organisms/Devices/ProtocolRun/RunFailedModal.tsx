@@ -108,7 +108,7 @@ export function RunFailedModal({
                 errorCode: errors[0].errorCode,
               })
             : `${errors.length} ${
-                runStatus === RUN_STATUS_SUCCEEDED ? 'warning' : 'error'
+                runStatus === RUN_STATUS_SUCCEEDED ? t('warning') : t('error')
               }${errors.length > 1 ? 's' : ''}`}
         </LegacyStyledText>
         <Flex css={ERROR_MESSAGE_STYLE}>

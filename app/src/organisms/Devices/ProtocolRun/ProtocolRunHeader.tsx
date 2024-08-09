@@ -939,9 +939,11 @@ function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
                   errorType: highestPriorityError?.errorType,
                   errorCode: highestPriorityError?.errorCode,
                 })
-              : `Run completed with ${
-                  runStatus === RUN_STATUS_SUCCEEDED ? 'warnings' : 'errors'
-                }.`}
+              : `${
+                  runStatus === RUN_STATUS_SUCCEEDED
+                    ? t('run_completed_with_warnings')
+                    : t('run_completed_with_errors')
+                }`}
           </LegacyStyledText>
 
           <LinkButton
