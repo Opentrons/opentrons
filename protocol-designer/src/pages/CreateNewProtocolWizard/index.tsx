@@ -20,6 +20,7 @@ import {
   WASTE_CHUTE_CUTOUT,
   getAreSlotsAdjacent,
 } from '@opentrons/shared-data'
+import { Box, COLORS } from '@opentrons/components'
 import {
   actions as fileActions,
   selectors as loadFileSelectors,
@@ -99,7 +100,7 @@ const initialFormState: WizardFormState = {
     name: undefined,
     description: undefined,
     organizationOrAuthor: undefined,
-    robotType: OT2_ROBOT_TYPE,
+    robotType: undefined,
   },
   pipettesByMount: {
     left: { pipetteName: undefined, tiprackDefURI: undefined },
@@ -366,13 +367,15 @@ export function CreateNewProtocolWizard(): JSX.Element | null {
   }
 
   return (
-    <CreateFileForm
-      currentWizardStep={currentWizardStep}
-      createProtocolFile={createProtocolFile}
-      proceed={proceed}
-      goBack={goBack}
-      setWizardSteps={setWizardSteps}
-    />
+    <Box backgroundColor={COLORS.grey20}>
+      <CreateFileForm
+        currentWizardStep={currentWizardStep}
+        createProtocolFile={createProtocolFile}
+        proceed={proceed}
+        goBack={goBack}
+        setWizardSteps={setWizardSteps}
+      />
+    </Box>
   )
 }
 
@@ -416,19 +419,15 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
                 {...formProps}
                 goBack={goBack}
                 proceed={() => {
-                  handleProceedRobotType(formProps.getValues().fields.robotType)
+                  handleProceedRobotType(
+                    formProps.getValues().fields.robotType ?? OT2_ROBOT_TYPE
+                  )
                   proceed()
                 }}
               />
             )
           case 'pipette':
-            return (
-              <SelectPipettes
-                {...formProps}
-                proceed={proceed}
-                goBack={goBack}
-              />
-            )
+            return <SelectPipettes {...{ ...formProps, proceed, goBack }} />
           case 'gripper':
             return <SelectGripper {...{ ...formProps, proceed, goBack }} />
           case 'modules':
