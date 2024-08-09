@@ -108,10 +108,10 @@ export function RunFailedModal({
                 errorCode: errors[0].errorCode,
               })
             : runStatus === RUN_STATUS_SUCCEEDED
-            ? t(errors.length > 1 ? 'no_of_warnings' : 'no_of_warning', {
+            ? t('no_of_warnings', {
                 count: errors.length,
               })
-            : t(errors.length > 1 ? 'no_of_errors' : 'no_of_error', {
+            : t('no_of_errors', {
                 count: errors.length,
               })}
         </LegacyStyledText>
