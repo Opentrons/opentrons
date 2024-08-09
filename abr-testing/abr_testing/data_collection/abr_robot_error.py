@@ -200,7 +200,7 @@ def read_each_log(folder_path: str, issue_url: str) -> None:
                         "content": [{"type": "text", "text": message}],
                     }
                     content_list.insert(0, line_1)
-                    ticket.comment(content_list, issue_url)
+                    ticket.comment(content_list, issue_key)
             no_word_found_message = (
                 f"Key words '{not_found_words} were not found in {file_name}."
             )
@@ -209,7 +209,7 @@ def read_each_log(folder_path: str, issue_url: str) -> None:
                 "content": [{"type": "text", "text": no_word_found_message}],
             }
             content_list.append(no_word_found_dict)
-            ticket.comment(content_list, issue_url)
+            ticket.comment(content_list, issue_key)
 
 
 def match_error_to_component(
