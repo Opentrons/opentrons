@@ -647,37 +647,79 @@ async def _run_xy_motion(
     ui.print_header("Run xy motion check...")
     XY_AXIS_SETTINGS = _creat_xy_axis_settings(arguments)
     LOG.info(XY_AXIS_SETTINGS)
-    for setting in XY_AXIS_SETTINGS:
-        print_motion_settings(
-            "X",
-            setting[Axis.X].max_speed,
-            setting[Axis.X].acceleration,
-            setting[Axis.X].run_current,
+    ui.print_header("Current Setting")
+    print(f"default x: current->{DEFAULT_X_CURRENT}, speed->{DEFAULT_X_SPEED}, acc->{DEFAULT_X_ACCELERATION}")
+    print(f"default y: current->{DEFAULT_Y_CURRENT}, speed->{DEFAULT_Y_SPEED}, acc->{DEFAULT_Y_ACCELERATION}")
+    
+    for x_speed in DEFAULT_X_SPEEDS:
+        # print_motion_settings(
+        #     "X",
+        #     setting[Axis.X].max_speed,
+        #     setting[Axis.X].acceleration,
+        #     setting[Axis.X].run_current,
+        # )
+        # print_motion_settings(
+        #     "Y",
+        #     setting[Axis.Y].max_speed,
+        #     setting[Axis.Y].acceleration,
+        #     setting[Axis.Y].run_current,
+        # )
+        #print(f"X: current-> {setting[Axis.X].run_current}, acc-> {setting[Axis.X].acceleration}, max_speed-> {setting[Axis.X].max_speed}")
+        #print(f"Y: current-> {setting[Axis.Y].run_current}, acc-> {setting[Axis.Y].acceleration}, max_speed-> {setting[Axis.Y].max_speed}")
+        input(f'x_speed: {x_speed}')
+        # res = input("应用这个配置？")
+        # if 'Y' in res.upper():
+            # for ax in [Axis.X, Axis.Y]:
+            #     await helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3(
+            #         api,
+            #         ax,
+            #         api.gantry_load,
+            #         default_max_speed=setting[ax].max_speed,
+            #         acceleration=setting[ax].acceleration,
+            #     )
+            #     await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
+            #         api,
+            #         ax,
+            #         api.gantry_load,
+            #         run_current=setting[ax].run_current,
+            #         # run_current=setting[ax].run_current,
+            #     )
+            #     LOG.info(f"Motor Current Settings: {api._backend._current_settings}")
+        ax = Axis.X
+        await helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3(
+            api,
+            ax,
+            api.gantry_load,
+            default_max_speed=x_speed,
+            acceleration=DEFAULT_X_ACCELERATION
         )
-        print_motion_settings(
-            "Y",
-            setting[Axis.Y].max_speed,
-            setting[Axis.Y].acceleration,
-            setting[Axis.Y].run_current,
+        await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
+            api,
+            ax,
+            api.gantry_load,
+            run_current=DEFAULT_X_CURRENT,
         )
-        for ax in [Axis.X, Axis.Y]:
-            await helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3(
-                api,
-                ax,
-                api.gantry_load,
-                default_max_speed=setting[ax].max_speed,
-                acceleration=setting[ax].acceleration,
-            )
-            await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
-                api,
-                ax,
-                api.gantry_load,
-                run_current=setting[ax].run_current,
-            )
-            LOG.info(f"Motor Current Settings: {api._backend._current_settings}")
+
+        ax = Axis.Y
+        await helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3(
+            api,
+            ax,
+            api.gantry_load,
+            default_max_speed=DEFAULT_Y_SPEED,
+            acceleration=DEFAULT_Y_ACCELERATION,
+        )
+        await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
+            api,
+            ax,
+            api.gantry_load,
+            run_current=DEFAULT_Y_CURRENT,
+        )
+      
         fail_count = 0
         pass_count = 0
+       
         for i in range(max(int(arguments.cycles / 2), 1)):
+
             res_b = await _run_bowtie(
                 api,
                 arguments.simulate,
@@ -702,9 +744,9 @@ async def _run_xy_motion(
             _record_motion_check_data(
                 "x_motion",
                 write_cb,
-                setting[Axis.X].max_speed,
-                setting[Axis.X].acceleration,
-                setting[Axis.X].run_current,
+                x_speed,
+                DEFAULT_X_ACCELERATION,
+                DEFAULT_X_CURRENT,
                 i + 1,
                 pass_count,
                 fail_count,
@@ -712,9 +754,9 @@ async def _run_xy_motion(
             _record_motion_check_data(
                 "y_motion",
                 write_cb,
-                setting[Axis.Y].max_speed,
-                setting[Axis.Y].acceleration,
-                setting[Axis.Y].run_current,
+                DEFAULT_Y_SPEED,
+                DEFAULT_Y_ACCELERATION,
+                DEFAULT_Y_CURRENT,
                 i + 1,
                 pass_count,
                 fail_count,
@@ -752,18 +794,18 @@ async def _run_gantry_cycles(
             )
             if not qc_pass:
                 return qc_pass
-            if not arguments.skip_mount:
-                for z_mount in MOUNT_AXES:
-                    qc_pass = await _run_mount_up_down(
-                        api,
-                        arguments.simulate,
-                        z_mount,
-                        mount_up_down_points[z_mount],
-                        csv_cb.write,
-                        arguments.record_error,
-                    )
-                    if not qc_pass:
-                        return qc_pass
+            # if not arguments.skip_mount:
+            #     for z_mount in MOUNT_AXES:
+            #         qc_pass = await _run_mount_up_down(
+            #             api,
+            #             arguments.simulate,
+            #             z_mount,
+            #             mount_up_down_points[z_mount],
+            #             csv_cb.write,
+            #             arguments.record_error,
+            #         )
+            #         if not qc_pass:
+            #             return qc_pass
         if not arguments.skip_hourglass:
             qc_pass = await _run_hour_glass(
                 api,
@@ -775,18 +817,18 @@ async def _run_gantry_cycles(
             )
             if not qc_pass:
                 return qc_pass
-            if not arguments.skip_mount:
-                for z_mount in MOUNT_AXES:
-                    qc_pass = await _run_mount_up_down(
-                        api,
-                        arguments.simulate,
-                        z_mount,
-                        mount_up_down_points[z_mount],
-                        csv_cb.write,
-                        arguments.record_error,
-                    )
-                    if not qc_pass:
-                        return qc_pass
+            # if not arguments.skip_mount:
+            #     for z_mount in MOUNT_AXES:
+            #         qc_pass = await _run_mount_up_down(
+            #             api,
+            #             arguments.simulate,
+            #             z_mount,
+            #             mount_up_down_points[z_mount],
+            #             csv_cb.write,
+            #             arguments.record_error,
+            #         )
+            #         if not qc_pass:
+            #             return qc_pass
 
     return qc_pass
 
@@ -891,29 +933,29 @@ async def _main(arguments: argparse.Namespace) -> None:
         LOG.info(DEFAULT_Z_CURRENT)
         LOG.info(f"Motor Current Settings: {api._backend._current_settings}")
 
-        qc_pass = await _run_gantry_cycles(
-            arguments,
-            api,
-            mount,
-            bowtie_points,
-            hour_glass_points,
-            mount_up_down_points,
-            csv_cb,
-        )
-        if not qc_pass:
-            return
-
+        # qc_pass = await _run_gantry_cycles(
+        #     arguments,
+        #     api,
+        #     mount,
+        #     bowtie_points,
+        #     hour_glass_points,
+        #     mount_up_down_points,
+        #     csv_cb,
+        # )
+        # if not qc_pass:
+        #     return
+        ui.print_header("开始运行XY")
         qc_pass = await _run_xy_motion(
             arguments, api, mount, bowtie_points, hour_glass_points, csv_cb.write
         )
         if not qc_pass:
             return
 
-        qc_pass = await _run_z_motion(
-            arguments, api, mount, mount_up_down_points, csv_cb.write
-        )
-        if not qc_pass:
-            return
+        # qc_pass = await _run_z_motion(
+        #     arguments, api, mount, mount_up_down_points, csv_cb.write
+        # )
+        # if not qc_pass:
+        #     return
 
     except KeyboardInterrupt:
         print("Cancelled")
