@@ -65,6 +65,12 @@ def mock_data_files_store(decoy: Decoy) -> DataFilesStore:
 
 
 @pytest.fixture
+def mock_data_files_directory(decoy: Decoy) -> Path:
+    """Get a mock DataFilesStore."""
+    return decoy.mock(cls=Path)
+
+
+@pytest.fixture
 def labware_offset_create() -> LabwareOffsetCreate:
     """Get a labware offset create request value object."""
     return pe_types.LabwareOffsetCreate(
@@ -246,6 +252,8 @@ async def test_create_protocol_run_bad_protocol_id(
     mock_deck_configuration_store: DeckConfigurationStore,
     mock_run_data_manager: RunDataManager,
     mock_run_auto_deleter: RunAutoDeleter,
+    mock_data_files_store: DataFilesStore,
+    mock_data_files_directory: Path,
 ) -> None:
     """It should 404 if a protocol for a run does not exist."""
     error = ProtocolNotFoundError("protocol-id")
@@ -260,6 +268,8 @@ async def test_create_protocol_run_bad_protocol_id(
             protocol_store=mock_protocol_store,
             deck_configuration_store=mock_deck_configuration_store,
             run_data_manager=mock_run_data_manager,
+            data_files_store=mock_data_files_store,
+            data_files_directory=mock_data_files_directory,
             run_id="run-id",
             created_at=datetime.now(),
             run_auto_deleter=mock_run_auto_deleter,
@@ -277,6 +287,8 @@ async def test_create_run_conflict(
     mock_run_auto_deleter: RunAutoDeleter,
     mock_deck_configuration_store: DeckConfigurationStore,
     mock_protocol_store: ProtocolStore,
+    mock_data_files_store: DataFilesStore,
+    mock_data_files_directory: Path,
 ) -> None:
     """It should respond with a conflict error if multiple engines are created."""
     created_at = datetime(year=2021, month=1, day=1)
@@ -307,6 +319,8 @@ async def test_create_run_conflict(
             run_auto_deleter=mock_run_auto_deleter,
             quick_transfer_run_auto_deleter=mock_run_auto_deleter,
             deck_configuration_store=mock_deck_configuration_store,
+            data_files_store=mock_data_files_store,
+            data_files_directory=mock_data_files_directory,
             notify_publishers=mock_notify_publishers,
             check_estop=True,
         )
