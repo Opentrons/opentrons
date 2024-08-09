@@ -49,7 +49,7 @@ async def get_data_files_directory(
 async def get_data_files_store(
     app_state: Annotated[AppState, Depends(get_app_state)],
     sql_engine: Annotated[SQLEngine, Depends(get_sql_engine)],
-    data_files_directory: Annotated[Path, Depends(get_data_files_directory)]
+    data_files_directory: Annotated[Path, Depends(get_data_files_directory)],
 ) -> DataFilesStore:
     """Get a singleton DataFilesStore to keep track of uploaded data files."""
     async with _data_files_store_init_lock:

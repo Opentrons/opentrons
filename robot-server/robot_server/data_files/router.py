@@ -84,7 +84,9 @@ class UnexpectedFileFormat(ErrorDetails):
 async def upload_data_file(
     data_files_directory: Annotated[Path, Depends(get_data_files_directory)],
     data_files_store: Annotated[DataFilesStore, Depends(get_data_files_store)],
-    data_file_auto_deleter: Annotated[DataFileAutoDeleter, Depends(get_data_file_auto_deleter)],
+    data_file_auto_deleter: Annotated[
+        DataFileAutoDeleter, Depends(get_data_file_auto_deleter)
+    ],
     file_reader_writer: Annotated[FileReaderWriter, Depends(get_file_reader_writer)],
     file_hasher: Annotated[FileHasher, Depends(get_file_hasher)],
     file_id: Annotated[str, Depends(get_unique_id, use_cache=False)],
