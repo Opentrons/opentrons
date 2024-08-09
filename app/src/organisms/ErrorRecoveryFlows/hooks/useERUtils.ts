@@ -1,5 +1,4 @@
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { useRouteUpdateActions } from './useRouteUpdateActions'
 import { useRecoveryCommands } from './useRecoveryCommands'
@@ -106,7 +105,6 @@ export function useERUtils({
 
   const tipStatusUtils = useRecoveryTipStatus({
     runId,
-    isFlex: robotType === FLEX_ROBOT_TYPE,
     runRecord,
     attachedInstruments,
   })

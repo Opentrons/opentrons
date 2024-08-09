@@ -22,7 +22,6 @@ import {
   useModulesQuery,
   useDoorQuery,
   useHost,
-  useInstrumentsQuery,
   useRunCommandErrors,
 } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
@@ -166,7 +165,6 @@ export function ProtocolRunHeader({
   const isRobotViewable = useIsRobotViewable(robotName)
   const runStatus = useRunStatus(runId)
   const { analysisErrors } = useProtocolAnalysisErrors(runId)
-  const { data: attachedInstruments } = useInstrumentsQuery()
   const isRunCurrent = Boolean(useNotifyRunQuery(runId)?.data?.data?.current)
   const mostRecentRunId = useMostRecentRunId()
   const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
@@ -224,10 +222,8 @@ export function ProtocolRunHeader({
     aPipetteWithTip,
   } = useTipAttachmentStatus({
     runId,
-    runRecord,
-    attachedInstruments,
+    runRecord: runRecord ?? null,
     host,
-    isFlex,
   })
   const {
     showDTModal,
