@@ -153,7 +153,7 @@ async def get_run_data_from_url(
         status.HTTP_409_CONFLICT: {"model": ErrorBody[RunAlreadyActive]},
     },
 )
-async def create_run(
+async def create_run(  # noqa: C901
     run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
     protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
     run_id: Annotated[str, Depends(get_unique_id)],
