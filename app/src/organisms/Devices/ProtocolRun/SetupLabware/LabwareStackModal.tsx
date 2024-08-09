@@ -29,6 +29,7 @@ import {
   getModuleType,
   TC_MODULE_LOCATION_OT2,
   TC_MODULE_LOCATION_OT3,
+  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import tiprackAdapter from '../../../../assets/images/labware/opentrons_flex_96_tiprack_adapter.png'
 
@@ -72,7 +73,7 @@ export const LabwareStackModal = (
   const isModuleThermocycler =
     moduleModel == null
       ? false
-      : getModuleType(moduleModel) === 'thermocyclerModuleType'
+      : getModuleType(moduleModel) === THERMOCYCLER_MODULE_TYPE
   const thermocyclerLocation =
     robotType === FLEX_ROBOT_TYPE
       ? TC_MODULE_LOCATION_OT3
