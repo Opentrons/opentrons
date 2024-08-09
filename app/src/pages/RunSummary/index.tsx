@@ -332,6 +332,7 @@ export function RunSummary(): JSX.Element {
               setShowRunFailedModal={setShowRunFailedModal}
               errors={runRecord?.data.errors}
               commandErrorList={commandErrorList}
+              runStatus={runStatus}
             />
           ) : null}
           <Flex

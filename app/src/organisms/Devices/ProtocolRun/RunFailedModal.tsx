@@ -50,7 +50,7 @@ interface RunFailedModalProps {
   setShowRunFailedModal: (showRunFailedModal: boolean) => void
   highestPriorityError?: RunError | null
   commandErrorList?: RunCommandErrors | null
-  runStatus: RunStatus
+  runStatus: RunStatus | null
 }
 
 export function RunFailedModal({
