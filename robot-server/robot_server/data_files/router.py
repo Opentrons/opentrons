@@ -12,6 +12,7 @@ from robot_server.service.json_api import (
     SimpleMultiBody,
     PydanticResponse,
     MultiBodyMeta,
+    SimpleEmptyBody,
 )
 from robot_server.errors.error_responses import ErrorDetails, ErrorBody
 from .dependencies import (
@@ -21,7 +22,7 @@ from .dependencies import (
 )
 from .data_files_store import DataFilesStore, DataFileInfo
 from .file_auto_deleter import DataFileAutoDeleter
-from .models import DataFile, FileIdNotFoundError, FileIdNotFound
+from .models import DataFile, FileIdNotFoundError, FileIdNotFound, FileInUseError
 from ..protocols.dependencies import get_file_hasher, get_file_reader_writer
 from ..service.dependencies import get_current_time, get_unique_id
 
@@ -54,6 +55,13 @@ class UnexpectedFileFormat(ErrorDetails):
 
     id: Literal["UnexpectedFileFormat"] = "UnexpectedFileFormat"
     title: str = "Unexpected file format"
+
+
+class DataFileInUse(ErrorDetails):
+    """And error returned when attempting to delete a file that is still in use."""
+
+    id: Literal["DataFileInUse"] = "DataFileInUse"
+    title: str = "Data file is in use"
 
 
 @PydanticResponse.wrap_route(
@@ -251,4 +259,37 @@ async def get_all_data_files(
             ],
             meta=meta,
         ),
+    )
+
+
+@PydanticResponse.wrap_route(
+    datafiles_router.delete,
+    path="/dataFiles/{dataFileId}",
+    summary="Delete a data file from persistent storage",
+    responses={
+        status.HTTP_200_OK: {"model": SimpleEmptyBody},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorBody[FileIdNotFound]},
+        status.HTTP_409_CONFLICT: {"model": ErrorBody[DataFileInUse]},
+    },
+)
+async def delete_file_by_id(
+    dataFileId: str,
+    data_files_store: DataFilesStore = Depends(get_data_files_store),
+) -> PydanticResponse[SimpleEmptyBody]:
+    """Delete an uploaded data file by ID.
+
+    Arguments:
+        dataFileId: ID of the data file to delete, pulled from URL.
+        data_files_store: Store for data files database access.
+    """
+    try:
+        data_files_store.remove(file_id=dataFileId)
+    except FileIdNotFoundError as e:
+        raise FileIdNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
+    except FileInUseError as e:
+        raise DataFileInUse(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e
+
+    return await PydanticResponse.create(
+        content=SimpleEmptyBody.construct(),
+        status_code=status.HTTP_200_OK,
     )
