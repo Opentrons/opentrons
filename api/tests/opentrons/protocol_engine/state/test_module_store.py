@@ -96,6 +96,7 @@ def test_initial_state() -> None:
     """It should initialize the module state."""
     subject = ModuleStore(
         config=_OT2_STANDARD_CONFIG,
+        deck_fixed_labware=[],
     )
 
     assert subject.state == ModuleState(
@@ -106,6 +107,7 @@ def test_initial_state() -> None:
         substate_by_module_id={},
         module_offset_by_serial={},
         additional_slots_occupied_by_module_id={},
+        deck_fixed_labware=[],
     )
 
 
@@ -206,6 +208,7 @@ def test_load_module(
 
     subject = ModuleStore(
         config=_OT2_STANDARD_CONFIG,
+        deck_fixed_labware=[],
     )
     subject.handle_action(action)
 
@@ -222,6 +225,7 @@ def test_load_module(
         substate_by_module_id={"module-id": expected_substate},
         module_offset_by_serial={},
         additional_slots_occupied_by_module_id={},
+        deck_fixed_labware=[],
     )
 
 
@@ -272,6 +276,7 @@ def test_load_thermocycler_in_thermocycler_slot(
             robot_type=robot_type,
             deck_type=deck_type,
         ),
+        deck_fixed_labware=[],
     )
     subject.handle_action(action)
 
@@ -352,6 +357,7 @@ def test_add_module_action(
 
     subject = ModuleStore(
         config=_OT2_STANDARD_CONFIG,
+        deck_fixed_labware=[],
     )
     subject.handle_action(action)
 
@@ -368,6 +374,7 @@ def test_add_module_action(
         substate_by_module_id={"module-id": expected_substate},
         module_offset_by_serial={},
         additional_slots_occupied_by_module_id={},
+        deck_fixed_labware=[],
     )
 
 
@@ -395,6 +402,7 @@ def test_handle_hs_temperature_commands(heater_shaker_v1_def: ModuleDefinition) 
     )
     subject = ModuleStore(
         config=_OT2_STANDARD_CONFIG,
+        deck_fixed_labware=[],
     )
 
     subject.handle_action(
@@ -448,6 +456,7 @@ def test_handle_hs_shake_commands(heater_shaker_v1_def: ModuleDefinition) -> Non
     )
     subject = ModuleStore(
         config=_OT2_STANDARD_CONFIG,
+        deck_fixed_labware=[],
     )
 
     subject.handle_action(
@@ -503,6 +512,7 @@ def test_handle_hs_labware_latch_commands(
     )
     subject = ModuleStore(
         config=_OT2_STANDARD_CONFIG,
+        deck_fixed_labware=[],
     )
 
     subject.handle_action(
@@ -569,6 +579,7 @@ def test_handle_tempdeck_temperature_commands(
     )
     subject = ModuleStore(
         config=_OT2_STANDARD_CONFIG,
+        deck_fixed_labware=[],
     )
 
     subject.handle_action(
@@ -630,6 +641,7 @@ def test_handle_thermocycler_temperature_commands(
     )
     subject = ModuleStore(
         config=_OT2_STANDARD_CONFIG,
+        deck_fixed_labware=[],
     )
 
     subject.handle_action(
@@ -713,6 +725,7 @@ def test_handle_thermocycler_lid_commands(
             robot_type="OT-3 Standard",
             deck_type=DeckType.OT3_STANDARD,
         ),
+        deck_fixed_labware=[],
     )
 
     subject.handle_action(

@@ -65,6 +65,7 @@ from .exceptions import (
     LocationIsOccupiedError,
     LocationNotAccessibleByPipetteError,
     LocationIsStagingSlotError,
+    LocationIsLidDockSlotError,
     InvalidAxisForRobotType,
     NotSupportedOnRobotType,
     CommandNotAllowedError,
@@ -139,6 +140,7 @@ __all__ = [
     "LocationIsOccupiedError",
     "LocationNotAccessibleByPipetteError",
     "LocationIsStagingSlotError",
+    "LocationIsLidDockSlotError",
     "InvalidAxisForRobotType",
     "NotSupportedOnRobotType",
     # error occurrence models

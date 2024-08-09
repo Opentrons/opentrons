@@ -1,4 +1,4 @@
-"""Command models to measure absorbance."""
+"""Command models to read absorbance."""
 from __future__ import annotations
 from typing import List, Optional, TYPE_CHECKING
 from typing_extensions import Literal, Type
@@ -13,17 +13,17 @@ if TYPE_CHECKING:
     from opentrons.protocol_engine.execution import EquipmentHandler
 
 
-MeasureAbsorbanceCommandType = Literal["absorbanceReader/measure"]
+ReadAbsorbanceCommandType = Literal["absorbanceReader/read"]
 
 
-class MeasureAbsorbanceParams(BaseModel):
+class ReadAbsorbanceParams(BaseModel):
     """Input parameters for a single absorbance reading."""
 
     moduleId: str = Field(..., description="Unique ID of the Absorbance Reader.")
     sampleWavelength: int = Field(..., description="Sample wavelength in nm.")
 
 
-class MeasureAbsorbanceResult(BaseModel):
+class ReadAbsorbanceResult(BaseModel):
     """Result data from running an aborbance reading."""
 
     # TODO: Transform this into a more complex model, such as a map with well names.
@@ -32,10 +32,8 @@ class MeasureAbsorbanceResult(BaseModel):
     )
 
 
-class MeasureAbsorbanceImpl(
-    AbstractCommandImpl[
-        MeasureAbsorbanceParams, SuccessData[MeasureAbsorbanceResult, None]
-    ]
+class ReadAbsorbanceImpl(
+    AbstractCommandImpl[ReadAbsorbanceParams, SuccessData[ReadAbsorbanceResult, None]]
 ):
     """Execution implementation of an Absorbance Reader measurement."""
 
@@ -49,8 +47,8 @@ class MeasureAbsorbanceImpl(
         self._equipment = equipment
 
     async def execute(
-        self, params: MeasureAbsorbanceParams
-    ) -> SuccessData[MeasureAbsorbanceResult, None]:
+        self, params: ReadAbsorbanceParams
+    ) -> SuccessData[ReadAbsorbanceResult, None]:
         """Initiate a single absorbance measurement."""
         abs_reader_substate = self._state_view.modules.get_absorbance_reader_substate(
             module_id=params.moduleId
@@ -63,32 +61,32 @@ class MeasureAbsorbanceImpl(
         if abs_reader is not None:
             result = await abs_reader.start_measure(wavelength=params.sampleWavelength)
             return SuccessData(
-                public=MeasureAbsorbanceResult(data=result),
+                public=ReadAbsorbanceResult(data=result),
                 private=None,
             )
 
         return SuccessData(
-            public=MeasureAbsorbanceResult(data=None),
+            public=ReadAbsorbanceResult(data=None),
             private=None,
         )
 
 
-class MeasureAbsorbance(
-    BaseCommand[MeasureAbsorbanceParams, MeasureAbsorbanceResult, ErrorOccurrence]
+class ReadAbsorbance(
+    BaseCommand[ReadAbsorbanceParams, ReadAbsorbanceResult, ErrorOccurrence]
 ):
     """A command to execute an Absorbance Reader measurement."""
 
-    commandType: MeasureAbsorbanceCommandType = "absorbanceReader/measure"
-    params: MeasureAbsorbanceParams
-    result: Optional[MeasureAbsorbanceResult]
+    commandType: ReadAbsorbanceCommandType = "absorbanceReader/read"
+    params: ReadAbsorbanceParams
+    result: Optional[ReadAbsorbanceResult]
 
-    _ImplementationCls: Type[MeasureAbsorbanceImpl] = MeasureAbsorbanceImpl
+    _ImplementationCls: Type[ReadAbsorbanceImpl] = ReadAbsorbanceImpl
 
 
-class MeasureAbsorbanceCreate(BaseCommandCreate[MeasureAbsorbanceParams]):
+class ReadAbsorbanceCreate(BaseCommandCreate[ReadAbsorbanceParams]):
     """A request to execute an Absorbance Reader measurement."""
 
-    commandType: MeasureAbsorbanceCommandType = "absorbanceReader/measure"
-    params: MeasureAbsorbanceParams
+    commandType: ReadAbsorbanceCommandType = "absorbanceReader/read"
+    params: ReadAbsorbanceParams
 
-    _CommandCls: Type[MeasureAbsorbance] = MeasureAbsorbance
+    _CommandCls: Type[ReadAbsorbance] = ReadAbsorbance

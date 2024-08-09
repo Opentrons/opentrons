@@ -60,6 +60,10 @@ export type FlexAddressableAreaName =
   | 'absorbanceReaderV1B3'
   | 'absorbanceReaderV1C3'
   | 'absorbanceReaderV1D3'
+  | 'absorbanceReaderV1LidDockA4'
+  | 'absorbanceReaderV1LidDockB4'
+  | 'absorbanceReaderV1LidDockC4'
+  | 'absorbanceReaderV1LidDockD4'
 
 export type OT2AddressableAreaName =
   | '1'
