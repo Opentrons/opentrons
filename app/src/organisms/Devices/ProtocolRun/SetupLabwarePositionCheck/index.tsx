@@ -127,7 +127,11 @@ export function SetupLabwarePositionCheck(
           id="LPC_setOffsetsConfirmed"
           padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
           {...confirmOffsetsTargetProps}
-          disabled={offsetsConfirmed || lpcDisabledReason !== null}
+          disabled={
+            offsetsConfirmed ||
+            lpcDisabledReason !== null ||
+            nonIdentityOffsets.length === 0
+          }
         >
           {t('confirm_offsets')}
         </SecondaryButton>
