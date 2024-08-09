@@ -3,6 +3,7 @@ import { css } from 'styled-components'
 import { Flex } from '../../primitives'
 import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
 import { BORDERS, COLORS } from '../../helix-design-system'
+import { FLEX_MAX_CONTENT } from '../../styles'
 import type { StyleProps } from '../../primitives'
 
 export type ListItemType = 'error' | 'noActive' | 'success' | 'warning'
@@ -43,7 +44,7 @@ export function ListItem(props: ListItemProps): JSX.Element {
   const LIST_ITEM_STYLE = css`
     background-color: ${listItemProps.backgroundColor};
     width: 100%;
-    height: max-content;
+    height: ${FLEX_MAX_CONTENT};
     padding: 0;
     border-radius: ${BORDERS.borderRadius4};
 
