@@ -37,7 +37,6 @@ import {
 import {
   useHost,
   useProtocolQuery,
-  useInstrumentsQuery,
   useDeleteRunMutation,
   useRunCommandErrors,
 } from '@opentrons/react-api-client'
@@ -86,7 +85,6 @@ export function RunSummary(): JSX.Element {
     useNotifyRunQuery(runId, { refetchInterval: CURRENT_RUN_POLL_MS })?.data
       ?.data?.current
   )
-  const { data: attachedInstruments } = useInstrumentsQuery()
   const { deleteRun } = useDeleteRunMutation()
   const runStatus = runRecord?.data.status ?? null
   const didRunSucceed = runStatus === RUN_STATUS_SUCCEEDED
@@ -172,10 +170,8 @@ export function RunSummary(): JSX.Element {
     aPipetteWithTip,
   } = useTipAttachmentStatus({
     runId,
-    runRecord,
-    attachedInstruments,
+    runRecord: runRecord ?? null,
     host,
-    isFlex: true,
   })
 
   // Determine tip status on initial render only. Error Recovery always handles tip status, so don't show it twice.

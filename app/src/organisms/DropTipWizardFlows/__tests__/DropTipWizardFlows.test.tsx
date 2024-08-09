@@ -13,6 +13,7 @@ import {
 import { getPipettesWithTipAttached } from '../getPipettesWithTipAttached'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import { DropTipWizard } from '../DropTipWizard'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
 import type { Mock } from 'vitest'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
@@ -28,6 +29,7 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
 vi.mock('../DropTipWizard')
 vi.mock('../getPipettesWithTipAttached')
 vi.mock('../hooks')
+vi.mock('@opentrons/react-api-client')
 
 const MOCK_ACTUAL_PIPETTE = {
   ...mockPipetteInfo.pipetteSpecs,
@@ -60,6 +62,7 @@ describe('useTipAttachmentStatus', () => {
     vi.mocked(getPipetteModelSpecs).mockReturnValue(MOCK_ACTUAL_PIPETTE)
     vi.mocked(DropTipWizard).mockReturnValue(<div>MOCK DROP TIP WIZ</div>)
     mockGetPipettesWithTipAttached.mockResolvedValue(mockPipettesWithTip)
+    vi.mocked(useInstrumentsQuery).mockReturnValue({ data: {} } as any)
   })
 
   afterEach(() => {

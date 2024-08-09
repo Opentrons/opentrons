@@ -137,20 +137,43 @@ export function SetupLabwareMap({
       const topLabwareId = labwareInAdapter?.result?.labwareId ?? labwareId
       const topLabwareDisplayName =
         labwareInAdapter?.params.displayName ?? displayName
+      const isLabwareInStack =
+        topLabwareDefinition != null &&
+        topLabwareId != null &&
+        labwareInAdapter != null
 
       return {
         labwareLocation: { slotName },
         definition: topLabwareDefinition,
         topLabwareId,
         topLabwareDisplayName,
+        highlight: isLabwareInStack && hoverLabwareId === topLabwareId,
         labwareChildren: (
-          <LabwareInfoOverlay
-            definition={topLabwareDefinition}
-            labwareId={topLabwareId}
-            displayName={topLabwareDisplayName}
-            runId={runId}
-          />
+          <g
+            cursor={isLabwareInStack ? 'pointer' : ''}
+            onClick={() => {
+              if (isLabwareInStack) {
+                setLabwareStackDetailsLabwareId(topLabwareId)
+              }
+            }}
+            onMouseEnter={() => {
+              if (topLabwareDefinition != null && topLabwareId != null) {
+                setHoverLabwareId(() => topLabwareId)
+              }
+            }}
+            onMouseLeave={() => {
+              setHoverLabwareId(null)
+            }}
+          >
+            <LabwareInfoOverlay
+              definition={topLabwareDefinition}
+              labwareId={topLabwareId}
+              displayName={topLabwareDisplayName}
+              runId={runId}
+            />
+          </g>
         ),
+        stacked: isLabwareInStack,
       }
     }
   )
