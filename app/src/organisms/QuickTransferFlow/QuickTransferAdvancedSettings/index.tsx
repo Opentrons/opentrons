@@ -1,27 +1,26 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  Flex,
-  SPACING,
-  DIRECTION_COLUMN,
-  JUSTIFY_SPACE_BETWEEN,
-  TYPOGRAPHY,
   ALIGN_CENTER,
   COLORS,
-  TEXT_ALIGN_RIGHT,
-  StyledText,
+  DIRECTION_COLUMN,
+  Flex,
   Icon,
+  JUSTIFY_SPACE_BETWEEN,
+  ListItem,
   SIZE_2,
+  SPACING,
+  StyledText,
   TEXT_ALIGN_LEFT,
+  TEXT_ALIGN_RIGHT,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-
-import type {
-  QuickTransferSummaryAction,
-  QuickTransferSummaryState,
-} from '../types'
+import {
+  TRASH_BIN_ADAPTER_FIXTURE,
+  WASTE_CHUTE_FIXTURES,
+} from '@opentrons/shared-data'
 import { ACTIONS } from '../constants'
 import { useToaster } from '../../../organisms/ToasterOven'
-import { ListItem } from '../../../atoms/ListItem'
 import { FlowRateEntry } from './FlowRate'
 import { PipettePath } from './PipettePath'
 import { TipPositionEntry } from './TipPosition'
@@ -30,11 +29,11 @@ import { Delay } from './Delay'
 import { TouchTip } from './TouchTip'
 import { AirGap } from './AirGap'
 import { BlowOut } from './BlowOut'
-import {
-  TRASH_BIN_ADAPTER_FIXTURE,
-  WASTE_CHUTE_FIXTURES,
-} from '@opentrons/shared-data'
 
+import type {
+  QuickTransferSummaryAction,
+  QuickTransferSummaryState,
+} from '../types'
 interface QuickTransferAdvancedSettingsProps {
   state: QuickTransferSummaryState
   dispatch: React.Dispatch<QuickTransferSummaryAction>
