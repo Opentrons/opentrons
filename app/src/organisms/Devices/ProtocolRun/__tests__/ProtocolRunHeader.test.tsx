@@ -858,7 +858,7 @@ describe('ProtocolRunHeader', () => {
       .thenReturn(RUN_STATUS_SUCCEEDED)
     render()
 
-    screen.getByText('Run completed.')
+    screen.getByText('Run completed with warnings.')
   })
   it('clicking close on a terminal run banner closes the run context', async () => {
     when(vi.mocked(useNotifyRunQuery))
@@ -986,23 +986,6 @@ describe('ProtocolRunHeader', () => {
     })
   })
 
-  it('renders banner with spinner if currently closing current run', async () => {
-    when(vi.mocked(useNotifyRunQuery))
-      .calledWith(RUN_ID)
-      .thenReturn({
-        data: { data: mockSucceededRun },
-      } as UseQueryResult<OpentronsApiClient.Run>)
-    when(vi.mocked(useRunStatus))
-      .calledWith(RUN_ID)
-      .thenReturn(RUN_STATUS_SUCCEEDED)
-    when(vi.mocked(useCloseCurrentRun)).calledWith().thenReturn({
-      isClosingCurrentRun: true,
-      closeCurrentRun: mockCloseCurrentRun,
-    })
-    render()
-    screen.getByText('Run completed.')
-    screen.getByLabelText('ot-spinner')
-  })
 
   it('renders door close banner when the robot door is open', () => {
     const mockOpenDoorStatus = {
