@@ -986,7 +986,6 @@ describe('ProtocolRunHeader', () => {
     })
   })
 
-
   it('renders door close banner when the robot door is open', () => {
     const mockOpenDoorStatus = {
       data: { status: 'open', doorRequiredClosedForProtocol: true },
