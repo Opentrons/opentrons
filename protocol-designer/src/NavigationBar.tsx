@@ -35,6 +35,8 @@ export function NavigationBar({
       navigate('/overview')
     }
   }
+  const filteredNavPaths =
+    location.pathname === '/createNew' || location.pathname === '/'
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
@@ -71,7 +73,7 @@ export function NavigationBar({
       </Flex>
       {/* TODO(ja, 8/12/24: delete later. Leaving access to other
       routes at all times until we make breadcrumbs and protocol overview pg */}
-      {location.pathname === '/createNew' ? null : (
+      {filteredNavPaths ? null : (
         <Flex
           backgroundColor={COLORS.blue20}
           padding={`${SPACING.spacing12} ${SPACING.spacing40}`}
