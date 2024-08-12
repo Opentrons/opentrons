@@ -245,18 +245,14 @@ class InnerGeometrySection(BaseModel):
 
 
 class BoundedSection(BaseModel):
-    shape: InnerGeometrySection = Field(
+    geometry: InnerGeometrySection = Field(
         ...,
-        description="Geometrical layout of the geometry of a section of the inside of a well",
+        description="Geometrical information needed to calculate the volume of a subsection of a well",
     )
     top_height: _NonNegativeNumber = Field(
         ...,
         description="The height at the top of a bounded subsection of a well"
     )
-
-
-class InnerLabwareGeometry(BaseModel):
-    boundedSections: List[BoundedSection]
 
 
 class Metadata1(BaseModel):
@@ -361,9 +357,9 @@ class LabwareDefinition(BaseModel):
         default_factory=None,
         description="Force, in Newtons, with which the gripper should grip the labware.",
     )
-    innerWellGeometry: Optional[InnerLabwareGeometry] = Field(
-        ...,
-        description="A layout describing the geometry of the inside of the wells.",
+    innerWellGeometry: Optional[List[BoundedSection]] = Field(
+        None,
+        description="A list of bounded sections describing the geometry of the inside of the wells.",
     )
 
 

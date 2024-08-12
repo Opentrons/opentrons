@@ -157,13 +157,10 @@ class HemisphereDimensions(TypedDict):
     diameter: float
 
 
+# This will either be a 2-Dimensional cross-section or a hemisphere
 InnerGeometrySection = Union[CircularArea, RectangularArea, HemisphereDimensions]
 
 
 class BoundedSection(TypedDict):
-    shape: InnerGeometrySection
+    geometry: InnerGeometrySection
     top_height: float
-
-
-class InnerLabwareGeometry(TypedDict):
-    bounded_sections: List[BoundedSection]
