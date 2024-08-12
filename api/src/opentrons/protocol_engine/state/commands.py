@@ -583,6 +583,7 @@ class CommandView(HasState[CommandState]):
         self,
         cursor: Optional[int],
         length: int,
+        all_commands: bool
     ) -> CommandSlice:
         """Get a subset of commands around a given cursor.
 
@@ -591,6 +592,7 @@ class CommandView(HasState[CommandState]):
         """
         running_command = self._state.command_history.get_running_command()
         queued_command_ids = self._state.command_history.get_queue_ids()
+        filtered_command_ids = self._state.command_history.get_filtered_queue_ids(all_commands=all_commands)
         total_length = self._state.command_history.length()
 
         # TODO(mm, 2024-05-17): This looks like it's attempting to do the same thing

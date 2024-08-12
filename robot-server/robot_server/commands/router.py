@@ -154,7 +154,9 @@ async def get_commands_list(
         cursor: Cursor index for the collection response.
         pageLength: Maximum number of items to return.
     """
-    cmd_slice = orchestrator.get_command_slice(cursor=cursor, length=pageLength)
+    cmd_slice = orchestrator.get_command_slice(
+        cursor=cursor, length=pageLength, all_commands=True
+    )
     commands = cast(List[StatelessCommand], cmd_slice.commands)
     meta = MultiBodyMeta(cursor=cmd_slice.cursor, totalLength=cmd_slice.total_length)
 

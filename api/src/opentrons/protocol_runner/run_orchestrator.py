@@ -260,15 +260,17 @@ class RunOrchestrator:
         self,
         cursor: Optional[int],
         length: int,
+        all_commands: bool
     ) -> CommandSlice:
         """Get a slice of run commands.
 
         Args:
             cursor: Requested index of first command in the returned slice.
             length: Length of slice to return.
+            all_commands: Get all command intents.
         """
         return self._protocol_engine.state_view.commands.get_slice(
-            cursor=cursor, length=length
+            cursor=cursor, length=length, all_commands=all_commands
         )
 
     def get_command_error_slice(

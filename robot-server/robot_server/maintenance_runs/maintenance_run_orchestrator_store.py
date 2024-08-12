@@ -226,7 +226,11 @@ class MaintenanceRunOrchestratorStore:
             cursor: Requested index of first command in the returned slice.
             length: Length of slice to return.
         """
-        return self.run_orchestrator.get_command_slice(cursor=cursor, length=length)
+        return self.run_orchestrator.get_command_slice(
+            cursor=cursor,
+            length=length,
+            all_commands=False,  # TODO(tz, 8-12-24) change to arg in router.
+        )
 
     def get_current_command(self) -> Optional[CommandPointer]:
         """Get the "current" command, if any."""
