@@ -1,10 +1,10 @@
-import { VIEWPORT } from '@opentrons/components'
+import { VIEWPORT } from '../../ui-style-constants'
 import { MenuItem as MenuItemComponent } from './MenuItem'
 
 import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<typeof MenuItemComponent> = {
-  title: 'App/Atoms/MenuItem',
+  title: 'Library/Atoms/MenuItem',
   component: MenuItemComponent,
   parameters: VIEWPORT.touchScreenViewport,
 }

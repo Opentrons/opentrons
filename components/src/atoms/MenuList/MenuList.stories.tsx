@@ -8,7 +8,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 const menuBtn = 'example menu btn'
 
 const meta: Meta<typeof MenuListComponent> = {
-  title: 'App/Atoms/MenuList',
+  title: 'Library/Atoms/MenuList',
   component: MenuListComponent,
   args: {
     onClick: action('clicked'),

@@ -1,14 +1,14 @@
 import * as React from 'react'
+
+import { BORDERS, COLORS } from '../../helix-design-system'
 import {
-  COLORS,
-  POSITION_ABSOLUTE,
   DIRECTION_COLUMN,
-  Flex,
-  SPACING,
-  BORDERS,
   JUSTIFY_CENTER,
-  ModalShell,
-} from '@opentrons/components'
+  POSITION_ABSOLUTE,
+} from '../../styles'
+import { Flex } from '../../primitives'
+import { SPACING } from '../../ui-style-constants'
+import { ModalShell } from '../../modals'
 
 interface MenuListProps {
   children: React.ReactNode

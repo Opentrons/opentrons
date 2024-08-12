@@ -15,18 +15,18 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   Link,
+  MenuItem,
   POSITION_ABSOLUTE,
   PrimaryButton,
   SecondaryButton,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
   useOnClickOutside,
 } from '@opentrons/components'
 import { LabwareCreator } from '@opentrons/labware-library'
 import { ERROR_TOAST, SUCCESS_TOAST } from '../../atoms/Toast'
-import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import {
   useTrackEvent,
   ANALYTICS_OPEN_LABWARE_CREATOR_FROM_BOTTOM_OF_LABWARE_LIBRARY_LIST,

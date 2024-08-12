@@ -3,7 +3,7 @@ import { OverflowBtn as OverflowBtnComponent } from './OverflowBtn'
 import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<typeof OverflowBtnComponent> = {
-  title: 'App/Atoms/OverflowBtn',
+  title: 'Library/Atoms/OverflowBtn',
   component: OverflowBtnComponent,
 }
 export default meta
