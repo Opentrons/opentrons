@@ -10,14 +10,13 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
+  OVERFLOW_AUTO,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
-  OVERFLOW_AUTO,
 } from '../../styles'
 import { Icon } from '../../icons'
 import { useOnClickOutside } from '../../interaction-enhancers'
 import { useHoverTooltip } from '../../tooltips'
-
 import { Tooltip } from '../../atoms/Tooltip'
 import { MenuItem } from './MenuItem'
 
