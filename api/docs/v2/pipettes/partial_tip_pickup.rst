@@ -32,19 +32,21 @@ Before getting started with partial tip pickup, make sure your protocol specifie
 Nozzle Layouts
 ==============
 
-Use the :py:meth:`.configure_nozzle_layout` method to choose how many tips a pipette will pick up. The method's ``style`` parameter accepts special layout constants. You must import these constants at the top of your protocol, or you won't be able to configure the pipette for partial tip pickup.
+Use the :py:meth:`.configure_nozzle_layout` method to choose how many tips a pipette will pick up. The method's required ``style`` parameter only accepts special layout constants. You must import these constants at the top of your protocol, or you won't be able to configure the pipette for partial tip pickup.
 
 At minimum, import the API from the ``opentrons`` package::
 
     from opentrons import protocol_api
 
-Then when you call ``configure_nozzle_layout`` later in your protocol, you can set a layout like ``style=protocol_api.COLUMN``.
+This import statement lets you configure a layout with a parameter like ``style=protocol_api.COLUMN``.
 
 For greater convenience, also import the individual layout constants that you plan to use in your protocol::
 
     from opentrons.protocol_api import COLUMN, ALL
 
-Then when you call ``configure_nozzle_layout`` later in your protocol, you can use the shorter ``style=COLUMN``.
+This more specific import statement lets you configure a layout with a parameter like ``style=COLUMN``. However, you wouldn't be able to set ``style=ROW`` without also importing that constant.
+
+The examples in the sections below use the shorter style and show the other required parameters of ``configure_nozzle_layout()``.
 
 Column Layout
 -------------
@@ -141,7 +143,10 @@ You can also set ``start="A1"`` to use the backmost nozzles and pick up from the
 Single Layout
 -------------
 
-Single-tip pickup is available on both 8-channel and 96-channel pipettes. For 8-channel pipettes, there are two possible configurations, using either the front or back nozzle. For 96-channel pipettes, there are four possible configurations, using any of the corner nozzles.
+Single-tip pickup is available on both 8-channel and 96-channel pipettes. 8-channel pipettes can pick up a single tip with either the front or back nozzle. 96-channel pipettes can pick up a single tip with any of the corner nozzles.
+
+.. note::
+    Remember that only the A1 and H12 nozzles of the 96-channel pipette contain pressure sensors. Avoid using the A12 and H1 nozzles for single-tip pickup if you need to detect liquid presence within wells.
 
 The ``start`` parameter sets the first and only nozzle used in the configuration. It also affects the order in which the pipette picks up tips. When using automatic tip tracking, single-tip configurations always consume all tips within a single column before proceeding to another column.
 
@@ -217,7 +222,7 @@ Since this configuration uses ``start="H12"``, it will pick up tips in the usual
 
 .. note::
 
-    You can pick up tips row-wise first, rather than column-wise first, by specifying a location for :py:meth:`.pick_up_tip` each time you use it in ``SINGLE`` configuration. However, as with all partial tip layouts, be careful that you don't place the pipette in a position where it overlaps more tips than intended.
+    You can pick up tips row by row, rather than column by column, by specifying a location for :py:meth:`.pick_up_tip` each time you use it in ``SINGLE`` configuration. However, as with all partial tip layouts, be careful that you don't place the pipette in a position where it overlaps more tips than intended.
 
 
 Partial Column Layout
