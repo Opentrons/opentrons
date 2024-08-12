@@ -132,7 +132,11 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
 
   const DROPDOWN_STYLE = css`
     flex-direction: ${DIRECTION_ROW};
+    align-items: ${ALIGN_CENTER};
     background-color: ${COLORS.white};
+    justify-content: ${JUSTIFY_SPACE_BETWEEN};
+    width: ${width};
+    height: 2.25rem;
     cursor: pointer;
     padding: ${SPACING.spacing8} ${SPACING.spacing12};
     border: 1px ${BORDERS.styleSolid}
@@ -140,10 +144,6 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
     border-radius: ${dropdownType === 'rounded'
       ? BORDERS.borderRadiusFull
       : BORDERS.borderRadius4};
-    align-items: ${ALIGN_CENTER};
-    justify-content: ${JUSTIFY_SPACE_BETWEEN};
-    width: ${width};
-    height: 2.25rem;
 
     &:hover {
       border: 1px ${BORDERS.styleSolid}
