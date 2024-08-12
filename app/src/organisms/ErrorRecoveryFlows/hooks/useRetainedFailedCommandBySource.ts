@@ -41,7 +41,11 @@ export function useRetainedFailedCommandBySource(
         })
       }
     }
-  }, [failedCommandByRunRecord?.key, protocolAnalysis?.id])
+  }, [
+    failedCommandByRunRecord?.key,
+    failedCommandByRunRecord?.error?.errorType,
+    protocolAnalysis?.id,
+  ])
 
   return retainedFailedCommand
 }
