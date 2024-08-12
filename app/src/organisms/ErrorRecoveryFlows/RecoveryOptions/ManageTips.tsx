@@ -301,9 +301,17 @@ export function useDropTipFlowUtils({
     }
   }
 
+  const pipetteId =
+    failedCommand != null &&
+    'params' in failedCommand.byRunRecord &&
+    'pipetteId' in failedCommand.byRunRecord.params
+      ? failedCommand.byRunRecord.params.pipetteId
+      : null
+
   return {
     runId,
     failedCommandId,
+    pipetteId,
     copyOverrides: buildCopyOverrides(),
     errorOverrides: buildErrorOverrides(),
     buttonOverrides: buildButtonOverrides(),
