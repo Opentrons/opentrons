@@ -40,7 +40,7 @@ export function EmptySelectorButton(
         width="100%"
         height="100%"
         alignItems={ALIGN_CENTER}
-        data-testid='EmptySelectorButton_container'
+        data-testid="EmptySelectorButton_container"
         justifyContent={
           textAlignment === 'middle' ? JUSTIFY_CENTER : JUSTIFY_START
         }
