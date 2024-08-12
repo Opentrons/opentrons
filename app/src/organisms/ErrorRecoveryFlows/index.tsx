@@ -25,6 +25,7 @@ import {
   useERUtils,
   useRecoveryAnalytics,
   useRecoveryTakeover,
+  useRetainedFailedCommandBySource,
   useShowDoorInfo,
 } from './hooks'
 
@@ -109,19 +110,24 @@ export function useErrorRecoveryFlows(
 export interface ErrorRecoveryFlowsProps {
   runId: string
   runStatus: RunStatus | null
-  failedCommand: FailedCommand | null
+  failedCommandByRunRecord: FailedCommand | null
   protocolAnalysis: CompletedProtocolAnalysis | null
 }
 
 export function ErrorRecoveryFlows(
   props: ErrorRecoveryFlowsProps
 ): JSX.Element | null {
-  const { protocolAnalysis, runStatus, failedCommand } = props
+  const { protocolAnalysis, runStatus, failedCommandByRunRecord } = props
+
+  const failedCommandBySource = useRetainedFailedCommandBySource(
+    failedCommandByRunRecord,
+    protocolAnalysis
+  )
 
   const analytics = useRecoveryAnalytics()
   React.useEffect(() => {
-    analytics.reportErrorEvent(failedCommand)
-  }, [failedCommand?.error?.detail])
+    analytics.reportErrorEvent(failedCommandByRunRecord)
+  }, [failedCommandByRunRecord?.error?.detail])
 
   const { hasLaunchedRecovery, toggleERWizard, showERWizard } = useERWizard()
   const isOnDevice = useSelector(getIsOnDevice)
@@ -145,6 +151,7 @@ export function ErrorRecoveryFlows(
     isOnDevice,
     robotType,
     analytics,
+    failedCommand: failedCommandBySource,
   })
 
   return (
@@ -165,6 +172,7 @@ export function ErrorRecoveryFlows(
           isOnDevice={isOnDevice}
           isDoorOpen={isDoorOpen}
           analytics={analytics}
+          failedCommand={failedCommandBySource}
         />
       ) : null}
       {showSplash ? (
@@ -176,6 +184,7 @@ export function ErrorRecoveryFlows(
           isOnDevice={isOnDevice}
           toggleERWizAsActiveUser={toggleERWizAsActiveUser}
           analytics={analytics}
+          failedCommand={failedCommandBySource}
         />
       ) : null}
     </>

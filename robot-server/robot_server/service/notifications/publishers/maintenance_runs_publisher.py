@@ -16,13 +16,19 @@ class MaintenanceRunsPublisher:
         """Returns a configured Maintenance Runs Publisher."""
         self._client = client
 
-    async def publish_current_maintenance_run(
+    async def publish_current_maintenance_run_async(
         self,
     ) -> None:
         """Publishes the equivalent of GET /maintenance_run/current_run"""
         await self._client.publish_advise_refetch_async(
             topic=topics.MAINTENANCE_RUNS_CURRENT_RUN
         )
+
+    def publish_current_maintenance_run(
+        self,
+    ) -> None:
+        """Publishes the equivalent of GET /maintenance_run/current_run"""
+        self._client.publish_advise_refetch(topic=topics.MAINTENANCE_RUNS_CURRENT_RUN)
 
 
 _maintenance_runs_publisher_accessor: AppStateAccessor[

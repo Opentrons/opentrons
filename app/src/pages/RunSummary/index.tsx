@@ -32,13 +32,15 @@ import {
   RUN_STATUS_FAILED,
   RUN_STATUS_STOPPED,
   RUN_STATUS_SUCCEEDED,
+  RUN_STATUSES_TERMINAL,
 } from '@opentrons/api-client'
 import {
   useHost,
   useProtocolQuery,
-  useInstrumentsQuery,
   useDeleteRunMutation,
+  useRunCommandErrors,
 } from '@opentrons/react-api-client'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { LargeButton } from '../../atoms/buttons'
 import {
@@ -63,12 +65,13 @@ import { getLocalRobot } from '../../redux/discovery'
 import { RunFailedModal } from '../../organisms/OnDeviceDisplay/RunningProtocol'
 import { formatTimeWithUtcLabel, useNotifyRunQuery } from '../../resources/runs'
 import { handleTipsAttachedModal } from '../../organisms/DropTipWizardFlows/TipsAttachedModal'
-import { useMostRecentRunId } from '../../organisms/ProtocolUpload/hooks/useMostRecentRunId'
 import { useTipAttachmentStatus } from '../../organisms/DropTipWizardFlows'
 import { useRecoveryAnalytics } from '../../organisms/ErrorRecoveryFlows/hooks'
 
 import type { OnDeviceRouteParams } from '../../App/types'
 import type { PipetteWithTip } from '../../organisms/DropTipWizardFlows'
+
+const CURRENT_RUN_POLL_MS = 5000
 
 export function RunSummary(): JSX.Element {
   const { runId } = useParams<
@@ -78,9 +81,10 @@ export function RunSummary(): JSX.Element {
   const navigate = useNavigate()
   const host = useHost()
   const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
-  const isRunCurrent = Boolean(runRecord?.data?.current)
-  const mostRecentRunId = useMostRecentRunId()
-  const { data: attachedInstruments } = useInstrumentsQuery()
+  const isRunCurrent = Boolean(
+    useNotifyRunQuery(runId, { refetchInterval: CURRENT_RUN_POLL_MS })?.data
+      ?.data?.current
+  )
   const { deleteRun } = useDeleteRunMutation()
   const runStatus = runRecord?.data.status ?? null
   const didRunSucceed = runStatus === RUN_STATUS_SUCCEEDED
@@ -145,6 +149,14 @@ export function RunSummary(): JSX.Element {
     localRobot?.serverHealth?.serialNumber ??
     null
 
+  const { data: commandErrorList } = useRunCommandErrors(runId, null, {
+    enabled:
+      runStatus != null &&
+      // @ts-expect-error runStatus expected to possibly not be terminal
+      RUN_STATUSES_TERMINAL.includes(runStatus) &&
+      isRunCurrent,
+  })
+
   let headerText = t('run_complete_splash')
   if (runStatus === RUN_STATUS_FAILED) {
     headerText = t('run_failed_splash')
@@ -158,10 +170,8 @@ export function RunSummary(): JSX.Element {
     aPipetteWithTip,
   } = useTipAttachmentStatus({
     runId,
-    runRecord,
-    attachedInstruments,
+    runRecord: runRecord ?? null,
     host,
-    isFlex: true,
   })
 
   // Determine tip status on initial render only. Error Recovery always handles tip status, so don't show it twice.
@@ -175,7 +185,8 @@ export function RunSummary(): JSX.Element {
   const queryClient = useQueryClient()
   const returnToDash = (): void => {
     closeCurrentRun()
-    // Eagerly clear the query cache to prevent top level redirecting back to this page.
+    // Eagerly clear the query caches to prevent top level redirecting back to this page.
+    queryClient.setQueryData([host, 'runs', 'details'], () => undefined)
     queryClient.setQueryData([host, 'runs', runId, 'details'], () => undefined)
     navigate('/')
   }
@@ -215,25 +226,39 @@ export function RunSummary(): JSX.Element {
   }
 
   const handleReturnToDash = (aPipetteWithTip: PipetteWithTip | null): void => {
-    if (mostRecentRunId === runId && aPipetteWithTip != null) {
+    if (isRunCurrent && aPipetteWithTip != null) {
       void handleTipsAttachedModal({
         setTipStatusResolved: setTipStatusResolvedAndRoute(handleReturnToDash),
         host,
         aPipetteWithTip,
+        instrumentModelSpecs: aPipetteWithTip.specs,
+        mount: aPipetteWithTip.mount,
+        robotType: FLEX_ROBOT_TYPE,
+        onClose: () => {
+          closeCurrentRun()
+          returnToDash()
+        },
       })
     } else if (isQuickTransfer) {
       returnToQuickTransfer()
     } else {
+      closeCurrentRun()
       returnToDash()
     }
   }
 
   const handleRunAgain = (aPipetteWithTip: PipetteWithTip | null): void => {
-    if (mostRecentRunId === runId && aPipetteWithTip != null) {
+    if (isRunCurrent && aPipetteWithTip != null) {
       void handleTipsAttachedModal({
         setTipStatusResolved: setTipStatusResolvedAndRoute(handleRunAgain),
         host,
         aPipetteWithTip,
+        instrumentModelSpecs: aPipetteWithTip.specs,
+        mount: aPipetteWithTip.mount,
+        robotType: FLEX_ROBOT_TYPE,
+        onClose: () => {
+          runAgain()
+        },
       })
     } else {
       if (!isResetRunLoading) {
@@ -321,6 +346,7 @@ export function RunSummary(): JSX.Element {
               runId={runId}
               setShowRunFailedModal={setShowRunFailedModal}
               errors={runRecord?.data.errors}
+              commandErrorList={commandErrorList}
             />
           ) : null}
           <Flex

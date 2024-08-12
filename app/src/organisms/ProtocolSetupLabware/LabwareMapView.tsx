@@ -72,6 +72,7 @@ export function LabwareMapView(props: LabwareMapViewProps): JSX.Element {
           : undefined,
       highlightLabware: true,
       moduleChildren: null,
+      stacked: topLabwareDefinition != null && topLabwareId != null,
     }
   })
 
@@ -84,6 +85,10 @@ export function LabwareMapView(props: LabwareMapViewProps): JSX.Element {
       const topLabwareDefinition =
         labwareInAdapter?.result?.definition ?? labwareDef
       const topLabwareId = labwareInAdapter?.result?.labwareId ?? labwareId
+      const isLabwareInStack =
+        topLabwareDefinition != null &&
+        topLabwareId != null &&
+        labwareInAdapter != null
 
       return {
         labwareLocation: { slotName },
@@ -94,6 +99,7 @@ export function LabwareMapView(props: LabwareMapViewProps): JSX.Element {
         },
         labwareChildren: null,
         highlight: true,
+        stacked: isLabwareInStack,
       }
     }
   )

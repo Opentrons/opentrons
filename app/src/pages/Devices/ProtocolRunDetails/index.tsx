@@ -10,6 +10,8 @@ import {
   Box,
   COLORS,
   DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  JUSTIFY_SPACE_AROUND,
   Flex,
   LegacyStyledText,
   OVERFLOW_SCROLL,
@@ -29,7 +31,11 @@ import {
 } from '../../../organisms/Devices/hooks'
 import { ProtocolRunHeader } from '../../../organisms/Devices/ProtocolRun/ProtocolRunHeader'
 import { RunPreview } from '../../../organisms/RunPreview'
-import { ProtocolRunSetup } from '../../../organisms/Devices/ProtocolRun/ProtocolRunSetup'
+import {
+  ProtocolRunSetup,
+  initialMissingSteps,
+} from '../../../organisms/Devices/ProtocolRun/ProtocolRunSetup'
+import { BackToTopButton } from '../../../organisms/Devices/ProtocolRun/BackToTopButton'
 import { ProtocolRunModuleControls } from '../../../organisms/Devices/ProtocolRun/ProtocolRunModuleControls'
 import { ProtocolRunRuntimeParameters } from '../../../organisms/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
 import { useCurrentRunId } from '../../../resources/runs'
@@ -134,7 +140,6 @@ export function ProtocolRunDetails(): JSX.Element | null {
   React.useEffect(() => {
     dispatch(fetchProtocols())
   }, [dispatch])
-
   return robot != null ? (
     <ApiHostProvider
       key={robot.name}
@@ -185,6 +190,10 @@ function PageContents(props: PageContentsProps): JSX.Element {
     }
   }, [jumpedIndex])
 
+  const [missingSteps, setMissingSteps] = React.useState<
+    ReturnType<typeof initialMissingSteps>
+  >(initialMissingSteps())
+
   const makeHandleScrollToStep = (i: number) => () => {
     listRef.current?.scrollToIndex(i, true, -1 * JUMP_OFFSET_FROM_TOP_PX)
   }
@@ -193,37 +202,68 @@ function PageContents(props: PageContentsProps): JSX.Element {
     setJumpedIndex(i)
   }
   const protocolRunDetailsContentByTab: {
-    [K in ProtocolRunDetailsTab]: JSX.Element | null
+    [K in ProtocolRunDetailsTab]: {
+      content: JSX.Element | null
+      backToTop: JSX.Element | null
+    }
   } = {
-    setup: (
-      <ProtocolRunSetup
-        protocolRunHeaderRef={protocolRunHeaderRef}
-        robotName={robotName}
-        runId={runId}
-      />
-    ),
-    'runtime-parameters': <ProtocolRunRuntimeParameters runId={runId} />,
-    'module-controls': (
-      <ProtocolRunModuleControls robotName={robotName} runId={runId} />
-    ),
-    'run-preview': (
-      <RunPreview
-        runId={runId}
-        robotType={robotType}
-        ref={listRef}
-        jumpedIndex={jumpedIndex}
-        makeHandleScrollToStep={makeHandleScrollToStep}
-      />
-    ),
+    setup: {
+      content: (
+        <ProtocolRunSetup
+          protocolRunHeaderRef={protocolRunHeaderRef}
+          robotName={robotName}
+          runId={runId}
+          setMissingSteps={setMissingSteps}
+          missingSteps={missingSteps}
+        />
+      ),
+      backToTop: (
+        <Flex
+          width="100%"
+          flexDirection={DIRECTION_ROW}
+          justifyContent={JUSTIFY_SPACE_AROUND}
+          marginTop={SPACING.spacing16}
+        >
+          <BackToTopButton
+            protocolRunHeaderRef={protocolRunHeaderRef}
+            robotName={robotName}
+            runId={runId}
+            sourceLocation=""
+          />
+        </Flex>
+      ),
+    },
+    'runtime-parameters': {
+      content: <ProtocolRunRuntimeParameters runId={runId} />,
+      backToTop: null,
+    },
+    'module-controls': {
+      content: (
+        <ProtocolRunModuleControls robotName={robotName} runId={runId} />
+      ),
+      backToTop: null,
+    },
+    'run-preview': {
+      content: (
+        <RunPreview
+          runId={runId}
+          robotType={robotType}
+          ref={listRef}
+          jumpedIndex={jumpedIndex}
+          makeHandleScrollToStep={makeHandleScrollToStep}
+        />
+      ),
+      backToTop: null,
+    },
   }
-
-  const protocolRunDetailsContent = protocolRunDetailsContentByTab[
-    protocolRunDetailsTab
-  ] ?? (
+  const tabDetails = protocolRunDetailsContentByTab[protocolRunDetailsTab] ?? {
     // default to the setup tab if no tab or nonexistent tab is passed as a param
-
-    <Navigate to={`/devices/${robotName}/protocol-runs/${runId}/setup`} />
-  )
+    content: (
+      <Navigate to={`/devices/${robotName}/protocol-runs/${runId}/setup`} />
+    ),
+    backToTop: null,
+  }
+  const { content, backToTop } = tabDetails
 
   return (
     <>
@@ -232,6 +272,7 @@ function PageContents(props: PageContentsProps): JSX.Element {
         robotName={robotName}
         runId={runId}
         makeHandleJumpToStep={makeHandleJumpToStep}
+        missingSetupSteps={missingSteps}
       />
       <Flex gridGap={SPACING.spacing8} marginBottom={SPACING.spacing12}>
         <SetupTab
@@ -256,8 +297,9 @@ function PageContents(props: PageContentsProps): JSX.Element {
         // remove left upper corner border radius when first tab is active
         borderRadius={BORDERS.borderRadius8}
       >
-        {protocolRunDetailsContent}
+        {content}
       </Box>
+      {backToTop}
     </>
   )
 }

@@ -50,7 +50,9 @@ describe('RecoveryError', () => {
 
     expect(screen.getByText('Retry step failed')).toBeInTheDocument()
     expect(
-      screen.getByText('Return to the menu to choose how to proceed.')
+      screen.getByText(
+        'Next, you can try another recovery action or cancel the run.'
+      )
     ).toBeInTheDocument()
     expect(screen.getByText('Back to menu')).toBeInTheDocument()
   })
@@ -62,7 +64,9 @@ describe('RecoveryError', () => {
 
     expect(screen.getByText('Retry step failed')).toBeInTheDocument()
     expect(
-      screen.getByText('Return to the menu to choose how to proceed.')
+      screen.getByText(
+        'Next, you can try another recovery action or cancel the run.'
+      )
     ).toBeInTheDocument()
     expect(screen.getByText('Return to menu')).toBeInTheDocument()
   })
@@ -88,7 +92,9 @@ describe('RecoveryError', () => {
 
     expect(screen.getByText('Tip drop failed')).toBeInTheDocument()
     expect(
-      screen.getByText('Return to the menu to choose how to proceed.')
+      screen.getByText(
+        'Next, you can try another recovery action or cancel the run.'
+      )
     ).toBeInTheDocument()
     expect(screen.getByText('Return to menu')).toBeInTheDocument()
   })

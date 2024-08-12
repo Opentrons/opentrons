@@ -30,7 +30,12 @@ from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
 from robot_server.maintenance_runs.dependencies import (
     get_maintenance_run_orchestrator_store,
 )
-from robot_server.service.notifications import get_runs_publisher, RunsPublisher
+from robot_server.service.notifications import (
+    get_runs_publisher,
+    get_maintenance_runs_publisher,
+    RunsPublisher,
+    MaintenanceRunsPublisher,
+)
 
 log = logging.getLogger(__name__)
 actions_router = APIRouter()
@@ -49,6 +54,9 @@ async def get_run_controller(
     run_orchestrator_store: RunOrchestratorStore = Depends(get_run_orchestrator_store),
     run_store: RunStore = Depends(get_run_store),
     runs_publisher: RunsPublisher = Depends(get_runs_publisher),
+    maintenance_runs_publisher: MaintenanceRunsPublisher = Depends(
+        get_maintenance_runs_publisher
+    ),
 ) -> RunController:
     """Get a RunController for the current run.
 
@@ -72,6 +80,7 @@ async def get_run_controller(
         run_orchestrator_store=run_orchestrator_store,
         run_store=run_store,
         runs_publisher=runs_publisher,
+        maintenance_runs_publisher=maintenance_runs_publisher,
     )
 
 

@@ -6,7 +6,6 @@ import styled, { css } from 'styled-components'
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
-  ALIGN_STRETCH,
   BORDERS,
   Box,
   COLORS,
@@ -22,6 +21,7 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
+  Chip,
 } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
@@ -37,7 +37,7 @@ import {
   useModulesQuery,
 } from '@opentrons/react-api-client'
 
-import { FloatingActionButton } from '../../atoms/buttons'
+import { FloatingActionButton, SmallButton } from '../../atoms/buttons'
 import { ODDBackButton } from '../../molecules/ODDBackButton'
 import { getTopPortalEl } from '../../App/portal'
 import { Modal } from '../../molecules/Modal'
@@ -49,6 +49,7 @@ import { getProtocolModulesInfo } from '../Devices/ProtocolRun/utils/getProtocol
 import { getAttachedProtocolModuleMatches } from '../ProtocolSetupModulesAndDeck/utils'
 import { getNestedLabwareInfo } from '../Devices/ProtocolRun/SetupLabware/getNestedLabwareInfo'
 import { LabwareMapView } from './LabwareMapView'
+import { LabwareStackModal } from '../Devices/ProtocolRun/SetupLabware/LabwareStackModal'
 
 import type { UseQueryResult } from 'react-query'
 import type {
@@ -77,11 +78,15 @@ const LabwareThumbnail = styled.svg`
 export interface ProtocolSetupLabwareProps {
   runId: string
   setSetupScreen: React.Dispatch<React.SetStateAction<SetupScreens>>
+  isConfirmed: boolean
+  setIsConfirmed: (confirmed: boolean) => void
 }
 
 export function ProtocolSetupLabware({
   runId,
   setSetupScreen,
+  isConfirmed,
+  setIsConfirmed,
 }: ProtocolSetupLabwareProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   const [showMapView, setShowMapView] = React.useState<boolean>(false)
@@ -93,6 +98,7 @@ export function ProtocolSetupLabware({
     | (LabwareDefinition2 & {
         location: LabwareLocation
         nickName: string | null
+        id: string
       })
     | null
   >(null)
@@ -138,10 +144,19 @@ export function ProtocolSetupLabware({
         ...labwareDef,
         location: foundLabware.location,
         nickName: nickName ?? null,
+        id: labwareId,
       })
       setShowLabwareDetailsModal(true)
     }
   }
+  const selectedLabwareIsTopOfStack = mostRecentAnalysis?.commands.some(
+    command =>
+      command.commandType === 'loadLabware' &&
+      command.result?.labwareId === selectedLabware?.id &&
+      typeof command.params.location === 'object' &&
+      ('moduleId' in command.params.location ||
+        'labwareId' in command.params.location)
+  )
 
   let location: JSX.Element | string | null = null
   if (
@@ -203,19 +218,16 @@ export function ProtocolSetupLabware({
     <>
       {createPortal(
         <>
-          {showLabwareDetailsModal && selectedLabware != null ? (
+          {showLabwareDetailsModal &&
+          !selectedLabwareIsTopOfStack &&
+          selectedLabware != null ? (
             <Modal
               onOutsideClick={() => {
                 setShowLabwareDetailsModal(false)
                 setSelectedLabware(null)
               }}
             >
-              <Flex alignItems={ALIGN_STRETCH} gridGap={SPACING.spacing48}>
-                <LabwareThumbnail
-                  viewBox={`${selectedLabware.cornerOffsetFromSlot.x} ${selectedLabware.cornerOffsetFromSlot.y} ${selectedLabware.dimensions.xDimension} ${selectedLabware.dimensions.yDimension}`}
-                >
-                  <LabwareRender definition={selectedLabware} />
-                </LabwareThumbnail>
+              <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
                   alignItems={ALIGN_FLEX_START}
@@ -241,18 +253,45 @@ export function ProtocolSetupLabware({
                       : null}
                   </LegacyStyledText>
                 </Flex>
+                <LabwareThumbnail
+                  viewBox={`${selectedLabware.cornerOffsetFromSlot.x} ${selectedLabware.cornerOffsetFromSlot.y} ${selectedLabware.dimensions.xDimension} ${selectedLabware.dimensions.yDimension}`}
+                >
+                  <LabwareRender definition={selectedLabware} />
+                </LabwareThumbnail>
               </Flex>
             </Modal>
           ) : null}
         </>,
         getTopPortalEl()
       )}
-      <ODDBackButton
-        label={t('labware')}
-        onClick={() => {
-          setSetupScreen('prepare to run')
-        }}
-      />
+      <Flex
+        flexDirection={DIRECTION_ROW}
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+      >
+        <ODDBackButton
+          label={t('labware')}
+          onClick={() => {
+            setSetupScreen('prepare to run')
+          }}
+        />
+        {isConfirmed ? (
+          <Chip
+            background
+            iconName="ot-check"
+            text={t('placements_ready')}
+            type="success"
+            chipSize="small"
+          />
+        ) : (
+          <SmallButton
+            buttonText={t('confirm_placements')}
+            onClick={() => {
+              setIsConfirmed(true)
+              setSetupScreen('prepare to run')
+            }}
+          />
+        )}
+      </Flex>
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing8}
@@ -305,6 +344,18 @@ export function ProtocolSetupLabware({
             })}
           </>
         )}
+        {showLabwareDetailsModal &&
+        selectedLabware != null &&
+        selectedLabwareIsTopOfStack ? (
+          <LabwareStackModal
+            labwareIdTop={selectedLabware?.id}
+            runId={runId}
+            closeModal={() => {
+              setSelectedLabware(null)
+              setShowLabwareDetailsModal(false)
+            }}
+          />
+        ) : null}
       </Flex>
       <FloatingActionButton
         buttonText={showMapView ? t('list_view') : t('map_view')}

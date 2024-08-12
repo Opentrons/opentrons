@@ -7,27 +7,35 @@ import { i18n } from '../../../../../i18n'
 import { SetupLiquids } from '../index'
 import { SetupLiquidsList } from '../SetupLiquidsList'
 import { SetupLiquidsMap } from '../SetupLiquidsMap'
-import { BackToTopButton } from '../../BackToTopButton'
 
 vi.mock('../SetupLiquidsList')
 vi.mock('../SetupLiquidsMap')
-vi.mock('../../BackToTopButton')
-
-const render = (props: React.ComponentProps<typeof SetupLiquids>) => {
-  return renderWithProviders(
-    <SetupLiquids
-      robotName="otie"
-      runId="123"
-      protocolRunHeaderRef={null}
-      protocolAnalysis={null}
-    />,
-    {
-      i18nInstance: i18n,
-    }
-  )
-}
 
 describe('SetupLiquids', () => {
+  const render = (
+    props: React.ComponentProps<typeof SetupLiquids> & {
+      startConfirmed?: boolean
+    }
+  ) => {
+    let isConfirmed =
+      props?.startConfirmed == null ? false : props.startConfirmed
+    const confirmFn = vi.fn((confirmed: boolean) => {
+      isConfirmed = confirmed
+    })
+    return renderWithProviders(
+      <SetupLiquids
+        runId="123"
+        protocolAnalysis={null}
+        isLiquidSetupConfirmed={isConfirmed}
+        setLiquidSetupConfirmed={confirmFn}
+        robotName="robotName"
+      />,
+      {
+        i18nInstance: i18n,
+      }
+    )
+  }
+
   let props: React.ComponentProps<typeof SetupLiquids>
   beforeEach(() => {
     vi.mocked(SetupLiquidsList).mockReturnValue(
@@ -36,16 +44,13 @@ describe('SetupLiquids', () => {
     vi.mocked(SetupLiquidsMap).mockReturnValue(
       <div>Mock setup liquids map</div>
     )
-    vi.mocked(BackToTopButton).mockReturnValue(
-      <button>Mock BackToTopButton</button>
-    )
   })
 
   it('renders the list and map view buttons and proceed button', () => {
     render(props)
     screen.getByRole('button', { name: 'List View' })
     screen.getByRole('button', { name: 'Map View' })
-    screen.getByRole('button', { name: 'Mock BackToTopButton' })
+    screen.getByRole('button', { name: 'Confirm locations and volumes' })
   })
   it('renders the map view when you press that toggle button', () => {
     render(props)

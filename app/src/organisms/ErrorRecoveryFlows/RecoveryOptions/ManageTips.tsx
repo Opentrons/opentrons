@@ -131,7 +131,7 @@ export function BeginRemoval({
         primaryBtnOnClick={primaryOnClick}
         primaryBtnTextOverride={t('begin_removal')}
         secondaryBtnOnClick={secondaryOnClick}
-        secondaryBtnTextOverride={t('skip')}
+        secondaryBtnTextOverride={t('skip_and_home_pipette')}
         secondaryAsTertiary={true}
       />
     </RecoverySingleColumnContentWrapper>
@@ -213,7 +213,7 @@ export function useDropTipFlowUtils({
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const { proceedToRouteAndStep } = routeUpdateActions
   const { updateSubMap, subMap } = subMapUtils
-  const failedCommandId = failedCommand?.id ?? '' // We should have a failed command here unless the run is not in AWAITING_RECOVERY.
+  const failedCommandId = failedCommand?.byRunRecord.id ?? '' // We should have a failed command here unless the run is not in AWAITING_RECOVERY.
 
   const buildTipDropCompleteBtn = (): string => {
     switch (selectedRecoveryOption) {

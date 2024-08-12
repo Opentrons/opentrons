@@ -244,7 +244,6 @@ class PythonAndLegacyRunner(AbstractRunner):
             await self._protocol_executor.execute(
                 protocol=protocol,
                 context=context,
-                parameter_context=self._parameter_context,
                 run_time_parameters_with_overrides=run_time_parameters_with_overrides,
             )
 

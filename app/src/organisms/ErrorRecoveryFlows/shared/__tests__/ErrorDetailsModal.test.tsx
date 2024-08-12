@@ -95,8 +95,11 @@ describe('ErrorDetailsModal', () => {
     it('renders the OverpressureBanner when the error kind is an overpressure error', () => {
       props.failedCommand = {
         ...props.failedCommand,
-        commandType: 'aspirate',
-        error: { isDefined: true, errorType: 'overpressure' },
+        byRunRecord: {
+          ...props.failedCommand?.byRunRecord,
+          commandType: 'aspirate',
+          error: { isDefined: true, errorType: 'overpressure' },
+        },
       } as any
       render({ ...props, isOnDevice })
 

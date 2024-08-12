@@ -21,7 +21,7 @@ from .dependencies import (
 )
 from .data_files_store import DataFilesStore, DataFileInfo
 from .file_auto_deleter import DataFileAutoDeleter
-from .models import DataFile, FileIdNotFoundError
+from .models import DataFile, FileIdNotFoundError, FileIdNotFound
 from ..protocols.dependencies import get_file_hasher, get_file_reader_writer
 from ..service.dependencies import get_current_time, get_unique_id
 
@@ -47,13 +47,6 @@ class FileNotFound(ErrorDetails):
 
     id: Literal["FileNotFound"] = "FileNotFound"
     title: str = "Specified file path not found on the robot"
-
-
-class FileIdNotFound(ErrorDetails):
-    """An error returned when specified file id was not found on the robot."""
-
-    id: Literal["FileIdNotFound"] = "FileIdNotFound"
-    title: str = "Specified file id not found on the robot"
 
 
 class UnexpectedFileFormat(ErrorDetails):

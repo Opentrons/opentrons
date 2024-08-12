@@ -2,9 +2,9 @@ import * as React from 'react'
 
 import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
 
-import { MANAGED_PIPETTE_ID, POSITION_AND_BLOWOUT } from '../../constants'
-import { getAddressableAreaFromConfig } from '../../getAddressableAreaFromConfig'
-import { useNotifyDeckConfigurationQuery } from '../../../../resources/deck_configuration'
+import { MANAGED_PIPETTE_ID, POSITION_AND_BLOWOUT } from '../constants'
+import { getAddressableAreaFromConfig } from '../getAddressableAreaFromConfig'
+import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
 import type {
   CreateCommand,
   AddressableAreaName,
@@ -14,14 +14,9 @@ import type {
 } from '@opentrons/shared-data'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import type { CommandData, PipetteData } from '@opentrons/api-client'
-import type {
-  Axis,
-  Sign,
-  StepSize,
-} from '../../../../molecules/JogControls/types'
-import type { DropTipFlowsStep, FixitCommandTypeUtils } from '../../types'
-import type { SetRobotErrorDetailsParams } from '../errors'
-import type { UseDTWithTypeParams } from '..'
+import type { Axis, Sign, StepSize } from '../../../molecules/JogControls/types'
+import type { DropTipFlowsStep, FixitCommandTypeUtils } from '../types'
+import type { SetRobotErrorDetailsParams, UseDTWithTypeParams } from '.'
 import type { RunCommandByCommandTypeParams } from './useDropTipCreateCommands'
 
 const JOG_COMMAND_TIMEOUT_MS = 10000
@@ -338,8 +333,8 @@ const buildMoveToAACommand = (
 }
 
 export const buildLoadPipetteCommand = (
-  mount: PipetteData['mount'],
-  pipetteName: PipetteModelSpecs['name']
+  pipetteName: PipetteModelSpecs['name'],
+  mount: PipetteData['mount']
 ): CreateCommand => {
   return {
     commandType: 'loadPipette',

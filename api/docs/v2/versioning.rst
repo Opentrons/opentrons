@@ -132,6 +132,11 @@ This table lists the correspondence between Protocol API versions and robot soft
 Changes in API Versions
 =======================
 
+Version 2.20
+------------
+
+- You can now call :py:obj:`.ProtocolContext.define_liquid()` without supplying a ``description`` or ``display_color``.
+
 Version 2.19
 ------------
 

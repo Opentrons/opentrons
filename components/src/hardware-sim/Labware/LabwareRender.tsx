@@ -84,9 +84,12 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
               : `translate(${cornerOffsetFromSlot.x}, ${cornerOffsetFromSlot.y})`
           }
           ref={gRef}
+          onClick={props.onLabwareClick}
         >
           <LabwareAdapter
             labwareLoadName={labwareLoadName as LabwareAdapterLoadName}
+            definition={definition}
+            highlight={props.highlight}
           />
         </g>
       </g>

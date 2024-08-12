@@ -585,7 +585,7 @@ async def test_get_referenced_data_files(
     subject.insert(protocol_resource_1)
     await data_files_store.insert(
         DataFileInfo(
-            id="data-file-id",
+            id="data-file-id-1",
             name="file-name",
             file_hash="abc123",
             created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
@@ -632,7 +632,7 @@ async def test_get_referenced_data_files(
             CSVParameterResource(
                 analysis_id="analysis-id-1",
                 parameter_variable_name="csv-var",
-                file_id="data-file-id",
+                file_id="data-file-id-1",
             ),
             CSVParameterResource(
                 analysis_id="analysis-id-1",
@@ -648,23 +648,20 @@ async def test_get_referenced_data_files(
     )
     result = await subject.get_referenced_data_files("protocol-id")
 
-    for data_file in result:
-        assert data_file in [
-            DataFile(
-                id="data-file-id",
-                name="file-name",
-                createdAt=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
-            ),
-            DataFile(
-                id="data-file-id-2",
-                name="file-name",
-                createdAt=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
-            ),
-            DataFile(
-                id="data-file-id-3",
-                name="file-name",
-                createdAt=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
-            ),
-        ]
-
-    assert len(result) == 3
+    assert result == [
+        DataFile(
+            id="data-file-id-1",
+            name="file-name",
+            createdAt=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        ),
+        DataFile(
+            id="data-file-id-2",
+            name="file-name",
+            createdAt=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        ),
+        DataFile(
+            id="data-file-id-3",
+            name="file-name",
+            createdAt=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        ),
+    ]
