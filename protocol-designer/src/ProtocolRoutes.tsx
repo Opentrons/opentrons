@@ -7,7 +7,7 @@ import { Liquids } from './pages/Liquids'
 import { StartingDeckState } from './pages/StartingDeckState'
 import { ProtocolSteps } from './pages/ProtocolSteps'
 import { CreateNewProtocolWizard } from './pages/CreateNewProtocolWizard'
-import { Navbar } from './Navbar'
+import { NavigationBar } from './NavigationBar'
 
 import type { RouteProps } from './types'
 
@@ -58,7 +58,9 @@ export function ProtocolRoutes(): JSX.Element {
 
   return (
     <>
-      {currentPath === LANDING_ROUTE ? null : <Navbar routes={pdRoutes} />}
+      {currentPath === LANDING_ROUTE ? null : (
+        <NavigationBar routes={pdRoutes} />
+      )}
       <Box width="100%">
         <Routes>
           {allRoutes.map(({ Component, path }: RouteProps) => {
