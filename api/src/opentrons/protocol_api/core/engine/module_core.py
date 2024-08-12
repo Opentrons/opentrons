@@ -24,7 +24,6 @@ from opentrons.protocol_engine.errors.exceptions import (
     LabwareNotLoadedOnModuleError,
     NoMagnetEngageHeightError,
 )
-from opentrons.protocol_engine.types import LabwareOffsetVector
 
 from opentrons.protocols.api_support.types import APIVersion
 

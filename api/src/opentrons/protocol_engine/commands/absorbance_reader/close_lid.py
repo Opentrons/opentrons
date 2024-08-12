@@ -8,11 +8,8 @@ from pydantic import BaseModel, Field
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ...errors.error_occurrence import ErrorOccurrence
 from ...errors import CannotPerformModuleAction
-from opentrons.protocol_engine.types import (
-    LabwareOffsetVector,
-    LabwareMovementOffsetData,
-    AddressableAreaLocation,
-)
+from opentrons.protocol_engine.types import AddressableAreaLocation
+
 from opentrons.protocol_engine.resources import labware_validation
 from .types import MoveLidResult
 
