@@ -54,16 +54,28 @@ class OpenLidImpl(AbstractCommandImpl[OpenLidParams, SuccessData[OpenLidResult, 
         mod_substate = self._state_view.modules.get_absorbance_reader_substate(
             module_id=params.moduleId
         )
-        # Make sure the lid is closed
-        mod_substate.raise_if_lid_status_not_expected(lid_on_expected=True)
-
-        # Allow propagation of ModuleNotAttachedError.
-        _ = self._equipment.get_module_hardware_api(mod_substate.module_id)
-
         # lid should currently be on the module
         assert mod_substate.lid_id is not None
         loaded_lid = self._state_view.labware.get(mod_substate.lid_id)
         assert labware_validation.is_absorbance_reader_lid(loaded_lid.loadName)
+
+        # If the lid is already Open, No-op out
+        if not mod_substate.is_lid_on:
+            current_offset_id = self._equipment.find_applicable_labware_offset_id(
+                labware_definition_uri=loaded_lid.definitionUri,
+                labware_location=loaded_lid.location,
+            )
+            return SuccessData(
+                public=OpenLidResult(
+                    lidId=loaded_lid.id,
+                    newLocation=loaded_lid.location,
+                    offsetId=current_offset_id,
+                ),
+                private=None,
+            )
+
+        # Allow propagation of ModuleNotAttachedError.
+        _ = self._equipment.get_module_hardware_api(mod_substate.module_id)
 
         current_location = loaded_lid.location
         validated_current_location = (
