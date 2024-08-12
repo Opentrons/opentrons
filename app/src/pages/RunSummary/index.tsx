@@ -184,7 +184,9 @@ export function RunSummary(): JSX.Element {
   // TODO(jh, 08-02-24): Revisit useCurrentRunRoute and top level redirects.
   const queryClient = useQueryClient()
   const returnToDash = (): void => {
-    // Eagerly clear the query cache to prevent top level redirecting back to this page.
+    closeCurrentRun()
+    // Eagerly clear the query caches to prevent top level redirecting back to this page.
+    queryClient.setQueryData([host, 'runs', 'details'], () => undefined)
     queryClient.setQueryData([host, 'runs', runId, 'details'], () => undefined)
     navigate('/')
   }
