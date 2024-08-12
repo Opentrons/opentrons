@@ -1,6 +1,9 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import { Btn, BORDERS, COLORS, SPACING } from '@opentrons/components'
+
+import { Btn } from '../../primitives'
+import { BORDERS, COLORS } from '../../helix-design-system'
+import { SPACING } from '../../ui-style-constants'
 
 export const OverflowBtn: (
   props: React.ComponentProps<typeof Btn>,

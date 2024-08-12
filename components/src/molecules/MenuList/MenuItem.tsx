@@ -1,12 +1,10 @@
 import styled from 'styled-components'
-import {
-  SPACING,
-  COLORS,
-  TYPOGRAPHY,
-  ALIGN_CENTER,
-  RESPONSIVENESS,
-} from '@opentrons/components'
-import type { StyleProps } from '@opentrons/components'
+
+import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { COLORS } from '../../helix-design-system'
+import { ALIGN_CENTER } from '../../styles'
+
+import type { StyleProps } from '../../primitives'
 
 interface ButtonProps extends StyleProps {
   /** optional isAlert boolean to turn the background red, only seen in ODD */

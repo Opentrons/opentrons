@@ -2,6 +2,7 @@ import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   ALIGN_CENTER,
@@ -12,15 +13,17 @@ import {
   DIRECTION_ROW,
   Flex,
   Icon,
+  LegacyStyledText,
   Link,
   PrimaryButton,
   SIZE_AUTO,
   SPACING,
-  LegacyStyledText,
+  Tooltip,
   TYPOGRAPHY,
   useConditionalConfirm,
   useHoverTooltip,
 } from '@opentrons/components'
+
 import { getIsHeaterShakerAttached } from '../../redux/config'
 import {
   getModuleDisplayName,
@@ -33,7 +36,6 @@ import { Slideout } from '../../atoms/Slideout'
 import { TertiaryButton } from '../../atoms/buttons'
 import { Divider } from '../../atoms/structure'
 import { InputField } from '../../atoms/InputField'
-import { Tooltip } from '../../atoms/Tooltip'
 import { ConfirmAttachmentModal } from './ConfirmAttachmentModal'
 import { useLatchControls } from './hooks'
 import { ModuleSetupModal } from './ModuleSetupModal'

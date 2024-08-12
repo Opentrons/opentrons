@@ -25,13 +25,13 @@ import {
   LegacyStyledText,
   OVERFLOW_AUTO,
   SPACING,
+  Tooltip,
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
 
 import { Banner } from '../../../atoms/Banner'
 import { Divider } from '../../../atoms/structure'
-import { Tooltip } from '../../../atoms/Tooltip'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useRunStatus } from '../../RunTimeControl/hooks'
 import { useNotifyRunQuery } from '../../../resources/runs'

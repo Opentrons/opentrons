@@ -16,11 +16,11 @@ import {
   PrimaryButton,
   RESPONSIVENESS,
   SPACING,
+  Tooltip,
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
 import { getIsOnDevice } from '../../redux/config'
-import { Tooltip } from '../../atoms/Tooltip'
 import { NeedHelpLink } from '../../organisms/CalibrationPanels'
 import { SmallButton, TextOnlyButton } from '../../atoms/buttons'
 

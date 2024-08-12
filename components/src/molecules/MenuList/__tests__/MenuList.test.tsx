@@ -1,7 +1,8 @@
 import * as React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders } from '../../../__testing-utils__'
+
+import { renderWithProviders } from '../../../testing/utils'
 import { MenuList } from '..'
 
 const render = (props: React.ComponentProps<typeof MenuList>) => {

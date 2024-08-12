@@ -1,6 +1,10 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { IconButton, Tooltip, useHoverTooltip } from '@opentrons/components'
+import {
+  IconButton,
+  LegacyTooltip,
+  useHoverTooltip,
+} from '@opentrons/components'
 import styles from '../StepEditForm.module.css'
 
 interface Props {
@@ -20,12 +24,12 @@ export const AspDispSection = (props: Props): JSX.Element => {
     <div className={className}>
       <div className={styles.section_header}>
         <span className={styles.section_header_text}>{prefix}</span>
-        <Tooltip
+        <LegacyTooltip
           {...tooltipProps}
           key={collapsed ? 'collapsed' : 'expanded'} // NOTE: without this key, the IconButton will not re-render unless clicked
         >
           {t('advanced_settings')}
-        </Tooltip>
+        </LegacyTooltip>
         <div
           {...targetProps}
           onClick={toggleCollapsed}

@@ -8,16 +8,16 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TOOLTIP_LEFT,
+  Tooltip,
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '../../App/portal'
 import { TertiaryButton } from '../../atoms/buttons'
-import { Tooltip } from '../../atoms/Tooltip'
 import { AskForCalibrationBlockModal } from '../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
 import {
   useTrackEvent,

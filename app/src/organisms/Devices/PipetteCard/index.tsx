@@ -11,8 +11,9 @@ import {
   DIRECTION_ROW,
   Flex,
   InstrumentDiagram,
-  SPACING,
   LegacyStyledText,
+  OverflowBtn,
+  SPACING,
   TYPOGRAPHY,
   useOnClickOutside,
 } from '@opentrons/components'
@@ -20,7 +21,6 @@ import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import { usePipetteSettingsQuery } from '@opentrons/react-api-client'
 
 import { LEFT } from '../../../redux/pipettes'
-import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
 import { useMenuHandleClickOutside } from '../../../atoms/MenuList/hooks'
 import { ChangePipette } from '../../ChangePipette'
 import { PipetteOverflowMenu } from './PipetteOverflowMenu'

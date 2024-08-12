@@ -3,36 +3,36 @@ import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
+import { css } from 'styled-components'
 
 import {
-  Flex,
+  ALIGN_FLEX_END,
   BORDERS,
   COLORS,
-  POSITION_ABSOLUTE,
   DIRECTION_COLUMN,
+  Flex,
+  MenuItem,
+  OverflowBtn,
+  POSITION_ABSOLUTE,
   POSITION_RELATIVE,
-  ALIGN_FLEX_END,
+  Tooltip,
   TYPOGRAPHY,
   useHoverTooltip,
+  useMenuHandleClickOutside,
 } from '@opentrons/components'
 
 import { CONNECTABLE, removeRobot } from '../../redux/discovery'
 import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
-import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
-import { Tooltip } from '../../atoms/Tooltip'
 import { Divider } from '../../atoms/structure'
-import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { getTopPortalEl } from '../../App/portal'
 import { ChooseProtocolSlideout } from '../ChooseProtocolSlideout'
 import { useCurrentRunId } from '../../resources/runs'
 import { ConnectionTroubleshootingModal } from './ConnectionTroubleshootingModal'
-import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 import { useIsRobotBusy } from './hooks'
 
 import type { StyleProps } from '@opentrons/components'
 import type { DiscoveredRobot } from '../../redux/discovery/types'
 import type { Dispatch, State } from '../../redux/types'
-import { css } from 'styled-components'
 
 interface RobotOverflowMenuProps extends StyleProps {
   robot: DiscoveredRobot
@@ -60,7 +60,7 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
   ] = React.useState<boolean>(false)
 
   const { autoUpdateAction } = useSelector((state: State) => {
-    return getRobotUpdateDisplayInfo(state, robot.name)
+    return getRobotUpdateDisplayInfo(state, robot.name as string)
   })
   const isRobotOnWrongVersionOfSoftware =
     autoUpdateAction === 'upgrade' || autoUpdateAction === 'downgrade'
@@ -146,7 +146,7 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
           {t('why_is_this_robot_unavailable')}
         </MenuItem>
         <MenuItem
-          onClick={() => dispatch(removeRobot(robot.name))}
+          onClick={() => dispatch(removeRobot(robot.name as string))}
           id={`RobotOverflowMenu_${String(robot.name)}_removeRobot`}
           css={css`
             border-radius: 0 0 ${BORDERS.borderRadius8} ${BORDERS.borderRadius8};

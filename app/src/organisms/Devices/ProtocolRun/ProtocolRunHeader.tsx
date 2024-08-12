@@ -38,12 +38,12 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   Link as LinkButton,
   PrimaryButton,
   SecondaryButton,
-  SIZE_1,
   SPACING,
-  LegacyStyledText,
+  Tooltip,
   TYPOGRAPHY,
   useConditionalConfirm,
   useHoverTooltip,
@@ -67,7 +67,6 @@ import {
   ANALYTICS_PROTOCOL_RUN_ACTION,
 } from '../../../redux/analytics'
 import { getIsHeaterShakerAttached } from '../../../redux/config'
-import { Tooltip } from '../../../atoms/Tooltip'
 import { useCloseCurrentRun } from '../../../organisms/ProtocolUpload/hooks'
 import { ConfirmCancelModal } from '../../../organisms/RunDetails/ConfirmCancelModal'
 import { HeaterShakerIsRunningModal } from '../HeaterShakerIsRunningModal'
@@ -829,7 +828,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
         {buttonIconName != null ? (
           <Icon
             name={buttonIconName}
-            size={SIZE_1}
+            size="1rem"
             marginRight={SPACING.spacing8}
             spin={
               isProtocolAnalyzing || runStatus === RUN_STATUS_STOP_REQUESTED

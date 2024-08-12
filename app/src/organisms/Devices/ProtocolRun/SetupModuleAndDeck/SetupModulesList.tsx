@@ -13,9 +13,10 @@ import {
   Flex,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TOOLTIP_LEFT,
+  Tooltip,
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
@@ -35,7 +36,6 @@ import {
 
 import { TertiaryButton } from '../../../../atoms/buttons'
 import { StatusLabel } from '../../../../atoms/StatusLabel'
-import { Tooltip } from '../../../../atoms/Tooltip'
 import { useChainLiveCommands } from '../../../../resources/runs'
 import { ModuleSetupModal } from '../../../ModuleCard/ModuleSetupModal'
 import { ModuleWizardFlows } from '../../../ModuleWizardFlows'

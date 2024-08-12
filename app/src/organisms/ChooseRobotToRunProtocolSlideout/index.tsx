@@ -5,18 +5,18 @@ import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
 import {
-  Icon,
-  Flex,
   DIRECTION_COLUMN,
-  PrimaryButton,
   DIRECTION_ROW,
+  Flex,
+  Icon,
+  PrimaryButton,
   SecondaryButton,
   SPACING,
+  Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
 import { useUploadCsvFileMutation } from '@opentrons/react-api-client'
 
-import { Tooltip } from '../../atoms/Tooltip'
 import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
 import { OPENTRONS_USB } from '../../redux/discovery'
 import { appShellRequestor } from '../../redux/shell/remote'
@@ -29,6 +29,7 @@ import { ApplyHistoricOffsets } from '../ApplyHistoricOffsets'
 import { useOffsetCandidatesForAnalysis } from '../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { ChooseRobotSlideout } from '../ChooseRobotSlideout'
 import { useCreateRunFromProtocol } from './useCreateRunFromProtocol'
+
 import type { StyleProps } from '@opentrons/components'
 import type { RunTimeParameter } from '@opentrons/shared-data'
 import type { State } from '../../redux/types'

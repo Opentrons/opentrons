@@ -2,8 +2,9 @@ import * as React from 'react'
 import {
   COLORS,
   TYPOGRAPHY,
-  Tooltip as SharedTooltip,
+  LegacyTooltip as SharedTooltip,
 } from '@opentrons/components'
+
 import type {
   UseTooltipResultTooltipProps,
   StyleProps,

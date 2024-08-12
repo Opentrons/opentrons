@@ -9,14 +9,14 @@ import {
   DIRECTION_COLUMN,
   Flex,
   Icon,
+  LegacyStyledText,
   RESPONSIVENESS,
   SPACING,
-  LegacyStyledText,
   TEXT_ALIGN_RIGHT,
+  Tooltip,
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
-import { Tooltip } from '../Tooltip'
 
 export const INPUT_TYPE_NUMBER = 'number' as const
 export const INPUT_TYPE_TEXT = 'text' as const

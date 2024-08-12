@@ -10,7 +10,7 @@ import {
   RadioGroup,
   SPACING,
   LegacyStyledText,
-  Tooltip,
+  LegacyTooltip,
   useHoverTooltip,
 } from '@opentrons/components'
 import { getMainPagePortalEl } from '../../../portals/MainPageModalPortal'
@@ -279,7 +279,9 @@ export const TipPositionModal = (
           units="mm"
           value={yValue ?? ''}
         />
-        <Tooltip {...tooltipProps}>{t('tooltip:y_position_value')}</Tooltip>
+        <LegacyTooltip {...tooltipProps}>
+          {t('tooltip:y_position_value')}
+        </LegacyTooltip>
       </Flex>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
         <LegacyStyledText as="label" paddingLeft={SPACING.spacing24}>

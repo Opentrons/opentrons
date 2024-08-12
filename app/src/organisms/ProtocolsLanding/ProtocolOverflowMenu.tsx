@@ -6,21 +6,21 @@ import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
 import {
-  Flex,
+  ALIGN_FLEX_END,
   BORDERS,
   COLORS,
-  POSITION_ABSOLUTE,
   DIRECTION_COLUMN,
+  Flex,
+  MenuItem,
+  OverflowBtn,
+  POSITION_ABSOLUTE,
   POSITION_RELATIVE,
-  ALIGN_FLEX_END,
   useConditionalConfirm,
+  useMenuHandleClickOutside,
 } from '@opentrons/components'
 import { FLEX_DISPLAY_NAME, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '../../App/portal'
-import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
-import { MenuItem } from '../../atoms/MenuList/MenuItem'
-import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,

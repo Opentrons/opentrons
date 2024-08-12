@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -7,18 +8,19 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_CENTER,
+  LegacyStyledText,
   PrimaryButton,
   SecondaryButton,
   SPACING,
-  LegacyStyledText,
   TOOLTIP_LEFT,
+  Tooltip,
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
 import { useProtocolQuery } from '@opentrons/react-api-client'
+
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useLPCSuccessToast } from '../../hooks/useLPCSuccessToast'
-import { Tooltip } from '../../../../atoms/Tooltip'
 import {
   useRobotType,
   useLPCDisabledReason,

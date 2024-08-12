@@ -2,15 +2,16 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
+  DIRECTION_ROW,
   Flex,
   JUSTIFY_CENTER,
-  SPACING,
-  useHoverTooltip,
-  PrimaryButton,
-  DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
+  PrimaryButton,
+  SPACING,
+  Tooltip,
   TYPOGRAPHY,
+  useHoverTooltip,
 } from '@opentrons/components'
 
 import { useToggleGroup } from '../../../../molecules/ToggleGroup/useToggleGroup'
@@ -19,7 +20,6 @@ import {
   getIsFixtureMismatch,
   getRequiredDeckConfig,
 } from '../../../../resources/deck_configuration/utils'
-import { Tooltip } from '../../../../atoms/Tooltip'
 import {
   useRunHasStarted,
   useUnmatchedModulesForProtocol,

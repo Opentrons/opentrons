@@ -13,21 +13,23 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   DISPLAY_BLOCK,
+  DropdownMenu,
   Flex,
   Icon,
-  Link as LinkComponent,
   JUSTIFY_CENTER,
   JUSTIFY_END,
   JUSTIFY_FLEX_START,
+  LegacyStyledText,
+  Link as LinkComponent,
   OVERFLOW_WRAP_ANYWHERE,
   PrimaryButton,
   ProtocolDeck,
-  SPACING,
   SecondaryButton,
-  LegacyStyledText,
+  SPACING,
+  Tooltip,
   TYPOGRAPHY,
-  useTooltip,
   useHoverTooltip,
+  useTooltip,
 } from '@opentrons/components'
 import {
   ApiHostProvider,
@@ -40,10 +42,8 @@ import { OPENTRONS_USB } from '../../redux/discovery'
 import { getStoredProtocols } from '../../redux/protocol-storage'
 import { appShellRequestor } from '../../redux/shell/remote'
 import { MultiSlideout } from '../../atoms/Slideout/MultiSlideout'
-import { Tooltip } from '../../atoms/Tooltip'
 import { ToggleButton } from '../../atoms/buttons'
 import { InputField } from '../../atoms/InputField'
-import { DropdownMenu } from '../../atoms/MenuList/DropdownMenu'
 import { MiniCard } from '../../molecules/MiniCard'
 import { UploadInput } from '../../molecules/UploadInput'
 import { useTrackCreateProtocolRunEvent } from '../Devices/hooks'

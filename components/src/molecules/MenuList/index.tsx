@@ -1,14 +1,14 @@
 import * as React from 'react'
+
+import { BORDERS, COLORS } from '../../helix-design-system'
+import { SPACING } from '../../ui-style-constants'
+import { Flex } from '../../primitives'
 import {
-  COLORS,
-  POSITION_ABSOLUTE,
   DIRECTION_COLUMN,
-  Flex,
-  SPACING,
-  BORDERS,
   JUSTIFY_CENTER,
-  ModalShell,
-} from '@opentrons/components'
+  POSITION_ABSOLUTE,
+} from '../../styles'
+import { ModalShell } from '../../modals'
 
 interface MenuListProps {
   children: React.ReactNode
@@ -16,7 +16,7 @@ interface MenuListProps {
   onClick?: React.MouseEventHandler
 }
 
-export const MenuList = (props: MenuListProps): JSX.Element | null => {
+export function MenuList(props: MenuListProps): JSX.Element | null {
   const { children, isOnDevice = false, onClick = null } = props
   return isOnDevice && onClick != null ? (
     <ModalShell

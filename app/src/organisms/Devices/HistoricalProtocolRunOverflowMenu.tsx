@@ -4,27 +4,26 @@ import { useTranslation } from 'react-i18next'
 import { NavLink, useNavigate } from 'react-router-dom'
 
 import {
+  ALIGN_CENTER,
+  ALIGN_FLEX_END,
+  Box,
+  COLORS,
+  DIRECTION_COLUMN,
   Flex,
   Icon,
+  MenuItem,
+  OverflowBtn,
   POSITION_ABSOLUTE,
-  ALIGN_FLEX_END,
-  DIRECTION_COLUMN,
   POSITION_RELATIVE,
-  COLORS,
-  useOnClickOutside,
-  useHoverTooltip,
-  Box,
   SPACING,
-  SIZE_1,
-  ALIGN_CENTER,
+  Tooltip,
+  useHoverTooltip,
+  useMenuHandleClickOutside,
+  useOnClickOutside,
 } from '@opentrons/components'
 import { useDeleteRunMutation } from '@opentrons/react-api-client'
 
 import { Divider } from '../../atoms/structure'
-import { Tooltip } from '../../atoms/Tooltip'
-import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
-import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
-import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { useRunControls } from '../../organisms/RunTimeControl/hooks'
 import {
   useTrackEvent,
@@ -203,7 +202,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
           {isRunLogLoading ? (
             <Icon
               name="ot-spinner"
-              size={SIZE_1}
+              size="1rem'"
               color={COLORS.grey50}
               aria-label="spinner"
               spin

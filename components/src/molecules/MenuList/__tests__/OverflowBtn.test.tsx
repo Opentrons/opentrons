@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { vi, it, expect, describe } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { COLORS } from '@opentrons/components'
 
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '../../../testing/utils'
+import { COLORS } from '../../../helix-design-system'
 import { OverflowBtn } from '../OverflowBtn'
 
 const render = (props: React.ComponentProps<typeof OverflowBtn>) => {

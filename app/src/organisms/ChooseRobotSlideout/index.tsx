@@ -12,17 +12,17 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   DISPLAY_INLINE_BLOCK,
+  DropdownMenu,
   Flex,
   Icon,
   JUSTIFY_CENTER,
   JUSTIFY_END,
   JUSTIFY_FLEX_START,
+  LegacyStyledText,
   Link,
   OVERFLOW_WRAP_ANYWHERE,
-  SIZE_1,
-  SIZE_4,
   SPACING,
-  LegacyStyledText,
+  Tooltip,
   TYPOGRAPHY,
   useTooltip,
 } from '@opentrons/components'
@@ -47,17 +47,15 @@ import { MultiSlideout } from '../../atoms/Slideout/MultiSlideout'
 import { ToggleButton } from '../../atoms/buttons'
 import { AvailableRobotOption } from './AvailableRobotOption'
 import { InputField } from '../../atoms/InputField'
-import { DropdownMenu } from '../../atoms/MenuList/DropdownMenu'
-import { Tooltip } from '../../atoms/Tooltip'
 import { UploadInput } from '../../molecules/UploadInput'
 import { FileCard } from './FileCard'
 
 import type { RobotType, RunTimeParameter } from '@opentrons/shared-data'
+import type { DropdownOption } from '@opentrons/components'
 import type { SlideoutProps } from '../../atoms/Slideout'
 import type { UseCreateRun } from '../../organisms/ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
 import type { State, Dispatch } from '../../redux/types'
 import type { Robot } from '../../redux/discovery/types'
-import type { DropdownOption } from '../../atoms/MenuList/DropdownMenu'
 
 export const CARD_OUTLINE_BORDER_STYLE = css`
   border-style: ${BORDERS.styleSolid};
@@ -268,10 +266,10 @@ export function ChooseRobotSlideout(
           flexDirection={DIRECTION_COLUMN}
           justifyContent={JUSTIFY_CENTER}
           alignItems={ALIGN_CENTER}
-          height={SIZE_4}
+          height="8rem"
           gridGap={SPACING.spacing8}
         >
-          <Icon name="alert-circle" size={SIZE_1} />
+          <Icon name="alert-circle" size="1rem'" />
           <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {t('no_available_robots_found')}
           </LegacyStyledText>

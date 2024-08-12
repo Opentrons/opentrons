@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
+
 import {
   ALIGN_CENTER,
   COLORS,
@@ -9,15 +10,16 @@ import {
   Flex,
   Icon,
   InfoScreen,
+  MenuItem,
+  OverflowBtn,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
   StyledText,
 } from '@opentrons/components'
 import { getLabwareDefURI } from '@opentrons/shared-data'
+
 import { Divider } from '../../atoms/structure'
-import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
-import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { getTopPortalEl } from '../../App/portal'
 import { LabwareDetails } from '../LabwareDetails'
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
