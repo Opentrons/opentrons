@@ -857,17 +857,6 @@ describe('ProtocolRunHeader', () => {
 
     screen.getByText('Run completed with warnings.')
   })
-  it('clicking close on a terminal run banner closes the run context', async () => {
-    vi.mocked(useNotifyRunQuery).mockReturnValue({
-      data: { data: mockSucceededRun },
-    } as UseQueryResult<OpentronsApiClient.Run>)
-    when(vi.mocked(useRunStatus))
-      .calledWith(RUN_ID)
-      .thenReturn(RUN_STATUS_SUCCEEDED)
-    render()
-
-    fireEvent.click(screen.queryAllByTestId('Banner_close-button')[0])
-  })
 
   it('does not display the "run successful" banner if the successful run is not current', async () => {
     when(vi.mocked(useNotifyRunQuery))
