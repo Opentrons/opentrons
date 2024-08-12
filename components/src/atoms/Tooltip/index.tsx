@@ -1,14 +1,11 @@
 import * as React from 'react'
-import {
-  COLORS,
-  TYPOGRAPHY,
-  LegacyTooltip as SharedTooltip,
-} from '@opentrons/components'
 
-import type {
-  UseTooltipResultTooltipProps,
-  StyleProps,
-} from '@opentrons/components'
+import { COLORS } from '../../helix-design-system'
+import { TYPOGRAPHY } from '../../ui-style-constants'
+import { LegacyTooltip as SharedTooltip } from '../../tooltips'
+
+import type { StyleProps } from '../../primitives'
+import type { UseTooltipResultTooltipProps } from '../../tooltips'
 
 export interface TooltipProps extends StyleProps {
   children: React.ReactNode
