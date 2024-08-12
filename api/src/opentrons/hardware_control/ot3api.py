@@ -2651,7 +2651,7 @@ class OT3API(
             top_types.Point(*self._config.gripper_mount_offset),
         )
         cp = self.critical_point_for(mount, None)
-        return deck_end_z + offset[2] + cp.z
+        return deck_end_z + offset.z + cp.z
 
     async def liquid_probe(
         self,
