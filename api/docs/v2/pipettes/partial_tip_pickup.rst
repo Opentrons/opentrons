@@ -87,7 +87,7 @@ Next, we load the 96-channel pipette. Note that :py:meth:`.load_instrument` only
 Finally, we configure the nozzle layout, with three arguments.
 
     - The ``style`` parameter directly accepts the ``COLUMN`` constant, since we imported it at the top of the protocol.
-    - The ``start`` parameter accepts a nozzle name, representing the back-left nozzle in the layout, as a string. ``"A12"`` tells the pipette to use its rightmost column of nozzles for pipetting.
+    - The ``start`` parameter accepts a nozzle name, representing the primary nozzle in the layout, as a string. ``"A12"`` tells the pipette to use its rightmost column of nozzles for pipetting.
     - The ``tip_racks`` parameter tells the pipette which racks to use for tip tracking, just like :ref:`adding tip racks <pipette-tip-racks>` when loading a pipette.
 
 In this configuration, pipetting actions will use a single column::
@@ -160,27 +160,27 @@ The ``start`` parameter sets the first and only nozzle used in the configuration
       - Pickup order
     * - 8-channel
       - A1
-      - | Front to back, right to left
+      - | Front to back, left to right
         | (H1 through A1, H2 through A2, …)
     * - 8-channel
       - H1
-      - | Back to front, right to left
+      - | Back to front, left to right
         | (A1 through H1, A2 through H2, …)
     * - 96-channel
       - A1
-      - | Front to back, left to right
+      - | Front to back, right to left
         | (H12 through A12, H11 through A11, …)
     * - 96-channel
       - H1
-      - | Back to front, left to right
+      - | Back to front, right to left
         | (A12 through H12, A11 through H11, …)
     * - 96-channel
       - A12
-      - | Front to back, right to left
+      - | Front to back, left to right
         | (H1 through A1, H2 through A2, …)
     * - 96-channel
       - H12
-      - | Back to front, right to left
+      - | Back to front, left to right
         | (A1 through H1, A2 through H2, …)
 
 Since they follow the same pickup order as a single-channel pipette, Opentrons recommends using the following configurations:
@@ -252,6 +252,8 @@ To specify the number of tips to pick up, add the ``end`` parameter when calling
       - C
       - B
 
+When picking up 3, 5, 6, or 7 tips, extra tips will be left at the front of each column. You can use these tips with a different nozzle configuration, or you can manually re-rack them at the end of your protocol for future use.
+
 Here is the start of a protocol that imports the ``PARTIAL_COLUMN`` and ``ALL`` layout constants, loads an 8-channel pipette, and sets it to pick up four tips:
 
 .. code-block:: python
@@ -288,6 +290,7 @@ This configuration will pick up tips from the back half of column 1, then the fr
 
 When handling liquids in partial column configuration, remember that *the frontmost channel of the pipette is its primary channel*. For example, to use the same configuration as above to transfer liquid from wells A1–D1 to wells A2–D2 on a plate, you must use the wells in row D as the source and destination targets::
 
+    # pipette in 4-nozzle partial column layout
     pipette.transfer(
         volume=100,
         source=plate["D1"],  # aspirate from A1-D1
@@ -335,7 +338,7 @@ When switching between full and partial pickup, you may want to organize your ti
 
 .. Tip::
 
-    It's also good practice to keep separate lists of tip racks when using multiple partial tip pickup configurations (i.e., using both column 1 and column 12 in the same protocol). This improves positional accuracy when picking up tips. Additionally, use Labware Position Check in the Opentrons App to ensure that the partial configuration is well-aligned to the rack.
+    It's also good practice to keep separate lists of tip racks when using multiple partial tip pickup configurations (e.g., using both column 1 and column 12 in the same protocol). This improves positional accuracy when picking up tips. Additionally, use Labware Position Check in the Opentrons App to ensure that the partial configuration is well-aligned to the rack.
 
 Now, when you configure the nozzle layout, you can reference the appropriate list as the value of ``tip_racks``::
 
@@ -350,7 +353,7 @@ Now, when you configure the nozzle layout, you can reference the appropriate lis
         style=ALL,
         tip_racks=full_tip_racks
     )
-    pipette.pick_up_tip()  # picks up full rack in C1
+    pipette.pick_up_tip()  # picks up full rack in C3
 
 This keeps tip tracking consistent across each type of pickup. And it reduces the risk of errors due to the incorrect presence or absence of a tip rack adapter.
 
