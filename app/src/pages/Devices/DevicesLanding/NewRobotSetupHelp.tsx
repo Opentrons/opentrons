@@ -5,6 +5,7 @@ import {
   ALIGN_FLEX_END,
   DIRECTION_COLUMN,
   Flex,
+  FLEX_MAX_CONTENT,
   Link,
   PrimaryButton,
   SPACING,
@@ -50,10 +51,16 @@ export function NewRobotSetupHelp(): JSX.Element {
                 <LegacyStyledText as="p" marginBottom={SPACING.spacing16}>
                   {t('new_robot_instructions')}
                 </LegacyStyledText>
-                <ExternalLink href={NEW_FLEX_SETUP_SUPPORT_ARTICLE_HREF}>
+                <ExternalLink
+                  href={NEW_FLEX_SETUP_SUPPORT_ARTICLE_HREF}
+                  width={FLEX_MAX_CONTENT}
+                >
                   {t('opentrons_flex_quickstart_guide')}
                 </ExternalLink>
-                <ExternalLink href={NEW_OT2_SETUP_SUPPORT_ARTICLE_HREF}>
+                <ExternalLink
+                  href={NEW_OT2_SETUP_SUPPORT_ARTICLE_HREF}
+                  width={FLEX_MAX_CONTENT}
+                >
                   {t('ot2_quickstart_guide')}
                 </ExternalLink>
                 <PrimaryButton
