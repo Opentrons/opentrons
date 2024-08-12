@@ -24,6 +24,7 @@ import { DropTipWizardFlows } from '../../DropTipWizardFlows'
 import { DT_ROUTES } from '../../DropTipWizardFlows/constants'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
+import type { PipettingRunTimeCommand } from '@opentrons/shared-data'
 import type { PipetteWithTip } from '../../DropTipWizardFlows'
 import type { RecoveryContentProps, RecoveryRoute, RouteStep } from '../types'
 import type { FixitCommandTypeUtils } from '../../DropTipWizardFlows/types'
@@ -200,6 +201,7 @@ export function useDropTipFlowUtils({
   subMapUtils,
   routeUpdateActions,
   recoveryMap,
+  failedPipetteInfo,
 }: RecoveryContentProps): FixitCommandTypeUtils {
   const { t } = useTranslation('error_recovery')
   const {
@@ -301,9 +303,17 @@ export function useDropTipFlowUtils({
     }
   }
 
+  const pipetteId =
+    failedCommand != null &&
+    'params' in failedCommand.byRunRecord &&
+    'pipetteId' in failedCommand.byRunRecord.params
+      ? failedCommand.byRunRecord.params.pipetteId
+      : null
+
   return {
     runId,
     failedCommandId,
+    pipetteId,
     copyOverrides: buildCopyOverrides(),
     errorOverrides: buildErrorOverrides(),
     buttonOverrides: buildButtonOverrides(),

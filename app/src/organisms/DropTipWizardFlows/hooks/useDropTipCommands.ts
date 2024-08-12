@@ -334,12 +334,13 @@ const buildMoveToAACommand = (
 
 export const buildLoadPipetteCommand = (
   pipetteName: PipetteModelSpecs['name'],
-  mount: PipetteData['mount']
+  mount: PipetteData['mount'],
+  pipetteId?: string | null
 ): CreateCommand => {
   return {
     commandType: 'loadPipette',
     params: {
-      pipetteId: MANAGED_PIPETTE_ID,
+      pipetteId: pipetteId ?? MANAGED_PIPETTE_ID,
       mount,
       pipetteName,
     },

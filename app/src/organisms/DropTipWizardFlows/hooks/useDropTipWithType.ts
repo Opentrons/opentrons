@@ -117,10 +117,15 @@ function useRegisterPipetteFixitType({
   instrumentModelSpecs,
   issuedCommandsType,
   chainRunCommands,
+  fixitCommandTypeUtils,
 }: UseRegisterPipetteFixitType): void {
   React.useEffect(() => {
     if (issuedCommandsType === 'fixit') {
-      const command = buildLoadPipetteCommand(instrumentModelSpecs.name, mount)
+      const command = buildLoadPipetteCommand(
+        instrumentModelSpecs.name,
+        mount,
+        fixitCommandTypeUtils?.pipetteId
+      )
       void chainRunCommands([command], true)
     }
   }, [])
