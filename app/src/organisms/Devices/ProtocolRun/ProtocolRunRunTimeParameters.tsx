@@ -56,15 +56,15 @@ export function ProtocolRunRuntimeParameters({
   // because the most recent analysis may not reflect the selected run (e.g. cloning a run
   // from a historical protocol run from the device details page)
   const run = useNotifyRunQuery(runId).data
-  let runTimeParameters
-  if (isRunTerminal) {
-    runTimeParameters =
-      run?.data != null && 'runTimeParameters' in run?.data
-        ? run?.data?.runTimeParameters
-        : []
-  } else {
-    runTimeParameters = mostRecentAnalysis?.runTimeParameters ?? []
-  }
+  const runTimeParametersFromRun =
+    run?.data != null && 'runTimeParameters' in run?.data
+      ? run?.data?.runTimeParameters
+      : []
+  const runTimeParametersFromAnalysis =
+    mostRecentAnalysis?.runTimeParameters ?? []
+  const runTimeParameters = isRunTerminal
+    ? runTimeParametersFromRun
+    : runTimeParametersFromAnalysis
   const hasRunTimeParameters = runTimeParameters.length > 0
   const hasCustomRunTimeParameterValues = runTimeParameters.some(parameter =>
     parameter.type !== 'csv_file' ? parameter.value !== parameter.default : true
