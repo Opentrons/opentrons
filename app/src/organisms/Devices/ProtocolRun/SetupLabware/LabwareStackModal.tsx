@@ -41,6 +41,17 @@ const HIDE_SCROLLBAR = css`
   }
 `
 
+const IMAGE_STYLE = css`
+  max-width: 11.5rem;
+  max-height: 6.875rem;
+`
+
+const IMAGE_CONTAINER_STYLE = css`
+  width: 11.5rem;
+  height: 100%;
+  justify-content: ${JUSTIFY_CENTER};
+`
+
 interface LabwareStackModalProps {
   labwareIdTop: string
   runId: string
@@ -69,7 +80,10 @@ export const LabwareStackModal = (
   } = getLocationInfoNames(labwareIdTop, commands)
 
   const topDefinition = getSlotLabwareDefinition(labwareIdTop, commands)
-  const adapterDef = getSlotLabwareDefinition(adapterId ?? '', commands)
+  const adapterDef =
+    adapterId != null
+      ? getSlotLabwareDefinition(adapterId ?? '', commands)
+      : null
   const isModuleThermocycler =
     moduleModel == null
       ? false
@@ -80,16 +94,12 @@ export const LabwareStackModal = (
       : TC_MODULE_LOCATION_OT2
   const moduleDisplayName =
     moduleModel != null ? getModuleDisplayName(moduleModel) : null ?? ''
-  const tiprackAdapterImg = (
-    <img width="156px" height="130px" src={tiprackAdapter} />
-  )
+  const isAdapterForTiprack =
+    adapterDef?.parameters.loadName === 'opentrons_flex_96_tiprack_adapter'
+  const tiprackAdapterImg = <img src={tiprackAdapter} css={IMAGE_STYLE} />
   const moduleImg =
     moduleModel != null ? (
-      <img
-        width="156px"
-        height="130px"
-        src={getModuleImage(moduleModel, true)}
-      />
+      <img src={getModuleImage(moduleModel, true)} css={IMAGE_STYLE} />
     ) : null
 
   return isOnDevice ? (
@@ -125,12 +135,14 @@ export const LabwareStackModal = (
               text={labwareName}
               subText={labwareNickname}
             />
-            <LabwareStackRender
-              definitionTop={topDefinition}
-              definitionBottom={adapterDef}
-              highlightBottom={false}
-              highlightTop={true}
-            />
+            <Flex css={IMAGE_CONTAINER_STYLE}>
+              <LabwareStackRender
+                definitionTop={topDefinition}
+                definitionBottom={adapterDef}
+                highlightBottom={false}
+                highlightTop={true}
+              />
+            </Flex>
           </Flex>
           <Divider marginY={SPACING.spacing16} />
         </>
@@ -142,16 +154,17 @@ export const LabwareStackModal = (
               gridGap={SPACING.spacing32}
             >
               <LabwareStackLabel text={adapterName ?? ''} isOnDevice />
-              {adapterDef.parameters.loadName ===
-              'opentrons_flex_96_tiprack_adapter' ? (
-                tiprackAdapterImg
+              {isAdapterForTiprack ? (
+                <Flex css={IMAGE_CONTAINER_STYLE}>{tiprackAdapterImg}</Flex>
               ) : (
-                <LabwareStackRender
-                  definitionTop={topDefinition}
-                  definitionBottom={adapterDef}
-                  highlightBottom={true}
-                  highlightTop={false}
-                />
+                <Flex css={IMAGE_CONTAINER_STYLE}>
+                  <LabwareStackRender
+                    definitionTop={topDefinition}
+                    definitionBottom={adapterDef}
+                    highlightBottom={true}
+                    highlightTop={false}
+                  />
+                </Flex>
               )}
             </Flex>
             {moduleModel != null ? (
@@ -166,7 +179,7 @@ export const LabwareStackModal = (
             gridGap={SPACING.spacing32}
           >
             <LabwareStackLabel text={moduleDisplayName} isOnDevice />
-            {moduleImg}
+            <Flex css={IMAGE_CONTAINER_STYLE}>{moduleImg}</Flex>
           </Flex>
         ) : null}
       </Flex>
@@ -194,12 +207,14 @@ export const LabwareStackModal = (
               justifyContent={JUSTIFY_SPACE_BETWEEN}
             >
               <LabwareStackLabel text={labwareName} subText={labwareNickname} />
-              <LabwareStackRender
-                definitionTop={topDefinition}
-                definitionBottom={adapterDef}
-                highlightBottom={false}
-                highlightTop={true}
-              />
+              <Flex css={IMAGE_CONTAINER_STYLE}>
+                <LabwareStackRender
+                  definitionTop={topDefinition}
+                  definitionBottom={adapterDef}
+                  highlightBottom={false}
+                  highlightTop={adapterDef != null && !isAdapterForTiprack}
+                />
+              </Flex>
             </Flex>
             <Divider marginY={SPACING.spacing16} />
           </>
@@ -211,16 +226,17 @@ export const LabwareStackModal = (
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
               >
                 <LabwareStackLabel text={adapterName ?? ''} />
-                {adapterDef.parameters.loadName ===
-                'opentrons_flex_96_tiprack_adapter' ? (
-                  tiprackAdapterImg
+                {isAdapterForTiprack ? (
+                  <Flex css={IMAGE_CONTAINER_STYLE}>{tiprackAdapterImg}</Flex>
                 ) : (
-                  <LabwareStackRender
-                    definitionTop={topDefinition}
-                    definitionBottom={adapterDef}
-                    highlightBottom={true}
-                    highlightTop={false}
-                  />
+                  <Flex css={IMAGE_CONTAINER_STYLE}>
+                    <LabwareStackRender
+                      definitionTop={topDefinition}
+                      definitionBottom={adapterDef}
+                      highlightBottom
+                      highlightTop={false}
+                    />
+                  </Flex>
                 )}
               </Flex>
               {moduleModel != null ? (
@@ -235,7 +251,7 @@ export const LabwareStackModal = (
               height="6.875rem"
             >
               <LabwareStackLabel text={moduleDisplayName} />
-              {moduleImg}
+              <Flex css={IMAGE_CONTAINER_STYLE}>{moduleImg}</Flex>
             </Flex>
           ) : null}
         </Flex>
