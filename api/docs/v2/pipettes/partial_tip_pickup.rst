@@ -29,6 +29,8 @@ Before getting started with partial tip pickup, make sure your protocol specifie
       - Single, partial column
       - 2.20
 
+.. _nozzle-layouts:
+
 Nozzle Layouts
 ==============
 

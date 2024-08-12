@@ -2012,16 +2012,19 @@ class InstrumentContext(publisher.CommandPublisher):
             tips from a tip rack that is in an adapter, the API will raise an error.
 
         :param style: The shape of the nozzle layout.
+            You must :ref:`import the layout constant <nozzle-layouts>` in order to use it.
 
             - ``ALL`` resets the pipette to use all of its nozzles. Calling
               ``configure_nozzle_layout`` with no arguments also resets the pipette.
-            - ``COLUMN`` sets the pipette to use 8 nozzles, aligned from front to back
+            - ``COLUMN`` sets a 96-channel pipette to use 8 nozzles, aligned from front to back
               with respect to the deck. This corresponds to a column of wells on labware.
-            - ``PARTIAL_COLUMN`` sets the pipette to use 2--7 nozzles, aligned from front to back
-              with respect to the deck.
-            - ``ROW`` sets the pipette to use 12 nozzles, aligned from left to right
+              For 8-channel pipettes, use ``ALL`` instead.
+            - ``PARTIAL_COLUMN`` sets an 8-channel pipette to use 2--7 nozzles, aligned from front to back
+              with respect to the deck. Not compatible with the 96-channel pipette.
+            - ``ROW`` sets a 96-channel pipette to use 12 nozzles, aligned from left to right
               with respect to the deck. This corresponds to a row of wells on labware.
-            - ``SINGLE`` sets the pipette to use 1 nozzle. This corresponds to a single of well on labware.
+              Not compatible with 8-channel pipettes.
+            - ``SINGLE`` sets the pipette to use 1 nozzle. This corresponds to a single well on labware.
 
         :type style: ``NozzleLayout`` or ``None``
         :param start: The primary nozzle of the layout, which the robot uses
