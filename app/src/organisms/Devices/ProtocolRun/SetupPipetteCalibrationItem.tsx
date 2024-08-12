@@ -13,7 +13,7 @@ import {
   Link,
   SPACING,
   TOOLTIP_LEFT,
-  Tooltip,
+  LegacyTooltip,
   TYPOGRAPHY,
   useHoverTooltip,
   WRAP,
@@ -124,11 +124,11 @@ export function SetupPipetteCalibrationItem({
             </TertiaryButton>
           </RRDLink>
           {!isDeckCalibrated ? (
-            <Tooltip {...tooltipProps}>
+            <LegacyTooltip {...tooltipProps}>
               <Box width="8rem">
                 {t('calibrate_deck_to_proceed_to_pipette_calibration')}
               </Box>
-            </Tooltip>
+            </LegacyTooltip>
           ) : null}
         </Flex>
       </>
