@@ -52,6 +52,12 @@ const IMAGE_CONTAINER_STYLE = css`
   justify-content: ${JUSTIFY_CENTER};
 `
 
+const LIST_ITEM_STYLE = css`
+  align-items: ${ALIGN_CENTER};
+  height: 6.875rem;
+  justify-content: ${JUSTIFY_SPACE_BETWEEN};
+`
+
 interface LabwareStackModalProps {
   labwareIdTop: string
   runId: string
@@ -125,11 +131,7 @@ export const LabwareStackModal = (
         width="41.675rem"
       >
         <>
-          <Flex
-            alignItems={ALIGN_CENTER}
-            height="6.875rem"
-            gridGap={SPACING.spacing32}
-          >
+          <Flex css={LIST_ITEM_STYLE}>
             <LabwareStackLabel
               isOnDevice
               text={labwareName}
@@ -148,11 +150,7 @@ export const LabwareStackModal = (
         </>
         {adapterDef != null ? (
           <>
-            <Flex
-              alignItems={ALIGN_CENTER}
-              height="6.875rem"
-              gridGap={SPACING.spacing32}
-            >
+            <Flex css={LIST_ITEM_STYLE}>
               <LabwareStackLabel text={adapterName ?? ''} isOnDevice />
               {isAdapterForTiprack ? (
                 <Flex css={IMAGE_CONTAINER_STYLE}>{tiprackAdapterImg}</Flex>
@@ -173,11 +171,7 @@ export const LabwareStackModal = (
           </>
         ) : null}
         {moduleModel != null ? (
-          <Flex
-            alignItems={ALIGN_CENTER}
-            height="6.875rem"
-            gridGap={SPACING.spacing32}
-          >
+          <Flex css={LIST_ITEM_STYLE}>
             <LabwareStackLabel text={moduleDisplayName} isOnDevice />
             <Flex css={IMAGE_CONTAINER_STYLE}>{moduleImg}</Flex>
           </Flex>
@@ -201,11 +195,7 @@ export const LabwareStackModal = (
       <Box padding={SPACING.spacing24} backgroundColor={COLORS.white}>
         <Flex flexDirection={DIRECTION_COLUMN}>
           <>
-            <Flex
-              alignItems={ALIGN_CENTER}
-              height="6.875rem"
-              justifyContent={JUSTIFY_SPACE_BETWEEN}
-            >
+            <Flex css={LIST_ITEM_STYLE}>
               <LabwareStackLabel text={labwareName} subText={labwareNickname} />
               <Flex css={IMAGE_CONTAINER_STYLE}>
                 <LabwareStackRender
@@ -220,11 +210,7 @@ export const LabwareStackModal = (
           </>
           {adapterDef != null ? (
             <>
-              <Flex
-                alignItems={ALIGN_CENTER}
-                height="6.875rem"
-                justifyContent={JUSTIFY_SPACE_BETWEEN}
-              >
+              <Flex css={LIST_ITEM_STYLE}>
                 <LabwareStackLabel text={adapterName ?? ''} />
                 {isAdapterForTiprack ? (
                   <Flex css={IMAGE_CONTAINER_STYLE}>{tiprackAdapterImg}</Flex>
@@ -245,11 +231,7 @@ export const LabwareStackModal = (
             </>
           ) : null}
           {moduleModel != null ? (
-            <Flex
-              alignItems={ALIGN_CENTER}
-              justifyContent={JUSTIFY_SPACE_BETWEEN}
-              height="6.875rem"
-            >
+            <Flex css={LIST_ITEM_STYLE}>
               <LabwareStackLabel text={moduleDisplayName} />
               <Flex css={IMAGE_CONTAINER_STYLE}>{moduleImg}</Flex>
             </Flex>
