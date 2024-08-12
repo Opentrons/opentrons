@@ -325,7 +325,7 @@ class AbsorbanceReader(mod_abc.AbstractModule):
         """Get the Absorbance Reader's current lid status."""
         await self._reader.get_lid_status()
         return self._reader.lid_status
-    
+
     def _enter_error_state(self, error: Exception) -> None:
         self._error = str(error)
         if isinstance(error, AbsorbanceReaderDisconnectedError):
