@@ -12,11 +12,13 @@ import {
   DIRECTION_ROW,
   Flex,
   Icon,
-  ModuleIcon,
-  SPACING,
   LegacyStyledText,
+  ModuleIcon,
+  OverflowBtn,
+  SPACING,
   TYPOGRAPHY,
   useHoverTooltip,
+  useMenuHandleClickOutside,
   useOnClickOutside,
 } from '@opentrons/components'
 import {
@@ -30,7 +32,6 @@ import {
 } from '@opentrons/shared-data'
 import { RUN_STATUS_FINISHING, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
-import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import {
   getRequestById,
   PENDING,
@@ -42,7 +43,6 @@ import {
 import { Banner } from '../../atoms/Banner'
 import { UpdateBanner } from '../../molecules/UpdateBanner'
 import { SUCCESS_TOAST } from '../../atoms/Toast'
-import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 import { Tooltip } from '../../atoms/Tooltip'
 import { useChainLiveCommands } from '../../resources/runs'
 import { useCurrentRunStatus } from '../RunTimeControl/hooks'

@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { COLORS, Overlay } from '@opentrons/components'
+import { COLORS } from '../helix-design-system'
+import { Overlay } from '../modals'
 
 interface MenuHandleClickOutside {
   menuOverlay: JSX.Element

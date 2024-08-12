@@ -16,18 +16,18 @@ import {
   Flex,
   Icon,
   JUSTIFY_FLEX_END,
+  LegacyStyledText,
+  MenuItem,
+  Modal,
+  OverflowBtn,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
-  Modal,
-  LegacyStyledText,
   TYPOGRAPHY,
   useConditionalConfirm,
   useOnClickOutside,
 } from '@opentrons/components'
 
-import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
-import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { Divider } from '../../atoms/structure'
 import { getTopPortalEl } from '../../App/portal'
 import {

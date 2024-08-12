@@ -10,12 +10,12 @@ import {
   Flex,
   Icon,
   LegacyStyledText,
+  MenuItem,
+  MenuList,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { MenuList } from '../../atoms/MenuList'
-import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { home, ROBOT } from '../../redux/robot-controls'
 import { useLights } from '../Devices/hooks'
 import { getTopPortalEl } from '../../App/portal'
