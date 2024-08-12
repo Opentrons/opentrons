@@ -20,7 +20,7 @@ Before getting started with partial tip pickup, make sure your protocol specifie
       - Column
       - 2.16
     * - Flex 96-Channel Pipette
-      - Single, partial column, row
+      - Single, row
       - 2.20
     * - Flex 8-Channel Pipettes
       - Single, partial column
@@ -223,11 +223,7 @@ Since this configuration uses ``start="H12"``, it will pick up tips in the usual
 Partial Column Layout
 ---------------------
 
-Partial column pickup is available on both 8-channel and 96-channel pipettes. Partial columns contain 2 to 7 consecutive tips in a single column. 8-channel pipettes always pick up partial columns with the frontmost nozzles of the pipette (``start="H1"``). 96-channel pipettes can pick up partial columns with the frontmost nozzles in the leftmost column (``start="H1"``) or the rightmost column (``start="H12"``).
-
-.. note::
-
-    Picking up partial columns with the backmost nozzles is currently not supported. Setting ``style=PARTIAL_COLUMN`` and either ``start="A1"`` or ``start="A12"`` will raise an error.
+Partial column pickup is available on 8-channel pipettes only. Partial columns contain 2 to 7 consecutive tips in a single column. The pipette always picks up partial columns with its frontmost nozzles (``start="H1"``).
 
 To specify the number of tips to pick up, add the ``end`` parameter when calling :py:meth:`.configure_nozzle_layout`. Use the chart below to determine the end row (G through B) for your desired number of tips. The end column should be the same as your start column (1 or 12).
 
