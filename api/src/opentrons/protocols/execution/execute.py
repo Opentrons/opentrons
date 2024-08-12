@@ -16,7 +16,6 @@ from opentrons.protocols.types import PythonProtocol, Protocol
 from opentrons.protocols.api_support.types import APIVersion
 
 from opentrons.protocols.parameters.csv_parameter_interface import CSVParameter
-from opentrons.protocols.parameters.exceptions import RuntimeParameterRequired
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -51,13 +50,8 @@ def run_protocol(
         finally:
             if protocol.api_level >= APIVersion(2, 18):
                 for parameter in context.params.get_all().values():
-                    if isinstance(parameter, CSVParameter):
-                        try:
-                            parameter.file.close()
-                        # This will be raised if the csv file wasn't set, which means it was never opened,
-                        # so we can safely skip this.
-                        except RuntimeParameterRequired:
-                            pass
+                    if isinstance(parameter, CSVParameter) and parameter.file_opened:
+                        parameter.file.close()
     else:
         if protocol.contents["schemaVersion"] == 3:
             ins = execute_json_v3.load_pipettes_from_json(context, protocol.contents)

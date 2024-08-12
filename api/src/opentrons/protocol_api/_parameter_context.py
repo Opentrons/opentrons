@@ -15,6 +15,7 @@ from opentrons.protocols.parameters.types import (
 from opentrons.protocols.parameters.exceptions import (
     ParameterDefinitionError,
     ParameterValueError,
+    IncompatibleParameterError,
 )
 from opentrons.protocol_engine.types import (
     RunTimeParameter,
@@ -183,6 +184,14 @@ class ParameterContext:
             variable_name: The variable name the CSV parameter will be referred to in the run context.
             description: A description of the parameter as it will show up on the frontend.
         """
+        if any(
+            isinstance(parameter, csv_parameter_definition.CSVParameterDefinition)
+            for parameter in self._parameters.values()
+        ):
+            raise IncompatibleParameterError(
+                "Only one CSV File parameter can be defined per protocol."
+            )
+
         validation.validate_variable_name_unique(variable_name, set(self._parameters))
         parameter = csv_parameter_definition.create_csv_parameter(
             display_name=display_name,
@@ -246,8 +255,11 @@ class ParameterContext:
             file_id = file_path.parent.name
             file_name = file_path.name
 
+            with file_path.open("rb") as fh:
+                contents = fh.read()
+
             parameter.file_info = FileInfo(id=file_id, name=file_name)
-            parameter.value = file_path
+            parameter.value = contents
 
     def export_parameters_for_analysis(self) -> List[RunTimeParameter]:
         """Exports all parameters into a protocol engine models for reporting in analysis.

@@ -40,9 +40,12 @@ export function HistoricalProtocolRun(
   const { t } = useTranslation('run_details')
   const { run, protocolName, robotIsBusy, robotName, protocolKey } = props
   const [drawerOpen, setDrawerOpen] = React.useState(false)
-  const countRunDataFiles = run.runTimeParameters.filter(
-    parameter => parameter.type === 'csv_file'
-  ).length
+  const countRunDataFiles =
+    'runTimeParameters' in run
+      ? run?.runTimeParameters.filter(
+          parameter => parameter.type === 'csv_file'
+        ).length
+      : 0
   const runStatus = run.status
   const runDisplayName = formatTimestamp(run.createdAt)
   let duration = EMPTY_TIMESTAMP

@@ -1,14 +1,15 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 
 import {
   Flex,
   COLORS,
   SPACING,
   AlertPrimaryButton,
-  SecondaryButton,
   JUSTIFY_FLEX_END,
+  StyledText,
+  PrimaryButton,
 } from '@opentrons/components'
 
 import { getIsOnDevice } from '../../redux/config'
@@ -23,47 +24,65 @@ type ExitConfirmationProps = DropTipWizardContainerProps & {
 }
 
 export function ExitConfirmation(props: ExitConfirmationProps): JSX.Element {
-  const { handleGoBack, handleExit } = props
-  const { i18n, t } = useTranslation(['drop_tip_wizard', 'shared'])
+  const { handleGoBack, handleExit, mount } = props
+  const { t } = useTranslation(['drop_tip_wizard', 'shared'])
 
-  const flowTitle = t('drop_tips')
   const isOnDevice = useSelector(getIsOnDevice)
 
   return (
     <SimpleWizardBody
-      iconColor={COLORS.yellow50}
-      header={t('exit_screen_title', { flow: flowTitle })}
+      iconColor={COLORS.red50}
+      header={t('remove_any_attached_tips')}
       isSuccess={false}
+      subHeader={
+        <StyledText
+          desktopStyle="bodyDefaultRegular"
+          oddStyle="level4HeaderRegular"
+        >
+          <Trans
+            t={t}
+            i18nKey="liquid_damages_this_pipette"
+            values={{
+              mount,
+            }}
+            components={{
+              mount: <strong />,
+            }}
+          />
+        </StyledText>
+      }
+      marginTop={isOnDevice ? '-2rem' : undefined}
     >
       {isOnDevice ? (
         <Flex
           width="100%"
           justifyContent={JUSTIFY_FLEX_END}
-          gridGap={SPACING.spacing4}
+          gridGap={SPACING.spacing8}
         >
-          <SmallButton
-            buttonType="alert"
-            buttonText={i18n.format(t('shared:exit'), 'capitalize')}
-            onClick={handleExit}
-            marginRight={SPACING.spacing4}
-          />
           <SmallButton
             buttonText={t('shared:go_back')}
             onClick={handleGoBack}
           />
+          <SmallButton
+            buttonType="alert"
+            buttonText={t('exit_and_home_pipette')}
+            onClick={handleExit}
+            marginRight={SPACING.spacing4}
+          />
         </Flex>
       ) : (
-        <>
-          <SecondaryButton
-            onClick={handleGoBack}
-            marginRight={SPACING.spacing4}
-          >
+        <Flex
+          width="100%"
+          justifyContent={JUSTIFY_FLEX_END}
+          gridGap={SPACING.spacing8}
+        >
+          <PrimaryButton onClick={handleGoBack} marginRight={SPACING.spacing4}>
             {t('shared:go_back')}
-          </SecondaryButton>
+          </PrimaryButton>
           <AlertPrimaryButton onClick={handleExit}>
-            {i18n.format(t('shared:exit'), 'capitalize')}
+            {t('exit_and_home_pipette')}
           </AlertPrimaryButton>
-        </>
+        </Flex>
       )}
     </SimpleWizardBody>
   )

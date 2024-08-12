@@ -1,15 +1,17 @@
 import { describe, expect, it } from 'vitest'
 
-import { mockFailedCommand } from '../../__fixtures__'
+import { mockRecoveryContentProps } from '../../__fixtures__'
 import { getNextStep, getNextSteps } from '../getNextStep'
 
 import type { RunCommandSummary } from '@opentrons/api-client'
+
+const mockFailedCommand = mockRecoveryContentProps.failedCommand
 
 describe('getNextStep', () => {
   const mockProtocolAnalysis = {
     commands: [
       { key: 'command1' },
-      mockFailedCommand,
+      mockFailedCommand?.byAnalysis,
       { key: 'command3' },
     ] as RunCommandSummary[],
   } as any
@@ -25,7 +27,13 @@ describe('getNextStep', () => {
       key: 'command3',
     }
 
-    const result = getNextStep(lastFailedCommand, mockProtocolAnalysis)
+    const result = getNextStep(
+      {
+        byRunRecord: lastFailedCommand as any,
+        byAnalysis: lastFailedCommand as any,
+      },
+      mockProtocolAnalysis
+    )
     expect(result).toBeNull()
   })
 
@@ -35,7 +43,13 @@ describe('getNextStep', () => {
       key: 'non_existent_command_key',
     }
 
-    const result = getNextStep(nonExistentFailedCommand, mockProtocolAnalysis)
+    const result = getNextStep(
+      {
+        byRunRecord: nonExistentFailedCommand as any,
+        byAnalysis: nonExistentFailedCommand as any,
+      },
+      mockProtocolAnalysis
+    )
     expect(result).toBeNull()
   })
 
@@ -54,7 +68,7 @@ describe('getNextSteps', () => {
   const mockProtocolAnalysis = {
     commands: [
       { key: 'command1' },
-      mockFailedCommand,
+      mockFailedCommand?.byAnalysis,
       { key: 'command3' },
       { key: 'command4' },
     ] as RunCommandSummary[],
@@ -71,7 +85,13 @@ describe('getNextSteps', () => {
       key: 'command4',
     }
 
-    const result = getNextStep(lastFailedCommand, mockProtocolAnalysis)
+    const result = getNextStep(
+      {
+        byRunRecord: lastFailedCommand as any,
+        byAnalysis: lastFailedCommand as any,
+      },
+      mockProtocolAnalysis
+    )
     expect(result).toBeNull()
   })
 
@@ -86,7 +106,13 @@ describe('getNextSteps', () => {
       key: 'non_existent_command_key',
     }
 
-    const result = getNextStep(nonExistentFailedCommand, mockProtocolAnalysis)
+    const result = getNextStep(
+      {
+        byRunRecord: nonExistentFailedCommand as any,
+        byAnalysis: nonExistentFailedCommand as any,
+      },
+      mockProtocolAnalysis
+    )
     expect(result).toBeNull()
   })
 

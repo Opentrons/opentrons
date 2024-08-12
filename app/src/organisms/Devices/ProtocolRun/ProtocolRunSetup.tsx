@@ -163,17 +163,6 @@ export function ProtocolRunSetup({
     return true
   })
 
-  const [
-    labwareSetupComplete,
-    setLabwareSetupComplete,
-  ] = React.useState<boolean>(false)
-  const [liquidSetupComplete, setLiquidSetupComplete] = React.useState<boolean>(
-    false
-  )
-  const [lpcComplete, setLpcComplete] = React.useState<boolean>(false)
-
-  if (robot == null) return null
-
   const liquids = protocolAnalysis?.liquids ?? []
   const liquidsInLoadOrder =
     protocolAnalysis != null
@@ -194,6 +183,18 @@ export function ProtocolRunSetup({
     ? t('install_modules', { count: modules.length })
     : t('no_deck_hardware_specified')
 
+  const [
+    labwareSetupComplete,
+    setLabwareSetupComplete,
+  ] = React.useState<boolean>(false)
+  const [liquidSetupComplete, setLiquidSetupComplete] = React.useState<boolean>(
+    !hasLiquids
+  )
+  if (!hasLiquids && missingSteps.includes('liquids')) {
+    setMissingSteps(missingSteps.filter(step => step !== 'liquids'))
+  }
+  const [lpcComplete, setLpcComplete] = React.useState<boolean>(false)
+  if (robot == null) return null
   const StepDetailMap: Record<
     StepKey,
     {
@@ -250,8 +251,14 @@ export function ProtocolRunSetup({
       rightElProps: {
         stepKey: MODULE_SETUP_KEY,
         complete:
-          calibrationStatusRobot.complete && calibrationStatusModules.complete,
-        completeText: isFlex ? t('calibration_ready') : '',
+          calibrationStatusRobot.complete &&
+          calibrationStatusModules.complete &&
+          !isMissingModule &&
+          !isFixtureMismatch,
+        completeText:
+          isFlex && hasModules
+            ? t('calibration_ready')
+            : t('deck_hardware_ready'),
         incompleteText: isFlex ? t('calibration_needed') : t('action_needed'),
         missingHardware: isMissingModule || isFixtureMismatch,
         missingHardwareText: t('action_needed'),
@@ -372,6 +379,11 @@ export function ProtocolRunSetup({
                     <EmptySetupStep
                       title={t(`${stepKey}_title`)}
                       description={StepDetailMap[stepKey].description}
+                      rightElement={
+                        <StepRightElement
+                          {...StepDetailMap[stepKey].rightElProps}
+                        />
+                      }
                     />
                   ) : (
                     <SetupStep
@@ -459,7 +471,6 @@ function StepRightElement(props: StepRightElementProps): JSX.Element | null {
           color={COLORS.black90}
           css={TYPOGRAPHY.pSemiBold}
           marginRight={SPACING.spacing16}
-          textTransform={TYPOGRAPHY.textTransformCapitalize}
           id={`RunSetupCard_${props.stepKey}_completeText`}
           whitespace="nowrap"
         >
@@ -481,7 +492,6 @@ function StepRightElement(props: StepRightElementProps): JSX.Element | null {
           color={COLORS.black90}
           css={TYPOGRAPHY.pSemiBold}
           marginRight={SPACING.spacing16}
-          textTransform={TYPOGRAPHY.textTransformCapitalize}
           id={`RunSetupCard_${props.stepKey}_missingHardwareText`}
           whitespace="nowrap"
         >
@@ -503,7 +513,6 @@ function StepRightElement(props: StepRightElementProps): JSX.Element | null {
           color={COLORS.black90}
           css={TYPOGRAPHY.pSemiBold}
           marginRight={SPACING.spacing16}
-          textTransform={TYPOGRAPHY.textTransformCapitalize}
           id={`RunSetupCard_${props.stepKey}_incompleteText`}
           whitespace="nowrap"
         >
