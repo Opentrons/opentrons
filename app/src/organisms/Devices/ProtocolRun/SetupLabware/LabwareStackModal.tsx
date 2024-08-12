@@ -142,7 +142,7 @@ export const LabwareStackModal = (
                 definitionTop={topDefinition}
                 definitionBottom={adapterDef}
                 highlightBottom={false}
-                highlightTop={true}
+                highlightTop={adapterDef != null && !isAdapterForTiprack}
               />
             </Flex>
           </Flex>
