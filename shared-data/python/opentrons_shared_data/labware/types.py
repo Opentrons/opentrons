@@ -37,6 +37,7 @@ LabwareRoles = Union[
 
 Circular = Literal["circular"]
 Rectangular = Literal["rectangular"]
+Hemisphere = Literal["hemisphere"]
 WellShape = Union[Circular, Rectangular]
 
 
@@ -138,3 +139,31 @@ class LabwareDefinition(_RequiredLabwareDefinition, total=False):
     gripperOffsets: Dict[str, GripperOffsets]
     gripForce: float
     gripHeightFromLabwareBottom: float
+
+
+class CircularArea(TypedDict):
+    shape: Circular
+    diameter: float
+
+
+class RectangularArea(TypedDict):
+    shape: Rectangular
+    xDimension: float
+    yDimension: float
+
+
+class HemisphereDimensions(TypedDict):
+    shape: Hemisphere
+    diameter: float
+
+
+InnerGeometrySection = Union[CircularArea, RectangularArea, HemisphereDimensions]
+
+
+class BoundedSection(TypedDict):
+    shape: InnerGeometrySection
+    top_height: float
+
+
+class InnerLabwareGeometry(TypedDict):
+    bounded_sections: List[BoundedSection]

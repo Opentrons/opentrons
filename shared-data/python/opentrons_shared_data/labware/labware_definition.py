@@ -105,33 +105,6 @@ class DisplayCategory(str, Enum):
     other = "other"
 
 
-class CircleArea(BaseModel):
-    radius: float
-
-
-class RectangleArea(BaseModel):
-    length: float
-    width: float
-
-
-class Hemisphere(BaseModel):
-    radius: float
-    depth: float
-
-
-CrossSectionShape = Union[CircleArea, RectangleArea]
-
-
-class CrossSection(BaseModel):
-    shape: CrossSectionShape
-    height: float
-
-
-class InnerLabwareGeometry(BaseModel):
-    cross_sections: List[CrossSection]
-    hemisphere: Optional[Hemisphere]
-
-
 class LabwareRole(str, Enum):
     labware = "labware"
     fixture = "fixture"
@@ -251,6 +224,41 @@ class WellDefinition(BaseModel):
     )
 
 
+class InnerGeometrySection(BaseModel):
+    shape: Literal["rectangular", "circular", "hemisphere"] = Field(
+        ...,
+        description="Shape of a cross-section of a well used to determine how "
+                    "to calculate area",
+    )
+    xDimension: Optional[_NonNegativeNumber] = Field(
+        None,
+        description="x dimension of rectangular wells",
+    )
+    yDimension: Optional[_NonNegativeNumber] = Field(
+        None,
+        description="y dimension of rectangular wells",
+    )
+    diameter: Optional[_NonNegativeNumber] = Field(
+        None,
+        description="diameter of circular wells",
+    )
+
+
+class BoundedSection(BaseModel):
+    shape: InnerGeometrySection = Field(
+        ...,
+        description="Geometrical layout of the geometry of a section of the inside of a well",
+    )
+    top_height: _NonNegativeNumber = Field(
+        ...,
+        description="The height at the top of a bounded subsection of a well"
+    )
+
+
+class InnerLabwareGeometry(BaseModel):
+    boundedSections: List[BoundedSection]
+
+
 class Metadata1(BaseModel):
     """
     Metadata specific to a grid of wells in a labware
@@ -353,3 +361,10 @@ class LabwareDefinition(BaseModel):
         default_factory=None,
         description="Force, in Newtons, with which the gripper should grip the labware.",
     )
+    innerWellGeometry: Optional[InnerLabwareGeometry] = Field(
+        ...,
+        description="A layout describing the geometry of the inside of the wells.",
+    )
+
+
+
