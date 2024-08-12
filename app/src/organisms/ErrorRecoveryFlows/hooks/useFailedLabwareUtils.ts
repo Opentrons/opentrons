@@ -62,7 +62,7 @@ export function useFailedLabwareUtils({
         failedCommandByRunRecord,
         runCommands,
       }),
-    [failedCommandByRunRecord?.error?.errorType, runCommands]
+    [failedCommandByRunRecord?.key, runCommands?.meta.totalLength]
   )
 
   const tipSelectionUtils = useTipSelectionUtils(recentRelevantFailedLabwareCmd)
@@ -74,12 +74,12 @@ export function useFailedLabwareUtils({
         recentRelevantFailedLabwareCmd,
         runRecord
       ),
-    [protocolAnalysis, recentRelevantFailedLabwareCmd, runRecord]
+    [protocolAnalysis?.id, recentRelevantFailedLabwareCmd?.key]
   )
 
   const failedLabware = React.useMemo(
     () => getFailedLabware(recentRelevantFailedLabwareCmd, runRecord),
-    [recentRelevantFailedLabwareCmd, runRecord]
+    [recentRelevantFailedLabwareCmd?.key]
   )
 
   const relevantWellName = getRelevantWellName(
