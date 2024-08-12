@@ -54,7 +54,7 @@ export interface LegacyInputFieldProps {
 }
 
 /**
- * @deprecated Use `InputField` in App/atoms instead
+ * @deprecated Use `InputField`
  */
 
 export function LegacyInputField(props: LegacyInputFieldProps): JSX.Element {
