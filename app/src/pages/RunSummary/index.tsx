@@ -157,7 +157,10 @@ export function RunSummary(): JSX.Element {
       isRunCurrent,
   })
 
-  let headerText = t('run_complete_splash')
+  let headerText =
+    commandErrorList != null && commandErrorList.data.length > 0
+      ? t('run_completed_with_warnings')
+      : t('run_completed_splash')
   if (runStatus === RUN_STATUS_FAILED) {
     headerText = t('run_failed_splash')
   } else if (runStatus === RUN_STATUS_STOPPED) {
@@ -347,6 +350,7 @@ export function RunSummary(): JSX.Element {
               setShowRunFailedModal={setShowRunFailedModal}
               errors={runRecord?.data.errors}
               commandErrorList={commandErrorList}
+              runStatus={runStatus}
             />
           ) : null}
           <Flex
@@ -414,7 +418,8 @@ export function RunSummary(): JSX.Element {
               height="17rem"
               css={showRunAgainSpinner ? RUN_AGAIN_CLICKED_STYLE : undefined}
             />
-            {!didRunSucceed ? (
+            {(commandErrorList != null && commandErrorList?.data.length > 0) ||
+            !didRunSucceed ? (
               <LargeButton
                 flex="1"
                 iconName="info"
@@ -423,8 +428,10 @@ export function RunSummary(): JSX.Element {
                 buttonText={t('view_error_details')}
                 height="17rem"
                 disabled={
-                  runRecord?.data.errors == null ||
-                  runRecord?.data.errors.length === 0
+                  (runRecord?.data.errors == null ||
+                    runRecord?.data.errors.length === 0) &&
+                  (commandErrorList == null ||
+                    commandErrorList?.data.length === 0)
                 }
               />
             ) : null}
