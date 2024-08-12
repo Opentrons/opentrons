@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { NavLink, useNavigate } from 'react-router-dom'
+import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
@@ -24,6 +24,7 @@ export function NavigationBar({
   const navRoutes = routes.filter(
     (route: RouteProps) => route.navLinkTo !== '/createNew'
   )
+  const location = useLocation()
   const dispatch: ThunkDispatch<any> = useDispatch()
   const navigate = useNavigate()
   const loadFile = (
@@ -53,11 +54,13 @@ export function NavigationBar({
           </StyledText>
         </Flex>
         <Flex gridGap={SPACING.spacing40} alignItems="center">
-          <NavbarLink key="createNew" to={'/createNew'}>
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {t('create_new_protocol')}
-            </StyledText>
-          </NavbarLink>
+          {location.pathname === '/createNew' ? null : (
+            <NavbarLink key="createNew" to={'/createNew'}>
+              <StyledText desktopStyle="bodyDefaultRegular">
+                {t('create_new_protocol')}
+              </StyledText>
+            </NavbarLink>
+          )}
           <StyledLabel>
             <StyledText desktopStyle="bodyLargeRegular" color={COLORS.grey60}>
               {t('import')}
@@ -68,18 +71,20 @@ export function NavigationBar({
       </Flex>
       {/* TODO(ja, 8/12/24: delete later. Leaving access to other
       routes at all times until we make breadcrumbs and protocol overview pg */}
-      <Flex
-        backgroundColor={COLORS.blue20}
-        padding={`${SPACING.spacing12} ${SPACING.spacing40}`}
-        gridGap={SPACING.spacing40}
-      >
-        TODO add breadcrumbs here
-        {navRoutes.map(({ name, navLinkTo }: RouteProps) => (
-          <NavbarLink key={name} to={navLinkTo}>
-            <StyledText desktopStyle="bodyDefaultRegular">{name}</StyledText>
-          </NavbarLink>
-        ))}
-      </Flex>
+      {location.pathname === '/createNew' ? null : (
+        <Flex
+          backgroundColor={COLORS.blue20}
+          padding={`${SPACING.spacing12} ${SPACING.spacing40}`}
+          gridGap={SPACING.spacing40}
+        >
+          TODO add breadcrumbs here
+          {navRoutes.map(({ name, navLinkTo }: RouteProps) => (
+            <NavbarLink key={name} to={navLinkTo}>
+              <StyledText desktopStyle="bodyDefaultRegular">{name}</StyledText>
+            </NavbarLink>
+          ))}
+        </Flex>
+      )}
     </Flex>
   )
 }
