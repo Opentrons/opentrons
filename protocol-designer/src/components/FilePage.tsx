@@ -13,7 +13,7 @@ import {
   InstrumentGroup,
   OutlineButton,
   DeprecatedPrimaryButton,
-  InputField,
+  LegacyInputField,
 } from '@opentrons/components'
 import { resetScrollElements } from '../ui/steps/utils'
 import { EditModulesCard } from './modules'
@@ -149,7 +149,7 @@ export const FilePage = (): JSX.Element => {
                 control={control}
                 name="protocolName"
                 render={({ field }) => (
-                  <InputField
+                  <LegacyInputField
                     placeholder="Untitled"
                     name="protocolName"
                     value={protocolName}
@@ -170,7 +170,7 @@ export const FilePage = (): JSX.Element => {
                 control={control}
                 name="author"
                 render={({ field }) => (
-                  <InputField
+                  <LegacyInputField
                     name="author"
                     value={author}
                     onChange={field.onChange}
@@ -191,7 +191,7 @@ export const FilePage = (): JSX.Element => {
               control={control}
               name="description"
               render={({ field }) => (
-                <InputField
+                <LegacyInputField
                   name="description"
                   value={description}
                   onChange={field.onChange}

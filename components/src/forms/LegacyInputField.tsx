@@ -8,7 +8,7 @@ export const INPUT_TYPE_PASSWORD: 'password' = 'password'
 
 // TODO: Ian 2018-09-14 remove 'label' prop when IngredientPropertiesForm gets updated
 
-export interface InputFieldProps {
+export interface LegacyInputFieldProps {
   /** field is disabled if value is true */
   disabled?: boolean
   /** change handler */
@@ -57,7 +57,7 @@ export interface InputFieldProps {
  * @deprecated Use `InputField` in App/atoms instead
  */
 
-export function InputField(props: InputFieldProps): JSX.Element {
+export function LegacyInputField(props: LegacyInputFieldProps): JSX.Element {
   const error = props.error != null
   const labelClass = cx(styles.form_field, props.className, {
     [styles.error]: error,
@@ -88,7 +88,7 @@ export function InputField(props: InputFieldProps): JSX.Element {
 }
 
 // TODO(mc, 2018-02-21): maybe simplify further and split out?
-function Input(props: InputFieldProps): JSX.Element {
+function Input(props: LegacyInputFieldProps): JSX.Element {
   const error = props.error != null
   const value = props.isIndeterminate ? '' : props.value ?? ''
   const placeHolder = props.isIndeterminate ? '-' : props.placeholder

@@ -6,7 +6,7 @@ import {
   AlertModal,
   FormGroup,
   RadioGroup,
-  InputField,
+  LegacyInputField,
   Flex,
   useHoverTooltip,
   Tooltip,
@@ -147,7 +147,7 @@ export const FlowRateInput = (props: FlowRateInputProps): JSX.Element => {
   }
 
   const FlowRateInputField = (
-    <InputField
+    <LegacyInputField
       disabled={disabled}
       caption={rangeDescription}
       error={errorMessage}
@@ -215,7 +215,7 @@ export const FlowRateInput = (props: FlowRateInputProps): JSX.Element => {
     <>
       {flowRateType === 'blowout' ? (
         <Flex {...targetProps}>
-          <InputField
+          <LegacyInputField
             className={className || stepFormStyles.small_field}
             disabled={disabled}
             isIndeterminate={isIndeterminate}
@@ -229,7 +229,7 @@ export const FlowRateInput = (props: FlowRateInputProps): JSX.Element => {
         </Flex>
       ) : (
         <FormGroup label={label || DEFAULT_LABEL} disabled={disabled}>
-          <InputField
+          <LegacyInputField
             className={className || stepFormStyles.small_field}
             disabled={disabled}
             isIndeterminate={isIndeterminate}

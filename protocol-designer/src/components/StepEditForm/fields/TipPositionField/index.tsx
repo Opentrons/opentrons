@@ -6,7 +6,7 @@ import {
   Flex,
   FormGroup,
   Icon,
-  InputField,
+  LegacyInputField,
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
@@ -185,7 +185,7 @@ export function TipPositionField(props: TipPositionFieldProps): JSX.Element {
             />
           </Flex>
         ) : (
-          <InputField
+          <LegacyInputField
             disabled={disabled}
             className={stepFormStyles.small_field}
             readOnly

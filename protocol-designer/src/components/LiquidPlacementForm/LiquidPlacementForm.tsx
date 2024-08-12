@@ -11,7 +11,7 @@ import {
   FormGroup,
   OutlineButton,
   DeprecatedPrimaryButton,
-  InputField,
+  LegacyInputField,
 } from '@opentrons/components'
 import styles from './LiquidPlacementForm.module.css'
 import formStyles from '../forms/forms.module.css'
@@ -212,7 +212,7 @@ export const LiquidPlacementForm = (): JSX.Element | null => {
                 required: true,
               }}
               render={({ field }) => (
-                <InputField
+                <LegacyInputField
                   name="volume"
                   units={t('application:units.microliter')}
                   value={volume}

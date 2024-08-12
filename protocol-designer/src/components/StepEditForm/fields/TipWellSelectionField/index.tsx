@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { createPortal } from 'react-dom'
-import { FormGroup, InputField } from '@opentrons/components'
+import { FormGroup, LegacyInputField } from '@opentrons/components'
 import { getPipetteEntities } from '../../../../step-forms/selectors'
 import { getNozzleType } from '../../utils'
 import { getMainPagePortalEl } from '../../../portals/MainPageModalPortal'
@@ -68,7 +68,7 @@ export function TipWellSelectionField(
         label={t('step_edit_form.wellSelectionLabel.wells')}
         className={styles.small_field}
       >
-        <InputField
+        <LegacyInputField
           readOnly
           error={errorToShow}
           name={name}
