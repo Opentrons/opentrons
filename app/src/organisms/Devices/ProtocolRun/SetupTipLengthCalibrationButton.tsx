@@ -2,17 +2,16 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
+  ALIGN_CENTER,
   Box,
+  COLORS,
   Flex,
   Link,
-  Tooltip,
-  useHoverTooltip,
-  ALIGN_CENTER,
-  SIZE_4,
   TEXT_ALIGN_CENTER,
   TOOLTIP_LEFT,
-  COLORS,
+  Tooltip,
   TYPOGRAPHY,
+  useHoverTooltip,
 } from '@opentrons/components'
 import {
   useAllPipetteOffsetCalibrationsQuery,
@@ -97,7 +96,7 @@ export function SetupTipLengthCalibrationButton({
       </Box>
       <Tooltip {...tooltipProps}>
         {
-          <Box width={SIZE_4} textAlign={TEXT_ALIGN_CENTER}>
+          <Box width="8rem" textAlign={TEXT_ALIGN_CENTER}>
             {isDeckCalibrated
               ? t('recalibrating_tip_length_not_available')
               : t('calibrate_deck_to_proceed_to_tip_length_calibration')}
@@ -146,7 +145,7 @@ export function SetupTipLengthCalibrationButton({
             {!isDeckCalibrated ? (
               <Tooltip {...tooltipProps}>
                 {
-                  <Box width={SIZE_4}>
+                  <Box width="8rem">
                     {t('calibrate_deck_to_proceed_to_tip_length_calibration')}
                   </Box>
                 }

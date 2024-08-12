@@ -18,7 +18,7 @@ export interface LegacyTooltipProps extends StyleProps {
   /** Contents of the tooltip */
   children?: React.ReactNode
   /**
-   * Tooltip element ID (provided by useTooltip). Will match
+   * LegacyTooltip element ID (provided by useTooltip). Will match
    * targetProps.aria-describedby
    */
   id: string
@@ -33,7 +33,7 @@ export interface LegacyTooltipProps extends StyleProps {
 }
 
 /**
- * Tooltip component that renders based on its `visible` prop. For use with the
+ * LegacyTooltip component that renders based on its `visible` prop. For use with the
  * `useTooltip` and `useHoverTooltip` hooks. See examples in `Tooltip.md`.
  */
 export const LegacyTooltip = React.forwardRef(function TooltipComponent(

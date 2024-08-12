@@ -3,10 +3,11 @@ import {
   getTiprackVolume,
   getLabwareDefURI,
 } from '@opentrons/shared-data'
+
 import type { PipetteName } from '@opentrons/shared-data'
-import type { Options } from '@opentrons/components'
+import type { Options, LegacyDropdownOption } from '@opentrons/components'
 import type { LabwareEntities, PipetteEntity } from '@opentrons/step-generation'
-import type { DropdownOption } from '../../../components/lib/forms/DropdownField.d'
+
 const supportedPipetteNames: PipetteName[] = [
   'p10_single',
   'p10_multi',
@@ -28,8 +29,9 @@ export const pipetteOptions: Options = supportedPipetteNames
         }
       : null
   })
-  .filter<DropdownOption>(
-    (option: DropdownOption | null): option is DropdownOption => Boolean(option)
+  .filter<LegacyDropdownOption>(
+    (option: LegacyDropdownOption | null): option is LegacyDropdownOption =>
+      Boolean(option)
   )
 
 // NOTE: this is similar to getPipetteWithTipMaxVol, the fns

@@ -16,10 +16,10 @@ import {
   POSITION_RELATIVE,
   SPACING,
   TYPOGRAPHY,
+  useMenuHandleClickOutside,
 } from '@opentrons/components'
 import flexGripper from '../../assets/images/flex_gripper.png'
 
-import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 import { MenuOverlay } from './MenuOverlay'
 
 import type { InstrumentDiagramProps, StyleProps } from '@opentrons/components'

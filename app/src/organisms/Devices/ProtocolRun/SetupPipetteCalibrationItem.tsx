@@ -1,23 +1,24 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link as RRDLink } from 'react-router-dom'
+
 import {
-  Box,
-  Flex,
-  Tooltip,
-  useHoverTooltip,
   ALIGN_CENTER,
+  Box,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  SIZE_4,
-  TOOLTIP_LEFT,
-  TYPOGRAPHY,
-  Link,
-  COLORS,
-  SPACING,
+  Flex,
   JUSTIFY_FLEX_END,
+  Link,
+  SPACING,
+  TOOLTIP_LEFT,
+  Tooltip,
+  TYPOGRAPHY,
+  useHoverTooltip,
   WRAP,
 } from '@opentrons/components'
+
 import { TertiaryButton } from '../../../atoms/buttons'
 import { Banner } from '../../../atoms/Banner'
 import * as PipetteConstants from '../../../redux/pipettes/constants'
@@ -124,7 +125,7 @@ export function SetupPipetteCalibrationItem({
           </RRDLink>
           {!isDeckCalibrated ? (
             <Tooltip {...tooltipProps}>
-              <Box width={SIZE_4}>
+              <Box width="8rem">
                 {t('calibrate_deck_to_proceed_to_pipette_calibration')}
               </Box>
             </Tooltip>

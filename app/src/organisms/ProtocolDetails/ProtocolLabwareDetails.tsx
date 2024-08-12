@@ -16,13 +16,13 @@ import {
   POSITION_RELATIVE,
   SPACING,
   StyledText,
+  useMenuHandleClickOutside,
 } from '@opentrons/components'
 import { getLabwareDefURI } from '@opentrons/shared-data'
 
 import { Divider } from '../../atoms/structure'
 import { getTopPortalEl } from '../../App/portal'
 import { LabwareDetails } from '../LabwareDetails'
-import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 
 import type { LoadLabwareRunTimeCommand } from '@opentrons/shared-data'
 import type { LabwareDefAndDate } from '../../pages/Labware/hooks'

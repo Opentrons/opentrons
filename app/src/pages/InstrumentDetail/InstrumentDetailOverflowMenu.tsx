@@ -1,13 +1,16 @@
 import * as React from 'react'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 import { useTranslation } from 'react-i18next'
+
 import {
   ALIGN_CENTER,
   COLORS,
   Flex,
   Icon,
-  SPACING,
   LegacyStyledText,
+  MenuItem,
+  MenuList,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -18,8 +21,6 @@ import {
 } from '@opentrons/shared-data'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
-import { MenuList } from '../../atoms/MenuList'
-import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { PipetteWizardFlows } from '../../organisms/PipetteWizardFlows'
 import { GripperWizardFlows } from '../../organisms/GripperWizardFlows'
 import {

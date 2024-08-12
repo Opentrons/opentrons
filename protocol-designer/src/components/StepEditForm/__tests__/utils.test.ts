@@ -1,16 +1,19 @@
 import { describe, expect, it, beforeEach } from 'vitest'
+
 import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
   DEST_WELL_BLOWOUT_DESTINATION,
 } from '@opentrons/step-generation'
+
 import { getBlowoutLocationOptionsForForm } from '../utils'
-import type { DropdownOption } from '@opentrons/components'
+
+import type { LegacyDropdownOption } from '@opentrons/components'
 
 describe('getBlowoutLocationOptionsForForm', () => {
-  let destOption: DropdownOption
-  let sourceOption: DropdownOption
-  let disabledSourceOption: DropdownOption
-  let disabledDestOption: DropdownOption
+  let destOption: LegacyDropdownOption
+  let sourceOption: LegacyDropdownOption
+  let disabledSourceOption: LegacyDropdownOption
+  let disabledDestOption: LegacyDropdownOption
   const sourceName = 'Source Well'
   const destName = 'Destination Well'
 
