@@ -40,6 +40,7 @@ import {
   useDeleteRunMutation,
   useRunCommandErrors,
 } from '@opentrons/react-api-client'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { LargeButton } from '../../atoms/buttons'
 import {
@@ -64,12 +65,13 @@ import { getLocalRobot } from '../../redux/discovery'
 import { RunFailedModal } from '../../organisms/OnDeviceDisplay/RunningProtocol'
 import { formatTimeWithUtcLabel, useNotifyRunQuery } from '../../resources/runs'
 import { handleTipsAttachedModal } from '../../organisms/DropTipWizardFlows/TipsAttachedModal'
-import { useMostRecentRunId } from '../../organisms/ProtocolUpload/hooks/useMostRecentRunId'
 import { useTipAttachmentStatus } from '../../organisms/DropTipWizardFlows'
 import { useRecoveryAnalytics } from '../../organisms/ErrorRecoveryFlows/hooks'
 
 import type { OnDeviceRouteParams } from '../../App/types'
 import type { PipetteWithTip } from '../../organisms/DropTipWizardFlows'
+
+const CURRENT_RUN_POLL_MS = 5000
 
 export function RunSummary(): JSX.Element {
   const { runId } = useParams<
@@ -79,8 +81,10 @@ export function RunSummary(): JSX.Element {
   const navigate = useNavigate()
   const host = useHost()
   const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
-  const isRunCurrent = Boolean(runRecord?.data?.current)
-  const mostRecentRunId = useMostRecentRunId()
+  const isRunCurrent = Boolean(
+    useNotifyRunQuery(runId, { refetchInterval: CURRENT_RUN_POLL_MS })?.data
+      ?.data?.current
+  )
   const { deleteRun } = useDeleteRunMutation()
   const runStatus = runRecord?.data.status ?? null
   const didRunSucceed = runStatus === RUN_STATUS_SUCCEEDED
@@ -222,25 +226,39 @@ export function RunSummary(): JSX.Element {
   }
 
   const handleReturnToDash = (aPipetteWithTip: PipetteWithTip | null): void => {
-    if (mostRecentRunId === runId && aPipetteWithTip != null) {
+    if (isRunCurrent && aPipetteWithTip != null) {
       void handleTipsAttachedModal({
         setTipStatusResolved: setTipStatusResolvedAndRoute(handleReturnToDash),
         host,
         aPipetteWithTip,
+        instrumentModelSpecs: aPipetteWithTip.specs,
+        mount: aPipetteWithTip.mount,
+        robotType: FLEX_ROBOT_TYPE,
+        onClose: () => {
+          closeCurrentRun()
+          returnToDash()
+        },
       })
     } else if (isQuickTransfer) {
       returnToQuickTransfer()
     } else {
+      closeCurrentRun()
       returnToDash()
     }
   }
 
   const handleRunAgain = (aPipetteWithTip: PipetteWithTip | null): void => {
-    if (mostRecentRunId === runId && aPipetteWithTip != null) {
+    if (isRunCurrent && aPipetteWithTip != null) {
       void handleTipsAttachedModal({
         setTipStatusResolved: setTipStatusResolvedAndRoute(handleRunAgain),
         host,
         aPipetteWithTip,
+        instrumentModelSpecs: aPipetteWithTip.specs,
+        mount: aPipetteWithTip.mount,
+        robotType: FLEX_ROBOT_TYPE,
+        onClose: () => {
+          runAgain()
+        },
       })
     } else {
       if (!isResetRunLoading) {

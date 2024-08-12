@@ -1,7 +1,7 @@
 // This is the main unifying function for maintenanceRun and fixit type flows.
 import * as React from 'react'
 
-import { useDropTipCommandErrors } from '../errors'
+import { useDropTipCommandErrors } from '.'
 import { useDropTipMaintenanceRun } from './useDropTipMaintenanceRun'
 import { useDropTipCreateCommands } from './useDropTipCreateCommands'
 import {
@@ -9,10 +9,10 @@ import {
   buildLoadPipetteCommand,
 } from './useDropTipCommands'
 
-import type { SetRobotErrorDetailsParams } from '../errors'
+import type { SetRobotErrorDetailsParams } from '.'
 import type { UseDropTipCommandsResult } from './useDropTipCommands'
-import type { ErrorDetails, IssuedCommandsType } from '../../types'
-import type { DropTipWizardFlowsProps } from '../..'
+import type { ErrorDetails, IssuedCommandsType } from '../types'
+import type { DropTipWizardFlowsProps } from '..'
 import type { UseDropTipCreateCommandsResult } from './useDropTipCreateCommands'
 
 export type UseDTWithTypeParams = DropTipWizardFlowsProps & {
@@ -120,7 +120,7 @@ function useRegisterPipetteFixitType({
 }: UseRegisterPipetteFixitType): void {
   React.useEffect(() => {
     if (issuedCommandsType === 'fixit') {
-      const command = buildLoadPipetteCommand(mount, instrumentModelSpecs.name)
+      const command = buildLoadPipetteCommand(instrumentModelSpecs.name, mount)
       void chainRunCommands([command], true)
     }
   }, [])

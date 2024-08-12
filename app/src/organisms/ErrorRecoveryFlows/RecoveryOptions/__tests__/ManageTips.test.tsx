@@ -96,14 +96,14 @@ describe('ManageTips', () => {
       /Homing the .* pipette with liquid in the tips may damage it\. You must remove all tips before using the pipette again\./
     )
     screen.queryAllByText('Begin removal')
-    screen.queryAllByText('Skip')
+    screen.queryAllByText('Skip and home pipette')
   })
 
   it('routes correctly when continuing on BeginRemoval', () => {
     render(props)
 
     const beginRemovalBtn = screen.queryAllByText('Begin removal')[0]
-    const skipBtn = screen.queryAllByText('Skip')[0]
+    const skipBtn = screen.queryAllByText('Skip and home pipette')[0]
 
     fireEvent.click(beginRemovalBtn)
     clickButtonLabeled('Begin removal')
@@ -111,7 +111,7 @@ describe('ManageTips', () => {
     expect(mockProceedNextStep).toHaveBeenCalled()
 
     fireEvent.click(skipBtn)
-    clickButtonLabeled('Skip')
+    clickButtonLabeled('Skip and home pipette')
 
     expect(mockSetRobotInMotion).toHaveBeenCalled()
   })
@@ -125,10 +125,10 @@ describe('ManageTips', () => {
     }
     render(props)
 
-    const skipBtn = screen.queryAllByText('Skip')[0]
+    const skipBtn = screen.queryAllByText('Skip and home pipette')[0]
 
     fireEvent.click(skipBtn)
-    clickButtonLabeled('Skip')
+    clickButtonLabeled('Skip and home pipette')
 
     expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
       RETRY_NEW_TIPS.ROUTE,
