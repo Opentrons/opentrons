@@ -6,7 +6,7 @@ import {
   AlertModal,
   DIRECTION_COLUMN,
   Flex,
-  InputField,
+  LegacyInputField,
   RadioGroup,
   SPACING,
   LegacyStyledText,
@@ -245,7 +245,7 @@ export const TipPositionModal = (
         <LegacyStyledText as="label" paddingLeft={SPACING.spacing24}>
           {t('tip_position.field_titles.x_position')}
         </LegacyStyledText>
-        <InputField
+        <LegacyInputField
           caption={t('tip_position.caption', {
             min: roundedXMin,
             max: roundedXMax,
@@ -267,7 +267,7 @@ export const TipPositionModal = (
         <LegacyStyledText as="label" paddingLeft={SPACING.spacing24}>
           {t('tip_position.field_titles.y_position')}
         </LegacyStyledText>
-        <InputField
+        <LegacyInputField
           caption={t('tip_position.caption', {
             min: roundedYMin,
             max: roundedYMax,
@@ -285,7 +285,7 @@ export const TipPositionModal = (
         <LegacyStyledText as="label" paddingLeft={SPACING.spacing24}>
           {t('tip_position.field_titles.z_position')}
         </LegacyStyledText>
-        <InputField
+        <LegacyInputField
           caption={t('tip_position.caption', {
             min: minMmFromBottom,
             max: maxMmFromBottom,

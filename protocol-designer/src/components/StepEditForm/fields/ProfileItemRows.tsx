@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux'
 import cx from 'classnames'
 import {
   Icon,
-  InputField,
+  LegacyInputField,
   OutlineButton,
   Tooltip,
   useConditionalConfirm,
@@ -270,7 +270,7 @@ const ProfileField = (props: ProfileFieldProps): JSX.Element => {
   }
   return (
     <div className={styles.step_input_wrapper}>
-      <InputField
+      <LegacyInputField
         className={cx(styles.step_input, className)}
         error={errorToShow}
         units={units}
