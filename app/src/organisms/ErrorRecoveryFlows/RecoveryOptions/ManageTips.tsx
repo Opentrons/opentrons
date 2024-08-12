@@ -24,7 +24,6 @@ import { DropTipWizardFlows } from '../../DropTipWizardFlows'
 import { DT_ROUTES } from '../../DropTipWizardFlows/constants'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
-import type { PipettingRunTimeCommand } from '@opentrons/shared-data'
 import type { PipetteWithTip } from '../../DropTipWizardFlows'
 import type { RecoveryContentProps, RecoveryRoute, RouteStep } from '../types'
 import type { FixitCommandTypeUtils } from '../../DropTipWizardFlows/types'
