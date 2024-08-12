@@ -6,7 +6,7 @@ import { ProtocolOverview } from './pages/ProtocolOverview'
 import { Liquids } from './pages/Liquids'
 import { StartingDeckState } from './pages/StartingDeckState'
 import { ProtocolSteps } from './pages/ProtocolSteps'
-import { CreateNewProtocol } from './pages/CreateNewProtocol'
+import { CreateNewProtocolWizard } from './pages/CreateNewProtocolWizard'
 import { Navbar } from './Navbar'
 
 import type { RouteProps } from './types'
@@ -38,7 +38,7 @@ const pdRoutes: RouteProps[] = [
     path: '/steps',
   },
   {
-    Component: CreateNewProtocol,
+    Component: CreateNewProtocolWizard,
     name: 'Create new protocol',
     navLinkTo: '/createNew',
     path: '/createNew',

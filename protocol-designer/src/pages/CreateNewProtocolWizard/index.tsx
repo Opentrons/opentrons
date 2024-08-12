@@ -1,123 +1,172 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
+import * as Yup from 'yup'
 import reduce from 'lodash/reduce'
-import mapValues from 'lodash/mapValues'
-import { useForm } from 'react-hook-form'
-import { yupResolver } from '@hookform/resolvers/yup'
 import omit from 'lodash/omit'
 import uniq from 'lodash/uniq'
-import * as Yup from 'yup'
-import { ModalShell } from '@opentrons/components'
+import mapValues from 'lodash/mapValues'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { useDispatch, useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
+import { useForm } from 'react-hook-form'
+import { useNavigate } from 'react-router-dom'
 import {
+  FLEX_ROBOT_TYPE,
+  HEATERSHAKER_MODULE_TYPE,
+  MAGNETIC_BLOCK_TYPE,
+  MAGNETIC_MODULE_TYPE,
   OT2_ROBOT_TYPE,
   TEMPERATURE_MODULE_TYPE,
-  HEATERSHAKER_MODULE_TYPE,
-  MAGNETIC_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
-  FLEX_ROBOT_TYPE,
   WASTE_CHUTE_CUTOUT,
   getAreSlotsAdjacent,
-  MAGNETIC_BLOCK_TYPE,
 } from '@opentrons/shared-data'
-import { actions as stepFormActions } from '../../../step-forms'
-import { INITIAL_DECK_SETUP_STEP_ID } from '../../../constants'
-import { uuid } from '../../../utils'
-import { actions as navigationActions } from '../../../navigation'
-import { getNewProtocolModal } from '../../../navigation/selectors'
+import { Box, COLORS } from '@opentrons/components'
 import {
   actions as fileActions,
   selectors as loadFileSelectors,
-} from '../../../load-file'
-import * as labwareDefSelectors from '../../../labware-defs/selectors'
-import * as labwareDefActions from '../../../labware-defs/actions'
-import * as labwareIngredActions from '../../../labware-ingred/actions'
-import { actions as steplistActions } from '../../../steplist'
+} from '../../load-file'
+import { uuid } from '../../utils'
+import * as labwareDefSelectors from '../../labware-defs/selectors'
+import * as labwareDefActions from '../../labware-defs/actions'
+import * as labwareIngredActions from '../../labware-ingred/actions'
+import { actions as steplistActions } from '../../steplist'
+import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
+import { actions as stepFormActions } from '../../step-forms'
+import { createModuleWithNoSlot } from '../../modules'
 import {
   createDeckFixture,
   toggleIsGripperRequired,
-} from '../../../step-forms/actions/additionalItems'
-import { createModuleWithNoSlot } from '../../../modules'
-import { RobotTypeTile } from './RobotTypeTile'
-import { MetadataTile } from './MetadataTile'
-import { FirstPipetteTypeTile, SecondPipetteTypeTile } from './PipetteTypeTile'
-import { FirstPipetteTipsTile, SecondPipetteTipsTile } from './PipetteTipsTile'
-import { ModulesAndOtherTile } from './ModulesAndOtherTile'
-import { WizardHeader } from './WizardHeader'
-import { StagingAreaTile } from './StagingAreaTile'
-import { getTrashSlot } from './utils'
+} from '../../step-forms/actions/additionalItems'
+import { SelectRobot } from './SelectRobot'
+import { SelectPipettes } from './SelectPipettes'
+import { SelectGripper } from './SelectGripper'
+import { SelectModules } from './SelectModules'
+import { SelectFixtures } from './SelectFixtures'
+import { AddMetadata } from './AddMetadata'
 
+import type { ThunkDispatch } from 'redux-thunk'
+import type { NormalizedPipette } from '@opentrons/step-generation'
+import type { BaseState } from '../../types'
 import type {
-  ModuleType,
+  FormPipette,
+  FormPipettesByMount,
+  PipetteOnDeck,
+} from '../../step-forms'
+import type {
   ModuleModel,
+  ModuleType,
   PipetteName,
 } from '@opentrons/shared-data'
-import type { NormalizedPipette } from '@opentrons/step-generation'
-import type { ThunkDispatch } from 'redux-thunk'
-import type {
-  FormPipettesByMount,
-  FormPipette,
-  PipetteOnDeck,
-} from '../../../step-forms'
-import type { BaseState } from '../../../types'
-import type { FormState } from './types'
+import type { WizardFormState } from './types'
 
 type WizardStep =
-  | 'robotType'
+  | 'robot'
+  | 'pipette'
+  | 'gripper'
+  | 'modules'
+  | 'fixtures'
   | 'metadata'
-  | 'first_pipette_type'
-  | 'first_pipette_tips'
-  | 'second_pipette_type'
-  | 'second_pipette_tips'
-  | 'staging_area'
-  | 'modulesAndOther'
 const WIZARD_STEPS: WizardStep[] = [
-  'robotType',
+  'robot',
+  'pipette',
+  'gripper',
+  'modules',
+  'fixtures',
   'metadata',
-  'first_pipette_type',
-  'first_pipette_tips',
-  'second_pipette_type',
-  'second_pipette_tips',
-  'staging_area',
-  'modulesAndOther',
 ]
 const WIZARD_STEPS_OT2: WizardStep[] = [
-  'robotType',
+  'robot',
+  'pipette',
+  'modules',
   'metadata',
-  'first_pipette_type',
-  'first_pipette_tips',
-  'second_pipette_type',
-  'second_pipette_tips',
-  'modulesAndOther',
 ]
-export const adapter96ChannelDefUri =
-  'opentrons/opentrons_flex_96_tiprack_adapter/1'
 
-export function CreateFileWizard(): JSX.Element | null {
+const adapter96ChannelDefUri = 'opentrons/opentrons_flex_96_tiprack_adapter/1'
+
+type PipetteFieldsData = Omit<
+  PipetteOnDeck,
+  'id' | 'spec' | 'tiprackLabwareDef'
+>
+
+interface ModuleCreationArgs {
+  type: ModuleType
+  model: ModuleModel
+  slot: string
+}
+
+const initialFormState: WizardFormState = {
+  fields: {
+    name: undefined,
+    description: undefined,
+    organizationOrAuthor: undefined,
+    robotType: undefined,
+  },
+  pipettesByMount: {
+    left: { pipetteName: undefined, tiprackDefURI: undefined },
+    right: { pipetteName: undefined, tiprackDefURI: undefined },
+  },
+  modules: {},
+  //  defaulting to selecting trashBin already to avoid user having to
+  //  click to add a trash bin/waste chute. Delete once we support returnTip()
+  additionalEquipment: ['trashBin'],
+}
+
+const pipetteValidationShape = Yup.object().shape({
+  pipetteName: Yup.string().nullable(),
+  tiprackDefURI: Yup.array()
+    .of(Yup.string())
+    .nullable()
+    .when('pipetteName', {
+      is: (val: string | null): boolean => Boolean(val),
+      then: schema => schema.required('Required'),
+      otherwise: schema => schema.nullable(),
+    }),
+})
+const moduleValidationShape: any = Yup.object().shape({
+  type: Yup.string(),
+  model: Yup.string(),
+  slot: Yup.string(),
+})
+
+const validationSchema: any = Yup.object().shape({
+  fields: Yup.object().shape({
+    name: Yup.string().required('Required'),
+  }),
+  pipettesByMount: Yup.object()
+    .shape({
+      left: pipetteValidationShape,
+      right: pipetteValidationShape,
+    })
+    .test('pipette-is-required', 'a pipette is required', value =>
+      //  @ts-expect-error todo: fix this
+      Object.keys(value).some((val: string) => value[val].pipetteName)
+    ),
+  modulesByType: Yup.object().shape({
+    [MAGNETIC_MODULE_TYPE]: moduleValidationShape,
+    [TEMPERATURE_MODULE_TYPE]: moduleValidationShape,
+    [THERMOCYCLER_MODULE_TYPE]: moduleValidationShape,
+    [HEATERSHAKER_MODULE_TYPE]: moduleValidationShape,
+    [MAGNETIC_BLOCK_TYPE]: moduleValidationShape,
+  }),
+})
+
+export function CreateNewProtocolWizard(): JSX.Element | null {
   const { t } = useTranslation(['modal', 'alert'])
-  const showWizard = useSelector(getNewProtocolModal)
   const hasUnsavedChanges = useSelector(loadFileSelectors.getHasUnsavedChanges)
   const customLabware = useSelector(
     labwareDefSelectors.getCustomLabwareDefsByURI
   )
+  const navigate = useNavigate()
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
   const [wizardSteps, setWizardSteps] = React.useState<WizardStep[]>(
     WIZARD_STEPS
   )
 
-  React.useEffect(() => {
-    // re-initialize wizard step count when modal is closed
-    if (!showWizard && currentStepIndex > 0) {
-      setCurrentStepIndex(0)
-    }
-  }, [showWizard])
-
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
 
-  const handleCancel = (): void => {
-    dispatch(navigationActions.toggleNewProtocolModal(false))
-  }
-  const createProtocolFile = (values: FormState): void => {
+  const createProtocolFile = (values: WizardFormState): void => {
+    navigate('/overview')
+
     const pipettes = reduce<FormPipettesByMount, PipetteFieldsData[]>(
       values.pipettesByMount,
       (acc, formPipette: FormPipette, mount): PipetteFieldsData[] => {
@@ -216,7 +265,8 @@ export function CreateFileWizard(): JSX.Element | null {
           createDeckFixture(
             'trashBin',
             values.fields.robotType === FLEX_ROBOT_TYPE
-              ? getTrashSlot(values)
+              ? //  TODO(ja, 8/9/24): add logic for which trash location for flex to default to
+                'cutoutA3'
               : 'cutout12'
           )
         )
@@ -303,14 +353,7 @@ export function CreateFileWizard(): JSX.Element | null {
       })
     }
   }
-  const wizardHeader = (
-    <WizardHeader
-      title={t('create_new_protocol')}
-      currentStep={currentStepIndex}
-      totalSteps={wizardSteps.length - 1}
-      onExit={handleCancel}
-    />
-  )
+
   const currentWizardStep = wizardSteps[currentStepIndex]
   const goBack = (stepsBack: number = 1): void => {
     if (currentStepIndex >= 0 + stepsBack) {
@@ -323,8 +366,8 @@ export function CreateFileWizard(): JSX.Element | null {
     }
   }
 
-  return showWizard ? (
-    <ModalShell width="48rem" header={wizardHeader}>
+  return (
+    <Box backgroundColor={COLORS.grey20}>
       <CreateFileForm
         currentWizardStep={currentWizardStep}
         createProtocolFile={createProtocolFile}
@@ -332,79 +375,13 @@ export function CreateFileWizard(): JSX.Element | null {
         goBack={goBack}
         setWizardSteps={setWizardSteps}
       />
-    </ModalShell>
-  ) : null
+    </Box>
+  )
 }
-
-type PipetteFieldsData = Omit<
-  PipetteOnDeck,
-  'id' | 'spec' | 'tiprackLabwareDef'
->
-
-interface ModuleCreationArgs {
-  type: ModuleType
-  model: ModuleModel
-  slot: string
-}
-
-const initialFormState: FormState = {
-  fields: {
-    name: undefined,
-    description: undefined,
-    organizationOrAuthor: undefined,
-    robotType: OT2_ROBOT_TYPE,
-  },
-  pipettesByMount: {
-    left: { pipetteName: undefined, tiprackDefURI: undefined },
-    right: { pipetteName: undefined, tiprackDefURI: undefined },
-  },
-  modules: {},
-  //  defaulting to selecting trashBin already to avoid user having to
-  //  click to add a trash bin/waste chute. Delete once we support returnTip()
-  additionalEquipment: ['trashBin'],
-}
-
-const pipetteValidationShape = Yup.object().shape({
-  pipetteName: Yup.string().nullable(),
-  tiprackDefURI: Yup.array()
-    .of(Yup.string())
-    .nullable()
-    .when('pipetteName', {
-      is: (val: string | null): boolean => Boolean(val),
-      then: schema => schema.required('Required'),
-      otherwise: schema => schema.nullable(),
-    }),
-})
-// any typing this because TS says there are too many possibilities of what this could be
-const moduleValidationShape: any = Yup.object().shape({
-  type: Yup.string(),
-  model: Yup.string(),
-  slot: Yup.string(),
-})
-
-const validationSchema: any = Yup.object().shape({
-  fields: Yup.object().shape({
-    name: Yup.string().required('Required'),
-  }),
-  pipettesByMount: Yup.object()
-    .shape({
-      left: pipetteValidationShape,
-      right: pipetteValidationShape,
-    })
-    .test('pipette-is-required', 'a pipette is required', value =>
-      // @ts-expect-error(sa, 2021-6-21): TS not extracting type of value properly
-      Object.keys(value).some((val: string) => value[val].pipetteName)
-    ),
-  modulesByType: Yup.object().shape({
-    [MAGNETIC_MODULE_TYPE]: moduleValidationShape,
-    [TEMPERATURE_MODULE_TYPE]: moduleValidationShape,
-    [THERMOCYCLER_MODULE_TYPE]: moduleValidationShape,
-  }),
-})
 
 interface CreateFileFormProps {
   currentWizardStep: WizardStep
-  createProtocolFile: (values: FormState) => void
+  createProtocolFile: (values: WizardFormState) => void
   goBack: () => void
   proceed: () => void
   setWizardSteps: React.Dispatch<React.SetStateAction<WizardStep[]>>
@@ -418,7 +395,7 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
     goBack,
     setWizardSteps,
   } = props
-  const { ...formProps } = useForm<FormState>({
+  const { ...formProps } = useForm<WizardFormState>({
     defaultValues: initialFormState,
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     resolver: yupResolver(validationSchema),
@@ -436,9 +413,9 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
     <form onSubmit={formProps.handleSubmit(() => {})}>
       {(() => {
         switch (currentWizardStep) {
-          case 'robotType':
+          case 'robot':
             return (
-              <RobotTypeTile
+              <SelectRobot
                 {...formProps}
                 goBack={goBack}
                 proceed={() => {
@@ -449,31 +426,17 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
                 }}
               />
             )
+          case 'pipette':
+            return <SelectPipettes {...{ ...formProps, proceed, goBack }} />
+          case 'gripper':
+            return <SelectGripper {...{ ...formProps, proceed, goBack }} />
+          case 'modules':
+            return <SelectModules {...{ ...formProps, proceed, goBack }} />
+          case 'fixtures':
+            return <SelectFixtures {...{ ...formProps, proceed, goBack }} />
           case 'metadata':
             return (
-              <MetadataTile {...formProps} proceed={proceed} goBack={goBack} />
-            )
-          case 'first_pipette_type':
-            return (
-              <FirstPipetteTypeTile {...{ ...formProps, proceed, goBack }} />
-            )
-          case 'first_pipette_tips':
-            return (
-              <FirstPipetteTipsTile {...{ ...formProps, proceed, goBack }} />
-            )
-          case 'second_pipette_type':
-            return (
-              <SecondPipetteTypeTile {...{ ...formProps, proceed, goBack }} />
-            )
-          case 'second_pipette_tips':
-            return (
-              <SecondPipetteTipsTile {...{ ...formProps, proceed, goBack }} />
-            )
-          case 'staging_area':
-            return <StagingAreaTile {...{ ...formProps, proceed, goBack }} />
-          case 'modulesAndOther':
-            return (
-              <ModulesAndOtherTile
+              <AddMetadata
                 {...formProps}
                 proceed={() => {
                   createProtocolFile(formProps.getValues())

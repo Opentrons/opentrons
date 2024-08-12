@@ -133,7 +133,7 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor};
     background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
       .defaultBackgroundColor};
-    cursor: default;
+    cursor: pointer;
     padding: ${SPACING.spacing16} ${SPACING.spacing24};
     text-align: ${TYPOGRAPHY.textAlignCenter};
     border-radius: ${BORDERS.borderRadiusFull};
@@ -148,7 +148,14 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
       ${activeIconStyle(buttonType)};
     }
 
+    &:disabled {
+      color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledColor};
+      background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
+        .disabledBackgroundColor};
+    }
+
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      cursor: default;
       align-items: ${ALIGN_FLEX_START};
       flex-direction: ${DIRECTION_COLUMN};
       border-radius: ${BORDERS.borderRadius16};
@@ -183,12 +190,6 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
           ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].focusVisibleOutlineColor};
         background-clip: padding-box;
         box-shadow: none;
-      }
-
-      &:disabled {
-        color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledColor};
-        background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
-          .disabledBackgroundColor};
       }
     }
   `
