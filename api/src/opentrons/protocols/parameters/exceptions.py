@@ -28,3 +28,7 @@ class ParameterDefinitionError(ValueError):
 
 class ParameterNameError(ValueError):
     """An error raised when a parameter name or description is not valid."""
+
+
+class IncompatibleParameterError(ValueError):
+    """An error raised when a parameter conflicts with another parameter."""

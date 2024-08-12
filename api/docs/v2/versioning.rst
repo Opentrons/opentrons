@@ -138,6 +138,7 @@ Version 2.20
 ------------
 
 - :py:meth:`.configure_nozzle_layout` now accepts row, single, and partial column layout constants. See :ref:`partial-tip-pickup`.
+- You can now call :py:obj:`.ProtocolContext.define_liquid()` without supplying a ``description`` or ``display_color``.
 
 Version 2.19
 ------------

@@ -484,7 +484,12 @@ def test_get_all_runs(
     assert result == expected_result
 
 
-def test_remove_run(subject: RunStore, mock_runs_publisher: mock.Mock) -> None:
+async def test_remove_run(
+    subject: RunStore,
+    mock_runs_publisher: mock.Mock,
+    data_files_store: DataFilesStore,
+    run_time_parameters: List[pe_types.RunTimeParameter],
+) -> None:
     """It can remove a previously stored run entry."""
     action = RunAction(
         actionType=RunActionType.PLAY,
@@ -498,6 +503,15 @@ def test_remove_run(subject: RunStore, mock_runs_publisher: mock.Mock) -> None:
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
     )
     subject.insert_action(run_id="run-id", action=action)
+    await data_files_store.insert(
+        DataFileInfo(
+            id="file-id",
+            name="my_csv_file.csv",
+            file_hash="file-hash",
+            created_at=datetime(year=2024, month=1, day=1, tzinfo=timezone.utc),
+        )
+    )
+    subject.insert_csv_rtp(run_id="run-id", run_time_parameters=run_time_parameters)
     subject.remove(run_id="run-id")
 
     assert subject.get_all(length=20) == []

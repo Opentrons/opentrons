@@ -138,7 +138,7 @@ describe('ErrorRecoveryFlows', () => {
   beforeEach(() => {
     props = {
       runStatus: RUN_STATUS_AWAITING_RECOVERY,
-      failedCommand: mockFailedCommand,
+      failedCommandByRunRecord: mockFailedCommand,
       runId: 'MOCK_RUN_ID',
       protocolAnalysis: {} as any,
     }
@@ -218,9 +218,11 @@ describe('ErrorRecoveryFlows', () => {
 
     const newProps = {
       ...props,
-      failedCommand: null,
+      failedCommandByRunRecord: null,
     }
     rerender(<ErrorRecoveryFlows {...newProps} />)
-    expect(mockReportErrorEvent).toHaveBeenCalledWith(newProps.failedCommand)
+    expect(mockReportErrorEvent).toHaveBeenCalledWith(
+      newProps.failedCommandByRunRecord
+    )
   })
 })

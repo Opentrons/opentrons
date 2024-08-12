@@ -19,6 +19,7 @@ export interface LabwareOutlineProps {
   /** [legacy] override the border color */
   stroke?: CSSProperties['stroke']
   fill?: CSSProperties['fill']
+  showRadius?: boolean
 }
 
 const OUTLINE_THICKNESS_MM = 1
@@ -32,6 +33,7 @@ export function LabwareOutline(props: LabwareOutlineProps): JSX.Element {
     highlight = false,
     stroke,
     fill,
+    showRadius = true,
   } = props
   const {
     parameters = { isTiprack },
@@ -62,6 +64,8 @@ export function LabwareOutline(props: LabwareOutlineProps): JSX.Element {
             stroke="#74B0FF"
             rx="8"
             ry="8"
+            showRadius={showRadius}
+            fill={backgroundFill}
           />
           <LabwareBorder
             borderThickness={2.2 * OUTLINE_THICKNESS_MM}
@@ -71,6 +75,7 @@ export function LabwareOutline(props: LabwareOutlineProps): JSX.Element {
             fill={backgroundFill}
             rx="4"
             ry="4"
+            showRadius={showRadius}
           />
         </>
       ) : (
@@ -80,6 +85,7 @@ export function LabwareOutline(props: LabwareOutlineProps): JSX.Element {
           yDimension={dimensions.yDimension}
           stroke={stroke ?? (parameters.isTiprack ? '#979797' : COLORS.black90)}
           fill={backgroundFill}
+          showRadius={showRadius}
         />
       )}
     </>
@@ -90,9 +96,16 @@ interface LabwareBorderProps extends React.SVGProps<SVGRectElement> {
   borderThickness: number
   xDimension: number
   yDimension: number
+  showRadius?: boolean
 }
 function LabwareBorder(props: LabwareBorderProps): JSX.Element {
-  const { borderThickness, xDimension, yDimension, ...svgProps } = props
+  const {
+    borderThickness,
+    xDimension,
+    yDimension,
+    showRadius = true,
+    ...svgProps
+  } = props
   return (
     <rect
       x={borderThickness}
@@ -100,7 +113,7 @@ function LabwareBorder(props: LabwareBorderProps): JSX.Element {
       strokeWidth={2 * borderThickness}
       width={xDimension - 2 * borderThickness}
       height={yDimension - 2 * borderThickness}
-      rx={6 * borderThickness}
+      rx={showRadius ? 6 * borderThickness : 0}
       {...svgProps}
     />
   )

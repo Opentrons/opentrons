@@ -1,5 +1,4 @@
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { useRouteUpdateActions } from './useRouteUpdateActions'
 import { useRecoveryCommands } from './useRecoveryCommands'
@@ -34,13 +33,15 @@ import type { RecoveryActionMutationResult } from './useRecoveryActionMutation'
 import type { StepCounts } from '../../../resources/protocols/hooks'
 import type { UseRecoveryAnalyticsResult } from './useRecoveryAnalytics'
 import type { UseRecoveryTakeoverResult } from './useRecoveryTakeover'
+import type { useRetainedFailedCommandBySource } from './useRetainedFailedCommandBySource'
 
-type ERUtilsProps = ErrorRecoveryFlowsProps & {
+export type ERUtilsProps = Omit<ErrorRecoveryFlowsProps, 'failedCommand'> & {
   toggleERWizAsActiveUser: UseRecoveryTakeoverResult['toggleERWizAsActiveUser']
   hasLaunchedRecovery: boolean
   isOnDevice: boolean
   robotType: RobotType
   analytics: UseRecoveryAnalyticsResult
+  failedCommand: ReturnType<typeof useRetainedFailedCommandBySource>
 }
 
 export interface ERUtilsResults {
@@ -83,6 +84,7 @@ export function useERUtils({
     cursor: 0,
     pageLength: 999,
   })
+  const failedCommandByRunRecord = failedCommand?.byRunRecord ?? null
 
   const stepCounts = useRunningStepCounts(runId, runCommands)
 
@@ -103,7 +105,6 @@ export function useERUtils({
 
   const tipStatusUtils = useRecoveryTipStatus({
     runId,
-    isFlex: robotType === FLEX_ROBOT_TYPE,
     runRecord,
     attachedInstruments,
   })
@@ -116,13 +117,13 @@ export function useERUtils({
   })
 
   const failedPipetteInfo = getFailedCommandPipetteInfo({
-    failedCommand,
+    failedCommandByRunRecord,
     runRecord,
     attachedInstruments,
   })
 
   const failedLabwareUtils = useFailedLabwareUtils({
-    failedCommand,
+    failedCommandByRunRecord,
     protocolAnalysis,
     failedPipetteInfo,
     runRecord,
@@ -131,7 +132,7 @@ export function useERUtils({
 
   const recoveryCommands = useRecoveryCommands({
     runId,
-    failedCommand,
+    failedCommandByRunRecord,
     failedLabwareUtils,
     routeUpdateActions,
     recoveryToastUtils,

@@ -53,7 +53,7 @@ from robot_server.data_files.dependencies import (
     get_data_files_store,
 )
 from robot_server.data_files.data_files_store import DataFilesStore
-from robot_server.data_files.models import DataFile
+from robot_server.data_files.models import DataFile, FileIdNotFound, FileIdNotFoundError
 
 from .analyses_manager import AnalysesManager, FailedToInitializeAnalyzer
 
@@ -197,7 +197,9 @@ protocols_router = APIRouter()
         status.HTTP_200_OK: {"model": SimpleBody[Protocol]},
         status.HTTP_201_CREATED: {"model": SimpleBody[Protocol]},
         status.HTTP_422_UNPROCESSABLE_ENTITY: {
-            "model": ErrorBody[Union[ProtocolFilesInvalid, ProtocolRobotTypeMismatch]]
+            "model": ErrorBody[
+                Union[ProtocolFilesInvalid, ProtocolRobotTypeMismatch, FileIdNotFound]
+            ]
         },
         status.HTTP_503_SERVICE_UNAVAILABLE: {"model": ErrorBody[LastAnalysisPending]},
     },
@@ -323,10 +325,15 @@ async def create_protocol(  # noqa: C901
         assert file.filename is not None
     buffered_files = await file_reader_writer.read(files=files)  # type: ignore[arg-type]
 
-    rtp_paths = {
-        name: data_files_directory / file_id / data_files_store.get(file_id).name
-        for name, file_id in parsed_rtp_files.items()
-    }
+    try:
+        rtp_paths = {
+            name: data_files_directory / file_id / data_files_store.get(file_id).name
+            for name, file_id in parsed_rtp_files.items()
+        }
+    except FileIdNotFoundError as e:
+        raise FileIdNotFound(detail=str(e)).as_error(
+            status.HTTP_422_UNPROCESSABLE_ENTITY
+        )
 
     content_hash = await file_hasher.hash(buffered_files)
     cached_protocol_id = protocol_store.get_id_by_hash(content_hash)
@@ -699,6 +706,7 @@ async def delete_protocol_by_id(
         status.HTTP_200_OK: {"model": SimpleMultiBody[AnalysisSummary]},
         status.HTTP_201_CREATED: {"model": SimpleMultiBody[AnalysisSummary]},
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[ProtocolNotFound]},
+        status.HTTP_422_UNPROCESSABLE_ENTITY: {"model": ErrorBody[FileIdNotFound]},
         status.HTTP_503_SERVICE_UNAVAILABLE: {"model": ErrorBody[LastAnalysisPending]},
     },
 )
@@ -732,10 +740,15 @@ async def create_protocol_analysis(
 
     rtp_files = request_body.data.runTimeParameterFiles if request_body else {}
 
-    rtp_paths = {
-        name: data_files_directory / file_id / data_files_store.get(file_id).name
-        for name, file_id in rtp_files.items()
-    }
+    try:
+        rtp_paths = {
+            name: data_files_directory / file_id / data_files_store.get(file_id).name
+            for name, file_id in rtp_files.items()
+        }
+    except FileIdNotFoundError as e:
+        raise FileIdNotFound(detail=str(e)).as_error(
+            status.HTTP_422_UNPROCESSABLE_ENTITY
+        )
 
     try:
         (

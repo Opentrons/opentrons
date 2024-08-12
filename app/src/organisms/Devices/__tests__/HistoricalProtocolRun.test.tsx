@@ -9,7 +9,9 @@ import { storedProtocolData as storedProtocolDataFixture } from '../../../redux/
 import { useRunStatus, useRunTimestamps } from '../../RunTimeControl/hooks'
 import { HistoricalProtocolRun } from '../HistoricalProtocolRun'
 import { HistoricalProtocolRunOverflowMenu } from '../HistoricalProtocolRunOverflowMenu'
+
 import type { RunStatus, RunData } from '@opentrons/api-client'
+import type { RunTimeParameter } from '@opentrons/shared-data'
 
 vi.mock('../../../redux/protocol-storage')
 vi.mock('../../RunTimeControl/hooks')
@@ -20,6 +22,7 @@ const run = {
   id: 'test_id',
   protocolId: 'test_protocol_id',
   status: 'succeeded' as RunStatus,
+  runTimeParameters: [] as RunTimeParameter[],
 } as RunData
 
 const render = (props: React.ComponentProps<typeof HistoricalProtocolRun>) => {

@@ -11,7 +11,6 @@ export type DevInternalFlag =
   | 'forceHttpPolling'
   | 'protocolStats'
   | 'enableRunNotes'
-  | 'enableQuickTransfer'
   | 'protocolTimeline'
   | 'enableLabwareCreator'
 

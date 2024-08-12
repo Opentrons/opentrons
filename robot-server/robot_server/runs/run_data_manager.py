@@ -207,6 +207,10 @@ class RunDataManager:
             created_at=created_at,
             protocol_id=protocol.protocol_id if protocol is not None else None,
         )
+        run_time_parameters = self._run_orchestrator_store.get_run_time_parameters()
+        self._run_store.insert_csv_rtp(
+            run_id=run_id, run_time_parameters=run_time_parameters
+        )
         await self._runs_publisher.start_publishing_for_run(
             get_current_command=self.get_current_command,
             get_recovery_target_command=self.get_recovery_target_command,
@@ -218,7 +222,7 @@ class RunDataManager:
             run_resource=run_resource,
             state_summary=state_summary,
             current=True,
-            run_time_parameters=self._run_orchestrator_store.get_run_time_parameters(),
+            run_time_parameters=run_time_parameters,
         )
 
     def get(self, run_id: str) -> Union[Run, BadRun]:
