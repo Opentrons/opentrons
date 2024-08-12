@@ -155,7 +155,10 @@ export function RunSummary(): JSX.Element {
       isRunCurrent,
   })
 
-  let headerText = t('run_complete_splash')
+  let headerText =
+    commandErrorList != null && commandErrorList.data.length > 0
+      ? t('run_completed_with_warnings')
+      : t('run_completed_splash')
   if (runStatus === RUN_STATUS_FAILED) {
     headerText = t('run_failed_splash')
   } else if (runStatus === RUN_STATUS_STOPPED) {
