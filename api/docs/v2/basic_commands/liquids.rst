@@ -270,10 +270,9 @@ You should generally detect liquid immediately after picking up a tip and before
 .. note::
     Accurate liquid detection requires fresh, dry pipette tips.
 
-
 .. code-block:: python
 
-    pipette.detect_liquid_presence()
+    pipette.detect_liquid_presence(well)
 
 In cases where you need records that are more informative than ``true`` or ``false``, you can write your own code to handle the output of this method. For example, by adding some indexing along with ``for`` and ``while`` loops, your protocol could count how many aspirations a robot performed before a source well ran out of liquid. Here's one way to do this in the ``run():`` function of our Flex :ref:`protocol template <protocol-template>`:
 
@@ -290,23 +289,23 @@ In cases where you need records that are more informative than ``true`` or ``fal
 
         cur_index = 0 # counts aspirate/dispense cycles from a reservoir well.
         while has_liquid:
-            pipette.pick_up_tip(tiprack[tipIndex])
+            pipette.pick_up_tip(tiprack[tip_index])
             pipette.aspirate(250, well)
-            pipette.dispense(250, plate[plateIndex])
+            pipette.dispense(250, plate[plate_index])
             pipette.drop_tip(trash)
-            tip_index+=1
-            plate_index+=1
+            tip_index += 1
+            plate_index += 1
 
-            pipette.pick_up_tip(tiprack[tipIndex])
+            pipette.pick_up_tip(tiprack[tip_index])
             has_liquid = pipette.detect_liquid_presence(well)
             pipette.drop_tip(trash)
-            tip_index+=1
+            tip_index += 1
 
-            cur_index+=1
+            cur_index += 1
 
         # Add a helpful record to the run log when a well runs dry or is empty.
         protocol.comment(
-            f"Found liquid and aspirated from well {name} {curIndex} times. Well is now empty."
+            f"Found liquid and aspirated from well {name} {cur_index} times. Well is now empty."
         )
 
     # Add a helpful record to the run log when all source wells are empty.
@@ -326,6 +325,6 @@ Detection takes place during aspiration, but you don't need to aspirate to use `
 
 .. code-block:: python
 
-    pipette.require_liquid_presence()
+    pipette.require_liquid_presence(well)
 
 .. versionadded:: 2.20
