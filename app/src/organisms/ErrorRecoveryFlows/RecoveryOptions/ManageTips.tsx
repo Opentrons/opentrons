@@ -200,6 +200,7 @@ export function useDropTipFlowUtils({
   subMapUtils,
   routeUpdateActions,
   recoveryMap,
+  failedPipetteInfo,
 }: RecoveryContentProps): FixitCommandTypeUtils {
   const { t } = useTranslation('error_recovery')
   const {
