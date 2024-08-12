@@ -17,29 +17,30 @@ import type { IconName } from '../..'
 interface EmptySelectorButtonProps {
   onClick: () => void
   text: string
-  size: 'large' | 'small'
   textAlignment: 'left' | 'middle'
   iconName?: IconName
+  size?: 'large' | 'small'
 }
 
 //  used for helix and Opentrons Ai
 export function EmptySelectorButton(
   props: EmptySelectorButtonProps
 ): JSX.Element {
-  const { onClick, text, iconName, size, textAlignment } = props
-  const sizing = size === 'large' ? '100%' : FLEX_MAX_CONTENT
+  const { onClick, text, iconName, size = 'large', textAlignment } = props
+  const buttonSizing = size === 'large' ? '100%' : FLEX_MAX_CONTENT
 
   return (
-    <Btn onClick={onClick} width={sizing} height={sizing}>
+    <Btn onClick={onClick} width={buttonSizing} height={buttonSizing}>
       <Flex
         gridGap={SPACING.spacing4}
         padding={SPACING.spacing12}
         backgroundColor={COLORS.blue30}
         borderRadius={BORDERS.borderRadius8}
         border={`2px dashed ${COLORS.blue50}`}
-        width={sizing}
-        height={sizing}
+        width="100%"
+        height="100%"
         alignItems={ALIGN_CENTER}
+        data-testid='EmptySelectorButton_container'
         justifyContent={
           textAlignment === 'middle' ? JUSTIFY_CENTER : JUSTIFY_START
         }
@@ -47,8 +48,7 @@ export function EmptySelectorButton(
         {iconName != null ? (
           <Icon
             name={iconName}
-            height="1.25rem"
-            width="1.25rem"
+            size="1.25rem"
             data-testid={`EmptySelectorButton_${iconName}`}
           />
         ) : null}
