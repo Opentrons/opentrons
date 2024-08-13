@@ -14,6 +14,7 @@ import {
   DISPLAY_INLINE_BLOCK,
   Flex,
   Icon,
+  InputField,
   JUSTIFY_CENTER,
   JUSTIFY_END,
   JUSTIFY_FLEX_START,
@@ -47,7 +48,6 @@ import { Slideout } from '../../atoms/Slideout'
 import { MultiSlideout } from '../../atoms/Slideout/MultiSlideout'
 import { ToggleButton } from '../../atoms/buttons'
 import { AvailableRobotOption } from './AvailableRobotOption'
-import { InputField } from '../../atoms/InputField'
 import { DropdownMenu } from '../../atoms/MenuList/DropdownMenu'
 import { UploadInput } from '../../molecules/UploadInput'
 import { FileCard } from './FileCard'

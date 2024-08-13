@@ -15,6 +15,7 @@ import {
   DISPLAY_BLOCK,
   Flex,
   Icon,
+  InputField,
   JUSTIFY_CENTER,
   JUSTIFY_END,
   JUSTIFY_FLEX_START,
@@ -42,7 +43,6 @@ import { getStoredProtocols } from '../../redux/protocol-storage'
 import { appShellRequestor } from '../../redux/shell/remote'
 import { MultiSlideout } from '../../atoms/Slideout/MultiSlideout'
 import { ToggleButton } from '../../atoms/buttons'
-import { InputField } from '../../atoms/InputField'
 import { DropdownMenu } from '../../atoms/MenuList/DropdownMenu'
 import { MiniCard } from '../../molecules/MiniCard'
 import { UploadInput } from '../../molecules/UploadInput'

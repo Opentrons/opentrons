@@ -10,14 +10,14 @@ import {
   DISPLAY_FLEX,
   Flex,
   Icon,
+  InputField,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   POSITION_FIXED,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { InputField } from '../../atoms/InputField'
 import { FullKeyboard } from '../../atoms/SoftwareKeyboard'
 import { useIsUnboxingFlowOngoing } from '../RobotSettingsDashboard/NetworkSettings/hooks'
 
