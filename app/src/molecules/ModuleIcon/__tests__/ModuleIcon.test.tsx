@@ -13,7 +13,7 @@ vi.mock('@opentrons/components', async importOriginal => {
   const actualComponents = await importOriginal<typeof OpentronsComponents>()
   return {
     ...actualComponents,
-    LegacyTooltip: vi.fn(({ children }) => <div>{children}</div>),
+    Tooltip: vi.fn(({ children }) => <div>{children}</div>),
   }
 })
 
