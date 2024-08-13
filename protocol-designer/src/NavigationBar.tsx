@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
+  ALIGN_CENTER,
   ALIGN_STRETCH,
   COLORS,
   DIRECTION_COLUMN,
@@ -35,7 +36,7 @@ export function NavigationBar({
       navigate('/overview')
     }
   }
-  const filteredNavPaths =
+  const isFilteredNavPaths =
     location.pathname === '/createNew' || location.pathname === '/'
 
   return (
@@ -44,7 +45,7 @@ export function NavigationBar({
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         padding={`${SPACING.spacing12} ${SPACING.spacing40}`}
       >
-        <Flex gridGap={SPACING.spacing8} alignItems="center">
+        <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
           <StyledText desktopStyle="bodyLargeSemiBold">
             {t('opentrons')}
           </StyledText>
@@ -55,16 +56,16 @@ export function NavigationBar({
             {t('version', { version: process.env.OT_PD_VERSION })}
           </StyledText>
         </Flex>
-        <Flex gridGap={SPACING.spacing40} alignItems="center">
+        <Flex gridGap={SPACING.spacing40} alignItems={ALIGN_CENTER}>
           {location.pathname === '/createNew' ? null : (
-            <NavbarLink key="createNew" to={'/createNew'}>
+            <NavbarLink key="createNew" to="/createNew">
               <StyledText desktopStyle="bodyDefaultRegular">
                 {t('create_new_protocol')}
               </StyledText>
             </NavbarLink>
           )}
           <StyledLabel>
-            <StyledText desktopStyle="bodyLargeRegular" color={COLORS.grey60}>
+            <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
               {t('import')}
             </StyledText>
             <input type="file" onChange={loadFile}></input>
@@ -73,7 +74,7 @@ export function NavigationBar({
       </Flex>
       {/* TODO(ja, 8/12/24: delete later. Leaving access to other
       routes at all times until we make breadcrumbs and protocol overview pg */}
-      {filteredNavPaths ? null : (
+      {isFilteredNavPaths ? null : (
         <Flex
           backgroundColor={COLORS.blue20}
           padding={`${SPACING.spacing12} ${SPACING.spacing40}`}
@@ -94,7 +95,7 @@ export function NavigationBar({
 const NavbarLink = styled(NavLink)`
   color: ${COLORS.black90};
   text-decoration: none;
-  align-self: ${ALIGN_STRETCH};
+  align-self: ${ALIGN_CENTER};
   &:hover {
     color: ${COLORS.black70};
   }
