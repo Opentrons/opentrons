@@ -1,7 +1,7 @@
-import { DropdownMenu as DropdownMenuComponent } from './DropdownMenu'
+import { DropdownMenu as DropdownMenuComponent } from '../../../../app/src/atoms/MenuList/DropdownMenu'
 
 import type { Meta, StoryObj } from '@storybook/react'
-import type { DropdownOption } from './DropdownMenu'
+import type { DropdownOption } from '../../../../app/src/atoms/MenuList/DropdownMenu'
 
 function createMockOptions(): DropdownOption[] {
   const options: DropdownOption[] = []

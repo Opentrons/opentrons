@@ -1,25 +1,23 @@
 import * as React from 'react'
 import { css } from 'styled-components'
+
+import { BORDERS, COLORS } from '../../helix-design-system'
 import {
   ALIGN_CENTER,
-  BORDERS,
-  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  Flex,
-  Icon,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
-  MenuItem,
   OVERFLOW_AUTO,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
-  SPACING,
-  Tooltip,
-  TYPOGRAPHY,
-  useHoverTooltip,
-  useOnClickOutside,
-} from '@opentrons/components'
+} from '../../styles'
+import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { Flex } from '../../primitives'
+import { Icon } from '../../icons'
+import { Tooltip } from '../../atoms/Tooltip'
+import { useHoverTooltip } from '../../tooltips'
+import { useOnClickOutside } from '../../interaction-enhancers'
+import { LegacyStyledText, MenuItem } from '../../atoms'
 
 /** this is the max height to display 10 items */
 const MAX_HEIGHT = 316

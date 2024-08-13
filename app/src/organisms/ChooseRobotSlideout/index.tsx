@@ -48,7 +48,7 @@ import { MultiSlideout } from '../../atoms/Slideout/MultiSlideout'
 import { ToggleButton } from '../../atoms/buttons'
 import { AvailableRobotOption } from './AvailableRobotOption'
 import { InputField } from '../../atoms/InputField'
-import { DropdownMenu } from '../../atoms/MenuList/DropdownMenu'
+import { DropdownMenu } from '@opentrons/components/src/molecules/DropdownMenu/DropdownMenu'
 import { UploadInput } from '../../molecules/UploadInput'
 import { FileCard } from './FileCard'
 
@@ -57,7 +57,7 @@ import type { SlideoutProps } from '../../atoms/Slideout'
 import type { UseCreateRun } from '../../organisms/ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
 import type { State, Dispatch } from '../../redux/types'
 import type { Robot } from '../../redux/discovery/types'
-import type { DropdownOption } from '../../atoms/MenuList/DropdownMenu'
+import type { DropdownOption } from '@opentrons/components/src/molecules/DropdownMenu/DropdownMenu'
 
 export const CARD_OUTLINE_BORDER_STYLE = css`
   border-style: ${BORDERS.styleSolid};
