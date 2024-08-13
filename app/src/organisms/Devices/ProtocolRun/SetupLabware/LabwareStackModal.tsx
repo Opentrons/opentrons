@@ -121,13 +121,13 @@ export const LabwareStackModal = (
           </Flex>
         ),
         onClick: closeModal,
+        padding: `${SPACING.spacing32} ${SPACING.spacing32} ${SPACING.spacing12}`,
       }}
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}
         css={HIDE_SCROLLBAR}
         overflowY="scroll"
-        gridGap={SPACING.spacing16}
         width="41.675rem"
       >
         <>
