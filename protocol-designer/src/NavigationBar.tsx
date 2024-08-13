@@ -5,7 +5,6 @@ import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
-  ALIGN_STRETCH,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
