@@ -2128,7 +2128,7 @@ class InstrumentContext(publisher.CommandPublisher):
                     )
             elif not (front_right is None and back_left is None):
                 raise ValueError(
-                    f"Parameters 'front_right' and 'back_left' cannot be used with {style.value} Nozzle Configuration Layout."
+                    f"Parameters 'front_right' and 'back_left' cannot be used with a {style.value} nozzle configuration."
                 )
 
         self._core.configure_nozzle_layout(
