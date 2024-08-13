@@ -2096,7 +2096,7 @@ class InstrumentContext(publisher.CommandPublisher):
             if style == NozzleLayout.PARTIAL_COLUMN:
                 if self.channels == 1 or self.channels == 96:
                     raise ValueError(
-                        "Partial Column configuraiton is only supported on 8-Channel Pipettes."
+                        "Partial column configuration is only supported on 8-Channel pipettes."
                     )
 
                 if end is None:
