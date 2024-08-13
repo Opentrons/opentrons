@@ -133,7 +133,7 @@ class CloseLidImpl(
                 result = await abs_reader.get_current_lid_status()
                 if result is not AbsorbanceReaderLidStatus.ON:
                     raise CannotPerformModuleAction(
-                        "The Opentrons Plate Reader lid mechanicaly position did not match expected Closed state."
+                        "The mechanical position of the Absorbance Plate Reader's lid did not match the expected 'closed' state."
                     )
             else:
                 raise CannotPerformModuleAction(

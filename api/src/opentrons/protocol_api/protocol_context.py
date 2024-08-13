@@ -712,7 +712,7 @@ class ProtocolContext(CommandPublisher):
         if isinstance(new_location, AbsorbanceReaderContext):
             if new_location.is_lid_on():
                 raise CommandPreconditionViolated(
-                    f"Cannot move {labware.name} onto the Absorbance Reader Module when Lid is Closed."
+                    f"Cannot move {labware.name} onto the Absorbance Reader Module when its lid is closed."
                 )
 
         location: Union[

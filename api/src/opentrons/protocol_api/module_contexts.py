@@ -999,7 +999,7 @@ class AbsorbanceReaderContext(ModuleContext):
 
     @requires_version(2, 21)
     def is_lid_on(self) -> bool:
-        """Return True if the Absorbance Reader's lid is currently closed."""
+        """Return ``True`` if the Absorbance Reader's lid is currently closed."""
         return self._core.is_lid_on()
 
     @requires_version(2, 21)
