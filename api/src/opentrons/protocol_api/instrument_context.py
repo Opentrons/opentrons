@@ -2105,7 +2105,7 @@ class InstrumentContext(publisher.CommandPublisher):
                     )
                 if start[0] in end:
                     raise ValueError(
-                        "When configuring in Partial Column the 'start' and 'end' parameters cannot be in the same row."
+                        "The 'start' and 'end' parameters of a partial column configuration cannot be in the same row."
                     )
                 # Determine if 'end' will be configured as front_right or back_left
                 if start == "H1" or start == "H12":
