@@ -2,16 +2,16 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  POSITION_RELATIVE,
-  POSITION_ABSOLUTE,
   BORDERS,
   COLORS,
-  SPACING,
   DIRECTION_COLUMN,
+  Flex,
+  MenuItem,
+  POSITION_ABSOLUTE,
+  POSITION_RELATIVE,
+  SPACING,
 } from '@opentrons/components'
 
-import { MenuItem } from '../../../atoms/MenuList/MenuItem'
 import { Divider } from '../../../atoms/structure'
 
 import type { PipetteModelSpecs } from '@opentrons/shared-data'

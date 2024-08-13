@@ -4,7 +4,7 @@ import {
   Box,
   DeprecatedPrimaryButton,
   OutlineButton,
-  Tooltip,
+  LegacyTooltip,
   useHoverTooltip,
   TOOLTIP_TOP,
   TOOLTIP_FIXED,
@@ -202,9 +202,9 @@ export const BatchEditMoveLiquid = (
             >
               {t('discard_changes')}
             </OutlineButton>
-            <Tooltip {...cancelButtonTooltipProps}>
+            <LegacyTooltip {...cancelButtonTooltipProps}>
               {t('tooltip:cancel_batch_edit')}
-            </Tooltip>
+            </LegacyTooltip>
           </Box>
 
           <Box
@@ -218,13 +218,13 @@ export const BatchEditMoveLiquid = (
             >
               {t('save')}
             </DeprecatedPrimaryButton>
-            <Tooltip {...saveButtonTooltipProps}>
+            <LegacyTooltip {...saveButtonTooltipProps}>
               {t(
                 `tooltip:save_batch_edit.${
                   disableSave ? 'disabled' : 'enabled'
                 }`
               )}
-            </Tooltip>
+            </LegacyTooltip>
           </Box>
         </Box>
       </Box>

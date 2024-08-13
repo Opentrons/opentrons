@@ -119,6 +119,12 @@ class SyncClient:
             "add_addressable_area", addressable_area_name=addressable_area_name
         )
 
+    def add_absorbance_reader_lid(self, module_id: str, lid_id: str) -> None:
+        """Add an absorbance reader lid to the module state."""
+        self._transport.call_method(
+            "add_absorbance_reader_lid", module_id=module_id, lid_id=lid_id
+        )
+
     def add_liquid(
         self, name: str, color: Optional[str], description: Optional[str]
     ) -> Liquid:

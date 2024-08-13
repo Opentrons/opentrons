@@ -5,7 +5,7 @@ import { ALL, COLUMN } from '@opentrons/shared-data'
 import {
   FormGroup,
   SelectField,
-  Tooltip,
+  LegacyTooltip,
   TOOLTIP_FIXED,
   useHoverTooltip,
 } from '@opentrons/components'
@@ -80,11 +80,11 @@ const OptionLabel = (props: OptionLabelProps): JSX.Element => {
       <div {...targetProps}>
         {t(`step_edit_form.field.nozzles.option.${value}`)}
         {disabled ? (
-          <Tooltip {...tooltipProps}>
+          <LegacyTooltip {...tooltipProps}>
             <div className={styles.tooltip}>
               {t(`step_edit_form.field.nozzles.option_tooltip.${value}`)}
             </div>
-          </Tooltip>
+          </LegacyTooltip>
         ) : null}
       </div>
     </>

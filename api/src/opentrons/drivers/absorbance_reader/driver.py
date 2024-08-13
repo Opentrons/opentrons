@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import asyncio
-from typing import Dict, Optional, List, TYPE_CHECKING
+from typing import Dict, Optional, List, Tuple, TYPE_CHECKING
 
 from opentrons.drivers.types import (
     AbsorbanceReaderLidStatus,
@@ -32,15 +32,6 @@ class AbsorbanceReaderDriver(AbstractAbsorbanceReaderDriver):
     def __init__(self, connection: AsyncByonoyType) -> None:
         self._connection = connection
 
-    async def get_device_info(self) -> Dict[str, str]:
-        """Get device info"""
-        connected = await self.is_connected()
-        if not connected:
-            info = await self._connection.get_device_static_info()
-        else:
-            info = await self._connection.get_device_information()
-        return info
-
     async def connect(self) -> None:
         """Connect to absorbance reader"""
         await self._connection.open()
@@ -52,6 +43,16 @@ class AbsorbanceReaderDriver(AbstractAbsorbanceReaderDriver):
     async def is_connected(self) -> bool:
         """Check connection to absorbance reader"""
         return await self._connection.is_open()
+
+    async def get_device_info(self) -> Dict[str, str]:
+        """Get device info"""
+        return await self._connection.get_device_information()
+
+    async def update_firmware(self, firmware_file_path: str) -> Tuple[bool, str]:
+        return await self._connection.update_firmware(firmware_file_path)
+
+    async def get_uptime(self) -> int:
+        return await self._connection.get_device_uptime()
 
     async def get_lid_status(self) -> AbsorbanceReaderLidStatus:
         return await self._connection.get_lid_status()

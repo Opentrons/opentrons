@@ -2,15 +2,15 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  useHoverTooltip,
   ALIGN_CENTER,
   DIRECTION_COLUMN,
-  SPACING,
+  Flex,
   PrimaryButton,
+  SPACING,
+  Tooltip,
+  useHoverTooltip,
 } from '@opentrons/components'
 
-import { Tooltip } from '../../../atoms/Tooltip'
 import {
   useTrackEvent,
   ANALYTICS_PROCEED_TO_MODULE_SETUP_STEP,

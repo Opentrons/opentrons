@@ -9,17 +9,17 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  POSITION_ABSOLUTE,
-  SPACING,
   LegacyStyledText,
-  TYPOGRAPHY,
-  useOnClickOutside,
-  POSITION_RELATIVE,
-  useHoverTooltip,
+  MenuItem,
   OVERFLOW_AUTO,
+  POSITION_ABSOLUTE,
+  POSITION_RELATIVE,
+  SPACING,
+  Tooltip,
+  TYPOGRAPHY,
+  useHoverTooltip,
+  useOnClickOutside,
 } from '@opentrons/components'
-import { Tooltip } from '../Tooltip'
-import { MenuItem } from './MenuItem'
 
 /** this is the max height to display 10 items */
 const MAX_HEIGHT = 316

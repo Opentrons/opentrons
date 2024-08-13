@@ -16,8 +16,9 @@ from opentrons.drivers.types import (
     HeaterShakerLabwareLatchStatus,
     ThermocyclerLidStatus,
 )
-from opentrons.types import DeckSlotName
+
 from opentrons.protocol_engine import commands as cmd
+from opentrons.types import DeckSlotName
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocol_engine.errors.exceptions import (
     LabwareNotLoadedOnModuleError,
@@ -535,11 +536,29 @@ class AbsorbanceReaderCore(ModuleCore, AbstractAbsorbanceReaderCore):
         )
         self._initialized_value = wavelength
 
-    def initiate_read(self) -> None:
+    def read(self) -> None:
         """Initiate read on the Absorbance Reader."""
         if self._initialized_value:
             self._engine_client.execute_command(
-                cmd.absorbance_reader.MeasureAbsorbanceParams(
+                cmd.absorbance_reader.ReadAbsorbanceParams(
                     moduleId=self.module_id, sampleWavelength=self._initialized_value
                 )
             )
+
+    def close_lid(
+        self,
+    ) -> None:
+        """Close the Absorbance Reader's lid."""
+        self._engine_client.execute_command(
+            cmd.absorbance_reader.CloseLidParams(
+                moduleId=self.module_id,
+            )
+        )
+
+    def open_lid(self) -> None:
+        """Close the Absorbance Reader's lid."""
+        self._engine_client.execute_command(
+            cmd.absorbance_reader.OpenLidParams(
+                moduleId=self.module_id,
+            )
+        )

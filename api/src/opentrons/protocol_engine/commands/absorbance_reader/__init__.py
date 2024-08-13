@@ -1,4 +1,20 @@
 """Command models for Absorbance Reader commands."""
+from .types import MoveLidResult
+from .close_lid import (
+    CloseLidCommandType,
+    CloseLidParams,
+    CloseLidResult,
+    CloseLid,
+    CloseLidCreate,
+)
+
+from .open_lid import (
+    OpenLidCommandType,
+    OpenLidParams,
+    OpenLidResult,
+    OpenLid,
+    OpenLidCreate,
+)
 
 from .initialize import (
     InitializeCommandType,
@@ -8,15 +24,29 @@ from .initialize import (
     InitializeCreate,
 )
 
-from .measure import (
-    MeasureAbsorbanceCommandType,
-    MeasureAbsorbanceParams,
-    MeasureAbsorbanceResult,
-    MeasureAbsorbance,
-    MeasureAbsorbanceCreate,
+from .read import (
+    ReadAbsorbanceCommandType,
+    ReadAbsorbanceParams,
+    ReadAbsorbanceResult,
+    ReadAbsorbance,
+    ReadAbsorbanceCreate,
 )
 
+
 __all__ = [
+    "MoveLidResult",
+    # absorbanace_reader/closeLid
+    "CloseLidCommandType",
+    "CloseLidParams",
+    "CloseLidResult",
+    "CloseLid",
+    "CloseLidCreate",
+    # absorbanace_reader/openLid
+    "OpenLidCommandType",
+    "OpenLidParams",
+    "OpenLidResult",
+    "OpenLid",
+    "OpenLidCreate",
     # absorbanace_reader/initialize
     "InitializeCommandType",
     "InitializeParams",
@@ -24,9 +54,10 @@ __all__ = [
     "Initialize",
     "InitializeCreate",
     # absorbanace_reader/measure
-    "MeasureAbsorbanceCommandType",
-    "MeasureAbsorbanceParams",
-    "MeasureAbsorbanceResult",
-    "MeasureAbsorbance",
-    "MeasureAbsorbanceCreate",
+    "ReadAbsorbanceCommandType",
+    "ReadAbsorbanceParams",
+    "ReadAbsorbanceResult",
+    "ReadAbsorbance",
+    "ReadAbsorbanceCreate",
+    # union type
 ]

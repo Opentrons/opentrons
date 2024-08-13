@@ -11,17 +11,17 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  JUSTIFY_SPACE_AROUND,
   Flex,
+  JUSTIFY_SPACE_AROUND,
   LegacyStyledText,
   OVERFLOW_SCROLL,
   POSITION_RELATIVE,
   SPACING,
+  Tooltip,
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
-import { Tooltip } from '../../../atoms/Tooltip'
 import {
   useModuleRenderInfoForProtocolById,
   useRobot,

@@ -6,7 +6,7 @@ import {
   useConditionalConfirm,
   Flex,
   Box,
-  Tooltip,
+  LegacyTooltip,
   useHoverTooltip,
   Icon,
   ALIGN_CENTER,
@@ -68,7 +68,7 @@ export const ClickableIcon = (props: ClickableIconProps): JSX.Element => {
 
   return (
     <Box id={id} {...boxStyles} {...targetProps} css={iconBoxStyles}>
-      <Tooltip {...tooltipProps}>{tooltipText}</Tooltip>
+      <LegacyTooltip {...tooltipProps}>{tooltipText}</LegacyTooltip>
       <Box onClick={onClick}>
         <Icon name={iconName} width={width || '1.25rem'} color={C_DARK_GRAY} />
       </Box>

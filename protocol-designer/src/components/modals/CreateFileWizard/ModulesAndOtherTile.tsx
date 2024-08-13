@@ -12,7 +12,7 @@ import {
   ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   useHoverTooltip,
-  Tooltip,
+  LegacyTooltip,
   WRAP,
 } from '@opentrons/components'
 import {
@@ -190,9 +190,9 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
             {t('review_file_details')}
           </PrimaryButton>
           {!hasATrash ? (
-            <Tooltip {...tooltipProps}>
+            <LegacyTooltip {...tooltipProps}>
               {t(`tooltip:disabled_no_trash`)}
-            </Tooltip>
+            </LegacyTooltip>
           ) : null}
         </Flex>
       </Flex>

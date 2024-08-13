@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
   FormGroup,
-  InputField,
+  LegacyInputField,
   LegacyModal,
   OutlineButton,
 } from '@opentrons/components'
@@ -54,7 +54,7 @@ export function MoreOptionsModal(props: Props): JSX.Element {
           label={t('form:step_edit_form.field.step_name.label')}
           className={styles.form_group}
         >
-          <InputField
+          <LegacyInputField
             onChange={makeHandleChange('stepName')}
             value={String(formData.stepName)}
           />

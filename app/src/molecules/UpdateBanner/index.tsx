@@ -3,16 +3,16 @@ import { useTranslation } from 'react-i18next'
 
 import {
   ALIGN_START,
-  DIRECTION_COLUMN,
-  SPACING,
-  TYPOGRAPHY,
   Btn,
-  useHoverTooltip,
+  DIRECTION_COLUMN,
   Flex,
+  SPACING,
+  Tooltip,
+  TYPOGRAPHY,
+  useHoverTooltip,
 } from '@opentrons/components'
 
 import { Banner } from '../../atoms/Banner'
-import { Tooltip } from '../../atoms/Tooltip'
 import { useIsFlex } from '../../organisms/Devices/hooks'
 import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
 

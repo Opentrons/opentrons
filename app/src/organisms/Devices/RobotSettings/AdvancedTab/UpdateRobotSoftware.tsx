@@ -8,16 +8,16 @@ import {
   Box,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   SPACING_AUTO,
   SPACING,
-  LegacyStyledText,
+  Tooltip,
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
 
 import { ExternalLink } from '../../../../atoms/Link/ExternalLink'
 import { TertiaryButton } from '../../../../atoms/buttons'
-import { Tooltip } from '../../../../atoms/Tooltip'
 import { getRobotUpdateDisplayInfo } from '../../../../redux/robot-update'
 import { useDispatchStartRobotUpdate } from '../../../../redux/robot-update/hooks'
 

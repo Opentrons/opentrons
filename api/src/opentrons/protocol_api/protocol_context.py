@@ -17,7 +17,10 @@ from opentrons_shared_data.pipette.types import PipetteNameType
 
 from opentrons.types import Mount, Location, DeckLocation, DeckSlotName, StagingSlotName
 from opentrons.legacy_broker import LegacyBroker
-from opentrons.hardware_control.modules.types import MagneticBlockModel
+from opentrons.hardware_control.modules.types import (
+    MagneticBlockModel,
+    AbsorbanceReaderModel,
+)
 from opentrons.legacy_commands import protocol_commands as cmds, types as cmd_types
 from opentrons.legacy_commands.helpers import stringify_labware_movement_command
 from opentrons.legacy_commands.publisher import (
@@ -826,6 +829,12 @@ class ProtocolContext(CommandPublisher):
                 api_element=f"Module of type {module_name}",
                 until_version="2.15",
                 current_version=f"{self._api_version}",
+            )
+        if isinstance(
+            requested_model, AbsorbanceReaderModel
+        ) and self._api_version < APIVersion(2, 21):
+            raise APIVersionError(
+                f"Module of type {module_name} is only available in versions 2.21 and above."
             )
 
         deck_slot = (

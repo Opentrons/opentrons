@@ -11,11 +11,12 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   Link,
   SIZE_1,
   SPACING,
-  LegacyStyledText,
   TOOLTIP_LEFT,
+  Tooltip,
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
@@ -28,7 +29,6 @@ import {
 
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getModalPortalEl } from '../../App/portal'
-import { Tooltip } from '../../atoms/Tooltip'
 import { useRunStatus } from '../RunTimeControl/hooks'
 import { InterventionModal, useInterventionModal } from '../InterventionModal'
 import { ProgressBar } from '../../atoms/ProgressBar'
