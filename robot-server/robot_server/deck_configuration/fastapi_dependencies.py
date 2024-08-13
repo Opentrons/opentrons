@@ -19,7 +19,7 @@ from robot_server.persistence.fastapi_dependencies import (
     get_active_persistence_directory,
     get_active_persistence_directory_failsafe,
 )
-from robot_server.persistence.filenames import DECK_CONFIGURATION_FILE
+from robot_server.persistence.file_and_directory_names import DECK_CONFIGURATION_FILE
 from robot_server.service.notifications import (
     DeckConfigurationPublisher,
     get_deck_configuration_publisher,

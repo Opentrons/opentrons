@@ -16,7 +16,7 @@ from robot_server.persistence.fastapi_dependencies import (
     get_active_persistence_directory,
     get_sql_engine,
 )
-from robot_server.persistence.filenames import DATA_FILES_DIRECTORY
+from robot_server.persistence.file_and_directory_names import DATA_FILES_DIRECTORY
 from robot_server.deletion_planner import DataFileDeletionPlanner
 from .data_files_store import DataFilesStore
 from .file_auto_deleter import DataFileAutoDeleter

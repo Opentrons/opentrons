@@ -22,7 +22,7 @@ from robot_server.persistence.fastapi_dependencies import (
     get_sql_engine,
     get_active_persistence_directory,
 )
-from robot_server.persistence.filenames import PROTOCOLS_DIRECTORY
+from robot_server.persistence.file_and_directory_names import PROTOCOLS_DIRECTORY
 from robot_server.settings import get_settings
 from .analyses_manager import AnalysesManager
 

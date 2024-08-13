@@ -19,7 +19,7 @@ from server_utils.fastapi_utils.app_state import (
 from robot_server.errors.error_responses import ErrorDetails
 
 from .database import create_sql_engine
-from .filenames import DB_FILE
+from .file_and_directory_names import DB_FILE
 from .persistence_directory import (
     PersistenceResetter,
     prepare_active_subdirectory,

@@ -14,7 +14,7 @@ from typing import Any
 import sqlalchemy
 
 from ..database import sql_engine_ctx
-from ..filenames import DB_FILE
+from ..file_and_directory_names import DB_FILE
 from ..tables import schema_5
 from .._folder_migrator import Migration
 
