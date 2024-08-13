@@ -8,135 +8,54 @@ import type { GetPipettesWithTipAttached } from '../getPipettesWithTipAttached'
 
 vi.mock('@opentrons/api-client')
 
+const HOST_NAME = 'localhost'
+const RUN_ID = 'testRunId'
+const LEFT_PIPETTE_ID = 'testId1'
+const RIGHT_PIPETTE_ID = 'testId2'
+const LEFT_PIPETTE_NAME = 'testLeftName'
+const RIGHT_PIPETTE_NAME = 'testRightName'
+const PICK_UP_TIP = 'pickUpTip'
+const DROP_TIP = 'dropTip'
+const DROP_TIP_IN_PLACE = 'dropTipInPlace'
+const LOAD_PIPETTE = 'loadPipette'
+const FIXIT_INTENT = 'fixit'
+
 const mockAttachedInstruments = {
   data: [
-    {
-      mount: 'left',
-      state: {
-        tipDetected: true,
-      },
-    },
-    {
-      mount: 'right',
-      state: {
-        tipDetected: true,
-      },
-    },
+    { mount: LEFT, state: { tipDetected: true } },
+    { mount: RIGHT, state: { tipDetected: true } },
   ],
-  meta: {
-    cursor: 0,
-    totalLength: 2,
-  },
+  meta: { cursor: 0, totalLength: 2 },
 }
+
+const createMockCommand = (
+  type: string,
+  id: string,
+  pipetteId: string,
+  status = 'succeeded'
+) => ({
+  id,
+  key: `${id}-key`,
+  commandType: type,
+  status,
+  params: { pipetteId },
+})
 
 const mockCommands = {
   data: [
-    {
-      id: '7bce590e-78bd-4e6c-9166-cbd3d39468bf',
-      key: 'b56a8e50-b08e-4792-ae97-70d175d2cf9a',
-      commandType: 'loadPipette',
-      createdAt: '2023-10-20T13:16:53.519743+00:00',
-      startedAt: '2023-10-20T13:18:06.494736+00:00',
-      completedAt: '2023-10-20T13:18:06.758755+00:00',
-      status: 'succeeded',
-      params: {
-        pipetteName: 'p1000_single_flex',
-        mount: 'left',
-        pipetteId: 'testId1',
-      },
-    },
-    {
-      id: 'e6ebdf69-f1f3-418c-9f25-2068180bfaa8',
-      key: 'b0a989d0-b651-4735-b3e8-e1f20ce5f53a',
-      commandType: 'loadLabware',
-      createdAt: '2023-10-20T13:16:53.536868+00:00',
-      startedAt: '2023-10-20T13:18:06.764154+00:00',
-      completedAt: '2023-10-20T13:18:06.765661+00:00',
-      status: 'succeeded',
-      params: {
-        location: {
-          slotName: 'A3',
-        },
-        loadName: 'opentrons_1_trash_3200ml_fixed',
-        namespace: 'opentrons',
-        version: 1,
-        labwareId:
-          'df371a43-1885-4590-8ca3-d38dc3096753:opentrons/opentrons_1_trash_3200ml_fixed/1',
-        displayName: 'Opentrons Fixed Trash',
-      },
-    },
-    {
-      id: '256f1bcf-ae9f-4190-be8a-5389f6b1a962',
-      key: '88c55e6a-4eb7-4863-a96e-de1de8ae27da',
-      commandType: 'pickUpTip',
-      createdAt: '2023-10-20T13:16:53.633713+00:00',
-      startedAt: '2023-10-20T13:18:06.830080+00:00',
-      completedAt: '2023-10-20T13:18:18.820189+00:00',
-      status: 'succeeded',
-      params: {
-        labwareId:
-          'c4b5c4b1-b4f7-4ec6-a4b7-6c8155d7288b:opentrons/opentrons_flex_96_filtertiprack_200ul/1',
-        pipetteId: 'testId1',
-      },
-    },
-    {
-      id: '7f362b85-2005-4ea7-ab50-3aba27be79ca',
-      key: '1bd57042-2f0d-4c0c-afa6-b1a7dfbff769',
-      commandType: 'aspirate',
-      createdAt: '2023-10-20T13:16:53.635966+00:00',
-      startedAt: '2023-10-20T13:18:18.822130+00:00',
-      completedAt: '2023-10-20T13:18:23.424071+00:00',
-      status: 'succeeded',
-      params: {
-        labwareId:
-          'd56511f1-8d02-4891-adba-d2710ae02279:opentrons/armadillo_96_wellplate_200ul_pcr_full_skirt/2',
-        wellName: 'A1',
-        wellLocation: {
-          origin: 'bottom',
-          offset: {
-            x: 0,
-            y: 0,
-            z: 1.0,
-          },
-        },
-        flowRate: 137.35,
-        volume: 5.0,
-        pipetteId: 'testId1',
-      },
-    },
-    {
-      id: '0220242c-4fe4-4d0c-92d8-71fcc45e944e',
-      key: 'a3e946a0-9b93-45d4-8d22-d08815bab0ce',
-      commandType: 'dropTip',
-      status: 'failed',
-      params: {
-        pipetteId: 'testId1',
-      },
-    },
+    createMockCommand(LOAD_PIPETTE, 'load-left', LEFT_PIPETTE_ID),
+    createMockCommand(LOAD_PIPETTE, 'load-right', RIGHT_PIPETTE_ID),
+    createMockCommand(PICK_UP_TIP, 'pickup-left', LEFT_PIPETTE_ID),
+    createMockCommand(DROP_TIP, 'drop-left', LEFT_PIPETTE_ID, 'succeeded'),
   ],
-  links: {
-    current: {
-      href:
-        '/runs/0d61a8ce-e5b8-4e09-9bf9-a65523094663/commands/0220242c-4fe4-4d0c-92d8-71fcc45e944e',
-      meta: {
-        runId: '0d61a8ce-e5b8-4e09-9bf9-a65523094663',
-        commandId: '0220242c-4fe4-4d0c-92d8-71fcc45e944e',
-        index: 10,
-        key: 'a3e946a0-9b93-45d4-8d22-d08815bab0ce',
-        createdAt: '2023-10-20T13:16:53.671711+00:00',
-      },
-    },
-  },
-  meta: {
-    cursor: 0,
-    totalLength: 11,
-  },
+  meta: { cursor: 0, totalLength: 4 },
 }
+
 const mockRunRecord = {
   data: {
     pipettes: [
-      { id: 'testId1', pipetteName: 'testLeftName', mount: 'left' },
-      { id: 'testId2', pipetteName: 'testRightName', mount: 'right' },
+      { id: LEFT_PIPETTE_ID, pipetteName: LEFT_PIPETTE_NAME, mount: LEFT },
+      { id: RIGHT_PIPETTE_ID, pipetteName: RIGHT_PIPETTE_NAME, mount: RIGHT },
     ],
   },
 }
@@ -146,9 +65,8 @@ describe('getPipettesWithTipAttached', () => {
 
   beforeEach(() => {
     DEFAULT_PARAMS = {
-      host: { hostname: 'localhost' },
-      isFlex: true,
-      runId: 'testRunId',
+      host: { hostname: HOST_NAME },
+      runId: RUN_ID,
       attachedInstruments: mockAttachedInstruments as any,
       runRecord: mockRunRecord as any,
     }
@@ -158,88 +76,113 @@ describe('getPipettesWithTipAttached', () => {
     } as any)
   })
 
-  it('returns an empty array if attachedInstruments is undefined', () => {
-    const params = {
-      ...DEFAULT_PARAMS,
-      attachedInstruments: undefined,
-    } as GetPipettesWithTipAttached
-
-    const result = getPipettesWithTipAttached(params)
-    return expect(result).resolves.toEqual([])
+  it('returns an empty array if attachedInstruments is null', async () => {
+    const params = { ...DEFAULT_PARAMS, attachedInstruments: null }
+    const result = await getPipettesWithTipAttached(params)
+    expect(result).toEqual([])
   })
 
-  it('returns an empty array if runRecord is undefined', () => {
-    const params = {
-      ...DEFAULT_PARAMS,
-      runRecord: undefined,
-    } as GetPipettesWithTipAttached
-
-    const result = getPipettesWithTipAttached(params)
-    return expect(result).resolves.toEqual([])
+  it('returns an empty array if runRecord is null', async () => {
+    const params = { ...DEFAULT_PARAMS, runRecord: null }
+    const result = await getPipettesWithTipAttached(params)
+    expect(result).toEqual([])
   })
 
-  it('returns pipettes with sensor detected tip attachment if the robot is a Flex', () => {
-    const result = getPipettesWithTipAttached(DEFAULT_PARAMS)
-    return expect(result).resolves.toEqual(mockAttachedInstruments.data)
-  })
-
-  it('returns pipettes with protocol detected tip attachment if the sensor does not detect tip attachment', () => {
-    const noTipDetectedInstruments = {
-      ...mockAttachedInstruments,
-      data: mockAttachedInstruments.data.map(item => ({
-        ...item,
-        state: {
-          ...item.state,
-          tipDetected: false,
-        },
-      })),
+  it('returns an empty array when no tips are attached according to protocol', async () => {
+    const mockCommandsWithoutAttachedTips = {
+      ...mockCommands,
+      data: [
+        createMockCommand(LOAD_PIPETTE, 'load-left', LEFT_PIPETTE_ID),
+        createMockCommand(LOAD_PIPETTE, 'load-right', RIGHT_PIPETTE_ID),
+        createMockCommand(PICK_UP_TIP, 'pickup-left', LEFT_PIPETTE_ID),
+        createMockCommand(DROP_TIP, 'drop-left', LEFT_PIPETTE_ID, 'succeeded'),
+      ],
     }
 
-    const params = {
-      ...DEFAULT_PARAMS,
-      attachedInstruments: noTipDetectedInstruments,
-    } as GetPipettesWithTipAttached
+    vi.mocked(getCommands).mockResolvedValue({
+      data: mockCommandsWithoutAttachedTips,
+    } as any)
 
-    const result = getPipettesWithTipAttached(params)
-    return expect(result).resolves.toEqual([noTipDetectedInstruments.data[0]])
+    const result = await getPipettesWithTipAttached(DEFAULT_PARAMS)
+    expect(result).toEqual([])
   })
 
-  it('returns pipettes with protocol detected tip attachment if the robot is an OT-2', () => {
-    const params = {
-      ...DEFAULT_PARAMS,
-      isFlex: false,
-    } as GetPipettesWithTipAttached
+  it('returns pipettes with protocol detected tip attachment', async () => {
+    const mockCommandsWithPickUpTip = {
+      ...mockCommands,
+      data: [
+        ...mockCommands.data,
+        createMockCommand(PICK_UP_TIP, 'pickup-left-2', LEFT_PIPETTE_ID),
+        createMockCommand(PICK_UP_TIP, 'pickup-right', RIGHT_PIPETTE_ID),
+      ],
+    }
 
-    const result = getPipettesWithTipAttached(params)
-    return expect(result).resolves.toEqual([mockAttachedInstruments.data[0]])
+    vi.mocked(getCommands).mockResolvedValue({
+      data: mockCommandsWithPickUpTip,
+    } as any)
+
+    const result = await getPipettesWithTipAttached(DEFAULT_PARAMS)
+    expect(result).toEqual(mockAttachedInstruments.data)
   })
 
   it('always returns the left mount before the right mount if both pipettes have tips attached', async () => {
+    const mockCommandsWithPickUpTip = {
+      ...mockCommands,
+      data: [
+        ...mockCommands.data,
+        createMockCommand(PICK_UP_TIP, 'pickup-right', RIGHT_PIPETTE_ID),
+        createMockCommand(PICK_UP_TIP, 'pickup-left-2', LEFT_PIPETTE_ID),
+      ],
+    }
+
+    vi.mocked(getCommands).mockResolvedValue({
+      data: mockCommandsWithPickUpTip,
+    } as any)
+
     const result = await getPipettesWithTipAttached(DEFAULT_PARAMS)
+    expect(result.length).toBe(2)
     expect(result[0].mount).toEqual(LEFT)
     expect(result[1].mount).toEqual(RIGHT)
   })
 
   it('does not return otherwise legitimate failed tip exchange commands if fixit intent tip commands are present and successful', async () => {
-    const mockCommandsWithFixit = mockCommands.data.push({
-      id: '0220242c-4fe4-4d0c-92d8-71fcc45e944e',
-      key: 'a3e946a0-9b93-45d4-8d22-d08815bab0ce',
-      intent: 'fixit',
-      commandType: 'dropTipInPlace',
-      status: 'succeeded',
-      params: {
-        pipetteId: 'testId1',
-      },
-    } as any)
+    const mockCommandsWithFixit = {
+      ...mockCommands,
+      data: [
+        ...mockCommands.data,
+        {
+          ...createMockCommand(
+            DROP_TIP_IN_PLACE,
+            'fixit-drop',
+            LEFT_PIPETTE_ID
+          ),
+          intent: FIXIT_INTENT,
+        },
+      ],
+    }
 
     vi.mocked(getCommands).mockResolvedValue({
-      data: { data: mockCommandsWithFixit, meta: { totalLength: 11 } },
+      data: mockCommandsWithFixit,
     } as any)
 
-    const result = await getPipettesWithTipAttached({
-      ...DEFAULT_PARAMS,
-      isFlex: false,
-    })
+    const result = await getPipettesWithTipAttached(DEFAULT_PARAMS)
     expect(result).toEqual([])
+  })
+
+  it('considers a tip attached only if the last tip exchange command was pickUpTip', async () => {
+    const mockCommandsWithPickUpTip = {
+      ...mockCommands,
+      data: [
+        ...mockCommands.data,
+        createMockCommand(PICK_UP_TIP, 'pickup-left-2', LEFT_PIPETTE_ID),
+      ],
+    }
+
+    vi.mocked(getCommands).mockResolvedValue({
+      data: mockCommandsWithPickUpTip,
+    } as any)
+
+    const result = await getPipettesWithTipAttached(DEFAULT_PARAMS)
+    expect(result).toEqual([mockAttachedInstruments.data[0]])
   })
 })

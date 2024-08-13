@@ -1,8 +1,8 @@
 """Parameter context for python protocols."""
-import tempfile
 from typing import List, Optional, Union, Dict
 
 from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.util import requires_version
 from opentrons.protocols.parameters import (
     parameter_definition,
     csv_parameter_definition,
@@ -15,6 +15,7 @@ from opentrons.protocols.parameters.types import (
 from opentrons.protocols.parameters.exceptions import (
     ParameterDefinitionError,
     ParameterValueError,
+    IncompatibleParameterError,
 )
 from opentrons.protocol_engine.types import (
     RunTimeParameter,
@@ -169,6 +170,7 @@ class ParameterContext:
         )
         self._parameters[parameter.variable_name] = parameter
 
+    @requires_version(2, 20)
     def add_csv_file(
         self,
         display_name: str,
@@ -182,6 +184,14 @@ class ParameterContext:
             variable_name: The variable name the CSV parameter will be referred to in the run context.
             description: A description of the parameter as it will show up on the frontend.
         """
+        if any(
+            isinstance(parameter, csv_parameter_definition.CSVParameterDefinition)
+            for parameter in self._parameters.values()
+        ):
+            raise IncompatibleParameterError(
+                "Only one CSV File parameter can be defined per protocol."
+            )
+
         validation.validate_variable_name_unique(variable_name, set(self._parameters))
         parameter = csv_parameter_definition.create_csv_parameter(
             display_name=display_name,
@@ -240,41 +250,16 @@ class ParameterContext:
                     f"File Id was provided for the parameter '{variable_name}',"
                     f" but '{variable_name}' is not a CSV parameter."
                 )
-            # TODO(jbl 2024-08-02) This file opening should be moved elsewhere to provide more flexibility with files
-            #    that may be opened as non-text or non-UTF-8
+
             # The parent folder in the path will be the file ID, so we can use that to resolve that here
             file_id = file_path.parent.name
             file_name = file_path.name
 
-            # Read the contents of the actual file
-            with file_path.open() as csv_file:
-                contents = csv_file.read()
-
-            # Open a temporary file with write permissions and write contents to that
-            temporary_file = tempfile.NamedTemporaryFile("r+")
-            temporary_file.write(contents)
-            temporary_file.flush()
-
-            # Open a new file handler for the temporary file with read-only permissions and close the other
-            parameter_file = open(temporary_file.name, "r")
-            temporary_file.close()
+            with file_path.open("rb") as fh:
+                contents = fh.read()
 
             parameter.file_info = FileInfo(id=file_id, name=file_name)
-            parameter.value = parameter_file
-
-    def close_csv_files(self) -> None:
-        """Close all file handlers for CSV parameters.
-
-        :meta private:
-
-        This is intended for Opentrons internal use only and is not a guaranteed API.
-        """
-        for parameter in self._parameters.values():
-            if (
-                isinstance(parameter, csv_parameter_definition.CSVParameterDefinition)
-                and parameter.value is not None
-            ):
-                parameter.value.close()
+            parameter.value = contents
 
     def export_parameters_for_analysis(self) -> List[RunTimeParameter]:
         """Exports all parameters into a protocol engine models for reporting in analysis.
@@ -299,7 +284,7 @@ class ParameterContext:
         for parameter in self._parameters.values():
             value: UserFacingTypes
             if isinstance(parameter, csv_parameter_definition.CSVParameterDefinition):
-                value = parameter.as_csv_parameter_interface()
+                value = parameter.as_csv_parameter_interface(self._api_version)
             else:
                 value = parameter.value
             parameters_for_protocol[parameter.variable_name] = value

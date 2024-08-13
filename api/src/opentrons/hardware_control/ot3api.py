@@ -2629,7 +2629,7 @@ class OT3API(
         force_both_sensors: bool = False,
     ) -> float:
         plunger_direction = -1 if probe_settings.aspirate_while_sensing else 1
-        await self._backend.liquid_probe(
+        end_z = await self._backend.liquid_probe(
             mount,
             p_travel,
             probe_settings.mount_speed,
@@ -2641,8 +2641,17 @@ class OT3API(
             probe=probe,
             force_both_sensors=force_both_sensors,
         )
-        end_pos = await self.gantry_position(mount, refresh=True)
-        return end_pos.z
+        machine_pos = await self._backend.update_position()
+        machine_pos[Axis.by_mount(mount)] = end_z
+        deck_end_z = self._deck_from_machine(machine_pos)[Axis.by_mount(mount)]
+        offset = offset_for_mount(
+            mount,
+            top_types.Point(*self._config.left_mount_offset),
+            top_types.Point(*self._config.right_mount_offset),
+            top_types.Point(*self._config.gripper_mount_offset),
+        )
+        cp = self.critical_point_for(mount, None)
+        return deck_end_z + offset.z + cp.z
 
     async def liquid_probe(
         self,
@@ -2717,7 +2726,7 @@ class OT3API(
         #  probe_start_pos.z + z_distance of pass - pos.z should be < max_z_dist
         # due to rounding errors this can get caught in an infinite loop when the distance is almost equal
         # so we check to see if they're within 0.01 which is 1/5th the minimum movement distance from move_utils.py
-        while (probe_start_pos.z - pos.z) < (max_z_dist + 0.01):
+        while (probe_start_pos.z - pos.z) < (max_z_dist - 0.01):
             # safe distance so we don't accidentally aspirate liquid if we're already close to liquid
             safe_plunger_pos = top_types.Point(
                 pos.x, pos.y, pos.z + probe_safe_reset_mm

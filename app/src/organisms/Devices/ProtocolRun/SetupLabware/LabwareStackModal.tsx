@@ -23,8 +23,17 @@ import { getLocationInfoNames } from '../utils/getLocationInfoNames'
 import { getSlotLabwareDefinition } from '../utils/getSlotLabwareDefinition'
 import { Divider } from '../../../../atoms/structure'
 import { getModuleImage } from '../SetupModuleAndDeck/utils'
-import { getModuleDisplayName } from '@opentrons/shared-data'
+import {
+  FLEX_ROBOT_TYPE,
+  getModuleDisplayName,
+  getModuleType,
+  TC_MODULE_LOCATION_OT2,
+  TC_MODULE_LOCATION_OT3,
+  THERMOCYCLER_MODULE_TYPE,
+} from '@opentrons/shared-data'
 import tiprackAdapter from '../../../../assets/images/labware/opentrons_flex_96_tiprack_adapter.png'
+
+import type { RobotType } from '@opentrons/shared-data'
 
 const HIDE_SCROLLBAR = css`
   ::-webkit-scrollbar {
@@ -36,12 +45,13 @@ interface LabwareStackModalProps {
   labwareIdTop: string
   runId: string
   closeModal: () => void
+  robotType?: RobotType
 }
 
 export const LabwareStackModal = (
   props: LabwareStackModalProps
 ): JSX.Element | null => {
-  const { labwareIdTop, runId, closeModal } = props
+  const { labwareIdTop, runId, closeModal, robotType = FLEX_ROBOT_TYPE } = props
   const { t } = useTranslation('protocol_setup')
   const isOnDevice = useSelector(getIsOnDevice)
   const protocolData = useMostRecentCompletedAnalysis(runId)
@@ -60,6 +70,14 @@ export const LabwareStackModal = (
 
   const topDefinition = getSlotLabwareDefinition(labwareIdTop, commands)
   const adapterDef = getSlotLabwareDefinition(adapterId ?? '', commands)
+  const isModuleThermocycler =
+    moduleModel == null
+      ? false
+      : getModuleType(moduleModel) === THERMOCYCLER_MODULE_TYPE
+  const thermocyclerLocation =
+    robotType === FLEX_ROBOT_TYPE
+      ? TC_MODULE_LOCATION_OT3
+      : TC_MODULE_LOCATION_OT2
   const moduleDisplayName =
     moduleModel != null ? getModuleDisplayName(moduleModel) : null ?? ''
   const tiprackAdapterImg = (
@@ -67,7 +85,11 @@ export const LabwareStackModal = (
   )
   const moduleImg =
     moduleModel != null ? (
-      <img width="156px" height="130px" src={getModuleImage(moduleModel)} />
+      <img
+        width="156px"
+        height="130px"
+        src={getModuleImage(moduleModel, true)}
+      />
     ) : null
 
   return isOnDevice ? (
@@ -76,7 +98,9 @@ export const LabwareStackModal = (
       header={{
         title: (
           <Flex gridGap={SPACING.spacing4}>
-            <DeckInfoLabel deckLabel={slotName} />
+            <DeckInfoLabel
+              deckLabel={isModuleThermocycler ? thermocyclerLocation : slotName}
+            />
             <DeckInfoLabel iconName="stacked" />
           </Flex>
         ),
@@ -151,14 +175,15 @@ export const LabwareStackModal = (
     <LegacyModal
       onClose={closeModal}
       closeOnOutsideClick
-      title={
-        <Flex gridGap={SPACING.spacing8}>
-          <DeckInfoLabel deckLabel={slotName} />
-          <DeckInfoLabel iconName="stacked" />
-          <StyledText>{t('stacked_slot')}</StyledText>
-        </Flex>
+      title={t('stacked_slot')}
+      titleElement1={
+        <DeckInfoLabel
+          deckLabel={isModuleThermocycler ? thermocyclerLocation : slotName}
+        />
       }
+      titleElement2={<DeckInfoLabel iconName="stacked" />}
       childrenPadding={0}
+      marginLeft="0"
     >
       <Box padding={SPACING.spacing24} backgroundColor={COLORS.white}>
         <Flex flexDirection={DIRECTION_COLUMN}>
@@ -186,14 +211,21 @@ export const LabwareStackModal = (
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
               >
                 <LabwareStackLabel text={adapterName ?? ''} />
-                <LabwareStackRender
-                  definitionTop={topDefinition}
-                  definitionBottom={adapterDef}
-                  highlightBottom={true}
-                  highlightTop={false}
-                />
+                {adapterDef.parameters.loadName ===
+                'opentrons_flex_96_tiprack_adapter' ? (
+                  tiprackAdapterImg
+                ) : (
+                  <LabwareStackRender
+                    definitionTop={topDefinition}
+                    definitionBottom={adapterDef}
+                    highlightBottom={true}
+                    highlightTop={false}
+                  />
+                )}
               </Flex>
-              <Divider marginY={SPACING.spacing16} />
+              {moduleModel != null ? (
+                <Divider marginY={SPACING.spacing16} />
+              ) : null}
             </>
           ) : null}
           {moduleModel != null ? (

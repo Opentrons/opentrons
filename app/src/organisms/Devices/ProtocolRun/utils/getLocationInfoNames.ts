@@ -89,6 +89,18 @@ export function getLocationInfoNames(
       }
     } else if (
       loadedAdapterCommand?.params.location !== 'offDeck' &&
+      'addressableAreaName' in loadedAdapterCommand?.params.location
+    ) {
+      return {
+        slotName: loadedAdapterCommand?.params.location.addressableAreaName,
+        labwareName,
+        labwareNickname,
+        adapterName:
+          loadedAdapterCommand?.result?.definition.metadata.displayName,
+        adapterId: loadedAdapterCommand?.result?.labwareId,
+      }
+    } else if (
+      loadedAdapterCommand?.params.location !== 'offDeck' &&
       'moduleId' in loadedAdapterCommand?.params.location
     ) {
       const moduleId = loadedAdapterCommand?.params.location.moduleId

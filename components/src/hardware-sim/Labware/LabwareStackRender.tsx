@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { WellLabels, StaticLabware } from './labwareInternals'
-import { LabwareAdapter } from './LabwareAdapter'
+import { LabwareAdapter, labwareAdapterLoadNames } from './LabwareAdapter'
 import { COLORS } from '../../helix-design-system'
 import { Svg } from '../..'
 
@@ -8,7 +8,6 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { HighlightedWellLabels } from './labwareInternals/types'
 import type { LabwareAdapterLoadName } from './LabwareAdapter'
 import type { WellLabelOption } from '../..'
-
 const HIGHLIGHT_COLOR = COLORS.blue30
 const STROKE_WIDTH = 1
 const SKEW_ANGLE_DEGREES = 30
@@ -87,7 +86,9 @@ export const LabwareStackRender = (
     definitionBottom.parameters.loadName === 'opentrons_flex_96_tiprack_adapter'
   ) {
     const { xDimension, yDimension } = definitionTop.dimensions
-    const isTopAdapter = definitionTop.metadata.displayCategory === 'adapter'
+    const isTopAdapter = labwareAdapterLoadNames.includes(
+      definitionTop.parameters.loadName
+    )
 
     return isTopAdapter ? (
       // adapter render

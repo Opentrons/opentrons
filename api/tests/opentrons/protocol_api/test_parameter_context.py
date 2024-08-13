@@ -13,7 +13,10 @@ from opentrons.protocols.parameters import (
     parameter_definition as mock_parameter_definition,
     validation as mock_validation,
 )
-from opentrons.protocols.parameters.exceptions import ParameterDefinitionError
+from opentrons.protocols.parameters.exceptions import (
+    ParameterDefinitionError,
+    IncompatibleParameterError,
+)
 from opentrons.protocol_engine.types import BooleanParameter
 
 from opentrons.protocol_api._parameter_context import ParameterContext
@@ -196,7 +199,7 @@ def test_add_string(decoy: Decoy, subject: ParameterContext) -> None:
 def test_add_csv(decoy: Decoy, subject: ParameterContext) -> None:
     """It should create and add a CSV parameter definition."""
     subject._parameters["other_param"] = decoy.mock(
-        cls=mock_csv_parameter_definition.CSVParameterDefinition
+        cls=mock_parameter_definition.ParameterDefinition
     )
     param_def = decoy.mock(cls=mock_csv_parameter_definition.CSVParameterDefinition)
     decoy.when(param_def.variable_name).then_return("my potentially cool variable")
@@ -218,6 +221,22 @@ def test_add_csv(decoy: Decoy, subject: ParameterContext) -> None:
     decoy.verify(
         mock_validation.validate_variable_name_unique("qwerty", {"other_param"})
     )
+
+
+def test_add_csv_raises_for_multiple_csvs(
+    decoy: Decoy, subject: ParameterContext
+) -> None:
+    """It should raise with a IncompatibleParameterError if there's already a CSV parameter.."""
+    subject._parameters["other_param"] = decoy.mock(
+        cls=mock_csv_parameter_definition.CSVParameterDefinition
+    )
+
+    with pytest.raises(IncompatibleParameterError):
+        subject.add_csv_file(
+            display_name="jkl",
+            variable_name="qwerty",
+            description="fee foo fum",
+        )
 
 
 def test_set_parameters(decoy: Decoy, subject: ParameterContext) -> None:

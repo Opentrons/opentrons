@@ -13,6 +13,8 @@ export interface LegacyModalProps extends StyleProps {
   onClose?: React.MouseEventHandler
   closeOnOutsideClick?: boolean
   title?: React.ReactNode
+  titleElement1?: JSX.Element
+  titleElement2?: JSX.Element
   fullPage?: boolean
   childrenPadding?: string | number
   children?: React.ReactNode
@@ -31,6 +33,8 @@ export const LegacyModal = (props: LegacyModalProps): JSX.Element => {
     childrenPadding = `${SPACING.spacing16} ${SPACING.spacing24} ${SPACING.spacing24}`,
     children,
     footer,
+    titleElement1,
+    titleElement2,
     ...styleProps
   } = props
 
@@ -58,6 +62,8 @@ export const LegacyModal = (props: LegacyModalProps): JSX.Element => {
     <LegacyModalHeader
       onClose={onClose}
       title={title}
+      titleElement1={titleElement1}
+      titleElement2={titleElement2}
       icon={['error', 'warning'].includes(type) ? modalIcon : undefined}
       color={COLORS.black90}
       backgroundColor={COLORS.white}

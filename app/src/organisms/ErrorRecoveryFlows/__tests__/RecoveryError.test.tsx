@@ -1,3 +1,4 @@
+/* eslint-disable testing-library/prefer-presence-queries */
 import * as React from 'react'
 import { describe, it, vi, expect, beforeEach } from 'vitest'
 import { screen, fireEvent } from '@testing-library/react'
@@ -48,11 +49,13 @@ describe('RecoveryError', () => {
       RECOVERY_MAP.ERROR_WHILE_RECOVERING.STEPS.RECOVERY_ACTION_FAILED
     render(props)
 
-    expect(screen.getByText('Retry step failed')).toBeInTheDocument()
+    expect(screen.queryAllByText('Retry step failed')[0]).toBeInTheDocument()
     expect(
-      screen.getByText('Return to the menu to choose how to proceed.')
+      screen.queryAllByText(
+        'Next, you can try another recovery action or cancel the run.'
+      )[0]
     ).toBeInTheDocument()
-    expect(screen.getByText('Back to menu')).toBeInTheDocument()
+    expect(screen.queryAllByText('Back to menu')[0]).toBeInTheDocument()
   })
 
   it(`renders RecoveryDropTipFlowErrors when step is ${ERROR_WHILE_RECOVERING.STEPS.DROP_TIP_GENERAL_ERROR}`, () => {
@@ -60,11 +63,13 @@ describe('RecoveryError', () => {
       RECOVERY_MAP.ERROR_WHILE_RECOVERING.STEPS.DROP_TIP_GENERAL_ERROR
     render(props)
 
-    expect(screen.getByText('Retry step failed')).toBeInTheDocument()
+    expect(screen.queryAllByText('Retry step failed')[0]).toBeInTheDocument()
     expect(
-      screen.getByText('Return to the menu to choose how to proceed.')
+      screen.queryAllByText(
+        'Next, you can try another recovery action or cancel the run.'
+      )[0]
     ).toBeInTheDocument()
-    expect(screen.getByText('Return to menu')).toBeInTheDocument()
+    expect(screen.queryAllByText('Return to menu')[0]).toBeInTheDocument()
   })
 
   it(`renders RecoveryDropTipFlowErrors when step is ${ERROR_WHILE_RECOVERING.STEPS.DROP_TIP_BLOWOUT_FAILED}`, () => {
@@ -72,13 +77,13 @@ describe('RecoveryError', () => {
       RECOVERY_MAP.ERROR_WHILE_RECOVERING.STEPS.DROP_TIP_BLOWOUT_FAILED
     render(props)
 
-    expect(screen.getByText('Blowout failed')).toBeInTheDocument()
+    expect(screen.queryAllByText('Blowout failed')[0]).toBeInTheDocument()
     expect(
-      screen.getByText(
+      screen.queryAllByText(
         'You can still drop the attached tips before proceeding to tip selection.'
-      )
+      )[0]
     ).toBeInTheDocument()
-    expect(screen.getByText('Continue to drop tip')).toBeInTheDocument()
+    expect(screen.queryAllByText('Continue to drop tip')[0]).toBeInTheDocument()
   })
 
   it(`renders RecoveryDropTipFlowErrors when step is ${ERROR_WHILE_RECOVERING.STEPS.DROP_TIP_TIP_DROP_FAILED}`, () => {
@@ -86,11 +91,13 @@ describe('RecoveryError', () => {
       RECOVERY_MAP.ERROR_WHILE_RECOVERING.STEPS.DROP_TIP_TIP_DROP_FAILED
     render(props)
 
-    expect(screen.getByText('Tip drop failed')).toBeInTheDocument()
+    expect(screen.queryAllByText('Tip drop failed')[0]).toBeInTheDocument()
     expect(
-      screen.getByText('Return to the menu to choose how to proceed.')
+      screen.queryAllByText(
+        'Next, you can try another recovery action or cancel the run.'
+      )[0]
     ).toBeInTheDocument()
-    expect(screen.getByText('Return to menu')).toBeInTheDocument()
+    expect(screen.queryAllByText('Return to menu')[0]).toBeInTheDocument()
   })
 
   it(`calls proceedToRouteAndStep with ${RECOVERY_MAP.OPTION_SELECTION.ROUTE} when the "Back to menu" button is clicked in ErrorRecoveryFlowError`, () => {
@@ -98,7 +105,7 @@ describe('RecoveryError', () => {
       RECOVERY_MAP.ERROR_WHILE_RECOVERING.STEPS.RECOVERY_ACTION_FAILED
     render(props)
 
-    fireEvent.click(screen.getByText('Back to menu'))
+    fireEvent.click(screen.queryAllByText('Back to menu')[0])
 
     expect(proceedToRouteAndStepMock).toHaveBeenCalledWith(
       RECOVERY_MAP.OPTION_SELECTION.ROUTE
@@ -110,7 +117,7 @@ describe('RecoveryError', () => {
       RECOVERY_MAP.ERROR_WHILE_RECOVERING.STEPS.DROP_TIP_GENERAL_ERROR
     render(props)
 
-    fireEvent.click(screen.getByText('Return to menu'))
+    fireEvent.click(screen.queryAllByText('Return to menu')[0])
 
     expect(proceedToRouteAndStepMock).toHaveBeenCalledWith(
       RECOVERY_MAP.OPTION_SELECTION.ROUTE
@@ -122,7 +129,7 @@ describe('RecoveryError', () => {
       RECOVERY_MAP.ERROR_WHILE_RECOVERING.STEPS.DROP_TIP_TIP_DROP_FAILED
     render(props)
 
-    fireEvent.click(screen.getByText('Return to menu'))
+    fireEvent.click(screen.queryAllByText('Return to menu')[0])
 
     expect(proceedToRouteAndStepMock).toHaveBeenCalledWith(
       RECOVERY_MAP.OPTION_SELECTION.ROUTE
@@ -134,7 +141,7 @@ describe('RecoveryError', () => {
       RECOVERY_MAP.ERROR_WHILE_RECOVERING.STEPS.DROP_TIP_BLOWOUT_FAILED
     render(props)
 
-    fireEvent.click(screen.getByText('Continue to drop tip'))
+    fireEvent.click(screen.queryAllByText('Continue to drop tip')[0])
 
     expect(proceedToRouteAndStepMock).toHaveBeenCalledWith(
       RECOVERY_MAP.DROP_TIP_FLOWS.ROUTE,

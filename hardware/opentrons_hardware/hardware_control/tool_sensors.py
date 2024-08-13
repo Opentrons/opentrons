@@ -201,7 +201,7 @@ async def run_sync_buffer_to_csv(
             ),
             expected_nodes=[tool],
         )
-    if raise_z is not None and False:
+    if raise_z is not None:
         #  if probing is finished, move the head node back up before requesting the data buffer
         if positions[head_node].move_ack == MoveCompleteAck.stopped_by_condition:
             await raise_z.run(can_messenger=messenger)

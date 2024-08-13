@@ -2,9 +2,9 @@ import * as React from 'react'
 
 import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
 
-import { MANAGED_PIPETTE_ID, POSITION_AND_BLOWOUT } from '../../constants'
-import { getAddressableAreaFromConfig } from '../../getAddressableAreaFromConfig'
-import { useNotifyDeckConfigurationQuery } from '../../../../resources/deck_configuration'
+import { MANAGED_PIPETTE_ID, POSITION_AND_BLOWOUT } from '../constants'
+import { getAddressableAreaFromConfig } from '../getAddressableAreaFromConfig'
+import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
 import type {
   CreateCommand,
   AddressableAreaName,
@@ -14,18 +14,14 @@ import type {
 } from '@opentrons/shared-data'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import type { CommandData, PipetteData } from '@opentrons/api-client'
-import type {
-  Axis,
-  Sign,
-  StepSize,
-} from '../../../../molecules/JogControls/types'
-import type { DropTipFlowsStep, FixitCommandTypeUtils } from '../../types'
-import type { SetRobotErrorDetailsParams } from '../errors'
-import type { UseDTWithTypeParams } from '..'
+import type { Axis, Sign, StepSize } from '../../../molecules/JogControls/types'
+import type { DropTipFlowsStep, FixitCommandTypeUtils } from '../types'
+import type { SetRobotErrorDetailsParams, UseDTWithTypeParams } from '.'
 import type { RunCommandByCommandTypeParams } from './useDropTipCreateCommands'
 
 const JOG_COMMAND_TIMEOUT_MS = 10000
 const MAXIMUM_BLOWOUT_FLOW_RATE_UL_PER_S = 50
+const MAX_QUEUED_JOGS = 3
 
 type UseDropTipSetupCommandsParams = UseDTWithTypeParams & {
   activeMaintenanceRunId: string | null
@@ -40,10 +36,9 @@ type UseDropTipSetupCommandsParams = UseDTWithTypeParams & {
 }
 
 export interface UseDropTipCommandsResult {
-  /*  */
   handleCleanUpAndClose: (homeOnExit?: boolean) => Promise<void>
   moveToAddressableArea: (addressableArea: AddressableAreaName) => Promise<void>
-  handleJog: (axis: Axis, dir: Sign, step: StepSize) => Promise<void>
+  handleJog: (axis: Axis, dir: Sign, step: StepSize) => void
   blowoutOrDropTip: (
     currentStep: DropTipFlowsStep,
     proceed: () => void
@@ -51,7 +46,6 @@ export interface UseDropTipCommandsResult {
   handleMustHome: () => Promise<void>
 }
 
-// Returns setup commands used in Drop Tip Wizard.
 export function useDropTipCommands({
   issuedCommandsType,
   toggleIsExiting,
@@ -66,6 +60,8 @@ export function useDropTipCommands({
 }: UseDropTipSetupCommandsParams): UseDropTipCommandsResult {
   const isFlex = robotType === FLEX_ROBOT_TYPE
   const [hasSeenClose, setHasSeenClose] = React.useState(false)
+  const [jogQueue, setJogQueue] = React.useState<Array<() => Promise<void>>>([])
+  const [isJogging, setIsJogging] = React.useState(false)
 
   const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation({
     onSuccess: () => {
@@ -154,7 +150,7 @@ export function useDropTipCommands({
     })
   }
 
-  const handleJog = (axis: Axis, dir: Sign, step: StepSize): Promise<void> => {
+  const executeJog = (axis: Axis, dir: Sign, step: StepSize): Promise<void> => {
     return new Promise((resolve, reject) => {
       return runCommand({
         command: {
@@ -177,6 +173,30 @@ export function useDropTipCommands({
           })
           resolve()
         })
+    })
+  }
+
+  const processJogQueue = (): void => {
+    if (jogQueue.length > 0 && !isJogging) {
+      setIsJogging(true)
+      const nextJog = jogQueue[0]
+      setJogQueue(prevQueue => prevQueue.slice(1))
+      nextJog().finally(() => {
+        setIsJogging(false)
+      })
+    }
+  }
+
+  React.useEffect(() => {
+    processJogQueue()
+  }, [jogQueue.length, isJogging])
+
+  const handleJog = (axis: Axis, dir: Sign, step: StepSize): void => {
+    setJogQueue(prevQueue => {
+      if (prevQueue.length < MAX_QUEUED_JOGS) {
+        return [...prevQueue, () => executeJog(axis, dir, step)]
+      }
+      return prevQueue
     })
   }
 
@@ -338,13 +358,14 @@ const buildMoveToAACommand = (
 }
 
 export const buildLoadPipetteCommand = (
+  pipetteName: PipetteModelSpecs['name'],
   mount: PipetteData['mount'],
-  pipetteName: PipetteModelSpecs['name']
+  pipetteId?: string | null
 ): CreateCommand => {
   return {
     commandType: 'loadPipette',
     params: {
-      pipetteId: MANAGED_PIPETTE_ID,
+      pipetteId: pipetteId ?? MANAGED_PIPETTE_ID,
       mount,
       pipetteName,
     },

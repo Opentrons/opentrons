@@ -14,11 +14,11 @@ from pydantic import BaseModel, Field
 
 from opentrons_shared_data.errors import ErrorCodes
 from opentrons.protocol_engine.types import CSVRuntimeParamPaths
-
 from opentrons.protocol_engine import (
     errors as pe_errors,
 )
 
+from robot_server.data_files.models import FileIdNotFound, FileIdNotFoundError
 from robot_server.data_files.dependencies import (
     get_data_files_directory,
     get_data_files_store,
@@ -150,10 +150,11 @@ async def get_run_data_from_url(
     responses={
         status.HTTP_201_CREATED: {"model": SimpleBody[Run]},
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[ProtocolNotFound]},
+        status.HTTP_422_UNPROCESSABLE_ENTITY: {"model": ErrorBody[FileIdNotFound]},
         status.HTTP_409_CONFLICT: {"model": ErrorBody[RunAlreadyActive]},
     },
 )
-async def create_run(
+async def create_run(  # noqa: C901
     request_body: Optional[RequestModel[RunCreate]] = None,
     run_data_manager: RunDataManager = Depends(get_run_data_manager),
     protocol_store: ProtocolStore = Depends(get_protocol_store),
@@ -199,12 +200,18 @@ async def create_run(
     )
 
     rtp_paths: Optional[CSVRuntimeParamPaths] = None
-    # TODO(jbl 2024-08-02) raise the proper error if file ids don't exist
-    if rtp_files:
-        rtp_paths = {
-            name: data_files_directory / file_id / data_files_store.get(file_id).name
-            for name, file_id in rtp_files.items()
-        }
+    try:
+        if rtp_files:
+            rtp_paths = {
+                name: data_files_directory
+                / file_id
+                / data_files_store.get(file_id).name
+                for name, file_id in rtp_files.items()
+            }
+    except FileIdNotFoundError as e:
+        raise FileIdNotFound(detail=str(e)).as_error(
+            status.HTTP_422_UNPROCESSABLE_ENTITY
+        )
 
     protocol_resource = None
 

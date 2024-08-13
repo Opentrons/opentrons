@@ -815,15 +815,9 @@ async def test_liquid_probe(
     with patch.object(
         hardware_backend, "liquid_probe", AsyncMock(spec=hardware_backend.liquid_probe)
     ) as mock_liquid_probe:
-        return_dict = {
-            head_node: 140,
-            NodeId.gantry_x: 0,
-            NodeId.gantry_y: 0,
-            pipette_node: 0,
-        }
 
         # make sure aspirate while sensing reverses direction
-        mock_liquid_probe.return_value = return_dict
+        mock_liquid_probe.return_value = 140
         fake_settings_aspirate = LiquidProbeSettings(
             mount_speed=5,
             plunger_speed=20,
@@ -849,8 +843,6 @@ async def test_liquid_probe(
             force_both_sensors=False,
         )
 
-        return_dict[head_node], return_dict[pipette_node] = 142, 142
-        mock_liquid_probe.return_value = return_dict
         await ot3_hardware.liquid_probe(
             mount, fake_max_z_dist, fake_liquid_settings
         )  # should raise no exceptions
@@ -903,7 +895,7 @@ async def test_liquid_probe_plunger_moves(
             PipetteLiquidNotFoundError,
             PipetteLiquidNotFoundError,
             PipetteLiquidNotFoundError,
-            None,
+            140,
         ]
 
         fake_max_z_dist = 75.0
@@ -958,7 +950,7 @@ async def test_liquid_probe_plunger_moves(
             mount_travel_distance = mount_speed * mount_travel_time
             max_z_distance -= mount_travel_distance
 
-            move_mount_z_time = (max_z_distance + probe_safe_reset_mm) / mount_speed
+            move_mount_z_time = (max_z_distance + probe_pass_z_offset_mm) / mount_speed
             p_travel_required_for_z = move_mount_z_time * config.plunger_speed
 
 
@@ -1056,16 +1048,10 @@ async def test_multi_liquid_probe(
     with patch.object(
         hardware_backend, "liquid_probe", AsyncMock(spec=hardware_backend.liquid_probe)
     ) as mock_liquid_probe:
-        return_dict = {
-            NodeId.head_l: 140,
-            NodeId.gantry_x: 0,
-            NodeId.gantry_y: 0,
-            NodeId.pipette_left: 0,
-        }
         side_effects = [
             PipetteLiquidNotFoundError(),
             PipetteLiquidNotFoundError(),
-            return_dict,
+            140,
         ]
 
         # make sure aspirate while sensing reverses direction
@@ -1102,9 +1088,6 @@ async def test_multi_liquid_probe(
             force_both_sensors=False,
         )
         assert mock_liquid_probe.call_count == 3
-
-        return_dict[NodeId.head_l], return_dict[NodeId.pipette_left] = 142, 142
-        mock_liquid_probe.return_value = return_dict
 
 
 async def test_liquid_not_found(
@@ -1167,7 +1150,7 @@ async def test_liquid_not_found(
             OT3Mount.LEFT, fake_max_z_dist, fake_settings_aspirate
         )
     # assert that it went through 4 passes and then prepared to aspirate
-    assert mock_move_to_plunger_bottom.call_count == 4
+    assert mock_move_to_plunger_bottom.call_count == 5
 
 
 @pytest.mark.parametrize(
