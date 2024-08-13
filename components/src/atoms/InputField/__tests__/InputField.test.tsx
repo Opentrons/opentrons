@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { screen, fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '../../../testing/utils'
 import { InputField } from '..'
 
 const render = (props: React.ComponentProps<typeof InputField>) => {

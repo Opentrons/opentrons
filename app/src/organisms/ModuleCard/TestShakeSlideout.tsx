@@ -13,6 +13,7 @@ import {
   DIRECTION_ROW,
   Flex,
   Icon,
+  InputField,
   LegacyStyledText,
   Link,
   PrimaryButton,
@@ -35,7 +36,6 @@ import { getTopPortalEl } from '../../App/portal'
 import { Slideout } from '../../atoms/Slideout'
 import { TertiaryButton } from '../../atoms/buttons'
 import { Divider } from '../../atoms/structure'
-import { InputField } from '../../atoms/InputField'
 import { ConfirmAttachmentModal } from './ConfirmAttachmentModal'
 import { useLatchControls } from './hooks'
 import { ModuleSetupModal } from './ModuleSetupModal'

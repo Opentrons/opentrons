@@ -7,9 +7,10 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  InputField,
+  LegacyStyledText,
   PrimaryButton,
   SPACING,
-  LegacyStyledText,
 } from '@opentrons/components'
 import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'
 import {
@@ -23,7 +24,6 @@ import {
   ANALYTICS_RENAME_ROBOT,
 } from '../../../../../redux/analytics'
 import { Slideout } from '../../../../../atoms/Slideout'
-import { InputField } from '../../../../../atoms/InputField'
 import { Banner } from '../../../../../atoms/Banner'
 import { useIsFlex } from '../../../hooks'
 

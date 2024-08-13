@@ -1,26 +1,19 @@
 import * as React from 'react'
 import styled, { css } from 'styled-components'
 
-import {
-  ALIGN_CENTER,
-  BORDERS,
-  COLOR_WARNING_DARK,
-  COLORS,
-  DIRECTION_COLUMN,
-  Flex,
-  Icon,
-  LegacyStyledText,
-  RESPONSIVENESS,
-  SPACING,
-  TEXT_ALIGN_RIGHT,
-  Tooltip,
-  TYPOGRAPHY,
-  useHoverTooltip,
-} from '@opentrons/components'
+import { Flex } from '../../primitives'
+import { ALIGN_CENTER, DIRECTION_COLUMN } from '../../styles'
+import { BORDERS, COLORS } from '../../helix-design-system'
+import { Icon } from '../../icons'
+import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { Tooltip } from '../Tooltip'
+import { useHoverTooltip } from '../../tooltips'
+import { LegacyStyledText } from '../StyledText'
 
 export const INPUT_TYPE_NUMBER = 'number' as const
-export const INPUT_TYPE_TEXT = 'text' as const
-export const INPUT_TYPE_PASSWORD = 'password' as const
+export const LEGACY_INPUT_TYPE_TEXT = 'text' as const
+export const LEGACY_INPUT_TYPE_PASSWORD = 'password' as const
+const COLOR_WARNING_DARK = '#9e5e00' // ToDo (kk:08/13/2024) replace this with COLORS
 
 export interface InputFieldProps {
   /** field is disabled if value is true */
@@ -47,8 +40,8 @@ export interface InputFieldProps {
   caption?: string | null
   /** optional input type (default "text") */
   type?:
-    | typeof INPUT_TYPE_TEXT
-    | typeof INPUT_TYPE_PASSWORD
+    | typeof LEGACY_INPUT_TYPE_TEXT
+    | typeof LEGACY_INPUT_TYPE_PASSWORD
     | typeof INPUT_TYPE_NUMBER
   /** mouse click handler */
   onClick?: (event: React.MouseEvent<HTMLInputElement>) => unknown
@@ -227,7 +220,7 @@ export const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
       font-size: ${TYPOGRAPHY.fontSizeLabel};
       font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
       line-height: ${TYPOGRAPHY.lineHeight12};
-      align-text: ${TEXT_ALIGN_RIGHT};
+      text-align: ${TYPOGRAPHY.textAlignRight};
       @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
         color: ${props.disabled ? COLORS.grey40 : COLORS.grey50};
         font-size: ${TYPOGRAPHY.fontSize22};

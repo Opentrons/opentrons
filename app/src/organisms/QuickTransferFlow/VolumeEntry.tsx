@@ -1,14 +1,15 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+
 import {
-  Flex,
-  SPACING,
-  DIRECTION_COLUMN,
   ALIGN_CENTER,
+  DIRECTION_COLUMN,
+  Flex,
+  InputField,
+  SPACING,
 } from '@opentrons/components'
 
 import { ChildNavigation } from '../ChildNavigation'
-import { InputField } from '../../atoms/InputField'
 import { NumericalKeyboard } from '../../atoms/SoftwareKeyboard'
 import { getVolumeRange } from './utils'
 import { CONSOLIDATE, DISTRIBUTE } from './constants'
