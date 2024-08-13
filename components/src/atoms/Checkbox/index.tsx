@@ -41,7 +41,7 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
     color: ${isChecked ? COLORS.white : COLORS.black90};
     background-color: ${isChecked ? COLORS.blue50 : COLORS.blue35};
     border-radius: ${BORDERS.borderRadiusFull};
-    padding: ${BORDERS.borderRadius12} ${BORDERS.borderRadius12};
+    padding: ${SPACING.spacing12} ${SPACING.spacing16};
     justify-content: ${JUSTIFY_SPACE_BETWEEN};
     cursor: pointer;
 
