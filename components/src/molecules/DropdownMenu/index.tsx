@@ -14,10 +14,11 @@ import {
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { Flex } from '../../primitives'
 import { Icon } from '../../icons'
-import { Tooltip } from '../../atoms/Tooltip'
 import { useHoverTooltip } from '../../tooltips'
 import { useOnClickOutside } from '../../interaction-enhancers'
-import { LegacyStyledText, MenuItem } from '../../atoms'
+import { LegacyStyledText } from '../../atoms/StyledText/LegacyStyledText'
+import { MenuItem } from '../../atoms/MenuList/MenuItem'
+import { Tooltip } from '../../atoms/Tooltip'
 
 /** this is the max height to display 10 items */
 const MAX_HEIGHT = 316

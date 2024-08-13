@@ -1,4 +1,5 @@
 export * from './DeckInfoLabel'
+export * from './DropdownMenu'
 export * from './LiquidIcon'
 export * from './ParametersTable'
 export * from './ParametersTable/InfoScreen'
