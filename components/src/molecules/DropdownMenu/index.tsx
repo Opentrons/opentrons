@@ -182,6 +182,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
                   name="information"
                   size={SPACING.spacing12}
                   color={COLORS.grey60}
+                  data-testid="information_icon"
                 />
               </Flex>
               <Tooltip tooltipProps={tooltipProps}>{tooltipText}</Tooltip>
