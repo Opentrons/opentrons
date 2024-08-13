@@ -32,7 +32,7 @@ type UseProtocolDropTipModalProps = Pick<
   areTipsAttached: TipAttachmentStatusResult['areTipsAttached']
   toggleDTWiz: () => void
   currentRunId: string
-  onClose: () => void
+  onSkipAndHome: () => void
   /* True if the most recent run is the current run */
   isRunCurrent: boolean
 }
@@ -49,15 +49,16 @@ export function useProtocolDropTipModal({
   areTipsAttached,
   toggleDTWiz,
   isRunCurrent,
-  onClose,
+  onSkipAndHome,
   ...homePipetteProps
 }: UseProtocolDropTipModalProps): UseProtocolDropTipModalResult {
   const [showDTModal, setShowDTModal] = React.useState(areTipsAttached)
 
   const { homePipettes, isHomingPipettes } = useHomePipettes({
     ...homePipetteProps,
-    onComplete: () => {
-      onClose()
+    isRunCurrent,
+    onHome: () => {
+      onSkipAndHome()
       setShowDTModal(false)
     },
   })
@@ -65,6 +66,7 @@ export function useProtocolDropTipModal({
   // Close the modal if a different app closes the run context.
   React.useEffect(() => {
     if (isRunCurrent && !isHomingPipettes) {
+      console.log('HITTING SET SHOW MODAL')
       setShowDTModal(areTipsAttached)
     } else if (!isRunCurrent) {
       setShowDTModal(false)

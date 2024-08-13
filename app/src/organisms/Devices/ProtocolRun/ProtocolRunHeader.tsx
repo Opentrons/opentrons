@@ -227,6 +227,7 @@ export function ProtocolRunHeader({
     runRecord: runRecord ?? null,
     host,
   })
+
   const {
     showDTModal,
     onDTModalSkip,
@@ -240,7 +241,7 @@ export function ProtocolRunHeader({
     instrumentModelSpecs: aPipetteWithTip?.specs,
     mount: aPipetteWithTip?.mount,
     robotType,
-    onClose: () => {
+    onSkipAndHome: () => {
       closeCurrentRun()
     },
   })
@@ -515,13 +516,16 @@ export function ProtocolRunHeader({
             robotType={isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE}
             mount={aPipetteWithTip.mount}
             instrumentModelSpecs={aPipetteWithTip.specs}
-            closeFlow={() =>
-              setTipStatusResolved()
-                .then(toggleDTWiz)
-                .then(() => {
+            closeFlow={isTakeover => {
+              if (isTakeover) {
+                toggleDTWiz()
+              } else {
+                void setTipStatusResolved(() => {
+                  toggleDTWiz()
                   closeCurrentRun()
-                })
-            }
+                }, toggleDTWiz)
+              }
+            }}
           />
         ) : null}
       </Flex>

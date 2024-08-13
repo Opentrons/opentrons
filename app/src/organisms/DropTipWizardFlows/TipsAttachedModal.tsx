@@ -25,12 +25,12 @@ import type { UseHomePipettesProps } from './hooks'
 
 type TipsAttachedModalProps = Pick<
   UseHomePipettesProps,
-  'robotType' | 'instrumentModelSpecs' | 'mount'
+  'robotType' | 'instrumentModelSpecs' | 'mount' | 'isRunCurrent'
 > & {
   aPipetteWithTip: PipetteWithTip
   host: HostConfig | null
   setTipStatusResolved: (onEmpty?: () => void) => Promise<void>
-  onClose: () => void
+  onSkipAndHome: () => void
 }
 
 export const handleTipsAttachedModal = (
@@ -56,8 +56,9 @@ const TipsAttachedModal = NiceModal.create(
     const { showDTWiz, toggleDTWiz } = useDropTipWizardFlows()
     const { homePipettes, isHomingPipettes } = useHomePipettes({
       ...homePipetteProps,
-      onComplete: () => {
-        cleanUpAndClose()
+      onHome: () => {
+        modal.remove()
+        void setTipStatusResolved()
       },
     })
 
@@ -71,9 +72,13 @@ const TipsAttachedModal = NiceModal.create(
       homePipettes()
     }
 
-    const cleanUpAndClose = (): void => {
-      modal.remove()
-      props.onClose()
+    const cleanUpAndClose = (isTakeover?: boolean): void => {
+      toggleDTWiz()
+
+      if (!isTakeover) {
+        modal.remove()
+        void setTipStatusResolved()
+      }
     }
 
     const is96Channel = specs.channels === 96
@@ -119,8 +124,8 @@ const TipsAttachedModal = NiceModal.create(
             instrumentModelSpecs={specs}
             mount={mount}
             robotType={FLEX_ROBOT_TYPE}
-            closeFlow={() => {
-              cleanUpAndClose()
+            closeFlow={isTakeover => {
+              cleanUpAndClose(isTakeover)
             }}
           />
         ) : null}
