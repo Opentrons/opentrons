@@ -6,7 +6,7 @@ import {
   Icon,
   LegacyInputField,
   OutlineButton,
-  SharedTooltip,
+  LegacyTooltip,
   useConditionalConfirm,
   useHoverTooltip,
   TOOLTIP_TOP,
@@ -121,17 +121,17 @@ export const ProfileCycleRow = (props: ProfileCycleRowProps): JSX.Element => {
               />
             </div>
           )}
-          <SharedTooltip {...addStepToCycleTooltipProps}>
+          <LegacyTooltip {...addStepToCycleTooltipProps}>
             {t('profile.add_step_to_cycle')}
-          </SharedTooltip>
+          </LegacyTooltip>
           <div className={styles.add_cycle_step} {...addStepToCycleTargetProps}>
             <OutlineButton onClick={addStepToCycle}>+ Step</OutlineButton>
           </div>
         </div>
         <div onClick={confirmDeleteCycle} {...deleteCycleTargetProps}>
-          <SharedTooltip {...deleteCycleTooltipProps}>
+          <LegacyTooltip {...deleteCycleTooltipProps}>
             {t('profile.delete_cycle')}
-          </SharedTooltip>
+          </LegacyTooltip>
           <Icon name="close" className={styles.delete_step_icon} />
         </div>
       </div>
@@ -205,12 +205,12 @@ export const ProfileItemRows = (props: ProfileItemRowsProps): JSX.Element => {
         </div>
       )}
       {rows}
-      <SharedTooltip {...addStepTooltipProps}>
+      <LegacyTooltip {...addStepTooltipProps}>
         {t('profile.add_step')}
-      </SharedTooltip>
-      <SharedTooltip {...addCycleTooltipProps}>
+      </LegacyTooltip>
+      <LegacyTooltip {...addCycleTooltipProps}>
         {t('profile.add_cycle')}
-      </SharedTooltip>
+      </LegacyTooltip>
       <div className={styles.profile_button_group}>
         <OutlineButton
           hoverTooltipHandlers={addStepTargetProps}
@@ -354,9 +354,9 @@ const ProfileStepRow = (props: ProfileStepRowProps): JSX.Element => {
         className={cx({ [styles.cycle_step_delete]: isCycle })}
         {...targetProps}
       >
-        <SharedTooltip {...tooltipProps}>
+        <LegacyTooltip {...tooltipProps}>
           {t('tooltip:profile.delete_step')}
-        </SharedTooltip>
+        </LegacyTooltip>
         <Icon name="close" className={styles.delete_step_icon} />
       </div>
     </div>

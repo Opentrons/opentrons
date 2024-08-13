@@ -4,7 +4,7 @@ import map from 'lodash/map'
 import noop from 'lodash/noop'
 import reduce from 'lodash/reduce'
 import omitBy from 'lodash/omitBy'
-import { SharedTooltip, useHoverTooltip } from '@opentrons/components'
+import { LegacyTooltip, useHoverTooltip } from '@opentrons/components'
 import { selectors } from '../../labware-ingred/selectors'
 import { IngredPill } from './IngredPill'
 import { PDListItem } from '../lists'
@@ -118,21 +118,21 @@ function SubstepRowComponent(props: SubstepRowProps): JSX.Element {
   })
   return (
     <>
-      <SharedTooltip {...sourceTooltipProps}>
+      <LegacyTooltip {...sourceTooltipProps}>
         <PillTooltipContents
           well={props.source ? props.source.well : ''}
           ingredNames={props.ingredNames}
           ingreds={compactedSourcePreIngreds}
         />
-      </SharedTooltip>
+      </LegacyTooltip>
 
-      <SharedTooltip {...destTooltipProps}>
+      <LegacyTooltip {...destTooltipProps}>
         <PillTooltipContents
           well={props.dest ? props.dest.well : ''}
           ingredNames={props.ingredNames}
           ingreds={compactedDestPreIngreds}
         />
-      </SharedTooltip>
+      </LegacyTooltip>
       <PDListItem
         border
         className={props.className}

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { COLORS, TYPOGRAPHY, SharedTooltip } from '@opentrons/components'
+import { COLORS, TYPOGRAPHY, LegacyTooltip } from '@opentrons/components'
 import type {
   UseTooltipResultTooltipProps,
   StyleProps,
@@ -15,7 +15,7 @@ export function Tooltip(props: TooltipProps): JSX.Element {
   const { children, tooltipProps, width = '8.75rem', ...styleProps } = props
 
   return (
-    <SharedTooltip
+    <LegacyTooltip
       {...tooltipProps}
       backgroundColor={COLORS.black90}
       fontSize={TYPOGRAPHY.fontSizeCaption}
@@ -23,6 +23,6 @@ export function Tooltip(props: TooltipProps): JSX.Element {
       {...styleProps}
     >
       {children}
-    </SharedTooltip>
+    </LegacyTooltip>
   )
 }

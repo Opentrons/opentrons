@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import cx from 'classnames'
 import {
-  SharedTooltip,
+  LegacyTooltip,
   useHoverTooltip,
   TOOLTIP_FIXED,
 } from '@opentrons/components'
@@ -80,13 +80,13 @@ export function MoveLabwareHeader(props: MoveLabwareHeaderProps): JSX.Element {
         <span>{t('new_location')}</span>
       </li>
 
-      <SharedTooltip {...sourceTooltipProps}>
+      <LegacyTooltip {...sourceTooltipProps}>
         <LabwareTooltipContents labwareNickname={sourceLabwareNickname} />
-      </SharedTooltip>
+      </LegacyTooltip>
 
-      <SharedTooltip {...destTooltipProps}>
+      <LegacyTooltip {...destTooltipProps}>
         <LabwareTooltipContents labwareNickname={destSlot} />
-      </SharedTooltip>
+      </LegacyTooltip>
 
       <PDListItem
         className={cx(

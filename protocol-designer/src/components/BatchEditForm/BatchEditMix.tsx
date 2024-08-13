@@ -4,7 +4,7 @@ import {
   Box,
   DeprecatedPrimaryButton,
   OutlineButton,
-  SharedTooltip,
+  LegacyTooltip,
   useHoverTooltip,
   TOOLTIP_TOP,
   TOOLTIP_FIXED,
@@ -183,9 +183,9 @@ export const BatchEditMix = (props: BatchEditMixProps): JSX.Element => {
             >
               {t('button:discard_changes')}
             </OutlineButton>
-            <SharedTooltip {...cancelButtonTooltipProps}>
+            <LegacyTooltip {...cancelButtonTooltipProps}>
               {t('tooltip:cancel_batch_edit')}
-            </SharedTooltip>
+            </LegacyTooltip>
           </Box>
 
           <Box
@@ -199,13 +199,13 @@ export const BatchEditMix = (props: BatchEditMixProps): JSX.Element => {
             >
               {t('button:save')}
             </DeprecatedPrimaryButton>
-            <SharedTooltip {...saveButtonTooltipProps}>
+            <LegacyTooltip {...saveButtonTooltipProps}>
               {t(
                 `tooltip:save_batch_edit.${
                   disableSave ? 'disabled' : 'enabled'
                 }`
               )}
-            </SharedTooltip>
+            </LegacyTooltip>
           </Box>
         </Box>
       </Box>

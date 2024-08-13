@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import cx from 'classnames'
 import {
   FormGroup,
-  SharedTooltip,
+  LegacyTooltip,
   useHoverTooltip,
 } from '@opentrons/components'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
@@ -69,7 +69,7 @@ const PathButton = (buttonProps: ButtonProps): JSX.Element => {
   const [targetProps, tooltipProps] = useHoverTooltip()
   const { t } = useTranslation('form')
   const tooltip = (
-    <SharedTooltip {...tooltipProps}>
+    <LegacyTooltip {...tooltipProps}>
       <div className={styles.path_tooltip_title}>
         {t(`step_edit_form.field.path.title.${path}`)}
       </div>
@@ -78,7 +78,7 @@ const PathButton = (buttonProps: ButtonProps): JSX.Element => {
         src={PATH_ANIMATION_IMAGES[path]}
       />
       <div className={styles.path_tooltip_subtitle}>{subtitle}</div>
-    </SharedTooltip>
+    </LegacyTooltip>
   )
 
   const pathButtonData = `PathButton_${selected ? 'selected' : 'deselected'}_${

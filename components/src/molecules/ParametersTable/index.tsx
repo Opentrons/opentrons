@@ -13,7 +13,7 @@ import {
 import { TYPOGRAPHY } from '../../helix-design-system/product'
 import { Chip } from '../../atoms/Chip'
 import { StyledText } from '../../atoms/StyledText'
-import { SharedTooltip, useHoverTooltip } from '../../tooltips'
+import { LegacyTooltip, useHoverTooltip } from '../../tooltips'
 import { Icon } from '../../icons'
 import { Flex } from '../../primitives'
 import { DISPLAY_INLINE, FLEX_MAX_CONTENT } from '../../styles'
@@ -146,14 +146,14 @@ const ParameterName = (props: ParameterNameProps): JSX.Element => {
               paddingTop={SPACING.spacing4}
             />
           </Flex>
-          <SharedTooltip
+          <LegacyTooltip
             {...tooltipProps}
             backgroundColor={COLORS.black90}
             css={LEGACY_TYPOGERAPHY.labelRegular}
             width="8.75rem"
           >
             {description}
-          </SharedTooltip>
+          </LegacyTooltip>
         </>
       ) : null}
     </StyledTableCell>

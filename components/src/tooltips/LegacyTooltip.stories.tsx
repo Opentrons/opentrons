@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { SharedTooltip } from './SharedTooltip'
+import { LegacyTooltip } from './LegacyTooltip'
 import { useTooltip } from './useTooltip'
 import { useHoverTooltip } from './useHoverTooltip'
 import {
@@ -16,7 +16,7 @@ import {
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'Library/Atoms/Tooltip',
+  title: 'Library/Atoms/LegacyTooltip',
   decorators: [
     Story => (
       <Flex
@@ -32,8 +32,8 @@ export default {
   ],
 } as Meta
 
-const Template: Story<React.ComponentProps<typeof SharedTooltip>> = args => (
-  <SharedTooltip {...args} />
+const Template: Story<React.ComponentProps<typeof LegacyTooltip>> = args => (
+  <LegacyTooltip {...args} />
 )
 export const Basic = Template.bind({})
 Basic.args = {
@@ -47,7 +47,7 @@ Basic.args = {
 }
 
 const StatefulTemplate: Story<
-  React.ComponentProps<typeof SharedTooltip>
+  React.ComponentProps<typeof LegacyTooltip>
 > = args => {
   const { visible, children, placement } = args
   const [targetProps, tooltipProps] = useTooltip({ placement })
@@ -61,7 +61,7 @@ const StatefulTemplate: Story<
       >
         Target
       </Box>
-      <SharedTooltip {...tooltipProps} {...{ visible, children }} />
+      <LegacyTooltip {...tooltipProps} {...{ visible, children }} />
     </>
   )
 }
@@ -73,7 +73,7 @@ WithUseTooltip.args = {
 }
 
 const HoverTemplate: Story<
-  React.ComponentProps<typeof SharedTooltip>
+  React.ComponentProps<typeof LegacyTooltip>
 > = args => {
   const { children } = args
   const [targetProps, tooltipProps] = useHoverTooltip()
@@ -87,7 +87,7 @@ const HoverTemplate: Story<
       >
         Target
       </Box>
-      <SharedTooltip {...tooltipProps}>{children}</SharedTooltip>
+      <LegacyTooltip {...tooltipProps}>{children}</LegacyTooltip>
     </>
   )
 }

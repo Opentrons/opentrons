@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import cx from 'classnames'
 import {
-  SharedTooltip,
+  LegacyTooltip,
   useHoverTooltip,
   TOOLTIP_FIXED,
 } from '@opentrons/components'
@@ -75,9 +75,9 @@ export function ModuleStepItems(props: ModuleStepItemsProps): JSX.Element {
           <span>{action}</span>
         </li>
       ) : null}
-      <SharedTooltip {...tooltipProps}>
+      <LegacyTooltip {...tooltipProps}>
         <LabwareTooltipContents labwareNickname={labwareNickname} />
-      </SharedTooltip>
+      </LegacyTooltip>
       <ModuleStepItemRow
         label={labwareNickname}
         targetProps={targetProps}

@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
-  SharedTooltip,
+  LegacyTooltip,
   DeprecatedPrimaryButton,
   useHoverTooltip,
   Flex,
@@ -83,9 +83,9 @@ export const OffDeckLabwareSlideout = (
             {t('button:add_off_deck')}
           </DeprecatedPrimaryButton>
           {disabled ? (
-            <SharedTooltip {...tooltipProps}>
+            <LegacyTooltip {...tooltipProps}>
               {t(`tooltip:disabled_off_deck`)}
-            </SharedTooltip>
+            </LegacyTooltip>
           ) : null}
         </div>
       }

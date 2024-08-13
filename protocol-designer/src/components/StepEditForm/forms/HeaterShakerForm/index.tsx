@@ -7,7 +7,7 @@ import {
   Flex,
   SPACING,
   useHoverTooltip,
-  SharedTooltip,
+  LegacyTooltip,
   TOOLTIP_BOTTOM,
 } from '@opentrons/components'
 import { getHeaterShakerLabwareOptions } from '../../../../ui/modules/selectors'
@@ -140,9 +140,9 @@ export const HeaterShakerForm = (props: StepFormProps): JSX.Element | null => {
           </CheckboxRowField>
         </Flex>
         {propsForFields.latchOpen.disabled && (
-          <SharedTooltip {...tooltipLatchProps}>
+          <LegacyTooltip {...tooltipLatchProps}>
             {propsForFields.latchOpen.tooltipContent}
-          </SharedTooltip>
+          </LegacyTooltip>
         )}
       </Flex>
     </div>
