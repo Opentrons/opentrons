@@ -13,7 +13,7 @@ import {
   DIRECTION_COLUMN,
   LabeledValue,
   SPACING,
-  Tooltip,
+  SharedTooltip,
   useHoverTooltip,
   Box,
   TYPOGRAPHY,
@@ -162,13 +162,13 @@ export function AdditionalItemsRow(
               </OutlineButton>
             </Box>
             {disabledRemoveButton ? (
-              <Tooltip
+              <SharedTooltip
                 {...tooltipProps}
                 width="10rem"
                 textAlign={TYPOGRAPHY.textAlignCenter}
               >
                 {t(`tooltip:disabled_cannot_delete_trash`)}
-              </Tooltip>
+              </SharedTooltip>
             ) : null}
           </Box>
         </Flex>

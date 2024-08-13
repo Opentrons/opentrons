@@ -18,7 +18,7 @@ import {
   COLORS,
   TYPOGRAPHY,
   useHoverTooltip,
-  Tooltip,
+  SharedTooltip,
   DIRECTION_COLUMN,
   Box,
   LegacyStyledText,
@@ -203,9 +203,9 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
           />
         </Flex>
         {isDisabled || numMultiples === maxMoam ? (
-          <Tooltip {...moamTooltipProps}>
+          <SharedTooltip {...moamTooltipProps}>
             {t(`not_enough_space_for_${multiples.moduleType}`)}
-          </Tooltip>
+          </SharedTooltip>
         ) : null}
       </Flex>
     )
@@ -277,7 +277,9 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
         </Flex>
       </Flex>
       {disabled ? (
-        <Tooltip {...equipmentTooltipProps}>{optionTooltip}</Tooltip>
+        <SharedTooltip {...equipmentTooltipProps}>
+          {optionTooltip}
+        </SharedTooltip>
       ) : null}
     </>
   )

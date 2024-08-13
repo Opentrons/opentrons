@@ -9,7 +9,7 @@ import {
   LegacyInputField,
   Flex,
   useHoverTooltip,
-  Tooltip,
+  SharedTooltip,
 } from '@opentrons/components'
 import { getMainPagePortalEl } from '../../../portals/MainPageModalPortal'
 import type { FieldProps } from '../../types'
@@ -225,7 +225,7 @@ export const FlowRateInput = (props: FlowRateInputProps): JSX.Element => {
             units={t('application:units.microliterPerSec')}
             value={props.value ? String(props.value) : 'default'}
           />
-          <Tooltip {...tooltipProps}>{tooltipContent}</Tooltip>
+          <SharedTooltip {...tooltipProps}>{tooltipContent}</SharedTooltip>
         </Flex>
       ) : (
         <FormGroup label={label || DEFAULT_LABEL} disabled={disabled}>

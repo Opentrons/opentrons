@@ -3,7 +3,7 @@ import * as React from 'react'
 import {
   Box,
   SelectField,
-  Tooltip,
+  SharedTooltip,
   useHoverTooltip,
 } from '@opentrons/components'
 import { Field } from 'formik'
@@ -54,7 +54,9 @@ export const Dropdown = (props: DropdownProps): JSX.Element => {
 
   return (
     <>
-      {tooltip != null && <Tooltip {...tooltipProps}>{tooltip}</Tooltip>}
+      {tooltip != null && (
+        <SharedTooltip {...tooltipProps}>{tooltip}</SharedTooltip>
+      )}
 
       <div {...targetProps} className={fieldStyles.field_wrapper}>
         <label

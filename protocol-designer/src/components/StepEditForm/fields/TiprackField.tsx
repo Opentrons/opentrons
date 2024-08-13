@@ -5,7 +5,7 @@ import {
   FormGroup,
   DropdownField,
   useHoverTooltip,
-  Tooltip,
+  SharedTooltip,
   Box,
 } from '@opentrons/components'
 import { selectors as uiLabwareSelectors } from '../../../ui/labware'
@@ -62,7 +62,9 @@ export function TiprackField(props: TiprackFieldProps): JSX.Element {
         />
       </FormGroup>
       {hasMissingTiprack ? (
-        <Tooltip {...tooltipProps}>{t('tooltip:missing_tiprack')}</Tooltip>
+        <SharedTooltip {...tooltipProps}>
+          {t('tooltip:missing_tiprack')}
+        </SharedTooltip>
       ) : null}
     </Box>
   )

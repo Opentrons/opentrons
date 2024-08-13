@@ -6,7 +6,7 @@ import {
   Flex,
   FormGroup,
   SPACING,
-  Tooltip,
+  SharedTooltip,
   TOOLTIP_BOTTOM,
   TOOLTIP_FIXED,
   useHoverTooltip,
@@ -59,9 +59,9 @@ export const MoveLabwareForm = (props: StepFormProps): JSX.Element => {
             marginLeft={SPACING.spacing16}
           >
             {!isGripperAttached ? (
-              <Tooltip {...tooltipProps}>
+              <SharedTooltip {...tooltipProps}>
                 {t('tooltip:step_fields.moveLabware.disabled.gripper_not_used')}
-              </Tooltip>
+              </SharedTooltip>
             ) : null}
             <div {...targetProps}>
               <FormGroup>

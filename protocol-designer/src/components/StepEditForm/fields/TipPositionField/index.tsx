@@ -7,7 +7,7 @@ import {
   FormGroup,
   Icon,
   LegacyInputField,
-  Tooltip,
+  SharedTooltip,
   useHoverTooltip,
 } from '@opentrons/components'
 import { getWellsDepth, getWellDimension } from '@opentrons/shared-data'
@@ -157,7 +157,7 @@ export function TipPositionField(props: TipPositionFieldProps): JSX.Element {
 
   return (
     <>
-      <Tooltip {...tooltipProps}>{tooltipContent}</Tooltip>
+      <SharedTooltip {...tooltipProps}>{tooltipContent}</SharedTooltip>
       {isModalOpen ? modal : null}
       <Wrapper
         targetProps={targetProps}

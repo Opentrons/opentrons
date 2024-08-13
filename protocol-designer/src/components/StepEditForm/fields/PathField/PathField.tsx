@@ -2,7 +2,11 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import cx from 'classnames'
-import { FormGroup, Tooltip, useHoverTooltip } from '@opentrons/components'
+import {
+  FormGroup,
+  SharedTooltip,
+  useHoverTooltip,
+} from '@opentrons/components'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
 import SINGLE_IMAGE from '../../../../images/path_single_transfers.svg'
 import MULTI_DISPENSE_IMAGE from '../../../../images/path_multi_dispense.svg'
@@ -65,7 +69,7 @@ const PathButton = (buttonProps: ButtonProps): JSX.Element => {
   const [targetProps, tooltipProps] = useHoverTooltip()
   const { t } = useTranslation('form')
   const tooltip = (
-    <Tooltip {...tooltipProps}>
+    <SharedTooltip {...tooltipProps}>
       <div className={styles.path_tooltip_title}>
         {t(`step_edit_form.field.path.title.${path}`)}
       </div>
@@ -74,7 +78,7 @@ const PathButton = (buttonProps: ButtonProps): JSX.Element => {
         src={PATH_ANIMATION_IMAGES[path]}
       />
       <div className={styles.path_tooltip_subtitle}>{subtitle}</div>
-    </Tooltip>
+    </SharedTooltip>
   )
 
   const pathButtonData = `PathButton_${selected ? 'selected' : 'deselected'}_${

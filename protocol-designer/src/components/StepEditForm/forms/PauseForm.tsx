@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux'
 import {
   FormGroup,
   useHoverTooltip,
-  Tooltip,
+  SharedTooltip,
   TOOLTIP_BOTTOM,
   TOOLTIP_FIXED,
 } from '@opentrons/components'
@@ -113,13 +113,13 @@ export const PauseForm = (props: StepFormProps): JSX.Element => {
           )}
 
           {pauseUntilModuleEnabled ? null : (
-            <Tooltip {...tooltipProps}>
+            <SharedTooltip {...tooltipProps}>
               {getSingleSelectDisabledTooltip(
                 'wait_until_temp',
                 'pauseAction',
                 t
               )}
-            </Tooltip>
+            </SharedTooltip>
           )}
           <div {...targetProps}>
             <div className={styles.checkbox_row}>

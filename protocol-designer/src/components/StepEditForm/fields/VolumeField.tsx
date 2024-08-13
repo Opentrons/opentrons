@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   FormGroup,
-  Tooltip,
+  SharedTooltip,
   useHoverTooltip,
   TOOLTIP_TOP,
   TOOLTIP_FIXED,
@@ -28,9 +28,9 @@ export const VolumeField = (props: Props): JSX.Element => {
 
   return (
     <div {...targetProps}>
-      <Tooltip {...tooltipProps}>
+      <SharedTooltip {...tooltipProps}>
         {getFieldDefaultTooltip(propsForVolumeField.name, t)}
-      </Tooltip>
+      </SharedTooltip>
       <FormGroup label={label} className={className}>
         <TextField
           {...propsForVolumeField}

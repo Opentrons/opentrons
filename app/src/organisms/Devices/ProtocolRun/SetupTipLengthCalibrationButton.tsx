@@ -5,7 +5,7 @@ import {
   Box,
   Flex,
   Link,
-  Tooltip,
+  SharedTooltip,
   useHoverTooltip,
   ALIGN_CENTER,
   SIZE_4,
@@ -95,7 +95,7 @@ export function SetupTipLengthCalibrationButton({
       >
         {t('recalibrate')}
       </Box>
-      <Tooltip {...tooltipProps}>
+      <SharedTooltip {...tooltipProps}>
         {
           <Box width={SIZE_4} textAlign={TEXT_ALIGN_CENTER}>
             {isDeckCalibrated
@@ -103,7 +103,7 @@ export function SetupTipLengthCalibrationButton({
               : t('calibrate_deck_to_proceed_to_tip_length_calibration')}
           </Box>
         }
-      </Tooltip>
+      </SharedTooltip>
     </>
   ) : (
     <Link
@@ -144,13 +144,13 @@ export function SetupTipLengthCalibrationButton({
               {t('calibrate_now')}
             </TertiaryButton>
             {!isDeckCalibrated ? (
-              <Tooltip {...tooltipProps}>
+              <SharedTooltip {...tooltipProps}>
                 {
                   <Box width={SIZE_4}>
                     {t('calibrate_deck_to_proceed_to_tip_length_calibration')}
                   </Box>
                 }
-              </Tooltip>
+              </SharedTooltip>
             ) : null}
           </>
         )}

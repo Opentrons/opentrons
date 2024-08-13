@@ -10,7 +10,7 @@ import {
   LegacyStyledText,
   BORDERS,
   useHoverTooltip,
-  Tooltip,
+  SharedTooltip,
 } from '@opentrons/components'
 
 interface TiprackOptionProps {
@@ -92,7 +92,9 @@ export function TiprackOption(props: TiprackOptionProps): JSX.Element {
         <LegacyStyledText as="label">{text}</LegacyStyledText>
       </Flex>
       {isDisabled ? (
-        <Tooltip {...tooltipProps}>{t('disabled_no_space_pipette')}</Tooltip>
+        <SharedTooltip {...tooltipProps}>
+          {t('disabled_no_space_pipette')}
+        </SharedTooltip>
       ) : null}
     </>
   )

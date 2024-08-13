@@ -12,7 +12,7 @@ import type { FlattenSimpleInterpolation } from 'styled-components'
 import type { Placement } from './types'
 import type { StyleProps } from '../primitives'
 
-export interface TooltipProps extends StyleProps {
+export interface SharedTooltipProps extends StyleProps {
   /** Whether or not the tooltip should be rendered */
   visible: boolean
   /** Contents of the tooltip */
@@ -36,8 +36,8 @@ export interface TooltipProps extends StyleProps {
  * Tooltip component that renders based on its `visible` prop. For use with the
  * `useTooltip` and `useHoverTooltip` hooks. See examples in `Tooltip.md`.
  */
-export const Tooltip = React.forwardRef(function TooltipComponent(
-  props: TooltipProps,
+export const SharedTooltip = React.forwardRef(function TooltipComponent(
+  props: SharedTooltipProps,
   ref: React.ForwardedRef<HTMLDivElement>
 ) {
   const {

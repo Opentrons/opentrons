@@ -2,7 +2,7 @@ import * as React from 'react'
 import {
   DeprecatedCheckboxField,
   useHoverTooltip,
-  Tooltip,
+  SharedTooltip,
   TOOLTIP_TOP,
 } from '@opentrons/components'
 import cx from 'classnames'
@@ -38,9 +38,9 @@ export const CheckboxRowField = (props: CheckboxRowProps): JSX.Element => {
   return (
     <>
       {tooltipContent && (
-        <Tooltip lineHeight="1.5" {...tooltipProps}>
+        <SharedTooltip lineHeight="1.5" {...tooltipProps}>
           {tooltipContent}
-        </Tooltip>
+        </SharedTooltip>
       )}
       <div className={styles.checkbox_row}>
         <DeprecatedCheckboxField

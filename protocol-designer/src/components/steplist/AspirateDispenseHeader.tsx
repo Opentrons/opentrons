@@ -2,7 +2,7 @@ import * as React from 'react'
 import cx from 'classnames'
 import {
   Icon,
-  Tooltip,
+  SharedTooltip,
   useHoverTooltip,
   TOOLTIP_FIXED,
 } from '@opentrons/components'
@@ -38,13 +38,13 @@ export function AspirateDispenseHeader(
         <span>DISPENSE</span>
       </li>
 
-      <Tooltip {...sourceTooltipProps}>
+      <SharedTooltip {...sourceTooltipProps}>
         <LabwareTooltipContents labwareNickname={sourceLabwareNickname} />
-      </Tooltip>
+      </SharedTooltip>
 
-      <Tooltip {...destTooltipProps}>
+      <SharedTooltip {...destTooltipProps}>
         <LabwareTooltipContents labwareNickname={destLabwareNickname} />
-      </Tooltip>
+      </SharedTooltip>
 
       <PDListItem
         className={cx(
