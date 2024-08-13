@@ -66,7 +66,6 @@ export function useProtocolDropTipModal({
   // Close the modal if a different app closes the run context.
   React.useEffect(() => {
     if (isRunCurrent && !isHomingPipettes) {
-      console.log('HITTING SET SHOW MODAL')
       setShowDTModal(areTipsAttached)
     } else if (!isRunCurrent) {
       setShowDTModal(false)

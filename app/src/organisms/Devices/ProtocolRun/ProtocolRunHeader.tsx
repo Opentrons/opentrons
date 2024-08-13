@@ -227,7 +227,6 @@ export function ProtocolRunHeader({
     runRecord: runRecord ?? null,
     host,
   })
-
   const {
     showDTModal,
     onDTModalSkip,
