@@ -2091,7 +2091,7 @@ class InstrumentContext(publisher.CommandPublisher):
             if style == NozzleLayout.ROW:
                 if self.channels != 96:
                     raise ValueError(
-                        "Row configuraiton is only supported on 96-Channel Pipettes."
+                        "Row configuration is only supported on 96-Channel pipettes."
                     )
             if style == NozzleLayout.PARTIAL_COLUMN:
                 if self.channels == 1 or self.channels == 96:
