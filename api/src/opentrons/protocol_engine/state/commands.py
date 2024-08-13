@@ -590,7 +590,13 @@ class CommandView(HasState[CommandState]):
         If False, return list will contain only safe commands.
         """
         return self._state.command_history.get_filtered_queue_ids(
-            all_commands=all_commands
+            command_intents=[
+                CommandIntent.SETUP,
+                CommandIntent.PROTOCOL,
+                CommandIntent.FIXIT,
+            ]
+            if all_commands
+            else [CommandIntent.SETUP, CommandIntent.PROTOCOL]
         )
 
     def get_slice(
@@ -601,27 +607,22 @@ class CommandView(HasState[CommandState]):
         If the cursor is omitted, a cursor will be selected automatically
         based on the currently running or most recently executed command.
         """
-        running_command = self._state.command_history.get_running_command()
-        if all_commands:
-            queued_command_ids = self._state.command_history.get_queue_ids()
-        else:
-            queued_command_ids = self._state.command_history.get_filtered_queue_ids(
-                all_commands=all_commands
-            )
+        queued_command_ids = self._state.command_history.get_filtered_queue_ids(
+            command_intents=[
+                CommandIntent.PROTOCOL,
+                CommandIntent.SETUP,
+                CommandIntent.FIXIT,
+            ]
+            if all_commands
+            else [CommandIntent.PROTOCOL, CommandIntent.SETUP]
+        )
         total_length = len(queued_command_ids)
 
-        # TODO(mm, 2024-05-17): This looks like it's attempting to do the same thing
-        # as self.get_current(), but in a different way. Can we unify them?
         if cursor is None:
-            if running_command is not None:
-                cursor = running_command.index
-            elif len(queued_command_ids) > 0:
-                # Get the most recently executed command,
-                # which we can find just before the first queued command.
-                cursor = (
-                    self._state.command_history.get(queued_command_ids.head()).index - 1
-                )
-            elif (
+            current_cursor = self.get_current()
+            if current_cursor:
+                cursor_index = current_cursor.index
+            elif current_cursor is None and (
                 self._state.run_result
                 and self._state.run_result == RunResult.FAILED
                 and self._state.failed_command
@@ -630,15 +631,15 @@ class CommandView(HasState[CommandState]):
                 # reach as failed. This makes command status alone insufficient to
                 # find the most recent command that actually executed, so we need to
                 # store that separately.
-                cursor = self._state.failed_command.index
+                cursor_index = self._state.failed_command.index
             else:
-                cursor = total_length - length
+                cursor_index = total_length - length
 
         # start is inclusive, stop is exclusive
-        actual_cursor = max(0, min(cursor, total_length - 1))
+        actual_cursor = max(0, min(cursor_index, total_length - 1))
         stop = min(total_length, actual_cursor + length)
-        commands = self._state.command_history.get_slice(
-            start=actual_cursor, stop=stop, command_ids=queued_command_ids
+        commands = self._state.command_history.get_filtered_slice(
+            start=actual_cursor, stop=stop, all_commands=all_commands
         )
 
         return CommandSlice(
