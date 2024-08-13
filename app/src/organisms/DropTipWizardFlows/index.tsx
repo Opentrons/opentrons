@@ -11,6 +11,7 @@ import type { PipetteModelSpecs, RobotType } from '@opentrons/shared-data'
 import type { Mount, PipetteData } from '@opentrons/api-client'
 import type { FixitCommandTypeUtils, IssuedCommandsType } from './types'
 import type { GetPipettesWithTipAttached } from './getPipettesWithTipAttached'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
 /** Provides the user toggle for rendering Drop Tip Wizard Flows.
  *
@@ -64,6 +65,8 @@ export function DropTipWizardFlows(
   )
 }
 
+const INSTRUMENTS_POLL_MS = 5000
+
 export interface PipetteWithTip {
   mount: Mount
   specs: PipetteModelSpecs
@@ -93,11 +96,14 @@ export interface TipAttachmentStatusResult {
 
 // Returns various utilities for interacting with the cache of pipettes with tips attached.
 export function useTipAttachmentStatus(
-  params: GetPipettesWithTipAttached
+  params: Omit<GetPipettesWithTipAttached, 'attachedInstruments'>
 ): TipAttachmentStatusResult {
   const [pipettesWithTip, setPipettesWithTip] = React.useState<
     PipetteWithTip[]
   >([])
+  const { data: attachedInstruments } = useInstrumentsQuery({
+    refetchInterval: INSTRUMENTS_POLL_MS,
+  })
 
   const aPipetteWithTip = head(pipettesWithTip) ?? null
 
@@ -107,7 +113,10 @@ export function useTipAttachmentStatus(
   const determineTipStatus = React.useCallback((): Promise<
     PipetteWithTip[]
   > => {
-    return getPipettesWithTipAttached(params).then(pipettesWithTip => {
+    return getPipettesWithTipAttached({
+      ...params,
+      attachedInstruments: attachedInstruments ?? null,
+    }).then(pipettesWithTip => {
       const pipettesWithTipsData = pipettesWithTip.map(pipette => {
         const specs = getPipetteModelSpecs(pipette.instrumentModel)
         return {

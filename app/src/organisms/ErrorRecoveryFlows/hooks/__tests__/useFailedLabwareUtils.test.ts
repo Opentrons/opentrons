@@ -85,7 +85,7 @@ describe('getRelevantFailedLabwareCmdFrom', () => {
       },
     }
     const result = getRelevantFailedLabwareCmdFrom({
-      failedCommand: failedLiquidProbeCommand,
+      failedCommandByRunRecord: failedLiquidProbeCommand,
     })
     expect(result).toEqual(failedLiquidProbeCommand)
   })
@@ -110,7 +110,7 @@ describe('getRelevantFailedLabwareCmdFrom', () => {
 
     overpressureErrorKinds.forEach(([commandType, errorType]) => {
       const result = getRelevantFailedLabwareCmdFrom({
-        failedCommand: {
+        failedCommandByRunRecord: {
           ...failedCommand,
           commandType,
           error: { isDefined: true, errorType },
@@ -122,7 +122,7 @@ describe('getRelevantFailedLabwareCmdFrom', () => {
   })
   it('should return null for GENERAL_ERROR error kind', () => {
     const result = getRelevantFailedLabwareCmdFrom({
-      failedCommand: {
+      failedCommandByRunRecord: {
         ...failedCommand,
         error: { errorType: 'literally anything else' },
       },
@@ -132,7 +132,7 @@ describe('getRelevantFailedLabwareCmdFrom', () => {
 
   it('should return null for unhandled error kinds', () => {
     const result = getRelevantFailedLabwareCmdFrom({
-      failedCommand: {
+      failedCommandByRunRecord: {
         ...failedCommand,
         error: { errorType: 'SOME_UNHANDLED_ERROR' },
       },

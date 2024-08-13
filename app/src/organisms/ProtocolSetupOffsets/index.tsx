@@ -93,6 +93,7 @@ export function ProtocolSetupOffsets({
             ) : (
               <SmallButton
                 buttonText={t('confirm_placements')}
+                disabled={nonIdentityOffsets.length === 0}
                 onClick={() => {
                   setIsConfirmed(true)
                   setSetupScreen('prepare to run')
