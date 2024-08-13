@@ -148,8 +148,8 @@ async def get_run_data_from_url(
     status_code=status.HTTP_201_CREATED,
     responses={
         status.HTTP_201_CREATED: {"model": SimpleBody[Run]},
-        status.HTTP_400_BAD_REQUEST: {"model": ErrorBody[FileIdNotFound]},
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[ProtocolNotFound]},
+        status.HTTP_422_UNPROCESSABLE_ENTITY: {"model": ErrorBody[FileIdNotFound]},
         status.HTTP_409_CONFLICT: {"model": ErrorBody[RunAlreadyActive]},
     },
 )
@@ -208,7 +208,9 @@ async def create_run(  # noqa: C901
                 for name, file_id in rtp_files.items()
             }
     except FileIdNotFoundError as e:
-        raise FileIdNotFound(detail=str(e)).as_error(status.HTTP_400_BAD_REQUEST)
+        raise FileIdNotFound(detail=str(e)).as_error(
+            status.HTTP_422_UNPROCESSABLE_ENTITY
+        )
 
     protocol_resource = None
 

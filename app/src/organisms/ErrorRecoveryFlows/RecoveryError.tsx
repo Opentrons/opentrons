@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 import {
   COLORS,
@@ -10,13 +11,21 @@ import {
   SPACING,
   ALIGN_CENTER,
   JUSTIFY_END,
+  PrimaryButton,
+  JUSTIFY_CENTER,
+  RESPONSIVENESS,
 } from '@opentrons/components'
 
-import { RECOVERY_MAP } from './constants'
+import { SmallButton } from '../../atoms/buttons'
 import { RecoverySingleColumnContentWrapper } from './shared'
+import {
+  DESKTOP_ONLY,
+  ICON_SIZE_ALERT_INFO_STYLE,
+  ODD_ONLY,
+  RECOVERY_MAP,
+} from './constants'
 
 import type { RecoveryContentProps } from './types'
-import { SmallButton } from '../../atoms/buttons'
 
 export function RecoveryError(props: RecoveryContentProps): JSX.Element {
   const { recoveryMap } = props
@@ -155,7 +164,6 @@ export function RecoveryDropTipFlowErrors({
 }
 
 export function ErrorContent({
-  isOnDevice,
   title,
   subTitle,
   btnText,
@@ -169,19 +177,12 @@ export function ErrorContent({
 }): JSX.Element | null {
   return (
     <RecoverySingleColumnContentWrapper>
-      <Flex
-        padding={SPACING.spacing40}
-        gridGap={SPACING.spacing24}
-        flexDirection={DIRECTION_COLUMN}
-        alignItems={ALIGN_CENTER}
-        justifyContent={ALIGN_CENTER}
-        flex="1"
-      >
+      <Flex css={CONTAINER_STYLE}>
         <Icon
           name="alert-circle"
-          size={SPACING.spacing60}
           color={COLORS.red50}
           data-testid="recovery_error_alert_icon"
+          css={ICON_SIZE_ALERT_INFO_STYLE}
         />
         <Flex
           gridGap={SPACING.spacing4}
@@ -204,8 +205,24 @@ export function ErrorContent({
         </Flex>
       </Flex>
       <Flex justifyContent={JUSTIFY_END}>
-        <SmallButton onClick={btnOnClick} buttonText={btnText} />
+        <SmallButton onClick={btnOnClick} buttonText={btnText} css={ODD_ONLY} />
+        <PrimaryButton onClick={btnOnClick} css={DESKTOP_ONLY}>
+          {btnText}
+        </PrimaryButton>
       </Flex>
     </RecoverySingleColumnContentWrapper>
   )
 }
+
+const CONTAINER_STYLE = css`
+  padding: ${SPACING.spacing40};
+  grid-gap: ${SPACING.spacing16};
+  flex-direction: ${DIRECTION_COLUMN};
+  align-items: ${ALIGN_CENTER};
+  justify-content: ${JUSTIFY_CENTER};
+  flex: 1;
+
+  @media (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+    grid-gap: ${SPACING.spacing24};
+  }
+`

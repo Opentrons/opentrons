@@ -11,6 +11,7 @@ type DropTipWizardHeaderProps = DropTipWizardProps & {
   isExitInitiated: boolean
   isFinalWizardStep: boolean
   confirmExit: () => void
+  showConfirmExit: boolean
 }
 
 export function DropTipWizardHeader({
@@ -22,6 +23,7 @@ export function DropTipWizardHeader({
   isFinalWizardStep,
   errorDetails,
   dropTipCommands,
+  showConfirmExit,
 }: DropTipWizardHeaderProps): JSX.Element {
   const { handleCleanUpAndClose } = dropTipCommands
   const { t, i18n } = useTranslation('drop_tip_wizard')
@@ -45,7 +47,7 @@ export function DropTipWizardHeader({
       title={i18n.format(t('drop_tips'), 'capitalize')}
       currentStep={currentStepNumber}
       totalSteps={totalSteps}
-      onExit={wizardHeaderOnExit}
+      onExit={!showConfirmExit ? wizardHeaderOnExit : null}
     />
   )
 }

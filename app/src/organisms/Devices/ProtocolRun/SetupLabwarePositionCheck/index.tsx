@@ -129,13 +129,18 @@ export function SetupLabwarePositionCheck(
           id="LPC_setOffsetsConfirmed"
           padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
           {...confirmOffsetsTargetProps}
-          disabled={offsetsConfirmed || lpcDisabledReason !== null}
+          disabled={
+            offsetsConfirmed ||
+            lpcDisabledReason !== null ||
+            nonIdentityOffsets.length === 0
+          }
         >
           {t('confirm_offsets')}
         </SecondaryButton>
-        {lpcDisabledReason !== null ? (
+        {lpcDisabledReason != null || nonIdentityOffsets.length === 0 ? (
           <Tooltip tooltipProps={confirmOffsetsTooltipProps}>
-            {lpcDisabledReason}
+            {lpcDisabledReason ??
+              t('run_labware_position_check_to_get_offsets')}
           </Tooltip>
         ) : null}
         <PrimaryButton

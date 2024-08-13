@@ -36,6 +36,7 @@ export interface DropTipWizardRouteOverride {
 export interface FixitCommandTypeUtils {
   runId: string
   failedCommandId: string
+  pipetteId: string | null
   copyOverrides: CopyOverrides
   errorOverrides: ErrorOverrides
   buttonOverrides: ButtonOverrides
