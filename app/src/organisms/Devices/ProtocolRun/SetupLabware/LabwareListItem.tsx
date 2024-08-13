@@ -56,7 +56,7 @@ import type { NestedLabwareInfo } from './getNestedLabwareInfo'
 
 const LabwareRow = styled.div`
   display: grid;
-  grid-template-columns: 1fr 6fr 5.9fr;
+  grid-template-columns: 90px 12fr;
   border-style: ${BORDERS.styleSolid};
   border-width: 1px;
   border-color: ${COLORS.grey30};
@@ -268,7 +268,7 @@ export function LabwareListItem(
 
   return (
     <LabwareRow>
-      <Flex alignItems={ALIGN_CENTER} width="80px" gridGap={SPACING.spacing2}>
+      <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing2}>
         {slotInfo != null && isFlex ? (
           <DeckInfoLabel deckLabel={slotInfo} />
         ) : (
@@ -283,13 +283,11 @@ export function LabwareListItem(
           <DeckInfoLabel iconName="stacked" />
         ) : null}
       </Flex>
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing16}
-        width="45.875rem"
-      >
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
         <Flex>
-          {showLabwareSVG && <StandaloneLabware definition={definition} />}
+          {showLabwareSVG ? (
+            <StandaloneLabware definition={definition} />
+          ) : null}
           <Flex
             flexDirection={DIRECTION_COLUMN}
             justifyContent={JUSTIFY_CENTER}
