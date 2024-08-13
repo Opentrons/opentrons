@@ -732,13 +732,21 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
       return module.moduleType === 'heaterShakerModuleType'
     })
     .some(module => module?.data != null && module.data.speedStatus !== 'idle')
+  const isValidRunAgain =
+    runStatus != null && RUN_AGAIN_STATUSES.includes(runStatus)
+  const validRunAgainButRequiresSetup = isValidRunAgain && !isSetupComplete
+  const runAgainWithSpinner = validRunAgainButRequiresSetup && isResetRunLoading
 
   let buttonText: string = ''
   let handleButtonClick = (): void => {}
   let buttonIconName: IconName | null = null
   let disableReason = null
 
-  if (currentRunId === runId && (!isSetupComplete || isFixtureMismatch)) {
+  if (
+    currentRunId === runId &&
+    (!isSetupComplete || isFixtureMismatch) &&
+    !isValidRunAgain
+  ) {
     disableReason = t('setup_incomplete')
   } else if (isOtherRunCurrent) {
     disableReason = t('shared:robot_is_busy')
@@ -803,7 +811,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
       }
     }
   } else if (runStatus != null && RUN_AGAIN_STATUSES.includes(runStatus)) {
-    buttonIconName = 'play'
+    buttonIconName = runAgainWithSpinner ? 'ot-spinner' : 'play'
     buttonText = t('run_again')
     handleButtonClick = () => {
       reset()
@@ -825,7 +833,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
         boxShadow="none"
         display={DISPLAY_FLEX}
         padding={`${SPACING.spacing12} ${SPACING.spacing16}`}
-        disabled={isRunControlButtonDisabled}
+        disabled={isRunControlButtonDisabled && !validRunAgainButRequiresSetup}
         onClick={handleButtonClick}
         id="ProtocolRunHeader_runControlButton"
         {...targetProps}
@@ -836,7 +844,9 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
             size={SIZE_1}
             marginRight={SPACING.spacing8}
             spin={
-              isProtocolAnalyzing || runStatus === RUN_STATUS_STOP_REQUESTED
+              isProtocolAnalyzing ||
+              runStatus === RUN_STATUS_STOP_REQUESTED ||
+              runAgainWithSpinner
             }
           />
         ) : null}
