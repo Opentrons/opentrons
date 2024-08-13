@@ -20,10 +20,13 @@
   "no": "No",
   "one_channel": "1-Channel",
   "opentrons_flex": "Opentrons Flex",
+  "opentrons": "Opentrons",
   "ot2": "Opentrons OT-2",
+  "protocol_designer": "Protocol Designer",
   "remove": "remove",
   "step_count": "Step {{current}}",
   "step": "Step {{current}} / {{max}}",
+  "version": "Version # {{version}}",
   "welcome": "Welcome to Protocol Designer",
   "yes": "Yes"
 }
