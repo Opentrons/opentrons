@@ -257,10 +257,7 @@ class RunOrchestrator:
         return self._protocol_engine.state_view.commands.get_current()
 
     def get_command_slice(
-        self,
-        cursor: Optional[int],
-        length: int,
-        all_commands: bool
+        self, cursor: Optional[int], length: int, all_commands: bool
     ) -> CommandSlice:
         """Get a slice of run commands.
 
