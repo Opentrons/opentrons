@@ -2117,7 +2117,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 elif start == "A1" or start == "A12":
                     if "H" in end:
                         raise ValueError(
-                            f"When configuring in Partial Column with 'start'={start} the 'end' parameter cannot be in row H."
+                            f"A partial column configuration with 'start'={start} cannot have its 'end' parameter be in row H."
                         )
                     front_right_resolved = end
 
