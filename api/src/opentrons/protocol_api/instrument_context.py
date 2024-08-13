@@ -2101,7 +2101,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
                 if end is None:
                     raise ValueError(
-                        "Parameter 'end' is required for Partial Column Nozzle Configuration Layout."
+                        "Partial column configurations require the 'end' parameter."
                     )
                 if start[0] in end:
                     raise ValueError(
