@@ -263,55 +263,15 @@ This example aspirates enough air to fill the remaining volume in a pipette::
 Detect Liquids
 ==============
 
-The :py:meth:`.InstrumentContext.detect_liquid_presence` method tells a Flex pipette to check for the presence of a liquid in a well plate or reservoir. This method returns ``True`` if the pressure sensors in the pipette detect a liquid and ``False`` if the sensors do not. It will not raise an error or stop your protocol when the robot detects an empty well. 
-
-You should generally detect liquid immediately after picking up a tip and before aspirating, but you don't need to aspirate to use ``detect_liquid_presence()``. It's a standalone method that can be called when you only want to detect liquid. 
-
-.. note::
-    Accurate liquid detection requires fresh, dry pipette tips.
+The :py:meth:`.InstrumentContext.detect_liquid_presence` method tells a Flex pipette to check for liquid in a well plate or reservoir. It returns ``True`` if the pressure sensors in the pipette detect a liquid and ``False`` if the sensors do not. Detection takes place during aspiration, but aspiration isn't required to use ``detect_liquid_presence()``. This is a standalone method that can be called when you want the robot to record the presence or absence of a liquid. When ``detect_liquid_presence()`` finds an empty well it won't raise an error or stop your protocol. See also :ref:`lpd`.
 
 .. code-block:: python
-
+    
     pipette.detect_liquid_presence(well)
 
-In cases where you need records that are more informative than ``true`` or ``false``, you can write your own code to handle the output of this method. For example, by adding some indexing along with ``for`` and ``while`` loops, your protocol could count how many aspirations a robot performed before a source well ran out of liquid. Here's one way to do this in the ``run():`` function of our Flex :ref:`protocol template <protocol-template>`:
+.. removed code sample. maybe some text advice could help?
 
-.. code-block:: python
-
-    tip_index = 0 # tracks how many tips are used.
-    plate_index = 0 # tracks the wells dispensed to. Increments after dispense.
-
-    for name, well in reservoir.items():
-        pipette.pick_up_tip(tiprack[tipIndex])
-        has_liquid = pipette.detect_liquid_presence(well)
-        pipette.drop_tip(trash)
-        tip_index+=1
-
-        cur_index = 0 # counts aspirate/dispense cycles from a reservoir well.
-        while has_liquid:
-            pipette.pick_up_tip(tiprack[tip_index])
-            pipette.aspirate(250, well)
-            pipette.dispense(250, plate[plate_index])
-            pipette.drop_tip(trash)
-            tip_index += 1
-            plate_index += 1
-
-            pipette.pick_up_tip(tiprack[tip_index])
-            has_liquid = pipette.detect_liquid_presence(well)
-            pipette.drop_tip(trash)
-            tip_index += 1
-
-            cur_index += 1
-
-        # Add a helpful record to the run log when a well runs dry or is empty.
-        protocol.comment(
-            f"Found liquid and aspirated from well {name} {cur_index} times. Well is now empty."
-        )
-
-    # Add a helpful record to the run log when all source wells are empty.
-    protocol.comment("Exhausted all wells in reservoir.") 
-
-Now the Flex records an entry in the run log that includes the well's name (e.g. ``A1``, ``A2``, ``B1`` etc.) and how many times the pipette aspirated from that well before it ran dry. If a protocol uses all the liquid in its source wells, the robot records that too.
+In cases where you need more information than ``true`` or ``false``, you could write your own code to handle the output of this method. For example, by adding some indexing along with ``for`` and ``while`` loops, your protocol could count how many aspirations a robot performed before a source well ran out of liquid.
 
 .. versionadded:: 2.20
 
@@ -320,8 +280,7 @@ Now the Flex records an entry in the run log that includes the well's name (e.g.
 Require Liquids
 ===============
 
-The :py:meth:`.InstrumentContext.require_liquid_presence` method tells a Flex pipette to check for and require a liquid in a well or reservoir. This method returns ``True`` if the pressure sensors in a pipette detect a liquid and ``False`` if liquid if the sensors do not. When the robot does not detect liquid, it raises an error, stops the protocol to let you resolve the problem, and writes a warning to the run log.
-Detection takes place during aspiration, but you don't need to aspirate to use ``require_liquid_presence``. It's a standalone method that can be called when you want to detect liquids only. See also :ref:`lpd`.
+The :py:meth:`.InstrumentContext.require_liquid_presence` method tells a Flex pipette to check for and require liquid in a well plate or reservoir. It returns ``True`` if the pressure sensors in a pipette detect a liquid and ``False`` if the sensors do not. Detection takes place during aspiration, but aspiration isn't required to use ``require_liquid_presence()``. This is a standalone method that can be called when you want the robot to react to a missing liquid or empty well. When ``require_liquid_presence()`` finds an empty well, it raises an error and stops the protocol to let you resolve the problem. See also :ref:`lpd`.
 
 .. code-block:: python
 
