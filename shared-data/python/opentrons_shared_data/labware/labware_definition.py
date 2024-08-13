@@ -224,11 +224,11 @@ class WellDefinition(BaseModel):
     )
 
 
-class InnerGeometrySection(BaseModel):
+class TopCrossSection(BaseModel):
     shape: Literal["rectangular", "circular", "hemisphere"] = Field(
         ...,
         description="Shape of a cross-section of a well used to determine how "
-                    "to calculate area",
+        "to calculate area",
     )
     xDimension: Optional[_NonNegativeNumber] = Field(
         None,
@@ -245,13 +245,12 @@ class InnerGeometrySection(BaseModel):
 
 
 class BoundedSection(BaseModel):
-    geometry: InnerGeometrySection = Field(
+    geometry: TopCrossSection = Field(
         ...,
         description="Geometrical information needed to calculate the volume of a subsection of a well",
     )
     top_height: _NonNegativeNumber = Field(
-        ...,
-        description="The height at the top of a bounded subsection of a well"
+        ..., description="The height at the top of a bounded subsection of a well"
     )
 
 
@@ -361,6 +360,3 @@ class LabwareDefinition(BaseModel):
         None,
         description="A list of bounded sections describing the geometry of the inside of the wells.",
     )
-
-
-

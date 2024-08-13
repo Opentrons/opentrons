@@ -14,7 +14,7 @@ from opentrons_shared_data.labware.labware_definition import (
     Metadata1,
     WellDefinition,
     BoundedSection,
-    InnerGeometrySection,
+    TopCrossSection,
 )
 from opentrons_shared_data.protocol.models import (
     protocol_schema_v6,
@@ -689,14 +689,14 @@ def _load_labware_definition_data() -> LabwareDefinition:
         cornerOffsetFromSlot=CornerOffsetFromSlot(x=0, y=0, z=0),
         innerWellGeometry=[
             BoundedSection(
-                geometry=InnerGeometrySection(
+                geometry=TopCrossSection(
                     shape="hemisphere",
                     diameter=25,
                 ),
                 top_height=10,
             ),
             BoundedSection(
-                geometry=InnerGeometrySection(
+                geometry=TopCrossSection(
                     shape="rectangular",
                     xDimension=5.6,
                     yDimension=6.5,

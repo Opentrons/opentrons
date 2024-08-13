@@ -158,9 +158,9 @@ class HemisphereDimensions(TypedDict):
 
 
 # This will either be a 2-Dimensional cross-section or a hemisphere
-InnerGeometrySection = Union[CircularArea, RectangularArea, HemisphereDimensions]
+TopCrossSection = Union[CircularArea, RectangularArea, HemisphereDimensions]
 
 
 class BoundedSection(TypedDict):
-    geometry: InnerGeometrySection
+    geometry: TopCrossSection
     top_height: float
