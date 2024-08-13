@@ -4,8 +4,9 @@ import { SPACING, VIEWPORT } from '../../ui-style-constants'
 import { DIRECTION_COLUMN } from '../../styles'
 import { Flex } from '../../primitives'
 import { LegacyStyledText } from '../StyledText'
-import { ListItemDescriptor } from './ListItemChildren/ListItemDescriptor'
-import { ListItem as ListItemComponent } from '.'
+import { ListItemDescriptor, ListItemCustomize } from './ListItemChildren'
+import { ListItem as ListItemComponent } from './index'
+import sampleImg from '../../images/labware/measurement-guide/images/depth/depth-plate-v@3x.png'
 
 import type { Meta, StoryObj } from '@storybook/react'
 
@@ -67,6 +68,21 @@ export const ListItemDescriptorMini: Story = {
         type="mini"
         content={<div>mock content</div>}
         description={<div>mock description</div>}
+      />
+    ),
+  },
+}
+
+export const ListItemCustomizeDefault: Story = {
+  args: {
+    type: 'noActive',
+    children: (
+      <ListItemCustomize
+        header="Header"
+        onClick={() => {}}
+        label="Label"
+        imgSrc={sampleImg}
+        linkText="Text"
       />
     ),
   },
