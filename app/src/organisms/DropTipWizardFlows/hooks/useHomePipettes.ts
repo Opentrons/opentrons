@@ -14,7 +14,8 @@ export type UseHomePipettesProps = Omit<
   UseDropTipMaintenanceRunParams,
   'issuedCommandsType' | 'closeFlow'
 > & {
-  onComplete: () => void
+  onHome: () => void
+  isRunCurrent: boolean
 }
 
 export function useHomePipettes(
@@ -26,31 +27,32 @@ export function useHomePipettes(
   const [isHomingPipettes, setIsHomingPipettes] = React.useState(false)
   const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation()
 
-  const createdMaintenanceRunId = useDropTipMaintenanceRun({
+  const { activeMaintenanceRunId } = useDropTipMaintenanceRun({
     ...props,
     issuedCommandsType: 'setup',
     enabled: isHomingPipettes,
-    closeFlow: props.onComplete,
+    closeFlow: props.onHome,
   })
-  const isMaintenanceRunActive = createdMaintenanceRunId != null
+  const isMaintenanceRunActive = activeMaintenanceRunId != null
 
   // Home the pipette after user click once a maintenance run has been created.
   React.useEffect(() => {
-    if (isMaintenanceRunActive && isHomingPipettes) {
+    if (isMaintenanceRunActive && isHomingPipettes && props.isRunCurrent) {
+      console.log('HITTING HERE!!!')
       void homePipettesCmd().finally(() => {
-        props.onComplete()
-        deleteMaintenanceRun(createdMaintenanceRunId)
+        props.onHome()
+        deleteMaintenanceRun(activeMaintenanceRunId)
       })
     }
-  }, [isMaintenanceRunActive, isHomingPipettes])
+  }, [isMaintenanceRunActive, isHomingPipettes, props.isRunCurrent])
 
   const { createMaintenanceCommand } = useCreateMaintenanceCommandMutation()
 
   const homePipettesCmd = React.useCallback(() => {
-    if (createdMaintenanceRunId != null) {
+    if (activeMaintenanceRunId != null) {
       return createMaintenanceCommand(
         {
-          maintenanceRunId: createdMaintenanceRunId,
+          maintenanceRunId: activeMaintenanceRunId,
           command: HOME_EXCEPT_PLUNGERS,
           waitUntilComplete: true,
         },
@@ -63,7 +65,7 @@ export function useHomePipettes(
         )
       )
     }
-  }, [createMaintenanceCommand, createdMaintenanceRunId])
+  }, [createMaintenanceCommand, activeMaintenanceRunId])
 
   return {
     homePipettes: () => {

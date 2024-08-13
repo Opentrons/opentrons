@@ -33,6 +33,7 @@ type UseDropTipSetupCommandsParams = UseDTWithTypeParams & {
   setErrorDetails: (errorDetails: SetRobotErrorDetailsParams) => void
   toggleIsExiting: () => void
   fixitCommandTypeUtils?: FixitCommandTypeUtils
+  toggleClientEndRun: () => void
 }
 
 export interface UseDropTipCommandsResult {
@@ -57,20 +58,14 @@ export function useDropTipCommands({
   instrumentModelSpecs,
   robotType,
   fixitCommandTypeUtils,
+  toggleClientEndRun,
 }: UseDropTipSetupCommandsParams): UseDropTipCommandsResult {
   const isFlex = robotType === FLEX_ROBOT_TYPE
   const [hasSeenClose, setHasSeenClose] = React.useState(false)
   const [jogQueue, setJogQueue] = React.useState<Array<() => Promise<void>>>([])
   const [isJogging, setIsJogging] = React.useState(false)
 
-  const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation({
-    onSuccess: () => {
-      closeFlow()
-    },
-    onError: () => {
-      closeFlow()
-    },
-  })
+  const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation()
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
 
   const handleCleanUpAndClose = (homeOnExit: boolean = true): Promise<void> => {
@@ -93,6 +88,8 @@ export function useDropTipCommands({
                 console.error(error.message)
               })
               .finally(() => {
+                toggleClientEndRun()
+                closeFlow()
                 deleteMaintenanceRun(activeMaintenanceRunId)
               })
           }

@@ -35,7 +35,8 @@ export interface DropTipWizardFlowsProps {
   robotType: RobotType
   mount: PipetteData['mount']
   instrumentModelSpecs: PipetteModelSpecs
-  closeFlow: () => void
+  /* isTakeover allows for optionally specifying a different callback if a different client cancels the "setup" type flow. */
+  closeFlow: (isTakeover?: boolean) => void
   /* Optional. If provided, DT will issue "fixit" commands and render alternate Error Recovery compatible views. */
   fixitCommandTypeUtils?: FixitCommandTypeUtils
 }
