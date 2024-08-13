@@ -34,11 +34,6 @@
     "rootDir": "src",
     "outDir": "lib"
   },
-  "include": [
-    "typings",
-    "src",
-    "../components/src/molecules/DropdownMenu/DropdownMenu.stories.tsx",
-    "../components/src/molecules/DropdownMenu/DropdownMenu.tsx"
-  ],
+  "include": ["typings", "src"],
   "exclude": ["**/*.stories.tsx"]
 }
