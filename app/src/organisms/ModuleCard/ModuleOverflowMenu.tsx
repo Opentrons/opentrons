@@ -6,6 +6,7 @@ import {
   MenuItem,
   MenuList,
   POSITION_RELATIVE,
+  Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
 
@@ -15,7 +16,6 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { Tooltip } from '../../atoms/Tooltip'
 import { useCurrentRunId } from '../../resources/runs'
 import {
   useIsFlex,

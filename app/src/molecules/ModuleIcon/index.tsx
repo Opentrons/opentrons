@@ -1,14 +1,15 @@
 import * as React from 'react'
 import { css } from 'styled-components'
+
 import {
   COLORS,
   Flex,
   ModuleIcon as SharedModuleIcon,
   POSITION_RELATIVE,
   SPACING,
+  Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
-import { Tooltip } from '../../atoms/Tooltip'
 
 import type { AttachedModule } from '../../redux/modules/types'
 

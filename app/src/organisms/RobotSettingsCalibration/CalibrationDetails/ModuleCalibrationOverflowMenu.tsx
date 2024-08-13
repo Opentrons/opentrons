@@ -11,12 +11,12 @@ import {
   OverflowBtn,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
+  Tooltip,
   useHoverTooltip,
   useMenuHandleClickOutside,
   useOnClickOutside,
 } from '@opentrons/components'
 
-import { Tooltip } from '../../../atoms/Tooltip'
 import { useChainLiveCommands } from '../../../resources/runs'
 import { useRunStatuses } from '../../Devices/hooks'
 import { getModulePrepCommands } from '../../Devices/getModulePrepCommands'

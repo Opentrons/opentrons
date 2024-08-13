@@ -17,12 +17,13 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_END,
   JUSTIFY_FLEX_START,
+  LegacyStyledText,
   Link,
   OVERFLOW_WRAP_ANYWHERE,
   SIZE_1,
   SIZE_4,
   SPACING,
-  LegacyStyledText,
+  Tooltip,
   TYPOGRAPHY,
   useTooltip,
 } from '@opentrons/components'
@@ -48,7 +49,6 @@ import { ToggleButton } from '../../atoms/buttons'
 import { AvailableRobotOption } from './AvailableRobotOption'
 import { InputField } from '../../atoms/InputField'
 import { DropdownMenu } from '../../atoms/MenuList/DropdownMenu'
-import { Tooltip } from '../../atoms/Tooltip'
 import { UploadInput } from '../../molecules/UploadInput'
 import { FileCard } from './FileCard'
 

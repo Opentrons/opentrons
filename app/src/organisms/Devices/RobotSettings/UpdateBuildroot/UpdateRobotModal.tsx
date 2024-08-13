@@ -4,17 +4,18 @@ import { useDispatch, useSelector } from 'react-redux'
 import styled, { css } from 'styled-components'
 
 import {
-  useHoverTooltip,
   ALIGN_CENTER,
+  BORDERS,
   DIRECTION_COLUMN,
-  JUSTIFY_SPACE_BETWEEN,
-  JUSTIFY_SPACE_AROUND,
-  SPACING,
   Flex,
+  JUSTIFY_SPACE_AROUND,
+  JUSTIFY_SPACE_BETWEEN,
+  Modal,
   NewPrimaryBtn,
   NewSecondaryBtn,
-  Modal,
-  BORDERS,
+  SPACING,
+  Tooltip,
+  useHoverTooltip,
 } from '@opentrons/components'
 
 import {
@@ -29,7 +30,6 @@ import {
 import { ExternalLink } from '../../../../atoms/Link/ExternalLink'
 import { ReleaseNotes } from '../../../../molecules/ReleaseNotes'
 import { useIsRobotBusy } from '../../hooks'
-import { Tooltip } from '../../../../atoms/Tooltip'
 import { Banner } from '../../../../atoms/Banner'
 import { useDispatchStartRobotUpdate } from '../../../../redux/robot-update/hooks'
 

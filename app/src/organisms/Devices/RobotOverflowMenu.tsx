@@ -14,6 +14,7 @@ import {
   OverflowBtn,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
+  Tooltip,
   TYPOGRAPHY,
   useHoverTooltip,
   useMenuHandleClickOutside,
@@ -21,7 +22,6 @@ import {
 
 import { CONNECTABLE, removeRobot } from '../../redux/discovery'
 import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
-import { Tooltip } from '../../atoms/Tooltip'
 import { Divider } from '../../atoms/structure'
 import { getTopPortalEl } from '../../App/portal'
 import { ChooseProtocolSlideout } from '../ChooseProtocolSlideout'

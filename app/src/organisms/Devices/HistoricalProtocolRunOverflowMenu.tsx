@@ -17,6 +17,7 @@ import {
   POSITION_RELATIVE,
   SIZE_1,
   SPACING,
+  Tooltip,
   useHoverTooltip,
   useMenuHandleClickOutside,
   useOnClickOutside,
@@ -24,7 +25,6 @@ import {
 import { useDeleteRunMutation } from '@opentrons/react-api-client'
 
 import { Divider } from '../../atoms/structure'
-import { Tooltip } from '../../atoms/Tooltip'
 import { useRunControls } from '../../organisms/RunTimeControl/hooks'
 import {
   useTrackEvent,
