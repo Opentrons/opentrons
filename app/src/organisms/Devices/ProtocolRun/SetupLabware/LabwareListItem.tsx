@@ -284,28 +284,9 @@ export function LabwareListItem(
         ) : null}
       </Flex>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-        <Flex>
-          {showLabwareSVG ? (
-            <StandaloneLabware definition={definition} />
-          ) : null}
-          <Flex
-            flexDirection={DIRECTION_COLUMN}
-            justifyContent={JUSTIFY_CENTER}
-            marginLeft={SPACING.spacing8}
-            marginRight={SPACING.spacing24}
-          >
-            <StyledText desktopStyle="bodyDefaultSemiBold">
-              {labwareDisplayName}
-            </StyledText>
-            <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
-              {nickName}
-            </StyledText>
-          </Flex>
-        </Flex>
         {nestedLabwareInfo != null &&
         nestedLabwareInfo?.sharedSlotId === slotInfo ? (
           <>
-            <Divider />
             <Flex>
               <Flex
                 flexDirection={DIRECTION_COLUMN}
@@ -324,8 +305,27 @@ export function LabwareListItem(
                 </StyledText>
               </Flex>
             </Flex>
+            <Divider />
           </>
         ) : null}
+        <Flex>
+          {showLabwareSVG ? (
+            <StandaloneLabware definition={definition} />
+          ) : null}
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            justifyContent={JUSTIFY_CENTER}
+            marginLeft={SPACING.spacing8}
+            marginRight={SPACING.spacing24}
+          >
+            <StyledText desktopStyle="bodyDefaultSemiBold">
+              {labwareDisplayName}
+            </StyledText>
+            <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
+              {nickName}
+            </StyledText>
+          </Flex>
+        </Flex>
         {moduleDisplayName != null ? (
           <>
             <Divider />
