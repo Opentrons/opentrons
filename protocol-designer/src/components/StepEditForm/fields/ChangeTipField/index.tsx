@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import {
   FormGroup,
   SelectField,
-  Tooltip,
+  LegacyTooltip,
   useHoverTooltip,
   TOOLTIP_FIXED,
 } from '@opentrons/components'
@@ -80,11 +80,11 @@ const ChangeTipOptionLabel = (props: LabelProps): JSX.Element => {
     <>
       <div {...targetProps}>
         {t(`step_edit_form.field.change_tip.option.${value}`)}
-        <Tooltip {...tooltipProps}>
+        <LegacyTooltip {...tooltipProps}>
           <div className={styles.tooltip}>
             {t(`step_edit_form.field.change_tip.option_tooltip.${value}`)}
           </div>
-        </Tooltip>
+        </LegacyTooltip>
       </div>
     </>
   )

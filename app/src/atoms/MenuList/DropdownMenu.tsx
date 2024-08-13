@@ -15,11 +15,11 @@ import {
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
+  Tooltip,
   TYPOGRAPHY,
   useHoverTooltip,
   useOnClickOutside,
 } from '@opentrons/components'
-import { Tooltip } from '../Tooltip'
 
 /** this is the max height to display 10 items */
 const MAX_HEIGHT = 316

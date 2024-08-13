@@ -9,7 +9,7 @@ import {
   COLORS,
   Flex,
   Icon,
-  Tooltip,
+  LegacyTooltip,
   useHoverTooltip,
 } from '@opentrons/components'
 import { getLabwareEntities } from '../../../step-forms/selectors'
@@ -53,7 +53,7 @@ export function BlowoutZOffsetField(
 
   return (
     <>
-      <Tooltip {...tooltipProps}>{tooltipContent}</Tooltip>
+      <LegacyTooltip {...tooltipProps}>{tooltipContent}</LegacyTooltip>
       {isModalOpen ? (
         <ZTipPositionModal
           closeModal={() => {

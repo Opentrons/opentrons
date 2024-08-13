@@ -4,7 +4,7 @@ import { Link as RRDLink } from 'react-router-dom'
 import {
   Box,
   Flex,
-  Tooltip,
+  LegacyTooltip,
   useHoverTooltip,
   ALIGN_CENTER,
   DIRECTION_COLUMN,
@@ -123,11 +123,11 @@ export function SetupPipetteCalibrationItem({
             </TertiaryButton>
           </RRDLink>
           {!isDeckCalibrated ? (
-            <Tooltip {...tooltipProps}>
+            <LegacyTooltip {...tooltipProps}>
               <Box width={SIZE_4}>
                 {t('calibrate_deck_to_proceed_to_pipette_calibration')}
               </Box>
-            </Tooltip>
+            </LegacyTooltip>
           ) : null}
         </Flex>
       </>

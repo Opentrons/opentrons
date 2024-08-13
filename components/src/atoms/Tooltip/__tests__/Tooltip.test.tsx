@@ -2,13 +2,13 @@ import * as React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { screen } from '@testing-library/react'
-import {
-  TOOLTIP_TOP,
-  SPACING,
-  COLORS,
-  POSITION_ABSOLUTE,
-} from '@opentrons/components'
-import { renderWithProviders } from '../../../__testing-utils__'
+
+import { COLORS } from '../../../helix-design-system'
+import { TOOLTIP_TOP } from '../../../tooltips'
+import { SPACING } from '../../../ui-style-constants'
+import { POSITION_ABSOLUTE } from '../../../styles'
+
+import { renderWithProviders } from '../../../testing/utils'
 import { Tooltip } from '..'
 
 const render = (props: React.ComponentProps<typeof Tooltip>) => {

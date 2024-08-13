@@ -1,17 +1,15 @@
 import * as React from 'react'
+import { Flex, Link } from '../../primitives'
+import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../styles'
+import { TYPOGRAPHY } from '../../ui-style-constants'
+import { COLORS } from '../../helix-design-system'
+import { PrimaryButton } from '../buttons'
 import {
-  Flex,
-  JUSTIFY_CENTER,
-  ALIGN_CENTER,
-  COLORS,
-  useHoverTooltip,
-  TOOLTIP_TOP_START,
   TOOLTIP_AUTO,
-  SIZE_4,
-  Link,
-  TYPOGRAPHY,
-} from '@opentrons/components'
-import { TertiaryButton } from '../buttons'
+  TOOLTIP_TOP_START,
+  useHoverTooltip,
+} from '../../tooltips'
+
 import { Tooltip } from './index'
 import type { Story, Meta } from '@storybook/react'
 
@@ -22,7 +20,7 @@ export default {
       <Flex
         justifyContent={JUSTIFY_CENTER}
         alignItems={ALIGN_CENTER}
-        height={SIZE_4}
+        height="8rem"
         width="100%"
         backgroundColor={COLORS.grey10}
       >
@@ -38,9 +36,9 @@ const WithHoverTemplate: Story<React.ComponentProps<typeof Tooltip>> = args => {
   const [targetProps, tooltipProps] = useHoverTooltip({ placement })
   return (
     <>
-      <TertiaryButton disabled={true} {...targetProps}>
+      <PrimaryButton disabled={true} {...targetProps}>
         Hover me
-      </TertiaryButton>
+      </PrimaryButton>
       <Tooltip key={key} tooltipProps={tooltipProps}>
         {children}
       </Tooltip>

@@ -14,6 +14,7 @@ import {
   OverflowBtn,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
+  Tooltip,
   useHoverTooltip,
   useMenuHandleClickOutside,
   useMountEffect,
@@ -21,7 +22,6 @@ import {
 
 import { getTopPortalEl } from '../../App/portal'
 import { Divider } from '../../atoms/structure'
-import { Tooltip } from '../../atoms/Tooltip'
 import { ChooseProtocolSlideout } from '../../organisms/ChooseProtocolSlideout'
 import { DisconnectModal } from '../../organisms/Devices/RobotSettings/ConnectNetwork/DisconnectModal'
 import { handleUpdateBuildroot } from '../../organisms/Devices/RobotSettings/UpdateBuildroot'

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Tooltip } from './Tooltip'
+import { LegacyTooltip } from './LegacyTooltip'
 import { useTooltip } from './useTooltip'
 import { useHoverTooltip } from './useHoverTooltip'
 import {
@@ -16,7 +16,7 @@ import {
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'Library/Atoms/Tooltip',
+  title: 'Library/Atoms/LegacyTooltip',
   decorators: [
     Story => (
       <Flex
@@ -32,8 +32,8 @@ export default {
   ],
 } as Meta
 
-const Template: Story<React.ComponentProps<typeof Tooltip>> = args => (
-  <Tooltip {...args} />
+const Template: Story<React.ComponentProps<typeof LegacyTooltip>> = args => (
+  <LegacyTooltip {...args} />
 )
 export const Basic = Template.bind({})
 Basic.args = {
@@ -46,7 +46,9 @@ Basic.args = {
   arrowStyle: {},
 }
 
-const StatefulTemplate: Story<React.ComponentProps<typeof Tooltip>> = args => {
+const StatefulTemplate: Story<
+  React.ComponentProps<typeof LegacyTooltip>
+> = args => {
   const { visible, children, placement } = args
   const [targetProps, tooltipProps] = useTooltip({ placement })
   return (
@@ -59,7 +61,7 @@ const StatefulTemplate: Story<React.ComponentProps<typeof Tooltip>> = args => {
       >
         Target
       </Box>
-      <Tooltip {...tooltipProps} {...{ visible, children }} />
+      <LegacyTooltip {...tooltipProps} {...{ visible, children }} />
     </>
   )
 }
@@ -70,7 +72,9 @@ WithUseTooltip.args = {
     'This is a tooltip that takes advantage of the useTooltip hook to anchor itself to a target.',
 }
 
-const HoverTemplate: Story<React.ComponentProps<typeof Tooltip>> = args => {
+const HoverTemplate: Story<
+  React.ComponentProps<typeof LegacyTooltip>
+> = args => {
   const { children } = args
   const [targetProps, tooltipProps] = useHoverTooltip()
   return (
@@ -83,7 +87,7 @@ const HoverTemplate: Story<React.ComponentProps<typeof Tooltip>> = args => {
       >
         Target
       </Box>
-      <Tooltip {...tooltipProps}>{children}</Tooltip>
+      <LegacyTooltip {...tooltipProps}>{children}</LegacyTooltip>
     </>
   )
 }
