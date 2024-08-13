@@ -9,10 +9,11 @@ import {
   DIRECTION_COLUMN,
   Flex,
   Icon,
+  InputField,
+  LegacyStyledText,
   Link,
   PrimaryButton,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -22,7 +23,6 @@ import {
 } from '@opentrons/react-api-client'
 
 import { ToggleButton } from '../../../../../atoms/buttons'
-import { InputField } from '../../../../../atoms/InputField'
 import { MultiSlideout } from '../../../../../atoms/Slideout/MultiSlideout'
 import { FileUpload } from '../../../../../molecules/FileUpload'
 import { UploadInput } from '../../../../../molecules/UploadInput'
