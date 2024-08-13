@@ -13,7 +13,7 @@ import { VolumeEntry } from '../VolumeEntry'
 vi.mock('../../../atoms/SoftwareKeyboard')
 vi.mock('../utils')
 
-vi.mock('../../../atoms/InputField', async importOriginal => {
+vi.mock('@opentrons/components', async importOriginal => {
   const actualComponents = await importOriginal<typeof InputField>()
   return {
     ...actualComponents,
