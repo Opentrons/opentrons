@@ -97,21 +97,14 @@ class CommandHistory:
             for command_id in self._all_command_ids
         ]
 
-    def get_filtered_queue_ids(self, all_commands: bool) -> list[str]:
-        print(list(self.get_fixit_queue_ids()))
-        return [
-            i
-            for i in self._all_command_ids
-            if i not in list(self.get_fixit_queue_ids())
-        ]
-
     def get_all_ids(self) -> List[str]:
         """Get all command IDs."""
         return self._all_command_ids
 
-    def get_slice(self, start: int, stop: int) -> List[Command]:
+    def get_slice(self, start: int, stop: int, command_ids: list[str]) -> List[Command]:
         """Get a list of commands between start and stop."""
-        commands = self._all_command_ids[start:stop]
+        selected_command_ids = command_ids or self._all_command_ids
+        commands = selected_command_ids[start:stop]
         return [self._commands_by_id[command].command for command in commands]
 
     def get_tail_command(self) -> Optional[CommandEntry]:
@@ -134,6 +127,22 @@ class CommandHistory:
             return None
         else:
             return self._commands_by_id[self._running_command_id]
+
+    def get_filtered_queue_ids(
+        self,
+        command_intents: list[CommandIntent] = [
+            CommandIntent.PROTOCOL,
+            CommandIntent.SETUP,
+        ],
+    ) -> OrderedSet[str]:
+        queued_ids = self._queued_command_ids
+        if CommandIntent.FIXIT not in command_intents:
+            queued_ids = self._queued_command_ids.__sub__(
+                other=self.get_fixit_queue_ids()
+            )
+        if CommandIntent.SETUP not in command_intents:
+            queued_ids = queued_ids.__sub__(other=self.get_setup_queue_ids())
+        return queued_ids
 
     def get_queue_ids(self) -> OrderedSet[str]:
         """Get the IDs of all queued protocol commands, in FIFO order."""
