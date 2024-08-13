@@ -10,7 +10,6 @@ from typing_extensions import Literal
 from sqlalchemy.engine import Engine as SQLEngine
 from anyio import to_thread
 from fastapi import Depends, status
-from typing_extensions import Final
 
 from server_utils.fastapi_utils.app_state import (
     AppState,
@@ -20,14 +19,12 @@ from server_utils.fastapi_utils.app_state import (
 from robot_server.errors.error_responses import ErrorDetails
 
 from .database import create_sql_engine
+from .filenames import DB_FILE
 from .persistence_directory import (
     PersistenceResetter,
     prepare_active_subdirectory,
     prepare_root,
 )
-
-
-_DATABASE_FILE: Final = "robot_server.db"
 
 
 _log = logging.getLogger(__name__)
@@ -105,7 +102,7 @@ def start_initializing_persistence(  # noqa: C901
             prepared_subdirectory = await subdirectory_prep_task
 
             sql_engine = await to_thread.run_sync(
-                create_sql_engine, prepared_subdirectory / _DATABASE_FILE
+                create_sql_engine, prepared_subdirectory / DB_FILE
             )
             return sql_engine
 
