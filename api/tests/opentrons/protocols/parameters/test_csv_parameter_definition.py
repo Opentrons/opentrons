@@ -1,6 +1,5 @@
 """Tests for the CSV Parameter Definitions."""
 import inspect
-from pathlib import Path
 
 import pytest
 from decoy import Decoy
@@ -62,9 +61,9 @@ def test_create_csv_parameter(decoy: Decoy) -> None:
 def test_set_csv_value(
     decoy: Decoy, csv_parameter_subject: CSVParameterDefinition
 ) -> None:
-    """It should set the CSV parameter value to a path."""
-    csv_parameter_subject.value = Path("123")
-    assert csv_parameter_subject.value == Path("123")
+    """It should set the CSV parameter value to a byte string."""
+    csv_parameter_subject.value = b"123"
+    assert csv_parameter_subject.value == b"123"
 
 
 def test_csv_parameter_as_protocol_engine_type(
@@ -79,13 +78,13 @@ def test_csv_parameter_as_protocol_engine_type(
         file=None,
     )
 
-    csv_parameter_subject.file_info = FileInfo(id="123abc", name="")
+    csv_parameter_subject.file_info = FileInfo(id="123", name="abc")
     result = csv_parameter_subject.as_protocol_engine_type()
     assert result == CSVParameter(
         displayName="My cool CSV",
         variableName="my_cool_csv",
         description="Comma Separated Value",
-        file=FileInfo(id="123abc", name=""),
+        file=FileInfo(id="123", name="abc"),
     )
 
 
@@ -98,6 +97,6 @@ def test_csv_parameter_as_csv_parameter_interface(
     with pytest.raises(RuntimeParameterRequired):
         result.file
 
-    csv_parameter_subject.value = Path("abc")
+    csv_parameter_subject.value = b"abc"
     result = csv_parameter_subject.as_csv_parameter_interface(api_version)
-    assert result._path == Path("abc")
+    assert result.contents == "abc"

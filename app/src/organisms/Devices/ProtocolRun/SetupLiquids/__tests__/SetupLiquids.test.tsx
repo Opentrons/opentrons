@@ -50,7 +50,7 @@ describe('SetupLiquids', () => {
     render(props)
     screen.getByRole('button', { name: 'List View' })
     screen.getByRole('button', { name: 'Map View' })
-    screen.getByRole('button', { name: 'Confirm placements' })
+    screen.getByRole('button', { name: 'Confirm locations and volumes' })
   })
   it('renders the map view when you press that toggle button', () => {
     render(props)

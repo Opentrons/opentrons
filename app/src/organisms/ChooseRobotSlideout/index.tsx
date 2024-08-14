@@ -12,6 +12,7 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   DISPLAY_INLINE_BLOCK,
+  DropdownMenu,
   Flex,
   Icon,
   InputField,
@@ -48,16 +49,15 @@ import { Slideout } from '../../atoms/Slideout'
 import { MultiSlideout } from '../../atoms/Slideout/MultiSlideout'
 import { ToggleButton } from '../../atoms/buttons'
 import { AvailableRobotOption } from './AvailableRobotOption'
-import { DropdownMenu } from '../../atoms/MenuList/DropdownMenu'
 import { UploadInput } from '../../molecules/UploadInput'
 import { FileCard } from './FileCard'
 
 import type { RobotType, RunTimeParameter } from '@opentrons/shared-data'
+import type { DropdownOption } from '@opentrons/components'
 import type { SlideoutProps } from '../../atoms/Slideout'
 import type { UseCreateRun } from '../../organisms/ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
 import type { State, Dispatch } from '../../redux/types'
 import type { Robot } from '../../redux/discovery/types'
-import type { DropdownOption } from '../../atoms/MenuList/DropdownMenu'
 
 export const CARD_OUTLINE_BORDER_STYLE = css`
   border-style: ${BORDERS.styleSolid};

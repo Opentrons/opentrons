@@ -38,6 +38,7 @@ import type {
   ERUtilsResults,
   UseRecoveryAnalyticsResult,
   UseRecoveryTakeoverResult,
+  useRetainedFailedCommandBySource,
 } from './hooks'
 
 export function useRunPausedSplash(
@@ -55,7 +56,7 @@ export function useRunPausedSplash(
 
 type RunPausedSplashProps = ERUtilsResults & {
   isOnDevice: boolean
-  failedCommand: ErrorRecoveryFlowsProps['failedCommand']
+  failedCommand: ReturnType<typeof useRetainedFailedCommandBySource>
   protocolAnalysis: ErrorRecoveryFlowsProps['protocolAnalysis']
   robotType: RobotType
   robotName: string
@@ -74,7 +75,7 @@ export function RunPausedSplash(
     robotName,
   } = props
   const { t } = useTranslation('error_recovery')
-  const errorKind = getErrorKind(failedCommand)
+  const errorKind = getErrorKind(failedCommand?.byRunRecord ?? null)
   const title = useErrorName(errorKind)
 
   const { proceedToRouteAndStep } = routeUpdateActions

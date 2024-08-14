@@ -13,6 +13,7 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   DISPLAY_BLOCK,
+  DropdownMenu,
   Flex,
   Icon,
   InputField,
@@ -43,7 +44,6 @@ import { getStoredProtocols } from '../../redux/protocol-storage'
 import { appShellRequestor } from '../../redux/shell/remote'
 import { MultiSlideout } from '../../atoms/Slideout/MultiSlideout'
 import { ToggleButton } from '../../atoms/buttons'
-import { DropdownMenu } from '../../atoms/MenuList/DropdownMenu'
 import { MiniCard } from '../../molecules/MiniCard'
 import { UploadInput } from '../../molecules/UploadInput'
 import { useTrackCreateProtocolRunEvent } from '../Devices/hooks'

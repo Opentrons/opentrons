@@ -1,8 +1,8 @@
 {
+  "another_app_controlling_robot": "The robot’s touchscreen or another computer with the app is currently controlling this robot.",
   "are_you_sure_you_want_to_cancel": "Are you sure you want to cancel?",
   "at_step": "At step",
   "back_to_menu": "Back to menu",
-  "another_app_controlling_robot": "The robot’s touchscreen or another computer with the app is currently controlling this robot.",
   "before_you_begin": "Before you begin",
   "begin_removal": "Begin removal",
   "blowout_failed": "Blowout failed",
@@ -64,7 +64,7 @@
   "robot_will_retry_with_tips": "The robot will retry the failed step with new tips.",
   "run_paused": "Run paused",
   "select_tip_pickup_location": "Select tip pick-up location",
-  "skip": "Skip",
+  "skip_and_home_pipette": "Skip and home pipette",
   "skip_to_next_step": "Skip to next step",
   "skip_to_next_step_new_tips": "Skip to next step with new tips",
   "skip_to_next_step_same_tips": "Skip to next step with same tips",

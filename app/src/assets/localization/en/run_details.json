@@ -42,6 +42,9 @@
   "end_step_time": "End",
   "error_info": "Error {{errorCode}}: {{errorType}}",
   "error_type": "Error: {{errorType}}",
+  "error_details": "Error details",
+  "no_of_error": "{{count}} error",
+  "no_of_errors": "{{count}} errors",
   "failed_step": "Failed step",
   "final_step": "Final Step",
   "ignore_stored_data": "Ignore stored data",
@@ -98,6 +101,8 @@
   "run_complete": "Run completed",
   "run_complete_splash": "Run completed",
   "run_completed": "Run completed.",
+  "run_completed_with_errors": "Run completed with errors.",
+  "run_completed_with_warnings": "Run completed with warnings.",
   "run_cta_disabled": "Complete required steps on Protocol tab before starting the run",
   "run_failed": "Run failed.",
   "run_failed_modal_body": "Error occurred when protocol was {{command}}",
@@ -144,5 +149,8 @@
   "view_analysis_error_details": "View <errorLink>error details</errorLink>",
   "view_current_step": "View current step",
   "view_error": "View error",
-  "view_error_details": "View error details"
+  "view_error_details": "View error details",
+  "warning_details": "Warning details",
+  "no_of_warning": "{{count}} warning",
+  "no_of_warnings": "{{count}} warnings"
 }

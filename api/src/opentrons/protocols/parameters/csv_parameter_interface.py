@@ -1,35 +1,46 @@
 import csv
-from pathlib import Path
+from tempfile import NamedTemporaryFile
 from typing import Optional, TextIO, Any, List
 
 from opentrons.protocols.api_support.types import APIVersion
 
-from . import parameter_file_reader
-from .exceptions import ParameterValueError
+from .exceptions import ParameterValueError, RuntimeParameterRequired
 
 
 # TODO(jbl 2024-08-02) This is a public facing class and as such should be moved to the protocol_api folder
 class CSVParameter:
-    def __init__(self, csv_path: Optional[Path], api_version: APIVersion) -> None:
-        self._path = csv_path
-        self._file: Optional[TextIO] = None
-        self._contents: Optional[str] = None
+    def __init__(self, contents: Optional[bytes], api_version: APIVersion) -> None:
+        self._contents = contents
         self._api_version = api_version
+        self._file: Optional[TextIO] = None
 
     @property
     def file(self) -> TextIO:
         """Returns the file handler for the CSV file."""
         if self._file is None:
-            self._file = parameter_file_reader.open_file_path(self._path)
+            text = self.contents
+            temporary_file = NamedTemporaryFile("r+")
+            temporary_file.write(text)
+            temporary_file.flush()
+
+            # Open a new file handler for the temporary file with read-only permissions and close the other
+            self._file = open(temporary_file.name, "r")
+            temporary_file.close()
         return self._file
+
+    @property
+    def file_opened(self) -> bool:
+        """Return if a file handler has been opened for the CSV parameter."""
+        return self._file is not None
 
     @property
     def contents(self) -> str:
         """Returns the full contents of the CSV file as a single string."""
         if self._contents is None:
-            self.file.seek(0)
-            self._contents = self.file.read()
-        return self._contents
+            raise RuntimeParameterRequired(
+                "CSV parameter needs to be set to a file for full analysis or run."
+            )
+        return self._contents.decode("utf-8")
 
     def parse_as_csv(
         self, detect_dialect: bool = True, **kwargs: Any
@@ -42,23 +53,20 @@ class CSVParameter:
         rows: List[List[str]] = []
         if detect_dialect:
             try:
-                self.file.seek(0)
-                dialect = csv.Sniffer().sniff(self.file.read(1024))
-                self.file.seek(0)
-                reader = csv.reader(self.file, dialect, **kwargs)
+                dialect = csv.Sniffer().sniff(self.contents[:1024])
+                reader = csv.reader(self.contents.split("\n"), dialect, **kwargs)
             except (UnicodeDecodeError, csv.Error):
                 raise ParameterValueError(
-                    "Cannot parse dialect or contents from provided CSV file."
+                    "Cannot parse dialect or contents from provided CSV contents."
                 )
         else:
             try:
-                reader = csv.reader(self.file, **kwargs)
+                reader = csv.reader(self.contents.split("\n"), **kwargs)
             except (UnicodeDecodeError, csv.Error):
-                raise ParameterValueError("Cannot parse provided CSV file.")
+                raise ParameterValueError("Cannot parse provided CSV contents.")
         try:
             for row in reader:
                 rows.append(row)
         except (UnicodeDecodeError, csv.Error):
-            raise ParameterValueError("Cannot parse provided CSV file.")
-        self.file.seek(0)
+            raise ParameterValueError("Cannot parse provided CSV contents.")
         return rows

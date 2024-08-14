@@ -48,6 +48,7 @@ export const getPipettingCommandText = ({
           robotType
         )
       : ''
+
   switch (command?.commandType) {
     case 'aspirate': {
       const { volume, flowRate } = command.params

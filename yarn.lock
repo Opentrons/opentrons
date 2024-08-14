@@ -3265,7 +3265,7 @@
     react-dom "18.2.0"
     react-error-boundary "^4.0.10"
     react-hook-form "7.50.1"
-    react-i18next "13.5.0"
+    react-i18next "14.0.0"
     react-intersection-observer "^8.33.1"
     react-markdown "9.0.1"
     react-redux "8.1.2"
@@ -3297,7 +3297,7 @@
     classnames "2.2.5"
     interactjs "^1.10.27"
     lodash "4.17.21"
-    react-i18next "13.5.0"
+    react-i18next "14.0.0"
     react-popper "1.0.0"
     react-remove-scroll "2.4.3"
     react-select "5.4.0"
@@ -18411,14 +18411,6 @@ react-hook-form@7.50.1:
   version "7.50.1"
   resolved "https://registry.yarnpkg.com/react-hook-form/-/react-hook-form-7.50.1.tgz#f6aeb17a863327e5a0252de8b35b4fc8990377ed"
   integrity sha512-3PCY82oE0WgeOgUtIr3nYNNtNvqtJ7BZjsbxh6TnYNbXButaD5WpjOmTjdxZfheuHKR68qfeFnEDVYoSSFPMTQ==
-
-react-i18next@13.5.0:
-  version "13.5.0"
-  resolved "https://registry.yarnpkg.com/react-i18next/-/react-i18next-13.5.0.tgz#44198f747628267a115c565f0c736a50a76b1ab0"
-  integrity sha512-CFJ5NDGJ2MUyBohEHxljOq/39NQ972rh1ajnadG9BjTk+UXbHLq4z5DKEbEQBDoIhUmmbuS/fIMJKo6VOax1HA==
-  dependencies:
-    "@babel/runtime" "^7.22.5"
-    html-parse-stringify "^3.0.1"
 
 react-i18next@14.0.0:
   version "14.0.0"

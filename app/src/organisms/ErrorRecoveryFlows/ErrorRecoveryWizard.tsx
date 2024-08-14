@@ -29,7 +29,11 @@ import { RECOVERY_MAP } from './constants'
 
 import type { RobotType } from '@opentrons/shared-data'
 import type { RecoveryContentProps } from './types'
-import type { ERUtilsResults, UseRecoveryAnalyticsResult } from './hooks'
+import type {
+  ERUtilsResults,
+  UseRecoveryAnalyticsResult,
+  useRetainedFailedCommandBySource,
+} from './hooks'
 import type { ErrorRecoveryFlowsProps } from '.'
 
 export interface UseERWizardResult {
@@ -65,6 +69,7 @@ export type ErrorRecoveryWizardProps = ErrorRecoveryFlowsProps &
     isOnDevice: boolean
     isDoorOpen: boolean
     analytics: UseRecoveryAnalyticsResult
+    failedCommand: ReturnType<typeof useRetainedFailedCommandBySource>
   }
 
 export function ErrorRecoveryWizard(
@@ -76,7 +81,7 @@ export function ErrorRecoveryWizard(
     recoveryCommands,
     routeUpdateActions,
   } = props
-  const errorKind = getErrorKind(failedCommand)
+  const errorKind = getErrorKind(failedCommand?.byRunRecord ?? null)
 
   useInitialPipetteHome({
     hasLaunchedRecovery,
