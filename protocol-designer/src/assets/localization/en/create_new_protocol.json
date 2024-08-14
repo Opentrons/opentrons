@@ -9,6 +9,8 @@
   "description": "Description",
   "edit": "Edit",
   "name": "Name",
+  "quantity": "Quantity",
+  "modules_added": "Modules added",
   "pip": "{{mount}} pipette",
   "need_gripper": "Does your protocol need a Flex Gripper?",
   "pip_gen": "Pipette generation",
