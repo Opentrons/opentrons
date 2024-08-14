@@ -287,6 +287,7 @@ export function ProtocolRunHeader({
       })
 
       // Close the run if no tips are attached after running tip check at least once.
+      // This marks the robot as "not busy" as soon as a run is cancelled if drop tip CTAs are unnecessary.
       if (initialPipettesWithTipsCount === 0) {
         closeCurrentRun()
       }
