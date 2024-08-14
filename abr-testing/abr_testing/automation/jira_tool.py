@@ -275,7 +275,7 @@ class JiraTicket:
             "POST", comment_url, data=payload, headers=self.headers, auth=self.auth
         )
 
-    def format_jira_comment(self, comment_info: str) -> List[Dict[str, Any]]:
+    def format_jira_comment(self, comment_info: Any) -> List[Dict[str, Any]]:
         """Formats a string input to work with the "comment" function."""
         content_list: List = []
         line_1 = {

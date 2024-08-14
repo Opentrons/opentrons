@@ -53,11 +53,11 @@ async def _main(
             print(f"Please enter a number.")
 
     # Ask, get, and test Jira ticket link
-    want_comment = False
+    connect_jira = False
     while True:
         y_or_no = input("Do you want to attach the results to a JIRA Ticket? Y/N: ")
         if y_or_no == "Y" or y_or_no == "y":
-            want_comment = True
+            connect_jira = True
             # grab testing teams jira api info from a local file - MAKE INTO FUNCTION
             storage_directory = "/var/lib/jupyter/notebooks"
             jira_info = os.path.join(storage_directory, "jira_credentials.json")
@@ -76,7 +76,7 @@ async def _main(
             issue_key = ticket.get_ticket()
             break
         elif y_or_no == "N" or y_or_no == "n":
-            want_comment = False
+            connect_jira = False
             break
         else:
             print("Please Choose a Valid Option")
@@ -188,7 +188,7 @@ async def _main(
         # Grab info and comment on JIRA
         await hw_api.disengage_axes([Axis.X, Axis.Y, Axis.Z, Axis.G])
         await hw_api.clean_up()
-        if want_comment == True:
+        if connect_jira == True:
             with open(file_path, newline="") as csvfile:
                 csvobj = csv.reader(csvfile, delimiter=",")
 
