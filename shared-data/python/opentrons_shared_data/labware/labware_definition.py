@@ -260,7 +260,9 @@ class BoundedSection(BaseModel):
         description="Geometrical information needed to calculate the volume of a subsection of a well",
     )
     top_height: _NonNegativeNumber = Field(
-        ..., description="The height at the top of a bounded subsection of a well"
+        ...,
+        description="The height at the top of a bounded subsection of a well, relative to the bottom"
+        "of the well",
     )
 
 
