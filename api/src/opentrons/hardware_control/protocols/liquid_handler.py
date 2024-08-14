@@ -130,6 +130,35 @@ class LiquidHandler(
         """
         ...
 
+    async def _move_to_plunger_top(
+        self,
+        mount: MountArgType,
+        volume: Optional[float] = None,
+        rate: float = 1.0,
+        acquire_lock: bool = True,
+        check_current_vol: bool = True,
+    ) -> None:
+        """
+        Aspirate a volume of liquid (in microliters/uL) using this pipette
+        from the *current location*. If no volume is passed, `aspirate` will
+        default to max available volume (after taking into account the volume
+        already present in the tip).
+
+        The function :py:meth:`prepare_for_aspirate` must be called prior to
+        calling this function, while the tip is above the well. This ensures
+        that the pipette tip is in the proper position at the bottom of the
+        pipette to begin aspiration, and prevents subtle over-aspiration if
+        an aspirate is done immediately after :py:meth:`blow_out`. If
+        :py:meth:`prepare_for_aspirate` has not been called since the last
+        call to :py:meth:`aspirate`, an exception will be raised.
+
+        mount : Mount.LEFT or Mount.RIGHT
+        volume : [float] The number of microliters to aspirate
+        rate : [float] Set plunger speed for this aspirate, where
+            speed = rate * aspirate_speed
+        """
+        ...
+
     async def tip_pickup_moves(
         self,
         mount: MountArgType,
@@ -163,6 +192,33 @@ class LiquidHandler(
         their value is taken from the pipette configuration.
         """
         ...
+
+    async def evo_pick_up_tip(
+        self,
+        mount: MountArgType,
+        tip_length: float,
+        presses: Optional[int] = None,
+        increment: Optional[float] = None,
+        volume: Optional[float] = None,
+    ) -> None:
+        """
+        Evo Pick up tip from current location.
+
+        This is achieved by attempting to move the instrument down by its
+        `pick_up_distance`, in a series of presses. This distance is larger
+        than the space available in the tip, so the stepper motor will
+        eventually skip steps, which is resolved by homing afterwards. The
+        pick up operation is done at a current specified in the pipette config,
+        which is experimentally determined to skip steps at a level of force
+        sufficient to provide a good seal between the pipette nozzle and tip
+        while also avoiding attaching the tip so firmly that it can't be
+        dropped later.
+
+        If ``presses`` or ``increment`` is not specified (or is ``None``),
+        their value is taken from the pipette configuration.
+        """
+        ...
+
 
     async def drop_tip(
         self,
