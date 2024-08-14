@@ -245,21 +245,19 @@ class RectangularCrossSection(BaseModel):
     )
 
 
-class Hemisphere(BaseModel):
-    shape: Literal["hemispherical"] = Field(
-        ..., description="Denote shape as hemispherical"
-    )
-    diameter: _NonNegativeNumber = Field(
+class SphericalSegment(BaseModel):
+    shape: Literal["spherical"] = Field(..., description="Denote shape as spherical")
+    radius_of_curvature: _NonNegativeNumber = Field(
         ...,
-        description="diameter of bottom subsection of wells",
+        description="radius of curvature of bottom subsection of wells",
     )
     depth: _NonNegativeNumber = Field(
-        ..., description="The depth of a hemispherical bottom of a well"
+        ..., description="The depth of a spherical bottom of a well"
     )
 
 
 TopCrossSection = Union[CircularCrossSection, RectangularCrossSection]
-BottomShape = Union[CircularCrossSection, RectangularCrossSection, Hemisphere]
+BottomShape = Union[CircularCrossSection, RectangularCrossSection, SphericalSegment]
 
 
 class BoundedSection(BaseModel):
@@ -310,7 +308,7 @@ class InnerLabwareGeometry(BaseModel):
     )
     bottomShape: BottomShape = Field(
         ...,
-        description="The shape at the bottom of the well: either a hemisphere or a cross-section",
+        description="The shape at the bottom of the well: either a spherical segment or a cross-section",
         discriminator="shape",
     )
 

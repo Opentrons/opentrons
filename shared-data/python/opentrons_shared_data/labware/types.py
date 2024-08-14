@@ -37,7 +37,7 @@ LabwareRoles = Union[
 
 Circular = Literal["circular"]
 Rectangular = Literal["rectangular"]
-Hemispherical = Literal["hemispherical"]
+Spherical = Literal["spherical"]
 WellShape = Union[Circular, Rectangular]
 
 
@@ -129,13 +129,14 @@ class RectangularCrossSection(TypedDict):
     yDimension: float
 
 
-class Hemisphere(TypedDict):
-    shape: Hemispherical
-    diameter: float
+class SphericalSegment(TypedDict):
+    shape: Spherical
+    radius_of_curvature: float
+    depth: float
 
 
 TopCrossSection = Union[CircularCrossSection, RectangularCrossSection]
-BottomShape = Union[CircularCrossSection, RectangularCrossSection, Hemispherical]
+BottomShape = Union[CircularCrossSection, RectangularCrossSection, Spherical]
 
 
 class BoundedSection(TypedDict):

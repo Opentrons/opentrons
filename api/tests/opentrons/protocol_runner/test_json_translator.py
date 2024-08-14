@@ -16,7 +16,7 @@ from opentrons_shared_data.labware.labware_definition import (
     BoundedSection,
     RectangularCrossSection,
     InnerLabwareGeometry,
-    Hemisphere,
+    SphericalSegment,
 )
 from opentrons_shared_data.protocol.models import (
     protocol_schema_v6,
@@ -708,9 +708,9 @@ def _load_labware_definition_data() -> LabwareDefinition:
                     topHeight=20,
                 ),
             ],
-            bottomShape=Hemisphere(
-                shape="hemispherical",
-                diameter=6,
+            bottomShape=SphericalSegment(
+                shape="spherical",
+                radius_of_curvature=6,
                 depth=10,
             ),
         ),
