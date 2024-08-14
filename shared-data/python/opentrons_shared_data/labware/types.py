@@ -37,6 +37,7 @@ LabwareRoles = Union[
 
 Circular = Literal["circular"]
 Rectangular = Literal["rectangular"]
+Hemispherical = Literal["hemispherical"]
 WellShape = Union[Circular, Rectangular]
 
 
@@ -117,33 +118,34 @@ class WellGroup(TypedDict, total=False):
     brand: LabwareBrandData
 
 
-class CircularArea(TypedDict):
+class CircularCrossSection(TypedDict):
     shape: Circular
     diameter: float
 
 
-class RectangularArea(TypedDict):
+class RectangularCrossSection(TypedDict):
     shape: Rectangular
     xDimension: float
     yDimension: float
 
 
-TopCrossSection = Union[CircularArea, RectangularArea]
-
-
 class Hemisphere(TypedDict):
+    shape: Hemispherical
     diameter: float
-    depth: float
+
+
+TopCrossSection = Union[CircularCrossSection, RectangularCrossSection]
+BottomShape = Union[CircularCrossSection, RectangularCrossSection, Hemisphere]
 
 
 class BoundedSection(TypedDict):
     geometry: TopCrossSection
-    top_height: float
+    topHeight: float
 
 
 class InnerLabwareGeometry(TypedDict):
     frusta: List[BoundedSection]
-    bottom_shape: Optional[Hemisphere]
+    bottomShape: BottomShape
 
 
 class _RequiredLabwareDefinition(TypedDict):

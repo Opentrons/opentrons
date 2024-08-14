@@ -224,21 +224,16 @@ class WellDefinition(BaseModel):
     )
 
 
-class Hemisphere(BaseModel):
+class CircularCrossSection(BaseModel):
+    shape: Literal["circular"] = Field(..., description="Denote shape as circular")
     diameter: _NonNegativeNumber = Field(
-        ...,
-        description="diameter of bottom subsection of wells",
-    )
-    depth: _NonNegativeNumber = Field(
-        ..., description="The depth of a hemispherical bottom of a well"
+        ..., description="The diameter of a circular cross section of a well"
     )
 
 
-class TopCrossSection(BaseModel):
-    shape: Literal["rectangular", "circular"] = Field(
-        ...,
-        description="Shape of a cross-section of a well used to determine how "
-        "to calculate area",
+class RectangularCrossSection(BaseModel):
+    shape: Literal["rectangular"] = Field(
+        ..., description="Denote shape as rectangular"
     )
     xDimension: Optional[_NonNegativeNumber] = Field(
         None,
@@ -248,18 +243,32 @@ class TopCrossSection(BaseModel):
         None,
         description="y dimension of a subsection of wells",
     )
-    diameter: Optional[_NonNegativeNumber] = Field(
-        None,
-        description="diameter of a subsection of wells",
+
+
+class Hemisphere(BaseModel):
+    shape: Literal["hemispherical"] = Field(
+        ..., description="Denote shape as hemispherical"
     )
+    diameter: _NonNegativeNumber = Field(
+        ...,
+        description="diameter of bottom subsection of wells",
+    )
+    depth: _NonNegativeNumber = Field(
+        ..., description="The depth of a hemispherical bottom of a well"
+    )
+
+
+TopCrossSection = Union[CircularCrossSection, RectangularCrossSection]
+BottomShape = Union[CircularCrossSection, RectangularCrossSection, Hemisphere]
 
 
 class BoundedSection(BaseModel):
     geometry: TopCrossSection = Field(
         ...,
         description="Geometrical information needed to calculate the volume of a subsection of a well",
+        discriminator="shape",
     )
-    top_height: _NonNegativeNumber = Field(
+    topHeight: _NonNegativeNumber = Field(
         ...,
         description="The height at the top of a bounded subsection of a well, relative to the bottom"
         "of the well",
@@ -299,8 +308,10 @@ class InnerLabwareGeometry(BaseModel):
         ...,
         description="A list of all of the sections of the well that have a contiguous shape",
     )
-    bottom_shape: Optional[Hemisphere] = Field(
-        None, description="An optional non-frustum shape at the bottom of a well"
+    bottomShape: BottomShape = Field(
+        ...,
+        description="An optional non-frustum shape at the bottom of a well",
+        discriminator="shape",
     )
 
 

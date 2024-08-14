@@ -14,7 +14,7 @@ from opentrons_shared_data.labware.labware_definition import (
     Metadata1,
     WellDefinition,
     BoundedSection,
-    TopCrossSection,
+    RectangularCrossSection,
     InnerLabwareGeometry,
     Hemisphere,
 )
@@ -692,23 +692,24 @@ def _load_labware_definition_data() -> LabwareDefinition:
         innerWellGeometry=InnerLabwareGeometry(
             frusta=[
                 BoundedSection(
-                    geometry=TopCrossSection(
+                    geometry=RectangularCrossSection(
                         shape="rectangular",
                         xDimension=7.6,
                         yDimension=8.5,
                     ),
-                    top_height=45,
+                    topHeight=45,
                 ),
                 BoundedSection(
-                    geometry=TopCrossSection(
+                    geometry=RectangularCrossSection(
                         shape="rectangular",
                         xDimension=5.6,
                         yDimension=6.5,
                     ),
-                    top_height=20,
+                    topHeight=20,
                 ),
             ],
-            bottom_shape=Hemisphere(
+            bottomShape=Hemisphere(
+                shape="hemispherical",
                 diameter=6,
                 depth=10,
             ),
