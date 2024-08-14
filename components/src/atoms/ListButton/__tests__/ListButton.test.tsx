@@ -24,19 +24,19 @@ describe('ListButton', () => {
   it('should render correct style - noActive', () => {
     render(props)
     const listButton = screen.getByTestId('ListButton_noActive')
-    expect(listButton).toHaveStyle(`backgroundColor: ${COLORS.grey35}`)
+    expect(listButton).toHaveStyle(`backgroundColor: ${COLORS.grey30}`)
   })
   it('should render correct style - connected', () => {
     props.type = 'connected'
     render(props)
     const listButton = screen.getByTestId('ListButton_connected')
-    expect(listButton).toHaveStyle(`backgroundColor: ${COLORS.green35}`)
+    expect(listButton).toHaveStyle(`backgroundColor: ${COLORS.green30}`)
   })
   it('should render correct style - notConnected', () => {
     props.type = 'notConnected'
     render(props)
     const listButton = screen.getByTestId('ListButton_notConnected')
-    expect(listButton).toHaveStyle(`backgroundColor: ${COLORS.yellow35}`)
+    expect(listButton).toHaveStyle(`backgroundColor: ${COLORS.yellow30}`)
   })
   it('should call on click when pressed', () => {
     render(props)
