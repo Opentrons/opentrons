@@ -23,7 +23,6 @@ import { RecoveryTakeover } from './RecoveryTakeover'
 import {
   useCurrentlyRecoveringFrom,
   useERUtils,
-  useRecoveryAnalytics,
   useRecoveryTakeover,
   useRetainedFailedCommandBySource,
   useShowDoorInfo,
@@ -124,11 +123,6 @@ export function ErrorRecoveryFlows(
     protocolAnalysis
   )
 
-  const analytics = useRecoveryAnalytics()
-  React.useEffect(() => {
-    analytics.reportErrorEvent(failedCommandByRunRecord)
-  }, [failedCommandByRunRecord?.error?.detail])
-
   const { hasLaunchedRecovery, toggleERWizard, showERWizard } = useERWizard()
   const isOnDevice = useSelector(getIsOnDevice)
   const robotType = protocolAnalysis?.robotType ?? OT2_ROBOT_TYPE
@@ -150,7 +144,6 @@ export function ErrorRecoveryFlows(
     toggleERWizAsActiveUser,
     isOnDevice,
     robotType,
-    analytics,
     failedCommand: failedCommandBySource,
   })
 
@@ -171,7 +164,6 @@ export function ErrorRecoveryFlows(
           robotType={robotType}
           isOnDevice={isOnDevice}
           isDoorOpen={isDoorOpen}
-          analytics={analytics}
           failedCommand={failedCommandBySource}
         />
       ) : null}
@@ -183,7 +175,6 @@ export function ErrorRecoveryFlows(
           robotName={robotName}
           isOnDevice={isOnDevice}
           toggleERWizAsActiveUser={toggleERWizAsActiveUser}
-          analytics={analytics}
           failedCommand={failedCommandBySource}
         />
       ) : null}

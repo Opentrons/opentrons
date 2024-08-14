@@ -206,23 +206,4 @@ describe('ErrorRecoveryFlows', () => {
     render(props)
     expect(screen.queryByText('MOCK RUN PAUSED SPLASH')).not.toBeInTheDocument()
   })
-
-  it('calls reportErrorEvent with failedCommand on mount and when failedCommand changes', () => {
-    const mockReportErrorEvent = vi.fn()
-    vi.mocked(useRecoveryAnalytics).mockReturnValue({
-      reportErrorEvent: mockReportErrorEvent,
-    } as any)
-
-    const { rerender } = render(props)
-    expect(mockReportErrorEvent).toHaveBeenCalledWith(mockFailedCommand)
-
-    const newProps = {
-      ...props,
-      failedCommandByRunRecord: null,
-    }
-    rerender(<ErrorRecoveryFlows {...newProps} />)
-    expect(mockReportErrorEvent).toHaveBeenCalledWith(
-      newProps.failedCommandByRunRecord
-    )
-  })
 })

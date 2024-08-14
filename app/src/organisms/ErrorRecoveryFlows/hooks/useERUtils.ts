@@ -15,6 +15,7 @@ import { useRecoveryOptionCopy } from './useRecoveryOptionCopy'
 import { useRecoveryActionMutation } from './useRecoveryActionMutation'
 import { useRunningStepCounts } from '../../../resources/protocols/hooks'
 import { useRecoveryToasts } from './useRecoveryToasts'
+import { useRecoveryAnalytics } from './useRecoveryAnalytics'
 
 import type { PipetteData } from '@opentrons/api-client'
 import type { RobotType } from '@opentrons/shared-data'
@@ -40,7 +41,6 @@ export type ERUtilsProps = Omit<ErrorRecoveryFlowsProps, 'failedCommand'> & {
   hasLaunchedRecovery: boolean
   isOnDevice: boolean
   robotType: RobotType
-  analytics: UseRecoveryAnalyticsResult
   failedCommand: ReturnType<typeof useRetainedFailedCommandBySource>
 }
 
@@ -59,6 +59,7 @@ export interface ERUtilsResults {
   stepCounts: StepCounts
   commandsAfterFailedCommand: ReturnType<typeof getNextSteps>
   subMapUtils: SubMapUtils
+  analytics: UseRecoveryAnalyticsResult
 }
 
 const SUBSEQUENT_COMMAND_DEPTH = 2
@@ -71,7 +72,6 @@ export function useERUtils({
   protocolAnalysis,
   isOnDevice,
   robotType,
-  analytics,
 }: ERUtilsProps): ERUtilsResults {
   const { data: attachedInstruments } = useInstrumentsQuery()
   const { data: runRecord } = useNotifyRunQuery(runId)
@@ -87,6 +87,8 @@ export function useERUtils({
   const failedCommandByRunRecord = failedCommand?.byRunRecord ?? null
 
   const stepCounts = useRunningStepCounts(runId, runCommands)
+
+  const analytics = useRecoveryAnalytics()
 
   const {
     recoveryMap,
@@ -172,5 +174,6 @@ export function useERUtils({
     getRecoveryOptionCopy,
     stepCounts,
     commandsAfterFailedCommand,
+    analytics,
   }
 }
