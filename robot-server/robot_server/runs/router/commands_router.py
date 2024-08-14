@@ -271,7 +271,7 @@ async def get_run_commands(
         _DEFAULT_COMMAND_LIST_LENGTH,
         description="The maximum number of commands in the list to return.",
     ),
-    allCommands: Optional[bool] = Query(
+    allCommands: bool = Query(
         True,
         description="If `true`, return all commands (protocol, setup, fixit)."
         " If `false`, only return safe commands (protocol, setup).",
