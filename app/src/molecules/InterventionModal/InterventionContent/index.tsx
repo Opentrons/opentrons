@@ -29,7 +29,7 @@ export function InterventionContent({
       css={`
         gap: ${SPACING.spacing16};
         width: 100%;
-        @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+        .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
           gap: ${SPACING.spacing8};
           width: 27rem;
         }
@@ -46,7 +46,7 @@ export function InterventionContent({
         css={`
           gap: ${SPACING.spacing16};
           width: 100%;
-          @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+          .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
             gap: ${SPACING.spacing24};
           }
         `}

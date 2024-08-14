@@ -79,7 +79,7 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
       ${isSelected ? SELECTED_BUTTON_STYLE : AVAILABLE_BUTTON_STYLE}
       ${disabled && DISABLED_BUTTON_STYLE}
 
-    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
         cursor: default;
         padding: ${isLarge ? SPACING.spacing24 : SPACING.spacing20};
         border-radius: ${BORDERS.borderRadius16};
@@ -91,7 +91,7 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
     <Flex
       css={css`
         width: auto;
-        @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+        .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
           width: 100%;
         }
       `}

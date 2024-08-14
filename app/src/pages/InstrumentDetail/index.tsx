@@ -96,7 +96,7 @@ const IconButton = styled('button')`
   &:disabled {
     background-color: transparent;
   }
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
     cursor: default;
   }
 `

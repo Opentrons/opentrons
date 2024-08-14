@@ -12,49 +12,49 @@ export interface LegacyProps extends React.ComponentProps<typeof Text> {
 const styleMap: { [tag: string]: FlattenSimpleInterpolation } = {
   h1: css`
     ${TYPOGRAPHY.h1Default};
-    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
       ${TYPOGRAPHY.level1Header};
     }
   `,
   h2: css`
     ${TYPOGRAPHY.h2Regular}
-    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
       ${TYPOGRAPHY.level2HeaderRegular};
     }
   `,
   h3: css`
     ${TYPOGRAPHY.h3Regular}
-    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
       ${TYPOGRAPHY.level3HeaderRegular};
     }
   `,
   h4: css`
-    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
       ${TYPOGRAPHY.level4HeaderRegular};
     }
   `,
   h6: TYPOGRAPHY.h6Default,
   p: css`
     ${TYPOGRAPHY.pRegular}
-    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
       ${TYPOGRAPHY.bodyTextRegular}
     }
   `,
   label: css`
     ${TYPOGRAPHY.labelRegular}
-    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
       ${TYPOGRAPHY.smallBodyTextRegular}
     }
   `,
   h2SemiBold: css`
     ${TYPOGRAPHY.h2SemiBold}
-    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
       ${TYPOGRAPHY.level2HeaderSemiBold}
     }
   `,
   h3SemiBold: css`
     ${TYPOGRAPHY.h3SemiBold}
-    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
       ${TYPOGRAPHY.level3HeaderSemiBold}
     }
   `,
@@ -62,13 +62,13 @@ const styleMap: { [tag: string]: FlattenSimpleInterpolation } = {
   h6SemiBold: TYPOGRAPHY.h6SemiBold,
   pSemiBold: css`
     ${TYPOGRAPHY.pSemiBold}
-    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
       ${TYPOGRAPHY.bodyTextSemiBold}
     }
   `,
   labelSemiBold: css`
     ${TYPOGRAPHY.labelSemiBold}
-    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
       font-size: ${TYPOGRAPHY.fontSize20};
       line-height: ${TYPOGRAPHY.lineHeight24};
     }

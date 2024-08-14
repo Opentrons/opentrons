@@ -80,7 +80,7 @@ export function ModalContentMixed(props: ModalContentMixedProps): JSX.Element {
         css={`
           gap: ${SPACING.spacing8};
 
-          @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+          .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
             gap: ${SPACING.spacing4};
           }
         `}
@@ -132,7 +132,7 @@ function ModalContentMixedIcon(props: ModalContentMixedIconProps): JSX.Element {
       css={`
         width: ${SPACING.spacing40};
         margin-bottom: ${SPACING.spacing16};
-        @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+        .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
           width: ${SPACING.spacing60};
           margin-bottom: ${SPACING.spacing24};
         }
@@ -155,7 +155,7 @@ function ModalContentMixedSpinner(
       marginBottom={SPACING.spacing16}
       width={'80px'}
       css={`
-        @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+        .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
           width: 100px;
           margin-bottom: ${SPACING.spacing24};
         }
@@ -177,7 +177,7 @@ function ModalContentMixedImage(
       css={`
         height: 150px;
         margin-bottom: ${SPACING.spacing16};
-        @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+        .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
           height: 180px;
           margin-bottom: ${SPACING.spacing24};
         }

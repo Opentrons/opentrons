@@ -202,7 +202,7 @@ const ODD_ONLY_BUTTON = css`
 `
 
 const DESKTOP_ONLY_BUTTON = css`
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
     display: none;
   }
 `

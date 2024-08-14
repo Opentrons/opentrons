@@ -103,7 +103,7 @@ const EMPTY_CONFIG_STYLE = css`
   border-radius: ${BORDERS.borderRadius4};
   width: 100%;
 
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
     background-color: ${COLORS.blue35};
   }
 
@@ -125,7 +125,7 @@ const EMPTY_CONFIG_STYLE = css`
     border: 3px solid ${COLORS.blue50};
     background-color: ${COLORS.blue35};
 
-    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
       background-color: ${COLORS.blue40};
     }
   }

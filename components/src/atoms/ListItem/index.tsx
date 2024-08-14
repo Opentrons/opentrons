@@ -48,7 +48,7 @@ export function ListItem(props: ListItemProps): JSX.Element {
     padding: 0;
     border-radius: ${BORDERS.borderRadius4};
 
-    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
       padding: ${SPACING.spacing16} ${SPACING.spacing24};
       border-radius: ${BORDERS.borderRadius12};
     }

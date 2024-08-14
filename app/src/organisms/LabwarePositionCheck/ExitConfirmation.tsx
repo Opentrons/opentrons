@@ -123,7 +123,7 @@ export const ExitConfirmation = (props: ExitConfirmationProps): JSX.Element => {
 const ConfirmationHeader = styled.h1`
   margin-top: ${SPACING.spacing24};
   ${TYPOGRAPHY.h1Default}
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
     ${TYPOGRAPHY.level4HeaderSemiBold}
   }
 `
@@ -131,13 +131,13 @@ const ConfirmationHeader = styled.h1`
 const ConfirmationHeaderODD = styled.h1`
   margin-top: ${SPACING.spacing24};
   ${TYPOGRAPHY.level3HeaderBold}
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
     ${TYPOGRAPHY.level4HeaderSemiBold}
   }
 `
 const ConfirmationBodyODD = styled.h1`
   ${TYPOGRAPHY.level4HeaderRegular}
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
     ${TYPOGRAPHY.level4HeaderRegular}
   }
   color: ${COLORS.grey60};

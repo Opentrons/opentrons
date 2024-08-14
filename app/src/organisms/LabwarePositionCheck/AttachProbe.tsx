@@ -190,7 +190,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
 export const BODY_STYLE = css`
   ${TYPOGRAPHY.pRegular};
 
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
     font-size: 1.275rem;
     line-height: 1.75rem;
   }
