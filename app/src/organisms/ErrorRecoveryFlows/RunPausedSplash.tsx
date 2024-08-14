@@ -78,7 +78,7 @@ export function RunPausedSplash(
   const title = useErrorName(errorKind)
 
   const { proceedToRouteAndStep } = routeUpdateActions
-  const { reportInitialActionEvent } = analytics
+  const { reportErrorEvent } = analytics
 
   const buildTitleHeadingDesktop = (): JSX.Element => {
     return (
@@ -91,14 +91,14 @@ export function RunPausedSplash(
   // Do not launch error recovery, but do utilize the wizard's cancel route.
   const onCancelClick = (): Promise<void> => {
     return toggleERWizAsActiveUser(true, false).then(() => {
-      reportInitialActionEvent('cancel-run')
+      reportErrorEvent(failedCommand?.byRunRecord ?? null, 'cancel-run')
       void proceedToRouteAndStep(RECOVERY_MAP.CANCEL_RUN.ROUTE)
     })
   }
 
   const onLaunchERClick = (): Promise<void> => {
     return toggleERWizAsActiveUser(true, true).then(() => {
-      reportInitialActionEvent('launch-recovery')
+      reportErrorEvent(failedCommand?.byRunRecord ?? null, 'launch-recovery')
     })
   }
 
