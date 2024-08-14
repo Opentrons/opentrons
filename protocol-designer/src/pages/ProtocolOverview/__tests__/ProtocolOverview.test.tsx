@@ -1,12 +1,21 @@
 import * as React from 'react'
-import { describe, it, vi, beforeEach } from 'vitest'
+import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../localization'
-import { DeckSetup } from '../DeckSetup'
 import { ProtocolOverview } from '../index'
 import { fireEvent, screen } from '@testing-library/react'
 
-vi.mock('../DeckSetup')
+import type { NavigateFunction } from 'react-router-dom'
+
+const mockNavigate = vi.fn()
+
+vi.mock('react-router-dom', async importOriginal => {
+  const actual = await importOriginal<NavigateFunction>()
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+  }
+})
 
 const render = () => {
   return renderWithProviders(<ProtocolOverview />, {
@@ -15,12 +24,10 @@ const render = () => {
 }
 
 describe('ProtocolOverview', () => {
-  beforeEach(() => {
-    vi.mocked(DeckSetup).mockReturnValue(<div>mock DeckSetup</div>)
-  })
+  beforeEach(() => {})
   it('renders the deck setup component when the button is clicked', () => {
     render()
     fireEvent.click(screen.getByText('go to deck setup'))
-    screen.getByText('mock DeckSetup')
+    expect(mockNavigate).toHaveBeenCalled()
   })
 })

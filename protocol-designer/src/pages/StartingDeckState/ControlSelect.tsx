@@ -8,11 +8,11 @@ import {
   LegacyStyledText,
   RobotCoordsForeignDiv,
 } from '@opentrons/components'
-import { START_TERMINAL_ITEM_ID } from '../../../steplist'
-import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
+import { START_TERMINAL_ITEM_ID } from '../../steplist'
+import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
 
 import type { CoordinateTuple, Dimensions } from '@opentrons/shared-data'
-import type { TerminalItemId } from '../../../steplist'
+import type { TerminalItemId } from '../../steplist'
 
 import styles from './DeckSetup.module.css'
 
@@ -40,7 +40,7 @@ export const ControlSelect = (
     setHover,
     slotTopLayerId,
   } = props
-  const { t } = useTranslation('protocol_overview')
+  const { t } = useTranslation('starting_deck_state')
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
   const moduleId = Object.keys(activeDeckSetup.modules).find(
     moduleId => slotTopLayerId === moduleId
