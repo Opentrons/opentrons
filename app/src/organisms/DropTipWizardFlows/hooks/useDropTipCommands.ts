@@ -64,6 +64,7 @@ export function useDropTipCommands({
   const [hasSeenClose, setHasSeenClose] = React.useState(false)
   const [jogQueue, setJogQueue] = React.useState<Array<() => Promise<void>>>([])
   const [isJogging, setIsJogging] = React.useState(false)
+  const pipetteId = fixitCommandTypeUtils?.pipetteId ?? null
 
   const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation()
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
@@ -110,7 +111,10 @@ export function useDropTipCommands({
       )
 
       if (addressableAreaFromConfig != null) {
-        const moveToAACommand = buildMoveToAACommand(addressableAreaFromConfig)
+        const moveToAACommand = buildMoveToAACommand(
+          addressableAreaFromConfig,
+          pipetteId
+        )
         return chainRunCommands(
           isFlex
             ? [UPDATE_ESTIMATORS_EXCEPT_PLUNGERS, moveToAACommand]
@@ -152,7 +156,11 @@ export function useDropTipCommands({
       return runCommand({
         command: {
           commandType: 'moveRelative',
-          params: { pipetteId: MANAGED_PIPETTE_ID, distance: step * dir, axis },
+          params: {
+            pipetteId: pipetteId ?? MANAGED_PIPETTE_ID,
+            distance: step * dir,
+            axis,
+          },
         },
         waitUntilComplete: true,
         timeout: JOG_COMMAND_TIMEOUT_MS,
@@ -204,8 +212,8 @@ export function useDropTipCommands({
     return new Promise((resolve, reject) => {
       chainRunCommands(
         currentStep === POSITION_AND_BLOWOUT
-          ? buildBlowoutCommands(instrumentModelSpecs, isFlex)
-          : buildDropTipInPlaceCommand(isFlex),
+          ? buildBlowoutCommands(instrumentModelSpecs, isFlex, pipetteId)
+          : buildDropTipInPlaceCommand(isFlex, pipetteId),
         true
       )
         .then((commandData: CommandData[]) => {
@@ -291,32 +299,35 @@ const UPDATE_ESTIMATORS_EXCEPT_PLUNGERS: CreateCommand = {
 }
 
 const buildDropTipInPlaceCommand = (
-  isFlex: boolean
+  isFlex: boolean,
+  pipetteId: string | null
 ): Array<DropTipInPlaceCreateCommand | UnsafeDropTipInPlaceCreateCommand> =>
   isFlex
     ? [
         {
           commandType: 'unsafe/dropTipInPlace',
-          params: { pipetteId: MANAGED_PIPETTE_ID },
+          params: { pipetteId: pipetteId ?? MANAGED_PIPETTE_ID },
         },
       ]
     : [
         {
           commandType: 'dropTipInPlace',
-          params: { pipetteId: MANAGED_PIPETTE_ID },
+          params: { pipetteId: pipetteId ?? MANAGED_PIPETTE_ID },
         },
       ]
 
 const buildBlowoutCommands = (
   specs: PipetteModelSpecs,
-  isFlex: boolean
+  isFlex: boolean,
+  pipetteId: string | null
 ): CreateCommand[] =>
   isFlex
     ? [
         {
           commandType: 'unsafe/blowOutInPlace',
           params: {
-            pipetteId: MANAGED_PIPETTE_ID,
+            pipetteId: pipetteId ?? MANAGED_PIPETTE_ID,
+
             flowRate: Math.min(
               specs.defaultBlowOutFlowRate.value,
               MAXIMUM_BLOWOUT_FLOW_RATE_UL_PER_S
@@ -326,7 +337,7 @@ const buildBlowoutCommands = (
         {
           commandType: 'prepareToAspirate',
           params: {
-            pipetteId: MANAGED_PIPETTE_ID,
+            pipetteId: pipetteId ?? MANAGED_PIPETTE_ID,
           },
         },
       ]
@@ -334,19 +345,21 @@ const buildBlowoutCommands = (
         {
           commandType: 'blowOutInPlace',
           params: {
-            pipetteId: MANAGED_PIPETTE_ID,
+            pipetteId: pipetteId ?? MANAGED_PIPETTE_ID,
+
             flowRate: specs.defaultBlowOutFlowRate.value,
           },
         },
       ]
 
 const buildMoveToAACommand = (
-  addressableAreaFromConfig: AddressableAreaName
+  addressableAreaFromConfig: AddressableAreaName,
+  pipetteId: string | null
 ): CreateCommand => {
   return {
     commandType: 'moveToAddressableArea',
     params: {
-      pipetteId: MANAGED_PIPETTE_ID,
+      pipetteId: pipetteId ?? MANAGED_PIPETTE_ID,
       stayAtHighestPossibleZ: true,
       addressableAreaName: addressableAreaFromConfig,
       offset: { x: 0, y: 0, z: 0 },
