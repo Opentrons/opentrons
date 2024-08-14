@@ -61,6 +61,7 @@ class AbsorbanceReaderDriver(AbstractAbsorbanceReaderDriver):
         return await self._connection.get_supported_wavelengths()
 
     async def get_single_measurement(self, wavelength: int) -> List[float]:
+        # TODO (cb, 08-02-2024): The list of measurements for 96 wells is rotated 180 degrees (well A1 is where well H12 should be) this must be corrected
         return await self._connection.get_single_measurement(wavelength)
 
     async def initialize_measurement(self, wavelength: int) -> None:
