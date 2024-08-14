@@ -597,6 +597,7 @@ class CommandView(HasState[CommandState]):
             else [CommandIntent.PROTOCOL, CommandIntent.SETUP]
         )
         total_length = len(command_ids)
+        cursor_index = cursor
 
         if cursor is None:
             current_cursor = self.get_current()
