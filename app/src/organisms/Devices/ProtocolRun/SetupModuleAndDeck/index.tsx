@@ -2,15 +2,16 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
-  Flex,
-  JUSTIFY_CENTER,
-  SPACING,
-  useHoverTooltip,
-  PrimaryButton,
   DIRECTION_ROW,
+  Flex,
+  FLEX_MAX_CONTENT,
+  JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
+  PrimaryButton,
+  SPACING,
   TYPOGRAPHY,
+  useHoverTooltip,
 } from '@opentrons/components'
 
 import { useToggleGroup } from '../../../../molecules/ToggleGroup/useToggleGroup'
