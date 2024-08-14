@@ -382,22 +382,29 @@ def get_run_error_info_from_robot(
             if labware["id"] == errored_labware_id:
                 errored_labware_dict["Slot"] = labware["location"].get("slotName", "")
                 errored_labware_dict["Labware Type"] = labware.get("definitionUri", "")
+                print(errored_labware_dict)
                 offset_id = labware.get("offsetId", "")
-                for lpc in lpc_dict:
-                    if lpc.get("id", "") == offset_id:
-                        errored_labware_dict["X"] = lpc["vector"].get("x", "")
-                        errored_labware_dict["Y"] = lpc["vector"].get("y", "")
-                        errored_labware_dict["Z"] = lpc["vector"].get("z", "")
-                        errored_labware_dict["Module"] = lpc["location"].get(
-                            "moduleModel", ""
-                        )
-                        errored_labware_dict["Adapter"] = lpc["location"].get(
-                            "definitionUri", ""
-                        )
+                if offset_id == "":
+                    print("Oh shoot")
+                    labware_slot = errored_labware_dict["Slot"]
+                    lpc_message = f"The current LPC coords found at {labware_slot} are (0, 0, 0). Please confirm with the ABR-LPC sheet and re-LPC."
+                    print(lpc_message)
+                else:
+                    for lpc in lpc_dict:
+                        if lpc.get("id", "") == offset_id:
+                            errored_labware_dict["X"] = lpc["vector"].get("x", "")
+                            errored_labware_dict["Y"] = lpc["vector"].get("y", "")
+                            errored_labware_dict["Z"] = lpc["vector"].get("z", "")
+                            errored_labware_dict["Module"] = lpc["location"].get(
+                                "moduleModel", ""
+                            )
+                            errored_labware_dict["Adapter"] = lpc["location"].get(
+                                "definitionUri", ""
+                            )
 
-                        lpc_message = compare_lpc_to_historical_data(
-                            errored_labware_dict, parent, storage_directory
-                        )
+                            lpc_message = compare_lpc_to_historical_data(
+                                errored_labware_dict, parent, storage_directory
+                            )
 
     description["protocol_step"] = protocol_step
     description["right_mount"] = results.get("right", "No attachment")
