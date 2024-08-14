@@ -247,7 +247,9 @@ export function ProtocolRunHeader({
     },
   })
 
-  const enteredER = runRecord?.data.hasEverEnteredErrorRecovery
+  const enteredER = runRecord?.data.hasEverEnteredErrorRecovery ?? false
+  const cancelledWithoutRecovery =
+    !enteredER && runStatus === RUN_STATUS_STOPPED
 
   React.useEffect(() => {
     if (isFlex) {
@@ -432,6 +434,7 @@ export function ProtocolRunHeader({
               setShowRunFailedModal,
               commandErrorList,
               highestPriorityError,
+              cancelledWithoutRecovery,
             }}
             isResetRunLoading={isResetRunLoadingRef.current}
             isRunCurrent={isRunCurrent}
@@ -914,6 +917,7 @@ interface TerminalRunProps {
   commandErrorList?: RunCommandErrors
   isResetRunLoading: boolean
   isRunCurrent: boolean
+  cancelledWithoutRecovery: boolean
   highestPriorityError?: RunError | null
 }
 function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
@@ -926,6 +930,7 @@ function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
     highestPriorityError,
     isResetRunLoading,
     isRunCurrent,
+    cancelledWithoutRecovery,
   } = props
   const { t } = useTranslation('run_details')
   const completedWithErrors =
@@ -992,9 +997,12 @@ function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
     !completedWithErrors
   ) {
     return buildSuccessBanner()
-  } else if (
-    highestPriorityError != null ||
-    (completedWithErrors && !isResetRunLoading)
+  }
+  // TODO(jh, 08-14-24): The backend never returns the "user cancelled a run" error and cancelledWithoutRecovery becomes unnecessary.
+  else if (
+    !cancelledWithoutRecovery &&
+    (highestPriorityError != null ||
+      (completedWithErrors && !isResetRunLoading))
   ) {
     return buildErrorBanner()
   } else {
