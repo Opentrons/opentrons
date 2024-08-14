@@ -310,7 +310,7 @@ class InnerLabwareGeometry(BaseModel):
     )
     bottomShape: BottomShape = Field(
         ...,
-        description="An optional non-frustum shape at the bottom of a well",
+        description="The shape at the bottom of the well: either a hemisphere or a cross-section",
         discriminator="shape",
     )
 
