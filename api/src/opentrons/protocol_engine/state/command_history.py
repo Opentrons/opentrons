@@ -101,17 +101,6 @@ class CommandHistory:
         """Get all command IDs."""
         return self._all_command_ids
 
-    def get_filtered_slice(
-        self, start: int, stop: int, all_commands: bool
-    ) -> List[Command]:
-        queued_ids = self.get_filtered_queue_ids(
-            [CommandIntent.PROTOCOL, CommandIntent.SETUP, CommandIntent.FIXIT]
-            if all_commands
-            else [CommandIntent.PROTOCOL, CommandIntent.SETUP]
-        )
-        commands = list(queued_ids)[start:stop]
-        return [self._commands_by_id[command].command for command in commands]
-
     def get_slice(
         self, start: int, stop: int, command_ids: Optional[list[str]] = None
     ) -> List[Command]:
@@ -141,21 +130,27 @@ class CommandHistory:
         else:
             return self._commands_by_id[self._running_command_id]
 
-    def get_filtered_queue_ids(
+    def get_filtered_command_ids(
         self,
         command_intents: list[CommandIntent] = [
             CommandIntent.PROTOCOL,
             CommandIntent.SETUP,
         ],
-    ) -> OrderedSet[str]:
-        queued_ids = self._queued_command_ids
+    ) -> List[str]:
+        filtered_command = self._commands_by_id
         if CommandIntent.FIXIT not in command_intents:
-            queued_ids = self._queued_command_ids.__sub__(
-                other=self.get_fixit_queue_ids()
-            )
+            filtered_command = {
+                key: val
+                for key, val in self._commands_by_id.items()
+                if val.command.intent != CommandIntent.FIXIT
+            }
         if CommandIntent.SETUP not in command_intents:
-            queued_ids = queued_ids.__sub__(other=self.get_setup_queue_ids())
-        return queued_ids
+            filtered_command = {
+                key: val
+                for key, val in filtered_command.items()
+                if val.command.intent != CommandIntent.SETUP
+            }
+        return list(filtered_command.keys())
 
     def get_queue_ids(self) -> OrderedSet[str]:
         """Get the IDs of all queued protocol commands, in FIFO order."""

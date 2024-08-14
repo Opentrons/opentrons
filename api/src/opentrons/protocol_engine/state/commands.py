@@ -579,26 +579,6 @@ class CommandView(HasState[CommandState]):
         """
         return self._state.command_history.get_all_commands()
 
-    def get_filtered_queue_ids(self, all_commands: bool) -> OrderedSet[str]:
-        """Get a list of all filtered commands in state.
-
-        Entries are returned in the order of first-added command to last-added command.
-        Replacing a command (to change its status, for example) keeps its place in the
-        ordering.
-
-        If all_commands is True, retunred list will contain all command intents.
-        If False, return list will contain only safe commands.
-        """
-        return self._state.command_history.get_filtered_queue_ids(
-            command_intents=[
-                CommandIntent.SETUP,
-                CommandIntent.PROTOCOL,
-                CommandIntent.FIXIT,
-            ]
-            if all_commands
-            else [CommandIntent.SETUP, CommandIntent.PROTOCOL]
-        )
-
     def get_slice(
         self, cursor: Optional[int], length: int, all_commands: bool
     ) -> CommandSlice:
@@ -607,7 +587,7 @@ class CommandView(HasState[CommandState]):
         If the cursor is omitted, a cursor will be selected automatically
         based on the currently running or most recently executed command.
         """
-        queued_command_ids = self._state.command_history.get_filtered_queue_ids(
+        command_ids = self._state.command_history.get_filtered_command_ids(
             command_intents=[
                 CommandIntent.PROTOCOL,
                 CommandIntent.SETUP,
@@ -616,7 +596,7 @@ class CommandView(HasState[CommandState]):
             if all_commands
             else [CommandIntent.PROTOCOL, CommandIntent.SETUP]
         )
-        total_length = len(queued_command_ids)
+        total_length = len(command_ids)
 
         if cursor is None:
             current_cursor = self.get_current()
@@ -638,8 +618,9 @@ class CommandView(HasState[CommandState]):
         # start is inclusive, stop is exclusive
         actual_cursor = max(0, min(cursor_index, total_length - 1))
         stop = min(total_length, actual_cursor + length)
-        commands = self._state.command_history.get_filtered_slice(
-            start=actual_cursor, stop=stop, all_commands=all_commands
+
+        commands = self._state.command_history.get_slice(
+            start=actual_cursor, stop=stop, command_ids=command_ids
         )
 
         return CommandSlice(

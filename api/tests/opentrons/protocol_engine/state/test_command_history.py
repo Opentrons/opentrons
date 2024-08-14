@@ -96,7 +96,7 @@ def test_get_all_commands(command_history: CommandHistory) -> None:
 
 def test_get_all_filtered_commands(command_history: CommandHistory) -> None:
     """It should return a list of all commands without fixit commands."""
-    assert list(command_history.get_filtered_queue_ids()) == []
+    assert list(command_history.get_filtered_command_ids()) == []
     command_entry_1 = create_queued_command_entry()
     command_entry_2 = create_queued_command_entry(index=1)
     command_history._add("0", command_entry_1)
@@ -104,7 +104,7 @@ def test_get_all_filtered_commands(command_history: CommandHistory) -> None:
     command_history._add_to_queue("0")
     command_history._add_to_queue("1")
     command_history._add_to_fixit_queue("1")
-    assert list(command_history.get_filtered_queue_ids()) == ["0"]
+    assert list(command_history.get_filtered_command_ids()) == ["0"]
 
 
 def test_get_all_ids(command_history: CommandHistory) -> None:
