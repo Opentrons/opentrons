@@ -105,10 +105,17 @@ export function useERUtils({
     robotType,
   })
 
+  const failedPipetteInfo = getFailedCommandPipetteInfo({
+    failedCommandByRunRecord,
+    runRecord,
+    attachedInstruments,
+  })
+
   const tipStatusUtils = useRecoveryTipStatus({
     runId,
     runRecord,
     attachedInstruments,
+    failedPipetteInfo,
   })
 
   const routeUpdateActions = useRouteUpdateActions({
@@ -116,12 +123,6 @@ export function useERUtils({
     recoveryMap,
     toggleERWizAsActiveUser,
     setRecoveryMap: setRM,
-  })
-
-  const failedPipetteInfo = getFailedCommandPipetteInfo({
-    failedCommandByRunRecord,
-    runRecord,
-    attachedInstruments,
   })
 
   const failedLabwareUtils = useFailedLabwareUtils({
