@@ -170,6 +170,7 @@ export function ProtocolRunHeader({
       ?.data?.current
   )
   const mostRecentRunId = useMostRecentRunId()
+  const isMostRecentRun = mostRecentRunId === runId
   const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
   const [showRunFailedModal, setShowRunFailedModal] = React.useState(false)
@@ -178,7 +179,7 @@ export function ProtocolRunHeader({
       runStatus != null &&
       // @ts-expect-error runStatus expected to possibly not be terminal
       RUN_STATUSES_TERMINAL.includes(runStatus) &&
-      isRunCurrent,
+      isMostRecentRun,
   })
   const isResetRunLoadingRef = React.useRef(false)
   const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
@@ -222,6 +223,7 @@ export function ProtocolRunHeader({
     resetTipStatus,
     setTipStatusResolved,
     aPipetteWithTip,
+    initialPipettesWithTipsCount,
   } = useTipAttachmentStatus({
     runId,
     runRecord: runRecord ?? null,
@@ -283,6 +285,11 @@ export function ProtocolRunHeader({
           ...robotAnalyticsData,
         },
       })
+
+      // Close the run if no tips are attached after running tip check at least once.
+      if (initialPipettesWithTipsCount === 0) {
+        closeCurrentRun()
+      }
     }
   }, [runStatus, isRunCurrent, runId])
 
@@ -415,7 +422,7 @@ export function ProtocolRunHeader({
             {t('shared:close_robot_door')}
           </Banner>
         ) : null}
-        {mostRecentRunId === runId ? (
+        {isMostRecentRun ? (
           <TerminalRunBanner
             {...{
               runStatus,
