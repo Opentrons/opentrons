@@ -9,16 +9,17 @@ import {
   ListItemCustomize,
   SPACING,
   StyledText,
+  WRAP,
 } from '@opentrons/components'
 import {
   ABSORBANCE_READER_V1,
   FLEX_ROBOT_TYPE,
+  getModuleDisplayName,
+  getModuleType,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
-  getModuleDisplayName,
-  getModuleType,
 } from '@opentrons/shared-data'
 import { uuid } from '../../utils'
 import {
@@ -122,7 +123,7 @@ export function SelectModules(props: WizardTileProps): JSX.Element | null {
           >
             {t('which_mods')}
           </StyledText>
-          <Flex gridGap={SPACING.spacing4} flexWrap="wrap">
+          <Flex gridGap={SPACING.spacing4} flexWrap={WRAP}>
             {filteredSupportedModules
               .filter(
                 module =>

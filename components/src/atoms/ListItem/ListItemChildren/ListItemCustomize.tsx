@@ -22,7 +22,7 @@ export const ListItemCustomize = (
   return (
     <Flex width="100%" alignItems={ALIGN_CENTER} padding={SPACING.spacing12}>
       <Flex gridGap={SPACING.spacing8} width="50%" alignItems={ALIGN_CENTER}>
-        {image != null ? <Flex size="60px">{image}</Flex> : null}
+        {image != null ? <Flex size="3.75rem">{image}</Flex> : null}
         <StyledText desktopStyle="bodyDefaultSemiBold">{header}</StyledText>
       </Flex>
       <Flex

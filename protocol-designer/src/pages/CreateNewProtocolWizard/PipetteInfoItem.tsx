@@ -69,7 +69,10 @@ export const PipetteInfoItem = (props: PipetteInfoItemProps): JSX.Element => {
             ))}
           </Flex>
         </Flex>
-        <Flex gridGap={SPACING.spacing20} textDecoration="underline">
+        <Flex
+          gridGap={SPACING.spacing20}
+          textDecoration={TYPOGRAPHY.textDecorationUnderline}
+        >
           <Btn
             onClick={editClick}
             textDecoration={TYPOGRAPHY.textDecorationUnderline}

@@ -4,22 +4,23 @@ import styled, { css } from 'styled-components'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   FLEX_ROBOT_TYPE,
-  OT2_ROBOT_TYPE,
   getAllPipetteNames,
+  OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import {
+  ALIGN_CENTER,
+  Box,
+  Btn,
+  Checkbox,
   DIRECTION_COLUMN,
+  EmptySelectorButton,
   Flex,
+  JUSTIFY_SPACE_BETWEEN,
+  PRODUCT,
+  RadioButton,
   SPACING,
   StyledText,
-  RadioButton,
-  Box,
-  Checkbox,
   TYPOGRAPHY,
-  Btn,
-  JUSTIFY_SPACE_BETWEEN,
-  EmptySelectorButton,
-  ALIGN_CENTER,
 } from '@opentrons/components'
 import { getAllowAllTipracks } from '../../feature-flags/selectors'
 import { getLabwareDefsByURI } from '../../labware-defs/selectors'
@@ -56,25 +57,26 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
   const allowAllTipracks = useSelector(getAllowAllTipracks)
   const allPipetteOptions = getAllPipetteNames('maxVolume', 'channels')
   const robotType = fields.robotType ?? OT2_ROBOT_TYPE
+  const defaultMount = mount ?? 'left'
   const selectedPip =
     pipetteType === '96' || pipetteGen === 'GEN1'
       ? `${pipetteVolume}_${pipetteType}`
       : `${pipetteVolume}_${pipetteType}_${pipetteGen.toLowerCase()}`
 
-  const selectedValues = pipettesByMount[mount ?? 'left'].tiprackDefURI ?? []
+  const selectedValues = pipettesByMount[defaultMount].tiprackDefURI ?? []
 
   const resetFields = (): void => {
     setPipetteType(null)
     setPipetteGen('flex')
     setPipetteVolume(null)
-    setValue(`pipettesByMount.${mount ?? 'left'}.pipetteName`, undefined)
-    setValue(`pipettesByMount.${mount ?? 'left'}.tiprackDefURI`, undefined)
+    setValue(`pipettesByMount.${defaultMount}.pipetteName`, undefined)
+    setValue(`pipettesByMount.${defaultMount}.tiprackDefURI`, undefined)
   }
 
   //    initialize pipette name once all fields are filled out
   React.useEffect(() => {
     if (pipetteType != null && pipetteVolume != null) {
-      setValue(`pipettesByMount.${mount ?? 'left'}.pipetteName`, selectedPip)
+      setValue(`pipettesByMount.${defaultMount}.pipetteName`, selectedPip)
     }
   }, [pipetteType, pipetteGen, pipetteVolume, selectedPip])
 
@@ -99,7 +101,7 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
         }
       }}
       disabled={
-        page === 'add' && pipettesByMount[mount ?? 'left'].tiprackDefURI == null
+        page === 'add' && pipettesByMount[defaultMount].tiprackDefURI == null
       }
     >
       {page === 'add' ? (
@@ -125,11 +127,11 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
                     setPipetteGen('flex')
                     setPipetteVolume(null)
                     setValue(
-                      `pipettesByMount.${mount ?? 'left'}.pipetteName`,
+                      `pipettesByMount.${defaultMount}.pipetteName`,
                       undefined
                     )
                     setValue(
-                      `pipettesByMount.${mount ?? 'left'}.tiprackDefURI`,
+                      `pipettesByMount.${defaultMount}.tiprackDefURI`,
                       undefined
                     )
                   }}
@@ -260,9 +262,7 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
                                 )
                               : [...(selectedValues ?? []), option.value]
                             setValue(
-                              `pipettesByMount.${
-                                mount ?? 'left'
-                              }.tiprackDefURI`,
+                              `pipettesByMount.${defaultMount}.tiprackDefURI`,
                               updatedValues.slice(0, 3)
                             )
                           }}
@@ -401,8 +401,8 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
 }
 
 const StyledLabel = styled.label`
-  text-decoration: underline;
-  font-size: 0.875rem;
+  text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
+  font-size: ${PRODUCT.TYPOGRAPHY.fontSizeBodyDefaultSemiBold};
   display: inline-block;
   cursor: pointer;
   input[type='file'] {

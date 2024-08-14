@@ -9,6 +9,7 @@ import {
   ListItemCustomize,
   SPACING,
   StyledText,
+  WRAP,
 } from '@opentrons/components'
 import { WizardBody } from './WizardBody'
 import { AdditionalEquipmentDiagram } from './utils'
@@ -55,7 +56,7 @@ export function SelectFixtures(props: WizardTileProps): JSX.Element | null {
             {t('which_fixtures')}
           </StyledText>
         </Flex>
-        <Flex gridGap={SPACING.spacing4} flexWrap="wrap">
+        <Flex gridGap={SPACING.spacing4} flexWrap={WRAP}>
           {filteredAdditionalEquipment.map(equipment => (
             <EmptySelectorButton
               key={equipment}

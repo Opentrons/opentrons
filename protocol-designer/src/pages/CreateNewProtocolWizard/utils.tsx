@@ -64,6 +64,9 @@ export const getNumSlotsAvailable = (
 interface EquipmentProps {
   additionalEquipment: AdditionalEquipment
 }
+
+const DIMENSION = '60px'
+
 export function AdditionalEquipmentDiagram(props: EquipmentProps): JSX.Element {
   const { additionalEquipment } = props
 
@@ -71,8 +74,8 @@ export function AdditionalEquipmentDiagram(props: EquipmentProps): JSX.Element {
     case 'wasteChute': {
       return (
         <img
-          width="60px"
-          height="60px"
+          width={DIMENSION}
+          height={DIMENSION}
           src={wasteChuteImage}
           alt={additionalEquipment}
         />
@@ -81,8 +84,8 @@ export function AdditionalEquipmentDiagram(props: EquipmentProps): JSX.Element {
     case 'trashBin': {
       return (
         <img
-          width="60px"
-          height="60px"
+          width={DIMENSION}
+          height={DIMENSION}
           src={trashBinImage}
           alt={additionalEquipment}
         />
@@ -91,8 +94,8 @@ export function AdditionalEquipmentDiagram(props: EquipmentProps): JSX.Element {
     default: {
       return (
         <img
-          width="60px"
-          height="60px"
+          width={DIMENSION}
+          height={DIMENSION}
           src={stagingAreaImage}
           alt={additionalEquipment}
         />
