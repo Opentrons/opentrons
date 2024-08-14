@@ -136,7 +136,7 @@ class SphericalSegment(TypedDict):
 
 
 TopCrossSection = Union[CircularCrossSection, RectangularCrossSection]
-BottomShape = Union[CircularCrossSection, RectangularCrossSection, Spherical]
+BottomShape = Union[CircularCrossSection, RectangularCrossSection, SphericalSegment]
 
 
 class BoundedSection(TypedDict):
