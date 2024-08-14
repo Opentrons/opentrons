@@ -167,6 +167,7 @@ export function SelectDestWells(props: SelectDestWellsProps): JSX.Element {
             <WellSelection
               definition={labwareDefinition}
               deselectWells={(wells: string[]) => {
+                setIsNumberWellsSelectedError(false)
                 setSelectedWells(prevWells =>
                   without(Object.keys(prevWells), ...wells).reduce(
                     (acc, well) => {

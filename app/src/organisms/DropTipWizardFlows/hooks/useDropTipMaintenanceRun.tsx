@@ -35,7 +35,10 @@ export function useDropTipMaintenanceRun({
   setErrorDetails,
   closeFlow,
   enabled,
-}: UseDropTipMaintenanceRunParams): string | null {
+}: UseDropTipMaintenanceRunParams): {
+  activeMaintenanceRunId: string | null
+  toggleClientEndRun: () => void
+} {
   const isMaintenanceRunType = issuedCommandsType === 'setup'
 
   const [createdMaintenanceRunId, setCreatedMaintenanceRunId] = React.useState<
@@ -57,14 +60,17 @@ export function useDropTipMaintenanceRun({
     enabled,
   })
 
-  useMonitorMaintenanceRunForDeletion({
+  const toggleClientEndRun = useMonitorMaintenanceRunForDeletion({
     isMaintenanceRunType,
     activeMaintenanceRunId,
     createdMaintenanceRunId,
     closeFlow,
   })
 
-  return activeMaintenanceRunId ?? null
+  return {
+    activeMaintenanceRunId: activeMaintenanceRunId ?? null,
+    toggleClientEndRun,
+  }
 }
 
 type UseCreateDropTipMaintenanceRunParams = Omit<
@@ -125,16 +131,18 @@ function useCreateDropTipMaintenanceRun({
         }
       })
     } else {
-      console.warn(
-        'Could not create maintenance run due to missing pipette data.'
-      )
+      if (mount != null || instrumentModelName != null) {
+        console.warn(
+          'Could not create maintenance run due to missing pipette data.'
+        )
+      }
     }
   }, [enabled, mount, instrumentModelName])
 }
 
 interface UseMonitorMaintenanceRunForDeletionParams {
   isMaintenanceRunType: boolean
-  closeFlow: () => void
+  closeFlow: (isTakeover?: boolean) => void
   createdMaintenanceRunId: string | null
   activeMaintenanceRunId?: string
 }
@@ -146,12 +154,15 @@ function useMonitorMaintenanceRunForDeletion({
   createdMaintenanceRunId,
   activeMaintenanceRunId,
   closeFlow,
-}: UseMonitorMaintenanceRunForDeletionParams): void {
+}: UseMonitorMaintenanceRunForDeletionParams): () => void {
   const [
     monitorMaintenanceRunForDeletion,
     setMonitorMaintenanceRunForDeletion,
   ] = React.useState<boolean>(false)
   const [closedOnce, setClosedOnce] = React.useState<boolean>(false)
+  const [closedByThisClient, setClosedByThisClient] = React.useState<boolean>(
+    false
+  )
 
   React.useEffect(() => {
     if (isMaintenanceRunType && !closedOnce) {
@@ -163,11 +174,16 @@ function useMonitorMaintenanceRunForDeletion({
       }
       if (
         activeMaintenanceRunId !== createdMaintenanceRunId &&
-        monitorMaintenanceRunForDeletion
+        monitorMaintenanceRunForDeletion &&
+        !closedByThisClient
       ) {
-        closeFlow()
+        closeFlow(true)
         setClosedOnce(true)
       }
     }
   }, [isMaintenanceRunType, createdMaintenanceRunId, activeMaintenanceRunId])
+
+  return () => {
+    setClosedByThisClient(!closedByThisClient)
+  }
 }

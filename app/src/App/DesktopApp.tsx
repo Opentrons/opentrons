@@ -121,7 +121,7 @@ export const DesktopApp = (): JSX.Element => {
                         <Route
                           key={path}
                           element={
-                            <>
+                            <React.Fragment key={Component.name}>
                               <Breadcrumbs />
                               <Box
                                 position={POSITION_RELATIVE}
@@ -138,7 +138,7 @@ export const DesktopApp = (): JSX.Element => {
                                   <Component />
                                 </Box>
                               </Box>
-                            </>
+                            </React.Fragment>
                           }
                           path={path}
                         />

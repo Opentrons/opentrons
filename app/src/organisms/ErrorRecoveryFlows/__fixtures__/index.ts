@@ -90,7 +90,6 @@ export const mockRecoveryContentProps: RecoveryContentProps = {
     reportErrorEvent: () => {},
     reportViewErrorDetailsEvent: () => {},
     reportActionSelectedEvent: () => {},
-    reportInitialActionEvent: () => {},
     reportActionSelectedResult: () => {},
   },
 }

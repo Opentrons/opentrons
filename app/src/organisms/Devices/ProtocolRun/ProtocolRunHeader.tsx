@@ -170,6 +170,7 @@ export function ProtocolRunHeader({
       ?.data?.current
   )
   const mostRecentRunId = useMostRecentRunId()
+  const isMostRecentRun = mostRecentRunId === runId
   const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
   const [showRunFailedModal, setShowRunFailedModal] = React.useState(false)
@@ -178,7 +179,7 @@ export function ProtocolRunHeader({
       runStatus != null &&
       // @ts-expect-error runStatus expected to possibly not be terminal
       RUN_STATUSES_TERMINAL.includes(runStatus) &&
-      isRunCurrent,
+      isMostRecentRun,
   })
   const isResetRunLoadingRef = React.useRef(false)
   const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
@@ -222,6 +223,7 @@ export function ProtocolRunHeader({
     resetTipStatus,
     setTipStatusResolved,
     aPipetteWithTip,
+    initialPipettesWithTipsCount,
   } = useTipAttachmentStatus({
     runId,
     runRecord: runRecord ?? null,
@@ -240,7 +242,7 @@ export function ProtocolRunHeader({
     instrumentModelSpecs: aPipetteWithTip?.specs,
     mount: aPipetteWithTip?.mount,
     robotType,
-    onClose: () => {
+    onSkipAndHome: () => {
       closeCurrentRun()
     },
   })
@@ -283,6 +285,12 @@ export function ProtocolRunHeader({
           ...robotAnalyticsData,
         },
       })
+
+      // Close the run if no tips are attached after running tip check at least once.
+      // This marks the robot as "not busy" as soon as a run is cancelled if drop tip CTAs are unnecessary.
+      if (initialPipettesWithTipsCount === 0) {
+        closeCurrentRun()
+      }
     }
   }, [runStatus, isRunCurrent, runId])
 
@@ -415,7 +423,7 @@ export function ProtocolRunHeader({
             {t('shared:close_robot_door')}
           </Banner>
         ) : null}
-        {mostRecentRunId === runId ? (
+        {isMostRecentRun ? (
           <TerminalRunBanner
             {...{
               runStatus,
@@ -515,13 +523,16 @@ export function ProtocolRunHeader({
             robotType={isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE}
             mount={aPipetteWithTip.mount}
             instrumentModelSpecs={aPipetteWithTip.specs}
-            closeFlow={() =>
-              setTipStatusResolved()
-                .then(toggleDTWiz)
-                .then(() => {
+            closeFlow={isTakeover => {
+              if (isTakeover) {
+                toggleDTWiz()
+              } else {
+                void setTipStatusResolved(() => {
+                  toggleDTWiz()
                   closeCurrentRun()
-                })
-            }
+                }, toggleDTWiz)
+              }
+            }}
           />
         ) : null}
       </Flex>
@@ -732,13 +743,21 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
       return module.moduleType === 'heaterShakerModuleType'
     })
     .some(module => module?.data != null && module.data.speedStatus !== 'idle')
+  const isValidRunAgain =
+    runStatus != null && RUN_AGAIN_STATUSES.includes(runStatus)
+  const validRunAgainButRequiresSetup = isValidRunAgain && !isSetupComplete
+  const runAgainWithSpinner = validRunAgainButRequiresSetup && isResetRunLoading
 
   let buttonText: string = ''
   let handleButtonClick = (): void => {}
   let buttonIconName: IconName | null = null
   let disableReason = null
 
-  if (currentRunId === runId && (!isSetupComplete || isFixtureMismatch)) {
+  if (
+    currentRunId === runId &&
+    (!isSetupComplete || isFixtureMismatch) &&
+    !isValidRunAgain
+  ) {
     disableReason = t('setup_incomplete')
   } else if (isOtherRunCurrent) {
     disableReason = t('shared:robot_is_busy')
@@ -803,7 +822,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
       }
     }
   } else if (runStatus != null && RUN_AGAIN_STATUSES.includes(runStatus)) {
-    buttonIconName = 'play'
+    buttonIconName = runAgainWithSpinner ? 'ot-spinner' : 'play'
     buttonText = t('run_again')
     handleButtonClick = () => {
       reset()
@@ -825,7 +844,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
         boxShadow="none"
         display={DISPLAY_FLEX}
         padding={`${SPACING.spacing12} ${SPACING.spacing16}`}
-        disabled={isRunControlButtonDisabled}
+        disabled={isRunControlButtonDisabled && !validRunAgainButRequiresSetup}
         onClick={handleButtonClick}
         id="ProtocolRunHeader_runControlButton"
         {...targetProps}
@@ -836,7 +855,9 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
             size={SIZE_1}
             marginRight={SPACING.spacing8}
             spin={
-              isProtocolAnalyzing || runStatus === RUN_STATUS_STOP_REQUESTED
+              isProtocolAnalyzing ||
+              runStatus === RUN_STATUS_STOP_REQUESTED ||
+              runAgainWithSpinner
             }
           />
         ) : null}

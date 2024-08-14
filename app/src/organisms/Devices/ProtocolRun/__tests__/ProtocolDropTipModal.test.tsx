@@ -26,7 +26,7 @@ describe('useProtocolDropTipModal', () => {
       areTipsAttached: true,
       toggleDTWiz: vi.fn(),
       isRunCurrent: true,
-      onClose: vi.fn(),
+      onSkipAndHome: vi.fn(),
       currentRunId: 'MOCK_ID',
       mount: 'left',
       instrumentModelSpecs: mockLeftSpecs,

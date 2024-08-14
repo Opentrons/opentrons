@@ -33,7 +33,7 @@ from ..database import (
 )
 from ..tables import schema_2, schema_3
 from .._folder_migrator import Migration
-from .._files_and_directories import (
+from ..file_and_directory_names import (
     DECK_CONFIGURATION_FILE,
     PROTOCOLS_DIRECTORY,
     DB_FILE,
