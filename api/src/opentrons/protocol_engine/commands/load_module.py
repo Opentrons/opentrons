@@ -179,11 +179,12 @@ class LoadModuleImplementation(
                     lid_labware = self._state_view.labware.get_by_addressable_area(
                         reader_area
                     )
+
                     if lid_labware is not None:
-                        lid_labware.location = (
-                            self._state_view.modules.absorbance_reader_dock_location(
-                                params.moduleId
-                            )
+                        self._state_view.labware._state.labware_by_id[
+                            lid_labware.id
+                        ].location = self._state_view.modules.absorbance_reader_dock_location(
+                            params.moduleId
                         )
 
         return SuccessData(

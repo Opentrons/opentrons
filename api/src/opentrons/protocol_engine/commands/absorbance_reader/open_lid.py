@@ -11,6 +11,7 @@ from ...errors import CannotPerformModuleAction
 
 from .types import MoveLidResult
 from opentrons.protocol_engine.resources import labware_validation
+from opentrons.protocol_engine.types import AddressableAreaLocation
 
 from opentrons.drivers.types import AbsorbanceReaderLidStatus
 
@@ -59,76 +60,75 @@ class OpenLidImpl(AbstractCommandImpl[OpenLidParams, SuccessData[OpenLidResult, 
         loaded_lid = self._state_view.labware.get(mod_substate.lid_id)
         assert labware_validation.is_absorbance_reader_lid(loaded_lid.loadName)
 
-        # If the lid is already Open, No-op out
-        if not mod_substate.is_lid_on:
-            current_offset_id = self._equipment.find_applicable_labware_offset_id(
-                labware_definition_uri=loaded_lid.definitionUri,
-                labware_location=loaded_lid.location,
-            )
-            return SuccessData(
-                public=OpenLidResult(
-                    lidId=loaded_lid.id,
-                    newLocation=loaded_lid.location,
-                    offsetId=current_offset_id,
-                ),
-                private=None,
-            )
-
-        # Allow propagation of ModuleNotAttachedError.
-        _ = self._equipment.get_module_hardware_api(mod_substate.module_id)
-
-        current_location = loaded_lid.location
-        validated_current_location = (
-            self._state_view.geometry.ensure_valid_gripper_location(current_location)
-        )
-
-        # we need to move the lid to the lid dock
-        new_location = self._state_view.modules.absorbance_reader_dock_location(
-            mod_substate.module_id
-        )
-        validated_new_location = (
-            self._state_view.geometry.ensure_valid_gripper_location(new_location)
-        )
-
-        lid_gripper_offsets = self._state_view.labware.get_labware_gripper_offsets(
-            loaded_lid.id, None
-        )
-        if lid_gripper_offsets is None:
-            raise ValueError(
-                "Gripper Offset values for Absorbance Reader Lid labware must not be None."
-            )
-
-        # Skips gripper moves when using virtual gripper
-        await self._labware_movement.move_labware_with_gripper(
-            labware_id=loaded_lid.id,
-            current_location=validated_current_location,
-            new_location=validated_new_location,
-            user_offset_data=lid_gripper_offsets,
-            post_drop_slide_offset=None,
-        )
-        new_offset_id = self._equipment.find_applicable_labware_offset_id(
-            labware_definition_uri=loaded_lid.definitionUri,
-            labware_location=new_location,
-        )
-
+        hardware_lid_status = AbsorbanceReaderLidStatus.ON
+        # If the lid is closed, if the lid is open No-op out
         if not self._state_view.config.use_virtual_modules:
             abs_reader = self._equipment.get_module_hardware_api(mod_substate.module_id)
 
             if abs_reader is not None:
                 result = await abs_reader.get_current_lid_status()
-                if result is not AbsorbanceReaderLidStatus.OFF:
-                    raise CannotPerformModuleAction(
-                        "The Opentrons Plate Reader lid mechanicaly position did not match expected Open state."
-                    )
+                hardware_lid_status = result
             else:
                 raise CannotPerformModuleAction(
                     "Could not reach the Hardware API for Opentrons Plate Reader Module."
                 )
 
+        # If the lid is already OFF, no-op the lid removal
+        if hardware_lid_status is AbsorbanceReaderLidStatus.OFF:
+            assert isinstance(loaded_lid.location, AddressableAreaLocation)
+            new_location = loaded_lid.location
+            new_offset_id = self._equipment.find_applicable_labware_offset_id(
+                labware_definition_uri=loaded_lid.definitionUri,
+                labware_location=loaded_lid.location,
+            )
+        else:
+            # Allow propagation of ModuleNotAttachedError.
+            _ = self._equipment.get_module_hardware_api(mod_substate.module_id)
+
+            absorbance_model = self._state_view.modules.get_requested_model(
+                params.moduleId
+            )
+            assert absorbance_model is not None
+            current_location = AddressableAreaLocation(
+                addressableAreaName=self._state_view.modules.ensure_and_convert_module_fixture_location(
+                    deck_slot=self._state_view.modules.get_location(
+                        params.moduleId
+                    ).slotName,
+                    deck_type=self._state_view.config.deck_type,
+                    model=absorbance_model,
+                )
+            )
+
+            # we need to move the lid to the lid dock
+            new_location = self._state_view.modules.absorbance_reader_dock_location(
+                mod_substate.module_id
+            )
+
+            lid_gripper_offsets = self._state_view.labware.get_labware_gripper_offsets(
+                loaded_lid.id, None
+            )
+            if lid_gripper_offsets is None:
+                raise ValueError(
+                    "Gripper Offset values for Absorbance Reader Lid labware must not be None."
+                )
+
+            # Skips gripper moves when using virtual gripper
+            await self._labware_movement.move_labware_with_gripper(
+                labware_id=loaded_lid.id,
+                current_location=current_location,
+                new_location=new_location,
+                user_offset_data=lid_gripper_offsets,
+                post_drop_slide_offset=None,
+            )
+            new_offset_id = self._equipment.find_applicable_labware_offset_id(
+                labware_definition_uri=loaded_lid.definitionUri,
+                labware_location=new_location,
+            )
+
         return SuccessData(
             public=OpenLidResult(
                 lidId=loaded_lid.id,
-                newLocation=validated_new_location,
+                newLocation=new_location,
                 offsetId=new_offset_id,
             ),
             private=None,
