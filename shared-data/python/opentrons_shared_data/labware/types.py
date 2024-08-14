@@ -135,7 +135,7 @@ class Hemisphere(TypedDict):
 
 
 TopCrossSection = Union[CircularCrossSection, RectangularCrossSection]
-BottomShape = Union[CircularCrossSection, RectangularCrossSection, Hemisphere]
+BottomShape = Union[CircularCrossSection, RectangularCrossSection, Hemispherical]
 
 
 class BoundedSection(TypedDict):
