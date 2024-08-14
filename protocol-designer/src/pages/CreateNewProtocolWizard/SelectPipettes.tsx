@@ -168,7 +168,7 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
             </Flex>
           ) : null}
           {(pipetteType != null && robotType === FLEX_ROBOT_TYPE) ||
-          (pipetteGen != 'flex' &&
+          (pipetteGen !== 'flex' &&
             pipetteType != null &&
             robotType === OT2_ROBOT_TYPE) ? (
             <Flex
@@ -274,7 +274,7 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
                       marginTop={SPACING.spacing4}
                     >
                       <StyledLabel>
-                        <StyledText as="bodyDefaultRegular">
+                        <StyledText desktopStyle="bodyDefaultRegular">
                           {t('add_custom_tips')}
                         </StyledText>
                         <input
@@ -292,7 +292,7 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
                         }}
                         textDecoration={TYPOGRAPHY.textDecorationUnderline}
                       >
-                        <StyledText as="bodyDefaultRegular">
+                        <StyledText desktopStyle="bodyDefaultRegular">
                           {allowAllTipracks
                             ? t('show_default_tips')
                             : t('show_all_tips')}

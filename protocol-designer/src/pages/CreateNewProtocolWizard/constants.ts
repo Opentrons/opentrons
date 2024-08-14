@@ -1,16 +1,32 @@
-import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
-import type { RobotType } from '@opentrons/shared-data'
+import {
+  FLEX_ROBOT_TYPE,
+  OT2_ROBOT_TYPE,
+  ABSORBANCE_READER_V1,
+  HEATERSHAKER_MODULE_TYPE,
+  HEATERSHAKER_MODULE_V1,
+  MAGNETIC_BLOCK_V1,
+  MAGNETIC_MODULE_TYPE,
+  MAGNETIC_MODULE_V1,
+  MAGNETIC_MODULE_V2,
+  SPAN7_8_10_11_SLOT,
+  TEMPERATURE_MODULE_TYPE,
+  TEMPERATURE_MODULE_V1,
+  TEMPERATURE_MODULE_V2,
+  THERMOCYCLER_MODULE_TYPE,
+  THERMOCYCLER_MODULE_V1,
+  THERMOCYCLER_MODULE_V2,
+} from '@opentrons/shared-data'
+import type { ModuleModel, ModuleType, RobotType } from '@opentrons/shared-data'
 import type { Gen, PipetteType, PipetteVolumes } from './types'
 
 export const PIPETTE_GENS: Gen[] = ['GEN1', 'GEN2']
 
-export const PIPETTE_TYPES: Record<
-  RobotType,
-  {
-    label: string
-    value: PipetteType
-  }[]
-> = {
+interface PipType {
+  label: string
+  value: PipetteType
+}
+
+export const PIPETTE_TYPES: Record<RobotType, PipType[]> = {
   [OT2_ROBOT_TYPE]: [
     {
       label: 'one_channel',
@@ -85,4 +101,44 @@ export const PIPETTE_VOLUMES: PipetteVolumes = {
       ],
     },
   ],
+}
+
+export const MAX_MOAM_MODULES = 7
+//  limiting 10 instead of 11 to make space for a single default tiprack
+//  to be auto-generated
+export const MAX_MAGNETIC_BLOCKS = 10
+
+export const FLEX_SUPPORTED_MODULE_MODELS: ModuleModel[] = [
+  THERMOCYCLER_MODULE_V2,
+  HEATERSHAKER_MODULE_V1,
+  MAGNETIC_BLOCK_V1,
+  TEMPERATURE_MODULE_V2,
+  ABSORBANCE_READER_V1,
+]
+
+export const OT2_SUPPORTED_MODULE_MODELS: ModuleModel[] = [
+  THERMOCYCLER_MODULE_V1,
+  THERMOCYCLER_MODULE_V2,
+  MAGNETIC_MODULE_V1,
+  MAGNETIC_MODULE_V2,
+  HEATERSHAKER_MODULE_V1,
+  TEMPERATURE_MODULE_V2,
+  TEMPERATURE_MODULE_V1,
+]
+
+export const DEFAULT_SLOT_MAP_FLEX: {
+  [moduleModel in ModuleModel]?: string
+} = {
+  [THERMOCYCLER_MODULE_V2]: 'B1',
+  [HEATERSHAKER_MODULE_V1]: 'D1',
+  [MAGNETIC_BLOCK_V1]: 'D2',
+  [TEMPERATURE_MODULE_V2]: 'C1',
+  [ABSORBANCE_READER_V1]: 'D3',
+}
+
+export const DEFAULT_SLOT_MAP_OT2: { [moduleType in ModuleType]?: string } = {
+  [THERMOCYCLER_MODULE_TYPE]: SPAN7_8_10_11_SLOT,
+  [HEATERSHAKER_MODULE_TYPE]: '1',
+  [MAGNETIC_MODULE_TYPE]: '1',
+  [TEMPERATURE_MODULE_TYPE]: '3',
 }

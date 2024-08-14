@@ -9,6 +9,7 @@ import { ListItem as ListItemComponent } from './index'
 import sampleImg from '../../images/labware/measurement-guide/images/depth/depth-plate-v@3x.png'
 
 import type { Meta, StoryObj } from '@storybook/react'
+import type { DropdownMenuProps } from '../../molecules'
 
 const meta: Meta<typeof ListItemComponent> = {
   title: 'Library/Atoms/ListItem',
@@ -73,6 +74,16 @@ export const ListItemDescriptorMini: Story = {
   },
 }
 
+const exampleDropDown: DropdownMenuProps = {
+  dropdownType: 'neutral',
+  onClick: () => {},
+  currentOption: { name: 'option 1', value: '1' },
+  filterOptions: [
+    { name: 'option 1', value: '1' },
+    { name: 'option 2', value: '2' },
+  ],
+}
+
 export const ListItemCustomizeDefault: Story = {
   args: {
     type: 'noActive',
@@ -80,8 +91,9 @@ export const ListItemCustomizeDefault: Story = {
       <ListItemCustomize
         header="Header"
         onClick={() => {}}
+        dropdown={exampleDropDown}
         label="Label"
-        imgSrc={sampleImg}
+        image={<img src={sampleImg} height="60px" width="60px" />}
         linkText="Text"
       />
     ),
