@@ -596,14 +596,23 @@ class CommandView(HasState[CommandState]):
             if all_commands
             else [CommandIntent.PROTOCOL, CommandIntent.SETUP]
         )
+        running_command = self._state.command_history.get_running_command()
+        queued_command_ids = self._state.command_history.get_queue_ids()
         total_length = len(command_ids)
         cursor_index = cursor
 
-        if cursor is None:
-            current_cursor = self.get_current()
-            if current_cursor:
-                cursor_index = current_cursor.index
-            elif current_cursor is None and (
+        # TODO(mm, 2024-05-17): This looks like it's attempting to do the same thing
+        # as self.get_current(), but in a different way. Can we unify them?
+        if cursor_index is None:
+            if running_command is not None:
+                cursor_index = running_command.index
+            elif len(queued_command_ids) > 0:
+                # Get the most recently executed command,
+                # which we can find just before the first queued command.
+                cursor_index = (
+                    self._state.command_history.get(queued_command_ids.head()).index - 1
+                )
+            elif (
                 self._state.run_result
                 and self._state.run_result == RunResult.FAILED
                 and self._state.failed_command
