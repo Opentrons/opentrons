@@ -7,11 +7,11 @@ import { StyledText } from '../../StyledText'
 interface ListButtonAccordionProps {
   headline: string
   children: React.ReactNode
-  //    determines if the accordion is expanded or not
+  // determines if the accordion is expanded or not
   isExpanded?: boolean
-  //    is it nested into another accordion?
+  // is it nested into another accordion?
   isNested?: boolean
-  //    optional main headline for the top level accordion
+  // optional main headline for the top level accordion
   mainHeadline?: string
 }
 

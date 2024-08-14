@@ -25,8 +25,9 @@ const meta: Meta<typeof ListButtonComponent> = {
 export default meta
 
 type Story = StoryObj<typeof ListButtonComponent>
+type ListButtonComponentProps = React.ComponentProps<typeof ListButtonComponent>
 
-const Template = (args: any): JSX.Element => {
+const Template = (args: ListButtonComponentProps): JSX.Element => {
   const [containerExpand, setContainerExpand] = React.useState<boolean>(false)
   const [buttonValue, setButtonValue] = React.useState<string | null>(null)
   const [nestedButtonValue, setNestedButtonValue] = React.useState<
@@ -42,7 +43,7 @@ const Template = (args: any): JSX.Element => {
     >
       <ListButtonAccordion
         key="main"
-        mainHeadline="Main heading"
+        mainHeadline="Main heading, click to expand accordion"
         headline="accordion heading"
         isExpanded={containerExpand}
       >
@@ -52,7 +53,7 @@ const Template = (args: any): JSX.Element => {
               key="buttonNested"
               isSelected={buttonValue === 'radio button nested'}
               buttonValue="radio button nested"
-              buttonText="Radio button with nested"
+              buttonText="Radio button, click to expand nested accordion"
               onChange={e => {
                 e.stopPropagation()
                 setButtonValue('radio button nested')
