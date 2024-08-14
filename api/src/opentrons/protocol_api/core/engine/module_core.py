@@ -562,3 +562,10 @@ class AbsorbanceReaderCore(ModuleCore, AbstractAbsorbanceReaderCore):
                 moduleId=self.module_id,
             )
         )
+
+    def is_lid_on(self) -> bool:
+        """Returns True if the Absorbance Reader's lid is currently on the Reader slot."""
+        abs_state = self._engine_client.state.modules.get_absorbance_reader_substate(
+            self.module_id
+        )
+        return abs_state.is_lid_on

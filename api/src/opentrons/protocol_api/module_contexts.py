@@ -994,8 +994,13 @@ class AbsorbanceReaderContext(ModuleContext):
 
     @requires_version(2, 21)
     def open_lid(self) -> None:
-        """Close the lid of the Absorbance Reader."""
+        """Open the lid of the Absorbance Reader."""
         self._core.open_lid()
+
+    @requires_version(2, 21)
+    def is_lid_on(self) -> bool:
+        """Return ``True`` if the Absorbance Reader's lid is currently closed."""
+        return self._core.is_lid_on()
 
     @requires_version(2, 21)
     def initialize(self, wavelength: int) -> None:

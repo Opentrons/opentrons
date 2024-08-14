@@ -369,3 +369,7 @@ class AbstractAbsorbanceReaderCore(AbstractModuleCore):
     @abstractmethod
     def open_lid(self) -> None:
         """Open the Absorbance Reader's lid."""
+
+    @abstractmethod
+    def is_lid_on(self) -> bool:
+        """Return True if the Absorbance Reader's lid is currently closed."""

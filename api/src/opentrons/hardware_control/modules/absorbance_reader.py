@@ -204,11 +204,11 @@ class AbsorbanceReader(mod_abc.AbstractModule):
 
     @property
     def lid_status(self) -> AbsorbanceReaderLidStatus:
-        return AbsorbanceReaderLidStatus.UNKNOWN
+        return self._reader.lid_status
 
     @property
     def plate_presence(self) -> AbsorbanceReaderPlatePresence:
-        return AbsorbanceReaderPlatePresence.UNKNOWN
+        return self._reader.plate_presence
 
     @property
     def device_info(self) -> Mapping[str, str]:
@@ -320,6 +320,11 @@ class AbsorbanceReader(mod_abc.AbstractModule):
     async def get_current_wavelength(self) -> None:
         """Get the Absorbance Reader's current active wavelength."""
         pass  # TODO: implement
+
+    async def get_current_lid_status(self) -> AbsorbanceReaderLidStatus:
+        """Get the Absorbance Reader's current lid status."""
+        await self._reader.get_lid_status()
+        return self._reader.lid_status
 
     def _enter_error_state(self, error: Exception) -> None:
         self._error = str(error)
