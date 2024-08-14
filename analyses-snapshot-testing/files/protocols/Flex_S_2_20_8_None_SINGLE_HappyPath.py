@@ -16,12 +16,14 @@ def run(protocol):
     trash = protocol.load_trash_bin("A3")  # must load trash bin
 
     partial_tip_rack = protocol.load_labware(
-        load_name="opentrons_flex_96_tiprack_1000ul",
+        load_name="opentrons_flex_96_tiprack_50ul",
         label="Partial Tip Rack",
-        location="C1",
+        location="B3",
     )
 
-    pipette = protocol.load_instrument(instrument_name="flex_8channel_50", mount="left")
+    thermocycler = protocol.load_module("thermocycler module gen2")
+
+    pipette = protocol.load_instrument(instrument_name="flex_8channel_50", mount="right")
     # mount on the right and you will get an error.
 
     # On the 8-channel SINGLE
@@ -92,43 +94,31 @@ def run(protocol):
         tip_racks=[partial_tip_rack],
     )
 
-    source_labware_B3 = protocol.load_labware(
-        load_name="nest_96_wellplate_100ul_pcr_full_skirt",
-        label="B3 Source Labware",
-        location="B3",
-    )
-
-    destination_labware_C3 = protocol.load_labware(
-        load_name="nest_96_wellplate_100ul_pcr_full_skirt",
-        label="C3 Destination Labware",
-        location="C3",
-    )
-
     #############################
     # Pipette do work
     pipette.consolidate(
         [volume, volume],
-        [source_labware_B3["A3"], source_labware_B3["A4"]],
-        destination_labware_C3["A3"],
+        [source_labware_B2["A3"], source_labware_B2["A4"]],
+        destination_labware_C2["A3"],
     )
 
-    pipette.transfer(volume, source_labware_B3["A6"], destination_labware_C3["A6"])
+    pipette.transfer(volume, source_labware_B2["A6"], destination_labware_C2["A6"])
 
     pipette.distribute(
         5,
         source_labware_B2["A7"],
-        [destination_labware_C3["A7"], destination_labware_C3["A8"]],
+        [destination_labware_C2["A7"], destination_labware_C2["A8"]],
     )
 
     pipette.pick_up_tip()
-    pipette.touch_tip(source_labware_B3["B1"])
+    pipette.touch_tip(source_labware_B2["B1"])
     pipette.drop_tip()
     pipette.pick_up_tip()
     pipette.home()
     pipette.drop_tip()
 
     pipette.pick_up_tip()
-    well = source_labware_B3["D1"]
+    well = source_labware_B2["D1"]
     # directly from docs http://sandbox.docs.opentrons.com/edge/v2/new_protocol_api.html#opentrons.protocol_api.InstrumentContext.prepare_to_aspirate
     pipette.move_to(well.bottom(z=2))
     pipette.mix(10, 10)
