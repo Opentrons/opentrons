@@ -13,6 +13,10 @@ from opentrons_shared_data.labware.labware_definition import (
     Group,
     Metadata1,
     WellDefinition,
+    BoundedSection,
+    RectangularCrossSection,
+    InnerLabwareGeometry,
+    SphericalSegment,
 )
 from opentrons_shared_data.protocol.models import (
     protocol_schema_v6,
@@ -685,6 +689,31 @@ def _load_labware_definition_data() -> LabwareDefinition:
         },
         dimensions=Dimensions(yDimension=85.5, zDimension=100, xDimension=127.75),
         cornerOffsetFromSlot=CornerOffsetFromSlot(x=0, y=0, z=0),
+        innerWellGeometry=InnerLabwareGeometry(
+            frusta=[
+                BoundedSection(
+                    geometry=RectangularCrossSection(
+                        shape="rectangular",
+                        xDimension=7.6,
+                        yDimension=8.5,
+                    ),
+                    topHeight=45,
+                ),
+                BoundedSection(
+                    geometry=RectangularCrossSection(
+                        shape="rectangular",
+                        xDimension=5.6,
+                        yDimension=6.5,
+                    ),
+                    topHeight=20,
+                ),
+            ],
+            bottomShape=SphericalSegment(
+                shape="spherical",
+                radius_of_curvature=6,
+                depth=10,
+            ),
+        ),
         brand=BrandData(brand="foo"),
         metadata=Metadata(
             displayName="Foo 8 Well Plate 33uL",

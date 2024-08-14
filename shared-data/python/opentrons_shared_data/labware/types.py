@@ -3,7 +3,7 @@
 types in this file by and large require the use of typing_extensions.
 this module shouldn't be imported unless typing.TYPE_CHECKING is true.
 """
-from typing import Dict, List, NewType, Union
+from typing import Dict, List, NewType, Union, Optional
 from typing_extensions import Literal, TypedDict
 
 
@@ -37,6 +37,7 @@ LabwareRoles = Union[
 
 Circular = Literal["circular"]
 Rectangular = Literal["rectangular"]
+Spherical = Literal["spherical"]
 WellShape = Union[Circular, Rectangular]
 
 
@@ -117,6 +118,37 @@ class WellGroup(TypedDict, total=False):
     brand: LabwareBrandData
 
 
+class CircularCrossSection(TypedDict):
+    shape: Circular
+    diameter: float
+
+
+class RectangularCrossSection(TypedDict):
+    shape: Rectangular
+    xDimension: float
+    yDimension: float
+
+
+class SphericalSegment(TypedDict):
+    shape: Spherical
+    radius_of_curvature: float
+    depth: float
+
+
+TopCrossSection = Union[CircularCrossSection, RectangularCrossSection]
+BottomShape = Union[CircularCrossSection, RectangularCrossSection, SphericalSegment]
+
+
+class BoundedSection(TypedDict):
+    geometry: TopCrossSection
+    topHeight: float
+
+
+class InnerLabwareGeometry(TypedDict):
+    frusta: List[BoundedSection]
+    bottomShape: BottomShape
+
+
 class _RequiredLabwareDefinition(TypedDict):
     schemaVersion: Literal[2]
     version: int
@@ -138,3 +170,4 @@ class LabwareDefinition(_RequiredLabwareDefinition, total=False):
     gripperOffsets: Dict[str, GripperOffsets]
     gripForce: float
     gripHeightFromLabwareBottom: float
+    innerWellGeometry: Optional[InnerLabwareGeometry]
