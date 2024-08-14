@@ -224,23 +224,33 @@ class WellDefinition(BaseModel):
     )
 
 
+class Hemisphere(BaseModel):
+    diameter: _NonNegativeNumber = Field(
+        ...,
+        description="diameter of bottom subsection of wells",
+    )
+    depth: _NonNegativeNumber = Field(
+        ..., description="The depth of a hemispherical bottom of a well"
+    )
+
+
 class TopCrossSection(BaseModel):
-    shape: Literal["rectangular", "circular", "hemisphere"] = Field(
+    shape: Literal["rectangular", "circular"] = Field(
         ...,
         description="Shape of a cross-section of a well used to determine how "
         "to calculate area",
     )
     xDimension: Optional[_NonNegativeNumber] = Field(
         None,
-        description="x dimension of rectangular wells",
+        description="x dimension of a subsection of wells",
     )
     yDimension: Optional[_NonNegativeNumber] = Field(
         None,
-        description="y dimension of rectangular wells",
+        description="y dimension of a subsection of wells",
     )
     diameter: Optional[_NonNegativeNumber] = Field(
         None,
-        description="diameter of circular wells",
+        description="diameter of a subsection of wells",
     )
 
 
@@ -279,6 +289,16 @@ class Group(BaseModel):
     )
     brand: Optional[BrandData] = Field(
         None, description="Brand data for the well group (e.g. for tubes)"
+    )
+
+
+class InnerLabwareGeometry(BaseModel):
+    frusta: List[BoundedSection] = Field(
+        ...,
+        description="A list of all of the sections of the well that have a contiguous shape",
+    )
+    bottom_shape: Optional[Hemisphere] = Field(
+        None, description="An optional non-frustum shape at the bottom of a well"
     )
 
 
@@ -356,7 +376,7 @@ class LabwareDefinition(BaseModel):
         default_factory=None,
         description="Force, in Newtons, with which the gripper should grip the labware.",
     )
-    innerWellGeometry: Optional[List[BoundedSection]] = Field(
+    innerWellGeometry: Optional[InnerLabwareGeometry] = Field(
         None,
         description="A list of bounded sections describing the geometry of the inside of the wells.",
     )

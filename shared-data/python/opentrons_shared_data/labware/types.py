@@ -3,7 +3,7 @@
 types in this file by and large require the use of typing_extensions.
 this module shouldn't be imported unless typing.TYPE_CHECKING is true.
 """
-from typing import Dict, List, NewType, Union
+from typing import Dict, List, NewType, Union, Optional
 from typing_extensions import Literal, TypedDict
 
 
@@ -37,7 +37,6 @@ LabwareRoles = Union[
 
 Circular = Literal["circular"]
 Rectangular = Literal["rectangular"]
-Hemisphere = Literal["hemisphere"]
 WellShape = Union[Circular, Rectangular]
 
 
@@ -118,6 +117,35 @@ class WellGroup(TypedDict, total=False):
     brand: LabwareBrandData
 
 
+class CircularArea(TypedDict):
+    shape: Circular
+    diameter: float
+
+
+class RectangularArea(TypedDict):
+    shape: Rectangular
+    xDimension: float
+    yDimension: float
+
+
+TopCrossSection = Union[CircularArea, RectangularArea]
+
+
+class Hemisphere(TypedDict):
+    diameter: float
+    depth: float
+
+
+class BoundedSection(TypedDict):
+    geometry: TopCrossSection
+    top_height: float
+
+
+class InnerLabwareGeometry(TypedDict):
+    frusta: List[BoundedSection]
+    bottom_shape: Optional[Hemisphere]
+
+
 class _RequiredLabwareDefinition(TypedDict):
     schemaVersion: Literal[2]
     version: int
@@ -139,28 +167,4 @@ class LabwareDefinition(_RequiredLabwareDefinition, total=False):
     gripperOffsets: Dict[str, GripperOffsets]
     gripForce: float
     gripHeightFromLabwareBottom: float
-
-
-class CircularArea(TypedDict):
-    shape: Circular
-    diameter: float
-
-
-class RectangularArea(TypedDict):
-    shape: Rectangular
-    xDimension: float
-    yDimension: float
-
-
-class HemisphereDimensions(TypedDict):
-    shape: Hemisphere
-    diameter: float
-
-
-# This will either be a 2-Dimensional cross-section or a hemisphere
-TopCrossSection = Union[CircularArea, RectangularArea, HemisphereDimensions]
-
-
-class BoundedSection(TypedDict):
-    geometry: TopCrossSection
-    top_height: float
+    innerWellGeometry: Optional[InnerLabwareGeometry]
