@@ -2093,6 +2093,11 @@ class InstrumentContext(publisher.CommandPublisher):
                     raise ValueError(
                         "Row configuration is only supported on 96-Channel pipettes."
                     )
+            if style == NozzleLayout.COLUMN:
+                if self.channels != 96:
+                    raise ValueError(
+                        "Column configuration is only supported on 96-Channel pipettes."
+                    )
             if style == NozzleLayout.PARTIAL_COLUMN:
                 if self.channels == 1 or self.channels == 96:
                     raise ValueError(
@@ -2111,13 +2116,13 @@ class InstrumentContext(publisher.CommandPublisher):
                 if start == "H1" or start == "H12":
                     if "A" in end:
                         raise ValueError(
-                            f"A partial column configuration with 'start'={start} cannot have its 'end' parameter be in row A."
+                            f"A partial column configuration with 'start'={start} cannot have its 'end' parameter be in row A. Use `ALL` configuration to utilize all nozzles."
                         )
                     back_left_resolved = end
                 elif start == "A1" or start == "A12":
                     if "H" in end:
                         raise ValueError(
-                            f"A partial column configuration with 'start'={start} cannot have its 'end' parameter be in row H."
+                            f"A partial column configuration with 'start'={start} cannot have its 'end' parameter be in row H. Use `ALL` configuration to utilize all nozzles."
                         )
                     front_right_resolved = end
 
