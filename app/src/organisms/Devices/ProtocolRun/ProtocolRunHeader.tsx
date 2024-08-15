@@ -292,13 +292,16 @@ export function ProtocolRunHeader({
         },
       })
 
+      // TODO(jh, 08-15-24): The enteredER condition is a hack, because errorCommands are only returned when a run is current.
+      // Ideally the run should not need to be current to view errorCommands.
+
       // Close the run if no tips are attached after running tip check at least once.
       // This marks the robot as "not busy" as soon as a run is cancelled if drop tip CTAs are unnecessary.
-      if (initialPipettesWithTipsCount === 0) {
+      if (initialPipettesWithTipsCount === 0 && !enteredER) {
         closeCurrentRun()
       }
     }
-  }, [runStatus, isRunCurrent, runId])
+  }, [runStatus, isRunCurrent, runId, enteredER])
 
   const startedAtTimestamp =
     startedAt != null ? formatTimestamp(startedAt) : EMPTY_TIMESTAMP
@@ -939,12 +942,16 @@ function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
   const { t } = useTranslation('run_details')
   const completedWithErrors =
     commandErrorList?.data != null && commandErrorList.data.length > 0
+
   const handleRunSuccessClick = (): void => {
     handleClearClick()
   }
 
   const handleFailedRunClick = (): void => {
-    handleClearClick()
+    // TODO(jh, 08-15-24): See TODO related to commandErrorList above.
+    if (commandErrorList == null) {
+      handleClearClick()
+    }
     setShowRunFailedModal(true)
   }
 
@@ -1005,8 +1012,8 @@ function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
   // TODO(jh, 08-14-24): The backend never returns the "user cancelled a run" error and cancelledWithoutRecovery becomes unnecessary.
   else if (
     !cancelledWithoutRecovery &&
-    (highestPriorityError != null ||
-      (completedWithErrors && !isResetRunLoading))
+    !isResetRunLoading &&
+    (highestPriorityError != null || completedWithErrors)
   ) {
     return buildErrorBanner()
   } else {
