@@ -25,7 +25,7 @@ const Table = styled('table')`
   width: 100%;
   border-spacing: 0 ${BORDERS.borderRadius8};
   text-align: ${TYPOGRAPHY.textAlignLeft};
-  color: ${COLORS.grey60};
+  color: ${COLORS.black90};
 `
 const TableHeader = styled('th')`
   text-transform: ${TYPOGRAPHY.textTransformCapitalize};
