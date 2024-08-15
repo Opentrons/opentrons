@@ -116,7 +116,6 @@ import type {
   RunCommandErrors,
   RunError,
   RunStatus,
-  GetCommandsParams,
 } from '@opentrons/api-client'
 import type { IconName } from '@opentrons/components'
 import type { State } from '../../../redux/types'
