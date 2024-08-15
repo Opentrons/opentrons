@@ -74,7 +74,7 @@ describe('ErrorDetailsModal', () => {
     expect(vi.mocked(Modal)).toHaveBeenCalledWith(
       expect.objectContaining({
         header: {
-          title: 'Error',
+          title: 'Tip not detected',
           hasExitIcon: true,
         },
         onOutsideClick: props.toggleModal,
