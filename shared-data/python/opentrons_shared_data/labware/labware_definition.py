@@ -223,7 +223,7 @@ class WellDefinition(BaseModel):
         "yDimension; if 'circular' use diameter",
     )
     geometryDefinitionId: Optional[str] = Field(
-        None, description="Index number of the well's corresponding" "innerWellGeometry"
+        None, description="str id of the well's corresponding" "innerWellGeometry"
     )
 
 
