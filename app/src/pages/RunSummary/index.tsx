@@ -134,7 +134,9 @@ export function RunSummary(): JSX.Element {
       reportRecoveredRunResult(runStatus, enteredER)
     }
   }, [isRunCurrent, enteredER])
+
   React.useEffect(() => {
+    // in case the run is remotely deleted by a desktop app, navigate to the dash
     if (runRecord == null) {
       navigate('/')
     }
