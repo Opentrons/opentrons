@@ -166,7 +166,7 @@ export function RunSummary(): JSX.Element {
   // TODO(jh, 08-14-24): The backend never returns the "user cancelled a run" error and cancelledWithoutRecovery becomes unnecessary.
   const cancelledWithoutRecovery =
     !enteredER && runStatus === RUN_STATUS_STOPPED
-  const showErrorDetailsBtn =
+  const disableErrorDetailsBtn =
     !cancelledWithoutRecovery &&
     ((runRecord?.data.errors != null && runRecord?.data.errors.length > 0) ||
       (commandErrorList != null && commandErrorList?.data.length > 0))
@@ -449,14 +449,13 @@ export function RunSummary(): JSX.Element {
               }
               css={showRunAgainSpinner ? RUN_AGAIN_CLICKED_STYLE : undefined}
             />
-            {showErrorDetailsBtn ? (
-              <EqualWidthButton
-                iconName="info"
-                buttonType="alert"
-                onClick={handleViewErrorDetails}
-                buttonText={t('view_error_details')}
-              />
-            ) : null}
+            <EqualWidthButton
+              iconName="info"
+              buttonType="alert"
+              onClick={handleViewErrorDetails}
+              buttonText={t('view_error_details')}
+              disabled={disableErrorDetailsBtn}
+            />
           </ButtonContainer>
         </Flex>
       )}
