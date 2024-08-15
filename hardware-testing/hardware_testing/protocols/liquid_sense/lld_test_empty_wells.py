@@ -78,7 +78,9 @@ def _setup(
     if PIPETTE_CHANNELS < 96:
         rack = ctx.load_labware(rack_name, SLOT_TIPRACK)
     else:
-        rack = ctx.load_labware(rack_name, SLOT_TIPRACK, adapter = "opentrons_flex_96_tiprack_adapter")
+        rack = ctx.load_labware(
+            rack_name, SLOT_TIPRACK, adapter="opentrons_flex_96_tiprack_adapter"
+        )
     pipette = ctx.load_instrument(pip_name, "left")
     labware = ctx.load_labware(LABWARE, SLOT_LABWARE)
     dial = ctx.load_labware("dial_indicator", SLOT_DIAL)
@@ -209,7 +211,6 @@ def _read_dial_indicator(
     return dial_port
 
 
-
 def _store_dial_baseline(
     ctx: ProtocolContext,
     pipette: InstrumentContext,
@@ -277,16 +278,20 @@ def _test_for_expected_liquid_state(
     _store_dial_baseline(ctx, pipette, dial, google_sheet, sheet_id, row)
     if pipette.channels > 1:
         _store_dial_baseline(
-            ctx, pipette, dial, google_sheet, sheet_id, row+1, front_channel=True
+            ctx, pipette, dial, google_sheet, sheet_id, row + 1, front_channel=True
         )
     csv_header = f'trial,result,tip-z-error,{",".join([w.well_name for w in wells])}'
     _write_line_to_csv(ctx, f"{csv_header}")
     # Write header to google sheet.
     if pipette.channels == 1:
-        gs_list = [["Trial"], ["Result"], ["Tip-Z-Error"]] + [[w.well_name] for w in wells]
+        gs_list = [["Trial"], ["Result"], ["Tip-Z-Error"]] + [
+            [w.well_name] for w in wells
+        ]
     else:
-        gs_list = [["Trial"], ["Result"], ["Tip-Z-Error 1 "], ["Tip-Z-Error 2"]] + [[w.well_name] for w in wells]
-        
+        gs_list = [["Trial"], ["Result"], ["Tip-Z-Error 1 "], ["Tip-Z-Error 2"]] + [
+            [w.well_name] for w in wells
+        ]
+
     _write_line_to_google_sheet(ctx, google_sheet, gs_list, sheet_id, row + 2)
     while trial_counter < trials:
         for tip in tips:

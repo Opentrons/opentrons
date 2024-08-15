@@ -212,9 +212,7 @@ def run(
     if run_args.dial_front_channel:
         y_offset = 0 if run_args.pipette_channels == 1 else 9 * 7
         x_offset = 0 if run_args.pipette_channels != 96 else 9 * -11
-        dial_target = dial_target.move(
-            top_types.Point(y=y_offset, x=x_offset)
-        )
+        dial_target = dial_target.move(top_types.Point(y=y_offset, x=x_offset))
 
     def read_dial() -> float:
         time.sleep(2)
