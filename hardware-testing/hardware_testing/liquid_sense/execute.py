@@ -216,7 +216,7 @@ def run(
 
     def read_dial() -> float:
         time.sleep(2)
-        dial_value = run_args.dial_indicator.read()
+        dial_value = run_args.dial_indicator.read()  # type: ignore[union-attr]
         return dial_value
 
     lpc_offset = 0.0
