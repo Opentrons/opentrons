@@ -3,7 +3,6 @@ import { useSelector } from 'react-redux'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
-import { useQueryClient } from 'react-query'
 
 import {
   ALIGN_CENTER,
@@ -195,15 +194,6 @@ export function RunSummary(): JSX.Element {
     }
   }, [isRunCurrent, enteredER])
 
-  // TODO(jh, 08-02-24): Revisit useCurrentRunRoute and top level redirects.
-  const queryClient = useQueryClient()
-  const returnToDash = (): void => {
-    // Eagerly clear the query caches to prevent top level redirecting back to this page.
-    queryClient.setQueryData([host, 'runs', 'details'], () => undefined)
-    queryClient.setQueryData([host, 'runs', runId, 'details'], () => undefined)
-    navigate('/')
-  }
-
   const returnToQuickTransfer = (): void => {
     if (!isRunCurrent) {
       deleteRun(runId)
@@ -249,15 +239,21 @@ export function RunSummary(): JSX.Element {
         robotType: FLEX_ROBOT_TYPE,
         isRunCurrent,
         onSkipAndHome: () => {
-          closeCurrentRun()
-          returnToDash()
+          closeCurrentRun({
+            onSuccess: () => {
+              navigate('/')
+            },
+          })
         },
       })
     } else if (isQuickTransfer) {
       returnToQuickTransfer()
     } else {
-      closeCurrentRun()
-      returnToDash()
+      closeCurrentRun({
+        onSuccess: () => {
+          navigate('/')
+        },
+      })
     }
   }
 
