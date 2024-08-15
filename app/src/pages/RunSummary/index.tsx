@@ -67,6 +67,7 @@ import { handleTipsAttachedModal } from '../../organisms/DropTipWizardFlows/Tips
 import { useTipAttachmentStatus } from '../../organisms/DropTipWizardFlows'
 import { useRecoveryAnalytics } from '../../organisms/ErrorRecoveryFlows/hooks'
 
+import type { IconName } from '@opentrons/components'
 import type { OnDeviceRouteParams } from '../../App/types'
 import type { PipetteWithTip } from '../../organisms/DropTipWizardFlows'
 
@@ -171,11 +172,15 @@ export function RunSummary(): JSX.Element {
     ((runRecord?.data.errors != null && runRecord?.data.errors.length > 0) ||
       (commandErrorList != null && commandErrorList?.data.length > 0))
 
-  let headerText =
-    commandErrorList != null && commandErrorList.data.length > 0
-      ? t('run_completed_with_warnings_splash')
-      : t('run_completed_splash')
-  if (runStatus === RUN_STATUS_FAILED) {
+  console.log('=>(index.tsx:181) runStatus', runStatus)
+
+  let headerText: string | null = null
+  if (runStatus === RUN_STATUS_SUCCEEDED) {
+    headerText =
+      commandErrorList != null && commandErrorList.data.length > 0
+        ? t('run_completed_with_warnings_splash')
+        : t('run_completed_splash')
+  } else if (runStatus === RUN_STATUS_FAILED) {
     headerText = t('run_failed_splash')
   } else if (runStatus === RUN_STATUS_STOPPED) {
     if (enteredER) {
@@ -299,6 +304,26 @@ export function RunSummary(): JSX.Element {
     setShowSplash(false)
   }
 
+  const buildHeaderIcon = (): JSX.Element | null => {
+    let iconName: IconName | null = null
+    let iconColor: string | null = null
+
+    if (runStatus === RUN_STATUS_SUCCEEDED) {
+      iconName = 'ot-check'
+      iconColor = COLORS.green50
+    } else if (runStatus === RUN_STATUS_STOPPED && !enteredER) {
+      iconName = 'ot-alert'
+      iconColor = COLORS.yellow50
+    } else if (runStatus === RUN_STATUS_FAILED) {
+      iconName = 'ot-alert'
+      iconColor = COLORS.red50
+    }
+
+    return iconName != null && iconColor != null ? (
+      <Icon name={iconName} size="2rem" color={iconColor} />
+    ) : null
+  }
+
   const buildReturnToCopy = (): string =>
     isQuickTransfer ? t('return_to_quick_transfer') : t('return_to_dashboard')
 
@@ -391,12 +416,10 @@ export function RunSummary(): JSX.Element {
             gridGap={SPACING.spacing16}
           >
             <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
-              <Icon
-                name={didRunSucceed ? 'ot-check' : 'ot-alert'}
-                size="2rem"
-                color={didRunSucceed ? COLORS.green50 : COLORS.red50}
-              />
-              <SummaryHeader>{headerText}</SummaryHeader>
+              {buildHeaderIcon()}
+              {headerText != null ? (
+                <SummaryHeader>{headerText}</SummaryHeader>
+              ) : null}
             </Flex>
             <ProtocolName>{protocolName}</ProtocolName>
             <Flex gridGap={SPACING.spacing8} flexWrap={WRAP}>
