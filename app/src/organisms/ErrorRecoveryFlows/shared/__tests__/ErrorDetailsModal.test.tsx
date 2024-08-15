@@ -129,7 +129,9 @@ describe('OverpressureBanner', () => {
       expect.objectContaining({
         type: 'alert',
         heading:
-          'Overpressure is usually caused by a tip contacting labware, a clog, or moving viscous liquid too quickly. If the issue persists, cancel the run and make the necessary changes to the protocol.',
+          'Overpressure is usually caused by a tip contacting labware, a clog, or moving viscous liquid too quickly',
+        message:
+          ' If the issue persists, cancel the run and make the necessary changes to the protocol',
       }),
       {}
     )
