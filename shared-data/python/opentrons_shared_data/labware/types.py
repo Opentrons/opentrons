@@ -90,7 +90,7 @@ class CircularWellDefinition(TypedDict):
     y: float
     z: float
     diameter: float
-    geometryDefinitionIndex: NotRequired[int]
+    geometryDefinitionId: NotRequired[str]
 
 
 class RectangularWellDefinition(TypedDict):
@@ -102,7 +102,7 @@ class RectangularWellDefinition(TypedDict):
     z: float
     xDimension: float
     yDimension: float
-    geometryDefinitionIndex: NotRequired[int]
+    geometryDefinitionId: NotRequired[str]
 
 
 WellDefinition = Union[CircularWellDefinition, RectangularWellDefinition]
