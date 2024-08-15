@@ -101,7 +101,7 @@
   "run_complete": "Run completed",
   "run_complete_splash": "Run completed",
   "run_completed": "Run completed.",
-  "run_completed_with_errors": "Run completed with errors.",
+  "run_canceled_with_errors": "Run canceled with errors.",
   "run_completed_with_warnings": "Run completed with warnings.",
   "run_cta_disabled": "Complete required steps on Protocol tab before starting the run",
   "run_failed": "Run failed.",
