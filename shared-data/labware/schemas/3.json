@@ -214,7 +214,6 @@
         }
       }
     },
-    # something on the same level as wells for innerLabwareGeometry
     "wells": {
       "type": "object",
       "description": "Unordered object of well objects with position and dimensional information",
