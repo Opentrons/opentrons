@@ -271,7 +271,7 @@ async def get_run_commands(
         _DEFAULT_COMMAND_LIST_LENGTH,
         description="The maximum number of commands in the list to return.",
     ),
-    allCommands: bool = Query(
+    includeFixitCommands: bool = Query(
         True,
         description="If `true`, return all commands (protocol, setup, fixit)."
         " If `false`, only return safe commands (protocol, setup).",
@@ -293,7 +293,7 @@ async def get_run_commands(
             run_id=runId,
             cursor=cursor,
             length=pageLength,
-            all_commands=allCommands,
+            include_fixit_commands=includeFixitCommands,
         )
     except RunNotFoundError as e:
         raise RunNotFound.from_exc(e).as_error(status.HTTP_404_NOT_FOUND) from e

@@ -367,7 +367,7 @@ class RunDataManager:
         )
 
     def get_commands_slice(
-        self, run_id: str, cursor: Optional[int], length: int, all_commands: bool
+        self, run_id: str, cursor: Optional[int], length: int, include_fixit_commands: bool
     ) -> CommandSlice:
         """Get a slice of run commands.
 
@@ -375,14 +375,14 @@ class RunDataManager:
             run_id: ID of the run.
             cursor: Requested index of first command in the returned slice.
             length: Length of slice to return.
-            all_commands: Weather we should return all command intents.
+            include_fixit_commands: Weather we should include fixit commands.
 
         Raises:
             RunNotFoundError: The given run identifier was not found in the database.
         """
         if run_id == self._run_orchestrator_store.current_run_id:
             return self._run_orchestrator_store.get_command_slice(
-                cursor=cursor, length=length, all_commands=all_commands
+                cursor=cursor, length=length, include_fixit_commands=include_fixit_commands
             )
 
         # Let exception propagate
