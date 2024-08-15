@@ -2,7 +2,7 @@ import * as React from 'react'
 import { css } from 'styled-components'
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { Flex } from '../../primitives'
-import { PrimaryButton, SPACING } from '../..'
+import { PrimaryButton, SPACING, TYPOGRAPHY } from '../..'
 
 interface ToggleGroupProps {
   leftText: string
@@ -43,14 +43,14 @@ const BUTTON_GROUP_STYLES = css`
   width: fit-content;
 
   button {
-    height: 28px;
+    height: 1.75rem;
     width: auto;
-    font-weight: 400;
+    font-weight: ${TYPOGRAPHY.fontWeightRegular};
     font-size: 11px;
     line-height: 14px;
     box-shadow: none;
-    padding-top: 6px;
-    padding-bottom: 8px;
+    padding-top: ${SPACING.spacing6};
+    padding-bottom: ${SPACING.spacing8};
     &:focus {
       box-shadow: none;
       color: ${COLORS.white};
