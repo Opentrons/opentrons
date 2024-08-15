@@ -1,6 +1,6 @@
 """Heater-Shaker Module sub-state."""
 from dataclasses import dataclass
-from typing import NewType, Optional, List
+from typing import NewType, Optional, Dict
 
 from opentrons.protocol_engine.errors import CannotPerformModuleAction
 
@@ -16,7 +16,7 @@ class AbsorbanceReaderSubState:
     configured: bool
     measured: bool
     is_lid_on: bool
-    data: Optional[List[float]]
+    data: Optional[Dict[str, float]]
     configured_wavelength: Optional[int]
     lid_id: Optional[str]
 
