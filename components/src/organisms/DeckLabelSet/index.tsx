@@ -5,8 +5,9 @@ import { BORDERS, COLORS } from '../../helix-design-system'
 import { DIRECTION_COLUMN, FLEX_MAX_CONTENT } from '../../styles'
 
 import { DeckLabel } from '../../molecules/DeckLabel'
-import type { DeckLabelProps } from '../../molecules/DeckLabel'
 import { SPACING } from '../../ui-style-constants'
+
+import type { DeckLabelProps } from '../../molecules/DeckLabel'
 
 interface DeckLabelSetProps {
   children: React.ReactNode
@@ -17,7 +18,6 @@ export function DeckLabelSet({
   children,
   deckLabels,
 }: DeckLabelSetProps): JSX.Element {
-  console.log('deckLabels', deckLabels)
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <StyledFlex data-testid="DeckLabeSet">{children}</StyledFlex>

@@ -19,6 +19,7 @@ describe('DeckLabel', () => {
     props = {
       text: 'mock DeckLabel text',
       isSelected: false,
+      isLast: true,
     }
   })
 
@@ -31,6 +32,25 @@ describe('DeckLabel', () => {
     expect(deckLabel).toHaveStyle(`color: ${COLORS.blue50}`)
     expect(deckLabel).toHaveStyle(`border-right: 3px solid ${COLORS.blue50}`)
     expect(deckLabel).toHaveStyle(`border-bottom: 3px solid ${COLORS.blue50}`)
+    expect(deckLabel).toHaveStyle(`border-left: 3px solid ${COLORS.blue50}`)
+    expect(deckLabel).toHaveStyle(`background-color: ${COLORS.white}`)
+  })
+
+  it('should render text and styles isSelected - false not last', () => {
+    props = {
+      ...props,
+      isLast: false,
+    }
+    render(props)
+    screen.getByText('mock DeckLabel text')
+    const deckLabel = screen.getByTestId('DeckLabel_UnSelected')
+    expect(deckLabel).toHaveStyle(`padding: ${SPACING.spacing4}`)
+    expect(deckLabel).toHaveStyle(`width: ${FLEX_MAX_CONTENT}`)
+    expect(deckLabel).toHaveStyle(`color: ${COLORS.blue50}`)
+    expect(deckLabel).toHaveStyle(`border-right: 3px solid ${COLORS.blue50}`)
+    expect(deckLabel).not.toHaveStyle(
+      `border-bottom: 3px solid ${COLORS.blue50}`
+    )
     expect(deckLabel).toHaveStyle(`border-left: 3px solid ${COLORS.blue50}`)
     expect(deckLabel).toHaveStyle(`background-color: ${COLORS.white}`)
   })
