@@ -417,7 +417,6 @@
                     { "required": ["diameter", "xDimension"] },
                     { "required": ["diameter", "yDimension"] },
                     { "required": ["diameter", "depth"] }
-
                   ]
                 }
             }
