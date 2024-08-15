@@ -244,7 +244,7 @@ export function SelectModules(props: WizardTileProps): JSX.Element | null {
                           setValue('modules', updatedModules)
                         }}
                         header={getModuleDisplayName(module.model)}
-                        image={
+                        leftHeaderItem={
                           <ModuleDiagram
                             type={module.type}
                             model={module.model}

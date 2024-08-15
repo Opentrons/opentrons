@@ -92,7 +92,7 @@ export function SelectFixtures(props: WizardTileProps): JSX.Element | null {
                     )
                   }}
                   header={t(`${ae}`)}
-                  image={
+                  leftHeaderItem={
                     <AdditionalEquipmentDiagram additionalEquipment={ae} />
                   }
                 />

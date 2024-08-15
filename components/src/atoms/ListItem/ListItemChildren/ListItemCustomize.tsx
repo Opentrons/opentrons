@@ -5,35 +5,54 @@ import { Flex, Link } from '../../../primitives'
 import { SPACING, TYPOGRAPHY } from '../../../ui-style-constants'
 import { StyledText } from '../../StyledText'
 import { DropdownMenu } from '../../../molecules/DropdownMenu'
+import { Tag } from '../../Tag/index'
 import type { DropdownMenuProps } from '../../../molecules/DropdownMenu'
+import type { TagProps } from '../../Tag/index'
 interface ListItemCustomizeProps {
   header: string
-  image?: JSX.Element
-  label?: string
-  linkText?: string
+  //  this is either an image or an icon
+  leftHeaderItem?: JSX.Element
   onClick?: () => void
+  linkText?: string
+  //  these are the middle prop options
+  label?: string
   dropdown?: DropdownMenuProps
+  tag?: TagProps
 }
 
 export const ListItemCustomize = (
   props: ListItemCustomizeProps
 ): JSX.Element => {
-  const { header, image, onClick, label, linkText, dropdown } = props
+  const {
+    header,
+    leftHeaderItem,
+    onClick,
+    label,
+    linkText,
+    dropdown,
+    tag,
+  } = props
   return (
     <Flex width="100%" alignItems={ALIGN_CENTER} padding={SPACING.spacing12}>
       <Flex gridGap={SPACING.spacing8} width="50%" alignItems={ALIGN_CENTER}>
-        {image != null ? <Flex size="3.75rem">{image}</Flex> : null}
+        {leftHeaderItem != null ? (
+          <Flex size="3.75rem">{leftHeaderItem}</Flex>
+        ) : null}
         <StyledText desktopStyle="bodyDefaultSemiBold">{header}</StyledText>
       </Flex>
       <Flex
         width={onClick != null && linkText != null ? '40%' : '50%'}
         gridGap={SPACING.spacing8}
         alignItems={ALIGN_CENTER}
+        justifyContent="center"
       >
-        <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
-          {label}
-        </StyledText>
+        {label != null ? (
+          <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
+            {label}
+          </StyledText>
+        ) : null}
         {dropdown != null ? <DropdownMenu {...dropdown} /> : null}
+        {tag != null ? <Tag {...tag} /> : null}
       </Flex>
       {onClick != null && linkText != null ? (
         <Flex width="10%" textDecoration={TYPOGRAPHY.textDecorationUnderline}>

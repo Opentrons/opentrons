@@ -4,10 +4,9 @@ import { SPACING, VIEWPORT } from '../../ui-style-constants'
 import { DIRECTION_COLUMN } from '../../styles'
 import { Flex } from '../../primitives'
 import { LegacyStyledText } from '../StyledText'
-import { ListItemDescriptor, ListItemCustomize } from './ListItemChildren'
-import { ListItem as ListItemComponent } from './index'
-import sampleImg from '../../images/labware/measurement-guide/images/depth/depth-plate-v@3x.png'
-
+import { ListItemDescriptor } from './ListItemChildren/ListItemDescriptor'
+import { ListItem as ListItemComponent, ListItemCustomize } from '.'
+import exampleImage from '../../images/labware/measurement-guide/images/spacing/spacing-well-rectangular@3x.png'
 import type { Meta, StoryObj } from '@storybook/react'
 import type { DropdownMenuProps } from '../../molecules'
 
@@ -73,28 +72,26 @@ export const ListItemDescriptorMini: Story = {
     ),
   },
 }
-
-const exampleDropDown: DropdownMenuProps = {
-  dropdownType: 'neutral',
-  onClick: () => {},
-  currentOption: { name: 'option 1', value: '1' },
+const dropdownProps: DropdownMenuProps = {
   filterOptions: [
-    { name: 'option 1', value: '1' },
-    { name: 'option 2', value: '2' },
+    { name: '1', value: '1' },
+    { name: '2', value: '2' },
   ],
+  onClick: () => {},
+  currentOption: { name: '1', value: '1' },
+  dropdownType: 'neutral',
 }
-
-export const ListItemCustomizeDefault: Story = {
+export const ListItemCustomizeImage: Story = {
   args: {
     type: 'noActive',
     children: (
       <ListItemCustomize
         header="Header"
-        onClick={() => {}}
-        dropdown={exampleDropDown}
+        leftHeaderItem={<img width="60px" height="60px" src={exampleImage} />}
+        linkText="Link text"
         label="Label"
-        image={<img src={sampleImg} height="60px" width="60px" />}
-        linkText="Text"
+        dropdown={dropdownProps}
+        onClick={() => {}}
       />
     ),
   },
