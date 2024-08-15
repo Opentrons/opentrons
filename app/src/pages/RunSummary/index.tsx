@@ -172,8 +172,6 @@ export function RunSummary(): JSX.Element {
     ((runRecord?.data.errors != null && runRecord?.data.errors.length > 0) ||
       (commandErrorList != null && commandErrorList?.data.length > 0))
 
-  console.log('=>(index.tsx:181) runStatus', runStatus)
-
   let headerText: string | null = null
   if (runStatus === RUN_STATUS_SUCCEEDED) {
     headerText =
