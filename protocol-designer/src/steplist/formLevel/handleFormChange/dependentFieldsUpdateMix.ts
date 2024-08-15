@@ -118,7 +118,7 @@ const updatePatchOnPipetteChannelChange = (
       const labwareDef = labwareEntities[labwareId].def
       update = {
         wells: getAllWellsFromPrimaryWells(
-          appliedPatch.wells,
+          appliedPatch.wells as string[],
           labwareDef,
           channels
         ),

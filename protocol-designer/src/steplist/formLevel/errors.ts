@@ -255,7 +255,10 @@ export const volumeTooHigh = (fields: HydratedFormData): FormError | null => {
   const { pipette, tipRack } = fields
   const volume = Number(fields.volume)
 
-  const pipetteCapacity = getPipetteCapacity(pipette, tipRack)
+  const pipetteCapacity = getPipetteCapacity(
+    pipette as PipetteEntity,
+    tipRack as string
+  )
   if (
     !Number.isNaN(volume) &&
     !Number.isNaN(pipetteCapacity) &&

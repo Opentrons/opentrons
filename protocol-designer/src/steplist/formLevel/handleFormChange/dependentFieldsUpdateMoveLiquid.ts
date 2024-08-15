@@ -281,7 +281,7 @@ const clampAspirateAirGapVolume = (
     const minAirGapVolume = 0 // NOTE: a form level warning will occur if the air gap volume is below the pipette min volume
 
     const maxAirGapVolume =
-      getPipetteCapacity(pipetteEntity, tipRack) - minPipetteVolume
+      getPipetteCapacity(pipetteEntity, tipRack as string) - minPipetteVolume
     const clampedAirGapVolume = clamp(
       Number(patchedAspirateAirgapVolume),
       minAirGapVolume,
