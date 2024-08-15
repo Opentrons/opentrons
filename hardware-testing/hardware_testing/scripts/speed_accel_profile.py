@@ -11,13 +11,13 @@ from abr_testing.automation import jira_tool  # type: ignore[import]
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons_shared_data.errors.exceptions import PositionUnknownError
 
-from hardware_testing.opentrons_api.types import (  # type: ignore[import]
+from hardware_testing.opentrons_api.types import (
     GantryLoad,
     OT3Mount,
     Axis,
     Point,
 )
-from hardware_testing.opentrons_api.helpers_ot3 import (  # type: ignore[import]
+from hardware_testing.opentrons_api.helpers_ot3 import (
     build_async_ot3_hardware_api,
     GantryLoadSettings,
     set_gantry_load_per_axis_settings_ot3,
