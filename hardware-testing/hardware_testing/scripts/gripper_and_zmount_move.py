@@ -7,7 +7,7 @@ import csv
 import requests
 import os
 import json
-from abr_testing.automation import jira_tool # type: ignore[import]
+from abr_testing.automation import jira_tool  # type: ignore[import]
 from opentrons_shared_data.errors.exceptions import (
     StallOrCollisionDetectedError,
     PythonException,
@@ -267,4 +267,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
