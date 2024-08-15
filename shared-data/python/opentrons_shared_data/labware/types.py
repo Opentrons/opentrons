@@ -151,7 +151,7 @@ class InnerWellGeometry(TypedDict):
     bottomShape: BottomShape
 
 
-class _RequiredLabwareDefinition(TypedDict):
+class LabwareDefinition(TypedDict):
     schemaVersion: Literal[2]
     version: int
     namespace: str
@@ -163,13 +163,10 @@ class _RequiredLabwareDefinition(TypedDict):
     dimensions: LabwareDimensions
     wells: Dict[str, WellDefinition]
     groups: List[WellGroup]
-
-
-class LabwareDefinition(_RequiredLabwareDefinition, total=False):
-    stackingOffsetWithLabware: Dict[str, NamedOffset]
-    stackingOffsetWithModule: Dict[str, NamedOffset]
-    allowedRoles: List[LabwareRoles]
-    gripperOffsets: Dict[str, GripperOffsets]
-    gripForce: float
-    gripHeightFromLabwareBottom: float
+    stackingOffsetWithLabware: NotRequired[Dict[str, NamedOffset]]
+    stackingOffsetWithModule: NotRequired[Dict[str, NamedOffset]]
+    allowedRoles: NotRequired[List[LabwareRoles]]
+    gripperOffsets: NotRequired[Dict[str, GripperOffsets]]
+    gripForce: NotRequired[float]
+    gripHeightFromLabwareBottom: NotRequired[float]
     innerLabwareGeometry: NotRequired[Dict[str, InnerWellGeometry]]
