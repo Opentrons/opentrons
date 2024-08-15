@@ -22,6 +22,7 @@ export function useCloseCurrentRun(): {
     options?: UseDismissCurrentRunMutationOptions
   ): void => {
     if (currentRunId != null) {
+      console.log('dismissing current run with id: ', currentRunId)
       dismissCurrentRun(currentRunId, {
         ...options,
         onError: () => {

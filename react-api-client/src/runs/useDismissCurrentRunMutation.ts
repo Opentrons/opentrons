@@ -31,7 +31,6 @@ export function useDismissCurrentRunMutation(
   const mutation = useMutation<EmptyResponse, unknown, string>(
     (runId: string) =>
       dismissCurrentRun(host as HostConfig, runId).then(response => {
-        queryClient.removeQueries([host, 'runs', runId])
         queryClient.invalidateQueries([host, 'runs']).catch((e: Error) => {
           console.error(`error invalidating runs query: ${e.message}`)
         })

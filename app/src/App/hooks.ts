@@ -139,6 +139,11 @@ export function useCurrentRunRoute(): string | null {
   const hasRunStarted = runActions?.some(
     action => action.actionType === RUN_ACTION_TYPE_PLAY
   )
+  console.group('top level redirects')
+
+  console.log({currentRunId})
+  console.log({runId})
+  console.groupEnd()
   if (
     runStatus === RUN_STATUS_SUCCEEDED ||
     (runStatus === RUN_STATUS_STOPPED && hasRunStarted) ||
