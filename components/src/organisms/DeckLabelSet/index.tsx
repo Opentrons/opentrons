@@ -20,7 +20,7 @@ export function DeckLabelSet({
   console.log('deckLabels', deckLabels)
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
-      <StyledFlex>{children}</StyledFlex>
+      <StyledFlex data-testid="DeckLabeSet">{children}</StyledFlex>
       <LabelContainer>
         {deckLabels.length > 0
           ? deckLabels.map((deckLabel, index) => (
