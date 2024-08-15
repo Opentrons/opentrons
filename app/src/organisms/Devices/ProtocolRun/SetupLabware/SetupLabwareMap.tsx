@@ -1,7 +1,6 @@
 import * as React from 'react'
 import map from 'lodash/map'
 
-import { parseInitialLoadedLabwareByAdapter } from '@opentrons/api-client'
 import {
   BaseDeck,
   Flex,
@@ -13,6 +12,7 @@ import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
   getSimplestDeckConfigForProtocol,
+  parseInitialLoadedLabwareByAdapter,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 

@@ -30,8 +30,8 @@ import {
   getLabwareDisplayName,
   getModuleDisplayName,
   HEATERSHAKER_MODULE_TYPE,
+  parseInitialLoadedLabwareByAdapter,
 } from '@opentrons/shared-data'
-import { parseInitialLoadedLabwareByAdapter } from '@opentrons/api-client'
 import {
   useCreateLiveCommandMutation,
   useModulesQuery,

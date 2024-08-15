@@ -1,10 +1,10 @@
 import * as React from 'react'
 
-import { parseInitialLoadedLabwareByAdapter } from '@opentrons/api-client'
 import {
   FLEX_ROBOT_TYPE,
   getLabwareDisplayName,
   getSimplestDeckConfigForProtocol,
+  parseInitialLoadedLabwareByAdapter,
 } from '@opentrons/shared-data'
 
 import { BaseDeck } from '../BaseDeck'

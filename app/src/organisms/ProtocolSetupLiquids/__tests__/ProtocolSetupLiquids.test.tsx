@@ -1,9 +1,12 @@
 import * as React from 'react'
 import { describe, it, beforeEach, vi } from 'vitest'
+import { screen, fireEvent } from '@testing-library/react'
+
 import {
-  parseLiquidsInLoadOrder,
   parseLabwareInfoByLiquidId,
-} from '@opentrons/api-client'
+  parseLiquidsInLoadOrder,
+} from '@opentrons/shared-data'
+
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
@@ -16,14 +19,21 @@ import {
   MOCK_PROTOCOL_ANALYSIS,
 } from '../fixtures'
 import { ProtocolSetupLiquids } from '..'
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
-import { screen, fireEvent } from '@testing-library/react'
+
+import type * as SharedData from '@opentrons/shared-data'
 
 vi.mock('../../Devices/ProtocolRun/SetupLiquids/utils')
 vi.mock('../../../atoms/buttons')
 vi.mock('../LiquidDetails')
 vi.mock('../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
-vi.mock('@opentrons/api-client')
+vi.mock('@opentrons/shared-data', async importOriginal => {
+  const actualSharedData = await importOriginal<typeof SharedData>()
+  return {
+    ...actualSharedData,
+    parseLabwareInfoByLiquidId: vi.fn(),
+    parseLiquidsInLoadOrder: vi.fn(),
+  }
+})
 
 describe('ProtocolSetupLiquids', () => {
   let isConfirmed = false
@@ -52,7 +62,7 @@ describe('ProtocolSetupLiquids', () => {
       MOCK_LABWARE_INFO_BY_LIQUID_ID as any
     )
     vi.mocked(useMostRecentCompletedAnalysis).mockReturnValue(
-      MOCK_PROTOCOL_ANALYSIS as CompletedProtocolAnalysis
+      MOCK_PROTOCOL_ANALYSIS as SharedData.CompletedProtocolAnalysis
     )
     vi.mocked(LiquidDetails).mockReturnValue(<div>mock liquid details</div>)
     vi.mocked(getTotalVolumePerLiquidId).mockReturnValue(50)

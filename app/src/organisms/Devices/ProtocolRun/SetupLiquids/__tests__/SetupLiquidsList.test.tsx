@@ -4,9 +4,9 @@ import { when } from 'vitest-when'
 import { describe, it, beforeEach, vi, expect } from 'vitest'
 
 import {
-  parseLiquidsInLoadOrder,
   parseLabwareInfoByLiquidId,
-} from '@opentrons/api-client'
+  parseLiquidsInLoadOrder,
+} from '@opentrons/shared-data'
 
 import {
   nestedTextMatcher,
@@ -26,6 +26,7 @@ import { LiquidsLabwareDetailsModal } from '../LiquidsLabwareDetailsModal'
 import { useNotifyRunQuery } from '../../../../../resources/runs'
 
 import type { Mock } from 'vitest'
+import type * as SharedData from '@opentrons/shared-data'
 
 const MOCK_LIQUIDS_IN_LOAD_ORDER = [
   {
@@ -58,7 +59,14 @@ vi.mock('../utils')
 vi.mock('../../utils/getLocationInfoNames')
 vi.mock('../../../hooks')
 vi.mock('../LiquidsLabwareDetailsModal')
-vi.mock('@opentrons/api-client')
+vi.mock('@opentrons/shared-data', async importOriginal => {
+  const actualSharedData = await importOriginal<typeof SharedData>()
+  return {
+    ...actualSharedData,
+    parseLabwareInfoByLiquidId: vi.fn(),
+    parseLiquidsInLoadOrder: vi.fn(),
+  }
+})
 vi.mock('../../../../../redux/analytics')
 vi.mock('../../../../../resources/runs')
 

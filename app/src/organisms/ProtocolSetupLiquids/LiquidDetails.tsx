@@ -17,8 +17,12 @@ import { MICRO_LITERS } from '@opentrons/shared-data'
 import { LiquidsLabwareDetailsModal } from '../Devices/ProtocolRun/SetupLiquids/LiquidsLabwareDetailsModal'
 import { getLocationInfoNames } from '../Devices/ProtocolRun/utils/getLocationInfoNames'
 import { getVolumePerWell } from '../Devices/ProtocolRun/SetupLiquids/utils'
-import type { RunTimeCommand } from '@opentrons/shared-data'
-import type { LabwareByLiquidId, ParsedLiquid } from '@opentrons/api-client'
+
+import type {
+  LabwareByLiquidId,
+  ParsedLiquid,
+  RunTimeCommand,
+} from '@opentrons/shared-data'
 
 const Table = styled('table')`
   table-layout: ${SPACING.spacingAuto};
