@@ -152,13 +152,17 @@ export function RunSummary(): JSX.Element {
     localRobot?.serverHealth?.serialNumber ??
     null
 
-  const { data: commandErrorList } = useRunCommandErrors(runId, null, {
-    enabled:
-      runStatus != null &&
-      // @ts-expect-error runStatus expected to possibly not be terminal
-      RUN_STATUSES_TERMINAL.includes(runStatus) &&
-      isRunCurrent,
-  })
+  const { data: commandErrorList } = useRunCommandErrors(
+    runId,
+    { cursor: 0, pageLength: 100 },
+    {
+      enabled:
+        runStatus != null &&
+        // @ts-expect-error runStatus expected to possibly not be terminal
+        RUN_STATUSES_TERMINAL.includes(runStatus) &&
+        isRunCurrent,
+    }
+  )
   // TODO(jh, 08-14-24): The backend never returns the "user cancelled a run" error and cancelledWithoutRecovery becomes unnecessary.
   const cancelledWithoutRecovery =
     !enteredER && runStatus === RUN_STATUS_STOPPED
