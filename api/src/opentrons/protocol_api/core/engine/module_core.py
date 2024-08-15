@@ -545,10 +545,12 @@ class AbsorbanceReaderCore(ModuleCore, AbstractAbsorbanceReaderCore):
                     moduleId=self.module_id, sampleWavelength=self._initialized_value
                 )
             )
-        read_result = self._engine_client.state.modules.get_absorbance_reader_substate(
-            self.module_id
-        ).data
         if not self._engine_client.state.config.use_virtual_modules:
+            read_result = (
+                self._engine_client.state.modules.get_absorbance_reader_substate(
+                    self.module_id
+                ).data
+            )
             if read_result is not None:
                 return read_result
             raise CannotPerformModuleAction(
