@@ -56,7 +56,7 @@ The :py:obj:`.CSVParameter.file` parameter provides a `file handler object <http
 
 The :py:obj:`.CSVParameter.contents` parameter returns the entire contents of the CSV file as a single string. You then need to parse the data yourself to extract the information you need.
 
-The :py:meth:`.CSVParameter.parse_as_csv` method returns CSV data in a structured format. Specifically, it is a list of list of strings. This lets you access any "cell" of your tabular data by row and column index. This example parses a runtime parameter named ``csv_data``, stores the parsed data as ``parsed_csv``, and then accesses different portions of the data::
+The :py:meth:`.CSVParameter.parse_as_csv` method returns CSV data in a structured format. Specifically, it is a list of lists of strings. This lets you access any "cell" of your tabular data by row and column index. This example parses a runtime parameter named ``csv_data``, stores the parsed data as ``parsed_csv``, and then accesses different portions of the data::
 
     parsed_csv = protocol.params.csv_data
     parsed_csv[0]                   # first row (header, if present)
