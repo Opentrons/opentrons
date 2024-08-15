@@ -126,6 +126,7 @@ def make_module_view(
         module_offset_by_serial=module_offset_by_serial or {},
         additional_slots_occupied_by_module_id=additional_slots_occupied_by_module_id
         or {},
+        deck_fixed_labware=[],
     )
 
     return ModuleView(state=state)

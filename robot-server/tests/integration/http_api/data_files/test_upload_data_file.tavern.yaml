@@ -49,6 +49,7 @@ stages:
           id: !anystr
           name: "sample_record.csv"
           createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+
   - name: Get color_codes.csv file info
     request:
       url: '{ot2_server_base_url}/dataFiles/{data_file_id}'

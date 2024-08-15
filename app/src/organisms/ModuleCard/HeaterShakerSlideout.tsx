@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+
 import {
   getModuleDisplayName,
   CELSIUS,
@@ -11,12 +12,13 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  SPACING,
+  InputField,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
 import { Slideout } from '../../atoms/Slideout'
-import { InputField } from '../../atoms/InputField'
 import { SubmitPrimaryButton } from '../../atoms/buttons'
 
 import type { HeaterShakerModule } from '../../redux/modules/types'

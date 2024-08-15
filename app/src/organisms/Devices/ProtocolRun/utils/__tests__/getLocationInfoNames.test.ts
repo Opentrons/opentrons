@@ -6,6 +6,7 @@ import type { ModuleModel } from '@opentrons/shared-data'
 const ADAPTER_DISPLAY_NAME = 'Opentrons 96 Flat Bottom Adapter'
 const LABWARE_DISPLAY_NAME = 'Corning 24 Well Plate 3.4 mL Flat'
 const SLOT = '5'
+const SLOT_EXTENSION = 'C4'
 const MOCK_MODEL = 'heaterShakerModuleV1' as ModuleModel
 const ADAPTER_ID =
   'd9a85adf-d272-4edd-9aae-426ef5756fef:opentrons/opentrons_96_flat_bottom_adapter/1'
@@ -119,6 +120,34 @@ const MOCK_ADAPTER_COMMANDS = [
     },
   },
 ]
+const MOCK_ADAPTER_EXTENSION_COMMANDS = [
+  {
+    commandType: 'loadLabware',
+    params: {
+      location: {
+        addressableAreaName: SLOT_EXTENSION,
+      },
+    },
+    result: {
+      labwareId: ADAPTER_ID,
+      definition: {
+        metadata: { displayName: ADAPTER_DISPLAY_NAME },
+      },
+    },
+  },
+  {
+    commandType: 'loadLabware',
+    params: {
+      location: {
+        labwareId: ADAPTER_ID,
+      },
+    },
+    result: {
+      labwareId: LABWARE_ID,
+      definition: {},
+    },
+  },
+]
 
 vi.mock('@opentrons/shared-data')
 
@@ -151,6 +180,7 @@ describe('getLocationInfoNames', () => {
       labwareName: LABWARE_DISPLAY_NAME,
       moduleModel: MOCK_MODEL,
       adapterName: ADAPTER_DISPLAY_NAME,
+      adapterId: ADAPTER_ID,
     }
     expect(
       getLocationInfoNames(LABWARE_ID, MOCK_ADAPTER_MOD_COMMANDS as any)
@@ -161,9 +191,21 @@ describe('getLocationInfoNames', () => {
       slotName: SLOT,
       labwareName: LABWARE_DISPLAY_NAME,
       adapterName: ADAPTER_DISPLAY_NAME,
+      adapterId: ADAPTER_ID,
     }
     expect(
       getLocationInfoNames(LABWARE_ID, MOCK_ADAPTER_COMMANDS as any)
+    ).toEqual(expected)
+  })
+  it('returns the adapter, slot number if the labware is on an adapter on the deck extension slot', () => {
+    const expected = {
+      slotName: SLOT_EXTENSION,
+      labwareName: LABWARE_DISPLAY_NAME,
+      adapterName: ADAPTER_DISPLAY_NAME,
+      adapterId: ADAPTER_ID,
+    }
+    expect(
+      getLocationInfoNames(LABWARE_ID, MOCK_ADAPTER_EXTENSION_COMMANDS as any)
     ).toEqual(expected)
   })
 })

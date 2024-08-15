@@ -1,18 +1,20 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
+
 import {
-  Flex,
-  SPACING,
-  DIRECTION_COLUMN,
-  POSITION_FIXED,
-  COLORS,
   ALIGN_CENTER,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  InputField,
+  LargeButton,
+  POSITION_FIXED,
+  SPACING,
 } from '@opentrons/components'
+
 import { getTopPortalEl } from '../../../App/portal'
-import { LargeButton } from '../../../atoms/buttons'
 import { ChildNavigation } from '../../ChildNavigation'
-import { InputField } from '../../../atoms/InputField'
 import { ACTIONS } from '../constants'
 
 import type {
@@ -85,6 +87,7 @@ export function Mix(props: MixProps): JSX.Element {
           type: mixAction,
           mixSettings: undefined,
         })
+        onBack()
       } else {
         setCurrentStep(2)
       }
@@ -117,11 +120,21 @@ export function Mix(props: MixProps): JSX.Element {
         })
       : null
 
+  const repititionRange = { min: 1, max: 999 }
+  const repititionError =
+    mixReps != null &&
+    (mixReps < repititionRange.min || mixReps > repititionRange.max)
+      ? t(`value_out_of_range`, {
+          min: repititionRange.min,
+          max: repititionRange.max,
+        })
+      : null
+
   let buttonIsDisabled = false
   if (currentStep === 2) {
     buttonIsDisabled = mixVolume == null || volumeError != null
   } else if (currentStep === 3) {
-    buttonIsDisabled = mixReps == null
+    buttonIsDisabled = mixReps == null || repititionError != null
   }
 
   return createPortal(
@@ -218,6 +231,7 @@ export function Mix(props: MixProps): JSX.Element {
             <InputField
               type="number"
               value={mixReps}
+              error={repititionError}
               title={t('mix_repetitions')}
               readOnly
             />

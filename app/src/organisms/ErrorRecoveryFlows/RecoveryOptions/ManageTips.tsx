@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
-import head from 'lodash/head'
 
 import {
   DIRECTION_COLUMN,
@@ -60,7 +59,7 @@ export function BeginRemoval({
   currentRecoveryOptionUtils,
 }: RecoveryContentProps): JSX.Element | null {
   const { t } = useTranslation('error_recovery')
-  const { pipettesWithTip } = tipStatusUtils
+  const { aPipetteWithTip } = tipStatusUtils
   const {
     proceedNextStep,
     setRobotInMotion,
@@ -69,7 +68,7 @@ export function BeginRemoval({
   const { cancelRun } = recoveryCommands
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const { ROBOT_CANCELING, RETRY_NEW_TIPS } = RECOVERY_MAP
-  const mount = head(pipettesWithTip)?.mount
+  const mount = aPipetteWithTip?.mount
 
   const primaryOnClick = (): void => {
     void proceedNextStep()
@@ -132,7 +131,7 @@ export function BeginRemoval({
         primaryBtnOnClick={primaryOnClick}
         primaryBtnTextOverride={t('begin_removal')}
         secondaryBtnOnClick={secondaryOnClick}
-        secondaryBtnTextOverride={t('skip')}
+        secondaryBtnTextOverride={t('skip_and_home_pipette')}
         secondaryAsTertiary={true}
       />
     </RecoverySingleColumnContentWrapper>
@@ -155,9 +154,7 @@ function DropTipFlowsContainer(
   const { setTipStatusResolved } = tipStatusUtils
   const { cancelRun } = recoveryCommands
 
-  const { mount, specs } = head(
-    tipStatusUtils.pipettesWithTip
-  ) as PipetteWithTip // Safe as we have to have tips to get to this point in the flow.
+  const { mount, specs } = tipStatusUtils.aPipetteWithTip as PipetteWithTip // Safe as we have to have tips to get to this point in the flow.
 
   const onCloseFlow = (): void => {
     if (selectedRecoveryOption === RETRY_NEW_TIPS.ROUTE) {
@@ -203,6 +200,7 @@ export function useDropTipFlowUtils({
   subMapUtils,
   routeUpdateActions,
   recoveryMap,
+  failedPipetteInfo,
 }: RecoveryContentProps): FixitCommandTypeUtils {
   const { t } = useTranslation('error_recovery')
   const {
@@ -216,7 +214,7 @@ export function useDropTipFlowUtils({
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const { proceedToRouteAndStep } = routeUpdateActions
   const { updateSubMap, subMap } = subMapUtils
-  const failedCommandId = failedCommand?.id ?? '' // We should have a failed command here unless the run is not in AWAITING_RECOVERY.
+  const failedCommandId = failedCommand?.byRunRecord.id ?? '' // We should have a failed command here unless the run is not in AWAITING_RECOVERY.
 
   const buildTipDropCompleteBtn = (): string => {
     switch (selectedRecoveryOption) {
@@ -304,9 +302,17 @@ export function useDropTipFlowUtils({
     }
   }
 
+  const pipetteId =
+    failedCommand != null &&
+    'params' in failedCommand.byRunRecord &&
+    'pipetteId' in failedCommand.byRunRecord.params
+      ? failedCommand.byRunRecord.params.pipetteId
+      : null
+
   return {
     runId,
     failedCommandId,
+    pipetteId,
     copyOverrides: buildCopyOverrides(),
     errorOverrides: buildErrorOverrides(),
     buttonOverrides: buildButtonOverrides(),

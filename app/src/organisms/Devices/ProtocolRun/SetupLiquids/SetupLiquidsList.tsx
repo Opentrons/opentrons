@@ -10,17 +10,17 @@ import {
   ALIGN_CENTER,
   BORDERS,
   Box,
+  DeckInfoLabel,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
   JUSTIFY_CENTER,
   JUSTIFY_FLEX_START,
+  JUSTIFY_SPACE_BETWEEN,
   LiquidIcon,
   SIZE_AUTO,
   SPACING,
-  LegacyStyledText,
-  TYPOGRAPHY,
   StyledText,
 } from '@opentrons/components'
 import { getModuleDisplayName, MICRO_LITERS } from '@opentrons/shared-data'
@@ -29,18 +29,17 @@ import {
   ANALYTICS_EXPAND_LIQUID_SETUP_ROW,
   ANALYTICS_OPEN_LIQUID_LABWARE_DETAIL_MODAL,
 } from '../../../../redux/analytics'
+import { useIsFlex } from '../../hooks'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getLocationInfoNames } from '../utils/getLocationInfoNames'
 import { LiquidsLabwareDetailsModal } from './LiquidsLabwareDetailsModal'
-import {
-  getTotalVolumePerLiquidId,
-  getTotalVolumePerLiquidLabwarePair,
-} from './utils'
+import { getTotalVolumePerLiquidId, getVolumePerWell } from './utils'
 
 import type { LabwareByLiquidId } from '@opentrons/api-client'
 
 interface SetupLiquidsListProps {
   runId: string
+  robotName: string
 }
 
 const HIDE_SCROLLBAR = css`
@@ -60,8 +59,10 @@ export const CARD_OUTLINE_BORDER_STYLE = css`
 `
 
 export function SetupLiquidsList(props: SetupLiquidsListProps): JSX.Element {
-  const { runId } = props
+  const { runId, robotName } = props
   const protocolData = useMostRecentCompletedAnalysis(runId)
+  const { t } = useTranslation('protocol_setup')
+  const isFlex = useIsFlex(robotName)
 
   const liquidsInLoadOrder = parseLiquidsInLoadOrder(
     protocolData?.liquids ?? [],
@@ -77,6 +78,29 @@ export function SetupLiquidsList(props: SetupLiquidsListProps): JSX.Element {
       data-testid="SetupLiquidsList_ListView"
       gridGap={SPACING.spacing8}
     >
+      <Flex
+        flexDirection={DIRECTION_ROW}
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+        gridGap={SPACING.spacing16}
+        marginTop={SPACING.spacing16}
+        marginBottom={SPACING.spacing8}
+      >
+        <StyledText
+          desktopStyle="bodyDefaultRegular"
+          color={COLORS.grey60}
+          marginLeft={SPACING.spacing16}
+        >
+          {t('liquid_information')}
+        </StyledText>
+        <StyledText
+          desktopStyle="bodyDefaultRegular"
+          color={COLORS.grey60}
+          marginLeft="auto"
+          marginRight={SPACING.spacing16}
+        >
+          {t('total_liquid_volume')}
+        </StyledText>
+      </Flex>
       {liquidsInLoadOrder?.map(liquid => (
         <LiquidsListItem
           key={liquid.id}
@@ -85,6 +109,7 @@ export function SetupLiquidsList(props: SetupLiquidsListProps): JSX.Element {
           displayColor={liquid.displayColor}
           displayName={liquid.displayName}
           runId={props.runId}
+          isFlex={isFlex}
         />
       ))}
     </Flex>
@@ -97,10 +122,18 @@ interface LiquidsListItemProps {
   displayColor: string
   displayName: string
   runId: string
+  isFlex: boolean
 }
 
 export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
-  const { liquidId, description, displayColor, displayName, runId } = props
+  const {
+    liquidId,
+    description,
+    displayColor,
+    displayName,
+    runId,
+    isFlex,
+  } = props
   const { t } = useTranslation('protocol_setup')
   const [openItem, setOpenItem] = React.useState(false)
   const [liquidDetailsLabwareId, setLiquidDetailsLabwareId] = React.useState<
@@ -164,30 +197,30 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
             marginTop={SPACING.spacing16}
             marginBottom={SPACING.spacing8}
           >
-            <LegacyStyledText
-              as="label"
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            <StyledText
+              desktopStyle="bodyDefaultRegular"
+              color={COLORS.grey60}
               marginLeft={SPACING.spacing16}
               width="8.125rem"
             >
               {t('location')}
-            </LegacyStyledText>
-            <LegacyStyledText
-              as="label"
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            </StyledText>
+            <StyledText
+              desktopStyle="bodyDefaultRegular"
+              color={COLORS.grey60}
               marginRight={SPACING.spacing32}
             >
               {t('labware_name')}
-            </LegacyStyledText>
-            <LegacyStyledText
-              as="label"
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              width="4.25rem"
+            </StyledText>
+            <StyledText
+              desktopStyle="bodyDefaultRegular"
+              color={COLORS.grey60}
+              width="9rem"
               marginLeft="auto"
               marginRight={SPACING.spacing16}
             >
-              {t('volume')}
-            </LegacyStyledText>
+              {t('individiual_well_volume')}
+            </StyledText>
           </Flex>
           {labwareByLiquidId[liquidId].map((labware, index) => {
             const {
@@ -219,27 +252,22 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
                   justifyContent={JUSTIFY_FLEX_START}
                   gridGap={SPACING.spacing16}
                 >
-                  <Flex>
-                    <LegacyStyledText
-                      as="p"
-                      fontWeight={TYPOGRAPHY.fontWeightRegular}
-                      minWidth="8.125rem"
-                      alignSelf={ALIGN_CENTER}
-                    >
-                      {slotName}
-                    </LegacyStyledText>
+                  <Flex minWidth="8.125rem" alignSelf={ALIGN_CENTER}>
+                    {isFlex ? (
+                      <DeckInfoLabel deckLabel={slotName} />
+                    ) : (
+                      <StyledText desktopStyle="bodyDefaultRegular">
+                        {slotName}
+                      </StyledText>
+                    )}
                   </Flex>
                   <Flex flexDirection={DIRECTION_COLUMN}>
-                    <LegacyStyledText
-                      as="p"
-                      fontWeight={TYPOGRAPHY.fontWeightRegular}
-                    >
+                    <StyledText desktopStyle="bodyDefaultRegular">
                       {labwareName}
-                    </LegacyStyledText>
+                    </StyledText>
                     {adapterName != null ? (
-                      <LegacyStyledText
-                        as="p"
-                        fontWeight={TYPOGRAPHY.fontWeightRegular}
+                      <StyledText
+                        desktopStyle="bodyDefaultRegular"
                         color={COLORS.grey50}
                       >
                         {moduleModel != null
@@ -250,23 +278,27 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
                           : t('on_adapter', {
                               adapterName: adapterName,
                             })}
-                      </LegacyStyledText>
+                      </StyledText>
                     ) : null}
                   </Flex>
-                  <LegacyStyledText
-                    as="p"
-                    fontWeight={TYPOGRAPHY.fontWeightRegular}
-                    minWidth="4.25rem"
+                  <StyledText
+                    desktopStyle="bodyDefaultRegular"
+                    minWidth="8.75rem"
                     marginLeft={SPACING.spacingAuto}
                     alignSelf={ALIGN_CENTER}
                   >
-                    {getTotalVolumePerLiquidLabwarePair(
+                    {getVolumePerWell(
                       liquidId,
                       labware.labwareId,
                       labwareByLiquidId
-                    ).toFixed(1)}{' '}
-                    {MICRO_LITERS}
-                  </LegacyStyledText>
+                    ) == null
+                      ? t('variable_well_amount')
+                      : `${getVolumePerWell(
+                          liquidId,
+                          labware.labwareId,
+                          labwareByLiquidId
+                        )} ${MICRO_LITERS}`}
+                  </StyledText>
                 </Flex>
               </Box>
             )

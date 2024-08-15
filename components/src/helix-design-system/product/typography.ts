@@ -63,7 +63,7 @@ const fontFamilyHeadingSmall = fontFamily
 export const fontSizeHeadingSmallRegular = fontSizeHeadingSmall
 export const lineHeightHeadingSmallRegular = lineHeightHeadingSmall
 export const fontFamilyHeadingSmallRegular = fontFamilyHeadingSmall
-export const fontWeightHeadingSmallRegular = '600'
+export const fontWeightHeadingSmallRegular = '400'
 export const fontStyleHeadingSmallRegular = `${fontWeightHeadingSmallRegular} ${fontSizeHeadingSmallRegular}/${lineHeightHeadingSmallRegular} ${fontFamilyHeadingSmallRegular}`
 
 // Heading-Small-Bold

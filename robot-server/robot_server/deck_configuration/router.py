@@ -2,7 +2,7 @@
 
 
 from datetime import datetime
-from typing import Union
+from typing import Annotated, Union
 
 import fastapi
 from starlette.status import HTTP_422_UNPROCESSABLE_ENTITY
@@ -62,9 +62,11 @@ router = fastapi.APIRouter()
 )
 async def put_deck_configuration(  # noqa: D103
     request_body: RequestModel[models.DeckConfigurationRequest],
-    store: DeckConfigurationStore = fastapi.Depends(get_deck_configuration_store),
-    now: datetime = fastapi.Depends(get_current_time),
-    deck_definition: DeckDefinitionV5 = fastapi.Depends(get_deck_definition),
+    store: Annotated[
+        DeckConfigurationStore, fastapi.Depends(get_deck_configuration_store)
+    ],
+    now: Annotated[datetime, fastapi.Depends(get_current_time)],
+    deck_definition: Annotated[DeckDefinitionV5, fastapi.Depends(get_deck_definition)],
 ) -> PydanticResponse[
     Union[
         SimpleBody[models.DeckConfigurationResponse],
@@ -104,7 +106,9 @@ async def put_deck_configuration(  # noqa: D103
     },
 )
 async def get_deck_configuration(  # noqa: D103
-    store: DeckConfigurationStore = fastapi.Depends(get_deck_configuration_store),
+    store: Annotated[
+        DeckConfigurationStore, fastapi.Depends(get_deck_configuration_store)
+    ],
 ) -> PydanticResponse[SimpleBody[models.DeckConfigurationResponse]]:
     return await PydanticResponse.create(
         content=SimpleBody.construct(data=await store.get())

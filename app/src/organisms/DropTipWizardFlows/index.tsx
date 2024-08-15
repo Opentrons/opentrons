@@ -11,6 +11,7 @@ import type { PipetteModelSpecs, RobotType } from '@opentrons/shared-data'
 import type { Mount, PipetteData } from '@opentrons/api-client'
 import type { FixitCommandTypeUtils, IssuedCommandsType } from './types'
 import type { GetPipettesWithTipAttached } from './getPipettesWithTipAttached'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
 /** Provides the user toggle for rendering Drop Tip Wizard Flows.
  *
@@ -64,6 +65,8 @@ export function DropTipWizardFlows(
   )
 }
 
+const INSTRUMENTS_POLL_MS = 5000
+
 export interface PipetteWithTip {
   mount: Mount
   specs: PipetteModelSpecs
@@ -75,9 +78,9 @@ export interface TipAttachmentStatusResult {
    * NOTE: Use responsibly! This function can potentially (but not likely) iterate over the entire length of a protocol run.
    * */
   determineTipStatus: () => Promise<PipetteWithTip[]>
-  /** Whether tips are likely attached on *any* pipette. Typically called after determineTipStatus() */
+  /* Whether tips are likely attached on *any* pipette. Typically called after determineTipStatus() */
   areTipsAttached: boolean
-  /** Resets the cached pipettes with tip statuses to null.  */
+  /* Resets the cached pipettes with tip statuses to null.  */
   resetTipStatus: () => void
   /** Removes the first element from the tip attached cache if present.
    * @param {Function} onEmptyCache After removing the pipette from the cache, if the attached tip cache is empty, invoke this callback.
@@ -86,18 +89,23 @@ export interface TipAttachmentStatusResult {
   setTipStatusResolved: (
     onEmptyCache?: () => void,
     onTipsDetected?: () => void
-  ) => Promise<PipetteWithTip[]>
-  /** Relevant pipette information for those pipettes with tips attached. */
-  pipettesWithTip: PipetteWithTip[]
+  ) => Promise<PipetteWithTip>
+  /* Relevant pipette information for a pipette with a tip attached. If both pipettes have tips attached, return the left pipette. */
+  aPipetteWithTip: PipetteWithTip | null
 }
 
 // Returns various utilities for interacting with the cache of pipettes with tips attached.
 export function useTipAttachmentStatus(
-  params: GetPipettesWithTipAttached
+  params: Omit<GetPipettesWithTipAttached, 'attachedInstruments'>
 ): TipAttachmentStatusResult {
   const [pipettesWithTip, setPipettesWithTip] = React.useState<
     PipetteWithTip[]
   >([])
+  const { data: attachedInstruments } = useInstrumentsQuery({
+    refetchInterval: INSTRUMENTS_POLL_MS,
+  })
+
+  const aPipetteWithTip = head(pipettesWithTip) ?? null
 
   const areTipsAttached =
     pipettesWithTip.length != null && head(pipettesWithTip)?.specs != null
@@ -105,7 +113,10 @@ export function useTipAttachmentStatus(
   const determineTipStatus = React.useCallback((): Promise<
     PipetteWithTip[]
   > => {
-    return getPipettesWithTipAttached(params).then(pipettesWithTip => {
+    return getPipettesWithTipAttached({
+      ...params,
+      attachedInstruments: attachedInstruments ?? null,
+    }).then(pipettesWithTip => {
       const pipettesWithTipsData = pipettesWithTip.map(pipette => {
         const specs = getPipetteModelSpecs(pipette.instrumentModel)
         return {
@@ -130,8 +141,8 @@ export function useTipAttachmentStatus(
   const setTipStatusResolved = (
     onEmptyCache?: () => void,
     onTipsDetected?: () => void
-  ): Promise<PipetteWithTip[]> => {
-    return new Promise<PipetteWithTip[]>(resolve => {
+  ): Promise<PipetteWithTip> => {
+    return new Promise<PipetteWithTip>(resolve => {
       setPipettesWithTip(prevPipettesWithTip => {
         const newState = [...prevPipettesWithTip.slice(1)]
         if (newState.length === 0) {
@@ -140,7 +151,7 @@ export function useTipAttachmentStatus(
           onTipsDetected?.()
         }
 
-        resolve(newState)
+        resolve(newState[0])
         return newState
       })
     })
@@ -150,7 +161,7 @@ export function useTipAttachmentStatus(
     areTipsAttached,
     determineTipStatus,
     resetTipStatus,
-    pipettesWithTip,
+    aPipetteWithTip,
     setTipStatusResolved,
   }
 }

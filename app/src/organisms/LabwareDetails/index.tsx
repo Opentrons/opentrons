@@ -13,18 +13,18 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   Link,
   OVERFLOW_WRAP_ANYWHERE,
   SIZE_1,
   SPACING,
-  LegacyStyledText,
   TOOLTIP_TOP_START,
+  Tooltip,
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
 import { getUniqueWellProperties } from '@opentrons/shared-data'
 import { Slideout } from '../../atoms/Slideout'
-import { Tooltip } from '../../atoms/Tooltip'
 import { getWellLabel } from './helpers/labels'
 import { WellCount } from './WellCount'
 import { WellProperties } from './WellProperties'

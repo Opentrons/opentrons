@@ -8,13 +8,13 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING,
   LegacyStyledText,
+  RadioButton,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { IconButton } from '../../atoms/buttons/IconButton'
-import { RadioButton } from '../../atoms/buttons/RadioButton'
 
 import type { WellGroup } from '@opentrons/components'
 import type {

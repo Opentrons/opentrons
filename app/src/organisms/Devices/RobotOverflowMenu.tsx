@@ -5,28 +5,28 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 
 import {
-  Flex,
+  ALIGN_FLEX_END,
   BORDERS,
   COLORS,
-  POSITION_ABSOLUTE,
   DIRECTION_COLUMN,
+  Flex,
+  MenuItem,
+  OverflowBtn,
+  POSITION_ABSOLUTE,
   POSITION_RELATIVE,
-  ALIGN_FLEX_END,
+  Tooltip,
   TYPOGRAPHY,
   useHoverTooltip,
+  useMenuHandleClickOutside,
 } from '@opentrons/components'
 
 import { CONNECTABLE, removeRobot } from '../../redux/discovery'
 import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
-import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
-import { Tooltip } from '../../atoms/Tooltip'
 import { Divider } from '../../atoms/structure'
-import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { getTopPortalEl } from '../../App/portal'
 import { ChooseProtocolSlideout } from '../ChooseProtocolSlideout'
 import { useCurrentRunId } from '../../resources/runs'
 import { ConnectionTroubleshootingModal } from './ConnectionTroubleshootingModal'
-import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 import { useIsRobotBusy } from './hooks'
 
 import type { StyleProps } from '@opentrons/components'

@@ -2,7 +2,7 @@ import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { FormGroup, InputField } from '@opentrons/components'
+import { FormGroup, LegacyInputField } from '@opentrons/components'
 import { COLUMN } from '@opentrons/shared-data'
 import {
   actions as stepsActions,
@@ -80,7 +80,7 @@ export const WellSelectionField = (props: Props): JSX.Element => {
       : t('step_edit_form.wellSelectionLabel.wells')
   return (
     <FormGroup label={label} disabled={disabled} className={styles.small_field}>
-      <InputField
+      <LegacyInputField
         readOnly
         name={name}
         value={primaryWellCount ?? null}

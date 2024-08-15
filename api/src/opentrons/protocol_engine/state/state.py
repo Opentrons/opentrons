@@ -191,6 +191,7 @@ class StateStore(StateView, ActionHandler):
         )
         self._module_store = ModuleStore(
             config=config,
+            deck_fixed_labware=deck_fixed_labware,
             module_calibration_offsets=module_calibration_offsets,
         )
         self._liquid_store = LiquidStore()

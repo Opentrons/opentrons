@@ -300,6 +300,7 @@ type AreaType =
   | 'wasteChute'
   | 'fixedTrash'
   | 'stagingSlot'
+  | 'lidDock'
 
 export interface AddressableArea {
   id: AddressableAreaName

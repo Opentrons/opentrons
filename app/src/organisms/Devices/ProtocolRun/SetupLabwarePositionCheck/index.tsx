@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -7,18 +8,19 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_CENTER,
+  LegacyStyledText,
   PrimaryButton,
   SecondaryButton,
   SPACING,
-  LegacyStyledText,
   TOOLTIP_LEFT,
+  Tooltip,
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
 import { useProtocolQuery } from '@opentrons/react-api-client'
+
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useLPCSuccessToast } from '../../hooks/useLPCSuccessToast'
-import { Tooltip } from '../../../../atoms/Tooltip'
 import {
   useRobotType,
   useLPCDisabledReason,
@@ -32,7 +34,8 @@ import { useNotifyRunQuery } from '../../../../resources/runs'
 import type { LabwareOffset } from '@opentrons/api-client'
 
 interface SetupLabwarePositionCheckProps {
-  expandLabwareStep: () => void
+  offsetsConfirmed: boolean
+  setOffsetsConfirmed: (confirmed: boolean) => void
   robotName: string
   runId: string
 }
@@ -40,7 +43,7 @@ interface SetupLabwarePositionCheckProps {
 export function SetupLabwarePositionCheck(
   props: SetupLabwarePositionCheckProps
 ): JSX.Element {
-  const { robotName, runId, expandLabwareStep } = props
+  const { robotName, runId, setOffsetsConfirmed, offsetsConfirmed } = props
   const { t, i18n } = useTranslation('protocol_setup')
 
   const robotType = useRobotType(robotName)
@@ -75,7 +78,13 @@ export function SetupLabwarePositionCheck(
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const protocolData = robotProtocolAnalysis ?? storedProtocolAnalysis
-  const [targetProps, tooltipProps] = useHoverTooltip({
+  const [runLPCTargetProps, runLPCTooltipProps] = useHoverTooltip({
+    placement: TOOLTIP_LEFT,
+  })
+  const [
+    confirmOffsetsTargetProps,
+    confirmOffsetsTooltipProps,
+  ] = useHoverTooltip({
     placement: TOOLTIP_LEFT,
   })
 
@@ -114,6 +123,27 @@ export function SetupLabwarePositionCheck(
       )}
       <Flex justifyContent={JUSTIFY_CENTER} gridGap={SPACING.spacing8}>
         <SecondaryButton
+          onClick={() => {
+            setOffsetsConfirmed(true)
+          }}
+          id="LPC_setOffsetsConfirmed"
+          padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
+          {...confirmOffsetsTargetProps}
+          disabled={
+            offsetsConfirmed ||
+            lpcDisabledReason !== null ||
+            nonIdentityOffsets.length === 0
+          }
+        >
+          {t('confirm_offsets')}
+        </SecondaryButton>
+        {lpcDisabledReason != null || nonIdentityOffsets.length === 0 ? (
+          <Tooltip tooltipProps={confirmOffsetsTooltipProps}>
+            {lpcDisabledReason ??
+              t('run_labware_position_check_to_get_offsets')}
+          </Tooltip>
+        ) : null}
+        <PrimaryButton
           textTransform={TYPOGRAPHY.textTransformCapitalize}
           title={t('run_labware_position_check')}
           onClick={() => {
@@ -121,21 +151,16 @@ export function SetupLabwarePositionCheck(
             setIsShowingLPCSuccessToast(false)
           }}
           id="LabwareSetup_checkLabwarePositionsButton"
-          {...targetProps}
+          {...runLPCTargetProps}
           disabled={lpcDisabledReason !== null}
         >
           {t('run_labware_position_check')}
-        </SecondaryButton>
-        {lpcDisabledReason !== null ? (
-          <Tooltip tooltipProps={tooltipProps}>{lpcDisabledReason}</Tooltip>
-        ) : null}
-        <PrimaryButton
-          onClick={expandLabwareStep}
-          id="ModuleSetup_proceedToLabwareSetup"
-          padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
-        >
-          {t('proceed_to_labware_setup_step')}
         </PrimaryButton>
+        {lpcDisabledReason !== null ? (
+          <Tooltip tooltipProps={runLPCTooltipProps}>
+            {lpcDisabledReason}
+          </Tooltip>
+        ) : null}
       </Flex>
       {LPCWizard}
     </Flex>

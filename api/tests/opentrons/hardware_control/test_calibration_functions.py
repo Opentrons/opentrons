@@ -10,7 +10,7 @@ from opentrons.util.helpers import utc_now
 from opentrons.types import Mount, Point
 
 
-def test_migrate_affine_xy_to_attitude():
+def test_migrate_affine_xy_to_attitude() -> None:
     affine = [
         [1.0, 2.0, 3.0, 4.0],
         [5.0, 6.0, 7.0, 8.0],
@@ -24,7 +24,7 @@ def test_migrate_affine_xy_to_attitude():
     assert result == expected
 
 
-def test_save_calibration(ot_config_tempdir):
+def test_save_calibration() -> None:
     pathway = (
         config.get_opentrons_path("robot_calibration_dir") / "deck_calibration.json"
     )
@@ -47,7 +47,7 @@ def test_save_calibration(ot_config_tempdir):
     assert data == expected
 
 
-def test_load_calibration(ot_config_tempdir):
+def test_load_calibration() -> None:
     pathway = Path(config.get_opentrons_path("robot_calibration_dir"))
 
     data = {
@@ -58,11 +58,11 @@ def test_load_calibration(ot_config_tempdir):
     }
     calibration_storage.file_operators.save_to_file(pathway, "deck_calibration", data)
     obj = robot_calibration.load_attitude_matrix()
-    transform = [[1, 0, 1], [0, 1, -0.5], [0, 0, 1]]
+    transform = [[1.0, 0, 1], [0, 1, -0.5], [0.0, 0, 1]]
     assert np.allclose(obj.attitude, transform)
 
 
-def test_load_malformed_calibration(ot_config_tempdir):
+def test_load_malformed_calibration() -> None:
     pathway = Path(config.get_opentrons_path("robot_calibration_dir"))
     data = {
         "atsadasitude": [[1, 0, 1], [0, 1, -0.5], [0, 0, 1]],
@@ -75,14 +75,14 @@ def test_load_malformed_calibration(ot_config_tempdir):
     assert np.allclose(obj.attitude, [[1, 0, 0], [0, 1, 0], [0, 0, 1]])
 
 
-def test_load_json(ot_config_tempdir):
+def test_load_json() -> None:
     path = config.get_opentrons_path("robot_calibration_dir") / "deck_calibration.json"
     path.write_text("{")
     obj = robot_calibration.load_attitude_matrix()
     assert obj.attitude == [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
 
 
-def test_load_pipette_offset(ot_config_tempdir):
+def test_load_pipette_offset() -> None:
     pip_id = "fakePip"
     mount = Mount.LEFT
     offset = Point(1, 2, 3)
@@ -95,7 +95,7 @@ def test_load_pipette_offset(ot_config_tempdir):
     assert np.allclose(obj.offset, offset)
 
 
-def test_load_bad_pipette_offset(ot_config_tempdir):
+def test_load_bad_pipette_offset() -> None:
     path = config.get_opentrons_path("pipette_calibration_dir") / "left"
     path.mkdir(parents=True, exist_ok=True)
     calpath = path / "fakePip.json"

@@ -9,8 +9,10 @@ import type {
 export interface LocationInfoNames {
   slotName: string
   labwareName: string
+  labwareNickname?: string
   adapterName?: string
   moduleModel?: ModuleModel
+  adapterId?: string
 }
 
 export function getLocationInfoNames(
@@ -39,6 +41,7 @@ export function getLocationInfoNames(
     loadLabwareCommand.result?.definition != null
       ? getLabwareDisplayName(loadLabwareCommand.result?.definition)
       : ''
+  const labwareNickname = loadLabwareCommand.params.displayName
 
   const labwareLocation = loadLabwareCommand.params.location
 
@@ -79,8 +82,22 @@ export function getLocationInfoNames(
       return {
         slotName: loadedAdapterCommand?.params.location.slotName,
         labwareName,
+        labwareNickname,
         adapterName:
           loadedAdapterCommand?.result?.definition.metadata.displayName,
+        adapterId: loadedAdapterCommand?.result?.labwareId,
+      }
+    } else if (
+      loadedAdapterCommand?.params.location !== 'offDeck' &&
+      'addressableAreaName' in loadedAdapterCommand?.params.location
+    ) {
+      return {
+        slotName: loadedAdapterCommand?.params.location.addressableAreaName,
+        labwareName,
+        labwareNickname,
+        adapterName:
+          loadedAdapterCommand?.result?.definition.metadata.displayName,
+        adapterId: loadedAdapterCommand?.result?.labwareId,
       }
     } else if (
       loadedAdapterCommand?.params.location !== 'offDeck' &&
@@ -96,8 +113,10 @@ export function getLocationInfoNames(
         ? {
             slotName: loadModuleCommandUnderAdapter.params.location.slotName,
             labwareName,
+            labwareNickname,
             adapterName:
               loadedAdapterCommand.result?.definition.metadata.displayName,
+            adapterId: loadedAdapterCommand?.result?.labwareId,
             moduleModel: loadModuleCommandUnderAdapter.params.model,
           }
         : { slotName: '', labwareName }

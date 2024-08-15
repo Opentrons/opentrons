@@ -4,7 +4,7 @@ from decoy import Decoy
 
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocol_api import MAX_SUPPORTED_VERSION, AbsorbanceReaderContext
+from opentrons.protocol_api import AbsorbanceReaderContext
 from opentrons.protocol_api.core.common import ProtocolCore, AbsorbanceReaderCore
 from opentrons.protocol_api.core.core_map import LoadedCoreMap
 
@@ -36,7 +36,7 @@ def mock_broker(decoy: Decoy) -> LegacyBroker:
 @pytest.fixture
 def api_version() -> APIVersion:
     """Get an API version to apply to the interface."""
-    return MAX_SUPPORTED_VERSION
+    return APIVersion(2, 21)
 
 
 @pytest.fixture

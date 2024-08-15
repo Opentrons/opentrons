@@ -2,7 +2,11 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import cx from 'classnames'
-import { Tooltip, useHoverTooltip, TOOLTIP_FIXED } from '@opentrons/components'
+import {
+  LegacyTooltip,
+  useHoverTooltip,
+  TOOLTIP_FIXED,
+} from '@opentrons/components'
 import {
   getLabwareDisplayName,
   getModuleDisplayName,
@@ -76,13 +80,13 @@ export function MoveLabwareHeader(props: MoveLabwareHeaderProps): JSX.Element {
         <span>{t('new_location')}</span>
       </li>
 
-      <Tooltip {...sourceTooltipProps}>
+      <LegacyTooltip {...sourceTooltipProps}>
         <LabwareTooltipContents labwareNickname={sourceLabwareNickname} />
-      </Tooltip>
+      </LegacyTooltip>
 
-      <Tooltip {...destTooltipProps}>
+      <LegacyTooltip {...destTooltipProps}>
         <LabwareTooltipContents labwareNickname={destSlot} />
-      </Tooltip>
+      </LegacyTooltip>
 
       <PDListItem
         className={cx(

@@ -23,8 +23,14 @@ import {
 
 import { useDownloadRunLog } from '../hooks'
 
-import type { RunError } from '@opentrons/api-client'
+import type {
+  RunError,
+  RunCommandErrors,
+  RunStatus,
+} from '@opentrons/api-client'
 import type { ModalProps } from '@opentrons/components'
+import { RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
+import type { RunCommandError } from '@opentrons/shared-data'
 
 /**
  * This modal is for Desktop app
@@ -43,6 +49,8 @@ interface RunFailedModalProps {
   runId: string
   setShowRunFailedModal: (showRunFailedModal: boolean) => void
   highestPriorityError?: RunError | null
+  commandErrorList?: RunCommandErrors | null
+  runStatus: RunStatus | null
 }
 
 export function RunFailedModal({
@@ -50,11 +58,18 @@ export function RunFailedModal({
   runId,
   setShowRunFailedModal,
   highestPriorityError,
+  commandErrorList,
+  runStatus,
 }: RunFailedModalProps): JSX.Element | null {
   const { i18n, t } = useTranslation(['run_details', 'shared', 'branded'])
   const modalProps: ModalProps = {
-    type: 'error',
-    title: t('run_failed_modal_title'),
+    type: runStatus === RUN_STATUS_SUCCEEDED ? 'warning' : 'error',
+    title:
+      commandErrorList == null || commandErrorList?.data.length === 0
+        ? t('run_failed_modal_title')
+        : runStatus === RUN_STATUS_SUCCEEDED
+        ? t('warning_details')
+        : t('error_details'),
     onClose: () => {
       setShowRunFailedModal(false)
     },
@@ -64,7 +79,7 @@ export function RunFailedModal({
   }
   const { downloadRunLog } = useDownloadRunLog(robotName, runId)
 
-  if (highestPriorityError == null) return null
+  if (highestPriorityError == null && commandErrorList == null) return null
 
   const handleClick = (): void => {
     setShowRunFailedModal(false)
@@ -76,20 +91,62 @@ export function RunFailedModal({
     downloadRunLog()
   }
 
+  interface ErrorContentProps {
+    errors: RunCommandError[]
+    isSingleError: boolean
+  }
+  const ErrorContent = ({
+    errors,
+    isSingleError,
+  }: ErrorContentProps): JSX.Element => {
+    return (
+      <>
+        <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          {isSingleError
+            ? t('error_info', {
+                errorType: errors[0].errorType,
+                errorCode: errors[0].errorCode,
+              })
+            : runStatus === RUN_STATUS_SUCCEEDED
+            ? t(errors.length > 1 ? 'no_of_warnings' : 'no_of_warning', {
+                count: errors.length,
+              })
+            : t(errors.length > 1 ? 'no_of_errors' : 'no_of_error', {
+                count: errors.length,
+              })}
+        </LegacyStyledText>
+        <Flex css={ERROR_MESSAGE_STYLE}>
+          {' '}
+          {errors.map((error, index) => (
+            <LegacyStyledText
+              as="p"
+              textAlign={TYPOGRAPHY.textAlignLeft}
+              key={index}
+            >
+              {' '}
+              {isSingleError
+                ? error.detail
+                : `${error.errorCode}: ${error.detail}`}
+            </LegacyStyledText>
+          ))}
+        </Flex>
+      </>
+    )
+  }
+
   return (
     <Modal {...modalProps}>
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-          {t('error_info', {
-            errorType: highestPriorityError.errorType,
-            errorCode: highestPriorityError.errorCode,
-          })}
-        </LegacyStyledText>
-        <Flex css={ERROR_MESSAGE_STYLE}>
-          <LegacyStyledText as="p" textAlign={TYPOGRAPHY.textAlignLeft}>
-            {highestPriorityError.detail}
-          </LegacyStyledText>
-        </Flex>
+        <ErrorContent
+          errors={
+            highestPriorityError
+              ? [highestPriorityError]
+              : commandErrorList?.data && commandErrorList?.data.length > 0
+              ? commandErrorList?.data
+              : []
+          }
+          isSingleError={!!highestPriorityError}
+        />
         <LegacyStyledText as="p">
           {t('branded:run_failed_modal_description_desktop')}
         </LegacyStyledText>

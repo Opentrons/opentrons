@@ -115,7 +115,10 @@ class LoadLabwareImplementation(
 
         if isinstance(params.location, AddressableAreaLocation):
             area_name = params.location.addressableAreaName
-            if not fixture_validation.is_deck_slot(params.location.addressableAreaName):
+            if not (
+                fixture_validation.is_deck_slot(params.location.addressableAreaName)
+                or fixture_validation.is_abs_reader(params.location.addressableAreaName)
+            ):
                 raise LabwareIsNotAllowedInLocationError(
                     f"Cannot load {params.loadName} onto addressable area {area_name}"
                 )

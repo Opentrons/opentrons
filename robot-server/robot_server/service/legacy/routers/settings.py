@@ -1,7 +1,7 @@
 import aiohttp
 import logging
 from dataclasses import asdict
-from typing import cast, Any, Dict, List, Optional, Union
+from typing import cast, Annotated, Any, Dict, List, Optional, Union
 from starlette import status
 from fastapi import APIRouter, Depends
 
@@ -87,8 +87,8 @@ async def set_oem_mode_request(enable):
 )
 async def post_settings(
     update: AdvancedSettingRequest,
-    hardware: HardwareControlAPI = Depends(get_hardware),
-    robot_type: RobotTypeEnum = Depends(get_robot_type_enum),
+    hardware: Annotated[HardwareControlAPI, Depends(get_hardware)],
+    robot_type: Annotated[RobotTypeEnum, Depends(get_robot_type_enum)],
 ) -> AdvancedSettingsResponse:
     """Update advanced setting (feature flag)"""
     try:
@@ -121,7 +121,7 @@ async def post_settings(
     response_model_exclude_unset=True,
 )
 async def get_settings(
-    robot_type: RobotTypeEnum = Depends(get_robot_type_enum),
+    robot_type: Annotated[RobotTypeEnum, Depends(get_robot_type_enum)],
 ) -> AdvancedSettingsResponse:
     """Get advanced setting (feature flags)"""
     return _create_settings_response(robot_type)
@@ -163,7 +163,7 @@ def _create_settings_response(robot_type: RobotTypeEnum) -> AdvancedSettingsResp
     },
 )
 async def post_log_level_local(
-    log_level: LogLevel, hardware: HardwareControlAPI = Depends(get_hardware)
+    log_level: LogLevel, hardware: Annotated[HardwareControlAPI, Depends(get_hardware)]
 ) -> V1BasicResponse:
     """Update local log level"""
     level = log_level.log_level
@@ -209,7 +209,7 @@ async def post_log_level_upstream(log_level: LogLevel) -> V1BasicResponse:
     response_model=FactoryResetOptions,
 )
 async def get_settings_reset_options(
-    robot_type: RobotTypeEnum = Depends(get_robot_type_enum),
+    robot_type: Annotated[RobotTypeEnum, Depends(get_robot_type_enum)],
 ) -> FactoryResetOptions:
     reset_options = reset_util.reset_options(robot_type).items()
     return FactoryResetOptions(
@@ -238,11 +238,13 @@ async def get_settings_reset_options(
 )
 async def post_settings_reset_options(
     factory_reset_commands: Dict[reset_util.ResetOptionId, bool],
-    persistence_resetter: PersistenceResetter = Depends(get_persistence_resetter),
-    deck_configuration_store: Optional[DeckConfigurationStore] = Depends(
-        get_deck_configuration_store_failsafe
-    ),
-    robot_type: RobotTypeEnum = Depends(get_robot_type_enum),
+    persistence_resetter: Annotated[
+        PersistenceResetter, Depends(get_persistence_resetter)
+    ],
+    deck_configuration_store: Annotated[
+        Optional[DeckConfigurationStore], Depends(get_deck_configuration_store_failsafe)
+    ],
+    robot_type: Annotated[RobotTypeEnum, Depends(get_robot_type_enum)],
 ) -> V1BasicResponse:
     reset_options = reset_util.reset_options(robot_type)
     not_allowed_options = [
@@ -302,7 +304,7 @@ async def post_settings_reset_options(
     response_model=RobotConfigs,
 )
 async def get_robot_settings(
-    hardware: HardwareControlAPI = Depends(get_hardware),
+    hardware: Annotated[HardwareControlAPI, Depends(get_hardware)],
 ) -> RobotConfigs:
     return asdict(hardware.config)
 
@@ -315,7 +317,7 @@ async def get_robot_settings(
     response_model_exclude_unset=True,
 )
 async def get_pipette_settings(
-    hardware: API = Depends(get_ot2_hardware),
+    hardware: Annotated[API, Depends(get_ot2_hardware)],
 ) -> MultiPipetteSettings:
     res = {}
     attached_pipettes = hardware.attached_pipettes
@@ -346,7 +348,7 @@ async def get_pipette_settings(
     },
 )
 async def get_pipette_setting(
-    pipette_id: str, hardware: API = Depends(get_ot2_hardware)
+    pipette_id: str, hardware: Annotated[API, Depends(get_ot2_hardware)]
 ) -> PipetteSettings:
     attached_pipettes = hardware.attached_pipettes
     known_ids = mutable_configurations.known_pipettes(
@@ -376,7 +378,7 @@ async def get_pipette_setting(
 async def patch_pipette_setting(
     pipette_id: str,
     settings_update: PipetteSettingsUpdate,
-    hardware: None = Depends(get_ot2_hardware),
+    hardware: Annotated[None, Depends(get_ot2_hardware)],
 ) -> PipetteSettings:
     # Convert fields to dict of field name to value
     fields = settings_update.setting_fields or {}

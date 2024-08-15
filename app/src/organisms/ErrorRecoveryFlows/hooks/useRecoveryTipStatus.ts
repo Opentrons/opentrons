@@ -12,7 +12,6 @@ import type {
 
 interface UseRecoveryTipStatusProps {
   runId: string
-  isFlex: boolean
   attachedInstruments?: Instruments
   runRecord?: Run
 }
@@ -33,6 +32,7 @@ export function useRecoveryTipStatus(
   const tipAttachmentStatusUtils = useTipAttachmentStatus({
     ...props,
     host,
+    runRecord: props.runRecord ?? null,
   })
 
   const determineTipStatusWithLoading = (): Promise<PipetteWithTip[]> => {

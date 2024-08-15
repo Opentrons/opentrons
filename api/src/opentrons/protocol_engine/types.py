@@ -4,6 +4,7 @@ import re
 from datetime import datetime
 from enum import Enum
 from dataclasses import dataclass
+from pathlib import Path
 from pydantic import (
     BaseModel,
     Field,
@@ -796,6 +797,7 @@ class AreaType(Enum):
     TEMPERATURE = "temperatureModule"
     MAGNETICBLOCK = "magneticBlock"
     ABSORBANCE_READER = "absorbanceReader"
+    LID_DOCK = "lidDock"
 
 
 @dataclass(frozen=True)
@@ -1069,3 +1071,4 @@ PrimitiveRunTimeParamValuesType = Mapping[
 ]  # update value types as more RTP types are added
 
 CSVRunTimeParamFilesType = Mapping[StrictStr, StrictStr]
+CSVRuntimeParamPaths = Dict[str, Path]

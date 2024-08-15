@@ -13,10 +13,11 @@ import {
   Icon,
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
+  ListItem,
+  Modal,
   PrimaryButton,
   SPACING,
-  Modal,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -24,7 +25,6 @@ import { useAcknowledgeEstopDisengageMutation } from '@opentrons/react-api-clien
 
 import { getTopPortalEl } from '../../App/portal'
 import { Banner } from '../../atoms/Banner'
-import { ListItem } from '../../atoms/ListItem'
 import { SmallButton } from '../../atoms/buttons'
 import { OddModal } from '../../molecules/OddModal'
 import { getIsOnDevice } from '../../redux/config'
