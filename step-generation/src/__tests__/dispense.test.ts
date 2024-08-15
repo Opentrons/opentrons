@@ -54,6 +54,8 @@ describe('dispense', () => {
         flowRate: 6,
         xOffset: 0,
         yOffset: 0,
+        tipRack: 'tiprack1Id',
+        nozzles: null,
       }
     })
     it('dispense normally (with tip)', () => {
@@ -102,6 +104,8 @@ describe('dispense', () => {
           well: 'A1',
           xOffset: 0,
           yOffset: 0,
+          tipRack: 'tiprack1Id',
+          nozzles: null,
         },
         invariantContext,
         initialRobotState

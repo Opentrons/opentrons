@@ -6,7 +6,6 @@ import {
 } from '../../../../steplist/formLevel/handleFormChange/utils'
 import type {
   ChangeTipOptions,
-  LabwareEntities,
   PipetteEntities,
 } from '@opentrons/step-generation'
 import type { PathOption } from '../../../../form-types'
@@ -24,7 +23,6 @@ export interface ValuesForPath {
 export function getDisabledPathMap(
   values: ValuesForPath,
   pipetteEntities: PipetteEntities,
-  labwareEntities: LabwareEntities,
   t: any
 ): DisabledPathMap {
   const {
@@ -59,7 +57,7 @@ export function getDisabledPathMap(
   // transfer volume overwrites change tip disable reasoning
   const pipetteEntity = pipetteEntities[pipette]
   const pipetteCapacity =
-    pipetteEntity && getPipetteCapacity(pipetteEntity, labwareEntities, tipRack)
+    pipetteEntity && getPipetteCapacity(pipetteEntity, tipRack)
   const volume = Number(values.volume)
   const airGapChecked = aspirate_airGap_checkbox
   let airGapVolume = airGapChecked ? Number(values.aspirate_airGap_volume) : 0

@@ -1,4 +1,4 @@
-import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import { COLUMN, FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
 import {
@@ -12,9 +12,13 @@ import {
   getIsHeaterShakerEastWestMultiChannelPipette,
   getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
   uuid,
+  getIsSafePipetteMovement,
 } from '../../utils'
 import { COLUMN_4_SLOTS } from '../../constants'
-import type { CreateCommand } from '@opentrons/shared-data'
+import type {
+  CreateCommand,
+  NozzleConfigurationStyle,
+} from '@opentrons/shared-data'
 import type { AspirateParams } from '@opentrons/shared-data/protocol/types/schemaV3'
 import type { CommandCreator, CommandCreatorError } from '../../types'
 
@@ -22,6 +26,7 @@ export interface ExtendedAspirateParams extends AspirateParams {
   xOffset: number
   yOffset: number
   tipRack: string
+  nozzles: NozzleConfigurationStyle | null
 }
 /** Aspirate with given args. Requires tip. */
 export const aspirate: CommandCreator<ExtendedAspirateParams> = (
@@ -40,6 +45,7 @@ export const aspirate: CommandCreator<ExtendedAspirateParams> = (
     tipRack,
     xOffset,
     yOffset,
+    nozzles,
   } = args
   const actionName = 'aspirate'
   const labwareState = prevRobotState.labware
@@ -106,6 +112,25 @@ export const aspirate: CommandCreator<ExtendedAspirateParams> = (
         well,
       })
     )
+  }
+
+  const is96Channel =
+    invariantContext.pipetteEntities[args.pipette]?.spec.channels === 96
+
+  if (
+    is96Channel &&
+    nozzles === COLUMN &&
+    !getIsSafePipetteMovement(
+      prevRobotState,
+      invariantContext,
+      args.pipette,
+      args.labware,
+      args.tipRack,
+      { x: xOffset, y: yOffset, z: offsetFromBottomMm },
+      args.well
+    )
+  ) {
+    errors.push(errorCreators.possiblePipetteCollision())
   }
 
   if (

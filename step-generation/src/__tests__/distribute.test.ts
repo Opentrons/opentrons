@@ -1,6 +1,10 @@
 import { beforeEach, describe, it, expect } from 'vitest'
 import { FIXED_TRASH_ID } from '../constants'
-import { fixtureTiprack300ul, getLabwareDefURI } from '@opentrons/shared-data'
+import {
+  WASTE_CHUTE_CUTOUT,
+  fixtureTiprack300ul,
+  getLabwareDefURI,
+} from '@opentrons/shared-data'
 import {
   ASPIRATE_OFFSET_FROM_BOTTOM_MM,
   blowoutHelper,
@@ -1711,6 +1715,43 @@ describe('invalid input + state errors', () => {
     expect(res.errors[0]).toMatchObject({
       type: 'PIPETTE_DOES_NOT_EXIST',
     })
+  })
+})
+
+it('should return an error for the labware already being discarded in previous step', () => {
+  const mockWasteChuteId = 'mockWasteChuteId'
+  const wasteChuteInvariantContext = {
+    ...invariantContext,
+    additionalEquipmentEntities: {
+      ...invariantContext.additionalEquipmentEntities,
+      mockWasteChuteId: {
+        name: 'wasteChute',
+        id: mockWasteChuteId,
+        location: WASTE_CHUTE_CUTOUT,
+      },
+    },
+  } as InvariantContext
+
+  robotStateWithTip.labware = {
+    [SOURCE_LABWARE]: { slot: 'gripperWasteChute' },
+  }
+
+  const distributeArgs = {
+    ...mixinArgs,
+    sourceWell: 'A1',
+    destWells: ['A2', 'A3'],
+    changeTip: 'always',
+    volume: 100,
+  } as DistributeArgs
+
+  const result = distribute(
+    distributeArgs,
+    wasteChuteInvariantContext,
+    robotStateWithTip
+  )
+  expect(getErrorResult(result).errors).toHaveLength(1)
+  expect(getErrorResult(result).errors[0]).toMatchObject({
+    type: 'LABWARE_DISCARDED_IN_WASTE_CHUTE',
   })
 })
 

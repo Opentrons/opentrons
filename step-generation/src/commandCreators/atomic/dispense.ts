@@ -1,4 +1,4 @@
-import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import { COLUMN, FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import * as errorCreators from '../../errorCreators'
 import {
   modulePipetteCollision,
@@ -11,15 +11,21 @@ import {
   getIsHeaterShakerEastWestMultiChannelPipette,
   getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
   uuid,
+  getIsSafePipetteMovement,
 } from '../../utils'
 import { COLUMN_4_SLOTS } from '../../constants'
-import type { CreateCommand } from '@opentrons/shared-data'
+import type {
+  CreateCommand,
+  NozzleConfigurationStyle,
+} from '@opentrons/shared-data'
 import type { DispenseParams } from '@opentrons/shared-data/protocol/types/schemaV3'
 import type { CommandCreator, CommandCreatorError } from '../../types'
 
 export interface ExtendedDispenseParams extends DispenseParams {
   xOffset: number
   yOffset: number
+  tipRack: string
+  nozzles: NozzleConfigurationStyle | null
 }
 /** Dispense with given args. Requires tip. */
 export const dispense: CommandCreator<ExtendedDispenseParams> = (
@@ -37,6 +43,7 @@ export const dispense: CommandCreator<ExtendedDispenseParams> = (
     isAirGap,
     xOffset,
     yOffset,
+    nozzles,
   } = args
   const actionName = 'dispense'
   const labwareState = prevRobotState.labware
@@ -102,6 +109,25 @@ export const dispense: CommandCreator<ExtendedDispenseParams> = (
         errorCreators.pipettingIntoColumn4({ typeOfStep: actionName })
       )
     }
+  }
+
+  const is96Channel =
+    invariantContext.pipetteEntities[args.pipette]?.spec.channels === 96
+
+  if (
+    is96Channel &&
+    nozzles === COLUMN &&
+    !getIsSafePipetteMovement(
+      prevRobotState,
+      invariantContext,
+      args.pipette,
+      args.labware,
+      args.tipRack,
+      { x: xOffset, y: yOffset, z: offsetFromBottomMm },
+      args.well
+    )
+  ) {
+    errors.push(errorCreators.possiblePipetteCollision())
   }
 
   if (
