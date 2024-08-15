@@ -11,6 +11,11 @@ const meta: Meta<typeof DeckLabelComponent> = {
         type: 'boolean',
       },
     },
+    isLast: {
+      control: {
+        type: 'boolean',
+      },
+    },
   },
 }
 export default meta
@@ -21,5 +26,6 @@ export const DeckLabel: Story = {
   args: {
     text: 'Label',
     isSelected: false,
+    isLast: true,
   },
 }

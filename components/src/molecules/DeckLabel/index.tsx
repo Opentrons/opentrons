@@ -8,16 +8,18 @@ import { StyledText } from '../../atoms'
 
 import type { FlattenSimpleInterpolation } from 'styled-components'
 
-interface DeckLabelProps {
+export interface DeckLabelProps {
   text: string
   isSelected: boolean
   labelBorderRadius?: string
+  isLast?: boolean
 }
 
 export function DeckLabel({
   text,
   isSelected,
   labelBorderRadius,
+  isLast = false,
 }: DeckLabelProps): JSX.Element {
   return (
     <Flex
@@ -25,7 +27,7 @@ export function DeckLabel({
       css={
         isSelected
           ? DECK_LABEL_SELECTED_STYLE(labelBorderRadius)
-          : DECK_LABEL_UNSELECTED_STYLE(labelBorderRadius)
+          : DECK_LABEL_UNSELECTED_STYLE(labelBorderRadius, isLast)
       }
     >
       <StyledText
@@ -56,12 +58,14 @@ const DECK_LABEL_SELECTED_STYLE = (
 `
 
 const DECK_LABEL_UNSELECTED_STYLE = (
-  labelBorderRadius?: string
+  labelBorderRadius?: string,
+  isLast?: boolean
 ): FlattenSimpleInterpolation => css`
   ${DECK_LABEL_BASE_STYLE(labelBorderRadius)}
   color: ${COLORS.blue50};
   border-right: 3px solid ${COLORS.blue50};
-  border-bottom: 3px solid ${COLORS.blue50};
+  border-bottom: ${isLast ? `3px solid ${COLORS.blue50}` : undefined};
   border-left: 3px solid ${COLORS.blue50};
   background-color: ${COLORS.white};
+  border-radius: ${isLast ? labelBorderRadius : '0'};
 `
