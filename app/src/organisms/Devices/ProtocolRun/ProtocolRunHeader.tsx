@@ -254,7 +254,14 @@ export function ProtocolRunHeader({
     mount: aPipetteWithTip?.mount,
     robotType,
     onSkipAndHome: () => {
-      closeCurrentRun()
+      closeCurrentRun({
+        onSuccess: () => {
+          if (isQuickTransfer) {
+            deleteRun(runId)
+            navigate(`/devices/${robotName}`)
+          }
+        },
+      })
     },
   })
 
@@ -468,23 +475,6 @@ export function ProtocolRunHeader({
             isRunCurrent={isRunCurrent}
           />
         ) : null}
-        {mostRecentRunId === runId && showDropTipBanner && areTipsAttached ? (
-          <ProtocolDropTipBanner
-            onLaunchWizardClick={toggleDTWiz}
-            onCloseClick={() => {
-              resetTipStatus()
-              setShowDropTipBanner(false)
-              closeCurrentRun({
-                onSuccess: () => {
-                  if (isQuickTransfer) {
-                    deleteRun(runId)
-                    navigate(`/devices/${robotName}`)
-                  }
-                },
-              })
-            }}
-          />
-        ) : null}
         {showDTModal ? (
           <ProtocolDropTipModal
             onSkip={onDTModalSkip}
@@ -577,7 +567,14 @@ export function ProtocolRunHeader({
               } else {
                 void setTipStatusResolved(() => {
                   toggleDTWiz()
-                  closeCurrentRun()
+                  closeCurrentRun({
+                    onSuccess: () => {
+                      if (isQuickTransfer) {
+                        deleteRun(runId)
+                        navigate(`/devices/${robotName}`)
+                      }
+                    },
+                  })
                 }, toggleDTWiz)
               }
             }}
