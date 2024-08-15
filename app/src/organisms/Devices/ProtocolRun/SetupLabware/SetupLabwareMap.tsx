@@ -128,7 +128,7 @@ export function SetupLabwareMap({
 
   const labwareOnDeck = map(
     labwareRenderInfo,
-    ({ x, y, labwareDef, displayName, slotName }, labwareId) => {
+    ({ labwareDef, displayName, slotName }, labwareId) => {
       const labwareInAdapter = initialLoadedLabwareByAdapter[labwareId]
       //  only rendering the labware on top most layer so
       //  either the adapter or the labware are rendered but not both
@@ -199,7 +199,7 @@ export function SetupLabwareMap({
       {labwareStackDetailsLabwareId != null && (
         <LabwareStackModal
           labwareIdTop={labwareStackDetailsLabwareId}
-          runId={runId}
+          commands={commands}
           closeModal={() => {
             setLabwareStackDetailsLabwareId(null)
           }}

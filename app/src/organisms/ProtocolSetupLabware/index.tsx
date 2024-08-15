@@ -349,7 +349,7 @@ export function ProtocolSetupLabware({
         selectedLabwareIsTopOfStack ? (
           <LabwareStackModal
             labwareIdTop={selectedLabware?.id}
-            runId={runId}
+            commands={mostRecentAnalysis?.commands ?? null}
             closeModal={() => {
               setSelectedLabware(null)
               setShowLabwareDetailsModal(false)
