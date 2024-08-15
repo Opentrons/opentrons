@@ -6,6 +6,7 @@ import {
   Flex,
   SPACING,
   PrimaryButton,
+  StyledText,
 } from '@opentrons/components'
 import { useTrackEvent } from '../../redux/analytics'
 
@@ -15,14 +16,12 @@ const BUTTON_GROUP_STYLES = css`
   width: fit-content;
 
   button {
-    height: 28px;
+    height: auto;
     width: auto;
     font-weight: 400;
     font-size: 11px;
     line-height: 14px;
     box-shadow: none;
-    padding-top: 6px;
-    padding-bottom: 8px;
     &:focus {
       box-shadow: none;
       color: ${COLORS.white};
@@ -58,16 +57,14 @@ const BUTTON_GROUP_STYLES = css`
 `
 
 const ACTIVE_STYLE = css`
-  padding-left: ${SPACING.spacing8};
-  padding-right: ${SPACING.spacing8};
+  padding: ${SPACING.spacing8};
   background-color: ${COLORS.blue50};
   color: ${COLORS.white};
   pointer-events: none;
 `
 
 const DEFAULT_STYLE = css`
-  padding-left: ${SPACING.spacing8};
-  padding-right: ${SPACING.spacing8};
+  padding: ${SPACING.spacing8};
   background-color: ${COLORS.white};
   color: ${COLORS.black90};
   border: 1px ${COLORS.grey30} solid;
@@ -108,7 +105,7 @@ export const useToggleGroup = (
         onClick={handleLeftClick}
         data-testid="useToggleGroup_leftButton"
       >
-        {left}
+        <StyledText desktopStyle="bodyDefaultRegular">{left}</StyledText>
       </PrimaryButton>
       <PrimaryButton
         css={selectedValue === right ? ACTIVE_STYLE : DEFAULT_STYLE}
@@ -116,7 +113,7 @@ export const useToggleGroup = (
         onClick={handleRightClick}
         data-testid="useToggleGroup_rightButton"
       >
-        {right}
+        <StyledText desktopStyle="bodyDefaultRegular">{right}</StyledText>
       </PrimaryButton>
     </Flex>,
   ]

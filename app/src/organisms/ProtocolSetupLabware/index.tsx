@@ -29,6 +29,7 @@ import {
   getLabwareDefURI,
   getLabwareDisplayName,
   getModuleDisplayName,
+  getModuleType,
   HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { parseInitialLoadedLabwareByAdapter } from '@opentrons/api-client'
@@ -541,8 +542,6 @@ function RowLabware({
       ? matchedModule.attachedModuleMatch
       : null
 
-  const matchedModuleType = matchedModule?.attachedModuleMatch?.moduleType
-
   let slotName: string = ''
   let location: JSX.Element | string | null = null
   if (initialLocation === 'offDeck') {
@@ -555,11 +554,10 @@ function RowLabware({
   } else if ('addressableAreaName' in initialLocation) {
     slotName = initialLocation.addressableAreaName
     location = <DeckInfoLabel deckLabel={initialLocation.addressableAreaName} />
-  } else if (matchedModuleType != null && matchedModule?.slotName != null) {
-    slotName = matchedModule.slotName
+  } else if (labware.moduleLocation != null) {
     location = (
       <>
-        <DeckInfoLabel deckLabel={matchedModule?.slotName} />
+        <DeckInfoLabel deckLabel={labware.moduleLocation.slotName} />
       </>
     )
   } else if ('labwareId' in initialLocation) {
