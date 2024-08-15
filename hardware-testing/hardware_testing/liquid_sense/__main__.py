@@ -27,7 +27,6 @@ from hardware_testing.data import (
     get_testing_data_directory,
 )
 from opentrons_hardware.hardware_control.motion_planning import move_utils
-from opentrons_hardware.hardware_control import tool_sensors
 
 from opentrons.protocol_api import InstrumentContext, ProtocolContext
 from opentrons.protocol_engine.types import LabwareOffset

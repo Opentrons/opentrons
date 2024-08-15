@@ -180,6 +180,7 @@ def _load_scale(
     return recorder
 
 
+# flake8: noqa: C901
 def run(
     tip: int,
     run_args: RunArgs,

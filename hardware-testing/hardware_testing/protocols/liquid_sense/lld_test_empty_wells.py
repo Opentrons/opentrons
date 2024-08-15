@@ -160,7 +160,7 @@ def _write_line_to_google_sheet(
 ) -> None:
     try:
         google_sheet.batch_update_cells(line, "A", row, sheet_id)
-    except:
+    except Exception:
         ctx.comment("Google sheet not updated.")
 
 
