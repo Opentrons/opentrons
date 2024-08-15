@@ -110,7 +110,8 @@ def _setup(
             model=PipetteModelType(pip_model_list[0]),
             channels=PipetteChannelType(pipette.channels),
             version=PipetteVersionType(
-                major=int(pip_model_list[-1][-3]), minor=int(pip_model_list[-1][-1])
+                major=int(pip_model_list[-1][-3]),  # type: ignore[arg-type]
+                minor=int(pip_model_list[-1][-1]),  # type: ignore[arg-type]
             ),
         )
         # Writes details about test run to google sheet.
@@ -118,41 +119,36 @@ def _setup(
         lld_min_height = pip_def.lld_settings[tipVolume]["minHeight"]
 
         _write_line_to_csv(ctx, f"lld-min-height,{lld_min_height}")
-        header = [
+        header: List[List[str]] = [
             ["Run ID", "Pipette Name", "Tip Type", "Labware", "lld-min-height"],
-            [RUN_ID, pip_name, rack_name, LABWARE, lld_min_height],
+            [RUN_ID, pip_name, rack_name, LABWARE, str(lld_min_height)],
         ]
         try:
-            google_sheet, sheet_id, row = _set_up_google_sheet(ctx, header)
+            res = _set_up_google_sheet(ctx, header)
+            if res:
+                google_sheet, sheet_id, row = res
         except google_sheets_tool.google_interaction_error:
             ctx.comment("Did not connect to google sheet.")
-            google_sheet = None
-            sheet_id = None
-            row = None
     return pipette, rack, labware, dial, google_sheet, sheet_id, row
 
 
 def _set_up_google_sheet(
     ctx: ProtocolContext, header: List[List[str]]
-) -> Optional[Tuple[Any, str]]:
+) -> Optional[Tuple[google_sheets_tool.google_sheet, str, int]]:
     """Connect to google sheet using credentials file in jupyter notebook."""
     if ctx.is_simulating():
-        return
+        return None
     credentials_path = "/var/lib/jupyter/notebooks/abr.json"
-    try:
-        google_sheet = google_sheets_tool.google_sheet(
-            credentials_path, "Empty Well Testing", tab_number=0
-        )
-        sheet_id = google_sheet.create_worksheet(RUN_ID)  # type: ignore[union-attr]
-        google_sheet.batch_update_cells(header, "A", 1, sheet_id)
-        row = len(header[0])
-        google_sheet.update_row_index()
-        ctx.comment("Connected to the google sheet.")
-        return google_sheet, sheet_id, row
-    except:
-        ctx.comment(
-            "There are no google sheets credentials. Make sure credentials in jupyter notebook."
-        )
+    google_sheet = google_sheets_tool.google_sheet(
+        credentials_path, "Empty Well Testing", tab_number=0
+    )
+    sheet_id = google_sheet.create_worksheet(RUN_ID)  # type: ignore[union-attr]
+    assert sheet_id
+    google_sheet.batch_update_cells(header, "A", 1, sheet_id)
+    row = len(header[0])
+    google_sheet.update_row_index()
+    ctx.comment("Connected to the google sheet.")
+    return google_sheet, sheet_id, row
 
 
 def _write_line_to_google_sheet(
@@ -206,7 +202,7 @@ def _read_dial_indicator(
     ctx.delay(seconds=2)
     if ctx.is_simulating():
         return 0.0
-    dial_port = DIAL_PORT.read()
+    dial_port = DIAL_PORT.read()  # type: ignore[union-attr]
     pipette.move_to(target.move(Point(z=10)))
     return dial_port
 
@@ -239,9 +235,10 @@ def _get_tip_z_error(
     front_channel: bool = False,
 ) -> float:
     idx = 0 if not front_channel else 1
-    assert DIAL_POS_WITHOUT_TIP[idx] is not None
+    dial_baseline_for_this_channel = DIAL_POS_WITHOUT_TIP[idx]
+    assert dial_baseline_for_this_channel is not None
     new_val = _read_dial_indicator(ctx, pipette, dial, front_channel)
-    z_error = new_val - DIAL_POS_WITHOUT_TIP[idx]
+    z_error = new_val - dial_baseline_for_this_channel
     # NOTE: dial-indicators are upside-down, so we need to flip the values
     return z_error * -1.0
 
@@ -323,7 +320,7 @@ def _test_for_expected_liquid_state(
             _write_line_to_google_sheet(
                 ctx,
                 google_sheet,
-                trial_data_for_google_sheet,
+                trial_data_for_google_sheet,  # type: ignore[arg-type]
                 sheet_id,
                 row + trial_counter + 2,
             )
@@ -349,6 +346,6 @@ def run(ctx: ProtocolContext) -> None:
         trials=NUM_TRIALS,
         liquid_state=False,
         google_sheet=google_sheet,
-        sheet_id=sheet_id,
-        row=row,
+        sheet_id=sheet_id,  # type: ignore[arg-type]
+        row=row,  # type: ignore[arg-type]
     )
