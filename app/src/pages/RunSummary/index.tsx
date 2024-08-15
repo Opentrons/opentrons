@@ -245,8 +245,11 @@ export function RunSummary(): JSX.Element {
         robotType: FLEX_ROBOT_TYPE,
         isRunCurrent,
         onSkipAndHome: () => {
-          closeCurrentRun()
-          returnToDash()
+          closeCurrentRun({
+            onSuccess: () => {
+              returnToDash()
+            },
+          })
         },
       })
     } else if (isQuickTransfer) {
@@ -528,7 +531,7 @@ const RUN_AGAIN_CLICKED_STYLE = css`
 `
 
 const ButtonContainer = styled(Flex)`
-  align-self: stretch;
+  align-self: ${ALIGN_STRETCH};
   gap: ${SPACING.spacing16};
 `
 
