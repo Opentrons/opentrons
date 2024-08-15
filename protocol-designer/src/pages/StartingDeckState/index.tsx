@@ -71,6 +71,7 @@ export function StartingDeckState(): JSX.Element {
   const trash = Object.values(activeDeckSetup.additionalEquipmentOnDeck).find(
     ae => ae.name === 'trashBin'
   )
+
   const navigate = useNavigate()
 
   const addEquipment = (slotId: string): void => {
@@ -135,21 +136,14 @@ export function StartingDeckState(): JSX.Element {
           navigate('/overview')
         }}
       >
-        cancel
-      </PrimaryButton>
-      <PrimaryButton
-        onClick={() => {
-          navigate('/overview')
-        }}
-      >
-        save
+        exit
       </PrimaryButton>
       {zoomIn != null ? (
         //  TODO(ja, 8/6/24): still need to develop the zoomed in slot
         <LegacyStyledText>you zoomed in on the slot!</LegacyStyledText>
       ) : (
         <Flex
-          maxWidth={robotType === FLEX_ROBOT_TYPE ? '130vh' : '100vh'}
+          maxWidth={robotType === FLEX_ROBOT_TYPE ? '130vw' : '100vw'}
           width="100%"
           maxHeight="120vh"
         >
