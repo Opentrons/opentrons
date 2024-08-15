@@ -133,7 +133,7 @@ class RectangularCrossSection(TypedDict):
 
 class SphericalSegment(TypedDict):
     shape: Spherical
-    radius_of_curvature: float
+    radiusOfCurvature: float
     depth: float
 
 
