@@ -284,7 +284,7 @@ async def get_run_commands(
         runId: Requested run ID, from the URL
         cursor: Cursor index for the collection response.
         pageLength: Maximum number of items to return.
-        allCommands: If `true`, return all commands."
+        includeFixitCommands: If `true`, return all commands."
             " If `false`, only return safe commands.
         run_data_manager: Run data retrieval interface.
     """

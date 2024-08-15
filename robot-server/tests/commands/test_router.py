@@ -138,7 +138,9 @@ async def test_get_commands_list(
         )
     )
     decoy.when(
-        run_orchestrator.get_command_slice(cursor=1337, length=42, all_commands=True)
+        run_orchestrator.get_command_slice(
+            cursor=1337, length=42, include_fixit_commands=True
+        )
     ).then_return(
         CommandSlice(commands=[command_1, command_2], cursor=0, total_length=2)
     )

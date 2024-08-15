@@ -367,7 +367,11 @@ class RunDataManager:
         )
 
     def get_commands_slice(
-        self, run_id: str, cursor: Optional[int], length: int, include_fixit_commands: bool
+        self,
+        run_id: str,
+        cursor: Optional[int],
+        length: int,
+        include_fixit_commands: bool,
     ) -> CommandSlice:
         """Get a slice of run commands.
 
@@ -382,7 +386,9 @@ class RunDataManager:
         """
         if run_id == self._run_orchestrator_store.current_run_id:
             return self._run_orchestrator_store.get_command_slice(
-                cursor=cursor, length=length, include_fixit_commands=include_fixit_commands
+                cursor=cursor,
+                length=length,
+                include_fixit_commands=include_fixit_commands,
             )
 
         # Let exception propagate

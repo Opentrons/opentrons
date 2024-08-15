@@ -580,7 +580,7 @@ class CommandView(HasState[CommandState]):
         return self._state.command_history.get_all_commands()
 
     def get_slice(
-        self, cursor: Optional[int], length: int, all_commands: bool
+        self, cursor: Optional[int], length: int, include_fixit_commands: bool
     ) -> CommandSlice:
         """Get a subset of commands around a given cursor.
 
@@ -593,7 +593,7 @@ class CommandView(HasState[CommandState]):
                 CommandIntent.SETUP,
                 CommandIntent.FIXIT,
             ]
-            if all_commands
+            if include_fixit_commands
             else [CommandIntent.PROTOCOL, CommandIntent.SETUP]
         )
         running_command = self._state.command_history.get_running_command()

@@ -845,7 +845,7 @@ def test_get_commands_slice_from_db(
         mock_run_store.get_commands_slice(run_id="run_id", cursor=1, length=2)
     ).then_return(expected_command_slice)
     result = subject.get_commands_slice(
-        run_id="run_id", cursor=1, length=2, all_commands=True
+        run_id="run_id", cursor=1, length=2, include_fixit_commands=True
     )
 
     assert expected_command_slice == result
@@ -877,7 +877,7 @@ def test_get_commands_slice_current_run(
         expected_command_slice
     )
 
-    result = subject.get_commands_slice("run-id", 1, 2, all_commands=True)
+    result = subject.get_commands_slice("run-id", 1, 2, include_fixit_commands=True)
 
     assert expected_command_slice == result
 
@@ -928,7 +928,7 @@ def test_get_commands_slice_from_db_run_not_found(
     ).then_raise(RunNotFoundError(run_id="run-id"))
     with pytest.raises(RunNotFoundError):
         subject.get_commands_slice(
-            run_id="run-id", cursor=1, length=2, all_commands=True
+            run_id="run-id", cursor=1, length=2, include_fixit_commands=True
         )
 
 
