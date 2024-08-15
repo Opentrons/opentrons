@@ -8,7 +8,6 @@ import {
   DIRECTION_ROW,
   Flex,
   Icon,
-  JUSTIFY_FLEX_END,
   SPACING,
   StyledText,
   TYPOGRAPHY,
