@@ -117,7 +117,7 @@ def fake_settings() -> CapacitivePassSettings:
 def fake_liquid_settings() -> LiquidProbeSettings:
     return LiquidProbeSettings(
         mount_speed=5,
-        plunger_speed=20,
+        plunger_speed=15,
         plunger_impulse_time=0.2,
         sensor_threshold_pascals=15,
         output_option=OutputOptions.can_bus_only,
@@ -820,7 +820,7 @@ async def test_liquid_probe(
         mock_liquid_probe.return_value = 140
         fake_settings_aspirate = LiquidProbeSettings(
             mount_speed=5,
-            plunger_speed=20,
+            plunger_speed=15,
             plunger_impulse_time=0.2,
             sensor_threshold_pascals=15,
             output_option=OutputOptions.can_bus_only,
