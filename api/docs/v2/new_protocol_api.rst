@@ -91,7 +91,7 @@ Useful Types
 .. automodule:: opentrons.types
    :members: PipetteNotAttachedError, Point, Location, Mount
 
-.. autoclass:: opentrons.protocols.parameters.types.CSVParameter
+.. autoclass:: opentrons.protocol_api.CSVParameter
    :members:
 
 
