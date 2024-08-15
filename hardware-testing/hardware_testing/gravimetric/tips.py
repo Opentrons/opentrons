@@ -8,7 +8,7 @@ from opentrons.protocol_api import (
     InstrumentContext,
 )
 
-_PROBES = 10
+_PROBES = 1
 
 # Rows by Channel:
 #  - Rear Racks (slot-row=C)
