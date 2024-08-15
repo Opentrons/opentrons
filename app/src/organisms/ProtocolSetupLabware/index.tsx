@@ -29,7 +29,6 @@ import {
   getLabwareDefURI,
   getLabwareDisplayName,
   getModuleDisplayName,
-  getModuleType,
   HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { parseInitialLoadedLabwareByAdapter } from '@opentrons/api-client'
