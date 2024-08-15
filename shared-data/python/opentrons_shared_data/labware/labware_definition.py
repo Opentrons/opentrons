@@ -222,6 +222,9 @@ class WellDefinition(BaseModel):
         description="If 'rectangular', use xDimension and "
         "yDimension; if 'circular' use diameter",
     )
+    innerGeometryDefinition: Optional[_NonNegativeNumber] = Field(
+        None, description="Index number of the well's corresponding" "innerWellGeometry"
+    )
 
 
 class CircularCrossSection(BaseModel):
@@ -387,7 +390,7 @@ class LabwareDefinition(BaseModel):
         default_factory=None,
         description="Force, in Newtons, with which the gripper should grip the labware.",
     )
-    innerWellGeometry: Optional[InnerLabwareGeometry] = Field(
+    innerWellGeometry: Optional[List[InnerLabwareGeometry]] = Field(
         None,
         description="A list of bounded sections describing the geometry of the inside of the wells.",
     )

@@ -3,8 +3,8 @@
 types in this file by and large require the use of typing_extensions.
 this module shouldn't be imported unless typing.TYPE_CHECKING is true.
 """
-from typing import Dict, List, NewType, Union, Optional
-from typing_extensions import Literal, TypedDict
+from typing import Dict, List, NewType, Union
+from typing_extensions import Literal, TypedDict, NotRequired
 
 
 LabwareUri = NewType("LabwareUri", str)
@@ -90,6 +90,7 @@ class CircularWellDefinition(TypedDict):
     y: float
     z: float
     diameter: float
+    innerGeometryDefinition: NotRequired[float]
 
 
 class RectangularWellDefinition(TypedDict):
@@ -101,6 +102,7 @@ class RectangularWellDefinition(TypedDict):
     z: float
     xDimension: float
     yDimension: float
+    innerGeometryDefinition: NotRequired[float]
 
 
 WellDefinition = Union[CircularWellDefinition, RectangularWellDefinition]
@@ -170,4 +172,4 @@ class LabwareDefinition(_RequiredLabwareDefinition, total=False):
     gripperOffsets: Dict[str, GripperOffsets]
     gripForce: float
     gripHeightFromLabwareBottom: float
-    innerWellGeometry: Optional[InnerLabwareGeometry]
+    innerWellGeometry: NotRequired[List[InnerLabwareGeometry]]
