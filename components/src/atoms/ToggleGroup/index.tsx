@@ -2,7 +2,9 @@ import * as React from 'react'
 import { css } from 'styled-components'
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { Flex } from '../../primitives'
-import { PrimaryButton, SPACING, TYPOGRAPHY } from '../..'
+import { fontWeightRegular } from '../../ui-style-constants/typography'
+import { PrimaryButton } from '../../atoms/buttons/PrimaryButton'
+import { spacing6, spacing8 } from '../../ui-style-constants/spacing'
 
 interface ToggleGroupProps {
   leftText: string
@@ -45,12 +47,12 @@ const BUTTON_GROUP_STYLES = css`
   button {
     height: 1.75rem;
     width: auto;
-    font-weight: ${TYPOGRAPHY.fontWeightRegular};
+    font-weight: ${fontWeightRegular};
     font-size: 11px;
     line-height: 14px;
     box-shadow: none;
-    padding-top: ${SPACING.spacing6};
-    padding-bottom: ${SPACING.spacing8};
+    padding-top: ${spacing6};
+    padding-bottom: ${spacing8};
     &:focus {
       box-shadow: none;
       color: ${COLORS.white};
@@ -86,16 +88,16 @@ const BUTTON_GROUP_STYLES = css`
 `
 
 const ACTIVE_STYLE = css`
-  padding-left: ${SPACING.spacing8};
-  padding-right: ${SPACING.spacing8};
+  padding-left: ${spacing8};
+  padding-right: ${spacing8};
   background-color: ${COLORS.blue50};
   color: ${COLORS.white};
   pointer-events: none;
 `
 
 const DEFAULT_STYLE = css`
-  padding-left: ${SPACING.spacing8};
-  padding-right: ${SPACING.spacing8};
+  padding-left: ${spacing8};
+  padding-right: ${spacing8};
   background-color: ${COLORS.white};
   color: ${COLORS.black90};
   border: 1px ${COLORS.grey30} solid;
