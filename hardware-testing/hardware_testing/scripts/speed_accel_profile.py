@@ -10,7 +10,6 @@ from typing import Tuple, Dict
 from abr_testing.automation import jira_tool  # type: ignore[import]
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons_shared_data.errors.exceptions import PositionUnknownError
-from statistics import mean
 from hardware_testing.opentrons_api.types import (
     GantryLoad,
     OT3Mount,
@@ -485,7 +484,7 @@ team jira credentials to: {storage_directory}."
                     min_error = error
                     min_error_info = str(row_of_interest)
         # find average error info and round all errors
-        avg_error = mean(tot_error)
+        avg_error = tot_error / row_count
         avg_error = round(avg_error, 5)
         avg_error_message = f"Average error was {avg_error}."
         max_error = round(max_error, 5)
