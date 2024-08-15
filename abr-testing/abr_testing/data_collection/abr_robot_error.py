@@ -386,7 +386,7 @@ def get_run_error_info_from_robot(
                 if offset_id == "":
                     labware_slot = errored_labware_dict["Slot"]
                     lpc_message = f"The current LPC coords found at {labware_slot} are (0, 0, 0). \
-                    Please confirm with the ABR-LPC sheet and re-LPC."
+Please confirm with the ABR-LPC sheet and re-LPC."
                 else:
                     for lpc in lpc_dict:
                         if lpc.get("id", "") == offset_id:

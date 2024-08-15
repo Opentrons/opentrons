@@ -7,12 +7,17 @@ import numpy as np
 import time
 import os
 from typing import Tuple, Dict
-from abr_testing.automation import jira_tool
+from abr_testing.automation import jira_tool  # type: ignore[import]
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons_shared_data.errors.exceptions import PositionUnknownError
 
-from hardware_testing.opentrons_api.types import GantryLoad, OT3Mount, Axis, Point
-from hardware_testing.opentrons_api.helpers_ot3 import (
+from hardware_testing.opentrons_api.types import (  # type: ignore[import]
+    GantryLoad,
+    OT3Mount,
+    Axis,
+    Point,
+)
+from hardware_testing.opentrons_api.helpers_ot3 import (  # type: ignore[import]
     build_async_ot3_hardware_api,
     GantryLoadSettings,
     set_gantry_load_per_axis_settings_ot3,
@@ -315,7 +320,7 @@ async def _main(is_simulating: bool) -> None:
     )
     print("HOMING")
     await api.home([Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R])
-    
+
     while True:
         y_or_no = input("Do you want to attach the results to a JIRA Ticket? Y/N: ")
         if y_or_no == "Y" or y_or_no == "y":
@@ -332,7 +337,8 @@ async def _main(is_simulating: bool) -> None:
                 email = tot_info["email"]
             except FileNotFoundError:
                 raise Exception(
-                    f"Please add json file with the testing team jira credentials to: {storage_directory}."
+                    f"Please add json file with the testing \
+team jira credentials to: {storage_directory}."
                 )
             domain_url = "https://opentrons.atlassian.net"
             ticket = jira_tool.JiraTicket(domain_url, api_token, email)
@@ -343,7 +349,7 @@ async def _main(is_simulating: bool) -> None:
             break
         else:
             print("Please Choose a Valid Option")
-    
+
     try:
         # #run the test while recording raw results
         table_results = {}
@@ -454,7 +460,7 @@ async def _main(is_simulating: bool) -> None:
     except KeyboardInterrupt:
         await api.disengage_axes([Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R])
     finally:
-        #if jira connection is requested, add jira comment and attach files
+        # if jira connection is requested, add jira comment and attach files
         """grab avg, max, and min values and associated values"""
         row_count = 0
         with open(raw_path, newline="") as csvfile:
@@ -462,12 +468,12 @@ async def _main(is_simulating: bool) -> None:
         tot_error = 0.0
         max_error = 0.0
         min_error = 1.0
-        #open the csv file containing raw data
+        # open the csv file containing raw data
         with open(raw_path, newline="") as csvfile:
             csvobj = csv.reader(csvfile, delimiter=",")
             full_list = list(csvobj)
             row_count = row_count - 1
-            #read through raw csv file and collect total error, max and min values
+            # read through raw csv file and collect total error, max and min values
             for count in range(row_count):
                 row_of_interest = str(full_list[count + 1])
                 error = float(row_of_interest.split("'")[9])
@@ -478,27 +484,31 @@ async def _main(is_simulating: bool) -> None:
                 if min_error >= error:
                     min_error = error
                     min_error_info = str(row_of_interest)
-        #find average error info and round all errors
+        # find average error info and round all errors
         avg_error = tot_error / row_count
         avg_error = round(avg_error, 5)
         avg_error_message = f"Average error was {avg_error}."
         max_error = round(max_error, 5)
         min_error = round(min_error, 5)
-        #grab maximum, minimum info and fomrat into a message
+        # grab maximum, minimum info and fomrat into a message
         max_current = max_error_info.split("'")[3]
         max_speed = max_error_info.split("'")[5]
         max_accel = max_error_info.split("'")[7]
-        max_error_message = f"Maximum error was {max_error} and occured at {max_current} current, {max_speed} speed, and {max_accel} acceleration."
+        max_error_message = f"Maximum error was {max_error} and occured at {max_current} current, \
+{max_speed} speed, and {max_accel} acceleration."
         min_current = min_error_info.split("'")[3]
         min_speed = min_error_info.split("'")[5]
         min_accel = min_error_info.split("'")[7]
-        min_error_message = f"Minimum error was {min_error} and occured at {min_current} current, {min_speed} speed, and {min_accel} acceleration."
-        comment_message = f"{max_error_message}\n{min_error_message}\n{avg_error_message}"
+        min_error_message = f"Minimum error was {min_error} and occured at {min_current} current, \
+{min_speed} speed, and {min_accel} acceleration."
+        comment_message = (
+            f"{max_error_message}\n{min_error_message}\n{avg_error_message}"
+        )
         print(comment_message)
-        if connect_jira == True:
-            #comment to Jira
+        if connect_jira is True:
+            # comment to Jira
             ticket_message = []
-            ticket_message = ticket.format_jira_comment(comment_message) 
+            ticket_message = ticket.format_jira_comment(comment_message)
             ticket.comment(ticket_message, issue_key)
 
             # post csv files created to jira ticket

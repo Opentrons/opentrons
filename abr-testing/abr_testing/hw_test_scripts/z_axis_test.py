@@ -56,13 +56,15 @@ def get_summary(file_path: str, count: int, errored: bool, error_message: str) -
         cropped_time = str(row_of_interest).split("'")[3]
         cropped_time = cropped_time[1:]
 
-    if errored == True:
-        comment_message = f"This test failed due to {error_message} on {cropped_cycle} and {cropped_time}."
+    if errored is True:
+        comment_message = f"This test failed due to \
+{error_message} on {cropped_cycle} and {cropped_time}."
     else:
         comment_message = (
             f"This test successfully completed at {cropped_cycle} and {cropped_time}."
         )
     return comment_message
+
 
 def get_robot_ip() -> str:
     """Gets and confirms robot IP address."""
@@ -142,7 +144,8 @@ async def _main(
                 email = tot_info["email"]
             except FileNotFoundError:
                 raise Exception(
-                    f"Please add json file with the testing team jira credentials to: {storage_directory}."
+                    f"Please add json file with the testing team \
+jira credentials to: {storage_directory}."
                 )
             ticket = jira_tool.JiraTicket(domain_url, api_token, email)
             issue_key = ticket.get_ticket()
@@ -230,7 +233,7 @@ async def _main(
         await hw_api.clean_up()
         comment_message = get_summary(file_path, count, errored, error_message)
         print(comment_message)
-        if connect_jira == True:
+        if connect_jira is True:
             # use REST to comment on JIRA ticket
             comment = ticket.format_jira_comment(comment_message)
             ticket.comment(comment, issue_key)
