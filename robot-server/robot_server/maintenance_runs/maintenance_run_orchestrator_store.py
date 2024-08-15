@@ -229,7 +229,7 @@ class MaintenanceRunOrchestratorStore:
         return self.run_orchestrator.get_command_slice(
             cursor=cursor,
             length=length,
-            include_fixit_commands=False,  # TODO(tz, 8-12-24) change to arg in router.
+            include_fixit_commands=False,
         )
 
     def get_current_command(self) -> Optional[CommandPointer]:
