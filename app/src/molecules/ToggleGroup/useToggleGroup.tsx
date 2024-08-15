@@ -31,6 +31,7 @@ export const useToggleGroup = (
   return [
     selectedValue,
     <ToggleGroup
+      key={`ToggleGroup_${left}_${right}`}
       leftText={left}
       rightText={right}
       leftClick={handleLeftClick}
