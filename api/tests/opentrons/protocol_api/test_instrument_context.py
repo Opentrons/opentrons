@@ -1128,17 +1128,28 @@ def test_prepare_to_aspirate_checks_volume(
 
 
 @pytest.mark.parametrize(
-    argnames=["style", "primary_nozzle", "front_right_nozzle", "end", "exception"],
+    argnames=[
+        "pipette_channels",
+        "style",
+        "primary_nozzle",
+        "front_right_nozzle",
+        "end",
+        "exception",
+    ],
     argvalues=[
-        [NozzleLayout.COLUMN, "A1", None, None, does_not_raise()],
-        [NozzleLayout.SINGLE, None, None, None, pytest.raises(ValueError)],
-        [NozzleLayout.ROW, "E1", None, None, pytest.raises(ValueError)],
-        [NozzleLayout.PARTIAL_COLUMN, "H1", None, "G1", does_not_raise()],
-        [NozzleLayout.PARTIAL_COLUMN, "H1", "H1", "G1", pytest.raises(ValueError)],
+        [96, NozzleLayout.COLUMN, "A1", None, None, does_not_raise()],
+        [96, NozzleLayout.SINGLE, None, None, None, pytest.raises(ValueError)],
+        [96, NozzleLayout.ROW, "E1", None, None, pytest.raises(ValueError)],
+        [8, NozzleLayout.PARTIAL_COLUMN, "H1", None, "G1", does_not_raise()],
+        [8, NozzleLayout.PARTIAL_COLUMN, "H1", "H1", "G1", pytest.raises(ValueError)],
+        [8, NozzleLayout.PARTIAL_COLUMN, "H1", None, "A1", pytest.raises(ValueError)],
     ],
 )
 def test_configure_nozzle_layout(
     subject: InstrumentContext,
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    pipette_channels: int,
     style: NozzleLayout,
     primary_nozzle: Optional[str],
     front_right_nozzle: Optional[str],
@@ -1146,6 +1157,42 @@ def test_configure_nozzle_layout(
     exception: ContextManager[None],
 ) -> None:
     """The correct model is passed to the engine client."""
+    decoy.when(mock_instrument_core.get_channels()).then_return(pipette_channels)
+    with exception:
+        subject.configure_nozzle_layout(
+            style=style, start=primary_nozzle, end=end, front_right=front_right_nozzle
+        )
+
+
+@pytest.mark.parametrize(
+    argnames=[
+        "pipette_channels",
+        "style",
+        "primary_nozzle",
+        "front_right_nozzle",
+        "end",
+        "exception",
+    ],
+    argvalues=[
+        [8, NozzleLayout.PARTIAL_COLUMN, "A1", None, "G1", does_not_raise()],
+        [96, NozzleLayout.PARTIAL_COLUMN, "H1", None, "G1", pytest.raises(ValueError)],
+        [8, NozzleLayout.ROW, "H1", None, None, pytest.raises(ValueError)],
+        [96, NozzleLayout.ROW, "H1", None, None, does_not_raise()],
+    ],
+)
+def test_pipette_supports_nozzle_layout(
+    subject: InstrumentContext,
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    pipette_channels: int,
+    style: NozzleLayout,
+    primary_nozzle: Optional[str],
+    front_right_nozzle: Optional[str],
+    end: Optional[str],
+    exception: ContextManager[None],
+) -> None:
+    """Test that error is raised when a pipette attempts to use an unsupported layout."""
+    decoy.when(mock_instrument_core.get_channels()).then_return(pipette_channels)
     with exception:
         subject.configure_nozzle_layout(
             style=style, start=primary_nozzle, end=end, front_right=front_right_nozzle

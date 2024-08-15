@@ -170,6 +170,7 @@ export function ProtocolRunHeader({
       ?.data?.current
   )
   const mostRecentRunId = useMostRecentRunId()
+  const isMostRecentRun = mostRecentRunId === runId
   const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
   const [showRunFailedModal, setShowRunFailedModal] = React.useState(false)
@@ -178,7 +179,7 @@ export function ProtocolRunHeader({
       runStatus != null &&
       // @ts-expect-error runStatus expected to possibly not be terminal
       RUN_STATUSES_TERMINAL.includes(runStatus) &&
-      isRunCurrent,
+      isMostRecentRun,
   })
   const isResetRunLoadingRef = React.useRef(false)
   const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
@@ -222,6 +223,7 @@ export function ProtocolRunHeader({
     resetTipStatus,
     setTipStatusResolved,
     aPipetteWithTip,
+    initialPipettesWithTipsCount,
   } = useTipAttachmentStatus({
     runId,
     runRecord: runRecord ?? null,
@@ -245,7 +247,9 @@ export function ProtocolRunHeader({
     },
   })
 
-  const enteredER = runRecord?.data.hasEverEnteredErrorRecovery
+  const enteredER = runRecord?.data.hasEverEnteredErrorRecovery ?? false
+  const cancelledWithoutRecovery =
+    !enteredER && runStatus === RUN_STATUS_STOPPED
 
   React.useEffect(() => {
     if (isFlex) {
@@ -283,6 +287,12 @@ export function ProtocolRunHeader({
           ...robotAnalyticsData,
         },
       })
+
+      // Close the run if no tips are attached after running tip check at least once.
+      // This marks the robot as "not busy" as soon as a run is cancelled if drop tip CTAs are unnecessary.
+      if (initialPipettesWithTipsCount === 0) {
+        closeCurrentRun()
+      }
     }
   }, [runStatus, isRunCurrent, runId])
 
@@ -400,7 +410,7 @@ export function ProtocolRunHeader({
             {t('close_door_to_resume')}
           </Banner>
         ) : null}
-        {runStatus === RUN_STATUS_STOPPED ? (
+        {runStatus === RUN_STATUS_STOPPED && !enteredER ? (
           <Banner type="warning" iconMarginLeft={SPACING.spacing4}>
             {t('run_canceled')}
           </Banner>
@@ -415,7 +425,7 @@ export function ProtocolRunHeader({
             {t('shared:close_robot_door')}
           </Banner>
         ) : null}
-        {mostRecentRunId === runId ? (
+        {isMostRecentRun ? (
           <TerminalRunBanner
             {...{
               runStatus,
@@ -424,6 +434,7 @@ export function ProtocolRunHeader({
               setShowRunFailedModal,
               commandErrorList,
               highestPriorityError,
+              cancelledWithoutRecovery,
             }}
             isResetRunLoading={isResetRunLoadingRef.current}
             isRunCurrent={isRunCurrent}
@@ -735,13 +746,21 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
       return module.moduleType === 'heaterShakerModuleType'
     })
     .some(module => module?.data != null && module.data.speedStatus !== 'idle')
+  const isValidRunAgain =
+    runStatus != null && RUN_AGAIN_STATUSES.includes(runStatus)
+  const validRunAgainButRequiresSetup = isValidRunAgain && !isSetupComplete
+  const runAgainWithSpinner = validRunAgainButRequiresSetup && isResetRunLoading
 
   let buttonText: string = ''
   let handleButtonClick = (): void => {}
   let buttonIconName: IconName | null = null
   let disableReason = null
 
-  if (currentRunId === runId && (!isSetupComplete || isFixtureMismatch)) {
+  if (
+    currentRunId === runId &&
+    (!isSetupComplete || isFixtureMismatch) &&
+    !isValidRunAgain
+  ) {
     disableReason = t('setup_incomplete')
   } else if (isOtherRunCurrent) {
     disableReason = t('shared:robot_is_busy')
@@ -806,7 +825,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
       }
     }
   } else if (runStatus != null && RUN_AGAIN_STATUSES.includes(runStatus)) {
-    buttonIconName = 'play'
+    buttonIconName = runAgainWithSpinner ? 'ot-spinner' : 'play'
     buttonText = t('run_again')
     handleButtonClick = () => {
       reset()
@@ -828,7 +847,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
         boxShadow="none"
         display={DISPLAY_FLEX}
         padding={`${SPACING.spacing12} ${SPACING.spacing16}`}
-        disabled={isRunControlButtonDisabled}
+        disabled={isRunControlButtonDisabled && !validRunAgainButRequiresSetup}
         onClick={handleButtonClick}
         id="ProtocolRunHeader_runControlButton"
         {...targetProps}
@@ -839,7 +858,9 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
             size={SIZE_1}
             marginRight={SPACING.spacing8}
             spin={
-              isProtocolAnalyzing || runStatus === RUN_STATUS_STOP_REQUESTED
+              isProtocolAnalyzing ||
+              runStatus === RUN_STATUS_STOP_REQUESTED ||
+              runAgainWithSpinner
             }
           />
         ) : null}
@@ -896,6 +917,7 @@ interface TerminalRunProps {
   commandErrorList?: RunCommandErrors
   isResetRunLoading: boolean
   isRunCurrent: boolean
+  cancelledWithoutRecovery: boolean
   highestPriorityError?: RunError | null
 }
 function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
@@ -908,6 +930,7 @@ function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
     highestPriorityError,
     isResetRunLoading,
     isRunCurrent,
+    cancelledWithoutRecovery,
   } = props
   const { t } = useTranslation('run_details')
   const completedWithErrors =
@@ -952,7 +975,7 @@ function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
               : `${
                   runStatus === RUN_STATUS_SUCCEEDED
                     ? t('run_completed_with_warnings')
-                    : t('run_completed_with_errors')
+                    : t('run_canceled_with_errors')
                 }`}
           </LegacyStyledText>
 
@@ -974,9 +997,12 @@ function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
     !completedWithErrors
   ) {
     return buildSuccessBanner()
-  } else if (
-    highestPriorityError != null ||
-    (completedWithErrors && !isResetRunLoading)
+  }
+  // TODO(jh, 08-14-24): The backend never returns the "user cancelled a run" error and cancelledWithoutRecovery becomes unnecessary.
+  else if (
+    !cancelledWithoutRecovery &&
+    (highestPriorityError != null ||
+      (completedWithErrors && !isResetRunLoading))
   ) {
     return buildErrorBanner()
   } else {

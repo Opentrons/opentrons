@@ -171,6 +171,59 @@ describe('ManageTips', () => {
 
     screen.getByText('MOCK DROP TIP FLOWS')
   })
+
+  describe('routeAlternativelyIfNoPipette', () => {
+    it('should route to RETRY_NEW_TIPS.STEPS.REPLACE_TIPS when selectedRecoveryOption is RETRY_NEW_TIPS.ROUTE and no pipette with tip', () => {
+      props.tipStatusUtils.aPipetteWithTip = null
+      props.currentRecoveryOptionUtils.selectedRecoveryOption =
+        RETRY_NEW_TIPS.ROUTE
+
+      render(props)
+
+      expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
+        RETRY_NEW_TIPS.ROUTE,
+        RETRY_NEW_TIPS.STEPS.REPLACE_TIPS
+      )
+    })
+
+    it('should route to SKIP_STEP_WITH_NEW_TIPS.STEPS.REPLACE_TIPS when selectedRecoveryOption is SKIP_STEP_WITH_NEW_TIPS.ROUTE and no pipette with tip', () => {
+      props.tipStatusUtils.aPipetteWithTip = null
+      props.currentRecoveryOptionUtils.selectedRecoveryOption =
+        RECOVERY_MAP.SKIP_STEP_WITH_NEW_TIPS.ROUTE
+
+      render(props)
+
+      expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
+        RECOVERY_MAP.SKIP_STEP_WITH_NEW_TIPS.ROUTE,
+        RECOVERY_MAP.SKIP_STEP_WITH_NEW_TIPS.STEPS.REPLACE_TIPS
+      )
+    })
+
+    it('should route to OPTION_SELECTION.ROUTE when selectedRecoveryOption is not RETRY_NEW_TIPS or SKIP_STEP_WITH_NEW_TIPS and no pipette with tip', () => {
+      props.tipStatusUtils.aPipetteWithTip = null
+      props.currentRecoveryOptionUtils.selectedRecoveryOption =
+        RECOVERY_MAP.CANCEL_RUN.ROUTE
+
+      render(props)
+
+      expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
+        RECOVERY_MAP.OPTION_SELECTION.ROUTE
+      )
+    })
+
+    it('should not route alternatively when there is a pipette with tip', () => {
+      props.tipStatusUtils.aPipetteWithTip = {
+        mount: 'left',
+        specs: MOCK_ACTUAL_PIPETTE,
+      }
+      props.currentRecoveryOptionUtils.selectedRecoveryOption =
+        RETRY_NEW_TIPS.ROUTE
+
+      render(props)
+
+      expect(mockProceedToRouteAndStep).not.toHaveBeenCalled()
+    })
+  })
 })
 
 describe('useDropTipFlowUtils', () => {

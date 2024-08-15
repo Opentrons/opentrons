@@ -1,6 +1,7 @@
 import asyncio
 from concurrent.futures import Future
 import contextlib
+from copy import deepcopy
 from functools import partial, lru_cache, wraps
 from dataclasses import replace
 import logging
@@ -2684,7 +2685,17 @@ class OT3API(
         )
 
         if not probe_settings:
-            probe_settings = self.config.liquid_sense
+            probe_settings = deepcopy(self.config.liquid_sense)
+
+        # We need to significatly slow down the 96 channel liquid probe
+        # TODO: (sigler) add LLD plunger-speed to pipette definitions
+        if self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
+            max_plunger_speed = self.config.motion_settings.max_speed_discontinuity[
+                GantryLoad.HIGH_THROUGHPUT
+            ][OT3AxisKind.P]
+            probe_settings.plunger_speed = min(
+                max_plunger_speed, probe_settings.plunger_speed
+            )
 
         probe_start_pos = await self.gantry_position(checked_mount, refresh=True)
 
@@ -2696,15 +2707,6 @@ class OT3API(
         p_total_mm = (
             instrument.plunger_positions.bottom - instrument.plunger_positions.top
         )
-
-        # We need to significatly slow down the 96 channel liquid probe
-        if self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
-            max_plunger_speed = self.config.motion_settings.max_speed_discontinuity[
-                GantryLoad.HIGH_THROUGHPUT
-            ][OT3AxisKind.P]
-            probe_settings.plunger_speed = min(
-                max_plunger_speed, probe_settings.plunger_speed
-            )
 
         p_working_mm = p_total_mm - (instrument.backlash_distance + p_impulse_mm)
 

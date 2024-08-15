@@ -128,7 +128,7 @@ export function RunSummary(): JSX.Element {
   const robotAnalyticsData = useRobotAnalyticsData(robotName as string)
   const { reportRecoveredRunResult } = useRecoveryAnalytics()
 
-  const enteredER = runRecord?.data.hasEverEnteredErrorRecovery
+  const enteredER = runRecord?.data.hasEverEnteredErrorRecovery ?? false
   React.useEffect(() => {
     if (isRunCurrent && typeof enteredER === 'boolean') {
       reportRecoveredRunResult(runStatus, enteredER)
@@ -156,15 +156,26 @@ export function RunSummary(): JSX.Element {
       RUN_STATUSES_TERMINAL.includes(runStatus) &&
       isRunCurrent,
   })
+  // TODO(jh, 08-14-24): The backend never returns the "user cancelled a run" error and cancelledWithoutRecovery becomes unnecessary.
+  const cancelledWithoutRecovery =
+    !enteredER && runStatus === RUN_STATUS_STOPPED
+  const showErrorDetailsBtn =
+    !cancelledWithoutRecovery &&
+    ((runRecord?.data.errors != null && runRecord?.data.errors.length > 0) ||
+      (commandErrorList != null && commandErrorList?.data.length > 0))
 
   let headerText =
     commandErrorList != null && commandErrorList.data.length > 0
-      ? t('run_completed_with_warnings')
+      ? t('run_completed_with_warnings_splash')
       : t('run_completed_splash')
   if (runStatus === RUN_STATUS_FAILED) {
     headerText = t('run_failed_splash')
   } else if (runStatus === RUN_STATUS_STOPPED) {
-    headerText = t('run_canceled_splash')
+    if (enteredER) {
+      headerText = t('run_canceled_with_errors_splash')
+    } else {
+      headerText = t('run_canceled_splash')
+    }
   }
 
   const {
@@ -419,8 +430,7 @@ export function RunSummary(): JSX.Element {
               height="17rem"
               css={showRunAgainSpinner ? RUN_AGAIN_CLICKED_STYLE : undefined}
             />
-            {(commandErrorList != null && commandErrorList?.data.length > 0) ||
-            !didRunSucceed ? (
+            {showErrorDetailsBtn ? (
               <LargeButton
                 flex="1"
                 iconName="info"
@@ -428,12 +438,6 @@ export function RunSummary(): JSX.Element {
                 onClick={handleViewErrorDetails}
                 buttonText={t('view_error_details')}
                 height="17rem"
-                disabled={
-                  (runRecord?.data.errors == null ||
-                    runRecord?.data.errors.length === 0) &&
-                  (commandErrorList == null ||
-                    commandErrorList?.data.length === 0)
-                }
               />
             ) : null}
           </Flex>
@@ -467,7 +471,6 @@ const SplashBody = styled.h4`
 const SummaryHeader = styled.h4`
   font-weight: ${TYPOGRAPHY.fontWeightBold};
   text-align: ${TYPOGRAPHY.textAlignLeft};
-  text-transform: ${TYPOGRAPHY.textTransformCapitalize};
   font-size: ${TYPOGRAPHY.fontSize28};
   line-height: ${TYPOGRAPHY.lineHeight36};
 `

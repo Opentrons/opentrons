@@ -236,6 +236,7 @@
   "protocol_run_complete": "Protocol run complete.",
   "protocol_run_failed": "Protocol run failed.",
   "protocol_run_started": "Protocol run started.",
+  "protocol_run_stopped": "Protocol run stopped.",
   "protocol_specifies": "Protocol specifies",
   "protocol_upload_revamp_feedback": "Have feedback about this experience?",
   "quantity": "Quantity",

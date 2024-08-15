@@ -259,7 +259,8 @@ export function ProtocolRunSetup({
           isFlex && hasModules
             ? t('calibration_ready')
             : t('deck_hardware_ready'),
-        incompleteText: isFlex ? t('calibration_needed') : t('action_needed'),
+        incompleteText:
+          isFlex && hasModules ? t('calibration_needed') : t('action_needed'),
         missingHardware: isMissingModule || isFixtureMismatch,
         missingHardwareText: t('action_needed'),
         incompleteElement: null,
