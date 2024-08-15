@@ -69,11 +69,6 @@ const BUTTON_GROUP_STYLES = css`
       background-color: ${COLORS.blue50};
       color: ${COLORS.white};
     }
-
-    &:disabled {
-      background-color: inherit;
-      color: ${COLORS.grey40};
-    }
   }
 
   button:first-child {
