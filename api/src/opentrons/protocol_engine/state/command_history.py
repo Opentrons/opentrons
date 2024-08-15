@@ -105,7 +105,7 @@ class CommandHistory:
         self, start: int, stop: int, command_ids: Optional[list[str]] = None
     ) -> List[Command]:
         """Get a list of commands between start and stop."""
-        selected_command_ids = command_ids or self._all_command_ids
+        selected_command_ids = command_ids if command_ids is not None else self._all_command_ids
         commands = selected_command_ids[start:stop]
         return [self._commands_by_id[command].command for command in commands]
 
