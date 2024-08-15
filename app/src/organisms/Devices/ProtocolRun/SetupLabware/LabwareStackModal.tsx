@@ -113,7 +113,7 @@ export const LabwareStackModal = (
       onOutsideClick={closeModal}
       header={{
         title: (
-          <Flex gridGap={SPACING.spacing4}>
+          <Flex gridGap={SPACING.spacing8}>
             <DeckInfoLabel
               deckLabel={isModuleThermocycler ? thermocyclerLocation : slotName}
             />
