@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Icon, IconName } from '../../icons'
+import { Icon } from '../../icons'
 import { Box, Btn, Flex } from '../../primitives'
 import {
   ALIGN_CENTER,
@@ -11,6 +11,7 @@ import { BORDERS, COLORS } from '../../helix-design-system'
 import { SPACING } from '../../ui-style-constants'
 import { PrimaryButton, StyledText } from '../../atoms'
 import { textDecorationUnderline } from '../../ui-style-constants/typography'
+import type { IconName } from '../../icons'
 
 export interface ToolboxProps {
   header: string
