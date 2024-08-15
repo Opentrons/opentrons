@@ -221,7 +221,14 @@ Another example is a Flex protocol that uses a waste chute. Say you want to only
 Liquid Presence Detection
 =========================
 
-Liquid presence detection is a pressure-based feature that allows Opentrons Flex pipettes to detect the presence or absence of liquids in a well, reservoir, or other container. It gives you the ability to identify, avoid, and recover from liquid-related protocol errors. You can enable this feature for an entire protocol run or toggle it on and off as required. Liquid presence detection works with Flex pipettes only and is disabled by default.
+Liquid presence detection is a pressure-based feature that allows Opentrons Flex pipettes to detect the presence or absence of liquids in a well, reservoir, tube, or other container. It gives you the ability to identify, avoid, and recover from liquid-related protocol errors. You can enable this feature for an entire protocol run or toggle it on and off as required. Liquid presence detection is disabled by default.
+
+Pipette Compatibility
+---------------------
+
+Liquid presence detection works with Flex 1-, 8-, and 96-channel pipettes only. 1-channel pipettes have one pressure sensor. The 8-channel pipette pressure sensors are on channels 1 and 8 (positions A1 and H1). The 96-channel pipette pressure sensors are on channels 1 and 96 (positions A1 and H12). Other channels on multi-channel pipettes do not have sensors and cannot detect liquid.
+
+.. add text with link to revised pipette sensor section in manual?
 
 Enabling Globally
 -----------------

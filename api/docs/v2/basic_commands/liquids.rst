@@ -269,9 +269,7 @@ The :py:meth:`.InstrumentContext.detect_liquid_presence` method tells a Flex pip
     
     pipette.detect_liquid_presence(well)
 
-.. removed code sample. maybe some text advice could help?
-
-In cases where you need more information than ``true`` or ``false``, you could write your own code to handle the output of this method. For example, by adding some indexing along with ``for`` and ``while`` loops, your protocol could count how many aspirations a robot performed before a source well ran out of liquid.
+.. removed code sample.
 
 .. versionadded:: 2.20
 

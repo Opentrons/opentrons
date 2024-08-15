@@ -2122,7 +2122,7 @@ class InstrumentContext(publisher.CommandPublisher):
     def detect_liquid_presence(self, well: labware.Well) -> bool:
         """Checks for liquid in a well and returns ``True`` if liquid is present and ``False`` if liquid is not present. Will not raise an error if it does not detect liquid. When simulating a protocol, the check always succeeds (returns ``True``). Works with Flex 1-, 8-, and 96-channel pipettes. See :ref:`lpd` and :ref:`detect-liquid-presence`
         
-        If your protocol uses :ref:`partial tip pickup <partial-tip-pickup>`, the pressure sensors for the Flex 8-channel pipette are on channels A1 and H1. For the Flex 96-channel pipette, the pressure sensors are on channels A1 and H12. All other channels for these pipettes cannot detect the presence/absence of a liquid. 
+        If your protocol uses :ref:`partial tip pickup <partial-tip-pickup>`, the pressure sensors for the Flex 8-channel pipette are on channels 1 and 8 (positions A1 and H1). For the Flex 96-channel pipette, the pressure sensors are on channels 1 and 96 (positions A1 and H12). Other channels on multi-channel pipettes do not have sensors and cannot detect liquid. 
  
         """
         loc = well.top()
@@ -2131,9 +2131,9 @@ class InstrumentContext(publisher.CommandPublisher):
 
     @requires_version(2, 20)
     def require_liquid_presence(self, well: labware.Well) -> None:
-        """Check for liquid in a well and raise an error if none is detected. When this method raises an error, Flex will offer the opportunity to enter recovery mode. In recovery mode, you can manually add liquid to resolve the error. When simulating a protocol, the check always succeeds (does not raise an error). Works with Flex 1-, 8-, and 96-channel pipettes. See :ref:`lpd` and :ref:`require-liquid-presence`.
+        """Check for liquid in a well and raises an error if none is detected. When this method raises an error, Flex will offer the opportunity to enter recovery mode. In recovery mode, you can manually add liquid to resolve the error. When simulating a protocol, the check always succeeds (does not raise an error). Works with Flex 1-, 8-, and 96-channel pipettes. See :ref:`lpd` and :ref:`require-liquid-presence`.
 
-        If your protocol uses :ref:`partial tip pickup <partial-tip-pickup>`, the pressure sensors for the Flex 8-channel pipette are on channels A1 and H1. For the Flex 96-channel pipette, the pressure sensors are on channels A1 and H12. All other channels for these pipettes cannot detect the presence/absence of a liquid.
+        If your protocol uses :ref:`partial tip pickup <partial-tip-pickup>`, the pressure sensors for the Flex 8-channel pipette are on channels 1 and 8 (positions A1 and H1). For the Flex 96-channel pipette, the pressure sensors are on channels 1 and 96 (positions A1 and H12). Other channels on multi-channel pipettes do not have sensors and cannot detect liquid.
 
         """
         loc = well.top()
