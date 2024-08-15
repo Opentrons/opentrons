@@ -460,7 +460,6 @@ team jira credentials to: {storage_directory}."
     except KeyboardInterrupt:
         await api.disengage_axes([Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R])
     finally:
-        # if jira connection is requested, add jira comment and attach files
         """grab avg, max, and min values and associated values"""
         row_count = 0
         with open(raw_path, newline="") as csvfile:
@@ -506,6 +505,7 @@ team jira credentials to: {storage_directory}."
             f"{max_error_message}\n{min_error_message}\n{avg_error_message}"
         )
         print(comment_message)
+        # if jira connection is requested, add jira comment and attach files
         if connect_jira is True:
             # comment to Jira
             ticket_message = []
