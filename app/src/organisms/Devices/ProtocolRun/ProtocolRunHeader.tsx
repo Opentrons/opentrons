@@ -116,6 +116,7 @@ import type {
   RunCommandErrors,
   RunError,
   RunStatus,
+  GetCommandsParams,
 } from '@opentrons/api-client'
 import type { IconName } from '@opentrons/components'
 import type { State } from '../../../redux/types'
@@ -174,13 +175,17 @@ export function ProtocolRunHeader({
   const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
   const [showRunFailedModal, setShowRunFailedModal] = React.useState(false)
-  const { data: commandErrorList } = useRunCommandErrors(runId, null, {
-    enabled:
-      runStatus != null &&
-      // @ts-expect-error runStatus expected to possibly not be terminal
-      RUN_STATUSES_TERMINAL.includes(runStatus) &&
-      isMostRecentRun,
-  })
+  const { data: commandErrorList } = useRunCommandErrors(
+    runId,
+    { cursor: 0, pageLength: 100 },
+    {
+      enabled:
+        runStatus != null &&
+        // @ts-expect-error runStatus expected to possibly not be terminal
+        RUN_STATUSES_TERMINAL.includes(runStatus) &&
+        isMostRecentRun,
+    }
+  )
   const isResetRunLoadingRef = React.useRef(false)
   const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
   const highestPriorityError =
@@ -677,9 +682,8 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
   )
   const [showIsShakingModal, setShowIsShakingModal] = React.useState(false)
   const isSetupComplete =
-    isCalibrationComplete &&
-    isModuleCalibrationComplete &&
-    missingModuleIds.length === 0
+    //isCalibrationComplete &&
+    isModuleCalibrationComplete && missingModuleIds.length === 0
   const isRobotOnWrongVersionOfSoftware = ['upgrade', 'downgrade'].includes(
     useSelector((state: State) => {
       return getRobotUpdateDisplayInfo(state, robotName)
