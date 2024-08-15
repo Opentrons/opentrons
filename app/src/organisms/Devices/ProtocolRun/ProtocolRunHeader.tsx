@@ -682,7 +682,8 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
   const [showIsShakingModal, setShowIsShakingModal] = React.useState(false)
   const isSetupComplete =
     isCalibrationComplete &&
-    isModuleCalibrationComplete && missingModuleIds.length === 0
+    isModuleCalibrationComplete &&
+    missingModuleIds.length === 0
   const isRobotOnWrongVersionOfSoftware = ['upgrade', 'downgrade'].includes(
     useSelector((state: State) => {
       return getRobotUpdateDisplayInfo(state, robotName)
