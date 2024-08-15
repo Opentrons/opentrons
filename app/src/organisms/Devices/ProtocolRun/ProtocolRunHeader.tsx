@@ -410,7 +410,7 @@ export function ProtocolRunHeader({
             {t('close_door_to_resume')}
           </Banner>
         ) : null}
-        {runStatus === RUN_STATUS_STOPPED ? (
+        {runStatus === RUN_STATUS_STOPPED && !enteredER ? (
           <Banner type="warning" iconMarginLeft={SPACING.spacing4}>
             {t('run_canceled')}
           </Banner>
@@ -975,7 +975,7 @@ function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
               : `${
                   runStatus === RUN_STATUS_SUCCEEDED
                     ? t('run_completed_with_warnings')
-                    : t('run_completed_with_errors')
+                    : t('run_canceled_with_errors')
                 }`}
           </LegacyStyledText>
 

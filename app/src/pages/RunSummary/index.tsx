@@ -166,12 +166,16 @@ export function RunSummary(): JSX.Element {
 
   let headerText =
     commandErrorList != null && commandErrorList.data.length > 0
-      ? t('run_completed_with_warnings')
+      ? t('run_completed_with_warnings_splash')
       : t('run_completed_splash')
   if (runStatus === RUN_STATUS_FAILED) {
     headerText = t('run_failed_splash')
   } else if (runStatus === RUN_STATUS_STOPPED) {
-    headerText = t('run_canceled_splash')
+    if (enteredER) {
+      headerText = t('run_canceled_with_errors_splash')
+    } else {
+      headerText = t('run_canceled_splash')
+    }
   }
 
   const {
@@ -467,7 +471,6 @@ const SplashBody = styled.h4`
 const SummaryHeader = styled.h4`
   font-weight: ${TYPOGRAPHY.fontWeightBold};
   text-align: ${TYPOGRAPHY.textAlignLeft};
-  text-transform: ${TYPOGRAPHY.textTransformCapitalize};
   font-size: ${TYPOGRAPHY.fontSize28};
   line-height: ${TYPOGRAPHY.lineHeight36};
 `
