@@ -21,6 +21,7 @@ import {
 import {
   useModulesQuery,
   useDoorQuery,
+  useDeleteRunMutation,
   useHost,
   useRunCommandErrors,
 } from '@opentrons/react-api-client'
@@ -169,6 +170,7 @@ export function ProtocolRunHeader({
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
   const isRobotViewable = useIsRobotViewable(robotName)
   const runStatus = useRunStatus(runId)
+  const { deleteRun } = useDeleteRunMutation()
   const { analysisErrors } = useProtocolAnalysisErrors(runId)
   const isRunCurrent = Boolean(
     useNotifyRunQuery(runId, { refetchInterval: CURRENT_RUN_POLL_MS })?.data
@@ -306,6 +308,7 @@ export function ProtocolRunHeader({
         closeCurrentRun({
           onSuccess: () => {
             if (isQuickTransfer) {
+              deleteRun(runId)
               navigate(`/devices/${robotName}`)
             }
           },
@@ -361,6 +364,7 @@ export function ProtocolRunHeader({
     closeCurrentRun({
       onSuccess: () => {
         if (isQuickTransfer) {
+          deleteRun(runId)
           navigate(`/devices/${robotName}`)
         }
       },
@@ -473,6 +477,7 @@ export function ProtocolRunHeader({
               closeCurrentRun({
                 onSuccess: () => {
                   if (isQuickTransfer) {
+                    deleteRun(runId)
                     navigate(`/devices/${robotName}`)
                   }
                 },

@@ -134,6 +134,11 @@ export function RunSummary(): JSX.Element {
       reportRecoveredRunResult(runStatus, enteredER)
     }
   }, [isRunCurrent, enteredER])
+  React.useEffect(() => {
+    if (runRecord == null) {
+      navigate('/')
+    }
+  })
 
   const { reset, isResetRunLoading } = useRunControls(runId, onCloneRunSuccess)
   const trackEvent = useTrackEvent()
