@@ -1,27 +1,18 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Flex, PrimaryButton, SPACING } from '@opentrons/components'
-import { DeckSetup } from './DeckSetup'
+import { useNavigate } from 'react-router-dom'
 
 export function ProtocolOverview(): JSX.Element {
   const { t } = useTranslation('protocol_overview')
-  const [deckSetup, setDeckSetup] = React.useState<boolean>(false)
+  const navigate = useNavigate()
 
-  return deckSetup ? (
-    <DeckSetup
-      onCancel={() => {
-        setDeckSetup(false)
-      }}
-      onSave={() => {
-        setDeckSetup(false)
-      }}
-    />
-  ) : (
+  return (
     <Flex gridGap={SPACING.spacing16}>
       {t('protocol_overview')}
       <PrimaryButton
         onClick={() => {
-          setDeckSetup(true)
+          navigate('/startingDeckState')
         }}
       >
         go to deck setup

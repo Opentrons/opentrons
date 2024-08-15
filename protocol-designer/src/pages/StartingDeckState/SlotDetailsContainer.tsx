@@ -1,10 +1,9 @@
 import * as React from 'react'
-
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import {
   LegacyStyledText,
   RobotCoordsForeignObject,
 } from '@opentrons/components'
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import type { RobotType } from '@opentrons/shared-data'
 
