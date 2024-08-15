@@ -83,7 +83,6 @@ export function SetupLiquidsList(props: SetupLiquidsListProps): JSX.Element {
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         gridGap={SPACING.spacing16}
         marginTop={SPACING.spacing16}
-        marginBottom={SPACING.spacing8}
       >
         <StyledText
           desktopStyle="bodyDefaultRegular"

@@ -3,7 +3,6 @@ import { useSelector } from 'react-redux'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
-import { useQueryClient } from 'react-query'
 
 import {
   ALIGN_CENTER,
@@ -144,6 +143,10 @@ export function RunSummary(): JSX.Element {
   const [showRunAgainSpinner, setShowRunAgainSpinner] = React.useState<boolean>(
     false
   )
+  const [showReturnToSpinner, setShowReturnToSpinner] = React.useState<boolean>(
+    false
+  )
+
   const robotSerialNumber =
     localRobot?.health?.robot_serial ??
     localRobot?.serverHealth?.serialNumber ??
@@ -195,15 +198,6 @@ export function RunSummary(): JSX.Element {
     }
   }, [isRunCurrent, enteredER])
 
-  // TODO(jh, 08-02-24): Revisit useCurrentRunRoute and top level redirects.
-  const queryClient = useQueryClient()
-  const returnToDash = (): void => {
-    // Eagerly clear the query caches to prevent top level redirecting back to this page.
-    queryClient.setQueryData([host, 'runs', 'details'], () => undefined)
-    queryClient.setQueryData([host, 'runs', runId, 'details'], () => undefined)
-    navigate('/')
-  }
-
   const returnToQuickTransfer = (): void => {
     if (!isRunCurrent) {
       deleteRun(runId)
@@ -239,6 +233,7 @@ export function RunSummary(): JSX.Element {
   }
 
   const handleReturnToDash = (aPipetteWithTip: PipetteWithTip | null): void => {
+    setShowReturnToSpinner(true)
     if (isRunCurrent && aPipetteWithTip != null) {
       void handleTipsAttachedModal({
         setTipStatusResolved: setTipStatusResolvedAndRoute(handleReturnToDash),
@@ -251,7 +246,7 @@ export function RunSummary(): JSX.Element {
         onSkipAndHome: () => {
           closeCurrentRun({
             onSuccess: () => {
-              returnToDash()
+              navigate('/')
             },
           })
         },
@@ -259,8 +254,11 @@ export function RunSummary(): JSX.Element {
     } else if (isQuickTransfer) {
       returnToQuickTransfer()
     } else {
-      closeCurrentRun()
-      returnToDash()
+      closeCurrentRun({
+        onSuccess: () => {
+          navigate('/')
+        },
+      })
     }
   }
 
@@ -297,7 +295,22 @@ export function RunSummary(): JSX.Element {
     setShowSplash(false)
   }
 
-  const RUN_AGAIN_SPINNER_TEXT = (
+  const buildReturnToCopy = (): string =>
+    isQuickTransfer ? t('return_to_quick_transfer') : t('return_to_dashboard')
+
+  const buildReturnToWithSpinnerText = (): JSX.Element => (
+    <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="16rem">
+      {buildReturnToCopy()}
+      <Icon
+        name="ot-spinner"
+        aria-label="icon_ot-spinner"
+        spin={true}
+        size="3.5rem"
+        color={COLORS.white}
+      />
+    </Flex>
+  )
+  const buildRunAgainWithSpinnerText = (): JSX.Element => (
     <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="16rem">
       {t('run_again')}
       <Icon
@@ -414,10 +427,11 @@ export function RunSummary(): JSX.Element {
                 handleReturnToDash(aPipetteWithTip)
               }}
               buttonText={
-                isQuickTransfer
-                  ? t('return_to_quick_transfer')
-                  : t('return_to_dashboard')
+                showReturnToSpinner
+                  ? buildReturnToWithSpinnerText()
+                  : buildReturnToCopy()
               }
+              css={showReturnToSpinner ? RETURN_TO_CLICKED_STYLE : undefined}
             />
             <EqualWidthButton
               iconName="play-round-corners"
@@ -425,7 +439,9 @@ export function RunSummary(): JSX.Element {
                 handleRunAgain(aPipetteWithTip)
               }}
               buttonText={
-                showRunAgainSpinner ? RUN_AGAIN_SPINNER_TEXT : t('run_again')
+                showRunAgainSpinner
+                  ? buildRunAgainWithSpinnerText()
+                  : t('run_again')
               }
               css={showRunAgainSpinner ? RUN_AGAIN_CLICKED_STYLE : undefined}
             />
@@ -515,6 +531,22 @@ const DURATION_TEXT_STYLE = css`
   font-size: ${TYPOGRAPHY.fontSize22};
   line-height: ${TYPOGRAPHY.lineHeight28};
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
+`
+
+const RETURN_TO_CLICKED_STYLE = css`
+  background-color: ${COLORS.blue40};
+  &:focus {
+    background-color: ${COLORS.blue40};
+  }
+  &:hover {
+    background-color: ${COLORS.blue40};
+  }
+  &:focus-visible {
+    background-color: ${COLORS.blue40};
+  }
+  &:active {
+    background-color: ${COLORS.blue40};
+  }
 `
 
 const RUN_AGAIN_CLICKED_STYLE = css`

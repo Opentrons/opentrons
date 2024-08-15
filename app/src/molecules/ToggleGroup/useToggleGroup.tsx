@@ -11,17 +11,16 @@ import {
 import { useTrackEvent } from '../../redux/analytics'
 
 const BUTTON_GROUP_STYLES = css`
-  border-radius: ${BORDERS.borderRadius8};
-  margin-top: -1px;
   width: fit-content;
 
   button {
     height: auto;
     width: auto;
     font-weight: 400;
-    font-size: 11px;
-    line-height: 14px;
+    font-size: 14px;
+    line-height: 20px;
     box-shadow: none;
+    padding: 8px;
     &:focus {
       box-shadow: none;
       color: ${COLORS.white};

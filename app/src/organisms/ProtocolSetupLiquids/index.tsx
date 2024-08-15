@@ -8,7 +8,6 @@ import {
   DIRECTION_ROW,
   Flex,
   Icon,
-  JUSTIFY_FLEX_END,
   SPACING,
   StyledText,
   TYPOGRAPHY,
@@ -161,14 +160,14 @@ export function LiquidsList(props: LiquidsListProps): JSX.Element {
             {liquid.displayName}
           </StyledText>
         </Flex>
-        <Flex justifyContent={JUSTIFY_FLEX_END} flex="1">
+        <Flex flex="1">
           <Flex
             backgroundColor={`${COLORS.black90}${COLORS.opacity20HexCode}`}
             borderRadius={BORDERS.borderRadius8}
             height="2.75rem"
             padding={`${SPACING.spacing8} ${SPACING.spacing12}`}
             alignItems={TYPOGRAPHY.textAlignCenter}
-            marginRight="8rem"
+            marginLeft="30.825rem"
           >
             {getTotalVolumePerLiquidId(liquid.id, labwareByLiquidId)}{' '}
             {MICRO_LITERS}
