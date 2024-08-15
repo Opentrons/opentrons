@@ -286,7 +286,7 @@ class JiraTicket:
         return content_list
 
     def get_ticket(self) -> str:
-        """Gets and confirms jira ticket number"""
+        """Gets and confirms jira ticket number."""
         while True:
             issue_key = input("Ticket Key: ")
             url = f"{self.url}/rest/api/3/issue/{issue_key}"

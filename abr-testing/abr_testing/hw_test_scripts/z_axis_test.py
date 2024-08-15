@@ -23,6 +23,94 @@ from hardware_testing.opentrons_api.helpers_ot3 import (  # type: ignore[import]
 )
 
 
+def get_travel(mount_name: str) -> float:
+    """Gets and confirms z axis travel."""
+    limit = 150
+    if mount_name != "gripper":
+        limit = 210
+    while True:
+        try:
+            travel = float(
+                input(
+                    f"How far would you like the z axis to travel? \
+The range is between 1 and {str(limit)}: "
+                )
+            )
+            if 0 < int(travel) <= limit:
+                break
+            else:
+                print(f"Please choose a value between 1 and {str(limit)}.")
+        except ValueError:
+            print("Please enter a number.")
+    return travel
+
+
+def get_summary(file_path: str, count: int, errored: bool, error_message: str) -> str:
+    """Creates a summary of the results of the z axis test."""
+    with open(file_path, newline="") as csvfile:
+        csvobj = csv.reader(csvfile, delimiter=",")
+
+        full_list = list(csvobj)
+        row_of_interest = full_list[count]
+        cropped_cycle = str(row_of_interest).split("'")[1]
+        cropped_time = str(row_of_interest).split("'")[3]
+        cropped_time = cropped_time[1:]
+
+    if errored == True:
+        comment_message = f"This test failed due to {error_message} on {cropped_cycle} and {cropped_time}."
+    else:
+        comment_message = (
+            f"This test successfully completed at {cropped_cycle} and {cropped_time}."
+        )
+    return comment_message
+
+def get_robot_ip() -> str:
+    """Gets and confirms robot IP address."""
+    while True:
+        ip = input("Robot IP: ")
+        # From health: robot name
+        try:
+            response = requests.get(
+                f"http://{ip}:31950/health", headers={"opentrons-version": "3"}
+            )
+            # confirm connection of IP
+            if str(response) == "<Response [200]>":
+                break
+            else:
+                print("Please input a valid IP address")
+        except BaseException:
+            print("Please input a valid IP address")
+    return ip
+
+
+def get_robot_info(ip: str, mount_name: str) -> tuple[str, str]:
+    """Grabs robot name and instrument serial."""
+    response = requests.get(
+        f"http://{ip}:31950/health", headers={"opentrons-version": "3"}
+    )
+    health_data = response.json()
+    robot_name = health_data.get("name", "")
+    # from pipettes/instruments we get pipette/gripper serial
+    if mount_name == "gripper":
+        response = requests.get(
+            f"http://{ip}:31950/instruments", headers={"opentrons-version": "3"}
+        )
+        instruments = response.json()
+        for item in instruments["data"]:
+            if item["mount"] == "extension":
+                instrument_serial = item["serialNumber"]
+
+    else:
+        response = requests.get(
+            f"http://{ip}:31950/pipettes", headers={"opentrons-version": "3"}
+        )
+        pipette_data = response.json()
+        instrument_serial = pipette_data[mount_name].get("id", "")
+    if str(instrument_serial) == "None":
+        raise Exception("Please specify a valid mount.")
+    return robot_name, instrument_serial
+
+
 async def _main(
     mount: OT3Mount, mount_name: str, simulate: bool, time_min: int, z_axis: Axis
 ) -> None:
@@ -34,23 +122,7 @@ async def _main(
     if not os.path.exists(BASE_DIRECTORY):
         os.makedirs(BASE_DIRECTORY)
 
-    # set limits then grab input distance.
-    limit = 150
-    if mount_name != "gripper":
-        limit = 210
-    while True:
-        try:
-            distance = float(
-                input(
-                    f"How far would you like the z axis to travel? The range is between 1 and {str(limit)}: "
-                )
-            )
-            if 0 < int(distance) <= limit:
-                break
-            else:
-                print(f"Please choose a value between 1 and {str(limit)}.")
-        except ValueError:
-            print(f"Please enter a number.")
+    travel = get_travel(mount_name)
 
     # Ask, get, and test Jira ticket link
     connect_jira = False
@@ -81,43 +153,11 @@ async def _main(
         else:
             print("Please Choose a Valid Option")
 
-    # get and confirm robot IP address
-    while True:
-        ip = input("Robot IP: ")
-        # From health: robot name
-        try:
-            response = requests.get(
-                f"http://{ip}:31950/health", headers={"opentrons-version": "3"}
-            )
-            # confirm connection of IP
-            if str(response) == "<Response [200]>":
-                break
-            else:
-                print("Please input a valid IP address")
-        except BaseException:
-            print("Please input a valid IP address")
-
-    health_data = response.json()
-    robot_name = health_data.get("name", "")
-    # from pipettes/instruments we get pipette/gripper serial
-    if mount_name == "gripper":
-        response = requests.get(
-            f"http://{ip}:31950/instruments", headers={"opentrons-version": "3"}
-        )
-        instruments = response.json()
-        for item in instruments["data"]:
-            if item["mount"] == "extension":
-                instrument_serial = item["serialNumber"]
-
-    else:
-        response = requests.get(
-            f"http://{ip}:31950/pipettes", headers={"opentrons-version": "3"}
-        )
-        pipette_data = response.json()
-        instrument_serial = pipette_data[mount_name].get("id", "")
-    if str(instrument_serial) == "None":
-        raise Exception("Please specify a valid mount.")
-
+    # get and confirm robot IP address then grab robot name and instrument serial
+    ip = get_robot_ip()
+    robot_info = get_robot_info(ip, mount_name)
+    robot_name = robot_info[0]
+    instrument_serial = robot_info[1]
     print(instrument_serial)
     print(robot_name)
 
@@ -129,7 +169,7 @@ async def _main(
         [
             f"Robot: {robot_name}",
             f" Mount: {mount_name}",
-            f" Distance: {distance}",
+            f" Distance: {travel}",
             f" Instrument Serial: {instrument_serial}",
         ],
     ]
@@ -151,15 +191,15 @@ async def _main(
     count = 0
     errored = False
     # finding home and starting to move
-
+    error_message = ""
     try:
         await hw_api.home()
         await asyncio.sleep(1)
         await hw_api.move_rel(mount, Point(0, 0, -1))
         while time.time() < timeout_start + timeout:
             # while True:
-            await hw_api.move_rel(mount, Point(0, 0, (-1 * int(distance))))
-            await hw_api.move_rel(mount, Point(0, 0, int(distance)))
+            await hw_api.move_rel(mount, Point(0, 0, (-1 * int(travel))))
+            await hw_api.move_rel(mount, Point(0, 0, int(travel)))
             # grab and print time and move count
             count += 1
             print(f"cycle: {count}")
@@ -188,21 +228,9 @@ async def _main(
         # Grab info and comment on JIRA
         await hw_api.disengage_axes([Axis.X, Axis.Y, Axis.Z, Axis.G])
         await hw_api.clean_up()
+        comment_message = get_summary(file_path, count, errored, error_message)
+        print(comment_message)
         if connect_jira == True:
-            with open(file_path, newline="") as csvfile:
-                csvobj = csv.reader(csvfile, delimiter=",")
-
-                full_list = list(csvobj)
-                row_of_interest = full_list[count]
-                cropped_cycle = str(row_of_interest).split("'")[1]
-                cropped_time = str(row_of_interest).split("'")[3]
-                cropped_time = cropped_time[1:]
-
-            if errored == True:
-                comment_message = f"This test failed due to {error_message} on {cropped_cycle} and {cropped_time}."
-            else:
-                comment_message = f"This test successfully completed at {cropped_cycle} and {cropped_time}."
-
             # use REST to comment on JIRA ticket
             comment = ticket.format_jira_comment(comment_message)
             ticket.comment(comment, issue_key)
