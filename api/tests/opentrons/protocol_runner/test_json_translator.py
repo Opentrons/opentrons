@@ -15,7 +15,7 @@ from opentrons_shared_data.labware.labware_definition import (
     WellDefinition,
     BoundedSection,
     RectangularCrossSection,
-    InnerLabwareGeometry,
+    InnerWellGeometry,
     SphericalSegment,
 )
 from opentrons_shared_data.protocol.models import (
@@ -689,8 +689,8 @@ def _load_labware_definition_data() -> LabwareDefinition:
         },
         dimensions=Dimensions(yDimension=85.5, zDimension=100, xDimension=127.75),
         cornerOffsetFromSlot=CornerOffsetFromSlot(x=0, y=0, z=0),
-        innerWellGeometry=[
-            InnerLabwareGeometry(
+        innerLabwareGeometry=[
+            InnerWellGeometry(
                 frusta=[
                     BoundedSection(
                         geometry=RectangularCrossSection(

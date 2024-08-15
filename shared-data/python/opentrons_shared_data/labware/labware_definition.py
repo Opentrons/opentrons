@@ -304,7 +304,7 @@ class Group(BaseModel):
     )
 
 
-class InnerLabwareGeometry(BaseModel):
+class InnerWellGeometry(BaseModel):
     frusta: List[BoundedSection] = Field(
         ...,
         description="A list of all of the sections of the well that have a contiguous shape",
@@ -390,7 +390,7 @@ class LabwareDefinition(BaseModel):
         default_factory=None,
         description="Force, in Newtons, with which the gripper should grip the labware.",
     )
-    innerWellGeometry: Optional[List[InnerLabwareGeometry]] = Field(
+    innerLabwareGeometry: Optional[List[InnerWellGeometry]] = Field(
         None,
         description="A list of bounded sections describing the geometry of the inside of the wells.",
     )

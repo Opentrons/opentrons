@@ -146,7 +146,7 @@ class BoundedSection(TypedDict):
     topHeight: float
 
 
-class InnerLabwareGeometry(TypedDict):
+class InnerWellGeometry(TypedDict):
     frusta: List[BoundedSection]
     bottomShape: BottomShape
 
@@ -172,4 +172,4 @@ class LabwareDefinition(_RequiredLabwareDefinition, total=False):
     gripperOffsets: Dict[str, GripperOffsets]
     gripForce: float
     gripHeightFromLabwareBottom: float
-    innerWellGeometry: NotRequired[List[InnerLabwareGeometry]]
+    innerLabwareGeometry: NotRequired[List[InnerWellGeometry]]
