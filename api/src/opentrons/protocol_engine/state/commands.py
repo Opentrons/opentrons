@@ -599,17 +599,16 @@ class CommandView(HasState[CommandState]):
         running_command = self._state.command_history.get_running_command()
         queued_command_ids = self._state.command_history.get_queue_ids()
         total_length = len(command_ids)
-        cursor_index = cursor
 
         # TODO(mm, 2024-05-17): This looks like it's attempting to do the same thing
         # as self.get_current(), but in a different way. Can we unify them?
-        if cursor_index is None:
+        if cursor is None:
             if running_command is not None:
-                cursor_index = running_command.index
+                cursor = running_command.index
             elif len(queued_command_ids) > 0:
                 # Get the most recently executed command,
                 # which we can find just before the first queued command.
-                cursor_index = (
+                cursor = (
                     self._state.command_history.get(queued_command_ids.head()).index - 1
                 )
             elif (
@@ -621,12 +620,12 @@ class CommandView(HasState[CommandState]):
                 # reach as failed. This makes command status alone insufficient to
                 # find the most recent command that actually executed, so we need to
                 # store that separately.
-                cursor_index = self._state.failed_command.index
+                cursor = self._state.failed_command.index
             else:
-                cursor_index = total_length - length
+                cursor = total_length - length
 
         # start is inclusive, stop is exclusive
-        actual_cursor = max(0, min(cursor_index, total_length - 1))
+        actual_cursor = max(0, min(cursor, total_length - 1))
         stop = min(total_length, actual_cursor + length)
 
         commands = self._state.command_history.get_slice(
