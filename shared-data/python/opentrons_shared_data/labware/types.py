@@ -172,4 +172,4 @@ class LabwareDefinition(_RequiredLabwareDefinition, total=False):
     gripperOffsets: Dict[str, GripperOffsets]
     gripForce: float
     gripHeightFromLabwareBottom: float
-    innerLabwareGeometry: NotRequired[List[InnerWellGeometry]]
+    innerLabwareGeometry: NotRequired[Dict[str, InnerWellGeometry]]

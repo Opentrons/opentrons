@@ -390,7 +390,7 @@ class LabwareDefinition(BaseModel):
         default_factory=None,
         description="Force, in Newtons, with which the gripper should grip the labware.",
     )
-    innerLabwareGeometry: Optional[List[InnerWellGeometry]] = Field(
+    innerLabwareGeometry: Optional[Dict[str, InnerWellGeometry]] = Field(
         None,
-        description="A list of bounded sections describing the geometry of the inside of the wells.",
+        description="A dictionary holding all unique inner well geometries in a labware.",
     )

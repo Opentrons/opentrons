@@ -689,8 +689,8 @@ def _load_labware_definition_data() -> LabwareDefinition:
         },
         dimensions=Dimensions(yDimension=85.5, zDimension=100, xDimension=127.75),
         cornerOffsetFromSlot=CornerOffsetFromSlot(x=0, y=0, z=0),
-        innerLabwareGeometry=[
-            InnerWellGeometry(
+        innerLabwareGeometry={
+            "welldefinition1111": InnerWellGeometry(
                 frusta=[
                     BoundedSection(
                         geometry=RectangularCrossSection(
@@ -715,7 +715,7 @@ def _load_labware_definition_data() -> LabwareDefinition:
                     depth=10,
                 ),
             )
-        ],
+        },
         brand=BrandData(brand="foo"),
         metadata=Metadata(
             displayName="Foo 8 Well Plate 33uL",
