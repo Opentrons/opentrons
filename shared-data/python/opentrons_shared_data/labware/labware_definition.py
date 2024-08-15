@@ -222,6 +222,9 @@ class WellDefinition(BaseModel):
         description="If 'rectangular', use xDimension and "
         "yDimension; if 'circular' use diameter",
     )
+    geometryDefinitionId: Optional[str] = Field(
+        None, description="str id of the well's corresponding" "innerWellGeometry"
+    )
 
 
 class CircularCrossSection(BaseModel):
@@ -301,7 +304,7 @@ class Group(BaseModel):
     )
 
 
-class InnerLabwareGeometry(BaseModel):
+class InnerWellGeometry(BaseModel):
     frusta: List[BoundedSection] = Field(
         ...,
         description="A list of all of the sections of the well that have a contiguous shape",
@@ -387,7 +390,7 @@ class LabwareDefinition(BaseModel):
         default_factory=None,
         description="Force, in Newtons, with which the gripper should grip the labware.",
     )
-    innerWellGeometry: Optional[InnerLabwareGeometry] = Field(
+    innerLabwareGeometry: Optional[Dict[str, InnerWellGeometry]] = Field(
         None,
-        description="A list of bounded sections describing the geometry of the inside of the wells.",
+        description="A dictionary holding all unique inner well geometries in a labware.",
     )
