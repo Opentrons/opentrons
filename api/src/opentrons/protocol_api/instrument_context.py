@@ -1990,7 +1990,7 @@ class InstrumentContext(publisher.CommandPublisher):
         self._core.prepare_to_aspirate()
 
     @requires_version(2, 16)
-    def configure_nozzle_layout(  # noqa: C901
+    def configure_nozzle_layout(
         self,
         style: NozzleLayout,
         start: Optional[str] = None,
@@ -2013,7 +2013,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         :param style: The shape of the nozzle layout.
 
-            - ``SINGLE`` sets the pipette to use 1 nozzle. This corresponds to a single of well on labware.
+            - ``SINGLE`` sets the pipette to use 1 nozzle. This corresponds to a single well on labware.
             - ``COLUMN`` sets the pipette to use 8 nozzles, aligned from front to back
               with respect to the deck. This corresponds to a column of wells on labware.
             - ``PARTIAL_COLUMN`` sets the pipette to use 2-7 nozzles, aligned from front to back
@@ -2079,66 +2079,54 @@ class InstrumentContext(publisher.CommandPublisher):
 
         front_right_resolved = front_right
         back_left_resolved = back_left
-        if style != NozzleLayout.ALL:
-            if start is None:
-                raise ValueError(
-                    f"Cannot configure a nozzle layout of style {style.value} without a starting nozzle."
+        validated_start: Optional[str] = None
+        match style:
+            case NozzleLayout.SINGLE:
+                validated_start = _check_valid_start_nozzle(style, start)
+                _raise_if_has_end_or_front_right_or_back_left(
+                    style, end, front_right, back_left
                 )
-            if start not in types.ALLOWED_PRIMARY_NOZZLES:
-                raise ValueError(
-                    f"Starting nozzle specified is not one of {types.ALLOWED_PRIMARY_NOZZLES}"
+            case NozzleLayout.COLUMN | NozzleLayout.ROW:
+                self._raise_if_configuration_not_supported_by_pipette(style)
+                validated_start = _check_valid_start_nozzle(style, start)
+                _raise_if_has_end_or_front_right_or_back_left(
+                    style, end, front_right, back_left
                 )
-            if style == NozzleLayout.ROW:
-                if self.channels != 96:
-                    raise ValueError(
-                        "Row configuration is only supported on 96-Channel pipettes."
-                    )
-            if style == NozzleLayout.COLUMN:
-                if self.channels != 96:
-                    raise ValueError(
-                        "Column configuration is only supported on 96-Channel pipettes."
-                    )
-            if style == NozzleLayout.PARTIAL_COLUMN:
-                if self.channels == 1 or self.channels == 96:
-                    raise ValueError(
-                        "Partial column configuration is only supported on 8-Channel pipettes."
-                    )
-
-                if end is None:
-                    raise ValueError(
-                        "Partial column configurations require the 'end' parameter."
-                    )
-                if start[0] in end:
-                    raise ValueError(
-                        "The 'start' and 'end' parameters of a partial column configuration cannot be in the same row."
-                    )
-                # Determine if 'end' will be configured as front_right or back_left
-                if start == "H1" or start == "H12":
-                    if "A" in end:
-                        raise ValueError(
-                            f"A partial column configuration with 'start'={start} cannot have its 'end' parameter be in row A. Use `ALL` configuration to utilize all nozzles."
-                        )
-                    back_left_resolved = end
+            case NozzleLayout.PARTIAL_COLUMN:
+                self._raise_if_configuration_not_supported_by_pipette(style)
+                validated_start = _check_valid_start_nozzle(style, start)
+                validated_end = _check_valid_end_nozzle(validated_start, end)
+                _raise_if_has_front_right_or_back_left_for_partial_column(
+                    front_right, back_left
+                )
+                # Convert 'validated_end' to front_right or back_left as appropriate
+                if validated_start == "H1" or validated_start == "H12":
+                    back_left_resolved = validated_end
+                    front_right_resolved = validated_start
                 elif start == "A1" or start == "A12":
-                    if "H" in end:
-                        raise ValueError(
-                            f"A partial column configuration with 'start'={start} cannot have its 'end' parameter be in row H. Use `ALL` configuration to utilize all nozzles."
-                        )
-                    front_right_resolved = end
-
-            if style == NozzleLayout.QUADRANT:
-                if front_right is None and back_left is None:
-                    raise ValueError(
-                        "Cannot configure a QUADRANT layout without a front right or back left nozzle."
-                    )
-            elif not (front_right is None and back_left is None):
-                raise ValueError(
-                    f"Parameters 'front_right' and 'back_left' cannot be used with a {style.value} nozzle configuration."
+                    front_right_resolved = validated_end
+                    back_left_resolved = validated_start
+            case NozzleLayout.QUADRANT:
+                validated_start = _check_valid_start_nozzle(style, start)
+                _raise_if_has_end_nozzle_for_quadrant(end)
+                _raise_if_no_front_right_or_back_left_for_quadrant(
+                    front_right, back_left
                 )
+                if front_right is None:
+                    front_right_resolved = validated_start
+                elif back_left is None:
+                    back_left_resolved = validated_start
+            case NozzleLayout.ALL:
+                validated_start = start
+                if any([start, end, front_right, back_left]):
+                    _log.warning(
+                        "Parameters 'start', 'end', 'front_right', 'back_left' specified"
+                        " for ALL nozzle configuration will be ignored."
+                    )
 
         self._core.configure_nozzle_layout(
             style,
-            primary_nozzle=start,
+            primary_nozzle=validated_start,
             front_right_nozzle=front_right_resolved,
             back_left_nozzle=back_left_resolved,
         )
@@ -2179,3 +2167,91 @@ class InstrumentContext(publisher.CommandPublisher):
         self._96_tip_config_valid()
         height = self._core.liquid_probe_without_recovery(well._core, loc)
         return height
+
+    def _raise_if_configuration_not_supported_by_pipette(
+        self, style: NozzleLayout
+    ) -> None:
+        match style:
+            case NozzleLayout.COLUMN | NozzleLayout.ROW:
+                if self.channels != 96:
+                    raise ValueError(
+                        f"{style.value} configuration is only supported on 96-Channel pipettes."
+                    )
+            case NozzleLayout.PARTIAL_COLUMN:
+                if self.channels != 8:
+                    raise ValueError(
+                        "Partial column configuration is only supported on 8-Channel pipettes."
+                    )
+            # SINGLE, QUADRANT and ALL are supported by all pipettes
+
+
+def _raise_if_has_end_or_front_right_or_back_left(
+    style: NozzleLayout,
+    end: Optional[str],
+    front_right: Optional[str],
+    back_left: Optional[str],
+) -> None:
+    if any([end, front_right, back_left]):
+        raise ValueError(
+            f"Parameters 'end', 'front_right' and 'back_left' cannot be used with "
+            f"the {style.name} nozzle configuration."
+        )
+
+
+def _check_valid_start_nozzle(style: NozzleLayout, start: Optional[str]) -> str:
+    if start is None:
+        raise ValueError(
+            f"Cannot configure a nozzle layout of style {style.value} without a starting nozzle."
+        )
+    if start not in types.ALLOWED_PRIMARY_NOZZLES:
+        raise ValueError(
+            f"Starting nozzle specified is not one of {types.ALLOWED_PRIMARY_NOZZLES}."
+        )
+    return start
+
+
+def _check_valid_end_nozzle(start: str, end: Optional[str]) -> str:
+    if end is None:
+        raise ValueError("Partial column configurations require the 'end' parameter.")
+    if start[0] in end:
+        raise ValueError(
+            "The 'start' and 'end' parameters of a partial column configuration cannot be in the same row."
+        )
+    if start == "H1" or start == "H12":
+        if "A" in end:
+            raise ValueError(
+                f"A partial column configuration with 'start'={start} cannot have its 'end' parameter be in row A. Use `ALL` configuration to utilize all nozzles."
+            )
+    elif start == "A1" or start == "A12":
+        if "H" in end:
+            raise ValueError(
+                f"A partial column configuration with 'start'={start} cannot have its 'end' parameter be in row H. Use `ALL` configuration to utilize all nozzles."
+            )
+    return end
+
+
+def _raise_if_no_front_right_or_back_left_for_quadrant(
+    front_right: Optional[str], back_left: Optional[str]
+) -> None:
+    if front_right is None and back_left is None:
+        raise ValueError(
+            "Cannot configure a QUADRANT layout without a front right or back left nozzle."
+        )
+
+
+def _raise_if_has_end_nozzle_for_quadrant(end: Optional[str]) -> None:
+    if end is not None:
+        raise ValueError(
+            "Parameter 'end' is not supported for QUADRANT configuration."
+            " Use 'front_right' and 'back_left' arguments to specify the quadrant nozzle map instead."
+        )
+
+
+def _raise_if_has_front_right_or_back_left_for_partial_column(
+    front_right: Optional[str], back_left: Optional[str]
+) -> None:
+    if any([front_right, back_left]):
+        raise ValueError(
+            "Parameters 'front_right' and 'back_left' cannot be used with "
+            "the PARTIAL_COLUMN configuration."
+        )
