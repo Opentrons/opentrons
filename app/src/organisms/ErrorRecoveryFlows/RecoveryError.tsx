@@ -54,16 +54,21 @@ export function ErrorRecoveryFlowError({
   getRecoveryOptionCopy,
   currentRecoveryOptionUtils,
   routeUpdateActions,
+  recoveryCommands,
 }: RecoveryContentProps): JSX.Element {
   const { OPTION_SELECTION } = RECOVERY_MAP
   const { t } = useTranslation('error_recovery')
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
-  const { proceedToRouteAndStep } = routeUpdateActions
+  const { proceedToRouteAndStep, setRobotInMotion } = routeUpdateActions
+  const { homePipetteZAxes } = recoveryCommands
 
   const userRecoveryOptionCopy = getRecoveryOptionCopy(selectedRecoveryOption)
 
   const onPrimaryClick = (): void => {
-    void proceedToRouteAndStep(OPTION_SELECTION.ROUTE)
+    void setRobotInMotion(true)
+      .then(() => homePipetteZAxes())
+      .finally(() => setRobotInMotion(false))
+      .then(() => proceedToRouteAndStep(OPTION_SELECTION.ROUTE))
   }
 
   return (
