@@ -58,12 +58,16 @@ export function TwoColTextAndFailedStepNextStep(
           >
             {leftColTitle}
           </StyledText>
-          <StyledText
-            oddStyle="bodyTextRegular"
-            desktopStyle="bodyDefaultRegular"
-          >
-            {leftColBodyText}
-          </StyledText>
+          {typeof leftColBodyText === 'string' ? (
+            <StyledText
+              oddStyle="bodyTextRegular"
+              desktopStyle="bodyDefaultRegular"
+            >
+              {leftColBodyText}
+            </StyledText>
+          ) : (
+            leftColBodyText
+          )}
         </Flex>
         <FailedStepNextStep {...props} />
       </TwoColumn>
