@@ -10,7 +10,7 @@ from typing import Tuple, Dict
 from abr_testing.automation import jira_tool  # type: ignore[import]
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons_shared_data.errors.exceptions import PositionUnknownError
-
+from statistics import mean
 from hardware_testing.opentrons_api.types import (
     GantryLoad,
     OT3Mount,
@@ -465,9 +465,10 @@ team jira credentials to: {storage_directory}."
         row_count = 0
         with open(raw_path, newline="") as csvfile:
             row_count = sum(1 for row in csvfile)
+        # initialize these variables as they are all locked behind if statements
         tot_error = 0.0
         max_error = 0.0
-        min_error = 1.0
+        min_error = 100.0
         # open the csv file containing raw data
         with open(raw_path, newline="") as csvfile:
             csvobj = csv.reader(csvfile, delimiter=",")
@@ -485,7 +486,7 @@ team jira credentials to: {storage_directory}."
                     min_error = error
                     min_error_info = str(row_of_interest)
         # find average error info and round all errors
-        avg_error = tot_error / row_count
+        avg_error = mean(tot_error)
         avg_error = round(avg_error, 5)
         avg_error_message = f"Average error was {avg_error}."
         max_error = round(max_error, 5)
