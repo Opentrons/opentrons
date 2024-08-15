@@ -100,7 +100,7 @@ export function RunFailedModal({
     isSingleError,
   }: ErrorContentProps): JSX.Element => {
     return (
-      <>
+      <Flex flexDirection={DIRECTION_COLUMN}>
         <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {isSingleError
             ? t('error_info', {
@@ -130,7 +130,7 @@ export function RunFailedModal({
             </LegacyStyledText>
           ))}
         </Flex>
-      </>
+      </Flex>
     )
   }
 
