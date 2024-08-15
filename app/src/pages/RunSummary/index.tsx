@@ -170,12 +170,16 @@ export function RunSummary(): JSX.Element {
 
   let headerText =
     commandErrorList != null && commandErrorList.data.length > 0
-      ? t('run_completed_with_warnings')
+      ? t('run_completed_with_warnings_splash')
       : t('run_completed_splash')
   if (runStatus === RUN_STATUS_FAILED) {
     headerText = t('run_failed_splash')
   } else if (runStatus === RUN_STATUS_STOPPED) {
-    headerText = t('run_canceled_splash')
+    if (enteredER) {
+      headerText = t('run_canceled_with_errors_splash')
+    } else {
+      headerText = t('run_canceled_splash')
+    }
   }
 
   const {
@@ -249,8 +253,11 @@ export function RunSummary(): JSX.Element {
         robotType: FLEX_ROBOT_TYPE,
         isRunCurrent,
         onSkipAndHome: () => {
-          closeCurrentRun()
-          returnToDash()
+          closeCurrentRun({
+            onSuccess: () => {
+              returnToDash()
+            },
+          })
         },
       })
     } else if (isQuickTransfer) {
@@ -295,7 +302,7 @@ export function RunSummary(): JSX.Element {
   }
 
   const RUN_AGAIN_SPINNER_TEXT = (
-    <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="25.5rem">
+    <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="16rem">
       {t('run_again')}
       <Icon
         name="ot-spinner"
@@ -403,9 +410,8 @@ export function RunSummary(): JSX.Element {
               </SummaryDatum>
             </Flex>
           </Flex>
-          <Flex alignSelf={ALIGN_STRETCH} gridGap={SPACING.spacing16}>
-            <LargeButton
-              flex="1"
+          <ButtonContainer>
+            <EqualWidthButton
               iconName="arrow-left"
               buttonType="secondary"
               onClick={() => {
@@ -416,10 +422,8 @@ export function RunSummary(): JSX.Element {
                   ? t('return_to_quick_transfer')
                   : t('return_to_dashboard')
               }
-              height="17rem"
             />
-            <LargeButton
-              flex="1"
+            <EqualWidthButton
               iconName="play-round-corners"
               onClick={() => {
                 handleRunAgain(aPipetteWithTip)
@@ -427,20 +431,17 @@ export function RunSummary(): JSX.Element {
               buttonText={
                 showRunAgainSpinner ? RUN_AGAIN_SPINNER_TEXT : t('run_again')
               }
-              height="17rem"
               css={showRunAgainSpinner ? RUN_AGAIN_CLICKED_STYLE : undefined}
             />
             {showErrorDetailsBtn ? (
-              <LargeButton
-                flex="1"
+              <EqualWidthButton
                 iconName="info"
                 buttonType="alert"
                 onClick={handleViewErrorDetails}
                 buttonText={t('view_error_details')}
-                height="17rem"
               />
             ) : null}
-          </Flex>
+          </ButtonContainer>
         </Flex>
       )}
     </Btn>
@@ -471,7 +472,6 @@ const SplashBody = styled.h4`
 const SummaryHeader = styled.h4`
   font-weight: ${TYPOGRAPHY.fontWeightBold};
   text-align: ${TYPOGRAPHY.textAlignLeft};
-  text-transform: ${TYPOGRAPHY.textTransformCapitalize};
   font-size: ${TYPOGRAPHY.fontSize28};
   line-height: ${TYPOGRAPHY.lineHeight36};
 `
@@ -535,4 +535,15 @@ const RUN_AGAIN_CLICKED_STYLE = css`
   &:active {
     background-color: ${COLORS.blue60};
   }
+`
+
+const ButtonContainer = styled(Flex)`
+  align-self: ${ALIGN_STRETCH};
+  gap: ${SPACING.spacing16};
+`
+
+const EqualWidthButton = styled(LargeButton)`
+  flex: 1;
+  min-width: 0;
+  height: 17rem;
 `
