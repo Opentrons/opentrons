@@ -4,6 +4,7 @@ from contextlib import nullcontext as does_not_raise
 from typing import NamedTuple, Optional, ContextManager, Any
 
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
+from opentrons.protocols.api_support.util import UnsupportedAPIError
 
 
 class NozzleLayoutArgs(NamedTuple):
@@ -94,8 +95,8 @@ PIPETTE_INDEPENDENT_TEST_SPECS = [
             front_right="X1",
             back_left="Z1",
         ),
-        expected_raise=does_not_raise(),
-    ),  # Arguments are ignored
+        expected_raise=does_not_raise(),  # Arguments are ignored
+    ),
     PipetteIndependentNozzleConfigSpec(
         nozzle_layout_args=NozzleLayoutArgs(
             style=NozzleLayout.ALL,
@@ -105,6 +106,16 @@ PIPETTE_INDEPENDENT_TEST_SPECS = [
             back_left=None,
         ),
         expected_raise=does_not_raise(),
+    ),
+    PipetteIndependentNozzleConfigSpec(
+        nozzle_layout_args=NozzleLayoutArgs(
+            style=NozzleLayout.QUADRANT,
+            start="H1",
+            end="G1",
+            front_right="X1",
+            back_left="Z1",
+        ),
+        expected_raise=pytest.raises(UnsupportedAPIError),
     ),
 ]
 

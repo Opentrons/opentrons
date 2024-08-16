@@ -2064,8 +2064,8 @@ class InstrumentContext(publisher.CommandPublisher):
             NozzleLayout.QUADRANT,
         ]
         if style in disabled_layouts:
-            raise ValueError(
-                f"Nozzle layout configuration of style {style.value} is currently unsupported."
+            raise UnsupportedAPIError(
+                message=f"Nozzle layout configuration of style {style.value} is currently unsupported."
             )
 
         original_enabled_layouts = [NozzleLayout.COLUMN, NozzleLayout.ALL]
@@ -2073,7 +2073,7 @@ class InstrumentContext(publisher.CommandPublisher):
             self._api_version
             < _PARTIAL_NOZZLE_CONFIGURATION_SINGLE_ROW_PARTIAL_COLUMN_ADDED_IN
         ) and (style not in original_enabled_layouts):
-            raise ValueError(
+            raise APIVersionError(
                 f"Nozzle layout configuration of style {style.value} is unsupported in API Versions lower than {_PARTIAL_NOZZLE_CONFIGURATION_SINGLE_ROW_PARTIAL_COLUMN_ADDED_IN}."
             )
 
