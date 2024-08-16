@@ -547,9 +547,6 @@ export function ChooseRobotSlideout(
                     >
                       {t('csv_file')}
                     </LegacyStyledText>
-                    <LegacyStyledText as="p">
-                      {t('csv_required')}
-                    </LegacyStyledText>
                   </Flex>
                   {runtimeParam.file == null ? (
                     <UploadInput
