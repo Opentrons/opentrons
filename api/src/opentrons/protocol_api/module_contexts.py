@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from typing import List, Optional, Union, cast
+from typing import List, Dict, Optional, Union, cast
 
 from opentrons_shared_data.labware.types import LabwareDefinition
 from opentrons_shared_data.module.types import ModuleModel, ModuleType
@@ -1008,6 +1008,6 @@ class AbsorbanceReaderContext(ModuleContext):
         self._core.initialize(wavelength)
 
     @requires_version(2, 21)
-    def read(self) -> None:
-        """Initiate read on the Absorbance Reader."""
-        self._core.read()
+    def read(self) -> Optional[Dict[str, float]]:
+        """Initiate read on the Absorbance Reader. Returns a dictionary of values ordered by well name."""
+        return self._core.read()

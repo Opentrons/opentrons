@@ -1,7 +1,7 @@
 """Protocol API module implementation logic."""
 from __future__ import annotations
 
-from typing import Optional, List
+from typing import Optional, List, Dict
 
 from opentrons.hardware_control import SynchronousAdapter, modules as hw_modules
 from opentrons.hardware_control.modules.types import (
@@ -23,6 +23,7 @@ from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocol_engine.errors.exceptions import (
     LabwareNotLoadedOnModuleError,
     NoMagnetEngageHeightError,
+    CannotPerformModuleAction,
 )
 
 from opentrons.protocols.api_support.types import APIVersion
@@ -536,14 +537,26 @@ class AbsorbanceReaderCore(ModuleCore, AbstractAbsorbanceReaderCore):
         )
         self._initialized_value = wavelength
 
-    def read(self) -> None:
-        """Initiate read on the Absorbance Reader."""
+    def read(self) -> Optional[Dict[str, float]]:
+        """Initiate a read on the Absorbance Reader, and return the results. During Analysis, this will return None."""
         if self._initialized_value:
             self._engine_client.execute_command(
                 cmd.absorbance_reader.ReadAbsorbanceParams(
                     moduleId=self.module_id, sampleWavelength=self._initialized_value
                 )
             )
+        if not self._engine_client.state.config.use_virtual_modules:
+            read_result = (
+                self._engine_client.state.modules.get_absorbance_reader_substate(
+                    self.module_id
+                ).data
+            )
+            if read_result is not None:
+                return read_result
+            raise CannotPerformModuleAction(
+                "Absorbance Reader failed to return expected read result."
+            )
+        return None
 
     def close_lid(
         self,

@@ -1,11 +1,12 @@
 """Command models to read absorbance."""
 from __future__ import annotations
-from typing import List, Optional, TYPE_CHECKING
+from typing import Optional, Dict, TYPE_CHECKING
 from typing_extensions import Literal, Type
 
 from pydantic import BaseModel, Field
 
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ...errors import CannotPerformModuleAction
 from ...errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
@@ -24,12 +25,9 @@ class ReadAbsorbanceParams(BaseModel):
 
 
 class ReadAbsorbanceResult(BaseModel):
-    """Result data from running an aborbance reading."""
+    """Result data from running an aborbance reading, returned as a dictionary map of values by well name (eg. ("A1": 0.0, ...))."""
 
-    # TODO: Transform this into a more complex model, such as a map with well names.
-    data: Optional[List[float]] = Field(
-        ..., min_items=96, max_items=96, description="Absorbance data points."
-    )
+    data: Optional[Dict[str, float]] = Field(..., description="Absorbance data points.")
 
 
 class ReadAbsorbanceImpl(
@@ -58,10 +56,20 @@ class ReadAbsorbanceImpl(
             abs_reader_substate.module_id
         )
 
+        if abs_reader_substate.configured is False:
+            raise CannotPerformModuleAction(
+                "Cannot perform Read action on Absorbance Reader without calling `.initialize(...)` first."
+            )
+
         if abs_reader is not None:
             result = await abs_reader.start_measure(wavelength=params.sampleWavelength)
+            converted_values = (
+                self._state_view.modules.convert_absorbance_reader_data_points(
+                    data=result
+                )
+            )
             return SuccessData(
-                public=ReadAbsorbanceResult(data=result),
+                public=ReadAbsorbanceResult(data=converted_values),
                 private=None,
             )
 
