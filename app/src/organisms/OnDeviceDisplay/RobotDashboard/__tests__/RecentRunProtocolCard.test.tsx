@@ -5,15 +5,13 @@ import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
+import { RUN_STATUS_FAILED } from '@opentrons/api-client'
+import { COLORS } from '@opentrons/components'
 import {
   useProtocolQuery,
   useProtocolAnalysisAsDocumentQuery,
 } from '@opentrons/react-api-client'
-import {
-  RUN_STATUS_FAILED,
-  simpleAnalysisFileFixture,
-} from '@opentrons/api-client'
-import { COLORS } from '@opentrons/components'
+import { simpleAnalysisFileFixture } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
