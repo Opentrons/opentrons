@@ -69,6 +69,7 @@ async def create_protocol_engine(
 def create_protocol_engine_in_thread(
     hardware_api: HardwareControlAPI,
     config: Config,
+    deck_configuration: typing.Optional[DeckConfigurationType],
     error_recovery_policy: ErrorRecoveryPolicy,
     drop_tips_after_run: bool,
     post_run_hardware_state: PostRunHardwareState,
@@ -97,6 +98,7 @@ def create_protocol_engine_in_thread(
         _protocol_engine(
             hardware_api,
             config,
+            deck_configuration,
             error_recovery_policy,
             drop_tips_after_run,
             post_run_hardware_state,
@@ -113,6 +115,7 @@ def create_protocol_engine_in_thread(
 async def _protocol_engine(
     hardware_api: HardwareControlAPI,
     config: Config,
+    deck_configuration: typing.Optional[DeckConfigurationType],
     error_recovery_policy: ErrorRecoveryPolicy,
     drop_tips_after_run: bool,
     post_run_hardware_state: PostRunHardwareState,
@@ -131,10 +134,7 @@ async def _protocol_engine(
         protocol_engine=protocol_engine,
     )
     try:
-        # TODO(mm, 2023-11-21): Callers like opentrons.execute need to be able to pass in
-        # the deck_configuration argument to ProtocolEngine.play().
-        # https://opentrons.atlassian.net/browse/RSS-400
-        orchestrator.play()
+        orchestrator.play(deck_configuration)
         yield protocol_engine
     finally:
         await orchestrator.finish(
