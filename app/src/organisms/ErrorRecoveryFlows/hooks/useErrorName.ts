@@ -17,7 +17,8 @@ export function useErrorName(errorKind: ErrorKind): string {
       return t('pipette_overpressure')
     case ERROR_KINDS.OVERPRESSURE_WHILE_DISPENSING:
       return t('pipette_overpressure')
+    // The only "general error" case currently is tipPhysicallyMissing.
     default:
-      return t('error')
+      return t('tip_not_detected')
   }
 }

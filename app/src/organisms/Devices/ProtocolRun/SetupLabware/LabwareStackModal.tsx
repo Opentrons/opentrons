@@ -17,7 +17,6 @@ import {
 } from '@opentrons/components'
 import { Modal } from '../../../../molecules/Modal'
 import { getIsOnDevice } from '../../../../redux/config'
-import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { LegacyModal } from '../../../../molecules/LegacyModal'
 import { getLocationInfoNames } from '../utils/getLocationInfoNames'
 import { getSlotLabwareDefinition } from '../utils/getSlotLabwareDefinition'
@@ -33,7 +32,7 @@ import {
 } from '@opentrons/shared-data'
 import tiprackAdapter from '../../../../assets/images/labware/opentrons_flex_96_tiprack_adapter.png'
 
-import type { RobotType } from '@opentrons/shared-data'
+import type { RobotType, RunTimeCommand } from '@opentrons/shared-data'
 
 const HIDE_SCROLLBAR = css`
   ::-webkit-scrollbar {
@@ -60,7 +59,7 @@ const LIST_ITEM_STYLE = css`
 
 interface LabwareStackModalProps {
   labwareIdTop: string
-  runId: string
+  commands: RunTimeCommand[] | null
   closeModal: () => void
   robotType?: RobotType
 }
@@ -68,14 +67,18 @@ interface LabwareStackModalProps {
 export const LabwareStackModal = (
   props: LabwareStackModalProps
 ): JSX.Element | null => {
-  const { labwareIdTop, runId, closeModal, robotType = FLEX_ROBOT_TYPE } = props
+  const {
+    labwareIdTop,
+    commands,
+    closeModal,
+    robotType = FLEX_ROBOT_TYPE,
+  } = props
   const { t } = useTranslation('protocol_setup')
   const isOnDevice = useSelector(getIsOnDevice)
-  const protocolData = useMostRecentCompletedAnalysis(runId)
-  if (protocolData == null) {
+
+  if (commands == null) {
     return null
   }
-  const commands = protocolData?.commands ?? []
   const {
     slotName,
     adapterName,
@@ -113,7 +116,7 @@ export const LabwareStackModal = (
       onOutsideClick={closeModal}
       header={{
         title: (
-          <Flex gridGap={SPACING.spacing4}>
+          <Flex gridGap={SPACING.spacing8}>
             <DeckInfoLabel
               deckLabel={isModuleThermocycler ? thermocyclerLocation : slotName}
             />

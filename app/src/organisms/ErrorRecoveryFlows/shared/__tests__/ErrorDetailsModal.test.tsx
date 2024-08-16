@@ -74,7 +74,7 @@ describe('ErrorDetailsModal', () => {
     expect(vi.mocked(Modal)).toHaveBeenCalledWith(
       expect.objectContaining({
         header: {
-          title: 'Error',
+          title: 'Tip not detected',
           hasExitIcon: true,
         },
         onOutsideClick: props.toggleModal,
@@ -129,7 +129,9 @@ describe('OverpressureBanner', () => {
       expect.objectContaining({
         type: 'alert',
         heading:
-          'Overpressure is usually caused by a tip contacting labware, a clog, or moving viscous liquid too quickly. If the issue persists, cancel the run and make the necessary changes to the protocol.',
+          'Overpressure is usually caused by a tip contacting labware, a clog, or moving viscous liquid too quickly',
+        message:
+          ' If the issue persists, cancel the run and make the necessary changes to the protocol',
       }),
       {}
     )

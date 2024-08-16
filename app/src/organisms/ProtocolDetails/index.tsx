@@ -36,17 +36,15 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
-  parseInitialPipetteNamesByMount,
-  parseInitialLoadedModulesBySlot,
-  parseInitialLoadedLabwareBySlot,
-  parseInitialLoadedLabwareByModuleId,
-  parseInitialLoadedLabwareByAdapter,
-} from '@opentrons/api-client'
-import {
   MAGNETIC_BLOCK_TYPE,
   getGripperDisplayName,
   getModuleType,
   getSimplestDeckConfigForProtocol,
+  parseInitialLoadedLabwareByAdapter,
+  parseInitialLoadedLabwareByModuleId,
+  parseInitialLoadedLabwareBySlot,
+  parseInitialLoadedModulesBySlot,
+  parseInitialPipetteNamesByMount,
 } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '../../App/portal'

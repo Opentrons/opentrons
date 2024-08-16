@@ -58,8 +58,8 @@ export const Success = (props: SuccessProps): JSX.Element => {
         <img
           src={SuccessIcon}
           alt="Success Icon"
-          width="170px"
-          height="141px"
+          width={isOnDevice ? '282px' : '170px'}
+          height={isOnDevice ? '234px' : '141px'}
         />
         <StyledText desktopStyle="headingSmallBold" oddStyle="level3HeaderBold">
           {message}

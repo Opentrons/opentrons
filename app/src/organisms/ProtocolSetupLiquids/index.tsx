@@ -15,18 +15,17 @@ import {
   Chip,
 } from '@opentrons/components'
 import {
-  parseLiquidsInLoadOrder,
+  MICRO_LITERS,
   parseLabwareInfoByLiquidId,
-} from '@opentrons/api-client'
-import { MICRO_LITERS } from '@opentrons/shared-data'
+  parseLiquidsInLoadOrder,
+} from '@opentrons/shared-data'
 import { ODDBackButton } from '../../molecules/ODDBackButton'
 import { SmallButton } from '../../atoms/buttons'
 
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getTotalVolumePerLiquidId } from '../Devices/ProtocolRun/SetupLiquids/utils'
 import { LiquidDetails } from './LiquidDetails'
-import type { RunTimeCommand } from '@opentrons/shared-data'
-import type { ParsedLiquid } from '@opentrons/api-client'
+import type { ParsedLiquid, RunTimeCommand } from '@opentrons/shared-data'
 import type { SetupScreens } from '../../pages/ProtocolSetup'
 
 export interface ProtocolSetupLiquidsProps {

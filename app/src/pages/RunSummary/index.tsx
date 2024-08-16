@@ -67,6 +67,7 @@ import { handleTipsAttachedModal } from '../../organisms/DropTipWizardFlows/Tips
 import { useTipAttachmentStatus } from '../../organisms/DropTipWizardFlows'
 import { useRecoveryAnalytics } from '../../organisms/ErrorRecoveryFlows/hooks'
 
+import type { IconName } from '@opentrons/components'
 import type { OnDeviceRouteParams } from '../../App/types'
 import type { PipetteWithTip } from '../../organisms/DropTipWizardFlows'
 
@@ -152,33 +153,62 @@ export function RunSummary(): JSX.Element {
     localRobot?.serverHealth?.serialNumber ??
     null
 
-  const { data: commandErrorList } = useRunCommandErrors(runId, null, {
-    enabled:
-      runStatus != null &&
-      // @ts-expect-error runStatus expected to possibly not be terminal
-      RUN_STATUSES_TERMINAL.includes(runStatus) &&
-      isRunCurrent,
-  })
+  const { data: commandErrorList } = useRunCommandErrors(
+    runId,
+    { cursor: 0, pageLength: 100 },
+    {
+      enabled:
+        runStatus != null &&
+        // @ts-expect-error runStatus expected to possibly not be terminal
+        RUN_STATUSES_TERMINAL.includes(runStatus) &&
+        isRunCurrent,
+    }
+  )
   // TODO(jh, 08-14-24): The backend never returns the "user cancelled a run" error and cancelledWithoutRecovery becomes unnecessary.
-  const cancelledWithoutRecovery =
-    !enteredER && runStatus === RUN_STATUS_STOPPED
-  const showErrorDetailsBtn =
-    !cancelledWithoutRecovery &&
-    ((runRecord?.data.errors != null && runRecord?.data.errors.length > 0) ||
-      (commandErrorList != null && commandErrorList?.data.length > 0))
-
-  let headerText =
+  const hasCommandErrors =
     commandErrorList != null && commandErrorList.data.length > 0
+  const disableErrorDetailsBtn = !(
+    hasCommandErrors ||
+    (runRecord?.data.errors != null && runRecord?.data.errors.length > 0)
+  )
+
+  let headerText: string | null = null
+  if (runStatus === RUN_STATUS_SUCCEEDED) {
+    headerText = hasCommandErrors
       ? t('run_completed_with_warnings_splash')
       : t('run_completed_splash')
-  if (runStatus === RUN_STATUS_FAILED) {
+  } else if (runStatus === RUN_STATUS_FAILED) {
     headerText = t('run_failed_splash')
   } else if (runStatus === RUN_STATUS_STOPPED) {
-    if (enteredER) {
-      headerText = t('run_canceled_with_errors_splash')
-    } else {
-      headerText = t('run_canceled_splash')
+    headerText =
+      enteredER && !disableErrorDetailsBtn
+        ? t('run_canceled_with_errors_splash')
+        : t('run_canceled_splash')
+  }
+
+  const buildHeaderIcon = (): JSX.Element | null => {
+    let iconName: IconName | null = null
+    let iconColor: string | null = null
+
+    if (runStatus === RUN_STATUS_SUCCEEDED) {
+      if (hasCommandErrors) {
+        iconName = 'ot-check'
+        iconColor = COLORS.yellow50
+      } else {
+        iconName = 'ot-check'
+        iconColor = COLORS.green50
+      }
+    } else if (runStatus === RUN_STATUS_FAILED) {
+      iconName = 'ot-alert'
+      iconColor = COLORS.red50
+    } else if (runStatus === RUN_STATUS_STOPPED) {
+      iconName = 'ot-alert'
+      iconColor = COLORS.red50
     }
+
+    return iconName != null && iconColor != null ? (
+      <Icon name={iconName} size="2rem" color={iconColor} />
+    ) : null
   }
 
   const {
@@ -245,7 +275,7 @@ export function RunSummary(): JSX.Element {
         isRunCurrent,
         onSkipAndHome: () => {
           closeCurrentRun({
-            onSuccess: () => {
+            onSettled: () => {
               navigate('/')
             },
           })
@@ -255,7 +285,7 @@ export function RunSummary(): JSX.Element {
       returnToQuickTransfer()
     } else {
       closeCurrentRun({
-        onSuccess: () => {
+        onSettled: () => {
           navigate('/')
         },
       })
@@ -355,7 +385,7 @@ export function RunSummary(): JSX.Element {
               />
               <SplashHeader>
                 {didRunSucceed
-                  ? t('run_complete_splash')
+                  ? t('run_completed_splash')
                   : t('run_failed_splash')}
               </SplashHeader>
             </Flex>
@@ -387,12 +417,10 @@ export function RunSummary(): JSX.Element {
             gridGap={SPACING.spacing16}
           >
             <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
-              <Icon
-                name={didRunSucceed ? 'ot-check' : 'ot-alert'}
-                size="2rem"
-                color={didRunSucceed ? COLORS.green50 : COLORS.red50}
-              />
-              <SummaryHeader>{headerText}</SummaryHeader>
+              {buildHeaderIcon()}
+              {headerText != null ? (
+                <SummaryHeader>{headerText}</SummaryHeader>
+              ) : null}
             </Flex>
             <ProtocolName>{protocolName}</ProtocolName>
             <Flex gridGap={SPACING.spacing8} flexWrap={WRAP}>
@@ -445,14 +473,17 @@ export function RunSummary(): JSX.Element {
               }
               css={showRunAgainSpinner ? RUN_AGAIN_CLICKED_STYLE : undefined}
             />
-            {showErrorDetailsBtn ? (
-              <EqualWidthButton
-                iconName="info"
-                buttonType="alert"
-                onClick={handleViewErrorDetails}
-                buttonText={t('view_error_details')}
-              />
-            ) : null}
+            <EqualWidthButton
+              iconName="info"
+              buttonType="alert"
+              onClick={handleViewErrorDetails}
+              buttonText={
+                hasCommandErrors && runStatus === RUN_STATUS_SUCCEEDED
+                  ? t('view_warning_details')
+                  : t('view_error_details')
+              }
+              disabled={disableErrorDetailsBtn}
+            />
           </ButtonContainer>
         </Flex>
       )}
