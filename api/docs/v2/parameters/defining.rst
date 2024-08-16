@@ -197,7 +197,7 @@ Briefly describe the purpose of your CSV parameter when defining it.
         description="Table of labware, wells, and volumes to transfer."
     )
 
-During run setup, the technician can use the Flex touchscreen to select from files already stored on the robot or on an attached USB drive. Or in the Opentrons App, they can choose any file on their computer.
+During run setup, the technician can use the Flex touchscreen to choose a CSV file. They can choose from files on an attached USB drive, or from files already associated with the protocol and stored on the robot. Or in the Opentrons App, they can choose any file on their computer.
 
 .. note::
     The touchscreen and app currently limit you to selecting one CSV file per run. To match this limitation, the API will raise an error if you define more than one CSV parameter.

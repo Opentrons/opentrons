@@ -54,9 +54,10 @@ class CSVParameter:
         If the CSV has a header, that will be the first row in the list: ``.parse_as_csv()[0]``.
 
         Each item in the child lists corresponds to a single cell within its row.
-        The data for each cell is represented as a string, even if it is numeric in nature.
-        Cast these strings to integers or floating point numbers, as appropriate, to use
-        them as inputs to other API methods.
+        The data for each cell is represented as a string. You may need to trim whitespace
+        or otherwise validate string contents before passing them as inputs to other API methods.
+        For numeric data, cast these strings to integers or floating point numbers,
+        as appropriate.
 
         :param detect_dialect: If ``True``, examine the file and try to assign it a
             :py:class:`csv.Dialect` to improve parsing behavior.

@@ -70,7 +70,7 @@ First, we need to load the source labware. Let's assume that we always use Opent
   
 First, we'll get all of the data from the first column of the CSV, using a list comprehension. Then we'll take a slice of the resulting list to remove the header::
 
-    source_slots = [row[0] for row in well_data][1::]
+    source_slots = [row[0] for row in well_data][1:]
     # ['D1', 'D1', 'D2']
 
 Next, we'll get the unique items in the list by converting it to a :py:obj:`set` and back to a list::
