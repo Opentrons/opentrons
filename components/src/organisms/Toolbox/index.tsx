@@ -14,35 +14,37 @@ import { textDecorationUnderline } from '../../ui-style-constants/typography'
 import type { IconName } from '../../icons'
 
 export interface ToolboxProps {
-  header: string
+  title: string
   children: React.ReactNode
-  doneButtonText: string
+  confirmButtonText: string
   onCloseClick: () => void
-  headerIconName: IconName
-  exitButtonText?: string
+  titleIconName: IconName
+  closeButtonText?: string
   width?: string
 }
 
-export const Toolbox = (props: ToolboxProps): JSX.Element => {
+export function Toolbox(props: ToolboxProps): JSX.Element {
   const {
-    header,
+    title,
     children,
-    doneButtonText,
+    confirmButtonText,
     onCloseClick,
-    headerIconName,
-    exitButtonText,
+    titleIconName,
+    closeButtonText,
     width = '19.5rem',
   } = props
 
   const slideOutRef = React.useRef<HTMLDivElement>(null)
-  const [isReachedBottom, setIsReachedBottom] = React.useState<boolean>(false)
+  const [isScrolledToBottom, setIsScrolledToBottom] = React.useState<boolean>(
+    false
+  )
   const handleScroll = (): void => {
     if (slideOutRef.current == null) return
     const { scrollTop, scrollHeight, clientHeight } = slideOutRef.current
     if (scrollTop + clientHeight === scrollHeight) {
-      setIsReachedBottom(true)
+      setIsScrolledToBottom(true)
     } else {
-      setIsReachedBottom(false)
+      setIsScrolledToBottom(false)
     }
   }
 
@@ -73,18 +75,18 @@ export const Toolbox = (props: ToolboxProps): JSX.Element => {
           padding={`${SPACING.spacing20} ${SPACING.spacing16}`}
           borderBottom={`1px solid ${COLORS.grey30}`}
         >
-          <Flex gridGap={SPACING.spacing2} alignItems={ALIGN_CENTER}>
-            <Icon name={headerIconName} size="20px" />
-            <StyledText desktopStyle="bodyLargeSemiBold">{header}</StyledText>
+          <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
+            <Icon name={titleIconName} size="1.25rem" />
+            <StyledText desktopStyle="bodyLargeSemiBold">{title}</StyledText>
           </Flex>
 
           <Btn
             onClick={onCloseClick}
             textDecoration={textDecorationUnderline}
-            data-testid={`Toolbox_${exitButtonText}`}
+            data-testid={`Toolbox_${closeButtonText}`}
           >
             <StyledText desktopStyle="bodyDefaultRegular">
-              {exitButtonText}
+              {closeButtonText}
             </StyledText>
           </Btn>
         </Flex>
@@ -99,18 +101,18 @@ export const Toolbox = (props: ToolboxProps): JSX.Element => {
         </Box>
         <Box
           padding={SPACING.spacing16}
-          boxShadow={isReachedBottom ? 'none' : '0px -4px 12px #0000001a'}
-          zIndex="3"
+          boxShadow={isScrolledToBottom ? 'none' : '0px -4px 12px #0000001a'}
+          zIndex={3}
           width="100%"
           borderTop={`1px solid ${COLORS.grey30}`}
           alignItems={ALIGN_CENTER}
         >
           <PrimaryButton
             width="100%"
-            data-testid="Toolbox_doneButton"
+            data-testid="Toolbox_confirmButton"
             onClick={onCloseClick}
           >
-            {doneButtonText}
+            {confirmButtonText}
           </PrimaryButton>
         </Box>
       </Flex>

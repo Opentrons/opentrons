@@ -14,11 +14,11 @@ type Story = StoryObj<typeof ToolboxComponent>
 
 export const Toolbox: Story = {
   args: {
-    header: 'Header',
+    title: 'Header',
     children: <div>Slot Component: Replace me using the component panel.</div>,
-    doneButtonText: 'Done',
+    confirmButtonText: 'Done',
     onCloseClick: () => {},
-    headerIconName: 'swap-horizontal',
-    exitButtonText: 'Text link',
+    titleIconName: 'swap-horizontal',
+    closeButtonText: 'Text link',
   },
 }
