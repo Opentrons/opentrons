@@ -95,6 +95,7 @@ export function ProtocolAnalysisFailure(
               title={t('protocol_analysis_failure')}
               onClose={handleClickHideDetails}
             >
+              <p>check</p>
               {errors.map((error, index) => (
                 <LegacyStyledText key={index} as="p">
                   {error}
