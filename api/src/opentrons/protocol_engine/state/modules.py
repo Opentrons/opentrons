@@ -613,6 +613,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         configured_wavelength = absorbance_reader_substate.configured_wavelength
         is_lid_on = absorbance_reader_substate.is_lid_on
         lid_id = absorbance_reader_substate.lid_id
+        data = absorbance_reader_substate.data
 
         if isinstance(command.result, absorbance_reader.InitializeResult):
             self._state.substate_by_module_id[module_id] = AbsorbanceReaderSubState(
@@ -642,7 +643,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 configured_wavelength=configured_wavelength,
                 is_lid_on=False,
                 measured=True,
-                data=None,
+                data=data,
                 lid_id=lid_id,
             )
 
@@ -653,7 +654,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 configured_wavelength=configured_wavelength,
                 is_lid_on=True,
                 measured=True,
-                data=None,
+                data=data,
                 lid_id=lid_id,
             )
 
@@ -1272,6 +1273,25 @@ class ModuleView(HasState[ModuleState]):
             return True
         else:
             return False
+
+    def convert_absorbance_reader_data_points(
+        self, data: List[float]
+    ) -> Dict[str, float]:
+        """Return the data from the Absorbance Reader module in a map of wells for each read value."""
+        if len(data) == 96:
+            # We have to reverse the reader values because the Opentrons Absorbance Reader is rotated 180 degrees on the deck
+            data.reverse()
+            well_map: Dict[str, float] = {}
+            for i, value in enumerate(data):
+                row = chr(ord("A") + i // 12)  # Convert index to row (A-H)
+                col = (i % 12) + 1  # Convert index to column (1-12)
+                well_key = f"{row}{col}"
+                well_map[well_key] = value
+            return well_map
+        else:
+            raise ValueError(
+                "Only readings of 96 Well labware are supported for conversion to map of values by well."
+            )
 
     def ensure_and_convert_module_fixture_location(
         self,

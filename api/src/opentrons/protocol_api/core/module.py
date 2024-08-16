@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import List, Optional, TypeVar, ClassVar
+from typing import List, Dict, Optional, TypeVar, ClassVar
 
 from opentrons.drivers.types import (
     HeaterShakerLabwareLatchStatus,
@@ -359,7 +359,7 @@ class AbstractAbsorbanceReaderCore(AbstractModuleCore):
         """Initialize the Absorbance Reader by taking zero reading."""
 
     @abstractmethod
-    def read(self) -> None:
+    def read(self) -> Optional[Dict[str, float]]:
         """Get an absorbance reading from the Absorbance Reader."""
 
     @abstractmethod
