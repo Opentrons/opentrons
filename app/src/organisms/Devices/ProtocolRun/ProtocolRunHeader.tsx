@@ -65,6 +65,7 @@ import {
   ANALYTICS_PROTOCOL_RUN_ACTION,
 } from '../../../redux/analytics'
 import { getIsHeaterShakerAttached } from '../../../redux/config'
+import { getStoredProtocol } from '../../../redux/protocol-storage'
 import { Tooltip } from '../../../atoms/Tooltip'
 import { useCloseCurrentRun } from '../../ProtocolUpload/hooks'
 import { ConfirmCancelModal } from '../../RunDetails/ConfirmCancelModal'
@@ -158,6 +159,9 @@ export function ProtocolRunHeader({
     protocolKey,
     isProtocolAnalyzing,
   } = useProtocolDetailsForRun(runId)
+  const storedProtocol = useSelector((state: State) =>
+    getStoredProtocol(state, protocolKey)
+  )
   const { reportRecoveredRunResult } = useRecoveryAnalytics()
 
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
@@ -390,7 +394,7 @@ export function ProtocolRunHeader({
             />
           )}
         <Flex>
-          {protocolKey != null ? (
+          {storedProtocol != null ? (
             <Link to={`/protocols/${protocolKey}`}>
               <LegacyStyledText
                 as="h2"
