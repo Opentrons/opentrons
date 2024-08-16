@@ -233,7 +233,7 @@ Liquid presence detection works with Flex 1-, 8-, and 96-channel pipettes only. 
 Enabling Globally
 -----------------
 
-The easiest, and recommended, way to use liquid presence detection is by adding the optional Boolean argument, ``liquid_presence_detection=True`` to :py:meth:`.ProtocolContext.load_instrument` in your protocol. When ``True`` the robot will check for liquid on every aspiration. You can also turn this feature off and back on again later in a protocol. This example enables liquid presence detection on the 8-channel pipette used in the sample protocol at the top of the page.
+To automatically use liquid presence detection, add the optional Boolean argument  ``liquid_presence_detection=True`` to :py:meth:`.ProtocolContext.load_instrument` in your protocol. The robot will check for liquid on every aspiration. You can also turn this feature off and back on again later in a protocol. This example enables liquid presence detection on the 8-channel pipette used in the sample protocol at the top of the page.
 
 .. code-block:: python
 
@@ -247,30 +247,30 @@ The easiest, and recommended, way to use liquid presence detection is by adding 
 .. note::
     Accurate liquid detection requires fresh, dry pipette tips. Protocols using this feature must discard used tips after an aspirate/dispense cycle and pick up new tips before the next cycle. The API will raise an error if liquid detection is active and your protocol attempts to reuse a pipette tip or if the robot thinks the tip is wet.
 
-Let's take a look at how all this works. First, tell the robot to pick up a new, clean tip, aspirate 100 ul from a reservoir, and dispense that volume into a well plate.
+Let's take a look at how all this works. First, tell the robot to pick up a clean tip, aspirate 100 µL from a reservoir, and dispense that volume into a well plate.
 
 .. code-block:: python
     
-    right.pick_up_tip(tiprack2)
-    right.aspirate(100, reservoir["A1"])
+    right.pick_up_tip()
+    right.aspirate(100, reservoir["A1"])  # checks for liquid
     right.dispense(100, plate["A1"])
 
 Liquid detection takes place prior to aspiration. Upon detecting a liquid, the pipette stops, raises itself above the liquid's surface, and then aspirates according to your protocol. Checking for a liquid adds time to your protocol run, so be aware of that before using it. If Flex doesn't detect liquid, it raises an error and stops the protocol until the problem is resolved.
 
-However, aspiration isn't required for liquid level detection. Two standalone methods, :ref:`detect-liquid-presence` and :ref:`require-liquid-presence`, let you add liquid detection to a protocol with or without aspirating. The former checks for liquid and returns ``True`` if it finds liquid or ``False`` if it does not. It won't raise an error or stop a protocol. The latter checks for liquid and raises an error if it does not detect liquid. It will stop a protocol until the error is resolved.
+However, aspiration isn't required for liquid level detection. Two standalone methods, :py:meth:`.detect_liquid_presence` and :py:meth:`.require_liquid_presence`, let you add liquid detection to a protocol with or without aspirating. Automatic detection is the same as calling ``require_liquid_presence()`` before every aspiration. See :ref:`detect-liquid-presence` and :ref:`require-liquid-presence` for details.
 
 .. versionadded:: 2.20
 
 Activating and Deactivating
 ---------------------------
 
-You can turn liquid presence detection off and on throughout a protocol. To turn it off, set ``pipette.liquid_presence_detection=False`` at the point in a protocol where it needs to be disabled, usually between picking up a new tip and aspirating a liquid. This overrides the global argument, ``liquid_presence_detection=True`` that we set on :py:meth:`~.ProtocolContext.load_instrument`. Let's try this starting after picking up a new tip. 
+You can turn liquid presence detection off and on throughout a protocol. To turn it off, set ``pipette.liquid_presence_detection=False`` at the point in a protocol where it needs to be disabled, usually between picking up a new tip and aspirating a liquid. This overrides the global argument, ``liquid_presence_detection=True`` that we set on :py:meth:`~.ProtocolContext.load_instrument`. Let's try this  after picking up a new tip. 
 
 .. code-block:: python
     
     right.pick_up_tip()
-    right.liquid_presence_detection=False
-    right.aspirate(100, reservoir["A2"])
+    right.liquid_presence_detection = False  # Turns off liquid presence detection.
+    right.aspirate(100, reservoir["A2"])     # Aspirates immediately.
 
 From now on, the pipette will not check for liquid until you turn this feature back on. 
 
@@ -279,8 +279,8 @@ To reactivate, set ``liquid_presence_detection=True`` at the point later in the 
 .. code-block:: python
 
     right.pick_up_tip()
-    right.liquid_presence_detection=True  # Turns on liquid presence detection.
-    right.aspirate(100, reservoir["A3"])  # Detects liquid before aspirating.
+    right.liquid_presence_detection = True  # Turns on liquid presence detection.
+    right.aspirate(100, reservoir["A3"])    # Detects liquid before aspirating.
 
 The robot will continue to check for liquid until this feature is disabled again, or an empty well is detected (and the robot raises an error), or the protocol completes.
 

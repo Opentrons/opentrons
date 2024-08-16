@@ -906,9 +906,9 @@ class ProtocolContext(CommandPublisher):
                              control <advanced-control>` applications. You cannot
                              replace an instrument in the middle of a protocol being run
                              from the Opentrons App or touchscreen.
-        :param bool liquid_presence_detection: If ``True``, enable :ref:`liquid presence detection<lpd>` for Flex 1-, 8-, or 96-channel pipettes. If your protocol uses :ref:`partial tip pickup <partial-tip-pickup>`, the pressure sensors for the Flex 8-channel pipette are on channels A1 and H1. For the Flex 96-channel pipette, the pressure sensors are on channels A1 and H12. All other channels for these pipettes cannot detect the presence/absence of a liquid.
-
-                    .. versionadded:: 2.20
+        :param bool liquid_presence_detection: If ``True``, enable automatic
+            :ref:`liquid presence detection <lpd>` for Flex 1-, 8-, or 96-channel pipettes.
+            .. versionadded:: 2.20
         """
         instrument_name = validation.ensure_lowercase_name(instrument_name)
         checked_instrument_name = validation.ensure_pipette_name(instrument_name)
