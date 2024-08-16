@@ -161,45 +161,49 @@ export const RunPreviewComponent = (
             const isCurrent = index === currentRunCommandIndex
             const backgroundColor = isCurrent ? COLORS.blue30 : COLORS.grey20
             const iconColor = isCurrent ? COLORS.blue60 : COLORS.grey50
-            return (
-              <Flex
-                key={command.id}
-                alignItems={ALIGN_CENTER}
-                gridGap={SPACING.spacing8}
-              >
-                <LegacyStyledText
-                  minWidth={SPACING.spacing16}
-                  fontSize={TYPOGRAPHY.fontSizeCaption}
-                >
-                  {index + 1}
-                </LegacyStyledText>
+            if (command && command.intent != 'fixit') {
+              return (
                 <Flex
-                  flexDirection={DIRECTION_COLUMN}
-                  gridGap={SPACING.spacing4}
-                  width="100%"
-                  backgroundColor={
-                    index === jumpedIndex ? '#F5E3FF' : backgroundColor
-                  }
-                  color={COLORS.black90}
-                  borderRadius={BORDERS.borderRadius4}
-                  padding={SPACING.spacing8}
-                  css={css`
-                    transition: background-color ${COLOR_FADE_MS}ms ease-out,
-                      border-color ${COLOR_FADE_MS}ms ease-out;
-                  `}
+                  key={command.id}
+                  alignItems={ALIGN_CENTER}
+                  gridGap={SPACING.spacing8}
                 >
-                  <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
-                    <CommandIcon command={command} color={iconColor} />
-                    <CommandText
-                      command={command}
-                      commandTextData={protocolDataFromAnalysisOrRun}
-                      robotType={robotType}
-                      color={COLORS.black90}
-                    />
+                  <LegacyStyledText
+                    minWidth={SPACING.spacing16}
+                    fontSize={TYPOGRAPHY.fontSizeCaption}
+                  >
+                    {index + 1}
+                  </LegacyStyledText>
+                  <Flex
+                    flexDirection={DIRECTION_COLUMN}
+                    gridGap={SPACING.spacing4}
+                    width="100%"
+                    backgroundColor={
+                      index === jumpedIndex ? '#F5E3FF' : backgroundColor
+                    }
+                    color={COLORS.black90}
+                    borderRadius={BORDERS.borderRadius4}
+                    padding={SPACING.spacing8}
+                    css={css`
+                      transition: background-color ${COLOR_FADE_MS}ms ease-out,
+                        border-color ${COLOR_FADE_MS}ms ease-out;
+                    `}
+                  >
+                    <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
+                      <CommandIcon command={command} color={iconColor} />
+                      <CommandText
+                        command={command}
+                        commandTextData={protocolDataFromAnalysisOrRun}
+                        robotType={robotType}
+                        color={COLORS.black90}
+                      />
+                    </Flex>
                   </Flex>
                 </Flex>
-              </Flex>
-            )
+              )
+            } else {
+              return null
+            }
           }}
         </ViewportList>
         {currentRunCommandIndex >= 0 ? (
