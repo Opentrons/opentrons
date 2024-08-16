@@ -73,10 +73,6 @@ export function useRecoveryTipStatus(
 
       setIsLoadingTipStatus(false)
       setFailedCommandPipette(head(failedCommandPipettes) ?? null)
-      console.log(
-        '=>(useRecoveryTipStatus.ts:76) failedCommandPipettes',
-        failedCommandPipettes
-      )
 
       return Promise.resolve(pipettesWithTip)
     })

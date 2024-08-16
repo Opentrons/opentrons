@@ -99,7 +99,7 @@ export const BeforeBeginning = ({
               ? JUSTIFY_SPACE_BETWEEN
               : JUSTIFY_FLEX_END
           }
-          marginTop={issuedCommandsType === 'fixit' ? '6.875rem' : undefined}
+          marginTop={issuedCommandsType === 'fixit' ? '6.875rem' : 'auto'}
         >
           {fixitCommandTypeUtils != null ? (
             <TextOnlyButton

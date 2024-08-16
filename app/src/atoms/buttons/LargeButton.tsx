@@ -151,24 +151,30 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     }
 
     &:active {
-      background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
-        .activeBackgroundColor};
-      ${activeColorFor(buttonType)};
+      background-color: ${disabled
+        ? LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledBackgroundColor
+        : LARGE_BUTTON_PROPS_BY_TYPE[buttonType].activeBackgroundColor};
+      ${!disabled && activeColorFor(buttonType)};
       border: ${BORDERS.borderRadius4} solid
-        ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].activeBackgroundColor};
+        ${disabled
+          ? LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledBackgroundColor
+          : LARGE_BUTTON_PROPS_BY_TYPE[buttonType].activeBackgroundColor};
     }
     &:active #btn-icon {
       ${activeIconStyle(buttonType)};
     }
 
     &:focus-visible {
-      background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
-        .focusVisibleBackgroundColor};
-      ${activeColorFor(buttonType)};
+      background-color: ${disabled
+        ? LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledBackgroundColor
+        : LARGE_BUTTON_PROPS_BY_TYPE[buttonType].focusVisibleBackgroundColor};
+      ${!disabled && activeColorFor(buttonType)};
       padding: calc(${SPACING.spacing24} + ${SPACING.spacing2});
       border: ${SPACING.spacing2} solid ${COLORS.transparent};
-      outline: 3px solid
-        ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].focusVisibleOutlineColor};
+      outline: ${disabled
+        ? 'none'
+        : `3px solid
+    ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].focusVisibleOutlineColor}`};
       background-clip: padding-box;
       box-shadow: none;
     }

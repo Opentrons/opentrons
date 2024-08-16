@@ -26,10 +26,6 @@ import { useCloneRun } from '../../../ProtocolUpload/hooks'
 import { useRerunnableStatusText } from '../hooks'
 import { RecentRunProtocolCard } from '../'
 import { useNotifyAllRunsQuery } from '../../../../resources/runs'
-import {
-  useRobotInitializationStatus,
-  INIT_STATUS,
-} from '../../../../resources/health/hooks'
 
 import type { NavigateFunction } from 'react-router-dom'
 import type { ProtocolHardware } from '../../../../pages/Protocols/hooks'
@@ -54,7 +50,6 @@ vi.mock('../../../../organisms/ProtocolUpload/hooks')
 vi.mock('../../../../redux/analytics')
 vi.mock('../hooks')
 vi.mock('../../../../resources/runs')
-vi.mock('../../../../resources/health/hooks')
 
 const RUN_ID = 'mockRunId'
 const ROBOT_NAME = 'otie'
@@ -160,9 +155,6 @@ describe('RecentRunProtocolCard', () => {
         runTimeParameters: [],
       },
     } as any)
-    vi.mocked(useRobotInitializationStatus).mockReturnValue(
-      INIT_STATUS.SUCCEEDED
-    )
     when(useTrackProtocolRunEvent).calledWith(RUN_ID, ROBOT_NAME).thenReturn({
       trackProtocolRunEvent: mockTrackProtocolRunEvent,
     })
@@ -265,20 +257,6 @@ describe('RecentRunProtocolCard', () => {
       isLoading: true,
       data: { data: { metadata: { protocolName: 'mockProtocol' } } },
     } as any)
-    render(props)
-    screen.getByText('mock Skeleton')
-  })
-
-  it('should render the skeleton when the robot server is initializing', () => {
-    vi.mocked(useRobotInitializationStatus).mockReturnValue(
-      INIT_STATUS.INITIALIZING
-    )
-    render(props)
-    screen.getByText('mock Skeleton')
-  })
-
-  it('should render the skeleton when the robot server is unresponsive', () => {
-    vi.mocked(useRobotInitializationStatus).mockReturnValue(null)
     render(props)
     screen.getByText('mock Skeleton')
   })

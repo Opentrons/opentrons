@@ -994,7 +994,9 @@ function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
             onClick={handleFailedRunClick}
             textDecoration={TYPOGRAPHY.textDecorationUnderline}
           >
-            {t('view_error')}
+            {runStatus === RUN_STATUS_SUCCEEDED
+              ? t('view_warning_details')
+              : t('view_error_details')}
           </LinkButton>
         </Flex>
       </Banner>
