@@ -160,8 +160,9 @@ export const RunPreviewComponent = (
             const isCurrent = index === currentRunCommandIndex
             const backgroundColor = isCurrent ? COLORS.blue30 : COLORS.grey20
             const iconColor = isCurrent ? COLORS.blue60 : COLORS.grey50
+            
 
-            if (command != null && !('intent' in command)) {
+            if (command != null && !('intent' in command && command.intent === 'fixit')) {
               return (
                 <Flex
                   key={command.id}
