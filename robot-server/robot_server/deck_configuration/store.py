@@ -148,11 +148,11 @@ def _http_types_to_storage_types(
 ) -> _StorableDeckConfiguration:
     storage_cutout_fixture_placements = [
         calibration_storage_types.CutoutFixturePlacement(
-            cutout_fixture_id=e.cutoutFixtureId,
-            cutout_id=e.cutoutId,
-            opentrons_module_serial_number=e.opentronsModuleSerialNumber,
+            cutout_fixture_id=http_element.cutoutFixtureId,
+            cutout_id=http_element.cutoutId,
+            opentrons_module_serial_number=http_element.opentronsModuleSerialNumber,
         )
-        for e in http_val.cutoutFixtures
+        for http_element in http_val.cutoutFixtures
     ]
     return storage_cutout_fixture_placements, last_modified_at
 
@@ -163,11 +163,11 @@ def _storage_types_to_http_types(
     storage_cutout_fixtures, last_modified_at = storage_val
     http_cutout_fixtures = [
         models.CutoutFixture.construct(
-            cutoutFixtureId=e.cutout_fixture_id,
-            cutoutId=e.cutout_id,
-            opentronsModuleSerialNumber=e.opentrons_module_serial_number,
+            cutoutFixtureId=storage_element.cutout_fixture_id,
+            cutoutId=storage_element.cutout_id,
+            opentronsModuleSerialNumber=storage_element.opentrons_module_serial_number,
         )
-        for e in storage_cutout_fixtures
+        for storage_element in storage_cutout_fixtures
     ]
     return models.DeckConfigurationResponse.construct(
         cutoutFixtures=http_cutout_fixtures,
