@@ -27,5 +27,5 @@ It continues with a selection of use cases and some overall style guidance. When
 
 - :ref:`Use case – sample count <use-case-sample-count>`: Change behavior throughout a protocol based on how many samples you plan to process. Setting sample count exactly saves time, tips, and reagents.
 - :ref:`Use case – dry run <use-case-dry-run>`: Test your protocol, rather than perform a live run, just by flipping a toggle.
-- :ref:`Use case – cherrypicking <use-case-cherrypicking>`: Use a CSV file to specify locations for a simple cherrypicking protocol.
+- :ref:`Use case – cherrypicking <use-case-cherrypicking>`: Use a CSV file to specify locations and volumes for a simple cherrypicking protocol.
 - :ref:`Style and usage <rtp-style>`: When you're a protocol author, you write code. When you're a parameter author, you write words. Follow this advice to make things as clear as possible for the technicians who will run your protocol.

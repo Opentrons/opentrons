@@ -73,7 +73,7 @@ Types of Parameters
 
 The API supports four types of parameters that correspond to Python built-in types: Boolean (:py:class:`bool`), integer (:py:class:`int`), floating point number (:py:class:`float`), and string (:py:class:`str`). It is not possible to mix types within a single parameter.
 
-In addition, starting in version 2.20, the API supports CSV files as parameters. All data contained in CSV parameters, including numeric data, is initially interpreted as strings. See :ref:`using-rtp-types` for more information on manipulating CSV values.
+In addition, starting in version 2.20, the API supports CSV files as parameters. All data contained in CSV parameters, including numeric data, is initially interpreted as strings. See :ref:`rtp-csv-data` for more information.
 
 Boolean Parameters
 ------------------
@@ -198,5 +198,8 @@ Briefly describe the purpose of your CSV parameter when defining it.
     )
 
 During run setup, the technician can use the Flex touchscreen to select from files already stored on the robot or on an attached USB drive. Or in the Opentrons App, they can choose any file on their computer.
+
+.. note::
+    The touchscreen and app currently limit you to selecting one CSV file per run. To match this limitation, the API will raise an error if you define more than one CSV parameter.
 
 .. versionadded:: 2.20

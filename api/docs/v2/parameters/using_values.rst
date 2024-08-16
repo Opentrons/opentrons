@@ -58,14 +58,30 @@ The :py:obj:`.CSVParameter.contents` parameter returns the entire contents of th
 
 The :py:meth:`.CSVParameter.parse_as_csv` method returns CSV data in a structured format. Specifically, it is a list of lists of strings. This lets you access any "cell" of your tabular data by row and column index. This example parses a runtime parameter named ``csv_data``, stores the parsed data as ``parsed_csv``, and then accesses different portions of the data::
 
-    parsed_csv = protocol.params.csv_data
+    parsed_csv = protocol.params.csv_data.parse_as_csv()
     parsed_csv[0]                   # first row (header, if present)
     parsed_csv[1][2]                # second row, third column
     [row[1] for row in parsed_csv]  # second column
 
 .. versionadded:: 2.20
 
-Remember that, like all Python lists, the lists representing your CSVs are zero-indexed.
+Like all Python lists, the lists representing your CSVs are zero-indexed.
+
+.. tip::
+
+    Remember that CSV parameters don't have default values. Accessing CSV data in any of the above ways will prevent protocol analysis from completing until you select a CSV file and confirm all runtime parameter values during run setup.
+    
+    You can use a try–except block to work around this and provide the data needed for protocol analysis. First, add ``from opentrons.protocol_api import RuntimeParameterRequiredError`` at the top of your protocol. Then catch the error like this::
+    
+        try:
+            parsed_csv = protocol.params.csv_data.parse_as_csv()
+        except RuntimeParameterRequiredError:
+            parsed_csv = [
+                ["source slot", "source well", "volume"],
+                ["D1", "A1", "50"],
+                ["D2", "B1", "50"],
+            ]
+
 
 Limitations
 ===========
