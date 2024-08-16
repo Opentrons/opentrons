@@ -940,8 +940,8 @@ class InstrumentContext(publisher.CommandPublisher):
                 # in which self.starting_tip consumes tips. It would currently vary
                 # depending on the configuration layout of a pipette at a given
                 # time, which means that some combination of starting tip and partial
-                # configuraiton are incompatible under the current understanding of
-                # starting tip behavior. Replacing starting_tip with an undeprecated
+                # configuration are incompatible under the current understanding of
+                # starting tip behavior. Replacing starting_tip with an un-deprecated
                 # Labware.has_tip may solve this.
                 raise CommandPreconditionViolated(
                     "Automatic tip tracking is not available when using a partial pipette"
@@ -1683,12 +1683,10 @@ class InstrumentContext(publisher.CommandPublisher):
     @requires_version(2, 20)
     def liquid_presence_detection(self) -> bool:
         """
-        Gets the global setting for liquid level detection.
+        Whether the pipette will perform automatic liquid presence detection.
 
-        When True, `liquid_probe` will be called before
-        aspirates and dispenses to bring the tip to the liquid level.
-
-        The default value is False.
+        When ``True``, the pipette will check for liquid on every aspiration.
+        Defaults to ``False``. See :ref:`lpd`.
         """
         return self._core.get_liquid_presence_detection()
 
@@ -2115,9 +2113,12 @@ class InstrumentContext(publisher.CommandPublisher):
 
     @requires_version(2, 20)
     def detect_liquid_presence(self, well: labware.Well) -> bool:
-        """Check if there is liquid in a well.
+        """Checks for liquid in a well.
 
-        :returns: A boolean.
+        Returns ``True`` if liquid is present and ``False`` if liquid is not present. Will not raise an error if it does not detect liquid. When simulating a protocol, the check always succeeds (returns ``True``). Works with Flex 1-, 8-, and 96-channel pipettes. See :ref:`detect-liquid-presence`.
+
+        .. note::
+            The pressure sensors for the Flex 8-channel pipette are on channels 1 and 8 (positions A1 and H1). For the Flex 96-channel pipette, the pressure sensors are on channels 1 and 96 (positions A1 and H12). Other channels on multi-channel pipettes do not have sensors and cannot detect liquid.
         """
         loc = well.top()
         self._96_tip_config_valid()
@@ -2125,9 +2126,12 @@ class InstrumentContext(publisher.CommandPublisher):
 
     @requires_version(2, 20)
     def require_liquid_presence(self, well: labware.Well) -> None:
-        """If there is no liquid in a well, raise an error.
+        """Check for liquid in a well and raises an error if none is detected.
 
-        :returns: None.
+        When this method raises an error, Flex will offer the opportunity to enter recovery mode. In recovery mode, you can manually add liquid to resolve the error. When simulating a protocol, the check always succeeds (does not raise an error). Works with Flex 1-, 8-, and 96-channel pipettes. See :ref:`lpd` and :ref:`require-liquid-presence`.
+
+        .. note::
+            The pressure sensors for the Flex 8-channel pipette are on channels 1 and 8 (positions A1 and H1). For the Flex 96-channel pipette, the pressure sensors are on channels 1 and 96 (positions A1 and H12). Other channels on multi-channel pipettes do not have sensors and cannot detect liquid.
         """
         loc = well.top()
         self._96_tip_config_valid()
