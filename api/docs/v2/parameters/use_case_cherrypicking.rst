@@ -19,7 +19,7 @@ The destination labware and well order will remain fixed, to focus on using thes
 Preparing the CSV
 =================
 
-First, we need to set up the CSV parameter. The data format we expect for this protocol is simple enough to fully explain in the parameter's description.
+To get started, let's set up the CSV parameter. The data format we expect for this protocol is simple enough to fully explain in the parameter's description.
 
 .. code-block:: python
 
@@ -62,7 +62,7 @@ Now ``well_data`` is a list with four elements, one for each row in the file. We
 Loading Source Labware
 ======================
 
-First, we need to load the source labware. Let's assume that we always use Opentrons Tough PCR plates for both source and destination plates. Then we need to determine the locations for loading source plates from the first column of the CSV. This will have three steps:
+We'll use the data from the ``source slot`` column as part of loading the source labware. Let's assume that we always use Opentrons Tough PCR plates for both source and destination plates. Then we need to determine the locations for loading source plates from the first column of the CSV. This will have three steps:
 
   - Using a list comprehension to get data from the ``source slot`` column.
   - Deduplicating the items in the column.

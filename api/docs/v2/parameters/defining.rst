@@ -185,7 +185,7 @@ During run setup, the technician can choose from a menu of the provided choices.
 CSV Parameters
 --------------
 
-CSV parameters accept any valid comma-separated file. You don't need to specify the format of the data. Due to this flexibility, they do not have default values. Separately provide standard operating procedures or template files to the scientists and technicians who will create the tabular data your protocol relies on.
+CSV parameters accept any valid comma-separated file. You don't need to specify the format of the data. Due to this flexibility, CSV parameters do not have default values. Separately provide standard operating procedures or template files to the scientists and technicians who will create the tabular data your protocol relies on.
 
 Briefly describe the purpose of your CSV parameter when defining it.
 
