@@ -35,7 +35,6 @@ import { useLastRunCommand } from '../Devices/hooks/useLastRunCommand'
 import type { RunStatus } from '@opentrons/api-client'
 import type { RobotType } from '@opentrons/shared-data'
 import type { ViewportListRef } from 'react-viewport-list'
-
 const COLOR_FADE_MS = 500
 const LIVE_RUN_COMMANDS_POLL_MS = 3000
 // arbitrary large number of commands
@@ -161,7 +160,8 @@ export const RunPreviewComponent = (
             const isCurrent = index === currentRunCommandIndex
             const backgroundColor = isCurrent ? COLORS.blue30 : COLORS.grey20
             const iconColor = isCurrent ? COLORS.blue60 : COLORS.grey50
-            if (command && command.intent != 'fixit') {
+
+            if (command != null && !('intent' in command)) {
               return (
                 <Flex
                   key={command.id}
