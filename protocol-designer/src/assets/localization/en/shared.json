@@ -29,9 +29,13 @@
   "protocol_designer": "Protocol Designer",
   "remove": "remove",
   "slot_stack_information": "Slot Stack Information",
+  "stagingArea": "Staging area",
   "step_count": "Step {{current}}",
   "step": "Step {{current}} / {{max}}",
+  "trashBin": "Trash bin",
   "version": "Version # {{version}}",
+  "wasteChute": "Waste chute",
+  "wasteChuteAndStagingArea": "Waste chute and staging area",
   "welcome": "Welcome to Protocol Designer",
   "yes": "Yes"
 }

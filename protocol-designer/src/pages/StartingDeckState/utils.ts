@@ -1,7 +1,23 @@
+import {
+  FLEX_ROBOT_TYPE,
+  OT2_ROBOT_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+  THERMOCYCLER_MODULE_V2,
+  getModuleType,
+} from '@opentrons/shared-data'
+import {
+  FLEX_MODULE_MODELS,
+  OT2_MODULE_MODELS,
+  RECOMMENDED_LABWARE_BY_MODULE,
+} from './constants'
 import type {
   AddressableAreaName,
   CutoutFixture,
   CutoutId,
+  DeckSlotId,
+  LabwareDefinition2,
+  ModuleModel,
+  RobotType,
 } from '@opentrons/shared-data'
 
 export function getCutoutIdForAddressableArea(
@@ -17,4 +33,64 @@ export function getCutoutIdForAddressableArea(
       ) ?? []
     return (cutoutId as CutoutId) ?? acc
   }, null)
+}
+
+export function getModuleModelsBySlot(
+  enableAbsorbanceReader: boolean,
+  robotType: RobotType,
+  slot: DeckSlotId
+): ModuleModel[] {
+  const FLEX_MIDDLE_SLOTS = ['B2', 'C2', 'A2', 'D2']
+  const OT2_MIDDLE_SLOTS = ['2', '5', '8', '11']
+
+  let moduleModels: ModuleModel[] = enableAbsorbanceReader
+    ? FLEX_MODULE_MODELS.filter(model => model !== 'absorbanceReaderV1')
+    : FLEX_MODULE_MODELS
+
+  switch (robotType) {
+    case FLEX_ROBOT_TYPE: {
+      if (slot !== 'B1' && !FLEX_MIDDLE_SLOTS.includes(slot)) {
+        moduleModels = FLEX_MODULE_MODELS.filter(
+          model => model !== 'thermocyclerModuleV2'
+        )
+      }
+      if (FLEX_MIDDLE_SLOTS.includes(slot)) {
+        moduleModels = FLEX_MODULE_MODELS.filter(
+          model => model === 'magneticBlockV1'
+        )
+      }
+      break
+    }
+    case OT2_ROBOT_TYPE: {
+      if (OT2_MIDDLE_SLOTS.includes(slot)) {
+        moduleModels = []
+      } else if (slot !== '10') {
+        moduleModels = OT2_MODULE_MODELS.filter(
+          model => getModuleType(model) !== THERMOCYCLER_MODULE_TYPE
+        )
+      } else {
+        moduleModels = OT2_MODULE_MODELS
+      }
+      break
+    }
+  }
+  return moduleModels
+}
+export const getLabwareIsRecommended = (
+  def: LabwareDefinition2,
+  moduleModel?: ModuleModel | null
+): boolean => {
+  //  special-casing the thermocycler module V2 recommended labware
+  const moduleType = moduleModel != null ? getModuleType(moduleModel) : null
+  if (moduleModel === THERMOCYCLER_MODULE_V2) {
+    return (
+      def.parameters.loadName === 'opentrons_96_wellplate_200ul_pcr_full_skirt'
+    )
+  } else {
+    return moduleType != null
+      ? RECOMMENDED_LABWARE_BY_MODULE[moduleType].includes(
+          def.parameters.loadName
+        )
+      : false
+  }
 }

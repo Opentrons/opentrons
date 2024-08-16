@@ -1,5 +1,19 @@
 {
+  "adapter": "Adapter",
+  "adapter_compatible_lab": "Adapter compatible labware",
+  "add_fixture": "Add a fixture",
   "add_labware": "Add labware",
+  "add_module": "Add a module",
+  "aluminumBlock": "Aluminum block",
+  "clear": "Clear",
+  "customize_slot": "Customize slot {{slotName}}",
+  "deck_hardware": "Deck hardware",
+  "done": "Done",
   "edit": "Edit",
-  "starting_deck_state": "Starting deck state"
+  "labware": "Labware",
+  "reservoir": "Reservoir",
+  "starting_deck_state": "Starting deck state",
+  "tiprack": "Tiprack",
+  "tubeRack": "Tube rack",
+  "wellPlate": "Well plate"
 }

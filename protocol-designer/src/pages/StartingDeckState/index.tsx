@@ -6,7 +6,6 @@ import {
   DeckFromLayers,
   Flex,
   FlexTrash,
-  LegacyStyledText,
   PrimaryButton,
   RobotCoordinateSpaceWithRef,
   SingleSlotFixture,
@@ -32,6 +31,7 @@ import { getHasGen1MultiChannelPipette } from '../../step-forms'
 import { SlotDetailsContainer } from './SlotDetailsContainer'
 import { DeckSetupDetails } from './DeckSetupDetails'
 import { getCutoutIdForAddressableArea } from './utils'
+import { DeckSetupTools } from './DeckSetupTools'
 
 import type { StagingAreaLocation, TrashCutoutId } from '@opentrons/components'
 import type { AddressableAreaName, CutoutId } from '@opentrons/shared-data'
@@ -140,7 +140,12 @@ export function StartingDeckState(): JSX.Element {
       </PrimaryButton>
       {zoomIn != null ? (
         //  TODO(ja, 8/6/24): still need to develop the zoomed in slot
-        <LegacyStyledText>you zoomed in on the slot!</LegacyStyledText>
+        <DeckSetupTools
+          onCloseClick={() => {
+            setZoomInOnSlot(null)
+          }}
+          slot={zoomIn.slot}
+        />
       ) : (
         <Flex
           maxWidth={robotType === FLEX_ROBOT_TYPE ? '130vw' : '100vw'}
