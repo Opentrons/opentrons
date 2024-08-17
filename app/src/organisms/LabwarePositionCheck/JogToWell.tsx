@@ -266,7 +266,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
 const Header = styled.h1`
   ${TYPOGRAPHY.h1Default}
 
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
     ${TYPOGRAPHY.level4HeaderSemiBold}
   }
 `

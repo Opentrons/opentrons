@@ -5,6 +5,8 @@
 // is precisely 600x1024
 export const touchscreenMediaQuerySpecs = '(height: 600px) and (width: 1024px)'
 
+export const TOUCH_ODD_CLASS = 'touch-odd' as const
+
 // This needs to be recalculated on-render to work with storybook viewport settings, so
 // if you need to support both media types in js use the function
 export const isTouchscreenDynamic = (): boolean =>

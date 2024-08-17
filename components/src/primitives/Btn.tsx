@@ -24,7 +24,7 @@ const BUTTON_BASE_STYLE = css`
     cursor: default;
   }
 
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
     cursor: default;
   }
 `

@@ -261,7 +261,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
         opacity: 70%;
       }
 
-      @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
         font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
         font-size: ${TYPOGRAPHY.fontSize22};
 

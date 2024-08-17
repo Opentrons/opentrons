@@ -57,13 +57,16 @@ import {
 
 import { OnDeviceDisplayAppFallback } from './OnDeviceDisplayAppFallback'
 
-import { hackWindowNavigatorOnLine } from './hacks'
+import { hackWindowNavigatorOnLine, hackAddTouchClass } from './hacks'
 
 import type { Dispatch } from '../redux/types'
 
 // forces electron to think we're online which means axios won't elide
 // network calls to localhost. see ./hacks.ts for more.
 hackWindowNavigatorOnLine()
+
+// add a touch class to the window object to tell CSS that we're in ODD mode
+hackAddTouchClass()
 
 export const ON_DEVICE_DISPLAY_PATHS = [
   '/dashboard',

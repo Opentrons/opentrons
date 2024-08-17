@@ -126,9 +126,9 @@ function ThermocyclerRunProfile(
       {...styleProps}
       alignItems={shouldPropagateCenter ? ALIGN_CENTER : undefined}
       css={`
-        @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+        .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
           display: flex !important;
-        } ;
+        }
       `}
     >
       <CommandStyledText

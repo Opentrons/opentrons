@@ -8,9 +8,16 @@
 // This function is exposed in its own module so it can be mocked in testing
 // since jest really doesn't like you doing this.
 
+import { RESPONSIVENESS } from '@opentrons/components'
+
 export const hackWindowNavigatorOnLine = (): void => {
   Object.defineProperty(window.navigator, 'onLine', {
     get: () => true,
   })
   window.dispatchEvent(new Event('online'))
+}
+
+// explicitly add a touch class to the body so UI elements know to render in ODD mode
+export const hackAddTouchClass = (): void => {
+  document.body.classList.add(RESPONSIVENESS.TOUCH_ODD_CLASS)
 }

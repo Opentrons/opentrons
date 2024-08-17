@@ -416,7 +416,7 @@ function useInitiateExit(): {
 }
 
 const ERROR_MODAL_FIXIT_STYLE = css`
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
     margin-top: -${SPACING.spacing68}; // See EXEC-520. This clearly isn't ideal.
   }
 `
