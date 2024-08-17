@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { css } from 'styled-components'
 import { createPortal } from 'react-dom'
 import { Trans, useTranslation } from 'react-i18next'
 
@@ -73,14 +72,11 @@ export function ProtocolAnalysisErrorBanner(
               title={t('protocol_analysis_failure')}
               onClose={handleToggleDetails}
             >
-              <Flex css={SCROLL_LONG}>
-                <p>check</p>
                 {errors.map((error, index) => (
                   <LegacyStyledText as="p" key={index}>
                     {error?.detail}
                   </LegacyStyledText>
                 ))}
-              </Flex>
               <Flex justifyContent={JUSTIFY_FLEX_END}>
                 <PrimaryButton
                   role="button"
@@ -99,8 +95,3 @@ export function ProtocolAnalysisErrorBanner(
     </Banner>
   )
 }
-
-const SCROLL_LONG = css`
-  overflow-x: scroll;
-  width: inherit;
-`
