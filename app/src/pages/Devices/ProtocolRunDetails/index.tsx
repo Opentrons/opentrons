@@ -322,9 +322,10 @@ const SetupTab = (props: SetupTabProps): JSX.Element | null => {
   )}`
 
   React.useEffect(() => {
-    if (disabled && protocolRunDetailsTab === 'setup')
+    if (currentRunId === null && protocolRunDetailsTab === 'setup') {
       navigate(`/devices/${robotName}/protocol-runs/${runId}/run-preview`)
-  }, [disabled, navigate, robotName, runId])
+    }
+  }, [disabled, navigate, protocolRunDetailsTab, robotName, runId])
 
   return (
     <RoundTab
