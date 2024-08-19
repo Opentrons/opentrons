@@ -97,14 +97,12 @@ export function ProtocolAnalysisFailure(
               onClose={handleClickHideDetails}
             >
               <Flex css={SCROLL_LONG}>
-              {errors.map((error, index) => (
-                <LegacyStyledText key={index} as="p">
-                  {error}
-                </LegacyStyledText>
-              )
-              )
-              }
-                            </Flex>
+                {errors.map((error, index) => (
+                  <LegacyStyledText key={index} as="p">
+                    {error}
+                  </LegacyStyledText>
+                ))}
+              </Flex>
               <Flex justifyContent={JUSTIFY_FLEX_END}>
                 <PrimaryButton
                   onClick={handleClickHideDetails}
@@ -123,6 +121,7 @@ export function ProtocolAnalysisFailure(
 }
 
 const SCROLL_LONG = css`
-  overflow-x: scroll;
+  overflow: scroll;
   width: inherit;
+  height: 11.75rem;
 `

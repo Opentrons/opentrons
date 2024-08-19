@@ -72,11 +72,11 @@ export function ProtocolAnalysisErrorBanner(
               title={t('protocol_analysis_failure')}
               onClose={handleToggleDetails}
             >
-                {errors.map((error, index) => (
-                  <LegacyStyledText as="p" key={index}>
-                    {error?.detail}
-                  </LegacyStyledText>
-                ))}
+              {errors.map((error, index) => (
+                <LegacyStyledText as="p" key={index}>
+                  {error?.detail}
+                </LegacyStyledText>
+              ))}
               <Flex justifyContent={JUSTIFY_FLEX_END}>
                 <PrimaryButton
                   role="button"
