@@ -1,1 +1,1 @@
-console.log('organisms for new components')
+export * from './SlotInformation'
