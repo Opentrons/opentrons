@@ -9,8 +9,8 @@ import { SPACING } from '../../../ui-style-constants'
 
 interface ListItemDescriptorProps {
   type: 'default' | 'mini'
-  description: JSX.Element
-  content: JSX.Element
+  description: JSX.Element | string
+  content: JSX.Element | string
 }
 
 export const ListItemDescriptor = (
