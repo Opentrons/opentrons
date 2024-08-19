@@ -51,7 +51,7 @@
     ]
   },
   "metadata": {
-    "displayName": "Corning 96 Well Plate 360 µL Flat",
+    "displayName": "Fixture Corning 96 Well Plate 360 µL Flat",
     "displayCategory": "wellPlate",
     "displayVolumeUnits": "µL",
     "tags": []
@@ -1043,7 +1043,7 @@
     "format": "96Standard",
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "corning_96_wellplate_360ul_flat"
+    "loadName": "fixture_corning_96_wellplate_360_flat"
   },
   "namespace": "fixture",
   "version": 2,

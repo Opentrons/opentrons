@@ -226,7 +226,7 @@ export const DeckSetupTools = (props: DeckSetupToolsProps): JSX.Element => {
 
   return (
     <Toolbox
-      width="400px"
+      width="25rem"
       title={t('customize_slot', { slotName: slot })}
       closeButtonText={t('clear')}
       onCloseClick={() => {

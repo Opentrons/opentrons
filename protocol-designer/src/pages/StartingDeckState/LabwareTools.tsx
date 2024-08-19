@@ -371,6 +371,7 @@ export const LabwareTools = (props: LabwareToolsProps): JSX.Element => {
           {t('custom_labware')}
         </StyledText>
         <input
+          data-testid="customLabwareInput"
           type="file"
           onChange={e => {
             setSelectedCategory(CUSTOM_CATEGORY)

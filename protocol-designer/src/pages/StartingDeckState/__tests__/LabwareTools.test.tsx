@@ -2,6 +2,12 @@ import * as React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { fireEvent, screen } from '@testing-library/react'
+import {
+  FLEX_ROBOT_TYPE,
+  HEATERSHAKER_MODULE_V1,
+  fixtureP1000SingleV2Specs,
+  fixtureTiprack1000ul,
+} from '@opentrons/shared-data'
 import { i18n } from '../../../localization'
 import { renderWithProviders } from '../../../__testing-utils__'
 import {
@@ -9,13 +15,8 @@ import {
   getPermittedTipracks,
   getPipetteEntities,
 } from '../../../step-forms/selectors'
-import {
-  FLEX_ROBOT_TYPE,
-  HEATERSHAKER_MODULE_V1,
-  fixtureP1000SingleV2Specs,
-  fixtureTiprack1000ul,
-} from '@opentrons/shared-data'
 import { getHas96Channel } from '../../../utils'
+import { createCustomLabwareDef } from '../../../labware-defs/actions'
 import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { getRobotType } from '../../../file-data/selectors'
 import { LabwareTools } from '../LabwareTools'
@@ -25,6 +26,7 @@ vi.mock('../../../utils')
 vi.mock('../../../step-forms/selectors')
 vi.mock('../../../file-data/selectors')
 vi.mock('../../../labware-defs/selectors')
+vi.mock('../../../labware-defs/actions')
 
 const render = (props: React.ComponentProps<typeof LabwareTools>) => {
   return renderWithProviders(<LabwareTools {...props} />, {
@@ -90,12 +92,19 @@ describe('LabwareTools', () => {
     //   set adapter
     fireEvent.click(
       screen.getByRole('label', {
-        name: 'Opentrons Universal Flat Heater-Shaker Adapter',
+        name: 'Fixture Opentrons Universal Flat Heater-Shaker Adapter',
       })
     )
     //  set labware
     screen.getByText('Adapter compatible labware')
     fireEvent.click(screen.getAllByRole('label')[1])
     expect(props.setNestedSelectedLabwareDefURI).toHaveBeenCalled()
+  })
+
+  it('renders the custom labware flow', () => {
+    render(props)
+    screen.getByText('Add custom labware')
+    fireEvent.change(screen.getByTestId('customLabwareInput'))
+    expect(vi.mocked(createCustomLabwareDef)).toHaveBeenCalled()
   })
 })
