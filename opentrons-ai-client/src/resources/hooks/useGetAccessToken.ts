@@ -12,7 +12,7 @@ interface UseGetAccessTokenResult {
 export const useGetAccessToken = (): UseGetAccessTokenResult => {
   const { getAccessTokenSilently } = useAuth0()
 
-  const getAuth0Audience = (): string => {
+  const auth0Audience = (): string => {
     switch (process.env.NODE_ENV) {
       case 'production':
         return PROD_AUTH0_AUDIENCE
@@ -29,13 +29,11 @@ export const useGetAccessToken = (): UseGetAccessTokenResult => {
     }
   }
 
-  const auth0Audience = getAuth0Audience()
-
   const getAccessToken = async (): Promise<string> => {
     try {
       const accessToken = await getAccessTokenSilently({
         authorizationParams: {
-          audience: auth0Audience,
+          audience: auth0Audience(),
         },
       })
       return accessToken

@@ -35,12 +35,13 @@ const getDomain = (): string => {
 
 if (rootElement != null) {
   const clientId = getClientId()
+  const domain = getDomain()
 
   ReactDOM.createRoot(rootElement).render(
     <React.StrictMode>
       <Auth0Provider
         clientId={clientId}
-        domain={getDomain()}
+        domain={domain}
         authorizationParams={{
           redirect_uri: window.location.origin,
         }}
