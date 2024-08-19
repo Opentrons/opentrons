@@ -11,10 +11,10 @@ import {
   parseLiquidsInLoadOrder,
   parseLabwareInfoByLiquidId,
   parseInitialLoadedLabwareByAdapter,
-} from '../utils'
+} from '../parseProtocolCommands'
 import { simpleAnalysisFileFixture } from '../__fixtures__'
 
-import type { RunTimeCommand } from '@opentrons/shared-data'
+import type { RunTimeCommand } from '../../../command/types'
 
 const mockRunTimeCommands: RunTimeCommand[] = simpleAnalysisFileFixture.commands as any
 const mockLoadLiquidRunTimeCommands = [

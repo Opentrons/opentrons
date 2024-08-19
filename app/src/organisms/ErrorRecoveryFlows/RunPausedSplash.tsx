@@ -79,7 +79,7 @@ export function RunPausedSplash(
   const title = useErrorName(errorKind)
 
   const { proceedToRouteAndStep } = routeUpdateActions
-  const { reportInitialActionEvent } = analytics
+  const { reportErrorEvent } = analytics
 
   const buildTitleHeadingDesktop = (): JSX.Element => {
     return (
@@ -92,14 +92,14 @@ export function RunPausedSplash(
   // Do not launch error recovery, but do utilize the wizard's cancel route.
   const onCancelClick = (): Promise<void> => {
     return toggleERWizAsActiveUser(true, false).then(() => {
-      reportInitialActionEvent('cancel-run')
+      reportErrorEvent(failedCommand?.byRunRecord ?? null, 'cancel-run')
       void proceedToRouteAndStep(RECOVERY_MAP.CANCEL_RUN.ROUTE)
     })
   }
 
   const onLaunchERClick = (): Promise<void> => {
     return toggleERWizAsActiveUser(true, true).then(() => {
-      reportInitialActionEvent('launch-recovery')
+      reportErrorEvent(failedCommand?.byRunRecord ?? null, 'launch-recovery')
     })
   }
 
@@ -123,7 +123,7 @@ export function RunPausedSplash(
         position={POSITION_ABSOLUTE}
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing60}
-        paddingY={SPACING.spacing40}
+        padding={SPACING.spacing40}
         backgroundColor={COLORS.red50}
         zIndex={5}
       >
@@ -132,7 +132,7 @@ export function RunPausedSplash(
             <Icon name="ot-alert" size="4.5rem" color={COLORS.white} />
             <SplashHeader>{title}</SplashHeader>
           </Flex>
-          <Flex width="49rem" justifyContent={JUSTIFY_CENTER}>
+          <Flex width="100%" justifyContent={JUSTIFY_CENTER}>
             <StepInfo
               {...props}
               oddStyle="level3HeaderBold"
@@ -228,7 +228,6 @@ const SplashFrame = styled(Flex)`
   justify-content: ${JUSTIFY_CENTER};
   align-items: ${ALIGN_CENTER};
   grid-gap: ${SPACING.spacing40};
-  padding: ${SPACING.spacing24};
   padding-bottom: 0px;
 `
 

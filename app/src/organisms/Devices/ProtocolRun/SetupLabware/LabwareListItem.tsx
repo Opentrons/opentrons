@@ -56,7 +56,7 @@ import type { NestedLabwareInfo } from './getNestedLabwareInfo'
 
 const LabwareRow = styled.div`
   display: grid;
-  grid-template-columns: 1fr 6fr 5.9fr;
+  grid-template-columns: 90px 12fr;
   border-style: ${BORDERS.styleSolid};
   border-width: 1px;
   border-color: ${COLORS.grey30};
@@ -268,7 +268,7 @@ export function LabwareListItem(
 
   return (
     <LabwareRow>
-      <Flex alignItems={ALIGN_CENTER} width="80px" gridGap={SPACING.spacing2}>
+      <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing2} width="5rem">
         {slotInfo != null && isFlex ? (
           <DeckInfoLabel deckLabel={slotInfo} />
         ) : (
@@ -283,31 +283,10 @@ export function LabwareListItem(
           <DeckInfoLabel iconName="stacked" />
         ) : null}
       </Flex>
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing16}
-        width="45.875rem"
-      >
-        <Flex>
-          {showLabwareSVG && <StandaloneLabware definition={definition} />}
-          <Flex
-            flexDirection={DIRECTION_COLUMN}
-            justifyContent={JUSTIFY_CENTER}
-            marginLeft={SPACING.spacing8}
-            marginRight={SPACING.spacing24}
-          >
-            <StyledText desktopStyle="bodyDefaultSemiBold">
-              {labwareDisplayName}
-            </StyledText>
-            <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
-              {nickName}
-            </StyledText>
-          </Flex>
-        </Flex>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
         {nestedLabwareInfo != null &&
         nestedLabwareInfo?.sharedSlotId === slotInfo ? (
           <>
-            <Divider />
             <Flex>
               <Flex
                 flexDirection={DIRECTION_COLUMN}
@@ -326,11 +305,30 @@ export function LabwareListItem(
                 </StyledText>
               </Flex>
             </Flex>
+            <Divider marginY="0" />
           </>
         ) : null}
+        <Flex>
+          {showLabwareSVG ? (
+            <StandaloneLabware definition={definition} />
+          ) : null}
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            justifyContent={JUSTIFY_CENTER}
+            marginLeft={SPACING.spacing8}
+            marginRight={SPACING.spacing24}
+          >
+            <StyledText desktopStyle="bodyDefaultSemiBold">
+              {labwareDisplayName}
+            </StyledText>
+            <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
+              {nickName}
+            </StyledText>
+          </Flex>
+        </Flex>
         {moduleDisplayName != null ? (
           <>
-            <Divider />
+            <Divider marginY="0" />
             <Flex
               justifyContent={JUSTIFY_SPACE_BETWEEN}
               flexDirection={DIRECTION_ROW}

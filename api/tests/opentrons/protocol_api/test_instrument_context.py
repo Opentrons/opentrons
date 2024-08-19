@@ -2,9 +2,8 @@
 import inspect
 import pytest
 from collections import OrderedDict
-from contextlib import nullcontext as does_not_raise
 from datetime import datetime
-from typing import ContextManager, Optional
+from typing import ContextManager, Optional, Any
 from unittest.mock import sentinel
 
 from decoy import Decoy
@@ -18,6 +17,16 @@ from opentrons.protocol_engine.errors.error_occurrence import (
 from opentrons.legacy_broker import LegacyBroker
 
 from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
+from tests.opentrons.protocol_api.partial_tip_configurations import (
+    PipetteReliantNozzleConfigSpec,
+    PIPETTE_RELIANT_TEST_SPECS,
+    NozzleLayoutArgs,
+    PipetteIndependentNozzleConfigSpec,
+    PIPETTE_INDEPENDENT_TEST_SPECS,
+    InstrumentCoreNozzleConfigSpec,
+    INSTRUMENT_CORE_NOZZLE_LAYOUT_TEST_SPECS,
+    ExpectedCoreArgs,
+)
 from tests.opentrons.protocol_engine.pipette_fixtures import (
     NINETY_SIX_COLS,
     NINETY_SIX_MAP,
@@ -47,7 +56,6 @@ from opentrons.protocol_api.core.legacy.legacy_instrument_core import (
 
 from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
-from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons_shared_data.pipette.pipette_definition import ValidNozzleMaps
 from opentrons.types import Location, Mount, Point
 
@@ -1128,28 +1136,86 @@ def test_prepare_to_aspirate_checks_volume(
 
 
 @pytest.mark.parametrize(
-    argnames=["style", "primary_nozzle", "front_right_nozzle", "end", "exception"],
-    argvalues=[
-        [NozzleLayout.COLUMN, "A1", None, None, does_not_raise()],
-        [NozzleLayout.SINGLE, None, None, None, pytest.raises(ValueError)],
-        [NozzleLayout.ROW, "E1", None, None, pytest.raises(ValueError)],
-        [NozzleLayout.PARTIAL_COLUMN, "H1", None, "G1", does_not_raise()],
-        [NozzleLayout.PARTIAL_COLUMN, "H1", "H1", "G1", pytest.raises(ValueError)],
-    ],
+    argnames=PipetteReliantNozzleConfigSpec._fields,
+    argvalues=PIPETTE_RELIANT_TEST_SPECS,
+)
+def test_configure_pip_reliant_nozzle_layout_checks_for_config_validity(
+    subject: InstrumentContext,
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    pipette_channels: int,
+    nozzle_layout_args: NozzleLayoutArgs,
+    expected_raise: ContextManager[Any],
+) -> None:
+    """It should raise an error if you specify the wrong arguments for the nozzle configuration."""
+    decoy.when(mock_instrument_core.get_channels()).then_return(pipette_channels)
+    with expected_raise:
+        subject.configure_nozzle_layout(
+            style=nozzle_layout_args.style,
+            start=nozzle_layout_args.start,
+            end=nozzle_layout_args.end,
+            front_right=nozzle_layout_args.front_right,
+            back_left=nozzle_layout_args.back_left,
+        )
+
+
+@pytest.mark.parametrize(
+    "pipette_channels",
+    [1, 8, 96],
+)
+@pytest.mark.parametrize(
+    argnames=PipetteIndependentNozzleConfigSpec._fields,
+    argvalues=PIPETTE_INDEPENDENT_TEST_SPECS,
+)
+def test_configure_pip_independent_nozzle_layout_checks_for_config_validity(
+    subject: InstrumentContext,
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    pipette_channels: int,
+    nozzle_layout_args: NozzleLayoutArgs,
+    expected_raise: ContextManager[Any],
+) -> None:
+    """It should raise an error if you specify the wrong arguments for the nozzle configuration."""
+    decoy.when(mock_instrument_core.get_channels()).then_return(pipette_channels)
+    with expected_raise:
+        subject.configure_nozzle_layout(
+            style=nozzle_layout_args.style,
+            start=nozzle_layout_args.start,
+            end=nozzle_layout_args.end,
+            front_right=nozzle_layout_args.front_right,
+            back_left=nozzle_layout_args.back_left,
+        )
+
+
+@pytest.mark.parametrize(
+    argnames=InstrumentCoreNozzleConfigSpec._fields,
+    argvalues=INSTRUMENT_CORE_NOZZLE_LAYOUT_TEST_SPECS,
 )
 def test_configure_nozzle_layout(
     subject: InstrumentContext,
-    style: NozzleLayout,
-    primary_nozzle: Optional[str],
-    front_right_nozzle: Optional[str],
-    end: Optional[str],
-    exception: ContextManager[None],
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    pipette_channels: int,
+    nozzle_layout_args: NozzleLayoutArgs,
+    expected_core_args: ExpectedCoreArgs,
 ) -> None:
-    """The correct model is passed to the engine client."""
-    with exception:
-        subject.configure_nozzle_layout(
-            style=style, start=primary_nozzle, end=end, front_right=front_right_nozzle
+    """It should pass the correct configuration model to the engine client."""
+    decoy.when(mock_instrument_core.get_channels()).then_return(pipette_channels)
+    subject.configure_nozzle_layout(
+        style=nozzle_layout_args.style,
+        start=nozzle_layout_args.start,
+        end=nozzle_layout_args.end,
+        front_right=nozzle_layout_args.front_right,
+        back_left=nozzle_layout_args.back_left,
+    )
+    decoy.verify(
+        mock_instrument_core.configure_nozzle_layout(
+            style=nozzle_layout_args.style,
+            primary_nozzle=expected_core_args.primary_nozzle,
+            front_right_nozzle=expected_core_args.front_right_nozzle,
+            back_left_nozzle=expected_core_args.back_left_nozzle,
         )
+    )
 
 
 @pytest.mark.parametrize("api_version", [APIVersion(2, 15)])

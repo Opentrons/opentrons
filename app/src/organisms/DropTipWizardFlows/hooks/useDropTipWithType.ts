@@ -41,10 +41,14 @@ export function useDropTipWithType(
   const { isExiting, toggleIsExiting } = useIsExitingDT(issuedCommandsType)
   const { errorDetails, setErrorDetails } = useErrorDetails()
 
-  const activeMaintenanceRunId = useDropTipMaintenanceRun({
+  const {
+    activeMaintenanceRunId,
+    toggleClientEndRun,
+  } = useDropTipMaintenanceRun({
     ...params,
     setErrorDetails,
   })
+
   const dtCreateCommandUtils = useDropTipCreateCommands({
     ...params,
     setErrorDetails,
@@ -59,6 +63,7 @@ export function useDropTipWithType(
     setErrorDetails,
     toggleIsExiting,
     fixitCommandTypeUtils,
+    toggleClientEndRun,
   })
 
   useRegisterPipetteFixitType({ ...params, ...dtCreateCommandUtils })

@@ -35,7 +35,8 @@ export interface DropTipWizardFlowsProps {
   robotType: RobotType
   mount: PipetteData['mount']
   instrumentModelSpecs: PipetteModelSpecs
-  closeFlow: () => void
+  /* isTakeover allows for optionally specifying a different callback if a different client cancels the "setup" type flow. */
+  closeFlow: (isTakeover?: boolean) => void
   /* Optional. If provided, DT will issue "fixit" commands and render alternate Error Recovery compatible views. */
   fixitCommandTypeUtils?: FixitCommandTypeUtils
 }
@@ -92,6 +93,8 @@ export interface TipAttachmentStatusResult {
   ) => Promise<PipetteWithTip>
   /* Relevant pipette information for a pipette with a tip attached. If both pipettes have tips attached, return the left pipette. */
   aPipetteWithTip: PipetteWithTip | null
+  /* The initial number of pipettes with tips. Null if there has been no tip check yet. */
+  initialPipettesWithTipsCount: number | null
 }
 
 // Returns various utilities for interacting with the cache of pipettes with tips attached.
@@ -101,14 +104,16 @@ export function useTipAttachmentStatus(
   const [pipettesWithTip, setPipettesWithTip] = React.useState<
     PipetteWithTip[]
   >([])
+  const [initialPipettesCount, setInitialPipettesCount] = React.useState<
+    number | null
+  >(null)
   const { data: attachedInstruments } = useInstrumentsQuery({
     refetchInterval: INSTRUMENTS_POLL_MS,
   })
 
   const aPipetteWithTip = head(pipettesWithTip) ?? null
-
   const areTipsAttached =
-    pipettesWithTip.length != null && head(pipettesWithTip)?.specs != null
+    pipettesWithTip.length > 0 && head(pipettesWithTip)?.specs != null
 
   const determineTipStatus = React.useCallback((): Promise<
     PipetteWithTip[]
@@ -129,6 +134,10 @@ export function useTipAttachmentStatus(
       ) as PipetteWithTip[]
 
       setPipettesWithTip(pipettesWithTipAndSpecs)
+      // Set only once.
+      if (initialPipettesCount === null) {
+        setInitialPipettesCount(pipettesWithTipAndSpecs.length)
+      }
 
       return Promise.resolve(pipettesWithTipAndSpecs)
     })
@@ -136,6 +145,7 @@ export function useTipAttachmentStatus(
 
   const resetTipStatus = (): void => {
     setPipettesWithTip([])
+    setInitialPipettesCount(null)
   }
 
   const setTipStatusResolved = (
@@ -163,5 +173,6 @@ export function useTipAttachmentStatus(
     resetTipStatus,
     aPipetteWithTip,
     setTipStatusResolved,
+    initialPipettesWithTipsCount: initialPipettesCount,
   }
 }

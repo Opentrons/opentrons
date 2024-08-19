@@ -2,10 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
-import {
-  parseLiquidsInLoadOrder,
-  parseLabwareInfoByLiquidId,
-} from '@opentrons/api-client'
+
 import {
   Box,
   COLORS,
@@ -18,6 +15,11 @@ import {
   TYPOGRAPHY,
   Modal,
 } from '@opentrons/components'
+import {
+  parseLabwareInfoByLiquidId,
+  parseLiquidsInLoadOrder,
+} from '@opentrons/shared-data'
+
 import { OddModal } from '../../../../molecules/OddModal'
 import { getIsOnDevice } from '../../../../redux/config'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
