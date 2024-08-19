@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css?family=Public+Sans:300,400,400i,600,700');
+@import url('https://fonts.googleapis.com/css2?family=Reddit+Mono:wght@200..900&display=swap');
 
 /* OT NAV */
 
@@ -40,13 +41,13 @@ div.body p {
 
 pre, tt, code {
     font-size: 0.9em;
-    font-family: "Roboto Mono", "Consolas", "Lucida Console", monospace;
+    font-family: "Reddit Mono", "Consolas", "Lucida Console", monospace;
 }
 
 /* classes for API Reference docstring signatures */
 .sig, .sig-name, code.descname, .sig-prename, .optional, .sig-paren {
     font-size: 1em;
-    font-family: "Roboto Mono", "Consolas", "Lucida Console", monospace;
+    font-family: "Reddit Mono", "Consolas", "Lucida Console", monospace;
 }
 
 div.body h1 {
