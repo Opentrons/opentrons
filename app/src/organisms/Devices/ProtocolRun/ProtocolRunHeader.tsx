@@ -255,7 +255,7 @@ export function ProtocolRunHeader({
     robotType,
     onSkipAndHome: () => {
       closeCurrentRun({
-        onSuccess: () => {
+        onSettled: () => {
           if (isQuickTransfer) {
             deleteRun(runId)
             navigate(`/devices/${robotName}`)
@@ -313,7 +313,7 @@ export function ProtocolRunHeader({
       // This marks the robot as "not busy" as soon as a run is cancelled if drop tip CTAs are unnecessary.
       if (initialPipettesWithTipsCount === 0 && !enteredER) {
         closeCurrentRun({
-          onSuccess: () => {
+          onSettled: () => {
             if (isQuickTransfer) {
               deleteRun(runId)
               navigate(`/devices/${robotName}`)
@@ -369,7 +369,7 @@ export function ProtocolRunHeader({
       properties: robotAnalyticsData ?? undefined,
     })
     closeCurrentRun({
-      onSuccess: () => {
+      onSettled: () => {
         if (isQuickTransfer) {
           deleteRun(runId)
           navigate(`/devices/${robotName}`)
@@ -568,7 +568,7 @@ export function ProtocolRunHeader({
                 void setTipStatusResolved(() => {
                   toggleDTWiz()
                   closeCurrentRun({
-                    onSuccess: () => {
+                    onSettled: () => {
                       if (isQuickTransfer) {
                         deleteRun(runId)
                         navigate(`/devices/${robotName}`)
