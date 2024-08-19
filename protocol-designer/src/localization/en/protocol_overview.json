@@ -1,3 +1,18 @@
 {
-  "protocol_overview": "Protocol overview"
+  "author": "Organization/Author",
+  "created": "Date created",
+  "description": "Description",
+  "edit": "Edit",
+  "robotType": "Robot type",
+  "liquids": "Liquids",
+  "step": "Protocol steps",
+  "left_pip": "Left pipette",
+  "starting_deck": "Protocol starting deck",
+  "right_pip": "Right pipette",
+  "instruments": "Instruments",
+  "extension": "Extension mount",
+  "gripper": "Opentrons Flex Gripper",
+  "untitled_protocol": "Untitled protocol",
+  "modified": "Last exported",
+  "protocol_metadata": "Protocol metadata"
 }
