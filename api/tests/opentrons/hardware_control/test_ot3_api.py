@@ -1663,13 +1663,11 @@ async def test_move_to_plunger_bottom(
     backlash_pos[pip_ax] += pipette.backlash_distance
 
     # plunger will move at different speeds, depending on if:
-    #  - no tip attached (max speed)
-    #  - tip attached and moving down (blowout speed)
+    #  - tip not attached (max speed)
+    #  - tip attached and moving down (max speed)
     #  - tip attached and moving up (aspirate speed)
     expected_speed_no_tip = max_speeds[ot3_hardware.gantry_load][OT3AxisKind.P]
-    expected_speed_moving_down = ot3_hardware._pipette_handler.plunger_speed(
-        pipette, pipette.blow_out_flow_rate, "dispense"
-    )
+    expected_speed_moving_down = expected_speed_no_tip
     expected_speed_moving_up = ot3_hardware._pipette_handler.plunger_speed(
         pipette, pipette.aspirate_flow_rate, "aspirate"
     )

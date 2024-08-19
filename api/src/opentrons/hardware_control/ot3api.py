@@ -1877,12 +1877,10 @@ class OT3API(
 
         With wet tips, the primary concern is leftover droplets inside the tip.
         These droplets ideally only move down and out of the tip, not up into the tip.
-        Therefore, it is preferable to use the "blow-out" speed when moving the
-        plunger down, and the slower "aspirate" speed when moving the plunger up.
+        Therefore, it is preferable to use the slower "aspirate" speed when
+        moving the plunger up after a blow-out.
 
-        Assume all tips are wet, because we do not differentiate between wet/dry tips.
-
-        When no tip is attached, moving at the max speed is preferable, to save time.
+        All other situations, moving at the max speed is preferable, to save time.
         """
         checked_mount = OT3Mount.from_mount(mount)
         instrument = self._pipette_handler.get_pipette(checked_mount)
@@ -1895,21 +1893,22 @@ class OT3API(
             self._current_position,
         )
         pip_ax = Axis.of_main_tool_actuator(checked_mount)
-        # speed depends on if there is a tip, and which direction to move
-        if instrument.has_tip_length:
+        # save time while moving down by using max speed
+        max_speeds = self.config.motion_settings.default_max_speed
+        speed_down = max_speeds[self.gantry_load][OT3AxisKind.P]
+        # upward moves can be max speed, or aspirate speed
+        # use the (slower) aspirate if there is a tip and we're following a blow-out
+        plunger_is_below_bottom_pos = (
+            self._current_position[pip_ax] > instrument.plunger_positions.bottom
+        )
+        if instrument.has_tip_length and plunger_is_below_bottom_pos:
             # using slower aspirate flow-rate, to avoid pulling droplets up
             speed_up = self._pipette_handler.plunger_speed(
                 instrument, instrument.aspirate_flow_rate, "aspirate"
             )
-            # use blow-out flow-rate, so we can push droplets out
-            speed_down = self._pipette_handler.plunger_speed(
-                instrument, instrument.blow_out_flow_rate, "dispense"
-            )
         else:
-            # save time by using max speed
-            max_speeds = self.config.motion_settings.default_max_speed
+            # either no tip, or plunger just homed, so tip is dry
             speed_up = max_speeds[self.gantry_load][OT3AxisKind.P]
-            speed_down = speed_up
         # IMPORTANT: Here is our backlash compensation.
         #            The plunger is pre-loaded in the "aspirate" direction
         backlash_pos = target_pos.copy()
