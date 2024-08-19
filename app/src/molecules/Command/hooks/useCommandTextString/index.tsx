@@ -71,6 +71,7 @@ export function useCommandTextString(
       }
 
     case 'loadLabware':
+    case 'reloadLabware':
     case 'loadPipette':
     case 'loadModule':
     case 'loadLiquid':

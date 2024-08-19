@@ -21,6 +21,7 @@ export interface ProtocolDetails {
   protocolKey: string | null
   isProtocolAnalyzing?: boolean
   robotType: RobotType
+  isQuickTransfer: boolean
 }
 
 export function useProtocolDetailsForRun(
@@ -67,5 +68,6 @@ export function useProtocolDetailsForRun(
       (mostRecentAnalysis?.status === 'completed'
         ? mostRecentAnalysis?.robotType ?? FLEX_ROBOT_TYPE
         : FLEX_ROBOT_TYPE),
+    isQuickTransfer: protocolRecord?.data.protocolKind === 'quick-transfer',
   }
 }
