@@ -137,10 +137,12 @@ export function RunSummary(): JSX.Element {
 
   React.useEffect(() => {
     // in case the run is remotely deleted by a desktop app, navigate to the dash
-    if (runRecord == null) {
+    console.log('run record == null: ', runRecord == null)
+    console.log('is quick transfer: ', isQuickTransfer)
+    if (runRecord == null && isQuickTransfer) {
       navigate('/')
     }
-  }, [runRecord])
+  }, [runRecord, isQuickTransfer])
 
   const { reset, isResetRunLoading } = useRunControls(runId, onCloneRunSuccess)
   const trackEvent = useTrackEvent()
