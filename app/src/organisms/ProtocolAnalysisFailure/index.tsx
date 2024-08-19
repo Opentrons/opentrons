@@ -98,7 +98,7 @@ export function ProtocolAnalysisFailure(
             >
               <Flex css={SCROLL_LONG}>
                 {errors.map((error, index) => (
-                  <LegacyStyledText key={index} as="p">
+                  <LegacyStyledText key={index} as="p" css={css`text-wrap: nowrap;`}>
                     {error}
                   </LegacyStyledText>
                 ))}
@@ -123,5 +123,5 @@ export function ProtocolAnalysisFailure(
 const SCROLL_LONG = css`
   overflow: scroll;
   width: inherit;
-  height: 11.75rem;
+  max-height: 11.75rem;
 `
