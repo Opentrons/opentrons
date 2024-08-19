@@ -1,4 +1,5 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
   DeckInfoLabel,
@@ -23,6 +24,7 @@ export const SlotInformation: React.FC<SlotInformationProps> = ({
   labwares = [],
   modules = [],
 }) => {
+  const { t } = useTranslation('shared')
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
@@ -32,13 +34,13 @@ export const SlotInformation: React.FC<SlotInformationProps> = ({
       <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
         <DeckInfoLabel deckLabel={location} />
         <StyledText desktopStyle="headingSmallBold">
-          {'Slot Stack Information'}
+          {t('slot_stack_information')}
         </StyledText>
       </Flex>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-        <StackInfoList title="Liquid" items={liquids} />
-        <StackInfoList title="Labware" items={labwares} />
-        <StackInfoList title="Module" items={modules} />
+        <StackInfoList title={t('liquid')} items={liquids} />
+        <StackInfoList title={t('labware')} items={labwares} />
+        <StackInfoList title={t('module')} items={modules} />
       </Flex>
     </Flex>
   )
@@ -72,15 +74,13 @@ interface StackInfoProps {
   stackInformation?: string
 }
 
-function StackInfo({
-  title,
-  stackInformation = 'None',
-}: StackInfoProps): JSX.Element {
+function StackInfo({ title, stackInformation }: StackInfoProps): JSX.Element {
+  const { t } = useTranslation('shared')
   return (
     <ListItem type="noActive">
       <ListItemDescriptor
         type="mini"
-        content={stackInformation}
+        content={stackInformation ?? t('none')}
         description={title}
       />
     </ListItem>

@@ -3,6 +3,7 @@ import { describe, it, beforeEach, expect } from 'vitest'
 import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '../../../__testing-utils__'
+import { i18n } from '../../../localization'
 
 import { SlotInformation } from '..'
 
@@ -11,7 +12,9 @@ const mockLabwares = ['96 Well Plate', 'Adapter']
 const mockModules = ['Thermocycler Module Gen2', 'Heater-Shaker Module']
 
 const render = (props: React.ComponentProps<typeof SlotInformation>) => {
-  return renderWithProviders(<SlotInformation {...props} />)
+  return renderWithProviders(<SlotInformation {...props} />, {
+    i18nInstance: i18n,
+  })
 }
 
 describe('SlotInformation', () => {
