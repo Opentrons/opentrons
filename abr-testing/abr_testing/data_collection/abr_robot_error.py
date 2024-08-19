@@ -384,8 +384,6 @@ def get_run_error_info_from_robot(
                 errored_labware_dict["Labware Type"] = labware.get("definitionUri", "")
                 offset_id = labware.get("offsetId", "")
                 labware_slot = errored_labware_dict["Slot"]
-                print(f"Labware slot was: _{labware_slot}_")
-                print(str(labware_slot))
                 if str(labware_slot) == "":
                     lpc_message = "No labware slot was associated with this error. \
 Please manually check LPC data."
