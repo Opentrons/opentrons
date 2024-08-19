@@ -144,6 +144,7 @@ export function StartingDeckState(): JSX.Element {
           onCloseClick={() => {
             setZoomInOnSlot(null)
           }}
+          cutoutId={zoomIn.cutoutId}
           slot={zoomIn.slot}
         />
       ) : (

@@ -14,6 +14,7 @@ import {
   MAGNETIC_BLOCK_TYPE,
   ABSORBANCE_READER_TYPE,
 } from '@opentrons/shared-data'
+
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 
 export const FLEX_MODULE_MODELS: ModuleModel[] = [
@@ -91,3 +92,15 @@ export const RECOMMENDED_LABWARE_BY_MODULE: { [K in ModuleType]: string[] } = {
   ],
   [ABSORBANCE_READER_TYPE]: [],
 }
+
+export const MOAM_MODELS_WITH_FF: ModuleModel[] = [TEMPERATURE_MODULE_V2]
+export const MOAM_MODELS: ModuleModel[] = [
+  TEMPERATURE_MODULE_V2,
+  HEATERSHAKER_MODULE_V1,
+  MAGNETIC_BLOCK_V1,
+]
+
+export const MAX_MOAM_MODULES = 7
+//  limiting 10 instead of 11 to make space for a single default tiprack
+//  to be auto-generated
+export const MAX_MAGNETIC_BLOCKS = 10

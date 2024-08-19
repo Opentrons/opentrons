@@ -11,11 +11,13 @@ import {
   Toolbox,
 } from '@opentrons/components'
 import {
+  MAGNETIC_BLOCK_V1,
+  MODULE_MODELS,
   OT2_ROBOT_TYPE,
-  WASTE_CHUTE_CUTOUT,
   getModuleDisplayName,
   getModuleType,
 } from '@opentrons/shared-data'
+
 import { getRobotType } from '../../file-data/selectors'
 import {
   createDeckFixture,
@@ -24,56 +26,80 @@ import {
 import { createModule, deleteModule } from '../../step-forms/actions'
 import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
 import { createContainer, deleteContainer } from '../../labware-ingred/actions'
-import { getEnableAbsorbanceReader } from '../../feature-flags/selectors'
-import { FIXTURES } from './constants'
+import {
+  getEnableAbsorbanceReader,
+  getEnableMoam,
+} from '../../feature-flags/selectors'
+import { createContainerAboveModule } from '../../step-forms/actions/thunks'
+import {
+  FIXTURES,
+  MAX_MAGNETIC_BLOCKS,
+  MAX_MOAM_MODULES,
+  MOAM_MODELS,
+  MOAM_MODELS_WITH_FF,
+} from './constants'
 import { getModuleModelsBySlot } from './utils'
 import { LabwareTools } from './LabwareTools'
 
-import type { DeckSlotId, ModuleModel } from '@opentrons/shared-data'
+import type { CutoutId, DeckSlotId, ModuleModel } from '@opentrons/shared-data'
+import type { DeckFixture } from '../../step-forms/actions/additionalItems'
 import type { Fixture } from './constants'
 
 import type { ThunkDispatch } from '../../types'
 
 interface DeckSetupToolsProps {
+  cutoutId: CutoutId
   slot: DeckSlotId
   onCloseClick: () => void
 }
 
 export const DeckSetupTools = (props: DeckSetupToolsProps): JSX.Element => {
-  const { slot, onCloseClick } = props
+  const { slot, onCloseClick, cutoutId } = props
   const { t } = useTranslation(['starting_deck_state', 'shared'])
   const robotType = useSelector(getRobotType)
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const enableAbsorbanceReader = useSelector(getEnableAbsorbanceReader)
+  const enableMoam = useSelector(getEnableMoam)
   const deckSetup = useSelector(getDeckSetupForActiveItem)
   const {
     labware: deckSetupLabware,
     modules: deckSetupModules,
     additionalEquipmentOnDeck,
   } = deckSetup
+  const hasTrash = Object.values(additionalEquipmentOnDeck).some(
+    ae => ae.name === 'trashBin'
+  )
   const createdModuleForSlot = Object.values(deckSetupModules).find(
     module => module.slot === slot
   )
-  const createdParentLabwareForSlot = Object.values(deckSetupLabware).find(
+  const createdLabwareForSlot = Object.values(deckSetupLabware).find(
     lw => lw.slot === slot || lw.slot === createdModuleForSlot?.id
   )
-  const createdChildLabwareForSlot = Object.values(deckSetupLabware).find(lw =>
+  const createdNestedLabwareForSlot = Object.values(deckSetupLabware).find(lw =>
     Object.keys(deckSetupLabware).includes(lw.slot)
   )
-  const createFixtureForSlot = Object.values(additionalEquipmentOnDeck).find(
+  const createFixtureForSlots = Object.values(additionalEquipmentOnDeck).filter(
     ae => ae.location?.split('cutout')[1] === slot
   )
 
+  const preSelectedFixture =
+    createFixtureForSlots != null && createFixtureForSlots.length === 2
+      ? ('wasteChuteAndStagingArea' as Fixture)
+      : (createFixtureForSlots[0]?.name as Fixture)
+
   const [selectedHardware, setHardware] = React.useState<
     ModuleModel | Fixture | null
-  >(null)
+  >(createdModuleForSlot?.model ?? preSelectedFixture ?? null)
+
   const [selecteLabwareDefURI, setSelectedLabwareDefURI] = React.useState<
     string | null
-  >(null)
+  >(createdLabwareForSlot?.labwareDefURI ?? null)
   const [
     nestedSelectedLabwareDefURI,
     setNestedSelectedLabwareDefURI,
-  ] = React.useState<string | null>(null)
+  ] = React.useState<string | null>(
+    createdNestedLabwareForSlot?.labwareDefURI ?? null
+  )
   const moduleModels = getModuleModelsBySlot(
     enableAbsorbanceReader,
     robotType,
@@ -112,66 +138,87 @@ export const DeckSetupTools = (props: DeckSetupToolsProps): JSX.Element => {
     },
   }
 
-  //   TODO - this needs to be a thunk so we can grab the state for the slot Ids
-  //   that are the module id or adapter id
-  const handleConfirm = (): void => {
-    if (selectedHardware != null) {
-      if (FIXTURES.includes(selectedHardware as Fixture)) {
-        if (selectedHardware === 'wasteChuteAndStagingArea') {
-          dispatch(createDeckFixture('wasteChute', WASTE_CHUTE_CUTOUT))
-          dispatch(createDeckFixture('stagingArea', 'cutoutD3'))
-        } else {
-          dispatch(
-            createDeckFixture(
-              selectedHardware as 'wasteChute' | 'trashBin' | 'stagingArea',
-              slot
-            )
-          )
-        }
-      } else {
-        dispatch(
-          createModule({
-            slot: slot,
-            type: getModuleType(selectedHardware as ModuleModel),
-            model: selectedHardware as ModuleModel,
-          })
-        )
-      }
-    }
-    if (selecteLabwareDefURI != null) {
-      const parentLabwareSlot =
-        createdModuleForSlot != null ? createdModuleForSlot.slot : slot
-      dispatch(
-        createContainer({
-          slot: parentLabwareSlot,
-          labwareDefURI: selecteLabwareDefURI,
-        })
-      )
-    }
-    if (nestedSelectedLabwareDefURI != null) {
-      dispatch(
-        createContainer({
-          slot: slot,
-          labwareDefURI: nestedSelectedLabwareDefURI,
-        })
-      )
-    }
-    onCloseClick()
-  }
-
   const handleClear = (): void => {
+    //  clear module from slot
     if (createdModuleForSlot != null) {
       dispatch(deleteModule(createdModuleForSlot.id))
     }
-    if (createFixtureForSlot != null) {
-      dispatch(deleteDeckFixture(createFixtureForSlot.id))
+    //  clear fixture(s) from slot
+    if (createFixtureForSlots.length > 0) {
+      createFixtureForSlots.forEach(fixture =>
+        dispatch(deleteDeckFixture(fixture.id))
+      )
     }
-    if (createdParentLabwareForSlot != null) {
-      dispatch(deleteContainer({ labwareId: createdParentLabwareForSlot.id }))
+    //  clear labware from slot
+    if (createdLabwareForSlot != null) {
+      dispatch(deleteContainer({ labwareId: createdLabwareForSlot.id }))
     }
-    if (createdChildLabwareForSlot != null) {
-      dispatch(deleteContainer({ labwareId: createdChildLabwareForSlot.id }))
+    //  clear nested labware from slot
+    if (createdNestedLabwareForSlot != null) {
+      dispatch(deleteContainer({ labwareId: createdNestedLabwareForSlot.id }))
     }
+  }
+
+  const handleConfirm = (): void => {
+    //  clear entities first before recreating them
+    handleClear()
+    const fixture = FIXTURES.includes(selectedHardware as Fixture)
+      ? (selectedHardware as DeckFixture | 'wasteChuteAndStagingArea')
+      : undefined
+    const moduleModel = MODULE_MODELS.includes(selectedHardware as ModuleModel)
+      ? (selectedHardware as ModuleModel)
+      : undefined
+
+    if (fixture != null) {
+      //  create fixture(s)
+      if (fixture === 'wasteChuteAndStagingArea') {
+        dispatch(createDeckFixture('wasteChute', cutoutId))
+        dispatch(createDeckFixture('stagingArea', cutoutId))
+      } else {
+        dispatch(createDeckFixture(fixture, cutoutId))
+      }
+    }
+    if (moduleModel != null) {
+      //  create module
+      dispatch(
+        createModule({
+          slot: slot,
+          type: getModuleType(moduleModel),
+          model: moduleModel,
+        })
+      )
+    }
+    if (moduleModel == null && selecteLabwareDefURI != null) {
+      //  create adapter + labware on deck
+      dispatch(
+        createContainer({
+          slot,
+          labwareDefURI:
+            nestedSelectedLabwareDefURI == null
+              ? selecteLabwareDefURI
+              : nestedSelectedLabwareDefURI,
+          adapterUnderLabwareDefURI:
+            nestedSelectedLabwareDefURI == null
+              ? undefined
+              : selecteLabwareDefURI,
+        })
+      )
+    }
+    if (moduleModel != null && selecteLabwareDefURI != null) {
+      //   create adapter + labware on module
+      dispatch(
+        createContainerAboveModule({
+          slot,
+          labwareDefURI: selecteLabwareDefURI,
+          nestedLabwareDefURI: nestedSelectedLabwareDefURI ?? undefined,
+        })
+      )
+    }
+
+    onCloseClick()
+  }
+
+  const handleResetToolbox = (): void => {
     setHardware(null)
     setSelectedLabwareDefURI(null)
     setNestedSelectedLabwareDefURI(null)
@@ -182,8 +229,13 @@ export const DeckSetupTools = (props: DeckSetupToolsProps): JSX.Element => {
       width="400px"
       title={t('customize_slot', { slotName: slot })}
       closeButtonText={t('clear')}
-      onCloseClick={handleClear}
-      onConfirmClick={handleConfirm}
+      onCloseClick={() => {
+        handleClear()
+        handleResetToolbox()
+      }}
+      onConfirmClick={() => {
+        handleConfirm()
+      }}
       confirmButtonText={t('done')}
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
@@ -200,18 +252,39 @@ export const DeckSetupTools = (props: DeckSetupToolsProps): JSX.Element => {
                   {t('add_module')}
                 </StyledText>
               </Flex>
-              {moduleModels.map(model => (
-                <RadioButton
-                  buttonLabel={getModuleDisplayName(model)}
-                  key={`${model}_${slot}`}
-                  buttonValue={model}
-                  onChange={() => {
-                    setHardware(model)
-                    setSelectedLabwareDefURI(null)
-                  }}
-                  isSelected={model === selectedHardware}
-                />
-              ))}
+              {moduleModels.map(model => {
+                const modelSomewhereOnDeck = Object.values(
+                  deckSetupModules
+                ).filter(
+                  module => module.model === model && module.slot !== slot
+                )
+                const moamModels = enableMoam
+                  ? MOAM_MODELS
+                  : MOAM_MODELS_WITH_FF
+                const maxMoamModel =
+                  model === MAGNETIC_BLOCK_V1
+                    ? MAX_MAGNETIC_BLOCKS
+                    : MAX_MOAM_MODULES
+
+                return (
+                  <RadioButton
+                    disabled={
+                      (modelSomewhereOnDeck.length === 1 &&
+                        !moamModels.includes(model)) ||
+                      (moamModels.includes(model) &&
+                        modelSomewhereOnDeck.length === maxMoamModel)
+                    }
+                    buttonLabel={getModuleDisplayName(model)}
+                    key={`${model}_${slot}`}
+                    buttonValue={model}
+                    onChange={() => {
+                      setHardware(model)
+                      setSelectedLabwareDefURI(null)
+                    }}
+                    isSelected={model === selectedHardware}
+                  />
+                )
+              })}
             </Flex>
             {robotType === OT2_ROBOT_TYPE || fixtures.length === 0 ? null : (
               <Flex
@@ -226,6 +299,8 @@ export const DeckSetupTools = (props: DeckSetupToolsProps): JSX.Element => {
                 </Flex>
                 {fixtures.map(fixture => (
                   <RadioButton
+                    //    delete this when multiple trash bins are supported
+                    disabled={fixture === 'trashBin' && hasTrash}
                     buttonLabel={t(`shared:${fixture}`)}
                     key={`${fixture}_${slot}`}
                     buttonValue={fixture}

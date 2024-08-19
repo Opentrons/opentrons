@@ -1,5 +1,7 @@
 import {
   FLEX_ROBOT_TYPE,
+  FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS,
+  MAGNETIC_BLOCK_V1,
   OT2_ROBOT_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V2,
@@ -10,6 +12,7 @@ import {
   OT2_MODULE_MODELS,
   RECOMMENDED_LABWARE_BY_MODULE,
 } from './constants'
+
 import type {
   AddressableAreaName,
   CutoutFixture,
@@ -51,20 +54,27 @@ export function getModuleModelsBySlot(
     case FLEX_ROBOT_TYPE: {
       if (slot !== 'B1' && !FLEX_MIDDLE_SLOTS.includes(slot)) {
         moduleModels = FLEX_MODULE_MODELS.filter(
-          model => model !== 'thermocyclerModuleV2'
+          model => model !== THERMOCYCLER_MODULE_V2
         )
       }
       if (FLEX_MIDDLE_SLOTS.includes(slot)) {
         moduleModels = FLEX_MODULE_MODELS.filter(
-          model => model === 'magneticBlockV1'
+          model => model === MAGNETIC_BLOCK_V1
         )
+      }
+      if (
+        FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS.includes(
+          slot as AddressableAreaName
+        )
+      ) {
+        moduleModels = []
       }
       break
     }
     case OT2_ROBOT_TYPE: {
       if (OT2_MIDDLE_SLOTS.includes(slot)) {
         moduleModels = []
-      } else if (slot !== '10') {
+      } else if (slot !== '7') {
         moduleModels = OT2_MODULE_MODELS.filter(
           model => getModuleType(model) !== THERMOCYCLER_MODULE_TYPE
         )
@@ -76,11 +86,13 @@ export function getModuleModelsBySlot(
   }
   return moduleModels
 }
+
 export const getLabwareIsRecommended = (
   def: LabwareDefinition2,
   moduleModel?: ModuleModel | null
 ): boolean => {
-  //  special-casing the thermocycler module V2 recommended labware
+  //  special-casing the thermocycler module V2 recommended labware since the thermocyclerModuleTypes
+  //  have different recommended labware
   const moduleType = moduleModel != null ? getModuleType(moduleModel) : null
   if (moduleModel === THERMOCYCLER_MODULE_V2) {
     return (
