@@ -214,6 +214,8 @@ export function OverflowMenu({
               css={css`
                 border-radius: ${BORDERS.borderRadius8};
               `}
+              disabled={isRunning}
+              aria-label={`CalibrationOverflowMenu_button_calibrate`}
             >
               {t(
                 ot3PipCal == null
