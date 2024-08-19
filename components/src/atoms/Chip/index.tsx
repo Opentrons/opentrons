@@ -135,6 +135,7 @@ export function Chip(props: ChipProps): JSX.Element {
       alignItems={ALIGN_CENTER}
       backgroundColor={backgroundColor}
       borderRadius={CHIP_PROPS_BY_TYPE[type].borderRadius}
+      flexDirection={DIRECTION_ROW}
       height={FLEX_MAX_CONTENT}
       css={
         chipSize === 'medium' ? MEDIUM_CONTAINER_STYLE : SMALL_CONTAINER_STYLE
