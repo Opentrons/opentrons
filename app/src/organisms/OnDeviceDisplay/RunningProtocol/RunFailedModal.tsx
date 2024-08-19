@@ -20,7 +20,12 @@ import { SmallButton } from '../../../atoms/buttons'
 import { Modal } from '../../../molecules/Modal'
 
 import type { ModalHeaderBaseProps } from '../../../molecules/Modal/types'
-import type { RunCommandErrors, RunError } from '@opentrons/api-client'
+import type {
+  RunCommandErrors,
+  RunError,
+  RunStatus,
+} from '@opentrons/api-client'
+import { RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
 
 import type { RunCommandError } from '@opentrons/shared-data'
 
@@ -29,6 +34,7 @@ interface RunFailedModalProps {
   setShowRunFailedModal: (showRunFailedModal: boolean) => void
   errors?: RunError[]
   commandErrorList?: RunCommandErrors
+  runStatus: RunStatus | null
 }
 
 export function RunFailedModal({
@@ -36,6 +42,7 @@ export function RunFailedModal({
   setShowRunFailedModal,
   errors,
   commandErrorList,
+  runStatus,
 }: RunFailedModalProps): JSX.Element | null {
   const { t, i18n } = useTranslation(['run_details', 'shared', 'branded'])
   const navigate = useNavigate()
@@ -48,7 +55,12 @@ export function RunFailedModal({
   )
     return null
   const modalHeader: ModalHeaderBaseProps = {
-    title: t('run_failed_modal_title'),
+    title:
+      commandErrorList == null || commandErrorList?.data.length === 0
+        ? t('run_failed_modal_title')
+        : runStatus === RUN_STATUS_SUCCEEDED
+        ? t('warning_details')
+        : t('error_details'),
   }
 
   const highestPriorityError = getHighestPriorityError(errors ?? [])
@@ -85,7 +97,13 @@ export function RunFailedModal({
                 errorType: errors[0].errorType,
                 errorCode: errors[0].errorCode,
               })
-            : `${errors.length} errors`}
+            : runStatus === RUN_STATUS_SUCCEEDED
+            ? t(errors.length > 1 ? 'no_of_warnings' : 'no_of_warning', {
+                count: errors.length,
+              })
+            : t(errors.length > 1 ? 'no_of_errors' : 'no_of_error', {
+                count: errors.length,
+              })}
         </LegacyStyledText>
         <Flex
           width="100%"

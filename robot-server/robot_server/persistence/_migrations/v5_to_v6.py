@@ -27,7 +27,7 @@ from ..tables import schema_5, schema_6
 from .._folder_migrator import Migration
 
 from ._util import copy_rows_unmodified, copy_if_exists, copytree_if_exists
-from .._files_and_directories import (
+from ..file_and_directory_names import (
     DECK_CONFIGURATION_FILE,
     PROTOCOLS_DIRECTORY,
     DATA_FILES_DIRECTORY,

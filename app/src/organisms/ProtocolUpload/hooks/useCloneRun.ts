@@ -48,7 +48,11 @@ export function useCloneRun(
   )
   const cloneRun = (): void => {
     if (runRecord != null) {
-      const { protocolId, labwareOffsets, runTimeParameters } = runRecord.data
+      const { protocolId, labwareOffsets } = runRecord.data
+      const runTimeParameters =
+        'runTimeParameters' in runRecord.data
+          ? runRecord.data.runTimeParameters
+          : []
       const runTimeParameterValues = getRunTimeParameterValuesForRun(
         runTimeParameters
       )

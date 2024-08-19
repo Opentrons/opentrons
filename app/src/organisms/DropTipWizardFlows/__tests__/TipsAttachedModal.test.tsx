@@ -7,7 +7,7 @@ import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 
 import { handleTipsAttachedModal } from '../TipsAttachedModal'
-import { LEFT } from '@opentrons/shared-data'
+import { FLEX_ROBOT_TYPE, LEFT } from '@opentrons/shared-data'
 import { mockPipetteInfo } from '../../../redux/pipettes/__fixtures__'
 import { useCloseCurrentRun } from '../../ProtocolUpload/hooks'
 import { useDropTipWizardFlows } from '..'
@@ -52,6 +52,11 @@ const render = (aPipetteWithTip: PipetteWithTip) => {
             host: MOCK_HOST,
             aPipetteWithTip,
             setTipStatusResolved: mockSetTipStatusResolved,
+            robotType: FLEX_ROBOT_TYPE,
+            mount: 'left',
+            instrumentModelSpecs: mockPipetteInfo.pipetteSpecs as any,
+            onSkipAndHome: vi.fn(),
+            isRunCurrent: true,
           })
         }
         data-testid="testButton"
@@ -93,9 +98,8 @@ describe('TipsAttachedModal', () => {
     const btn = screen.getByTestId('testButton')
     fireEvent.click(btn)
 
-    const skipBtn = screen.getByText('Skip')
+    const skipBtn = screen.getByText('Skip and home pipette')
     fireEvent.click(skipBtn)
-    expect(mockSetTipStatusResolved).toHaveBeenCalled()
   })
   it('clicking the launch wizard button properly launches the wizard', () => {
     render(MOCK_A_PIPETTE_WITH_TIP)

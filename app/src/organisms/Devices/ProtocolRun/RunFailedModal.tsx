@@ -23,7 +23,12 @@ import {
 import { LegacyModal } from '../../../molecules/LegacyModal'
 import { useDownloadRunLog } from '../hooks'
 
-import type { RunError, RunCommandErrors } from '@opentrons/api-client'
+import type {
+  RunError,
+  RunCommandErrors,
+  RunStatus,
+} from '@opentrons/api-client'
+import { RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
 import type { LegacyModalProps } from '../../../molecules/LegacyModal'
 import type { RunCommandError } from '@opentrons/shared-data'
 
@@ -45,6 +50,7 @@ interface RunFailedModalProps {
   setShowRunFailedModal: (showRunFailedModal: boolean) => void
   highestPriorityError?: RunError | null
   commandErrorList?: RunCommandErrors | null
+  runStatus: RunStatus | null
 }
 
 export function RunFailedModal({
@@ -53,11 +59,17 @@ export function RunFailedModal({
   setShowRunFailedModal,
   highestPriorityError,
   commandErrorList,
+  runStatus,
 }: RunFailedModalProps): JSX.Element | null {
   const { i18n, t } = useTranslation(['run_details', 'shared', 'branded'])
   const modalProps: LegacyModalProps = {
-    type: 'error',
-    title: t('run_failed_modal_title'),
+    type: runStatus === RUN_STATUS_SUCCEEDED ? 'warning' : 'error',
+    title:
+      commandErrorList == null || commandErrorList?.data.length === 0
+        ? t('run_failed_modal_title')
+        : runStatus === RUN_STATUS_SUCCEEDED
+        ? t('warning_details')
+        : t('error_details'),
     onClose: () => {
       setShowRunFailedModal(false)
     },
@@ -95,7 +107,13 @@ export function RunFailedModal({
                 errorType: errors[0].errorType,
                 errorCode: errors[0].errorCode,
               })
-            : `${errors.length} errors`}
+            : runStatus === RUN_STATUS_SUCCEEDED
+            ? t(errors.length > 1 ? 'no_of_warnings' : 'no_of_warning', {
+                count: errors.length,
+              })
+            : t(errors.length > 1 ? 'no_of_errors' : 'no_of_error', {
+                count: errors.length,
+              })}
         </LegacyStyledText>
         <Flex css={ERROR_MESSAGE_STYLE}>
           {' '}

@@ -37,6 +37,7 @@ import type {
   ERUtilsResults,
   UseRecoveryAnalyticsResult,
   UseRecoveryTakeoverResult,
+  useRetainedFailedCommandBySource,
 } from './hooks'
 
 export function useRunPausedSplash(
@@ -54,7 +55,7 @@ export function useRunPausedSplash(
 
 type RunPausedSplashProps = ERUtilsResults & {
   isOnDevice: boolean
-  failedCommand: ErrorRecoveryFlowsProps['failedCommand']
+  failedCommand: ReturnType<typeof useRetainedFailedCommandBySource>
   protocolAnalysis: ErrorRecoveryFlowsProps['protocolAnalysis']
   robotType: RobotType
   robotName: string
@@ -73,11 +74,11 @@ export function RunPausedSplash(
     robotName,
   } = props
   const { t } = useTranslation('error_recovery')
-  const errorKind = getErrorKind(failedCommand)
+  const errorKind = getErrorKind(failedCommand?.byRunRecord ?? null)
   const title = useErrorName(errorKind)
 
   const { proceedToRouteAndStep } = routeUpdateActions
-  const { reportInitialActionEvent } = analytics
+  const { reportErrorEvent } = analytics
 
   const buildTitleHeadingDesktop = (): JSX.Element => {
     return (
@@ -90,14 +91,14 @@ export function RunPausedSplash(
   // Do not launch error recovery, but do utilize the wizard's cancel route.
   const onCancelClick = (): Promise<void> => {
     return toggleERWizAsActiveUser(true, false).then(() => {
-      reportInitialActionEvent('cancel-run')
+      reportErrorEvent(failedCommand?.byRunRecord ?? null, 'cancel-run')
       void proceedToRouteAndStep(RECOVERY_MAP.CANCEL_RUN.ROUTE)
     })
   }
 
   const onLaunchERClick = (): Promise<void> => {
     return toggleERWizAsActiveUser(true, true).then(() => {
-      reportInitialActionEvent('launch-recovery')
+      reportErrorEvent(failedCommand?.byRunRecord ?? null, 'launch-recovery')
     })
   }
 

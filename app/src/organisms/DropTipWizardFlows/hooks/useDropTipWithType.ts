@@ -1,7 +1,7 @@
 // This is the main unifying function for maintenanceRun and fixit type flows.
 import * as React from 'react'
 
-import { useDropTipCommandErrors } from '../errors'
+import { useDropTipCommandErrors } from '.'
 import { useDropTipMaintenanceRun } from './useDropTipMaintenanceRun'
 import { useDropTipCreateCommands } from './useDropTipCreateCommands'
 import {
@@ -9,10 +9,10 @@ import {
   buildLoadPipetteCommand,
 } from './useDropTipCommands'
 
-import type { SetRobotErrorDetailsParams } from '../errors'
+import type { SetRobotErrorDetailsParams } from '.'
 import type { UseDropTipCommandsResult } from './useDropTipCommands'
-import type { ErrorDetails, IssuedCommandsType } from '../../types'
-import type { DropTipWizardFlowsProps } from '../..'
+import type { ErrorDetails, IssuedCommandsType } from '../types'
+import type { DropTipWizardFlowsProps } from '..'
 import type { UseDropTipCreateCommandsResult } from './useDropTipCreateCommands'
 
 export type UseDTWithTypeParams = DropTipWizardFlowsProps & {
@@ -41,10 +41,14 @@ export function useDropTipWithType(
   const { isExiting, toggleIsExiting } = useIsExitingDT(issuedCommandsType)
   const { errorDetails, setErrorDetails } = useErrorDetails()
 
-  const activeMaintenanceRunId = useDropTipMaintenanceRun({
+  const {
+    activeMaintenanceRunId,
+    toggleClientEndRun,
+  } = useDropTipMaintenanceRun({
     ...params,
     setErrorDetails,
   })
+
   const dtCreateCommandUtils = useDropTipCreateCommands({
     ...params,
     setErrorDetails,
@@ -59,6 +63,7 @@ export function useDropTipWithType(
     setErrorDetails,
     toggleIsExiting,
     fixitCommandTypeUtils,
+    toggleClientEndRun,
   })
 
   useRegisterPipetteFixitType({ ...params, ...dtCreateCommandUtils })
@@ -117,10 +122,15 @@ function useRegisterPipetteFixitType({
   instrumentModelSpecs,
   issuedCommandsType,
   chainRunCommands,
+  fixitCommandTypeUtils,
 }: UseRegisterPipetteFixitType): void {
   React.useEffect(() => {
     if (issuedCommandsType === 'fixit') {
-      const command = buildLoadPipetteCommand(mount, instrumentModelSpecs.name)
+      const command = buildLoadPipetteCommand(
+        instrumentModelSpecs.name,
+        mount,
+        fixitCommandTypeUtils?.pipetteId
+      )
       void chainRunCommands([command], true)
     }
   }, [])

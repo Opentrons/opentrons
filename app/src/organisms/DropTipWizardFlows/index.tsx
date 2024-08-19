@@ -11,6 +11,7 @@ import type { PipetteModelSpecs, RobotType } from '@opentrons/shared-data'
 import type { Mount, PipetteData } from '@opentrons/api-client'
 import type { FixitCommandTypeUtils, IssuedCommandsType } from './types'
 import type { GetPipettesWithTipAttached } from './getPipettesWithTipAttached'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
 /** Provides the user toggle for rendering Drop Tip Wizard Flows.
  *
@@ -34,7 +35,8 @@ export interface DropTipWizardFlowsProps {
   robotType: RobotType
   mount: PipetteData['mount']
   instrumentModelSpecs: PipetteModelSpecs
-  closeFlow: () => void
+  /* isTakeover allows for optionally specifying a different callback if a different client cancels the "setup" type flow. */
+  closeFlow: (isTakeover?: boolean) => void
   /* Optional. If provided, DT will issue "fixit" commands and render alternate Error Recovery compatible views. */
   fixitCommandTypeUtils?: FixitCommandTypeUtils
 }
@@ -64,6 +66,8 @@ export function DropTipWizardFlows(
   )
 }
 
+const INSTRUMENTS_POLL_MS = 5000
+
 export interface PipetteWithTip {
   mount: Mount
   specs: PipetteModelSpecs
@@ -89,15 +93,23 @@ export interface TipAttachmentStatusResult {
   ) => Promise<PipetteWithTip>
   /* Relevant pipette information for a pipette with a tip attached. If both pipettes have tips attached, return the left pipette. */
   aPipetteWithTip: PipetteWithTip | null
+  /* The initial number of pipettes with tips. Null if there has been no tip check yet. */
+  initialPipettesWithTipsCount: number | null
 }
 
 // Returns various utilities for interacting with the cache of pipettes with tips attached.
 export function useTipAttachmentStatus(
-  params: GetPipettesWithTipAttached
+  params: Omit<GetPipettesWithTipAttached, 'attachedInstruments'>
 ): TipAttachmentStatusResult {
   const [pipettesWithTip, setPipettesWithTip] = React.useState<
     PipetteWithTip[]
   >([])
+  const [initialPipettesCount, setInitialPipettesCount] = React.useState<
+    number | null
+  >(null)
+  const { data: attachedInstruments } = useInstrumentsQuery({
+    refetchInterval: INSTRUMENTS_POLL_MS,
+  })
 
   const aPipetteWithTip = head(pipettesWithTip) ?? null
 
@@ -107,7 +119,10 @@ export function useTipAttachmentStatus(
   const determineTipStatus = React.useCallback((): Promise<
     PipetteWithTip[]
   > => {
-    return getPipettesWithTipAttached(params).then(pipettesWithTip => {
+    return getPipettesWithTipAttached({
+      ...params,
+      attachedInstruments: attachedInstruments ?? null,
+    }).then(pipettesWithTip => {
       const pipettesWithTipsData = pipettesWithTip.map(pipette => {
         const specs = getPipetteModelSpecs(pipette.instrumentModel)
         return {
@@ -120,6 +135,10 @@ export function useTipAttachmentStatus(
       ) as PipetteWithTip[]
 
       setPipettesWithTip(pipettesWithTipAndSpecs)
+      // Set only once.
+      if (initialPipettesCount === null) {
+        setInitialPipettesCount(pipettesWithTipAndSpecs.length)
+      }
 
       return Promise.resolve(pipettesWithTipAndSpecs)
     })
@@ -154,5 +173,6 @@ export function useTipAttachmentStatus(
     resetTipStatus,
     aPipetteWithTip,
     setTipStatusResolved,
+    initialPipettesWithTipsCount: initialPipettesCount,
   }
 }

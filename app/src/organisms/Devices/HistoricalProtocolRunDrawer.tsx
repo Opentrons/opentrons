@@ -46,15 +46,17 @@ export function HistoricalProtocolRunDrawer(
   const allLabwareOffsets = run.labwareOffsets?.sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   )
-  const runDataFileIds = run.runTimeParameters.reduce<string[]>(
-    (acc, parameter) => {
-      if (parameter.type === 'csv_file') {
-        return parameter.file?.id != null ? [...acc, parameter.file?.id] : acc
-      }
-      return acc
-    },
-    []
-  )
+  const runDataFileIds =
+    'runTimeParameters' in run
+      ? run.runTimeParameters.reduce<string[]>((acc, parameter) => {
+          if (parameter.type === 'csv_file') {
+            return parameter.file?.id != null
+              ? [...acc, parameter.file?.id]
+              : acc
+          }
+          return acc
+        }, [])
+      : []
   const uniqueLabwareOffsets = allLabwareOffsets?.filter(
     (offset, index, array) => {
       return (

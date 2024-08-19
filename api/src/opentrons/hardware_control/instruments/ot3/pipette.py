@@ -24,6 +24,7 @@ from opentrons_shared_data.errors.exceptions import (
     InvalidLiquidClassName,
     CommandPreconditionViolated,
     PythonException,
+    InvalidInstrumentData,
 )
 from opentrons_shared_data.pipette.ul_per_mm import (
     piecewise_volume_conversion,
@@ -652,12 +653,8 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         try:
             new_tips = self._liquid_class.supported_tips[tip_type]
         except KeyError as e:
-            raise InvalidLiquidClassName(
-                message=f"There is no configuration for {tip_type.name} in liquid class {str(self._liquid_class_name)} on a {self._config.display_name}",
-                detail={
-                    "current-liquid-class": str(self._liquid_class_name),
-                    "requested-type": tip_type.name,
-                },
+            raise InvalidInstrumentData(
+                message=f"There is no configuration for {tip_type.name} in the pick up tip configurations for a {self._config.display_name}",
                 wrapping=[PythonException(e)],
             ) from e
 

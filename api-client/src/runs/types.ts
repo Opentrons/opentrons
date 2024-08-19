@@ -54,11 +54,11 @@ export interface LegacyGoodRunData {
   modules: LoadedModule[]
   protocolId?: string
   labwareOffsets?: LabwareOffset[]
-  runTimeParameters: RunTimeParameter[]
 }
 
 export interface KnownGoodRunData extends LegacyGoodRunData {
   ok: true
+  runTimeParameters: RunTimeParameter[]
 }
 
 export interface KnownInvalidRunData extends LegacyGoodRunData {

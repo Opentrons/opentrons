@@ -1,6 +1,7 @@
 import * as React from 'react'
 import {
   COLORS,
+  FLEX_MAX_CONTENT,
   TYPOGRAPHY,
   Tooltip as SharedTooltip,
 } from '@opentrons/components'
@@ -16,7 +17,13 @@ export interface TooltipProps extends StyleProps {
 }
 
 export function Tooltip(props: TooltipProps): JSX.Element {
-  const { children, tooltipProps, width = '8.75rem', ...styleProps } = props
+  const {
+    children,
+    tooltipProps,
+    width = FLEX_MAX_CONTENT,
+    maxWidth = '8.75rem',
+    ...styleProps
+  } = props
 
   return (
     <SharedTooltip
@@ -24,6 +31,7 @@ export function Tooltip(props: TooltipProps): JSX.Element {
       backgroundColor={COLORS.black90}
       fontSize={TYPOGRAPHY.fontSizeCaption}
       width={width}
+      maxWidth={maxWidth}
       {...styleProps}
     >
       {children}

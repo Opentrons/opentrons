@@ -18,54 +18,81 @@ import {
   LegacyModalShell,
 } from '../../../molecules/LegacyModal'
 import { TextOnlyButton } from '../../../atoms/buttons'
+import { useHomePipettes } from '../../DropTipWizardFlows/hooks'
 
 import type { PipetteData } from '@opentrons/api-client'
 import type { IconProps } from '@opentrons/components'
+import type { UseHomePipettesProps } from '../../DropTipWizardFlows/hooks'
 import type { TipAttachmentStatusResult } from '../../DropTipWizardFlows'
 
-interface UseProtocolDropTipModalProps {
+type UseProtocolDropTipModalProps = Pick<
+  UseHomePipettesProps,
+  'robotType' | 'instrumentModelSpecs' | 'mount'
+> & {
   areTipsAttached: TipAttachmentStatusResult['areTipsAttached']
   toggleDTWiz: () => void
+  currentRunId: string
+  onSkipAndHome: () => void
   /* True if the most recent run is the current run */
-  isMostRecentRunCurrent: boolean
+  isRunCurrent: boolean
 }
 
 interface UseProtocolDropTipModalResult {
   showDTModal: boolean
   onDTModalSkip: () => void
   onDTModalRemoval: () => void
+  isDisabled: boolean
 }
 
 // Wraps functionality required for rendering the related modal.
 export function useProtocolDropTipModal({
   areTipsAttached,
   toggleDTWiz,
-  isMostRecentRunCurrent,
+  isRunCurrent,
+  onSkipAndHome,
+  ...homePipetteProps
 }: UseProtocolDropTipModalProps): UseProtocolDropTipModalResult {
   const [showDTModal, setShowDTModal] = React.useState(areTipsAttached)
 
+  const { homePipettes, isHomingPipettes } = useHomePipettes({
+    ...homePipetteProps,
+    isRunCurrent,
+    onHome: () => {
+      onSkipAndHome()
+      setShowDTModal(false)
+    },
+  })
+
+  // Close the modal if a different app closes the run context.
   React.useEffect(() => {
-    if (isMostRecentRunCurrent) {
+    if (isRunCurrent && !isHomingPipettes) {
       setShowDTModal(areTipsAttached)
-    } else {
+    } else if (!isRunCurrent) {
       setShowDTModal(false)
     }
-  }, [areTipsAttached, isMostRecentRunCurrent])
+  }, [isRunCurrent, areTipsAttached, showDTModal]) // Continue to show the modal if a client dismisses the maintenance run on a different app.
 
   const onDTModalSkip = (): void => {
-    setShowDTModal(false)
+    homePipettes()
   }
 
   const onDTModalRemoval = (): void => {
     toggleDTWiz()
+    setShowDTModal(false)
   }
 
-  return { showDTModal, onDTModalSkip, onDTModalRemoval }
+  return {
+    showDTModal,
+    onDTModalSkip,
+    onDTModalRemoval,
+    isDisabled: isHomingPipettes,
+  }
 }
 
 interface ProtocolDropTipModalProps {
   onSkip: UseProtocolDropTipModalResult['onDTModalSkip']
   onBeginRemoval: UseProtocolDropTipModalResult['onDTModalRemoval']
+  isDisabled: UseProtocolDropTipModalResult['isDisabled']
   mount?: PipetteData['mount']
 }
 
@@ -73,6 +100,7 @@ export function ProtocolDropTipModal({
   onSkip,
   onBeginRemoval,
   mount,
+  isDisabled,
 }: ProtocolDropTipModalProps): JSX.Element {
   const { t } = useTranslation('drop_tip_wizard')
 
@@ -117,8 +145,12 @@ export function ProtocolDropTipModal({
           />
         </StyledText>
         <Flex gridGap={SPACING.spacing24} justifyContent={JUSTIFY_END}>
-          <TextOnlyButton onClick={onSkip} buttonText={t('skip')} />
-          <PrimaryButton onClick={onBeginRemoval}>
+          <TextOnlyButton
+            onClick={onSkip}
+            buttonText={t('skip_and_home_pipette')}
+            disabled={isDisabled}
+          />
+          <PrimaryButton onClick={onBeginRemoval} disabled={isDisabled}>
             {t('begin_removal')}
           </PrimaryButton>
         </Flex>
