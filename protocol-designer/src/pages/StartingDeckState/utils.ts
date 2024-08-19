@@ -7,6 +7,7 @@ import {
   THERMOCYCLER_MODULE_V2,
   getModuleType,
 } from '@opentrons/shared-data'
+import { getOnlyLatestDefs } from '../../labware-defs'
 import {
   FLEX_MODULE_MODELS,
   OT2_MODULE_MODELS,
@@ -105,4 +106,21 @@ export const getLabwareIsRecommended = (
         )
       : false
   }
+}
+
+export const getLabwareCompatibleWithAdapter = (
+  adapterLoadName?: string
+): string[] => {
+  const defs = getOnlyLatestDefs()
+
+  if (adapterLoadName == null) {
+    return []
+  }
+
+  return Object.entries(defs)
+    .filter(
+      ([, { stackingOffsetWithLabware }]) =>
+        stackingOffsetWithLabware?.[adapterLoadName] != null
+    )
+    .map(([labwareDefUri]) => labwareDefUri)
 }

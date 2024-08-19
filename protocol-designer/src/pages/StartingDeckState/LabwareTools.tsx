@@ -32,7 +32,6 @@ import { getOnlyLatestDefs } from '../../labware-defs'
 import {
   ADAPTER_96_CHANNEL,
   getLabwareIsCompatible as _getLabwareIsCompatible,
-  getLabwareCompatibleWithAdapter,
 } from '../../utils/labwareModuleCompatibility'
 import { getHas96Channel } from '../../utils'
 import { createCustomLabwareDef } from '../../labware-defs/actions'
@@ -40,7 +39,10 @@ import { getRobotType } from '../../file-data/selectors'
 import { getCustomLabwareDefsByURI } from '../../labware-defs/selectors'
 import { getPipetteEntities } from '../../step-forms/selectors'
 import { ORDERED_CATEGORIES } from './constants'
-import { getLabwareIsRecommended } from './utils'
+import {
+  getLabwareIsRecommended,
+  getLabwareCompatibleWithAdapter,
+} from './utils'
 
 import type {
   DeckSlotId,
