@@ -42,7 +42,7 @@ export const PipetteInfoItem = (props: PipetteInfoItemProps): JSX.Element => {
   const { t, i18n } = useTranslation('create_new_protocol')
   const otherMount = mount === 'left' ? 'right' : 'left'
   const allLabware = useSelector(getLabwareDefsByURI)
-
+  const is96Channel = pipetteName === 'p1000_96'
   return (
     <ListItem type="noActive">
       <Flex
@@ -52,7 +52,10 @@ export const PipetteInfoItem = (props: PipetteInfoItemProps): JSX.Element => {
       >
         <Flex gridGap={SPACING.spacing4} flexDirection={DIRECTION_COLUMN}>
           <StyledText desktopStyle="bodyDefaultSemiBold">
-            {i18n.format(t('pip', { mount }), 'capitalize')}
+            {i18n.format(
+              t('pip', { mount: is96Channel ? 'Left+Right' : mount }),
+              'capitalize'
+            )}
           </StyledText>
           <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
             {getPipetteSpecsV2(pipetteName)?.displayName}

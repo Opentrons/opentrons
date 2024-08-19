@@ -39,6 +39,7 @@ export function SelectFixtures(props: WizardTileProps): JSX.Element | null {
     <WizardBody
       stepNumber={5}
       header={t('add_fixtures')}
+      subHeader={t('fixtures_replace')}
       disabled={false}
       goBack={() => {
         goBack(1)

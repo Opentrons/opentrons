@@ -58,6 +58,7 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
   const allPipetteOptions = getAllPipetteNames('maxVolume', 'channels')
   const robotType = fields.robotType ?? OT2_ROBOT_TYPE
   const defaultMount = mount ?? 'left'
+  const has96Channel = pipettesByMount.left.pipetteName === 'p1000_96'
   const selectedPip =
     pipetteType === '96' || pipetteGen === 'GEN1'
       ? `${pipetteVolume}_${pipetteType}`
@@ -69,8 +70,6 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
     setPipetteType(null)
     setPipetteGen('flex')
     setPipetteVolume(null)
-    setValue(`pipettesByMount.${defaultMount}.pipetteName`, undefined)
-    setValue(`pipettesByMount.${defaultMount}.tiprackDefURI`, undefined)
   }
 
   //    initialize pipette name once all fields are filled out
@@ -95,6 +94,8 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
       goBack={() => {
         if (page === 'add') {
           resetFields()
+          setValue(`pipettesByMount.${defaultMount}.pipetteName`, undefined)
+          setValue(`pipettesByMount.${defaultMount}.tiprackDefURI`, undefined)
           goBack(1)
         } else {
           setPage('add')
@@ -109,7 +110,7 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
           flexDirection="column"
           height="48vh"
           overflowY="scroll"
-          marginBottom={SPACING.spacing40}
+          marginTop={SPACING.spacing60}
         >
           <>
             <StyledText
@@ -119,27 +120,31 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
               {t('pip_type')}
             </StyledText>
             <Flex gridGap={SPACING.spacing4}>
-              {PIPETTE_TYPES[robotType].map(type => (
-                <RadioButton
-                  key={`${type.label}_${type.value}`}
-                  onChange={() => {
-                    setPipetteType(type.value)
-                    setPipetteGen('flex')
-                    setPipetteVolume(null)
-                    setValue(
-                      `pipettesByMount.${defaultMount}.pipetteName`,
-                      undefined
-                    )
-                    setValue(
-                      `pipettesByMount.${defaultMount}.tiprackDefURI`,
-                      undefined
-                    )
-                  }}
-                  buttonLabel={t(`shared:${type.label}`)}
-                  buttonValue="single"
-                  isSelected={pipetteType === type.value}
-                />
-              ))}
+              {PIPETTE_TYPES[robotType].map(type => {
+                return type.value === '96' &&
+                  (pipettesByMount.left.pipetteName != null ||
+                    pipettesByMount.right.pipetteName != null) ? null : (
+                  <RadioButton
+                    key={`${type.label}_${type.value}`}
+                    onChange={() => {
+                      setPipetteType(type.value)
+                      setPipetteGen('flex')
+                      setPipetteVolume(null)
+                      setValue(
+                        `pipettesByMount.${defaultMount}.pipetteName`,
+                        undefined
+                      )
+                      setValue(
+                        `pipettesByMount.${defaultMount}.tiprackDefURI`,
+                        undefined
+                      )
+                    }}
+                    buttonLabel={t(`shared:${type.label}`)}
+                    buttonValue="single"
+                    isSelected={pipetteType === type.value}
+                  />
+                )
+              })}
             </Flex>
           </>
           {pipetteType != null && robotType === OT2_ROBOT_TYPE ? (
@@ -314,35 +319,37 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
             <StyledText desktopStyle="headingSmallBold">
               {t('your_pips')}
             </StyledText>
-            <Btn
-              onClick={() => {
-                const leftPipetteName = pipettesByMount.left.pipetteName
-                const rightPipetteName = pipettesByMount.right.pipetteName
-                const leftTiprackDefURI = pipettesByMount.left.tiprackDefURI
-                const rightTiprackDefURI = pipettesByMount.right.tiprackDefURI
+            {has96Channel ? null : (
+              <Btn
+                onClick={() => {
+                  const leftPipetteName = pipettesByMount.left.pipetteName
+                  const rightPipetteName = pipettesByMount.right.pipetteName
+                  const leftTiprackDefURI = pipettesByMount.left.tiprackDefURI
+                  const rightTiprackDefURI = pipettesByMount.right.tiprackDefURI
 
-                setValue('pipettesByMount.left.pipetteName', rightPipetteName)
-                setValue('pipettesByMount.right.pipetteName', leftPipetteName)
-                setValue(
-                  'pipettesByMount.left.tiprackDefURI',
-                  rightTiprackDefURI
-                )
-                setValue(
-                  'pipettesByMount.right.tiprackDefURI',
-                  leftTiprackDefURI
-                )
-              }}
-            >
-              <StyledText desktopStyle="bodyDefaultRegular">
-                {t('swap')}
-              </StyledText>
-            </Btn>
+                  setValue('pipettesByMount.left.pipetteName', rightPipetteName)
+                  setValue('pipettesByMount.right.pipetteName', leftPipetteName)
+                  setValue(
+                    'pipettesByMount.left.tiprackDefURI',
+                    rightTiprackDefURI
+                  )
+                  setValue(
+                    'pipettesByMount.right.tiprackDefURI',
+                    leftTiprackDefURI
+                  )
+                }}
+              >
+                <StyledText desktopStyle="bodyDefaultRegular">
+                  {t('swap')}
+                </StyledText>
+              </Btn>
+            )}
           </Flex>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
             {pipettesByMount.left.pipetteName != null &&
             pipettesByMount.left.tiprackDefURI != null ? (
               <PipetteInfoItem
-                mount="left"
+                mount={'left'}
                 pipetteName={pipettesByMount.left.pipetteName as PipetteName}
                 tiprackDefURIs={pipettesByMount.left.tiprackDefURI}
                 editClick={() => {
@@ -380,7 +387,7 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
                 setValue={setValue}
                 cleanForm={resetFields}
               />
-            ) : (
+            ) : has96Channel ? null : (
               <EmptySelectorButton
                 onClick={() => {
                   setPage('add')

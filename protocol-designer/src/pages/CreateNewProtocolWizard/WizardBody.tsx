@@ -67,7 +67,6 @@ export function WizardBody(props: WizardBodyProps): JSX.Element {
           {subHeader != null ? (
             <StyledText
               desktopStyle="headingLargeRegular"
-              marginBottom={SPACING.spacing60}
               color={COLORS.grey60}
             >
               {subHeader}

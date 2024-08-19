@@ -45,10 +45,7 @@ describe('SelectRobot', () => {
     render(props)
     screen.getByText('Step 1')
     screen.getByText('Let’s start with the basics')
-    screen.getByText(
-      'We’re going to ask a few questions to help you get started building your protocol.'
-    )
-    screen.getByText('Which robot would you like to use?')
+    screen.getByText('What kind of robot do you have?')
     fireEvent.click(screen.getByRole('label', { name: 'Opentrons Flex' }))
     expect(props.setValue).toHaveBeenCalled()
     fireEvent.click(screen.getByRole('label', { name: 'Opentrons OT-2' }))
