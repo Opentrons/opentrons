@@ -181,7 +181,7 @@ def process_csv_directory(  # noqa: C901
                         [x] for x in pressure_header_row
                     ]
                     google_sheet.batch_update_cells(
-                        pressure_header_for_google_sheet, "H", 10, sheet_id
+                        pressure_header_for_google_sheet, "I", 10, sheet_id
                     )
                 except google_sheets_tool.google_interaction_error:
                     ui.print_error("Header did not write on google sheet.")
@@ -254,7 +254,7 @@ def process_csv_directory(  # noqa: C901
                     transposed_pressure_rows = list(map(list, zip(*pressure_rows)))
                     try:
                         google_sheet.batch_update_cells(
-                            transposed_pressure_rows, "H", 11, sheet_id
+                            transposed_pressure_rows, "I", 11, sheet_id
                         )
                     except google_sheets_tool.google_interaction_error:
                         ui.print_error("Did not write pressure data to google sheet.")
@@ -289,18 +289,14 @@ def process_google_sheet(
     ]
     num_of_trials = run_args.trials  # type: ignore[attr-defined]
     google_sheet.batch_update_cells(test_parameters, "A", 1, sheet_id)
-    target_height = google_sheet.get_cell(sheet_name, "B9")
-    ui.print_info(target_height)
     last_trial_row = 10 + num_of_trials
-    adjusted_height_range = "E11:E" + str(last_trial_row)
-    adjusted_height = google_sheet.get_single_col_range(
-        sheet_name, adjusted_height_range
-    )
-    normalized_height = [
-        float(height) - float(target_height) for height in adjusted_height
-    ]
-    google_sheet.batch_update_cells([normalized_height], "F", 11, sheet_id)
+    target_height_range = "B11:B" + str(last_trial_row)
+    target_height = google_sheet.get_single_col_range(sheet_name, target_height_range)
+    ui.print_info(target_height)
+    norm_height_range = "G11:G" + str(last_trial_row)
+    normalized_height = google_sheet.get_single_col_range(sheet_name, norm_height_range)
     # Find accuracy, precision, repeatability
+    normalized_height = [float(height) for height in normalized_height]
     try:
         accuracy = statistics.mean(normalized_height)
         precision = (max(normalized_height) - min(normalized_height)) / 2
@@ -334,8 +330,8 @@ def process_google_sheet(
                             "sheetId": sheet_id,
                             "startRowIndex": 9,
                             "endRowIndex": 1494,
-                            "startColumnIndex": 7,
-                            "endColumnIndex": 8,
+                            "startColumnIndex": 8,
+                            "endColumnIndex": 9,
                         }
                     ]
                 }
@@ -352,8 +348,8 @@ def process_google_sheet(
                             "sheetId": sheet_id,
                             "startRowIndex": 9,
                             "endRowIndex": 1494,
-                            "startColumnIndex": 9 + 4 * i,
-                            "endColumnIndex": 10 + 4 * i,
+                            "startColumnIndex": 10 + 4 * i,
+                            "endColumnIndex": 11 + 4 * i,
                         }
                     ]
                 }
@@ -376,7 +372,7 @@ def process_google_sheet(
         ui.print_error(traceback.format_exc())
 
     # 2. Height vs Offset Comparison
-    heights_range = "B11:B" + str(last_trial_row)
+    heights_range = "C11:C" + str(last_trial_row)
     heights = google_sheet.get_single_col_range(sheet_name, heights_range)
     axis = [
         {"position": "BOTTOM_AXIS", "title": titles[1]},
@@ -416,8 +412,8 @@ def process_google_sheet(
                             "sheetId": sheet_id,
                             "startRowIndex": 9,
                             "endRowIndex": last_trial_row,
-                            "startColumnIndex": 1,
-                            "endColumnIndex": 2,
+                            "startColumnIndex": 2,
+                            "endColumnIndex": 3,
                         }
                     ]
                 }
@@ -434,8 +430,8 @@ def process_google_sheet(
                             "sheetId": sheet_id,
                             "startRowIndex": 9,
                             "endRowIndex": last_trial_row,
-                            "startColumnIndex": 3,
-                            "endColumnIndex": 4,
+                            "startColumnIndex": 4,
+                            "endColumnIndex": 5,
                         }
                     ]
                 }
@@ -471,8 +467,8 @@ def process_google_sheet(
                             "sheetId": sheet_id,
                             "startRowIndex": 9,
                             "endRowIndex": last_trial_row,
-                            "startColumnIndex": 5,
-                            "endColumnIndex": 6,
+                            "startColumnIndex": 6,
+                            "endColumnIndex": 7,
                         }
                     ]
                 }

@@ -27,7 +27,6 @@ from hardware_testing.data import (
     get_testing_data_directory,
 )
 from opentrons_hardware.hardware_control.motion_planning import move_utils
-from opentrons_hardware.hardware_control import tool_sensors
 
 from opentrons.protocol_api import InstrumentContext, ProtocolContext
 from opentrons.protocol_engine.types import LabwareOffset
@@ -37,11 +36,11 @@ from .report import build_ls_report, store_config, store_serial_numbers
 from .post_process import process_csv_directory, process_google_sheet
 
 from hardware_testing.protocols.liquid_sense_lpc import (
-    liquid_sense_ot3_p50_single_96well,
-    liquid_sense_ot3_p1000_96_1well,
-    liquid_sense_ot3_p1000_single_96well,
-    liquid_sense_ot3_p50_multi_12well,
-    liquid_sense_ot3_p1000_multi_12well,
+    liquid_sense_ot3_p50_single_vial,
+    liquid_sense_ot3_p50_multi_vial,
+    liquid_sense_ot3_p1000_96_vial,
+    liquid_sense_ot3_p1000_single_vial,
+    liquid_sense_ot3_p1000_multi_vial,
 )
 
 try:
@@ -73,13 +72,13 @@ MAX_PROBE_SECONDS = 3.5
 
 LIQUID_SENSE_CFG: Dict[int, Dict[int, Any]] = {
     50: {
-        1: liquid_sense_ot3_p50_single_96well,
-        8: liquid_sense_ot3_p50_multi_12well,
+        1: liquid_sense_ot3_p50_single_vial,
+        8: liquid_sense_ot3_p50_multi_vial,
     },
     1000: {
-        1: liquid_sense_ot3_p1000_single_96well,
-        8: liquid_sense_ot3_p1000_multi_12well,
-        96: liquid_sense_ot3_p1000_96_1well,
+        1: liquid_sense_ot3_p1000_single_vial,
+        8: liquid_sense_ot3_p1000_multi_vial,
+        96: liquid_sense_ot3_p1000_96_vial,
     },
 }
 
@@ -123,6 +122,7 @@ class RunArgs:
     no_multi_pass: int
     test_well: str
     wet: bool
+    dial_front_channel: bool
 
     @classmethod
     def _get_protocol_context(cls, args: argparse.Namespace) -> ProtocolContext:
@@ -232,7 +232,6 @@ class RunArgs:
             protocol_cfg.LABWARE_ON_SCALE,  # type: ignore[union-attr]
             args.z_speed,
         )
-        tool_sensors.PLUNGER_SOLO_MOVE_TIME = args.p_solo_time
         return RunArgs(
             tip_volumes=tip_volumes,
             run_id=run_id,
@@ -257,6 +256,7 @@ class RunArgs:
             no_multi_pass=args.no_multi_pass,
             test_well=args.test_well,
             wet=args.wet,
+            dial_front_channel=args.dial_front_channel,
         )
 
 
@@ -274,20 +274,19 @@ if __name__ == "__main__":
     parser.add_argument("--trials-before-jog", type=int, default=7)
     parser.add_argument("--z-speed", type=float, default=5)
     parser.add_argument("--aspirate", action="store_true")
-    parser.add_argument("--plunger-speed", type=float, default=20)
+    parser.add_argument("--plunger-speed", type=float, default=15)
     parser.add_argument("--no-multi-pass", action="store_true")
     parser.add_argument("--wet", action="store_true")
     parser.add_argument("--starting-tip", type=str, default="A1")
     parser.add_argument("--test-well", type=str, default="A1")
-    parser.add_argument(
-        "--p-solo-time", type=float, default=tool_sensors.PLUNGER_SOLO_MOVE_TIME
-    )
+    parser.add_argument("--p-solo-time", type=float, default=0)
     parser.add_argument("--google-sheet-name", type=str, default="LLD-Shared-Data")
     parser.add_argument(
         "--gd-parent-folder", type=str, default="1b2V85fDPA0tNqjEhyHOGCWRZYgn8KsGf"
     )
     parser.add_argument("--liquid", type=str, default="unknown")
     parser.add_argument("--skip-labware-offsets", action="store_true")
+    parser.add_argument("--dial-front-channel", action="store_true")
 
     args = parser.parse_args()
 
