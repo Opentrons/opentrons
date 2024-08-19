@@ -2,7 +2,7 @@ import * as React from 'react'
 import { describe, it, beforeEach, expect } from 'vitest'
 import { screen } from '@testing-library/react'
 
-import { renderWithProviders } from '../../../testing/utils'
+import { renderWithProviders } from '../../../__testing-utils__'
 
 import { SlotInformation } from '..'
 

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Flex } from '../../primitives'
+import { Flex } from '@opentrons/components'
 import { SlotInformation as SlotInformationComponent } from '.'
 
 import type { Meta, StoryObj } from '@storybook/react'
@@ -24,7 +24,7 @@ const mockLabwares = ['96 Well Plate', 'Adapter']
 const mockModules = ['Thermocycler Module Gen2', 'Heater-Shaker Module']
 
 const meta: Meta<typeof SlotInformationComponent> = {
-  title: 'Library/Organisms/SlotInformation',
+  title: 'Protocol-Designer/Organisms/SlotInformation',
   component: SlotInformationComponent,
   argTypes: {
     location: {

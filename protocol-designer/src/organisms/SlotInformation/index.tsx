@@ -1,11 +1,14 @@
 import React from 'react'
-import { Flex } from '../../primitives'
-import { ALIGN_CENTER, DIRECTION_COLUMN } from '../../styles'
-import { SPACING } from '../../ui-style-constants'
-import { StyledText } from '../../atoms/StyledText'
-import { ListItem } from '../../atoms/ListItem'
-import { ListItemDescriptor } from '../../atoms/ListItem/ListItemChildren/ListItemDescriptor'
-import { DeckInfoLabel } from '../../molecules/DeckInfoLabel'
+import {
+  ALIGN_CENTER,
+  DeckInfoLabel,
+  DIRECTION_COLUMN,
+  Flex,
+  ListItem,
+  ListItemDescriptor,
+  SPACING,
+  StyledText,
+} from '@opentrons/components'
 
 interface SlotInformationProps {
   location: string
