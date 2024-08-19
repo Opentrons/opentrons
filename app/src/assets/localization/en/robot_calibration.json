@@ -91,7 +91,7 @@
   "pipette_offset_recalibrate_both_mounts": "Pipette offsets for both mounts will have to be recalibrated.",
   "pipette_offset_requires_tip_length": "You don’t have a tip length saved with this pipette yet. You will need to calibrate tip length before calibrating your pipette offset.",
   "pipette_offset_title": "pipette offset calibration",
-  "place_cal_block": "Place the Calibration Block into it's designated slot",
+  "place_cal_block": "Place the Calibration Block into its designated slot",
   "place_full_tip_rack": "Place a full {{tip_rack}} into slot 8",
   "position_pipette_over_tip": "Position pipette over A1",
   "prepare_the_space": "Prepare the space",
