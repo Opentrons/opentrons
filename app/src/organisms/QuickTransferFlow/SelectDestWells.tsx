@@ -107,9 +107,10 @@ export function SelectDestWells(props: SelectDestWellsProps): JSX.Element {
   const resetButtonProps: React.ComponentProps<typeof SmallButton> = {
     buttonType: 'tertiaryLowLight',
     buttonText: t('shared:reset'),
-    onClick: () => {
+    onClick: (e: React.MouseEvent<HTMLButtonElement>) => {
       setIsNumberWellsSelectedError(false)
       setSelectedWells({})
+      e.currentTarget.blur?.()
     },
   }
   let labwareDefinition =
