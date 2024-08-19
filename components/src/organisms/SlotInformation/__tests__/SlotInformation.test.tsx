@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { describe, it, beforeEach, vi, expect } from 'vitest'
+import { describe, it, beforeEach, expect } from 'vitest'
 import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '../../../testing/utils'
