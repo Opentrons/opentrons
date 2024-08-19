@@ -29,6 +29,7 @@ DEFAULT_LIQUID_PROBE_SETTINGS: Final[LiquidProbeSettings] = LiquidProbeSettings(
     sensor_threshold_pascals=15,
     output_option=OutputOptions.sync_buffer_to_csv,
     aspirate_while_sensing=False,
+    z_overlap_between_passes_mm=0.1,
     data_files={InstrumentProbeType.PRIMARY: "/data/pressure_sensor_data.csv"},
 )
 
@@ -342,6 +343,9 @@ def _build_default_liquid_probe(
         output_option=from_conf.get("output_option", default.output_option),
         aspirate_while_sensing=from_conf.get(
             "aspirate_while_sensing", default.aspirate_while_sensing
+        ),
+        z_overlap_between_passes_mm=from_conf.get(
+            "z_overlap_between_passes_mm", default.z_overlap_between_passes_mm
         ),
         data_files=data_files,
     )

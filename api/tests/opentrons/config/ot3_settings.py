@@ -124,6 +124,7 @@ ot3_dummy_settings = {
         "sensor_threshold_pascals": 17,
         "output_option": OutputOptions.stream_to_csv,
         "aspirate_while_sensing": False,
+        "z_overlap_between_passes_mm": 0.1,
         "data_files": {"PRIMARY": "/data/pressure_sensor_data.csv"},
     },
     "calibration": {
