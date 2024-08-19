@@ -1,5 +1,5 @@
 {
-  "$id": "opentronsLabwareSchemaV2",
+  "$id": "opentronsLabwareSchemaV3",
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
     "positiveNumber": {
@@ -372,7 +372,7 @@
       "type": "number",
       "description": "Recommended Z-height, from labware bottom to the center of gripper pads, when gripping the labware."
     },
-    "innerLabwareGeometry" : {
+    "innerLabwareGeometry": {
       "type": "object",
       "properties": {
         "default": {
@@ -395,30 +395,30 @@
                   ]
                 },
                 "topHeight": {
-                "description": "The height at the top of a bounded subsection of a well, relative to the bottom of the well",
-                "$ref": "#/definitions/positiveNumber"
+                  "description": "The height at the top of a bounded subsection of a well, relative to the bottom of the well",
+                  "$ref": "#/definitions/positiveNumber"
                 }
               }
             },
             "bottomShape": {
               "type": "object",
               "required": ["shape"],
-                "oneOf": [
-                  { "required": ["xDimension", "yDimension"] },
-                  { "required": ["radiusOfCurvature", "depth"] },
-                  { "required": ["diameter"] }
-                ],
-                "not": {
-                  "anyOf": [
-                    { "required": ["radiusOfCurvature", "xDimension"] },
-                    { "required": ["radiusOfCurvature", "yDimension"] },
-                    { "required": ["depth", "xDimension"] },
-                    { "required": ["depth", "yDimension"] },
-                    { "required": ["diameter", "xDimension"] },
-                    { "required": ["diameter", "yDimension"] },
-                    { "required": ["diameter", "depth"] }
-                  ]
-                }
+              "oneOf": [
+                { "required": ["xDimension", "yDimension"] },
+                { "required": ["radiusOfCurvature", "depth"] },
+                { "required": ["diameter"] }
+              ],
+              "not": {
+                "anyOf": [
+                  { "required": ["radiusOfCurvature", "xDimension"] },
+                  { "required": ["radiusOfCurvature", "yDimension"] },
+                  { "required": ["depth", "xDimension"] },
+                  { "required": ["depth", "yDimension"] },
+                  { "required": ["diameter", "xDimension"] },
+                  { "required": ["diameter", "yDimension"] },
+                  { "required": ["diameter", "depth"] }
+                ]
+              }
             }
           }
         }

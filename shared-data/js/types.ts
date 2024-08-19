@@ -55,7 +55,6 @@ export interface WellDefinition {
   'total-liquid-volume': number
 }
 
-
 // typedef for labware definitions under v1 labware schema
 export interface LabwareDefinition1 {
   metadata: {
@@ -245,7 +244,6 @@ export interface LabwareDefinition3 {
   stackingOffsetWithLabware?: Record<string, LabwareOffset>
   stackingOffsetWithModule?: Record<string, LabwareOffset>
   innerLabwareGeometry: Record<string, InnerWellGeometry>
-
 }
 
 export interface LabwareDefByDefURI {
