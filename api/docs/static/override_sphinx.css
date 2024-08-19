@@ -105,9 +105,10 @@ div.body h5 {
     font-family: "Public Sans", "sans-serif";
 }
 
-/* Links need an extra pixel of padding when body font is Public Sans */
+/* Links need an extra two pixels of padding to compensate between body font height 
+being 1em and code font height being 0.9em */
 a.reference {
-    padding-bottom: 1px;
+    padding-bottom: 2px;
 }
 
 /* Suppressing the display of the toctrees rendered in the doc body means we
