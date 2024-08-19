@@ -80,7 +80,13 @@ export function RunSummary(): JSX.Element {
   const { t } = useTranslation('run_details')
   const navigate = useNavigate()
   const host = useHost()
-  const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
+  const { data: runRecord } = useNotifyRunQuery(runId, {
+    staleTime: Infinity,
+    onError: () => {
+      // in case the run is remotely deleted by a desktop app, navigate to the dash
+      navigate('/')
+    },
+  })
   const isRunCurrent = Boolean(
     useNotifyRunQuery(runId, { refetchInterval: CURRENT_RUN_POLL_MS })?.data
       ?.data?.current
@@ -134,15 +140,6 @@ export function RunSummary(): JSX.Element {
       reportRecoveredRunResult(runStatus, enteredER)
     }
   }, [isRunCurrent, enteredER])
-
-  React.useEffect(() => {
-    // in case the run is remotely deleted by a desktop app, navigate to the dash
-    console.log('run record == null: ', runRecord == null)
-    console.log('is quick transfer: ', isQuickTransfer)
-    if (runRecord == null && isQuickTransfer) {
-      navigate('/')
-    }
-  }, [runRecord, isQuickTransfer])
 
   const { reset, isResetRunLoading } = useRunControls(runId, onCloneRunSuccess)
   const trackEvent = useTrackEvent()
