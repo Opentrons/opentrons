@@ -187,6 +187,7 @@ const PROTOCOL_DETAILS = {
   protocolKey: PROTOCOL_KEY,
   isProtocolAnalyzing: false,
   robotType: 'OT-2 Standard' as const,
+  isQuickTransfer: false,
 }
 
 const RUN_COMMAND_ERRORS = {
@@ -477,6 +478,7 @@ describe('ProtocolRunHeader', () => {
       protocolKey: null,
       isProtocolAnalyzing: true,
       robotType: 'OT-2 Standard',
+      isQuickTransfer: false,
     })
 
     render()
