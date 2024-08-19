@@ -140,7 +140,7 @@ export function RunSummary(): JSX.Element {
     if (runRecord == null) {
       navigate('/')
     }
-  })
+  }, [runRecord])
 
   const { reset, isResetRunLoading } = useRunControls(runId, onCloneRunSuccess)
   const trackEvent = useTrackEvent()

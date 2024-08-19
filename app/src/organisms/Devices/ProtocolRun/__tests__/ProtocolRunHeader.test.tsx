@@ -20,6 +20,7 @@ import {
   useModulesQuery,
   usePipettesQuery,
   useDismissCurrentRunMutation,
+  useDeleteRunMutation,
   useEstopQuery,
   useDoorQuery,
   useInstrumentsQuery,
@@ -284,6 +285,9 @@ describe('ProtocolRunHeader', () => {
     )
     vi.mocked(useModulesQuery).mockReturnValue({
       data: { data: [] },
+    } as any)
+    vi.mocked(useDeleteRunMutation).mockReturnValue({
+      deleteRun: vi.fn(),
     } as any)
     vi.mocked(usePipettesQuery).mockReturnValue({
       data: {
