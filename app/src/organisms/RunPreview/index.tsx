@@ -83,8 +83,7 @@ export const RunPreviewComponent = (
   const filteredCommandsFromQuery = React.useMemo(
     () =>
       commandsFromQuery?.filter(
-        command =>
-!('intent' in command) || command.intent !== 'fixit'
+        command => !('intent' in command) || command.intent !== 'fixit'
       ),
     [commandsFromQuery == null]
   )
@@ -115,7 +114,6 @@ export const RunPreviewComponent = (
     commands != null
       ? commands.findIndex(c => c.key === currentRunCommandKey)
       : 0
-  console.log('currentRunCommandIndex ', currentRunCommandIndex)
   if (isRunCommandDataLoading || commands == null) {
     return (
       <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing16}>
@@ -125,7 +123,6 @@ export const RunPreviewComponent = (
       </Flex>
     )
   }
-  console.log('commands before ', commands)
   return commands.length === 0 ? (
     <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing16}>
       <InfoScreen contentType="runNotStarted" />
@@ -161,8 +158,6 @@ export const RunPreviewComponent = (
             lowestVisibleIndex,
             highestVisibleIndex,
           ]) => {
-            console.log('lowestVisibleIndex ', lowestVisibleIndex)
-            console.log('highestVisibleIndex ', highestVisibleIndex)
             if (currentRunCommandIndex >= 0) {
               setIsCurrentCommandVisible(
                 currentRunCommandIndex >= lowestVisibleIndex &&
