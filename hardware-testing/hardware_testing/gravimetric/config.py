@@ -172,6 +172,8 @@ def _get_liquid_probe_settings(
         sensor_threshold_pascals=lqid_cfg["sensor_threshold_pascals"],
         output_option=OutputOptions.sync_only,
         aspirate_while_sensing=False,
+        samples_for_baselining=20,
+        sample_time_sec=0.004,
         data_files={InstrumentProbeType.PRIMARY: "/data/testing_data/pressure.csv"},
     )
 

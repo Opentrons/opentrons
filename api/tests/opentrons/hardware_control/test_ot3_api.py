@@ -122,6 +122,8 @@ def fake_liquid_settings() -> LiquidProbeSettings:
         sensor_threshold_pascals=15,
         output_option=OutputOptions.can_bus_only,
         aspirate_while_sensing=False,
+        samples_for_baselining=20,
+        sample_time_sec=0.004,
         data_files={InstrumentProbeType.PRIMARY: "fake_file_name"},
     )
 
@@ -825,6 +827,8 @@ async def test_liquid_probe(
             sensor_threshold_pascals=15,
             output_option=OutputOptions.can_bus_only,
             aspirate_while_sensing=True,
+            samples_for_baselining=20,
+            sample_time_sec=0.004,
             data_files={InstrumentProbeType.PRIMARY: "fake_file_name"},
         )
         fake_max_z_dist = 10.0
@@ -901,8 +905,12 @@ async def test_liquid_probe_plunger_moves(
         fake_max_z_dist = 75.0
         config = ot3_hardware.config.liquid_sense
         mount_speed = config.mount_speed
+        samples_for_baselining = config.samples_for_baselining
+        sample_time_sec = config.sample_time_sec
         non_responsive_z_mm = ot3_hardware.liquid_probe_non_responsive_z_distance(
-            mount_speed
+            mount_speed,
+            samples_for_baselining,
+            sample_time_sec,
         )
 
         probe_pass_overlap = 0.1
@@ -995,8 +1003,12 @@ async def test_liquid_probe_mount_moves(
         fake_max_z_dist = 10.0
         config = ot3_hardware.config.liquid_sense
         mount_speed = config.mount_speed
+        samples_for_baselining = config.samples_for_baselining
+        sample_time_sec = config.sample_time_sec
         non_responsive_z_mm = ot3_hardware.liquid_probe_non_responsive_z_distance(
-            mount_speed
+            mount_speed,
+            samples_for_baselining,
+            sample_time_sec,
         )
 
         probe_pass_overlap = 0.1
@@ -1068,6 +1080,8 @@ async def test_multi_liquid_probe(
             sensor_threshold_pascals=15,
             output_option=OutputOptions.can_bus_only,
             aspirate_while_sensing=True,
+            samples_for_baselining=20,
+            sample_time_sec=0.004,
             data_files={InstrumentProbeType.PRIMARY: "fake_file_name"},
         )
         fake_max_z_dist = 10.0
@@ -1140,6 +1154,8 @@ async def test_liquid_not_found(
         sensor_threshold_pascals=15,
         output_option=OutputOptions.can_bus_only,
         aspirate_while_sensing=True,
+        samples_for_baselining=20,
+        sample_time_sec=0.004,
         data_files={InstrumentProbeType.PRIMARY: "fake_file_name"},
     )
     # with a mount speed of 5, pass overlap of 0.5 and a 0.2s delay on z

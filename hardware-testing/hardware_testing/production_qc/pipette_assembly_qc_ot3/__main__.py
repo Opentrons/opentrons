@@ -1380,6 +1380,8 @@ async def _test_liquid_probe(
                 sensor_threshold_pascals=probe_cfg.sensor_threshold_pascals,
                 output_option=OutputOptions.can_bus_only,  # FIXME: remove
                 aspirate_while_sensing=False,
+                samples_for_baselining=20,
+                sample_time_sec=0.004,
                 data_files=None,
             )
             end_z = await api.liquid_probe(
