@@ -93,7 +93,7 @@ def test_configure_virtual_pipette_for_volume(
         nozzle_map=result1.nozzle_map,
         back_left_corner_offset=Point(-8.0, -22.0, -259.15),
         front_right_corner_offset=Point(-8.0, -22.0, -259.15),
-        pipette_lld_settings={"t50": {"minHeight": 0.5, "minVolume": 0.0}},
+        pipette_lld_settings={"t50": {"minHeight": 1.0, "minVolume": 0.0}},
     )
     subject_instance.configure_virtual_pipette_for_volume(
         "my-pipette", 1, result1.model
@@ -119,7 +119,7 @@ def test_configure_virtual_pipette_for_volume(
         nozzle_map=result2.nozzle_map,
         back_left_corner_offset=Point(-8.0, -22.0, -259.15),
         front_right_corner_offset=Point(-8.0, -22.0, -259.15),
-        pipette_lld_settings={"t50": {"minHeight": 0.5, "minVolume": 0.0}},
+        pipette_lld_settings={"t50": {"minHeight": 1.0, "minVolume": 0.0}},
     )
 
 
