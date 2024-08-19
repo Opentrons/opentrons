@@ -14,10 +14,10 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { FLEX_ROBOT_TYPE, getPipetteSpecsV2 } from '@opentrons/shared-data'
 import { getInitialDeckSetup } from '../../step-forms/selectors'
 import { selectors as fileSelectors } from '../../file-data'
 import { getRobotType } from '../../file-data/selectors'
-import { FLEX_ROBOT_TYPE, getPipetteSpecsV2 } from '@opentrons/shared-data'
 import type { PipetteName } from '@opentrons/shared-data'
 
 const DATE_ONLY_FORMAT = 'MMM dd, yyyy'
