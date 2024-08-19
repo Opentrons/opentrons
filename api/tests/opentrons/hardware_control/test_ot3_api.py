@@ -840,7 +840,11 @@ async def test_liquid_probe(
         mock_move_to_plunger_bottom.call_count == 2
         mock_liquid_probe.assert_called_once_with(
             mount,
-            ((fake_max_z_dist - probe_pass_z_offset_mm + probe_safe_reset_mm) / fake_settings_aspirate.mount_speed) * fake_settings_aspirate.plunger_speed ,
+            (
+                (fake_max_z_dist - probe_pass_z_offset_mm + probe_safe_reset_mm)
+                / fake_settings_aspirate.mount_speed
+            )
+            * fake_settings_aspirate.plunger_speed,
             fake_settings_aspirate.mount_speed,
             (fake_settings_aspirate.plunger_speed * -1),
             fake_settings_aspirate.sensor_threshold_pascals,
@@ -916,7 +920,6 @@ async def test_liquid_probe_plunger_moves(
         probe_pass_z_offset_mm = non_responsive_z_mm + probe_pass_overlap
         probe_safe_reset_mm = max(2.0, probe_pass_z_offset_mm)
 
-
         probe_start_pos = await ot3_hardware.gantry_position(mount)
         safe_plunger_pos = Point(
             probe_start_pos.x,
@@ -928,13 +931,17 @@ async def test_liquid_probe_plunger_moves(
         p_total_mm = pipette.plunger_positions.bottom - pipette.plunger_positions.top
         p_working_mm = p_total_mm - (pipette.backlash_distance + p_impulse_mm)
         # simulate multiple passes of liquid probe
-        z_pass = (p_total_mm-pipette.backlash_distance)/config.plunger_speed*config.mount_speed
+        z_pass = (
+            (p_total_mm - pipette.backlash_distance)
+            / config.plunger_speed
+            * config.mount_speed
+        )
         mock_gantry_position.side_effect = [
             Point(x=0, y=0, z=100),
             Point(x=0, y=0, z=100),
-            Point(x=0, y=0, z=100-z_pass),
-            Point(x=0, y=0, z=100-2*z_pass),
-            Point(x=0, y=0, z=100-3*z_pass),
+            Point(x=0, y=0, z=100 - z_pass),
+            Point(x=0, y=0, z=100 - 2 * z_pass),
+            Point(x=0, y=0, z=100 - 3 * z_pass),
             Point(x=0, y=0, z=25),
         ]
         max_z_time = (
