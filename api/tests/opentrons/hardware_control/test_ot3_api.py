@@ -907,7 +907,7 @@ async def test_liquid_probe_plunger_moves(
             mount_speed
         )
 
-        probe_pass_overlap = 0.1
+        probe_pass_overlap = config.z_overlap_between_passes_mm
         probe_pass_z_offset_mm = non_responsive_z_mm + probe_pass_overlap
         probe_safe_reset_mm = max(2.0, probe_pass_z_offset_mm)
 
@@ -1001,7 +1001,7 @@ async def test_liquid_probe_mount_moves(
             mount_speed
         )
 
-        probe_pass_overlap = 0.1
+        probe_pass_overlap = config.z_overlap_between_passes_mm
         probe_pass_z_offset_mm = non_responsive_z_mm + probe_pass_overlap
         probe_safe_reset_mm = max(2.0, probe_pass_z_offset_mm)
 
