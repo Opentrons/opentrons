@@ -5,7 +5,7 @@ from typing import Callable, Dict, IO, List
 
 import pytest
 
-from robot_server.persistence import LATEST_VERSION_DIRECTORY
+from robot_server.persistence.file_and_directory_names import LATEST_VERSION_DIRECTORY
 
 from tests.integration.dev_server import DevServer
 from tests.integration.robot_client import RobotClient

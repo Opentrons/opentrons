@@ -121,7 +121,7 @@ export const RunPreviewComponent = (
     <Flex
       ref={viewPortRef}
       flexDirection={DIRECTION_COLUMN}
-      height="28rem"
+      height="65vh"
       width="100%"
       overflowY={OVERFLOW_SCROLL}
       gridGap={SPACING.spacing8}

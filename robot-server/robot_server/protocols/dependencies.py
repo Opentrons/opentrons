@@ -3,8 +3,7 @@
 
 from asyncio import Lock as AsyncLock
 from pathlib import Path
-from typing import Annotated, Final
-import logging
+from typing_extensions import Annotated
 
 from anyio import Path as AsyncPath
 from fastapi import Depends
@@ -24,6 +23,7 @@ from robot_server.persistence.fastapi_dependencies import (
     get_sql_engine,
     get_active_persistence_directory,
 )
+from robot_server.persistence.file_and_directory_names import PROTOCOLS_DIRECTORY
 from robot_server.settings import get_settings
 from .analyses_manager import AnalysesManager
 
@@ -33,10 +33,6 @@ from .protocol_store import (
 )
 from .analysis_store import AnalysisStore
 
-
-_PROTOCOL_FILES_SUBDIRECTORY: Final = "protocols"
-
-_log = logging.getLogger(__name__)
 
 _protocol_store_init_lock = AsyncLock()
 _protocol_store_accessor = AppStateAccessor[ProtocolStore]("protocol_store")
@@ -71,7 +67,7 @@ async def get_protocol_directory(
     async with _protocol_directory_init_lock:
         protocol_directory = _protocol_directory_accessor.get_from(app_state)
         if protocol_directory is None:
-            protocol_directory = persistence_directory / _PROTOCOL_FILES_SUBDIRECTORY
+            protocol_directory = persistence_directory / PROTOCOLS_DIRECTORY
             await AsyncPath(protocol_directory).mkdir(exist_ok=True)
             _protocol_directory_accessor.set_on(app_state, protocol_directory)
 

@@ -20,6 +20,8 @@ import { useIsFlex, useRunHasStarted } from '../hooks'
 import { SetupDeckCalibration } from './SetupDeckCalibration'
 import { SetupInstrumentCalibration } from './SetupInstrumentCalibration'
 import { SetupTipLengthCalibration } from './SetupTipLengthCalibration'
+import { useRunStatus } from '../../RunTimeControl/hooks'
+import { RUN_STATUS_STOPPED } from '@opentrons/api-client'
 
 import type { ProtocolCalibrationStatus } from '../../../redux/calibration/types'
 import type { StepKey } from './ProtocolRunSetup'
@@ -48,10 +50,13 @@ export function SetupRobotCalibration({
   const trackEvent = useTrackEvent()
 
   const runHasStarted = useRunHasStarted(runId)
+  const runStatus = useRunStatus(runId)
   const isFlex = useIsFlex(robotName)
 
   let tooltipText: string | null = null
-  if (runHasStarted) {
+  if (runStatus === RUN_STATUS_STOPPED) {
+    tooltipText = t('protocol_run_stopped')
+  } else if (runHasStarted) {
     tooltipText = t('protocol_run_started')
   } else if (calibrationStatus.reason != null) {
     tooltipText = t(calibrationStatus.reason)

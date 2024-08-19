@@ -10,6 +10,8 @@ import {
   getPipetteNameSpecs,
   FLEX_STANDARD_MODEL,
   getGripperDisplayName,
+  parseAllRequiredModuleModels,
+  parseInitialPipetteNamesByMount,
 } from '@opentrons/shared-data'
 import {
   ALIGN_FLEX_START,
@@ -31,11 +33,6 @@ import {
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
-
-import {
-  parseInitialPipetteNamesByMount,
-  parseAllRequiredModuleModels,
-} from '@opentrons/api-client'
 
 import { getIsProtocolAnalysisInProgress } from '../../redux/protocol-storage'
 import { InstrumentContainer } from '../../atoms/InstrumentContainer'

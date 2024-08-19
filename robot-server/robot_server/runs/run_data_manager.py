@@ -359,6 +359,8 @@ class RunDataManager:
             parameters = self._run_orchestrator_store.get_run_time_parameters()
             run_resource = self._run_store.get(run_id=run_id)
 
+        await self._runs_publisher.publish_runs_advise_refetch_async(run_id)
+
         return _build_run(
             run_resource=run_resource,
             state_summary=state_summary,

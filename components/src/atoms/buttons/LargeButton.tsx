@@ -131,8 +131,9 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
 
   const LARGE_BUTTON_STYLE = css`
     color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor};
-    background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
-      .defaultBackgroundColor};
+    background-color: ${
+      LARGE_BUTTON_PROPS_BY_TYPE[buttonType].defaultBackgroundColor
+    };
     cursor: pointer;
     padding: ${SPACING.spacing16} ${SPACING.spacing24};
     text-align: ${TYPOGRAPHY.textAlignCenter};
@@ -140,8 +141,9 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     align-items: ${ALIGN_CENTER};
 
     &:active {
-      background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
-        .activeBackgroundColor};
+      background-color: ${
+        LARGE_BUTTON_PROPS_BY_TYPE[buttonType].activeBackgroundColor
+      };
       ${activeColorFor(buttonType)};
     }
     &:active #btn-icon {
@@ -150,8 +152,9 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
 
     &:disabled {
       color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledColor};
-      background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
-        .disabledBackgroundColor};
+      background-color: ${
+        LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledBackgroundColor
+      };
     }
 
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
@@ -164,33 +167,64 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
       line-height: ${TYPOGRAPHY.lineHeight20};
       gap: ${SPACING.spacing60};
       border: ${BORDERS.borderRadius4} solid
-        ${buttonType === 'alertStroke' && !disabled
-          ? LARGE_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor
-          : 'none'};
+        ${
+          buttonType === 'alertStroke' && !disabled
+            ? LARGE_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor
+            : 'none'
+        };
 
       ${TYPOGRAPHY.pSemiBold}
 
-      #btn-icon: {
-        color: ${disabled
+    #btn-icon: {
+      color: ${
+        disabled
           ? LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledIconColor
-          : LARGE_BUTTON_PROPS_BY_TYPE[buttonType].iconColor};
-      }
-      &:active {
-        border: ${BORDERS.borderRadius4} solid
-          ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].activeBackgroundColor};
-      }
+          : LARGE_BUTTON_PROPS_BY_TYPE[buttonType].iconColor
+      };
+    }
 
-      &:focus-visible {
-        background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
-          .focusVisibleBackgroundColor};
-        ${activeColorFor(buttonType)};
-        padding: calc(${SPACING.spacing24} + ${SPACING.spacing2});
-        border: ${SPACING.spacing2} solid ${COLORS.transparent};
-        outline: 3px solid
-          ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].focusVisibleOutlineColor};
-        background-clip: padding-box;
-        box-shadow: none;
-      }
+    &:active {
+      background-color: ${
+        disabled
+          ? LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledBackgroundColor
+          : LARGE_BUTTON_PROPS_BY_TYPE[buttonType].activeBackgroundColor
+      };
+      ${!disabled && activeColorFor(buttonType)};
+      border: ${BORDERS.borderRadius4} solid
+        ${
+          disabled
+            ? LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledBackgroundColor
+            : LARGE_BUTTON_PROPS_BY_TYPE[buttonType].activeBackgroundColor
+        };
+    }
+    &:active #btn-icon {
+      ${activeIconStyle(buttonType)};
+    }
+
+    &:focus-visible {
+      background-color: ${
+        disabled
+          ? LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledBackgroundColor
+          : LARGE_BUTTON_PROPS_BY_TYPE[buttonType].focusVisibleBackgroundColor
+      };
+      ${!disabled && activeColorFor(buttonType)};
+      padding: calc(${SPACING.spacing24} + ${SPACING.spacing2});
+      border: ${SPACING.spacing2} solid ${COLORS.transparent};
+      outline: ${
+        disabled
+          ? 'none'
+          : `3px solid
+    ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].focusVisibleOutlineColor}`
+      };
+      background-clip: padding-box;
+      box-shadow: none;
+    }
+
+    &:disabled {
+      color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledColor};
+      background-color: ${
+        LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledBackgroundColor
+      };
     }
   `
   return (

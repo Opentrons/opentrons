@@ -1,4 +1,4 @@
-import { simpleAnalysisFileFixture } from '@opentrons/api-client'
+import { simpleAnalysisFileFixture } from '@opentrons/shared-data'
 import type { StoredProtocolData, StoredProtocolDir } from '../types'
 
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'

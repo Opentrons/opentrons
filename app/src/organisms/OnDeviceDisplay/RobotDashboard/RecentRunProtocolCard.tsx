@@ -37,10 +37,6 @@ import { Skeleton } from '../../../atoms/Skeleton'
 import { useMissingProtocolHardware } from '../../../pages/Protocols/hooks'
 import { useCloneRun } from '../../ProtocolUpload/hooks'
 import { useRerunnableStatusText } from './hooks'
-import {
-  useRobotInitializationStatus,
-  INIT_STATUS,
-} from '../../../resources/health/hooks'
 
 import type { Run, RunData, RunStatus } from '@opentrons/api-client'
 import type { ProtocolResource } from '@opentrons/shared-data'
@@ -96,9 +92,6 @@ export function ProtocolWithLastRun({
     navigate(`runs/${createRunResponse.data.id}/setup`)
   }
   const { cloneRun } = useCloneRun(runData.id, onResetSuccess)
-  const robotInitStatus = useRobotInitializationStatus()
-  const isRobotInitializing =
-    robotInitStatus === INIT_STATUS.INITIALIZING || robotInitStatus == null
   const [showSpinner, setShowSpinner] = React.useState<boolean>(false)
 
   const protocolName =
@@ -173,7 +166,7 @@ export function ProtocolWithLastRun({
     }
   ).replace('about ', '')
 
-  return isProtocolFetching || isLookingForHardware || isRobotInitializing ? (
+  return isProtocolFetching || isLookingForHardware ? (
     <Skeleton
       height="24.5rem"
       width="25.8125rem"

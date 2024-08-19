@@ -1,20 +1,24 @@
-// set of functions that parse details out of a protocol record and it's internals
+// set of functions that parse details out of a protocol record and its internals
 import reduce from 'lodash/reduce'
 
-import { getLabwareDefURI, DEFAULT_LIQUID_COLORS } from '@opentrons/shared-data'
+import { DEFAULT_LIQUID_COLORS } from '../constants'
+import { getLabwareDefURI } from '..'
+
+import type {
+  LoadLabwareRunTimeCommand,
+  LoadLiquidRunTimeCommand,
+  LoadModuleRunTimeCommand,
+  LoadPipetteRunTimeCommand,
+  RunTimeCommand,
+} from '../../command/types'
+import type { PipetteName } from '../pipettes'
 import type {
   Liquid,
   LoadedLabware,
   LoadedModule,
   LoadedPipette,
-  LoadLabwareRunTimeCommand,
-  LoadLiquidRunTimeCommand,
-  LoadModuleRunTimeCommand,
-  LoadPipetteRunTimeCommand,
   ModuleModel,
-  PipetteName,
-  RunTimeCommand,
-} from '@opentrons/shared-data'
+} from '../types'
 
 interface PipetteNamesByMount {
   left: PipetteName | null

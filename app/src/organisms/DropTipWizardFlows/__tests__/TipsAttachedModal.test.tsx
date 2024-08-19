@@ -55,7 +55,8 @@ const render = (aPipetteWithTip: PipetteWithTip) => {
             robotType: FLEX_ROBOT_TYPE,
             mount: 'left',
             instrumentModelSpecs: mockPipetteInfo.pipetteSpecs as any,
-            onClose: vi.fn(),
+            onSkipAndHome: vi.fn(),
+            isRunCurrent: true,
           })
         }
         data-testid="testButton"
