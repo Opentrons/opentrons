@@ -55,6 +55,7 @@ export interface WellDefinition {
   'total-liquid-volume': number
 }
 
+
 // typedef for labware definitions under v1 labware schema
 export interface LabwareDefinition1 {
   metadata: {
@@ -157,6 +158,41 @@ export type LabwareWell = LabwareWellProperties & {
   z: number
 }
 
+export interface CircularCrossSectionProperties {
+  shape: 'circular'
+  diameter: number
+}
+
+export interface RectangularCrossSectionProperties {
+  shape: 'rectangular'
+  xDimension: number
+  yDimension: number
+}
+
+export interface SphericalSegmentProperties {
+  shape: 'spherical'
+  radiusOfCurvature: number
+  depth: number
+}
+
+export type TopCrossSectionProperties =
+  | CircularCrossSectionProperties
+  | RectangularCrossSectionProperties
+
+export type BottomShapeProperties =
+  | CircularCrossSectionProperties
+  | RectangularCrossSectionProperties
+  | SphericalSegmentProperties
+
+export type BoundedSection = TopCrossSectionProperties & {
+  topHeight: number
+}
+
+export interface InnerWellGeometry {
+  frusta: BoundedSection[]
+  bottomShape: BottomShapeProperties
+}
+
 // TODO(mc, 2019-03-21): exact object is tough to use with the initial value in
 // reduce, so leaving this inexact (e.g. `const a: {||} = {}` errors)
 export type LabwareWellMap = Record<string, LabwareWell>
@@ -191,6 +227,25 @@ export interface LabwareDefinition2 {
   allowedRoles?: LabwareRoles[]
   stackingOffsetWithLabware?: Record<string, LabwareOffset>
   stackingOffsetWithModule?: Record<string, LabwareOffset>
+}
+
+export interface LabwareDefinition3 {
+  version: number
+  schemaVersion: 3
+  namespace: string
+  metadata: LabwareMetadata
+  dimensions: LabwareDimensions
+  cornerOffsetFromSlot: LabwareOffset
+  parameters: LabwareParameters
+  brand: LabwareBrand
+  ordering: string[][]
+  wells: LabwareWellMap
+  groups: LabwareWellGroup[]
+  allowedRoles?: LabwareRoles[]
+  stackingOffsetWithLabware?: Record<string, LabwareOffset>
+  stackingOffsetWithModule?: Record<string, LabwareOffset>
+  innerLabwareGeometry: Record<string, InnerWellGeometry>
+
 }
 
 export interface LabwareDefByDefURI {
