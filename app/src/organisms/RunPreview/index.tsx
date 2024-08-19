@@ -80,10 +80,22 @@ export const RunPreviewComponent = (
     isCurrentCommandVisible,
     setIsCurrentCommandVisible,
   ] = React.useState<boolean>(true)
-  if (robotSideAnalysis == null) return null
+  const filteredCommandsFromQuery = React.useMemo(
+    () => 
+      commandsFromQuery?.filter(
+        command =>
+          !('intent' in command && command.intent === 'fixit') ||
+          !('intent' in command)
+      ),
+    [commandsFromQuery == null]
+  )
+
+  if (robotSideAnalysis == null) {return null}
+
   const commands = isRunTerminal
-    ? commandsFromQuery
+    ? filteredCommandsFromQuery
     : robotSideAnalysis.commands
+
   // pass relevant data from run rather than analysis so that CommandText utilities can properly hash the entities' IDs
   // TODO (nd:05/02/2024, AUTH-380): update name and types for CommandText (and children/utilities) use of analysis.
   // We should ideally pass only subset of analysis/run data required by these children and utilities
@@ -102,7 +114,7 @@ export const RunPreviewComponent = (
     commands != null
       ? commands.findIndex(c => c.key === currentRunCommandKey)
       : 0
-
+  console.log('currentRunCommandIndex ', currentRunCommandIndex)
   if (isRunCommandDataLoading || commands == null) {
     return (
       <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing16}>
@@ -112,6 +124,7 @@ export const RunPreviewComponent = (
       </Flex>
     )
   }
+  console.log('commands before ', commands)
   return commands.length === 0 ? (
     <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing16}>
       <InfoScreen contentType="runNotStarted" />
@@ -147,6 +160,8 @@ export const RunPreviewComponent = (
             lowestVisibleIndex,
             highestVisibleIndex,
           ]) => {
+            console.log('lowestVisibleIndex ', lowestVisibleIndex)
+            console.log('highestVisibleIndex ', highestVisibleIndex)
             if (currentRunCommandIndex >= 0) {
               setIsCurrentCommandVisible(
                 currentRunCommandIndex >= lowestVisibleIndex &&
@@ -160,53 +175,45 @@ export const RunPreviewComponent = (
             const isCurrent = index === currentRunCommandIndex
             const backgroundColor = isCurrent ? COLORS.blue30 : COLORS.grey20
             const iconColor = isCurrent ? COLORS.blue60 : COLORS.grey50
-
-            if (
-              command != null &&
-              !('intent' in command && command.intent === 'fixit')
-            ) {
-              return (
-                <Flex
-                  key={command.id}
-                  alignItems={ALIGN_CENTER}
-                  gridGap={SPACING.spacing8}
+            return (
+              <Flex
+                key={command.id}
+                alignItems={ALIGN_CENTER}
+                gridGap={SPACING.spacing8}
+              >
+                <LegacyStyledText
+                  minWidth={SPACING.spacing16}
+                  fontSize={TYPOGRAPHY.fontSizeCaption}
                 >
-                  <LegacyStyledText
-                    minWidth={SPACING.spacing16}
-                    fontSize={TYPOGRAPHY.fontSizeCaption}
-                  >
-                    {index + 1}
-                  </LegacyStyledText>
-                  <Flex
-                    flexDirection={DIRECTION_COLUMN}
-                    gridGap={SPACING.spacing4}
-                    width="100%"
-                    backgroundColor={
-                      index === jumpedIndex ? '#F5E3FF' : backgroundColor
-                    }
-                    color={COLORS.black90}
-                    borderRadius={BORDERS.borderRadius4}
-                    padding={SPACING.spacing8}
-                    css={css`
-                      transition: background-color ${COLOR_FADE_MS}ms ease-out,
-                        border-color ${COLOR_FADE_MS}ms ease-out;
-                    `}
-                  >
-                    <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
-                      <CommandIcon command={command} color={iconColor} />
-                      <CommandText
-                        command={command}
-                        commandTextData={protocolDataFromAnalysisOrRun}
-                        robotType={robotType}
-                        color={COLORS.black90}
-                      />
-                    </Flex>
+                  {index + 1}
+                </LegacyStyledText>
+                <Flex
+                  flexDirection={DIRECTION_COLUMN}
+                  gridGap={SPACING.spacing4}
+                  width="100%"
+                  backgroundColor={
+                    index === jumpedIndex ? '#F5E3FF' : backgroundColor
+                  }
+                  color={COLORS.black90}
+                  borderRadius={BORDERS.borderRadius4}
+                  padding={SPACING.spacing8}
+                  css={css`
+                    transition: background-color ${COLOR_FADE_MS}ms ease-out,
+                      border-color ${COLOR_FADE_MS}ms ease-out;
+                  `}
+                >
+                  <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
+                    <CommandIcon command={command} color={iconColor} />
+                    <CommandText
+                      command={command}
+                      commandTextData={protocolDataFromAnalysisOrRun}
+                      robotType={robotType}
+                      color={COLORS.black90}
+                    />
                   </Flex>
                 </Flex>
-              )
-            } else {
-              return null
-            }
+              </Flex>
+            )
           }}
         </ViewportList>
         {currentRunCommandIndex >= 0 ? (
