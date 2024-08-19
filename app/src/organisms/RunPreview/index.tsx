@@ -84,8 +84,7 @@ export const RunPreviewComponent = (
     () =>
       commandsFromQuery?.filter(
         command =>
-          !('intent' in command && command.intent === 'fixit') ||
-          !('intent' in command)
+!('intent' in command) || command.intent !== 'fixit'
       ),
     [commandsFromQuery == null]
   )
