@@ -81,7 +81,7 @@ export const RunPreviewComponent = (
     setIsCurrentCommandVisible,
   ] = React.useState<boolean>(true)
   const filteredCommandsFromQuery = React.useMemo(
-    () => 
+    () =>
       commandsFromQuery?.filter(
         command =>
           !('intent' in command && command.intent === 'fixit') ||
@@ -90,7 +90,9 @@ export const RunPreviewComponent = (
     [commandsFromQuery == null]
   )
 
-  if (robotSideAnalysis == null) {return null}
+  if (robotSideAnalysis == null) {
+    return null
+  }
 
   const commands = isRunTerminal
     ? filteredCommandsFromQuery
