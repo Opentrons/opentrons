@@ -122,6 +122,7 @@ async function usbListener(
       headers: { ...config.headers, ...formHeaders },
     })
     usbLog.silly(`${config.method} ${config.url} resolved ok`)
+    usbLog.info(`response is ${JSON.stringify(response.data)}`)
     return {
       error: false,
       data: response.data,
