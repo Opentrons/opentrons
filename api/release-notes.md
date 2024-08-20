@@ -38,6 +38,7 @@ Welcome to the v7.5.0 release of the Opentrons robot software!
 ### Bug Fixes
 
 - Fixed certain string runtime parameter values being misinterpreted as an incorrect type.
+- The `opentrons_execute` command-line tool and `opentrons.execute` Python API functions now take the deck configuration of Flex into account when planning gantry movement.
 
 ### Known Issue
 
