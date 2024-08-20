@@ -18,7 +18,6 @@ import {
   FLEX_ROBOT_TYPE,
   OT2_ROBOT_TYPE,
   parseAllRequiredModuleModels,
-  parseLiquidsInLoadOrder,
 } from '@opentrons/shared-data'
 
 import { Line } from '../../../atoms/structure'
@@ -165,11 +164,7 @@ export function ProtocolRunSetup({
   })
 
   const liquids = protocolAnalysis?.liquids ?? []
-  const liquidsInLoadOrder =
-    protocolAnalysis != null
-      ? parseLiquidsInLoadOrder(liquids, protocolAnalysis.commands)
-      : []
-  const hasLiquids = liquidsInLoadOrder.length > 0
+  const hasLiquids = liquids.length > 0
   const hasModules = protocolAnalysis != null && modules.length > 0
   // need config compatibility (including check for single slot conflicts)
   const requiredDeckConfigCompatibility = getRequiredDeckConfig(
@@ -191,7 +186,11 @@ export function ProtocolRunSetup({
   const [liquidSetupComplete, setLiquidSetupComplete] = React.useState<boolean>(
     !hasLiquids
   )
-  if (!hasLiquids && missingSteps.includes('liquids')) {
+  if (
+    !hasLiquids &&
+    protocolAnalysis != null &&
+    missingSteps.includes('liquids')
+  ) {
     setMissingSteps(missingSteps.filter(step => step !== 'liquids'))
   }
   const [lpcComplete, setLpcComplete] = React.useState<boolean>(false)

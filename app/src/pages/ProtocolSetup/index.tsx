@@ -515,6 +515,7 @@ function PrepareToRun({
       : 'not ready'
   // Liquids information
   const liquidsInProtocol = mostRecentAnalysis?.liquids ?? []
+  const areLiquidsInProtocol = liquidsInProtocol.length > 0
 
   const isReadyToRun =
     incompleteInstrumentCount === 0 && areModulesReady && areFixturesReady
@@ -528,7 +529,7 @@ function PrepareToRun({
           !(
             labwareConfirmed &&
             offsetsConfirmed &&
-            (liquidsConfirmed || liquidsInProtocol.length === 0)
+            (liquidsConfirmed || !areLiquidsInProtocol)
           )
         ) {
           confirmStepsComplete()
@@ -803,18 +804,16 @@ function PrepareToRun({
               }}
               title={i18n.format(t('liquids'), 'capitalize')}
               status={
-                liquidsConfirmed || liquidsInProtocol.length === 0
-                  ? 'ready'
-                  : 'general'
+                liquidsConfirmed || !areLiquidsInProtocol ? 'ready' : 'general'
               }
               detail={
-                liquidsInProtocol.length > 0
+                areLiquidsInProtocol
                   ? t('initial_liquids_num', {
                       count: liquidsInProtocol.length,
                     })
                   : t('liquids_not_in_setup')
               }
-              interactionDisabled={liquidsInProtocol.length === 0}
+              interactionDisabled={!areLiquidsInProtocol}
             />
           </>
         ) : (
@@ -889,6 +888,8 @@ export function ProtocolSetup(): JSX.Element {
     }
   )
 
+  const areLiquidsInProtocol = (mostRecentAnalysis?.liquids?.length ?? 0) > 0
+
   React.useEffect(() => {
     if (mostRecentAnalysis?.status === 'completed') {
       setIsPollingForCompletedAnalysis(false)
@@ -954,7 +955,7 @@ export function ProtocolSetup(): JSX.Element {
   const missingSteps = [
     !offsetsConfirmed ? t('applied_labware_offsets') : null,
     !labwareConfirmed ? t('labware_placement') : null,
-    !liquidsConfirmed ? t('liquids') : null,
+    !liquidsConfirmed && areLiquidsInProtocol ? t('liquids') : null,
   ].filter(s => s != null)
   const {
     confirm: confirmMissingSteps,
