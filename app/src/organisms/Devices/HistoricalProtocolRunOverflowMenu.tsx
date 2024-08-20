@@ -175,7 +175,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
       right={0}
       flexDirection={DIRECTION_COLUMN}
     >
-      <NavLink to={`/devices/${robotName}/protocol-runs/${runId}/setup`}>
+      <NavLink to={`/devices/${robotName}/protocol-runs/${runId}/run-preview`}>
         <MenuItem data-testid="RecentProtocolRun_OverflowMenu_viewRunRecord">
           {t('view_run_record')}
         </MenuItem>
