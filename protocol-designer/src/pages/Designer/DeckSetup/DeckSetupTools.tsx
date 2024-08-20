@@ -18,19 +18,22 @@ import {
   getModuleType,
 } from '@opentrons/shared-data'
 
-import { getRobotType } from '../../file-data/selectors'
+import { getRobotType } from '../../../file-data/selectors'
 import {
   createDeckFixture,
   deleteDeckFixture,
-} from '../../step-forms/actions/additionalItems'
-import { createModule, deleteModule } from '../../step-forms/actions'
-import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
-import { createContainer, deleteContainer } from '../../labware-ingred/actions'
+} from '../../../step-forms/actions/additionalItems'
+import { createModule, deleteModule } from '../../../step-forms/actions'
+import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
+import {
+  createContainer,
+  deleteContainer,
+} from '../../../labware-ingred/actions'
 import {
   getEnableAbsorbanceReader,
   getEnableMoam,
-} from '../../feature-flags/selectors'
-import { createContainerAboveModule } from '../../step-forms/actions/thunks'
+} from '../../../feature-flags/selectors'
+import { createContainerAboveModule } from '../../../step-forms/actions/thunks'
 import {
   FIXTURES,
   MAX_MAGNETIC_BLOCKS,
@@ -42,8 +45,8 @@ import { getModuleModelsBySlot } from './utils'
 import { LabwareTools } from './LabwareTools'
 
 import type { CutoutId, DeckSlotId, ModuleModel } from '@opentrons/shared-data'
-import type { DeckFixture } from '../../step-forms/actions/additionalItems'
-import type { ThunkDispatch } from '../../types'
+import type { DeckFixture } from '../../../step-forms/actions/additionalItems'
+import type { ThunkDispatch } from '../../../types'
 import type { Fixture } from './constants'
 
 interface DeckSetupToolsProps {

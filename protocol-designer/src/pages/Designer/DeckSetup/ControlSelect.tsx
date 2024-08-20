@@ -8,11 +8,11 @@ import {
   LegacyStyledText,
   RobotCoordsForeignDiv,
 } from '@opentrons/components'
-import { START_TERMINAL_ITEM_ID } from '../../steplist'
-import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
+import { START_TERMINAL_ITEM_ID } from '../../../steplist'
+import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 
 import type { CoordinateTuple, Dimensions } from '@opentrons/shared-data'
-import type { TerminalItemId } from '../../steplist'
+import type { TerminalItemId } from '../../../steplist'
 
 import styles from './DeckSetup.module.css'
 

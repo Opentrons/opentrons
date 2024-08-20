@@ -3,32 +3,32 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import { FLEX_ROBOT_TYPE, fixture96Plate } from '@opentrons/shared-data'
-import { i18n } from '../../../assets/localization'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { deleteContainer } from '../../../labware-ingred/actions'
-import { createModule, deleteModule } from '../../../step-forms/actions'
-import { getRobotType } from '../../../file-data/selectors'
+import { i18n } from '../../../../assets/localization'
+import { renderWithProviders } from '../../../../__testing-utils__'
+import { deleteContainer } from '../../../../labware-ingred/actions'
+import { createModule, deleteModule } from '../../../../step-forms/actions'
+import { getRobotType } from '../../../../file-data/selectors'
 import {
   getEnableAbsorbanceReader,
   getEnableMoam,
-} from '../../../feature-flags/selectors'
+} from '../../../../feature-flags/selectors'
 import {
   createDeckFixture,
   deleteDeckFixture,
-} from '../../../step-forms/actions/additionalItems'
-import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
+} from '../../../../step-forms/actions/additionalItems'
+import { getDeckSetupForActiveItem } from '../../../../top-selectors/labware-locations'
 import { DeckSetupTools } from '../DeckSetupTools'
 import { LabwareTools } from '../LabwareTools'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
-vi.mock('../../../feature-flags/selectors')
-vi.mock('../../../file-data/selectors')
-vi.mock('../../../top-selectors/labware-locations')
+vi.mock('../../../../feature-flags/selectors')
+vi.mock('../../../../file-data/selectors')
+vi.mock('../../../../top-selectors/labware-locations')
 vi.mock('../LabwareTools')
-vi.mock('../../../labware-ingred/actions')
-vi.mock('../../../step-forms/actions')
-vi.mock('../../../step-forms/actions/additionalItems')
+vi.mock('../../../../labware-ingred/actions')
+vi.mock('../../../../step-forms/actions')
+vi.mock('../../../../step-forms/actions/additionalItems')
 
 const render = (props: React.ComponentProps<typeof DeckSetupTools>) => {
   return renderWithProviders(<DeckSetupTools {...props} />, {

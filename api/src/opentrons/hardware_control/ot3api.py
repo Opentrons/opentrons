@@ -2707,14 +2707,14 @@ class OT3API(
             instrument.backlash_distance + sensor_baseline_plunger_move_mm
         )
         # height where probe action will begin
-        # TODO: (sigler) add this to pipette's liquid def (per tip)
-        z_overlap_between_passes_mm = 0.1
         sensor_baseline_z_move_mm = OT3API.liquid_probe_non_responsive_z_distance(
             probe_settings.mount_speed,
             probe_settings.samples_for_baselining,
             probe_settings.sample_time_sec,
         )
-        z_offset_per_pass = sensor_baseline_z_move_mm + z_overlap_between_passes_mm
+        z_offset_per_pass = (
+            sensor_baseline_z_move_mm + probe_settings.z_overlap_between_passes_mm
+        )
 
         # height that is considered safe to reset the plunger without disturbing liquid
         # this usually needs to at least 1-2mm from liquid, to avoid splashes from air
