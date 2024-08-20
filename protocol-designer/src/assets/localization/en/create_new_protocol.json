@@ -31,11 +31,11 @@
   "stagingArea_cutoutD3": "Staging area D3",
   "swap": "Swap pipettes",
   "tell_us": "Tell us about your protocol",
-  "trashBin": "Trash bin",
+  "trashBin": "Trash Bin",
   "vol_label": "{{volume}} uL",
-  "wasteChute": "Waste chute",
+  "wasteChute": "Waste Chute",
   "which_fixtures": "Which fixtures will you be using?",
   "which_mods": "Select modules to use in your protocol.",
-  "which_pip": "Pick your first pipette. If you need a second pipette, you can add it next.",
+  "which_pipette": "Pick your first pipette. If you need a second pipette, you can add it next.",
   "your_pips": "Your pipettes"
 }

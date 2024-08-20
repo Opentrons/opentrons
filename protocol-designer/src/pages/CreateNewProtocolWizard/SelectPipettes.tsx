@@ -83,7 +83,7 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
     <WizardBody
       stepNumber={2}
       header={page === 'add' ? t('add_pip') : t('robot_pips')}
-      subHeader={page === 'add' ? t('which_pip') : undefined}
+      subHeader={page === 'add' ? t('which_pipette') : undefined}
       proceed={() => {
         if (page === 'overview') {
           proceed(1)

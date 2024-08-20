@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { ALIGN_CENTER } from '../../../styles'
+import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../../styles'
 import { COLORS } from '../../../helix-design-system'
 import { Flex, Link } from '../../../primitives'
 import { SPACING, TYPOGRAPHY } from '../../../ui-style-constants'
@@ -20,9 +20,7 @@ interface ListItemCustomizeProps {
   tag?: TagProps
 }
 
-export const ListItemCustomize = (
-  props: ListItemCustomizeProps
-): JSX.Element => {
+export function ListItemCustomize(props: ListItemCustomizeProps): JSX.Element {
   const {
     header,
     leftHeaderItem,
@@ -44,7 +42,7 @@ export const ListItemCustomize = (
         width={onClick != null && linkText != null ? '40%' : '50%'}
         gridGap={SPACING.spacing8}
         alignItems={ALIGN_CENTER}
-        justifyContent="center"
+        justifyContent={JUSTIFY_CENTER}
       >
         {label != null ? (
           <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>

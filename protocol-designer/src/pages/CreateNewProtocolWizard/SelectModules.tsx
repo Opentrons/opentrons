@@ -9,6 +9,7 @@ import {
   ListItemCustomize,
   SPACING,
   StyledText,
+  TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
 import {
@@ -132,7 +133,7 @@ export function SelectModules(props: WizardTileProps): JSX.Element | null {
               .map(moduleModel => (
                 <EmptySelectorButton
                   key={moduleModel}
-                  textAlignment="left"
+                  textAlignment={TYPOGRAPHY.textAlignLeft}
                   size="small"
                   iconName="plus"
                   text={getModuleDisplayName(moduleModel)}

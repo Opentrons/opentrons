@@ -28,7 +28,7 @@ interface PipetteInfoItemProps {
   watch: UseFormWatch<WizardFormState>
 }
 
-export const PipetteInfoItem = (props: PipetteInfoItemProps): JSX.Element => {
+export function PipetteInfoItem(props: PipetteInfoItemProps): JSX.Element {
   const {
     mount,
     pipetteName,
@@ -40,7 +40,7 @@ export const PipetteInfoItem = (props: PipetteInfoItemProps): JSX.Element => {
   } = props
   const pipettesByMount = watch('pipettesByMount')
   const { t, i18n } = useTranslation('create_new_protocol')
-  const otherMount = mount === 'left' ? 'right' : 'left'
+  const oppositeMount = mount === 'left' ? 'right' : 'left'
   const allLabware = useSelector(getLabwareDefsByURI)
   const is96Channel = pipetteName === 'p1000_96'
   return (
@@ -53,7 +53,9 @@ export const PipetteInfoItem = (props: PipetteInfoItemProps): JSX.Element => {
         <Flex gridGap={SPACING.spacing4} flexDirection={DIRECTION_COLUMN}>
           <StyledText desktopStyle="bodyDefaultSemiBold">
             {i18n.format(
-              t('pip', { mount: is96Channel ? 'Left+Right' : mount }),
+              t('pip', {
+                mount: is96Channel ? t('left_right') : t(`${mount}`),
+              }),
               'capitalize'
             )}
           </StyledText>
@@ -84,7 +86,7 @@ export const PipetteInfoItem = (props: PipetteInfoItemProps): JSX.Element => {
               {t('edit')}
             </StyledText>
           </Btn>
-          {pipettesByMount[otherMount].pipetteName == null ? null : (
+          {pipettesByMount[oppositeMount].pipetteName == null ? null : (
             <Btn
               onClick={() => {
                 setValue(`pipettesByMount.${mount}.pipetteName`, undefined)

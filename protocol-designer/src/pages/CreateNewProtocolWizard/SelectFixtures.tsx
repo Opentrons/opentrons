@@ -9,6 +9,7 @@ import {
   ListItemCustomize,
   SPACING,
   StyledText,
+  TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
 import { WizardBody } from './WizardBody'
@@ -16,7 +17,7 @@ import { AdditionalEquipmentDiagram } from './utils'
 
 import type { AdditionalEquipment, WizardTileProps } from './types'
 
-const ADDITIONAL_EQUIPMENT: AdditionalEquipment[] = [
+const ADDITIONAL_EQUIPMENTS: AdditionalEquipment[] = [
   'wasteChute',
   'trashBin',
   'stagingArea_cutoutA3',
@@ -31,7 +32,7 @@ export function SelectFixtures(props: WizardTileProps): JSX.Element | null {
   const filteredAdditionalEquipmentWithoutGripper = additionalEquipment.filter(
     ae => ae !== 'gripper'
   )
-  const filteredAdditionalEquipment = ADDITIONAL_EQUIPMENT.filter(
+  const filteredAdditionalEquipment = ADDITIONAL_EQUIPMENTS.filter(
     equipment => !filteredAdditionalEquipmentWithoutGripper.includes(equipment)
   )
 
@@ -61,7 +62,7 @@ export function SelectFixtures(props: WizardTileProps): JSX.Element | null {
           {filteredAdditionalEquipment.map(equipment => (
             <EmptySelectorButton
               key={equipment}
-              textAlignment="left"
+              textAlignment={TYPOGRAPHY.textAlignLeft}
               size="small"
               iconName="plus"
               text={t(`${equipment}`)}

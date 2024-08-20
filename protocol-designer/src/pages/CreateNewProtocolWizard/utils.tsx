@@ -10,6 +10,7 @@ import stagingAreaImage from '../../images/staging_area.png'
 import type { AdditionalEquipment, WizardFormState } from './types'
 
 const TOTAL_MODULE_SLOTS = 8
+const MIDDLE_SLOT_NUM = 4
 
 export const getNumSlotsAvailable = (
   modules: WizardFormState['modules'],
@@ -31,7 +32,8 @@ export const getNumSlotsAvailable = (
   if (magneticBlocks.length > 0) {
     //  once blocks exceed 4, then we dont' want to subtract the amount available
     //  because block can go into the center slots where all other modules/trashes can not
-    const numBlocks = magneticBlocks.length > 4 ? 4 : magneticBlocks.length
+    const numBlocks =
+      magneticBlocks.length > 4 ? MIDDLE_SLOT_NUM : magneticBlocks.length
     filteredModuleLength = filteredModuleLength - numBlocks
   }
 
