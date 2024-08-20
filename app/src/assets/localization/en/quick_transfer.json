@@ -151,5 +151,5 @@
   "well_ratio": "Quick transfers with multiple source wells can either be one-to-one (select {{wells}} for this transfer) or consolidate (select 1 destination well).",
   "well_selection": "Well selection",
   "wells": "wells",
-  "will_be_deleted": " will be permanently deleted."
+  "will_be_deleted": "<strong>{{transferName}}</strong> will be permanently deleted."
 }

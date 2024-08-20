@@ -33,13 +33,10 @@ export const SaveOrRunModal = (props: SaveOrRunModalProps): JSX.Element => {
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing10}
+        gridGap={SPACING.spacing32}
         width="100%"
       >
-        <LegacyStyledText
-          css={TYPOGRAPHY.bodyTextRegular}
-          paddingBottom={SPACING.spacing24}
-        >
+        <LegacyStyledText css={TYPOGRAPHY.bodyTextRegular}>
           {t('save_to_run_later')}
         </LegacyStyledText>
         <Flex gridGap={SPACING.spacing8}>
