@@ -285,6 +285,11 @@ async def get_run_commands(
             description="The maximum number of commands in the list to return.",
         ),
     ] = _DEFAULT_COMMAND_LIST_LENGTH,
+    includeFixitCommands: bool = Query(
+        True,
+        description="If `true`, return all commands (protocol, setup, fixit)."
+        " If `false`, only return safe commands (protocol, setup).",
+    ),
 ) -> PydanticResponse[MultiBody[RunCommandSummary, CommandCollectionLinks]]:
     """Get a summary of a set of commands in a run.
 
@@ -293,12 +298,15 @@ async def get_run_commands(
         cursor: Cursor index for the collection response.
         pageLength: Maximum number of items to return.
         run_data_manager: Run data retrieval interface.
+        includeFixitCommands: If `true`, return all commands."
+            " If `false`, only return safe commands.
     """
     try:
         command_slice = run_data_manager.get_commands_slice(
             run_id=runId,
             cursor=cursor,
             length=pageLength,
+            include_fixit_commands=includeFixitCommands,
         )
     except RunNotFoundError as e:
         raise RunNotFound.from_exc(e).as_error(status.HTTP_404_NOT_FOUND) from e

@@ -97,6 +97,28 @@ class CommandHistory:
             for command_id in self._all_command_ids
         ]
 
+    def get_filtered_command_ids(
+        self,
+        command_intents: list[CommandIntent] = [
+            CommandIntent.PROTOCOL,
+            CommandIntent.SETUP,
+        ],
+    ) -> List[str]:
+        filtered_command = self._commands_by_id
+        if CommandIntent.FIXIT not in command_intents:
+            filtered_command = {
+                key: val
+                for key, val in self._commands_by_id.items()
+                if val.command.intent != CommandIntent.FIXIT
+            }
+        if CommandIntent.SETUP not in command_intents:
+            filtered_command = {
+                key: val
+                for key, val in filtered_command.items()
+                if val.command.intent != CommandIntent.SETUP
+            }
+        return list(filtered_command.keys())
+
     def get_filtered_queue_ids(self, all_commands: bool) -> list[str]:
         print(list(self.get_fixit_queue_ids()))
         return [
@@ -109,9 +131,15 @@ class CommandHistory:
         """Get all command IDs."""
         return self._all_command_ids
 
-    def get_slice(self, start: int, stop: int) -> List[Command]:
-        """Get a list of commands between start and stop."""
+    def get_slice(
+        self, start: int, stop: int, command_ids: Optional[list[str]] = None
+    ) -> List[Command]:
+        """Get a list of commands between start and stop.""" """Get a list of commands between start and stop."""
         commands = self._all_command_ids[start:stop]
+        selected_command_ids = (
+            command_ids if command_ids is not None else self._all_command_ids
+        )
+        commands = selected_command_ids[start:stop]
         return [self._commands_by_id[command].command for command in commands]
 
     def get_tail_command(self) -> Optional[CommandEntry]:

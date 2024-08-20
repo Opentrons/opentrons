@@ -257,7 +257,7 @@ class RunOrchestrator:
         return self._protocol_engine.state_view.commands.get_current()
 
     def get_command_slice(
-        self, cursor: Optional[int], length: int, all_commands: bool
+        self, cursor: Optional[int], length: int, include_fixit_commands: bool
     ) -> CommandSlice:
         """Get a slice of run commands.
 
@@ -267,7 +267,7 @@ class RunOrchestrator:
             all_commands: Get all command intents.
         """
         return self._protocol_engine.state_view.commands.get_slice(
-            cursor=cursor, length=length, all_commands=all_commands
+            cursor=cursor, length=length, include_fixit_commands=include_fixit_commands
         )
 
     def get_command_error_slice(

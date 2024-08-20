@@ -579,22 +579,8 @@ class CommandView(HasState[CommandState]):
         """
         return self._state.command_history.get_all_commands()
 
-    def get_filtered_queue_ids(self, all_commands: bool) -> List[str]:
-        """Get a list of all filtered commands in state.
-
-        Entries are returned in the order of first-added command to last-added command.
-        Replacing a command (to change its status, for example) keeps its place in the
-        ordering.
-
-        If all_commands is True, retunred list will contain all command intents.
-        If False, return list will contain only safe commands.
-        """
-        return self._state.command_history.get_filtered_queue_ids(
-            all_commands=all_commands
-        )
-
     def get_slice(
-        self, cursor: Optional[int], length: int, all_commands: bool
+        self, cursor: Optional[int], length: int, include_fixit_commands: bool
     ) -> CommandSlice:
         """Get a subset of commands around a given cursor.
 
@@ -610,8 +596,8 @@ class CommandView(HasState[CommandState]):
             if include_fixit_commands
             else [CommandIntent.PROTOCOL, CommandIntent.SETUP]
         )
-        running_command = self._state.command_history.get_running_command()	        
-        queued_command_ids = self._state.command_history.get_queue_ids()	        
+        running_command = self._state.command_history.get_running_command()
+        queued_command_ids = self._state.command_history.get_queue_ids()
         total_length = len(command_ids)
 
         # TODO(mm, 2024-05-17): This looks like it's attempting to do the same thing

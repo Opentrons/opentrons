@@ -330,17 +330,18 @@ class RunOrchestratorStore:
         return self.run_orchestrator.get_current_command()
 
     def get_command_slice(
-        self,
-        cursor: Optional[int],
-        length: int,
+        self, cursor: Optional[int], length: int, include_fixit_commands: bool
     ) -> CommandSlice:
         """Get a slice of run commands.
 
         Args:
             cursor: Requested index of first command in the returned slice.
             length: Length of slice to return.
+            include_fixit_commands: Include fixit commands.
         """
-        return self.run_orchestrator.get_command_slice(cursor=cursor, length=length)
+        return self.run_orchestrator.get_command_slice(
+            cursor=cursor, length=length, include_fixit_commands=include_fixit_commands
+        )
 
     def get_command_error_slice(
         self,
