@@ -232,6 +232,6 @@ describe('ProtocolRunRuntimeParameters', () => {
     screen.getByText('mock.csv')
   })
 
-  // // ToDo Additional test will be implemented when chip component is added
-  // // Need to a case to test subtext default values/custom values
+  // ToDo Additional test will be implemented when chip component is added
+  // Need to a case to test subtext default values/custom values
 })
