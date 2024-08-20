@@ -15,10 +15,13 @@ import {
   SPAN7_8_10_11_SLOT,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { getSlotIdsBlockedBySpanning, getSlotIsEmpty } from '../../step-forms'
-import { LabwareOnDeck } from '../../components/DeckSetup/LabwareOnDeck'
-import { SlotWarning } from '../../components/DeckSetup/SlotWarning'
-import { getStagingAreaAddressableAreas } from '../../utils'
+import {
+  getSlotIdsBlockedBySpanning,
+  getSlotIsEmpty,
+} from '../../../step-forms'
+import { LabwareOnDeck } from '../../../components/DeckSetup/LabwareOnDeck'
+import { SlotWarning } from '../../../components/DeckSetup/SlotWarning'
+import { getStagingAreaAddressableAreas } from '../../../utils'
 import { ControlSelect } from './ControlSelect'
 
 import type { ModuleTemporalProperties } from '@opentrons/step-generation'
@@ -32,8 +35,8 @@ import type {
   InitialDeckSetup,
   LabwareOnDeck as LabwareOnDeckType,
   ModuleOnDeck,
-} from '../../step-forms'
-import type { TerminalItemId } from '../../steplist'
+} from '../../../step-forms'
+import type { TerminalItemId } from '../../../steplist'
 
 interface DeckSetupDetailsProps {
   activeDeckSetup: InitialDeckSetup
