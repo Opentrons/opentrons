@@ -2606,17 +2606,17 @@ class OT3API(
         self._gripper_handler.remove_probe()
 
     @staticmethod
-    def liquid_probe_non_responsive_z_distance(z_speed: float) -> float:
+    def liquid_probe_non_responsive_z_distance(
+        z_speed: float, samples_for_baselining: int, sample_time_sec: float
+    ) -> float:
         """Calculate the Z distance travelled where the LLD pass will be unresponsive."""
         # NOTE: (sigler) Here lye some magic numbers.
         #       The Z axis probing motion uses the first 20 samples to calculate
         #       a baseline for all following samples, making the very beginning of
         #       that Z motion unable to detect liquid. The sensor is configured for
         #       4ms sample readings, and so we then assume it takes ~80ms to complete.
-        #       If the Z is moving at 5mm/sec, then ~80ms equates to ~0.4
-        baseline_during_z_sample_num = 20  # FIXME: (sigler) shouldn't be defined here?
-        sample_time_sec = 0.004  # FIXME: (sigler) shouldn't be defined here?
-        baseline_duration_sec = baseline_during_z_sample_num * sample_time_sec
+        #       If the Z is moving at 5mm/sec, then ~80ms equates to ~0.4mm
+        baseline_duration_sec = samples_for_baselining * sample_time_sec
         non_responsive_z_mm = baseline_duration_sec * z_speed
         return non_responsive_z_mm
 
@@ -2707,12 +2707,14 @@ class OT3API(
             instrument.backlash_distance + sensor_baseline_plunger_move_mm
         )
         # height where probe action will begin
-        # TODO: (sigler) add this to pipette's liquid def (per tip)
-        z_overlap_between_passes_mm = 0.1
         sensor_baseline_z_move_mm = OT3API.liquid_probe_non_responsive_z_distance(
-            probe_settings.mount_speed
+            probe_settings.mount_speed,
+            probe_settings.samples_for_baselining,
+            probe_settings.sample_time_sec,
         )
-        z_offset_per_pass = sensor_baseline_z_move_mm + z_overlap_between_passes_mm
+        z_offset_per_pass = (
+            sensor_baseline_z_move_mm + probe_settings.z_overlap_between_passes_mm
+        )
 
         # height that is considered safe to reset the plunger without disturbing liquid
         # this usually needs to at least 1-2mm from liquid, to avoid splashes from air

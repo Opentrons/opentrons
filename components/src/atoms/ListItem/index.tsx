@@ -6,6 +6,8 @@ import { BORDERS, COLORS } from '../../helix-design-system'
 import { FLEX_MAX_CONTENT } from '../../styles'
 import type { StyleProps } from '../../primitives'
 
+export * from './ListItemChildren'
+
 export type ListItemType = 'error' | 'noActive' | 'success' | 'warning'
 
 interface ListItemProps extends StyleProps {

@@ -33,7 +33,11 @@ export function AddMetadata(props: WizardTileProps): JSX.Element | null {
         proceed(1)
       }}
     >
-      <>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        marginTop={SPACING.spacing60}
+        gridGap={SPACING.spacing12}
+      >
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
           <StyledText desktopStyle="captionRegular">{t('name')}</StyledText>
           {/* TODO(ja, 8/9/24): add new input field */}
@@ -55,7 +59,7 @@ export function AddMetadata(props: WizardTileProps): JSX.Element | null {
             register={register}
           />
         </Flex>
-      </>
+      </Flex>
     </WizardBody>
   )
 }

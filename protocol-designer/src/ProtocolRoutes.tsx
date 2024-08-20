@@ -4,8 +4,7 @@ import { Box } from '@opentrons/components'
 import { Landing } from './pages/Landing'
 import { ProtocolOverview } from './pages/ProtocolOverview'
 import { Liquids } from './pages/Liquids'
-import { StartingDeckState } from './pages/StartingDeckState'
-import { ProtocolSteps } from './pages/ProtocolSteps'
+import { Designer } from './pages/Designer'
 import { CreateNewProtocolWizard } from './pages/CreateNewProtocolWizard'
 import { NavigationBar } from './NavigationBar'
 
@@ -26,16 +25,10 @@ const pdRoutes: RouteProps[] = [
     path: '/liquids',
   },
   {
-    Component: StartingDeckState,
-    name: 'Starting deck state',
-    navLinkTo: '/startingDeckState',
-    path: '/startingDeckState',
-  },
-  {
-    Component: ProtocolSteps,
-    name: 'Protocol steps',
-    navLinkTo: '/steps',
-    path: '/steps',
+    Component: Designer,
+    name: 'Edit protocol',
+    navLinkTo: '/designer',
+    path: '/designer',
   },
   {
     Component: CreateNewProtocolWizard,

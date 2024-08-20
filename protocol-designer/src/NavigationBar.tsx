@@ -79,7 +79,6 @@ export function NavigationBar({
           padding={`${SPACING.spacing12} ${SPACING.spacing40}`}
           gridGap={SPACING.spacing40}
         >
-          TODO add breadcrumbs here
           {navRoutes.map(({ name, navLinkTo }: RouteProps) => (
             <NavbarLink key={name} to={navLinkTo}>
               <StyledText desktopStyle="bodyDefaultRegular">{name}</StyledText>
