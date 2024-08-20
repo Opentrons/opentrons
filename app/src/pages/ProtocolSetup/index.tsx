@@ -1044,6 +1044,7 @@ export function ProtocolSetup(): JSX.Element {
         <AnalysisFailedModal
           setShowAnalysisFailedModal={setShowAnalysisFailedModal}
           protocolId={runRecord?.data.protocolId ?? null}
+          runId={runId}
           errors={analysisErrors.map(error => error.detail)}
         />
       ) : null}
