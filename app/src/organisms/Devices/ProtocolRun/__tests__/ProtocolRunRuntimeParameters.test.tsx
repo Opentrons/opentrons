@@ -178,6 +178,16 @@ describe('ProtocolRunRuntimeParameters', () => {
   })
 
   it('should render title, and banner when RunTimeParameters from view protocol run record overflow menu button', () => {
+    when(useNotifyRunQuery)
+      .calledWith(RUN_ID)
+      .thenReturn({
+        data: {
+          data: {
+            ...mockSucceededRun,
+            runTimeParameters: mockRunTimeParameterData,
+          },
+        },
+      } as any)
     vi.mocked(useMostRecentCompletedAnalysis).mockReturnValue({
       runTimeParameters: [
         ...mockRunTimeParameterData,
@@ -191,6 +201,8 @@ describe('ProtocolRunRuntimeParameters', () => {
         },
       ],
     } as CompletedProtocolAnalysis)
+
+    vi.mocked(useRunStatus).mockReturnValue('succeeded')
     render(props)
     screen.getByText('Download files')
     screen.getByText(
