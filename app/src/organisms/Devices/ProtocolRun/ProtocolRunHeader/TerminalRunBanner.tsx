@@ -23,7 +23,7 @@ interface TerminalRunProps {
   runStatus: RunStatus | null
   handleClearClick: () => void
   isClosingCurrentRun: boolean
-  setShowRunFailedModal: (showRunFailedModal: boolean) => void
+  toggleRunFailedModal: () => void
   commandErrorList?: RunCommandErrors
   isResetRunLoading: boolean
   isRunCurrent: boolean
@@ -37,7 +37,7 @@ export function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
     runStatus,
     handleClearClick,
     isClosingCurrentRun,
-    setShowRunFailedModal,
+    toggleRunFailedModal,
     commandErrorList,
     highestPriorityError,
     isResetRunLoading,
@@ -57,7 +57,7 @@ export function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
     if (commandErrorList == null) {
       handleClearClick()
     }
-    setShowRunFailedModal(true)
+    toggleRunFailedModal()
   }
 
   const buildSuccessBanner = (): JSX.Element => {

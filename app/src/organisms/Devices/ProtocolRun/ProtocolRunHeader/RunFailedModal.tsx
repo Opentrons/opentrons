@@ -22,7 +22,7 @@ import {
   DISPLAY_FLEX,
 } from '@opentrons/components'
 
-import { useDownloadRunLog } from '../hooks'
+import { useDownloadRunLog } from '../../hooks'
 import { RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
 
 import type {
@@ -45,10 +45,25 @@ import type { RunCommandError } from '@opentrons/shared-data'
 // Note(kk:08/07/2023)
 // This modal and run failed modal for Touchscreen app will be merged into one component like EstopModals.
 
+interface UseRunFailedModalResult {
+  showRunFailedModal: boolean
+  toggleModal: () => void
+}
+
+export function useRunFailedModal(): UseRunFailedModalResult {
+  const [showRunFailedModal, setShowRunFailedModal] = React.useState(false)
+
+  const toggleModal = (): void => {
+    setShowRunFailedModal(!showRunFailedModal)
+  }
+
+  return { showRunFailedModal, toggleModal }
+}
+
 interface RunFailedModalProps {
   robotName: string
   runId: string
-  setShowRunFailedModal: (showRunFailedModal: boolean) => void
+  toggleModal: () => void
   highestPriorityError?: RunError | null
   commandErrorList?: RunCommandErrors | null
   runStatus: RunStatus | null
@@ -57,7 +72,7 @@ interface RunFailedModalProps {
 export function RunFailedModal({
   robotName,
   runId,
-  setShowRunFailedModal,
+  toggleModal,
   highestPriorityError,
   commandErrorList,
   runStatus,
@@ -72,7 +87,7 @@ export function RunFailedModal({
         ? t('warning_details')
         : t('error_details'),
     onClose: () => {
-      setShowRunFailedModal(false)
+      toggleModal()
     },
     closeOnOutsideClick: true,
     childrenPadding: SPACING.spacing24,
@@ -83,7 +98,7 @@ export function RunFailedModal({
   if (highestPriorityError == null && commandErrorList == null) return null
 
   const handleClick = (): void => {
-    setShowRunFailedModal(false)
+    toggleModal()
   }
 
   const handleDownloadClick: React.MouseEventHandler<HTMLAnchorElement> = e => {

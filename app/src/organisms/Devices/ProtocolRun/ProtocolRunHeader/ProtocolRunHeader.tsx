@@ -55,7 +55,7 @@ import { formatTimestamp } from '../../utils'
 import { RunTimer } from '../RunTimer'
 import { EMPTY_TIMESTAMP } from '../../constants'
 import { getHighestPriorityError } from '../../../OnDeviceDisplay/RunningProtocol'
-import { RunFailedModal } from '../RunFailedModal'
+import { RunFailedModal, useRunFailedModal } from './RunFailedModal'
 import { RunProgressMeter } from '../../../RunProgressMeter'
 import { getIsFixtureMismatch } from '../../../../resources/deck_configuration/utils'
 import { useDeckConfigurationCompatibility } from '../../../../resources/deck_configuration/hooks'
@@ -114,11 +114,15 @@ export function ProtocolRunHeader({
   const { analysisErrors } = useProtocolAnalysisErrors(runId)
   const isRunCurrent = useIsRunCurrent(runId)
 
+  const {
+    showRunFailedModal,
+    toggleModal: toggleRunFailedModal,
+  } = useRunFailedModal()
+
   const mostRecentRunId = useMostRecentRunId()
   const isMostRecentRun = mostRecentRunId === runId
   const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
-  const [showRunFailedModal, setShowRunFailedModal] = React.useState(false)
   const { data: commandErrorList } = useRunCommandErrors(
     runId,
     { cursor: 0, pageLength: 100 },
@@ -293,7 +297,7 @@ export function ProtocolRunHeader({
         <RunFailedModal
           robotName={robotName}
           runId={runId}
-          setShowRunFailedModal={setShowRunFailedModal}
+          toggleModal={toggleRunFailedModal}
           highestPriorityError={highestPriorityError}
           commandErrorList={commandErrorList}
           runStatus={runStatus}
@@ -367,7 +371,7 @@ export function ProtocolRunHeader({
               runStatus,
               handleClearClick,
               isClosingCurrentRun,
-              setShowRunFailedModal,
+              toggleRunFailedModal,
               commandErrorList,
               highestPriorityError,
               cancelledWithoutRecovery,

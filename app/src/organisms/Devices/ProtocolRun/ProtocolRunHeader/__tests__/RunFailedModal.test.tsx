@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { describe, it, beforeEach, vi, expect, afterEach } from 'vitest'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../i18n'
-import { useDownloadRunLog } from '../../hooks'
+import { renderWithProviders } from '../../../../../__testing-utils__'
+import { i18n } from '../../../../../i18n'
+import { useDownloadRunLog } from '../../../hooks'
 import { RunFailedModal } from '../RunFailedModal'
 
 import { RUN_STATUS_FAILED } from '@opentrons/api-client'
