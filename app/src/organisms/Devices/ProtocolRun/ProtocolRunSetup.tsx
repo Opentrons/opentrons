@@ -251,7 +251,6 @@ export function ProtocolRunSetup({
       rightElProps: {
         stepKey: MODULE_SETUP_KEY,
         complete:
-          calibrationStatusRobot.complete &&
           calibrationStatusModules.complete &&
           !isMissingModule &&
           !isFixtureMismatch,
