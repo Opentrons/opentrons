@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import {
   COLORS,
   DIRECTION_COLUMN,
+  DISPLAY_INLINE_BLOCK,
   Flex,
   ListButton,
   ListButtonAccordion,
@@ -55,7 +56,8 @@ import type { LabwareDefByDefURI } from '../../labware-defs'
 import type { Fixture } from './constants'
 
 const CUSTOM_CATEGORY = 'custom'
-
+const STANDARD_X_DIMENSION = 127.75
+const STANDARD_Y_DIMENSION = 85.48
 interface LabwareToolsProps {
   slot: DeckSlotId
   selectedHardware: ModuleModel | Fixture | null
@@ -67,7 +69,7 @@ interface LabwareToolsProps {
   selectedNestedSelectedLabwareDefURI: string | null
 }
 
-export const LabwareTools = (props: LabwareToolsProps): JSX.Element => {
+export function LabwareTools(props: LabwareToolsProps): JSX.Element {
   const {
     slot,
     selectedHardware,
@@ -81,10 +83,8 @@ export const LabwareTools = (props: LabwareToolsProps): JSX.Element => {
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const permittedTipracks = useSelector(stepFormSelectors.getPermittedTipracks)
   const pipetteEntities = useSelector(getPipetteEntities)
-  const has96Channel = getHas96Channel(pipetteEntities)
   const customLabwareDefs = useSelector(getCustomLabwareDefsByURI)
   const deckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
-  const defs = getOnlyLatestDefs()
   //    TODO(ja, 8/16/24): We are always filtering recommended labware, check with designs
   //    where to add the filter checkbox/button
   const [filterRecommended, setFilterRecommended] = React.useState<boolean>(
@@ -95,6 +95,8 @@ export const LabwareTools = (props: LabwareToolsProps): JSX.Element => {
   )
   const [filterHeight, setFilterHeight] = React.useState<boolean>(false)
 
+  const has96Channel = getHas96Channel(pipetteEntities)
+  const defs = getOnlyLatestDefs()
   const modulesById = deckSetup.modules
   const moduleModel = MODULE_MODELS.includes(selectedHardware as ModuleModel)
     ? (selectedHardware as ModuleModel)
@@ -134,8 +136,8 @@ export const LabwareTools = (props: LabwareToolsProps): JSX.Element => {
       const { dimensions, parameters } = labwareDef
       const { xDimension, yDimension } = dimensions
 
-      const isSmallXDimension = xDimension < 127.75
-      const isSmallYDimension = yDimension < 85.48
+      const isSmallXDimension = xDimension < STANDARD_X_DIMENSION
+      const isSmallYDimension = yDimension < STANDARD_Y_DIMENSION
       const isIrregularSize = isSmallXDimension && isSmallYDimension
 
       const isAdapter = labwareDef.allowedRoles?.includes('adapter')
@@ -388,7 +390,7 @@ export const LabwareTools = (props: LabwareToolsProps): JSX.Element => {
 const StyledLabel = styled.label`
   text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
   text-align: ${TYPOGRAPHY.textAlignCenter}};
-  display: inline-block;
+  display: ${DISPLAY_INLINE_BLOCK}
   cursor: pointer;
   input[type='file'] {
     display: none;

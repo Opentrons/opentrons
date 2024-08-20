@@ -36,14 +36,14 @@ export const OT2_MODULE_MODELS: ModuleModel[] = [
 
 export type Fixture =
   | 'stagingArea'
-  | 'wasteChute'
   | 'trashBin'
+  | 'wasteChute'
   | 'wasteChuteAndStagingArea'
 
 export const FIXTURES: Fixture[] = [
   'stagingArea',
-  'wasteChute',
   'trashBin',
+  'wasteChute',
   'wasteChuteAndStagingArea',
 ]
 

@@ -284,15 +284,9 @@ describe('test schemas of all v2 labware fixtures', () => {
     })
 
     it(`fixture file name matches loadName: ${labwarePath}`, () => {
-      //  filtering out this fixture since we need the exact loadName to test
-      //  for PD's heater-shaker adapter/labware combos
-      if (
-        labwareDef.parameters.loadName !== 'opentrons_universal_flat_adapter'
-      ) {
-        expect(labwareDef.parameters.loadName).toEqual(
-          path.basename(filename, '.json')
-        )
-      }
+      expect(labwareDef.parameters.loadName).toEqual(
+        path.basename(filename, '.json')
+      )
     })
 
     it(`namespace is "fixture": ${labwarePath}`, () => {

@@ -53,7 +53,7 @@ interface DeckSetupToolsProps {
   onCloseClick: () => void
 }
 
-export const DeckSetupTools = (props: DeckSetupToolsProps): JSX.Element => {
+export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element {
   const { slot, onCloseClick, cutoutId } = props
   const { t } = useTranslation(['starting_deck_state', 'shared'])
   const robotType = useSelector(getRobotType)
@@ -182,7 +182,7 @@ export const DeckSetupTools = (props: DeckSetupToolsProps): JSX.Element => {
       //  create module
       dispatch(
         createModule({
-          slot: slot,
+          slot,
           type: getModuleType(moduleModel),
           model: moduleModel,
         })

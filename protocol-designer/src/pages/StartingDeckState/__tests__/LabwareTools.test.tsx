@@ -83,12 +83,12 @@ describe('LabwareTools', () => {
     //  set labware
     expect(props.setSelectedLabwareDefURI).toHaveBeenCalled()
   })
-  it('renders slot with heater-shaker on it and selects an adapter and labware', () => {
-    props.selectedHardware = HEATERSHAKER_MODULE_V1
-    props.selecteLabwareDefURI = 'fixture/opentrons_universal_flat_adapter/1'
+  it('renders deck slot and selects an adapter and labware', () => {
+    props.selecteLabwareDefURI =
+      'fixture/fixture_universal_flat_bottom_adapter/1'
     render(props)
     screen.getByText('Adapter')
-    fireEvent.click(screen.getAllByTestId('ListButton_noActive')[0])
+    fireEvent.click(screen.getAllByTestId('ListButton_noActive')[4])
     //   set adapter
     fireEvent.click(
       screen.getByRole('label', {
@@ -97,7 +97,12 @@ describe('LabwareTools', () => {
     )
     //  set labware
     screen.getByText('Adapter compatible labware')
-    fireEvent.click(screen.getAllByRole('label')[1])
+    screen.getByText('Fixture Corning 96 Well Plate 360 µL Flat')
+    fireEvent.click(
+      screen.getByRole('label', {
+        name: 'Fixture Corning 96 Well Plate 360 µL Flat',
+      })
+    )
     expect(props.setNestedSelectedLabwareDefURI).toHaveBeenCalled()
   })
 

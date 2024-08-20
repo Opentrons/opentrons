@@ -11,9 +11,9 @@
     "tags": []
   },
   "dimensions": {
-    "xDimension": 111,
-    "yDimension": 75,
-    "zDimension": 12
+    "xDimension": 156.5,
+    "yDimension": 93,
+    "zDimension": 132
   },
   "wells": {},
   "groups": [
@@ -27,7 +27,7 @@
     "quirks": [],
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "opentrons_universal_flat_adapter"
+    "loadName": "fixture_universal_flat_bottom_adapter"
   },
   "namespace": "fixture",
   "version": 1,
