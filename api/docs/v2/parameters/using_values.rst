@@ -52,7 +52,7 @@ Manipulating CSV Data
 
 CSV parameters have their own :py:class:`.CSVParameter` type, since they don't correspond to a built-in Python type. This class has properties and methods that let you access the CSV data in one of three ways: as a file handler, as a string, or as nested lists.
 
-The :py:obj:`.CSVParameter.file` parameter provides a `file handler object <https://docs.python.org/3/c-api/file.html>`_ that points to your CSV data. You can pass this object to functions of the built-in :py:obj:`csv` module, or to other modules you import, such as ``pandas``.
+The :py:obj:`.CSVParameter.file` parameter provides a read-only `file handler object <https://docs.python.org/3/glossary.html#term-file-object>`_ that points to your CSV data. You can pass this object to functions of the built-in :py:obj:`csv` module, or to other modules you import, such as ``pandas``.
 
 The :py:obj:`.CSVParameter.contents` parameter returns the entire contents of the CSV file as a single string. You then need to parse the data yourself to extract the information you need.
 
@@ -69,7 +69,7 @@ Like all Python lists, the lists representing your CSVs are zero-indexed.
 
 .. tip::
 
-    Remember that CSV parameters don't have default values. Accessing CSV data in any of the above ways will prevent protocol analysis from completing until you select a CSV file and confirm all runtime parameter values during run setup.
+    CSV parameters don't have default values. Accessing CSV data in any of the above ways will prevent protocol analysis from completing until you select a CSV file and confirm all runtime parameter values during run setup.
     
     You can use a try–except block to work around this and provide the data needed for protocol analysis. First, add ``from opentrons.protocol_api import RuntimeParameterRequiredError`` at the top of your protocol. Then catch the error like this::
     
