@@ -9,6 +9,10 @@ body {
     font-family: "Public Sans", "sans-serif";
 }
 
+iframe {
+    border: 0;
+}
+
 .highlight-none, .mi, .literal {
     color: #048f85;
 }
