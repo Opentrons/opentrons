@@ -103,7 +103,7 @@ class ModuleContext(CommandPublisher):
             raise UnsupportedAPIError(
                 api_element="`ModuleContext.load_labware_object`",
                 since_version="2.14",
-                message=" Use `ModuleContext.load_labware` or `load_labware_by_definition` instead.",
+                extra_message="Use `ModuleContext.load_labware` or `load_labware_by_definition` instead.",
             )
 
         _log.warning(
@@ -305,7 +305,7 @@ class ModuleContext(CommandPublisher):
         raise UnsupportedAPIError(
             api_element="`ModuleContext.geometry`",
             since_version="2.14",
-            message=" Use properties of the `ModuleContext` itself.",
+            extra_message="Use properties of the `ModuleContext` itself.",
         )
 
     def __repr__(self) -> str:
@@ -482,7 +482,7 @@ class MagneticModuleContext(ModuleContext):
                     api_element="The height parameter of MagneticModuleContext.engage()",
                     since_version=f"{_MAGNETIC_MODULE_HEIGHT_PARAM_REMOVED_IN}",
                     current_version=f"{self._api_version}",
-                    message=" Use offset or height_from_base.",
+                    extra_message="Use offset or height_from_base.",
                 )
             self._core.engage(height_from_home=height)
 
