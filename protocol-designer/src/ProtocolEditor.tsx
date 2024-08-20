@@ -43,20 +43,22 @@ function ProtocolEditorComponent(): JSX.Element {
     <div id="protocol-editor">
       <TopPortalRoot />
       {enableRedesign ? (
-        <Flex flexDirection={DIRECTION_COLUMN}>
-          <Flex padding={SPACING.spacing12} flexDirection={DIRECTION_ROW}>
-            <PrimaryButton
-              onClick={() => {
-                dispatch(setFeatureFlags({ OT_PD_ENABLE_REDESIGN: false }))
-              }}
-            >
-              turn off redesign
-            </PrimaryButton>
+        <>
+          <Flex flexDirection={DIRECTION_COLUMN}>
+            <Flex padding={SPACING.spacing12} flexDirection={DIRECTION_ROW}>
+              <PrimaryButton
+                onClick={() => {
+                  dispatch(setFeatureFlags({ OT_PD_ENABLE_REDESIGN: false }))
+                }}
+              >
+                turn off redesign
+              </PrimaryButton>
+            </Flex>
+            <BrowserRouter>
+              <ProtocolRoutes />
+            </BrowserRouter>
           </Flex>
-          <BrowserRouter>
-            <ProtocolRoutes />
-          </BrowserRouter>
-        </Flex>
+        </>
       ) : (
         <div className="container">
           <ComputingSpinner />
