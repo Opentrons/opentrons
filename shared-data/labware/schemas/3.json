@@ -70,7 +70,6 @@
       "properties": {
         "shape": {
           "type": "string",
-          "description": ".",
           "enum": ["circular"]
         },
         "diameter": {
@@ -83,7 +82,6 @@
       "properties": {
         "shape": {
           "type": "string",
-          "description": ".",
           "enum": ["rectangular"]
         },
         "xDimension": {
@@ -99,7 +97,6 @@
       "properties": {
         "shape": {
           "type": "string",
-          "description": ".",
           "enum": ["spherical"]
         },
         "radiusOfCurvature": {
@@ -125,7 +122,7 @@
         },
         "topHeight": {
           "type": "number",
-          "description": "."
+          "description": "The height at the top of a bounded subsection of a well, relative to the bottom"
         }
       }
     },
@@ -134,17 +131,17 @@
       "required": ["frusta", "bottomShape"],
       "properties": {
         "frusta": {
-          "description": ".",
+          "description": "A list of all of the sections of the well that have a contiguous shape",
           "type": "array",
           "items": {
             "type": "object",
-            "description": ".",
             "additionalProperties": {
               "$ref": "#/definitions/BoundedSection"
             }
           }
         },
         "bottomShape": {
+          "description": "The shape at the bottom of the well: either a spherical segment or a cross-section",
           "anyOf": [
             {
               "$ref": "#/definitions/CircularCrossSection"
@@ -157,9 +154,6 @@
             }
           ]
         }
-
-
-
       }
     }
   },
@@ -471,7 +465,7 @@
     },
     "innerLabwareGeometry": {
       "type": "object",
-      "description": ".",
+      "description": "A dictionary holding all unique inner well geometries in a labware.",
       "additionalProperties": {
         "$ref": "#/definitions/InnerWellGeometry"
       }
