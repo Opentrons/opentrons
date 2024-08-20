@@ -4,11 +4,10 @@ import '@testing-library/jest-dom/vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import {
   FLEX_ROBOT_TYPE,
-  HEATERSHAKER_MODULE_V1,
   fixtureP1000SingleV2Specs,
   fixtureTiprack1000ul,
 } from '@opentrons/shared-data'
-import { i18n } from '../../../localization'
+import { i18n } from '../../../assets/localization'
 import { renderWithProviders } from '../../../__testing-utils__'
 import {
   getInitialDeckSetup,

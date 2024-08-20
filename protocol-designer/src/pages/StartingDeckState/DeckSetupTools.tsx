@@ -43,9 +43,8 @@ import { LabwareTools } from './LabwareTools'
 
 import type { CutoutId, DeckSlotId, ModuleModel } from '@opentrons/shared-data'
 import type { DeckFixture } from '../../step-forms/actions/additionalItems'
-import type { Fixture } from './constants'
-
 import type { ThunkDispatch } from '../../types'
+import type { Fixture } from './constants'
 
 interface DeckSetupToolsProps {
   cutoutId: CutoutId
