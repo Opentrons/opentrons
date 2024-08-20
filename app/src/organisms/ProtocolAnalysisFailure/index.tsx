@@ -2,6 +2,7 @@ import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useDispatch } from 'react-redux'
 import { useTranslation, Trans } from 'react-i18next'
+import { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
@@ -95,11 +96,13 @@ export function ProtocolAnalysisFailure(
               title={t('protocol_analysis_failure')}
               onClose={handleClickHideDetails}
             >
-              {errors.map((error, index) => (
-                <LegacyStyledText key={index} as="p">
-                  {error}
-                </LegacyStyledText>
-              ))}
+              <Flex css={SCROLL_LONG}>
+                {errors.map((error, index) => (
+                  <LegacyStyledText key={index} as="p">
+                    {error}
+                  </LegacyStyledText>
+                ))}
+              </Flex>
               <Flex justifyContent={JUSTIFY_FLEX_END}>
                 <PrimaryButton
                   onClick={handleClickHideDetails}
@@ -116,3 +119,9 @@ export function ProtocolAnalysisFailure(
     </Banner>
   )
 }
+
+const SCROLL_LONG = css`
+  overflow: scroll;
+  width: inherit;
+  max-height: 11.75rem;
+`
