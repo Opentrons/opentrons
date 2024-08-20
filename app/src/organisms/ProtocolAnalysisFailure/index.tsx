@@ -51,6 +51,7 @@ export function ProtocolAnalysisFailure(
     e.stopPropagation()
     dispatch(analyzeProtocol(protocolKey))
   }
+  console.log('errors ', errors)
   return (
     <Banner type="warning" marginRight={SPACING.spacing24}>
       <Flex
@@ -98,7 +99,7 @@ export function ProtocolAnalysisFailure(
             >
               <Flex css={SCROLL_LONG}>
                 {errors.map((error, index) => (
-                  <LegacyStyledText key={index} as="p" css={css`text-wrap: nowrap;`}>
+                  <LegacyStyledText key={index} as="p">
                     {error}
                   </LegacyStyledText>
                 ))}
