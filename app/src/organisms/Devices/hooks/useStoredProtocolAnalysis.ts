@@ -1,10 +1,11 @@
 import { useSelector } from 'react-redux'
+
+import { useProtocolQuery } from '@opentrons/react-api-client'
 import {
   parseRequiredModulesEntity,
   parseInitialLoadedLabwareEntity,
   parsePipetteEntity,
-} from '@opentrons/api-client'
-import { useProtocolQuery } from '@opentrons/react-api-client'
+} from '@opentrons/shared-data'
 
 import { getStoredProtocol } from '../../../redux/protocol-storage'
 import { useNotifyRunQuery } from '../../../resources/runs'

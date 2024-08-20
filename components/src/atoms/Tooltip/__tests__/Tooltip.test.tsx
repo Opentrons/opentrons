@@ -57,7 +57,7 @@ describe('Tooltip', () => {
     expect(tooltip).toHaveStyle('left: 0.25rem')
     expect(tooltip).toHaveStyle(`background: ${COLORS.black90}`)
     expect(tooltip).toHaveStyle(`color: ${COLORS.white}`)
-    expect(tooltip).toHaveStyle('width: 8.75rem')
+    expect(tooltip).toHaveStyle('max-width: 8.75rem')
     expect(tooltip).toHaveStyle('font-size: 0.625rem')
     expect(tooltip).toHaveAttribute('role', 'tooltip')
   })

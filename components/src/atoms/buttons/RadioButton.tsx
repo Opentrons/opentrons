@@ -25,6 +25,7 @@ interface RadioButtonProps extends StyleProps {
   subButtonLabel?: string
   id?: string
   iconName?: IconName
+  maxLines?: number | null
 }
 
 //  used for ODD and helix
@@ -39,6 +40,7 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
     subButtonLabel,
     id = buttonLabel,
     iconName,
+    maxLines = null,
   } = props
 
   const isLarge = radioButtonType === 'large'
@@ -83,6 +85,9 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
         cursor: default;
         padding: ${isLarge ? SPACING.spacing24 : SPACING.spacing20};
         border-radius: ${BORDERS.borderRadius16};
+        display: ${maxLines != null ? '-webkit-box' : undefined};
+        -webkit-line-clamp: ${maxLines ?? undefined};
+        -webkit-box-orient: ${maxLines != null ? 'vertical' : undefined};
       }
     }
   `

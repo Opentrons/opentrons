@@ -799,8 +799,7 @@ describe('ProtocolRunHeader', () => {
       .thenReturn(RUN_STATUS_FAILED)
     render()
 
-    fireEvent.click(screen.getByText('View error'))
-    expect(mockCloseCurrentRun).toBeCalled()
+    fireEvent.click(screen.getByText('View error details'))
     screen.getByText('mock RunFailedModal')
   })
 

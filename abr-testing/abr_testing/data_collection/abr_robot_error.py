@@ -200,7 +200,7 @@ def read_each_log(folder_path: str, issue_url: str) -> None:
                         "content": [{"type": "text", "text": message}],
                     }
                     content_list.insert(0, line_1)
-                    ticket.comment(content_list, issue_url)
+                    ticket.comment(content_list, issue_key)
             no_word_found_message = (
                 f"Key words '{not_found_words} were not found in {file_name}."
             )
@@ -209,7 +209,7 @@ def read_each_log(folder_path: str, issue_url: str) -> None:
                 "content": [{"type": "text", "text": no_word_found_message}],
             }
             content_list.append(no_word_found_dict)
-            ticket.comment(content_list, issue_url)
+            ticket.comment(content_list, issue_key)
 
 
 def match_error_to_component(
@@ -383,21 +383,26 @@ def get_run_error_info_from_robot(
                 errored_labware_dict["Slot"] = labware["location"].get("slotName", "")
                 errored_labware_dict["Labware Type"] = labware.get("definitionUri", "")
                 offset_id = labware.get("offsetId", "")
-                for lpc in lpc_dict:
-                    if lpc.get("id", "") == offset_id:
-                        errored_labware_dict["X"] = lpc["vector"].get("x", "")
-                        errored_labware_dict["Y"] = lpc["vector"].get("y", "")
-                        errored_labware_dict["Z"] = lpc["vector"].get("z", "")
-                        errored_labware_dict["Module"] = lpc["location"].get(
-                            "moduleModel", ""
-                        )
-                        errored_labware_dict["Adapter"] = lpc["location"].get(
-                            "definitionUri", ""
-                        )
+                if offset_id == "":
+                    labware_slot = errored_labware_dict["Slot"]
+                    lpc_message = f"The current LPC coords found at {labware_slot} are (0, 0, 0). \
+Please confirm with the ABR-LPC sheet and re-LPC."
+                else:
+                    for lpc in lpc_dict:
+                        if lpc.get("id", "") == offset_id:
+                            errored_labware_dict["X"] = lpc["vector"].get("x", "")
+                            errored_labware_dict["Y"] = lpc["vector"].get("y", "")
+                            errored_labware_dict["Z"] = lpc["vector"].get("z", "")
+                            errored_labware_dict["Module"] = lpc["location"].get(
+                                "moduleModel", ""
+                            )
+                            errored_labware_dict["Adapter"] = lpc["location"].get(
+                                "definitionUri", ""
+                            )
 
-                        lpc_message = compare_lpc_to_historical_data(
-                            errored_labware_dict, parent, storage_directory
-                        )
+                            lpc_message = compare_lpc_to_historical_data(
+                                errored_labware_dict, parent, storage_directory
+                            )
 
     description["protocol_step"] = protocol_step
     description["right_mount"] = results.get("right", "No attachment")

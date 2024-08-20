@@ -66,7 +66,6 @@ export const ANALYTICS_ROBOT_UPDATE_CHANGE_LOG_VIEW = 'robotUpdateChangeLogView'
  */
 
 export const ANALYTICS_RECOVERY_ERROR_EVENT = 'recoveryErrorEvent'
-export const ANALYTICS_RECOVERY_INITIAL_ACTION = 'recoveryInitialAction'
 export const ANALYTICS_RECOVERY_ACTION_SELECTED =
   'recoverySelectedRecoveryAction'
 export const ANALYTICS_RECOVERY_VIEW_ERROR_DETAILS = 'recoveryViewErrorDetails'

@@ -222,6 +222,58 @@ class WellDefinition(BaseModel):
         description="If 'rectangular', use xDimension and "
         "yDimension; if 'circular' use diameter",
     )
+    geometryDefinitionId: Optional[str] = Field(
+        None, description="str id of the well's corresponding" "innerWellGeometry"
+    )
+
+
+class CircularCrossSection(BaseModel):
+    shape: Literal["circular"] = Field(..., description="Denote shape as circular")
+    diameter: _NonNegativeNumber = Field(
+        ..., description="The diameter of a circular cross section of a well"
+    )
+
+
+class RectangularCrossSection(BaseModel):
+    shape: Literal["rectangular"] = Field(
+        ..., description="Denote shape as rectangular"
+    )
+    xDimension: Optional[_NonNegativeNumber] = Field(
+        None,
+        description="x dimension of a subsection of wells",
+    )
+    yDimension: Optional[_NonNegativeNumber] = Field(
+        None,
+        description="y dimension of a subsection of wells",
+    )
+
+
+class SphericalSegment(BaseModel):
+    shape: Literal["spherical"] = Field(..., description="Denote shape as spherical")
+    radius_of_curvature: _NonNegativeNumber = Field(
+        ...,
+        description="radius of curvature of bottom subsection of wells",
+    )
+    depth: _NonNegativeNumber = Field(
+        ..., description="The depth of a spherical bottom of a well"
+    )
+
+
+TopCrossSection = Union[CircularCrossSection, RectangularCrossSection]
+BottomShape = Union[CircularCrossSection, RectangularCrossSection, SphericalSegment]
+
+
+class BoundedSection(BaseModel):
+    geometry: TopCrossSection = Field(
+        ...,
+        description="Geometrical information needed to calculate the volume of a subsection of a well",
+        discriminator="shape",
+    )
+    topHeight: _NonNegativeNumber = Field(
+        ...,
+        description="The height at the top of a bounded subsection of a well, relative to the bottom"
+        "of the well",
+    )
 
 
 class Metadata1(BaseModel):
@@ -249,6 +301,18 @@ class Group(BaseModel):
     )
     brand: Optional[BrandData] = Field(
         None, description="Brand data for the well group (e.g. for tubes)"
+    )
+
+
+class InnerWellGeometry(BaseModel):
+    frusta: List[BoundedSection] = Field(
+        ...,
+        description="A list of all of the sections of the well that have a contiguous shape",
+    )
+    bottomShape: BottomShape = Field(
+        ...,
+        description="The shape at the bottom of the well: either a spherical segment or a cross-section",
+        discriminator="shape",
     )
 
 
@@ -325,4 +389,8 @@ class LabwareDefinition(BaseModel):
     gripForce: Optional[float] = Field(
         default_factory=None,
         description="Force, in Newtons, with which the gripper should grip the labware.",
+    )
+    innerLabwareGeometry: Optional[Dict[str, InnerWellGeometry]] = Field(
+        None,
+        description="A dictionary holding all unique inner well geometries in a labware.",
     )

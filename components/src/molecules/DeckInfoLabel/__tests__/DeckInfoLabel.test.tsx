@@ -28,7 +28,7 @@ describe('DeckInfoLabel', () => {
     )
     expect(deckInfoLabel).toHaveStyle(`height: ${SPACING.spacing20}`)
     expect(deckInfoLabel).toHaveStyle('width: max-content')
-    expect(deckInfoLabel).toHaveStyle(`border: 2px solid ${COLORS.black90}`)
+    expect(deckInfoLabel).toHaveStyle(`border: 1px solid ${COLORS.black90}`)
     expect(deckInfoLabel).toHaveStyle(`border-radius: ${BORDERS.borderRadius8}`)
   })
 

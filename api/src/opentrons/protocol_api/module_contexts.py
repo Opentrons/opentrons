@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from typing import List, Optional, Union, cast
+from typing import List, Dict, Optional, Union, cast
 
 from opentrons_shared_data.labware.types import LabwareDefinition
 from opentrons_shared_data.module.types import ModuleModel, ModuleType
@@ -994,8 +994,13 @@ class AbsorbanceReaderContext(ModuleContext):
 
     @requires_version(2, 21)
     def open_lid(self) -> None:
-        """Close the lid of the Absorbance Reader."""
+        """Open the lid of the Absorbance Reader."""
         self._core.open_lid()
+
+    @requires_version(2, 21)
+    def is_lid_on(self) -> bool:
+        """Return ``True`` if the Absorbance Reader's lid is currently closed."""
+        return self._core.is_lid_on()
 
     @requires_version(2, 21)
     def initialize(self, wavelength: int) -> None:
@@ -1003,6 +1008,6 @@ class AbsorbanceReaderContext(ModuleContext):
         self._core.initialize(wavelength)
 
     @requires_version(2, 21)
-    def read(self) -> None:
-        """Initiate read on the Absorbance Reader."""
-        self._core.read()
+    def read(self) -> Optional[Dict[str, float]]:
+        """Initiate read on the Absorbance Reader. Returns a dictionary of values ordered by well name."""
+        return self._core.read()

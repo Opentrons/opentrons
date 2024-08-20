@@ -14,8 +14,8 @@ import type {
   CompletedProtocolAnalysis,
   DeckDefinition,
   LabwareDefinition2,
+  LoadedLabwareByAdapter,
 } from '@opentrons/shared-data'
-import type { LoadedLabwareByAdapter } from '@opentrons/api-client'
 import type { AttachedProtocolModuleMatch } from '../ProtocolSetupModulesAndDeck/utils'
 
 interface LabwareMapViewProps {

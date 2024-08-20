@@ -12,7 +12,7 @@
   "dimensions": {
     "xDimension": 128,
     "yDimension": 86,
-    "zDimension": 136
+    "zDimension": 155
   },
   "parameters": {
     "format": "irregular",
@@ -23,13 +23,13 @@
   },
   "wells": {
     "A1": {
-      "depth": 14,
+      "depth": 0.5,
       "totalLiquidVolume": 10,
       "shape": "circular",
       "diameter": 4,
       "x": 60.8,
       "y": 41.5,
-      "z": 135
+      "z": 154.5
     }
   },
   "brand": {

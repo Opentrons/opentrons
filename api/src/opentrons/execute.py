@@ -545,6 +545,7 @@ def _create_live_context_pe(
         create_protocol_engine_in_thread(
             hardware_api=hardware_api_wrapped,
             config=_get_protocol_engine_config(),
+            deck_configuration=entrypoint_util.get_deck_configuration(),
             error_recovery_policy=error_recovery_policy.never_recover,
             drop_tips_after_run=False,
             post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
@@ -689,8 +690,6 @@ def _get_protocol_engine_config() -> Config:
         # We deliberately omit ignore_pause=True because, in the current implementation of
         # opentrons.protocol_api.core.engine, that would incorrectly make
         # ProtocolContext.is_simulating() return True.
-        use_simulated_deck_config=True,
-        # TODO the above is not correct for this and it should use the robot's actual config
     )
 
 

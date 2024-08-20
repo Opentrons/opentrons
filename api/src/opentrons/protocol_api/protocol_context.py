@@ -42,6 +42,7 @@ from opentrons.protocols.api_support.util import (
     RobotTypeError,
     UnsupportedAPIError,
 )
+from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
 
 from ._types import OffDeckType
 from .core.common import ModuleCore, LabwareCore, ProtocolCore
@@ -707,6 +708,13 @@ class ProtocolContext(CommandPublisher):
                 f"Expected labware of type 'Labware' but got {type(labware)}."
             )
 
+        # Ensure that when moving to an absorbance reader than the lid is open
+        if isinstance(new_location, AbsorbanceReaderContext):
+            if new_location.is_lid_on():
+                raise CommandPreconditionViolated(
+                    f"Cannot move {labware.name} onto the Absorbance Reader Module when its lid is closed."
+                )
+
         location: Union[
             ModuleCore,
             LabwareCore,
@@ -922,7 +930,9 @@ class ProtocolContext(CommandPublisher):
                              control <advanced-control>` applications. You cannot
                              replace an instrument in the middle of a protocol being run
                              from the Opentrons App or touchscreen.
-        :param bool liquid_presence_detection: If ``True``, enable liquid presence detection for instrument. Only available on Flex robots in API Version 2.20 and above.
+        :param bool liquid_presence_detection: If ``True``, enable automatic
+            :ref:`liquid presence detection <lpd>` for Flex 1-, 8-, or 96-channel pipettes.
+            .. versionadded:: 2.20
         """
         instrument_name = validation.ensure_lowercase_name(instrument_name)
         checked_instrument_name = validation.ensure_pipette_name(instrument_name)

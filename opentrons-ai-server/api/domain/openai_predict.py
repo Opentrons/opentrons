@@ -44,7 +44,9 @@ class OpenAIPredict:
 
         # define file paths for storage
         example_command_path = str(ROOT_PATH / "api" / "storage" / "index" / "commands")
-        documentation_path = str(ROOT_PATH / "api" / "storage" / "index" / "v215")
+        documentation_path = str(ROOT_PATH / "api" / "storage" / "index" / "v219")
+        documentation_ref_path = str(ROOT_PATH / "api" / "storage" / "index" / "v219_ref")
+
         labware_api_path = standard_labware_api
 
         # retrieve example commands
@@ -65,15 +67,23 @@ class OpenAIPredict:
         # retrieve documentation
         storage_context = StorageContext.from_defaults(persist_dir=documentation_path)
         index = load_index_from_storage(storage_context)
-        retriever = index.as_retriever(similarity_top_k=3)
+        retriever = index.as_retriever(similarity_top_k=2)
         nodes = retriever.retrieve(query)
         docs = "\n".join(node.text.strip() for node in nodes)
-        docs_v215 = f"\n{'='*15} DOCUMENTATION {'='*15}\n\n" + docs
+        docs = f"\n{'='*15} DOCUMENTATION {'='*15}\n\n" + docs
+
+        # retrieve reference
+        storage_context = StorageContext.from_defaults(persist_dir=documentation_ref_path)
+        index = load_index_from_storage(storage_context)
+        retriever = index.as_retriever(similarity_top_k=2)
+        nodes = retriever.retrieve(query)
+        docs_ref = "\n".join(node.text.strip() for node in nodes)
+        docs_ref = f"\n{'='*15} DOCUMENTATION REFERENCE {'='*15}\n\n" + docs_ref
 
         # standard api names
         standard_api_names = f"\n{'='*15} STANDARD API NAMES {'='*15}\n\n" + labware_api_path
 
-        return example_commands, docs_v215, standard_api_names
+        return example_commands, docs + docs_ref, standard_api_names
 
     def extract_atomic_description(self, protocol_description: str) -> List[str]:
         class atomic_descr(BaseModel):
@@ -126,13 +136,13 @@ class OpenAIPredict:
         if chat_completion_message_params:
             messages += chat_completion_message_params
 
-        example_commands, docs_v215, standard_api_names = self.get_docs_all(prompt)
+        example_commands, docs_refs, standard_api_names = self.get_docs_all(prompt)
 
         user_message: ChatCompletionMessageParam = {
             "role": "user",
             "content": f"QUESTION/DESCRIPTION: \n{prompt}\n\n"
             f"PYTHON API V2 DOCUMENTATION: \n{example_commands}\n"
-            f"{pipette_type}\n{example_pcr_1}\n\n{docs_v215}\n\n"
+            f"{pipette_type}\n{example_pcr_1}\n\n{docs_refs}\n\n"
             f"{rules_for_transfer}\n\n{standard_api_names}\n\n",
         }
 
