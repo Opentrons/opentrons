@@ -1,8 +1,8 @@
 import { useAuth0 } from '@auth0/auth0-react'
 import {
+  LOCAL_AUTH0_AUDIENCE,
   PROD_AUTH0_AUDIENCE,
   STAGING_AUTH0_AUDIENCE,
-  LOCAL_AUTH0_AUDIENCE,
 } from '../constants'
 
 interface UseGetAccessTokenResult {
