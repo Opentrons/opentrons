@@ -176,7 +176,7 @@
     "schemaVersion": {
       "description": "Which schema version a labware is using",
       "type": "number",
-      "enum": [2]
+      "enum": [3]
     },
     "version": {
       "description": "Version of the labware definition itself (eg myPlate v1/v2/v3). An incrementing integer",
