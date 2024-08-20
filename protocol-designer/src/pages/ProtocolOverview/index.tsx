@@ -210,7 +210,7 @@ export function ProtocolOverview(): JSX.Element {
               data-testid="toDeckSetup"
               textDecoration={TYPOGRAPHY.textDecorationUnderline}
               onClick={() => {
-                navigate('/startingDeckState')
+                navigate('/designer')
               }}
             >
               <StyledText desktopStyle="bodyDefaultRegular">

@@ -7,7 +7,7 @@ import {
   THERMOCYCLER_MODULE_V2,
   getModuleType,
 } from '@opentrons/shared-data'
-import { getOnlyLatestDefs } from '../../labware-defs'
+import { getOnlyLatestDefs } from '../../../labware-defs'
 import {
   FLEX_MODULE_MODELS,
   OT2_MODULE_MODELS,

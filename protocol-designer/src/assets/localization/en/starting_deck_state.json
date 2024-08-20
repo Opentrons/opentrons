@@ -11,6 +11,7 @@
   "customize_slot": "Customize slot {{slotName}}",
   "deck_hardware": "Deck hardware",
   "done": "Done",
+  "protocol_starting_deck": "Protocol starting deck",
   "edit": "Edit",
   "labware": "Labware",
   "reservoir": "Reservoir",

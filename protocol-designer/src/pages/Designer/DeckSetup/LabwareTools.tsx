@@ -28,17 +28,17 @@ import {
   getModuleType,
 } from '@opentrons/shared-data'
 
-import { selectors as stepFormSelectors } from '../../step-forms'
-import { getOnlyLatestDefs } from '../../labware-defs'
+import { selectors as stepFormSelectors } from '../../../step-forms'
+import { getOnlyLatestDefs } from '../../../labware-defs'
 import {
   ADAPTER_96_CHANNEL,
   getLabwareIsCompatible as _getLabwareIsCompatible,
-} from '../../utils/labwareModuleCompatibility'
-import { getHas96Channel } from '../../utils'
-import { createCustomLabwareDef } from '../../labware-defs/actions'
-import { getRobotType } from '../../file-data/selectors'
-import { getCustomLabwareDefsByURI } from '../../labware-defs/selectors'
-import { getPipetteEntities } from '../../step-forms/selectors'
+} from '../../../utils/labwareModuleCompatibility'
+import { getHas96Channel } from '../../../utils'
+import { createCustomLabwareDef } from '../../../labware-defs/actions'
+import { getRobotType } from '../../../file-data/selectors'
+import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
+import { getPipetteEntities } from '../../../step-forms/selectors'
 import { ORDERED_CATEGORIES } from './constants'
 import {
   getLabwareIsRecommended,
@@ -50,9 +50,9 @@ import type {
   LabwareDefinition2,
   ModuleModel,
 } from '@opentrons/shared-data'
-import type { ModuleOnDeck } from '../../step-forms'
-import type { ThunkDispatch } from '../../types'
-import type { LabwareDefByDefURI } from '../../labware-defs'
+import type { ModuleOnDeck } from '../../../step-forms'
+import type { ThunkDispatch } from '../../../types'
+import type { LabwareDefByDefURI } from '../../../labware-defs'
 import type { Fixture } from './constants'
 
 const CUSTOM_CATEGORY = 'custom'
