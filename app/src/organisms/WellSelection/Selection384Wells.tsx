@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import flatten from 'lodash/flatten'
 
 import {
-  Box,
   Checkbox,
   DIRECTION_COLUMN,
   Flex,
@@ -131,16 +130,17 @@ export function Selection384Wells({
     )
   }
   return (
-    <Flex
-      justifyContent={JUSTIFY_SPACE_BETWEEN}
-      gridGap={SPACING.spacing40}
-      width="100%"
-    >
-      <Box flex="2 0 0">{labwareRender}</Box>
+    <Flex width="100%">
+      {labwareRender}
       <Flex
         flex="1 0 0"
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing32}
+        height="100%"
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+        marginLeft={`-${SPACING.spacing12}`}
+        paddingTop={SPACING.spacing24}
+        paddingBottom={SPACING.spacing40}
       >
         {channels === 1 ? (
           <SelectBy
@@ -196,34 +196,36 @@ function SelectBy({
       <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {i18n.format(t('select_by'), 'capitalize')}
       </LegacyStyledText>
-      <RadioButton
-        buttonLabel={i18n.format(t('columns'), 'capitalize')}
-        buttonValue="columns"
-        isSelected={selectBy === 'columns'}
-        onChange={() => {
-          setSelectBy('columns')
-          setLastSelectedIndex(lastSelectedIndex =>
-            lastSelectedIndex != null
-              ? Math.floor(lastSelectedIndex / ROW_COUNT_384)
-              : lastSelectedIndex
-          )
-        }}
-        radioButtonType="small"
-      />
-      <RadioButton
-        buttonLabel={i18n.format(t('wells'), 'capitalize')}
-        buttonValue="wells"
-        isSelected={selectBy === 'wells'}
-        onChange={() => {
-          setSelectBy('wells')
-          setLastSelectedIndex(lastSelectedIndex =>
-            lastSelectedIndex != null
-              ? (lastSelectedIndex + 1) * ROW_COUNT_384 - 1
-              : lastSelectedIndex
-          )
-        }}
-        radioButtonType="small"
-      />
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+        <RadioButton
+          buttonLabel={i18n.format(t('columns'), 'capitalize')}
+          buttonValue="columns"
+          isSelected={selectBy === 'columns'}
+          onChange={() => {
+            setSelectBy('columns')
+            setLastSelectedIndex(lastSelectedIndex =>
+              lastSelectedIndex != null
+                ? Math.floor(lastSelectedIndex / ROW_COUNT_384)
+                : lastSelectedIndex
+            )
+          }}
+          radioButtonType="small"
+        />
+        <RadioButton
+          buttonLabel={i18n.format(t('wells'), 'capitalize')}
+          buttonValue="wells"
+          isSelected={selectBy === 'wells'}
+          onChange={() => {
+            setSelectBy('wells')
+            setLastSelectedIndex(lastSelectedIndex =>
+              lastSelectedIndex != null
+                ? (lastSelectedIndex + 1) * ROW_COUNT_384 - 1
+                : lastSelectedIndex
+            )
+          }}
+          radioButtonType="small"
+        />
+      </Flex>
     </Flex>
   )
 }
@@ -269,27 +271,29 @@ function StartingWell({
       <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {i18n.format(t('starting_well'), 'capitalize')}
       </LegacyStyledText>
-      {checkboxWellOptions.map(well => (
-        <Checkbox
-          key={well}
-          isChecked={startingWellState[well]}
-          labelText={well}
-          onClick={() => {
-            if (channels === 96) {
-              if (startingWellState[well]) {
-                deselectWells([well])
-              } else {
-                selectWells({ [well]: null })
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+        {checkboxWellOptions.map(well => (
+          <Checkbox
+            key={well}
+            isChecked={startingWellState[well]}
+            labelText={well}
+            onClick={() => {
+              if (channels === 96) {
+                if (startingWellState[well]) {
+                  deselectWells([well])
+                } else {
+                  selectWells({ [well]: null })
+                }
               }
-            }
 
-            setStartingWellState(startingWellState => ({
-              ...startingWellState,
-              [well]: !startingWellState[well],
-            }))
-          }}
-        />
-      ))}
+              setStartingWellState(startingWellState => ({
+                ...startingWellState,
+                [well]: !startingWellState[well],
+              }))
+            }}
+          />
+        ))}
+      </Flex>
     </Flex>
   )
 }
@@ -321,7 +325,7 @@ function ButtonControls(props: ButtonControlsProps): JSX.Element {
             'capitalize'
           )}
         </LegacyStyledText>
-        <Flex gridGap={SPACING.spacing16}>
+        <Flex gridGap={SPACING.spacing16} height="6.5rem">
           <IconButton
             disabled={minusDisabled}
             onClick={handleMinus}

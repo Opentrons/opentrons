@@ -29,7 +29,7 @@ export const ConfirmExitModal = (props: ConfirmExitModalProps): JSX.Element => {
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing10}
+        gridGap={SPACING.spacing32}
         width="100%"
       >
         <LegacyStyledText css={TYPOGRAPHY.bodyTextRegular}>
