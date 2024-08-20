@@ -8,7 +8,7 @@ import {
   getInitialDeckSetup,
 } from '../../step-forms/selectors'
 import { getIsMultiSelectMode } from '../../ui/steps'
-import { i18n } from '../../localization'
+import { i18n } from '../../assets/localization'
 import { getEnableComment } from '../../feature-flags/selectors'
 import { StepCreationButton } from '../StepCreationButton'
 

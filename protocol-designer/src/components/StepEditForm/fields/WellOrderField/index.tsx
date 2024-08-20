@@ -11,7 +11,7 @@ import {
   C_LIGHT_GRAY,
 } from '@opentrons/components'
 import cx from 'classnames'
-import ZIG_ZAG_IMAGE from '../../../../images/zig_zag_icon.svg'
+import ZIG_ZAG_IMAGE from '../../../../assets/images/zig_zag_icon.svg'
 import { WellOrderModal } from './WellOrderModal'
 import stepEditStyles from '../../StepEditForm.module.css'
 import styles from './WellOrderInput.module.css'

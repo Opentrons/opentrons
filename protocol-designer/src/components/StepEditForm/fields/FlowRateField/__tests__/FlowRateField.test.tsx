@@ -4,7 +4,7 @@ import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import { fixtureP100096V2Specs } from '@opentrons/shared-data'
 import { renderWithProviders } from '../../../../../__testing-utils__'
-import { i18n } from '../../../../../localization'
+import { i18n } from '../../../../../assets/localization'
 import { getPipetteEntities } from '../../../../../step-forms/selectors'
 import { FlowRateField } from '../index'
 

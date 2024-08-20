@@ -14,7 +14,7 @@ import {
   Btn,
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
-import temporaryImg from '../../images/placeholder_image_delete.png'
+import temporaryImg from '../../assets/images/placeholder_image_delete.png'
 
 interface WizardBodyProps {
   stepNumber: number
