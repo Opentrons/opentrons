@@ -1,0 +1,68 @@
+{
+  "adapter_compatible_labware": "Adapter Compatible Labware",
+  "custom_labware": "Custom Labware",
+  "additional_equipment_display_names": {
+    "gripper": "Flex Gripper",
+    "stagingAreas": "Staging Area Slots",
+    "trashBin": "Trash Bin",
+    "wasteChute": "Waste Chute"
+  },
+  "module_display_names": {
+    "multipleheaterShakerModuleTypes": "Multiple Heater-Shakers",
+    "multipletemperatureModuleTypes": "Multiple Temperatures",
+    "multiplemagneticBlockTypes": "Multiple Magnetic Blocks",
+    "temperatureModuleType": "Temperature",
+    "magneticModuleType": "Magnetic",
+    "thermocyclerModuleType": "Thermocycler",
+    "heaterShakerModuleType": "Heater-Shaker",
+    "magneticBlockType": "Magnetic Block",
+    "absorbanceReaderType": "Absorbance Plate Reader"
+  },
+  "module_long_names": {
+    "temperatureModuleType": "Temperature module",
+    "magneticModuleType": "Magnetic module",
+    "thermocyclerModuleType": "Thermocycler module",
+    "heaterShakerModuleType": "Heater-Shaker module",
+    "magneticBlockType": "Magnetic block",
+    "absorbanceReaderType": "Absorbance Plate Reader"
+  },
+  "model_display_name": {
+    "temperatureModuleV1": "GEN1",
+    "temperatureModuleV2": "GEN2",
+    "magneticModuleV1": "GEN1",
+    "magneticModuleV2": "GEN2",
+    "thermocyclerModuleV1": "GEN1",
+    "thermocyclerModuleV2": "GEN2",
+    "heaterShakerModuleV1": "GEN1",
+    "magneticBlockV1": "GEN1",
+    "gripperV1": "GEN1",
+    "absorbanceReaderV1": "GEN1"
+  },
+  "status": {
+    "engaged": "engaged",
+    "disengaged": "disengaged",
+    "deactivated": "deactivated"
+  },
+  "actions": {
+    "action": "action",
+    "await_temperature": "pause until",
+    "cycling": "cycling",
+    "disengage": "disengage",
+    "engage": "engage",
+    "go_to": "go to",
+    "hold": "hold",
+    "profile": "profile",
+    "closed_and_locked": "Closed and Locked",
+    "open": "Open",
+    "deactivate_after": "Deactivate after"
+  },
+  "block_label": "Block",
+  "lid_label": "Lid ({{lidStatus}})",
+  "lid_closed": "closed",
+  "lid_open": "open",
+  "lid_undefined": "undefined",
+  "latch_label": "Latch",
+  "heater_label": "Heater",
+  "shaker_label": "Shaker",
+  "labware_latch": "Labware Latch"
+}

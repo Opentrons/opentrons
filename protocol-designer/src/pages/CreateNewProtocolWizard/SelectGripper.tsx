@@ -1,7 +1,13 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import without from 'lodash/without'
-import { Flex, SPACING, StyledText, RadioButton } from '@opentrons/components'
+import {
+  Flex,
+  SPACING,
+  StyledText,
+  RadioButton,
+  DIRECTION_COLUMN,
+} from '@opentrons/components'
 import { WizardBody } from './WizardBody'
 
 import type { WizardTileProps } from './types'
@@ -37,7 +43,7 @@ export function SelectGripper(props: WizardTileProps): JSX.Element | null {
         proceed(1)
       }}
     >
-      <>
+      <Flex flexDirection={DIRECTION_COLUMN} marginTop={SPACING.spacing60}>
         <StyledText
           desktopStyle="headingSmallBold"
           marginBottom={SPACING.spacing16}
@@ -62,7 +68,7 @@ export function SelectGripper(props: WizardTileProps): JSX.Element | null {
             isSelected={gripperStatus === 'no'}
           />
         </Flex>
-      </>
+      </Flex>
     </WizardBody>
   )
 }

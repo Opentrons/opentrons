@@ -14,10 +14,9 @@ from typing import Any
 import sqlalchemy
 
 from ..database import sql_engine_ctx
+from ..file_and_directory_names import DB_FILE
 from ..tables import schema_4
 from .._folder_migrator import Migration
-
-_DB_FILE = "robot_server.db"
 
 
 class Migration3to4(Migration):  # noqa: D101
@@ -29,7 +28,7 @@ class Migration3to4(Migration):  # noqa: D101
                 shutil.copytree(src=item, dst=dest_dir / item.name)
             else:
                 shutil.copy(src=item, dst=dest_dir / item.name)
-        dest_db_file = dest_dir / _DB_FILE
+        dest_db_file = dest_dir / DB_FILE
 
         # Append the new column to existing analyses in v4 database
         with ExitStack() as exit_stack:

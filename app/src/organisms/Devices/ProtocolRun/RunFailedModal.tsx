@@ -19,9 +19,11 @@ import {
   Modal,
   LegacyStyledText,
   TYPOGRAPHY,
+  DISPLAY_FLEX,
 } from '@opentrons/components'
 
 import { useDownloadRunLog } from '../hooks'
+import { RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
 
 import type {
   RunError,
@@ -29,7 +31,6 @@ import type {
   RunStatus,
 } from '@opentrons/api-client'
 import type { ModalProps } from '@opentrons/components'
-import { RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
 import type { RunCommandError } from '@opentrons/shared-data'
 
 /**
@@ -100,7 +101,7 @@ export function RunFailedModal({
     isSingleError,
   }: ErrorContentProps): JSX.Element => {
     return (
-      <>
+      <Flex flexDirection={DIRECTION_COLUMN}>
         <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {isSingleError
             ? t('error_info', {
@@ -130,7 +131,7 @@ export function RunFailedModal({
             </LegacyStyledText>
           ))}
         </Flex>
-      </>
+      </Flex>
     )
   }
 
@@ -172,6 +173,8 @@ export function RunFailedModal({
 }
 
 const ERROR_MESSAGE_STYLE = css`
+  display: ${DISPLAY_FLEX};
+  flex-direction: ${DIRECTION_COLUMN};
   max-height: 9.5rem;
   overflow-y: ${OVERFLOW_AUTO};
   margin-top: ${SPACING.spacing8};

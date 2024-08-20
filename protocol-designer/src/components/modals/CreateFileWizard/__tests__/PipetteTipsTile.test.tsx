@@ -7,7 +7,7 @@ import {
   fixture_tiprack_300_ul,
 } from '@opentrons/shared-data/labware/fixtures/2'
 import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../localization'
+import { i18n } from '../../../../assets/localization'
 import { getLabwareDefsByURI } from '../../../../labware-defs/selectors'
 import { getAllowAllTipracks } from '../../../../feature-flags/selectors'
 import { getTiprackOptions } from '../../utils'

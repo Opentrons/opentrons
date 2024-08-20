@@ -14,7 +14,7 @@ import {
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
-import { parseLiquidsInLoadOrder } from '@opentrons/api-client'
+import { parseLiquidsInLoadOrder } from '@opentrons/shared-data'
 import { EmptySection } from './EmptySection'
 
 import {

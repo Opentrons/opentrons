@@ -19,12 +19,13 @@ describe('Toolbox', () => {
       titleIconName: 'swap-horizontal',
       onCloseClick: vi.fn(),
       closeButtonText: 'exit',
+      onConfirmClick: vi.fn(),
     }
     render(props)
     screen.getByText('header')
     screen.getByText('done')
     fireEvent.click(screen.getByTestId('Toolbox_confirmButton'))
-    expect(props.onCloseClick).toHaveBeenCalled()
+    expect(props.onConfirmClick).toHaveBeenCalled()
     screen.getByText('mock children')
     screen.getByText('exit')
     fireEvent.click(screen.getByTestId('Toolbox_exit'))

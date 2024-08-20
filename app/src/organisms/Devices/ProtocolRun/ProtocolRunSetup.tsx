@@ -2,10 +2,6 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  parseAllRequiredModuleModels,
-  parseLiquidsInLoadOrder,
-} from '@opentrons/api-client'
-import {
   ALIGN_CENTER,
   COLORS,
   DIRECTION_COLUMN,
@@ -18,7 +14,12 @@ import {
   TYPOGRAPHY,
   FLEX_MAX_CONTENT,
 } from '@opentrons/components'
-import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import {
+  FLEX_ROBOT_TYPE,
+  OT2_ROBOT_TYPE,
+  parseAllRequiredModuleModels,
+  parseLiquidsInLoadOrder,
+} from '@opentrons/shared-data'
 
 import { Line } from '../../../atoms/structure'
 import { InfoMessage } from '../../../molecules/InfoMessage'
@@ -259,7 +260,8 @@ export function ProtocolRunSetup({
           isFlex && hasModules
             ? t('calibration_ready')
             : t('deck_hardware_ready'),
-        incompleteText: isFlex ? t('calibration_needed') : t('action_needed'),
+        incompleteText:
+          isFlex && hasModules ? t('calibration_needed') : t('action_needed'),
         missingHardware: isMissingModule || isFixtureMismatch,
         missingHardwareText: t('action_needed'),
         incompleteElement: null,

@@ -27,7 +27,7 @@ export interface LabwareStackRenderProps {
   /** highlight bottom labware if it exists */
   highlightBottom: boolean
   gRef?: React.RefObject<SVGGElement>
-  definitionBottom?: LabwareDefinition2
+  definitionBottom?: LabwareDefinition2 | null
   shouldRotateAdapterOrientation?: boolean
   /** option to show well labels inside or outside of labware outline */
   wellLabelOption?: WellLabelOption

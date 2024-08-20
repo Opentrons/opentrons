@@ -13,3 +13,9 @@ export const STAGING_AUTH0_AUDIENCE = 'https://staging.opentrons.ai/api'
 // auth0 for production
 export const PROD_AUTH0_CLIENT_ID = 'b5oTRmfMY94tjYL8GyUaVYHhMTC28X8o'
 export const PROD_AUTH0_AUDIENCE = 'https://opentrons.ai/api'
+
+// auth0 for local
+export const LOCAL_AUTH0_CLIENT_ID = 'PcuD1wEutfijyglNeRBi41oxsKJ1HtKw'
+export const LOCAL_AUTH0_AUDIENCE = 'sandbox-ai-api'
+export const LOCAL_AUTH0_DOMAIN = 'identity.auth-dev.opentrons.com'
+export const LOCAL_END_POINT = 'http://localhost:8000/api/chat/completion'

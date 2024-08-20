@@ -1,10 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-import {
-  parseLabwareInfoByLiquidId,
-  parseLiquidsInLoadOrder,
-} from '@opentrons/api-client'
 
 import {
   ALIGN_CENTER,
@@ -23,7 +19,13 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { getModuleDisplayName, MICRO_LITERS } from '@opentrons/shared-data'
+import {
+  getModuleDisplayName,
+  MICRO_LITERS,
+  parseLabwareInfoByLiquidId,
+  parseLiquidsInLoadOrder,
+} from '@opentrons/shared-data'
+
 import {
   useTrackEvent,
   ANALYTICS_EXPAND_LIQUID_SETUP_ROW,
@@ -35,7 +37,7 @@ import { getLocationInfoNames } from '../utils/getLocationInfoNames'
 import { LiquidsLabwareDetailsModal } from './LiquidsLabwareDetailsModal'
 import { getTotalVolumePerLiquidId, getVolumePerWell } from './utils'
 
-import type { LabwareByLiquidId } from '@opentrons/api-client'
+import type { LabwareByLiquidId } from '@opentrons/shared-data'
 
 interface SetupLiquidsListProps {
   runId: string
@@ -83,7 +85,6 @@ export function SetupLiquidsList(props: SetupLiquidsListProps): JSX.Element {
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         gridGap={SPACING.spacing16}
         marginTop={SPACING.spacing16}
-        marginBottom={SPACING.spacing8}
       >
         <StyledText
           desktopStyle="bodyDefaultRegular"

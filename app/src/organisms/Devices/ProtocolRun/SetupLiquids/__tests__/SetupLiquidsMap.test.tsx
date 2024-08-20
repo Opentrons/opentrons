@@ -5,6 +5,7 @@ import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
 
 import { BaseDeck, LabwareRender } from '@opentrons/components'
 import {
+  fixtureTiprack300ul,
   FLEX_ROBOT_TYPE,
   FLEX_SIMPLEST_DECK_CONFIG_PROTOCOL_SPEC,
   getDeckDefFromRobotType,
@@ -12,14 +13,11 @@ import {
   OT2_ROBOT_TYPE,
   ot2StandardDeckV4 as ot2StandardDeckDef,
   ot3StandardDeckV4 as ot3StandardDeckDef,
-  fixtureTiprack300ul,
-} from '@opentrons/shared-data'
-import {
   parseInitialLoadedLabwareByAdapter,
   parseLabwareInfoByLiquidId,
   parseLiquidsInLoadOrder,
   simpleAnalysisFileFixture,
-} from '@opentrons/api-client'
+} from '@opentrons/shared-data'
 
 import { renderWithProviders } from '../../../../../__testing-utils__'
 import { i18n } from '../../../../../i18n'
@@ -50,8 +48,6 @@ vi.mock('@opentrons/components', async importOriginal => {
 })
 
 vi.mock('@opentrons/components/src/hardware-sim/BaseDeck')
-vi.mock('@opentrons/api-client')
-vi.mock('@opentrons/shared-data/js/helpers')
 vi.mock('../../LabwareInfoOverlay')
 vi.mock('../../../hooks')
 vi.mock('../utils')
@@ -65,6 +61,9 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
     ...actual,
     getSimplestDeckConfigForProtocol: vi.fn(),
     getDeckDefFromRobotType: vi.fn(),
+    parseInitialLoadedLabwareByAdapter: vi.fn(),
+    parseLabwareInfoByLiquidId: vi.fn(),
+    parseLiquidsInLoadOrder: vi.fn(),
   }
 })
 vi.mock('@opentrons/components', async importOriginal => {

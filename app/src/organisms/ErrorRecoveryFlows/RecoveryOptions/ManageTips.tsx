@@ -32,6 +32,8 @@ import type { FixitCommandTypeUtils } from '../../DropTipWizardFlows/types'
 export function ManageTips(props: RecoveryContentProps): JSX.Element {
   const { recoveryMap } = props
 
+  routeAlternativelyIfNoPipette(props)
+
   const buildContent = (): JSX.Element => {
     const { DROP_TIP_FLOWS } = RECOVERY_MAP
     const { step, route } = recoveryMap
@@ -319,4 +321,42 @@ export function useDropTipFlowUtils({
     routeOverride: buildRouteOverride(),
     reportMap: updateSubMap,
   }
+}
+
+// Handle cases in which there is no pipette that could be used for drop tip wizard by routing
+// to the next step or to option selection, if no special routing is provided.
+function routeAlternativelyIfNoPipette(props: RecoveryContentProps): void {
+  const {
+    routeUpdateActions,
+    currentRecoveryOptionUtils,
+    tipStatusUtils,
+  } = props
+  const { proceedToRouteAndStep } = routeUpdateActions
+  const { selectedRecoveryOption } = currentRecoveryOptionUtils
+  const {
+    RETRY_NEW_TIPS,
+    SKIP_STEP_WITH_NEW_TIPS,
+    OPTION_SELECTION,
+  } = RECOVERY_MAP
+
+  if (tipStatusUtils.aPipetteWithTip == null)
+    switch (selectedRecoveryOption) {
+      case RETRY_NEW_TIPS.ROUTE: {
+        proceedToRouteAndStep(
+          selectedRecoveryOption,
+          RETRY_NEW_TIPS.STEPS.REPLACE_TIPS
+        )
+        break
+      }
+      case SKIP_STEP_WITH_NEW_TIPS.ROUTE: {
+        proceedToRouteAndStep(
+          selectedRecoveryOption,
+          SKIP_STEP_WITH_NEW_TIPS.STEPS.REPLACE_TIPS
+        )
+        break
+      }
+      default: {
+        proceedToRouteAndStep(OPTION_SELECTION.ROUTE)
+      }
+    }
 }

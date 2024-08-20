@@ -92,7 +92,7 @@ describe('RunPausedSplash', () => {
 
   it('should render a generic paused screen if there is no handled errorType', () => {
     render(props)
-    screen.getByText('Error')
+    screen.getByText('Tip not detected')
     screen.getByText('MOCK STEP INFO')
   })
 
