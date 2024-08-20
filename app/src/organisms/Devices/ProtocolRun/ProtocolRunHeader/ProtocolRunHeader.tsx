@@ -121,6 +121,7 @@ import {
 import type { State } from '../../../../redux/types'
 import type { HeaterShakerModule } from '../../../../redux/modules/types'
 import { DisplayRunStatus } from './DisplayRunStatus'
+import { LabeledValue } from './LabeledValueProps'
 
 const EQUIPMENT_POLL_MS = 5000
 const CURRENT_RUN_POLL_MS = 5000
@@ -548,26 +549,6 @@ export function ProtocolRunHeader({
         ) : null}
       </Flex>
     </>
-  )
-}
-
-interface LabeledValueProps {
-  label: string
-  value: React.ReactNode
-}
-
-function LabeledValue(props: LabeledValueProps): JSX.Element {
-  return (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-      <LegacyStyledText as="h6" color={COLORS.grey60}>
-        {props.label}
-      </LegacyStyledText>
-      {typeof props.value === 'string' ? (
-        <LegacyStyledText as="p">{props.value}</LegacyStyledText>
-      ) : (
-        props.value
-      )}
-    </Flex>
   )
 }
 
