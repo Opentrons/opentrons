@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
 
 import type { Run } from '@opentrons/api-client'
@@ -12,12 +11,7 @@ import {
   RUN_STATUS_STOPPED,
   RUN_STATUSES_TERMINAL,
 } from '@opentrons/api-client'
-import {
-  useDoorQuery,
-  useHost,
-  useRunCommandErrors,
-} from '@opentrons/react-api-client'
-import type { RunCommandError } from '@opentrons/shared-data'
+import { useHost, useRunCommandErrors } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import {
   BORDERS,
@@ -31,7 +25,7 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { getRobotSettings } from '../../../../redux/robot-settings'
+
 import { ProtocolAnalysisErrorBanner } from '../ProtocolAnalysisErrorBanner'
 import {
   DropTipWizardFlows,
@@ -67,7 +61,7 @@ import { getIsFixtureMismatch } from '../../../../resources/deck_configuration/u
 import { useDeckConfigurationCompatibility } from '../../../../resources/deck_configuration/hooks'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useMostRecentRunId } from '../../../ProtocolUpload/hooks/useMostRecentRunId'
-import { useNotifyRunQuery } from '../../../../resources/runs'
+import { useIsRunCurrent, useNotifyRunQuery } from '../../../../resources/runs'
 import {
   ErrorRecoveryFlows,
   useErrorRecoveryFlows,
@@ -77,14 +71,14 @@ import {
   ProtocolDropTipModal,
   useProtocolDropTipModal,
 } from '../ProtocolDropTipModal'
-import type { State } from '../../../../redux/types'
 import { DisplayRunStatus } from './DisplayRunStatus'
 import { LabeledValue } from './LabeledValueProps'
 import { TerminalRunBanner } from './TerminalRunBanner'
 import { ActionButton } from './ActionButton'
-import { EQUIPMENT_POLL_MS, CANCELLABLE_STATUSES } from './constants'
+import { CANCELLABLE_STATUSES } from './constants'
+import { useIsDoorOpen } from './hooks'
 
-const CURRENT_RUN_POLL_MS = 5000
+import type { RunCommandError } from '@opentrons/shared-data'
 
 interface ProtocolRunHeaderProps {
   protocolRunHeaderRef: React.RefObject<HTMLDivElement> | null
@@ -118,10 +112,8 @@ export function ProtocolRunHeader({
   const isRobotViewable = useIsRobotViewable(robotName)
   const runStatus = useRunStatus(runId)
   const { analysisErrors } = useProtocolAnalysisErrors(runId)
-  const isRunCurrent = Boolean(
-    useNotifyRunQuery(runId, { refetchInterval: CURRENT_RUN_POLL_MS })?.data
-      ?.data?.current
-  )
+  const isRunCurrent = useIsRunCurrent(runId)
+
   const mostRecentRunId = useMostRecentRunId()
   const isMostRecentRun = mostRecentRunId === runId
   const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
@@ -145,11 +137,8 @@ export function ProtocolRunHeader({
       ? getHighestPriorityError(runRecord.data.errors as RunCommandError[])
       : null
 
-  const robotSettings = useSelector((state: State) =>
-    getRobotSettings(state, robotName)
-  )
-  const isFlex = useIsFlex(robotName)
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
+  const isFlex = useIsFlex(robotName)
   const robotType = isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE
   const deckConfigCompatibility = useDeckConfigurationCompatibility(
     robotType,
@@ -157,21 +146,6 @@ export function ProtocolRunHeader({
   )
   const isFixtureMismatch = getIsFixtureMismatch(deckConfigCompatibility)
   const { isERActive, failedCommand } = useErrorRecoveryFlows(runId, runStatus)
-
-  const doorSafetySetting = robotSettings.find(
-    setting => setting.id === 'enableDoorSafetySwitch'
-  )
-  const { data: doorStatus } = useDoorQuery({
-    refetchInterval: EQUIPMENT_POLL_MS,
-  })
-  let isDoorOpen: boolean
-  if (isFlex) {
-    isDoorOpen = doorStatus?.data.status === 'open'
-  } else if (!isFlex && Boolean(doorSafetySetting?.value)) {
-    isDoorOpen = doorStatus?.data.status === 'open'
-  } else {
-    isDoorOpen = false
-  }
 
   const { showDTWiz, toggleDTWiz } = useDropTipWizardFlows()
   const {
@@ -203,6 +177,8 @@ export function ProtocolRunHeader({
       closeCurrentRun()
     },
   })
+
+  const isDoorOpen = useIsDoorOpen(robotName, isFlex)
 
   const enteredER = runRecord?.data.hasEverEnteredErrorRecovery ?? false
   const cancelledWithoutRecovery =
