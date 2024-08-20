@@ -13,14 +13,56 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { getTopPortalEl } from '../../../App/portal'
+import { getTopPortalEl } from '../../../../App/portal'
 
 import type { AnalysisError } from '@opentrons/shared-data'
+import { useProtocolAnalysisErrors } from '../../hooks'
 
-interface ProtocolAnalysisErrorModalProps {
+export type UseAnalysisErrorsModalProps = Omit<
+  ProtocolAnalysisErrorModalProps,
+  'errors' | 'onClose'
+> & { runId: string | null }
+
+export type UseAnalysisErrorsModalResult =
+  | { showModal: false; modalProps: null }
+  | { showModal: true; modalProps: ProtocolAnalysisErrorModalProps }
+
+// Provides validated modal props. Implicitly set the modal to true if analysis errors are present.
+export function useProtocolAnalysisErrorsModal({
+  robotName,
+  displayName,
+  runId,
+}: UseAnalysisErrorsModalProps): UseAnalysisErrorsModalResult {
+  const { analysisErrors } = useProtocolAnalysisErrors(runId)
+  const [showModal, setShowModal] = React.useState(false)
+
+  React.useEffect(() => {
+    if (analysisErrors != null && analysisErrors?.length > 0) {
+      setShowModal(true)
+    }
+  }, [analysisErrors])
+
+  const toggleModal = (): void => {
+    setShowModal(false)
+  }
+
+  return showModal && analysisErrors != null && analysisErrors.length > 0
+    ? {
+        showModal: true,
+        modalProps: {
+          onClose: toggleModal,
+          errors: analysisErrors,
+          robotName,
+          displayName,
+        },
+      }
+    : { showModal: false, modalProps: null }
+}
+
+export interface ProtocolAnalysisErrorModalProps {
   displayName: string | null
   errors: AnalysisError[]
-  onClose: React.MouseEventHandler<HTMLButtonElement>
+  onClose: () => void
   robotName: string
 }
 

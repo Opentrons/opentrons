@@ -32,7 +32,10 @@ import {
   useDropTipWizardFlows,
   useTipAttachmentStatus,
 } from '../../../DropTipWizardFlows'
-import { ProtocolAnalysisErrorModal } from '../ProtocolAnalysisErrorModal'
+import {
+  ProtocolAnalysisErrorModal,
+  useProtocolAnalysisErrorsModal,
+} from './ProtocolAnalysisErrorModal'
 import { Banner } from '../../../../atoms/Banner'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '../../../../redux/analytics'
 import { useCloseCurrentRun } from '../../../ProtocolUpload/hooks'
@@ -45,7 +48,6 @@ import {
 import {
   useIsFlex,
   useIsRobotViewable,
-  useProtocolAnalysisErrors,
   useProtocolDetailsForRun,
   useRobotAnalyticsData,
   useRunCreatedAtTimestamp,
@@ -111,13 +113,17 @@ export function ProtocolRunHeader({
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
   const isRobotViewable = useIsRobotViewable(robotName)
   const runStatus = useRunStatus(runId)
-  const { analysisErrors } = useProtocolAnalysisErrors(runId)
   const isRunCurrent = useIsRunCurrent(runId)
 
   const {
     showRunFailedModal,
     toggleModal: toggleRunFailedModal,
   } = useRunFailedModal()
+
+  const {
+    showModal: showAnalysisErrorsModal,
+    modalProps: analysisErrorsModalProps,
+  } = useProtocolAnalysisErrorsModal({ robotName, runId, displayName })
 
   const mostRecentRunId = useMostRecentRunId()
   const isMostRecentRun = mostRecentRunId === runId
@@ -251,20 +257,6 @@ export function ProtocolRunHeader({
 
   const { pause, play } = useRunControls(runId, onResetSuccess)
 
-  const [showAnalysisErrorModal, setShowAnalysisErrorModal] = React.useState(
-    false
-  )
-  const handleErrorModalCloseClick: React.MouseEventHandler = e => {
-    e.preventDefault()
-    e.stopPropagation()
-    setShowAnalysisErrorModal(false)
-  }
-  React.useEffect(() => {
-    if (analysisErrors != null && analysisErrors?.length > 0) {
-      setShowAnalysisErrorModal(true)
-    }
-  }, [analysisErrors])
-
   const [
     showConfirmCancelModal,
     setShowConfirmCancelModal,
@@ -312,16 +304,9 @@ export function ProtocolRunHeader({
         marginBottom={SPACING.spacing16}
         padding={SPACING.spacing16}
       >
-        {showAnalysisErrorModal &&
-          analysisErrors != null &&
-          analysisErrors.length > 0 && (
-            <ProtocolAnalysisErrorModal
-              displayName={displayName}
-              errors={analysisErrors}
-              onClose={handleErrorModalCloseClick}
-              robotName={robotName}
-            />
-          )}
+        {showAnalysisErrorsModal ? (
+          <ProtocolAnalysisErrorModal {...analysisErrorsModalProps} />
+        ) : null}
         <Flex>
           {protocolKey != null ? (
             <Link to={`/protocols/${protocolKey}`}>
@@ -342,9 +327,11 @@ export function ProtocolRunHeader({
             </LegacyStyledText>
           )}
         </Flex>
-        {analysisErrors != null && analysisErrors.length > 0 && (
-          <ProtocolAnalysisErrorBanner errors={analysisErrors} />
-        )}
+        {showAnalysisErrorsModal ? (
+          <ProtocolAnalysisErrorBanner
+            errors={analysisErrorsModalProps.errors}
+          />
+        ) : null}
         {runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR ? (
           <Banner type="warning" iconMarginLeft={SPACING.spacing4}>
             {t('close_door_to_resume')}
