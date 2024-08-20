@@ -49,34 +49,34 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 
-import { getRobotUpdateDisplayInfo } from '../../../redux/robot-update'
-import { getRobotSettings } from '../../../redux/robot-settings'
-import { getRobotSerialNumber } from '../../../redux/discovery'
-import { ProtocolAnalysisErrorBanner } from './ProtocolAnalysisErrorBanner'
+import { getRobotUpdateDisplayInfo } from '../../../../redux/robot-update'
+import { getRobotSettings } from '../../../../redux/robot-settings'
+import { getRobotSerialNumber } from '../../../../redux/discovery'
+import { ProtocolAnalysisErrorBanner } from '../ProtocolAnalysisErrorBanner'
 import {
   DropTipWizardFlows,
   useDropTipWizardFlows,
   useTipAttachmentStatus,
-} from '../../DropTipWizardFlows'
-import { ProtocolAnalysisErrorModal } from './ProtocolAnalysisErrorModal'
-import { Banner } from '../../../atoms/Banner'
+} from '../../../DropTipWizardFlows'
+import { ProtocolAnalysisErrorModal } from '../ProtocolAnalysisErrorModal'
+import { Banner } from '../../../../atoms/Banner'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
   ANALYTICS_PROTOCOL_RUN_ACTION,
-} from '../../../redux/analytics'
-import { getIsHeaterShakerAttached } from '../../../redux/config'
-import { useCloseCurrentRun } from '../../ProtocolUpload/hooks'
-import { ConfirmCancelModal } from '../../RunDetails/ConfirmCancelModal'
-import { HeaterShakerIsRunningModal } from '../HeaterShakerIsRunningModal'
+} from '../../../../redux/analytics'
+import { getIsHeaterShakerAttached } from '../../../../redux/config'
+import { useCloseCurrentRun } from '../../../ProtocolUpload/hooks'
+import { ConfirmCancelModal } from '../../../RunDetails/ConfirmCancelModal'
+import { HeaterShakerIsRunningModal } from '../../HeaterShakerIsRunningModal'
 import {
   useRunControls,
   useRunStatus,
   useRunTimestamps,
-} from '../../../organisms/RunTimeControl/hooks'
-import { useIsHeaterShakerInProtocol } from '../../ModuleCard/hooks'
-import { ConfirmAttachmentModal } from '../../ModuleCard/ConfirmAttachmentModal'
-import { ConfirmMissingStepsModal } from './ConfirmMissingStepsModal'
+} from '../../../../organisms/RunTimeControl/hooks'
+import { useIsHeaterShakerInProtocol } from '../../../ModuleCard/hooks'
+import { ConfirmAttachmentModal } from '../../../ModuleCard/ConfirmAttachmentModal'
+import { ConfirmMissingStepsModal } from '../ConfirmMissingStepsModal'
 import {
   useProtocolDetailsForRun,
   useProtocolAnalysisErrors,
@@ -89,27 +89,27 @@ import {
   useIsFlex,
   useModuleCalibrationStatus,
   useRobot,
-} from '../hooks'
-import { formatTimestamp } from '../utils'
-import { RunTimer } from './RunTimer'
-import { EMPTY_TIMESTAMP } from '../constants'
-import { getHighestPriorityError } from '../../OnDeviceDisplay/RunningProtocol'
-import { RunFailedModal } from './RunFailedModal'
-import { RunProgressMeter } from '../../RunProgressMeter'
-import { getIsFixtureMismatch } from '../../../resources/deck_configuration/utils'
-import { useDeckConfigurationCompatibility } from '../../../resources/deck_configuration/hooks'
-import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { useMostRecentRunId } from '../../ProtocolUpload/hooks/useMostRecentRunId'
-import { useNotifyRunQuery, useCurrentRunId } from '../../../resources/runs'
+} from '../../hooks'
+import { formatTimestamp } from '../../utils'
+import { RunTimer } from '../RunTimer'
+import { EMPTY_TIMESTAMP } from '../../constants'
+import { getHighestPriorityError } from '../../../OnDeviceDisplay/RunningProtocol'
+import { RunFailedModal } from '../RunFailedModal'
+import { RunProgressMeter } from '../../../RunProgressMeter'
+import { getIsFixtureMismatch } from '../../../../resources/deck_configuration/utils'
+import { useDeckConfigurationCompatibility } from '../../../../resources/deck_configuration/hooks'
+import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useMostRecentRunId } from '../../../ProtocolUpload/hooks/useMostRecentRunId'
+import { useNotifyRunQuery, useCurrentRunId } from '../../../../resources/runs'
 import {
   useErrorRecoveryFlows,
   ErrorRecoveryFlows,
-} from '../../ErrorRecoveryFlows'
-import { useRecoveryAnalytics } from '../../ErrorRecoveryFlows/hooks'
+} from '../../../ErrorRecoveryFlows'
+import { useRecoveryAnalytics } from '../../../ErrorRecoveryFlows/hooks'
 import {
   useProtocolDropTipModal,
   ProtocolDropTipModal,
-} from './ProtocolDropTipModal'
+} from '../ProtocolDropTipModal'
 
 import type {
   Run,
@@ -118,8 +118,9 @@ import type {
   RunStatus,
 } from '@opentrons/api-client'
 import type { IconName } from '@opentrons/components'
-import type { State } from '../../../redux/types'
-import type { HeaterShakerModule } from '../../../redux/modules/types'
+import type { RunCommandError } from '@opentrons/shared-data'
+import type { State } from '../../../../redux/types'
+import type { HeaterShakerModule } from '../../../../redux/modules/types'
 
 const EQUIPMENT_POLL_MS = 5000
 const CURRENT_RUN_POLL_MS = 5000
@@ -189,7 +190,7 @@ export function ProtocolRunHeader({
   const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
   const highestPriorityError =
     runRecord?.data.errors?.[0] != null
-      ? getHighestPriorityError(runRecord?.data?.errors)
+      ? getHighestPriorityError(runRecord.data.errors as RunCommandError[])
       : null
 
   const robotSettings = useSelector((state: State) =>
