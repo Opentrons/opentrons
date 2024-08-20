@@ -24,8 +24,8 @@ import {
   OT2_DISPLAY_NAME,
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
-import opentronsFlexImage from '../../../images/OpentronsFlex.png'
-import OT2Image from '../../../images/OT2.png'
+import opentronsFlexImage from '../../../assets/images/OpentronsFlex.png'
+import OT2Image from '../../../assets/images/OT2.png'
 import { HandleEnter } from './HandleEnter'
 
 import type { RobotType } from '@opentrons/shared-data'

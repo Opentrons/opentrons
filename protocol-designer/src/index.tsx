@@ -7,7 +7,7 @@ import { configureStore } from './configureStore'
 import { initialize } from './initialize'
 import { initializeMixpanel } from './analytics/mixpanel'
 import { getEnableRedesign } from './feature-flags/selectors'
-import { i18n } from './localization'
+import { i18n } from './assets/localization'
 import { App } from './App'
 import { GlobalStyle } from './atoms/GlobalStyle'
 

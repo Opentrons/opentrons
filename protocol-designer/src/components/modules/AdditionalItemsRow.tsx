@@ -19,9 +19,9 @@ import {
   TYPOGRAPHY,
   DIRECTION_ROW,
 } from '@opentrons/components'
-import gripperImage from '../../images/flex_gripper.png'
-import wasteChuteImage from '../../images/waste_chute.png'
-import trashBinImage from '../../images/flex_trash_bin.png'
+import gripperImage from '../../assets/images/flex_gripper.png'
+import wasteChuteImage from '../../assets/images/waste_chute.png'
+import trashBinImage from '../../assets/images/flex_trash_bin.png'
 import { getTopPortalEl } from '../portals/TopPortal'
 import { TrashModal } from './TrashModal'
 import { FlexSlotMap } from './FlexSlotMap'

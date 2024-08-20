@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { describe, it, vi, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
-import { i18n } from '../../../../localization'
+import { i18n } from '../../../../assets/localization'
 import { getPipetteEntities } from '../../../../step-forms/selectors'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { getTiprackOptions } from '../../../../ui/labware/selectors'

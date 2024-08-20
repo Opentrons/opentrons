@@ -14,7 +14,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { actions as loadFileActions } from '../../load-file'
-import welcomeImage from '../../images/welcome_page.png'
+import welcomeImage from '../../assets/images/welcome_page.png'
 import type { ThunkDispatch } from '../../types'
 
 export function Landing(): JSX.Element {

@@ -8,7 +8,7 @@ import {
   getCurrentPage,
   getNewProtocolModal,
 } from '../../../navigation/selectors'
-import { i18n } from '../../../localization'
+import { i18n } from '../../../assets/localization'
 import {
   getAdditionalEquipment,
   getInitialDeckSetup,

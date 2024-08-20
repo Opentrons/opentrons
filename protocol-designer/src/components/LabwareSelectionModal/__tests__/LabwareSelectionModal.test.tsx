@@ -14,7 +14,7 @@ import {
   ADAPTER_96_CHANNEL,
   getLabwareCompatibleWithAdapter,
 } from '../../../utils/labwareModuleCompatibility'
-import { i18n } from '../../../localization'
+import { i18n } from '../../../assets/localization'
 import { LabwareSelectionModal } from '../LabwareSelectionModal'
 import {
   getInitialDeckSetup,

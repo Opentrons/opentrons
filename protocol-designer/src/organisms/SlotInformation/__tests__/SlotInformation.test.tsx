@@ -3,7 +3,7 @@ import { describe, it, beforeEach, expect } from 'vitest'
 import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../localization'
+import { i18n } from '../../../assets/localization'
 
 import { SlotInformation } from '..'
 
