@@ -3,28 +3,36 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
 
-import {
-  RUN_STATUS_IDLE,
-  RUN_STATUS_RUNNING,
-  RUN_STATUS_PAUSED,
-  RUN_STATUS_STOP_REQUESTED,
-  RUN_STATUS_STOPPED,
-  RUN_STATUS_FAILED,
-  RUN_STATUS_FINISHING,
-  RUN_STATUS_SUCCEEDED,
-  RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
-  RUN_STATUS_AWAITING_RECOVERY,
-  RUN_STATUSES_TERMINAL,
-  RUN_STATUS_AWAITING_RECOVERY_PAUSED,
-  RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
+import type {
+  Run,
+  RunCommandErrors,
+  RunError,
+  RunStatus,
 } from '@opentrons/api-client'
 import {
-  useModulesQuery,
+  RUN_STATUS_AWAITING_RECOVERY,
+  RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
+  RUN_STATUS_AWAITING_RECOVERY_PAUSED,
+  RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
+  RUN_STATUS_FAILED,
+  RUN_STATUS_FINISHING,
+  RUN_STATUS_IDLE,
+  RUN_STATUS_PAUSED,
+  RUN_STATUS_RUNNING,
+  RUN_STATUS_STOP_REQUESTED,
+  RUN_STATUS_STOPPED,
+  RUN_STATUS_SUCCEEDED,
+  RUN_STATUSES_TERMINAL,
+} from '@opentrons/api-client'
+import {
   useDoorQuery,
   useHost,
+  useModulesQuery,
   useRunCommandErrors,
 } from '@opentrons/react-api-client'
+import type { RunCommandError } from '@opentrons/shared-data'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import type { IconName } from '@opentrons/components'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -61,9 +69,9 @@ import {
 import { ProtocolAnalysisErrorModal } from '../ProtocolAnalysisErrorModal'
 import { Banner } from '../../../../atoms/Banner'
 import {
-  useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
   ANALYTICS_PROTOCOL_RUN_ACTION,
+  useTrackEvent,
 } from '../../../../redux/analytics'
 import { getIsHeaterShakerAttached } from '../../../../redux/config'
 import { useCloseCurrentRun } from '../../../ProtocolUpload/hooks'
@@ -78,17 +86,17 @@ import { useIsHeaterShakerInProtocol } from '../../../ModuleCard/hooks'
 import { ConfirmAttachmentModal } from '../../../ModuleCard/ConfirmAttachmentModal'
 import { ConfirmMissingStepsModal } from '../ConfirmMissingStepsModal'
 import {
-  useProtocolDetailsForRun,
+  useIsFlex,
+  useIsRobotViewable,
+  useModuleCalibrationStatus,
   useProtocolAnalysisErrors,
+  useProtocolDetailsForRun,
+  useRobot,
+  useRobotAnalyticsData,
   useRunCalibrationStatus,
   useRunCreatedAtTimestamp,
-  useUnmatchedModulesForProtocol,
-  useIsRobotViewable,
   useTrackProtocolRunEvent,
-  useRobotAnalyticsData,
-  useIsFlex,
-  useModuleCalibrationStatus,
-  useRobot,
+  useUnmatchedModulesForProtocol,
 } from '../../hooks'
 import { formatTimestamp } from '../../utils'
 import { RunTimer } from '../RunTimer'
@@ -100,27 +108,19 @@ import { getIsFixtureMismatch } from '../../../../resources/deck_configuration/u
 import { useDeckConfigurationCompatibility } from '../../../../resources/deck_configuration/hooks'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useMostRecentRunId } from '../../../ProtocolUpload/hooks/useMostRecentRunId'
-import { useNotifyRunQuery, useCurrentRunId } from '../../../../resources/runs'
+import { useCurrentRunId, useNotifyRunQuery } from '../../../../resources/runs'
 import {
-  useErrorRecoveryFlows,
   ErrorRecoveryFlows,
+  useErrorRecoveryFlows,
 } from '../../../ErrorRecoveryFlows'
 import { useRecoveryAnalytics } from '../../../ErrorRecoveryFlows/hooks'
 import {
-  useProtocolDropTipModal,
   ProtocolDropTipModal,
+  useProtocolDropTipModal,
 } from '../ProtocolDropTipModal'
-
-import type {
-  Run,
-  RunCommandErrors,
-  RunError,
-  RunStatus,
-} from '@opentrons/api-client'
-import type { IconName } from '@opentrons/components'
-import type { RunCommandError } from '@opentrons/shared-data'
 import type { State } from '../../../../redux/types'
 import type { HeaterShakerModule } from '../../../../redux/modules/types'
+import { DisplayRunStatus } from './DisplayRunStatus'
 
 const EQUIPMENT_POLL_MS = 5000
 const CURRENT_RUN_POLL_MS = 5000
@@ -567,38 +567,6 @@ function LabeledValue(props: LabeledValueProps): JSX.Element {
       ) : (
         props.value
       )}
-    </Flex>
-  )
-}
-
-interface DisplayRunStatusProps {
-  runStatus: RunStatus | null
-}
-
-function DisplayRunStatus(props: DisplayRunStatusProps): JSX.Element {
-  const { t } = useTranslation('run_details')
-  return (
-    <Flex alignItems={ALIGN_CENTER}>
-      {props.runStatus === RUN_STATUS_RUNNING ? (
-        <Icon
-          name="circle"
-          color={COLORS.blue50}
-          size={SPACING.spacing4}
-          marginRight={SPACING.spacing4}
-          data-testid="running_circle"
-        >
-          <animate
-            attributeName="fill"
-            values={`${COLORS.blue50}; transparent`}
-            dur="1s"
-            calcMode="discrete"
-            repeatCount="indefinite"
-          />
-        </Icon>
-      ) : null}
-      <LegacyStyledText as="p">
-        {props.runStatus != null ? t(`status_${String(props.runStatus)}`) : ''}
-      </LegacyStyledText>
     </Flex>
   )
 }
