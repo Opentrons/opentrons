@@ -2,7 +2,6 @@
 import random
 import logging
 import paho.mqtt.client as mqtt
-from anyio import to_thread
 from fastapi import Depends
 from typing import Annotated, Any, Dict, Optional
 from enum import Enum
@@ -77,10 +76,10 @@ class NotificationClient:
         )
         self._client.loop_start()
 
-    async def disconnect(self) -> None:
+    def disconnect(self) -> None:
         """Disconnect the client from the MQTT broker."""
         self._client.loop_stop()
-        await to_thread.run_sync(self._client.disconnect)
+        self._client.disconnect()
 
     def publish_advise_refetch(
         self,
@@ -183,6 +182,8 @@ def initialize_notification_client(app_state: AppState) -> None:
         )
 
 
+# todo(mm, 2024-08-20): When ASGI app teardown no longer uses asyncio.gather(),
+# this can be non-async.
 async def clean_up_notification_client(app_state: AppState) -> None:
     """Clean up the `NotificationClient` stored on `app_state`.
 
@@ -193,7 +194,7 @@ async def clean_up_notification_client(app_state: AppState) -> None:
     ] = _notification_client_accessor.get_from(app_state)
 
     if notification_client is not None:
-        await notification_client.disconnect()
+        notification_client.disconnect()
 
 
 def get_notification_client(
