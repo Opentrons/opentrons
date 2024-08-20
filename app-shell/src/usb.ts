@@ -98,6 +98,18 @@ function reconstructFormData(ipcSafeFormData: IPCSafeFormData): FormData {
     return result
 }
 
+const cloneError = (e: object): object =>
+    Object.entries(axios.isAxiosError(e) ? e.toJSON() : e).reduce(
+        (acc, [k, v]) => {
+            try {
+                return (acc[k] = structuredClone(v))
+            } catch (e) {
+                return acc
+            }
+        },
+        {}
+    )
+
 async function usbListener(
     _event: IpcMainInvokeEvent,
     config: AxiosRequestConfig
@@ -135,7 +147,7 @@ async function usbListener(
     } catch (e) {
         usbLog.info(`${config.method} ${config.url} failed: ${e}`)
         return {
-            error: axios.isAxiosError(e) ? e.toJSON() : e,
+            error: cloneError(e),
         }
     }
 }
