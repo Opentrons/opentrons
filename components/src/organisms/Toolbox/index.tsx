@@ -17,10 +17,11 @@ export interface ToolboxProps {
   title: string
   children: React.ReactNode
   confirmButtonText: string
+  onConfirmClick: () => void
   onCloseClick: () => void
-  titleIconName: IconName
-  closeButtonText?: string
+  closeButtonText: string
   width?: string
+  titleIconName?: IconName
 }
 
 export function Toolbox(props: ToolboxProps): JSX.Element {
@@ -29,6 +30,7 @@ export function Toolbox(props: ToolboxProps): JSX.Element {
     children,
     confirmButtonText,
     onCloseClick,
+    onConfirmClick,
     titleIconName,
     closeButtonText,
     width = '19.5rem',
@@ -76,10 +78,11 @@ export function Toolbox(props: ToolboxProps): JSX.Element {
           borderBottom={`1px solid ${COLORS.grey30}`}
         >
           <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
-            <Icon name={titleIconName} size="1.25rem" />
+            {titleIconName != null ? (
+              <Icon name={titleIconName} size="1.25rem" />
+            ) : null}
             <StyledText desktopStyle="bodyLargeSemiBold">{title}</StyledText>
           </Flex>
-
           <Btn
             onClick={onCloseClick}
             textDecoration={textDecorationUnderline}
@@ -110,7 +113,7 @@ export function Toolbox(props: ToolboxProps): JSX.Element {
           <PrimaryButton
             width="100%"
             data-testid="Toolbox_confirmButton"
-            onClick={onCloseClick}
+            onClick={onConfirmClick}
           >
             {confirmButtonText}
           </PrimaryButton>

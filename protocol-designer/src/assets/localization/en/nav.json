@@ -1,0 +1,29 @@
+{
+  "settings": {
+    "app": "APP",
+    "privacy": "PRIVACY",
+    "feature_flags": "Feature Flags"
+  },
+  "tab_name": {
+    "design": "DESIGN",
+    "file": "FILE",
+    "help": "HELP",
+    "liquids": "LIQUIDS",
+    "settings": "Settings"
+  },
+  "terminal_item": {
+    "__initial_setup__": "Starting Deck State",
+    "__end__": "Final Deck State"
+  },
+  "title": {
+    "settings-features": "Protocol Designer",
+    "settings-app": "Protocol Designer",
+    "file-splash": "Protocol Designer"
+  },
+  "subtitle": {
+    "file-detail": "File Details",
+    "settings-app": "App Settings",
+    "liquids": "Liquids"
+  },
+  "nameAndLiquids": "Name & Liquids"
+}

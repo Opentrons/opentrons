@@ -1,6 +1,12 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { Flex, RadioButton, SPACING, StyledText } from '@opentrons/components'
+import {
+  DIRECTION_COLUMN,
+  Flex,
+  RadioButton,
+  SPACING,
+  StyledText,
+} from '@opentrons/components'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import { WizardBody } from './WizardBody'
 import type { WizardTileProps } from './types'
@@ -16,12 +22,12 @@ export function SelectRobot(props: WizardTileProps): JSX.Element {
       stepNumber={1}
       header={t('basics')}
       subHeader={t('questions')}
-      disabled={robotType === undefined}
+      disabled={false}
       proceed={() => {
         proceed(1)
       }}
     >
-      <>
+      <Flex flexDirection={DIRECTION_COLUMN} marginTop={SPACING.spacing60}>
         <StyledText
           desktopStyle="headingSmallBold"
           marginBottom={SPACING.spacing16}
@@ -47,7 +53,7 @@ export function SelectRobot(props: WizardTileProps): JSX.Element {
             isSelected={robotType === OT2_ROBOT_TYPE}
           />
         </Flex>
-      </>
+      </Flex>
     </WizardBody>
   )
 }

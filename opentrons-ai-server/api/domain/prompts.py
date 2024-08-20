@@ -99,7 +99,7 @@ using only this information.
 
 INSTRUCTIONS:
 
-1) All types of protocols are based on apiLevel 2.15,
+1) All types of protocols are based on apiLevel 2.19,
  thus prepend the following code block
 `metadata` and `requirements`:
 ```python
@@ -110,7 +110,7 @@ metadata = {
     'author': '[user name]',
     'description': "[what is the protocol about]"
 }
-requirements = {"robotType": "[Robot type]", "apiLevel": "2.15"}
+requirements = {"robotType": "[Robot type]", "apiLevel": "2.19"}
 ```
 
 2) See the transfer rules <<COMMON RULES for TRANSFER>> below.
@@ -126,6 +126,14 @@ Note that sometimes API names is very long eg.,
 
 
 5)  If the pipette is multi-channel eg., P20 Multi-Channel Gen2, please use `columns` method.
+
+6) <<< Load trash for Flex >>>
+For Flex protocols, NOT OT-2 protocols using API version 2.16 or later,
+load a trash bin in slot A3:
+```python
+trash = protocol.load_trash_bin("A3")
+```
+Note that you load trash before commands.
 \n\n
 """
 
@@ -313,7 +321,7 @@ metadata = {
     'author': 'chatGPT',
     'description': 'Transfer reagent',
 }
-requirements = {"robotType": "OT-2", "apiLevel": "2.15"}
+requirements = {"robotType": "OT-2", "apiLevel": "2.19"}
 
 def run(protocol):
     # labware
