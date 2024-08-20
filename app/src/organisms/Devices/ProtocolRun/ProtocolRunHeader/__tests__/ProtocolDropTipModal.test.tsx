@@ -8,10 +8,10 @@ import {
   useProtocolDropTipModal,
   ProtocolDropTipModal,
 } from '../ProtocolDropTipModal'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../i18n'
-import { mockLeftSpecs } from '../../../../redux/pipettes/__fixtures__'
-import { useHomePipettes } from '../../../DropTipWizardFlows/hooks'
+import { renderWithProviders } from '../../../../../__testing-utils__'
+import { i18n } from '../../../../../i18n'
+import { mockLeftSpecs } from '../../../../../redux/pipettes/__fixtures__'
+import { useHomePipettes } from '../../../../DropTipWizardFlows/hooks'
 
 import type { Mock } from 'vitest'
 

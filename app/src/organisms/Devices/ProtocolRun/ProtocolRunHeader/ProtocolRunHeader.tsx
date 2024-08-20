@@ -72,7 +72,7 @@ import { useRecoveryAnalytics } from '../../../ErrorRecoveryFlows/hooks'
 import {
   ProtocolDropTipModal,
   useProtocolDropTipModal,
-} from '../ProtocolDropTipModal'
+} from './ProtocolDropTipModal'
 import { DisplayRunStatus } from './DisplayRunStatus'
 import { LabeledValue } from './LabeledValueProps'
 import { TerminalRunBanner } from './TerminalRunBanner'
