@@ -95,17 +95,17 @@ function reconstructFormData(ipcSafeFormData: IPCSafeFormData): FormData {
 }
 
 const cloneError = (e: any): Record<string, unknown> =>
-  Object.entries(axios.isAxiosError(e) ? e.toJSON() : e).reduce(
-    (acc, [k, v]) => {
-      try {
-        acc[k] = structuredClone(v)
-        return acc
-      } catch (e) {
-        return acc
-      }
-    },
-    {} as Record<string, unknown>
-  )
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+  Object.entries(axios.isAxiosError(e) ? e.toJSON() : e).reduce<
+    Record<string, unknown>
+  >((acc, [k, v]) => {
+    try {
+      acc[k] = structuredClone(v)
+      return acc
+    } catch (e) {
+      return acc
+    }
+  }, {})
 
 async function usbListener(
   _event: IpcMainInvokeEvent,
