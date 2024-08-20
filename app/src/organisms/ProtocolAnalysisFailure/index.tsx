@@ -51,7 +51,6 @@ export function ProtocolAnalysisFailure(
     e.stopPropagation()
     dispatch(analyzeProtocol(protocolKey))
   }
-  console.log('errors ', errors)
   return (
     <Banner type="warning" marginRight={SPACING.spacing24}>
       <Flex
