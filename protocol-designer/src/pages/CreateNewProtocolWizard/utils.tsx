@@ -3,9 +3,9 @@ import {
   MAGNETIC_BLOCK_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import wasteChuteImage from '../../images/waste_chute.png'
-import trashBinImage from '../../images/flex_trash_bin.png'
-import stagingAreaImage from '../../images/staging_area.png'
+import wasteChuteImage from '../../assets/images/waste_chute.png'
+import trashBinImage from '../../assets/images/flex_trash_bin.png'
+import stagingAreaImage from '../../assets/images/staging_area.png'
 
 import type { AdditionalEquipment, WizardFormState } from './types'
 
