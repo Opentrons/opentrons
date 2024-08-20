@@ -64,6 +64,101 @@
           "type": "number"
         }
       }
+    },
+    "CircularCrossSection": {
+      "type": "object",
+      "properties": {
+        "shape": {
+          "type": "string",
+          "description": ".",
+          "enum": ["circular"]
+        },
+        "diameter": {
+          "type": "number"
+        }
+      }
+    },
+    "RectangularCrossSection": {
+      "type": "object",
+      "properties": {
+        "shape": {
+          "type": "string",
+          "description": ".",
+          "enum": ["rectangular"]
+        },
+        "xDimension": {
+          "type": "number"
+        },
+        "yDimension": {
+          "type": "number"
+        }
+      }
+    },
+    "SphericalSegment": {
+      "type": "object",
+      "properties": {
+        "shape": {
+          "type": "string",
+          "description": ".",
+          "enum": ["spherical"]
+        },
+        "radiusOfCurvature": {
+          "type": "number"
+        },
+        "depth": {
+          "type": "number"
+        }
+      }
+    },
+    "BoundedSection": {
+      "type": "object",
+      "properties": {
+        "geometry": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/CircularCrossSection"
+            },
+            {
+              "$ref": "#/definitions/RectangularCrossSection"
+            }
+          ]
+        },
+        "topHeight": {
+          "type": "number",
+          "description": "."
+        }
+      }
+    },
+    "InnerWellGeometry": {
+      "type": "object",
+      "required": ["frusta", "bottomShape"],
+      "properties": {
+        "frusta": "array",
+        "description": ".",
+        "items": {
+          "type": "object",
+          "description": ".",
+          "additionalProperties": {
+            "$ref": "#/definitions/BoundedSection"
+          }
+        },
+        "bottomShape": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/CircularCrossSection"
+            },
+            {
+              "$ref": "#/definitions/RectangularCrossSection"
+            },
+            {
+              "$ref": "#/definitions/SphericalSegment"
+            }
+          ]
+        }
+
+
+
+      }
     }
   },
   "type": "object",
@@ -273,7 +368,7 @@
             },
             "geometryDefinitionId": {
               "description": "string id of the well's corresponding innerWellGeometry",
-              "type": "string"
+              "type": ["string", "null"]
             }
           }
         }
@@ -374,55 +469,12 @@
     },
     "innerLabwareGeometry": {
       "type": "object",
-      "properties": {
-        "default": {
-          "type": "object",
-          "properties": {
-            "frusta": {
-              "type": "array",
-              "description": "A list of all of the sections of the well that have a contiguous shape",
-              "items": {
-                "type": "object",
-                "required": ["shape"],
-                "oneOf": [
-                  { "required": ["xDimension", "yDimension"] },
-                  { "required": ["diameter"] }
-                ],
-                "not": {
-                  "anyOf": [
-                    { "required": ["diameter", "xDimension"] },
-                    { "required": ["diameter", "yDimension"] }
-                  ]
-                },
-                "topHeight": {
-                  "description": "The height at the top of a bounded subsection of a well, relative to the bottom of the well",
-                  "$ref": "#/definitions/positiveNumber"
-                }
-              }
-            },
-            "bottomShape": {
-              "type": "object",
-              "required": ["shape"],
-              "oneOf": [
-                { "required": ["xDimension", "yDimension"] },
-                { "required": ["radiusOfCurvature", "depth"] },
-                { "required": ["diameter"] }
-              ],
-              "not": {
-                "anyOf": [
-                  { "required": ["radiusOfCurvature", "xDimension"] },
-                  { "required": ["radiusOfCurvature", "yDimension"] },
-                  { "required": ["depth", "xDimension"] },
-                  { "required": ["depth", "yDimension"] },
-                  { "required": ["diameter", "xDimension"] },
-                  { "required": ["diameter", "yDimension"] },
-                  { "required": ["diameter", "depth"] }
-                ]
-              }
-            }
-          }
-        }
+      "description": ".",
+      "additionalProperties": {
+        "$ref": "#/definitions/InnerWellGeometry"
       }
     }
   }
 }
+
+
