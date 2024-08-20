@@ -19,7 +19,6 @@ from opentrons.protocol_engine.types import (
 from opentrons_shared_data.errors.exceptions import ExecutionCancelledError
 
 MODULE_LOG = logging.getLogger(__name__)
-EXEC_MODULE_NAME = "opentrons_protocol_exec"
 
 
 def _runfunc_ok(run_func: Any):
@@ -115,7 +114,7 @@ def exec_add_parameters(
     run_time_param_file_overrides: Optional[CSVRuntimeParamPaths],
 ) -> Optional[Parameters]:
     """Exec the add_parameters function and get the final run time parameters with overrides."""
-    new_globs: Dict[Any, Any] = {"__name__": EXEC_MODULE_NAME}
+    new_globs: Dict[Any, Any] = {"__name__": 'opentrons_exec_params'}
     exec(protocol.contents, new_globs)
     filename = _get_filename(protocol)
 
@@ -137,7 +136,7 @@ def exec_run(
     context: ProtocolContext,
     run_time_parameters_with_overrides: Optional[Parameters] = None,
 ) -> None:
-    new_globs: Dict[Any, Any] = {"__name__": EXEC_MODULE_NAME}
+    new_globs: Dict[Any, Any] = {"__name__": 'opentrons_exec_run'}
     exec(proto.contents, new_globs)
     # If the protocol is written correctly, it will have defined a function
     # like run(context: ProtocolContext). If so, that function is now in the
