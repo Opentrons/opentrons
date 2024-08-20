@@ -282,6 +282,23 @@ class DeckSlotName(enum.Enum):
         str_val = str(value).upper()
         return cls(str_val)
 
+    @classmethod
+    def ot3_slots(cls) -> List["DeckSlotName"]:
+        return [
+            DeckSlotName.SLOT_A1,
+            DeckSlotName.SLOT_A2,
+            DeckSlotName.SLOT_A3,
+            DeckSlotName.SLOT_B1,
+            DeckSlotName.SLOT_B2,
+            DeckSlotName.SLOT_B3,
+            DeckSlotName.SLOT_C1,
+            DeckSlotName.SLOT_C2,
+            DeckSlotName.SLOT_C3,
+            DeckSlotName.SLOT_D1,
+            DeckSlotName.SLOT_D2,
+            DeckSlotName.SLOT_D3,
+        ]
+
     # TODO(mm, 2023-05-08):
     # Migrate callers off of this method. https://opentrons.atlassian.net/browse/RLAB-345
     def as_int(self) -> int:

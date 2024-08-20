@@ -4,7 +4,7 @@ import { css } from 'styled-components'
 import {
   FormGroup,
   Text,
-  Tooltip,
+  LegacyTooltip,
   useHoverTooltip,
   FONT_WEIGHT_SEMIBOLD,
   FONT_SIZE_BODY_1,
@@ -85,9 +85,9 @@ export const WellOrderField = (props: WellOrderFieldProps): JSX.Element => {
 
   return (
     <>
-      <Tooltip {...tooltipProps}>
+      <LegacyTooltip {...tooltipProps}>
         {t('step_edit_form.field.well_order.label')}
-      </Tooltip>
+      </LegacyTooltip>
       <div {...targetProps}>
         <FormGroup label={props.label} className={className}>
           {firstValue != null && secondValue != null ? (

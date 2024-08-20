@@ -8,7 +8,7 @@ import {
   FormGroup,
   BUTTON_TYPE_SUBMIT,
   OutlineButton,
-  Tooltip,
+  LegacyTooltip,
   useHoverTooltip,
   ModalShell,
   Flex,
@@ -358,7 +358,9 @@ const EditModulesModalComponent = (
               {showSlotOption && (
                 <>
                   {!enableSlotSelection && (
-                    <Tooltip {...tooltipProps}>{slotOptionTooltip}</Tooltip>
+                    <LegacyTooltip {...tooltipProps}>
+                      {slotOptionTooltip}
+                    </LegacyTooltip>
                   )}
 
                   <Box {...targetProps} height="3.125rem">

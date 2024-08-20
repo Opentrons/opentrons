@@ -5,36 +5,43 @@ import {
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
+  DIRECTION_ROW,
   Flex,
   Icon,
-  JUSTIFY_FLEX_END,
   SPACING,
-  LegacyStyledText,
+  StyledText,
   TYPOGRAPHY,
+  JUSTIFY_SPACE_BETWEEN,
+  Chip,
 } from '@opentrons/components'
 import {
-  parseLiquidsInLoadOrder,
+  MICRO_LITERS,
   parseLabwareInfoByLiquidId,
-} from '@opentrons/api-client'
-import { MICRO_LITERS } from '@opentrons/shared-data'
+  parseLiquidsInLoadOrder,
+} from '@opentrons/shared-data'
 import { ODDBackButton } from '../../molecules/ODDBackButton'
+import { SmallButton } from '../../atoms/buttons'
+
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getTotalVolumePerLiquidId } from '../Devices/ProtocolRun/SetupLiquids/utils'
 import { LiquidDetails } from './LiquidDetails'
-import type { RunTimeCommand } from '@opentrons/shared-data'
-import type { ParsedLiquid } from '@opentrons/api-client'
+import type { ParsedLiquid, RunTimeCommand } from '@opentrons/shared-data'
 import type { SetupScreens } from '../../pages/ProtocolSetup'
 
 export interface ProtocolSetupLiquidsProps {
   runId: string
   setSetupScreen: React.Dispatch<React.SetStateAction<SetupScreens>>
+  isConfirmed: boolean
+  setIsConfirmed: (confirmed: boolean) => void
 }
 
 export function ProtocolSetupLiquids({
   runId,
   setSetupScreen,
+  isConfirmed,
+  setIsConfirmed,
 }: ProtocolSetupLiquidsProps): JSX.Element {
-  const { t } = useTranslation('protocol_setup')
+  const { t, i18n } = useTranslation('protocol_setup')
   const protocolData = useMostRecentCompletedAnalysis(runId)
   const liquidsInLoadOrder = parseLiquidsInLoadOrder(
     protocolData?.liquids ?? [],
@@ -42,17 +49,51 @@ export function ProtocolSetupLiquids({
   )
   return (
     <>
-      <ODDBackButton
-        label={t('liquids')}
-        onClick={() => {
-          setSetupScreen('prepare to run')
-        }}
-      />
+      <Flex
+        flexDirection={DIRECTION_ROW}
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+      >
+        <ODDBackButton
+          label={i18n.format(t('liquids'), 'capitalize')}
+          onClick={() => {
+            setSetupScreen('prepare to run')
+          }}
+        />
+        {isConfirmed ? (
+          <Chip
+            background
+            iconName="ot-check"
+            text={t('liquids_confirmed')}
+            type="success"
+            chipSize="small"
+          />
+        ) : (
+          <SmallButton
+            buttonText={t('confirm_liquids')}
+            onClick={() => {
+              setIsConfirmed(true)
+              setSetupScreen('prepare to run')
+            }}
+          />
+        )}
+      </Flex>
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing8}
         marginTop="2.375rem"
       >
+        <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} marginRight="13rem">
+          <Flex paddingLeft={SPACING.spacing16} width="10.5625rem">
+            <StyledText oddStyle="smallBodyTextSemiBold" color={COLORS.grey60}>
+              {t('liquid_name')}
+            </StyledText>
+          </Flex>
+          <Flex>
+            <StyledText oddStyle="smallBodyTextSemiBold" color={COLORS.grey60}>
+              {t('total_liquid_volume')}
+            </StyledText>
+          </Flex>
+        </Flex>
         {liquidsInLoadOrder?.map(liquid => (
           <React.Fragment key={liquid.id}>
             <LiquidsList
@@ -114,18 +155,18 @@ export function LiquidsList(props: LiquidsListProps): JSX.Element {
           flexDirection={DIRECTION_COLUMN}
           alignItems={TYPOGRAPHY.textAlignCenter}
         >
-          <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          <StyledText oddStyle="bodyTextSemiBold">
             {liquid.displayName}
-          </LegacyStyledText>
+          </StyledText>
         </Flex>
-        <Flex justifyContent={JUSTIFY_FLEX_END} flex="1">
+        <Flex flex="1">
           <Flex
-            backgroundColor={COLORS.grey35}
-            borderRadius={BORDERS.borderRadius4}
+            backgroundColor={`${COLORS.black90}${COLORS.opacity20HexCode}`}
+            borderRadius={BORDERS.borderRadius8}
             height="2.75rem"
             padding={`${SPACING.spacing8} ${SPACING.spacing12}`}
             alignItems={TYPOGRAPHY.textAlignCenter}
-            marginRight={SPACING.spacing8}
+            marginLeft="30.825rem"
           >
             {getTotalVolumePerLiquidId(liquid.id, labwareByLiquidId)}{' '}
             {MICRO_LITERS}

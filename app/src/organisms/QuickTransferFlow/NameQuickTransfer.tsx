@@ -1,18 +1,20 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
+
 import {
-  Flex,
-  LegacyStyledText,
-  SPACING,
-  DIRECTION_COLUMN,
-  POSITION_FIXED,
   COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  InputField,
+  LegacyStyledText,
+  POSITION_FIXED,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
 import { getTopPortalEl } from '../../App/portal'
 import { AlphanumericKeyboard } from '../../atoms/SoftwareKeyboard'
-import { InputField } from '../../atoms/InputField'
 import { ChildNavigation } from '../ChildNavigation'
 
 interface NameQuickTransferProps {

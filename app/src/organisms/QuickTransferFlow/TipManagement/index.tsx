@@ -1,20 +1,20 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  Flex,
-  LegacyStyledText,
-  SPACING,
-  TYPOGRAPHY,
-  DIRECTION_COLUMN,
-  JUSTIFY_SPACE_BETWEEN,
-  COLORS,
-  TEXT_ALIGN_RIGHT,
-  Icon,
-  SIZE_2,
   ALIGN_CENTER,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  Icon,
+  JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
+  ListItem,
+  SIZE_2,
+  SPACING,
+  TEXT_ALIGN_RIGHT,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { TRASH_BIN_ADAPTER_FIXTURE } from '@opentrons/shared-data'
-import { ListItem } from '../../../atoms/ListItem'
 import { ChangeTip } from './ChangeTip'
 import { TipDropLocation } from './TipDropLocation'
 

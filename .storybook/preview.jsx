@@ -7,7 +7,7 @@ global.APP_SHELL_REMOTE = {
   ipcRenderer: {
     on: (topic, cb) => {},
     invoke: (callname, args) => {},
-    send:  (message, payload) => {}
+    send: (message, payload) => {},
   },
 }
 global._PKG_VERSION_ = '0.0.0-storybook'
@@ -29,8 +29,8 @@ export const customViewports = {
     type: 'desktop',
     styles: {
       width: '600px',
-      height: '450px'
-    }
+      height: '450px',
+    },
   },
   desktopSmall: {
     // A size typically used in figma app backgrounds, useful for viewing
@@ -39,9 +39,9 @@ export const customViewports = {
     type: 'desktop',
     styles: {
       width: '1024px',
-      height: '700px'
-    }
-  }
+      height: '700px',
+    },
+  },
 }
 
 export const parameters = {
@@ -50,7 +50,14 @@ export const parameters = {
   options: {
     storySort: {
       method: 'alphabetical',
-      order: ['Design Tokens', 'Library', 'App', 'ODD', 'AI'],
+      order: [
+        'Design Tokens',
+        'Library',
+        'App',
+        'ODD',
+        'Protocol-Designer',
+        'AI',
+      ],
     },
   },
 }

@@ -1,5 +1,5 @@
 from enum import Enum, auto
-from typing import TYPE_CHECKING, Optional, Union, cast, Tuple, List, Set
+from typing import TYPE_CHECKING, Any, Optional, Union, cast, Tuple, List, Set
 
 if TYPE_CHECKING:
     from opentrons.protocol_api.labware import Labware, Well
@@ -161,7 +161,7 @@ class LabwareLike:
         seen: Set[LabwareLike] = set()
 
         # internal function to have the cycle detector different per call
-        def _fp_recurse(location: LabwareLike):
+        def _fp_recurse(location: LabwareLike) -> Optional[str]:
             if location in seen:
                 raise RuntimeError("Cycle in labware parent")
             seen.add(location)
@@ -222,12 +222,12 @@ class LabwareLike:
     def __repr__(self) -> str:
         return str(self)
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         return (
             other is not None
             and isinstance(other, LabwareLike)
             and self.object == other.object
         )
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return id(self)

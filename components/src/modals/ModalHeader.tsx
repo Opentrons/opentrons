@@ -12,6 +12,8 @@ import type { IconProps } from '../icons'
 export interface ModalHeaderProps {
   title: React.ReactNode
   onClose?: React.MouseEventHandler
+  titleElement1?: JSX.Element
+  titleElement2?: JSX.Element
   backgroundColor?: string
   color?: string
   icon?: IconProps
@@ -35,7 +37,16 @@ const closeIconStyles = css`
 `
 
 export const ModalHeader = (props: ModalHeaderProps): JSX.Element => {
-  const { icon, onClose, title, backgroundColor, color, closeButton } = props
+  const {
+    icon,
+    onClose,
+    title,
+    titleElement1,
+    titleElement2,
+    backgroundColor,
+    color,
+    closeButton,
+  } = props
   return (
     <>
       <Flex
@@ -46,8 +57,11 @@ export const ModalHeader = (props: ModalHeaderProps): JSX.Element => {
         backgroundColor={backgroundColor}
         data-testid="Modal_header"
       >
-        <Flex>
+        <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
           {icon != null && <Icon {...icon} data-testid="Modal_header_icon" />}
+          {titleElement1}
+          {titleElement2}
+          {/* TODO (nd: 08/07/2024) Convert to StyledText once designs are resolved */}
           <LegacyStyledText
             as="h3"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}

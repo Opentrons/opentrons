@@ -15,6 +15,8 @@ from opentrons.protocols.execution import execute_json_v4, execute_json_v3
 from opentrons.protocols.types import PythonProtocol, Protocol
 from opentrons.protocols.api_support.types import APIVersion
 
+from opentrons.protocols.parameters.csv_parameter_interface import CSVParameter
+
 MODULE_LOG = logging.getLogger(__name__)
 
 
@@ -32,14 +34,24 @@ def run_protocol(
         or execute, this will be None (until RTP is supported in cli commands)
     """
     if isinstance(protocol, PythonProtocol):
-        if protocol.api_level >= APIVersion(2, 0):
-            exec_run(
-                proto=protocol,
-                context=context,
-                run_time_parameters_with_overrides=run_time_parameters_with_overrides,
-            )
-        else:
-            raise RuntimeError(f"Unsupported python API version: {protocol.api_level}")
+        try:
+            if protocol.api_level >= APIVersion(2, 0):
+                exec_run(
+                    proto=protocol,
+                    context=context,
+                    run_time_parameters_with_overrides=run_time_parameters_with_overrides,
+                )
+            else:
+                raise RuntimeError(
+                    f"Unsupported python API version: {protocol.api_level}"
+                )
+        except Exception:
+            raise
+        finally:
+            if protocol.api_level >= APIVersion(2, 18):
+                for parameter in context.params.get_all().values():
+                    if isinstance(parameter, CSVParameter) and parameter.file_opened:
+                        parameter.file.close()
     else:
         if protocol.contents["schemaVersion"] == 3:
             ins = execute_json_v3.load_pipettes_from_json(context, protocol.contents)

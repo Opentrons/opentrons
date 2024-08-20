@@ -74,7 +74,7 @@ describe('ErrorDetailsModal', () => {
     expect(vi.mocked(OddModal)).toHaveBeenCalledWith(
       expect.objectContaining({
         header: {
-          title: 'Error',
+          title: 'Tip not detected',
           hasExitIcon: true,
         },
         onOutsideClick: props.toggleModal,
@@ -95,8 +95,11 @@ describe('ErrorDetailsModal', () => {
     it('renders the OverpressureBanner when the error kind is an overpressure error', () => {
       props.failedCommand = {
         ...props.failedCommand,
-        commandType: 'aspirate',
-        error: { isDefined: true, errorType: 'overpressure' },
+        byRunRecord: {
+          ...props.failedCommand?.byRunRecord,
+          commandType: 'aspirate',
+          error: { isDefined: true, errorType: 'overpressure' },
+        },
       } as any
       render({ ...props, isOnDevice })
 
@@ -126,7 +129,9 @@ describe('OverpressureBanner', () => {
       expect.objectContaining({
         type: 'alert',
         heading:
-          'Overpressure is usually caused by a tip contacting labware, a clog, or moving viscous liquid too quickly. If the issue persists, cancel the run and make the necessary changes to the protocol.',
+          'Overpressure is usually caused by a tip contacting labware, a clog, or moving viscous liquid too quickly',
+        message:
+          ' If the issue persists, cancel the run and make the necessary changes to the protocol',
       }),
       {}
     )

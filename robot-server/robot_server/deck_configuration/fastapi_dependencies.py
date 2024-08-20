@@ -2,7 +2,7 @@
 
 
 from pathlib import Path
-from typing import Optional
+from typing import Annotated, Optional
 
 import fastapi
 
@@ -19,31 +19,30 @@ from robot_server.persistence.fastapi_dependencies import (
     get_active_persistence_directory,
     get_active_persistence_directory_failsafe,
 )
+from robot_server.persistence.file_and_directory_names import DECK_CONFIGURATION_FILE
 from robot_server.service.notifications import (
     DeckConfigurationPublisher,
     get_deck_configuration_publisher,
 )
 
 
-# This needs to be kept in sync with opentrons.execute, which reads this file.
-_DECK_CONFIGURATION_FILE_NAME = "deck_configuration.json"
-
-
 _accessor = AppStateAccessor[DeckConfigurationStore]("deck_configuration_store")
 
 
 async def get_deck_configuration_store(
-    app_state: AppState = fastapi.Depends(get_app_state),
-    deck_type: DeckType = fastapi.Depends(get_deck_type),
-    persistence_directory: Path = fastapi.Depends(get_active_persistence_directory),
-    deck_configuration_publisher: DeckConfigurationPublisher = fastapi.Depends(
-        get_deck_configuration_publisher
-    ),
+    app_state: Annotated[AppState, fastapi.Depends(get_app_state)],
+    deck_type: Annotated[DeckType, fastapi.Depends(get_deck_type)],
+    persistence_directory: Annotated[
+        Path, fastapi.Depends(get_active_persistence_directory)
+    ],
+    deck_configuration_publisher: Annotated[
+        DeckConfigurationPublisher, fastapi.Depends(get_deck_configuration_publisher)
+    ],
 ) -> DeckConfigurationStore:
     """Return the server's singleton `DeckConfigurationStore`."""
     deck_configuration_store = _accessor.get_from(app_state)
     if deck_configuration_store is None:
-        path = persistence_directory / _DECK_CONFIGURATION_FILE_NAME
+        path = persistence_directory / DECK_CONFIGURATION_FILE
         # If this initialization becomes async, we will need to protect it with a lock,
         # to protect against the bug described in https://github.com/Opentrons/opentrons/pull/11927.
         deck_configuration_store = DeckConfigurationStore(
@@ -57,14 +56,14 @@ async def get_deck_configuration_store(
 
 # TODO(mm, 2024-02-07): Resolve the duplication between these two implementations.
 async def get_deck_configuration_store_failsafe(
-    app_state: AppState = fastapi.Depends(get_app_state),
-    deck_type: DeckType = fastapi.Depends(get_deck_type),
-    persistence_directory: Optional[Path] = fastapi.Depends(
-        get_active_persistence_directory_failsafe
-    ),
-    deck_configuration_publisher: DeckConfigurationPublisher = fastapi.Depends(
-        get_deck_configuration_publisher
-    ),
+    app_state: Annotated[AppState, fastapi.Depends(get_app_state)],
+    deck_type: Annotated[DeckType, fastapi.Depends(get_deck_type)],
+    persistence_directory: Annotated[
+        Optional[Path], fastapi.Depends(get_active_persistence_directory_failsafe)
+    ],
+    deck_configuration_publisher: Annotated[
+        DeckConfigurationPublisher, fastapi.Depends(get_deck_configuration_publisher)
+    ],
 ) -> Optional[DeckConfigurationStore]:
     """Return the server's singleton `DeckConfigurationStore`.
 
@@ -77,7 +76,7 @@ async def get_deck_configuration_store_failsafe(
         return None
     deck_configuration_store = _accessor.get_from(app_state)
     if deck_configuration_store is None:
-        path = persistence_directory / _DECK_CONFIGURATION_FILE_NAME
+        path = persistence_directory / DECK_CONFIGURATION_FILE
         # If this initialization becomes async, we will need to protect it with a lock,
         # to protect against the bug described in https://github.com/Opentrons/opentrons/pull/11927.
         deck_configuration_store = DeckConfigurationStore(

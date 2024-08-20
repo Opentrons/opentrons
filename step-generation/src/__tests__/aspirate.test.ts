@@ -70,6 +70,7 @@ describe('aspirate', () => {
       tipRack: 'tiprack1Id',
       xOffset: 0,
       yOffset: 0,
+      nozzles: null,
     }
     const result = aspirate(params, invariantContext, robotStateWithTip)
     expect(getSuccessResult(result).commands).toEqual([
@@ -113,6 +114,7 @@ describe('aspirate', () => {
         tipRack: 'tiprack1Id',
         xOffset: 0,
         yOffset: 0,
+        nozzles: null,
       },
       invariantContext,
       robotStateWithTip
@@ -142,6 +144,7 @@ describe('aspirate', () => {
         tipRack: 'tipRack',
         xOffset: 0,
         yOffset: 0,
+        nozzles: null,
       },
       invariantContext,
       robotStateWithTip
@@ -164,6 +167,7 @@ describe('aspirate', () => {
         tipRack: 'tipRack',
         xOffset: 0,
         yOffset: 0,
+        nozzles: null,
       },
       invariantContext,
       robotStateWithTip
@@ -183,6 +187,7 @@ describe('aspirate', () => {
         tipRack: 'tipRack',
         xOffset: 0,
         yOffset: 0,
+        nozzles: null,
       },
       invariantContext,
       initialRobotState
@@ -205,6 +210,7 @@ describe('aspirate', () => {
         tipRack: 'tipRack',
         xOffset: 0,
         yOffset: 0,
+        nozzles: null,
       },
       invariantContext,
       robotStateWithTip
@@ -231,6 +237,7 @@ describe('aspirate', () => {
         tipRack: 'tipRack',
         xOffset: 0,
         yOffset: 0,
+        nozzles: null,
       },
       invariantContext,
       initialRobotState
@@ -265,6 +272,7 @@ describe('aspirate', () => {
         tipRack: 'tipRack',
         xOffset: 0,
         yOffset: 0,
+        nozzles: null,
       },
       invariantContext,
       robotStateWithTip
@@ -299,6 +307,7 @@ describe('aspirate', () => {
         tipRack: 'tipRack',
         xOffset: 0,
         yOffset: 0,
+        nozzles: null,
       },
       invariantContext,
       robotStateWithTip
@@ -339,6 +348,7 @@ describe('aspirate', () => {
         tipRack: 'tipRack',
         xOffset: 0,
         yOffset: 0,
+        nozzles: null,
       },
       invariantContext,
       robotStateWithTip
@@ -373,6 +383,7 @@ describe('aspirate', () => {
         tipRack: 'tipRack',
         xOffset: 0,
         yOffset: 0,
+        nozzles: null,
       },
       invariantContext,
       robotStateWithTip
@@ -413,6 +424,7 @@ describe('aspirate', () => {
         tipRack: 'tipRack',
         xOffset: 0,
         yOffset: 0,
+        nozzles: null,
       },
       invariantContext,
       robotStateWithTip
@@ -443,6 +455,7 @@ describe('aspirate', () => {
         tipRack: 'tipRack',
         xOffset: 0,
         yOffset: 0,
+        nozzles: null,
       },
       invariantContext,
       robotStateWithTip
@@ -472,6 +485,7 @@ describe('aspirate', () => {
         tipRack: 'tipRack',
         xOffset: 0,
         yOffset: 0,
+        nozzles: null,
       },
       invariantContext,
       robotStateWithTip
@@ -502,6 +516,7 @@ describe('aspirate', () => {
         tipRack: 'tipRack',
         xOffset: 0,
         yOffset: 0,
+        nozzles: null,
       },
       invariantContext,
       robotStateWithTip
@@ -533,6 +548,7 @@ describe('aspirate', () => {
         tipRack: 'tipRack',
         xOffset: 0,
         yOffset: 0,
+        nozzles: null,
       },
       invariantContext,
       robotStateWithTip

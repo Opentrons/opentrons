@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import List, Optional, TypeVar, ClassVar
+from typing import List, Dict, Optional, TypeVar, ClassVar
 
 from opentrons.drivers.types import (
     HeaterShakerLabwareLatchStatus,
@@ -359,5 +359,17 @@ class AbstractAbsorbanceReaderCore(AbstractModuleCore):
         """Initialize the Absorbance Reader by taking zero reading."""
 
     @abstractmethod
-    def initiate_read(self) -> None:
-        """Initiate read on the Absorbance Reader."""
+    def read(self) -> Optional[Dict[str, float]]:
+        """Get an absorbance reading from the Absorbance Reader."""
+
+    @abstractmethod
+    def close_lid(self) -> None:
+        """Close the Absorbance Reader's lid."""
+
+    @abstractmethod
+    def open_lid(self) -> None:
+        """Open the Absorbance Reader's lid."""
+
+    @abstractmethod
+    def is_lid_on(self) -> bool:
+        """Return True if the Absorbance Reader's lid is currently closed."""

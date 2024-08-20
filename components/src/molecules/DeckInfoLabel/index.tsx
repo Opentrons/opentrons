@@ -26,13 +26,14 @@ interface HardwareIconProps extends StyleProps {
 // type union requires one of deckLabel or iconName, but not both
 export type DeckInfoLabelProps = (DeckLabelProps | HardwareIconProps) & {
   highlight?: boolean
+  svgSize?: string | number
 }
 
 export const DeckInfoLabel = styled(DeckInfoLabelComponent)`
   align-items: ${ALIGN_CENTER};
   background-color: ${props =>
     props.highlight ?? false ? COLORS.blue50 : 'inherit'};
-  border: 2px solid
+  border: 1px solid
     ${props => (props.highlight ?? false ? 'transparent' : COLORS.black90)};
   width: ${props => props.width ?? 'max-content'};
   padding: ${SPACING.spacing2} ${SPACING.spacing4};
@@ -42,19 +43,20 @@ export const DeckInfoLabel = styled(DeckInfoLabelComponent)`
     props.height ?? SPACING.spacing20}; // prevents the icon from being squished
 
   > svg {
-    height: 0.875rem;
-    width: 0.875rem;
+    height: ${props => props.svgSize ?? '0.875rem'};
+    width: ${props => props.svgSize ?? '0.875rem'};
   }
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    border-width: 2px;
     border-radius: ${BORDERS.borderRadius12};
     height: ${props => props.height ?? SPACING.spacing32};
     padding: ${SPACING.spacing4}
       ${props =>
         props.deckLabel != null ? SPACING.spacing8 : SPACING.spacing6};
     > svg {
-      height: 1.25rem;
-      width: 1.25rem;
+      height: ${props => props.svgSize ?? '1.25rem'};
+      width: ${props => props.svgSize ?? '1.25rem'};
     }
   }
 `

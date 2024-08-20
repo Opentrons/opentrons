@@ -7,9 +7,9 @@ import {
   DIRECTION_COLUMN,
   POSITION_FIXED,
   COLORS,
+  RadioButton,
 } from '@opentrons/components'
 import { getTopPortalEl } from '../../../App/portal'
-import { RadioButton } from '../../../atoms/buttons'
 import { ChildNavigation } from '../../ChildNavigation'
 
 import type {

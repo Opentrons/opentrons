@@ -21,6 +21,8 @@ import {
   GRIPPER_V1_2,
   MAGNETIC_BLOCK_FIXTURES,
   MAGNETIC_BLOCK_TYPE,
+  TC_MODULE_LOCATION_OT3,
+  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import {
@@ -113,7 +115,11 @@ function HardwareItem({
     </LegacyStyledText>
   )
   if (hardware.hardwareType === 'module') {
-    location = <DeckInfoLabel deckLabel={hardware.slot} />
+    const slot =
+      getModuleType(hardware.moduleModel) === THERMOCYCLER_MODULE_TYPE
+        ? TC_MODULE_LOCATION_OT3
+        : hardware.slot
+    location = <DeckInfoLabel deckLabel={slot} />
   } else if (hardware.hardwareType === 'fixture') {
     location = (
       <DeckInfoLabel

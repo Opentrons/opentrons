@@ -4,7 +4,7 @@ import logging
 import paho.mqtt.client as mqtt
 from anyio import to_thread
 from fastapi import Depends
-from typing import Any, Dict, Optional
+from typing import Annotated, Any, Dict, Optional
 from enum import Enum
 
 
@@ -210,7 +210,7 @@ async def clean_up_notification_client(app_state: AppState) -> None:
 
 
 def get_notification_client(
-    app_state: AppState = Depends(get_app_state),
+    app_state: Annotated[AppState, Depends(get_app_state)],
 ) -> Optional[NotificationClient]:
     """Intended to be used by endpoint functions as a FastAPI dependency."""
     notification_client = _notification_client_accessor.get_from(app_state)

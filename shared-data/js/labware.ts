@@ -110,6 +110,7 @@ import opentronsFlex96Tiprack1000UlV1Uncasted from '../labware/definitions/2/ope
 import opentronsFlex96Tiprack200UlV1Uncasted from '../labware/definitions/2/opentrons_flex_96_tiprack_200ul/1.json'
 import opentronsFlex96Tiprack50UlV1Uncasted from '../labware/definitions/2/opentrons_flex_96_tiprack_50ul/1.json'
 import opentronsFlex96TiprackAdapterV1Uncasted from '../labware/definitions/2/opentrons_flex_96_tiprack_adapter/1.json'
+import opentronsFlexLidAbsorbancePlateReaderModuleV1Uncasted from '../labware/definitions/2/opentrons_flex_lid_absorbance_plate_reader_module/1.json'
 import opentronsUniversalFlatAdapterV1Uncasted from '../labware/definitions/2/opentrons_universal_flat_adapter/1.json'
 import opentronsUniversalFlatAdapterCorning384Wellplate112UlFlatV1Uncasted from '../labware/definitions/2/opentrons_universal_flat_adapter_corning_384_wellplate_112ul_flat/1.json'
 import opentrons96DeepWellTempModAdapterV1Uncasted from '../labware/definitions/2/opentrons_96_deep_well_temp_mod_adapter/1.json'
@@ -284,6 +285,7 @@ const opentronsFlex96Tiprack1000UlV1 = opentronsFlex96Tiprack1000UlV1Uncasted as
 const opentronsFlex96Tiprack200UlV1 = opentronsFlex96Tiprack200UlV1Uncasted as LabwareDefinition2
 const opentronsFlex96Tiprack50UlV1 = opentronsFlex96Tiprack50UlV1Uncasted as LabwareDefinition2
 const opentronsFlex96TiprackAdapterV1 = opentronsFlex96TiprackAdapterV1Uncasted as LabwareDefinition2
+const opentronsFlexLidAbsorbancePlateReaderModuleV1 = opentronsFlexLidAbsorbancePlateReaderModuleV1Uncasted as LabwareDefinition2
 const opentronsUniversalFlatAdapterV1 = opentronsUniversalFlatAdapterV1Uncasted as LabwareDefinition2
 const opentronsUniversalFlatAdapterCorning384Wellplate112UlFlatV1 = opentronsUniversalFlatAdapterCorning384Wellplate112UlFlatV1Uncasted as LabwareDefinition2
 const thermoscientificnunc96Wellplate1300UlV1 = thermoscientificnunc96Wellplate1300UlV1Uncasted as LabwareDefinition2
@@ -450,6 +452,7 @@ const latestDefs = {
   opentronsFlex96Tiprack200UlV1,
   opentronsFlex96Tiprack50UlV1,
   opentronsFlex96TiprackAdapterV1,
+  opentronsFlexLidAbsorbancePlateReaderModuleV1,
   opentronsUniversalFlatAdapterV1,
   opentronsUniversalFlatAdapterCorning384Wellplate112UlFlatV1,
   thermoscientificnunc96Wellplate1300UlV1,

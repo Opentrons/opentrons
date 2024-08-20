@@ -43,7 +43,6 @@ export function OddModalHeader(props: OddModalHeaderBaseProps): JSX.Element {
             color={iconColor}
             size="2rem"
             alignSelf={ALIGN_CENTER}
-            marginRight={SPACING.spacing16}
           />
         ) : null}
         <LegacyStyledText

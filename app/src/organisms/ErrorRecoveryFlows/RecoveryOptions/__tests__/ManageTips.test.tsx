@@ -58,7 +58,7 @@ describe('ManageTips', () => {
         step: DROP_TIP_FLOWS.STEPS.BEGIN_REMOVAL,
       },
       tipStatusUtils: {
-        pipettesWithTip: [{ mount: 'left', specs: MOCK_ACTUAL_PIPETTE }],
+        aPipetteWithTip: { mount: 'left', specs: MOCK_ACTUAL_PIPETTE },
       } as any,
       routeUpdateActions: {
         proceedNextStep: mockProceedNextStep,
@@ -96,14 +96,14 @@ describe('ManageTips', () => {
       /Homing the .* pipette with liquid in the tips may damage it\. You must remove all tips before using the pipette again\./
     )
     screen.queryAllByText('Begin removal')
-    screen.queryAllByText('Skip')
+    screen.queryAllByText('Skip and home pipette')
   })
 
   it('routes correctly when continuing on BeginRemoval', () => {
     render(props)
 
     const beginRemovalBtn = screen.queryAllByText('Begin removal')[0]
-    const skipBtn = screen.queryAllByText('Skip')[0]
+    const skipBtn = screen.queryAllByText('Skip and home pipette')[0]
 
     fireEvent.click(beginRemovalBtn)
     clickButtonLabeled('Begin removal')
@@ -111,7 +111,7 @@ describe('ManageTips', () => {
     expect(mockProceedNextStep).toHaveBeenCalled()
 
     fireEvent.click(skipBtn)
-    clickButtonLabeled('Skip')
+    clickButtonLabeled('Skip and home pipette')
 
     expect(mockSetRobotInMotion).toHaveBeenCalled()
   })
@@ -125,10 +125,10 @@ describe('ManageTips', () => {
     }
     render(props)
 
-    const skipBtn = screen.queryAllByText('Skip')[0]
+    const skipBtn = screen.queryAllByText('Skip and home pipette')[0]
 
     fireEvent.click(skipBtn)
-    clickButtonLabeled('Skip')
+    clickButtonLabeled('Skip and home pipette')
 
     expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
       RETRY_NEW_TIPS.ROUTE,
@@ -171,6 +171,59 @@ describe('ManageTips', () => {
 
     screen.getByText('MOCK DROP TIP FLOWS')
   })
+
+  describe('routeAlternativelyIfNoPipette', () => {
+    it('should route to RETRY_NEW_TIPS.STEPS.REPLACE_TIPS when selectedRecoveryOption is RETRY_NEW_TIPS.ROUTE and no pipette with tip', () => {
+      props.tipStatusUtils.aPipetteWithTip = null
+      props.currentRecoveryOptionUtils.selectedRecoveryOption =
+        RETRY_NEW_TIPS.ROUTE
+
+      render(props)
+
+      expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
+        RETRY_NEW_TIPS.ROUTE,
+        RETRY_NEW_TIPS.STEPS.REPLACE_TIPS
+      )
+    })
+
+    it('should route to SKIP_STEP_WITH_NEW_TIPS.STEPS.REPLACE_TIPS when selectedRecoveryOption is SKIP_STEP_WITH_NEW_TIPS.ROUTE and no pipette with tip', () => {
+      props.tipStatusUtils.aPipetteWithTip = null
+      props.currentRecoveryOptionUtils.selectedRecoveryOption =
+        RECOVERY_MAP.SKIP_STEP_WITH_NEW_TIPS.ROUTE
+
+      render(props)
+
+      expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
+        RECOVERY_MAP.SKIP_STEP_WITH_NEW_TIPS.ROUTE,
+        RECOVERY_MAP.SKIP_STEP_WITH_NEW_TIPS.STEPS.REPLACE_TIPS
+      )
+    })
+
+    it('should route to OPTION_SELECTION.ROUTE when selectedRecoveryOption is not RETRY_NEW_TIPS or SKIP_STEP_WITH_NEW_TIPS and no pipette with tip', () => {
+      props.tipStatusUtils.aPipetteWithTip = null
+      props.currentRecoveryOptionUtils.selectedRecoveryOption =
+        RECOVERY_MAP.CANCEL_RUN.ROUTE
+
+      render(props)
+
+      expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
+        RECOVERY_MAP.OPTION_SELECTION.ROUTE
+      )
+    })
+
+    it('should not route alternatively when there is a pipette with tip', () => {
+      props.tipStatusUtils.aPipetteWithTip = {
+        mount: 'left',
+        specs: MOCK_ACTUAL_PIPETTE,
+      }
+      props.currentRecoveryOptionUtils.selectedRecoveryOption =
+        RETRY_NEW_TIPS.ROUTE
+
+      render(props)
+
+      expect(mockProceedToRouteAndStep).not.toHaveBeenCalled()
+    })
+  })
 })
 
 describe('useDropTipFlowUtils', () => {
@@ -210,7 +263,11 @@ describe('useDropTipFlowUtils', () => {
     const { result } = renderHook(() =>
       useDropTipFlowUtils({
         ...mockProps,
-        failedCommand: { id: 'MOCK_COMMAND_ID' },
+        failedCommand: {
+          byRunRecord: {
+            id: 'MOCK_COMMAND_ID',
+          },
+        },
       } as any)
     )
 

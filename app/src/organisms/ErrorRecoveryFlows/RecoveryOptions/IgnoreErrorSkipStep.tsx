@@ -9,6 +9,7 @@ import {
   SPACING,
   StyledText,
   RESPONSIVENESS,
+  RadioButton,
 } from '@opentrons/components'
 
 import {
@@ -23,7 +24,6 @@ import {
   RecoverySingleColumnContentWrapper,
   RecoveryRadioGroup,
 } from '../shared'
-import { RadioButton } from '../../../atoms/buttons'
 
 import type { RecoveryContentProps } from '../types'
 

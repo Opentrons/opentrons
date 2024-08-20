@@ -2,7 +2,11 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import cx from 'classnames'
-import { FormGroup, Tooltip, useHoverTooltip } from '@opentrons/components'
+import {
+  FormGroup,
+  LegacyTooltip,
+  useHoverTooltip,
+} from '@opentrons/components'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
 import SINGLE_IMAGE from '../../../../images/path_single_transfers.svg'
 import MULTI_DISPENSE_IMAGE from '../../../../images/path_multi_dispense.svg'
@@ -65,7 +69,7 @@ const PathButton = (buttonProps: ButtonProps): JSX.Element => {
   const [targetProps, tooltipProps] = useHoverTooltip()
   const { t } = useTranslation('form')
   const tooltip = (
-    <Tooltip {...tooltipProps}>
+    <LegacyTooltip {...tooltipProps}>
       <div className={styles.path_tooltip_title}>
         {t(`step_edit_form.field.path.title.${path}`)}
       </div>
@@ -74,7 +78,7 @@ const PathButton = (buttonProps: ButtonProps): JSX.Element => {
         src={PATH_ANIMATION_IMAGES[path]}
       />
       <div className={styles.path_tooltip_subtitle}>{subtitle}</div>
-    </Tooltip>
+    </LegacyTooltip>
   )
 
   const pathButtonData = `PathButton_${selected ? 'selected' : 'deselected'}_${
@@ -124,7 +128,6 @@ export const PathField = (props: PathFieldProps): JSX.Element => {
   } = props
   const { t } = useTranslation('form')
   const pipetteEntities = useSelector(stepFormSelectors.getPipetteEntities)
-  const labwareEntities = useSelector(stepFormSelectors.getLabwareEntities)
   const disabledPathMap = getDisabledPathMap(
     {
       aspirate_airGap_checkbox,
@@ -137,7 +140,6 @@ export const PathField = (props: PathFieldProps): JSX.Element => {
       tipRack,
     },
     pipetteEntities,
-    labwareEntities,
     t
   )
   return (

@@ -6,10 +6,10 @@ import {
   SPACING,
   DIRECTION_COLUMN,
   ALIGN_CENTER,
+  PrimaryButton,
 } from '@opentrons/components'
 import { useToggleGroup } from '../../../../molecules/ToggleGroup/useToggleGroup'
 import { ANALYTICS_LIQUID_SETUP_VIEW_TOGGLE } from '../../../../redux/analytics'
-import { BackToTopButton } from '../BackToTopButton'
 import { SetupLiquidsList } from './SetupLiquidsList'
 import { SetupLiquidsMap } from './SetupLiquidsMap'
 
@@ -19,17 +19,19 @@ import type {
 } from '@opentrons/shared-data'
 
 interface SetupLiquidsProps {
-  protocolRunHeaderRef: React.RefObject<HTMLDivElement> | null
-  robotName: string
   runId: string
   protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput | null
+  isLiquidSetupConfirmed: boolean
+  setLiquidSetupConfirmed: (confirmed: boolean) => void
+  robotName: string
 }
 
 export function SetupLiquids({
-  protocolRunHeaderRef,
-  robotName,
   runId,
   protocolAnalysis,
+  isLiquidSetupConfirmed,
+  setLiquidSetupConfirmed,
+  robotName,
 }: SetupLiquidsProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   const [selectedValue, toggleGroup] = useToggleGroup(
@@ -46,17 +48,19 @@ export function SetupLiquids({
     >
       {toggleGroup}
       {selectedValue === t('list_view') ? (
-        <SetupLiquidsList runId={runId} />
+        <SetupLiquidsList runId={runId} robotName={robotName} />
       ) : (
         <SetupLiquidsMap runId={runId} protocolAnalysis={protocolAnalysis} />
       )}
       <Flex alignSelf={ALIGN_CENTER}>
-        <BackToTopButton
-          protocolRunHeaderRef={protocolRunHeaderRef}
-          robotName={robotName}
-          runId={runId}
-          sourceLocation="SetupLiquids"
-        />
+        <PrimaryButton
+          onClick={() => {
+            setLiquidSetupConfirmed(true)
+          }}
+          disabled={isLiquidSetupConfirmed}
+        >
+          {t('confirm_locations_and_volumes')}
+        </PrimaryButton>
       </Flex>
     </Flex>
   )

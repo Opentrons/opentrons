@@ -10,18 +10,18 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  MenuItem,
+  OverflowBtn,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
+  Tooltip,
   useHoverTooltip,
+  useMenuHandleClickOutside,
   useMountEffect,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '../../App/portal'
-import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
-import { MenuItem } from '../../atoms/MenuList/MenuItem'
-import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { Divider } from '../../atoms/structure'
-import { Tooltip } from '../../atoms/Tooltip'
 import { ChooseProtocolSlideout } from '../../organisms/ChooseProtocolSlideout'
 import { DisconnectModal } from '../../organisms/Devices/RobotSettings/ConnectNetwork/DisconnectModal'
 import { handleUpdateBuildroot } from '../../organisms/Devices/RobotSettings/UpdateBuildroot'

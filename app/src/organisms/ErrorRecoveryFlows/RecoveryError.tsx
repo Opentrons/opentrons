@@ -1,22 +1,31 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
   Icon,
-  LegacyStyledText,
+  StyledText,
   SPACING,
   ALIGN_CENTER,
   JUSTIFY_END,
+  PrimaryButton,
+  JUSTIFY_CENTER,
+  RESPONSIVENESS,
 } from '@opentrons/components'
 
-import { RECOVERY_MAP } from './constants'
+import { SmallButton } from '../../atoms/buttons'
 import { RecoverySingleColumnContentWrapper } from './shared'
+import {
+  DESKTOP_ONLY,
+  ICON_SIZE_ALERT_INFO_STYLE,
+  ODD_ONLY,
+  RECOVERY_MAP,
+} from './constants'
 
 import type { RecoveryContentProps } from './types'
-import { SmallButton } from '../../atoms/buttons'
 
 export function RecoveryError(props: RecoveryContentProps): JSX.Element {
   const { recoveryMap } = props
@@ -45,23 +54,28 @@ export function ErrorRecoveryFlowError({
   getRecoveryOptionCopy,
   currentRecoveryOptionUtils,
   routeUpdateActions,
+  recoveryCommands,
 }: RecoveryContentProps): JSX.Element {
   const { OPTION_SELECTION } = RECOVERY_MAP
   const { t } = useTranslation('error_recovery')
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
-  const { proceedToRouteAndStep } = routeUpdateActions
+  const { proceedToRouteAndStep, setRobotInMotion } = routeUpdateActions
+  const { homePipetteZAxes } = recoveryCommands
 
   const userRecoveryOptionCopy = getRecoveryOptionCopy(selectedRecoveryOption)
 
   const onPrimaryClick = (): void => {
-    void proceedToRouteAndStep(OPTION_SELECTION.ROUTE)
+    void setRobotInMotion(true)
+      .then(() => homePipetteZAxes())
+      .finally(() => setRobotInMotion(false))
+      .then(() => proceedToRouteAndStep(OPTION_SELECTION.ROUTE))
   }
 
   return (
     <ErrorContent
       isOnDevice={isOnDevice}
       title={t('recovery_action_failed', { action: userRecoveryOptionCopy })}
-      subTitle={t('return_to_the_menu')}
+      subTitle={t('next_try_another_action')}
       btnText={t('back_to_menu')}
       btnOnClick={onPrimaryClick}
     />
@@ -103,13 +117,13 @@ export function RecoveryDropTipFlowErrors({
   const buildSubTitle = (): string => {
     switch (step) {
       case ERROR_WHILE_RECOVERING.STEPS.DROP_TIP_GENERAL_ERROR:
-        return t('return_to_the_menu')
+        return t('next_try_another_action')
       case ERROR_WHILE_RECOVERING.STEPS.DROP_TIP_TIP_DROP_FAILED:
-        return t('return_to_the_menu')
+        return t('next_try_another_action')
       case ERROR_WHILE_RECOVERING.STEPS.DROP_TIP_BLOWOUT_FAILED:
         return t('you_can_still_drop_tips')
       default:
-        return t('return_to_the_menu')
+        return t('next_try_another_action')
     }
   }
 
@@ -155,7 +169,6 @@ export function RecoveryDropTipFlowErrors({
 }
 
 export function ErrorContent({
-  isOnDevice,
   title,
   subTitle,
   btnText,
@@ -169,19 +182,12 @@ export function ErrorContent({
 }): JSX.Element | null {
   return (
     <RecoverySingleColumnContentWrapper>
-      <Flex
-        padding={SPACING.spacing40}
-        gridGap={SPACING.spacing24}
-        flexDirection={DIRECTION_COLUMN}
-        alignItems={ALIGN_CENTER}
-        justifyContent={ALIGN_CENTER}
-        flex="1"
-      >
+      <Flex css={CONTAINER_STYLE}>
         <Icon
           name="alert-circle"
-          size={SPACING.spacing60}
           color={COLORS.red50}
           data-testid="recovery_error_alert_icon"
+          css={ICON_SIZE_ALERT_INFO_STYLE}
         />
         <Flex
           gridGap={SPACING.spacing4}
@@ -189,13 +195,39 @@ export function ErrorContent({
           alignItems={ALIGN_CENTER}
           textAlign={ALIGN_CENTER}
         >
-          <LegacyStyledText as="h3Bold">{title}</LegacyStyledText>
-          <LegacyStyledText as="h4">{subTitle}</LegacyStyledText>
+          <StyledText
+            oddStyle="level3HeaderBold"
+            desktopStyle="headingSmallBold"
+          >
+            {title}
+          </StyledText>
+          <StyledText
+            oddStyle="level4HeaderRegular"
+            desktopStyle="bodyDefaultRegular"
+          >
+            {subTitle}
+          </StyledText>
         </Flex>
       </Flex>
       <Flex justifyContent={JUSTIFY_END}>
-        <SmallButton onClick={btnOnClick} buttonText={btnText} />
+        <SmallButton onClick={btnOnClick} buttonText={btnText} css={ODD_ONLY} />
+        <PrimaryButton onClick={btnOnClick} css={DESKTOP_ONLY}>
+          {btnText}
+        </PrimaryButton>
       </Flex>
     </RecoverySingleColumnContentWrapper>
   )
 }
+
+const CONTAINER_STYLE = css`
+  padding: ${SPACING.spacing40};
+  grid-gap: ${SPACING.spacing16};
+  flex-direction: ${DIRECTION_COLUMN};
+  align-items: ${ALIGN_CENTER};
+  justify-content: ${JUSTIFY_CENTER};
+  flex: 1;
+
+  @media (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+    grid-gap: ${SPACING.spacing24};
+  }
+`

@@ -16,6 +16,8 @@ from opentrons.types import DeckSlotName
 
 from opentrons.protocol_engine.resources import deck_configuration_provider
 
+from opentrons.drivers.types import AbsorbanceReaderLidStatus
+
 if TYPE_CHECKING:
     from ..state import StateView
     from ..execution import EquipmentHandler
@@ -150,6 +152,40 @@ class LoadModuleImplementation(
                 location=verified_location,
                 module_id=params.moduleId,
             )
+
+        # Handle lid position update for loaded Plate Reader module on deck
+        if (
+            not self._state_view.config.use_virtual_modules
+            and params.model == ModuleModel.ABSORBANCE_READER_V1
+            and params.moduleId is not None
+        ):
+            abs_reader = self._equipment.get_module_hardware_api(
+                self._state_view.modules.get_absorbance_reader_substate(
+                    params.moduleId
+                ).module_id
+            )
+
+            if abs_reader is not None:
+                result = await abs_reader.get_current_lid_status()
+                if (
+                    isinstance(result, AbsorbanceReaderLidStatus)
+                    and result is not AbsorbanceReaderLidStatus.ON
+                ):
+                    reader_area = self._state_view.modules.ensure_and_convert_module_fixture_location(
+                        params.location.slotName,
+                        self._state_view.config.deck_type,
+                        params.model,
+                    )
+                    lid_labware = self._state_view.labware.get_by_addressable_area(
+                        reader_area
+                    )
+
+                    if lid_labware is not None:
+                        self._state_view.labware._state.labware_by_id[
+                            lid_labware.id
+                        ].location = self._state_view.modules.absorbance_reader_dock_location(
+                            params.moduleId
+                        )
 
         return SuccessData(
             public=LoadModuleResult(

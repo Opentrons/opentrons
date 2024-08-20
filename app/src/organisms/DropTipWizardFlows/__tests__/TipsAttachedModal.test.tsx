@@ -7,7 +7,7 @@ import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 
 import { handleTipsAttachedModal } from '../TipsAttachedModal'
-import { LEFT } from '@opentrons/shared-data'
+import { FLEX_ROBOT_TYPE, LEFT } from '@opentrons/shared-data'
 import { mockPipetteInfo } from '../../../redux/pipettes/__fixtures__'
 import { useCloseCurrentRun } from '../../ProtocolUpload/hooks'
 import { useDropTipWizardFlows } from '..'
@@ -33,25 +33,30 @@ const ninetySixSpecs = {
   channels: 96,
 } as PipetteModelSpecs
 
-const MOCK_PIPETTES_WITH_TIP: PipetteWithTip[] = [
-  { mount: LEFT, specs: MOCK_ACTUAL_PIPETTE },
-]
-const MOCK_96_WITH_TIP: PipetteWithTip[] = [
-  { mount: LEFT, specs: ninetySixSpecs },
-]
+const MOCK_A_PIPETTE_WITH_TIP: PipetteWithTip = {
+  mount: LEFT,
+  specs: MOCK_ACTUAL_PIPETTE,
+}
+
+const MOCK_96_WITH_TIP: PipetteWithTip = { mount: LEFT, specs: ninetySixSpecs }
 
 const mockSetTipStatusResolved = vi.fn()
 const MOCK_HOST: HostConfig = { hostname: 'MOCK_HOST' }
 
-const render = (pipettesWithTips: PipetteWithTip[]) => {
+const render = (aPipetteWithTip: PipetteWithTip) => {
   return renderWithProviders(
     <NiceModal.Provider>
       <button
         onClick={() =>
           handleTipsAttachedModal({
             host: MOCK_HOST,
-            pipettesWithTip: pipettesWithTips,
+            aPipetteWithTip,
             setTipStatusResolved: mockSetTipStatusResolved,
+            robotType: FLEX_ROBOT_TYPE,
+            mount: 'left',
+            instrumentModelSpecs: mockPipetteInfo.pipetteSpecs as any,
+            onSkipAndHome: vi.fn(),
+            isRunCurrent: true,
           })
         }
         data-testid="testButton"
@@ -79,7 +84,7 @@ describe('TipsAttachedModal', () => {
   })
 
   it('renders appropriate warning given the pipette mount', () => {
-    render(MOCK_PIPETTES_WITH_TIP)
+    render(MOCK_A_PIPETTE_WITH_TIP)
     const btn = screen.getByTestId('testButton')
     fireEvent.click(btn)
 
@@ -89,16 +94,15 @@ describe('TipsAttachedModal', () => {
     )
   })
   it('clicking the skip button properly closes the modal', () => {
-    render(MOCK_PIPETTES_WITH_TIP)
+    render(MOCK_A_PIPETTE_WITH_TIP)
     const btn = screen.getByTestId('testButton')
     fireEvent.click(btn)
 
-    const skipBtn = screen.getByText('Skip')
+    const skipBtn = screen.getByText('Skip and home pipette')
     fireEvent.click(skipBtn)
-    expect(mockSetTipStatusResolved).toHaveBeenCalled()
   })
   it('clicking the launch wizard button properly launches the wizard', () => {
-    render(MOCK_PIPETTES_WITH_TIP)
+    render(MOCK_A_PIPETTE_WITH_TIP)
     const btn = screen.getByTestId('testButton')
     fireEvent.click(btn)
 

@@ -25,7 +25,7 @@ import { getErrorKind } from '../utils'
 import type { RobotType } from '@opentrons/shared-data'
 import type { IconProps } from '@opentrons/components'
 import type { OddModalHeaderBaseProps } from '../../../molecules/OddModal/types'
-import type { ERUtilsResults } from '../hooks'
+import type { ERUtilsResults, useRetainedFailedCommandBySource } from '../hooks'
 import type { ErrorRecoveryFlowsProps } from '..'
 import type { DesktopSizeType } from '../types'
 
@@ -42,17 +42,21 @@ export function useErrorDetailsModal(): {
   return { showModal, toggleModal }
 }
 
-type ErrorDetailsModalProps = ErrorRecoveryFlowsProps &
+type ErrorDetailsModalProps = Omit<
+  ErrorRecoveryFlowsProps,
+  'failedCommandByRunRecord'
+> &
   ERUtilsResults & {
     toggleModal: () => void
     isOnDevice: boolean
     robotType: RobotType
     desktopType: DesktopSizeType
+    failedCommand: ReturnType<typeof useRetainedFailedCommandBySource>
   }
 
 export function ErrorDetailsModal(props: ErrorDetailsModalProps): JSX.Element {
   const { failedCommand, toggleModal, isOnDevice } = props
-  const errorKind = getErrorKind(failedCommand)
+  const errorKind = getErrorKind(failedCommand?.byRunRecord ?? null)
   const errorName = useErrorName(errorKind)
 
   const getIsOverpressureErrorKind = (): boolean => {
@@ -194,6 +198,7 @@ export function OverpressureBanner(): JSX.Element | null {
     <InlineNotification
       type="alert"
       heading={t('overpressure_is_usually_caused')}
+      message={t('if_issue_persists')}
     />
   )
 }

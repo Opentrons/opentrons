@@ -320,6 +320,14 @@ class RobotClient:
         response.raise_for_status()
         return response
 
+    async def get_deck_configuration(self) -> Response:
+        """PUT /deck_configuration."""
+        response = await self.httpx_client.get(
+            url=f"{self.base_url}/deck_configuration",
+        )
+        response.raise_for_status()
+        return response
+
     async def put_deck_configuration(
         self,
         req_body: Dict[str, object],
@@ -337,6 +345,20 @@ class RobotClient:
         response = await self.httpx_client.post(
             url=f"{self.base_url}/dataFiles",
             data=req_body,
+        )
+        response.raise_for_status()
+        return response
+
+    async def get_data_files(self) -> Response:
+        """GET /dataFiles."""
+        response = await self.httpx_client.get(url=f"{self.base_url}/dataFiles")
+        response.raise_for_status()
+        return response
+
+    async def delete_data_file(self, file_id: str) -> Response:
+        """DELETE /dataFiles/{file_id}."""
+        response = await self.httpx_client.delete(
+            f"{self.base_url}/dataFiles/{file_id}"
         )
         response.raise_for_status()
         return response

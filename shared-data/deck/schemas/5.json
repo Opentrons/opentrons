@@ -141,7 +141,8 @@
                   "stagingSlot",
                   "movableTrash",
                   "fixedTrash",
-                  "wasteChute"
+                  "wasteChute",
+                  "lidDock"
                 ]
               },
               "offsetFromCutoutFixture": {
@@ -223,7 +224,7 @@
         },
         "legacyFixtures": {
           "type": "array",
-          "description": "Fixed position objects on the deck.",
+          "description": "Fixed position objects on the deck and fixture-dependant Module labware Eg Plate Reader Lid.",
           "items": {
             "type": "object",
             "required": ["id", "displayName"],

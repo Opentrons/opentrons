@@ -1,18 +1,22 @@
 import * as React from 'react'
 import { screen } from '@testing-library/react'
 import { describe, it, beforeEach, vi } from 'vitest'
-import {
-  parseLiquidsInLoadOrder,
-  parseLabwareInfoByLiquidId,
-} from '@opentrons/api-client'
+import { parseLiquidsInLoadOrder } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { ProtocolLiquidsDetails } from '../ProtocolLiquidsDetails'
-import { LiquidsListItemDetails } from '../../Devices/ProtocolRun/SetupLiquids/SetupLiquidsList'
+
+import type * as SharedData from '@opentrons/shared-data'
 
 vi.mock('../../Devices/ProtocolRun/SetupLiquids/SetupLiquidsList')
-vi.mock('@opentrons/api-client')
+vi.mock('@opentrons/shared-data', async importOriginal => {
+  const actualSharedData = await importOriginal<typeof SharedData>()
+  return {
+    ...actualSharedData,
+    parseLiquidsInLoadOrder: vi.fn(),
+  }
+})
 
 const render = (props: React.ComponentProps<typeof ProtocolLiquidsDetails>) => {
   return renderWithProviders(<ProtocolLiquidsDetails {...props} />, {
@@ -33,24 +37,19 @@ describe('ProtocolLiquidsDetails', () => {
         },
       ],
     }
-    vi.mocked(LiquidsListItemDetails).mockReturnValue(
-      <div>mock liquids list item</div>
-    )
     vi.mocked(parseLiquidsInLoadOrder).mockReturnValue([
       {
         id: '1',
         displayName: 'mock liquid',
-        description: '',
+        description: 'mock description',
         displayColor: '#FFFFFF',
       },
     ])
-    vi.mocked(parseLabwareInfoByLiquidId).mockReturnValue({
-      '1': [{ labwareId: '123', volumeByWell: { A1: 30 } }],
-    })
   })
   it('renders the display name, description and total volume', () => {
     render(props)
-    screen.getAllByText('mock liquids list item')
+    screen.getByText('mock liquid')
+    screen.getByText('mock description')
   })
   it('renders the correct info for no liquids in the protocol', () => {
     props.liquids = []
