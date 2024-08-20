@@ -588,13 +588,7 @@ class CommandView(HasState[CommandState]):
         based on the currently running or most recently executed command.
         """
         command_ids = self._state.command_history.get_filtered_command_ids(
-            command_intents=[
-                CommandIntent.PROTOCOL,
-                CommandIntent.SETUP,
-                CommandIntent.FIXIT,
-            ]
-            if include_fixit_commands
-            else [CommandIntent.PROTOCOL, CommandIntent.SETUP]
+            include_fixit_commands=include_fixit_commands
         )
         running_command = self._state.command_history.get_running_command()
         queued_command_ids = self._state.command_history.get_queue_ids()

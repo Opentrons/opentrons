@@ -270,7 +270,10 @@ def test_remove_id_from_setup_queue(command_history: CommandHistory) -> None:
 
 def test_get_filtered_commands(command_history: CommandHistory) -> None:
     """It should return a list of all commands without fixit commands."""
-    assert list(command_history.get_filtered_command_ids()) == []
+    assert (
+        list(command_history.get_filtered_command_ids(include_fixit_commands=False))
+        == []
+    )
     command_entry_1 = create_queued_command(command_id="0")
     command_entry_2 = create_queued_command(command_id="1")
     fixit_command_entry_1 = create_queued_command(
@@ -279,21 +282,15 @@ def test_get_filtered_commands(command_history: CommandHistory) -> None:
     command_history.append_queued_command(command_entry_1)
     command_history.append_queued_command(command_entry_2)
     command_history.append_queued_command(fixit_command_entry_1)
-    assert list(command_history.get_filtered_command_ids()) == ["0", "1"]
+    assert list(
+        command_history.get_filtered_command_ids(include_fixit_commands=False)
+    ) == ["0", "1"]
 
 
 def test_get_all_filtered_commands(command_history: CommandHistory) -> None:
     """It should return a list of all commands without fixit commands."""
     assert (
-        list(
-            command_history.get_filtered_command_ids(
-                command_intents=[
-                    CommandIntent.FIXIT,
-                    CommandIntent.PROTOCOL,
-                    CommandIntent.SETUP,
-                ]
-            )
-        )
+        list(command_history.get_filtered_command_ids(include_fixit_commands=False))
         == []
     )
     command_entry_1 = create_queued_command_entry()
@@ -303,13 +300,7 @@ def test_get_all_filtered_commands(command_history: CommandHistory) -> None:
     command_history._add("1", command_entry_2)
     command_history._add("fixit-1", fixit_command_entry_1)
     assert list(
-        command_history.get_filtered_command_ids(
-            command_intents=[
-                CommandIntent.FIXIT,
-                CommandIntent.PROTOCOL,
-                CommandIntent.SETUP,
-            ]
-        )
+        command_history.get_filtered_command_ids(include_fixit_commands=True)
     ) == ["0", "1", "fixit-1"]
 
 

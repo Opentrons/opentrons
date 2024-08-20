@@ -24,6 +24,9 @@ class CommandHistory:
     _all_command_ids: List[str]
     """All command IDs, in insertion order."""
 
+    _all_fixit_command_ids: List[str]
+    """All fixit command IDs, in insertion order."""
+
     _commands_by_id: Dict[str, CommandEntry]
     """All command resources, in insertion order, mapped by their unique IDs."""
 
@@ -44,6 +47,7 @@ class CommandHistory:
 
     def __init__(self) -> None:
         self._all_command_ids = []
+        self._all_fixit_command_ids = []
         self._queued_command_ids = OrderedSet()
         self._queued_setup_command_ids = OrderedSet()
         self._queued_fixit_command_ids = OrderedSet()
@@ -97,27 +101,15 @@ class CommandHistory:
             for command_id in self._all_command_ids
         ]
 
-    def get_filtered_command_ids(
-        self,
-        command_intents: list[CommandIntent] = [
-            CommandIntent.PROTOCOL,
-            CommandIntent.SETUP,
-        ],
-    ) -> List[str]:
-        filtered_command = self._commands_by_id
-        if CommandIntent.FIXIT not in command_intents:
-            filtered_command = {
-                key: val
-                for key, val in self._commands_by_id.items()
-                if val.command.intent != CommandIntent.FIXIT
-            }
-        if CommandIntent.SETUP not in command_intents:
-            filtered_command = {
-                key: val
-                for key, val in filtered_command.items()
-                if val.command.intent != CommandIntent.SETUP
-            }
-        return list(filtered_command.keys())
+    def get_filtered_command_ids(self, include_fixit_commands: bool) -> List[str]:
+        if include_fixit_commands:
+            return [
+                command
+                for command in self._all_command_ids
+                if command not in self._all_fixit_command_ids
+            ]
+        else:
+            return self._all_command_ids
 
     def get_all_ids(self) -> List[str]:
         """Get all command IDs."""
@@ -271,6 +263,7 @@ class CommandHistory:
     def _add_to_fixit_queue(self, command_id: str) -> None:
         """Add a new ID to the queued fixit."""
         self._queued_fixit_command_ids.add(command_id)
+        self._all_fixit_command_ids.append(command_id)
 
     def _remove_queue_id(self, command_id: str) -> None:
         """Remove a specific command from the queued command ids structure."""
