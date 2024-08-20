@@ -53,7 +53,7 @@ class RunsPublisher:
             ]
         )
 
-    async def start_publishing_for_run(
+    def start_publishing_for_run(
         self,
         run_id: str,
         get_current_command: Callable[[str], Optional[CommandPointer]],
@@ -75,51 +75,47 @@ class RunsPublisher:
         )
         self._engine_state_slice = _EngineStateSlice()
 
-        await self.publish_runs_advise_refetch_async(run_id=run_id)
+        self.publish_runs_advise_refetch(run_id=run_id)
 
-    async def clean_up_run(self, run_id: str) -> None:
+    def clean_up_run(self, run_id: str) -> None:
         """Publish final refetch and unsubscribe flags for the given run."""
-        await self.publish_runs_advise_refetch_async(run_id=run_id)
-        await self._publish_runs_advise_unsubscribe_async(run_id=run_id)
+        self.publish_runs_advise_refetch(run_id=run_id)
+        self._publish_runs_advise_unsubscribe(run_id=run_id)
 
-    async def publish_runs_advise_refetch_async(self, run_id: str) -> None:
+    def publish_runs_advise_refetch(self, run_id: str) -> None:
         """Publish a refetch flag for relevant runs topics."""
-        await self._client.publish_advise_refetch_async(topic=topics.RUNS)
+        self._client.publish_advise_refetch(topic=topics.RUNS)
 
         if self._run_hooks is not None:
-            await self._client.publish_advise_refetch_async(
+            self._client.publish_advise_refetch(
                 topic=topics.TopicName(f"{topics.RUNS}/{run_id}")
             )
 
-    async def _publish_command_links(self) -> None:
+    def _publish_command_links(self) -> None:
         """Publish an update to the run's command links.
 
         Corresponds to the `links` field in `GET /runs/:runId/commands`
         (regardless of query parameters).
         """
-        await self._client.publish_advise_refetch_async(
-            topic=topics.RUNS_COMMANDS_LINKS
-        )
+        self._client.publish_advise_refetch(topic=topics.RUNS_COMMANDS_LINKS)
 
-    async def _publish_runs_advise_unsubscribe_async(self, run_id: str) -> None:
+    def _publish_runs_advise_unsubscribe(self, run_id: str) -> None:
         """Publish an unsubscribe flag for relevant runs topics."""
         if self._run_hooks is not None:
-            await self._client.publish_advise_unsubscribe_async(
+            self._client.publish_advise_unsubscribe(
                 topic=topics.TopicName(f"{topics.RUNS}/{run_id}")
             )
-            await self._client.publish_advise_unsubscribe_async(
-                topic=topics.RUNS_COMMANDS_LINKS
-            )
-            await self._client.publish_advise_unsubscribe_async(
+            self._client.publish_advise_unsubscribe(topic=topics.RUNS_COMMANDS_LINKS)
+            self._client.publish_advise_unsubscribe(
                 topic=topics.TopicName(
                     f"{topics.RUNS_PRE_SERIALIZED_COMMANDS}/{run_id}"
                 )
             )
 
-    async def publish_pre_serialized_commands_notification(self, run_id: str) -> None:
+    def publish_pre_serialized_commands_notification(self, run_id: str) -> None:
         """Publishes notification for GET /runs/:runId/commandsAsPreSerializedList."""
         if self._run_hooks is not None:
-            await self._client.publish_advise_refetch_async(
+            self._client.publish_advise_refetch(
                 topic=topics.TopicName(
                     f"{topics.RUNS_PRE_SERIALIZED_COMMANDS}/{run_id}"
                 )
@@ -132,7 +128,7 @@ class RunsPublisher:
                 self._run_hooks.run_id
             )
             if self._engine_state_slice.current_command != new_current_command:
-                await self._publish_command_links()
+                self._publish_command_links()
                 self._engine_state_slice.current_command = new_current_command
 
     async def _handle_recovery_target_command_change(self) -> None:
@@ -144,7 +140,7 @@ class RunsPublisher:
                 self._engine_state_slice.recovery_target_command
                 != new_recovery_target_command
             ):
-                await self._publish_command_links()
+                self._publish_command_links()
                 self._engine_state_slice.recovery_target_command = (
                     new_recovery_target_command
                 )
@@ -161,9 +157,7 @@ class RunsPublisher:
                 and self._engine_state_slice.state_summary_status
                 != new_state_summary.status
             ):
-                await self.publish_runs_advise_refetch_async(
-                    run_id=self._run_hooks.run_id
-                )
+                self.publish_runs_advise_refetch(run_id=self._run_hooks.run_id)
                 self._engine_state_slice.state_summary_status = new_state_summary.status
 
 

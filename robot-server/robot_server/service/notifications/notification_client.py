@@ -82,25 +82,9 @@ class NotificationClient:
         self._client.loop_stop()
         await to_thread.run_sync(self._client.disconnect)
 
-    async def publish_advise_refetch_async(self, topic: TopicName) -> None:
-        """Asynchronously publish a refetch message on a specific topic to the MQTT broker.
-
-        Args:
-            topic: The topic to publish the message on.
-        """
-        await to_thread.run_sync(self.publish_advise_refetch, topic)
-
-    async def publish_advise_unsubscribe_async(self, topic: TopicName) -> None:
-        """Asynchronously publish an unsubscribe message on a specific topic to the MQTT broker.
-
-        Args:
-            topic: The topic to publish the message on.
-        """
-        await to_thread.run_sync(self.publish_advise_unsubscribe, topic)
-
     def publish_advise_refetch(
         self,
-        topic: str,
+        topic: TopicName,
     ) -> None:
         """Publish a refetch message on a specific topic to the MQTT broker.
 
@@ -118,7 +102,7 @@ class NotificationClient:
 
     def publish_advise_unsubscribe(
         self,
-        topic: str,
+        topic: TopicName,
     ) -> None:
         """Publish an unsubscribe message on a specific topic to the MQTT broker.
 

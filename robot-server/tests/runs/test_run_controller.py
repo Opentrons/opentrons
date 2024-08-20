@@ -199,7 +199,7 @@ async def test_create_play_action_to_start(
             commands=protocol_commands,
             run_time_parameters=run_time_parameters,
         ),
-        await mock_runs_publisher.publish_pre_serialized_commands_notification(run_id),
+        mock_runs_publisher.publish_pre_serialized_commands_notification(run_id),
         times=1,
     )
 
