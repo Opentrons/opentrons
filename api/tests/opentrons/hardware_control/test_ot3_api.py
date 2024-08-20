@@ -122,6 +122,7 @@ def fake_liquid_settings() -> LiquidProbeSettings:
         sensor_threshold_pascals=15,
         output_option=OutputOptions.can_bus_only,
         aspirate_while_sensing=False,
+        z_overlap_between_passes_mm=0.1,
         data_files={InstrumentProbeType.PRIMARY: "fake_file_name"},
     )
 
@@ -825,6 +826,7 @@ async def test_liquid_probe(
             sensor_threshold_pascals=15,
             output_option=OutputOptions.can_bus_only,
             aspirate_while_sensing=True,
+            z_overlap_between_passes_mm=0.1,
             data_files={InstrumentProbeType.PRIMARY: "fake_file_name"},
         )
         fake_max_z_dist = 10.0
@@ -905,7 +907,7 @@ async def test_liquid_probe_plunger_moves(
             mount_speed
         )
 
-        probe_pass_overlap = 0.1
+        probe_pass_overlap = config.z_overlap_between_passes_mm
         probe_pass_z_offset_mm = non_responsive_z_mm + probe_pass_overlap
         probe_safe_reset_mm = max(2.0, probe_pass_z_offset_mm)
 
@@ -999,7 +1001,7 @@ async def test_liquid_probe_mount_moves(
             mount_speed
         )
 
-        probe_pass_overlap = 0.1
+        probe_pass_overlap = config.z_overlap_between_passes_mm
         probe_pass_z_offset_mm = non_responsive_z_mm + probe_pass_overlap
         probe_safe_reset_mm = max(2.0, probe_pass_z_offset_mm)
 
@@ -1068,6 +1070,7 @@ async def test_multi_liquid_probe(
             sensor_threshold_pascals=15,
             output_option=OutputOptions.can_bus_only,
             aspirate_while_sensing=True,
+            z_overlap_between_passes_mm=0.1,
             data_files={InstrumentProbeType.PRIMARY: "fake_file_name"},
         )
         fake_max_z_dist = 10.0
@@ -1140,6 +1143,7 @@ async def test_liquid_not_found(
         sensor_threshold_pascals=15,
         output_option=OutputOptions.can_bus_only,
         aspirate_while_sensing=True,
+        z_overlap_between_passes_mm=0.1,
         data_files={InstrumentProbeType.PRIMARY: "fake_file_name"},
     )
     # with a mount speed of 5, pass overlap of 0.5 and a 0.2s delay on z
