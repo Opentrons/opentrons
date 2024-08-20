@@ -16,7 +16,7 @@ export function SelectRobot(props: WizardTileProps): JSX.Element {
       stepNumber={1}
       header={t('basics')}
       subHeader={t('questions')}
-      disabled={robotType === undefined}
+      disabled={false}
       proceed={() => {
         proceed(1)
       }}

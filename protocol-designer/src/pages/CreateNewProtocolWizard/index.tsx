@@ -99,7 +99,7 @@ const initialFormState: WizardFormState = {
     name: undefined,
     description: undefined,
     organizationOrAuthor: undefined,
-    robotType: undefined,
+    robotType: FLEX_ROBOT_TYPE,
   },
   pipettesByMount: {
     left: { pipetteName: undefined, tiprackDefURI: undefined },
