@@ -322,7 +322,7 @@ export function ProtocolRunHeader({
         })
       }
     }
-  }, [runStatus, isRunCurrent, runId, enteredER])
+  }, [runStatus, isRunCurrent, runId, enteredER, initialPipettesWithTipsCount])
 
   const startedAtTimestamp =
     startedAt != null ? formatTimestamp(startedAt) : EMPTY_TIMESTAMP
