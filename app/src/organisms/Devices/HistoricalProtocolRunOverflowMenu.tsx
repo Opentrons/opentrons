@@ -189,7 +189,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
         {t('rerun_now')}
       </MenuItem>
       {isRobotOnWrongVersionOfSoftware && (
-        <Tooltip tooltipProps={tooltipProps}>
+        <Tooltip tooltipProps={tooltipProps} maxWidth={'max-content'}>
           {t('shared:a_software_update_is_available')}
         </Tooltip>
       )}
