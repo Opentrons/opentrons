@@ -133,13 +133,15 @@
       "type": "object",
       "required": ["frusta", "bottomShape"],
       "properties": {
-        "frusta": "array",
-        "description": ".",
-        "items": {
-          "type": "object",
+        "frusta": {
           "description": ".",
-          "additionalProperties": {
-            "$ref": "#/definitions/BoundedSection"
+          "type": "array",
+          "items": {
+            "type": "object",
+            "description": ".",
+            "additionalProperties": {
+              "$ref": "#/definitions/BoundedSection"
+            }
           }
         },
         "bottomShape": {
