@@ -5,7 +5,6 @@ import { SPACING } from '../../../ui-style-constants'
 import { StyledText } from '../../StyledText'
 
 interface ListButtonAccordionProps {
-  headline: string
   children: React.ReactNode
   // determines if the accordion is expanded or not
   isExpanded?: boolean
@@ -13,6 +12,7 @@ interface ListButtonAccordionProps {
   isNested?: boolean
   // optional main headline for the top level accordion
   mainHeadline?: string
+  headline?: string
 }
 
 /*
@@ -33,7 +33,11 @@ export function ListButtonAccordion(
   return (
     <Flex flexDirection={DIRECTION_COLUMN} width="100%">
       {mainHeadline != null ? (
-        <Flex marginBottom={isExpanded ? SPACING.spacing40 : '0'}>
+        <Flex
+          marginBottom={
+            isExpanded && headline != null ? SPACING.spacing40 : '0'
+          }
+        >
           <StyledText desktopStyle="bodyDefaultSemiBold">
             {mainHeadline}
           </StyledText>
@@ -46,11 +50,13 @@ export function ListButtonAccordion(
           gridGap={SPACING.spacing4}
           marginLeft={isNested ? SPACING.spacing40 : '0'}
         >
-          <Flex marginBottom={SPACING.spacing4}>
-            <StyledText desktopStyle="bodyDefaultSemiBold">
-              {headline}
-            </StyledText>
-          </Flex>
+          {headline != null ? (
+            <Flex marginBottom={SPACING.spacing4}>
+              <StyledText desktopStyle="bodyDefaultSemiBold">
+                {headline}
+              </StyledText>
+            </Flex>
+          ) : null}
           <Flex flexDirection={DIRECTION_COLUMN}>{children}</Flex>
         </Flex>
       ) : null}
