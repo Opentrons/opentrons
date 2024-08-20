@@ -354,7 +354,7 @@ async def test_get_run_commands(
         run_data_manager=mock_run_data_manager,
         cursor=None,
         pageLength=42,
-        includeFixitCommands=True
+        includeFixitCommands=True,
     )
 
     assert result.content.data == [
@@ -421,7 +421,7 @@ async def test_get_run_commands_empty(
         run_data_manager=mock_run_data_manager,
         cursor=21,
         pageLength=42,
-        includeFixitCommands=True
+        includeFixitCommands=True,
     )
 
     assert result.content.data == []
@@ -440,7 +440,8 @@ async def test_get_run_commands_not_found(
     decoy.when(
         mock_run_data_manager.get_commands_slice(
             run_id="run-id", cursor=21, length=42, include_fixit_commands=True
-        )    ).then_raise(not_found_error)
+        )
+    ).then_raise(not_found_error)
 
     with pytest.raises(ApiError) as exc_info:
         await get_run_commands(
@@ -448,7 +449,7 @@ async def test_get_run_commands_not_found(
             run_data_manager=mock_run_data_manager,
             cursor=21,
             pageLength=42,
-            includeFixitCommands=True
+            includeFixitCommands=True,
         )
 
     assert exc_info.value.status_code == 404
