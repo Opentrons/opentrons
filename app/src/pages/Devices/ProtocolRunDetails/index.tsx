@@ -322,11 +322,12 @@ const SetupTab = (props: SetupTabProps): JSX.Element | null => {
     'not_available_for_a_completed_run'
   )}`
 
+  // On the initial render only, navigate to "run preview" if the run has started.
   React.useEffect(() => {
     if (runHasStarted && protocolRunDetailsTab === 'setup') {
       navigate(`/devices/${robotName}/protocol-runs/${runId}/run-preview`)
     }
-  }, [runHasStarted, navigate, protocolRunDetailsTab, robotName, runId])
+  }, [])
 
   return (
     <RoundTab
