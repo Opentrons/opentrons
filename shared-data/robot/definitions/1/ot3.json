@@ -2,9 +2,9 @@
   "displayName": "OT-3",
   "robotType": "OT-3 Standard",
   "models": ["OT-3 Standard"],
-  "extents": [477.2, 493.8, 0.0],
+  "extents": [519.1, 493.8, 0.0],
   "mountOffsets": {
-    "left": [-13.5, -60.5, 255.675],
+    "left": [-59.7, -60.5, 255.675],
     "right": [40.5, -60.5, 255.675],
     "gripper": [84.55, -12.75, 93.85]
   }
