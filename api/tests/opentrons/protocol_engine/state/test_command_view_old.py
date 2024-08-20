@@ -904,7 +904,7 @@ def test_get_current() -> None:
 def test_get_slice_empty() -> None:
     """It should return a slice from the tail if no current command."""
     subject = get_command_view(commands=[])
-    result = subject.get_slice(cursor=0, length=2)
+    result = subject.get_slice(cursor=0, length=2, all_commands=True)
 
     assert result == CommandSlice(commands=[], cursor=0, total_length=0)
 
@@ -918,7 +918,7 @@ def test_get_slice() -> None:
 
     subject = get_command_view(commands=[command_1, command_2, command_3, command_4])
 
-    result = subject.get_slice(cursor=1, length=3)
+    result = subject.get_slice(cursor=1, length=3, all_commands=True)
 
     assert result == CommandSlice(
         commands=[command_2, command_3, command_4],
@@ -926,7 +926,7 @@ def test_get_slice() -> None:
         total_length=4,
     )
 
-    result = subject.get_slice(cursor=-3, length=10)
+    result = subject.get_slice(cursor=-3, length=10, all_commands=True)
 
     assert result == CommandSlice(
         commands=[command_1, command_2, command_3, command_4],
@@ -944,7 +944,7 @@ def test_get_slice_default_cursor_no_current() -> None:
 
     subject = get_command_view(commands=[command_1, command_2, command_3, command_4])
 
-    result = subject.get_slice(cursor=None, length=3)
+    result = subject.get_slice(cursor=None, length=3, all_commands=True)
 
     assert result == CommandSlice(
         commands=[command_2, command_3, command_4],
@@ -975,7 +975,7 @@ def test_get_slice_default_cursor_failed_command() -> None:
         failed_command=CommandEntry(index=2, command=command_3),
     )
 
-    result = subject.get_slice(cursor=None, length=3)
+    result = subject.get_slice(cursor=None, length=3, all_commands=True)
 
     assert result == CommandSlice(
         commands=[command_3, command_4],
@@ -997,7 +997,7 @@ def test_get_slice_default_cursor_running() -> None:
         running_command_id="command-id-3",
     )
 
-    result = subject.get_slice(cursor=None, length=2)
+    result = subject.get_slice(cursor=None, length=2, all_commands=True)
 
     assert result == CommandSlice(
         commands=[command_3, command_4],

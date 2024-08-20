@@ -97,6 +97,14 @@ class CommandHistory:
             for command_id in self._all_command_ids
         ]
 
+    def get_filtered_queue_ids(self, all_commands: bool) -> list[str]:
+        print(list(self.get_fixit_queue_ids()))
+        return [
+            i
+            for i in self._all_command_ids
+            if i not in list(self.get_fixit_queue_ids())
+        ]
+
     def get_all_ids(self) -> List[str]:
         """Get all command IDs."""
         return self._all_command_ids
