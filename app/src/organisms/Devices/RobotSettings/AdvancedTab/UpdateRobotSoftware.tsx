@@ -8,11 +8,13 @@ import {
   Box,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
+  DIRECTION_COLUMN,
   SPACING_AUTO,
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
   useHoverTooltip,
+  StyledText,
 } from '@opentrons/components'
 
 import { ExternalLink } from '../../../../atoms/Link/ExternalLink'
@@ -20,6 +22,7 @@ import { TertiaryButton } from '../../../../atoms/buttons'
 import { Tooltip } from '../../../../atoms/Tooltip'
 import { getRobotUpdateDisplayInfo } from '../../../../redux/robot-update'
 import { useDispatchStartRobotUpdate } from '../../../../redux/robot-update/hooks'
+import { Banner } from '../../../../atoms/Banner'
 
 import type { State } from '../../../../redux/types'
 
@@ -67,43 +70,50 @@ export function UpdateRobotSoftware({
   }
 
   return (
-    <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-      <Box width="70%">
-        <LegacyStyledText
-          css={TYPOGRAPHY.pSemiBold}
-          marginBottom={SPACING.spacing8}
-          id="AdvancedSettings_updateRobotSoftware"
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
+      <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
+        <Box width="70%">
+          <LegacyStyledText
+            css={TYPOGRAPHY.pSemiBold}
+            marginBottom={SPACING.spacing8}
+            id="AdvancedSettings_updateRobotSoftware"
+          >
+            {t('update_robot_software')}
+          </LegacyStyledText>
+          <LegacyStyledText as="p" marginBottom={SPACING.spacing8}>
+            {t('branded:update_robot_software_description')}
+          </LegacyStyledText>
+          <ExternalLink href={OT_APP_UPDATE_PAGE_LINK}>
+            {t('branded:update_robot_software_link')}
+          </ExternalLink>
+        </Box>
+        <TertiaryButton
+          marginLeft={SPACING_AUTO}
+          id="AdvancedSettings_softwareUpdateButton"
+          {...updateButtonProps}
+          disabled={updateDisabled || isRobotBusy}
+          onClick={handleClick}
         >
-          {t('update_robot_software')}
-        </LegacyStyledText>
-        <LegacyStyledText as="p" marginBottom={SPACING.spacing8}>
-          {t('branded:update_robot_software_description')}
-        </LegacyStyledText>
-        <ExternalLink href={OT_APP_UPDATE_PAGE_LINK}>
-          {t('branded:update_robot_software_link')}
-        </ExternalLink>
-      </Box>
-      <TertiaryButton
-        marginLeft={SPACING_AUTO}
-        id="AdvancedSettings_softwareUpdateButton"
-        {...updateButtonProps}
-        disabled={updateDisabled || isRobotBusy}
-        onClick={handleClick}
-      >
-        {t('browse_file_system')}
-        <input
-          ref={inputRef}
-          type="file"
-          onChange={handleChange}
-          disabled={updateDisabled}
-          css={HIDDEN_CSS}
-        />
-      </TertiaryButton>
-      {updateFromFileDisabledReason != null && (
-        <Tooltip tooltipProps={updateButtonTooltipProps}>
-          {updateFromFileDisabledReason}
-        </Tooltip>
-      )}
+          {t('browse_file_system')}
+          <input
+            ref={inputRef}
+            type="file"
+            onChange={handleChange}
+            disabled={updateDisabled}
+            css={HIDDEN_CSS}
+          />
+        </TertiaryButton>
+        {updateFromFileDisabledReason != null && (
+          <Tooltip tooltipProps={updateButtonTooltipProps}>
+            {updateFromFileDisabledReason}
+          </Tooltip>
+        )}
+      </Flex>
+      <Banner type="warning">
+        <StyledText desktopStyle="bodyDefaultRegular">
+          {t('you_should_not_downgrade')}
+        </StyledText>
+      </Banner>
     </Flex>
   )
 }
