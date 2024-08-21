@@ -55,6 +55,7 @@ export const SecondaryButton = styled.button.withConfig<SecondaryButtonProps>({
     box-shadow: none;
     border-color: ${COLORS.grey30};
     color: ${COLORS.grey40};
+    cursor: default;
   }
 
   ${styleProps}
