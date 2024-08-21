@@ -1,6 +1,7 @@
 """Customize the ProtocolEngine to monitor and control legacy (APIv2) protocols."""
 from __future__ import annotations
 
+import asyncio
 from contextlib import ExitStack
 from typing import Optional
 
@@ -30,11 +31,14 @@ class LegacyContextPlugin(AbstractPlugin):
 
     def __init__(
         self,
+        engine_loop: asyncio.AbstractEventLoop,
         broker: LegacyBroker,
         equipment_broker: ReadOnlyBroker[LoadInfo],
         legacy_command_mapper: Optional[LegacyCommandMapper] = None,
     ) -> None:
         """Initialize the plugin with its dependencies."""
+        self._engine_loop = engine_loop
+
         self._broker = broker
         self._equipment_broker = equipment_broker
         self._legacy_command_mapper = legacy_command_mapper or LegacyCommandMapper()
@@ -91,8 +95,10 @@ class LegacyContextPlugin(AbstractPlugin):
         Used as a broker callback, so this will run in the APIv2 protocol's thread.
         """
         pe_actions = self._legacy_command_mapper.map_command(command=command)
-        for pe_action in pe_actions:
-            self.dispatch(pe_action)
+        future = asyncio.run_coroutine_threadsafe(
+            self._dispatch_action_list(pe_actions), self._engine_loop
+        )
+        future.result()
 
     def _handle_equipment_loaded(self, load_info: LoadInfo) -> None:
         """Handle an equipment load reported by the legacy APIv2 protocol.
@@ -100,5 +106,11 @@ class LegacyContextPlugin(AbstractPlugin):
         Used as a broker callback, so this will run in the APIv2 protocol's thread.
         """
         pe_actions = self._legacy_command_mapper.map_equipment_load(load_info=load_info)
-        for pe_action in pe_actions:
-            self.dispatch(pe_action)
+        future = asyncio.run_coroutine_threadsafe(
+            self._dispatch_action_list(pe_actions), self._engine_loop
+        )
+        future.result()
+
+    async def _dispatch_action_list(self, actions: list[pe_actions.Action]) -> None:
+        for action in actions:
+            self.dispatch(action)
