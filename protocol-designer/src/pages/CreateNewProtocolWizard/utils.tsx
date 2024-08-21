@@ -9,7 +9,11 @@ import {
 import wasteChuteImage from '../../assets/images/waste_chute.png'
 import trashBinImage from '../../assets/images/flex_trash_bin.png'
 import stagingAreaImage from '../../assets/images/staging_area.png'
-import type { LabwareDefByDefURI, PipetteName } from '@opentrons/shared-data'
+import type {
+  LabwareDefByDefURI,
+  LabwareDefinition2,
+  PipetteName,
+} from '@opentrons/shared-data'
 import type { AdditionalEquipment, WizardFormState } from './types'
 
 const TOTAL_MODULE_SLOTS = 8
@@ -146,7 +150,7 @@ export function getTiprackOptions(
         def.namespace === 'custom_beta'
       )
     })
-    .reduce((acc, def) => {
+    .reduce((acc: Record<string, string>, def: LabwareDefinition2) => {
       const displayName = getLabwareDisplayName(def)
       const name =
         def.parameters.loadName.includes('flex') && isFlexPipette
@@ -154,7 +158,7 @@ export function getTiprackOptions(
           : displayName
       acc[getLabwareDefURI(def)] = name
       return acc
-    }, {} as Record<string, string>)
+    }, {})
 
   return tiprackOptionsMap
 }
