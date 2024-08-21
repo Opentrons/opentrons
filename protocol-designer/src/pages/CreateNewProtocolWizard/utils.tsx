@@ -2,11 +2,14 @@ import * as React from 'react'
 import {
   MAGNETIC_BLOCK_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  getLabwareDefURI,
+  getLabwareDisplayName,
+  getPipetteSpecsV2,
 } from '@opentrons/shared-data'
 import wasteChuteImage from '../../assets/images/waste_chute.png'
 import trashBinImage from '../../assets/images/flex_trash_bin.png'
 import stagingAreaImage from '../../assets/images/staging_area.png'
-
+import type { LabwareDefByDefURI, PipetteName } from '@opentrons/shared-data'
 import type { AdditionalEquipment, WizardFormState } from './types'
 
 const TOTAL_MODULE_SLOTS = 8
@@ -104,4 +107,56 @@ export function AdditionalEquipmentDiagram(props: EquipmentProps): JSX.Element {
       )
     }
   }
+}
+
+export interface TiprackOption {
+  name: string
+  value: string
+}
+
+interface TiprackOptionsProps {
+  allLabware: LabwareDefByDefURI
+  allowAllTipracks: boolean
+  selectedPipetteName?: string | null
+}
+export function getTiprackOptions(props: TiprackOptionsProps): TiprackOption[] {
+  const { allLabware, allowAllTipracks, selectedPipetteName } = props
+
+  if (!allLabware) return []
+
+  const pipetteSpecs = selectedPipetteName
+    ? getPipetteSpecsV2(selectedPipetteName as PipetteName)
+    : null
+
+  const defaultTipracks = pipetteSpecs?.liquids.default.defaultTipracks ?? []
+  const displayCategory = pipetteSpecs?.displayCategory ?? ''
+  const isFlexPipette =
+    displayCategory === 'FLEX' || selectedPipetteName === 'p1000_96'
+
+  const tiprackOptions = Object.values(allLabware)
+    .filter(def => def.metadata.displayCategory === 'tipRack')
+    .filter(def => {
+      if (allowAllTipracks) {
+        return isFlexPipette
+          ? def.metadata.displayName.includes('Flex') ||
+              def.namespace === 'custom_beta'
+          : !def.metadata.displayName.includes('Flex') ||
+              def.namespace === 'custom_beta'
+      }
+      return (
+        defaultTipracks.includes(getLabwareDefURI(def)) ||
+        def.namespace === 'custom_beta'
+      )
+    })
+    .map(def => {
+      const displayName = getLabwareDisplayName(def)
+      const name =
+        def.parameters.loadName.includes('flex') && isFlexPipette
+          ? displayName.split('Opentrons Flex')[1]
+          : displayName
+      return { name, value: getLabwareDefURI(def) }
+    })
+    .sort((a, b) => (a.name.includes('(Retired)') ? 1 : -1))
+
+  return tiprackOptions
 }

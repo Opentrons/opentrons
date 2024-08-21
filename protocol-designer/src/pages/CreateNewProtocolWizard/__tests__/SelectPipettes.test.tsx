@@ -7,18 +7,18 @@ import { i18n } from '../../../assets/localization'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { getLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { getAllowAllTipracks } from '../../../feature-flags/selectors'
-import { getTiprackOptions } from '../../../components/modals/utils'
 import { IncompatibleTipsModal } from '../../../organisms'
 import { createCustomTiprackDef } from '../../../labware-defs/actions'
 import { SelectPipettes } from '../SelectPipettes'
+import { getTiprackOptions } from '../utils'
 
 import type { WizardFormState, WizardTileProps } from '../types'
 
 vi.mock('../../../labware-defs/selectors')
 vi.mock('../../../feature-flags/selectors')
-vi.mock('../../../components/modals/utils')
 vi.mock('../../../organisms')
 vi.mock('../../../labware-defs/actions')
+vi.mock('../utils')
 
 const render = (props: React.ComponentProps<typeof SelectPipettes>) => {
   return renderWithProviders(<SelectPipettes {...props} />, {
