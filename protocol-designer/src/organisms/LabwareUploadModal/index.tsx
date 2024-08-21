@@ -16,7 +16,7 @@ import {
 } from '../../labware-defs/actions'
 import { LabwareUploadModalBody } from './LabwareUploadModalBody'
 
-export const LabwareUploadModal = (): JSX.Element | null => {
+export function LabwareUploadModal(): JSX.Element | null {
   const message = useSelector(getLabwareUploadMessage)
   const dispatch = useDispatch()
   const { t } = useTranslation('shared')
@@ -35,14 +35,12 @@ export const LabwareUploadModal = (): JSX.Element | null => {
     } else {
       console.assert(
         false,
-        `labware def should only be overwritten when messageType is ASK_FOR_LABWARE_OVERWRITE. Got ${String(
-          message?.messageType
-        )}`
+        `labware def should only be overwritten when messageType is ASK_FOR_LABWARE_OVERWRITE. Got ${message?.messageType}`
       )
     }
   }
 
-  if (!message) return null
+  if (message == null) return null
 
   return (
     <Modal
@@ -51,26 +49,24 @@ export const LabwareUploadModal = (): JSX.Element | null => {
           ? 'warning'
           : 'error'
       }
-      title={t(`${message.messageType}`)}
+      title={t(`${message.messageType.toLowerCase()}`)}
       closeOnOutsideClick
       onClose={dismissModal}
       footer={
-        <Flex
-          padding={SPACING.spacing24}
-          justifyContent={JUSTIFY_END}
-          gridGap={SPACING.spacing8}
-        >
-          {message.messageType === 'ASK_FOR_LABWARE_OVERWRITE' ? (
-            <>
-              <SecondaryButton onClick={dismissModal}>
-                {t('cancel')}
-              </SecondaryButton>
-              <PrimaryButton onClick={overwriteLabwareDef}>
-                {t('overwrite_labware')}
-              </PrimaryButton>
-            </>
-          ) : undefined}
-        </Flex>
+        message.messageType === 'ASK_FOR_LABWARE_OVERWRITE' && (
+          <Flex
+            padding={SPACING.spacing24}
+            justifyContent={JUSTIFY_END}
+            gridGap={SPACING.spacing8}
+          >
+            <SecondaryButton onClick={dismissModal}>
+              {t('cancel')}
+            </SecondaryButton>
+            <PrimaryButton onClick={overwriteLabwareDef}>
+              {t('overwrite_labware')}
+            </PrimaryButton>
+          </Flex>
+        )
       }
     >
       <LabwareUploadModalBody message={message} />

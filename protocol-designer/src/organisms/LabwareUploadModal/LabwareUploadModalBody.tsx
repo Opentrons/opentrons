@@ -6,24 +6,27 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { LabwareUploadMessage } from '../../labware-defs'
+import type { LabwareUploadMessage } from '../../labware-defs'
 
-export const LabwareUploadModalBody = (props: {
+export function LabwareUploadModalBody(props: {
   message: LabwareUploadMessage
-}): JSX.Element | null => {
+}): JSX.Element | null {
   const { message } = props
   const { t } = useTranslation('shared')
-  if (
-    message.messageType === 'EXACT_LABWARE_MATCH' ||
-    message.messageType === 'INVALID_JSON_FILE' ||
-    message.messageType === 'ONLY_TIPRACK' ||
-    message.messageType === 'NOT_JSON' ||
-    message.messageType === 'USES_STANDARD_NAMESPACE'
-  ) {
+
+  const validMessageTypes = [
+    'EXACT_LABWARE_MATCH',
+    'INVALID_JSON_FILE',
+    'ONLY_TIPRACK',
+    'NOT_JSON',
+    'USES_STANDARD_NAMESPACE',
+  ]
+
+  if (validMessageTypes.includes(message.messageType)) {
     return (
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
         <StyledText desktopStyle="bodyDefaultRegular">
-          {t(`message_${message.messageType}`)}
+          {t(`message_${message.messageType.toLowerCase()}`)}
         </StyledText>
         {'errorText' in message ? (
           <StyledText desktopStyle="bodyDefaultRegular">
