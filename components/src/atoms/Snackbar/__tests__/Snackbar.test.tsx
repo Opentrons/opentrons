@@ -4,6 +4,7 @@ import '@testing-library/jest-dom/vitest'
 import { screen, act } from '@testing-library/react'
 import { renderWithProviders } from '../../../testing/utils'
 import { Snackbar } from '..'
+import { COLORS } from '../../../helix-design-system'
 
 const render = (props: React.ComponentProps<typeof Snackbar>) => {
   return renderWithProviders(<Snackbar {...props} />)[0]
@@ -29,8 +30,7 @@ describe('Snackbar', () => {
     }
     render(props)
     const testSnackbar = screen.getByTestId('Snackbar')
-    expect(testSnackbar).toHaveStyle(`color: #16212D
-    background-color: #eaeaeb`)
+    expect(testSnackbar).toHaveStyle(`background-color: ${COLORS.black90}`)
   })
 
   it('after 4 seconds the snackbar should be closed automatically', async () => {

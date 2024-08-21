@@ -273,7 +273,7 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
                               updatedValues.slice(0, 3)
                             )
                             if (selectedValues.length === 3) {
-                              makeSnackbar(t('up_to_3_tipracks'))
+                              makeSnackbar(t('up_to_3_tipracks') as string)
                             }
                           }}
                         />
