@@ -19,8 +19,8 @@ import {
   getModuleType,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
+  MAGNETIC_BLOCK_V1,
   TEMPERATURE_MODULE_TYPE,
-  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { uuid } from '../../utils'
 import {
@@ -33,8 +33,6 @@ import {
   DEFAULT_SLOT_MAP_FLEX,
   DEFAULT_SLOT_MAP_OT2,
   FLEX_SUPPORTED_MODULE_MODELS,
-  MAX_MAGNETIC_BLOCKS,
-  MAX_MOAM_MODULES,
   OT2_SUPPORTED_MODULE_MODELS,
 } from './constants'
 import { getNumSlotsAvailable } from './utils'
@@ -65,6 +63,14 @@ export function SelectModules(props: WizardTileProps): JSX.Element | null {
       ? FLEX_SUPPORTED_MODULE_MODELS
       : OT2_SUPPORTED_MODULE_MODELS
 
+  const numSlotsAvailable = getNumSlotsAvailable(modules, additionalEquipment)
+  const hasNoAvailableSlots = numSlotsAvailable === 0
+  const numMagneticBlocks =
+    modules != null
+      ? Object.values(modules).filter(
+          module => module.model === MAGNETIC_BLOCK_V1
+        )?.length
+      : 0
   const filteredSupportedModules = supportedModules.filter(
     moduleModel =>
       !(
@@ -79,17 +85,6 @@ export function SelectModules(props: WizardTileProps): JSX.Element | null {
   const MOAM_MODULE_TYPES: ModuleType[] = enableMoam
     ? [TEMPERATURE_MODULE_TYPE, HEATERSHAKER_MODULE_TYPE, MAGNETIC_BLOCK_TYPE]
     : [TEMPERATURE_MODULE_TYPE]
-
-  let isDisabled = getNumSlotsAvailable(modules, additionalEquipment) === 0
-  //  special-casing TC since it takes up 2 slots
-  if (
-    modules != null &&
-    Object.values(modules).some(
-      module => module.type === THERMOCYCLER_MODULE_TYPE
-    )
-  ) {
-    isDisabled = getNumSlotsAvailable(modules, additionalEquipment) <= 1
-  }
 
   const filteredModules: FormModules = {}
   const seenModels = new Set<ModuleModel>()
@@ -107,7 +102,7 @@ export function SelectModules(props: WizardTileProps): JSX.Element | null {
     <WizardBody
       stepNumber={robotType === FLEX_ROBOT_TYPE ? 4 : 3}
       header={t('add_modules')}
-      disabled={isDisabled}
+      disabled={false}
       goBack={() => {
         goBack(1)
         setValue('modules', null)
@@ -118,12 +113,14 @@ export function SelectModules(props: WizardTileProps): JSX.Element | null {
     >
       <Flex marginTop={SPACING.spacing60} flexDirection={DIRECTION_COLUMN}>
         <Flex flexDirection={DIRECTION_COLUMN}>
-          <StyledText
-            desktopStyle="headingSmallBold"
-            marginBottom={SPACING.spacing12}
-          >
-            {t('which_mods')}
-          </StyledText>
+          {filteredSupportedModules.length > 0 ? (
+            <StyledText
+              desktopStyle="headingSmallBold"
+              marginBottom={SPACING.spacing12}
+            >
+              {t('which_mods')}
+            </StyledText>
+          ) : null}
           <Flex gridGap={SPACING.spacing4} flexWrap={WRAP}>
             {filteredSupportedModules
               .filter(module =>
@@ -134,22 +131,37 @@ export function SelectModules(props: WizardTileProps): JSX.Element | null {
               .map(moduleModel => (
                 <EmptySelectorButton
                   key={moduleModel}
+                  disabled={
+                    (moduleModel !== 'magneticBlockV1' &&
+                      hasNoAvailableSlots) ||
+                    (moduleModel === 'thermocyclerModuleV2' &&
+                      numSlotsAvailable <= 1) ||
+                    (moduleModel === 'magneticBlockV1' &&
+                      hasNoAvailableSlots &&
+                      numMagneticBlocks === 4)
+                  }
                   textAlignment={TYPOGRAPHY.textAlignLeft}
                   size="small"
                   iconName="plus"
                   text={getModuleDisplayName(moduleModel)}
                   onClick={() => {
-                    setValue('modules', {
-                      ...modules,
-                      [uuid()]: {
-                        model: moduleModel,
-                        type: getModuleType(moduleModel),
-                        slot:
-                          robotType === FLEX_ROBOT_TYPE
-                            ? DEFAULT_SLOT_MAP_FLEX[moduleModel]
-                            : DEFAULT_SLOT_MAP_OT2[getModuleType(moduleModel)],
-                      },
-                    })
+                    if (hasNoAvailableSlots) {
+                      // render snackbar
+                    } else {
+                      setValue('modules', {
+                        ...modules,
+                        [uuid()]: {
+                          model: moduleModel,
+                          type: getModuleType(moduleModel),
+                          slot:
+                            robotType === FLEX_ROBOT_TYPE
+                              ? DEFAULT_SLOT_MAP_FLEX[moduleModel]
+                              : DEFAULT_SLOT_MAP_OT2[
+                                  getModuleType(moduleModel)
+                                ],
+                        },
+                      })
+                    }
                   }}
                 />
               ))}
@@ -213,9 +225,9 @@ export function SelectModules(props: WizardTileProps): JSX.Element | null {
                     },
                     dropdownType: 'neutral' as any,
                     filterOptions: getMoamOptions(
-                      module.type === MAGNETIC_BLOCK_TYPE
-                        ? MAX_MAGNETIC_BLOCKS
-                        : MAX_MOAM_MODULES
+                      module.model === 'magneticBlockV1'
+                        ? numSlotsAvailable + 3 + length
+                        : numSlotsAvailable + length
                     ),
                   }
                   return (

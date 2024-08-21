@@ -15,6 +15,7 @@ import {
   MAGNETIC_BLOCK_TYPE,
   MAGNETIC_MODULE_TYPE,
   OT2_ROBOT_TYPE,
+  STAGING_AREA_CUTOUTS,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   WASTE_CHUTE_CUTOUT,
@@ -58,6 +59,7 @@ import type {
   PipetteName,
 } from '@opentrons/shared-data'
 import type { WizardFormState } from './types'
+import { getTrashSlot } from './utils'
 
 type WizardStep =
   | 'robot'
@@ -265,8 +267,7 @@ export function CreateNewProtocolWizard(): JSX.Element | null {
           createDeckFixture(
             'trashBin',
             values.fields.robotType === FLEX_ROBOT_TYPE
-              ? //  TODO(ja, 8/9/24): add logic for which trash location for flex to default to
-                'cutoutA3'
+              ? getTrashSlot(values)
               : 'cutout12'
           )
         )
@@ -277,13 +278,14 @@ export function CreateNewProtocolWizard(): JSX.Element | null {
         dispatch(createDeckFixture('wasteChute', WASTE_CHUTE_CUTOUT))
       }
       //  add staging areas
-      const stagingAreas = values.additionalEquipment.filter(equipment =>
-        equipment.includes('stagingArea')
+      const stagingAreas = values.additionalEquipment.filter(
+        equipment => equipment === 'stagingArea'
       )
       if (stagingAreas.length > 0) {
-        stagingAreas.forEach(stagingArea => {
-          const [, location] = stagingArea.split('_')
-          dispatch(createDeckFixture('stagingArea', location))
+        stagingAreas.forEach((_, index) => {
+          return dispatch(
+            createDeckFixture('stagingArea', STAGING_AREA_CUTOUTS[index])
+          )
         })
       }
 
@@ -316,7 +318,8 @@ export function CreateNewProtocolWizard(): JSX.Element | null {
       if (values.additionalEquipment.includes('gripper')) {
         dispatch(toggleIsGripperRequired())
       }
-      // auto-generate tipracks for pipettes
+
+      // auto-generate assigned tipracks for pipettes
       const newTiprackModels: string[] = uniq(
         pipettes.flatMap(pipette => pipette.tiprackDefURI)
       )

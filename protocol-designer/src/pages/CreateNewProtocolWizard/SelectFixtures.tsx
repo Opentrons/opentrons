@@ -1,8 +1,11 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import without from 'lodash/without'
+import { THERMOCYCLER_MODULE_V2 } from '@opentrons/shared-data'
 import {
   DIRECTION_COLUMN,
+  DropdownBorder,
+  DropdownOption,
   EmptySelectorButton,
   Flex,
   ListItem,
@@ -13,40 +16,61 @@ import {
   WRAP,
 } from '@opentrons/components'
 import { WizardBody } from './WizardBody'
-import { AdditionalEquipmentDiagram } from './utils'
+import { AdditionalEquipmentDiagram, getNumSlotsAvailable } from './utils'
 
 import type { AdditionalEquipment, WizardTileProps } from './types'
+
+const getStagingAreaOptions = (length: number): DropdownOption[] => {
+  return Array.from({ length }, (_, i) => ({
+    name: `${i + 1}`,
+    value: `${i + 1}`,
+  }))
+}
 
 const ADDITIONAL_EQUIPMENTS: AdditionalEquipment[] = [
   'wasteChute',
   'trashBin',
-  'stagingArea_cutoutA3',
-  'stagingArea_cutoutB3',
-  'stagingArea_cutoutC3',
-  'stagingArea_cutoutD3',
+  'stagingArea',
 ]
 export function SelectFixtures(props: WizardTileProps): JSX.Element | null {
   const { goBack, proceed, setValue, watch } = props
   const additionalEquipment = watch('additionalEquipment')
+  const modules = watch('modules')
   const { t } = useTranslation(['create_new_protocol', 'shared'])
+  const hasTC =
+    modules != null &&
+    Object.values(modules).some(
+      module => module.model === THERMOCYCLER_MODULE_V2
+    )
+  const hasTrash = additionalEquipment.some(
+    ae => ae === 'trashBin' || ae === 'wasteChute'
+  )
   const filteredAdditionalEquipmentWithoutGripper = additionalEquipment.filter(
     ae => ae !== 'gripper'
+  )
+  const filteredDuplicateStagingAreas = Array.from(
+    new Set(filteredAdditionalEquipmentWithoutGripper)
   )
   const filteredAdditionalEquipment = ADDITIONAL_EQUIPMENTS.filter(
     equipment => !filteredAdditionalEquipmentWithoutGripper.includes(equipment)
   )
+  const numSlotsAvailable = getNumSlotsAvailable(modules, additionalEquipment)
 
   return (
     <WizardBody
       stepNumber={5}
       header={t('add_fixtures')}
       subHeader={t('fixtures_replace')}
-      disabled={false}
+      disabled={!hasTrash}
       goBack={() => {
         goBack(1)
       }}
       proceed={() => {
-        proceed(1)
+        if (!hasTrash) {
+          // render snackbar
+        } else {
+          proceed(1)
+        }
       }}
     >
       <Flex marginTop={SPACING.spacing60} flexDirection={DIRECTION_COLUMN}>
@@ -61,16 +85,21 @@ export function SelectFixtures(props: WizardTileProps): JSX.Element | null {
         <Flex gridGap={SPACING.spacing4} flexWrap={WRAP}>
           {filteredAdditionalEquipment.map(equipment => (
             <EmptySelectorButton
+              disabled={numSlotsAvailable === 0}
               key={equipment}
               textAlignment={TYPOGRAPHY.textAlignLeft}
               size="small"
               iconName="plus"
               text={t(`${equipment}`)}
               onClick={() => {
-                setValue('additionalEquipment', [
-                  ...additionalEquipment,
-                  equipment,
-                ])
+                if (numSlotsAvailable === 0) {
+                  // render snackbar
+                } else {
+                  setValue('additionalEquipment', [
+                    ...additionalEquipment,
+                    equipment,
+                  ])
+                }
               }}
             />
           ))}
@@ -83,23 +112,59 @@ export function SelectFixtures(props: WizardTileProps): JSX.Element | null {
             {t('fixtures_added')}
           </StyledText>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-            {filteredAdditionalEquipmentWithoutGripper.map(ae => (
-              <ListItem type="noActive" key={ae}>
-                <ListItemCustomize
-                  linkText={t('remove')}
-                  onClick={() => {
-                    setValue(
-                      'additionalEquipment',
-                      without(additionalEquipment, ae)
-                    )
-                  }}
-                  header={t(`${ae}`)}
-                  leftHeaderItem={
-                    <AdditionalEquipmentDiagram additionalEquipment={ae} />
+            {filteredDuplicateStagingAreas.map(ae => {
+              const numStagingAreas = filteredAdditionalEquipmentWithoutGripper.filter(
+                additionalEquipment => additionalEquipment === 'stagingArea'
+              )?.length
+
+              const dropdownProps = {
+                currentOption: {
+                  name: `${numStagingAreas}`,
+                  value: `${numStagingAreas}`,
+                },
+                dropdownType: 'neutral' as DropdownBorder,
+                filterOptions: getStagingAreaOptions(
+                  numSlotsAvailable >= 4
+                    ? 4
+                    : numSlotsAvailable + numStagingAreas - (hasTC ? 1 : 0)
+                ),
+                onClick: (value: string) => {
+                  const num = parseInt(value)
+                  let updatedStagingAreas = [...additionalEquipment]
+
+                  if (num > numStagingAreas) {
+                    const difference = num - numStagingAreas
+                    updatedStagingAreas = [
+                      ...updatedStagingAreas,
+                      ...Array(difference).fill(ae),
+                    ]
+                  } else {
+                    updatedStagingAreas = updatedStagingAreas.slice(0, num)
                   }
-                />
-              </ListItem>
-            ))}
+
+                  setValue('additionalEquipment', updatedStagingAreas)
+                },
+              }
+              return (
+                <ListItem type="noActive" key={ae}>
+                  <ListItemCustomize
+                    linkText={t('remove')}
+                    onClick={() => {
+                      setValue(
+                        'additionalEquipment',
+                        without(additionalEquipment, ae)
+                      )
+                    }}
+                    label={ae === 'stagingArea' ? t('quantity') : null}
+                    dropdown={ae === 'stagingArea' ? dropdownProps : undefined}
+                    header={t(`${ae}`)}
+                    leftHeaderItem={
+                      <AdditionalEquipmentDiagram additionalEquipment={ae} />
+                    }
+                  />
+                </ListItem>
+              )
+            })}
           </Flex>
         </Flex>
       </Flex>
