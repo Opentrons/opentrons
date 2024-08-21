@@ -84,7 +84,7 @@ export function RunSummary(): JSX.Element {
     staleTime: Infinity,
     onError: () => {
       // in case the run is remotely deleted by a desktop app, navigate to the dash
-      navigate('/')
+      navigate('/dashboard')
     },
   })
   const isRunCurrent = Boolean(
@@ -144,6 +144,19 @@ export function RunSummary(): JSX.Element {
   const { reset, isResetRunLoading } = useRunControls(runId, onCloneRunSuccess)
   const trackEvent = useTrackEvent()
   const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
+  // Close the current run only if it's active and then execute the onSuccess callback. Prefer this wrapper over
+  // closeCurrentRun directly, since the callback is swallowed if currentRun is null.
+  const closeCurrentRunIfValid = (onSuccess?: () => void): void => {
+    if (isRunCurrent) {
+      closeCurrentRun({
+        onSuccess: () => {
+          onSuccess?.()
+        },
+      })
+    } else {
+      onSuccess?.()
+    }
+  }
   const [showRunFailedModal, setShowRunFailedModal] = React.useState<boolean>(
     false
   )
@@ -239,11 +252,9 @@ export function RunSummary(): JSX.Element {
       deleteRun(runId)
       navigate('/quick-transfer')
     } else {
-      closeCurrentRun({
-        onSuccess: () => {
-          deleteRun(runId)
-          navigate('/quick-transfer')
-        },
+      closeCurrentRunIfValid(() => {
+        deleteRun(runId)
+        navigate('/quick-transfer')
       })
     }
   }
@@ -281,20 +292,16 @@ export function RunSummary(): JSX.Element {
         robotType: FLEX_ROBOT_TYPE,
         isRunCurrent,
         onSkipAndHome: () => {
-          closeCurrentRun({
-            onSettled: () => {
-              navigate('/')
-            },
+          closeCurrentRunIfValid(() => {
+            navigate('/dashboard')
           })
         },
       })
     } else if (isQuickTransfer) {
       returnToQuickTransfer()
     } else {
-      closeCurrentRun({
-        onSettled: () => {
-          navigate('/')
-        },
+      closeCurrentRunIfValid(() => {
+        navigate('/dashboard')
       })
     }
   }
