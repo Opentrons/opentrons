@@ -449,11 +449,7 @@ function PrepareToRun({
       const isCurrentFixtureCompatible =
         cutoutFixtureId != null &&
         compatibleCutoutFixtureIds.includes(cutoutFixtureId)
-      return (
-        !isCurrentFixtureCompatible &&
-        cutoutFixtureId != null &&
-        !SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId)
-      )
+      return !isCurrentFixtureCompatible && cutoutFixtureId != null
     }
   )
   const isLocationConflict = locationConflictSlots.some(
