@@ -1,33 +1,33 @@
 import * as React from 'react'
 
 import type {
+  SnackbarProps,
   ToastProps,
   ToastType,
-  SnackbarProps,
 } from '@opentrons/components'
 
-export type MakeToastOptions = Omit<
+export type BakeOptions = Omit<
   ToastProps,
   'id' | 'message' | 'type' | 'exitNow'
 >
 
-type MakeToast = (
+type BakeToast = (
   message: string,
   type: ToastType,
-  options?: MakeToastOptions
+  options?: BakeOptions
 ) => string
 
 type EatToast = (toastId: string) => void
 
-export interface ToasterContextType {
+export interface KitchenContextType {
   eatToast: EatToast
-  makeToast: MakeToast
+  bakeToast: BakeToast
   makeSnackbar: MakeSnackbar
 }
 
-export const ToasterContext = React.createContext<ToasterContextType>({
+export const KitchenContext = React.createContext<KitchenContextType>({
   eatToast: () => {},
-  makeToast: () => '',
+  bakeToast: () => '',
   makeSnackbar: () => {},
 })
 

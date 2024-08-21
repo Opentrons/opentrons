@@ -1,17 +1,12 @@
 import * as React from 'react'
 import { css } from 'styled-components'
+import { ALIGN_CENTER } from '../../styles'
+import { Flex } from '../../primitives'
+import { BORDERS, COLORS } from '../../helix-design-system'
+import { SPACING } from '../../ui-style-constants'
+import { StyledText } from '../StyledText'
 
-import {
-  ALIGN_CENTER,
-  BORDERS,
-  COLORS,
-  Flex,
-  SPACING,
-  LegacyStyledText,
-  TYPOGRAPHY,
-} from '@opentrons/components'
-
-import type { StyleProps } from '@opentrons/components'
+import type { StyleProps } from '../../primitives'
 
 export interface SnackbarProps extends StyleProps {
   message: string
@@ -82,16 +77,15 @@ export function Snackbar(props: SnackbarProps): JSX.Element {
       maxWidth="max-content"
       padding={`${SPACING.spacing20} ${SPACING.spacing24}`}
       data-testid="Snackbar"
+      color={COLORS.white}
       {...styleProps}
     >
-      <LegacyStyledText
-        color={COLORS.white}
-        fontSize={TYPOGRAPHY.fontSize22}
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        lineHeight={TYPOGRAPHY.lineHeight28}
+      <StyledText
+        oddStyle="bodyTextSemiBold"
+        desktopStyle="bodyDefaultSemiBold"
       >
         {message}
-      </LegacyStyledText>
+      </StyledText>
     </Flex>
   )
 }

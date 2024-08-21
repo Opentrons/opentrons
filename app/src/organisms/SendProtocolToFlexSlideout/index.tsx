@@ -6,8 +6,12 @@ import { useCreateProtocolMutation } from '@opentrons/react-api-client'
 
 import { FLEX_DISPLAY_NAME, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { PrimaryButton } from '@opentrons/components'
-import { ERROR_TOAST, INFO_TOAST, SUCCESS_TOAST } from '../../atoms/Toast'
+import {
+  PrimaryButton,
+  ERROR_TOAST,
+  INFO_TOAST,
+  SUCCESS_TOAST,
+} from '@opentrons/components'
 import { ChooseRobotSlideout } from '../../organisms/ChooseRobotSlideout'
 import {
   getAnalysisStatus,

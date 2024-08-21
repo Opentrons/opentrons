@@ -1,29 +1,30 @@
 import * as React from 'react'
 import {
+  ALIGN_CENTER,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
   JUSTIFY_CENTER,
-  POSITION_FIXED,
   PrimaryButton,
   SPACING,
   LegacyStyledText,
   VIEWPORT,
 } from '@opentrons/components'
-import { Toast } from '.'
+
+import { Snackbar } from './index'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'ODD/Atoms/Toast',
-  component: Toast,
+  title: 'Library/Atoms/Snackbar',
+  component: Snackbar,
   parameters: VIEWPORT.touchScreenViewport,
 } as Meta
 
-const Template: Story<React.ComponentProps<typeof Toast>> = args => {
-  const [isShowToast, setIsShowToast] = React.useState<boolean>(false)
+const DefaultTemplate: Story<React.ComponentProps<typeof Snackbar>> = args => {
+  const [isShowSnackbar, setIsShowSnackbar] = React.useState<boolean>(false)
 
   const handleClick = (): void => {
-    setIsShowToast(true)
+    setIsShowSnackbar(true)
   }
 
   return (
@@ -32,26 +33,26 @@ const Template: Story<React.ComponentProps<typeof Toast>> = args => {
         <PrimaryButton onClick={handleClick}>Click me</PrimaryButton>
         <Flex flexDirection={DIRECTION_COLUMN} marginLeft={SPACING.spacing8}>
           <LegacyStyledText as="p">
-            When clicking the button, the Toast shows up in the bottom.
+            When clicking the button, the Snackbar shows up in the bottom.
           </LegacyStyledText>
           <LegacyStyledText as="p">
-            Unless you set a duration or disable the timeout, the Toast will
-            disappear between 2 and 7 seconds depending on the length of the
-            text.
+            By default the Snackbar will disappear after 4 seconds.
           </LegacyStyledText>
         </Flex>
       </Flex>
-      {isShowToast && (
+      {isShowSnackbar && (
         <Flex
+          alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_CENTER}
-          position={POSITION_FIXED}
-          bottom={SPACING.spacing16}
+          width="100%"
+          position="absolute"
+          bottom={SPACING.spacing40}
           zIndex={1000}
         >
-          <Toast
+          <Snackbar
             {...args}
             onClose={() => {
-              setIsShowToast(false)
+              setIsShowSnackbar(false)
             }}
           />
         </Flex>
@@ -60,9 +61,7 @@ const Template: Story<React.ComponentProps<typeof Toast>> = args => {
   )
 }
 
-export const ToastComponent = Template.bind({})
-ToastComponent.args = {
-  message: 'Success Toast message',
-  type: 'success',
-  displayType: 'odd',
+export const SnackbarComponent = DefaultTemplate.bind({})
+SnackbarComponent.args = {
+  message: 'Short and sweet message',
 }

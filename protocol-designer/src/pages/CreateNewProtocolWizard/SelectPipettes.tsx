@@ -27,6 +27,7 @@ import { getLabwareDefsByURI } from '../../labware-defs/selectors'
 import { getTiprackOptions } from '../../components/modals/utils'
 import { setFeatureFlags } from '../../feature-flags/actions'
 import { createCustomTiprackDef } from '../../labware-defs/actions'
+import { useKitchen } from '../../organisms/Kitchen/hooks'
 import { PipetteInfoItem } from './PipetteInfoItem'
 import { WizardBody } from './WizardBody'
 import { PIPETTE_GENS, PIPETTE_TYPES, PIPETTE_VOLUMES } from './constants'
@@ -47,6 +48,7 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
   const { t } = useTranslation(['create_new_protocol', 'shared'])
   const pipettesByMount = watch('pipettesByMount')
   const fields = watch('fields')
+  const { makeSnackbar } = useKitchen()
   const allLabware = useSelector(getLabwareDefsByURI)
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
   const [mount, setMount] = React.useState<PipetteMount | null>(null)
@@ -270,6 +272,9 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
                               `pipettesByMount.${defaultMount}.tiprackDefURI`,
                               updatedValues.slice(0, 3)
                             )
+                            if (selectedValues.length === 3) {
+                              makeSnackbar(t('up_to_3_tipracks'))
+                            }
                           }}
                         />
                       ))}

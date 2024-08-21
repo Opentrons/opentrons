@@ -2,7 +2,7 @@ import * as React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { screen, act } from '@testing-library/react'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '../../../testing/utils'
 import { Snackbar } from '..'
 
 const render = (props: React.ComponentProps<typeof Snackbar>) => {

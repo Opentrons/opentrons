@@ -19,6 +19,7 @@ import {
   Tooltip,
   TYPOGRAPHY,
   useHoverTooltip,
+  SUCCESS_TOAST,
   useMenuHandleClickOutside,
   useOnClickOutside,
 } from '@opentrons/components'
@@ -43,7 +44,6 @@ import {
 } from '../../redux/robot-api'
 import { Banner } from '../../atoms/Banner'
 import { UpdateBanner } from '../../molecules/UpdateBanner'
-import { SUCCESS_TOAST } from '../../atoms/Toast'
 import { useChainLiveCommands } from '../../resources/runs'
 import { useCurrentRunStatus } from '../RunTimeControl/hooks'
 import { useIsFlex } from '../../organisms/Devices/hooks'
