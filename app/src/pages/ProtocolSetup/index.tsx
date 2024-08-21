@@ -36,7 +36,6 @@ import {
   getDeckDefFromRobotType,
   getModuleDisplayName,
   getFixtureDisplayName,
-  SINGLE_SLOT_FIXTURES,
 } from '@opentrons/shared-data'
 
 import {
