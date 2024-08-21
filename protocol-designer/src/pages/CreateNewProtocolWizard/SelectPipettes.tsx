@@ -271,19 +271,17 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
                           flex-wrap: ${WRAP};
                         `}
                       >
-                        {tiprackOptions.map(option => (
+                        {Object.entries(tiprackOptions).map(([value, name]) => (
                           <Checkbox
-                            key={option.value}
-                            isChecked={selectedValues.includes(option.value)}
-                            labelText={option.name}
+                            key={value}
+                            isChecked={selectedValues.includes(value)}
+                            labelText={name}
                             onClick={() => {
-                              const updatedValues = selectedValues?.includes(
-                                option.value
+                              const updatedValues = selectedValues.includes(
+                                value
                               )
-                                ? selectedValues.filter(
-                                    value => value !== option.value
-                                  )
-                                : [...(selectedValues ?? []), option.value]
+                                ? selectedValues.filter(v => v !== value)
+                                : [...selectedValues, value]
                               setValue(
                                 `pipettesByMount.${defaultMount}.tiprackDefURI`,
                                 updatedValues.slice(0, 3)

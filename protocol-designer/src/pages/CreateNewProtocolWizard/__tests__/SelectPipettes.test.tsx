@@ -58,16 +58,10 @@ describe('SelectPipettes', () => {
     )
     vi.mocked(getLabwareDefsByURI).mockReturnValue({})
     vi.mocked(getAllowAllTipracks).mockReturnValue(false)
-    vi.mocked(getTiprackOptions).mockReturnValue([
-      {
-        name: '200uL Flex tipracks',
-        value: 'opentrons/opentrons_flex_96_tiprack_200ul/1',
-      },
-      {
-        name: '1000uL Flex tipracks',
-        value: 'opentrons/opentrons_flex_96_tiprack_1000ul/1',
-      },
-    ])
+    vi.mocked(getTiprackOptions).mockReturnValue({
+      'opentrons/opentrons_flex_96_tiprack_200ul/1': '200uL Flex tipracks',
+      'opentrons/opentrons_flex_96_tiprack_1000ul/1': '1000uL Flex tipracks',
+    })
   })
 
   it('renders the first page of select pipettes for a Flex', () => {
@@ -98,16 +92,10 @@ describe('SelectPipettes', () => {
   })
 
   it('renders the first page of select pipettes for an ot-2', () => {
-    vi.mocked(getTiprackOptions).mockReturnValue([
-      {
-        name: '10uL tipracks',
-        value: 'opentrons/opentrons_96_tiprack_10ul/1',
-      },
-      {
-        name: '300uL tipracks',
-        value: 'opentrons/opentrons_96_tiprack_300ul/1',
-      },
-    ])
+    vi.mocked(getTiprackOptions).mockReturnValue({
+      'opentrons/opentrons_96_tiprack_10ul/1': '10uL tipracks',
+      'opentrons/opentrons_96_tiprack_300ul/1': '300uL tipracks',
+    })
 
     const values = {
       additionalEquipment: [],

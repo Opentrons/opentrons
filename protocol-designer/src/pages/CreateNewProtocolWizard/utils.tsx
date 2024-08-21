@@ -109,20 +109,18 @@ export function AdditionalEquipmentDiagram(props: EquipmentProps): JSX.Element {
   }
 }
 
-export interface TiprackOption {
-  name: string
-  value: string
-}
-
 interface TiprackOptionsProps {
   allLabware: LabwareDefByDefURI
   allowAllTipracks: boolean
   selectedPipetteName?: string | null
 }
-export function getTiprackOptions(props: TiprackOptionsProps): TiprackOption[] {
+//  returns a hashmap of LabwareDefUri : displayName
+export function getTiprackOptions(
+  props: TiprackOptionsProps
+): Record<string, string> {
   const { allLabware, allowAllTipracks, selectedPipetteName } = props
 
-  if (!allLabware) return []
+  if (!allLabware) return {}
 
   const pipetteSpecs = selectedPipetteName
     ? getPipetteSpecsV2(selectedPipetteName as PipetteName)
@@ -133,7 +131,7 @@ export function getTiprackOptions(props: TiprackOptionsProps): TiprackOption[] {
   const isFlexPipette =
     displayCategory === 'FLEX' || selectedPipetteName === 'p1000_96'
 
-  const tiprackOptions = Object.values(allLabware)
+  const tiprackOptionsMap = Object.values(allLabware)
     .filter(def => def.metadata.displayCategory === 'tipRack')
     .filter(def => {
       if (allowAllTipracks) {
@@ -148,15 +146,15 @@ export function getTiprackOptions(props: TiprackOptionsProps): TiprackOption[] {
         def.namespace === 'custom_beta'
       )
     })
-    .map(def => {
+    .reduce((acc, def) => {
       const displayName = getLabwareDisplayName(def)
       const name =
         def.parameters.loadName.includes('flex') && isFlexPipette
           ? displayName.split('Opentrons Flex')[1]
           : displayName
-      return { name, value: getLabwareDefURI(def) }
-    })
-    .sort((a, b) => (a.name.includes('(Retired)') ? 1 : -1))
+      acc[getLabwareDefURI(def)] = name
+      return acc
+    }, {} as Record<string, string>)
 
-  return tiprackOptions
+  return tiprackOptionsMap
 }
