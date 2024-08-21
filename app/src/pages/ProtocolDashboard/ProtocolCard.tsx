@@ -194,6 +194,15 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
   if (isFailedAnalysis) protocolCardBackgroundColor = COLORS.red35
   if (isRequiredCSV) protocolCardBackgroundColor = COLORS.yellow35
 
+  const textWrap = (lastRun: string | undefined): string => {
+    if (lastRun != null) {
+      lastRun = formatDistance(new Date(lastRun), new Date(), {
+        addSuffix: true,
+      }).replace('about ', '')
+    }
+    return lastRun === 'less than a minute ago' ? 'normal' : 'nowrap'
+  }
+
   return (
     <Flex
       alignItems={isFailedAnalysis || isRequiredCSV ? ALIGN_END : ALIGN_CENTER}
