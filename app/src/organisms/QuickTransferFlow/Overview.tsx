@@ -32,7 +32,7 @@ export function Overview(props: OverviewProps): JSX.Element | null {
     transferCopy = t('dispense_volume')
   }
   const onClick = (): void => {
-    makeSnackbar(t('create_new_to_edit'))
+    makeSnackbar(t('create_new_to_edit') as string)
   }
 
   const displayItems = [

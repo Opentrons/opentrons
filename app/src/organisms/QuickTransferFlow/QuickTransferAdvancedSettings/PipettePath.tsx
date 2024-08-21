@@ -51,7 +51,7 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
   const tipVolume = Object.values(state.tipRack.wells)[0].totalLiquidVolume
 
   // this is the max amount of liquid that can be held in the tip at any time
-  let maxTipCapacity = Math.min(maxPipetteVolume, tipVolume)
+  const maxTipCapacity = Math.min(maxPipetteVolume, tipVolume)
 
   const allowedPipettePathOptions: Array<{
     pathOption: PathOption

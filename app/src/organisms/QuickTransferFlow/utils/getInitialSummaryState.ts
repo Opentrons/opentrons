@@ -3,7 +3,6 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
-import { getVolumeRange } from './'
 
 import type {
   LabwareDefinition2,
@@ -47,7 +46,7 @@ export function getInitialSummaryState(
   const tipVolume = Object.values(state.tipRack.wells)[0].totalLiquidVolume
 
   // this is the max amount of liquid that can be held in the tip at any time
-  let maxTipCapacity = Math.min(maxPipetteVolume, tipVolume)
+  const maxTipCapacity = Math.min(maxPipetteVolume, tipVolume)
 
   let path: PathOption = 'single'
   // for multiDispense the volume capacity must be at least 3x the volume per well
