@@ -15,6 +15,7 @@ import {
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
+import { useKitchen } from '../../organisms/Kitchen/hooks'
 import { WizardBody } from './WizardBody'
 import { AdditionalEquipmentDiagram, getNumSlotsAvailable } from './utils'
 
@@ -34,6 +35,7 @@ const ADDITIONAL_EQUIPMENTS: AdditionalEquipment[] = [
 ]
 export function SelectFixtures(props: WizardTileProps): JSX.Element | null {
   const { goBack, proceed, setValue, watch } = props
+  const { makeSnackbar } = useKitchen()
   const additionalEquipment = watch('additionalEquipment')
   const modules = watch('modules')
   const { t } = useTranslation(['create_new_protocol', 'shared'])
@@ -67,7 +69,7 @@ export function SelectFixtures(props: WizardTileProps): JSX.Element | null {
       }}
       proceed={() => {
         if (!hasTrash) {
-          // render snackbar
+          makeSnackbar(t('trash_required') as string)
         } else {
           proceed(1)
         }
@@ -93,7 +95,7 @@ export function SelectFixtures(props: WizardTileProps): JSX.Element | null {
               text={t(`${equipment}`)}
               onClick={() => {
                 if (numSlotsAvailable === 0) {
-                  // render snackbar
+                  makeSnackbar(t('slot_limit_reached') as string)
                 } else {
                   setValue('additionalEquipment', [
                     ...additionalEquipment,

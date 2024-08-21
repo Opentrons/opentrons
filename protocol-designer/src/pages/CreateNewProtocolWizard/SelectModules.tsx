@@ -27,6 +27,7 @@ import {
   getEnableAbsorbanceReader,
   getEnableMoam,
 } from '../../feature-flags/selectors'
+import { useKitchen } from '../../organisms/Kitchen/hooks'
 import { ModuleDiagram } from '../../components/modules'
 import { WizardBody } from './WizardBody'
 import {
@@ -52,6 +53,7 @@ const getMoamOptions = (length: number): DropdownOption[] => {
 export function SelectModules(props: WizardTileProps): JSX.Element | null {
   const { goBack, proceed, watch, setValue } = props
   const { t } = useTranslation(['create_new_protocol', 'shared'])
+  const { makeSnackbar } = useKitchen()
   const fields = watch('fields')
   const modules = watch('modules')
   const additionalEquipment = watch('additionalEquipment')
@@ -146,7 +148,7 @@ export function SelectModules(props: WizardTileProps): JSX.Element | null {
                   text={getModuleDisplayName(moduleModel)}
                   onClick={() => {
                     if (hasNoAvailableSlots) {
-                      // render snackbar
+                      makeSnackbar(t('slot_limit_reached') as string)
                     } else {
                       setValue('modules', {
                         ...modules,
