@@ -152,9 +152,11 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
       {...svgProps}
     >
       {robotType === OT2_ROBOT_TYPE ? (
-        <DeckFromLayers
+        <OT2Deck
           robotType={robotType}
-          layerBlocklist={deckLayerBlocklist}
+          deckLayerBlocklist={deckLayerBlocklist}
+          labwareOnDeck={labwareOnDeck}
+          modulesOnDeck={modulesOnDeck}
         />
       ) : (
         <>
@@ -234,11 +236,180 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
               return null
             }
           })}
+          {modulesOnDeck.map(
+            ({
+              moduleModel,
+              moduleLocation,
+              nestedLabwareDef,
+              nestedLabwareWellFill,
+              innerProps,
+              moduleChildren,
+              onLabwareClick,
+              highlightLabware,
+              stacked = false,
+            }) => {
+              const slotPosition = getPositionFromSlotId(
+                moduleLocation.slotName,
+                deckDef
+              )
+              const moduleDef = getModuleDef2(moduleModel)
+              return slotPosition != null ? (
+                <Module
+                  key={`${moduleModel} ${moduleLocation.slotName}`}
+                  def={moduleDef}
+                  x={slotPosition[0]}
+                  y={slotPosition[1]}
+                  orientation={inferModuleOrientationFromXCoordinate(
+                    slotPosition[0]
+                  )}
+                  innerProps={innerProps}
+                >
+                  {nestedLabwareDef != null ? (
+                    <LabwareRender
+                      definition={nestedLabwareDef}
+                      onLabwareClick={onLabwareClick}
+                      wellFill={nestedLabwareWellFill}
+                      shouldRotateAdapterOrientation={
+                        inferModuleOrientationFromXCoordinate(
+                          slotPosition[0]
+                        ) === 'left' && moduleModel === HEATERSHAKER_MODULE_V1
+                      }
+                      highlight={highlightLabware}
+                    />
+                  ) : null}
+                  {moduleChildren}
+                  {stacked ? <StackedBadge /> : null}
+                </Module>
+              ) : null
+            }
+          )}
+          {labwareOnDeck.map(
+            ({
+              labwareLocation,
+              definition,
+              labwareChildren,
+              wellFill,
+              missingTips,
+              onLabwareClick,
+              highlight,
+              stacked = false,
+            }) => {
+              if (
+                labwareLocation === 'offDeck' ||
+                !('slotName' in labwareLocation) ||
+                // for legacy protocols that list fixed trash as a labware, do not render
+                definition.parameters.loadName ===
+                  'opentrons_1_trash_3200ml_fixed'
+              ) {
+                return null
+              }
+
+              const slotPosition = getPositionFromSlotId(
+                labwareLocation.slotName,
+                deckDef
+              )
+
+              return slotPosition != null ? (
+                <g
+                  key={labwareLocation.slotName}
+                  transform={`translate(${slotPosition[0].toString()},${slotPosition[1].toString()})`}
+                  cursor={onLabwareClick != null ? 'pointer' : ''}
+                >
+                  <LabwareRender
+                    definition={definition}
+                    onLabwareClick={onLabwareClick}
+                    wellFill={wellFill ?? undefined}
+                    missingTips={missingTips}
+                    highlight={highlight}
+                  />
+                  {labwareChildren}
+                  {stacked ? <StackedBadge /> : null}
+                </g>
+              ) : null
+            }
+          )}
         </>
       )}
-      <>
-        {modulesOnDeck.map(
-          ({
+      {children}
+    </RobotCoordinateSpace>
+  )
+}
+
+function OT2Deck(
+  props: Pick<
+    BaseDeckProps,
+    'robotType' | 'modulesOnDeck' | 'labwareOnDeck' | 'deckLayerBlocklist'
+  >
+): JSX.Element {
+  const {
+    robotType,
+    modulesOnDeck = [],
+    labwareOnDeck = [],
+    deckLayerBlocklist = [],
+  } = props
+
+  const deckDef = getDeckDefFromRobotType(robotType)
+
+  /**
+   * TODO(bh, 2024-08-20):
+   * Unlike HTML elements, SVGs layer according to DOM render order. To layer a labware
+   * with a top-right stacked badge that occludes another labware, which occurs as an
+   * OT-2-only artifact of current stacked labware designs, we need to render SVGs
+   * such that slots with badges render later in the DOM than top- and right-adjacent slots.
+   *
+   * For the OT-2, as an emergent property of deck map numbering this can be achieved by
+   * sorting modules/labware in reverse numerical order, 11 -> 10 -> ... -> 1.
+   *
+   * As a means of layering SVG renderings on top of an adjacent labware, this "escape hatch"
+   * should only be done once - to programmatically occlude an adjacent labware again will
+   * require changing the BaseDeck approach to labware SVG rendering layers.
+   */
+  const deckItems: Array<ModuleOnDeck | LabwareOnDeck> = [
+    ...modulesOnDeck,
+    ...labwareOnDeck,
+  ]
+
+  const filteredDeckItems = deckItems.filter(
+    item =>
+      'moduleLocation' in item ||
+      (item.labwareLocation !== 'offDeck' && 'slotName' in item.labwareLocation)
+  )
+
+  const sortedDeckItems = filteredDeckItems.sort((a, b) => {
+    let locationA = 0
+    if ('moduleLocation' in a) {
+      locationA = Number(a.moduleLocation.slotName)
+    } else if (
+      a.labwareLocation !== 'offDeck' &&
+      'slotName' in a.labwareLocation
+    ) {
+      locationA = Number(a.labwareLocation.slotName)
+    }
+
+    let locationB = 0
+    if ('moduleLocation' in b) {
+      locationB = Number(b.moduleLocation.slotName)
+    } else if (
+      b.labwareLocation !== 'offDeck' &&
+      'slotName' in b.labwareLocation
+    ) {
+      locationB = Number(b.labwareLocation.slotName)
+    }
+
+    return locationA < locationB ? 1 : -1
+  })
+
+  console.log('deckItems', deckItems, 'sortedDeckItems', sortedDeckItems)
+
+  return (
+    <>
+      <DeckFromLayers
+        robotType={robotType}
+        layerBlocklist={deckLayerBlocklist}
+      />
+      {sortedDeckItems.map(item => {
+        if ('moduleModel' in item) {
+          const {
             moduleModel,
             moduleLocation,
             nestedLabwareDef,
@@ -248,43 +419,42 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
             onLabwareClick,
             highlightLabware,
             stacked = false,
-          }) => {
-            const slotPosition = getPositionFromSlotId(
-              moduleLocation.slotName,
-              deckDef
-            )
-            const moduleDef = getModuleDef2(moduleModel)
-            return slotPosition != null ? (
-              <Module
-                key={`${moduleModel} ${moduleLocation.slotName}`}
-                def={moduleDef}
-                x={slotPosition[0]}
-                y={slotPosition[1]}
-                orientation={inferModuleOrientationFromXCoordinate(
-                  slotPosition[0]
-                )}
-                innerProps={innerProps}
-              >
-                {nestedLabwareDef != null ? (
-                  <LabwareRender
-                    definition={nestedLabwareDef}
-                    onLabwareClick={onLabwareClick}
-                    wellFill={nestedLabwareWellFill}
-                    shouldRotateAdapterOrientation={
-                      inferModuleOrientationFromXCoordinate(slotPosition[0]) ===
-                        'left' && moduleModel === HEATERSHAKER_MODULE_V1
-                    }
-                    highlight={highlightLabware}
-                  />
-                ) : null}
-                {moduleChildren}
-                {stacked ? <StackedBadge /> : null}
-              </Module>
-            ) : null
-          }
-        )}
-        {labwareOnDeck.map(
-          ({
+          } = item
+
+          const slotPosition = getPositionFromSlotId(
+            moduleLocation.slotName,
+            deckDef
+          )
+          const moduleDef = getModuleDef2(moduleModel)
+          return slotPosition != null ? (
+            <Module
+              key={`${moduleModel} ${moduleLocation.slotName}`}
+              def={moduleDef}
+              x={slotPosition[0]}
+              y={slotPosition[1]}
+              orientation={inferModuleOrientationFromXCoordinate(
+                slotPosition[0]
+              )}
+              innerProps={innerProps}
+            >
+              {nestedLabwareDef != null ? (
+                <LabwareRender
+                  definition={nestedLabwareDef}
+                  onLabwareClick={onLabwareClick}
+                  wellFill={nestedLabwareWellFill}
+                  shouldRotateAdapterOrientation={
+                    inferModuleOrientationFromXCoordinate(slotPosition[0]) ===
+                      'left' && moduleModel === HEATERSHAKER_MODULE_V1
+                  }
+                  highlight={highlightLabware}
+                />
+              ) : null}
+              {moduleChildren}
+              {stacked ? <StackedBadge /> : null}
+            </Module>
+          ) : null
+        } else {
+          const {
             labwareLocation,
             definition,
             labwareChildren,
@@ -293,44 +463,40 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
             onLabwareClick,
             highlight,
             stacked = false,
-          }) => {
-            if (
-              labwareLocation === 'offDeck' ||
-              !('slotName' in labwareLocation) ||
-              // for legacy protocols that list fixed trash as a labware, do not render
-              definition.parameters.loadName ===
-                'opentrons_1_trash_3200ml_fixed'
-            ) {
-              return null
-            }
+          } = item
 
-            const slotPosition = getPositionFromSlotId(
-              labwareLocation.slotName,
-              deckDef
-            )
-
-            return slotPosition != null ? (
-              <g
-                key={labwareLocation.slotName}
-                transform={`translate(${slotPosition[0].toString()},${slotPosition[1].toString()})`}
-                cursor={onLabwareClick != null ? 'pointer' : ''}
-              >
-                <LabwareRender
-                  definition={definition}
-                  onLabwareClick={onLabwareClick}
-                  wellFill={wellFill ?? undefined}
-                  missingTips={missingTips}
-                  highlight={highlight}
-                />
-                {labwareChildren}
-                {stacked ? <StackedBadge /> : null}
-              </g>
-            ) : null
+          if (
+            labwareLocation === 'offDeck' ||
+            !('slotName' in labwareLocation)
+          ) {
+            return null
           }
-        )}
-      </>
-      {children}
-    </RobotCoordinateSpace>
+
+          const slotPosition = getPositionFromSlotId(
+            labwareLocation.slotName,
+            deckDef
+          )
+
+          return slotPosition != null ? (
+            <g
+              key={labwareLocation.slotName}
+              transform={`translate(${slotPosition[0].toString()},${slotPosition[1].toString()})`}
+              cursor={onLabwareClick != null ? 'pointer' : ''}
+            >
+              <LabwareRender
+                definition={definition}
+                onLabwareClick={onLabwareClick}
+                wellFill={wellFill ?? undefined}
+                missingTips={missingTips}
+                highlight={highlight}
+              />
+              {labwareChildren}
+              {stacked ? <StackedBadge /> : null}
+            </g>
+          ) : null
+        }
+      })}
+    </>
   )
 }
 
