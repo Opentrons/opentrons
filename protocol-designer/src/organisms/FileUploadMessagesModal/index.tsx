@@ -17,16 +17,18 @@ export function FileUploadMessagesModal(): JSX.Element | null {
   const message = useSelector(getFileUploadMessages)
   const dispatch = useDispatch()
   const { t } = useTranslation('shared')
-  const dismissModal = (): void => {
-    dispatch(dismissFileUploadMessage())
-  }
   const modalContents = useFileUploadModalContents({
     uploadResponse: message,
   })
+  const dismissModal = (): void => {
+    dispatch(dismissFileUploadMessage())
+  }
 
   if (modalContents == null) return null
 
   const { title, body } = modalContents
+  const showButtons =
+    title !== t('invalid_json_file') && title !== t('incorrect_file_header')
 
   return (
     <Modal
@@ -35,8 +37,7 @@ export function FileUploadMessagesModal(): JSX.Element | null {
       closeOnOutsideClick
       onClose={dismissModal}
       footer={
-        title !== t('invalid_json_file') &&
-        title !== t('incorrect_file_header') ? (
+        showButtons && (
           <Flex
             padding={SPACING.spacing24}
             justifyContent={JUSTIFY_END}
@@ -51,7 +52,7 @@ export function FileUploadMessagesModal(): JSX.Element | null {
             </SecondaryButton>
             <PrimaryButton onClick={dismissModal}>{t('confirm')}</PrimaryButton>
           </Flex>
-        ) : undefined
+        )
       }
     >
       {body}

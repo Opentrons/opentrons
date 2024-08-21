@@ -12,9 +12,9 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
+import { getFileMetadata } from './file-data/selectors'
 import { actions as loadFileActions } from './load-file'
 import type { ThunkDispatch, RouteProps } from './types'
-import { getFileMetadata } from './file-data/selectors'
 
 export function NavigationBar({
   routes,
