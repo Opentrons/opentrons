@@ -300,17 +300,32 @@ export function generateQuickTransferArgs(
     quickTransferState.pipette.liquids.default.supportedTips[tipType]
   const pipetteEntity = Object.values(invariantContext.pipetteEntities)[0]
   const labwareEntityValues = Object.values(invariantContext.labwareEntities)
-  const sourceLabwareEntity = labwareEntityValues.find(
-    entity =>
-      entity.labwareDefURI === getLabwareDefURI(quickTransferState.source)
+
+  const sourceLabwareId = Object.keys(robotState.labware).find(
+    key => robotState.labware[key].slot === 'C2'
   )
+  const sourceLabwareEntity =
+    sourceLabwareId != null
+      ? invariantContext.labwareEntities[sourceLabwareId]
+      : labwareEntityValues.find(
+          entity =>
+            entity.labwareDefURI === getLabwareDefURI(quickTransferState.source)
+        )
   let destLabwareEntity = sourceLabwareEntity
   if (quickTransferState.destination !== 'source') {
-    destLabwareEntity = labwareEntityValues.find(
-      entity =>
-        entity.labwareDefURI ===
-        getLabwareDefURI(quickTransferState.destination as LabwareDefinition2)
+    const destinationLabwareId = Object.keys(robotState.labware).find(
+      key => robotState.labware[key].slot === 'D2'
     )
+    destLabwareEntity =
+      destinationLabwareId != null
+        ? invariantContext.labwareEntities[destinationLabwareId]
+        : labwareEntityValues.find(
+            entity =>
+              entity.labwareDefURI ===
+              getLabwareDefURI(
+                quickTransferState.destination as LabwareDefinition2
+              )
+          )
   }
 
   let nozzles = null
