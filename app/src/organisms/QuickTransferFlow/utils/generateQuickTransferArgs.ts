@@ -307,10 +307,7 @@ export function generateQuickTransferArgs(
   const sourceLabwareEntity =
     sourceLabwareId != null
       ? invariantContext.labwareEntities[sourceLabwareId]
-      : labwareEntityValues.find(
-          entity =>
-            entity.labwareDefURI === getLabwareDefURI(quickTransferState.source)
-        )
+      : undefined
   let destLabwareEntity = sourceLabwareEntity
   if (quickTransferState.destination !== 'source') {
     const destinationLabwareId = Object.keys(robotState.labware).find(
@@ -319,13 +316,7 @@ export function generateQuickTransferArgs(
     destLabwareEntity =
       destinationLabwareId != null
         ? invariantContext.labwareEntities[destinationLabwareId]
-        : labwareEntityValues.find(
-            entity =>
-              entity.labwareDefURI ===
-              getLabwareDefURI(
-                quickTransferState.destination as LabwareDefinition2
-              )
-          )
+        : undefined
   }
 
   let nozzles = null
