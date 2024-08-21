@@ -1,30 +1,25 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
+import { Btn, Flex, Link } from '../../primitives'
+import { Icon } from '../../icons'
+import { BORDERS, COLORS } from '../../helix-design-system'
+import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { truncateString } from '../../utils'
 import {
   ALIGN_CENTER,
-  BORDERS,
-  Btn,
-  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  Flex,
-  Icon,
   JUSTIFY_SPACE_BETWEEN,
-  Link,
-  SPACING,
-  LegacyStyledText,
-  truncateString,
-  TYPOGRAPHY,
-} from '@opentrons/components'
-
+} from '../../styles'
+import { LegacyStyledText } from '../StyledText'
 import type {
   DefaultTheme,
   FlattenSimpleInterpolation,
   ThemedCssFunction,
 } from 'styled-components'
-import type { IconName, IconProps, StyleProps } from '@opentrons/components'
+import type { StyleProps } from '../../primitives'
+import type { IconName, IconProps } from '../../icons'
 
 export const SUCCESS_TOAST: 'success' = 'success'
 export const WARNING_TOAST: 'warning' = 'warning'
@@ -75,7 +70,6 @@ export function Toast(props: ToastProps): JSX.Element {
     onLinkClick = () => null,
     ...styleProps
   } = props
-  const { t } = useTranslation('shared')
   const [isClosed, setIsClosed] = React.useState<boolean>(exitNow)
 
   // We want to be able to storybook both the ODD and the Desktop versions,
@@ -92,8 +86,11 @@ export function Toast(props: ToastProps): JSX.Element {
   if (buttonText != null) {
     closeText = buttonText
   } else if (closeButton) {
-    if (displayType === 'odd') closeText = t('close')
-    else closeText = ''
+    if (displayType === 'odd') {
+      closeText = 'Close'
+    } else {
+      closeText = ''
+    }
   }
 
   const ANIMATION_OVERFLOW = `

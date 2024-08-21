@@ -1,6 +1,4 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
-import { v4 as uuidv4 } from 'uuid'
 
 import {
   Flex,
@@ -10,50 +8,46 @@ import {
   JUSTIFY_CENTER,
   POSITION_FIXED,
   SPACING,
-  Snackbar,
   Toast,
+  Snackbar,
 } from '@opentrons/components'
+import { uuid } from '../../utils'
+import { KitchenContext } from './KitchenContext'
 
-import { getIsOnDevice } from '../../redux/config'
-import { ToasterContext } from './ToasterContext'
-
-import type { SnackbarProps } from '@opentrons/components'
 import type {
+  SnackbarProps,
   ToastProps,
   ToastType,
-} from '@opentrons/components/src/atoms/Toast'
-import type { MakeSnackbarOptions, MakeToastOptions } from './ToasterContext'
+} from '@opentrons/components'
+import type { BakeOptions, MakeSnackbarOptions } from './KitchenContext'
 
-interface ToasterOvenProps {
+interface PantryProps {
   children: React.ReactNode
 }
 
 /**
- * A toaster oven that renders up to 5 toasts in an app-level display container
+ * A Kitchen that renders up to 5 toasts in an app-level display container
+ * and one snackBar
  * @param children passes through and renders children
  * @returns
  */
-export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
+export function Kitchen({ children }: PantryProps): JSX.Element {
   const [toasts, setToasts] = React.useState<ToastProps[]>([])
   const [snackbar, setSnackbar] = React.useState<SnackbarProps | null>(null)
 
-  const isOnDevice = useSelector(getIsOnDevice) ?? null
-  const displayType: 'desktop' | 'odd' =
-    isOnDevice != null && isOnDevice ? 'odd' : 'desktop'
-
   /**
-   * makes toast, rendering it in the toaster oven display container
+   * makes toast, rendering it in the Kitchen display container
    * @param {string} message
    * @param {ToastType} type
    * @param {MakeToastOptions} options
    * @returns {string} returns the id to allow imperative eatToast close from caller
    */
-  function makeToast(
+  function bakeToast(
     message: string,
     type: ToastType,
-    options?: MakeToastOptions
+    options?: BakeOptions
   ): string {
-    const id = uuidv4()
+    const id = uuid()
     const toastsForRemoval = toasts.map(toast => {
       return {
         ...toast,
@@ -86,14 +80,14 @@ export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
   }
 
   // This function is needed to actually make the snackbar auto-close in the context of the
-  // ToasterOven. It closes fine by itself in tests and storybook, but we need to eat it
+  // Kitchen. It closes fine by itself in tests and storybook, but we need to eat it
   // here to remove it from the page as a whole.
   function eatSnackbar(): void {
     setSnackbar(null)
   }
 
   /**
-   * removes (eats) a toast from toaster oven display container
+   * removes (eats) a toast from Kitchen display container
    * @param {string} toastId the id of the toast to remove
    */
   function eatToast(toastId: string): void {
@@ -101,7 +95,7 @@ export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
   }
 
   return (
-    <ToasterContext.Provider value={{ eatToast, makeToast, makeSnackbar }}>
+    <KitchenContext.Provider value={{ eatToast, bakeToast, makeSnackbar }}>
       {toasts.length > 0 ? (
         <Flex
           flexDirection={DIRECTION_COLUMN_REVERSE}
@@ -116,7 +110,7 @@ export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
           {toasts.map(toast => (
             <Toast
               {...toast}
-              displayType={displayType}
+              displayType="desktop"
               key={toast.id}
               onClose={() => {
                 toast.onClose?.()
@@ -148,6 +142,6 @@ export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
         </Flex>
       )}
       {children}
-    </ToasterContext.Provider>
+    </KitchenContext.Provider>
   )
 }
