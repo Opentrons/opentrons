@@ -43,20 +43,24 @@ export function getInitialSummaryState(
   const flowRatesForSupportedTip =
     state.pipette.liquids.default.supportedTips[tipType]
 
-  const volumeLimits = getVolumeRange(state)
+  const maxPipetteVolume = Object.values(state.pipette.liquids)[0].maxVolume
+  const tipVolume = Object.values(state.tipRack.wells)[0].totalLiquidVolume
+
+  // this is the max amount of liquid that can be held in the tip at any time
+  let maxTipCapacity = Math.min(maxPipetteVolume, tipVolume)
 
   let path: PathOption = 'single'
   // for multiDispense the volume capacity must be at least 3x the volume per well
   // to account for the 1x volume per well disposal volume default
   if (
     state.transferType === 'distribute' &&
-    volumeLimits.max >= state.volume * 3
+    maxTipCapacity >= state.volume * 3
   ) {
     path = 'multiDispense'
     // for multiAspirate the volume capacity must be at least 2x the volume per well
   } else if (
     state.transferType === 'consolidate' &&
-    volumeLimits.max >= state.volume * 2
+    maxTipCapacity >= state.volume * 2
   ) {
     path = 'multiAspirate'
   }
