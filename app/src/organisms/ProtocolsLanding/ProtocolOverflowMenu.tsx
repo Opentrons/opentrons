@@ -74,9 +74,7 @@ export function ProtocolOverflowMenu(
   }, true)
 
   const robotType =
-    mostRecentAnalysis != null && mostRecentAnalysis.errors.length === 0
-      ? mostRecentAnalysis?.robotType ?? null
-      : null
+    mostRecentAnalysis != null ? mostRecentAnalysis?.robotType ?? null : null
 
   const handleClickShowInFolder: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
@@ -117,6 +115,7 @@ export function ProtocolOverflowMenu(
     navigate(`/protocols/${protocolKey}/timeline`)
     setShowOverflowMenu(prevShowOverflowMenu => !prevShowOverflowMenu)
   }
+
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
