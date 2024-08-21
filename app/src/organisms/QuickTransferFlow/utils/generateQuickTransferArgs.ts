@@ -299,7 +299,6 @@ export function generateQuickTransferArgs(
   const flowRatesForSupportedTip =
     quickTransferState.pipette.liquids.default.supportedTips[tipType]
   const pipetteEntity = Object.values(invariantContext.pipetteEntities)[0]
-  const labwareEntityValues = Object.values(invariantContext.labwareEntities)
 
   const sourceLabwareId = Object.keys(robotState.labware).find(
     key => robotState.labware[key].slot === 'C2'
