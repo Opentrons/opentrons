@@ -21,6 +21,7 @@ import {
   MAGNETIC_BLOCK_TYPE,
   MAGNETIC_BLOCK_V1,
   TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
 import { uuid } from '../../utils'
 import {
@@ -36,19 +37,13 @@ import {
   FLEX_SUPPORTED_MODULE_MODELS,
   OT2_SUPPORTED_MODULE_MODELS,
 } from './constants'
-import { getNumSlotsAvailable } from './utils'
+import { getNumOptions, getNumSlotsAvailable } from './utils'
+import { HandleEnter } from './HandleEnter'
 
-import type { DropdownOption } from '@opentrons/components'
+import type { DropdownBorder } from '@opentrons/components'
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 import type { FormModules } from '../../step-forms'
 import type { WizardTileProps } from './types'
-
-const getMoamOptions = (length: number): DropdownOption[] => {
-  return Array.from({ length }, (_, i) => ({
-    name: `${i + 1}`,
-    value: `${i + 1}`,
-  }))
-}
 
 export function SelectModules(props: WizardTileProps): JSX.Element | null {
   const { goBack, proceed, watch, setValue } = props
@@ -101,180 +96,249 @@ export function SelectModules(props: WizardTileProps): JSX.Element | null {
   }
 
   return (
-    <WizardBody
-      stepNumber={robotType === FLEX_ROBOT_TYPE ? 4 : 3}
-      header={t('add_modules')}
-      disabled={false}
-      goBack={() => {
-        goBack(1)
-        setValue('modules', null)
-      }}
-      proceed={() => {
-        proceed(1)
-      }}
-    >
-      <Flex marginTop={SPACING.spacing60} flexDirection={DIRECTION_COLUMN}>
-        <Flex flexDirection={DIRECTION_COLUMN}>
-          {filteredSupportedModules.length > 0 ? (
-            <StyledText
-              desktopStyle="headingSmallBold"
-              marginBottom={SPACING.spacing12}
-            >
-              {t('which_mods')}
-            </StyledText>
-          ) : null}
-          <Flex gridGap={SPACING.spacing4} flexWrap={WRAP}>
-            {filteredSupportedModules
-              .filter(module =>
-                enableAbsorbanceReader
-                  ? module
-                  : module !== ABSORBANCE_READER_V1
-              )
-              .map(moduleModel => (
-                <EmptySelectorButton
-                  key={moduleModel}
-                  disabled={
-                    (moduleModel !== 'magneticBlockV1' &&
-                      hasNoAvailableSlots) ||
-                    (moduleModel === 'thermocyclerModuleV2' &&
-                      numSlotsAvailable <= 1) ||
-                    (moduleModel === 'magneticBlockV1' &&
-                      hasNoAvailableSlots &&
-                      numMagneticBlocks === 4)
-                  }
-                  textAlignment={TYPOGRAPHY.textAlignLeft}
-                  size="small"
-                  iconName="plus"
-                  text={getModuleDisplayName(moduleModel)}
-                  onClick={() => {
-                    if (hasNoAvailableSlots) {
-                      makeSnackbar(t('slot_limit_reached') as string)
-                    } else {
-                      setValue('modules', {
-                        ...modules,
-                        [uuid()]: {
-                          model: moduleModel,
-                          type: getModuleType(moduleModel),
-                          slot:
-                            robotType === FLEX_ROBOT_TYPE
-                              ? DEFAULT_SLOT_MAP_FLEX[moduleModel]
-                              : DEFAULT_SLOT_MAP_OT2[
-                                  getModuleType(moduleModel)
-                                ],
-                        },
-                      })
-                    }
-                  }}
-                />
-              ))}
-          </Flex>
-          {modules != null &&
-          Object.keys(modules).length > 0 &&
-          Object.keys(filteredModules).length > 0 ? (
-            <Flex
-              marginTop={SPACING.spacing32}
-              flexDirection={DIRECTION_COLUMN}
-            >
+    <HandleEnter onEnter={proceed}>
+      <WizardBody
+        stepNumber={robotType === FLEX_ROBOT_TYPE ? 4 : 3}
+        header={t('add_modules')}
+        disabled={false}
+        goBack={() => {
+          goBack(1)
+          setValue('modules', null)
+        }}
+        proceed={() => {
+          proceed(1)
+        }}
+      >
+        <Flex marginTop={SPACING.spacing60} flexDirection={DIRECTION_COLUMN}>
+          <Flex flexDirection={DIRECTION_COLUMN}>
+            {filteredSupportedModules.length > 0 ? (
               <StyledText
                 desktopStyle="headingSmallBold"
                 marginBottom={SPACING.spacing12}
               >
-                {t('modules_added')}
+                {t('which_mods')}
               </StyledText>
-              <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-                {Object.values(filteredModules).map((module, index) => {
-                  const length = Object.values(modules).filter(
-                    mod => module.type === mod.type
-                  ).length
-
-                  const dropdownProps = {
-                    currentOption: { name: `${length}`, value: `${length}` },
-                    onClick: (value: string) => {
-                      const num = parseInt(value)
-                      const moamModules =
-                        modules != null
-                          ? Object.entries(modules).filter(
-                              ([key, mod]) => mod.type === module.type
-                            )
-                          : []
-
-                      if (num > moamModules.length) {
-                        const newModules = { ...modules }
-                        for (let i = 0; i < num - moamModules.length; i++) {
-                          //  @ts-expect-error: TS can't determine modules's type correctly
-                          newModules[uuid()] = {
-                            model: module.model,
-                            type: module.type,
-                            slot: null,
-                          }
-                        }
-                        setValue('modules', newModules)
-                      } else if (num < moamModules.length) {
-                        const modulesToRemove = moamModules.length - num
-                        const remainingModules: FormModules = {}
-
-                        Object.entries(modules).forEach(([key, mod]) => {
-                          const shouldRemove = moamModules
-                            .slice(-modulesToRemove)
-                            .some(([removeKey]) => removeKey === key)
-                          if (!shouldRemove) {
-                            remainingModules[parseInt(key)] = mod
-                          }
+            ) : null}
+            <Flex gridGap={SPACING.spacing4} flexWrap={WRAP}>
+              {filteredSupportedModules
+                .filter(module =>
+                  enableAbsorbanceReader
+                    ? module
+                    : module !== ABSORBANCE_READER_V1
+                )
+                .map(moduleModel => (
+                  <EmptySelectorButton
+                    key={moduleModel}
+                    disabled={
+                      (moduleModel !== 'magneticBlockV1' &&
+                        hasNoAvailableSlots) ||
+                      (moduleModel === 'thermocyclerModuleV2' &&
+                        numSlotsAvailable <= 1) ||
+                      (moduleModel === 'magneticBlockV1' &&
+                        hasNoAvailableSlots &&
+                        numMagneticBlocks === 4)
+                    }
+                    textAlignment={TYPOGRAPHY.textAlignLeft}
+                    size="small"
+                    iconName="plus"
+                    text={getModuleDisplayName(moduleModel)}
+                    onClick={() => {
+                      if (hasNoAvailableSlots) {
+                        makeSnackbar(t('slot_limit_reached') as string)
+                      } else {
+                        setValue('modules', {
+                          ...modules,
+                          [uuid()]: {
+                            model: moduleModel,
+                            type: getModuleType(moduleModel),
+                            slot:
+                              robotType === FLEX_ROBOT_TYPE
+                                ? DEFAULT_SLOT_MAP_FLEX[moduleModel]
+                                : DEFAULT_SLOT_MAP_OT2[
+                                    getModuleType(moduleModel)
+                                  ],
+                          },
                         })
-
-                        setValue('modules', remainingModules)
                       }
-                    },
-                    dropdownType: 'neutral' as any,
-                    filterOptions: getMoamOptions(
-                      module.model === 'magneticBlockV1'
-                        ? numSlotsAvailable + 3 + length
-                        : numSlotsAvailable + length
-                    ),
-                  }
-                  return (
-                    <ListItem type="noActive" key={`${module.model}_${index}`}>
-                      <ListItemCustomize
-                        dropdown={
-                          MOAM_MODULE_TYPES.includes(module.type) &&
-                          robotType === FLEX_ROBOT_TYPE
-                            ? dropdownProps
-                            : undefined
-                        }
-                        label={
-                          MOAM_MODULE_TYPES.includes(module.type) &&
-                          robotType === FLEX_ROBOT_TYPE
-                            ? t('quantity')
-                            : null
-                        }
-                        linkText={t('remove')}
-                        onClick={() => {
-                          const updatedModules =
-                            modules != null
-                              ? Object.fromEntries(
-                                  Object.entries(modules).filter(
-                                    ([key, value]) => value.type !== module.type
-                                  )
-                                )
-                              : {}
-                          setValue('modules', updatedModules)
-                        }}
-                        header={getModuleDisplayName(module.model)}
-                        leftHeaderItem={
-                          <ModuleDiagram
-                            type={module.type}
-                            model={module.model}
-                          />
-                        }
-                      />
-                    </ListItem>
-                  )
-                })}
-              </Flex>
+                    }}
+                  />
+                ))}
             </Flex>
-          ) : null}
+            {modules != null &&
+            Object.keys(modules).length > 0 &&
+            Object.keys(filteredModules).length > 0 ? (
+              <Flex
+                marginTop={SPACING.spacing32}
+                flexDirection={DIRECTION_COLUMN}
+              >
+                <StyledText
+                  desktopStyle="headingSmallBold"
+                  marginBottom={SPACING.spacing12}
+                >
+                  {t('which_mods')}
+                </StyledText>
+              </Flex>
+            ) : null}
+
+            <Flex gridGap={SPACING.spacing4} flexWrap={WRAP}>
+              {filteredSupportedModules
+                .filter(
+                  module =>
+                    module !== ABSORBANCE_READER_V1 && enableAbsorbanceReader
+                )
+                .map(moduleModel => (
+                  <EmptySelectorButton
+                    key={moduleModel}
+                    disabled={
+                      (moduleModel !== MAGNETIC_BLOCK_V1 &&
+                        hasNoAvailableSlots) ||
+                      (moduleModel === THERMOCYCLER_MODULE_V2 &&
+                        numSlotsAvailable <= 1) ||
+                      (moduleModel === MAGNETIC_BLOCK_V1 &&
+                        hasNoAvailableSlots &&
+                        numMagneticBlocks === 4)
+                    }
+                    textAlignment={TYPOGRAPHY.textAlignLeft}
+                    size="small"
+                    iconName="plus"
+                    text={getModuleDisplayName(moduleModel)}
+                    onClick={() => {
+                      if (hasNoAvailableSlots) {
+                        makeSnackbar(t('slot_limit_reached') as string)
+                      } else {
+                        setValue('modules', {
+                          ...modules,
+                          [uuid()]: {
+                            model: moduleModel,
+                            type: getModuleType(moduleModel),
+                            slot:
+                              robotType === FLEX_ROBOT_TYPE
+                                ? DEFAULT_SLOT_MAP_FLEX[moduleModel]
+                                : DEFAULT_SLOT_MAP_OT2[
+                                    getModuleType(moduleModel)
+                                  ],
+                          },
+                        })
+                      }
+                    }}
+                  />
+                ))}
+            </Flex>
+            {modules != null &&
+            Object.keys(modules).length > 0 &&
+            Object.keys(filteredModules).length > 0 ? (
+              <Flex
+                marginTop={SPACING.spacing32}
+                flexDirection={DIRECTION_COLUMN}
+              >
+                <StyledText
+                  desktopStyle="headingSmallBold"
+                  marginBottom={SPACING.spacing12}
+                >
+                  {t('modules_added')}
+                </StyledText>
+                <Flex
+                  flexDirection={DIRECTION_COLUMN}
+                  gridGap={SPACING.spacing4}
+                >
+                  {Object.values(filteredModules).map((module, index) => {
+                    const length = Object.values(modules).filter(
+                      mod => module.type === mod.type
+                    ).length
+
+                    const dropdownProps = {
+                      currentOption: { name: `${length}`, value: `${length}` },
+                      onClick: (value: string) => {
+                        const num = parseInt(value)
+                        const moamModules =
+                          modules != null
+                            ? Object.entries(modules).filter(
+                                ([key, mod]) => mod.type === module.type
+                              )
+                            : []
+
+                        if (num > moamModules.length) {
+                          const newModules = { ...modules }
+                          for (let i = 0; i < num - moamModules.length; i++) {
+                            //  @ts-expect-error: TS can't determine modules's type correctly
+                            newModules[uuid()] = {
+                              model: module.model,
+                              type: module.type,
+                              slot: null,
+                            }
+                          }
+                          setValue('modules', newModules)
+                        } else if (num < moamModules.length) {
+                          const modulesToRemove = moamModules.length - num
+                          const remainingModules: FormModules = {}
+
+                          Object.entries(modules).forEach(([key, mod]) => {
+                            const shouldRemove = moamModules
+                              .slice(-modulesToRemove)
+                              .some(([removeKey]) => removeKey === key)
+                            if (!shouldRemove) {
+                              remainingModules[parseInt(key)] = mod
+                            }
+                          })
+
+                          setValue('modules', remainingModules)
+                        }
+                      },
+                      dropdownType: 'neutral' as DropdownBorder,
+                      filterOptions: getNumOptions(
+                        module.model === 'magneticBlockV1'
+                          ? numSlotsAvailable + 3 + length
+                          : numSlotsAvailable + length
+                      ),
+                    }
+                    return (
+                      <ListItem
+                        type="noActive"
+                        key={`${module.model}_${index}`}
+                      >
+                        <ListItemCustomize
+                          dropdown={
+                            MOAM_MODULE_TYPES.includes(module.type) &&
+                            robotType === FLEX_ROBOT_TYPE
+                              ? dropdownProps
+                              : undefined
+                          }
+                          label={
+                            MOAM_MODULE_TYPES.includes(module.type) &&
+                            robotType === FLEX_ROBOT_TYPE
+                              ? t('quantity')
+                              : null
+                          }
+                          linkText={t('remove')}
+                          onClick={() => {
+                            const updatedModules =
+                              modules != null
+                                ? Object.fromEntries(
+                                    Object.entries(modules).filter(
+                                      ([key, value]) =>
+                                        value.type !== module.type
+                                    )
+                                  )
+                                : {}
+                            setValue('modules', updatedModules)
+                          }}
+                          header={getModuleDisplayName(module.model)}
+                          leftHeaderItem={
+                            <ModuleDiagram
+                              type={module.type}
+                              model={module.model}
+                            />
+                          }
+                        />
+                      </ListItem>
+                    )
+                  })}
+                </Flex>
+              </Flex>
+            ) : null}
+          </Flex>
         </Flex>
-      </Flex>
-    </WizardBody>
+      </WizardBody>
+    </HandleEnter>
   )
 }

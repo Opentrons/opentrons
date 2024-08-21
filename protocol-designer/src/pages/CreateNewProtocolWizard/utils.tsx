@@ -1,6 +1,5 @@
 import * as React from 'react'
 import {
-  CutoutId,
   MAGNETIC_BLOCK_TYPE,
   STAGING_AREA_CUTOUTS,
   THERMOCYCLER_MODULE_TYPE,
@@ -13,14 +12,23 @@ import wasteChuteImage from '../../assets/images/waste_chute.png'
 import trashBinImage from '../../assets/images/flex_trash_bin.png'
 import stagingAreaImage from '../../assets/images/staging_area.png'
 import type {
+  CutoutId,
   LabwareDefByDefURI,
   LabwareDefinition2,
   PipetteName,
 } from '@opentrons/shared-data'
+import type { DropdownOption } from '@opentrons/components'
 import type { AdditionalEquipment, WizardFormState } from './types'
 
 const TOTAL_MODULE_SLOTS = 8
 const MIDDLE_SLOT_NUM = 4
+
+export const getNumOptions = (length: number): DropdownOption[] => {
+  return Array.from({ length }, (_, i) => ({
+    name: `${i + 1}`,
+    value: `${i + 1}`,
+  }))
+}
 
 export const getNumSlotsAvailable = (
   modules: WizardFormState['modules'],
@@ -30,6 +38,10 @@ export const getNumSlotsAvailable = (
   const hasTC = Object.values(modules || {}).some(
     module => module.type === THERMOCYCLER_MODULE_TYPE
   )
+  const numStagingAreas = additionalEquipment.filter(ae => ae === 'stagingArea')
+    ?.length
+  const hasWasteChute = additionalEquipment.some(ae => ae === 'wasteChute')
+
   const magneticBlocks = Object.values(modules || {}).filter(
     module => module.type === MAGNETIC_BLOCK_TYPE
   )
@@ -51,6 +63,9 @@ export const getNumSlotsAvailable = (
 
   let filteredAdditionalEquipmentLength = additionalEquipmentLength
   if (hasGripper) {
+    filteredAdditionalEquipmentLength = filteredAdditionalEquipmentLength - 1
+  }
+  if (numStagingAreas === 4 && hasWasteChute) {
     filteredAdditionalEquipmentLength = filteredAdditionalEquipmentLength - 1
   }
   return (

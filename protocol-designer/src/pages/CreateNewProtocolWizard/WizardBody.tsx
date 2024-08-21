@@ -89,7 +89,7 @@ export function WizardBody(props: WizardBodyProps): JSX.Element {
             </Btn>
           ) : null}
           <LargeButton
-            disabled={disabled}
+            ariaDisabled={disabled}
             onClick={proceed}
             iconName="arrow-right"
             buttonText={t('shared:confirm')}
