@@ -846,7 +846,9 @@ def test_get_commands_slice_from_db(
     )
 
     decoy.when(
-        mock_run_store.get_commands_slice(run_id="run_id", cursor=1, length=2)
+        mock_run_store.get_commands_slice(
+            run_id="run_id", cursor=1, length=2, include_fixit_commands=True
+        )
     ).then_return(expected_command_slice)
     result = subject.get_commands_slice(
         run_id="run_id", cursor=1, length=2, include_fixit_commands=True
@@ -928,7 +930,9 @@ def test_get_commands_slice_from_db_run_not_found(
 ) -> None:
     """Should get a sliced command list from run store."""
     decoy.when(
-        mock_run_store.get_commands_slice(run_id="run-id", cursor=1, length=2)
+        mock_run_store.get_commands_slice(
+            run_id="run-id", cursor=1, length=2, include_fixit_commands=True
+        )
     ).then_raise(RunNotFoundError(run_id="run-id"))
     with pytest.raises(RunNotFoundError):
         subject.get_commands_slice(

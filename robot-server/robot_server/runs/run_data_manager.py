@@ -395,7 +395,7 @@ class RunDataManager:
 
         # Let exception propagate
         return self._run_store.get_commands_slice(
-            run_id=run_id, cursor=cursor, length=length
+            run_id=run_id, cursor=cursor, length=length, include_fixit_commands=True
         )
 
     def get_command_error_slice(

@@ -64,6 +64,7 @@ def protocol_commands() -> List[pe_commands.Command]:
             createdAt=datetime(year=2021, month=1, day=1),
             params=pe_commands.WaitForResumeParams(message="hello world"),
             result=pe_commands.WaitForResumeResult(),
+            intent=pe_commands.CommandIntent.PROTOCOL,
         ),
         pe_commands.WaitForResume(
             id="pause-2",
@@ -72,6 +73,7 @@ def protocol_commands() -> List[pe_commands.Command]:
             createdAt=datetime(year=2022, month=2, day=2),
             params=pe_commands.WaitForResumeParams(message="hey world"),
             result=pe_commands.WaitForResumeResult(),
+            intent=pe_commands.CommandIntent.PROTOCOL,
         ),
         pe_commands.WaitForResume(
             id="pause-3",
@@ -252,6 +254,7 @@ async def test_update_run_state(
         run_id="run-id",
         length=len(protocol_commands),
         cursor=0,
+        include_fixit_commands=True,
     )
 
     assert result == RunResource(
@@ -729,7 +732,10 @@ def test_get_command_slice(
         run_time_parameters=[],
     )
     result = subject.get_commands_slice(
-        run_id="run-id", cursor=0, length=len(protocol_commands)
+        run_id="run-id",
+        cursor=0,
+        length=len(protocol_commands),
+        include_fixit_commands=True,
     )
 
     assert result == CommandSlice(
@@ -776,7 +782,10 @@ def test_get_commands_slice_clamping(
         run_time_parameters=[],
     )
     result = subject.get_commands_slice(
-        run_id="run-id", cursor=input_cursor, length=input_length
+        run_id="run-id",
+        cursor=input_cursor,
+        length=input_length,
+        include_fixit_commands=True,
     )
 
     assert result.cursor == expected_cursor
@@ -794,7 +803,9 @@ def test_get_run_command_slice_none(subject: RunStore) -> None:
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
     )
 
-    result = subject.get_commands_slice(run_id="run-id", length=999, cursor=None)
+    result = subject.get_commands_slice(
+        run_id="run-id", length=999, cursor=None, include_fixit_commands=True
+    )
     assert result == CommandSlice(commands=[], cursor=0, total_length=0)
 
 
@@ -804,7 +815,9 @@ def test_get_commands_slice_run_not_found(subject: RunStore) -> None:
         run_id="run-id", protocol_id=None, created_at=datetime.now(timezone.utc)
     )
     with pytest.raises(RunNotFoundError):
-        subject.get_commands_slice(run_id="not-run-id", cursor=1, length=3)
+        subject.get_commands_slice(
+            run_id="not-run-id", cursor=1, length=3, include_fixit_commands=True
+        )
 
 
 def test_get_all_commands_as_preserialized_list(
@@ -827,9 +840,9 @@ def test_get_all_commands_as_preserialized_list(
     result = subject.get_all_commands_as_preserialized_list(run_id="run-id")
     assert result == [
         '{"id": "pause-1", "createdAt": "2021-01-01T00:00:00", "commandType": "waitForResume",'
-        ' "key": "command-key", "status": "succeeded", "params": {"message": "hello world"}, "result": {}}',
+        ' "key": "command-key", "status": "succeeded", "params": {"message": "hello world"}, "result": {}, "intent": "protocol"}',
         '{"id": "pause-2", "createdAt": "2022-02-02T00:00:00", "commandType": "waitForResume",'
-        ' "key": "command-key", "status": "succeeded", "params": {"message": "hey world"}, "result": {}}',
+        ' "key": "command-key", "status": "succeeded", "params": {"message": "hey world"}, "result": {}, "intent": "protocol"}',
         '{"id": "pause-3", "createdAt": "2023-03-03T00:00:00", "commandType": "waitForResume",'
         ' "key": "command-key", "status": "succeeded", "params": {"message": "sup world"}, "result": {}}',
     ]

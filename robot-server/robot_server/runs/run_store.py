@@ -175,6 +175,9 @@ class RunStore:
                         "index_in_run": command_index,
                         "command_id": command.id,
                         "command": pydantic_to_json(command),
+                        "command_intent": str(command.intent.value)
+                        if command.intent
+                        else None,
                     },
                 )
 
@@ -430,6 +433,7 @@ class RunStore:
         run_id: str,
         length: int,
         cursor: Optional[int],
+        include_fixit_commands: bool,
     ) -> CommandSlice:
         """Get a slice of run commands from the store.
 
@@ -439,6 +443,7 @@ class RunStore:
             cursor: The starting index of the slice in the whole collection.
                 If `None`, up to `length` elements at the end of the collection will
                 be returned.
+            include_fixit_commands: Wether we should include fixit command intent in the result.
 
         Returns:
             A collection of commands as well as the actual cursor used and
@@ -451,9 +456,15 @@ class RunStore:
             if not self._run_exists(run_id, transaction):
                 raise RunNotFoundError(run_id=run_id)
 
-            select_count = sqlalchemy.select(sqlalchemy.func.count()).where(
-                run_command_table.c.run_id == run_id
-            )
+            if include_fixit_commands:
+                select_count = sqlalchemy.select(sqlalchemy.func.count()).where(
+                    run_command_table.c.run_id == run_id
+                )
+            else:
+                select_count = sqlalchemy.select(sqlalchemy.func.count()).where(
+                    run_command_table.c.run_id == run_id
+                    and run_command_table.c.command_intent != "fixit"
+                )
             count_result: int = transaction.execute(select_count).scalar_one()
 
             actual_cursor = cursor if cursor is not None else count_result - length

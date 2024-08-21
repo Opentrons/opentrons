@@ -81,6 +81,7 @@ def get_command_view(  # noqa: C901
 
     if running_command_id:
         command_history._set_running_command_id(running_command_id)
+    # TODO(tz, 8-21-24): consolidate all quques into 1 and use append_queued_command
     if queued_command_ids:
         for command_id in queued_command_ids:
             command_history._add_to_queue(command_id)
