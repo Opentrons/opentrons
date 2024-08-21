@@ -126,14 +126,20 @@ export function useProtocolReceiptToast(): void {
 
 export function useCurrentRunRoute(): string | null {
   const currentRunId = useCurrentRunId({ refetchInterval: CURRENT_RUN_POLL })
-  const { data: runRecord } = useNotifyRunQuery(currentRunId, {
-    staleTime: Infinity,
-    enabled: currentRunId != null,
+  const { data: runRecord, isFetching } = useNotifyRunQuery(currentRunId, {
+    refetchInterval: CURRENT_RUN_POLL,
   })
 
   const runStatus = runRecord?.data.status
   const runActions = runRecord?.data.actions
-  if (runRecord == null || runStatus == null || runActions == null) return null
+  if (
+    runRecord == null ||
+    runStatus == null ||
+    runActions == null ||
+    isFetching
+  ) {
+    return null
+  }
   // grabbing run id off of the run query to have all routing info come from one source of truth
   const runId = runRecord.data.id
   const hasRunStarted = runActions?.some(
