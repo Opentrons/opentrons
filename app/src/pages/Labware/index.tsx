@@ -22,12 +22,13 @@ import {
   POSITION_ABSOLUTE,
   PrimaryButton,
   SecondaryButton,
+  ERROR_TOAST,
+  SUCCESS_TOAST,
   SPACING,
   TYPOGRAPHY,
   useOnClickOutside,
 } from '@opentrons/components'
 import { LabwareCreator } from '@opentrons/labware-library'
-import { ERROR_TOAST, SUCCESS_TOAST } from '../../atoms/Toast'
 import {
   useTrackEvent,
   ANALYTICS_OPEN_LABWARE_CREATOR_FROM_BOTTOM_OF_LABWARE_LIBRARY_LIST,

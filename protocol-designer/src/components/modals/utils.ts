@@ -37,15 +37,9 @@ export function getTiprackOptions(props: TiprackOptionsProps): TiprackOption[] {
         .filter(def => def.metadata.displayCategory === 'tipRack')
         .filter(def => {
           if (allowAllTipracks && !isFlexPipette) {
-            return (
-              !def.metadata.displayName.includes('Flex') ||
-              def.namespace === 'custom_beta'
-            )
+            return !def.metadata.displayName.includes('Flex')
           } else if (allowAllTipracks && isFlexPipette) {
-            return (
-              def.metadata.displayName.includes('Flex') ||
-              def.namespace === 'custom_beta'
-            )
+            return def.metadata.displayName.includes('Flex')
           } else {
             return (
               selectedPipetteDefaultTipracks.includes(getLabwareDefURI(def)) ||

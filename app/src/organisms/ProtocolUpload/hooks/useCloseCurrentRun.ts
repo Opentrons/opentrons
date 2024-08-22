@@ -23,10 +23,10 @@ export function useCloseCurrentRun(): {
   ): void => {
     if (currentRunId != null) {
       dismissCurrentRun(currentRunId, {
-        ...options,
         onError: () => {
           console.warn('failed to dismiss current')
         },
+        ...options,
       })
     }
   }

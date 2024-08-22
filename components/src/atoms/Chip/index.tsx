@@ -3,7 +3,7 @@ import { css } from 'styled-components'
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { Flex } from '../../primitives'
 import { LegacyStyledText } from '../StyledText'
-import { ALIGN_CENTER, DIRECTION_ROW } from '../../styles'
+import { ALIGN_CENTER, DIRECTION_ROW, FLEX_MAX_CONTENT } from '../../styles'
 import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { Icon } from '../../icons'
 
@@ -91,6 +91,7 @@ export function Chip(props: ChipProps): JSX.Element {
   const MEDIUM_CONTAINER_STYLE = css`
     padding: ${SPACING.spacing2} ${background === false ? 0 : SPACING.spacing8};
     grid-gap: ${SPACING.spacing4};
+
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
       padding: ${SPACING.spacing8}
         ${background === false ? 0 : SPACING.spacing16};
@@ -101,6 +102,7 @@ export function Chip(props: ChipProps): JSX.Element {
   const SMALL_CONTAINER_STYLE = css`
     padding: ${SPACING.spacing4} ${background === false ? 0 : SPACING.spacing6};
     grid-gap: ${SPACING.spacing4};
+
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
       padding: ${SPACING.spacing4}
         ${background === false ? 0 : SPACING.spacing8};
@@ -111,6 +113,7 @@ export function Chip(props: ChipProps): JSX.Element {
   const ICON_STYLE = css`
     width: ${chipSize === 'medium' ? '1rem' : '0.75rem'};
     height: ${chipSize === 'medium' ? '1rem' : '0.75rem'};
+
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
       width: ${chipSize === 'medium' ? '1.5rem' : '1.25rem'};
       height: ${chipSize === 'medium' ? '1.5rem' : '1.25rem'};
@@ -119,6 +122,7 @@ export function Chip(props: ChipProps): JSX.Element {
 
   const TEXT_STYLE = css`
     ${chipSize === 'medium' ? WEB_MEDIUM_TEXT_STYLE : WEB_SMALL_TEXT_STYLE}
+
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
       ${chipSize === 'medium'
         ? TYPOGRAPHY.bodyTextSemiBold
@@ -132,6 +136,7 @@ export function Chip(props: ChipProps): JSX.Element {
       backgroundColor={backgroundColor}
       borderRadius={CHIP_PROPS_BY_TYPE[type].borderRadius}
       flexDirection={DIRECTION_ROW}
+      height={FLEX_MAX_CONTENT}
       css={
         chipSize === 'medium' ? MEDIUM_CONTAINER_STYLE : SMALL_CONTAINER_STYLE
       }

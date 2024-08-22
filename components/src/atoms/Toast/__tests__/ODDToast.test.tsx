@@ -2,14 +2,11 @@ import * as React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { act, fireEvent, screen } from '@testing-library/react'
-import { i18n } from '../../../i18n'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '../../../testing/utils'
 import { Toast, TOAST_ANIMATION_DURATION } from '..'
 
 const render = (props: React.ComponentProps<typeof Toast>) => {
-  return renderWithProviders(<Toast {...props} displayType="odd" />, {
-    i18nInstance: i18n,
-  })[0]
+  return renderWithProviders(<Toast {...props} displayType="odd" />)[0]
 }
 
 describe('Toast', () => {

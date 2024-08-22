@@ -588,6 +588,23 @@ describe('CommandText', () => {
     )
     screen.getByText('Load NEST 96 Well Plate 100 µL PCR Full Skirt off deck')
   })
+  it('renders correct text for reloadLabware', () => {
+    const reloadLabwareCommand = mockCommandTextData.commands.find(
+      c => c.commandType === 'reloadLabware'
+    )
+    expect(reloadLabwareCommand).not.toBeUndefined()
+    if (reloadLabwareCommand != null) {
+      renderWithProviders(
+        <CommandText
+          commandTextData={mockCommandTextData}
+          robotType={FLEX_ROBOT_TYPE}
+          command={reloadLabwareCommand}
+        />,
+        { i18nInstance: i18n }
+      )
+    }
+    screen.getByText('Reloading NEST 96 Well Plate 100 µL PCR Full Skirt (1)')
+  })
   it('renders correct text for loadLiquid', () => {
     const loadLabwareCommands = mockCommandTextData.commands.filter(
       c => c.commandType === 'loadLabware'

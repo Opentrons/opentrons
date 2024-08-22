@@ -1,17 +1,15 @@
 import * as React from 'react'
-import {
-  DIRECTION_COLUMN,
-  DIRECTION_ROW,
-  Flex,
-  PrimaryButton,
-  SPACING,
-  LegacyStyledText,
-} from '@opentrons/components'
+
 import { Toast } from './index'
+import { Flex } from '../../primitives'
+import { DIRECTION_COLUMN, DIRECTION_ROW } from '../../styles'
+import { SPACING } from '../../ui-style-constants'
+import { PrimaryButton } from '../buttons'
+import { LegacyStyledText } from '../StyledText'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'App/Atoms/Toast',
+  title: 'Library/Atoms/Toast',
   component: Toast,
 } as Meta
 

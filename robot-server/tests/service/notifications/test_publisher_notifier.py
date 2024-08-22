@@ -8,15 +8,6 @@ from robot_server.service.notifications import (
 )
 
 
-async def test_initialize() -> None:
-    """It should create a new task."""
-    publisher_notifier = PublisherNotifier(ChangeNotifier())
-
-    await publisher_notifier._initialize()
-
-    assert asyncio.get_running_loop()
-
-
 def test_notify_publishers() -> None:
     """Invoke the change notifier's notify method."""
     change_notifier = MagicMock()
@@ -65,11 +56,9 @@ async def test_wait_for_event() -> None:
         await asyncio.sleep(0.1)
         change_notifier.notify()
 
-    task = asyncio.create_task(publisher_notifier._initialize())
+    publisher_notifier._initialize()
 
-    await asyncio.gather(trigger_callbacks(), task)
+    await asyncio.gather(trigger_callbacks())
 
     assert callback_called
     assert callback_2_called
-
-    task.cancel()

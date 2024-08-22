@@ -66,4 +66,13 @@ describe('RobotSettings UpdateRobotSoftware', () => {
     const button = screen.getByText('Browse file system')
     expect(button).toBeDisabled()
   })
+
+  it('should render a banner warning users about downgrading their robot', () => {
+    render()
+    screen.getByTestId('Banner_warning')
+    screen.getByLabelText('icon_warning')
+    screen.getByText(
+      'You should not downgrade to a software version released before the manufacture date of your robot or any attached hardware.'
+    )
+  })
 })
