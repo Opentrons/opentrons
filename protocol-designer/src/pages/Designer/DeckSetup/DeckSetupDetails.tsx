@@ -175,7 +175,6 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
                   />
                   <ControlSelect
                     hover={hover}
-                    slotTopLayerId={labwareLoadedOnModule.id}
                     setHover={setHover}
                     addEquipment={addEquipment}
                     slotBoundingBox={controlSelectDimensions}
@@ -188,7 +187,6 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
 
               {labwareLoadedOnModule == null ? (
                 <ControlSelect
-                  slotTopLayerId={moduleOnDeck.id}
                   hover={hover}
                   setHover={setHover}
                   addEquipment={addEquipment}
@@ -241,7 +239,6 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
           return (
             <React.Fragment key={addressableArea.id}>
               <ControlSelect
-                slotTopLayerId={addressableArea.id}
                 hover={hover}
                 setHover={setHover}
                 addEquipment={addEquipment}
@@ -283,7 +280,6 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
               labwareOnDeck={labware}
             />
             <ControlSelect
-              slotTopLayerId={labware.id}
               hover={hover}
               setHover={setHover}
               addEquipment={addEquipment}
@@ -341,7 +337,6 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
               labwareOnDeck={labware}
             />
             <ControlSelect
-              slotTopLayerId={labware.id}
               hover={hover}
               setHover={setHover}
               addEquipment={addEquipment}

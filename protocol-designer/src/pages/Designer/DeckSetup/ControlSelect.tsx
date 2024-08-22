@@ -2,7 +2,6 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import cx from 'classnames'
 import { css } from 'styled-components'
-import { useSelector } from 'react-redux'
 import {
   Flex,
   JUSTIFY_CENTER,
@@ -10,7 +9,6 @@ import {
   StyledText,
 } from '@opentrons/components'
 import { START_TERMINAL_ITEM_ID } from '../../../steplist'
-import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import { SlotOverflowMenu } from './SlotOverflowMenu'
 
 import type { CoordinateTuple, Dimensions } from '@opentrons/shared-data'
@@ -25,7 +23,6 @@ interface ControlSelectProps {
   addEquipment: (slotId: string) => void
   hover: string | null
   setHover: React.Dispatch<React.SetStateAction<string | null>>
-  slotTopLayerId: string // can be AddressableAreaName, moduleId, labwareId
   selectedTerminalItemId?: TerminalItemId | null
 }
 
@@ -40,14 +37,9 @@ export const ControlSelect = (
     addEquipment,
     hover,
     setHover,
-    slotTopLayerId,
   } = props
   const { t } = useTranslation('starting_deck_state')
   const [showMenuList, setShowMenuList] = React.useState<boolean>(false)
-  const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
-  const moduleId = Object.keys(activeDeckSetup.modules).find(
-    moduleId => slotTopLayerId === moduleId
-  )
 
   if (selectedTerminalItemId !== START_TERMINAL_ITEM_ID || slotPosition == null)
     return null
@@ -85,7 +77,7 @@ export const ControlSelect = (
             }}
           >
             <StyledText desktopStyle="bodyDefaultSemiBold">
-              {moduleId != null ? t('add_labware') : t('edit_slot')}
+              {slotId === 'offDeck' ? t('edit_labware') : t('edit_slot')}
             </StyledText>
           </a>
         </Flex>
