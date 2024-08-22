@@ -1,2 +1,2 @@
 export * from './useIsDoorOpen'
-export * from './useAnalysisErrorsModal'
+export * from './useRunAnalytics'

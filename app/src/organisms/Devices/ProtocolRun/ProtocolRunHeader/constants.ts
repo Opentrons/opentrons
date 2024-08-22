@@ -17,29 +17,29 @@ import type { RunStatus } from '@opentrons/api-client'
 
 export const EQUIPMENT_POLL_MS = 5000
 
-export const START_RUN_STATUSES: RunStatus[] = [
+export const START_RUN_STATUSES = [
   RUN_STATUS_IDLE,
   RUN_STATUS_PAUSED,
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
-]
-export const RUN_AGAIN_STATUSES: RunStatus[] = [
+] as Array<RunStatus | null>
+export const RUN_AGAIN_STATUSES = [
   RUN_STATUS_STOPPED,
   RUN_STATUS_FINISHING,
   RUN_STATUS_FAILED,
   RUN_STATUS_SUCCEEDED,
-]
-export const RECOVERY_STATUSES: RunStatus[] = [
+] as Array<RunStatus | null>
+export const RECOVERY_STATUSES = [
   RUN_STATUS_AWAITING_RECOVERY,
   RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_AWAITING_RECOVERY_PAUSED,
-]
-export const DISABLED_STATUSES: RunStatus[] = [
+] as Array<RunStatus | null>
+export const DISABLED_STATUSES = [
   RUN_STATUS_FINISHING,
   RUN_STATUS_STOP_REQUESTED,
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
   ...RECOVERY_STATUSES,
-]
-export const CANCELLABLE_STATUSES: RunStatus[] = [
+] as Array<RunStatus | null>
+export const CANCELLABLE_STATUSES = [
   RUN_STATUS_RUNNING,
   RUN_STATUS_PAUSED,
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
@@ -47,4 +47,9 @@ export const CANCELLABLE_STATUSES: RunStatus[] = [
   RUN_STATUS_AWAITING_RECOVERY,
   RUN_STATUS_AWAITING_RECOVERY_PAUSED,
   RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
-]
+] as Array<RunStatus | null>
+export const TERMINAL_STATUSES = [
+  RUN_STATUS_STOPPED,
+  RUN_STATUS_SUCCEEDED,
+  RUN_STATUS_FAILED,
+] as Array<RunStatus | null>

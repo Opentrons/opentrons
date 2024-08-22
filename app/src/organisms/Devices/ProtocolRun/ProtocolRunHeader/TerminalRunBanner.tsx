@@ -12,6 +12,7 @@ import {
 import { RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
 
 import { Banner } from '../../../../atoms/Banner'
+import { useCloseCurrentRun } from '../../../ProtocolUpload/hooks'
 
 import type {
   RunStatus,
@@ -21,8 +22,6 @@ import type {
 
 interface TerminalRunProps {
   runStatus: RunStatus | null
-  handleClearClick: () => void
-  isClosingCurrentRun: boolean
   toggleRunFailedModal: () => void
   commandErrorList?: RunCommandErrors
   isResetRunLoading: boolean
@@ -35,8 +34,6 @@ interface TerminalRunProps {
 export function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
   const {
     runStatus,
-    handleClearClick,
-    isClosingCurrentRun,
     toggleRunFailedModal,
     commandErrorList,
     highestPriorityError,
@@ -45,17 +42,19 @@ export function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
     cancelledWithoutRecovery,
   } = props
   const { t } = useTranslation('run_details')
+  const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
+
   const completedWithErrors =
     commandErrorList?.data != null && commandErrorList.data.length > 0
 
   const handleRunSuccessClick = (): void => {
-    handleClearClick()
+    closeCurrentRun()
   }
 
   const handleFailedRunClick = (): void => {
-    // TODO(jh, 08-15-24): See TODO related to commandErrorList above.
+    // TODO(jh, 08-15-24): Revisit the control flow here here after commandErrorList may be fetched for a non-current run.
     if (commandErrorList == null) {
-      handleClearClick()
+      closeCurrentRun()
     }
     toggleRunFailedModal()
   }

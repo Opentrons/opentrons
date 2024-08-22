@@ -90,7 +90,7 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
   const attachedModules =
     useModulesQuery({
       refetchInterval: EQUIPMENT_POLL_MS,
-      enabled: runStatus != null && START_RUN_STATUSES.includes(runStatus),
+      enabled: START_RUN_STATUSES.includes(runStatus),
     })?.data?.data ?? []
   const trackEvent = useTrackEvent()
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
@@ -141,12 +141,11 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
     isOtherRunCurrent ||
     isProtocolAnalyzing ||
     isFixtureMismatch ||
-    (runStatus != null && DISABLED_STATUSES.includes(runStatus)) ||
+    DISABLED_STATUSES.includes(runStatus) ||
     isRobotOnWrongVersionOfSoftware ||
     // For before running a protocol, "close door to begin".
     (isDoorOpen &&
       runStatus !== RUN_STATUS_BLOCKED_BY_OPEN_DOOR &&
-      runStatus != null &&
       CANCELLABLE_STATUSES.includes(runStatus))
   const robot = useRobot(robotName)
   const robotSerialNumber =
@@ -191,8 +190,7 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
       return module.moduleType === 'heaterShakerModuleType'
     })
     .some(module => module?.data != null && module.data.speedStatus !== 'idle')
-  const isValidRunAgain =
-    runStatus != null && RUN_AGAIN_STATUSES.includes(runStatus)
+  const isValidRunAgain = RUN_AGAIN_STATUSES.includes(runStatus)
   const validRunAgainButRequiresSetup = isValidRunAgain && !isSetupComplete
   const runAgainWithSpinner = validRunAgainButRequiresSetup && isResetRunLoading
 
@@ -211,11 +209,7 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
     disableReason = t('shared:robot_is_busy')
   } else if (isRobotOnWrongVersionOfSoftware) {
     disableReason = t('shared:a_software_update_is_available')
-  } else if (
-    isDoorOpen &&
-    runStatus != null &&
-    START_RUN_STATUSES.includes(runStatus)
-  ) {
+  } else if (isDoorOpen && START_RUN_STATUSES.includes(runStatus)) {
     disableReason = t('close_door')
   }
 
@@ -229,7 +223,7 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
     buttonText = t('analyzing_on_robot')
   } else if (
     runStatus === RUN_STATUS_RUNNING ||
-    (runStatus != null && RECOVERY_STATUSES.includes(runStatus))
+    RECOVERY_STATUSES.includes(runStatus)
   ) {
     buttonIconName = 'pause'
     buttonText = t('pause_run')
@@ -240,7 +234,7 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
   } else if (runStatus === RUN_STATUS_STOP_REQUESTED) {
     buttonIconName = 'ot-spinner'
     buttonText = t('canceling_run')
-  } else if (runStatus != null && START_RUN_STATUSES.includes(runStatus)) {
+  } else if (START_RUN_STATUSES.includes(runStatus)) {
     buttonIconName = 'play'
     buttonText =
       runStatus === RUN_STATUS_IDLE ? t('start_run') : t('resume_run')
@@ -269,7 +263,7 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
         })
       }
     }
-  } else if (runStatus != null && RUN_AGAIN_STATUSES.includes(runStatus)) {
+  } else if (RUN_AGAIN_STATUSES.includes(runStatus)) {
     buttonIconName = runAgainWithSpinner ? 'ot-spinner' : 'play'
     buttonText = t('run_again')
     handleButtonClick = () => {

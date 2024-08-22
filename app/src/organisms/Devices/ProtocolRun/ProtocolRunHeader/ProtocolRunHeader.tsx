@@ -37,7 +37,6 @@ import {
   useProtocolAnalysisErrorsModal,
 } from './ProtocolAnalysisErrorModal'
 import { Banner } from '../../../../atoms/Banner'
-import { ANALYTICS_PROTOCOL_RUN_ACTION } from '../../../../redux/analytics'
 import { useCloseCurrentRun } from '../../../ProtocolUpload/hooks'
 import { ConfirmCancelModal } from '../../../RunDetails/ConfirmCancelModal'
 import {
@@ -49,9 +48,7 @@ import {
   useIsFlex,
   useIsRobotViewable,
   useProtocolDetailsForRun,
-  useRobotAnalyticsData,
   useRunCreatedAtTimestamp,
-  useTrackProtocolRunEvent,
 } from '../../hooks'
 import { formatTimestamp } from '../../utils'
 import { RunTimer } from '../RunTimer'
@@ -68,7 +65,6 @@ import {
   ErrorRecoveryFlows,
   useErrorRecoveryFlows,
 } from '../../../ErrorRecoveryFlows'
-import { useRecoveryAnalytics } from '../../../ErrorRecoveryFlows/hooks'
 import {
   ProtocolDropTipModal,
   useProtocolDropTipModal,
@@ -78,7 +74,7 @@ import { LabeledValue } from './LabeledValueProps'
 import { TerminalRunBanner } from './TerminalRunBanner'
 import { ActionButton } from './ActionButton'
 import { CANCELLABLE_STATUSES } from './constants'
-import { useIsDoorOpen } from './hooks'
+import { useIsDoorOpen, useRunAnalytics } from './hooks'
 
 import type { RunCommandError } from '@opentrons/shared-data'
 
@@ -107,10 +103,7 @@ export function ProtocolRunHeader({
     protocolKey,
     isProtocolAnalyzing,
   } = useProtocolDetailsForRun(runId)
-  const { reportRecoveredRunResult } = useRecoveryAnalytics()
 
-  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
-  const robotAnalyticsData = useRobotAnalyticsData(robotName)
   const isRobotViewable = useIsRobotViewable(robotName)
   const runStatus = useRunStatus(runId)
   const isRunCurrent = useIsRunCurrent(runId)
@@ -134,10 +127,8 @@ export function ProtocolRunHeader({
     { cursor: 0, pageLength: 100 },
     {
       enabled:
-        runStatus != null &&
         // @ts-expect-error runStatus expected to possibly not be terminal
-        RUN_STATUSES_TERMINAL.includes(runStatus) &&
-        isMostRecentRun,
+        RUN_STATUSES_TERMINAL.includes(runStatus) && isMostRecentRun,
     }
   )
   const isResetRunLoadingRef = React.useRef(false)
@@ -199,7 +190,6 @@ export function ProtocolRunHeader({
       if (runStatus === RUN_STATUS_IDLE) {
         resetTipStatus()
       } else if (
-        runStatus != null &&
         // @ts-expect-error runStatus expected to possibly not be terminal
         RUN_STATUSES_TERMINAL.includes(runStatus) &&
         enteredER === false
@@ -215,22 +205,9 @@ export function ProtocolRunHeader({
     }
   }, [protocolData, isRobotViewable, navigate])
 
-  React.useEffect(() => {
-    if (isRunCurrent && typeof enteredER === 'boolean') {
-      reportRecoveredRunResult(runStatus, enteredER)
-    }
-  }, [isRunCurrent, enteredER])
-
   // Side effects dependent on the current run state.
   React.useEffect(() => {
     if (runStatus === RUN_STATUS_STOPPED && isRunCurrent && runId != null) {
-      trackProtocolRunEvent({
-        name: ANALYTICS_PROTOCOL_RUN_ACTION.FINISH,
-        properties: {
-          ...robotAnalyticsData,
-        },
-      })
-
       // TODO(jh, 08-15-24): The enteredER condition is a hack, because errorCommands are only returned when a run is current.
       // Ideally the run should not need to be current to view errorCommands.
 
@@ -262,18 +239,12 @@ export function ProtocolRunHeader({
     setShowConfirmCancelModal,
   ] = React.useState<boolean>(false)
 
-  const handleCancelClick = (): void => {
+  const handleCancelRunClick = (): void => {
     if (runStatus === RUN_STATUS_RUNNING) pause()
     setShowConfirmCancelModal(true)
   }
 
-  const handleClearClick = (): void => {
-    trackProtocolRunEvent({
-      name: ANALYTICS_PROTOCOL_RUN_ACTION.FINISH,
-      properties: robotAnalyticsData ?? undefined,
-    })
-    closeCurrentRun()
-  }
+  useRunAnalytics({ runId, robotName, enteredER })
 
   return (
     <>
@@ -346,7 +317,6 @@ export function ProtocolRunHeader({
         {isDoorOpen &&
         runStatus !== RUN_STATUS_BLOCKED_BY_OPEN_DOOR &&
         runStatus !== RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR &&
-        runStatus != null &&
         CANCELLABLE_STATUSES.includes(runStatus) ? (
           <Banner type="warning" iconMarginLeft={SPACING.spacing4}>
             {t('shared:close_robot_door')}
@@ -356,7 +326,6 @@ export function ProtocolRunHeader({
           <TerminalRunBanner
             {...{
               runStatus,
-              handleClearClick,
               isClosingCurrentRun,
               toggleRunFailedModal,
               commandErrorList,
@@ -422,7 +391,7 @@ export function ProtocolRunHeader({
               {CANCELLABLE_STATUSES.includes(runStatus) && (
                 <SecondaryButton
                   isDangerous
-                  onClick={handleCancelClick}
+                  onClick={handleCancelRunClick}
                   disabled={isClosingCurrentRun}
                 >
                   {t('cancel_run')}
