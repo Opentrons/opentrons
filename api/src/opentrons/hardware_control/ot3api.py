@@ -2733,13 +2733,9 @@ class OT3API(
             # Prep the plunger
             await self.move_to(checked_mount, mount_pos_for_plunger_prep)
             if aspirate_while_sensing:
-                await self._move_to_plunger_bottom(
-                    checked_mount, rate=1
-                )  # rate used to be 15/70 for high/low throughput
+                await self._move_to_plunger_bottom(checked_mount, rate=1)
             else:
-                await self._move_to_plunger_top_for_liquid_probe(
-                    checked_mount, rate=1
-                )  # rate used to be 15/70 for high/low throughput
+                await self._move_to_plunger_top_for_liquid_probe(checked_mount, rate=1)
 
         error: Optional[PipetteLiquidNotFoundError] = None
         current_position = await self.gantry_position(checked_mount, refresh=True)
