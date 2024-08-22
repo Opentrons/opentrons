@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
@@ -12,6 +12,7 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
+import { getFileMetadata } from './file-data/selectors'
 import { actions as loadFileActions } from './load-file'
 import type { ThunkDispatch, RouteProps } from './types'
 
@@ -24,17 +25,22 @@ export function NavigationBar({
   const navRoutes = routes.filter(
     (route: RouteProps) => route.navLinkTo !== '/createNew'
   )
+  const metadata = useSelector(getFileMetadata)
   const location = useLocation()
   const dispatch: ThunkDispatch<any> = useDispatch()
   const navigate = useNavigate()
   const loadFile = (
     fileChangeEvent: React.ChangeEvent<HTMLInputElement>
   ): void => {
-    if (window.confirm(t('confirm_import') as string)) {
-      dispatch(loadFileActions.loadProtocolFile(fileChangeEvent))
+    dispatch(loadFileActions.loadProtocolFile(fileChangeEvent))
+  }
+
+  React.useEffect(() => {
+    if (metadata?.created != null) {
       navigate('/overview')
     }
-  }
+  }, [metadata, navigate])
+
   const isFilteredNavPaths =
     location.pathname === '/createNew' || location.pathname === '/'
 
