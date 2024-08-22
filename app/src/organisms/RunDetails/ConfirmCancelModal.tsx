@@ -26,6 +26,21 @@ import { useTrackProtocolRunEvent, useIsFlex } from '../Devices/hooks'
 import { useRunStatus } from '../RunTimeControl/hooks'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '../../redux/analytics'
 
+export interface UseConfirmCancelModalResult {
+  showModal: boolean
+  toggleModal: () => void
+}
+
+export function useConfirmCancelModal(): UseConfirmCancelModalResult {
+  const [showModal, setShowModal] = React.useState(false)
+
+  const toggleModal = (): void => {
+    setShowModal(!showModal)
+  }
+
+  return { showModal, toggleModal }
+}
+
 export interface ConfirmCancelModalProps {
   onClose: () => unknown
   runId: string

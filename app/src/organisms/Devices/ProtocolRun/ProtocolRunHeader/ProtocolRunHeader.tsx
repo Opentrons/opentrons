@@ -2,7 +2,6 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from 'react-router-dom'
 
-import type { Run } from '@opentrons/api-client'
 import {
   RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
@@ -38,7 +37,10 @@ import {
 } from './ProtocolAnalysisErrorModal'
 import { Banner } from '../../../../atoms/Banner'
 import { useCloseCurrentRun } from '../../../ProtocolUpload/hooks'
-import { ConfirmCancelModal } from '../../../RunDetails/ConfirmCancelModal'
+import {
+  ConfirmCancelModal,
+  useConfirmCancelModal,
+} from '../../../RunDetails/ConfirmCancelModal'
 import {
   useRunControls,
   useRunStatus,
@@ -225,23 +227,18 @@ export function ProtocolRunHeader({
   const completedAtTimestamp =
     completedAt != null ? formatTimestamp(completedAt) : EMPTY_TIMESTAMP
 
-  // redirect to new run after successful reset
-  const onResetSuccess = (createRunResponse: Run): void => {
-    navigate(
-      `/devices/${robotName}/protocol-runs/${createRunResponse.data.id}/run-preview`
-    )
-  }
+  const { play, pause } = useRunControls(runId)
 
-  const { pause, play } = useRunControls(runId, onResetSuccess)
-
-  const [
-    showConfirmCancelModal,
-    setShowConfirmCancelModal,
-  ] = React.useState<boolean>(false)
+  const {
+    showModal: showConfirmCancelModal,
+    toggleModal: toggleConfirmCancelModal,
+  } = useConfirmCancelModal()
 
   const handleCancelRunClick = (): void => {
-    if (runStatus === RUN_STATUS_RUNNING) pause()
-    setShowConfirmCancelModal(true)
+    if (runStatus === RUN_STATUS_RUNNING) {
+      pause()
+    }
+    toggleConfirmCancelModal()
   }
 
   useRunAnalytics({ runId, robotName, enteredER })
@@ -410,9 +407,7 @@ export function ProtocolRunHeader({
         />
         {showConfirmCancelModal ? (
           <ConfirmCancelModal
-            onClose={() => {
-              setShowConfirmCancelModal(false)
-            }}
+            onClose={toggleConfirmCancelModal}
             runId={runId}
             robotName={robotName}
           />
