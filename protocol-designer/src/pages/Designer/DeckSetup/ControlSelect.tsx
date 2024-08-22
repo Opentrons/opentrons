@@ -5,11 +5,13 @@ import { css } from 'styled-components'
 import { useSelector } from 'react-redux'
 import {
   Flex,
-  LegacyStyledText,
+  JUSTIFY_CENTER,
   RobotCoordsForeignDiv,
+  StyledText,
 } from '@opentrons/components'
 import { START_TERMINAL_ITEM_ID } from '../../../steplist'
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
+import { SlotOverflowMenu } from './SlotOverflowMenu'
 
 import type { CoordinateTuple, Dimensions } from '@opentrons/shared-data'
 import type { TerminalItemId } from '../../../steplist'
@@ -41,6 +43,7 @@ export const ControlSelect = (
     slotTopLayerId,
   } = props
   const { t } = useTranslation('starting_deck_state')
+  const [showMenuList, setShowMenuList] = React.useState<boolean>(false)
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
   const moduleId = Object.keys(activeDeckSetup.modules).find(
     moduleId => slotTopLayerId === moduleId
@@ -50,40 +53,52 @@ export const ControlSelect = (
     return null
 
   return (
-    <RobotCoordsForeignDiv
-      x={slotPosition[0]}
-      y={slotPosition[1]}
-      width={slotBoundingBox.xDimension}
-      height={slotBoundingBox.yDimension}
-      innerDivProps={{
-        //  TODO(ja, 8/6/24): refactor to not require className? and update styling to match designs
-        className: cx(styles.slot_overlay, styles.appear_on_mouseover),
-        onMouseEnter: () => {
-          setHover(slotId)
-        },
-        onMouseLeave: () => {
-          setHover(null)
-        },
-        onClick: () => {
-          addEquipment(slotId)
-        },
-      }}
-    >
-      <Flex
-        css={css`
-          opacity: ${hover != null && hover === slotId ? `1` : `0`};
-        `}
+    <>
+      <RobotCoordsForeignDiv
+        x={slotPosition[0]}
+        y={slotPosition[1]}
+        width={slotBoundingBox.xDimension}
+        height={slotBoundingBox.yDimension}
+        innerDivProps={{
+          className: cx(styles.slot_overlay, styles.appear_on_mouseover),
+          onMouseEnter: () => {
+            setHover(slotId)
+          },
+          onMouseLeave: () => {
+            setHover(null)
+          },
+          onClick: () => {
+            setShowMenuList(true)
+          },
+        }}
       >
-        <a
-          onClick={() => {
-            addEquipment(slotId)
-          }}
+        <Flex
+          css={css`
+            justify-content: ${JUSTIFY_CENTER};
+            width: 100%;
+            opacity: ${hover != null && hover === slotId ? `1` : `0`};
+          `}
         >
-          <LegacyStyledText>
-            {moduleId != null ? t('add_labware') : t('edit')}
-          </LegacyStyledText>
-        </a>
-      </Flex>
-    </RobotCoordsForeignDiv>
+          <a
+            onClick={() => {
+              setShowMenuList(true)
+            }}
+          >
+            <StyledText desktopStyle="bodyDefaultSemiBold">
+              {moduleId != null ? t('add_labware') : t('edit_slot')}
+            </StyledText>
+          </a>
+        </Flex>
+        {showMenuList && (
+          <SlotOverflowMenu
+            slot={slotId}
+            addEquipment={addEquipment}
+            setShowMenuList={setShowMenuList}
+            xSlotPosition={slotPosition[0]}
+            ySlotPosition={slotPosition[1]}
+          />
+        )}
+      </RobotCoordsForeignDiv>
+    </>
   )
 }
