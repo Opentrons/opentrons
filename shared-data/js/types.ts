@@ -53,6 +53,7 @@ export interface WellDefinition {
   y: number
   z: number
   'total-liquid-volume': number
+  geometryDefinitionId?: string
 }
 
 // typedef for labware definitions under v1 labware schema
