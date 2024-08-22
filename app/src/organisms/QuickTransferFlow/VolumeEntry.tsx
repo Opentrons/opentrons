@@ -33,7 +33,7 @@ export function VolumeEntry(props: VolumeEntryProps): JSX.Element {
   const keyboardRef = React.useRef(null)
 
   const [volume, setVolume] = React.useState<string>(
-    state.volume ? state.volume.toString() : ''
+    state.volume?.toString() ?? ''
   )
   const volumeRange = getVolumeRange(state)
   let headerCopy = t('set_transfer_volume')

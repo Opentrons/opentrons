@@ -127,44 +127,65 @@ describe('VolumeEntry', () => {
     )
   })
 
-  it('calls on next and dispatch if you press continue when volume is non-null and within range', () => {
-    render({
-      ...props,
-      state: {
-        sourceWells: ['A1', 'A2'],
-        destinationWells: ['A1'],
-        transferType: 'consolidate',
-        volume: 20,
-      },
-    })
-    const continueBtn = screen.getByTestId('ChildNavigation_Primary_Button')
-    expect(continueBtn).toBeEnabled()
-    fireEvent.click(continueBtn)
-    expect(vi.mocked(props.onNext)).toHaveBeenCalled()
-    expect(vi.mocked(props.dispatch)).toHaveBeenCalled()
-  })
+  it.each([
+    { volume: 20 },
+    { volume: 5.0 },
+    { volume: 50.0 },
+    { volume: 5 },
+    { volume: 50 },
+  ])(
+    'calls onNext and dispatch when volume is $volume and within range',
+    ({ volume }) => {
+      render({
+        ...props,
+        state: {
+          sourceWells: ['A1', 'A2'],
+          destinationWells: ['A1'],
+          transferType: 'consolidate',
+          volume,
+        },
+      })
 
-  it('displays an error and disables continue when volume is outside of range', () => {
-    render({
-      ...props,
-      state: {
-        sourceWells: ['A1', 'A2'],
-        destinationWells: ['A1'],
-        transferType: 'consolidate',
-        volume: 90,
-      },
-    })
-    const continueBtn = screen.getByTestId('ChildNavigation_Primary_Button')
-    expect(continueBtn).toBeDisabled()
-    expect(vi.mocked(InputField)).toHaveBeenCalledWith(
-      {
-        title: 'Aspirate volume per well (µL)',
-        error: 'Value must be between 5-50',
-        readOnly: true,
-        type: 'text',
-        value: '90',
-      },
-      {}
-    )
-  })
+      const continueBtn = screen.getByTestId('ChildNavigation_Primary_Button')
+      expect(continueBtn).toBeEnabled()
+      fireEvent.click(continueBtn)
+      expect(vi.mocked(props.onNext)).toHaveBeenCalled()
+      expect(vi.mocked(props.dispatch)).toHaveBeenCalled()
+    }
+  )
+
+  it.each([
+    { volume: 51, expectedError: 'Value must be between 5-50' },
+    { volume: 0, expectedError: 'Value must be between 5-50' },
+    { volume: 4, expectedError: 'Value must be between 5-50' },
+    { volume: -1, expectedError: 'Value must be between 5-50' },
+    { volume: 50.001, expectedError: 'Value must be between 5-50' },
+    { volume: 4.999, expectedError: 'Value must be between 5-50' },
+    // don't need to test NaN, null, undefined, '', 'abc'
+  ])(
+    'displays an error and disables continue when volume is $volume and out of range',
+    ({ volume, expectedError }) => {
+      render({
+        ...props,
+        state: {
+          sourceWells: ['A1', 'A2'],
+          destinationWells: ['A1'],
+          transferType: 'consolidate',
+          volume,
+        },
+      })
+      const continueBtn = screen.getByTestId('ChildNavigation_Primary_Button')
+      expect(continueBtn).toBeDisabled()
+      expect(vi.mocked(InputField)).toHaveBeenCalledWith(
+        {
+          title: 'Aspirate volume per well (µL)',
+          error: expectedError,
+          readOnly: true,
+          type: 'text',
+          value: String(volume),
+        },
+        {}
+      )
+    }
+  )
 })
