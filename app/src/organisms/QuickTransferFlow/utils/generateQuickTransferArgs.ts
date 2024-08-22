@@ -301,7 +301,7 @@ export function generateQuickTransferArgs(
   const pipetteEntity = Object.values(invariantContext.pipetteEntities)[0]
 
   const sourceLabwareId = Object.keys(robotState.labware).find(
-    key => robotState.labware[key].slot === 'C2'
+    labwareId => robotState.labware[labwareId].slot === 'C2'
   )
   const sourceLabwareEntity =
     sourceLabwareId != null
@@ -310,7 +310,7 @@ export function generateQuickTransferArgs(
   let destLabwareEntity = sourceLabwareEntity
   if (quickTransferState.destination !== 'source') {
     const destinationLabwareId = Object.keys(robotState.labware).find(
-      key => robotState.labware[key].slot === 'D2'
+      labwareId => robotState.labware[labwareId].slot === 'D2'
     )
     destLabwareEntity =
       destinationLabwareId != null
