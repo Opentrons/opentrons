@@ -113,6 +113,7 @@ class RunStore:
         """Initialize a RunStore with sql engine and notification client."""
         self._sql_engine = sql_engine
 
+    # TODO (tz, 8-21-24): write tests without fixit
     def update_run_state(
         self,
         run_id: str,
@@ -428,6 +429,7 @@ class RunStore:
             )
             return []
 
+    # TODO (tz, 8-21-24): write tests without fixit
     def get_commands_slice(
         self,
         run_id: str,
@@ -495,16 +497,30 @@ class RunStore:
             commands=sliced_commands,
         )
 
-    def get_all_commands_as_preserialized_list(self, run_id: str) -> List[str]:
+    # TODO (tz, 8-21-24): write tests without fixit
+    def get_all_commands_as_preserialized_list(
+        self, run_id: str, include_fixit_commands: bool
+    ) -> List[str]:
         """Get all commands of the run as a list of strings of json command objects."""
         with self._sql_engine.begin() as transaction:
             if not self._run_exists(run_id, transaction):
                 raise RunNotFoundError(run_id=run_id)
-            select_commands = (
-                sqlalchemy.select(run_command_table.c.command)
-                .where(run_command_table.c.run_id == run_id)
-                .order_by(run_command_table.c.index_in_run)
-            )
+            # TODO (tz, 8-21-24): consolidate into 1 query.
+            if include_fixit_commands:
+                select_commands = (
+                    sqlalchemy.select(run_command_table.c.command)
+                    .where(run_command_table.c.run_id == run_id)
+                    .order_by(run_command_table.c.index_in_run)
+                )
+            else:
+                select_commands = (
+                    sqlalchemy.select(run_command_table.c.command)
+                    .where(
+                        run_command_table.c.run_id == run_id
+                        and run_command_table.c.intent != "fixit"
+                    )
+                    .order_by(run_command_table.c.index_in_run)
+                )
             commands_result = transaction.scalars(select_commands).all()
         return commands_result
 

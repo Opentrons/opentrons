@@ -837,7 +837,9 @@ def test_get_all_commands_as_preserialized_list(
         commands=protocol_commands,
         run_time_parameters=[],
     )
-    result = subject.get_all_commands_as_preserialized_list(run_id="run-id")
+    result = subject.get_all_commands_as_preserialized_list(
+        run_id="run-id", include_fixit_commands=True
+    )
     assert result == [
         '{"id": "pause-1", "createdAt": "2021-01-01T00:00:00", "commandType": "waitForResume",'
         ' "key": "command-key", "status": "succeeded", "params": {"message": "hello world"}, "result": {}, "intent": "protocol"}',

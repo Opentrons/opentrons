@@ -1053,7 +1053,7 @@ def test_get_all_commands_as_preserialized_list(
     """It should return the pre-serialized commands list."""
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return(None)
     decoy.when(
-        mock_run_store.get_all_commands_as_preserialized_list("run-id")
+        mock_run_store.get_all_commands_as_preserialized_list("run-id", True)
     ).then_return(['{"id": command-1}', '{"id": command-2}'])
     assert subject.get_all_commands_as_preserialized_list("run-id") == [
         '{"id": command-1}',

@@ -474,7 +474,9 @@ class RunDataManager:
         # TODO(tz, 8-5-2024): Change this to return to error list from the DB when we implement https://opentrons.atlassian.net/browse/EXEC-655.
         raise RunNotCurrentError()
 
-    def get_all_commands_as_preserialized_list(self, run_id: str) -> List[str]:
+    def get_all_commands_as_preserialized_list(
+        self, run_id: str, include_fixit_commands: bool
+    ) -> List[str]:
         """Get all commands of a run in a serialized json list."""
         if (
             run_id == self._run_orchestrator_store.current_run_id
@@ -483,7 +485,9 @@ class RunDataManager:
             raise PreSerializedCommandsNotAvailableError(
                 "Pre-serialized commands are only available after a run has ended."
             )
-        return self._run_store.get_all_commands_as_preserialized_list(run_id)
+        return self._run_store.get_all_commands_as_preserialized_list(
+            run_id, include_fixit_commands
+        )
 
     def set_policies(self, run_id: str, policies: List[ErrorRecoveryRule]) -> None:
         """Create run policy rules for error recovery."""

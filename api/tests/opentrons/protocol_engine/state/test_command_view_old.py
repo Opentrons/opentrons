@@ -97,6 +97,7 @@ def get_command_view(  # noqa: C901
                 command_id=command.id,
                 command_entry=CommandEntry(index=index, command=command),
             )
+            # TODO (tz, 8-21-24): change this to arg
             if command.intent != cmd.CommandIntent.FIXIT:
                 command_history._all_command_ids_but_fixit_command_ids.append(
                     command.id
