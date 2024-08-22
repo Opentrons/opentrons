@@ -38,7 +38,7 @@ import { useMissingProtocolHardware } from '../../../pages/Protocols/hooks'
 import { useCloneRun } from '../../ProtocolUpload/hooks'
 import { useRerunnableStatusText } from './hooks'
 
-import type { Run, RunData, RunStatus } from '@opentrons/api-client'
+import type { RunData, RunStatus } from '@opentrons/api-client'
 import type { ProtocolResource } from '@opentrons/shared-data'
 
 interface RecentRunProtocolCardProps {
@@ -142,7 +142,7 @@ export function ProtocolWithLastRun({
       cloneRun()
       // Navigate to a dummy setup skeleton until TopLevelRedirects routes to the proper setup page. Doing so prevents
       // needing to manage complex UI state updates for protocol cards, overzealous dashboard rendering, and potential navigation pitfalls.
-      navigate(`/runs/1234/setup`)
+      navigate('/runs/1234/setup')
       trackEvent({
         name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
         properties: { sourceLocation: 'RecentRunProtocolCard' },
