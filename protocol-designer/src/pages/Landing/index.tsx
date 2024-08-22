@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
@@ -14,20 +14,28 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { actions as loadFileActions } from '../../load-file'
+import { getFileMetadata } from '../../file-data/selectors'
 import welcomeImage from '../../assets/images/welcome_page.png'
 import type { ThunkDispatch } from '../../types'
 
 export function Landing(): JSX.Element {
   const { t } = useTranslation('shared')
   const dispatch: ThunkDispatch<any> = useDispatch()
+  const metadata = useSelector(getFileMetadata)
   const navigate = useNavigate()
+
+  React.useEffect(() => {
+    if (metadata?.created != null) {
+      navigate('/overview')
+    } else {
+      navigate('/')
+    }
+  }, [metadata, navigate])
+
   const loadFile = (
     fileChangeEvent: React.ChangeEvent<HTMLInputElement>
   ): void => {
-    if (window.confirm(t('confirm_import') as string)) {
-      dispatch(loadFileActions.loadProtocolFile(fileChangeEvent))
-      navigate('/overview')
-    }
+    dispatch(loadFileActions.loadProtocolFile(fileChangeEvent))
   }
 
   return (
@@ -54,7 +62,7 @@ export function Landing(): JSX.Element {
         maxWidth="34.25rem"
         textAlign={TYPOGRAPHY.textAlignCenter}
       >
-        {t('no-code-solution')}
+        {t('no-code-required')}
       </StyledText>
       <LargeButton
         marginY={SPACING.spacing32}
@@ -69,7 +77,7 @@ export function Landing(): JSX.Element {
 
       <StyledLabel>
         <StyledText desktopStyle="bodyLargeRegular" color={COLORS.grey60}>
-          {t('import_existing')}
+          {t('edit_existing')}
         </StyledText>
         <input type="file" onChange={loadFile}></input>
       </StyledLabel>
