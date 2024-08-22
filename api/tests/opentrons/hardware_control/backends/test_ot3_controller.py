@@ -183,6 +183,7 @@ def fake_liquid_settings() -> LiquidProbeSettings:
         output_option=OutputOptions.can_bus_only,
         aspirate_while_sensing=False,
         z_overlap_between_passes_mm=0.1,
+        plunger_reset_offset=2.0,
         samples_for_baselining=20,
         sample_time_sec=0.004,
         data_files={InstrumentProbeType.PRIMARY: "fake_file_name"},
