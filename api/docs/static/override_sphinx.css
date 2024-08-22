@@ -6,21 +6,22 @@
 body {
     padding: 0;
     margin: 0;
-    font-family: "Public Sans", "sans-serif";
 }
 
-iframe {
-    border: 0;
-}
-
-.highlight-none, .mi, .literal {
+div.document .highlight-none, .mi, .literal {
     color: #048f85;
+}
+
+/* use Akko from docs site instead of from main site */
+header a.button-sm {
+    font-family: "AkkoPro-Regular", "Akko Pro", "Open Sans", sans-serif !important;
 }
 
 /* DOCS */
 div.document {
     padding-top: 150px;
     margin-top: 0;
+    font-family: "Public Sans", "sans-serif";
 }
 
 div.document [id] {
@@ -38,36 +39,45 @@ div.document [id] {
     }
 }
 
-div.body p {
+div.document p {
     line-height: 20pt;
     font-family: "Public Sans", "sans-serif";
 }
 
-pre, tt, code {
+div.document pre, tt, code {
     font-size: 0.9em;
     font-family: "Reddit Mono", "Consolas", "Lucida Console", monospace;
 }
 
 /* classes for API Reference docstring signatures */
-.sig, .sig-name, code.descname, .sig-prename, .optional, .sig-paren {
+div.document .sig, .sig-name, code.descname, .sig-prename, .optional, .sig-paren {
     font-size: 1em;
     font-family: "Reddit Mono", "Consolas", "Lucida Console", monospace;
 }
 
-div.body h1 {
+div.document h1 {
     margin-top: 0;
     margin-bottom: 0;
     padding-top: 0;
-    font-size: 2.4em;
+    font-size: 2em;
     min-height: 78px;
 }
 
-div.body h1 + p {
+div.document h1 + p {
     padding-top: 24px;
 }
 
 div.document {
     position: relative;
+}
+
+a:hover {
+    color: inherit;
+    text-decoration: inherit;
+}
+
+div.body a {
+    color: #006FFF;
 }
 
 div.documentwrapper {
@@ -102,10 +112,10 @@ div.sphinxsidebar h3,
 div.sphinxsidebar h4,
 div.sphinxsidebar h5,
 div.sphinxsidebar h6,
-div.body h2,
-div.body h3,
-div.body h4,
-div.body h5 {
+div.document h2,
+div.document h3,
+div.document h4,
+div.document h5 {
     font-family: "Public Sans", "sans-serif";
 }
 
@@ -209,16 +219,16 @@ div.sphinxsidebar h3 a:hover,
     }
 }
 
-div.body p.caption {
+div.document p.caption {
     font-size: 22px;
 }
 
-ul {
+div.document ul {
     /* margin-left: 0; */
     font-family: "Public Sans", "sans-serif";
 }
 
-ul ul {
+div.document ul ul {
     list-style-type: circle;
     margin-left: 30px;
     font-family: "Public Sans", "sans-serif";

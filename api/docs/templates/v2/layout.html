@@ -31,7 +31,7 @@ in sidebar #} {%- block relbar1 %}{% endblock %} {%- block relbar2 %}{% endblock
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WCDX9CX"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <header id="nav">
-  <iframe src="https://opentrons.com/remote-nav" height=96></iframe>
+  {%- include "remote-nav.html" %}
 </header>
 
 {%- if theme_fixed_sidebar|lower == 'true' %}
