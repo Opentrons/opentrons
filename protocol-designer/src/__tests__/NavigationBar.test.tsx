@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { describe, it, vi, beforeEach, expect } from 'vitest'
-import { screen, fireEvent } from '@testing-library/react'
+import { describe, it } from 'vitest'
+import { screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 
 import { i18n } from '../assets/localization'
