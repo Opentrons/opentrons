@@ -91,6 +91,7 @@ export function SlotOverflowMenu(
 
   return createPortal(
     <Overlay
+      data-testid="SlotOverflowMenu_Overlay"
       onClick={(e: React.MouseEvent) => {
         e.stopPropagation()
         setShowMenuList(false)

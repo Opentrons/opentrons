@@ -3,6 +3,7 @@
   "adapter": "Adapter",
   "add_fixture": "Add a fixture",
   "add_hw": "Add hardware/labware",
+  "add_labware": "Add labware",
   "add_liquid": "Add liquid",
   "add_module": "Add a module",
   "add_rest": "Add labware and liquids to complete deck setup",
