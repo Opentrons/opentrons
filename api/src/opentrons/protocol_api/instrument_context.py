@@ -2059,6 +2059,8 @@ class InstrumentContext(publisher.CommandPublisher):
             NozzleLayout.QUADRANT,
         ]
         if style in disabled_layouts:
+            # todo(mm, 2024-08-20): UnsupportedAPIError boils down to an API_REMOVED
+            # error code, which is not correct here.
             raise UnsupportedAPIError(
                 message=f"Nozzle layout configuration of style {style.value} is currently unsupported."
             )
@@ -2069,7 +2071,11 @@ class InstrumentContext(publisher.CommandPublisher):
             < _PARTIAL_NOZZLE_CONFIGURATION_SINGLE_ROW_PARTIAL_COLUMN_ADDED_IN
         ) and (style not in original_enabled_layouts):
             raise APIVersionError(
-                f"Nozzle layout configuration of style {style.value} is unsupported in API Versions lower than {_PARTIAL_NOZZLE_CONFIGURATION_SINGLE_ROW_PARTIAL_COLUMN_ADDED_IN}."
+                api_element=f"Nozzle layout configuration of style {style.value}",
+                until_version=str(
+                    _PARTIAL_NOZZLE_CONFIGURATION_SINGLE_ROW_PARTIAL_COLUMN_ADDED_IN
+                ),
+                current_version=str(self._api_version),
             )
 
         front_right_resolved = front_right

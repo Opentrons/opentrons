@@ -58,6 +58,7 @@ describe('useProtocolDetailsForRun hook', () => {
       protocolKey: null,
       isProtocolAnalyzing: false,
       robotType: 'OT-3 Standard',
+      isQuickTransfer: false,
     })
   })
 
@@ -95,6 +96,7 @@ describe('useProtocolDetailsForRun hook', () => {
       protocolKey: 'fakeProtocolKey',
       isProtocolAnalyzing: false,
       robotType: 'OT-2 Standard',
+      isQuickTransfer: false,
     })
   })
 })

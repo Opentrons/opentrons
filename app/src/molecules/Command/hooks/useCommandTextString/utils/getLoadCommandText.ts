@@ -140,6 +140,14 @@ export const getLoadCommandText = ({
             })
       }
     }
+    case 'reloadLabware': {
+      const { labwareId } = command.params
+      const labware =
+        commandTextData != null
+          ? getLabwareName(commandTextData, labwareId)
+          : null
+      return t('reloading_labware', { labware })
+    }
     case 'loadLiquid': {
       const { liquidId, labwareId } = command.params
       return t('load_liquids_info_protocol_setup', {

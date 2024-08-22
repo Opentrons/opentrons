@@ -21,6 +21,7 @@ import {
 import {
   useModulesQuery,
   useDoorQuery,
+  useDeleteRunMutation,
   useHost,
   useRunCommandErrors,
 } from '@opentrons/react-api-client'
@@ -66,6 +67,7 @@ import {
   ANALYTICS_PROTOCOL_RUN_ACTION,
 } from '../../../redux/analytics'
 import { getIsHeaterShakerAttached } from '../../../redux/config'
+import { getStoredProtocol } from '../../../redux/protocol-storage'
 import { useCloseCurrentRun } from '../../ProtocolUpload/hooks'
 import { ConfirmCancelModal } from '../../RunDetails/ConfirmCancelModal'
 import { HeaterShakerIsRunningModal } from '../HeaterShakerIsRunningModal'
@@ -157,13 +159,18 @@ export function ProtocolRunHeader({
     displayName,
     protocolKey,
     isProtocolAnalyzing,
+    isQuickTransfer,
   } = useProtocolDetailsForRun(runId)
+  const storedProtocol = useSelector((state: State) =>
+    getStoredProtocol(state, protocolKey)
+  )
   const { reportRecoveredRunResult } = useRecoveryAnalytics()
 
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
   const isRobotViewable = useIsRobotViewable(robotName)
   const runStatus = useRunStatus(runId)
+  const { deleteRun } = useDeleteRunMutation()
   const { analysisErrors } = useProtocolAnalysisErrors(runId)
   const isRunCurrent = Boolean(
     useNotifyRunQuery(runId, { refetchInterval: CURRENT_RUN_POLL_MS })?.data
@@ -247,7 +254,14 @@ export function ProtocolRunHeader({
     mount: aPipetteWithTip?.mount,
     robotType,
     onSkipAndHome: () => {
-      closeCurrentRun()
+      closeCurrentRun({
+        onSuccess: () => {
+          if (isQuickTransfer) {
+            deleteRun(runId)
+            navigate(`/devices/${robotName}`)
+          }
+        },
+      })
     },
   })
 
@@ -298,10 +312,17 @@ export function ProtocolRunHeader({
       // Close the run if no tips are attached after running tip check at least once.
       // This marks the robot as "not busy" as soon as a run is cancelled if drop tip CTAs are unnecessary.
       if (initialPipettesWithTipsCount === 0 && !enteredER) {
-        closeCurrentRun()
+        closeCurrentRun({
+          onSuccess: () => {
+            if (isQuickTransfer) {
+              deleteRun(runId)
+              navigate(`/devices/${robotName}`)
+            }
+          },
+        })
       }
     }
-  }, [runStatus, isRunCurrent, runId, enteredER])
+  }, [runStatus, isRunCurrent, runId, enteredER, initialPipettesWithTipsCount])
 
   const startedAtTimestamp =
     startedAt != null ? formatTimestamp(startedAt) : EMPTY_TIMESTAMP
@@ -347,7 +368,14 @@ export function ProtocolRunHeader({
       name: ANALYTICS_PROTOCOL_RUN_ACTION.FINISH,
       properties: robotAnalyticsData ?? undefined,
     })
-    closeCurrentRun()
+    closeCurrentRun({
+      onSettled: () => {
+        if (isQuickTransfer) {
+          deleteRun(runId)
+          navigate(`/devices/${robotName}`)
+        }
+      },
+    })
   }
 
   return (
@@ -390,7 +418,7 @@ export function ProtocolRunHeader({
             />
           )}
         <Flex>
-          {protocolKey != null ? (
+          {storedProtocol != null ? (
             <Link to={`/protocols/${protocolKey}`}>
               <LegacyStyledText
                 as="h2"
@@ -539,7 +567,14 @@ export function ProtocolRunHeader({
               } else {
                 void setTipStatusResolved(() => {
                   toggleDTWiz()
-                  closeCurrentRun()
+                  closeCurrentRun({
+                    onSuccess: () => {
+                      if (isQuickTransfer) {
+                        deleteRun(runId)
+                        navigate(`/devices/${robotName}`)
+                      }
+                    },
+                  })
                 }, toggleDTWiz)
               }
             }}

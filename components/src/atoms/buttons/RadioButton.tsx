@@ -82,10 +82,10 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
       ${disabled && DISABLED_BUTTON_STYLE}
 
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-        cursor: default;
-        padding: ${isLarge ? SPACING.spacing24 : SPACING.spacing20};
-        border-radius: ${BORDERS.borderRadius16};
-        display: ${maxLines != null ? '-webkit-box' : undefined};
+       cursor: default;
+       padding: ${isLarge ? SPACING.spacing24 : SPACING.spacing20};
+       border-radius: ${BORDERS.borderRadius16};
+       display: ${maxLines != null ? '-webkit-box' : undefined};
         -webkit-line-clamp: ${maxLines ?? undefined};
         -webkit-box-orient: ${maxLines != null ? 'vertical' : undefined};
       }
