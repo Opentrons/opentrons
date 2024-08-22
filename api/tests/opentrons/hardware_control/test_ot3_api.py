@@ -835,7 +835,9 @@ async def test_liquid_probe(
         )
         fake_max_z_dist = 10.0
         non_responsive_z_mm = ot3_hardware.liquid_probe_non_responsive_z_distance(
-            fake_settings_aspirate.mount_speed
+            fake_settings_aspirate.mount_speed,
+            fake_settings_aspirate.samples_for_baselining,
+            fake_settings_aspirate.sample_time_sec,
         )
 
         probe_pass_overlap = 0.1
@@ -909,7 +911,6 @@ async def test_liquid_probe_plunger_moves(
     ) as mock_liquid_probe:
 
         mock_liquid_probe.side_effect = [
-            PipetteLiquidNotFoundError,
             PipetteLiquidNotFoundError,
             PipetteLiquidNotFoundError,
             PipetteLiquidNotFoundError,
