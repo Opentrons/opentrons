@@ -194,7 +194,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
   if (isFailedAnalysis) protocolCardBackgroundColor = COLORS.red35
   if (isRequiredCSV) protocolCardBackgroundColor = COLORS.yellow35
 
-  const textWrap = (lastRun: string | undefined): string => {
+  const textWrap = (lastRun?: string): string => {
     if (lastRun != null) {
       lastRun = formatDistance(new Date(lastRun), new Date(), {
         addSuffix: true,
