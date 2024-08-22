@@ -19,13 +19,14 @@ import type {
   RunCommandErrors,
   RunError,
 } from '@opentrons/api-client'
+import { useIsRunCurrent } from '../../../../resources/runs'
 
 interface TerminalRunProps {
   runStatus: RunStatus | null
+  runId: string | null
   toggleRunFailedModal: () => void
   commandErrorList?: RunCommandErrors
   isResetRunLoading: boolean
-  isRunCurrent: boolean
   cancelledWithoutRecovery: boolean
   highestPriorityError?: RunError | null
 }
@@ -38,11 +39,12 @@ export function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
     commandErrorList,
     highestPriorityError,
     isResetRunLoading,
-    isRunCurrent,
     cancelledWithoutRecovery,
+    runId,
   } = props
   const { t } = useTranslation('run_details')
   const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
+  const isRunCurrent = useIsRunCurrent(runId)
 
   const completedWithErrors =
     commandErrorList?.data != null && commandErrorList.data.length > 0

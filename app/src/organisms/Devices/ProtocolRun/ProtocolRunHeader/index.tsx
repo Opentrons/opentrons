@@ -5,12 +5,11 @@ import { Link, useNavigate } from 'react-router-dom'
 import {
   RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
-  RUN_STATUS_IDLE,
   RUN_STATUS_RUNNING,
   RUN_STATUS_STOPPED,
   RUN_STATUSES_TERMINAL,
 } from '@opentrons/api-client'
-import { useHost, useRunCommandErrors } from '@opentrons/react-api-client'
+import { useRunCommandErrors } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import {
   BORDERS,
@@ -26,11 +25,7 @@ import {
 } from '@opentrons/components'
 
 import { ProtocolAnalysisErrorBanner } from '../ProtocolAnalysisErrorBanner'
-import {
-  DropTipWizardFlows,
-  useDropTipWizardFlows,
-  useTipAttachmentStatus,
-} from '../../../DropTipWizardFlows'
+import { DropTipWizardFlows } from '../../../DropTipWizardFlows'
 import {
   ProtocolAnalysisErrorModal,
   useProtocolAnalysisErrorsModal,
@@ -62,21 +57,18 @@ import { getIsFixtureMismatch } from '../../../../resources/deck_configuration/u
 import { useDeckConfigurationCompatibility } from '../../../../resources/deck_configuration/hooks'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useMostRecentRunId } from '../../../ProtocolUpload/hooks/useMostRecentRunId'
-import { useIsRunCurrent, useNotifyRunQuery } from '../../../../resources/runs'
+import { useNotifyRunQuery } from '../../../../resources/runs'
 import {
   ErrorRecoveryFlows,
   useErrorRecoveryFlows,
 } from '../../../ErrorRecoveryFlows'
-import {
-  ProtocolDropTipModal,
-  useProtocolDropTipModal,
-} from './ProtocolDropTipModal'
+import { ProtocolDropTipModal } from './ProtocolDropTipModal'
 import { DisplayRunStatus } from './DisplayRunStatus'
 import { LabeledValue } from './LabeledValueProps'
 import { TerminalRunBanner } from './TerminalRunBanner'
 import { ActionButton } from './ActionButton'
 import { CANCELLABLE_STATUSES } from './constants'
-import { useIsDoorOpen, useRunAnalytics } from './hooks'
+import { useIsDoorOpen, useRunAnalytics, useRunHeaderDropTip } from './hooks'
 
 import type { RunCommandError } from '@opentrons/shared-data'
 
@@ -97,7 +89,6 @@ export function ProtocolRunHeader({
 }: ProtocolRunHeaderProps): JSX.Element | null {
   const { t } = useTranslation(['run_details', 'shared'])
   const navigate = useNavigate()
-  const host = useHost()
   const createdAtTimestamp = useRunCreatedAtTimestamp(runId)
   const {
     protocolData,
@@ -108,7 +99,6 @@ export function ProtocolRunHeader({
 
   const isRobotViewable = useIsRobotViewable(robotName)
   const runStatus = useRunStatus(runId)
-  const isRunCurrent = useIsRunCurrent(runId)
 
   const {
     showRunFailedModal,
@@ -122,7 +112,7 @@ export function ProtocolRunHeader({
 
   const mostRecentRunId = useMostRecentRunId()
   const isMostRecentRun = mostRecentRunId === runId
-  const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
+  const { isClosingCurrentRun } = useCloseCurrentRun()
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
   const { data: commandErrorList } = useRunCommandErrors(
     runId,
@@ -150,76 +140,23 @@ export function ProtocolRunHeader({
   const isFixtureMismatch = getIsFixtureMismatch(deckConfigCompatibility)
   const { isERActive, failedCommand } = useErrorRecoveryFlows(runId, runStatus)
 
-  const { showDTWiz, toggleDTWiz } = useDropTipWizardFlows()
-  const {
-    areTipsAttached,
-    determineTipStatus,
-    resetTipStatus,
-    setTipStatusResolved,
-    aPipetteWithTip,
-    initialPipettesWithTipsCount,
-  } = useTipAttachmentStatus({
-    runId,
-    runRecord: runRecord ?? null,
-    host,
-  })
-  const {
-    showDTModal,
-    onDTModalSkip,
-    onDTModalRemoval,
-    isDisabled: areDTModalBtnsDisabled,
-  } = useProtocolDropTipModal({
-    areTipsAttached,
-    toggleDTWiz,
-    isRunCurrent,
-    currentRunId: runId,
-    instrumentModelSpecs: aPipetteWithTip?.specs,
-    mount: aPipetteWithTip?.mount,
-    robotType,
-    onSkipAndHome: () => {
-      closeCurrentRun()
-    },
-  })
-
   const isDoorOpen = useIsDoorOpen(robotName, isFlex)
+  const { dropTipModalUtils, dropTipWizardUtils } = useRunHeaderDropTip({
+    runId,
+    runStatus,
+    runRecord: runRecord ?? null,
+    robotType,
+  })
 
   const enteredER = runRecord?.data.hasEverEnteredErrorRecovery ?? false
   const cancelledWithoutRecovery =
     !enteredER && runStatus === RUN_STATUS_STOPPED
 
   React.useEffect(() => {
-    if (isFlex) {
-      if (runStatus === RUN_STATUS_IDLE) {
-        resetTipStatus()
-      } else if (
-        // @ts-expect-error runStatus expected to possibly not be terminal
-        RUN_STATUSES_TERMINAL.includes(runStatus) &&
-        enteredER === false
-      ) {
-        void determineTipStatus()
-      }
-    }
-  }, [runStatus])
-
-  React.useEffect(() => {
     if (protocolData != null && !isRobotViewable) {
       navigate('/devices')
     }
   }, [protocolData, isRobotViewable, navigate])
-
-  // Side effects dependent on the current run state.
-  React.useEffect(() => {
-    if (runStatus === RUN_STATUS_STOPPED && isRunCurrent && runId != null) {
-      // TODO(jh, 08-15-24): The enteredER condition is a hack, because errorCommands are only returned when a run is current.
-      // Ideally the run should not need to be current to view errorCommands.
-
-      // Close the run if no tips are attached after running tip check at least once.
-      // This marks the robot as "not busy" as soon as a run is cancelled if drop tip CTAs are unnecessary.
-      if (initialPipettesWithTipsCount === 0 && !enteredER) {
-        closeCurrentRun()
-      }
-    }
-  }, [runStatus, isRunCurrent, runId, enteredER])
 
   const startedAtTimestamp =
     startedAt != null ? formatTimestamp(startedAt) : EMPTY_TIMESTAMP
@@ -323,6 +260,7 @@ export function ProtocolRunHeader({
           <TerminalRunBanner
             {...{
               runStatus,
+              runId,
               isClosingCurrentRun,
               toggleRunFailedModal,
               commandErrorList,
@@ -330,16 +268,10 @@ export function ProtocolRunHeader({
               cancelledWithoutRecovery,
             }}
             isResetRunLoading={isResetRunLoadingRef.current}
-            isRunCurrent={isRunCurrent}
           />
         ) : null}
-        {showDTModal ? (
-          <ProtocolDropTipModal
-            onSkip={onDTModalSkip}
-            onBeginRemoval={onDTModalRemoval}
-            mount={aPipetteWithTip?.mount}
-            isDisabled={areDTModalBtnsDisabled}
-          />
+        {dropTipModalUtils.showModal ? (
+          <ProtocolDropTipModal {...dropTipModalUtils.modalProps} />
         ) : null}
         <Box display="grid" gridTemplateColumns="4fr 3fr 3fr 4fr">
           <LabeledValue label={t('run')} value={createdAtTimestamp} />
@@ -412,22 +344,8 @@ export function ProtocolRunHeader({
             robotName={robotName}
           />
         ) : null}
-        {showDTWiz && aPipetteWithTip != null ? (
-          <DropTipWizardFlows
-            robotType={isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE}
-            mount={aPipetteWithTip.mount}
-            instrumentModelSpecs={aPipetteWithTip.specs}
-            closeFlow={isTakeover => {
-              if (isTakeover) {
-                toggleDTWiz()
-              } else {
-                void setTipStatusResolved(() => {
-                  toggleDTWiz()
-                  closeCurrentRun()
-                }, toggleDTWiz)
-              }
-            }}
-          />
+        {dropTipWizardUtils.showDTWiz ? (
+          <DropTipWizardFlows {...dropTipWizardUtils.dtWizProps} />
         ) : null}
       </Flex>
     </>

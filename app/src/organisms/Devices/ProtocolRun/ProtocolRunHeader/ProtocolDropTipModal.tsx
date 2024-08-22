@@ -35,12 +35,12 @@ type UseProtocolDropTipModalProps = Pick<
   isRunCurrent: boolean
 }
 
-interface UseProtocolDropTipModalResult {
-  showDTModal: boolean
-  onDTModalSkip: () => void
-  onDTModalRemoval: () => void
-  isDisabled: boolean
-}
+export type UseProtocolDropTipModalResult =
+  | {
+      showModal: true
+      modalProps: ProtocolDropTipModalProps
+    }
+  | { showModal: false; modalProps: null }
 
 // Wraps functionality required for rendering the related modal.
 export function useProtocolDropTipModal({
@@ -50,47 +50,51 @@ export function useProtocolDropTipModal({
   onSkipAndHome,
   ...homePipetteProps
 }: UseProtocolDropTipModalProps): UseProtocolDropTipModalResult {
-  const [showDTModal, setShowDTModal] = React.useState(areTipsAttached)
+  const [showModal, setShowModal] = React.useState(areTipsAttached)
 
   const { homePipettes, isHomingPipettes } = useHomePipettes({
     ...homePipetteProps,
     isRunCurrent,
     onHome: () => {
       onSkipAndHome()
-      setShowDTModal(false)
+      setShowModal(false)
     },
   })
 
   // Close the modal if a different app closes the run context.
   React.useEffect(() => {
     if (isRunCurrent && !isHomingPipettes) {
-      setShowDTModal(areTipsAttached)
+      setShowModal(areTipsAttached)
     } else if (!isRunCurrent) {
-      setShowDTModal(false)
+      setShowModal(false)
     }
-  }, [isRunCurrent, areTipsAttached, showDTModal]) // Continue to show the modal if a client dismisses the maintenance run on a different app.
+  }, [isRunCurrent, areTipsAttached, showModal]) // Continue to show the modal if a client dismisses the maintenance run on a different app.
 
-  const onDTModalSkip = (): void => {
+  const onSkip = (): void => {
     homePipettes()
   }
 
-  const onDTModalRemoval = (): void => {
+  const onBeginRemoval = (): void => {
     toggleDTWiz()
-    setShowDTModal(false)
+    setShowModal(false)
   }
 
-  return {
-    showDTModal,
-    onDTModalSkip,
-    onDTModalRemoval,
-    isDisabled: isHomingPipettes,
-  }
+  return showModal
+    ? {
+        showModal: true,
+        modalProps: {
+          onSkip,
+          onBeginRemoval,
+          isDisabled: isHomingPipettes,
+        },
+      }
+    : { showModal: false, modalProps: null }
 }
 
 interface ProtocolDropTipModalProps {
-  onSkip: UseProtocolDropTipModalResult['onDTModalSkip']
-  onBeginRemoval: UseProtocolDropTipModalResult['onDTModalRemoval']
-  isDisabled: UseProtocolDropTipModalResult['isDisabled']
+  onSkip: () => void
+  onBeginRemoval: () => void
+  isDisabled: boolean
   mount?: PipetteData['mount']
 }
 
