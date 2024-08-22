@@ -53,6 +53,35 @@ def test_networking_status(api_client, monkeypatch):
     assert resp.status_code == 500
 
 
+def test_networking_status_tolerates_bad_iface(api_client, monkeypatch):
+    connection_status = {
+        "eth0": {
+            "ipAddress": "169.254.229.173/16",
+            "macAddress": "B8:27:EB:39:C0:9A",
+            "gatewayAddress": None,
+            "state": "connecting (configuring)",
+            "type": "ethernet",
+        }
+    }
+
+    async def mock_is_connected():
+        return "full"
+
+    async def mock_get_connection_status(iface):
+        if iface == nmcli.NETWORK_IFACES.WIFI:
+            raise ValueError("Oh no!")
+        else:
+            return connection_status["eth0"]
+
+    monkeypatch.setattr(nmcli, "is_connected", mock_is_connected)
+    monkeypatch.setattr(nmcli, "iface_info", mock_get_connection_status)
+    expected = {"status": "full", "interfaces": connection_status}
+    resp = api_client.get("/networking/status")
+    body_json = resp.json()
+    assert resp.status_code == 200
+    assert body_json == expected
+
+
 def test_wifi_list(api_client, monkeypatch):
     expected_res = [
         {
