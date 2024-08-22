@@ -8,7 +8,6 @@ import {
   RadioButton,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
-import { useKitchen } from '../../organisms/Kitchen/hooks'
 import { WizardBody } from './WizardBody'
 import { HandleEnter } from './HandleEnter'
 
@@ -16,7 +15,6 @@ import type { WizardTileProps } from './types'
 
 export function SelectGripper(props: WizardTileProps): JSX.Element | null {
   const { goBack, setValue, proceed, watch } = props
-  const { makeSnackbar } = useKitchen()
   const { t } = useTranslation(['create_new_protocol', 'shared'])
   const [gripperStatus, setGripperStatus] = React.useState<'yes' | 'no' | null>(
     null
@@ -36,9 +34,7 @@ export function SelectGripper(props: WizardTileProps): JSX.Element | null {
 
   const isDisabled = gripperStatus == null
   const handleProceed = (): void => {
-    if (isDisabled) {
-      makeSnackbar(t('select_gripper_before_proceeding') as string)
-    } else {
+    if (!isDisabled) {
       proceed(1)
     }
   }

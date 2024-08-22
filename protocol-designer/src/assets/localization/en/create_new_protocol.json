@@ -35,8 +35,6 @@
   "tell_us": "Tell us about your protocol",
   "up_to_3_tipracks": "Up to 3 tip rack types are allowed per pipette",
   "trashBin": "Trash Bin",
-  "select_pip_before_proceeding": "Select a pipette before proceeding",
-  "select_gripper_before_proceeding": "Select a gripper before proceding",
   "vol_label": "{{volume}} uL",
   "wasteChute": "Waste Chute",
   "which_fixtures": "Which fixtures will you be using?",

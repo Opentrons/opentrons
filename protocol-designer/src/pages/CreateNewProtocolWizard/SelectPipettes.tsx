@@ -93,12 +93,12 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
     page === 'add' && pipettesByMount[defaultMount].tiprackDefURI == null
 
   const handleProceed = (): void => {
-    if (isDisabled) {
-      makeSnackbar(t('select_pip_before_proceeding') as string)
-    } else if (page === 'overview') {
-      proceed(1)
-    } else {
-      setPage('overview')
+    if (!isDisabled) {
+      if (page === 'overview') {
+        proceed(1)
+      } else {
+        setPage('overview')
+      }
     }
   }
   return (
