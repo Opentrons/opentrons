@@ -14,6 +14,7 @@ import {
   SPACING,
   Tooltip,
   useHoverTooltip,
+  ALIGN_CENTER,
 } from '@opentrons/components'
 import { useUploadCsvFileMutation } from '@opentrons/react-api-client'
 
@@ -145,7 +146,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
           : acc,
       {}
     )
-    Promise.all(
+    void Promise.all(
       Object.entries(dataFilesForProtocolMap).map(([key, file]) => {
         const fileResponse = uploadCsvFile(file)
         const varName = Promise.resolve(key)
@@ -274,7 +275,15 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
               {...targetProps}
             >
               {isCreatingRun ? (
-                <Icon name="ot-spinner" spin size="1rem" />
+                <Flex
+                  gridGap={SPACING.spacing4}
+                  alignItems={ALIGN_CENTER}
+                  whiteSpace="nowrap"
+                  marginLeft={`-${SPACING.spacing4}`}
+                >
+                  <Icon name="ot-spinner" spin size="1rem" />
+                  {t('shared:confirm_values')}
+                </Flex>
               ) : (
                 t('shared:confirm_values')
               )}

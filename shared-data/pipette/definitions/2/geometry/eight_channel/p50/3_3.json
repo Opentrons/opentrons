@@ -40,7 +40,7 @@
   },
   "lldSettings": {
     "t50": {
-      "minHeight": 0.5,
+      "minHeight": 1.0,
       "minVolume": 0
     }
   }
