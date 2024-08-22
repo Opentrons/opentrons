@@ -1,5 +1,5 @@
 """Exception hierarchy for error codes."""
-from typing import Dict, Any, Optional, List, Iterator, Union, Sequence
+from typing import Dict, Any, Optional, List, Iterator, Union, Sequence, overload
 from logging import getLogger
 from traceback import format_exception_only, format_tb
 import inspect
@@ -900,12 +900,37 @@ class TipDetectorNotFound(RoboticsInteractionError):
 class APIRemoved(GeneralError):
     """An error indicating that a specific API is no longer available."""
 
-    def __init__(
+    @overload
+    def __init__(  # noqa: D107
         self,
+        *,
         api_element: Optional[str] = None,
         since_version: Optional[str] = None,
         current_version: Optional[str] = None,
+        extra_message: Optional[str] = None,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        pass
+
+    @overload
+    def __init__(  # noqa: D107
+        self,
         message: Optional[str] = None,
+        *,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        pass
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        *,
+        api_element: Optional[str] = None,
+        since_version: Optional[str] = None,
+        current_version: Optional[str] = None,
+        extra_message: Optional[str] = None,
         detail: Optional[Dict[str, str]] = None,
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
@@ -914,23 +939,27 @@ class APIRemoved(GeneralError):
         checked_detail["identifier"] = api_element
         checked_detail["since_version"] = since_version
         checked_detail["current_version"] = current_version
-        checked_message = ""
-        if api_element and since_version and current_version:
-            checked_message = f"{api_element} is not available after API version {since_version}. You are currently using API version {current_version}."
-        elif api_element and since_version:
-            checked_message = (
-                f"{api_element} is not available after API version {since_version}."
-            )
-        elif api_element:
-            checked_message = (
-                f"{api_element} is no longer available in the API version in use."
-            )
-        if message:
-            checked_message = checked_message + message
-        checked_message = (
-            checked_message
-            or "This feature is no longer available in the API version in use."
-        )
+
+        checked_api_element = api_element if api_element is not None else "This feature"
+
+        if message is not None:
+            checked_message = message
+        else:
+            if since_version is not None and current_version is not None:
+                checked_message = (
+                    f"{checked_api_element} is not available after API version {since_version}."
+                    f" You are currently using API version {current_version}."
+                )
+            elif since_version is not None and current_version is None:
+                checked_message = f"{checked_api_element} is not available after API version {since_version}."
+            elif since_version is None and current_version is not None:
+                checked_message = f"{checked_api_element} is not available in API version {current_version}."
+            else:
+                checked_message = f"{checked_api_element} is no longer available in the API version in use."
+
+            if extra_message is not None:
+                checked_message += " " + extra_message
+
         super().__init__(
             ErrorCodes.API_REMOVED, checked_message, checked_detail, wrapping
         )
@@ -939,12 +968,37 @@ class APIRemoved(GeneralError):
 class IncorrectAPIVersion(GeneralError):
     """An error indicating that a command was issued that is not supported by the API version in use."""
 
-    def __init__(
+    @overload
+    def __init__(  # noqa: D107
         self,
+        *,
         api_element: Optional[str] = None,
         until_version: Optional[str] = None,
         current_version: Optional[str] = None,
+        extra_message: Optional[str] = None,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        pass
+
+    @overload
+    def __init__(  # noqa: D107
+        self,
         message: Optional[str] = None,
+        *,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        pass
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        *,
+        api_element: Optional[str] = None,
+        until_version: Optional[str] = None,
+        current_version: Optional[str] = None,
+        extra_message: Optional[str] = None,
         detail: Optional[Dict[str, str]] = None,
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
@@ -953,22 +1007,27 @@ class IncorrectAPIVersion(GeneralError):
         checked_detail["identifier"] = api_element
         checked_detail["until_version"] = until_version
         checked_detail["current_version"] = current_version
-        if api_element and until_version and current_version:
-            checked_message = f"{api_element} is not available until API version {until_version}. You are currently using API version {current_version}."
-        elif api_element and until_version:
-            checked_message = (
-                f"{api_element} is not available until API version {until_version}."
-            )
-        elif api_element:
-            checked_message = (
-                f"{api_element} is not yet available in the API version in use."
-            )
-        if message:
-            checked_message = checked_message + " " + message
-        checked_message = (
-            checked_message
-            or "This feature is not yet available in the API version in use."
-        )
+
+        checked_api_element = api_element if api_element is not None else "This feature"
+
+        if message is not None:
+            checked_message = message
+        else:
+            if until_version is not None and current_version is not None:
+                checked_message = (
+                    f"{checked_api_element} is not available until API version {until_version}."
+                    f" You are currently using API version {current_version}."
+                )
+            elif until_version is not None and current_version is None:
+                checked_message = f"{checked_api_element} is not available until API version {until_version}."
+            elif until_version is None and current_version is not None:
+                checked_message = f"{checked_api_element} is not available in API version {current_version}."
+            else:
+                checked_message = f"{checked_api_element} is not yet available in the API version in use."
+
+            if extra_message is not None:
+                checked_message += " " + extra_message
+
         super().__init__(
             ErrorCodes.INCORRECT_API_VERSION, checked_message, checked_detail, wrapping
         )

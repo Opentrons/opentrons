@@ -10,15 +10,18 @@ import {
   JUSTIFY_CENTER,
   POSITION_FIXED,
   SPACING,
+  Snackbar,
+  Toast,
 } from '@opentrons/components'
 
-import { Snackbar } from '../../atoms/Snackbar'
-import { Toast } from '../../atoms/Toast'
 import { getIsOnDevice } from '../../redux/config'
 import { ToasterContext } from './ToasterContext'
 
-import type { SnackbarProps } from '../../atoms/Snackbar'
-import type { ToastProps, ToastType } from '../../atoms/Toast'
+import type { SnackbarProps } from '@opentrons/components'
+import type {
+  ToastProps,
+  ToastType,
+} from '@opentrons/components/src/atoms/Toast'
 import type { MakeSnackbarOptions, MakeToastOptions } from './ToasterContext'
 
 interface ToasterOvenProps {

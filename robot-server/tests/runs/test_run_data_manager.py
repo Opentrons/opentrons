@@ -661,11 +661,11 @@ async def test_update_current(
     result = await subject.update(run_id=run_id, current=False)
 
     decoy.verify(
-        await mock_runs_publisher.publish_pre_serialized_commands_notification(run_id),
+        mock_runs_publisher.publish_pre_serialized_commands_notification(run_id),
         times=1,
     )
     decoy.verify(
-        await mock_runs_publisher.publish_runs_advise_refetch_async(run_id),
+        mock_runs_publisher.publish_runs_advise_refetch(run_id),
         times=1,
     )
     assert result == Run(
@@ -720,7 +720,7 @@ async def test_update_current_noop(
             commands=matchers.Anything(),
             run_time_parameters=matchers.Anything(),
         ),
-        await mock_runs_publisher.publish_pre_serialized_commands_notification(run_id),
+        mock_runs_publisher.publish_pre_serialized_commands_notification(run_id),
         times=0,
     )
 

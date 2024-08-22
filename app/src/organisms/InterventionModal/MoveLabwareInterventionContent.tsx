@@ -26,6 +26,7 @@ import {
   TC_MODULE_LOCATION_OT2,
   TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_TYPE,
+  inferModuleOrientationFromXCoordinate,
   getDeckDefFromRobotType,
   getLoadedLabwareDefinitionsByUri,
   getModuleType,
@@ -213,7 +214,13 @@ export function MoveLabwareInterventionContent({
                       nestedLabwareDef,
                       nestedLabwareId,
                     }) => (
-                      <Module key={moduleId} def={moduleDef} x={x} y={y}>
+                      <Module
+                        key={moduleId}
+                        def={moduleDef}
+                        x={x}
+                        y={y}
+                        orientation={inferModuleOrientationFromXCoordinate(x)}
+                      >
                         {nestedLabwareDef != null &&
                         nestedLabwareId !== command.params.labwareId ? (
                           <LabwareRender definition={nestedLabwareDef} />

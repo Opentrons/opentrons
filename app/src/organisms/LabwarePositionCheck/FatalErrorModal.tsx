@@ -25,66 +25,88 @@ import { WizardHeader } from '../../molecules/WizardHeader'
 import { i18n } from '../../i18n'
 
 const SUPPORT_EMAIL = 'support@opentrons.com'
-
-interface FatalErrorModalProps {
+interface FatalErrorProps {
   errorMessage: string
   shouldUseMetalProbe: boolean
   onClose: () => void
 }
+
+interface FatalErrorModalProps extends FatalErrorProps {
+  isOnDevice: boolean
+}
+
 export function FatalErrorModal(props: FatalErrorModalProps): JSX.Element {
-  const { errorMessage, shouldUseMetalProbe, onClose } = props
   const { t } = useTranslation(['labware_position_check', 'shared', 'branded'])
+  const { onClose, isOnDevice } = props
   return createPortal(
-    <ModalShell
-      width="47rem"
-      header={
+    isOnDevice ? (
+      <ModalShell fullPage>
         <WizardHeader
           title={t('labware_position_check_title')}
           onExit={onClose}
         />
-      }
-    >
-      <Flex
-        padding={SPACING.spacing32}
-        flexDirection={DIRECTION_COLUMN}
-        alignItems={ALIGN_CENTER}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-        gridGap={SPACING.spacing16}
+        <FatalError {...props} />
+      </ModalShell>
+    ) : (
+      <ModalShell
+        width="47rem"
+        header={
+          <WizardHeader
+            title={t('labware_position_check_title')}
+            onExit={onClose}
+          />
+        }
       >
-        <Icon
-          name="ot-alert"
-          size="2.5rem"
-          color={COLORS.red50}
-          aria-label="alert"
-        />
-        <ErrorHeader>
-          {i18n.format(t('shared:something_went_wrong'), 'sentenceCase')}
-        </ErrorHeader>
-        {shouldUseMetalProbe ? (
-          <LegacyStyledText
-            as="p"
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            textAlign={TEXT_ALIGN_CENTER}
-          >
-            {t('remove_probe_before_exit')}
-          </LegacyStyledText>
-        ) : null}
-        <LegacyStyledText as="p" textAlign={TEXT_ALIGN_CENTER}>
-          {t('branded:help_us_improve_send_error_report', {
-            support_email: SUPPORT_EMAIL,
-          })}
-        </LegacyStyledText>
-        <ErrorTextArea readOnly value={errorMessage ?? ''} spellCheck={false} />
-        <PrimaryButton
-          textTransform={TEXT_TRANSFORM_CAPITALIZE}
-          alignSelf={ALIGN_FLEX_END}
-          onClick={onClose}
-        >
-          {t('shared:exit')}
-        </PrimaryButton>
-      </Flex>
-    </ModalShell>,
+        <FatalError {...props} />
+      </ModalShell>
+    ),
     getTopPortalEl()
+  )
+}
+
+export function FatalError(props: FatalErrorProps): JSX.Element {
+  const { errorMessage, shouldUseMetalProbe, onClose } = props
+  const { t } = useTranslation(['labware_position_check', 'shared', 'branded'])
+  return (
+    <Flex
+      padding={SPACING.spacing32}
+      flexDirection={DIRECTION_COLUMN}
+      alignItems={ALIGN_CENTER}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      gridGap={SPACING.spacing16}
+    >
+      <Icon
+        name="ot-alert"
+        size="2.5rem"
+        color={COLORS.red50}
+        aria-label="alert"
+      />
+      <ErrorHeader>
+        {i18n.format(t('shared:something_went_wrong'), 'sentenceCase')}
+      </ErrorHeader>
+      {shouldUseMetalProbe ? (
+        <LegacyStyledText
+          as="p"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          textAlign={TEXT_ALIGN_CENTER}
+        >
+          {t('remove_probe_before_exit')}
+        </LegacyStyledText>
+      ) : null}
+      <LegacyStyledText as="p" textAlign={TEXT_ALIGN_CENTER}>
+        {t('branded:help_us_improve_send_error_report', {
+          support_email: SUPPORT_EMAIL,
+        })}
+      </LegacyStyledText>
+      <ErrorTextArea readOnly value={errorMessage ?? ''} spellCheck={false} />
+      <PrimaryButton
+        textTransform={TEXT_TRANSFORM_CAPITALIZE}
+        alignSelf={ALIGN_FLEX_END}
+        onClick={onClose}
+      >
+        {t('shared:exit')}
+      </PrimaryButton>
+    </Flex>
   )
 }
 
