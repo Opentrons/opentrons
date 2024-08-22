@@ -61,10 +61,10 @@ TEST_SPEEDS4 = [2.0]
 #     1: TEST_SPEEDS,
 # }
 
-PLUNGER_CURRENTS_SPEED = {1: TEST_SPEEDS,
-                          1: TEST_SPEEDS2,
+PLUNGER_CURRENTS_SPEED = {1: TEST_SPEEDS4,
                           1: TEST_SPEEDS3,
-                          1: TEST_SPEEDS4}
+                          1: TEST_SPEEDS2,
+                          1: TEST_SPEEDS}
 
 MAX_SPEED = max(TEST_SPEEDS)
 MAX_CURRENT = max(max(list(PLUNGER_CURRENTS_SPEED.keys())), 1.0)
