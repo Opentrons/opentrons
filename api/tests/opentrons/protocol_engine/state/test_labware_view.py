@@ -40,7 +40,7 @@ from opentrons.protocol_engine.types import (
     OverlapOffset,
     LabwareMovementOffsetData,
 )
-from opentrons.protocol_engine.state.move_types import EdgePathType
+from opentrons.protocol_engine.state._move_types import EdgePathType
 from opentrons.protocol_engine.state.labware import (
     LabwareState,
     LabwareView,
@@ -1264,7 +1264,9 @@ def test_raise_if_labware_inaccessible_by_pipette_off_deck() -> None:
         subject.raise_if_labware_inaccessible_by_pipette("labware-id")
 
 
-def test_raise_if_labware_inaccessible_by_pipette_stacked_labware_on_staging_area() -> None:
+def test_raise_if_labware_inaccessible_by_pipette_stacked_labware_on_staging_area() -> (
+    None
+):
     """It should raise if the labware is stacked on a staging slot."""
     subject = get_labware_view(
         labware_by_id={

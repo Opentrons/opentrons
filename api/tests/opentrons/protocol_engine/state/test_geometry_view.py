@@ -61,7 +61,7 @@ from opentrons.protocol_engine.commands import (
     LoadModuleParams,
 )
 from opentrons.protocol_engine.actions import SucceedCommandAction
-from opentrons.protocol_engine.state import move_types
+from opentrons.protocol_engine.state import _move_types
 from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.state.labware import LabwareView, LabwareStore
 from opentrons.protocol_engine.state.modules import ModuleView, ModuleStore
@@ -105,10 +105,10 @@ def mock_addressable_area_view(decoy: Decoy) -> AddressableAreaView:
 
 
 @pytest.fixture(autouse=True)
-def patch_mock_move_types(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
-    """Mock out move_types.py functions."""
-    for name, func in inspect.getmembers(move_types, inspect.isfunction):
-        monkeypatch.setattr(move_types, name, decoy.mock(func=func))
+def patch_mock__move_types(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Mock out _move_types.py functions."""
+    for name, func in inspect.getmembers(_move_types, inspect.isfunction):
+        monkeypatch.setattr(_move_types, name, decoy.mock(func=func))
 
 
 @pytest.fixture
