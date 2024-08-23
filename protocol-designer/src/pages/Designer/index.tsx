@@ -45,7 +45,7 @@ export function Designer(): JSX.Element {
         closeButton: true,
       })
     }
-  }, [hasHardware])
+  }, [hasHardware, metadata])
 
   return (
     <>
