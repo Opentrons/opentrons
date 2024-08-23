@@ -19,7 +19,7 @@ from opentrons.protocol_engine.errors.exceptions import (
     EStopActivatedError as PE_EStopActivatedError,
 )
 from opentrons.protocol_engine.resources import ModelUtils
-from opentrons.protocol_engine.state import StateStore
+from opentrons.protocol_engine.state.state import StateStore
 from opentrons.protocol_engine.actions import (
     ActionDispatcher,
     RunCommandAction,

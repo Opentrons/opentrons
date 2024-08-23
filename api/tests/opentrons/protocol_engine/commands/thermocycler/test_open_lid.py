@@ -4,7 +4,7 @@ from decoy import Decoy
 from opentrons.hardware_control.modules import Thermocycler
 
 from opentrons.protocol_engine.types import MotorAxis
-from opentrons.protocol_engine.state import StateView
+from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.state.module_substates import (
     ThermocyclerModuleSubState,
     ThermocyclerModuleId,

@@ -19,7 +19,7 @@ from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, Succes
 from ..errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
-    from ..state import StateView
+    from ..state.state import StateView
     from ..execution import EquipmentHandler
 
 

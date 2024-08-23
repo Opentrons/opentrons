@@ -3,7 +3,7 @@ from decoy import Decoy
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine.execution import MovementHandler
-from opentrons.protocol_engine.state import StateView
+from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.types import DeckPoint
 from opentrons.types import Point
 

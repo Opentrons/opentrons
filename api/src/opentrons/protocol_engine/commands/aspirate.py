@@ -30,7 +30,7 @@ from ..types import WellLocation, WellOrigin, CurrentWell, DeckPoint
 if TYPE_CHECKING:
     from ..execution import MovementHandler, PipettingHandler
     from ..resources import ModelUtils
-    from ..state import StateView
+    from ..state.state import StateView
     from ..notes import CommandNoteAdder
 
 

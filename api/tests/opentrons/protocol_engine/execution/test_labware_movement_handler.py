@@ -44,7 +44,7 @@ from opentrons.protocol_engine.errors import (
     ThermocyclerNotOpenError,
     HeaterShakerLabwareLatchNotOpenError,
 )
-from opentrons.protocol_engine.state import StateStore
+from opentrons.protocol_engine.state.state import StateStore
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API
@@ -87,9 +87,9 @@ def heater_shaker_movement_flagger(decoy: Decoy) -> HeaterShakerMovementFlagger:
 
 
 @pytest.fixture
-def hardware_gripper_offset_data() -> Tuple[
-    LabwareMovementOffsetData, LabwareMovementOffsetData
-]:
+def hardware_gripper_offset_data() -> (
+    Tuple[LabwareMovementOffsetData, LabwareMovementOffsetData]
+):
     """Get a set of mocked labware offset data."""
     user_offset_data = LabwareMovementOffsetData(
         pickUpOffset=LabwareOffsetVector(x=123, y=234, z=345),

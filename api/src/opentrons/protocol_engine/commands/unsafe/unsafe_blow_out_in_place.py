@@ -16,7 +16,7 @@ from opentrons.hardware_control.types import Axis
 
 if TYPE_CHECKING:
     from ...execution import PipettingHandler
-    from ...state import StateView
+    from ...state.state import StateView
 
 
 UnsafeBlowOutInPlaceCommandType = Literal["unsafe/blowOutInPlace"]

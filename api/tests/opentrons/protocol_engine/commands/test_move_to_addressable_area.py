@@ -3,7 +3,7 @@ from decoy import Decoy
 
 from opentrons.protocol_engine import DeckPoint, AddressableOffsetVector
 from opentrons.protocol_engine.execution import MovementHandler
-from opentrons.protocol_engine.state import StateView
+from opentrons.protocol_engine.state.state import StateView
 from opentrons.types import Point
 
 from opentrons.protocol_engine.commands.command import SuccessData

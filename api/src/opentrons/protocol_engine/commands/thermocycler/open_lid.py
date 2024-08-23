@@ -10,7 +10,7 @@ from ...errors.error_occurrence import ErrorOccurrence
 from opentrons.protocol_engine.types import MotorAxis
 
 if TYPE_CHECKING:
-    from opentrons.protocol_engine.state import StateView
+    from opentrons.protocol_engine.state.state import StateView
     from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandler
 
 

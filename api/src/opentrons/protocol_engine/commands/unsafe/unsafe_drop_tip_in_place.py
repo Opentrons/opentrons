@@ -14,7 +14,7 @@ from ...resources import ensure_ot3_hardware
 
 if TYPE_CHECKING:
     from ...execution import TipHandler
-    from ...state import StateView
+    from ...state.state import StateView
 
 
 UnsafeDropTipInPlaceCommandType = Literal["unsafe/dropTipInPlace"]

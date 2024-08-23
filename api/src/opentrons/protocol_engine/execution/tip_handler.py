@@ -11,7 +11,7 @@ from opentrons_shared_data.errors.exceptions import (
 )
 
 from ..resources import LabwareDataProvider, ensure_ot3_hardware
-from ..state import StateView
+from ..state.state import StateView
 from ..types import TipGeometry, TipPresenceStatus
 from ..errors import (
     HardwareNotSupportedError,

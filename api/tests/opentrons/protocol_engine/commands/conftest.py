@@ -16,7 +16,7 @@ from opentrons.protocol_engine.execution import (
     GantryMover,
 )
 from opentrons.protocol_engine.resources.model_utils import ModelUtils
-from opentrons.protocol_engine.state import StateView
+from opentrons.protocol_engine.state.state import StateView
 
 
 @pytest.fixture

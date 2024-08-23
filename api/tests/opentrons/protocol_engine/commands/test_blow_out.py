@@ -3,7 +3,7 @@ from decoy import Decoy
 
 from opentrons.types import Point
 from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset, DeckPoint
-from opentrons.protocol_engine.state import StateView
+from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.commands import (
     BlowOutResult,
     BlowOutImplementation,

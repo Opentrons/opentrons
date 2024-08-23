@@ -4,7 +4,7 @@ from typing import cast
 from decoy import Decoy
 
 from opentrons.protocol_engine.errors import LocationIsOccupiedError
-from opentrons.protocol_engine.state import StateView
+from opentrons.protocol_engine.state.state import StateView
 from opentrons_shared_data.robot.types import RobotType
 from opentrons.types import DeckSlotName
 from opentrons.protocol_engine.types import (

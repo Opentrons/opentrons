@@ -8,7 +8,8 @@ from opentrons.types import Mount
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.hardware_control.dev_types import PipetteDict
 
-from opentrons.protocol_engine.state import StateView, HardwarePipette
+from opentrons.protocol_engine.state.state import StateView
+from opentrons.protocol_engine.state.pipettes import HardwarePipette
 from opentrons.protocol_engine.types import TipGeometry
 from opentrons.protocol_engine.execution.pipetting import (
     HardwarePipettingHandler,

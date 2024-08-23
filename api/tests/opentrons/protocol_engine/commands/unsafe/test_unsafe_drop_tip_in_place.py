@@ -3,7 +3,7 @@ import pytest
 from decoy import Decoy
 
 from opentrons.types import MountType
-from opentrons.protocol_engine.state import StateView
+from opentrons.protocol_engine.state.state import StateView
 
 from opentrons.protocol_engine.execution import TipHandler
 

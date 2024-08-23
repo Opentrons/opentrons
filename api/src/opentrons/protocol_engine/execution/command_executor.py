@@ -13,7 +13,7 @@ from opentrons_shared_data.errors.exceptions import (
 
 from opentrons.protocol_engine.commands.command import SuccessData
 
-from ..state import StateStore
+from ..state.state import StateStore
 from ..resources import ModelUtils
 from ..commands import CommandStatus
 from ..actions import (

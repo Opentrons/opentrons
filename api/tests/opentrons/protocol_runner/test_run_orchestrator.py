@@ -10,7 +10,7 @@ from typing import Union, Generator
 
 from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
 from opentrons.protocol_engine.errors import RunStoppedError
-from opentrons.protocol_engine.state import StateStore
+from opentrons.protocol_engine.state.state import StateStore
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_engine import ProtocolEngine
 from opentrons.protocol_engine.types import PostRunHardwareState

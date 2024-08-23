@@ -21,7 +21,7 @@ from ..errors import InvalidSpecificationForRobotTypeError, InvalidLoadPipetteSp
 
 if TYPE_CHECKING:
     from ..execution import EquipmentHandler
-    from ..state import StateView
+    from ..state.state import StateView
 
 
 LoadPipetteCommandType = Literal["loadPipette"]

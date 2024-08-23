@@ -12,7 +12,7 @@ from ...errors.error_occurrence import ErrorOccurrence
 
 # Work around type-only circular dependencies.
 if TYPE_CHECKING:
-    from ...state import StateView
+    from ...state.state import StateView
 
 from ...types import ModuleOffsetVector, DeckSlotLocation
 

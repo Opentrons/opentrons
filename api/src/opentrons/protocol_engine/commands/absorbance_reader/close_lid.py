@@ -16,7 +16,7 @@ from .types import MoveLidResult
 from opentrons.drivers.types import AbsorbanceReaderLidStatus
 
 if TYPE_CHECKING:
-    from opentrons.protocol_engine.state import StateView
+    from opentrons.protocol_engine.state.state import StateView
     from opentrons.protocol_engine.execution import (
         EquipmentHandler,
         LabwareMovementHandler,

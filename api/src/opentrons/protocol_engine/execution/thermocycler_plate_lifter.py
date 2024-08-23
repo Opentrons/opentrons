@@ -5,7 +5,8 @@ import asyncio
 from typing import TYPE_CHECKING, AsyncGenerator, Optional
 from opentrons.hardware_control.modules.thermocycler import Thermocycler
 from opentrons.protocol_engine.types import LabwareLocation, ModuleLocation, ModuleModel
-from opentrons.protocol_engine.state import StateStore, ThermocyclerModuleId
+from opentrons.protocol_engine.state.state import StateStore
+from opentrons.protocol_engine.state.module_substates import ThermocyclerModuleId
 from contextlib import asynccontextmanager
 
 if TYPE_CHECKING:

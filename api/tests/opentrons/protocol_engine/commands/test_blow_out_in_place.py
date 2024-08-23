@@ -1,7 +1,7 @@
 """Test blow-out-in-place commands."""
 from decoy import Decoy
 
-from opentrons.protocol_engine.state import StateView
+from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.commands.blow_out_in_place import (
     BlowOutInPlaceParams,
     BlowOutInPlaceResult,

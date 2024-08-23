@@ -4,7 +4,7 @@ from typing import Generator, AsyncGenerator, Callable
 import pytest
 from decoy import Decoy, matchers
 
-from opentrons.protocol_engine.state import StateStore
+from opentrons.protocol_engine.state.state import StateStore
 from opentrons.protocol_engine.errors import RunStoppedError
 from opentrons.protocol_engine.execution import CommandExecutor, QueueWorker
 

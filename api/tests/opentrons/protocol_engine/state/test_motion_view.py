@@ -20,13 +20,13 @@ from opentrons.protocol_engine.types import (
     MotorAxis,
     AddressableOffsetVector,
 )
-from opentrons.protocol_engine.state import PipetteLocationData, _move_types
+from opentrons.protocol_engine.state import _move_types
 from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.state.labware import LabwareView
 from opentrons.protocol_engine.state.pipettes import PipetteView
 from opentrons.protocol_engine.state.addressable_areas import AddressableAreaView
 from opentrons.protocol_engine.state.geometry import GeometryView
-from opentrons.protocol_engine.state.motion import MotionView
+from opentrons.protocol_engine.state.motion import MotionView, PipetteLocationData
 from opentrons.protocol_engine.state.modules import ModuleView
 from opentrons.protocol_engine.state.module_substates import HeaterShakerModuleId
 from opentrons_shared_data.robot.types import RobotType

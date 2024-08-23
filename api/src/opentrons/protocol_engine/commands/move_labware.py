@@ -23,7 +23,7 @@ from opentrons_shared_data.gripper.constants import GRIPPER_PADDLE_WIDTH
 
 if TYPE_CHECKING:
     from ..execution import EquipmentHandler, RunControlHandler, LabwareMovementHandler
-    from ..state import StateView
+    from ..state.state import StateView
 
 
 MoveLabwareCommandType = Literal["moveLabware"]

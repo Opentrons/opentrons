@@ -30,7 +30,7 @@ from opentrons.protocol_engine.commands.liquid_probe import (
 )
 from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
 
-from opentrons.protocol_engine.state import StateView
+from opentrons.protocol_engine.state.state import StateView
 
 from opentrons.protocol_engine.execution import (
     MovementHandler,

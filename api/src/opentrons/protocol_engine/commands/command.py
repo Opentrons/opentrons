@@ -29,7 +29,7 @@ from ..notes import CommandNote, CommandNoteAdder
 # Work around type-only circular dependencies.
 if TYPE_CHECKING:
     from .. import execution
-    from ..state import StateView
+    from ..state.state import StateView
 
 
 _ParamsT = TypeVar("_ParamsT", bound=BaseModel)

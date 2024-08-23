@@ -30,7 +30,7 @@ from ..types import DeckPoint
 if TYPE_CHECKING:
     from ..execution import PipettingHandler, GantryMover
     from ..resources import ModelUtils
-    from ..state import StateView
+    from ..state.state import StateView
     from ..notes import CommandNoteAdder
 
 AspirateInPlaceCommandType = Literal["aspirateInPlace"]

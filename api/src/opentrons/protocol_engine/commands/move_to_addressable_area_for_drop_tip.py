@@ -17,7 +17,7 @@ from ..errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
     from ..execution import MovementHandler
-    from ..state import StateView
+    from ..state.state import StateView
 
 MoveToAddressableAreaForDropTipCommandType = Literal["moveToAddressableAreaForDropTip"]
 

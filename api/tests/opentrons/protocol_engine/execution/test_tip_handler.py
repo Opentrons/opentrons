@@ -12,7 +12,7 @@ from opentrons.hardware_control.types import TipStateType
 from opentrons.hardware_control.protocols.types import OT2RobotType, FlexRobotType
 
 from opentrons.protocols.models import LabwareDefinition
-from opentrons.protocol_engine.state import StateView
+from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.types import TipGeometry, TipPresenceStatus
 from opentrons.protocol_engine.resources import LabwareDataProvider
 from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
@@ -121,7 +121,6 @@ async def test_flex_pick_up_tip_state(
     with patch.object(
         ot3_hardware_api, "cache_tip", AsyncMock(spec=ot3_hardware_api.cache_tip)
     ) as mock_add_tip:
-
         if tip_state == TipStateType.PRESENT:
             await subject.pick_up_tip(
                 pipette_id="pipette-id",

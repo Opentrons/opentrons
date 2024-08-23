@@ -21,7 +21,7 @@ from opentrons.protocol_engine.types import (
     DeckType,
     AddressableAreaLocation,
 )
-from opentrons.protocol_engine.state import StateView
+from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.move_labware import (
     MoveLabwareParams,

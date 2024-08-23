@@ -25,7 +25,7 @@ from .command import (
 )
 
 if TYPE_CHECKING:
-    from ..state import StateView
+    from ..state.state import StateView
     from ..execution import MovementHandler, TipHandler
 
 

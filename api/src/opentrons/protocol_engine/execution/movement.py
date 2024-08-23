@@ -16,7 +16,7 @@ from ..types import (
     CurrentWell,
     AddressableOffsetVector,
 )
-from ..state import StateStore
+from ..state.state import StateStore
 from ..resources import ModelUtils
 from .thermocycler_movement_flagger import ThermocyclerMovementFlagger
 from .heater_shaker_movement_flagger import HeaterShakerMovementFlagger

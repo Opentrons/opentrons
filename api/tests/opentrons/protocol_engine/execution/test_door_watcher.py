@@ -16,7 +16,7 @@ from opentrons.hardware_control.types import (
 )
 
 from opentrons.protocol_engine.actions import ActionDispatcher, DoorChangeAction
-from opentrons.protocol_engine.state import StateStore
+from opentrons.protocol_engine.state.state import StateStore
 from opentrons.protocol_engine.execution.door_watcher import (
     DoorWatcher,
 )

@@ -2,7 +2,7 @@
 from decoy import Decoy
 
 from opentrons.types import MountType
-from opentrons.protocol_engine.state import StateView
+from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.commands.unsafe.unsafe_blow_out_in_place import (
     UnsafeBlowOutInPlaceParams,
     UnsafeBlowOutInPlaceResult,

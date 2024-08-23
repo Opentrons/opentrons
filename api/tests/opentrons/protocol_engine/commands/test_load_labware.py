@@ -18,7 +18,7 @@ from opentrons.protocol_engine.types import (
 )
 from opentrons.protocol_engine.execution import LoadedLabwareData, EquipmentHandler
 from opentrons.protocol_engine.resources import labware_validation
-from opentrons.protocol_engine.state import StateView
+from opentrons.protocol_engine.state.state import StateView
 
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.load_labware import (

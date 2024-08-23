@@ -15,7 +15,7 @@ from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardwa
 
 if TYPE_CHECKING:
     from opentrons.hardware_control import HardwareControlAPI
-    from ...state import StateView
+    from ...state.state import StateView
 
 # These offsets supplied from HW
 _ATTACH_POINT = Point(x=0, y=110)

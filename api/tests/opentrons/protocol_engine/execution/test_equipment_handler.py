@@ -39,7 +39,8 @@ from opentrons.protocol_engine.types import (
     FlowRates,
 )
 
-from opentrons.protocol_engine.state import Config, StateStore
+from opentrons.protocol_engine.state.config import Config
+from opentrons.protocol_engine.state.state import StateStore
 from opentrons.protocol_engine.state.modules import HardwareModule
 from opentrons.protocol_engine.resources import (
     ModelUtils,

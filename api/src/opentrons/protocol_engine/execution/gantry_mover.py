@@ -10,7 +10,7 @@ from opentrons_shared_data.errors.exceptions import PositionUnknownError
 
 from opentrons.motion_planning import Waypoint
 
-from ..state import StateView
+from ..state.state import StateView
 from ..types import MotorAxis, CurrentWell
 from ..errors import MustHomeError, InvalidAxisForRobotType
 

@@ -3,7 +3,7 @@ import asyncio
 from logging import getLogger
 from typing import Optional, AsyncGenerator, Callable
 
-from ..state import StateStore
+from ..state.state import StateStore
 from .command_executor import CommandExecutor
 
 log = getLogger(__name__)

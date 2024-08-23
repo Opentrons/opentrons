@@ -19,9 +19,7 @@ from opentrons.protocol_engine.commands.command import SuccessData, DefinedError
 from opentrons.protocol_engine.errors.exceptions import PipetteNotReadyToAspirateError
 from opentrons.protocol_engine.notes import CommandNoteAdder
 from opentrons.protocol_engine.resources import ModelUtils
-from opentrons.protocol_engine.state import (
-    StateStore,
-)
+from opentrons.protocol_engine.state.state import StateStore
 from opentrons.protocol_engine.types import DeckPoint
 from opentrons.protocol_engine.commands.pipetting_common import (
     OverpressureError,

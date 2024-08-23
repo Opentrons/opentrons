@@ -9,7 +9,7 @@ from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import OT3Mount, Axis
 from opentrons.motion_planning import get_gripper_labware_movement_waypoints
 
-from opentrons.protocol_engine.state import StateStore
+from opentrons.protocol_engine.state.state import StateStore
 from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
 
 from .thermocycler_movement_flagger import ThermocyclerMovementFlagger

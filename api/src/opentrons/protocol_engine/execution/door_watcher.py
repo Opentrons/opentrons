@@ -15,7 +15,7 @@ from opentrons.hardware_control.types import (
 
 from opentrons.protocol_engine.actions import ActionDispatcher, DoorChangeAction
 
-from ..state import StateStore
+from ..state.state import StateStore
 
 
 _UnsubscribeCallback = Callable[[], None]

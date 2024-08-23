@@ -4,7 +4,7 @@ from typing import AsyncGenerator, Callable
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine.execution.rail_lights import RailLightsHandler
 
-from ..state import StateStore
+from ..state.state import StateStore
 from ..actions import ActionDispatcher
 from .equipment import EquipmentHandler
 from .movement import MovementHandler

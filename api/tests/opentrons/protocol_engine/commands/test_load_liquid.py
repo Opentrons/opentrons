@@ -8,7 +8,7 @@ from opentrons.protocol_engine.commands import (
     LoadLiquidImplementation,
     LoadLiquidParams,
 )
-from opentrons.protocol_engine.state import StateView
+from opentrons.protocol_engine.state.state import StateView
 
 
 @pytest.fixture

@@ -5,7 +5,8 @@ from contextlib import contextmanager
 
 from opentrons.hardware_control import HardwareControlAPI
 
-from ..state import StateView, HardwarePipette
+from ..state.state import StateView
+from ..state.pipettes import HardwarePipette
 from ..notes import CommandNoteAdder, CommandNote
 from ..errors.exceptions import (
     TipNotAttachedError,
