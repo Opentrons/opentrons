@@ -471,7 +471,7 @@ class RunDataManager:
         if run_id == self._run_orchestrator_store.current_run_id:
             return self._run_orchestrator_store.get_command_errors()
 
-        # TODO(tz, 8-5-2024): Change this to return to error list from the DB when we implement https://opentrons.atlassian.net/browse/EXEC-655.
+        # TODO(tz, 8-5-2024): Change this to return the error list from the DB when we implement https://opentrons.atlassian.net/browse/EXEC-655.
         raise RunNotCurrentError()
 
     def get_all_commands_as_preserialized_list(
