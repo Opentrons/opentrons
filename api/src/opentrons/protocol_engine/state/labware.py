@@ -58,7 +58,7 @@ from ..actions import (
     AddLabwareOffsetAction,
     AddLabwareDefinitionAction,
 )
-from .abstract_store import HasState, HandlesActions
+from ._abstract_store import HasState, HandlesActions
 from .move_types import EdgePathType
 
 

@@ -43,7 +43,7 @@ from ..actions import (
     AddAddressableAreaAction,
 )
 from .config import Config
-from .abstract_store import HasState, HandlesActions
+from ._abstract_store import HasState, HandlesActions
 
 
 @dataclass
