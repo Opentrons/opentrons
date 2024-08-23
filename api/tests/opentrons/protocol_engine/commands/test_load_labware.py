@@ -32,7 +32,7 @@ from opentrons.protocol_engine.commands.load_labware import (
 def patch_mock_labware_validation(
     decoy: Decoy, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """Mock out move_types.py functions."""
+    """Mock out labware_validations.py functions."""
     for name, func in inspect.getmembers(labware_validation, inspect.isfunction):
         monkeypatch.setattr(labware_validation, name, decoy.mock(func=func))
 
