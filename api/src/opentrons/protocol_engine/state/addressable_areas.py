@@ -352,6 +352,20 @@ class AddressableAreaView(HasState[AddressableAreaState]):
             "right": Point(x=right_offset[0], y=right_offset[1], z=right_offset[2]),
         }
 
+    @cached_property
+    def padding_offsets(self) -> Dict[str, float]:
+        """The padding offsets to be applied to the deck extents of the robot."""
+        rear_offset = self.state.robot_definition["paddingOffsets"]["rear"]
+        front_offset = self.state.robot_definition["paddingOffsets"]["front"]
+        left_side_offset = self.state.robot_definition["paddingOffsets"]["leftSide"]
+        right_side_offset = self.state.robot_definition["paddingOffsets"]["rightSide"]
+        return {
+            "rear": rear_offset,
+            "front": front_offset,
+            "left_side": left_side_offset,
+            "right_side": right_side_offset,
+        }
+
     def get_addressable_area(self, addressable_area_name: str) -> AddressableArea:
         """Get addressable area."""
         if not self._state.use_simulated_deck_config:

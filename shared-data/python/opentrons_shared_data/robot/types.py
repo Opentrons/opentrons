@@ -37,6 +37,15 @@ class mountOffset(TypedDict):
     gripper: NotRequired[List[float]]
 
 
+class paddingOffset(TypedDict):
+    """The padding offsets for a given robot type based off how far the pipettes can travel beyond the deck extents."""
+
+    rear: float
+    front: float
+    leftSide: float
+    rightSide: float
+
+
 class RobotDefinition(TypedDict):
     """A python version of the robot definition type."""
 
@@ -44,4 +53,5 @@ class RobotDefinition(TypedDict):
     robotType: RobotType
     models: List[str]
     extents: List[float]
+    paddingOffsets: paddingOffset
     mountOffsets: mountOffset
