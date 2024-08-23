@@ -166,8 +166,6 @@ class CommandHistory:
             command=command,
         )
         self._add(command.id, updated_command)
-        if command.intent != CommandIntent.FIXIT:
-            self._all_command_ids_but_fixit_command_ids.append(command.id)
 
         if command.intent == CommandIntent.SETUP:
             self._add_to_setup_queue(command.id)
@@ -248,6 +246,8 @@ class CommandHistory:
         """Create or update a command entry."""
         if command_id not in self._commands_by_id:
             self._all_command_ids.append(command_id)
+            if command_entry.command.intent != CommandIntent.FIXIT:
+                self._all_command_ids_but_fixit_command_ids.append(command_id)
         self._commands_by_id[command_id] = command_entry
 
     def _add_to_queue(self, command_id: str) -> None:
