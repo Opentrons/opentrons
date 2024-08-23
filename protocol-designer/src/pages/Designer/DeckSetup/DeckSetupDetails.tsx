@@ -22,7 +22,7 @@ import {
 import { LabwareOnDeck } from '../../../components/DeckSetup/LabwareOnDeck'
 import { SlotWarning } from '../../../components/DeckSetup/SlotWarning'
 import { getStagingAreaAddressableAreas } from '../../../utils'
-import { ControlSelect } from './ControlSelect'
+import { DeckItemHover } from './DeckItemHover'
 
 import type { ModuleTemporalProperties } from '@opentrons/step-generation'
 import type {
@@ -173,7 +173,7 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
                     y={0}
                     labwareOnDeck={labwareLoadedOnModule}
                   />
-                  <ControlSelect
+                  <DeckItemHover
                     hover={hover}
                     setHover={setHover}
                     addEquipment={addEquipment}
@@ -186,7 +186,7 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
               ) : null}
 
               {labwareLoadedOnModule == null ? (
-                <ControlSelect
+                <DeckItemHover
                   hover={hover}
                   setHover={setHover}
                   addEquipment={addEquipment}
@@ -238,7 +238,7 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
         .map(addressableArea => {
           return (
             <React.Fragment key={addressableArea.id}>
-              <ControlSelect
+              <DeckItemHover
                 hover={hover}
                 setHover={setHover}
                 addEquipment={addEquipment}
@@ -279,7 +279,7 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
               y={slotPosition[1]}
               labwareOnDeck={labware}
             />
-            <ControlSelect
+            <DeckItemHover
               hover={hover}
               setHover={setHover}
               addEquipment={addEquipment}
@@ -336,7 +336,7 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
               y={slotPosition[1]}
               labwareOnDeck={labware}
             />
-            <ControlSelect
+            <DeckItemHover
               hover={hover}
               setHover={setHover}
               addEquipment={addEquipment}

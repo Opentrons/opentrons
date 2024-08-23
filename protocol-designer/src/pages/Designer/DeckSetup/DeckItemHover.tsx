@@ -19,7 +19,7 @@ import { SlotOverflowMenu } from './SlotOverflowMenu'
 import type { CoordinateTuple, Dimensions } from '@opentrons/shared-data'
 import type { TerminalItemId } from '../../../steplist'
 
-interface ControlSelectProps {
+interface DeckItemHoverProps {
   slotPosition: CoordinateTuple | null
   slotBoundingBox: Dimensions
   slotId: string
@@ -29,8 +29,8 @@ interface ControlSelectProps {
   selectedTerminalItemId?: TerminalItemId | null
 }
 
-export const ControlSelect = (
-  props: ControlSelectProps
+export const DeckItemHover = (
+  props: DeckItemHoverProps
 ): JSX.Element | null => {
   const {
     slotBoundingBox,
