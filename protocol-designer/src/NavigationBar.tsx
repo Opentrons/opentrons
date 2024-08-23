@@ -12,11 +12,12 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   StyledText,
+  Tabs,
 } from '@opentrons/components'
 import { actions as loadFileActions } from './load-file'
 import type { ThunkDispatch } from './types'
 
-export function NavigationBar(): JSX.Element {
+export function NavigationBar(): JSX.Element | null {
   const { t } = useTranslation('shared')
   const location = useLocation()
   const dispatch: ThunkDispatch<any> = useDispatch()
@@ -26,7 +27,7 @@ export function NavigationBar(): JSX.Element {
     dispatch(loadFileActions.loadProtocolFile(fileChangeEvent))
   }
 
-  return (
+  return location.pathname === '/designer' ? null : (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <Flex
         justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -43,6 +44,7 @@ export function NavigationBar(): JSX.Element {
             {t('version', { version: process.env.OT_PD_VERSION })}
           </StyledText>
         </Flex>
+
         <Flex gridGap={SPACING.spacing40} alignItems={ALIGN_CENTER}>
           {location.pathname === '/createNew' ? null : (
             <NavbarLink key="createNew" to="/createNew">
