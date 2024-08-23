@@ -17,6 +17,8 @@ export interface StaticLabwareProps {
   definition: LabwareDefinition2
   /** Add thicker blurred blue border to labware, defaults to false */
   highlight?: boolean
+  /** adds a drop shadow to the highlight border */
+  highlightShadow?: boolean
   /** Optional callback to be executed when entire labware element is clicked */
   onLabwareClick?: () => void
   /** Optional callback to be executed when mouse enters a well element */
@@ -55,6 +57,7 @@ export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
   const {
     definition,
     highlight,
+    highlightShadow,
     onLabwareClick,
     onMouseEnterWell,
     onMouseLeaveWell,
@@ -69,6 +72,7 @@ export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
         <LabwareOutline
           definition={definition}
           highlight={highlight}
+          highlightShadow={highlightShadow}
           fill={fill}
           showRadius={showRadius}
         />
