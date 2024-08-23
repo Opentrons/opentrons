@@ -1,10 +1,15 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import cx from 'classnames'
 import { css } from 'styled-components'
 import {
+  ALIGN_CENTER,
+  BORDERS,
+  COLORS,
+  DISPLAY_FLEX,
   Flex,
   JUSTIFY_CENTER,
+  POSITION_ABSOLUTE,
+  PRODUCT,
   RobotCoordsForeignDiv,
   StyledText,
 } from '@opentrons/components'
@@ -13,8 +18,6 @@ import { SlotOverflowMenu } from './SlotOverflowMenu'
 
 import type { CoordinateTuple, Dimensions } from '@opentrons/shared-data'
 import type { TerminalItemId } from '../../../steplist'
-
-import styles from './DeckSetup.module.css'
 
 interface ControlSelectProps {
   slotPosition: CoordinateTuple | null
@@ -44,6 +47,8 @@ export const ControlSelect = (
   if (selectedTerminalItemId !== START_TERMINAL_ITEM_ID || slotPosition == null)
     return null
 
+  const hoverOpacity = hover != null && hover === slotId ? '1' : '0'
+
   return (
     <>
       <RobotCoordsForeignDiv
@@ -52,7 +57,22 @@ export const ControlSelect = (
         width={slotBoundingBox.xDimension}
         height={slotBoundingBox.yDimension}
         innerDivProps={{
-          className: cx(styles.slot_overlay, styles.appear_on_mouseover),
+          style: {
+            opacity: hover != null && hover === slotId ? 1 : 0,
+            position: POSITION_ABSOLUTE,
+            top: 0,
+            right: 0,
+            bottom: 0,
+            left: 0,
+            transform: 'rotate(180deg) scaleX(-1)',
+            zIndex: 1,
+            backgroundColor: `${COLORS.black90}cc`,
+            display: DISPLAY_FLEX,
+            alignItems: ALIGN_CENTER,
+            color: COLORS.white,
+            fontSize: PRODUCT.TYPOGRAPHY.fontSizeBodyDefaultSemiBold,
+            borderRadius: BORDERS.borderRadius8,
+          },
           onMouseEnter: () => {
             setHover(slotId)
           },
@@ -68,7 +88,7 @@ export const ControlSelect = (
           css={css`
             justify-content: ${JUSTIFY_CENTER};
             width: 100%;
-            opacity: ${hover != null && hover === slotId ? `1` : `0`};
+            opacity: ${hoverOpacity};
           `}
         >
           <a

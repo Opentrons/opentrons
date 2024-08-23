@@ -9,6 +9,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   POSITION_ABSOLUTE,
+  SPACING,
   StyledText,
 } from '@opentrons/components'
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
@@ -138,11 +139,9 @@ export function SlotOverflowMenu(
         <MenuButton
           disabled={labwareOnSlot == null || isLabwareTiprack}
           onClick={() => {
-            if (labwareOnSlot != null && !isLabwareTiprack) {
-              //  todo(ja, 8/22/24): wire this up
-              console.log('open liquids')
-              setShowMenuList(false)
-            }
+            //  todo(ja, 8/22/24): wire this up
+            console.log('open liquids')
+            setShowMenuList(false)
           }}
         >
           <StyledText desktopStyle="bodyDefaultRegular">
@@ -152,7 +151,7 @@ export function SlotOverflowMenu(
         <MenuButton
           disabled={labwareOnSlot == null && !isLabwareAnAdapter}
           onClick={() => {
-            if (labwareOnSlot != null && !isLabwareAnAdapter) {
+            if (labwareOnSlot != null) {
               dispatch(duplicateLabware(labwareOnSlot.id))
               setShowMenuList(false)
             }
@@ -165,10 +164,8 @@ export function SlotOverflowMenu(
         <MenuButton
           disabled={hasNoItems || hasTrashOnSlot}
           onClick={() => {
-            if (!hasNoItems || !hasTrashOnSlot) {
-              handleClear()
-              setShowMenuList(false)
-            }
+            handleClear()
+            setShowMenuList(false)
           }}
         >
           <StyledText desktopStyle="bodyDefaultRegular">
@@ -185,7 +182,7 @@ const MenuButton = styled.button`
   background-color: ${COLORS.transparent};
 
   cursor: pointer;
-  padding: 8px 12px;
+  padding: ${SPACING.spacing8} ${SPACING.spacing12};
   border: none;
   &:hover {
     background-color: ${COLORS.blue10};
