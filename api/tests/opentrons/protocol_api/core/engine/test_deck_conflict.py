@@ -706,7 +706,7 @@ def test_deck_conflict_raises_for_collision_with_tc_lid(
     )
     with pytest.raises(
         deck_conflict.PartialTipMovementNotAllowedError,
-        match="collision with thermocycler lid in deck slot A1.",
+        match="Requested motion with the A12 nozzle partial configuration is outside of robot bounds for the pipette.",
     ):
         deck_conflict.check_safe_for_pipette_movement(
             engine_state=mock_state_view,

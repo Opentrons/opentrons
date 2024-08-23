@@ -432,8 +432,8 @@ def _is_within_pipette_extents(
     # D1: Back right nozzle is within the front and left-side padding limits
     # A3 Front left nozzle is within the rear and right-side padding limits
     # D3: Back left nozzle is within the front and right-side padding limits
-    # Thermocycler Column A2: Front right nozzle is within safety box
-    # raise ValueError(f"front bounds: {pip_front_right_bound.x}, {pip_front_right_bound.y} back bounds: {pip_back_right_bound.x},{pip_back_right_bound.y}")
+    # Thermocycler Column A2: Front right nozzle is within padding limits
+
     return (
         pip_front_right_bound.y
         <= robot_extents.deck_extents.y + robot_extents.padding_rear
