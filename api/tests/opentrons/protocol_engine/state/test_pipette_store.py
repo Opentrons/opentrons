@@ -75,6 +75,35 @@ def subject() -> PipetteStore:
     return PipetteStore()
 
 
+def _create_move_to_well_action(
+    pipette_id: str,
+    labware_id: str,
+    well_name: str,
+    deck_point: DeckPoint,
+) -> SucceedCommandAction:
+    command = create_move_to_well_command(
+        pipette_id=pipette_id,
+        labware_id=labware_id,
+        well_name=well_name,
+        destination=deck_point,
+    )
+    action = SucceedCommandAction(
+        command=command,
+        private_result=None,
+        state_update=update_types.StateUpdate(
+            pipette_location=update_types.PipetteLocationUpdate(
+                pipette_id=pipette_id,
+                new_location=update_types.Well(
+                    labware_id=labware_id,
+                    well_name=well_name,
+                ),
+                new_deck_point=deck_point,
+            )
+        ),
+    )
+    return action
+
+
 def test_sets_initial_state(subject: PipetteStore) -> None:
     """It should initialize its state object properly."""
     result = subject.state
@@ -520,21 +549,6 @@ def test_blow_out_clears_volume(
         ),
         (
             SucceedCommandAction(
-                command=create_move_to_well_command(
-                    pipette_id="pipette-id",
-                    labware_id="move-to-well-labware-id",
-                    well_name="move-to-well-well-name",
-                ),
-                private_result=None,
-            ),
-            CurrentWell(
-                pipette_id="pipette-id",
-                labware_id="move-to-well-labware-id",
-                well_name="move-to-well-well-name",
-            ),
-        ),
-        (
-            SucceedCommandAction(
                 command=create_blow_out_command(
                     pipette_id="pipette-id",
                     labware_id="move-to-well-labware-id",
@@ -767,19 +781,20 @@ def test_movement_commands_without_well_clear_current_well(
         pipette_name=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
     )
-    move_command = create_move_to_well_command(
-        pipette_id="pipette-id",
-        labware_id="labware-id",
-        well_name="well-name",
-    )
-
     subject.handle_action(
         SucceedCommandAction(private_result=None, command=load_pipette_command)
     )
+
     subject.handle_action(
-        SucceedCommandAction(private_result=None, command=move_command)
+        _create_move_to_well_action(
+            pipette_id="pipette-id",
+            labware_id="labware-id",
+            well_name="well-name",
+            deck_point=DeckPoint(x=1, y=2, z=3),
+        )
     )
-    subject.handle_action(SucceedCommandAction(private_result=None, command=command))
+
+    subject.handle_action(SucceedCommandAction(command=command, private_result=None))
 
     assert subject.state.current_location is None
 
@@ -819,19 +834,19 @@ def test_heater_shaker_command_without_movement(
         pipette_name=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
     )
-    move_command = create_move_to_well_command(
-        pipette_id="pipette-id",
-        labware_id="labware-id",
-        well_name="well-name",
-        destination=DeckPoint(x=1, y=2, z=3),
-    )
-
     subject.handle_action(
         SucceedCommandAction(private_result=None, command=load_pipette_command)
     )
+
     subject.handle_action(
-        SucceedCommandAction(private_result=None, command=move_command)
+        _create_move_to_well_action(
+            pipette_id="pipette-id",
+            labware_id="labware-id",
+            well_name="well-name",
+            deck_point=DeckPoint(x=1, y=2, z=3),
+        )
     )
+
     subject.handle_action(SucceedCommandAction(private_result=None, command=command))
 
     assert subject.state.current_location == CurrentWell(
@@ -931,17 +946,17 @@ def test_move_labware_clears_current_well(
         pipette_name=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
     )
-    move_to_well_command = create_move_to_well_command(
-        pipette_id="pipette-id",
-        labware_id="matching-labware-id",
-        well_name="well-name",
-    )
-
     subject.handle_action(
         SucceedCommandAction(private_result=None, command=load_pipette_command)
     )
+
     subject.handle_action(
-        SucceedCommandAction(private_result=None, command=move_to_well_command)
+        _create_move_to_well_action(
+            pipette_id="pipette-id",
+            labware_id="matching-labware-id",
+            well_name="well-name",
+            deck_point=DeckPoint(x=1, y=2, z=3),
+        )
     )
 
     subject.handle_action(
@@ -1121,15 +1136,6 @@ def test_add_pipette_config(
         ),
         SucceedCommandAction(
             command=create_touch_tip_command(
-                pipette_id="pipette-id",
-                labware_id="labware-id",
-                well_name="well-name",
-                destination=DeckPoint(x=11, y=22, z=33),
-            ),
-            private_result=None,
-        ),
-        SucceedCommandAction(
-            command=create_move_to_well_command(
                 pipette_id="pipette-id",
                 labware_id="labware-id",
                 well_name="well-name",
@@ -1321,32 +1327,28 @@ def test_homing_commands_clear_deck_point(
     command: cmd.Command,
     subject: PipetteStore,
 ) -> None:
-    """It should save the last used pipette, labware, and well for movement commands."""
+    """Commands that homed the robot should clear the deck point."""
     load_pipette_command = create_load_pipette_command(
         pipette_id="pipette-id",
         pipette_name=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
     )
-    move_command = create_move_to_well_command(
-        pipette_id="pipette-id",
-        labware_id="labware-id",
-        well_name="well-name",
-        destination=DeckPoint(x=1, y=2, z=3),
-    )
-
     subject.handle_action(
         SucceedCommandAction(private_result=None, command=load_pipette_command)
     )
     subject.handle_action(
-        SucceedCommandAction(private_result=None, command=move_command)
+        _create_move_to_well_action(
+            pipette_id="pipette-id",
+            labware_id="labware-id",
+            well_name="well-name",
+            deck_point=DeckPoint(x=1, y=2, z=3),
+        )
     )
-
     assert subject.state.current_deck_point == CurrentDeckPoint(
         mount=MountType.LEFT, deck_point=DeckPoint(x=1, y=2, z=3)
     )
 
     subject.handle_action(SucceedCommandAction(private_result=None, command=command))
-
     assert subject.state.current_deck_point == CurrentDeckPoint(
         mount=None, deck_point=None
     )

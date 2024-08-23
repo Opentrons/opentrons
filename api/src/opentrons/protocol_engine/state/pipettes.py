@@ -326,7 +326,6 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         if isinstance(action, SucceedCommandAction) and isinstance(
             action.command.result,
             (
-                commands.MoveToWellResult,
                 commands.PickUpTipResult,
                 commands.DropTipResult,
                 commands.AspirateResult,
@@ -452,7 +451,6 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         if isinstance(action, SucceedCommandAction) and isinstance(
             action.command.result,
             (
-                commands.MoveToWellResult,
                 commands.MoveToCoordinatesResult,
                 commands.MoveRelativeResult,
                 commands.MoveToAddressableAreaResult,
