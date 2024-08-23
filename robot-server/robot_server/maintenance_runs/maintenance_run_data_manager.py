@@ -109,6 +109,8 @@ class MaintenanceRunDataManager:
             notify_publishers=notify_publishers,
         )
 
+        await self._maintenance_runs_publisher.publish_current_maintenance_run_async()
+
         maintenance_run_data = _build_run(
             run_id=run_id,
             created_at=created_at,
