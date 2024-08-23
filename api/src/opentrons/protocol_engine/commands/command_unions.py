@@ -216,7 +216,6 @@ from .pick_up_tip import (
     PickUpTipResult,
     PickUpTipCommandType,
     TipPhysicallyMissingError,
-    TipPhysicallyMissingErrorInternalData,
 )
 
 from .touch_tip import (
@@ -701,7 +700,7 @@ CommandPrivateResult = Union[
 
 # All `DefinedErrorData`s that implementations will actually return in practice.
 CommandDefinedErrorData = Union[
-    DefinedErrorData[TipPhysicallyMissingError, TipPhysicallyMissingErrorInternalData],
+    DefinedErrorData[TipPhysicallyMissingError, None],
     DefinedErrorData[OverpressureError, OverpressureErrorInternalData],
     DefinedErrorData[LiquidNotFoundError, LiquidNotFoundErrorInternalData],
 ]

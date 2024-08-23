@@ -519,21 +519,6 @@ def test_blow_out_clears_volume(
         ),
         (
             SucceedCommandAction(
-                command=create_pick_up_tip_command(
-                    pipette_id="pipette-id",
-                    labware_id="pick-up-tip-labware-id",
-                    well_name="pick-up-tip-well-name",
-                ),
-                private_result=None,
-            ),
-            CurrentWell(
-                pipette_id="pipette-id",
-                labware_id="pick-up-tip-labware-id",
-                well_name="pick-up-tip-well-name",
-            ),
-        ),
-        (
-            SucceedCommandAction(
                 command=create_drop_tip_command(
                     pipette_id="pipette-id",
                     labware_id="drop-tip-labware-id",
@@ -1112,15 +1097,6 @@ def test_add_pipette_config(
                 labware_id="labware-id",
                 well_name="well-name",
                 flow_rate=1.23,
-                destination=DeckPoint(x=11, y=22, z=33),
-            ),
-            private_result=None,
-        ),
-        SucceedCommandAction(
-            command=create_pick_up_tip_command(
-                pipette_id="pipette-id",
-                labware_id="labware-id",
-                well_name="well-name",
                 destination=DeckPoint(x=11, y=22, z=33),
             ),
             private_result=None,
