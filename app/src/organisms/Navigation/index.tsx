@@ -157,7 +157,7 @@ export function Navigation(props: NavigationProps): JSX.Element {
             >
               <Flex
                 ref={
-                  '/dashboard' === location.pathname ? navBarScrollRef : null
+                  location.pathname === '/dashboard' ? navBarScrollRef : null
                 }
               >
                 <NavigationLink
@@ -177,12 +177,11 @@ export function Navigation(props: NavigationProps): JSX.Element {
                 />
               ) : null}
               {NAV_LINKS.map(path => (
-                <Flex ref={path === location.pathname ? navBarScrollRef : null}>
-                  <NavigationLink
-                    key={path}
-                    to={path}
-                    name={getPathDisplayName(path)}
-                  />
+                <Flex
+                  ref={path === location.pathname ? navBarScrollRef : null}
+                  key={path}
+                >
+                  <NavigationLink to={path} name={getPathDisplayName(path)} />
                 </Flex>
               ))}
             </Flex>
