@@ -4,6 +4,7 @@
   "add_fixture": "Add a fixture",
   "add_labware": "Add labware",
   "add_module": "Add a module",
+  "add_rest": "Add labware and liquids to complete deck setup",
   "aluminumBlock": "Aluminum block",
   "clear": "Clear",
   "custom_labware": "Add custom labware",
@@ -18,5 +19,6 @@
   "starting_deck_state": "Starting deck state",
   "tipRack": "Tip rack",
   "tubeRack": "Tube rack",
+  "we_added_hardware": "We've added your deck hardware and tip racks!",
   "wellPlate": "Well plate"
 }
