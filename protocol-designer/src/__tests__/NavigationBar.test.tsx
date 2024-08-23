@@ -1,11 +1,13 @@
 import * as React from 'react'
-import { describe, it } from 'vitest'
+import { describe, it, vi } from 'vitest'
 import { screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 
 import { i18n } from '../assets/localization'
 import { renderWithProviders } from '../__testing-utils__'
 import { NavigationBar } from '../NavigationBar'
+
+vi.mock('../file-data/selectors')
 
 const render = () => {
   return renderWithProviders(
