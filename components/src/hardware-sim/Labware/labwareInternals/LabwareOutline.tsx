@@ -16,6 +16,8 @@ export interface LabwareOutlineProps {
   isTiprack?: boolean
   /** adds thicker blue border with blur to labware, defaults to false */
   highlight?: boolean
+  /** adds a drop shadow to the highlight border */
+  highlightShadow?: boolean
   /** [legacy] override the border color */
   stroke?: CSSProperties['stroke']
   fill?: CSSProperties['fill']
@@ -31,6 +33,7 @@ export function LabwareOutline(props: LabwareOutlineProps): JSX.Element {
     height = SLOT_RENDER_HEIGHT,
     isTiprack = false,
     highlight = false,
+    highlightShadow = false,
     stroke,
     fill,
     showRadius = true,
@@ -52,30 +55,40 @@ export function LabwareOutline(props: LabwareOutlineProps): JSX.Element {
         <>
           <defs>
             <filter id="feOffset" filterUnits="objectBoundingBox">
-              <feGaussianBlur stdDeviation="6" />
+              {/* *
+               * TODO(bh, 2024-08-23): layer drop shadow filters to mimic CSS box shadow - may need to evaluate performance
+               * https://stackoverflow.com/questions/22486039/css3-filter-drop-shadow-spread-property-alternatives
+               * */}
+              <feDropShadow
+                dx="0"
+                dy="0"
+                stdDeviation="3"
+                floodColor={COLORS.blue50}
+              />
+              <feDropShadow
+                dx="0"
+                dy="0"
+                stdDeviation="1.75"
+                floodColor={COLORS.blue50}
+              />
+              <feDropShadow
+                dx="0"
+                dy="0"
+                stdDeviation="1"
+                floodColor={COLORS.blue50}
+              />
             </filter>
           </defs>
-          {/* TODO(bh, 2024-07-22): adjust gaussian blur for stacks */}
-          <LabwareBorder
-            borderThickness={1.5 * OUTLINE_THICKNESS_MM}
-            xDimension={dimensions.xDimension}
-            yDimension={dimensions.yDimension}
-            filter="url(#feOffset)"
-            stroke="#74B0FF"
-            rx="8"
-            ry="8"
-            showRadius={showRadius}
-            fill={backgroundFill}
-          />
           <LabwareBorder
             borderThickness={2.2 * OUTLINE_THICKNESS_MM}
             xDimension={dimensions.xDimension}
             yDimension={dimensions.yDimension}
+            filter={highlightShadow ? 'url(#feOffset)' : ''}
             stroke={COLORS.blue50}
-            fill={backgroundFill}
-            rx="4"
-            ry="4"
+            rx="8"
+            ry="8"
             showRadius={showRadius}
+            fill={backgroundFill}
           />
         </>
       ) : (
