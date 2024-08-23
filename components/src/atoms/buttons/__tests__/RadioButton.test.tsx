@@ -82,6 +82,7 @@ describe('RadioButton', () => {
     expect(idRadioButton).toBeInTheDocument()
     const buttonLabelIdRadioButton = getById(
       render(props).container,
+      //  @ts-expect-error(ja, 8/23/24): buttonLabel is a string type
       props.buttonLabel
     )
     expect(buttonLabelIdRadioButton).not.toBeInTheDocument()

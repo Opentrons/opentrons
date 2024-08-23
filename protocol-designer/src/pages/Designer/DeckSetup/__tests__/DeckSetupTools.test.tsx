@@ -22,10 +22,10 @@ import { LabwareTools } from '../LabwareTools'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
+vi.mock('../LabwareTools')
 vi.mock('../../../../feature-flags/selectors')
 vi.mock('../../../../file-data/selectors')
 vi.mock('../../../../top-selectors/labware-locations')
-vi.mock('../LabwareTools')
 vi.mock('../../../../labware-ingred/actions')
 vi.mock('../../../../step-forms/actions')
 vi.mock('../../../../step-forms/actions/additionalItems')

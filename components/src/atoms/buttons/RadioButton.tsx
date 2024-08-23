@@ -16,9 +16,10 @@ import type { IconName } from '../..'
 import type { StyleProps } from '../../primitives'
 
 interface RadioButtonProps extends StyleProps {
-  buttonLabel: string
+  buttonLabel: string | React.ReactNode
   buttonValue: string | number
   onChange: React.ChangeEventHandler<HTMLInputElement>
+  desktopRadiusType?: 'rounded' | 'square'
   disabled?: boolean
   isSelected?: boolean
   radioButtonType?: 'large' | 'small'
@@ -38,7 +39,10 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
     onChange,
     radioButtonType = 'large',
     subButtonLabel,
-    id = buttonLabel,
+    id = typeof buttonLabel === 'string'
+      ? buttonLabel
+      : `RadioButtonId_${buttonValue}`,
+    desktopRadiusType = 'rounded',
     iconName,
     maxLines = null,
   } = props
@@ -52,6 +56,7 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
   const AVAILABLE_BUTTON_STYLE = css`
     background: ${COLORS.blue35};
 
+    &:hover,
     &:active {
       background-color: ${COLORS.blue40};
     }
@@ -61,8 +66,9 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
     background: ${COLORS.blue50};
     color: ${COLORS.white};
 
+    &:hover,
     &:active {
-      background-color: ${COLORS.blue60};
+      background-color: ${COLORS.blue55};
     }
   `
 
@@ -73,7 +79,11 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
   `
 
   const SettingButtonLabel = styled.label`
-      border-radius: ${BORDERS.borderRadius40};
+      border-radius: ${
+        desktopRadiusType === 'rounded'
+          ? BORDERS.borderRadius40
+          : BORDERS.borderRadius8
+      };
       cursor: pointer;
       padding: 14px ${SPACING.spacing16};
       width: 100%;
@@ -123,12 +133,16 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
               data-testid={`icon_${iconName}`}
             />
           ) : null}
-          <StyledText
-            oddStyle={isLarge ? 'level4HeaderSemiBold' : 'bodyTextRegular'}
-            desktopStyle="bodyDefaultRegular"
-          >
-            {buttonLabel}
-          </StyledText>
+          {typeof buttonLabel === 'string' ? (
+            <StyledText
+              oddStyle={isLarge ? 'level4HeaderSemiBold' : 'bodyTextRegular'}
+              desktopStyle="bodyDefaultRegular"
+            >
+              {buttonLabel}
+            </StyledText>
+          ) : (
+            buttonLabel
+          )}
         </Flex>
         {subButtonLabel != null ? (
           <StyledText

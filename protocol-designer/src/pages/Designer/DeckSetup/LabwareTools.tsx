@@ -283,7 +283,11 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
                             buttonValue={labwareURI}
                             onChange={e => {
                               e.stopPropagation()
-                              setSelectedLabwareDefURI(labwareURI)
+                              setSelectedLabwareDefURI(
+                                labwareURI === selecteLabwareDefURI
+                                  ? null
+                                  : labwareURI
+                              )
                             }}
                             isSelected={labwareURI === selecteLabwareDefURI}
                           />
