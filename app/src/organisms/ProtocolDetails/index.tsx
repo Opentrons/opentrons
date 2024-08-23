@@ -136,7 +136,9 @@ function MetadataDetails({
         flexDirection={DIRECTION_COLUMN}
         data-testid="ProtocolDetails_description"
       >
-        <LegacyStyledText as="p">{description}</LegacyStyledText>
+        <LegacyStyledText as="p" overflowWrap={OVERFLOW_WRAP_ANYWHERE}>
+          {description}
+        </LegacyStyledText>
         {filteredMetaData.map((item, index) => {
           return (
             <React.Fragment key={index}>
