@@ -309,9 +309,9 @@ export function ProtocolRunHeader({
       // TODO(jh, 08-15-24): The enteredER condition is a hack, because errorCommands are only returned when a run is current.
       // Ideally the run should not need to be current to view errorCommands.
 
-      // Close the run if no tips are attached after running tip check at least once.
+      // Close the run if no tips are attached after running tip check at least once. Post-run tip checks only occur on the Flex.
       // This marks the robot as "not busy" as soon as a run is cancelled if drop tip CTAs are unnecessary.
-      if (initialPipettesWithTipsCount === 0 && !enteredER) {
+      if ((initialPipettesWithTipsCount === 0 || !isFlex) && !enteredER) {
         closeCurrentRun({
           onSettled: () => {
             if (isQuickTransfer) {
