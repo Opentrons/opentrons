@@ -3,6 +3,7 @@ import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+
 import {
   ALIGN_CENTER,
   COLORS,
@@ -14,17 +15,10 @@ import {
 } from '@opentrons/components'
 import { getFileMetadata } from './file-data/selectors'
 import { actions as loadFileActions } from './load-file'
-import type { ThunkDispatch, RouteProps } from './types'
+import type { ThunkDispatch } from './types'
 
-export function NavigationBar({
-  routes,
-}: {
-  routes: RouteProps[]
-}): JSX.Element {
+export function NavigationBar(): JSX.Element {
   const { t } = useTranslation('shared')
-  const navRoutes = routes.filter(
-    (route: RouteProps) => route.navLinkTo !== '/createNew'
-  )
   const metadata = useSelector(getFileMetadata)
   const location = useLocation()
   const dispatch: ThunkDispatch<any> = useDispatch()
@@ -40,9 +34,6 @@ export function NavigationBar({
       navigate('/overview')
     }
   }, [metadata, navigate])
-
-  const isFilteredNavPaths =
-    location.pathname === '/createNew' || location.pathname === '/'
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
@@ -77,21 +68,6 @@ export function NavigationBar({
           </StyledLabel>
         </Flex>
       </Flex>
-      {/* TODO(ja, 8/12/24: delete later. Leaving access to other
-      routes at all times until we make breadcrumbs and protocol overview pg */}
-      {isFilteredNavPaths ? null : (
-        <Flex
-          backgroundColor={COLORS.blue20}
-          padding={`${SPACING.spacing12} ${SPACING.spacing40}`}
-          gridGap={SPACING.spacing40}
-        >
-          {navRoutes.map(({ name, navLinkTo }: RouteProps) => (
-            <NavbarLink key={name} to={navLinkTo}>
-              <StyledText desktopStyle="bodyDefaultRegular">{name}</StyledText>
-            </NavbarLink>
-          ))}
-        </Flex>
-      )}
     </Flex>
   )
 }
