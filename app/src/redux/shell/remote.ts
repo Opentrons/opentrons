@@ -57,7 +57,11 @@ export async function appShellRequestor<Data>(
       : data
   const configProxy = { ...config, data: formDataProxy }
 
-  return await remote.ipcRenderer.invoke('usb:request', configProxy)
+  const result = await remote.ipcRenderer.invoke('usb:request', configProxy)
+  if (result?.error != null) {
+    throw result.error
+  }
+  return result
 }
 
 interface CallbackStore {

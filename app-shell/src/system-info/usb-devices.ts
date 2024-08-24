@@ -133,10 +133,15 @@ function upstreamDeviceFromUsbDeviceWinAPI(
       const parsePoshJsonOutputToWmiObjectArray = (
         dump: string
       ): WmiObject[] => {
-        if (dump[0] === '[') {
-          return JSON.parse(dump) as WmiObject[]
-        } else {
-          return [JSON.parse(dump) as WmiObject]
+        try {
+          if (dump[0] === '[') {
+            return JSON.parse(dump) as WmiObject[]
+          } else {
+            return [JSON.parse(dump) as WmiObject]
+          }
+        } catch (e: any) {
+          log.error(`Failed to parse posh json output: ${dump}`)
+          throw e
         }
       }
       if (dump.stderr !== '') {

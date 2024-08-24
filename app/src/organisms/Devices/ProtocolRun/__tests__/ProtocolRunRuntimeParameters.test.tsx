@@ -8,7 +8,10 @@ import { i18n } from '../../../../i18n'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useRunStatus } from '../../../RunTimeControl/hooks'
 import { useNotifyRunQuery } from '../../../../resources/runs'
-import { mockSucceededRun } from '../../../RunTimeControl/__fixtures__'
+import {
+  mockSucceededRun,
+  mockIdleUnstartedRun,
+} from '../../../RunTimeControl/__fixtures__'
 import { ProtocolRunRuntimeParameters } from '../ProtocolRunRunTimeParameters'
 
 import type { UseQueryResult } from 'react-query'
@@ -128,6 +131,13 @@ describe('ProtocolRunRuntimeParameters', () => {
   })
 
   it('should render title, and banner when RunTimeParameters are not empty and all values are default', () => {
+    when(useNotifyRunQuery)
+      .calledWith(RUN_ID)
+      .thenReturn({
+        data: {
+          data: mockIdleUnstartedRun,
+        },
+      } as any)
     render(props)
     screen.getByText('Parameters')
     screen.getByText('Default values')
@@ -151,6 +161,13 @@ describe('ProtocolRunRuntimeParameters', () => {
         },
       ],
     } as CompletedProtocolAnalysis)
+    when(useNotifyRunQuery)
+      .calledWith(RUN_ID)
+      .thenReturn({
+        data: {
+          data: mockIdleUnstartedRun,
+        },
+      } as any)
     render(props)
     screen.getByText('Parameters')
     screen.getByText('Custom values')
@@ -158,6 +175,39 @@ describe('ProtocolRunRuntimeParameters', () => {
     screen.getByText('Cancel the run and restart setup to edit')
     screen.getByText('Name')
     screen.getByText('Value')
+  })
+
+  it('should render title, and banner when RunTimeParameters from view protocol run record overflow menu button', () => {
+    when(useNotifyRunQuery)
+      .calledWith(RUN_ID)
+      .thenReturn({
+        data: {
+          data: {
+            ...mockSucceededRun,
+            runTimeParameters: mockRunTimeParameterData,
+          },
+        },
+      } as any)
+    vi.mocked(useMostRecentCompletedAnalysis).mockReturnValue({
+      runTimeParameters: [
+        ...mockRunTimeParameterData,
+        {
+          displayName: 'Dry Run',
+          variableName: 'DRYRUN',
+          description: 'Is this a dry or wet run? Wet is true, dry is false',
+          type: 'bool',
+          default: false,
+          value: true,
+        },
+      ],
+    } as CompletedProtocolAnalysis)
+
+    vi.mocked(useRunStatus).mockReturnValue('succeeded')
+    render(props)
+    screen.getByText('Download files')
+    screen.getByText(
+      'All files associated with the protocol run are available on the robot detail screen.'
+    )
   })
 
   it('should render RunTimeParameters when RunTimeParameters are not empty', () => {
