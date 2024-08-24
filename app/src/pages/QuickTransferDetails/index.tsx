@@ -354,7 +354,7 @@ export function QuickTransferDetails(): JSX.Element | null {
       makeSnackbar(t('unpinned_transfer') as string)
     }
     dispatch(
-      updateConfigValue('protocols.pinnedTransferIds', pinnedTransferIds)
+      updateConfigValue('protocols.pinnedQuickTransferIds', pinnedTransferIds)
     )
   }
   const handleRunTransfer = (): void => {
