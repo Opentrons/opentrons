@@ -82,8 +82,6 @@ capacitive_output_file_heading = [
     "threshold(farads)",
 ]
 
-# FIXME we should organize all of these functions to use the sensor drivers.
-
 
 def _fix_pass_step_for_buffer(
     move_group: MoveGroupStep,
