@@ -2,7 +2,7 @@
   "adapter_compatible_lab": "Adapter compatible labware",
   "adapter": "Adapter",
   "add_fixture": "Add a fixture",
-  "add_hw": "Add hardware/labware",
+  "add_hw_lw": "Add hardware/labware",
   "add_labware": "Add labware",
   "add_liquid": "Add liquid",
   "add_module": "Add a module",

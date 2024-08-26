@@ -20,97 +20,96 @@ import type { CoordinateTuple, Dimensions } from '@opentrons/shared-data'
 import type { TerminalItemId } from '../../../steplist'
 
 interface DeckItemHoverProps {
-  slotPosition: CoordinateTuple | null
-  slotBoundingBox: Dimensions
-  slotId: string
   addEquipment: (slotId: string) => void
   hover: string | null
   setHover: React.Dispatch<React.SetStateAction<string | null>>
+  slotBoundingBox: Dimensions
+  slotId: string
+  slotPosition: CoordinateTuple | null
   selectedTerminalItemId?: TerminalItemId | null
 }
 
-export const DeckItemHover = (
-  props: DeckItemHoverProps
-): JSX.Element | null => {
+export function DeckItemHover(props: DeckItemHoverProps): JSX.Element | null {
   const {
-    slotBoundingBox,
-    slotPosition,
-    slotId,
-    selectedTerminalItemId,
     addEquipment,
     hover,
+    selectedTerminalItemId,
     setHover,
+    slotBoundingBox,
+    slotId,
+    slotPosition,
   } = props
   const { t } = useTranslation('starting_deck_state')
   const [showMenuList, setShowMenuList] = React.useState<boolean>(false)
 
-  if (selectedTerminalItemId !== START_TERMINAL_ITEM_ID || slotPosition == null)
+  if (
+    selectedTerminalItemId !== START_TERMINAL_ITEM_ID ||
+    slotPosition === null
+  )
     return null
 
   const hoverOpacity = hover != null && hover === slotId ? '1' : '0'
 
   return (
-    <>
-      <RobotCoordsForeignDiv
-        x={slotPosition[0]}
-        y={slotPosition[1]}
-        width={slotBoundingBox.xDimension}
-        height={slotBoundingBox.yDimension}
-        innerDivProps={{
-          style: {
-            opacity: hover != null && hover === slotId ? 1 : 0,
-            position: POSITION_ABSOLUTE,
-            top: 0,
-            right: 0,
-            bottom: 0,
-            left: 0,
-            transform: 'rotate(180deg) scaleX(-1)',
-            zIndex: 1,
-            backgroundColor: `${COLORS.black90}cc`,
-            display: DISPLAY_FLEX,
-            alignItems: ALIGN_CENTER,
-            color: COLORS.white,
-            fontSize: PRODUCT.TYPOGRAPHY.fontSizeBodyDefaultSemiBold,
-            borderRadius: BORDERS.borderRadius8,
-          },
-          onMouseEnter: () => {
-            setHover(slotId)
-          },
-          onMouseLeave: () => {
-            setHover(null)
-          },
-          onClick: () => {
-            setShowMenuList(true)
-          },
-        }}
+    <RobotCoordsForeignDiv
+      x={slotPosition[0]}
+      y={slotPosition[1]}
+      width={slotBoundingBox.xDimension}
+      height={slotBoundingBox.yDimension}
+      innerDivProps={{
+        style: {
+          opacity: hoverOpacity,
+          position: POSITION_ABSOLUTE,
+          top: 0,
+          right: 0,
+          bottom: 0,
+          left: 0,
+          transform: 'rotate(180deg) scaleX(-1)',
+          zIndex: 1,
+          backgroundColor: `${COLORS.black90}cc`,
+          display: DISPLAY_FLEX,
+          alignItems: ALIGN_CENTER,
+          color: COLORS.white,
+          fontSize: PRODUCT.TYPOGRAPHY.fontSizeBodyDefaultSemiBold,
+          borderRadius: BORDERS.borderRadius8,
+        },
+        onMouseEnter: () => {
+          setHover(slotId)
+        },
+        onMouseLeave: () => {
+          setHover(null)
+        },
+        onClick: () => {
+          setShowMenuList(true)
+        },
+      }}
+    >
+      <Flex
+        css={css`
+          justify-content: ${JUSTIFY_CENTER};
+          width: 100%;
+          opacity: ${hoverOpacity};
+        `}
       >
-        <Flex
-          css={css`
-            justify-content: ${JUSTIFY_CENTER};
-            width: 100%;
-            opacity: ${hoverOpacity};
-          `}
+        <a
+          onClick={() => {
+            setShowMenuList(true)
+          }}
         >
-          <a
-            onClick={() => {
-              setShowMenuList(true)
-            }}
-          >
-            <StyledText desktopStyle="bodyDefaultSemiBold">
-              {slotId === 'offDeck' ? t('edit_labware') : t('edit_slot')}
-            </StyledText>
-          </a>
-        </Flex>
-        {showMenuList && (
-          <SlotOverflowMenu
-            slot={slotId}
-            addEquipment={addEquipment}
-            setShowMenuList={setShowMenuList}
-            xSlotPosition={slotPosition[0]}
-            ySlotPosition={slotPosition[1]}
-          />
-        )}
-      </RobotCoordsForeignDiv>
-    </>
+          <StyledText desktopStyle="bodyDefaultSemiBold">
+            {slotId === 'offDeck' ? t('edit_labware') : t('edit_slot')}
+          </StyledText>
+        </a>
+      </Flex>
+      {showMenuList ? (
+        <SlotOverflowMenu
+          slot={slotId}
+          addEquipment={addEquipment}
+          setShowMenuList={setShowMenuList}
+          xSlotPosition={slotPosition[0]}
+          ySlotPosition={slotPosition[1]}
+        />
+      ) : null}
+    </RobotCoordsForeignDiv>
   )
 }

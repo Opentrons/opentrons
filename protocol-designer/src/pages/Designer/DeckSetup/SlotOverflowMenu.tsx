@@ -121,7 +121,7 @@ export function SlotOverflowMenu(
           }}
         >
           <StyledText desktopStyle="bodyDefaultRegular">
-            {t('add_hw')}
+            {t('add_hw_lw')}
           </StyledText>
         </MenuButton>
         <MenuButton
