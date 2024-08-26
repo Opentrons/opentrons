@@ -40,7 +40,11 @@ export function WizardBody(props: WizardBodyProps): JSX.Element {
   const { t } = useTranslation('shared')
 
   return (
-    <Flex padding={SPACING.spacing16} gridGap={SPACING.spacing16}>
+    <Flex
+      padding={SPACING.spacing16}
+      gridGap={SPACING.spacing16}
+      height="calc(100vh - 48px)"
+    >
       <Flex
         width="60%"
         padding={SPACING.spacing80}

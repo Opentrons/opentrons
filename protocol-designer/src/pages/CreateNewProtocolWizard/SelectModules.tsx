@@ -64,7 +64,6 @@ export function SelectModules(props: WizardTileProps): JSX.Element | null {
     robotType === FLEX_ROBOT_TYPE
       ? FLEX_SUPPORTED_MODULE_MODELS
       : OT2_SUPPORTED_MODULE_MODELS
-
   const filteredSupportedModules = supportedModules.filter(
     moduleModel =>
       !(
@@ -102,7 +101,6 @@ export function SelectModules(props: WizardTileProps): JSX.Element | null {
       }
     })
   }
-
   return (
     <WizardBody
       stepNumber={robotType === FLEX_ROBOT_TYPE ? 4 : 3}
@@ -131,28 +129,32 @@ export function SelectModules(props: WizardTileProps): JSX.Element | null {
                   ? module
                   : module !== ABSORBANCE_READER_V1
               )
-              .map(moduleModel => (
-                <EmptySelectorButton
-                  key={moduleModel}
-                  textAlignment={TYPOGRAPHY.textAlignLeft}
-                  size="small"
-                  iconName="plus"
-                  text={getModuleDisplayName(moduleModel)}
-                  onClick={() => {
-                    setValue('modules', {
-                      ...modules,
-                      [uuid()]: {
-                        model: moduleModel,
-                        type: getModuleType(moduleModel),
-                        slot:
-                          robotType === FLEX_ROBOT_TYPE
-                            ? DEFAULT_SLOT_MAP_FLEX[moduleModel]
-                            : DEFAULT_SLOT_MAP_OT2[getModuleType(moduleModel)],
-                      },
-                    })
-                  }}
-                />
-              ))}
+              .map(moduleModel => {
+                return (
+                  <EmptySelectorButton
+                    key={moduleModel}
+                    textAlignment={TYPOGRAPHY.textAlignLeft}
+                    size="small"
+                    iconName="plus"
+                    text={getModuleDisplayName(moduleModel)}
+                    onClick={() => {
+                      setValue('modules', {
+                        ...modules,
+                        [uuid()]: {
+                          model: moduleModel,
+                          type: getModuleType(moduleModel),
+                          slot:
+                            robotType === FLEX_ROBOT_TYPE
+                              ? DEFAULT_SLOT_MAP_FLEX[moduleModel]
+                              : DEFAULT_SLOT_MAP_OT2[
+                                  getModuleType(moduleModel)
+                                ],
+                        },
+                      })
+                    }}
+                  />
+                )
+              })}
           </Flex>
           {modules != null &&
           Object.keys(modules).length > 0 &&

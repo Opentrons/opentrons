@@ -44,7 +44,7 @@ export function Landing(): JSX.Element {
       flexDirection={DIRECTION_COLUMN}
       alignItems={ALIGN_CENTER}
       paddingTop="14.875rem"
-      height="100vh"
+      height="calc(100vh - 48px)"
       width="100%"
     >
       <img
