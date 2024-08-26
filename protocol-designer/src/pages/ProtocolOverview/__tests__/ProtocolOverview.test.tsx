@@ -89,4 +89,11 @@ describe('ProtocolOverview', () => {
     fireEvent.click(screen.getByTestId('toDeckSetup'))
     expect(mockNavigate).toHaveBeenCalled()
   })
+
+  it('navigates to starting deck state', () => {
+    render()
+    const button = screen.getByRole('button', { name: 'Edit protocol' })
+    fireEvent.click(button)
+    expect(mockNavigate).toHaveBeenCalledWith('/startingDeckState')
+  })
 })
