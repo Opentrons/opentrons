@@ -157,14 +157,6 @@ class OverpressureError(ErrorOccurrence):
     errorInfo: ErrorLocationInfo
 
 
-@dataclass(frozen=True)
-class OverpressureErrorInternalData:
-    """Internal-to-ProtocolEngine data about an OverpressureError."""
-
-    position: DeckPoint
-    """Same meaning as DestinationPositionResult.position."""
-
-
 class LiquidNotFoundError(ErrorOccurrence):
     """Returned when no liquid is detected during the liquid probe process/move.
 

@@ -18,10 +18,7 @@ from opentrons.protocol_engine.commands.dispense import (
     DispenseImplementation,
 )
 from opentrons.protocol_engine.resources.model_utils import ModelUtils
-from opentrons.protocol_engine.commands.pipetting_common import (
-    OverpressureError,
-    OverpressureErrorInternalData,
-)
+from opentrons.protocol_engine.commands.pipetting_common import OverpressureError
 
 
 @pytest.fixture

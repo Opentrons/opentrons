@@ -13,8 +13,6 @@ from opentrons.protocol_engine.commands.command import DefinedErrorData
 from opentrons.protocol_engine.commands.pipetting_common import (
     LiquidNotFoundError,
     LiquidNotFoundErrorInternalData,
-    OverpressureError,
-    OverpressureErrorInternalData,
 )
 from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
 from opentrons.protocol_engine.types import (
@@ -921,64 +919,6 @@ def test_add_pipette_config(
                 destination=DeckPoint(x=11, y=22, z=33),
             ),
             private_result=None,
-        ),
-        FailCommandAction(
-            running_command=cmd.AspirateInPlace(
-                params=cmd.AspirateInPlaceParams(
-                    pipetteId="pipette-id",
-                    volume=125,
-                    flowRate=1.23,
-                ),
-                id="command-id",
-                key="command-key",
-                createdAt=datetime.now(),
-                status=cmd.CommandStatus.RUNNING,
-            ),
-            error=DefinedErrorData(
-                public=OverpressureError(
-                    id="error-id",
-                    detail="error-detail",
-                    createdAt=datetime.now(),
-                    errorInfo={"retryLocation": (11, 22, 33)},
-                ),
-                private=OverpressureErrorInternalData(
-                    position=DeckPoint(x=11, y=22, z=33)
-                ),
-            ),
-            command_id="command-id",
-            error_id="error-id",
-            failed_at=datetime.now(),
-            notes=[],
-            type=ErrorRecoveryType.WAIT_FOR_RECOVERY,
-        ),
-        FailCommandAction(
-            running_command=cmd.DispenseInPlace(
-                params=cmd.DispenseInPlaceParams(
-                    pipetteId="pipette-id",
-                    volume=125,
-                    flowRate=1.23,
-                ),
-                id="command-id",
-                key="command-key",
-                createdAt=datetime.now(),
-                status=cmd.CommandStatus.RUNNING,
-            ),
-            error=DefinedErrorData(
-                public=OverpressureError(
-                    id="error-id",
-                    detail="error-detail",
-                    createdAt=datetime.now(),
-                    errorInfo={"retryLocation": (11, 22, 33)},
-                ),
-                private=OverpressureErrorInternalData(
-                    position=DeckPoint(x=11, y=22, z=33)
-                ),
-            ),
-            command_id="command-id",
-            error_id="error-id",
-            failed_at=datetime.now(),
-            notes=[],
-            type=ErrorRecoveryType.WAIT_FOR_RECOVERY,
         ),
     ),
 )

@@ -10,7 +10,6 @@ from opentrons.util.get_union_elements import get_union_elements
 from .command import DefinedErrorData
 from .pipetting_common import (
     OverpressureError,
-    OverpressureErrorInternalData,
     LiquidNotFoundError,
     LiquidNotFoundErrorInternalData,
 )
@@ -701,7 +700,7 @@ CommandPrivateResult = Union[
 # All `DefinedErrorData`s that implementations will actually return in practice.
 CommandDefinedErrorData = Union[
     DefinedErrorData[TipPhysicallyMissingError, None],
-    DefinedErrorData[OverpressureError, OverpressureErrorInternalData],
+    DefinedErrorData[OverpressureError, None],
     DefinedErrorData[LiquidNotFoundError, LiquidNotFoundErrorInternalData],
 ]
 
