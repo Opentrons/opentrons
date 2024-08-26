@@ -121,7 +121,7 @@ export function ProtocolAnalysisFailure(
 }
 
 const SCROLL_LONG = css`
-  overflow: scroll;
+  overflow: auto;
   width: inherit;
   max-height: 11.75rem;
 `
