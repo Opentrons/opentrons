@@ -109,15 +109,15 @@ class MaintenanceRunDataManager:
             notify_publishers=notify_publishers,
         )
 
-        await self._maintenance_runs_publisher.publish_current_maintenance_run_async()
-
         maintenance_run_data = _build_run(
             run_id=run_id,
             created_at=created_at,
             state_summary=state_summary,
         )
 
-        await self._maintenance_runs_publisher.publish_current_maintenance_run_async()
+        await self._maintenance_runs_publisher.start_publishing_for_maintenance_run(
+            run_id=run_id, get_state_summary=self._get_state_summary
+        )
 
         return maintenance_run_data
 
