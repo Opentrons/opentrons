@@ -183,8 +183,8 @@ def addressable_area_store(
             "models": ["OT-3 Standard"],
             "extents": [477.2, 493.8, 0.0],
             "paddingOffsets": {
-                "rear": -181.42,
-                "front": 55.8,
+                "rear": -177.42,
+                "front": 51.8,
                 "leftSide": 31.88,
                 "rightSide": -80.32,
             },
