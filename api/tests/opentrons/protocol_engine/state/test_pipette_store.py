@@ -6,6 +6,7 @@ from typing import Optional, Union
 from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons_shared_data.pipette import pipette_definition
 
+from opentrons.protocol_engine.state import update_types
 from opentrons.types import DeckSlotName, MountType, Point
 from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.commands.command import DefinedErrorData
@@ -17,6 +18,7 @@ from opentrons.protocol_engine.commands.pipetting_common import (
 )
 from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
 from opentrons.protocol_engine.types import (
+    CurrentAddressableArea,
     DeckPoint,
     DeckSlotLocation,
     LoadedPipette,
@@ -52,6 +54,7 @@ from .command_fixtures import (
     create_pick_up_tip_command,
     create_drop_tip_command,
     create_drop_tip_in_place_command,
+    create_succeeded_command,
     create_unsafe_drop_tip_in_place_command,
     create_touch_tip_command,
     create_move_to_well_command,
@@ -87,6 +90,85 @@ def test_sets_initial_state(subject: PipetteStore) -> None:
         flow_rates_by_id={},
         nozzle_configuration_by_id={},
         liquid_presence_detection_by_id={},
+    )
+
+
+def test_location_state_update(subject: PipetteStore) -> None:
+    """It should update pipette locations."""
+    load_command = create_load_pipette_command(
+        pipette_id="pipette-id",
+        pipette_name=PipetteNameType.P300_SINGLE,
+        mount=MountType.RIGHT,
+    )
+    subject.handle_action(
+        SucceedCommandAction(command=load_command, private_result=None)
+    )
+
+    # Update the location to a well:
+    dummy_command = create_succeeded_command()
+    subject.handle_action(
+        SucceedCommandAction(
+            command=dummy_command,
+            private_result=None,
+            state_update=update_types.StateUpdate(
+                pipette_location=update_types.PipetteLocationUpdate(
+                    pipette_id="pipette-id",
+                    new_location=update_types.Well(
+                        labware_id="come on barbie",
+                        well_name="let's go party",
+                    ),
+                    new_deck_point=DeckPoint(x=111, y=222, z=333),
+                )
+            ),
+        )
+    )
+    assert subject.state.current_location == CurrentWell(
+        pipette_id="pipette-id", labware_id="come on barbie", well_name="let's go party"
+    )
+    assert subject.state.current_deck_point == CurrentDeckPoint(
+        mount=MountType.RIGHT, deck_point=DeckPoint(x=111, y=222, z=333)
+    )
+
+    # Update the location to an addressable area:
+    subject.handle_action(
+        SucceedCommandAction(
+            command=dummy_command,
+            private_result=None,
+            state_update=update_types.StateUpdate(
+                pipette_location=update_types.PipetteLocationUpdate(
+                    pipette_id="pipette-id",
+                    new_location=update_types.AddressableArea(
+                        addressable_area_name="na na na na na"
+                    ),
+                    new_deck_point=DeckPoint(x=333, y=444, z=555),
+                )
+            ),
+        )
+    )
+    assert subject.state.current_location == CurrentAddressableArea(
+        pipette_id="pipette-id", addressable_area_name="na na na na na"
+    )
+    assert subject.state.current_deck_point == CurrentDeckPoint(
+        mount=MountType.RIGHT, deck_point=DeckPoint(x=333, y=444, z=555)
+    )
+
+    # Clear the logical location:
+    subject.handle_action(
+        SucceedCommandAction(
+            command=dummy_command,
+            private_result=None,
+            state_update=update_types.StateUpdate(
+                pipette_location=update_types.PipetteLocationUpdate(
+                    pipette_id="pipette-id",
+                    new_location=None,
+                    new_deck_point=update_types.NO_CHANGE,
+                )
+            ),
+        )
+    )
+    assert subject.state.current_location is None
+    assert subject.state.current_deck_point == CurrentDeckPoint(
+        mount=MountType.RIGHT, deck_point=DeckPoint(x=333, y=444, z=555)
     )
 
 
