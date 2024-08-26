@@ -33,7 +33,7 @@ export function EmptySelectorButton(
     iconName,
     size = 'large',
     textAlignment,
-    disabled,
+    disabled = false,
   } = props
   const buttonSizing = size === 'large' ? '100%' : FLEX_MAX_CONTENT
 

@@ -16,6 +16,8 @@ import { HandleEnter } from './HandleEnter'
 
 import type { WizardTileProps } from './types'
 
+const FLEX_METADATA_WIZARD_STEP = 6
+const OT2_METADATA_WIZARD_STEP = 4
 export function AddMetadata(props: WizardTileProps): JSX.Element | null {
   const { goBack, proceed, watch, register } = props
   const { t } = useTranslation(['create_new_protocol', 'shared'])
@@ -25,7 +27,11 @@ export function AddMetadata(props: WizardTileProps): JSX.Element | null {
   return (
     <HandleEnter onEnter={proceed}>
       <WizardBody
-        stepNumber={robotType === FLEX_ROBOT_TYPE ? 6 : 4}
+        stepNumber={
+          robotType === FLEX_ROBOT_TYPE
+            ? FLEX_METADATA_WIZARD_STEP
+            : OT2_METADATA_WIZARD_STEP
+        }
         header={t('tell_us')}
         disabled={false}
         goBack={() => {

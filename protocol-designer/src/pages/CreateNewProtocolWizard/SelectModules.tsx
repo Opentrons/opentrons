@@ -100,7 +100,6 @@ export function SelectModules(props: WizardTileProps): JSX.Element | null {
       <WizardBody
         stepNumber={robotType === FLEX_ROBOT_TYPE ? 4 : 3}
         header={t('add_modules')}
-        disabled={false}
         goBack={() => {
           goBack(1)
           setValue('modules', null)
@@ -144,7 +143,7 @@ export function SelectModules(props: WizardTileProps): JSX.Element | null {
                     text={getModuleDisplayName(moduleModel)}
                     onClick={() => {
                       if (hasNoAvailableSlots) {
-                        makeSnackbar(t('slot_limit_reached') as string)
+                        makeSnackbar(t('slots_limit_reached') as string)
                       } else {
                         setValue('modules', {
                           ...modules,

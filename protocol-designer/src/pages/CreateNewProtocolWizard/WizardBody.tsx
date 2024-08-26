@@ -21,7 +21,7 @@ interface WizardBodyProps {
   header: string
   children: React.ReactNode
   proceed: () => void
-  disabled: boolean
+  disabled?: boolean
   goBack?: () => void
   subHeader?: string
   imgSrc?: string
@@ -34,7 +34,7 @@ export function WizardBody(props: WizardBodyProps): JSX.Element {
     goBack,
     subHeader,
     proceed,
-    disabled,
+    disabled = false,
     imgSrc,
   } = props
   const { t } = useTranslation('shared')

@@ -30,7 +30,7 @@
   "show_tips": "Show incompatible tips",
   "stagingArea": "Staging area",
   "swap": "Swap pipettes",
-  "slot_limit_reached": "Slots limit reached",
+  "slots_limit_reached": "Slots limit reached",
   "trash_required": "A trash entity is required",
   "tell_us": "Tell us about your protocol",
   "up_to_3_tipracks": "Up to 3 tip rack types are allowed per pipette",

@@ -25,6 +25,7 @@ import { HandleEnter } from './HandleEnter'
 import type { DropdownBorder } from '@opentrons/components'
 import type { AdditionalEquipment, WizardTileProps } from './types'
 
+const MAX_SLOTS = 4
 const ADDITIONAL_EQUIPMENTS: AdditionalEquipment[] = [
   'wasteChute',
   'trashBin',
@@ -96,7 +97,7 @@ export function SelectFixtures(props: WizardTileProps): JSX.Element | null {
                 text={t(`${equipment}`)}
                 onClick={() => {
                   if (numSlotsAvailable === 0) {
-                    makeSnackbar(t('slot_limit_reached') as string)
+                    makeSnackbar(t('slots_limit_reached') as string)
                   } else {
                     setValue('additionalEquipment', [
                       ...additionalEquipment,
@@ -122,27 +123,30 @@ export function SelectFixtures(props: WizardTileProps): JSX.Element | null {
 
                 const dropdownProps = {
                   currentOption: {
-                    name: `${numStagingAreas}`,
-                    value: `${numStagingAreas}`,
+                    name: numStagingAreas.toString(),
+                    value: numStagingAreas.toString(),
                   },
                   dropdownType: 'neutral' as DropdownBorder,
                   filterOptions: getNumOptions(
-                    numSlotsAvailable >= 4
-                      ? 4
+                    numSlotsAvailable >= MAX_SLOTS
+                      ? MAX_SLOTS
                       : numSlotsAvailable + numStagingAreas - (hasTC ? 1 : 0)
                   ),
                   onClick: (value: string) => {
-                    const num = parseInt(value)
+                    const inputNum = parseInt(value)
                     let updatedStagingAreas = [...additionalEquipment]
 
-                    if (num > numStagingAreas) {
-                      const difference = num - numStagingAreas
+                    if (inputNum > numStagingAreas) {
+                      const difference = inputNum - numStagingAreas
                       updatedStagingAreas = [
                         ...updatedStagingAreas,
                         ...Array(difference).fill(ae),
                       ]
                     } else {
-                      updatedStagingAreas = updatedStagingAreas.slice(0, num)
+                      updatedStagingAreas = updatedStagingAreas.slice(
+                        0,
+                        inputNum
+                      )
                     }
 
                     setValue('additionalEquipment', updatedStagingAreas)

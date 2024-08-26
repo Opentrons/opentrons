@@ -65,7 +65,7 @@ export const getNumSlotsAvailable = (
   if (hasGripper) {
     filteredAdditionalEquipmentLength = filteredAdditionalEquipmentLength - 1
   }
-  if (numStagingAreas === 4 && hasWasteChute) {
+  if (numStagingAreas === MIDDLE_SLOT_NUM && hasWasteChute) {
     filteredAdditionalEquipmentLength = filteredAdditionalEquipmentLength - 1
   }
   return (
