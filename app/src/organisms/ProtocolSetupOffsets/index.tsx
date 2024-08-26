@@ -92,12 +92,13 @@ export function ProtocolSetupOffsets({
               />
             ) : (
               <SmallButton
-                buttonText={t('confirm_placements')}
+                buttonText={t('confirm_offsets')}
                 disabled={nonIdentityOffsets.length === 0}
                 onClick={() => {
                   setIsConfirmed(true)
                   setSetupScreen('prepare to run')
                 }}
+                buttonCategory="rounded"
               />
             )}
           </Flex>

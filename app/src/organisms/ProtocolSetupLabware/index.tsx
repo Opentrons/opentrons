@@ -187,6 +187,7 @@ export function ProtocolSetupLabware({
               setIsConfirmed(true)
               setSetupScreen('prepare to run')
             }}
+            buttonCategory="rounded"
           />
         )}
       </Flex>
