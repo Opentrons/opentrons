@@ -7,7 +7,6 @@ import { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
-  ALIGN_STRETCH,
   Btn,
   DIRECTION_COLUMN,
   Flex,
@@ -68,7 +67,6 @@ export function ProtocolOverview(): JSX.Element {
       <Flex
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
-        // alignSelf={ALIGN_STRETCH}
         gridGap={SPACING.spacing60}
       >
         <Flex flex="1">
@@ -128,8 +126,7 @@ export function ProtocolOverview(): JSX.Element {
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
               {metaDataInfo.map(info => {
                 const [title, value] = Object.entries(info)[0]
-                console.log('title', title)
-                console.log('value', value)
+
                 return (
                   <ListItem type="noActive" key={`ProtocolOverview_${title}`}>
                     <ListItemDescriptor
