@@ -7,12 +7,14 @@ import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../assets/localization'
 import { getFileMetadata, getRobotType } from '../../../file-data/selectors'
 import { getInitialDeckSetup } from '../../../step-forms/selectors'
+import { useBlockingHint } from '../../../components/Hints/useBlockingHint'
 import { ProtocolOverview } from '../index'
 
 import type { NavigateFunction } from 'react-router-dom'
 
 vi.mock('../../../step-forms/selectors')
 vi.mock('../../../file-data/selectors')
+vi.mock('../../../components/Hints/useBlockingHint')
 
 const mockNavigate = vi.fn()
 
@@ -44,6 +46,7 @@ describe('ProtocolOverview', () => {
       author: 'mockAuthor',
       description: 'mockDescription',
     })
+    vi.mocked(useBlockingHint).mockReturnValue(null)
   })
   it('renders each section with text', () => {
     render()
@@ -96,4 +99,14 @@ describe('ProtocolOverview', () => {
     fireEvent.click(button)
     expect(mockNavigate).toHaveBeenCalledWith('/startingDeckState')
   })
+
+  it('renders the file sidebar and exports with blocking hint for exporting', () => {
+    vi.mocked(useBlockingHint).mockReturnValue(<div>mock blocking hint</div>)
+    render()
+    fireEvent.click(screen.getByRole('button', { name: 'Export protocol' }))
+    expect(vi.mocked(useBlockingHint)).toHaveBeenCalled()
+    screen.getByText('mock blocking hint')
+  })
+
+  it.todo('warning modal tests')
 })
