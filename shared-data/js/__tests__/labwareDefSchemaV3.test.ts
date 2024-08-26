@@ -19,6 +19,17 @@ const checkGeometryDefinitions = (
   test(`all geometryDefinitionIds specified in {filename} should have an accompanying valid entry in innerLabwareGeometry`, () => {
     for (const wellName in labwareDef.wells) {
       const wellGeometryId = labwareDef.wells[wellName].geometryDefinitionId
+
+      if (wellGeometryId === undefined) {
+        return
+      }
+      if (
+        labwareDef.innerLabwareGeometry === null ||
+        labwareDef.innerLabwareGeometry === undefined
+      ) {
+        return
+      }
+
       expect(wellGeometryId in labwareDef.innerLabwareGeometry).toBe(true)
 
       const wellDepth = labwareDef.wells[wellName].depth

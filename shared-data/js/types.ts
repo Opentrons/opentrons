@@ -156,6 +156,7 @@ export type LabwareWell = LabwareWellProperties & {
   x: number
   y: number
   z: number
+  geometryDefinitionId?: string
 }
 
 export interface CircularCrossSection {
