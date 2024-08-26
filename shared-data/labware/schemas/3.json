@@ -109,6 +109,7 @@
     },
     "BoundedSection": {
       "type": "object",
+      "required": ["geometry", "topHeight"],
       "properties": {
         "geometry": {
           "anyOf": [
@@ -134,10 +135,7 @@
           "description": "A list of all of the sections of the well that have a contiguous shape",
           "type": "array",
           "items": {
-            "type": "object",
-            "additionalProperties": {
-              "$ref": "#/definitions/BoundedSection"
-            }
+            "$ref": "#/definitions/BoundedSection"
           }
         },
         "bottomShape": {

@@ -14,8 +14,10 @@ def get_ot_defs() -> List[Tuple[str, int]]:
 
 
 # TODO(cm): add python validation once labware definitions are added
+"""
 def get_ot_defs_3() -> List[Tuple[str, int]]:
     def_files = (
             Path(__file__).parent / ".." / ".." / ".." / "labware" / "definitions" / "3"
     ).glob("**/*.json")
     return [(f.parent.name, int(f.stem)) for f in def_files]
+"""

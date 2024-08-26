@@ -1,10 +1,7 @@
 {
-  "ordering": [
-    ["A1"],
-    ["A2"]
-  ],
+  "ordering": [["A1"], ["A2"]],
   "schemaVersion": 3,
-  "version": 1,
+  "version": 3,
   "namespace": "fixture",
   "metadata": {
     "displayName": "12 Channel Trough",
@@ -52,10 +49,7 @@
   },
   "groups": [
     {
-      "wells": [
-        "A1",
-        "A2"
-      ],
+      "wells": ["A1", "A2"],
       "metadata": {
         "wellBottomShape": "v"
       }
