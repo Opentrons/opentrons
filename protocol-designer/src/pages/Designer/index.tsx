@@ -41,7 +41,7 @@ export function Designer(): JSX.Element {
   const navigate = useNavigate()
   const deckSetup = useSelector(getDeckSetupForActiveItem)
   const metadata = useSelector(getFileMetadata)
-  const [zoomIn, setZoomInOnSlot] = React.useState<OpenSlot | null>(null)
+  const [zoomInOnSlot, setZoomInOnSlot] = React.useState<OpenSlot | null>(null)
   const [tab, setTab] = React.useState<'startingDeck' | 'protocolSteps'>(
     'startingDeck'
   )
@@ -80,7 +80,7 @@ export function Designer(): JSX.Element {
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} padding={SPACING.spacing12}>
-        {zoomIn != null ? null : (
+        {zoomInOnSlot != null ? null : (
           <Tabs tabs={[startingDeckTab, protocolStepTab]} />
         )}
         <Flex flexDirection={DIRECTION_COLUMN}>
@@ -126,7 +126,7 @@ export function Designer(): JSX.Element {
         {tab === 'startingDeck' ? (
           <DeckSetupContainer
             setZoomInOnSlot={setZoomInOnSlot}
-            zoomIn={zoomIn}
+            zoomIn={zoomInOnSlot}
           />
         ) : (
           <div>TODO wire this up</div>

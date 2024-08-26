@@ -60,7 +60,7 @@ describe('Designer', () => {
     screen.getByText('Protocol starting deck')
     screen.getByText('Liquids')
     fireEvent.click(screen.getByRole('button', { name: 'Done' }))
-    expect(mockNavigate).toHaveBeenCalled()
+    expect(mockNavigate).toHaveBeenCalledWith('/overview')
   })
   it.todo('renders the liquids button overflow menu')
   it.todo('renders the protocol steps page')
