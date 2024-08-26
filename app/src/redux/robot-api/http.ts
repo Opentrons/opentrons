@@ -79,7 +79,7 @@ export function fetchRobotApi(
           body: result?.response?.data,
           // FIXME(sf) this doesn't seem right, but also the type interface isn't written to allow for request
           // failures that don't come from valid connections
-          status: result?.response?.status ?? -1,
+          status: result?.response?.status ?? 444,
           // appShellRequestor eventually calls axios.request, which doesn't provide an ok boolean in the response
           ok: result.isError
             ? false
