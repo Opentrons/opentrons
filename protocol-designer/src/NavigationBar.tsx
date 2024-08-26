@@ -16,7 +16,7 @@ import {
 import { actions as loadFileActions } from './load-file'
 import type { ThunkDispatch } from './types'
 
-export function NavigationBar(): JSX.Element {
+export function NavigationBar(): JSX.Element | null {
   const { t } = useTranslation('shared')
   const location = useLocation()
   const dispatch: ThunkDispatch<any> = useDispatch()
@@ -26,7 +26,7 @@ export function NavigationBar(): JSX.Element {
     dispatch(loadFileActions.loadProtocolFile(fileChangeEvent))
   }
 
-  return (
+  return location.pathname === '/designer' ? null : (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <Flex
         justifyContent={JUSTIFY_SPACE_BETWEEN}
