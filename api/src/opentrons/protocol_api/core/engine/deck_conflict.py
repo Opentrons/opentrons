@@ -416,6 +416,7 @@ def _is_within_pipette_extents(
     pipette_bounding_box_at_loc: Tuple[Point, Point, Point, Point],
 ) -> bool:
     """Whether a given point is within the extents of a configured pipette on the specified robot."""
+    channels = engine_state.pipettes.get_channels(pipette_id)
     robot_extents = engine_state.geometry.absolute_deck_extents
     (
         pip_back_left_bound,
@@ -434,19 +435,29 @@ def _is_within_pipette_extents(
     # D3: Back left nozzle is within the front and right-side padding limits
     # Thermocycler Column A2: Front right nozzle is within padding limits
 
+    if channels == 96:
+        return (
+            pip_front_right_bound.y
+            <= robot_extents.deck_extents.y + robot_extents.padding_rear
+            and pip_front_right_bound.x >= robot_extents.padding_left_side
+            and pip_back_right_bound.y >= robot_extents.padding_front
+            and pip_back_right_bound.x >= robot_extents.padding_left_side
+            and pip_front_left_bound.y
+            <= robot_extents.deck_extents.y + robot_extents.padding_rear
+            and pip_front_left_bound.x
+            <= robot_extents.deck_extents.x + robot_extents.padding_right_side
+            and pip_back_left_bound.y >= robot_extents.padding_front
+            and pip_back_left_bound.x
+            <= robot_extents.deck_extents.x + robot_extents.padding_right_side
+        )
+    # For 8ch pipettes we only check the rear and front extents
     return (
         pip_front_right_bound.y
         <= robot_extents.deck_extents.y + robot_extents.padding_rear
-        and pip_front_right_bound.x >= robot_extents.padding_left_side
         and pip_back_right_bound.y >= robot_extents.padding_front
-        and pip_back_right_bound.x >= robot_extents.padding_left_side
         and pip_front_left_bound.y
         <= robot_extents.deck_extents.y + robot_extents.padding_rear
-        and pip_front_left_bound.x
-        <= robot_extents.deck_extents.x + robot_extents.padding_right_side
         and pip_back_left_bound.y >= robot_extents.padding_front
-        and pip_back_left_bound.x
-        <= robot_extents.deck_extents.x + robot_extents.padding_right_side
     )
 
 
