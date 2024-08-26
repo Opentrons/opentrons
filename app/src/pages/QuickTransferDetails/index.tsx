@@ -403,7 +403,7 @@ export function QuickTransferDetails(): JSX.Element | null {
           isScrolled={isScrolled}
           isTransferFetching={isTransferFetching}
         />
-        <Flex flexDirection={DIRECTION_COLUMN}>
+        <Flex flexDirection={DIRECTION_COLUMN} paddingTop={SPACING.spacing6}>
           <TransferSectionTabs
             currentOption={currentOption}
             setCurrentOption={setCurrentOption}
