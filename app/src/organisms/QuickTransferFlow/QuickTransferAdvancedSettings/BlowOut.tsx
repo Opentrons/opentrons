@@ -196,6 +196,7 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
         >
           {blowOutLocationItems.map(blowOutLocationItem => (
             <RadioButton
+              key={blowOutLocationItem.description}
               isSelected={blowOutLocation === blowOutLocationItem.location}
               onChange={() => {
                 setBlowOutLocation(
