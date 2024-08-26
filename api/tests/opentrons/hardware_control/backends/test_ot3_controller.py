@@ -724,6 +724,7 @@ async def test_liquid_probe(
             plunger_speed=fake_liquid_settings.plunger_speed,
             threshold_pascals=fake_liquid_settings.sensor_threshold_pascals,
             plunger_impulse_time=fake_liquid_settings.plunger_impulse_time,
+            num_baseline_reads=fake_liquid_settings.samples_for_baselining,
             output_option=fake_liquid_settings.output_option,
         )
     except PipetteLiquidNotFoundError:
