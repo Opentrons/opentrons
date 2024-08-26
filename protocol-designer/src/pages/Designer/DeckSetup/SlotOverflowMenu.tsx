@@ -151,10 +151,12 @@ export function SlotOverflowMenu(
         <MenuButton
           disabled={labwareOnSlot == null && !isLabwareAnAdapter}
           onClick={() => {
-            if (labwareOnSlot != null) {
+            if (labwareOnSlot != null && !isLabwareAnAdapter) {
               dispatch(duplicateLabware(labwareOnSlot.id))
-              setShowMenuList(false)
+            } else if (nestedLabwareOnSlot != null) {
+              dispatch(duplicateLabware(nestedLabwareOnSlot.id))
             }
+            setShowMenuList(false)
           }}
         >
           <StyledText desktopStyle="bodyDefaultRegular">

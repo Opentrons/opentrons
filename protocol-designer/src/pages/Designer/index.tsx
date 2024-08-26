@@ -75,7 +75,7 @@ export function Designer(): JSX.Element {
         closeButton: true,
       })
     }
-  }, [hasHardware, metadata])
+  }, [])
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
