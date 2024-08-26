@@ -10,6 +10,7 @@
   "additional_off_deck_labware": "Additional Off-Deck Labware",
   "all_files_associated": "All files associated with the protocol run are available on the robot detail screen.",
   "applied_labware_offsets": "applied labware offsets",
+  "applied_labware_offset_data": "Applied labware offset data",
   "are_you_sure_you_want_to_proceed": "Are you sure you want to proceed to run?",
   "attach_gripper_failure_reason": "Attach the required gripper to continue",
   "attach_gripper": "attach gripper",
