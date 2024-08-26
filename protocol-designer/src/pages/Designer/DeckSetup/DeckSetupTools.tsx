@@ -2,8 +2,10 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import {
+  ALIGN_CENTER,
   DIRECTION_COLUMN,
   Flex,
+  ModuleIcon,
   RadioButton,
   SPACING,
   StyledText,
@@ -11,7 +13,7 @@ import {
   Toolbox,
 } from '@opentrons/components'
 import {
-  MAGNETIC_BLOCK_V1,
+  FLEX_ROBOT_TYPE,
   MODULE_MODELS,
   OT2_ROBOT_TYPE,
   getModuleDisplayName,
@@ -33,15 +35,10 @@ import {
   getEnableAbsorbanceReader,
   getEnableMoam,
 } from '../../../feature-flags/selectors'
+import { useKitchen } from '../../../organisms/Kitchen/hooks'
 import { createContainerAboveModule } from '../../../step-forms/actions/thunks'
-import {
-  FIXTURES,
-  MAX_MAGNETIC_BLOCKS,
-  MAX_MOAM_MODULES,
-  MOAM_MODELS,
-  MOAM_MODELS_WITH_FF,
-} from './constants'
-import { getModuleModelsBySlot } from './utils'
+import { FIXTURES, MOAM_MODELS, MOAM_MODELS_WITH_FF } from './constants'
+import { getModuleModelsBySlot, getOt2HeaterShakerDeckErrors } from './utils'
 import { LabwareTools } from './LabwareTools'
 
 import type { CutoutId, DeckSlotId, ModuleModel } from '@opentrons/shared-data'
@@ -58,6 +55,7 @@ interface DeckSetupToolsProps {
 export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element {
   const { slot, onCloseClick, cutoutId } = props
   const { t } = useTranslation(['starting_deck_state', 'shared'])
+  const { makeSnackbar } = useKitchen()
   const robotType = useSelector(getRobotType)
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const enableAbsorbanceReader = useSelector(getEnableAbsorbanceReader)
@@ -107,8 +105,11 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element {
     robotType,
     slot
   )
+
   const [tab, setTab] = React.useState<'hardware' | 'labware'>(
-    moduleModels.length === 0 ? 'labware' : 'hardware'
+    moduleModels.length === 0 || createdModuleForSlot != null
+      ? 'labware'
+      : 'hardware'
   )
 
   let fixtures: Fixture[] = []
@@ -260,28 +261,72 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element {
                 ).filter(
                   module => module.model === model && module.slot !== slot
                 )
+                const typeSomewhereOnDeck = Object.values(
+                  deckSetupModules
+                ).filter(
+                  module =>
+                    module.type === getModuleType(model) && module.slot !== slot
+                )
                 const moamModels = enableMoam
                   ? MOAM_MODELS
                   : MOAM_MODELS_WITH_FF
-                const maxMoamModel =
-                  model === MAGNETIC_BLOCK_V1
-                    ? MAX_MAGNETIC_BLOCKS
-                    : MAX_MOAM_MODULES
+
+                const ot2CollisionError = getOt2HeaterShakerDeckErrors({
+                  modules: deckSetupModules,
+                  selectedSlot: slot,
+                  selectedModel: model,
+                })
 
                 return (
                   <RadioButton
-                    disabled={
-                      (modelSomewhereOnDeck.length === 1 &&
-                        !moamModels.includes(model)) ||
-                      (moamModels.includes(model) &&
-                        modelSomewhereOnDeck.length === maxMoamModel)
+                    largeDesktopBorderRadius
+                    buttonLabel={
+                      <Flex
+                        gridGap={SPACING.spacing4}
+                        alignItems={ALIGN_CENTER}
+                      >
+                        <ModuleIcon
+                          size="1rem"
+                          moduleType={getModuleType(model)}
+                        />
+                        <StyledText desktopStyle="bodyDefaultRegular">
+                          {getModuleDisplayName(model)}
+                        </StyledText>
+                      </Flex>
                     }
-                    buttonLabel={getModuleDisplayName(model)}
                     key={`${model}_${slot}`}
                     buttonValue={model}
                     onChange={() => {
-                      setHardware(model)
-                      setSelectedLabwareDefURI(null)
+                      if (
+                        modelSomewhereOnDeck.length === 1 &&
+                        !moamModels.includes(model) &&
+                        robotType === FLEX_ROBOT_TYPE
+                      ) {
+                        makeSnackbar(
+                          t('one_item', {
+                            hardware: getModuleDisplayName(model),
+                          }) as string
+                        )
+                      } else if (
+                        typeSomewhereOnDeck.length > 0 &&
+                        robotType === OT2_ROBOT_TYPE
+                      ) {
+                        makeSnackbar(
+                          t('one_item', {
+                            hardware: t(
+                              `shared:${getModuleType(model).toLowerCase()}`
+                            ),
+                          }) as string
+                        )
+                      } else if (
+                        robotType === OT2_ROBOT_TYPE &&
+                        ot2CollisionError != null
+                      ) {
+                        makeSnackbar(t(`${ot2CollisionError}`) as string)
+                      } else {
+                        setHardware(model)
+                        setSelectedLabwareDefURI(null)
+                      }
                     }}
                     isSelected={model === selectedHardware}
                   />
@@ -301,14 +346,22 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element {
                 </Flex>
                 {fixtures.map(fixture => (
                   <RadioButton
-                    //    delete this when multiple trash bins are supported
-                    disabled={fixture === 'trashBin' && hasTrash}
+                    largeDesktopBorderRadius
                     buttonLabel={t(`shared:${fixture}`)}
                     key={`${fixture}_${slot}`}
                     buttonValue={fixture}
                     onChange={() => {
-                      setHardware(fixture)
-                      setSelectedLabwareDefURI(null)
+                      //    delete this when multiple trash bins are supported
+                      if (fixture === 'trashBin' && hasTrash) {
+                        makeSnackbar(
+                          t('one_item', {
+                            hardware: t('shared:trashBin'),
+                          }) as string
+                        )
+                      } else {
+                        setHardware(fixture)
+                        setSelectedLabwareDefURI(null)
+                      }
                     }}
                     isSelected={fixture === selectedHardware}
                   />
