@@ -29,8 +29,7 @@ const StyledLabel = styled.label`
   text-align: ${TYPOGRAPHY.textAlignCenter};
   background-color: ${COLORS.white};
 
-  &:hover,
-  &:focus-within {
+  &:hover {
     border: 2px dashed ${COLORS.blue50};
   }
 `
