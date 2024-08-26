@@ -21,7 +21,6 @@ import {
   MAGNETIC_BLOCK_TYPE,
   MAGNETIC_BLOCK_V1,
   TEMPERATURE_MODULE_TYPE,
-  THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
 import { uuid } from '../../utils'
 import {
