@@ -77,6 +77,11 @@ class _GripperMoveType(enum.Enum):
 class _AbsoluteRobotExtents:
     front_left: Dict[MountType, Point]
     back_right: Dict[MountType, Point]
+    deck_extents: Point
+    padding_rear: float
+    padding_front: float
+    padding_left_side: float
+    padding_right_side: float
 
 
 _LabwareLocation = TypeVar("_LabwareLocation", bound=LabwareLocation)
@@ -118,7 +123,13 @@ class GeometryView:
             MountType.RIGHT: self._addressable_areas.deck_extents + right_offset,
         }
         return _AbsoluteRobotExtents(
-            front_left=front_left_abs, back_right=back_right_abs
+            front_left=front_left_abs,
+            back_right=back_right_abs,
+            deck_extents=self._addressable_areas.deck_extents,
+            padding_rear=self._addressable_areas.padding_offsets["rear"],
+            padding_front=self._addressable_areas.padding_offsets["front"],
+            padding_left_side=self._addressable_areas.padding_offsets["left_side"],
+            padding_right_side=self._addressable_areas.padding_offsets["right_side"],
         )
 
     def get_labware_highest_z(self, labware_id: str) -> float:

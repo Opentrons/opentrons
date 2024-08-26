@@ -37,6 +37,29 @@
       "description": "The maximum addressable coordinates of the deck without instruments.",
       "$ref": "#/definitions/xyzArray"
     },
+    "paddingOffsets": {
+      "description": "The distance from a given edge of a deck extent by which the maximum amount of travel is limited.",
+      "type": "object",
+      "required": ["rear", "front", "leftSide", "rightSide"],
+      "properties": {
+        "rear": {
+          "description": "The padding distance from the rear edge of the deck extents which the front nozzles of a pipette must not exceed.",
+          "type": "number"
+        },
+        "front": {
+          "description": "The padding distance from the front edge of the deck extents which the rear nozzles of a pipette must not exceed.",
+          "type": "number"
+        },
+        "leftSide": {
+          "description": "The padding distance from the left edge of the deck extents which the right-most nozzles of a pipette must not exceed.",
+          "type": "number"
+        },
+        "rightSide": {
+          "description": "The padding distance from the right edge of the deck extents which the left-most nozzles of a pipette must not exceed.",
+          "type": "number"
+        }
+      }
+    },
     "mountOffsets": {
       "description": "The physical mount offsets from the center of the instrument carriage.",
       "type": "object",

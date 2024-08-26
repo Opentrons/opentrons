@@ -48,6 +48,12 @@ def subject(
             "robotType": "OT-2 Standard",
             "models": ["OT-2 Standard", "OT-2 Refresh"],
             "extents": [446.75, 347.5, 0.0],
+            "paddingOffsets": {
+                "rear": -35.91,
+                "front": 31.89,
+                "leftSide": 0,
+                "rightSide": 0,
+            },
             "mountOffsets": {"left": [-34.0, 0.0, 0.0], "right": [0.0, 0.0, 0.0]},
         },
         deck_fixed_labware=[],

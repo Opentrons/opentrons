@@ -416,23 +416,48 @@ def _is_within_pipette_extents(
     pipette_bounding_box_at_loc: Tuple[Point, Point, Point, Point],
 ) -> bool:
     """Whether a given point is within the extents of a configured pipette on the specified robot."""
-    mount = engine_state.pipettes.get_mount(pipette_id)
-    robot_extent_per_mount = engine_state.geometry.absolute_deck_extents
-    pip_back_left_bound, pip_front_right_bound, _, _ = pipette_bounding_box_at_loc
-    pipette_bounds_offsets = engine_state.pipettes.get_pipette_bounding_box(pipette_id)
-    from_back_right = (
-        robot_extent_per_mount.back_right[mount]
-        + pipette_bounds_offsets.back_right_corner
-    )
-    from_front_left = (
-        robot_extent_per_mount.front_left[mount]
-        + pipette_bounds_offsets.front_left_corner
-    )
+    channels = engine_state.pipettes.get_channels(pipette_id)
+    robot_extents = engine_state.geometry.absolute_deck_extents
+    (
+        pip_back_left_bound,
+        pip_front_right_bound,
+        pip_back_right_bound,
+        pip_front_left_bound,
+    ) = pipette_bounding_box_at_loc
+
+    # Given the padding values accounted for against the deck extents,
+    # a pipette is within extents when all of the following are true:
+
+    # Each corner slot full pickup case:
+    # A1: Front right nozzle is within the rear and left-side padding limits
+    # D1: Back right nozzle is within the front and left-side padding limits
+    # A3 Front left nozzle is within the rear and right-side padding limits
+    # D3: Back left nozzle is within the front and right-side padding limits
+    # Thermocycler Column A2: Front right nozzle is within padding limits
+
+    if channels == 96:
+        return (
+            pip_front_right_bound.y
+            <= robot_extents.deck_extents.y + robot_extents.padding_rear
+            and pip_front_right_bound.x >= robot_extents.padding_left_side
+            and pip_back_right_bound.y >= robot_extents.padding_front
+            and pip_back_right_bound.x >= robot_extents.padding_left_side
+            and pip_front_left_bound.y
+            <= robot_extents.deck_extents.y + robot_extents.padding_rear
+            and pip_front_left_bound.x
+            <= robot_extents.deck_extents.x + robot_extents.padding_right_side
+            and pip_back_left_bound.y >= robot_extents.padding_front
+            and pip_back_left_bound.x
+            <= robot_extents.deck_extents.x + robot_extents.padding_right_side
+        )
+    # For 8ch pipettes we only check the rear and front extents
     return (
-        from_back_right.x >= pip_back_left_bound.x >= from_front_left.x
-        and from_back_right.y >= pip_back_left_bound.y >= from_front_left.y
-        and from_back_right.x >= pip_front_right_bound.x >= from_front_left.x
-        and from_back_right.y >= pip_front_right_bound.y >= from_front_left.y
+        pip_front_right_bound.y
+        <= robot_extents.deck_extents.y + robot_extents.padding_rear
+        and pip_back_right_bound.y >= robot_extents.padding_front
+        and pip_front_left_bound.y
+        <= robot_extents.deck_extents.y + robot_extents.padding_rear
+        and pip_back_left_bound.y >= robot_extents.padding_front
     )
 
 
