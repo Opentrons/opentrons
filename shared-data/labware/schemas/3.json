@@ -67,6 +67,7 @@
     },
     "CircularCrossSection": {
       "type": "object",
+      "required": ["shape", "diameter"],
       "properties": {
         "shape": {
           "type": "string",
@@ -79,6 +80,7 @@
     },
     "RectangularCrossSection": {
       "type": "object",
+      "required": ["shape", "xDimension", "yDimension"],
       "properties": {
         "shape": {
           "type": "string",
@@ -94,6 +96,7 @@
     },
     "SphericalSegment": {
       "type": "object",
+      "required": ["shape", "radiusOfCurvature", "depth"],
       "properties": {
         "shape": {
           "type": "string",
@@ -462,7 +465,7 @@
       "description": "Recommended Z-height, from labware bottom to the center of gripper pads, when gripping the labware."
     },
     "innerLabwareGeometry": {
-      "type": "object",
+      "type": ["object", "null"],
       "description": "A dictionary holding all unique inner well geometries in a labware.",
       "additionalProperties": {
         "$ref": "#/definitions/InnerWellGeometry"
