@@ -81,7 +81,9 @@ export function fetchRobotApi(
           // failures that don't come from valid connections
           status: result?.response?.status ?? -1,
           // appShellRequestor eventually calls axios.request, which doesn't provide an ok boolean in the response
-          ok: result.isError || inRange(result?.response?.status, 200, 300),
+          ok: result.isError
+            ? false
+            : inRange(result?.response?.status, 200, 300),
         }))
       )
     : from(fetch(url, options)).pipe(
