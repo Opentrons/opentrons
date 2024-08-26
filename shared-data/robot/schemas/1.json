@@ -38,7 +38,7 @@
       "$ref": "#/definitions/xyzArray"
     },
     "paddingOffsets": {
-      "description": "The distance from a given edge of a deck extent by which the maximum amount of travel outside the extents is limited.",
+      "description": "The distance from a given edge of a deck extent by which the maximum amount of travel is limited.",
       "type": "object",
       "required": ["rear", "front", "leftSide", "rightSide"],
       "properties": {
