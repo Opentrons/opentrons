@@ -132,19 +132,19 @@ export interface LabwareBrand {
   links?: string[]
 }
 
-export interface CircularWellShapeProperties {
+export interface CircularWellShape {
   shape: 'circular'
   diameter: number
 }
-export interface RectangularWellShapeProperties {
+export interface RectangularWellShape {
   shape: 'rectangular'
   xDimension: number
   yDimension: number
 }
 
 export type LabwareWellShapeProperties =
-  | CircularWellShapeProperties
-  | RectangularWellShapeProperties
+  | CircularWellShape
+  | RectangularWellShape
 
 // well without x,y,z
 export type LabwareWellProperties = LabwareWellShapeProperties & {
@@ -158,39 +158,38 @@ export type LabwareWell = LabwareWellProperties & {
   z: number
 }
 
-export interface CircularCrossSectionProperties {
+export interface CircularCrossSection {
   shape: 'circular'
   diameter: number
 }
 
-export interface RectangularCrossSectionProperties {
+export interface RectangularCrossSection {
   shape: 'rectangular'
   xDimension: number
   yDimension: number
 }
 
-export interface SphericalSegmentProperties {
+export interface SphericalSegment {
   shape: 'spherical'
   radiusOfCurvature: number
   depth: number
 }
 
-export type TopCrossSectionProperties =
-  | CircularCrossSectionProperties
-  | RectangularCrossSectionProperties
+export type TopCrossSection = CircularCrossSection | RectangularCrossSection
 
-export type BottomShapeProperties =
-  | CircularCrossSectionProperties
-  | RectangularCrossSectionProperties
-  | SphericalSegmentProperties
+export type BottomShape =
+  | CircularCrossSection
+  | RectangularCrossSection
+  | SphericalSegment
 
-export type BoundedSection = TopCrossSectionProperties & {
+export interface BoundedSection {
+  geometry: TopCrossSection
   topHeight: number
 }
 
 export interface InnerWellGeometry {
   frusta: BoundedSection[]
-  bottomShape: BottomShapeProperties
+  bottomShape: BottomShape
 }
 
 // TODO(mc, 2019-03-21): exact object is tough to use with the initial value in
@@ -244,7 +243,7 @@ export interface LabwareDefinition3 {
   allowedRoles?: LabwareRoles[]
   stackingOffsetWithLabware?: Record<string, LabwareOffset>
   stackingOffsetWithModule?: Record<string, LabwareOffset>
-  innerLabwareGeometry: Record<string, InnerWellGeometry>
+  innerLabwareGeometry?: Record<string, InnerWellGeometry> | null
 }
 
 export interface LabwareDefByDefURI {
