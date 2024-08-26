@@ -19,14 +19,14 @@ interface RadioButtonProps extends StyleProps {
   buttonLabel: string | React.ReactNode
   buttonValue: string | number
   onChange: React.ChangeEventHandler<HTMLInputElement>
-  desktopRadiusType?: 'rounded' | 'square'
   disabled?: boolean
+  iconName?: IconName
+  id?: string
   isSelected?: boolean
+  largeDesktopBorderRadius?: boolean
+  maxLines?: number | null
   radioButtonType?: 'large' | 'small'
   subButtonLabel?: string
-  id?: string
-  iconName?: IconName
-  maxLines?: number | null
 }
 
 //  used for ODD and helix
@@ -42,7 +42,7 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
     id = typeof buttonLabel === 'string'
       ? buttonLabel
       : `RadioButtonId_${buttonValue}`,
-    desktopRadiusType = 'rounded',
+    largeDesktopBorderRadius = false,
     iconName,
     maxLines = null,
   } = props
@@ -80,12 +80,12 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
 
   const SettingButtonLabel = styled.label`
       border-radius: ${
-        desktopRadiusType === 'rounded'
+        !largeDesktopBorderRadius
           ? BORDERS.borderRadius40
           : BORDERS.borderRadius8
       };
       cursor: pointer;
-      padding: 14px ${SPACING.spacing16};
+      padding: ${SPACING.spacing12} ${SPACING.spacing16};
       width: 100%;
 
       ${isSelected ? SELECTED_BUTTON_STYLE : AVAILABLE_BUTTON_STYLE}

@@ -94,7 +94,7 @@
   "step_count": "Step {{current}}",
   "step": "Step {{current}} / {{max}}",
   "temperaturemoduletype": "Temperature Module",
-  "thermocyclermoduletype": "Thermocycler",
+  "thermocyclermoduletype": "Thermocycler Module",
   "trashBin": "Trash Bin",
   "uses_standard_namespace": "Opentrons verified labware",
   "version": "Version # {{version}}",

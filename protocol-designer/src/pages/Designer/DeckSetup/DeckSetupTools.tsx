@@ -279,15 +279,14 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element {
 
                 return (
                   <RadioButton
-                    desktopRadiusType="square"
+                    largeDesktopBorderRadius
                     buttonLabel={
                       <Flex
                         gridGap={SPACING.spacing4}
                         alignItems={ALIGN_CENTER}
                       >
                         <ModuleIcon
-                          height="1rem"
-                          width="1rem"
+                          size="1rem"
                           moduleType={getModuleType(model)}
                         />
                         <StyledText desktopStyle="bodyDefaultRegular">
@@ -347,7 +346,7 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element {
                 </Flex>
                 {fixtures.map(fixture => (
                   <RadioButton
-                    desktopRadiusType="square"
+                    largeDesktopBorderRadius
                     buttonLabel={t(`shared:${fixture}`)}
                     key={`${fixture}_${slot}`}
                     buttonValue={fixture}
