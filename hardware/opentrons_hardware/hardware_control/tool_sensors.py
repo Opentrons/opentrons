@@ -402,6 +402,7 @@ async def liquid_probe(
     mount_speed: float,
     threshold_pascals: float,
     plunger_impulse_time: float,
+    num_baseline_reads: int,
     csv_output: bool = False,
     sync_buffer_output: bool = False,
     can_bus_only_output: bool = False,
@@ -414,7 +415,7 @@ async def liquid_probe(
     sensor_driver = SensorDriver()
     threshold_fixed_point = threshold_pascals * sensor_fixed_point_conversion
     # How many samples to take to level out the sensor
-    num_baseline_reads = 20
+    num_baseline_reads = num_baseline_reads
     sensor_binding = None
     if sensor_id == SensorId.BOTH and force_both_sensors:
         # this covers the case when we want to use both sensors in an AND configuration

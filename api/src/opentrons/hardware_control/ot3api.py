@@ -2636,6 +2636,7 @@ class OT3API(
             (probe_settings.plunger_speed * plunger_direction),
             probe_settings.sensor_threshold_pascals,
             probe_settings.plunger_impulse_time,
+            probe_settings.samples_for_baselining,
             probe_settings.output_option,
             probe_settings.data_files,
             probe=probe,
