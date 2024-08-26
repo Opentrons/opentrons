@@ -268,7 +268,6 @@ class InstrumentContext(publisher.CommandPublisher):
             and self._96_tip_config_valid()
         ):
             self.require_liquid_presence(well=well)
-            self.prepare_to_aspirate()
 
         with publisher.publish_context(
             broker=self.broker,
