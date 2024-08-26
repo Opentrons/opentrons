@@ -178,13 +178,14 @@ export function Delay(props: DelayProps): JSX.Element {
           width="100%"
         >
           {delayEnabledDisplayItems.map(displayItem => (
-          <RadioButton
-            isSelected={ delayIsEnabled === displayItem.option}
-            onChange={displayItem.onClick}
-            buttonValue={displayItem.description}
-            buttonLabel={displayItem.description}
-            radioButtonType='large'
-          />
+            <RadioButton
+              key={displayItem.description}
+              isSelected={delayIsEnabled === displayItem.option}
+              onChange={displayItem.onClick}
+              buttonValue={displayItem.description}
+              buttonLabel={displayItem.description}
+              radioButtonType="large"
+            />
           ))}
         </Flex>
       ) : null}

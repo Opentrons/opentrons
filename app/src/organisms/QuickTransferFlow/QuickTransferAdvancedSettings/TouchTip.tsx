@@ -151,11 +151,12 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
         >
           {enableTouchTipDisplayItems.map(displayItem => (
             <RadioButton
-              isSelected={ touchTipIsEnabled === displayItem.option}
+              key={displayItem.description}
+              isSelected={touchTipIsEnabled === displayItem.option}
               onChange={displayItem.onClick}
               buttonValue={displayItem.description}
               buttonLabel={displayItem.description}
-              radioButtonType='large'
+              radioButtonType="large"
             />
           ))}
         </Flex>

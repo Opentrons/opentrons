@@ -176,11 +176,12 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
         >
           {enableBlowOutDisplayItems.map(displayItem => (
             <RadioButton
-              isSelected={ isBlowOutEnabled === displayItem.option}
+              key={displayItem.description}
+              isSelected={isBlowOutEnabled === displayItem.option}
               onChange={displayItem.onClick}
               buttonValue={displayItem.description}
               buttonLabel={displayItem.description}
-              radioButtonType='large'
+              radioButtonType="large"
             />
           ))}
         </Flex>
@@ -195,7 +196,7 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
         >
           {blowOutLocationItems.map(blowOutLocationItem => (
             <RadioButton
-              isSelected={ blowOutLocation === blowOutLocationItem.location}
+              isSelected={blowOutLocation === blowOutLocationItem.location}
               onChange={() => {
                 setBlowOutLocation(
                   blowOutLocationItem.location as BlowOutLocation
@@ -203,7 +204,7 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
               }}
               buttonValue={blowOutLocationItem.description}
               buttonLabel={blowOutLocationItem.description}
-              radioButtonType='large'
+              radioButtonType="large"
             />
           ))}
         </Flex>

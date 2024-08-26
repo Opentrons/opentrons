@@ -154,13 +154,14 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
         >
           {allowedPipettePathOptions.map(option => (
             <RadioButton
-              isSelected={ selectedPath === option.pathOption}
+              key={option.description}
+              isSelected={selectedPath === option.pathOption}
               onChange={() => {
                 setSelectedPath(option.pathOption)
               }}
               buttonValue={option.description}
               buttonLabel={option.description}
-              radioButtonType='large'
+              radioButtonType="large"
             />
           ))}
         </Flex>
@@ -215,13 +216,14 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
         >
           {blowOutLocationItems.map(option => (
             <RadioButton
-              isSelected={ blowOutLocation === option.location}
+              key={option.description}
+              isSelected={blowOutLocation === option.location}
               onChange={() => {
                 setBlowOutLocation(option.location)
               }}
               buttonValue={option.description}
               buttonLabel={option.description}
-              radioButtonType='large'
+              radioButtonType="large"
             />
           ))}
         </Flex>

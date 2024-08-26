@@ -159,11 +159,12 @@ export function Mix(props: MixProps): JSX.Element {
         >
           {enableMixDisplayItems.map(displayItem => (
             <RadioButton
-              isSelected={ mixIsEnabled === displayItem.option}
+              key={displayItem.description}
+              isSelected={mixIsEnabled === displayItem.option}
               onChange={displayItem.onClick}
               buttonValue={displayItem.description}
               buttonLabel={displayItem.description}
-              radioButtonType='large'
+              radioButtonType="large"
             />
           ))}
         </Flex>

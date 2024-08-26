@@ -162,11 +162,12 @@ export function AirGap(props: AirGapProps): JSX.Element {
         >
           {enableAirGapDisplayItems.map(displayItem => (
             <RadioButton
-              isSelected={ airGapEnabled === displayItem.option}
+              key={displayItem.description}
+              isSelected={airGapEnabled === displayItem.option}
               onChange={displayItem.onClick}
               buttonValue={displayItem.description}
               buttonLabel={displayItem.description}
-              radioButtonType='large'
+              radioButtonType="large"
             />
           ))}
         </Flex>
