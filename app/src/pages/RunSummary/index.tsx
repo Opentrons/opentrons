@@ -242,10 +242,10 @@ export function RunSummary(): JSX.Element {
 
   // Determine tip status on initial render only. Error Recovery always handles tip status, so don't show it twice.
   React.useEffect(() => {
-    if (isRunCurrent && enteredER === false) {
+    if (enteredER === false) {
       void determineTipStatus()
     }
-  }, [isRunCurrent, enteredER])
+  }, [enteredER])
 
   const returnToQuickTransfer = (): void => {
     if (!isRunCurrent) {
@@ -282,7 +282,7 @@ export function RunSummary(): JSX.Element {
 
   const handleReturnToDash = (aPipetteWithTip: PipetteWithTip | null): void => {
     setShowReturnToSpinner(true)
-    if (isRunCurrent && aPipetteWithTip != null) {
+    if (aPipetteWithTip != null) {
       void handleTipsAttachedModal({
         setTipStatusResolved: setTipStatusResolvedAndRoute(handleReturnToDash),
         host,
@@ -307,7 +307,7 @@ export function RunSummary(): JSX.Element {
   }
 
   const handleRunAgain = (aPipetteWithTip: PipetteWithTip | null): void => {
-    if (isRunCurrent && aPipetteWithTip != null) {
+    if (aPipetteWithTip != null) {
       void handleTipsAttachedModal({
         setTipStatusResolved: setTipStatusResolvedAndRoute(handleRunAgain),
         host,
