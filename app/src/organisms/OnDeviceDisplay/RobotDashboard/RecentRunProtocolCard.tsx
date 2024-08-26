@@ -51,7 +51,8 @@ export function RecentRunProtocolCard({
   const { data, isLoading } = useProtocolQuery(runData.protocolId ?? null)
   const protocolData = data?.data ?? null
   const isProtocolFetching = isLoading
-  return protocolData == null ? null : (
+  return protocolData == null ||
+    protocolData.protocolKind === 'quick-transfer' ? null : (
     <ProtocolWithLastRun
       protocolData={protocolData}
       runData={runData}
