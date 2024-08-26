@@ -1,28 +1,7 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import { useDispatch, useSelector } from 'react-redux'
-import { createPortal } from 'react-dom'
-import { useTranslation } from 'react-i18next'
-import {
-  Box,
-  Btn,
-  COLORS,
-  DIRECTION_COLUMN,
-  Flex,
-  Icon,
-  JUSTIFY_END,
-  JUSTIFY_SPACE_BETWEEN,
-  Modal,
-  POSITION_ABSOLUTE,
-  PrimaryButton,
-  SPACING,
-  SecondaryButton,
-  StyledText,
-} from '@opentrons/components'
-import { getTopPortalEl } from './components/portals/TopPortal'
-import { getFeatureFlagData } from './feature-flags/selectors'
-import { userFacingFlags, actions as featureFlagActions } from './feature-flags'
-import type { FlagTypes } from './feature-flags'
+import { Box, COLORS, POSITION_ABSOLUTE } from '@opentrons/components'
+import { FeatureFlagsModal } from './organisms'
 
 interface Location {
   x: number
@@ -30,68 +9,12 @@ interface Location {
 }
 
 export const Bouncing = (): JSX.Element => {
-  const { t } = useTranslation(['feature_flags', 'shared'])
-  const flags = useSelector(getFeatureFlagData)
-  const dispatch = useDispatch()
   const [isDragging, setIsDragging] = React.useState<boolean>(false)
   const [position, setPosition] = React.useState<Location>({ x: 100, y: 100 })
   const [velocity, setVelocity] = React.useState<Location>({ x: 2, y: 2 })
   const [isPaused, setIsPaused] = React.useState<boolean>(false)
   const [isStopped, setIsStopped] = React.useState<boolean>(false)
   const [showFeatureFlags, setShowFeatureFlags] = React.useState<boolean>(false)
-  const allFlags = Object.keys(flags) as FlagTypes[]
-
-  const prereleaseFlagNames = allFlags.filter(
-    flagName => !userFacingFlags.includes(flagName)
-  )
-
-  const getDescription = (flag: FlagTypes): string => {
-    return t(`feature_flags:${flag}.description`)
-  }
-
-  const setFeatureFlags = (
-    flags: Partial<Record<FlagTypes, boolean | null | undefined>>
-  ): void => {
-    dispatch(featureFlagActions.setFeatureFlags(flags))
-  }
-
-  const toFlagRow = (flagName: FlagTypes): JSX.Element => {
-    const iconName = Boolean(flags[flagName])
-      ? 'ot-toggle-input-on'
-      : 'ot-toggle-input-off'
-
-    return (
-      <Flex key={flagName} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-        <Flex flexDirection={DIRECTION_COLUMN}>
-          <StyledText desktopStyle="bodyDefaultSemiBold">
-            {t(`feature_flags:${flagName}.title`)}
-          </StyledText>
-          <StyledText desktopStyle="bodyDefaultRegular">
-            {getDescription(flagName)}
-          </StyledText>
-        </Flex>
-        <Btn
-          role="switch"
-          aria-checked={Boolean(flags[flagName])}
-          size="2rem"
-          css={
-            Boolean(flags[flagName])
-              ? TOGGLE_ENABLED_STYLES
-              : TOGGLE_DISABLED_STYLES
-          }
-          onClick={() => {
-            setFeatureFlags({
-              [flagName as string]: !flags[flagName],
-            })
-          }}
-        >
-          <Icon name={iconName} height="1rem" />
-        </Btn>
-      </Flex>
-    )
-  }
-
-  const prereleaseFlagRows = prereleaseFlagNames.map(toFlagRow)
 
   const divSize = 50
 
@@ -164,55 +87,14 @@ export const Bouncing = (): JSX.Element => {
 
   return (
     <>
-      {showFeatureFlags
-        ? createPortal(
-            <Modal
-              width="40rem"
-              type="warning"
-              title="Developer Feature Flags"
-              onClose={() => {
-                setShowFeatureFlags(false)
-                setIsPaused(false)
-              }}
-              footer={
-                <Flex
-                  padding={SPACING.spacing16}
-                  justifyContent={JUSTIFY_END}
-                  gridGap={SPACING.spacing8}
-                >
-                  <SecondaryButton
-                    onClick={() => {
-                      setIsStopped(prev => !prev)
-                      setIsPaused(false)
-                    }}
-                  >
-                    {isStopped ? 'Resume bounce' : 'Stop ball from bouncing'}
-                  </SecondaryButton>
-                  <PrimaryButton
-                    onClick={() => {
-                      setShowFeatureFlags(false)
-                    }}
-                  >
-                    {t('shared:close')}
-                  </PrimaryButton>
-                </Flex>
-              }
-              closeOnOutsideClick
-            >
-              <StyledText desktopStyle="bodyDefaultRegular">
-                For internal use only.
-              </StyledText>
-              <Flex
-                flexDirection="column"
-                marginTop={SPACING.spacing16}
-                gridGap={SPACING.spacing16}
-              >
-                {prereleaseFlagRows}
-              </Flex>
-            </Modal>,
-            getTopPortalEl()
-          )
-        : null}
+      {showFeatureFlags ? (
+        <FeatureFlagsModal
+          isStopped={isStopped}
+          setIsStopped={setIsStopped}
+          setIsPaused={setIsPaused}
+          setShowFeatureFlags={setShowFeatureFlags}
+        />
+      ) : null}
 
       <Box
         onClick={() => {
@@ -241,35 +123,3 @@ export const Bouncing = (): JSX.Element => {
     </>
   )
 }
-
-const TOGGLE_DISABLED_STYLES = css`
-  color: ${COLORS.grey50};
-
-  &:hover {
-    color: ${COLORS.grey55};
-  }
-
-  &:focus-visible {
-    box-shadow: 0 0 0 3px ${COLORS.yellow50};
-  }
-
-  &:disabled {
-    color: ${COLORS.grey30};
-  }
-`
-
-const TOGGLE_ENABLED_STYLES = css`
-  color: ${COLORS.blue50};
-
-  &:hover {
-    color: ${COLORS.blue55};
-  }
-
-  &:focus-visible {
-    box-shadow: 0 0 0 3px ${COLORS.yellow50};
-  }
-
-  &:disabled {
-    color: ${COLORS.grey30};
-  }
-`
