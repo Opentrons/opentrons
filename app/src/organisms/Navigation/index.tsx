@@ -48,8 +48,8 @@ const CarouselWrapper = styled.div`
   -webkit-mask-image: linear-gradient(
     to right,
     transparent 0%,
-    black 1%,
-    black 99%,
+    black 0%,
+    black 96.5%,
     transparent 100%
   );
   &::-webkit-scrollbar {
@@ -152,8 +152,7 @@ export function Navigation(props: NavigationProps): JSX.Element {
             <Flex
               flexDirection={DIRECTION_ROW}
               gridGap={SPACING.spacing32}
-              marginRight={SPACING.spacing8}
-              marginLeft={SPACING.spacing8}
+              marginRight={SPACING.spacing24}
             >
               <Flex
                 ref={
