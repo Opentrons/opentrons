@@ -175,66 +175,6 @@ export function SelectModules(props: WizardTileProps): JSX.Element | null {
                   desktopStyle="headingSmallBold"
                   marginBottom={SPACING.spacing12}
                 >
-                  {t('which_mods')}
-                </StyledText>
-              </Flex>
-            ) : null}
-
-            <Flex gridGap={SPACING.spacing4} flexWrap={WRAP}>
-              {filteredSupportedModules
-                .filter(
-                  module =>
-                    module !== ABSORBANCE_READER_V1 && enableAbsorbanceReader
-                )
-                .map(moduleModel => (
-                  <EmptySelectorButton
-                    key={moduleModel}
-                    disabled={
-                      (moduleModel !== MAGNETIC_BLOCK_V1 &&
-                        hasNoAvailableSlots) ||
-                      (moduleModel === THERMOCYCLER_MODULE_V2 &&
-                        numSlotsAvailable <= 1) ||
-                      (moduleModel === MAGNETIC_BLOCK_V1 &&
-                        hasNoAvailableSlots &&
-                        numMagneticBlocks === 4)
-                    }
-                    textAlignment={TYPOGRAPHY.textAlignLeft}
-                    size="small"
-                    iconName="plus"
-                    text={getModuleDisplayName(moduleModel)}
-                    onClick={() => {
-                      if (hasNoAvailableSlots) {
-                        makeSnackbar(t('slot_limit_reached') as string)
-                      } else {
-                        setValue('modules', {
-                          ...modules,
-                          [uuid()]: {
-                            model: moduleModel,
-                            type: getModuleType(moduleModel),
-                            slot:
-                              robotType === FLEX_ROBOT_TYPE
-                                ? DEFAULT_SLOT_MAP_FLEX[moduleModel]
-                                : DEFAULT_SLOT_MAP_OT2[
-                                    getModuleType(moduleModel)
-                                  ],
-                          },
-                        })
-                      }
-                    }}
-                  />
-                ))}
-            </Flex>
-            {modules != null &&
-            Object.keys(modules).length > 0 &&
-            Object.keys(filteredModules).length > 0 ? (
-              <Flex
-                marginTop={SPACING.spacing32}
-                flexDirection={DIRECTION_COLUMN}
-              >
-                <StyledText
-                  desktopStyle="headingSmallBold"
-                  marginBottom={SPACING.spacing12}
-                >
                   {t('modules_added')}
                 </StyledText>
                 <Flex
