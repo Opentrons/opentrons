@@ -6,6 +6,7 @@ import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../assets/localization'
 
 import { SlotInformation } from '..'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 const mockLiquids = ['Mastermix', 'Ethanol', 'Water']
 const mockLabwares = ['96 Well Plate', 'Adapter']
@@ -22,10 +23,12 @@ describe('SlotInformation', () => {
 
   beforeEach(() => {
     props = {
+      robotType: FLEX_ROBOT_TYPE,
       location: 'A1',
       liquids: [],
       labwares: [],
       modules: [],
+      fixtures: [],
     }
   })
 
