@@ -3,11 +3,15 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { format } from 'date-fns'
+import { css } from 'styled-components'
+
 import {
   ALIGN_CENTER,
+  ALIGN_STRETCH,
   Btn,
   DIRECTION_COLUMN,
   Flex,
+  JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
   LargeButton,
   ListItem,
@@ -61,18 +65,30 @@ export function ProtocolOverview(): JSX.Element {
       padding={`${SPACING.spacing60} ${SPACING.spacing80}`}
       gridGap={SPACING.spacing60}
     >
-      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER}>
-        <StyledText desktopStyle="displayBold">
-          {protocolName ?? t('untitled_protocol')}
-        </StyledText>
-        <Flex gridGap={SPACING.spacing8}>
+      <Flex
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+        alignItems={ALIGN_CENTER}
+        // alignSelf={ALIGN_STRETCH}
+        gridGap={SPACING.spacing60}
+      >
+        <Flex flex="1">
+          <StyledText desktopStyle="displayBold" css={PROTOCOL_NAME_TEXT_STYLE}>
+            {protocolName ?? t('untitled_protocol')}
+          </StyledText>
+        </Flex>
+
+        <Flex
+          gridGap={SPACING.spacing8}
+          flex="1"
+          alignItems={ALIGN_CENTER}
+          justifyContent={JUSTIFY_FLEX_END}
+        >
           <LargeButton
             buttonText={t('edit_protocol')}
             onClick={() => {
               console.log('open edit modal')
             }}
             whiteSpace="nowrap"
-            height="3.5rem"
           />
           <LargeButton
             buttonText={t('export_protocol')}
@@ -81,7 +97,6 @@ export function ProtocolOverview(): JSX.Element {
             }}
             iconName="arrow-right"
             whiteSpace="nowrap"
-            height="3.5rem"
           />
         </Flex>
       </Flex>
@@ -254,3 +269,12 @@ export function ProtocolOverview(): JSX.Element {
     </Flex>
   )
 }
+
+const PROTOCOL_NAME_TEXT_STYLE = css`
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-wrap: break-word;
+  -webkit-line-clamp: 3;
+`
