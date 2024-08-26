@@ -83,9 +83,6 @@ capacitive_output_file_heading = [
 ]
 
 # FIXME we should organize all of these functions to use the sensor drivers.
-# FIXME we should restrict some of these functions by instrument type.
-
-PLUNGER_SOLO_MOVE_TIME = 0.2
 
 
 def _fix_pass_step_for_buffer(
@@ -414,8 +411,6 @@ async def liquid_probe(
     log_files: Dict[SensorId, str] = {} if not data_files else data_files
     sensor_driver = SensorDriver()
     threshold_fixed_point = threshold_pascals * sensor_fixed_point_conversion
-    # How many samples to take to level out the sensor
-    num_baseline_reads = num_baseline_reads
     sensor_binding = None
     if sensor_id == SensorId.BOTH and force_both_sensors:
         # this covers the case when we want to use both sensors in an AND configuration
