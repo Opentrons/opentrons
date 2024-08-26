@@ -21,11 +21,8 @@ import {
 } from '@opentrons/components'
 import { getTopPortalEl } from './components/portals/TopPortal'
 import { getFeatureFlagData } from './feature-flags/selectors'
-import {
-  FlagTypes,
-  userFacingFlags,
-  actions as featureFlagActions,
-} from './feature-flags'
+import { userFacingFlags, actions as featureFlagActions } from './feature-flags'
+import type { FlagTypes } from './feature-flags'
 
 interface Location {
   x: number
@@ -100,13 +97,13 @@ export const Bouncing = (): JSX.Element => {
 
   React.useEffect(() => {
     if (!isPaused && !isStopped) {
-      const moveDiv = () => {
+      const moveDiv = (): void => {
         const screenWidth = window.innerWidth
         const screenHeight = window.innerHeight
 
         setPosition(prevPosition => {
-          let newX = prevPosition.x + velocity.x
-          let newY = prevPosition.y + velocity.y
+          const newX = prevPosition.x + velocity.x
+          const newY = prevPosition.y + velocity.y
 
           if (newX <= 0 || newX + divSize >= screenWidth) {
             setVelocity(prevVelocity => ({
@@ -127,7 +124,9 @@ export const Bouncing = (): JSX.Element => {
 
       const intervalId = setInterval(moveDiv, 10)
 
-      return () => clearInterval(intervalId)
+      return () => {
+        clearInterval(intervalId)
+      }
     }
   }, [velocity, isPaused, isStopped])
 
