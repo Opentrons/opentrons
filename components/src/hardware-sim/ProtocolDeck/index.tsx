@@ -92,6 +92,10 @@ export function ProtocolDeck(props: ProtocolDeckProps): JSX.Element | null {
             </LabwareInfo>
           ) : null,
         highlightLabware: handleLabwareClick != null,
+        highlightShadowLabware:
+          handleLabwareClick != null &&
+          topLabwareDefinition != null &&
+          topLabwareId != null,
         onLabwareClick:
           handleLabwareClick != null &&
           topLabwareDefinition != null &&
@@ -140,6 +144,7 @@ export function ProtocolDeck(props: ProtocolDeckProps): JSX.Element | null {
           </LabwareInfo>
         ) : null,
         highlight: handleLabwareClick != null,
+        highlightShadow: handleLabwareClick != null && isLabwareInStack,
         onLabwareClick:
           handleLabwareClick != null
             ? () => {

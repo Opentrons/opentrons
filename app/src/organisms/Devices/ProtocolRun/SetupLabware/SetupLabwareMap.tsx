@@ -88,6 +88,10 @@ export function SetupLabwareMap({
         topLabwareDefinition != null &&
         topLabwareId != null &&
         hoverLabwareId === topLabwareId,
+      highlightShadowLabware:
+        topLabwareDefinition != null &&
+        topLabwareId != null &&
+        hoverLabwareId === topLabwareId,
       stacked: topLabwareDefinition != null && topLabwareId != null,
       moduleChildren: (
         // open modal
@@ -148,6 +152,7 @@ export function SetupLabwareMap({
         topLabwareId,
         topLabwareDisplayName,
         highlight: isLabwareInStack && hoverLabwareId === topLabwareId,
+        highlightShadow: isLabwareInStack && hoverLabwareId === topLabwareId,
         labwareChildren: (
           <g
             cursor={isLabwareInStack ? 'pointer' : ''}
