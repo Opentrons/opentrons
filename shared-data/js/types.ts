@@ -53,6 +53,7 @@ export interface WellDefinition {
   y: number
   z: number
   'total-liquid-volume': number
+  geometryDefinitionId?: string | null
 }
 
 // typedef for labware definitions under v1 labware schema
@@ -131,19 +132,19 @@ export interface LabwareBrand {
   links?: string[]
 }
 
-export interface CircularWellShapeProperties {
+export interface CircularWellShape {
   shape: 'circular'
   diameter: number
 }
-export interface RectangularWellShapeProperties {
+export interface RectangularWellShape {
   shape: 'rectangular'
   xDimension: number
   yDimension: number
 }
 
 export type LabwareWellShapeProperties =
-  | CircularWellShapeProperties
-  | RectangularWellShapeProperties
+  | CircularWellShape
+  | RectangularWellShape
 
 // well without x,y,z
 export type LabwareWellProperties = LabwareWellShapeProperties & {
@@ -155,6 +156,41 @@ export type LabwareWell = LabwareWellProperties & {
   x: number
   y: number
   z: number
+  geometryDefinitionId?: string
+}
+
+export interface CircularCrossSection {
+  shape: 'circular'
+  diameter: number
+}
+
+export interface RectangularCrossSection {
+  shape: 'rectangular'
+  xDimension: number
+  yDimension: number
+}
+
+export interface SphericalSegment {
+  shape: 'spherical'
+  radiusOfCurvature: number
+  depth: number
+}
+
+export type TopCrossSection = CircularCrossSection | RectangularCrossSection
+
+export type BottomShape =
+  | CircularCrossSection
+  | RectangularCrossSection
+  | SphericalSegment
+
+export interface BoundedSection {
+  geometry: TopCrossSection
+  topHeight: number
+}
+
+export interface InnerWellGeometry {
+  frusta: BoundedSection[]
+  bottomShape: BottomShape
 }
 
 // TODO(mc, 2019-03-21): exact object is tough to use with the initial value in
@@ -191,6 +227,24 @@ export interface LabwareDefinition2 {
   allowedRoles?: LabwareRoles[]
   stackingOffsetWithLabware?: Record<string, LabwareOffset>
   stackingOffsetWithModule?: Record<string, LabwareOffset>
+}
+
+export interface LabwareDefinition3 {
+  version: number
+  schemaVersion: 3
+  namespace: string
+  metadata: LabwareMetadata
+  dimensions: LabwareDimensions
+  cornerOffsetFromSlot: LabwareOffset
+  parameters: LabwareParameters
+  brand: LabwareBrand
+  ordering: string[][]
+  wells: LabwareWellMap
+  groups: LabwareWellGroup[]
+  allowedRoles?: LabwareRoles[]
+  stackingOffsetWithLabware?: Record<string, LabwareOffset>
+  stackingOffsetWithModule?: Record<string, LabwareOffset>
+  innerLabwareGeometry?: Record<string, InnerWellGeometry> | null
 }
 
 export interface LabwareDefByDefURI {
