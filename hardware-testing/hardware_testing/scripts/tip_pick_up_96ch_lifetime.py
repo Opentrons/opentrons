@@ -66,15 +66,15 @@ async def _main(is_simulating: bool) -> None:
     print("mount.id:{}".format(test_pip["pipette_id"]))
 
     # set pick up speed to 10
-    await helpers_ot3.update_pick_up_speed(api, mount, 10.0)
+    #await helpers_ot3.update_pick_up_speed(api, mount, 10.0)
     # set clamp speed to 5.5
-    api.clamp_tip_speed = 5.5
+    #api.clamp_tip_speed = 5.5
     # set drop tip speed to 10
-    await helpers_ot3.update_drop_tip_speed(api, mount, 10.0)
+    #await helpers_ot3.update_drop_tip_speed(api, mount, 10.0)
     # set clamp speed to 5.5
-    api.clamp_drop_tip_speed = 5.5
+    #api.clamp_drop_tip_speed = 5.5
     # set clamp distance to 18.25
-    await helpers_ot3.update_pick_up_distance(api, mount, 18.25)
+    #await helpers_ot3.update_pick_up_distance(api, mount, 18.25)
 
     test_name = "tip-pick-up-lifetime-test"
     if args.restart_flag:
@@ -85,12 +85,11 @@ async def _main(is_simulating: bool) -> None:
         else:
             print("Slot locations calibration file not found.\n")
     else:
-        file_name = data.create_file_name(test_name=test_name, run_id=data.create_run_id(), tag=test_tag,
-                                          pipid=test_pip["pipette_id"])
+        file_name = data.create_file_name(test_name=test_name, run_id=data.create_run_id(), tag=test_tag)
         header = ['Time (W:H:M:S)', 'Test Robot', 'Test Pipette', 'Tip Rack', 'Tip Number', 'Total Tip Pick Ups',
                   'Total Failures']
         header_str = data.convert_list_to_csv_line(header)
-        data.append_data_to_file(test_name=test_name, file_name=file_name, data=header_str)
+        data.append_data_to_file(test_name=test_name,run_id=data.create_run_id(), file_name=file_name, data=header_str)
 
     print("test_pip", test_pip)
     if len(test_pip) == 0:
@@ -236,14 +235,14 @@ async def _main(is_simulating: bool) -> None:
                         await api.move_rel(mount, delta=Point(z=z_pt))
 
                         # move plunger from blowout to top, back to blow_out
-                        top_pos, bottom_pos, _, _ = helpers_ot3.get_plunger_positions_ot3(api, mount)
+                        #top_pos, bottom_pos, _, _ = helpers_ot3.get_plunger_positions_ot3(api, mount)
 
-                        print("Move to bottom plunger position\n")
-                        await helpers_ot3.move_plunger_absolute_ot3(api, mount, bottom_pos)
-                        print("Move to top plunger position\n")
-                        await helpers_ot3.move_plunger_absolute_ot3(api, mount, top_pos)
-                        print("Move to bottom plunger position\n")
-                        await helpers_ot3.move_plunger_absolute_ot3(api, mount, bottom_pos)
+                        # print("Move to bottom plunger position\n")
+                        # await helpers_ot3.move_plunger_absolute_ot3(api, mount, bottom_pos)
+                        # print("Move to top plunger position\n")
+                        # await helpers_ot3.move_plunger_absolute_ot3(api, mount, top_pos)
+                        # print("Move to bottom plunger position\n")
+                        # await helpers_ot3.move_plunger_absolute_ot3(api, mount, bottom_pos)
 
                         print("Dropping tip...\n")
                         await api.drop_tip(mount)
@@ -252,7 +251,7 @@ async def _main(is_simulating: bool) -> None:
                                       test_pip["pipette_id"], rack, pick_up + 1,
                                       total_pick_ups, total_failures]
                         cycle_data_str = data.convert_list_to_csv_line(cycle_data)
-                        data.append_data_to_file(test_name=test_name, file_name=file_name, data=cycle_data_str)
+                        data.append_data_to_file(test_name=test_name,run_id=data.create_run_id(), file_name=file_name, data=cycle_data_str)
 
                         # save the last complete information
 
