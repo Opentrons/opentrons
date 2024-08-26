@@ -11,7 +11,7 @@ import {
 } from '@opentrons/components'
 import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
 import { getTopPortalEl } from '../../../App/portal'
-import { LargeButton } from '../../../atoms/buttons'
+import { RadioButton } from '../../../atoms/buttons'
 import { ChildNavigation } from '../../ChildNavigation'
 import { useBlowOutLocationOptions } from './BlowOut'
 
@@ -153,15 +153,15 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
           width="100%"
         >
           {allowedPipettePathOptions.map(option => (
-            <LargeButton
-              key={option.pathOption}
-              buttonType={
-                selectedPath === option.pathOption ? 'primary' : 'secondary'
-              }
-              onClick={() => {
+            <RadioButton
+              key={option.description}
+              isSelected={selectedPath === option.pathOption}
+              onChange={() => {
                 setSelectedPath(option.pathOption)
               }}
-              buttonText={option.description}
+              buttonValue={option.description}
+              buttonLabel={option.description}
+              radioButtonType="large"
             />
           ))}
         </Flex>
@@ -215,15 +215,15 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
           width="100%"
         >
           {blowOutLocationItems.map(option => (
-            <LargeButton
+            <RadioButton
               key={option.description}
-              buttonType={
-                blowOutLocation === option.location ? 'primary' : 'secondary'
-              }
-              onClick={() => {
+              isSelected={blowOutLocation === option.location}
+              onChange={() => {
                 setBlowOutLocation(option.location)
               }}
-              buttonText={option.description}
+              buttonValue={option.description}
+              buttonLabel={option.description}
+              radioButtonType="large"
             />
           ))}
         </Flex>
