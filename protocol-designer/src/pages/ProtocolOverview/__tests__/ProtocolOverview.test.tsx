@@ -2,6 +2,7 @@ import * as React from 'react'
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../assets/localization'
 import { getFileMetadata, getRobotType } from '../../../file-data/selectors'
@@ -46,6 +47,10 @@ describe('ProtocolOverview', () => {
   })
   it('renders each section with text', () => {
     render()
+    // buttons
+    screen.getByRole('button', { name: 'Edit protocol' })
+    screen.getByRole('button', { name: 'Export protocol' })
+
     //  metadata
     screen.getByText('mockName')
     screen.getByText('Protocol metadata')
@@ -67,6 +72,16 @@ describe('ProtocolOverview', () => {
     screen.getByText('Liquids')
     //  steps
     screen.getByText('Protocol steps')
+  })
+
+  it('should render text N/A if there is no data', () => {
+    vi.mocked(getFileMetadata).mockReturnValue({
+      protocolName: undefined,
+      author: undefined,
+      description: undefined,
+    })
+    render()
+    expect(screen.getAllByText('N/A').length).toBe(7)
   })
 
   it('navigates to deck setup deck setup', () => {

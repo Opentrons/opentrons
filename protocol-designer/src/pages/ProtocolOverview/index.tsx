@@ -4,10 +4,12 @@ import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { format } from 'date-fns'
 import {
+  ALIGN_CENTER,
   Btn,
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
+  LargeButton,
   ListItem,
   ListItemDescriptor,
   SPACING,
@@ -20,8 +22,8 @@ import { selectors as fileSelectors } from '../../file-data'
 import { getRobotType } from '../../file-data/selectors'
 import type { PipetteName } from '@opentrons/shared-data'
 
-const DATE_ONLY_FORMAT = 'MMM dd, yyyy'
-const DATETIME_FORMAT = 'MMM dd, yyyy | h:mm a'
+const DATE_ONLY_FORMAT = 'MMMM dd, yyyy'
+const DATETIME_FORMAT = 'MMMM dd, yyyy | h:mm a'
 
 export function ProtocolOverview(): JSX.Element {
   const { t } = useTranslation(['protocol_overview', 'shared'])
@@ -44,12 +46,12 @@ export function ProtocolOverview(): JSX.Element {
     author,
   } = formValues
   const metaDataInfo = [
-    { description: description },
-    { author: author },
-    { created: created != null ? format(created, DATE_ONLY_FORMAT) : 'N/A' },
+    { description },
+    { author },
+    { created: created != null ? format(created, DATE_ONLY_FORMAT) : t('na') },
     {
       modified:
-        lastModified != null ? format(lastModified, DATETIME_FORMAT) : 'N/A',
+        lastModified != null ? format(lastModified, DATETIME_FORMAT) : t('na'),
     },
   ]
 
@@ -57,14 +59,38 @@ export function ProtocolOverview(): JSX.Element {
     <Flex
       flexDirection={DIRECTION_COLUMN}
       padding={`${SPACING.spacing60} ${SPACING.spacing80}`}
+      gridGap={SPACING.spacing60}
     >
-      <Flex marginBottom={SPACING.spacing60}>
+      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER}>
         <StyledText desktopStyle="displayBold">
           {protocolName ?? t('untitled_protocol')}
         </StyledText>
+        <Flex gridGap={SPACING.spacing8}>
+          <LargeButton
+            buttonText={t('edit_protocol')}
+            onClick={() => {
+              console.log('open edit modal')
+            }}
+            whiteSpace="nowrap"
+            height="3.5rem"
+          />
+          <LargeButton
+            buttonText={t('export_protocol')}
+            onClick={() => {
+              console.log('export json')
+            }}
+            iconName="arrow-right"
+            whiteSpace="nowrap"
+            height="3.5rem"
+          />
+        </Flex>
       </Flex>
       <Flex gridGap={SPACING.spacing80}>
-        <Flex flexDirection={DIRECTION_COLUMN} width="50%">
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          width="50%"
+          gridGap={SPACING.spacing40}
+        >
           <Flex flexDirection={DIRECTION_COLUMN}>
             <Flex
               justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -87,6 +113,8 @@ export function ProtocolOverview(): JSX.Element {
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
               {metaDataInfo.map(info => {
                 const [title, value] = Object.entries(info)[0]
+                console.log('title', title)
+                console.log('value', value)
                 return (
                   <ListItem type="noActive" key={`ProtocolOverview_${title}`}>
                     <ListItemDescriptor
@@ -99,7 +127,7 @@ export function ProtocolOverview(): JSX.Element {
               })}
             </Flex>
           </Flex>
-          <Flex flexDirection={DIRECTION_COLUMN} marginTop={SPACING.spacing40}>
+          <Flex flexDirection={DIRECTION_COLUMN}>
             <Flex
               justifyContent={JUSTIFY_SPACE_BETWEEN}
               marginBottom={SPACING.spacing12}
@@ -165,7 +193,7 @@ export function ProtocolOverview(): JSX.Element {
               ) : null}
             </Flex>
           </Flex>
-          <Flex flexDirection={DIRECTION_COLUMN} marginTop={SPACING.spacing40}>
+          <Flex flexDirection={DIRECTION_COLUMN}>
             <Flex marginBottom={SPACING.spacing12}>
               <StyledText desktopStyle="headingSmallBold">
                 {t('liquids')}
@@ -181,7 +209,7 @@ export function ProtocolOverview(): JSX.Element {
               </ListItem>
             </Flex>
           </Flex>
-          <Flex flexDirection={DIRECTION_COLUMN} marginTop={SPACING.spacing40}>
+          <Flex flexDirection={DIRECTION_COLUMN}>
             <Flex marginBottom={SPACING.spacing12}>
               <StyledText desktopStyle="headingSmallBold">
                 {t('step')}
@@ -214,7 +242,7 @@ export function ProtocolOverview(): JSX.Element {
               }}
             >
               <StyledText desktopStyle="bodyDefaultRegular">
-                {t('edit')}
+                {t('materials_list')}
               </StyledText>
             </Btn>
           </Flex>
