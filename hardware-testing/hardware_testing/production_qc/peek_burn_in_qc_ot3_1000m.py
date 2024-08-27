@@ -45,10 +45,10 @@ assert (
 #     60
 # ]
 
-TEST_SPEEDS = [0.5]
-TEST_SPEEDS2 = [1.0]
-TEST_SPEEDS3 = [1.5]
-TEST_SPEEDS4 = [2.0]
+TEST_SPEEDS = [0.5,1.0,1.5,2.0]
+# TEST_SPEEDS2 = [1.0]
+# TEST_SPEEDS3 = [1.5]
+# TEST_SPEEDS4 = [2.0]
 
 # PLUNGER_CURRENTS_SPEED = {
 #     0.3: TEST_SPEEDS,
@@ -61,10 +61,7 @@ TEST_SPEEDS4 = [2.0]
 #     1: TEST_SPEEDS,
 # }
 
-PLUNGER_CURRENTS_SPEED = {1: TEST_SPEEDS4,
-                          1: TEST_SPEEDS3,
-                          1: TEST_SPEEDS2,
-                          1: TEST_SPEEDS}
+PLUNGER_CURRENTS_SPEED = {1: TEST_SPEEDS}
 
 MAX_SPEED = max(TEST_SPEEDS)
 MAX_CURRENT = max(max(list(PLUNGER_CURRENTS_SPEED.keys())), 1.0)
@@ -252,12 +249,12 @@ async def _test_plunger(
     continue_after_stall: bool,
 ) -> float:
     # start at HIGHEST (easiest) current
-    currents = sorted(list(PLUNGER_CURRENTS_SPEED.keys()), reverse=True)
+    currents = sorted(list(PLUNGER_CURRENTS_SPEED.keys()), reverse=False)
     max_failed_current = 0.0
     for current in currents:
         ui.print_title(f"CURRENT = {current}")
         # start at LOWEST (easiest) speed
-        speeds = sorted(PLUNGER_CURRENTS_SPEED[current], reverse=True)
+        speeds = sorted(PLUNGER_CURRENTS_SPEED[current], reverse=False)
         for speed in speeds:
             for trial in range(trials):
                 ui.print_header(
