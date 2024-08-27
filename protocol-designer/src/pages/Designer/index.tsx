@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import {
   ALIGN_CENTER,
+  ALIGN_END,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
@@ -16,6 +17,7 @@ import {
   SecondaryButton,
   StyledText,
   Tabs,
+  ToggleGroup,
 } from '@opentrons/components'
 
 import { useKitchen } from '../../organisms/Kitchen/hooks'
@@ -25,6 +27,7 @@ import { DeckSetupContainer } from './DeckSetup'
 
 import type { CutoutId } from '@opentrons/shared-data'
 import type { DeckSlot } from '@opentrons/step-generation'
+import { OffDeck } from './Offdeck'
 
 export interface OpenSlot {
   cutoutId: CutoutId
@@ -45,6 +48,12 @@ export function Designer(): JSX.Element {
   const [tab, setTab] = React.useState<'startingDeck' | 'protocolSteps'>(
     'startingDeck'
   )
+  const leftString = t('onDeck')
+  const rightString = t('offDeck')
+
+  const [deckView, setDeckView] = React.useState<
+    typeof leftString | typeof rightString
+  >(leftString)
 
   const { modules, additionalEquipmentOnDeck } = deckSetup
   const startingDeckTab = {
@@ -122,12 +131,32 @@ export function Designer(): JSX.Element {
         flexDirection={DIRECTION_COLUMN}
         backgroundColor={COLORS.grey10}
         padding={SPACING.spacing80}
+        height="calc(100vh - 64px)"
       >
         {tab === 'startingDeck' ? (
-          <DeckSetupContainer
-            setZoomInOnSlot={setZoomInOnSlot}
-            zoomIn={zoomInOnSlot}
-          />
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
+            <Flex alignSelf={ALIGN_END}>
+              <ToggleGroup
+                selectedValue={deckView}
+                leftText={leftString}
+                rightText={rightString}
+                leftClick={() => {
+                  setDeckView(leftString)
+                }}
+                rightClick={() => {
+                  setDeckView(rightString)
+                }}
+              />
+            </Flex>
+            {deckView === leftString ? (
+              <DeckSetupContainer
+                setZoomInOnSlot={setZoomInOnSlot}
+                zoomIn={zoomInOnSlot}
+              />
+            ) : (
+              <OffDeck />
+            )}
+          </Flex>
         ) : (
           <div>TODO wire this up</div>
         )}

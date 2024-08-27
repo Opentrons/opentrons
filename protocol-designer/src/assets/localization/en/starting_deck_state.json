@@ -32,6 +32,9 @@
   "starting_deck_state": "Starting deck state",
   "tipRack": "Tip rack",
   "tubeRack": "Tube rack",
+  "onDeck": "On deck",
+  "off_deck_labware": "Off-deck Labware",
+  "offDeck": "Off deck",
   "untitled_protocol": "Untitled protocol",
   "we_added_hardware": "We've added your deck hardware!",
   "wellPlate": "Well plate"
