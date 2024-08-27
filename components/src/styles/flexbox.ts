@@ -34,3 +34,6 @@ export const WRAP_REVERSE = 'wrap-reverse'
 
 export const WHITE_SPACE_NORMAL = 'normal'
 export const WHITE_SPACE_PRE = 'pre'
+export const WHITE_SPACE_PRE_WRAP = 'pre-wrap'
+export const WHITE_SPACE_PRE_LINE = 'pre-line'
+export const WHITE_SPACE_BREAK_SPACES = 'break-spaces'
