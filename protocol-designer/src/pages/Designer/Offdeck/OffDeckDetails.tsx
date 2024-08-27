@@ -23,6 +23,8 @@ import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locati
 import { DeckItemHover } from '../DeckSetup/DeckItemHover'
 import { SlotDetailsContainer } from '../../../organisms'
 import { getRobotType } from '../../../file-data/selectors'
+import { SlotOverflowMenu } from '../DeckSetup/SlotOverflowMenu'
+import type { DeckSlotId } from '@opentrons/shared-data'
 
 interface OffDeckDetailsProps {
   onClick: () => void
@@ -33,6 +35,9 @@ interface OffDeckDetailsProps {
 export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
   const { onClick, addLabware, hover, setHover } = props
   const { t } = useTranslation('starting_deck_state')
+  const [menuListId, setShowMenuListForId] = React.useState<DeckSlotId | null>(
+    null
+  )
   const robotType = useSelector(getRobotType)
   const deckSetup = useSelector(getDeckSetupForActiveItem)
   const offDeckLabware = Object.values(deckSetup.labware).filter(
@@ -98,34 +103,49 @@ export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
               zDimension: dimensions.zDimension ?? 0,
             }
             return (
-              <Flex width="9.5625rem" height="6.375rem" key={lw.id}>
-                <RobotWorkSpace
-                  key={lw.id}
-                  viewBox={`${definition.cornerOffsetFromSlot.x} ${definition.cornerOffsetFromSlot.y} ${dimensions.xDimension} ${dimensions.yDimension}`}
-                  width="100%"
-                  height="100%"
-                >
-                  {() => (
-                    <>
-                      <LabwareRender
-                        definition={definition}
-                        wellFill={wellFillFromWellContents(
-                          wellContents,
-                          liquidDisplayColors
-                        )}
-                      />
-                      <DeckItemHover
-                        hover={hover}
-                        setHover={setHover}
-                        addEquipment={addLabware}
-                        slotBoundingBox={xyzDimensions}
-                        slotPosition={[0, 0, 0]}
-                        itemId={lw.id}
-                        selectedTerminalItemId={START_TERMINAL_ITEM_ID}
-                      />
-                    </>
-                  )}
-                </RobotWorkSpace>
+              <Flex flexDirection={DIRECTION_COLUMN}>
+                <Flex width="9.5625rem" height="6.375rem" key={lw.id}>
+                  <RobotWorkSpace
+                    key={lw.id}
+                    viewBox={`${definition.cornerOffsetFromSlot.x} ${definition.cornerOffsetFromSlot.y} ${dimensions.xDimension} ${dimensions.yDimension}`}
+                    width="100%"
+                    height="100%"
+                  >
+                    {() => (
+                      <>
+                        <LabwareRender
+                          definition={definition}
+                          wellFill={wellFillFromWellContents(
+                            wellContents,
+                            liquidDisplayColors
+                          )}
+                        />
+                        <DeckItemHover
+                          hover={hover}
+                          setShowMenuListForId={setShowMenuListForId}
+                          menuListId={menuListId}
+                          setHover={setHover}
+                          slotBoundingBox={xyzDimensions}
+                          slotPosition={[0, 0, 0]}
+                          itemId={lw.id}
+                          selectedTerminalItemId={START_TERMINAL_ITEM_ID}
+                        />
+                      </>
+                    )}
+                  </RobotWorkSpace>
+                </Flex>
+                {menuListId != null ? (
+                  // TODO fix this rendering position
+                  <Flex marginTop="-2rem" marginLeft="4rem" zIndex={3}>
+                    <SlotOverflowMenu
+                      slot={menuListId}
+                      addEquipment={addLabware}
+                      setShowMenuList={() => {
+                        setShowMenuListForId(null)
+                      }}
+                    />
+                  </Flex>
+                ) : null}
               </Flex>
             )
           })}

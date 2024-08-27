@@ -33,8 +33,6 @@ describe('SlotOverflowMenu', () => {
   beforeEach(() => {
     props = {
       slot: 'D3',
-      xSlotPosition: 1,
-      ySlotPosition: 1,
       setShowMenuList: vi.fn(),
       addEquipment: vi.fn(),
     }

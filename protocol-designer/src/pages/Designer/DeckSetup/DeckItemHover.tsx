@@ -16,34 +16,38 @@ import {
 } from '@opentrons/components'
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import { START_TERMINAL_ITEM_ID } from '../../../steplist'
-import { SlotOverflowMenu } from './SlotOverflowMenu'
 
-import type { CoordinateTuple, Dimensions } from '@opentrons/shared-data'
+import type {
+  CoordinateTuple,
+  DeckSlotId,
+  Dimensions,
+} from '@opentrons/shared-data'
 import type { TerminalItemId } from '../../../steplist'
 
 interface DeckItemHoverProps {
-  addEquipment: (slotId: string) => void
   hover: string | null
   setHover: React.Dispatch<React.SetStateAction<string | null>>
   slotBoundingBox: Dimensions
   //  can be slotId or labwareId (for off-deck labware)
   itemId: string
   slotPosition: CoordinateTuple | null
+  setShowMenuListForId: React.Dispatch<React.SetStateAction<string | null>>
+  menuListId: DeckSlotId | null
   selectedTerminalItemId?: TerminalItemId | null
 }
 
 export function DeckItemHover(props: DeckItemHoverProps): JSX.Element | null {
   const {
-    addEquipment,
     hover,
     selectedTerminalItemId,
     setHover,
     slotBoundingBox,
     itemId,
+    setShowMenuListForId,
+    menuListId,
     slotPosition,
   } = props
   const { t } = useTranslation('starting_deck_state')
-  const [showMenuList, setShowMenuList] = React.useState<boolean>(false)
   const deckSetup = useSelector(getDeckSetupForActiveItem)
   const offDeckLabware = Object.values(deckSetup.labware).find(
     lw => lw.id === itemId
@@ -55,32 +59,10 @@ export function DeckItemHover(props: DeckItemHoverProps): JSX.Element | null {
     return null
 
   const hoverOpacity =
-    (hover != null && hover === itemId) || showMenuList ? '1' : '0'
+    (hover != null && hover === itemId) || menuListId === itemId ? '1' : '0'
 
   return (
     <>
-      {showMenuList ? (
-        <RobotCoordsForeignDiv
-          x={slotPosition[0] + 50}
-          y={slotPosition[1] - 160}
-          width="172px"
-          height="180px"
-          innerDivProps={{
-            style: {
-              position: POSITION_ABSOLUTE,
-              transform: 'rotate(180deg) scaleX(-1)',
-              zIndex: 5,
-            },
-          }}
-        >
-          <SlotOverflowMenu
-            slot={itemId}
-            addEquipment={addEquipment}
-            setShowMenuList={setShowMenuList}
-          />
-        </RobotCoordsForeignDiv>
-      ) : null}
-
       <RobotCoordsForeignDiv
         x={slotPosition[0]}
         y={slotPosition[1]}
@@ -110,7 +92,7 @@ export function DeckItemHover(props: DeckItemHoverProps): JSX.Element | null {
             setHover(null)
           },
           onClick: () => {
-            setShowMenuList(true)
+            setShowMenuListForId(itemId)
           },
         }}
       >
@@ -123,7 +105,7 @@ export function DeckItemHover(props: DeckItemHoverProps): JSX.Element | null {
         >
           <a
             onClick={() => {
-              setShowMenuList(true)
+              setShowMenuListForId(itemId)
             }}
           >
             <StyledText desktopStyle="bodyDefaultSemiBold">
