@@ -15,6 +15,7 @@ import {
   Tooltip,
   useHoverTooltip,
   ALIGN_CENTER,
+  NO_WRAP,
 } from '@opentrons/components'
 import { useUploadCsvFileMutation } from '@opentrons/react-api-client'
 
@@ -64,7 +65,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
   const [selectedRobot, setSelectedRobot] = React.useState<Robot | null>(null)
   const { trackCreateProtocolRunEvent } = useTrackCreateProtocolRunEvent(
     storedProtocolData,
-    selectedRobot?.name ?? ''
+    selectedRobot?.name ?? '' as
   )
   const runTimeParameters =
     storedProtocolData.mostRecentAnalysis?.runTimeParameters ?? []
@@ -278,7 +279,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
                 <Flex
                   gridGap={SPACING.spacing4}
                   alignItems={ALIGN_CENTER}
-                  whiteSpace="nowrap"
+                  whiteSpace={NO_WRAP}
                   marginLeft={`-${SPACING.spacing4}`}
                 >
                   <Icon name="ot-spinner" spin size="1rem" />

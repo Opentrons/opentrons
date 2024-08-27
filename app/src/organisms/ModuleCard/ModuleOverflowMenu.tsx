@@ -5,6 +5,7 @@ import {
   Flex,
   MenuItem,
   MenuList,
+  NO_WRAP,
   POSITION_RELATIVE,
   Tooltip,
   useHoverTooltip,
@@ -151,7 +152,7 @@ export const ModuleOverflowMenu = (
                 <MenuItem
                   onClick={() => item.onClick(item.isSecondary)}
                   disabled={item.disabledReason || isDisabled}
-                  whiteSpace="nowrap"
+                  whiteSpace={NO_WRAP}
                 >
                   {item.setSetting}
                 </MenuItem>

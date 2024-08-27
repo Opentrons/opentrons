@@ -6,13 +6,14 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  FLEX_MAX_CONTENT,
   Flex,
   Icon,
-  Link,
-  SPACING,
   LegacyStyledText,
+  Link,
+  NO_WRAP,
+  SPACING,
   TYPOGRAPHY,
-  FLEX_MAX_CONTENT,
 } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
@@ -474,7 +475,7 @@ function StepRightElement(props: StepRightElementProps): JSX.Element | null {
           css={TYPOGRAPHY.pSemiBold}
           marginRight={SPACING.spacing16}
           id={`RunSetupCard_${props.stepKey}_completeText`}
-          whitespace="nowrap"
+          whitespace={NO_WRAP}
         >
           {props.completeText}
         </LegacyStyledText>
@@ -495,7 +496,7 @@ function StepRightElement(props: StepRightElementProps): JSX.Element | null {
           css={TYPOGRAPHY.pSemiBold}
           marginRight={SPACING.spacing16}
           id={`RunSetupCard_${props.stepKey}_missingHardwareText`}
-          whitespace="nowrap"
+          whitespace={NO_WRAP}
         >
           {props.missingHardwareText}
         </LegacyStyledText>
@@ -516,7 +517,7 @@ function StepRightElement(props: StepRightElementProps): JSX.Element | null {
           css={TYPOGRAPHY.pSemiBold}
           marginRight={SPACING.spacing16}
           id={`RunSetupCard_${props.stepKey}_incompleteText`}
-          whitespace="nowrap"
+          whitespace={NO_WRAP}
         >
           {props.incompleteText}
         </LegacyStyledText>
@@ -537,7 +538,7 @@ function LearnAboutLPC(): JSX.Element {
       <Link
         css={TYPOGRAPHY.linkPSemiBold}
         marginRight={SPACING.spacing16}
-        whiteSpace="nowrap"
+        whiteSpace={NO_WRAP}
         onClick={(e: React.MouseEvent) => {
           // clicking link shouldn't toggle step expanded state
           e.preventDefault()

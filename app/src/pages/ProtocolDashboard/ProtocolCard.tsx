@@ -16,6 +16,7 @@ import {
   Flex,
   Icon,
   LegacyStyledText,
+  NO_WRAP,
   OVERFLOW_WRAP_ANYWHERE,
   OVERFLOW_WRAP_BREAK_WORD,
   SPACING,
@@ -244,7 +245,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
         </LegacyStyledText>
       </Flex>
       <Flex width="9.25rem">
-        <LegacyStyledText as="p" color={COLORS.grey60} whiteSpace="nowrap">
+        <LegacyStyledText as="p" color={COLORS.grey60} whiteSpace={NO_WRAP}>
           {lastRun != null
             ? formatDistance(new Date(lastRun), new Date(), {
                 addSuffix: true,
@@ -252,7 +253,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
             : t('no_history')}
         </LegacyStyledText>
       </Flex>
-      <Flex width="12.5rem" whiteSpace="nowrap">
+      <Flex width="12.5rem" whiteSpace={NO_WRAP}>
         <LegacyStyledText as="p" color={COLORS.grey60}>
           {formatTimeWithUtcLabel(protocol.createdAt)}
         </LegacyStyledText>
