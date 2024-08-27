@@ -259,7 +259,11 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
             </PrimaryButton>
           </>
         ) : (
-          <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_ROW}>
+          <Flex
+            gridGap={SPACING.spacing8}
+            flexDirection={DIRECTION_ROW}
+            whiteSpace="nowrap"
+          >
             <SecondaryButton
               onClick={() => {
                 setCurrentPage(1)
@@ -278,7 +282,6 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
                 <Flex
                   gridGap={SPACING.spacing4}
                   alignItems={ALIGN_CENTER}
-                  whiteSpace="nowrap"
                   marginLeft={`-${SPACING.spacing4}`}
                 >
                   <Icon name="ot-spinner" spin size="1rem" />
