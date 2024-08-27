@@ -9,6 +9,7 @@ import sys
 import os
 from typing import Dict, Tuple, Any, List
 from statistics import mean, StatisticsError
+from datetime import datetime
 
 
 def determine_lifetime(abr_google_sheet: Any) -> None:
@@ -116,11 +117,18 @@ def compare_run_to_temp_data(
             for recording in temp_data:
                 temp_robot = recording["Robot"]
                 if len(recording["Timestamp"]) > 1:
-                    timestamp = recording["Timestamp"]
+                    try:
+                        timestamp_str = recording["Timestamp"].split(".")[0]
+                    except ValueError:
+                        timestamp_str = recording["Timestamp"]
+                    try:
+                        timestamp = datetime.strptime(timestamp_str, "%m/%d/%Y %H:%M:%S")
+                    except ValueError:
+                        timestamp = datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M:%S")
                     if (
                         temp_robot == run["Robot"]
-                        and timestamp >= run["Start_Time"]
-                        and timestamp <= run["End_Time"]
+                        and timestamp >= datetime.strptime(run["Start_Time"], "%m/%d/%Y %H:%M:%S") 
+                        and timestamp <= datetime.strptime(run["End_Time"], "%m/%d/%Y %H:%M:%S")
                     ):
                         temps.append(float(recording["Temp (oC)"]))
                         rel_hums.append(float(recording["Relative Humidity (%)"]))
