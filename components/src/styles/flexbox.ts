@@ -32,8 +32,19 @@ export const WRAP = 'wrap'
 export const NO_WRAP = 'nowrap'
 export const WRAP_REVERSE = 'wrap-reverse'
 
+// white-space
 export const WHITE_SPACE_NORMAL = 'normal'
 export const WHITE_SPACE_PRE = 'pre'
 export const WHITE_SPACE_PRE_WRAP = 'pre-wrap'
 export const WHITE_SPACE_PRE_LINE = 'pre-line'
 export const WHITE_SPACE_BREAK_SPACES = 'break-spaces'
+
+// cursor
+export const CURSOR_AUTO = 'auto'
+export const CURSOR_CROSSHAIR = 'crosshair'
+export const CURSOR_DEFAULT = 'default'
+export const CURSOR_GRAB = 'grab'
+export const CURSOR_HELP = 'help'
+export const CURSOR_NOT_ALLOWED = 'not-allowed'
+export const CURSOR_POINTER = 'pointer'
+export const CURSOR_ZOOM_IN = 'zoom-in'
