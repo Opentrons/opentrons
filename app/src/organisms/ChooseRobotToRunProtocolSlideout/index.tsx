@@ -65,7 +65,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
   const [selectedRobot, setSelectedRobot] = React.useState<Robot | null>(null)
   const { trackCreateProtocolRunEvent } = useTrackCreateProtocolRunEvent(
     storedProtocolData,
-    selectedRobot?.name ?? '' as
+    selectedRobot?.name ?? ''
   )
   const runTimeParameters =
     storedProtocolData.mostRecentAnalysis?.runTimeParameters ?? []
