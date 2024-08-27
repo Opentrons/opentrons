@@ -52,7 +52,7 @@ class PublisherNotifier:
                             f'PublisherNotifier: exception in callback {getattr(callback, "__name__", "<unknown>")}'
                         )
         except BaseException:
-            LOG.exception(f"PublisherNotifer notify task failed")
+            LOG.exception("PublisherNotifer notify task failed")
 
 
 _pe_publisher_notifier_accessor: AppStateAccessor[PublisherNotifier] = AppStateAccessor[
