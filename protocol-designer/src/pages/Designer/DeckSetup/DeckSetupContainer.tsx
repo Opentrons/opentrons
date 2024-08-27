@@ -1,12 +1,10 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
 import {
   COLORS,
   DeckFromLayers,
   Flex,
   FlexTrash,
-  PrimaryButton,
   RobotCoordinateSpaceWithRef,
   SingleSlotFixture,
   SlotLabels,
@@ -39,11 +37,7 @@ import type {
   AdditionalEquipmentEntity,
   DeckSlot,
 } from '@opentrons/step-generation'
-
-interface OpenSlot {
-  cutoutId: CutoutId
-  slot: DeckSlot
-}
+import type { OpenSlot } from '../index'
 
 const WASTE_CHUTE_SPACE = 30
 const OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
@@ -60,19 +54,24 @@ const OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
 const lightFill = COLORS.grey35
 const darkFill = COLORS.grey60
 
-export function DeckSetupContainer(): JSX.Element {
+interface DeckSetupContainerProps {
+  setZoomInOnSlot: React.Dispatch<React.SetStateAction<OpenSlot | null>>
+  zoomIn: OpenSlot | null
+}
+
+export function DeckSetupContainer(
+  props: DeckSetupContainerProps
+): JSX.Element {
+  const { setZoomInOnSlot, zoomIn } = props
   const selectedTerminalItemId = useSelector(getSelectedTerminalItemId)
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
   const _disableCollisionWarnings = useSelector(getDisableModuleRestrictions)
   const robotType = useSelector(getRobotType)
   const deckDef = React.useMemo(() => getDeckDefFromRobotType(robotType), [])
   const [hover, setHover] = React.useState<DeckSlot | null>(null)
-  const [zoomIn, setZoomInOnSlot] = React.useState<OpenSlot | null>(null)
   const trash = Object.values(activeDeckSetup.additionalEquipmentOnDeck).find(
     ae => ae.name === 'trashBin'
   )
-
-  const navigate = useNavigate()
 
   const addEquipment = (slotId: string): void => {
     const cutoutId =
@@ -131,13 +130,6 @@ export function DeckSetupContainer(): JSX.Element {
   )
   return (
     <>
-      <PrimaryButton
-        onClick={() => {
-          navigate('/overview')
-        }}
-      >
-        exit
-      </PrimaryButton>
       {zoomIn != null ? (
         //  TODO(ja, 8/6/24): still need to develop the zoomed in slot
         <DeckSetupTools
@@ -149,6 +141,7 @@ export function DeckSetupContainer(): JSX.Element {
         />
       ) : (
         <Flex
+          backgroundColor={COLORS.white}
           maxWidth={robotType === FLEX_ROBOT_TYPE ? '130vw' : '100vw'}
           width="100%"
           maxHeight="120vh"

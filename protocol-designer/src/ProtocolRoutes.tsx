@@ -54,7 +54,7 @@ export function ProtocolRoutes(): JSX.Element {
 
   return (
     <>
-      <NavigationBar routes={pdRoutes} />
+      <NavigationBar />
       <Kitchen>
         <Box width="100%">
           <LabwareUploadModal />

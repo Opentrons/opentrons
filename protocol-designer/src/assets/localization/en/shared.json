@@ -22,11 +22,13 @@
   "invalid_json_file_body": "This JSON file is either missing required information or contains sections that Protocol Designer cannot read. At this time we do not support JSON files created outside of Protocol Designer.",
   "invalid_json_file_error": "Error message:",
   "invalid_json_file": "Invalid JSON file",
+  "heatershakermoduletype": "Heater-shaker Module",
   "labware_name_conflict": "Duplicate labware name",
   "labware": "Labware",
   "left_right": "Left+Right",
   "left": "Left",
   "liquid": "Liquid",
+  "magneticmoduletype": "Magnetic Module",
   "migration_header": "Your protocol was made in an older version of Protocol Designer",
   "migrations": {
     "noBehaviorChange": {
@@ -91,6 +93,8 @@
   "stagingArea": "Staging area",
   "step_count": "Step {{current}}",
   "step": "Step {{current}} / {{max}}",
+  "temperaturemoduletype": "Temperature Module",
+  "thermocyclermoduletype": "Thermocycler Module",
   "trashBin": "Trash Bin",
   "uses_standard_namespace": "Opentrons verified labware",
   "version": "Version # {{version}}",

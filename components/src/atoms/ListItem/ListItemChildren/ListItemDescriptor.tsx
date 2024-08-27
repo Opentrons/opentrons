@@ -29,8 +29,13 @@ export const ListItemDescriptor = (
           : SPACING.spacing12
       }
     >
-      <Flex width={type === 'mini' ? FLEX_AUTO : '40%'}>{description}</Flex>
-      {content}
+      <Flex
+        flex={type === 'default' && '1'}
+        width={type === 'mini' ? FLEX_AUTO : '40%'}
+      >
+        {description}
+      </Flex>
+      <Flex flex={type === 'default' && '1.95'}>{content}</Flex>
     </Flex>
   )
 }
