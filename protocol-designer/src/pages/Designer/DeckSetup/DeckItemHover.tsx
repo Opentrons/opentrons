@@ -20,8 +20,6 @@ import { SlotOverflowMenu } from './SlotOverflowMenu'
 
 import type { CoordinateTuple, Dimensions } from '@opentrons/shared-data'
 import type { TerminalItemId } from '../../../steplist'
-import { createPortal } from 'react-dom'
-import { getTopPortalEl } from '../../../components/portals/TopPortal'
 
 interface DeckItemHoverProps {
   addEquipment: (slotId: string) => void
@@ -58,8 +56,6 @@ export function DeckItemHover(props: DeckItemHoverProps): JSX.Element | null {
 
   const hoverOpacity =
     (hover != null && hover === itemId) || showMenuList ? '1' : '0'
-
-  const svgRef = React.useRef(null)
 
   return (
     <>

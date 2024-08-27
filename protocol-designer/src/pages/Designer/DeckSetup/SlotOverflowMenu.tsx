@@ -18,7 +18,7 @@ import {
   deleteContainer,
   duplicateLabware,
 } from '../../../labware-ingred/actions'
-import type { DeckSlotId, Dimensions } from '@opentrons/shared-data'
+import type { DeckSlotId } from '@opentrons/shared-data'
 import type { ThunkDispatch } from '../../../types'
 
 interface SlotOverflowMenuProps {

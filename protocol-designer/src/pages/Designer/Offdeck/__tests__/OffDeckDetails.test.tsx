@@ -10,7 +10,7 @@ import { getRobotType } from '../../../../file-data/selectors'
 import { getDeckSetupForActiveItem } from '../../../../top-selectors/labware-locations'
 import { getAllWellContentsForActiveItem } from '../../../../top-selectors/well-contents'
 import { OffDeckDetails } from '../OffDeckDetails'
-import { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type * as Components from '@opentrons/components'
 
 vi.mock('../../../../top-selectors/labware-locations')
