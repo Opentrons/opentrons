@@ -20,6 +20,8 @@ import { SlotOverflowMenu } from './SlotOverflowMenu'
 
 import type { CoordinateTuple, Dimensions } from '@opentrons/shared-data'
 import type { TerminalItemId } from '../../../steplist'
+import { createPortal } from 'react-dom'
+import { getTopPortalEl } from '../../../components/portals/TopPortal'
 
 interface DeckItemHoverProps {
   addEquipment: (slotId: string) => void
@@ -54,10 +56,35 @@ export function DeckItemHover(props: DeckItemHoverProps): JSX.Element | null {
   )
     return null
 
-  const hoverOpacity = hover != null && hover === itemId ? '1' : '0'
+  const hoverOpacity =
+    (hover != null && hover === itemId) || showMenuList ? '1' : '0'
+
+  const svgRef = React.useRef(null)
 
   return (
     <>
+      {showMenuList ? (
+        <RobotCoordsForeignDiv
+          x={slotPosition[0] + 50}
+          y={slotPosition[1] - 160}
+          width="172px"
+          height="180px"
+          innerDivProps={{
+            style: {
+              position: POSITION_ABSOLUTE,
+              transform: 'rotate(180deg) scaleX(-1)',
+              zIndex: 5,
+            },
+          }}
+        >
+          <SlotOverflowMenu
+            slot={itemId}
+            addEquipment={addEquipment}
+            setShowMenuList={setShowMenuList}
+          />
+        </RobotCoordsForeignDiv>
+      ) : null}
+
       <RobotCoordsForeignDiv
         x={slotPosition[0]}
         y={slotPosition[1]}
@@ -110,16 +137,6 @@ export function DeckItemHover(props: DeckItemHoverProps): JSX.Element | null {
             </StyledText>
           </a>
         </Flex>
-
-        {showMenuList ? (
-          <SlotOverflowMenu
-            slot={itemId}
-            addEquipment={addEquipment}
-            setShowMenuList={setShowMenuList}
-            xSlotPosition={slotPosition[0]}
-            ySlotPosition={slotPosition[1]}
-          />
-        ) : null}
       </RobotCoordsForeignDiv>
     </>
   )
