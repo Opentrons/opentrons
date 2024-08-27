@@ -30,7 +30,7 @@ div.document .highlight-none, .mi, .literal {
 }
 
 div.document {
-    padding-top: 150px;
+    padding-top: 96px;
     margin-top: 0;
     font-family: "Public Sans", "sans-serif";
 }
@@ -92,6 +92,14 @@ div.document {
     position: relative;
 }
 
+div.documentwrapper {
+    float: none;
+}
+
+div.body {
+    padding-top: 1rem;
+}
+
 a:hover {
     color: inherit;
     text-decoration: inherit;
@@ -99,10 +107,6 @@ a:hover {
 
 div.body a {
     color: #006FFF;
-}
-
-div.documentwrapper {
-    float: none;
 }
 
 /* Don't allow inline items try to clear themselves below the sidebar */
@@ -113,14 +117,14 @@ pre, div[class*="highlight-"], blockquote, blockquote::after, div.admonition::af
 /* Sticky, scrolling sidebar. Height calc leaves room for header. */
 div.sphinxsidebar {
     position: sticky;
-    top: 150px;
+    top: 96px;
     align-self: flex-start;
-    max-height: calc(100vh - 150px);
+    max-height: calc(100vh - 96px);
     overflow-y: auto;
 }
 
 div.sphinxsidebarwrapper {
-    padding-top: 6px;
+    padding-top: 1rem;
 }
 
 /* Hide the redundant 'description' tagline */
