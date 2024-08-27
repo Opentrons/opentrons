@@ -103,8 +103,8 @@ export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
               zDimension: dimensions.zDimension ?? 0,
             }
             return (
-              <Flex flexDirection={DIRECTION_COLUMN}>
-                <Flex width="9.5625rem" height="6.375rem" key={lw.id}>
+              <Flex flexDirection={DIRECTION_COLUMN} key={lw.id}>
+                <Flex width="9.5625rem" height="6.375rem">
                   <RobotWorkSpace
                     key={lw.id}
                     viewBox={`${definition.cornerOffsetFromSlot.x} ${definition.cornerOffsetFromSlot.y} ${dimensions.xDimension} ${dimensions.yDimension}`}
