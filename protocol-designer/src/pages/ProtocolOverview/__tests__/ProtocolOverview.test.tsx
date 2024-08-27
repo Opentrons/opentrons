@@ -97,7 +97,7 @@ describe('ProtocolOverview', () => {
     render()
     const button = screen.getByRole('button', { name: 'Edit protocol' })
     fireEvent.click(button)
-    expect(mockNavigate).toHaveBeenCalledWith('/startingDeckState')
+    expect(mockNavigate).toHaveBeenCalledWith('/designer')
   })
 
   it('renders the file sidebar and exports with blocking hint for exporting', () => {

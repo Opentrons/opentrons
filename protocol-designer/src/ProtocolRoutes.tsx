@@ -6,7 +6,6 @@ import { ProtocolOverview } from './pages/ProtocolOverview'
 import { Liquids } from './pages/Liquids'
 import { Designer } from './pages/Designer'
 import { CreateNewProtocolWizard } from './pages/CreateNewProtocolWizard'
-import { StartingDeckState } from './pages/StartingDeckState'
 import { NavigationBar } from './NavigationBar'
 import {
   Kitchen,
@@ -41,12 +40,6 @@ const pdRoutes: RouteProps[] = [
     name: 'Create new protocol',
     navLinkTo: '/createNew',
     path: '/createNew',
-  },
-  {
-    Component: StartingDeckState,
-    name: 'Starting DeckState',
-    navLinkTo: '/startingDeckState',
-    path: '/startingDeckState',
   },
 ]
 

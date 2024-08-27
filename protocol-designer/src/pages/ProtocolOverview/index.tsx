@@ -197,7 +197,7 @@ export function ProtocolOverview(): JSX.Element {
             <LargeButton
               buttonText={t('edit_protocol')}
               onClick={() => {
-                navigate('/startingDeckState')
+                navigate('/designer')
               }}
               whiteSpace="nowrap"
             />
@@ -370,7 +370,8 @@ export function ProtocolOverview(): JSX.Element {
                 data-testid="toDeckSetup"
                 textDecoration={TYPOGRAPHY.textDecorationUnderline}
                 onClick={() => {
-                  navigate('/designer')
+                  // ToDo (kk:08/27/2024) wire up material list modal
+                  console.log('open material list modal')
                 }}
               >
                 <StyledText desktopStyle="bodyDefaultRegular">
