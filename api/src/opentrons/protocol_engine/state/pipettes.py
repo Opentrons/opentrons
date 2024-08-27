@@ -326,7 +326,6 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         if isinstance(action, SucceedCommandAction) and isinstance(
             action.command.result,
             (
-                commands.BlowOutResult,
                 commands.TouchTipResult,
                 commands.LiquidProbeResult,
                 commands.TryLiquidProbeResult,
@@ -445,7 +444,6 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 commands.MoveRelativeResult,
                 commands.MoveToAddressableAreaResult,
                 commands.MoveToAddressableAreaForDropTipResult,
-                commands.BlowOutResult,
                 commands.TouchTipResult,
             ),
         ):

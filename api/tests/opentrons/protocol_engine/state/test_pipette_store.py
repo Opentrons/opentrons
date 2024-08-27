@@ -446,22 +446,6 @@ def test_blow_out_clears_volume(
 @pytest.mark.parametrize(
     ("action", "expected_location"),
     (
-        (
-            SucceedCommandAction(
-                command=create_blow_out_command(
-                    pipette_id="pipette-id",
-                    labware_id="move-to-well-labware-id",
-                    well_name="move-to-well-well-name",
-                    flow_rate=1.23,
-                ),
-                private_result=None,
-            ),
-            CurrentWell(
-                pipette_id="pipette-id",
-                labware_id="move-to-well-labware-id",
-                well_name="move-to-well-well-name",
-            ),
-        ),
         # liquidProbe and tryLiquidProbe succeeding and with overpressure error
         (
             SucceedCommandAction(
@@ -915,16 +899,6 @@ def test_add_pipette_config(
 @pytest.mark.parametrize(
     "action",
     (
-        SucceedCommandAction(
-            command=create_blow_out_command(
-                pipette_id="pipette-id",
-                labware_id="labware-id",
-                well_name="well-name",
-                flow_rate=1.23,
-                destination=DeckPoint(x=11, y=22, z=33),
-            ),
-            private_result=None,
-        ),
         SucceedCommandAction(
             command=create_touch_tip_command(
                 pipette_id="pipette-id",
