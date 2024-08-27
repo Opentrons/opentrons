@@ -448,60 +448,6 @@ def test_blow_out_clears_volume(
     (
         (
             SucceedCommandAction(
-                command=create_aspirate_command(
-                    pipette_id="pipette-id",
-                    labware_id="aspirate-labware-id",
-                    well_name="aspirate-well-name",
-                    volume=1337,
-                    flow_rate=1.23,
-                ),
-                private_result=None,
-            ),
-            CurrentWell(
-                pipette_id="pipette-id",
-                labware_id="aspirate-labware-id",
-                well_name="aspirate-well-name",
-            ),
-        ),
-        (
-            FailCommandAction(
-                running_command=cmd.Aspirate(
-                    params=cmd.AspirateParams(
-                        pipetteId="pipette-id",
-                        labwareId="aspirate-labware-id",
-                        wellName="aspirate-well-name",
-                        volume=99999,
-                        flowRate=1.23,
-                    ),
-                    id="command-id",
-                    key="command-key",
-                    createdAt=datetime.now(),
-                    status=cmd.CommandStatus.RUNNING,
-                ),
-                error=DefinedErrorData(
-                    public=OverpressureError(
-                        id="error-id",
-                        createdAt=datetime.now(),
-                        errorInfo={"retryLocation": (0, 0, 0)},
-                    ),
-                    private=OverpressureErrorInternalData(
-                        position=DeckPoint(x=0, y=0, z=0)
-                    ),
-                ),
-                command_id="command-id",
-                error_id="error-id",
-                failed_at=datetime.now(),
-                notes=[],
-                type=ErrorRecoveryType.WAIT_FOR_RECOVERY,
-            ),
-            CurrentWell(
-                pipette_id="pipette-id",
-                labware_id="aspirate-labware-id",
-                well_name="aspirate-well-name",
-            ),
-        ),
-        (
-            SucceedCommandAction(
                 command=create_dispense_command(
                     pipette_id="pipette-id",
                     labware_id="dispense-labware-id",
@@ -1023,48 +969,6 @@ def test_add_pipette_config(
 @pytest.mark.parametrize(
     "action",
     (
-        SucceedCommandAction(
-            command=create_aspirate_command(
-                pipette_id="pipette-id",
-                labware_id="labware-id",
-                well_name="well-name",
-                volume=1337,
-                flow_rate=1.23,
-                destination=DeckPoint(x=11, y=22, z=33),
-            ),
-            private_result=None,
-        ),
-        FailCommandAction(
-            running_command=cmd.Aspirate(
-                params=cmd.AspirateParams(
-                    pipetteId="pipette-id",
-                    labwareId="labware-id",
-                    wellName="well-name",
-                    volume=99999,
-                    flowRate=1.23,
-                ),
-                id="command-id",
-                key="command-key",
-                createdAt=datetime.now(),
-                status=cmd.CommandStatus.RUNNING,
-            ),
-            error=DefinedErrorData(
-                public=OverpressureError(
-                    id="error-id",
-                    detail="error-detail",
-                    createdAt=datetime.now(),
-                    errorInfo={"retryLocation": (11, 22, 33)},
-                ),
-                private=OverpressureErrorInternalData(
-                    position=DeckPoint(x=11, y=22, z=33)
-                ),
-            ),
-            command_id="command-id",
-            error_id="error-id",
-            failed_at=datetime.now(),
-            notes=[],
-            type=ErrorRecoveryType.WAIT_FOR_RECOVERY,
-        ),
         SucceedCommandAction(
             command=create_dispense_command(
                 pipette_id="pipette-id",

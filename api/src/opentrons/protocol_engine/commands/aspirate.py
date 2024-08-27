@@ -6,7 +6,6 @@ from typing_extensions import Literal
 
 from .pipetting_common import (
     OverpressureError,
-    OverpressureErrorInternalData,
     PipetteIdMixin,
     AspirateVolumeMixin,
     FlowRateMixin,
@@ -25,6 +24,7 @@ from ..errors.error_occurrence import ErrorOccurrence
 
 from opentrons.hardware_control import HardwareControlAPI
 
+from ..state.update_types import StateUpdate
 from ..types import WellLocation, WellOrigin, CurrentWell, DeckPoint
 
 if TYPE_CHECKING:
@@ -53,7 +53,7 @@ class AspirateResult(BaseLiquidHandlingResult, DestinationPositionResult):
 
 _ExecuteReturn = Union[
     SuccessData[AspirateResult, None],
-    DefinedErrorData[OverpressureError, OverpressureErrorInternalData],
+    DefinedErrorData[OverpressureError, None],
 ]
 
 
@@ -92,6 +92,7 @@ class AspirateImplementation(AbstractCommandImpl[AspirateParams, _ExecuteReturn]
         )
 
         current_well = None
+        state_update = StateUpdate()
 
         if not ready_to_aspirate:
             await self._movement.move_to_well(
@@ -118,6 +119,13 @@ class AspirateImplementation(AbstractCommandImpl[AspirateParams, _ExecuteReturn]
             well_location=params.wellLocation,
             current_well=current_well,
         )
+        deck_point = DeckPoint.construct(x=position.x, y=position.y, z=position.z)
+        state_update.set_pipette_location(
+            pipette_id=pipette_id,
+            new_labware_id=labware_id,
+            new_well_name=well_name,
+            new_deck_point=deck_point,
+        )
 
         try:
             volume_aspirated = await self._pipetting.aspirate_in_place(
@@ -140,21 +148,17 @@ class AspirateImplementation(AbstractCommandImpl[AspirateParams, _ExecuteReturn]
                     ],
                     errorInfo={"retryLocation": (position.x, position.y, position.z)},
                 ),
-                private=OverpressureErrorInternalData(
-                    position=DeckPoint.construct(
-                        x=position.x, y=position.y, z=position.z
-                    )
-                ),
+                private=None,
+                state_update=state_update,
             )
         else:
             return SuccessData(
                 public=AspirateResult(
                     volume=volume_aspirated,
-                    position=DeckPoint.construct(
-                        x=position.x, y=position.y, z=position.z
-                    ),
+                    position=deck_point,
                 ),
                 private=None,
+                state_update=state_update,
             )
 
 

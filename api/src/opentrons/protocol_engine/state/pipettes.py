@@ -326,7 +326,6 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         if isinstance(action, SucceedCommandAction) and isinstance(
             action.command.result,
             (
-                commands.AspirateResult,
                 commands.DispenseResult,
                 commands.BlowOutResult,
                 commands.TouchTipResult,
@@ -343,9 +342,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             isinstance(action.error, DefinedErrorData)
             and (
                 (
-                    isinstance(
-                        action.running_command, (commands.Aspirate, commands.Dispense)
-                    )
+                    isinstance(action.running_command, commands.Dispense)
                     and isinstance(action.error.public, OverpressureError)
                 )
                 or (
@@ -453,7 +450,6 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 commands.MoveRelativeResult,
                 commands.MoveToAddressableAreaResult,
                 commands.MoveToAddressableAreaForDropTipResult,
-                commands.AspirateResult,
                 commands.DispenseResult,
                 commands.BlowOutResult,
                 commands.TouchTipResult,
@@ -470,7 +466,6 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             and isinstance(
                 action.running_command,
                 (
-                    commands.Aspirate,
                     commands.Dispense,
                     commands.AspirateInPlace,
                     commands.DispenseInPlace,
