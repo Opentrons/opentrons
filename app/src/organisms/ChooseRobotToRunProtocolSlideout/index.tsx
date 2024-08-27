@@ -203,9 +203,9 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
     first(srcFileNames) ??
     protocolKey
 
-  // intentionally show both robot types if analysis has any error
+  // intentionally show both robot types if analysis fails
   const robotType =
-    mostRecentAnalysis != null && mostRecentAnalysis.errors.length === 0
+    mostRecentAnalysis != null && mostRecentAnalysis.result !== 'not-ok'
       ? mostRecentAnalysis?.robotType ?? null
       : null
 
