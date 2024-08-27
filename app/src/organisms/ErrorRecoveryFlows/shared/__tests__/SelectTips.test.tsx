@@ -49,7 +49,10 @@ describe('SelectTips', () => {
           channels: 8,
         },
       } as any,
-      failedLabwareUtils: { selectedTipLocations: { A1: null } } as any,
+      failedLabwareUtils: {
+        selectedTipLocations: { A1: null },
+        areTipsSelected: true,
+      } as any,
     }
 
     vi.mocked(TipSelectionModal).mockReturnValue(
@@ -143,7 +146,10 @@ describe('SelectTips', () => {
   it('disables the primary button if tips are not selected', () => {
     props = {
       ...props,
-      failedLabwareUtils: { selectedTipLocations: null } as any,
+      failedLabwareUtils: {
+        selectedTipLocations: null,
+        areTipsSelected: false,
+      } as any,
     }
 
     render(props)

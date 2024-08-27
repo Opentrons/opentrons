@@ -76,7 +76,7 @@ export function SelectTips(props: RecoveryContentProps): JSX.Element | null {
         </TwoColumn>
         <RecoveryFooterButtons
           primaryBtnOnClick={primaryBtnOnClick}
-          primaryBtnDisabled={failedLabwareUtils.selectedTipLocations == null}
+          primaryBtnDisabled={!failedLabwareUtils.areTipsSelected}
           secondaryBtnOnClick={goBackPrevStep}
           primaryBtnTextOverride={t('pick_up_tips')}
           {...buildTertiaryBtnProps()}

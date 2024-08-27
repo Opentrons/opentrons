@@ -24,7 +24,10 @@ describe('TipSelectionModal', () => {
       ...mockRecoveryContentProps,
       allowTipSelection: true,
       toggleModal: vi.fn(),
-      failedLabwareUtils: { selectedTipLocations: { A1: null } } as any,
+      failedLabwareUtils: {
+        selectedTipLocations: { A1: null },
+        areTipsSelected: true,
+      } as any,
     }
 
     vi.mocked(TipSelection).mockReturnValue(<div>MOCK TIP SELECTION</div>)
@@ -46,7 +49,7 @@ describe('TipSelectionModal', () => {
   it('prevents from users from exiting the modal if no well(s) are selected', () => {
     props = {
       ...props,
-      failedLabwareUtils: { selectedTipLocations: null } as any,
+      failedLabwareUtils: { areTipsSelected: false } as any,
     }
 
     render(props)

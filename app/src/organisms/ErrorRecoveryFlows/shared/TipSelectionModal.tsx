@@ -17,12 +17,10 @@ export function TipSelectionModal(
   props: TipSelectionModalProps
 ): JSX.Element | null {
   const { isOnDevice, toggleModal, failedLabwareUtils } = props
-  const { selectedTipLocations } = failedLabwareUtils
+  const { areTipsSelected } = failedLabwareUtils
   const { t } = useTranslation('error_recovery')
 
   // If users end up in a state in which they deselect all wells, don't let them escape this modal.
-  const areTipsSelected = selectedTipLocations != null
-
   const modalHeader: ModalHeaderBaseProps = {
     title: t('change_tip_pickup_location'),
     hasExitIcon: areTipsSelected,
